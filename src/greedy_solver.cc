@@ -23,8 +23,8 @@ void GreedySolver::__GreedilySatisfySet(RequestSet::Ptr prs) {
   std::vector<Node::Ptr>::iterator req_it = nodes.begin();
   
   while( (match <= target) && (req_it != nodes.end()) ) {
-    std::vector<Arc::Ptr>& arcs = graph_->node_arc_map[*req_it];
-    std::vector<Arc::Ptr>::iterator arc_it = arcs.begin();
+    std::vector<Arc>& arcs = graph_->node_arc_map[*req_it];
+    std::vector<Arc>::iterator arc_it = arcs.begin();
     
     while( (match <= target) && (arc_it != arcs.end()) ) {
       double remain = target - match;

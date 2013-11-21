@@ -46,10 +46,10 @@ cyclus::ExchangeGraph SetUp2(double qty, double unit_cap_req,
   
   Node::Ptr u(new Node());
   Node::Ptr v(new Node());
-  Arc::Ptr a(new Arc(u, v));
+  Arc a(u, v);
 
-  u->unit_capacities[a.get()].push_back(unit_cap_req);
-  v->unit_capacities[a.get()].push_back(unit_cap_sup);
+  u->unit_capacities[a].push_back(unit_cap_req);
+  v->unit_capacities[a].push_back(unit_cap_sup);
   
   RequestSet::Ptr request(new RequestSet(qty));
   request->capacities.push_back(qty);
@@ -80,13 +80,13 @@ cyclus::ExchangeGraph SetUp3(double qty, double cap1, double cap2) {
   Node::Ptr u(new Node());
   Node::Ptr v(new Node());
   Node::Ptr w(new Node());
-  Arc::Ptr a1(new Arc(u, v));
-  Arc::Ptr a2(new Arc(u, w));
+  Arc a1(u, v);
+  Arc a2(u, w);
 
-  u->unit_capacities[a1.get()].push_back(1);
-  v->unit_capacities[a1.get()].push_back(1);
-  u->unit_capacities[a2.get()].push_back(1);
-  w->unit_capacities[a2.get()].push_back(1);
+  u->unit_capacities[a1].push_back(1);
+  v->unit_capacities[a1].push_back(1);
+  u->unit_capacities[a2].push_back(1);
+  w->unit_capacities[a2].push_back(1);
 
   RequestSet::Ptr request(new RequestSet(qty));
   request->capacities.push_back(qty);
@@ -124,13 +124,13 @@ cyclus::ExchangeGraph SetUp4(double qty1, double qty2, double cap) {
   Node::Ptr v1(new Node());
   Node::Ptr w(new Node());
   Node::Ptr v2(new Node());
-  Arc::Ptr a1(new Arc(u, v1));
-  Arc::Ptr a2(new Arc(w, v2));
+  Arc a1(u, v1);
+  Arc a2(w, v2);
 
-  u->unit_capacities[a1.get()].push_back(1);
-  v1->unit_capacities[a1.get()].push_back(1);
-  w->unit_capacities[a2.get()].push_back(1);
-  v2->unit_capacities[a2.get()].push_back(1);
+  u->unit_capacities[a1].push_back(1);
+  v1->unit_capacities[a1].push_back(1);
+  w->unit_capacities[a2].push_back(1);
+  v2->unit_capacities[a2].push_back(1);
 
   RequestSet::Ptr req1(new RequestSet(qty1));
   req1->capacities.push_back(qty1);
@@ -169,13 +169,13 @@ cyclus::ExchangeGraph SetUp5(double qty, double cap1, double cap2) {
   Node::Ptr u2(new Node());
   Node::Ptr v(new Node());
   Node::Ptr w(new Node());
-  Arc::Ptr a1(new Arc(u1, v));
-  Arc::Ptr a2(new Arc(u2, w));
+  Arc a1(u1, v);
+  Arc a2(u2, w);
 
-  u1->unit_capacities[a1.get()].push_back(1);
-  v->unit_capacities[a1.get()].push_back(1);
-  u2->unit_capacities[a2.get()].push_back(1);
-  w->unit_capacities[a2.get()].push_back(1);
+  u1->unit_capacities[a1].push_back(1);
+  v->unit_capacities[a1].push_back(1);
+  u2->unit_capacities[a2].push_back(1);
+  w->unit_capacities[a2].push_back(1);
 
   RequestSet::Ptr request(new RequestSet(qty));
   request->capacities.push_back(qty);
@@ -219,19 +219,19 @@ cyclus::ExchangeGraph SetUp6(double qty1, double qty2,
   Node::Ptr v1_2(new Node());
   Node::Ptr v2_1(new Node());
   Node::Ptr v2_2(new Node());
-  Arc::Ptr a1(new Arc(u1_1, v1_1));
-  Arc::Ptr a2(new Arc(u1_2, v2_1));
-  Arc::Ptr a3(new Arc(u2_1, v1_2));
-  Arc::Ptr a4(new Arc(u2_2, v2_2));
+  Arc a1(u1_1, v1_1);
+  Arc a2(u1_2, v2_1);
+  Arc a3(u2_1, v1_2);
+  Arc a4(u2_2, v2_2);
 
-  u1_1->unit_capacities[a1.get()].push_back(1);
-  u1_2->unit_capacities[a2.get()].push_back(1);
-  u2_1->unit_capacities[a3.get()].push_back(1);
-  u2_2->unit_capacities[a4.get()].push_back(1);
-  v1_1->unit_capacities[a1.get()].push_back(1);
-  v1_2->unit_capacities[a3.get()].push_back(1);
-  v2_1->unit_capacities[a2.get()].push_back(1);
-  v2_2->unit_capacities[a4.get()].push_back(1);
+  u1_1->unit_capacities[a1].push_back(1);
+  u1_2->unit_capacities[a2].push_back(1);
+  u2_1->unit_capacities[a3].push_back(1);
+  u2_2->unit_capacities[a4].push_back(1);
+  v1_1->unit_capacities[a1].push_back(1);
+  v1_2->unit_capacities[a3].push_back(1);
+  v2_1->unit_capacities[a2].push_back(1);
+  v2_2->unit_capacities[a4].push_back(1);
 
   RequestSet::Ptr req1(new RequestSet(qty1));
   req1->capacities.push_back(qty1);

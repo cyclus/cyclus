@@ -79,7 +79,7 @@ TEST(ExXlateTests, XlateCapacities) {
 
   Node::Ptr rnode(new Node());
   Node::Ptr bnode(new Node());
-  Arc::Ptr arc(new Arc(rnode, bnode));
+  Arc arc(rnode, bnode);
 
   double rarr[] = {(converter1(mat) / qty1), (converter2(mat) / qty2)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
@@ -88,10 +88,10 @@ TEST(ExXlateTests, XlateCapacities) {
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
       
   TranslateCapacities<Material>(mat, rconstrs, rnode, arc);
-  EXPECT_EQ(rexp, rnode->unit_capacities[arc.get()]);
+  EXPECT_EQ(rexp, rnode->unit_capacities[arc]);
 
   TranslateCapacities<Material>(mat, bconstrs, bnode, arc);
-  EXPECT_EQ(bexp, bnode->unit_capacities[arc.get()]);
+  EXPECT_EQ(bexp, bnode->unit_capacities[arc]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -207,18 +207,18 @@ TEST(ExXlateTests, XlateArc) {
   RequestSet::Ptr rset = xlator.__TranslateRequestPortfolio(rport);
   NodeSet::Ptr bset = xlator.__TranslateBidPortfolio(bport);
 
-  Arc::Ptr a = xlator.__TranslateArc(bid);
+  Arc a = xlator.__TranslateArc(bid);
 
-  EXPECT_EQ(xlator.bid_to_node_[bid], a->vnode);
-  EXPECT_EQ(xlator.request_to_node_[req], a->unode);
+  EXPECT_EQ(xlator.bid_to_node_[bid], a.second);
+  EXPECT_EQ(xlator.request_to_node_[req], a.first);
 
   double barr[] = {(converter1(mat) / qty1), (converter2(mat) / qty2)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
-  EXPECT_EQ(bexp, a->vnode->unit_capacities[a.get()]);
+  EXPECT_EQ(bexp, a.second->unit_capacities[a]);
       
   double rarr[] = {(converter1(mat) / qty1)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
-  EXPECT_EQ(rexp, a->unode->unit_capacities[a.get()]);
+  EXPECT_EQ(rexp, a.first->unit_capacities[a]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -279,8 +279,8 @@ TEST(ExXlateTests, BackXlate) {
   xlator.__AddBid(vb, v);
   xlator.__AddBid(yb, y);
   
-  Arc::Ptr a(new Arc(u, v));
-  Arc::Ptr b(new Arc(x, y));
+  Arc a(u, v);
+  Arc b(x, y);
 
   double qty = 2.5; // some magic numbers
   double aqty = qty * 0.1;

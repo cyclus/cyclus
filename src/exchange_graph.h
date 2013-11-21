@@ -10,7 +10,11 @@
 namespace cyclus {
 
 class NodeSet;
-class Arc;
+class Node;
+
+/// @brief by convention, arc.first == request node (unode), arc.second == bid
+/// node (vnode)
+typedef std::pair< boost::shared_ptr<Node>, boost::shared_ptr<Node> > Arc;
 
 /// @brief Nodes are used in ExchangeGraphs to house information about a given
 /// translated Bid or Request. Specifically, Nodes have a notion of unit
@@ -19,10 +23,10 @@ class Arc;
 struct Node {
  public:
   typedef boost::shared_ptr<Node> Ptr;
-
+  
   Node();
   
-  std::map<const Arc*, std::vector<double> > unit_capacities;
+  std::map<Arc, std::vector<double> > unit_capacities;
 
   NodeSet* set;
 };
@@ -37,7 +41,7 @@ bool operator==(const Node& lhs, const Node& rhs);
 class NodeSet {
  public:
   typedef boost::shared_ptr<NodeSet> Ptr;
-
+  
   std::vector<Node::Ptr> nodes;
   std::vector<double> capacities;
 
@@ -58,22 +62,11 @@ class RequestSet : public NodeSet {
   double qty;
 };
 
-struct Arc {
- public:
-  typedef boost::shared_ptr<Arc> Ptr;
-
-  Arc(Node::Ptr unode, Node::Ptr vnode);
-  
-  Node::Ptr unode;
-  Node::Ptr vnode;
-};
-
 /// @brief the capacity of the arc
 ///
 /// @param a the arc
 /// @return The minimum of the unode and vnode's capacities
 double Capacity(const Arc& a);
-double Capacity(Arc::Ptr pa);
 
 /// @brief the capacity of a node
 ///
@@ -82,16 +75,16 @@ double Capacity(Arc::Ptr pa);
 /// capacities. If the node/node set have no capacities, std::max<double> is
 /// returned.
 double Capacity(Node& n, const Arc& a);
-double Capacity(Node::Ptr pn, Arc::Ptr pa);
+double Capacity(Node::Ptr pn, const Arc& a);
 
 /// @brief updates the capacity of a given node
 ///
 /// @param n the Node
 /// @param qty the quantity for the node to update
 void UpdateCapacity(Node& n, const Arc& a, double qty);
-void UpdateCapacity(Node::Ptr pn, Arc::Ptr pa, double qty);
+void UpdateCapacity(Node::Ptr pn, const Arc& a, double qty);
 
-typedef std::pair<Arc::Ptr, double> Match;
+typedef std::pair<Arc, double> Match;
 
 /// @class ExchangeGraph
 ///
@@ -107,11 +100,11 @@ class ExchangeGraph {
 
   std::vector<RequestSet::Ptr> request_sets;
   std::vector<NodeSet::Ptr> supply_sets;
-  std::map<Node::Ptr, std::vector<Arc::Ptr> > node_arc_map;
+  std::map<Node::Ptr, std::vector<Arc> > node_arc_map;
   std::vector<Match> matches;
 
   /// @brief use the AddArc() api to update arcs_
-  std::vector<Arc::Ptr> arcs_;
+  std::vector<Arc> arcs_;
 
   /// @brief adds a request set to the graph
   void AddRequestSet(RequestSet::Ptr prs);
@@ -120,13 +113,13 @@ class ExchangeGraph {
   void AddSupplySet(NodeSet::Ptr prs);
   
   /// @brief adds an arc to the graph
-  void AddArc(Arc::Ptr pa);
+  void AddArc(const Arc& a);
 
   /// @brief adds a match for a quanity of flow along an arc
   ///
   /// @param pa the arc corresponding to a match
   /// @param qty the amount of flow corresponding to a match
-  void AddMatch(Arc::Ptr pa, double qty);
+  void AddMatch(const Arc& a, double qty);
 };
   
 } // namespace cyclus

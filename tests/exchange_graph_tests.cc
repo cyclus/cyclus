@@ -34,7 +34,7 @@ TEST(ExGraphTests, ReqSets) {
 TEST(ExGraphTests, NodeCapThrow) {
   Node::Ptr m(new Node());
   Node::Ptr n(new Node());
-  Arc::Ptr a(new Arc(m, n));
+  Arc a(m, n);
   EXPECT_THROW(Capacity(m, a), cyclus::StateError);
 }
 
@@ -42,7 +42,7 @@ TEST(ExGraphTests, NodeCapThrow) {
 TEST(ExGraphTests, NodeNoCap) {
   Node::Ptr m(new Node());
   Node::Ptr n(new Node());
-  Arc::Ptr a(new Arc(m, n));
+  Arc a(m, n);
   
   NodeSet uset;
   uset.AddNode(m);
@@ -55,8 +55,8 @@ TEST(ExGraphTests, NodeCaps1) {
   double ncap = 1.0;
   Node::Ptr m(new Node());
   Node::Ptr n(new Node());
-  Arc::Ptr a(new Arc(m, n));
-  n->unit_capacities[a.get()].push_back(ncap);
+  Arc a(m, n);
+  n->unit_capacities[a].push_back(ncap);
 
   double scap = 1.5;
   NodeSet s;
@@ -88,8 +88,8 @@ TEST(ExGraphTests, NodeCaps2) {
 
   Node::Ptr m(new Node());
   Node::Ptr n(new Node());
-  Arc::Ptr a(new Arc(m, n));
-  n->unit_capacities[a.get()] = ucaps;
+  Arc a(m, n);
+  n->unit_capacities[a] = ucaps;
 
   NodeSet s;
   s.capacities = caps;
@@ -107,7 +107,7 @@ TEST(ExGraphTests, NodeCaps2) {
 TEST(ExGraphTests, NodeUpdateThrow1) {
   Node::Ptr m(new Node());
   Node::Ptr n(new Node());
-  Arc::Ptr a(new Arc(m, n));
+  Arc a(m, n);
 
   double qty = 5;
   EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::StateError);  
@@ -123,8 +123,8 @@ TEST(ExGraphTests, NodeUpdateThrow2) {
   
   Node::Ptr m(new Node());
   Node::Ptr n(new Node());
-  Arc::Ptr a(new Arc(m, n));
-  n->unit_capacities[a.get()].push_back(unit);
+  Arc a(m, n);
+  n->unit_capacities[a].push_back(unit);
 
   NodeSet s;
   s.capacities.push_back(cap);
@@ -141,10 +141,10 @@ TEST(ExGraphTests, ArcCap) {
   Node::Ptr u(new Node());
   
   Node::Ptr v(new Node());
-  Arc::Ptr a(new Arc(u, v));
+  Arc a(u, v);
   
-  u->unit_capacities[a.get()].push_back(uval);
-  v->unit_capacities[a.get()].push_back(vval);
+  u->unit_capacities[a].push_back(uval);
+  v->unit_capacities[a].push_back(vval);
   
   NodeSet uset;
   uset.AddNode(u);
@@ -168,7 +168,7 @@ TEST(ExGraphTests, ArcCap) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, AddReqSet) {
-  RequestSet::Ptr prs = RequestSet::Ptr(new RequestSet());
+  RequestSet::Ptr prs(new RequestSet());
   ExchangeGraph g;
   g.AddRequestSet(prs);
   EXPECT_EQ(g.request_sets[0], prs);
@@ -176,7 +176,7 @@ TEST(ExGraphTests, AddReqSet) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, AddSuppSet) {
-  NodeSet::Ptr pss = NodeSet::Ptr(new NodeSet());
+  NodeSet::Ptr pss(new NodeSet());
   ExchangeGraph g;
   g.AddSupplySet(pss);
   EXPECT_EQ(g.supply_sets[0], pss);
@@ -186,13 +186,13 @@ TEST(ExGraphTests, AddSuppSet) {
 TEST(ExGraphTests, AddArc1) {
   ExchangeGraph g;
   
-  Node::Ptr u = Node::Ptr(new Node());  
-  Node::Ptr v = Node::Ptr(new Node());
+  Node::Ptr u(new Node());  
+  Node::Ptr v(new Node());
 
-  Arc::Ptr a = Arc::Ptr(new Arc(u, v));
+  Arc a(u, v);
 
-  Arc::Ptr arr[] = {a};
-  vector<Arc::Ptr> exp (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+  Arc arr[] = {a};
+  vector<Arc> exp (arr, arr + sizeof(arr) / sizeof(arr[0]) );
 
   g.AddArc(a);
   EXPECT_EQ(exp, g.node_arc_map[u]);
@@ -203,26 +203,26 @@ TEST(ExGraphTests, AddArc1) {
 TEST(ExGraphTests, AddArc2) {
   ExchangeGraph g;
   
-  Node::Ptr u = Node::Ptr(new Node());
-  Node::Ptr v = Node::Ptr(new Node());
-  Node::Ptr w = Node::Ptr(new Node());
-  Node::Ptr x = Node::Ptr(new Node());
+  Node::Ptr u(new Node());
+  Node::Ptr v(new Node());
+  Node::Ptr w(new Node());
+  Node::Ptr x(new Node());
 
-  Arc::Ptr a1 = Arc::Ptr(new Arc(u, v));
-  Arc::Ptr a2 = Arc::Ptr(new Arc(u, w));
-  Arc::Ptr a3 = Arc::Ptr(new Arc(x, w));
+  Arc a1(u, v);
+  Arc a2(u, w);
+  Arc a3(x, w);
 
-  Arc::Ptr arru[] = {a1, a2};
-  vector<Arc::Ptr> expu (arru, arru + sizeof(arru) / sizeof(arru[0]) );
+  Arc arru[] = {a1, a2};
+  vector<Arc> expu (arru, arru + sizeof(arru) / sizeof(arru[0]) );
   
-  Arc::Ptr arrv[] = {a1};
-  vector<Arc::Ptr> expv (arrv, arrv + sizeof(arrv) / sizeof(arrv[0]) );
+  Arc arrv[] = {a1};
+  vector<Arc> expv (arrv, arrv + sizeof(arrv) / sizeof(arrv[0]) );
   
-  Arc::Ptr arrw[] = {a2, a3};
-  vector<Arc::Ptr> expw (arrw, arrw + sizeof(arrw) / sizeof(arrw[0]) );
+  Arc arrw[] = {a2, a3};
+  vector<Arc> expw (arrw, arrw + sizeof(arrw) / sizeof(arrw[0]) );
   
-  Arc::Ptr arrx[] = {a3};
-  vector<Arc::Ptr> expx (arrx, arrx + sizeof(arrx) / sizeof(arrx[0]) );
+  Arc arrx[] = {a3};
+  vector<Arc> expx (arrx, arrx + sizeof(arrx) / sizeof(arrx[0]) );
 
   g.AddArc(a1);
   g.AddArc(a2);
@@ -240,21 +240,21 @@ TEST(ExGraphTests, AddMatch) {
 
   double uval = 1.0;
   double vval = 0.5;
-  Node::Ptr u = Node::Ptr(new Node());  
-  Node::Ptr v = Node::Ptr(new Node());
-  Arc::Ptr a = Arc::Ptr(new Arc(u, v));
+  Node::Ptr u(new Node());  
+  Node::Ptr v(new Node());
+  Arc a(u, v);
   
-  u->unit_capacities[a.get()].push_back(uval);
-  v->unit_capacities[a.get()].push_back(vval);
+  u->unit_capacities[a].push_back(uval);
+  v->unit_capacities[a].push_back(vval);
   
   double large = 500;
   
-  NodeSet::Ptr uset = NodeSet::Ptr(new NodeSet());
+  NodeSet::Ptr uset(new NodeSet());
   uset->AddNode(u);
   double ucap = uval * 500;
   uset->capacities.push_back(ucap);
   
-  NodeSet::Ptr vset = NodeSet::Ptr(new NodeSet());
+  NodeSet::Ptr vset(new NodeSet());
   vset->AddNode(v);
   double vcap = vval * 500;
   vset->capacities.push_back(vcap);

@@ -25,18 +25,10 @@ void NodeSet::AddNode(Node::Ptr node) {
 RequestSet::RequestSet(double qty) : qty(qty) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Arc::Arc(Node::Ptr unode, Node::Ptr vnode) : unode(unode), vnode(vnode) { }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a) {
-  double ucap = Capacity(*a.unode.get(), a);
-  double vcap = Capacity(*a.vnode.get(), a);
+  double ucap = Capacity(a.first, a);
+  double vcap = Capacity(a.second, a);
   return std::min(ucap, vcap);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(Arc::Ptr pa) {
-  return Capacity(*pa.get());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -45,11 +37,11 @@ double Capacity(Node& n, const Arc& a) {
     throw cyclus::StateError("An notion of node capacity requires a nodeset.");
   }
 
-  if (n.unit_capacities[&a].size() == 0) {
+  if (n.unit_capacities[a].size() == 0) {
     return std::numeric_limits<double>::max();
   }
 
-  std::vector<double>& unit_caps = n.unit_capacities[&a];
+  std::vector<double>& unit_caps = n.unit_capacities[a];
   const std::vector<double>& set_caps = n.set->capacities;
   std::vector<double> caps;
   for (int i = 0; i < unit_caps.size(); i++) {
@@ -60,8 +52,8 @@ double Capacity(Node& n, const Arc& a) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(Node::Ptr pn, Arc::Ptr pa) {
-  return Capacity(*pn.get(), *pa.get());
+double Capacity(Node::Ptr pn, const Arc& a) {
+  return Capacity(*pn.get(), a);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,7 +66,7 @@ void UpdateCapacity(Node& n, const Arc& a, double qty) {
     throw cyclus::StateError("An notion of node capacity requires a nodeset.");
   }
   
-  vector<double>& unit_caps = n.unit_capacities[&a];
+  vector<double>& unit_caps = n.unit_capacities[a];
   vector<double>& caps = n.set->capacities;
   for (int i = 0; i < caps.size(); i++) {
     double val = caps[i] - qty * unit_caps[i];
@@ -84,8 +76,8 @@ void UpdateCapacity(Node& n, const Arc& a, double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void UpdateCapacity(Node::Ptr pn, Arc::Ptr pa, double qty) {
-  return UpdateCapacity(*pn.get(), *pa.get(), qty);
+void UpdateCapacity(Node::Ptr pn, const Arc& a, double qty) {
+  return UpdateCapacity(*pn.get(), a, qty);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,17 +91,17 @@ void ExchangeGraph::AddSupplySet(NodeSet::Ptr pss) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ExchangeGraph::AddArc(Arc::Ptr pa) {
-  arcs_.push_back(pa);
-  node_arc_map[pa->unode].push_back(pa);
-  node_arc_map[pa->vnode].push_back(pa);
+void ExchangeGraph::AddArc(const Arc& a) {
+  arcs_.push_back(a);
+  node_arc_map[a.first].push_back(a);
+  node_arc_map[a.second].push_back(a);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ExchangeGraph::AddMatch(Arc::Ptr pa, double qty) {
-  UpdateCapacity(pa->unode, pa, qty);
-  UpdateCapacity(pa->vnode, pa, qty);
-  matches.push_back(std::make_pair(pa, qty));
+void ExchangeGraph::AddMatch(const Arc& a, double qty) {
+  UpdateCapacity(a.first, a, qty);
+  UpdateCapacity(a.second, a, qty);
+  matches.push_back(std::make_pair(a, qty));
 }
 
 } // namespace cyclus
