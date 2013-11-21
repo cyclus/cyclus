@@ -13,14 +13,14 @@
 
 #include "bid_portfolio.h" 
 
-using std::string;
+using cyclus::Bid;
+using cyclus::BidPortfolio;
 using cyclus::CapacityConstraint;
 using cyclus::KeyError;
 using cyclus::Request;
-using cyclus::Bid;
-using cyclus::BidPortfolio;
 using cyclus::Resource;
 using cyclus::TestContext;
+using std::string;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BidPortfolioTests: public ::testing::Test {

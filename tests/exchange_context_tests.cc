@@ -4,28 +4,28 @@
 #include <set>
 #include <vector>
 
+#include "bid.h"
+#include "bid_portfolio.h"
 #include "mock_facility.h"
 #include "request.h"
 #include "request_portfolio.h"
-#include "bid.h"
-#include "bid_portfolio.h"
 #include "resource.h"
+#include "resource_helpers.h"
 #include "test_context.h"
 #include "trader.h"
-#include "resource_helpers.h"
 
 #include "exchange_context.h"
 
-using std::string;
 using std::set;
+using std::string;
 using std::vector;
 
-using cyclus::ExchangeContext;
-using cyclus::Request;
-using cyclus::RequestPortfolio;
 using cyclus::Bid;
 using cyclus::BidPortfolio;
+using cyclus::ExchangeContext;
 using cyclus::PrefMap;
+using cyclus::Request;
+using cyclus::RequestPortfolio;
 using cyclus::Resource;
 using cyclus::TestContext;
 using cyclus::Trader;

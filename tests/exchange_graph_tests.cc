@@ -5,13 +5,13 @@
 
 #include "exchange_graph.h"
 
-using std::vector;
 using cyclus::Arc;
+using cyclus::ExchangeGraph;
+using cyclus::Match;
 using cyclus::Node;
 using cyclus::NodeSet;
 using cyclus::RequestSet;
-using cyclus::ExchangeGraph;
-using cyclus::Match;
+using std::vector;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, NodeSets) {

@@ -7,19 +7,19 @@
 #include "facility_model.h"
 #include "generic_resource.h"
 #include "material.h"
-#include "test_context.h"
 #include "mock_facility.h"
 #include "request.h"
+#include "test_context.h"
 
 #include "bid.h"
 
-using std::string;
+using cyclus::Bid;
 using cyclus::Composition;
 using cyclus::GenericResource;
 using cyclus::Material;
 using cyclus::Request;
-using cyclus::Bid;
 using cyclus::TestContext;
+using std::string;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, MaterialGetSet) {

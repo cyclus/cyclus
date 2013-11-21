@@ -6,11 +6,11 @@
 #include "mock_facility.h"
 #include "timer.h"
 
-using cyclus::Timer;
-using cyclus::Model;
-using cyclus::Trader;
-using cyclus::EventManager;
 using cyclus::Context;
+using cyclus::EventManager;
+using cyclus::Model;
+using cyclus::Timer;
+using cyclus::Trader;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ContextTests: public ::testing::Test {

@@ -6,10 +6,10 @@
 
 using cyclus::ExchangeGraph;
 using cyclus::GreedySolver;
+using cyclus::Match;
 using cyclus::Node;
 using cyclus::NodeSet;
 using cyclus::RequestSet;
-using cyclus::Match;
 
 /* --- */
 // Case 0:

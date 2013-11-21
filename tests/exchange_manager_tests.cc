@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 
+#include "greedy_solver.h"
 #include "material.h"
 #include "test_context.h"
-#include "greedy_solver.h"
 
 #include "exchange_manager.h"
 
-using cyclus::TestContext;
-using cyclus::GreedySolver;
 using cyclus::ExchangeManager;
+using cyclus::GreedySolver;
 using cyclus::Material;
+using cyclus::TestContext;
 
 TEST(ExManagerTests, NullTest) {
   TestContext tc;

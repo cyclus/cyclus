@@ -6,33 +6,33 @@
 
 #include "resource_exchange.h"
 
-#include "composition.h"
-#include "test_context.h"
-#include "request.h"
-#include "request_portfolio.h"
 #include "bid.h"
 #include "bid_portfolio.h"
-#include "mock_facility.h"
-#include "material.h"
-#include "model.h"
-#include "facility_model.h"
+#include "composition.h"
 #include "exchange_context.h"
+#include "facility_model.h"
+#include "material.h"
+#include "mock_facility.h"
+#include "model.h"
+#include "request.h"
+#include "request_portfolio.h"
+#include "test_context.h"
 
-using std::set;
-using std::string;
+using cyclus::Bid;
+using cyclus::BidPortfolio;
 using cyclus::Composition;
 using cyclus::Context;
 using cyclus::ExchangeContext;
 using cyclus::FacilityModel;
 using cyclus::Material;
 using cyclus::Model;
-using cyclus::TestContext;
+using cyclus::PrefMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
-using cyclus::Bid;
-using cyclus::BidPortfolio;
 using cyclus::ResourceExchange;
-using cyclus::PrefMap;
+using cyclus::TestContext;
+using std::set;
+using std::string;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Requester: public MockFacility {

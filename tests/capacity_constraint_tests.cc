@@ -14,14 +14,14 @@
 
 #include "capacity_constraint.h"
 
-using std::string;
 using cyclus::CapacityConstraint;
-using cyclus::Composition;
 using cyclus::CompMap;
+using cyclus::Composition;
 using cyclus::GenericResource;
 using cyclus::Material;
 using cyclus::Resource;
 using cyclus::TestContext;
+using std::string;
 
 static double fraction = 0.5;
 static int u235 = 92235;

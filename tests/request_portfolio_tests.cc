@@ -11,13 +11,13 @@
 #include "mock_facility.h"
 #include "request.h"
 #include "resource.h"
-#include "test_context.h"
 #include "resource_helpers.h"
+#include "test_context.h"
 
 #include "request_portfolio.h"
 
-using std::string;
 using std::set;
+using std::string;
 
 using cyclus::CapacityConstraint;
 using cyclus::GenericResource;

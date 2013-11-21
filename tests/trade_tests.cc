@@ -1,23 +1,23 @@
 #include <gtest/gtest.h>
 
-#include "material.h"
-#include "test_context.h"
-#include "mock_facility.h"
-#include "context.h"
-#include "model.h"
-#include "trade.h"
-#include "resource_helpers.h"
-#include "request.h"
 #include "bid.h"
-#include "trader_management.h"
+#include "context.h"
 #include "error.h"
+#include "material.h"
+#include "mock_facility.h"
+#include "model.h"
+#include "request.h"
+#include "resource_helpers.h"
+#include "test_context.h"
+#include "trade.h"
+#include "trader_management.h"
 
-using cyclus::TestContext;
+using cyclus::Bid;
 using cyclus::Context;
 using cyclus::Material;
-using cyclus::Trade;
 using cyclus::Request;
-using cyclus::Bid;
+using cyclus::TestContext;
+using cyclus::Trade;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Sender : public MockFacility {
