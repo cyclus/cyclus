@@ -5,7 +5,9 @@
 
 namespace cyclus {
 
-/// A CapacityConstraint provides an ability to determine an agent's
+/// @class CapacityConstraint
+///
+/// @brief A CapacityConstraint provides an ability to determine an agent's
 /// constraints on resource allocation given a capacity.
 template <class T>
 struct CapacityConstraint {
@@ -21,9 +23,9 @@ struct CapacityConstraint {
   double (*converter)(boost::shared_ptr<T>);
 
   /// @return a unique id for the constraint
-  const int id() const {return id_;};
+  int id() const {return id_;};
 
- private:
+  /* -------------------- private methods and members ----------------------- */  
   int id_;
   static int next_id_;
 };

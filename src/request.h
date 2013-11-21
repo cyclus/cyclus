@@ -19,7 +19,10 @@ template <class T> class RequestPortfolio;
 /// A Request is templated its resource.
 template <class T>
 struct Request {
+ public:
   typedef boost::shared_ptr< Request<T> > Ptr;
+
+  Request() : id_(next_id_++) { };
   
   /// @return the commodity associated with this request
   std::string commodity;
@@ -39,27 +42,30 @@ struct Request {
   /// @return a unique id for the request
   const int id() const {return id_;};
 
- private:
+  /* -------------------- private methods and members -------------------------- */
   int id_;
   static int next_id_;
-
 };
 
 template<class T> int Request<T>::next_id_ = 0;
 
+/// @brief equality operator
 template<class T>
-bool operator==(const Request<T>& lhs, const Request<T>& rhs) {
+inline bool operator==(const Request<T>& lhs,
+                       const Request<T>& rhs) {
   return  ((lhs.commodity == rhs.commodity) &&
            (lhs.target == rhs.target) &&
            (DoubleEq(lhs.preference, rhs.preference)) &&
            (lhs.requester == rhs.requester));
 }
 
+/// @brief comparison operator, allows usage in ordered containers
 template<class T>
-std::ostream& operator<<(std::ostream& os, const Request<T>& r) {
-  os << "Request for: " << r.commodity;
-  return os;
+inline bool operator<(const cyclus::Request<T>& lhs,
+                      const cyclus::Request<T>& rhs) {
+  return  (lhs.id() < rhs.id());
 };
+
 } // namespace cyclus
 
 #endif

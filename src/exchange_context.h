@@ -14,7 +14,6 @@
 
 namespace cyclus {
 
-// work around for template typedefs
 template <class T>
 struct PrefMap {
   typedef std::map< typename Request<T>::Ptr,
@@ -70,78 +69,82 @@ class ExchangeContext {
 
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Bid<T>::Ptr pb = *it;
-      AddBid(pb);
+      __AddBid(pb);
     }
   }
 
-  /// @brief 
+  /// @return all known request portfolios
   inline const std::vector< RequestPortfolio<T> >& requests() const {
     return requests_;
   }
   
-  /// @brief 
+  /// @return all known requesters
   inline const std::set<Trader*>& requesters() const {return requesters_;}
 
-  /// @brief 
+  /// @return all known bid portfolios
   inline const std::vector< BidPortfolio<T> >& bids() const {return bids_;}
 
-  /// @brief 
+  /// @return all known bidders
   inline const std::set<Trader*>& bidders() const {return bidders_;}
   
-  /// @brief 
+  /// @return all known requests for a given commodity
+  /// @param commod the commodity
   inline const std::vector< typename Request<T>::Ptr >&
       RequestsForCommod(std::string commod) const {
     return requests_by_commod_.at(commod);
   }
-  
-  /// @brief 
   inline const std::vector< typename Request<T>::Ptr >&
       RequestsForCommod(std::string commod) {
     return requests_by_commod_[commod];
   }
   
-  /// @brief 
+  /// @return all known bids for a request
+  /// @param request the request
   inline const std::vector< typename Bid<T>::Ptr >&
       BidsForRequest(typename Request<T>::Ptr request) const {
     return bids_by_request_.at(request);
   }
-  
-  /// @brief 
   inline const std::vector< typename Bid<T>::Ptr >&
       BidsForRequest(typename Request<T>::Ptr request) {
     return bids_by_request_[request];
   }
 
-  /// @brief 
+  /// @return all known preferences for a requester
+  /// @param requester the requester
+  inline typename PrefMap<T>::type& Prefs(Trader* requester) const {
+    return trader_prefs_.at(requester);
+  }
   inline typename PrefMap<T>::type& Prefs(Trader* requester) {
     return trader_prefs_[requester];
   }
 
- private:
-  /// a reference to an exchange's set of requests
+  /* -------------------- private methods and members ----------------------- */
+  /// @brief a reference to an exchange's set of requests
   std::vector< RequestPortfolio<T> > requests_;
 
-  /// a reference to an exchange's set of bids
+  /// @brief a reference to an exchange's set of bids
   std::vector< BidPortfolio<T> > bids_;
 
-  /// known requesters
+  /// @brief known requesters
   std::set<Trader*> requesters_;
   
-  /// known bidders
+  /// @brief known bidders
   std::set<Trader*> bidders_;
   
-  /// maps commodity name to requests for that commodity
+  /// @brief maps commodity name to requests for that commodity
   std::map< std::string, std::vector<typename Request<T>::Ptr> >
       requests_by_commod_;
 
-  /// maps request to all bids for request
+  /// @brief maps request to all bids for request
   std::map< typename Request<T>::Ptr, std::vector<typename Bid<T>::Ptr> >
       bids_by_request_;
 
-  /// maps commodity name to requests for that commodity
-  std::map<Trader* , typename PrefMap<T>::type > trader_prefs_;
+  /// @brief maps commodity name to requests for that commodity
+  std::map< Trader*, typename PrefMap<T>::type > trader_prefs_;
 
-  void AddBid(typename Bid<T>::Ptr pb) {
+  /// @brief adds a bid to the appropriate containers
+  /// @param pb the bid
+  void __AddBid(typename Bid<T>::Ptr pb) {
     bids_by_request_[pb->request].push_back(pb);
 
     trader_prefs_[pb->request->requester][pb->request].push_back(

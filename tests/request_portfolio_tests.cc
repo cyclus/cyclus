@@ -66,9 +66,6 @@ TEST_F(RequestPortfolioTests, ReqAdd){
   ASSERT_EQ(rp.requests()[0], r1);
   EXPECT_THROW(rp.AddRequest(r2), KeyError);
   EXPECT_THROW(rp.AddRequest(r3), KeyError);
-
-  rp.Clear();
-  ASSERT_EQ(rp.requests().size(), 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -79,9 +76,6 @@ TEST_F(RequestPortfolioTests, CapAdd) {
   EXPECT_NO_THROW(rp.AddConstraint(c));
   ASSERT_EQ(rp.constraints().count(c), 1);
   ASSERT_EQ(*rp.constraints().begin(), c);
-
-  rp.Clear();
-  ASSERT_EQ(rp.constraints().size(), 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

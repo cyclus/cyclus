@@ -64,8 +64,6 @@ class ExchangeContextTests: public ::testing::Test {
   };
   
   virtual void TearDown() {
-    rp1.Clear();
-    rp2.Clear();
     delete fac1;
     delete fac2;
   };

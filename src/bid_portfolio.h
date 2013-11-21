@@ -35,61 +35,55 @@ class BidPortfolio {
       : bidder_(NULL),
         commodity_("NO_COMMODITY_SET"),
         id_(next_id_++) { };
-  
-  /// @return the model associated with the portfolio. if no bids have
-  /// been added, the bidder is NULL.
-  Trader* bidder() const {
-    return bidder_;
-  };
-    
-  /// @return the commodity associated with the portfolio. if no bids have
-  /// been added, the commodity is 'NO_COMMODITY_SET'.
-  std::string commodity() const {
-    return commodity_;
-  };
 
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
   /// @throws if a bid is added from a different bidder than the original or if
   /// the bid commodity is different than the original
   void AddBid(const typename Bid<T>::Ptr b) {
-    VerifyResponder(b);
-    VerifyCommodity(b);
+    __VerifyResponder(b);
+    __VerifyCommodity(b);
     bids_.insert(b);
     b->portfolio = this;
+  };
+  
+  /// @return the model associated with the portfolio. if no bids have
+  /// been added, the bidder is NULL.
+  inline Trader* bidder() const {
+    return bidder_;
+  };
+    
+  /// @return the commodity associated with the portfolio. if no bids have
+  /// been added, the commodity is 'NO_COMMODITY_SET'.
+  inline std::string commodity() const {
+    return commodity_;
   };
 
   /// @brief add a capacity constraint associated with the portfolio
   /// @param c the constraint to add
-  void AddConstraint(const CapacityConstraint<T>& c) {
+  inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
   };
 
   /// @return const access to the bids
-  const std::set<typename Bid<T>::Ptr>& bids() const {
+  inline const std::set<typename Bid<T>::Ptr>& bids() const {
     return bids_;
   };
   
   /// @return the set of constraints over the bids
-  const std::set< CapacityConstraint<T> >& constraints() const {
+  inline const std::set< CapacityConstraint<T> >& constraints() const {
     return constraints_;
   };
 
   /// @return a unique id for the constraint
-  const int id() const {return id_;};
+  inline const int id() const {return id_;};
 
-  /// @brief clear all associated containers
-  void Clear() {
-    bids_.clear();
-    constraints_.clear();
-  }
-
- private:
+  /* -------------------- private methods and members -------------------------- */
   /// @brief if the bidder has not been determined yet, it is set. otherwise
   /// VerifyResponder() verifies the the bid is associated with the
   /// portfolio's bidder
   /// @throws if a bid is added from a different bidder than the original
-  void VerifyResponder(const typename Bid<T>::Ptr r) {
+  void __VerifyResponder(const typename Bid<T>::Ptr r) {
     if (bidder_ == NULL) {
       bidder_ = r->bidder;
     } else if (bidder_ != r->bidder) {
@@ -103,7 +97,7 @@ class BidPortfolio {
   /// portfolio's commodity
   /// @throws if a commodity is added that is a different commodity from the
   /// original
-  void VerifyCommodity(const typename Bid<T>::Ptr r) {
+  void __VerifyCommodity(const typename Bid<T>::Ptr r) {
     std::string other = r->request->commodity;
     if (commodity_ == "NO_COMMODITY_SET") {
       commodity_ = other;
@@ -113,11 +107,11 @@ class BidPortfolio {
     }
   };
   
-  /// bid_ is a set because there is a one-to-one correspondance between a
-  /// bid and a request, i.e., bids are unique
+  // bid_ is a set because there is a one-to-one correspondance between a
+  // bid and a request, i.e., bids are unique
   std::set< typename Bid<T>::Ptr > bids_;
 
-  /// constraints_ is a set because constraints are assumed to be unique
+  // constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;
   
   std::string commodity_;
@@ -130,15 +124,15 @@ template<class T> int BidPortfolio<T>::next_id_ = 0;
 
 /// @brief comparison operator, allows usage in ordered containers
 template<class T>
-bool operator<(const BidPortfolio<T>& lhs,
-               const BidPortfolio<T>& rhs) {
+inline bool operator<(const BidPortfolio<T>& lhs,
+                      const BidPortfolio<T>& rhs) {
   return  (lhs.id() < rhs.id());
 };
 
-/// @brief equality operator, allows comparison
+/// @brief equality operator
 template<class T>
-bool operator==(const BidPortfolio<T>& lhs,
-                const BidPortfolio<T>& rhs) {
+inline bool operator==(const BidPortfolio<T>& lhs,
+                       const BidPortfolio<T>& rhs) {
   return  (lhs.bids() == rhs.bids() &&
            lhs.constraints() == rhs.constraints() &&
            lhs.commodity() == rhs.commodity() &&
@@ -147,8 +141,8 @@ bool operator==(const BidPortfolio<T>& lhs,
 
 /// @brief inequality operator
 template<class T>
-bool operator!=(const BidPortfolio<T>& lhs,
-                const BidPortfolio<T>& rhs) {
+inline bool operator!=(const BidPortfolio<T>& lhs,
+                       const BidPortfolio<T>& rhs) {
   return !(lhs == rhs);
 };
 

@@ -10,14 +10,16 @@ namespace cyclus {
 template<class T> class BidPortfolio;
 class Trader;
   
-/// A Bid encapsulates all the information required to
-/// communicate a bid response to a request for a resource, including the
-/// resource bid and the bidder.
+/// @class Bid
+///
+/// @brief A Bid encapsulates all the information required to communicate a bid
+/// response to a request for a resource, including the resource bid and the
+/// bidder.
 template <class T>
 struct Bid {
+ public:
   typedef boost::shared_ptr< Bid<T> > Ptr;
   
-  /// constructor
   Bid() : id_(next_id_++) { };
   
   /// @return the request being responded to
@@ -33,8 +35,9 @@ struct Bid {
   BidPortfolio<T>* portfolio;
   
   /// @return a unique id for the bid
-  const int id() const {return id_;};
+  int id() const {return id_;};
 
+  /* -------------------- private methods and members -------------------------- */
   int id_;
   static int next_id_;
 };
@@ -43,8 +46,8 @@ template<class T> int Bid<T>::next_id_ = 0;
 
 /// @brief equality operator
 template<class T>
-bool operator==(const cyclus::Bid<T>& lhs,
-                const cyclus::Bid<T>& rhs) {
+inline bool operator==(const cyclus::Bid<T>& lhs,
+                       const cyclus::Bid<T>& rhs) {
   return  ((lhs.request == rhs.request) &&
            (lhs.offer == rhs.offer) &&
            (lhs.bidder == rhs.bidder));
@@ -52,8 +55,8 @@ bool operator==(const cyclus::Bid<T>& lhs,
 
 /// @brief comparison operator, allows usage in ordered containers
 template<class T>
-bool operator<(const cyclus::Bid<T>& lhs,
-               const cyclus::Bid<T>& rhs) {
+inline bool operator<(const cyclus::Bid<T>& lhs,
+                      const cyclus::Bid<T>& rhs) {
   return  (lhs.id() < rhs.id());
 };
 
