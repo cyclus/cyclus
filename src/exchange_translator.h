@@ -82,13 +82,13 @@ class ExchangeTranslator {
   std::map<Node::Ptr, typename Bid<T>::Ptr> node_to_bid_;
 
   /// @brief Adds a request-node mapping
-  void __AddRequest(typename Request<T>::Ptr r, Node::Ptr n) {
+  inline void __AddRequest(typename Request<T>::Ptr r, Node::Ptr n) {
     request_to_node_[r] = n;
     node_to_request_[n] = r;
   }
 
   /// @brief Adds a bid-node mapping
-  void __AddBid(typename Bid<T>::Ptr b, Node::Ptr n) {
+  inline void __AddBid(typename Bid<T>::Ptr b, Node::Ptr n) {
     bid_to_node_[b] = n;
     node_to_bid_[n] = b;
   }

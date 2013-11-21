@@ -64,7 +64,9 @@ class ResourceExchange {
     ctx_ = ctx;    
   };
 
-  inline ExchangeContext<T>& ex_ctx() {return ex_ctx_;} 
+  inline ExchangeContext<T>& ex_ctx() {
+    return ex_ctx_;
+  } 
   
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
