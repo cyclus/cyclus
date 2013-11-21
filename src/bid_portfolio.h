@@ -38,7 +38,7 @@ class BidPortfolio {
   
   /// @return the model associated with the portfolio. if no bids have
   /// been added, the bidder is NULL.
-  const Trader* bidder() const {
+  Trader* bidder() const {
     return bidder_;
   };
     

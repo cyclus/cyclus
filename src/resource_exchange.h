@@ -17,14 +17,14 @@
 
 namespace cyclus {
 
+/// @brief Preference adjustment method helpers to convert from templates to the
+/// Model inheritance hierarchy
 template<class T>
 inline static void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) { }
-
 inline static void AdjustPrefs(Model* m,
                                PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
 }
-
 inline static void AdjustPrefs(Model* m,
                                typename PrefMap<GenericResource>::type& prefs) {
   m->AdjustGenRsrcPrefs(prefs);
@@ -45,10 +45,11 @@ inline static void AdjustPrefs(Model* m,
 ///     Preferences for each request-bid pair are set, informing\n
 ///     the evenutal soluation mechanism
 ///
-/// For example, assuming a simulation Context, ctx:
+/// For example, assuming a simulation Context, ctx, and resource type,
+/// ResourceType:
 ///
 /// @code
-/// ResourceExchange exchng(ctx);
+/// ResourceExchange<ResourceType> exchng(ctx);
 /// exchng.AddAllRequests();
 /// exchng.AddAllBids();
 /// exchng.DoAllAdjustments();
@@ -64,10 +65,8 @@ class ResourceExchange {
   };
 
   inline ExchangeContext<T>& ex_ctx() {return ex_ctx_;} 
-
-  inline const ExchangeContext<T>& const_ex_ctx() {return ex_ctx_;} 
   
-  /// @brief queries facilities and collects all requests for bids
+  /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
     std::set<Trader*> traders = ctx_->traders();
     std::for_each(
@@ -77,7 +76,7 @@ class ResourceExchange {
                      this));
   }
   
-  /// @brief queries facilities and collects all requests for bids
+  /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
     std::set<Trader*> traders = ctx_->traders();
     std::for_each(
@@ -89,12 +88,13 @@ class ResourceExchange {
 
   /// @brief adjust preferences for requests given bid responses
   void DoAllAdjustments() {
-    std::set<const Trader*> traders = ex_ctx_.requesters();
+    std::set<Trader*> traders = ex_ctx_.requesters();
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::__DoAdjustment),
-                     this));
+        std::bind1st(
+            std::mem_fun(&cyclus::ResourceExchange<T>::__DoAdjustment),
+            this));
   }
   
   /* -------------------- private methods and members -------------------------- */
@@ -102,29 +102,28 @@ class ResourceExchange {
   ExchangeContext<T> ex_ctx_;
 
   /// @brief queries a given facility model for 
-  void __AddRequests(Trader* f) {
-    std::set< RequestPortfolio<T> > r = QueryRequests<T>(f);
+  void __AddRequests(Trader* t) {
+    std::set< RequestPortfolio<T> > rp = QueryRequests<T>(t);
     typename std::set< RequestPortfolio<T> >::iterator it;
-    for (it = r.begin(); it != r.end(); ++it) {
+    for (it = rp.begin(); it != rp.end(); ++it) {
       ex_ctx_.AddRequestPortfolio(*it);
     }
   };
 
   /// @brief queries a given facility model for 
-  void __AddBids(Trader* f) {
-    std::set< BidPortfolio<T> > r = QueryBids<T>(f, &ex_ctx_);
+  void __AddBids(Trader* t) {
+    std::set< BidPortfolio<T> > bp = QueryBids<T>(t, &ex_ctx_);
     typename std::set< BidPortfolio<T> >::iterator it;
-    for (it = r.begin(); it != r.end(); ++it) {
+    for (it = bp.begin(); it != bp.end(); ++it) {
       ex_ctx_.AddBidPortfolio(*it);
     }
   };
   
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
-  void __DoAdjustment(const Trader* f) {
-    Trader* t = const_cast<Trader*>(f);
+  void __DoAdjustment(Trader* t) {
     typename PrefMap<T>::type& prefs = ex_ctx_.Prefs(t);
-    Model* m = dynamic_cast<Model*>(t);
+    Model* m = t;
     while (m != NULL) {
       AdjustPrefs(m, prefs);
       m = m->parent();
@@ -136,4 +135,3 @@ class ResourceExchange {
 } // namespace cyclus
 
 #endif
-

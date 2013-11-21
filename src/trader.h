@@ -22,14 +22,10 @@ template <class T> class ExchangeContext;
 /// A Trader is a mixin class designed for agents that wish to exchange
 /// resources. It defines the API for the querying of requests, offers, and the
 /// corresponding exchanges.
-/*
 class Trader : virtual public Model {
  public:
-  
   Trader(Context* ctx) : Model(ctx) { };
-*/
-class Trader {
- public:
+
   /// @brief default implementation for material requests
   virtual std::set< RequestPortfolio<Material> > AddMatlRequests() {
     return std::set< RequestPortfolio<Material> >();

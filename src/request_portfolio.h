@@ -37,7 +37,7 @@ class RequestPortfolio {
   
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
-  const Trader* requester() const {
+  Trader* requester() const {
     return requester_;
   };
 

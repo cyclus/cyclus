@@ -80,13 +80,13 @@ class ExchangeContext {
   }
   
   /// @brief 
-  inline const std::set<const Trader*>& requesters() const {return requesters_;}
+  inline const std::set<Trader*>& requesters() const {return requesters_;}
 
   /// @brief 
   inline const std::vector< BidPortfolio<T> >& bids() const {return bids_;}
 
   /// @brief 
-  inline const std::set<const Trader*>& bidders() const {return bidders_;}
+  inline const std::set<Trader*>& bidders() const {return bidders_;}
   
   /// @brief 
   inline const std::vector< typename Request<T>::Ptr >&
@@ -125,10 +125,10 @@ class ExchangeContext {
   std::vector< BidPortfolio<T> > bids_;
 
   /// known requesters
-  std::set<const Trader*> requesters_;
+  std::set<Trader*> requesters_;
   
   /// known bidders
-  std::set<const Trader*> bidders_;
+  std::set<Trader*> bidders_;
   
   /// maps commodity name to requests for that commodity
   std::map< std::string, std::vector<typename Request<T>::Ptr> >
@@ -139,7 +139,7 @@ class ExchangeContext {
       bids_by_request_;
 
   /// maps commodity name to requests for that commodity
-  std::map< const Trader* , typename PrefMap<T>::type > trader_prefs_;
+  std::map<Trader* , typename PrefMap<T>::type > trader_prefs_;
 
   void AddBid(typename Bid<T>::Ptr pb) {
     bids_by_request_[pb->request].push_back(pb);

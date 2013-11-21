@@ -18,6 +18,7 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel(Context* ctx)
     : TimeAgent(ctx),
+      Trader(ctx),
       Model(ctx),
       fac_lifetime_(std::numeric_limits<int>::max()) {
   SetModelType("Facility");

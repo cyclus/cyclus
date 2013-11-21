@@ -187,7 +187,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   EXPECT_EQ(1, rcast->req_ctr_);
   EXPECT_EQ(1, exchng->ex_ctx().requesters().size());
   
-  const ExchangeContext<Material>& ctx = exchng->const_ex_ctx();
+  ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
   std::vector<RequestPortfolio<Material> > vp;
   RequestPortfolio<Material> rp;

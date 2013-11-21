@@ -96,7 +96,7 @@ TEST_F(ExchangeContextTests, AddRequest1) {
   EXPECT_EQ(vr, context.RequestsForCommod(commod1));
 
   EXPECT_EQ(1, context.requesters().size());  
-  std::set<const Trader*> requesters;
+  std::set<Trader*> requesters;
   requesters.insert(fac1);
   EXPECT_EQ(requesters, context.requesters());
 }
@@ -173,7 +173,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
   EXPECT_EQ(vr, context.BidsForRequest(req1));
 
   EXPECT_EQ(1, context.bidders().size());  
-  std::set<const Trader*> bidders;
+  std::set<Trader*> bidders;
   bidders.insert(fac1);
   EXPECT_EQ(bidders, context.bidders());
 
@@ -248,7 +248,7 @@ TEST_F(ExchangeContextTests, AddBid2) {
   EXPECT_EQ(vreq2, context.BidsForRequest(req2));
 
   EXPECT_EQ(2, context.bidders().size());  
-  std::set<const Trader*> bidders;
+  std::set<Trader*> bidders;
   bidders.insert(fac1);
   bidders.insert(fac2);
   EXPECT_EQ(bidders, context.bidders());
