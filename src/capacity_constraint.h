@@ -15,7 +15,6 @@ class CapacityConstraint {
   typedef double (*Converter)(T*);
   
   /// constructor
-  /// CapacityConstraint(double capacity, double (*converter)(T*))
   CapacityConstraint(double capacity, Converter converter)
     : capacity_(capacity),
       converter_(converter),

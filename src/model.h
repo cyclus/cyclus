@@ -192,7 +192,7 @@ class Model {
   /**
      return parent of this model
    */
-  Model* parent();
+  inline Model* parent() const {return parent_;}
 
   /**
      return the parent' id

@@ -177,18 +177,6 @@ void Model::SetParent(Model* parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::parent() {
-  // if parent pointer is null, throw an error
-  // if (parent_ == NULL) {
-  //   std::string null_err = "You have tried to access the parent of " +  \
-  //                          this->name() + " but the parent pointer is NULL.";
-  //   throw ValueError(null_err);
-  // }
-  // else return pointer to parent
-  return parent_;
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddChild(Model* child) {
   if (child == this)
     throw KeyError("Model " + name() +

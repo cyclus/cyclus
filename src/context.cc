@@ -17,18 +17,6 @@ void Context::AddPrototype(std::string name, Model* p) {
   protos_[name] = p;
 }
 
-void Context::RegisterTrader(Trader* e) {
-  traders_.insert(e);
-}
-
-void Context::UnregisterTrader(Trader* e) {
-  traders_.erase(e);
-}
-
-const std::set<Trader*> Context::traders() {
-  return traders_;
-}
-
 void Context::AddRecipe(std::string name, Composition::Ptr c) {
   recipes_[name] = c;
 };

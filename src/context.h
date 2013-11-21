@@ -37,13 +37,19 @@ class Context {
   void AddPrototype(std::string name, Model* m);
 
   /// Registers an agent as a participant in resource exchanges
-  void RegisterTrader(Trader* e);
+  inline void RegisterTrader(Trader* e) {
+    traders_.insert(e);
+  }
 
   /// Unregisters an agent as a participant in resource exchanges
-  void UnregisterTrader(Trader* e);
+  inline void UnregisterTrader(Trader* e) {
+    traders_.erase(e);
+  }
 
   /// @return the current set of facilities in the simulation
-  const std::set<Trader*> traders();
+  inline const std::set<Trader*>& traders() const {
+      return traders_;
+  }
 
   /// Create a new model by cloning the named prototype. The returned model is
   /// not initialized as a simulation participant.

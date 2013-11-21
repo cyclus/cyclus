@@ -31,7 +31,7 @@ struct Node {
   NodeSet* set;
 };
 
-bool operator==(const Node& lhs, const Node& rhs);
+inline bool operator==(const Node& lhs, const Node& rhs);
 
 /// @class NodeSet
 ///
