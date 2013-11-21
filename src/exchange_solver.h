@@ -13,8 +13,13 @@ class ExchangeSolver {
   ExchangeSolver() { };
   explicit ExchangeSolver(ExchangeGraph* g) : graph_(g) { };
   virtual ~ExchangeSolver() { };
+
   void set_graph(ExchangeGraph* graph) {graph_ = graph;}
+
+  /// @brief any solver must implement a Solve() function
   virtual void Solve() = 0;
+
+  /* -------------------- private methods and members ----------------------- */  
   ExchangeGraph* graph_;
 };
 

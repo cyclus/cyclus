@@ -12,7 +12,11 @@ namespace cyclus {
 class NodeSet;
 class Arc;
 
-class Node {
+/// @brief Nodes are used in ExchangeGraphs to house information about a given
+/// translated Bid or Request. Specifically, Nodes have a notion of unit
+/// capacities that the given Bid or Request contribute to the overall capacity
+/// of NodeSet.
+struct Node {
  public:
   typedef boost::shared_ptr<Node> Ptr;
 
@@ -25,6 +29,11 @@ class Node {
 
 bool operator==(const Node& lhs, const Node& rhs);
 
+/// @class NodeSet
+///
+/// @brief A NodeSet is a collection of Nodes, and is the ExchangeGraph
+/// representation of a BidPortfolio or RequestPortfolio. It houses information
+/// about the concrete capacities associated with either portfolio.
 class NodeSet {
  public:
   typedef boost::shared_ptr<NodeSet> Ptr;
@@ -37,6 +46,10 @@ class NodeSet {
   void AddNode(Node::Ptr node);
 };
 
+/// @class RequestSet
+///
+/// @brief A RequestSet is a specific NodeSet with a notion of an total
+/// requested quantity.
 class RequestSet : public NodeSet {
  public:
   typedef boost::shared_ptr<RequestSet> Ptr;
@@ -80,6 +93,14 @@ void UpdateCapacity(Node::Ptr pn, Arc::Ptr pa, double qty);
 
 typedef std::pair<Arc::Ptr, double> Match;
 
+/// @class ExchangeGraph
+///
+/// @brief An ExchangeGraph is a resource-neutral representation of a
+/// ResourceExchange. In general, it is produced via translation by an
+/// ExchangeTranslator. It is comprised of Nodes that are collected into
+/// NodeSets. Arcs are defined, connecting Nodes to each other. An
+/// ExchangeSolver can solve a given instance of an ExchangeGraph, and the
+/// solution is stored on the Graph in the form of Matches.
 class ExchangeGraph {
  public: 
   typedef boost::shared_ptr<ExchangeGraph> Ptr;

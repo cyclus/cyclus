@@ -24,7 +24,13 @@ class GreedySolver: public ExchangeSolver {
   GreedySolver() { };
   explicit GreedySolver(ExchangeGraph* g) : ExchangeSolver(g) { };
   virtual ~GreedySolver() {};
+
+  /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
+  /// RequestSet and matching requests with the minimum bids possible, starting
+  /// from the beginning of the the respective request and bid containers.
   virtual void Solve();
+
+  /* -------------------- private methods and members ----------------------- */  
   void __GreedilySatisfySet(RequestSet::Ptr prs);
 };
 
