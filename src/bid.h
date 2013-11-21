@@ -16,28 +16,44 @@ class Trader;
 /// response to a request for a resource, including the resource bid and the
 /// bidder.
 template <class T>
-struct Bid {
+class Bid {
  public:
   typedef boost::shared_ptr< Bid<T> > Ptr;
   
-  Bid() : id_(next_id_++) { };
+  Bid(typename Request<T>::Ptr request,
+      boost::shared_ptr<T> offer,
+      Trader* bidder)
+    : request_(request),
+      offer_(offer),
+      bidder_(bidder),
+      portfolio_(NULL),
+      id_(next_id_++) { };
   
   /// @return the request being responded to
-  typename Request<T>::Ptr request;
+  inline typename Request<T>::Ptr request() const {return request_;}
 
   /// @return the bid object for the request
-  boost::shared_ptr<T> offer;
+  inline boost::shared_ptr<T> offer() const {return offer_;}
 
   /// @return the model responding the request
-  Trader* bidder;
-
+  inline Trader* bidder() const {return bidder_;}
+  
   /// @return the portfolio of which this bid is a part
-  BidPortfolio<T>* portfolio;
+  inline BidPortfolio<T>* portfolio() {return portfolio_;}
+
+  /// @brief set the portfolio for this bid
+  inline void set_portfolio(BidPortfolio<T>* portfolio) {
+    portfolio_ = portfolio;
+  }
   
   /// @return a unique id for the bid
-  int id() const {return id_;};
+  inline int id() const {return id_;};
 
   /* -------------------- private methods and members -------------------------- */
+  typename Request<T>::Ptr request_;
+  boost::shared_ptr<T> offer_;
+  Trader* bidder_;
+  BidPortfolio<T>* portfolio_;
   int id_;
   static int next_id_;
 };

@@ -145,15 +145,15 @@ class ExchangeTranslator {
   /// @brief translates an arc given a bid and subsequent data, and also
   /// updates the unit capacities for the associated nodes on the arc
   Arc __TranslateArc(typename Bid<T>::Ptr bid) {
-    typename Request<T>::Ptr req = bid->request;
+    typename Request<T>::Ptr req = bid->request();
     
     Node::Ptr unode = request_to_node_[req];
     Node::Ptr vnode = bid_to_node_[bid];
     Arc arc(unode, vnode);
 
-    typename T::Ptr offer = bid->offer;
-    BidPortfolio<T>* bp = bid->portfolio;
-    RequestPortfolio<T>* rp = req->portfolio;
+    typename T::Ptr offer = bid->offer();
+    BidPortfolio<T>* bp = bid->portfolio();
+    RequestPortfolio<T>* rp = req->portfolio();
     
     TranslateCapacities(offer, bp->constraints(), vnode, arc); // bid is v
     TranslateCapacities(offer, rp->constraints(), unode, arc); // req is u

@@ -8,9 +8,9 @@
 #include "error.h"
 #include "facility_model.h"
 #include "generic_resource.h"
+#include "material.h"
 #include "mock_facility.h"
 #include "request.h"
-#include "resource.h"
 #include "resource_helpers.h"
 #include "test_context.h"
 
@@ -22,9 +22,9 @@ using std::string;
 using cyclus::CapacityConstraint;
 using cyclus::GenericResource;
 using cyclus::KeyError;
+using cyclus::Material;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
-using cyclus::Resource;
 using cyclus::TestContext;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,17 +48,13 @@ class RequestPortfolioTests: public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RequestPortfolioTests, ReqAdd){ 
-  Request<Resource>::Ptr r1 = Request<Resource>::Ptr(new Request<Resource>());
-  r1->requester = fac1;
-  r1->target = get_mat();
-  Request<Resource>::Ptr r2 = Request<Resource>::Ptr(new Request<Resource>());
-  r2->requester = fac2; // a different requester
-  r1->target = get_mat();
-  Request<Resource>::Ptr r3 = Request<Resource>::Ptr(new Request<Resource>());
-  r3->requester = fac1;
-  r3->target = get_mat(92235, 150051.0); // some different quantity
+  Request<Material>::Ptr r1(new Request<Material>(get_mat(), fac1));
+  // a different requester
+  Request<Material>::Ptr r2(new Request<Material>(get_mat(), fac2));
+  // some different quantity
+  Request<Material>::Ptr r3(new Request<Material>(get_mat(92235, 150051.0), fac1));
   
-  RequestPortfolio<Resource> rp;
+  RequestPortfolio<Material> rp;
   ASSERT_EQ(rp.requests().size(), 0);
   EXPECT_NO_THROW(rp.AddRequest(r1));
   ASSERT_EQ(rp.requester(), fac1);
@@ -70,9 +66,9 @@ TEST_F(RequestPortfolioTests, ReqAdd){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RequestPortfolioTests, CapAdd) {
-  CapacityConstraint<Resource> c;
+  CapacityConstraint<Material> c;
   
-  RequestPortfolio<Resource> rp;
+  RequestPortfolio<Material> rp;
   EXPECT_NO_THROW(rp.AddConstraint(c));
   ASSERT_EQ(rp.constraints().count(c), 1);
   ASSERT_EQ(*rp.constraints().begin(), c);
@@ -80,20 +76,13 @@ TEST_F(RequestPortfolioTests, CapAdd) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RequestPortfolioTests, Sets) {
-  Request<Resource>::Ptr req1 = Request<Resource>::Ptr(new Request<Resource>());
-  Request<Resource>::Ptr req2 = Request<Resource>::Ptr(new Request<Resource>());
-  RequestPortfolio<Resource> rp1, rp2, rp3;
-  string commod1, commod2;
+  RequestPortfolio<Material> rp1, rp2, rp3;
   
-  commod1 = "1";
-  req1->commodity = commod1;
-  req1->requester = fac1;
-  req1->target = get_mat();
+  std::string commod1 = "1";
+  Request<Material>::Ptr req1(new Request<Material>(get_mat(), fac1, commod1));
   
-  commod2 = "2";
-  req2->commodity = commod2;
-  req2->requester = fac1;
-  req2->target = get_mat();
+  std::string commod2 = "2";
+  Request<Material>::Ptr req2(new Request<Material>(get_mat(), fac1, commod2));
 
   rp1.AddRequest(req1);
     
@@ -110,7 +99,7 @@ TEST_F(RequestPortfolioTests, Sets) {
   EXPECT_NE(rp2.id(), rp3.id());
   EXPECT_NE(rp3.id(), rp1.id());
   
-  set< RequestPortfolio<Resource> > requests;
+  set< RequestPortfolio<Material> > requests;
   EXPECT_EQ(requests.size(), 0);
   EXPECT_EQ(requests.count(rp1), 0);
   EXPECT_EQ(requests.count(rp2), 0);

@@ -48,11 +48,11 @@ class ExchangeContext {
     
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Request<T>::Ptr pr = *it;
-      if (requests_by_commod_.count(pr->commodity) == 0) {
-        requests_by_commod_[pr->commodity] =
+      if (requests_by_commod_.count(pr->commodity()) == 0) {
+        requests_by_commod_[pr->commodity()] =
             std::vector<typename Request<T>::Ptr>();
       }
-      requests_by_commod_[pr->commodity].push_back(pr);
+      requests_by_commod_[pr->commodity()].push_back(pr);
     }
   }
 
@@ -145,10 +145,10 @@ class ExchangeContext {
   /// @brief adds a bid to the appropriate containers
   /// @param pb the bid
   void __AddBid(typename Bid<T>::Ptr pb) {
-    bids_by_request_[pb->request].push_back(pb);
+    bids_by_request_[pb->request()].push_back(pb);
 
-    trader_prefs_[pb->request->requester][pb->request].push_back(
-        std::make_pair(pb, pb->request->preference));
+    trader_prefs_[pb->request()->requester()][pb->request()].push_back(
+        std::make_pair(pb, pb->request()->preference()));
   } 
 };
 

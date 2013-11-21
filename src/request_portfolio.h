@@ -42,13 +42,13 @@ class RequestPortfolio {
     __VerifyRequester(r);
     __VerifyQty(r);
     requests_.push_back(r);
-    r->portfolio = this;
+    r->set_portfolio(this);
   };
 
   /// @brief add a capacity constraint associated with the portfolio, if it
   /// doesn't already exist
   /// @param c the constraint to add
-  void AddConstraint(const CapacityConstraint<T>& c) {
+  inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
   };
     
@@ -78,7 +78,7 @@ class RequestPortfolio {
   };
 
   /// @return a unique id for the constraint
-  inline const int id() const {return id_;};
+  inline int id() const {return id_;};
   
   /* -------------------- private methods and members -------------------------- */
   /// @brief if the requester has not been determined yet, it is set. otherwise
@@ -87,8 +87,8 @@ class RequestPortfolio {
   /// @throws if a request is added from a different requester than the original
   void __VerifyRequester(const typename Request<T>::Ptr r) {
     if (requester_ == NULL) {
-      requester_ = r->requester;
-    } else if (requester_ != r->requester) {
+      requester_ = r->requester();
+    } else if (requester_ != r->requester()) {
       std::string msg = "Insertion error: requesters do not match.";
       throw KeyError(msg);
     }
@@ -99,7 +99,7 @@ class RequestPortfolio {
   /// the portfolio
   /// @throws if a quanityt is different than the original
   void __VerifyQty(const typename Request<T>::Ptr r) {
-    double qty = r->target->quantity();
+    double qty = r->target()->quantity();
     if (qty_ == -1) {
       qty_ = qty;
     } else if (qty_ != qty) {

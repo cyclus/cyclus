@@ -9,6 +9,7 @@
 #include "material.h"
 #include "mock_facility.h"
 #include "request.h"
+#include "resource_helpers.h"
 #include "test_context.h"
 
 #include "bid.h"
@@ -30,16 +31,13 @@ TEST(BidTests, MaterialGetSet) {
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   double qty = 1.0;
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
-  Request<Material>::Ptr req = Request<Material>::Ptr(new Request<Material>());
+  Request<Material>::Ptr req = get_req();
   
-  Bid<Material> r;
-  r.bidder = fac;
-  r.request = req;
-  r.offer = mat;
+  Bid<Material> r(req, mat, fac);
 
-  EXPECT_EQ(fac, r.bidder);
-  EXPECT_EQ(req, r.request);
-  EXPECT_EQ(mat, r.offer);
+  EXPECT_EQ(fac, r.bidder());
+  EXPECT_EQ(req, r.request());
+  EXPECT_EQ(mat, r.offer());
   
   delete fac;
 }
@@ -54,17 +52,15 @@ TEST(BidTests, GenRsrcGetSet) {
 
   GenericResource::Ptr rsrc =
       GenericResource::CreateUntracked(qty, quality, units);
-  Request<GenericResource>::Ptr req =
-      Request<GenericResource>::Ptr(new Request<GenericResource>());
   
-  Bid<GenericResource> r;
-  r.bidder = fac;
-  r.request = req;
-  r.offer = rsrc;
+  Request<GenericResource>::Ptr req(
+      new Request<GenericResource>(rsrc, &helper_trader));
+  
+  Bid<GenericResource> r(req, rsrc, fac);
 
-  EXPECT_EQ(fac, r.bidder);
-  EXPECT_EQ(req, r.request);
-  EXPECT_EQ(rsrc, r.offer);
+  EXPECT_EQ(fac, r.bidder());
+  EXPECT_EQ(req, r.request());
+  EXPECT_EQ(rsrc, r.offer());
   
   delete fac;
 }

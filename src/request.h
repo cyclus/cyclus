@@ -12,37 +12,56 @@ namespace cyclus {
 
 class Trader;
 template <class T> class RequestPortfolio;
-    
-/// A Request encapsulates all the information required to communicate the
-/// needs of an agent in the Dynamic Resource Exchange, including the
+
+/// @class Request
+///
+/// @brief A Request encapsulates all the information required to communicate
+/// the needs of an agent in the Dynamic Resource Exchange, including the
 /// commodity it needs as well as a resource specification for that commodity.
 /// A Request is templated its resource.
 template <class T>
-struct Request {
+class Request {
  public:
   typedef boost::shared_ptr< Request<T> > Ptr;
 
-  Request() : id_(next_id_++) { };
+  Request(boost::shared_ptr<T> target, Trader* requester,
+          std::string commodity = "", double preference = 0)
+    : target_(target),
+      requester_(requester),
+      commodity_(commodity),
+      preference_(preference),
+      portfolio_(NULL),
+      id_(next_id_++) { };
+
+  /// @return this request's target
+  inline boost::shared_ptr<T> target() const {return target_;}
+
+  /// @return the requester associated with this request
+  inline Trader* requester() const {return requester_;}
   
   /// @return the commodity associated with this request
-  std::string commodity;
-
-  /// @return the target resource for this request
-  boost::shared_ptr<T> target;
+  inline std::string commodity() const {return commodity_;}
 
   /// @return the preference value for this request
-  double preference;
-
-  /// @return the model requesting the resource
-  Trader* requester;
-  
-  /// @return the portfolio of which this request is a part
-  RequestPortfolio<T>* portfolio;
+  inline double preference() const {return preference_;}
   
   /// @return a unique id for the request
-  const int id() const {return id_;};
+  inline int id() const {return id_;};
+
+  /// @brief set the portfolio for this request
+  inline void set_portfolio(RequestPortfolio<T>* portfolio) {
+    portfolio_ = portfolio;
+  }
+
+  /// @return the portfolio of which this request is a part
+  inline RequestPortfolio<T>* portfolio() const {return portfolio_;}
 
   /* -------------------- private methods and members -------------------------- */
+  boost::shared_ptr<T> target_;
+  Trader* requester_;
+  double preference_;
+  std::string commodity_;
+  RequestPortfolio<T>* portfolio_;
   int id_;
   static int next_id_;
 };

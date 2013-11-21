@@ -44,7 +44,7 @@ class BidPortfolio {
     __VerifyResponder(b);
     __VerifyCommodity(b);
     bids_.insert(b);
-    b->portfolio = this;
+    b->set_portfolio(this);
   };
   
   /// @return the model associated with the portfolio. if no bids have
@@ -85,8 +85,8 @@ class BidPortfolio {
   /// @throws if a bid is added from a different bidder than the original
   void __VerifyResponder(const typename Bid<T>::Ptr r) {
     if (bidder_ == NULL) {
-      bidder_ = r->bidder;
-    } else if (bidder_ != r->bidder) {
+      bidder_ = r->bidder();
+    } else if (bidder_ != r->bidder()) {
       std::string msg = "Insertion error: bidders do not match.";
       throw KeyError(msg);
     }
@@ -98,7 +98,7 @@ class BidPortfolio {
   /// @throws if a commodity is added that is a different commodity from the
   /// original
   void __VerifyCommodity(const typename Bid<T>::Ptr r) {
-    std::string other = r->request->commodity;
+    std::string other = r->request()->commodity();
     if (commodity_ == "NO_COMMODITY_SET") {
       commodity_ = other;
     } else if (commodity_ != other) {

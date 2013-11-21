@@ -47,17 +47,11 @@ class ExchangeContextTests: public ::testing::Test {
 
     pref = 0.5;
     commod1 = "commod1";
-    req1 = Request<Resource>::Ptr(new Request<Resource>());
-    req1->commodity = commod1;
-    req1->requester = fac1;
-    req1->preference = pref;
-    req1->target = get_mat();
+    req1 = Request<Resource>::Ptr(
+        new Request<Resource>(get_mat(), fac1, commod1, pref));
     
-    req2 = Request<Resource>::Ptr(new Request<Resource>());
-    req2->commodity = commod1;
-    req2->requester = fac2;
-    req2->preference = pref;
-    req2->target = get_mat();
+    req2 = Request<Resource>::Ptr(
+        new Request<Resource>(get_mat(), fac2, commod1, pref));
 
     rp1.AddRequest(req1);    
     rp2.AddRequest(req2);
@@ -122,10 +116,7 @@ TEST_F(ExchangeContextTests, AddRequest2) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ExchangeContextTests, AddRequest3) {
   // 2 requests for 2 commod
-  Request<Resource>::Ptr req = Request<Resource>::Ptr(new Request<Resource>());
-  req->commodity = commod2;
-  req->requester = fac1;
-  req->target = get_mat();
+  Request<Resource>::Ptr req(new Request<Resource>(get_mat(), fac1, commod2));
   rp1.AddRequest(req);
   
   ExchangeContext<Resource> context;
@@ -152,9 +143,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
 
   EXPECT_TRUE(context.BidsForRequest(req1).empty());
   
-  Bid<Resource>::Ptr bid = Bid<Resource>::Ptr(new Bid<Resource>());
-  bid->request = req1;
-  bid->bidder = fac1;
+  Bid<Resource>::Ptr bid(new Bid<Resource>(req1, get_mat(), fac1));
   BidPortfolio<Resource> bp1;
   bp1.AddBid(bid);
 
@@ -176,11 +165,11 @@ TEST_F(ExchangeContextTests, AddBid1) {
   EXPECT_EQ(bidders, context.bidders());
 
   PrefMap<Resource>::type obs;
-  obs[req1].push_back(std::make_pair(bid, req1->preference));
-  EXPECT_EQ(context.Prefs(req1->requester), obs);
+  obs[req1].push_back(std::make_pair(bid, req1->preference()));
+  EXPECT_EQ(context.Prefs(req1->requester()), obs);
   obs.clear();
-  obs[req1].push_back(std::make_pair(bid, req1->preference * 0.1));
-  EXPECT_NE(context.Prefs(req1->requester), obs);
+  obs[req1].push_back(std::make_pair(bid, req1->preference() * 0.1));
+  EXPECT_NE(context.Prefs(req1->requester()), obs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -195,24 +184,16 @@ TEST_F(ExchangeContextTests, AddBid2) {
 
   // bid1 and bid2 are from one bidder (fac1)
   BidPortfolio<Resource> bp1;
-  Bid<Resource>::Ptr bid1 = Bid<Resource>::Ptr(new Bid<Resource>());
-  bid1->request = req1;
-  bid1->bidder = fac1;
+  Bid<Resource>::Ptr bid1(new Bid<Resource>(req1, get_mat(), fac1));
   bp1.AddBid(bid1);
-  Bid<Resource>::Ptr bid2 = Bid<Resource>::Ptr(new Bid<Resource>());
-  bid2->request = req2;
-  bid2->bidder = fac1;
+  Bid<Resource>::Ptr bid2(new Bid<Resource>(req2, get_mat(), fac1));
   bp1.AddBid(bid2);
   
   // bid3 and bid4 are from one bidder (fac2)
   BidPortfolio<Resource> bp2;
-  Bid<Resource>::Ptr bid3 = Bid<Resource>::Ptr(new Bid<Resource>());
-  bid3->request = req1;
-  bid3->bidder = fac2;
+  Bid<Resource>::Ptr bid3(new Bid<Resource>(req1, get_mat(), fac2));
   bp2.AddBid(bid3);
-  Bid<Resource>::Ptr bid4 = Bid<Resource>::Ptr(new Bid<Resource>());
-  bid4->request = req2;
-  bid4->bidder = fac2;
+  Bid<Resource>::Ptr bid4(new Bid<Resource>(req2, get_mat(), fac2));
   bp2.AddBid(bid4);
 
   std::vector<BidPortfolio<Resource> > vp;

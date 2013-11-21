@@ -3,10 +3,13 @@
 
 #include "composition.h"
 #include "material.h"
+#include "test_context.h"
+#include "mock_facility.h"
+#include "request.h"
+#include "bid.h"
 
 /// @brief just some simple helper functions when dealing with resources and
 /// exchanges
-
 static int helper_iso = 92235;
 static double helper_qty = 4.5;
 
@@ -19,6 +22,19 @@ static cyclus::Material::Ptr get_mat(int iso, double qty) {
 
 static cyclus::Material::Ptr get_mat() {
   return get_mat(helper_iso, helper_qty);
+}
+
+static cyclus::TestContext helper_tc;
+static MockFacility helper_trader(helper_tc.get());
+
+static cyclus::Request<cyclus::Material>::Ptr get_req(std::string commod = "") {
+  return cyclus::Request<cyclus::Material>::Ptr(
+      new cyclus::Request<cyclus::Material>(get_mat(), &helper_trader, commod));
+}
+
+static cyclus::Bid<cyclus::Material>::Ptr get_bid() {
+  return cyclus::Bid<cyclus::Material>::Ptr(
+      new cyclus::Bid<cyclus::Material>(get_req(), get_mat(), &helper_trader));
 }
 
 #endif // ifndef CYCLUS_TESTS_RESOURCE_HELPERS_H_

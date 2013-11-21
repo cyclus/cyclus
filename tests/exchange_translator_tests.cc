@@ -96,10 +96,8 @@ TEST(ExXlateTests, XlateCapacities) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateReq) {
-  Material::Ptr mat = get_mat(u235, qty);
-  
-  Request<Material>::Ptr req(new Request<Material>());
-  req->target = mat;
+  Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty),
+                                                   &helper_trader));
   double qty1 = 2.5 * qty;
 
   CapacityConstraint<Material> cc1;
@@ -132,12 +130,8 @@ TEST(ExXlateTests, XlateReq) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateBid) {
-  Material::Ptr mat = get_mat(u235, qty);
-  
-  Request<Material>::Ptr req(new Request<Material>());
-  Bid<Material>::Ptr bid(new Bid<Material>());
-  bid->offer = mat;
-  bid->request = req;
+  Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &helper_trader));
+  Bid<Material>::Ptr bid(new Bid<Material>(req, get_mat(u235, qty), &helper_trader));
   
   double qty1 = 2.5 * qty;
   CapacityConstraint<Material> cc1;
@@ -170,14 +164,10 @@ TEST(ExXlateTests, XlateBid) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateArc) {
   Material::Ptr mat = get_mat(u235, qty);
-  
-  Request<Material>::Ptr req(new Request<Material>());
-  req->target = mat;
-  
-  Bid<Material>::Ptr bid(new Bid<Material>());
-  bid->offer = mat;
-  bid->request = req;
-  
+
+  Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &helper_trader));
+  Bid<Material>::Ptr bid(new Bid<Material>(req, get_mat(u235, qty), &helper_trader));
+    
   double qty1 = 2.5 * qty;
   CapacityConstraint<Material> cc1;
   cc1.capacity = qty1;
@@ -223,19 +213,9 @@ TEST(ExXlateTests, XlateArc) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, SimpleXlate) {
-  TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
-  Material::Ptr mat = get_mat(u235, qty);
-  
-  Request<Material>::Ptr req(new Request<Material>());
-  req->target = mat;
-  req->requester = fac;
-  
-  Bid<Material>::Ptr bid(new Bid<Material>());
-  bid->offer = mat;
-  bid->request = req;
-  bid->bidder = fac;
-  
+  Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &helper_trader));
+  Bid<Material>::Ptr bid(new Bid<Material>(req, get_mat(u235, qty), &helper_trader));
+      
   BidPortfolio<Material> bport;
   bport.AddBid(bid);
 
@@ -255,19 +235,17 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(2, graph->node_arc_map.size());
   EXPECT_EQ(1, graph->arcs_.size());
   EXPECT_EQ(0, graph->matches.size());
-
-  delete fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, BackXlate) {
-  ExchangeContext<Resource> ctx;
-  ExchangeTranslator<Resource> xlator(&ctx);
+  ExchangeContext<Material> ctx;
+  ExchangeTranslator<Material> xlator(&ctx);
   
-  Request<Resource>::Ptr ur(new Request<Resource>());
-  Request<Resource>::Ptr xr(new Request<Resource>());
-  Bid<Resource>::Ptr vb(new Bid<Resource>());
-  Bid<Resource>::Ptr yb(new Bid<Resource>());
+  Request<Material>::Ptr ur(get_req());
+  Request<Material>::Ptr xr(get_req());
+  Bid<Material>::Ptr vb(get_bid());
+  Bid<Material>::Ptr yb(get_bid());
   
   Node::Ptr u(new Node());  
   Node::Ptr v(new Node());
@@ -286,11 +264,11 @@ TEST(ExXlateTests, BackXlate) {
   double aqty = qty * 0.1;
   double bqty = qty * 1.5;
 
-  Trade<Resource> aexp(ur, vb, aqty);
-  Trade<Resource> bexp(xr, yb, bqty);
+  Trade<Material> aexp(ur, vb, aqty);
+  Trade<Material> bexp(xr, yb, bqty);
   
-  Trade<Resource> tarr[] = {aexp, bexp};
-  std::vector< Trade<Resource> > exp(tarr, tarr + sizeof(tarr) / sizeof(tarr[0]));
+  Trade<Material> tarr[] = {aexp, bexp};
+  std::vector< Trade<Material> > exp(tarr, tarr + sizeof(tarr) / sizeof(tarr[0]));
   
   Match amatch(std::make_pair(a, aqty));
   Match bmatch(std::make_pair(b, bqty));
@@ -298,7 +276,7 @@ TEST(ExXlateTests, BackXlate) {
   Match marr[] = {amatch, bmatch};
   std::vector<Match> matches(marr, marr + sizeof(marr) / sizeof(marr[0]));
 
-  std::vector< Trade<Resource> > obs;
+  std::vector< Trade<Material> > obs;
   xlator.BackTranslateSolution(matches, obs);
   EXPECT_EQ(exp, obs);
 }

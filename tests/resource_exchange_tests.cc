@@ -16,6 +16,7 @@
 #include "model.h"
 #include "request.h"
 #include "request_portfolio.h"
+#include "resource_helpers.h"
 #include "test_context.h"
 
 using cyclus::Bid;
@@ -142,16 +143,12 @@ class ResourceExchangeTests: public ::testing::Test {
     mat = Material::CreateUntracked(qty, comp);
 
     
-    req = Request<Material>::Ptr(new Request<Material>());
-    req->commodity = commod;
-    req->preference = pref;
-    req->target = mat;
+    req = Request<Material>::Ptr(
+        new Request<Material>(mat, &helper_trader, commod, pref));
     reqr = new Requester(tc.get(), req);
-    req->requester = reqr;
+    req->requester_ = reqr;
     
-    bid = Bid<Material>::Ptr(new Bid<Material>());
-    bid->request = req;
-    bid->offer = mat;
+    bid = Bid<Material>::Ptr(new Bid<Material>(req, mat, &helper_trader));
 
     exchng = new ResourceExchange<Material>(tc.get());
   };
@@ -210,11 +207,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
   RequestPortfolio<Material> rp;
-  Request<Material>::Ptr req1 = Request<Material>::Ptr(new Request<Material>);
-  req1->commodity = commod;
-  req1->preference = pref;
-  req1->target = mat;
-  req1->requester = reqr;
+  Request<Material>::Ptr req1(new Request<Material>(mat, reqr, commod, pref));
   
   rp.AddRequest(req);
   rp.AddRequest(req1);
@@ -222,9 +215,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   const std::vector<Request<Material>::Ptr>& reqs = ctx.RequestsForCommod(commod);
   EXPECT_EQ(2, reqs.size());  
 
-  Bid<Material>::Ptr bid1 = Bid<Material>::Ptr(new Bid<Material>());
-  bid1->request = req1;
-  bid->offer = mat;
+  Bid<Material>::Ptr bid1(new Bid<Material>(req1, mat, &helper_trader));
   
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(bid);
@@ -232,8 +223,8 @@ TEST_F(ResourceExchangeTests, Bids) {
   
   Bidder* bidr = new Bidder(tc.get(), bids, commod);
 
-  bid->bidder = bidr;
-  bid1->bidder = bidr;
+  bid->bidder_ = bidr;
+  bid1->bidder_ = bidr;
   
   FacilityModel* clone = dynamic_cast<FacilityModel*>(bidr->Clone());
   clone->Deploy(clone);
@@ -279,17 +270,9 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   Requester* ccast = dynamic_cast<Requester*>(child);
 
   // doin a little magic to simulate each requester making their own request
-  Request<Material>::Ptr preq = Request<Material>::Ptr(new Request<Material>());
-  preq->commodity = commod;
-  preq->preference = pref;
-  preq->target = mat;
-  preq->requester = pcast;
+  Request<Material>::Ptr preq(new Request<Material>(mat, pcast, commod, pref));
   pcast->r_ = preq;
-  Request<Material>::Ptr creq = Request<Material>::Ptr(new Request<Material>());
-  creq->commodity = commod;
-  creq->preference = pref;
-  creq->target = mat;
-  creq->requester = ccast;
+  Request<Material>::Ptr creq(new Request<Material>(mat, ccast, commod, pref));
   ccast->r_ = creq;
   
   EXPECT_EQ(0, pcast->req_ctr_);
@@ -324,31 +307,21 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   Requester* ccast = dynamic_cast<Requester*>(child);
 
   // doin a little magic to simulate each requester making their own request
-  Request<Material>::Ptr preq = Request<Material>::Ptr(new Request<Material>());
-  preq->commodity = commod;
-  preq->preference = pref;
-  preq->target = mat;
-  preq->requester = pcast;
+  Request<Material>::Ptr preq(new Request<Material>(mat, pcast, commod, pref));
   pcast->r_ = preq;
-  Request<Material>::Ptr creq = Request<Material>::Ptr(new Request<Material>());
-  creq->commodity = commod;
-  creq->preference = pref;
-  creq->target = mat;
-  creq->requester = ccast;
+  Request<Material>::Ptr creq(new Request<Material>(mat, ccast, commod, pref));
   ccast->r_ = creq;
 
-  Bid<Material>::Ptr pbid = Bid<Material>::Ptr(new Bid<Material>());
-  Bid<Material>::Ptr cbid = Bid<Material>::Ptr(new Bid<Material>());
-  pbid->request = preq;
-  cbid->request = creq;
+  Bid<Material>::Ptr pbid(new Bid<Material>(preq, mat, &helper_trader));
+  Bid<Material>::Ptr cbid(new Bid<Material>(creq, mat, &helper_trader));
   
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(pbid);
   bids.push_back(cbid);
   
   Bidder* bidr = new Bidder(tc.get(), bids, commod);
-  pbid->bidder = bidr;
-  cbid->bidder = bidr;  
+  pbid->bidder_ = bidr;
+  cbid->bidder_ = bidr;  
   FacilityModel* bclone = dynamic_cast<FacilityModel*>(bidr->Clone());
   bclone->Deploy(bclone);
   
@@ -356,9 +329,9 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   EXPECT_NO_THROW(exchng->AddAllBids());
 
   PrefMap<Material>::type pobs;
-  pobs[preq].push_back(std::make_pair(pbid, preq->preference));
+  pobs[preq].push_back(std::make_pair(pbid, preq->preference()));
   PrefMap<Material>::type cobs;
-  cobs[creq].push_back(std::make_pair(cbid, creq->preference));
+  cobs[creq].push_back(std::make_pair(cbid, creq->preference()));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();  
   EXPECT_EQ(context.Prefs(parent), pobs);
@@ -366,8 +339,8 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   
   EXPECT_NO_THROW(exchng->DoAllAdjustments());
 
-  pobs[preq][0].second = std::pow(preq->preference, 2);
-  cobs[creq][0].second = std::pow(std::pow(creq->preference, 2), 2);
+  pobs[preq][0].second = std::pow(preq->preference(), 2);
+  cobs[creq][0].second = std::pow(std::pow(creq->preference(), 2), 2);
   EXPECT_EQ(context.Prefs(parent), pobs);
   EXPECT_EQ(context.Prefs(child), cobs);
   

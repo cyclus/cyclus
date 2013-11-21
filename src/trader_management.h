@@ -54,13 +54,13 @@ inline static typename T::Ptr ExecTradeOffer(const Trade<T>& trade) {
 template<>
 inline Material::Ptr
     ExecTradeOffer<Material>(const Trade<Material>& trade) {
-  return trade.bid->bidder->OfferMatlTrade(trade);
+  return trade.bid->bidder()->OfferMatlTrade(trade);
 }
 
 template<>
 inline GenericResource::Ptr
     ExecTradeOffer<GenericResource>(const Trade<GenericResource>& trade) {
-  return trade.bid->bidder->OfferGenRsrcTrade(trade);
+  return trade.bid->bidder()->OfferGenRsrcTrade(trade);
 }
 
 template<class T>
@@ -70,14 +70,14 @@ inline static void ExecTradeAccept(const Trade<T>& trade,
 template<>
 inline void ExecTradeAccept<Material>(const Trade<Material>& trade,
                                       Material::Ptr rsrc) {
-  return trade.request->requester->AcceptMatlTrade(trade, rsrc);
+  return trade.request->requester()->AcceptMatlTrade(trade, rsrc);
 }
 
 template<>
 inline void ExecTradeAccept<GenericResource>(
     const Trade<GenericResource>& trade,
     GenericResource::Ptr rsrc) {
-  return trade.request->requester->AcceptGenRsrcTrade(trade, rsrc);
+  return trade.request->requester()->AcceptGenRsrcTrade(trade, rsrc);
 }
 
 template<class T>

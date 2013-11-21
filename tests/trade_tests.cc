@@ -38,7 +38,7 @@ class Sender : public MockFacility {
 
   Material::Ptr OfferMatlTrade(const Trade<Material>& trade) {
     ++i;
-    Material::Ptr mat = trade.bid->offer;
+    Material::Ptr mat = trade.bid->offer();
     if (adjust) {
       mat = mat->ExtractQty(mat->quantity() - 0.1);
     }
@@ -79,20 +79,15 @@ TEST(TradeTests, Offer) {
   
   Material::Ptr mat = get_mat();
   Receiver* r = new Receiver(tc.get(), mat);
-  Request<Material>::Ptr req(new Request<Material>());
-  req->target = mat;
-  req->requester = r;
+  Request<Material>::Ptr req(new Request<Material>(mat, r));
   
   Sender* s = new Sender(tc.get());
-  Bid<Material>::Ptr bid(new Bid<Material>());
-  bid->offer = mat;
-  bid->bidder = s;
-  bid->request = req;
+  Bid<Material>::Ptr bid(new Bid<Material>(req, mat, s));
   
   Trade<Material> trade(req, bid, mat->quantity());
   EXPECT_EQ(0, s->i);
   Material::Ptr rsrc = cyclus::ExecTradeOffer(trade);
-  EXPECT_EQ(bid->offer, rsrc);
+  EXPECT_EQ(bid->offer(), rsrc);
   EXPECT_EQ(1, s->i);
   delete s;
   delete r;
@@ -104,15 +99,10 @@ TEST(TradeTests, Accept) {
   
   Material::Ptr mat = get_mat();
   Receiver* r = new Receiver(tc.get(), mat);
-  Request<Material>::Ptr req(new Request<Material>());
-  req->target = mat;
-  req->requester = r;
+  Request<Material>::Ptr req(new Request<Material>(mat, r));
   
   Sender* s = new Sender(tc.get());
-  Bid<Material>::Ptr bid(new Bid<Material>());
-  bid->offer = mat;
-  bid->bidder = s;
-  bid->request = req;
+  Bid<Material>::Ptr bid(new Bid<Material>(req, mat, s));
   
   Trade<Material> trade(req, bid, mat->quantity());
   EXPECT_EQ(0, r->i);
@@ -132,15 +122,10 @@ TEST(TradeTests, OfferThrow) {
   
   Material::Ptr mat = get_mat();
   Receiver* r = new Receiver(tc.get(), mat);
-  Request<Material>::Ptr req(new Request<Material>());
-  req->target = mat;
-  req->requester = r;
+  Request<Material>::Ptr req(new Request<Material>(mat, r));
   
   Sender* s = new Sender(tc.get(), true);
-  Bid<Material>::Ptr bid(new Bid<Material>());
-  bid->offer = mat;
-  bid->bidder = s;
-  bid->request = req;
+  Bid<Material>::Ptr bid(new Bid<Material>(req, mat, s));
   
   Trade<Material> trade(req, bid, mat->quantity());
   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);
