@@ -234,7 +234,7 @@ protected:
      each facility needs a lifetime
    */
   int fac_lifetime_;
-
+  
   friend class InstModel;
   /* ------------------- */
 

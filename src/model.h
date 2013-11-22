@@ -53,23 +53,6 @@ class Model {
   static std::set<std::string> dynamic_module_types();
 
   /**
-     returns a model given the template's name
-
-     @param name name of the template as defined in the input file
-   */
-  static Model* GetModelByName(std::string name);
-
-  /**
-     prints the current list of models
-   */
-  static void PrintModelList();
-
-  /**
-     returns the current list of models
-   */
-  static std::vector<Model*> GetModelList();
-
-  /**
      Initialize members related to core classes
      @param qe a pointer to a QueryEngine object containing initialization data
    */
@@ -333,11 +316,6 @@ class Model {
      Stores the next available facility ID
    */
   static int next_id_;
-
-  /**
-     comprehensive list of all initialized models.
-   */
-  static std::vector<Model*> model_list_;
 
   /**
      used to remove model instance refs from static model lists

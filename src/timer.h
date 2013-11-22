@@ -48,7 +48,7 @@ class Timer {
   /**
      Runs the simulation.
    */
-  void RunSim();
+  void RunSim(Context* ctx);
 
   /**
      registers a sim. agent to receive time step notifications.

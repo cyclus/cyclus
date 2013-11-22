@@ -36,6 +36,24 @@ class Context {
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Model* m);
 
+  /// Adds a model to a simulation-wide accessible list.
+  inline void AddModel(Model* m) {model_list_.push_back(m);}
+
+  /**
+     returns a model given the template's name
+
+     @param name name of the template as defined in the input file
+   */
+  Model* GetModelByName(std::string name);
+
+  /**
+     prints the current list of models
+   */
+  void PrintModelList();
+  
+  /// Access the simulation-wide model list.
+  inline std::vector<Model*>& GetModels() {return model_list_;}
+
   /// Registers an agent as a participant in resource exchanges
   inline void RegisterTrader(Trader* e) {
     traders_.insert(e);
@@ -107,7 +125,8 @@ class Context {
   std::map<std::string, Model*> protos_;
   std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
-
+  std::vector<Model*> model_list_;
+  
   Timer* ti_;
   EventManager* em_;
 };

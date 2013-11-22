@@ -13,7 +13,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::RunSim() {
+void Timer::RunSim(Context* ctx) {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
                   << start_date_ << " to end=" << end_date_;
   time_ = start_time_;
@@ -28,7 +28,7 @@ void Timer::RunSim() {
       if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
         Material::DecayAll(time_);
       }
-
+      
       // provides robustness when listeners are added during ticks/tocks
       for (int i = 0; i < new_tickers_.size(); ++i) {
         tick_listeners_.push_back(new_tickers_[i]);
@@ -47,23 +47,21 @@ void Timer::RunSim() {
       }
       date_ += boost::gregorian::days(1);
     }
-
+    
     time_++;
   }
 
   // initiate deletion of models that don't have parents.
   // dealloc will propogate through hierarchy as models delete their children
-  int count = 0;
-  while (Model::GetModelList().size() > 0) {
-    Model* model = Model::GetModelList().at(count);
-    try {
-      model->parent();
-    } catch (ValueError err) {
-      delete model;
-      count = 0;
-      continue;
-    }
-    count++;
+  std::vector<Model*>::iterator it;
+  std::vector<Model*> to_del;
+  std::vector<Model*> models = ctx->GetModels();
+  for (it = models.begin(); it != models.end(); ++it) {
+    if((*it)->parent() == NULL) to_del.push_back(*it);
+  }
+
+  for (it = to_del.begin(); it != to_del.end(); ++it) {
+    delete *it;
   }
 }
 

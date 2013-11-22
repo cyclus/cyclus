@@ -65,7 +65,7 @@ void RegionModel::AddChildrenToTree() {
   Model* inst;
   std::set<std::string>::iterator it;
   for (it = inst_names_.begin(); it != inst_names_.end(); it++) {
-    inst = Model::GetModelByName((*it));
+    inst = context()->GetModelByName((*it));
     inst->Deploy(this);
   }
 }

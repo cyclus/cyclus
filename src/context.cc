@@ -13,6 +13,38 @@ boost::uuids::uuid Context::sim_id() {
   return em_->sim_id();
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Model* Context::GetModelByName(std::string name) {
+  Model* found_model = NULL;
+
+  const std::vector<Model*>& models = GetModels();
+  
+  for (int i = 0; i < models.size(); i++) {
+    if (name == models.at(i)->name()) {
+      found_model = models.at(i);
+      break;
+    }
+  }
+
+  if (found_model == NULL) {
+    std::string err_msg = "Model '" + name + "' doesn't exist.";
+    throw KeyError(err_msg);
+  }
+  return found_model;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Context::PrintModelList() {
+  const std::vector<Model*>& models = GetModels();
+
+  CLOG(LEV_INFO1) << "There are " << models.size() << " models.";
+  CLOG(LEV_INFO3) << "Model list {";
+  for (int i = 0; i < models.size(); i++) {
+    CLOG(LEV_INFO3) << models.at(i)->str();
+  }
+  CLOG(LEV_INFO3) << "}";
+}
+
 void Context::AddPrototype(std::string name, Model* p) {
   protos_[name] = p;
 }

@@ -17,7 +17,6 @@ namespace cyclus {
 
 // static members
 int Model::next_id_ = 0;
-std::vector<Model*> Model::model_list_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> Model::dynamic_module_types() {
@@ -27,39 +26,6 @@ std::set<std::string> Model::dynamic_module_types() {
   types.insert("Inst");
   types.insert("Facility");
   return types;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::GetModelByName(std::string name) {
-  Model* found_model = NULL;
-
-  for (int i = 0; i < model_list_.size(); i++) {
-    if (name == model_list_.at(i)->name()) {
-      found_model = model_list_.at(i);
-      break;
-    }
-  }
-
-  if (found_model == NULL) {
-    std::string err_msg = "Model '" + name + "' doesn't exist.";
-    throw KeyError(err_msg);
-  }
-  return found_model;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::PrintModelList() {
-  CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
-  CLOG(LEV_INFO3) << "Model list {";
-  for (int i = 0; i < model_list_.size(); i++) {
-    CLOG(LEV_INFO3) << model_list_.at(i)->str();
-  }
-  CLOG(LEV_INFO3) << "}";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Model*> Model::GetModelList() {
-  return Model::model_list_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -86,7 +52,7 @@ Model::Model(Context* ctx)
     deathtime_(-1),
     parent_(NULL) {
   MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
-  model_list_.push_back(this);
+  ctx_->AddModel(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -100,9 +66,9 @@ Model::~Model() {
     ->AddVal("DeathDate", deathtime_)
     ->Record();
   }
-
+  
   // remove references to self
-  RemoveFromList(this, model_list_);
+  RemoveFromList(this, ctx_->GetModels());
 
   if (parent_ != NULL) {
     parent_->RemoveChild(this);

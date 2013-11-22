@@ -179,11 +179,11 @@ int main(int argc, char* argv[]) {
   em.RegisterBackend(back);
 
   // print the model list
-  Model::PrintModelList();
+  ctx.PrintModelList();
 
   // Run the simulation 
   try {
-    ti.RunSim();
+    ti.RunSim(&ctx);
   } catch (Error err) {
     success = false;
     CLOG(LEV_ERROR) << err.what();
