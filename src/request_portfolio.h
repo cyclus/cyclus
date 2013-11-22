@@ -67,7 +67,6 @@ class RequestPortfolio {
   };
 
   /// @return const access to the unconstrained requests
-  //const std::vector<boost::shared_ptr< Request<T> > >& requests() const {
   inline const std::vector<typename Request<T>::Ptr>& requests() const {
     return requests_;
   };
