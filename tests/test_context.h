@@ -17,7 +17,9 @@ class TestContext {
     delete ctx_;
   };
   
-  Context* get() {return ctx_;};
+  Context* get() {return ctx_;}
+  Timer* timer() {return &ti_;}
+  EventManager* event_manager() {return &em_;}
 
  private:
   Timer ti_;
