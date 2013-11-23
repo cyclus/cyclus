@@ -297,7 +297,8 @@ class Model {
      superclass' InitFrom method. The InitFrom method should only initialize
      this class' members - not inherited state.
 
-     @param m the model containing state that should be used to initialize this model.
+     @param m the model containing state that should be used to initialize this
+     model.
   */
   virtual void InitFrom(Model* m);
 

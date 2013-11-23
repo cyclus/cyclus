@@ -9,6 +9,9 @@
 #include "error.h"
 #include "logger.h"
 #include "material.h"
+#include "generic_resource.h"
+#include "exchange_manager.h"
+#include "greedy_solver.h"
 
 namespace cyclus {
 
@@ -18,6 +21,7 @@ void Timer::RunSim(Context* ctx) {
                   << start_date_ << " to end=" << end_date_;
   time_ = start_time_;
   CLOG(LEV_INFO1) << "Beginning simulation";
+
   while (date_ < endDate()) {
     if (date_.day() == 1) {
       CLOG(LEV_INFO2) << "Current date: " << date_ << " Current time: " << time_ <<
@@ -34,8 +38,14 @@ void Timer::RunSim(Context* ctx) {
         tick_listeners_.push_back(new_tickers_[i]);
       }
       new_tickers_.clear();
+
       SendTick();
-      SendResolve();
+      GreedySolver matl_solver;
+      ExchangeManager<Material> matl_manager(ctx, &matl_solver);
+      matl_manager.Execute();
+      GreedySolver genrsrc_solver;
+      ExchangeManager<GenericResource> genrsrc_manager(ctx, &genrsrc_solver);
+      genrsrc_manager.Execute();
     }
 
     int eom_day = LastDayOfMonth();
@@ -59,7 +69,7 @@ void Timer::RunSim(Context* ctx) {
   for (it = models.begin(); it != models.end(); ++it) {
     if((*it)->parent() == NULL) to_del.push_back(*it);
   }
-
+  
   for (it = to_del.begin(); it != to_del.end(); ++it) {
     delete *it;
   }

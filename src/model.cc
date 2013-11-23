@@ -107,7 +107,6 @@ std::string Model::str() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Deploy(Model* parent) {
-
   CLOG(LEV_DEBUG1) << "Model '" << name()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";

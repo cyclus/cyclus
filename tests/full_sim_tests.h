@@ -4,46 +4,67 @@
 #include "material.h"
 #include "model.h"
 #include "request_portfolio.h"
+#include "bid_portfolio.h"
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class TestSender : public MockFacility {
+namespace cyclus {
+class TestTrader : public MockFacility {
  public:
-  TestSender(cyclus::Context* ctx, bool adjust = false)
+  TestTrader(Context* ctx)
     : MockFacility(ctx),
-      cyclus::Model(ctx),
-      accept(0),
-      requests(0) { };
+      Model(ctx),
+      adjusts(0),
+      requests(0),
+      bids(0),
+      accept(0) { };
   
-  virtual cyclus::Model* Clone() {
-    TestSender* m = new TestSender(*this);
+  virtual Model* Clone() {
+    TestTrader* m = new TestTrader(*this);
     m->InitFrom(this);
-    m->accept = accept;
+    m->adjusts = adjusts;
     m->requests = requests;
+    m->bids = bids;
+    m->accept = accept;
     context()->RegisterTicker(m);
     return m;
   };
 
-  virtual std::set< cyclus::RequestPortfolio<cyclus::Material> > AddMatlRequests() {
+  virtual std::set< RequestPortfolio<Material> >
+      AddMatlRequests() {
     requests++;
-    return std::set< cyclus::RequestPortfolio<cyclus::Material> >();
+    return std::set< RequestPortfolio<Material> >();
+  }
+  
+  virtual std::set< BidPortfolio<Material> >
+      AddMatlBids(ExchangeContext<Material>* ec) {
+    bids ++;
+    return std::set< BidPortfolio<Material> >();
   }
 
-  /// @brief default implementation for material trade acceptance
-  virtual void AcceptMatlTrade(const cyclus::Trade<cyclus::Material>& trade,
-                               cyclus::Material::Ptr) {
+  virtual void AcceptMatlTrade(const Trade<Material>& trade,
+                               Material::Ptr) {
     accept++;
   }
 
-  int accept, requests;
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
+    adjusts++;
+  };
+  
+  int accept, requests, bids, adjusts;
 };
 
-/// cyclus::Material::Ptr OfferMatlTrade(const cyclus::Trade<cyclus::Material>& trade) {
-///     offer++;
-///     return mat;
-///   }
+/* // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* class TestRequester : public TestTrader { */
+/*  public: */
+/*   TestRequester(Context* ctx) */
+/*     : TestTrader(ctx), */
+/*       Model(ctx) { } */
+/* }; */
 
-///   /// @brief default implementation for material requests
-///   virtual std::set< BidPortfolio<Material> >
-///       AddMatlBids(ExchangeContext<Material>* ec) {
-///     return std::set< BidPortfolio<Material> >();
-///   }
+/* // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* class TestSupplier : public TestTrader { */
+/*  public: */
+/*   TestSupplier(Context* ctx) */
+/*     : TestTrader(ctx), */
+/*       Model(ctx) { } */
+/* }; */
+} // namespace cyclus
