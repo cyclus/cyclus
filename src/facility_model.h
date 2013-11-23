@@ -92,7 +92,7 @@ class FacilityModel : public TimeAgent, public Communicator, public Trader {
 
      @param parent the parent of this facility
    */
-  virtual void Deploy(Model* parent);
+  virtual void Deploy(Model* parent = NULL);
 
   /**
      decommissions the facility, default behavior is for the facility

@@ -236,7 +236,7 @@ class Model {
      module-level enter simulation methods
      @param parent this model's parent
    */
-  virtual void Deploy(Model* parent);
+  virtual void Deploy(Model* parent = NULL);
 
   /**
      decommissions the model, removing it from the simulation

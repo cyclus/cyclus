@@ -113,6 +113,8 @@ void Model::Deploy(Model* parent) {
   CLOG(LEV_DEBUG3) << " * Implementation: " << ModelImpl();
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
+  if (parent == NULL) parent = this;
+  
   // set model-specific members
   parent_id_ = parent->id();
   SetParent(parent);
