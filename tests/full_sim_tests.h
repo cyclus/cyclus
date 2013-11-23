@@ -52,19 +52,42 @@ class TestTrader : public MockFacility {
   int accept, requests, bids, adjusts;
 };
 
-/* // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* class TestRequester : public TestTrader { */
-/*  public: */
-/*   TestRequester(Context* ctx) */
-/*     : TestTrader(ctx), */
-/*       Model(ctx) { } */
-/* }; */
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class TestRequester : public TestTrader {
+ public:
+  TestRequester(Context* ctx)
+    : TestTrader(ctx),
+      Model(ctx) { }
 
-/* // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* class TestSupplier : public TestTrader { */
-/*  public: */
-/*   TestSupplier(Context* ctx) */
-/*     : TestTrader(ctx), */
-/*       Model(ctx) { } */
-/* }; */
+  virtual Model* Clone() {
+    TestRequester* m = new TestRequester(*this);
+    m->InitFrom(this);
+    m->adjusts = adjusts;
+    m->requests = requests;
+    m->bids = bids;
+    m->accept = accept;
+    context()->RegisterTicker(m);
+    return m;
+  };
+};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class TestSupplier : public TestTrader {
+ public:
+  TestSupplier(Context* ctx)
+    : TestTrader(ctx),
+      Model(ctx) { }
+
+  virtual Model* Clone() {
+    TestSupplier* m = new TestSupplier(*this);
+    m->InitFrom(this);
+    m->adjusts = adjusts;
+    m->requests = requests;
+    m->bids = bids;
+    m->accept = accept;
+    context()->RegisterTicker(m);
+    return m;
+  };
+};
+
 } // namespace cyclus
