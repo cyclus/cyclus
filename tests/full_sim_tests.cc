@@ -31,38 +31,40 @@ TEST(FullSimTests, LoneTrader) {
   delete trader;
 }
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST(FullSimTests, NullTrade) {
-//   TestContext tc;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(FullSimTests, NullTrade) {
+  TestContext tc;
+  // TestObjFactory fac;
+  // bool is_requester = true;
   
-//   TestTrader* base_supplier = new TestTrader(tc.get());
-//   TestTrader* supplier =
-//       dynamic_cast<TestTrader*>(base_supplier->Clone());
-//   supplier->Deploy();
+  TestTrader* base_supplier = new TestTrader(tc.get());//, &fac, !is_requester);
+  TestTrader* supplier =
+      dynamic_cast<TestTrader*>(base_supplier->Clone());
+  supplier->Deploy();
 
-//   TestTrader* base_requester = new TestTrader(tc.get());
-//   TestTrader* requester =
-//       dynamic_cast<TestTrader*>(base_requester->Clone());
-//   requester->Deploy();
+  TestTrader* base_requester = new TestTrader(tc.get()); //, &fac, is_requester);
+  TestTrader* requester =
+      dynamic_cast<TestTrader*>(base_requester->Clone());
+  requester->Deploy();
 
-//   int nsteps = 2;
+  int nsteps = 2;
   
-//   tc.timer()->Initialize(tc.get(), nsteps);
-//   tc.timer()->RunSim(tc.get());
+  tc.timer()->Initialize(tc.get(), nsteps);
+  tc.timer()->RunSim(tc.get());
 
-//   EXPECT_EQ(nsteps, supplier->requests);
-//   EXPECT_EQ(nsteps, supplier->bids);
-//   EXPECT_EQ(0, supplier->accept);
-//   EXPECT_EQ(0, supplier->adjusts);
+  EXPECT_EQ(nsteps, supplier->requests);
+  EXPECT_EQ(nsteps, supplier->bids);
+  EXPECT_EQ(0, supplier->accept);
+  EXPECT_EQ(0, supplier->adjusts);
   
-//   EXPECT_EQ(nsteps, requester->requests);
-//   EXPECT_EQ(nsteps, requester->bids);
-//   EXPECT_EQ(0, requester->accept);
-//   EXPECT_EQ(0, requester->adjusts);
+  EXPECT_EQ(nsteps, requester->requests);
+  EXPECT_EQ(nsteps, requester->bids);
+  EXPECT_EQ(0, requester->accept);
+  EXPECT_EQ(0, requester->adjusts);
   
-//   delete supplier;
-//   delete requester;
-// }
+  delete supplier;
+  delete requester;
+}
 
 // //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // TEST(FullSimTests, Trade) {
