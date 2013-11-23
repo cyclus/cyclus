@@ -14,10 +14,14 @@ TEST(FullSimTests, Test) {
   TestSender* sender = dynamic_cast<TestSender*>(base_sender->Clone());
   
   sender->Deploy(sender);
+
+  int nsteps = 2;
   
-  tc.timer()->Initialize(tc.get());
+  tc.timer()->Initialize(tc.get(), nsteps);
   tc.timer()->RunSim(tc.get());
 
+  EXPECT_EQ(nsteps, sender->requests);
+  EXPECT_EQ(0, sender->accept);
+  
   delete sender;
-  // delete base_sender;
 }
