@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <string>
+#include <set>
 
 #include "capacity_constraint.h"
 #include "error.h"
@@ -70,6 +71,53 @@ TEST_F(BidPortfolioTests, RespAdd) {
 
   Bid<Material>::Ptr r3(new Bid<Material>(req2, get_mat(), fac1));
   EXPECT_THROW(rp.AddBid(r3), KeyError);    
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(BidPortfolioTests, Sets) {
+  BidPortfolio<Material> rp1, rp2, rp3;
+  
+  Bid<Material>::Ptr bid1(new Bid<Material>(req1, get_mat(), fac1));
+  Bid<Material>::Ptr bid2(new Bid<Material>(req1, get_mat(), fac1));
+
+  rp1.AddBid(bid1);
+    
+  rp2.AddBid(bid2);
+
+  rp3.AddBid(bid1);
+  rp3.AddBid(bid2);
+
+  EXPECT_NE(rp1, rp2);
+  EXPECT_NE(rp2, rp3);
+  EXPECT_NE(rp3, rp1);
+
+  EXPECT_NE(rp1.id(), rp2.id());
+  EXPECT_NE(rp2.id(), rp3.id());
+  EXPECT_NE(rp3.id(), rp1.id());
+  
+  std::set< BidPortfolio<Material> > bids;
+  EXPECT_EQ(bids.size(), 0);
+  EXPECT_EQ(bids.count(rp1), 0);
+  EXPECT_EQ(bids.count(rp2), 0);
+  EXPECT_EQ(bids.count(rp3), 0);
+
+  bids.insert(rp1);
+  EXPECT_EQ(bids.size(), 1);
+  EXPECT_EQ(bids.count(rp1), 1);
+  EXPECT_EQ(bids.count(rp2), 0);
+  EXPECT_EQ(bids.count(rp3), 0);
+  
+  bids.insert(rp2);
+  EXPECT_EQ(bids.size(), 2);
+  EXPECT_EQ(bids.count(rp1), 1);
+  EXPECT_EQ(bids.count(rp2), 1);
+  EXPECT_EQ(bids.count(rp3), 0);
+  
+  bids.insert(rp3);
+  EXPECT_EQ(bids.size(), 3);
+  EXPECT_EQ(bids.count(rp1), 1);
+  EXPECT_EQ(bids.count(rp2), 1);
+  EXPECT_EQ(bids.count(rp3), 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
