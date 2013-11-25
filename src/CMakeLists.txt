@@ -144,6 +144,7 @@ INSTALL(FILES
   facility_model.h
   function.h
   generic_resource.h
+  greedy_solver.h
   hdf5_back.h
   inst_model.h
   intrusive_base.h
