@@ -58,11 +58,6 @@ class ExchangeTranslator {
       const std::set<typename Bid<T>::Ptr>& bids = bp_it->bids();
       typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
-        CLOG(LEV_DEBUG4) << "pre arc bid capacity size: "
-                  << b_it->get()->portfolio()->constraints().size() << std::endl;
-        CLOG(LEV_DEBUG4) << "pre arc request capacity size: "
-                  << b_it->get()->request()->portfolio()->constraints().size()
-                  << std::endl;
         Arc a = __TranslateArc(*b_it);
         graph->AddArc(a);
       }
@@ -75,6 +70,8 @@ class ExchangeTranslator {
   void BackTranslateSolution(const std::vector<Match>& matches,
                              std::vector< Trade<T> >& ret) {
     std::vector<Match>::const_iterator m_it;
+    CLOG(LEV_DEBUG1) << "Back traslating " << matches.size()
+                     << " trade matches.";
     for (m_it = matches.begin(); m_it != matches.end(); ++m_it) {
       ret.push_back(__BackTranslateMatch(*m_it));
     }
@@ -104,35 +101,25 @@ class ExchangeTranslator {
   /// are known
   RequestSet::Ptr __TranslateRequestPortfolio(const RequestPortfolio<T>& rp) {
     RequestSet::Ptr rs(new RequestSet(rp.qty()));
-    
+    CLOG(LEV_DEBUG2) << "Translating request portfolio of size " << rp.qty();
+
     typename std::vector<typename Request<T>::Ptr>::const_iterator r_it;
     for (r_it = rp.requests().begin();
          r_it != rp.requests().end();
          ++r_it) {
-
-      CLOG(LEV_DEBUG4) << "this request sees "
-                << r_it->get()->portfolio()->constraints().size()
-                << " request capacities" << std::endl;
-      CLOG(LEV_DEBUG4) << "and the portfolio has "
-                << rp.constraints().size()
-                << " request capacities" << std::endl;
-      CLOG(LEV_DEBUG4) << r_it->get()->portfolio() << " ?==? " << &rp << std::endl;
       Node::Ptr n(new Node());
       rs->AddNode(n);
       __AddRequest(*r_it, n);
     }
 
     CLOG(LEV_DEBUG4) << "adding " << rp.constraints().size()
-              << " request capacities" << std::endl;    
+                     << " request capacities";    
     typename std::set< CapacityConstraint<T> >::const_iterator c_it;
     for (c_it = rp.constraints().begin();
          c_it != rp.constraints().end();
          ++c_it) {
       rs->capacities.push_back(c_it->capacity());
     }
-
-    CLOG(LEV_DEBUG4) << "which corresponds to a node set with " << rs->capacities.size()
-              << " constraints." << std::endl;
     
     return rs;
   }
@@ -148,18 +135,11 @@ class ExchangeTranslator {
          ++b_it) {
       Node::Ptr n(new Node());
       bs->AddNode(n);
-      CLOG(LEV_DEBUG4) << "this bid sees "
-                << b_it->get()->portfolio()->constraints().size()
-                << " bid capacities";    
-      CLOG(LEV_DEBUG4) << "and the portfolio has "
-                << bp.constraints().size()                \
-                << " bid capacities";
-      CLOG(LEV_DEBUG4) << b_it->get()->portfolio() << " ?==? " << &bp;
       __AddBid(*b_it, n);
     }
 
     CLOG(LEV_DEBUG4) << "adding " << bp.constraints().size()
-              << " bid capacities";    
+                     << " bid capacities";    
 
     typename std::set< CapacityConstraint<T> >::const_iterator c_it;
     for (c_it = bp.constraints().begin();
@@ -167,9 +147,6 @@ class ExchangeTranslator {
          ++c_it) {
       bs->capacities.push_back(c_it->capacity());
     }
-
-    CLOG(LEV_DEBUG4) << "which corresponds to a node set with " << bs->capacities.size()
-              << " constraints.";
     
     return bs;
   }
@@ -187,11 +164,6 @@ class ExchangeTranslator {
     BidPortfolio<T>* bp = bid->portfolio();
     RequestPortfolio<T>* rp = req->portfolio();
 
-    CLOG(LEV_DEBUG4) << "arc translation:";
-    CLOG(LEV_DEBUG4) << "request portfolio has " << rp->constraints().size()
-              << " constraints."<< std::endl;
-    CLOG(LEV_DEBUG4) << "bid portfolio has " << bp->constraints().size()
-              << " constraints."<< std::endl;    
     TranslateCapacities(offer, bp->constraints(), vnode, arc); // bid is v
     TranslateCapacities(offer, rp->constraints(), unode, arc); // req is u
     CLOG(LEV_DEBUG4) << "translated arc capacities!";
@@ -221,8 +193,6 @@ void TranslateCapacities(
     Node::Ptr n,
     const Arc& a) {
   typename std::set< CapacityConstraint<T> >::const_iterator it;
-  CLOG(LEV_DEBUG4) << "translate capacity time! there are " << constr.size()
-            << " total.";
   for (it = constr.begin(); it != constr.end(); ++it) {
     n->unit_capacities[a].push_back(it->convert(offer) / it->capacity());
   }

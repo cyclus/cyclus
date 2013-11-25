@@ -4,6 +4,8 @@
 #include <functional>
 #include <vector>
 
+#include "logger.h"
+
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -21,7 +23,9 @@ void GreedySolver::__GreedilySatisfySet(RequestSet::Ptr prs) {
   double match = 0;
   std::vector<Node::Ptr>& nodes = prs->nodes;
   std::vector<Node::Ptr>::iterator req_it = nodes.begin();
-  
+
+  CLOG(LEV_DEBUG1) << "Greedy Solving for " << target
+                   << " amount of a resource.";
   while( (match <= target) && (req_it != nodes.end()) ) {
     std::vector<Arc>& arcs = graph_->node_arc_map[*req_it];
     std::vector<Arc>::iterator arc_it = arcs.begin();
