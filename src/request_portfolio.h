@@ -7,6 +7,7 @@
 
 #include "capacity_constraint.h"
 #include "error.h"
+#include "logger.h"
 #include "request.h"
 
 namespace cyclus {
@@ -38,10 +39,12 @@ class RequestPortfolio {
   };
 
   /// @brief copy constructor
+  /// @todo needs a test!
   RequestPortfolio(const RequestPortfolio& rhs) : id_(next_id_++) {
     requester_ = rhs.requester_;
     requests_ = rhs.requests_;
     constraints_ = rhs.constraints_;
+    qty_ = rhs.qty_;
     typename std::vector<typename Request<T>::Ptr>::iterator it;
     for (it = requests_.begin(); it != requests_.end(); ++it) {
       it->get()->set_portfolio(this);
@@ -54,6 +57,8 @@ class RequestPortfolio {
   void AddRequest(const typename Request<T>::Ptr r) {
     __VerifyRequester(r);
     __VerifyQty(r);
+    CLOG(LEV_DEBUG2) << "Added request of size " << r->target()->quantity();
+    CLOG(LEV_DEBUG2) << "Portfolio size is " << qty_;
     requests_.push_back(r);
     r->set_portfolio(this);
   };
@@ -151,6 +156,7 @@ inline bool operator==(const RequestPortfolio<T>& lhs,
                        const RequestPortfolio<T>& rhs) {
   return  (lhs.requests() == rhs.requests() &&
            lhs.constraints() == rhs.constraints() &&
+           lhs.qty() == rhs.qty() &&
            lhs.requester() == rhs.requester());
 };
 
