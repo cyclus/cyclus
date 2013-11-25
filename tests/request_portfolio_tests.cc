@@ -57,13 +57,23 @@ TEST_F(RequestPortfolioTests, ReqAdd){
   Request<Material>::Ptr r3(new Request<Material>(get_mat(92235, 150051.0), fac1));
   
   RequestPortfolio<Material> rp;
-  ASSERT_EQ(rp.requests().size(), 0);
+  EXPECT_EQ(rp.requests().size(), 0);
   EXPECT_NO_THROW(rp.AddRequest(r1));
-  ASSERT_EQ(rp.requester(), fac1);
-  ASSERT_EQ(rp.requests().size(), 1);
-  ASSERT_EQ(rp.requests()[0], r1);
+  EXPECT_EQ(rp.requester(), fac1);
+  EXPECT_EQ(rp.requests().size(), 1);
+  EXPECT_EQ(rp.qty(), get_mat()->quantity());
+  EXPECT_EQ(rp.requests()[0], r1);
   EXPECT_THROW(rp.AddRequest(r2), KeyError);
   EXPECT_THROW(rp.AddRequest(r3), KeyError);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(RequestPortfolioTests, Copy) { 
+  Request<Material>::Ptr r1(new Request<Material>(get_mat(), fac1));
+  RequestPortfolio<Material> rp;
+  EXPECT_NO_THROW(rp.AddRequest(r1));
+  RequestPortfolio<Material> copy(rp);
+  EXPECT_EQ(rp, copy);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -72,8 +82,8 @@ TEST_F(RequestPortfolioTests, CapAdd) {
   
   RequestPortfolio<Material> rp;
   EXPECT_NO_THROW(rp.AddConstraint(c));
-  ASSERT_EQ(rp.constraints().count(c), 1);
-  ASSERT_EQ(*rp.constraints().begin(), c);
+  EXPECT_EQ(rp.constraints().count(c), 1);
+  EXPECT_EQ(*rp.constraints().begin(), c);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

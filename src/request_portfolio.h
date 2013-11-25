@@ -39,7 +39,6 @@ class RequestPortfolio {
   };
 
   /// @brief copy constructor
-  /// @todo needs a test!
   RequestPortfolio(const RequestPortfolio& rhs) : id_(next_id_++) {
     requester_ = rhs.requester_;
     requests_ = rhs.requests_;

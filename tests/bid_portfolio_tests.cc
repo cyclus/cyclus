@@ -59,11 +59,11 @@ TEST_F(BidPortfolioTests, RespAdd) {
   Bid<Material>::Ptr r1(new Bid<Material>(req1, get_mat(), fac1));
   
   BidPortfolio<Material> rp;
-  ASSERT_EQ(rp.bids().size(), 0);
+  EXPECT_EQ(rp.bids().size(), 0);
   EXPECT_NO_THROW(rp.AddBid(r1));
-  ASSERT_EQ(rp.bidder(), fac1);
-  ASSERT_EQ(rp.bids().size(), 1);
-  ASSERT_EQ(*rp.bids().begin(), r1);
+  EXPECT_EQ(rp.bidder(), fac1);
+  EXPECT_EQ(rp.bids().size(), 1);
+  EXPECT_EQ(*rp.bids().begin(), r1);
 
   Bid<Material>::Ptr r2(new Bid<Material>(req2, get_mat(), fac2));
   EXPECT_THROW(rp.AddBid(r2), KeyError);  
@@ -73,11 +73,20 @@ TEST_F(BidPortfolioTests, RespAdd) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(BidPortfolioTests, Copy) { 
+  Bid<Material>::Ptr r1(new Bid<Material>(req1, get_mat(), fac1));
+  BidPortfolio<Material> rp;
+  EXPECT_NO_THROW(rp.AddBid(r1));
+  BidPortfolio<Material> copy(rp);
+  EXPECT_EQ(rp, copy);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BidPortfolioTests, CapAdd) {
   CapacityConstraint<Material> c(5, &converter);
   
   BidPortfolio<Material> rp;
   EXPECT_NO_THROW(rp.AddConstraint(c));
-  ASSERT_EQ(rp.constraints().count(c), 1);
-  ASSERT_EQ(*rp.constraints().begin(), c);
+  EXPECT_EQ(rp.constraints().count(c), 1);
+  EXPECT_EQ(*rp.constraints().begin(), c);
 }
