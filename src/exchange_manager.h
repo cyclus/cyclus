@@ -36,18 +36,24 @@ class ExchangeManager {
     exchng.AddAllRequests();
     exchng.AddAllBids();
     exchng.DoAllAdjustments();
-
+    CLOG(LEV_DEBUG1) << "done with info gathering";
+    
     // translate graph
     ExchangeTranslator<T> xlator(&exchng.ex_ctx());
+    CLOG(LEV_DEBUG1) << "translating graph...";
     ExchangeGraph::Ptr graph = xlator.Translate();
-
+    CLOG(LEV_DEBUG1) << "graph translated!";
+    
     // solve graph
     solver_->set_graph(graph.get());
+    CLOG(LEV_DEBUG1) << "solving graph...";
     solver_->Solve();
+    CLOG(LEV_DEBUG1) << "graph solved!";
 
     // get trades
     std::vector< Trade<T> > trades;
     xlator.BackTranslateSolution(graph->matches, trades);
+    CLOG(LEV_DEBUG1) << "trades translated!";
 
     std::for_each(trades.begin(), trades.end(), ExecuteTrade<T>);
   }
