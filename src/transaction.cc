@@ -27,14 +27,10 @@ void Transaction::Record() {
   ->AddVal("ID", id_)
   ->AddVal("SenderID", sender_id_)
   ->AddVal("ReceiverID", receiver_id_)
+  ->AddVal("ResourceID", resource_id_)
   ->AddVal("Commodity", commod_)
   ->AddVal("Price", price_)
   ->AddVal("Time", ctx_->time())
-  ->Record();
-  
-  ctx_->NewEvent("TransactedResources")
-  ->AddVal("TransactionID", id_)
-  ->AddVal("ResourceID", resource_id_)
   ->Record();
 }
 
