@@ -141,7 +141,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     qty_ = rhs.qty_;
     typename std::vector<typename Request<T>::Ptr>::iterator it;
     for (it = requests_.begin(); it != requests_.end(); ++it) {
-      it->get()->set_portfolio(this);
+      it->get()->set_portfolio(this->shared_from_this());
     }
   };
 

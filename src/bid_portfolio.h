@@ -134,7 +134,7 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
     constraints_ = rhs.constraints_;
     typename std::set<typename Bid<T>::Ptr>::iterator it;
     for (it = bids_.begin(); it != bids_.end(); ++it) {
-      it->get()->set_portfolio(this);
+      it->get()->set_portfolio(this->shared_from_this());
     }
   };
 };
