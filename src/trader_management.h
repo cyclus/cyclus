@@ -80,11 +80,27 @@ inline static void AcceptTrades(
 }
 
 template<>
+<<<<<<< HEAD
 inline void AcceptTrades(
     Trader* trader,
     const std::vector< std::pair<Trade<Material>,
     typename Material::Ptr> >& responses) {
   trader->AcceptMatlTrades(responses);
+=======
+inline void ExecTradeAccept<GenericResource>(
+    const Trade<GenericResource>& trade,
+    GenericResource::Ptr rsrc) {
+  return trade.request->requester()->AcceptGenRsrcTrade(trade, rsrc);
+}
+
+template<class T>
+static void ExecuteTrade(const Trade<T>& trade) {
+  typename T::Ptr rsrc = ExecTradeOffer(trade);
+  if (rsrc->quantity() != trade.amt) {
+    throw ValueError("Trade amt and resource qty must match");
+  }
+  ExecTradeAccept(trade, rsrc);
+  RecordTrade(trade, rsrc);
 }
 
 template<>
