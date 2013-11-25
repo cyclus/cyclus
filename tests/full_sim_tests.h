@@ -114,40 +114,6 @@ class TestTrader : public MockFacility {
   int accept, offer, requests, bids, adjusts;
 };
 
-/* // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* class TestRequester : public TestTrader { */
-/*  public: */
-/*   TestRequester(Context* ctx, Material::Ptr request) */
-/*     : TestTrader(ctx), */
-/*       Model(ctx), */
-/*       req(request) { } */
-
-/*   virtual Model* Clone() { */
-/*     TestRequester* m = new TestRequester(*this); */
-/*     m->InitFrom(this); */
-/*     m->adjusts = adjusts; */
-/*     m->requests = requests; */
-/*     m->bids = bids; */
-/*     m->accept = accept; */
-/*     m->request = request; */
-/*     context()->RegisterTicker(m); */
-/*     return m; */
-/*   }; */
-
-/*   Material::Ptr req; */
-/* }; */
-
-/* // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* class TestSupplier : public TestTrader { */
-/*  public: */
-/*   TestSupplier(Context* ctx, Request<Material<::Ptr request, */
-/*                Bid<Material>::Ptr bid) */
-/*     : TestTrader(ctx), */
-/*       Model(ctx), */
-/*       req(request), */
-/*       bid(bid) { } */
-/* }; */
-
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_TESTS_FULL_SIM_TESTS_H_
