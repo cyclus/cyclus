@@ -41,6 +41,14 @@ class Transaction {
   static int next_id_;
 };
 
+inline bool operator ==(const Transaction& rhs, const Transaction& lhs) {
+  return (rhs.commodity() == rhs.commodity(),
+          rhs.sender_id() == rhs.sender_id(),
+          rhs.receiver_id() == rhs.receiver_id(),
+          rhs.resource_id() == rhs.resource_id(),
+          rhs.price() == rhs.price());
+}
+
 } // namespace cyclus
 
 #endif // CYCLUS_TRANSACTION_H_
