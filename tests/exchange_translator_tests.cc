@@ -108,10 +108,10 @@ TEST(ExXlateTests, XlateReq) {
   double carr[] = {qty1, qty2};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
-  RequestPortfolio<Material> rp;
-  rp.AddRequest(req);
-  rp.AddConstraint(cc1);
-  rp.AddConstraint(cc2);
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  rp->AddRequest(req);
+  rp->AddConstraint(cc1);
+  rp->AddConstraint(cc2);
 
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
@@ -174,9 +174,9 @@ TEST(ExXlateTests, XlateArc) {
   bport.AddConstraint(cc1);
   bport.AddConstraint(cc2);
 
-  RequestPortfolio<Material> rport;
-  rport.AddRequest(req);
-  rport.AddConstraint(cc1);
+  RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
+  rport->AddRequest(req);
+  rport->AddConstraint(cc1);
 
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
@@ -207,8 +207,9 @@ TEST(ExXlateTests, SimpleXlate) {
   BidPortfolio<Material> bport;
   bport.AddBid(bid);
 
-  RequestPortfolio<Material> rport;
-  rport.AddRequest(req);
+
+  RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
+  rport->AddRequest(req);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rport);

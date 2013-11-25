@@ -105,8 +105,8 @@ class ResourceExchange {
 
   /// @brief queries a given facility model for 
   void __AddRequests(Trader* t) {
-    std::set< RequestPortfolio<T> > rp = QueryRequests<T>(t);
-    typename std::set< RequestPortfolio<T> >::iterator it;
+    std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
+    typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;
     for (it = rp.begin(); it != rp.end(); ++it) {
       ex_ctx_.AddRequestPortfolio(*it);
     }

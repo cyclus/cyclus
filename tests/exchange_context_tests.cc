@@ -39,7 +39,7 @@ class ExchangeContextTests: public ::testing::Test {
   MockFacility* fac1;
   MockFacility* fac2;
   Request<Resource>::Ptr req1, req2;
-  RequestPortfolio<Resource> rp1, rp2;
+  RequestPortfolio<Resource>::Ptr rp1, rp2;
   string commod1, commod2;
   double pref;
   
@@ -55,8 +55,10 @@ class ExchangeContextTests: public ::testing::Test {
     req2 = Request<Resource>::Ptr(
         new Request<Resource>(get_mat(), fac2, commod1, pref));
 
-    rp1.AddRequest(req1);    
-    rp2.AddRequest(req2);
+    rp1 = RequestPortfolio<Resource>::Ptr(new RequestPortfolio<Resource>());
+    rp1->AddRequest(req1);    
+    rp2 = RequestPortfolio<Resource>::Ptr(new RequestPortfolio<Resource>());
+    rp2->AddRequest(req2);
   };
   
   virtual void TearDown() {
@@ -80,7 +82,7 @@ TEST_F(ExchangeContextTests, AddRequest1) {
     
   context.AddRequestPortfolio(rp1);
 
-  std::vector<RequestPortfolio<Resource> > vp;
+  std::vector<RequestPortfolio<Resource>::Ptr> vp;
   vp.push_back(rp1);
   EXPECT_EQ(vp, context.requests());
   
@@ -103,7 +105,7 @@ TEST_F(ExchangeContextTests, AddRequest2) {
   context.AddRequestPortfolio(rp1);
   context.AddRequestPortfolio(rp2);
 
-  std::vector<RequestPortfolio<Resource> > vp;
+  std::vector<RequestPortfolio<Resource>::Ptr> vp;
   vp.push_back(rp1);
   vp.push_back(rp2);
   EXPECT_EQ(vp, context.requests());
@@ -119,7 +121,7 @@ TEST_F(ExchangeContextTests, AddRequest2) {
 TEST_F(ExchangeContextTests, AddRequest3) {
   // 2 requests for 2 commod
   Request<Resource>::Ptr req(new Request<Resource>(get_mat(), fac1, commod2));
-  rp1.AddRequest(req);
+  rp1->AddRequest(req);
   
   ExchangeContext<Resource> context;
     

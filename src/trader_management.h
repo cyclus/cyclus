@@ -10,18 +10,19 @@ namespace cyclus {
   
 // template specializations to support inheritance and virtual functions
 template<class T>
-inline static std::set< RequestPortfolio<T> > QueryRequests(Trader* t) {
-  return std::set< RequestPortfolio<T> >();
+    inline static std::set<typename RequestPortfolio<T>::Ptr>
+    QueryRequests(Trader* t) {
+  return std::set<typename RequestPortfolio<T>::Ptr>();
 }
 
 template<>
-inline std::set< RequestPortfolio<Material> >
+    inline std::set<RequestPortfolio<Material>::Ptr>
     QueryRequests<Material>(Trader* t) {
   return t->AddMatlRequests();
 }
 
 template<>
-inline std::set< RequestPortfolio<GenericResource> >
+inline std::set<RequestPortfolio<GenericResource>::Ptr>
     QueryRequests<GenericResource>(Trader* t) {
   return t->AddGenRsrcRequests();
 }

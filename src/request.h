@@ -30,7 +30,6 @@ class Request {
       requester_(requester),
       commodity_(commodity),
       preference_(preference),
-      portfolio_(NULL),
       id_(next_id_++) { };
 
   /// @return this request's target
@@ -59,12 +58,12 @@ class Request {
   }
 
   /// @brief set the portfolio for this request
-  inline void set_portfolio(RequestPortfolio<T>* portfolio) {
+  inline void set_portfolio(typename RequestPortfolio<T>::Ptr portfolio) {
     portfolio_ = portfolio;
   }
 
   /// @return the portfolio of which this request is a part
-  inline RequestPortfolio<T>* portfolio() const {
+  inline typename RequestPortfolio<T>::Ptr portfolio() const {
     return portfolio_;
   }
 
@@ -73,7 +72,7 @@ class Request {
   Trader* requester_;
   double preference_;
   std::string commodity_;
-  RequestPortfolio<T>* portfolio_;
+  typename RequestPortfolio<T>::Ptr portfolio_;
   int id_;
   static int next_id_;
 };

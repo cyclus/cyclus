@@ -57,11 +57,11 @@ class Requester: public MockFacility {
     return m;
   };
   
-  set< RequestPortfolio<Material> > AddMatlRequests() {
-    set< RequestPortfolio<Material> > rps;
-    RequestPortfolio<Material> rp;
+  set<RequestPortfolio<Material>::Ptr> AddMatlRequests() {
+    set<RequestPortfolio<Material>::Ptr> rps;
+    RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
     for (int i = 0; i < i_; i++) {
-      rp.AddRequest(r_);
+      rp->AddRequest(r_);
     }
     rps.insert(rp);
     req_ctr_++;
@@ -188,12 +188,11 @@ TEST_F(ResourceExchangeTests, Requests) {
   
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
-  std::vector<RequestPortfolio<Material> > vp;
-  RequestPortfolio<Material> rp;
-  rp.AddRequest(req);
-  vp.push_back(rp);
-  const std::vector< RequestPortfolio<Material> >& obsvp = ctx.requests();
-  EXPECT_EQ(vp, obsvp);
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  rp->AddRequest(req);
+  const std::vector<RequestPortfolio<Material>::Ptr>& obsvp = ctx.requests();
+  EXPECT_EQ(1, obsvp.size());
+  EXPECT_EQ(*rp.get(), *obsvp[0].get());
 
   const std::vector<Request<Material>::Ptr>& obsvr = ctx.RequestsForCommod(commod);
   EXPECT_EQ(1, obsvr.size());  
@@ -208,11 +207,11 @@ TEST_F(ResourceExchangeTests, Requests) {
 TEST_F(ResourceExchangeTests, Bids) {
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
-  RequestPortfolio<Material> rp;
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>::Ptr req1(new Request<Material>(mat, reqr, commod, pref));
   
-  rp.AddRequest(req);
-  rp.AddRequest(req1);
+  rp->AddRequest(req);
+  rp->AddRequest(req1);
   ctx.AddRequestPortfolio(rp);
   const std::vector<Request<Material>::Ptr>& reqs = ctx.RequestsForCommod(commod);
   EXPECT_EQ(2, reqs.size());  

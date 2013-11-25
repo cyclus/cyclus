@@ -51,18 +51,18 @@ class TestTrader : public MockFacility {
     return m;
   };
 
-  virtual std::set< RequestPortfolio<Material> >
+  virtual std::set<RequestPortfolio<Material>::Ptr>
       AddMatlRequests() {
     requests++;
     if (obj_fac == NULL || !is_requester) {
-      return std::set< RequestPortfolio<Material> >();
+      return std::set<RequestPortfolio<Material>::Ptr>();
     } else {
-      std::set< RequestPortfolio<Material> > ports;
-      RequestPortfolio<Material> port;
+      std::set<RequestPortfolio<Material>::Ptr> ports;
+      RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
       Request<Material>::Ptr request(
           new Request<Material>(obj_fac->mat, this, obj_fac->commod));
       req = request; // exp request
-      port.AddRequest(request);
+      port->AddRequest(request);
       ports.insert(port);
       return ports;
     }

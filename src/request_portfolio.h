@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include "capacity_constraint.h"
 #include "error.h"
 #include "logger.h"
@@ -31,24 +34,13 @@ class Trader;
 /// AddRequest interface have an option boolean for exclusivity. This utility needs
 /// to be used first to determine what the appropriate way forward is.
 template<class T>
-class RequestPortfolio {
+class RequestPortfolio :
+public boost::enable_shared_from_this< RequestPortfolio<T> > {
  public:
-  /// @brief default constructor
-  RequestPortfolio() : requester_(NULL), qty_(-1), id_(next_id_++) {
-      constraints_.clear();
-  };
+  typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
 
-  /// @brief copy constructor
-  RequestPortfolio(const RequestPortfolio& rhs) : id_(next_id_++) {
-    requester_ = rhs.requester_;
-    requests_ = rhs.requests_;
-    constraints_ = rhs.constraints_;
-    qty_ = rhs.qty_;
-    typename std::vector<typename Request<T>::Ptr>::iterator it;
-    for (it = requests_.begin(); it != requests_.end(); ++it) {
-      it->get()->set_portfolio(this);
-    }
-  };
+  /// @brief default constructor
+  RequestPortfolio() : requester_(NULL), qty_(-1), id_(next_id_++) { };
 
   /// @brief add a request to the portfolio
   /// @param r the request to add
@@ -59,7 +51,7 @@ class RequestPortfolio {
     CLOG(LEV_DEBUG2) << "Added request of size " << r->target()->quantity();
     CLOG(LEV_DEBUG2) << "Portfolio size is " << qty_;
     requests_.push_back(r);
-    r->set_portfolio(this);
+    r->set_portfolio(this->shared_from_this());
   };
 
   /// @brief add a capacity constraint associated with the portfolio, if it
@@ -138,6 +130,21 @@ class RequestPortfolio {
   Trader* requester_;
   int id_;
   static int next_id_;
+  
+ private:
+  /// @brief copy constructor, which we wish not to be used in general, due to
+  /// the ownership relation of the requests
+  RequestPortfolio(const RequestPortfolio& rhs) : id_(next_id_++) {
+    requester_ = rhs.requester_;
+    requests_ = rhs.requests_;
+    constraints_ = rhs.constraints_;
+    qty_ = rhs.qty_;
+    typename std::vector<typename Request<T>::Ptr>::iterator it;
+    for (it = requests_.begin(); it != requests_.end(); ++it) {
+      it->get()->set_portfolio(this);
+    }
+  };
+
 };
 
 template<class T> int RequestPortfolio<T>::next_id_ = 0;

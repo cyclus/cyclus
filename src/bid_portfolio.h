@@ -38,18 +38,6 @@ class BidPortfolio {
     constraints_.clear();
   };
 
-  /// @brief copy constructor
-  BidPortfolio(const BidPortfolio& rhs) : id_(next_id_++) {
-    bidder_ = rhs.bidder_;
-    bids_ = rhs.bids_;
-    commodity_ = rhs.commodity_;
-    constraints_ = rhs.constraints_;
-    typename std::set<typename Bid<T>::Ptr>::iterator it;
-    for (it = bids_.begin(); it != bids_.end(); ++it) {
-      it->get()->set_portfolio(this);
-    }
-  };
-
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
   /// @throws if a bid is added from a different bidder than the original or if
@@ -134,6 +122,20 @@ class BidPortfolio {
   Trader* bidder_;
   int id_;
   static int next_id_;
+
+  // private:
+  /// @brief copy constructor, which we wish not to be used in general, due to
+  /// the ownership relation of the bids
+  BidPortfolio(const BidPortfolio& rhs) : id_(next_id_++) {
+    bidder_ = rhs.bidder_;
+    bids_ = rhs.bids_;
+    commodity_ = rhs.commodity_;
+    constraints_ = rhs.constraints_;
+    typename std::set<typename Bid<T>::Ptr>::iterator it;
+    for (it = bids_.begin(); it != bids_.end(); ++it) {
+      it->get()->set_portfolio(this);
+    }
+  };
 };
 
 template<class T> int BidPortfolio<T>::next_id_ = 0;

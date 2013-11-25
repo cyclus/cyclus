@@ -27,13 +27,14 @@ class Trader : virtual public Model {
   Trader(Context* ctx) : Model(ctx) { };
 
   /// @brief default implementation for material requests
-  virtual std::set< RequestPortfolio<Material> > AddMatlRequests() {
-    return std::set< RequestPortfolio<Material> >();
+  virtual std::set<RequestPortfolio<Material>::Ptr> AddMatlRequests() {
+    return std::set<RequestPortfolio<Material>::Ptr>();
   }
   
   /// @brief default implementation for generic resource requests
-  virtual std::set< RequestPortfolio<GenericResource> > AddGenRsrcRequests() {
-    return std::set< RequestPortfolio<GenericResource> >();
+  virtual std::set<RequestPortfolio<GenericResource>::Ptr>
+      AddGenRsrcRequests() {
+    return std::set<RequestPortfolio<GenericResource>::Ptr >();
   }
 
   /// @brief default implementation for material requests

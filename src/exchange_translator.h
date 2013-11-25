@@ -40,8 +40,10 @@ class ExchangeTranslator {
     ExchangeGraph::Ptr graph(new ExchangeGraph());
 
     // add each request set
-    const std::vector< RequestPortfolio<T> >& requests = ctx_->requests();
-    typename std::vector< RequestPortfolio<T> >::const_iterator rp_it;
+    const std::vector<typename RequestPortfolio<T>::Ptr>& requests =
+        ctx_->requests();
+    typename std::vector<typename RequestPortfolio<T>::Ptr>::const_iterator
+        rp_it;
     for (rp_it = requests.begin(); rp_it != requests.end(); ++rp_it) {
       RequestSet::Ptr rs = __TranslateRequestPortfolio(*rp_it);
       graph->AddRequestSet(rs);
@@ -99,24 +101,25 @@ class ExchangeTranslator {
   /// @brief translates a request portfolio by adding request nodes and
   /// accounting for capacities. Request unit capcities must be added when arcs
   /// are known
-  RequestSet::Ptr __TranslateRequestPortfolio(const RequestPortfolio<T>& rp) {
-    RequestSet::Ptr rs(new RequestSet(rp.qty()));
-    CLOG(LEV_DEBUG2) << "Translating request portfolio of size " << rp.qty();
+  RequestSet::Ptr __TranslateRequestPortfolio(
+      const typename RequestPortfolio<T>::Ptr rp) {
+    RequestSet::Ptr rs(new RequestSet(rp->qty()));
+    CLOG(LEV_DEBUG2) << "Translating request portfolio of size " << rp->qty();
 
     typename std::vector<typename Request<T>::Ptr>::const_iterator r_it;
-    for (r_it = rp.requests().begin();
-         r_it != rp.requests().end();
+    for (r_it = rp->requests().begin();
+         r_it != rp->requests().end();
          ++r_it) {
       Node::Ptr n(new Node());
       rs->AddNode(n);
       __AddRequest(*r_it, n);
     }
 
-    CLOG(LEV_DEBUG4) << "adding " << rp.constraints().size()
+    CLOG(LEV_DEBUG4) << "adding " << rp->constraints().size()
                      << " request capacities";    
     typename std::set< CapacityConstraint<T> >::const_iterator c_it;
-    for (c_it = rp.constraints().begin();
-         c_it != rp.constraints().end();
+    for (c_it = rp->constraints().begin();
+         c_it != rp->constraints().end();
          ++c_it) {
       rs->capacities.push_back(c_it->capacity());
     }
@@ -162,7 +165,7 @@ class ExchangeTranslator {
 
     typename T::Ptr offer = bid->offer();
     BidPortfolio<T>* bp = bid->portfolio();
-    RequestPortfolio<T>* rp = req->portfolio();
+    typename RequestPortfolio<T>::Ptr rp = req->portfolio();
 
     TranslateCapacities(offer, bp->constraints(), vnode, arc); // bid is v
     TranslateCapacities(offer, rp->constraints(), unode, arc); // req is u

@@ -36,14 +36,14 @@ template <class T>
 class ExchangeContext {
  public:  
   /// @brief adds a request to the context
-  void AddRequestPortfolio(const RequestPortfolio<T>& port) {
+  void AddRequestPortfolio(const typename RequestPortfolio<T>::Ptr port) {
     requests_.push_back(port);
-    const std::vector<typename Request<T>::Ptr>& vr = port.requests();
+    const std::vector<typename Request<T>::Ptr>& vr = port->requests();
     typename std::vector<typename Request<T>::Ptr>::const_iterator it;
 
     if (!vr.empty()) {
-      assert(port.requester() != NULL);
-      requesters_.insert(port.requester());
+      assert(port->requester() != NULL);
+      requesters_.insert(port->requester());
     }
     
     for (it = vr.begin(); it != vr.end(); ++it) {
@@ -74,7 +74,8 @@ class ExchangeContext {
   }
 
   /// @return all known request portfolios
-  inline const std::vector< RequestPortfolio<T> >& requests() const {
+  inline const std::vector<typename RequestPortfolio<T>::Ptr>&
+      requests() const {
     return requests_;
   }
   
@@ -89,11 +90,11 @@ class ExchangeContext {
   
   /// @return all known requests for a given commodity
   /// @param commod the commodity
-  inline const std::vector< typename Request<T>::Ptr >&
+  inline const std::vector<typename Request<T>::Ptr>&
       RequestsForCommod(std::string commod) const {
     return requests_by_commod_.at(commod);
   }
-  inline const std::vector< typename Request<T>::Ptr >&
+  inline const std::vector<typename Request<T>::Ptr>&
       RequestsForCommod(std::string commod) {
     return requests_by_commod_[commod];
   }
@@ -120,7 +121,7 @@ class ExchangeContext {
 
   /* -------------------- private methods and members ----------------------- */
   /// @brief a reference to an exchange's set of requests
-  std::vector< RequestPortfolio<T> > requests_;
+  std::vector<typename RequestPortfolio<T>::Ptr> requests_;
 
   /// @brief a reference to an exchange's set of bids
   std::vector< BidPortfolio<T> > bids_;
@@ -140,7 +141,7 @@ class ExchangeContext {
       bids_by_request_;
 
   /// @brief maps commodity name to requests for that commodity
-  std::map< Trader*, typename PrefMap<T>::type > trader_prefs_;
+  std::map<Trader*, typename PrefMap<T>::type> trader_prefs_;
 
   /// @brief adds a bid to the appropriate containers
   /// @param pb the bid
