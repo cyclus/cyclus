@@ -265,4 +265,38 @@ cyclus::ExchangeGraph SetUp6(double qty1, double qty2,
   return g;
 };
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::ExchangeGraph SetUp7(double qty, int N) {
+  using cyclus::ExchangeGraph;
+  using cyclus::Node;
+  using cyclus::NodeSet;
+  using cyclus::RequestSet;
+  using cyclus::Arc;
+  using cyclus::Match;
+  
+  ExchangeGraph g;
+
+  // a single request for qty of a resource
+  Node::Ptr u(new Node());
+  RequestSet::Ptr req(new RequestSet(qty));
+  req->capacities.push_back(qty);
+  req->AddNode(u);
+  g.AddRequestSet(req);
+
+  // a node set with N bids for q/N of a resource
+  NodeSet::Ptr sup(new NodeSet());
+  sup->capacities.push_back(qty);  
+  for (int i = 0; i < N; i++) {
+    Node::Ptr v(new Node(qty / N)); 
+    sup->AddNode(v);  
+    Arc a(u, v);
+    u->unit_capacities[a].push_back(1);
+    v->unit_capacities[a].push_back(1);
+    g.AddArc(a);
+  }
+  g.AddSupplySet(sup);    
+  
+  return g;
+};
+
 #endif // ifndef CYCLUS_TESTS_GREEDY_SOLVER_TESTS_H_

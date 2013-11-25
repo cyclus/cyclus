@@ -1,6 +1,7 @@
 #ifndef CYCLUS_EXCHANGE_GRAPH_H_
 #define CYCLUS_EXCHANGE_GRAPH_H_
 
+#include <limits>
 #include <map>
 #include <utility>
 #include <vector>
@@ -19,16 +20,29 @@ typedef std::pair< boost::shared_ptr<Node>, boost::shared_ptr<Node> > Arc;
 /// @brief Nodes are used in ExchangeGraphs to house information about a given
 /// translated Bid or Request. Specifically, Nodes have a notion of unit
 /// capacities that the given Bid or Request contribute to the overall capacity
-/// of NodeSet.
+/// of NodeSet. Nodes also have a notion of quantity, i.e., the maximum amount
+/// of a resource that can be attributed to it. 
 struct Node {
  public:
   typedef boost::shared_ptr<Node> Ptr;
   
-  Node();
-  
-  std::map<Arc, std::vector<double> > unit_capacities;
+  explicit Node(double max_qty = std::numeric_limits<double>::max());
 
+  /// @brief the parent NodeSet to which this Node belongs
   NodeSet* set;
+
+  /// @brief unit values associated with this Node corresponding to capacties of
+  /// its parent NodeSet. This information corresponds to the resource object
+  /// from which this Node was translated. 
+  std::map<Arc, std::vector<double> > unit_capacities;
+  
+  /// @brief the maximum amount of a resource that can be associated with this
+  /// node
+  double max_qty;
+
+  /// @brief a running total of the amount of resource associated with this
+  /// node
+  double qty;
 };
 
 inline bool operator==(const Node& lhs, const Node& rhs);
@@ -72,13 +86,15 @@ double Capacity(const Arc& a);
 ///
 /// @param n the node
 /// @return The minimum of the node's nodeset capacities / the node's unit
-/// capacities. If the node/node set have no capacities, std::max<double> is
-/// returned.
+/// capacities, or the Node's remaining qty -- whichever is smaller. 
 double Capacity(Node& n, const Arc& a);
 double Capacity(Node::Ptr pn, const Arc& a);
 
-/// @brief updates the capacity of a given node
+/// @brief updates the capacity of a given Node (i.e., its max_qty and the
+/// capacities of its NodeSet)
 ///
+/// @throws if the update results in a negative NodeSet capacity or a negative
+/// Node max_qty
 /// @param n the Node
 /// @param qty the quantity for the node to update
 void UpdateCapacity(Node& n, const Arc& a, double qty);

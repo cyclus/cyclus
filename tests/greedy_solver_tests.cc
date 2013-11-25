@@ -593,3 +593,26 @@ TEST(GrSolverTests, Case6b) {
   EXPECT_EQ(vexp, g.matches);
 }
 /* --- */
+
+/* --- */
+// Case 7:
+// N supply node with capacity, q/N
+// 1 request node with request quantity, q
+// N flows from s->r = q/N
+TEST(GrSolverTests, Case7) {
+  double q = 5;
+  int N = 10;
+  double f = q / N;
+  
+  ExchangeGraph g = SetUp7(q, N);
+  GreedySolver solver(&g);
+  solver.Solve();
+  
+  ASSERT_EQ(g.arcs_.size(), N);
+  ASSERT_EQ(g.matches.size(), N);
+  for (int i = 0; i < N; i++) {
+    Match exp = Match(g.arcs_[i], f);
+    EXPECT_EQ(exp, g.matches[i]);
+  }
+}
+/* --- */

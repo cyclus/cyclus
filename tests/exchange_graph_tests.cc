@@ -104,6 +104,29 @@ TEST(ExGraphTests, NodeCaps2) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, NodeCaps3) {
+  double ncap = 1.0;
+  double qty = 0.5;
+
+  Node::Ptr m(new Node());
+  Node::Ptr n(new Node(0.5));
+  EXPECT_EQ(n->max_qty, 0.5);
+  
+  Arc a(m, n);
+  n->unit_capacities[a].push_back(ncap);
+
+  double scap = 1.5;
+  NodeSet s;
+  s.capacities.push_back(scap);
+  s.AddNode(n);
+
+  EXPECT_EQ(qty, Capacity(n, a));  
+  UpdateCapacity(n, a, qty);
+  EXPECT_EQ(n->qty, 0.5);
+  EXPECT_EQ(0, Capacity(n, a));  
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, NodeUpdateThrow1) {
   Node::Ptr m(new Node());
   Node::Ptr n(new Node());
@@ -131,6 +154,20 @@ TEST(ExGraphTests, NodeUpdateThrow2) {
   s.AddNode(n);
   
   EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, NodeUpdateThrow3) {
+  double qty = 5;
+  
+  Node::Ptr m(new Node());
+  Node::Ptr n(new Node(qty - 1));
+  Arc a(m, n);
+
+  NodeSet s;
+  s.AddNode(n);
+
+  EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

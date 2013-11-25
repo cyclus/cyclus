@@ -8,11 +8,13 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Node::Node() : set(NULL) { }
+Node::Node(double max_qty) : max_qty(max_qty), qty(0), set(NULL) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool operator==(const Node& lhs, const Node& rhs) {
-  return (lhs.unit_capacities == rhs.unit_capacities) && (lhs.set == rhs.set);
+  return (lhs.unit_capacities == rhs.unit_capacities &&
+          lhs.max_qty == rhs.max_qty &&
+          lhs.set == rhs.set);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,7 +50,7 @@ double Capacity(Node& n, const Arc& a) {
     caps.push_back(set_caps[i] / unit_caps[i]);
   }
 
-  return *std::min_element(caps.begin(), caps.end());
+  return std::min(*std::min_element(caps.begin(), caps.end()), n.max_qty - n.qty);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -73,6 +75,12 @@ void UpdateCapacity(Node& n, const Arc& a, double qty) {
     if (DoubleNeg(val)) throw ValueError("Capacities can not be reduced below 0.");
     caps[i] = val;
   }
+
+  double val = n.max_qty - qty;
+  if (DoubleNeg(val)) {
+    throw ValueError("Node quantities can not be reduced below 0.");
+  }
+  n.qty += qty;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
