@@ -31,6 +31,7 @@ class TestTrader : public MockFacility {
      is_requester(is_requester),
      MockFacility(ctx),
      Model(ctx),
+     offer(0),
      adjusts(0),
      requests(0),
      bids(0),
@@ -43,6 +44,7 @@ class TestTrader : public MockFacility {
     m->requests = requests;
     m->bids = bids;
     m->accept = accept;
+    m->offer = offer;
     m->obj_fac = obj_fac;
     m->is_requester = is_requester;
     context()->RegisterTicker(m);
@@ -91,8 +93,8 @@ class TestTrader : public MockFacility {
   };
 
   virtual Material::Ptr OfferMatlTrade(const Trade<Material>& trade) {
-    obs_trade = Trade<Material>(trade); // obs trade
     offer++;
+    obs_trade = Trade<Material>(trade); // obs trade
     return obj_fac->mat;
   }
 

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "logger.h"
 #include "test_context.h"
 
 #include "full_sim_tests.h"
@@ -34,15 +35,13 @@ TEST(FullSimTests, LoneTrader) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(FullSimTests, NullTrade) {
   TestContext tc;
-  // TestObjFactory fac;
-  // bool is_requester = true;
   
-  TestTrader* base_supplier = new TestTrader(tc.get());//, &fac, !is_requester);
+  TestTrader* base_supplier = new TestTrader(tc.get());
   TestTrader* supplier =
       dynamic_cast<TestTrader*>(base_supplier->Clone());
   supplier->Deploy();
 
-  TestTrader* base_requester = new TestTrader(tc.get()); //, &fac, is_requester);
+  TestTrader* base_requester = new TestTrader(tc.get());
   TestTrader* requester =
       dynamic_cast<TestTrader*>(base_requester->Clone());
   requester->Deploy();
@@ -66,40 +65,53 @@ TEST(FullSimTests, NullTrade) {
   delete requester;
 }
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST(FullSimTests, Trade) {
-//   TestContext tc;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(FullSimTests, Trade) {
+  TestContext tc;
+  TestObjFactory fac;
+  bool is_requester = true;
 
-//   Material::Ptr offer = test_helpers::get_mat();
-//   Material::Ptr request = test_helpers::get_mat();
+  //  Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
   
-//   TestRequester* base_requester = new TestRequester(tc.get(), request);
-//   TestRequester* requester =
-//       dynamic_cast<TestRequester*>(base_requester->Clone());
-//   requester->Deploy();
-  
-//   TestSupplier* base_supplier = new TestSupplier(tc.get(), offer, request);
-//   TestSupplier* supplier =
-//       dynamic_cast<TestSupplier*>(base_supplier->Clone());
-//   supplier->Deploy();
+  TestTrader* base_supplier = new TestTrader(tc.get(), &fac, !is_requester);
+  TestTrader* supplier =
+      dynamic_cast<TestTrader*>(base_supplier->Clone());
+  supplier->Deploy();
 
-//   int nsteps = 2;
-  
-//   tc.timer()->Initialize(tc.get(), nsteps);
-//   tc.timer()->RunSim(tc.get());
+  TestTrader* base_requester = new TestTrader(tc.get(), &fac, is_requester);
+  TestTrader* requester =
+      dynamic_cast<TestTrader*>(base_requester->Clone());
+  requester->Deploy();
 
-//   EXPECT_EQ(nsteps, supplier->requests);
-//   EXPECT_EQ(nsteps, supplier->bids);
-//   EXPECT_EQ(0, supplier->accept);
-//   EXPECT_EQ(0, supplier->adjusts);
+  int nsteps = 3;
   
-//   EXPECT_EQ(nsteps, requester->requests);
-//   EXPECT_EQ(nsteps, requester->bids);
-//   EXPECT_EQ(0, requester->accept);
-//   EXPECT_EQ(0, requester->adjusts);
+  tc.timer()->Initialize(tc.get(), nsteps);
+  tc.timer()->RunSim(tc.get());
+
+  EXPECT_EQ(nsteps, supplier->requests);
+  EXPECT_EQ(nsteps, supplier->bids);
+  EXPECT_EQ(0, supplier->accept);
+  EXPECT_EQ(0, supplier->adjusts);
+  EXPECT_EQ(nsteps, supplier->offer);
   
-//   delete supplier;
-//   delete requester;
-// }
+  EXPECT_EQ(nsteps, requester->requests);
+  EXPECT_EQ(nsteps, requester->bids);
+  EXPECT_EQ(nsteps, requester->accept);
+  EXPECT_EQ(nsteps, requester->adjusts);
+  EXPECT_EQ(0, requester->offer);
+
+  // obs, exp
+  Trade<Material> exp_trade(requester->req, supplier->bid,
+                            supplier->bid->offer()->quantity());
+  Material::Ptr exp_mat = fac.mat;
+  EXPECT_EQ(supplier->req, requester->req);
+  EXPECT_EQ(requester->bid, supplier->bid);
+  EXPECT_EQ(requester->obs_trade, exp_trade);
+  EXPECT_EQ(supplier->obs_trade, exp_trade);
+  EXPECT_EQ(requester->mat, exp_mat);
+  
+  delete supplier;
+  delete requester;
+}
 
 }// namespace cyclus
