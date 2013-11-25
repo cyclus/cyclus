@@ -33,7 +33,20 @@ template<class T>
 class RequestPortfolio {
  public:
   /// @brief default constructor
-  RequestPortfolio() : requester_(NULL), qty_(-1), id_(next_id_++) { };
+  RequestPortfolio() : requester_(NULL), qty_(-1), id_(next_id_++) {
+      constraints_.clear();
+  };
+
+  /// @brief copy constructor
+  RequestPortfolio(const RequestPortfolio& rhs) : id_(next_id_++) {
+    requester_ = rhs.requester_;
+    requests_ = rhs.requests_;
+    constraints_ = rhs.constraints_;
+    typename std::vector<typename Request<T>::Ptr>::iterator it;
+    for (it = requests_.begin(); it != requests_.end(); ++it) {
+      it->get()->set_portfolio(this);
+    }
+  };
 
   /// @brief add a request to the portfolio
   /// @param r the request to add

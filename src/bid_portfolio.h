@@ -34,7 +34,21 @@ class BidPortfolio {
   BidPortfolio()
     : bidder_(NULL),
       commodity_("NO_COMMODITY_SET"),
-      id_(next_id_++) { };
+      id_(next_id_++) {
+    constraints_.clear();
+  };
+
+  /// @brief copy constructor
+  BidPortfolio(const BidPortfolio& rhs) : id_(next_id_++) {
+    bidder_ = rhs.bidder_;
+    bids_ = rhs.bids_;
+    commodity_ = rhs.commodity_;
+    constraints_ = rhs.constraints_;
+    typename std::set<typename Bid<T>::Ptr>::iterator it;
+    for (it = bids_.begin(); it != bids_.end(); ++it) {
+      it->get()->set_portfolio(this);
+    }
+  };
 
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
@@ -85,10 +99,10 @@ class BidPortfolio {
   /// VerifyResponder() verifies the the bid is associated with the
   /// portfolio's bidder
   /// @throws if a bid is added from a different bidder than the original
-  void __VerifyResponder(const typename Bid<T>::Ptr r) {
+  void __VerifyResponder(typename Bid<T>::Ptr b) {
     if (bidder_ == NULL) {
-      bidder_ = r->bidder();
-    } else if (bidder_ != r->bidder()) {
+      bidder_ = b->bidder();
+    } else if (bidder_ != b->bidder()) {
       std::string msg = "Insertion error: bidders do not match.";
       throw KeyError(msg);
     }
