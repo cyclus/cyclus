@@ -21,10 +21,6 @@ class TestInst: public cyclus::InstModel {
 
   virtual cyclus::Model* Clone() {return new TestInst(context());};
 
-  void ReceiveMessage(cyclus::Message::Ptr msg) {
-    msg->SetDir(cyclus::DOWN_MSG);
-  }
-
   void WrapAddAvailablePrototype(std::string proto_name) {
     AddAvailablePrototype(proto_name);
   }

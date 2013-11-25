@@ -3,7 +3,6 @@
 #define CYCLUS_INST_MODEL_H_
 
 #include "time_agent.h"
-#include "communicator.h"
 #include "model.h"
 #include "region_model.h"
 
@@ -50,7 +49,7 @@ typedef std::set<std::string>::iterator PrototypeIterator;
    @section thirdPartyImpl Third Party Implementations
    (None)
  */
-class InstModel : public TimeAgent, public Communicator {
+class InstModel : public TimeAgent {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
@@ -79,11 +78,6 @@ class InstModel : public TimeAgent, public Communicator {
   virtual std::string str();
 
  public:
-  /**
-     default InstModel receiver is to ignore message.
-   */
-  virtual void ReceiveMessage(Message::Ptr msg);
-
   /**
      Each institution is prompted to do its beginning-of-time-step
      stuff at the tick of the timer.

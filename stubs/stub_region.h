@@ -5,7 +5,6 @@
 
 #include "context.h"
 #include "region_model.h"
-#include "message.h"
 #include "query_engine.h"
 
 namespace stubs {
@@ -68,11 +67,6 @@ class StubRegion : public cyclus::RegionModel {
      Initializes a StubRegion object by copying the members of another.
    */
    virtual cyclus::Model* Clone();
-
-   /**
-     The StubRegion should ignore incoming messages 
-   */
-   virtual void ReceiveMessage(cyclus::Message::Ptr msg);
   
 /* -------------------- */
 

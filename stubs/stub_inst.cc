@@ -36,9 +36,6 @@ std::string StubInst::str() {
   return InstModel::str();
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::ReceiveMessage(cyclus::Message::Ptr msg) {}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructStubInst(cyclus::Context* ctx) {
   return new StubInst(ctx);

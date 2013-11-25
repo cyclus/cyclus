@@ -6,7 +6,6 @@
 #include <vector>
 #include <set>
 
-#include "communicator.h"
 #include "model.h"
 #include "time_agent.h"
 #include "trader.h"
@@ -69,7 +68,7 @@ class InstModel;
    Collaborators are encouraged to add to this list and link to external
    pages that describe how to get the models and the detailed behavior
  */
-class FacilityModel : public TimeAgent, public Communicator, public Trader {
+class FacilityModel : public TimeAgent, public Trader {
  public:
   FacilityModel(Context* ctx);
 
@@ -110,13 +109,6 @@ class FacilityModel : public TimeAgent, public Communicator, public Trader {
      every model should be able to print a verbose description
    */
   virtual std::string str();
-
-  /**
-     There is no default FacilityModel receiver
-
-     Each derived class must implement an offer/request receiver
-   */
-  virtual void ReceiveMessage(Message::Ptr msg) = 0;
 
   /**
      Sets the facility's name

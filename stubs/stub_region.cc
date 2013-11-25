@@ -36,9 +36,6 @@ std::string StubRegion::str() {
   return RegionModel::str();
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::ReceiveMessage(cyclus::Message::Ptr msg) {}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructStubRegion(cyclus::Context* ctx) {
   return new StubRegion(ctx);

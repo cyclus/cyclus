@@ -10,6 +10,7 @@
 
 #include "dynamic_module.h"
 #include "transaction.h"
+#include "resource.h"
 #include "query_engine.h"
 #include "exchange_context.h"
 

@@ -5,7 +5,6 @@
 #include <set>
 
 #include "time_agent.h"
-#include "communicator.h"
 #include "query_engine.h"
 
 namespace cyclus {
@@ -63,7 +62,7 @@ namespace cyclus {
    facility's allowability in the region). It makes no alterations to
    messages passed through it in either the up or down direction.
  */
-class RegionModel : public TimeAgent, public Communicator {
+class RegionModel : public TimeAgent {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
@@ -95,11 +94,6 @@ class RegionModel : public TimeAgent, public Communicator {
      every model should be able to print a verbose description
    */
   virtual std::string str();
-
-  /**
-     default RegionModel receiver is to ignore messages
-   */
-  virtual void ReceiveMessage(Message::Ptr msg);
 
   /**
      Each region is prompted to do its beginning-of-time-step

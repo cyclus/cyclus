@@ -38,17 +38,6 @@ std::string StubFacility::str() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::ReceiveMessage(cyclus::Message::Ptr msg) {}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<cyclus::Resource::Ptr>
-StubFacility::RemoveResource(cyclus::Transaction order) {}
-    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::AddResource(cyclus::Transaction trans,
-                               std::vector<cyclus::Resource::Ptr> manifest){}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubFacility::HandleTick(int time){}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

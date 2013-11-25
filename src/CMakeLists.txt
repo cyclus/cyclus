@@ -82,11 +82,9 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/logger.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/market_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/message.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc
@@ -122,7 +120,6 @@ INSTALL(FILES
   commodity.h
   commodity_producer.h
   commodity_producer_manager.h
-  communicator.h
   comp_math.h
   composition.h
   context.h
@@ -152,11 +149,9 @@ INSTALL(FILES
   intrusive_base.h
   l_matrix.h
   logger.h
-  market_model.h
   mass_table.h
   mat_query.h
   material.h
-  message.h
   model.h
   query_engine.h 
   region_model.h

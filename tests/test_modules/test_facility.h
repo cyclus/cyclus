@@ -12,16 +12,9 @@ class TestFacility: public cyclus::FacilityModel {
       : cyclus::FacilityModel(ctx),
         cyclus::Model(ctx) {};
       
-  virtual cyclus::Model* Clone() {return new TestFacility(context());};
+  virtual cyclus::Model* Clone() { return new TestFacility(context()); };
 
-  void ReceiveMessage(cyclus::Message::Ptr msg) {
-    msg->SetDir(cyclus::DOWN_MSG);
-  }
-
-  void ReceiveMaterial(cyclus::Transaction trans,
-                       std::vector<cyclus::Material::Ptr> manifest) {}
-
-  void CloneModuleMembersFrom(cyclus::FacilityModel* source) {}
+  void CloneModuleMembersFrom(cyclus::FacilityModel* source) {};
   void HandleTick(int time) {};
   void HandleTock(int time) {};
 };

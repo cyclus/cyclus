@@ -20,9 +20,6 @@ class MockFacility : public cyclus::FacilityModel {
     return m;
   };
 
-  void ReceiveMessage(cyclus::Message::Ptr msg) {};
-  void ReceiveMaterial(cyclus::Transaction trans,
-                       std::vector<cyclus::Material::Ptr> manifest) {};
   void CloneModuleMembersFrom(cyclus::FacilityModel* source) {};
   void HandleTick(int time) {};
   void HandleTock(int time) {};

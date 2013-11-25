@@ -9,7 +9,6 @@
 
 #include "error.h"
 #include "logger.h"
-#include "market_model.h"
 #include "region_model.h"
 #include "resource.h"
 
@@ -21,7 +20,6 @@ int Model::next_id_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> Model::dynamic_module_types() {
   std::set<std::string> types;
-  types.insert("Market");
   types.insert("Region");
   types.insert("Inst");
   types.insert("Facility");

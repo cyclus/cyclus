@@ -5,7 +5,6 @@
 
 #include "context.h"
 #include "facility_model.h"
-#include "message.h"
 #include "query_engine.h"
 
 namespace stubs {
@@ -68,30 +67,6 @@ class StubFacility : public cyclus::FacilityModel  {
      Initializes a StubFacility object by copying the members of another.
    */
    virtual cyclus::Model* Clone();
-   
-  /**
-     Transacted resources are extracted through this method 
-      
-     @param order the msg/order for which resource(s) are to be prepared 
-     @return list of resources to be sent for this order 
-      
-   */ 
-   virtual std::vector<cyclus::Resource::Ptr>
-       RemoveResource(cyclus::Transaction order);
-
-  /**
-     Transacted resources are received through this method 
-      
-     @param trans the transaction to which these resource objects belong 
-     @param manifest is the set of resources being received 
-   */ 
-   virtual void AddResource(cyclus::Transaction trans,
-                            std::vector<cyclus::Resource::Ptr> manifest);
-
-   /**
-     The StubFacility should ignore incoming messages 
-   */
-  virtual void ReceiveMessage(cyclus::Message::Ptr msg);
 
   /**
      The handleTick function specific to the StubFacility. 
