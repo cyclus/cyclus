@@ -50,14 +50,14 @@ class ExchangeTranslator {
     }
 
     // add each bid set
-    const std::vector< BidPortfolio<T> >& bidports = ctx_->bids();
-    typename std::vector< BidPortfolio<T> >::const_iterator bp_it;
+    const std::vector<typename BidPortfolio<T>::Ptr>& bidports = ctx_->bids();
+    typename std::vector<typename BidPortfolio<T>::Ptr>::const_iterator bp_it;
     for (bp_it = bidports.begin(); bp_it != bidports.end(); ++bp_it) {
       NodeSet::Ptr ns = __TranslateBidPortfolio(*bp_it);
       graph->AddSupplySet(ns);
 
       // add each request-bid arc
-      const std::set<typename Bid<T>::Ptr>& bids = bp_it->bids();
+      const std::set<typename Bid<T>::Ptr>& bids = (*bp_it)->bids();
       typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
         Arc a = __TranslateArc(*b_it);
@@ -129,24 +129,25 @@ class ExchangeTranslator {
   
   /// @brief translates a bid portfolio by adding bid nodes and accounting
   /// for capacities. Bid unit capcities must be added when arcs are known
-  NodeSet::Ptr __TranslateBidPortfolio(const BidPortfolio<T>& bp) {
+  NodeSet::Ptr __TranslateBidPortfolio(
+      const typename BidPortfolio<T>::Ptr bp) {
     NodeSet::Ptr bs(new NodeSet());
     
     typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
-    for (b_it = bp.bids().begin();
-         b_it != bp.bids().end();
+    for (b_it = bp->bids().begin();
+         b_it != bp->bids().end();
          ++b_it) {
       Node::Ptr n(new Node());
       bs->AddNode(n);
       __AddBid(*b_it, n);
     }
 
-    CLOG(LEV_DEBUG4) << "adding " << bp.constraints().size()
+    CLOG(LEV_DEBUG4) << "adding " << bp->constraints().size()
                      << " bid capacities";    
 
     typename std::set< CapacityConstraint<T> >::const_iterator c_it;
-    for (c_it = bp.constraints().begin();
-         c_it != bp.constraints().end();
+    for (c_it = bp->constraints().begin();
+         c_it != bp->constraints().end();
          ++c_it) {
       bs->capacities.push_back(c_it->capacity());
     }
@@ -164,7 +165,7 @@ class ExchangeTranslator {
     Arc arc(unode, vnode);
 
     typename T::Ptr offer = bid->offer();
-    BidPortfolio<T>* bp = bid->portfolio();
+    typename BidPortfolio<T>::Ptr bp = bid->portfolio();
     typename RequestPortfolio<T>::Ptr rp = req->portfolio();
 
     TranslateCapacities(offer, bp->constraints(), vnode, arc); // bid is v

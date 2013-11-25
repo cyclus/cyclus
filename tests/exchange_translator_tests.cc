@@ -138,10 +138,10 @@ TEST(ExXlateTests, XlateBid) {
   double carr[] = {qty1, qty2};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
-  BidPortfolio<Material> port;
-  port.AddBid(bid);
-  port.AddConstraint(cc1);
-  port.AddConstraint(cc2);
+  BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
+  port->AddBid(bid);
+  port->AddConstraint(cc1);
+  port->AddConstraint(cc2);
 
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
@@ -169,10 +169,10 @@ TEST(ExXlateTests, XlateArc) {
   double carr[] = {qty1, qty2};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
-  BidPortfolio<Material> bport;
-  bport.AddBid(bid);
-  bport.AddConstraint(cc1);
-  bport.AddConstraint(cc2);
+  BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
+  bport->AddBid(bid);
+  bport->AddConstraint(cc1);
+  bport->AddConstraint(cc2);
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
   rport->AddRequest(req);
@@ -203,9 +203,9 @@ TEST(ExXlateTests, XlateArc) {
 TEST(ExXlateTests, SimpleXlate) {
   Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &trader));
   Bid<Material>::Ptr bid(new Bid<Material>(req, get_mat(u235, qty), &trader));
-      
-  BidPortfolio<Material> bport;
-  bport.AddBid(bid);
+
+  BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
+  bport->AddBid(bid);
 
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());

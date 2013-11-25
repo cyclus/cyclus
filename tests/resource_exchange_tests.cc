@@ -105,12 +105,12 @@ class Bidder: public MockFacility {
     return m;
   };
   
-  set< BidPortfolio<Material> > AddMatlBids(ExchangeContext<Material>* ec) {
-    set< BidPortfolio<Material> > bps;
-    BidPortfolio<Material> bp;
+  set<BidPortfolio<Material>::Ptr> AddMatlBids(ExchangeContext<Material>* ec) {
+    set<BidPortfolio<Material>::Ptr> bps;
+    BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
     int sz = ec->RequestsForCommod(commod_).size();
     for (int i = 0; i < sz; i++) {
-      bp.AddBid(bids_[i]);
+      bp->AddBid(bids_[i]);
     }
     bps.insert(bp);
     bid_ctr_++;
@@ -236,13 +236,12 @@ TEST_F(ResourceExchangeTests, Bids) {
   EXPECT_EQ(1, bcast->bid_ctr_);
   EXPECT_EQ(1, exchng->ex_ctx().bidders().size());
   
-  std::vector<BidPortfolio<Material> > vp;
-  BidPortfolio<Material> bp;
-  bp.AddBid(bid);
-  bp.AddBid(bid1);
-  vp.push_back(bp);
-  const std::vector< BidPortfolio<Material> >& obsvp = ctx.bids();
-  EXPECT_EQ(vp, obsvp);
+  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+  bp->AddBid(bid);
+  bp->AddBid(bid1);
+  const std::vector<BidPortfolio<Material>::Ptr>& obsvp = ctx.bids();
+  EXPECT_EQ(1, obsvp.size());
+  EXPECT_EQ(*bp.get(), *obsvp[0].get());
 
   const std::vector<Bid<Material>::Ptr>& obsvb = ctx.BidsForRequest(req);
   EXPECT_EQ(1, obsvb.size());  

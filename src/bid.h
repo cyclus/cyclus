@@ -26,7 +26,6 @@ class Bid {
     : request_(request),
       offer_(offer),
       bidder_(bidder),
-      portfolio_(NULL),
       id_(next_id_++) { };
   
   /// @return the request being responded to
@@ -45,12 +44,12 @@ class Bid {
   }
   
   /// @return the portfolio of which this bid is a part
-  inline BidPortfolio<T>* portfolio() {
+  inline typename BidPortfolio<T>::Ptr portfolio() {
     return portfolio_;
   }
 
   /// @brief set the portfolio for this bid
-  inline void set_portfolio(BidPortfolio<T>* portfolio) {
+  inline void set_portfolio(typename BidPortfolio<T>::Ptr portfolio) {
     portfolio_ = portfolio;
   }
   
@@ -63,7 +62,7 @@ class Bid {
   typename Request<T>::Ptr request_;
   boost::shared_ptr<T> offer_;
   Trader* bidder_;
-  BidPortfolio<T>* portfolio_;
+  typename BidPortfolio<T>::Ptr portfolio_;
   int id_;
   static int next_id_;
 };
@@ -74,9 +73,10 @@ template<class T> int Bid<T>::next_id_ = 0;
 template<class T>
 inline bool operator==(const cyclus::Bid<T>& lhs,
                        const cyclus::Bid<T>& rhs) {
-  return  ((lhs.request == rhs.request) &&
-           (lhs.offer == rhs.offer) &&
-           (lhs.bidder == rhs.bidder));
+  return  (lhs.request() == rhs.request() &&
+           lhs.offer() == rhs.offer() &&
+           lhs.portfolio() == rhs.portfolio() &&
+           lhs.bidder() == rhs.bidder());
 }
 
 /// @brief comparison operator, allows usage in ordered containers

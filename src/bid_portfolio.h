@@ -26,7 +26,8 @@ class Trader;
 /// and the commodity that it produces. Constraints are assumed to act over the
 /// entire set of possible bids.
 template <class T>
-class BidPortfolio {
+class BidPortfolio :
+public boost::enable_shared_from_this< BidPortfolio<T> > {
  public:
   typedef boost::shared_ptr< BidPortfolio<T> > Ptr;
 
@@ -46,7 +47,7 @@ class BidPortfolio {
     __VerifyResponder(b);
     __VerifyCommodity(b);
     bids_.insert(b);
-    b->set_portfolio(this);
+    b->set_portfolio(this->shared_from_this());
   };
   
   /// @return the model associated with the portfolio. if no bids have
@@ -123,7 +124,7 @@ class BidPortfolio {
   int id_;
   static int next_id_;
 
-  // private:
+ private:
   /// @brief copy constructor, which we wish not to be used in general, due to
   /// the ownership relation of the bids
   BidPortfolio(const BidPortfolio& rhs) : id_(next_id_++) {

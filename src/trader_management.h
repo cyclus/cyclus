@@ -30,19 +30,19 @@ inline std::set<RequestPortfolio<GenericResource>::Ptr>
 template<class T> class ExchangeContext;
   
 template<class T>
-inline static std::set< BidPortfolio<T> >
+inline static std::set<typename BidPortfolio<T>::Ptr>
     QueryBids(Trader* t, ExchangeContext<T>* ec) {
-  return std::set< BidPortfolio<T> >();
+  return std::set<typename BidPortfolio<T>::Ptr>();
 }
   
 template<>
-inline std::set< BidPortfolio<Material> >
+inline std::set<BidPortfolio<Material>::Ptr>
     QueryBids<Material>(Trader* t, ExchangeContext<Material>* ec) {
   return t->AddMatlBids(ec);
 }
 
 template<>
-inline std::set< BidPortfolio<GenericResource> >
+inline std::set<BidPortfolio<GenericResource>::Ptr>
     QueryBids<GenericResource>(Trader* t, ExchangeContext<GenericResource>* ec) {
   return t->AddGenRsrcBids(ec);
 }

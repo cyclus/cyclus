@@ -68,20 +68,20 @@ class TestTrader : public MockFacility {
     }
   }
   
-  virtual std::set< BidPortfolio<Material> >
+  virtual std::set<BidPortfolio<Material>::Ptr>
       AddMatlBids(ExchangeContext<Material>* ec) {
     bids++;
     if (obj_fac == NULL || is_requester) {
-      return std::set< BidPortfolio<Material> >();
+      return std::set<BidPortfolio<Material>::Ptr>();
     } else {
       req = ec->RequestsForCommod(obj_fac->commod)[0]; // obs request
     
-      std::set< BidPortfolio<Material> > ports;
-      BidPortfolio<Material> port;
+      std::set<BidPortfolio<Material>::Ptr> ports;
+      BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
       Bid<Material>::Ptr to_bid(
           new Bid<Material>(req, obj_fac->mat, this));
       bid = to_bid; // exp bid
-      port.AddBid(to_bid);
+      port->AddBid(to_bid);
       ports.insert(port);
       return ports;
     }

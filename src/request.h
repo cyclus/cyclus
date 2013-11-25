@@ -83,10 +83,11 @@ template<class T> int Request<T>::next_id_ = 0;
 template<class T>
 inline bool operator==(const Request<T>& lhs,
                        const Request<T>& rhs) {
-  return  ((lhs.commodity == rhs.commodity) &&
-           (lhs.target == rhs.target) &&
-           (DoubleEq(lhs.preference, rhs.preference)) &&
-           (lhs.requester == rhs.requester));
+  return (lhs.commodity() == rhs.commodity() &&
+          lhs.target() == rhs.target() &&
+          lhs.portfolio() == rhs.portfolio() &&
+          DoubleEq(lhs.preference(), rhs.preference()) &&
+          lhs.requester() == rhs.requester());
 }
 
 /// @brief comparison operator, allows usage in ordered containers

@@ -57,14 +57,13 @@ class ExchangeContext {
   }
 
   /// @brief adds a bid to the context
-  void AddBidPortfolio(const BidPortfolio<T>& port) {
+  void AddBidPortfolio(const typename BidPortfolio<T>::Ptr port) {
     bids_.push_back(port);
-    const std::set<typename Bid<T>::Ptr>& vr = port.bids();
+    const std::set<typename Bid<T>::Ptr>& vr = port->bids();
     typename std::set<typename Bid<T>::Ptr>::const_iterator it;
     
     if (!vr.empty()) {
-      assert(port.bidder() != NULL);
-      bidders_.insert(port.bidder());
+      bidders_.insert(port->bidder());
     }
 
     for (it = vr.begin(); it != vr.end(); ++it) {
@@ -83,7 +82,10 @@ class ExchangeContext {
   inline const std::set<Trader*>& requesters() const {return requesters_;}
 
   /// @return all known bid portfolios
-  inline const std::vector< BidPortfolio<T> >& bids() const {return bids_;}
+  inline const std::vector<typename BidPortfolio<T>::Ptr>&
+      bids() const {
+    return bids_;
+  }
 
   /// @return all known bidders
   inline const std::set<Trader*>& bidders() const {return bidders_;}
@@ -101,11 +103,11 @@ class ExchangeContext {
   
   /// @return all known bids for a request
   /// @param request the request
-  inline const std::vector< typename Bid<T>::Ptr >&
+  inline const std::vector<typename Bid<T>::Ptr>&
       BidsForRequest(typename Request<T>::Ptr request) const {
     return bids_by_request_.at(request);
   }
-  inline const std::vector< typename Bid<T>::Ptr >&
+  inline const std::vector<typename Bid<T>::Ptr>&
       BidsForRequest(typename Request<T>::Ptr request) {
     return bids_by_request_[request];
   }
@@ -124,7 +126,7 @@ class ExchangeContext {
   std::vector<typename RequestPortfolio<T>::Ptr> requests_;
 
   /// @brief a reference to an exchange's set of bids
-  std::vector< BidPortfolio<T> > bids_;
+  std::vector<typename BidPortfolio<T>::Ptr> bids_;
 
   /// @brief known requesters
   std::set<Trader*> requesters_;
