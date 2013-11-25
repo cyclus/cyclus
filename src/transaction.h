@@ -8,9 +8,21 @@
 namespace cyclus {
 
 class Context;
-  
+
+/// @class Transaction
+///
+/// @brief A Transaction is a class used for recording resource transactions
+/// within a simulation. 
 class Transaction {
  public:
+  /// @brief constructor
+  ///
+  /// @param ctx the simulation Context
+  /// @param sender_id the ID of the sender Model
+  /// @param receiver_id the ID of the receiver Model
+  /// @param rsrc_id the ID of the Resource
+  /// @param commodity the commodity associated with the transaction
+  /// @param price a price value of the transaction
   Transaction(Context* ctx, int sender_id, int receiver_id, int rsrc_id,
               std::string commodity, double price = 0.0);
 
