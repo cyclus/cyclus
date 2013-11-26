@@ -90,6 +90,29 @@ inline static void ExecuteTrade(const Trade<T>& trade) {
   ExecTradeAccept(trade, rsrc);
 }
 
+template<class T>
+inline static void PopulateTradeResponses(
+    Trader* trader,
+    const std::vector< Trade<T> >& trades,
+    std::vector< std::pair<Trade<T>, typename T::Ptr> >& responses) { }
+
+template<>
+inline void PopulateTradeResponses<Material>(
+    Trader* trader,
+    const std::vector< Trade<Material> >& trades,
+    std::vector<std::pair<Trade<Material>, Material::Ptr> >&
+    responses) {
+  trader->PopulateMatlTradeResponses(trades, responses);
+}
+
+template<>
+inline void PopulateTradeResponses<GenericResource>(
+    Trader* trader,
+    const std::vector< Trade<GenericResource> >& trades,
+    std::vector<std::pair<Trade<GenericResource>,
+    GenericResource::Ptr> >& responses) {
+  trader->PopulateGenRsrcTradeResponses(trades, responses);
+}
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_TRADER_MANAGEMENT_H_

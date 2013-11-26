@@ -1,29 +1,65 @@
 #include <gtest/gtest.h>
 
+#include <map>
+#include <set>
+#include <utility>
+#include <vector>
+
 #include "bid.h"
+#include "context.h"
 #include "material.h"
 #include "mock_facility.h"
+#include "model.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
 #include "trade.h"
-#include "trader.h"
 #include "trade_executor.h"
+#include "trader.h"
 
 using cyclus::Bid;
+using cyclus::Context;
 using cyclus::Material;
+using cyclus::Model;
 using cyclus::Request;
 using cyclus::TestContext;
 using cyclus::Trade;
-using cyclus::Trader;
 using cyclus::TradeExecutor;
+using cyclus::Trader;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class TestSender : public MockFacility {
+ public:
+  TestSender(Context* ctx, Material::Ptr mat)
+    : MockFacility(ctx),
+      Model(ctx),
+      mat(mat) { };
+  
+  virtual cyclus::Model* Clone() {
+    TestSender* m = new TestSender(*this);
+    m->InitFrom(this);
+    m->mat = mat;
+    return m;
+  };
+
+  virtual void PopulateMatlTradeResponses(
+    const std::vector< Trade<Material> >& trades,
+    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
+    std::vector< Trade<Material> >::const_iterator it;
+    for (it = trades.begin(); it != trades.end(); ++it) {
+      responses.push_back(std::make_pair(*it, mat));
+    }
+  }
+  
+  Material::Ptr mat;
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class TradeExecutorTests : public ::testing::Test {
  public:
   TestContext tc;
-  MockFacility* s1;
-  MockFacility* s2;
+  TestSender* s1;
+  TestSender* s2;
   MockFacility* r1;
   MockFacility* r2;
   Material::Ptr mat;
@@ -36,8 +72,8 @@ class TradeExecutorTests : public ::testing::Test {
   virtual void SetUp() {
     mat = test_helpers::get_mat();
     amt = 4.5; // some magic number..
-    s1 = new MockFacility(tc.get());
-    s2 = new MockFacility(tc.get());
+    s1 = new TestSender(tc.get(), mat);
+    s2 = new TestSender(tc.get(), mat);
     r1 = new MockFacility(tc.get());
     r2 = new MockFacility(tc.get());
 
@@ -66,7 +102,7 @@ class TradeExecutorTests : public ::testing::Test {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(TradeExecutorTests, SupplierMap) {
+TEST_F(TradeExecutorTests, SupplierGrouping) {
   TradeExecutor<Material> exec(trades);
   exec.__GroupTradesBySupplier();
   std::map<Trader*, std::vector< Trade<Material> > > obs =
@@ -77,4 +113,35 @@ TEST_F(TradeExecutorTests, SupplierMap) {
   exp[s2].push_back(t3);
 
   EXPECT_EQ(obs, exp);
+
+  std::set<Trader*> requesters;
+  std::set<Trader*> suppliers;
+  requesters.insert(r1);
+  requesters.insert(r2);
+  suppliers.insert(s1);
+  suppliers.insert(s2);
+  EXPECT_EQ(exec.requesters_, requesters);
+  EXPECT_EQ(exec.suppliers_, suppliers);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(TradeExecutorTests, SupplierResponses) {
+  TradeExecutor<Material> exec(trades);
+  exec.__GroupTradesBySupplier();  
+  exec.__GetTradeResponses();
+
+  std::map<Trader*,
+           std::vector< std::pair<Trade<Material>, Material::Ptr> > >
+      trades_by_requester;
+  trades_by_requester[r1].push_back(std::make_pair(t1, mat));
+  trades_by_requester[r1].push_back(std::make_pair(t2, mat));
+  trades_by_requester[r2].push_back(std::make_pair(t3, mat));
+  EXPECT_EQ(exec.trades_by_requester_, trades_by_requester);
+  
+  std::map<std::pair<Trader*, Trader*>,
+           std::vector< std::pair<Trade<Material>, Material::Ptr> > > all_trades;
+  all_trades[std::make_pair(s1, r1)].push_back(std::make_pair(t1, mat));
+  all_trades[std::make_pair(s2, r1)].push_back(std::make_pair(t2, mat));
+  all_trades[std::make_pair(s2, r2)].push_back(std::make_pair(t3, mat));
+  EXPECT_EQ(exec.all_trades_, all_trades);
 }
