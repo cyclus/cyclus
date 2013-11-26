@@ -121,6 +121,9 @@ class Context {
   /// See EventManager::NewEvent documentation.
   Event* NewEvent(std::string title);
 
+  /// @return the next transaction id
+  inline int NextTransactionID() {return trans_id_++;}
+      
  private:
   std::map<std::string, Model*> protos_;
   std::set<Trader*> traders_;
@@ -129,6 +132,7 @@ class Context {
   
   Timer* ti_;
   EventManager* em_;
+  int trans_id_;
 };
 
 } // namespace cyclus

@@ -11,13 +11,15 @@ struct Trade {
   typename Request<T>::Ptr request;
   typename Bid<T>::Ptr bid;
   double amt;
-
+  double price;
+  
   Trade() {};
   
   Trade(typename Request<T>::Ptr request, typename Bid<T>::Ptr bid, double amt)
     : request(request),
       bid(bid),
-      amt(amt) { };
+      amt(amt),
+      price(0) { };
 };
 
 /// @brief equality operator
@@ -26,6 +28,7 @@ bool operator==(const cyclus::Trade<T>& lhs,
                 const cyclus::Trade<T>& rhs) {
   return  ((lhs.request == rhs.request) &&
            (lhs.bid == rhs.bid) &&
+           (lhs.price == rhs.price) &&
            (lhs.amt == rhs.amt));
 }
 

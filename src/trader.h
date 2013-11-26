@@ -85,6 +85,16 @@ class Trader : virtual public Model {
     std::vector<std::pair<Trade<GenericResource>,
     GenericResource::Ptr> >& responses)
   { }
+
+  /// @brief default implementation for material trade acceptance
+  virtual void AcceptMatlTrades(
+      const std::vector<std::pair<Trade<Material>,
+      Material::Ptr> >& responses) { }
+
+  /// @brief default implementation for generic resource trade acceptance
+  virtual void AcceptGenRsrcTrades(
+      const std::vector<std::pair<Trade<GenericResource>,
+      GenericResource::Ptr> >& responses) { }
 };
 
 } // namespace cyclus

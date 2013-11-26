@@ -12,7 +12,7 @@ namespace cyclus {
 template<class T>
     inline static std::set<typename RequestPortfolio<T>::Ptr>
     QueryRequests(Trader* t) {
-  return std::set<typename RequestPortfolio<T>::Ptr>();
+  throw StateError("Templated version of QueryRequests not supported");
 }
 
 template<>
@@ -32,7 +32,7 @@ template<class T> class ExchangeContext;
 template<class T>
 inline static std::set<typename BidPortfolio<T>::Ptr>
     QueryBids(Trader* t, ExchangeContext<T>* ec) {
-  return std::set<typename BidPortfolio<T>::Ptr>();
+  throw StateError("Templated version of QueryBids not supported");
 }
   
 template<>
@@ -94,7 +94,9 @@ template<class T>
 inline static void PopulateTradeResponses(
     Trader* trader,
     const std::vector< Trade<T> >& trades,
-    std::vector< std::pair<Trade<T>, typename T::Ptr> >& responses) { }
+    std::vector< std::pair<Trade<T>, typename T::Ptr> >& responses) {
+  throw StateError("Templated version of PopulateTradeResponses not supported");
+}
 
 template<>
 inline void PopulateTradeResponses<Material>(
@@ -112,6 +114,29 @@ inline void PopulateTradeResponses<GenericResource>(
     std::vector<std::pair<Trade<GenericResource>,
     GenericResource::Ptr> >& responses) {
   trader->PopulateGenRsrcTradeResponses(trades, responses);
+}
+
+template<class T>
+inline static void AcceptTrades(
+    Trader* trader,
+    const std::vector< std::pair<Trade<T>, typename T::Ptr> >& responses) {
+  throw StateError("Templated version of AcceptTrades not supported");
+}
+
+template<>
+inline void AcceptTrades(
+    Trader* trader,
+    const std::vector< std::pair<Trade<Material>,
+    typename Material::Ptr> >& responses) {
+  trader->AcceptMatlTrades(responses);
+}
+
+template<>
+inline void AcceptTrades(
+    Trader* trader,
+    const std::vector< std::pair<Trade<GenericResource>,
+    typename GenericResource::Ptr> >& responses) {
+  trader->AcceptGenRsrcTrades(responses);
 }
 } // namespace cyclus
 

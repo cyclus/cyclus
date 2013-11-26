@@ -6,12 +6,13 @@
 #include <utility>
 #include <vector>
 
+#include "context.h"
 #include "trade.h"
 #include "trader.h"
 #include "trader_management.h"
 
 namespace cyclus {
-
+  
 template <class T>
 class TradeExecutor {
  public:
@@ -21,12 +22,35 @@ class TradeExecutor {
   void ExecuteTrades() {
     __GroupTradesBySupplier();
     __GetTradeResponses();
-    // send trades by requester
+    __SendTradeResources();
   };
   
-  void RecordTrades() {
+  void RecordTrades(Context* ctx) {
     // record all trades
-  };
+    typename std::map<std::pair<Trader*, Trader*>,
+        std::vector< std::pair<Trade<T>, typename T::Ptr> > >::iterator m_it;
+    for (m_it = all_trades_.begin(); m_it != all_trades_.end(); ++m_it) {
+      Trader* supplier = m_it->first.first;
+      Trader* requester = m_it->first.second;
+      typename std::vector< std::pair<Trade<T>, typename T::Ptr> >& trades =
+          m_it->second;
+      typename std::vector< std::pair<Trade<T>,
+          typename T::Ptr> >::iterator v_it;
+      for (v_it = trades.begin(); v_it != trades.end(); ++v_it) {
+        Trade<T>& trade = v_it->first;
+        typename T::Ptr rsrc =  v_it->second;
+        ctx->NewEvent("Transactions")
+            ->AddVal("ID", ctx->NextTransactionID())
+            ->AddVal("SenderID", supplier->id())
+            ->AddVal("ReceiverID", requester->id())
+            ->AddVal("ResourceID", rsrc->id())
+            ->AddVal("Commodity", trade.request->commodity())
+            ->AddVal("Price", trade.price)
+            ->AddVal("Time", ctx->time())
+            ->Record();
+      }
+    }
+  }
   
   /* -------------------- private methods and members -------------------------- */
   const std::vector< Trade<T> >& trades_;
@@ -76,6 +100,15 @@ class TradeExecutor {
         trades_by_requester_[requester].push_back(*r_it);
         all_trades_[std::make_pair(supplier, requester)].push_back(*r_it);
       }
+    }
+  }
+  
+  void __SendTradeResources() {
+    std::set<Trader*>::iterator it;
+    for (it = requesters_.begin(); it != requesters_.end(); ++it) {
+      // get responses
+      Trader* requester = *it;
+      AcceptTrades(requester, trades_by_requester_[requester]);
     }
   }
 };

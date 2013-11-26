@@ -28,17 +28,21 @@ using cyclus::TradeExecutor;
 using cyclus::Trader;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class TestSender : public MockFacility {
+class TestTrader : public MockFacility {
  public:
-  TestSender(Context* ctx, Material::Ptr mat)
+  TestTrader(Context* ctx, Material::Ptr mat)
     : MockFacility(ctx),
       Model(ctx),
-      mat(mat) { };
+      mat(mat),
+      noffer(0),
+      naccept(0) { };
   
   virtual cyclus::Model* Clone() {
-    TestSender* m = new TestSender(*this);
+    TestTrader* m = new TestTrader(*this);
     m->InitFrom(this);
     m->mat = mat;
+    m->noffer = noffer;
+    m->naccept = naccept;
     return m;
   };
 
@@ -48,20 +52,28 @@ class TestSender : public MockFacility {
     std::vector< Trade<Material> >::const_iterator it;
     for (it = trades.begin(); it != trades.end(); ++it) {
       responses.push_back(std::make_pair(*it, mat));
+      noffer++;
     }
   }
   
+  virtual void AcceptMatlTrades(
+      const std::vector<std::pair<Trade<Material>,
+                                  Material::Ptr> >& responses) {
+    naccept += responses.size();
+  }
+
   Material::Ptr mat;
+  int noffer, naccept;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class TradeExecutorTests : public ::testing::Test {
  public:
   TestContext tc;
-  TestSender* s1;
-  TestSender* s2;
-  MockFacility* r1;
-  MockFacility* r2;
+  TestTrader* s1;
+  TestTrader* s2;
+  TestTrader* r1;
+  TestTrader* r2;
   Material::Ptr mat;
   double amt;
   Request<Material>::Ptr req1, req2;
@@ -72,10 +84,10 @@ class TradeExecutorTests : public ::testing::Test {
   virtual void SetUp() {
     mat = test_helpers::get_mat();
     amt = 4.5; // some magic number..
-    s1 = new TestSender(tc.get(), mat);
-    s2 = new TestSender(tc.get(), mat);
-    r1 = new MockFacility(tc.get());
-    r2 = new MockFacility(tc.get());
+    s1 = new TestTrader(tc.get(), mat);
+    s2 = new TestTrader(tc.get(), mat);
+    r1 = new TestTrader(tc.get(), mat);
+    r2 = new TestTrader(tc.get(), mat);
 
     req1 = Request<Material>::Ptr(new Request<Material>(mat, r1));
     req2 = Request<Material>::Ptr(new Request<Material>(mat, r2));
@@ -144,4 +156,25 @@ TEST_F(TradeExecutorTests, SupplierResponses) {
   all_trades[std::make_pair(s2, r1)].push_back(std::make_pair(t2, mat));
   all_trades[std::make_pair(s2, r2)].push_back(std::make_pair(t3, mat));
   EXPECT_EQ(exec.all_trades_, all_trades);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(TradeExecutorTests, WholeShebang) {
+  TradeExecutor<Material> exec(trades);
+  exec.ExecuteTrades();
+  EXPECT_EQ(s1->noffer, 1);
+  EXPECT_EQ(s1->naccept, 0);
+  EXPECT_EQ(s2->noffer, 2);
+  EXPECT_EQ(s2->naccept, 0);
+  EXPECT_EQ(r1->noffer, 0);
+  EXPECT_EQ(r1->naccept, 2);
+  EXPECT_EQ(r2->noffer, 0);
+  EXPECT_EQ(r2->naccept, 1);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(TradeExecutorTests, NoThrowWriting) {
+  TradeExecutor<Material> exec(trades);
+  exec.ExecuteTrades();
+  EXPECT_NO_THROW(exec.RecordTrades(tc.get()));
 }

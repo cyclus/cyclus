@@ -66,7 +66,7 @@ class ExchangeManager {
     /// groupings to backends.
     // TradeExecutor<T> exec(trades);
     // exec.ExecuteTrades();
-    // exec.RecordTrades();
+    // exec.RecordTrades(ctx);
     std::for_each(trades.begin(), trades.end(), ExecuteTrade<T>);
   }
 
