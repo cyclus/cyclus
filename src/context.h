@@ -15,7 +15,6 @@ namespace cyclus {
 class EventManager;
 class Event;
 class Trader;
-class MarketModel;
 class Timer;
 class TimeAgent;
 
@@ -97,9 +96,6 @@ class Context {
 
   /// See Timer::RegisterTickListener documentation.
   void RegisterTicker(TimeAgent* ta);
-
-  /// See Timer::RegisterResolveListener documentation.
-  void RegisterResolver(MarketModel* mkt);
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.
