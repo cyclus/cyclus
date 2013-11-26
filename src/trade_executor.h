@@ -112,6 +112,12 @@ class TradeExecutor {
       // populate containers
       typename std::vector< std::pair<Trade<T>, typename T::Ptr> >::iterator r_it;
       for (r_it = responses.begin(); r_it != responses.end(); ++r_it) {
+        // @todo unsure if this is needed...
+        // Trade<T>& trade = r_it->first;
+        // typename T::Ptr rsrc= r_it->second;
+        // if (rsrc->quantity() != trade.amt) {
+        //   throw ValueError("Trade amt and resource qty must match");
+        // }
         Trader* requester = r_it->first.request->requester();
         trades_by_requester_[requester].push_back(*r_it);
         all_trades_[std::make_pair(supplier, requester)].push_back(*r_it);

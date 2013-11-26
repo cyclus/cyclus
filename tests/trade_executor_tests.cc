@@ -13,6 +13,7 @@
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
+#include "test_trader.h"
 #include "trade.h"
 #include "trade_executor.h"
 #include "trader.h"
@@ -23,48 +24,11 @@ using cyclus::Material;
 using cyclus::Model;
 using cyclus::Request;
 using cyclus::TestContext;
+using cyclus::TestObjFactory;
+using cyclus::TestTrader;
 using cyclus::Trade;
 using cyclus::TradeExecutor;
 using cyclus::Trader;
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class TestTrader : public MockFacility {
- public:
-  TestTrader(Context* ctx, Material::Ptr mat)
-    : MockFacility(ctx),
-      Model(ctx),
-      mat(mat),
-      noffer(0),
-      naccept(0) { };
-  
-  virtual cyclus::Model* Clone() {
-    TestTrader* m = new TestTrader(*this);
-    m->InitFrom(this);
-    m->mat = mat;
-    m->noffer = noffer;
-    m->naccept = naccept;
-    return m;
-  };
-
-  virtual void PopulateMatlTradeResponses(
-    const std::vector< Trade<Material> >& trades,
-    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
-    std::vector< Trade<Material> >::const_iterator it;
-    for (it = trades.begin(); it != trades.end(); ++it) {
-      responses.push_back(std::make_pair(*it, mat));
-      noffer++;
-    }
-  }
-  
-  virtual void AcceptMatlTrades(
-      const std::vector<std::pair<Trade<Material>,
-                                  Material::Ptr> >& responses) {
-    naccept += responses.size();
-  }
-
-  Material::Ptr mat;
-  int noffer, naccept;
-};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class TradeExecutorTests : public ::testing::Test {
@@ -74,7 +38,8 @@ class TradeExecutorTests : public ::testing::Test {
   TestTrader* s2;
   TestTrader* r1;
   TestTrader* r2;
-  Material::Ptr mat;
+  TestObjFactory fac;
+  
   double amt;
   Request<Material>::Ptr req1, req2;
   Bid<Material>::Ptr bid1, bid2, bid3;
@@ -82,20 +47,19 @@ class TradeExecutorTests : public ::testing::Test {
   std::vector< Trade<Material> > trades;
   
   virtual void SetUp() {
-    mat = test_helpers::get_mat();
     amt = 4.5; // some magic number..
-    s1 = new TestTrader(tc.get(), mat);
-    s2 = new TestTrader(tc.get(), mat);
-    r1 = new TestTrader(tc.get(), mat);
-    r2 = new TestTrader(tc.get(), mat);
+    s1 = new TestTrader(tc.get(), &fac);
+    s2 = new TestTrader(tc.get(), &fac);
+    r1 = new TestTrader(tc.get(), &fac);
+    r2 = new TestTrader(tc.get(), &fac);
 
-    req1 = Request<Material>::Ptr(new Request<Material>(mat, r1));
-    req2 = Request<Material>::Ptr(new Request<Material>(mat, r2));
+    req1 = Request<Material>::Ptr(new Request<Material>(fac.mat, r1));
+    req2 = Request<Material>::Ptr(new Request<Material>(fac.mat, r2));
     // supplier 1 makes a single bid for req1
-    bid1 = Bid<Material>::Ptr(new Bid<Material>(req1, mat, s1));
+    bid1 = Bid<Material>::Ptr(new Bid<Material>(req1, fac.mat, s1));
     // supplier 2 makes a bid for req1 and req2
-    bid2 = Bid<Material>::Ptr(new Bid<Material>(req1, mat, s2));
-    bid3 = Bid<Material>::Ptr(new Bid<Material>(req2, mat, s2));
+    bid2 = Bid<Material>::Ptr(new Bid<Material>(req1, fac.mat, s2));
+    bid3 = Bid<Material>::Ptr(new Bid<Material>(req2, fac.mat, s2));
 
     t1 = Trade<Material>(req1, bid1, amt);
     t2 = Trade<Material>(req1, bid2, amt);
@@ -145,16 +109,16 @@ TEST_F(TradeExecutorTests, SupplierResponses) {
   std::map<Trader*,
            std::vector< std::pair<Trade<Material>, Material::Ptr> > >
       trades_by_requester;
-  trades_by_requester[r1].push_back(std::make_pair(t1, mat));
-  trades_by_requester[r1].push_back(std::make_pair(t2, mat));
-  trades_by_requester[r2].push_back(std::make_pair(t3, mat));
+  trades_by_requester[r1].push_back(std::make_pair(t1, fac.mat));
+  trades_by_requester[r1].push_back(std::make_pair(t2, fac.mat));
+  trades_by_requester[r2].push_back(std::make_pair(t3, fac.mat));
   EXPECT_EQ(exec.trades_by_requester_, trades_by_requester);
   
   std::map<std::pair<Trader*, Trader*>,
            std::vector< std::pair<Trade<Material>, Material::Ptr> > > all_trades;
-  all_trades[std::make_pair(s1, r1)].push_back(std::make_pair(t1, mat));
-  all_trades[std::make_pair(s2, r1)].push_back(std::make_pair(t2, mat));
-  all_trades[std::make_pair(s2, r2)].push_back(std::make_pair(t3, mat));
+  all_trades[std::make_pair(s1, r1)].push_back(std::make_pair(t1, fac.mat));
+  all_trades[std::make_pair(s2, r1)].push_back(std::make_pair(t2, fac.mat));
+  all_trades[std::make_pair(s2, r2)].push_back(std::make_pair(t3, fac.mat));
   EXPECT_EQ(exec.all_trades_, all_trades);
 }
 
@@ -162,14 +126,14 @@ TEST_F(TradeExecutorTests, SupplierResponses) {
 TEST_F(TradeExecutorTests, WholeShebang) {
   TradeExecutor<Material> exec(trades);
   exec.ExecuteTrades();
-  EXPECT_EQ(s1->noffer, 1);
-  EXPECT_EQ(s1->naccept, 0);
-  EXPECT_EQ(s2->noffer, 2);
-  EXPECT_EQ(s2->naccept, 0);
-  EXPECT_EQ(r1->noffer, 0);
-  EXPECT_EQ(r1->naccept, 2);
-  EXPECT_EQ(r2->noffer, 0);
-  EXPECT_EQ(r2->naccept, 1);
+  EXPECT_EQ(s1->offer, 1);
+  EXPECT_EQ(s1->accept, 0);
+  EXPECT_EQ(s2->offer, 2);
+  EXPECT_EQ(s2->accept, 0);
+  EXPECT_EQ(r1->offer, 0);
+  EXPECT_EQ(r1->accept, 2);
+  EXPECT_EQ(r2->offer, 0);
+  EXPECT_EQ(r2->accept, 1);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -178,3 +142,23 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
   exec.ExecuteTrades();
   EXPECT_NO_THROW(exec.RecordTrades(tc.get()));
 }
+
+// This test was a part of a previous iteration of Trade testing, but its not
+// clear if this throwing behavior is what we want. I'm leaving it here for now
+// in case it needs to be picked up again. MJG - 11/26/13
+// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// TEST(TradeTests, OfferThrow) {
+//   TestContext tc;
+  
+//   Material::Ptr mat = get_mat();
+//   Receiver* r = new Receiver(tc.get(), mat);
+//   Request<Material>::Ptr req(new Request<Material>(mat, r));
+  
+//   Sender* s = new Sender(tc.get(), true);
+//   Bid<Material>::Ptr bid(new Bid<Material>(req, mat, s));
+  
+//   Trade<Material> trade(req, bid, mat->quantity());
+//   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);
+//   delete s;
+//   delete r;
+// }

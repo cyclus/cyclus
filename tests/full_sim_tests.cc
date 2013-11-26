@@ -2,8 +2,7 @@
 
 #include "logger.h"
 #include "test_context.h"
-
-#include "full_sim_tests.h"
+#include "test_trader.h"
 
 namespace cyclus {
 

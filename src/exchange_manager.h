@@ -7,6 +7,7 @@
 #include "exchange_solver.h"
 #include "exchange_translator.h"
 #include "resource_exchange.h"
+#include "trade_executor.h"
 #include "trader_management.h"
 
 namespace cyclus {
@@ -61,13 +62,10 @@ class ExchangeManager {
     xlator.BackTranslateSolution(graph->matches, trades);
     CLOG(LEV_DEBUG1) << "trades translated!";
 
-    /// @todo Write a class that handles TradeExecution. Specific tasks may
-    /// involved grouping trades by requester or supplier and writing those
-    /// groupings to backends.
-    // TradeExecutor<T> exec(trades);
-    // exec.ExecuteTrades();
-    // exec.RecordTrades(ctx);
-    std::for_each(trades.begin(), trades.end(), ExecuteTrade<T>);
+    // execute trades!
+    TradeExecutor<T> exec(trades);
+    exec.ExecuteTrades();
+    exec.RecordTrades(ctx_);
   }
 
   /* -------------------- private methods and members ----------------------- */  

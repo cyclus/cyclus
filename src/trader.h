@@ -50,32 +50,12 @@ class Trader : virtual public Model {
     return std::set<BidPortfolio<GenericResource>::Ptr>();
   }
 
-  /// @brief default implementation for material trade offer
-  virtual Material::Ptr OfferMatlTrade(const Trade<Material>& trade) {
-    CompMap cm;
-    return Material::CreateUntracked(0.0, Composition::CreateFromMass(cm));
-  }
-
-  /// @brief default implementation for generic resource trade offer
-  virtual GenericResource::Ptr
-      OfferGenRsrcTrade(const Trade<GenericResource>& trade) {
-    return GenericResource::CreateUntracked(0.0, "", "");
-  }
-  
-  /// @brief default implementation for material trade acceptance
-  virtual void AcceptMatlTrade(const Trade<Material>& trade, Material::Ptr) { }
-
-  /// @brief default implementation for generic resource trade acceptance
-  virtual void AcceptGenRsrcTrade(const Trade<GenericResource>& trade,
-                                  GenericResource::Ptr) { }
-
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
   virtual void PopulateMatlTradeResponses(
     const std::vector< Trade<Material> >& trades,
-    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses)
-  { }
+    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) { }
   
   /// @brief default implementation for responding to generic resource trades
   /// @param trades all trades in which this trader is the supplier
@@ -83,8 +63,7 @@ class Trader : virtual public Model {
   virtual void PopulateGenRsrcTradeResponses(
     const std::vector< Trade<GenericResource> >& trades,
     std::vector<std::pair<Trade<GenericResource>,
-    GenericResource::Ptr> >& responses)
-  { }
+    GenericResource::Ptr> >& responses) { }
 
   /// @brief default implementation for material trade acceptance
   virtual void AcceptMatlTrades(

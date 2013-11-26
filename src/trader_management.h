@@ -12,7 +12,7 @@ namespace cyclus {
 template<class T>
     inline static std::set<typename RequestPortfolio<T>::Ptr>
     QueryRequests(Trader* t) {
-  throw StateError("Templated version of QueryRequests not supported");
+  throw StateError("Non-specialized version of QueryRequests not supported");
 }
 
 template<>
@@ -32,7 +32,7 @@ template<class T> class ExchangeContext;
 template<class T>
 inline static std::set<typename BidPortfolio<T>::Ptr>
     QueryBids(Trader* t, ExchangeContext<T>* ec) {
-  throw StateError("Templated version of QueryBids not supported");
+  throw StateError("Non-specialized version of QueryBids not supported");
 }
   
 template<>
@@ -48,54 +48,11 @@ inline std::set<BidPortfolio<GenericResource>::Ptr>
 }
 
 template<class T>
-inline static typename T::Ptr ExecTradeOffer(const Trade<T>& trade) {
-  return typename T::Ptr(new T());
-}
-
-template<>
-inline Material::Ptr
-    ExecTradeOffer<Material>(const Trade<Material>& trade) {
-  return trade.bid->bidder()->OfferMatlTrade(trade);
-}
-
-template<>
-inline GenericResource::Ptr
-    ExecTradeOffer<GenericResource>(const Trade<GenericResource>& trade) {
-  return trade.bid->bidder()->OfferGenRsrcTrade(trade);
-}
-
-template<class T>
-inline static void ExecTradeAccept(const Trade<T>& trade,
-                                   typename T::Ptr rsrc) { }
-
-template<>
-inline void ExecTradeAccept<Material>(const Trade<Material>& trade,
-                                      Material::Ptr rsrc) {
-  return trade.request->requester()->AcceptMatlTrade(trade, rsrc);
-}
-
-template<>
-inline void ExecTradeAccept<GenericResource>(
-    const Trade<GenericResource>& trade,
-    GenericResource::Ptr rsrc) {
-  return trade.request->requester()->AcceptGenRsrcTrade(trade, rsrc);
-}
-
-template<class T>
-inline static void ExecuteTrade(const Trade<T>& trade) {
-  typename T::Ptr rsrc = ExecTradeOffer(trade);
-  if (rsrc->quantity() != trade.amt) {
-    throw ValueError("Trade amt and resource qty must match");
-  }
-  ExecTradeAccept(trade, rsrc);
-}
-
-template<class T>
 inline static void PopulateTradeResponses(
     Trader* trader,
     const std::vector< Trade<T> >& trades,
     std::vector< std::pair<Trade<T>, typename T::Ptr> >& responses) {
-  throw StateError("Templated version of PopulateTradeResponses not supported");
+  throw StateError("Non-specialized version of PopulateTradeResponses not supported");
 }
 
 template<>
@@ -120,7 +77,7 @@ template<class T>
 inline static void AcceptTrades(
     Trader* trader,
     const std::vector< std::pair<Trade<T>, typename T::Ptr> >& responses) {
-  throw StateError("Templated version of AcceptTrades not supported");
+  throw StateError("Non-specialized version of AcceptTrades not supported");
 }
 
 template<>

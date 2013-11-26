@@ -1,5 +1,5 @@
-#ifndef CYCLUS_TESTS_FULL_SIM_TESTS_H_
-#define CYCLUS_TESTS_FULL_SIM_TESTS_H_
+#ifndef CYCLUS_TESTS_TEST_TRADER_H_
+#define CYCLUS_TESTS_TEST_TRADER_H_
 
 #include "mock_facility.h"
 #include "context.h"
@@ -92,17 +92,25 @@ class TestTrader : public MockFacility {
     adjusts++;
   };
 
-  virtual Material::Ptr OfferMatlTrade(const Trade<Material>& trade) {
-    offer++;
-    obs_trade = Trade<Material>(trade); // obs trade
-    return obj_fac->mat;
+  virtual void PopulateMatlTradeResponses(
+    const std::vector< Trade<Material> >& trades,
+    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
+    std::vector< Trade<Material> >::const_iterator it;
+    for (it = trades.begin(); it != trades.end(); ++it) {
+      obs_trade = Trade<Material>(*it);
+      responses.push_back(std::make_pair(*it, obj_fac->mat));
+      offer++;
+    }
   }
-
-  virtual void AcceptMatlTrade(const Trade<Material>& trade,
-                               Material::Ptr rsrc) {
-    obs_trade = Trade<Material>(trade); // obs trade
-    mat = rsrc; // obs resource
-    accept++;
+  
+  virtual void AcceptMatlTrades(
+      const std::vector<std::pair<Trade<Material>,
+      Material::Ptr> >& responses) {
+    if (responses.size() > 0) {
+      obs_trade = Trade<Material>(responses.at(0).first);
+      mat = responses.at(0).second;
+    }
+    accept += responses.size();
   }
 
   TestObjFactory* obj_fac;
@@ -116,4 +124,4 @@ class TestTrader : public MockFacility {
 
 } // namespace cyclus
 
-#endif // ifndef CYCLUS_TESTS_FULL_SIM_TESTS_H_
+#endif // ifndef CYCLUS_TESTS_TEST_TRADER_H_
