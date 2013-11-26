@@ -18,8 +18,8 @@ struct Trade {
   typename Bid<T>::Ptr bid;
   double amt;
   double price;
-
-  Trade() {};
+  
+  Trade() : amt(0), price(0) {};
   
   Trade(typename Request<T>::Ptr request, typename Bid<T>::Ptr bid, double amt)
     : request(request),
