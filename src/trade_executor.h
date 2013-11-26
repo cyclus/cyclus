@@ -12,19 +12,33 @@
 #include "trader_management.h"
 
 namespace cyclus {
-  
+
+/// @class TradeExecutor
+///
+/// @brief The TradeExecutor is an object whose task is to execute a collection
+/// of Trades. Trade Execution takes nominally three steps:
+///     #. Grouping all trades by supplier (sender)
+///     #. Collecting responses for the group of trades from each supplier
+///     #. Grouping all responses by requester (receiver)
+///     #. Sending all grouped responses to their respective requester
 template <class T>
 class TradeExecutor {
  public:
   explicit TradeExecutor(const std::vector< Trade<T> >& trades)
     : trades_(trades) { };
 
+  /// @brief execute all trades, collecting responsers from bidders and sending
+  /// responses to requesters
   void ExecuteTrades() {
     __GroupTradesBySupplier();
     __GetTradeResponses();
     __SendTradeResources();
   };
-  
+
+  /// @brief Record all trades with the appropriate backends
+  ///
+  /// @param ctx the Context through which communication with backends will
+  /// occur
   void RecordTrades(Context* ctx) {
     // record all trades
     typename std::map<std::pair<Trader*, Trader*>,
@@ -55,20 +69,22 @@ class TradeExecutor {
   /* -------------------- private methods and members -------------------------- */
   const std::vector< Trade<T> >& trades_;
 
-  // all suppliers
   std::set<Trader*> suppliers_;
   
-  // all requesters
   std::set<Trader*> requesters_;
-  
-  // map of supplier to container of all trades associated with that supplier
+
+  // the key is the supplier
   std::map<Trader*,
       std::vector< Trade<T> > > trades_by_supplier_;
   
+  // the key is the requester, values are a vector of the target Trade with the
+  // associated response resource provided by the supplier
   std::map<Trader*,
       std::vector< std::pair<Trade<T>, typename T::Ptr> > >
       trades_by_requester_;
-  
+
+  // by convention, the first trader is the supplier, the second is the
+  // requester
   std::map<std::pair<Trader*, Trader*>,
       std::vector< std::pair<Trade<T>, typename T::Ptr> > > all_trades_;
 

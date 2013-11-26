@@ -6,13 +6,19 @@
 
 namespace cyclus {
 
+/// @class Trade
+///
+/// @brief A Trade is a simple container that associates a request for a
+/// resource with a bid for that resource. Additionally, a quantity is assigned
+/// to the Trade which may be less than either the request or bid
+/// quantity. Finally, Trades have a price member which is not currently used.
 template <class T>
 struct Trade {
   typename Request<T>::Ptr request;
   typename Bid<T>::Ptr bid;
   double amt;
   double price;
-  
+
   Trade() {};
   
   Trade(typename Request<T>::Ptr request, typename Bid<T>::Ptr bid, double amt)
