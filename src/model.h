@@ -163,9 +163,7 @@ class Model {
   /**
    Returns this model's current simulation context.
    */
-  Context* context() {
-    return ctx_;
-  };
+  inline Context* context() const {return ctx_;}
 
   /**
      every model should be able to print a verbose description
