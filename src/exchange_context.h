@@ -48,14 +48,15 @@ class ExchangeContext {
     
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Request<T>::Ptr pr = *it;
-      if (requests_by_commod_.count(pr->commodity()) == 0) {
-        requests_by_commod_[pr->commodity()] =
-            std::vector<typename Request<T>::Ptr>();
-      }
-      requests_by_commod_[pr->commodity()].push_back(pr);
+      __AddRequest(*it);
     }
   }
 
+  /// @brief Adds an individual request
+  void __AddRequest(typename Request<T>::Ptr pr) {
+    requests_by_commod_[pr->commodity()].push_back(pr);
+  }
+  
   /// @brief adds a bid to the context
   void AddBidPortfolio(const typename BidPortfolio<T>::Ptr port) {
     bids_.push_back(port);
