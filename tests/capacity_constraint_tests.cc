@@ -56,6 +56,13 @@ TEST(CapacityConstraintTests, RsrcGetSet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CapacityConstraintTests, Trivial) {
+  CapacityConstraint<Resource> cc(val);
+  Material* mat;
+  EXPECT_EQ(1, cc.convert(mat));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CapacityConstraintTests, RsrcQty) {
   TestContext tc;
   cyclus::CompMap cm;

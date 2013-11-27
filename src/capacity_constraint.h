@@ -5,6 +5,9 @@
 
 namespace cyclus {
 
+template<class T>
+static double trivial_converter(T*) {return 1;}
+  
 /// @class CapacityConstraint
 ///
 /// @brief A CapacityConstraint provides an ability to determine an agent's
@@ -13,11 +16,18 @@ template <class T>
 class CapacityConstraint {
  public:
   typedef double (*Converter)(T*);
-  
-  /// constructor
+
+  /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(double capacity, Converter converter)
     : capacity_(capacity),
       converter_(converter),
+      id_(next_id_++) {};
+
+  /// @brief constructor for a constraint with a trivial converter (i.e., one
+  /// that simply returns 1)
+  explicit CapacityConstraint(double capacity)
+    : capacity_(capacity),
+      converter_(&trivial_converter),
       id_(next_id_++) {};
   
   /// @return the constraints capacity
