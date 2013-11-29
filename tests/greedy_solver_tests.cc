@@ -8,8 +8,8 @@ using cyclus::ExchangeGraph;
 using cyclus::GreedySolver;
 using cyclus::Match;
 using cyclus::ExchangeNode;
-using cyclus::ExchangeNodeSet;
-using cyclus::RequestSet;
+using cyclus::ExchangeNodeGroup;
+using cyclus::RequestGroup;
 
 /* --- */
 // Case 0:

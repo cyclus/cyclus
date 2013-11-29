@@ -18,13 +18,13 @@ bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ExchangeNodeSet::AddExchangeNode(ExchangeNode::Ptr node) {
+void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
   node->set = this;
   nodes.push_back(node);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RequestSet::RequestSet(double qty) : qty(qty) {}
+RequestGroup::RequestGroup(double qty) : qty(qty) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a) {
@@ -89,13 +89,13 @@ void UpdateCapacity(ExchangeNode::Ptr pn, const Arc& a, double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ExchangeGraph::AddRequestSet(RequestSet::Ptr prs) {
-  request_sets.push_back(prs);
+void ExchangeGraph::AddRequestGroup(RequestGroup::Ptr prs) {
+  request_groups.push_back(prs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ExchangeGraph::AddSupplySet(ExchangeNodeSet::Ptr pss) {
-  supply_sets.push_back(pss);
+void ExchangeGraph::AddSupplySet(ExchangeNodeGroup::Ptr pss) {
+  supply_groups.push_back(pss);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

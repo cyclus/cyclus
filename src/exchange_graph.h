@@ -10,7 +10,7 @@
 
 namespace cyclus {
 
-class ExchangeNodeSet;
+class ExchangeNodeGroup;
 class ExchangeNode;
 
 /// @brief by convention, arc.first == request node (unode), arc.second == bid
@@ -20,7 +20,7 @@ typedef std::pair< boost::shared_ptr<ExchangeNode>, boost::shared_ptr<ExchangeNo
 /// @brief ExchangeNodes are used in ExchangeGraphs to house information about a given
 /// translated Bid or Request. Specifically, ExchangeNodes have a notion of unit
 /// capacities that the given Bid or Request contribute to the overall capacity
-/// of ExchangeNodeSet. ExchangeNodes also have a notion of quantity, i.e., the maximum amount
+/// of ExchangeNodeGroup. ExchangeNodes also have a notion of quantity, i.e., the maximum amount
 /// of a resource that can be attributed to it. 
 struct ExchangeNode {
  public:
@@ -28,11 +28,11 @@ struct ExchangeNode {
   
   explicit ExchangeNode(double max_qty = std::numeric_limits<double>::max());
 
-  /// @brief the parent ExchangeNodeSet to which this ExchangeNode belongs
-  ExchangeNodeSet* set;
+  /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
+  ExchangeNodeGroup* set;
 
   /// @brief unit values associated with this ExchangeNode corresponding to capacties of
-  /// its parent ExchangeNodeSet. This information corresponds to the resource object
+  /// its parent ExchangeNodeGroup. This information corresponds to the resource object
   /// from which this ExchangeNode was translated. 
   std::map<Arc, std::vector<double> > unit_capacities;
   
@@ -47,32 +47,32 @@ struct ExchangeNode {
 
 inline bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs);
 
-/// @class ExchangeNodeSet
+/// @class ExchangeNodeGroup
 ///
-/// @brief A ExchangeNodeSet is a collection of ExchangeNodes, and is the ExchangeGraph
+/// @brief A ExchangeNodeGroup is a collection of ExchangeNodes, and is the ExchangeGraph
 /// representation of a BidPortfolio or RequestPortfolio. It houses information
 /// about the concrete capacities associated with either portfolio.
-class ExchangeNodeSet {
+class ExchangeNodeGroup {
  public:
-  typedef boost::shared_ptr<ExchangeNodeSet> Ptr;
+  typedef boost::shared_ptr<ExchangeNodeGroup> Ptr;
   
   std::vector<ExchangeNode::Ptr> nodes;
   std::vector<double> capacities;
 
-  /// @brief Add the node to the ExchangeNodeSet and informs the node it is a member of
-  /// this ExchangeNodeSet
+  /// @brief Add the node to the ExchangeNodeGroup and informs the node it is a member of
+  /// this ExchangeNodeGroup
   void AddExchangeNode(ExchangeNode::Ptr node);
 };
 
-/// @class RequestSet
+/// @class RequestGroup
 ///
-/// @brief A RequestSet is a specific ExchangeNodeSet with a notion of an total
+/// @brief A RequestGroup is a specific ExchangeNodeGroup with a notion of an total
 /// requested quantity.
-class RequestSet : public ExchangeNodeSet {
+class RequestGroup : public ExchangeNodeGroup {
  public:
-  typedef boost::shared_ptr<RequestSet> Ptr;
+  typedef boost::shared_ptr<RequestGroup> Ptr;
   
-  explicit RequestSet(double qty = 0.0);
+  explicit RequestGroup(double qty = 0.0);
   double qty;
 };
 
@@ -91,9 +91,9 @@ double Capacity(ExchangeNode& n, const Arc& a);
 double Capacity(ExchangeNode::Ptr pn, const Arc& a);
 
 /// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
-/// capacities of its ExchangeNodeSet)
+/// capacities of its ExchangeNodeGroup)
 ///
-/// @throws if the update results in a negative ExchangeNodeSet capacity or a negative
+/// @throws if the update results in a negative ExchangeNodeGroup capacity or a negative
 /// ExchangeNode max_qty
 /// @param n the ExchangeNode
 /// @param qty the quantity for the node to update
@@ -107,15 +107,15 @@ typedef std::pair<Arc, double> Match;
 /// @brief An ExchangeGraph is a resource-neutral representation of a
 /// ResourceExchange. In general, it is produced via translation by an
 /// ExchangeTranslator. It is comprised of ExchangeNodes that are collected into
-/// ExchangeNodeSets. Arcs are defined, connecting ExchangeNodes to each other. An
+/// ExchangeNodeGroups. Arcs are defined, connecting ExchangeNodes to each other. An
 /// ExchangeSolver can solve a given instance of an ExchangeGraph, and the
 /// solution is stored on the Graph in the form of Matches.
 class ExchangeGraph {
  public: 
   typedef boost::shared_ptr<ExchangeGraph> Ptr;
 
-  std::vector<RequestSet::Ptr> request_sets;
-  std::vector<ExchangeNodeSet::Ptr> supply_sets;
+  std::vector<RequestGroup::Ptr> request_groups;
+  std::vector<ExchangeNodeGroup::Ptr> supply_groups;
   std::map<ExchangeNode::Ptr, std::vector<Arc> > node_arc_map;
   std::vector<Match> matches;
 
@@ -123,10 +123,10 @@ class ExchangeGraph {
   std::vector<Arc> arcs_;
 
   /// @brief adds a request set to the graph
-  void AddRequestSet(RequestSet::Ptr prs);
+  void AddRequestGroup(RequestGroup::Ptr prs);
   
   /// @brief adds a supply set to the graph
-  void AddSupplySet(ExchangeNodeSet::Ptr prs);
+  void AddSupplySet(ExchangeNodeGroup::Ptr prs);
   
   /// @brief adds an arc to the graph
   void AddArc(const Arc& a);

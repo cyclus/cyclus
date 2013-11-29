@@ -45,15 +45,15 @@ class ExchangeTranslator {
     typename std::vector<typename RequestPortfolio<T>::Ptr>::const_iterator
         rp_it;
     for (rp_it = requests.begin(); rp_it != requests.end(); ++rp_it) {
-      RequestSet::Ptr rs = TranslateRequestPortfolio_(*rp_it);
-      graph->AddRequestSet(rs);
+      RequestGroup::Ptr rs = TranslateRequestPortfolio_(*rp_it);
+      graph->AddRequestGroup(rs);
     }
 
     // add each bid set
     const std::vector<typename BidPortfolio<T>::Ptr>& bidports = ex_ctx_->bids();
     typename std::vector<typename BidPortfolio<T>::Ptr>::const_iterator bp_it;
     for (bp_it = bidports.begin(); bp_it != bidports.end(); ++bp_it) {
-      ExchangeNodeSet::Ptr ns = TranslateBidPortfolio_(*bp_it);
+      ExchangeNodeGroup::Ptr ns = TranslateBidPortfolio_(*bp_it);
       graph->AddSupplySet(ns);
 
       // add each request-bid arc
@@ -94,9 +94,9 @@ class ExchangeTranslator {
   /// @brief translates a request portfolio by adding request nodes and
   /// accounting for capacities. Request unit capcities must be added when arcs
   /// are known
-  RequestSet::Ptr TranslateRequestPortfolio_(
+  RequestGroup::Ptr TranslateRequestPortfolio_(
       const typename RequestPortfolio<T>::Ptr rp) {
-    RequestSet::Ptr rs(new RequestSet(rp->qty()));
+    RequestGroup::Ptr rs(new RequestGroup(rp->qty()));
     CLOG(LEV_DEBUG2) << "Translating request portfolio of size " << rp->qty();
 
     typename std::vector<typename Request<T>::Ptr>::const_iterator r_it;
@@ -122,9 +122,9 @@ class ExchangeTranslator {
   
   /// @brief translates a bid portfolio by adding bid nodes and accounting
   /// for capacities. Bid unit capcities must be added when arcs are known
-  ExchangeNodeSet::Ptr TranslateBidPortfolio_(
+  ExchangeNodeGroup::Ptr TranslateBidPortfolio_(
       const typename BidPortfolio<T>::Ptr bp) {
-    ExchangeNodeSet::Ptr bs(new ExchangeNodeSet());
+    ExchangeNodeGroup::Ptr bs(new ExchangeNodeGroup());
     
     typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
     for (b_it = bp->bids().begin();

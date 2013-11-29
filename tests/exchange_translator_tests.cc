@@ -28,10 +28,10 @@ using cyclus::ExchangeTranslator;
 using cyclus::Match;
 using cyclus::Material;
 using cyclus::ExchangeNode;
-using cyclus::ExchangeNodeSet;
+using cyclus::ExchangeNodeGroup;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
-using cyclus::RequestSet;
+using cyclus::RequestGroup;
 using cyclus::Resource;
 using cyclus::TestContext;
 using cyclus::Trade;
@@ -116,7 +116,7 @@ TEST(ExXlateTests, XlateReq) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  RequestSet::Ptr set = xlator.TranslateRequestPortfolio_(rp);
+  RequestGroup::Ptr set = xlator.TranslateRequestPortfolio_(rp);
 
   EXPECT_EQ(qty, set->qty);
   EXPECT_EQ(cexp, set->capacities);
@@ -146,7 +146,7 @@ TEST(ExXlateTests, XlateBid) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  ExchangeNodeSet::Ptr set = xlator.TranslateBidPortfolio_(port);
+  ExchangeNodeGroup::Ptr set = xlator.TranslateBidPortfolio_(port);
 
   EXPECT_EQ(cexp, set->capacities);
   EXPECT_TRUE(xlator.bid_to_node_.find(bid)
@@ -182,8 +182,8 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeTranslator<Material> xlator(&ctx);
 
   // give the xlator the correct state
-  RequestSet::Ptr rset = xlator.TranslateRequestPortfolio_(rport);
-  ExchangeNodeSet::Ptr bset = xlator.TranslateBidPortfolio_(bport);
+  RequestGroup::Ptr rset = xlator.TranslateRequestPortfolio_(rport);
+  ExchangeNodeGroup::Ptr bset = xlator.TranslateBidPortfolio_(bport);
 
   Arc a = xlator.TranslateArc_(bid);
 
@@ -219,8 +219,8 @@ TEST(ExXlateTests, SimpleXlate) {
   
   ExchangeGraph::Ptr graph;
   EXPECT_NO_THROW(graph = xlator.Translate());
-  EXPECT_EQ(1, graph->request_sets.size());
-  EXPECT_EQ(1, graph->supply_sets.size());
+  EXPECT_EQ(1, graph->request_groups.size());
+  EXPECT_EQ(1, graph->supply_groups.size());
   EXPECT_EQ(2, graph->node_arc_map.size());
   EXPECT_EQ(1, graph->arcs_.size());
   EXPECT_EQ(0, graph->matches.size());

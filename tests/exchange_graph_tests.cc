@@ -9,14 +9,14 @@ using cyclus::Arc;
 using cyclus::ExchangeGraph;
 using cyclus::Match;
 using cyclus::ExchangeNode;
-using cyclus::ExchangeNodeSet;
-using cyclus::RequestSet;
+using cyclus::ExchangeNodeGroup;
+using cyclus::RequestGroup;
 using std::vector;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, ExchangeNodeSets) {
+TEST(ExGraphTests, ExchangeNodeGroups) {
   ExchangeNode::Ptr n(new ExchangeNode());
-  ExchangeNodeSet s;
+  ExchangeNodeGroup s;
   s.AddExchangeNode(n);
   EXPECT_EQ(&s, n->set);
 }
@@ -24,9 +24,9 @@ TEST(ExGraphTests, ExchangeNodeSets) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, ReqSets) {
   double q = 1.5;
-  RequestSet r;
+  RequestGroup r;
   EXPECT_EQ(0, r.qty);
-  r = RequestSet(q);
+  r = RequestGroup(q);
   EXPECT_EQ(q, r.qty);
 }
 
@@ -44,7 +44,7 @@ TEST(ExGraphTests, ExchangeNodeNoCap) {
   ExchangeNode::Ptr n(new ExchangeNode());
   Arc a(m, n);
   
-  ExchangeNodeSet uset;
+  ExchangeNodeGroup uset;
   uset.AddExchangeNode(m);
     
   EXPECT_DOUBLE_EQ(Capacity(m, a), std::numeric_limits<double>::max());
@@ -59,7 +59,7 @@ TEST(ExGraphTests, ExchangeNodeCaps1) {
   n->unit_capacities[a].push_back(ncap);
 
   double scap = 1.5;
-  ExchangeNodeSet s;
+  ExchangeNodeGroup s;
   s.capacities.push_back(scap);
   s.AddExchangeNode(n);
 
@@ -91,7 +91,7 @@ TEST(ExGraphTests, ExchangeNodeCaps2) {
   Arc a(m, n);
   n->unit_capacities[a] = ucaps;
 
-  ExchangeNodeSet s;
+  ExchangeNodeGroup s;
   s.capacities = caps;
   s.AddExchangeNode(n);
   double min_exp = cap / ucap;
@@ -116,7 +116,7 @@ TEST(ExGraphTests, ExchangeNodeCaps3) {
   n->unit_capacities[a].push_back(ncap);
 
   double scap = 1.5;
-  ExchangeNodeSet s;
+  ExchangeNodeGroup s;
   s.capacities.push_back(scap);
   s.AddExchangeNode(n);
 
@@ -149,7 +149,7 @@ TEST(ExGraphTests, ExchangeNodeUpdateThrow2) {
   Arc a(m, n);
   n->unit_capacities[a].push_back(unit);
 
-  ExchangeNodeSet s;
+  ExchangeNodeGroup s;
   s.capacities.push_back(cap);
   s.AddExchangeNode(n);
   
@@ -164,7 +164,7 @@ TEST(ExGraphTests, ExchangeNodeUpdateThrow3) {
   ExchangeNode::Ptr n(new ExchangeNode(qty - 1));
   Arc a(m, n);
 
-  ExchangeNodeSet s;
+  ExchangeNodeGroup s;
   s.AddExchangeNode(n);
 
   EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);  
@@ -183,12 +183,12 @@ TEST(ExGraphTests, ArcCap) {
   u->unit_capacities[a].push_back(uval);
   v->unit_capacities[a].push_back(vval);
   
-  ExchangeNodeSet uset;
+  ExchangeNodeGroup uset;
   uset.AddExchangeNode(u);
   double ucap = uval * 1.5;
   uset.capacities.push_back(ucap);
   
-  ExchangeNodeSet vset;
+  ExchangeNodeGroup vset;
   vset.AddExchangeNode(v);
   double vcap = vval;
   vset.capacities.push_back(vcap);
@@ -205,18 +205,18 @@ TEST(ExGraphTests, ArcCap) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, AddReqSet) {
-  RequestSet::Ptr prs(new RequestSet());
+  RequestGroup::Ptr prs(new RequestGroup());
   ExchangeGraph g;
-  g.AddRequestSet(prs);
-  EXPECT_EQ(g.request_sets[0], prs);
+  g.AddRequestGroup(prs);
+  EXPECT_EQ(g.request_groups[0], prs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, AddSuppSet) {
-  ExchangeNodeSet::Ptr pss(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr pss(new ExchangeNodeGroup());
   ExchangeGraph g;
   g.AddSupplySet(pss);
-  EXPECT_EQ(g.supply_sets[0], pss);
+  EXPECT_EQ(g.supply_groups[0], pss);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -286,12 +286,12 @@ TEST(ExGraphTests, AddMatch) {
   
   double large = 500;
   
-  ExchangeNodeSet::Ptr uset(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr uset(new ExchangeNodeGroup());
   uset->AddExchangeNode(u);
   double ucap = uval * 500;
   uset->capacities.push_back(ucap);
   
-  ExchangeNodeSet::Ptr vset(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr vset(new ExchangeNodeGroup());
   vset->AddExchangeNode(v);
   double vcap = vval * 500;
   vset->capacities.push_back(vcap);

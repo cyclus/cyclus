@@ -49,10 +49,10 @@ class ExchangeManager {
     solver_->set_graph(graph.get());
     CLOG(LEV_DEBUG1) << "solving graph...";
     /// @todo Add a presolve step, which for the greedy solver will order
-    /// RequestSets and Requests. Specifically, provide a commodity to weight
-    /// mapping. For each Request in a RequestSet, sort the Requests by
-    /// highest-to-lowest weight, and determine the RequestSet's average
-    /// weight. Sort the RequestSets by average weight.
+    /// RequestGroups and Requests. Specifically, provide a commodity to weight
+    /// mapping. For each Request in a RequestGroup, sort the Requests by
+    /// highest-to-lowest weight, and determine the RequestGroup's average
+    /// weight. Sort the RequestGroups by average weight.
     // solver_->Presolve();
     solver_->Solve();
     CLOG(LEV_DEBUG1) << "graph solved!";

@@ -10,15 +10,15 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::Solve() {
-  std::for_each(graph_->request_sets.begin(),
-                graph_->request_sets.end(),
+  std::for_each(graph_->request_groups.begin(),
+                graph_->request_groups.end(),
                 std::bind1st(
                     std::mem_fun(&GreedySolver::GreedilySatisfySet_),
                     this));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GreedySolver::GreedilySatisfySet_(RequestSet::Ptr prs) { 
+void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) { 
   double target = prs->qty;
   double match = 0;
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes;

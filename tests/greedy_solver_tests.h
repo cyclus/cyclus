@@ -8,13 +8,13 @@
 cyclus::ExchangeGraph SetUp1a() {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
-  using cyclus::RequestSet;
+  using cyclus::RequestGroup;
 
   ExchangeGraph g;
-  RequestSet::Ptr set = RequestSet::Ptr(new RequestSet());
+  RequestGroup::Ptr set = RequestGroup::Ptr(new RequestGroup());
   ExchangeNode::Ptr n = ExchangeNode::Ptr(new ExchangeNode());
   set->AddExchangeNode(n);
-  g.AddRequestSet(set);
+  g.AddRequestGroup(set);
   return g;
 };
 
@@ -22,10 +22,10 @@ cyclus::ExchangeGraph SetUp1a() {
 cyclus::ExchangeGraph SetUp1b() {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
-  using cyclus::ExchangeNodeSet;
+  using cyclus::ExchangeNodeGroup;
   
   ExchangeGraph g;
-  ExchangeNodeSet::Ptr set = ExchangeNodeSet::Ptr(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr set = ExchangeNodeGroup::Ptr(new ExchangeNodeGroup());
   ExchangeNode::Ptr n = ExchangeNode::Ptr(new ExchangeNode());
   set->AddExchangeNode(n);
   g.AddSupplySet(set);
@@ -37,8 +37,8 @@ cyclus::ExchangeGraph SetUp2(double qty, double unit_cap_req,
                              double capacity, double unit_cap_sup) {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
-  using cyclus::ExchangeNodeSet;
-  using cyclus::RequestSet;
+  using cyclus::ExchangeNodeGroup;
+  using cyclus::RequestGroup;
   using cyclus::Arc;
   using cyclus::Match;
   
@@ -51,12 +51,12 @@ cyclus::ExchangeGraph SetUp2(double qty, double unit_cap_req,
   u->unit_capacities[a].push_back(unit_cap_req);
   v->unit_capacities[a].push_back(unit_cap_sup);
   
-  RequestSet::Ptr request(new RequestSet(qty));
+  RequestGroup::Ptr request(new RequestGroup(qty));
   request->capacities.push_back(qty);
   request->AddExchangeNode(u);  
-  g.AddRequestSet(request);
+  g.AddRequestGroup(request);
 
-  ExchangeNodeSet::Ptr supply(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr supply(new ExchangeNodeGroup());
   supply->capacities.push_back(capacity);
   supply->AddExchangeNode(v);  
   g.AddSupplySet(supply);
@@ -70,8 +70,8 @@ cyclus::ExchangeGraph SetUp2(double qty, double unit_cap_req,
 cyclus::ExchangeGraph SetUp3(double qty, double cap1, double cap2) {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
-  using cyclus::ExchangeNodeSet;
-  using cyclus::RequestSet;
+  using cyclus::ExchangeNodeGroup;
+  using cyclus::RequestGroup;
   using cyclus::Arc;
   using cyclus::Match;
   
@@ -88,17 +88,17 @@ cyclus::ExchangeGraph SetUp3(double qty, double cap1, double cap2) {
   u->unit_capacities[a2].push_back(1);
   w->unit_capacities[a2].push_back(1);
 
-  RequestSet::Ptr request(new RequestSet(qty));
+  RequestGroup::Ptr request(new RequestGroup(qty));
   request->capacities.push_back(qty);
   request->AddExchangeNode(u);  
-  g.AddRequestSet(request);
+  g.AddRequestGroup(request);
   
-  ExchangeNodeSet::Ptr supply1(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr supply1(new ExchangeNodeGroup());
   supply1->capacities.push_back(cap1);
   supply1->AddExchangeNode(v);  
   g.AddSupplySet(supply1);
   
-  ExchangeNodeSet::Ptr supply2(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr supply2(new ExchangeNodeGroup());
   supply2->capacities.push_back(cap2);
   supply2->AddExchangeNode(w);  
   g.AddSupplySet(supply2);
@@ -113,8 +113,8 @@ cyclus::ExchangeGraph SetUp3(double qty, double cap1, double cap2) {
 cyclus::ExchangeGraph SetUp4(double qty1, double qty2, double cap) {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
-  using cyclus::ExchangeNodeSet;
-  using cyclus::RequestSet;
+  using cyclus::ExchangeNodeGroup;
+  using cyclus::RequestGroup;
   using cyclus::Arc;
   using cyclus::Match;
   
@@ -132,17 +132,17 @@ cyclus::ExchangeGraph SetUp4(double qty1, double qty2, double cap) {
   w->unit_capacities[a2].push_back(1);
   v2->unit_capacities[a2].push_back(1);
 
-  RequestSet::Ptr req1(new RequestSet(qty1));
+  RequestGroup::Ptr req1(new RequestGroup(qty1));
   req1->capacities.push_back(qty1);
   req1->AddExchangeNode(u);  
-  g.AddRequestSet(req1);
+  g.AddRequestGroup(req1);
   
-  RequestSet::Ptr req2(new RequestSet(qty2));
+  RequestGroup::Ptr req2(new RequestGroup(qty2));
   req2->capacities.push_back(qty2);
   req2->AddExchangeNode(w);  
-  g.AddRequestSet(req2);
+  g.AddRequestGroup(req2);
   
-  ExchangeNodeSet::Ptr supply(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr supply(new ExchangeNodeGroup());
   supply->capacities.push_back(cap);
   supply->AddExchangeNode(v1);  
   supply->AddExchangeNode(v2);  
@@ -158,8 +158,8 @@ cyclus::ExchangeGraph SetUp4(double qty1, double qty2, double cap) {
 cyclus::ExchangeGraph SetUp5(double qty, double cap1, double cap2) {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
-  using cyclus::ExchangeNodeSet;
-  using cyclus::RequestSet;
+  using cyclus::ExchangeNodeGroup;
+  using cyclus::RequestGroup;
   using cyclus::Arc;
   using cyclus::Match;
   
@@ -177,18 +177,18 @@ cyclus::ExchangeGraph SetUp5(double qty, double cap1, double cap2) {
   u2->unit_capacities[a2].push_back(1);
   w->unit_capacities[a2].push_back(1);
 
-  RequestSet::Ptr request(new RequestSet(qty));
+  RequestGroup::Ptr request(new RequestGroup(qty));
   request->capacities.push_back(qty);
   request->AddExchangeNode(u1);
   request->AddExchangeNode(u2);  
-  g.AddRequestSet(request);
+  g.AddRequestGroup(request);
   
-  ExchangeNodeSet::Ptr supply1(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr supply1(new ExchangeNodeGroup());
   supply1->capacities.push_back(cap1);
   supply1->AddExchangeNode(v);  
   g.AddSupplySet(supply1);
   
-  ExchangeNodeSet::Ptr supply2(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr supply2(new ExchangeNodeGroup());
   supply2->capacities.push_back(cap2);
   supply2->AddExchangeNode(w);  
   g.AddSupplySet(supply2);
@@ -204,8 +204,8 @@ cyclus::ExchangeGraph SetUp6(double qty1, double qty2,
                              double cap1, double cap2) {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
-  using cyclus::ExchangeNodeSet;
-  using cyclus::RequestSet;
+  using cyclus::ExchangeNodeGroup;
+  using cyclus::RequestGroup;
   using cyclus::Arc;
   using cyclus::Match;
   
@@ -233,25 +233,25 @@ cyclus::ExchangeGraph SetUp6(double qty1, double qty2,
   v2_1->unit_capacities[a2].push_back(1);
   v2_2->unit_capacities[a4].push_back(1);
 
-  RequestSet::Ptr req1(new RequestSet(qty1));
+  RequestGroup::Ptr req1(new RequestGroup(qty1));
   req1->capacities.push_back(qty1);
   req1->AddExchangeNode(u1_1);
   req1->AddExchangeNode(u1_2);  
-  g.AddRequestSet(req1);
+  g.AddRequestGroup(req1);
   
-  RequestSet::Ptr req2(new RequestSet(qty2));
+  RequestGroup::Ptr req2(new RequestGroup(qty2));
   req2->capacities.push_back(qty2);
   req2->AddExchangeNode(u2_1);
   req2->AddExchangeNode(u2_2);  
-  g.AddRequestSet(req2);
+  g.AddRequestGroup(req2);
   
-  ExchangeNodeSet::Ptr sup1(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr sup1(new ExchangeNodeGroup());
   sup1->capacities.push_back(cap1);
   sup1->AddExchangeNode(v1_1);  
   sup1->AddExchangeNode(v1_2);  
   g.AddSupplySet(sup1);
   
-  ExchangeNodeSet::Ptr sup2(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr sup2(new ExchangeNodeGroup());
   sup2->capacities.push_back(cap2);
   sup2->AddExchangeNode(v2_1);
   sup2->AddExchangeNode(v2_2);
@@ -269,8 +269,8 @@ cyclus::ExchangeGraph SetUp6(double qty1, double qty2,
 cyclus::ExchangeGraph SetUp7(double qty, int N) {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
-  using cyclus::ExchangeNodeSet;
-  using cyclus::RequestSet;
+  using cyclus::ExchangeNodeGroup;
+  using cyclus::RequestGroup;
   using cyclus::Arc;
   using cyclus::Match;
   
@@ -278,13 +278,13 @@ cyclus::ExchangeGraph SetUp7(double qty, int N) {
 
   // a single request for qty of a resource
   ExchangeNode::Ptr u(new ExchangeNode());
-  RequestSet::Ptr req(new RequestSet(qty));
+  RequestGroup::Ptr req(new RequestGroup(qty));
   req->capacities.push_back(qty);
   req->AddExchangeNode(u);
-  g.AddRequestSet(req);
+  g.AddRequestGroup(req);
 
   // a node set with N bids for q/N of a resource
-  ExchangeNodeSet::Ptr sup(new ExchangeNodeSet());
+  ExchangeNodeGroup::Ptr sup(new ExchangeNodeGroup());
   sup->capacities.push_back(qty);  
   for (int i = 0; i < N; i++) {
     ExchangeNode::Ptr v(new ExchangeNode(qty / N)); 
