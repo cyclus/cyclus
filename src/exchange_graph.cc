@@ -8,17 +8,17 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Node::Node(double max_qty) : max_qty(max_qty), qty(0), set(NULL) {}
+ExchangeNode::ExchangeNode(double max_qty) : max_qty(max_qty), qty(0), set(NULL) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool operator==(const Node& lhs, const Node& rhs) {
+bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
   return (lhs.unit_capacities == rhs.unit_capacities &&
           lhs.max_qty == rhs.max_qty &&
           lhs.set == rhs.set);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void NodeSet::AddNode(Node::Ptr node) {
+void ExchangeNodeSet::AddExchangeNode(ExchangeNode::Ptr node) {
   node->set = this;
   nodes.push_back(node);
 }
@@ -34,7 +34,7 @@ double Capacity(const Arc& a) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(Node& n, const Arc& a) {
+double Capacity(ExchangeNode& n, const Arc& a) {
   if (n.set == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodeset.");
   }
@@ -54,12 +54,12 @@ double Capacity(Node& n, const Arc& a) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(Node::Ptr pn, const Arc& a) {
+double Capacity(ExchangeNode::Ptr pn, const Arc& a) {
   return Capacity(*pn.get(), a);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void UpdateCapacity(Node& n, const Arc& a, double qty) {
+void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
   using std::vector;
   using cyclus::IsNegative;
   using cyclus::ValueError;
@@ -78,13 +78,13 @@ void UpdateCapacity(Node& n, const Arc& a, double qty) {
 
   double val = n.max_qty - qty;
   if (IsNegative(val)) {
-    throw ValueError("Node quantities can not be reduced below 0.");
+    throw ValueError("ExchangeNode quantities can not be reduced below 0.");
   }
   n.qty += qty;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void UpdateCapacity(Node::Ptr pn, const Arc& a, double qty) {
+void UpdateCapacity(ExchangeNode::Ptr pn, const Arc& a, double qty) {
   return UpdateCapacity(*pn.get(), a, qty);
 }
 
@@ -94,7 +94,7 @@ void ExchangeGraph::AddRequestSet(RequestSet::Ptr prs) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ExchangeGraph::AddSupplySet(NodeSet::Ptr pss) {
+void ExchangeGraph::AddSupplySet(ExchangeNodeSet::Ptr pss) {
   supply_sets.push_back(pss);
 }
 

@@ -27,8 +27,8 @@ using cyclus::ExchangeGraph;
 using cyclus::ExchangeTranslator;
 using cyclus::Match;
 using cyclus::Material;
-using cyclus::Node;
-using cyclus::NodeSet;
+using cyclus::ExchangeNode;
+using cyclus::ExchangeNodeSet;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::RequestSet;
@@ -77,8 +77,8 @@ TEST(ExXlateTests, XlateCapacities) {
   std::set< CapacityConstraint<Material> >
       bconstrs(carr2, carr2 + sizeof(carr2) / sizeof(carr2[0]));
 
-  Node::Ptr rnode(new Node());
-  Node::Ptr bnode(new Node());
+  ExchangeNode::Ptr rnode(new ExchangeNode());
+  ExchangeNode::Ptr bnode(new ExchangeNode());
   Arc arc(rnode, bnode);
 
   double rarr[] = {(converter1(mat.get()) / qty1), (converter2(mat.get()) / qty2)};
@@ -146,7 +146,7 @@ TEST(ExXlateTests, XlateBid) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  NodeSet::Ptr set = xlator.TranslateBidPortfolio_(port);
+  ExchangeNodeSet::Ptr set = xlator.TranslateBidPortfolio_(port);
 
   EXPECT_EQ(cexp, set->capacities);
   EXPECT_TRUE(xlator.bid_to_node_.find(bid)
@@ -183,7 +183,7 @@ TEST(ExXlateTests, XlateArc) {
 
   // give the xlator the correct state
   RequestSet::Ptr rset = xlator.TranslateRequestPortfolio_(rport);
-  NodeSet::Ptr bset = xlator.TranslateBidPortfolio_(bport);
+  ExchangeNodeSet::Ptr bset = xlator.TranslateBidPortfolio_(bport);
 
   Arc a = xlator.TranslateArc_(bid);
 
@@ -236,10 +236,10 @@ TEST(ExXlateTests, BackXlate) {
   Bid<Material>::Ptr vb(get_bid());
   Bid<Material>::Ptr yb(get_bid());
   
-  Node::Ptr u(new Node());  
-  Node::Ptr v(new Node());
-  Node::Ptr x(new Node());  
-  Node::Ptr y(new Node());
+  ExchangeNode::Ptr u(new ExchangeNode());  
+  ExchangeNode::Ptr v(new ExchangeNode());
+  ExchangeNode::Ptr x(new ExchangeNode());  
+  ExchangeNode::Ptr y(new ExchangeNode());
 
   xlator.AddRequest_(ur, u);
   xlator.AddRequest_(xr, x);

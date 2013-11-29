@@ -7,8 +7,8 @@
 using cyclus::ExchangeGraph;
 using cyclus::GreedySolver;
 using cyclus::Match;
-using cyclus::Node;
-using cyclus::NodeSet;
+using cyclus::ExchangeNode;
+using cyclus::ExchangeNodeSet;
 using cyclus::RequestSet;
 
 /* --- */

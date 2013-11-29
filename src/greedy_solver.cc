@@ -21,8 +21,8 @@ void GreedySolver::Solve() {
 void GreedySolver::GreedilySatisfySet_(RequestSet::Ptr prs) { 
   double target = prs->qty;
   double match = 0;
-  std::vector<Node::Ptr>& nodes = prs->nodes;
-  std::vector<Node::Ptr>::iterator req_it = nodes.begin();
+  std::vector<ExchangeNode::Ptr>& nodes = prs->nodes;
+  std::vector<ExchangeNode::Ptr>::iterator req_it = nodes.begin();
 
   CLOG(LEV_DEBUG1) << "Greedy Solving for " << target
                    << " amount of a resource.";

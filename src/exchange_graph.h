@@ -10,30 +10,30 @@
 
 namespace cyclus {
 
-class NodeSet;
-class Node;
+class ExchangeNodeSet;
+class ExchangeNode;
 
 /// @brief by convention, arc.first == request node (unode), arc.second == bid
 /// node (vnode)
-typedef std::pair< boost::shared_ptr<Node>, boost::shared_ptr<Node> > Arc;
+typedef std::pair< boost::shared_ptr<ExchangeNode>, boost::shared_ptr<ExchangeNode> > Arc;
 
-/// @brief Nodes are used in ExchangeGraphs to house information about a given
-/// translated Bid or Request. Specifically, Nodes have a notion of unit
+/// @brief ExchangeNodes are used in ExchangeGraphs to house information about a given
+/// translated Bid or Request. Specifically, ExchangeNodes have a notion of unit
 /// capacities that the given Bid or Request contribute to the overall capacity
-/// of NodeSet. Nodes also have a notion of quantity, i.e., the maximum amount
+/// of ExchangeNodeSet. ExchangeNodes also have a notion of quantity, i.e., the maximum amount
 /// of a resource that can be attributed to it. 
-struct Node {
+struct ExchangeNode {
  public:
-  typedef boost::shared_ptr<Node> Ptr;
+  typedef boost::shared_ptr<ExchangeNode> Ptr;
   
-  explicit Node(double max_qty = std::numeric_limits<double>::max());
+  explicit ExchangeNode(double max_qty = std::numeric_limits<double>::max());
 
-  /// @brief the parent NodeSet to which this Node belongs
-  NodeSet* set;
+  /// @brief the parent ExchangeNodeSet to which this ExchangeNode belongs
+  ExchangeNodeSet* set;
 
-  /// @brief unit values associated with this Node corresponding to capacties of
-  /// its parent NodeSet. This information corresponds to the resource object
-  /// from which this Node was translated. 
+  /// @brief unit values associated with this ExchangeNode corresponding to capacties of
+  /// its parent ExchangeNodeSet. This information corresponds to the resource object
+  /// from which this ExchangeNode was translated. 
   std::map<Arc, std::vector<double> > unit_capacities;
   
   /// @brief the maximum amount of a resource that can be associated with this
@@ -45,30 +45,30 @@ struct Node {
   double qty;
 };
 
-inline bool operator==(const Node& lhs, const Node& rhs);
+inline bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs);
 
-/// @class NodeSet
+/// @class ExchangeNodeSet
 ///
-/// @brief A NodeSet is a collection of Nodes, and is the ExchangeGraph
+/// @brief A ExchangeNodeSet is a collection of ExchangeNodes, and is the ExchangeGraph
 /// representation of a BidPortfolio or RequestPortfolio. It houses information
 /// about the concrete capacities associated with either portfolio.
-class NodeSet {
+class ExchangeNodeSet {
  public:
-  typedef boost::shared_ptr<NodeSet> Ptr;
+  typedef boost::shared_ptr<ExchangeNodeSet> Ptr;
   
-  std::vector<Node::Ptr> nodes;
+  std::vector<ExchangeNode::Ptr> nodes;
   std::vector<double> capacities;
 
-  /// @brief Add the node to the NodeSet and informs the node it is a member of
-  /// this NodeSet
-  void AddNode(Node::Ptr node);
+  /// @brief Add the node to the ExchangeNodeSet and informs the node it is a member of
+  /// this ExchangeNodeSet
+  void AddExchangeNode(ExchangeNode::Ptr node);
 };
 
 /// @class RequestSet
 ///
-/// @brief A RequestSet is a specific NodeSet with a notion of an total
+/// @brief A RequestSet is a specific ExchangeNodeSet with a notion of an total
 /// requested quantity.
-class RequestSet : public NodeSet {
+class RequestSet : public ExchangeNodeSet {
  public:
   typedef boost::shared_ptr<RequestSet> Ptr;
   
@@ -86,19 +86,19 @@ double Capacity(const Arc& a);
 ///
 /// @param n the node
 /// @return The minimum of the node's nodeset capacities / the node's unit
-/// capacities, or the Node's remaining qty -- whichever is smaller. 
-double Capacity(Node& n, const Arc& a);
-double Capacity(Node::Ptr pn, const Arc& a);
+/// capacities, or the ExchangeNode's remaining qty -- whichever is smaller. 
+double Capacity(ExchangeNode& n, const Arc& a);
+double Capacity(ExchangeNode::Ptr pn, const Arc& a);
 
-/// @brief updates the capacity of a given Node (i.e., its max_qty and the
-/// capacities of its NodeSet)
+/// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
+/// capacities of its ExchangeNodeSet)
 ///
-/// @throws if the update results in a negative NodeSet capacity or a negative
-/// Node max_qty
-/// @param n the Node
+/// @throws if the update results in a negative ExchangeNodeSet capacity or a negative
+/// ExchangeNode max_qty
+/// @param n the ExchangeNode
 /// @param qty the quantity for the node to update
-void UpdateCapacity(Node& n, const Arc& a, double qty);
-void UpdateCapacity(Node::Ptr pn, const Arc& a, double qty);
+void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty);
+void UpdateCapacity(ExchangeNode::Ptr pn, const Arc& a, double qty);
 
 typedef std::pair<Arc, double> Match;
 
@@ -106,8 +106,8 @@ typedef std::pair<Arc, double> Match;
 ///
 /// @brief An ExchangeGraph is a resource-neutral representation of a
 /// ResourceExchange. In general, it is produced via translation by an
-/// ExchangeTranslator. It is comprised of Nodes that are collected into
-/// NodeSets. Arcs are defined, connecting Nodes to each other. An
+/// ExchangeTranslator. It is comprised of ExchangeNodes that are collected into
+/// ExchangeNodeSets. Arcs are defined, connecting ExchangeNodes to each other. An
 /// ExchangeSolver can solve a given instance of an ExchangeGraph, and the
 /// solution is stored on the Graph in the form of Matches.
 class ExchangeGraph {
@@ -115,8 +115,8 @@ class ExchangeGraph {
   typedef boost::shared_ptr<ExchangeGraph> Ptr;
 
   std::vector<RequestSet::Ptr> request_sets;
-  std::vector<NodeSet::Ptr> supply_sets;
-  std::map<Node::Ptr, std::vector<Arc> > node_arc_map;
+  std::vector<ExchangeNodeSet::Ptr> supply_sets;
+  std::map<ExchangeNode::Ptr, std::vector<Arc> > node_arc_map;
   std::vector<Match> matches;
 
   /// @brief use the AddArc() api to update arcs_
@@ -126,7 +126,7 @@ class ExchangeGraph {
   void AddRequestSet(RequestSet::Ptr prs);
   
   /// @brief adds a supply set to the graph
-  void AddSupplySet(NodeSet::Ptr prs);
+  void AddSupplySet(ExchangeNodeSet::Ptr prs);
   
   /// @brief adds an arc to the graph
   void AddArc(const Arc& a);
