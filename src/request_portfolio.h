@@ -149,14 +149,15 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
 
 template<class T> int RequestPortfolio<T>::next_id_ = 0;
 
-/// @brief comparison operator, allows usage in ordered containers
+/// @brief RequestPortfolio-RequestPortfolio comparison operator, allows usage
+/// in ordered containers
 template<class T>
 inline bool operator<(const RequestPortfolio<T>& lhs,
                       const RequestPortfolio<T>& rhs) {
   return  (lhs.id() < rhs.id());
 };
 
-/// @brief equality operator
+/// @brief RequestPortfolio-RequestPortfolio equality operator
 template<class T>
 inline bool operator==(const RequestPortfolio<T>& lhs,
                        const RequestPortfolio<T>& rhs) {
@@ -166,7 +167,7 @@ inline bool operator==(const RequestPortfolio<T>& lhs,
            lhs.requester() == rhs.requester());
 };
 
-/// @brief inequality operator
+/// @brief RequestPortfolio-RequestPortfolio inequality operator
 template<class T>
 inline bool operator!=(const RequestPortfolio<T>& lhs,
                        const RequestPortfolio<T>& rhs) {

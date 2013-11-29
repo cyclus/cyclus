@@ -69,7 +69,7 @@ class Bid {
 
 template<class T> int Bid<T>::next_id_ = 0;
 
-/// @brief equality operator
+/// @brief Bid-Bid equality operator
 template<class T>
 inline bool operator==(const cyclus::Bid<T>& lhs,
                        const cyclus::Bid<T>& rhs) {
@@ -79,7 +79,7 @@ inline bool operator==(const cyclus::Bid<T>& lhs,
            lhs.bidder() == rhs.bidder());
 }
 
-/// @brief comparison operator, allows usage in ordered containers
+/// @brief Bid-Bid comparison operator, allows usage in ordered containers
 template<class T>
 inline bool operator<(const cyclus::Bid<T>& lhs,
                       const cyclus::Bid<T>& rhs) {

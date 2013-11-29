@@ -141,14 +141,15 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
 
 template<class T> int BidPortfolio<T>::next_id_ = 0;
 
-/// @brief comparison operator, allows usage in ordered containers
+/// @brief BidPortfolio-BidPortfolio comparison operator, allows usage in
+/// ordered containers
 template<class T>
 inline bool operator<(const BidPortfolio<T>& lhs,
                       const BidPortfolio<T>& rhs) {
   return  (lhs.id() < rhs.id());
 };
 
-/// @brief equality operator
+/// @brief BidPortfolio-BidPortfolio equality operator
 template<class T>
 inline bool operator==(const BidPortfolio<T>& lhs,
                        const BidPortfolio<T>& rhs) {
@@ -158,7 +159,7 @@ inline bool operator==(const BidPortfolio<T>& lhs,
            lhs.bidder() == rhs.bidder());
 };
 
-/// @brief inequality operator
+/// @brief BidPortfolio-BidPortfolio inequality operator
 template<class T>
 inline bool operator!=(const BidPortfolio<T>& lhs,
                        const BidPortfolio<T>& rhs) {

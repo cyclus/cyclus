@@ -28,7 +28,7 @@ struct Trade {
       price(0) {};
 };
 
-/// @brief equality operator
+/// @brief Trade-Trade equality operator
 template<class T>
 bool operator==(const cyclus::Trade<T>& lhs,
                 const cyclus::Trade<T>& rhs) {

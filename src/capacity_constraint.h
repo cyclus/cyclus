@@ -53,7 +53,7 @@ class CapacityConstraint {
 
 template<class T> int CapacityConstraint<T>::next_id_ = 0;
 
-/// @brief equality operator
+/// @brief CapacityConstraint-CapacityConstraint equality operator
 template<class T>
 inline bool operator==(const CapacityConstraint<T>& lhs,
                        const CapacityConstraint<T>& rhs) {
@@ -61,7 +61,8 @@ inline bool operator==(const CapacityConstraint<T>& lhs,
            (lhs.converter() == rhs.converter()));
 };
 
-/// @brief comparison operator, allows usage in ordered containers
+/// @brief CapacityConstraint-CapacityConstraint comparison operator, allows
+/// usage in ordered containers
 template<class T>
 inline bool operator<(const CapacityConstraint<T>& lhs,
                       const CapacityConstraint<T>& rhs) {

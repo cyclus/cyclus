@@ -79,7 +79,7 @@ class Request {
 
 template<class T> int Request<T>::next_id_ = 0;
 
-/// @brief equality operator
+/// @brief Request-Request equality operator
 template<class T>
 inline bool operator==(const Request<T>& lhs,
                        const Request<T>& rhs) {
@@ -90,7 +90,7 @@ inline bool operator==(const Request<T>& lhs,
           lhs.requester() == rhs.requester());
 }
 
-/// @brief comparison operator, allows usage in ordered containers
+/// @brief Request-Request comparison operator, allows usage in ordered containers
 template<class T>
 inline bool operator<(const cyclus::Request<T>& lhs,
                       const cyclus::Request<T>& rhs) {
