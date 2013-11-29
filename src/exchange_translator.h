@@ -30,9 +30,9 @@ class ExchangeTranslator {
  public:
   /// @brief default constructor
   ///
-  /// @param ctx the exchance context
-  ExchangeTranslator(ExchangeContext<T>* ctx) {
-    ctx_ = ctx;    
+  /// @param ex_ctx the exchance context
+  ExchangeTranslator(ExchangeContext<T>* ex_ctx) {
+    ex_ctx_ = ex_ctx;    
   };
 
   /// @brief translate the ExchangeContext into an ExchangeGraph
@@ -41,7 +41,7 @@ class ExchangeTranslator {
 
     // add each request set
     const std::vector<typename RequestPortfolio<T>::Ptr>& requests =
-        ctx_->requests();
+        ex_ctx_->requests();
     typename std::vector<typename RequestPortfolio<T>::Ptr>::const_iterator
         rp_it;
     for (rp_it = requests.begin(); rp_it != requests.end(); ++rp_it) {
@@ -50,7 +50,7 @@ class ExchangeTranslator {
     }
 
     // add each bid set
-    const std::vector<typename BidPortfolio<T>::Ptr>& bidports = ctx_->bids();
+    const std::vector<typename BidPortfolio<T>::Ptr>& bidports = ex_ctx_->bids();
     typename std::vector<typename BidPortfolio<T>::Ptr>::const_iterator bp_it;
     for (bp_it = bidports.begin(); bp_it != bidports.end(); ++bp_it) {
       NodeSet::Ptr ns = TranslateBidPortfolio_(*bp_it);
@@ -180,7 +180,7 @@ class ExchangeTranslator {
     return t;
   };
   
-  ExchangeContext<T>* ctx_;
+  ExchangeContext<T>* ex_ctx_;
   std::map<typename Request<T>::Ptr, Node::Ptr> request_to_node_;
   std::map<Node::Ptr, typename Request<T>::Ptr> node_to_request_;
   std::map<typename Bid<T>::Ptr, Node::Ptr> bid_to_node_;
