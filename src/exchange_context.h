@@ -80,7 +80,7 @@ class ExchangeContext {
   }
   
   /// @return all known requesters
-  inline const std::set<Trader*>& requesters() const {return requesters_;}
+  inline const std::set<Trader*>& requesters() const { return requesters_; }
 
   /// @return all known bid portfolios
   inline const std::vector<typename BidPortfolio<T>::Ptr>&
@@ -89,7 +89,7 @@ class ExchangeContext {
   }
 
   /// @return all known bidders
-  inline const std::set<Trader*>& bidders() const {return bidders_;}
+  inline const std::set<Trader*>& bidders() const { return bidders_; }
   
   /// @return all known requests for a given commodity
   /// @param commod the commodity

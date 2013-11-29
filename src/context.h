@@ -37,7 +37,7 @@ class Context {
   void AddPrototype(std::string name, Model* m);
 
   /// Adds a model to a simulation-wide accessible list.
-  inline void AddModel(Model* m) {model_list_.push_back(m);}
+  inline void AddModel(Model* m) { model_list_.push_back(m); }
 
   /**
      returns a model given the template's name
@@ -52,7 +52,7 @@ class Context {
   void PrintModelList();
   
   /// Access the simulation-wide model list.
-  inline std::vector<Model*>& GetModels() {return model_list_;}
+  inline std::vector<Model*>& GetModels() { return model_list_; }
 
   /// Registers an agent as a participant in resource exchanges
   inline void RegisterTrader(Trader* e) {
@@ -122,7 +122,7 @@ class Context {
   Event* NewEvent(std::string title);
 
   /// @return the next transaction id
-  inline int NextTransactionID() {return trans_id_++;}
+  inline int NextTransactionID() { return trans_id_++; }
       
  private:
   std::map<std::string, Model*> protos_;

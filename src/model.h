@@ -163,7 +163,7 @@ class Model {
   /**
    Returns this model's current simulation context.
    */
-  inline Context* context() const {return ctx_;}
+  inline Context* context() const { return ctx_; }
 
   /**
      every model should be able to print a verbose description
@@ -173,7 +173,7 @@ class Model {
   /**
      return parent of this model
    */
-  inline Model* parent() const {return parent_;}
+  inline Model* parent() const { return parent_; }
 
   /**
      return the parent' id
