@@ -61,7 +61,7 @@ double Capacity(Node::Ptr pn, const Arc& a) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void UpdateCapacity(Node& n, const Arc& a, double qty) {
   using std::vector;
-  using cyclus::DoubleNeg;
+  using cyclus::IsNegative;
   using cyclus::ValueError;
 
   if (n.set == NULL) {
@@ -72,12 +72,12 @@ void UpdateCapacity(Node& n, const Arc& a, double qty) {
   vector<double>& caps = n.set->capacities;
   for (int i = 0; i < caps.size(); i++) {
     double val = caps[i] - qty * unit_caps[i];
-    if (DoubleNeg(val)) throw ValueError("Capacities can not be reduced below 0.");
+    if (IsNegative(val)) throw ValueError("Capacities can not be reduced below 0.");
     caps[i] = val;
   }
 
   double val = n.max_qty - qty;
-  if (DoubleNeg(val)) {
+  if (IsNegative(val)) {
     throw ValueError("Node quantities can not be reduced below 0.");
   }
   n.qty += qty;

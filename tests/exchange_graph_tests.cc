@@ -142,7 +142,7 @@ TEST(ExGraphTests, NodeUpdateThrow2) {
   double unit = 2;
   double min_diff = cyclus::eps() * (1 + cyclus::eps());
   double cap = qty * unit - min_diff;
-  ASSERT_TRUE(cyclus::DoubleNeg(cap - qty * unit));
+  ASSERT_TRUE(cyclus::IsNegative(cap - qty * unit));
   
   Node::Ptr m(new Node());
   Node::Ptr n(new Node());

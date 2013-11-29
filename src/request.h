@@ -86,7 +86,7 @@ inline bool operator==(const Request<T>& lhs,
   return (lhs.commodity() == rhs.commodity() &&
           lhs.target() == rhs.target() &&
           lhs.portfolio() == rhs.portfolio() &&
-          DoubleEq(lhs.preference(), rhs.preference()) &&
+          AlmostEq(lhs.preference(), rhs.preference()) &&
           lhs.requester() == rhs.requester());
 }
 
