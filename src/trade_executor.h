@@ -30,9 +30,9 @@ class TradeExecutor {
   /// @brief execute all trades, collecting responsers from bidders and sending
   /// responses to requesters
   void ExecuteTrades() {
-    __GroupTradesBySupplier();
-    __GetTradeResponses();
-    __SendTradeResources();
+    GroupTradesBySupplier_();
+    GetTradeResponses_();
+    SendTradeResources_();
   };
 
   /// @brief Record all trades with the appropriate backends
@@ -89,7 +89,7 @@ class TradeExecutor {
       std::vector< std::pair<Trade<T>, typename T::Ptr> > > all_trades_;
 
   /// @brief populates suppliers_, requesters_, and trades_by_supplier_
-  void __GroupTradesBySupplier() {
+  void GroupTradesBySupplier_() {
     typename std::vector< Trade<T> >::const_iterator it;
     for (it = trades_.begin(); it != trades_.end(); ++it) {
       trades_by_supplier_[it->bid->bidder()].push_back(*it);
@@ -100,7 +100,7 @@ class TradeExecutor {
 
   /// @brief queries each supplier for the responses to thier matched trade and
   /// populates trades_by_requester_ and all_trades_ with the results
-  void __GetTradeResponses() {
+  void GetTradeResponses_() {
     std::set<Trader*>::iterator it;
     for (it = suppliers_.begin(); it != suppliers_.end(); ++it) {
       // get responses
@@ -125,7 +125,7 @@ class TradeExecutor {
     }
   }
   
-  void __SendTradeResources() {
+  void SendTradeResources_() {
     std::set<Trader*>::iterator it;
     for (it = requesters_.begin(); it != requesters_.end(); ++it) {
       // get responses

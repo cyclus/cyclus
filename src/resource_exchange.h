@@ -74,7 +74,7 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::__AddRequests),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
                      this));
   }
   
@@ -84,7 +84,7 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::__AddBids),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids_),
                      this));
   }
 
@@ -95,7 +95,7 @@ class ResourceExchange {
         traders.begin(),
         traders.end(),
         std::bind1st(
-            std::mem_fun(&cyclus::ResourceExchange<T>::__DoAdjustment),
+            std::mem_fun(&cyclus::ResourceExchange<T>::DoAdjustment_),
             this));
   }
   
@@ -104,7 +104,7 @@ class ResourceExchange {
   ExchangeContext<T> ex_ctx_;
 
   /// @brief queries a given facility model for 
-  void __AddRequests(Trader* t) {
+  void AddRequests_(Trader* t) {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
     typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;
     for (it = rp.begin(); it != rp.end(); ++it) {
@@ -113,7 +113,7 @@ class ResourceExchange {
   };
 
   /// @brief queries a given facility model for 
-  void __AddBids(Trader* t) {
+  void AddBids_(Trader* t) {
     std::set<typename BidPortfolio<T>::Ptr> bp = QueryBids<T>(t, &ex_ctx_);
     typename std::set<typename BidPortfolio<T>::Ptr>::iterator it;
     for (it = bp.begin(); it != bp.end(); ++it) {
@@ -123,7 +123,7 @@ class ResourceExchange {
   
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
-  void __DoAdjustment(Trader* t) {
+  void DoAdjustment_(Trader* t) {
     typename PrefMap<T>::type& prefs = ex_ctx_.Prefs(t);
     Model* m = t;
     while (m != NULL) {

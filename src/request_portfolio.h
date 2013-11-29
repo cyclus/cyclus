@@ -46,8 +46,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @param r the request to add
   /// @throws if a request is added from a different requester than the original
   void AddRequest(const typename Request<T>::Ptr r) {
-    __VerifyRequester(r);
-    __VerifyQty(r);
+    VerifyRequester_(r);
+    VerifyQty_(r);
     CLOG(LEV_DEBUG2) << "Added request of size " << r->target()->quantity();
     CLOG(LEV_DEBUG2) << "Portfolio size is " << qty_;
     requests_.push_back(r);
@@ -95,7 +95,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// VerifyRequester() verifies the the request is associated with the portfolio's
   /// requester
   /// @throws if a request is added from a different requester than the original
-  void __VerifyRequester(const typename Request<T>::Ptr r) {
+  void VerifyRequester_(const typename Request<T>::Ptr r) {
     if (requester_ == NULL) {
       requester_ = r->requester();
     } else if (requester_ != r->requester()) {
@@ -108,7 +108,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// VerifyRequester() verifies the the quantity is the same as all others in
   /// the portfolio
   /// @throws if a quanityt is different than the original
-  void __VerifyQty(const typename Request<T>::Ptr r) {
+  void VerifyQty_(const typename Request<T>::Ptr r) {
     double qty = r->target()->quantity();
     if (qty_ == -1) {
       qty_ = qty;

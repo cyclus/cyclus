@@ -48,12 +48,12 @@ class ExchangeContext {
     
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Request<T>::Ptr pr = *it;
-      __AddRequest(*it);
+      AddRequest_(*it);
     }
   }
 
   /// @brief Adds an individual request
-  void __AddRequest(typename Request<T>::Ptr pr) {
+  void AddRequest_(typename Request<T>::Ptr pr) {
     requests_by_commod_[pr->commodity()].push_back(pr);
   }
   
@@ -69,7 +69,7 @@ class ExchangeContext {
 
     for (it = vr.begin(); it != vr.end(); ++it) {
       typename Bid<T>::Ptr pb = *it;
-      __AddBid(pb);
+      AddBid_(pb);
     }
   }
 
@@ -148,7 +148,7 @@ class ExchangeContext {
 
   /// @brief adds a bid to the appropriate containers
   /// @param pb the bid
-  void __AddBid(typename Bid<T>::Ptr pb) {
+  void AddBid_(typename Bid<T>::Ptr pb) {
     bids_by_request_[pb->request()].push_back(pb);
 
     trader_prefs_[pb->request()->requester()][pb->request()].push_back(

@@ -80,7 +80,7 @@ class TradeExecutorTests : public ::testing::Test {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(TradeExecutorTests, SupplierGrouping) {
   TradeExecutor<Material> exec(trades);
-  exec.__GroupTradesBySupplier();
+  exec.GroupTradesBySupplier_();
   std::map<Trader*, std::vector< Trade<Material> > > obs =
       exec.trades_by_supplier_;
   std::map<Trader*, std::vector< Trade<Material> > > exp;
@@ -103,8 +103,8 @@ TEST_F(TradeExecutorTests, SupplierGrouping) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(TradeExecutorTests, SupplierResponses) {
   TradeExecutor<Material> exec(trades);
-  exec.__GroupTradesBySupplier();  
-  exec.__GetTradeResponses();
+  exec.GroupTradesBySupplier_();  
+  exec.GetTradeResponses_();
 
   std::map<Trader*,
            std::vector< std::pair<Trade<Material>, Material::Ptr> > >

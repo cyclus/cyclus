@@ -13,12 +13,12 @@ void GreedySolver::Solve() {
   std::for_each(graph_->request_sets.begin(),
                 graph_->request_sets.end(),
                 std::bind1st(
-                    std::mem_fun(&GreedySolver::__GreedilySatisfySet),
+                    std::mem_fun(&GreedySolver::GreedilySatisfySet_),
                     this));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GreedySolver::__GreedilySatisfySet(RequestSet::Ptr prs) { 
+void GreedySolver::GreedilySatisfySet_(RequestSet::Ptr prs) { 
   double target = prs->qty;
   double match = 0;
   std::vector<Node::Ptr>& nodes = prs->nodes;

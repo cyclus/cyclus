@@ -45,7 +45,7 @@ class ExchangeTranslator {
     typename std::vector<typename RequestPortfolio<T>::Ptr>::const_iterator
         rp_it;
     for (rp_it = requests.begin(); rp_it != requests.end(); ++rp_it) {
-      RequestSet::Ptr rs = __TranslateRequestPortfolio(*rp_it);
+      RequestSet::Ptr rs = TranslateRequestPortfolio_(*rp_it);
       graph->AddRequestSet(rs);
     }
 
@@ -53,14 +53,14 @@ class ExchangeTranslator {
     const std::vector<typename BidPortfolio<T>::Ptr>& bidports = ctx_->bids();
     typename std::vector<typename BidPortfolio<T>::Ptr>::const_iterator bp_it;
     for (bp_it = bidports.begin(); bp_it != bidports.end(); ++bp_it) {
-      NodeSet::Ptr ns = __TranslateBidPortfolio(*bp_it);
+      NodeSet::Ptr ns = TranslateBidPortfolio_(*bp_it);
       graph->AddSupplySet(ns);
 
       // add each request-bid arc
       const std::set<typename Bid<T>::Ptr>& bids = (*bp_it)->bids();
       typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
-        Arc a = __TranslateArc(*b_it);
+        Arc a = TranslateArc_(*b_it);
         graph->AddArc(a);
       }
     }
@@ -75,7 +75,7 @@ class ExchangeTranslator {
     CLOG(LEV_DEBUG1) << "Back traslating " << matches.size()
                      << " trade matches.";
     for (m_it = matches.begin(); m_it != matches.end(); ++m_it) {
-      ret.push_back(__BackTranslateMatch(*m_it));
+      ret.push_back(BackTranslateMatch_(*m_it));
     }
   };
   
@@ -87,13 +87,13 @@ class ExchangeTranslator {
   std::map<Node::Ptr, typename Bid<T>::Ptr> node_to_bid_;
 
   /// @brief Adds a request-node mapping
-  inline void __AddRequest(typename Request<T>::Ptr r, Node::Ptr n) {
+  inline void AddRequest_(typename Request<T>::Ptr r, Node::Ptr n) {
     request_to_node_[r] = n;
     node_to_request_[n] = r;
   }
 
   /// @brief Adds a bid-node mapping
-  inline void __AddBid(typename Bid<T>::Ptr b, Node::Ptr n) {
+  inline void AddBid_(typename Bid<T>::Ptr b, Node::Ptr n) {
     bid_to_node_[b] = n;
     node_to_bid_[n] = b;
   }
@@ -101,7 +101,7 @@ class ExchangeTranslator {
   /// @brief translates a request portfolio by adding request nodes and
   /// accounting for capacities. Request unit capcities must be added when arcs
   /// are known
-  RequestSet::Ptr __TranslateRequestPortfolio(
+  RequestSet::Ptr TranslateRequestPortfolio_(
       const typename RequestPortfolio<T>::Ptr rp) {
     RequestSet::Ptr rs(new RequestSet(rp->qty()));
     CLOG(LEV_DEBUG2) << "Translating request portfolio of size " << rp->qty();
@@ -112,7 +112,7 @@ class ExchangeTranslator {
          ++r_it) {
       Node::Ptr n(new Node());
       rs->AddNode(n);
-      __AddRequest(*r_it, n);
+      AddRequest_(*r_it, n);
     }
 
     CLOG(LEV_DEBUG4) << "adding " << rp->constraints().size()
@@ -129,7 +129,7 @@ class ExchangeTranslator {
   
   /// @brief translates a bid portfolio by adding bid nodes and accounting
   /// for capacities. Bid unit capcities must be added when arcs are known
-  NodeSet::Ptr __TranslateBidPortfolio(
+  NodeSet::Ptr TranslateBidPortfolio_(
       const typename BidPortfolio<T>::Ptr bp) {
     NodeSet::Ptr bs(new NodeSet());
     
@@ -139,7 +139,7 @@ class ExchangeTranslator {
          ++b_it) {
       Node::Ptr n(new Node());
       bs->AddNode(n);
-      __AddBid(*b_it, n);
+      AddBid_(*b_it, n);
     }
 
     CLOG(LEV_DEBUG4) << "adding " << bp->constraints().size()
@@ -157,7 +157,7 @@ class ExchangeTranslator {
   
   /// @brief translates an arc given a bid and subsequent data, and also
   /// updates the unit capacities for the associated nodes on the arc
-  Arc __TranslateArc(typename Bid<T>::Ptr bid) {
+  Arc TranslateArc_(typename Bid<T>::Ptr bid) {
     typename Request<T>::Ptr req = bid->request();
     
     Node::Ptr unode = request_to_node_[req];
@@ -176,7 +176,7 @@ class ExchangeTranslator {
   }
   
   /// @brief simple translation from a Match to a Trade, given internal state
-  Trade<T> __BackTranslateMatch(const Match& match) {
+  Trade<T> BackTranslateMatch_(const Match& match) {
     Node::Ptr req_node = match.first.first;
     Node::Ptr bid_node = match.first.second;
     

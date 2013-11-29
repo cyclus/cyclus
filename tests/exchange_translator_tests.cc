@@ -116,7 +116,7 @@ TEST(ExXlateTests, XlateReq) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  RequestSet::Ptr set = xlator.__TranslateRequestPortfolio(rp);
+  RequestSet::Ptr set = xlator.TranslateRequestPortfolio_(rp);
 
   EXPECT_EQ(qty, set->qty);
   EXPECT_EQ(cexp, set->capacities);
@@ -146,7 +146,7 @@ TEST(ExXlateTests, XlateBid) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  NodeSet::Ptr set = xlator.__TranslateBidPortfolio(port);
+  NodeSet::Ptr set = xlator.TranslateBidPortfolio_(port);
 
   EXPECT_EQ(cexp, set->capacities);
   EXPECT_TRUE(xlator.bid_to_node_.find(bid)
@@ -182,10 +182,10 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeTranslator<Material> xlator(&ctx);
 
   // give the xlator the correct state
-  RequestSet::Ptr rset = xlator.__TranslateRequestPortfolio(rport);
-  NodeSet::Ptr bset = xlator.__TranslateBidPortfolio(bport);
+  RequestSet::Ptr rset = xlator.TranslateRequestPortfolio_(rport);
+  NodeSet::Ptr bset = xlator.TranslateBidPortfolio_(bport);
 
-  Arc a = xlator.__TranslateArc(bid);
+  Arc a = xlator.TranslateArc_(bid);
 
   EXPECT_EQ(xlator.bid_to_node_[bid], a.second);
   EXPECT_EQ(xlator.request_to_node_[req], a.first);
@@ -241,10 +241,10 @@ TEST(ExXlateTests, BackXlate) {
   Node::Ptr x(new Node());  
   Node::Ptr y(new Node());
 
-  xlator.__AddRequest(ur, u);
-  xlator.__AddRequest(xr, x);
-  xlator.__AddBid(vb, v);
-  xlator.__AddBid(yb, y);
+  xlator.AddRequest_(ur, u);
+  xlator.AddRequest_(xr, x);
+  xlator.AddBid_(vb, v);
+  xlator.AddBid_(yb, y);
   
   Arc a(u, v);
   Arc b(x, y);

@@ -31,7 +31,7 @@ class GreedySolver: public ExchangeSolver {
   virtual void Solve();
 
   /* -------------------- private methods and members ----------------------- */  
-  void __GreedilySatisfySet(RequestSet::Ptr prs);
+  void GreedilySatisfySet_(RequestSet::Ptr prs);
 };
 
 } // namespace cyclus
