@@ -8,18 +8,18 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ExchangeNode::ExchangeNode(double max_qty) : max_qty(max_qty), qty(0), set(NULL) {}
+ExchangeNode::ExchangeNode(double max_qty) : max_qty(max_qty), qty(0), group(NULL) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
   return (lhs.unit_capacities == rhs.unit_capacities &&
           lhs.max_qty == rhs.max_qty &&
-          lhs.set == rhs.set);
+          lhs.group == rhs.group);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
-  node->set = this;
+  node->group = this;
   nodes.push_back(node);
 }
 
@@ -35,8 +35,8 @@ double Capacity(const Arc& a) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(ExchangeNode& n, const Arc& a) {
-  if (n.set == NULL) {
-    throw cyclus::StateError("An notion of node capacity requires a nodeset.");
+  if (n.group == NULL) {
+    throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
 
   if (n.unit_capacities[a].size() == 0) {
@@ -44,10 +44,10 @@ double Capacity(ExchangeNode& n, const Arc& a) {
   }
 
   std::vector<double>& unit_caps = n.unit_capacities[a];
-  const std::vector<double>& set_caps = n.set->capacities;
+  const std::vector<double>& group_caps = n.group->capacities;
   std::vector<double> caps;
   for (int i = 0; i < unit_caps.size(); i++) {
-    caps.push_back(set_caps[i] / unit_caps[i]);
+    caps.push_back(group_caps[i] / unit_caps[i]);
   }
 
   return std::min(*std::min_element(caps.begin(), caps.end()), n.max_qty - n.qty);
@@ -64,12 +64,12 @@ void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
   using cyclus::IsNegative;
   using cyclus::ValueError;
 
-  if (n.set == NULL) {
-    throw cyclus::StateError("An notion of node capacity requires a nodeset.");
+  if (n.group == NULL) {
+    throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
   
   vector<double>& unit_caps = n.unit_capacities[a];
-  vector<double>& caps = n.set->capacities;
+  vector<double>& caps = n.group->capacities;
   for (int i = 0; i < caps.size(); i++) {
     double val = caps[i] - qty * unit_caps[i];
     if (IsNegative(val)) throw ValueError("Capacities can not be reduced below 0.");
@@ -94,7 +94,7 @@ void ExchangeGraph::AddRequestGroup(RequestGroup::Ptr prs) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ExchangeGraph::AddSupplySet(ExchangeNodeGroup::Ptr pss) {
+void ExchangeGraph::AddSupplyGroup(ExchangeNodeGroup::Ptr pss) {
   supply_groups.push_back(pss);
 }
 

@@ -18,11 +18,11 @@ TEST(ExGraphTests, ExchangeNodeGroups) {
   ExchangeNode::Ptr n(new ExchangeNode());
   ExchangeNodeGroup s;
   s.AddExchangeNode(n);
-  EXPECT_EQ(&s, n->set);
+  EXPECT_EQ(&s, n->group);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, ReqSets) {
+TEST(ExGraphTests, ReqGroups) {
   double q = 1.5;
   RequestGroup r;
   EXPECT_EQ(0, r.qty);
@@ -44,8 +44,8 @@ TEST(ExGraphTests, ExchangeNodeNoCap) {
   ExchangeNode::Ptr n(new ExchangeNode());
   Arc a(m, n);
   
-  ExchangeNodeGroup uset;
-  uset.AddExchangeNode(m);
+  ExchangeNodeGroup ugroup;
+  ugroup.AddExchangeNode(m);
     
   EXPECT_DOUBLE_EQ(Capacity(m, a), std::numeric_limits<double>::max());
 }
@@ -183,15 +183,15 @@ TEST(ExGraphTests, ArcCap) {
   u->unit_capacities[a].push_back(uval);
   v->unit_capacities[a].push_back(vval);
   
-  ExchangeNodeGroup uset;
-  uset.AddExchangeNode(u);
+  ExchangeNodeGroup ugroup;
+  ugroup.AddExchangeNode(u);
   double ucap = uval * 1.5;
-  uset.capacities.push_back(ucap);
+  ugroup.capacities.push_back(ucap);
   
-  ExchangeNodeGroup vset;
-  vset.AddExchangeNode(v);
+  ExchangeNodeGroup vgroup;
+  vgroup.AddExchangeNode(v);
   double vcap = vval;
-  vset.capacities.push_back(vcap);
+  vgroup.capacities.push_back(vcap);
   
   
   EXPECT_DOUBLE_EQ(Capacity(a), 1.0);
@@ -204,7 +204,7 @@ TEST(ExGraphTests, ArcCap) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, AddReqSet) {
+TEST(ExGraphTests, AddReqGroup) {
   RequestGroup::Ptr prs(new RequestGroup());
   ExchangeGraph g;
   g.AddRequestGroup(prs);
@@ -212,10 +212,10 @@ TEST(ExGraphTests, AddReqSet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, AddSuppSet) {
+TEST(ExGraphTests, AddSuppGroup) {
   ExchangeNodeGroup::Ptr pss(new ExchangeNodeGroup());
   ExchangeGraph g;
-  g.AddSupplySet(pss);
+  g.AddSupplyGroup(pss);
   EXPECT_EQ(g.supply_groups[0], pss);
 }
 
@@ -286,15 +286,15 @@ TEST(ExGraphTests, AddMatch) {
   
   double large = 500;
   
-  ExchangeNodeGroup::Ptr uset(new ExchangeNodeGroup());
-  uset->AddExchangeNode(u);
+  ExchangeNodeGroup::Ptr ugroup(new ExchangeNodeGroup());
+  ugroup->AddExchangeNode(u);
   double ucap = uval * 500;
-  uset->capacities.push_back(ucap);
+  ugroup->capacities.push_back(ucap);
   
-  ExchangeNodeGroup::Ptr vset(new ExchangeNodeGroup());
-  vset->AddExchangeNode(v);
+  ExchangeNodeGroup::Ptr vgroup(new ExchangeNodeGroup());
+  vgroup->AddExchangeNode(v);
   double vcap = vval * 500;
-  vset->capacities.push_back(vcap);
+  vgroup->capacities.push_back(vcap);
   
   double qty = large * 0.1;
   

@@ -29,7 +29,7 @@ struct ExchangeNode {
   explicit ExchangeNode(double max_qty = std::numeric_limits<double>::max());
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
-  ExchangeNodeGroup* set;
+  ExchangeNodeGroup* group;
 
   /// @brief unit values associated with this ExchangeNode corresponding to capacties of
   /// its parent ExchangeNodeGroup. This information corresponds to the resource object
@@ -85,7 +85,7 @@ double Capacity(const Arc& a);
 /// @brief the capacity of a node
 ///
 /// @param n the node
-/// @return The minimum of the node's nodeset capacities / the node's unit
+/// @return The minimum of the node's nodegroup capacities / the node's unit
 /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller. 
 double Capacity(ExchangeNode& n, const Arc& a);
 double Capacity(ExchangeNode::Ptr pn, const Arc& a);
@@ -122,11 +122,11 @@ class ExchangeGraph {
   /// @brief use the AddArc() api to update arcs_
   std::vector<Arc> arcs_;
 
-  /// @brief adds a request set to the graph
+  /// @brief adds a request group to the graph
   void AddRequestGroup(RequestGroup::Ptr prs);
   
-  /// @brief adds a supply set to the graph
-  void AddSupplySet(ExchangeNodeGroup::Ptr prs);
+  /// @brief adds a supply group to the graph
+  void AddSupplyGroup(ExchangeNodeGroup::Ptr prs);
   
   /// @brief adds an arc to the graph
   void AddArc(const Arc& a);

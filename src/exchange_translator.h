@@ -39,7 +39,7 @@ class ExchangeTranslator {
   ExchangeGraph::Ptr Translate() {
     ExchangeGraph::Ptr graph(new ExchangeGraph());
 
-    // add each request set
+    // add each request group
     const std::vector<typename RequestPortfolio<T>::Ptr>& requests =
         ex_ctx_->requests();
     typename std::vector<typename RequestPortfolio<T>::Ptr>::const_iterator
@@ -49,12 +49,12 @@ class ExchangeTranslator {
       graph->AddRequestGroup(rs);
     }
 
-    // add each bid set
+    // add each bid group
     const std::vector<typename BidPortfolio<T>::Ptr>& bidports = ex_ctx_->bids();
     typename std::vector<typename BidPortfolio<T>::Ptr>::const_iterator bp_it;
     for (bp_it = bidports.begin(); bp_it != bidports.end(); ++bp_it) {
       ExchangeNodeGroup::Ptr ns = TranslateBidPortfolio_(*bp_it);
-      graph->AddSupplySet(ns);
+      graph->AddSupplyGroup(ns);
 
       // add each request-bid arc
       const std::set<typename Bid<T>::Ptr>& bids = (*bp_it)->bids();
