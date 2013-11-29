@@ -34,6 +34,7 @@ class CapacityConstraint {
   inline double convert(T* item) const {
     return (*converter_)(item);
   }
+
   inline double convert(boost::shared_ptr<T> item) const {
     return convert(item.get());
   }
@@ -43,10 +44,8 @@ class CapacityConstraint {
     return id_;
   }
 
-  /* -------------------- private methods and members ----------------------- */  
   double capacity_;
   Converter converter_;
-  /// double (*converter_)(T*);
   int id_;
   static int next_id_;
 };

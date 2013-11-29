@@ -68,7 +68,6 @@ class ExchangeManager {
     exec.RecordTrades(ctx_);
   }
 
-  /* -------------------- private methods and members ----------------------- */  
   Context* ctx_;
   ExchangeSolver* solver_;
 };

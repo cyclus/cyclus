@@ -98,10 +98,6 @@ class ResourceExchange {
             std::mem_fun(&cyclus::ResourceExchange<T>::DoAdjustment_),
             this));
   }
-  
-  /* -------------------- private methods and members ----------------------- */
-  Context* ctx_;
-  ExchangeContext<T> ex_ctx_;
 
   /// @brief queries a given facility model for 
   void AddRequests_(Trader* t) {
@@ -131,7 +127,9 @@ class ResourceExchange {
       m = m->parent();
     }
   };
-
+  
+  Context* ctx_;
+  ExchangeContext<T> ex_ctx_;
 };
 
 } // namespace cyclus

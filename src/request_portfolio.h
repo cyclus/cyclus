@@ -60,6 +60,32 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
   };
+  /// @brief if the requester has not been determined yet, it is set. otherwise
+  /// VerifyRequester() verifies the the request is associated with the portfolio's
+  /// requester
+  /// @throws if a request is added from a different requester than the original
+  void VerifyRequester_(const typename Request<T>::Ptr r) {
+    if (requester_ == NULL) {
+      requester_ = r->requester();
+    } else if (requester_ != r->requester()) {
+      std::string msg = "Insertion error: requesters do not match.";
+      throw KeyError(msg);
+    }
+  };
+
+  /// @brief if the quanityt has not been determined yet, it is set. otherwise
+  /// VerifyRequester() verifies the the quantity is the same as all others in
+  /// the portfolio
+  /// @throws if a quanityt is different than the original
+  void VerifyQty_(const typename Request<T>::Ptr r) {
+    double qty = r->target()->quantity();
+    if (qty_ == -1) {
+      qty_ = qty;
+    } else if (qty_ != qty) {
+      std::string msg = "Insertion error: request quantity do not match.";
+      throw KeyError(msg);
+    }
+  };
     
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
@@ -90,35 +116,6 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     return id_;
   }
   
-  /* -------------------- private methods and members -------------------------- */
-  /// @brief if the requester has not been determined yet, it is set. otherwise
-  /// VerifyRequester() verifies the the request is associated with the portfolio's
-  /// requester
-  /// @throws if a request is added from a different requester than the original
-  void VerifyRequester_(const typename Request<T>::Ptr r) {
-    if (requester_ == NULL) {
-      requester_ = r->requester();
-    } else if (requester_ != r->requester()) {
-      std::string msg = "Insertion error: requesters do not match.";
-      throw KeyError(msg);
-    }
-  };
-
-  /// @brief if the quanityt has not been determined yet, it is set. otherwise
-  /// VerifyRequester() verifies the the quantity is the same as all others in
-  /// the portfolio
-  /// @throws if a quanityt is different than the original
-  void VerifyQty_(const typename Request<T>::Ptr r) {
-    double qty = r->target()->quantity();
-    if (qty_ == -1) {
-      qty_ = qty;
-    } else if (qty_ != qty) {
-      std::string msg = "Insertion error: request quantity do not match.";
-      throw KeyError(msg);
-    }
-  };
-
-  /* -------------------- private methods and members -------------------------- */
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
   std::vector<typename Request<T>::Ptr> requests_;

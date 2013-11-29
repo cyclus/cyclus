@@ -58,7 +58,6 @@ class Bid {
     return id_;
   }
 
-  /* -------------------- private methods and members -------------------------- */
   typename Request<T>::Ptr request_;
   boost::shared_ptr<T> offer_;
   Trader* bidder_;

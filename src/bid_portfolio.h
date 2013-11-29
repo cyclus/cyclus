@@ -49,18 +49,6 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
     bids_.insert(b);
     b->set_portfolio(this->shared_from_this());
   };
-  
-  /// @return the model associated with the portfolio. if no bids have
-  /// been added, the bidder is NULL.
-  inline Trader* bidder() const {
-    return bidder_;
-  };
-    
-  /// @return the commodity associated with the portfolio. if no bids have
-  /// been added, the commodity is 'NO_COMMODITY_SET'.
-  inline std::string commodity() const {
-    return commodity_;
-  };
 
   /// @brief add a capacity constraint associated with the portfolio
   /// @param c the constraint to add
@@ -68,22 +56,6 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
     constraints_.insert(c);
   };
 
-  /// @return const access to the bids
-  inline const std::set<typename Bid<T>::Ptr>& bids() const {
-    return bids_;
-  };
-  
-  /// @return the set of constraints over the bids
-  inline const std::set< CapacityConstraint<T> >& constraints() const {
-    return constraints_;
-  };
-
-  /// @return a unique id for the constraint
-  inline const int id() const {
-    return id_;
-  }
-
-  /* -------------------- private methods and members -------------------------- */
   /// @brief if the bidder has not been determined yet, it is set. otherwise
   /// VerifyResponder() verifies the the bid is associated with the
   /// portfolio's bidder
@@ -111,6 +83,33 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
       throw KeyError(msg);
     }
   };
+  
+  /// @return the model associated with the portfolio. if no bids have
+  /// been added, the bidder is NULL.
+  inline Trader* bidder() const {
+    return bidder_;
+  };
+    
+  /// @return the commodity associated with the portfolio. if no bids have
+  /// been added, the commodity is 'NO_COMMODITY_SET'.
+  inline std::string commodity() const {
+    return commodity_;
+  };
+
+  /// @return const access to the bids
+  inline const std::set<typename Bid<T>::Ptr>& bids() const {
+    return bids_;
+  };
+  
+  /// @return the set of constraints over the bids
+  inline const std::set< CapacityConstraint<T> >& constraints() const {
+    return constraints_;
+  };
+
+  /// @return a unique id for the constraint
+  inline const int id() const {
+    return id_;
+  }
   
   // bid_ is a set because there is a one-to-one correspondance between a
   // bid and a request, i.e., bids are unique

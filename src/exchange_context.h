@@ -22,8 +22,8 @@ struct PrefMap {
 
 /// @class ExchangeContext
 ///
-/// @brief The context is designed to provide an ease-of-use interface for
-/// querying and reaggregating information regarding requests and bids of a
+/// @brief The ExchangeContext is designed to provide an ease-of-use interface
+/// for querying and reaggregating information regarding requests and bids of a
 /// resource exchange.
 ///
 /// The ExchangeContext is used by a ResourceExchange or related class to
@@ -73,6 +73,15 @@ class ExchangeContext {
     }
   }
 
+  /// @brief adds a bid to the appropriate containers
+  /// @param pb the bid
+  void AddBid_(typename Bid<T>::Ptr pb) {
+    bids_by_request_[pb->request()].push_back(pb);
+
+    trader_prefs_[pb->request()->requester()][pb->request()].push_back(
+        std::make_pair(pb, pb->request()->preference()));
+  }
+
   /// @return all known request portfolios
   inline const std::vector<typename RequestPortfolio<T>::Ptr>&
       requests() const {
@@ -97,6 +106,7 @@ class ExchangeContext {
       RequestsForCommod(std::string commod) const {
     return requests_by_commod_.at(commod);
   }
+
   inline const std::vector<typename Request<T>::Ptr>&
       RequestsForCommod(std::string commod) {
     return requests_by_commod_[commod];
@@ -108,6 +118,7 @@ class ExchangeContext {
       BidsForRequest(typename Request<T>::Ptr request) const {
     return bids_by_request_.at(request);
   }
+
   inline const std::vector<typename Bid<T>::Ptr>&
       BidsForRequest(typename Request<T>::Ptr request) {
     return bids_by_request_[request];
@@ -118,11 +129,11 @@ class ExchangeContext {
   inline typename PrefMap<T>::type& Prefs(Trader* requester) const {
     return trader_prefs_.at(requester);
   }
+
   inline typename PrefMap<T>::type& Prefs(Trader* requester) {
     return trader_prefs_[requester];
   }
-
-  /* -------------------- private methods and members ----------------------- */
+  
   /// @brief a reference to an exchange's set of requests
   std::vector<typename RequestPortfolio<T>::Ptr> requests_;
 
@@ -144,16 +155,7 @@ class ExchangeContext {
       bids_by_request_;
 
   /// @brief maps commodity name to requests for that commodity
-  std::map<Trader*, typename PrefMap<T>::type> trader_prefs_;
-
-  /// @brief adds a bid to the appropriate containers
-  /// @param pb the bid
-  void AddBid_(typename Bid<T>::Ptr pb) {
-    bids_by_request_[pb->request()].push_back(pb);
-
-    trader_prefs_[pb->request()->requester()][pb->request()].push_back(
-        std::make_pair(pb, pb->request()->preference()));
-  } 
+  std::map<Trader*, typename PrefMap<T>::type> trader_prefs_; 
 };
 
 } // namespace cyclus

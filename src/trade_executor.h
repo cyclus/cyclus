@@ -65,28 +65,6 @@ class TradeExecutor {
       }
     }
   }
-  
-  /* -------------------- private methods and members -------------------------- */
-  const std::vector< Trade<T> >& trades_;
-
-  std::set<Trader*> suppliers_;
-  
-  std::set<Trader*> requesters_;
-
-  // the key is the supplier
-  std::map<Trader*,
-      std::vector< Trade<T> > > trades_by_supplier_;
-  
-  // the key is the requester, values are a vector of the target Trade with the
-  // associated response resource provided by the supplier
-  std::map<Trader*,
-      std::vector< std::pair<Trade<T>, typename T::Ptr> > >
-      trades_by_requester_;
-
-  // by convention, the first trader is the supplier, the second is the
-  // requester
-  std::map<std::pair<Trader*, Trader*>,
-      std::vector< std::pair<Trade<T>, typename T::Ptr> > > all_trades_;
 
   /// @brief populates suppliers_, requesters_, and trades_by_supplier_
   void GroupTradesBySupplier_() {
@@ -124,15 +102,33 @@ class TradeExecutor {
       }
     }
   }
-  
+
   void SendTradeResources_() {
     std::set<Trader*>::iterator it;
     for (it = requesters_.begin(); it != requesters_.end(); ++it) {
-      // get responses
       Trader* requester = *it;
       AcceptTrades(requester, trades_by_requester_[requester]);
     }
   }
+  
+  const std::vector< Trade<T> >& trades_;
+  std::set<Trader*> suppliers_;
+  std::set<Trader*> requesters_;
+
+  // the key is the supplier
+  std::map<Trader*,
+      std::vector< Trade<T> > > trades_by_supplier_;
+  
+  // the key is the requester, values are a vector of the target Trade with the
+  // associated response resource provided by the supplier
+  std::map<Trader*,
+      std::vector< std::pair<Trade<T>, typename T::Ptr> > >
+      trades_by_requester_;
+
+  // by convention, the first trader is the supplier, the second is the
+  // requester
+  std::map<std::pair<Trader*, Trader*>,
+      std::vector< std::pair<Trade<T>, typename T::Ptr> > > all_trades_;
 };
 
 } // namespace cyclus

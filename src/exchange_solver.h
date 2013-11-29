@@ -19,7 +19,6 @@ class ExchangeSolver {
   /// @brief any solver must implement a Solve() function
   virtual void Solve() = 0;
 
-  /* -------------------- private methods and members ----------------------- */  
   ExchangeGraph* graph_;
 };
 

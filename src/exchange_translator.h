@@ -78,13 +78,6 @@ class ExchangeTranslator {
       ret.push_back(BackTranslateMatch_(*m_it));
     }
   };
-  
-  /* -------------------- private methods and members -------------------------- */
-  ExchangeContext<T>* ctx_;
-  std::map<typename Request<T>::Ptr, Node::Ptr> request_to_node_;
-  std::map<Node::Ptr, typename Request<T>::Ptr> node_to_request_;
-  std::map<typename Bid<T>::Ptr, Node::Ptr> bid_to_node_;
-  std::map<Node::Ptr, typename Bid<T>::Ptr> node_to_bid_;
 
   /// @brief Adds a request-node mapping
   inline void AddRequest_(typename Request<T>::Ptr r, Node::Ptr n) {
@@ -186,6 +179,12 @@ class ExchangeTranslator {
     t.amt = match.second;
     return t;
   };
+  
+  ExchangeContext<T>* ctx_;
+  std::map<typename Request<T>::Ptr, Node::Ptr> request_to_node_;
+  std::map<Node::Ptr, typename Request<T>::Ptr> node_to_request_;
+  std::map<typename Bid<T>::Ptr, Node::Ptr> bid_to_node_;
+  std::map<Node::Ptr, typename Bid<T>::Ptr> node_to_bid_;
 };
 
 /// @brief updates a node's unit capacities given, a target resource and
