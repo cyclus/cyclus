@@ -26,7 +26,7 @@ class Bid {
     : request_(request),
       offer_(offer),
       bidder_(bidder),
-      id_(next_id_++) { };
+      id_(next_id_++) {};
   
   /// @return the request being responded to
   inline typename Request<T>::Ptr request() const {

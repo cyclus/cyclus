@@ -6,7 +6,7 @@ namespace cyclus {
 const std::string Error::kPrefix("cyclus error: ");
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Error::Error() : msg_(Error::kPrefix) { }
+Error::Error() : msg_(Error::kPrefix) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Error::Error(std::string msg) {

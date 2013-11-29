@@ -4,7 +4,7 @@
 #include <cmath>
 
 namespace cyclus {
-MatQuery::MatQuery(Material::Ptr m) : m_(m) { };
+MatQuery::MatQuery(Material::Ptr m) : m_(m) {};
 
 double MatQuery::qty() {
   return m_->quantity();

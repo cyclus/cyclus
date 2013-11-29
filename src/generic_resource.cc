@@ -72,6 +72,6 @@ GenericResource::GenericResource(Context* ctx, double quantity,
                                  std::string quality,
                                  std::string units)
   : units_(units), quality_(quality), quantity_(quantity), tracker_(ctx, this),
-    ctx_(ctx) { }
+    ctx_(ctx) {}
 
 } // namespace cyclus

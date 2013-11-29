@@ -35,7 +35,7 @@ class TestTrader : public MockFacility {
      adjusts(0),
      requests(0),
      bids(0),
-     accept(0) { };
+     accept(0) {};
 
   virtual Model* Clone() {
     TestTrader* m = new TestTrader(*this);

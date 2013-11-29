@@ -25,7 +25,7 @@ struct Trade {
     : request(request),
       bid(bid),
       amt(amt),
-      price(0) { };
+      price(0) {};
 };
 
 /// @brief equality operator

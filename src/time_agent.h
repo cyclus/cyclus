@@ -17,7 +17,7 @@ namespace cyclus {
 class TimeAgent : virtual public Model {
  public:
 
-  TimeAgent(Context* ctx) : Model(ctx) { };
+  TimeAgent(Context* ctx) : Model(ctx) {};
 
   /**
      destructor

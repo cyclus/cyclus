@@ -230,7 +230,7 @@ Timer::Timer() :
   dur_(0),
   decay_interval_(0),
   month0_(0),
-  year0_(0) { }
+  year0_(0) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::ConvertDate(int month, int year) {

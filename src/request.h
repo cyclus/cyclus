@@ -30,7 +30,7 @@ class Request {
       requester_(requester),
       commodity_(commodity),
       preference_(preference),
-      id_(next_id_++) { };
+      id_(next_id_++) {};
 
   /// @return this request's target
   inline boost::shared_ptr<T> target() const {

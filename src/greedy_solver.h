@@ -21,8 +21,8 @@ class ExchangeGraph;
 ///   2) All SupplySets are at capacity
 class GreedySolver: public ExchangeSolver {
  public:
-  GreedySolver() { };
-  explicit GreedySolver(ExchangeGraph* g) : ExchangeSolver(g) { };
+  GreedySolver() {};
+  explicit GreedySolver(ExchangeGraph* g) : ExchangeSolver(g) {};
   virtual ~GreedySolver() {};
 
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each

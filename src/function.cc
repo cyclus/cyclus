@@ -11,7 +11,7 @@
 namespace cyclus {
 
 // -----------------------------------------------------------------------------
-Function::Function() { }
+Function::Function() {}
 
 // -----------------------------------------------------------------------------
 void Function::AddVariable(Variable::Ptr v, double modifier) {
@@ -59,7 +59,7 @@ std::string Function::Print() {
 Constraint::Constraint(Constraint::EqualityRelation eq_r, double rhs)
     : eq_relation_(eq_r), 
       rhs_(rhs) 
-{ };
+{};
 
 // -----------------------------------------------------------------------------
 Constraint::EqualityRelation Constraint::eq_relation() { 
@@ -105,7 +105,7 @@ std::string Constraint::EqRToStr() {
 // -----------------------------------------------------------------------------
 ObjectiveFunction::ObjectiveFunction(ObjectiveFunction::Direction dir)
     : dir_(dir) 
-{ }
+{}
 
 // -----------------------------------------------------------------------------
 ObjectiveFunction::Direction ObjectiveFunction::dir() {

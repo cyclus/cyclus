@@ -28,7 +28,7 @@ class ExchangeManager {
  public:
   ExchangeManager(Context* ctx, ExchangeSolver* solver)
     : ctx_(ctx),
-      solver_(solver) { };
+      solver_(solver) {};
 
   /// @brief execute the full resource sequence
   void Execute() {

@@ -24,7 +24,7 @@ template <class T> class ExchangeContext;
 /// corresponding exchanges.
 class Trader : virtual public Model {
  public:
-  Trader(Context* ctx) : Model(ctx) { };
+  Trader(Context* ctx) : Model(ctx) {};
 
   /// @brief default implementation for material requests
   virtual std::set<RequestPortfolio<Material>::Ptr>
@@ -55,7 +55,7 @@ class Trader : virtual public Model {
   /// @param responses a container to populate with responses to each trade
   virtual void PopulateMatlTradeResponses(
     const std::vector< Trade<Material> >& trades,
-    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) { }
+    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {}
   
   /// @brief default implementation for responding to generic resource trades
   /// @param trades all trades in which this trader is the supplier
@@ -63,17 +63,17 @@ class Trader : virtual public Model {
   virtual void PopulateGenRsrcTradeResponses(
     const std::vector< Trade<GenericResource> >& trades,
     std::vector<std::pair<Trade<GenericResource>,
-    GenericResource::Ptr> >& responses) { }
+    GenericResource::Ptr> >& responses) {}
 
   /// @brief default implementation for material trade acceptance
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>,
-      Material::Ptr> >& responses) { }
+      Material::Ptr> >& responses) {}
 
   /// @brief default implementation for generic resource trade acceptance
   virtual void AcceptGenRsrcTrades(
       const std::vector<std::pair<Trade<GenericResource>,
-      GenericResource::Ptr> >& responses) { }
+      GenericResource::Ptr> >& responses) {}
 };
 
 } // namespace cyclus

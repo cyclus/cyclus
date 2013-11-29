@@ -9,7 +9,7 @@ class MockInst : public cyclus::InstModel {
  public:
   MockInst(cyclus::Context* ctx)
       : cyclus::InstModel(ctx),
-        cyclus::Model(ctx) { };
+        cyclus::Model(ctx) {};
   
   virtual ~MockInst() {};
 

@@ -47,7 +47,7 @@ class Requester: public MockFacility {
         i_(i),
         req_ctr_(0),
         pref_ctr_(0)
-  { };
+  {};
 
   virtual cyclus::Model* Clone() {
     Requester* m = new Requester(*this);
@@ -95,7 +95,7 @@ class Bidder: public MockFacility {
         bids_(bids),
         commod_(commod),
         bid_ctr_(0)
-  { };
+  {};
 
   virtual cyclus::Model* Clone() {
     Bidder* m = new Bidder(*this);

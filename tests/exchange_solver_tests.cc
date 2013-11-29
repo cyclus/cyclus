@@ -7,7 +7,7 @@ using cyclus::ExchangeSolver;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MockSolver: public ExchangeSolver {
  public:
-  explicit MockSolver() : i(0) { }
+  explicit MockSolver() : i(0) {}
   
   virtual void Solve() { ++i; }
 

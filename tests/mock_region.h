@@ -9,9 +9,9 @@ class MockRegion : public cyclus::RegionModel {
  public:
   MockRegion(cyclus::Context* ctx)
       : cyclus::RegionModel(ctx),
-        cyclus::Model(ctx) { };
+        cyclus::Model(ctx) {};
 
-  virtual ~MockRegion() { };
+  virtual ~MockRegion() {};
 
   virtual cyclus::Model* Clone() {
     MockRegion* m = new MockRegion(*this);

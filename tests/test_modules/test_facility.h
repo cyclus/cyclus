@@ -10,7 +10,7 @@ class TestFacility: public cyclus::FacilityModel {
  public:
   TestFacility(cyclus::Context* ctx)
       : cyclus::FacilityModel(ctx),
-        cyclus::Model(ctx) { };
+        cyclus::Model(ctx) {};
       
   virtual cyclus::Model* Clone() {return new TestFacility(context());};
 
@@ -19,11 +19,11 @@ class TestFacility: public cyclus::FacilityModel {
   }
 
   void ReceiveMaterial(cyclus::Transaction trans,
-                       std::vector<cyclus::Material::Ptr> manifest) { }
+                       std::vector<cyclus::Material::Ptr> manifest) {}
 
-  void CloneModuleMembersFrom(cyclus::FacilityModel* source) { }
-  void HandleTick(int time) { };
-  void HandleTock(int time) { };
+  void CloneModuleMembersFrom(cyclus::FacilityModel* source) {}
+  void HandleTick(int time) {};
+  void HandleTock(int time) {};
 };
 
 #endif

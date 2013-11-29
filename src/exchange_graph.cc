@@ -8,7 +8,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Node::Node(double max_qty) : max_qty(max_qty), qty(0), set(NULL) { }
+Node::Node(double max_qty) : max_qty(max_qty), qty(0), set(NULL) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool operator==(const Node& lhs, const Node& rhs) {
@@ -24,7 +24,7 @@ void NodeSet::AddNode(Node::Ptr node) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RequestSet::RequestSet(double qty) : qty(qty) { }
+RequestSet::RequestSet(double qty) : qty(qty) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a) {

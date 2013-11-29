@@ -98,7 +98,7 @@ class Communicator {
 
      @param src the Communicator to copy
    */
-  virtual void Copy(Communicator* src) { };
+  virtual void Copy(Communicator* src) {};
 
 };
 } // namespace cyclus

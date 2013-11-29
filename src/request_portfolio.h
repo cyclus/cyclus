@@ -40,7 +40,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
 
   /// @brief default constructor
-  RequestPortfolio() : requester_(NULL), qty_(-1), id_(next_id_++) { };
+  RequestPortfolio() : requester_(NULL), qty_(-1), id_(next_id_++) {};
 
   /// @brief add a request to the portfolio
   /// @param r the request to add

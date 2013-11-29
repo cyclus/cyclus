@@ -7,7 +7,7 @@
 namespace cyclus {
 
 Context::Context(Timer* ti, EventManager* em)
-    : ti_(ti), em_(em), trans_id_(0) { };
+    : ti_(ti), em_(em), trans_id_(0) {};
 
 boost::uuids::uuid Context::sim_id() {
   return em_->sim_id();

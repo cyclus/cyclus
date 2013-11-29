@@ -18,7 +18,7 @@ class CapacityConstraint {
   CapacityConstraint(double capacity, Converter converter)
     : capacity_(capacity),
       converter_(converter),
-      id_(next_id_++) { };
+      id_(next_id_++) {};
   
   /// @return the constraints capacity
   inline double capacity() const {

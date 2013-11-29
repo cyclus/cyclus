@@ -25,7 +25,7 @@ template <class T>
 class TradeExecutor {
  public:
   explicit TradeExecutor(const std::vector< Trade<T> >& trades)
-    : trades_(trades) { };
+    : trades_(trades) {};
 
   /// @brief execute all trades, collecting responsers from bidders and sending
   /// responses to requesters

@@ -283,10 +283,10 @@ class Model {
                            std::vector<Resource::Ptr> manifest);
 
   /** @brief default implementation for material preferences */
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) { };
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};
   
   /** @brief default implementation for material preferences */
-  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) { };
+  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) {};
   
  protected:
   /**

@@ -10,9 +10,9 @@ class ExchangeGraph;
 /// @brief a very simple interface for solving translated resource exchanges
 class ExchangeSolver {
  public:
-  ExchangeSolver() { };
-  explicit ExchangeSolver(ExchangeGraph* g) : graph_(g) { };
-  virtual ~ExchangeSolver() { };
+  ExchangeSolver() {};
+  explicit ExchangeSolver(ExchangeGraph* g) : graph_(g) {};
+  virtual ~ExchangeSolver() {};
 
   inline void set_graph(ExchangeGraph* graph) {graph_ = graph;}
 
