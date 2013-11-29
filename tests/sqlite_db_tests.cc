@@ -56,16 +56,16 @@ TEST_F(SqliteDbTests, Overwrite) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(SqliteDbTest, CreateAndInsert) {
+TEST_F(SqliteDbTests, CreateAndInsert) {
   using cyclus::SqliteDb;
   using cyclus::StrList;
   std::vector<StrList> result;
 
-  std::string path = "somedb.sqlite";
-  SqliteDb db(path);
+  std::string new_path = "new" + path;
+  SqliteDb db(new_path);
 
   ASSERT_NO_THROW(db.open());
-
+  
   ASSERT_NO_THROW(db.Execute("create table t1 (data1 TEXT, data2 TEXT);"));
   ASSERT_NO_THROW(db.Execute(
       "insert into t1 (data1, data2) values ('hello', 'goodbye');"));
@@ -76,6 +76,6 @@ TEST(SqliteDbTest, CreateAndInsert) {
   EXPECT_EQ(result.front().back(), "goodbye");
 
   ASSERT_NO_THROW(db.close());
-  remove(path.c_str());
+  remove(new_path.c_str());
 }
 
