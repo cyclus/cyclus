@@ -52,7 +52,6 @@
 #include "trader_management.h"
 #include "time_agent.h"
 #include "timer.h"
-#include "transaction.h"
 #include "variable.h"
 #include "version.h"
 

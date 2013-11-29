@@ -100,7 +100,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_factories.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_functions.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/timer.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/transaction.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/variable.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader.cc 
@@ -178,7 +177,6 @@ INSTALL(FILES
   trade_executor.h
   trader.h
   trader_management.h
-  transaction.h
   uniform_taylor.h
   unix_helper_functions.h
   use_matrix_lib.h

@@ -5,7 +5,6 @@
 #include "material.h"
 #include "generic_resource.h"
 #include "trader.h"
-#include "transaction.h"
 #include "error.h"
 
 namespace cyclus {

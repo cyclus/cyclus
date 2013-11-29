@@ -9,7 +9,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "dynamic_module.h"
-#include "transaction.h"
 #include "resource.h"
 #include "query_engine.h"
 #include "exchange_context.h"
@@ -154,32 +153,11 @@ class Model {
   virtual void SetParent(Model* parent);
 
   /**
-     Transacted resources are extracted through this method.
-
-     @warning This method should never be directly invoked.  All
-     resource transfers should take place using the
-     Message.ApproveTransfer() method.
-
-     @param order the transaction for which Resource(s) are to be prepared
-
-     @return list of resources to be sent for this order
+     return the ith child
    */
-  virtual std::vector<Resource::Ptr> RemoveResource(Transaction order);
-
-  /**
-     Transacted resources are received through this method.
-
-     @warning This method should never be directly invoked.  All
-     resource transfers should take place using the
-     Message.ApproveTransfer() method.
-
-     @param trans the transaction that corresponds with the materials
-     being received
-
-     @param manifest is the set of resources being
-   */
-  virtual void AddResource(Transaction trans,
-                           std::vector<Resource::Ptr> manifest);
+  Model* children(int i) {
+    return children_[i];
+  }
 
   /** @brief default implementation for material preferences */
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};

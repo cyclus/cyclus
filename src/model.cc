@@ -202,21 +202,6 @@ const std::string Model::ModelImpl() {
   return model_impl_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource::Ptr> Model::RemoveResource(Transaction order) {
-  std::string msg = "The model " + name();
-  msg += " doesn't support resource removal.";
-  throw Error(msg);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::AddResource(Transaction trans,
-                        std::vector<Resource::Ptr> manifest) {
-  std::string err_msg = "The model " + name();
-  err_msg += " doesn't support resource receiving.";
-  throw Error(err_msg);
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddToTable() {
   ctx_->NewEvent("Agents")
