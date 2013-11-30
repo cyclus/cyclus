@@ -70,9 +70,9 @@ class ExchangeContextTests: public ::testing::Test {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ExchangeContextTests, Empty) {
   ExchangeContext<Resource> context;
-  EXPECT_TRUE(context.requests().empty());
-  EXPECT_TRUE(context.RequestsForCommod(commod2).empty());
-  EXPECT_TRUE(context.RequestsForCommod(commod2).empty());
+  EXPECT_TRUE(context.requests.empty());
+  EXPECT_TRUE(context.requests_by_commod[commod2].empty());
+  EXPECT_TRUE(context.requests_by_commod[commod2].empty());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -84,17 +84,17 @@ TEST_F(ExchangeContextTests, AddRequest1) {
 
   std::vector<RequestPortfolio<Resource>::Ptr> vp;
   vp.push_back(rp1);
-  EXPECT_EQ(vp, context.requests());
+  EXPECT_EQ(vp, context.requests);
   
-  EXPECT_EQ(1, context.RequestsForCommod(commod1).size());  
+  EXPECT_EQ(1, context.requests_by_commod[commod1].size());  
   std::vector<Request<Resource>::Ptr> vr;
   vr.push_back(req1);
-  EXPECT_EQ(vr, context.RequestsForCommod(commod1));
+  EXPECT_EQ(vr, context.requests_by_commod[commod1]);
 
-  EXPECT_EQ(1, context.requesters().size());  
+  EXPECT_EQ(1, context.requesters.size());  
   std::set<Trader*> requesters;
   requesters.insert(fac1);
-  EXPECT_EQ(requesters, context.requesters());
+  EXPECT_EQ(requesters, context.requesters);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -108,13 +108,13 @@ TEST_F(ExchangeContextTests, AddRequest2) {
   std::vector<RequestPortfolio<Resource>::Ptr> vp;
   vp.push_back(rp1);
   vp.push_back(rp2);
-  EXPECT_EQ(vp, context.requests());
+  EXPECT_EQ(vp, context.requests);
   
-  EXPECT_EQ(2, context.RequestsForCommod(commod1).size());  
+  EXPECT_EQ(2, context.requests_by_commod[commod1].size());  
   std::vector<Request<Resource>::Ptr> vr;
   vr.push_back(req1);
   vr.push_back(req2);
-  EXPECT_EQ(vr, context.RequestsForCommod(commod1));
+  EXPECT_EQ(vr, context.requests_by_commod[commod1]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -127,16 +127,16 @@ TEST_F(ExchangeContextTests, AddRequest3) {
     
   context.AddRequestPortfolio(rp1);
   
-  EXPECT_EQ(1, context.RequestsForCommod(commod1).size());
-  EXPECT_EQ(1, context.RequestsForCommod(commod2).size());
+  EXPECT_EQ(1, context.requests_by_commod[commod1].size());
+  EXPECT_EQ(1, context.requests_by_commod[commod2].size());
   
   std::vector<Request<Resource>::Ptr> vr;
   vr.push_back(req1);
-  EXPECT_EQ(vr, context.RequestsForCommod(commod1));
+  EXPECT_EQ(vr, context.requests_by_commod[commod1]);
 
   vr.clear();
   vr.push_back(req);
-  EXPECT_EQ(vr, context.RequestsForCommod(commod2));  
+  EXPECT_EQ(vr, context.requests_by_commod[commod2]);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -145,7 +145,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
   ExchangeContext<Resource> context;
   context.AddRequestPortfolio(rp1);
 
-  EXPECT_TRUE(context.BidsForRequest(req1).empty());
+  EXPECT_TRUE(context.bids_by_request[req1].empty());
   
   Bid<Resource>::Ptr bid(new Bid<Resource>(req1, get_mat(), fac1));
   BidPortfolio<Resource>::Ptr bp1(new BidPortfolio<Resource>());
@@ -155,25 +155,25 @@ TEST_F(ExchangeContextTests, AddBid1) {
 
   std::vector<BidPortfolio<Resource>::Ptr> vp;
   vp.push_back(bp1);
-  EXPECT_EQ(vp, context.bids());
+  EXPECT_EQ(vp, context.bids);
 
-  EXPECT_EQ(1, context.BidsForRequest(req1).size());
+  EXPECT_EQ(1, context.bids_by_request[req1].size());
   
   std::vector<Bid<Resource>::Ptr> vr;
   vr.push_back(bid);
-  EXPECT_EQ(vr, context.BidsForRequest(req1));
+  EXPECT_EQ(vr, context.bids_by_request[req1]);
 
-  EXPECT_EQ(1, context.bidders().size());  
+  EXPECT_EQ(1, context.bidders.size());  
   std::set<Trader*> bidders;
   bidders.insert(fac1);
-  EXPECT_EQ(bidders, context.bidders());
+  EXPECT_EQ(bidders, context.bidders);
 
   PrefMap<Resource>::type obs;
   obs[req1].push_back(std::make_pair(bid, req1->preference()));
-  EXPECT_EQ(context.Prefs(req1->requester()), obs);
+  EXPECT_EQ(context.trader_prefs[req1->requester()], obs);
   obs.clear();
   obs[req1].push_back(std::make_pair(bid, req1->preference() * 0.1));
-  EXPECT_NE(context.Prefs(req1->requester()), obs);
+  EXPECT_NE(context.trader_prefs[req1->requester()], obs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -183,8 +183,8 @@ TEST_F(ExchangeContextTests, AddBid2) {
   context.AddRequestPortfolio(rp1);
   context.AddRequestPortfolio(rp2);
 
-  EXPECT_TRUE(context.BidsForRequest(req1).empty());
-  EXPECT_TRUE(context.BidsForRequest(req2).empty());
+  EXPECT_TRUE(context.bids_by_request[req1].empty());
+  EXPECT_TRUE(context.bids_by_request[req2].empty());
 
   // bid1 and bid2 are from one bidder (fac1)
   BidPortfolio<Resource>::Ptr bp1(new BidPortfolio<Resource>());
@@ -208,31 +208,31 @@ TEST_F(ExchangeContextTests, AddBid2) {
   context.AddBidPortfolio(bp1);
 
   vp.push_back(bp1);
-  EXPECT_EQ(vp, context.bids());
+  EXPECT_EQ(vp, context.bids);
   
   vreq1.push_back(bid1);
   vreq2.push_back(bid2);
-  EXPECT_EQ(1, context.BidsForRequest(req1).size());
-  EXPECT_EQ(1, context.BidsForRequest(req2).size());
-  EXPECT_EQ(vreq1, context.BidsForRequest(req1));
-  EXPECT_EQ(vreq2, context.BidsForRequest(req2));
+  EXPECT_EQ(1, context.bids_by_request[req1].size());
+  EXPECT_EQ(1, context.bids_by_request[req2].size());
+  EXPECT_EQ(vreq1, context.bids_by_request[req1]);
+  EXPECT_EQ(vreq2, context.bids_by_request[req2]);
   
   // add bids from second bidder
   context.AddBidPortfolio(bp2);
 
   vp.push_back(bp2);
-  EXPECT_EQ(vp, context.bids());
+  EXPECT_EQ(vp, context.bids);
   
   vreq1.push_back(bid3);
   vreq2.push_back(bid4);
-  EXPECT_EQ(2, context.BidsForRequest(req1).size());
-  EXPECT_EQ(2, context.BidsForRequest(req2).size());
-  EXPECT_EQ(vreq1, context.BidsForRequest(req1));
-  EXPECT_EQ(vreq2, context.BidsForRequest(req2));
+  EXPECT_EQ(2, context.bids_by_request[req1].size());
+  EXPECT_EQ(2, context.bids_by_request[req2].size());
+  EXPECT_EQ(vreq1, context.bids_by_request[req1]);
+  EXPECT_EQ(vreq2, context.bids_by_request[req2]);
 
-  EXPECT_EQ(2, context.bidders().size());  
+  EXPECT_EQ(2, context.bidders.size());  
   std::set<Trader*> bidders;
   bidders.insert(fac1);
   bidders.insert(fac2);
-  EXPECT_EQ(bidders, context.bidders());
+  EXPECT_EQ(bidders, context.bidders);
 }

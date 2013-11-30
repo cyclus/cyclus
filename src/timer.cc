@@ -2,7 +2,6 @@
 // Implements the Timer class
 
 #include "timer.h"
-
 #include <string>
 #include <iostream>
 

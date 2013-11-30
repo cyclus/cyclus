@@ -74,7 +74,7 @@ class TestTrader : public MockFacility {
     if (obj_fac == NULL || is_requester) {
       return std::set<BidPortfolio<Material>::Ptr>();
     } else {
-      req = ec->RequestsForCommod(obj_fac->commod)[0]; // obs request
+      req = ec->requests_by_commod[obj_fac->commod][0]; // obs request
     
       std::set<BidPortfolio<Material>::Ptr> ports;
       BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());

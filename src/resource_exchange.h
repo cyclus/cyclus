@@ -90,7 +90,7 @@ class ResourceExchange {
 
   /// @brief adjust preferences for requests given bid responses
   void DoAllAdjustments() {
-    std::set<Trader*> traders = ex_ctx_.requesters();
+    std::set<Trader*> traders = ex_ctx_.requesters;
     std::for_each(
         traders.begin(),
         traders.end(),
@@ -120,7 +120,7 @@ class ResourceExchange {
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
   void DoAdjustment_(Trader* t) {
-    typename PrefMap<T>::type& prefs = ex_ctx_.Prefs(t);
+    typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[t];
     Model* m = t;
     while (m != NULL) {
       AdjustPrefs(m, prefs);

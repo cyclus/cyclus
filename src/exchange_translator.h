@@ -42,7 +42,7 @@ class ExchangeTranslator {
 
     // add each request group
     const std::vector<typename RequestPortfolio<T>::Ptr>& requests =
-        ex_ctx_->requests();
+        ex_ctx_->requests;
     typename std::vector<typename RequestPortfolio<T>::Ptr>::const_iterator
         rp_it;
     for (rp_it = requests.begin(); rp_it != requests.end(); ++rp_it) {
@@ -51,7 +51,7 @@ class ExchangeTranslator {
     }
 
     // add each bid group
-    const std::vector<typename BidPortfolio<T>::Ptr>& bidports = ex_ctx_->bids();
+    const std::vector<typename BidPortfolio<T>::Ptr>& bidports = ex_ctx_->bids;
     typename std::vector<typename BidPortfolio<T>::Ptr>::const_iterator bp_it;
     for (bp_it = bidports.begin(); bp_it != bidports.end(); ++bp_it) {
       ExchangeNodeGroup::Ptr ns = TranslateBidPortfolio(xlation_ctx_, *bp_it);

@@ -106,7 +106,7 @@ class Bidder: public MockFacility {
   set<BidPortfolio<Material>::Ptr> AddMatlBids(ExchangeContext<Material>* ec) {
     set<BidPortfolio<Material>::Ptr> bps;
     BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-    int sz = ec->RequestsForCommod(commod_).size();
+    int sz = ec->requests_by_commod[commod_].size();
     for (int i = 0; i < sz; i++) {
       bp->AddBid(bids_[i]);
     }
@@ -181,17 +181,17 @@ TEST_F(ResourceExchangeTests, Requests) {
   EXPECT_EQ(0, rcast->req_ctr_);
   exchng->AddAllRequests();
   EXPECT_EQ(1, rcast->req_ctr_);
-  EXPECT_EQ(1, exchng->ex_ctx().requesters().size());
+  EXPECT_EQ(1, exchng->ex_ctx().requesters.size());
   
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   rp->AddRequest(req);
-  const std::vector<RequestPortfolio<Material>::Ptr>& obsvp = ctx.requests();
+  const std::vector<RequestPortfolio<Material>::Ptr>& obsvp = ctx.requests;
   EXPECT_EQ(1, obsvp.size());
   EXPECT_EQ(*rp.get(), *obsvp[0].get());
 
-  const std::vector<Request<Material>::Ptr>& obsvr = ctx.RequestsForCommod(commod);
+  const std::vector<Request<Material>::Ptr>& obsvr = ctx.requests_by_commod[commod];
   EXPECT_EQ(1, obsvr.size());  
   std::vector<Request<Material>::Ptr> vr;
   vr.push_back(req);
@@ -210,7 +210,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   rp->AddRequest(req);
   rp->AddRequest(req1);
   ctx.AddRequestPortfolio(rp);
-  const std::vector<Request<Material>::Ptr>& reqs = ctx.RequestsForCommod(commod);
+  const std::vector<Request<Material>::Ptr>& reqs = ctx.requests_by_commod[commod];
   EXPECT_EQ(2, reqs.size());  
   
   Bidder* bidr = new Bidder(tc.get(), commod);
@@ -230,22 +230,22 @@ TEST_F(ResourceExchangeTests, Bids) {
   EXPECT_EQ(0, bcast->bid_ctr_);
   exchng->AddAllBids();
   EXPECT_EQ(1, bcast->bid_ctr_);
-  EXPECT_EQ(1, exchng->ex_ctx().bidders().size());
+  EXPECT_EQ(1, exchng->ex_ctx().bidders.size());
   
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   bp->AddBid(bid);
   bp->AddBid(bid1);
-  const std::vector<BidPortfolio<Material>::Ptr>& obsvp = ctx.bids();
+  const std::vector<BidPortfolio<Material>::Ptr>& obsvp = ctx.bids;
   EXPECT_EQ(1, obsvp.size());
   EXPECT_EQ(*bp.get(), *obsvp[0].get());
 
-  const std::vector<Bid<Material>::Ptr>& obsvb = ctx.BidsForRequest(req);
+  const std::vector<Bid<Material>::Ptr>& obsvb = ctx.bids_by_request[req];
   EXPECT_EQ(1, obsvb.size());  
   std::vector<Bid<Material>::Ptr> vb;
   vb.push_back(bid);
   EXPECT_EQ(vb, obsvb);
 
-  const std::vector<Bid<Material>::Ptr>& obsvb1 = ctx.BidsForRequest(req1);
+  const std::vector<Bid<Material>::Ptr>& obsvb1 = ctx.bids_by_request[req1];
   EXPECT_EQ(1, obsvb1.size());  
   vb.clear();
   vb.push_back(bid1);
@@ -274,7 +274,7 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   EXPECT_EQ(0, pcast->req_ctr_);
   EXPECT_EQ(0, ccast->req_ctr_);
   exchng->AddAllRequests();
-  EXPECT_EQ(2, exchng->ex_ctx().requesters().size());
+  EXPECT_EQ(2, exchng->ex_ctx().requesters.size());
   EXPECT_EQ(1, pcast->req_ctr_);
   EXPECT_EQ(1, ccast->req_ctr_);
   
@@ -330,15 +330,15 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   cobs[creq].push_back(std::make_pair(cbid, creq->preference()));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();  
-  EXPECT_EQ(context.Prefs(parent), pobs);
-  EXPECT_EQ(context.Prefs(child), cobs);
+  EXPECT_EQ(context.trader_prefs[parent], pobs);
+  EXPECT_EQ(context.trader_prefs[child], cobs);
   
   EXPECT_NO_THROW(exchng->DoAllAdjustments());
 
   pobs[preq][0].second = std::pow(preq->preference(), 2);
   cobs[creq][0].second = std::pow(std::pow(creq->preference(), 2), 2);
-  EXPECT_EQ(context.Prefs(parent), pobs);
-  EXPECT_EQ(context.Prefs(child), cobs);
+  EXPECT_EQ(context.trader_prefs[parent], pobs);
+  EXPECT_EQ(context.trader_prefs[child], cobs);
   
   child->Decommission();
   parent->Decommission();
