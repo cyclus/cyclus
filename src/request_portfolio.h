@@ -46,8 +46,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @param r the request to add
   /// @throws if a request is added from a different requester than the original
   void AddRequest(const typename Request<T>::Ptr r) {
-    VerifyRequester_(r);
-    VerifyQty_(r);
+    VerifyRequester(r);
+    VerifyQty(r);
     CLOG(LEV_DEBUG2) << "Added request of size " << r->target()->quantity();
     CLOG(LEV_DEBUG2) << "Portfolio size is " << qty_;
     requests_.push_back(r);
@@ -60,11 +60,12 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
   };
+  
   /// @brief if the requester has not been determined yet, it is set. otherwise
   /// VerifyRequester() verifies the the request is associated with the portfolio's
   /// requester
   /// @throws if a request is added from a different requester than the original
-  void VerifyRequester_(const typename Request<T>::Ptr r) {
+  void VerifyRequester(const typename Request<T>::Ptr r) {
     if (requester_ == NULL) {
       requester_ = r->requester();
     } else if (requester_ != r->requester()) {
@@ -77,7 +78,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// VerifyRequester() verifies the the quantity is the same as all others in
   /// the portfolio
   /// @throws if a quanityt is different than the original
-  void VerifyQty_(const typename Request<T>::Ptr r) {
+  void VerifyQty(const typename Request<T>::Ptr r) {
     double qty = r->target()->quantity();
     if (qty_ == -1) {
       qty_ = qty;
@@ -115,7 +116,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline int id() const {
     return id_;
   }
-  
+
+ private:
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
   std::vector<typename Request<T>::Ptr> requests_;
@@ -128,7 +130,6 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   int id_;
   static int next_id_;
   
- private:
   /// @brief copy constructor, which we wish not to be used in general, due to
   /// the ownership relation of the requests
   RequestPortfolio(const RequestPortfolio& rhs) : id_(next_id_++) {

@@ -44,8 +44,8 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @throws if a bid is added from a different bidder than the original or if
   /// the bid commodity is different than the original
   void AddBid(const typename Bid<T>::Ptr b) {
-    VerifyResponder_(b);
-    VerifyCommodity_(b);
+    VerifyResponder(b);
+    VerifyCommodity(b);
     bids_.insert(b);
     b->set_portfolio(this->shared_from_this());
   };
@@ -60,7 +60,7 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// VerifyResponder() verifies the the bid is associated with the
   /// portfolio's bidder
   /// @throws if a bid is added from a different bidder than the original
-  void VerifyResponder_(typename Bid<T>::Ptr b) {
+  void VerifyResponder(typename Bid<T>::Ptr b) {
     if (bidder_ == NULL) {
       bidder_ = b->bidder();
     } else if (bidder_ != b->bidder()) {
@@ -74,7 +74,7 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// portfolio's commodity
   /// @throws if a commodity is added that is a different commodity from the
   /// original
-  void VerifyCommodity_(const typename Bid<T>::Ptr r) {
+  void VerifyCommodity(const typename Bid<T>::Ptr r) {
     std::string other = r->request()->commodity();
     if (commodity_ == "NO_COMMODITY_SET") {
       commodity_ = other;
@@ -111,6 +111,7 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
     return id_;
   }
   
+ private:
   // bid_ is a set because there is a one-to-one correspondance between a
   // bid and a request, i.e., bids are unique
   std::set< typename Bid<T>::Ptr > bids_;
@@ -123,7 +124,6 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   int id_;
   static int next_id_;
 
- private:
   /// @brief copy constructor, which we wish not to be used in general, due to
   /// the ownership relation of the bids
   BidPortfolio(const BidPortfolio& rhs) : id_(next_id_++) {

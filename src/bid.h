@@ -58,6 +58,7 @@ class Bid {
     return id_;
   }
 
+ private:
   typename Request<T>::Ptr request_;
   boost::shared_ptr<T> offer_;
   Trader* bidder_;

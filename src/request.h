@@ -67,6 +67,7 @@ class Request {
     return portfolio_;
   }
 
+ private:
   boost::shared_ptr<T> target_;
   Trader* requester_;
   double preference_;
