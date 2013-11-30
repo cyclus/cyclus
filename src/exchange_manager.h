@@ -59,7 +59,7 @@ class ExchangeManager {
 
     // get trades
     std::vector< Trade<T> > trades;
-    xlator.BackTranslateSolution(graph->matches, trades);
+    xlator.BackTranslateSolution(graph->matches(), trades);
     CLOG(LEV_DEBUG1) << "trades translated!";
 
     // execute trades!

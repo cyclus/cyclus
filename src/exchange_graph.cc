@@ -90,26 +90,26 @@ void UpdateCapacity(ExchangeNode::Ptr pn, const Arc& a, double qty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddRequestGroup(RequestGroup::Ptr prs) {
-  request_groups.push_back(prs);
+  request_groups_.push_back(prs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddSupplyGroup(ExchangeNodeGroup::Ptr pss) {
-  supply_groups.push_back(pss);
+  supply_groups_.push_back(pss);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddArc(const Arc& a) {
   arcs_.push_back(a);
-  node_arc_map[a.first].push_back(a);
-  node_arc_map[a.second].push_back(a);
+  node_arc_map_[a.first].push_back(a);
+  node_arc_map_[a.second].push_back(a);
 }
-
+#include <iostream>
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddMatch(const Arc& a, double qty) {
   UpdateCapacity(a.first, a, qty);
   UpdateCapacity(a.second, a, qty);
-  matches.push_back(std::make_pair(a, qty));
+  matches_.push_back(std::make_pair(a, qty));
 }
 
 } // namespace cyclus

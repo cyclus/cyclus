@@ -18,7 +18,7 @@ TEST(GrSolverTests, Case0) {
   ExchangeGraph g;
   GreedySolver solver(&g);
   solver.Solve();
-  EXPECT_TRUE(g.matches.empty());
+  EXPECT_TRUE(g.matches().empty());
 }
 /* --- */
 
@@ -30,7 +30,7 @@ TEST(GrSolverTests, Case1a) {
   ExchangeGraph g = SetUp1a();
   GreedySolver solver(&g);
   solver.Solve();
-  EXPECT_TRUE(g.matches.empty());
+  EXPECT_TRUE(g.matches().empty());
 }
 
 TEST(GrSolverTests, Case1b) {
@@ -38,7 +38,7 @@ TEST(GrSolverTests, Case1b) {
   ExchangeGraph g = SetUp1b();
   GreedySolver solver(&g);
   solver.Solve();
-  EXPECT_TRUE(g.matches.empty());
+  EXPECT_TRUE(g.matches().empty());
 }
 /* --- */
 
@@ -60,10 +60,10 @@ TEST(GrSolverTests, Case2a) {
   GreedySolver solver(&g);
   solver.Solve();
   
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  Match exp = Match(g.arcs_[0], f);
-  ASSERT_TRUE(g.matches.size() > 0);
-  EXPECT_EQ(exp, g.matches[0]);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  Match exp = Match(g.arcs().at(0), f);
+  ASSERT_TRUE(g.matches().size() > 0);
+  EXPECT_EQ(exp, g.matches().at(0));
 }
 
 TEST(GrSolverTests, Case2b) {
@@ -79,10 +79,10 @@ TEST(GrSolverTests, Case2b) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  Match exp = Match(g.arcs_[0], f);
-  ASSERT_TRUE(g.matches.size() > 0);
-  EXPECT_EQ(exp, g.matches[0]);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  Match exp = Match(g.arcs().at(0), f);
+  ASSERT_TRUE(g.matches().size() > 0);
+  EXPECT_EQ(exp, g.matches().at(0));
 }
 
 TEST(GrSolverTests, Case2c) {
@@ -98,10 +98,10 @@ TEST(GrSolverTests, Case2c) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  Match exp = Match(g.arcs_[0], f);
-  ASSERT_TRUE(g.matches.size() > 0);
-  EXPECT_EQ(exp, g.matches[0]);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  Match exp = Match(g.arcs().at(0), f);
+  ASSERT_TRUE(g.matches().size() > 0);
+  EXPECT_EQ(exp, g.matches().at(0));
 }
 
 TEST(GrSolverTests, Case2d) {
@@ -117,10 +117,10 @@ TEST(GrSolverTests, Case2d) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  Match exp = Match(g.arcs_[0], f);
-  ASSERT_TRUE(g.matches.size() > 0);
-  EXPECT_EQ(exp, g.matches[0]);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  Match exp = Match(g.arcs().at(0), f);
+  ASSERT_TRUE(g.matches().size() > 0);
+  EXPECT_EQ(exp, g.matches().at(0));
 }
 
 TEST(GrSolverTests, Case2e) {
@@ -136,10 +136,10 @@ TEST(GrSolverTests, Case2e) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  Match exp = Match(g.arcs_[0], f);
-  ASSERT_TRUE(g.matches.size() > 0);
-  EXPECT_EQ(exp, g.matches[0]);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  Match exp = Match(g.arcs().at(0), f);
+  ASSERT_TRUE(g.matches().size() > 0);
+  EXPECT_EQ(exp, g.matches().at(0));
 }
 
 TEST(GrSolverTests, Case2f) {
@@ -155,10 +155,10 @@ TEST(GrSolverTests, Case2f) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  Match exp = Match(g.arcs_[0], f);
-  ASSERT_TRUE(g.matches.size() > 0);
-  EXPECT_EQ(exp, g.matches[0]);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  Match exp = Match(g.arcs().at(0), f);
+  ASSERT_TRUE(g.matches().size() > 0);
+  EXPECT_EQ(exp, g.matches().at(0));
 }
 
 TEST(GrSolverTests, Case2g) {
@@ -174,10 +174,10 @@ TEST(GrSolverTests, Case2g) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  Match exp = Match(g.arcs_[0], f);
-  ASSERT_TRUE(g.matches.size() > 0);
-  EXPECT_EQ(exp, g.matches[0]);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  Match exp = Match(g.arcs().at(0), f);
+  ASSERT_TRUE(g.matches().size() > 0);
+  EXPECT_EQ(exp, g.matches().at(0));
 }
 
 TEST(GrSolverTests, Case2h) {
@@ -193,10 +193,10 @@ TEST(GrSolverTests, Case2h) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  Match exp = Match(g.arcs_[0], f);
-  ASSERT_TRUE(g.matches.size() > 0);
-  EXPECT_EQ(exp, g.matches[0]);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  Match exp = Match(g.arcs().at(0), f);
+  ASSERT_TRUE(g.matches().size() > 0);
+  EXPECT_EQ(exp, g.matches().at(0));
 }
 /* --- */
 
@@ -218,13 +218,13 @@ TEST(GrSolverTests, Case3a) {
   GreedySolver solver(&g);
   solver.Solve();
   
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp = Match(g.arcs_[0], f1);
+  Match exp = Match(g.arcs().at(0), f1);
   Match arr[] = {exp};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case3b) {
@@ -240,14 +240,14 @@ TEST(GrSolverTests, Case3b) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case3c) {
@@ -263,14 +263,14 @@ TEST(GrSolverTests, Case3c) {
   GreedySolver solver(&g);
   solver.Solve();
   
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case3d) {
@@ -286,14 +286,14 @@ TEST(GrSolverTests, Case3d) {
   GreedySolver solver(&g);
   solver.Solve();
     
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 /* --- */
 
@@ -315,13 +315,13 @@ TEST(GrSolverTests, Case4a) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp = Match(g.arcs_[0], f1);
+  Match exp = Match(g.arcs().at(0), f1);
   Match arr[] = {exp};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case4b) {
@@ -336,13 +336,13 @@ TEST(GrSolverTests, Case4b) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 0);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 0);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp = Match(g.arcs_[0], f1);
+  Match exp = Match(g.arcs().at(0), f1);
   Match arr[] = {exp};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case4c) {
@@ -358,14 +358,14 @@ TEST(GrSolverTests, Case4c) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case4d) {
@@ -381,14 +381,14 @@ TEST(GrSolverTests, Case4d) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case4e) {
@@ -404,14 +404,14 @@ TEST(GrSolverTests, Case4e) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 /* --- */
 
@@ -433,13 +433,13 @@ TEST(GrSolverTests, Case5a) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp = Match(g.arcs_[0], f1);
+  Match exp = Match(g.arcs().at(0), f1);
   Match arr[] = {exp};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case5b) {
@@ -454,13 +454,13 @@ TEST(GrSolverTests, Case5b) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp = Match(g.arcs_[0], f1);
+  Match exp = Match(g.arcs().at(0), f1);
   Match arr[] = {exp};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case5c) {
@@ -476,14 +476,14 @@ TEST(GrSolverTests, Case5c) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case5d) {
@@ -499,14 +499,14 @@ TEST(GrSolverTests, Case5d) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case5e) {
@@ -522,14 +522,14 @@ TEST(GrSolverTests, Case5e) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 1);
-  EXPECT_EQ(g.arcs_.size(), 2);
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 /* --- */
 
@@ -556,15 +556,15 @@ TEST(GrSolverTests, Case6a) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 3);
-  EXPECT_EQ(g.arcs_.size(), 4);
+  ASSERT_TRUE(g.arcs().size() > 3);
+  EXPECT_EQ(g.arcs().size(), 4);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[1], f2);
-  Match exp3 = Match(g.arcs_[3], f4);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(1), f2);
+  Match exp3 = Match(g.arcs().at(3), f4);
   Match arr[] = {exp1, exp2, exp3};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 
 TEST(GrSolverTests, Case6b) {
@@ -582,15 +582,15 @@ TEST(GrSolverTests, Case6b) {
   GreedySolver solver(&g);
   solver.Solve();
 
-  ASSERT_TRUE(g.arcs_.size() > 3);
-  EXPECT_EQ(g.arcs_.size(), 4);
+  ASSERT_TRUE(g.arcs().size() > 3);
+  EXPECT_EQ(g.arcs().size(), 4);
   
-  Match exp1 = Match(g.arcs_[0], f1);
-  Match exp2 = Match(g.arcs_[2], f3);
-  Match exp3 = Match(g.arcs_[3], f4);
+  Match exp1 = Match(g.arcs().at(0), f1);
+  Match exp2 = Match(g.arcs().at(2), f3);
+  Match exp3 = Match(g.arcs().at(3), f4);
   Match arr[] = {exp1, exp2, exp3};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
-  EXPECT_EQ(vexp, g.matches);
+  EXPECT_EQ(vexp, g.matches());
 }
 /* --- */
 
@@ -608,11 +608,11 @@ TEST(GrSolverTests, Case7) {
   GreedySolver solver(&g);
   solver.Solve();
   
-  ASSERT_EQ(g.arcs_.size(), N);
-  ASSERT_EQ(g.matches.size(), N);
+  ASSERT_EQ(g.arcs().size(), N);
+  ASSERT_EQ(g.matches().size(), N);
   for (int i = 0; i < N; i++) {
-    Match exp = Match(g.arcs_[i], f);
-    EXPECT_EQ(exp, g.matches[i]);
+    Match exp = Match(g.arcs().at(i), f);
+    EXPECT_EQ(exp, g.matches().at(i));
   }
 }
 /* --- */

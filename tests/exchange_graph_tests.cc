@@ -208,7 +208,7 @@ TEST(ExGraphTests, AddReqGroup) {
   RequestGroup::Ptr prs(new RequestGroup());
   ExchangeGraph g;
   g.AddRequestGroup(prs);
-  EXPECT_EQ(g.request_groups[0], prs);
+  EXPECT_EQ(g.request_groups().at(0), prs);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -216,7 +216,7 @@ TEST(ExGraphTests, AddSuppGroup) {
   ExchangeNodeGroup::Ptr pss(new ExchangeNodeGroup());
   ExchangeGraph g;
   g.AddSupplyGroup(pss);
-  EXPECT_EQ(g.supply_groups[0], pss);
+  EXPECT_EQ(g.supply_groups().at(0), pss);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -232,8 +232,8 @@ TEST(ExGraphTests, AddArc1) {
   vector<Arc> exp (arr, arr + sizeof(arr) / sizeof(arr[0]) );
 
   g.AddArc(a);
-  EXPECT_EQ(exp, g.node_arc_map[u]);
-  EXPECT_EQ(exp, g.node_arc_map[v]);
+  EXPECT_EQ(exp, g.node_arc_map().at(u));
+  EXPECT_EQ(exp, g.node_arc_map().at(v));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -265,10 +265,10 @@ TEST(ExGraphTests, AddArc2) {
   g.AddArc(a2);
   g.AddArc(a3);
   
-  EXPECT_EQ(expu, g.node_arc_map[u]);
-  EXPECT_EQ(expv, g.node_arc_map[v]);
-  EXPECT_EQ(expw, g.node_arc_map[w]);
-  EXPECT_EQ(expx, g.node_arc_map[x]);
+  EXPECT_EQ(expu, g.node_arc_map().at(u));
+  EXPECT_EQ(expv, g.node_arc_map().at(v));
+  EXPECT_EQ(expw, g.node_arc_map().at(w));
+  EXPECT_EQ(expx, g.node_arc_map().at(x));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -300,9 +300,7 @@ TEST(ExGraphTests, AddMatch) {
   
   Match match(std::make_pair(a, qty));
   
-  Match arr[] = {match};
-  std::vector<Match> exp (arr, arr + sizeof(arr) / sizeof(arr[0]));
-
   g.AddMatch(a, qty);
-  EXPECT_EQ(exp, g.matches);
+  ASSERT_EQ(1, g.matches().size());
+  EXPECT_EQ(match, g.matches().at(0));
 }

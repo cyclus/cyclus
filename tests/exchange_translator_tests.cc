@@ -218,11 +218,11 @@ TEST(ExXlateTests, SimpleXlate) {
   
   ExchangeGraph::Ptr graph;
   EXPECT_NO_THROW(graph = xlator.Translate());
-  EXPECT_EQ(1, graph->request_groups.size());
-  EXPECT_EQ(1, graph->supply_groups.size());
-  EXPECT_EQ(2, graph->node_arc_map.size());
-  EXPECT_EQ(1, graph->arcs_.size());
-  EXPECT_EQ(0, graph->matches.size());
+  EXPECT_EQ(1, graph->request_groups().size());
+  EXPECT_EQ(1, graph->supply_groups().size());
+  EXPECT_EQ(2, graph->node_arc_map().size());
+  EXPECT_EQ(1, graph->arcs().size());
+  EXPECT_EQ(0, graph->matches().size());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
