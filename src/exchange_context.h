@@ -77,58 +77,6 @@ struct ExchangeContext {
     trader_prefs[pb->request()->requester()][pb->request()].push_back(
         std::make_pair(pb, pb->request()->preference()));
   }
-
-  /* /// @return all known request portfolios */
-  /* inline const std::vector<typename RequestPortfolio<T>::Ptr>& */
-  /*     requests() const { */
-  /*   return requests_; */
-  /* } */
-  
-  /* /// @return all known requesters */
-  /* inline const std::set<Trader*>& requesters() const { return requesters_; } */
-
-  /* /// @return all known bid portfolios */
-  /* inline const std::vector<typename BidPortfolio<T>::Ptr>& */
-  /*     bids() const { */
-  /*   return bids_; */
-  /* } */
-
-  /* /// @return all known bidders */
-  /* inline const std::set<Trader*>& bidders() const { return bidders_; } */
-  
-  /* /// @return all known requests for a given commodity */
-  /* /// @param commod the commodity */
-  /* inline const std::vector<typename Request<T>::Ptr>& */
-  /*     requests_by_commod[std]::string commod) const { */
-  /*   return requests_by_commod.at(commod); */
-  /* } */
-
-  /* inline const std::vector<typename Request<T>::Ptr>& */
-  /*     requests_by_commod[std]::string commod) { */
-  /*   return requests_by_commod[commod]; */
-  /* } */
-  
-  /* /// @return all known bids for a request */
-  /* /// @param request the request */
-  /* inline const std::vector<typename Bid<T>::Ptr>& */
-  /*     BidsForRequest(typename Request<T>::Ptr request) const { */
-  /*   return bids_by_request.at(request); */
-  /* } */
-
-  /* inline const std::vector<typename Bid<T>::Ptr>& */
-  /*     BidsForRequest(typename Request<T>::Ptr request) { */
-  /*   return bids_by_request[request]; */
-  /* } */
-
-  /* /// @return all known preferences for a requester */
-  /* /// @param requester the requester */
-  /* inline typename PrefMap<T>::type& Prefs(Trader* requester) const { */
-  /*   return trader_prefs.at(requester); */
-  /* } */
-
-  /* inline typename PrefMap<T>::type& Prefs(Trader* requester) { */
-  /*   return trader_prefs[requester]; */
-  /* } */
   
   /// @brief a reference to an exchange's set of requests
   std::vector<typename RequestPortfolio<T>::Ptr> requests;
