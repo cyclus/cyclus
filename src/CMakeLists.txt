@@ -143,6 +143,7 @@ INSTALL(FILES
   exchange_manager.h
   exchange_solver.h 
   exchange_translator.h
+  exchange_translation_context.h
   facility_model.h
   function.h
   generic_resource.h
