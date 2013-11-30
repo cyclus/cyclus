@@ -30,6 +30,7 @@ class GreedySolver: public ExchangeSolver {
   /// from the beginning of the the respective request and bid containers.
   virtual void Solve();
 
+ private:
   void GreedilySatisfySet_(RequestGroup::Ptr prs);
 };
 
