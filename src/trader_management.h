@@ -95,6 +95,7 @@ inline void AcceptTrades(
     typename GenericResource::Ptr> >& responses) {
   trader->AcceptGenRsrcTrades(responses);
 }
+
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_TRADER_MANAGEMENT_H_
