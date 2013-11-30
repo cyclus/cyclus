@@ -40,10 +40,9 @@ using test_helpers::trader;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Requester: public MockFacility {
  public:
-  Requester(Context* ctx, Request<Material>::Ptr r, int i = 1)
+  Requester(Context* ctx, int i = 1)
       : MockFacility(ctx),
         Model(ctx),
-        r_(r),
         i_(i),
         req_ctr_(0),
         pref_ctr_(0)
@@ -89,10 +88,9 @@ class Requester: public MockFacility {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Bidder: public MockFacility {
  public:
-  Bidder(Context* ctx, std::vector<Bid<Material>::Ptr> bids, std::string commod)
+  Bidder(Context* ctx, std::string commod)
       : MockFacility(ctx),
         Model(ctx),
-        bids_(bids),
         commod_(commod),
         bid_ctr_(0)
   {};
@@ -144,11 +142,10 @@ class ResourceExchangeTests: public ::testing::Test {
     double qty = 1.0;
     mat = Material::CreateUntracked(qty, comp);
 
-    
+    reqr = new Requester(tc.get());
     req = Request<Material>::Ptr(
-        new Request<Material>(mat, &trader, commod, pref));
-    reqr = new Requester(tc.get(), req);
-    req->requester_ = reqr;
+        new Request<Material>(mat, reqr, commod, pref));
+    reqr->r_ = req;
     
     bid = Bid<Material>::Ptr(new Bid<Material>(req, mat, &trader));
 
@@ -215,17 +212,16 @@ TEST_F(ResourceExchangeTests, Bids) {
   ctx.AddRequestPortfolio(rp);
   const std::vector<Request<Material>::Ptr>& reqs = ctx.RequestsForCommod(commod);
   EXPECT_EQ(2, reqs.size());  
-
-  Bid<Material>::Ptr bid1(new Bid<Material>(req1, mat, &trader));
   
+  Bidder* bidr = new Bidder(tc.get(), commod);
+
+  bid = Bid<Material>::Ptr(new Bid<Material>(req, mat, bidr));
+  Bid<Material>::Ptr bid1(new Bid<Material>(req1, mat, bidr));
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(bid);
   bids.push_back(bid1);
   
-  Bidder* bidr = new Bidder(tc.get(), bids, commod);
-
-  bid->bidder_ = bidr;
-  bid1->bidder_ = bidr;
+  bidr->bids_ = bids;
   
   FacilityModel* clone = dynamic_cast<FacilityModel*>(bidr->Clone());
   clone->Deploy(clone);
@@ -312,16 +308,16 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   Request<Material>::Ptr creq(new Request<Material>(mat, ccast, commod, pref));
   ccast->r_ = creq;
 
-  Bid<Material>::Ptr pbid(new Bid<Material>(preq, mat, &trader));
-  Bid<Material>::Ptr cbid(new Bid<Material>(creq, mat, &trader));
+  Bidder* bidr = new Bidder(tc.get(), commod);
+
+  Bid<Material>::Ptr pbid(new Bid<Material>(preq, mat, bidr));
+  Bid<Material>::Ptr cbid(new Bid<Material>(creq, mat, bidr));
   
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(pbid);
   bids.push_back(cbid);
+  bidr->bids_ = bids;
   
-  Bidder* bidr = new Bidder(tc.get(), bids, commod);
-  pbid->bidder_ = bidr;
-  cbid->bidder_ = bidr;  
   FacilityModel* bclone = dynamic_cast<FacilityModel*>(bidr->Clone());
   bclone->Deploy(bclone);
   
