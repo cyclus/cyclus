@@ -44,6 +44,7 @@ class CapacityConstraint {
     return id_;
   }
 
+ private:
   double capacity_;
   Converter converter_;
   int id_;
