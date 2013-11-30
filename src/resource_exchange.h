@@ -99,6 +99,7 @@ class ResourceExchange {
             this));
   }
 
+ private:
   /// @brief queries a given facility model for 
   void AddRequests_(Trader* t) {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
