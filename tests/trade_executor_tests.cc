@@ -80,9 +80,9 @@ class TradeExecutorTests : public ::testing::Test {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(TradeExecutorTests, SupplierGrouping) {
   TradeExecutor<Material> exec(trades);
-  exec.GroupTradesBySupplier_();
+  GroupTradesBySupplier(exec.trade_ctx(), trades);
   std::map<Trader*, std::vector< Trade<Material> > > obs =
-      exec.trades_by_supplier_;
+      exec.trade_ctx().trades_by_supplier;
   std::map<Trader*, std::vector< Trade<Material> > > exp;
   exp[s1].push_back(t1);
   exp[s2].push_back(t2);
@@ -96,15 +96,15 @@ TEST_F(TradeExecutorTests, SupplierGrouping) {
   requesters.insert(r2);
   suppliers.insert(s1);
   suppliers.insert(s2);
-  EXPECT_EQ(exec.requesters_, requesters);
-  EXPECT_EQ(exec.suppliers_, suppliers);
+  EXPECT_EQ(exec.trade_ctx().requesters, requesters);
+  EXPECT_EQ(exec.trade_ctx().suppliers, suppliers);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(TradeExecutorTests, SupplierResponses) {
   TradeExecutor<Material> exec(trades);
-  exec.GroupTradesBySupplier_();  
-  exec.GetTradeResponses_();
+  GroupTradesBySupplier(exec.trade_ctx(), trades);
+  GetTradeResponses(exec.trade_ctx());
 
   std::map<Trader*,
            std::vector< std::pair<Trade<Material>, Material::Ptr> > >
@@ -112,14 +112,14 @@ TEST_F(TradeExecutorTests, SupplierResponses) {
   trades_by_requester[r1].push_back(std::make_pair(t1, fac.mat));
   trades_by_requester[r1].push_back(std::make_pair(t2, fac.mat));
   trades_by_requester[r2].push_back(std::make_pair(t3, fac.mat));
-  EXPECT_EQ(exec.trades_by_requester_, trades_by_requester);
+  EXPECT_EQ(exec.trade_ctx().trades_by_requester, trades_by_requester);
   
   std::map<std::pair<Trader*, Trader*>,
            std::vector< std::pair<Trade<Material>, Material::Ptr> > > all_trades;
   all_trades[std::make_pair(s1, r1)].push_back(std::make_pair(t1, fac.mat));
   all_trades[std::make_pair(s2, r1)].push_back(std::make_pair(t2, fac.mat));
   all_trades[std::make_pair(s2, r2)].push_back(std::make_pair(t3, fac.mat));
-  EXPECT_EQ(exec.all_trades_, all_trades);
+  EXPECT_EQ(exec.trade_ctx().all_trades, all_trades);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -178,6 +178,8 @@ INSTALL(FILES
   symbolic_functions.h
   time_agent.h
   timer.h
+  trade.h
+  trade_executor.h
   trader.h
   trader_management.h
   transaction.h
