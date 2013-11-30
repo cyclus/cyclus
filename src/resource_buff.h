@@ -51,7 +51,7 @@ class ResourceBuff {
   /// capacity returns the maximum resource quantity this store can hold (units
   /// based on constituent resource objects' units).
   /// Never throws.
-  double capacity() {
+  inline double capacity() const {
     return capacity_;
   };
 
