@@ -80,8 +80,11 @@ class ExchangeTranslator {
     }
   };
 
-  const ExchangeTranslationContext<T>& xlation_ctx() const { return xlation_ctx_; }
-  ExchangeTranslationContext<T>& xlation_ctx() { return xlation_ctx_; }
+  const ExchangeTranslationContext<T>& translation_ctx() const {
+    return xlation_ctx_;
+  }
+  
+  ExchangeTranslationContext<T>& translation_ctx() { return xlation_ctx_; }
   
  private: 
   ExchangeContext<T>* ex_ctx_;
@@ -90,18 +93,18 @@ class ExchangeTranslator {
 
 /// @brief Adds a request-node mapping
 template <class T>
-    inline void AddRequest(ExchangeTranslationContext<T>& xlation_ctx,
+    inline void AddRequest(ExchangeTranslationContext<T>& translation_ctx,
                            typename Request<T>::Ptr r, ExchangeNode::Ptr n) {
-  xlation_ctx.request_to_node[r] = n;
-  xlation_ctx.node_to_request[n] = r;
+  translation_ctx.request_to_node[r] = n;
+  translation_ctx.node_to_request[n] = r;
 }
 
 /// @brief Adds a bid-node mapping
 template <class T>
-    inline void AddBid(ExchangeTranslationContext<T>& xlation_ctx,
+    inline void AddBid(ExchangeTranslationContext<T>& translation_ctx,
                        typename Bid<T>::Ptr b, ExchangeNode::Ptr n) {
-  xlation_ctx.bid_to_node[b] = n;
-  xlation_ctx.node_to_bid[n] = b;
+  translation_ctx.bid_to_node[b] = n;
+  translation_ctx.node_to_bid[n] = b;
 }
   
 
@@ -110,7 +113,7 @@ template <class T>
 /// are known
 template <class T>
 RequestGroup::Ptr TranslateRequestPortfolio(
-    ExchangeTranslationContext<T>& xlation_ctx,
+    ExchangeTranslationContext<T>& translation_ctx,
     const typename RequestPortfolio<T>::Ptr rp) {
   RequestGroup::Ptr rs(new RequestGroup(rp->qty()));
   CLOG(LEV_DEBUG2) << "Translating request portfolio of size " << rp->qty();
@@ -121,7 +124,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
        ++r_it) {
     ExchangeNode::Ptr n(new ExchangeNode());
     rs->AddExchangeNode(n);
-    AddRequest(xlation_ctx, *r_it, n);
+    AddRequest(translation_ctx, *r_it, n);
   }
 
   CLOG(LEV_DEBUG4) << "adding " << rp->constraints().size()
@@ -140,7 +143,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
 /// for capacities. Bid unit capcities must be added when arcs are known
 template <class T>
 ExchangeNodeGroup::Ptr TranslateBidPortfolio(
-    ExchangeTranslationContext<T>& xlation_ctx,
+    ExchangeTranslationContext<T>& translation_ctx,
     const typename BidPortfolio<T>::Ptr bp) {
   ExchangeNodeGroup::Ptr bs(new ExchangeNodeGroup());
     
@@ -150,7 +153,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
        ++b_it) {
     ExchangeNode::Ptr n(new ExchangeNode());
     bs->AddExchangeNode(n);
-    AddBid(xlation_ctx, *b_it, n);
+    AddBid(translation_ctx, *b_it, n);
   }
 
   CLOG(LEV_DEBUG4) << "adding " << bp->constraints().size()
@@ -169,12 +172,12 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 /// @brief translates an arc given a bid and subsequent data, and also
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
-Arc TranslateArc(const ExchangeTranslationContext<T>& xlation_ctx,
+Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
                  typename Bid<T>::Ptr bid) {
   typename Request<T>::Ptr req = bid->request();
     
-  ExchangeNode::Ptr unode = xlation_ctx.request_to_node.at(req);
-  ExchangeNode::Ptr vnode = xlation_ctx.bid_to_node.at(bid);
+  ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
+  ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
 
   typename T::Ptr offer = bid->offer();
@@ -189,14 +192,14 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& xlation_ctx,
   
 /// @brief simple translation from a Match to a Trade, given internal state
 template <class T>
-Trade<T> BackTranslateMatch(const ExchangeTranslationContext<T>& xlation_ctx,
+Trade<T> BackTranslateMatch(const ExchangeTranslationContext<T>& translation_ctx,
                             const Match& match) {
   ExchangeNode::Ptr req_node = match.first.first;
   ExchangeNode::Ptr bid_node = match.first.second;
     
   Trade<T> t;
-  t.request = xlation_ctx.node_to_request.at(req_node);
-  t.bid = xlation_ctx.node_to_bid.at(bid_node);
+  t.request = translation_ctx.node_to_request.at(req_node);
+  t.bid = translation_ctx.node_to_bid.at(bid_node);
   t.amt = match.second;
   return t;
 };

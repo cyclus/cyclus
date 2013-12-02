@@ -15,6 +15,7 @@ class ExchangeSolver {
   virtual ~ExchangeSolver() {};
 
   inline void set_graph(ExchangeGraph* graph) { graph_ = graph; }
+  inline const ExchangeGraph* set_graph() const { return graph_; }
 
   /// @brief any solver must implement a Solve() function
   virtual void Solve() = 0;

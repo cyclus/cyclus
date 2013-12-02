@@ -115,12 +115,12 @@ TEST(ExXlateTests, XlateReq) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  RequestGroup::Ptr set = TranslateRequestPortfolio(xlator.xlation_ctx(), rp);
+  RequestGroup::Ptr set = TranslateRequestPortfolio(xlator.translation_ctx(), rp);
 
   EXPECT_EQ(qty, set->qty);
   EXPECT_EQ(cexp, set->capacities);
-  EXPECT_TRUE(xlator.xlation_ctx().request_to_node.find(req)
-              != xlator.xlation_ctx().request_to_node.end());
+  EXPECT_TRUE(xlator.translation_ctx().request_to_node.find(req)
+              != xlator.translation_ctx().request_to_node.end());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -145,11 +145,11 @@ TEST(ExXlateTests, XlateBid) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  ExchangeNodeGroup::Ptr set = TranslateBidPortfolio(xlator.xlation_ctx(), port);
+  ExchangeNodeGroup::Ptr set = TranslateBidPortfolio(xlator.translation_ctx(), port);
 
   EXPECT_EQ(cexp, set->capacities);
-  EXPECT_TRUE(xlator.xlation_ctx().bid_to_node.find(bid)
-              != xlator.xlation_ctx().bid_to_node.end());
+  EXPECT_TRUE(xlator.translation_ctx().bid_to_node.find(bid)
+              != xlator.translation_ctx().bid_to_node.end());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -181,13 +181,13 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeTranslator<Material> xlator(&ctx);
 
   // give the xlator the correct state
-  RequestGroup::Ptr rset = TranslateRequestPortfolio(xlator.xlation_ctx(), rport);
-  ExchangeNodeGroup::Ptr bset = TranslateBidPortfolio(xlator.xlation_ctx(), bport);
+  RequestGroup::Ptr rset = TranslateRequestPortfolio(xlator.translation_ctx(), rport);
+  ExchangeNodeGroup::Ptr bset = TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  Arc a = TranslateArc(xlator.xlation_ctx(), bid);
+  Arc a = TranslateArc(xlator.translation_ctx(), bid);
 
-  EXPECT_EQ(xlator.xlation_ctx().bid_to_node[bid], a.second);
-  EXPECT_EQ(xlator.xlation_ctx().request_to_node[req], a.first);
+  EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.second);
+  EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.first);
 
   double barr[] = {(converter1(mat.get()) / qty1), (converter2(mat.get()) / qty2)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
@@ -240,10 +240,10 @@ TEST(ExXlateTests, BackXlate) {
   ExchangeNode::Ptr x(new ExchangeNode());  
   ExchangeNode::Ptr y(new ExchangeNode());
 
-  AddRequest(xlator.xlation_ctx(), ur, u);
-  AddRequest(xlator.xlation_ctx(), xr, x);
-  AddBid(xlator.xlation_ctx(), vb, v);
-  AddBid(xlator.xlation_ctx(), yb, y);
+  AddRequest(xlator.translation_ctx(), ur, u);
+  AddRequest(xlator.translation_ctx(), xr, x);
+  AddBid(xlator.translation_ctx(), vb, v);
+  AddBid(xlator.translation_ctx(), yb, y);
   
   Arc a(u, v);
   Arc b(x, y);
