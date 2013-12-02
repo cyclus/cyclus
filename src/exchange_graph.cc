@@ -104,6 +104,8 @@ void ExchangeGraph::AddArc(const Arc& a) {
   node_arc_map_[a.first].push_back(a);
   node_arc_map_[a.second].push_back(a);
 }
+
+
 #include <iostream>
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddMatch(const Arc& a, double qty) {
