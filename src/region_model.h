@@ -96,7 +96,6 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   virtual std::string str();
 
- public:
   /**
      default RegionModel receiver is to ignore messages
    */
@@ -128,7 +127,6 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   virtual void HandleDailyTasks(int time, int day);
 
- public:
   /**
      returns if the facility is in this region's allowed facs
    */
@@ -137,7 +135,6 @@ class RegionModel : public TimeAgent, public Communicator {
             != allowedFacilities_.end());
   } ;
 
- protected:
   /**
      populate the region's list of allowed facilities
    */
@@ -159,6 +156,7 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   virtual void AddChildrenToTree();
 
+ private:
   /**
      every region has a list of allowed facilities
    */

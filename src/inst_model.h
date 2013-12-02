@@ -123,12 +123,6 @@ class InstModel : public TimeAgent, public Communicator {
    * all INSTMODEL classes have these members
    * --------------------
    */
- protected:
-  /**
-     The Inst's set of available prototypes to build
-   */
-  PrototypeSet prototypes_;
-
   /**
      the initial prototypes to build
    */
@@ -153,7 +147,6 @@ class InstModel : public TimeAgent, public Communicator {
    */
   void AddPrototypeToInitialBuild(QueryEngine* qe);
 
- public:
   /**
      return the number of prototypes this inst can build
    */
@@ -223,9 +216,15 @@ class InstModel : public TimeAgent, public Communicator {
    */
   virtual void RegisterCloneAsDecommissioned(Model* clone);
 
+private:
+  /**
+     The Inst's set of available prototypes to build
+   */
+  PrototypeSet prototypes_;
   /* ------------------- */
-
 };
+
 } // namespace cyclus
+
 #endif // ifndef CYCLUS_INST_MODEL_H_
 
