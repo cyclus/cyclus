@@ -6,7 +6,7 @@
 namespace cyclus {
 
 template<class T>
-static double trivial_converter(T*) {return 1;}
+    static double trivial_converter(boost::shared_ptr<T>) {return 1;}
   
 /// @class CapacityConstraint
 ///
@@ -15,7 +15,7 @@ static double trivial_converter(T*) {return 1;}
 template <class T>
 class CapacityConstraint {
  public:
-  typedef double (*Converter)(T*);
+  typedef double (*Converter)(boost::shared_ptr<T>);
 
   /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(double capacity, Converter converter)
@@ -42,11 +42,12 @@ class CapacityConstraint {
 
   /// @return the converted value of a given item
   inline double convert(T* item) const {
-    return (*converter_)(item);
+    /// return (*converter_)(item);
   }
 
   inline double convert(boost::shared_ptr<T> item) const {
-    return convert(item.get());
+    return (*converter_)(item);
+    /// return convert(item.get());
   }
 
   /// @return a unique id for the constraint

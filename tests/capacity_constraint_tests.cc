@@ -30,17 +30,20 @@ static std::string quality = "qual";
 static double fraction = 0.5;
 
 // some helper functions to use
-static double rsrc_quantity_converter(cyclus::Resource* r) {
+// static double rsrc_quantity_converter(cyclus::Resource* r) {
+static double rsrc_quantity_converter(cyclus::Resource::Ptr r) {
   return r->quantity() * fraction;
 }
 
-static double mat_quality_converter(cyclus::Material* m) {
+// static double mat_quality_converter(cyclus::Material* m) {
+static double mat_quality_converter(cyclus::Material::Ptr m) {
   const cyclus::CompMap& comp = m->comp()->mass();
   double uamt = comp.find(u235)->second;
   return comp.find(u235)->second * fraction;
 }
 
-static double gen_rsrc_quality_converter(cyclus::GenericResource* gr) {
+// static double gen_rsrc_quality_converter(cyclus::GenericResource* gr) {
+static double gen_rsrc_quality_converter(cyclus::GenericResource::Ptr gr) {
   if (gr->quality().compare(quality) == 0) {
     return val;
   } else {
@@ -58,8 +61,7 @@ TEST(CapacityConstraintTests, RsrcGetSet) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CapacityConstraintTests, Trivial) {
   CapacityConstraint<Resource> cc(val);
-  Material* mat;
-  EXPECT_EQ(1, cc.convert(mat));
+  EXPECT_EQ(1, cc.convert(Material::CreateBlank(51041))); // some magic number
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

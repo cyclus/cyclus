@@ -34,10 +34,16 @@ class Assays {
 /// @return the atom percent of U-235 w.r.t Uranium in a material
 double UraniumAssay(Material::Ptr mat);
 
+/// inline double UraniumAssay(Material::Ptr mat) {
+///   return UraniumAssay(mat.get());
+/// }
+
 /// @param mat the material inquired about
 /// @return the quantity of uranium in a material whose units match
 /// those of the given material
 double UraniumQty(Material::Ptr mat);
+
+/// inline double UraniumQty(Material::Ptr mat) { return UraniumQty(mat.get()); }
 
 /// @param product_qty the amount of product Uranium
 /// @param assays the assay of product, feed, and tails

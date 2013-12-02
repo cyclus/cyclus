@@ -40,7 +40,7 @@ static cyclus::Bid<cyclus::Material>::Ptr get_bid() {
       new cyclus::Bid<cyclus::Material>(get_req(), get_mat(), &trader));
 }
 
-static double converter(cyclus::Material* r) {
+static double converter(cyclus::Material::Ptr r) {
   return r->quantity() * helper_qty;
 }
 

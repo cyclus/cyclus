@@ -46,13 +46,13 @@ double fraction = 0.7;
 int u235 = 92235;
 double qty = 6.3;
 
-double converter1(Material* m) {
+double converter1(Material::Ptr m) {
   const CompMap& comp = m->comp()->mass();
   double uamt = comp.find(u235)->second;
   return comp.find(u235)->second * fraction;
 }
 
-double converter2(Material* m) {
+double converter2(Material::Ptr m) {
   const CompMap& comp = m->comp()->mass();
   double uamt = comp.find(u235)->second;
   return comp.find(u235)->second * fraction * fraction;
@@ -80,10 +80,10 @@ TEST(ExXlateTests, XlateCapacities) {
   ExchangeNode::Ptr bnode(new ExchangeNode());
   Arc arc(rnode, bnode);
 
-  double rarr[] = {(converter1(mat.get()) / qty1), (converter2(mat.get()) / qty2)};
+  double rarr[] = {(converter1(mat) / qty1), (converter2(mat) / qty2)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
       
-  double barr[] = {(converter1(mat.get()) / qty1)};
+  double barr[] = {(converter1(mat) / qty1)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
       
   TranslateCapacities<Material>(mat, rconstrs, rnode, arc);
@@ -189,11 +189,11 @@ TEST(ExXlateTests, XlateArc) {
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.second);
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.first);
 
-  double barr[] = {(converter1(mat.get()) / qty1), (converter2(mat.get()) / qty2)};
+  double barr[] = {(converter1(mat) / qty1), (converter2(mat) / qty2)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
   EXPECT_EQ(bexp, a.second->unit_capacities[a]);
       
-  double rarr[] = {(converter1(mat.get()) / qty1)};
+  double rarr[] = {(converter1(mat) / qty1)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
   EXPECT_EQ(rexp, a.first->unit_capacities[a]);
 }
