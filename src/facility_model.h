@@ -208,7 +208,7 @@ class FacilityModel : public TimeAgent, public Communicator, public Trader {
    */
   virtual void HandleDailyTasks(int time, int day);
 
-protected:
+ private:
   /**
      each facility should have an institution that manages it
    */
@@ -234,11 +234,9 @@ protected:
      each facility needs a lifetime
    */
   int fac_lifetime_;
-  
-  friend class InstModel;
   /* ------------------- */
-
 };
+
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_FACILITYMODEL_H_
