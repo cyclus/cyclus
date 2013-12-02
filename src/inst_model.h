@@ -117,31 +117,11 @@ class InstModel : public TimeAgent, public Communicator {
    */
   virtual void Deploy(Model* parent);
   /* ------------------- */
-
- protected:
+ 
   /* --------------------
    * all INSTMODEL classes have these members
    * --------------------
    */
-  /**
-     add a prototoype to the set of available prototypes
-     @param proto_name the name of the prototype to add
-   */
-  void AddAvailablePrototype(std::string proto_name);
-
-  /**
-     perform any actions required after prototype has been added to
-     the list of available prototypes
-     @param proto_name the name of prototype to register
-   */
-  virtual void RegisterAvailablePrototype(std::string proto_name);
-
-  /**
-     Adds a prototype build order to initial_build_order_
-     @param qe a pointer to a QueryEngine object containing intialization data
-   */
-  void AddPrototypeToInitialBuild(QueryEngine* qe);
-
   /**
      return the number of prototypes this inst can build
    */
@@ -171,13 +151,6 @@ class InstModel : public TimeAgent, public Communicator {
   }
 
   /**
-     checks if a prototype is in its list of available prototypes
-     if not, it throws an error
-     @param p the prototype to check for
-   */
-  void ThrowErrorIfPrototypeIsntAvailable(std::string p);
-
-  /**
      returns this institution's region
    */
   RegionModel* GetRegion() {
@@ -196,6 +169,33 @@ class InstModel : public TimeAgent, public Communicator {
      @param proto_name the name of the prototype to build
    */
   void Build(std::string proto_name);
+
+ protected:
+  /**
+     add a prototoype to the set of available prototypes
+     @param proto_name the name of the prototype to add
+   */
+  void AddAvailablePrototype(std::string proto_name);
+
+  /**
+     perform any actions required after prototype has been added to
+     the list of available prototypes
+     @param proto_name the name of prototype to register
+   */
+  virtual void RegisterAvailablePrototype(std::string proto_name);
+
+  /**
+     Adds a prototype build order to initial_build_order_
+     @param qe a pointer to a QueryEngine object containing intialization data
+   */
+  void AddPrototypeToInitialBuild(QueryEngine* qe);
+
+  /**
+     checks if a prototype is in its list of available prototypes
+     if not, it throws an error
+     @param p the prototype to check for
+   */
+  void ThrowErrorIfPrototypeIsntAvailable(std::string p);
 
   /**
      perform any registration functionality after a clone has been
