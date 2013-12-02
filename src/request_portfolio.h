@@ -74,10 +74,10 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     }
   };
 
-  /// @brief if the quanityt has not been determined yet, it is set. otherwise
+  /// @brief if the quantity has not been determined yet, it is set. otherwise
   /// VerifyRequester() verifies the the quantity is the same as all others in
   /// the portfolio
-  /// @throws if a quanityt is different than the original
+  /// @throws if a quantity is different than the original
   void VerifyQty(const typename Request<T>::Ptr r) {
     double qty = r->target()->quantity();
     if (qty_ == -1) {
