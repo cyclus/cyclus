@@ -23,7 +23,8 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
   double match = 0;
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes;
   std::vector<ExchangeNode::Ptr>::const_iterator req_it = nodes.begin();
-
+  std::vector<Arc>::const_iterator arc_it;
+  
   CLOG(LEV_DEBUG1) << "Greedy Solving for " << target
                    << " amount of a resource.";
   while( (match <= target) && (req_it != nodes.end()) ) {
@@ -32,7 +33,7 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
     // arcs associated with it
     if (graph_->node_arc_map().count(*req_it) > 0) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
-      std::vector<Arc>::const_iterator arc_it = arcs.begin();
+      arc_it = arcs.begin();
     
       while( (match <= target) && (arc_it != arcs.end()) ) {
         double remain = target - match;
