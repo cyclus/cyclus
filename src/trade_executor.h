@@ -22,8 +22,7 @@ struct TradeExecutionContext {
   std::set<Trader*> requesters;
 
   // the key is the supplier
-  std::map<Trader*,
-    std::vector< Trade<T> > > trades_by_supplier;
+  std::map<Trader*, std::vector< Trade<T> > > trades_by_supplier;
   
   // the key is the requester, values are a vector of the target Trade with the
   // associated response resource provided by the supplier
