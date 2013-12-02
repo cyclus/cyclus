@@ -188,7 +188,7 @@ class InstModel : public TimeAgent, public Communicator {
      reports number of facilities in this inst
    */
   int GetNumFacilities() {
-    return this->NChildren();
+    return children().size();
   };
 
   /**

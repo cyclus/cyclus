@@ -82,8 +82,8 @@ std::string RegionModel::str() {
   }
 
   s += ". And has insts: ";
-  for (std::vector<Model*>::iterator inst = children_.begin();
-       inst != children_.end();
+  for (std::vector<Model*>::const_iterator inst = children().begin();
+       inst != children().end();
        inst++) {
     s += (*inst)->name() + ", ";
   }
@@ -101,41 +101,41 @@ void RegionModel::ReceiveMessage(Message::Ptr msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::HandleTick(int time) {
-  int currsize = children_.size();
+  int currsize = children().size();
   int i = 0;
-  while (i < children_.size()) {
-    Model* m = children_.at(i);
+  while (i < children().size()) {
+    Model* m = children().at(i);
     dynamic_cast<InstModel*>(m)->HandleTick(time);
 
     // increment not needed if a facility deleted itself
-    if (children_.size() == currsize) {
+    if (children().size() == currsize) {
       i++;
     }
-    currsize = children_.size();
+    currsize = children().size();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::HandleTock(int time) {
-  int currsize = children_.size();
+  int currsize = children().size();
   int i = 0;
-  while (i < children_.size()) {
-    Model* m = children_.at(i);
+  while (i < children().size()) {
+    Model* m = children().at(i);
     dynamic_cast<InstModel*>(m)->HandleTock(time);
 
     // increment not needed if a facility deleted itself
-    if (children_.size() == currsize) {
+    if (children().size() == currsize) {
       i++;
     }
-    currsize = children_.size();
+    currsize = children().size();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::HandleDailyTasks(int time, int day) {
   // tell all of the institution models to handle the tick
-  for (std::vector<Model*>::iterator inst = children_.begin();
-       inst != children_.end();
+  for (std::vector<Model*>::const_iterator inst = children().begin();
+       inst != children().end();
        inst++) {
     (dynamic_cast<InstModel*>(*inst))->HandleDailyTasks(time, day);
   }

@@ -130,39 +130,39 @@ void InstModel::ReceiveMessage(Message::Ptr msg) {
 
 void InstModel::HandleTick(int time) {
   // tell all of the institution's child models to handle the tick
-  int currsize = children_.size();
+  int currsize = children().size();
   int i = 0;
-  while (i < children_.size()) {
-    Model* m = children_.at(i);
+  while (i < children().size()) {
+    Model* m = children().at(i);
     dynamic_cast<FacilityModel*>(m)->HandleTick(time);
 
     // increment not needed if a facility deleted itself
-    if (children_.size() == currsize) {
+    if (children().size() == currsize) {
       i++;
     }
-    currsize = children_.size();
+    currsize = children().size();
   }
 }
 
 void InstModel::HandleTock(int time) {
   // tell all of the institution's child models to handle the tock
-  std::vector<FacilityModel*> children_to_decomm;
+  std::vector<FacilityModel*> to_decomm;
 
-  for (int i = 0; i < children_.size(); i++) {
-    FacilityModel* child = dynamic_cast<FacilityModel*>(children_.at(i));
+  for (int i = 0; i < children().size(); i++) {
+    FacilityModel* child = dynamic_cast<FacilityModel*>(children().at(i));
     child->HandleTock(time);
 
     if (child->LifetimeReached(time)) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
       if (child->CheckDecommissionCondition()) {
-        children_to_decomm.push_back(child);
+        to_decomm.push_back(child);
       }
     }
   }
 
-  while (!children_to_decomm.empty()) {
-    FacilityModel* child = children_to_decomm.back();
-    children_to_decomm.pop_back();
+  while (!to_decomm.empty()) {
+    FacilityModel* child = to_decomm.back();
+    to_decomm.pop_back();
     RegisterCloneAsDecommissioned(child);
     child->Decommission();
   }
@@ -170,8 +170,8 @@ void InstModel::HandleTock(int time) {
 
 void InstModel::HandleDailyTasks(int time, int day) {
   // tell all of the institution models to handle the tick
-  for (std::vector<Model*>::iterator fac = children_.begin();
-       fac != children_.end();
+  for (std::vector<Model*>::const_iterator fac = children().begin();
+       fac != children().end();
        fac++) {
     dynamic_cast<FacilityModel*>(*fac)->HandleDailyTasks(time, day);
   }

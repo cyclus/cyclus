@@ -188,8 +188,8 @@ std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
   std::stringstream ss("");
   ss << m->name() << std::endl;
   ret.push_back(ss.str());
-  for (int i = 0; i < m->NChildren(); i++) {
-    std::vector<std::string> outs = GetTreePrintOuts(m->children(i));
+  for (int i = 0; i < m->children().size(); i++) {
+    std::vector<std::string> outs = GetTreePrintOuts(m->children().at(i));
     for (int j = 0; j < outs.size(); j++) {
       ss.str("");
       ss << "\t" << outs.at(j) << std::endl;
