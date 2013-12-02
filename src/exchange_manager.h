@@ -46,7 +46,7 @@ class ExchangeManager {
     CLOG(LEV_DEBUG1) << "graph translated!";
     
     // solve graph
-    solver_->set_graph(graph.get());
+    solver_->graph(graph.get());
     CLOG(LEV_DEBUG1) << "solving graph...";
     /// @todo Add a presolve step, which for the greedy solver will order
     /// RequestGroups and Requests. Specifically, provide a commodity to weight
