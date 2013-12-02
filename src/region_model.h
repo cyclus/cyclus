@@ -127,6 +127,11 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   virtual void HandleDailyTasks(int time, int day);
 
+ protected:
+  /* --------------------
+   * all REGIONMODEL classes have these members
+   * --------------------
+   */
   /**
      returns if the facility is in this region's allowed facs
    */
@@ -166,6 +171,9 @@ class RegionModel : public TimeAgent, public Communicator {
      the names of the institutions in this region
    */
   std::set<std::string> inst_names_;
+  /* ------------------- */
 };
+
 } // namespace cyclus
+
 #endif // ifndef CYCLUS_REGIONMODEL_H_

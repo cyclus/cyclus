@@ -118,16 +118,11 @@ class InstModel : public TimeAgent, public Communicator {
   virtual void Deploy(Model* parent);
   /* ------------------- */
 
-
+ protected:
   /* --------------------
    * all INSTMODEL classes have these members
    * --------------------
    */
-  /**
-     the initial prototypes to build
-   */
-  std::map<std::string, int> initial_build_order_;
-
   /**
      add a prototoype to the set of available prototypes
      @param proto_name the name of the prototype to add
@@ -221,6 +216,11 @@ private:
      The Inst's set of available prototypes to build
    */
   PrototypeSet prototypes_;
+
+  /**
+     the initial prototypes to build
+   */
+  std::map<std::string, int> initial_build_order_;
   /* ------------------- */
 };
 
