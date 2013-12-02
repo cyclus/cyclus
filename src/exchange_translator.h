@@ -133,7 +133,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
   for (c_it = rp->constraints().begin();
        c_it != rp->constraints().end();
        ++c_it) {
-    rs->capacities.push_back(c_it->capacity());
+    rs->capacities().push_back(c_it->capacity());
   }
     
   return rs;
@@ -163,7 +163,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   for (c_it = bp->constraints().begin();
        c_it != bp->constraints().end();
        ++c_it) {
-    bs->capacities.push_back(c_it->capacity());
+    bs->capacities().push_back(c_it->capacity());
   }
     
   return bs;

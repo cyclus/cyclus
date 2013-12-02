@@ -19,9 +19,9 @@ void GreedySolver::Solve() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) { 
-  double target = prs->qty;
+  double target = prs->qty();
   double match = 0;
-  std::vector<ExchangeNode::Ptr>& nodes = prs->nodes;
+  const std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
   std::vector<ExchangeNode::Ptr>::const_iterator req_it = nodes.begin();
   std::vector<Arc>::const_iterator arc_it;
   

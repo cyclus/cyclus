@@ -117,8 +117,8 @@ TEST(ExXlateTests, XlateReq) {
 
   RequestGroup::Ptr set = TranslateRequestPortfolio(xlator.translation_ctx(), rp);
 
-  EXPECT_EQ(qty, set->qty);
-  EXPECT_EQ(cexp, set->capacities);
+  EXPECT_EQ(qty, set->qty());
+  EXPECT_EQ(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().request_to_node.find(req)
               != xlator.translation_ctx().request_to_node.end());
 }
@@ -147,7 +147,7 @@ TEST(ExXlateTests, XlateBid) {
 
   ExchangeNodeGroup::Ptr set = TranslateBidPortfolio(xlator.translation_ctx(), port);
 
-  EXPECT_EQ(cexp, set->capacities);
+  EXPECT_EQ(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().bid_to_node.find(bid)
               != xlator.translation_ctx().bid_to_node.end());
 }

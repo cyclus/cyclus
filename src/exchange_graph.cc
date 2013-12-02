@@ -20,11 +20,11 @@ bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
   node->group = this;
-  nodes.push_back(node);
+  nodes_.push_back(node);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RequestGroup::RequestGroup(double qty) : qty(qty) {}
+RequestGroup::RequestGroup(double qty) : qty_(qty) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a) {
@@ -44,7 +44,7 @@ double Capacity(ExchangeNode& n, const Arc& a) {
   }
 
   std::vector<double>& unit_caps = n.unit_capacities[a];
-  const std::vector<double>& group_caps = n.group->capacities;
+  const std::vector<double>& group_caps = n.group->capacities();
   std::vector<double> caps;
   for (int i = 0; i < unit_caps.size(); i++) {
     caps.push_back(group_caps[i] / unit_caps[i]);
@@ -69,7 +69,7 @@ void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
   }
   
   vector<double>& unit_caps = n.unit_capacities[a];
-  vector<double>& caps = n.group->capacities;
+  vector<double>& caps = n.group->capacities();
   for (int i = 0; i < caps.size(); i++) {
     double val = caps[i] - qty * unit_caps[i];
     if (IsNegative(val)) throw ValueError("Capacities can not be reduced below 0.");

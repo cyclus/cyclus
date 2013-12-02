@@ -25,9 +25,9 @@ TEST(ExGraphTests, ExchangeNodeGroups) {
 TEST(ExGraphTests, ReqGroups) {
   double q = 1.5;
   RequestGroup r;
-  EXPECT_EQ(0, r.qty);
+  EXPECT_EQ(0, r.qty());
   r = RequestGroup(q);
-  EXPECT_EQ(q, r.qty);
+  EXPECT_EQ(q, r.qty());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -60,7 +60,7 @@ TEST(ExGraphTests, ExchangeNodeCaps1) {
 
   double scap = 1.5;
   ExchangeNodeGroup s;
-  s.capacities.push_back(scap);
+  s.capacities().push_back(scap);
   s.AddExchangeNode(n);
 
   EXPECT_EQ(scap, Capacity(n, a));  
@@ -92,13 +92,13 @@ TEST(ExGraphTests, ExchangeNodeCaps2) {
   n->unit_capacities[a] = ucaps;
 
   ExchangeNodeGroup s;
-  s.capacities = caps;
+  s.capacities() = caps;
   s.AddExchangeNode(n);
   double min_exp = cap / ucap;
   EXPECT_EQ(min_exp, Capacity(n, a));
 
   UpdateCapacity(n, a, qty);
-  EXPECT_EQ(exp, s.capacities);
+  EXPECT_EQ(exp, s.capacities());
   min_exp = (cap - qty * ucap) / ucap;
   EXPECT_EQ(min_exp, Capacity(n, a));
 }
@@ -117,7 +117,7 @@ TEST(ExGraphTests, ExchangeNodeCaps3) {
 
   double scap = 1.5;
   ExchangeNodeGroup s;
-  s.capacities.push_back(scap);
+  s.capacities().push_back(scap);
   s.AddExchangeNode(n);
 
   EXPECT_EQ(qty, Capacity(n, a));  
@@ -150,7 +150,7 @@ TEST(ExGraphTests, ExchangeNodeUpdateThrow2) {
   n->unit_capacities[a].push_back(unit);
 
   ExchangeNodeGroup s;
-  s.capacities.push_back(cap);
+  s.capacities().push_back(cap);
   s.AddExchangeNode(n);
   
   EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);
@@ -186,12 +186,12 @@ TEST(ExGraphTests, ArcCap) {
   ExchangeNodeGroup ugroup;
   ugroup.AddExchangeNode(u);
   double ucap = uval * 1.5;
-  ugroup.capacities.push_back(ucap);
+  ugroup.capacities().push_back(ucap);
   
   ExchangeNodeGroup vgroup;
   vgroup.AddExchangeNode(v);
   double vcap = vval;
-  vgroup.capacities.push_back(vcap);
+  vgroup.capacities().push_back(vcap);
   
   
   EXPECT_DOUBLE_EQ(Capacity(a), 1.0);
@@ -289,12 +289,12 @@ TEST(ExGraphTests, AddMatch) {
   ExchangeNodeGroup::Ptr ugroup(new ExchangeNodeGroup());
   ugroup->AddExchangeNode(u);
   double ucap = uval * 500;
-  ugroup->capacities.push_back(ucap);
+  ugroup->capacities().push_back(ucap);
   
   ExchangeNodeGroup::Ptr vgroup(new ExchangeNodeGroup());
   vgroup->AddExchangeNode(v);
   double vcap = vval * 500;
-  vgroup->capacities.push_back(vcap);
+  vgroup->capacities().push_back(vcap);
   
   double qty = large * 0.1;
   

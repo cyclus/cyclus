@@ -58,28 +58,38 @@ inline bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs);
 /// ExchangeGraph representation of a BidPortfolio or RequestPortfolio. It
 /// houses information about the concrete capacities associated with either
 /// portfolio.
-struct ExchangeNodeGroup {
+class ExchangeNodeGroup {
  public:
   typedef boost::shared_ptr<ExchangeNodeGroup> Ptr;
   
-  std::vector<ExchangeNode::Ptr> nodes;
-  std::vector<double> capacities;
+  const std::vector<ExchangeNode::Ptr>& nodes() { return nodes_; }
+  
+  const std::vector<double>& capacities() const { return capacities_; }
+  std::vector<double>& capacities() { return capacities_; }
 
   /// @brief Add the node to the ExchangeNodeGroup and informs the node it is a
   /// member of this ExchangeNodeGroup
   void AddExchangeNode(ExchangeNode::Ptr node);
+
+ private:
+  std::vector<ExchangeNode::Ptr> nodes_;
+  std::vector<double> capacities_;
 };
 
 /// @class RequestGroup
 ///
 /// @brief A RequestGroup is a specific ExchangeNodeGroup with a notion of an total
 /// requested quantity.
-struct RequestGroup : public ExchangeNodeGroup {
+class RequestGroup : public ExchangeNodeGroup {
  public:
   typedef boost::shared_ptr<RequestGroup> Ptr;
   
   explicit RequestGroup(double qty = 0.0);
-  double qty;
+
+  double qty() { return qty_; }
+  
+ private:
+  double qty_;
 };
 
 /// @brief the capacity of the arc
