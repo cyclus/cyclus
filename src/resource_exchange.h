@@ -52,7 +52,7 @@ inline static void AdjustPrefs(Model* m,
 /// ResourceExchange<ResourceType> exchng(ctx);
 /// exchng.AddAllRequests();
 /// exchng.AddAllBids();
-/// exchng.DoAllAdjustments();
+/// exchng.AdjustAll();
 /// @endcode
 template <class T>
 class ResourceExchange {
@@ -89,13 +89,13 @@ class ResourceExchange {
   }
 
   /// @brief adjust preferences for requests given bid responses
-  void DoAllAdjustments() {
+  void AdjustAll() {
     std::set<Trader*> traders = ex_ctx_.requesters;
     std::for_each(
         traders.begin(),
         traders.end(),
         std::bind1st(
-            std::mem_fun(&cyclus::ResourceExchange<T>::DoAdjustment_),
+            std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs_),
             this));
   }
 
@@ -120,7 +120,7 @@ class ResourceExchange {
   
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
-  void DoAdjustment_(Trader* t) {
+  void AdjustPrefs_(Trader* t) {
     typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[t];
     Model* m = t;
     while (m != NULL) {

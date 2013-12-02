@@ -281,7 +281,7 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   EXPECT_EQ(0, pcast->pref_ctr_);
   EXPECT_EQ(0, ccast->pref_ctr_);
   
-  EXPECT_NO_THROW(exchng->DoAllAdjustments());
+  EXPECT_NO_THROW(exchng->AdjustAll());
 
   // child gets to adjust once - its own request
   // parent gets called twice - its request and adjusting its child's request
@@ -333,7 +333,7 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   EXPECT_EQ(context.trader_prefs[parent], pobs);
   EXPECT_EQ(context.trader_prefs[child], cobs);
   
-  EXPECT_NO_THROW(exchng->DoAllAdjustments());
+  EXPECT_NO_THROW(exchng->AdjustAll());
 
   pobs[preq][0].second = std::pow(preq->preference(), 2);
   cobs[creq][0].second = std::pow(std::pow(creq->preference(), 2), 2);

@@ -36,7 +36,7 @@ class ExchangeManager {
     ResourceExchange<T> exchng(ctx_);
     exchng.AddAllRequests();
     exchng.AddAllBids();
-    exchng.DoAllAdjustments();
+    exchng.AdjustAll();
     CLOG(LEV_DEBUG1) << "done with info gathering";
     
     // translate graph
