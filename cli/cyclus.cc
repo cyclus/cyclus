@@ -179,7 +179,13 @@ int main(int argc, char* argv[]) {
   em.RegisterBackend(back);
 
   // print the model list
-  ctx.PrintModelList();
+  const std::vector<Model*>& models = ctx.GetModels();
+  CLOG(LEV_INFO1) << "There are " << models.size() << " models.";
+  CLOG(LEV_INFO3) << "Model list {";
+  for (int i = 0; i < models.size(); i++) {
+    CLOG(LEV_INFO3) << models.at(i)->str();
+  }
+  CLOG(LEV_INFO3) << "}";
 
   // Run the simulation 
   try {

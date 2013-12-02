@@ -33,18 +33,6 @@ Model* Context::GetModelByName(std::string name) {
   return found_model;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Context::PrintModelList() {
-  const std::vector<Model*>& models = GetModels();
-
-  CLOG(LEV_INFO1) << "There are " << models.size() << " models.";
-  CLOG(LEV_INFO3) << "Model list {";
-  for (int i = 0; i < models.size(); i++) {
-    CLOG(LEV_INFO3) << models.at(i)->str();
-  }
-  CLOG(LEV_INFO3) << "}";
-}
-
 void Context::AddPrototype(std::string name, Model* p) {
   protos_[name] = p;
 }

@@ -45,13 +45,9 @@ class Context {
      @param name name of the template as defined in the input file
    */
   Model* GetModelByName(std::string name);
-
-  /**
-     prints the current list of models
-   */
-  void PrintModelList();
   
   /// Access the simulation-wide model list.
+  inline const std::vector<Model*>& GetModels() const { return model_list_; }
   inline std::vector<Model*>& GetModels() { return model_list_; }
 
   /// Registers an agent as a participant in resource exchanges
