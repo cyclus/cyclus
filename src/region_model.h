@@ -127,7 +127,6 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   virtual void HandleDailyTasks(int time, int day);
 
- protected:
   /* --------------------
    * all REGIONMODEL classes have these members
    * --------------------
@@ -135,11 +134,12 @@ class RegionModel : public TimeAgent, public Communicator {
   /**
      returns if the facility is in this region's allowed facs
    */
-  bool IsAllowedFacility(std::string proto_name) {
+  inline bool IsAllowedFacility(std::string proto_name) {
     return (allowedFacilities_.find(proto_name)
             != allowedFacilities_.end());
   } ;
 
+ protected:
   /**
      populate the region's list of allowed facilities
    */
