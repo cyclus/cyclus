@@ -82,6 +82,13 @@ TEST(CapacityConstraintTests, Trivial) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CapacityConstraintTests, Equality) {
+  CapacityConstraint<Resource> cc1(val);
+  CapacityConstraint<Resource> cc2(val);
+  EXPECT_EQ(cc1, cc2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CapacityConstraintTests, RsrcQty) {
   TestContext tc;
   cyclus::CompMap cm;

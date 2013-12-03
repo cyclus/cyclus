@@ -16,6 +16,11 @@ struct Converter {
   virtual ~Converter() {}
   
   virtual double convert(boost::shared_ptr<T>) = 0;
+
+  /// @brief operator== is available for subclassing, see
+  /// cyclus::TrivialConverter for an example
+  virtual bool operator==(Converter& other) const { return false; }
+  bool operator!=(Converter& other) const { return !operator==(other); }
 };
 
 /// @class TrivialConverter
@@ -25,8 +30,14 @@ template<class T>
 struct TrivialConverter : public Converter<T> {
   TrivialConverter() {}
   virtual ~TrivialConverter() {}
-  
+
+  /// @returns 1 always
   virtual double convert(boost::shared_ptr<T>) { return 1; }
+
+  /// @returns true if a dynamic cast succeeds
+  virtual bool operator==(Converter<T>& other) const {
+    return dynamic_cast<TrivialConverter<T>*>(&other) != NULL;
+  }
 };
 
 /// @class CapacityConstraint
@@ -83,7 +94,7 @@ template<class T>
 inline bool operator==(const CapacityConstraint<T>& lhs,
                        const CapacityConstraint<T>& rhs) {
   return  ((lhs.capacity() == rhs.capacity()) &&
-           (lhs.converter() == rhs.converter()));
+           (*lhs.converter() == *rhs.converter()));
 };
 
 /// @brief CapacityConstraint-CapacityConstraint comparison operator, allows

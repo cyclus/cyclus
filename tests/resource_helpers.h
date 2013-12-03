@@ -47,6 +47,11 @@ struct TestConverter : public cyclus::Converter<cyclus::Material> {
   virtual double convert(cyclus::Material::Ptr r) {
     return r->quantity() * helper_qty;
   }
+
+  /// @returns true if a dynamic cast succeeds
+  virtual bool operator==(Converter<cyclus::Material>& other) const {
+    return dynamic_cast<TestConverter*>(&other) != NULL;
+  }
 };
 
 } // namespace test_helpers
