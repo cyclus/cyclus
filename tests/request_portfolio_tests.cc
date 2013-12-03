@@ -20,6 +20,7 @@ using std::set;
 using std::string;
 
 using cyclus::CapacityConstraint;
+using cyclus::Converter;
 using cyclus::GenericResource;
 using cyclus::KeyError;
 using cyclus::Material;
@@ -27,7 +28,7 @@ using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::TestContext;
 using test_helpers::get_mat;
-using test_helpers::converter;
+using test_helpers::TestConverter;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class RequestPortfolioTests: public ::testing::Test {
@@ -69,7 +70,8 @@ TEST_F(RequestPortfolioTests, ReqAdd){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RequestPortfolioTests, CapAdd) {
-  CapacityConstraint<Material> c(5, &converter);;
+  Converter<Material>::Ptr test_converter(new TestConverter());
+  CapacityConstraint<Material> c(5, test_converter);
   
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   EXPECT_NO_THROW(rp->AddConstraint(c));

@@ -18,6 +18,7 @@
 using cyclus::Bid;
 using cyclus::BidPortfolio;
 using cyclus::CapacityConstraint;
+using cyclus::Converter;
 using cyclus::KeyError;
 using cyclus::Request;
 using cyclus::Material;
@@ -25,7 +26,7 @@ using cyclus::TestContext;
 using std::string;
 using test_helpers::get_mat;
 using test_helpers::get_req;
-using test_helpers::converter;
+using test_helpers::TestConverter;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BidPortfolioTests: public ::testing::Test {
@@ -124,7 +125,8 @@ TEST_F(BidPortfolioTests, Sets) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BidPortfolioTests, CapAdd) {
-  CapacityConstraint<Material> c(5, &converter);
+  Converter<Material>::Ptr test_converter(new TestConverter());
+  CapacityConstraint<Material> c(5, test_converter);
   
   BidPortfolio<Material>::Ptr rp(new BidPortfolio<Material>());
   EXPECT_NO_THROW(rp->AddConstraint(c));

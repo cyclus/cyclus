@@ -40,9 +40,14 @@ static cyclus::Bid<cyclus::Material>::Ptr get_bid() {
       new cyclus::Bid<cyclus::Material>(get_req(), get_mat(), &trader));
 }
 
-static double converter(cyclus::Material::Ptr r) {
-  return r->quantity() * helper_qty;
-}
+struct TestConverter : public cyclus::Converter<cyclus::Material> {
+  TestConverter() {}
+  virtual ~TestConverter() {}
+  
+  virtual double convert(cyclus::Material::Ptr r) {
+    return r->quantity() * helper_qty;
+  }
+};
 
 } // namespace test_helpers
 

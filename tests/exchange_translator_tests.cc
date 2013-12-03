@@ -23,6 +23,7 @@ using cyclus::BidPortfolio;
 using cyclus::CapacityConstraint;
 using cyclus::CompMap;
 using cyclus::Composition;
+using cyclus::Converter;
 using cyclus::ExchangeContext;
 using cyclus::ExchangeGraph;
 using cyclus::ExchangeTranslator;
@@ -46,27 +47,41 @@ double fraction = 0.7;
 int u235 = 92235;
 double qty = 6.3;
 
-double converter1(Material::Ptr m) {
-  const CompMap& comp = m->comp()->mass();
-  double uamt = comp.find(u235)->second;
-  return comp.find(u235)->second * fraction;
-}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+struct MatConverter1 : public Converter<Material> {
+  MatConverter1() {}
+  virtual ~MatConverter1() {}
+  
+  virtual double convert(Material::Ptr r) {
+    const CompMap& comp = r->comp()->mass();
+    double uamt = comp.find(u235)->second;
+    return comp.find(u235)->second * fraction;
+  }
+};
 
-double converter2(Material::Ptr m) {
-  const CompMap& comp = m->comp()->mass();
-  double uamt = comp.find(u235)->second;
-  return comp.find(u235)->second * fraction * fraction;
-}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+struct MatConverter2 : public Converter<Material> {
+  MatConverter2() {}
+  virtual ~MatConverter2() {}
+  
+  virtual double convert(Material::Ptr r) {
+    const CompMap& comp = r->comp()->mass();
+    double uamt = comp.find(u235)->second;
+    return comp.find(u235)->second * fraction * fraction;
+  }
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateCapacities) {
   Material::Ptr mat = get_mat(u235, qty);
-  
-  double qty1 = 2.5 * qty;
-  CapacityConstraint<Material> cc1(qty1, &converter1);
 
+  Converter<Material>::Ptr c1(new MatConverter1());
+  double qty1 = 2.5 * qty;
+  CapacityConstraint<Material> cc1(qty1, c1);
+
+  Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
-  CapacityConstraint<Material> cc2(qty2, &converter2);
+  CapacityConstraint<Material> cc2(qty2, c2);
   
   CapacityConstraint<Material> carr1[] = {cc1, cc2};
   std::set< CapacityConstraint<Material> >
@@ -80,10 +95,10 @@ TEST(ExXlateTests, XlateCapacities) {
   ExchangeNode::Ptr bnode(new ExchangeNode());
   Arc arc(rnode, bnode);
 
-  double rarr[] = {(converter1(mat) / qty1), (converter2(mat) / qty2)};
+  double rarr[] = {(c1->convert(mat) / qty1), (c2->convert(mat) / qty2)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
       
-  double barr[] = {(converter1(mat) / qty1)};
+  double barr[] = {(c1->convert(mat) / qty1)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
       
   TranslateCapacities<Material>(mat, rconstrs, rnode, arc);
@@ -97,13 +112,14 @@ TEST(ExXlateTests, XlateCapacities) {
 TEST(ExXlateTests, XlateReq) {
   Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty),
                                                    &trader));
+  Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
+  CapacityConstraint<Material> cc1(qty1, c1);
 
-  CapacityConstraint<Material> cc1(qty1, &converter1);
-
+  Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
-  CapacityConstraint<Material> cc2(qty2, &converter2);
-  
+  CapacityConstraint<Material> cc2(qty2, c2);
+    
   double carr[] = {qty1, qty2};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
@@ -128,11 +144,13 @@ TEST(ExXlateTests, XlateBid) {
   Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &trader));
   Bid<Material>::Ptr bid(new Bid<Material>(req, get_mat(u235, qty), &trader));
   
+  Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
-  CapacityConstraint<Material> cc1(qty1, &converter1);
+  CapacityConstraint<Material> cc1(qty1, c1);
 
+  Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
-  CapacityConstraint<Material> cc2(qty2, &converter2);
+  CapacityConstraint<Material> cc2(qty2, c2);
   
   double carr[] = {qty1, qty2};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
@@ -159,11 +177,13 @@ TEST(ExXlateTests, XlateArc) {
   Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &trader));
   Bid<Material>::Ptr bid(new Bid<Material>(req, get_mat(u235, qty), &trader));
     
+  Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
-  CapacityConstraint<Material> cc1(qty1, &converter1);
+  CapacityConstraint<Material> cc1(qty1, c1);
 
+  Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
-  CapacityConstraint<Material> cc2(qty2, &converter2);
+  CapacityConstraint<Material> cc2(qty2, c2);
   
   double carr[] = {qty1, qty2};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
@@ -189,11 +209,11 @@ TEST(ExXlateTests, XlateArc) {
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.second);
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.first);
 
-  double barr[] = {(converter1(mat) / qty1), (converter2(mat) / qty2)};
+  double barr[] = {(c1->convert(mat) / qty1), (c2->convert(mat) / qty2)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
   EXPECT_EQ(bexp, a.second->unit_capacities[a]);
       
-  double rarr[] = {(converter1(mat) / qty1)};
+  double rarr[] = {(c1->convert(mat) / qty1)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
   EXPECT_EQ(rexp, a.first->unit_capacities[a]);
 }
@@ -205,7 +225,6 @@ TEST(ExXlateTests, SimpleXlate) {
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
   bport->AddBid(bid);
-
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
   rport->AddRequest(req);

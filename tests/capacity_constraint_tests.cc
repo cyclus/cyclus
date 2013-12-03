@@ -17,6 +17,7 @@
 using cyclus::CapacityConstraint;
 using cyclus::CompMap;
 using cyclus::Composition;
+using cyclus::Converter;
 using cyclus::GenericResource;
 using cyclus::Material;
 using cyclus::Resource;
@@ -30,30 +31,46 @@ static std::string quality = "qual";
 static double fraction = 0.5;
 
 // some helper functions to use
-// static double rsrc_quantity_converter(cyclus::Resource* r) {
-static double rsrc_quantity_converter(cyclus::Resource::Ptr r) {
-  return r->quantity() * fraction;
-}
-
-// static double mat_quality_converter(cyclus::Material* m) {
-static double mat_quality_converter(cyclus::Material::Ptr m) {
-  const cyclus::CompMap& comp = m->comp()->mass();
-  double uamt = comp.find(u235)->second;
-  return comp.find(u235)->second * fraction;
-}
-
-// static double gen_rsrc_quality_converter(cyclus::GenericResource* gr) {
-static double gen_rsrc_quality_converter(cyclus::GenericResource::Ptr gr) {
-  if (gr->quality().compare(quality) == 0) {
-    return val;
-  } else {
-    return 0.0;
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+struct RsrcQtyConverter : public Converter<Resource> {
+  RsrcQtyConverter() {}
+  virtual ~RsrcQtyConverter() {}
+  
+  virtual double convert(Resource::Ptr r) {
+    return r->quantity() * fraction;
   }
-}
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+struct MatQualConverter : public Converter<Material> {
+  MatQualConverter() {}
+  virtual ~MatQualConverter() {}
+  
+  virtual double convert(Material::Ptr r) {
+    const CompMap& comp = r->comp()->mass();
+    double uamt = comp.find(u235)->second;
+    return comp.find(u235)->second * fraction;
+  }
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+struct GenRsrcQualConverter : public Converter<GenericResource> {
+  GenRsrcQualConverter() {}
+  virtual ~GenRsrcQualConverter() {}
+  
+  virtual double convert(GenericResource::Ptr r) {
+    if (r->quality().compare(quality) == 0) {
+      return val;
+    } else {
+      return 0.0;
+    }
+  }
+};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CapacityConstraintTests, RsrcGetSet) {
-  CapacityConstraint<Resource> cc(val, &rsrc_quantity_converter);
+  Converter<Resource>::Ptr c(new RsrcQtyConverter());
+  CapacityConstraint<Resource> cc(val, c);
   
   EXPECT_EQ(val, cc.capacity());
 }
@@ -72,7 +89,8 @@ TEST(CapacityConstraintTests, RsrcQty) {
   cm[92235] = val;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
 
-  CapacityConstraint<Resource> cc(val, &rsrc_quantity_converter);
+  Converter<Resource>::Ptr c(new RsrcQtyConverter());
+  CapacityConstraint<Resource> cc(val, c);
   
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
   EXPECT_DOUBLE_EQ(cc.convert(mat), qty*fraction);
@@ -99,7 +117,8 @@ TEST(CapacityConstraintTests, MaterialQuality) {
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
   
-  CapacityConstraint<Material> cc(val, &mat_quality_converter);
+  Converter<Material>::Ptr c(new MatQualConverter());
+  CapacityConstraint<Material> cc(val, c);
   
   EXPECT_DOUBLE_EQ(cc.convert(mat), val*fraction);
   
@@ -117,13 +136,14 @@ TEST(CapacityConstraintTests, MaterialQuality) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CapacityConstraintTests, GenRsrcQuality) {
+TEST(CapacityConstraintTests, GenGenRsrcQuality) {
   TestContext tc;
   double quan = 4.0;
   string units = "kg";
   string qual = quality;
   
-  CapacityConstraint<GenericResource> cc(val, &gen_rsrc_quality_converter);
+  Converter<GenericResource>::Ptr c(new GenRsrcQualConverter());
+  CapacityConstraint<GenericResource> cc(val, c);
   
   GenericResource::Ptr gr = GenericResource::CreateUntracked(quan, qual, units);
   EXPECT_DOUBLE_EQ(cc.convert(gr), val);

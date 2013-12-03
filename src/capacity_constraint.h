@@ -5,9 +5,30 @@
 
 namespace cyclus {
 
+/// @class Converter
+///
+/// @brief a simple interface for converting resource objects to unit capacities
 template<class T>
-    static double trivial_converter(boost::shared_ptr<T>) {return 1;}
+struct Converter {
+  typedef boost::shared_ptr< Converter<T> > Ptr;
+
+  Converter() {}
+  virtual ~Converter() {}
   
+  virtual double convert(boost::shared_ptr<T>) = 0;
+};
+
+/// @class TrivialConverter
+///
+/// @brief The default converter: just return 1
+template<class T>
+struct TrivialConverter : public Converter<T> {
+  TrivialConverter() {}
+  virtual ~TrivialConverter() {}
+  
+  virtual double convert(boost::shared_ptr<T>) { return 1; }
+};
+
 /// @class CapacityConstraint
 ///
 /// @brief A CapacityConstraint provides an ability to determine an agent's
@@ -15,10 +36,8 @@ template<class T>
 template <class T>
 class CapacityConstraint {
  public:
-  typedef double (*Converter)(boost::shared_ptr<T>);
-
   /// @brief constructor for a constraint with a non-trivial converter
-  CapacityConstraint(double capacity, Converter converter)
+  CapacityConstraint(double capacity, typename Converter<T>::Ptr converter)
     : capacity_(capacity),
       converter_(converter),
       id_(next_id_++) {};
@@ -27,8 +46,9 @@ class CapacityConstraint {
   /// that simply returns 1)
   explicit CapacityConstraint(double capacity)
     : capacity_(capacity),
-      converter_(&trivial_converter),
-      id_(next_id_++) {};
+      id_(next_id_++) {
+    converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
+  }
   
   /// @return the constraints capacity
   inline double capacity() const {
@@ -36,18 +56,12 @@ class CapacityConstraint {
   }
 
   /// @return the converter
-  inline Converter converter() const {
+  inline typename Converter<T>::Ptr converter() const {
     return converter_;
   }
 
-  /// @return the converted value of a given item
-  inline double convert(T* item) const {
-    /// return (*converter_)(item);
-  }
-
   inline double convert(boost::shared_ptr<T> item) const {
-    return (*converter_)(item);
-    /// return convert(item.get());
+    return converter_->convert(item);
   }
 
   /// @return a unique id for the constraint
@@ -57,7 +71,7 @@ class CapacityConstraint {
 
  private:
   double capacity_;
-  Converter converter_;
+  typename Converter<T>::Ptr converter_;
   int id_;
   static int next_id_;
 };
