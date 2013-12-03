@@ -27,7 +27,6 @@ Material::Ptr Material::Create(Model* creator, double quantity,
 Material::Ptr Material::CreateUntracked(double quantity,
                                         Composition::Ptr c) {
   Material::Ptr m(new Material(NULL, quantity, c));
-  m->tracker_.DontTrack();
   return m;
 }
 
@@ -162,6 +161,8 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c)
   all_mats_[this] = true;
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
+  } else {
+    tracker_.DontTrack();
   }
 }
 
