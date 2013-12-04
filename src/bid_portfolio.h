@@ -42,8 +42,8 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @throws if a bid is added from a different bidder than the original or if
   /// the bid commodity is different than the original
   void AddBid(const typename Bid<T>::Ptr b) {
-    VerifyResponder(b);
-    VerifyCommodity(b);
+    VerifyResponder_(b);
+    VerifyCommodity_(b);
     bids_.insert(b);
     b->set_portfolio(this->shared_from_this());
   };
@@ -52,34 +52,6 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @param c the constraint to add
   inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
-  };
-
-  /// @brief if the bidder has not been determined yet, it is set. otherwise
-  /// VerifyResponder() verifies the the bid is associated with the
-  /// portfolio's bidder
-  /// @throws if a bid is added from a different bidder than the original
-  void VerifyResponder(typename Bid<T>::Ptr b) {
-    if (bidder_ == NULL) {
-      bidder_ = b->bidder();
-    } else if (bidder_ != b->bidder()) {
-      std::string msg = "Insertion error: bidders do not match.";
-      throw KeyError(msg);
-    }
-  };
-
-  /// @brief if the commodity has not been determined yet, it is set. otherwise
-  /// VerifyCommodity() verifies the the commodity is associated with the
-  /// portfolio's commodity
-  /// @throws if a commodity is added that is a different commodity from the
-  /// original
-  void VerifyCommodity(const typename Bid<T>::Ptr r) {
-    std::string other = r->request()->commodity();
-    if (commodity_ == "NO_COMMODITY_SET") {
-      commodity_ = other;
-    } else if (commodity_ != other) {
-      std::string msg = "Insertion error: commodities do not match.";
-      throw KeyError(msg);
-    }
   };
   
   /// @return the model associated with the portfolio. if no bids have
@@ -110,6 +82,47 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   }
   
  private:
+  /// @brief copy constructor is private to prevent copying and preserve
+  /// explicit single-ownership of bids
+  BidPortfolio(const BidPortfolio& rhs) : id_(next_id_++) {
+    bidder_ = rhs.bidder_;
+    bids_ = rhs.bids_;
+    commodity_ = rhs.commodity_;
+    constraints_ = rhs.constraints_;
+    typename std::set<typename Bid<T>::Ptr>::iterator it;
+    for (it = bids_.begin(); it != bids_.end(); ++it) {
+      it->get()->set_portfolio(this->shared_from_this());
+    }
+  };
+
+  /// @brief if the bidder has not been determined yet, it is set. otherwise
+  /// VerifyResponder() verifies the the bid is associated with the
+  /// portfolio's bidder
+  /// @throws if a bid is added from a different bidder than the original
+  void VerifyResponder_(typename Bid<T>::Ptr b) {
+    if (bidder_ == NULL) {
+      bidder_ = b->bidder();
+    } else if (bidder_ != b->bidder()) {
+      std::string msg = "Insertion error: bidders do not match.";
+      throw KeyError(msg);
+    }
+  };
+
+  /// @brief if the commodity has not been determined yet, it is set. otherwise
+  /// VerifyCommodity() verifies the the commodity is associated with the
+  /// portfolio's commodity
+  /// @throws if a commodity is added that is a different commodity from the
+  /// original
+  void VerifyCommodity_(const typename Bid<T>::Ptr r) {
+    std::string other = r->request()->commodity();
+    if (commodity_ == "NO_COMMODITY_SET") {
+      commodity_ = other;
+    } else if (commodity_ != other) {
+      std::string msg = "Insertion error: commodities do not match.";
+      throw KeyError(msg);
+    }
+  };
+
   // bid_ is a set because there is a one-to-one correspondance between a
   // bid and a request, i.e., bids are unique
   std::set< typename Bid<T>::Ptr > bids_;
@@ -121,19 +134,6 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   Trader* bidder_;
   int id_;
   static int next_id_;
-
-  /// @brief copy constructor, which we wish not to be used in general, due to
-  /// the ownership relation of the bids
-  BidPortfolio(const BidPortfolio& rhs) : id_(next_id_++) {
-    bidder_ = rhs.bidder_;
-    bids_ = rhs.bids_;
-    commodity_ = rhs.commodity_;
-    constraints_ = rhs.constraints_;
-    typename std::set<typename Bid<T>::Ptr>::iterator it;
-    for (it = bids_.begin(); it != bids_.end(); ++it) {
-      it->get()->set_portfolio(this->shared_from_this());
-    }
-  };
 };
 
 template<class T> int BidPortfolio<T>::next_id_ = 0;
