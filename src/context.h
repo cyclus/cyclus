@@ -40,9 +40,9 @@ class Context {
   inline void AddModel(Model* m) { model_list_.push_back(m); }
 
   /**
-     returns a model given the template's name
+     returns a model given the prototype's name
 
-     @param name name of the template as defined in the input file
+     @param name name of the prototype as defined in the input file
    */
   Model* GetModelByName(std::string name);
   
