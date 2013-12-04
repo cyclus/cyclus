@@ -46,10 +46,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @param r the request to add
   /// @throws if a request is added from a different requester than the original
   void AddRequest(const typename Request<T>::Ptr r) {
-    VerifyRequester(r);
-    VerifyQty(r);
-    CLOG(LEV_DEBUG2) << "Added request of size " << r->target()->quantity();
-    CLOG(LEV_DEBUG2) << "Portfolio size is " << qty_;
+    VerifyRequester_(r);
+    VerifyQty_(r);
     requests_.push_back(r);
     r->set_portfolio(this->shared_from_this());
   };
@@ -60,34 +58,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
   };
-  
-  /// @brief if the requester has not been determined yet, it is set. otherwise
-  /// VerifyRequester() verifies the the request is associated with the portfolio's
-  /// requester
-  /// @throws if a request is added from a different requester than the original
-  void VerifyRequester(const typename Request<T>::Ptr r) {
-    if (requester_ == NULL) {
-      requester_ = r->requester();
-    } else if (requester_ != r->requester()) {
-      std::string msg = "Insertion error: requesters do not match.";
-      throw KeyError(msg);
-    }
-  };
-
-  /// @brief if the quantity has not been determined yet, it is set. otherwise
-  /// VerifyRequester() verifies the the quantity is the same as all others in
-  /// the portfolio
-  /// @throws if a quantity is different than the original
-  void VerifyQty(const typename Request<T>::Ptr r) {
-    double qty = r->target()->quantity();
-    if (qty_ == -1) {
-      qty_ = qty;
-    } else if (qty_ != qty) {
-      std::string msg = "Insertion error: request quantity do not match.";
-      throw KeyError(msg);
-    }
-  };
-    
+      
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
   inline Trader* requester() const {
@@ -118,20 +89,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   }
 
  private:
-  /// requests_ is a vector because many requests may be identical, i.e., a set
-  /// is not appropriate
-  std::vector<typename Request<T>::Ptr> requests_;
-
-  /// constraints_ is a set because constraints are assumed to be unique
-  std::set< CapacityConstraint<T> > constraints_;
-
-  double qty_;
-  Trader* requester_;
-  int id_;
-  static int next_id_;
-  
-  /// @brief copy constructor, which we wish not to be used in general, due to
-  /// the ownership relation of the requests
+  /// @brief copy constructor is private to prevent copying and preserve
+  /// explicit single-ownership of requests
   RequestPortfolio(const RequestPortfolio& rhs) : id_(next_id_++) {
     requester_ = rhs.requester_;
     requests_ = rhs.requests_;
@@ -143,6 +102,44 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     }
   };
 
+  /// @brief if the requester has not been determined yet, it is set. otherwise
+  /// VerifyRequester() verifies the the request is associated with the portfolio's
+  /// requester
+  /// @throws if a request is added from a different requester than the original
+  void VerifyRequester_(const typename Request<T>::Ptr r) {
+    if (requester_ == NULL) {
+      requester_ = r->requester();
+    } else if (requester_ != r->requester()) {
+      std::string msg = "Insertion error: requesters do not match.";
+      throw KeyError(msg);
+    }
+  };
+
+  /// @brief if the quantity has not been determined yet, it is set. otherwise
+  /// VerifyRequester() verifies the the quantity is the same as all others in
+  /// the portfolio
+  /// @throws if a quantity is different than the original
+  void VerifyQty_(const typename Request<T>::Ptr r) {
+    double qty = r->target()->quantity();
+    if (qty_ == -1) {
+      qty_ = qty;
+    } else if (qty_ != qty) {
+      std::string msg = "Insertion error: request quantity do not match.";
+      throw KeyError(msg);
+    }
+  };
+
+  /// requests_ is a vector because many requests may be identical, i.e., a set
+  /// is not appropriate
+  std::vector<typename Request<T>::Ptr> requests_;
+
+  /// constraints_ is a set because constraints are assumed to be unique
+  std::set< CapacityConstraint<T> > constraints_;
+
+  double qty_;
+  Trader* requester_;
+  int id_;
+  static int next_id_;
 };
 
 template<class T> int RequestPortfolio<T>::next_id_ = 0;
