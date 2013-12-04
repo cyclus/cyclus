@@ -4,11 +4,10 @@
 #include <string>
 #include <math.h>
 
-#include "resource_exchange.h"
-
 #include "bid.h"
 #include "bid_portfolio.h"
 #include "composition.h"
+#include "equality_helpers.h"
 #include "exchange_context.h"
 #include "facility_model.h"
 #include "material.h"
@@ -18,6 +17,8 @@
 #include "request_portfolio.h"
 #include "resource_helpers.h"
 #include "test_context.h"
+
+#include "resource_exchange.h"
 
 using cyclus::Bid;
 using cyclus::BidPortfolio;
@@ -189,7 +190,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   rp->AddRequest(req);
   const std::vector<RequestPortfolio<Material>::Ptr>& obsvp = ctx.requests;
   EXPECT_EQ(1, obsvp.size());
-  EXPECT_EQ(*rp.get(), *obsvp[0].get());
+  EXPECT_TRUE(RPEq(*rp.get(), *obsvp[0].get()));
 
   const std::vector<Request<Material>::Ptr>& obsvr = ctx.requests_by_commod[commod];
   EXPECT_EQ(1, obsvr.size());  
@@ -237,7 +238,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   bp->AddBid(bid1);
   const std::vector<BidPortfolio<Material>::Ptr>& obsvp = ctx.bids;
   EXPECT_EQ(1, obsvp.size());
-  EXPECT_EQ(*bp.get(), *obsvp[0].get());
+  EXPECT_TRUE(BPEq(*bp.get(), *obsvp[0].get()));
 
   const std::vector<Bid<Material>::Ptr>& obsvb = ctx.bids_by_request[req];
   EXPECT_EQ(1, obsvb.size());  

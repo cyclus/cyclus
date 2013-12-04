@@ -34,8 +34,7 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @brief default constructor
   BidPortfolio()
     : bidder_(NULL),
-      commodity_("NO_COMMODITY_SET"),
-      id_(next_id_++) {};
+      commodity_("NO_COMMODITY_SET") {};
 
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
@@ -69,14 +68,11 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   inline const std::set< CapacityConstraint<T> >& constraints() const {
     return constraints_;
   };
-
-  /// @return a unique id for the constraint
-  inline const int id() const { return id_; }
   
  private:
   /// @brief copy constructor is private to prevent copying and preserve
   /// explicit single-ownership of bids
-  BidPortfolio(const BidPortfolio& rhs) : id_(next_id_++) {
+  BidPortfolio(const BidPortfolio& rhs) {
     bidder_ = rhs.bidder_;
     bids_ = rhs.bids_;
     commodity_ = rhs.commodity_;
@@ -124,35 +120,6 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   
   std::string commodity_;
   Trader* bidder_;
-  int id_;
-  static int next_id_;
-};
-
-template<class T> int BidPortfolio<T>::next_id_ = 0;
-
-/// @brief BidPortfolio-BidPortfolio comparison operator, allows usage in
-/// ordered containers
-template<class T>
-inline bool operator<(const BidPortfolio<T>& lhs,
-                      const BidPortfolio<T>& rhs) {
-  return  (lhs.id() < rhs.id());
-};
-
-/// @brief BidPortfolio-BidPortfolio equality operator
-template<class T>
-inline bool operator==(const BidPortfolio<T>& lhs,
-                       const BidPortfolio<T>& rhs) {
-  return  (lhs.bids() == rhs.bids() &&
-           lhs.constraints() == rhs.constraints() &&
-           lhs.commodity() == rhs.commodity() &&
-           lhs.bidder() == rhs.bidder());
-};
-
-/// @brief BidPortfolio-BidPortfolio inequality operator
-template<class T>
-inline bool operator!=(const BidPortfolio<T>& lhs,
-                       const BidPortfolio<T>& rhs) {
-  return !(lhs == rhs);
 };
 
 } // namespace cyclus

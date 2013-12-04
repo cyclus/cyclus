@@ -40,7 +40,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
 
   /// @brief default constructor
-  RequestPortfolio() : requester_(NULL), qty_(-1), id_(next_id_++) {};
+  RequestPortfolio() : requester_(NULL), qty_(-1) {};
 
   /// @brief add a request to the portfolio
   /// @param r the request to add
@@ -79,13 +79,10 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     return constraints_;
   };
 
-  /// @return a unique id for the constraint
-  inline int id() const { return id_; }
-
  private:
   /// @brief copy constructor is private to prevent copying and preserve
   /// explicit single-ownership of requests
-  RequestPortfolio(const RequestPortfolio& rhs) : id_(next_id_++) {
+  RequestPortfolio(const RequestPortfolio& rhs) {
     requester_ = rhs.requester_;
     requests_ = rhs.requests_;
     constraints_ = rhs.constraints_;
@@ -132,35 +129,6 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
 
   double qty_;
   Trader* requester_;
-  int id_;
-  static int next_id_;
-};
-
-template<class T> int RequestPortfolio<T>::next_id_ = 0;
-
-/// @brief RequestPortfolio-RequestPortfolio comparison operator, allows usage
-/// in ordered containers
-template<class T>
-inline bool operator<(const RequestPortfolio<T>& lhs,
-                      const RequestPortfolio<T>& rhs) {
-  return  (lhs.id() < rhs.id());
-};
-
-/// @brief RequestPortfolio-RequestPortfolio equality operator
-template<class T>
-inline bool operator==(const RequestPortfolio<T>& lhs,
-                       const RequestPortfolio<T>& rhs) {
-  return  (lhs.requests() == rhs.requests() &&
-           lhs.constraints() == rhs.constraints() &&
-           lhs.qty() == rhs.qty() &&
-           lhs.requester() == rhs.requester());
-};
-
-/// @brief RequestPortfolio-RequestPortfolio inequality operator
-template<class T>
-inline bool operator!=(const RequestPortfolio<T>& lhs,
-                       const RequestPortfolio<T>& rhs) {
-  return !(lhs == rhs);
 };
 
 } // namespace cyclus

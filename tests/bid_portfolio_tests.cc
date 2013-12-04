@@ -89,14 +89,6 @@ TEST_F(BidPortfolioTests, Sets) {
 
   rp3->AddBid(bid1);
   rp3->AddBid(bid2);
-
-  EXPECT_NE(rp1, rp2);
-  EXPECT_NE(rp2, rp3);
-  EXPECT_NE(rp3, rp1);
-
-  EXPECT_NE(rp1->id(), rp2->id());
-  EXPECT_NE(rp2->id(), rp3->id());
-  EXPECT_NE(rp3->id(), rp1->id());
   
   std::set< BidPortfolio<Material>::Ptr > bids;
   EXPECT_EQ(bids.size(), 0);
