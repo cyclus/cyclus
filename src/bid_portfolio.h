@@ -35,9 +35,7 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   BidPortfolio()
     : bidder_(NULL),
       commodity_("NO_COMMODITY_SET"),
-      id_(next_id_++) {
-    constraints_.clear();
-  };
+      id_(next_id_++) {};
 
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
