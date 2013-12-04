@@ -20,6 +20,12 @@ struct PrefMap {
     std::vector< std::pair< typename Bid<T>::Ptr, double > > > type;
 };
 
+template <class T>
+struct CommodMap {
+  typedef std::map< std::string, std::vector<typename Request<T>::Ptr> > type;
+};
+  
+
 /// @class ExchangeContext
 ///
 /// @brief The ExchangeContext is designed to provide an ease-of-use interface
@@ -91,8 +97,7 @@ struct ExchangeContext {
   std::set<Trader*> bidders;
   
   /// @brief maps commodity name to requests for that commodity
-  std::map< std::string, std::vector<typename Request<T>::Ptr> >
-      requests_by_commod;
+  typename CommodMap<T>::type requests_by_commod;
 
   /// @brief maps request to all bids for request
   std::map< typename Request<T>::Ptr, std::vector<typename Bid<T>::Ptr> >

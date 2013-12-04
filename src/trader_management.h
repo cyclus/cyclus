@@ -1,6 +1,7 @@
 #ifndef CYCLUS_TRADER_MANAGEMENT_H_
 #define CYCLUS_TRADER_MANAGEMENT_H_
 
+#include "exchange_context.h"
 #include "material.h"
 #include "generic_resource.h"
 #include "trader.h"
@@ -27,24 +28,22 @@ inline std::set<RequestPortfolio<GenericResource>::Ptr>
   return t->GetGenRsrcRequests();
 }
 
-template<class T> class ExchangeContext;
-  
 template<class T>
 inline static std::set<typename BidPortfolio<T>::Ptr>
-    QueryBids(Trader* t, ExchangeContext<T>* ec) {
+    QueryBids(Trader* t, const typename CommodMap<T>::type& map) {
   throw StateError("Non-specialized version of QueryBids not supported");
 }
   
 template<>
 inline std::set<BidPortfolio<Material>::Ptr>
-    QueryBids<Material>(Trader* t, ExchangeContext<Material>* ec) {
-  return t->GetMatlBids(ec);
+    QueryBids<Material>(Trader* t, const CommodMap<Material>::type& map) {
+  return t->GetMatlBids(map);
 }
 
 template<>
 inline std::set<BidPortfolio<GenericResource>::Ptr>
-    QueryBids<GenericResource>(Trader* t, ExchangeContext<GenericResource>* ec) {
-  return t->GetGenRsrcBids(ec);
+    QueryBids<GenericResource>(Trader* t, const CommodMap<GenericResource>::type& map) {
+  return t->GetGenRsrcBids(map);
 }
 
 template<class T>

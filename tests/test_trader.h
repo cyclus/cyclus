@@ -1,14 +1,15 @@
 #ifndef CYCLUS_TESTS_TEST_TRADER_H_
 #define CYCLUS_TESTS_TEST_TRADER_H_
 
-#include "mock_facility.h"
+#include "bid_portfolio.h"
 #include "context.h"
-#include "trade.h"
+#include "exchange_context.h"
 #include "material.h"
+#include "mock_facility.h"
 #include "model.h"
 #include "request_portfolio.h"
-#include "bid_portfolio.h"
 #include "resource_helpers.h"
+#include "trade.h"
 
 namespace cyclus {
 
@@ -69,12 +70,12 @@ class TestTrader : public MockFacility {
   }
   
   virtual std::set<BidPortfolio<Material>::Ptr>
-      GetMatlBids(ExchangeContext<Material>* ec) {
+      GetMatlBids(const CommodMap<Material>::type& requests_by_commodity) {
     bids++;
     if (obj_fac == NULL || is_requester) {
       return std::set<BidPortfolio<Material>::Ptr>();
     } else {
-      req = ec->requests_by_commod[obj_fac->commod][0]; // obs request
+      req = requests_by_commodity.at(obj_fac->commod)[0]; // obs request
     
       std::set<BidPortfolio<Material>::Ptr> ports;
       BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());

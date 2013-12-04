@@ -5,14 +5,13 @@
 
 #include "bid_portfolio.h"
 #include "composition.h"
+#include "exchange_context.h"
 #include "generic_resource.h"
 #include "material.h"
 #include "request_portfolio.h"
 #include "trade.h"
 
 namespace cyclus {
-
-template <class T> class ExchangeContext;
 
 /// @class Trader
 ///
@@ -40,13 +39,14 @@ class Trader : virtual public Model {
 
   /// @brief default implementation for material requests
   virtual std::set<BidPortfolio<Material>::Ptr>
-      GetMatlBids(ExchangeContext<Material>* ec) {
+      GetMatlBids(const CommodMap<Material>::type& requests_by_commodity) {
     return std::set<BidPortfolio<Material>::Ptr>();
   }
   
   /// @brief default implementation for generic resource requests
   virtual std::set<BidPortfolio<GenericResource>::Ptr>
-      GetGenRsrcBids(ExchangeContext<GenericResource>* ec) {
+      GetGenRsrcBids(const CommodMap<GenericResource>::type&
+                     requests_by_commodity) {
     return std::set<BidPortfolio<GenericResource>::Ptr>();
   }
 

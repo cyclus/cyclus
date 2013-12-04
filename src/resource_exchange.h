@@ -111,7 +111,8 @@ class ResourceExchange {
 
   /// @brief queries a given facility model for 
   void AddBids_(Trader* t) {
-    std::set<typename BidPortfolio<T>::Ptr> bp = QueryBids<T>(t, &ex_ctx_);
+    std::set<typename BidPortfolio<T>::Ptr> bp =
+        QueryBids<T>(t, ex_ctx_.requests_by_commod);
     typename std::set<typename BidPortfolio<T>::Ptr>::iterator it;
     for (it = bp.begin(); it != bp.end(); ++it) {
       ex_ctx_.AddBidPortfolio(*it);

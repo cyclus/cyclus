@@ -22,6 +22,7 @@
 
 using cyclus::Bid;
 using cyclus::BidPortfolio;
+using cyclus::CommodMap;
 using cyclus::Composition;
 using cyclus::Context;
 using cyclus::ExchangeContext;
@@ -104,10 +105,11 @@ class Bidder: public MockFacility {
     return m;
   };
   
-  set<BidPortfolio<Material>::Ptr> GetMatlBids(ExchangeContext<Material>* ec) {
+  set<BidPortfolio<Material>::Ptr> GetMatlBids(
+      const CommodMap<Material>::type& requests_by_commodity) {
     set<BidPortfolio<Material>::Ptr> bps;
     BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-    int sz = ec->requests_by_commod[commod_].size();
+    int sz = requests_by_commodity.at(commod_).size();
     for (int i = 0; i < sz; i++) {
       bp->AddBid(bids_[i]);
     }
