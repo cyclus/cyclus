@@ -71,8 +71,8 @@ class ExchangeContextTests: public ::testing::Test {
 TEST_F(ExchangeContextTests, Empty) {
   ExchangeContext<Resource> context;
   EXPECT_TRUE(context.requests.empty());
-  EXPECT_TRUE(context.requests_by_commod[commod2].empty());
-  EXPECT_TRUE(context.requests_by_commod[commod2].empty());
+  EXPECT_TRUE(context.commod_requests[commod2].empty());
+  EXPECT_TRUE(context.commod_requests[commod2].empty());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -86,10 +86,10 @@ TEST_F(ExchangeContextTests, AddRequest1) {
   vp.push_back(rp1);
   EXPECT_EQ(vp, context.requests);
   
-  EXPECT_EQ(1, context.requests_by_commod[commod1].size());  
+  EXPECT_EQ(1, context.commod_requests[commod1].size());  
   std::vector<Request<Resource>::Ptr> vr;
   vr.push_back(req1);
-  EXPECT_EQ(vr, context.requests_by_commod[commod1]);
+  EXPECT_EQ(vr, context.commod_requests[commod1]);
 
   EXPECT_EQ(1, context.requesters.size());  
   std::set<Trader*> requesters;
@@ -110,11 +110,11 @@ TEST_F(ExchangeContextTests, AddRequest2) {
   vp.push_back(rp2);
   EXPECT_EQ(vp, context.requests);
   
-  EXPECT_EQ(2, context.requests_by_commod[commod1].size());  
+  EXPECT_EQ(2, context.commod_requests[commod1].size());  
   std::vector<Request<Resource>::Ptr> vr;
   vr.push_back(req1);
   vr.push_back(req2);
-  EXPECT_EQ(vr, context.requests_by_commod[commod1]);
+  EXPECT_EQ(vr, context.commod_requests[commod1]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -127,16 +127,16 @@ TEST_F(ExchangeContextTests, AddRequest3) {
     
   context.AddRequestPortfolio(rp1);
   
-  EXPECT_EQ(1, context.requests_by_commod[commod1].size());
-  EXPECT_EQ(1, context.requests_by_commod[commod2].size());
+  EXPECT_EQ(1, context.commod_requests[commod1].size());
+  EXPECT_EQ(1, context.commod_requests[commod2].size());
   
   std::vector<Request<Resource>::Ptr> vr;
   vr.push_back(req1);
-  EXPECT_EQ(vr, context.requests_by_commod[commod1]);
+  EXPECT_EQ(vr, context.commod_requests[commod1]);
 
   vr.clear();
   vr.push_back(req);
-  EXPECT_EQ(vr, context.requests_by_commod[commod2]);  
+  EXPECT_EQ(vr, context.commod_requests[commod2]);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -106,10 +106,10 @@ class Bidder: public MockFacility {
   };
   
   set<BidPortfolio<Material>::Ptr> GetMatlBids(
-      const CommodMap<Material>::type& requests_by_commodity) {
+      const CommodMap<Material>::type& commod_requests) {
     set<BidPortfolio<Material>::Ptr> bps;
     BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-    int sz = requests_by_commodity.at(commod_).size();
+    int sz = commod_requests.at(commod_).size();
     for (int i = 0; i < sz; i++) {
       bp->AddBid(bids_[i]);
     }
@@ -194,7 +194,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   EXPECT_EQ(1, obsvp.size());
   EXPECT_TRUE(RPEq(*rp.get(), *obsvp[0].get()));
 
-  const std::vector<Request<Material>::Ptr>& obsvr = ctx.requests_by_commod[commod];
+  const std::vector<Request<Material>::Ptr>& obsvr = ctx.commod_requests[commod];
   EXPECT_EQ(1, obsvr.size());  
   std::vector<Request<Material>::Ptr> vr;
   vr.push_back(req);
@@ -213,7 +213,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   rp->AddRequest(req);
   rp->AddRequest(req1);
   ctx.AddRequestPortfolio(rp);
-  const std::vector<Request<Material>::Ptr>& reqs = ctx.requests_by_commod[commod];
+  const std::vector<Request<Material>::Ptr>& reqs = ctx.commod_requests[commod];
   EXPECT_EQ(2, reqs.size());  
   
   Bidder* bidr = new Bidder(tc.get(), commod);

@@ -57,7 +57,7 @@ struct ExchangeContext {
   void AddRequest(typename Request<T>::Ptr pr) {
     assert(pr->requester() != NULL);
     requesters.insert(pr->requester());
-    requests_by_commod[pr->commodity()].push_back(pr);
+    commod_requests[pr->commodity()].push_back(pr);
   }
   
   /// @brief adds a bid to the context
@@ -97,7 +97,7 @@ struct ExchangeContext {
   std::set<Trader*> bidders;
   
   /// @brief maps commodity name to requests for that commodity
-  typename CommodMap<T>::type requests_by_commod;
+  typename CommodMap<T>::type commod_requests;
 
   /// @brief maps request to all bids for request
   std::map< typename Request<T>::Ptr, std::vector<typename Bid<T>::Ptr> >

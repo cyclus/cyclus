@@ -39,14 +39,14 @@ class Trader : virtual public Model {
 
   /// @brief default implementation for material requests
   virtual std::set<BidPortfolio<Material>::Ptr>
-      GetMatlBids(const CommodMap<Material>::type& requests_by_commodity) {
+      GetMatlBids(const CommodMap<Material>::type& commod_requests) {
     return std::set<BidPortfolio<Material>::Ptr>();
   }
   
   /// @brief default implementation for generic resource requests
   virtual std::set<BidPortfolio<GenericResource>::Ptr>
       GetGenRsrcBids(const CommodMap<GenericResource>::type&
-                     requests_by_commodity) {
+                     commod_requests) {
     return std::set<BidPortfolio<GenericResource>::Ptr>();
   }
 

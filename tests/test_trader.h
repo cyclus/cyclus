@@ -70,12 +70,12 @@ class TestTrader : public MockFacility {
   }
   
   virtual std::set<BidPortfolio<Material>::Ptr>
-      GetMatlBids(const CommodMap<Material>::type& requests_by_commodity) {
+      GetMatlBids(const CommodMap<Material>::type& commod_requests) {
     bids++;
     if (obj_fac == NULL || is_requester) {
       return std::set<BidPortfolio<Material>::Ptr>();
     } else {
-      req = requests_by_commodity.at(obj_fac->commod)[0]; // obs request
+      req = commod_requests.at(obj_fac->commod)[0]; // obs request
     
       std::set<BidPortfolio<Material>::Ptr> ports;
       BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
