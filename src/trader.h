@@ -28,25 +28,25 @@ class Trader : virtual public Model {
 
   /// @brief default implementation for material requests
   virtual std::set<RequestPortfolio<Material>::Ptr>
-      AddMatlRequests() {
+      GetMatlRequests() {
     return std::set<RequestPortfolio<Material>::Ptr>();
   }
   
   /// @brief default implementation for generic resource requests
   virtual std::set<RequestPortfolio<GenericResource>::Ptr>
-      AddGenRsrcRequests() {
+      GetGenRsrcRequests() {
     return std::set<RequestPortfolio<GenericResource>::Ptr >();
   }
 
   /// @brief default implementation for material requests
   virtual std::set<BidPortfolio<Material>::Ptr>
-      AddMatlBids(ExchangeContext<Material>* ec) {
+      GetMatlBids(ExchangeContext<Material>* ec) {
     return std::set<BidPortfolio<Material>::Ptr>();
   }
   
   /// @brief default implementation for generic resource requests
   virtual std::set<BidPortfolio<GenericResource>::Ptr>
-      AddGenRsrcBids(ExchangeContext<GenericResource>* ec) {
+      GetGenRsrcBids(ExchangeContext<GenericResource>* ec) {
     return std::set<BidPortfolio<GenericResource>::Ptr>();
   }
 

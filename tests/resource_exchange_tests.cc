@@ -57,7 +57,7 @@ class Requester: public MockFacility {
     return m;
   };
   
-  set<RequestPortfolio<Material>::Ptr> AddMatlRequests() {
+  set<RequestPortfolio<Material>::Ptr> GetMatlRequests() {
     set<RequestPortfolio<Material>::Ptr> rps;
     RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
     for (int i = 0; i < i_; i++) {
@@ -104,7 +104,7 @@ class Bidder: public MockFacility {
     return m;
   };
   
-  set<BidPortfolio<Material>::Ptr> AddMatlBids(ExchangeContext<Material>* ec) {
+  set<BidPortfolio<Material>::Ptr> GetMatlBids(ExchangeContext<Material>* ec) {
     set<BidPortfolio<Material>::Ptr> bps;
     BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
     int sz = ec->requests_by_commod[commod_].size();

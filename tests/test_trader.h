@@ -52,7 +52,7 @@ class TestTrader : public MockFacility {
   };
 
   virtual std::set<RequestPortfolio<Material>::Ptr>
-      AddMatlRequests() {
+      GetMatlRequests() {
     requests++;
     if (obj_fac == NULL || !is_requester) {
       return std::set<RequestPortfolio<Material>::Ptr>();
@@ -69,7 +69,7 @@ class TestTrader : public MockFacility {
   }
   
   virtual std::set<BidPortfolio<Material>::Ptr>
-      AddMatlBids(ExchangeContext<Material>* ec) {
+      GetMatlBids(ExchangeContext<Material>* ec) {
     bids++;
     if (obj_fac == NULL || is_requester) {
       return std::set<BidPortfolio<Material>::Ptr>();
