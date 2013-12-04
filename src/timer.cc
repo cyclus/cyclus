@@ -21,6 +21,10 @@ void Timer::RunSim(Context* ctx) {
   time_ = start_time_;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
+  
+  GreedySolver solver;
+  ExchangeManager<Material> matl_manager(ctx, &solver);
+  ExchangeManager<GenericResource> genrsrc_manager(ctx, &solver);
   while (date_ < endDate()) {
     if (date_.day() == 1) {
       CLOG(LEV_INFO2) << "Current date: " << date_ << " Current time: " << time_ <<
@@ -39,11 +43,7 @@ void Timer::RunSim(Context* ctx) {
       new_tickers_.clear();
 
       SendTick();
-      GreedySolver matl_solver;
-      ExchangeManager<Material> matl_manager(ctx, &matl_solver);
       matl_manager.Execute();
-      GreedySolver genrsrc_solver;
-      ExchangeManager<GenericResource> genrsrc_manager(ctx, &genrsrc_solver);
       genrsrc_manager.Execute();
     }
 
