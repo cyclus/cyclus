@@ -92,7 +92,7 @@ class TestTrader : public MockFacility {
     adjusts++;
   };
 
-  virtual void PopulateMatlTradeResponses(
+  virtual void GetMatlTrades(
     const std::vector< Trade<Material> >& trades,
     std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
     std::vector< Trade<Material> >::const_iterator it;

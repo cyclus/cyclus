@@ -61,7 +61,7 @@ inline void PopulateTradeResponses<Material>(
     const std::vector< Trade<Material> >& trades,
     std::vector<std::pair<Trade<Material>, Material::Ptr> >&
     responses) {
-  trader->PopulateMatlTradeResponses(trades, responses);
+  trader->GetMatlTrades(trades, responses);
 }
 
 template<>
@@ -70,7 +70,7 @@ inline void PopulateTradeResponses<GenericResource>(
     const std::vector< Trade<GenericResource> >& trades,
     std::vector<std::pair<Trade<GenericResource>,
     GenericResource::Ptr> >& responses) {
-  trader->PopulateGenRsrcTradeResponses(trades, responses);
+  trader->GetGenRsrcTrades(trades, responses);
 }
 
 template<class T>

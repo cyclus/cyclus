@@ -53,14 +53,14 @@ class Trader : virtual public Model {
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
-  virtual void PopulateMatlTradeResponses(
+  virtual void GetMatlTrades(
     const std::vector< Trade<Material> >& trades,
     std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {}
   
   /// @brief default implementation for responding to generic resource trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
-  virtual void PopulateGenRsrcTradeResponses(
+  virtual void GetGenRsrcTrades(
     const std::vector< Trade<GenericResource> >& trades,
     std::vector<std::pair<Trade<GenericResource>,
     GenericResource::Ptr> >& responses) {}
