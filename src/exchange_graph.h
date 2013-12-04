@@ -94,12 +94,14 @@ class RequestGroup : public ExchangeNodeGroup {
 
 /// @brief the capacity of the arc
 ///
+/// @throws StateError if either ExchangeNode does not have a ExchangeNodeGroup
 /// @param a the arc
 /// @return The minimum of the unode and vnode's capacities
 double Capacity(const Arc& a);
 
 /// @brief the capacity of a node
 ///
+/// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
 /// @param n the node
 /// @return The minimum of the node's nodegroup capacities / the node's unit
 /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller. 
@@ -109,8 +111,9 @@ double Capacity(ExchangeNode::Ptr pn, const Arc& a);
 /// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
 /// capacities of its ExchangeNodeGroup)
 ///
-/// @throws if the update results in a negative ExchangeNodeGroup capacity or a
-/// negative ExchangeNode max_qty
+/// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
+/// @throws ValueError if the update results in a negative ExchangeNodeGroup
+/// capacity or a negative ExchangeNode max_qty
 /// @param n the ExchangeNode
 /// @param qty the quantity for the node to update
 void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty);

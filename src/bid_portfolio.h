@@ -38,8 +38,8 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
 
   /// @brief add a bid to the portfolio
   /// @param r the bid to add
-  /// @throws if a bid is added from a different bidder than the original or if
-  /// the bid commodity is different than the original
+  /// @throws KeyError if a bid is added from a different bidder than the
+  /// original or if the bid commodity is different than the original
   void AddBid(const typename Bid<T>::Ptr b) {
     VerifyResponder_(b);
     VerifyCommodity_(b);
@@ -86,7 +86,8 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @brief if the bidder has not been determined yet, it is set. otherwise
   /// VerifyResponder() verifies the the bid is associated with the
   /// portfolio's bidder
-  /// @throws if a bid is added from a different bidder than the original
+  /// @throws KeyError if a bid is added from a different bidder than the
+  /// original
   void VerifyResponder_(typename Bid<T>::Ptr b) {
     if (bidder_ == NULL) {
       bidder_ = b->bidder();
@@ -99,8 +100,8 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @brief if the commodity has not been determined yet, it is set. otherwise
   /// VerifyCommodity() verifies the the commodity is associated with the
   /// portfolio's commodity
-  /// @throws if a commodity is added that is a different commodity from the
-  /// original
+  /// @throws KeyError if a commodity is added that is a different commodity
+  /// from the original
   void VerifyCommodity_(const typename Bid<T>::Ptr r) {
     std::string other = r->request()->commodity();
     if (commodity_ == "NO_COMMODITY_SET") {

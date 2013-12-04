@@ -43,6 +43,7 @@ class Context {
      returns a model given the prototype's name
 
      @param name name of the prototype as defined in the input file
+     @throws KeyError if name is not found
    */
   Model* GetModelByName(std::string name);
   

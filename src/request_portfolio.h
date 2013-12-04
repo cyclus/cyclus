@@ -44,7 +44,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
 
   /// @brief add a request to the portfolio
   /// @param r the request to add
-  /// @throws if a request is added from a different requester than the original
+  /// @throws KeyError if a request is added from a different requester than the
+  /// original or if the request quantity is different than the original
   void AddRequest(const typename Request<T>::Ptr r) {
     VerifyRequester_(r);
     VerifyQty_(r);
@@ -96,7 +97,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @brief if the requester has not been determined yet, it is set. otherwise
   /// VerifyRequester() verifies the the request is associated with the portfolio's
   /// requester
-  /// @throws if a request is added from a different requester than the original
+  /// @throws KeyError if a request is added from a different requester than the
+  /// original
   void VerifyRequester_(const typename Request<T>::Ptr r) {
     if (requester_ == NULL) {
       requester_ = r->requester();
@@ -109,7 +111,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @brief if the quantity has not been determined yet, it is set. otherwise
   /// VerifyRequester() verifies the the quantity is the same as all others in
   /// the portfolio
-  /// @throws if a quantity is different than the original
+  /// @throws KeyError if a quantity is different than the original
   void VerifyQty_(const typename Request<T>::Ptr r) {
     double qty = r->target()->quantity();
     if (qty_ == -1) {
