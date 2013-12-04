@@ -61,17 +61,13 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
       
   /// @return the model associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
-  inline Trader* requester() const {
-    return requester_;
-  };
+  inline Trader* requester() const { return requester_; }
 
   /// @return the request quantity associated with the portfolio.
   ///
   /// @brief, all requests in a portfolio must have the same quantity, which is
   /// checked during AddRequest()
-  inline double qty() const {
-    return qty_;
-  };
+  inline double qty() const { return qty_; }
 
   /// @return const access to the unconstrained requests
   inline const std::vector<typename Request<T>::Ptr>& requests() const {
@@ -84,9 +80,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   };
 
   /// @return a unique id for the constraint
-  inline int id() const {
-    return id_;
-  }
+  inline int id() const { return id_; }
 
  private:
   /// @brief copy constructor is private to prevent copying and preserve
