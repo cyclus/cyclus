@@ -47,8 +47,8 @@ class Context {
   Model* GetModelByName(std::string name);
   
   /// Access the simulation-wide model list.
-  inline const std::vector<Model*>& GetModels() const { return model_list_; }
-  inline std::vector<Model*>& GetModels() { return model_list_; }
+  inline const std::vector<Model*>& model_list() const { return model_list_; }
+  inline std::vector<Model*>& model_list() { return model_list_; }
 
   /// Registers an agent as a participant in resource exchanges
   inline void RegisterTrader(Trader* e) {

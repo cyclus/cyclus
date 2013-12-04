@@ -68,7 +68,7 @@ Model::~Model() {
   }
   
   // remove references to self
-  RemoveFromList(this, ctx_->GetModels());
+  RemoveFromList(this, ctx_->model_list());
 
   if (parent_ != NULL) {
     parent_->RemoveChild(this);

@@ -17,7 +17,7 @@ boost::uuids::uuid Context::sim_id() {
 Model* Context::GetModelByName(std::string name) {
   Model* found_model = NULL;
 
-  const std::vector<Model*>& models = GetModels();
+  const std::vector<Model*>& models = model_list();
   
   for (int i = 0; i < models.size(); i++) {
     if (name == models.at(i)->name()) {
