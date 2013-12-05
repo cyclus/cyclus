@@ -16,43 +16,30 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RunSim(Context* ctx) {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << start_date_ << " to end=" << end_date_;
-  time_ = start_time_;
+                  << start_time_ << " to end=" << start_time_ + dur_;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
-
+  time_ = start_time_;
   ExchangeManager<Material> matl_manager(ctx);
   ExchangeManager<GenericResource> genrsrc_manager(ctx);
-  while (date_ < endDate()) {
-    if (date_.day() == 1) {
-      CLOG(LEV_INFO2) << "Current date: " << date_ << " Current time: " << time_ <<
-                      " {";
-      CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " <<
-                       ReportListeners();
-
-      if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
-        Material::DecayAll(time_);
-      }
+  while (time_ < start_time_ + dur_) {
+    CLOG(LEV_INFO2) << " Current time: " << time_;
+    CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " <<
+                     ReportListeners();
+    if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
+      Material::DecayAll(time_);
+    }
       
-      // provides robustness when listeners are added during ticks/tocks
-      for (int i = 0; i < new_tickers_.size(); ++i) {
-        tick_listeners_.push_back(new_tickers_[i]);
-      }
-      new_tickers_.clear();
-
-      SendTick();
-      matl_manager.Execute();
-      genrsrc_manager.Execute();
+    // provides robustness when listeners are added during ticks/tocks
+    for (int i = 0; i < new_tickers_.size(); ++i) {
+      tick_listeners_.push_back(new_tickers_[i]);
     }
+    new_tickers_.clear();
 
-    int eom_day = LastDayOfMonth();
-    for (int i = 1; i < eom_day + 1; i++) {
-      if (i == eom_day) {
-        SendTock();
-        CLOG(LEV_INFO2) << "}";
-      }
-      date_ += boost::gregorian::days(1);
-    }
+    SendTick();
+    matl_manager.Execute();
+    genrsrc_manager.Execute();
+    SendTock();
     
     time_++;
   }
@@ -69,13 +56,6 @@ void Timer::RunSim(Context* ctx) {
   for (it = to_del.begin(); it != to_del.end(); ++it) {
     delete *it;
   }
-}
-
-int Timer::LastDayOfMonth() {
-  int lastDay =
-    boost::gregorian::gregorian_calendar::end_of_month_day(date_.year(),
-                                                           date_.month());
-  return lastDay;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -134,9 +114,6 @@ void Timer::Reset() {
   start_time_ = 0;
   time_ = 0;
   dur_ = 0;
-  start_date_ = boost::gregorian::date();
-  end_date_ = boost::gregorian::date();
-  date_ = boost::gregorian::date();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -167,22 +144,7 @@ void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
   time_ = start;
   dur_ = dur;
 
-  start_date_ = boost::gregorian::date(year0_, month0_, 1);
-  end_date_ = GetEndDate(start_date_, dur_);
-  date_ = boost::gregorian::date(start_date_);
-
   LogTimeData(ctx, handle);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-boost::gregorian::date Timer::GetEndDate(boost::gregorian::date startDate,
-                                         int dur_) {
-  boost::gregorian::date endDate(startDate);
-  endDate += boost::gregorian::months(dur_ - 1);
-  endDate += boost::gregorian::days(
-               boost::gregorian::gregorian_calendar::end_of_month_day(endDate.year(),
-                   endDate.month()) - 1);
-  return endDate;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -198,18 +160,6 @@ Timer::Timer() :
   decay_interval_(0),
   month0_(0),
   year0_(0) {}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int Timer::ConvertDate(int month, int year) {
-  return (year - year0_) * 12 + (month - month0_) + start_time_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::pair<int, int> Timer::ConvertDate(int time) {
-  int month = (time - start_time_) % 12 + 1;
-  int year = (time - start_time_ - (month - 1)) / 12 + year0_;
-  return std::make_pair(month, year);
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::LogTimeData(Context* ctx, std::string handle) {
