@@ -30,7 +30,7 @@ struct ExchangeNode {
  public:
   typedef boost::shared_ptr<ExchangeNode> Ptr;
   
-  explicit ExchangeNode(double max_qty = std::numeric_limits<double>::max());
+  ExchangeNode(double max_qty = std::numeric_limits<double>::max());
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
