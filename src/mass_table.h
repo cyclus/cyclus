@@ -1,6 +1,6 @@
 // mass_table.h
-#if !defined(_MASSTABLE)
-#define _MASSTABLE
+#ifndef CYCLUS_MASS_TABLE_H_
+#define CYCLUS_MASS_TABLE_H_
 
 #include <string>
 #include <vector>
@@ -97,4 +97,4 @@ class MassTable {
 
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_MASS_TABLE_H_

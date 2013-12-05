@@ -1,6 +1,6 @@
 // env.h
-#if !defined(_ENVIRONMENT)
-# define _ENVIRONMENT
+#ifndef CYCLUS_ENV_H_
+#define CYCLUS_ENV_H_
 
 #include <string>
 #include "boost/filesystem.hpp"
@@ -113,5 +113,5 @@ class Env {
 };
 } // namespace cyclus
 
-#endif
+#endif // ifndef CYCLUS_ENV_H_
 

@@ -39,7 +39,7 @@ void EnrichmentTests::SetUp() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EnrichmentTests::TearDown() { }
+void EnrichmentTests::TearDown() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EnrichmentTests::SetEnrichmentParameters() {

@@ -85,6 +85,10 @@ class Material: public Resource {
   /// the simulation and is untracked.
   static Ptr CreateUntracked(double quantity, Composition::Ptr c);
 
+  /// Creates a new material resource that does not actually exist as part of
+  /// the simulation, is untracked, and does not have a known composition.
+  static Ptr CreateBlank(double quantity);
+
   /// Returns the id of the material's internal nuclide composition.
   virtual int state_id() const;
 

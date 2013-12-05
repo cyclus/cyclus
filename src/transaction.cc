@@ -32,7 +32,7 @@ Transaction::Transaction(Model* creator, TransType type, Resource::Ptr res,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Transaction::~Transaction() { }
+Transaction::~Transaction() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Transaction* Transaction::Clone() {

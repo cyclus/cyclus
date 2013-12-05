@@ -19,9 +19,9 @@ class Resource {
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 
-  Resource() : id_(0) { };
+  Resource() : id_(0) {};
 
-  virtual ~Resource() { };
+  virtual ~Resource() {};
 
   /// Returns the unique id corresponding to this resource and its current
   /// state.  All resource id's are unique - even across different resource

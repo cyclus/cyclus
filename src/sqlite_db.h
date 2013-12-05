@@ -1,6 +1,6 @@
 // sqlite_db.h
-#if !defined(_SQLITEDB_H)
-#define _SQLITEDB_H
+#ifndef CYCLUS_SQLITEDB_H_
+#define CYCLUS_SQLITEDB_H_
 
 #include <vector>
 #include <string>
@@ -79,5 +79,5 @@ class SqliteDb {
   bool readonly_;
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_SQLITEDB_H_
 

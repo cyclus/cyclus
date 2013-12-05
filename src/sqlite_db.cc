@@ -16,10 +16,10 @@ SqliteDb::SqliteDb(std::string path, bool readonly)
     isOpen_(false),
     path_(path),
     readonly_(readonly),
-    overwrite_(false) { }
+    overwrite_(false) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SqliteDb::~SqliteDb() { }
+SqliteDb::~SqliteDb() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteDb::Overwrite() {

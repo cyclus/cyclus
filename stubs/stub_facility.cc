@@ -4,7 +4,8 @@ using stubs::StubFacility;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::StubFacility(cyclus::Context* ctx)
-    : cyclus::FacilityModel(ctx)
+    : cyclus::FacilityModel(ctx),
+      cyclus::Model(ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -4,7 +4,8 @@ using stubs::StubInst;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::StubInst(cyclus::Context* ctx)
-    : cyclus::InstModel(ctx)
+    : cyclus::InstModel(ctx),
+      cyclus::Model(ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

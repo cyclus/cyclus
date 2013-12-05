@@ -18,6 +18,8 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel(Context* ctx)
     : TimeAgent(ctx),
+      Trader(ctx),
+      Model(ctx),
       fac_lifetime_(std::numeric_limits<int>::max()) {
   SetModelType("Facility");
 };
@@ -64,6 +66,12 @@ void FacilityModel::InitFrom(Model* m) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::Deploy(Model* parent) {
+  Model::Deploy(parent);
+  context()->RegisterTrader(this);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {
   std::stringstream ss("");
   ss << Model::str() << " with: "
@@ -89,8 +97,8 @@ void FacilityModel::Decommission() {
     throw Error("Cannot decommission " + name());
   }
 
-  CLOG(LEV_INFO3) << name() << " is being decommissioned";
-  delete this;
+  context()->UnregisterTrader(this);
+  Model::Decommission();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -29,7 +29,7 @@ Event::Event(EventManager* m, std::string title)
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event::~Event() { }
+Event::~Event() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Event::title() {

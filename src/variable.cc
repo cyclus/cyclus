@@ -66,28 +66,28 @@ LinearVariable::LinearVariable(Bound lb, Bound ub)
     : Variable(lb, ub, LINEAR),
       lbound_val_(-kLinBoundLimit),
       ubound_val_(kLinBoundLimit) 
-{ }
+{}
 
 // -----------------------------------------------------------------------------
 LinearVariable::LinearVariable(double lb_val, Bound ub)
     : Variable(FINITE, ub, LINEAR),
       lbound_val_(lb_val),
       ubound_val_(kLinBoundLimit) 
-{ }
+{}
   
 // -----------------------------------------------------------------------------
 LinearVariable::LinearVariable(Bound lb, double ub_val)
     : Variable(lb, FINITE, LINEAR),
       lbound_val_(-kLinBoundLimit),
       ubound_val_(ub_val) 
-{ } 
+{} 
 
 // -----------------------------------------------------------------------------
 LinearVariable::LinearVariable(double lb_val, double ub_val)
     : Variable(FINITE, FINITE, LINEAR),
       lbound_val_(lb_val),
       ubound_val_(ub_val) 
-{ }
+{}
 
 // -----------------------------------------------------------------------------
 double LinearVariable::lbound_val() {
@@ -104,28 +104,28 @@ IntegerVariable::IntegerVariable(Bound lb, Bound ub)
     : Variable(lb, ub, INT),
       lbound_val_(-kIntBoundLimit),
       ubound_val_(kIntBoundLimit) 
-{ }
+{}
 
 // -----------------------------------------------------------------------------
 IntegerVariable::IntegerVariable(int lb_val, Bound ub)
     : Variable(FINITE, ub, INT),
       lbound_val_(lb_val),
       ubound_val_(kIntBoundLimit) 
-{ }
+{}
   
 // -----------------------------------------------------------------------------
 IntegerVariable::IntegerVariable(Bound lb, int ub_val)
     : Variable(lb, FINITE, INT),
       lbound_val_(-kIntBoundLimit),
       ubound_val_(ub_val) 
-{ } 
+{} 
 
 // -----------------------------------------------------------------------------
 IntegerVariable::IntegerVariable(int lb_val, int ub_val)
     : Variable(FINITE, FINITE, INT),
       lbound_val_(lb_val),
       ubound_val_(ub_val) 
-{ } 
+{} 
 
 // -----------------------------------------------------------------------------
 int IntegerVariable::lbound_val() {

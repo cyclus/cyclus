@@ -6974,7 +6974,7 @@ int ForkingDeathTest::Wait() {
 class NoExecDeathTest : public ForkingDeathTest {
  public:
   NoExecDeathTest(const char* a_statement, const RE* a_regex) :
-      ForkingDeathTest(a_statement, a_regex) { }
+      ForkingDeathTest(a_statement, a_regex) {}
   virtual TestRole AssumeRole();
 };
 
@@ -7029,7 +7029,7 @@ class ExecDeathTest : public ForkingDeathTest {
  public:
   ExecDeathTest(const char* a_statement, const RE* a_regex,
                 const char* file, int line) :
-      ForkingDeathTest(a_statement, a_regex), file_(file), line_(line) { }
+      ForkingDeathTest(a_statement, a_regex), file_(file), line_(line) {}
   virtual TestRole AssumeRole();
  private:
   // The name of the file in which the death test is located.

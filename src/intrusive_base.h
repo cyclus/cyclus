@@ -65,12 +65,12 @@ template <class Derived> class IntrusiveBase {
 
 protected:
   /// protected because we don't want direct instantiations of
-  IntrusiveBase(): counter_(0) { }
+  IntrusiveBase(): counter_(0) {}
 
-  ~IntrusiveBase() { }
+  ~IntrusiveBase() {}
 
   /// the copy constructor must zero out the ref count
-  IntrusiveBase(const IntrusiveBase&) : counter_(0) { }
+  IntrusiveBase(const IntrusiveBase&) : counter_(0) {}
 
   IntrusiveBase& operator=(const IntrusiveBase&) {
     return *this;

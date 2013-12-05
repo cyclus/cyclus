@@ -44,14 +44,14 @@ typename T::Ptr ResCast(Resource::Ptr r) {
 /// the resources were pushed (i.e. oldest resources are popd first).
 class ResourceBuff {
  public:
-  ResourceBuff() : capacity_(0), qty_(0) { };
+  ResourceBuff() : capacity_(0), qty_(0) {};
 
-  virtual ~ResourceBuff() { };
+  virtual ~ResourceBuff() {};
 
   /// capacity returns the maximum resource quantity this store can hold (units
   /// based on constituent resource objects' units).
   /// Never throws.
-  double capacity() {
+  inline double capacity() const {
     return capacity_;
   };
 

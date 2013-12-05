@@ -1,6 +1,6 @@
 // communicator.h
-#if !defined(_COMMUNICATOR_H)
-#define _COMMUNICATOR_H
+#ifndef CYCLUS_COMMUNICATOR_H_
+#define CYCLUS_COMMUNICATOR_H_
 
 #include <set>
 
@@ -98,9 +98,9 @@ class Communicator {
 
      @param src the Communicator to copy
    */
-  virtual void Copy(Communicator* src) { };
+  virtual void Copy(Communicator* src) {};
 
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_COMMUNICATOR_H_
 

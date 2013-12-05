@@ -9,7 +9,7 @@ namespace cyclus {
 /// output database.
 class Blob {
  public:
-  Blob(std::string s) : str_(s) { };
+  Blob(std::string s) : str_(s) {};
 
   const std::string& str() const {
     return str_;

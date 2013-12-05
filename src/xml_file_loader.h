@@ -1,6 +1,6 @@
 // xml_file_loader.h
-#if !defined(_XMLFILELOADER_H)
-#define _XMLFILELOADER_H
+#ifndef CYCLUS_XML_FILE_LOADER_H_
+#define CYCLUS_XML_FILE_LOADER_H_
 
 #include <map>
 #include <string>
@@ -75,4 +75,4 @@ class XMLFileLoader {
 };
 } // namespace cyclus
 
-#endif
+#endif // ifndef CYCLUS_XML_FILE_LOADER_H_

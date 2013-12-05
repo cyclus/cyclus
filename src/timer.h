@@ -1,6 +1,6 @@
 // timer.h
-#if !defined(_TIMER)
-# define _TIMER
+#ifndef CYCLUS_TIMER_H_
+#define CYCLUS_TIMER_H_
 
 #include <utility>
 #include <vector>
@@ -48,7 +48,7 @@ class Timer {
   /**
      Runs the simulation.
    */
-  void RunSim();
+  void RunSim(Context* ctx);
 
   /**
      registers a sim. agent to receive time step notifications.
@@ -257,6 +257,8 @@ class Timer {
   void SendDailyTasks();
 
 };
+
 } // namespace cyclus
-#endif
+
+#endif // ifndef CYCLUS_TIMER_H_
 

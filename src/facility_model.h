@@ -1,13 +1,15 @@
 // facility_model.h
-#if !defined(_FACILITYMODEL_H)
-#define _FACILITYMODEL_H
+#ifndef CYCLUS_FACILITYMODEL_H_
+#define CYCLUS_FACILITYMODEL_H_
 
 #include <string>
 #include <vector>
+#include <set>
 
+#include "communicator.h"
 #include "model.h"
 #include "time_agent.h"
-#include "communicator.h"
+#include "trader.h"
 
 namespace cyclus {
 
@@ -67,12 +69,7 @@ class InstModel;
    Collaborators are encouraged to add to this list and link to external
    pages that describe how to get the models and the detailed behavior
  */
-
-class FacilityModel : public TimeAgent, public Communicator {
-  /* --------------------
-   * all MODEL classes have these members
-   * --------------------
-   */
+class FacilityModel : public TimeAgent, public Communicator, public Trader {
  public:
   FacilityModel(Context* ctx);
 
@@ -90,63 +87,12 @@ class FacilityModel : public TimeAgent, public Communicator {
    */
   virtual void InitFrom(Model* m);
 
-  virtual void Deploy(Model* parent) {
-    Model::Deploy(parent);
-  }
-
   /**
-     every model should be able to print a verbose description
+     @brief deploys the facility in the simulation
+
+     @param parent the parent of this facility
    */
-  virtual std::string str();
-
-  /* ------------------- */
-
-
-  /* --------------------
-   * all COMMUNICATOR classes have these members
-   * --------------------
-   */
- public:
-  /**
-     There is no default FacilityModel receiver
-
-     Each derived class must implement an offer/request receiver
-   */
-  virtual void ReceiveMessage(Message::Ptr msg) = 0;
-
-  /* ------------------- */
-
-
-  /* --------------------
-   * all FACILITYMODEL classes have these members
-   * --------------------
-   */
- protected:
-  /**
-     each facility should have an institution that manages it
-   */
-  std::string inst_name_;
-
-  /**
-     Most facilities will have a vector of incoming, request commodities.
-     Ultimately, it's up to the facility to utilize this list. However, the
-     user interface is assisted by this specificity in the input scheme.
-     For details, see issue #323 in cyclus/cyclus.
-   */
-  std::vector<std::string> in_commods_;
-
-  /**
-     most facilities will have a vector of outgoing, offer commodities
-     Ultimately, it's up to the facility to utilize this list. However, the
-     user interface is assisted by this specificity in the input scheme.
-     For details, see issue #323 in cyclus/cyclus.
-   */
-  std::vector<std::string> out_commods_;
-
-  /**
-     each facility needs a lifetime
-   */
-  int fac_lifetime_;
+  virtual void Deploy(Model* parent = NULL);
 
   /**
      decommissions the facility, default behavior is for the facility
@@ -160,7 +106,18 @@ class FacilityModel : public TimeAgent, public Communicator {
    */
   virtual bool CheckDecommissionCondition();
 
- public:
+  /**
+     every model should be able to print a verbose description
+   */
+  virtual std::string str();
+
+  /**
+     There is no default FacilityModel receiver
+
+     Each derived class must implement an offer/request receiver
+   */
+  virtual void ReceiveMessage(Message::Ptr msg) = 0;
+
   /**
      Sets the facility's name
      @param facName is the new name of the facility
@@ -251,10 +208,35 @@ class FacilityModel : public TimeAgent, public Communicator {
    */
   virtual void HandleDailyTasks(int time, int day);
 
-  friend class InstModel;
-  /* ------------------- */
+ private:
+  /**
+     each facility should have an institution that manages it
+   */
+  std::string inst_name_;
 
+  /**
+     Most facilities will have a vector of incoming, request commodities.
+     Ultimately, it's up to the facility to utilize this list. However, the
+     user interface is assisted by this specificity in the input scheme.
+     For details, see issue #323 in cyclus/cyclus.
+   */
+  std::vector<std::string> in_commods_;
+
+  /**
+     most facilities will have a vector of outgoing, offer commodities
+     Ultimately, it's up to the facility to utilize this list. However, the
+     user interface is assisted by this specificity in the input scheme.
+     For details, see issue #323 in cyclus/cyclus.
+   */
+  std::vector<std::string> out_commods_;
+
+  /**
+     each facility needs a lifetime
+   */
+  int fac_lifetime_;
+  /* ------------------- */
 };
+
 } // namespace cyclus
 
-#endif
+#endif // ifndef CYCLUS_FACILITYMODEL_H_
