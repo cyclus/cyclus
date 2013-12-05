@@ -37,11 +37,11 @@ TEST(BidTests, MaterialGetSet) {
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
   Request<Material>::Ptr req = get_req();
   
-  Bid<Material> r(req, mat, fac);
+  Bid<Material>::Ptr r = Bid<Material>::Create(req, mat, fac);
 
-  EXPECT_EQ(fac, r.bidder());
-  EXPECT_EQ(req, r.request());
-  EXPECT_EQ(mat, r.offer());
+  EXPECT_EQ(fac, r->bidder());
+  EXPECT_EQ(req, r->request());
+  EXPECT_EQ(mat, r->offer());
   
   delete fac;
 }
@@ -60,11 +60,11 @@ TEST(BidTests, GenRsrcGetSet) {
   Request<GenericResource>::Ptr req(
       new Request<GenericResource>(rsrc, &trader));
   
-  Bid<GenericResource> r(req, rsrc, fac);
+  Bid<GenericResource>::Ptr r = Bid<GenericResource>::Create(req, rsrc, fac);
 
-  EXPECT_EQ(fac, r.bidder());
-  EXPECT_EQ(req, r.request());
-  EXPECT_EQ(rsrc, r.offer());
+  EXPECT_EQ(fac, r->bidder());
+  EXPECT_EQ(req, r->request());
+  EXPECT_EQ(rsrc, r->offer());
   
   delete fac;
 }

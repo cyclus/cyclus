@@ -19,13 +19,13 @@ template <class T>
 class Bid {
  public:
   typedef boost::shared_ptr< Bid<T> > Ptr;
-  
-  Bid(typename Request<T>::Ptr request, 
-      boost::shared_ptr<T> offer,
-      Trader* bidder)
-    : request_(request),
-      offer_(offer),
-      bidder_(bidder){};
+
+  /// @brief a factory method for a bid
+  inline static typename Bid<T>::Ptr Create(typename Request<T>::Ptr request, 
+                                            boost::shared_ptr<T> offer,
+                                            Trader* bidder) {
+    return Ptr(new Bid<T>(request, offer, bidder));
+  }
   
   /// @return the request being responded to
   inline typename Request<T>::Ptr request() const { return request_; }
@@ -45,6 +45,13 @@ class Bid {
   }
 
  private:
+  Bid(typename Request<T>::Ptr request, 
+      boost::shared_ptr<T> offer,
+      Trader* bidder)
+    : request_(request),
+      offer_(offer),
+      bidder_(bidder){};
+
   typename Request<T>::Ptr request_;
   boost::shared_ptr<T> offer_;
   Trader* bidder_;

@@ -37,7 +37,7 @@ static cyclus::Request<cyclus::Material>::Ptr get_req(std::string commod = "") {
 
 static cyclus::Bid<cyclus::Material>::Ptr get_bid() {
   return cyclus::Bid<cyclus::Material>::Ptr(
-      new cyclus::Bid<cyclus::Material>(get_req(), get_mat(), &trader));
+      cyclus::Bid<cyclus::Material>::Create(get_req(), get_mat(), &trader));
 }
 
 struct TestConverter : public cyclus::Converter<cyclus::Material> {

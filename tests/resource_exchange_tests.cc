@@ -150,7 +150,7 @@ class ResourceExchangeTests: public ::testing::Test {
         new Request<Material>(mat, reqr, commod, pref));
     reqr->r_ = req;
     
-    bid = Bid<Material>::Ptr(new Bid<Material>(req, mat, &trader));
+    bid = Bid<Material>::Create(req, mat, &trader);
 
     exchng = new ResourceExchange<Material>(tc.get());
   };
@@ -218,8 +218,8 @@ TEST_F(ResourceExchangeTests, Bids) {
   
   Bidder* bidr = new Bidder(tc.get(), commod);
 
-  bid = Bid<Material>::Ptr(new Bid<Material>(req, mat, bidr));
-  Bid<Material>::Ptr bid1(new Bid<Material>(req1, mat, bidr));
+  bid = Bid<Material>::Create(req, mat, bidr);
+  Bid<Material>::Ptr bid1 = Bid<Material>::Create(req1, mat, bidr);
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(bid);
   bids.push_back(bid1);
@@ -313,8 +313,8 @@ TEST_F(ResourceExchangeTests, PrefValues) {
 
   Bidder* bidr = new Bidder(tc.get(), commod);
 
-  Bid<Material>::Ptr pbid(new Bid<Material>(preq, mat, bidr));
-  Bid<Material>::Ptr cbid(new Bid<Material>(creq, mat, bidr));
+  Bid<Material>::Ptr pbid = Bid<Material>::Create(preq, mat, bidr);
+  Bid<Material>::Ptr cbid = Bid<Material>::Create(creq, mat, bidr);
   
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(pbid);

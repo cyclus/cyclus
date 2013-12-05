@@ -56,10 +56,10 @@ class TradeExecutorTests : public ::testing::Test {
     req1 = Request<Material>::Ptr(new Request<Material>(fac.mat, r1));
     req2 = Request<Material>::Ptr(new Request<Material>(fac.mat, r2));
     // supplier 1 makes a single bid for req1
-    bid1 = Bid<Material>::Ptr(new Bid<Material>(req1, fac.mat, s1));
+    bid1 = Bid<Material>::Create(req1, fac.mat, s1);
     // supplier 2 makes a bid for req1 and req2
-    bid2 = Bid<Material>::Ptr(new Bid<Material>(req1, fac.mat, s2));
-    bid3 = Bid<Material>::Ptr(new Bid<Material>(req2, fac.mat, s2));
+    bid2 = Bid<Material>::Create(req1, fac.mat, s2);
+    bid3 = Bid<Material>::Create(req2, fac.mat, s2);
 
     t1 = Trade<Material>(req1, bid1, amt);
     t2 = Trade<Material>(req1, bid2, amt);
@@ -155,7 +155,7 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
 //   Request<Material>::Ptr req(new Request<Material>(mat, r));
   
 //   Sender* s = new Sender(tc.get(), true);
-//   Bid<Material>::Ptr bid(new Bid<Material>(req, mat, s));
+//   Bid<Material>::Ptr bid = Bid<Material>::Create(req, mat, s);
   
 //   Trade<Material> trade(req, bid, mat->quantity());
 //   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);
