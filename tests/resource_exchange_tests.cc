@@ -53,7 +53,6 @@ class Requester: public MockFacility {
   virtual cyclus::Model* Clone() {
     Requester* m = new Requester(*this);
     m->InitFrom(this);
-    m->r_ = r_;
     m->i_ = i_;
     m->port_ = port_;
     return m;
@@ -62,10 +61,6 @@ class Requester: public MockFacility {
   set<RequestPortfolio<Material>::Ptr> GetMatlRequests() {
     set<RequestPortfolio<Material>::Ptr> rps;
     RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-    // for (int i = 0; i < i_; i++) {
-    //   rp->AddRequest(r_);
-    // }
-    // rps.insert(rp);
     rps.insert(port_);
     req_ctr_++;
     return rps;
@@ -83,7 +78,6 @@ class Requester: public MockFacility {
     pref_ctr_++;
   }
   
-  Request<Material>::Ptr r_;
   RequestPortfolio<Material>::Ptr port_;
   int i_;
   int pref_ctr_;
@@ -103,7 +97,6 @@ class Bidder: public MockFacility {
   virtual cyclus::Model* Clone() {
     Bidder* m = new Bidder(*this);
     m->InitFrom(this);
-    m->bids_ = bids_;
     m->commod_ = commod_;
     m->port_ = port_;
     return m;
@@ -112,18 +105,11 @@ class Bidder: public MockFacility {
   set<BidPortfolio<Material>::Ptr> GetMatlBids(
       const CommodMap<Material>::type& commod_requests) {
     set<BidPortfolio<Material>::Ptr> bps;
-    int sz = commod_requests.at(commod_).size();
-    // BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-    // for (int i = 0; i < sz; i++) {
-    //   bp->AddBid(bids_[i]->request(), bids_[i]->offer(), bids_[i]->bidder());
-    // }
-    // bps.insert(bp);
     bps.insert(port_);
     bid_ctr_++;
     return bps;
   }
 
-  std::vector<Bid<Material>::Ptr> bids_;
   BidPortfolio<Material>::Ptr port_;
   std::string commod_;
   int bid_ctr_;
@@ -152,11 +138,6 @@ class ResourceExchangeTests: public ::testing::Test {
     mat = Material::CreateUntracked(qty, comp);
 
     reqr = new Requester(tc.get());
-    req = Request<Material>::Create(mat, reqr, commod, pref);
-    reqr->r_ = req;
-    
-    bid = Bid<Material>::Create(req, mat, &trader);
-
     exchng = new ResourceExchange<Material>(tc.get());
   };
   
@@ -166,19 +147,6 @@ class ResourceExchangeTests: public ::testing::Test {
   };
   
 };
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, Cloning) {
-  EXPECT_EQ(req, reqr->r_);  
-
-  FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
-  clone->Deploy(clone);
-
-  Requester* cast = dynamic_cast<Requester*>(clone);
-  EXPECT_EQ(req, cast->r_);
-  
-  clone->Decommission();
-}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, Requests) {
@@ -322,18 +290,14 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   ccast->port_ = rp2;
     
   Bidder* bidr = new Bidder(tc.get(), commod);
-
   
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  // Bid<Material>::Ptr pbid = Bid<Material>::Create(preq, mat, bidr);
-  // Bid<Material>::Ptr cbid = Bid<Material>::Create(creq, mat, bidr);
   Bid<Material>::Ptr pbid = bp->AddBid(preq, mat, bidr);
   Bid<Material>::Ptr cbid = bp->AddBid(creq, mat, bidr);
   
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(pbid);
   bids.push_back(cbid);
-  //bidr->bids_ = bids;
   bidr->port_ = bp;
   
   FacilityModel* bclone = dynamic_cast<FacilityModel*>(bidr->Clone());
