@@ -11,7 +11,9 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::Solve() {
-  if (conditioner_ != NULL) conditioner_->Condition(graph_);
+  if (conditioner_ != NULL) {
+    conditioner_->Condition(graph_);
+  }
   
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
