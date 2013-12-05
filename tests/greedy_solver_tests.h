@@ -67,7 +67,8 @@ cyclus::ExchangeGraph SetUp2(double qty, double unit_cap_req,
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::ExchangeGraph SetUp3(double qty, double cap1, double cap2) {
+cyclus::ExchangeGraph SetUp3(double qty, double cap1, double cap2,
+                             double pref1 = 0.0, double pref2 = 0.0) {
   using cyclus::ExchangeGraph;
   using cyclus::ExchangeNode;
   using cyclus::ExchangeNodeGroup;
@@ -87,6 +88,8 @@ cyclus::ExchangeGraph SetUp3(double qty, double cap1, double cap2) {
   v->unit_capacities[a1].push_back(1);
   u->unit_capacities[a2].push_back(1);
   w->unit_capacities[a2].push_back(1);
+  u->prefs[a1] = pref1;
+  u->prefs[a2] = pref2;
 
   RequestGroup::Ptr request(new RequestGroup(qty));
   request->capacities().push_back(qty);
