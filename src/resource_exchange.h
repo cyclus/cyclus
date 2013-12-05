@@ -127,7 +127,7 @@ class ResourceExchange {
     while (m != NULL) {
       AdjustPrefs(m, prefs);
       m = m->parent();
-    }
+    }    
   };
   
   Context* ctx_;

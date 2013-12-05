@@ -39,6 +39,9 @@ struct ExchangeNode {
   /// capacties of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
   std::map<Arc, std::vector<double> > unit_capacities;
+
+  /// @brief preference values for arcs
+  std::map<Arc, double> prefs;
   
   /// @brief the maximum amount of a resource that can be associated with this
   /// node

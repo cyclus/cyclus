@@ -83,7 +83,7 @@ class TestTrader : public MockFacility {
   }
 
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
-    bid = prefs[req][0].first; // obs bid
+    bid = (*prefs[req].begin()).first; // obs bid
     adjusts++;
   };
 
