@@ -1,6 +1,6 @@
 // market_model.h
-#if !defined(_MARKETMODEL_H)
-#define _MARKETMODEL_H
+#ifndef CYCLUS_MARKETMODEL_H_
+#define CYCLUS_MARKETMODEL_H_
 
 #include <deque>
 #include <set>
@@ -46,7 +46,7 @@ namespace cyclus {
    @section thirdPartyImpl Third-party Implementations
    (None)
  */
-class MarketModel : public Model, public Communicator {
+class MarketModel : virtual public Model, public Communicator {
   /* --------------------
    * THIS class has these members
    * --------------------
@@ -167,7 +167,7 @@ class MarketModel : public Model, public Communicator {
 
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_MARKETMODEL_H_
 
 
 

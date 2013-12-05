@@ -17,7 +17,7 @@ namespace fs = boost::filesystem;
 
 class DirDel {
  public:
-  DirDel(std::string path) : path_(path) { };
+  DirDel(std::string path) : path_(path) {};
   ~DirDel() {
     fs::remove_all(path);
   };

@@ -17,7 +17,6 @@ namespace cyclus {
 
 // static members
 int Model::next_id_ = 0;
-std::vector<Model*> Model::model_list_;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> Model::dynamic_module_types() {
@@ -27,39 +26,6 @@ std::set<std::string> Model::dynamic_module_types() {
   types.insert("Inst");
   types.insert("Facility");
   return types;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::GetModelByName(std::string name) {
-  Model* found_model = NULL;
-
-  for (int i = 0; i < model_list_.size(); i++) {
-    if (name == model_list_.at(i)->name()) {
-      found_model = model_list_.at(i);
-      break;
-    }
-  }
-
-  if (found_model == NULL) {
-    std::string err_msg = "Model '" + name + "' doesn't exist.";
-    throw KeyError(err_msg);
-  }
-  return found_model;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::PrintModelList() {
-  CLOG(LEV_INFO1) << "There are " << model_list_.size() << " models.";
-  CLOG(LEV_INFO3) << "Model list {";
-  for (int i = 0; i < model_list_.size(); i++) {
-    CLOG(LEV_INFO3) << model_list_.at(i)->str();
-  }
-  CLOG(LEV_INFO3) << "}";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Model*> Model::GetModelList() {
-  return Model::model_list_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -86,7 +52,7 @@ Model::Model(Context* ctx)
     deathtime_(-1),
     parent_(NULL) {
   MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
-  model_list_.push_back(this);
+  ctx_->AddModel(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -100,9 +66,9 @@ Model::~Model() {
     ->AddVal("DeathDate", deathtime_)
     ->Record();
   }
-
+  
   // remove references to self
-  RemoveFromList(this, model_list_);
+  RemoveFromList(this, ctx_->model_list());
 
   if (parent_ != NULL) {
     parent_->RemoveChild(this);
@@ -141,13 +107,14 @@ std::string Model::str() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Deploy(Model* parent) {
-
   CLOG(LEV_DEBUG1) << "Model '" << name()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
   CLOG(LEV_DEBUG3) << " * Implementation: " << ModelImpl();
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
+  if (parent == NULL) parent = this;
+  
   // set model-specific members
   parent_id_ = parent->id();
   SetParent(parent);
@@ -161,6 +128,12 @@ void Model::Deploy(Model* parent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Model::Decommission() {
+  CLOG(LEV_INFO3) << name() << " is being decommissioned";
+  delete this;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::SetParent(Model* parent) {
   if (parent == this) {
     // root nodes are their own parent
@@ -169,18 +142,6 @@ void Model::SetParent(Model* parent) {
     parent_ = parent;
   }
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Model::parent() {
-  // if parent pointer is null, throw an error
-  if (parent_ == NULL) {
-    std::string null_err = "You have tried to access the parent of " +  \
-                           this->name() + " but the parent pointer is NULL.";
-    throw ValueError(null_err);
-  }
-  // else return pointer to parent
-  return parent_;
-};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddChild(Model* child) {
@@ -227,8 +188,8 @@ std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
   std::stringstream ss("");
   ss << m->name() << std::endl;
   ret.push_back(ss.str());
-  for (int i = 0; i < m->NChildren(); i++) {
-    std::vector<std::string> outs = GetTreePrintOuts(m->children(i));
+  for (int i = 0; i < m->children().size(); i++) {
+    std::vector<std::string> outs = GetTreePrintOuts(m->children().at(i));
     for (int j = 0; j < outs.size(); j++) {
       ss.str("");
       ss << "\t" << outs.at(j) << std::endl;

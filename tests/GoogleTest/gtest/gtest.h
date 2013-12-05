@@ -3257,8 +3257,8 @@ namespace internal {
 
 class GTEST_API_ FilePath {
  public:
-  FilePath() : pathname_("") { }
-  FilePath(const FilePath& rhs) : pathname_(rhs.pathname_) { }
+  FilePath() : pathname_("") {}
+  FilePath(const FilePath& rhs) : pathname_(rhs.pathname_) {}
 
   explicit FilePath(const char* pathname) : pathname_(pathname) {
     Normalize();
@@ -8024,12 +8024,12 @@ class GTEST_API_ DeathTest {
   static bool Create(const char* statement, const RE* regex,
                      const char* file, int line, DeathTest** test);
   DeathTest();
-  virtual ~DeathTest() { }
+  virtual ~DeathTest() {}
 
   // A helper class that aborts a death test when it's deleted.
   class ReturnSentinel {
    public:
-    explicit ReturnSentinel(DeathTest* test) : test_(test) { }
+    explicit ReturnSentinel(DeathTest* test) : test_(test) {}
     ~ReturnSentinel() { test_->Abort(TEST_ENCOUNTERED_RETURN_STATEMENT); }
    private:
     DeathTest* const test_;
@@ -8084,7 +8084,7 @@ class GTEST_API_ DeathTest {
 // Factory interface for death tests.  May be mocked out for testing.
 class DeathTestFactory {
  public:
-  virtual ~DeathTestFactory() { }
+  virtual ~DeathTestFactory() {}
   virtual bool Create(const char* statement, const RE* regex,
                       const char* file, int line, DeathTest** test) = 0;
 };
@@ -18636,7 +18636,7 @@ class GTEST_API_ AssertHelper {
                      const char* srcfile,
                      int line_num,
                      const char* msg)
-        : type(t), file(srcfile), line(line_num), message(msg) { }
+        : type(t), file(srcfile), line(line_num), message(msg) {}
 
     TestPartResult::Type const type;
     const char*        const file;

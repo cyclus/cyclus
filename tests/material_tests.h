@@ -52,5 +52,5 @@ class MaterialTest : public ::testing::Test {
     th228_halflife_ = 2 * 11; // approximate, in months
   }
 
-  virtual void TearDown() { }
+  virtual void TearDown() {}
 };

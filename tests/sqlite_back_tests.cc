@@ -11,7 +11,7 @@ static std::string const path = "testdb.sqlite";
 
 class FlushCatcher: public cyclus::SqliteBack {
 public:
-  FlushCatcher(std::string path) : SqliteBack(path) { };
+  FlushCatcher(std::string path) : SqliteBack(path) {};
   cyclus::StrList cmds;
 
 protected:

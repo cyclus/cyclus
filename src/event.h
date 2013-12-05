@@ -1,6 +1,6 @@
 // event.h
-#if !defined(_EVENT_H)
-#define _EVENT_H
+#ifndef CYCLUS_EVENT_H_
+#define CYCLUS_EVENT_H_
 
 #include <list>
 #include <string>
@@ -64,4 +64,4 @@ class Event {
   Vals vals_;
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_EVENT_H_

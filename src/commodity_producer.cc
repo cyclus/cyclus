@@ -8,18 +8,18 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodInfo::CommodInfo()
   : capacity(0),
-    cost(kModifierLimit) { }
+    cost(kModifierLimit) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodInfo::CommodInfo(double a_capacity,
                                            double a_cost)
   : capacity(a_capacity),
-    cost(a_cost) { }
+    cost(a_cost) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducer::CommodityProducer()
   : default_capacity_(0.0),
-    default_cost_(kModifierLimit) { }
+    default_cost_(kModifierLimit) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducer::~CommodityProducer() {}

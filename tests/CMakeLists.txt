@@ -1,6 +1,6 @@
-##############################################################################################
-#################################### begin google test #######################################
-##############################################################################################
+###############################################################################
+#################################### begin google test ########################
+###############################################################################
 
 # Be sure to clear these each time
 SET( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
@@ -51,13 +51,13 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
   COMPONENT testing
   )
 
-##############################################################################################
-##################################### end google test ########################################
-##############################################################################################
+###############################################################################
+##################################### end google test #########################
+###############################################################################
 
-##############################################################################################
-################################### begin cyclus testing #####################################
-##############################################################################################
+###############################################################################
+################################### begin cyclus testing ######################
+###############################################################################
 
 INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
@@ -67,37 +67,54 @@ ADD_SUBDIRECTORY(test_modules)
 # added to ctest.
 set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   # --
+  ${CMAKE_CURRENT_SOURCE_DIR}/bid_portfolio_tests.cc  
+  ${CMAKE_CURRENT_SOURCE_DIR}/bid_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/capacity_constraint_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/context_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_context_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_solver_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/full_sim_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/market_player_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/message_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/resource_exchange_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/trade_executor_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/variable_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc
@@ -147,6 +164,6 @@ add_custom_command(TARGET ${tgt}
   VERBATIM
   )
 
-##############################################################################################
-#################################### end cyclus testing ######################################
-##############################################################################################
+###############################################################################
+#################################### end cyclus testing #######################
+###############################################################################

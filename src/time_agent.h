@@ -1,6 +1,6 @@
 // time_agent.h
-#if !defined(_TIMEAGENT_H)
-#define _TIMEAGENT_H
+#ifndef CYCLUS_TIMEAGENT_H_
+#define CYCLUS_TIMEAGENT_H_
 
 #include <string>
 
@@ -14,10 +14,10 @@ namespace cyclus {
    that requires knowlege of ticks and tocks.
  */
 
-class TimeAgent : public Model {
+class TimeAgent : virtual public Model {
  public:
 
-  TimeAgent(Context* ctx) : Model(ctx) { };
+  TimeAgent(Context* ctx) : Model(ctx) {};
 
   /**
      destructor
@@ -50,5 +50,5 @@ class TimeAgent : public Model {
 
 };
 } // namespace cyclus
-#endif
+#endif // ifndef CYCLUS_TIMEAGENT_H_
 

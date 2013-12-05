@@ -63,7 +63,7 @@ TEST(CycloptsObjectiveFunctionTests, Constructor) {
 // class for parameterized constraint function testing
 class ConstraintTests :
     public
-::testing::TestWithParam<cyclus::Constraint::EqualityRelation> { };
+::testing::TestWithParam<cyclus::Constraint::EqualityRelation> {};
 
 // parameterized test
 TEST_P(ConstraintTests, Constructor) {

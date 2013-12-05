@@ -4,7 +4,8 @@ using stubs::StubRegion;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubRegion::StubRegion(cyclus::Context* ctx)
-    : cyclus::RegionModel(ctx)
+    : cyclus::RegionModel(ctx),
+      cyclus::Model(ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -16,7 +16,7 @@ BuildOrder::BuildOrder(int n, Builder* b,
                        CommodityProducer* cp) :
   number(n),
   builder(b),
-  producer(cp) { }
+  producer(cp) {}
 
 // -------------------------------------------------------------------
 ProblemInstance::ProblemInstance(
@@ -29,13 +29,13 @@ ProblemInstance::ProblemInstance(
     unmet_demand(demand),
     interface(sinterface),
     constraint(constr),
-    solution(soln) { }
+    solution(soln) {}
 
 // -------------------------------------------------------------------
-BuildingManager::BuildingManager() { }
+BuildingManager::BuildingManager() {}
 
 // -------------------------------------------------------------------
-BuildingManager::~BuildingManager() { }
+BuildingManager::~BuildingManager() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManager::RegisterBuilder(Builder* builder) {

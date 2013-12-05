@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <set>
 
 #include "composition.h"
 #include "event_manager.h"
@@ -13,6 +14,7 @@ namespace cyclus {
 
 class EventManager;
 class Event;
+class Trader;
 class MarketModel;
 class Timer;
 class TimeAgent;
@@ -33,6 +35,36 @@ class Context {
 
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Model* m);
+
+  /// Adds a model to a simulation-wide accessible list.
+  inline void AddModel(Model* m) { model_list_.push_back(m); }
+
+  /**
+     returns a model given the prototype's name
+
+     @param name name of the prototype as defined in the input file
+     @throws KeyError if name is not found
+   */
+  Model* GetModelByName(std::string name);
+  
+  /// Access the simulation-wide model list.
+  inline const std::vector<Model*>& model_list() const { return model_list_; }
+  inline std::vector<Model*>& model_list() { return model_list_; }
+
+  /// Registers an agent as a participant in resource exchanges
+  inline void RegisterTrader(Trader* e) {
+    traders_.insert(e);
+  }
+
+  /// Unregisters an agent as a participant in resource exchanges
+  inline void UnregisterTrader(Trader* e) {
+    traders_.erase(e);
+  }
+
+  /// @return the current set of facilities in the simulation
+  inline const std::set<Trader*>& traders() const {
+      return traders_;
+  }
 
   /// Create a new model by cloning the named prototype. The returned model is
   /// not initialized as a simulation participant.
@@ -69,7 +101,8 @@ class Context {
   /// See Timer::RegisterResolveListener documentation.
   void RegisterResolver(MarketModel* mkt);
 
-  /// Initializes the simulation time parameters. Should only be called once - NOT idempotent.
+  /// Initializes the simulation time parameters. Should only be called once -
+  /// NOT idempotent.
   void InitTime(int start, int duration, int decay, int m0 = 1, int y0 = 2010,
                 std::string handle = "");
 
@@ -85,12 +118,18 @@ class Context {
   /// See EventManager::NewEvent documentation.
   Event* NewEvent(std::string title);
 
+  /// @return the next transaction id
+  inline int NextTransactionID() { return trans_id_++; }
+      
  private:
   std::map<std::string, Model*> protos_;
+  std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
-
+  std::vector<Model*> model_list_;
+  
   Timer* ti_;
   EventManager* em_;
+  int trans_id_;
 };
 
 } // namespace cyclus

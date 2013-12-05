@@ -13,7 +13,9 @@
  */
 class TestInst: public cyclus::InstModel {
  public:
-  TestInst(cyclus::Context* ctx) : cyclus::InstModel(ctx) { };
+  TestInst(cyclus::Context* ctx)
+      : cyclus::InstModel(ctx),
+        cyclus::Model(ctx) {};      
 
   virtual ~TestInst() {};
 

@@ -73,16 +73,16 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/event_manager.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/logger.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/market_model.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/market_player.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/market_player_manager.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
@@ -112,9 +112,12 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 
 INSTALL(FILES
   any.hpp
+  bid.h
+  bid_portfolio.h
   blob.h
   builder.h
   building_manager.h
+  capacity_constraint.h
   cbc_solver.h
   commodity.h
   commodity_producer.h
@@ -135,6 +138,12 @@ INSTALL(FILES
   event.h
   event_backend.h
   event_manager.h
+  exchange_context.h
+  exchange_graph.h
+  exchange_manager.h
+  exchange_solver.h 
+  exchange_translator.h
+  exchange_translation_context.h
   facility_model.h
   function.h
   generic_resource.h
@@ -144,8 +153,6 @@ INSTALL(FILES
   l_matrix.h
   logger.h
   market_model.h
-  market_player.h
-  market_player_manager.h
   mass_table.h
   mat_query.h
   material.h
@@ -154,9 +161,12 @@ INSTALL(FILES
   query_engine.h 
   region_model.h
   relax_ng_validator.h 
+  request.h
+  request_portfolio.h
   res_tracker.h
   resource.h
   resource_buff.h
+  resource_exchange.h
   solver.h
   solver_interface.h
   sqlite_back.h
@@ -168,6 +178,10 @@ INSTALL(FILES
   symbolic_functions.h
   time_agent.h
   timer.h
+  trade.h
+  trade_executor.h
+  trader.h
+  trader_management.h
   transaction.h
   uniform_taylor.h
   unix_helper_functions.h

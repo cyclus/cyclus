@@ -11,9 +11,13 @@
 #include "dynamic_module.h"
 #include "transaction.h"
 #include "query_engine.h"
+#include "exchange_context.h"
 
 namespace cyclus {
 
+class Material;
+class GenericResource;
+  
 /**
    defines the possible model types
 
@@ -49,23 +53,6 @@ class Model {
   static std::set<std::string> dynamic_module_types();
 
   /**
-     returns a model given the template's name
-
-     @param name name of the template as defined in the input file
-   */
-  static Model* GetModelByName(std::string name);
-
-  /**
-     prints the current list of models
-   */
-  static void PrintModelList();
-
-  /**
-     returns the current list of models
-   */
-  static std::vector<Model*> GetModelList();
-
-  /**
      Initialize members related to core classes
      @param qe a pointer to a QueryEngine object containing initialization data
    */
@@ -91,14 +78,6 @@ class Model {
   virtual ~Model();
 
   /**
-  Returns a module's xml rng schema for initializing from input files. All
-  concrete models should override this method.
-  */
-  virtual std::string schema() {
-    return "<text />\n";
-  };
-
-  /**
      Return a newly created/allocated prototype that is an exact copy of this.
      This method should ONLY be impelemented by the LEAVES of the model
      inheritance hierarchy (i.e. not superclasses). It must call the
@@ -107,7 +86,7 @@ class Model {
      Example:
 
      @code
-     class MyModelClass : public Model {
+     class MyModelClass : virtual public Model {
        ...
 
        virtual Model* Clone() {
@@ -127,91 +106,9 @@ class Model {
   virtual Model* Clone() = 0;
 
   /**
-     get model instance name
-   */
-  const std::string name() const {
-    return name_;
-  };
-
-  /**
-     set model instance name
-   */
-  void SetName(std::string name) {
-    name_ = name;
-  };
-
-  /**
-     get model instance SN
-   */
-  const int id() const {
-    return id_;
-  };
-
-  /**
      get model implementation name
    */
   const std::string ModelImpl();
-
-  /**
-     set model implementation
-   */
-  void SetModelImpl(std::string new_impl) {
-    model_impl_ = new_impl;
-  };
-
-  /**
-     get model type
-   */
-  const std::string ModelType() {
-    return model_type_;
-  };
-
-  /**
-     set model type
-   */
-  void SetModelType(std::string new_type) {
-    model_type_ = new_type;
-  };
-
-  /**
-   Returns this model's current simulation context.
-   */
-  Context* context() {
-    return ctx_;
-  };
-
-  /**
-     every model should be able to print a verbose description
-   */
-  virtual std::string str();
-
-  /**
-     return parent of this model
-   */
-  Model* parent();
-
-  /**
-     return the parent' id
-   */
-  int parent_id() {
-    return parent_id_;
-  };
-
-  /**
-     returns the time this model began operation (-1 if the model has never been
-     deployed).
-   */
-  int birthtime() {
-    return birthtime_;
-  };
-
-  /**
-     returns the time this model ceased operation (-1 if the model is still
-     operating).
-   */
-  int deathtime() {
-    return deathtime_;
-  };
 
   /**
      add a child to the list of children.
@@ -224,13 +121,6 @@ class Model {
      add a child to the list of children
    */
   void RemoveChild(Model* child);
-
-  /**
-     Return the number of children the model has
-   */
-  int NChildren() {
-    return children_.size();
-  }
 
   /**
      recursively prints the parent-child tree
@@ -249,20 +139,18 @@ class Model {
      module-level enter simulation methods
      @param parent this model's parent
    */
-  virtual void Deploy(Model* parent);
+  virtual void Deploy(Model* parent = NULL);
+
+  /**
+     decommissions the model, removing it from the simulation
+   */
+  virtual void Decommission();
 
   /**
      sets the parent_ member
      @param parent the model to set parent_ to
    */
   virtual void SetParent(Model* parent);
-
-  /**
-     return the ith child
-   */
-  Model* children(int i) {
-    return children_[i];
-  }
 
   /**
      Transacted resources are extracted through this method.
@@ -292,6 +180,91 @@ class Model {
   virtual void AddResource(Transaction trans,
                            std::vector<Resource::Ptr> manifest);
 
+  /** @brief default implementation for material preferences */
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};
+  
+  /** @brief default implementation for material preferences */
+  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) {};
+
+  /**
+  Returns a module's xml rng schema for initializing from input files. All
+  concrete models should override this method.
+  */
+  virtual std::string schema() {
+    return "<text />\n";
+  };
+
+  /**
+     get model instance name
+   */
+  inline const std::string name() const { return name_; }
+
+  /**
+     set model instance name
+   */
+  inline void SetName(std::string name) { name_ = name; }
+
+  /**
+     get model instance SN
+   */
+  inline const int id() const { return id_; }
+
+  /**
+     set model implementation
+   */
+  inline void SetModelImpl(std::string new_impl) {
+    model_impl_ = new_impl;
+  }
+
+  /**
+     get model type
+   */
+  inline const std::string ModelType() const { return model_type_; }
+
+  /**
+     set model type
+   */
+  inline void SetModelType(std::string new_type) {
+    model_type_ = new_type;
+  };
+
+  /**
+   Returns this model's current simulation context.
+   */
+  inline Context* context() const { return ctx_; }
+
+  /**
+     every model should be able to print a verbose description
+   */
+  virtual std::string str();
+
+  /**
+     return parent of this model
+   */
+  inline Model* parent() const { return parent_; }
+
+  /**
+     return the parent' id
+   */
+  inline const int parent_id() const { return parent_id_; }
+
+  /**
+     returns the time this model began operation (-1 if the model has never been
+     deployed).
+   */
+  inline const int birthtime() const { return birthtime_; }
+
+  /**
+     returns the time this model ceased operation (-1 if the model is still
+     operating).
+   */
+  inline const int deathtime() const { return deathtime_; }
+
+  /**
+     @return a list of children this model has
+   */
+  inline const std::vector<Model*>& children() const { return children_; }
+  
  protected:
   /**
      A method that must be implemented by and only by classes in the model
@@ -299,9 +272,26 @@ class Model {
      superclass' InitFrom method. The InitFrom method should only initialize
      this class' members - not inherited state.
 
-     @param m the model containing state that should be used to initialize this model.
+     @param m the model containing state that should be used to initialize this
+     model.
   */
   virtual void InitFrom(Model* m);
+
+ private:
+  /**
+     add an agent to the transactiont table
+   */
+  void AddToTable();
+
+  /**
+     used to remove model instance refs from static model lists
+   */
+  void RemoveFromList(Model* model, std::vector<Model*>& mlist);
+
+  /**
+     Stores the next available facility ID
+   */
+  static int next_id_;
 
   /**
      children of this model
@@ -312,22 +302,6 @@ class Model {
      parent of this model
    */
   Model* parent_;
-
- private:
-  /**
-     Stores the next available facility ID
-   */
-  static int next_id_;
-
-  /**
-     comprehensive list of all initialized models.
-   */
-  static std::vector<Model*> model_list_;
-
-  /**
-     used to remove model instance refs from static model lists
-   */
-  void RemoveFromList(Model* model, std::vector<Model*>& mlist);
 
   /**
      parent's ID of this model
@@ -367,13 +341,9 @@ class Model {
   int id_;
 
   Context* ctx_;
-
-  /**
-     add an agent to the transactiont table
-   */
-  void AddToTable();
-
 };
+
 } // namespace cyclus
+
 #endif
 

@@ -14,14 +14,16 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieModel : public cyclus::FacilityModel {
  public:
-  DieModel(cyclus::Context* ctx) : FacilityModel(ctx) {
+  DieModel(cyclus::Context* ctx)
+      : FacilityModel(ctx),
+        cyclus::Model(ctx)  {
     tickCount_ = 0;
     tockCount_ = 0;
   };
 
   virtual ~DieModel() {};
 
-  virtual void ReceiveMessage(cyclus::Message::Ptr msg) { };
+  virtual void ReceiveMessage(cyclus::Message::Ptr msg) {};
   virtual void CloneModuleMembersFrom(FacilityModel* source) {};
   virtual void Decommission() {
     delete this;
@@ -88,7 +90,7 @@ class InstModelClassTests : public ::testing::Test {
 TEST_F(InstModelClassTests, TockIter) {
   child2_->SetFacLifetime(0);
 
-  EXPECT_EQ(inst_->NChildren(), 5);
+  EXPECT_EQ(inst_->children().size(), 5);
   ASSERT_NO_THROW(inst_->HandleTock(0));
   EXPECT_EQ(DieModel::totalTocks, 5);
   EXPECT_EQ(child1_->tockCount_, 1);
@@ -99,7 +101,7 @@ TEST_F(InstModelClassTests, TockIter) {
   child1_->SetFacLifetime(0);
   child3_->SetFacLifetime(0);
 
-  EXPECT_EQ(inst_->NChildren(), 4);
+  EXPECT_EQ(inst_->children().size(), 4);
   ASSERT_NO_THROW(inst_->HandleTock(1));
   EXPECT_EQ(DieModel::totalTocks, 9);
   EXPECT_EQ(child4_->tockCount_, 2);

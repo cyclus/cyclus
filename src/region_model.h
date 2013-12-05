@@ -1,6 +1,6 @@
 // Regionmodel.h
-#if !defined(_REGIONMODEL_H)
-#define _REGIONMODEL_H
+#ifndef CYCLUS_REGIONMODEL_H_
+#define CYCLUS_REGIONMODEL_H_
 
 #include <set>
 
@@ -96,7 +96,6 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   virtual std::string str();
 
- public:
   /**
      default RegionModel receiver is to ignore messages
    */
@@ -128,11 +127,14 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   virtual void HandleDailyTasks(int time, int day);
 
- public:
+  /* --------------------
+   * all REGIONMODEL classes have these members
+   * --------------------
+   */
   /**
      returns if the facility is in this region's allowed facs
    */
-  bool IsAllowedFacility(std::string proto_name) {
+  inline bool IsAllowedFacility(std::string proto_name) {
     return (allowedFacilities_.find(proto_name)
             != allowedFacilities_.end());
   } ;
@@ -159,6 +161,7 @@ class RegionModel : public TimeAgent, public Communicator {
    */
   virtual void AddChildrenToTree();
 
+ private:
   /**
      every region has a list of allowed facilities
    */
@@ -168,6 +171,9 @@ class RegionModel : public TimeAgent, public Communicator {
      the names of the institutions in this region
    */
   std::set<std::string> inst_names_;
+  /* ------------------- */
 };
+
 } // namespace cyclus
-#endif
+
+#endif // ifndef CYCLUS_REGIONMODEL_H_

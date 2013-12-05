@@ -45,7 +45,7 @@ class GenericResource : public Resource {
 
   virtual Resource::Ptr Clone() const;
 
-  virtual void Record(Context* ctx) const { };
+  virtual void Record(Context* ctx) const {};
 
   virtual std::string units() const {
     return units_;

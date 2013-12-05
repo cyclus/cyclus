@@ -2,22 +2,29 @@
 // Implements the Timer class
 
 #include "timer.h"
-
 #include <string>
 #include <iostream>
 
 #include "error.h"
 #include "logger.h"
 #include "material.h"
+#include "generic_resource.h"
+#include "exchange_manager.h"
+#include "greedy_solver.h"
 
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::RunSim() {
+void Timer::RunSim(Context* ctx) {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
                   << start_date_ << " to end=" << end_date_;
   time_ = start_time_;
   CLOG(LEV_INFO1) << "Beginning simulation";
+
+  
+  GreedySolver solver;
+  ExchangeManager<Material> matl_manager(ctx, &solver);
+  ExchangeManager<GenericResource> genrsrc_manager(ctx, &solver);
   while (date_ < endDate()) {
     if (date_.day() == 1) {
       CLOG(LEV_INFO2) << "Current date: " << date_ << " Current time: " << time_ <<
@@ -28,14 +35,16 @@ void Timer::RunSim() {
       if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
         Material::DecayAll(time_);
       }
-
+      
       // provides robustness when listeners are added during ticks/tocks
       for (int i = 0; i < new_tickers_.size(); ++i) {
         tick_listeners_.push_back(new_tickers_[i]);
       }
       new_tickers_.clear();
+
       SendTick();
-      SendResolve();
+      matl_manager.Execute();
+      genrsrc_manager.Execute();
     }
 
     int eom_day = LastDayOfMonth();
@@ -47,23 +56,21 @@ void Timer::RunSim() {
       }
       date_ += boost::gregorian::days(1);
     }
-
+    
     time_++;
   }
 
   // initiate deletion of models that don't have parents.
   // dealloc will propogate through hierarchy as models delete their children
-  int count = 0;
-  while (Model::GetModelList().size() > 0) {
-    Model* model = Model::GetModelList().at(count);
-    try {
-      model->parent();
-    } catch (ValueError err) {
-      delete model;
-      count = 0;
-      continue;
-    }
-    count++;
+  std::vector<Model*>::iterator it;
+  std::vector<Model*> to_del;
+  std::vector<Model*> models = ctx->model_list();
+  for (it = models.begin(); it != models.end(); ++it) {
+    if((*it)->parent() == NULL) to_del.push_back(*it);
+  }
+  
+  for (it = to_del.begin(); it != to_del.end(); ++it) {
+    delete *it;
   }
 }
 
@@ -222,7 +229,7 @@ Timer::Timer() :
   dur_(0),
   decay_interval_(0),
   month0_(0),
-  year0_(0) { }
+  year0_(0) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::ConvertDate(int month, int year) {

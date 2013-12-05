@@ -74,7 +74,7 @@ class QueryEngineTests  : public ::testing::Test {
   }
 
   virtual void TearDown() {
-    delete ptqe;
+    delete pqe;
   }
   
 

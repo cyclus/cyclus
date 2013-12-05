@@ -11,7 +11,7 @@
 
 class TrackerMessage : public cyclus::Message {
   public:
-    TrackerMessage(cyclus::Communicator* originator) : cyclus::Message(originator) { }
+    TrackerMessage(cyclus::Communicator* originator) : cyclus::Message(originator) {}
 
     std::vector<std::string> dest_list_;
 };
@@ -33,7 +33,7 @@ class TestCommunicator : public cyclus::Communicator {
       down_up_count_ = 0;
     }
 
-    virtual ~TestCommunicator() { }
+    virtual ~TestCommunicator() {}
 
     cyclus::Communicator* parent_;
     cyclus::Message::Ptr msg_;
