@@ -219,8 +219,11 @@ TEST(ExXlateTests, XlateArc) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, SimpleXlate) {
+  std::string commod = "c";
+  double pref = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader);
+  Request<Material>::Ptr req =
+      rport->AddRequest(get_mat(u235, qty), &trader, commod, pref);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
   bport->AddBid(req, get_mat(u235, qty), &trader);
@@ -238,6 +241,8 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(2, graph->node_arc_map().size());
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
+  const Arc& a = *graph->arcs().begin();
+  EXPECT_EQ(pref, a.first->prefs[a]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
