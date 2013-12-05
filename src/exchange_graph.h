@@ -47,6 +47,9 @@ struct ExchangeNode {
   /// @brief a running total of the amount of resource associated with this
   /// node
   double qty;
+
+  /// @brief the commodity associated with this exchange node
+  std::string commod;
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator

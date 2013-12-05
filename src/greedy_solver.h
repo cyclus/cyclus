@@ -21,7 +21,8 @@ class GreedyPreconditioner;
 ///   2) All SupplySets are at capacity
 class GreedySolver: public ExchangeSolver {
  public:
-  GreedySolver() {};
+  GreedySolver(GreedyPreconditioner* c = NULL) : conditioner_(c) {};
+  
   GreedySolver(ExchangeGraph* g, GreedyPreconditioner* c = NULL)
     : conditioner_(c),
       ExchangeSolver(g) {};
