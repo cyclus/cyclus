@@ -55,16 +55,18 @@ class Requester: public MockFacility {
     m->InitFrom(this);
     m->r_ = r_;
     m->i_ = i_;
+    m->port_ = port_;
     return m;
   };
   
   set<RequestPortfolio<Material>::Ptr> GetMatlRequests() {
     set<RequestPortfolio<Material>::Ptr> rps;
     RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-    for (int i = 0; i < i_; i++) {
-      rp->AddRequest(r_);
-    }
-    rps.insert(rp);
+    // for (int i = 0; i < i_; i++) {
+    //   rp->AddRequest(r_);
+    // }
+    // rps.insert(rp);
+    rps.insert(port_);
     req_ctr_++;
     return rps;
   }
@@ -82,6 +84,7 @@ class Requester: public MockFacility {
   }
   
   Request<Material>::Ptr r_;
+  RequestPortfolio<Material>::Ptr port_;
   int i_;
   int pref_ctr_;
   int req_ctr_;
@@ -179,10 +182,13 @@ TEST_F(ResourceExchangeTests, Cloning) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, Requests) {
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  req = rp->AddRequest(mat, reqr, commod, pref);
+  reqr->port_ = rp;
+  
   FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
   clone->Deploy(clone);
   Requester* rcast = dynamic_cast<Requester*>(clone);
-
   EXPECT_EQ(0, rcast->req_ctr_);
   exchng->AddAllRequests();
   EXPECT_EQ(1, rcast->req_ctr_);
@@ -190,8 +196,6 @@ TEST_F(ResourceExchangeTests, Requests) {
   
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
-  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  rp->AddRequest(req);
   const std::vector<RequestPortfolio<Material>::Ptr>& obsvp = ctx.requests;
   EXPECT_EQ(1, obsvp.size());
   EXPECT_TRUE(RPEq(*rp.get(), *obsvp[0].get()));
@@ -210,10 +214,8 @@ TEST_F(ResourceExchangeTests, Bids) {
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req1 = Request<Material>::Create(mat, reqr, commod, pref);
-  
-  rp->AddRequest(req);
-  rp->AddRequest(req1);
+  req = rp->AddRequest(mat, reqr, commod, pref);
+  Request<Material>::Ptr req1 = rp->AddRequest(mat, reqr, commod, pref);
   ctx.AddRequestPortfolio(rp);
   const std::vector<Request<Material>::Ptr>& reqs = ctx.commod_requests[commod];
   EXPECT_EQ(2, reqs.size());  
@@ -273,13 +275,13 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   Requester* ccast = dynamic_cast<Requester*>(child);
 
   // doin a little magic to simulate each requester making their own request
-  Request<Material>::Ptr preq =
-      Request<Material>::Create(mat, pcast, commod, pref);
-  pcast->r_ = preq;
-  Request<Material>::Ptr creq =
-      Request<Material>::Create(mat, ccast, commod, pref);
-  ccast->r_ = creq;
-  
+  RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
+  Request<Material>::Ptr preq = rp1->AddRequest(mat, pcast, commod, pref);
+  pcast->port_ = rp1;
+  RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
+  Request<Material>::Ptr creq = rp2->AddRequest(mat, ccast, commod, pref);
+  ccast->port_ = rp2;
+    
   EXPECT_EQ(0, pcast->req_ctr_);
   EXPECT_EQ(0, ccast->req_ctr_);
   exchng->AddAllRequests();
@@ -312,13 +314,13 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   Requester* ccast = dynamic_cast<Requester*>(child);
 
   // doin a little magic to simulate each requester making their own request
-  Request<Material>::Ptr preq =
-      Request<Material>::Create(mat, pcast, commod, pref);
-  pcast->r_ = preq;
-  Request<Material>::Ptr creq =
-      Request<Material>::Create(mat, ccast, commod, pref);
-  ccast->r_ = creq;
-
+  RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
+  Request<Material>::Ptr preq = rp1->AddRequest(mat, pcast, commod, pref);
+  pcast->port_ = rp1;
+  RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
+  Request<Material>::Ptr creq = rp2->AddRequest(mat, ccast, commod, pref);
+  ccast->port_ = rp2;
+    
   Bidder* bidr = new Bidder(tc.get(), commod);
 
   

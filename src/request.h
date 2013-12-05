@@ -23,6 +23,18 @@ class Request {
   typedef boost::shared_ptr< Request<T> > Ptr;
 
   /// @brief a factory method for a request
+  inline static typename Request<T>::Ptr Create(
+      boost::shared_ptr<T> target,
+      Trader* requester,
+      typename RequestPortfolio<T>::Ptr portfolio,
+      std::string commodity = "",
+      double preference = 0) {
+    return Ptr(
+        new Request<T>(target, requester, portfolio, commodity, preference));
+  }
+
+  /// @brief a factory method for a bid for a bid without a portfolio
+  /// @warning this factory should generally only be used for testing
   inline static typename Request<T>::Ptr Create(boost::shared_ptr<T> target,
                                                 Trader* requester,
                                                 std::string commodity = "",
@@ -42,11 +54,6 @@ class Request {
   /// @return the preference value for this request
   inline double preference() const { return preference_; }
 
-  /// @brief set the portfolio for this request
-  inline void set_portfolio(typename RequestPortfolio<T>::Ptr portfolio) {
-    portfolio_ = portfolio;
-  }
-
   /// @return the portfolio of which this request is a part
   inline typename RequestPortfolio<T>::Ptr portfolio() const { 
     return portfolio_;
@@ -59,6 +66,15 @@ class Request {
       requester_(requester),
       commodity_(commodity),
       preference_(preference) {};
+
+  Request(boost::shared_ptr<T> target, Trader* requester,
+          typename RequestPortfolio<T>::Ptr portfolio,
+          std::string commodity = "", double preference = 0)
+    : target_(target),
+      requester_(requester),
+      commodity_(commodity),
+      preference_(preference),
+      portfolio_(portfolio) {};
 
   boost::shared_ptr<T> target_;
   Trader* requester_;

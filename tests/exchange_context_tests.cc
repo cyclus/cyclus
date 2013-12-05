@@ -49,14 +49,11 @@ class ExchangeContextTests: public ::testing::Test {
 
     pref = 0.5;
     commod1 = "commod1";
-    req1 = Request<Resource>::Create(get_mat(), fac1, commod1, pref);
-    
-    req2 = Request<Resource>::Create(get_mat(), fac2, commod1, pref);
 
     rp1 = RequestPortfolio<Resource>::Ptr(new RequestPortfolio<Resource>());
-    rp1->AddRequest(req1);    
+    req1 = rp1->AddRequest(get_mat(), fac1, commod1, pref);    
     rp2 = RequestPortfolio<Resource>::Ptr(new RequestPortfolio<Resource>());
-    rp2->AddRequest(req2);
+    req2 = rp2->AddRequest(get_mat(), fac2, commod1, pref);
   };
   
   virtual void TearDown() {
@@ -118,8 +115,7 @@ TEST_F(ExchangeContextTests, AddRequest2) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ExchangeContextTests, AddRequest3) {
   // 2 requests for 2 commod
-  Request<Resource>::Ptr req = Request<Resource>::Create(get_mat(), fac1, commod2);
-  rp1->AddRequest(req);
+  Request<Resource>::Ptr req = rp1->AddRequest(get_mat(), fac1, commod2);
   
   ExchangeContext<Resource> context;
     
