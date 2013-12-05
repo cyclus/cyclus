@@ -52,15 +52,15 @@ TEST_F(StubFacilityTest, ReceiveMessage) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, Tick) {
   int time = 1;
-  ASSERT_NO_THROW(src_facility_->HandleTick(time));
-  // Test StubFacility specific behaviors of the HandleTick function here
+  ASSERT_NO_THROW(src_facility_->Tick(time));
+  // Test StubFacility specific behaviors of the Tick function here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_facility_->HandleTock(time));
-  // Test StubFacility specific behaviors of the HandleTock function here
+  EXPECT_NO_THROW(src_facility_->Tock(time));
+  // Test StubFacility specific behaviors of the Tock function here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

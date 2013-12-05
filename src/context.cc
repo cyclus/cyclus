@@ -70,7 +70,7 @@ int Context::sim_dur() {
   return ti_->dur();
 };
 
-void Context::RegisterTicker(TimeAgent* ta) {
+void Context::RegisterTimeListener(TimeListener* ta) {
   ti_->RegisterTickListener(ta);
 };
 

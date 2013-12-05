@@ -175,7 +175,7 @@ INSTALL(FILES
   supply_demand_manager.h
   symbolic_function_factories.h
   symbolic_functions.h
-  time_agent.h
+  time_listener.h
   timer.h
   trade.h
   trade_executor.h

@@ -1,6 +1,6 @@
 // datum.h
-#ifndef CYCLUS_EVENT_H_
-#define CYCLUS_EVENT_H_
+#ifndef CYCLUS_DATUM_H_
+#define CYCLUS_DATUM_H_
 
 #include <list>
 #include <string>
@@ -64,4 +64,4 @@ class Datum {
   Vals vals_;
 };
 } // namespace cyclus
-#endif // ifndef CYCLUS_EVENT_H_
+#endif // ifndef CYCLUS_DATUM_H_

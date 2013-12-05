@@ -28,12 +28,12 @@ class DieModel : public cyclus::FacilityModel {
     delete this;
   }
 
-  virtual void HandleTick(int time) {
+  virtual void Tick(int time) {
     tickCount_++;
     totalTicks++;
   }
 
-  virtual void HandleTock(int time) {
+  virtual void Tock(int time) {
     tockCount_++;
     totalTocks++;
   }
@@ -62,7 +62,7 @@ class InstModelClassTests : public ::testing::Test {
   DieModel* child4_;
   DieModel* child5_;
 
-  cyclus::TimeAgent* inst_;
+  cyclus::TimeListener* inst_;
   cyclus::Recorder rec_;
   cyclus::Timer ti_;
   cyclus::Context* ctx_;
@@ -90,7 +90,7 @@ TEST_F(InstModelClassTests, TockIter) {
   child2_->SetFacLifetime(0);
 
   EXPECT_EQ(inst_->children().size(), 5);
-  ASSERT_NO_THROW(inst_->HandleTock(0));
+  ASSERT_NO_THROW(inst_->Tock(0));
   EXPECT_EQ(DieModel::totalTocks, 5);
   EXPECT_EQ(child1_->tockCount_, 1);
   EXPECT_EQ(child3_->tockCount_, 1);
@@ -101,7 +101,7 @@ TEST_F(InstModelClassTests, TockIter) {
   child3_->SetFacLifetime(0);
 
   EXPECT_EQ(inst_->children().size(), 4);
-  ASSERT_NO_THROW(inst_->HandleTock(1));
+  ASSERT_NO_THROW(inst_->Tock(1));
   EXPECT_EQ(DieModel::totalTocks, 9);
   EXPECT_EQ(child4_->tockCount_, 2);
   EXPECT_EQ(child5_->tockCount_, 2);

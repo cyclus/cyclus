@@ -2,7 +2,7 @@
 #ifndef CYCLUS_INST_MODEL_H_
 #define CYCLUS_INST_MODEL_H_
 
-#include "time_agent.h"
+#include "time_listener.h"
 #include "model.h"
 #include "region_model.h"
 
@@ -47,7 +47,7 @@ typedef std::set<std::string>::iterator PrototypeIterator;
    @section thirdPartyImpl Third Party Implementations
    (None)
  */
-class InstModel : public TimeAgent {
+class InstModel : public TimeListener {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
@@ -83,7 +83,7 @@ class InstModel : public TimeAgent {
 
      @param time is the time to perform the tick
    */
-  virtual void HandleTick(int time);
+  virtual void Tick(int time);
 
   /**
      Each institution is prompted to its end-of-time-step
@@ -92,17 +92,7 @@ class InstModel : public TimeAgent {
 
      @param time is the time to perform the tock
    */
-  virtual void HandleTock(int time);
-
-  /**
-     Each inst is prompted to do its daily tasks.
-
-     Normally, insts simply hand the command down to facilities.
-
-     @param time is the number of months since the beginning of the
-     simulation @param day is the current day in this month
-   */
-  virtual void HandleDailyTasks(int time, int day);
+  virtual void Tock(int time);
 
   /**
      perform all tasks required when an inst enters the simulation

@@ -1,6 +1,6 @@
 // recorder.h
-#ifndef EVENTMANAGER_H_
-#define EVENTMANAGER_H_
+#ifndef CYCLUS_RECORDER_H_
+#define CYCLUS_RECORDER_H_
 
 #include <list>
 #include <string>

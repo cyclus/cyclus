@@ -49,14 +49,14 @@ TEST_F(StubRegionTest, ReceiveMessage) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubRegionTest, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(src_region_->HandleTick(time));
+  EXPECT_NO_THROW(src_region_->Tick(time));
   // Test StubRegion specific behaviors of the handleTick function here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubRegionTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_region_->HandleTick(time));
+  EXPECT_NO_THROW(src_region_->Tick(time));
   // Test StubRegion specific behaviors of the handleTock function here
 }
 

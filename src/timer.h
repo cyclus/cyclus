@@ -8,7 +8,7 @@
 
 #include "context.h"
 #include "query_engine.h"
-#include "time_agent.h"
+#include "time_listener.h"
 
 namespace cyclus {
 
@@ -54,7 +54,7 @@ class Timer {
 
      @param agent agent that will receive time-step notifications
    */
-  void RegisterTickListener(TimeAgent* agent);
+  void RegisterTickListener(TimeListener* agent);
 
   /**
      Returns the current time, in months since the simulation started.
@@ -208,12 +208,12 @@ class Timer {
   /**
      Concrete models that desire to receive tick and tock notifications
    */
-  std::vector<TimeAgent*> tick_listeners_;
+  std::vector<TimeListener*> tick_listeners_;
 
   /**
      Concrete models that desire to receive tick and tock notifications
    */
-  std::vector<TimeAgent*> new_tickers_;
+  std::vector<TimeListener*> new_tickers_;
 
   /**
      Returns a string of all models listening to the tick
@@ -231,12 +231,6 @@ class Timer {
      notifications.
    */
   void SendTock();
-
-  /**
-     sends a notification to Tick listeners that a day has passed
-   */
-  void SendDailyTasks();
-
 };
 
 } // namespace cyclus

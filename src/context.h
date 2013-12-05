@@ -17,7 +17,7 @@ class ExchangeSolver;
 class Recorder;
 class Trader;
 class Timer;
-class TimeAgent;
+class TimeListener;
 
 /// A simulation context that provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
@@ -101,7 +101,7 @@ class Context {
   Composition::Ptr GetRecipe(std::string name);
 
   /// See Timer::RegisterTickListener documentation.
-  void RegisterTicker(TimeAgent* ta);
+  void RegisterTimeListener(TimeListener* ta);
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.

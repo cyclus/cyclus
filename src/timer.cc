@@ -47,7 +47,6 @@ void Timer::RunSim(Context* ctx) {
 
     int eom_day = LastDayOfMonth();
     for (int i = 1; i < eom_day + 1; i++) {
-      SendDailyTasks();
       if (i == eom_day) {
         SendTock();
         CLOG(LEV_INFO2) << "}";
@@ -82,7 +81,7 @@ int Timer::LastDayOfMonth() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Timer::ReportListeners() {
   std::string report = "";
-  for (std::vector<TimeAgent*>::iterator agent = tick_listeners_.begin();
+  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
        agent != tick_listeners_.end();
        agent++) {
     report += (*agent)->name() + " ";
@@ -92,39 +91,30 @@ std::string Timer::ReportListeners() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SendTick() {
-  for (std::vector<TimeAgent*>::iterator agent = tick_listeners_.begin();
+  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
        agent != tick_listeners_.end();
        agent++) {
     CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->id()
                     << ", name=" << (*agent)->name() << " {";
-    (*agent)->HandleTick(time_);
+    (*agent)->Tick(time_);
     CLOG(LEV_INFO3) << "}";
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SendTock() {
-  for (std::vector<TimeAgent*>::iterator agent = tick_listeners_.begin();
+  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
        agent != tick_listeners_.end();
        agent++) {
     CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->id()
                     << ", name=" << (*agent)->name() << " {";
-    (*agent)->HandleTock(time_);
+    (*agent)->Tock(time_);
     CLOG(LEV_INFO3) << "}";
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::SendDailyTasks() {
-  for (std::vector<TimeAgent*>::iterator agent = tick_listeners_.begin();
-       agent != tick_listeners_.end();
-       agent++) {
-    (*agent)->HandleDailyTasks(time_, date_.day());
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::RegisterTickListener(TimeAgent* agent) {
+void Timer::RegisterTickListener(TimeListener* agent) {
   CLOG(LEV_INFO2) << "Model ID=" << agent->id() << ", name=" << agent->name()
                   << " has registered to receive 'ticks' and 'tocks'.";
   new_tickers_.push_back(agent);

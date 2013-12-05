@@ -15,8 +15,8 @@ class TestFacility: public cyclus::FacilityModel {
   virtual cyclus::Model* Clone() { return new TestFacility(context()); };
 
   void CloneModuleMembersFrom(cyclus::FacilityModel* source) {};
-  void HandleTick(int time) {};
-  void HandleTock(int time) {};
+  void Tick(int time) {};
+  void Tock(int time) {};
 };
 
 #endif

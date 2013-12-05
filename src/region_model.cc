@@ -16,7 +16,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RegionModel::RegionModel(Context* ctx) : TimeAgent(ctx), Model(ctx) {
+RegionModel::RegionModel(Context* ctx) : TimeListener(ctx), Model(ctx) {
   SetModelType("Region");
 }
 
@@ -57,7 +57,7 @@ void RegionModel::Deploy(Model* parent) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::AddRegionAsRootNode() {
-  context()->RegisterTicker(this);
+  context()->RegisterTimeListener(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -95,12 +95,12 @@ std::string RegionModel::str() {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::HandleTick(int time) {
+void RegionModel::Tick(int time) {
   int currsize = children().size();
   int i = 0;
   while (i < children().size()) {
     Model* m = children().at(i);
-    dynamic_cast<InstModel*>(m)->HandleTick(time);
+    dynamic_cast<InstModel*>(m)->Tick(time);
 
     // increment not needed if a facility deleted itself
     if (children().size() == currsize) {
@@ -111,28 +111,18 @@ void RegionModel::HandleTick(int time) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::HandleTock(int time) {
+void RegionModel::Tock(int time) {
   int currsize = children().size();
   int i = 0;
   while (i < children().size()) {
     Model* m = children().at(i);
-    dynamic_cast<InstModel*>(m)->HandleTock(time);
+    dynamic_cast<InstModel*>(m)->Tock(time);
 
     // increment not needed if a facility deleted itself
     if (children().size() == currsize) {
       i++;
     }
     currsize = children().size();
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::HandleDailyTasks(int time, int day) {
-  // tell all of the institution models to handle the tick
-  for (std::vector<Model*>::const_iterator inst = children().begin();
-       inst != children().end();
-       inst++) {
-    (dynamic_cast<InstModel*>(*inst))->HandleDailyTasks(time, day);
   }
 }
 } // namespace cyclus

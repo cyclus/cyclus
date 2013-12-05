@@ -21,8 +21,8 @@ class MockFacility : public cyclus::FacilityModel {
   };
 
   void CloneModuleMembersFrom(cyclus::FacilityModel* source) {};
-  void HandleTick(int time) {};
-  void HandleTock(int time) {};
+  void Tick(int time) {};
+  void Tock(int time) {};
 };
 
 #endif // CYCLUS_TESTS_MOCK_FACILITY_H_
