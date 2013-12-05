@@ -22,14 +22,14 @@ namespace cyclus {
 /// RequestGroup is sorted according to their average weight.
 ///
 /// @section example Example
-/// Consider the following commodity-to-weight mapping: {"spam": 1, "eggs": 2}.
+/// Consider the following commodity-to-weight mapping: {"spam": 5, "eggs": 2}.
 /// Now consider two RequestGroups with the following commodities:
-///   #. g1 = {"eggs", "spam"}
-///   #. g2 = {"eggs", "spam", "eggs"}
+///   #. g1 = {"eggs", "spam", "eggs"}
+///   #. g2 = {"eggs", "spam"}
 ///
 /// First, the groups will be ordered and averaged weights will be determined:
-///   #. g1 = {"spam", "eggs"}, weight = 3/2
-///   #. g2 = {"spam", "eggs", "eggs"}, weight = 5/3
+///   #. g1 = {"spam", "eggs", "eggs"}, weight = 9/3
+///   #. g2 = {"spam", "eggs"}, weight = 7/2
 ///
 /// Finally, the groups themselves will be ordered by average weight:
 ///   #. {g2, g1}

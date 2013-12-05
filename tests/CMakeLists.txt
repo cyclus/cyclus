@@ -96,6 +96,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/full_sim_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
