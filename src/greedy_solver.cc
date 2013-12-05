@@ -4,12 +4,15 @@
 #include <functional>
 #include <vector>
 
+#include "greedy_preconditioner.h"
 #include "logger.h"
 
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::Solve() {
+  if (conditioner_ != NULL) conditioner_->Condition(graph_);
+  
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind1st(

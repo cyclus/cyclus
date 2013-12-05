@@ -1,13 +1,13 @@
 #ifndef CYCLUS_GREEDY_SOLVER_H_
 #define CYCLUS_GREEDY_SOLVER_H_
 
-#include "exchange_solver.h"
-
 #include "exchange_graph.h"
+#include "exchange_solver.h"
 
 namespace cyclus {
 
 class ExchangeGraph;
+class GreedyPreconditioner;
   
 /// @brief The GreedySolver provides the implementation for a "greedy" solution
 /// to a resource exchange graph.
@@ -22,7 +22,10 @@ class ExchangeGraph;
 class GreedySolver: public ExchangeSolver {
  public:
   GreedySolver() {};
-  explicit GreedySolver(ExchangeGraph* g) : ExchangeSolver(g) {};
+  GreedySolver(ExchangeGraph* g, GreedyPreconditioner* c = NULL)
+    : conditioner_(c),
+      ExchangeSolver(g) {};
+  
   virtual ~GreedySolver() {};
 
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
@@ -32,6 +35,7 @@ class GreedySolver: public ExchangeSolver {
 
  private:
   void GreedilySatisfySet_(RequestGroup::Ptr prs);
+  GreedyPreconditioner* conditioner_;
 };
 
 } // namespace cyclus
