@@ -35,12 +35,12 @@ TEST(RequestTests, MaterialGetSet) {
   double qty = 1.0;
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
   
-  Request<Material> r(mat, fac, commod, pref);
+  Request<Material>::Ptr r = Request<Material>::Create(mat, fac, commod, pref);
 
-  EXPECT_EQ(commod, r.commodity());
-  EXPECT_EQ(excast, r.requester());
-  EXPECT_EQ(mat, r.target());
-  EXPECT_EQ(pref, r.preference());
+  EXPECT_EQ(commod, r->commodity());
+  EXPECT_EQ(excast, r->requester());
+  EXPECT_EQ(mat, r->target());
+  EXPECT_EQ(pref, r->preference());
   
   delete fac;
 }
@@ -58,12 +58,13 @@ TEST(RequestTests, GenRsrcGetSet) {
   GenericResource::Ptr rsrc =
       GenericResource::CreateUntracked(qty, quality, units);
   
-  Request<GenericResource> r(rsrc, fac, commod, pref);
+  Request<GenericResource>::Ptr r =
+      Request<GenericResource>::Create(rsrc, fac, commod, pref);
 
-  EXPECT_EQ(commod, r.commodity());
-  EXPECT_EQ(fac, r.requester());
-  EXPECT_EQ(rsrc, r.target());
-  EXPECT_EQ(pref, r.preference());
+  EXPECT_EQ(commod, r->commodity());
+  EXPECT_EQ(fac, r->requester());
+  EXPECT_EQ(rsrc, r->target());
+  EXPECT_EQ(pref, r->preference());
   
   delete fac;
 }

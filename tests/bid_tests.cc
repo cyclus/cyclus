@@ -57,8 +57,8 @@ TEST(BidTests, GenRsrcGetSet) {
   GenericResource::Ptr rsrc =
       GenericResource::CreateUntracked(qty, quality, units);
   
-  Request<GenericResource>::Ptr req(
-      new Request<GenericResource>(rsrc, &trader));
+  Request<GenericResource>::Ptr req =
+      Request<GenericResource>::Create(rsrc, &trader);
   
   Bid<GenericResource>::Ptr r = Bid<GenericResource>::Create(req, rsrc, fac);
 

@@ -146,8 +146,7 @@ class ResourceExchangeTests: public ::testing::Test {
     mat = Material::CreateUntracked(qty, comp);
 
     reqr = new Requester(tc.get());
-    req = Request<Material>::Ptr(
-        new Request<Material>(mat, reqr, commod, pref));
+    req = Request<Material>::Create(mat, reqr, commod, pref);
     reqr->r_ = req;
     
     bid = Bid<Material>::Create(req, mat, &trader);
@@ -208,7 +207,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
   
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req1(new Request<Material>(mat, reqr, commod, pref));
+  Request<Material>::Ptr req1 = Request<Material>::Create(mat, reqr, commod, pref);
   
   rp->AddRequest(req);
   rp->AddRequest(req1);
@@ -269,9 +268,9 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   Requester* ccast = dynamic_cast<Requester*>(child);
 
   // doin a little magic to simulate each requester making their own request
-  Request<Material>::Ptr preq(new Request<Material>(mat, pcast, commod, pref));
+  Request<Material>::Ptr preq = Request<Material>::Create(mat, pcast, commod, pref);
   pcast->r_ = preq;
-  Request<Material>::Ptr creq(new Request<Material>(mat, ccast, commod, pref));
+  Request<Material>::Ptr creq = Request<Material>::Create(mat, ccast, commod, pref);
   ccast->r_ = creq;
   
   EXPECT_EQ(0, pcast->req_ctr_);
@@ -306,9 +305,9 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   Requester* ccast = dynamic_cast<Requester*>(child);
 
   // doin a little magic to simulate each requester making their own request
-  Request<Material>::Ptr preq(new Request<Material>(mat, pcast, commod, pref));
+  Request<Material>::Ptr preq = Request<Material>::Create(mat, pcast, commod, pref);
   pcast->r_ = preq;
-  Request<Material>::Ptr creq(new Request<Material>(mat, ccast, commod, pref));
+  Request<Material>::Ptr creq = Request<Material>::Create(mat, ccast, commod, pref);
   ccast->r_ = creq;
 
   Bidder* bidr = new Bidder(tc.get(), commod);

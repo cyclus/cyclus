@@ -110,8 +110,8 @@ TEST(ExXlateTests, XlateCapacities) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateReq) {
-  Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty),
-                                                   &trader));
+  Request<Material>::Ptr req = Request<Material>::Create(get_mat(u235, qty),
+                                                         &trader);
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
   CapacityConstraint<Material> cc1(qty1, c1);
@@ -141,7 +141,7 @@ TEST(ExXlateTests, XlateReq) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateBid) {
-  Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &trader));
+  Request<Material>::Ptr req = Request<Material>::Create(get_mat(u235, qty), &trader);
   Bid<Material>::Ptr bid = Bid<Material>::Create(req, get_mat(u235, qty), &trader);
   
   Converter<Material>::Ptr c1(new MatConverter1());
@@ -174,7 +174,7 @@ TEST(ExXlateTests, XlateBid) {
 TEST(ExXlateTests, XlateArc) {
   Material::Ptr mat = get_mat(u235, qty);
 
-  Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &trader));
+  Request<Material>::Ptr req = Request<Material>::Create(get_mat(u235, qty), &trader);
   Bid<Material>::Ptr bid = Bid<Material>::Create(req, get_mat(u235, qty), &trader);
     
   Converter<Material>::Ptr c1(new MatConverter1());
@@ -220,7 +220,7 @@ TEST(ExXlateTests, XlateArc) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, SimpleXlate) {
-  Request<Material>::Ptr req(new Request<Material>(get_mat(u235, qty), &trader));
+  Request<Material>::Ptr req = Request<Material>::Create(get_mat(u235, qty), &trader);
   Bid<Material>::Ptr bid = Bid<Material>::Create(req, get_mat(u235, qty), &trader);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());

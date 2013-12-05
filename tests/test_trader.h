@@ -60,8 +60,8 @@ class TestTrader : public MockFacility {
     } else {
       std::set<RequestPortfolio<Material>::Ptr> ports;
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-      Request<Material>::Ptr request(
-          new Request<Material>(obj_fac->mat, this, obj_fac->commod));
+      Request<Material>::Ptr request =
+          Request<Material>::Create(obj_fac->mat, this, obj_fac->commod);
       req = request; // exp request
       port->AddRequest(request);
       ports.insert(port);

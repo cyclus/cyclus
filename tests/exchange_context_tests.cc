@@ -49,11 +49,9 @@ class ExchangeContextTests: public ::testing::Test {
 
     pref = 0.5;
     commod1 = "commod1";
-    req1 = Request<Resource>::Ptr(
-        new Request<Resource>(get_mat(), fac1, commod1, pref));
+    req1 = Request<Resource>::Create(get_mat(), fac1, commod1, pref);
     
-    req2 = Request<Resource>::Ptr(
-        new Request<Resource>(get_mat(), fac2, commod1, pref));
+    req2 = Request<Resource>::Create(get_mat(), fac2, commod1, pref);
 
     rp1 = RequestPortfolio<Resource>::Ptr(new RequestPortfolio<Resource>());
     rp1->AddRequest(req1);    
@@ -120,7 +118,7 @@ TEST_F(ExchangeContextTests, AddRequest2) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ExchangeContextTests, AddRequest3) {
   // 2 requests for 2 commod
-  Request<Resource>::Ptr req(new Request<Resource>(get_mat(), fac1, commod2));
+  Request<Resource>::Ptr req = Request<Resource>::Create(get_mat(), fac1, commod2);
   rp1->AddRequest(req);
   
   ExchangeContext<Resource> context;

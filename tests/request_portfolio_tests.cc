@@ -51,11 +51,11 @@ class RequestPortfolioTests: public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RequestPortfolioTests, ReqAdd){ 
-  Request<Material>::Ptr r1(new Request<Material>(get_mat(), fac1));
+  Request<Material>::Ptr r1 = Request<Material>::Create(get_mat(), fac1);
   // a different requester
-  Request<Material>::Ptr r2(new Request<Material>(get_mat(), fac2));
+  Request<Material>::Ptr r2 = Request<Material>::Create(get_mat(), fac2);
   // some different quantity
-  Request<Material>::Ptr r3(new Request<Material>(get_mat(92235, 150051.0), fac1));
+  Request<Material>::Ptr r3 = Request<Material>::Create(get_mat(92235, 150051.0), fac1);
   
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   EXPECT_EQ(rp->requests().size(), 0);
@@ -86,10 +86,10 @@ TEST_F(RequestPortfolioTests, Sets) {
   RequestPortfolio<Material>::Ptr rp3(new RequestPortfolio<Material>());
   
   std::string commod1 = "1";
-  Request<Material>::Ptr req1(new Request<Material>(get_mat(), fac1, commod1));
+  Request<Material>::Ptr req1 = Request<Material>::Create(get_mat(), fac1, commod1);
   
   std::string commod2 = "2";
-  Request<Material>::Ptr req2(new Request<Material>(get_mat(), fac1, commod2));
+  Request<Material>::Ptr req2 = Request<Material>::Create(get_mat(), fac1, commod2);
 
   rp1->AddRequest(req1);
     

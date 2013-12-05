@@ -53,8 +53,8 @@ class TradeExecutorTests : public ::testing::Test {
     r1 = new TestTrader(tc.get(), &fac);
     r2 = new TestTrader(tc.get(), &fac);
 
-    req1 = Request<Material>::Ptr(new Request<Material>(fac.mat, r1));
-    req2 = Request<Material>::Ptr(new Request<Material>(fac.mat, r2));
+    req1 = Request<Material>::Create(fac.mat, r1);
+    req2 = Request<Material>::Create(fac.mat, r2);
     // supplier 1 makes a single bid for req1
     bid1 = Bid<Material>::Create(req1, fac.mat, s1);
     // supplier 2 makes a bid for req1 and req2
@@ -152,7 +152,7 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
   
 //   Material::Ptr mat = get_mat();
 //   Receiver* r = new Receiver(tc.get(), mat);
-//   Request<Material>::Ptr req(new Request<Material>(mat, r));
+//   Request<Material>::Ptr req = Request<Material>::Create(mat, r);
   
 //   Sender* s = new Sender(tc.get(), true);
 //   Bid<Material>::Ptr bid = Bid<Material>::Create(req, mat, s);

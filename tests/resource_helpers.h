@@ -31,8 +31,7 @@ static cyclus::TestContext helper_tc;
 static MockFacility trader(helper_tc.get());
 
 static cyclus::Request<cyclus::Material>::Ptr get_req(std::string commod = "") {
-  return cyclus::Request<cyclus::Material>::Ptr(
-      new cyclus::Request<cyclus::Material>(get_mat(), &trader, commod));
+  return cyclus::Request<cyclus::Material>::Create(get_mat(), &trader, commod);
 }
 
 static cyclus::Bid<cyclus::Material>::Ptr get_bid() {

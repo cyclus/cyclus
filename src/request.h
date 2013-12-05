@@ -22,12 +22,13 @@ class Request {
  public:
   typedef boost::shared_ptr< Request<T> > Ptr;
 
-  Request(boost::shared_ptr<T> target, Trader* requester,
-          std::string commodity = "", double preference = 0)
-    : target_(target),
-      requester_(requester),
-      commodity_(commodity),
-      preference_(preference) {};
+  /// @brief a factory method for a request
+  inline static typename Request<T>::Ptr Create(boost::shared_ptr<T> target,
+                                                Trader* requester,
+                                                std::string commodity = "",
+                                                double preference = 0) {
+    return Ptr(new Request<T>(target, requester, commodity, preference));
+  }
 
   /// @return this request's target
   inline boost::shared_ptr<T> target() const { return target_; }
@@ -52,6 +53,13 @@ class Request {
   }
 
  private:
+  Request(boost::shared_ptr<T> target, Trader* requester,
+          std::string commodity = "", double preference = 0)
+    : target_(target),
+      requester_(requester),
+      commodity_(commodity),
+      preference_(preference) {};
+
   boost::shared_ptr<T> target_;
   Trader* requester_;
   double preference_;
