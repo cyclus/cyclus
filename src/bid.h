@@ -21,6 +21,10 @@ class Bid {
   typedef boost::shared_ptr< Bid<T> > Ptr;
 
   /// @brief a factory method for a bid
+  /// @param request the request being responded to by this bid
+  /// @param offer the resource being offered in response to the request
+  /// @param bidder the bidder
+  /// @param portfolio the porftolio of which this bid is a part
   inline static typename Bid<T>::Ptr Create(
       typename Request<T>::Ptr request, 
       boost::shared_ptr<T> offer,
@@ -50,6 +54,7 @@ class Bid {
   inline typename BidPortfolio<T>::Ptr portfolio() { return portfolio_; }
 
  private:
+  /// @brief constructors are private to require use of factory methods
   Bid(typename Request<T>::Ptr request, 
       boost::shared_ptr<T> offer,
       Trader* bidder)

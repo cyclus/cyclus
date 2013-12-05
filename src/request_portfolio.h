@@ -43,7 +43,11 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   RequestPortfolio() : requester_(NULL), qty_(-1) {};
 
   /// @brief add a request to the portfolio
-  /// @param r the request to add
+  /// @param target the target resource associated with this request
+  /// @param requester the requester
+  /// @param commodity the commodity associated with this request
+  /// @param preference the preference associated with this request (relative to
+  /// others in the portfolio)
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
   typename Request<T>::Ptr AddRequest(boost::shared_ptr<T> target,

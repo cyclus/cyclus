@@ -37,7 +37,9 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
       commodity_("NO_COMMODITY_SET") {};
 
   /// @brief add a bid to the portfolio
-  /// @param r the bid to add
+  /// @param request the request being responded to by this bid
+  /// @param offer the resource being offered in response to the request
+  /// @param bidder the bidder
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original or if the bid commodity is different than the original
   typename Bid<T>::Ptr AddBid(typename Request<T>::Ptr request, 

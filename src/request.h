@@ -23,6 +23,12 @@ class Request {
   typedef boost::shared_ptr< Request<T> > Ptr;
 
   /// @brief a factory method for a request
+  /// @param target the target resource associated with this request
+  /// @param requester the requester
+  /// @param portfolio the porftolio of which this request is a part
+  /// @param commodity the commodity associated with this request
+  /// @param preference the preference associated with this request (relative to
+  /// others in the portfolio)
   inline static typename Request<T>::Ptr Create(
       boost::shared_ptr<T> target,
       Trader* requester,
@@ -60,6 +66,7 @@ class Request {
   }
 
  private:
+  /// @brief constructors are private to require use of factory methods
   Request(boost::shared_ptr<T> target, Trader* requester,
           std::string commodity = "", double preference = 0)
     : target_(target),
