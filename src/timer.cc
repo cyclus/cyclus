@@ -223,7 +223,7 @@ std::pair<int, int> Timer::ConvertDate(int time) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::LogTimeData(Context* ctx, std::string handle) {
-  ctx->NewEvent("SimulationTimeInfo")
+  ctx->NewDatum("SimulationTimeInfo")
   ->AddVal("SimHandle", handle)
   ->AddVal("InitialYear", year0_)
   ->AddVal("InitialMonth", month0_)

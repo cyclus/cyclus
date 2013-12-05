@@ -1,4 +1,4 @@
-// event.h
+// datum.h
 #ifndef CYCLUS_EVENT_H_
 #define CYCLUS_EVENT_H_
 
@@ -8,25 +8,25 @@
 #include <boost/pool/singleton_pool.hpp>
 #include "any.hpp"
 
-#include "event_manager.h"
+#include "recorder.h"
 
 namespace cyclus {
 
 /*!
 Used to specify and send a collection of key-value pairs to the
-EventManager for recording.
+Recorder for recording.
 */
-class Event {
-  friend class EventManager;
+class Datum {
+  friend class Recorder;
 
  public:
   typedef std::pair<const char*, boost::spirit::hold_any> Entry;
   typedef std::vector<Entry> Vals;
 
-  virtual ~Event();
+  virtual ~Datum();
 
   /*!
-  Add an arbitrary field-value pair to the event.
+  Add an arbitrary field-value pair to the datum.
 
   @param field a label or key for a value. Loosely analogous to a column
   label.
@@ -37,29 +37,29 @@ class Event {
   @warning for the val argument - what variable types are supported
   depends on what the backend(s) in use are designed to handle.
   */
-  Event* AddVal(const char* field, boost::spirit::hold_any val);
+  Datum* AddVal(const char* field, boost::spirit::hold_any val);
 
   /*!
-  Record this event to its EventManager. Recorded events of the same
+  Record this datum to its Recorder. Recorded Datum objects of the same
   title (e.g. same table) must not contain any fields that were not
-  present in the first event recorded of that title.
+  present in the first datum recorded of that title.
   */
   void Record();
 
-  /// Returns the event's title as specified during the event's creation.
+  /// Returns the datum's title as specified during the datum's creation.
   std::string title();
 
-  /// Returns a map of all field-value pairs that have been added to this event.
+  /// Returns a map of all field-value pairs that have been added to this datum.
   const Vals& vals();
 
   static void* operator new(size_t size);
   static void operator delete(void* rawMemory) throw();
 
  private:
-  /// events should only be created via an EventManager
-  Event(EventManager* m, std::string title);
+  /// Datum objects should only be created via an Recorder
+  Datum(Recorder* m, std::string title);
 
-  EventManager* manager_;
+  Recorder* manager_;
   std::string title_;
   Vals vals_;
 };

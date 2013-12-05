@@ -58,9 +58,9 @@ int main(int argc, char* argv[]) {
   po::notify(vm);
 
   // setup context
-  EventManager em;
+  Recorder rec;
   Timer ti;
-  Context ctx(&ti, &em);
+  Context ctx(&ti, &rec);
 
   // respond to command line args that don't run a simulation
   if (vm.count("help")) {
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
   }
 
   std::string ext = fs::path(output_path).extension().generic_string();
-  EventBackend* back;
+  RecBackend* back;
   if (ext == ".h5") {
     back = new Hdf5Back(output_path.c_str());
   } else if (ext == ".csv") {
@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) {
   } else {
     back = new SqliteBack(output_path);
   }
-  em.RegisterBackend(back);
+  rec.RegisterBackend(back);
 
   // print the model list
   const std::vector<Model*>& models = ctx.model_list();
@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
   // Run the simulation 
   ti.RunSim(&ctx);
 
-  em.close();
+  rec.close();
   delete back;
   delete loader;
 

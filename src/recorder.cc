@@ -1,93 +1,93 @@
-// event_manager.cc
+// recorder.cc
 
-#include "event_manager.h"
+#include "recorder.h"
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "event_backend.h"
-#include "event.h"
+#include "rec_backend.h"
+#include "datum.h"
 #include "logger.h"
 
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-EventManager::EventManager() : index_(0) {
+Recorder::Recorder() : index_(0) {
   uuid_ = boost::uuids::random_generator()();
   set_dump_count(kDefaultDumpCount);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-EventManager::~EventManager() {
-  for (int i = 0; i < events_.size(); ++i) {
-    delete events_[i];
+Recorder::~Recorder() {
+  for (int i = 0; i < data_.size(); ++i) {
+    delete data_[i];
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-unsigned int EventManager::dump_count() {
+unsigned int Recorder::dump_count() {
   return dump_count_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-boost::uuids::uuid EventManager::sim_id() {
+boost::uuids::uuid Recorder::sim_id() {
   return uuid_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::set_dump_count(unsigned int count) {
-  for (int i = 0; i < events_.size(); ++i) {
-    delete events_[i];
+void Recorder::set_dump_count(unsigned int count) {
+  for (int i = 0; i < data_.size(); ++i) {
+    delete data_[i];
   }
-  events_.clear();
-  events_.reserve(count);
+  data_.clear();
+  data_.reserve(count);
   for (int i = 0; i < count; ++i) {
-    Event* ev = new Event(this, "");
-    ev->AddVal("SimID", uuid_);
-    events_.push_back(ev);
+    Datum* d = new Datum(this, "");
+    d->AddVal("SimID", uuid_);
+    data_.push_back(d);
   }
   dump_count_ = count;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event* EventManager::NewEvent(std::string title) {
-  Event* ev = events_[index_];
-  ev->title_ = title;
-  ev->vals_.resize(1);
+Datum* Recorder::NewDatum(std::string title) {
+  Datum* d = data_[index_];
+  d->title_ = title;
+  d->vals_.resize(1);
   index_++;
-  return ev;
+  return d;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::AddEvent(Event* ev) {
-  if (index_ >= events_.size()) {
+void Recorder::AddDatum(Datum* d) {
+  if (index_ >= data_.size()) {
     NotifyBackends();
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::NotifyBackends() {
+void Recorder::NotifyBackends() {
   index_ = 0;
-  std::list<EventBackend*>::iterator it;
+  std::list<RecBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
-    (*it)->Notify(events_);
+    (*it)->Notify(data_);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::RegisterBackend(EventBackend* b) {
+void Recorder::RegisterBackend(RecBackend* b) {
   backs_.push_back(b);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void EventManager::close() {
-  for (int i = index_; i < events_.size(); ++i) {
-    delete events_[i];
+void Recorder::close() {
+  for (int i = index_; i < data_.size(); ++i) {
+    delete data_[i];
   }
-  events_.resize(index_);
+  data_.resize(index_);
   NotifyBackends();
-  std::list<EventBackend*>::iterator it;
+  std::list<RecBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
     (*it)->Close();
   }

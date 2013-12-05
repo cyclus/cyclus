@@ -88,7 +88,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/event_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/recorder_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_context_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_manager_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_solver_tests.cc

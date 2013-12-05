@@ -5,16 +5,16 @@
 #include <list>
 #include <string>
 
-#include "event_backend.h"
+#include "rec_backend.h"
 #include "sqlite_db.h"
 
 namespace cyclus {
 
-/// An EventManager backend that writes data to an sqlite database.  Identically
-/// named events have their data placed as rows in a single table.  Handles the
-/// following event value types: int, float, double, std::string, cyclus::Blob.
+/// An Recorder backend that writes data to an sqlite database.  Identically
+/// named Datum objects have their data placed as rows in a single table.  Handles the
+/// following datum value types: int, float, double, std::string, cyclus::Blob.
 /// Unsupported value types are stored as an empty string.
-class SqliteBack: public EventBackend {
+class SqliteBack: public RecBackend {
  public:
   /// Creates a new sqlite backend that will write to the database file
   /// specified by path. If the file doesn't exist, a new one is created.
@@ -23,9 +23,9 @@ class SqliteBack: public EventBackend {
 
   virtual ~SqliteBack() {};
 
-  /// Write events immediately to the database as a single transaction.
-  /// @param events group of events to write to the database together.
-  void Notify(EventList events);
+  /// Writes Datum objects immediately to the database as a single transaction.
+  /// @param data group of Datum objects to write to the database together.
+  void Notify(DatumList data);
 
   /// Returns a unique name for this backend.
   std::string Name();
@@ -50,11 +50,11 @@ class SqliteBack: public EventBackend {
   /// converts the value to a string insertable into the sqlite db.
   std::string ValAsString(boost::spirit::hold_any v);
 
-  /// Queue up a table-create command for e.
-  void CreateTable(Event* e);
+  /// Queue up a table-create command for d.
+  void CreateTable(Datum* d);
 
-  /// constructs an SQL INSERT command for e and queues it for db insertion.
-  void WriteEvent(Event* e);
+  /// constructs an SQL INSERT command for d and queues it for db insertion.
+  void WriteDatum(Datum* d);
 
   /// An interface to a sqlite db managed by the SqliteBack class.
   SqliteDb db_;

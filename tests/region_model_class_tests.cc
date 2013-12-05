@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "context.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "inst_model.h"
 #include "region_model.h"
 #include "mock_region.h"
@@ -72,12 +72,12 @@ class RegionModelClassTests : public ::testing::Test {
     DieInst* child5_;
 
     cyclus::TimeAgent* reg_;
-    cyclus::EventManager em_;
+    cyclus::Recorder rec_;
     cyclus::Timer ti_;
     cyclus::Context* ctx_;
 
     virtual void SetUp() {
-      ctx_ = new cyclus::Context(&ti_, &em_);
+      ctx_ = new cyclus::Context(&ti_, &rec_);
 
       child1_ = new DieInst(ctx_);
       child2_ = new DieInst(ctx_);

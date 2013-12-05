@@ -3,7 +3,7 @@
 
 #include "composition.h"
 #include "context.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "mass_table.h"
 #include "mat_query.h"
 #include "material.h"
@@ -11,9 +11,9 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(MatQueryTests, MassAndMoles) { 
-  cyclus::EventManager em;
+  cyclus::Recorder rec;
   cyclus::Timer ti;
-  cyclus::Context ctx(&ti, &em);
+  cyclus::Context ctx(&ti, &rec);
   cyclus::MassTable* mt = cyclus::MT;
 
   cyclus::CompMap v;
@@ -37,9 +37,9 @@ TEST(MatQueryTests, MassAndMoles) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(MatQueryTests, AlmostEq) { 
-  cyclus::EventManager em;
+  cyclus::Recorder rec;
   cyclus::Timer ti;
-  cyclus::Context ctx(&ti, &em);
+  cyclus::Context ctx(&ti, &rec);
   cyclus::CompMap v;
   cyclus::Composition::Ptr c;
 

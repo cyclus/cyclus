@@ -3,14 +3,14 @@
 #define TEST_CONTEXT_H_
 
 #include "context.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "timer.h"
 
 namespace cyclus {
 class TestContext {
  public:
   TestContext() {
-    ctx_ = new Context(&ti_, &em_);
+    ctx_ = new Context(&ti_, &rec_);
   };
 
   ~TestContext() {
@@ -19,11 +19,11 @@ class TestContext {
   
   Context* get() {return ctx_;}
   Timer* timer() {return &ti_;}
-  EventManager* event_manager() {return &em_;}
+  Recorder* recorder() {return &rec_;}
 
  private:
   Timer ti_;
-  EventManager em_;
+  Recorder rec_;
   Context* ctx_;
 };
 } // namespace cyclus

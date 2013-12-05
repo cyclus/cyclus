@@ -9,7 +9,7 @@
 
 #include "blob.h"
 #include "error.h"
-#include "event.h"
+#include "datum.h"
 #include "logger.h"
 
 namespace cyclus {
@@ -28,12 +28,12 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::Notify(EventList evts) {
-  for (EventList::iterator it = evts.begin(); it != evts.end(); ++it) {
+void SqliteBack::Notify(DatumList dats) {
+  for (DatumList::iterator it = dats.begin(); it != dats.end(); ++it) {
     if (! TableExists((*it)->title())) {
       CreateTable(*it);
     }
-    WriteEvent(*it);
+    WriteDatum(*it);
   }
   Flush();
 }
@@ -50,12 +50,12 @@ std::string SqliteBack::Name() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::CreateTable(Event* e) {
-  std::string name = e->title();
+void SqliteBack::CreateTable(Datum* d) {
+  std::string name = d->title();
   tbl_names_.push_back(name);
 
-  Event::Vals vals = e->vals();
-  Event::Vals::iterator it = vals.begin();
+  Datum::Vals vals = d->vals();
+  Datum::Vals::iterator it = vals.begin();
   std::string cmd = "CREATE TABLE " + name + " (";
   cmd += std::string(it->first) + " " + ValType(it->second);
   ++it;
@@ -86,11 +86,11 @@ bool SqliteBack::TableExists(std::string name) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::WriteEvent(Event* e) {
+void SqliteBack::WriteDatum(Datum* d) {
   std::stringstream colss, valss, cmd;
-  Event::Vals vals = e->vals();
+  Datum::Vals vals = d->vals();
 
-  Event::Vals::iterator it = vals.begin();
+  Datum::Vals::iterator it = vals.begin();
   colss << it->first;
   valss << ValAsString(it->second);
   ++it;
@@ -100,7 +100,7 @@ void SqliteBack::WriteEvent(Event* e) {
     ++it;
   }
 
-  cmd << "INSERT INTO " << e->title() << " (" << colss.str() << ") "
+  cmd << "INSERT INTO " << d->title() << " (" << colss.str() << ") "
       << "VALUES (" << valss.str() << ");";
   cmds_.push_back(cmd.str());
 }

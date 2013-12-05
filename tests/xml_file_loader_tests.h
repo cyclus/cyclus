@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include "context.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "timer.h"
 #include "xml_file_loader.h"
 
@@ -26,7 +26,7 @@ class XMLFileLoaderTests : public ::testing::Test {
  public:
   std::string controlFile, falseFile, moduleFile, recipeFile;
 
-  cyclus::EventManager em_;
+  cyclus::Recorder rec_;
   cyclus::Timer ti_;
   cyclus::Context* ctx_;
 

@@ -1,7 +1,7 @@
 
 #include "res_tracker.h"
 
-#include "event_manager.h"
+#include "recorder.h"
 
 namespace cyclus {
 
@@ -22,7 +22,7 @@ void ResTracker::Create(Model* creator) {
   }
 
   Record();
-  ctx_->NewEvent("ResCreators")
+  ctx_->NewDatum("ResCreators")
     ->AddVal("ResID", res_->id())
     ->AddVal("ModelID", creator->id())
     ->Record();
@@ -65,7 +65,7 @@ void ResTracker::Absorb(ResTracker* absorbed) {
 
 void ResTracker::Record() {
   res_->BumpId();
-  ctx_->NewEvent("Resources")
+  ctx_->NewDatum("Resources")
   ->AddVal("ID", res_->id())
   ->AddVal("Type", res_->type())
   ->AddVal("TimeCreated", ctx_->time())

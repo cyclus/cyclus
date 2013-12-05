@@ -2,12 +2,12 @@
 #include <gtest/gtest.h>
 
 #include "context.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "mock_facility.h"
 #include "timer.h"
 
 using cyclus::Context;
-using cyclus::EventManager;
+using cyclus::Recorder;
 using cyclus::Model;
 using cyclus::Timer;
 using cyclus::Trader;
@@ -16,12 +16,12 @@ using cyclus::Trader;
 class ContextTests: public ::testing::Test {
  protected:
   Timer ti;
-  EventManager em;
+  Recorder rec;
   Context* ctx;
   MockFacility* fac;
   
   virtual void SetUp() {
-    ctx = new Context(&ti, &em);
+    ctx = new Context(&ti, &rec);
     fac = new MockFacility(ctx);
   };
   

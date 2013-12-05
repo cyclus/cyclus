@@ -7,15 +7,15 @@
 
 namespace cyclus {
 
-Context::Context(Timer* ti, EventManager* em)
-    : ti_(ti), em_(em), solver_(NULL), trans_id_(0) {};
+Context::Context(Timer* ti, Recorder* rec)
+    : ti_(ti), rec_(rec), solver_(NULL), trans_id_(0) {};
 
 Context::~Context() {
   if (solver_ != NULL) delete solver_;
 }
 
 boost::uuids::uuid Context::sim_id() {
-  return em_->sim_id();
+  return rec_->sim_id();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,8 +74,8 @@ void Context::RegisterTicker(TimeAgent* ta) {
   ti_->RegisterTickListener(ta);
 };
 
-Event* Context::NewEvent(std::string title) {
-  return em_->NewEvent(title);
+Datum* Context::NewDatum(std::string title) {
+  return rec_->NewDatum(title);
 };
 
 } // namespace cyclus

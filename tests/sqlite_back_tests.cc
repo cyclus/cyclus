@@ -37,25 +37,25 @@ private:
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(SqliteBackTest, Regression) {
-  using cyclus::EventManager;
+  using cyclus::Recorder;
   FileDeleter fd(path);
-  EventManager m;
+  Recorder m;
   FlushCatcher back(path);
   m.RegisterBackend(&back);
 
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
   ->AddVal("animal", std::string("monkey"))
   ->AddVal("weight", 10)
   ->AddVal("height", 5.5)
   ->AddVal("data", cyclus::Blob("banana"))
   ->Record();
 
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
   ->AddVal("animal", std::string("elephant"))
   ->AddVal("weight", 1000)
   ->Record();
 
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
   ->AddVal("animal", std::string("sea cucumber"))
   ->AddVal("height", 1.2)
   ->Record();

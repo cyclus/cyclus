@@ -29,15 +29,15 @@ class DirDel {
 TEST(CsvBackTest, ReadWrite) {
   DirDel dd(path);
 
-  cyclus::EventManager m;
+  cyclus::Recorder m;
   cyclus::CsvBack back(path);
   m.RegisterBackend(&back);
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
   ->AddVal("animal", std::string("monkey"))
   ->AddVal("weight", 10)
   ->AddVal("height", 5.5)
   ->Record();
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
   ->AddVal("animal", std::string("elephant"))
   ->AddVal("weight", 1000)
   ->AddVal("height", 7.2)
@@ -45,10 +45,10 @@ TEST(CsvBackTest, ReadWrite) {
   m.close();
 
   // make sure append works
-  cyclus::EventManager m2;
+  cyclus::Recorder m2;
   cyclus::CsvBack back2(path);
   m2.RegisterBackend(&back2);
-  m2.NewEvent("DumbTitle")
+  m2.NewDatum("DumbTitle")
   ->AddVal("animal", std::string("sea cucumber"))
   ->AddVal("weight", 1)
   ->AddVal("height", .4)
@@ -85,16 +85,16 @@ std::string ReadAll(std::string fname) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CsvBackTest, Blob) {
-  using cyclus::EventManager;
+  using cyclus::Recorder;
   using cyclus::CsvBack;
   DirDel dd(path);
 
   cyclus::Blob data("my name is flipper");
 
-  EventManager m;
+  Recorder m;
   CsvBack back(path);
   m.RegisterBackend(&back);
-  m.NewEvent("Blobs")
+  m.NewDatum("Blobs")
   ->AddVal("data", data)
   ->Record();
   m.close();

@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "event_manager.h"
-#include "event_backend.h"
+#include "recorder.h"
+#include "rec_backend.h"
 
-class TestBack : public cyclus::EventBackend {
+class TestBack : public cyclus::RecBackend {
   public:
     TestBack() {
       flush_count = 0;
@@ -11,9 +11,9 @@ class TestBack : public cyclus::EventBackend {
       closed = false;
     };
 
-    virtual void Notify(cyclus::EventList evs) {
-      flush_count = evs.size();
-      events = evs;
+    virtual void Notify(cyclus::DatumList data) {
+      flush_count = data.size();
+      this->data = data;
       notify_count++;
     };
 
@@ -25,30 +25,30 @@ class TestBack : public cyclus::EventBackend {
       closed = true;
     };
 
-    int flush_count; // # events in last notify
+    int flush_count; // # Datum objects in last notify
     int notify_count; // # times notify called
     bool closed;
-    cyclus::EventList events; // last receive list
+    cyclus::DatumList data; // last receive list
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Manager_NewEvent) {
-  cyclus::EventManager m;
-  cyclus::Event* ev = m.NewEvent("DumbTitle");
-  EXPECT_EQ(ev->title(), "DumbTitle");
+TEST(RecorderTest, Manager_NewDatum) {
+  cyclus::Recorder m;
+  cyclus::Datum* d = m.NewDatum("DumbTitle");
+  EXPECT_EQ(d->title(), "DumbTitle");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Manager_CreateDefault) {
-  using cyclus::EventManager;
-  EventManager m;
+TEST(RecorderTest, Manager_CreateDefault) {
+  using cyclus::Recorder;
+  Recorder m;
   EXPECT_EQ(m.dump_count(), cyclus::kDefaultDumpCount);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Manager_GetSetDumpFreq) {
-  using cyclus::EventManager;
-  EventManager m;
+TEST(RecorderTest, Manager_GetSetDumpFreq) {
+  using cyclus::Recorder;
+  Recorder m;
   m.set_dump_count(1);
   EXPECT_EQ(m.dump_count(), 1);
 
@@ -57,9 +57,9 @@ TEST(EventManagerTest, Manager_GetSetDumpFreq) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Manager_Closing) {
-  using cyclus::EventManager;
-  EventManager m;
+TEST(RecorderTest, Manager_Closing) {
+  using cyclus::Recorder;
+  Recorder m;
   TestBack back1;
   TestBack back2;
   m.RegisterBackend(&back1);
@@ -75,22 +75,22 @@ TEST(EventManagerTest, Manager_Closing) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Manager_Buffering) {
-  using cyclus::EventManager;
+TEST(RecorderTest, Manager_Buffering) {
+  using cyclus::Recorder;
   TestBack back1;
 
-  EventManager m;
+  Recorder m;
   m.set_dump_count(2);
   m.RegisterBackend(&back1);
 
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
    ->AddVal("animal", std::string("monkey"))
    ->Record();
 
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);
 
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
    ->AddVal("animal", std::string("elephant"))
    ->Record();
 
@@ -99,15 +99,15 @@ TEST(EventManagerTest, Manager_Buffering) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Manager_CloseFlushing) {
-  using cyclus::EventManager;
+TEST(RecorderTest, Manager_CloseFlushing) {
+  using cyclus::Recorder;
   TestBack back1;
 
-  EventManager m;
+  Recorder m;
   m.set_dump_count(2);
   m.RegisterBackend(&back1);
 
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
    ->AddVal("animal", std::string("monkey"))
    ->Record();
 
@@ -121,41 +121,41 @@ TEST(EventManagerTest, Manager_CloseFlushing) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Event_record) {
-  using cyclus::Event;
-  using cyclus::EventManager;
+TEST(RecorderTest, Datum_record) {
+  using cyclus::Datum;
+  using cyclus::Recorder;
   TestBack back;
-  EventManager m;
+  Recorder m;
   m.set_dump_count(1);
   m.RegisterBackend(&back);
 
-  Event* ev = m.NewEvent("DumbTitle");
-  ev->AddVal("animal", std::string("monkey"));
+  Datum* d = m.NewDatum("DumbTitle");
+  d->AddVal("animal", std::string("monkey"));
 
   EXPECT_EQ(back.flush_count, 0);
 
-  ev->Record();
+  d->Record();
 
   EXPECT_EQ(back.flush_count, 1);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(EventManagerTest, Event_addVal) {
-  using cyclus::Event;
-  using cyclus::EventManager;
+TEST(RecorderTest, Datum_addVal) {
+  using cyclus::Datum;
+  using cyclus::Recorder;
   TestBack back;
-  EventManager m;
+  Recorder m;
   m.RegisterBackend(&back);
 
-  cyclus::Event* ev = m.NewEvent("DumbTitle");
-  ev->AddVal("animal", std::string("monkey"));
-  ev->AddVal("weight", 10);
-  ev->AddVal("height", 5.5);
-  ev->Record();
+  cyclus::Datum* d = m.NewDatum("DumbTitle");
+  d->AddVal("animal", std::string("monkey"));
+  d->AddVal("weight", 10);
+  d->AddVal("height", 5.5);
+  d->Record();
 
-  ASSERT_EQ(ev->vals().size(), 4);
+  ASSERT_EQ(d->vals().size(), 4);
 
-  cyclus::Event::Vals::const_iterator it = ev->vals().begin();
+  cyclus::Datum::Vals::const_iterator it = d->vals().begin();
   EXPECT_STREQ(it->first, "SimID");
   EXPECT_EQ(it->second.cast<boost::uuids::uuid>(), m.sim_id());
   ++it;
@@ -170,7 +170,7 @@ TEST(EventManagerTest, Event_addVal) {
 
   m.close();
 
-  cyclus::Event::Vals vals = back.events.back()->vals();
+  cyclus::Datum::Vals vals = back.data.back()->vals();
   ASSERT_EQ(vals.size(), 4);
   EXPECT_STREQ(vals.front().first, "SimID");
   EXPECT_EQ(vals.front().second.cast<boost::uuids::uuid>(), m.sim_id());

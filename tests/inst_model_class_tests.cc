@@ -1,7 +1,7 @@
 // Instmodel_tests.h
 #include <gtest/gtest.h>
 
-#include "event_manager.h"
+#include "recorder.h"
 #include "facility_model.h"
 #include "inst_model.h"
 #include "mock_inst.h"
@@ -63,12 +63,12 @@ class InstModelClassTests : public ::testing::Test {
   DieModel* child5_;
 
   cyclus::TimeAgent* inst_;
-  cyclus::EventManager em_;
+  cyclus::Recorder rec_;
   cyclus::Timer ti_;
   cyclus::Context* ctx_;
 
   virtual void SetUp() {
-    ctx_ = new cyclus::Context(&ti_, &em_);
+    ctx_ = new cyclus::Context(&ti_, &rec_);
 
     child1_ = new DieModel(ctx_);
     child2_ = new DieModel(ctx_);
