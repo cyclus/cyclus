@@ -7,6 +7,13 @@
 
 namespace cyclus {
 
+/// @brief A comparison function for sorting a container of Arcs by the
+/// requester's (unode's) preference, in decensing order (i.e., most preferred
+/// Arc first)
+inline bool ReqPrefComp(const Arc& l, const Arc& r) {
+  return l.first->prefs[l] > r.first->prefs[r];
+}
+  
 class ExchangeGraph;
   
 /// @brief The GreedySolver provides the implementation for a "greedy" solution
