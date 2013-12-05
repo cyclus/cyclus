@@ -58,20 +58,16 @@ class BidPortfolioTests: public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BidPortfolioTests, RespAdd) {
-  Bid<Material>::Ptr r1 = Bid<Material>::Create(req1, get_mat(), fac1);
   
   BidPortfolio<Material>::Ptr rp(new BidPortfolio<Material>());
   EXPECT_EQ(rp->bids().size(), 0);
-  EXPECT_NO_THROW(rp->AddBid(r1));
+  Bid<Material>::Ptr r1 = rp->AddBid(req1, get_mat(), fac1);
   EXPECT_EQ(rp->bidder(), fac1);
   EXPECT_EQ(rp->bids().size(), 1);
   EXPECT_EQ(*rp->bids().begin(), r1);
 
-  Bid<Material>::Ptr r2 = Bid<Material>::Create(req2, get_mat(), fac2);
-  EXPECT_THROW(rp->AddBid(r2), KeyError);  
-
-  Bid<Material>::Ptr r3 = Bid<Material>::Create(req2, get_mat(), fac1);
-  EXPECT_THROW(rp->AddBid(r3), KeyError);    
+  EXPECT_THROW(rp->AddBid(req2, get_mat(), fac2), KeyError);  
+  EXPECT_THROW(rp->AddBid(req2, get_mat(), fac1), KeyError);    
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -79,16 +75,9 @@ TEST_F(BidPortfolioTests, Sets) {
   BidPortfolio<Material>::Ptr rp1(new BidPortfolio<Material>());
   BidPortfolio<Material>::Ptr rp2(new BidPortfolio<Material>());
   BidPortfolio<Material>::Ptr rp3(new BidPortfolio<Material>());
-  
-  Bid<Material>::Ptr bid1 = Bid<Material>::Create(req1, get_mat(), fac1);
-  Bid<Material>::Ptr bid2 = Bid<Material>::Create(req1, get_mat(), fac1);
 
-  rp1->AddBid(bid1);
-    
-  rp2->AddBid(bid2);
-
-  rp3->AddBid(bid1);
-  rp3->AddBid(bid2);
+  rp3->AddBid(req1, get_mat(), fac1);
+  rp3->AddBid(req1, get_mat(), fac1);
   
   std::set< BidPortfolio<Material>::Ptr > bids;
   EXPECT_EQ(bids.size(), 0);

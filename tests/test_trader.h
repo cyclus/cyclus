@@ -79,10 +79,7 @@ class TestTrader : public MockFacility {
     
       std::set<BidPortfolio<Material>::Ptr> ports;
       BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
-      Bid<Material>::Ptr to_bid =
-          Bid<Material>::Create(req, obj_fac->mat, this);
-      bid = to_bid; // exp bid
-      port->AddBid(to_bid);
+      bid = port->AddBid(req, obj_fac->mat, this); // exp bid
       ports.insert(port);
       return ports;
     }

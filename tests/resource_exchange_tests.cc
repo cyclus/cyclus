@@ -102,23 +102,26 @@ class Bidder: public MockFacility {
     m->InitFrom(this);
     m->bids_ = bids_;
     m->commod_ = commod_;
+    m->port_ = port_;
     return m;
   };
   
   set<BidPortfolio<Material>::Ptr> GetMatlBids(
       const CommodMap<Material>::type& commod_requests) {
     set<BidPortfolio<Material>::Ptr> bps;
-    BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
     int sz = commod_requests.at(commod_).size();
-    for (int i = 0; i < sz; i++) {
-      bp->AddBid(bids_[i]);
-    }
-    bps.insert(bp);
+    // BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+    // for (int i = 0; i < sz; i++) {
+    //   bp->AddBid(bids_[i]->request(), bids_[i]->offer(), bids_[i]->bidder());
+    // }
+    // bps.insert(bp);
+    bps.insert(port_);
     bid_ctr_++;
     return bps;
   }
 
   std::vector<Bid<Material>::Ptr> bids_;
+  BidPortfolio<Material>::Ptr port_;
   std::string commod_;
   int bid_ctr_;
 };
@@ -217,13 +220,15 @@ TEST_F(ResourceExchangeTests, Bids) {
   
   Bidder* bidr = new Bidder(tc.get(), commod);
 
-  bid = Bid<Material>::Create(req, mat, bidr);
-  Bid<Material>::Ptr bid1 = Bid<Material>::Create(req1, mat, bidr);
+  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+  bid = bp->AddBid(req, mat, bidr);
+  Bid<Material>::Ptr bid1 = bp->AddBid(req1, mat, bidr);
+  
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(bid);
   bids.push_back(bid1);
-  
-  bidr->bids_ = bids;
+
+  bidr->port_ = bp;
   
   FacilityModel* clone = dynamic_cast<FacilityModel*>(bidr->Clone());
   clone->Deploy(clone);
@@ -234,12 +239,12 @@ TEST_F(ResourceExchangeTests, Bids) {
   EXPECT_EQ(1, bcast->bid_ctr_);
   EXPECT_EQ(1, exchng->ex_ctx().bidders.size());
   
-  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  bp->AddBid(bid);
-  bp->AddBid(bid1);
   const std::vector<BidPortfolio<Material>::Ptr>& obsvp = ctx.bids;
   EXPECT_EQ(1, obsvp.size());
   EXPECT_TRUE(BPEq(*bp.get(), *obsvp[0].get()));
+  const cyclus::BidPortfolio<Material>& lhs = *bp;
+  const cyclus::BidPortfolio<Material>& rhs = *obsvp[0];
+  EXPECT_TRUE(BPEq(*bp, *obsvp[0]));
 
   const std::vector<Bid<Material>::Ptr>& obsvb = ctx.bids_by_request[req];
   EXPECT_EQ(1, obsvb.size());  
@@ -268,9 +273,11 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   Requester* ccast = dynamic_cast<Requester*>(child);
 
   // doin a little magic to simulate each requester making their own request
-  Request<Material>::Ptr preq = Request<Material>::Create(mat, pcast, commod, pref);
+  Request<Material>::Ptr preq =
+      Request<Material>::Create(mat, pcast, commod, pref);
   pcast->r_ = preq;
-  Request<Material>::Ptr creq = Request<Material>::Create(mat, ccast, commod, pref);
+  Request<Material>::Ptr creq =
+      Request<Material>::Create(mat, ccast, commod, pref);
   ccast->r_ = creq;
   
   EXPECT_EQ(0, pcast->req_ctr_);
@@ -305,20 +312,27 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   Requester* ccast = dynamic_cast<Requester*>(child);
 
   // doin a little magic to simulate each requester making their own request
-  Request<Material>::Ptr preq = Request<Material>::Create(mat, pcast, commod, pref);
+  Request<Material>::Ptr preq =
+      Request<Material>::Create(mat, pcast, commod, pref);
   pcast->r_ = preq;
-  Request<Material>::Ptr creq = Request<Material>::Create(mat, ccast, commod, pref);
+  Request<Material>::Ptr creq =
+      Request<Material>::Create(mat, ccast, commod, pref);
   ccast->r_ = creq;
 
   Bidder* bidr = new Bidder(tc.get(), commod);
 
-  Bid<Material>::Ptr pbid = Bid<Material>::Create(preq, mat, bidr);
-  Bid<Material>::Ptr cbid = Bid<Material>::Create(creq, mat, bidr);
+  
+  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+  // Bid<Material>::Ptr pbid = Bid<Material>::Create(preq, mat, bidr);
+  // Bid<Material>::Ptr cbid = Bid<Material>::Create(creq, mat, bidr);
+  Bid<Material>::Ptr pbid = bp->AddBid(preq, mat, bidr);
+  Bid<Material>::Ptr cbid = bp->AddBid(creq, mat, bidr);
   
   std::vector<Bid<Material>::Ptr> bids;
   bids.push_back(pbid);
   bids.push_back(cbid);
-  bidr->bids_ = bids;
+  //bidr->bids_ = bids;
+  bidr->port_ = bp;
   
   FacilityModel* bclone = dynamic_cast<FacilityModel*>(bidr->Clone());
   bclone->Deploy(bclone);

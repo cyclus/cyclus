@@ -141,8 +141,8 @@ TEST(ExXlateTests, XlateReq) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateBid) {
-  Request<Material>::Ptr req = Request<Material>::Create(get_mat(u235, qty), &trader);
-  Bid<Material>::Ptr bid = Bid<Material>::Create(req, get_mat(u235, qty), &trader);
+  Request<Material>::Ptr req =
+      Request<Material>::Create(get_mat(u235, qty), &trader);
   
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
@@ -156,14 +156,15 @@ TEST(ExXlateTests, XlateBid) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
   BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
-  port->AddBid(bid);
+  Bid<Material>::Ptr bid = port->AddBid(req, get_mat(u235, qty), &trader);
   port->AddConstraint(cc1);
   port->AddConstraint(cc2);
 
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  ExchangeNodeGroup::Ptr set = TranslateBidPortfolio(xlator.translation_ctx(), port);
+  ExchangeNodeGroup::Ptr set =
+      TranslateBidPortfolio(xlator.translation_ctx(), port);
 
   EXPECT_EQ(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().bid_to_node.find(bid)
@@ -175,7 +176,6 @@ TEST(ExXlateTests, XlateArc) {
   Material::Ptr mat = get_mat(u235, qty);
 
   Request<Material>::Ptr req = Request<Material>::Create(get_mat(u235, qty), &trader);
-  Bid<Material>::Ptr bid = Bid<Material>::Create(req, get_mat(u235, qty), &trader);
     
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
@@ -189,7 +189,7 @@ TEST(ExXlateTests, XlateArc) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  bport->AddBid(bid);
+  Bid<Material>::Ptr bid = bport->AddBid(req, get_mat(u235, qty), &trader);
   bport->AddConstraint(cc1);
   bport->AddConstraint(cc2);
 
@@ -201,8 +201,10 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeTranslator<Material> xlator(&ctx);
 
   // give the xlator the correct state
-  RequestGroup::Ptr rset = TranslateRequestPortfolio(xlator.translation_ctx(), rport);
-  ExchangeNodeGroup::Ptr bset = TranslateBidPortfolio(xlator.translation_ctx(), bport);
+  RequestGroup::Ptr rset =
+      TranslateRequestPortfolio(xlator.translation_ctx(), rport);
+  ExchangeNodeGroup::Ptr bset =
+      TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
   Arc a = TranslateArc(xlator.translation_ctx(), bid);
 
@@ -221,10 +223,9 @@ TEST(ExXlateTests, XlateArc) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, SimpleXlate) {
   Request<Material>::Ptr req = Request<Material>::Create(get_mat(u235, qty), &trader);
-  Bid<Material>::Ptr bid = Bid<Material>::Create(req, get_mat(u235, qty), &trader);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  bport->AddBid(bid);
+  bport->AddBid(req, get_mat(u235, qty), &trader);
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
   rport->AddRequest(req);

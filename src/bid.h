@@ -21,6 +21,16 @@ class Bid {
   typedef boost::shared_ptr< Bid<T> > Ptr;
 
   /// @brief a factory method for a bid
+  inline static typename Bid<T>::Ptr Create(
+      typename Request<T>::Ptr request, 
+      boost::shared_ptr<T> offer,
+      Trader* bidder,
+      typename BidPortfolio<T>::Ptr portfolio) {
+    return Ptr(new Bid<T>(request, offer, bidder, portfolio));
+  }
+
+  /// @brief a factory method for a bid for a bid without a portfolio
+  /// @warning this factory should generally only be used for testing
   inline static typename Bid<T>::Ptr Create(typename Request<T>::Ptr request, 
                                             boost::shared_ptr<T> offer,
                                             Trader* bidder) {
@@ -39,18 +49,22 @@ class Bid {
   /// @return the portfolio of which this bid is a part
   inline typename BidPortfolio<T>::Ptr portfolio() { return portfolio_; }
 
-  /// @brief set the portfolio for this bid
-  inline void set_portfolio(typename BidPortfolio<T>::Ptr portfolio) {
-    portfolio_ = portfolio;
-  }
-
  private:
   Bid(typename Request<T>::Ptr request, 
       boost::shared_ptr<T> offer,
       Trader* bidder)
     : request_(request),
       offer_(offer),
-      bidder_(bidder){};
+      bidder_(bidder) {};
+
+  Bid(typename Request<T>::Ptr request, 
+      boost::shared_ptr<T> offer,
+      Trader* bidder,
+      typename BidPortfolio<T>::Ptr portfolio)
+    : request_(request),
+      offer_(offer),
+      bidder_(bidder),
+      portfolio_(portfolio) {};
 
   typename Request<T>::Ptr request_;
   boost::shared_ptr<T> offer_;

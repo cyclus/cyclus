@@ -40,22 +40,15 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @param r the bid to add
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original or if the bid commodity is different than the original
-  void AddBid(typename Request<T>::Ptr request, 
-              boost::shared_ptr<T> offer,
-              Trader* bidder) {
-    typename Bid<T>::Ptr b = Bid<T>::Create(request, offer, bidder);
-    AddBid(b);
-  };
-
-  /// @brief add a bid to the portfolio
-  /// @param r the bid to add
-  /// @throws KeyError if a bid is added from a different bidder than the
-  /// original or if the bid commodity is different than the original
-  void AddBid(const typename Bid<T>::Ptr b) {
+  typename Bid<T>::Ptr AddBid(typename Request<T>::Ptr request, 
+                              boost::shared_ptr<T> offer,
+                              Trader* bidder) {
+    typename Bid<T>::Ptr b =
+        Bid<T>::Create(request, offer, bidder, this->shared_from_this());
     VerifyResponder_(b);
     VerifyCommodity_(b);
     bids_.insert(b);
-    b->set_portfolio(this->shared_from_this());
+    return b;
   };
 
   /// @brief add a capacity constraint associated with the portfolio
