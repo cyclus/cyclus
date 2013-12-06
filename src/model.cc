@@ -9,7 +9,6 @@
 
 #include "error.h"
 #include "logger.h"
-#include "market_model.h"
 #include "region_model.h"
 #include "resource.h"
 
@@ -21,7 +20,6 @@ int Model::next_id_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> Model::dynamic_module_types() {
   std::set<std::string> types;
-  types.insert("Market");
   types.insert("Region");
   types.insert("Inst");
   types.insert("Facility");
@@ -202,21 +200,6 @@ std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const std::string Model::ModelImpl() {
   return model_impl_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Resource::Ptr> Model::RemoveResource(Transaction order) {
-  std::string msg = "The model " + name();
-  msg += " doesn't support resource removal.";
-  throw Error(msg);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::AddResource(Transaction trans,
-                        std::vector<Resource::Ptr> manifest) {
-  std::string err_msg = "The model " + name();
-  err_msg += " doesn't support resource receiving.";
-  throw Error(err_msg);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

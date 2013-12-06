@@ -9,7 +9,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "dynamic_module.h"
-#include "transaction.h"
+#include "resource.h"
 #include "query_engine.h"
 #include "exchange_context.h"
 
@@ -27,7 +27,7 @@ class GenericResource;
    @todo consider changing to a vector of strings & consolidating with
    the model_type instance variable of the model class
  */
-enum ModelType {REGION, INST, FACILITY, MARKET, END_MODEL_TYPES};
+enum ModelType {REGION, INST, FACILITY, END_MODEL_TYPES};
 
 /**
    @class Model
@@ -37,13 +37,6 @@ enum ModelType {REGION, INST, FACILITY, MARKET, END_MODEL_TYPES};
    that will be available for dynamic loading.  This common interface
    means that the basic process of loading and registering models can
    be implemented in a single place.
-
-   To allow serialization of different types of models in unified
-   ID space, this interface is inherited by type-specific abstract
-   classes, such as MarketModel, that has its own static integer
-   to keep track of the next available ID.
-
-   @warning all constructors must set id_ and increment next_id_
  */
 class Model {
  public:
@@ -153,32 +146,11 @@ class Model {
   virtual void SetParent(Model* parent);
 
   /**
-     Transacted resources are extracted through this method.
-
-     @warning This method should never be directly invoked.  All
-     resource transfers should take place using the
-     Message.ApproveTransfer() method.
-
-     @param order the transaction for which Resource(s) are to be prepared
-
-     @return list of resources to be sent for this order
+     return the ith child
    */
-  virtual std::vector<Resource::Ptr> RemoveResource(Transaction order);
-
-  /**
-     Transacted resources are received through this method.
-
-     @warning This method should never be directly invoked.  All
-     resource transfers should take place using the
-     Message.ApproveTransfer() method.
-
-     @param trans the transaction that corresponds with the materials
-     being received
-
-     @param manifest is the set of resources being
-   */
-  virtual void AddResource(Transaction trans,
-                           std::vector<Resource::Ptr> manifest);
+  Model* children(int i) {
+    return children_[i];
+  }
 
   /** @brief default implementation for material preferences */
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};

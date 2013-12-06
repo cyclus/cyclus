@@ -1,7 +1,7 @@
 
 #include <gtest/gtest.h>
 
-#include "logger.h"
+#include "cyclus.h"
 
 using cyclus::Logger;
 

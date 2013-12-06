@@ -12,10 +12,6 @@ class TestRegion: public cyclus::RegionModel {
         cyclus::Model(ctx) {};
       
   virtual cyclus::Model* Clone() {return new TestRegion(context());};
-
-  void ReceiveMessage(cyclus::Message::Ptr msg) {
-    msg->SetDir(cyclus::DOWN_MSG);
-  }
 };
 
 #endif

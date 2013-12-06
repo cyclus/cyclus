@@ -5,7 +5,6 @@
 
 #include "context.h"
 #include "inst_model.h"
-#include "message.h"
 #include "query_engine.h"
 
 namespace stubs {
@@ -68,11 +67,6 @@ class StubInst : public cyclus::InstModel {
      every model should be able to print a verbose description 
    */
    virtual std::string str();
-
-   /**
-      The StubInst should ignore incoming messages 
-    */
-   virtual void ReceiveMessage(cyclus::Message::Ptr msg);
 
 /* ------------------- */ 
 

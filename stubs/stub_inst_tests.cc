@@ -42,13 +42,6 @@ TEST_F(StubInstTest, Print) {
   // Test StubInst specific aspects of the print method here
 }
 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(StubInstTest, ReceiveMessage) {
-  cyclus::Message::Ptr msg;
-  // Test StubInst specific behaviors of the receiveMessage function here
-}
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(StubInstTest, Tick) {
   int time = 1;

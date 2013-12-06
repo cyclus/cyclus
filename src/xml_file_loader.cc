@@ -82,7 +82,6 @@ XMLFileLoader::XMLFileLoader(Context* ctx,
   ->AddVal("Data", Blob(input.str()))
   ->Record();
 
-  schema_paths_["Market"] = "/*/market";
   schema_paths_["Converter"] = "/*/converter";
   schema_paths_["Region"] = "/*/region";
   schema_paths_["Inst"] = "/*/region/institution";
@@ -191,7 +190,7 @@ void XMLFileLoader::LoadInitialAgents() {
       // register module
       if (*it == "Facility") {
         ctx_->AddPrototype(model->name(), model);
-      } else if (*it == "Market" || *it == "Region") {
+      } else if (*it == "Region") {
         model->Deploy(model);
       }
     }

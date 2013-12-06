@@ -23,7 +23,6 @@ class DieModel : public cyclus::FacilityModel {
 
   virtual ~DieModel() {};
 
-  virtual void ReceiveMessage(cyclus::Message::Ptr msg) {};
   virtual void CloneModuleMembersFrom(FacilityModel* source) {};
   virtual void Decommission() {
     delete this;

@@ -6,7 +6,6 @@
 #include <vector>
 #include <set>
 
-#include "communicator.h"
 #include "model.h"
 #include "time_agent.h"
 #include "trader.h"
@@ -26,18 +25,18 @@ class InstModel;
 
    @section intro Introduction
 
-   The FacilityModel type plays a primary role in Cyclus.  A
-   FacilityModel facility is where offers and requests are generated and
-   transmitted to markets and where shipments of material, issued by the
-   markets, are executed. The algorithms to determine what offers and
-   requests are issued and how material shipments are handled are the
-   primary differentiators between different FacilityModel
-   implementations.
-   Like all model implementations, there are a number of implementations
-   that are distributed as part of the core Cyclus application as well
-   as implementations contributed by third-party developers.  The links
-   below describe additional parameters necessary for the complete
-   definition of a facility of that implementation.
+   The FacilityModel type plays a primary role in Cyclus.  A FacilityModel
+   facility is where offers and requests are generated and transmitted to a
+   ResourceExchange and where shipments of material, issued by the exchange, are
+   executed. The algorithms to determine what offers and requests are issued and
+   how material shipments are handled are the primary differentiators between
+   different FacilityModel implementations.
+
+   Like all model implementations, there are a number of implementations that
+   are distributed as part of the core Cyclus application as well as
+   implementations contributed by third-party developers.  The links below
+   describe additional parameters necessary for the complete definition of a
+   facility of that implementation.
 
    @section available Available Core Implementations
 
@@ -69,7 +68,7 @@ class InstModel;
    Collaborators are encouraged to add to this list and link to external
    pages that describe how to get the models and the detailed behavior
  */
-class FacilityModel : public TimeAgent, public Communicator, public Trader {
+class FacilityModel : public TimeAgent, public Trader {
  public:
   FacilityModel(Context* ctx);
 
@@ -110,13 +109,6 @@ class FacilityModel : public TimeAgent, public Communicator, public Trader {
      every model should be able to print a verbose description
    */
   virtual std::string str();
-
-  /**
-     There is no default FacilityModel receiver
-
-     Each derived class must implement an offer/request receiver
-   */
-  virtual void ReceiveMessage(Message::Ptr msg) = 0;
 
   /**
      Sets the facility's name

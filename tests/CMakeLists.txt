@@ -104,7 +104,6 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/message_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc
