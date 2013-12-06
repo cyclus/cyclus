@@ -93,18 +93,6 @@ std::string Timer::ReportListeners() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::SendResolve() {
-  for (std::vector<MarketModel*>::iterator agent = resolve_listeners_.begin();
-       agent != resolve_listeners_.end();
-       agent++) {
-    CLOG(LEV_INFO3) << "Sending resolve to Model ID=" << (*agent)->id()
-                    << ", name=" << (*agent)->name() << " {";
-    (*agent)->Resolve();
-    CLOG(LEV_INFO3) << "}";
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SendTick() {
   for (std::vector<TimeAgent*>::iterator agent = tick_listeners_.begin();
        agent != tick_listeners_.end();
@@ -145,19 +133,11 @@ void Timer::RegisterTickListener(TimeAgent* agent) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::RegisterResolveListener(MarketModel* agent) {
-  CLOG(LEV_INFO2) << "Model ID=" << agent->id() << ", name=" << agent->name()
-                  << " has registered to receive 'resolves'.";
-  resolve_listeners_.push_back(agent);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::time() {
   return time_;
 }
 
 void Timer::Reset() {
-  resolve_listeners_.clear();
   tick_listeners_.clear();
 
   decay_interval_ = 0;

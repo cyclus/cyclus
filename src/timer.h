@@ -7,7 +7,6 @@
 #include "boost/date_time/gregorian/gregorian.hpp"
 
 #include "context.h"
-#include "market_model.h"
 #include "query_engine.h"
 #include "time_agent.h"
 
@@ -56,13 +55,6 @@ class Timer {
      @param agent agent that will receive time-step notifications
    */
   void RegisterTickListener(TimeAgent* agent);
-
-  /**
-     registers a sim. agent to receive (market) resolve notifications.
-
-     @param agent agent that will receive resolve notifications
-   */
-  void RegisterResolveListener(MarketModel* agent);
 
   /**
      Returns the current time, in months since the simulation started.
@@ -227,17 +219,6 @@ class Timer {
      Returns a string of all models listening to the tick
    */
   std::string ReportListeners();
-
-  /**
-     Concrete models that desire to receive resolve (markets)
-   */
-  std::vector<MarketModel*> resolve_listeners_;
-
-  /**
-     sends the resolve signal to all of the (market) models receiving
-     resolve notifications.
-   */
-  void SendResolve();
 
   /**
      sends the tick signal to all of the models receiving time

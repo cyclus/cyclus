@@ -95,11 +95,6 @@ std::string RegionModel::str() {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::ReceiveMessage(Message::Ptr msg) {
-  msg->SendOn();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::HandleTick(int time) {
   int currsize = children().size();
   int i = 0;

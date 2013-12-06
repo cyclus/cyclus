@@ -64,13 +64,13 @@ class ResourceBuff {
 
   /// count returns the total number of constituent resource objects
   /// in the store. Never throws.
-  int count() {
+  inline int count() const {
     return mats_.size();
   };
 
   /// quantity returns the total resource quantity of constituent resource objects
   /// in the store. Never throws.
-  double quantity() {
+  inline double quantity() const {
     return qty_;
   };
 
@@ -78,12 +78,12 @@ class ResourceBuff {
   ///
   /// It is effectively the difference between the capacity and the quantity.
   /// Never throws.
-  double space() {
+  inline double space() const {
     return capacity_ - qty_;
   };
 
   /// returns true if there are no mats in mats_
-  bool empty() {
+  inline bool empty() const {
     return mats_.empty();
   };
 

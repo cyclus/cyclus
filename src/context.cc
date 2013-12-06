@@ -69,10 +69,6 @@ void Context::RegisterTicker(TimeAgent* ta) {
   ti_->RegisterTickListener(ta);
 };
 
-void Context::RegisterResolver(MarketModel* mkt) {
-  ti_->RegisterResolveListener(mkt);
-};
-
 Event* Context::NewEvent(std::string title) {
   return em_->NewEvent(title);
 };

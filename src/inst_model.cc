@@ -119,15 +119,6 @@ void InstModel::Deploy(Model* parent) {
  * all COMMUNICATOR classes have these members
  * --------------------
  */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::ReceiveMessage(Message::Ptr msg) {
-  // Default institutions aren't insterested in fooling with messages.
-  // Just pass them along.
-  // If it's going up, send it to the region.
-  // If it's going down, send it to the facility.
-  msg->SendOn();
-}
-
 void InstModel::HandleTick(int time) {
   // tell all of the institution's child models to handle the tick
   int currsize = children().size();

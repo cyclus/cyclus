@@ -82,14 +82,6 @@ std::string XMLFileLoaderTests::RecipeSequence() {
 
 std::string XMLFileLoaderTests::ModuleSequence() {
   return  "<simulation>"
-          "  <!-- markets -->"
-          "  <market>"
-          "    <name>freshfuel</name>"
-          "    <mktcommodity>fresh_fuel</mktcommodity>"
-          "    <model>"
-          "      <TestMarket/>"
-          "    </model>"
-          "  </market>"
           "  <!-- facility prototypes -->"
           "  <facility>"
           "    <name>fac</name>"

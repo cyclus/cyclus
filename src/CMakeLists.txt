@@ -83,11 +83,9 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/logger.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/market_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/message.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc
@@ -103,7 +101,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_factories.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_functions.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/timer.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/transaction.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/variable.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader.cc 
@@ -123,7 +120,6 @@ INSTALL(FILES
   commodity.h
   commodity_producer.h
   commodity_producer_manager.h
-  communicator.h
   comp_math.h
   composition.h
   context.h
@@ -148,16 +144,15 @@ INSTALL(FILES
   facility_model.h
   function.h
   generic_resource.h
+  greedy_solver.h
   hdf5_back.h
   inst_model.h
   intrusive_base.h
   l_matrix.h
   logger.h
-  market_model.h
   mass_table.h
   mat_query.h
   material.h
-  message.h
   model.h
   query_engine.h 
   region_model.h
@@ -183,7 +178,6 @@ INSTALL(FILES
   trade_executor.h
   trader.h
   trader_management.h
-  transaction.h
   uniform_taylor.h
   unix_helper_functions.h
   use_matrix_lib.h

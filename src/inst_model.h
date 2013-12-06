@@ -3,7 +3,6 @@
 #define CYCLUS_INST_MODEL_H_
 
 #include "time_agent.h"
-#include "communicator.h"
 #include "model.h"
 #include "region_model.h"
 
@@ -23,14 +22,12 @@ typedef std::set<std::string>::iterator PrototypeIterator;
    The InstModel class is the abstract class/interface
    used by all institution models
 
-   @section introduction Introduction
-   The InstModel type assists in defining the
-   region-institution-facility hierarchy in Cyclus. A InstModel
-   institution is an actor associated with a set of facilities
-   for which it is responsible. An InstModel may be used to help
-   MarketModel implementations to make material routing decisions
-   based on interfacility relationships. Deployment is a primary
-   differentiator between different InstModel implementations.
+   @section introduction Introduction The InstModel type assists in defining the
+   region-institution-facility hierarchy in Cyclus. A InstModel institution is
+   an actor associated with a set of facilities for which it is responsible. An
+   InstModel may be used to adjust preferences in the ResourceExchange to make
+   material routing decisions based on interfacility relationships. Deployment
+   is a primary differentiator between different InstModel implementations.
 
    Like all model implementations, there are a number of
    implementations that are distributed as part of the core Cyclus
@@ -50,7 +47,7 @@ typedef std::set<std::string>::iterator PrototypeIterator;
    @section thirdPartyImpl Third Party Implementations
    (None)
  */
-class InstModel : public TimeAgent, public Communicator {
+class InstModel : public TimeAgent {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
@@ -79,11 +76,6 @@ class InstModel : public TimeAgent, public Communicator {
   virtual std::string str();
 
  public:
-  /**
-     default InstModel receiver is to ignore message.
-   */
-  virtual void ReceiveMessage(Message::Ptr msg);
-
   /**
      Each institution is prompted to do its beginning-of-time-step
      stuff at the tick of the timer.
