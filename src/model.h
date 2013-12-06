@@ -27,7 +27,7 @@ class GenericResource;
    @todo consider changing to a vector of strings & consolidating with
    the model_type instance variable of the model class
  */
-enum ModelType {REGION, INST, FACILITY, MARKET, END_MODEL_TYPES};
+enum ModelType {REGION, INST, FACILITY, END_MODEL_TYPES};
 
 /**
    @class Model
@@ -37,13 +37,6 @@ enum ModelType {REGION, INST, FACILITY, MARKET, END_MODEL_TYPES};
    that will be available for dynamic loading.  This common interface
    means that the basic process of loading and registering models can
    be implemented in a single place.
-
-   To allow serialization of different types of models in unified
-   ID space, this interface is inherited by type-specific abstract
-   classes, such as MarketModel, that has its own static integer
-   to keep track of the next available ID.
-
-   @warning all constructors must set id_ and increment next_id_
  */
 class Model {
  public:

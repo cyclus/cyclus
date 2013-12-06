@@ -25,18 +25,18 @@ class InstModel;
 
    @section intro Introduction
 
-   The FacilityModel type plays a primary role in Cyclus.  A
-   FacilityModel facility is where offers and requests are generated and
-   transmitted to markets and where shipments of material, issued by the
-   markets, are executed. The algorithms to determine what offers and
-   requests are issued and how material shipments are handled are the
-   primary differentiators between different FacilityModel
-   implementations.
-   Like all model implementations, there are a number of implementations
-   that are distributed as part of the core Cyclus application as well
-   as implementations contributed by third-party developers.  The links
-   below describe additional parameters necessary for the complete
-   definition of a facility of that implementation.
+   The FacilityModel type plays a primary role in Cyclus.  A FacilityModel
+   facility is where offers and requests are generated and transmitted to a
+   ResourceExchange and where shipments of material, issued by the exchange, are
+   executed. The algorithms to determine what offers and requests are issued and
+   how material shipments are handled are the primary differentiators between
+   different FacilityModel implementations.
+
+   Like all model implementations, there are a number of implementations that
+   are distributed as part of the core Cyclus application as well as
+   implementations contributed by third-party developers.  The links below
+   describe additional parameters necessary for the complete definition of a
+   facility of that implementation.
 
    @section available Available Core Implementations
 
