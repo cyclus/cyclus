@@ -17,7 +17,7 @@ namespace cyclus {
 template <class T>
 struct PrefMap {
   typedef std::map< typename Request<T>::Ptr,
-    std::vector< std::pair< typename Bid<T>::Ptr, double > > > type;
+    std::map< typename Bid<T>::Ptr, double > > type;
 };
 
 template <class T>
@@ -72,7 +72,8 @@ struct ExchangeContext {
     }
   }
 
-  /// @brief adds a bid to the appropriate containers
+  /// @brief adds a bid to the appropriate containers, default trade preference
+  /// between request and bid is set
   /// @param pb the bid
   void AddBid(typename Bid<T>::Ptr pb) {
     assert(pb->bidder() != NULL);
@@ -80,7 +81,7 @@ struct ExchangeContext {
     
     bids_by_request[pb->request()].push_back(pb);
 
-    trader_prefs[pb->request()->requester()][pb->request()].push_back(
+    trader_prefs[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, pb->request()->preference()));
   }
   

@@ -4,12 +4,17 @@
 #include <functional>
 #include <vector>
 
+#include "greedy_preconditioner.h"
 #include "logger.h"
 
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::Solve() {
+  if (conditioner_ != NULL) {
+    conditioner_->Condition(graph_);
+  }
+  
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind1st(
@@ -33,9 +38,11 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
     // arcs associated with it
     if (graph_->node_arc_map().count(*req_it) > 0) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
-      arc_it = arcs.begin();
+      std::vector<Arc> sorted(arcs); // make a copy for now
+      std::sort(sorted.begin(), sorted.end(), ReqPrefComp);
+      arc_it = sorted.begin();
     
-      while( (match <= target) && (arc_it != arcs.end()) ) {
+      while( (match <= target) && (arc_it != sorted.end()) ) {
         double remain = target - match;
         double tomatch = std::min(remain, Capacity(*arc_it));
         if (tomatch > 0) {

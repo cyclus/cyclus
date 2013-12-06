@@ -61,7 +61,16 @@ class ExchangeTranslator {
       const std::set<typename Bid<T>::Ptr>& bids = (*bp_it)->bids();
       typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
-        Arc a = TranslateArc(xlation_ctx_, *b_it);
+        typename Bid<T>::Ptr bid = *b_it;
+
+        // get translated arc
+        Arc a = TranslateArc(xlation_ctx_, bid);
+        
+        // add unode's preference for this arc
+        typename Request<T>::Ptr req = bid->request();
+        double pref =
+            ex_ctx_->trader_prefs.at(req->requester())[req][bid];
+        a.first->prefs[a] = pref; // request node is a.first
         graph->AddArc(a);
       }
     }
@@ -123,6 +132,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
        r_it != rp->requests().end();
        ++r_it) {
     ExchangeNode::Ptr n(new ExchangeNode());
+    n->commod = (*r_it)->commodity();
     rs->AddExchangeNode(n);
     AddRequest(translation_ctx, *r_it, n);
   }
@@ -152,6 +162,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
        b_it != bp->bids().end();
        ++b_it) {
     ExchangeNode::Ptr n(new ExchangeNode());
+    n->commod = (*b_it)->request()->commodity();
     bs->AddExchangeNode(n);
     AddBid(translation_ctx, *b_it, n);
   }

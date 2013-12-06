@@ -77,6 +77,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc

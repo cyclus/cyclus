@@ -30,7 +30,7 @@ struct ExchangeNode {
  public:
   typedef boost::shared_ptr<ExchangeNode> Ptr;
   
-  explicit ExchangeNode(double max_qty = std::numeric_limits<double>::max());
+  ExchangeNode(double max_qty = std::numeric_limits<double>::max());
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
@@ -39,6 +39,9 @@ struct ExchangeNode {
   /// capacties of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
   std::map<Arc, std::vector<double> > unit_capacities;
+
+  /// @brief preference values for arcs
+  std::map<Arc, double> prefs;
   
   /// @brief the maximum amount of a resource that can be associated with this
   /// node
@@ -47,6 +50,9 @@ struct ExchangeNode {
   /// @brief a running total of the amount of resource associated with this
   /// node
   double qty;
+
+  /// @brief the commodity associated with this exchange node
+  std::string commod;
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator

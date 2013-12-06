@@ -162,10 +162,10 @@ TEST_F(ExchangeContextTests, AddBid1) {
   EXPECT_EQ(bidders, context.bidders);
 
   PrefMap<Resource>::type obs;
-  obs[req1].push_back(std::make_pair(bid, req1->preference()));
+  obs[req1].insert(std::make_pair(bid, req1->preference()));
   EXPECT_EQ(context.trader_prefs[req1->requester()], obs);
   obs.clear();
-  obs[req1].push_back(std::make_pair(bid, req1->preference() * 0.1));
+  obs[req1].insert(std::make_pair(bid, req1->preference() * 0.1));
   EXPECT_NE(context.trader_prefs[req1->requester()], obs);
 }
 

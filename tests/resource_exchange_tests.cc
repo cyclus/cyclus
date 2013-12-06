@@ -69,10 +69,12 @@ class Requester: public MockFacility {
   // increments counter and squares all preferences
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
     std::map<Request<Material>::Ptr,
-             std::vector<std::pair<Bid<Material>::Ptr, double> > >::iterator m_it;
-    for (m_it = prefs.begin(); m_it != prefs.end(); ++m_it) {
-      for (int i = 0; i < m_it->second.size(); i++) {
-        m_it->second[i].second = std::pow(m_it->second[i].second, 2);
+             std::map<Bid<Material>::Ptr, double> >::iterator p_it;
+    for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
+      std::map<Bid<Material>::Ptr, double>& map = p_it->second;
+      std::map<Bid<Material>::Ptr, double>::iterator m_it;
+      for (m_it = map.begin(); m_it != map.end(); ++m_it) {
+        m_it->second = std::pow(m_it->second, 2);
       }
     }    
     pref_ctr_++;
@@ -307,9 +309,9 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   EXPECT_NO_THROW(exchng->AddAllBids());
 
   PrefMap<Material>::type pobs;
-  pobs[preq].push_back(std::make_pair(pbid, preq->preference()));
+  pobs[preq].insert(std::make_pair(pbid, preq->preference()));
   PrefMap<Material>::type cobs;
-  cobs[creq].push_back(std::make_pair(cbid, creq->preference()));
+  cobs[creq].insert(std::make_pair(cbid, creq->preference()));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();  
   EXPECT_EQ(context.trader_prefs[parent], pobs);
@@ -317,8 +319,8 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   
   EXPECT_NO_THROW(exchng->AdjustAll());
 
-  pobs[preq][0].second = std::pow(preq->preference(), 2);
-  cobs[creq][0].second = std::pow(std::pow(creq->preference(), 2), 2);
+  pobs[preq].begin()->second = std::pow(preq->preference(), 2);
+  cobs[creq].begin()->second = std::pow(std::pow(creq->preference(), 2), 2);
   EXPECT_EQ(context.trader_prefs[parent], pobs);
   EXPECT_EQ(context.trader_prefs[child], cobs);
   

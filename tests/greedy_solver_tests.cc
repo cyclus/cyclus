@@ -204,6 +204,8 @@ TEST(GrSolverTests, Case2h) {
 // Case 3:
 // 2 suppliers (2 nodes) with capacity, c1 & c2
 // 1 requester (1 node) with request quantity, q
+// requester pref for s1 := p1
+// requester pref for s2 := p2
 // flow from s1 -> r := f1
 // flow from s2 -> r := f2
 TEST(GrSolverTests, Case3a) {
@@ -291,6 +293,58 @@ TEST(GrSolverTests, Case3d) {
   
   Match exp1 = Match(g.arcs().at(0), f1);
   Match exp2 = Match(g.arcs().at(1), f2);
+  Match arr[] = {exp1, exp2};
+  std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+  EXPECT_EQ(vexp, g.matches());
+}
+
+TEST(GrSolverTests, Case3e) {
+  // q = c2
+  // p2 > p1
+  // f1 DNE, f2 = c2
+  double q = 5;
+  double c1 = 2;
+  double c2 = q;
+  double f2 = c2;
+  double p2 = 5;
+  double p1 = 2;
+  
+  ExchangeGraph g = SetUp3(q, c1, c2, p1, p2);
+  GreedySolver solver(&g);
+  solver.Solve();
+    
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
+  
+  Match exp1 = Match(g.arcs().at(1), f2);
+  Match arr[] = {exp1};
+  std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+  EXPECT_EQ(vexp, g.matches());
+}
+
+TEST(GrSolverTests, Case3f) {
+  // q > c2, q - c2 < c1
+  // p2 > p1
+  // f1 = q - c2, f2 = c2
+  double q = 5;
+  double c1 = 3;
+  double c2 = 4;
+  double f1 = q - c2;
+  double f2 = c2;
+  double p2 = 5;
+  double p1 = 2;
+  
+  ExchangeGraph g = SetUp3(q, c1, c2, p1, p2);
+  GreedySolver solver(&g);
+  solver.Solve();
+    
+  ASSERT_TRUE(g.arcs().size() > 1);
+  EXPECT_EQ(g.arcs().size(), 2);
+  
+  // exp f2 on arc 1 (whereas f1 is on arc 0) to get matched first due to
+  // sorting
+  Match exp1 = Match(g.arcs().at(1), f2); 
+  Match exp2 = Match(g.arcs().at(0), f1);
   Match arr[] = {exp1, exp2};
   std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
   EXPECT_EQ(vexp, g.matches());

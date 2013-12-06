@@ -122,8 +122,11 @@ TEST(ExXlateTests, XlateReq) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
   
+
+  std::string commod = "commod";
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rp->AddRequest(get_mat(u235, qty), &trader);
+  Request<Material>::Ptr req =
+      rp->AddRequest(get_mat(u235, qty), &trader, commod);
   rp->AddConstraint(cc1);
   rp->AddConstraint(cc2);
 
@@ -136,12 +139,16 @@ TEST(ExXlateTests, XlateReq) {
   EXPECT_EQ(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().request_to_node.find(req)
               != xlator.translation_ctx().request_to_node.end());
+  EXPECT_EQ(
+      xlator.translation_ctx().request_to_node.find(req)->second->commod,
+      commod);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateBid) {
+  std::string commod = "commod";
   Request<Material>::Ptr req =
-      Request<Material>::Create(get_mat(u235, qty), &trader);
+      Request<Material>::Create(get_mat(u235, qty), &trader, commod);
   
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
@@ -168,6 +175,9 @@ TEST(ExXlateTests, XlateBid) {
   EXPECT_EQ(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().bid_to_node.find(bid)
               != xlator.translation_ctx().bid_to_node.end());
+  EXPECT_EQ(
+      xlator.translation_ctx().bid_to_node.find(bid)->second->commod,
+      commod);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -219,8 +229,11 @@ TEST(ExXlateTests, XlateArc) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, SimpleXlate) {
+  std::string commod = "c";
+  double pref = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader);
+  Request<Material>::Ptr req =
+      rport->AddRequest(get_mat(u235, qty), &trader, commod, pref);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
   bport->AddBid(req, get_mat(u235, qty), &trader);
@@ -238,6 +251,8 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(2, graph->node_arc_map().size());
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
+  const Arc& a = *graph->arcs().begin();
+  EXPECT_EQ(pref, a.first->prefs[a]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
