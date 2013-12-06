@@ -30,7 +30,7 @@ struct ExchangeNode {
  public:
   typedef boost::shared_ptr<ExchangeNode> Ptr;
   
-  explicit ExchangeNode(double max_qty = std::numeric_limits<double>::max());
+  ExchangeNode(double max_qty = std::numeric_limits<double>::max());
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
@@ -50,6 +50,9 @@ struct ExchangeNode {
   /// @brief a running total of the amount of resource associated with this
   /// node
   double qty;
+
+  /// @brief the commodity associated with this exchange node
+  std::string commod;
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
