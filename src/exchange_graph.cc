@@ -8,7 +8,10 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ExchangeNode::ExchangeNode(double max_qty) : max_qty(max_qty), qty(0), group(NULL) {}
+ExchangeNode::ExchangeNode(double max_qty)
+  : max_qty(max_qty),
+    qty(0),
+    group(NULL) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
