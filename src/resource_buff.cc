@@ -75,6 +75,19 @@ Resource::Ptr ResourceBuff::Pop() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Resource::Ptr ResourceBuff::PopBack() {
+  if (mats_.size() < 1) {
+    throw ValueError("Cannot pop material from an empty store.");
+  }
+  Resource::Ptr r = mats_.back();
+  qty_ -= r->quantity();
+
+  mats_.pop_back();
+  mats_present_.erase(r);
+  return r;
+};
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::Push(Resource::Ptr r) {
   if (r->quantity() - space() > eps_rsrc()) {
     throw ValueError("Resource pushing breaks capacity limit.");
