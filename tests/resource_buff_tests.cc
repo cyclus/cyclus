@@ -221,6 +221,26 @@ TEST_F(ResourceBuffTest, RemoveOne_Filled) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+TEST_F(ResourceBuffTest, PopBack) {
+  using cyclus::Resource;
+  Resource::Ptr mat;
+
+  ASSERT_NO_THROW(mat = filled_store_.PopBack());
+  EXPECT_DOUBLE_EQ(mat->quantity(), mat2_->quantity());
+  EXPECT_EQ(mat, mat2_);
+  EXPECT_EQ(filled_store_.count(), 1);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat1_->quantity());
+
+  ASSERT_NO_THROW(mat = filled_store_.PopBack());
+  EXPECT_DOUBLE_EQ(mat->quantity(), mat1_->quantity());
+  EXPECT_EQ(mat, mat1_);
+  EXPECT_EQ(filled_store_.count(), 0);
+  EXPECT_DOUBLE_EQ(filled_store_.quantity(), 0.0);
+
+  ASSERT_THROW(mat = filled_store_.PopBack(), cyclus::ValueError);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 //- - - - - - Pushing into buffer - - - - - - - - - - - - - - - - - - - - - - -    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, Push_Empty) {

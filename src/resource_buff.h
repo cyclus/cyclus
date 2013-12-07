@@ -116,6 +116,11 @@ class ResourceBuff {
   /// @throws ValueError the store is empty.
   Resource::Ptr Pop();
 
+  /// Pop pops the back (i.e. youngest) resource object from the store.
+  ///
+  /// @throws ValueError the store is empty.
+  Resource::Ptr PopBack();
+
   /// A convenience method identical to Pop for auto-casting to specific
   /// Resource types.
   template <class T>
