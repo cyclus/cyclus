@@ -178,6 +178,7 @@ INSTALL(FILES
   trade_executor.h
   trader.h
   trader_management.h
+  transaction.h
   uniform_taylor.h
   unix_helper_functions.h
   use_matrix_lib.h
