@@ -62,27 +62,21 @@ Manifest ResourceBuff::PopN(int num) {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Resource::Ptr ResourceBuff::Pop() {
+Resource::Ptr ResourceBuff::Pop(AccessDir dir) {
   if (mats_.size() < 1) {
     throw ValueError("Cannot pop material from an empty store.");
   }
-  Resource::Ptr r = mats_.front();
-  qty_ -= r->quantity();
-
-  mats_.pop_front();
-  mats_present_.erase(r);
-  return r;
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Resource::Ptr ResourceBuff::PopBack() {
-  if (mats_.size() < 1) {
-    throw ValueError("Cannot pop material from an empty store.");
+  
+  Resource::Ptr r;
+  if (dir == FRONT) {
+    r = mats_.front();
+    mats_.pop_front();
+  } else {
+    r = mats_.back();
+    mats_.pop_back();
   }
-  Resource::Ptr r = mats_.back();
+  
   qty_ -= r->quantity();
-
-  mats_.pop_back();
   mats_present_.erase(r);
   return r;
 };

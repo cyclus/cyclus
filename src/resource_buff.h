@@ -44,6 +44,11 @@ typename T::Ptr ResCast(Resource::Ptr r) {
 /// the resources were pushed (i.e. oldest resources are popd first).
 class ResourceBuff {
  public:
+  enum AccessDir {
+    FRONT,
+    BACK
+  };
+  
   ResourceBuff() : capacity_(0), qty_(0) {};
 
   virtual ~ResourceBuff() {};
@@ -110,16 +115,13 @@ class ResourceBuff {
 
   /// Pop pops one resource object from the store.
   ///
-  /// Resources are not split.  Resources are retrieved in the order they were
-  /// pushed (i.e. oldest first).
+  /// Resources are not split.  Resources are retrieved by default in the order
+  /// they were pushed (i.e. oldest first).
+  ///
+  /// @param dir the access direction, which is the front by default
   ///
   /// @throws ValueError the store is empty.
-  Resource::Ptr Pop();
-
-  /// Pop pops the back (i.e. youngest) resource object from the store.
-  ///
-  /// @throws ValueError the store is empty.
-  Resource::Ptr PopBack();
+  Resource::Ptr Pop(AccessDir dir = FRONT);
 
   /// A convenience method identical to Pop for auto-casting to specific
   /// Resource types.
