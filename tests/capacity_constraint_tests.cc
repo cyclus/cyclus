@@ -78,7 +78,8 @@ TEST(CapacityConstraintTests, RsrcGetSet) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CapacityConstraintTests, Trivial) {
   CapacityConstraint<Resource> cc(val);
-  EXPECT_EQ(1, cc.convert(Material::CreateBlank(51041))); // some magic number
+  double val = 42;
+  EXPECT_EQ(val, cc.convert(Material::CreateBlank(val))); // some magic number
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

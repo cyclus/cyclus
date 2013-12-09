@@ -95,10 +95,10 @@ TEST(ExXlateTests, XlateCapacities) {
   ExchangeNode::Ptr bnode(new ExchangeNode());
   Arc arc(rnode, bnode);
 
-  double rarr[] = {(c1->convert(mat) / qty1), (c2->convert(mat) / qty2)};
+  double rarr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
       
-  double barr[] = {(c1->convert(mat) / qty1)};
+  double barr[] = {(c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
       
   TranslateCapacities<Material>(mat, rconstrs, rnode, arc);
@@ -118,10 +118,8 @@ TEST(ExXlateTests, XlateReq) {
   double qty2 = 0.8 * qty;
   CapacityConstraint<Material> cc2(qty2, c2);
     
-  double carr[] = {qty1, qty2};
+  double carr[] = {qty2, qty1};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
-  
-  
 
   std::string commod = "commod";
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
@@ -158,7 +156,7 @@ TEST(ExXlateTests, XlateBid) {
   double qty2 = 0.8 * qty;
   CapacityConstraint<Material> cc2(qty2, c2);
   
-  double carr[] = {qty1, qty2};
+  double carr[] = {qty2, qty1};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
   BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
@@ -218,11 +216,11 @@ TEST(ExXlateTests, XlateArc) {
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.second);
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.first);
 
-  double barr[] = {(c1->convert(mat) / qty1), (c2->convert(mat) / qty2)};
+  double barr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
   EXPECT_EQ(bexp, a.second->unit_capacities[a]);
       
-  double rarr[] = {(c1->convert(mat) / qty1)};
+  double rarr[] = {(c1->convert(mat) / qty)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
   EXPECT_EQ(rexp, a.first->unit_capacities[a]);
 }

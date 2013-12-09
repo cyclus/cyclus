@@ -2,6 +2,7 @@
 
 #include "cyc_limits.h"
 #include "error.h"
+#include "logger.h"
 
 #include "exchange_graph.h"
 
@@ -33,6 +34,12 @@ RequestGroup::RequestGroup(double qty) : qty_(qty) {}
 double Capacity(const Arc& a) {
   double ucap = Capacity(a.first, a);
   double vcap = Capacity(a.second, a);
+
+  CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
+  CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
+  CLOG(cyclus::LEV_DEBUG1) << "Capacity for arc         : "
+                           << std::min(ucap, vcap);
+  
   return std::min(ucap, vcap);
 }
 
@@ -50,7 +57,18 @@ double Capacity(ExchangeNode& n, const Arc& a) {
   const std::vector<double>& group_caps = n.group->capacities();
   std::vector<double> caps;
   for (int i = 0; i < unit_caps.size(); i++) {
-    caps.push_back(group_caps[i] / unit_caps[i]);
+    CLOG(cyclus::LEV_DEBUG1) << "Capacity for node: ";
+    CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << group_caps[i];
+    CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << unit_caps[i];
+    CLOG(cyclus::LEV_DEBUG1) << "         capacity: "
+                             << group_caps[i] / unit_caps[i];
+    
+    // special case for unlimited capacities
+    if (group_caps[i] == std::numeric_limits<double>::max()) {
+      caps.push_back(std::numeric_limits<double>::max());
+    } else {
+      caps.push_back(group_caps[i] / unit_caps[i]);
+    }
   }
 
   return std::min(*std::min_element(caps.begin(), caps.end()), n.max_qty - n.qty);
@@ -74,15 +92,24 @@ void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
   vector<double>& unit_caps = n.unit_capacities[a];
   vector<double>& caps = n.group->capacities();
   for (int i = 0; i < caps.size(); i++) {
-    double val = caps[i] - qty * unit_caps[i];
-    if (IsNegative(val)) throw ValueError("Capacities can not be reduced below 0.");
-    caps[i] = val;
+    // special case for unlimited capacities
+    CLOG(cyclus::LEV_DEBUG1) << "Updating capacity value from: "
+                             << caps[i];
+    caps[i] = (caps[i] == std::numeric_limits<double>::max()) ?
+              std::numeric_limits<double>::max() :
+              caps[i] - qty * unit_caps[i];
+    CLOG(cyclus::LEV_DEBUG1) << "                          to: "
+                             << caps[i];
+    
+    if (IsNegative(caps[i])) {
+      throw ValueError("Capacities can not be reduced below 0.");
+    }
   }
 
-  double val = n.max_qty - qty;
-  if (IsNegative(val)) {
+  if (IsNegative(n.max_qty - qty)) {
     throw ValueError("ExchangeNode quantities can not be reduced below 0.");
   }
+
   n.qty += qty;
 }
 
@@ -108,8 +135,6 @@ void ExchangeGraph::AddArc(const Arc& a) {
   node_arc_map_[a.second].push_back(a);
 }
 
-
-#include <iostream>
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddMatch(const Arc& a, double qty) {
   UpdateCapacity(a.first, a, qty);

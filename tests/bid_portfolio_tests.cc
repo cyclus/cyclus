@@ -111,6 +111,5 @@ TEST_F(BidPortfolioTests, CapAdd) {
   
   BidPortfolio<Material>::Ptr rp(new BidPortfolio<Material>());
   EXPECT_NO_THROW(rp->AddConstraint(c));
-  EXPECT_EQ(rp->constraints().count(c), 1);
   EXPECT_EQ(*rp->constraints().begin(), c);
 }

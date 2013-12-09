@@ -1,6 +1,8 @@
 #ifndef CYCLUS_CAPACITY_CONSTRAINT_H_
 #define CYCLUS_CAPACITY_CONSTRAINT_H_
 
+#include <assert.h>
+
 #include <boost/shared_ptr.hpp>
 
 namespace cyclus {
@@ -12,9 +14,6 @@ template<class T>
 struct Converter {
   typedef boost::shared_ptr< Converter<T> > Ptr;
 
-  Converter() {}
-  virtual ~Converter() {}
-  
   virtual double convert(boost::shared_ptr<T>) = 0;
 
   /// @brief operator== is available for subclassing, see
@@ -25,14 +24,13 @@ struct Converter {
 
 /// @class TrivialConverter
 ///
-/// @brief The default converter: just return 1
+/// @brief The default converter returns the resource's quantity
 template<class T>
 struct TrivialConverter : public Converter<T> {
-  TrivialConverter() {}
-  virtual ~TrivialConverter() {}
-
-  /// @returns 1 always
-  virtual double convert(boost::shared_ptr<T>) { return 1; }
+  /// @returns the quantity of rsrc
+  inline virtual double convert(boost::shared_ptr<T> rsrc) {
+    return rsrc->quantity();
+  }
 
   /// @returns true if a dynamic cast succeeds
   virtual bool operator==(Converter<T>& other) const {
@@ -51,7 +49,9 @@ class CapacityConstraint {
   CapacityConstraint(double capacity, typename Converter<T>::Ptr converter)
     : capacity_(capacity),
       converter_(converter),
-      id_(next_id_++) {};
+      id_(next_id_++) {
+    assert(capacity_ > 0);
+  };
 
   /// @brief constructor for a constraint with a trivial converter (i.e., one
   /// that simply returns 1)
@@ -59,7 +59,16 @@ class CapacityConstraint {
     : capacity_(capacity),
       id_(next_id_++) {
     converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
+    assert(capacity_ > 0);
   }
+
+  /// @brief constructor for a constraint with a non-trivial converter
+  CapacityConstraint(const CapacityConstraint& other)
+    : capacity_(other.capacity_),
+      converter_(other.converter_),
+      id_(next_id_++) {
+    assert(capacity_ > 0);
+  };
   
   /// @return the constraints capacity
   inline double capacity() const {

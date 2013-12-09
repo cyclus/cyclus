@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "greedy_preconditioner.h"
+#include "cyc_limits.h"
 #include "logger.h"
 
 namespace cyclus {
@@ -45,7 +46,9 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
       while( (match <= target) && (arc_it != sorted.end()) ) {
         double remain = target - match;
         double tomatch = std::min(remain, Capacity(*arc_it));
-        if (tomatch > 0) {
+        if (tomatch > eps()) {
+          CLOG(LEV_DEBUG1) << "Greedy Solver is matching " << tomatch
+                           << " amount of a resource.";
           graph_->AddMatch(*arc_it, tomatch);
           match += tomatch;
         }

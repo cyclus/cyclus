@@ -69,7 +69,6 @@ TEST_F(RequestPortfolioTests, CapAdd) {
   
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   EXPECT_NO_THROW(rp->AddConstraint(c));
-  EXPECT_EQ(rp->constraints().count(c), 1);
   EXPECT_EQ(*rp->constraints().begin(), c);
 }
 
@@ -78,14 +77,6 @@ TEST_F(RequestPortfolioTests, Sets) {
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
   RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
   RequestPortfolio<Material>::Ptr rp3(new RequestPortfolio<Material>());
-  
-  // std::string commod1 = "1";  
-  // std::string commod2 = "2";
-  // Request<Material>::Ptr req1 = rp1->AddRequest(get_mat(), fac1, commod1);
-  // Request<Material>::Ptr req2 = rp2->AddRequest(get_mat(), fac1, commod2);
-
-  // rp3->AddRequest(req1);
-  // rp3->AddRequest(req2);
   
   set<RequestPortfolio<Material>::Ptr> requests;
   EXPECT_EQ(requests.size(), 0);
