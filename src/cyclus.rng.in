@@ -15,10 +15,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     <oneOrMore>
     <ref name="commodity"/>
     </oneOrMore>
-  
-    <oneOrMore>
-    <ref name="market"/>
-    </oneOrMore>
       
     <oneOrMore>
     <choice>
@@ -142,28 +138,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </optional>
   </define>
   <!-- end section for commodities -->
-
-  <!-- begin section for markets-->
-  <define name="market">
-    <element name="market">
-
-      <element name="name">
-        <text/>
-      </element>
-
-      <element name="mktcommodity">
-        <text/>
-      </element>
-
-      <element name="model">
-      <choice> @Market_REFS@
-      </choice>
-      </element>
-
-    </element>
-  </define>
-
-  <!-- end section for markets-->
 
   <!-- begin section for facilities -->
   <define name="facility">
