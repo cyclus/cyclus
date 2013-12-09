@@ -60,7 +60,7 @@ TEST(ExGraphTests, ExchangeNodeCaps1) {
 
   double scap = 1.5;
   ExchangeNodeGroup s;
-  s.capacities().push_back(scap);
+  s.AddCapacity(scap);
   s.AddExchangeNode(n);
 
   EXPECT_EQ(scap, Capacity(n, a));  
@@ -92,7 +92,9 @@ TEST(ExGraphTests, ExchangeNodeCaps2) {
   n->unit_capacities[a] = ucaps;
 
   ExchangeNodeGroup s;
-  s.capacities() = caps;
+  for (int i = 0; i < caps.size(); i++) {
+    s.AddCapacity(caps[i]);
+  }
   s.AddExchangeNode(n);
   double min_exp = cap / ucap;
   EXPECT_EQ(min_exp, Capacity(n, a));
@@ -117,7 +119,7 @@ TEST(ExGraphTests, ExchangeNodeCaps3) {
 
   double scap = 1.5;
   ExchangeNodeGroup s;
-  s.capacities().push_back(scap);
+  s.AddCapacity(scap);
   s.AddExchangeNode(n);
 
   EXPECT_EQ(qty, Capacity(n, a));  
@@ -150,7 +152,7 @@ TEST(ExGraphTests, ExchangeNodeUpdateThrow2) {
   n->unit_capacities[a].push_back(unit);
 
   ExchangeNodeGroup s;
-  s.capacities().push_back(cap);
+  s.AddCapacity(cap);
   s.AddExchangeNode(n);
   
   EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);
@@ -186,12 +188,12 @@ TEST(ExGraphTests, ArcCap) {
   ExchangeNodeGroup ugroup;
   ugroup.AddExchangeNode(u);
   double ucap = uval * 1.5;
-  ugroup.capacities().push_back(ucap);
+  ugroup.AddCapacity(ucap);
   
   ExchangeNodeGroup vgroup;
   vgroup.AddExchangeNode(v);
   double vcap = vval;
-  vgroup.capacities().push_back(vcap);
+  vgroup.AddCapacity(vcap);
   
   
   EXPECT_DOUBLE_EQ(Capacity(a), 1.0);
@@ -289,12 +291,12 @@ TEST(ExGraphTests, AddMatch) {
   ExchangeNodeGroup::Ptr ugroup(new ExchangeNodeGroup());
   ugroup->AddExchangeNode(u);
   double ucap = uval * 500;
-  ugroup->capacities().push_back(ucap);
+  ugroup->AddCapacity(ucap);
   
   ExchangeNodeGroup::Ptr vgroup(new ExchangeNodeGroup());
   vgroup->AddExchangeNode(v);
   double vcap = vval * 500;
-  vgroup->capacities().push_back(vcap);
+  vgroup->AddCapacity(vcap);
   
   double qty = large * 0.1;
   

@@ -69,13 +69,17 @@ class ExchangeNodeGroup {
   typedef boost::shared_ptr<ExchangeNodeGroup> Ptr;
   
   const std::vector<ExchangeNode::Ptr>& nodes() { return nodes_; }
-  
+
+  /// @brief the flow capacities assocaited with this group
   const std::vector<double>& capacities() const { return capacities_; }
   std::vector<double>& capacities() { return capacities_; }
 
   /// @brief Add the node to the ExchangeNodeGroup and informs the node it is a
   /// member of this ExchangeNodeGroup
   void AddExchangeNode(ExchangeNode::Ptr node);
+
+  /// @brief Add a flow capacity to the group
+  inline void AddCapacity(double c) { capacities_.push_back(c); }
 
  private:
   std::vector<ExchangeNode::Ptr> nodes_;

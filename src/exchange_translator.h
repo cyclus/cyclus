@@ -143,7 +143,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
   for (c_it = rp->constraints().begin();
        c_it != rp->constraints().end();
        ++c_it) {
-    rs->capacities().push_back(c_it->capacity());
+    rs->AddCapacity(c_it->capacity());
   }
     
   return rs;
@@ -174,7 +174,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   for (c_it = bp->constraints().begin();
        c_it != bp->constraints().end();
        ++c_it) {
-    bs->capacities().push_back(c_it->capacity());
+    bs->AddCapacity(c_it->capacity());
   }
     
   return bs;
@@ -225,7 +225,9 @@ void TranslateCapacities(
     const Arc& a) {
   typename std::set< CapacityConstraint<T> >::const_iterator it;
   for (it = constr.begin(); it != constr.end(); ++it) {
-    n->unit_capacities[a].push_back(it->convert(offer) / it->capacity());
+    CLOG(cyclus::LEV_DEBUG1) << "Additing unit capacity: "
+                             << it->convert(offer) / offer->quantity();
+    n->unit_capacities[a].push_back(it->convert(offer) / offer->quantity());
   }
 }
 
