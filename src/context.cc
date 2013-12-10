@@ -3,6 +3,7 @@
 
 #include "cyc_std.h"
 #include "error.h"
+#include "logger.h"
 #include "timer.h"
 
 #include "context.h"
@@ -49,6 +50,8 @@ void Context::ProcessCommodities() {
        it != commodity_order_.end();
        ++it) {
     if (it->second < 1) it->second = max + 1;
+    CLOG(LEV_INFO1) << "Commodity ordering for " << it->first
+                    << " is " << it->second;
   }
 }
 

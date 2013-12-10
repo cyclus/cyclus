@@ -7,6 +7,7 @@
 #include <string>
 
 #include "cyc_std.h"
+#include "logger.h"
 
 #include "greedy_preconditioner.h"
 
@@ -31,6 +32,8 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
     
     // get avg group weights
     group_weights_[*it] = GroupWeight(*it, &commod_weights_); 
+    CLOG(LEV_DEBUG1) << "Group weight value during graph preconditioning is "
+                     << group_weights_[*it] << ".";
   }
 
   // sort groups by avg weight
@@ -54,14 +57,23 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
   
   assert(min >= 0);
   
+  std::map<std::string, double>::iterator it;
   switch(order) {
     case REVERSE:
-      std::map<std::string, double>::iterator it;
+     
       for (it = commod_weights_.begin();
            it != commod_weights_.end();
            ++it) {
         it->second = max + min - it->second; // reverses order
       }
+  }
+     
+  for (it = commod_weights_.begin();
+       it != commod_weights_.end();
+       ++it) {
+    CLOG(LEV_INFO1) << "GreedyPreconditioner commodity weight value for "
+                    << it->first
+                    << " is " << it->second;
   }
   
   // @MJGFlag not sure if this is needed..
