@@ -20,6 +20,12 @@ class Error: public std::exception {
   /// Returns the error message associated with this Error.
   virtual const char* what() const throw();
 
+  /// Returns the error message associated with this Error.
+  std::string msg() const { return msg_; }
+
+  /// sets the error message
+  std::string msg(std::string msg) { msg_ = msg; }
+
   virtual ~Error() throw() {};
 
  protected:

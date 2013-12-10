@@ -6,16 +6,12 @@ namespace cyclus {
 const std::string Error::kPrefix("cyclus error: ");
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Error::Error() : msg_(Error::kPrefix) {}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Error::Error(std::string msg) {
-  msg_ = Error::kPrefix + msg;
-}
+Error::Error(std::string msg) : msg_(msg) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const char* Error::what() const throw() {
-  return msg_.c_str();
+  std::string thrown = Error::kPrefix + msg_;
+  return thrown.c_str();
 }
 
 } // namespace cyclus
