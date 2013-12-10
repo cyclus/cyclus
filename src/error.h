@@ -24,7 +24,7 @@ class Error: public std::exception {
   std::string msg() const { return msg_; }
 
   /// sets the error message
-  std::string msg(std::string msg) { msg_ = msg; }
+  std::string msg(std::string msg) { return msg_ = msg; }
 
   virtual ~Error() throw() {};
 
