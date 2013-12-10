@@ -126,6 +126,7 @@ INSTALL(FILES
   csv_back.h
   cyc_arithmetic.h
   cyc_limits.h
+  cyc_std.h
   cyclus.h
   decayer.h
   dynamic_module.h

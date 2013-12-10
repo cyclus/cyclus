@@ -71,6 +71,11 @@ class ExchangeTranslator {
         double pref =
             ex_ctx_->trader_prefs.at(req->requester())[req][bid];
         a.first->prefs[a] = pref; // request node is a.first
+        int n_prefs = a.first->prefs.size();
+        a.first->avg_pref = ((n_prefs - 1) *
+                             a.first->avg_pref + pref) / n_prefs;
+        // @MJGFlag this^ would be easier if ExchangeNode was a class,
+        // need to make an issue
         graph->AddArc(a);
       }
     }

@@ -15,6 +15,7 @@
 #include "context.h"
 #include "cyc_arithmetic.h"
 #include "cyc_limits.h"
+#include "cyc_std.h"
 #include "enrichment.h"
 #include "env.h"
 #include "error.h"

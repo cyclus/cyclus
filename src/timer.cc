@@ -10,6 +10,7 @@
 #include "material.h"
 #include "generic_resource.h"
 #include "exchange_manager.h"
+#include "greedy_preconditioner.h"
 #include "greedy_solver.h"
 
 namespace cyclus {
@@ -21,8 +22,11 @@ void Timer::RunSim(Context* ctx) {
   time_ = start_time_;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
-  
-  GreedySolver solver;
+
+  ctx->ProcessCommodities();
+  GreedyPreconditioner conditioner(ctx->commodity_order(),
+                                   GreedyPreconditioner::REVERSE);
+  GreedySolver solver(&conditioner);
   ExchangeManager<Material> matl_manager(ctx, &solver);
   ExchangeManager<GenericResource> genrsrc_manager(ctx, &solver);
   while (date_ < endDate()) {

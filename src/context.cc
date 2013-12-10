@@ -1,8 +1,11 @@
 
-#include "context.h"
+#include <algorithm> 
 
+#include "cyc_std.h"
 #include "error.h"
 #include "timer.h"
+
+#include "context.h"
 
 namespace cyclus {
 
@@ -31,6 +34,22 @@ Model* Context::GetModelByName(std::string name) {
     throw KeyError(err_msg);
   }
   return found_model;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Context::ProcessCommodities() {
+  double max = std::max_element(
+      commodity_order_.begin(),
+      commodity_order_.end(),
+      SecondLT< std::pair<std::string, double> >())->second;
+  if (max < 1) max = 0; // in case no orders are specified
+  
+  std::map<std::string, double>::iterator it;
+  for (it = commodity_order_.begin();
+       it != commodity_order_.end();
+       ++it) {
+    if (it->second < 1) it->second = max + 1;
+  }
 }
 
 void Context::AddPrototype(std::string name, Model* p) {

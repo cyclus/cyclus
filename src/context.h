@@ -38,6 +38,22 @@ class Context {
   /// Adds a model to a simulation-wide accessible list.
   inline void AddModel(Model* m) { model_list_.push_back(m); }
 
+  /// Adds a commodity and its (optional) preferred solution order to a
+  /// simulation-wide accessible containter.
+  /// @warning A nonpositive order value implies the order was not specified, and
+  /// can be arbitrarily set larger than the largest order value
+  inline void AddCommodity(std::string commod) {
+    commodity_order_[commod] = 0;
+  }
+  inline void AddCommodity(std::string commod, double order) {
+    commodity_order_[commod] = order;
+  }
+
+  /// Processes commodity orders, such that any without a defined order (i.e.,
+  /// are nonpositive), are given an order value greater the last known
+  /// commodity
+  void ProcessCommodities();
+  
   /**
      returns a model given the prototype's name
 
@@ -102,6 +118,11 @@ class Context {
   void InitTime(int start, int duration, int decay, int m0 = 1, int y0 = 2010,
                 std::string handle = "");
 
+  /// @return the map of commodities to their solution order
+  inline const std::map<std::string, double>& commodity_order() const { 
+      return commodity_order_;
+  }
+
   /// Returns the current simulation timestep.
   int time();
 
@@ -122,6 +143,7 @@ class Context {
   std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::vector<Model*> model_list_;
+  std::map<std::string, double> commodity_order_;
   
   Timer* ti_;
   EventManager* em_;

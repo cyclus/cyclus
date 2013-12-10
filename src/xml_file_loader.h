@@ -41,6 +41,9 @@ class XMLFileLoader {
   /// @param use_main_schema whether or not to use the main schema
   void LoadSim(bool use_main_schema = true);
 
+  /// Method to load the simulation commodities.
+  void LoadCommodities();
+
   /// Method to load the simulation control parameters.
   void LoadControlParams();
 

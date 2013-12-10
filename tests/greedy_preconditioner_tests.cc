@@ -50,8 +50,8 @@ TEST(ConditionerTests, Conditioning) {
   weights["eggs"] = 2;
   GreedyPreconditioner gp(weights);
 
-  EXPECT_DOUBLE_EQ(GroupWeight(g1, weights), 9./3); 
-  EXPECT_DOUBLE_EQ(GroupWeight(g2, weights), 7./2);
+  EXPECT_DOUBLE_EQ(GroupWeight(g1, &weights), 9./3); 
+  EXPECT_DOUBLE_EQ(GroupWeight(g2, &weights), 7./2);
   
   gp.Condition(&g);
 

@@ -82,7 +82,6 @@ XMLFileLoader::XMLFileLoader(Context* ctx,
   ->AddVal("Data", Blob(input.str()))
   ->Record();
 
-  schema_paths_["Converter"] = "/*/converter";
   schema_paths_["Region"] = "/*/region";
   schema_paths_["Inst"] = "/*/region/institution";
   schema_paths_["Facility"] = "/*/facility";
@@ -111,10 +110,27 @@ void XMLFileLoader::LoadSim(bool use_main_schema) {
     parser_->Validate(ss);
   }
 
+  LoadCommodities();
   LoadControlParams();
   LoadRecipes();
   LoadInitialAgents();
 };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::LoadCommodities() {
+  XMLQueryEngine xqe(*parser_);
+
+  std::string query = "/*/commodity";
+  std::string name;
+  double order;
+  int num_commods = xqe.NElementsMatchingQuery(query);
+  for (int i = 0; i < num_commods; i++) {
+    QueryEngine* qe = xqe.QueryElement(query, i);
+    name = qe->GetElementContent("name");
+    order = GetOptionalQuery<double>(qe, "solution_order", -1);
+    ctx_->AddCommodity(name, order);
+  }
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadRecipes() {
