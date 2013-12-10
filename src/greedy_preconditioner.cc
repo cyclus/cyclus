@@ -100,7 +100,16 @@ double GroupWeight(RequestGroup::Ptr g,
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double NodeWeight(ExchangeNode::Ptr n,
                   std::map<std::string, double>* weights) {
-  return (*weights)[n->commod] * ( 1 + n->avg_pref / ( 1 + n->avg_pref));
+  double commod_weight = (*weights)[n->commod];
+  double avg_pref = n->avg_pref;
+  double node_weight = commod_weight * ( 1 + avg_pref / ( 1 + avg_pref));
+  
+  CLOG(LEV_DEBUG5) << "Determining node weight: ";
+  CLOG(LEV_DEBUG5) << "       commodity weight: " << commod_weight;
+  CLOG(LEV_DEBUG5) << "               avg pref: " << avg_pref; 
+  CLOG(LEV_DEBUG5) << "            node weight: " << node_weight;
+
+  return node_weight;
 }
 
 } // namespace cyclus
