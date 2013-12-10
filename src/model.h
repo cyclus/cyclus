@@ -250,7 +250,7 @@ class Model {
   virtual void InitFrom(Model* m);
 
   /**
-     @brief adds model-specific information to an error message
+     @brief adds model-specific information prefix to an error message
    */
   virtual std::string InformErrorMsg(std::string msg);
   
