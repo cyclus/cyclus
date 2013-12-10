@@ -36,6 +36,16 @@ void Model::InitFrom(Model* m) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string Model::InformErrorMsg(std::string msg) {
+  std::stringstream ret;
+  ret << "A(n) " << model_impl_ << " named " << name_
+      << " at time " << context()->time()
+      << " received the following error:\n"
+      << msg;
+  return ret.str();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::InitCoreMembers(QueryEngine* qe) {
   name_ = qe->GetElementContent("name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
