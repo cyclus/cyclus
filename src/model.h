@@ -249,6 +249,11 @@ class Model {
   */
   virtual void InitFrom(Model* m);
 
+  /**
+     @brief adds model-specific information to an error message
+   */
+  virtual std::string InformErrorMsg(std::string msg);
+  
  private:
   /**
      add an agent to the transactiont table
