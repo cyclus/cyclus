@@ -37,4 +37,22 @@ bool MatQuery::AlmostEq(Material::Ptr other, double threshold) {
   compmath::Normalize(&n2);
   return compmath::AlmostEq(n1, n2, threshold);
 };
+
+Iso MatQuery::MinIsoByMass(Composition::Ptr comp, double threshold) {
+  CompMap map = m_->comp()->mass();
+  const CompMap& isos = comp->mass();
+  CompMap::const_iterator it;
+
+  double max = threshold;
+  Iso i = -1;
+  for (it = isos.begin(); it != isos.end(); ++it) {
+    if (map[it->first] > max) i = it->first;
+  }
+
+  return i;
+};
+
+Iso MatQuery::MinIsoByMass(Composition::Ptr comp) {
+  return MinIsoByMass(comp, eps_rsrc());
+}
 } // namespace cyclus

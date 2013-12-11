@@ -33,6 +33,15 @@ class MatQuery {
   /// are the same within threshold.
   bool AlmostEq(Material::Ptr other, double threshold = eps_rsrc());
 
+  /// @returns the isotope in a composition with the minimum mass over the
+  /// threshold in m
+  /// @warning if the set of isotopes in comp and m are disjoint, the return
+  /// value is -1
+  Iso MinIsoByMass(Composition::Ptr comp, double threshold);
+
+  /// @returns MinIsoByMass() with a default threshold of eps_rsrc()
+  Iso MinIsoByMass(Composition::Ptr comp);
+  
  private:
   Material::Ptr m_;
 };
