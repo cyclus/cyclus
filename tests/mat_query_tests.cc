@@ -69,3 +69,31 @@ TEST(MatQueryTests, AlmostEq) {
   EXPECT_TRUE(mq.AlmostEq(m5, 4.0 * cyclus::eps_rsrc()));
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST(MatQueryTests, MinIso) {
+  cyclus::CompMap v;
+  cyclus::Composition::Ptr c;
+
+  v[92235] = 1.5;
+  v[1008] = 2.5;
+  c = cyclus::Composition::CreateFromMass(v);
+
+  cyclus::Material::Ptr m = cyclus::Material::CreateUntracked(4.0, c);
+  cyclus::MatQuery mq(m);
+  EXPECT_EQ(mq.MinIsoByMass(c), 92235);
+
+  cyclus::CompMap v1;
+  v1[1008] = 1;
+  c = cyclus::Composition::CreateFromMass(v1);
+  EXPECT_EQ(mq.MinIsoByMass(c), 1008);
+
+  cyclus::CompMap v2;  
+  v2[92235] = 1;
+  c = cyclus::Composition::CreateFromMass(v2);
+  EXPECT_EQ(mq.MinIsoByMass(c), 92235);
+
+  cyclus::CompMap v3;  
+  v3[92238] = 1;
+  c = cyclus::Composition::CreateFromMass(v3);
+  EXPECT_EQ(mq.MinIsoByMass(c), -1);
+}
