@@ -1,7 +1,6 @@
 // xml_file_loader.cc
 // Implements file reader for an XML format
-#include "xml_file_loader.h"
-
+#include <algorithm>
 #include <fstream>
 #include <set>
 #include <streambuf>
@@ -10,15 +9,21 @@
 
 #include "blob.h"
 #include "context.h"
+#include "cyc_std.h"
 #include "env.h"
 #include "error.h"
 #include "event_manager.h"
+#include "greedy_preconditioner.h"
+#include "greedy_solver.h"
 #include "logger.h"
 #include "model.h"
 #include "timer.h"
 #include "xml_query_engine.h"
 
+#include "xml_file_loader.h"
+
 namespace cyclus {
+
 namespace fs = boost::filesystem;
 
 // - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
@@ -110,17 +115,18 @@ void XMLFileLoader::LoadSim(bool use_main_schema) {
     parser_->Validate(ss);
   }
 
-  LoadCommodities();
+  LoadSolver();
   LoadControlParams();
   LoadRecipes();
   LoadInitialAgents();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadCommodities() {
+void XMLFileLoader::LoadSolver() {
   XMLQueryEngine xqe(*parser_);
-
   std::string query = "/*/commodity";
+
+  std::map<std::string, double> commodity_order;
   std::string name;
   double order;
   int num_commods = xqe.NElementsMatchingQuery(query);
@@ -128,7 +134,38 @@ void XMLFileLoader::LoadCommodities() {
     QueryEngine* qe = xqe.QueryElement(query, i);
     name = qe->GetElementContent("name");
     order = GetOptionalQuery<double>(qe, "solution_order", -1);
-    ctx_->AddCommodity(name, order);
+    commodity_order[name] = order;
+  }
+  
+  ProcessCommodities(&commodity_order);
+  
+  // solver will delete conditioner
+  GreedyPreconditioner* conditioner = new GreedyPreconditioner(
+      commodity_order,
+      GreedyPreconditioner::REVERSE);
+  
+  // context will delete solver
+  GreedySolver* solver = new GreedySolver(conditioner);
+  
+  ctx_->solver(solver);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::ProcessCommodities(
+    std::map<std::string, double>* commodity_order) {
+  double max = std::max_element(
+      commodity_order->begin(),
+      commodity_order->end(),
+      SecondLT< std::pair<std::string, double> >())->second;
+  if (max < 1) max = 0; // in case no orders are specified
+  
+  std::map<std::string, double>::iterator it;
+  for (it = commodity_order->begin();
+       it != commodity_order->end();
+       ++it) {
+    if (it->second < 1) it->second = max + 1;
+    CLOG(LEV_INFO1) << "Commodity ordering for " << it->first
+                    << " is " << it->second;
   }
 }
 

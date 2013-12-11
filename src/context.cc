@@ -1,8 +1,5 @@
-
-#include <algorithm> 
-
-#include "cyc_std.h"
 #include "error.h"
+#include "exchange_solver.h"
 #include "logger.h"
 #include "timer.h"
 
@@ -11,7 +8,11 @@
 namespace cyclus {
 
 Context::Context(Timer* ti, EventManager* em)
-    : ti_(ti), em_(em), trans_id_(0) {};
+    : ti_(ti), em_(em), solver_(NULL), trans_id_(0) {};
+
+Context::~Context() {
+  if (solver_ != NULL) delete solver_;
+}
 
 boost::uuids::uuid Context::sim_id() {
   return em_->sim_id();
@@ -35,24 +36,6 @@ Model* Context::GetModelByName(std::string name) {
     throw KeyError(err_msg);
   }
   return found_model;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Context::ProcessCommodities() {
-  double max = std::max_element(
-      commodity_order_.begin(),
-      commodity_order_.end(),
-      SecondLT< std::pair<std::string, double> >())->second;
-  if (max < 1) max = 0; // in case no orders are specified
-  
-  std::map<std::string, double>::iterator it;
-  for (it = commodity_order_.begin();
-       it != commodity_order_.end();
-       ++it) {
-    if (it->second < 1) it->second = max + 1;
-    CLOG(LEV_INFO1) << "Commodity ordering for " << it->first
-                    << " is " << it->second;
-  }
 }
 
 void Context::AddPrototype(std::string name, Model* p) {

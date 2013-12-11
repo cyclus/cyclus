@@ -13,8 +13,9 @@ using cyclus::TestContext;
 
 TEST(ExManagerTests, NullTest) {
   TestContext tc;
-  GreedySolver solver;
-  ExchangeManager<Material> manager(tc.get(), &solver);
+  GreedySolver* solver = new GreedySolver();
+  tc.get()->solver(solver);
+  ExchangeManager<Material> manager(tc.get());
 
   EXPECT_NO_THROW(manager.Execute());
 }

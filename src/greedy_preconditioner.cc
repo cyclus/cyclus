@@ -40,6 +40,9 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
   std::sort(groups.begin(),
             groups.end(),
             l::bind(&GreedyPreconditioner::GroupComp, this, l::_1, l::_2));
+
+  // clear graph-specific state
+  group_weights_.clear();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

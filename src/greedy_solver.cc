@@ -4,7 +4,6 @@
 #include <functional>
 #include <vector>
 
-#include "greedy_preconditioner.h"
 #include "cyc_limits.h"
 #include "logger.h"
 

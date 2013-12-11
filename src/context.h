@@ -14,6 +14,7 @@ namespace cyclus {
 
 class EventManager;
 class Event;
+class ExchangeSolver;
 class Trader;
 class Timer;
 class TimeAgent;
@@ -23,11 +24,16 @@ class TimeAgent;
 /// know simulation time, creates/deploys facilities, and/or uses loaded
 /// composition recipes will need a context pointer. In general, all global
 /// state should be accessed through a simulation context.
+///
+/// @warning the Context is responsible for deleting the solver it is given!
 class Context {
  public:
   /// Creates a new context working with the specified timer and event manager.
   /// The timer does not have to be initialized (yet).
   Context(Timer* ti, EventManager* em);
+
+  /// the Context is responsible for deleting its solver
+  ~Context();
 
   /// See EventManager::sim_id documentation.
   boost::uuids::uuid sim_id();
@@ -37,22 +43,6 @@ class Context {
 
   /// Adds a model to a simulation-wide accessible list.
   inline void AddModel(Model* m) { model_list_.push_back(m); }
-
-  /// Adds a commodity and its (optional) preferred solution order to a
-  /// simulation-wide accessible containter.
-  /// @warning A nonpositive order value implies the order was not specified, and
-  /// can be arbitrarily set larger than the largest order value
-  inline void AddCommodity(std::string commod) {
-    commodity_order_[commod] = 0;
-  }
-  inline void AddCommodity(std::string commod, double order) {
-    commodity_order_[commod] = order;
-  }
-
-  /// Processes commodity orders, such that any without a defined order (i.e.,
-  /// are nonpositive), are given an order value greater the last known
-  /// commodity
-  void ProcessCommodities();
   
   /**
      returns a model given the prototype's name
@@ -118,11 +108,6 @@ class Context {
   void InitTime(int start, int duration, int decay, int m0 = 1, int y0 = 2010,
                 std::string handle = "");
 
-  /// @return the map of commodities to their solution order
-  inline const std::map<std::string, double>& commodity_order() const { 
-      return commodity_order_;
-  }
-
   /// Returns the current simulation timestep.
   int time();
 
@@ -137,16 +122,22 @@ class Context {
 
   /// @return the next transaction id
   inline int NextTransactionID() { return trans_id_++; }
+
+  /// Returns the exchange solver associated with this context
+  ExchangeSolver* solver() { return solver_; }
+  
+  /// sets the solver associated with this context
+  void solver(ExchangeSolver* solver) { solver_ = solver; }
       
  private:
   std::map<std::string, Model*> protos_;
   std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::vector<Model*> model_list_;
-  std::map<std::string, double> commodity_order_;
   
   Timer* ti_;
   EventManager* em_;
+  ExchangeSolver* solver_;
   int trans_id_;
 };
 
