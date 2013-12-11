@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "greedy_solver.h"
 #include "logger.h"
 #include "test_context.h"
 #include "test_trader.h"
@@ -9,7 +10,8 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(FullSimTests, LoneTrader) {
   TestContext tc;
-
+  GreedySolver* solver = new GreedySolver(); // context deletes
+  tc.get()->solver(solver);
   TestObjFactory fac;
   
   TestTrader* base_trader = new TestTrader(tc.get());
@@ -34,6 +36,8 @@ TEST(FullSimTests, LoneTrader) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(FullSimTests, NullTrade) {
   TestContext tc;
+  GreedySolver* solver = new GreedySolver(); // context deletes
+  tc.get()->solver(solver);
   
   TestTrader* base_supplier = new TestTrader(tc.get());
   TestTrader* supplier =
@@ -67,6 +71,8 @@ TEST(FullSimTests, NullTrade) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(FullSimTests, Trade) {
   TestContext tc;
+  GreedySolver* solver = new GreedySolver(); // context deletes
+  tc.get()->solver(solver);
   TestObjFactory fac;
   bool is_requester = true;
 

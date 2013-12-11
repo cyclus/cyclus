@@ -14,6 +14,7 @@ namespace cyclus {
 
 class EventManager;
 class Event;
+class ExchangeSolver;
 class Trader;
 class Timer;
 class TimeAgent;
@@ -23,11 +24,16 @@ class TimeAgent;
 /// know simulation time, creates/deploys facilities, and/or uses loaded
 /// composition recipes will need a context pointer. In general, all global
 /// state should be accessed through a simulation context.
+///
+/// @warning the Context is responsible for deleting the solver it is given!
 class Context {
  public:
   /// Creates a new context working with the specified timer and event manager.
   /// The timer does not have to be initialized (yet).
   Context(Timer* ti, EventManager* em);
+
+  /// the Context is responsible for deleting its solver
+  ~Context();
 
   /// See EventManager::sim_id documentation.
   boost::uuids::uuid sim_id();
@@ -37,7 +43,7 @@ class Context {
 
   /// Adds a model to a simulation-wide accessible list.
   inline void AddModel(Model* m) { model_list_.push_back(m); }
-
+  
   /**
      returns a model given the prototype's name
 
@@ -116,6 +122,12 @@ class Context {
 
   /// @return the next transaction id
   inline int NextTransactionID() { return trans_id_++; }
+
+  /// Returns the exchange solver associated with this context
+  ExchangeSolver* solver() { return solver_; }
+  
+  /// sets the solver associated with this context
+  void solver(ExchangeSolver* solver) { solver_ = solver; }
       
  private:
   std::map<std::string, Model*> protos_;
@@ -125,6 +137,7 @@ class Context {
   
   Timer* ti_;
   EventManager* em_;
+  ExchangeSolver* solver_;
   int trans_id_;
 };
 

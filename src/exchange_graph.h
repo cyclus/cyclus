@@ -43,6 +43,9 @@ struct ExchangeNode {
 
   /// @brief preference values for arcs
   std::map<Arc, double> prefs;
+
+  /// @brief the average preference this node has across its arcs
+  double avg_pref;
   
   /// @brief the maximum amount of a resource that can be associated with this
   /// node

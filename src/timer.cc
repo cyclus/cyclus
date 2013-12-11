@@ -10,7 +10,6 @@
 #include "material.h"
 #include "generic_resource.h"
 #include "exchange_manager.h"
-#include "greedy_solver.h"
 
 namespace cyclus {
 
@@ -21,10 +20,9 @@ void Timer::RunSim(Context* ctx) {
   time_ = start_time_;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
-  
-  GreedySolver solver;
-  ExchangeManager<Material> matl_manager(ctx, &solver);
-  ExchangeManager<GenericResource> genrsrc_manager(ctx, &solver);
+
+  ExchangeManager<Material> matl_manager(ctx);
+  ExchangeManager<GenericResource> genrsrc_manager(ctx);
   while (date_ < endDate()) {
     if (date_.day() == 1) {
       CLOG(LEV_INFO2) << "Current date: " << date_ << " Current time: " << time_ <<

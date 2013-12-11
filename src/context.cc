@@ -1,13 +1,18 @@
+#include "error.h"
+#include "exchange_solver.h"
+#include "logger.h"
+#include "timer.h"
 
 #include "context.h"
-
-#include "error.h"
-#include "timer.h"
 
 namespace cyclus {
 
 Context::Context(Timer* ti, EventManager* em)
-    : ti_(ti), em_(em), trans_id_(0) {};
+    : ti_(ti), em_(em), solver_(NULL), trans_id_(0) {};
+
+Context::~Context() {
+  if (solver_ != NULL) delete solver_;
+}
 
 boost::uuids::uuid Context::sim_id() {
   return em_->sim_id();

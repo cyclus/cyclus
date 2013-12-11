@@ -8,6 +8,14 @@
 
 namespace cyclus {
 
+/// @returns the node's weight given the node and commodity weight
+double NodeWeight(ExchangeNode::Ptr n,
+                  std::map<std::string, double>* weights);
+
+/// @returns average RequestGroup weight
+double GroupWeight(RequestGroup::Ptr g,
+                   std::map<std::string, double>* weights);
+
 /// @class GreedyPreconditioner
 ///
 /// @brief A GreedyPreconditioner conditions an ExchangeGraph for a GreedySolver
@@ -35,8 +43,27 @@ namespace cyclus {
 ///   #. {g2, g1}
 class GreedyPreconditioner {
  public:
-  GreedyPreconditioner(std::map<std::string, double> commod_weights)
-    : commod_weights_(commod_weights) {};
+  /// @brief the order of commodity weights
+  enum WgtOrder {
+    REVERSE, ///< a flag for commodity weights given in the reverse order, i.e.,
+             ///lightest first
+    END ///< default flag, indicating heaviest-first ordering
+  };
+
+  /// @brief constructor if weights are given in heaviest-first order
+  /// @warning weights are assumed to be positive
+  GreedyPreconditioner(const std::map<std::string, double>& commod_weights)
+    : commod_weights_(commod_weights) {
+    ProcessWeights_(END);
+  }
+  
+  /// @brief constructor if weights may not be given in heaviest-first order
+  /// @warning weights are assumed to be positive
+  GreedyPreconditioner(const std::map<std::string, double>& commod_weights,
+                       WgtOrder order)
+    : commod_weights_(commod_weights) {
+    ProcessWeights_(order);
+  };
 
   /// @brief conditions the graph as described above
   /// @throws KeyError if a commodity is in the graph but not in the weight
@@ -45,9 +72,9 @@ class GreedyPreconditioner {
 
   /// @brief a comparitor for ordering containers of ExchangeNode::Ptrs in
   /// descending order based on their commodity's weight
-  inline bool CommodComp(const ExchangeNode::Ptr l,
-                         const ExchangeNode::Ptr r) {
-    return commod_weights_[l->commod] > commod_weights_[r->commod];
+  inline bool NodeComp(const ExchangeNode::Ptr l,
+                       const ExchangeNode::Ptr r) {
+    return NodeWeight(l, &commod_weights_) > NodeWeight(r, &commod_weights_);
   }
 
   /// @brief a comparitor for ordering containers of Request::Ptrs in
@@ -58,12 +85,13 @@ class GreedyPreconditioner {
   }
 
  private:
+  /// @brief normalizes all weights to 1 and puts them in the heaviest-first
+  /// direction
+  void ProcessWeights_(WgtOrder order);
+  
   std::map<std::string, double> commod_weights_;
   std::map<RequestGroup::Ptr, double> group_weights_;
 };
-
-/// @returns average RequestGroup weight
-double GroupWeight(RequestGroup::Ptr, std::map<std::string, double>& weights);
 
 } // namespace cyclus
 

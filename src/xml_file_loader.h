@@ -41,12 +41,20 @@ class XMLFileLoader {
   /// @param use_main_schema whether or not to use the main schema
   void LoadSim(bool use_main_schema = true);
 
+  /// Method to load the simulation exchange solver.
+  void LoadSolver();
+
   /// Method to load the simulation control parameters.
   void LoadControlParams();
 
   /// Method to load recipes from either the primary input file
   /// or a recipeBook catalog.
   void LoadRecipes();
+
+  /// Processes commodity orders, such that any without a defined order (i.e.,
+  /// are nonpositive), are given an order value greater the last known
+  /// commodity
+  void ProcessCommodities(std::map<std::string, double>* commodity_order);
 
  private:
   /// Creates all initial agent instances from the input file.

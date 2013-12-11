@@ -16,19 +16,17 @@ namespace cyclus {
 ///
 /// @brief The ExchangeManager is designed to house all of the internals
 /// involved in executing a resource exchange. At a given timestep, assuming a
-/// simulation context, ctx, a resource solver, solver, and resource type,
-/// ResourceType, it can be invoked by:
+/// simulation context, ctx, and resource type, ResourceType, it can be invoked
+/// by:
 ///
 /// @code
-/// ExchangeManager<ResourceType> manager(ctx, solver);
+/// ExchangeManager<ResourceType> manager(ctx);
 /// manager.Execute();
 /// @endcode
 template <class T>
 class ExchangeManager {
  public:
-  ExchangeManager(Context* ctx, ExchangeSolver* solver)
-    : ctx_(ctx),
-      solver_(solver) {};
+  ExchangeManager(Context* ctx) : ctx_(ctx) {};
 
   /// @brief execute the full resource sequence
   void Execute() {
@@ -46,15 +44,9 @@ class ExchangeManager {
     CLOG(LEV_DEBUG1) << "graph translated!";
     
     // solve graph
-    solver_->graph(graph.get());
+    ctx_->solver()->graph(graph.get());
     CLOG(LEV_DEBUG1) << "solving graph...";
-    /// @todo Add a presolve step, which for the greedy solver will order
-    /// RequestGroups and Requests. Specifically, provide a commodity to weight
-    /// mapping. For each Request in a RequestGroup, sort the Requests by
-    /// highest-to-lowest weight, and determine the RequestGroup's average
-    /// weight. Sort the RequestGroups by average weight.
-    // solver_->Presolve();
-    solver_->Solve();
+    ctx_->solver()->Solve();
     CLOG(LEV_DEBUG1) << "graph solved!";
 
     // get trades
@@ -70,7 +62,6 @@ class ExchangeManager {
 
  private:
   Context* ctx_;
-  ExchangeSolver* solver_;
 };
 
 } // namespace cyclus

@@ -3,6 +3,7 @@
 
 #include "exchange_graph.h"
 #include "exchange_solver.h"
+#include "greedy_preconditioner.h"
 
 namespace cyclus {
 
@@ -27,6 +28,8 @@ class GreedyPreconditioner;
 /// when one of the following conditions is met:
 ///   1) All RequestGroups are satisfied
 ///   2) All SupplySets are at capacity
+///
+/// @warning the GreedySolver is responsible for deleting is conditioner!
 class GreedySolver: public ExchangeSolver {
  public:
   GreedySolver(GreedyPreconditioner* c = NULL) : conditioner_(c) {};
@@ -35,7 +38,7 @@ class GreedySolver: public ExchangeSolver {
     : conditioner_(c),
       ExchangeSolver(g) {};
   
-  virtual ~GreedySolver() {};
+  virtual ~GreedySolver() { if (conditioner_ != NULL) delete conditioner_; }
 
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
   /// RequestGroup and matching requests with the minimum bids possible, starting
