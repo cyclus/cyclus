@@ -35,7 +35,7 @@ TEST_F(ResourceBuffTest, GetCapacity_ExceptionsEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, GetCapacity_InitialEmpty) {
-  EXPECT_DOUBLE_EQ(store_.capacity(), 0.0);
+  EXPECT_DOUBLE_EQ(store_.capacity(), cyclus::kBuffInfinity);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
@@ -50,7 +50,7 @@ TEST_F(ResourceBuffTest, Getset_capacityEmpty) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, GetSpace_Empty) {
   ASSERT_NO_THROW(store_.space());
-  EXPECT_DOUBLE_EQ(store_.space(), 0.0);
+  EXPECT_DOUBLE_EQ(store_.space(), cyclus::kBuffInfinity);
 
   store_.set_capacity(zero_cap);
   ASSERT_NO_THROW(store_.space());

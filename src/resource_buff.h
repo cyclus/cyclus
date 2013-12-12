@@ -40,8 +40,9 @@ typename T::Ptr ResCast(Resource::Ptr r) {
 /// 
 /// Methods that begin with a "set", "make", "push", or "pop" prefix change the
 /// state/behavior of the store; other methods do not.  Default constructed
-/// resource store has zero (finite) capacity. Resource popping occurs in the order
-/// the resources were pushed (i.e. oldest resources are popd first).
+/// resource store has infinite capacity. Resource popping occurs in the order
+/// the resources were pushed (i.e. oldest resources are popped first), unless
+/// explicitly specified otherwise.
 class ResourceBuff {
  public:
   enum AccessDir {
@@ -49,7 +50,7 @@ class ResourceBuff {
     BACK
   };
   
-  ResourceBuff() : capacity_(0), qty_(0) {};
+  ResourceBuff() : capacity_(kBuffInfinity), qty_(0) {};
 
   virtual ~ResourceBuff() {};
 
