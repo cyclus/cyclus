@@ -82,9 +82,13 @@ class FacilityModel : public TimeAgent, public Trader {
 
   /**
      Copy module members from a source model
+
+     Any facility subclassing facility model should invoke their own InitFrom
+     method, calling FacilityModel's first!
+     
      @param m the model to copy from
    */
-  virtual void InitFrom(Model* m);
+  void InitFrom(FacilityModel* m);
 
   /**
      @brief deploys the facility in the simulation
