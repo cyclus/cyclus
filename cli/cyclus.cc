@@ -188,12 +188,7 @@ int main(int argc, char* argv[]) {
   CLOG(LEV_INFO3) << "}";
 
   // Run the simulation 
-  try {
-    ti.RunSim(&ctx);
-  } catch (Error err) {
-    success = false;
-    CLOG(LEV_ERROR) << err.what();
-  }
+  ti.RunSim(&ctx);
 
   em.close();
   delete back;
