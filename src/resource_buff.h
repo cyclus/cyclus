@@ -49,7 +49,7 @@ class ResourceBuff {
     BACK
   };
   
-  ResourceBuff() : capacity_(0), qty_(0) {};
+  ResourceBuff() : capacity_(kBuffInfinity), qty_(0) {};
 
   virtual ~ResourceBuff() {};
 
