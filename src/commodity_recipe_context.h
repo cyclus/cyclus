@@ -64,7 +64,16 @@ class CommodityRecipeContext {
   inline std::string commod(Resource::Ptr rsrc) {
     return rsrc_commod_map_[rsrc];
   }
-  
+
+  inline bool operator==(CommodityRecipeContext& other) {
+    return (in_commods_ == other.in_commods_
+            && out_commods_ == other.out_commods_
+            && out_commod_map_ == other.out_commod_map_
+            && in_recipes_ == other.in_recipes_
+            && out_recipes_ == other.out_recipes_
+            && rsrc_commod_map_ == other.rsrc_commod_map_);
+  }
+      
  private:
   std::vector<std::string> in_commods_;
   std::vector<std::string> out_commods_;
