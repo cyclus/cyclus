@@ -5,14 +5,14 @@
 #include <string>
 #include <vector>
 
-#include "material.h"
+#include "resource.h"
 
 namespace cyclus {
 
 /// @class CommodityRecipeContext
 ///
 /// @brief a CommodityRecipeContext contains relationships between commodities,
-/// recipes and materials
+/// recipes and resources
 class CommodityRecipeContext {
  public:
   /// @brief add an input commodity and its relations
@@ -22,14 +22,14 @@ class CommodityRecipeContext {
       std::string out_commod,
       std::string out_recipe);
 
-  /// @brief add a material and its commodity affiliation
-  void AddMat(std::string commod, Material::Ptr mat);
+  /// @brief add a resource and its commodity affiliation
+  void AddRsrc(std::string commod, Resource::Ptr rsrc);
 
-  /// @brief update a material and its commodity affiliation  
-  void UpdateMat(std::string commod, Material::Ptr mat);
+  /// @brief update a resource and its commodity affiliation  
+  void UpdateRsrc(std::string commod, Resource::Ptr rsrc);
   
-  /// @brief removes a material from the context
-  void RemoveMat(Material::Ptr mat);
+  /// @brief removes a resource from the context
+  void RemoveRsrc(Resource::Ptr rsrc);
   
   /// @brief update an input recipe and its commodity affiliation  
   void UpdateInRec(std::string in_commod, std::string recipe);
@@ -61,8 +61,8 @@ class CommodityRecipeContext {
 
   /// @return commodity of a material
   /// @warning returns a blank string if material isn't found
-  inline std::string commod(Material::Ptr mat) {
-    return mat_commod_map_[mat];
+  inline std::string commod(Resource::Ptr rsrc) {
+    return rsrc_commod_map_[rsrc];
   }
   
  private:
@@ -71,7 +71,7 @@ class CommodityRecipeContext {
   std::map<std::string, std::string> out_commod_map_;
   std::map<std::string, std::string> in_recipes_;
   std::map<std::string, std::string> out_recipes_;
-  std::map<Material::Ptr, std::string> mat_commod_map_;
+  std::map<Resource::Ptr, std::string> rsrc_commod_map_;
 };
   
 } // namespace cyclus

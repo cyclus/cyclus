@@ -19,18 +19,18 @@ void CommodityRecipeContext::AddInCommod(
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityRecipeContext::AddMat(std::string commod, Material::Ptr mat) {
-  mat_commod_map_.insert(std::make_pair(mat, commod));
+void CommodityRecipeContext::AddRsrc(std::string commod, Resource::Ptr rsrc) {
+  rsrc_commod_map_.insert(std::make_pair(rsrc, commod));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityRecipeContext::RemoveMat(Material::Ptr mat) {
-  mat_commod_map_.erase(mat);
+void CommodityRecipeContext::RemoveRsrc(Resource::Ptr rsrc) {
+  rsrc_commod_map_.erase(rsrc);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityRecipeContext::UpdateMat(std::string commod, Material::Ptr mat) {
-  mat_commod_map_[mat] = commod;
+void CommodityRecipeContext::UpdateRsrc(std::string commod, Resource::Ptr rsrc) {
+  rsrc_commod_map_[rsrc] = commod;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

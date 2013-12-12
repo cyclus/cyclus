@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "material.h"
+
 #include "commodity_recipe_context.h"
 
 namespace cyclus {
@@ -25,11 +27,11 @@ TEST(CommodRecCtx, All) {
   EXPECT_EQ(ctx.out_recipe(in_r), out_r);
   EXPECT_EQ(ctx.out_recipe(in_r2), out_r);
 
-  ctx.AddMat(in_c, mat);
+  ctx.AddRsrc(in_c, mat);
   EXPECT_EQ(ctx.commod(mat), in_c);
-  ctx.UpdateMat(out_c, mat);
+  ctx.UpdateRsrc(out_c, mat);
   EXPECT_EQ(ctx.commod(mat), out_c);
-  ctx.RemoveMat(mat);
+  ctx.RemoveRsrc(mat);
   EXPECT_EQ(ctx.commod(mat), "");
   
 }
