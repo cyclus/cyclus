@@ -16,8 +16,7 @@ template<class T> struct SecondLT : std::binary_function<T, T, bool> {
 // taken from
 // http://stackoverflow.com/questions/8473009/how-to-efficiently-compare-two-maps-of-strings-in-c
 template <typename Map>
-    bool map_compare (Map const &lhs, Map const &rhs) {
-  // No predicate needed because there is operator== for pairs already.
+bool map_compare (Map const &lhs, Map const &rhs) {
   return lhs.size() == rhs.size()
       && std::equal(lhs.begin(), lhs.end(),
                     rhs.begin());

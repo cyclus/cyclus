@@ -67,8 +67,8 @@ class CommodityRecipeContext {
   }
 
   inline bool operator==(const CommodityRecipeContext& other) const {
-    return (in_commods_ == other.in_commods_
-            && out_commods_ == other.out_commods_
+    return (in_commods_.size() == other.in_commods_.size()
+            && out_commods_.size() == other.out_commods_.size()
             && map_compare(out_commod_map_, other.out_commod_map_)
             && map_compare(in_recipes_, other.in_recipes_)
             && map_compare(out_recipes_, other.out_recipes_)
