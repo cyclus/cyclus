@@ -33,7 +33,17 @@ TEST(CommodRecCtx, All) {
   EXPECT_EQ(ctx.commod(mat), out_c);
   ctx.RemoveRsrc(mat);
   EXPECT_EQ(ctx.commod(mat), "");
-  
+
+  CommodityRecipeContext one;
+  one.AddInCommod(in_c, in_r, out_c, out_r);
+  one.AddInCommod("yabba", "dabba", "dooo", "oooo");
+  CommodityRecipeContext other;
+  other.AddInCommod(in_c, in_r, out_c, out_r);
+  other.AddInCommod("yabba", "dabba", "dooo", "oooo");
+  CommodityRecipeContext other_one;
+  other_one.AddInCommod(in_c, in_r, out_c, out_r);
+  EXPECT_EQ(one, other);
+  EXPECT_NE(one, other_one);
 }
 
 } // namespace cyclus

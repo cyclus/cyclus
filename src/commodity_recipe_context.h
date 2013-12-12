@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "cyc_std.h"
 #include "resource.h"
 
 namespace cyclus {
@@ -68,12 +69,16 @@ class CommodityRecipeContext {
   inline bool operator==(const CommodityRecipeContext& other) const {
     return (in_commods_ == other.in_commods_
             && out_commods_ == other.out_commods_
-            && out_commod_map_ == other.out_commod_map_
-            && in_recipes_ == other.in_recipes_
-            && out_recipes_ == other.out_recipes_
-            && rsrc_commod_map_ == other.rsrc_commod_map_);
+            && map_compare(out_commod_map_, other.out_commod_map_)
+            && map_compare(in_recipes_, other.in_recipes_)
+            && map_compare(out_recipes_, other.out_recipes_)
+            && map_compare(rsrc_commod_map_, other.rsrc_commod_map_));
   }
-      
+
+  inline bool operator!=(const CommodityRecipeContext& other) const {
+    return !operator==(other);
+  }
+  
  private:
   std::vector<std::string> in_commods_;
   std::vector<std::string> out_commods_;
