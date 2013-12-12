@@ -20,6 +20,7 @@ Material::~Material() {
 Material::Ptr Material::Create(Model* creator, double quantity,
                                Composition::Ptr c) {
   Material::Ptr m(new Material(creator->context(), quantity, c));
+  all_mats_[m.get()] = true;
   m->tracker_.Create(creator);
   return m;
 }
@@ -158,7 +159,6 @@ Composition::Ptr Material::comp() const {
 Material::Material(Context* ctx, double quantity, Composition::Ptr c)
   : qty_(quantity), comp_(c), tracker_(ctx, this), ctx_(ctx),
     prev_decay_time_(0) {
-  all_mats_[this] = true;
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
   } else {
