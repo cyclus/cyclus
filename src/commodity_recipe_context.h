@@ -65,7 +65,7 @@ class CommodityRecipeContext {
     return rsrc_commod_map_[rsrc];
   }
 
-  inline bool operator==(const CommodityRecipeContext& other) {
+  inline bool operator==(const CommodityRecipeContext& other) const {
     return (in_commods_ == other.in_commods_
             && out_commods_ == other.out_commods_
             && out_commod_map_ == other.out_commod_map_
