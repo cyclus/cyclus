@@ -10,6 +10,7 @@
 #include "commodity.h"
 #include "commodity_producer.h"
 #include "commodity_producer_manager.h"
+#include "commodity_recipe_context.h"
 #include "comp_math.h"
 #include "composition.h"
 #include "context.h"

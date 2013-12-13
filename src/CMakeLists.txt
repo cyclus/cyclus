@@ -61,6 +61,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_recipe_context.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/comp_math.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/composition.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/context.cc 
@@ -120,6 +121,7 @@ INSTALL(FILES
   commodity.h
   commodity_producer.h
   commodity_producer_manager.h
+  commodity_recipe_context.h
   comp_math.h
   composition.h
   context.h
