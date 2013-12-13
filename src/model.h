@@ -73,9 +73,10 @@ class Model {
   /**
      Return a newly created/allocated prototype that is an exact copy of this.
      This method should ONLY be impelemented by the LEAVES of the model
-     inheritance hierarchy (i.e. not superclasses). It must call the
-     superclass' InitFrom method with "this" as the argument.  All
-     initialization/cloning operations must be done AFTER calling InitFrom.
+     inheritance hierarchy (i.e. not superclasses). All initialization/cloning
+     operations should be done in the leaf model's InitFrom. See the Model
+     InitFrom() method below.
+     
      Example:
 
      @code
@@ -83,12 +84,8 @@ class Model {
        ...
 
        virtual Model* Clone() {
-         MyModelClass* m = new MyModelClass(*this);
+         MyModelClass* m = new MyModelClass(context());
          m->InitFrom(this);
-
-         // put custom initialization/cloning details here
-         ...
-
          return m;
        };
 
@@ -240,14 +237,33 @@ class Model {
  protected:
   /**
      A method that must be implemented by and only by classes in the model
-     heirarchy that have been subclassed.  This method must call the
-     superclass' InitFrom method. The InitFrom method should only initialize
-     this class' members - not inherited state.
+     heirarchy that have been subclassed. This method must call the superclass'
+     InitFrom method. The InitFrom method should only initialize this class'
+     members - not inherited state.
 
      @param m the model containing state that should be used to initialize this
      model.
+     
+     Example:
+
+     @code
+     class MyModelClass : virtual public Model {
+       ...
+
+       void InitFrom(MyModelClass* m) {
+         MostDerivedModelClass::InitFrom(m);
+         // for example, if you hierarchy is Model->FacilityModel->MyModelClass
+         // then, you would use FacilityModel::InitFrom(m)
+         
+         // now do MyModelClass' initialitions, e.g.:
+         my_var_ = m->my_var_;
+       };
+
+       ...
+     };
+     @endcode
   */
-  virtual void InitFrom(Model* m);
+  void InitFrom(Model* m);
 
   /**
      @brief adds model-specific information prefix to an error message
