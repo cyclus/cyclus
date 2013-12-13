@@ -108,17 +108,23 @@ void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadSim(bool use_main_schema) {
-  LoadDynamicModules();
-
-  if (use_main_schema) {
-    std::stringstream ss(BuildMasterSchema());
-    parser_->Validate(ss);
+  try {
+    LoadDynamicModules();
+    
+    if (use_main_schema) {
+      std::stringstream ss(BuildMasterSchema());
+      parser_->Validate(ss);
+    }
+    
+    LoadSolver();
+    LoadControlParams();
+    LoadRecipes();
+    LoadInitialAgents();
+  } catch(std::exception& e) {
+    std::string msg = "Error reading xml file: ";
+    msg += e.what();
+    throw cyclus::Error(msg);
   }
-
-  LoadSolver();
-  LoadControlParams();
-  LoadRecipes();
-  LoadInitialAgents();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
