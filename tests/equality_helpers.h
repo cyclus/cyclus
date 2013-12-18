@@ -4,6 +4,33 @@
 #include "bid_portfolio.h" 
 #include "request_portfolio.h" 
 
+template<class T>
+inline void TestVecEq(const std::vector<T>& lhs,
+                      const std::vector<T>& rhs) {
+  ASSERT_EQ(lhs.size(), rhs.size()) << "Vectors not the same size";
+  for (int i = 0; i < lhs.size(); i++) {
+    EXPECT_EQ(lhs[i], rhs[i]) << "Vectors differ at index " << i;
+  }
+}
+
+template<>
+inline void TestVecEq(const std::vector<double>& lhs,
+                      const std::vector<double>& rhs) {
+  ASSERT_EQ(lhs.size(), rhs.size()) << "Vectors not the same size";
+  for (int i = 0; i < lhs.size(); i++) {
+    EXPECT_DOUBLE_EQ(lhs[i], rhs[i]) << "Vectors differ at index " << i;
+  }
+}
+
+template<>
+inline void TestVecEq(const std::vector<float>& lhs,
+                      const std::vector<float>& rhs) {
+  ASSERT_EQ(lhs.size(), rhs.size()) << "Vectors not the same size";
+  for (int i = 0; i < lhs.size(); i++) {
+    EXPECT_FLOAT_EQ(lhs[i], rhs[i]) << "Vectors differ at index " << i;
+  }
+}
+
 /// @brief BidPortfolio-BidPortfolio equality
 /// @warning only tests bid set sizes are the same... sets are non optimal for
 /// testing equality among members that have a single field (i.e., porfolio)
