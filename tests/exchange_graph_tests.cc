@@ -63,10 +63,10 @@ TEST(ExGraphTests, ExchangeNodeCaps1) {
   s.AddCapacity(scap);
   s.AddExchangeNode(n);
 
-  EXPECT_EQ(scap, Capacity(n, a));  
+  EXPECT_DOUBLE_EQ(scap, Capacity(n, a));  
   double qty = 1.0;
   UpdateCapacity(n, a, qty);
-  EXPECT_EQ(scap - qty, Capacity(n, a));  
+  EXPECT_DOUBLE_EQ(scap - qty, Capacity(n, a));  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -102,7 +102,7 @@ TEST(ExGraphTests, ExchangeNodeCaps2) {
   UpdateCapacity(n, a, qty);
   EXPECT_EQ(exp, s.capacities());
   min_exp = (cap - qty * ucap) / ucap;
-  EXPECT_EQ(min_exp, Capacity(n, a));
+  EXPECT_DOUBLE_EQ(min_exp, Capacity(n, a));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -122,10 +122,10 @@ TEST(ExGraphTests, ExchangeNodeCaps3) {
   s.AddCapacity(scap);
   s.AddExchangeNode(n);
 
-  EXPECT_EQ(qty, Capacity(n, a));  
+  EXPECT_DOUBLE_EQ(qty, Capacity(n, a));  
   UpdateCapacity(n, a, qty);
   EXPECT_EQ(n->qty, 0.5);
-  EXPECT_EQ(0, Capacity(n, a));  
+  EXPECT_DOUBLE_EQ(0, Capacity(n, a));  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
