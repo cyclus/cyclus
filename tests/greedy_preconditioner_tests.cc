@@ -50,6 +50,11 @@ TEST(ConditionerTests, Conditioning) {
   weights["eggs"] = 2;
   GreedyPreconditioner gp(weights);
 
+  EXPECT_DOUBLE_EQ(NodeWeight(n11, &weights), weights[n11->commod]); 
+  EXPECT_DOUBLE_EQ(NodeWeight(n12, &weights), weights[n12->commod]); 
+  EXPECT_DOUBLE_EQ(NodeWeight(n13, &weights), weights[n13->commod]); 
+  EXPECT_DOUBLE_EQ(NodeWeight(n21, &weights), weights[n21->commod]); 
+  EXPECT_DOUBLE_EQ(NodeWeight(n21, &weights), weights[n21->commod]); 
   EXPECT_DOUBLE_EQ(GroupWeight(g1, &weights), 9./3); 
   EXPECT_DOUBLE_EQ(GroupWeight(g2, &weights), 7./2);
   
