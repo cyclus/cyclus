@@ -8,6 +8,7 @@
 #include "exchange_graph.h"
 #include "exchange_translator.h"
 #include "exchange_translation_context.h"
+#include "equality_helpers.h"
 #include "material.h"
 #include "mock_facility.h"
 #include "request.h"
@@ -102,10 +103,10 @@ TEST(ExXlateTests, XlateCapacities) {
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
       
   TranslateCapacities<Material>(mat, rconstrs, rnode, arc);
-  EXPECT_EQ(rexp, rnode->unit_capacities[arc]);
+  TestVecEq(rexp, rnode->unit_capacities[arc]);
 
   TranslateCapacities<Material>(mat, bconstrs, bnode, arc);
-  EXPECT_EQ(bexp, bnode->unit_capacities[arc]);
+  TestVecEq(bexp, bnode->unit_capacities[arc]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -133,8 +134,8 @@ TEST(ExXlateTests, XlateReq) {
 
   RequestGroup::Ptr set = TranslateRequestPortfolio(xlator.translation_ctx(), rp);
 
-  EXPECT_EQ(qty, set->qty());
-  EXPECT_EQ(cexp, set->capacities());
+  EXPECT_DOUBLE_EQ(qty, set->qty());
+  TestVecEq(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().request_to_node.find(req)
               != xlator.translation_ctx().request_to_node.end());
   EXPECT_EQ(
@@ -170,7 +171,7 @@ TEST(ExXlateTests, XlateBid) {
   ExchangeNodeGroup::Ptr set =
       TranslateBidPortfolio(xlator.translation_ctx(), port);
 
-  EXPECT_EQ(cexp, set->capacities());
+  TestVecEq(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().bid_to_node.find(bid)
               != xlator.translation_ctx().bid_to_node.end());
   EXPECT_EQ(
@@ -218,11 +219,11 @@ TEST(ExXlateTests, XlateArc) {
 
   double barr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
-  EXPECT_EQ(bexp, a.second->unit_capacities[a]);
+  TestVecEq(bexp, a.second->unit_capacities[a]);
       
   double rarr[] = {(c1->convert(mat) / qty)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
-  EXPECT_EQ(rexp, a.first->unit_capacities[a]);
+  TestVecEq(rexp, a.first->unit_capacities[a]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
