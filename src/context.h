@@ -101,7 +101,7 @@ class Context {
   Composition::Ptr GetRecipe(std::string name);
 
   /// See Timer::RegisterTickListener documentation.
-  void RegisterTimeListener(TimeListener* ta);
+  void RegisterTimeListener(TimeListener* tl);
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.

@@ -70,8 +70,8 @@ int Context::sim_dur() {
   return ti_->dur();
 };
 
-void Context::RegisterTimeListener(TimeListener* ta) {
-  ti_->RegisterTickListener(ta);
+void Context::RegisterTimeListener(TimeListener* tl) {
+  ti_->RegisterTickListener(tl);
 };
 
 Datum* Context::NewDatum(std::string title) {
