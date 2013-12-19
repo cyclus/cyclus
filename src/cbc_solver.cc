@@ -107,6 +107,8 @@ void CBCSolver::PopulateSolution(CbcModel& model,
       case Variable::INT:
         value = static_cast<int>(solution[i]);
         break;
+      default: // do nothing
+        break;
     }
     variables.at(i)->set_value(value);
   }
