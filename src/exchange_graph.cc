@@ -12,6 +12,8 @@ namespace cyclus {
 ExchangeNode::ExchangeNode(double max_qty)
   : max_qty(max_qty),
     qty(0),
+    avg_pref(0),
+    commod(""),
     group(NULL) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
