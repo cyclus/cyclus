@@ -125,6 +125,8 @@ class BuildingManager {
                                         orders,
                                         std::vector<Variable::Ptr>& solution);
 
+  const std::set<Builder*>& builders() { return builders_; }
+  
  private:
   /// the set of registered builders
   std::set<Builder*> builders_;
