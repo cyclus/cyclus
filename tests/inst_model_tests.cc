@@ -10,13 +10,13 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(InstModelTests, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(inst_model_->HandleTick(time));
+  EXPECT_NO_THROW(inst_model_->Tick(time));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(InstModelTests, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(inst_model_->HandleTock(time));
+  EXPECT_NO_THROW(inst_model_->Tock(time));
 }
 
 // //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

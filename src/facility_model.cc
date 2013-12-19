@@ -17,7 +17,7 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel(Context* ctx)
-    : TimeAgent(ctx),
+    : TimeListener(ctx),
       Trader(ctx),
       Model(ctx),
       fac_lifetime_(std::numeric_limits<int>::max()) {
@@ -83,11 +83,6 @@ std::string FacilityModel::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel* FacilityModel::FacInst() {
   return dynamic_cast<InstModel*>(parent());
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::HandleDailyTasks(int time, int day) {
-  // facilities who have more intricate details should utilize this function
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

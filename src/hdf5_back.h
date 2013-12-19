@@ -5,22 +5,22 @@
 #include <map>
 #include <string>
 
-#include "event_backend.h"
+#include "rec_backend.h"
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
 namespace cyclus {
-/// An EventManager backend that writes data to an hdf5 file.  Identically named
-/// events have their data placed as rows in a single table.  Handles the following
-/// event value types: int, float, double, std::string, cyclus::Blob
-class Hdf5Back : public EventBackend {
+/// An Recorder backend that writes data to an hdf5 file.  Identically named
+/// Datum objects have their data placed as rows in a single table.  Handles the following
+/// datum value types: int, float, double, std::string, cyclus::Blob
+class Hdf5Back : public RecBackend {
  public:
   /// Creates a new backend writing data to the specified file.
   ///
   /// @param path the file to write to. If it exists, it will be overwritten.
   Hdf5Back(std::string path);
 
-  virtual void Notify(EventList events);
+  virtual void Notify(DatumList data);
 
   virtual std::string Name();
 
@@ -31,13 +31,13 @@ class Hdf5Back : public EventBackend {
 
  private:
   /// creates and initializes an hdf5 table
-  void CreateTable(Event* ev);
+  void CreateTable(Datum* d);
 
-  /// write a group of events with the same title to their corresponding hdf5 dataset
-  void WriteGroup(EventList& group);
+  /// write a group of Datum objects with the same title to their corresponding hdf5 dataset
+  void WriteGroup(DatumList& group);
 
   /// fill a contiguous memory buffer with data from group for writing to an hdf5 dataset.
-  void FillBuf(char* buf, EventList& group, size_t* sizes, size_t rowsize);
+  void FillBuf(char* buf, DatumList& group, size_t* sizes, size_t rowsize);
 
   /// An interface to a sqlite db managed by the SqliteBack class.
   hid_t file_;

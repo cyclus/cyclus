@@ -4,11 +4,10 @@
 
 #include <utility>
 #include <vector>
-#include "boost/date_time/gregorian/gregorian.hpp"
 
 #include "context.h"
 #include "query_engine.h"
-#include "time_agent.h"
+#include "time_listener.h"
 
 namespace cyclus {
 
@@ -54,7 +53,7 @@ class Timer {
 
      @param agent agent that will receive time-step notifications
    */
-  void RegisterTickListener(TimeAgent* agent);
+  void RegisterTickListener(TimeListener* agent);
 
   /**
      Returns the current time, in months since the simulation started.
@@ -76,82 +75,6 @@ class Timer {
      @return the duration, in months
    */
   int dur();
-
-  /**
-     Returns the starting date of the simulation.
-
-     @return the start date as a datetime object
-   */
-  boost::gregorian::date StartDate() {
-    return start_date_;
-  }
-
-  /**
-     Calculates the ending date of the simulation.
-
-     @param startDate the starting date as specified in the input file
-     @param simDur the simulation duration as specified
-
-     @return the end date as a datetime object
-   */
-  boost::gregorian::date GetEndDate(boost::gregorian::date startDate, int simDur);
-
-  /**
-     Returns the ending date of the simulation.
-
-     @return the end date as a datetime object
-   */
-  boost::gregorian::date endDate() {
-    return end_date_;
-  }
-
-  /**
-     Returns true if it is the ending date of the simulation
-
-     @return whether it is the last day of the simulation
-   */
-  bool CheckEndDate() {
-    return (date_ == end_date_);
-  }
-
-  /**
-     Returns true if it is the ending month of the simulation
-
-     @return whether it is the last day of the simulation
-   */
-  bool CheckEndMonth() {
-    return (date_.month() == end_date_.month());
-  }
-
-  /**
-     Given the current date, returns the last day of the current month
-
-     @return the last date of the current month
-   */
-  int LastDayOfMonth();
-
-  /**
-     Returns the current date of the simulation.
-
-     @return the current date as a datetime object
-   */
-  boost::gregorian::date date() {
-    return date_;
-  }
-
-  /**
-     Converts the given date into a GENIUS time.
-
-     @param month the month corresponding to the date (Jan = 1, etc.)
-     @param year the year corresponding to the date
-     @return the GENIUS date
-   */
-  int ConvertDate(int month, int year);
-
-  /**
-     Converts the given GENIUS time into a (month, year) pair.
-   */
-  std::pair<int, int> ConvertDate(int time);
 
  private:
   /**
@@ -180,21 +103,6 @@ class Timer {
   int decay_interval_;
 
   /**
-     The start date of the simulation
-   */
-  boost::gregorian::date start_date_;
-
-  /**
-     The end date of the simulation
-   */
-  boost::gregorian::date end_date_;
-
-  /**
-     The current date of the simulation
-   */
-  boost::gregorian::date date_;
-
-  /**
      The number of the month (Jan = 1, etc.) corresponding to t = 0 for
      the scenario being run.
    */
@@ -208,12 +116,12 @@ class Timer {
   /**
      Concrete models that desire to receive tick and tock notifications
    */
-  std::vector<TimeAgent*> tick_listeners_;
+  std::vector<TimeListener*> tick_listeners_;
 
   /**
      Concrete models that desire to receive tick and tock notifications
    */
-  std::vector<TimeAgent*> new_tickers_;
+  std::vector<TimeListener*> new_tickers_;
 
   /**
      Returns a string of all models listening to the tick
@@ -231,12 +139,6 @@ class Timer {
      notifications.
    */
   void SendTock();
-
-  /**
-     sends a notification to Tick listeners that a day has passed
-   */
-  void SendDailyTasks();
-
 };
 
 } // namespace cyclus

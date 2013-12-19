@@ -69,7 +69,7 @@ Model::~Model() {
   // set died on date and record it in the table if it was ever deployed
   if (birthtime_ > -1) {
     deathtime_ = ctx_->time();
-    ctx_->NewEvent("AgentDeaths")
+    ctx_->NewDatum("AgentDeaths")
     ->AddVal("AgentID", id())
     ->AddVal("DeathDate", deathtime_)
     ->Record();
@@ -214,7 +214,7 @@ const std::string Model::ModelImpl() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddToTable() {
-  ctx_->NewEvent("Agents")
+  ctx_->NewDatum("Agents")
   ->AddVal("ID", id())
   ->AddVal("AgentType", ModelType())
   ->AddVal("ModelType", ModelImpl())

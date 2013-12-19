@@ -73,14 +73,14 @@ class StubFacility : public cyclus::FacilityModel  {
       
      @param time the time of the tick 
    */
-  virtual void HandleTick(int time);
+  virtual void Tick(int time);
 
   /**
      The handleTick function specific to the StubFacility. 
       
      @param time the time of the tock 
    */
-  virtual void HandleTock(int time);
+  virtual void Tock(int time);
 
 /* ------------------- */ 
 

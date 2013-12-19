@@ -8,7 +8,7 @@
 #include "context.h"
 #include "env.h"
 #include "error.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "model.h"
 #include "timer.h"
 #include "dynamic_module.h"
@@ -32,9 +32,9 @@ TEST(DynamicLoadingTests, LoadLibError) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, ConstructTestFacility) {
-  cyclus::EventManager em;
+  cyclus::Recorder rec;
   cyclus::Timer ti;
-  cyclus::Context ctx(&ti, &em);
+  cyclus::Context ctx(&ti, &rec);
   cyclus::DynamicModule* module = new DynamicModule("TestFacility");
   EXPECT_NO_THROW(
                   Model* fac = module->ConstructInstance(&ctx);
@@ -46,9 +46,9 @@ TEST(DynamicLoadingTests, ConstructTestFacility) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, cloneTestFacility) {
-  cyclus::EventManager em;
+  cyclus::Recorder rec;
   cyclus::Timer ti;
-  cyclus::Context ctx(&ti, &em);
+  cyclus::Context ctx(&ti, &rec);
   cyclus::DynamicModule* module = new DynamicModule("TestFacility");
   EXPECT_NO_THROW(
                   Model* fac = module->ConstructInstance(&ctx);

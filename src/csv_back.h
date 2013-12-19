@@ -9,25 +9,25 @@
 #include <boost/filesystem.hpp>
 
 #include "any.hpp"
-#include "event_backend.h"
+#include "rec_backend.h"
 
 namespace cyclus {
 
 typedef std::vector<std::string> LineList;
 
-/// An EventManager backend that writes data to a collection of csv files.
-/// Identically named events have their data placed in the same file.  Handles the
-/// following event value types: int, float, double, std::string, cyclus::Blob.
-class CsvBack: public EventBackend {
+/// An Recorder backend that writes data to a collection of csv files.
+/// Identically named Datum objects have their data placed in the same file.  Handles the
+/// following datum value types: int, float, double, std::string, cyclus::Blob.
+class CsvBack: public RecBackend {
  public:
   /// Creates a new csv backend that will write to a set of csv files in path
   /// @param path directory to place csv file into
   /// @param overwrite true to overwrite existing csv files with same path/name.
   CsvBack(std::string path, bool overwrite = false);
 
-  /// Collect events to be written to csv files.
-  /// @param events group of events to write to the csv file collection.
-  void Notify(EventList events);
+  /// Collects Datum objects to be written to csv files.
+  /// @param data group of Datum objects to write to the csv file collection.
+  void Notify(DatumList data);
 
   std::string Name();
 
@@ -45,8 +45,8 @@ class CsvBack: public EventBackend {
   /// converts the value to a valid csv value string.
   std::string ValAsString(boost::spirit::hold_any& v);
 
-  /// constructs a valid csv line for the event and queues it for writing
-  void WriteEvent(Event* e);
+  /// constructs a valid csv line for the datum and queues it for writing
+  void WriteDatum(Datum* d);
 
   /// Stores the database's path, declared during construction.
   boost::filesystem::path path_;

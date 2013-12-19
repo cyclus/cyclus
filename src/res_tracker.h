@@ -24,7 +24,7 @@ class ResTracker {
   /// Create a new tracker following r.
   ResTracker(Context* ctx, Resource* r);
 
-  /// Prevents a resource's heritage from being tracked and recorded.
+  /// Prevent a resource's heritage from being tracked and recorded.
   void DontTrack();
 
   /// Should be called when a resource instance is newly created.

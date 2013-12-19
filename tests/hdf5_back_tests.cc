@@ -19,7 +19,7 @@ class FileDeleter {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(Hdf5BackTest, ReadWrite) {
-  using cyclus::EventManager;
+  using cyclus::Recorder;
   using cyclus::Hdf5Back;
   FileDeleter fd(path);
 
@@ -36,10 +36,10 @@ TEST(Hdf5BackTest, ReadWrite) {
   const char* field_names = "string,int,float,double,blob";
   char buf[size];
 
-  EventManager m;
+  Recorder m;
   Hdf5Back back(path);
   m.RegisterBackend(&back);
-  m.NewEvent("DumbTitle")
+  m.NewDatum("DumbTitle")
   ->AddVal("string", str)
   ->AddVal("int", i)
   ->AddVal("float", f)

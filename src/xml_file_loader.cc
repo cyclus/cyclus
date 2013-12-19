@@ -12,11 +12,11 @@
 #include "cyc_std.h"
 #include "env.h"
 #include "error.h"
-#include "event_manager.h"
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
 #include "logger.h"
 #include "model.h"
+#include "recorder.h"
 #include "timer.h"
 #include "xml_query_engine.h"
 
@@ -41,8 +41,8 @@ void LoadStringstreamFromFile(std::stringstream& stream,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string BuildMasterSchema() {
   Timer ti;
-  EventManager em;
-  Context ctx(&ti, &em);
+  Recorder rec;
+  Context ctx(&ti, &rec);
 
   std::stringstream schema("");
   std::string schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
@@ -83,7 +83,7 @@ XMLFileLoader::XMLFileLoader(Context* ctx,
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->Init(input);
 
-  ctx_->NewEvent("InputFiles")
+  ctx_->NewDatum("InputFiles")
   ->AddVal("Data", Blob(input.str()))
   ->Record();
 

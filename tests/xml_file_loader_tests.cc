@@ -14,7 +14,7 @@ using namespace std;
 using cyclus::XMLFileLoader;
 
 void XMLFileLoaderTests::SetUp() {
-  ctx_ = new cyclus::Context(&ti_, &em_);
+  ctx_ = new cyclus::Context(&ti_, &rec_);
   falseFile = "false.xml";
   CreateTestInputFile(falseFile, FalseSequence());
 

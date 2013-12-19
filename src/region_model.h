@@ -4,7 +4,7 @@
 
 #include <set>
 
-#include "time_agent.h"
+#include "time_listener.h"
 #include "query_engine.h"
 
 namespace cyclus {
@@ -60,7 +60,7 @@ namespace cyclus {
    facility's allowability in the region). It makes no alterations to
    messages passed through it in either the up or down direction.
  */
-class RegionModel : public TimeAgent {
+class RegionModel : public TimeListener {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
@@ -100,7 +100,7 @@ class RegionModel : public TimeAgent {
 
      @param time is the time to perform the tick
    */
-  virtual void HandleTick(int time);
+  virtual void Tick(int time);
 
   /**
      Each region is prompted to do its end-of-time-step
@@ -109,15 +109,7 @@ class RegionModel : public TimeAgent {
 
      @param time is the time to perform the tock
    */
-  virtual void HandleTock(int time);
-
-  /**
-     Each region is prompted to do its daily task.
-
-     @param time is the month since the start of the simulation
-     @param day is the current day of that month
-   */
-  virtual void HandleDailyTasks(int time, int day);
+  virtual void Tock(int time);
 
   /* --------------------
    * all REGIONMODEL classes have these members

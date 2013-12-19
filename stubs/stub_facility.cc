@@ -38,10 +38,10 @@ std::string StubFacility::str() {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::HandleTick(int time){}
+void StubFacility::Tick(int time){}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::HandleTock(int time){}
+void StubFacility::Tock(int time){}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructStubFacility(cyclus::Context* ctx) {

@@ -7,17 +7,17 @@
 #include <set>
 
 #include "composition.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "model.h"
 
 namespace cyclus {
 
-class EventManager;
-class Event;
+class Datum;
 class ExchangeSolver;
+class Recorder;
 class Trader;
 class Timer;
-class TimeAgent;
+class TimeListener;
 
 /// A simulation context that provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
@@ -28,14 +28,14 @@ class TimeAgent;
 /// @warning the Context is responsible for deleting the solver it is given!
 class Context {
  public:
-  /// Creates a new context working with the specified timer and event manager.
+  /// Creates a new context working with the specified timer and datum manager.
   /// The timer does not have to be initialized (yet).
-  Context(Timer* ti, EventManager* em);
+  Context(Timer* ti, Recorder* rec);
 
   /// the Context is responsible for deleting its solver
   ~Context();
 
-  /// See EventManager::sim_id documentation.
+  /// See Recorder::sim_id documentation.
   boost::uuids::uuid sim_id();
 
   /// Adds a prototype to a simulation-wide accessible list.
@@ -101,7 +101,7 @@ class Context {
   Composition::Ptr GetRecipe(std::string name);
 
   /// See Timer::RegisterTickListener documentation.
-  void RegisterTicker(TimeAgent* ta);
+  void RegisterTimeListener(TimeListener* tl);
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.
@@ -117,8 +117,8 @@ class Context {
   /// Returns the number of timesteps in the entire simulation.
   int sim_dur();
 
-  /// See EventManager::NewEvent documentation.
-  Event* NewEvent(std::string title);
+  /// See Recorder::NewDatum documentation.
+  Datum* NewDatum(std::string title);
 
   /// @return the next transaction id
   inline int NextTransactionID() { return trans_id_++; }
@@ -136,8 +136,8 @@ class Context {
   std::vector<Model*> model_list_;
   
   Timer* ti_;
-  EventManager* em_;
   ExchangeSolver* solver_;
+  Recorder* rec_;
   int trans_id_;
 };
 

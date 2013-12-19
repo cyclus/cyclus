@@ -7,7 +7,7 @@
 #include <set>
 
 #include "model.h"
-#include "time_agent.h"
+#include "time_listener.h"
 #include "trader.h"
 
 namespace cyclus {
@@ -68,7 +68,7 @@ class InstModel;
    Collaborators are encouraged to add to this list and link to external
    pages that describe how to get the models and the detailed behavior
  */
-class FacilityModel : public TimeAgent, public Trader {
+class FacilityModel : public TimeListener, public Trader {
  public:
   FacilityModel(Context* ctx);
 
@@ -183,7 +183,7 @@ class FacilityModel : public TimeAgent, public Trader {
 
      @param time is the time to perform the tick
    */
-  virtual void HandleTick(int time) = 0;
+  virtual void Tick(int time) = 0;
 
   /**
      Each facility is prompted to its end-of-time-step
@@ -194,15 +194,7 @@ class FacilityModel : public TimeAgent, public Trader {
 
      @param time is the time to perform the tock
    */
-  virtual void HandleTock(int time) = 0;
-
-  /**
-     Each facility is prompted to do its daily tasks
-
-     @param time is the number of months since the beginning of the
-     simulation @param day is the current day in this month
-   */
-  virtual void HandleDailyTasks(int time, int day);
+  virtual void Tock(int time) = 0;
 
  private:
   /**

@@ -10,7 +10,7 @@
 
 #include "blob.h"
 #include "error.h"
-#include "event.h"
+#include "datum.h"
 #include "logger.h"
 
 namespace fs = boost::filesystem;
@@ -26,9 +26,9 @@ CsvBack::CsvBack(std::string path, bool overwrite) : path_(path) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::Notify(EventList evts) {
-  for (EventList::iterator it = evts.begin(); it != evts.end(); it++) {
-    WriteEvent(*it);
+void CsvBack::Notify(DatumList data) {
+  for (DatumList::iterator it = data.begin(); it != data.end(); it++) {
+    WriteDatum(*it);
   }
   Flush();
 }
@@ -44,15 +44,15 @@ std::string CsvBack::Name() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::WriteEvent(Event* e) {
+void CsvBack::WriteDatum(Datum* d) {
   std::stringstream line;
   std::stringstream header;
-  Event::Vals vals = e->vals();
-  fs::path fname(e->title() + ".csv");
+  Datum::Vals vals = d->vals();
+  fs::path fname(d->title() + ".csv");
   std::string path = (path_ / fname).string();
 
-  // create header if first event with this title
-  Event::Vals::iterator it = vals.begin();
+  // create header if first datum with this title
+  Datum::Vals::iterator it = vals.begin();
   if (file_data_.find(path) == file_data_.end() && !fs::exists(path)) {
     it = vals.begin();
     while (true) {

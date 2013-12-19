@@ -7,7 +7,7 @@
 #include "composition.h"
 #include "context.h"
 #include "cyc_limits.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "error.h"
 #include "material.h"
 #include "timer.h"
@@ -26,8 +26,8 @@ void EnrichmentTests::SetUp() {
   mass_u_ = 10;
 
   cyclus::Timer ti;
-  cyclus::EventManager em;
-  cyclus::Context ctx(&ti, &em);
+  cyclus::Recorder rec;
+  cyclus::Context ctx(&ti, &rec);
 
   CompMap v;
   v[92235] = assay_u_;

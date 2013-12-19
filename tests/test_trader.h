@@ -48,7 +48,7 @@ class TestTrader : public MockFacility {
     m->offer = offer;
     m->obj_fac = obj_fac;
     m->is_requester = is_requester;
-    context()->RegisterTicker(m);
+    context()->RegisterTimeListener(m);
     return m;
   };
 

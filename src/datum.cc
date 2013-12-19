@@ -1,54 +1,54 @@
-// event.cc
+// datum.cc
 
 #include "timer.h"
-#include "event.h"
+#include "datum.h"
 
 namespace cyclus {
 
-typedef boost::singleton_pool<Event, sizeof(Event)> EventPool;
+typedef boost::singleton_pool<Datum, sizeof(Datum)> DatumPool;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event* Event::AddVal(const char* field, boost::spirit::hold_any val) {
+Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val) {
   vals_.push_back(std::pair<const char*, boost::spirit::hold_any>(field, val));
   return this;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Event::Record() {
-  manager_->AddEvent(this);
+void Datum::Record() {
+  manager_->AddDatum(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event::Event(EventManager* m, std::string title)
+Datum::Datum(Recorder* m, std::string title)
   : title_(title),
     manager_(m) {
   // The (vect) size to reserve is chosen to be just bigger than most/all cyclus
   // core tables.  This prevents extra reallocations in the underlying
-  // vector as vals are added to the event.
+  // vector as vals are added to the datum.
   vals_.reserve(10);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Event::~Event() {}
+Datum::~Datum() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Event::title() {
+std::string Datum::title() {
   return title_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const Event::Vals& Event::vals() {
+const Datum::Vals& Datum::vals() {
   return vals_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void* Event::operator new(size_t size) {
-  if (size != sizeof(Event)) {
+void* Datum::operator new(size_t size) {
+  if (size != sizeof(Datum)) {
     return ::operator new(size);
   }
 
   while (true) {
-    void* ptr = EventPool::malloc();
+    void* ptr = DatumPool::malloc();
     if (ptr != NULL) {
       return ptr;
     }
@@ -65,10 +65,10 @@ void* Event::operator new(size_t size) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Event::operator delete(void* rawMemory) throw() {
+void Datum::operator delete(void* rawMemory) throw() {
   if (rawMemory == 0) {
     return;
   }
-  EventPool::free(rawMemory);
+  DatumPool::free(rawMemory);
 }
 } // namespace cyclus

@@ -5,7 +5,7 @@
 #include "context.h"
 #include "error.h"
 #include "decayer.h"
-#include "event_manager.h"
+#include "recorder.h"
 #include "mass_table.h"
 
 namespace cyclus {
@@ -80,7 +80,7 @@ void Composition::Record(Context* ctx) {
     mass(); // force lazy evaluation now
     compmath::Normalize(&mass_, 1);
     for (it = mass().begin(); it != mass().end(); ++it) {
-      ctx->NewEvent("Compositions")
+      ctx->NewDatum("Compositions")
          ->AddVal("ID", id())
          ->AddVal("IsoID", it->first)
          ->AddVal("Quantity", it->second)

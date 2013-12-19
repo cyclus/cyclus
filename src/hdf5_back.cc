@@ -23,18 +23,18 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::Notify(EventList evts) {
-  std::map<std::string, EventList> groups;
-  for (EventList::iterator it = evts.begin(); it != evts.end(); ++it) {
+void Hdf5Back::Notify(DatumList data) {
+  std::map<std::string, DatumList> groups;
+  for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
     std::string name = (*it)->title();
     if (tbl_size_.count(name) == 0) {
-      Event* ev = *it;
-      CreateTable(ev);
+      Datum* d = *it;
+      CreateTable(d);
     }
     groups[name].push_back(*it);
   }
 
-  std::map<std::string, EventList>::iterator it;
+  std::map<std::string, DatumList>::iterator it;
   for (it = groups.begin(); it != groups.end(); ++it) {
     WriteGroup(it->second);
   }
@@ -61,8 +61,8 @@ std::string Hdf5Back::Name() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::CreateTable(Event* ev) {
-  Event::Vals vals = ev->vals();
+void Hdf5Back::CreateTable(Datum* d) {
+  Datum::Vals vals = d->vals();
 
   size_t dst_size = 0;
   size_t* dst_offset = new size_t[vals.size()];
@@ -100,7 +100,7 @@ void Hdf5Back::CreateTable(Event* ev) {
   }
 
   herr_t status;
-  const char* title = ev->title().c_str();
+  const char* title = d->title().c_str();
   int compress = 0;
   int chunk_size = 50000;
   void* fill_data = NULL;
@@ -111,13 +111,13 @@ void Hdf5Back::CreateTable(Event* ev) {
                           data);
 
   // record everything for later
-  tbl_offset_[ev->title()] = dst_offset;
-  tbl_size_[ev->title()] = dst_size;
-  tbl_sizes_[ev->title()] = dst_sizes;
+  tbl_offset_[d->title()] = dst_offset;
+  tbl_size_[d->title()] = dst_size;
+  tbl_sizes_[d->title()] = dst_sizes;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::WriteGroup(EventList& group) {
+void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
   herr_t status;
 
@@ -134,9 +134,9 @@ void Hdf5Back::WriteGroup(EventList& group) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::FillBuf(char* buf, EventList& group, size_t* sizes,
+void Hdf5Back::FillBuf(char* buf, DatumList& group, size_t* sizes,
                        size_t rowsize) {
-  Event::Vals header = group.front()->vals();
+  Datum::Vals header = group.front()->vals();
   int valtype[header.size()];
   enum Type {STR, NUM, UUID, BLOB};
   for (int col = 0; col < header.size(); ++col) {
@@ -153,7 +153,7 @@ void Hdf5Back::FillBuf(char* buf, EventList& group, size_t* sizes,
 
   size_t offset = 0;
   const void* val;
-  EventList::iterator it;
+  DatumList::iterator it;
   for (it = group.begin(); it != group.end(); ++it) {
     for (int col = 0; col < header.size(); ++col) {
       const boost::spirit::hold_any* a = &((*it)->vals()[col].second);

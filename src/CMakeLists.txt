@@ -67,13 +67,12 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/context.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc  
+  ${CMAKE_CURRENT_SOURCE_DIR}/datum.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/enrichment.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/env.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/event.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/event_manager.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
@@ -89,6 +88,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/relax_ng_validator.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc 
@@ -130,14 +130,12 @@ INSTALL(FILES
   cyc_limits.h
   cyc_std.h
   cyclus.h
+  datum.h
   decayer.h
   dynamic_module.h
   enrichment.h
   env.h
   error.h
-  event.h
-  event_backend.h
-  event_manager.h
   exchange_context.h
   exchange_graph.h
   exchange_manager.h
@@ -158,6 +156,8 @@ INSTALL(FILES
   material.h
   model.h
   query_engine.h 
+  rec_backend.h
+  recorder.h
   region_model.h
   relax_ng_validator.h 
   request.h
@@ -175,7 +175,7 @@ INSTALL(FILES
   supply_demand_manager.h
   symbolic_function_factories.h
   symbolic_functions.h
-  time_agent.h
+  time_listener.h
   timer.h
   trade.h
   trade_executor.h
