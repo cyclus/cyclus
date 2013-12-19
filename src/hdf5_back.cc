@@ -23,9 +23,9 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::Notify(DatumList dats) {
+void Hdf5Back::Notify(DatumList data) {
   std::map<std::string, DatumList> groups;
-  for (DatumList::iterator it = dats.begin(); it != dats.end(); ++it) {
+  for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
     std::string name = (*it)->title();
     if (tbl_size_.count(name) == 0) {
       Datum* d = *it;

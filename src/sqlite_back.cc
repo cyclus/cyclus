@@ -28,8 +28,8 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::Notify(DatumList dats) {
-  for (DatumList::iterator it = dats.begin(); it != dats.end(); ++it) {
+void SqliteBack::Notify(DatumList data) {
+  for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
     if (! TableExists((*it)->title())) {
       CreateTable(*it);
     }

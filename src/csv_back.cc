@@ -26,8 +26,8 @@ CsvBack::CsvBack(std::string path, bool overwrite) : path_(path) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::Notify(DatumList dats) {
-  for (DatumList::iterator it = dats.begin(); it != dats.end(); it++) {
+void CsvBack::Notify(DatumList data) {
+  for (DatumList::iterator it = data.begin(); it != data.end(); it++) {
     WriteDatum(*it);
   }
   Flush();
