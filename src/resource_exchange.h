@@ -26,7 +26,7 @@ inline static void AdjustPrefs(Model* m,
   m->AdjustMatlPrefs(prefs);
 }
 inline static void AdjustPrefs(Model* m,
-                               typename PrefMap<GenericResource>::type& prefs) {
+                               PrefMap<GenericResource>::type& prefs) {
   m->AdjustGenRsrcPrefs(prefs);
 }
 
