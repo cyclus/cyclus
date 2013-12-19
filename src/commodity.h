@@ -42,7 +42,7 @@ class Commodity {
    we do not care how they are compared, only that they can be
  */
 struct CommodityCompare {
-  inline bool operator()(const Commodity& lhs, const Commodity& rhs) {
+  inline bool operator()(const Commodity& lhs, const Commodity& rhs) const {
     return lhs.name() < rhs.name();
   }
 };

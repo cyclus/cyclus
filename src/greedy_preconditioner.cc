@@ -63,12 +63,14 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
   std::map<std::string, double>::iterator it;
   switch(order) {
     case REVERSE:
-     
       for (it = commod_weights_.begin();
            it != commod_weights_.end();
            ++it) {
         it->second = max + min - it->second; // reverses order
       }
+      break;
+    default: // do nothing
+      break;
   }
      
   for (it = commod_weights_.begin();
