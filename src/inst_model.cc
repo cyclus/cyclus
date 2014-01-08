@@ -21,6 +21,13 @@ InstModel::InstModel(Context* ctx) : TimeListener(ctx), Model(ctx) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void InstModel::InitFrom(InstModel* m) {
+  Model::InitFrom(m);
+  this->initial_build_order_ = m->initial_build_order_;
+  this->prototypes_ = m->prototypes_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::InitCoreMembers(QueryEngine* qe) {
   Model::InitCoreMembers(qe);
 

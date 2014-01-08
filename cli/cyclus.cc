@@ -14,6 +14,7 @@
 #include "hdf5_back.h"
 #include "sqlite_back.h"
 #include "xml_file_loader.h"
+#include "xml_flat_loader.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -27,23 +28,30 @@ int main(int argc, char* argv[]) {
 
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
-  vmessage += "   LEV_ERROR (least verbose, default), LEV_WARN, \n   LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n\n";
-  vmessage += "Or an integer:\n\n   0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)\n";
+  vmessage +=
+    "   LEV_ERROR (least verbose, default), LEV_WARN, \n   LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n\n";
+  vmessage +=
+    "Or an integer:\n\n   0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)\n";
 
   // parse command line options
   po::options_description desc("Allowed options");
   desc.add_options()
-    ("help,h", "produce help message")
-    ("include", "print the cyclus include directory")
-    ("version", "print cyclus core and dependency versions and quit")
-    ("schema", "dump the cyclus master schema including all installed module schemas")
-    ("module-schema", po::value<std::string>(), "dump the schema for the named module")
-    ("no-model", "only print log entries from cyclus core code")
-    ("no-mem", "exclude memory log statement from logger output")
-    ("verb,v", po::value<std::string>(), vmessage.c_str())
-    ("output-path,o", po::value<std::string>(), "output path")
-    ("input-file", po::value<std::string>(), "input file")
-    ;
+  ("help,h", "produce help message")
+  ("include", "print the cyclus include directory")
+  ("version", "print cyclus core and dependency versions and quit")
+  ("schema",
+   "dump the cyclus master schema including all installed module schemas")
+  ("module-schema", po::value<std::string>(),
+   "dump the schema for the named module")
+  ("schema-path", po::value<std::string>(),
+   "manually specify the path to the cyclus master schema")
+  ("flat-schema", "use the flat master simulation schema")
+  ("no-model", "only print log entries from cyclus core code")
+  ("no-mem", "exclude memory log statement from logger output")
+  ("verb,v", po::value<std::string>(), vmessage.c_str())
+  ("output-path,o", po::value<std::string>(), "output path")
+  ("input-file", po::value<std::string>(), "input file")
+  ;
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -61,6 +69,16 @@ int main(int argc, char* argv[]) {
   Recorder rec;
   Timer ti;
   Context ctx(&ti, &rec);
+
+  std::string schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
+  bool flat_schema = false;
+  if (vm.count("flat-schema")) {
+    schema_path = Env::GetInstallPath() + "/share/cyclus-flat.rng.in";
+    flat_schema = true;
+  }
+  if (vm.count("schema-path")) {
+    schema_path = vm["schema-path"].as<std::string>();
+  }
 
   // respond to command line args that don't run a simulation
   if (vm.count("help")) {
@@ -84,9 +102,14 @@ int main(int argc, char* argv[]) {
     return 0;
   } else if (vm.count("schema")) {
     try {
-      std::cout << "\n" << BuildMasterSchema() << "\n";
+      if (flat_schema) {
+        std::cout << "\n" << BuildFlatMasterSchema(schema_path) << "\n";
+      } else {
+        std::cout << "\n" << BuildMasterSchema(schema_path) << "\n";
+      }
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
+      return 1;
     }
     return 0;
   } else if (vm.count("module-schema")) {
@@ -149,7 +172,11 @@ int main(int argc, char* argv[]) {
   std::string inputFile = vm["input-file"].as<std::string>();
   XMLFileLoader* loader;
   try {
-    loader = new XMLFileLoader(&ctx, inputFile);
+    if (flat_schema) {
+      loader = new XMLFlatLoader(&ctx, schema_path, inputFile);
+    } else {
+      loader = new XMLFileLoader(&ctx, schema_path, inputFile);
+    }
     loader->LoadSim();
   } catch (Error e) {
     CLOG(LEV_ERROR) << e.what();
@@ -159,7 +186,7 @@ int main(int argc, char* argv[]) {
   // Create the output file
   std::string output_path = "cyclus.sqlite";
   try {
-    if (vm.count("output-path")){
+    if (vm.count("output-path")) {
       output_path = vm["output-path"].as<std::string>();
     }
   } catch (Error ge) {
@@ -187,7 +214,7 @@ int main(int argc, char* argv[]) {
   }
   CLOG(LEV_INFO3) << "}";
 
-  // Run the simulation 
+  // Run the simulation
   ti.RunSim(&ctx);
 
   rec.close();
@@ -210,7 +237,9 @@ int main(int argc, char* argv[]) {
   std::cout << "|              run successful                |" << std::endl;
   std::cout << "|--------------------------------------------|" << std::endl;
   std::cout << "Output location: " << output_path << std::endl;
-  std::cout << "Simulation ID: " << boost::lexical_cast<std::string>(ctx.sim_id()) << std::endl;
+  std::cout << "Simulation ID: " << boost::lexical_cast<std::string>
+            (ctx.sim_id()) << std::endl;
   std::cout << std::endl;
   return 0;
 }
+

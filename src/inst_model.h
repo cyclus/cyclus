@@ -153,6 +153,8 @@ class InstModel : public TimeListener {
   void Build(std::string proto_name);
 
  protected:
+  void InitFrom(InstModel* m);
+
   /**
      add a prototoype to the set of available prototypes
      @param proto_name the name of the prototype to add

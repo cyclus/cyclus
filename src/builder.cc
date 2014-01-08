@@ -12,37 +12,37 @@ Builder::~Builder() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Builder::RegisterProducer(CommodityProducer* producer) {
-  if (producers_.find(producer) != producers_.end()) {
+  if (commod_producers_.find(producer) != commod_producers_.end()) {
     throw KeyError("A builder is trying to register a producer twice.");
   } else {
-    producers_.insert(producer);
+    commod_producers_.insert(producer);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Builder::UnRegisterProducer(CommodityProducer* producer) {
-  if (producers_.find(producer) == producers_.end()) {
+  if (commod_producers_.find(producer) == commod_producers_.end()) {
     throw KeyError("A builder is trying to unregister a producer not originally registered with it.");
   } else {
-    producers_.erase(producer);
+    commod_producers_.erase(producer);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Builder::NBuildingPrototypes() {
-  return producers_.size();
+  return commod_producers_.size();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<CommodityProducer*>::iterator
 Builder::BeginningProducer() {
-  return producers_.begin();
+  return commod_producers_.begin();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<CommodityProducer*>::iterator
 Builder::EndingProducer() {
-  return producers_.end();
+  return commod_producers_.end();
 }
 
 } // namespace cyclus
