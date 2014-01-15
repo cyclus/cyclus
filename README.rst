@@ -127,24 +127,26 @@ you should make use of the boostRoot installation flag.
 
 .. code-block:: bash
 
-
     .../cyclus/cyclus$ python install.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
 
-Now, run it with some input file, for this example, call it 
-`input.xml`. You can find instructions for writng an input file
-for cyclus from `Cyclus User Guide`_  or use sample input files
-from `Cycamore Repo`_ ::
+There are additional options which can be inspected via `install.py`'s help:
 
-    .../cyclus/install/cyclus/bin$ ./cyclus input.xml
+.. code-block:: bash
 
-Debugging Build
----------------
+    .../cyclus/cyclus$ python install.py -h
 
-Building the debug version of the core library requires an additional
-CMake variable flag. Simply add the following to your cmake command:
-::
+Running Cyclus
+==============
 
-  -DCMAKE_BUILD_TYPE:STRING=Debug
+You can find instructions for writng an input file for cyclus from `Cyclus User
+Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
+file `input.xml`, you can run Cyclus via:
+
+.. code-block:: bash
+
+    ...$ install/path/to/cyclus path/to/input.xml
+
+For a more detailed explanation, checkout the user guide.
 
 .. _`Cyclus Homepage`: http://cyclus.github.com
 .. _`CMake`: http://www.cmake.org
