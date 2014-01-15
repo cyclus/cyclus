@@ -255,10 +255,8 @@ refers to your fork as "origin".
 
 First, let's make our "work" branch:
 ::
-
     .../cyclus_dir/$ git branch work
     .../cyclus_dir/$ git push origin work
-
 
 We now have the following situation: there exists the "blessed" copy of the Master and
 Develop branches, there exists your fork's copy of the Master, Develop, and Work branches,
@@ -270,22 +268,20 @@ copies of your branches may be different when you next sit down at the other loc
 Workflow: The Beginning
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Now, for the workflow! This is by no means the only way to perform this type of workflow, 
-but I assume that you wish to handle conflicts as often as possible (so as to keep their total 
-number small). Let us imagine that you have been at work, finished, and successfully pushed 
-your changes to your *Origin* repository. You are now at home, perhaps after dinner (let's just 
-say some time has passed), and want to continue working a bit (you're industrious, I suppose... 
-or a grad student). To begin, let's update our *home's local branches*.
-::
+Now, for the workflow! This is by no means the only way to perform this type of
+workflow, but I assume that you wish to handle conflicts as often as possible
+(so as to keep their total number small). Let us imagine that you have been at
+work, finished, and successfully pushed your changes to your *Origin*
+repository. You are now at home and want to continue working a bit. To begin,
+let's update our *home's local branches*.  ::
 
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull origin develop 
     .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git push origin develop
 
     .../cyclus_dir/$ git checkout work
     .../cyclus_dir/$ git pull origin work
-    .../cyclus_dir/$ git merge develop
+    .../cyclus_dir/$ git rebase develop
     .../cyclus_dir/$ git push origin work
 
 Perhaps a little explanation is required. We first want to make sure that this new local copy of 
