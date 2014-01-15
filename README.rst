@@ -168,8 +168,8 @@ For a more detailed explanation, checkout the user guide.
 The Developer Workflow
 **********************
 
-*Note that terminology we use is based on the `Integrator Workflow
- <http://en.wikipedia.org/wiki/Integrator_workflow>`_.*
+Note that terminology we use is based on the `Integrator Workflow
+ <http://en.wikipedia.org/wiki/Integrator_workflow>`_.
 
 General Notes
 =============
