@@ -44,7 +44,7 @@ Installing Dependencies
 This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Ubuntu 12.10 and `apt-get`_. 
+of Ubuntu 12.10. 
 
 The command to install a dependency takes the form of:
 
@@ -99,9 +99,9 @@ fairly straightforward.
 We make the following assumptions in this guide:
 
 #. there is some master directory in which you're placing all
-     Cyclus-related files called .../cyclus
+   Cyclus-related files called .../cyclus
 #. you have a directory named .../cyclus/install in which you plan
-     to install all Cyclus-related files
+   to install all Cyclus-related files
 #. you have acquired the Cyclus source code from the `Cyclus repo`_
 #. you have placed the Cyclus repository in .../cyclus/cyclus
 
@@ -148,7 +148,6 @@ CMake variable flag. Simply add the following to your cmake command:
 
 .. _`Cyclus Homepage`: http://cyclus.github.com
 .. _`CMake`: http://www.cmake.org
-.. _`apt-get`: http://linux.die.net/man/8/apt-get
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cyclus User Guide`: http://cyclus.github.io/usrdoc/main.html
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
