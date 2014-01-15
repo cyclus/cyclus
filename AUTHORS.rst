@@ -1,7 +1,8 @@
 Repository Authors
 ==================
 
-The following people (in alphabetical order) have committed to the Cyclus repository:
+This project has had contributions from the following people (in alphabetical
+order):
 
   * Robert Carlsen
   * Royal Elmore
