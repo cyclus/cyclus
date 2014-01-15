@@ -30,7 +30,7 @@ Package                Minimum Version
 Coin-Cbc               2.5
 ====================   ==================
 
-In addition, there is an optional dependency:
+An optional dependency (to build documentation) is:
 
 ====================   ==================
 Package                Minimum Version   
@@ -38,85 +38,79 @@ Package                Minimum Version
 doxygen                1.7.6.1
 ====================   ==================
 
-As with all software, the build/install can be broken into two steps:
-
-  #. building and installing the dependencies
-  #. building and installing Cyclus
-
 Installing Dependencies
 =======================
 
-This guide assumes that the user has root access (to issue sudo 
-commands) and access to a package manager or has some other suitable 
-method of automatically installing established libraries. This process
-was tested using a fresh install of Ubuntu 12.10. 
+This guide assumes that the user has root access (to issue sudo commands) and
+access to a package manager or has some other suitable method of automatically
+installing established libraries. This process was tested using a fresh install
+of Ubuntu 12.10 and `apt-get`_. 
 
-All Others
-----------
-
-All other dependencies are common libraries available through package
-managers. We provide an example using `apt-get`_. All required 
-commands will take the form of:
+The command to install a dependency takes the form of:
 
 .. code-block:: bash
 
   sudo apt-get install package
 
-Where you will replace "package" with the correct package name. The
-list of required package names are:
+where "package" is replaced by the correct package name. The minimal list of
+required library package names is:
 
-  #. cmake
-  #. libboost-all-dev
-  #. libxml++2.6-dev
-  #. libsqlite3-dev
-  #. libhdf5-serial-dev
-  #. libbz2-dev
-  #. coinor-libcbc-dev
-  #. coinor-libcgl-dev
+#. cmake
+#. libboost-all-dev (see note below)
+#. libxml++2.6-dev
+#. libsqlite3-dev
+#. libhdf5-serial-dev
+#. libbz2-dev
+#. coinor-libcbc-dev
+#. coinor-libcgl-dev
 
-Optional dependencies:
+and (optionally):
 
-  #. doxygen
+#. doxygen
 
-So, for example, in order to install libxml++ on your system, you will
-type:
+For example, in order to install libxml++ (and libxml2) on your system, type:
 
 .. code-block:: bash
 
   sudo apt-get install libxml++2.6-dev
 
-Let us take a moment to note the Boost library dependency. As it 
-currently stands, we in fact depend on a small subset of the Boost 
+Boost Note
+----------
+
+The `libboost-all-dev` used above will install the entire Boost library, which
+is not strictly needed. We currently depend on a small subset of the Boost
 libraries:
 
-  #. libboost-program-options-dev
-  #. libboost-system-dev
-  #. libboost-filesystem-dev
+#. libboost-program-options-dev
+#. libboost-system-dev
+#. libboost-filesystem-dev
 
-However, it is possible (likely) that additional Boost libraries will
-be used because they are an industry standard. Accordingly, we suggest
-simply installing libboost-all-dev to limit any headaches due to 
-possible dependency additions in the future.
+However, it is possible (likely) that additional Boost libraries will be used
+because they are an industry standard. Accordingly, we suggest simply installing
+`libboost-all-dev` to limit any headaches due to possible dependency additions
+in the future.
 
 Installing Cyclus
 =================
 
-Assuming you have the dependencies installed correctly, it's pretty
-straightforward to install Cyclus. We make the following assumptions
-in this guide:
+Assuming you have the dependencies installed correctly, installing Cyclus is
+fairly straightforward. 
 
-  #. there is some master directory in which you're placing all
+We make the following assumptions in this guide:
+
+#. there is some master directory in which you're placing all
      Cyclus-related files called .../cyclus
-  #. you have a directory named .../cyclus/install in which you plan
+#. you have a directory named .../cyclus/install in which you plan
      to install all Cyclus-related files
-  #. you have acquired the Cyclus source code from the `Cyclus repo`_
-  #. you have placed the Cyclus repository in .../cyclus/cyclus
+#. you have acquired the Cyclus source code from the `Cyclus repo`_
+#. you have placed the Cyclus repository in .../cyclus/cyclus
 
 Under these assumptions **and** if you used a package manager to 
 install coin-Cbc (i.e. it's installed in a standard location), the
 Cyclus building and installation process will look like:
 
 .. code-block:: bash
+
     .../cyclus/cyclus$ python install.py --prefix=../install
 
 If you have installed coin-Cbc from source or otherwise have it 
