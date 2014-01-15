@@ -224,15 +224,6 @@ Cautions
   blessed repository.  You should NEVER rebase commits that are a part of the
   'master' branch. *If you do, you will be flogged publicly*.
 
-* Make sure that you are pushing/pulling from/to the right branches. When in
-  doubt, use the following syntax::
-
-      git push [remote] [from-branch]:[to-branch]
-
-  and (*note that pull always merges into the current checked out branch*)::
-
-      git pull [remote] [from-branch]
-
 An Example
 ==========
 
