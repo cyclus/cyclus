@@ -6,8 +6,8 @@ order):
 
 * Robert Carlsen
 * Royal Elmore
-* Katy Huff
 * Matthew Gidden
+* Katy Huff
 * Olzhas Rakhimov
 * Anthony Scopatz
 * Zach Welch
