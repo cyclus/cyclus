@@ -30,7 +30,7 @@ Package                Minimum Version
 Coin-Cbc               2.5
 ====================   ==================
 
-In addition, there is an optional dependency:
+An optional dependency (to build documentation) is:
 
 ====================   ==================
 Package                Minimum Version   
@@ -38,85 +38,79 @@ Package                Minimum Version
 doxygen                1.7.6.1
 ====================   ==================
 
-As with all software, the build/install can be broken into two steps:
-
-  #. building and installing the dependencies
-  #. building and installing Cyclus
-
 Installing Dependencies
 =======================
 
-This guide assumes that the user has root access (to issue sudo 
-commands) and access to a package manager or has some other suitable 
-method of automatically installing established libraries. This process
-was tested using a fresh install of Ubuntu 12.10. 
+This guide assumes that the user has root access (to issue sudo commands) and
+access to a package manager or has some other suitable method of automatically
+installing established libraries. This process was tested using a fresh install
+of Ubuntu 12.10. 
 
-All Others
-----------
-
-All other dependencies are common libraries available through package
-managers. We provide an example using `apt-get`_. All required 
-commands will take the form of:
+The command to install a dependency takes the form of:
 
 .. code-block:: bash
 
   sudo apt-get install package
 
-Where you will replace "package" with the correct package name. The
-list of required package names are:
+where "package" is replaced by the correct package name. The minimal list of
+required library package names is:
 
-  #. cmake
-  #. libboost-all-dev
-  #. libxml++2.6-dev
-  #. libsqlite3-dev
-  #. libhdf5-serial-dev
-  #. libbz2-dev
-  #. coinor-libcbc-dev
-  #. coinor-libcgl-dev
+#. cmake
+#. libboost-all-dev (see note below)
+#. libxml++2.6-dev
+#. libsqlite3-dev
+#. libhdf5-serial-dev
+#. libbz2-dev
+#. coinor-libcbc-dev
+#. coinor-libcgl-dev
 
-Optional dependencies:
+and (optionally):
 
-  #. doxygen
+#. doxygen
 
-So, for example, in order to install libxml++ on your system, you will
-type:
+For example, in order to install libxml++ (and libxml2) on your system, type:
 
 .. code-block:: bash
 
   sudo apt-get install libxml++2.6-dev
 
-Let us take a moment to note the Boost library dependency. As it 
-currently stands, we in fact depend on a small subset of the Boost 
+Boost Note
+----------
+
+The `libboost-all-dev` used above will install the entire Boost library, which
+is not strictly needed. We currently depend on a small subset of the Boost
 libraries:
 
-  #. libboost-program-options-dev
-  #. libboost-system-dev
-  #. libboost-filesystem-dev
+#. libboost-program-options-dev
+#. libboost-system-dev
+#. libboost-filesystem-dev
 
-However, it is possible (likely) that additional Boost libraries will
-be used because they are an industry standard. Accordingly, we suggest
-simply installing libboost-all-dev to limit any headaches due to 
-possible dependency additions in the future.
+However, it is possible (likely) that additional Boost libraries will be used
+because they are an industry standard. Accordingly, we suggest simply installing
+`libboost-all-dev` to limit any headaches due to possible dependency additions
+in the future.
 
 Installing Cyclus
 =================
 
-Assuming you have the dependencies installed correctly, it's pretty
-straightforward to install Cyclus. We make the following assumptions
-in this guide:
+Assuming you have the dependencies installed correctly, installing Cyclus is
+fairly straightforward. 
 
-  #. there is some master directory in which you're placing all
-     Cyclus-related files called .../cyclus
-  #. you have a directory named .../cyclus/install in which you plan
-     to install all Cyclus-related files
-  #. you have acquired the Cyclus source code from the `Cyclus repo`_
-  #. you have placed the Cyclus repository in .../cyclus/cyclus
+We make the following assumptions in this guide:
+
+#. there is some master directory in which you're placing all
+   Cyclus-related files called .../cyclus
+#. you have a directory named .../cyclus/install in which you plan
+   to install all Cyclus-related files
+#. you have acquired the Cyclus source code from the `Cyclus repo`_
+#. you have placed the Cyclus repository in .../cyclus/cyclus
 
 Under these assumptions **and** if you used a package manager to 
 install coin-Cbc (i.e. it's installed in a standard location), the
 Cyclus building and installation process will look like:
 
 .. code-block:: bash
+
     .../cyclus/cyclus$ python install.py --prefix=../install
 
 If you have installed coin-Cbc from source or otherwise have it 
@@ -133,28 +127,39 @@ you should make use of the boostRoot installation flag.
 
 .. code-block:: bash
 
-
     .../cyclus/cyclus$ python install.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
 
-Now, run it with some input file, for this example, call it 
-`input.xml`. You can find instructions for writng an input file
-for cyclus from `Cyclus User Guide`_  or use sample input files
-from `Cycamore Repo`_ ::
+There are additional options which can be inspected via `install.py`'s help:
 
-    .../cyclus/install/cyclus/bin$ ./cyclus input.xml
+.. code-block:: bash
 
-Debugging Build
----------------
+    .../cyclus/cyclus$ python install.py -h
 
-Building the debug version of the core library requires an additional
-CMake variable flag. Simply add the following to your cmake command:
-::
+Running Tests
+=============
 
-  -DCMAKE_BUILD_TYPE:STRING=Debug
+Installing Cyclus will also install a test driver (i.e., an executable of all of
+our tests). You can run the tests yourself via:
+
+.. code-block:: bash
+
+    ...$ prefix/bin/cyclus_unit_tests
+
+Running Cyclus
+==============
+
+You can find instructions for writng an input file for cyclus from `Cyclus User
+Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
+file `input.xml`, you can run Cyclus via:
+
+.. code-block:: bash
+
+    ...$ prefix/bin/cyclus path/to/input.xml
+
+For a more detailed explanation, checkout the user guide.
 
 .. _`Cyclus Homepage`: http://cyclus.github.com
 .. _`CMake`: http://www.cmake.org
-.. _`apt-get`: http://linux.die.net/man/8/apt-get
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cyclus User Guide`: http://cyclus.github.io/usrdoc/main.html
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
@@ -163,136 +168,64 @@ CMake variable flag. Simply add the following to your cmake command:
 The Developer Workflow
 **********************
 
-*Note that "blessed" repository refers to the primary `cyclus/core` repository.*
+General Notes
+=============
 
-As you do your development, push primarily only to your own fork. Make a pull 
-request to the blessed repository (usually the "develop" branch) only after:
+* The terminology we use is based on the `Integrator Workflow
+  <http://en.wikipedia.org/wiki/Integrator_workflow>`_
 
-  * You have pulled the latest changes from the blessed repository.
-  * You have completed a logical set of changes.
-  * Cyclus compiles with no errors.
-  * All tests pass.
-  * Cyclus input files run as expected.
-  * (recommended) your code has been reviewed by another developer.
+* Use a branching workflow similar to the one described at
+  http://progit.org/book/ch3-4.html.
 
-Code from the "develop" branch generally must pass even more rigorous checks
-before being integrated into the "master" branch. Hot-fixes would be a
-possible exception to this.
+* Keep your own "master" and "develop" branches in sync with the blessed
+  repository's "master" and "develop" branches. Specifically, do not push your
+  own commits directly to your "master" and "develop" branches (see `Updating
+  Your Repositories`_ below).
 
-Workflow Notes
-==============
+* Any commit should *pass all tests* (see `Running Tests`_).
 
-  * Use a branching workflow similar to the one described at
-    http://progit.org/book/ch3-4.html.
+* See the `An Example`_ section below for a full walk through
 
-  * The "develop" branch is how core developers will share (generally compilable) progress
-    when we are not yet ready for the code to become 'production'.
+Issuing a Pull Request
+======================
 
-  * Keep your own "master" and "develop" branches in sync with the blessed repository's
-    "master" and "develop" branches. The master branch should always be the 'stable'
-    or 'production' release of Cyclus.
-    
-     - Pull the most recent history from the blessed repository "master"
-       and/or "develop" branches before you merge changes into your
-       corresponding local branch. Consider doing a rebase pull instead of
-       a regular pull or 'fetch and merge'.  For example::
+* When you are ready to move changes from one of your topic branches into the
+  "develop" branch, it must be reviewed and accepted by another developer.
 
-         git checkout develop
-         git pull --rebase blessed develop
+* You may want to review this `tutorial
+  <https://help.github.com/articles/using-pull-requests/>`_ before you make a
+  pull request to the develop branch.
 
-     - Only merge changes into your "master" or "develop" branch when you
-       are ready for those changes to be integrated into the blessed
-       repository's corresponding branch. 
+Reviewing a Pull Request
+========================
 
-  * As you do development on topic branches in your own fork, consider rebasing
-    the topic branch onto the "master" and/or "develop"  branches after *pulls* from the blessed
-    repository rather than merging the pulled changes into your branch.  This
-    will help maintain a more linear (and clean) history.
-    *Please see caution about rebasing below*.  For example::
+* Look over the code. 
 
-      git checkout [your topic branch]
-      git rebase develop
+  * Check that it meets `our style guidelines
+    <http://cyclus.github.com/devdoc/style_guide.html>`_.
 
-  * **Passing Tests**
+  * Make inline review comments concerning improvements. 
 
-      - To check that your branch passes the tests, you must build and install your topic 
-        branch and then run the CyclusUnitTestDriver (at the moment, ```make 
-        test``` is insufficient). For example ::
-      
-          mkdir install
-          python install.py --prefix=install/ ....
-          install/cyclus/bin/CyclusUnitTestDriver
+* Wait for the Continuous Integration service to show full test passage
 
-      - If your changes to the core repository have an effect on any module 
-        repositories (such as `cyamore <https://github.com/cyclus/cycamore/>`_ 
-        ), please install those modules and test them appropriately as well.  
-
-  * **Making a Pull Request** 
-    
-      - When you are ready to move changes from one of your topic branches into the 
-        "develop" branch, it must be reviewed and accepted by another 
-        developer. 
-
-      - You may want to review this `tutorial <https://help.github.com/articles/using-pull-requests/>`_ 
-        before you make a pull request to the develop branch.
-        
-  * **Reviewing a Pull Request** 
-
-     - Build, install, and test it. If you have added the remote repository as 
-       a remote you can check it out and merge it with the current develop 
-       branch thusly, ::
-       
-         git checkout -b remote_name/branch_name
-         git merge develop
-
-     - Look over the code. 
-
-        - Check that it meets `our style guidelines <http://cyclus.github.com/devdoc/style_guide.html>`_.
-
-        - Make inline review comments concerning improvements. 
-      
-     - Accept the Pull Request    
-
-        - In general, **every commit** (notice this is not 'every push') to the
-          "develop" and "master" branches should compile and pass tests. This
-          is guaranteed by using a NON-fast-forward merge during the pull request 
-          acceptance process. 
-    
-        - The green "Merge Pull Request" button does a non-fast-forward merge by 
-          default. However, if that button is unavailable, you've made minor 
-          local changes to the pulled branch, or you just want to do it from the 
-          command line, make sure your merge is a non-fast-forward merge. For example::
-          
-            git checkout develop
-            git merge --no-ff remote_name/branch_name -m "A message""
-
+* Click the green "Merge Pull Request" button
+  
+  * Note: if the button is not available, the requester needs to merge or rebase
+    from the current HEAD of the blessed's "develop" (or "master") branch
 
 Cautions
 ========
 
-  * **NEVER** merge the "master" branch into the "develop"
-    branch. Changes should only flow *to* the "master" branch *from* the
-    "develop" branch.
+* **NEVER** merge the "master" branch into the "develop" branch. Changes should
+  only flow *to* the "master" branch *from* the "develop" branch.
 
-  * **DO NOT** rebase any commits that have been pulled/pushed anywhere
-    else other than your own fork (especially if those commits have been
-    integrated into the blessed repository.  You should NEVER rebase
-    commits that are a part of the 'master' branch.  *If you do, you will be
-    flogged publicly*.
-
-  * Make sure that you are pushing/pulling from/to the right branches.
-    When in doubt, use the following syntax::
-
-      git push [remote] [from-branch]:[to-branch]
-
-    and (*note that pull always merges into the current checked out branch*)::
-
-      git pull [remote] [from-branch]
-
+* **DO NOT** rebase any commits that have been pulled/pushed anywhere else other
+  than your own fork (especially if those commits have been integrated into the
+  blessed repository.  You should NEVER rebase commits that are a part of the
+  'master' branch. *If you do, you will be flogged publicly*.
 
 An Example
 ==========
-
 
 Introduction
 ------------
@@ -322,10 +255,8 @@ refers to your fork as "origin".
 
 First, let's make our "work" branch:
 ::
-
     .../cyclus_dir/$ git branch work
     .../cyclus_dir/$ git push origin work
-
 
 We now have the following situation: there exists the "blessed" copy of the Master and
 Develop branches, there exists your fork's copy of the Master, Develop, and Work branches,
@@ -337,22 +268,20 @@ copies of your branches may be different when you next sit down at the other loc
 Workflow: The Beginning
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Now, for the workflow! This is by no means the only way to perform this type of workflow, 
-but I assume that you wish to handle conflicts as often as possible (so as to keep their total 
-number small). Let us imagine that you have been at work, finished, and successfully pushed 
-your changes to your *Origin* repository. You are now at home, perhaps after dinner (let's just 
-say some time has passed), and want to continue working a bit (you're industrious, I suppose... 
-or a grad student). To begin, let's update our *home's local branches*.
-::
+Now, for the workflow! This is by no means the only way to perform this type of
+workflow, but I assume that you wish to handle conflicts as often as possible
+(so as to keep their total number small). Let us imagine that you have been at
+work, finished, and successfully pushed your changes to your *Origin*
+repository. You are now at home and want to continue working a bit. To begin,
+let's update our *home's local branches*.  ::
 
     .../cyclus_dir/$ git checkout develop
-    .../cyclus_dir/$ git pull origin develop 
     .../cyclus_dir/$ git pull upstream develop
     .../cyclus_dir/$ git push origin develop
 
     .../cyclus_dir/$ git checkout work
     .../cyclus_dir/$ git pull origin work
-    .../cyclus_dir/$ git merge develop
+    .../cyclus_dir/$ git rebase develop
     .../cyclus_dir/$ git push origin work
 
 Perhaps a little explanation is required. We first want to make sure that this new local copy of 
