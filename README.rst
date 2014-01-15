@@ -168,11 +168,11 @@ For a more detailed explanation, checkout the user guide.
 The Developer Workflow
 **********************
 
-Note that terminology we use is based on the `Integrator Workflow
- <http://en.wikipedia.org/wiki/Integrator_workflow>`_.
-
 General Notes
 =============
+
+  * The terminology we use is based on the `Integrator Workflow
+    <http://en.wikipedia.org/wiki/Integrator_workflow>`_
 
   * Use a branching workflow similar to the one described at
     http://progit.org/book/ch3-4.html.
