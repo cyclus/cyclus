@@ -135,6 +135,16 @@ There are additional options which can be inspected via `install.py`'s help:
 
     .../cyclus/cyclus$ python install.py -h
 
+Running Tests
+=============
+
+Installing Cyclus will also install a test driver (i.e., an executable of all of
+our tests). You can run the tests yourself via:
+
+.. code-block:: bash
+
+    ...$ prefix/bin/cyclus_unit_tests
+
 Running Cyclus
 ==============
 
@@ -144,7 +154,7 @@ file `input.xml`, you can run Cyclus via:
 
 .. code-block:: bash
 
-    ...$ install/path/to/cyclus path/to/input.xml
+    ...$ prefix/bin/cyclus path/to/input.xml
 
 For a more detailed explanation, checkout the user guide.
 
@@ -158,109 +168,51 @@ For a more detailed explanation, checkout the user guide.
 The Developer Workflow
 **********************
 
-*Note that "blessed" repository refers to the primary `cyclus/core` repository.*
+*Note that terminology we use is based on the `Integrator Workflow`_.*
 
-As you do your development, push primarily only to your own fork. Make a pull 
-request to the blessed repository (usually the "develop" branch) only after:
+.. _`Integrator Workflow`: http://en.wikipedia.org/wiki/Integrator_workflow
 
-  * You have pulled the latest changes from the blessed repository.
-  * You have completed a logical set of changes.
-  * Cyclus compiles with no errors.
-  * All tests pass.
-  * Cyclus input files run as expected.
-  * (recommended) your code has been reviewed by another developer.
-
-Code from the "develop" branch generally must pass even more rigorous checks
-before being integrated into the "master" branch. Hot-fixes would be a
-possible exception to this.
-
-Workflow Notes
-==============
+General Notes
+=============
 
   * Use a branching workflow similar to the one described at
     http://progit.org/book/ch3-4.html.
 
-  * The "develop" branch is how core developers will share (generally compilable) progress
-    when we are not yet ready for the code to become 'production'.
+  * Keep your own "master" and "develop" branches in sync with the blessed
+    repository's "master" and "develop" branches. Specifically, do not push your
+    own commits directly to your "master" and "develop" branches (see `Updating
+    Your Repositories`_ below).
 
-  * Keep your own "master" and "develop" branches in sync with the blessed repository's
-    "master" and "develop" branches. The master branch should always be the 'stable'
-    or 'production' release of Cyclus.
+  * Any commit should *pass all tests* (see `Running Tests`_).
+
+  * See the `An Example`_ section below for a full walk through
+
+Issuing a Pull Request
+======================
     
-     - Pull the most recent history from the blessed repository "master"
-       and/or "develop" branches before you merge changes into your
-       corresponding local branch. Consider doing a rebase pull instead of
-       a regular pull or 'fetch and merge'.  For example::
+  * When you are ready to move changes from one of your topic branches into the
+    "develop" branch, it must be reviewed and accepted by another developer.
 
-         git checkout develop
-         git pull --rebase blessed develop
+  * You may want to review this `tutorial
+    <https://help.github.com/articles/using-pull-requests/>`_ before you make a
+    pull request to the develop branch.
 
-     - Only merge changes into your "master" or "develop" branch when you
-       are ready for those changes to be integrated into the blessed
-       repository's corresponding branch. 
+Reviewing a Pull Request
+========================
 
-  * As you do development on topic branches in your own fork, consider rebasing
-    the topic branch onto the "master" and/or "develop"  branches after *pulls* from the blessed
-    repository rather than merging the pulled changes into your branch.  This
-    will help maintain a more linear (and clean) history.
-    *Please see caution about rebasing below*.  For example::
+  * Look over the code. 
 
-      git checkout [your topic branch]
-      git rebase develop
+    * Check that it meets `our style guidelines <http://cyclus.github.com/devdoc/style_guide.html>`_.
 
-  * **Passing Tests**
+    * Make inline review comments concerning improvements. 
 
-      - To check that your branch passes the tests, you must build and install your topic 
-        branch and then run the CyclusUnitTestDriver (at the moment, ```make 
-        test``` is insufficient). For example ::
-      
-          mkdir install
-          python install.py --prefix=install/ ....
-          install/cyclus/bin/CyclusUnitTestDriver
+  * Wait for the Continuous Integration service to show full test passage
 
-      - If your changes to the core repository have an effect on any module 
-        repositories (such as `cyamore <https://github.com/cyclus/cycamore/>`_ 
-        ), please install those modules and test them appropriately as well.  
-
-  * **Making a Pull Request** 
-    
-      - When you are ready to move changes from one of your topic branches into the 
-        "develop" branch, it must be reviewed and accepted by another 
-        developer. 
-
-      - You may want to review this `tutorial <https://help.github.com/articles/using-pull-requests/>`_ 
-        before you make a pull request to the develop branch.
-        
-  * **Reviewing a Pull Request** 
-
-     - Build, install, and test it. If you have added the remote repository as 
-       a remote you can check it out and merge it with the current develop 
-       branch thusly, ::
-       
-         git checkout -b remote_name/branch_name
-         git merge develop
-
-     - Look over the code. 
-
-        - Check that it meets `our style guidelines <http://cyclus.github.com/devdoc/style_guide.html>`_.
-
-        - Make inline review comments concerning improvements. 
-      
-     - Accept the Pull Request    
-
-        - In general, **every commit** (notice this is not 'every push') to the
-          "develop" and "master" branches should compile and pass tests. This
-          is guaranteed by using a NON-fast-forward merge during the pull request 
-          acceptance process. 
-    
-        - The green "Merge Pull Request" button does a non-fast-forward merge by 
-          default. However, if that button is unavailable, you've made minor 
-          local changes to the pulled branch, or you just want to do it from the 
-          command line, make sure your merge is a non-fast-forward merge. For example::
-          
-            git checkout develop
-            git merge --no-ff remote_name/branch_name -m "A message""
-
+  * Click the green "Merge Pull Request" button
+  
+    * Note: if the button is not available, the requester needs to merge or
+      rebase from the current HEAD of the blessed's "develop" (or "master")
+      branch
 
 Cautions
 ========
@@ -284,10 +236,8 @@ Cautions
 
       git pull [remote] [from-branch]
 
-
 An Example
 ==========
-
 
 Introduction
 ------------
