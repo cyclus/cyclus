@@ -171,67 +171,65 @@ The Developer Workflow
 General Notes
 =============
 
-  * The terminology we use is based on the `Integrator Workflow
-    <http://en.wikipedia.org/wiki/Integrator_workflow>`_
+* The terminology we use is based on the `Integrator Workflow
+  <http://en.wikipedia.org/wiki/Integrator_workflow>`_
 
-  * Use a branching workflow similar to the one described at
-    http://progit.org/book/ch3-4.html.
+* Use a branching workflow similar to the one described at
+  http://progit.org/book/ch3-4.html.
 
-  * Keep your own "master" and "develop" branches in sync with the blessed
-    repository's "master" and "develop" branches. Specifically, do not push your
-    own commits directly to your "master" and "develop" branches (see `Updating
-    Your Repositories`_ below).
+* Keep your own "master" and "develop" branches in sync with the blessed
+  repository's "master" and "develop" branches. Specifically, do not push your
+  own commits directly to your "master" and "develop" branches (see `Updating
+  Your Repositories`_ below).
 
-  * Any commit should *pass all tests* (see `Running Tests`_).
+* Any commit should *pass all tests* (see `Running Tests`_).
 
-  * See the `An Example`_ section below for a full walk through
+* See the `An Example`_ section below for a full walk through
 
 Issuing a Pull Request
 ======================
-    
-  * When you are ready to move changes from one of your topic branches into the
-    "develop" branch, it must be reviewed and accepted by another developer.
 
-  * You may want to review this `tutorial
-    <https://help.github.com/articles/using-pull-requests/>`_ before you make a
-    pull request to the develop branch.
+* When you are ready to move changes from one of your topic branches into the
+  "develop" branch, it must be reviewed and accepted by another developer.
+
+* You may want to review this `tutorial
+  <https://help.github.com/articles/using-pull-requests/>`_ before you make a
+  pull request to the develop branch.
 
 Reviewing a Pull Request
 ========================
 
-  * Look over the code. 
+* Look over the code. 
 
-    * Check that it meets `our style guidelines <http://cyclus.github.com/devdoc/style_guide.html>`_.
+  * Check that it meets `our style guidelines
+    <http://cyclus.github.com/devdoc/style_guide.html>`_.
 
-    * Make inline review comments concerning improvements. 
+  * Make inline review comments concerning improvements. 
 
-  * Wait for the Continuous Integration service to show full test passage
+* Wait for the Continuous Integration service to show full test passage
 
-  * Click the green "Merge Pull Request" button
+* Click the green "Merge Pull Request" button
   
-    * Note: if the button is not available, the requester needs to merge or
-      rebase from the current HEAD of the blessed's "develop" (or "master")
-      branch
+  * Note: if the button is not available, the requester needs to merge or rebase
+    from the current HEAD of the blessed's "develop" (or "master") branch
 
 Cautions
 ========
 
-  * **NEVER** merge the "master" branch into the "develop"
-    branch. Changes should only flow *to* the "master" branch *from* the
-    "develop" branch.
+* **NEVER** merge the "master" branch into the "develop" branch. Changes should
+  only flow *to* the "master" branch *from* the "develop" branch.
 
-  * **DO NOT** rebase any commits that have been pulled/pushed anywhere
-    else other than your own fork (especially if those commits have been
-    integrated into the blessed repository.  You should NEVER rebase
-    commits that are a part of the 'master' branch.  *If you do, you will be
-    flogged publicly*.
+* **DO NOT** rebase any commits that have been pulled/pushed anywhere else other
+  than your own fork (especially if those commits have been integrated into the
+  blessed repository.  You should NEVER rebase commits that are a part of the
+  'master' branch. *If you do, you will be flogged publicly*.
 
-  * Make sure that you are pushing/pulling from/to the right branches.
-    When in doubt, use the following syntax::
+* Make sure that you are pushing/pulling from/to the right branches. When in
+  doubt, use the following syntax::
 
       git push [remote] [from-branch]:[to-branch]
 
-    and (*note that pull always merges into the current checked out branch*)::
+  and (*note that pull always merges into the current checked out branch*)::
 
       git pull [remote] [from-branch]
 
