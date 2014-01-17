@@ -101,8 +101,8 @@ void Hdf5Back::CreateTable(Datum* d) {
 
   herr_t status;
   const char* title = d->title().c_str();
-  int compress = 0;
-  int chunk_size = 50000;
+  int compress = 1;
+  int chunk_size = 1000;
   void* fill_data = NULL;
   void* data = NULL;
 
