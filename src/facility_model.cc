@@ -17,8 +17,7 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel(Context* ctx)
-    : TimeListener(ctx),
-      Trader(ctx),
+    : Trader(this),
       Model(ctx),
       fac_lifetime_(std::numeric_limits<int>::max()) {
   model_type_ = "Facility";

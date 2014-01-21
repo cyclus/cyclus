@@ -24,8 +24,6 @@ void Timer::RunSim(Context* ctx) {
   ExchangeManager<GenericResource> genrsrc_manager(ctx);
   while (time_ < start_time_ + dur_) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
-    CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " <<
-                     ReportListeners();
     if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
       Material::DecayAll(time_);
     }
@@ -46,25 +44,11 @@ void Timer::RunSim(Context* ctx) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Timer::ReportListeners() {
-  std::string report = "";
-  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
-       agent != tick_listeners_.end();
-       agent++) {
-    report += (*agent)->name() + " ";
-  }
-  return report;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SendTick() {
   for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
        agent != tick_listeners_.end();
        agent++) {
-    CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->id()
-                    << ", name=" << (*agent)->name() << " {";
     (*agent)->Tick(time_);
-    CLOG(LEV_INFO3) << "}";
   }
 }
 
@@ -73,17 +57,12 @@ void Timer::SendTock() {
   for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
        agent != tick_listeners_.end();
        agent++) {
-    CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->id()
-                    << ", name=" << (*agent)->name() << " {";
     (*agent)->Tock(time_);
-    CLOG(LEV_INFO3) << "}";
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RegisterTickListener(TimeListener* agent) {
-  CLOG(LEV_INFO2) << "Model ID=" << agent->id() << ", name=" << agent->name()
-                  << " has registered to receive 'ticks' and 'tocks'.";
   new_tickers_.push_back(agent);
 }
 
