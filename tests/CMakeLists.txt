@@ -94,6 +94,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_test_cases.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/full_sim_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc

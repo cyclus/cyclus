@@ -5,36 +5,61 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "exchange_graph.h"
-#include "exchange_solver.h"
-#include "greedy_solver.h"
+#include "exchange_test_cases.h"
 
 namespace cyclus {
 
-/// A factory class to supply exchange solver tests with configured
-/// ExchangeSolvers.
-/// To add a new solver, add a unique name for it to solver_types_ and its
-/// configureation to the Solver factory member function
-class SolverFactory {
- public:
-  SolverFactory() {
-    solver_types_.push_back("greedy");
-  }
+/// This testing suite uses <a
+/// href="http://code.google.com/p/googletest/wiki/V1_7_AdvancedGuide#Type-Parameterized_Tests">type-parameterized
+/// tests</a>. See an example by google <a
+/// href="http://code.google.com/p/googletest/source/browse/trunk/samples/sample6_unittest.cc">here</a>.
+///
+/// To add a new case, add the appropriate factory method. For some new test
+/// case, CaseN, you would add (in this header file):
+///
+///   @code
+///   template <>
+///   ExchangeCase* CreateExchangeCase<Case0>() { return new CaseN; }
+///   @endcode
+///
+/// and also add your new case to Implementations in the implementation file.
+///
+/// To add a new solver, add the appropriate TYPED_TEST in the implementation
+/// file. For some new solver, MySolver, you would add:
+///
+///   @code
+///   TYPED_TEST(ExchangeSolverTest, MySolver) {
+///     std::string type = "greedy";
+///     ExchangeGraph g;
+///     this->case_->Construct(&g);
+///     MySolver solver(&g);
+///     solver.Solve();
+///     this->case_->Test(type, &g);
+///   }
+///   @endcode
+///
+/// See exchange_test_cases.h for instructions on adding solutions for your
+/// solver.
+///
+template <class T>
+ExchangeCase* CreateExchangeCase();
 
-  /// A factory for any known configured ExchangeSolver
-  boost::shared_ptr<ExchangeSolver> Solver(std::string solver_type,
-                                           ExchangeGraph* g) {
-    boost::shared_ptr<ExchangeSolver> ret;
-    if (solver_type == "greedy") {
-      ret = boost::shared_ptr<ExchangeSolver>(new GreedySolver(g));
-    }
-    return ret;
-  }
-  
-  std::vector<std::string> solver_types() { return solver_types_; }
+template <>
+ExchangeCase* CreateExchangeCase<Case0>() { return new Case0; }
 
- private:
-  std::vector<std::string> solver_types_;
+template <>
+ExchangeCase* CreateExchangeCase<Case1a>() { return new Case1a; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case1b>() { return new Case1b; }
+
+/// ExchangeSolverTest fixture class template.
+template <class T>
+class ExchangeSolverTest : public testing::Test {
+ protected:
+  ExchangeSolverTest() : case_(CreateExchangeCase<T>()) {}
+  virtual ~ExchangeSolverTest() { delete case_; }
+  ExchangeCase* const case_;
 };
 
 } // namespace cyclus
