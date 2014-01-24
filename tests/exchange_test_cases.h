@@ -136,6 +136,21 @@ class Case2h: public Case2 {
   virtual void Construct(ExchangeGraph* g); 
 };
 
+/// Case 7:
+/// N supply node with capacity, q/N
+/// 1 request node with request quantity, q
+/// N flows from s->r = q/N
+class Case7: public ExchangeCase {
+ public:
+  virtual ~Case7() {}
+  virtual void Construct(ExchangeGraph* g); 
+  virtual void Test(std::string solver_type, ExchangeGraph* g);
+
+ protected:
+  double qty, flow;
+  int N;
+};
+
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_TESTS_EXCHANGE_TEST_CASES_H_

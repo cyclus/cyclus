@@ -42,12 +42,12 @@ void Case1b::Test(std::string solver_type, ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case2::Construct(ExchangeGraph* g) {
-  using cyclus::ExchangeGraph;
-  using cyclus::ExchangeNode;
-  using cyclus::ExchangeNodeGroup;
-  using cyclus::RequestGroup;
-  using cyclus::Arc;
-  using cyclus::Match;
+  // using cyclus::ExchangeGraph;
+  // using cyclus::ExchangeNode;
+  // using cyclus::ExchangeNodeGroup;
+  // using cyclus::RequestGroup;
+  // using cyclus::Arc;
+  // using cyclus::Match;
   
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
@@ -173,6 +173,45 @@ void Case2h::Construct(ExchangeGraph* g) {
   flow = capacity / unit_cap_req;
 
   Case2::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case7::Construct(ExchangeGraph* g) {
+  qty = 5;
+  N = 10;
+  flow = qty / N;
+  
+  // a single request for qty of a resource
+  ExchangeNode::Ptr u(new ExchangeNode());
+  RequestGroup::Ptr req(new RequestGroup(qty));
+  req->AddCapacity(qty);
+  req->AddExchangeNode(u);
+  g->AddRequestGroup(req);
+
+  // a node group with N bids for q/N of a resource
+  ExchangeNodeGroup::Ptr sup(new ExchangeNodeGroup());
+  sup->AddCapacity(qty);  
+  for (int i = 0; i < N; i++) {
+    ExchangeNode::Ptr v(new ExchangeNode(qty / N)); 
+    sup->AddExchangeNode(v);  
+    Arc a(u, v);
+    u->unit_capacities[a].push_back(1);
+    v->unit_capacities[a].push_back(1);
+    g->AddArc(a);
+  }
+  g->AddSupplyGroup(sup);    
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case7::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy") {
+    ASSERT_EQ(g->arcs().size(), N);
+    ASSERT_EQ(g->matches().size(), N);
+    for (int i = 0; i < N; i++) {
+      Match exp = Match(g->arcs().at(i), flow);
+      EXPECT_EQ(exp, g->matches().at(i));
+    }
+  }
 }
 
 } // namespace cyclus

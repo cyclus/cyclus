@@ -47,10 +47,14 @@ ExchangeCase* CreateExchangeCase<Case2g>() { return new Case2g; }
 template <>
 ExchangeCase* CreateExchangeCase<Case2h>() { return new Case2h; }
 
+template <>
+ExchangeCase* CreateExchangeCase<Case7>() { return new Case7; }
+
 // Add it again here
 typedef Types<Case0,
               Case1a, Case1b,
-              Case2a, Case2b, Case2c, Case2d, Case2e, Case2f, Case2g, Case2h>
+              Case2a, Case2b, Case2c, Case2d, Case2e, Case2f, Case2g, Case2h,
+              Case7>
 Implementations;
 
 TYPED_TEST_CASE(ExchangeSolverTest, Implementations);
