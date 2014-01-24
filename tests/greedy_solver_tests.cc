@@ -128,7 +128,7 @@ TEST(GrSolverTests, Case2e) {
   // f = q
   double q = 10;
   double u_r = 1;
-  double c = 5;
+  double c = 10;
   double u_s = 0.3;
   double f = q;
 

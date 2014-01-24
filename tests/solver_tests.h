@@ -6,7 +6,7 @@
 namespace cyclus {
 
 /// This testing suite uses <a
-/// href="http://code.google.com/p/googletest/wiki/V1_7_AdvancedGuide#Type-Parameterized_Tests">type-parameterized
+/// href="http://code.google.com/p/googletest/wiki/V1_7_AdvancedGuide#Typed_Tests">typed
 /// tests</a>. See an example by google <a
 /// href="http://code.google.com/p/googletest/source/browse/trunk/samples/sample6_unittest.cc">here</a>.
 ///

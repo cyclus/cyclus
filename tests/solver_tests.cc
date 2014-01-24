@@ -23,8 +23,35 @@ ExchangeCase* CreateExchangeCase<Case1a>() { return new Case1a; }
 template <>
 ExchangeCase* CreateExchangeCase<Case1b>() { return new Case1b; }
 
+template <>
+ExchangeCase* CreateExchangeCase<Case2a>() { return new Case2a; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case2b>() { return new Case2b; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case2c>() { return new Case2c; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case2d>() { return new Case2d; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case2e>() { return new Case2e; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case2f>() { return new Case2f; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case2g>() { return new Case2g; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case2h>() { return new Case2h; }
+
 // Add it again here
-typedef Types<Case0, Case1a, Case1b> Implementations;
+typedef Types<Case0,
+              Case1a, Case1b,
+              Case2a, Case2b, Case2c, Case2d, Case2e, Case2f, Case2g, Case2h>
+Implementations;
 
 TYPED_TEST_CASE(ExchangeSolverTest, Implementations);
 

@@ -50,6 +50,92 @@ class Case1b: public ExchangeCase {
   virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
+/// Case 2:
+/// 1 supply node with capacity, c, and unit capacity, u_s
+/// 1 request node with request quantity, q, and unit capacity, u_r
+/// flow from s->r = f
+class Case2: public ExchangeCase {
+ public:
+  virtual ~Case2() {}
+  virtual void Construct(ExchangeGraph* g); 
+  virtual void Test(std::string solver_type, ExchangeGraph* g);
+  
+ protected:
+  double qty, unit_cap_req, capacity, unit_cap_sup, flow;
+};
+
+/// Case2a:
+/// q < c, u_s = 1
+/// f = q
+class Case2a: public Case2 {
+ public:
+  virtual ~Case2a() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case2b:
+///q = c, u_s = 1
+///f = c
+class Case2b: public Case2 {
+ public:
+  virtual ~Case2b() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case2c:
+///q > c, u_s = 1, u_r = 1
+///f = c
+class Case2c: public Case2 {
+ public:
+  virtual ~Case2c() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case2d:
+///q > c, u_s < 1, c/u_s > q, u_r = 1
+///f = q
+class Case2d: public Case2 {
+ public:
+  virtual ~Case2d() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case2e:
+///q = c, u_s < 1 ( => c/u_s > q ), u_r = 1
+///f = q
+class Case2e: public Case2 {
+ public:
+  virtual ~Case2e() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case2f:
+/// q = c, u_s > 1 ( => c/u_s < q ), u_r = 1
+/// f = c / u_s
+class Case2f: public Case2 {
+ public:
+  virtual ~Case2f() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case2g:
+// q = c, u_s = 1, u_r < 1 ( => q/u_r > c )
+// f = c
+class Case2g: public Case2 {
+ public:
+  virtual ~Case2g() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case2h:
+/// q = c, u_s = 1, u_r > 1 ( => q/u_r < c )
+/// f = q / u_r
+class Case2h: public Case2 {
+ public:
+  virtual ~Case2h() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_TESTS_EXCHANGE_TEST_CASES_H_
