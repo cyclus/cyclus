@@ -42,13 +42,6 @@ void Case1b::Test(std::string solver_type, ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case2::Construct(ExchangeGraph* g) {
-  // using cyclus::ExchangeGraph;
-  // using cyclus::ExchangeNode;
-  // using cyclus::ExchangeNodeGroup;
-  // using cyclus::RequestGroup;
-  // using cyclus::Arc;
-  // using cyclus::Match;
-  
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
   Arc a(u, v);
@@ -173,6 +166,116 @@ void Case2h::Construct(ExchangeGraph* g) {
   flow = capacity / unit_cap_req;
 
   Case2::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case6::Construct(ExchangeGraph* g) {  
+  ExchangeNode::Ptr u1_1(new ExchangeNode());
+  ExchangeNode::Ptr u1_2(new ExchangeNode());
+  ExchangeNode::Ptr u2_1(new ExchangeNode());
+  ExchangeNode::Ptr u2_2(new ExchangeNode());
+  ExchangeNode::Ptr v1_1(new ExchangeNode());
+  ExchangeNode::Ptr v1_2(new ExchangeNode());
+  ExchangeNode::Ptr v2_1(new ExchangeNode());
+  ExchangeNode::Ptr v2_2(new ExchangeNode());
+  Arc a1(u1_1, v1_1);
+  Arc a2(u1_2, v2_1);
+  Arc a3(u2_1, v1_2);
+  Arc a4(u2_2, v2_2);
+
+  u1_1->unit_capacities[a1].push_back(1);
+  u1_2->unit_capacities[a2].push_back(1);
+  u2_1->unit_capacities[a3].push_back(1);
+  u2_2->unit_capacities[a4].push_back(1);
+  v1_1->unit_capacities[a1].push_back(1);
+  v1_2->unit_capacities[a3].push_back(1);
+  v2_1->unit_capacities[a2].push_back(1);
+  v2_2->unit_capacities[a4].push_back(1);
+
+  RequestGroup::Ptr req1(new RequestGroup(q1));
+  req1->AddCapacity(q1);
+  req1->AddExchangeNode(u1_1);
+  req1->AddExchangeNode(u1_2);  
+  g->AddRequestGroup(req1);
+  
+  RequestGroup::Ptr req2(new RequestGroup(q2));
+  req2->AddCapacity(q2);
+  req2->AddExchangeNode(u2_1);
+  req2->AddExchangeNode(u2_2);  
+  g->AddRequestGroup(req2);
+  
+  ExchangeNodeGroup::Ptr sup1(new ExchangeNodeGroup());
+  sup1->AddCapacity(c1);
+  sup1->AddExchangeNode(v1_1);  
+  sup1->AddExchangeNode(v1_2);  
+  g->AddSupplyGroup(sup1);
+  
+  ExchangeNodeGroup::Ptr sup2(new ExchangeNodeGroup());
+  sup2->AddCapacity(c2);
+  sup2->AddExchangeNode(v2_1);
+  sup2->AddExchangeNode(v2_2);
+  g->AddSupplyGroup(sup2);
+  
+  g->AddArc(a1);
+  g->AddArc(a2);
+  g->AddArc(a3);
+  g->AddArc(a4);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case6a::Construct(ExchangeGraph* g) {
+  q1 = 7;
+  c1 = 5;
+  c2 = q1 - c1 + 3;
+  q2 = c2 - (q1 - c1) - 1;
+  f1 = c1;
+  f2 = q1 - c1;
+  f4 = q2;
+
+  Case6::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case6a::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy") {
+    ASSERT_TRUE(g->arcs().size() > 3);
+    EXPECT_EQ(g->arcs().size(), 4);
+  
+    Match exp1 = Match(g->arcs().at(0), f1);
+    Match exp2 = Match(g->arcs().at(1), f2);
+    Match exp3 = Match(g->arcs().at(3), f4);
+    Match arr[] = {exp1, exp2, exp3};
+    std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    EXPECT_EQ(vexp, g->matches());
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case6b::Construct(ExchangeGraph* g) {
+  q1 = 5;
+  c1 = 7;
+  q2 = c1 - q1 + 0.5;
+  c2 = q2 - (c1 - q1) + 3;
+  f1 = q1;
+  f3 = c1 - q1;
+  f4 = q2 - (c1 - q1);
+
+  Case6::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case6b::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy") {
+    ASSERT_TRUE(g->arcs().size() > 3);
+    EXPECT_EQ(g->arcs().size(), 4);
+  
+    Match exp1 = Match(g->arcs().at(0), f1);
+    Match exp2 = Match(g->arcs().at(2), f3);
+    Match exp3 = Match(g->arcs().at(3), f4);
+    Match arr[] = {exp1, exp2, exp3};
+    std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    EXPECT_EQ(vexp, g->matches());
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
