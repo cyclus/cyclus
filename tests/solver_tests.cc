@@ -3,6 +3,8 @@
 #include "exchange_graph.h"
 #include "greedy_solver.h"
 
+#include "exchange_test_cases.h"
+
 #include "solver_tests.h"
 
 namespace cyclus {
@@ -11,7 +13,17 @@ namespace cyclus {
 
 using testing::Types;
 
-// The list of types we want to test.
+// The list of types we want to test, add yours to it!
+template <>
+ExchangeCase* CreateExchangeCase<Case0>() { return new Case0; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case1a>() { return new Case1a; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case1b>() { return new Case1b; }
+
+// Add it again here
 typedef Types<Case0, Case1a, Case1b> Implementations;
 
 TYPED_TEST_CASE(ExchangeSolverTest, Implementations);
@@ -24,6 +36,8 @@ TYPED_TEST(ExchangeSolverTest, GreedySolver) {
   solver.Solve();
   this->case_->Test(type, &g);
 }
+
+// add any more solvers to test here
 
 #endif  // GTEST_HAS_TYPED_TEST
 
