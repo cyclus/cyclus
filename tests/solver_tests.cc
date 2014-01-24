@@ -66,6 +66,21 @@ ExchangeCase* CreateExchangeCase<Case2h>() { return new Case2h; }
 // ExchangeCase* CreateExchangeCase<Case3f>() { return new Case3f; }
 
 template <>
+ExchangeCase* CreateExchangeCase<Case5a>() { return new Case5a; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case5b>() { return new Case5b; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case5c>() { return new Case5c; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case5d>() { return new Case5d; }
+
+template <>
+ExchangeCase* CreateExchangeCase<Case5e>() { return new Case5e; }
+
+template <>
 ExchangeCase* CreateExchangeCase<Case6a>() { return new Case6a; }
 
 template <>
@@ -79,9 +94,9 @@ typedef Types<Case0,
               Case1a, Case1b,
               Case2a, Case2b, Case2c, Case2d, Case2e, Case2f, Case2g, Case2h,
               // Case3a, Case3b, Case3c, Case3d, Case3e, Case3f,
+              Case5a, Case5b, Case5c, Case5d, Case5e,
               Case6a, Case6b,
-              Case7>
-Implementations;
+              Case7> Implementations;
 
 TYPED_TEST_CASE(ExchangeSolverTest, Implementations);
 

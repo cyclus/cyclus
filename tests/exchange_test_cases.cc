@@ -169,6 +169,110 @@ void Case2h::Construct(ExchangeGraph* g) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case5::Construct(ExchangeGraph* g) {  
+  ExchangeNode::Ptr u1(new ExchangeNode());
+  ExchangeNode::Ptr u2(new ExchangeNode());
+  ExchangeNode::Ptr v(new ExchangeNode());
+  ExchangeNode::Ptr w(new ExchangeNode());
+  Arc a1(u1, v);
+  Arc a2(u2, w);
+
+  u1->unit_capacities[a1].push_back(1);
+  v->unit_capacities[a1].push_back(1);
+  u2->unit_capacities[a2].push_back(1);
+  w->unit_capacities[a2].push_back(1);
+
+  RequestGroup::Ptr request(new RequestGroup(q));
+  request->AddCapacity(q);
+  request->AddExchangeNode(u1);
+  request->AddExchangeNode(u2);  
+  g->AddRequestGroup(request);
+  
+  ExchangeNodeGroup::Ptr supply1(new ExchangeNodeGroup());
+  supply1->AddCapacity(c1);
+  supply1->AddExchangeNode(v);  
+  g->AddSupplyGroup(supply1);
+  
+  ExchangeNodeGroup::Ptr supply2(new ExchangeNodeGroup());
+  supply2->AddCapacity(c2);
+  supply2->AddExchangeNode(w);  
+  g->AddSupplyGroup(supply2);
+
+  g->AddArc(a1);
+  g->AddArc(a2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case5::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy") {
+    ASSERT_TRUE(g->arcs().size() > 1) << "there are "
+                                      << g->arcs().size() << " arcs";
+    EXPECT_EQ(g->arcs().size(), 2);
+
+    std::vector<Match> vexp;
+    vexp.push_back(Match(g->arcs().at(0), f1));
+    if (f2 > 0)
+      vexp.push_back(Match(g->arcs().at(1), f2));
+    EXPECT_EQ(vexp, g->matches());
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case5a::Construct(ExchangeGraph* g) {
+  q = 1;
+  c1 = 5;
+  c2 = 0.5;
+  f1 = q;
+  f2 = 0;
+  
+  Case5::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case5b::Construct(ExchangeGraph* g) {
+  q = 5;
+  c1 = 5;
+  c2 = 0.5;
+  f1 = c1;
+  f2 = 0;
+
+  Case5::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case5c::Construct(ExchangeGraph* g) {
+  q = 7;
+  c1 = 5;
+  c2 = q - c1 + 1;
+  f1 = c1;
+  f2 = q - c1;
+
+  Case5::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case5d::Construct(ExchangeGraph* g) {
+  q = 7;
+  c1 = 5;
+  c2 = q - c1;
+  f1 = c1;
+  f2 = c2;
+
+  Case5::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case5e::Construct(ExchangeGraph* g) {
+  q = 7;
+  c1 = 5;
+  c2 = q - c1 - 1;
+  f1 = c1;
+  f2 = c2;
+
+  Case5::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case6::Construct(ExchangeGraph* g) {  
   ExchangeNode::Ptr u1_1(new ExchangeNode());
   ExchangeNode::Ptr u1_2(new ExchangeNode());
