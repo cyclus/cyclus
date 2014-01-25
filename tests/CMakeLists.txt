@@ -94,11 +94,11 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_test_cases.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/full_sim_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
@@ -112,6 +112,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_exchange_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_tests.cc
