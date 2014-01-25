@@ -47,23 +47,23 @@ ExchangeCase* CreateExchangeCase<Case2g>() { return new Case2g; }
 template <>
 ExchangeCase* CreateExchangeCase<Case2h>() { return new Case2h; }
 
-// template <>
-// ExchangeCase* CreateExchangeCase<Case3a>() { return new Case3a; }
+template <>
+ExchangeCase* CreateExchangeCase<Case3a>() { return new Case3a; }
 
-// template <>
-// ExchangeCase* CreateExchangeCase<Case3b>() { return new Case3b; }
+template <>
+ExchangeCase* CreateExchangeCase<Case3b>() { return new Case3b; }
 
-// template <>
-// ExchangeCase* CreateExchangeCase<Case3c>() { return new Case3c; }
+template <>
+ExchangeCase* CreateExchangeCase<Case3c>() { return new Case3c; }
 
-// template <>
-// ExchangeCase* CreateExchangeCase<Case3d>() { return new Case3d; }
+template <>
+ExchangeCase* CreateExchangeCase<Case3d>() { return new Case3d; }
 
-// template <>
-// ExchangeCase* CreateExchangeCase<Case3e>() { return new Case3e; }
+template <>
+ExchangeCase* CreateExchangeCase<Case3e>() { return new Case3e; }
 
-// template <>
-// ExchangeCase* CreateExchangeCase<Case3f>() { return new Case3f; }
+template <>
+ExchangeCase* CreateExchangeCase<Case3f>() { return new Case3f; }
 
 template <>
 ExchangeCase* CreateExchangeCase<Case4a>() { return new Case4a; }
@@ -108,7 +108,7 @@ ExchangeCase* CreateExchangeCase<Case7>() { return new Case7; }
 typedef Types<Case0,
               Case1a, Case1b,
               Case2a, Case2b, Case2c, Case2d, Case2e, Case2f, Case2g, Case2h,
-              // Case3a, Case3b, Case3c, Case3d, Case3e, Case3f,
+              Case3a, Case3b, Case3c, Case3d, Case3e, Case3f,
               Case4a, Case4b, Case4c, Case4d, Case4e,
               Case5a, Case5b, Case5c, Case5d, Case5e,
               Case6a, Case6b,

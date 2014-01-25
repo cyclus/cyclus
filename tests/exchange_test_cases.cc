@@ -169,6 +169,150 @@ void Case2h::Construct(ExchangeGraph* g) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3::Construct(ExchangeGraph* g) {
+  ExchangeNode::Ptr u(new ExchangeNode());
+  ExchangeNode::Ptr v(new ExchangeNode());
+  ExchangeNode::Ptr w(new ExchangeNode());
+  Arc a1(u, v);
+  Arc a2(u, w);
+
+  u->unit_capacities[a1].push_back(1);
+  v->unit_capacities[a1].push_back(1);
+  u->unit_capacities[a2].push_back(1);
+  w->unit_capacities[a2].push_back(1);
+  u->prefs[a1] = p1;
+  u->prefs[a2] = p2;
+
+  RequestGroup::Ptr request(new RequestGroup(q));
+  request->AddCapacity(q);
+  request->AddExchangeNode(u);  
+  g->AddRequestGroup(request);
+  
+  ExchangeNodeGroup::Ptr supply1(new ExchangeNodeGroup());
+  supply1->AddCapacity(c1);
+  supply1->AddExchangeNode(v);  
+  g->AddSupplyGroup(supply1);
+  
+  ExchangeNodeGroup::Ptr supply2(new ExchangeNodeGroup());
+  supply2->AddCapacity(c2);
+  supply2->AddExchangeNode(w);  
+  g->AddSupplyGroup(supply2);
+
+  g->AddArc(a1);
+  g->AddArc(a2);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy") {
+    ASSERT_TRUE(g->arcs().size() > 1) << "there are "
+                                      << g->arcs().size() << " arcs";
+    EXPECT_EQ(g->arcs().size(), 2);
+
+    std::vector<Match> vexp;
+    if (f1 > 0)
+      vexp.push_back(Match(g->arcs().at(0), f1));
+    if (f2 > 0)
+      vexp.push_back(Match(g->arcs().at(1), f2));
+    EXPECT_EQ(vexp, g->matches());
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3a::Construct(ExchangeGraph* g) {
+  q = 5;
+  c1 = 5;
+  c2 = 10;
+  f1 = c1;
+  f2 = 0;
+  p1 = 0;
+  p2 = 0;
+  
+  Case3::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3b::Construct(ExchangeGraph* g) {
+  q = 5;
+  c1 = 3;
+  c2 = q - c1 + 0.1;
+  f1 = c1;
+  f2 = q - c1;
+  p1 = 0;
+  p2 = 0;
+  
+  Case3::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3c::Construct(ExchangeGraph* g) {
+  q = 5;
+  c1 = 3;
+  c2 = q - c1;
+  f1 = c1;
+  f2 = c2;
+  p1 = 0;
+  p2 = 0;
+  
+  Case3::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3d::Construct(ExchangeGraph* g) {
+  q = 5;
+  c1 = 3;
+  c2 = q - c1 - 0.1;
+  f1 = c1;
+  f2 = c2;
+  p1 = 0;
+  p2 = 0;
+  
+  Case3::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3e::Construct(ExchangeGraph* g) {
+  q = 5;
+  c1 = 2;
+  c2 = q;
+  f1 = 0;
+  f2 = c2;
+  p2 = 5;
+  p1 = 2;
+  
+  Case3::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3f::Construct(ExchangeGraph* g) {
+  q = 5;
+  c1 = 3;
+  c2 = 4;
+  f1 = q - c2;
+  f2 = c2;
+  p2 = 5;
+  p1 = 2;
+
+  Case3::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3f::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy") {
+      ASSERT_TRUE(g->arcs().size() > 1);
+      EXPECT_EQ(g->arcs().size(), 2);
+  
+      // exp f2 on arc 1 (whereas f1 is on arc 0) to get matched first due to
+      // sorting
+      Match exp1 = Match(g->arcs().at(1), f2); 
+      Match exp2 = Match(g->arcs().at(0), f1);
+      Match arr[] = {exp1, exp2};
+      std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+      EXPECT_EQ(vexp, g->matches());
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case4::Construct(ExchangeGraph* g) {
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v1(new ExchangeNode());
@@ -210,7 +354,8 @@ void Case4::Test(std::string solver_type, ExchangeGraph* g) {
     EXPECT_EQ(g->arcs().size(), 2);
 
     std::vector<Match> vexp;
-    vexp.push_back(Match(g->arcs().at(0), f1));
+    if (f1 > 0)
+      vexp.push_back(Match(g->arcs().at(0), f1));
     if (f2 > 0)
       vexp.push_back(Match(g->arcs().at(1), f2));
     EXPECT_EQ(vexp, g->matches());
@@ -314,7 +459,8 @@ void Case5::Test(std::string solver_type, ExchangeGraph* g) {
     EXPECT_EQ(g->arcs().size(), 2);
 
     std::vector<Match> vexp;
-    vexp.push_back(Match(g->arcs().at(0), f1));
+    if (f1 > 0)
+      vexp.push_back(Match(g->arcs().at(0), f1));
     if (f2 > 0)
       vexp.push_back(Match(g->arcs().at(1), f2));
     EXPECT_EQ(vexp, g->matches());

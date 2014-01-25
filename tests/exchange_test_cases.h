@@ -136,73 +136,83 @@ class Case2h: public Case2 {
   virtual void Construct(ExchangeGraph* g); 
 };
 
-/// /// Case 3:
-/// /// 1 supply node with capacity, c, and unit capacity, u_s
-/// /// 1 request node with request quantity, q, and unit capacity, u_r
-/// /// flow from s->r = f
-/// class Case3: public ExchangeCase {
-///  public:
-///   virtual ~Case3() {}
-///   virtual void Construct(ExchangeGraph* g); 
-///   virtual void Test(std::string solver_type, ExchangeGraph* g);
+/// Case 3:
+/// 2 suppliers (2 nodes) with capacity, c1 & c2
+/// 1 requester (1 node) with request quantity, q
+/// requester pref for s1 := p1
+/// requester pref for s2 := p2
+/// flow from s1 -> r := f1
+/// flow from s2 -> r := f2
+class Case3: public ExchangeCase {
+ public:
+  virtual ~Case3() {}
+  virtual void Construct(ExchangeGraph* g); 
+  virtual void Test(std::string solver_type, ExchangeGraph* g);
   
-///  protected:
-///   double qty, unit_cap_req, capacity, unit_cap_sup, flow;
-/// };
+ protected:
+  double q, c1, c2;
+  double p1, p2;
+  double f1, f2;
+};
 
-/// /// Case3a:
-/// /// q < c, u_s = 1
-/// /// f = q
-/// class Case3a: public Case3 {
-///  public:
-///   virtual ~Case3a() {}
-///   virtual void Construct(ExchangeGraph* g); 
-/// };
+/// Case3a:
+/// q = c1
+/// f1 = c1, f2 DNE
+class Case3a: public Case3 {
+ public:
+  virtual ~Case3a() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
 
-/// /// Case3b:
-/// ///q = c, u_s = 1
-/// ///f = c
-/// class Case3b: public Case3 {
-///  public:
-///   virtual ~Case3b() {}
-///   virtual void Construct(ExchangeGraph* g); 
-/// };
+/// Case3b:
+/// q - c1 < c2
+/// f1 = c1, f2 = q - c1
+class Case3b: public Case3 {
+ public:
+  virtual ~Case3b() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
 
-/// /// Case3c:
-/// ///q > c, u_s = 1, u_r = 1
-/// ///f = c
-/// class Case3c: public Case3 {
-///  public:
-///   virtual ~Case3c() {}
-///   virtual void Construct(ExchangeGraph* g); 
-/// };
+/// Case3c:
+/// q - c1 = c2
+/// f1 = c1, f2 = c2
+class Case3c: public Case3 {
+ public:
+  virtual ~Case3c() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
 
-/// /// Case3d:
-/// ///q > c, u_s < 1, c/u_s > q, u_r = 1
-/// ///f = q
-/// class Case3d: public Case3 {
-///  public:
-///   virtual ~Case3d() {}
-///   virtual void Construct(ExchangeGraph* g); 
-/// };
+/// Case3d:
+/// q - c1 > c2
+/// f1 = c1, f2 = c2
+class Case3d: public Case3 {
+ public:
+  virtual ~Case3d() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
 
-/// /// Case3e:
-/// ///q = c, u_s < 1 ( => c/u_s > q ), u_r = 1
-/// ///f = q
-/// class Case3e: public Case3 {
-///  public:
-///   virtual ~Case3e() {}
-///   virtual void Construct(ExchangeGraph* g); 
-/// };
+/// Case3e:
+/// q = c2
+/// p2 > p1
+/// f1 DNE, f2 = c2
+class Case3e: public Case3 {
+ public:
+  virtual ~Case3e() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
 
-/// /// Case3f:
-/// /// q = c, u_s > 1 ( => c/u_s < q ), u_r = 1
-/// /// f = c / u_s
-/// class Case3f: public Case3 {
-///  public:
-///   virtual ~Case3f() {}
-///   virtual void Construct(ExchangeGraph* g); 
-/// };
+/// Case3f:
+/// q > c2, q - c2 < c1
+/// p2 > p1
+/// f1 = q - c2, f2 = c2
+class Case3f: public Case3 {
+ public:
+  virtual ~Case3f() {}
+  virtual void Construct(ExchangeGraph* g);
+
+  /// overrides case3 Test
+  virtual void Test(std::string solver_type, ExchangeGraph* g); 
+};
 
 /// Case 4:
 /// 1 suppliers (2 nodes) with capacity, c
