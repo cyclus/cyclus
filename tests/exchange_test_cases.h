@@ -204,6 +204,67 @@ class Case2h: public Case2 {
 ///   virtual void Construct(ExchangeGraph* g); 
 /// };
 
+/// Case 4:
+/// 1 suppliers (2 nodes) with capacity, c
+/// 2 requester (2 nodes) with request quantities, q1 & q2
+/// flow from s -> r1 := f1
+/// flow from s -> r2 := f2
+class Case4: public ExchangeCase {
+ public:
+  virtual ~Case4() {}
+  virtual void Construct(ExchangeGraph* g); 
+  virtual void Test(std::string solver_type, ExchangeGraph* g);
+
+ protected:
+  double q1, q2, c;
+  double f1, f2;
+};
+
+/// Case 4a
+/// q1 > c
+/// f1 = c, f2 DNE
+class Case4a: public Case4 {
+ public:
+  virtual ~Case4a() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case 4b
+/// q1 = c
+/// f1 = c, f2 DNE
+class Case4b: public Case4 {
+ public:
+  virtual ~Case4b() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case 4c
+/// q1 < c, q2 > c - q1
+/// f1 = q1, f2 = c - q1
+class Case4c: public Case4 {
+ public:
+  virtual ~Case4c() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case 4d
+/// q1 < c, q2 = c - q1
+/// f1 = q1, f2 = c - q1
+class Case4d: public Case4 {
+ public:
+  virtual ~Case4d() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
+/// Case 4e
+/// q1 < c, q2 < c - q1
+/// f1 = q1, f2 = q2
+class Case4e: public Case4 {
+ public:
+  virtual ~Case4e() {}
+  virtual void Construct(ExchangeGraph* g); 
+};
+
 /// Case 5:
 /// 2 suppliers (2 nodes) with capacities, c1 & c2
 /// 1 requester (2 nodes) with request quantities, q
