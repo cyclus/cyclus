@@ -31,6 +31,7 @@ CONFIGURE_FILE(
 INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
     ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/cyclus-flat.rng.in
     ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
   DESTINATION share
   COMPONENT core
@@ -105,6 +106,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/variable.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader.cc 
+  ${CMAKE_CURRENT_SOURCE_DIR}/xml_flat_loader.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine.cc 
   )
@@ -188,6 +190,7 @@ INSTALL(FILES
   version.h
   windows_helper_functions.h
   xml_file_loader.h
+  xml_flat_loader.h
   xml_parser.h
   xml_query_engine.h
   DESTINATION include/cyclus

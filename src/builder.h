@@ -36,9 +36,9 @@ class Builder {
   /// @return the beginning iterator of the set of producers
   std::set<CommodityProducer*>::iterator EndingProducer();
 
- private:
+ protected:
   /// the set of managed producers
-  std::set<CommodityProducer*> producers_;
+  std::set<CommodityProducer*> commod_producers_;
 
   //#include "commodity_producer_manager_tests.h"
   //friend class CommodityProducerManagerTests;

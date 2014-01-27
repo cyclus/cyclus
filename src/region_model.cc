@@ -15,6 +15,13 @@
 
 namespace cyclus {
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::InitFrom(RegionModel* m) {
+  Model::InitFrom(m);
+  this->allowedFacilities_ = m->allowedFacilities_;
+  this->inst_names_ = m->inst_names_;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RegionModel::RegionModel(Context* ctx) : TimeListener(ctx), Model(ctx) {
   SetModelType("Region");

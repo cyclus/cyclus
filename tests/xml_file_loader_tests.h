@@ -29,6 +29,7 @@ class XMLFileLoaderTests : public ::testing::Test {
   cyclus::Recorder rec_;
   cyclus::Timer ti_;
   cyclus::Context* ctx_;
+  std::string schema_path;
 
   virtual void SetUp();
 

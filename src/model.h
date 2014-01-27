@@ -13,6 +13,9 @@
 #include "query_engine.h"
 #include "exchange_context.h"
 
+#define SHOW(X) \
+  std::cout << __FILE__ << ":" << __LINE__ << ": "#X" = " << X << "\n"
+
 namespace cyclus {
 
 class Material;

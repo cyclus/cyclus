@@ -39,13 +39,12 @@ void LoadStringstreamFromFile(std::stringstream& stream,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string BuildMasterSchema() {
+std::string BuildMasterSchema(std::string schema_path) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
 
   std::stringstream schema("");
-  std::string schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
@@ -75,8 +74,42 @@ std::string BuildMasterSchema() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Composition::Ptr ReadRecipe(QueryEngine* qe) {
+  bool atom_basis;
+  std::string basis_str = qe->GetElementContent("basis");
+  if (basis_str == "atom") {
+    atom_basis = true;
+  } else if (basis_str == "mass") {
+    atom_basis = false;
+  } else {
+    throw IOError(basis_str + " basis is not 'mass' or 'atom'.");
+  }
+
+  double value;
+  int key;
+  std::string query = "isotope";
+  int nisos = qe->NElementsMatchingQuery(query);
+  CompMap v;
+  for (int i = 0; i < nisos; i++) {
+    QueryEngine* isotope = qe->QueryElement(query, i);
+    key = strtol(isotope->GetElementContent("id").c_str(), NULL, 10);
+    value = strtod(isotope->GetElementContent("comp").c_str(), NULL);
+    v[key] = value;
+    CLOG(LEV_DEBUG3) << "  Isotope: " << key << " Value: " << v[key];
+  }
+
+  if (atom_basis) {
+    return Composition::CreateFromAtom(v);
+  } else {
+    return Composition::CreateFromMass(v);
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(Context* ctx,
+                             std::string schema_path,
                              const std::string load_filename) : ctx_(ctx) {
+  schema_path_ = schema_path;
   file_ = load_filename;
   std::stringstream input;
   LoadStringstreamFromFile(input, file_);
@@ -107,20 +140,21 @@ void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadSim(bool use_main_schema) {
+std::string XMLFileLoader::master_schema() {
+  return BuildMasterSchema(schema_path_);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::LoadSim() {
   try {
     LoadDynamicModules();
-    
-    if (use_main_schema) {
-      std::stringstream ss(BuildMasterSchema());
-      parser_->Validate(ss);
-    }
-    
+    std::stringstream ss(master_schema());
+    parser_->Validate(ss);
     LoadSolver();
     LoadControlParams();
     LoadRecipes();
     LoadInitialAgents();
-  } catch(std::exception& e) {
+  } catch (std::exception& e) {
     std::string msg = "Error reading xml file: ";
     msg += e.what();
     throw cyclus::Error(msg);
@@ -142,34 +176,38 @@ void XMLFileLoader::LoadSolver() {
     order = GetOptionalQuery<double>(qe, "solution_order", -1);
     commodity_order[name] = order;
   }
-  
+
   ProcessCommodities(&commodity_order);
-  
+
   // solver will delete conditioner
   GreedyPreconditioner* conditioner = new GreedyPreconditioner(
-      commodity_order,
-      GreedyPreconditioner::REVERSE);
-  
+    commodity_order,
+    GreedyPreconditioner::REVERSE);
+
   // context will delete solver
   GreedySolver* solver = new GreedySolver(conditioner);
-  
+
   ctx_->solver(solver);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::ProcessCommodities(
-    std::map<std::string, double>* commodity_order) {
+  std::map<std::string, double>* commodity_order) {
   double max = std::max_element(
-      commodity_order->begin(),
-      commodity_order->end(),
-      SecondLT< std::pair<std::string, double> >())->second;
-  if (max < 1) max = 0; // in case no orders are specified
-  
+                 commodity_order->begin(),
+                 commodity_order->end(),
+                 SecondLT< std::pair<std::string, double> >())->second;
+  if (max < 1) {
+    max = 0;  // in case no orders are specified
+  }
+
   std::map<std::string, double>::iterator it;
   for (it = commodity_order->begin();
        it != commodity_order->end();
        ++it) {
-    if (it->second < 1) it->second = max + 1;
+    if (it->second < 1) {
+      it->second = max + 1;
+    }
     CLOG(LEV_INFO1) << "Commodity ordering for " << it->first
                     << " is " << it->second;
   }
@@ -183,43 +221,9 @@ void XMLFileLoader::LoadRecipes() {
   int num_recipes = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < num_recipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    LoadRecipe(qe);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadRecipe(QueryEngine* qe) {
-  bool atom_basis;
-  std::string basis_str = qe->GetElementContent("basis");
-  if (basis_str == "atom") {
-    atom_basis = true;
-  } else if (basis_str == "mass") {
-    atom_basis = false;
-  } else {
-    throw IOError(basis_str + " basis is not 'mass' or 'atom'.");
-  }
-
-  std::string name = qe->GetElementContent("name");
-  CLOG(LEV_DEBUG3) << "loading recipe: " << name
-                   << " with basis: " << basis_str;
-
-  double value;
-  int key;
-  std::string query = "isotope";
-  int nisos = qe->NElementsMatchingQuery(query);
-  CompMap v;
-  for (int i = 0; i < nisos; i++) {
-    QueryEngine* isotope = qe->QueryElement(query, i);
-    key = strtol(isotope->GetElementContent("id").c_str(), NULL, 10);
-    value = strtod(isotope->GetElementContent("comp").c_str(), NULL);
-    v[key] = value;
-    CLOG(LEV_DEBUG3) << "  Isotope: " << key << " Value: " << v[key];
-  }
-
-  if (atom_basis) {
-    ctx_->AddRecipe(name, Composition::CreateFromAtom(v));
-  } else {
-    ctx_->AddRecipe(name, Composition::CreateFromMass(v));
+    std::string name = qe->GetElementContent("name");
+    CLOG(LEV_DEBUG3) << "loading recipe: " << name;
+    ctx_->AddRecipe(name, ReadRecipe(qe));
   }
 }
 
@@ -296,4 +300,7 @@ void XMLFileLoader::LoadControlParams() {
 
   ctx_->InitTime(sim0, dur, dec, m0, y0, handle);
 }
+
 } // namespace cyclus
+
+

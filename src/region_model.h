@@ -124,6 +124,8 @@ class RegionModel : public TimeListener {
   } ;
 
  protected:
+  void InitFrom(RegionModel* m);
+
   /**
      populate the region's list of allowed facilities
    */

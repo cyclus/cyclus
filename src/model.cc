@@ -55,6 +55,7 @@ void Model::InitCoreMembers(QueryEngine* qe) {
 Model::Model(Context* ctx)
   : ctx_(ctx),
     id_(next_id_++),
+    model_type_("Model"),
     parent_id_(-1),
     birthtime_(-1),
     deathtime_(-1),

@@ -60,6 +60,7 @@ void FacilityModel::InitCoreMembers(QueryEngine* qe) {
 void FacilityModel::InitFrom(FacilityModel* m) {
   Model::InitFrom(m);
   fac_lifetime_ = m->fac_lifetime_;
+  inst_name_ = m->inst_name_;
   in_commods_ = m->in_commods_;
   out_commods_ = m->out_commods_;
 }
