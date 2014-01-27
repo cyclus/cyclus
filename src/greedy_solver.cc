@@ -10,6 +10,12 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+GreedySolver::~GreedySolver() {
+  if (conditioner_ != NULL)
+    delete conditioner_;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::Solve() {
   if (conditioner_ != NULL) {
     conditioner_->Condition(graph_);

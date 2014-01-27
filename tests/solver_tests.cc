@@ -125,6 +125,16 @@ TYPED_TEST(ExchangeSolverTest, GreedySolver) {
   this->case_->Test(type, &g);
 }
 
+TYPED_TEST(ExchangeSolverTest, ExclusiveGreedySolver) {
+  std::string type = "greedy-excl";
+  ExchangeGraph g;
+  this->case_->Construct(&g);
+  bool exclusive_orders = true;
+  GreedySolver solver(&g, exclusive_orders);
+  solver.Solve();
+  this->case_->Test(type, &g);
+}
+
 // add any more solvers to test here
 
 #endif  // GTEST_HAS_TYPED_TEST

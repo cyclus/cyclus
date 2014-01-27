@@ -32,13 +32,19 @@ class GreedyPreconditioner;
 /// @warning the GreedySolver is responsible for deleting is conditioner!
 class GreedySolver: public ExchangeSolver {
  public:
-  GreedySolver(GreedyPreconditioner* c = NULL) : conditioner_(c) {};
+  GreedySolver(bool exclusive_orders = false,
+               GreedyPreconditioner* c = NULL)
+    : exclusive_orders_(exclusive_orders),
+      conditioner_(c) {};
   
-  GreedySolver(ExchangeGraph* g, GreedyPreconditioner* c = NULL)
+  GreedySolver(ExchangeGraph* g,
+               bool exclusive_orders = false,
+               GreedyPreconditioner* c = NULL)
     : conditioner_(c),
+      exclusive_orders_(exclusive_orders),
       ExchangeSolver(g) {};
   
-  virtual ~GreedySolver() { if (conditioner_ != NULL) delete conditioner_; }
+  virtual ~GreedySolver();
 
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
   /// RequestGroup and matching requests with the minimum bids possible, starting
@@ -48,6 +54,7 @@ class GreedySolver: public ExchangeSolver {
  private:
   void GreedilySatisfySet_(RequestGroup::Ptr prs);
   GreedyPreconditioner* conditioner_;
+  bool exclusive_orders_;
 };
 
 } // namespace cyclus

@@ -171,6 +171,7 @@ class Case3b: public Case3 {
  public:
   virtual ~Case3b() {}
   virtual void Construct(ExchangeGraph* g); 
+  /// virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
 /// Case3c:
