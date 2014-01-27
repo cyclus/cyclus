@@ -723,6 +723,8 @@ void Case7::Test(std::string solver_type, ExchangeGraph* g) {
       Match exp = Match(g->arcs().at(i), flow);
       EXPECT_EQ(exp, g->matches().at(i));
     }
+  } else if (solver_type == "greedy-excl") {
+    EXPECT_EQ(g->matches().size(), 0);
   }
 }
 
