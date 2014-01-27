@@ -365,18 +365,16 @@ void Case4::Construct(ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case4::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 1) << "there are "
-                                      << g->arcs().size() << " arcs";
-    EXPECT_EQ(g->arcs().size(), 2);
+  ASSERT_TRUE(g->arcs().size() > 1) << "there are "
+                                    << g->arcs().size() << " arcs";
+  EXPECT_EQ(g->arcs().size(), 2);
 
-    std::vector<Match> vexp;
-    if (f1 > 0)
-      vexp.push_back(Match(g->arcs().at(0), f1));
-    if (f2 > 0)
-      vexp.push_back(Match(g->arcs().at(1), f2));
-    EXPECT_EQ(vexp, g->matches());
-  }
+  std::vector<Match> vexp;
+  if (f1 > 0)
+    vexp.push_back(Match(g->arcs().at(0), f1));
+  if (f2 > 0)
+    vexp.push_back(Match(g->arcs().at(1), f2));
+  EXPECT_EQ(vexp, g->matches());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -388,6 +386,16 @@ void Case4a::Construct(ExchangeGraph* g) {
   f2 = 0;
   
   Case4::Construct(g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case4a::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy-excl") {
+    f1 = 15; // q1 > c => not a full order
+    f2 = c;
+  }
+
+  Case4::Test(solver_type, g);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -413,12 +421,21 @@ void Case4c::Construct(ExchangeGraph* g) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case4c::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy-excl") {
+    f2 = 0; // q2 > c - q1 => not a full order
+  }
+
+  Case4::Test(solver_type, g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case4d::Construct(ExchangeGraph* g) {
   q1 = 2;
   c = 5;
   q2 = c - q1;
   f1 = q1;
-  f2 = c - q1;
+  f2 = q2;
   
   Case4::Construct(g);
 }

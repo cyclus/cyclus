@@ -238,6 +238,7 @@ class Case4a: public Case4 {
  public:
   virtual ~Case4a() {}
   virtual void Construct(ExchangeGraph* g); 
+  virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
 /// Case 4b
@@ -256,6 +257,7 @@ class Case4c: public Case4 {
  public:
   virtual ~Case4c() {}
   virtual void Construct(ExchangeGraph* g); 
+  virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
 /// Case 4d
