@@ -391,7 +391,7 @@ void Case4a::Construct(ExchangeGraph* g) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case4a::Test(std::string solver_type, ExchangeGraph* g) {
   if (solver_type == "greedy-excl") {
-    f1 = 15; // q1 > c => not a full order
+    f1 = 0; // q1 > c => not a full order
     f2 = c;
   }
 
@@ -487,18 +487,25 @@ void Case5::Construct(ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case5::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 1) << "there are "
-                                      << g->arcs().size() << " arcs";
-    EXPECT_EQ(g->arcs().size(), 2);
-
-    std::vector<Match> vexp;
-    if (f1 > 0)
-      vexp.push_back(Match(g->arcs().at(0), f1));
-    if (f2 > 0)
-      vexp.push_back(Match(g->arcs().at(1), f2));
-    EXPECT_EQ(vexp, g->matches());
+  if (solver_type == "greedy-excl") { // 0 out non-exclusive flows
+    if (f1 < q) {
+      f1 = 0;
+    }
+    if (f2 < q) {
+      f2 = 0;
+    }
   }
+
+  ASSERT_TRUE(g->arcs().size() > 1) << "there are "
+                                    << g->arcs().size() << " arcs";
+  EXPECT_EQ(g->arcs().size(), 2);
+
+  std::vector<Match> vexp;
+  if (f1 > 0)
+    vexp.push_back(Match(g->arcs().at(0), f1));
+  if (f2 > 0)
+    vexp.push_back(Match(g->arcs().at(1), f2));
+  EXPECT_EQ(vexp, g->matches());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
