@@ -212,6 +212,15 @@ void Case3::Construct(ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case3::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy-excl") { // 0 out non-exclusive flows
+    if (f1 < q) {
+      f1 = 0;
+    }
+    if (f2 < q) {
+      f2 = 0;
+    }
+  }
+  
   ASSERT_TRUE(g->arcs().size() > 1) << "there are "
                                     << g->arcs().size() << " arcs";
   EXPECT_EQ(g->arcs().size(), 2);
@@ -229,10 +238,10 @@ void Case3a::Construct(ExchangeGraph* g) {
   q = 5;
   c1 = 5;
   c2 = 10;
-  f1 = c1;
-  f2 = 0;
   p1 = 0;
   p2 = 0;
+  f1 = c1;
+  f2 = 0;
   
   Case3::Construct(g);
 }
@@ -249,16 +258,6 @@ void Case3b::Construct(ExchangeGraph* g) {
   
   Case3::Construct(g);
 }
-
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// void Case3b::Test(std::string solver_type, ExchangeGraph* g) {
-//   if (solver_type == "greedy-excl") {
-//     f1 = 0;
-//     f2 = 0; // both capacities are too low to provide the order
-//   }
-  
-//   Case3::Test(solver_type, g);
-// }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case3c::Construct(ExchangeGraph* g) {
@@ -325,6 +324,8 @@ void Case3f::Test(std::string solver_type, ExchangeGraph* g) {
       Match arr[] = {exp1, exp2};
       std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
       EXPECT_EQ(vexp, g->matches());
+  } else if(solver_type == "greedy-excl") {
+    EXPECT_TRUE(g->matches().empty());
   }
 }
 
