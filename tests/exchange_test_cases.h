@@ -340,7 +340,7 @@ class Case5e: public Case5 {
 };
 
 /// Case 6:
-/// 2 suppliers (2 nodes ea.) with capacitoes, c1 & c2
+/// 2 suppliers (2 nodes ea.) with capacities, c1 & c2
 /// 2 requester (2 nodes eq.) with request quantities, q1 & q2
 /// flow from s1 -> r1 := f1
 /// flow from s2 -> r1 := f2

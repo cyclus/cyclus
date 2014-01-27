@@ -623,24 +623,31 @@ void Case6a::Construct(ExchangeGraph* g) {
   c1 = 5;
   c2 = q1 - c1 + 3;
   q2 = c2 - (q1 - c1) - 1;
-  f1 = c1;
-  f2 = q1 - c1;
-  f4 = q2;
 
   Case6::Construct(g);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case6a::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 3);
-    EXPECT_EQ(g->arcs().size(), 4);
+  ASSERT_TRUE(g->arcs().size() > 3);
+  EXPECT_EQ(g->arcs().size(), 4);
+
+  f1 = c1;
+  f2 = q1 - c1;
+  f4 = q2;
   
+  std::vector<Match> vexp;
+  if (solver_type == "greedy") {
     Match exp1 = Match(g->arcs().at(0), f1);
     Match exp2 = Match(g->arcs().at(1), f2);
     Match exp3 = Match(g->arcs().at(3), f4);
     Match arr[] = {exp1, exp2, exp3};
-    std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    vexp = std::vector<Match>(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    EXPECT_EQ(vexp, g->matches());
+  } else if (solver_type == "greedy-excl") {
+    Match exp3 = Match(g->arcs().at(2), f4);
+    Match arr[] = {exp3};
+    vexp = std::vector<Match>(arr, arr + sizeof(arr) / sizeof(arr[0]));
     EXPECT_EQ(vexp, g->matches());
   }
 }
@@ -660,15 +667,22 @@ void Case6b::Construct(ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case6b::Test(std::string solver_type, ExchangeGraph* g) {
+  ASSERT_TRUE(g->arcs().size() > 3);
+  EXPECT_EQ(g->arcs().size(), 4);
+
+  std::vector<Match> vexp;  
   if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 3);
-    EXPECT_EQ(g->arcs().size(), 4);
-  
     Match exp1 = Match(g->arcs().at(0), f1);
     Match exp2 = Match(g->arcs().at(2), f3);
     Match exp3 = Match(g->arcs().at(3), f4);
     Match arr[] = {exp1, exp2, exp3};
-    std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    vexp = std::vector<Match>(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    EXPECT_EQ(vexp, g->matches());
+  } else if (solver_type == "greedy-excl") {
+    Match exp1 = Match(g->arcs().at(0), f1);
+    Match exp3 = Match(g->arcs().at(3), f4 + f3);
+    Match arr[] = {exp1, exp3};
+    vexp = std::vector<Match>(arr, arr + sizeof(arr) / sizeof(arr[0]));
     EXPECT_EQ(vexp, g->matches());
   }
 }
