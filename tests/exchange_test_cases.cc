@@ -7,7 +7,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case0::Construct(ExchangeGraph* g) {}
+void Case0::Construct(ExchangeGraph* g, bool exclusive_orders) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case0::Test(std::string solver_type, ExchangeGraph* g) {
@@ -15,7 +15,7 @@ void Case0::Test(std::string solver_type, ExchangeGraph* g) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case1a::Construct(ExchangeGraph* g) {
+void Case1a::Construct(ExchangeGraph* g, bool exclusive_orders) {
   RequestGroup::Ptr group = RequestGroup::Ptr(new RequestGroup());
   ExchangeNode::Ptr n = ExchangeNode::Ptr(new ExchangeNode());
   group->AddExchangeNode(n);
@@ -28,7 +28,7 @@ void Case1a::Test(std::string solver_type, ExchangeGraph* g) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case1b::Construct(ExchangeGraph* g) {
+void Case1b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNodeGroup::Ptr group = ExchangeNodeGroup::Ptr(new ExchangeNodeGroup());
   ExchangeNode::Ptr n = ExchangeNode::Ptr(new ExchangeNode());
   group->AddExchangeNode(n);
@@ -41,11 +41,11 @@ void Case1b::Test(std::string solver_type, ExchangeGraph* g) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2::Construct(ExchangeGraph* g) {
+void Case2::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
-  Arc a(u, v);
-
+  Arc a(u, v, exclusive_orders, qty);
+  
   u->unit_capacities[a].push_back(unit_cap_req);
   v->unit_capacities[a].push_back(unit_cap_sup);
   
@@ -64,16 +64,24 @@ void Case2::Construct(ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case2::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 0);
+  if (solver_type == "greedy-excl") {
+    if (flow < qty) {
+      flow = 0;
+    }
+  }
+  
+  ASSERT_TRUE(g->arcs().size() > 0);
+  if (flow > 0) {
     Match exp = Match(g->arcs().at(0), flow);
     ASSERT_TRUE(g->matches().size() > 0);
     EXPECT_EQ(exp, g->matches().at(0));
+  } else {
+    EXPECT_TRUE(g->matches().empty());
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2a::Construct(ExchangeGraph* g) {
+void Case2a::Construct(ExchangeGraph* g, bool exclusive_orders) {
   // set 2a members
   qty = 5;
   unit_cap_req = 1;
@@ -81,11 +89,11 @@ void Case2a::Construct(ExchangeGraph* g) {
   unit_cap_sup = 1;
   flow = qty;
 
-  Case2::Construct(g);
+  Case2::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2b::Construct(ExchangeGraph* g) {
+void Case2b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   // set 2b members
   qty = 10;
   unit_cap_req = 1;
@@ -93,11 +101,11 @@ void Case2b::Construct(ExchangeGraph* g) {
   unit_cap_sup = 2;
   flow = capacity / unit_cap_sup;
 
-  Case2::Construct(g);
+  Case2::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2c::Construct(ExchangeGraph* g) {
+void Case2c::Construct(ExchangeGraph* g, bool exclusive_orders) {
   // set 2c members
   qty = 10;
   unit_cap_req = 1;
@@ -105,11 +113,11 @@ void Case2c::Construct(ExchangeGraph* g) {
   unit_cap_sup = 1;
   flow = capacity;
 
-  Case2::Construct(g);
+  Case2::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2d::Construct(ExchangeGraph* g) {
+void Case2d::Construct(ExchangeGraph* g, bool exclusive_orders) {
   // set 2d members
   qty = 10;
   unit_cap_req = 1;
@@ -117,11 +125,11 @@ void Case2d::Construct(ExchangeGraph* g) {
   unit_cap_sup = 0.3;
   flow = qty;
 
-  Case2::Construct(g);
+  Case2::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2e::Construct(ExchangeGraph* g) {
+void Case2e::Construct(ExchangeGraph* g, bool exclusive_orders) {
   // set 2e members
   qty = 10;
   unit_cap_req = 1;
@@ -129,11 +137,11 @@ void Case2e::Construct(ExchangeGraph* g) {
   unit_cap_sup = 0.3;
   flow = qty;
 
-  Case2::Construct(g);
+  Case2::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2f::Construct(ExchangeGraph* g) {
+void Case2f::Construct(ExchangeGraph* g, bool exclusive_orders) {
   // set 2f members
   qty = 10;
   unit_cap_req = 1;
@@ -141,11 +149,11 @@ void Case2f::Construct(ExchangeGraph* g) {
   unit_cap_sup = 2;
   flow = capacity / unit_cap_sup;
 
-  Case2::Construct(g);
+  Case2::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2g::Construct(ExchangeGraph* g) {
+void Case2g::Construct(ExchangeGraph* g, bool exclusive_orders) {
   // set 2g members
   qty = 10;
   unit_cap_req = 0.9;
@@ -153,11 +161,11 @@ void Case2g::Construct(ExchangeGraph* g) {
   unit_cap_sup = 1;
   flow = capacity;
 
-  Case2::Construct(g);
+  Case2::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case2h::Construct(ExchangeGraph* g) {
+void Case2h::Construct(ExchangeGraph* g, bool exclusive_orders) {
   // set 2h members
   qty = 10;
   unit_cap_req = 2;
@@ -165,16 +173,16 @@ void Case2h::Construct(ExchangeGraph* g) {
   unit_cap_sup = 1;
   flow = capacity / unit_cap_req;
 
-  Case2::Construct(g);
+  Case2::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case3::Construct(ExchangeGraph* g) {
+void Case3::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
   ExchangeNode::Ptr w(new ExchangeNode());
-  Arc a1(u, v);
-  Arc a2(u, w);
+  Arc a1(u, v, exclusive_orders, q);
+  Arc a2(u, w, exclusive_orders, q);
 
   u->unit_capacities[a1].push_back(1);
   v->unit_capacities[a1].push_back(1);
@@ -204,48 +212,55 @@ void Case3::Construct(ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case3::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 1) << "there are "
-                                      << g->arcs().size() << " arcs";
-    EXPECT_EQ(g->arcs().size(), 2);
-
-    std::vector<Match> vexp;
-    if (f1 > 0)
-      vexp.push_back(Match(g->arcs().at(0), f1));
-    if (f2 > 0)
-      vexp.push_back(Match(g->arcs().at(1), f2));
-    EXPECT_EQ(vexp, g->matches());
+  if (solver_type == "greedy-excl") { // 0 out non-exclusive flows
+    if (f1 < q) {
+      f1 = 0;
+    }
+    if (f2 < q) {
+      f2 = 0;
+    }
   }
+  
+  ASSERT_TRUE(g->arcs().size() > 1) << "there are "
+                                    << g->arcs().size() << " arcs";
+  EXPECT_EQ(g->arcs().size(), 2);
+
+  std::vector<Match> vexp;
+  if (f1 > 0)
+    vexp.push_back(Match(g->arcs().at(0), f1));
+  if (f2 > 0)
+    vexp.push_back(Match(g->arcs().at(1), f2));
+  EXPECT_EQ(vexp, g->matches());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case3a::Construct(ExchangeGraph* g) {
+void Case3a::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 5;
   c2 = 10;
-  f1 = c1;
-  f2 = 0;
   p1 = 0;
   p2 = 0;
+  f1 = c1;
+  f2 = 0;
   
-  Case3::Construct(g);
+  Case3::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case3b::Construct(ExchangeGraph* g) {
+void Case3b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 3;
   c2 = q - c1 + 0.1;
-  f1 = c1;
-  f2 = q - c1;
   p1 = 0;
   p2 = 0;
+  f1 = c1;
+  f2 = q - c1;
   
-  Case3::Construct(g);
+  Case3::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case3c::Construct(ExchangeGraph* g) {
+void Case3c::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 3;
   c2 = q - c1;
@@ -254,11 +269,11 @@ void Case3c::Construct(ExchangeGraph* g) {
   p1 = 0;
   p2 = 0;
   
-  Case3::Construct(g);
+  Case3::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case3d::Construct(ExchangeGraph* g) {
+void Case3d::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 3;
   c2 = q - c1 - 0.1;
@@ -267,11 +282,11 @@ void Case3d::Construct(ExchangeGraph* g) {
   p1 = 0;
   p2 = 0;
   
-  Case3::Construct(g);
+  Case3::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case3e::Construct(ExchangeGraph* g) {
+void Case3e::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 2;
   c2 = q;
@@ -280,11 +295,11 @@ void Case3e::Construct(ExchangeGraph* g) {
   p2 = 5;
   p1 = 2;
   
-  Case3::Construct(g);
+  Case3::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case3f::Construct(ExchangeGraph* g) {
+void Case3f::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 3;
   c2 = 4;
@@ -293,7 +308,7 @@ void Case3f::Construct(ExchangeGraph* g) {
   p2 = 5;
   p1 = 2;
 
-  Case3::Construct(g);
+  Case3::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -309,17 +324,19 @@ void Case3f::Test(std::string solver_type, ExchangeGraph* g) {
       Match arr[] = {exp1, exp2};
       std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
       EXPECT_EQ(vexp, g->matches());
+  } else if(solver_type == "greedy-excl") {
+    EXPECT_TRUE(g->matches().empty());
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case4::Construct(ExchangeGraph* g) {
+void Case4::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v1(new ExchangeNode());
   ExchangeNode::Ptr w(new ExchangeNode());
   ExchangeNode::Ptr v2(new ExchangeNode());
-  Arc a1(u, v1);
-  Arc a2(w, v2);
+  Arc a1(u, v1, exclusive_orders, q1);
+  Arc a2(w, v2, exclusive_orders, q2);
 
   u->unit_capacities[a1].push_back(1);
   v1->unit_capacities[a1].push_back(1);
@@ -348,83 +365,100 @@ void Case4::Construct(ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case4::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 1) << "there are "
-                                      << g->arcs().size() << " arcs";
-    EXPECT_EQ(g->arcs().size(), 2);
+  ASSERT_TRUE(g->arcs().size() > 1) << "there are "
+                                    << g->arcs().size() << " arcs";
+  EXPECT_EQ(g->arcs().size(), 2);
 
-    std::vector<Match> vexp;
-    if (f1 > 0)
-      vexp.push_back(Match(g->arcs().at(0), f1));
-    if (f2 > 0)
-      vexp.push_back(Match(g->arcs().at(1), f2));
-    EXPECT_EQ(vexp, g->matches());
-  }
+  std::vector<Match> vexp;
+  if (f1 > 0)
+    vexp.push_back(Match(g->arcs().at(0), f1));
+  if (f2 > 0)
+    vexp.push_back(Match(g->arcs().at(1), f2));
+  EXPECT_EQ(vexp, g->matches());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case4a::Construct(ExchangeGraph* g) {
+void Case4a::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q1 = 5;
   q2 = 1;
   c = 1;
   f1 = c;
   f2 = 0;
   
-  Case4::Construct(g);
+  Case4::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case4b::Construct(ExchangeGraph* g) {
+void Case4a::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy-excl") {
+    f1 = 0; // q1 > c => not a full order
+    f2 = c;
+  }
+
+  Case4::Test(solver_type, g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case4b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q1 = 1;
   q2 = 3;
   c = 1;
   f1 = c;
   f2 = 0;
   
-  Case4::Construct(g);
+  Case4::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case4c::Construct(ExchangeGraph* g) {
+void Case4c::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q1 = 3;
   c = 5;
   q2 = c - q1 + 0.1;
   f1 = q1;
   f2 = c - q1;
   
-  Case4::Construct(g);
+  Case4::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case4d::Construct(ExchangeGraph* g) {
+void Case4c::Test(std::string solver_type, ExchangeGraph* g) {
+  if (solver_type == "greedy-excl") {
+    f2 = 0; // q2 > c - q1 => not a full order
+  }
+
+  Case4::Test(solver_type, g);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case4d::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q1 = 2;
   c = 5;
   q2 = c - q1;
   f1 = q1;
-  f2 = c - q1;
+  f2 = q2;
   
-  Case4::Construct(g);
+  Case4::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case4e::Construct(ExchangeGraph* g) {
+void Case4e::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q1 = 3;
   c = 8;
   q2 = c - q1 - 0.1;
   f1 = q1;
   f2 = q2;
   
-  Case4::Construct(g);
+  Case4::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case5::Construct(ExchangeGraph* g) {  
+void Case5::Construct(ExchangeGraph* g, bool exclusive_orders) {  
   ExchangeNode::Ptr u1(new ExchangeNode());
   ExchangeNode::Ptr u2(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
   ExchangeNode::Ptr w(new ExchangeNode());
-  Arc a1(u1, v);
-  Arc a2(u2, w);
+  Arc a1(u1, v, exclusive_orders, q);
+  Arc a2(u2, w, exclusive_orders, q);
 
   u1->unit_capacities[a1].push_back(1);
   v->unit_capacities[a1].push_back(1);
@@ -453,77 +487,84 @@ void Case5::Construct(ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case5::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 1) << "there are "
-                                      << g->arcs().size() << " arcs";
-    EXPECT_EQ(g->arcs().size(), 2);
-
-    std::vector<Match> vexp;
-    if (f1 > 0)
-      vexp.push_back(Match(g->arcs().at(0), f1));
-    if (f2 > 0)
-      vexp.push_back(Match(g->arcs().at(1), f2));
-    EXPECT_EQ(vexp, g->matches());
+  if (solver_type == "greedy-excl") { // 0 out non-exclusive flows
+    if (f1 < q) {
+      f1 = 0;
+    }
+    if (f2 < q) {
+      f2 = 0;
+    }
   }
+
+  ASSERT_TRUE(g->arcs().size() > 1) << "there are "
+                                    << g->arcs().size() << " arcs";
+  EXPECT_EQ(g->arcs().size(), 2);
+
+  std::vector<Match> vexp;
+  if (f1 > 0)
+    vexp.push_back(Match(g->arcs().at(0), f1));
+  if (f2 > 0)
+    vexp.push_back(Match(g->arcs().at(1), f2));
+  EXPECT_EQ(vexp, g->matches());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case5a::Construct(ExchangeGraph* g) {
+void Case5a::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 1;
   c1 = 5;
   c2 = 0.5;
   f1 = q;
   f2 = 0;
   
-  Case5::Construct(g);
+  Case5::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case5b::Construct(ExchangeGraph* g) {
+void Case5b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 5;
   c2 = 0.5;
   f1 = c1;
   f2 = 0;
 
-  Case5::Construct(g);
+  Case5::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case5c::Construct(ExchangeGraph* g) {
+void Case5c::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 7;
   c1 = 5;
   c2 = q - c1 + 1;
   f1 = c1;
   f2 = q - c1;
 
-  Case5::Construct(g);
+  Case5::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case5d::Construct(ExchangeGraph* g) {
+void Case5d::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 7;
   c1 = 5;
   c2 = q - c1;
   f1 = c1;
   f2 = c2;
 
-  Case5::Construct(g);
+  Case5::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case5e::Construct(ExchangeGraph* g) {
+void Case5e::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 7;
   c1 = 5;
   c2 = q - c1 - 1;
   f1 = c1;
   f2 = c2;
 
-  Case5::Construct(g);
+  Case5::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case6::Construct(ExchangeGraph* g) {  
+void Case6::Construct(ExchangeGraph* g, bool exclusive_orders) {  
   ExchangeNode::Ptr u1_1(new ExchangeNode());
   ExchangeNode::Ptr u1_2(new ExchangeNode());
   ExchangeNode::Ptr u2_1(new ExchangeNode());
@@ -532,10 +573,10 @@ void Case6::Construct(ExchangeGraph* g) {
   ExchangeNode::Ptr v1_2(new ExchangeNode());
   ExchangeNode::Ptr v2_1(new ExchangeNode());
   ExchangeNode::Ptr v2_2(new ExchangeNode());
-  Arc a1(u1_1, v1_1);
-  Arc a2(u1_2, v2_1);
-  Arc a3(u2_1, v1_2);
-  Arc a4(u2_2, v2_2);
+  Arc a1(u1_1, v1_1, exclusive_orders, q1);
+  Arc a2(u1_2, v2_1, exclusive_orders, q1);
+  Arc a3(u2_1, v1_2, exclusive_orders, q2);
+  Arc a4(u2_2, v2_2, exclusive_orders, q2);
 
   u1_1->unit_capacities[a1].push_back(1);
   u1_2->unit_capacities[a2].push_back(1);
@@ -577,35 +618,42 @@ void Case6::Construct(ExchangeGraph* g) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case6a::Construct(ExchangeGraph* g) {
+void Case6a::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q1 = 7;
   c1 = 5;
   c2 = q1 - c1 + 3;
   q2 = c2 - (q1 - c1) - 1;
-  f1 = c1;
-  f2 = q1 - c1;
-  f4 = q2;
 
-  Case6::Construct(g);
+  Case6::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case6a::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 3);
-    EXPECT_EQ(g->arcs().size(), 4);
+  ASSERT_TRUE(g->arcs().size() > 3);
+  EXPECT_EQ(g->arcs().size(), 4);
+
+  f1 = c1;
+  f2 = q1 - c1;
+  f4 = q2;
   
+  std::vector<Match> vexp;
+  if (solver_type == "greedy") {
     Match exp1 = Match(g->arcs().at(0), f1);
     Match exp2 = Match(g->arcs().at(1), f2);
     Match exp3 = Match(g->arcs().at(3), f4);
     Match arr[] = {exp1, exp2, exp3};
-    std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    vexp = std::vector<Match>(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    EXPECT_EQ(vexp, g->matches());
+  } else if (solver_type == "greedy-excl") {
+    Match exp3 = Match(g->arcs().at(2), f4);
+    Match arr[] = {exp3};
+    vexp = std::vector<Match>(arr, arr + sizeof(arr) / sizeof(arr[0]));
     EXPECT_EQ(vexp, g->matches());
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case6b::Construct(ExchangeGraph* g) {
+void Case6b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q1 = 5;
   c1 = 7;
   q2 = c1 - q1 + 0.5;
@@ -614,26 +662,33 @@ void Case6b::Construct(ExchangeGraph* g) {
   f3 = c1 - q1;
   f4 = q2 - (c1 - q1);
 
-  Case6::Construct(g);
+  Case6::Construct(g, exclusive_orders);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case6b::Test(std::string solver_type, ExchangeGraph* g) {
+  ASSERT_TRUE(g->arcs().size() > 3);
+  EXPECT_EQ(g->arcs().size(), 4);
+
+  std::vector<Match> vexp;  
   if (solver_type == "greedy") {
-    ASSERT_TRUE(g->arcs().size() > 3);
-    EXPECT_EQ(g->arcs().size(), 4);
-  
     Match exp1 = Match(g->arcs().at(0), f1);
     Match exp2 = Match(g->arcs().at(2), f3);
     Match exp3 = Match(g->arcs().at(3), f4);
     Match arr[] = {exp1, exp2, exp3};
-    std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    vexp = std::vector<Match>(arr, arr + sizeof(arr) / sizeof(arr[0]));
+    EXPECT_EQ(vexp, g->matches());
+  } else if (solver_type == "greedy-excl") {
+    Match exp1 = Match(g->arcs().at(0), f1);
+    Match exp3 = Match(g->arcs().at(3), f4 + f3);
+    Match arr[] = {exp1, exp3};
+    vexp = std::vector<Match>(arr, arr + sizeof(arr) / sizeof(arr[0]));
     EXPECT_EQ(vexp, g->matches());
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Case7::Construct(ExchangeGraph* g) {
+void Case7::Construct(ExchangeGraph* g, bool exclusive_orders) {
   qty = 5;
   N = 10;
   flow = qty / N;
@@ -651,7 +706,7 @@ void Case7::Construct(ExchangeGraph* g) {
   for (int i = 0; i < N; i++) {
     ExchangeNode::Ptr v(new ExchangeNode(qty / N)); 
     sup->AddExchangeNode(v);  
-    Arc a(u, v);
+    Arc a(u, v, exclusive_orders, qty);
     u->unit_capacities[a].push_back(1);
     v->unit_capacities[a].push_back(1);
     g->AddArc(a);
@@ -668,6 +723,8 @@ void Case7::Test(std::string solver_type, ExchangeGraph* g) {
       Match exp = Match(g->arcs().at(i), flow);
       EXPECT_EQ(exp, g->matches().at(i));
     }
+  } else if (solver_type == "greedy-excl") {
+    EXPECT_EQ(g->matches().size(), 0);
   }
 }
 

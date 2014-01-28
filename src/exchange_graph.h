@@ -16,9 +16,43 @@ class ExchangeNode;
 
 /// @brief by convention, arc.first == request node (unode), arc.second == bid
 /// node (vnode)
-typedef std::pair<
-    boost::shared_ptr<ExchangeNode>,
-    boost::shared_ptr<ExchangeNode> > Arc;
+struct Arc {
+  boost::shared_ptr<ExchangeNode> first;
+  boost::shared_ptr<ExchangeNode> second;
+  bool exclusive;
+  double excl_val;
+  
+  Arc(boost::shared_ptr<ExchangeNode> first,
+      boost::shared_ptr<ExchangeNode> second,
+      bool excl_flag = false,
+      double excl_val = 0.0)
+   : first(first),
+     second(second),
+     exclusive(excl_flag),
+     excl_val(excl_val) {};
+
+  Arc(const Arc& other)
+   : first(other.first),
+     second(other.second),
+     exclusive(other.exclusive),
+     excl_val(other.excl_val) {};
+
+  inline Arc& operator=(const Arc& other) {
+    first = other.first;
+    second = other.second;
+    exclusive = other.exclusive;
+    excl_val = other.excl_val;
+    return *this;
+  }
+};
+
+inline bool operator<(const Arc& l, const Arc& r) {
+  return l.first < r.first || (!(r.first < l.first) && l.second < r.second);
+}
+
+inline bool operator==(const Arc& l, const Arc& r) {
+  return l.first == r.first && l.second == r.second;
+}
 
 /// @class ExchangeNode
 ///
@@ -161,7 +195,7 @@ class ExchangeGraph {
   /// @param pa the arc corresponding to a match
   /// @param qty the amount of flow corresponding to a match
   void AddMatch(const Arc& a, double qty);
-
+  
   inline const std::vector<RequestGroup::Ptr>& request_groups() {
     return request_groups_;
   }

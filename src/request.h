@@ -29,14 +29,18 @@ class Request {
   /// @param commodity the commodity associated with this request
   /// @param preference the preference associated with this request (relative to
   /// others in the portfolio)
+  /// @param exclusive a flag denoting that this request must be met exclusively,
+  /// i.e., in its entirety by a single offer
   inline static typename Request<T>::Ptr Create(
       boost::shared_ptr<T> target,
       Trader* requester,
       typename RequestPortfolio<T>::Ptr portfolio,
       std::string commodity = "",
-      double preference = 0) {
+      double preference = 0,
+      bool exclusive = false) {
     return Ptr(
-        new Request<T>(target, requester, portfolio, commodity, preference));
+        new Request<T>(target, requester, portfolio, commodity, preference,
+                       exclusive));
   }
 
   /// @brief a factory method for a bid for a bid without a portfolio
@@ -44,8 +48,10 @@ class Request {
   inline static typename Request<T>::Ptr Create(boost::shared_ptr<T> target,
                                                 Trader* requester,
                                                 std::string commodity = "",
-                                                double preference = 0) {
-    return Ptr(new Request<T>(target, requester, commodity, preference));
+                                                double preference = 0,
+                                                bool exclusive = false) {
+    return Ptr(new Request<T>(target, requester, commodity, preference,
+                              exclusive));
   }
 
   /// @return this request's target
@@ -65,29 +71,37 @@ class Request {
     return portfolio_;
   }
 
+  /// @return whether or not this an exclusive request
+  inline bool exclusive() const { return exclusive_; }
+  
  private:
   /// @brief constructors are private to require use of factory methods
   Request(boost::shared_ptr<T> target, Trader* requester,
-          std::string commodity = "", double preference = 0)
-    : target_(target),
-      requester_(requester),
-      commodity_(commodity),
-      preference_(preference) {};
-
-  Request(boost::shared_ptr<T> target, Trader* requester,
-          typename RequestPortfolio<T>::Ptr portfolio,
-          std::string commodity = "", double preference = 0)
+          std::string commodity = "", double preference = 0,
+          bool exclusive = false)
     : target_(target),
       requester_(requester),
       commodity_(commodity),
       preference_(preference),
-      portfolio_(portfolio) {};
+      exclusive_(exclusive) {};
+
+  Request(boost::shared_ptr<T> target, Trader* requester,
+          typename RequestPortfolio<T>::Ptr portfolio,
+          std::string commodity = "", double preference = 0,
+          bool exclusive = false)
+    : target_(target),
+      requester_(requester),
+      commodity_(commodity),
+      preference_(preference),
+      portfolio_(portfolio),
+      exclusive_(exclusive) {};
 
   boost::shared_ptr<T> target_;
   Trader* requester_;
   double preference_;
   std::string commodity_;
   typename RequestPortfolio<T>::Ptr portfolio_;
+  bool exclusive_;
 };
 
 } // namespace cyclus

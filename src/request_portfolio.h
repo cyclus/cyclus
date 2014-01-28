@@ -48,15 +48,18 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @param commodity the commodity associated with this request
   /// @param preference the preference associated with this request (relative to
   /// others in the portfolio)
+  /// @param exclusive a flag denoting that this request must be met exclusively,
+  /// i.e., in its entirety by a single offer
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
   typename Request<T>::Ptr AddRequest(boost::shared_ptr<T> target,
                                       Trader* requester,
                                       std::string commodity = "",
-                                      double preference = 0) {
+                                      double preference = 0,
+                                      bool exclusive = false) {
     typename Request<T>::Ptr r =
         Request<T>::Create(target, requester, this->shared_from_this(),
-                           commodity, preference);
+                           commodity, preference, exclusive);
     VerifyRequester_(r);
     VerifyQty_(r);
     requests_.push_back(r);
