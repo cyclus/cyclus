@@ -51,6 +51,13 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
       while( (match <= target) && (arc_it != sorted.end()) ) {
         double remain = target - match;
         double tomatch = std::min(remain, Capacity(*arc_it));
+    
+        if (arc_it->exclusive) {
+          // this implementation is for requester-specific exclusivity
+          double excl_val = arc_it->excl_val;
+          tomatch = (tomatch < excl_val) ? 0 : tomatch;
+        }
+
         if (tomatch > eps()) {
           CLOG(LEV_DEBUG1) << "Greedy Solver is matching " << tomatch
                            << " amount of a resource.";
