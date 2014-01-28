@@ -192,7 +192,31 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
     
   return bs;
 }
+
+/// @brief information container for the exclusive status of an arc
+template <class T>
+struct ExclusiveStatus {
+  bool exclusive;
+  double qty;
   
+ ExclusiveStatus(typename Request<T>::Ptr r, typename Bid<T>::Ptr b) : qty(0) {
+   bool rexcl = r->exclusive();
+   bool bexcl = b->exclusive();
+   exclusive = rexcl || bexcl;
+   if (exclusive) {
+     double rqty = r->target()->quantity();
+     double bqty = b->offer()->quantity();
+     if (rexcl && bexcl) {
+       qty = (rqty != bqty) ? 0 : rqty;
+     } else if (rexcl) {
+       qty = (rqty > bqty) ? 0 : rqty;
+     } else if (bexcl) {
+       qty = (rqty < bqty) ? 0 : bqty;
+     }
+   }
+  }
+};
+
 /// @brief translates an arc given a bid and subsequent data, and also
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
@@ -202,7 +226,8 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
     
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
-  Arc arc(unode, vnode, req->exclusive(), req->target()->quantity());
+  ExclusiveStatus<T> es(req, bid);
+  Arc arc(unode, vnode, es.exclusive, es.qty);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
