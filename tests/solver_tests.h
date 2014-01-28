@@ -4,6 +4,7 @@
 #include <string>
 
 namespace cyclus {
+namespace exchng_tsts {
 
 /// This testing suite uses <a
 /// href="http://code.google.com/p/googletest/wiki/V1_7_AdvancedGuide#Typed_Tests">typed
@@ -50,6 +51,7 @@ class ExchangeSolverTest : public testing::Test {
   ExchangeCase* const case_;
 };
 
+} // namespace exchng_tsts
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_TESTS_SOLVER_TESTS_H_

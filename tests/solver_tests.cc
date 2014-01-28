@@ -8,6 +8,7 @@
 #include "solver_tests.h"
 
 namespace cyclus {
+namespace exchng_tsts {
 
 #if GTEST_HAS_TYPED_TEST
 
@@ -139,4 +140,5 @@ TYPED_TEST(ExchangeSolverTest, ExclusiveGreedySolver) {
 
 #endif  // GTEST_HAS_TYPED_TEST
 
+} // namespace exchng_tsts 
 } // namespace cyclus
