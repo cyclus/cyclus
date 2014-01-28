@@ -202,7 +202,7 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
     
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
-  Arc arc(unode, vnode);
+  Arc arc(unode, vnode, req->exclusive(), req->target()->quantity());
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();

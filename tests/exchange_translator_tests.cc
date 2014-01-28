@@ -195,7 +195,9 @@ TEST(ExXlateTests, XlateArc) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader);
+  bool exclusive = true;
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader,
+                                                 "", 0, exclusive);
   rport->AddConstraint(cc1);
   
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
@@ -216,7 +218,9 @@ TEST(ExXlateTests, XlateArc) {
 
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.second);
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.first);
-
+  EXPECT_TRUE(a.exclusive);
+  EXPECT_EQ(a.excl_val, qty);
+  
   double barr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
   TestVecEq(bexp, a.second->unit_capacities[a]);
