@@ -5,7 +5,7 @@
 #include "exchange_graph.h"
 
 namespace cyclus {
-namespace exchng_tsts {
+namespace ex_tsts {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case0::Construct(ExchangeGraph* g, bool exclusive_orders) {}
@@ -729,5 +729,5 @@ void Case7::Test(std::string solver_type, ExchangeGraph* g) {
   }
 }
 
-} // namespace exchng_tsts 
+} // namespace ex_tsts 
 } // namespace cyclus
