@@ -50,11 +50,15 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
     
       while( (match <= target) && (arc_it != sorted.end()) ) {
         double remain = target - match;
+
+        // capacity adjustment
         double tomatch = std::min(remain, Capacity(*arc_it));
 
-        // this implementat-ion is for requester-specific exclusivity
-        tomatch = (arc_it->exclusive && tomatch < arc_it->excl_val) ?
-                  0 : tomatch;
+        // exclusivity adjustment
+        if (arc_it->exclusive) {
+          double excl_val = arc_it->excl_val;
+          tomatch = (tomatch < excl_val) ? 0 : excl_val;
+        }
           
         if (tomatch > eps()) {
           CLOG(LEV_DEBUG1) << "Greedy Solver is matching " << tomatch
