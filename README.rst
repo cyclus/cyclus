@@ -42,9 +42,9 @@ Installing Dependencies
 =======================
 
 This guide assumes that the user has root access (to issue sudo commands) and
-access to a package manager or has some other suitable method of automatically
-installing established libraries. This process was tested using a fresh install
-of Ubuntu 12.10. 
+access to a package manager (e.g. `apt-get` on *nix systems or `macports` on
+Macs) or has some other suitable method of automatically installing established
+libraries. This process was tested using a fresh install of Ubuntu 12.10.
 
 The command to install a dependency takes the form of:
 
