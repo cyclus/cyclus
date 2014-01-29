@@ -48,7 +48,8 @@ This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
 of Ubuntu 12.10 using apt-get as the package manager; if on a Mac system, a good
-manager to use is macports.
+manager to use is macports. In that case, replace all of the following instances 
+of `apt-get` with `port`.
 
 The command to install a dependency takes the form of:
 
