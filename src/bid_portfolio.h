@@ -44,9 +44,11 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// original or if the bid commodity is different than the original
   typename Bid<T>::Ptr AddBid(typename Request<T>::Ptr request, 
                               boost::shared_ptr<T> offer,
-                              Trader* bidder) {
+                              Trader* bidder,
+                              bool exclusive = false) {
     typename Bid<T>::Ptr b =
-        Bid<T>::Create(request, offer, bidder, this->shared_from_this());
+        Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
+                       exclusive);
     VerifyResponder_(b);
     VerifyCommodity_(b);
     bids_.insert(b);
