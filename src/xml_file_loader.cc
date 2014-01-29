@@ -185,7 +185,8 @@ void XMLFileLoader::LoadSolver() {
     GreedyPreconditioner::REVERSE);
 
   // context will delete solver
-  GreedySolver* solver = new GreedySolver(conditioner);
+  bool exclusive_orders = false;
+  GreedySolver* solver = new GreedySolver(exclusive_orders, conditioner);
 
   ctx_->solver(solver);
 }
