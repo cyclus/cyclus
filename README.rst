@@ -27,10 +27,10 @@ Package                Minimum Version
 `python`               2.6
 `sqlite3`              3.7.10            
 `HDF5`                 1.8.0
-Coin-Cbc               2.5
-Coin-Cgl               2.5
-Coin-Clp               2.5
-Coin-Osi               2.5
+`Coin-Cbc`             2.5
+`Coin-Cgl`             0.58
+`Coin-Clp`             1.90
+`Coin-Osi`             0.99
 ====================   ==================
 
 An optional dependency (to build documentation) is:
@@ -61,6 +61,7 @@ required library package names is:
 
 #. cmake
 #. libboost-all-dev (see note below)
+#. libxml2-dev
 #. libxml++2.6-dev
 #. libsqlite3-dev
 #. libhdf5-serial-dev
