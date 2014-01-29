@@ -195,9 +195,7 @@ TEST(ExXlateTests, XlateArc) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  bool exclusive = true;
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader,
-                                                 "", 0, exclusive);
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader);
   rport->AddConstraint(cc1);
   
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
@@ -218,8 +216,7 @@ TEST(ExXlateTests, XlateArc) {
 
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.second);
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.first);
-  EXPECT_TRUE(a.exclusive);
-  EXPECT_EQ(a.excl_val, qty);
+  EXPECT_FALSE(a.exclusive);
   
   double barr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
@@ -228,6 +225,99 @@ TEST(ExXlateTests, XlateArc) {
   double rarr[] = {(c1->convert(mat) / qty)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
   TestVecEq(rexp, a.first->unit_capacities[a]);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExXlateTests, XlateArcReqExclusive) {
+  bool exclusive = true;
+
+  RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader,
+                                                 "", 0, exclusive);
+
+  BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
+  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty  + 1), &trader);
+  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty - 1), &trader);
+  Bid<Material>::Ptr bid3 = bport->AddBid(req, get_mat(u235, qty), &trader);
+  
+  ExchangeContext<Material> ctx;
+  ExchangeTranslator<Material> xlator(&ctx);
+  TranslateRequestPortfolio(xlator.translation_ctx(), rport);
+  TranslateBidPortfolio(xlator.translation_ctx(), bport);
+
+  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1);
+  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2);
+  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3);
+  EXPECT_TRUE(a1.exclusive);
+  
+  // bid > request, so excl_val set to request qty
+  EXPECT_DOUBLE_EQ(a1.excl_val, qty);
+  // request < bid, so arc excl_val is set to 0
+  EXPECT_DOUBLE_EQ(a2.excl_val, 0.0);
+  // bid == request, so excl_val set to request qty
+  EXPECT_DOUBLE_EQ(a3.excl_val, qty);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExXlateTests, XlateArcBidExclusive) {
+  bool exclusive = true;
+  
+  RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader);
+
+  BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
+  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty - 1), &trader,
+                                         exclusive);
+  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty + 1), &trader,
+                                          exclusive);
+  Bid<Material>::Ptr bid3 = bport->AddBid(req, get_mat(u235, qty), &trader,
+                                          exclusive);
+    
+  ExchangeContext<Material> ctx;
+  ExchangeTranslator<Material> xlator(&ctx);
+  TranslateRequestPortfolio(xlator.translation_ctx(), rport);
+  TranslateBidPortfolio(xlator.translation_ctx(), bport);
+
+  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1);
+  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2);
+  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3);
+  EXPECT_TRUE(a1.exclusive);
+
+  // request > bid, so excl_val set to bid qty
+  EXPECT_DOUBLE_EQ(a1.excl_val, qty - 1);
+  // bid is more than request, so excl_val is set to 0
+  EXPECT_DOUBLE_EQ(a2.excl_val, 0.0);
+  // request == bid, so excl_val set to bid qty
+  EXPECT_DOUBLE_EQ(a3.excl_val, qty);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExXlateTests, XlateArcBothExclusive) {
+  bool exclusive = true;
+
+  RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader,
+                                                 "", 0, exclusive);
+
+  BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
+  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty), &trader,
+                                          exclusive);
+  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty - 1), &trader,
+                                          exclusive);
+    
+  ExchangeContext<Material> ctx;
+  ExchangeTranslator<Material> xlator(&ctx);
+  TranslateRequestPortfolio(xlator.translation_ctx(), rport);
+  TranslateBidPortfolio(xlator.translation_ctx(), bport);
+
+  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1);
+  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2);
+  EXPECT_TRUE(a1.exclusive);
+
+  // same qty, excl_val == qty
+  EXPECT_DOUBLE_EQ(a1.excl_val, qty);
+  // different qty, excl_val -> 0
+  EXPECT_DOUBLE_EQ(a2.excl_val, 0.0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

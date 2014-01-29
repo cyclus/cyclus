@@ -4,8 +4,9 @@
 #include <string>
 
 namespace cyclus {
-
+  
 class ExchangeGraph;
+
   
 /// ExchangeCase, a class that provides a virtual interface for constructing
 /// and testing a variety of ExchangeGraph/ExchangeSolver test instances.
@@ -171,7 +172,6 @@ class Case3b: public Case3 {
  public:
   virtual ~Case3b() {}
   virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
-  /// virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
 /// Case3c:
@@ -391,6 +391,7 @@ class Case7: public ExchangeCase {
   double qty, flow;
   int N;
 };
+
 
 } // namespace cyclus
 
