@@ -15,7 +15,7 @@ Building and Installing Cyclus
 
 In order to facilitate future compatibility with multiple platforms, 
 Cyclus is built using `CMake`_. A full list of the Cyclus package 
-dependencies is show below:
+dependencies is shown below:
 
 ====================   ==================
 Package                Minimum Version   
@@ -40,6 +40,24 @@ Package                Minimum Version
 ====================   ==================
 doxygen                1.7.6.1
 ====================   ==================
+
+Windows
+=======
+
+A native Windows installation is not currently explicitly supported. However, a 
+Virtual Machine image can be downloaded which includes a pre-installation of all 
+of these dependencies as well as a pre-installation of Cyclus. If you do not 
+have access to a Linux or Unix (MacOS) machine, please follow these three steps:
+
+#. Install `VirtualBox <https://www.virtualbox.org/>`_
+#. Download `cyclus_user_environment.ova 
+   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus_user_environment.ova>`_ 
+#. Open the .ova file using VirtualBox (File->Import Appliance).
+
+The user name is "cyclus-user" and the password is "cyclus". You now have the 
+same user environment as someone who installed cyclus on an Ubuntu Linux 
+machine. Congratulations. You may skip to [Running Tests][].
+
 
 Installing Dependencies
 =======================
