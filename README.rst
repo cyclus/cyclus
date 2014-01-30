@@ -39,23 +39,6 @@ Package                Minimum Version
 doxygen                1.7.6.1
 ====================   ==================
 
-Windows
-=======
-
-A native Windows installation is not currently explicitly supported. However, a 
-Virtual Machine image can be downloaded which includes a pre-installation of all 
-of these dependencies as well as a pre-installation of Cyclus. If you do not 
-have access to a Linux or Unix (MacOS) machine, please follow these three steps:
-
-#. Install `VirtualBox <https://www.virtualbox.org/>`_
-#. Download `cyclus_user_environment.ova 
-   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus_user_environment.ova>`_ 
-#. Open the .ova file using VirtualBox (File->Import Appliance).
-
-The user name is "cyclus-user" and the password is "cyclus". You now have the 
-same user environment as someone who installed cyclus on an Ubuntu Linux 
-machine. Congratulations. You may skip to `Running Tests`_ .
-
 
 Installing Dependencies (Linux and Unix)
 ========================================
@@ -65,7 +48,8 @@ access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
 of Ubuntu 12.10 using apt-get as the package manager; if on a Mac system, a good
 manager to use is macports. In that case, replace all of the following instances 
-of "apt-get" with "port".
+of "apt-get" with "port". (If on a Windows system, please skip to the `Windows`_ 
+instructions.
 
 The command to install a dependency takes the form of:
 
@@ -156,6 +140,24 @@ There are additional options which can be inspected via `install.py`'s help:
 .. code-block:: bash
 
     .../cyclus/cyclus$ python install.py -h
+
+Windows
+=======
+
+A native Windows installation is not currently explicitly supported. However, a 
+Virtual Machine image can be downloaded which includes a pre-installation of all 
+of these dependencies as well as a pre-installation of Cyclus. If you do not 
+have access to a Linux or Unix (MacOS) machine, please follow these three steps:
+
+#. Install `VirtualBox <https://www.virtualbox.org/>`_
+#. Download `cyclus_user_environment.ova 
+   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus_user_environment.ova>`_ 
+#. Open the .ova file using VirtualBox (File->Import Appliance).
+
+The user name is "cyclus-user" and the password is "cyclus". You now have the 
+same user environment as someone who installed cyclus on an Ubuntu Linux 
+machine. Congratulations. You may skip to `Running Tests`_ .
+
 
 Running Tests
 =============
