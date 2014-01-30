@@ -59,8 +59,8 @@ same user environment as someone who installed cyclus on an Ubuntu Linux
 machine. Congratulations. You may skip to `Running Tests`_ .
 
 
-Installing Dependencies
-=======================
+Installing Dependencies (Linux and Unix)
+========================================
 
 This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
