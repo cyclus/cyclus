@@ -56,7 +56,7 @@ have access to a Linux or Unix (MacOS) machine, please follow these three steps:
 
 The user name is "cyclus-user" and the password is "cyclus". You now have the 
 same user environment as someone who installed cyclus on an Ubuntu Linux 
-machine. Congratulations. You may skip to :ref:`runningtests` .
+machine. Congratulations. You may skip to runningtests_ .
 
 
 Installing Dependencies
