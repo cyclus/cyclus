@@ -29,8 +29,6 @@ Package                Minimum Version
 `HDF5`                 1.8.0
 `Coin-Cbc`             2.5
 `Coin-Cgl`             0.58
-`Coin-Clp`             1.90
-`Coin-Osi`             0.99
 ====================   ==================
 
 An optional dependency (to build documentation) is:
@@ -87,8 +85,6 @@ required library package names is:
 #. libbz2-dev
 #. coinor-libcbc-dev
 #. coinor-libcgl-dev
-#. coinor-libclp-dev
-#. coinor-libosi-dev
 
 and (optionally):
 
