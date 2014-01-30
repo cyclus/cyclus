@@ -56,7 +56,7 @@ have access to a Linux or Unix (MacOS) machine, please follow these three steps:
 
 The user name is "cyclus-user" and the password is "cyclus". You now have the 
 same user environment as someone who installed cyclus on an Ubuntu Linux 
-machine. Congratulations. You may skip to [Running Tests][].
+machine. Congratulations. You may skip to [Running Tests][runningtests].
 
 
 Installing Dependencies
@@ -161,8 +161,8 @@ There are additional options which can be inspected via `install.py`'s help:
 
     .../cyclus/cyclus$ python install.py -h
 
-Running Tests
-=============
+Running Tests <a name="runningtests"></a>
+=========================================
 
 Installing Cyclus will also install a test driver (i.e., an executable of all of
 our tests). You can run the tests yourself via:
