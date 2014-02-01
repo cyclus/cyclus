@@ -28,7 +28,6 @@ Package                Minimum Version
 `sqlite3`              3.7.10            
 `HDF5`                 1.8.0
 `Coin-Cbc`             2.5
-`Coin-Cgl`             0.58
 ====================   ==================
 
 An optional dependency (to build documentation) is:
@@ -67,7 +66,6 @@ required library package names is:
 #. libhdf5-serial-dev
 #. libbz2-dev
 #. coinor-libcbc-dev
-#. coinor-libcgl-dev
 
 and (optionally):
 
