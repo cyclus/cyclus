@@ -15,7 +15,7 @@ Building and Installing Cyclus
 
 In order to facilitate future compatibility with multiple platforms, 
 Cyclus is built using `CMake`_. A full list of the Cyclus package 
-dependencies is show below:
+dependencies is shown below:
 
 ====================   ==================
 Package                Minimum Version   
@@ -27,7 +27,7 @@ Package                Minimum Version
 `python`               2.6
 `sqlite3`              3.7.10            
 `HDF5`                 1.8.0
-Coin-Cbc               2.5
+`Coin-Cbc`             2.5
 ====================   ==================
 
 An optional dependency (to build documentation) is:
@@ -38,14 +38,16 @@ Package                Minimum Version
 doxygen                1.7.6.1
 ====================   ==================
 
-Installing Dependencies
-=======================
+
+Installing Dependencies (Linux and Unix)
+========================================
 
 This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
 of Ubuntu 12.10 using apt-get as the package manager; if on a Mac system, a good
-manager to use is macports.
+manager to use is macports. In that case, replace all of the following instances 
+of "apt-get" with "port". 
 
 The command to install a dependency takes the form of:
 
@@ -58,12 +60,12 @@ required library package names is:
 
 #. cmake
 #. libboost-all-dev (see note below)
+#. libxml2-dev
 #. libxml++2.6-dev
 #. libsqlite3-dev
 #. libhdf5-serial-dev
 #. libbz2-dev
 #. coinor-libcbc-dev
-#. coinor-libcgl-dev
 
 and (optionally):
 
@@ -91,8 +93,8 @@ because they are an industry standard. Accordingly, we suggest simply installing
 `libboost-all-dev` to limit any headaches due to possible dependency additions
 in the future.
 
-Installing Cyclus
-=================
+Installing Cyclus (Linux and Unix)
+==================================
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward. 
@@ -135,6 +137,24 @@ There are additional options which can be inspected via `install.py`'s help:
 .. code-block:: bash
 
     .../cyclus/cyclus$ python install.py -h
+
+Windows
+=======
+
+A native Windows installation is not currently explicitly supported. However, a 
+Virtual Machine image can be downloaded which includes a pre-installation of all 
+of these dependencies as well as a pre-installation of Cyclus. If you do not 
+have access to a Linux or Unix (MacOS) machine, please follow these three steps:
+
+#. Install `VirtualBox <https://www.virtualbox.org/>`_
+#. Download `cyclus_user_environment.ova 
+   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus_user_environment.ova>`_ 
+#. Open the .ova file using VirtualBox (File->Import Appliance).
+
+The user name is "cyclus-user" and the password is "cyclus". You now have the 
+same user environment as someone who installed cyclus on an Ubuntu Linux 
+machine. Congratulations. You may skip to `Running Tests`_ .
+
 
 Running Tests
 =============
