@@ -2,6 +2,7 @@
 
 #include "exchange_graph.h"
 #include "greedy_solver.h"
+#include "prog_solver.h"
 
 #include "exchange_test_cases.h"
 
@@ -131,6 +132,15 @@ TYPED_TEST(ExchangeSolverTest, ExclusiveGreedySolver) {
   bool exclusive_orders = true;
   this->case_->Construct(&g, exclusive_orders);
   GreedySolver solver(&g, exclusive_orders);
+  solver.Solve();
+  this->case_->Test(type, &g);
+}
+
+TYPED_TEST(ExchangeSolverTest, LPSolver) {
+  std::string type = "lp";
+  ExchangeGraph g;
+  this->case_->Construct(&g);
+  ProgSolver solver(&g);
   solver.Solve();
   this->case_->Test(type, &g);
 }
