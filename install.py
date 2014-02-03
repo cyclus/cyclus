@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import os
+import sys
 import subprocess
 import shutil
 
@@ -37,6 +38,10 @@ def install_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
 
     if not os.path.exists(makefile):
+        rtn = subprocess.call(['which', 'cmake'], shell=(os.name == 'nt'))
+        if rtn != 0:
+            sys.exit("CMake could not be found, "
+                     "please install CMake before developing Cyclus.")
         cmake_cmd = ['cmake', os.path.abspath(root_dir)]
         if args.prefix:
             cmake_cmd += ['-DCMAKE_INSTALL_PREFIX=' +
