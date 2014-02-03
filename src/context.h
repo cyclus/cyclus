@@ -70,12 +70,12 @@ class Context {
     Model* m = protos_[proto_name];
     T* casted(NULL);
     Model* clone = m->Clone();
-    model_list_.push_back(clone); 
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
       delete clone;
       throw CastError("Invalid cast for prototype " + proto_name);
     }
+    model_list_.push_back(clone);
     return casted;
   };
 

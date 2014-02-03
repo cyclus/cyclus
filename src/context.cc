@@ -21,7 +21,7 @@ Context::~Context() {
     if((*it)->parent() == NULL) to_del.push_back(*it);
   }
   for (it = to_del.begin(); it != to_del.end(); ++it) {
-    delete *it;
+    KillModel(*it);
   }
 }
 

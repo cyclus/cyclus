@@ -127,7 +127,7 @@ void Model::Deploy(Model* parent) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Decommission() {
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
-  delete this;
+  ctx_->KillModel(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
