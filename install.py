@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import os
+import sys
 import subprocess
 import shutil
 
@@ -37,6 +38,10 @@ def install_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
 
     if not os.path.exists(makefile):
+        rtn = subprocess.call(['which', 'cmake'], shell=(os.name == 'nt'))
+        if rtn != 0:
+            sys.exit("CMake could not be found, "
+                     "please install CMake before developing Cyclus.")
         cmake_cmd = ['cmake', os.path.abspath(root_dir)]
         if args.prefix:
             cmake_cmd += ['-DCMAKE_INSTALL_PREFIX=' +
@@ -68,6 +73,13 @@ def install_cyclus(args):
         rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
 
+def uninstall_cyclus(args):
+    makefile = os.path.join(args.build_dir, 'Makefile')
+    if not os.path.exists(args.build_dir) or not os.path.exists(makefile):
+        sys.exist("May not uninstall Cyclus since it has not yet been built.")
+    rtn = subprocess.check_call(['make', 'uninstall'], cwd=args.build_dir,
+                                shell=(os.name == 'nt'))
+
 
 def main():
     localdir = absexpanduser('~/.local')
@@ -78,6 +90,9 @@ def main():
 
     build_dir = 'where to place the build directory'
     parser.add_argument('--build_dir', help=build_dir, default='build')
+
+    uninst = 'uninstall'
+    parser.add_argument('--uninstall', action='store_true', help=uninst, default=False)
 
     clean = 'attempt to remove the build directory before building'
     parser.add_argument('--clean-build', action='store_true', help=clean)
@@ -104,7 +119,11 @@ def main():
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
     parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
 
-    install_cyclus(parser.parse_args())
+    args = parser.parse_args()
+    if args.uninstall:
+        uninstall_cyclus(args)
+    else:
+        install_cyclus(args)
 
 if __name__ == "__main__":
     main()
