@@ -74,7 +74,6 @@ def install_cyclus(args):
                                     shell=(os.name == 'nt'))
 
 def uninstall_cyclus(args):
-    root_dir = os.path.split(__file__)[0]
     makefile = os.path.join(args.build_dir, 'Makefile')
     if not os.path.exists(args.build_dir) or not os.path.exists(makefile):
         sys.exist("May not uninstall Cyclus since it has not yet been built.")
