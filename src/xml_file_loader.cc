@@ -252,9 +252,8 @@ void XMLFileLoader::LoadInitialAgents() {
       CLOG(LEV_DEBUG3) << " * ID: " << model->id();
 
       // register module
-      if (*it == "Facility") {
-        ctx_->AddPrototype(model->name(), model);
-      } else if (*it == "Region") {
+      ctx_->AddPrototype(model->name(), model);
+      if (*it == "Region") {
         model->Deploy(model);
       }
     }

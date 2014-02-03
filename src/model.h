@@ -280,11 +280,6 @@ class Model {
   void AddToTable();
 
   /**
-     used to remove model instance refs from static model lists
-   */
-  void RemoveFromList(Model* model, std::vector<Model*>& mlist);
-
-  /**
      Stores the next available facility ID
    */
   static int next_id_;

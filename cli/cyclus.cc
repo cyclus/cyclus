@@ -205,15 +205,6 @@ int main(int argc, char* argv[]) {
   }
   rec.RegisterBackend(back);
 
-  // print the model list
-  const std::vector<Model*>& models = ctx.model_list();
-  CLOG(LEV_INFO1) << "There are " << models.size() << " models.";
-  CLOG(LEV_INFO3) << "Model list {";
-  for (int i = 0; i < models.size(); i++) {
-    CLOG(LEV_INFO3) << models.at(i)->str();
-  }
-  CLOG(LEV_INFO3) << "}";
-
   // Run the simulation
   ti.RunSim(&ctx);
 

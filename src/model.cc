@@ -61,7 +61,6 @@ Model::Model(Context* ctx)
     deathtime_(-1),
     parent_(NULL) {
   MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
-  ctx_->AddModel(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,9 +75,6 @@ Model::~Model() {
     ->Record();
   }
   
-  // remove references to self
-  RemoveFromList(this, ctx_->model_list());
-
   if (parent_ != NULL) {
     parent_->RemoveChild(this);
   }
@@ -87,18 +83,10 @@ Model::~Model() {
   while (children_.size() > 0) {
     Model* child = children_.at(0);
     MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->id() << " {";
-    delete child;
+    ctx_->KillModel(child);
     MLOG(LEV_DEBUG4) << "}";
   }
   MLOG(LEV_DEBUG3) << "}";
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::RemoveFromList(Model* model, std::vector<Model*>& mlist) {
-  std::vector<Model*>::iterator it = find(mlist.begin(), mlist.end(), model);
-  if (it != mlist.end()) {
-    mlist.erase(it);
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,7 +163,11 @@ void Model::RemoveChild(Model* child) {
   CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->id()
                    << " has removed child '" << child->name() << "' ID="
                    << child->id() << " from its list of children.";
-  RemoveFromList(child, children_);
+  std::vector<Model*>::iterator it;
+  it = find(children_.begin(), children_.end(), child);
+  if (it != children_.end()) {
+    children_.erase(it);
+  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

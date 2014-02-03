@@ -43,19 +43,6 @@ void Timer::RunSim(Context* ctx) {
     
     time_++;
   }
-
-  // initiate deletion of models that don't have parents.
-  // dealloc will propogate through hierarchy as models delete their children
-  std::vector<Model*>::iterator it;
-  std::vector<Model*> to_del;
-  std::vector<Model*> models = ctx->model_list();
-  for (it = models.begin(); it != models.end(); ++it) {
-    if((*it)->parent() == NULL) to_del.push_back(*it);
-  }
-  
-  for (it = to_del.begin(); it != to_del.end(); ++it) {
-    delete *it;
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

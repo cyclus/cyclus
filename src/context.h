@@ -41,21 +41,6 @@ class Context {
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Model* m);
 
-  /// Adds a model to a simulation-wide accessible list.
-  inline void AddModel(Model* m) { model_list_.push_back(m); }
-  
-  /**
-     returns a model given the prototype's name
-
-     @param name name of the prototype as defined in the input file
-     @throws KeyError if name is not found
-   */
-  Model* GetModelByName(std::string name);
-  
-  /// Access the simulation-wide model list.
-  inline const std::vector<Model*>& model_list() const { return model_list_; }
-  inline std::vector<Model*>& model_list() { return model_list_; }
-
   /// Registers an agent as a participant in resource exchanges
   inline void RegisterTrader(Trader* e) {
     traders_.insert(e);
@@ -65,6 +50,9 @@ class Context {
   inline void UnregisterTrader(Trader* e) {
     traders_.erase(e);
   }
+
+  /// Destructs and cleans up m (and it's children recursively).
+  void KillModel(Model* m);
 
   /// @return the current set of facilities in the simulation
   inline const std::set<Trader*>& traders() const {
@@ -82,6 +70,7 @@ class Context {
     Model* m = protos_[proto_name];
     T* casted(NULL);
     Model* clone = m->Clone();
+    model_list_.push_back(clone); 
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
       delete clone;
