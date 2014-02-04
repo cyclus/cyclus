@@ -111,8 +111,13 @@ class Material: public Resource {
   /// Same as ExtractComp with c = this->comp().
   Ptr ExtractQty(double qty);
 
-  /// Creates a new material by extracting quantity qty of composition c from this one.
-  /// @return a new material with quantity qty and composition c.
+  /// Creates a new material by extracting from this one.
+  ///
+  /// @param qty the mass quantity to extract
+  /// @param c the composition the extracted/returned material
+  /// @param threshold an absolute mass cutoff below which constituent isotope
+  /// quantities of the remaining unextracted material are set to zero.
+  /// @return a new material with quantity qty and composition c
   Ptr ExtractComp(double qty, Composition::Ptr c, double threshold = eps_rsrc());
 
   /// Combines material mat with this one.  mat's quantity becomes zero.
