@@ -24,9 +24,6 @@ class DieModel : public cyclus::FacilityModel {
   virtual ~DieModel() {};
 
   virtual void CloneModuleMembersFrom(FacilityModel* source) {};
-  virtual void Decommission() {
-    delete this;
-  }
 
   virtual void Tick(int time) {
     tickCount_++;

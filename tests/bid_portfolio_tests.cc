@@ -49,10 +49,7 @@ class BidPortfolioTests: public ::testing::Test {
     req2 = get_req(commod2);
   };
   
-  virtual void TearDown() {
-    delete fac1;
-    delete fac2;
-  };
+  virtual void TearDown() {};
   
 };
 

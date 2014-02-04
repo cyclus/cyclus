@@ -42,8 +42,6 @@ TEST(BidTests, MaterialGetSet) {
   EXPECT_EQ(fac, r->bidder());
   EXPECT_EQ(req, r->request());
   EXPECT_EQ(mat, r->offer());
-  
-  delete fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,6 +63,4 @@ TEST(BidTests, GenRsrcGetSet) {
   EXPECT_EQ(fac, r->bidder());
   EXPECT_EQ(req, r->request());
   EXPECT_EQ(rsrc, r->offer());
-  
-  delete fac;
 }

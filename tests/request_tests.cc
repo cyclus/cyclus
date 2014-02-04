@@ -42,7 +42,6 @@ TEST(RequestTests, MaterialGetSet) {
   EXPECT_EQ(mat, r->target());
   EXPECT_EQ(pref, r->preference());
   
-  delete fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -66,5 +65,4 @@ TEST(RequestTests, GenRsrcGetSet) {
   EXPECT_EQ(rsrc, r->target());
   EXPECT_EQ(pref, r->preference());
   
-  delete fac;
 }

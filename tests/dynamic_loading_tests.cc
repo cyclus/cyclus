@@ -34,28 +34,25 @@ TEST(DynamicLoadingTests, LoadLibError) {
 TEST(DynamicLoadingTests, ConstructTestFacility) {
   cyclus::Recorder rec;
   cyclus::Timer ti;
-  cyclus::Context ctx(&ti, &rec);
-  cyclus::DynamicModule* module = new DynamicModule("TestFacility");
+  cyclus::DynamicModule module("TestFacility");
+  cyclus::Context* ctx = new cyclus::Context(&ti, &rec);
   EXPECT_NO_THROW(
-                  Model* fac = module->ConstructInstance(&ctx);
-                  delete fac;
+                  Model* fac = module.ConstructInstance(ctx);
                   );
-  module->CloseLibrary();
-  delete module;
+  delete ctx;
+  module.CloseLibrary();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(DynamicLoadingTests, cloneTestFacility) {
   cyclus::Recorder rec;
   cyclus::Timer ti;
-  cyclus::Context ctx(&ti, &rec);
-  cyclus::DynamicModule* module = new DynamicModule("TestFacility");
+  cyclus::DynamicModule module("TestFacility");
+  cyclus::Context* ctx = new cyclus::Context(&ti, &rec);
   EXPECT_NO_THROW(
-                  Model* fac = module->ConstructInstance(&ctx);
+                  Model* fac = module.ConstructInstance(ctx);
                   Model* clone = fac->Clone();
-                  delete clone;
-                  delete fac;
                   );
-  module->CloseLibrary();
-  delete module;
+  delete ctx;
+  module.CloseLibrary();
 }

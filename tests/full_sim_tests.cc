@@ -29,8 +29,6 @@ TEST(FullSimTests, LoneTrader) {
   EXPECT_EQ(nsteps, trader->bids);
   EXPECT_EQ(0, trader->adjusts);
   EXPECT_EQ(0, trader->accept);
-  
-  delete trader;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,9 +61,6 @@ TEST(FullSimTests, NullTrade) {
   EXPECT_EQ(nsteps, requester->bids);
   EXPECT_EQ(0, requester->accept);
   EXPECT_EQ(0, requester->adjusts);
-  
-  delete supplier;
-  delete requester;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -114,9 +109,6 @@ TEST(FullSimTests, Trade) {
   EXPECT_EQ(requester->obs_trade, exp_trade);
   EXPECT_EQ(supplier->obs_trade, exp_trade);
   EXPECT_EQ(requester->mat, exp_mat);
-  
-  delete supplier;
-  delete requester;
 }
 
 }// namespace cyclus

@@ -140,12 +140,6 @@ class Model {
   virtual void Decommission();
 
   /**
-     sets the parent_ member
-     @param parent the model to set parent_ to
-   */
-  virtual void SetParent(Model* parent);
-
-  /**
      return the ith child
    */
   Model* children(int i) {

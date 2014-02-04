@@ -33,6 +33,7 @@ void Model::InitFrom(Model* m) {
   model_type_ = m->model_type_;
   model_impl_ = m->model_impl_;
   ctx_ = m->ctx_;
+  ctx_->model_list_.insert(this); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -60,6 +61,7 @@ Model::Model(Context* ctx)
     birthtime_(-1),
     deathtime_(-1),
     parent_(NULL) {
+  ctx_->model_list_.insert(this); 
   MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
 }
 
@@ -75,7 +77,9 @@ Model::~Model() {
     ->Record();
   }
   
+  std::cout << "destructing model\n";
   if (parent_ != NULL) {
+    std::cout << "removing child\n";
     parent_->RemoveChild(this);
   }
 
@@ -83,7 +87,7 @@ Model::~Model() {
   while (children_.size() > 0) {
     Model* child = children_.at(0);
     MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->id() << " {";
-    ctx_->KillModel(child);
+    ctx_->DelModel(child);
     MLOG(LEV_DEBUG4) << "}";
   }
   MLOG(LEV_DEBUG3) << "}";
@@ -110,34 +114,18 @@ void Model::Deploy(Model* parent) {
   CLOG(LEV_DEBUG3) << " * Implementation: " << ModelImpl();
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
-  if (parent == NULL) parent = this;
-  
-  // set model-specific members
-  parent_id_ = parent->id();
-  SetParent(parent);
-  if (parent != this) {
+  if (parent != NULL) {
+    parent_id_ = parent->id();
     parent->AddChild(this);
   }
   birthtime_ = ctx_->time();
-
-  // add model to the database
   this->AddToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Decommission() {
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
-  ctx_->KillModel(this);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::SetParent(Model* parent) {
-  if (parent == this) {
-    // root nodes are their own parent
-    parent_ = NULL; // parent pointer set to NULL for memory management
-  } else {
-    parent_ = parent;
-  }
+  ctx_->DelModel(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

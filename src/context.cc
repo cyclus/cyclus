@@ -1,9 +1,12 @@
+#include "context.h"
+
+#include <vector>
+
 #include "error.h"
 #include "exchange_solver.h"
 #include "logger.h"
 #include "timer.h"
 
-#include "context.h"
 
 namespace cyclus {
 
@@ -15,22 +18,18 @@ Context::~Context() {
 
   // initiate deletion of models that don't have parents.
   // dealloc will propogate through hierarchy as models delete their children
-  std::vector<Model*>::iterator it;
   std::vector<Model*> to_del;
+  std::set<Model*>::iterator it;
   for (it = model_list_.begin(); it != model_list_.end(); ++it) {
     if((*it)->parent() == NULL) to_del.push_back(*it);
   }
-  for (it = to_del.begin(); it != to_del.end(); ++it) {
-    KillModel(*it);
+  for (int i = 0; i < to_del.size(); ++i) {
+    DelModel(to_del[i]);
   }
 }
 
-void Context::KillModel(Model* m) {
-  std::vector<Model*>::iterator it;
-  it = find(model_list_.begin(), model_list_.end(), m);
-  if (it != model_list_.end()) {
-    model_list_.erase(it);
-  }
+void Context::DelModel(Model* m) {
+  model_list_.erase(m);
   delete m;
 }
 
@@ -40,7 +39,6 @@ boost::uuids::uuid Context::sim_id() {
 };
 
 void Context::AddPrototype(std::string name, Model* p) {
-  model_list_.push_back(p); 
   protos_[name] = p;
 }
 

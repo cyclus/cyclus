@@ -25,14 +25,20 @@ class TimeListener;
 /// composition recipes will need a context pointer. In general, all global
 /// state should be accessed through a simulation context.
 ///
-/// @warning the Context is responsible for deleting the solver it is given!
+/// @warning the context takes ownership of and manages the lifetime/destruction
+/// of all models constructed with it (including Cloned models).
+///
+/// @warning the context takes ownership of the solver and will manage its destruction.
 class Context {
  public:
+  friend class Model;
+
   /// Creates a new context working with the specified timer and datum manager.
   /// The timer does not have to be initialized (yet).
   Context(Timer* ti, Recorder* rec);
 
-  /// the Context is responsible for deleting its solver
+  /// Clean up resources including destructing the solver and all models the
+  /// context is aware of.
   ~Context();
 
   /// See Recorder::sim_id documentation.
@@ -52,7 +58,7 @@ class Context {
   }
 
   /// Destructs and cleans up m (and it's children recursively).
-  void KillModel(Model* m);
+  void DelModel(Model* m);
 
   /// @return the current set of facilities in the simulation
   inline const std::set<Trader*>& traders() const {
@@ -72,10 +78,9 @@ class Context {
     Model* clone = m->Clone();
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
-      delete clone;
+      DelModel(clone);
       throw CastError("Invalid cast for prototype " + proto_name);
     }
-    model_list_.push_back(clone);
     return casted;
   };
 
@@ -122,7 +127,7 @@ class Context {
   std::map<std::string, Model*> protos_;
   std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
-  std::vector<Model*> model_list_;
+  std::set<Model*> model_list_;
   
   Timer* ti_;
   ExchangeSolver* solver_;

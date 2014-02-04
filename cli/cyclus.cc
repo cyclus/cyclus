@@ -230,7 +230,7 @@ int main(int argc, char* argv[]) {
 
   delete ctx;
   rec.close();
-  //delete back;
+  delete back;
   delete loader;
 
   return 0;
