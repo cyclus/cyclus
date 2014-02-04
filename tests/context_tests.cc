@@ -19,22 +19,22 @@ class ContextTests: public ::testing::Test {
   Recorder rec;
   Context* ctx;
   MockFacility* fac;
-  
+
   virtual void SetUp() {
     ctx = new Context(&ti, &rec);
     fac = new MockFacility(ctx);
   };
-  
+
   virtual void TearDown() {
     delete ctx;
   };
-  
+
 };
 
 class DonutShop : public Model {
  public:
   DonutShop(Context* ctx, std::string dotd)
-      : Model(ctx), donut_of_the_day(dotd) { };
+    : Model(ctx), donut_of_the_day(dotd) { };
 
   virtual ~DonutShop() {
     destruct_count++;
@@ -62,32 +62,36 @@ TEST_F(ContextTests, traders) {
   EXPECT_EQ(*ctx->traders().begin(), exr);
   clone->Decommission();
   EXPECT_TRUE(ctx->traders().empty());
-}  
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ContextTests, CreateModel) {
   Timer ti;
   Recorder rec;
-  Context ctx(&ti, &rec);
+  Context* ctx = new Context(&ti, &rec);
 
-  Model* m1 = new DonutShop(&ctx, "old fashion");
-  ctx.AddPrototype("dunkin donuts", m1);
-  Model* m2 = new DonutShop(&ctx, "apple fritter");
-  ctx.AddPrototype("krispy kreme", m2);
-  Model* m3 = new DonutShop(&ctx, "raspberry filled");
-  ctx.AddPrototype("greenbush bakery", m3);
+  Model* m1 = new DonutShop(ctx, "old fashion");
+  ctx->AddPrototype("dunkin donuts", m1);
+  Model* m2 = new DonutShop(ctx, "apple fritter");
+  ctx->AddPrototype("krispy kreme", m2);
+  Model* m3 = new DonutShop(ctx, "raspberry filled");
+  ctx->AddPrototype("greenbush bakery", m3);
 
   DonutShop* d;
-  ASSERT_NO_THROW(d = ctx.CreateModel<DonutShop>("dunkin donuts"));
+  ASSERT_NO_THROW(d = ctx->CreateModel<DonutShop>("dunkin donuts"));
   EXPECT_EQ("old fashion", d->donut_of_the_day);
   EXPECT_NE(d, m1);
 
-  ASSERT_NO_THROW(d = ctx.CreateModel<DonutShop>("krispy kreme"));
+  ASSERT_NO_THROW(d = ctx->CreateModel<DonutShop>("krispy kreme"));
   EXPECT_EQ("apple fritter", d->donut_of_the_day);
   EXPECT_NE(d, m2);
 
-  ASSERT_THROW(ctx.CreateModel<cyclus::Context>("krispy kreme"), cyclus::CastError);
+  ASSERT_THROW(ctx->CreateModel<cyclus::Context>("krispy kreme"),
+               cyclus::CastError);
 
-  EXPECT_EQ(5, DonutShop::destruct_count);
-}  
+  delete ctx;
+
+  EXPECT_EQ(6, DonutShop::destruct_count);
+}
+
 

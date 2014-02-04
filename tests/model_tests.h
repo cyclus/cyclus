@@ -23,9 +23,7 @@ class ModelTests : public TestWithParam<ModelConstructor*> {
     virtual void SetUp() { 
       model_ = (*GetParam())(tc_.get());
     }
-    virtual void TearDown(){ 
-      delete model_;
-    }
+    virtual void TearDown(){}
 
   protected:
     cyclus::Model* model_;

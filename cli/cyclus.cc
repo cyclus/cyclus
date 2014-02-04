@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
       std::cout << "<element name=\"" << name << "\">\n";
       std::cout << m->schema();
       std::cout << "</element>\n";
-      delete m;
+      ctx->DelModel(m);
       dyn.CloseLibrary();
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";

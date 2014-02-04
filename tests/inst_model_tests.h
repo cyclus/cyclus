@@ -36,11 +36,7 @@ class InstModelTests : public TestWithParam<InstModelConstructor*> {
     test_region_ = new MockRegion(tc_.get());
     inst_model_->Deploy(test_region_);
   }
-  virtual void TearDown(){ 
-    delete inst_model_;
-    delete test_facility_;
-    delete test_region_;
-  }   
+  virtual void TearDown(){}   
 };
 
 #else

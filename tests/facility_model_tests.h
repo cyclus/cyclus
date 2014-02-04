@@ -27,9 +27,7 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
     facility_model_->Deploy(test_inst_);
   }
   
-  virtual void TearDown(){ 
-    delete test_inst_;
-  }
+  virtual void TearDown(){}
     
  protected:
   cyclus::FacilityModel* facility_model_;

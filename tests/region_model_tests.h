@@ -24,9 +24,7 @@ class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
     virtual void SetUp() { 
       region_model_ = (*GetParam())(tc_.get());
     }
-    virtual void TearDown(){ 
-      delete region_model_;
-    }
+    virtual void TearDown(){}
 
   protected:
     cyclus::TestContext tc_;

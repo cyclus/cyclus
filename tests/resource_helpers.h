@@ -28,15 +28,15 @@ static cyclus::Material::Ptr get_mat() {
 }
 
 static cyclus::TestContext helper_tc;
-static MockFacility trader(helper_tc.get());
+static MockFacility* trader = new MockFacility(helper_tc.get());
 
 static cyclus::Request<cyclus::Material>::Ptr get_req(std::string commod = "") {
-  return cyclus::Request<cyclus::Material>::Create(get_mat(), &trader, commod);
+  return cyclus::Request<cyclus::Material>::Create(get_mat(), trader, commod);
 }
 
 static cyclus::Bid<cyclus::Material>::Ptr get_bid() {
   return cyclus::Bid<cyclus::Material>::Ptr(
-      cyclus::Bid<cyclus::Material>::Create(get_req(), get_mat(), &trader));
+      cyclus::Bid<cyclus::Material>::Create(get_req(), get_mat(), trader));
 }
 
 struct TestConverter : public cyclus::Converter<cyclus::Material> {

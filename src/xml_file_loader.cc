@@ -56,7 +56,7 @@ std::string BuildMasterSchema(std::string schema_path) {
     subschemas[m->ModelType()] += "<element name=\"" + names[i] + "\">\n";
     subschemas[m->ModelType()] += m->schema() + "\n";
     subschemas[m->ModelType()] += "</element>\n";
-    delete m;
+    ctx.DelModel(m);
     dyn.CloseLibrary();
   }
 

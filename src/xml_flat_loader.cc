@@ -31,7 +31,7 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
     subschemas += "<element name=\"" + names[i] + "\">\n";
     subschemas += m->schema() + "\n";
     subschemas += "</element>\n";
-    delete m;
+    ctx.DelModel(m);
     dyn.CloseLibrary();
   }
 

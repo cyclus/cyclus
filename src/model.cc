@@ -77,10 +77,15 @@ Model::~Model() {
     ->Record();
   }
   
-  std::cout << "destructing model\n";
   if (parent_ != NULL) {
-    std::cout << "removing child\n";
-    parent_->RemoveChild(this);
+    CLOG(LEV_DEBUG2) << "Model '" << parent_->name() << "' ID=" << parent_->id()
+                     << " has removed child '" << name() << "' ID="
+                     << id() << " from its list of children.";
+    std::vector<Model*>::iterator it;
+    it = find(parent_->children_.begin(), parent_->children_.end(), this);
+    if (it != parent_->children_.end()) {
+      parent_->children_.erase(it);
+    }
   }
 
   // delete children
@@ -108,6 +113,10 @@ std::string Model::str() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Deploy(Model* parent) {
+  if (parent == this)
+    throw KeyError("Model " + name() +
+                   "is trying to add itself as its own child.");
+
   CLOG(LEV_DEBUG1) << "Model '" << name()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
@@ -115,8 +124,12 @@ void Model::Deploy(Model* parent) {
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
   if (parent != NULL) {
+    parent_ = parent;
     parent_id_ = parent->id();
-    parent->AddChild(this);
+    parent->children_.push_back(this);
+    CLOG(LEV_DEBUG2) << "Model '" << parent->name() << "' ID=" << parent->id()
+                     << " has added child '" << name() << "' ID="
+                     << id() << " to its list of children.";
   }
   birthtime_ = ctx_->time();
   this->AddToTable();
@@ -127,36 +140,6 @@ void Model::Decommission() {
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
   ctx_->DelModel(this);
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::AddChild(Model* child) {
-  if (child == this)
-    throw KeyError("Model " + name() +
-                   "is trying to add itself as its own child.");
-
-  if (!child)
-    throw ValueError("Model " + name() +
-                     "is trying to add an invalid model as its child.");
-
-
-  CLOG(LEV_DEBUG2) << "Model '" << name() << "' ID=" << id()
-                   << " has added child '" << child->name() << "' ID="
-                   << child->id() << " to its list of children.";
-
-  children_.push_back(child);
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::RemoveChild(Model* child) {
-  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->id()
-                   << " has removed child '" << child->name() << "' ID="
-                   << child->id() << " from its list of children.";
-  std::vector<Model*>::iterator it;
-  it = find(children_.begin(), children_.end(), child);
-  if (it != children_.end()) {
-    children_.erase(it);
-  }
-};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::PrintChildren() {

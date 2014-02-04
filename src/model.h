@@ -104,18 +104,6 @@ class Model {
   const std::string ModelImpl();
 
   /**
-     add a child to the list of children.
-
-     This does NOT set the specified child's parent to be this model.
-   */
-  void AddChild(Model* child);
-
-  /**
-     add a child to the list of children
-   */
-  void RemoveChild(Model* child);
-
-  /**
      recursively prints the parent-child tree
    */
   std::string PrintChildren();
