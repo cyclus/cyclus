@@ -60,7 +60,8 @@ Model::Model(Context* ctx)
     parent_id_(-1),
     birthtime_(-1),
     deathtime_(-1),
-    parent_(NULL) {
+    parent_(NULL),
+    model_impl_("UNSPECIFIED") {
   ctx_->model_list_.insert(this); 
   MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
 }

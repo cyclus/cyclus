@@ -55,12 +55,6 @@ class Model {
   virtual void InitFrom(QueryEngine* qe);
 
   /**
-     Initialize members related to derived module class
-     @param qe a pointer to a QueryEngine object containing initialization data
-   */
-  virtual void InitModuleMembers(QueryEngine* qe) {};
-
-  /**
      Constructor for the Model Class
 
      @warning all constructors must set id_ and increment next_id_

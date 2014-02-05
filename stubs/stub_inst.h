@@ -56,7 +56,12 @@ class StubInst : public cyclus::InstModel {
       
      @param qe is a QueryEngine object that contains intialization data
    */
-  virtual void InitModuleMembers(cyclus::QueryEngine* qe);
+  virtual void InitFrom(cyclus::QueryEngine* qe);
+
+  /**
+     Initialize members for a cloned module.
+   */
+  virtual void InitFrom(StubInst* m);
 
   /**
      Initializes a StubInst object by copying the members of another.

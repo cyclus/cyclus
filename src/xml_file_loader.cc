@@ -241,9 +241,8 @@ void XMLFileLoader::LoadInitialAgents() {
       std::string module_name = module_data->GetElementName();
 
       Model* model = modules_[module_name]->ConstructInstance(ctx_);
-      model->InitFrom(qe);
       model->SetModelImpl(module_name);
-      model->InitModuleMembers(module_data->QueryElement(module_name));
+      model->InitFrom(qe);
 
       CLOG(LEV_DEBUG3) << "Module '" << model->name()
                        << "' has had its module members initialized:";

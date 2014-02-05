@@ -56,8 +56,13 @@ class StubRegion : public cyclus::RegionModel {
 
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  virtual void InitModuleMembers(cyclus::QueryEngine* qe);
+  virtual void InitFrom(cyclus::QueryEngine* qe);
   
+  /**
+     Initialize members for a cloned module.
+   */
+  virtual void InitFrom(StubRegion* m);
+
   /**
      A verbose printer for the StubRegion
    */
