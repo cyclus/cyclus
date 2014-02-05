@@ -1,4 +1,7 @@
 // xml_query_engine_tests.h
+#ifndef CYCLUS_TESTS_XML_QUERY_ENGINE_TESTS_H_
+#define CYCLUS_TESTS_XML_QUERY_ENGINE_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include <string>
@@ -28,3 +31,5 @@ class XMLQueryEngineTest : public ::testing::Test {
   virtual void TearDown();
 
 }; 
+
+#endif  // CYCLUS_TESTS_XML_QUERY_ENGINE_TESTS_H_

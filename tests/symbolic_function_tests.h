@@ -1,4 +1,7 @@
 // symbolic_function_tests.h
+#ifndef CYCLUS_TESTS_SYMBOLIC_FUNCTION_TESTS_H_
+#define CYCLUS_TESTS_SYMBOLIC_FUNCTION_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include "symbolic_functions.h"
@@ -30,3 +33,5 @@ class SymbolicFunctionTests : public ::testing::Test
   double exp_value(double value);
   double piecewise_value(double value, int index);
 };
+
+#endif  // CYCLUS_TESTS_SYMBOLIC_FUNCTION_TESTS_H_

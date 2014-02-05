@@ -1,6 +1,6 @@
 // test_context.h
-#ifndef TEST_CONTEXT_H_
-#define TEST_CONTEXT_H_
+#ifndef CYCLUS_TESTS_TEST_CONTEXT_H_
+#define CYCLUS_TESTS_TEST_CONTEXT_H_
 
 #include "context.h"
 #include "recorder.h"
@@ -27,4 +27,5 @@ class TestContext {
   Context* ctx_;
 };
 } // namespace cyclus
-#endif
+
+#endif  // CYCLUS_TESTS_TEST_CONTEXT_H_

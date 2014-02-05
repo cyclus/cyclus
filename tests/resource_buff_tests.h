@@ -1,3 +1,5 @@
+#ifndef CYCLUS_TESTS_RESOURCE_BUFF_TESTS_H_
+#define CYCLUS_TESTS_RESOURCE_BUFF_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -59,3 +61,5 @@ class ResourceBuffTest : public ::testing::Test {
     }
   }
 };
+
+#endif  // CYCLUS_TESTS_RESOURCE_BUFF_TESTS_H_

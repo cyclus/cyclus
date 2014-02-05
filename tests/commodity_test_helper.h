@@ -1,5 +1,5 @@
-#ifndef COMMODITYTESTHELPER_H
-#define COMMODITYTESTHELPER_H
+#ifndef CYCLUS_TESTS_COMMODITY_TEST_HELPER_H_
+#define CYCLUS_TESTS_COMMODITY_TEST_HELPER_H_
 
 #include <string>
 #include "commodity.h"
@@ -43,4 +43,4 @@ class CommodityTestHelper {
   void SetUpProducerManager();
 };
 
-#endif
+#endif  // CYCLUS_TESTS_COMMODITY_TEST_HELPER_H_

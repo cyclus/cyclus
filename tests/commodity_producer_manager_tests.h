@@ -1,4 +1,7 @@
 // commodity_producer_manager_tests.h
+#ifndef CYCLUS_TESTS_COMMODITY_PRODUCER_MANAGER_TESTS_H_
+#define CYCLUS_TESTS_COMMODITY_PRODUCER_MANAGER_TESTS_H_
+
 #include <gtest/gtest.h>
 #include "commodity_test_helper.h"
 
@@ -20,3 +23,5 @@ class CommodityProducerManagerTests : public ::testing::Test {
   void RegisterProducer(cyclus::CommodityProducer* producer);
   void UnRegisterProducer(cyclus::CommodityProducer* producer);
 };
+
+#endif  // CYCLUS_TESTS_COMMODITY_PRODUCER_MANAGER_TESTS_H_

@@ -1,5 +1,5 @@
-#ifndef _CYCLUS_TESTS_MOCK_FACILITY_H_
-#define _CYCLUS_TESTS_MOCK_FACILITY_H_
+#ifndef CYCLUS_TESTS_MOCK_FACILITY_H_
+#define CYCLUS_TESTS_MOCK_FACILITY_H_
 
 #include "context.h"
 #include "facility_model.h"

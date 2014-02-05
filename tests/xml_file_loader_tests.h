@@ -1,4 +1,7 @@
 // xml_file_loader_tests.h
+#ifndef CYCLUS_TESTS_XML_FILE_LOADER_TESTS_H_
+#define CYCLUS_TESTS_XML_FILE_LOADER_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include <fstream>
@@ -43,4 +46,4 @@ class XMLFileLoaderTests : public ::testing::Test {
 
 };
 
-
+#endif  // CYCLUS_TESTS_XML_FILE_LOADER_TESTS_H_

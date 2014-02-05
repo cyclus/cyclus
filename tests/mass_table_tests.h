@@ -1,4 +1,7 @@
 // mass_table_tests.cc
+#ifndef CYCLUS_TESTS_MASS_TABLE_TESTS_H_
+#define CYCLUS_TESTS_MASS_TABLE_TESTS_H_
+
 #include <gtest/gtest.h>
 #include "mass_table.h"
 
@@ -21,3 +24,5 @@ class MassTableTest : public ::testing::Test {
     virtual void TearDown(){
     }
 };
+
+#endif  // CYCLUS_TESTS_MASS_TABLE_TESTS_H_

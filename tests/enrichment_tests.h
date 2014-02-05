@@ -1,4 +1,6 @@
-// building_manager_tests.h
+#ifndef CYCLUS_TESTS_ENRICHMENT_TESTS_H_
+#define CYCLUS_TESTS_ENRICHMENT_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include "enrichment.h"
@@ -18,3 +20,5 @@ class EnrichmentTests : public ::testing::Test
   virtual void TearDown();
   void SetEnrichmentParameters();
 };
+
+#endif  // CYCLUS_TESTS_ENRICHMENT_TESTS_H_
