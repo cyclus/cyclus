@@ -13,10 +13,10 @@ class ExchangeGraph;
 class ProgSolver: public ExchangeSolver {
  public:
   ProgSolver(bool exclusive_orders = false);
-  ProgSolver(ExchangeGraph* g, bool exclusive_orders = false);
   
   virtual ~ProgSolver();
 
+ protected:
   /// @brief the ProgSolver solves an ExchangeGraph...
   virtual void Solve();
 

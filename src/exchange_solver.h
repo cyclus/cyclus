@@ -10,18 +10,22 @@ class ExchangeGraph;
 /// @brief a very simple interface for solving translated resource exchanges
 class ExchangeSolver {
  public:
-  ExchangeSolver() {};
-  explicit ExchangeSolver(ExchangeGraph* g) : graph_(g) {};
+  explicit ExchangeSolver(bool exclusive_orders = false) {};
   virtual ~ExchangeSolver() {};
 
-  inline void graph(ExchangeGraph* graph) { graph_ = graph; }
-  inline const ExchangeGraph* graph() const { return graph_; }
-
-  /// @brief any solver must implement a Solve() function
-  virtual void Solve() = 0;
-
+  /// @brief interface for solving a given exchange graph
+  /// @param a pointer to the graph to be solved
+  void Solve(ExchangeGraph* graph) {
+    graph_ = graph;
+    this->Solve();
+  }
+  
  protected:
+  /// @brief Worker function for solving a graph. This must be implemented by
+  /// any solver.
+  virtual void Solve() = 0;
   ExchangeGraph* graph_;
+  bool exclusive_orders_;
 };
 
 } // namespace cyclus
