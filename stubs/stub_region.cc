@@ -23,7 +23,7 @@ void StubRegion::InitFrom(cyclus::QueryEngine* qe) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Model* StubRegion::Clone() {
-  StubRegion* m = new StubRegion(*this);
+  StubRegion* m = new StubRegion(context());
   m->InitFrom(this);
   return m;
 }

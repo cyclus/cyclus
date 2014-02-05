@@ -15,9 +15,13 @@ class MockFacility : public cyclus::FacilityModel {
   virtual ~MockFacility() {};
 
   virtual cyclus::Model* Clone() {
-    MockFacility* m = new MockFacility(*this);
+    MockFacility* m = new MockFacility(context());
     m->InitFrom(this);
     return m;
+  };
+
+  void InitFrom(MockFacility* m) {
+    cyclus::FacilityModel::InitFrom(m);
   };
 
   void CloneModuleMembersFrom(cyclus::FacilityModel* source) {};

@@ -39,17 +39,21 @@ class TestTrader : public MockFacility {
      accept(0) {};
 
   virtual Model* Clone() {
-    TestTrader* m = new TestTrader(*this);
+    TestTrader* m = new TestTrader(context());
     m->InitFrom(this);
-    m->adjusts = adjusts;
-    m->requests = requests;
-    m->bids = bids;
-    m->accept = accept;
-    m->offer = offer;
-    m->obj_fac = obj_fac;
-    m->is_requester = is_requester;
-    context()->RegisterTimeListener(m);
     return m;
+  }
+
+  void InitFrom(TestTrader* m) {
+    MockFacility::InitFrom(this);
+    adjusts = m->adjusts;
+    requests = m->requests;
+    bids = m->bids;
+    accept = m->accept;
+    offer = m->offer;
+    obj_fac = m->obj_fac;
+    is_requester = m->is_requester;
+    context()->RegisterTimeListener(this);
   };
 
   virtual std::set<RequestPortfolio<Material>::Ptr>
