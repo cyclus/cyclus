@@ -1,4 +1,6 @@
 // material_tests.h
+#ifndef CYCLUS_TESTS_MATERIAL_TESTS_H_
+#define CYCLUS_TESTS_MATERIAL_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -54,3 +56,5 @@ class MaterialTest : public ::testing::Test {
 
   virtual void TearDown() {}
 };
+
+#endif  // CYCLUS_TESTS_MATERIAL_TESTS_H_

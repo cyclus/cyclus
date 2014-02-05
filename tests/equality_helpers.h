@@ -54,4 +54,4 @@ inline bool RPEq(const cyclus::RequestPortfolio<T>& lhs,
            lhs.requester() == rhs.requester());
 };
 
-#endif // CYCLUS_TESTS_EQUALITY_HELPERS_H_
+#endif  // CYCLUS_TESTS_EQUALITY_HELPERS_H_

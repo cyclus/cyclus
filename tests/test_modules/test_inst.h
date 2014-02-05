@@ -1,5 +1,5 @@
-#if !defined _TESTINST_H_
-#define _TESTINST_H_
+#ifndef CYCLUS_TESTS_TEST_MODULES_TEST_INST_H_
+#define CYCLUS_TESTS_TEST_MODULES_TEST_INST_H_
 
 #include "inst_model.h"
 
@@ -26,4 +26,4 @@ class TestInst: public cyclus::InstModel {
   }
 };
 
-#endif
+#endif  // CYCLUS_TESTS_TEST_MODULES_TEST_INST_H_

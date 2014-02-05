@@ -1,4 +1,7 @@
 // building_manager_tests.h
+#ifndef CYCLUS_TESTS_BUILDING_MANAGER_TESTS_H_
+#define CYCLUS_TESTS_BUILDING_MANAGER_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include "building_manager.h"
@@ -19,3 +22,5 @@ class BuildingManagerTests : public ::testing::Test {
   virtual void TearDown();
   void SetUpProblem();
 };
+
+#endif  // CYCLUS_TESTS_BUILDING_MANAGER_TESTS_H_

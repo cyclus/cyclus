@@ -1,5 +1,5 @@
-#if !defined TEST_REGION_H_
-#define TEST_REGION_H_
+#ifndef CYCLUS_TESTS_TEST_MODULES_TEST_REGION_H_
+#define CYCLUS_TESTS_TEST_MODULES_TEST_REGION_H_
 
 #include "region_model.h"
 
@@ -14,4 +14,4 @@ class TestRegion: public cyclus::RegionModel {
   virtual cyclus::Model* Clone() {return new TestRegion(context());};
 };
 
-#endif
+#endif  // CYCLUS_TESTS_TEST_MODULES_TEST_REGION_H_

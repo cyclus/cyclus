@@ -1,5 +1,5 @@
-#if !defined _TESTFACILITY_H_
-#define _TESTFACILITY_H_
+#ifndef CYCLUS_TESTS_TEST_MODULES_TEST_FACILITY_H_
+#define CYCLUS_TESTS_TEST_MODULES_TEST_FACILITY_H_
 
 #include "facility_model.h"
 #include "material.h"
@@ -19,4 +19,4 @@ class TestFacility: public cyclus::FacilityModel {
   void Tock(int time) {};
 };
 
-#endif
+#endif  // CYCLUS_TESTS_TEST_MODULES_TEST_FACILITY_H_

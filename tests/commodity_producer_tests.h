@@ -1,4 +1,7 @@
 // commodity_producer_tests.h
+#ifndef CYCLUS_TESTS_COMMODITY_PRODUCER_TESTS_H_
+#define CYCLUS_TESTS_COMMODITY_PRODUCER_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include "commodity_producer.h"
@@ -21,3 +24,5 @@ class CommodityProducerTests : public ::testing::Test {
   void SetCapacity();
   void SetCost();
 };
+
+#endif  // CYCLUS_TESTS_COMMODITY_PRODUCER_TESTS_H_

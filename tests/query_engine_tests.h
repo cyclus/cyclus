@@ -1,4 +1,7 @@
 // query_engine_tests.h
+#ifndef CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_
+#define CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include "query_engine.h"
@@ -80,3 +83,5 @@ class QueryEngineTests  : public ::testing::Test {
 
 
 };
+
+#endif  // CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_

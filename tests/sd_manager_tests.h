@@ -1,3 +1,6 @@
+#ifndef CYCLUS_TESTS_SD_MANAGER_TESTS_H_
+#define CYCLUS_TESTS_SD_MANAGER_TESTS_H_
+
 // sd_manager_tests.h
 #include <gtest/gtest.h>
 #include "commodity_test_helper.h"
@@ -15,3 +18,5 @@ class SDManagerTests : public ::testing::Test {
   virtual void SetUp();  
   virtual void TearDown();
 };
+
+#endif  // CYCLUS_TESTS_SD_MANAGER_TESTS_H_

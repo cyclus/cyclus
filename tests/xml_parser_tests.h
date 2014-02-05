@@ -1,4 +1,7 @@
 // xml_parser_tests.h
+#ifndef CYCLUS_TESTS_XML_PARSER_TESTS_H_
+#define CYCLUS_TESTS_XML_PARSER_TESTS_H_
+
 #include <gtest/gtest.h>
 
 #include "xml_parser.h"
@@ -17,3 +20,5 @@ class XMLParserTests : public ::testing::Test {
   virtual void SetUp();
   virtual void TearDown();
 };
+
+#endif  // CYCLUS_TESTS_XML_PARSER_TESTS_H_
