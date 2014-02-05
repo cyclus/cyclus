@@ -254,7 +254,7 @@ void XMLFileLoader::LoadInitialAgents() {
       // register module
       ctx_->AddPrototype(model->name(), model);
       if (*it == "Region") {
-        model->Deploy(model);
+        model->Deploy();
       }
     }
   }

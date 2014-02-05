@@ -29,8 +29,10 @@ Context::~Context() {
 }
 
 void Context::DelModel(Model* m) {
-  model_list_.erase(m);
-  delete m;
+  int n = model_list_.erase(m);
+  if (n == 1) {
+    delete m;
+  }
 }
 
 

@@ -68,6 +68,7 @@ Model::Model(Context* ctx)
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << id_ << " {";
+  context()->model_list_.erase(this);
   // set died on date and record it in the table if it was ever deployed
   if (birthtime_ > -1) {
     deathtime_ = ctx_->time();
