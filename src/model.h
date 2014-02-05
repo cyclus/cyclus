@@ -52,7 +52,7 @@ class Model {
      Initialize members related to core classes
      @param qe a pointer to a QueryEngine object containing initialization data
    */
-  virtual void InitCoreMembers(QueryEngine* qe);
+  virtual void InitFrom(QueryEngine* qe);
 
   /**
      Initialize members related to derived module class

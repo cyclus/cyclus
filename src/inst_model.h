@@ -68,7 +68,7 @@ class InstModel : public TimeListener {
 
      @param qe a pointer to a QueryEngine object containing intialization data
    */
-  virtual void InitCoreMembers(QueryEngine* qe);
+  virtual void InitFrom(QueryEngine* qe);
 
   /**
      every model should be able to print a verbose description

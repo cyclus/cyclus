@@ -28,8 +28,8 @@ void InstModel::InitFrom(InstModel* m) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::InitCoreMembers(QueryEngine* qe) {
-  Model::InitCoreMembers(qe);
+void InstModel::InitFrom(QueryEngine* qe) {
+  Model::InitFrom(qe);
 
   std::string name, query;
   int nEntries;

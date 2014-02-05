@@ -28,8 +28,8 @@ RegionModel::RegionModel(Context* ctx) : TimeListener(ctx), Model(ctx) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::InitCoreMembers(QueryEngine* qe) {
-  Model::InitCoreMembers(qe); // name_
+void RegionModel::InitFrom(QueryEngine* qe) {
+  Model::InitFrom(qe); // name_
   RegionModel::InitAllowedFacilities(qe); // allowedFacilities_
   RegionModel::InitInstitutionNames(qe); // inst_names_
 }

@@ -47,7 +47,7 @@ std::string Model::InformErrorMsg(std::string msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::InitCoreMembers(QueryEngine* qe) {
+void Model::InitFrom(QueryEngine* qe) {
   name_ = qe->GetElementContent("name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
 }
