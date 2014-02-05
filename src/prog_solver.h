@@ -12,16 +12,12 @@ class ExchangeGraph;
 /// programming solution to a resource exchange graph.
 class ProgSolver: public ExchangeSolver {
  public:
-  ProgSolver(bool exclusive_orders = false);
-  
+  ProgSolver(bool exclusive_orders = false); 
   virtual ~ProgSolver();
 
  protected:
   /// @brief the ProgSolver solves an ExchangeGraph...
   virtual void Solve();
-
- private:
-  bool exclusive_orders_;
 };
 
 } // namespace cyclus
