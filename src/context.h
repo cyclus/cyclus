@@ -26,9 +26,10 @@ class TimeListener;
 /// state should be accessed through a simulation context.
 ///
 /// @warning the context takes ownership of and manages the lifetime/destruction
-/// of all models constructed with it (including Cloned models).
-///
-/// @warning the context takes ownership of the solver and will manage its destruction.
+/// of all models constructed with it (including Cloned models). Models should
+/// generally NEVER be allocated on the stack.
+/// @warning the context takes ownership of the solver and will manage its
+/// destruction.
 class Context {
  public:
   friend class Model;
