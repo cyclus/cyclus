@@ -98,6 +98,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/solver.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/supply_demand_manager.cc
@@ -172,6 +173,7 @@ INSTALL(FILES
   resource_exchange.h
   solver.h
   solver_interface.h
+  solver_factory.h
   sqlite_back.h
   sqlite_db.h
   suffix.h

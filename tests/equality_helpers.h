@@ -1,6 +1,8 @@
 #ifndef CYCLUS_TESTS_EQUALITY_HELPERS_H_
 #define CYCLUS_TESTS_EQUALITY_HELPERS_H_
 
+#include <gtest/gtest.h>
+
 #include "bid_portfolio.h" 
 #include "request_portfolio.h" 
 
@@ -53,5 +55,36 @@ inline bool RPEq(const cyclus::RequestPortfolio<T>& lhs,
            lhs.qty() == rhs.qty() &&
            lhs.requester() == rhs.requester());
 };
+
+// -----------
+// Copied mostly from:
+// http://stackoverflow.com/questions/1460703/comparison-of-arrays-in-google-test
+template <class T>
+void array_eq(const T* const expected, const T* const actual,
+              unsigned long length) {
+  for (unsigned long index = 0; index < length; index++) {
+    T exp = expected[index];
+    T act = actual[index];
+    EXPECT_EQ(exp, act) << "arrays differ at index "
+                        << index << "\n"
+                        << " exp: " << exp << "\n"
+                        << " act: " << act << "\n";
+  }
+}
+
+template <class T>
+void array_double_eq(const T* const expected, const T* const actual,
+                     unsigned long length) {
+  for (unsigned long index = 0; index < length; index++) {
+    T exp = expected[index];
+    T act = actual[index];
+    EXPECT_DOUBLE_EQ(exp, act) << "arrays differ at index "
+                               << index << "\n"
+                               << " exp: " << exp << "\n"
+                               << " act: " << act << "\n";
+  }
+}
+
+// -----------
 
 #endif  // CYCLUS_TESTS_EQUALITY_HELPERS_H_
