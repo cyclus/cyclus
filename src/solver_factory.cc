@@ -9,5 +9,5 @@ OsiSolverInterface* SolverFactory::get() {
     return new OsiClpSolverInterface();
   // } else if (t_ == "cbc") {
   //   return new OsiCbcSolverInterface();
-  }
+  // }
 }
