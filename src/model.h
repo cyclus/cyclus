@@ -208,7 +208,8 @@ class Model {
   /// adds model-specific information prefix to an error message
   virtual std::string InformErrorMsg(std::string msg);
   
-  /// describes the model subclass (e.g. Region, Inst, etc.)
+  /// describes the model subclass (e.g. Region, Inst, etc.). The in-core
+  /// subclasses must set this variable in their constructor(s).
   std::string model_type_;
 
  private:
