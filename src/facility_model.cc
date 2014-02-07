@@ -21,15 +21,15 @@ FacilityModel::FacilityModel(Context* ctx)
       Trader(ctx),
       Model(ctx),
       fac_lifetime_(std::numeric_limits<int>::max()) {
-  SetModelType("Facility");
+  model_type_ = "Facility";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::~FacilityModel() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::InitCoreMembers(QueryEngine* qe) {
-  Model::InitCoreMembers(qe);
+void FacilityModel::InitFrom(QueryEngine* qe) {
+  Model::InitFrom(qe);
 
   // get lifetime
   int lifetime =

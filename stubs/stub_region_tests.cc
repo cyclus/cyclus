@@ -17,16 +17,13 @@ class StubRegionTest : public ::testing::Test {
       src_region_ = new StubRegion(tc_.get());
     };
 
-    virtual void TearDown() {
-      delete src_region_;
-    }
+    virtual void TearDown() {}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubRegionTest, clone) {
   StubRegion* cloned_fac =
       dynamic_cast<StubRegion*> (src_region_->Clone());
-  delete cloned_fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

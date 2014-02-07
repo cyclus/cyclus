@@ -18,21 +18,13 @@ namespace cyclus {
 int Model::next_id_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::set<std::string> Model::dynamic_module_types() {
-  std::set<std::string> types;
-  types.insert("Region");
-  types.insert("Inst");
-  types.insert("Facility");
-  return types;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::InitFrom(Model* m) {
   id_ = next_id_++;
   name_ = m->name_;
   model_type_ = m->model_type_;
   model_impl_ = m->model_impl_;
   ctx_ = m->ctx_;
+  ctx_->model_list_.insert(this); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,7 +38,7 @@ std::string Model::InformErrorMsg(std::string msg) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::InitCoreMembers(QueryEngine* qe) {
+void Model::InitFrom(QueryEngine* qe) {
   name_ = qe->GetElementContent("name");
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
 }
@@ -59,14 +51,16 @@ Model::Model(Context* ctx)
     parent_id_(-1),
     birthtime_(-1),
     deathtime_(-1),
-    parent_(NULL) {
+    parent_(NULL),
+    model_impl_("UNSPECIFIED") {
+  ctx_->model_list_.insert(this); 
   MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
-  ctx_->AddModel(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << id_ << " {";
+  context()->model_list_.erase(this);
   // set died on date and record it in the table if it was ever deployed
   if (birthtime_ > -1) {
     deathtime_ = ctx_->time();
@@ -76,35 +70,31 @@ Model::~Model() {
     ->Record();
   }
   
-  // remove references to self
-  RemoveFromList(this, ctx_->model_list());
-
   if (parent_ != NULL) {
-    parent_->RemoveChild(this);
+    CLOG(LEV_DEBUG2) << "Model '" << parent_->name() << "' ID=" << parent_->id()
+                     << " has removed child '" << name() << "' ID="
+                     << id() << " from its list of children.";
+    std::vector<Model*>::iterator it;
+    it = find(parent_->children_.begin(), parent_->children_.end(), this);
+    if (it != parent_->children_.end()) {
+      parent_->children_.erase(it);
+    }
   }
 
   // delete children
   while (children_.size() > 0) {
     Model* child = children_.at(0);
     MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->id() << " {";
-    delete child;
+    ctx_->DelModel(child);
     MLOG(LEV_DEBUG4) << "}";
   }
   MLOG(LEV_DEBUG3) << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::RemoveFromList(Model* model, std::vector<Model*>& mlist) {
-  std::vector<Model*>::iterator it = find(mlist.begin(), mlist.end(), model);
-  if (it != mlist.end()) {
-    mlist.erase(it);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::str() {
   std::stringstream ss;
-  ss << model_type_ << "_" << name_
+  ss << model_type() << "_" << name_
      << " ( "
      << "ID=" << id_
      << ", implementation=" << model_impl_
@@ -116,67 +106,33 @@ std::string Model::str() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Deploy(Model* parent) {
+  if (parent == this)
+    throw KeyError("Model " + name() +
+                   "is trying to add itself as its own child.");
+
   CLOG(LEV_DEBUG1) << "Model '" << name()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
   CLOG(LEV_DEBUG3) << " * Implementation: " << ModelImpl();
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
-  if (parent == NULL) parent = this;
-  
-  // set model-specific members
-  parent_id_ = parent->id();
-  SetParent(parent);
-  if (parent != this) {
-    parent->AddChild(this);
+  if (parent != NULL) {
+    parent_ = parent;
+    parent_id_ = parent->id();
+    parent->children_.push_back(this);
+    CLOG(LEV_DEBUG2) << "Model '" << parent->name() << "' ID=" << parent->id()
+                     << " has added child '" << name() << "' ID="
+                     << id() << " to its list of children.";
   }
   birthtime_ = ctx_->time();
-
-  // add model to the database
   this->AddToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Decommission() {
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
-  delete this;
+  ctx_->DelModel(this);
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::SetParent(Model* parent) {
-  if (parent == this) {
-    // root nodes are their own parent
-    parent_ = NULL; // parent pointer set to NULL for memory management
-  } else {
-    parent_ = parent;
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::AddChild(Model* child) {
-  if (child == this)
-    throw KeyError("Model " + name() +
-                   "is trying to add itself as its own child.");
-
-  if (!child)
-    throw ValueError("Model " + name() +
-                     "is trying to add an invalid model as its child.");
-
-
-  CLOG(LEV_DEBUG2) << "Model '" << name() << "' ID=" << id()
-                   << " has added child '" << child->name() << "' ID="
-                   << child->id() << " to its list of children.";
-
-  children_.push_back(child);
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::RemoveChild(Model* child) {
-  CLOG(LEV_DEBUG2) << "Model '" << this->name() << "' ID=" << this->id()
-                   << " has removed child '" << child->name() << "' ID="
-                   << child->id() << " from its list of children.";
-  RemoveFromList(child, children_);
-};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::PrintChildren() {
@@ -217,10 +173,10 @@ const std::string Model::ModelImpl() {
 void Model::AddToTable() {
   ctx_->NewDatum("Agents")
   ->AddVal("ID", id())
-  ->AddVal("AgentType", ModelType())
+  ->AddVal("AgentType", model_type())
   ->AddVal("ModelType", ModelImpl())
   ->AddVal("Prototype", name())
-  ->AddVal("ParentID", parent_id())
+  ->AddVal("ParentID", parent_id_)
   ->AddVal("EnterDate", birthtime())
   ->Record();
 }

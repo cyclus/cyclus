@@ -125,7 +125,7 @@ TEST(ExXlateTests, XlateReq) {
   std::string commod = "commod";
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>::Ptr req =
-      rp->AddRequest(get_mat(u235, qty), &trader, commod);
+      rp->AddRequest(get_mat(u235, qty), trader, commod);
   rp->AddConstraint(cc1);
   rp->AddConstraint(cc2);
 
@@ -147,7 +147,7 @@ TEST(ExXlateTests, XlateReq) {
 TEST(ExXlateTests, XlateBid) {
   std::string commod = "commod";
   Request<Material>::Ptr req =
-      Request<Material>::Create(get_mat(u235, qty), &trader, commod);
+      Request<Material>::Create(get_mat(u235, qty), trader, commod);
   
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
@@ -161,7 +161,7 @@ TEST(ExXlateTests, XlateBid) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
   
   BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid = port->AddBid(req, get_mat(u235, qty), &trader);
+  Bid<Material>::Ptr bid = port->AddBid(req, get_mat(u235, qty), trader);
   port->AddConstraint(cc1);
   port->AddConstraint(cc2);
 
@@ -195,11 +195,11 @@ TEST(ExXlateTests, XlateArc) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader);
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), trader);
   rport->AddConstraint(cc1);
   
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid = bport->AddBid(req, get_mat(u235, qty), &trader);
+  Bid<Material>::Ptr bid = bport->AddBid(req, get_mat(u235, qty), trader);
   bport->AddConstraint(cc1);
   bport->AddConstraint(cc2);
     
@@ -232,13 +232,13 @@ TEST(ExXlateTests, XlateArcReqExclusive) {
   bool exclusive = true;
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader,
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), trader,
                                                  "", 0, exclusive);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty  + 1), &trader);
-  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty - 1), &trader);
-  Bid<Material>::Ptr bid3 = bport->AddBid(req, get_mat(u235, qty), &trader);
+  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty  + 1), trader);
+  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty - 1), trader);
+  Bid<Material>::Ptr bid3 = bport->AddBid(req, get_mat(u235, qty), trader);
   
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
@@ -263,14 +263,14 @@ TEST(ExXlateTests, XlateArcBidExclusive) {
   bool exclusive = true;
   
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader);
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), trader);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty - 1), &trader,
+  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty - 1), trader,
                                          exclusive);
-  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty + 1), &trader,
+  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty + 1), trader,
                                           exclusive);
-  Bid<Material>::Ptr bid3 = bport->AddBid(req, get_mat(u235, qty), &trader,
+  Bid<Material>::Ptr bid3 = bport->AddBid(req, get_mat(u235, qty), trader,
                                           exclusive);
     
   ExchangeContext<Material> ctx;
@@ -296,13 +296,13 @@ TEST(ExXlateTests, XlateArcBothExclusive) {
   bool exclusive = true;
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), &trader,
+  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), trader,
                                                  "", 0, exclusive);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty), &trader,
+  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty), trader,
                                           exclusive);
-  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty - 1), &trader,
+  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty - 1), trader,
                                           exclusive);
     
   ExchangeContext<Material> ctx;
@@ -326,10 +326,10 @@ TEST(ExXlateTests, SimpleXlate) {
   double pref = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
   Request<Material>::Ptr req =
-      rport->AddRequest(get_mat(u235, qty), &trader, commod, pref);
+      rport->AddRequest(get_mat(u235, qty), trader, commod, pref);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  bport->AddBid(req, get_mat(u235, qty), &trader);
+  bport->AddBid(req, get_mat(u235, qty), trader);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rport);

@@ -12,7 +12,10 @@ StubFacility::StubFacility(cyclus::Context* ctx)
 StubFacility::~StubFacility() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubFacility::InitModuleMembers(cyclus::QueryEngine* qe) {
+void StubFacility::InitFrom(cyclus::QueryEngine* qe) {
+  cyclus::FacilityModel::InitFrom(qe);
+  qe = qe->QueryElement(ModelImpl());
+  
   cyclus::QueryEngine* input = qe->QueryElement("input");
   //retrieve input data members here. For example :  
   //string query = "incommodity";
@@ -21,15 +24,15 @@ void StubFacility::InitModuleMembers(cyclus::QueryEngine* qe) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Model* StubFacility::Clone() {
-  StubFacility* m = new StubFacility(*this);
-
-  // required to copy parent class members
+  StubFacility* m = new StubFacility(context());
   m->InitFrom(this);
-
-  // clone specific members for your module, e.g.
-  // m->SetSomeMember(someMember());
-
   return m;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StubFacility::InitFrom(StubFacility* m) {
+  cyclus::FacilityModel::InitFrom(m);
+  // Initialize stubfacility members for a cloned module here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

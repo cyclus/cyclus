@@ -81,7 +81,7 @@ class RegionModel : public TimeListener {
 
      @param qe A pointer to a QueryEngine object containing initialization data
    */
-  virtual void InitCoreMembers(QueryEngine* qe);
+  virtual void InitFrom(QueryEngine* qe);
 
   /**
      perform actions required when entering the simulation

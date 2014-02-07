@@ -19,16 +19,13 @@ class StubInstTest : public ::testing::Test {
       src_inst_ = new StubInst(tc_.get());
     };
 
-    virtual void TearDown() {
-      delete src_inst_;
-    }
+    virtual void TearDown() {}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubInstTest, clone) {
   StubInst* cloned_fac =
       dynamic_cast<StubInst*> (src_inst_->Clone());
-  delete cloned_fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

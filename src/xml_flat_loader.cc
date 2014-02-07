@@ -31,7 +31,7 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
     subschemas += "<element name=\"" + names[i] + "\">\n";
     subschemas += m->schema() + "\n";
     subschemas += "</element>\n";
-    delete m;
+    ctx.DelModel(m);
     dyn.CloseLibrary();
   }
 
@@ -61,13 +61,12 @@ void XMLFlatLoader::LoadInitialAgents() {
     std::string module_name = module_data->GetElementName();
 
     Model* model = modules_[module_name]->ConstructInstance(ctx_);
-    model->InitCoreMembers(qe);
     model->SetModelImpl(module_name);
-    model->InitModuleMembers(module_data->QueryElement(module_name));
+    model->InitFrom(qe);
 
     CLOG(LEV_DEBUG3) << "Module '" << model->name()
                      << "' has had its module members initialized:";
-    CLOG(LEV_DEBUG3) << " * Type: " << model->ModelType();
+    CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
     CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
     CLOG(LEV_DEBUG3) << " * ID: " << model->id();
 

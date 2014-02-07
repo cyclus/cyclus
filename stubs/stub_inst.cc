@@ -12,7 +12,10 @@ StubInst::StubInst(cyclus::Context* ctx)
 StubInst::~StubInst() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubInst::InitModuleMembers(cyclus::QueryEngine* qe) {
+void StubInst::InitFrom(cyclus::QueryEngine* qe) {
+  cyclus::InstModel::InitFrom(qe);
+  qe = qe->QueryElement(ModelImpl());
+  
   //retrieve input data members here. For example :  
   //string query = "incommodity";
   //incommodity_ = lexical_cast<double>(qe->getElementContent(query));
@@ -20,15 +23,15 @@ void StubInst::InitModuleMembers(cyclus::QueryEngine* qe) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Model* StubInst::Clone() {
-  StubInst* m = new StubInst(*this);
-
-  // required to copy parent class members
+  StubInst* m = new StubInst(context());
   m->InitFrom(this);
-
-  // clone specific members for your module, e.g.
-  // m->SetSomeMember(someMember());
-
   return m;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+void StubInst::InitFrom(StubInst* m) {
+  cyclus::InstModel::InitFrom(m);
+  // Initialize stubinst members for a cloned module here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    

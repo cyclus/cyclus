@@ -16,20 +16,15 @@ class StubFacilityTest : public ::testing::Test {
 
   virtual void SetUp(){
     src_facility_ = new StubFacility(tc_.get());
-    // for facilities that trade commodities, create appropriate markets here
   };
   
-  virtual void TearDown() {
-    delete src_facility_;
-    // for facilities that trade commodities, delete appropriate markets here
-  }
+  virtual void TearDown() {}
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, clone) {
   StubFacility* cloned_fac =
       dynamic_cast<StubFacility*> (src_facility_->Clone());
-  delete cloned_fac;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

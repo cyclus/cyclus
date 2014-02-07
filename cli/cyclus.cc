@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
   // setup context
   Recorder rec;
   Timer ti;
-  Context ctx(&ti, &rec);
+  Context* ctx = new Context(&ti, &rec);
 
   std::string schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
   bool flat_schema = false;
@@ -116,11 +116,11 @@ int main(int argc, char* argv[]) {
     std::string name(vm["module-schema"].as<std::string>());
     try {
       DynamicModule dyn(name);
-      Model* m = dyn.ConstructInstance(&ctx);
+      Model* m = dyn.ConstructInstance(ctx);
       std::cout << "<element name=\"" << name << "\">\n";
       std::cout << m->schema();
       std::cout << "</element>\n";
-      delete m;
+      ctx->DelModel(m);
       dyn.CloseLibrary();
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
@@ -173,9 +173,9 @@ int main(int argc, char* argv[]) {
   XMLFileLoader* loader;
   try {
     if (flat_schema) {
-      loader = new XMLFlatLoader(&ctx, schema_path, inputFile);
+      loader = new XMLFlatLoader(ctx, schema_path, inputFile);
     } else {
-      loader = new XMLFileLoader(&ctx, schema_path, inputFile);
+      loader = new XMLFileLoader(ctx, schema_path, inputFile);
     }
     loader->LoadSim();
   } catch (Error e) {
@@ -205,21 +205,8 @@ int main(int argc, char* argv[]) {
   }
   rec.RegisterBackend(back);
 
-  // print the model list
-  const std::vector<Model*>& models = ctx.model_list();
-  CLOG(LEV_INFO1) << "There are " << models.size() << " models.";
-  CLOG(LEV_INFO3) << "Model list {";
-  for (int i = 0; i < models.size(); i++) {
-    CLOG(LEV_INFO3) << models.at(i)->str();
-  }
-  CLOG(LEV_INFO3) << "}";
-
   // Run the simulation
-  ti.RunSim(&ctx);
-
-  rec.close();
-  delete back;
-  delete loader;
+  ti.RunSim(ctx);
 
   if (!success) {
     std::cout << std::endl;
@@ -238,8 +225,14 @@ int main(int argc, char* argv[]) {
   std::cout << "|--------------------------------------------|" << std::endl;
   std::cout << "Output location: " << output_path << std::endl;
   std::cout << "Simulation ID: " << boost::lexical_cast<std::string>
-            (ctx.sim_id()) << std::endl;
+            (ctx->sim_id()) << std::endl;
   std::cout << std::endl;
+
+  delete ctx;
+  rec.close();
+  delete back;
+  delete loader;
+
   return 0;
 }
 

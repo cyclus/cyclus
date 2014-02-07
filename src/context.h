@@ -25,14 +25,21 @@ class TimeListener;
 /// composition recipes will need a context pointer. In general, all global
 /// state should be accessed through a simulation context.
 ///
-/// @warning the Context is responsible for deleting the solver it is given!
+/// @warning the context takes ownership of and manages the lifetime/destruction
+/// of all models constructed with it (including Cloned models). Models should
+/// generally NEVER be allocated on the stack.
+/// @warning the context takes ownership of the solver and will manage its
+/// destruction.
 class Context {
  public:
+  friend class Model;
+
   /// Creates a new context working with the specified timer and datum manager.
   /// The timer does not have to be initialized (yet).
   Context(Timer* ti, Recorder* rec);
 
-  /// the Context is responsible for deleting its solver
+  /// Clean up resources including destructing the solver and all models the
+  /// context is aware of.
   ~Context();
 
   /// See Recorder::sim_id documentation.
@@ -40,21 +47,6 @@ class Context {
 
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Model* m);
-
-  /// Adds a model to a simulation-wide accessible list.
-  inline void AddModel(Model* m) { model_list_.push_back(m); }
-  
-  /**
-     returns a model given the prototype's name
-
-     @param name name of the prototype as defined in the input file
-     @throws KeyError if name is not found
-   */
-  Model* GetModelByName(std::string name);
-  
-  /// Access the simulation-wide model list.
-  inline const std::vector<Model*>& model_list() const { return model_list_; }
-  inline std::vector<Model*>& model_list() { return model_list_; }
 
   /// Registers an agent as a participant in resource exchanges
   inline void RegisterTrader(Trader* e) {
@@ -65,6 +57,9 @@ class Context {
   inline void UnregisterTrader(Trader* e) {
     traders_.erase(e);
   }
+
+  /// Destructs and cleans up m (and it's children recursively).
+  void DelModel(Model* m);
 
   /// @return the current set of facilities in the simulation
   inline const std::set<Trader*>& traders() const {
@@ -84,7 +79,7 @@ class Context {
     Model* clone = m->Clone();
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
-      delete clone;
+      DelModel(clone);
       throw CastError("Invalid cast for prototype " + proto_name);
     }
     return casted;
@@ -133,7 +128,7 @@ class Context {
   std::map<std::string, Model*> protos_;
   std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
-  std::vector<Model*> model_list_;
+  std::set<Model*> model_list_;
   
   Timer* ti_;
   ExchangeSolver* solver_;

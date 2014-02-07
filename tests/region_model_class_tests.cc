@@ -35,7 +35,7 @@ class DieInst : public cyclus::InstModel {
     totalTicks++;
 
     if (tickDie_) {
-      delete this;
+      context()->DelModel(this);
     }
   }
 
@@ -44,7 +44,7 @@ class DieInst : public cyclus::InstModel {
     totalTocks++;
     
     if (tockDie_) {
-      delete this;
+      context()->DelModel(this);
     }
   }
 

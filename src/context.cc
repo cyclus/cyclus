@@ -1,9 +1,12 @@
+#include "context.h"
+
+#include <vector>
+
 #include "error.h"
 #include "exchange_solver.h"
 #include "logger.h"
 #include "timer.h"
 
-#include "context.h"
 
 namespace cyclus {
 
@@ -12,31 +15,30 @@ Context::Context(Timer* ti, Recorder* rec)
 
 Context::~Context() {
   if (solver_ != NULL) delete solver_;
+
+  // initiate deletion of models that don't have parents.
+  // dealloc will propogate through hierarchy as models delete their children
+  std::vector<Model*> to_del;
+  std::set<Model*>::iterator it;
+  for (it = model_list_.begin(); it != model_list_.end(); ++it) {
+    if((*it)->parent() == NULL) to_del.push_back(*it);
+  }
+  for (int i = 0; i < to_del.size(); ++i) {
+    DelModel(to_del[i]);
+  }
 }
+
+void Context::DelModel(Model* m) {
+  int n = model_list_.erase(m);
+  if (n == 1) {
+    delete m;
+  }
+}
+
 
 boost::uuids::uuid Context::sim_id() {
   return rec_->sim_id();
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Model* Context::GetModelByName(std::string name) {
-  Model* found_model = NULL;
-
-  const std::vector<Model*>& models = model_list();
-  
-  for (int i = 0; i < models.size(); i++) {
-    if (name == models.at(i)->name()) {
-      found_model = models.at(i);
-      break;
-    }
-  }
-
-  if (found_model == NULL) {
-    std::string err_msg = "Model '" + name + "' doesn't exist.";
-    throw KeyError(err_msg);
-  }
-  return found_model;
-}
 
 void Context::AddPrototype(std::string name, Model* p) {
   protos_[name] = p;

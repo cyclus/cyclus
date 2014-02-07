@@ -53,10 +53,10 @@ std::string BuildMasterSchema(std::string schema_path) {
   for (int i = 0; i < names.size(); ++i) {
     DynamicModule dyn(names[i]);
     Model* m = dyn.ConstructInstance(&ctx);
-    subschemas[m->ModelType()] += "<element name=\"" + names[i] + "\">\n";
-    subschemas[m->ModelType()] += m->schema() + "\n";
-    subschemas[m->ModelType()] += "</element>\n";
-    delete m;
+    subschemas[m->model_type()] += "<element name=\"" + names[i] + "\">\n";
+    subschemas[m->model_type()] += m->schema() + "\n";
+    subschemas[m->model_type()] += "</element>\n";
+    ctx.DelModel(m);
     dyn.CloseLibrary();
   }
 
@@ -230,7 +230,10 @@ void XMLFileLoader::LoadRecipes() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadInitialAgents() {
-  std::set<std::string> module_types = Model::dynamic_module_types();
+  std::set<std::string> module_types;
+  module_types.insert("Region");
+  module_types.insert("Inst");
+  module_types.insert("Facility");
   std::set<std::string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
     XMLQueryEngine xqe(*parser_);
@@ -241,21 +244,19 @@ void XMLFileLoader::LoadInitialAgents() {
       std::string module_name = module_data->GetElementName();
 
       Model* model = modules_[module_name]->ConstructInstance(ctx_);
-      model->InitCoreMembers(qe);
       model->SetModelImpl(module_name);
-      model->InitModuleMembers(module_data->QueryElement(module_name));
+      model->InitFrom(qe);
 
       CLOG(LEV_DEBUG3) << "Module '" << model->name()
                        << "' has had its module members initialized:";
-      CLOG(LEV_DEBUG3) << " * Type: " << model->ModelType();
+      CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
       CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
       CLOG(LEV_DEBUG3) << " * ID: " << model->id();
 
       // register module
-      if (*it == "Facility") {
-        ctx_->AddPrototype(model->name(), model);
-      } else if (*it == "Region") {
-        model->Deploy(model);
+      ctx_->AddPrototype(model->name(), model);
+      if (*it == "Region") {
+        model->Deploy();
       }
     }
   }

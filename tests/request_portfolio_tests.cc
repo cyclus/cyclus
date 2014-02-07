@@ -43,8 +43,6 @@ class RequestPortfolioTests: public ::testing::Test {
   };
   
   virtual void TearDown() {
-    delete fac1;
-    delete fac2;
   };
   
 };
