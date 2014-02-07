@@ -15,7 +15,7 @@ class SolverFactoryTests : public ::testing::Test  {
   virtual void TearDown();
   void Init(OsiSolverInterface* si);
   void Solve(OsiSolverInterface* si);
-  bool HasInt(OsiSolverInterface* si);
+  void AddInts(OsiSolverInterface* si);
 
  protected:
   SolverFactory sf_;
@@ -28,8 +28,7 @@ class SolverFactoryTests : public ::testing::Test  {
   double* lp_exp_;
 
   double mip_obj_;
-  double* mip_exp_c_;
-  int* mip_exp_i_;
+  double* mip_exp_;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,17 +39,26 @@ void SolverFactoryTests::SetUp() {
   lp_obj_ = 5.47;
   lp_exp_ = new double[n_vars_];
   lp_exp_[0] = 1.7; lp_exp_[1] = 2.7; lp_exp_[2] = 0.4;
-  mip_exp_c_ = new double[n_vars_ - n_int_vars_];
-  mip_exp_c_[0] = 1.5; 
-  mip_exp_i_ = new int[n_int_vars_];
-  mip_exp_i_[0] = 0; mip_exp_i_[1] = 1;
+  mip_obj_ = 7.6;
+  mip_exp_ = new double[n_vars_];
+  mip_exp_[0] = 2.4; mip_exp_[1] = 2; mip_exp_[2] = 1; 
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SolverFactoryTests::TearDown() {
   delete [] lp_exp_;
-  delete [] mip_exp_c_;
-  delete [] mip_exp_i_;
+  delete [] mip_exp_;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool HasInt(OsiSolverInterface* si) {
+  int i = 0;
+  for (i = 0; i != si->getNumCols(); i++) {
+    // std::cout << "hi mom!" << si->isInteger(i) << "\n";
+    if(si->isInteger(i)) {
+      return true;
+    }
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,7 +67,7 @@ void SolverFactoryTests::Init(OsiSolverInterface* si) {
   // s.t.  x +    y        > 4.4
   //              y +    z < 3.1
   //     x > 1.3, y > 2, z > 0.4
-  //                y, z integer
+  //                y, z integer (if integer solver)
   double inf = si->getInfinity();
   double obj [] = {2.0, 0.5, 1.8};
   double col_lb [] = {1.3, 2.0, 0.4};
@@ -76,22 +84,15 @@ void SolverFactoryTests::Init(OsiSolverInterface* si) {
   m.setDimensions(0, n_vars_);
   m.appendRow(row1);
   m.appendRow(row2);
-  si->setInteger(1); // y
-  si->setInteger(2); // z
   si->loadProblem(m, &col_lb[0], &col_ub[0], &obj[0], &row_lb[0], &row_ub[0]);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool SolverFactoryTests::HasInt(OsiSolverInterface* si) {
-  int i = 0;
-  for (i = 0; i != si->getNumCols(); i++) {
-    // std::cout << "hi mom!" << si->isInteger(i) << "\n";
-    if(si->isInteger(i)) {
-      return true;
-    }
-  }
+void SolverFactoryTests::AddInts(OsiSolverInterface* si) {
+  si->setInteger(1); // y
+  si->setInteger(2); // z
+  EXPECT_TRUE(HasInt(si));
 }
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SolverFactoryTests::Solve(OsiSolverInterface* si) {
   si->initialSolve();
@@ -117,12 +118,13 @@ TEST_F(SolverFactoryTests, Clp) {
 TEST_F(SolverFactoryTests, Cbc) {
   sf_.solver_t("cbc");
   OsiSolverInterface* si = sf_.get();
-  Init(si);
-  Solve(si);
   CoinMessageHandler h;
-  h.setLogLevel(0);
+  h.setLogLevel(-1);
   si->passInMessageHandler(&h);
-  const double* exp = &lp_exp_[0];
+  Init(si);
+  AddInts(si);
+  Solve(si);
+  const double* exp = &mip_exp_[0];
   array_double_eq(&exp[0], si->getColSolution(), n_vars_);
-  EXPECT_DOUBLE_EQ(lp_obj_, si->getObjValue());  
+  EXPECT_DOUBLE_EQ(mip_obj_, si->getObjValue());  
 }
