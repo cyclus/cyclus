@@ -53,9 +53,9 @@ std::string BuildMasterSchema(std::string schema_path) {
   for (int i = 0; i < names.size(); ++i) {
     DynamicModule dyn(names[i]);
     Model* m = dyn.ConstructInstance(&ctx);
-    subschemas[m->ModelType()] += "<element name=\"" + names[i] + "\">\n";
-    subschemas[m->ModelType()] += m->schema() + "\n";
-    subschemas[m->ModelType()] += "</element>\n";
+    subschemas[m->model_type()] += "<element name=\"" + names[i] + "\">\n";
+    subschemas[m->model_type()] += m->schema() + "\n";
+    subschemas[m->model_type()] += "</element>\n";
     ctx.DelModel(m);
     dyn.CloseLibrary();
   }
@@ -249,7 +249,7 @@ void XMLFileLoader::LoadInitialAgents() {
 
       CLOG(LEV_DEBUG3) << "Module '" << model->name()
                        << "' has had its module members initialized:";
-      CLOG(LEV_DEBUG3) << " * Type: " << model->ModelType();
+      CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
       CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
       CLOG(LEV_DEBUG3) << " * ID: " << model->id();
 

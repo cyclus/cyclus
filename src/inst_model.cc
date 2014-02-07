@@ -17,7 +17,7 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel::InstModel(Context* ctx) : TimeListener(ctx), Model(ctx) {
-  SetModelType("Inst");
+  model_type_ = "Inst";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

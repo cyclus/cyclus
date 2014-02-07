@@ -66,7 +66,7 @@ void XMLFlatLoader::LoadInitialAgents() {
 
     CLOG(LEV_DEBUG3) << "Module '" << model->name()
                      << "' has had its module members initialized:";
-    CLOG(LEV_DEBUG3) << " * Type: " << model->ModelType();
+    CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
     CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
     CLOG(LEV_DEBUG3) << " * ID: " << model->id();
 

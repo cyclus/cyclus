@@ -21,7 +21,7 @@ FacilityModel::FacilityModel(Context* ctx)
       Trader(ctx),
       Model(ctx),
       fac_lifetime_(std::numeric_limits<int>::max()) {
-  SetModelType("Facility");
+  model_type_ = "Facility";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

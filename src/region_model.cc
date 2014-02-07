@@ -24,7 +24,7 @@ void RegionModel::InitFrom(RegionModel* m) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RegionModel::RegionModel(Context* ctx) : TimeListener(ctx), Model(ctx) {
-  SetModelType("Region");
+  model_type_ = "Region";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

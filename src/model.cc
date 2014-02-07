@@ -94,7 +94,7 @@ Model::~Model() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::str() {
   std::stringstream ss;
-  ss << model_type_ << "_" << name_
+  ss << model_type() << "_" << name_
      << " ( "
      << "ID=" << id_
      << ", implementation=" << model_impl_
@@ -173,10 +173,10 @@ const std::string Model::ModelImpl() {
 void Model::AddToTable() {
   ctx_->NewDatum("Agents")
   ->AddVal("ID", id())
-  ->AddVal("AgentType", ModelType())
+  ->AddVal("AgentType", model_type())
   ->AddVal("ModelType", ModelImpl())
   ->AddVal("Prototype", name())
-  ->AddVal("ParentID", parent_id())
+  ->AddVal("ParentID", parent_id_)
   ->AddVal("EnterDate", birthtime())
   ->Record();
 }

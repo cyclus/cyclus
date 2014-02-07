@@ -151,146 +151,97 @@ class Model {
     model_impl_ = new_impl;
   }
 
-  /**
-     get model type
-   */
-  inline const std::string ModelType() const { return model_type_; }
+  /// returns a string that describes the model subclass (e.g. Region, etc.)
+  inline const std::string model_type() const {return model_type_;};
 
-  /**
-     set model type
-   */
-  inline void SetModelType(std::string new_type) {
-    model_type_ = new_type;
-  };
-
-  /**
-   Returns this model's current simulation context.
-   */
+  /// Returns this model's current simulation context.
   inline Context* context() const { return ctx_; }
 
-  /**
-     every model should be able to print a verbose description
-   */
+  /// every model should be able to print a verbose description
   virtual std::string str();
 
-  /**
-     return parent of this model
-   */
+  /// returns parent of this model
   inline Model* parent() const { return parent_; }
 
-  /**
-     return the parent' id
-   */
+  /// returns the parent's id
   inline const int parent_id() const { return parent_id_; }
 
-  /**
-     returns the time this model began operation (-1 if the model has never been
-     deployed).
-   */
+  /// returns the time this model began operation (-1 if the model has never
+  /// been deployed).
   inline const int birthtime() const { return birthtime_; }
 
-  /**
-     returns the time this model ceased operation (-1 if the model is still
-     operating).
-   */
+  /// returns the time this model ceased operation (-1 if the model is still
+  /// operating).
   inline const int deathtime() const { return deathtime_; }
 
-  /**
-     @return a list of children this model has
-   */
+  /// returns a list of children this model has
   inline const std::vector<Model*>& children() const { return children_; }
   
  protected:
-  /**
-     Initializes a model by copying parameters from the passed model m. This
-     method must be implemented by all models.  This method must call the
-     superclass' InitFrom method. The InitFrom method should only initialize
-     this class' members - not inherited state. The superclass InitFrom should
-     generally be called before any other work is done.
-
-     @param m the model containing state that should be used to initialize this
-     model.
-     
-     Example:
-
-     @code
-     class MyModelClass : virtual public cyclus::FacilityModel {
-       // ...
-
-       void InitFrom(MyModelClass* m) {
-         cyclus::FacilityModel::InitFrom(m); // call superclass' InitFrom
-         // now do MyModelClass' initialitions, e.g.:
-         my_var_ = m->my_var_;
-         // ...
-       };
-
-       // ...
-     };
-     @endcode
-  */
+  /// Initializes a model by copying parameters from the passed model m. This
+  /// method must be implemented by all models.  This method must call the
+  /// superclass' InitFrom method. The InitFrom method should only initialize
+  /// this class' members - not inherited state. The superclass InitFrom should
+  /// generally be called before any other work is done.
+  ///
+  /// @param m the model containing state that should be used to initialize this
+  /// model.
+  /// 
+  /// Example:
+  ///
+  /// @code
+  /// class MyModelClass : virtual public cyclus::FacilityModel {
+  ///   // ...
+  ///
+  ///   void InitFrom(MyModelClass* m) {
+  ///     cyclus::FacilityModel::InitFrom(m); // call superclass' InitFrom
+  ///     // now do MyModelClass' initialitions, e.g.:
+  ///     my_var_ = m->my_var_;
+  ///     // ...
+  ///   };
+  ///
+  ///   // ...
+  /// };
+  /// @endcode
   void InitFrom(Model* m);
 
-  /**
-     @brief adds model-specific information prefix to an error message
-   */
+  /// adds model-specific information prefix to an error message
   virtual std::string InformErrorMsg(std::string msg);
   
- private:
-  /**
-     add an agent to the transactiont table
-   */
-  void AddToTable();
-
-  /**
-     Stores the next available facility ID
-   */
-  static int next_id_;
-
-  /**
-     children of this model
-   */
-  std::vector<Model*> children_;
-
-  /**
-     parent of this model
-   */
-  Model* parent_;
-
-  /**
-     parent's ID of this model
-     Note: we keep the parent id in the model so we can reference it
-     even if the parent is deallocated.
-   */
-  int parent_id_;
-
-  /**
-     born on date of this model
-   */
-  int birthtime_;
-
-  /**
-     died on date of this model
-   */
-  int deathtime_;
-
-  /**
-     every instance of a model should have a name
-   */
-  std::string name_;
-
-  /**
-     every instance of a model should know its type
-   */
+  /// describes the model subclass (e.g. Region, Inst, etc.)
   std::string model_type_;
 
-  /**
-     every instance of a model should know its implementation
-   */
+ private:
+  /// add an agent to the transactiont table
+  void AddToTable();
+
+  /// Stores the next available facility ID
+  static int next_id_;
+
+  /// children of this model
+  std::vector<Model*> children_;
+
+  /// parent of this model
+  Model* parent_;
+
+  /// parent's ID of this model
+  /// Note: we keep the parent id in the model so we can reference it
+  /// even if the parent is deallocated.
+  int parent_id_;
+
+  /// born on date of this model
+  int birthtime_;
+
+  /// died on date of this model
+  int deathtime_;
+
+  /// every instance of a model should have a name
+  std::string name_;
+
+  /// concrete type of a model (e.g. "MyReactorModel")
   std::string model_impl_;
 
-  /**
-     every instance of a model will have a serialized ID
-   */
+  /// an instance-unique ID for the model
   int id_;
 
   Context* ctx_;

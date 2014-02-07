@@ -47,25 +47,7 @@ TEST_P(ModelTests, InitAndGetName) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, SetAndGetModelType) {
-  for(int i=cyclus::REGION; i<cyclus::END_MODEL_TYPES; i++){
-    switch(i){
-      case (cyclus::REGION):
-        EXPECT_NO_THROW(model_->SetModelType("Region"));
-        EXPECT_EQ("Region", model_->ModelType());
-        break;
-      case (cyclus::INST):
-        EXPECT_NO_THROW(model_->SetModelType("Inst"));
-        EXPECT_EQ("Inst", model_->ModelType());
-        break;
-      case (cyclus::FACILITY):
-        EXPECT_NO_THROW(model_->SetModelType("Facility"));
-        EXPECT_EQ("Facility", model_->ModelType());
-        break;
-      default:
-        FAIL();
-        break;
-    }
-  }
+TEST_P(ModelTests, GetModelType) {
+  EXPECT_NE(std::string("Model"), model_->model_type());
 }
 
