@@ -85,10 +85,10 @@ TEST_F(SolverFactoryTests, Clp) {
   sf_.solver_t("clp");
   OsiSolverInterface* si = sf_.get();
   Init(si);
-  Solve(si);
-  const double* exp = &lp_exp_[0];
-  array_double_eq(&exp[0], si->getColSolution(), n_vars_);
-  EXPECT_DOUBLE_EQ(lp_obj_, si->getObjValue());
+  // Solve(si);
+  // const double* exp = &lp_exp_[0];
+  // array_double_eq(&exp[0], si->getColSolution(), n_vars_);
+  // EXPECT_DOUBLE_EQ(lp_obj_, si->getObjValue());
   delete si;
 }
 
