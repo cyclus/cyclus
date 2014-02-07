@@ -85,6 +85,7 @@ void SolverFactoryTests::Init(OsiSolverInterface* si) {
 bool SolverFactoryTests::HasInt(OsiSolverInterface* si) {
   int i = 0;
   for (i = 0; i != si->getNumCols(); i++) {
+    // std::cout << "hi mom!" << si->isInteger(i) << "\n";
     if(si->isInteger(i)) {
       return true;
     }
@@ -103,7 +104,7 @@ TEST_F(SolverFactoryTests, Clp) {
   sf_.solver_t("clp");
   OsiSolverInterface* si = sf_.get();
   CoinMessageHandler h;
-  h.setLogLevel(-1);
+  h.setLogLevel(0);
   si->passInMessageHandler(&h);
   Init(si);
   Solve(si);
@@ -113,10 +114,15 @@ TEST_F(SolverFactoryTests, Clp) {
   delete si;
 }
 
-// TEST_F(SolverFactoryTests, Cbc) {
-//   sf_.solver_t("cbc");
-//   OsiSolverInterface* si = sf_.get();
-//   Init(si);
-//   Solve(si);
-  
-// }
+TEST_F(SolverFactoryTests, Cbc) {
+  sf_.solver_t("cbc");
+  OsiSolverInterface* si = sf_.get();
+  Init(si);
+  Solve(si);
+  CoinMessageHandler h;
+  h.setLogLevel(0);
+  si->passInMessageHandler(&h);
+  const double* exp = &lp_exp_[0];
+  array_double_eq(&exp[0], si->getColSolution(), n_vars_);
+  EXPECT_DOUBLE_EQ(lp_obj_, si->getObjValue());  
+}
