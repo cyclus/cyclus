@@ -14,8 +14,8 @@ class SolverFactoryTests : public ::testing::Test  {
   virtual void SetUp();
   virtual void TearDown();
   void Init(OsiSolverInterface* si);
+  void InitRedundant(OsiSolverInterface* si);
   void Solve(OsiSolverInterface* si);
-  void AddInts(OsiSolverInterface* si);
 
  protected:
   SolverFactory sf_;
@@ -88,11 +88,25 @@ void SolverFactoryTests::Init(OsiSolverInterface* si) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SolverFactoryTests::AddInts(OsiSolverInterface* si) {
-  si->setInteger(1); // y
-  si->setInteger(2); // z
-  EXPECT_TRUE(HasInt(si));
+void SolverFactoryTests::InitRedundant(OsiSolverInterface* si) {
+  // min  x + y
+  // s.t. x + y >= 1
+  //      x, y in [0, 1], integer if integer solver
+  double inf = si->getInfinity();
+  double obj [] = {1.0, 1.0};
+  double col_lb [] = {0.0, 0.0};
+  double col_ub [] = {1.0, 1.0};
+  double row_lb [] = {1.0};
+  double row_ub [] = {inf};
+  CoinPackedVector row1;
+  row1.insert(0, 1.0); // x
+  row1.insert(1, 1.0); // y
+  CoinPackedMatrix m(false, 0, 0);
+  m.setDimensions(0, 2);
+  m.appendRow(row1);
+  si->loadProblem(m, &col_lb[0], &col_ub[0], &obj[0], &row_lb[0], &row_ub[0]);
 }
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SolverFactoryTests::Solve(OsiSolverInterface* si) {
   si->initialSolve();
@@ -115,16 +129,47 @@ TEST_F(SolverFactoryTests, Clp) {
   delete si;
 }
 
+TEST_F(SolverFactoryTests, ClpRedundant) {
+  sf_.solver_t("clp");
+  OsiSolverInterface* si = sf_.get();
+  CoinMessageHandler h;
+  h.setLogLevel(0);
+  si->passInMessageHandler(&h);
+  InitRedundant(si);
+  Solve(si);
+  double exp [] = {1, 0};
+  array_double_eq(exp, si->getColSolution(), 2);
+  EXPECT_DOUBLE_EQ(1, si->getObjValue());
+  delete si;
+}
+
 TEST_F(SolverFactoryTests, Cbc) {
   sf_.solver_t("cbc");
   OsiSolverInterface* si = sf_.get();
   CoinMessageHandler h;
-  h.setLogLevel(-1);
+  h.setLogLevel(0);
   si->passInMessageHandler(&h);
   Init(si);
-  AddInts(si);
+  si->setInteger(1); // y
+  si->setInteger(2); // z
   Solve(si);
   const double* exp = &mip_exp_[0];
   array_double_eq(&exp[0], si->getColSolution(), n_vars_);
   EXPECT_DOUBLE_EQ(mip_obj_, si->getObjValue());  
+}
+
+TEST_F(SolverFactoryTests, CbcRedundant) {
+  sf_.solver_t("clp");
+  OsiSolverInterface* si = sf_.get();
+  CoinMessageHandler h;
+  h.setLogLevel(0);
+  si->passInMessageHandler(&h);
+  InitRedundant(si);
+  si->setInteger(0); // x
+  si->setInteger(1); // y
+  Solve(si);
+  double exp [] = {1, 0};
+  array_double_eq(exp, si->getColSolution(), 2);
+  EXPECT_DOUBLE_EQ(1, si->getObjValue());
+  delete si;
 }
