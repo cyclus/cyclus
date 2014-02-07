@@ -18,15 +18,6 @@ namespace cyclus {
 int Model::next_id_ = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::set<std::string> Model::dynamic_module_types() {
-  std::set<std::string> types;
-  types.insert("Region");
-  types.insert("Inst");
-  types.insert("Facility");
-  return types;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::InitFrom(Model* m) {
   id_ = next_id_++;
   name_ = m->name_;

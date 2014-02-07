@@ -41,9 +41,13 @@ class DonutShop : public Model {
   }
 
   virtual Model* Clone() {
-    DonutShop* m = new DonutShop(*this);
+    DonutShop* m = new DonutShop(context(), donut_of_the_day);
     m->InitFrom(this);
     return m;
+  };
+
+  void InitFrom(DonutShop* m) {
+    Model::InitFrom(m);
   };
 
   static int destruct_count;

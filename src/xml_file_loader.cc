@@ -230,7 +230,10 @@ void XMLFileLoader::LoadRecipes() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadInitialAgents() {
-  std::set<std::string> module_types = Model::dynamic_module_types();
+  std::set<std::string> module_types;
+  module_types.insert("Region");
+  module_types.insert("Inst");
+  module_types.insert("Facility");
   std::set<std::string>::iterator it;
   for (it = module_types.begin(); it != module_types.end(); it++) {
     XMLQueryEngine xqe(*parser_);

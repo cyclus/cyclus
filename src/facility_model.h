@@ -115,14 +115,6 @@ class FacilityModel : public TimeListener, public Trader {
   virtual std::string str();
 
   /**
-     Sets the facility's name
-     @param facName is the new name of the facility
-   */
-  virtual void SetFacName(std::string facName) {
-    this->SetName(facName);
-  };
-
-  /**
      Returns the facility's name
      @return fac_name_ the name of this facility, a string
    */
