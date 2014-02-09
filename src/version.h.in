@@ -21,7 +21,7 @@ namespace version {
   };
 
   const char* core() {
-    return "0.3";
+    return "0.4-rc1";
   };
 
   const char* boost() {
