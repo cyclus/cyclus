@@ -1,0 +1,99 @@
+========================
+Cyclus 0.4 Release Notes
+========================
+
+:Author: Cyclus Developers
+:Website: http://fuelcycle.org/
+:Contact: https://groups.google.com/forum/#!forum/cyclus-dev
+
+The Cyclus core team is excited to announce the latest stable version 
+of the cyclus ecosystem!  This includes over 415 commits by 
+6 developers.  Major features include, 
+
+- Brand new Dynamic Resource Exchange Procedure, removed the previous notion 
+  of markets, CEP18
+
+- Continuous integration for all pull requests now occurs via BaTLab though 
+  polyphemus.
+
+- Cleaned up API for model instantiation and deallocation.  Users no longer should
+  worry about memory management of their models.
+
+- Added regression tests to the test suite.
+
+- Many bug and testing issues were fixed.
+
+Since v0.3, 207 files have changed encompassing a net 9173 line insertions(+) and 
+5043 deletions(-).
+
+Changes from 0.3 to 0.4
+=======================
+
+New features
+------------
+
+- added more detail about context model ownership and stack models are bad. (7682c6c)
+- changed clone methods to use context-arg constructor (eaede68)
+- changed xml Init[Core/Module]Member fan methods to be InitFrom chain. 
+  Gave model class a default val for model_impl_ to facilitate testing of xml init 
+  methods. (3efb2b6)
+- renamed InitCoreMembers to InitFrom (f6e0add)
+- fixed deploy self as parent bug in xmlfileloader. Model class removes 'this' from 
+  context model_list_ in destructor to prevent some segfaults when models are 
+  allocated on the stack causing a double delete (one by runtime and one by context). 
+  Put guard on context::DelModel to only delete if the model is in the model_list_ 
+  (53ec514)
+- made context model management more universal. Made model_list_ a std::set. 
+  added doc comment about context model management. minor tweaks (45efa47)
+- removed model_list getters from context class. model list is now entirely 
+  context-private (4b18f0d)
+- updated exclusivity adjustment. this bug wasn't evident (or testable) because 
+  capacity-constraints will cause tomatch < remain which then will by definition 
+  be tomatch < excl_val of arc. all tests pass and alls well. (0ee97f2)
+- made greedy algorithm a little simpler for exclusive arcs (deb90a0)
+- added a namespace specifically for solver testing (9eaa900)
+- exclusive bids now supported and tested (a098999)
+- smaller hdf5 table chunk size and turn compression on (a3c4e98)
+- trimmed fat from cyclus.rng.in and finished rng cleanup. (e1928dd)
+- added authorship file (f021d01)
+- moved test objects off the heap, fixes the building manager tests (d6d60e9)
+- renamed timeagent ta vars to timelistener tl vars (3728fa0)
+- removed boost date stuff from timer (60df1c9)
+- renamed timeagent to timelistener and methods to just tick/tock. 
+  removed daily tasks (4b07b64)
+- renamed EventManager to Recorder and renamed Event to Datum and EventBackend to 
+  RecBackend (8d2b9a6)
+- initialized more members of the exchange node struct (3193d72)
+- updated the initfrom interface to be easier to use/more intuitive (b2ba4e1)
+- made context more resource generic (ed39a0d)
+- buffers default to having a capacity (8497bf5)
+- added a context helper for a facility with many input and output recipes and 
+  commodities (13cffc7)
+- added a hook for the context to register a facility (136d13a)
+- added a resource exchange class (4a810d9)
+- added request portfolios and associated tests. required notion of equality of 
+  capacity constraints and requests and required notion of ordering of capacity 
+  constraints for use as a map key, so I added an id member and associated < operator. 
+  (f464cb8)
+- added request class and associated tests for materials (202048c)
+
+
+Known bugs
+----------
+N/A
+
+Contributors
+============
+
+The following people contributed to this release of Cyclus.  A "*" by their
+name indicates a first time contributor.  Names follow alphabetically, 
+
+* Robert Carlsen
+* Royal Elmore
+* Matthew Gidden
+* Katy Huff
+* Olzhas Rakhimov
+* Anthony Scopatz
+* Zach Welch
+* Paul Wilson
+
