@@ -1,18 +1,18 @@
-#include "stub_facility.h"
+#include "sink_facility.h"
 
-using stubs::StubFacility;
+using cyclus::SinkFacility;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubFacility::StubFacility(cyclus::Context* ctx)
+SinkFacility::SinkFacility(cyclus::Context* ctx)
     : cyclus::FacilityModel(ctx),
       cyclus::Model(ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubFacility::~StubFacility() {};
+SinkFacility::~SinkFacility() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubFacility::InitFrom(cyclus::QueryEngine* qe) {
+void SinkFacility::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::FacilityModel::InitFrom(qe);
   qe = qe->QueryElement(ModelImpl());
   
@@ -23,30 +23,30 @@ void StubFacility::InitFrom(cyclus::QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubFacility::Clone() {
-  StubFacility* m = new StubFacility(context());
+cyclus::Model* SinkFacility::Clone() {
+  SinkFacility* m = new SinkFacility(context());
   m->InitFrom(this);
   return m;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubFacility::InitFrom(StubFacility* m) {
+void SinkFacility::InitFrom(SinkFacility* m) {
   cyclus::FacilityModel::InitFrom(m);
-  // Initialize stubfacility members for a cloned module here
+  // Initialize sinkfacility members for a cloned module here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::string StubFacility::str() {
+std::string SinkFacility::str() {
   return FacilityModel::str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::Tick(int time){}
+void SinkFacility::Tick(int time){}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::Tock(int time){}
+void SinkFacility::Tock(int time){}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructStubFacility(cyclus::Context* ctx) {
-  return new StubFacility(ctx);
+extern "C" cyclus::Model* ConstructSinkFacility(cyclus::Context* ctx) {
+  return new SinkFacility(ctx);
 }
