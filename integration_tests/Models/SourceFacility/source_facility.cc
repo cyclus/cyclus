@@ -1,52 +1,52 @@
-#include "stub_facility.h"
+#include "source_facility.h"
 
-using stubs::StubFacility;
+using cyclus::SourceFacility;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubFacility::StubFacility(cyclus::Context* ctx)
+SourceFacility::SourceFacility(cyclus::Context* ctx)
     : cyclus::FacilityModel(ctx),
       cyclus::Model(ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubFacility::~StubFacility() {};
+SourceFacility::~SourceFacility() {};
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubFacility::InitFrom(cyclus::QueryEngine* qe) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void SourceFacility::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::FacilityModel::InitFrom(qe);
   qe = qe->QueryElement(ModelImpl());
-  
+
   cyclus::QueryEngine* input = qe->QueryElement("input");
-  //retrieve input data members here. For example :  
+  //retrieve input data members here. For example :
   //string query = "incommodity";
   //incommodity_ = lexical_cast<double>(input->getElementContent(query));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubFacility::Clone() {
-  StubFacility* m = new StubFacility(context());
+cyclus::Model* SourceFacility::Clone() {
+  SourceFacility* m = new SourceFacility(context());
   m->InitFrom(this);
   return m;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubFacility::InitFrom(StubFacility* m) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void SourceFacility::InitFrom(SourceFacility* m) {
   cyclus::FacilityModel::InitFrom(m);
-  // Initialize stubfacility members for a cloned module here
+  // Initialize sourcefacility members for a cloned module here
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::string StubFacility::str() {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string SourceFacility::str() {
   return FacilityModel::str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::Tick(int time){}
+void SourceFacility::Tick(int time){}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::Tock(int time){}
+void SourceFacility::Tock(int time){}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructStubFacility(cyclus::Context* ctx) {
-  return new StubFacility(ctx);
+extern "C" cyclus::Model* ConstructSourceFacility(cyclus::Context* ctx) {
+  return new SourceFacility(ctx);
 }
