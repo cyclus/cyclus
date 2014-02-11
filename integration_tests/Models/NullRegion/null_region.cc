@@ -1,45 +1,45 @@
-#include "stub_region.h"
+#include "null_region.h"
 
-using stubs::StubRegion;
+using cyclus::NullRegion;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubRegion::StubRegion(cyclus::Context* ctx)
+NullRegion::NullRegion(cyclus::Context* ctx)
     : cyclus::RegionModel(ctx),
       cyclus::Model(ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubRegion::~StubRegion() {};
+NullRegion::~NullRegion() {};
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubRegion::InitFrom(cyclus::QueryEngine* qe) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void NullRegion::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::RegionModel::InitFrom(qe);
   qe = qe->QueryElement(ModelImpl());
-  
-  //retrieve input data members here. For example :  
+
+  //retrieve input data members here. For example :
   //string query = "incommodity";
   //incommodity_ = lexical_cast<double>(qe->getElementContent(query));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubRegion::Clone() {
-  StubRegion* m = new StubRegion(context());
+cyclus::Model* NullRegion::Clone() {
+  NullRegion* m = new NullRegion(context());
   m->InitFrom(this);
   return m;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubRegion::InitFrom(StubRegion* m) {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void NullRegion::InitFrom(NullRegion* m) {
   cyclus::RegionModel::InitFrom(m);
-  // Initialize stubregion members for a cloned module here
+  // Initialize nullregion members for a cloned module here
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::string StubRegion::str() {
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string NullRegion::str() {
   return RegionModel::str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructStubRegion(cyclus::Context* ctx) {
-  return new StubRegion(ctx);
+extern "C" cyclus::Model* ConstructNullRegion(cyclus::Context* ctx) {
+  return new NullRegion(ctx);
 }
