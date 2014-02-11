@@ -1,5 +1,5 @@
-#ifndef CYCLUS_STUBS_STUB_FACILITY_H_
-#define CYCLUS_STUBS_STUB_FACILITY_H_
+#ifndef SINK_FACILITY_H_
+#define SINK_FACILITY_H_
 
 #include <string>
 
@@ -7,99 +7,97 @@
 #include "facility_model.h"
 #include "query_engine.h"
 
-namespace stubs {
+namespace cyclus {
 
 /**
-   @class StubFacility 
-    
-   This FacilityModel is intended 
-   as a skeleton to guide the implementation of new FacilityModel 
-   models.  
-   The StubFacility class inherits from the FacilityModel class and is 
-   dynamically loaded by the Model class when requested. 
-    
-   @section intro Introduction 
-   Place an introduction to the model here. 
-    
-   @section modelparams Model Parameters 
-   Place a description of the required input parameters which define the 
-   model implementation. 
-    
-   @section optionalparams Optional Parameters 
-   Place a description of the optional input parameters to define the 
-   model implementation. 
-    
-   @section detailed Detailed Behavior 
-   Place a description of the detailed behavior of the model. Consider 
-   describing the behavior at the tick and tock as well as the behavior 
-   upon sending and receiving materials and messages. 
- */
-class StubFacility : public cyclus::FacilityModel  {
-/* --------------------
- * all FACILITYMODEL classes have these members
- * --------------------
- */
+  @class SinkFacility
+  Detailed description will be defined later.
+
+  This FacilityModel is intended
+  to be used in Cyclus integration tests as a basic sink facility.
+
+  @section intro Introduction
+  Place an introduction to the model here.
+
+  @section modelparams Model Parameters
+  Place a description of the required input parameters which define the
+  model implementation.
+
+  @section optionalparams Optional Parameters
+  Place a description of the optional input parameters to define the
+  model implementation.
+
+  @section detailed Detailed Behavior
+  Place a description of the detailed behavior of the model. Consider
+  describing the behavior at the tick and tock as well as the behavior
+  upon sending and receiving materials and messages.
+  */
+class SinkFacility : public cyclus::FacilityModel  {
+  /* --------------------
+   * all FACILITYMODEL classes have these members
+   * --------------------
+   */
  public:
   /**
-     Constructor for StubFacility Class 
-     @param ctx the cyclus context for access to simulation-wide parameters
-   */
-  StubFacility(cyclus::Context* ctx);
+    Constructor for SinkFacility Class
+    @param ctx the cyclus context for access to simulation-wide parameters
+    */
+  SinkFacility(cyclus::Context* ctx);
 
   /**
-     every model should be destructable 
-   */
-  virtual ~StubFacility();
-    
-  /**
-     Initialize members related to derived module class
+    every model should be destructable
+    */
+  virtual ~SinkFacility();
 
-     @param qe a pointer to a QueryEngine object containing initialization data
-   */
+  /**
+    Initialize members related to derived module class
+
+    @param qe a pointer to a QueryEngine object containing initialization data
+    */
   virtual void InitFrom(cyclus::QueryEngine* qe);
 
   /**
-     Initialize members for a cloned module.
-   */
-  virtual void InitFrom(StubFacility* m);
-  
-  /**
-     A verbose printer for the StubFacility
-   */
-   virtual std::string str();
+    Initialize members for a cloned module.
+    */
+  virtual void InitFrom(SinkFacility* m);
 
   /**
-     Initializes a StubFacility object by copying the members of another.
-   */
-   virtual cyclus::Model* Clone();
+    A verbose printer for the SinkFacility
+    */
+  virtual std::string str();
 
   /**
-     The handleTick function specific to the StubFacility. 
-      
-     @param time the time of the tick 
-   */
+    Initializes a SinkFacility object by copying the members of another.
+    */
+  virtual cyclus::Model* Clone();
+
+  /**
+    The handleTick function specific to the SinkFacility.
+
+    @param time the time of the tick
+    */
   virtual void Tick(int time);
 
   /**
-     The handleTick function specific to the StubFacility. 
-      
-     @param time the time of the tock 
-   */
+    The handleTick function specific to the SinkFacility.
+
+    @param time the time of the tock
+    */
   virtual void Tock(int time);
 
-/* ------------------- */ 
+  /* ------------------- */
 
 
-/* --------------------
- * _THIS_ FACILITYMODEL class has these members
- * --------------------
- */
+  /* --------------------
+   * _THIS_ FACILITYMODEL class has these members
+   * --------------------
+   */
 
-/* ------------------- */ 
+  /* ------------------- */
 
 };
 
-} // namespace stub
-  
-#endif // STUB_FACILITY_H_
+} // namespace sink
+
+#endif // SINK_FACILITY_H_
 
