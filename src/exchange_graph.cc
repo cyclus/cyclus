@@ -121,6 +121,9 @@ void UpdateCapacity(ExchangeNode::Ptr pn, const Arc& a, double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ExchangeGraph::ExchangeGraph() : next_arc_id_(0) { }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddRequestGroup(RequestGroup::Ptr prs) {
   request_groups_.push_back(prs);
 }
@@ -133,6 +136,7 @@ void ExchangeGraph::AddSupplyGroup(ExchangeNodeGroup::Ptr pss) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddArc(const Arc& a) {
   arcs_.push_back(a);
+  arc_ids_[a] = ++next_arc_id_;
   node_arc_map_[a.first].push_back(a);
   node_arc_map_[a.second].push_back(a);
 }

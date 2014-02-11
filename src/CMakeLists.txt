@@ -75,6 +75,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/env.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc  
+  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 

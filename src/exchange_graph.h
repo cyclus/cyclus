@@ -181,6 +181,8 @@ class ExchangeGraph {
  public: 
   typedef boost::shared_ptr<ExchangeGraph> Ptr;
 
+  ExchangeGraph();
+  
   /// @brief adds a request group to the graph
   void AddRequestGroup(RequestGroup::Ptr prs);
   
@@ -212,12 +214,16 @@ class ExchangeGraph {
   
   inline const std::vector<Arc>& arcs() { return arcs_; }
   
+  inline const std::map<Arc, int>& arc_ids() { return arc_ids_; }
+  
  private: 
   std::vector<RequestGroup::Ptr> request_groups_;
   std::vector<ExchangeNodeGroup::Ptr> supply_groups_;
   std::map<ExchangeNode::Ptr, std::vector<Arc> > node_arc_map_;
   std::vector<Match> matches_;
   std::vector<Arc> arcs_;
+  std::map<Arc, int> arc_ids_;
+  int next_arc_id_;
 };
   
 } // namespace cyclus
