@@ -1,18 +1,18 @@
-#include "stub_inst.h"
+#include "null_inst.h"
 
-using stubs::StubInst;
+using cyclus::NullInst;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubInst::StubInst(cyclus::Context* ctx)
+NullInst::NullInst(cyclus::Context* ctx)
     : cyclus::InstModel(ctx),
       cyclus::Model(ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubInst::~StubInst() {};
+NullInst::~NullInst() {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubInst::InitFrom(cyclus::QueryEngine* qe) {
+void NullInst::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::InstModel::InitFrom(qe);
   qe = qe->QueryElement(ModelImpl());
   
@@ -22,24 +22,24 @@ void StubInst::InitFrom(cyclus::QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubInst::Clone() {
-  StubInst* m = new StubInst(context());
+cyclus::Model* NullInst::Clone() {
+  NullInst* m = new NullInst(context());
   m->InitFrom(this);
   return m;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-void StubInst::InitFrom(StubInst* m) {
+void NullInst::InitFrom(NullInst* m) {
   cyclus::InstModel::InitFrom(m);
   // Initialize stubinst members for a cloned module here
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-std::string StubInst::str() {
+std::string NullInst::str() {
   return InstModel::str();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructStubInst(cyclus::Context* ctx) {
-  return new StubInst(ctx);
+extern "C" cyclus::Model* ConstructNullInst(cyclus::Context* ctx) {
+  return new NullInst(ctx);
 }
