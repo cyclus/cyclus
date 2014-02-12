@@ -1,5 +1,5 @@
-#ifndef STUBS_STUB_FACILITY_H_
-#define STUBS_STUB_FACILITY_H_
+#ifndef CYCLUS_STUBS_STUB_FACILITY_H_
+#define CYCLUS_STUBS_STUB_FACILITY_H_
 
 #include <string>
 
@@ -100,4 +100,4 @@ class StubFacility : public cyclus::FacilityModel  {
 
 }  // namespace stubs
 
-#endif  // STUBS_STUB_FACILITY_H_
+#endif  // CYCLUS_STUBS_STUB_FACILITY_H_

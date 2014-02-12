@@ -1,5 +1,5 @@
-#ifndef STUBS_STUB_REGION_H_
-#define STUBS_STUB_REGION_H_
+#ifndef CYCLUS_STUBS_STUB_REGION_H_
+#define CYCLUS_STUBS_STUB_REGION_H_
 
 #include <string>
 
@@ -86,4 +86,4 @@ class StubRegion : public cyclus::RegionModel {
 
 }  // namespace stubs
 
-#endif  // STUBS_STUB_REGION_H_
+#endif  // CYCLUS_STUBS_STUB_REGION_H_
