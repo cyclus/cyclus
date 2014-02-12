@@ -2,6 +2,24 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeTranslator::ToProg(ExchangeGraph* g, OsiSolverInterface* iface) {
+  TranslateObj(g, iface);
+  
+  const std::vector<SupplyGroup::Ptr>& sgs = g->supply_groups();
+  std::vector<SupplyGroup::Ptr>::const_iterator sg_it;
+  for (sg_it = sgs->begin(); sg_it != sgs->end(); ++sg_it) {
+    TranslateSGRow(*sg_it);
+  }
+
+  const std::vector<RequestGroup::Ptr>& rgs = g->request_groups();
+  std::vector<RequestGroup::Ptr>::const_iterator rg_it;
+  for (rg_it = rgs->begin(); rg_it != rgs->end(); ++rg_it) {
+    TranslateRGRow(*rg_it);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ExchangeTranslator::TranslateObj(ExchangeGraph* g,
+                                      OsiSolverInterface* iface) {
   iface->setObjSense(-1.0); // maximize
   const std::vector<Arc>& arcs = g->arcs();
   std::vector<Arcs>::const_iterator a_it;
