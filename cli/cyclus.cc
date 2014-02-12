@@ -88,8 +88,8 @@ int main(int argc, char* argv[]) {
     return 0;
   } else if (vm.count("version")) {
     std::cout << "Cyclus Core " << version::core()
-        << " (" << version::describe() << ")"
-        << "\n\nDependencies:\n";
+              << " (" << version::describe() << ")"
+              << "\n\nDependencies:\n";
     std::cout << "   Boost    " << version::boost() << "\n";
     std::cout << "   Coin-Cbc " << version::coincbc() << "\n";
     std::cout << "   Hdf5     " << version::hdf5() << "\n";
@@ -224,7 +224,7 @@ int main(int argc, char* argv[]) {
   std::cout << "|--------------------------------------------|" << std::endl;
   std::cout << "Output location: " << output_path << std::endl;
   std::cout << "Simulation ID: " << boost::lexical_cast<std::string>
-      (ctx->sim_id()) << std::endl;
+            (ctx->sim_id()) << std::endl;
   std::cout << std::endl;
 
   delete ctx;
