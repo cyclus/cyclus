@@ -9,17 +9,17 @@ StubFacility::StubFacility(cyclus::Context* ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubFacility::~StubFacility() {};
+StubFacility::~StubFacility() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubFacility::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::FacilityModel::InitFrom(qe);
   qe = qe->QueryElement(ModelImpl());
-  
+
   cyclus::QueryEngine* input = qe->QueryElement("input");
-  //retrieve input data members here. For example :  
-  //string query = "incommodity";
-  //incommodity_ = lexical_cast<double>(input->getElementContent(query));
+  // retrieve input data members here. For example :
+  // string query = "incommodity";
+  // incommodity_ = lexical_cast<double>(input->getElementContent(query));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,22 +29,22 @@ cyclus::Model* StubFacility::Clone() {
   return m;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubFacility::InitFrom(StubFacility* m) {
   cyclus::FacilityModel::InitFrom(m);
   // Initialize stubfacility members for a cloned module here
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubFacility::str() {
   return FacilityModel::str();
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::Tick(int time){}
+void StubFacility::Tick(int time) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::Tock(int time){}
+void StubFacility::Tock(int time) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructStubFacility(cyclus::Context* ctx) {

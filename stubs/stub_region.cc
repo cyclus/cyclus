@@ -9,16 +9,16 @@ StubRegion::StubRegion(cyclus::Context* ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubRegion::~StubRegion() {};
+StubRegion::~StubRegion() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubRegion::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::RegionModel::InitFrom(qe);
   qe = qe->QueryElement(ModelImpl());
-  
-  //retrieve input data members here. For example :  
-  //string query = "incommodity";
-  //incommodity_ = lexical_cast<double>(qe->getElementContent(query));
+
+  // retrieve input data members here. For example :
+  // string query = "incommodity";
+  // incommodity_ = lexical_cast<double>(qe->getElementContent(query));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,16 +28,16 @@ cyclus::Model* StubRegion::Clone() {
   return m;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubRegion::InitFrom(StubRegion* m) {
   cyclus::RegionModel::InitFrom(m);
   // Initialize stubregion members for a cloned module here
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubRegion::str() {
   return RegionModel::str();
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructStubRegion(cyclus::Context* ctx) {

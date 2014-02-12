@@ -9,16 +9,16 @@ StubInst::StubInst(cyclus::Context* ctx)
     {};
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubInst::~StubInst() {};
+StubInst::~StubInst() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::InstModel::InitFrom(qe);
   qe = qe->QueryElement(ModelImpl());
-  
-  //retrieve input data members here. For example :  
-  //string query = "incommodity";
-  //incommodity_ = lexical_cast<double>(qe->getElementContent(query));
+
+  // retrieve input data members here. For example :
+  // string query = "incommodity";
+  // incommodity_ = lexical_cast<double>(qe->getElementContent(query));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,16 +28,16 @@ cyclus::Model* StubInst::Clone() {
   return m;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::InitFrom(StubInst* m) {
   cyclus::InstModel::InitFrom(m);
   // Initialize stubinst members for a cloned module here
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubInst::str() {
   return InstModel::str();
-};
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructStubInst(cyclus::Context* ctx) {
