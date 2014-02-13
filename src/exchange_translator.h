@@ -107,10 +107,6 @@ class ExchangeTranslator {
   }
   
   ExchangeTranslationContext<T>& translation_ctx() { return xlation_ctx_; }
-
-  /// @brief translates an exchange graph into an instance of a mathematical
-  /// program
-  void ToProg(ExchangeGraph* g, OsiSolverInterface* iface);
   
  private: 
   ExchangeContext<T>* ex_ctx_;
