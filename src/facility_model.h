@@ -169,25 +169,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
    */
   bool LifetimeReached(int time);
 
-  /**
-     Each facility is prompted to do its beginning-of-time-step
-     stuff at the tick of the timer.
-
-     @param time is the time to perform the tick
-   */
-  virtual void Tick(int time) = 0;
-
-  /**
-     Each facility is prompted to its end-of-time-step
-     stuff on the tock of the timer.
-
-     By default, facilities are decommissioned if time is greater
-     than or equal to its end date.
-
-     @param time is the time to perform the tock
-   */
-  virtual void Tock(int time) = 0;
-
  private:
   /**
      each facility should have an institution that manages it

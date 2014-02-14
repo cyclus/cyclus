@@ -105,6 +105,7 @@ std::string InstModel::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::Deploy(Model* parent) {
   Model::Deploy(parent);
+  context()->RegisterTimeListener(this);
 
   // build initial prototypes
   std::map<std::string, int>::iterator it;
@@ -122,34 +123,10 @@ void InstModel::Deploy(Model* parent) {
   }
 }
 
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-void InstModel::Tick(int time) {
-  // tell all of the institution's child models to handle the tick
-  int currsize = children().size();
-  int i = 0;
-  while (i < children().size()) {
-    Model* m = children().at(i);
-    dynamic_cast<FacilityModel*>(m)->Tick(time);
-
-    // increment not needed if a facility deleted itself
-    if (children().size() == currsize) {
-      i++;
-    }
-    currsize = children().size();
-  }
-}
-
 void InstModel::Tock(int time) {
-  // tell all of the institution's child models to handle the tock
-  std::vector<FacilityModel*> to_decomm;
-
+  std::vector<Model*> to_decomm;
   for (int i = 0; i < children().size(); i++) {
     FacilityModel* child = dynamic_cast<FacilityModel*>(children().at(i));
-    child->Tock(time);
-
     if (child->LifetimeReached(time)) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
       if (child->CheckDecommissionCondition()) {
@@ -159,7 +136,7 @@ void InstModel::Tock(int time) {
   }
 
   while (!to_decomm.empty()) {
-    FacilityModel* child = to_decomm.back();
+    Model* child = to_decomm.back();
     to_decomm.pop_back();
     RegisterCloneAsDecommissioned(child);
     child->Decommission();

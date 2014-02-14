@@ -77,24 +77,6 @@ class InstModel : public Model, public TimeListener {
 
  public:
   /**
-     Each institution is prompted to do its beginning-of-time-step
-     stuff at the tick of the timer.
-     Default behavior is to ignore the tick.
-
-     @param time is the time to perform the tick
-   */
-  virtual void Tick(int time);
-
-  /**
-     Each institution is prompted to its end-of-time-step
-     stuff on the tock of the timer.
-     Default behavior is to ignore the tock.
-
-     @param time is the time to perform the tock
-   */
-  virtual void Tock(int time);
-
-  /**
      perform all tasks required when an inst enters the simulation
    */
   virtual void Deploy(Model* parent);
@@ -151,6 +133,10 @@ class InstModel : public Model, public TimeListener {
      @param proto_name the name of the prototype to build
    */
   void Build(std::string proto_name);
+
+  virtual void Tick(int time) {};
+
+  virtual void Tock(int time);
 
  protected:
   void InitFrom(InstModel* m);

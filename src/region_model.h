@@ -93,24 +93,6 @@ class RegionModel : public Model, public TimeListener {
    */
   virtual std::string str();
 
-  /**
-     Each region is prompted to do its beginning-of-time-step
-     stuff at the tick of the timer.
-     The default behavior is to ignore the tick.
-
-     @param time is the time to perform the tick
-   */
-  virtual void Tick(int time);
-
-  /**
-     Each region is prompted to do its end-of-time-step
-     stuff at the tock of the timer.
-     The default behavior is to ignore the tock.
-
-     @param time is the time to perform the tock
-   */
-  virtual void Tock(int time);
-
   /* --------------------
    * all REGIONMODEL classes have these members
    * --------------------
@@ -122,6 +104,10 @@ class RegionModel : public Model, public TimeListener {
     return (allowedFacilities_.find(proto_name)
             != allowedFacilities_.end());
   } ;
+
+  virtual void Tick(int time) {};
+
+  virtual void Tock(int time) {};
 
  protected:
   void InitFrom(RegionModel* m);

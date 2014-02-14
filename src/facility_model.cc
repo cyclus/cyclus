@@ -68,6 +68,7 @@ void FacilityModel::InitFrom(FacilityModel* m) {
 void FacilityModel::Deploy(Model* parent) {
   Model::Deploy(parent);
   context()->RegisterTrader(this);
+  context()->RegisterTimeListener(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
