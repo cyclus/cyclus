@@ -11,11 +11,12 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                                bool exclusive)
-    :  g_(g), iface_(iface), excl_(exclusive), m_(false, 0, 0) {
+    :  g_(g), iface_(iface), excl_(exclusive) {
   arc_offset_ = g_->arcs().size();
   int reserve = arc_offset_ + g_->request_groups().size();
-  obj_coeffs_.reserve(reserve);
-  col_ubs_.reserve(reserve);
+  ctx_.m = CoinPackedMatrix(false, 0, 0);
+  ctx_.obj_coeffs.reserve(reserve);
+  ctx_.col_ubs.reserve(reserve);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -33,7 +34,7 @@ void ProgTranslator::ToProg() {
 
   // number of variables = number of arcs + faux arcs
   int n_cols = arcs.size() + n_req_nodes;
-  m_.setDimensions(0, n_cols);
+  ctx_.m.setDimensions(0, n_cols);
 
   bool req;
   std::vector<ExchangeNodeGroup::Ptr>& sgs = g_->supply_groups();
@@ -48,8 +49,8 @@ void ProgTranslator::ToProg() {
   }
 
   // load er up!
-  iface_->loadProblem(m_, &col_lbs_[0], &col_ubs_[0], &obj_coeffs_[0],
-                     &row_lbs_[0], &row_ubs_[0]);
+  iface_->loadProblem(ctx_.m, &ctx_.col_lbs[0], &ctx_.col_ubs[0], &ctx_.obj_coeffs[0],
+                     &ctx_.row_lbs[0], &ctx_.row_ubs[0]);
 
   if (excl_) {
     for (int i = 0; i != arcs.size(); i++) {
@@ -100,9 +101,9 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
 
       // add obj coeff for arc
       double pref = nodes[i]->prefs[a];
-      obj_coeffs_[arc_id] = a.exclusive ? pref * a.excl_val : pref;
-      col_lbs_.push_back(0);
-      col_ubs_[arc_id] = a.exclusive ? 1 : inf;
+      ctx_.obj_coeffs[arc_id] = a.exclusive ? pref * a.excl_val : pref;
+      ctx_.col_lbs.push_back(0);
+      ctx_.col_ubs[arc_id] = a.exclusive ? 1 : inf;
     }
     
     if (excl_row.getNumElements() > 0) {
@@ -113,9 +114,9 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
   double faux_id;
   if (req) {
     faux_id = ++arc_offset_;
-    obj_coeffs_[faux_id] = 0;
-    col_lbs_.push_back(0);
-    col_ubs_[faux_id] = inf;
+    ctx_.obj_coeffs[faux_id] = 0;
+    ctx_.col_lbs.push_back(0);
+    ctx_.col_ubs[faux_id] = inf;
   }
 
   // add all capacity rows  
@@ -126,16 +127,16 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
     
     double lb = req ? caps[i] : 0;
     double ub = req ? inf : caps[i];
-    row_lbs_.push_back(lb);
-    row_ubs_.push_back(ub);
-    m_.appendRow(cap_rows[i]);
+    ctx_.row_lbs.push_back(lb);
+    ctx_.row_ubs.push_back(ub);
+    ctx_.m.appendRow(cap_rows[i]);
   }
 
   // add all exclusive rows
   for (int i = 0; i != excl_rows.size(); i++) {
-    row_lbs_.push_back(0.0);
-    row_ubs_.push_back(1.0);
-    m_.appendRow(excl_rows[i]);
+    ctx_.row_lbs.push_back(0.0);
+    ctx_.row_ubs.push_back(1.0);
+    ctx_.m.appendRow(excl_rows[i]);
   }
 }
 

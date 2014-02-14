@@ -25,6 +25,16 @@ class ExchangeNodeGroup;
 /// @endcode
 class ProgTranslator {
  public:
+  /// @brief struct to hold all problem instance state
+  struct Context {
+    std::vector<double> obj_coeffs;
+    std::vector<double> row_ubs;
+    std::vector<double> row_lbs;
+    std::vector<double> col_ubs;
+    std::vector<double> col_lbs;
+    CoinPackedMatrix m;    
+  };
+  
   /// constructor
   ///
   /// @param g the exchange graph
@@ -38,6 +48,8 @@ class ProgTranslator {
 
   /// @brief translates solution from iface back into graph matches
   void FromProg();
+
+  const ProgTranslator::Context& ctx() const { return ctx_; }
   
  private:
   /// perform all translation for a node group
@@ -48,13 +60,8 @@ class ProgTranslator {
   ExchangeGraph* g_;
   OsiSolverInterface* iface_;
   bool excl_;
-  CoinPackedMatrix m_;
   int arc_offset_;
-  std::vector<double> obj_coeffs_;
-  std::vector<double> row_ubs_;
-  std::vector<double> row_lbs_;
-  std::vector<double> col_ubs_;
-  std::vector<double> col_lbs_;
+  ProgTranslator::Context ctx_;
 };
 
 } // namespace cyclus
