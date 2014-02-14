@@ -14,26 +14,16 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
     :  g_(g), iface_(iface), excl_(exclusive) {
   arc_offset_ = g_->arcs().size();
   int reserve = arc_offset_ + g_->request_groups().size();
-  ctx_.m = CoinPackedMatrix(false, 0, 0);
   ctx_.obj_coeffs.reserve(reserve);
   ctx_.col_ubs.reserve(reserve);
+  ctx_.col_lbs.reserve(reserve);
+  ctx_.m = CoinPackedMatrix(false, 0, 0);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void ProgTranslator::ToProg() {
-  iface_->setObjSense(-1.0); // maximize
-  std::vector<Arc>& arcs = g_->arcs();
-  
-  // count req nodes
-  int n_req_nodes = 0;
-  const std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
-  std::vector<RequestGroup::Ptr>::const_iterator rg_it;
-  for (rg_it = rgs.begin(); rg_it != rgs.end(); ++rg_it) {
-    n_req_nodes += (*rg_it)->nodes().size();
-  }
-
-  // number of variables = number of arcs + faux arcs
-  int n_cols = arcs.size() + n_req_nodes;
+void ProgTranslator::Translate() {
+  // number of variables = number of arcs + 1 faux arc per request group
+  int n_cols = g_->arcs.size() + g_->request_groups().size();
   ctx_.m.setDimensions(0, n_cols);
 
   bool req;
@@ -47,12 +37,18 @@ void ProgTranslator::ToProg() {
     req = true;
     XlateGrp_(rgs[i].get(), req);
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void ProgTranslator::Populate() {
+  iface_->setObjSense(-1.0); // maximize
 
   // load er up!
-  iface_->loadProblem(ctx_.m, &ctx_.col_lbs[0], &ctx_.col_ubs[0], &ctx_.obj_coeffs[0],
-                     &ctx_.row_lbs[0], &ctx_.row_ubs[0]);
+  iface_->loadProblem(ctx_.m, &ctx_.col_lbs[0], &ctx_.col_ubs[0],
+                      &ctx_.obj_coeffs[0], &ctx_.row_lbs[0], &ctx_.row_ubs[0]);
 
   if (excl_) {
+    std::vector<Arc>& arcs = g_->arcs();
     for (int i = 0; i != arcs.size(); i++) {
       Arc& a = arcs[i];
       if (a.exclusive) {
@@ -60,6 +56,12 @@ void ProgTranslator::ToProg() {
       }
     }
   }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void ProgTranslator::ToProg() {
+  Translate();
+  Populate();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -102,7 +104,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
       // add obj coeff for arc
       double pref = nodes[i]->prefs[a];
       ctx_.obj_coeffs[arc_id] = a.exclusive ? pref * a.excl_val : pref;
-      ctx_.col_lbs.push_back(0);
+      ctx_.col_lbs[arc_id] = 0;
       ctx_.col_ubs[arc_id] = a.exclusive ? 1 : inf;
     }
     
@@ -115,7 +117,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
   if (req) {
     faux_id = ++arc_offset_;
     ctx_.obj_coeffs[faux_id] = 0;
-    ctx_.col_lbs.push_back(0);
+    ctx_.col_lbs[faux_id] = 0;
     ctx_.col_ubs[faux_id] = inf;
   }
 

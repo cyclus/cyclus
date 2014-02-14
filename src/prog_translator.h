@@ -43,9 +43,17 @@ class ProgTranslator {
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                  bool exclusive = false);
 
-  /// @brief translates graph into mathematic program via iface
-  void ToProg();
+  /// @brief translates the graph, filling the translators Context
+  void Translate();
 
+  /// @brief populates the solver interface with values from the translators
+  /// Context
+  void Populate();
+  
+  /// @brief translates graph into mathematic program via iface. This method is
+  /// equivalent to calling Translate(), then Populate().
+  void ToProg();
+  
   /// @brief translates solution from iface back into graph matches
   void FromProg();
 
