@@ -215,6 +215,7 @@ class ExchangeGraph {
   inline const std::vector<Arc>& arcs() { return arcs_; }
   
   inline const std::map<Arc, int>& arc_ids() { return arc_ids_; }
+  inline const std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
   
  private: 
   std::vector<RequestGroup::Ptr> request_groups_;
@@ -223,6 +224,7 @@ class ExchangeGraph {
   std::vector<Match> matches_;
   std::vector<Arc> arcs_;
   std::map<Arc, int> arc_ids_;
+  std::map<int, Arc> arc_by_id_;
   int next_arc_id_;
 };
   

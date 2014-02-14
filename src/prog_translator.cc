@@ -137,4 +137,17 @@ void Proreqranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void ProgTranslator::FromProg() {
+  const double* sol = si->getColSolution();
+  std::vector<Arc>& arcs = g_->arcs();
+  for (int i = 0; i < arcs.size(); i++) {
+    double val = sol[i];
+    Arc& a = g_->arc_by_id()[i];
+    if (val < cyclus::eps()) continue;
+    val = (excl_ && a.exclusive) ? val * a.excl_val : val;
+    g_->AddMatch(a, val);
+  }
+}
+
 } // namespace cyclus
