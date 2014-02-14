@@ -1,11 +1,16 @@
 #ifndef CYCLUS_PROG_TRANSLATOR_H_
 #define CYCLUS_PROG_TRANSLATOR_H_
 
+#include <vector>
+
+#include "CoinPackedMatrix.hpp"
+
 class OsiSolverInterface;
 
 namespace cyclus {
 
 class ExchangeGraph;
+class ExchangeNodeGroup;
 
 /// a helper class to translate a generic resource exchange into a mathematical
 /// program.
@@ -38,7 +43,7 @@ class ProgTranslator {
   /// perform all translation for a node group
   /// @param grp a pointer to the node group
   /// @param req a boolean flag, true if grp is a request group
-  XlateGrp_(ExchangeNodeGroup* grp, bool req);
+  void XlateGrp_(ExchangeNodeGroup* grp, bool req);
   
   ExchangeGraph* g_;
   OsiSolverInterface* iface_;
@@ -51,6 +56,7 @@ class ProgTranslator {
   std::vector<double> col_ubs_;
   std::vector<double> col_lbs_;
 };
+
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_PROG_TRANSLATOR_H_

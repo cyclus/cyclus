@@ -106,7 +106,8 @@ class ExchangeNodeGroup {
  public:
   typedef boost::shared_ptr<ExchangeNodeGroup> Ptr;
   
-  const std::vector<ExchangeNode::Ptr>& nodes() { return nodes_; }
+  const std::vector<ExchangeNode::Ptr>& nodes() const { return nodes_; }
+  std::vector<ExchangeNode::Ptr>& nodes() { return nodes_; }
 
   /// @brief the flow capacities assocaited with this group
   const std::vector<double>& capacities() const { return capacities_; }
@@ -198,11 +199,17 @@ class ExchangeGraph {
   /// @param qty the amount of flow corresponding to a match
   void AddMatch(const Arc& a, double qty);
   
-  inline const std::vector<RequestGroup::Ptr>& request_groups() {
+  inline const std::vector<RequestGroup::Ptr>& request_groups() const {
+    return request_groups_;
+  }
+  inline std::vector<RequestGroup::Ptr>& request_groups() {
     return request_groups_;
   }
   
-  inline const std::vector<ExchangeNodeGroup::Ptr>& supply_groups() {
+  inline const std::vector<ExchangeNodeGroup::Ptr>& supply_groups() const {
+    return supply_groups_;
+  }
+  inline std::vector<ExchangeNodeGroup::Ptr>& supply_groups() {
     return supply_groups_;
   }
   
@@ -212,10 +219,14 @@ class ExchangeGraph {
   
   inline const std::vector<Match>& matches() { return matches_; }
   
-  inline const std::vector<Arc>& arcs() { return arcs_; }
+  inline const std::vector<Arc>& arcs() const { return arcs_; }
+  inline std::vector<Arc>& arcs() { return arcs_; }
   
-  inline const std::map<Arc, int>& arc_ids() { return arc_ids_; }
-  inline const std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
+  inline const std::map<Arc, int>& arc_ids() const { return arc_ids_; }
+  inline std::map<Arc, int>& arc_ids() { return arc_ids_; }
+  
+  inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
+  inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
   
  private: 
   std::vector<RequestGroup::Ptr> request_groups_;
