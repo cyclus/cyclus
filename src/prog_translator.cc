@@ -142,11 +142,12 @@ void ProgTranslator::FromProg() {
   const double* sol = si->getColSolution();
   std::vector<Arc>& arcs = g_->arcs();
   for (int i = 0; i < arcs.size(); i++) {
-    double val = sol[i];
+    double flow = sol[i];
     Arc& a = g_->arc_by_id()[i];
-    if (val < cyclus::eps()) continue;
-    val = (excl_ && a.exclusive) ? val * a.excl_val : val;
-    g_->AddMatch(a, val);
+    flow = (a.exclusive) ? flow * a.excl_flow : flow;
+    if (flow > cyclus::eps()) {
+      g_->AddMatch(a, flow);
+    }
   }
 }
 
