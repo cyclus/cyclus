@@ -102,11 +102,14 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
         excl_row.insert(arc_id, 1.0);
       }
 
-      // add obj coeff for arc
-      double pref = nodes[i]->prefs[a];
-      ctx_.obj_coeffs[arc_id] = a.exclusive ? pref * a.excl_val : pref;
-      ctx_.col_lbs[arc_id] = 0;
-      ctx_.col_ubs[arc_id] = a.exclusive ? 1 : inf;
+      if (req) {
+        // add obj coeff for arc
+        double pref = nodes[i]->prefs[a];
+        pref = a.exclusive ? pref * a.excl_val : pref;
+        ctx_.obj_coeffs[arc_id] = pref;
+        ctx_.col_lbs[arc_id] = 0;
+        ctx_.col_ubs[arc_id] = a.exclusive ? 1 : inf;
+      }
     }
     
     if (excl_row.getNumElements() > 0) {

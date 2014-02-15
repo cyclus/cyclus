@@ -36,6 +36,12 @@ TEST(ProgTranslatorTests, translation) {
   int excl_arcs [] = {1, 2, 4};
   double excl_flow [] = {0, 2, 2, 0, 2, 0, 0};
 
+  std::vector<double> obj_coeffs;
+  for (int i = 0; i != narcs + nfaux; i++) {
+    obj_coeffs.push_back((excl_flow[i] != 0) ?
+                         excl_flow[i] * prefs[i] : prefs[i]);
+  }
+  
   ExchangeNode::Ptr a0(new ExchangeNode());
   ExchangeNode::Ptr a1(new ExchangeNode());
   ExchangeNode::Ptr b0(new ExchangeNode());
@@ -47,10 +53,10 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNode::Ptr d1(new ExchangeNode());
 
   Arc x0(a0, c0);
-  Arc x1(b0, c1, true, excl_arcs[0]);
-  Arc x2(b1, c2, true, excl_arcs[1]);
+  Arc x1(b0, c1, true, excl_flow[1]);
+  Arc x2(b1, c2, true, excl_flow[2]);
   Arc x3(a1, d0);
-  Arc x4(b1, d1, true, excl_arcs[2]);
+  Arc x4(b1, d1, true, excl_flow[4]);
 
   a0->unit_capacities[x0] = std::vector<double>(
       ucaps_a_0, ucaps_a_0 + sizeof(ucaps_a_0) / sizeof(ucaps_a_0[0]) );
@@ -115,7 +121,7 @@ TEST(ProgTranslatorTests, translation) {
   ProgTranslator pt(&g, iface);
   EXPECT_NO_THROW(pt.Translate());
 
-  array_double_eq(prefs, &pt.ctx().obj_coeffs[0], narcs + nfaux);
+  array_double_eq(&obj_coeffs[0], &pt.ctx().obj_coeffs[0], narcs + nfaux);
   
   delete iface;
 };
