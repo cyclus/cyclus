@@ -121,7 +121,12 @@ TEST(ProgTranslatorTests, translation) {
   ProgTranslator pt(&g, iface);
   EXPECT_NO_THROW(pt.Translate());
 
+  double inf = iface->getInfinity();
+  double col_lbs [] = {0, 0, 0, 0, 0, 0, 0};
+  double col_ubs [] = {inf, 1, 1, inf, 1, inf, inf};
   array_double_eq(&obj_coeffs[0], &pt.ctx().obj_coeffs[0], narcs + nfaux);
+  array_double_eq(col_ubs, &pt.ctx().col_ubs[0], narcs + nfaux);
+  array_double_eq(col_lbs, &pt.ctx().col_lbs[0], narcs + nfaux);
   
   delete iface;
 };
