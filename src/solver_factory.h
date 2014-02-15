@@ -2,6 +2,8 @@
 
 class OsiSolverInterface;
 
+namespace cyclus {
+
 /// A factory class that, given a configuration, returns a
 /// Coin::OsiSolverInterface for a solver.
 ///
@@ -18,3 +20,5 @@ class SolverFactory {
  private:
   std::string t_;
 };
+
+} // namespace cyclus

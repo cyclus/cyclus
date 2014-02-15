@@ -9,6 +9,8 @@
 
 #include "equality_helpers.h"
 
+namespace cyclus {
+
 class SolverFactoryTests : public ::testing::Test  {
  public:
   virtual void SetUp();
@@ -173,3 +175,5 @@ TEST_F(SolverFactoryTests, CbcRedundant) {
   EXPECT_DOUBLE_EQ(1, si->getObjValue());
   delete si;
 }
+
+} // namespace cyclus

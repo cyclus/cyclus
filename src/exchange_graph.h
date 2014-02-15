@@ -134,7 +134,7 @@ class RequestGroup : public ExchangeNodeGroup {
   typedef boost::shared_ptr<RequestGroup> Ptr;
   
   explicit RequestGroup(double qty = 0.0);
-
+  
   double qty() { return qty_; }
   
  private:

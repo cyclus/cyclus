@@ -3,6 +3,8 @@
 #include "OsiClpSolverInterface.hpp"
 #include "OsiCbcSolverInterface.hpp" 
 
+namespace cyclus {
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 OsiSolverInterface* SolverFactory::get() {
   if (t_ == "clp") {
@@ -11,3 +13,5 @@ OsiSolverInterface* SolverFactory::get() {
     return new OsiCbcSolverInterface();
   }
 }
+
+} // namespace cyclus
