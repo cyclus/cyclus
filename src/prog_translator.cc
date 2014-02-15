@@ -117,7 +117,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
   int faux_id;
   if (req) {
     faux_id = arc_offset_++;
-    ctx_.obj_coeffs[faux_id] = 0;
+    ctx_.obj_coeffs[faux_id] = -1;
     ctx_.col_lbs[faux_id] = 0;
     ctx_.col_ubs[faux_id] = inf;
   }
