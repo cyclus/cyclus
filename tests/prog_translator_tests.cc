@@ -3,6 +3,7 @@
 #include "OsiSolverInterface.hpp"
 
 #include "exchange_graph.h"
+#include "equality_helpers.h"
 #include "prog_translator.h"
 #include "solver_factory.h"
 
@@ -10,9 +11,10 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ProgTranslatorTests, translation) {
-  int narcs = 7;
-
-  double prefs [] = {0.2, 1.2, 4, 5, 1.3, 0, 0};
+  int narcs = 5;
+  int nfaux = 2;
+  
+  double prefs [] = {0.2, 1.2, 4, 5, 1.3, -1, -1};
   double ucaps_a_0 [] = {0.5, 0.4};
   double ucaps_a_3 [] = {0.3, 0.6};
   double ucaps_b_1 [] = {0.9};
@@ -112,6 +114,9 @@ TEST(ProgTranslatorTests, translation) {
   OsiSolverInterface* iface = sf.get();
   ProgTranslator pt(&g, iface);
   EXPECT_NO_THROW(pt.Translate());
+
+  array_double_eq(prefs, &pt.ctx().obj_coeffs[0], narcs + nfaux);
+  
   delete iface;
 };
 
