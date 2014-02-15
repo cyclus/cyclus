@@ -33,11 +33,11 @@ void ProgTranslator::Translate() {
     XlateGrp_(sgs[i].get(), req);
   }
 
-  // std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
-  // for (int i = 0; i != rgs.size(); i++) {
-  //   req = true;
-  //   XlateGrp_(rgs[i].get(), req);
-  // }
+  std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
+  for (int i = 0; i != rgs.size(); i++) {
+    req = true;
+    XlateGrp_(rgs[i].get(), req);
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -114,9 +114,9 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
     }
   }
 
-  double faux_id;
+  int faux_id;
   if (req) {
-    faux_id = ++arc_offset_;
+    faux_id = arc_offset_++;
     ctx_.obj_coeffs[faux_id] = 0;
     ctx_.col_lbs[faux_id] = 0;
     ctx_.col_ubs[faux_id] = inf;
