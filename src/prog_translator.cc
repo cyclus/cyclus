@@ -33,11 +33,11 @@ void ProgTranslator::Translate() {
     XlateGrp_(sgs[i].get(), req);
   }
 
-  std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
-  for (int i = 0; i != rgs.size(); i++) {
-    req = true;
-    XlateGrp_(rgs[i].get(), req);
-  }
+  // std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
+  // for (int i = 0; i != rgs.size(); i++) {
+  //   req = true;
+  //   XlateGrp_(rgs[i].get(), req);
+  // }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
