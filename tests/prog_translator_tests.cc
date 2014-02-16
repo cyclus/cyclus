@@ -189,14 +189,14 @@ TEST(ProgTranslatorTests, translation) {
   // test population
   EXPECT_NO_THROW(pt.Populate());
 
-  CoinModel model(nrows, narcs + nfaux, &m, &row_lbs[0], &row_ubs[0],
-                  &col_lbs[0], &col_ubs[0], &obj_coeffs[0]);
-  ClpSimplex* compare = dynamic_cast<OsiClpSolverInterface*>(iface)->getModelPtr();
-
   for (int i = 0; i != nexcl; i++) {
     EXPECT_TRUE(iface->isInteger(excl_arcs[i]));
   }
-  
+
+  CoinModel model(nrows, narcs + nfaux, &m, &row_lbs[0], &row_ubs[0],
+                  &col_lbs[0], &col_ubs[0], &obj_coeffs[0]);
+  ClpSimplex* compare =
+      dynamic_cast<OsiClpSolverInterface*>(iface)->getModelPtr();
   // CoinModel* test = compare->createCoinModel();
   // EXPECT_EQ(0, model.differentModel(*test, true));
   
