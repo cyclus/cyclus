@@ -1,6 +1,6 @@
 // blob.h
-#ifndef CYCLUS_CORE_UTILITY_BLOB_H_
-#define CYCLUS_CORE_UTILITY_BLOB_H_
+#ifndef CYCLUS_SRC_BLOB_H_
+#define CYCLUS_SRC_BLOB_H_
 
 #include <string>
 
@@ -9,15 +9,15 @@ namespace cyclus {
 /// output database.
 class Blob {
  public:
-  Blob(std::string s) : str_(s) {};
+  explicit Blob(std::string s) : str_(s) {}
 
   const std::string& str() const {
     return str_;
-  };
+  }
 
  private:
   std::string str_;
 };
-}
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_BLOB_H_
