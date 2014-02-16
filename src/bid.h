@@ -1,5 +1,5 @@
-#ifndef CYCLUS_BID_H_
-#define CYCLUS_BID_H_
+#ifndef CYCLUS_SRC_BID_H_
+#define CYCLUS_SRC_BID_H_
 
 #include <boost/shared_ptr.hpp>
 
@@ -9,7 +9,7 @@ namespace cyclus {
 
 class Trader;
 template<class T> class BidPortfolio;
-  
+
 /// @class Bid
 ///
 /// @brief A Bid encapsulates all the information required to communicate a bid
@@ -26,7 +26,7 @@ class Bid {
   /// @param bidder the bidder
   /// @param portfolio the porftolio of which this bid is a part
   inline static typename Bid<T>::Ptr Create(
-      typename Request<T>::Ptr request, 
+      typename Request<T>::Ptr request,
       boost::shared_ptr<T> offer,
       Trader* bidder,
       typename BidPortfolio<T>::Ptr portfolio,
@@ -36,13 +36,13 @@ class Bid {
 
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
-  inline static typename Bid<T>::Ptr Create(typename Request<T>::Ptr request, 
+  inline static typename Bid<T>::Ptr Create(typename Request<T>::Ptr request,
                                             boost::shared_ptr<T> offer,
                                             Trader* bidder,
                                             bool exclusive = false) {
     return Ptr(new Bid<T>(request, offer, bidder, exclusive));
   }
-  
+
   /// @return the request being responded to
   inline typename Request<T>::Ptr request() const { return request_; }
 
@@ -51,7 +51,7 @@ class Bid {
 
   /// @return the model responding the request
   inline Trader* bidder() const { return bidder_; }
-  
+
   /// @return the portfolio of which this bid is a part
   inline typename BidPortfolio<T>::Ptr portfolio() { return portfolio_; }
 
@@ -60,16 +60,16 @@ class Bid {
 
  private:
   /// @brief constructors are private to require use of factory methods
-  Bid(typename Request<T>::Ptr request, 
+  Bid(typename Request<T>::Ptr request,
       boost::shared_ptr<T> offer,
       Trader* bidder,
       bool exclusive = false)
     : request_(request),
       offer_(offer),
       bidder_(bidder),
-      exclusive_(exclusive) {};
+      exclusive_(exclusive) {}
 
-  Bid(typename Request<T>::Ptr request, 
+  Bid(typename Request<T>::Ptr request,
       boost::shared_ptr<T> offer,
       Trader* bidder,
       typename BidPortfolio<T>::Ptr portfolio,
@@ -78,7 +78,7 @@ class Bid {
       offer_(offer),
       bidder_(bidder),
       portfolio_(portfolio),
-      exclusive_(exclusive) {};
+      exclusive_(exclusive) {}
 
   typename Request<T>::Ptr request_;
   boost::shared_ptr<T> offer_;
@@ -87,6 +87,6 @@ class Bid {
   bool exclusive_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_BID_H_
