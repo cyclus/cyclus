@@ -5,32 +5,33 @@
 
 #include "context.h"
 #include "facility_model.h"
+#include "generic_resource.h"
+#include "logger.h"
+#include "material.h"
 #include "query_engine.h"
+#include "request_portfolio.h"
+#include "resource_buff.h"
+#include "trade.h"
 
 namespace cyclus {
 
 /**
   @class SinkFacility
-  Detailed description will be defined later.
+  This sink facility accepts specified amount of commodity.
+  This sink facility is similar to SinkFacility provided in cycamore, but it
+  has minimum implementation to run integration tests.
+  Some parts of the code is directrly copied from cycamore SinkFacility.
 
   This FacilityModel is intended
   to be used in Cyclus integration tests as a basic sink facility.
 
   @section intro Introduction
-  Place an introduction to the model here.
 
   @section modelparams Model Parameters
-  Place a description of the required input parameters which define the
-  model implementation.
 
   @section optionalparams Optional Parameters
-  Place a description of the optional input parameters to define the
-  model implementation.
 
   @section detailed Detailed Behavior
-  Place a description of the detailed behavior of the model. Consider
-  describing the behavior at the tick and tock as well as the behavior
-  upon sending and receiving materials and messages.
   */
 class SinkFacility : public cyclus::FacilityModel  {
   /* --------------------
@@ -87,13 +88,45 @@ class SinkFacility : public cyclus::FacilityModel  {
 
   /* ------------------- */
 
+  /// @brief SinkFacilities request Materials of their given commodity. Note
+  /// that it is assumed the SinkFacility operates on a single resource type!
+  virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
+      GetMatlRequests();
+
+  /// @brief SinkFacilities request GenericResources of their given
+  /// commodity. Note that it is assumed the SinkFacility operates on a single
+  /// resource type!
+  virtual std::set<cyclus::RequestPortfolio<cyclus::GenericResource>::Ptr>
+      GetGenRsrcRequests();
+
+  /// @brief SinkFacilities place accepted trade Materials in their Inventory
+  virtual void AcceptMatlTrades(
+      const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
+      cyclus::Material::Ptr> >& responses);
+
+  /// @brief SinkFacilities place accepted trade Materials in their Inventory
+  virtual void AcceptGenRsrcTrades(
+      const std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
+      cyclus::GenericResource::Ptr> >& responses);
+  /* --- */
 
   /* --------------------
    * _THIS_ FACILITYMODEL class has these members
    * --------------------
    */
 
+  /**
+     determines the amount to request
+   */
+  inline double RequestAmt() const {
+    return capacity_;
+  }
+
   /* ------------------- */
+ private:
+  std::string incommodity_;
+  double capacity_;
+  cyclus::ResourceBuff inventory_;
 };
 
 }  // namespace cyclus
