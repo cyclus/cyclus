@@ -98,7 +98,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
       }
       
       // add exclusive arc
-      if (excl_ && a.exclusive) {
+      if (excl_ && req && a.exclusive) {
         excl_row.insert(arc_id, 1.0);
       }
 
