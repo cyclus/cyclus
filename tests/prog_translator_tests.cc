@@ -17,6 +17,7 @@ TEST(ProgTranslatorTests, translation) {
   int narcs = 5;
   int nfaux = 2;
   int nrows = 8;
+  int nexcl = 3;
   
   double prefs [] = {0.2, 1.2, 4, 5, 1.3, -1, -1};
   double ucaps_a_0 [] = {0.5, 0.4};
@@ -191,7 +192,13 @@ TEST(ProgTranslatorTests, translation) {
   CoinModel model(nrows, narcs + nfaux, &m, &row_lbs[0], &row_ubs[0],
                   &col_lbs[0], &col_ubs[0], &obj_coeffs[0]);
   ClpSimplex* compare = dynamic_cast<OsiClpSolverInterface*>(iface)->getModelPtr();
-  // EXPECT_EQ(0, model.differentModel(*(compare->createCoinModel()), true));
+
+  for (int i = 0; i != nexcl; i++) {
+    EXPECT_TRUE(iface->isInteger(excl_arcs[i]));
+  }
+  
+  // CoinModel* test = compare->createCoinModel();
+  // EXPECT_EQ(0, model.differentModel(*test, true));
   
   delete iface;
 };
