@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "OsiSolverInterface.hpp"
+#include "CoinPackedMatrix.hpp"
 
 #include "exchange_graph.h"
 #include "equality_helpers.h"
@@ -98,6 +99,7 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNodeGroup::Ptr c(new ExchangeNodeGroup());
   c->AddExchangeNode(c0);
   c->AddExchangeNode(c1);
+  c->AddExchangeNode(c2);
   c->AddCapacity(sup_c[0]);
   ExchangeNodeGroup::Ptr d(new ExchangeNodeGroup());
   d->AddExchangeNode(d0);
@@ -124,6 +126,8 @@ TEST(ProgTranslatorTests, translation) {
   EXPECT_NO_THROW(pt.Translate());
 
   double inf = iface->getInfinity();
+
+  // test non-coin xlate members
   double col_lbs [] = {0, 0, 0, 0, 0, 0, 0};
   double col_ubs [] = {inf, 1, 1, inf, 1, inf, inf};
   double row_lbs [] = {0, 0, 0, dem_a[0], dem_a[1], dem_b[0], 0, 0};
@@ -133,6 +137,56 @@ TEST(ProgTranslatorTests, translation) {
   array_double_eq(col_lbs, &pt.ctx().col_lbs[0], narcs + nfaux, "col_lb");
   array_double_eq(row_ubs, &pt.ctx().row_ubs[0], nrows, "row_ub");
   array_double_eq(row_lbs, &pt.ctx().row_lbs[0], nrows, "row_lb");
+
+  // test coin xlate members
+  CoinPackedMatrix m(false, 0, 0);
+  m.setDimensions(0, narcs + nfaux);
+  
+  int row_ind_0 [] = {0, 1, 2};
+  double row_val_0 [] = {ucaps_c_0[0],
+                         ucaps_c_1[0] * excl_flow[1],
+                         ucaps_c_2[0] * excl_flow[2]};
+  m.appendRow(3, row_ind_0, row_val_0);
+
+  int row_ind_1 [] = {3, 4};
+  double row_val_1 [] = {ucaps_d_3[0],
+                         ucaps_d_4[0] * excl_flow[4]};
+  m.appendRow(2, row_ind_1, row_val_1);
+  
+  int row_ind_2 [] = {3, 4};
+  double row_val_2 [] = {ucaps_d_3[1],
+                         ucaps_d_4[1] * excl_flow[4]};
+  m.appendRow(2, row_ind_2, row_val_2);
+  
+  int row_ind_3 [] = {0, 3, 5};
+  double row_val_3 [] = {ucaps_a_0[0], ucaps_a_3[0], 1};
+  m.appendRow(3, row_ind_3, row_val_3);
+
+  int row_ind_4 [] = {0, 3, 5};
+  double row_val_4 [] = {ucaps_a_0[1], ucaps_a_3[1], 1};
+  m.appendRow(3, row_ind_4, row_val_4);
+  
+  int row_ind_5 [] = {1, 2, 4, 6};
+  double row_val_5 [] = {ucaps_b_1[0] * excl_flow[1],
+                         ucaps_b_2[0] * excl_flow[2],
+                         ucaps_b_4[0] * excl_flow[4],
+                         1};
+  m.appendRow(4, row_ind_5, row_val_5);
+
+  int row_ind_6 [] = {1};
+  double row_val_6 [] = {1};
+  m.appendRow(1, row_ind_6, row_val_6);
+
+  int row_ind_7 [] = {2, 4};
+  double row_val_7 [] = {1, 1};
+  m.appendRow(2, row_ind_7, row_val_7);
+
+  for (int i = 0; i != nrows; i++) {
+    EXPECT_EQ(m.getVector(i).getNumElements(),
+              pt.ctx().m.getVector(i).getNumElements()) << i;
+  }
+  
+  EXPECT_TRUE(m.isEquivalent2(pt.ctx().m));
   
   delete iface;
 };
