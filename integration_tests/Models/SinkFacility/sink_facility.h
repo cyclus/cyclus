@@ -1,5 +1,5 @@
-#ifndef SINK_FACILITY_H_
-#define SINK_FACILITY_H_
+#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_SINK_FACILITY_H_
+#define CYCLUS_INTEGRATION_TESTS_MODELS_SINK_FACILITY_H_
 
 #include <string>
 
@@ -42,7 +42,7 @@ class SinkFacility : public cyclus::FacilityModel  {
     Constructor for SinkFacility Class
     @param ctx the cyclus context for access to simulation-wide parameters
     */
-  SinkFacility(cyclus::Context* ctx);
+  explicit SinkFacility(cyclus::Context* ctx);
 
   /**
     every model should be destructable
@@ -94,10 +94,8 @@ class SinkFacility : public cyclus::FacilityModel  {
    */
 
   /* ------------------- */
-
 };
 
-} // namespace sink
+}  // namespace cyclus
 
-#endif // SINK_FACILITY_H_
-
+#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_SINK_FACILITY_H_

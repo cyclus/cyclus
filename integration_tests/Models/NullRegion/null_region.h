@@ -1,5 +1,5 @@
-#ifndef NULL_REGION_H_
-#define NULL_REGION_H_
+#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_NULL_REGION_H_
+#define CYCLUS_INTEGRATION_TESTS_MODELS_NULL_REGION_H_
 
 #include <string>
 
@@ -37,7 +37,7 @@ class NullRegion : public cyclus::RegionModel {
     Constructor for NullRegion Class
     @param ctx the cyclus context for access to simulation-wide parameters
     */
-  NullRegion(cyclus::Context* ctx);
+  explicit NullRegion(cyclus::Context* ctx);
 
   /**
     every model should be destructable
@@ -75,9 +75,8 @@ class NullRegion : public cyclus::RegionModel {
    */
 
   /* ------------------- */
-
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // NULL_REGION_H_
+#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_NULL_REGION_H_

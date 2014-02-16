@@ -1,5 +1,5 @@
-#ifndef NULL_INST_H_
-#define NULL_INST_H_
+#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_NULL_INST_H_
+#define CYCLUS_INTEGRATION_TESTS_MODELS_NULL_INST_H_
 
 #include <string>
 
@@ -39,7 +39,7 @@ class NullInst : public cyclus::InstModel {
     Constructor for NullInst Class
     @param ctx the cyclus context for access to simulation-wide parameters
     */
-  NullInst(cyclus::Context* ctx);
+  explicit NullInst(cyclus::Context* ctx);
 
   /**
     every model should be destructable
@@ -77,9 +77,8 @@ class NullInst : public cyclus::InstModel {
    */
 
   /* ------------------- */
-
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // NULL_INST_H_
+#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_NULL_INST_H_

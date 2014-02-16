@@ -1,5 +1,5 @@
-#ifndef SOURCE_FACILITY_H_
-#define SOURCE_FACILITY_H_
+#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_SOURCE_FACILITY_H_
+#define CYCLUS_INTEGRATION_TESTS_MODELS_SOURCE_FACILITY_H_
 
 #include <string>
 
@@ -42,7 +42,7 @@ class SourceFacility : public cyclus::FacilityModel  {
     Constructor for SourceFacility Class
     @param ctx the cyclus context for access to simulation-wide parameters
     */
-  SourceFacility(cyclus::Context* ctx);
+  explicit SourceFacility(cyclus::Context* ctx);
 
   /**
     every model should be destructable
@@ -94,10 +94,8 @@ class SourceFacility : public cyclus::FacilityModel  {
    */
 
   /* ------------------- */
-
 };
 
-} // namespace source
+}  // namespace cyclus
 
-#endif // SOURCE_FACILITY_H_
-
+#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_SOURCE_FACILITY_H_
