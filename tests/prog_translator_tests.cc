@@ -127,11 +127,11 @@ TEST(ProgTranslatorTests, translation) {
   double col_ubs [] = {inf, 1, 1, inf, 1, inf, inf};
   double row_lbs [] = {0, 0, 0, dem_a[0], dem_a[1], dem_b[0], 1, 1};
   double row_ubs [] = {sup_c[0], sup_d[0], sup_d[1], 0, 0, 0, 0, 0};
-  array_double_eq(&obj_coeffs[0], &pt.ctx().obj_coeffs[0], narcs + nfaux);
-  array_double_eq(col_ubs, &pt.ctx().col_ubs[0], narcs + nfaux);
-  array_double_eq(col_lbs, &pt.ctx().col_lbs[0], narcs + nfaux);
-  array_double_eq(row_ubs, &pt.ctx().row_ubs[0], nrows);
-  array_double_eq(row_lbs, &pt.ctx().row_lbs[0], nrows);
+  array_double_eq(&obj_coeffs[0], &pt.ctx().obj_coeffs[0], narcs + nfaux, "obj");
+  array_double_eq(col_ubs, &pt.ctx().col_ubs[0], narcs + nfaux, "col_ub");
+  array_double_eq(col_lbs, &pt.ctx().col_lbs[0], narcs + nfaux, "col_lb");
+  array_double_eq(row_ubs, &pt.ctx().row_ubs[0], nrows, "row_ub");
+  array_double_eq(row_lbs, &pt.ctx().row_lbs[0], nrows, "row_lb");
   
   delete iface;
 };

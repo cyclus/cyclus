@@ -74,11 +74,11 @@ void array_eq(const T* const expected, const T* const actual,
 
 template <class T>
 void array_double_eq(const T* const expected, const T* const actual,
-                     unsigned long length) {
+                     unsigned long length, std::string name = "") {
   for (unsigned long index = 0; index < length; index++) {
     T exp = expected[index];
     T act = actual[index];
-    EXPECT_DOUBLE_EQ(exp, act) << "arrays differ at index "
+    EXPECT_DOUBLE_EQ(exp, act) << name << " arrays differ at index "
                                << index << "\n"
                                << " exp: " << exp << "\n"
                                << " act: " << act << "\n";
