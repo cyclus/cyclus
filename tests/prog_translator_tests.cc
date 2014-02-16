@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 
 #include "OsiSolverInterface.hpp"
+#include "OsiClpSolverInterface.hpp"
 #include "CoinPackedMatrix.hpp"
+#include "CoinModel.hpp"
 
 #include "exchange_graph.h"
 #include "equality_helpers.h"
@@ -181,12 +183,15 @@ TEST(ProgTranslatorTests, translation) {
   double row_val_7 [] = {1, 1};
   m.appendRow(2, row_ind_7, row_val_7);
 
-  for (int i = 0; i != nrows; i++) {
-    EXPECT_EQ(m.getVector(i).getNumElements(),
-              pt.ctx().m.getVector(i).getNumElements()) << i;
-  }
-  
   EXPECT_TRUE(m.isEquivalent2(pt.ctx().m));
+
+  // test population
+  EXPECT_NO_THROW(pt.Populate());
+
+  CoinModel model(nrows, narcs + nfaux, &m, &row_lbs[0], &row_ubs[0],
+                  &col_lbs[0], &col_ubs[0], &obj_coeffs[0]);
+  ClpSimplex* compare = dynamic_cast<OsiClpSolverInterface*>(iface)->getModelPtr();
+  // EXPECT_EQ(0, model.differentModel(*(compare->createCoinModel()), true));
   
   delete iface;
 };
