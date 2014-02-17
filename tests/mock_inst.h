@@ -12,7 +12,7 @@ class MockInst : public cyclus::InstModel {
   virtual ~MockInst() {};
 
   virtual cyclus::Model* Clone() {
-    MockInst* m = new MockInst(*this);
+    MockInst* m = new MockInst(context());
     m->InitFrom(this);
     return m;
   }

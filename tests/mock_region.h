@@ -12,7 +12,7 @@ class MockRegion : public cyclus::RegionModel {
   virtual ~MockRegion() {};
 
   virtual cyclus::Model* Clone() {
-    MockRegion* m = new MockRegion(*this);
+    MockRegion* m = new MockRegion(context());
     m->InitFrom(this);
     return m;
   }
