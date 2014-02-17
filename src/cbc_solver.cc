@@ -136,7 +136,6 @@ void CBCSolver::PrintObjFunction(int num) {
   std::cout << std::endl;
 }
 
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CBCSolver::PrintConstraints(int n_const, int n_vars) {
   std::cout << "Constraints:" << std::endl;
