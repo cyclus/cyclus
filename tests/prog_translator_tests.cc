@@ -8,11 +8,11 @@
 #include "CoinModel.hpp"
 
 #include "coin_helpers.h"
-#include "exchange_graph.h"
 #include "equality_helpers.h"
+#include "exchange_graph.h"
+#include "logger.h"
 #include "prog_translator.h"
 #include "solver_factory.h"
-#include "logger.h"
 
 namespace cyclus {
 
