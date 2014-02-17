@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <utility>
+
 #include "OsiSolverInterface.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include "CoinPackedMatrix.hpp"
@@ -122,8 +124,11 @@ TEST(ProgTranslatorTests, translation) {
   g.AddArc(x4);
 
   SolverFactory sf;
-  sf.solver_t("clp");
+  sf.solver_t("cbc");
   OsiSolverInterface* iface = sf.get();
+  CoinMessageHandler h;
+  h.setLogLevel(0);
+  iface->passInMessageHandler(&h);
   bool excl = true;
   ProgTranslator pt(&g, iface, excl);
   EXPECT_NO_THROW(pt.Translate());
@@ -192,15 +197,60 @@ TEST(ProgTranslatorTests, translation) {
   for (int i = 0; i != nexcl; i++) {
     EXPECT_TRUE(iface->isInteger(excl_arcs[i]));
   }
-
-  CoinModel model(nrows, narcs + nfaux, &m, &row_lbs[0], &row_ubs[0],
-                  &col_lbs[0], &col_ubs[0], &obj_coeffs[0]);
+  
+  // CoinModel model(nrows, narcs + nfaux, &m, &row_lbs[0], &row_ubs[0],
+  //                 &col_lbs[0], &col_ubs[0], &obj_coeffs[0]);
   // ClpSimplex* compare =
   //     dynamic_cast<OsiClpSolverInterface*>(iface)->getModelPtr();
   // CoinModel* test = compare->createCoinModel();
   // EXPECT_EQ(0, model.differentModel(*test, true));
 
   EXPECT_NO_THROW(Solve(iface));
+
+  OsiClpSolverInterface checkface;
+  checkface.passInMessageHandler(&h);
+  checkface.loadProblem(m, &col_lbs[0], &col_ubs[0],
+                         &obj_coeffs[0], &row_lbs[0], &row_ubs[0]);
+  for (int i = 0; i != nexcl; i++) {
+    checkface.setInteger(excl_arcs[i]);
+  }
+  checkface.setObjSense(-1.0);
+  checkface.initialSolve();
+  checkface.branchAndBound();
+  
+  const double* soln = iface->getColSolution();
+  const double* check = checkface.getColSolution();
+  array_double_eq(soln, check, narcs + nfaux);
+  
+  // check solution
+  double x0_flow = (sup_c[0] -
+                    ucaps_c_1[0] * excl_flow[1] - ucaps_c_2[0] * excl_flow[2]) /
+                   ucaps_c_0[0]; // 9.42857..
+  double x1_flow = excl_flow[1];
+  double x2_flow = excl_flow[2];
+  double x3_flow = sup_d[1] / ucaps_d_3[1]; // 4.55
+  double x4_flow = 0;
+
+  // first faux arc
+  double x5_flow = 0;
+  // second faux arc 
+  double x6_flow = dem_b[0] -
+                   ucaps_b_1[0] * excl_flow[1] -
+                   ucaps_b_2[0] * excl_flow[2]; // 0.6; 
+  
+  EXPECT_DOUBLE_EQ(soln[0], x0_flow);
+  EXPECT_EQ(soln[1], 1);
+  EXPECT_EQ(soln[2], 1);
+  EXPECT_DOUBLE_EQ(soln[3], x3_flow);
+  EXPECT_EQ(soln[4], 0);
+  EXPECT_DOUBLE_EQ(soln[5], 0);
+  EXPECT_DOUBLE_EQ(soln[6], x6_flow);
+
+  // check back translation
+  // pt.FromProg();
+  // const std::vector<Match>& matches = g.matches();
+  // std::pair<Arc, double> ck_x0 = std::pair<Arc, double>(x0, x0_flow);
+  // EXPECT_EQ(matches[0], ck_x0);
   
   delete iface;
 };
