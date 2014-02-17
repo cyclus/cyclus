@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SRC_CONSTRAINT_H_
-#define CYCLUS_SRC_CONSTRAINT_H_
+#ifndef CYCLUS_SRC_CAPACITY_CONSTRAINT_H_
+#define CYCLUS_SRC_CAPACITY_CONSTRAINT_H_
 
 #include <assert.h>
 
@@ -116,4 +116,4 @@ inline bool operator<(const CapacityConstraint<T>& lhs,
 
 }  // namespace cyclus
 
-#endif  // CYCLUS_SRC_CONSTRAINT_H_
+#endif  // CYCLUS_SRC_CAPACITY_CONSTRAINT_H_
