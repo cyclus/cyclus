@@ -254,7 +254,7 @@ TEST(ProgTranslatorTests, translation) {
   // check back translation
   pt.FromProg();
   const std::vector<Match>& matches = g.matches();
-  EXPECT_EQ(4, matches.size());
+  ASSERT_EQ(4, matches.size());
   pair_double_eq(matches[0], std::pair<Arc, double>(x0, x0_flow));
   pair_double_eq(matches[1], std::pair<Arc, double>(x1, x1_flow));
   pair_double_eq(matches[2], std::pair<Arc, double>(x2, x2_flow));
