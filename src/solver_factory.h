@@ -14,8 +14,13 @@ namespace cyclus {
 /// interface
 class SolverFactory {
  public:
-  /// set the solver type
+  /// @param t the solver type
+  explicit SolverFactory(std::string t = "");
+  
+  /// get/set the solver type
   inline void solver_t(std::string t) { t_ = t; }
+  inline const std::string solver_t() const { return t_; }
+  inline std::string solver_t() { return t_; }
 
   /// get the configured solver
   OsiSolverInterface* get();

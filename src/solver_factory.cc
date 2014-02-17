@@ -6,6 +6,9 @@
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+SolverFactory::SolverFactory(std::string t) : t_(t) { }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 OsiSolverInterface* SolverFactory::get() {
   if (t_ == "clp") {
     return new OsiClpSolverInterface();
