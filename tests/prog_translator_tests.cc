@@ -7,6 +7,7 @@
 #include "CoinPackedMatrix.hpp"
 #include "CoinModel.hpp"
 
+#include "coin_helpers.h"
 #include "exchange_graph.h"
 #include "equality_helpers.h"
 #include "prog_translator.h"
@@ -149,6 +150,10 @@ TEST(ProgTranslatorTests, translation) {
   array_double_eq(row_ubs, &pt.ctx().row_ubs[0], nrows, "row_ub");
   array_double_eq(row_lbs, &pt.ctx().row_lbs[0], nrows, "row_lb");
 
+  for (int i = 0; i != 7; i++) {
+    EXPECT_DOUBLE_EQ(col_lbs[i], pt.ctx().col_lbs[i]);
+  }
+  
   // test coin xlate members
   CoinPackedMatrix m(false, 0, 0);
   m.setDimensions(0, narcs + nfaux);
@@ -196,36 +201,33 @@ TEST(ProgTranslatorTests, translation) {
 
   // test population
   EXPECT_NO_THROW(pt.Populate());
-
+  
   for (int i = 0; i != nexcl; i++) {
     EXPECT_TRUE(iface->isInteger(excl_arcs[i]));
   }
-  
-  // CoinModel model(nrows, narcs + nfaux, &m, &row_lbs[0], &row_ubs[0],
-  //                 &col_lbs[0], &col_ubs[0], &obj_coeffs[0]);
-  // ClpSimplex* compare =
-  //     dynamic_cast<OsiClpSolverInterface*>(iface)->getModelPtr();
-  // CoinModel* test = compare->createCoinModel();
-  // EXPECT_EQ(0, model.differentModel(*test, true));
 
-  EXPECT_NO_THROW(Solve(iface));
-
+  // verify problem instance
   OsiClpSolverInterface checkface;
-  checkface.passInMessageHandler(&h);
   checkface.loadProblem(m, &col_lbs[0], &col_ubs[0],
-                         &obj_coeffs[0], &row_lbs[0], &row_ubs[0]);
+                        &obj_coeffs[0], &row_lbs[0], &row_ubs[0]);
   for (int i = 0; i != nexcl; i++) {
     checkface.setInteger(excl_arcs[i]);
   }
+  EXPECT_EQ(0, differentModel(*iface, checkface));
+  differentModel(*iface, checkface);
+
+  checkface.passInMessageHandler(&h);
   checkface.setObjSense(-1.0);
   checkface.initialSolve();
   checkface.branchAndBound();
-  
+
+  // verify solution
+  EXPECT_NO_THROW(Solve(iface));  
   const double* soln = iface->getColSolution();
   const double* check = checkface.getColSolution();
   array_double_eq(soln, check, narcs + nfaux);
   
-  // check solution
+  // validate solution
   double x0_flow = (sup_c[0] -
                     ucaps_c_1[0] * excl_flow[1] - ucaps_c_2[0] * excl_flow[2]) /
                    ucaps_c_0[0]; // 9.42857..

@@ -24,8 +24,8 @@ differentModel(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
   bool gotHint = (lhs.getHintParam(OsiDoReducePrint,takeHint,strength));
   assert (gotHint);
   bool printStuff=true;
-  if (strength!=OsiHintIgnore&&takeHint) 
-    printStuff=false;
+  // if (strength!=OsiHintIgnore&&takeHint) // always printStuff
+  //   printStuff=false;
   int returnCode=0;
   int numberRows = lhs.getNumRows();
   int numberColumns = lhs.getNumCols();
