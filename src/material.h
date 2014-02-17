@@ -115,7 +115,7 @@ class Material: public Resource {
   ///
   /// @param qty the mass quantity to extract
   /// @param c the composition the extracted/returned material
-  /// @param threshold an absolute mass cutoff below which constituent isotope
+  /// @param threshold an absolute mass cutoff below which constituent nuclide
   /// quantities of the remaining unextracted material are set to zero.
   /// @return a new material with quantity qty and composition c
   Ptr ExtractComp(double qty, Composition::Ptr c, double threshold = eps_rsrc());

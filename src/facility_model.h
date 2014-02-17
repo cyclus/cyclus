@@ -58,7 +58,7 @@ class InstModel;
    and produced a fixed/corresponding spent fuel recipe at the same
    frequency - SeparationsMatrixFacility: A facility that consumes a
    fixed quantity of material of one commodity and produces many
-   different output streams with the input isotopes distributed across
+   different output streams with the input nuclides distributed across
    those output streams according to a fixed matrix
    - EnrichmentFacility: A facility that offers a fixed quantity of SWUs
    to accomplish isotopic enrichment of material

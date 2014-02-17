@@ -10,7 +10,7 @@ class Context;
 
 typedef int Iso;
 
-/// a raw definition of isotopes and corresponding (dimensionless quantities).
+/// a raw definition of nuclides and corresponding (dimensionless quantities).
 typedef std::map<Iso, double> CompMap;
 
 /// An immutable object responsible for holding a nuclide composition. It tracks

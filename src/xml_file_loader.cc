@@ -87,15 +87,15 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
 
   double value;
   int key;
-  std::string query = "isotope";
+  std::string query = "nuclide";
   int nisos = qe->NElementsMatchingQuery(query);
   CompMap v;
   for (int i = 0; i < nisos; i++) {
-    QueryEngine* isotope = qe->QueryElement(query, i);
-    key = strtol(isotope->GetElementContent("id").c_str(), NULL, 10);
-    value = strtod(isotope->GetElementContent("comp").c_str(), NULL);
+    QueryEngine* nuclide = qe->QueryElement(query, i);
+    key = strtol(nuclide->GetElementContent("id").c_str(), NULL, 10);
+    value = strtod(nuclide->GetElementContent("comp").c_str(), NULL);
     v[key] = value;
-    CLOG(LEV_DEBUG3) << "  Isotope: " << key << " Value: " << v[key];
+    CLOG(LEV_DEBUG3) << "  Nuclide: " << key << " Value: " << v[key];
   }
 
   if (atom_basis) {

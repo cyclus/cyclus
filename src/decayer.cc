@@ -15,7 +15,7 @@ bool Decayer::decay_info_loaded_ = false;
 ParentMap Decayer::parent_ = ParentMap();
 DaughtersMap Decayer::daughters_ = DaughtersMap();
 Matrix Decayer::decay_matrix_ = Matrix();
-IsoList Decayer::isotopes_tracked_ = IsoList();
+IsoList Decayer::nuclides_tracked_ = IsoList();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Decayer::Decayer(const CompMap& comp) {
@@ -30,22 +30,22 @@ Decayer::Decayer(const CompMap& comp) {
     int iso = comp_iter->first;
     long double atom_count = comp_iter->second;
 
-    // if the isotope is tracked in the decay matrix
+    // if the nuclide is tracked in the decay matrix
     if (parent_.count(iso) > 0) {
       int col = parent_[iso].first; // get Vector position
       pre_vect_(col, 1) = atom_count;
-      // if it is not in the decay matrix, then it is added as a stable isotope
+      // if it is not in the decay matrix, then it is added as a stable nuclide
     } else {
       double decayConst = 0;
       int col = parent_.size() + 1;
-      parent_[iso] = std::make_pair(col, decayConst);  // add isotope to parent map
+      parent_[iso] = std::make_pair(col, decayConst);  // add nuclide to parent map
 
       int nDaughters = 0;
       std::vector< std::pair<int, double> > temp(nDaughters);
-      daughters_[col] = temp;  // add isotope to daughters map
+      daughters_[col] = temp;  // add nuclide to daughters map
 
       std::vector<long double> row(1, atom_count);
-      pre_vect_.AddRow(row);  // add isotope to the end of the Vector
+      pre_vect_.AddRow(row);  // add nuclide to the end of the Vector
     }
   }
 }
@@ -67,9 +67,9 @@ void Decayer::LoadDecayInfo() {
 
   decayInfo >> iso;  // get first parent
 
-  // checks to see if there are isotopes in 'decayInfo.dat'
+  // checks to see if there are nuclides in 'decayInfo.dat'
   if (decayInfo.eof()) {
-    std::string err_msg = "There are no isotopes in the 'decayInfo.dat' file";
+    std::string err_msg = "There are no nuclides in the 'decayInfo.dat' file";
     throw ValidationError(err_msg);
   }
 
@@ -77,7 +77,7 @@ void Decayer::LoadDecayInfo() {
   while (!decayInfo.eof()) {
     if (parent_.find(iso) != parent_.end()) {
       std::string err_msg;
-      err_msg = "A duplicate parent isotope was found in 'decayInfo.dat'";
+      err_msg = "A duplicate parent nuclide was found in 'decayInfo.dat'";
       throw ValidationError(err_msg);
     }
 
@@ -95,11 +95,11 @@ void Decayer::LoadDecayInfo() {
       decayInfo >> branchRatio;
       AddIsoToList(iso);
 
-      // checks for duplicate daughter isotopes
+      // checks for duplicate daughter nuclides
       for (int j = 0; j < nDaughters; ++j) {
         if (temp[j].first == iso) {
           throw ValidationError(
-            std::string("A duplicate daughter isotope, %i , was found in decayInfo.dat",
+            std::string("A duplicate daughter nuclide, %i , was found in decayInfo.dat",
                         iso));
         }
       }
@@ -127,17 +127,17 @@ double Decayer::DecayConstant(int iso) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::AddIsoToList(int iso) {
-  bool exists = (find(isotopes_tracked_.begin(), isotopes_tracked_.end(),
-                      iso) != isotopes_tracked_.end());
+  bool exists = (find(nuclides_tracked_.begin(), nuclides_tracked_.end(),
+                      iso) != nuclides_tracked_.end());
   if (!exists) {
-    isotopes_tracked_.push_back(iso);
+    nuclides_tracked_.push_back(iso);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::GetResult(CompMap& comp) {
   // loops through the ParentMap and populates the passed CompMap with
-  // the number density from the comp parameter for each isotope
+  // the number density from the comp parameter for each nuclide
   ParentMap::const_iterator parent_iter = parent_.begin(); // get first parent
   while (parent_iter != parent_.end()) {
     int iso = parent_iter->first;
@@ -146,7 +146,7 @@ void Decayer::GetResult(CompMap& comp) {
     // checks to see if the Vector position is valid
     if (col <= post_vect_.NumRows()) {
       double atom_count = post_vect_(col, 1);
-      // adds isotope to the map if its number density is non-zero
+      // adds nuclide to the map if its number density is non-zero
       if (atom_count > 0) {
         comp[iso] = atom_count;
       }
@@ -175,7 +175,7 @@ void Decayer::BuildDecayMatrix() {
     // processes the vector in the daughters map if it is not empty
     if (!daughters_.find(jcol)->second.empty()) {
       // an iterator that points to 1st daughter in the vector
-      // pair<isotope,branchratio>
+      // pair<nuclide,branchratio>
       std::vector< std::pair<int, double> >::const_iterator
       iso_iter = daughters_.find(jcol)->second.begin();
 

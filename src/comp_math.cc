@@ -62,7 +62,7 @@ void Normalize(CompMap* v, double val) {
   }
 }
 
-bool ValidIsos(const CompMap& v) {
+bool ValidNucs(const CompMap& v) {
   int min = 1001;
   int max = 1182949;
 

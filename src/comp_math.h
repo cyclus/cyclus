@@ -38,7 +38,7 @@ void ApplyThreshold(CompMap* v, double threshold);
 void Normalize(CompMap* v, double val = 1.0);
 
 /// Returns true if all nuclide keys in v are valid.
-bool ValidIsos(const CompMap& v);
+bool ValidNucs(const CompMap& v);
 
 /// Returns true if all nuclides in v have quantities greater than or equal to
 /// zero.

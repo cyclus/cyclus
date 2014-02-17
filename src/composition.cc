@@ -13,8 +13,8 @@ namespace cyclus {
 int Composition::next_id_ = 0;
 
 Composition::Ptr Composition::CreateFromAtom(CompMap v) {
-  if (!compmath::ValidIsos(v) || !compmath::AllPositive(v)) {
-    throw ValueError("invalid isotope or negative quantity in CompMap");
+  if (!compmath::ValidNucs(v) || !compmath::AllPositive(v)) {
+    throw ValueError("invalid nuclide or negative quantity in CompMap");
   }
 
   Composition::Ptr c(new Composition());
@@ -23,8 +23,8 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
 }
 
 Composition::Ptr Composition::CreateFromMass(CompMap v) {
-  if (!compmath::ValidIsos(v) || !compmath::AllPositive(v)) {
-    throw ValueError("invalid isotope or negative quantity in CompMap");
+  if (!compmath::ValidNucs(v) || !compmath::AllPositive(v)) {
+    throw ValueError("invalid nuclide or negative quantity in CompMap");
   }
 
   Composition::Ptr c(new Composition());

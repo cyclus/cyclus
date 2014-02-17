@@ -1,5 +1,5 @@
-#ifndef MATQUERY_H_
-#define MATQUERY_H_
+#ifndef CYCLUS_SRC_MAT_QUERY_H_
+#define CYCLUS_SRC_MAT_QUERY_H_
 
 #include "comp_math.h"
 #include "cyc_limits.h"
@@ -17,16 +17,16 @@ class MatQuery {
   /// Returns the mass in kg of the material.
   double qty();
 
-  /// Returns the mass in kg of isotope iso in the material.
+  /// Returns the mass in kg of nuclide iso in the material.
   double mass(Iso iso);
 
-  /// Returns the number of moles of isotope iso in the material.
+  /// Returns the number of moles of nuclide iso in the material.
   double moles(Iso iso);
 
-  /// Returns the mass fraction of isotope iso in the material.
+  /// Returns the mass fraction of nuclide iso in the material.
   double mass_frac(Iso iso);
 
-  /// returns the atom/mole fraction of isotope iso in the material.
+  /// returns the atom/mole fraction of nuclide iso in the material.
   double atom_frac(Iso iso);
 
   /// Returns true if all nuclide fractions of the material and other
@@ -39,4 +39,4 @@ class MatQuery {
 
 } // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_MAT_QUERY_H_

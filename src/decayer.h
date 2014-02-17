@@ -10,7 +10,7 @@
 namespace cyclus {
 
 /**
-   A map type to represent all of the parent isotopes tracked.  The key
+   A map type to represent all of the parent nuclides tracked.  The key
    for this map type is the parent's Iso number, and the value is a pair
    that contains the corresponding decay matrix column and decay
    constant associated with that parent.
@@ -18,7 +18,7 @@ namespace cyclus {
 typedef std::map< int, std::pair<int, double> > ParentMap;
 
 /**
-   A map type to represent all of the daughter isotopes tracked.  The
+   A map type to represent all of the daughter nuclides tracked.  The
    key for this map type is the decay matrix column associated with the
    parent, and the value is a vector of pairs of all the daughters for
    that parent. Each of the daughters are represented by a pair that
@@ -70,17 +70,17 @@ class Decayer {
   static bool decay_info_loaded_;
 
   /**
-     the list of tracked isotopes
+     the list of tracked nuclides
    */
-  static IsoList isotopes_tracked_;
+  static IsoList nuclides_tracked_;
 
   /**
-     Add the Isotope to our list of tracked isotopes IFF it is not
+     Add the nuclide to our list of tracked nuclides IFF it is not
    */
   static void AddIsoToList(int iso);
 
  public:
-  /// Returns the decay constant for specified isotope in inverse years.
+  /// Returns the decay constant for specified nuclide in inverse years.
   static double DecayConstant(int iso);
 
   /**
@@ -100,17 +100,17 @@ class Decayer {
   void Decay(double years);
 
   /**
-     the number of tracked isotopes
+     the number of tracked nuclides
    */
-  int n_tracked_isotopes() {
-    return isotopes_tracked_.size();
+  int n_tracked_nuclides() {
+    return nuclides_tracked_.size();
   }
 
   /**
-     the tracked isotope at position i
+     the tracked nuclide at position i
    */
-  int TrackedIsotope(int i) {
-    return isotopes_tracked_.at(i);
+  int TrackedNuclide(int i) {
+    return nuclides_tracked_.at(i);
   }
 };
 
