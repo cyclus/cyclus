@@ -94,6 +94,7 @@ void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
   vector<double>& unit_caps = n.unit_capacities[a];
   vector<double>& caps = n.group->capacities();
   for (int i = 0; i < caps.size(); i++) {
+    double prev = caps[i];
     // special case for unlimited capacities
     CLOG(cyclus::LEV_DEBUG1) << "Updating capacity value from: "
                              << caps[i];
@@ -103,9 +104,12 @@ void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
     CLOG(cyclus::LEV_DEBUG1) << "                          to: "
                              << caps[i];
     
-    if (IsNegative(caps[i])) {
-      throw ValueError("Capacities can not be reduced below 0.");
-    }
+    // if (IsNegative(caps[i])) {
+    //   std::stringstream msg;
+    //   msg << "Can't reduce a capacity from "
+    //       << prev << " to " << caps[i] << ".";
+    //   throw ValueError(msg.str());
+    // }
   }
 
   if (IsNegative(n.max_qty - qty)) {
