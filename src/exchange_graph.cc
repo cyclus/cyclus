@@ -97,10 +97,10 @@ void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
     double prev = caps[i];
     // special case for unlimited capacities
     CLOG(cyclus::LEV_DEBUG1) << "Updating capacity value from: "
-                             << caps[i];
-    caps[i] = (caps[i] == std::numeric_limits<double>::max()) ?
+                             << prev;
+    caps[i] = (prev == std::numeric_limits<double>::max()) ?
               std::numeric_limits<double>::max() :
-              caps[i] - qty * unit_caps[i];
+              prev - qty * unit_caps[i];
     CLOG(cyclus::LEV_DEBUG1) << "                          to: "
                              << caps[i];
     
