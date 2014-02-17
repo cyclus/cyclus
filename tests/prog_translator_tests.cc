@@ -11,11 +11,14 @@
 #include "equality_helpers.h"
 #include "prog_translator.h"
 #include "solver_factory.h"
+#include "logger.h"
 
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ProgTranslatorTests, translation) {
+  // Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
+
   int narcs = 5;
   int nfaux = 2;
   int nrows = 8;
@@ -247,10 +250,13 @@ TEST(ProgTranslatorTests, translation) {
   EXPECT_DOUBLE_EQ(soln[6], x6_flow);
 
   // check back translation
-  // pt.FromProg();
-  // const std::vector<Match>& matches = g.matches();
-  // std::pair<Arc, double> ck_x0 = std::pair<Arc, double>(x0, x0_flow);
-  // EXPECT_EQ(matches[0], ck_x0);
+  pt.FromProg();
+  const std::vector<Match>& matches = g.matches();
+  EXPECT_EQ(4, matches.size());
+  pair_double_eq(matches[0], std::pair<Arc, double>(x0, x0_flow));
+  pair_double_eq(matches[1], std::pair<Arc, double>(x1, x1_flow));
+  pair_double_eq(matches[2], std::pair<Arc, double>(x2, x2_flow));
+  pair_double_eq(matches[3], std::pair<Arc, double>(x3, x3_flow));
   
   delete iface;
 };
