@@ -1,5 +1,7 @@
 #include "prog_translator.h"
 
+#include <algorithm>
+
 #include "CoinPackedVector.hpp"
 #include "OsiSolverInterface.hpp"
 
@@ -18,6 +20,9 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
   ctx_.col_ubs.resize(n_cols);
   ctx_.col_lbs.resize(n_cols);
   ctx_.m = CoinPackedMatrix(false, 0, 0);
+  min_row_coeff_ = std::numeric_limits<double>::max();
+  max_obj_coeff_ = 0;
+  cost_add_ = 1;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -38,11 +43,22 @@ void ProgTranslator::Translate() {
     req = true;
     XlateGrp_(rgs[i].get(), req);
   }
+
+  // add each false arc
+  double inf = iface_->getInfinity();
+  double max_cost = max_obj_coeff_ / min_row_coeff_ + cost_add_;
+  // double max_cost = *std::max_element(ctx_.obj_coeffs.begin(),
+  //                                     ctx_.obj_coeffs.end()) + cost_add_;
+  for (int i = g_->arcs().size(); i != arc_offset_; i++) {
+    ctx_.obj_coeffs[i] = max_cost;
+    ctx_.col_lbs[i] = 0;
+    ctx_.col_ubs[i] = inf;
+  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 void ProgTranslator::Populate() {
-  iface_->setObjSense(-1.0); // maximize
+  iface_->setObjSense(1.0); // minimize
 
   // load er up!
   iface_->loadProblem(ctx_.m, &ctx_.col_lbs[0], &ctx_.col_ubs[0],
@@ -94,7 +110,13 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
         if (excl_ && a.exclusive) {
           coeff *= a.excl_val;
         }
+
         cap_rows[j].insert(arc_id, coeff);
+        
+        double compare = coeff;// / caps[j];
+        if (min_row_coeff_ > compare) {
+          min_row_coeff_ = compare;
+        }
       }
       
       // add exclusive arc
@@ -105,8 +127,11 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
       if (req) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
-        pref = a.exclusive ? pref * a.excl_val : pref;
-        ctx_.obj_coeffs[arc_id] = pref;
+        double obj_coeff = a.exclusive ? 1 / pref * a.excl_val : 1 / pref;
+        if (max_obj_coeff_ < obj_coeff) {
+          max_obj_coeff_ = obj_coeff;
+        }
+        ctx_.obj_coeffs[arc_id] = obj_coeff;
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] = a.exclusive ? 1 : inf;
       }
@@ -120,9 +145,6 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
   int faux_id;
   if (req) {
     faux_id = arc_offset_++;
-    ctx_.obj_coeffs[faux_id] = -1;
-    ctx_.col_lbs[faux_id] = 0;
-    ctx_.col_ubs[faux_id] = inf;
   }
 
   // add all capacity rows  

@@ -19,13 +19,20 @@ namespace cyclus {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ProgTranslatorTests, translation) {
   // Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
-
+  SolverFactory sf;
+  sf.solver_t("cbc");
+  OsiSolverInterface* iface = sf.get();
+  CoinMessageHandler h;
+  h.setLogLevel(0);
+  iface->passInMessageHandler(&h);
+  double inf = iface->getInfinity();
+  
   int narcs = 5;
   int nfaux = 2;
   int nrows = 8;
   int nexcl = 3;
   
-  double prefs [] = {0.2, 1.2, 4, 5, 1.3, -1, -1};
+  double prefs [] = {0.2, 1.2, 4, 5, 1.3};
   double ucaps_a_0 [] = {0.5, 0.4};
   double ucaps_a_3 [] = {0.3, 0.6};
   double ucaps_b_1 [] = {0.9};
@@ -48,9 +55,17 @@ TEST(ProgTranslatorTests, translation) {
   double excl_flow [] = {0, 2, 2, 0, 2, 0, 0};
 
   std::vector<double> obj_coeffs;
-  for (int i = 0; i != narcs + nfaux; i++) {
+  for (int i = 0; i != narcs; i++) {
     obj_coeffs.push_back((excl_flow[i] != 0) ?
-                         excl_flow[i] * prefs[i] : prefs[i]);
+                         excl_flow[i] / prefs[i] : 1 / prefs[i]);
+  }
+
+  double cost_add = 1;
+  double max_obj_coeff = 1 / 0.2; // 1 / prefs[0]
+  double min_row_coeff = 0.3; // ucaps_a_3
+  double max_cost = max_obj_coeff / min_row_coeff + cost_add;
+  for (int i = 0; i != nfaux; i++) {
+    obj_coeffs.push_back(max_cost);
   }
   
   ExchangeNode::Ptr a0(new ExchangeNode());
@@ -127,17 +142,9 @@ TEST(ProgTranslatorTests, translation) {
   g.AddArc(x3);
   g.AddArc(x4);
 
-  SolverFactory sf;
-  sf.solver_t("cbc");
-  OsiSolverInterface* iface = sf.get();
-  CoinMessageHandler h;
-  h.setLogLevel(0);
-  iface->passInMessageHandler(&h);
   bool excl = true;
   ProgTranslator pt(&g, iface, excl);
   EXPECT_NO_THROW(pt.Translate());
-
-  double inf = iface->getInfinity();
 
   // test non-coin xlate members
   double col_lbs [] = {0, 0, 0, 0, 0, 0, 0};
@@ -217,7 +224,7 @@ TEST(ProgTranslatorTests, translation) {
   differentModel(*iface, checkface);
 
   checkface.passInMessageHandler(&h);
-  checkface.setObjSense(-1.0);
+  checkface.setObjSense(1.0);
   checkface.initialSolve();
   checkface.branchAndBound();
 
@@ -228,13 +235,11 @@ TEST(ProgTranslatorTests, translation) {
   array_double_eq(soln, check, narcs + nfaux);
   
   // validate solution
-  double x0_flow = (sup_c[0] -
-                    ucaps_c_1[0] * excl_flow[1] - ucaps_c_2[0] * excl_flow[2]) /
-                   ucaps_c_0[0]; // 9.42857..
   double x1_flow = excl_flow[1];
   double x2_flow = excl_flow[2];
   double x3_flow = sup_d[1] / ucaps_d_3[1]; // 4.55
   double x4_flow = 0;
+  double x0_flow = (dem_a[0] - ucaps_a_3[0] * x3_flow) /  ucaps_a_0[0]; // 7.27
 
   // first faux arc
   double x5_flow = 0;

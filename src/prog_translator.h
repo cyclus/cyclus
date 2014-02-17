@@ -70,6 +70,9 @@ class ProgTranslator {
   bool excl_;
   int arc_offset_;
   ProgTranslator::Context ctx_;
+  double max_obj_coeff_;
+  double min_row_coeff_;
+  int cost_add_;
 };
 
 } // namespace cyclus
