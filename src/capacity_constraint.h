@@ -1,5 +1,5 @@
-#ifndef CYCLUS_CAPACITY_CONSTRAINT_H_
-#define CYCLUS_CAPACITY_CONSTRAINT_H_
+#ifndef CYCLUS_SRC_CAPACITY_CONSTRAINT_H_
+#define CYCLUS_SRC_CAPACITY_CONSTRAINT_H_
 
 #include <assert.h>
 
@@ -47,29 +47,29 @@ class CapacityConstraint {
  public:
   /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(double capacity, typename Converter<T>::Ptr converter)
-    : capacity_(capacity),
+      : capacity_(capacity),
       converter_(converter),
       id_(next_id_++) {
-    assert(capacity_ > 0);
-  };
+        assert(capacity_ > 0);
+      }
 
   /// @brief constructor for a constraint with a trivial converter (i.e., one
   /// that simply returns 1)
   explicit CapacityConstraint(double capacity)
-    : capacity_(capacity),
+      : capacity_(capacity),
       id_(next_id_++) {
-    converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
-    assert(capacity_ > 0);
-  }
+        converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
+        assert(capacity_ > 0);
+      }
 
   /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(const CapacityConstraint& other)
-    : capacity_(other.capacity_),
+      : capacity_(other.capacity_),
       converter_(other.converter_),
       id_(next_id_++) {
-    assert(capacity_ > 0);
-  };
-  
+        assert(capacity_ > 0);
+      }
+
   /// @return the constraints capacity
   inline double capacity() const {
     return capacity_;
@@ -104,7 +104,7 @@ inline bool operator==(const CapacityConstraint<T>& lhs,
                        const CapacityConstraint<T>& rhs) {
   return  ((lhs.capacity() == rhs.capacity()) &&
            (*lhs.converter() == *rhs.converter()));
-};
+}
 
 /// @brief CapacityConstraint-CapacityConstraint comparison operator, allows
 /// usage in ordered containers
@@ -112,8 +112,8 @@ template<class T>
 inline bool operator<(const CapacityConstraint<T>& lhs,
                       const CapacityConstraint<T>& rhs) {
   return  (lhs.id() < rhs.id());
-};
+}
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_CAPACITY_CONSTRAINT_H_
