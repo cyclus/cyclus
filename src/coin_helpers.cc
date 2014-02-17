@@ -1,3 +1,7 @@
+// Copyright (C) 2000, International Business Machines
+// Corporation and others.  All Rights Reserved.
+// This code is licensed under the terms of the Eclipse Public License (EPL).
+
 #include "coin_helpers.h"
 
 #include "CoinPackedMatrix.hpp"
@@ -5,7 +9,7 @@
 
 /// taken directly from OsiSolverInterface.cpp on 2/17/14 from
 /// https://projects.coin-or.org/Osi/browser/trunk. Thanks to John Forrest for
-/// his assistance!
+/// his assistance! Some small changes have been made to the original file.
 
 namespace cyclus {
 
