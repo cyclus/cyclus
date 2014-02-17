@@ -20,7 +20,7 @@ class ExchangeNodeGroup;
 /// // given a graph, g, and interface, iface
 /// ProgTranslator t(g, iface);
 /// t->ToProg();
-/// iface->Solve(); // or whatever member function
+/// // solve the program via the interface
 /// t->FromProg();
 /// @endcode
 class ProgTranslator {

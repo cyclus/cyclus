@@ -18,7 +18,7 @@ OsiSolverInterface* SolverFactory::get() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Solve(OsiSolverInterface* si) {
+void SolveProg(OsiSolverInterface* si) {
   si->initialSolve();
   if (HasInt(si)) {
     si->branchAndBound();

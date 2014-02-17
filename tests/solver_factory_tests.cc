@@ -104,7 +104,7 @@ TEST_F(SolverFactoryTests, Clp) {
   h.setLogLevel(0);
   si->passInMessageHandler(&h);
   Init(si);
-  Solve(si);
+  SolveProg(si);
   const double* exp = &lp_exp_[0];
   array_double_eq(&exp[0], si->getColSolution(), n_vars_);
   EXPECT_DOUBLE_EQ(lp_obj_, si->getObjValue());
@@ -118,7 +118,7 @@ TEST_F(SolverFactoryTests, ClpRedundant) {
   h.setLogLevel(0);
   si->passInMessageHandler(&h);
   InitRedundant(si);
-  Solve(si);
+  SolveProg(si);
   double exp [] = {1, 0};
   array_double_eq(exp, si->getColSolution(), 2);
   EXPECT_DOUBLE_EQ(1, si->getObjValue());
@@ -134,7 +134,7 @@ TEST_F(SolverFactoryTests, Cbc) {
   Init(si);
   si->setInteger(1); // y
   si->setInteger(2); // z
-  Solve(si);
+  SolveProg(si);
   const double* exp = &mip_exp_[0];
   array_double_eq(&exp[0], si->getColSolution(), n_vars_);
   EXPECT_DOUBLE_EQ(mip_obj_, si->getObjValue());  
@@ -149,7 +149,7 @@ TEST_F(SolverFactoryTests, CbcRedundant) {
   InitRedundant(si);
   si->setInteger(0); // x
   si->setInteger(1); // y
-  Solve(si);
+  SolveProg(si);
   double exp [] = {1, 0};
   array_double_eq(exp, si->getColSolution(), 2);
   EXPECT_DOUBLE_EQ(1, si->getObjValue());

@@ -21,7 +21,7 @@ void ProgSolver::Solve() {
   try {
     ProgTranslator xlator(graph_, iface, exclusive_orders_);
     xlator.ToProg();
-    cyclus::Solve(iface);
+    SolveProg(iface);
     xlator.FromProg();
   } catch(...) {
     delete iface;

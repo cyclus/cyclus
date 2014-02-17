@@ -138,15 +138,6 @@ TYPED_TEST(ExchangeSolverTest, ExclusiveGreedySolver) {
   delete solver;
 }
 
-// TYPED_TEST(ExchangeSolverTest, LPSolver) {
-//   std::string type = "lp";
-//   ExchangeGraph g;
-//   this->case_->Construct(&g);
-//   ProgSolver solver(&g);
-//   solver.Solve();
-//   this->case_->Test(type, &g);
-// }
-
 // add any more solvers to test here
 
 #endif  // GTEST_HAS_TYPED_TEST

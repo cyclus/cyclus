@@ -222,7 +222,7 @@ TEST(ProgTranslatorTests, translation) {
   checkface.branchAndBound();
 
   // verify solution
-  EXPECT_NO_THROW(Solve(iface));  
+  EXPECT_NO_THROW(SolveProg(iface));  
   const double* soln = iface->getColSolution();
   const double* check = checkface.getColSolution();
   array_double_eq(soln, check, narcs + nfaux);
