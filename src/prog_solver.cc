@@ -1,19 +1,33 @@
 #include "prog_solver.h"
 
+#include "OsiSolverInterface.hpp"
+
+#include "prog_translator.h"
+#include "solver_factory.h"
+
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ProgSolver::ProgSolver(bool exclusive_orders)
-  : ExchangeSolver(exclusive_orders) { }
+ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
+  : solver_t_(solver_t), ExchangeSolver(exclusive_orders) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ProgSolver::~ProgSolver() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ProgSolver::Solve() {
-  // translate exchange graph to lp/milp instance
-  // call solver
-  // backtranslate to matched arcs
+  SolverFactory sf(solver_t_);
+  OsiSolverInterface* iface = sf.get();
+  try {
+    ProgTranslator xlator(graph_, iface, exclusive_orders_);
+    xlator.ToProg();
+    cyclus::Solve(iface);
+    xlator.FromProg();
+  } catch(...) {
+    delete iface;
+    throw;
+  }
+  delete iface;
 }
 
 } // namespace cyclus
