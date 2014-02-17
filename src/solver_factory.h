@@ -24,6 +24,9 @@ class SolverFactory {
   std::string t_;
 };
 
+void Solve(OsiSolverInterface* si);
+bool HasInt(OsiSolverInterface* si);
+
 } // namespace cyclus
 
 #endif // ifndef CYCLUS_SOLVER_FACTORY_H_

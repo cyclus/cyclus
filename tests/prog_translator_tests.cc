@@ -195,10 +195,12 @@ TEST(ProgTranslatorTests, translation) {
 
   CoinModel model(nrows, narcs + nfaux, &m, &row_lbs[0], &row_ubs[0],
                   &col_lbs[0], &col_ubs[0], &obj_coeffs[0]);
-  ClpSimplex* compare =
-      dynamic_cast<OsiClpSolverInterface*>(iface)->getModelPtr();
+  // ClpSimplex* compare =
+  //     dynamic_cast<OsiClpSolverInterface*>(iface)->getModelPtr();
   // CoinModel* test = compare->createCoinModel();
   // EXPECT_EQ(0, model.differentModel(*test, true));
+
+  EXPECT_NO_THROW(Solve(iface));
   
   delete iface;
 };

@@ -17,7 +17,6 @@ class SolverFactoryTests : public ::testing::Test  {
   virtual void TearDown();
   void Init(OsiSolverInterface* si);
   void InitRedundant(OsiSolverInterface* si);
-  void Solve(OsiSolverInterface* si);
 
  protected:
   SolverFactory sf_;
@@ -50,17 +49,6 @@ void SolverFactoryTests::SetUp() {
 void SolverFactoryTests::TearDown() {
   delete [] lp_exp_;
   delete [] mip_exp_;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool HasInt(OsiSolverInterface* si) {
-  int i = 0;
-  for (i = 0; i != si->getNumCols(); i++) {
-    // std::cout << "hi mom!" << si->isInteger(i) << "\n";
-    if(si->isInteger(i)) {
-      return true;
-    }
-  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,14 +95,6 @@ void SolverFactoryTests::InitRedundant(OsiSolverInterface* si) {
   m.setDimensions(0, 2);
   m.appendRow(row1);
   si->loadProblem(m, &col_lb[0], &col_ub[0], &obj[0], &row_lb[0], &row_ub[0]);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SolverFactoryTests::Solve(OsiSolverInterface* si) {
-  si->initialSolve();
-  if (HasInt(si)) {
-    si->branchAndBound();
-  }
 }
 
 TEST_F(SolverFactoryTests, Clp) {
