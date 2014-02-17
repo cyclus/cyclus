@@ -85,6 +85,20 @@ void array_double_eq(const T* const expected, const T* const actual,
   }
 }
 
+template <class T>
+void pair_double_eq(const std::pair<T, double>& p1,
+                    const std::pair<T, double>& p2) {
+  EXPECT_EQ(p1.first, p2.first);
+  EXPECT_DOUBLE_EQ(p1.second, p2.second);
+}
+
+template <class T>
+void pair_double_eq(const std::pair<double, T>& p1,
+                    const std::pair<double, T>& p2) {
+  EXPECT_EQ(p1.second, p2.second);
+  EXPECT_DOUBLE_EQ(p1.first, p2.first);
+}
+
 // -----------
 
 #endif  // CYCLUS_TESTS_EQUALITY_HELPERS_H_
