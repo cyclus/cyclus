@@ -161,7 +161,7 @@ void CBCSolver::Print(int n_const, int n_vars) {
 void CBCSolver::Solve(std::vector<Variable::Ptr>& variables,
                       ObjectiveFunction::Ptr obj,
                       std::vector<Constraint::Ptr>& constraints) {
-  // use builder_ to build constraint probelm
+  // use builder_ to build constraint problem
   Solver::PopulateIndices(variables);
   SetUpConstraints(constraints);
   SetUpVariablesAndObj(variables, obj);
