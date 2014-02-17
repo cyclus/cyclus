@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!-- 1 SourceFacility Source, 1 SinkFacility Sink -->
+
+<simulation>
+  <control>
+    <duration>100</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+    <simstart>0</simstart>
+    <decay>0</decay>
+  </control>
+
+  <commodity>
+    <name>commodity</name>
+  </commodity>
+
+  <facility>
+    <name>Source</name>
+    <model>
+      <SourceFacility>
+        <output>
+          <outcommodity>commodity</outcommodity>
+          <output_capacity>1</output_capacity>
+          <recipe>commod_recipe</recipe>
+        </output>
+      </SourceFacility>
+    </model>
+    <outcommodity>commodity</outcommodity>
+  </facility>
+
+  <facility>
+    <name>Sink</name>
+    <model>
+      <SinkFacility>
+        <input>
+          <commodities>
+            <incommodity>commodity</incommodity>
+          </commodities>
+          <input_capacity>1</input_capacity>
+        </input>
+      </SinkFacility>
+    </model>
+    <incommodity>commodity</incommodity>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <allowedfacility>Source</allowedfacility>
+    <allowedfacility>Sink</allowedfacility>
+    <model>
+      <NullRegion/>
+    </model>
+    <institution>
+      <name>SingleInstitution</name>
+      <availableprototype>Source</availableprototype>
+      <availableprototype>Sink</availableprototype>
+      <initialfacilitylist>
+        <entry>
+          <prototype>Source</prototype>
+          <number>1</number>
+        </entry>
+        <entry>
+          <prototype>Sink</prototype>
+          <number>1</number>
+        </entry>
+      </initialfacilitylist>
+      <model>
+        <NullInst/>
+      </model>
+    </institution>
+  </region>
+
+  <recipe>
+    <name>commod_recipe</name>
+    <basis>mass</basis>
+    <isotope>
+      <id>01001</id>
+      <comp>1</comp>
+    </isotope>
+  </recipe>
+
+</simulation>
