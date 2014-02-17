@@ -59,6 +59,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${CMAKE_CURRENT_SOURCE_DIR}/builder.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/building_manager.cc  
   ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager.cc 
@@ -124,6 +125,7 @@ INSTALL(FILES
   building_manager.h
   capacity_constraint.h
   cbc_solver.h
+  coin_helpers.h
   commodity.h
   commodity_producer.h
   commodity_producer_manager.h
