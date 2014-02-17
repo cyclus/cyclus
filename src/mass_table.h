@@ -47,7 +47,7 @@ class MassTable {
      get the Atomic Number of an nuclide according to its
      identifier.
 
-     @param tope is the nuclide identifier of type Iso, which is an int
+     @param tope is the nuclide identifier of type Nuc, which is an int
      typedef
      @return int the atomic number of the tope nuclide.
    */
@@ -57,7 +57,7 @@ class MassTable {
      get the Mass, a double, of an nuclide according to its
      identifier.
 
-     @param tope is the nuclide identifier of type Iso, which is an int
+     @param tope is the nuclide identifier of type Nuc, which is an int
      typedef
      @return the mass, a double, of the tope nuclide.
    */

@@ -8,10 +8,10 @@ namespace cyclus {
 
 class Context;
 
-typedef int Iso;
+typedef int Nuc;
 
 /// a raw definition of nuclides and corresponding (dimensionless quantities).
-typedef std::map<Iso, double> CompMap;
+typedef std::map<Nuc, double> CompMap;
 
 /// An immutable object responsible for holding a nuclide composition. It tracks
 /// decay lineages to prevent duplicate calculations and output recording and is

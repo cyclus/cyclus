@@ -15,7 +15,7 @@ bool Decayer::decay_info_loaded_ = false;
 ParentMap Decayer::parent_ = ParentMap();
 DaughtersMap Decayer::daughters_ = DaughtersMap();
 Matrix Decayer::decay_matrix_ = Matrix();
-IsoList Decayer::nuclides_tracked_ = IsoList();
+NucList Decayer::nuclides_tracked_ = NucList();
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Decayer::Decayer(const CompMap& comp) {
@@ -84,7 +84,7 @@ void Decayer::LoadDecayInfo() {
     // make parent
     decayInfo >> decayConst;
     decayInfo >> nDaughters;
-    AddIsoToList(iso);
+    AddNucToList(iso);
 
     parent_[iso] = std::make_pair(jcol, decayConst);
 
@@ -93,7 +93,7 @@ void Decayer::LoadDecayInfo() {
     for (int i = 0; i < nDaughters; ++i) {
       decayInfo >> iso;
       decayInfo >> branchRatio;
-      AddIsoToList(iso);
+      AddNucToList(iso);
 
       // checks for duplicate daughter nuclides
       for (int j = 0; j < nDaughters; ++j) {
@@ -126,7 +126,7 @@ double Decayer::DecayConstant(int iso) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Decayer::AddIsoToList(int iso) {
+void Decayer::AddNucToList(int iso) {
   bool exists = (find(nuclides_tracked_.begin(), nuclides_tracked_.end(),
                       iso) != nuclides_tracked_.end());
   if (!exists) {

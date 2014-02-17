@@ -40,7 +40,7 @@ const CompMap& Composition::atom() {
   if (atom_.size() == 0) {
     CompMap::iterator it;
     for (it = mass_.begin(); it != mass_.end(); ++it) {
-      Iso iso = it->first;
+      Nuc iso = it->first;
       atom_[iso] = mass_[iso] / MT->GramsPerMol(iso);
     }
   }
@@ -51,7 +51,7 @@ const CompMap& Composition::mass() {
   if (mass_.size() == 0) {
     CompMap::iterator it;
     for (it = atom_.begin(); it != atom_.end(); ++it) {
-      Iso iso = it->first;
+      Nuc iso = it->first;
       mass_[iso] = atom_[iso] * MT->GramsPerMol(iso);
     }
   }
@@ -82,7 +82,7 @@ void Composition::Record(Context* ctx) {
     for (it = mass().begin(); it != mass().end(); ++it) {
       ctx->NewDatum("Compositions")
          ->AddVal("ID", id())
-         ->AddVal("IsoID", it->first)
+         ->AddVal("NucID", it->first)
          ->AddVal("Quantity", it->second)
          ->Record();
     }

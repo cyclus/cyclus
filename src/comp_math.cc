@@ -68,7 +68,7 @@ bool ValidNucs(const CompMap& v) {
 
   CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
-    Iso iso = it->first;
+    Nuc iso = it->first;
     if (iso < min || iso > max) {
       return false;
     }
@@ -112,7 +112,7 @@ bool AlmostEq(const CompMap& v1,
 
   CompMap::iterator it;
   for (it = n1.begin(); it != n1.end(); ++it) {
-    Iso iso = it->first;
+    Nuc iso = it->first;
     if (n2.count(iso) == 0) {
       return false;
     }

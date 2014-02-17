@@ -18,16 +18,16 @@ class MatQuery {
   double qty();
 
   /// Returns the mass in kg of nuclide iso in the material.
-  double mass(Iso iso);
+  double mass(Nuc iso);
 
   /// Returns the number of moles of nuclide iso in the material.
-  double moles(Iso iso);
+  double moles(Nuc iso);
 
   /// Returns the mass fraction of nuclide iso in the material.
-  double mass_frac(Iso iso);
+  double mass_frac(Nuc iso);
 
   /// returns the atom/mole fraction of nuclide iso in the material.
-  double atom_frac(Iso iso);
+  double atom_frac(Nuc iso);
 
   /// Returns true if all nuclide fractions of the material and other
   /// are the same within threshold.

@@ -10,21 +10,21 @@ double MatQuery::qty() {
   return m_->quantity();
 };
 
-double MatQuery::mass(Iso iso) {
+double MatQuery::mass(Nuc iso) {
   return mass_frac(iso) * qty();
 };
 
-double MatQuery::moles(Iso iso) {
+double MatQuery::moles(Nuc iso) {
   return mass(iso) / (MT->GramsPerMol(iso) * units::g);
 };
 
-double MatQuery::mass_frac(Iso iso) {
+double MatQuery::mass_frac(Nuc iso) {
   CompMap v = m_->comp()->mass();
   compmath::Normalize(&v);
   return v[iso];
 };
 
-double MatQuery::atom_frac(Iso iso) {
+double MatQuery::atom_frac(Nuc iso) {
   CompMap v = m_->comp()->atom();
   compmath::Normalize(&v);
   return v[iso];
