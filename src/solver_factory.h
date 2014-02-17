@@ -1,3 +1,6 @@
+#ifndef CYCLUS_SOLVER_FACTORY_H_
+#define CYCLUS_SOLVER_FACTORY_H_
+
 #include <string>
 
 class OsiSolverInterface;
@@ -22,3 +25,5 @@ class SolverFactory {
 };
 
 } // namespace cyclus
+
+#endif // ifndef CYCLUS_SOLVER_FACTORY_H_
