@@ -1,4 +1,3 @@
-
 #ifndef CYCLUS_RESOURCE_EXCHANGE_H_
 #define CYCLUS_RESOURCE_EXCHANGE_H_
 
@@ -123,7 +122,7 @@ class ResourceExchange {
   /// system
   void AdjustPrefs_(Trader* t) {
     typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[t];
-    Model* m = t;
+    Model* m = t->manager();
     while (m != NULL) {
       AdjustPrefs(m, prefs);
       m = m->parent();

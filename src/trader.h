@@ -21,9 +21,11 @@ namespace cyclus {
 /// A Trader is a mixin class designed for agents that wish to exchange
 /// resources. It defines the API for the querying of requests, offers, and the
 /// corresponding exchanges.
-class Trader : virtual public Model {
+class Trader {
  public:
-  Trader(Context* ctx) : Model(ctx) {};
+  Trader(Model* manager) : manager_(manager) {};
+
+  virtual Model* manager() {return manager_;};
 
   /// @brief default implementation for material requests
   virtual std::set<RequestPortfolio<Material>::Ptr>
@@ -74,6 +76,8 @@ class Trader : virtual public Model {
   virtual void AcceptGenRsrcTrades(
       const std::vector<std::pair<Trade<GenericResource>,
       GenericResource::Ptr> >& responses) {}
+ private:
+  Model* manager_;
 };
 
 } // namespace cyclus
