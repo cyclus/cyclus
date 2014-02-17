@@ -40,8 +40,8 @@ const CompMap& Composition::atom() {
   if (atom_.size() == 0) {
     CompMap::iterator it;
     for (it = mass_.begin(); it != mass_.end(); ++it) {
-      Nuc iso = it->first;
-      atom_[iso] = mass_[iso] / MT->GramsPerMol(iso);
+      Nuc nuc = it->first;
+      atom_[nuc] = mass_[nuc] / MT->GramsPerMol(nuc);
     }
   }
   return atom_;
@@ -51,8 +51,8 @@ const CompMap& Composition::mass() {
   if (mass_.size() == 0) {
     CompMap::iterator it;
     for (it = atom_.begin(); it != atom_.end(); ++it) {
-      Nuc iso = it->first;
-      mass_[iso] = atom_[iso] * MT->GramsPerMol(iso);
+      Nuc nuc = it->first;
+      mass_[nuc] = atom_[nuc] * MT->GramsPerMol(nuc);
     }
   }
   return mass_;

@@ -16,9 +16,9 @@ namespace test_helpers {
 static int u235 = 92235;
 static double helper_qty = 4.5;
     
-static cyclus::Material::Ptr get_mat(int iso, double qty) {
+static cyclus::Material::Ptr get_mat(int nuc, double qty) {
   cyclus::CompMap cm;
-  cm[iso] = qty;
+  cm[nuc] = qty;
   cyclus::Composition::Ptr comp = cyclus::Composition::CreateFromMass(cm);
   return cyclus::Material::CreateUntracked(qty, comp);
 }

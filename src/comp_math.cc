@@ -15,8 +15,8 @@ CompMap Add(const CompMap& v1,
   CompMap out(v1);
   CompMap vv2(v2);
   for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
-    int iso = it->first;
-    out[iso] += vv2[iso];
+    int nuc = it->first;
+    out[nuc] += vv2[nuc];
   }
   return out;
 }
@@ -26,8 +26,8 @@ CompMap Sub(const CompMap& v1,
   CompMap out(v1);
   CompMap vv2(v2);
   for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
-    int iso = it->first;
-    out[iso] -= vv2[iso];
+    int nuc = it->first;
+    out[nuc] -= vv2[nuc];
   }
   return out;
 }
@@ -68,8 +68,8 @@ bool ValidNucs(const CompMap& v) {
 
   CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
-    Nuc iso = it->first;
-    if (iso < min || iso > max) {
+    Nuc nuc = it->first;
+    if (nuc < min || nuc > max) {
       return false;
     }
   }
@@ -112,12 +112,12 @@ bool AlmostEq(const CompMap& v1,
 
   CompMap::iterator it;
   for (it = n1.begin(); it != n1.end(); ++it) {
-    Nuc iso = it->first;
-    if (n2.count(iso) == 0) {
+    Nuc nuc = it->first;
+    if (n2.count(nuc) == 0) {
       return false;
     }
-    double minuend = n2[iso];
-    double subtrahend = n1[iso];
+    double minuend = n2[nuc];
+    double subtrahend = n1[nuc];
     double diff = minuend - subtrahend;
     if (std::abs(minuend) == 0 || std::abs(subtrahend) == 0) {
       if (std::abs(diff) > std::abs(diff)*threshold) {

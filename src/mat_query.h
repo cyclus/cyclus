@@ -17,17 +17,17 @@ class MatQuery {
   /// Returns the mass in kg of the material.
   double qty();
 
-  /// Returns the mass in kg of nuclide iso in the material.
-  double mass(Nuc iso);
+  /// Returns the mass in kg of nuclide nuc in the material.
+  double mass(Nuc nuc);
 
-  /// Returns the number of moles of nuclide iso in the material.
-  double moles(Nuc iso);
+  /// Returns the number of moles of nuclide nuc in the material.
+  double moles(Nuc nuc);
 
-  /// Returns the mass fraction of nuclide iso in the material.
-  double mass_frac(Nuc iso);
+  /// Returns the mass fraction of nuclide nuc in the material.
+  double mass_frac(Nuc nuc);
 
-  /// returns the atom/mole fraction of nuclide iso in the material.
-  double atom_frac(Nuc iso);
+  /// returns the atom/mole fraction of nuclide nuc in the material.
+  double atom_frac(Nuc nuc);
 
   /// Returns true if all nuclide fractions of the material and other
   /// are the same within threshold.

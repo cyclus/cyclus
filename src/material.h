@@ -52,7 +52,7 @@ const double ug = kg* .000000001;
 /// * A reactor transmuting fuel:
 ///
 ///   @code
-///   Composition::Ptr burned_comp = ... // fancy code to calculate burned isotopics
+///   Composition::Ptr burned_comp = ... // fancy code to calculate burned nuclides
 ///   Material::Ptr assembly = core_fuel.Pop();
 ///
 ///   assembly.Transmute(burned_comp);
@@ -61,7 +61,7 @@ const double ug = kg* .000000001;
 /// * A separations plant extracting stuff from spent fuel:
 ///
 ///   @code
-///   Composition::Ptr comp = ... // fancy code to calculate extraction isotopics
+///   Composition::Ptr comp = ... // fancy code to calculate extracted nuclides
 ///   Material::Ptr bucket = spent_fuel.Pop();
 ///   double qty = 3.0;
 ///

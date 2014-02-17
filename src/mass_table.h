@@ -87,7 +87,7 @@ class MassTable {
   /**
      a map for index lookup in the nuclide vector.
    */
-  std::map<int, int> isoIndex_;
+  std::map<int, int> nucIndex_;
 
   /**
      a function to initialize a large array of Nuclide structs via the

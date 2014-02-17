@@ -62,7 +62,7 @@ class Composition {
   /// delta timesteps). This composition remains unchanged.
   Ptr Decay(int delta);
 
-  /// Records the isotopic composition in output database Compositions table (if
+  /// Records the composition in output database Compositions table (if
   /// not done previously).
   void Record(Context* ctx);
 

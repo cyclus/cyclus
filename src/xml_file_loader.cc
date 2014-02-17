@@ -88,9 +88,9 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   double value;
   int key;
   std::string query = "nuclide";
-  int nisos = qe->NElementsMatchingQuery(query);
+  int nnucs = qe->NElementsMatchingQuery(query);
   CompMap v;
-  for (int i = 0; i < nisos; i++) {
+  for (int i = 0; i < nnucs; i++) {
     QueryEngine* nuclide = qe->QueryElement(query, i);
     key = strtol(nuclide->GetElementContent("id").c_str(), NULL, 10);
     value = strtod(nuclide->GetElementContent("comp").c_str(), NULL);

@@ -61,7 +61,7 @@ class InstModel;
    different output streams with the input nuclides distributed across
    those output streams according to a fixed matrix
    - EnrichmentFacility: A facility that offers a fixed quantity of SWUs
-   to accomplish isotopic enrichment of material
+   to accomplish enrichment of material
 
    @section thirdparty Third-party Implementations
 

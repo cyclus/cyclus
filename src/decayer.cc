@@ -27,18 +27,18 @@ Decayer::Decayer(const CompMap& comp) {
   pre_vect_ = Vector(parent_.size(), 1);
   std::map<int, double>::const_iterator comp_iter = comp.begin();
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
-    int iso = comp_iter->first;
+    int nuc = comp_iter->first;
     long double atom_count = comp_iter->second;
 
     // if the nuclide is tracked in the decay matrix
-    if (parent_.count(iso) > 0) {
-      int col = parent_[iso].first; // get Vector position
+    if (parent_.count(nuc) > 0) {
+      int col = parent_[nuc].first; // get Vector position
       pre_vect_(col, 1) = atom_count;
       // if it is not in the decay matrix, then it is added as a stable nuclide
     } else {
       double decayConst = 0;
       int col = parent_.size() + 1;
-      parent_[iso] = std::make_pair(col, decayConst);  // add nuclide to parent map
+      parent_[nuc] = std::make_pair(col, decayConst);  // add nuclide to parent map
 
       int nDaughters = 0;
       std::vector< std::pair<int, double> > temp(nDaughters);
@@ -60,12 +60,12 @@ void Decayer::LoadDecayInfo() {
   }
 
   int jcol = 1;
-  int iso = 0;
+  int nuc = 0;
   int nDaughters = 0;
   double decayConst = 0; // decay constant, in inverse years
   double branchRatio = 0;
 
-  decayInfo >> iso;  // get first parent
+  decayInfo >> nuc;  // get first parent
 
   // checks to see if there are nuclides in 'decayInfo.dat'
   if (decayInfo.eof()) {
@@ -75,7 +75,7 @@ void Decayer::LoadDecayInfo() {
 
   // processes 'decayInfo.dat'
   while (!decayInfo.eof()) {
-    if (parent_.find(iso) != parent_.end()) {
+    if (parent_.find(nuc) != parent_.end()) {
       std::string err_msg;
       err_msg = "A duplicate parent nuclide was found in 'decayInfo.dat'";
       throw ValidationError(err_msg);
@@ -84,53 +84,53 @@ void Decayer::LoadDecayInfo() {
     // make parent
     decayInfo >> decayConst;
     decayInfo >> nDaughters;
-    AddNucToList(iso);
+    AddNucToList(nuc);
 
-    parent_[iso] = std::make_pair(jcol, decayConst);
+    parent_[nuc] = std::make_pair(jcol, decayConst);
 
     // make daughters
     std::vector< std::pair<int, double> > temp(nDaughters);
     for (int i = 0; i < nDaughters; ++i) {
-      decayInfo >> iso;
+      decayInfo >> nuc;
       decayInfo >> branchRatio;
-      AddNucToList(iso);
+      AddNucToList(nuc);
 
       // checks for duplicate daughter nuclides
       for (int j = 0; j < nDaughters; ++j) {
-        if (temp[j].first == iso) {
+        if (temp[j].first == nuc) {
           throw ValidationError(
             std::string("A duplicate daughter nuclide, %i , was found in decayInfo.dat",
-                        iso));
+                        nuc));
         }
       }
-      temp[i] = std::make_pair(iso, branchRatio);
+      temp[i] = std::make_pair(nuc, branchRatio);
     }
 
     daughters_[jcol] = temp;
     ++jcol; // set next column
-    decayInfo >> iso; // get next parent
+    decayInfo >> nuc; // get next parent
   }
   BuildDecayMatrix();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Decayer::DecayConstant(int iso) {
+double Decayer::DecayConstant(int nuc) {
   if (!decay_info_loaded_) {
     Decayer::LoadDecayInfo();
     decay_info_loaded_ = true;
   }
-  if (parent_.count(iso) > 0) {
-    return parent_[iso].second;
+  if (parent_.count(nuc) > 0) {
+    return parent_[nuc].second;
   }
   return 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Decayer::AddNucToList(int iso) {
+void Decayer::AddNucToList(int nuc) {
   bool exists = (find(nuclides_tracked_.begin(), nuclides_tracked_.end(),
-                      iso) != nuclides_tracked_.end());
+                      nuc) != nuclides_tracked_.end());
   if (!exists) {
-    nuclides_tracked_.push_back(iso);
+    nuclides_tracked_.push_back(nuc);
   }
 }
 
@@ -140,15 +140,15 @@ void Decayer::GetResult(CompMap& comp) {
   // the number density from the comp parameter for each nuclide
   ParentMap::const_iterator parent_iter = parent_.begin(); // get first parent
   while (parent_iter != parent_.end()) {
-    int iso = parent_iter->first;
-    int col = parent_.find(iso)->second.first; // get Vector position
+    int nuc = parent_iter->first;
+    int col = parent_.find(nuc)->second.first; // get Vector position
 
     // checks to see if the Vector position is valid
     if (col <= post_vect_.NumRows()) {
       double atom_count = post_vect_(col, 1);
       // adds nuclide to the map if its number density is non-zero
       if (atom_count > 0) {
-        comp[iso] = atom_count;
+        comp[nuc] = atom_count;
       }
     } else {
       LOG(LEV_ERROR, "none!") << "Decay Error - invalid Vector position";
@@ -177,16 +177,16 @@ void Decayer::BuildDecayMatrix() {
       // an iterator that points to 1st daughter in the vector
       // pair<nuclide,branchratio>
       std::vector< std::pair<int, double> >::const_iterator
-      iso_iter = daughters_.find(jcol)->second.begin();
+      nuc_iter = daughters_.find(jcol)->second.begin();
 
       // processes all daughters of the parent
-      while (iso_iter != daughters_.find(jcol)->second.end()) {
-        int iso = iso_iter->first;
-        int irow = parent_.find(iso)->second.first; // determines row index
-        double branchRatio = iso_iter->second;
+      while (nuc_iter != daughters_.find(jcol)->second.end()) {
+        int nuc = nuc_iter->first;
+        int irow = parent_.find(nuc)->second.first; // determines row index
+        double branchRatio = nuc_iter->second;
         decay_matrix_(irow, jcol) = branchRatio * decayConst; // sets A(i,j) value
 
-        ++iso_iter; // get next daughter
+        ++nuc_iter; // get next daughter
       }
     }
     ++parent_iter; // get next parent

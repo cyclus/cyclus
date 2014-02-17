@@ -77,11 +77,11 @@ class Decayer {
   /**
      Add the nuclide to our list of tracked nuclides IFF it is not
    */
-  static void AddNucToList(int iso);
+  static void AddNucToList(int nuc);
 
  public:
   /// Returns the decay constant for specified nuclide in inverse years.
-  static double DecayConstant(int iso);
+  static double DecayConstant(int nuc);
 
   /**
      default constructor
