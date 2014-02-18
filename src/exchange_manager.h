@@ -44,9 +44,8 @@ class ExchangeManager {
     CLOG(LEV_DEBUG1) << "graph translated!";
     
     // solve graph
-    ctx_->solver()->graph(graph.get());
     CLOG(LEV_DEBUG1) << "solving graph...";
-    ctx_->solver()->Solve();
+    ctx_->solver()->Solve(graph.get());
     CLOG(LEV_DEBUG1) << "graph solved!";
 
     // get trades

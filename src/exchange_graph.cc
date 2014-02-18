@@ -94,18 +94,22 @@ void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
   vector<double>& unit_caps = n.unit_capacities[a];
   vector<double>& caps = n.group->capacities();
   for (int i = 0; i < caps.size(); i++) {
+    double prev = caps[i];
     // special case for unlimited capacities
     CLOG(cyclus::LEV_DEBUG1) << "Updating capacity value from: "
-                             << caps[i];
-    caps[i] = (caps[i] == std::numeric_limits<double>::max()) ?
+                             << prev;
+    caps[i] = (prev == std::numeric_limits<double>::max()) ?
               std::numeric_limits<double>::max() :
-              caps[i] - qty * unit_caps[i];
+              prev - qty * unit_caps[i];
     CLOG(cyclus::LEV_DEBUG1) << "                          to: "
                              << caps[i];
     
-    if (IsNegative(caps[i])) {
-      throw ValueError("Capacities can not be reduced below 0.");
-    }
+    // if (IsNegative(caps[i])) {
+    //   std::stringstream msg;
+    //   msg << "Can't reduce a capacity from "
+    //       << prev << " to " << caps[i] << ".";
+    //   throw ValueError(msg.str());
+    // }
   }
 
   if (IsNegative(n.max_qty - qty)) {
@@ -121,6 +125,9 @@ void UpdateCapacity(ExchangeNode::Ptr pn, const Arc& a, double qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ExchangeGraph::ExchangeGraph() : next_arc_id_(0) { }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddRequestGroup(RequestGroup::Ptr prs) {
   request_groups_.push_back(prs);
 }
@@ -133,6 +140,9 @@ void ExchangeGraph::AddSupplyGroup(ExchangeNodeGroup::Ptr pss) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddArc(const Arc& a) {
   arcs_.push_back(a);
+  int id = next_arc_id_++;
+  arc_ids_.insert(std::pair<Arc, int>(a, id));
+  arc_by_id_.insert(std::pair<int, Arc>(id, a));
   node_arc_map_[a.first].push_back(a);
   node_arc_map_[a.second].push_back(a);
 }

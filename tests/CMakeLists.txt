@@ -106,12 +106,14 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   ${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/model_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc 
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/resource_exchange_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/solver_factory_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/solver_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
