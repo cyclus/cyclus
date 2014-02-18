@@ -3,36 +3,36 @@
 ############# special file configuration ########################
 #################################################################
 
-CONFIGURE_FILE(suffix.h.in ${CMAKE_CURRENT_SOURCE_DIR}/suffix.h @ONLY)
+CONFIGURE_FILE(suffix.h.in "${CMAKE_CURRENT_SOURCE_DIR}/suffix.h" @ONLY)
 
 EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
-CONFIGURE_FILE(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h @ONLY)
+CONFIGURE_FILE(version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/version.h" @ONLY)
 
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
-  ${CYCLUS_BINARY_DIR}/share/mass.sqlite
+  "${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite"
+  "${CYCLUS_BINARY_DIR}/share/mass.sqlite"
   COPYONLY
   )
 
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
-  ${CYCLUS_BINARY_DIR}/share/decayInfo.dat
+  "${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat"
+  "${CYCLUS_BINARY_DIR}/share/decayInfo.dat"
   COPYONLY
   )
 
-SET(cyclus_install_dir ${CMAKE_INSTALL_PREFIX})
-SET(cyclus_build_dir ${CYCLUS_BINARY_DIR})
+SET(cyclus_install_dir "${CMAKE_INSTALL_PREFIX}")
+SET(cyclus_build_dir "${CYCLUS_BINARY_DIR}")
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/env.cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in"
+  "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
   @ONLY
   )
 
 INSTALL(FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite
-    ${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/cyclus-flat.rng.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat
+    "${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cyclus-flat.rng.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/decayInfo.dat"
   DESTINATION share
   COMPONENT core
   )
@@ -46,74 +46,73 @@ INSTALL(FILES
 #################################################################
 
 INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_SOURCE_DIR}
+  "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 
 SET(
   CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}
+  "${CMAKE_CURRENT_SOURCE_DIR}"
   PARENT_SCOPE
   )
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
-  ${CMAKE_CURRENT_SOURCE_DIR}/builder.cc  
-  ${CMAKE_CURRENT_SOURCE_DIR}/building_manager.cc  
-  ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_recipe_context.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/comp_math.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/composition.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/context.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc  
-  ${CMAKE_CURRENT_SOURCE_DIR}/datum.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/enrichment.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/env.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/error.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc  
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator.cc  
-  ${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/function.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/logger.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/material.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/relax_ng_validator.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/resource.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/solver.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/supply_demand_manager.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_factories.cc  
-  ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_functions.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/timer.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/variable.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_flat_loader.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine.cc 
+  "${CMAKE_CURRENT_SOURCE_DIR}/builder.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/building_manager.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc" 
+  "${CMAKE_CURRENT_SOURCE_DIR}/commodity.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/commodity_recipe_context.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/comp_math.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/composition.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/context.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/datum.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/enrichment.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/error.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/function.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/logger.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/material.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/relax_ng_validator.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/resource.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/solver.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/supply_demand_manager.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_factories.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/symbolic_functions.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/timer.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/variable.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/xml_flat_loader.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/xml_parser.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine.cc"
   )
 
 INSTALL(FILES

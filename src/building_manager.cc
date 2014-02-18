@@ -11,33 +11,33 @@
 
 namespace cyclus {
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BuildOrder::BuildOrder(int n, Builder* b,
                        CommodityProducer* cp) :
-  number(n),
-  builder(b),
-  producer(cp) {}
+    number(n),
+    builder(b),
+    producer(cp) {}
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ProblemInstance::ProblemInstance(
-  Commodity& commod,
-  double demand,
-  SolverInterface& sinterface,
-  Constraint::Ptr constr,
-  std::vector<Variable::Ptr>& soln)
-  : commodity(commod),
+    Commodity& commod,
+    double demand,
+    SolverInterface& sinterface,
+    Constraint::Ptr constr,
+    std::vector<Variable::Ptr>& soln)
+    : commodity(commod),
     unmet_demand(demand),
     interface(sinterface),
     constraint(constr),
     solution(soln) {}
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BuildingManager::BuildingManager() {}
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BuildingManager::~BuildingManager() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManager::RegisterBuilder(Builder* builder) {
   if (builders_.find(builder) != builders_.end()) {
     throw KeyError("A manager is trying to register a builder twice.");
@@ -46,16 +46,17 @@ void BuildingManager::RegisterBuilder(Builder* builder) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManager::UnRegisterBuilder(Builder* builder) {
   if (builders_.find(builder) == builders_.end()) {
-    throw KeyError("A manager is trying to unregister a builder not originally registered with it.");
+    throw KeyError("A manager is trying to unregister"
+                   " a builder not originally registered with it.");
   } else {
     builders_.erase(builder);
   }
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
     Commodity& commodity,
     double unmet_demand) {
@@ -63,7 +64,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
   using boost::any_cast;
 
   vector<BuildOrder> orders;
-  
+
   if (unmet_demand > 0) {
     // set up solver and interface
     Solver::Ptr solver(new CBCSolver());
@@ -71,14 +72,14 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
 
     // set up objective function
     ObjectiveFunction::Ptr obj(
-      new ObjectiveFunction(
-        ObjectiveFunction::MIN));
+        new ObjectiveFunction(
+            ObjectiveFunction::MIN));
     csi.RegisterObjFunction(obj);
 
     // set up constraint
     Constraint::Ptr constraint(
-      new Constraint(
-        Constraint::GTEQ, unmet_demand));
+        new Constraint(
+            Constraint::GTEQ, unmet_demand));
     csi.RegisterConstraint(constraint);
 
     // set up variables, constraints, and objective function
@@ -88,7 +89,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
 
     // report problem
     LOG(LEV_DEBUG2, "buildman") <<
-                                "Building Manager is solving a decision problem with:";
+        "Building Manager is solving a decision problem with:";
     LOG(LEV_DEBUG2, "buildman") << "  * Objective Function: " << obj->Print();
     LOG(LEV_DEBUG2, "buildman") << "  * Constraint: " << constraint->Print();
 
@@ -97,13 +98,13 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
 
     // report solution
     LOG(LEV_DEBUG2, "buildman") <<
-                                "Building Manager has solved a decision problem with:";
+        "Building Manager has solved a decision problem with:";
     LOG(LEV_DEBUG2, "buildman") << "  * Types of Prototypes to build: " <<
-                                solution.size();
+        solution.size();
     for (int i = 0; i < solution.size(); i++) {
       Variable::Ptr x = solution.at(i);
       LOG(LEV_DEBUG2, "buildman") << "  * Type: " << x->name()
-                                  << "  * Value: " << any_cast<int>(x->value());
+          << "  * Value: " << any_cast<int>(x->value());
     }
 
     // construct order
@@ -113,10 +114,10 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
   return orders;
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManager::SetUpProblem(ProblemInstance& problem) {
   solution_map_ = std::map < Variable::Ptr,
-  std::pair<Builder*, CommodityProducer*> > ();
+                std::pair<Builder*, CommodityProducer*> > ();
 
   std::set<Builder*>::iterator builder_it;
   for (builder_it = builders_.begin(); builder_it != builders_.end();
@@ -134,13 +135,13 @@ void BuildingManager::SetUpProblem(ProblemInstance& problem) {
   }
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManager::AddProducerVariableToProblem(
-  CommodityProducer* producer,
-  Builder* builder,
-  ProblemInstance& problem) {
+    CommodityProducer* producer,
+    Builder* builder,
+    ProblemInstance& problem) {
   using std::make_pair;
-  
+
   Variable::Ptr x(new IntegerVariable(0, Variable::INF));
   problem.solution.push_back(x);
   problem.interface.RegisterVariable(x);
@@ -154,10 +155,10 @@ void BuildingManager::AddProducerVariableToProblem(
   problem.interface.AddVarToObjFunction(x, obj_modifier);
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManager::ConstructBuildOrdersFromSolution(
-  std::vector<BuildOrder>& orders,
-  std::vector<Variable::Ptr>& solution) {
+    std::vector<BuildOrder>& orders,
+    std::vector<Variable::Ptr>& solution) {
   using boost::any_cast;
 
   // construct the build orders
@@ -166,11 +167,11 @@ void BuildingManager::ConstructBuildOrdersFromSolution(
     if (number > 0) {
       Builder* builder = solution_map_[solution.at(i)].first;
       CommodityProducer* producer = \
-                                                   solution_map_[solution.at(i)].second;
+                                    solution_map_[solution.at(i)].second;
       BuildOrder order(number, builder, producer);
       orders.push_back(order);
     }
   }
 }
 
-} // namespace cyclus
+}  // namespace cyclus

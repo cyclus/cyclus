@@ -124,11 +124,6 @@ class Timer {
   std::vector<TimeListener*> new_tickers_;
 
   /**
-     Returns a string of all models listening to the tick
-   */
-  std::string ReportListeners();
-
-  /**
      sends the tick signal to all of the models receiving time
      notifications.
    */

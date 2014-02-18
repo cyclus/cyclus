@@ -31,7 +31,6 @@ class TestTrader : public MockFacility {
    : obj_fac(fac),
      is_requester(is_requester),
      MockFacility(ctx),
-     Model(ctx),
      offer(0),
      adjusts(0),
      requests(0),

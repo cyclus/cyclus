@@ -8,9 +8,7 @@
 /// This is the simplest possible Facility, for testing
 class TestFacility: public cyclus::FacilityModel {
  public:
-  TestFacility(cyclus::Context* ctx)
-      : cyclus::FacilityModel(ctx),
-        cyclus::Model(ctx) {};
+  TestFacility(cyclus::Context* ctx) : cyclus::FacilityModel(ctx) {};
       
   virtual cyclus::Model* Clone() { return new TestFacility(context()); };
 

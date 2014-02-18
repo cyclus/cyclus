@@ -47,7 +47,7 @@ typedef std::set<std::string>::iterator PrototypeIterator;
    @section thirdPartyImpl Third Party Implementations
    (None)
  */
-class InstModel : public TimeListener {
+class InstModel : public Model, public TimeListener {
   /* --------------------
    * all MODEL classes have these members
    * --------------------

@@ -6,7 +6,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 #include "csv_back.h"
@@ -25,33 +24,33 @@ using namespace cyclus;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
   vmessage +=
-    "   LEV_ERROR (least verbose, default), LEV_WARN, \n   LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n\n";
+      "   LEV_ERROR (least verbose, default), LEV_WARN, \n"
+      "   LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n\n";
   vmessage +=
-    "Or an integer:\n\n   0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)\n";
+      "Or an integer:\n\n   0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)\n";
 
   // parse command line options
   po::options_description desc("Allowed options");
   desc.add_options()
-  ("help,h", "produce help message")
-  ("include", "print the cyclus include directory")
-  ("version", "print cyclus core and dependency versions and quit")
-  ("schema",
-   "dump the cyclus master schema including all installed module schemas")
-  ("module-schema", po::value<std::string>(),
-   "dump the schema for the named module")
-  ("schema-path", po::value<std::string>(),
-   "manually specify the path to the cyclus master schema")
-  ("flat-schema", "use the flat master simulation schema")
-  ("no-model", "only print log entries from cyclus core code")
-  ("no-mem", "exclude memory log statement from logger output")
-  ("verb,v", po::value<std::string>(), vmessage.c_str())
-  ("output-path,o", po::value<std::string>(), "output path")
-  ("input-file", po::value<std::string>(), "input file")
-  ;
+      ("help,h", "produce help message")
+      ("include", "print the cyclus include directory")
+      ("version", "print cyclus core and dependency versions and quit")
+      ("schema",
+       "dump the cyclus master schema including all installed module schemas")
+      ("module-schema", po::value<std::string>(),
+       "dump the schema for the named module")
+      ("schema-path", po::value<std::string>(),
+       "manually specify the path to the cyclus master schema")
+      ("flat-schema", "use the flat master simulation schema")
+      ("no-model", "only print log entries from cyclus core code")
+      ("no-mem", "exclude memory log statement from logger output")
+      ("verb,v", po::value<std::string>(), vmessage.c_str())
+      ("output-path,o", po::value<std::string>(), "output path")
+      ("input-file", po::value<std::string>(), "input file")
+      ;
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -60,7 +59,7 @@ int main(int argc, char* argv[]) {
   po::positional_options_description p;
   p.add("input-file", 1);
 
-  //po::variables_map vm;
+  // po::variables_map vm;
   po::store(po::command_line_parser(argc, argv).
             options(desc).positional(p).run(), vm);
   po::notify(vm);
@@ -147,7 +146,7 @@ int main(int argc, char* argv[]) {
     Logger::NoMem() = true;
   }
 
-  if (! vm.count("input-file")) {
+  if (!vm.count("input-file")) {
     std::string err_msg = "Cyclus usage requires an input file.\n";
     err_msg += "Usage:   cyclus [path/to/input/filename]\n";
     std::cout << err_msg << std::endl;
@@ -235,4 +234,3 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-

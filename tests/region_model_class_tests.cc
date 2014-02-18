@@ -15,9 +15,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieInst : public cyclus::InstModel {
  public:
-  DieInst(cyclus::Context* ctx)
-      : cyclus::InstModel(ctx),
-        cyclus::Model(ctx)  {
+  DieInst(cyclus::Context* ctx) : cyclus::InstModel(ctx) {
     tickCount_ = 0;
     tockCount_ = 0;
     tickDie_ = false;
@@ -71,7 +69,7 @@ class RegionModelClassTests : public ::testing::Test {
     DieInst* child4_;
     DieInst* child5_;
 
-    cyclus::TimeListener* reg_;
+    cyclus::RegionModel* reg_;
     cyclus::Recorder rec_;
     cyclus::Timer ti_;
     cyclus::Context* ctx_;
