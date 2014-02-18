@@ -44,14 +44,13 @@ class Requester: public MockFacility {
  public:
   Requester(Context* ctx, int i = 1)
       : MockFacility(ctx),
-        Model(ctx),
         i_(i),
         req_ctr_(0),
         pref_ctr_(0)
   {};
 
   virtual cyclus::Model* Clone() {
-    Requester* m = new Requester(*this);
+    Requester* m = new Requester(context());
     m->InitFrom(this);
     m->i_ = i_;
     m->port_ = port_;
@@ -69,14 +68,14 @@ class Requester: public MockFacility {
   // increments counter and squares all preferences
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
     std::map<Request<Material>::Ptr,
-             std::map<Bid<Material>::Ptr, double> >::iterator p_it;
+             std::map<Bid<Material>::Ptr, double> >::iterator p_it;  
     for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
       std::map<Bid<Material>::Ptr, double>& map = p_it->second;
       std::map<Bid<Material>::Ptr, double>::iterator m_it;
       for (m_it = map.begin(); m_it != map.end(); ++m_it) {
         m_it->second = std::pow(m_it->second, 2);
       }
-    }    
+    }
     pref_ctr_++;
   }
   
@@ -91,15 +90,13 @@ class Bidder: public MockFacility {
  public:
   Bidder(Context* ctx, std::string commod)
       : MockFacility(ctx),
-        Model(ctx),
         commod_(commod),
         bid_ctr_(0)
   {};
 
   virtual cyclus::Model* Clone() {
-    Bidder* m = new Bidder(*this);
+    Bidder* m = new Bidder(context(), commod_);
     m->InitFrom(this);
-    m->commod_ = commod_;
     m->port_ = port_;
     return m;
   };
@@ -242,6 +239,13 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   Requester* pcast = dynamic_cast<Requester*>(parent);
   Requester* ccast = dynamic_cast<Requester*>(child);
 
+  ASSERT_TRUE(pcast != NULL);
+  ASSERT_TRUE(ccast != NULL);
+  ASSERT_TRUE(pcast->parent() == NULL);
+  ASSERT_TRUE(ccast->parent() == dynamic_cast<Model*>(pcast));
+  ASSERT_TRUE(pcast->manager() == dynamic_cast<Model*>(pcast));
+  ASSERT_TRUE(ccast->manager() == dynamic_cast<Model*>(ccast));
+
   // doin a little magic to simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
   Request<Material>::Ptr preq = rp1->AddRequest(mat, pcast, commod, pref);
@@ -259,9 +263,8 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   
   EXPECT_EQ(0, pcast->pref_ctr_);
   EXPECT_EQ(0, ccast->pref_ctr_);
-  
   EXPECT_NO_THROW(exchng->AdjustAll());
-
+  
   // child gets to adjust once - its own request
   // parent gets called twice - its request and adjusting its child's request
   EXPECT_EQ(2, pcast->pref_ctr_); 

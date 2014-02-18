@@ -1,5 +1,5 @@
-#ifndef CYCLUS_CYCLOPTS_CBC_SOLVER_H_
-#define CYCLUS_CYCLOPTS_CBC_SOLVER_H_
+#ifndef CYCLUS_SRC_CBC_SOLVER_H_
+#define CYCLUS_SRC_CBC_SOLVER_H_
 
 #include <utility>
 
@@ -23,8 +23,8 @@ class CBCSolver : public Solver {
   /// the value() member.
   /// @param obj A pointer to the objective function.
   /// @param constraints A container of pointers to the problem's constraints.
-  virtual void Solve(std::vector<Variable::Ptr>& variables, 
-                     ObjectiveFunction::Ptr obj, 
+  virtual void Solve(std::vector<Variable::Ptr>& variables,
+                     ObjectiveFunction::Ptr obj,
                      std::vector<Constraint::Ptr>& constraints);
 
  private:
@@ -36,7 +36,7 @@ class CBCSolver : public Solver {
 
   /// set variable/objective function values
   void SetUpVariablesAndObj(
-      std::vector<Variable::Ptr>& variables, 
+      std::vector<Variable::Ptr>& variables,
       ObjectiveFunction::Ptr obj);
 
   /// set up constraints
@@ -66,7 +66,6 @@ class CBCSolver : public Solver {
   void Print(int n_const, int n_vars);
 };
 
+}  // namespace cyclus
 
-} // namespace cyclus
-
-#endif
+#endif  // CYCLUS_SRC_CBC_SOLVER_H_

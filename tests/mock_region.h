@@ -7,9 +7,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MockRegion : public cyclus::RegionModel {
  public:
-  MockRegion(cyclus::Context* ctx)
-      : cyclus::RegionModel(ctx),
-        cyclus::Model(ctx) {};
+  MockRegion(cyclus::Context* ctx) : cyclus::RegionModel(ctx) {};
 
   virtual ~MockRegion() {};
 

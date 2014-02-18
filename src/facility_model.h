@@ -68,7 +68,7 @@ class InstModel;
    Collaborators are encouraged to add to this list and link to external
    pages that describe how to get the models and the detailed behavior
  */
-class FacilityModel : public TimeListener, public Trader {
+class FacilityModel : public TimeListener, public Model, public Trader {
  public:
   FacilityModel(Context* ctx);
 
