@@ -144,7 +144,7 @@ TEST(ProgTranslatorTests, translation) {
 
   bool excl = true;
   ProgTranslator pt(&g, iface, excl);
-  EXPECT_NO_THROW(pt.Translate());
+  ASSERT_NO_THROW(pt.Translate());
 
   // test non-coin xlate members
   double col_lbs [] = {0, 0, 0, 0, 0, 0, 0};
@@ -257,7 +257,7 @@ TEST(ProgTranslatorTests, translation) {
   EXPECT_DOUBLE_EQ(soln[6], x6_flow);
 
   // check back translation
-  pt.FromProg();
+  ASSERT_NO_THROW(pt.FromProg());
   const std::vector<Match>& matches = g.matches();
   ASSERT_EQ(4, matches.size());
   pair_double_eq(matches[0], std::pair<Arc, double>(x0, x0_flow));
