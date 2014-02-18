@@ -48,12 +48,12 @@ endif()
 
 # Where gtest's .h files can be found.
 include_directories(
-  ${gtest_SOURCE_DIR}/include
-  ${gtest_SOURCE_DIR})
+  "${gtest_SOURCE_DIR}/include"
+  "${gtest_SOURCE_DIR}")
 
 # Where the gtest libraries can be found.
 link_directories(
-  ${gtest_BINARY_DIR}/src)
+  "${gtest_BINARY_DIR}/src")
 
 # Defines CMAKE_USE_PTHREADS_INIT and CMAKE_THREAD_LIBS_INIT.
 find_package(Threads)
@@ -336,8 +336,8 @@ function(py_test name)
     # only at ctest runtime (by calling ctest -c <Configuration>), so
     # we have to escape $ to delay variable substitution here.
     add_test(${name}
-      ${PYTHON_EXECUTABLE} ${gtest_SOURCE_DIR}/test/${name}.py
-          --gtest_build_dir=${gtest_BINARY_DIR}/\${CTEST_CONFIGURATION_TYPE})
+      "${PYTHON_EXECUTABLE}" "${gtest_SOURCE_DIR}/test/${name}.py"
+          "--gtest_build_dir=${gtest_BINARY_DIR}/\${CTEST_CONFIGURATION_TYPE}")
   endif()
 endfunction()
 
