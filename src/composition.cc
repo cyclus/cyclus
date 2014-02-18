@@ -13,8 +13,8 @@ namespace cyclus {
 int Composition::next_id_ = 0;
 
 Composition::Ptr Composition::CreateFromAtom(CompMap v) {
-  if (!compmath::ValidIsos(v) || !compmath::AllPositive(v)) {
-    throw ValueError("invalid isotope or negative quantity in CompMap");
+  if (!compmath::ValidNucs(v) || !compmath::AllPositive(v)) {
+    throw ValueError("invalid nuclide or negative quantity in CompMap");
   }
 
   Composition::Ptr c(new Composition());
@@ -23,8 +23,8 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
 }
 
 Composition::Ptr Composition::CreateFromMass(CompMap v) {
-  if (!compmath::ValidIsos(v) || !compmath::AllPositive(v)) {
-    throw ValueError("invalid isotope or negative quantity in CompMap");
+  if (!compmath::ValidNucs(v) || !compmath::AllPositive(v)) {
+    throw ValueError("invalid nuclide or negative quantity in CompMap");
   }
 
   Composition::Ptr c(new Composition());
@@ -40,8 +40,8 @@ const CompMap& Composition::atom() {
   if (atom_.size() == 0) {
     CompMap::iterator it;
     for (it = mass_.begin(); it != mass_.end(); ++it) {
-      Iso iso = it->first;
-      atom_[iso] = mass_[iso] / MT->GramsPerMol(iso);
+      Nuc nuc = it->first;
+      atom_[nuc] = mass_[nuc] / MT->GramsPerMol(nuc);
     }
   }
   return atom_;
@@ -51,8 +51,8 @@ const CompMap& Composition::mass() {
   if (mass_.size() == 0) {
     CompMap::iterator it;
     for (it = atom_.begin(); it != atom_.end(); ++it) {
-      Iso iso = it->first;
-      mass_[iso] = atom_[iso] * MT->GramsPerMol(iso);
+      Nuc nuc = it->first;
+      mass_[nuc] = atom_[nuc] * MT->GramsPerMol(nuc);
     }
   }
   return mass_;
@@ -82,7 +82,7 @@ void Composition::Record(Context* ctx) {
     for (it = mass().begin(); it != mass().end(); ++it) {
       ctx->NewDatum("Compositions")
          ->AddVal("ID", id())
-         ->AddVal("IsoID", it->first)
+         ->AddVal("NucID", it->first)
          ->AddVal("Quantity", it->second)
          ->Record();
     }

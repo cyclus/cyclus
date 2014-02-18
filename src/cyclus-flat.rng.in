@@ -104,7 +104,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="name"><text/></element>
       <element name="basis"><text/></element>
       <oneOrMore>
-        <element name="isotope">
+        <element name="nuclide">
           <element name="id"><text/></element>
           <element name="comp"><text/></element>
         </element>
