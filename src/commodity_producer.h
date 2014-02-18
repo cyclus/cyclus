@@ -1,5 +1,5 @@
-#ifndef COMMODITYPRODUCER_H
-#define COMMODITYPRODUCER_H
+#ifndef CYCLUS_SRC_COMMODITY_PRODUCER_H_
+#define CYCLUS_SRC_COMMODITY_PRODUCER_H_
 
 #include <map>
 #include <set>
@@ -22,7 +22,7 @@ class CommodityProducer {
   /// constructor
   CommodityProducer();
 
-  /// virtual destructor for inheritence
+  /// virtual destructor for inheritance
   virtual ~CommodityProducer();
 
   /// @return the set of commodities produced by this producers
@@ -40,7 +40,7 @@ class CommodityProducer {
   /// @param commodity the commodity in question
   double ProductionCost(const Commodity& commodity);
 
-  // protected: @MJGFlag - should be protected. revise when tests can
+  // protected: @MJGFlag - should be protected. Revise when tests can
   // be found by classes in the Utility folder
   /// register a commodity as being produced by this object
   /// @param commodity the commodity being produced
@@ -67,7 +67,7 @@ class CommodityProducer {
   /// @param source the original commodity producer
   void CopyProducedCommoditiesFrom(CommodityProducer* source);
 
-  /// checks if ProducesCommodity() is true. if it is false, an
+  /// checks if ProducesCommodity() is true. If it is false, an
   /// error is thrown.
   /// @param commodity the commodity in question
   void ThrowErrorIfCommodityNotProduced(const Commodity& commodity);
@@ -81,12 +81,12 @@ class CommodityProducer {
  private:
   /// a collection of commodities and their production capacities
   std::map<Commodity, CommodInfo, CommodityCompare>
-  produced_commodities_;
+      produced_commodities_;
 
-  //#include "commodity_producer_tests.h"
-  //friend class CommodityProducerTests;
+  // #include "commodity_producer_tests.h"
+  // friend class CommodityProducerTests;
   // @MJGFlag - removed for the same reason as above
 };
 
-} // namespace cyclus
-#endif
+}  // namespace cyclus
+#endif  // CYCLUS_SRC_COMMODITY_PRODUCER_H_
