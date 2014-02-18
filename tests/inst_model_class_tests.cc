@@ -14,9 +14,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieModel : public cyclus::FacilityModel {
  public:
-  DieModel(cyclus::Context* ctx)
-      : FacilityModel(ctx),
-        cyclus::Model(ctx)  {
+  DieModel(cyclus::Context* ctx) : FacilityModel(ctx) {
     tickCount_ = 0;
     tockCount_ = 0;
   };
@@ -59,7 +57,7 @@ class InstModelClassTests : public ::testing::Test {
   DieModel* child4_;
   DieModel* child5_;
 
-  cyclus::TimeListener* inst_;
+  cyclus::InstModel* inst_;
   cyclus::Recorder rec_;
   cyclus::Timer ti_;
   cyclus::Context* ctx_;

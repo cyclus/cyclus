@@ -60,7 +60,7 @@ namespace cyclus {
    facility's allowability in the region). It makes no alterations to
    messages passed through it in either the up or down direction.
  */
-class RegionModel : public TimeListener {
+class RegionModel : public Model, public TimeListener {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
