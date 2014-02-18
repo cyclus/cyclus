@@ -1,6 +1,6 @@
 // mass_table.h
-#ifndef CYCLUS_MASS_TABLE_H_
-#define CYCLUS_MASS_TABLE_H_
+#ifndef CYCLUS_SRC_MASS_TABLE_H_
+#define CYCLUS_SRC_MASS_TABLE_H_
 
 #include <string>
 #include <vector>
@@ -13,7 +13,7 @@ namespace cyclus {
 /**
    @class MassTable
    The MassTable class provides an interface to the mass.sqlite
-   database, providing a robust and correct mass lookup by isotope
+   database, providing a robust and correct mass lookup by nuclide
  */
 class MassTable {
  private:
@@ -44,22 +44,22 @@ class MassTable {
   ~MassTable();
 
   /**
-     get the Atomic Number of an isotope according to its
+     get the Atomic Number of an nuclide according to its
      identifier.
 
-     @param tope is the isotope identifier of type Iso, which is an int
+     @param tope is the nuclide identifier of type Nuc, which is an int
      typedef
-     @return int the atomic number of the tope isotope.
+     @return int the atomic number of the tope nuclide.
    */
   int GetAtomicNum(int tope);
 
   /**
-     get the Mass, a double, of an isotope according to its
+     get the Mass, a double, of an nuclide according to its
      identifier.
 
-     @param tope is the isotope identifier of type Iso, which is an int
+     @param tope is the nuclide identifier of type Nuc, which is an int
      typedef
-     @return the mass, a double, of the tope isotope.
+     @return the mass, a double, of the tope nuclide.
    */
   double GramsPerMol(int tope);
 
@@ -87,7 +87,7 @@ class MassTable {
   /**
      a map for index lookup in the nuclide vector.
    */
-  std::map<int, int> isoIndex_;
+  std::map<int, int> nucIndex_;
 
   /**
      a function to initialize a large array of Nuclide structs via the

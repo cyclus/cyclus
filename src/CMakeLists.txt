@@ -88,6 +88,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/material.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/pyne.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc"
@@ -157,6 +158,7 @@ INSTALL(FILES
   mat_query.h
   material.h
   model.h
+  pyne.h
   query_engine.h 
   rec_backend.h
   recorder.h

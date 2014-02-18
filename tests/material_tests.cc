@@ -8,7 +8,7 @@
 #include "error.h"
 #include "mat_query.h"
 
-using cyclus::Iso;
+using cyclus::Nuc;
 using cyclus::CompMap;
 using cyclus::Composition;
 using cyclus::Material;

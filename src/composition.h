@@ -8,10 +8,10 @@ namespace cyclus {
 
 class Context;
 
-typedef int Iso;
+typedef int Nuc;
 
-/// a raw definition of isotopes and corresponding (dimensionless quantities).
-typedef std::map<Iso, double> CompMap;
+/// a raw definition of nuclides and corresponding (dimensionless quantities).
+typedef std::map<Nuc, double> CompMap;
 
 /// An immutable object responsible for holding a nuclide composition. It tracks
 /// decay lineages to prevent duplicate calculations and output recording and is
@@ -62,7 +62,7 @@ class Composition {
   /// delta timesteps). This composition remains unchanged.
   Ptr Decay(int delta);
 
-  /// Records the isotopic composition in output database Compositions table (if
+  /// Records the composition in output database Compositions table (if
   /// not done previously).
   void Record(Context* ctx);
 

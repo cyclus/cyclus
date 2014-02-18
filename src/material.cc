@@ -127,8 +127,8 @@ void Material::Decay(int curr_time) {
   } else {
     CompMap::const_iterator it;
     for (it = c.end(); it != c.begin(); --it) {
-      int iso = it->first;
-      double lambda_months = Decayer::DecayConstant(iso) / 12;
+      int nuc = it->first;
+      double lambda_months = Decayer::DecayConstant(nuc) / 12;
 
       if (eps <= 1 - std::exp(-lambda_months * dt)) {
         decay = true;
