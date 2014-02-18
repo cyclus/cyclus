@@ -4,9 +4,7 @@ using cyclus::NullInst;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NullInst::NullInst(cyclus::Context* ctx)
-    : cyclus::InstModel(ctx),
-      cyclus::Model(ctx)
-    {};
+    : cyclus::InstModel(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NullInst::~NullInst() {}

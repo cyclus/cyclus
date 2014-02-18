@@ -4,9 +4,7 @@ using cyclus::SinkFacility;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SinkFacility::SinkFacility(cyclus::Context* ctx)
-: cyclus::FacilityModel(ctx),
-    cyclus::Model(ctx)
-{};
+    : cyclus::FacilityModel(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SinkFacility::~SinkFacility() {}
@@ -113,9 +111,9 @@ SinkFacility::GetGenRsrcRequests() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SinkFacility::AcceptMatlTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
-                                 cyclus::Material::Ptr> >& responses) {
+    cyclus::Material::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Material>,
-                         cyclus::Material::Ptr> >::const_iterator it;
+  cyclus::Material::Ptr> >::const_iterator it;
   for (it = responses.begin(); it != responses.end(); ++it) {
     inventory_.Push(it->second);
   }
@@ -124,9 +122,9 @@ void SinkFacility::AcceptMatlTrades(
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SinkFacility::AcceptGenRsrcTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
-                                 cyclus::GenericResource::Ptr> >& responses) {
+    cyclus::GenericResource::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
-                         cyclus::GenericResource::Ptr> >::const_iterator it;
+  cyclus::GenericResource::Ptr> >::const_iterator it;
   for (it = responses.begin(); it != responses.end(); ++it) {
     inventory_.Push(it->second);
   }
@@ -138,7 +136,7 @@ void SinkFacility::Tick(int time) {
   using std::string;
   using std::vector:
 
-  LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
+      LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
 
   double requestAmt = request_;
   // inform the simulation about what the sink facility will be requesting

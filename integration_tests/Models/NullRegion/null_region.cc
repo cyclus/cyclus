@@ -4,9 +4,7 @@ using cyclus::NullRegion;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NullRegion::NullRegion(cyclus::Context* ctx)
-    : cyclus::RegionModel(ctx),
-      cyclus::Model(ctx)
-    {};
+    : cyclus::RegionModel(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NullRegion::~NullRegion() {}
