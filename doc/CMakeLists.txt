@@ -5,9 +5,9 @@
 # ---------------------------------
 
 IF (DOXYGEN_FOUND)
-  SET(DOXYGEN_SOURCE_DIR ${DOC_SOURCE_DIR})
-  SET(DOXYGEN_INPUT ${DOC_INPUT_DIR}/doxygen.conf)
-  SET(DOXYGEN_OUTPUT ${DOC_OUTPUT_DIR}/html/index.html)
+  SET(DOXYGEN_SOURCE_DIR "${DOC_SOURCE_DIR}")
+  SET(DOXYGEN_INPUT "${DOC_INPUT_DIR}/doxygen.conf")
+  SET(DOXYGEN_OUTPUT "${DOC_OUTPUT_DIR}/html/index.html")
   
   FIND_PACKAGE(HTMLHelp)
   
@@ -39,7 +39,7 @@ IF (DOXYGEN_FOUND)
   
   STRING(REGEX REPLACE ";" " " DOXYGEN_INPUT_LIST "${DOXYGEN_SOURCE_DIR}")
   
-  CONFIGURE_FILE(${DOC_INPUT_DIR}/doxy.conf.in ${DOC_INPUT_DIR}/doxygen.conf)
+  CONFIGURE_FILE("${DOC_INPUT_DIR}/doxy.conf.in" "${DOXYGEN_INPUT}")
   
 
   IF (WIN32)
@@ -54,22 +54,22 @@ IF (DOXYGEN_FOUND)
   ENDIF (WIN32)
 
   ADD_CUSTOM_COMMAND(
-    OUTPUT ${DOXYGEN_OUTPUT}
-    COMMAND ${CMAKE_COMMAND} -E echo_append "Building cyclus Documentation..."
-    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
-    COMMAND ${CMAKE_COMMAND} -E echo "Done."
-    WORKING_DIRECTORY ${DOC_OUTPUT_DIR}
-    DEPENDS ${DOXYGEN_INPUT}
+    OUTPUT "${DOXYGEN_OUTPUT}"
+    COMMAND "${CMAKE_COMMAND}" -E echo_append "Building cyclus Documentation..."
+    COMMAND "${DOXYGEN_EXECUTABLE}" "\"${DOXYGEN_INPUT}\""
+    COMMAND "${CMAKE_COMMAND}" -E echo "Done."
+    WORKING_DIRECTORY "${DOC_OUTPUT_DIR}"
+    DEPENDS "${DOXYGEN_INPUT}"
     )
 
-  ADD_CUSTOM_TARGET(cyclusdoc DEPENDS ${DOXYGEN_OUTPUT})
+  ADD_CUSTOM_TARGET(cyclusdoc DEPENDS "${DOXYGEN_OUTPUT}")
   ADD_CUSTOM_TARGET(coredoc DEPENDS cyclusdoc)
 
   ADD_CUSTOM_TARGET(cyclusdoc_forced
-    COMMAND ${CMAKE_COMMAND} -E echo_append "Building cyclus Documentation..."
-    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
-    COMMAND ${CMAKE_COMMAND} -E echo "Done."
-    WORKING_DIRECTORY ${DOC_OUTPUT_DIR}
+    COMMAND "${CMAKE_COMMAND}" -E echo_append "Building cyclus Documentation..."
+    COMMAND "${DOXYGEN_EXECUTABLE}" "\"${DOXYGEN_INPUT}\""
+    COMMAND "${CMAKE_COMMAND}" -E echo "Done."
+    WORKING_DIRECTORY "${DOC_OUTPUT_DIR}"
     )
 
 ENDIF (DOXYGEN_FOUND)

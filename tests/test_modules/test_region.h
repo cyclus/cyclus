@@ -7,9 +7,7 @@
 /// This is the simplest possible Region, for testing
 class TestRegion: public cyclus::RegionModel {
  public:
-  TestRegion(cyclus::Context* ctx)
-      : cyclus::RegionModel(ctx),
-        cyclus::Model(ctx) {};
+  TestRegion(cyclus::Context* ctx) : cyclus::RegionModel(ctx) {};
       
   virtual cyclus::Model* Clone() {return new TestRegion(context());};
 };

@@ -9,29 +9,29 @@ IF(NOT CYCLUS_DOC_ONLY)
 ##############################################################################################
 
 # set project directories
-SET( PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
-SET( CYCLUS_CLI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cli )
-SET( CYCLUS_DOC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/doc )
-SET( CYCLUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src )
-SET( CYCLUS_STUB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stubs )
-SET( CYCLUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests )
-SET( CYCLUS_INTEGRATION_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/integration_tests )
+SET(PROJECT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+SET(CYCLUS_CLI_DIR "${PROJECT_SOURCE_DIR}/cli")
+SET(CYCLUS_DOC_DIR "${PROJECT_SOURCE_DIR}/doc")
+SET(CYCLUS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
+SET(CYCLUS_STUB_DIR "${PROJECT_SOURCE_DIR}/stubs")
+SET(CYCLUS_TEST_DIR "${PROJECT_SOURCE_DIR}/tests")
+SET(CYCLUS_INTEGRATION_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/integration_tests")
 
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
 
 # Setup build locations.
 IF(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/bin)
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CYCLUS_BINARY_DIR}/bin")
 endif()
 IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
+  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CYCLUS_BINARY_DIR}/lib")
 endif()
 IF(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-  SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CYCLUS_BINARY_DIR}/lib)
+  SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CYCLUS_BINARY_DIR}/lib")
 ENDIF()
 
-SET(CYCLUS_EXECUTABLE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+SET(CYCLUS_EXECUTABLE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 # use, i.e. don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -53,8 +53,8 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Tell CMake where the modules are
-SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_DIR}/share/cmake-2.8/Modules")
-SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMake )
+LIST(APPEND CMAKE_MODULE_PATH
+     "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/CMake")
 
 # Include macros
 INCLUDE(CyclusModuleMacros)
@@ -90,24 +90,20 @@ ENDIF()
 # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
 # libxml2 is required for relaxng schema validation
 FIND_PACKAGE( LibXml2 REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR})
 ADD_DEFINITIONS (${LIBXML2_DEFINITIONS})
 SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
 # Find LibXML++ and dependencies
 FIND_PACKAGE( LibXML++ REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${LibXML++_INCLUDE_DIR} ${Glibmm_INCLUDE_DIRS} ${LibXML++Config_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
 MESSAGE(${LIBS})
 
 # Find Sqlite3
 FIND_PACKAGE( Sqlite3 REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${SQLITE3_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
 # Find HDF5
 FIND_PACKAGE( HDF5 REQUIRED)
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
 ADD_DEFINITIONS(${HDF5_DEFINITIONS})
 set(LIBS ${LIBS} ${HDF5_LIBRARIES} )
 
@@ -118,7 +114,6 @@ SET(Boost_USE_STATIC_LIBS       OFF)
 SET(Boost_USE_STATIC_RUNTIME    OFF)
 # SET(Boost_USE_MULTITHREADED    OFF)
 FIND_PACKAGE( Boost COMPONENTS program_options filesystem system REQUIRED)
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 MESSAGE("--    Boost Root: ${Boost_ROOT}")
 MESSAGE("--    Boost Include directory: ${Boost_INCLUDE_DIR}")
 MESSAGE("--    Boost Library directories: ${Boost_LIBRARY_DIRS}")
@@ -136,7 +131,6 @@ MESSAGE("\tFound LAPACK Libraries: ${LAPACK_LIBRARIES}")
 
 # find coin and link to it
 FIND_PACKAGE( COIN REQUIRED )
-SET(CYCLUS_INCLUDE_DIR ${CYCLUS_INCLUDE_DIR} ${COIN_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${COIN_LIBRARIES})
 
 ##############################################################################################
@@ -148,13 +142,27 @@ set(LIBS ${LIBS} ${COIN_LIBRARIES})
 ##############################################################################################
 
 # include all the directories we just found
-INCLUDE_DIRECTORIES( ${CYCLUS_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
+                    "${LibXML++_INCLUDE_DIR}"
+                    ${Glibmm_INCLUDE_DIRS}
+                    "${LibXML++Config_INCLUDE_DIR}"
+                    "${SQLITE3_INCLUDE_DIR}"
+                    ${HDF5_INCLUDE_DIRS}
+                    "${Boost_INCLUDE_DIR}"
+                    ${COIN_INCLUDE_DIRS})
 
+<<<<<<< HEAD
 ADD_SUBDIRECTORY(${CYCLUS_SOURCE_DIR})
 ADD_SUBDIRECTORY(${CYCLUS_CLI_DIR})
 ADD_SUBDIRECTORY(${CYCLUS_STUB_DIR})
 ADD_SUBDIRECTORY(${CYCLUS_TEST_DIR})
 ADD_SUBDIRECTORY(${CYCLUS_INTEGRATION_TEST_DIR})
+=======
+ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
+ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
+ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
+ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
+>>>>>>> develop
 
 ##############################################################################################
 ####################################### end includes #########################################
@@ -171,7 +179,7 @@ configure_file(
     )
 
 add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+    COMMAND "${CMAKE_COMMAND}" -P "\"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake\"")
 
 ##############################################################################################
 ################################### end uninstall target #####################################
@@ -217,14 +225,14 @@ ENDIF(NOT CYCLUS_DOC_ONLY)
 ##############################################################################################
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
-SET( DOC_SOURCE_DIR ${CYCLUS_SOURCE_DIR} )
-SET( DOC_INPUT_DIR ${CYCLUS_DOC_DIR} )
-SET( DOC_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doc )
+SET(DOC_SOURCE_DIR "${CYCLUS_SOURCE_DIR}")
+SET(DOC_INPUT_DIR "${CYCLUS_DOC_DIR}")
+SET(DOC_OUTPUT_DIR "${CMAKE_BINARY_DIR}/doc")
   
 # If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
 FIND_PACKAGE(Doxygen)
 IF (DOXYGEN_FOUND)
-  ADD_SUBDIRECTORY(${CYCLUS_DOC_DIR})
+  ADD_SUBDIRECTORY("${CYCLUS_DOC_DIR}")
 ELSE (DOXYGEN_FOUND)
   MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
 ENDIF (DOXYGEN_FOUND)
