@@ -4,13 +4,13 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducerManager::CommodityProducerManager() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodityProducerManager::~CommodityProducerManager() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double CommodityProducerManager::TotalProductionCapacity(Commodity& commodity) {
   double total = 0.0;
   std::set<CommodityProducer*>::iterator it;
@@ -22,7 +22,7 @@ double CommodityProducerManager::TotalProductionCapacity(Commodity& commodity) {
   return total;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityProducerManager::RegisterProducer(
   CommodityProducer* producer) {
   if (producers_.find(producer) != producers_.end()) {
@@ -32,15 +32,16 @@ void CommodityProducerManager::RegisterProducer(
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityProducerManager::UnRegisterProducer(
   CommodityProducer* producer) {
   if (producers_.find(producer) == producers_.end()) {
-    throw KeyError("A manager is trying to unregister a producer not originally registered with it.");
+    throw KeyError("A manager is trying to unregister"
+                   " a producer not originally registered with it.");
   } else {
     producers_.erase(producer);
   }
 }
- 
-} // namespace cyclus
+
+}  // namespace cyclus
 
