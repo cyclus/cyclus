@@ -58,7 +58,7 @@ TEST(CsvBackTest, ReadWrite) {
   std::string sid1 = boost::lexical_cast<std::string>(m.sim_id());
   std::string sid2 = boost::lexical_cast<std::string>(m2.sim_id());
   std::vector<std::string> lines(4);
-  lines[0] = "SimID, animal, weight, height";
+  lines[0] = "SimId, animal, weight, height";
   lines[1] = "\"" + sid1 + "\", \"monkey\", 10, 5.5";
   lines[2] = "\"" + sid1 + "\", \"elephant\", 1000, 7.2";
   lines[3] = "\"" + sid2 + "\", \"sea cucumber\", 1, 0.4";
