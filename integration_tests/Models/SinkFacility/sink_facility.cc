@@ -12,10 +12,12 @@ SinkFacility::~SinkFacility() {}
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SinkFacility::schema() {
   return
-      "  <element name =\"input\">             \n"
-      "    <element name =\"incommodity\"/>    \n"
-      "    <element name =\"input_capacity\"/> \n"
-      "  </element>                            \n";
+      "  <element name =\"input\">               \n"
+      "    <element name =\"incommodity\"/>      \n"
+      "    <element name =\"input_capacity\">    \n"
+      "      <data type=\"double\"/> \n"
+      "    </element>                            \n"
+      "  </element>                              \n";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,6 +46,7 @@ void SinkFacility::InitFrom(SinkFacility* m) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SinkFacility::str() {
+  // no info for now. Change later
   return FacilityModel::str();
 }
 

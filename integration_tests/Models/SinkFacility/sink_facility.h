@@ -46,9 +46,13 @@ class SinkFacility : public cyclus::FacilityModel  {
   explicit SinkFacility(cyclus::Context* ctx);
 
   /**
-    every model should be destructable
+    Distructor for SinkFacility
     */
   virtual ~SinkFacility();
+  /**
+    Schema for SinkFacility
+    */
+  virtual std::string schema();
 
   /**
     Initialize members related to derived module class
@@ -116,14 +120,15 @@ class SinkFacility : public cyclus::FacilityModel  {
    */
 
   /**
-     determines the amount to request
-   */
+    determines the amount to request
+    */
   inline double RequestAmt() const {
     return capacity_;
   }
 
   /* ------------------- */
  private:
+  std::vector<std::string> in_commods_;
   std::string incommodity_;
   double capacity_;
   cyclus::ResourceBuff inventory_;

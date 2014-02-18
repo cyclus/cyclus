@@ -151,18 +151,11 @@ INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
                     "${Boost_INCLUDE_DIR}"
                     ${COIN_INCLUDE_DIRS})
 
-<<<<<<< HEAD
-ADD_SUBDIRECTORY(${CYCLUS_SOURCE_DIR})
-ADD_SUBDIRECTORY(${CYCLUS_CLI_DIR})
-ADD_SUBDIRECTORY(${CYCLUS_STUB_DIR})
-ADD_SUBDIRECTORY(${CYCLUS_TEST_DIR})
-ADD_SUBDIRECTORY(${CYCLUS_INTEGRATION_TEST_DIR})
-=======
 ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
->>>>>>> develop
+ADD_SUBDIRECTORY("${CYCLUS_INTEGRATION_TEST_DIR}")
 
 ##############################################################################################
 ####################################### end includes #########################################
