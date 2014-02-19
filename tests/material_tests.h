@@ -25,10 +25,10 @@ class MaterialTest : public ::testing::Test {
 
   virtual void SetUp() {
     // composition set up
-    u235_ = 92235;
-    am241_ = 95241;
-    th228_ = 90228;
-    pb208_ = 82208;
+    u235_ = 922350000;
+    am241_ = 952410000;
+    th228_ = 902280000;
+    pb208_ = 822080000;
     test_size_ = 10 * units::g;
     fraction = 2.0 / 3.0;
 
