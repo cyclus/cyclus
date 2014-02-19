@@ -1,10 +1,12 @@
+#include <boost/lexical_cast.hpp>
+
 #include "sink_facility.h"
 
 using cyclus::SinkFacility;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SinkFacility::SinkFacility(cyclus::Context* ctx)
-    : cyclus::FacilityModel(ctx) {};
+  : cyclus::FacilityModel(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SinkFacility::~SinkFacility() {}
@@ -15,7 +17,7 @@ std::string SinkFacility::schema() {
       "  <element name =\"input\">               \n"
       "    <element name =\"incommodity\"/>      \n"
       "    <element name =\"input_capacity\">    \n"
-      "      <data type=\"double\"/> \n"
+      "      <data type=\"double\"/>             \n"
       "    </element>                            \n"
       "  </element>                              \n";
 }
@@ -25,9 +27,11 @@ void SinkFacility::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::FacilityModel::InitFrom(qe);
   qe = qe->QueryElement("model/" + ModelImpl());
 
+  using boost::lexical_cast;
+
   cyclus::QueryEngine* input = qe->QueryElement("input");
   incommodity_ = input->GetElementContent("incommodity", 0);
-  capacity_ = input->GetElementContent<double>("input_capacity", 0);
+  capacity_ = lexical_cast<double>(input->GetElementContent("input_capacity", 0));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -137,11 +141,11 @@ void SinkFacility::AcceptGenRsrcTrades(
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SinkFacility::Tick(int time) {
   using std::string;
-  using std::vector:
+  using std::vector;
 
-      LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
+  LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
 
-  double requestAmt = request_;
+  double requestAmt = RequestAmt();
   // inform the simulation about what the sink facility will be requesting
   if (requestAmt > cyclus::eps()) {
     for (vector<string>::iterator commod = in_commods_.begin();
