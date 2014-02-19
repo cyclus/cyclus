@@ -71,6 +71,7 @@ class MassTable {
   typedef struct Nuclide {
     int  Z; /**< an integer indicating the atomic (proton) number of an atom >**/
     int  A; /**< an integer indicating the A (mass A=N+Z) number of an atom.  >**/
+    int  S; /**< an integer indicating the S (state) number of an atom.  >**/
     double  mass; /**< a double indicating the mass of an atom >**/
   } Nuclide;
 

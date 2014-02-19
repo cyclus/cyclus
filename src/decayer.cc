@@ -66,6 +66,7 @@ void Decayer::LoadDecayInfo() {
   double branchRatio = 0;
 
   decayInfo >> nuc;  // get first parent
+  nuc *= 10000;  // put in id form
 
   // checks to see if there are nuclides in 'decayInfo.dat'
   if (decayInfo.eof()) {
@@ -92,6 +93,7 @@ void Decayer::LoadDecayInfo() {
     std::vector< std::pair<int, double> > temp(nDaughters);
     for (int i = 0; i < nDaughters; ++i) {
       decayInfo >> nuc;
+      nuc *= 10000;  // put in id form
       decayInfo >> branchRatio;
       AddNucToList(nuc);
 
@@ -109,6 +111,7 @@ void Decayer::LoadDecayInfo() {
     daughters_[jcol] = temp;
     ++jcol; // set next column
     decayInfo >> nuc; // get next parent
+    nuc *= 10000;  // put in id form
   }
   BuildDecayMatrix();
 }
