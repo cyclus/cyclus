@@ -28,6 +28,14 @@ inline static void AdjustPrefs(Model* m,
                                PrefMap<GenericResource>::type& prefs) {
   m->AdjustGenRsrcPrefs(prefs);
 }
+inline static void AdjustPrefs(Trader* t,
+                               PrefMap<Material>::type& prefs) {
+  t->AdjustMatlPrefs(prefs);
+}
+inline static void AdjustPrefs(Trader* t,
+                               PrefMap<GenericResource>::type& prefs) {
+  t->AdjustGenRsrcPrefs(prefs);
+}
 
 /// @class ResourceExchange
 ///
@@ -122,7 +130,8 @@ class ResourceExchange {
   /// system
   void AdjustPrefs_(Trader* t) {
     typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[t];
-    Model* m = t->manager();
+    AdjustPrefs(t, prefs);
+    Model* m = t->manager()->parent();
     while (m != NULL) {
       AdjustPrefs(m, prefs);
       m = m->parent();

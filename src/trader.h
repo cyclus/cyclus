@@ -52,6 +52,12 @@ class Trader {
     return std::set<BidPortfolio<GenericResource>::Ptr>();
   }
 
+  /// default implementation for material preferences.
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};
+  
+  /// default implementation for material preferences.
+  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) {};
+
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
