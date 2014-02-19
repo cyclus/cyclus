@@ -41,4 +41,4 @@ void CommodityRecipeContext::UpdateInRec(
   in_recipes_[incommod] = recipe;
 }
 
-} // namespace cyclus
+}  // namespace cyclus
