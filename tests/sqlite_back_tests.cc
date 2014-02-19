@@ -66,15 +66,15 @@ TEST(SqliteBackTest, Regression) {
 
   ASSERT_EQ(back.cmds.size(), 4);
   EXPECT_EQ(back.cmds.at(0),
-            "CREATE TABLE DumbTitle (SimID TEXT, animal TEXT, weight INTEGER, height REAL, data BLOB);");
+            "CREATE TABLE DumbTitle (SimId TEXT, animal TEXT, weight INTEGER, height REAL, data BLOB);");
   EXPECT_EQ(back.cmds.at(1),
-            "INSERT INTO DumbTitle (SimID, animal, weight, height, data) VALUES ('" + sid +
+            "INSERT INTO DumbTitle (SimId, animal, weight, height, data) VALUES ('" + sid +
             "', 'monkey', 10, 5.5, X'62616e616e61');");
   EXPECT_EQ(back.cmds.at(2),
-            "INSERT INTO DumbTitle (SimID, animal, weight) VALUES ('" + sid +
+            "INSERT INTO DumbTitle (SimId, animal, weight) VALUES ('" + sid +
             "', 'elephant', 1000);");
   EXPECT_EQ(back.cmds.at(3),
-            "INSERT INTO DumbTitle (SimID, animal, height) VALUES ('" + sid +
+            "INSERT INTO DumbTitle (SimId, animal, height) VALUES ('" + sid +
             "', 'sea cucumber', 1.2);");
 }
 
