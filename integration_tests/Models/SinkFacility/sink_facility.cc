@@ -15,7 +15,9 @@ SinkFacility::~SinkFacility() {}
 std::string SinkFacility::schema() {
   return
       "  <element name =\"input\">               \n"
-      "    <element name =\"incommodity\"/>      \n"
+      "    <element name =\"incommodity\">       \n"
+      "      <text/>                             \n"
+      "    </element>                            \n"
       "    <element name =\"input_capacity\">    \n"
       "      <data type=\"double\"/>             \n"
       "    </element>                            \n"

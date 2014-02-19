@@ -51,10 +51,10 @@
   <recipe>
     <name>commod_recipe</name>
     <basis>mass</basis>
-    <isotope>
+    <nuclide>
       <id>01001</id>
       <comp>1</comp>
-    </isotope>
+    </nuclide>
   </recipe>
 
 </simulation>
