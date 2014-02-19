@@ -91,6 +91,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/model.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/pyne.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc"
@@ -166,6 +167,7 @@ INSTALL(FILES
   model.h
   prog_solver.h 
   prog_translator.h 
+  pyne.h
   query_engine.h 
   rec_backend.h
   recorder.h

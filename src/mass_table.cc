@@ -34,8 +34,8 @@ MassTable::~MassTable() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double MassTable::GramsPerMol(int tope) {
-  double toRet = nuclide_vec_[isoIndex_[tope]].mass;
+double MassTable::GramsPerMol(int nuc) {
+  double toRet = nuclide_vec_[nucIndex_[nuc]].mass;
   return toRet;
 }
 
@@ -59,11 +59,11 @@ void MassTable::InitializeSQL() {
     int a = atoi(aStr.c_str());
     double mass = atof(mStr.c_str());
     // create a nuclide member and add it to the nuclide vector
-    Nuclide n = {z, a, mass};
+    Nuclide n = {z, a, 0, mass};
     nuclide_vec_.push_back(n);
     // create an index and log it accordingly
-    int tope = z * 1000 + a;
-    isoIndex_.insert(std::make_pair(tope, i));
+    int nuc = (z * 10000000) + (a * 10000);
+    nucIndex_.insert(std::make_pair(nuc, i));
   }
   // set the total number of nuclides
   nuclide_len_ = nuclide_vec_.size();
