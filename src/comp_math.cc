@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "cyc_arithmetic.h"
+#include "pyne.h"
 #include "error.h"
 
 namespace cyclus {
@@ -63,13 +64,9 @@ void Normalize(CompMap* v, double val) {
 }
 
 bool ValidNucs(const CompMap& v) {
-  int min = 1001;
-  int max = 1182949;
-
   CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
-    Nuc nuc = it->first;
-    if (nuc < min || nuc > max) {
+    if (!pyne::nucname::isnuclide(it->first)) {
       return false;
     }
   }

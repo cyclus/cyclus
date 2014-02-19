@@ -33,6 +33,7 @@
 #include "mat_query.h"
 #include "material.h"
 #include "model.h"
+#include "pyne.h"
 #include "query_engine.h"
 #include "region_model.h"
 #include "request.h"
