@@ -128,4 +128,3 @@ bool AlmostEq(const CompMap& v1, const CompMap& v2, double threshold) {
 
 }  // namespace compmath
 }  // namespace cyclus
-
