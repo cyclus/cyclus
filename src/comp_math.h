@@ -1,5 +1,5 @@
-#ifndef COMP_MATH_H
-#define COMP_MATH_H
+#ifndef CYCLUS_SRC_COMP_MATH_H_
+#define CYCLUS_SRC_COMP_MATH_H_
 
 #include "composition.h"
 
@@ -22,13 +22,11 @@ namespace compmath {
 /// // v3[92235] == 3.4, v3[92238] == 2.5
 /// @endcode
 ///
-CompMap Add(const CompMap& v1,
-                      const CompMap& v2);
+CompMap Add(const CompMap& v1, const CompMap& v2);
 
 /// Does component-wise subtraction of the nuclide quantities of v1 and v2 and
 /// returns the result.  No normalization is done.
-CompMap Sub(const CompMap& v1, const CompMap&
-                      v2);
+CompMap Sub(const CompMap& v1, const CompMap& v2);
 
 /// All nuclides with quantities below threshold will have their quantity set to
 /// zero.
@@ -46,10 +44,9 @@ bool AllPositive(const CompMap& v);
 
 /// Returns true if all nuclides of v1 and v2 are the same within threshold. No
 /// normalization is performed.
-bool AlmostEq(const CompMap& v1, const CompMap& v2, double
-              threshold);
+bool AlmostEq(const CompMap& v1, const CompMap& v2, double threshold);
 
-} // namespace compmath
-} // namespace cyclus
+}  // namespace compmath
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_COMP_MATH_H_
