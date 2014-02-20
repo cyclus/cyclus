@@ -213,6 +213,10 @@ class Model {
   std::string model_type_;
 
  private:
+  /// Prevents creation/use of copy constructors (including in subclasses).
+  /// Cloning and InitFrom should be used instead.
+  Model(const Model& m) {};
+
   /// add an agent to the transactiont table
   void AddToTable();
 
