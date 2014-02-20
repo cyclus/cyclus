@@ -44,7 +44,7 @@ void Recorder::set_dump_count(unsigned int count) {
   data_.reserve(count);
   for (int i = 0; i < count; ++i) {
     Datum* d = new Datum(this, "");
-    d->AddVal("SimID", uuid_);
+    d->AddVal("SimId", uuid_);
     data_.push_back(d);
   }
   dump_count_ = count;

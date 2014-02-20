@@ -10,24 +10,24 @@ double MatQuery::qty() {
   return m_->quantity();
 };
 
-double MatQuery::mass(Iso iso) {
-  return mass_frac(iso) * qty();
+double MatQuery::mass(Nuc nuc) {
+  return mass_frac(nuc) * qty();
 };
 
-double MatQuery::moles(Iso iso) {
-  return mass(iso) / (MT->GramsPerMol(iso) * units::g);
+double MatQuery::moles(Nuc nuc) {
+  return mass(nuc) / (MT->GramsPerMol(nuc) * units::g);
 };
 
-double MatQuery::mass_frac(Iso iso) {
+double MatQuery::mass_frac(Nuc nuc) {
   CompMap v = m_->comp()->mass();
   compmath::Normalize(&v);
-  return v[iso];
+  return v[nuc];
 };
 
-double MatQuery::atom_frac(Iso iso) {
+double MatQuery::atom_frac(Nuc nuc) {
   CompMap v = m_->comp()->atom();
   compmath::Normalize(&v);
-  return v[iso];
+  return v[nuc];
 };
 
 bool MatQuery::AlmostEq(Material::Ptr other, double threshold) {

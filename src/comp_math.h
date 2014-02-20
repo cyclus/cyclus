@@ -13,13 +13,13 @@ namespace compmath {
 ///
 /// @code
 /// CompMap v1;
-/// v1[92235] = 2.3;
-/// v1[92238] = 1.3;
+/// v1[922350000] = 2.3;
+/// v1[922380000] = 1.3;
 /// CompMap v2;
-/// v2[92235] = 1.1;
-/// v2[92238] = 1.2;
+/// v2[922350000] = 1.1;
+/// v2[922380000] = 1.2;
 /// CompMap v3 = compmath::Add(v1, v2):
-/// // v3[92235] == 3.4, v3[92238] == 2.5
+/// // v3[922350000] == 3.4, v3[922380000] == 2.5
 /// @endcode
 ///
 CompMap Add(const CompMap& v1,
@@ -38,7 +38,7 @@ void ApplyThreshold(CompMap* v, double threshold);
 void Normalize(CompMap* v, double val = 1.0);
 
 /// Returns true if all nuclide keys in v are valid.
-bool ValidIsos(const CompMap& v);
+bool ValidNucs(const CompMap& v);
 
 /// Returns true if all nuclides in v have quantities greater than or equal to
 /// zero.

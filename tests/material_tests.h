@@ -12,7 +12,7 @@ namespace units = cyclus::units;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MaterialTest : public ::testing::Test {
  protected:
-  cyclus::Iso u235_, am241_, th228_, pb208_, pu239_;
+  cyclus::Nuc u235_, am241_, th228_, pb208_, pu239_;
   int one_g_; // grams
   cyclus::Composition::Ptr test_comp_, diff_comp_;
   double test_size_, fraction;
@@ -25,10 +25,10 @@ class MaterialTest : public ::testing::Test {
 
   virtual void SetUp() {
     // composition set up
-    u235_ = 92235;
-    am241_ = 95241;
-    th228_ = 90228;
-    pb208_ = 82208;
+    u235_ = 922350000;
+    am241_ = 952410000;
+    th228_ = 902280000;
+    pb208_ = 822080000;
     test_size_ = 10 * units::g;
     fraction = 2.0 / 3.0;
 

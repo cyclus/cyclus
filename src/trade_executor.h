@@ -79,10 +79,10 @@ class TradeExecutor {
         Trade<T>& trade = v_it->first;
         typename T::Ptr rsrc =  v_it->second;
         ctx->NewDatum("Transactions")
-            ->AddVal("ID", ctx->NextTransactionID())
-            ->AddVal("SenderID", supplier->id())
-            ->AddVal("ReceiverID", requester->id())
-            ->AddVal("ResourceID", rsrc->id())
+            ->AddVal("TransactionId", ctx->NextTransactionID())
+            ->AddVal("SenderId", supplier->id())
+            ->AddVal("ReceiverId", requester->id())
+            ->AddVal("ResourceId", rsrc->id())
             ->AddVal("Commodity", trade.request->commodity())
             ->AddVal("Price", trade.price)
             ->AddVal("Time", ctx->time())
