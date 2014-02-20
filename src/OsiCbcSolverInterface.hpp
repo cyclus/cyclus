@@ -268,8 +268,11 @@ public:
       It is the user's responsibility to free the double pointers in the
       vector using delete[].
   */
-  virtual std::vector<double*> getDualRays(int maxNumRays,
-					   bool fullRay = false) const;
+  // virtual std::vector<double*> getDualRays(int maxNumRays,
+  //       				   bool fullRay = false) const;
+  // signature change to be compatible with current apt-get version
+  virtual std::vector<double*> getDualRays(int maxNumRays) const;
+  
   /** Get as many primal rays as the solver can provide. (In case of proven
       dual infeasibility there should be at least one.)
       
