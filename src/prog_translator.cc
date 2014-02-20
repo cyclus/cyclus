@@ -31,17 +31,17 @@ void ProgTranslator::Translate() {
   int n_cols = g_->arcs().size() + g_->request_groups().size();
   ctx_.m.setDimensions(0, n_cols);
 
-  bool req;
+  bool request;
   std::vector<ExchangeNodeGroup::Ptr>& sgs = g_->supply_groups();
   for (int i = 0; i != sgs.size(); i++) {
-    req = false;
-    XlateGrp_(sgs[i].get(), req);
+    request = false;
+    XlateGrp_(sgs[i].get(), request);
   }
 
   std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
   for (int i = 0; i != rgs.size(); i++) {
-    req = true;
-    XlateGrp_(rgs[i].get(), req);
+    request = true;
+    XlateGrp_(rgs[i].get(), request);
   }
 
   // add each false arc
@@ -82,7 +82,7 @@ void ProgTranslator::ToProg() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
+void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
   double inf = iface_->getInfinity();
   std::vector<double>& caps = grp->capacities();
 
@@ -120,11 +120,11 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
       }
       
       // add exclusive arc
-      if (excl_ && req && a.exclusive) {
+      if (excl_ && request && a.exclusive) {
         excl_row.insert(arc_id, 1.0);
       }
 
-      if (req) {
+      if (request) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
         double obj_coeff = a.exclusive ? 1 / pref * a.excl_val : 1 / pref;
@@ -143,18 +143,18 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool req) {
   }
 
   int faux_id;
-  if (req) {
+  if (request) {
     faux_id = arc_offset_++;
   }
 
   // add all capacity rows  
   for (int i = 0; i != cap_rows.size(); i++) {
-    if (req) {
+    if (request) {
       cap_rows[i].insert(faux_id, 1.0); // faux arc
     }
     
-    double lb = req ? caps[i] : 0;
-    double ub = req ? inf : caps[i];
+    double lb = request ? caps[i] : 0;
+    double ub = request ? inf : caps[i];
     ctx_.row_lbs.push_back(lb);
     ctx_.row_ubs.push_back(ub);
     ctx_.m.appendRow(cap_rows[i]);
