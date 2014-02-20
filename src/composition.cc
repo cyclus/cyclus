@@ -1,4 +1,3 @@
-
 #include "composition.h"
 
 #include "comp_math.h"
@@ -77,7 +76,7 @@ Composition::Ptr Composition::Decay(int delta) {
 void Composition::Record(Context* ctx) {
   if (!recorded_) {
     CompMap::const_iterator it;
-    mass(); // force lazy evaluation now
+    mass();  // force lazy evaluation now
     compmath::Normalize(&mass_, 1);
     for (it = mass().begin(); it != mass().end(); ++it) {
       ctx->NewDatum("Compositions")
@@ -90,8 +89,7 @@ void Composition::Record(Context* ctx) {
   }
 }
 
-Composition::Composition()
-  : prev_decay_(0), recorded_(false) {
+Composition::Composition() : prev_decay_(0), recorded_(false) {
   id_ = next_id_;
   next_id_++;
   decay_line_ = ChainPtr(new Chain());
@@ -101,9 +99,9 @@ Composition::Composition(int prev_decay, ChainPtr decay_line)
   : recorded_(false),
     prev_decay_(prev_decay),
     decay_line_(decay_line) {
-  id_ = next_id_;
-  next_id_++;
-}
+      id_ = next_id_;
+      next_id_++;
+    }
 
 Composition::Ptr Composition::NewDecay(int delta) {
   int tot_decay = prev_decay_ + delta;
@@ -120,4 +118,4 @@ Composition::Ptr Composition::NewDecay(int delta) {
   return decayed;
 }
 
-} // namespace cyclus
+}  // namespace cyclus
