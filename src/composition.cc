@@ -96,12 +96,12 @@ Composition::Composition() : prev_decay_(0), recorded_(false) {
 }
 
 Composition::Composition(int prev_decay, ChainPtr decay_line)
-  : recorded_(false),
-    prev_decay_(prev_decay),
-    decay_line_(decay_line) {
-      id_ = next_id_;
-      next_id_++;
-    }
+    : recorded_(false),
+      prev_decay_(prev_decay),
+      decay_line_(decay_line) {
+  id_ = next_id_;
+  next_id_++;
+}
 
 Composition::Ptr Composition::NewDecay(int delta) {
   int tot_decay = prev_decay_ + delta;
