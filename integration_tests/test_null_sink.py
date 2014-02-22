@@ -10,7 +10,7 @@ from tools import check_cmd
 def test_null_sink():
     """ Testing for null sink case without a source facility """
     #Cyclus simulation input for null sink testing
-    sim_input = "./inputs/null_sink.xml"
+    sim_input = "./Inputs/null_sink.xml"
     holdsrtn = [1] # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
