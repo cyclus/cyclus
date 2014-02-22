@@ -1,6 +1,6 @@
 // context.h
-#ifndef CONTEXT_H_
-#define CONTEXT_H_
+#ifndef CYCLUS_SRC_CONTEXT_H_
+#define CYCLUS_SRC_CONTEXT_H_
 
 #include <map>
 #include <string>
@@ -63,7 +63,7 @@ class Context {
 
   /// @return the current set of facilities in the simulation
   inline const std::set<Trader*>& traders() const {
-      return traders_;
+    return traders_;
   }
 
   /// Create a new model by cloning the named prototype. The returned model is
@@ -83,12 +83,12 @@ class Context {
       throw CastError("Invalid cast for prototype " + proto_name);
     }
     return casted;
-  };
+  }
 
   /// Adds a composition recipe to a simulation-wide accessible list.
   /// Agents should NOT add their own recipes.
   void AddRecipe(std::string name, Composition::Ptr c);
-  
+
   /// Retrieve a registered recipe.  This is intended for retrieving
   /// compositions loaded from an input file(s) at the start of a
   /// simulation and NOT for communicating compositions between facilities
@@ -116,26 +116,32 @@ class Context {
   Datum* NewDatum(std::string title);
 
   /// @return the next transaction id
-  inline int NextTransactionID() { return trans_id_++; }
+  inline int NextTransactionID() {
+    return trans_id_++;
+  }
 
   /// Returns the exchange solver associated with this context
-  ExchangeSolver* solver() { return solver_; }
-  
+  ExchangeSolver* solver() {
+    return solver_;
+  }
+
   /// sets the solver associated with this context
-  void solver(ExchangeSolver* solver) { solver_ = solver; }
-      
+  void solver(ExchangeSolver* solver) {
+    solver_ = solver;
+  }
+
  private:
   std::map<std::string, Model*> protos_;
   std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Model*> model_list_;
-  
+
   Timer* ti_;
   ExchangeSolver* solver_;
   Recorder* rec_;
   int trans_id_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_CONTEXT_H_
