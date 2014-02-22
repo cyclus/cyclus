@@ -11,8 +11,7 @@ from tools import check_cmd
 def test_source_to_sink():
     """ Tests linear growth of sink inventory """
     #Cyclus simulation input for source_to_sink
-    sim_inputs = ["./inputs/source_to_sink/source_to_sink.xml",
-                  "./inputs/source_to_sink/source_to_sink_limited_lifetime.xml"]
+    sim_inputs = ["./Inputs/source_to_sink.xml"]
 
     for sim_input in sim_inputs:
         holdsrtn = [1] # needed because nose does not send() to test generator
@@ -26,8 +25,17 @@ def test_source_to_sink():
         # tables of interest
         paths = ["/Agents", "/Resources", "/Transactions","/TransactedResources"]
         # Check if these tables exist
+        tables_there = True
         for path in paths:
             yield assert_true, output.__contains__(path)
+            # Have to stop further operations after these tests
+            if tables_there and not output.__contains__(path):
+                tables_there = False
+
+        if not tables_there:
+            output.close()
+            os.remove("./output_temp.h5")
+            return
 
         # Get specific tables and columns
         agents = output.get_node("/Agents")[:]
