@@ -13,10 +13,10 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BuildOrder::BuildOrder(int n, Builder* b,
-                       CommodityProducer* cp) :
-    number(n),
-    builder(b),
-    producer(cp) {}
+                       CommodityProducer* cp)
+    : number(n),
+      builder(b),
+      producer(cp) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ProblemInstance::ProblemInstance(
@@ -26,10 +26,10 @@ ProblemInstance::ProblemInstance(
     Constraint::Ptr constr,
     std::vector<Variable::Ptr>& soln)
     : commodity(commod),
-    unmet_demand(demand),
-    interface(sinterface),
-    constraint(constr),
-    solution(soln) {}
+      unmet_demand(demand),
+      interface(sinterface),
+      constraint(constr),
+      solution(soln) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BuildingManager::BuildingManager() {}

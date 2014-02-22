@@ -64,21 +64,21 @@ class Bid {
       boost::shared_ptr<T> offer,
       Trader* bidder,
       bool exclusive = false)
-    : request_(request),
-      offer_(offer),
-      bidder_(bidder),
-      exclusive_(exclusive) {}
+      : request_(request),
+        offer_(offer),
+        bidder_(bidder),
+        exclusive_(exclusive) {}
 
   Bid(typename Request<T>::Ptr request,
       boost::shared_ptr<T> offer,
       Trader* bidder,
       typename BidPortfolio<T>::Ptr portfolio,
       bool exclusive = false)
-    : request_(request),
-      offer_(offer),
-      bidder_(bidder),
-      portfolio_(portfolio),
-      exclusive_(exclusive) {}
+      : request_(request),
+        offer_(offer),
+        bidder_(bidder),
+        portfolio_(portfolio),
+        exclusive_(exclusive) {}
 
   typename Request<T>::Ptr request_;
   boost::shared_ptr<T> offer_;
