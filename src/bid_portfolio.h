@@ -33,7 +33,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @brief default constructor
   BidPortfolio()
       : bidder_(NULL),
-      commodity_("NO_COMMODITY_SET") {}
+        commodity_("NO_COMMODITY_SET") {}
 
   /// @brief add a bid to the portfolio
   /// @param request the request being responded to by this bid
