@@ -20,7 +20,7 @@
       <SourceFacility>
         <output>
           <outcommodity>commodity</outcommodity>
-          <output_capacity>1</output_capacity>
+          <output_capacity>1.00</output_capacity>
           <recipe>commod_recipe</recipe>
         </output>
       </SourceFacility>
@@ -33,10 +33,8 @@
     <model>
       <SinkFacility>
         <input>
-          <commodities>
-            <incommodity>commodity</incommodity>
-          </commodities>
-          <input_capacity>1</input_capacity>
+          <incommodity>commodity</incommodity>
+          <input_capacity>1.00</input_capacity>
         </input>
       </SinkFacility>
     </model>
@@ -73,10 +71,10 @@
   <recipe>
     <name>commod_recipe</name>
     <basis>mass</basis>
-    <isotope>
+    <nuclide>
       <id>01001</id>
       <comp>1</comp>
-    </isotope>
+    </nuclide>
   </recipe>
 
 </simulation>
