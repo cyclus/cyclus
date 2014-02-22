@@ -31,51 +31,31 @@ namespace cyclus {
   */
 class NullInst : public cyclus::InstModel {
   /* --------------------
-   * all INSTMODEL classes have these members
+   * all MODEL classes have these members
    * --------------------
    */
  public:
   /**
-    Constructor for NullInst Class
-    @param ctx the cyclus context for access to simulation-wide parameters
-    */
-  explicit NullInst(cyclus::Context* ctx);
+     Default constructor
+   */
+  NullInst(cyclus::Context* ctx);
 
   /**
-    every model should be destructable
-    */
+     Default destructor
+   */
   virtual ~NullInst();
 
-  /**
-    Initializes the module member data from the data in a QueryEngine object
+  virtual cyclus::Model* Clone() {
+    NullInst* m = new NullInst(context());
+    m->InitFrom(this);
+    return m;
+  }
 
-    @param qe is a QueryEngine object that contains intialization data
-    */
-  virtual void InitFrom(cyclus::QueryEngine* qe);
-
-  /**
-    Initialize members for a cloned module.
-    */
-  virtual void InitFrom(NullInst* m);
-
-  /**
-    Initializes a NullInst object by copying the members of another.
-    */
-  virtual cyclus::Model* Clone();
-
-  /**
-    every model should be able to print a verbose description
-    */
-  virtual std::string str();
+  void InitFrom(NullInst* m) {
+    cyclus::InstModel::InitFrom(m);
+  }
 
   /* ------------------- */
-
-
-  /* --------------------
-   * _THIS_ INSTMODEL class has these members
-   * --------------------
-   */
-
   /* ------------------- */
 };
 
