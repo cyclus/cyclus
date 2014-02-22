@@ -130,4 +130,4 @@ void CsvBack::Flush() {
   }
 }
 
-} // namespace cyclus
+}  // namespace cyclus
