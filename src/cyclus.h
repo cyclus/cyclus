@@ -1,5 +1,5 @@
-#ifndef CYCLUS_H_
-#define CYCLUS_H_
+#ifndef CYCLUS_SRC_CYCLUS_H_
+#define CYCLUS_SRC_CYCLUS_H_
 
 #include "bid.h"
 #include "bid_portfolio.h"
@@ -17,13 +17,12 @@
 #include "cyc_arithmetic.h"
 #include "cyc_limits.h"
 #include "cyc_std.h"
+#include "datum.h"
 #include "enrichment.h"
 #include "env.h"
 #include "error.h"
 #include "exchange_graph.h"
 #include "exchange_solver.h"
-#include "datum.h"
-#include "recorder.h"
 #include "facility_model.h"
 #include "function.h"
 #include "generic_resource.h"
@@ -33,7 +32,9 @@
 #include "mat_query.h"
 #include "material.h"
 #include "model.h"
+#include "pyne.h"
 #include "query_engine.h"
+#include "recorder.h"
 #include "region_model.h"
 #include "request.h"
 #include "request_portfolio.h"
@@ -45,12 +46,12 @@
 #include "supply_demand_manager.h"
 #include "symbolic_function_factories.h"
 #include "symbolic_functions.h"
+#include "time_listener.h"
+#include "timer.h"
 #include "trade.h"
 #include "trader.h"
 #include "trader_management.h"
-#include "time_listener.h"
-#include "timer.h"
 #include "variable.h"
 #include "version.h"
 
-#endif
+#endif  // CYCLUS_SRC_CYCLUS_H_

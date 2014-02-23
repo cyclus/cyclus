@@ -1,5 +1,5 @@
-#ifndef CYCLUS_COMMODITY_RECIPE_CONTEXT_H_
-#define CYCLUS_COMMODITY_RECIPE_CONTEXT_H_
+#ifndef CYCLUS_SRC_COMMODITY_RECIPE_CONTEXT_H_
+#define CYCLUS_SRC_COMMODITY_RECIPE_CONTEXT_H_
 
 #include <map>
 #include <string>
@@ -26,13 +26,13 @@ class CommodityRecipeContext {
   /// @brief add a resource and its commodity affiliation
   void AddRsrc(std::string commod, Resource::Ptr rsrc);
 
-  /// @brief update a resource and its commodity affiliation  
+  /// @brief update a resource and its commodity affiliation
   void UpdateRsrc(std::string commod, Resource::Ptr rsrc);
-  
+
   /// @brief removes a resource from the context
   void RemoveRsrc(Resource::Ptr rsrc);
-  
-  /// @brief update an input recipe and its commodity affiliation  
+
+  /// @brief update an input recipe and its commodity affiliation
   void UpdateInRec(std::string in_commod, std::string recipe);
 
   /// @return input commodities
@@ -40,7 +40,7 @@ class CommodityRecipeContext {
     return in_commods_;
   }
 
-  /// @return output commodities  
+  /// @return output commodities
   inline const std::vector<std::string>& out_commods() const {
     return out_commods_;
   }
@@ -50,7 +50,7 @@ class CommodityRecipeContext {
     return out_commod_map_[in_commod];
   }
 
-  /// @return input recipe of an input commodity    
+  /// @return input recipe of an input commodity
   inline std::string in_recipe(std::string in_commod) {
     return in_recipes_[in_commod];
   }
@@ -78,7 +78,7 @@ class CommodityRecipeContext {
   inline bool operator!=(const CommodityRecipeContext& other) const {
     return !operator==(other);
   }
-  
+
  private:
   std::vector<std::string> in_commods_;
   std::vector<std::string> out_commods_;
@@ -87,7 +87,7 @@ class CommodityRecipeContext {
   std::map<std::string, std::string> out_recipes_;
   std::map<Resource::Ptr, std::string> rsrc_commod_map_;
 };
-  
-} // namespace cyclus
 
-#endif // CYCLUS_COMMODITY_RECIPE_CONTEXT_H_
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_COMMODITY_RECIPE_CONTEXT_H_

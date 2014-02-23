@@ -254,7 +254,7 @@ TEST_F(MaterialTest, ExtractInGrams) {
 TEST_F(MaterialTest, DecayShortcut) {
   using cyclus::Composition;
   cyclus::CompMap mp;
-  mp[92235] = 1;
+  mp[922350000] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(mp);
   cyclus::Material::Ptr m = Material::CreateUntracked(1.0, c);
 

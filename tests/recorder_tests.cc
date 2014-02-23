@@ -156,7 +156,7 @@ TEST(RecorderTest, Datum_addVal) {
   ASSERT_EQ(d->vals().size(), 4);
 
   cyclus::Datum::Vals::const_iterator it = d->vals().begin();
-  EXPECT_STREQ(it->first, "SimID");
+  EXPECT_STREQ(it->first, "SimId");
   EXPECT_EQ(it->second.cast<boost::uuids::uuid>(), m.sim_id());
   ++it;
   EXPECT_STREQ(it->first, "animal");
@@ -172,7 +172,7 @@ TEST(RecorderTest, Datum_addVal) {
 
   cyclus::Datum::Vals vals = back.data.back()->vals();
   ASSERT_EQ(vals.size(), 4);
-  EXPECT_STREQ(vals.front().first, "SimID");
+  EXPECT_STREQ(vals.front().first, "SimId");
   EXPECT_EQ(vals.front().second.cast<boost::uuids::uuid>(), m.sim_id());
 }
 

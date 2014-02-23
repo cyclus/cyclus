@@ -23,8 +23,8 @@ void ResTracker::Create(Model* creator) {
 
   Record();
   ctx_->NewDatum("ResCreators")
-    ->AddVal("ResID", res_->id())
-    ->AddVal("ModelID", creator->id())
+    ->AddVal("ResourceId", res_->id())
+    ->AddVal("AgentId", creator->id())
     ->Record();
 }
 
@@ -66,11 +66,11 @@ void ResTracker::Absorb(ResTracker* absorbed) {
 void ResTracker::Record() {
   res_->BumpId();
   ctx_->NewDatum("Resources")
-  ->AddVal("ID", res_->id())
+  ->AddVal("ResourceId", res_->id())
   ->AddVal("Type", res_->type())
   ->AddVal("TimeCreated", ctx_->time())
   ->AddVal("Quantity", res_->quantity())
-  ->AddVal("units", res_->units())
+  ->AddVal("Units", res_->units())
   ->AddVal("StateId", res_->state_id())
   ->AddVal("Parent1", parent1_)
   ->AddVal("Parent2", parent2_)

@@ -1,5 +1,5 @@
-#ifndef COMPOSITION_H
-#define COMPOSITION_H
+#ifndef CYCLUS_SRC_COMPOSITION_H_
+#define CYCLUS_SRC_COMPOSITION_H_
 
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -27,8 +27,8 @@ typedef std::map<Nuc, double> CompMap;
 ///
 /// @code
 /// CompMap v;
-/// v[92235] = 2.4;
-/// v[8016] = 4.8;
+/// v[922350000] = 2.4;
+/// v[80160000] = 4.8;
 /// Composition c = Composition::CreateFromAtom(v);
 /// @endcode
 ///
@@ -67,7 +67,6 @@ class Composition {
   void Record(Context* ctx);
 
  protected:
-
   /// a chain containing compositions that are a result of decay from a common
   /// ancestor composition. The key is the total amount of time a composition
   /// has been decayed from its root parent.
@@ -97,6 +96,6 @@ class Composition {
   int prev_decay_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_COMPOSITION_H_
