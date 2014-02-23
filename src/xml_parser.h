@@ -1,6 +1,6 @@
 //xml_parser.h
-#ifndef _XMLPARSER_H
-#define _XMLPARSER_H
+#ifndef CYCLUS_SRC_XML_PARSER_H_
+#define CYCLUS_SRC_XML_PARSER_H_
 
 #include <sstream>
 #include <libxml++/libxml++.h>
@@ -41,6 +41,6 @@ class XMLParser {
   /// file parser
   boost::shared_ptr<xmlpp::DomParser> parser_;
 };
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_XML_PARSER_H_
