@@ -1,6 +1,6 @@
 // env.h
-#ifndef CYCLUS_ENV_H_
-#define CYCLUS_ENV_H_
+#ifndef CYCLUS_SRC_ENV_H_
+#define CYCLUS_SRC_ENV_H_
 
 #include <string>
 #include "boost/filesystem.hpp"
@@ -12,28 +12,6 @@ namespace cyclus {
 /// settings. The environment for a given simulation can be accessed via the
 /// simulation's Context.
 class Env {
- private:
-  /// the relative path from cwd to cyclus
-  static boost::filesystem::path path_from_cwd_to_cyclus_;
-
-  /// the cwd path
-  static boost::filesystem::path cwd_;
-
-  /// the cwd path
-  static boost::filesystem::path path_to_output_dir_;
-
-  /// Taken directly from
-  /// http://www.boost.org/doc/libs/1_31_0/libs/filesystem/doc/index.htm. This
-  /// function recursively searches a directory and its sub-directories for the
-  /// file name, returning a bool, and if successful, the path to the file that
-  /// was found.
-  /// @param dir_path the directory path to search
-  /// @param file_name the file to search for
-  /// @param path_found the path, which is populated if the file is found
-  /// @return true if the file is found, false if it isn't
-  static bool FindFile(const boost::filesystem::path& dir_path,
-                       const std::string& file_name,
-                       boost::filesystem::path& path_found);
  public:
   /// the path basis
   /// @return path with the last item removed
@@ -55,7 +33,7 @@ class Env {
   /// modules.
   inline static const std::string module_install_path() {
     return Env::GetInstallPath() + "/lib/cyclus";
-  };
+  }
 
   /// the relative path to the root build directory (containing bin, lib, etc.)
   /// @return the absolute path to the build directory
@@ -95,10 +73,10 @@ class Env {
   /// Equivalent to the module class name (e.g. SourceFacility).
   static std::vector<std::string> ListModules();
 
-  /// @return the correct environment variable delimeter based on the file system
+  /// @return the correct environment variable delimiter based on the file system
   static const std::string EnvDelimiter();
 
-  /// @return the correct path delimeter based on the file system
+  /// @return the correct path delimiter based on the file system
   static const std::string PathDelimiter();
 
   /// Environment searches for a library and, if found, sets the path. The search
@@ -110,8 +88,29 @@ class Env {
   static bool FindModuleLib(std::string name,
                             boost::filesystem::path& path_found);
 
+ private:
+  /// the relative path from cwd to cyclus
+  static boost::filesystem::path path_from_cwd_to_cyclus_;
+
+  /// the cwd path
+  static boost::filesystem::path cwd_;
+
+  /// the cwd path
+  static boost::filesystem::path path_to_output_dir_;
+
+  /// Taken directly from
+  /// http://www.boost.org/doc/libs/1_31_0/libs/filesystem/doc/index.htm. This
+  /// function recursively searches a directory and its sub-directories for the
+  /// file name, returning a bool, and if successful, the path to the file that
+  /// was found.
+  /// @param dir_path the directory path to search
+  /// @param file_name the file to search for
+  /// @param path_found the path, which is populated if the file is found
+  /// @return true if the file is found, false if it isn't
+  static bool FindFile(const boost::filesystem::path& dir_path,
+                       const std::string& file_name,
+                       boost::filesystem::path& path_found);
 };
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_ENV_H_
-
+#endif  // CYCLUS_SRC_ENV_H_
