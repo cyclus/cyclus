@@ -1,6 +1,6 @@
 // datum.h
-#ifndef CYCLUS_DATUM_H_
-#define CYCLUS_DATUM_H_
+#ifndef CYCLUS_SRC_DATUM_H_
+#define CYCLUS_SRC_DATUM_H_
 
 #include <list>
 #include <string>
@@ -63,5 +63,5 @@ class Datum {
   std::string title_;
   Vals vals_;
 };
-} // namespace cyclus
-#endif // ifndef CYCLUS_DATUM_H_
+}  // namespace cyclus
+#endif  // CYCLUS_SRC_DATUM_H_
