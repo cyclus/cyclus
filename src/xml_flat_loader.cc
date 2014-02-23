@@ -67,7 +67,7 @@ void XMLFlatLoader::LoadInitialAgents() {
     CLOG(LEV_DEBUG3) << "Module '" << model->name()
                      << "' has had its module members initialized:";
     CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
-    CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
+    CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl();
     CLOG(LEV_DEBUG3) << " * ID: " << model->id();
 
     // register module
@@ -75,8 +75,8 @@ void XMLFlatLoader::LoadInitialAgents() {
   }
 
   int num_agents = xqe.NElementsMatchingQuery("/*/agent");
-  std::map<std::string, Model*> agents; // map<name, agent>
-  std::map<std::string, std::string> parents; // map<agent, parent>
+  std::map<std::string, Model*> agents;  // map<name, agent>
+  std::map<std::string, std::string> parents;  // map<agent, parent>
   for (int i = 0; i < num_agents; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/agent", i);
     std::string name = qe->GetElementContent("name");
@@ -98,5 +98,4 @@ void XMLFlatLoader::LoadInitialAgents() {
   }
 }
 
-} // namespace cyclus
-
+}  // namespace cyclus

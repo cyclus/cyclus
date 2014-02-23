@@ -1,6 +1,6 @@
 // xml_flat_loader.h
-#ifndef CYCLUS_XML_FLAT_LOADER_H_
-#define CYCLUS_XML_FLAT_LOADER_H_
+#ifndef CYCLUS_SRC_XML_FLAT_LOADER_H_
+#define CYCLUS_SRC_XML_FLAT_LOADER_H_
 
 #include "xml_file_loader.h"
 
@@ -18,7 +18,7 @@ class XMLFlatLoader : public XMLFileLoader {
  public:
   XMLFlatLoader(Context* ctx, std::string schema_path,
                 const std::string load_filename = "")
-    : XMLFileLoader(ctx, schema_path, load_filename) { };
+      : XMLFileLoader(ctx, schema_path, load_filename) {}
 
  protected:
   virtual std::string master_schema();
@@ -26,7 +26,6 @@ class XMLFlatLoader : public XMLFileLoader {
   /// Creates all initial agent instances from the input file.
   void LoadInitialAgents();
 };
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_XML_FLAT_LOADER_H_
-
+#endif  // CYCLUS_SRC_XML_FLAT_LOADER_H_
