@@ -4,8 +4,8 @@
 #include <sstream>
 
 #include "cyc_arithmetic.h"
-#include "pyne.h"
 #include "error.h"
+#include "pyne.h"
 
 namespace cyclus {
 namespace compmath {

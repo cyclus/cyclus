@@ -98,8 +98,7 @@ void CommodityProducer::CopyProducedCommoditiesFrom(CommodityProducer* source) {
 void CommodityProducer::ThrowErrorIfCommodityNotProduced(
     const Commodity& commodity) {
   if (!ProducesCommodity(commodity)) {
-    throw KeyError("Producer does not produce "
-                   + commodity.name());
+    throw KeyError("Producer does not produce " + commodity.name());
   }
 }
 

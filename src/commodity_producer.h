@@ -80,8 +80,7 @@ class CommodityProducer {
 
  private:
   /// a collection of commodities and their production capacities
-  std::map<Commodity, CommodInfo, CommodityCompare>
-      produced_commodities_;
+  std::map<Commodity, CommodInfo, CommodityCompare> produced_commodities_;
 
   // #include "commodity_producer_tests.h"
   // friend class CommodityProducerTests;

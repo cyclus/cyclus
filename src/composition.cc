@@ -2,10 +2,10 @@
 
 #include "comp_math.h"
 #include "context.h"
-#include "error.h"
 #include "decayer.h"
-#include "recorder.h"
+#include "error.h"
 #include "mass_table.h"
+#include "recorder.h"
 
 namespace cyclus {
 

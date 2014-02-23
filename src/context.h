@@ -3,12 +3,12 @@
 #define CYCLUS_SRC_CONTEXT_H_
 
 #include <map>
-#include <string>
 #include <set>
+#include <string>
 
 #include "composition.h"
-#include "recorder.h"
 #include "model.h"
+#include "recorder.h"
 
 namespace cyclus {
 
