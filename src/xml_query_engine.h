@@ -1,13 +1,14 @@
 //XMLquery_engine.h
-#ifndef CYCLUS_XML_QUERY_ENGINE_H_
-#define CYCLUS_XML_QUERY_ENGINE_H_
+#ifndef CYCLUS_SRC_XML_QUERY_ENGINE_H_
+#define CYCLUS_SRC_XML_QUERY_ENGINE_H_
 
 #include <string>
 #include <vector>
 
+#include <libxml++/libxml++.h>
+
 #include "query_engine.h"
 #include "xml_parser.h"
-#include <libxml++/libxml++.h>
 
 namespace cyclus {
 
@@ -53,8 +54,7 @@ class XMLQueryEngine : public QueryEngine {
      @param query the query
      @param index the index of the queried element
    */
-  virtual std::string GetElementContent(std::string query,
-                                        int index = 0);
+  virtual std::string GetElementContent(std::string query, int index = 0);
 
  protected:
   /**
@@ -70,8 +70,7 @@ class XMLQueryEngine : public QueryEngine {
      @param index the index of the queried element
      @return a query engine initialized via the snippet
    */
-  virtual QueryEngine* GetEngineFromQuery(std::string query,
-                                          int index);
+  virtual QueryEngine* GetEngineFromQuery(std::string query, int index);
   /**
      sets the current node to a given node
      @param node the new current node
@@ -81,6 +80,6 @@ class XMLQueryEngine : public QueryEngine {
  private:
   xmlpp::Node* current_node_;
 };
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_XML_QUERY_ENGINE_H_
+#endif  // CYCLUS_SRC_XML_QUERY_ENGINE_H_

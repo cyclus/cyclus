@@ -3,22 +3,22 @@
 #include <iostream>
 #include <sstream>
 
-#include "xml_query_engine.h"
 #include "error.h"
+#include "xml_query_engine.h"
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLQueryEngine::XMLQueryEngine(XMLParser& parser) : current_node_(0) {
   current_node_ = parser.Document()->get_root_node();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLQueryEngine::XMLQueryEngine(xmlpp::Node* node) : current_node_(0) {
   current_node_ = node;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int XMLQueryEngine::NElements() {
   using xmlpp::Element;
   int n = 0;
@@ -33,14 +33,13 @@ int XMLQueryEngine::NElements() {
   return n;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int XMLQueryEngine::NElementsMatchingQuery(std::string query) {
   return current_node_->find(query).size();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string XMLQueryEngine::GetElementContent(std::string query,
-                                              int index) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string XMLQueryEngine::GetElementContent(std::string query, int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
   using xmlpp::TextNode;
@@ -76,7 +75,7 @@ std::string XMLQueryEngine::GetElementContent(std::string query,
   return text->get_content();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLQueryEngine::GetElementName(int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
@@ -95,9 +94,8 @@ std::string XMLQueryEngine::GetElementName(int index) {
   return elements.at(index)->get_name();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-QueryEngine* XMLQueryEngine::GetEngineFromQuery(std::string query,
-                                                int index) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+QueryEngine* XMLQueryEngine::GetEngineFromQuery(std::string query, int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
   const NodeSet nodeset = current_node_->find(query);
@@ -115,4 +113,4 @@ QueryEngine* XMLQueryEngine::GetEngineFromQuery(std::string query,
 
   return new XMLQueryEngine(element);
 }
-} // namespace cyclus
+}  // namespace cyclus
