@@ -1,6 +1,6 @@
 // dynamic_module.h
-#ifndef DYNAMICMODULE_H
-#define DYNAMICMODULE_H
+#ifndef CYCLUS_SRC_DYNAMIC_MODULE_H_
+#define CYCLUS_SRC_DYNAMIC_MODULE_H_
 
 #include <string>
 
@@ -59,6 +59,6 @@ class DynamicModule {
   /// sets the constructor member
   void SetConstructor();
 };
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_DYNAMIC_MODULE_H_
