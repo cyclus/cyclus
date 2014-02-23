@@ -4,8 +4,8 @@
 
 #include <map>
 
-#include "use_matrix_lib.h"
 #include "composition.h"
+#include "use_matrix_lib.h"
 
 namespace cyclus {
 

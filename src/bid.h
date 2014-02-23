@@ -44,19 +44,29 @@ class Bid {
   }
 
   /// @return the request being responded to
-  inline typename Request<T>::Ptr request() const { return request_; }
+  inline typename Request<T>::Ptr request() const {
+    return request_;
+  }
 
   /// @return the bid object for the request
-  inline boost::shared_ptr<T> offer() const { return offer_; }
+  inline boost::shared_ptr<T> offer() const {
+    return offer_;
+  }
 
   /// @return the model responding the request
-  inline Trader* bidder() const { return bidder_; }
+  inline Trader* bidder() const {
+    return bidder_;
+  }
 
   /// @return the portfolio of which this bid is a part
-  inline typename BidPortfolio<T>::Ptr portfolio() { return portfolio_; }
+  inline typename BidPortfolio<T>::Ptr portfolio() {
+    return portfolio_;
+  }
 
   /// @return whether or not this an exclusive bid
-  inline bool exclusive() const { return exclusive_; }
+  inline bool exclusive() const {
+    return exclusive_;
+  }
 
  private:
   /// @brief constructors are private to require use of factory methods

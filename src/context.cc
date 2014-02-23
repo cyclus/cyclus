@@ -41,7 +41,6 @@ void Context::DelModel(Model* m) {
   }
 }
 
-
 boost::uuids::uuid Context::sim_id() {
   return rec_->sim_id();
 }

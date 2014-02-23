@@ -5,10 +5,10 @@
 #ifndef CYCLUS_SRC_CYC_ARITHMETIC_H_
 #define CYCLUS_SRC_CYC_ARITHMETIC_H_
 
-#include <iostream>
 #include <algorithm>
-#include <vector>
+#include <iostream>
 #include <map>
+#include <vector>
 
 namespace cyclus {
 /// @brief CycArithmetic is a toolkit for arithmetic

@@ -3,11 +3,10 @@
 #include <boost/any.hpp>
 
 #include "cbc_solver.h"
-#include "solver.h"
-#include "solver_interface.h"
-
 #include "error.h"
 #include "logger.h"
+#include "solver.h"
+#include "solver_interface.h"
 
 namespace cyclus {
 
@@ -117,7 +116,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManager::SetUpProblem(ProblemInstance& problem) {
   solution_map_ = std::map < Variable::Ptr,
-                std::pair<Builder*, CommodityProducer*> > ();
+                  std::pair<Builder*, CommodityProducer*> > ();
 
   std::set<Builder*>::iterator builder_it;
   for (builder_it = builders_.begin(); builder_it != builders_.end();

@@ -6,8 +6,8 @@
 #include <string>
 
 #include <boost/pool/singleton_pool.hpp>
-#include "any.hpp"
 
+#include "any.hpp"
 #include "recorder.h"
 
 namespace cyclus {
