@@ -68,6 +68,6 @@ double SwuRequired(double product_qty, const Assays& assays);
 /// @return the value function for a given fraction in [0,1)
 double ValueFunc(double frac);
 
-};  // namespace enrichment
+}  // namespace enrichment
 }  // namespace cyclus
 #endif  // CYCLUS_SRC_ENRICHMENT_H_
