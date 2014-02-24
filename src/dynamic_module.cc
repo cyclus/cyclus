@@ -2,11 +2,12 @@
 
 #include "dynamic_module.h"
 
+#include "boost/filesystem.hpp"
+
 #include "context.h"
 #include "env.h"
-#include "suffix.h"
 #include "model.h"
-#include "boost/filesystem.hpp"
+#include "suffix.h"
 
 #include DYNAMICLOADLIB
 
@@ -21,10 +22,10 @@ const std::string DynamicModule::Suffix() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::DynamicModule(std::string name)
-  : module_name_(name),
-    constructor_name_("Construct" + name),
-    module_library_(0), constructor_(0) {
-
+    : module_name_(name),
+      constructor_name_("Construct" + name),
+      module_library_(0),
+      constructor_(0) {
   std::string lib_name = "lib" + module_name_ + Suffix();
   fs::path p;
   if (!Env::FindModuleLib(lib_name, p)) {
@@ -50,4 +51,4 @@ std::string DynamicModule::name() {
 std::string DynamicModule::path() {
   return abs_path_;
 }
-} // namespace cyclus
+}  // namespace cyclus

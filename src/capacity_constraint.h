@@ -18,8 +18,12 @@ struct Converter {
 
   /// @brief operator== is available for subclassing, see
   /// cyclus::TrivialConverter for an example
-  virtual bool operator==(Converter& other) const { return false; }
-  bool operator!=(Converter& other) const { return !operator==(other); }
+  virtual bool operator==(Converter& other) const {
+    return false;
+  }
+  bool operator!=(Converter& other) const {
+    return !operator==(other);
+  }
 };
 
 /// @class TrivialConverter

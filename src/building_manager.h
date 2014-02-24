@@ -1,8 +1,8 @@
 #ifndef CYCLUS_SRC_BUILDING_MANAGER_H_
 #define CYCLUS_SRC_BUILDING_MANAGER_H_
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #include "builder.h"
 #include "commodity_producer.h"
@@ -125,16 +125,17 @@ class BuildingManager {
                                         orders,
                                         std::vector<Variable::Ptr>& solution);
 
-  const std::set<Builder*>& builders() { return builders_; }
+  const std::set<Builder*>& builders() {
+    return builders_;
+  }
 
  private:
   /// the set of registered builders
   std::set<Builder*> builders_;
 
   /// a map of variables to their associated builder and producer
-  std::map < Variable::Ptr,
-      std::pair<Builder*, CommodityProducer*> >
-          solution_map_;
+  std::map < Variable::Ptr, std::pair<Builder*, CommodityProducer*> >
+      solution_map_;
 };
 
 // #include "building_manager_tests.h"

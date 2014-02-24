@@ -1,8 +1,9 @@
 // enrichment.h
-#ifndef _ENRICHMENT_H
-#define _ENRICHMENT_H
+#ifndef CYCLUS_SRC_ENRICHMENT_H_
+#define CYCLUS_SRC_ENRICHMENT_H_
 
 #include <set>
+
 #include "material.h"
 
 namespace cyclus {
@@ -67,6 +68,6 @@ double SwuRequired(double product_qty, const Assays& assays);
 /// @return the value function for a given fraction in [0,1)
 double ValueFunc(double frac);
 
-}; // namespace enrichment
-} // namespace cyclus
-#endif
+}  // namespace enrichment
+}  // namespace cyclus
+#endif  // CYCLUS_SRC_ENRICHMENT_H_

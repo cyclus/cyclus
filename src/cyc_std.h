@@ -1,11 +1,10 @@
 #ifndef CYCLUS_SRC_CYC_STD_H_
 #define CYCLUS_SRC_CYC_STD_H_
 
-#include <utility>
 #include <functional>
+#include <utility>
 
 /// @brief a collection of tools that are standard-library like
-
 namespace cyclus {
 
 /// @brief a less-than comparison for pairs

@@ -9,8 +9,8 @@
 #include <boost/uuid/uuid_io.hpp>
 
 #include "blob.h"
-#include "error.h"
 #include "datum.h"
+#include "error.h"
 #include "logger.h"
 
 namespace fs = boost::filesystem;
