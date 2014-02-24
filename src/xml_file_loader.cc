@@ -294,14 +294,11 @@ void XMLFileLoader::LoadControlParams() {
   // get start year
   std::string y0_str = qe->GetElementContent("startyear");
   int y0 = strtol(y0_str.c_str(), NULL, 10);
-  // get simulation start
-  std::string sim0_str = qe->GetElementContent("simstart");
-  int sim0 = strtol(sim0_str.c_str(), NULL, 10);
   // get decay interval
   std::string decay_str = qe->GetElementContent("decay");
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
-  ctx_->InitTime(sim0, dur, dec, m0, y0, handle);
+  ctx_->InitTime(dur, dec, m0, y0, handle);
 }
 
 } // namespace cyclus

@@ -17,18 +17,17 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RunSim(Context* ctx) {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << start_time_ << " to end=" << start_time_ + dur_;
+                  << 0 << " to end=" << dur_;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
-  time_ = start_time_;
   ExchangeManager<Material> matl_manager(ctx);
   ExchangeManager<GenericResource> genrsrc_manager(ctx);
-  while (time_ < start_time_ + dur_) {
+  while (time_ < dur_) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
     if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
       Material::DecayAll(time_);
     }
-      
+
     // build queued agents
     std::vector<std::pair<std::string, Model*> > build_list = build_queue_[time_];
     for (int i = 0; i < build_list.size(); ++i) {
@@ -51,7 +50,7 @@ void Timer::RunSim(Context* ctx) {
       m->parent()->DecomNotify(m);
       m->Decommission();
     }
-    
+
     time_++;
   }
 }
@@ -107,17 +106,18 @@ int Timer::time() {
 
 void Timer::Reset() {
   tickers_.clear();
+  build_queue_.clear();
+  decom_queue_.clear();
 
   decay_interval_ = 0;
   month0_ = 0;
   year0_ = 0;
-  start_time_ = 0;
   time_ = 0;
   dur_ = 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
+void Timer::Initialize(Context* ctx, int dur, int m0, int y0,
                        int decay, std::string handle) {
   if (m0 < 1 || m0 > 12) {
     throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
@@ -140,8 +140,7 @@ void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
   month0_ = m0;
   year0_ = y0;
 
-  start_time_ = start;
-  time_ = start;
+  time_ = 0;
   dur_ = dur;
 
   LogTimeData(ctx, handle);
@@ -155,7 +154,6 @@ int Timer::dur() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Timer::Timer() :
   time_(0),
-  start_time_(0),
   dur_(0),
   decay_interval_(0),
   month0_(0),
@@ -167,10 +165,11 @@ void Timer::LogTimeData(Context* ctx, std::string handle) {
   ->AddVal("Handle", handle)
   ->AddVal("InitialYear", year0_)
   ->AddVal("InitialMonth", month0_)
-  ->AddVal("Start", start_time_)
+  ->AddVal("Start", time_)
   ->AddVal("Duration", dur_)
   ->AddVal("DecayInterval", decay_interval_)
   ->Record();
 }
 } // namespace cyclus
+
 
