@@ -29,12 +29,12 @@ void Timer::RunSim(Context* ctx) {
       Material::DecayAll(time_);
     }
       
-    // deploy queued agents
+    // build queued agents
     std::vector<std::pair<std::string, Model*> > build_list = build_queue_[time_];
     for (int i = 0; i < build_list.size(); ++i) {
       Model* m = ctx->CreateModel<Model>(build_list[i].first);
       Model* parent = build_list[i].second;
-      m->Deploy(parent);
+      m->Build(parent);
       parent->BuildNotify(m);
     }
 

@@ -91,9 +91,9 @@ void XMLFlatLoader::LoadInitialAgents() {
     std::string name = it->first;
     Model* agent = it->second;
     if (parents[name] == "") {
-      agent->Deploy();
+      agent->Build();
     } else {
-      agent->Deploy(agents[parents[name]]);
+      agent->Build(agents[parents[name]]);
     }
   }
 }

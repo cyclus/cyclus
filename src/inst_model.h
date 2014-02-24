@@ -28,24 +28,6 @@ typedef std::set<std::string>::iterator PrototypeIterator;
    InstModel may be used to adjust preferences in the ResourceExchange to make
    material routing decisions based on interfacility relationships. Deployment
    is a primary differentiator between different InstModel implementations.
-
-   Like all model implementations, there are a number of
-   implementations that are distributed as part of the core Cyclus
-   application as well as implementations contributed by third-party
-   developers. The links below descrie parameters necessary for the
-   complete definition of an implemented instituion.
-
-   @section availableCoreImpl Available Core Implementations
-   - FixedInst: This institution is unchanging and is statically
-   associated with facilities that are deployed by some other
-   entity (such as the region or the logician.
-
-   @section anticipatedCoreImpl Anticipated Core Implementations
-   - DeploymentInst: This institution deploys allowed facilities
-   according to a demand curve.
-
-   @section thirdPartyImpl Third Party Implementations
-   (None)
  */
 class InstModel : public Model, public TimeListener {
   /* --------------------
@@ -79,7 +61,7 @@ class InstModel : public Model, public TimeListener {
   /**
      perform all tasks required when an inst enters the simulation
    */
-  virtual void Deploy(Model* parent);
+  virtual void Build(Model* parent);
   /* ------------------- */
  
   /* --------------------

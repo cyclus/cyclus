@@ -86,7 +86,7 @@ class RegionModel : public Model, public TimeListener {
   /**
      perform actions required when entering the simulation
    */
-  virtual void Deploy(Model* parent);
+  virtual void Build(Model* parent);
 
   /**
      every model should be able to print a verbose description

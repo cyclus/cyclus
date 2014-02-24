@@ -91,11 +91,11 @@ class FacilityModel : public TimeListener, public Model, public Trader {
   void InitFrom(FacilityModel* m);
 
   /**
-     @brief deploys the facility in the simulation
+     @brief builds the facility in the simulation
 
      @param parent the parent of this facility
    */
-  virtual void Deploy(Model* parent = NULL);
+  virtual void Build(Model* parent = NULL);
 
   /**
      decommissions the facility, default behavior is for the facility

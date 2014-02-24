@@ -257,7 +257,7 @@ void XMLFileLoader::LoadInitialAgents() {
       ctx_->AddPrototype(model->name(), model);
       if (*it == "Region") {
         Model* clone = ctx_->CreateModel<Model>(model->name());
-        clone->Deploy();
+        clone->Build();
       }
     }
   }

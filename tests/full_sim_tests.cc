@@ -18,7 +18,7 @@ TEST(FullSimTests, LoneTrader) {
   TestTrader* trader =
       dynamic_cast<TestTrader*>(base_trader->Clone());
     
-  trader->Deploy();
+  trader->Build();
 
   int nsteps = 5;
   
@@ -40,12 +40,12 @@ TEST(FullSimTests, NullTrade) {
   TestTrader* base_supplier = new TestTrader(tc.get());
   TestTrader* supplier =
       dynamic_cast<TestTrader*>(base_supplier->Clone());
-  supplier->Deploy();
+  supplier->Build();
 
   TestTrader* base_requester = new TestTrader(tc.get());
   TestTrader* requester =
       dynamic_cast<TestTrader*>(base_requester->Clone());
-  requester->Deploy();
+  requester->Build();
 
   int nsteps = 2;
   
@@ -76,12 +76,12 @@ TEST(FullSimTests, Trade) {
   TestTrader* base_supplier = new TestTrader(tc.get(), &fac, !is_requester);
   TestTrader* supplier =
       dynamic_cast<TestTrader*>(base_supplier->Clone());
-  supplier->Deploy();
+  supplier->Build();
 
   TestTrader* base_requester = new TestTrader(tc.get(), &fac, is_requester);
   TestTrader* requester =
       dynamic_cast<TestTrader*>(base_requester->Clone());
-  requester->Deploy();
+  requester->Build();
 
   int nsteps = 3;
   

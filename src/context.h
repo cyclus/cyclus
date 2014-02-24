@@ -21,7 +21,7 @@ class TimeListener;
 
 /// A simulation context that provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
-/// know simulation time, creates/deploys facilities, and/or uses loaded
+/// know simulation time, creates/builds facilities, and/or uses loaded
 /// composition recipes will need a context pointer. In general, all global
 /// state should be accessed through a simulation context.
 ///

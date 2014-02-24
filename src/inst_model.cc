@@ -90,8 +90,8 @@ std::string InstModel::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::Deploy(Model* parent) {
-  Model::Deploy(parent);
+void InstModel::Build(Model* parent) {
+  Model::Build(parent);
   context()->RegisterTimeListener(this);
 
   // build initial prototypes
@@ -106,7 +106,7 @@ void InstModel::Deploy(Model* parent) {
     for (int i = 0; i < number; i++) {
       // build as many as required
       Model* m = context()->CreateModel<Model>(proto_name);
-      m->Deploy(this);
+      m->Build(this);
     }
   }
 }

@@ -67,11 +67,11 @@ class RegionModelClassTests : public ::testing::Test {
       child5_ = new DieInst(ctx_);
 
       reg_ = new MockRegion(ctx_);
-      child1_->Deploy(reg_);
-      child2_->Deploy(reg_);
-      child3_->Deploy(reg_);
-      child4_->Deploy(reg_);
-      child5_->Deploy(reg_);
+      child1_->Build(reg_);
+      child2_->Build(reg_);
+      child3_->Build(reg_);
+      child4_->Build(reg_);
+      child5_->Build(reg_);
     }
 };
 

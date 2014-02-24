@@ -36,11 +36,11 @@ class InstModelClassTests : public ::testing::Test {
     child5_ = new MockFacility(ctx_);
 
     inst_ = new MockInst(ctx_);
-    child1_->Deploy(inst_);
-    child2_->Deploy(inst_);
-    child3_->Deploy(inst_);
-    child4_->Deploy(inst_);
-    child5_->Deploy(inst_);
+    child1_->Build(inst_);
+    child2_->Build(inst_);
+    child3_->Build(inst_);
+    child4_->Build(inst_);
+    child5_->Build(inst_);
   }
 };
 

@@ -56,8 +56,8 @@ void RegionModel::InitInstitutionNames(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::Deploy(Model* parent) {
-  Model::Deploy(parent);
+void RegionModel::Build(Model* parent) {
+  Model::Build(parent);
   AddRegionAsRootNode();
   AddChildrenToTree();
 }
@@ -73,7 +73,7 @@ void RegionModel::AddChildrenToTree() {
   std::set<std::string>::iterator it;
   for (it = inst_names_.begin(); it != inst_names_.end(); it++) {
     inst = context()->CreateModel<Model>(*it);
-    inst->Deploy(this);
+    inst->Build(this);
   }
 }
 

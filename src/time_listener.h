@@ -15,8 +15,8 @@ namespace cyclus {
 ///
 /// @begincode
 ///
-/// MyFacilityModel::Deploy(cyclus::Model* parent) {
-///   cyclus::FacilityModel::Deploy(parent);
+/// MyFacilityModel::Build(cyclus::Model* parent) {
+///   cyclus::FacilityModel::Build(parent);
 ///   context()->RegisterTimeListener(this);
 /// }
 /// 

@@ -117,7 +117,7 @@ class Model {
   /// creates the parent-child link and invokes the core-level and
   /// module-level enter simulation methods
   /// @param parent this model's parent
-  virtual void Deploy(Model* parent = NULL);
+  virtual void Build(Model* parent = NULL);
 
   /// Called when a new child of this agent has just been built.
   virtual void BuildNotify(Model* m) {};
@@ -173,7 +173,7 @@ class Model {
   inline const int parent_id() const { return parent_id_; }
 
   /// returns the time this model began operation (-1 if the model has never
-  /// been deployed).
+  /// been built).
   inline const int birthtime() const { return birthtime_; }
 
   /// returns the time this model ceased operation (-1 if the model is still
