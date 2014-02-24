@@ -1,6 +1,6 @@
 #include <boost/lexical_cast.hpp>
 
-#include "sink_facility.h"
+#include "simple_sink.h"
 
 using cyclus::SimpleSink;
 

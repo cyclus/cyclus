@@ -1,4 +1,4 @@
-#include "source_facility.h"
+#include "simple_source.h"
 
 #include <sstream>
 #include <limits>
