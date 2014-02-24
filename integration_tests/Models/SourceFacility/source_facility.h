@@ -1,5 +1,5 @@
-#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_SOURCE_FACILITY_H_
-#define CYCLUS_INTEGRATION_TESTS_MODELS_SOURCE_FACILITY_H_
+#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_SIMPLE_SOURCE_H_
+#define CYCLUS_INTEGRATION_TESTS_MODELS_SIMPLE_SOURCE_H_
 
 #include <string>
 #include <set>
@@ -18,7 +18,7 @@ namespace cyclus {
 class Context;
 
 /**
-  @class SourceFacility
+  @class SimpleSource
   This facility is a source of some commodity with some capacity.
   This facility is sort of reduced copy of cycamore's source facility.
   A lot of implementation code is barrowed from cycamore's source facility
@@ -43,7 +43,7 @@ class Context;
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
-class SourceFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer {
+class SimpleSource : public cyclus::FacilityModel, public cyclus::CommodityProducer {
 
   /* --------------------
    * all FACILITYMODEL classes have these members
@@ -51,15 +51,15 @@ class SourceFacility : public cyclus::FacilityModel, public cyclus::CommodityPro
    */
  public:
   /**
-    Constructor for SourceFacility Class
+    Constructor for SimpleSource Class
     @param ctx the cyclus context for access to simulation-wide parameters
     */
-  explicit SourceFacility(cyclus::Context* ctx);
+  explicit SimpleSource(cyclus::Context* ctx);
 
   /**
     every model should be destructable
     */
-  virtual ~SourceFacility();
+  virtual ~SimpleSource();
   virtual std::string schema();
   virtual cyclus::Model* Clone();
   /**
@@ -72,22 +72,22 @@ class SourceFacility : public cyclus::FacilityModel, public cyclus::CommodityPro
   /**
     Initialize members for a cloned module.
     */
-  virtual void InitFrom(SourceFacility* m);
+  virtual void InitFrom(SimpleSource* m);
 
   /**
-    A verbose printer for the SourceFacility
+    A verbose printer for the SimpleSource
     */
   virtual std::string str();
 
   /**
-    The handleTick function specific to the SourceFacility.
+    The handleTick function specific to the SimpleSource.
 
     @param time the time of the tick
     */
   virtual void Tick(int time);
 
   /**
-    The handleTick function specific to the SourceFacility.
+    The handleTick function specific to the SimpleSource.
 
     @param time the time of the tock
     */
@@ -111,7 +111,7 @@ class SourceFacility : public cyclus::FacilityModel, public cyclus::CommodityPro
       cyclus::Material::Ptr> >& responses);
   /* --- */
 
-  /* --- SourceFacility Members --- */
+  /* --- SimpleSource Members --- */
   /**
     @brief creates a material object to offer to a requester
     @param target the material target a request desires
@@ -184,4 +184,4 @@ class SourceFacility : public cyclus::FacilityModel, public cyclus::CommodityPro
 
 }  // namespace cyclus
 
-#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_SOURCE_FACILITY_H_
+#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_SIMPLE_SOURCE_H_

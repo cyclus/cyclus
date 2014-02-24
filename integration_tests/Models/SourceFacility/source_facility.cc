@@ -15,7 +15,7 @@
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SourceFacility::SourceFacility(cyclus::Context* ctx)
+SimpleSource::SimpleSource(cyclus::Context* ctx)
     : cyclus::FacilityModel(ctx),
       out_commod_(""),
       recipe_name_(""),
@@ -23,10 +23,10 @@ SourceFacility::SourceFacility(cyclus::Context* ctx)
       capacity_(std::numeric_limits<double>::max()) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SourceFacility::~SourceFacility() {}
+SimpleSource::~SimpleSource() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SourceFacility::schema() {
+std::string SimpleSource::schema() {
   return
     "  <element name =\"output\">          \n"
     "    <ref name=\"outcommodity\"/>      \n"
@@ -40,7 +40,7 @@ std::string SourceFacility::schema() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SourceFacility::InitFrom(cyclus::QueryEngine* qe) {
+void SimpleSource::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::FacilityModel::InitFrom(qe);
   qe = qe->QueryElement("model/" + ModelImpl());
 
@@ -64,7 +64,7 @@ void SourceFacility::InitFrom(cyclus::QueryEngine* qe) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SourceFacility::str() {
+std::string SimpleSource::str() {
   std::stringstream ss;
   ss << cyclus::FacilityModel::str()
      << " supplies commodity '"
@@ -75,14 +75,14 @@ std::string SourceFacility::str() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* SourceFacility::Clone() {
-  SourceFacility* m = new SourceFacility(context());
+cyclus::Model* SimpleSource::Clone() {
+  SimpleSource* m = new SimpleSource(context());
   m->InitFrom(this);
   return m;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SourceFacility::InitFrom(SourceFacility* m) {
+void SimpleSource::InitFrom(SimpleSource* m) {
   FacilityModel::InitFrom(m);
   commodity(m->commodity());
   capacity(m->capacity());
@@ -92,7 +92,7 @@ void SourceFacility::InitFrom(SourceFacility* m) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SourceFacility::Tick(int time) {
+void SimpleSource::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is ticking {";
   LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity_
                                    << " kg of "
@@ -102,13 +102,13 @@ void SourceFacility::Tick(int time) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SourceFacility::Tock(int time) {
+void SimpleSource::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is tocking {";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Material::Ptr SourceFacility::GetOffer(
+cyclus::Material::Ptr SimpleSource::GetOffer(
     const cyclus::Material::Ptr target) const {
   using cyclus::Material;
   double qty = std::min(target->quantity(), capacity_);
@@ -117,7 +117,7 @@ cyclus::Material::Ptr SourceFacility::GetOffer(
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
-SourceFacility::GetMatlBids(
+SimpleSource::GetMatlBids(
     const cyclus::CommodMap<cyclus::Material>::type& commod_requests) {
   using cyclus::Bid;
   using cyclus::BidPortfolio;
@@ -148,7 +148,7 @@ SourceFacility::GetMatlBids(
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SourceFacility::GetMatlTrades(
+void SimpleSource::GetMatlTrades(
     const std::vector< cyclus::Trade<cyclus::Material> >& trades,
     std::vector<std::pair<cyclus::Trade<cyclus::Material>,
                           cyclus::Material::Ptr> >& responses) {
@@ -179,8 +179,8 @@ void SourceFacility::GetMatlTrades(
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructSourceFacility(cyclus::Context* ctx) {
-  return new SourceFacility(ctx);
+extern "C" cyclus::Model* ConstructSimpleSource(cyclus::Context* ctx) {
+  return new SimpleSource(ctx);
 }
 
 }  // namespace cyclus

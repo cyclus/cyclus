@@ -6,71 +6,71 @@
 #include "facility_model_tests.h"
 #include "model_tests.h"
 
-using cyclus::SourceFacility;
+using cyclus::SimpleSource;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class SourceFacilityTest : public ::testing::Test {
+class SimpleSourceTest : public ::testing::Test {
  protected:
   cyclus::TestContext tc_;
-  SourceFacility* src_facility_;
+  SimpleSource* src_facility_;
 
   virtual void SetUp() {
-    src_facility_ = new SourceFacility(tc_.get());
+    src_facility_ = new SimpleSource(tc_.get());
   }
 
   virtual void TearDown() {}
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceFacilityTest, clone) {
-  SourceFacility* cloned_fac =
-      dynamic_cast<SourceFacility*> (src_facility_->Clone());
+TEST_F(SimpleSourceTest, clone) {
+  SimpleSource* cloned_fac =
+      dynamic_cast<SimpleSource*> (src_facility_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceFacilityTest, InitialState) {
+TEST_F(SimpleSourceTest, InitialState) {
   // Test things about the initial state of the facility here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceFacilityTest, Print) {
+TEST_F(SimpleSourceTest, Print) {
   EXPECT_NO_THROW(std::string s = src_facility_->str());
-  // Test SourceFacility specific aspects of the print method here
+  // Test SimpleSource specific aspects of the print method here
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceFacilityTest, ReceiveMessage) {
-  // Test SourceFacility specific behaviors of the ReceiveMessage function here
+TEST_F(SimpleSourceTest, ReceiveMessage) {
+  // Test SimpleSource specific behaviors of the ReceiveMessage function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceFacilityTest, Tick) {
+TEST_F(SimpleSourceTest, Tick) {
   int time = 1;
   ASSERT_NO_THROW(src_facility_->Tick(time));
-  // Test SourceFacility specific behaviors of the Tick function here
+  // Test SimpleSource specific behaviors of the Tick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceFacilityTest, Tock) {
+TEST_F(SimpleSourceTest, Tock) {
   int time = 1;
   EXPECT_NO_THROW(src_facility_->Tock(time));
-  // Test SourceFacility specific behaviors of the Tock function here
+  // Test SimpleSource specific behaviors of the Tock function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* SourceFacilityModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new SourceFacility(ctx));
+cyclus::Model* SimpleSourceModelConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Model*>(new SimpleSource(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::FacilityModel* SourceFacilityConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::FacilityModel*>(new SourceFacility(ctx));
+cyclus::FacilityModel* SimpleSourceConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::FacilityModel*>(new SimpleSource(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 INSTANTIATE_TEST_CASE_P(SourceFac, FacilityModelTests,
-                        ::testing::Values(&SourceFacilityConstructor));
+                        ::testing::Values(&SimpleSourceConstructor));
 
 INSTANTIATE_TEST_CASE_P(SourceFac, ModelTests,
-                        ::testing::Values(&SourceFacilityModelConstructor));
+                        ::testing::Values(&SimpleSourceModelConstructor));
