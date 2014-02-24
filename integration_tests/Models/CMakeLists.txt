@@ -7,7 +7,7 @@ FILE(GLOB all_valid_subdirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/CMakeLists.t
 
 ADD_SUBDIRECTORY(SinkFacility)
 
-ADD_SUBDIRECTORY(SourceFacility)
+ADD_SUBDIRECTORY(SimpleSource)
 
 ADD_SUBDIRECTORY(NullInst)
 
