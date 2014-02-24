@@ -185,4 +185,3 @@ class SourceFacility : public cyclus::FacilityModel, public cyclus::CommodityPro
 }  // namespace cyclus
 
 #endif  // CYCLUS_INTEGRATION_TESTS_MODELS_SOURCE_FACILITY_H_
-

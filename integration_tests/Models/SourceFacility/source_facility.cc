@@ -25,7 +25,7 @@ SourceFacility::SourceFacility(cyclus::Context* ctx)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SourceFacility::~SourceFacility() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SourceFacility::schema() {
   return
     "  <element name =\"output\">          \n"
@@ -39,7 +39,7 @@ std::string SourceFacility::schema() {
     "  </element>                          \n";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SourceFacility::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::FacilityModel::InitFrom(qe);
   qe = qe->QueryElement("model/" + ModelImpl());
@@ -63,7 +63,7 @@ void SourceFacility::InitFrom(cyclus::QueryEngine* qe) {
   capacity(cap);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SourceFacility::str() {
   std::stringstream ss;
   ss << cyclus::FacilityModel::str()
@@ -74,14 +74,14 @@ std::string SourceFacility::str() {
   return ss.str();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Model* SourceFacility::Clone() {
   SourceFacility* m = new SourceFacility(context());
   m->InitFrom(this);
   return m;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SourceFacility::InitFrom(SourceFacility* m) {
   FacilityModel::InitFrom(m);
   commodity(m->commodity());
@@ -91,7 +91,7 @@ void SourceFacility::InitFrom(SourceFacility* m) {
   current_capacity_ = capacity();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SourceFacility::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is ticking {";
   LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity_
@@ -101,13 +101,13 @@ void SourceFacility::Tick(int time) {
   current_capacity_ = capacity_; // reset capacity
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SourceFacility::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is tocking {";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Material::Ptr SourceFacility::GetOffer(
     const cyclus::Material::Ptr target) const {
   using cyclus::Material;
@@ -115,7 +115,7 @@ cyclus::Material::Ptr SourceFacility::GetOffer(
   return Material::CreateUntracked(qty, context()->GetRecipe(recipe_name_));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
 SourceFacility::GetMatlBids(
     const cyclus::CommodMap<cyclus::Material>::type& commod_requests) {
@@ -147,7 +147,7 @@ SourceFacility::GetMatlBids(
   return ports;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SourceFacility::GetMatlTrades(
     const std::vector< cyclus::Trade<cyclus::Material> >& trades,
     std::vector<std::pair<cyclus::Trade<cyclus::Material>,
@@ -178,7 +178,7 @@ void SourceFacility::GetMatlTrades(
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructSourceFacility(cyclus::Context* ctx) {
   return new SourceFacility(ctx);
 }

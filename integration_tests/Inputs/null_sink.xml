@@ -52,7 +52,7 @@
     <name>commod_recipe</name>
     <basis>mass</basis>
     <nuclide>
-      <id>01001</id>
+      <id>010010000</id>
       <comp>1</comp>
     </nuclide>
   </recipe>
