@@ -73,24 +73,11 @@ void InstModel::AddPrototypeToInitialBuild(QueryEngine* qe) {
   std::string name = qe->GetElementContent("prototype");
   int number = atoi(qe->GetElementContent("number").c_str());
 
-  ThrowErrorIfPrototypeIsntAvailable(name);
-
   CLOG(LEV_DEBUG3) << "Institution: " << this->name() << " is adding "
                    << number << " prototypes of type " << name
                    << " to its list of initial facilities to build.";
 
   initial_build_order_.insert(std::make_pair(name, number));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::ThrowErrorIfPrototypeIsntAvailable(std::string p) {
-  if (!IsAvailablePrototype(p)) {
-    std::stringstream err("");
-    err << "Inst " << this->name() << " does not have "
-        << p
-        << " as one of its available prototypes.";
-    throw ValidationError(err.str());
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -118,7 +105,8 @@ void InstModel::Deploy(Model* parent) {
 
     for (int i = 0; i < number; i++) {
       // build as many as required
-      Build(proto_name);
+      Model* m = context()->CreateModel<Model>(proto_name);
+      m->Deploy(this);
     }
   }
 }
@@ -148,11 +136,8 @@ void InstModel::Tock(int time) {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::Build(std::string proto_name) {
-  ThrowErrorIfPrototypeIsntAvailable(proto_name);
-  Model* clone = context()->CreateModel<Model>(proto_name);
-  clone->Deploy(this);
-  RegisterCloneAsBuilt(clone);
+void InstModel::BuildNotify(Model* m) {
+  RegisterCloneAsBuilt(m);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

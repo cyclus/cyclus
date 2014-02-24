@@ -6,10 +6,11 @@
 #include <iostream>
 
 #include "error.h"
+#include "exchange_manager.h"
+#include "generic_resource.h"
 #include "logger.h"
 #include "material.h"
-#include "generic_resource.h"
-#include "exchange_manager.h"
+#include "model.h"
 
 namespace cyclus {
 
@@ -28,16 +29,28 @@ void Timer::RunSim(Context* ctx) {
       Material::DecayAll(time_);
     }
       
-    // provides robustness when listeners are added during ticks/tocks
-    for (int i = 0; i < new_tickers_.size(); ++i) {
-      tick_listeners_.push_back(new_tickers_[i]);
+    // deploy queued agents
+    std::vector<std::pair<std::string, Model*> > build_list = build_queue_[time_];
+    for (int i = 0; i < build_list.size(); ++i) {
+      Model* m = ctx->CreateModel<Model>(build_list[i].first);
+      Model* parent = build_list[i].second;
+      m->Deploy(parent);
+      parent->BuildNotify(m);
     }
-    new_tickers_.clear();
 
+    // run through phases
     SendTick();
     matl_manager.Execute();
     genrsrc_manager.Execute();
     SendTock();
+
+    // decommission queued agents
+    std::vector<Model*> decom_list = decom_queue_[time_];
+    for (int i = 0; i < decom_list.size(); ++i) {
+      Model* m = decom_list[i];
+      m->parent()->DecomNotify(m);
+      m->Decommission();
+    }
     
     time_++;
   }
@@ -45,8 +58,8 @@ void Timer::RunSim(Context* ctx) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SendTick() {
-  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
-       agent != tick_listeners_.end();
+  for (std::set<TimeListener*>::iterator agent = tickers_.begin();
+       agent != tickers_.end();
        agent++) {
     (*agent)->Tick(time_);
   }
@@ -54,16 +67,37 @@ void Timer::SendTick() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SendTock() {
-  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
-       agent != tick_listeners_.end();
+  for (std::set<TimeListener*>::iterator agent = tickers_.begin();
+       agent != tickers_.end();
        agent++) {
     (*agent)->Tock(time_);
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::RegisterTickListener(TimeListener* agent) {
-  new_tickers_.push_back(agent);
+void Timer::RegisterTimeListener(TimeListener* agent) {
+  tickers_.insert(agent);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::UnregisterTimeListener(TimeListener* tl) {
+  tickers_.erase(tl);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::SchedBuild(Model* parent, std::string proto_name, int t) {
+  if (t <= time_) {
+    throw ValueError("Cannot schedule build for t < [current-time]");
+  }
+  build_queue_[t].push_back(std::make_pair(proto_name, parent));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::SchedDecom(Model* m, int t) {
+  if (t <= time_) {
+    throw ValueError("Cannot schedule decommission for t < [current-time]");
+  }
+  decom_queue_[t].push_back(m);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -72,7 +106,7 @@ int Timer::time() {
 }
 
 void Timer::Reset() {
-  tick_listeners_.clear();
+  tickers_.clear();
 
   decay_interval_ = 0;
   month0_ = 0;

@@ -93,6 +93,7 @@ void FacilityModel::Decommission() {
   }
 
   context()->UnregisterTrader(this);
+  context()->UnregisterTimeListener(this);
   Model::Decommission();
 }
 

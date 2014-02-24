@@ -128,11 +128,7 @@ class InstModel : public Model, public TimeListener {
     return children().size();
   };
 
-  /**
-     builds a prototype
-     @param proto_name the name of the prototype to build
-   */
-  void Build(std::string proto_name);
+  virtual void BuildNotify(Model* m);
 
   virtual void Tick(int time) {};
 
@@ -159,13 +155,6 @@ class InstModel : public Model, public TimeListener {
      @param qe a pointer to a QueryEngine object containing intialization data
    */
   void AddPrototypeToInitialBuild(QueryEngine* qe);
-
-  /**
-     checks if a prototype is in its list of available prototypes
-     if not, it throws an error
-     @param p the prototype to check for
-   */
-  void ThrowErrorIfPrototypeIsntAvailable(std::string p);
 
   /**
      perform any registration functionality after a clone has been

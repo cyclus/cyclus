@@ -11,6 +11,8 @@
 
 namespace cyclus {
 
+class Model;
+
 /**
    @class Timer
 
@@ -19,6 +21,7 @@ namespace cyclus {
  */
 class Timer {
  public:
+
   Timer();
 
   /**
@@ -49,11 +52,23 @@ class Timer {
   void RunSim(Context* ctx);
 
   /**
-     registers a sim. agent to receive time step notifications.
-
-     @param agent agent that will receive time-step notifications
+     Registers an agent to receive tick/tock notifications every timestep.
+     Agents should register from their Deploy method.
    */
-  void RegisterTickListener(TimeListener* agent);
+  void RegisterTimeListener(TimeListener* agent);
+
+  /// Removes an agent from receiving tick/tock notifications.
+  /// Agents should unregister from their Decommission method.
+  void UnregisterTimeListener(TimeListener* tl);
+
+
+  /// Schedules the named prototype to be built for the specified parent at
+  /// timestep t.
+  void SchedBuild(Model* parent, std::string proto_name, int t);
+
+  /// Schedules the given Model to be decommissioned at the specified
+  /// timestep t.
+  void SchedDecom(Model* m, int time);
 
   /**
      Returns the current time, in months since the simulation started.
@@ -82,6 +97,12 @@ class Timer {
      the simulation start time and the simulation duration
    */
   void LogTimeData(Context* ctx, std::string handle);
+
+  // std::map<time,std::vector<std::pair<prototype, parent> > >
+  std::map<int, std::vector<std::pair<std::string, Model*> > > build_queue_;
+
+  // std::map<time,std::vector<agent> >
+  std::map<int, std::vector<Model*> > decom_queue_;
 
   /**
      The current time, measured in months from when the simulation
@@ -116,12 +137,8 @@ class Timer {
   /**
      Concrete models that desire to receive tick and tock notifications
    */
-  std::vector<TimeListener*> tick_listeners_;
+  std::set<TimeListener*> tickers_;
 
-  /**
-     Concrete models that desire to receive tick and tock notifications
-   */
-  std::vector<TimeListener*> new_tickers_;
 
   /**
      sends the tick signal to all of the models receiving time

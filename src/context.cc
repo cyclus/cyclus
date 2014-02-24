@@ -10,10 +10,10 @@
 namespace cyclus {
 
 Context::Context(Timer* ti, Recorder* rec)
-    : ti_(ti),
-      rec_(rec),
-      solver_(NULL),
-      trans_id_(0) {}
+  : ti_(ti),
+    rec_(rec),
+    solver_(NULL),
+    trans_id_(0) {}
 
 Context::~Context() {
   if (solver_ != NULL) {
@@ -39,6 +39,20 @@ void Context::DelModel(Model* m) {
   if (n == 1) {
     delete m;
   }
+}
+
+void Context::SchedBuild(Model* parent, std::string proto_name, int t) {
+  if (t == -1) {
+    t = time() + 1;
+  }
+  ti_->SchedBuild(parent, proto_name, t);
+}
+
+void Context::SchedDecom(Model* m, int t) {
+  if (t == -1) {
+    t = time();
+  }
+  ti_->SchedDecom(m, t);
 }
 
 boost::uuids::uuid Context::sim_id() {
@@ -78,7 +92,11 @@ int Context::sim_dur() {
 }
 
 void Context::RegisterTimeListener(TimeListener* tl) {
-  ti_->RegisterTickListener(tl);
+  ti_->RegisterTimeListener(tl);
+}
+
+void Context::UnregisterTimeListener(TimeListener* tl) {
+  ti_->UnregisterTimeListener(tl);
 }
 
 Datum* Context::NewDatum(std::string title) {
@@ -86,3 +104,4 @@ Datum* Context::NewDatum(std::string title) {
 }
 
 }  // namespace cyclus
+

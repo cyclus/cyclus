@@ -48,26 +48,26 @@ class Context {
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Model* m);
 
-  /// Registers an agent as a participant in resource exchanges
+  /// Registers an agent as a participant in resource exchanges. Agents should
+  /// register from their Deploy method.
   inline void RegisterTrader(Trader* e) {
     traders_.insert(e);
   }
 
-  /// Unregisters an agent as a participant in resource exchanges
+  /// Unregisters an agent as a participant in resource exchanges.
   inline void UnregisterTrader(Trader* e) {
     traders_.erase(e);
   }
 
-  /// Destructs and cleans up m (and it's children recursively).
-  void DelModel(Model* m);
-
-  /// @return the current set of facilities in the simulation
+  /// @return the current set of traders registered for resource exchange.
   inline const std::set<Trader*>& traders() const {
     return traders_;
   }
 
   /// Create a new model by cloning the named prototype. The returned model is
   /// not initialized as a simulation participant.
+  ///
+  /// @warning this method should generally NOT be used by agents.
   template <class T>
   T* CreateModel(std::string proto_name) {
     if (protos_.count(proto_name) == 0) {
@@ -85,6 +85,21 @@ class Context {
     return casted;
   }
 
+  /// Destructs and cleans up m (and it's children recursively).
+  ///
+  /// @warning this method should generally NOT be used by agents.
+  void DelModel(Model* m);
+
+  /// Schedules the named prototype to be built for the specified parent at
+  /// timestep t. The default t=-1 results in the build being scheduled for the
+  /// next build phase (i.e. the start of the next timestep).
+  void SchedBuild(Model* parent, std::string proto_name, int t = -1);
+
+  /// Schedules the given Model to be decommissioned at the specified timestep
+  /// t. The default t=-1 results in the decommission being scheduled for the
+  /// next decommission phase (i.e. the end of the current timestep).
+  void SchedDecom(Model* m, int time = -1);
+
   /// Adds a composition recipe to a simulation-wide accessible list.
   /// Agents should NOT add their own recipes.
   void AddRecipe(std::string name, Composition::Ptr c);
@@ -95,8 +110,13 @@ class Context {
   /// during the simulation.
   Composition::Ptr GetRecipe(std::string name);
 
-  /// See Timer::RegisterTickListener documentation.
+  /// Registers an agent to receive tick/tock notifications every timestep.
+  /// Agents should register from their Deploy method.
   void RegisterTimeListener(TimeListener* tl);
+
+  /// Removes an agent from receiving tick/tock notifications.
+  /// Agents should unregister from their Decommission method.
+  void UnregisterTimeListener(TimeListener* tl);
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.
@@ -132,10 +152,10 @@ class Context {
 
  private:
   std::map<std::string, Model*> protos_;
-  std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Model*> model_list_;
-
+  std::set<Trader*> traders_;
+  
   Timer* ti_;
   ExchangeSolver* solver_;
   Recorder* rec_;

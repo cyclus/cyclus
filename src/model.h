@@ -119,6 +119,12 @@ class Model {
   /// @param parent this model's parent
   virtual void Deploy(Model* parent = NULL);
 
+  /// Called when a new child of this agent has just been built.
+  virtual void BuildNotify(Model* m) {};
+
+  /// Called when a new child of this agent is about to be decommissioned.
+  virtual void DecomNotify(Model* m) {};
+
   /// Decommissions the model, removing it from the simulation. Results in
   /// destruction of the model object.
   virtual void Decommission();
