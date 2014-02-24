@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- 1 SimpleSource Source, 1 SinkFacility Sink -->
+<!-- 1 SimpleSource Source, 1 SimpleSink Sink -->
 
 <simulation>
   <control>
@@ -31,12 +31,12 @@
   <facility>
     <name>Sink</name>
     <model>
-      <SinkFacility>
+      <SimpleSink>
         <input>
           <incommodity>commodity</incommodity>
           <input_capacity>1.00</input_capacity>
         </input>
-      </SinkFacility>
+      </SimpleSink>
     </model>
     <incommodity>commodity</incommodity>
   </facility>
