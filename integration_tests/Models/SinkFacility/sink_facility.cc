@@ -2,17 +2,17 @@
 
 #include "sink_facility.h"
 
-using cyclus::SinkFacility;
+using cyclus::SimpleSink;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SinkFacility::SinkFacility(cyclus::Context* ctx)
+SimpleSink::SimpleSink(cyclus::Context* ctx)
   : cyclus::FacilityModel(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SinkFacility::~SinkFacility() {}
+SimpleSink::~SimpleSink() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SinkFacility::schema() {
+std::string SimpleSink::schema() {
   return
       "  <element name =\"input\">               \n"
       "    <element name =\"incommodity\">       \n"
@@ -25,7 +25,7 @@ std::string SinkFacility::schema() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SinkFacility::InitFrom(cyclus::QueryEngine* qe) {
+void SimpleSink::InitFrom(cyclus::QueryEngine* qe) {
   cyclus::FacilityModel::InitFrom(qe);
   qe = qe->QueryElement("model/" + ModelImpl());
 
@@ -37,28 +37,28 @@ void SinkFacility::InitFrom(cyclus::QueryEngine* qe) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* SinkFacility::Clone() {
-  SinkFacility* m = new SinkFacility(context());
+cyclus::Model* SimpleSink::Clone() {
+  SimpleSink* m = new SimpleSink(context());
   m->InitFrom(this);
   return m;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // not expected to be cloned
-void SinkFacility::InitFrom(SinkFacility* m) {
+void SimpleSink::InitFrom(SimpleSink* m) {
   cyclus::FacilityModel::InitFrom(m);
   // Initialize sinkfacility members for a cloned module here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SinkFacility::str() {
+std::string SimpleSink::str() {
   // no info for now. Change later
   return FacilityModel::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
-SinkFacility::GetMatlRequests() {
+SimpleSink::GetMatlRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::Material;
   using cyclus::RequestPortfolio;
@@ -86,7 +86,7 @@ SinkFacility::GetMatlRequests() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::RequestPortfolio<cyclus::GenericResource>::Ptr>
-SinkFacility::GetGenRsrcRequests() {
+SimpleSink::GetGenRsrcRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::GenericResource;
   using cyclus::RequestPortfolio;
@@ -118,7 +118,7 @@ SinkFacility::GetGenRsrcRequests() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SinkFacility::AcceptMatlTrades(
+void SimpleSink::AcceptMatlTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
     cyclus::Material::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Material>,
@@ -129,7 +129,7 @@ void SinkFacility::AcceptMatlTrades(
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SinkFacility::AcceptGenRsrcTrades(
+void SimpleSink::AcceptGenRsrcTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
     cyclus::GenericResource::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
@@ -141,7 +141,7 @@ void SinkFacility::AcceptGenRsrcTrades(
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SinkFacility::Tick(int time) {
+void SimpleSink::Tick(int time) {
   using std::string;
   using std::vector;
 
@@ -161,9 +161,9 @@ void SinkFacility::Tick(int time) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SinkFacility::Tock(int time) {}
+void SimpleSink::Tock(int time) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructSinkFacility(cyclus::Context* ctx) {
-  return new SinkFacility(ctx);
+extern "C" cyclus::Model* ConstructSimpleSink(cyclus::Context* ctx) {
+  return new SimpleSink(ctx);
 }

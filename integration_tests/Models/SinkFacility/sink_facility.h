@@ -16,11 +16,11 @@
 namespace cyclus {
 
 /**
-  @class SinkFacility
+  @class SimpleSink
   This sink facility accepts specified amount of commodity.
-  This sink facility is similar to SinkFacility provided in cycamore, but it
+  This sink facility is similar to SimpleSink provided in cycamore, but it
   has minimum implementation to run integration tests.
-  Some parts of the code is directrly copied from cycamore SinkFacility.
+  Some parts of the code is directrly copied from cycamore SimpleSink.
 
   This FacilityModel is intended
   to be used in Cyclus integration tests as a basic sink facility.
@@ -33,24 +33,24 @@ namespace cyclus {
 
   @section detailed Detailed Behavior
   */
-class SinkFacility : public cyclus::FacilityModel  {
+class SimpleSink : public cyclus::FacilityModel  {
   /* --------------------
    * all FACILITYMODEL classes have these members
    * --------------------
    */
  public:
   /**
-    Constructor for SinkFacility Class
+    Constructor for SimpleSink Class
     @param ctx the cyclus context for access to simulation-wide parameters
     */
-  explicit SinkFacility(cyclus::Context* ctx);
+  explicit SimpleSink(cyclus::Context* ctx);
 
   /**
-    Distructor for SinkFacility
+    Distructor for SimpleSink
     */
-  virtual ~SinkFacility();
+  virtual ~SimpleSink();
   /**
-    Schema for SinkFacility
+    Schema for SimpleSink
     */
   virtual std::string schema();
 
@@ -64,27 +64,27 @@ class SinkFacility : public cyclus::FacilityModel  {
   /**
     Initialize members for a cloned module.
     */
-  virtual void InitFrom(SinkFacility* m);
+  virtual void InitFrom(SimpleSink* m);
 
   /**
-    A verbose printer for the SinkFacility
+    A verbose printer for the SimpleSink
     */
   virtual std::string str();
 
   /**
-    Initializes a SinkFacility object by copying the members of another.
+    Initializes a SimpleSink object by copying the members of another.
     */
   virtual cyclus::Model* Clone();
 
   /**
-    The handleTick function specific to the SinkFacility.
+    The handleTick function specific to the SimpleSink.
 
     @param time the time of the tick
     */
   virtual void Tick(int time);
 
   /**
-    The handleTick function specific to the SinkFacility.
+    The handleTick function specific to the SimpleSink.
 
     @param time the time of the tock
     */
@@ -93,12 +93,12 @@ class SinkFacility : public cyclus::FacilityModel  {
   /* ------------------- */
 
   /// @brief SinkFacilities request Materials of their given commodity. Note
-  /// that it is assumed the SinkFacility operates on a single resource type!
+  /// that it is assumed the SimpleSink operates on a single resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
       GetMatlRequests();
 
   /// @brief SinkFacilities request GenericResources of their given
-  /// commodity. Note that it is assumed the SinkFacility operates on a single
+  /// commodity. Note that it is assumed the SimpleSink operates on a single
   /// resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::GenericResource>::Ptr>
       GetGenRsrcRequests();
