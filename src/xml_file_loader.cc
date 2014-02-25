@@ -335,8 +335,15 @@ void XMLFileLoader::LoadControlParams() {
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
   ctx_->InitTime(dur, dec, m0, y0, handle);
+
+  ctx->NewDatum("Info")
+  ->AddVal("Handle", handle)
+  ->AddVal("InitialYear", y0)
+  ->AddVal("InitialMonth", m0)
+  ->AddVal("Duration", dur)
+  ->AddVal("DecayInterval", dec)
+  ->Record();
 }
 
 } // namespace cyclus
-
 

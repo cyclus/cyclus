@@ -368,22 +368,13 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="basis">
         <text/>
       </element>
-<!--
-      <element name="unit">
-        <text/>
-      </element>
-
-      <element name="total">
-        <text/>
-      </element>
--->
       <oneOrMore>
       <element name="nuclide">
         <element name="id">
           <text/>
         </element>
-        <element name="comp">
-          <text/>
+        <element name="frac">
+          <data type="double"/>
         </element>
       </element>
       </oneOrMore>

@@ -71,10 +71,6 @@ class Timer {
   int dur();
 
  private:
-  /// logs relevant time-related data with the output system, including:
-  /// the simulation start time and the simulation duration
-  void LogTimeData(Context* ctx, std::string handle);
-
   /// builds all agents queued for the current timestep.
   void DoBuild();
 
