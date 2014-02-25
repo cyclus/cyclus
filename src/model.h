@@ -122,7 +122,9 @@ class Model {
   /// @param parent this model's parent
   virtual void Build(Model* parent = NULL);
 
-  /// Called when a new child of this agent has just been built.
+  // Called when a new child of this agent has just been built. It is possible
+  // for this method to be called before the simulation has started when
+  // initially existing agents are being setup.
   virtual void BuildNotify(Model* m) {};
 
   /// Called when a new child of this agent is about to be decommissioned.

@@ -93,7 +93,7 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   for (int i = 0; i < nnucs; i++) {
     QueryEngine* nuclide = qe->QueryElement(query, i);
     key = strtol(nuclide->GetElementContent("id").c_str(), NULL, 10);
-    value = strtod(nuclide->GetElementContent("frac").c_str(), NULL);
+    value = strtod(nuclide->GetElementContent("comp").c_str(), NULL);
     v[key] = value;
     CLOG(LEV_DEBUG3) << "  Nuclide: " << key << " Value: " << v[key];
   }
@@ -230,8 +230,10 @@ void XMLFileLoader::LoadInitialAgents() {
   module_types.insert("Inst");
   module_types.insert("Facility");
   std::set<std::string>::iterator it;
+  XMLQueryEngine xqe(*parser_);
+
+  // create prototypes
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    XMLQueryEngine xqe(*parser_);
     int num_models = xqe.NElementsMatchingQuery(schema_paths_[*it]);
     for (int i = 0; i < num_models; i++) {
       QueryEngine* qe = xqe.QueryElement(schema_paths_[*it], i);
@@ -250,9 +252,36 @@ void XMLFileLoader::LoadInitialAgents() {
 
       // register module
       ctx_->AddPrototype(model->name(), model);
-      if (*it == "Region") {
-        Model* clone = ctx_->CreateModel<Model>(model->name());
-        clone->Build();
+    }
+  }
+
+  // build initial agent instances
+  int nregions = xqe.NElementsMatchingQuery(schema_paths_["Region"]);
+  for (int i = 0; i < nregions; ++i) {
+    QueryEngine* qe = xqe.QueryElement(schema_paths_["Region"], i);
+    std::string region_proto = qe->GetElementContent("name");
+    Model* reg = ctx_->CreateModel<Model>(region_proto);
+    reg->Build();
+
+    int ninsts = qe->NElementsMatchingQuery("institution");
+    for (int j = 0; j < ninsts; ++j) {
+      QueryEngine* qe2 = qe->QueryElement("institution", j);
+      std::string inst_proto = qe2->GetElementContent("name");
+      Model* inst = ctx_->CreateModel<Model>(inst_proto);
+      inst->Build(reg);
+      reg->BuildNotify(inst);
+
+      int nfac = qe2->NElementsMatchingQuery("initialfacilitylist/entry");
+      for (int k = 0; k < nfac; ++k) {
+        QueryEngine* qe3 = qe2->QueryElement("initialfacilitylist/entry", k);
+        std::string fac_proto = qe3->GetElementContent("prototype");
+
+        int number = atoi(qe3->GetElementContent("number").c_str());
+        for (int z = 0; z < number; ++z) {
+          Model* fac = ctx_->CreateModel<Model>(fac_proto);
+          fac->Build(inst);
+          inst->BuildNotify(fac);
+        }
       }
     }
   }

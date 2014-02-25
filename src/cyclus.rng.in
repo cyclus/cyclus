@@ -364,8 +364,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="basis"><text/></element>
       <oneOrMore>
         <element name="nuclide">
-          <element name="id"><data type="integer"></element>
-          <element name="frac"><data type="double"/></element>
+          <element name="id"><data type="integer"/></element>
+          <element name="comp"><data type="double"/></element>
         </element>
       </oneOrMore>
     </element>

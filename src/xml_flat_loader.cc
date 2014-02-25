@@ -94,6 +94,7 @@ void XMLFlatLoader::LoadInitialAgents() {
       agent->Build();
     } else {
       agent->Build(agents[parents[name]]);
+      agents[parents[name]]->BuildNotify(agent);
     }
   }
 }
