@@ -146,43 +146,14 @@ std::string XMLFileLoader::master_schema() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadSim() {
-  try {
     LoadDynamicModules();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading dynamic modules: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
     std::stringstream ss(master_schema());
     parser_->Validate(ss);
-  try {
     LoadSolver();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading solver from xml file: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
-  try {
     LoadControlParams();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading control parameters from xml file: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
-  try {
     LoadRecipes();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading recipes from xml file: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
-  try {
+
     LoadInitialAgents();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading initial agents from xml file: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

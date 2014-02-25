@@ -58,7 +58,7 @@ class Recorder {
   /// set the Recorder to flush its collected Datum objects to registered backends
   /// every [count] Datum objects. If count == 0 then Datum objects will be flushed immediately
   /// as they come.
-
+  ///
   /// @param count # Datum objects to buffer before flushing to backends.
   void set_dump_count(unsigned int count);
 

@@ -1,6 +1,6 @@
 // rec_backend.h
-#ifndef CYCLUS_CORE_UTILITY_REC_BACKEND_H_
-#define CYCLUS_CORE_UTILITY_REC_BACKEND_H_
+#ifndef CYCLUS_SRC_REC_BACKEND_H_
+#define CYCLUS_SRC_REC_BACKEND_H_
 
 #include <vector>
 
