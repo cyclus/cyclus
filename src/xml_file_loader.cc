@@ -93,7 +93,7 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   for (int i = 0; i < nnucs; i++) {
     QueryEngine* nuclide = qe->QueryElement(query, i);
     key = strtol(nuclide->GetElementContent("id").c_str(), NULL, 10);
-    value = strtod(nuclide->GetElementContent("comp").c_str(), NULL);
+    value = strtod(nuclide->GetElementContent("frac").c_str(), NULL);
     v[key] = value;
     CLOG(LEV_DEBUG3) << "  Nuclide: " << key << " Value: " << v[key];
   }
@@ -307,7 +307,7 @@ void XMLFileLoader::LoadControlParams() {
 
   ctx_->InitTime(dur, dec, m0, y0, handle);
 
-  ctx->NewDatum("Info")
+  ctx_->NewDatum("Info")
   ->AddVal("Handle", handle)
   ->AddVal("InitialYear", y0)
   ->AddVal("InitialMonth", m0)

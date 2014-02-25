@@ -133,12 +133,6 @@ class InstModel : public Model, public TimeListener {
   virtual void RegisterAvailablePrototype(std::string proto_name);
 
   /**
-     Adds a prototype build order to initial_build_order_
-     @param qe a pointer to a QueryEngine object containing intialization data
-   */
-  void AddPrototypeToInitialBuild(QueryEngine* qe);
-
-  /**
      perform any registration functionality after a clone has been
      built
      @param clone the built (cloned) prototype
@@ -157,11 +151,6 @@ private:
      The Inst's set of available prototypes to build
    */
   PrototypeSet prototypes_;
-
-  /**
-     the initial prototypes to build
-   */
-  std::map<std::string, int> initial_build_order_;
   /* ------------------- */
 };
 

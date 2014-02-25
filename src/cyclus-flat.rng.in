@@ -53,20 +53,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
               </element>
             </oneOrMore>
           </optional>
-          <optional>
-            <element name="initialfacilitylist">
-              <oneOrMore>
-                <element name="entry">
-                  <element name="prototype">
-                    <text/>
-                  </element>
-                  <element name="number">
-                    <data type="nonNegativeInteger"/>
-                  </element>
-                </element>
-              </oneOrMore>
-            </element>
-          </optional>
         </group>
 
       </choice>
@@ -104,8 +90,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="basis"><text/></element>
       <oneOrMore>
         <element name="nuclide">
-          <element name="id"><text/></element>
-          <element name="comp"><text/></element>
+          <element name="id"><data type="integer"/></element>
+          <element name="frac"><data type="double"/></element>
         </element>
       </oneOrMore>
     </element>

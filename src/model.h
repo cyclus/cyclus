@@ -70,9 +70,10 @@ class Model {
   ///   // ...
   /// };
   /// @endcode
-  virtual void InitFrom(InitBackend* b);
+  virtual void InitFrom(QueryEngine* qe);
 
-  virtual void InfileToDb(QueryEngine* qe, DbInit* di);
+  //virtual void InitFrom(InitBackend* b) {};
+  //virtual void InfileToDb(QueryEngine* qe, DbInit* di) {};
 
   /// Constructor for the Model Class
   ///

@@ -117,32 +117,11 @@ class RegionModel : public Model, public TimeListener {
    */
   virtual void InitAllowedFacilities(QueryEngine* qe);
 
-  /**
-     populate the region's list of institution names
-   */
-  virtual void InitInstitutionNames(QueryEngine* qe);
-
-  /**
-     set the parameters necessary for RegionModel to interact
-     with the simulation
-   */
-  virtual void AddRegionAsRootNode();
-
-  /**
-     populate the region's list of child institutions
-   */
-  virtual void AddChildrenToTree();
-
  private:
   /**
      every region has a list of allowed facilities
    */
   std::set<std::string> allowedFacilities_;
-
-  /**
-     the names of the institutions in this region
-   */
-  std::set<std::string> inst_names_;
   /* ------------------- */
 };
 

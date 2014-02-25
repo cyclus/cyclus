@@ -19,7 +19,6 @@ namespace cyclus {
 void RegionModel::InitFrom(RegionModel* m) {
   Model::InitFrom(m);
   this->allowedFacilities_ = m->allowedFacilities_;
-  this->inst_names_ = m->inst_names_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,7 +30,6 @@ RegionModel::RegionModel(Context* ctx) : Model(ctx) {
 void RegionModel::InitFrom(QueryEngine* qe) {
   Model::InitFrom(qe); // name_
   RegionModel::InitAllowedFacilities(qe); // allowedFacilities_
-  RegionModel::InitInstitutionNames(qe); // inst_names_
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -45,36 +43,9 @@ void RegionModel::InitAllowedFacilities(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::InitInstitutionNames(QueryEngine* qe) {
-  int nInsts = qe->NElementsMatchingQuery("institution");
-  std::string name;
-  for (int i = 0; i < nInsts; i++) {
-    QueryEngine* inst_data = qe->QueryElement("institution", i);
-    name = inst_data->GetElementContent("name");
-    inst_names_.insert(name);
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::Build(Model* parent) {
   Model::Build(parent);
-  AddRegionAsRootNode();
-  AddChildrenToTree();
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::AddRegionAsRootNode() {
   context()->RegisterTimeListener(this);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::AddChildrenToTree() {
-  Model* inst;
-  std::set<std::string>::iterator it;
-  for (it = inst_names_.begin(); it != inst_names_.end(); it++) {
-    inst = context()->CreateModel<Model>(*it);
-    inst->Build(this);
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

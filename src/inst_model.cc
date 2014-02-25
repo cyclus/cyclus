@@ -23,7 +23,6 @@ InstModel::InstModel(Context* ctx) : Model(ctx) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::InitFrom(InstModel* m) {
   Model::InitFrom(m);
-  this->initial_build_order_ = m->initial_build_order_;
   this->prototypes_ = m->prototypes_;
 }
 
@@ -44,18 +43,6 @@ void InstModel::InitFrom(QueryEngine* qe) {
       AddAvailablePrototype(name);
     }
   }
-
-  query = "initialfacilitylist";
-  nEntries = qe->NElementsMatchingQuery(query);
-  // populate initial_build_order_
-  if (nEntries > 0) {
-    QueryEngine* list = qe->QueryElement(query);
-    int numInitFacs = list->NElementsMatchingQuery("entry");
-    for (int i = 0; i < numInitFacs; i++) {
-      QueryEngine* entry = list->QueryElement("entry", i);
-      AddPrototypeToInitialBuild(entry);
-    }
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -66,19 +53,6 @@ void InstModel::AddAvailablePrototype(std::string proto_name) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::RegisterAvailablePrototype(std::string proto_name) {}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::AddPrototypeToInitialBuild(QueryEngine* qe) {
-
-  std::string name = qe->GetElementContent("prototype");
-  int number = atoi(qe->GetElementContent("number").c_str());
-
-  CLOG(LEV_DEBUG3) << "Institution: " << this->name() << " is adding "
-                   << number << " prototypes of type " << name
-                   << " to its list of initial facilities to build.";
-
-  initial_build_order_.insert(std::make_pair(name, number));
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InstModel::str() {
@@ -93,22 +67,6 @@ std::string InstModel::str() {
 void InstModel::Build(Model* parent) {
   Model::Build(parent);
   context()->RegisterTimeListener(this);
-
-  // build initial prototypes
-  std::map<std::string, int>::iterator it;
-  for (it = initial_build_order_.begin();
-       it != initial_build_order_.end(); it ++) {
-
-    // for each prototype
-    std::string proto_name = it->first;
-    int number = it->second;
-
-    for (int i = 0; i < number; i++) {
-      // build as many as required
-      Model* m = context()->CreateModel<Model>(proto_name);
-      m->Build(this);
-    }
-  }
 }
 
 void InstModel::Tock(int time) {
