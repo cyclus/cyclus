@@ -24,6 +24,15 @@ using namespace cyclus;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+  SqliteBack* bk = new SqliteBack("cyclus.sqlite");
+  QueryResult q = bk->Query("InputFiles", NULL);
+  for (int i = 0; i < q.rows[0].size(); i++) {
+    std::cout << q.fields[i] << "(" << q.types[i] << "):\n";
+    std::cout << q.rows[0][i].cast<std::string>();
+  }
+  return 0;
+  
+
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
   vmessage +=

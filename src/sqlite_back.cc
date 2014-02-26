@@ -6,6 +6,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "blob.h"
 #include "error.h"
@@ -13,6 +14,17 @@
 #include "logger.h"
 
 namespace cyclus {
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path) : db_(path) {
@@ -42,6 +54,73 @@ void SqliteBack::Notify(DatumList data) {
 void SqliteBack::Close() {
   Flush();
   db_.close();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
+  QueryResult q = GetTableInfo(table);
+
+  std::stringstream sql;
+  sql << "SELECT * FROM " << table;
+  if (conds != NULL) {
+    sql << "WHERE ";
+    for (int i = 0; i < conds->size(); ++i) {
+      if (i > 0) {
+        sql << " AND ";
+      }
+      Cond c = (*conds)[i];
+      sql << c.field << " " << c.op << " " << ValAsString(c.val);
+    }
+  }
+  sql << ";";
+
+  std::vector<StrList> rows = db_.Query(sql.str());
+  for (int i = 0; i < rows.size(); ++i) {
+    std::cout << "n qfields = " << rows[0].size() << "\n";
+    std::cout << "n fields = " << q.fields.size() << "\n";
+    std::cout << "n types = " << q.types.size() << "\n";
+    QueryRow r;
+    for (int j = 0; j < q.fields.size(); ++j) {
+      std::cout << "field='" << q.fields[j] << "'\n";
+      std::cout << "type='" << q.types[j] << "'\n";
+      std::cout << "rowval='" << rows[i][j].substr(0, 20) << "'\n";
+      r.push_back(StringAsVal(rows[i][j], q.types[j]));
+    }
+    q.rows.push_back(r);
+  }
+  return q;
+}
+
+QueryResult SqliteBack::GetTableInfo(std::string table) {
+  std::string sql = "SELECT sql FROM sqlite_master WHERE tbl_name = '" + table + "';";
+  std::vector<StrList> rows = db_.Query(sql);
+  if (rows.size() == 0) {
+    throw ValueError("Invalid table name " + table);
+  }
+
+  std::string s = rows[0][0];
+  size_t start = s.find("(") + 1;
+  size_t n = s.find(")") - start;
+  std::string type_data = s.substr(start, n);
+  std::vector<std::string> fields = split(type_data, ',');
+  QueryResult info;
+  for (int i = 0; i < fields.size(); ++i) {
+    std::string field = fields[i];
+    boost::algorithm::trim(field);
+    size_t pos = field.rfind(" ") + 1;
+    std::string type = field.substr(pos);
+    pos = field.find(" ");
+    std::string name = field.substr(0, pos);
+    if (type != "INTEGER" &&
+        type != "REAL" &&
+        type != "BLOB" &&
+        type != "TEXT") {
+      throw IOError("Unsupported type for querying " + type);
+    }
+    info.types.push_back(type);
+    info.fields.push_back(name);
+  }
+  return info;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -106,12 +185,34 @@ void SqliteBack::WriteDatum(Datum* d) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string toHex(const std::string& s) {
+std::string StringToHex(const std::string& s) {
   std::ostringstream ret;
   for (int i = 0; i < s.length(); ++i) {
     ret << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(s[i]);
   }
   return ret.str();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::string StringFromHex(const std::string& in) {
+    std::string output;
+
+    if ((in.length() % 2) != 0) {
+        throw std::runtime_error("String is not valid length ...");
+    }
+
+    size_t cnt = in.length() / 2;
+
+    for (size_t i = 0; cnt > i; ++i) {
+        uint32_t s = 0;
+        std::stringstream ss;
+        ss << std::hex << in.substr(i * 2, 2);
+        ss >> s;
+
+        output.push_back(static_cast<unsigned char>(s));
+    }
+
+    return output;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -137,11 +238,29 @@ std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
     return ss.str();
   } else if (v.type() == typeid(Blob)) {
     std::string s = v.cast<Blob>().str();
-    return "X'" + toHex(s) + "'";
+    return "X'" + StringToHex(s) + "'";
   }
   CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
                   << Name();
   return "";
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type) {
+  boost::spirit::hold_any v;
+  if (type == "INTEGER") {
+    v = atoi(s.c_str());
+  } else if (type == "REAL") {
+    v = atof(s.c_str());
+  } else if (type == "TEXT") {
+    v = s;
+  } else if (type == "BLOB") {
+    v = s;
+  } else {
+    CLOG(LEV_ERROR) << "attempted to retrieve unsupported type from backend "
+                    << Name();
+  }
+  return v;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -53,6 +53,7 @@ std::string XMLFlatLoader::master_schema() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFlatLoader::LoadInitialAgents() {
   XMLQueryEngine xqe(*parser_);
+  DbInit di;
 
   int num_protos = xqe.NElementsMatchingQuery("/*/prototype");
   for (int i = 0; i < num_protos; i++) {
@@ -62,41 +63,40 @@ void XMLFlatLoader::LoadInitialAgents() {
 
     Model* model = modules_[module_name]->ConstructInstance(ctx_);
     model->SetModelImpl(module_name);
-    model->InitFrom(qe);
+    model->InfileToDb(qe, di);
 
     CLOG(LEV_DEBUG3) << "Module '" << model->name()
                      << "' has had its module members initialized:";
     CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
     CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl();
     CLOG(LEV_DEBUG3) << " * ID: " << model->id();
-
-    // register module
-    ctx_->AddPrototype(model->name(), model);
-  }
-
-  int num_agents = xqe.NElementsMatchingQuery("/*/agent");
-  std::map<std::string, Model*> agents;  // map<name, agent>
-  std::map<std::string, std::string> parents;  // map<agent, parent>
-  for (int i = 0; i < num_agents; i++) {
-    QueryEngine* qe = xqe.QueryElement("/*/agent", i);
-    std::string name = qe->GetElementContent("name");
-    std::string proto = qe->GetElementContent("prototype");
-    std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
-    agents[name] = ctx_->CreateModel<Model>(proto);
-    parents[name] = parent;
-  }
-
-  std::map<std::string, Model*>::iterator it;
-  for (it = agents.begin(); it != agents.end(); ++it) {
-    std::string name = it->first;
-    Model* agent = it->second;
-    if (parents[name] == "") {
-      agent->Build();
-    } else {
-      agent->Build(agents[parents[name]]);
-      agents[parents[name]]->BuildNotify(agent);
-    }
   }
 }
+
+//void XMLFlatLoader::BuildInitialAgents() {
+//  int num_agents = xqe.NElementsMatchingQuery("/*/agent");
+//  std::map<std::string, Model*> agents;  // map<name, agent>
+//  std::map<std::string, std::string> parents;  // map<agent, parent>
+//  for (int i = 0; i < num_agents; i++) {
+//    QueryEngine* qe = xqe.QueryElement("/*/agent", i);
+//    std::string name = qe->GetElementContent("name");
+//    std::string proto = qe->GetElementContent("prototype");
+//    std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
+//    agents[name] = ctx_->CreateModel<Model>(proto);
+//    parents[name] = parent;
+//  }
+//
+//  std::map<std::string, Model*>::iterator it;
+//  for (it = agents.begin(); it != agents.end(); ++it) {
+//    std::string name = it->first;
+//    Model* agent = it->second;
+//    if (parents[name] == "") {
+//      agent->Build();
+//    } else {
+//      agent->Build(agents[parents[name]]);
+//      agents[parents[name]]->BuildNotify(agent);
+//    }
+//  }
+//}
 
 }  // namespace cyclus

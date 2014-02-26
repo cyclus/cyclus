@@ -73,6 +73,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/datum.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/db_init.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/enrichment.cc"
@@ -143,6 +144,7 @@ INSTALL(FILES
   cyc_std.h
   cyclus.h
   datum.h
+  db_init.h
   decayer.h
   dynamic_module.h
   enrichment.h
@@ -159,6 +161,7 @@ INSTALL(FILES
   generic_resource.h
   greedy_solver.h
   hdf5_back.h
+  query_backend.h
   inst_model.h
   intrusive_base.h
   l_matrix.h

@@ -12,6 +12,8 @@
 #include "resource.h"
 #include "query_engine.h"
 #include "exchange_context.h"
+#include "query_backend.h"
+#include "db_init.h"
 
 #define SHOW(X) \
   std::cout << __FILE__ << ":" << __LINE__ << ": "#X" = " << X << "\n"
@@ -72,8 +74,8 @@ class Model {
   /// @endcode
   virtual void InitFrom(QueryEngine* qe);
 
-  //virtual void InitFrom(InitBackend* b) {};
-  //virtual void InfileToDb(QueryEngine* qe, DbInit* di) {};
+  virtual void InitFrom(QueryBackend* b) {};
+  virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
 
   /// Constructor for the Model Class
   ///
