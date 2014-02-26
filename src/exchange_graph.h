@@ -60,12 +60,15 @@ inline bool operator==(const Arc& l, const Arc& r) {
 /// given translated Bid or Request. Specifically, ExchangeNodes have a notion
 /// of unit capacities that the given Bid or Request contribute to the overall
 /// capacity of ExchangeNodeGroup. ExchangeNodes also have a notion of quantity,
-/// i.e., the maximum amount of a resource that can be attributed to it.
+/// i.e., the maximum amount of a resource that can be attributed to
+/// it. Finally, nodes can be exclusive, that is to say that they represent a
+/// request or bid that must be exclusively satisfied (it can not be split).
 struct ExchangeNode {
  public:
   typedef boost::shared_ptr<ExchangeNode> Ptr;
   
-  ExchangeNode(double max_qty = std::numeric_limits<double>::max());
+  ExchangeNode(double max_qty = std::numeric_limits<double>::max().
+               exlusive = false);
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
@@ -80,6 +83,9 @@ struct ExchangeNode {
 
   /// @brief the average preference this node has across its arcs
   double avg_pref;
+  
+  /// @brief whether this node represents an exclusive request or offer
+  bool exclusive;
   
   /// @brief the maximum amount of a resource that can be associated with this
   /// node
