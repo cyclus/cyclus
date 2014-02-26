@@ -52,6 +52,7 @@ std::string XMLFlatLoader::master_schema() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFlatLoader::LoadInitialAgents() {
+  LoadDynamicModules();
   XMLQueryEngine xqe(*parser_);
   DbInit di;
 

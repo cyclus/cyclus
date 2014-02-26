@@ -59,16 +59,19 @@ class XMLFileLoader {
   /// or a recipeBook catalog.
   void LoadRecipes();
 
+ protected:
+  virtual std::string master_schema();
+
   /// Processes commodity orders, such that any without a defined order (i.e.,
   /// are nonpositive), are given an order value greater the last known
   /// commodity
   void ProcessCommodities(std::map<std::string, double>* commodity_order);
 
- protected:
-  virtual std::string master_schema();
-
   /// Creates all initial agent instances from the input file.
   virtual void LoadInitialAgents();
+
+  /// Method to load all dyamic modules
+  void LoadDynamicModules();
 
   Context* ctx_;
 
@@ -85,14 +88,12 @@ class XMLFileLoader {
   /// registered with this map when loaded.
   std::map< std::string, DynamicModule*> modules_;
 
-  /// Method to load all dyamic modules
-  void LoadDynamicModules();
-
   /// loads a specific recipe
   void LoadRecipe(QueryEngine* qe);
 
   /// the input file name
   std::string file_;
+
 };
 } // namespace cyclus
 

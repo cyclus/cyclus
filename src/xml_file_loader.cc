@@ -146,7 +146,6 @@ std::string XMLFileLoader::master_schema() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadSim() {
-    LoadDynamicModules();
     std::stringstream ss(master_schema());
     parser_->Validate(ss);
     LoadControlParams();
@@ -239,6 +238,7 @@ void XMLFileLoader::LoadRecipes() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadInitialAgents() {
+  LoadDynamicModules();
   std::set<std::string> module_types;
   module_types.insert("Region");
   module_types.insert("Inst");

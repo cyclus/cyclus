@@ -227,6 +227,9 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  rec.close();
+  return 0;
+
   // Run the simulation
   ti.RunSim();
 
