@@ -76,6 +76,9 @@ class Model {
 
   virtual void InitFrom(QueryBackend* b) {};
   virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
+  typedef std::map<std::string, std::vector<Resource::Ptr> > Inventory;
+  virtual Inventory GetInventories() {};
+  virtual void SetInventories(const Inventory& inv) {};
 
   /// Constructor for the Model Class
   ///

@@ -24,15 +24,6 @@ using namespace cyclus;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  SqliteBack* bk = new SqliteBack("cyclus.sqlite");
-  QueryResult q = bk->Query("InputFiles", NULL);
-  for (int i = 0; i < q.rows[0].size(); i++) {
-    std::cout << q.fields[i] << "(" << q.types[i] << "):\n";
-    std::cout << q.rows[0][i].cast<std::string>();
-  }
-  return 0;
-  
-
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
   vmessage +=
@@ -199,21 +190,6 @@ int main(int argc, char* argv[]) {
   // tell pyne about the path to nuc data
   Env::SetNucDataPath();
 
-  // read input file and setup simulation
-  std::string inputFile = vm["input-file"].as<std::string>();
-  XMLFileLoader* loader;
-  try {
-    if (flat_schema) {
-      loader = new XMLFlatLoader(ctx, schema_path, inputFile);
-    } else {
-      loader = new XMLFileLoader(ctx, schema_path, inputFile);
-    }
-    loader->LoadSim();
-  } catch (Error e) {
-    CLOG(LEV_ERROR) << e.what();
-    return 1;
-  }
-
   // Create the output file
   std::string output_path = "cyclus.sqlite";
   try {
@@ -235,6 +211,21 @@ int main(int argc, char* argv[]) {
     back = new SqliteBack(output_path);
   }
   rec.RegisterBackend(back);
+
+  // read input file and setup simulation
+  std::string inputFile = vm["input-file"].as<std::string>();
+  XMLFileLoader* loader;
+  try {
+    if (flat_schema) {
+      loader = new XMLFlatLoader(ctx, schema_path, inputFile);
+    } else {
+      loader = new XMLFileLoader(ctx, schema_path, inputFile);
+    }
+    loader->LoadSim();
+  } catch (Error e) {
+    CLOG(LEV_ERROR) << e.what();
+    return 1;
+  }
 
   // Run the simulation
   ti.RunSim();

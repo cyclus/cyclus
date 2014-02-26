@@ -87,6 +87,7 @@ class Recorder {
   void NotifyBackends();
   void AddDatum(Datum* d);
 
+  bool closed_;
   DatumList data_;
   int index_;
   std::list<RecBackend*> backs_;

@@ -62,6 +62,8 @@ class InstModel : public Model, public TimeListener {
      perform all tasks required when an inst enters the simulation
    */
   virtual void Build(Model* parent);
+
+  virtual void DecomNotify(Model* m);
   /* ------------------- */
  
   /* --------------------

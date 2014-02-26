@@ -104,7 +104,7 @@ void Timer::SchedBuild(Model* parent, std::string proto_name, int t) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SchedDecom(Model* m, int t) {
-  if (t <= time_) {
+  if (t < time_) {
     throw ValueError("Cannot schedule decommission for t < [current-time]");
   }
   decom_queue_[t].push_back(m);

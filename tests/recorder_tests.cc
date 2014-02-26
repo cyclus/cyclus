@@ -129,12 +129,11 @@ TEST(RecorderTest, Datum_record) {
   m.set_dump_count(1);
   m.RegisterBackend(&back);
 
-  Datum* d = m.NewDatum("DumbTitle");
-  d->AddVal("animal", std::string("monkey"));
-
   EXPECT_EQ(back.flush_count, 0);
 
-  d->Record();
+  Datum* d = m.NewDatum("DumbTitle");
+  d->AddVal("animal", std::string("monkey"))
+  ->Record();
 
   EXPECT_EQ(back.flush_count, 1);
 }

@@ -69,6 +69,7 @@ void InstModel::Build(Model* parent) {
   context()->RegisterTimeListener(this);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::Tock(int time) {
   std::vector<Model*> to_decomm;
   for (int i = 0; i < children().size(); i++) {
@@ -84,9 +85,12 @@ void InstModel::Tock(int time) {
   while (!to_decomm.empty()) {
     Model* child = to_decomm.back();
     to_decomm.pop_back();
-    RegisterCloneAsDecommissioned(child);
-    child->Decommission();
+    context()->SchedDecom(child);
   }
+}
+
+void InstModel::DecomNotify(Model* m) {
+    RegisterCloneAsDecommissioned(m);
 }
 
 /* --------------------

@@ -13,7 +13,7 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Recorder::Recorder() : index_(0) {
+Recorder::Recorder() : index_(0), closed_(false) {
   uuid_ = boost::uuids::random_generator()();
   set_dump_count(kDefaultDumpCount);
 }
@@ -52,19 +52,23 @@ void Recorder::set_dump_count(unsigned int count) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Datum* Recorder::NewDatum(std::string title) {
+  if (closed_) {
+    throw StateError("Cannot create new datum from a closed Recorder");
+  }
+  
   Datum* d = data_[index_];
   d->title_ = title;
   d->vals_.resize(1);
+
   index_++;
+  if (index_ >= data_.size()) {
+    NotifyBackends();
+  }
   return d;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Recorder::AddDatum(Datum* d) {
-  if (index_ >= data_.size()) {
-    NotifyBackends();
-  }
-}
+void Recorder::AddDatum(Datum* d) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::NotifyBackends() {
@@ -82,6 +86,11 @@ void Recorder::RegisterBackend(RecBackend* b) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::close() {
+  if (closed_) {
+    return;
+  }
+  closed_ = true;
+
   for (int i = index_; i < data_.size(); ++i) {
     delete data_[i];
   }
