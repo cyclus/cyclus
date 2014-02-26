@@ -12,47 +12,7 @@
 namespace cyclus {
 
 class ExchangeNodeGroup;
-class ExchangeNode;
-
-/// @brief by convention, arc.first == request node (unode), arc.second == bid
-/// node (vnode)
-struct Arc {
-  boost::shared_ptr<ExchangeNode> first;
-  boost::shared_ptr<ExchangeNode> second;
-  bool exclusive;
-  double excl_val;
-  
-  Arc(boost::shared_ptr<ExchangeNode> first,
-      boost::shared_ptr<ExchangeNode> second,
-      bool excl_flag = false,
-      double excl_val = 0.0)
-   : first(first),
-     second(second),
-     exclusive(excl_flag),
-     excl_val(excl_val) {};
-
-  Arc(const Arc& other)
-   : first(other.first),
-     second(other.second),
-     exclusive(other.exclusive),
-     excl_val(other.excl_val) {};
-
-  inline Arc& operator=(const Arc& other) {
-    first = other.first;
-    second = other.second;
-    exclusive = other.exclusive;
-    excl_val = other.excl_val;
-    return *this;
-  }
-};
-
-inline bool operator<(const Arc& l, const Arc& r) {
-  return l.first < r.first || (!(r.first < l.first) && l.second < r.second);
-}
-
-inline bool operator==(const Arc& l, const Arc& r) {
-  return l.first == r.first && l.second == r.second;
-}
+class Arc;
 
 /// @class ExchangeNode
 ///
@@ -67,8 +27,8 @@ struct ExchangeNode {
  public:
   typedef boost::shared_ptr<ExchangeNode> Ptr;
   
-  ExchangeNode(double max_qty = std::numeric_limits<double>::max().
-               exlusive = false);
+  ExchangeNode(double max_qty = std::numeric_limits<double>::max(),
+               bool exclusive = false);
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
@@ -76,10 +36,10 @@ struct ExchangeNode {
   /// @brief unit values associated with this ExchangeNode corresponding to
   /// capacties of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
-  std::map<Arc, std::vector<double> > unit_capacities;
+  std::map<Arc*, std::vector<double> > unit_capacities;
 
   /// @brief preference values for arcs
-  std::map<Arc, double> prefs;
+  std::map<Arc*, double> prefs;
 
   /// @brief the average preference this node has across its arcs
   double avg_pref;
@@ -97,6 +57,48 @@ struct ExchangeNode {
 
   /// @brief the commodity associated with this exchange node
   std::string commod;
+};
+
+/// @brief by convention, arc.first == request node (unode), arc.second == bid
+/// node (vnode)
+struct Arc {
+  boost::shared_ptr<ExchangeNode> first;
+  boost::shared_ptr<ExchangeNode> second;
+  
+  Arc(boost::shared_ptr<ExchangeNode> first,
+      boost::shared_ptr<ExchangeNode> second)
+   : first(first),
+     second(second) {};
+
+  Arc(const Arc& other)
+   : first(other.first),
+     second(other.second) {};
+
+  inline bool operator <(const Arc& rhs) {
+    return first < rhs.first || (!(rhs.first < first) && second < rhs.second);
+  }
+
+  inline bool operator==(const Arc& rhs) {
+    return first == rhs.first && second == rhs.second;
+  };
+  
+  inline Arc& operator=(const Arc& other) {
+    first = other.first;
+    second = other.second;
+    return *this;
+  };
+
+  inline bool exclusive() {return first->exclusive || second->exclusive;}
+  inline bool excl_val() {
+    if (exclusive()) {
+      if (first->exclusive && second->exclusive) {
+        return (first->max_qty == second->max_qty) ? first->max_qty : 0;
+      } else {
+        return first->exclusive ? first->max_qty : second->max_qty;
+      }
+    }
+    return 0;
+  };
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
