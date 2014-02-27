@@ -86,9 +86,8 @@ Composition::Ptr Context::GetRecipe(std::string name) {
   return recipes_[name];
 }
 
-void Context::InitTime(int duration, int decay, int m0, int y0,
-                       std::string handle) {
-  ti_->Initialize(this, duration, m0, y0, decay, handle);
+void Context::InitTime(int duration, int decay, int m0, int y0) {
+  ti_->Initialize(this, duration, m0, y0, decay);
 }
 
 int Context::time() {

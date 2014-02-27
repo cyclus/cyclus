@@ -120,8 +120,7 @@ class Context {
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.
-  void InitTime(int duration, int decay, int m0 = 1, int y0 = 2010,
-                std::string handle = "");
+  void InitTime(int duration, int decay, int m0 = 1, int y0 = 2010);
 
   /// Returns the current simulation timestep.
   int time();

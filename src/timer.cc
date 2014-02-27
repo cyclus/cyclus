@@ -128,8 +128,7 @@ void Timer::Reset() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::Initialize(Context* ctx, int dur, int m0, int y0,
-                       int decay, std::string handle) {
+void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int decay) {
   ctx_ = ctx;
 
   if (m0 < 1 || m0 > 12) {

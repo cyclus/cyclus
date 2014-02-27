@@ -102,6 +102,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/resource.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/sim_init.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.cc"
@@ -183,6 +184,7 @@ INSTALL(FILES
   resource.h
   resource_buff.h
   resource_exchange.h
+  sim_init.h
   solver.h
   solver_interface.h
   solver_factory.h

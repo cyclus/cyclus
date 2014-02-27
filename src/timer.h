@@ -35,7 +35,7 @@ class Timer {
   /// decay is off (default = 0)
   /// @param handle a user specified name for the simulation run
   void Initialize(Context* ctx, int dur = 1, int m0 = 1, int y0 = 2010,
-                  int decay = 0, std::string handle = "");
+                  int decay = 0);
 
   /// resets all data (registered listeners, etc.) to empty or initial state
   void Reset();

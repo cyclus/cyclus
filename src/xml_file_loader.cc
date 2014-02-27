@@ -352,8 +352,6 @@ void XMLFileLoader::LoadControlParams() {
   std::string decay_str = qe->GetElementContent("decay");
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
-  ctx_->InitTime(dur, dec, m0, y0, handle);
-
   ctx_->NewDatum("Info")
   ->AddVal("Handle", handle)
   ->AddVal("InitialYear", y0)

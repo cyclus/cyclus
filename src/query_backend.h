@@ -28,6 +28,26 @@ struct QueryResult {
   std::vector<std::string> fields;
   std::vector<std::string> types;
   std::vector<QueryRow> rows;
+
+  template <class T>
+  T GetVal(int row, std::string field) {
+    if (row > rows.size()) {
+      throw KeyError("index larger than number of query rows");
+    }
+
+    int field_idx = -1;
+    for (int i = 0; i < fields.size(); ++i) {
+      if (fields[i] == field) {
+        field_idx = i;
+        break;
+      }
+    }
+    if (field_idx == -1) {
+      throw KeyError("query result has no such field " + field);
+    }
+
+    return rows[row][field_idx].cast<T>();
+  };
 };
 
 class QueryBackend : public RecBackend {
