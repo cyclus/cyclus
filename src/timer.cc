@@ -129,11 +129,11 @@ Timer::Timer() :
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::LogTimeData(Context* ctx, std::string handle) {
-  ctx->NewDatum("SimulationTimeInfo")
-  ->AddVal("SimHandle", handle)
+  ctx->NewDatum("Info")
+  ->AddVal("Handle", handle)
   ->AddVal("InitialYear", year0_)
   ->AddVal("InitialMonth", month0_)
-  ->AddVal("SimulationStart", start_time_)
+  ->AddVal("Start", start_time_)
   ->AddVal("Duration", dur_)
   ->AddVal("DecayInterval", decay_interval_)
   ->Record();
