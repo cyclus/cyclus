@@ -23,7 +23,7 @@ TEST(FullSimTests, LoneTrader) {
   int nsteps = 5;
   
   tc.timer()->Initialize(tc.get(), nsteps);
-  tc.timer()->RunSim(tc.get());
+  tc.timer()->RunSim();
 
   EXPECT_EQ(nsteps, trader->requests);
   EXPECT_EQ(nsteps, trader->bids);
@@ -50,7 +50,7 @@ TEST(FullSimTests, NullTrade) {
   int nsteps = 2;
   
   tc.timer()->Initialize(tc.get(), nsteps);
-  tc.timer()->RunSim(tc.get());
+  tc.timer()->RunSim();
 
   EXPECT_EQ(nsteps, supplier->requests);
   EXPECT_EQ(nsteps, supplier->bids);
@@ -86,7 +86,7 @@ TEST(FullSimTests, Trade) {
   int nsteps = 3;
   
   tc.timer()->Initialize(tc.get(), nsteps);
-  tc.timer()->RunSim(tc.get());
+  tc.timer()->RunSim();
 
   EXPECT_EQ(nsteps, supplier->requests);
   EXPECT_EQ(nsteps, supplier->bids);

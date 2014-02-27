@@ -6,57 +6,50 @@
 #include <iostream>
 
 #include "error.h"
-#include "exchange_manager.h"
-#include "generic_resource.h"
 #include "logger.h"
-#include "material.h"
 #include "model.h"
 
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::RunSim(Context* ctx) {
+void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
                   << 0 << " to end=" << dur_;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
-  ExchangeManager<Material> matl_manager(ctx);
-  ExchangeManager<GenericResource> genrsrc_manager(ctx);
+  ExchangeManager<Material> matl_manager(ctx_);
+  ExchangeManager<GenericResource> genrsrc_manager(ctx_);
   while (time_ < dur_) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
     if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
       Material::DecayAll(time_);
     }
 
-    // build queued agents
-    std::vector<std::pair<std::string, Model*> > build_list = build_queue_[time_];
-    for (int i = 0; i < build_list.size(); ++i) {
-      Model* m = ctx->CreateModel<Model>(build_list[i].first);
-      Model* parent = build_list[i].second;
-      m->Build(parent);
-      parent->BuildNotify(m);
-    }
-
     // run through phases
-    SendTick();
-    matl_manager.Execute();
-    genrsrc_manager.Execute();
-    SendTock();
-
-    // decommission queued agents
-    std::vector<Model*> decom_list = decom_queue_[time_];
-    for (int i = 0; i < decom_list.size(); ++i) {
-      Model* m = decom_list[i];
-      m->parent()->DecomNotify(m);
-      m->Decommission();
-    }
+    DoBuild();
+    DoTick();
+    DoResEx(&matl_manager, &genrsrc_manager);
+    DoTock();
+    DoDecom();
 
     time_++;
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::SendTick() {
+void Timer::DoBuild() {
+  // build queued agents
+  std::vector<std::pair<std::string, Model*> > build_list = build_queue_[time_];
+  for (int i = 0; i < build_list.size(); ++i) {
+    Model* m = ctx_->CreateModel<Model>(build_list[i].first);
+    Model* parent = build_list[i].second;
+    m->Build(parent);
+    parent->BuildNotify(m);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::DoTick() {
   for (std::set<TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
@@ -65,11 +58,29 @@ void Timer::SendTick() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::SendTock() {
+void Timer::DoResEx(ExchangeManager<Material>* matmgr,
+                    ExchangeManager<GenericResource>* genmgr) {
+  matmgr->Execute();
+  genmgr->Execute();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::DoTock() {
   for (std::set<TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
     (*agent)->Tock(time_);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::DoDecom() {
+  // decommission queued agents
+  std::vector<Model*> decom_list = decom_queue_[time_];
+  for (int i = 0; i < decom_list.size(); ++i) {
+    Model* m = decom_list[i];
+    m->parent()->DecomNotify(m);
+    m->Decommission();
   }
 }
 
@@ -119,6 +130,8 @@ void Timer::Reset() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::Initialize(Context* ctx, int dur, int m0, int y0,
                        int decay, std::string handle) {
+  ctx_ = ctx;
+
   if (m0 < 1 || m0 > 12) {
     throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
   }

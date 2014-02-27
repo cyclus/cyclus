@@ -6,6 +6,9 @@
 #include <vector>
 
 #include "context.h"
+#include "exchange_manager.h"
+#include "generic_resource.h"
+#include "material.h"
 #include "query_engine.h"
 #include "time_listener.h"
 
@@ -38,7 +41,7 @@ class Timer {
   void Reset();
 
   /// Runs the simulation.
-  void RunSim(Context* ctx);
+  void RunSim();
 
   /// Registers an agent to receive tick/tock notifications every timestep.
   /// Agents should register from their Deploy method.
@@ -72,13 +75,25 @@ class Timer {
   /// the simulation start time and the simulation duration
   void LogTimeData(Context* ctx, std::string handle);
 
+  /// builds all agents queued for the current timestep.
+  void DoBuild();
+
   /// sends the tick signal to all of the models receiving time
   /// notifications.
-  void SendTick();
+  void DoTick();
+
+  /// Runs the resource exchange process for all traders.
+  void DoResEx(ExchangeManager<Material>* matmgr,
+               ExchangeManager<GenericResource>* genmgr);
 
   /// sends the tock signal to all of the models receiving time
   /// notifications.
-  void SendTock();
+  void DoTock();
+
+  /// decommissions all agents queued for the current timestep.
+  void DoDecom();
+
+  Context* ctx_;
 
   /// The current time, measured in months from when the simulation
   /// started.
