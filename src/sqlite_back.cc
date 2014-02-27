@@ -63,7 +63,7 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
   std::stringstream sql;
   sql << "SELECT * FROM " << table;
   if (conds != NULL) {
-    sql << "WHERE ";
+    sql << " WHERE ";
     for (int i = 0; i < conds->size(); ++i) {
       if (i > 0) {
         sql << " AND ";
@@ -76,14 +76,8 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
 
   std::vector<StrList> rows = db_.Query(sql.str());
   for (int i = 0; i < rows.size(); ++i) {
-    std::cout << "n qfields = " << rows[0].size() << "\n";
-    std::cout << "n fields = " << q.fields.size() << "\n";
-    std::cout << "n types = " << q.types.size() << "\n";
     QueryRow r;
     for (int j = 0; j < q.fields.size(); ++j) {
-      std::cout << "field='" << q.fields[j] << "'\n";
-      std::cout << "type='" << q.types[j] << "'\n";
-      std::cout << "rowval='" << rows[i][j].substr(0, 20) << "'\n";
       r.push_back(StringAsVal(rows[i][j], q.types[j]));
     }
     q.rows.push_back(r);

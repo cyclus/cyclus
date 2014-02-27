@@ -3,6 +3,9 @@
 
 #include <boost/lexical_cast.hpp>
 
+#define SHOW(X) \
+  std::cout << __FILE__ << ":" << __LINE__ << ": "#X" = " << X << "\n"
+
 namespace cyclus {
 
 SimInit::SimInit() {
@@ -46,13 +49,19 @@ SimEngine* SimInit::InitBase() {
 
 void SimInit::LoadControlParams() {
   std::vector<Cond> conds;
-  conds.push_back(Cond("simid", "==", simid_));
-  QueryResult qr = b_->Query("info", &conds);
+  conds.push_back(Cond("SimId", "==", simid_));
+  QueryResult qr = b_->Query("Info", &conds);
 
   int dur = qr.GetVal<int>(0, "Duration");
   int dec = qr.GetVal<int>(0, "DecayInterval");
   int y0 = qr.GetVal<int>(0, "InitialYear");
   int m0 = qr.GetVal<int>(0, "InitialMonth");
+
+  SHOW(dur);
+  SHOW(dec);
+  SHOW(y0);
+  SHOW(m0);
+  SHOW(se_->rec->sim_id());
 
   se_->ctx->InitTime(dur, dec, m0, y0);
 }

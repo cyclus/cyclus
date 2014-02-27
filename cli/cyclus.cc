@@ -5,7 +5,6 @@
 #include <boost/program_options.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 #include "csv_back.h"
@@ -14,6 +13,10 @@
 #include "sqlite_back.h"
 #include "xml_file_loader.h"
 #include "xml_flat_loader.h"
+
+#include "sim_init.h"
+#include "query_backend.h"
+#include <boost/uuid/uuid_generators.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -24,6 +27,15 @@ using namespace cyclus;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+  SimInit si;
+  QueryBackend* qb = new SqliteBack("cyclus.sqlite");
+  QueryResult qr = qb->Query("Info", NULL);
+  std::string s = qr.GetVal<std::string>(0, "SimId");
+  boost::uuids::string_generator gen;
+  boost::uuids::uuid simid = gen(s);
+  si.Init(qb, simid);
+  return 0;
+
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
   vmessage +=
@@ -228,7 +240,6 @@ int main(int argc, char* argv[]) {
   }
 
   rec.close();
-  delete ctx;
   return 0;
 
   // Run the simulation
