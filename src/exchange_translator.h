@@ -70,19 +70,20 @@ class ExchangeTranslator {
         typename Request<T>::Ptr req = bid->request();
         double pref =
             ex_ctx_->trader_prefs.at(req->requester())[req][bid];
-        a.first->prefs[a] = pref; // request node is a.first
-        int n_prefs = a.first->prefs.size();
-        a.first->avg_pref = (
+        a.unode()->prefs[a] = pref; // request node is a.unode()
+        int n_prefs = a.unode()->prefs.size();
+        a.unode()->avg_pref = (
             (n_prefs == 0) ?
             pref :
-            ((n_prefs - 1) * a.first->avg_pref + pref)/ n_prefs);
+            ((n_prefs - 1) * a.unode()->avg_pref + pref)/ n_prefs);
         // @MJGFlag this^ would be easier if ExchangeNode was a class,
         // need to make an issue
         
         CLOG(LEV_DEBUG5) << "Updating preference for one of "
                          << req->requester()->manager()->prototype() << "'s trade nodes:";
-        CLOG(LEV_DEBUG5) << "   preference: " << a.first->prefs[a];
-        CLOG(LEV_DEBUG5) << " average pref: " << a.first->avg_pref;
+                         << "'s trade nodes:";
+        CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
+        CLOG(LEV_DEBUG5) << " average pref: " << a.unode()->avg_pref;
             
         graph->AddArc(a);
       }
@@ -222,8 +223,8 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
 template <class T>
 Trade<T> BackTranslateMatch(const ExchangeTranslationContext<T>& translation_ctx,
                             const Match& match) {
-  ExchangeNode::Ptr req_node = match.first.first;
-  ExchangeNode::Ptr bid_node = match.first.second;
+  ExchangeNode::Ptr req_node = match.first.unode();
+  ExchangeNode::Ptr bid_node = match.first.vnode();
     
   Trade<T> t;
   t.request = translation_ctx.node_to_request.at(req_node);

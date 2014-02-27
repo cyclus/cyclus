@@ -61,53 +61,42 @@ struct ExchangeNode {
 
 };
 
-/// @brief by convention, arc.first == request node (unode), arc.second == bid
-/// node (vnode)
-struct Arc {
-  boost::shared_ptr<ExchangeNode> first;
-  boost::shared_ptr<ExchangeNode> second;
-  
-  Arc(boost::shared_ptr<ExchangeNode> first,
-      boost::shared_ptr<ExchangeNode> second)
-   : first(first),
-     second(second) {};
+/// @brief by convention, arc.unode() == request node, arc.vnode() == bid
+/// node
+class Arc {
+ public:
+  Arc(boost::shared_ptr<ExchangeNode> unode,
+      boost::shared_ptr<ExchangeNode> vnode);
 
-  Arc(const Arc& other)
-   : first(other.first),
-     second(other.second) {};
+  Arc(const Arc& other);
 
-  inline bool operator <(const Arc& rhs) const {
-    return first < rhs.first || (!(rhs.first < first) && second < rhs.second);
-  }
-
-  inline bool operator==(const Arc& rhs) const {
-    return first == rhs.first && second == rhs.second;
-  };
-  
   inline Arc& operator=(const Arc& other) {
-    first = other.first;
-    second = other.second;
+    unode_ = other.unode();
+    vnode_ = other.vnode();
+    exclusive_ = other.exclusive();
+    excl_val_ = other.excl_val();
     return *this;
   };
 
-  inline bool exclusive() const {
-    return first->exclusive || second->exclusive;
+  inline bool operator <(const Arc& rhs) const {
+    return unode_ < rhs.unode() ||
+        (!(rhs.unode() < unode_) && vnode_ < rhs.vnode());
   }
 
-  inline double excl_val() const {
-    if (exclusive()) {
-      double fqty = first->max_qty;
-      double sqty = second->max_qty;
-      if (first->exclusive && second->exclusive) {
-        return fqty == sqty ? fqty : 0;
-      } else if (first->exclusive) {
-        return sqty >= fqty ? fqty : 0;
-      } else {
-        return fqty >= sqty ? sqty : 0;
-      }
-    }
-    return 0;
+  inline bool operator==(const Arc& rhs) const {
+    return unode_ == rhs.unode() && vnode_ == rhs.vnode();
   };
+    
+  inline boost::shared_ptr<ExchangeNode> unode() const { return unode_; }
+  inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_; }  
+  inline bool exclusive() const { return exclusive_; }
+  inline double excl_val() const { return excl_val_; }
+
+ private:
+  boost::shared_ptr<ExchangeNode> unode_;
+  boost::shared_ptr<ExchangeNode> vnode_;
+  bool exclusive_;
+  double excl_val_;
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator

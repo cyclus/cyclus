@@ -11,7 +11,7 @@ namespace cyclus {
 /// requester's (unode's) preference, in decensing order (i.e., most preferred
 /// Arc first)
 inline bool ReqPrefComp(const Arc& l, const Arc& r) {
-  return l.first->prefs[l] > r.first->prefs[r];
+  return l.unode()->prefs[l] > r.unode()->prefs[r];
 }
   
 class ExchangeGraph;

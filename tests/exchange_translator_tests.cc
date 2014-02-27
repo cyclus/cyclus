@@ -214,17 +214,17 @@ TEST(ExXlateTests, XlateArc) {
 
   Arc a = TranslateArc(xlator.translation_ctx(), bid);
 
-  EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.second);
-  EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.first);
+  EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
+  EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.unode());
   EXPECT_FALSE(a.exclusive());
   
   double barr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
-  TestVecEq(bexp, a.second->unit_capacities[a]);
+  TestVecEq(bexp, a.vnode()->unit_capacities[a]);
       
   double rarr[] = {(c1->convert(mat) / qty)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
-  TestVecEq(rexp, a.first->unit_capacities[a]);
+  TestVecEq(rexp, a.unode()->unit_capacities[a]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -329,7 +329,7 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
-  EXPECT_EQ(pref, a.first->prefs[a]);
+  EXPECT_EQ(pref, a.unode()->prefs[a]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
