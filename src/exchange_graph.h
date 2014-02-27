@@ -28,7 +28,8 @@ struct ExchangeNode {
   typedef boost::shared_ptr<ExchangeNode> Ptr;
   
   ExchangeNode(double max_qty = std::numeric_limits<double>::max(),
-               bool exclusive = false);
+               bool exclusive = false,
+               std::string commod = "");
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
@@ -36,16 +37,19 @@ struct ExchangeNode {
   /// @brief unit values associated with this ExchangeNode corresponding to
   /// capacties of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
-  std::map<Arc*, std::vector<double> > unit_capacities;
+  std::map<Arc, std::vector<double> > unit_capacities;
 
   /// @brief preference values for arcs
-  std::map<Arc*, double> prefs;
+  std::map<Arc, double> prefs;
 
   /// @brief the average preference this node has across its arcs
   double avg_pref;
   
   /// @brief whether this node represents an exclusive request or offer
   bool exclusive;
+
+  /// @brief the commodity associated with this exchange node
+  std::string commod;
   
   /// @brief the maximum amount of a resource that can be associated with this
   /// node
@@ -55,8 +59,6 @@ struct ExchangeNode {
   /// node
   double qty;
 
-  /// @brief the commodity associated with this exchange node
-  std::string commod;
 };
 
 /// @brief by convention, arc.first == request node (unode), arc.second == bid
@@ -74,11 +76,11 @@ struct Arc {
    : first(other.first),
      second(other.second) {};
 
-  inline bool operator <(const Arc& rhs) {
+  inline bool operator <(const Arc& rhs) const {
     return first < rhs.first || (!(rhs.first < first) && second < rhs.second);
   }
 
-  inline bool operator==(const Arc& rhs) {
+  inline bool operator==(const Arc& rhs) const {
     return first == rhs.first && second == rhs.second;
   };
   
@@ -88,13 +90,20 @@ struct Arc {
     return *this;
   };
 
-  inline bool exclusive() {return first->exclusive || second->exclusive;}
-  inline bool excl_val() {
+  inline bool exclusive() const {
+    return first->exclusive || second->exclusive;
+  }
+
+  inline double excl_val() const {
     if (exclusive()) {
+      double fqty = first->max_qty;
+      double sqty = second->max_qty;
       if (first->exclusive && second->exclusive) {
-        return (first->max_qty == second->max_qty) ? first->max_qty : 0;
+        return fqty == sqty ? fqty : 0;
+      } else if (first->exclusive) {
+        return sqty >= fqty ? fqty : 0;
       } else {
-        return first->exclusive ? first->max_qty : second->max_qty;
+        return fqty >= sqty ? sqty : 0;
       }
     }
     return 0;

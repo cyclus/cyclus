@@ -9,12 +9,12 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ExchangeNode::ExchangeNode(double max_qty, bool exclusive = false)
+ExchangeNode::ExchangeNode(double max_qty, bool exclusive, std::string commod)
   : max_qty(max_qty),
     exclusive(exclusive),
+    commod(commod),
     qty(0),
     avg_pref(0),
-    commod(""),
     group(NULL) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -22,7 +22,8 @@ bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
   return (lhs.unit_capacities == rhs.unit_capacities &&
           lhs.max_qty == rhs.max_qty &&
           lhs.exclusive == rhs.exclusive &&
-          lhs.group == rhs.group);
+          lhs.group == rhs.group &&
+          lhs.commod == rhs.commod);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
