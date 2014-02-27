@@ -42,9 +42,9 @@ void Case1b::Test(std::string solver_type, ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case2::Construct(ExchangeGraph* g, bool exclusive_orders) {
-  ExchangeNode::Ptr u(new ExchangeNode());
+  ExchangeNode::Ptr u(new ExchangeNode(qty, exclusive_orders));
   ExchangeNode::Ptr v(new ExchangeNode());
-  Arc a(u, v, exclusive_orders, qty);
+  Arc a(u, v);
   
   u->unit_capacities[a].push_back(unit_cap_req);
   v->unit_capacities[a].push_back(unit_cap_sup);
@@ -178,11 +178,11 @@ void Case2h::Construct(ExchangeGraph* g, bool exclusive_orders) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case3::Construct(ExchangeGraph* g, bool exclusive_orders) {
-  ExchangeNode::Ptr u(new ExchangeNode());
+  ExchangeNode::Ptr u(new ExchangeNode(q, exclusive_orders));
   ExchangeNode::Ptr v(new ExchangeNode());
   ExchangeNode::Ptr w(new ExchangeNode());
-  Arc a1(u, v, exclusive_orders, q);
-  Arc a2(u, w, exclusive_orders, q);
+  Arc a1(u, v);
+  Arc a2(u, w);
 
   u->unit_capacities[a1].push_back(1);
   v->unit_capacities[a1].push_back(1);
@@ -331,12 +331,12 @@ void Case3f::Test(std::string solver_type, ExchangeGraph* g) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case4::Construct(ExchangeGraph* g, bool exclusive_orders) {
-  ExchangeNode::Ptr u(new ExchangeNode());
+  ExchangeNode::Ptr u(new ExchangeNode(q1, exclusive_orders));
   ExchangeNode::Ptr v1(new ExchangeNode());
-  ExchangeNode::Ptr w(new ExchangeNode());
+  ExchangeNode::Ptr w(new ExchangeNode(q2, exclusive_orders));
   ExchangeNode::Ptr v2(new ExchangeNode());
-  Arc a1(u, v1, exclusive_orders, q1);
-  Arc a2(w, v2, exclusive_orders, q2);
+  Arc a1(u, v1);
+  Arc a2(w, v2);
 
   u->unit_capacities[a1].push_back(1);
   v1->unit_capacities[a1].push_back(1);
@@ -453,12 +453,12 @@ void Case4e::Construct(ExchangeGraph* g, bool exclusive_orders) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case5::Construct(ExchangeGraph* g, bool exclusive_orders) {  
-  ExchangeNode::Ptr u1(new ExchangeNode());
-  ExchangeNode::Ptr u2(new ExchangeNode());
+  ExchangeNode::Ptr u1(new ExchangeNode(q, exclusive_orders));
+  ExchangeNode::Ptr u2(new ExchangeNode(q, exclusive_orders));
   ExchangeNode::Ptr v(new ExchangeNode());
   ExchangeNode::Ptr w(new ExchangeNode());
-  Arc a1(u1, v, exclusive_orders, q);
-  Arc a2(u2, w, exclusive_orders, q);
+  Arc a1(u1, v);
+  Arc a2(u2, w);
 
   u1->unit_capacities[a1].push_back(1);
   v->unit_capacities[a1].push_back(1);
@@ -565,18 +565,18 @@ void Case5e::Construct(ExchangeGraph* g, bool exclusive_orders) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case6::Construct(ExchangeGraph* g, bool exclusive_orders) {  
-  ExchangeNode::Ptr u1_1(new ExchangeNode());
-  ExchangeNode::Ptr u1_2(new ExchangeNode());
-  ExchangeNode::Ptr u2_1(new ExchangeNode());
-  ExchangeNode::Ptr u2_2(new ExchangeNode());
+  ExchangeNode::Ptr u1_1(new ExchangeNode(q1, exclusive_orders));
+  ExchangeNode::Ptr u1_2(new ExchangeNode(q1, exclusive_orders));
+  ExchangeNode::Ptr u2_1(new ExchangeNode(q2, exclusive_orders));
+  ExchangeNode::Ptr u2_2(new ExchangeNode(q2, exclusive_orders));
   ExchangeNode::Ptr v1_1(new ExchangeNode());
   ExchangeNode::Ptr v1_2(new ExchangeNode());
   ExchangeNode::Ptr v2_1(new ExchangeNode());
   ExchangeNode::Ptr v2_2(new ExchangeNode());
-  Arc a1(u1_1, v1_1, exclusive_orders, q1);
-  Arc a2(u1_2, v2_1, exclusive_orders, q1);
-  Arc a3(u2_1, v1_2, exclusive_orders, q2);
-  Arc a4(u2_2, v2_2, exclusive_orders, q2);
+  Arc a1(u1_1, v1_1);
+  Arc a2(u1_2, v2_1);
+  Arc a3(u2_1, v1_2);
+  Arc a4(u2_2, v2_2);
 
   u1_1->unit_capacities[a1].push_back(1);
   u1_2->unit_capacities[a2].push_back(1);
@@ -694,7 +694,7 @@ void Case7::Construct(ExchangeGraph* g, bool exclusive_orders) {
   flow = qty / N;
   
   // a single request for qty of a resource
-  ExchangeNode::Ptr u(new ExchangeNode());
+  ExchangeNode::Ptr u(new ExchangeNode(qty, exclusive_orders));
   RequestGroup::Ptr req(new RequestGroup(qty));
   req->AddCapacity(qty);
   req->AddExchangeNode(u);
@@ -706,7 +706,7 @@ void Case7::Construct(ExchangeGraph* g, bool exclusive_orders) {
   for (int i = 0; i < N; i++) {
     ExchangeNode::Ptr v(new ExchangeNode(qty / N)); 
     sup->AddExchangeNode(v);  
-    Arc a(u, v, exclusive_orders, qty);
+    Arc a(u, v);
     u->unit_capacities[a].push_back(1);
     v->unit_capacities[a].push_back(1);
     g->AddArc(a);
