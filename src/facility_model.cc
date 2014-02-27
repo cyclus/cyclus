@@ -65,9 +65,10 @@ void FacilityModel::InitFrom(FacilityModel* m) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void FacilityModel::Deploy(Model* parent) {
-  Model::Deploy(parent);
+void FacilityModel::Build(Model* parent) {
+  Model::Build(parent);
   context()->RegisterTrader(this);
+  context()->RegisterTimeListener(this);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -92,6 +93,7 @@ void FacilityModel::Decommission() {
   }
 
   context()->UnregisterTrader(this);
+  context()->UnregisterTimeListener(this);
   Model::Decommission();
 }
 
