@@ -15,42 +15,54 @@ namespace cyclus {
 
 class Context;
 
+struct SimEngine {
+  Context* ctx;
+  Recorder* rec;
+  Timer* ti;
+}
+
 /// a class that encapsulates the methods needed to load input to
 /// a cyclus simulation from xml
 class SimInit {
  public:
-  SimInit() {};
+  SimInit();
 
-  Init(InitBackend* b, int t) {
-    int num_agents = xqe.NElementsMatchingQuery("/*/agent");
-    std::map<std::string, Model*> agents;  // map<name, agent>
-    std::map<std::string, std::string> parents;  // map<agent, parent>
-    for (int i = 0; i < num_agents; i++) {
-      QueryEngine* qe = xqe.QueryElement("/*/agent", i);
-      std::string name = qe->GetElementContent("name");
-      std::string proto = qe->GetElementContent("prototype");
-      std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
-      agents[name] = ctx_->CreateModel<Model>(proto);
-      parents[name] = parent;
-    }
+  /// Initialize a simulation with data from b for the given simid.
+  SimEngine* Init(QueryBackend* b, boost::uuids::uuid simid) {
+    se_->rec = new Recorder(simid);
+    b_ = b;
+    simid_ = simid;
+    t_ = 0;
+    return InitBase();
+  };
 
-    std::map<std::string, Model*>::iterator it;
-    for (it = agents.begin(); it != agents.end(); ++it) {
-      std::string name = it->first;
-      Model* agent = it->second;
-      if (parents[name] == "") {
-        agent->Build();
-      } else {
-        agent->Build(agents[parents[name]]);
-        agents[parents[name]]->BuildNotify(agent);
-      }
-    }
+  /// Restarts a simulation from time t with data from b identified by simid.
+  /// The newly configured simulation will run with a new simulation id.
+  SimEngine* Restart(QueryBackend* b, boost::uuids::uuid simid, int t) {
+    se_->rec = new Recorder();
+    b_ = b;
+    simid_ = simid;
+    t_ = t;
+    return InitBase()
   };
 
  private:
-  InitBackend* back_;
+  SimEngine* InitBase();
+
+  void LoadControlParams();
+  void LoadRecipes();
+  void LoadSolverInfo();
+  void LoadPrototypes();
+  void LoadInitialAgents();
+  void LoadInventories();
+
+  SimEngine* se_;
+  boost::uuids::uuid simid_;
+  QueryBackend* q_;
+  int t_;
 };
 
 } // namespace cyclus
 
 #endif
+

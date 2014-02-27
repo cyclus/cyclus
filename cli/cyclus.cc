@@ -228,6 +228,7 @@ int main(int argc, char* argv[]) {
   }
 
   rec.close();
+  delete ctx;
   return 0;
 
   // Run the simulation

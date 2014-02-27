@@ -47,8 +47,13 @@ class Recorder {
 
  public:
 
-  /// create a new datum manager with default dump frequency.
+  /// create a new datum manager with default dump frequency and random
+  /// simulation id.
   Recorder();
+
+  /// create a new datum manager with default dump frequency and the specified
+  /// simulation id.
+  Recorder(boost::uuids::uuid simid);
 
   ~Recorder();
 
@@ -87,6 +92,7 @@ class Recorder {
   void NotifyBackends();
   void AddDatum(Datum* d);
 
+  Datum* blank_;
   bool closed_;
   DatumList data_;
   int index_;

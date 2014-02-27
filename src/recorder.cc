@@ -16,10 +16,18 @@ namespace cyclus {
 Recorder::Recorder() : index_(0), closed_(false) {
   uuid_ = boost::uuids::random_generator()();
   set_dump_count(kDefaultDumpCount);
+  blank_ = new Datum(this, "closed-recorder-datum");
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Recorder::Recorder(boost::uuids::uuid simid)
+    : index_(0), closed_(false), uuid_(simid) {
+  set_dump_count(kDefaultDumpCount);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Recorder::~Recorder() {
+  delete blank_;
   for (int i = 0; i < data_.size(); ++i) {
     delete data_[i];
   }
@@ -53,7 +61,7 @@ void Recorder::set_dump_count(unsigned int count) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Datum* Recorder::NewDatum(std::string title) {
   if (closed_) {
-    throw StateError("Cannot create new datum from a closed Recorder");
+    return blank_;
   }
   
   Datum* d = data_[index_];

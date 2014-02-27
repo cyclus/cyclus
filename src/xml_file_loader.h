@@ -59,6 +59,9 @@ class XMLFileLoader {
   /// or a recipeBook catalog.
   void LoadRecipes();
 
+  /// Creates all initial agent instances from the input file.
+  virtual void LoadInitialAgents();
+
  protected:
   virtual std::string master_schema();
 
@@ -66,9 +69,6 @@ class XMLFileLoader {
   /// are nonpositive), are given an order value greater the last known
   /// commodity
   void ProcessCommodities(std::map<std::string, double>* commodity_order);
-
-  /// Creates all initial agent instances from the input file.
-  virtual void LoadInitialAgents();
 
   /// Method to load all dyamic modules
   void LoadDynamicModules();

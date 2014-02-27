@@ -20,11 +20,12 @@ class XMLFlatLoader : public XMLFileLoader {
                 const std::string load_filename = "")
       : XMLFileLoader(ctx, schema_path, load_filename) {}
 
+  /// Creates all initial agent instances from the input file.
+  void LoadInitialAgents();
+
  protected:
   virtual std::string master_schema();
 
-  /// Creates all initial agent instances from the input file.
-  void LoadInitialAgents();
 };
 }  // namespace cyclus
 
