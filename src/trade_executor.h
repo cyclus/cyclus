@@ -82,7 +82,6 @@ class TradeExecutor {
             ->AddVal("ReceiverId", requester->id())
             ->AddVal("ResourceId", rsrc->id())
             ->AddVal("Commodity", trade.request->commodity())
-            ->AddVal("Price", trade.price)
             ->AddVal("Time", ctx->time())
             ->Record();
       }
