@@ -144,8 +144,10 @@ RequestGroup::Ptr TranslateRequestPortfolio(
   for (r_it = rp->requests().begin();
        r_it != rp->requests().end();
        ++r_it) {
-    ExchangeNode::Ptr n(new ExchangeNode());
-    n->commod = (*r_it)->commodity();
+    typename Request<T>::Ptr r = *r_it;
+    ExchangeNode::Ptr n(new ExchangeNode(r->target()->quantity(),
+                                         r->exclusive(),
+                                         r->commodity()));
     rs->AddExchangeNode(n);
     AddRequest(translation_ctx, *r_it, n);
   }
@@ -174,8 +176,10 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   for (b_it = bp->bids().begin();
        b_it != bp->bids().end();
        ++b_it) {
-    ExchangeNode::Ptr n(new ExchangeNode());
-    n->commod = (*b_it)->request()->commodity();
+    typename Bid<T>::Ptr b = *b_it;
+    ExchangeNode::Ptr n(new ExchangeNode(b->offer()->quantity(),
+                                         b->exclusive(),
+                                         b->request()->commodity()));
     bs->AddExchangeNode(n);
     AddBid(translation_ctx, *b_it, n);
   }
@@ -193,30 +197,6 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   return bs;
 }
 
-/// @brief information container for the exclusive status of an arc
-template <class T>
-struct ExclusiveStatus {
-  bool exclusive;
-  double qty;
-  
- ExclusiveStatus(typename Request<T>::Ptr r, typename Bid<T>::Ptr b) : qty(0) {
-   bool rexcl = r->exclusive();
-   bool bexcl = b->exclusive();
-   exclusive = rexcl || bexcl;
-   if (exclusive) {
-     double rqty = r->target()->quantity();
-     double bqty = b->offer()->quantity();
-     if (rexcl && bexcl) {
-       qty = (rqty != bqty) ? 0 : rqty;
-     } else if (rexcl) {
-       qty = (rqty > bqty) ? 0 : rqty;
-     } else if (bexcl) {
-       qty = (rqty < bqty) ? 0 : bqty;
-     }
-   }
-  }
-};
-
 /// @brief translates an arc given a bid and subsequent data, and also
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
@@ -226,8 +206,7 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
     
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
-  ExclusiveStatus<T> es(req, bid);
-  Arc arc(unode, vnode, es.exclusive, es.qty);
+  Arc arc(unode, vnode);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
