@@ -297,13 +297,14 @@ void XMLFileLoader::LoadDynamicModules() {
     nmods = xqe.NElementsMatchingQuery(m_it->second);
     for (int i = 0; i != nmods; i++) {
       QueryEngine* qe = xqe.QueryElement(m_it->second, i);
-      name = qe->GetElementContent("name");
+      name = qe->QueryElement("model")->GetElementName(0);
       if (modules_.find(name) == modules_.end()) {
-        CLOG(LEV_DEBUG1) << "Loading module '" << names[i] << "'.";
+        CLOG(LEV_DEBUG1) << "Loading module '" << name << "'.";
         DynamicModule* module = new DynamicModule(name);
         modules_[name] = module;
         CLOG(LEV_DEBUG1) << "Module '" << name << "' has been loaded.";
       }
+    }
   }
 }
 
