@@ -59,15 +59,14 @@ class SimInit {
   void LoadControlParams();
   void LoadRecipes();
   void LoadSolverInfo();
-  void LoadBuildSched();
-  void LoadDecomSched();
   void LoadPrototypes();
   void LoadInitialAgents();
   void LoadInventories();
+  void LoadBuildSched();
+  void LoadDecomSched();
 
-  /// a map of loaded modules. all dynamically loaded modules are
-  /// registered with this map when loaded.
-  std::map< std::string, DynamicModule*> modules_;
+  // std::map<AgentId, Model*>
+  std::map<int, Model*> agents_;
 
   SimEngine* se_;
   boost::uuids::uuid simid_;

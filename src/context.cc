@@ -59,7 +59,7 @@ void Context::SchedDecom(Model* m, int t) {
     t = time();
   }
   ti_->SchedDecom(m, t);
-  NewDatum("DecomSchedul")
+  NewDatum("DecomSchedule")
     ->AddVal("AgentId", m->id())
     ->AddVal("SchedTime", time())
     ->AddVal("DecomTime", t)

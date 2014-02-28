@@ -27,14 +27,14 @@ using namespace cyclus;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  SimInit si;
-  QueryBackend* qb = new SqliteBack("cyclus.sqlite");
-  QueryResult qr = qb->Query("Info", NULL);
-  std::string s = qr.GetVal<std::string>(0, "SimId");
-  boost::uuids::string_generator gen;
-  boost::uuids::uuid simid = gen(s);
-  si.Init(qb, simid);
-  return 0;
+  //SimInit si;
+  //QueryBackend* qb = new SqliteBack("cyclus.sqlite");
+  //QueryResult qr = qb->Query("Info", NULL);
+  //std::string s = qr.GetVal<std::string>(0, "SimId");
+  //boost::uuids::string_generator gen;
+  //boost::uuids::uuid simid = gen(s);
+  //si.Init(qb, simid);
+  //return 0;
 
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
@@ -65,7 +65,14 @@ int main(int argc, char* argv[]) {
       ;
 
   po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, desc), vm);
+  try {
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+  } catch(std::exception err) {
+    std::cout << "Invalid arguments.\n"
+              <<  "Usage:   cyclus [options] [path/to/input/filename]\n"
+              << desc << "\n";
+    return 1;
+  }
   po::notify(vm);
 
   po::positional_options_description p;
@@ -94,7 +101,7 @@ int main(int argc, char* argv[]) {
   // respond to command line args that don't run a simulation
   if (vm.count("help")) {
     std::string err_msg = "Cyclus usage requires an input file.\n";
-    err_msg += "Usage:   cyclus [path/to/input/filename]\n";
+    err_msg += "Usage:   cyclus [options] [path/to/input/filename]\n";
     std::cout << err_msg << std::endl;
     std::cout << desc << "\n";
     return 0;

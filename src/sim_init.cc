@@ -40,6 +40,8 @@ SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
   LoadPrototypes();
   LoadInitialAgents();
   LoadInventories();
+  LoadBuildSched();
+  LoadDecomSched();
 
   // use rec.set_dump_count to reset all buffered datums that we don't want
   // to be eventually sent to backends that are to-be-added.
@@ -125,7 +127,7 @@ struct AgentInfo {
 void SimInit::LoadInitialAgents() {
   // find all agents that are alive at the current timestep
   std::vector<Cond> conds;
-  conds.push_back(Cond("EntryTime", "<=", t_));
+  conds.push_back(Cond("EnterTime", "<=", t_));
   QueryResult qentry = b_->Query("AgentEntry", &conds);
   std::vector<AgentInfo> infos;
   for (int i = 0; i < qentry.rows.size(); ++i) {
@@ -138,7 +140,7 @@ void SimInit::LoadInitialAgents() {
       ai.id = id;
       ai.impl = qentry.GetVal<std::string>(i, "Implementation");
       ai.proto = qentry.GetVal<std::string>(i, "Prototype");
-      ai.entry = qentry.GetVal<int>(i, "EntryTime");
+      ai.entry = qentry.GetVal<int>(i, "EnterTime");
       ai.parent = qentry.GetVal<int>(i, "ParentId");
       infos.push_back(ai);
     }
@@ -146,6 +148,31 @@ void SimInit::LoadInitialAgents() {
 }
 
 void SimInit::LoadInventories() {
+}
+
+void SimInit::LoadBuildSched() {
+  std::vector<Cond> conds;
+  conds.push_back(Cond("BuildTime", ">", t_));
+  QueryResult qr = b_->Query("BuildSchedule", &conds);
+
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    int t = qr.GetVal<int>(i, "BuildTime");
+    int parentid = qr.GetVal<int>(i, "ParentId");
+    std::string proto = qr.GetVal<std::string>(i, "Prototype");
+    se_->ctx->SchedBuild(agents_[parentid], proto, t);
+  }
+}
+
+void SimInit::LoadDecomSched() {
+  std::vector<Cond> conds;
+  conds.push_back(Cond("DecomTime", ">", t_));
+  QueryResult qr = b_->Query("DecomSchedule", &conds);
+
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    int t = qr.GetVal<int>(i, "DecomTime");
+    int agentid = qr.GetVal<int>(i, "AgentId");
+    se_->ctx->SchedDecom(agents_[agentid], t);
+  }
 }
 
 } // namespace cyclus
