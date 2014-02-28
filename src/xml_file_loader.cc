@@ -292,6 +292,7 @@ void XMLFileLoader::LoadDynamicModules() {
   std::string name;
   int nmods;
   QueryEngine* qe;
+  DynamicModule* module;
   std::map<std::string, std::string>::iterator m_it;
   XMLQueryEngine xqe(*parser_);
   for (m_it = schema_paths_.begin(); m_it != schema_paths_.end(); ++m_it) {
@@ -301,7 +302,7 @@ void XMLFileLoader::LoadDynamicModules() {
       name = qe->QueryElement("model")->GetElementName(0);
       if (modules_.find(name) == modules_.end()) {
         CLOG(LEV_DEBUG1) << "Loading module '" << name << "'.";
-        DynamicModule* module = new DynamicModule(name);
+        module = new DynamicModule(name);
         modules_[name] = module;
         CLOG(LEV_DEBUG1) << "Module '" << name << "' has been loaded.";
       }
