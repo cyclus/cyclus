@@ -1,6 +1,6 @@
 // csv_back.h
-#ifndef CYCLUS_CORE_UTILITY_CSV_BACK_H_
-#define CYCLUS_CORE_UTILITY_CSV_BACK_H_
+#ifndef CYCLUS_SRC_CSV_BACK_H_
+#define CYCLUS_SRC_CSV_BACK_H_
 
 #include <map>
 #include <string>
@@ -16,7 +16,7 @@ namespace cyclus {
 typedef std::vector<std::string> LineList;
 
 /// An Recorder backend that writes data to a collection of csv files.
-/// Identically named Datum objects have their data placed in the same file.  Handles the
+/// Identically named Datum objects have their data placed in the same file. Handles the
 /// following datum value types: int, float, double, std::string, cyclus::Blob.
 class CsvBack: public RecBackend {
  public:
@@ -34,7 +34,7 @@ class CsvBack: public RecBackend {
   /// Writes any remaining csv lines to files.
   void Close();
 
- protected: // for testing
+ protected:  // for testing
   /// Write all buffered csv lines.
   virtual void Flush();
 
@@ -52,4 +52,4 @@ class CsvBack: public RecBackend {
   boost::filesystem::path path_;
 };
 }  // namespace cyclus
-#endif
+#endif  // CYCLUS_SRC_CSV_BACK_H_

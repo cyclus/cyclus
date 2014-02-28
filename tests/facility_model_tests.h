@@ -24,7 +24,7 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
   virtual void SetUp() {    
     facility_model_ = (*GetParam())(tc_.get());
     test_inst_ = new MockInst(tc_.get());
-    facility_model_->Deploy(test_inst_);
+    facility_model_->Build(test_inst_);
   }
   
   virtual void TearDown(){}

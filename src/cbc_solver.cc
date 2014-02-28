@@ -118,9 +118,9 @@ void CBCSolver::PopulateSolution(CbcModel& model,
 void CBCSolver::PrintVariables(int num) {
   std::cout << "Variables:" << std::endl;
   for (int i = 0; i < num; i++) {
-    std::cout << "  lbound: " << builder_.getColLower(i) << " ubound: " <<
-        builder_.getColUpper(i) << " integer: "
-        << builder_.getColIsInteger(i) << std::endl;
+    std::cout << "  lbound: " << builder_.getColLower(i) << " ubound: "
+              << builder_.getColUpper(i) << " integer: "
+              << builder_.getColIsInteger(i) << std::endl;
   }
   std::cout << "note true = " << true << std::endl;
 }

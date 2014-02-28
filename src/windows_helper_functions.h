@@ -1,12 +1,12 @@
 // windows_helper_functions.h
 // This is the dynamic loading implementation for WINDOWS machines
-#ifndef WINDOWSHELPERFUNCTIONS_H
-#define WINDOWSHELPERFUNCTIONS_H
+#ifndef CYCLUS_SRC_WINDOWS_HELPER_FUNCTIONS_H_
+#define CYCLUS_SRC_WINDOWS_HELPER_FUNCTIONS_H_
 
 #include <windows.h>
 
-#include "suffix.h"
 #include "error.h"
+#include "suffix.h"
 
 namespace cyclus {
 
@@ -21,7 +21,6 @@ void DynamicModule::OpenLibrary() {
     err_msg += GetLastError();
     throw IOError(err_msg);
   }
-
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,7 +33,6 @@ void DynamicModule::SetConstructor() {
     err_msg += GetLastError();
     throw IOError(err_msg);
   }
-
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,6 +41,6 @@ void DynamicModule::CloseLibrary() {
     FreeLibrary(module_library_);
   }
 }
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_WINDOWS_HELPER_FUNCTIONS_H_

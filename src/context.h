@@ -1,14 +1,14 @@
 // context.h
-#ifndef CONTEXT_H_
-#define CONTEXT_H_
+#ifndef CYCLUS_SRC_CONTEXT_H_
+#define CYCLUS_SRC_CONTEXT_H_
 
 #include <map>
-#include <string>
 #include <set>
+#include <string>
 
 #include "composition.h"
-#include "recorder.h"
 #include "model.h"
+#include "recorder.h"
 
 namespace cyclus {
 
@@ -21,7 +21,7 @@ class TimeListener;
 
 /// A simulation context that provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
-/// know simulation time, creates/deploys facilities, and/or uses loaded
+/// know simulation time, creates/builds facilities, and/or uses loaded
 /// composition recipes will need a context pointer. In general, all global
 /// state should be accessed through a simulation context.
 ///
@@ -48,26 +48,26 @@ class Context {
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Model* m);
 
-  /// Registers an agent as a participant in resource exchanges
+  /// Registers an agent as a participant in resource exchanges. Agents should
+  /// register from their Deploy method.
   inline void RegisterTrader(Trader* e) {
     traders_.insert(e);
   }
 
-  /// Unregisters an agent as a participant in resource exchanges
+  /// Unregisters an agent as a participant in resource exchanges.
   inline void UnregisterTrader(Trader* e) {
     traders_.erase(e);
   }
 
-  /// Destructs and cleans up m (and it's children recursively).
-  void DelModel(Model* m);
-
-  /// @return the current set of facilities in the simulation
+  /// @return the current set of traders registered for resource exchange.
   inline const std::set<Trader*>& traders() const {
-      return traders_;
+    return traders_;
   }
 
   /// Create a new model by cloning the named prototype. The returned model is
   /// not initialized as a simulation participant.
+  ///
+  /// @warning this method should generally NOT be used by agents.
   template <class T>
   T* CreateModel(std::string proto_name) {
     if (protos_.count(proto_name) == 0) {
@@ -83,31 +83,48 @@ class Context {
       throw CastError("Invalid cast for prototype " + proto_name);
     }
     return casted;
-  };
+  }
+
+  /// Destructs and cleans up m (and it's children recursively).
+  ///
+  /// @warning this method should generally NOT be used by agents.
+  void DelModel(Model* m);
+
+  /// Schedules the named prototype to be built for the specified parent at
+  /// timestep t. The default t=-1 results in the build being scheduled for the
+  /// next build phase (i.e. the start of the next timestep).
+  void SchedBuild(Model* parent, std::string proto_name, int t = -1);
+
+  /// Schedules the given Model to be decommissioned at the specified timestep
+  /// t. The default t=-1 results in the decommission being scheduled for the
+  /// next decommission phase (i.e. the end of the current timestep).
+  void SchedDecom(Model* m, int time = -1);
 
   /// Adds a composition recipe to a simulation-wide accessible list.
   /// Agents should NOT add their own recipes.
   void AddRecipe(std::string name, Composition::Ptr c);
-  
+
   /// Retrieve a registered recipe.  This is intended for retrieving
   /// compositions loaded from an input file(s) at the start of a
   /// simulation and NOT for communicating compositions between facilities
   /// during the simulation.
   Composition::Ptr GetRecipe(std::string name);
 
-  /// See Timer::RegisterTickListener documentation.
+  /// Registers an agent to receive tick/tock notifications every timestep.
+  /// Agents should register from their Deploy method.
   void RegisterTimeListener(TimeListener* tl);
+
+  /// Removes an agent from receiving tick/tock notifications.
+  /// Agents should unregister from their Decommission method.
+  void UnregisterTimeListener(TimeListener* tl);
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.
-  void InitTime(int start, int duration, int decay, int m0 = 1, int y0 = 2010,
+  void InitTime(int duration, int decay, int m0 = 1, int y0 = 2010,
                 std::string handle = "");
 
   /// Returns the current simulation timestep.
   int time();
-
-  /// Returns the simulation starting timestep.
-  int start_time();
 
   /// Returns the number of timesteps in the entire simulation.
   int sim_dur();
@@ -116,19 +133,25 @@ class Context {
   Datum* NewDatum(std::string title);
 
   /// @return the next transaction id
-  inline int NextTransactionID() { return trans_id_++; }
+  inline int NextTransactionID() {
+    return trans_id_++;
+  }
 
   /// Returns the exchange solver associated with this context
-  ExchangeSolver* solver() { return solver_; }
-  
+  ExchangeSolver* solver() {
+    return solver_;
+  }
+
   /// sets the solver associated with this context
-  void solver(ExchangeSolver* solver) { solver_ = solver; }
-      
+  void solver(ExchangeSolver* solver) {
+    solver_ = solver;
+  }
+
  private:
   std::map<std::string, Model*> protos_;
-  std::set<Trader*> traders_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Model*> model_list_;
+  std::set<Trader*> traders_;
   
   Timer* ti_;
   ExchangeSolver* solver_;
@@ -136,6 +159,6 @@ class Context {
   int trans_id_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_CONTEXT_H_

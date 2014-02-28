@@ -1,18 +1,16 @@
-
 #include "comp_math.h"
 
 #include <cmath>
 #include <sstream>
 
 #include "cyc_arithmetic.h"
-#include "pyne.h"
 #include "error.h"
+#include "pyne.h"
 
 namespace cyclus {
 namespace compmath {
 
-CompMap Add(const CompMap& v1,
-                      const CompMap& v2) {
+CompMap Add(const CompMap& v1, const CompMap& v2) {
   CompMap out(v1);
   CompMap vv2(v2);
   for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
@@ -22,8 +20,7 @@ CompMap Add(const CompMap& v1,
   return out;
 }
 
-CompMap Sub(const CompMap& v1,
-                      const CompMap& v2) {
+CompMap Sub(const CompMap& v1, const CompMap& v2) {
   CompMap out(v1);
   CompMap vv2(v2);
   for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
@@ -83,9 +80,7 @@ bool AllPositive(const CompMap& v) {
   return true;
 }
 
-bool AlmostEq(const CompMap& v1,
-              const CompMap& v2,
-              double threshold) {
+bool AlmostEq(const CompMap& v1, const CompMap& v2, double threshold) {
   // I learned at
   // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
   // that the following is less naive than the intuitive way of doing this...
@@ -128,6 +123,5 @@ bool AlmostEq(const CompMap& v1,
   return true;
 }
 
-} // namespace compmath
-} // namespace cyclus
-
+}  // namespace compmath
+}  // namespace cyclus
