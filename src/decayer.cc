@@ -19,11 +19,14 @@ NucList Decayer::nuclides_tracked_ = NucList();
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Decayer::Decayer(const CompMap& comp) {
+  int nuc;
+  int col;
+  long double atom_count;
   pre_vect_ = Vector(parent_.size(), 1);
   std::map<int, double>::const_iterator comp_iter = comp.begin();
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
-    int nuc = comp_iter->first;
-    long double atom_count = comp_iter->second;
+    nuc = comp_iter->first;
+    atom_count = comp_iter->second;
 
     // if the nuclide is tracked in the decay matrix
     if (parent_.count(nuc) > 0) {
@@ -31,9 +34,8 @@ Decayer::Decayer(const CompMap& comp) {
       pre_vect_(col, 1) = atom_count;
       // if it is not in the decay matrix, then it is added as a stable nuclide
     } else {
-      double decayConst = 0;
-      int col = parent_.size() + 1;
-      parent_[nuc] = std::make_pair(col, decayConst);  // add nuclide to parent map
+      col = parent_.size() + 1;
+      parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));  // add nuclide to parent map
 
       int nDaughters = 0;
       std::vector< std::pair<int, double> > temp(nDaughters);
@@ -180,9 +182,9 @@ void Decayer::BuildDecayMatrix() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Decayer::Decay(double years) {
+void Decayer::Decay(double secs) {
   // solves the decay equation for the final composition
-  post_vect_ = UniformTaylor::MatrixExpSolver(decay_matrix_, pre_vect_, years);
+  post_vect_ = UniformTaylor::MatrixExpSolver(decay_matrix_, pre_vect_, secs);
 }
 
 }  // namespace cyclus

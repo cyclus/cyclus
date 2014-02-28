@@ -40,11 +40,9 @@ class Decayer {
    */
   void GetResult(CompMap& comp);
 
-  /**
-     decay the material
-     @param years the number of years to decay
-   */
-  void Decay(double years);
+  /// decay the material
+  /// @param secs the number of seconds to decay
+  void Decay(double secs);
 
   /**
      the number of tracked nuclides
