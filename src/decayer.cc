@@ -19,11 +19,6 @@ NucList Decayer::nuclides_tracked_ = NucList();
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Decayer::Decayer(const CompMap& comp) {
-  if (!decay_info_loaded_) {
-    Decayer::LoadDecayInfo();
-    decay_info_loaded_ = true;
-  }
-
   pre_vect_ = Vector(parent_.size(), 1);
   std::map<int, double>::const_iterator comp_iter = comp.begin();
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
@@ -114,18 +109,6 @@ void Decayer::LoadDecayInfo() {
     nuc *= 10000;  // put in id form
   }
   BuildDecayMatrix();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Decayer::DecayConstant(int nuc) {
-  if (!decay_info_loaded_) {
-    Decayer::LoadDecayInfo();
-    decay_info_loaded_ = true;
-  }
-  if (parent_.count(nuc) > 0) {
-    return parent_[nuc].second;
-  }
-  return 0;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

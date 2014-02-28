@@ -30,9 +30,6 @@ typedef std::vector<int> NucList;
 
 class Decayer {
  public:
-  /// Returns the decay constant for specified nuclide in inverse years.
-  static double DecayConstant(int nuc);
-
   /**
      default constructor
    */
@@ -70,13 +67,6 @@ class Decayer {
      stored in the static variable decayMatrix.
    */
   static void BuildDecayMatrix();
-
-  /**
-     Reads the decay information found in the 'decayInfo.dat' file
-     into the parent and daughters maps. Uses these maps to create the
-     decay matrix.
-   */
-  static void LoadDecayInfo();
 
   /**
      The CompMap's parent
