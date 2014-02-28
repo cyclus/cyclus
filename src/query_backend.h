@@ -50,7 +50,7 @@ struct QueryResult {
   };
 };
 
-class QueryBackend : public RecBackend {
+class QueryBackend {
  public:
   virtual ~QueryBackend() {};
 

@@ -17,21 +17,21 @@ SimInit::SimInit() {
 
 SimEngine* SimInit::Init(QueryBackend* b, boost::uuids::uuid simid) {
   se_->rec = new Recorder(simid);
-  b_ = b;
-  simid_ = simid;
-  t_ = 0;
-  return InitBase();
+  return InitBase(b, simid, 0);
 }
 
 SimEngine* SimInit::Restart(QueryBackend* b, boost::uuids::uuid simid, int t) {
   se_->rec = new Recorder();
-  b_ = b;
-  simid_ = simid;
-  t_ = t;
-  return InitBase();
+  return InitBase(b, simid, t);
 }
 
-SimEngine* SimInit::InitBase() {
+SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
+  std::vector<Cond> conds;
+  conds.push_back(Cond("SimId", "==", simid));
+  b_ = new CondInjector(b, conds);
+  t_ = t;
+  simid_ = simid;
+
   se_->ctx = new Context(se_->ti, se_->rec);
 
   LoadControlParams();
@@ -49,9 +49,7 @@ SimEngine* SimInit::InitBase() {
 }
 
 void SimInit::LoadControlParams() {
-  std::vector<Cond> conds;
-  conds.push_back(Cond("SimId", "==", simid_));
-  QueryResult qr = b_->Query("Info", &conds);
+  QueryResult qr = b_->Query("Info", NULL);
 
   int dur = qr.GetVal<int>(0, "Duration");
   int dec = qr.GetVal<int>(0, "DecayInterval");
@@ -62,26 +60,20 @@ void SimInit::LoadControlParams() {
 }
 
 void SimInit::LoadRecipes() {
-  std::vector<Cond> conds;
-  conds.push_back(Cond("SimId", "==", simid_));
-  QueryResult qr = b_->Query("Recipes", &conds);
+  QueryResult qr = b_->Query("Recipes", NULL);
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string recipe = qr.GetVal<std::string>(i, "Recipe");
     int stateid = qr.GetVal<int>(i, "StateId");
 
     std::vector<Cond> conds;
-    conds.push_back(Cond("SimId", "==", simid_));
     conds.push_back(Cond("StateId", "==", stateid));
     QueryResult qr = b_->Query("Compositions", &conds);
     CompMap m;
-    SHOW(recipe);
     for (int j = 0; j < qr.rows.size(); ++j) {
       int nuc = qr.GetVal<int>(j, "NucId");
       double frac = qr.GetVal<double>(j, "MassFrac");
       m[nuc] = frac;
-      SHOW(nuc);
-      SHOW(frac);
     }
     Composition::Ptr comp = Composition::CreateFromMass(m);
     se_->ctx->AddRecipe(recipe, comp);
@@ -89,9 +81,7 @@ void SimInit::LoadRecipes() {
 }
 
 void SimInit::LoadSolverInfo() {
-  std::vector<Cond> conds;
-  conds.push_back(Cond("SimId", "==", simid_));
-  QueryResult qr = b_->Query("CommodPriority", &conds);
+  QueryResult qr = b_->Query("CommodPriority", NULL);
 
   std::map<std::string, double> commod_order;
   for (int i = 0; i < qr.rows.size(); ++i) {
@@ -113,13 +103,14 @@ void SimInit::LoadSolverInfo() {
 }
 
 void SimInit::LoadPrototypes() {
-  std::vector<Cond> conds;
-  conds.push_back(Cond("SimId", "==", simid_));
-  QueryResult qr = b_->Query("Prototypes", &conds);
+  QueryResult qr = b_->Query("Prototypes", NULL);
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string proto = qr.GetVal<std::string>(i, "Prototype");
     std::string impl = qr.GetVal<std::string>(i, "Implementation");
 
+    Model* m = DynamicModule::Make(se_->ctx, impl);
+    m->InitFrom(b_);
+    se_->ctx->AddPrototype(proto, m);
   }
 }
 

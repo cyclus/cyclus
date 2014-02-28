@@ -18,6 +18,28 @@ struct SimEngine {
   Timer* ti;
 };
 
+class CondInjector: public QueryBackend {
+ public:
+  CondInjector(QueryBackend* b, std::vector<Cond> to_inject)
+    : b_(b), to_inject_(to_inject) {};
+
+  virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
+    if (conds == NULL) {
+      return b_->Query(table, &to_inject_);
+    }
+
+    std::vector<Cond> c = *conds;
+    for (int i = 0; i < to_inject_.size(); ++i) {
+      c.push_back(to_inject_[i]);
+    }
+    return b_->Query(table, &c);
+  };
+
+ private:
+  QueryBackend* b_;
+  std::vector<Cond> to_inject_;
+};
+
 /// a class that encapsulates the methods needed to load input to
 /// a cyclus simulation from xml
 class SimInit {
@@ -32,7 +54,7 @@ class SimInit {
   SimEngine* Restart(QueryBackend* b, boost::uuids::uuid simid, int t);
 
  private:
-  SimEngine* InitBase();
+  SimEngine* InitBase(QueryBackend* b, boost::uuids::uuid simid, int t);
 
   void LoadControlParams();
   void LoadRecipes();
