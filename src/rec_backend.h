@@ -25,9 +25,8 @@ class RecBackend {
   /// than one in a simulation.
   virtual std::string Name() = 0;
 
-  /// Used to notify the backend that no more Datum objects will be sent (i.e.
-  /// the simulatoin is over).
-  virtual void Close() = 0;
+  /// Flushes all buffered data in the backend to its final format/location.
+  virtual void Flush() = 0;
 };
 } // namespace cyclus
 #endif

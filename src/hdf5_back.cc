@@ -22,6 +22,21 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   H5Tset_size(blob_type_, H5T_VARIABLE);
 }
 
+Hdf5Back::~Hdf5Back() {
+  Flush();
+  H5Fclose(file_);
+  H5Tclose(string_type_);
+  H5Tclose(blob_type_);
+
+  std::map<std::string, size_t*>::iterator it;
+  for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
+    delete[](it->second);
+  }
+  for (it = tbl_sizes_.begin(); it != tbl_sizes_.end(); ++it) {
+    delete[](it->second);
+  }
+};
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::Notify(DatumList data) {
   std::map<std::string, DatumList> groups;
@@ -37,21 +52,6 @@ void Hdf5Back::Notify(DatumList data) {
   std::map<std::string, DatumList>::iterator it;
   for (it = groups.begin(); it != groups.end(); ++it) {
     WriteGroup(it->second);
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::Close() {
-  H5Fclose(file_);
-  H5Tclose(string_type_);
-  H5Tclose(blob_type_);
-
-  std::map<std::string, size_t*>::iterator it;
-  for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
-    delete[](it->second);
-  }
-  for (it = tbl_sizes_.begin(); it != tbl_sizes_.end(); ++it) {
-    delete[](it->second);
   }
 }
 

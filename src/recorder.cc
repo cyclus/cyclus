@@ -13,21 +13,19 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Recorder::Recorder() : index_(0), closed_(false) {
+Recorder::Recorder() : index_(0) {
   uuid_ = boost::uuids::random_generator()();
   set_dump_count(kDefaultDumpCount);
-  blank_ = new Datum(this, "closed-recorder-datum");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Recorder::Recorder(boost::uuids::uuid simid)
-    : index_(0), closed_(false), uuid_(simid) {
+    : index_(0), uuid_(simid) {
   set_dump_count(kDefaultDumpCount);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Recorder::~Recorder() {
-  delete blank_;
   for (int i = 0; i < data_.size(); ++i) {
     delete data_[i];
   }
@@ -60,10 +58,6 @@ void Recorder::set_dump_count(unsigned int count) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Datum* Recorder::NewDatum(std::string title) {
-  if (closed_) {
-    return blank_;
-  }
-  
   Datum* d = data_[index_];
   d->title_ = title;
   d->vals_.resize(1);
@@ -93,12 +87,7 @@ void Recorder::RegisterBackend(RecBackend* b) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Recorder::close() {
-  if (closed_) {
-    return;
-  }
-  closed_ = true;
-
+void Recorder::Close() {
   for (int i = index_; i < data_.size(); ++i) {
     delete data_[i];
   }
@@ -106,8 +95,10 @@ void Recorder::close() {
   NotifyBackends();
   std::list<RecBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
-    (*it)->Close();
+    (*it)->Flush();
   }
+  backs_.clear();
+  //set_dump_count(kDefaultDumpCount);
 }
 } // namespace cyclus
 

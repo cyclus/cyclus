@@ -9,9 +9,7 @@
 #include <string>
 #include <unistd.h>
 
-#include "context.h"
 #include "recorder.h"
-#include "timer.h"
 #include "xml_file_loader.h"
 
 //- - - - - - - - 
@@ -29,9 +27,7 @@ class XMLFileLoaderTests : public ::testing::Test {
  public:
   std::string controlFile, falseFile, moduleFile, recipeFile;
 
-  cyclus::Recorder rec_;
-  cyclus::Timer ti_;
-  cyclus::Context* ctx_;
+  cyclus::RecBackend* b_;
   std::string schema_path;
 
   virtual void SetUp();

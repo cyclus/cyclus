@@ -25,6 +25,8 @@ class CsvBack: public RecBackend {
   /// @param overwrite true to overwrite existing csv files with same path/name.
   CsvBack(std::string path, bool overwrite = false);
 
+  virtual ~CsvBack();
+
   /// Collects Datum objects to be written to csv files.
   /// @param data group of Datum objects to write to the csv file collection.
   void Notify(DatumList data);
@@ -32,12 +34,9 @@ class CsvBack: public RecBackend {
   std::string Name();
 
   /// Writes any remaining csv lines to files.
-  void Close();
+  void Flush();
 
  protected:  // for testing
-  /// Write all buffered csv lines.
-  virtual void Flush();
-
   /// maps filenames to pending csv lines
   std::map<std::string, LineList> file_data_;
 

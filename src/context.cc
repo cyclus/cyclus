@@ -45,26 +45,25 @@ void Context::SchedBuild(Model* parent, std::string proto_name, int t) {
   if (t == -1) {
     t = time() + 1;
   }
+  ti_->SchedBuild(parent, proto_name, t);
   NewDatum("BuildSchedule")
     ->AddVal("ParentId", parent->id())
     ->AddVal("Prototype", proto_name)
     ->AddVal("SchedTime", time())
     ->AddVal("BuildTime", t)
     ->Record();
-    
-  ti_->SchedBuild(parent, proto_name, t);
 }
 
 void Context::SchedDecom(Model* m, int t) {
   if (t == -1) {
     t = time();
   }
+  ti_->SchedDecom(m, t);
   NewDatum("DecomSchedul")
     ->AddVal("AgentId", m->id())
     ->AddVal("SchedTime", time())
     ->AddVal("DecomTime", t)
     ->Record();
-  ti_->SchedDecom(m, t);
 }
 
 boost::uuids::uuid Context::sim_id() {

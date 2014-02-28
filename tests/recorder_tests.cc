@@ -8,7 +8,7 @@ class TestBack : public cyclus::RecBackend {
     TestBack() {
       flush_count = 0;
       notify_count = 0;
-      closed = false;
+      flushed = false;
     };
 
     virtual void Notify(cyclus::DatumList data) {
@@ -21,13 +21,13 @@ class TestBack : public cyclus::RecBackend {
       return "TestBack";
     };
 
-    virtual void Close() {
-      closed = true;
+    virtual void Flush() {
+      flushed = true;
     };
 
     int flush_count; // # Datum objects in last notify
     int notify_count; // # times notify called
-    bool closed;
+    bool flushed;
     cyclus::DatumList data; // last receive list
 };
 
@@ -65,13 +65,13 @@ TEST(RecorderTest, Manager_Closing) {
   m.RegisterBackend(&back1);
   m.RegisterBackend(&back2);
 
-  ASSERT_FALSE(back1.closed);
-  ASSERT_FALSE(back2.closed);
+  ASSERT_FALSE(back1.flushed);
+  ASSERT_FALSE(back2.flushed);
 
-  m.close();
+  m.Close();
 
-  EXPECT_TRUE(back1.closed);
-  EXPECT_TRUE(back2.closed);
+  EXPECT_TRUE(back1.flushed);
+  EXPECT_TRUE(back2.flushed);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -114,7 +114,7 @@ TEST(RecorderTest, Manager_CloseFlushing) {
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);
 
-  m.close();
+  m.Close();
 
   EXPECT_EQ(back1.flush_count, 1);
   EXPECT_EQ(back1.notify_count, 1);
@@ -167,11 +167,9 @@ TEST(RecorderTest, Datum_addVal) {
   EXPECT_STREQ(it->first, "height");
   EXPECT_DOUBLE_EQ(it->second.cast<double>(), 5.5);
 
-  m.close();
+  m.Close();
 
   cyclus::Datum::Vals vals = back.data.back()->vals();
-  ASSERT_EQ(vals.size(), 4);
-  EXPECT_STREQ(vals.front().first, "SimId");
-  EXPECT_EQ(vals.front().second.cast<boost::uuids::uuid>(), m.sim_id());
+  EXPECT_EQ(d, back.data.back());
 }
 

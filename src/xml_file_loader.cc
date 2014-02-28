@@ -16,8 +16,6 @@
 #include "greedy_solver.h"
 #include "logger.h"
 #include "model.h"
-#include "recorder.h"
-#include "timer.h"
 #include "xml_query_engine.h"
 
 #include "xml_file_loader.h"
@@ -104,9 +102,12 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(Context* ctx,
+XMLFileLoader::XMLFileLoader(RecBackend* b,
                              std::string schema_path,
-                             const std::string load_filename) : ctx_(ctx) {
+                             const std::string load_filename) {
+  rec_.RegisterBackend(b);
+  ctx_ = new Context(&ti_, &rec_);
+
   schema_path_ = schema_path;
   file_ = load_filename;
   std::stringstream input;
@@ -121,6 +122,13 @@ XMLFileLoader::XMLFileLoader(Context* ctx,
   schema_paths_["Region"] = "/*/region";
   schema_paths_["Inst"] = "/*/region/institution";
   schema_paths_["Facility"] = "/*/facility";
+}
+
+XMLFileLoader::~XMLFileLoader() {
+  // MUST be before delete context to avoid logging incorrect initial agent
+  // exit dates.
+  rec_.Close();
+  delete ctx_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

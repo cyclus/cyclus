@@ -227,9 +227,9 @@ int main(int argc, char* argv[]) {
   XMLFileLoader* loader;
   try {
     if (flat_schema) {
-      loader = new XMLFlatLoader(ctx, schema_path, inputFile);
+      loader = new XMLFlatLoader(back, schema_path, inputFile);
     } else {
-      loader = new XMLFileLoader(ctx, schema_path, inputFile);
+      loader = new XMLFileLoader(back, schema_path, inputFile);
     }
     loader->LoadSim();
   } catch (Error e) {
@@ -237,7 +237,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  rec.close();
+  delete loader;
   return 0;
 
   // Run the simulation
@@ -257,7 +257,7 @@ int main(int argc, char* argv[]) {
             (ctx->sim_id()) << std::endl;
 
   delete ctx;
-  rec.close();
+  rec.Close();
   delete back;
   delete loader;
 

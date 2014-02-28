@@ -11,6 +11,8 @@
 #include "dynamic_module.h"
 #include "query_engine.h"
 #include "xml_parser.h"
+#include "timer.h"
+#include "recorder.h"
 
 namespace cyclus {
 
@@ -31,14 +33,16 @@ Composition::Ptr ReadRecipe(QueryEngine* qe);
 /// a cyclus simulation from xml
 class XMLFileLoader {
  public:
-  /// Constructor to create a new XML for loading. Defaults to using the main schema.
-  /// @param ctx all input file configuration will be loaded into here
+  /// Constructor to create a new XML for loading. Defaults to using the main
+  /// schema.
+  ///
+  /// @param b backend to dump input file info to.
   /// @param load_filename The filename for the file to be loaded; defaults to
-  /// an empty string
-  XMLFileLoader(Context* ctx, std::string schema_path,
+  /// an empty string.
+  XMLFileLoader(RecBackend* b, std::string schema_path,
                 const std::string load_filename = "");
 
-  virtual ~XMLFileLoader() {};
+  virtual ~XMLFileLoader();
 
   /// applies a schema agaisnt the parser used by the file loader
   /// @param schema the schema representation
@@ -70,6 +74,8 @@ class XMLFileLoader {
   /// commodity
   void ProcessCommodities(std::map<std::string, double>* commodity_order);
 
+  Recorder rec_;
+  Timer ti_;
   Context* ctx_;
 
   /// filepath to the schema

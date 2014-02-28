@@ -26,6 +26,11 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
+SqliteBack::~SqliteBack() {
+  Flush();
+  db_.close();
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path) : db_(path) {
   path_ = path;
@@ -48,12 +53,6 @@ void SqliteBack::Notify(DatumList data) {
     WriteDatum(*it);
   }
   Flush();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SqliteBack::Close() {
-  Flush();
-  db_.close();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

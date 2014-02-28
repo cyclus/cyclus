@@ -21,7 +21,7 @@ class SqliteBack: public RecBackend, public QueryBackend {
   /// @param path the filepath (including name) to write the sqlite file.
   SqliteBack(std::string path);
 
-  virtual ~SqliteBack() {};
+  virtual ~SqliteBack();
 
   /// Writes Datum objects immediately to the database as a single transaction.
   /// @param data group of Datum objects to write to the database together.
@@ -30,15 +30,12 @@ class SqliteBack: public RecBackend, public QueryBackend {
   /// Returns a unique name for this backend.
   std::string Name();
 
-  /// Finishes any incomplete tasks and closes the database/file.
-  void Close();
+  /// Executes all pending commands.
+  void Flush();
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
  protected: // for testing
-  /// Execute all pending commands.
-  virtual void Flush();
-
   /// pending sql commands.
   StrList cmds_;
 

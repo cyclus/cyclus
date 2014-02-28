@@ -10,14 +10,15 @@
 #include "env.h"
 #include "error.h"
 #include "dynamic_module.h"
+#include "sqlite_back.h"
 
 using namespace std;
 using cyclus::XMLFileLoader;
 
 void XMLFileLoaderTests::SetUp() {
   schema_path = cyclus::Env::GetInstallPath() + "/share/cyclus.rng.in";
+  b_ = new cyclus::SqliteBack("xmlfileloadtestdb.sqlite");
 
-  ctx_ = new cyclus::Context(&ti_, &rec_);
   falseFile = "false.xml";
   CreateTestInputFile(falseFile, FalseSequence());
 
@@ -32,6 +33,7 @@ void XMLFileLoaderTests::SetUp() {
 }
 
 void XMLFileLoaderTests::TearDown() {
+  remove("xmlfileloadtestdb.sqlite");
   unlink(falseFile.c_str());
   unlink(controlFile.c_str());
   unlink(recipeFile.c_str());
@@ -141,25 +143,25 @@ std::string XMLFileLoaderTests::ControlSchema() {
 }
 
 TEST_F(XMLFileLoaderTests, openfile) {
-  EXPECT_NO_THROW(XMLFileLoader file(ctx_, schema_path, controlFile));
+  EXPECT_NO_THROW(XMLFileLoader file(b_, schema_path, controlFile));
 }
 
 TEST_F(XMLFileLoaderTests, throws) {
-  EXPECT_THROW(XMLFileLoader file(ctx_, schema_path, "blah"), cyclus::IOError);
+  EXPECT_THROW(XMLFileLoader file(b_, schema_path, "blah"), cyclus::IOError);
 }
 
 TEST_F(XMLFileLoaderTests, control) {
-  XMLFileLoader file(ctx_, schema_path, controlFile);
+  XMLFileLoader file(b_, schema_path, controlFile);
   EXPECT_NO_THROW(file.LoadControlParams());
 }
 
 TEST_F(XMLFileLoaderTests, recipes) {
-  XMLFileLoader file(ctx_, schema_path, recipeFile);
+  XMLFileLoader file(b_, schema_path, recipeFile);
   EXPECT_NO_THROW(file.LoadRecipes());
 }
 
 TEST_F(XMLFileLoaderTests, schema) {
-  XMLFileLoader file(ctx_, schema_path, controlFile);
+  XMLFileLoader file(b_, schema_path, controlFile);
   std::stringstream schema(ControlSchema());
   EXPECT_NO_THROW(file.ApplySchema(schema););
 }
