@@ -114,7 +114,35 @@ void SimInit::LoadPrototypes() {
   }
 }
 
+struct AgentInfo {
+  int id;
+  std::string impl;
+  std::string proto;
+  int entry;
+  int parent;
+};
+
 void SimInit::LoadInitialAgents() {
+  // find all agents that are alive at the current timestep
+  std::vector<Cond> conds;
+  conds.push_back(Cond("EntryTime", "<=", t_));
+  QueryResult qentry = b_->Query("AgentEntry", &conds);
+  std::vector<AgentInfo> infos;
+  for (int i = 0; i < qentry.rows.size(); ++i) {
+    int id = qentry.GetVal<int>(i, "AgentId");
+    std::vector<Cond> conds;
+    conds.push_back(Cond("AgentId", "==", id));
+    QueryResult qexit = b_->Query("AgentExit", &conds);
+    if (qexit.rows.size() == 0) {
+      AgentInfo ai;
+      ai.id = id;
+      ai.impl = qentry.GetVal<std::string>(i, "Implementation");
+      ai.proto = qentry.GetVal<std::string>(i, "Prototype");
+      ai.entry = qentry.GetVal<int>(i, "EntryTime");
+      ai.parent = qentry.GetVal<int>(i, "ParentId");
+      infos.push_back(ai);
+    }
+  }
 }
 
 void SimInit::LoadInventories() {

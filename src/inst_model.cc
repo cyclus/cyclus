@@ -89,23 +89,4 @@ void InstModel::Tock(int time) {
   }
 }
 
-void InstModel::DecomNotify(Model* m) {
-    RegisterCloneAsDecommissioned(m);
-}
-
-/* --------------------
- * all INSTMODEL classes have these members
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::BuildNotify(Model* m) {
-  RegisterCloneAsBuilt(m);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::RegisterCloneAsBuilt(Model* clone) {}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::RegisterCloneAsDecommissioned(Model* clone) {}
-
 } // namespace cyclus

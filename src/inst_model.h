@@ -57,13 +57,11 @@ class InstModel : public Model, public TimeListener {
    */
   virtual std::string str();
 
- public:
   /**
      perform all tasks required when an inst enters the simulation
    */
   virtual void Build(Model* parent);
 
-  virtual void DecomNotify(Model* m);
   /* ------------------- */
  
   /* --------------------
@@ -98,22 +96,6 @@ class InstModel : public Model, public TimeListener {
     return (prototypes_.find(proto_name) != prototypes_.end());
   }
 
-  /**
-     returns this institution's region
-   */
-  RegionModel* GetRegion() {
-    return (dynamic_cast<RegionModel*>(this->parent()));
-  };
-
-  /**
-     reports number of facilities in this inst
-   */
-  int GetNumFacilities() {
-    return children().size();
-  };
-
-  virtual void BuildNotify(Model* m);
-
   virtual void Tick(int time) {};
 
   virtual void Tock(int time);
@@ -133,20 +115,6 @@ class InstModel : public Model, public TimeListener {
      @param proto_name the name of prototype to register
    */
   virtual void RegisterAvailablePrototype(std::string proto_name);
-
-  /**
-     perform any registration functionality after a clone has been
-     built
-     @param clone the built (cloned) prototype
-   */
-  virtual void RegisterCloneAsBuilt(Model* clone);
-
-  /**
-     perform any registration functionality before a clone is
-     decommissioned(deleted)
-     @param clone the to-be-decommissioned
-   */
-  virtual void RegisterCloneAsDecommissioned(Model* clone);
 
 private:
   /**

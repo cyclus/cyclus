@@ -123,14 +123,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
   };
 
   /**
-     Sets this facility's instutution name
-     @param name the name of the institution associated with this
-   */
-  virtual void SetInstName(std::string name) {
-    inst_name_ = name;
-  };
-
-  /**
      Returns this facility's institution
      @return the institution assosicated with this facility
    */
@@ -170,11 +162,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
   bool LifetimeReached(int time);
 
  private:
-  /**
-     each facility should have an institution that manages it
-   */
-  std::string inst_name_;
-
   /**
      Most facilities will have a vector of incoming, request commodities.
      Ultimately, it's up to the facility to utilize this list. However, the

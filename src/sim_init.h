@@ -59,6 +59,8 @@ class SimInit {
   void LoadControlParams();
   void LoadRecipes();
   void LoadSolverInfo();
+  void LoadBuildSched();
+  void LoadDecomSched();
   void LoadPrototypes();
   void LoadInitialAgents();
   void LoadInventories();
