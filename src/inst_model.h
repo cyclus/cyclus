@@ -28,24 +28,6 @@ typedef std::set<std::string>::iterator PrototypeIterator;
    InstModel may be used to adjust preferences in the ResourceExchange to make
    material routing decisions based on interfacility relationships. Deployment
    is a primary differentiator between different InstModel implementations.
-
-   Like all model implementations, there are a number of
-   implementations that are distributed as part of the core Cyclus
-   application as well as implementations contributed by third-party
-   developers. The links below descrie parameters necessary for the
-   complete definition of an implemented instituion.
-
-   @section availableCoreImpl Available Core Implementations
-   - FixedInst: This institution is unchanging and is statically
-   associated with facilities that are deployed by some other
-   entity (such as the region or the logician.
-
-   @section anticipatedCoreImpl Anticipated Core Implementations
-   - DeploymentInst: This institution deploys allowed facilities
-   according to a demand curve.
-
-   @section thirdPartyImpl Third Party Implementations
-   (None)
  */
 class InstModel : public Model, public TimeListener {
   /* --------------------
@@ -77,27 +59,9 @@ class InstModel : public Model, public TimeListener {
 
  public:
   /**
-     Each institution is prompted to do its beginning-of-time-step
-     stuff at the tick of the timer.
-     Default behavior is to ignore the tick.
-
-     @param time is the time to perform the tick
-   */
-  virtual void Tick(int time);
-
-  /**
-     Each institution is prompted to its end-of-time-step
-     stuff on the tock of the timer.
-     Default behavior is to ignore the tock.
-
-     @param time is the time to perform the tock
-   */
-  virtual void Tock(int time);
-
-  /**
      perform all tasks required when an inst enters the simulation
    */
-  virtual void Deploy(Model* parent);
+  virtual void Build(Model* parent);
   /* ------------------- */
  
   /* --------------------
@@ -146,11 +110,11 @@ class InstModel : public Model, public TimeListener {
     return children().size();
   };
 
-  /**
-     builds a prototype
-     @param proto_name the name of the prototype to build
-   */
-  void Build(std::string proto_name);
+  virtual void BuildNotify(Model* m);
+
+  virtual void Tick(int time) {};
+
+  virtual void Tock(int time);
 
  protected:
   void InitFrom(InstModel* m);
@@ -173,13 +137,6 @@ class InstModel : public Model, public TimeListener {
      @param qe a pointer to a QueryEngine object containing intialization data
    */
   void AddPrototypeToInitialBuild(QueryEngine* qe);
-
-  /**
-     checks if a prototype is in its list of available prototypes
-     if not, it throws an error
-     @param p the prototype to check for
-   */
-  void ThrowErrorIfPrototypeIsntAvailable(std::string p);
 
   /**
      perform any registration functionality after a clone has been

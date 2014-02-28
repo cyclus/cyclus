@@ -56,8 +56,8 @@ void RegionModel::InitInstitutionNames(QueryEngine* qe) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::Deploy(Model* parent) {
-  Model::Deploy(parent);
+void RegionModel::Build(Model* parent) {
+  Model::Build(parent);
   AddRegionAsRootNode();
   AddChildrenToTree();
 }
@@ -73,7 +73,7 @@ void RegionModel::AddChildrenToTree() {
   std::set<std::string>::iterator it;
   for (it = inst_names_.begin(); it != inst_names_.end(); it++) {
     inst = context()->CreateModel<Model>(*it);
-    inst->Deploy(this);
+    inst->Build(this);
   }
 }
 
@@ -97,39 +97,4 @@ std::string RegionModel::str() {
   return s;
 }
 
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::Tick(int time) {
-  int currsize = children().size();
-  int i = 0;
-  while (i < children().size()) {
-    Model* m = children().at(i);
-    dynamic_cast<InstModel*>(m)->Tick(time);
-
-    // increment not needed if a facility deleted itself
-    if (children().size() == currsize) {
-      i++;
-    }
-    currsize = children().size();
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::Tock(int time) {
-  int currsize = children().size();
-  int i = 0;
-  while (i < children().size()) {
-    Model* m = children().at(i);
-    dynamic_cast<InstModel*>(m)->Tock(time);
-
-    // increment not needed if a facility deleted itself
-    if (children().size() == currsize) {
-      i++;
-    }
-    currsize = children().size();
-  }
-}
 } // namespace cyclus

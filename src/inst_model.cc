@@ -73,24 +73,11 @@ void InstModel::AddPrototypeToInitialBuild(QueryEngine* qe) {
   std::string name = qe->GetElementContent("prototype");
   int number = atoi(qe->GetElementContent("number").c_str());
 
-  ThrowErrorIfPrototypeIsntAvailable(name);
-
   CLOG(LEV_DEBUG3) << "Institution: " << this->name() << " is adding "
                    << number << " prototypes of type " << name
                    << " to its list of initial facilities to build.";
 
   initial_build_order_.insert(std::make_pair(name, number));
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::ThrowErrorIfPrototypeIsntAvailable(std::string p) {
-  if (!IsAvailablePrototype(p)) {
-    std::stringstream err("");
-    err << "Inst " << this->name() << " does not have "
-        << p
-        << " as one of its available prototypes.";
-    throw ValidationError(err.str());
-  }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -103,8 +90,9 @@ std::string InstModel::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::Deploy(Model* parent) {
-  Model::Deploy(parent);
+void InstModel::Build(Model* parent) {
+  Model::Build(parent);
+  context()->RegisterTimeListener(this);
 
   // build initial prototypes
   std::map<std::string, int>::iterator it;
@@ -117,39 +105,16 @@ void InstModel::Deploy(Model* parent) {
 
     for (int i = 0; i < number; i++) {
       // build as many as required
-      Build(proto_name);
+      Model* m = context()->CreateModel<Model>(proto_name);
+      m->Build(this);
     }
-  }
-}
-
-/* --------------------
- * all COMMUNICATOR classes have these members
- * --------------------
- */
-void InstModel::Tick(int time) {
-  // tell all of the institution's child models to handle the tick
-  int currsize = children().size();
-  int i = 0;
-  while (i < children().size()) {
-    Model* m = children().at(i);
-    dynamic_cast<FacilityModel*>(m)->Tick(time);
-
-    // increment not needed if a facility deleted itself
-    if (children().size() == currsize) {
-      i++;
-    }
-    currsize = children().size();
   }
 }
 
 void InstModel::Tock(int time) {
-  // tell all of the institution's child models to handle the tock
-  std::vector<FacilityModel*> to_decomm;
-
+  std::vector<Model*> to_decomm;
   for (int i = 0; i < children().size(); i++) {
     FacilityModel* child = dynamic_cast<FacilityModel*>(children().at(i));
-    child->Tock(time);
-
     if (child->LifetimeReached(time)) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
       if (child->CheckDecommissionCondition()) {
@@ -159,7 +124,7 @@ void InstModel::Tock(int time) {
   }
 
   while (!to_decomm.empty()) {
-    FacilityModel* child = to_decomm.back();
+    Model* child = to_decomm.back();
     to_decomm.pop_back();
     RegisterCloneAsDecommissioned(child);
     child->Decommission();
@@ -171,11 +136,8 @@ void InstModel::Tock(int time) {
  * --------------------
  */
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::Build(std::string proto_name) {
-  ThrowErrorIfPrototypeIsntAvailable(proto_name);
-  Model* clone = context()->CreateModel<Model>(proto_name);
-  clone->Deploy(this);
-  RegisterCloneAsBuilt(clone);
+void InstModel::BuildNotify(Model* m) {
+  RegisterCloneAsBuilt(m);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_TRADE_EXECUTOR_H_
-#define CYCLUS_TRADE_EXECUTOR_H_
+#ifndef CYCLUS_SRC_TRADE_EXECUTOR_H_
+#define CYCLUS_SRC_TRADE_EXECUTOR_H_
 
 #include <map>
 #include <set>
@@ -23,17 +23,16 @@ struct TradeExecutionContext {
 
   // the key is the supplier
   std::map<Trader*, std::vector< Trade<T> > > trades_by_supplier;
-  
+
   // the key is the requester, values are a vector of the target Trade with the
   // associated response resource provided by the supplier
-  std::map<Trader*,
-    std::vector< std::pair<Trade<T>, typename T::Ptr> > >
+  std::map<Trader*, std::vector< std::pair<Trade<T>, typename T::Ptr> > >
       trades_by_requester;
 
   // by convention, the first trader is the supplier, the second is the
   // requester
   std::map<std::pair<Trader*, Trader*>,
-    std::vector< std::pair<Trade<T>, typename T::Ptr> > > all_trades;
+      std::vector< std::pair<Trade<T>, typename T::Ptr> > > all_trades;
 };
 
 /// @class TradeExecutor
@@ -46,17 +45,17 @@ struct TradeExecutionContext {
 ///     #. Sending all grouped responses to their respective requester
 template <class T>
 class TradeExecutor {
- public:  
+ public:
   explicit TradeExecutor(const std::vector< Trade<T> >& trades)
-    : trades_(trades) {};
+      : trades_(trades) {}
 
-  /// @brief execute all trades, collecting responsers from bidders and sending
+  /// @brief execute all trades, collecting responders from bidders and sending
   /// responses to requesters
   void ExecuteTrades() {
     GroupTradesBySupplier(trade_ctx_, trades_);
     GetTradeResponses(trade_ctx_);
     SendTradeResources(trade_ctx_);
-  };
+  }
 
   /// @brief Record all trades with the appropriate backends
   ///
@@ -67,14 +66,13 @@ class TradeExecutor {
     typename std::map<std::pair<Trader*, Trader*>,
         std::vector< std::pair<Trade<T>, typename T::Ptr> > >::iterator m_it;
     for (m_it = trade_ctx_.all_trades.begin();
-         m_it != trade_ctx_.all_trades.end();
-         ++m_it) {
+         m_it != trade_ctx_.all_trades.end(); ++m_it) {
       Model* supplier = m_it->first.first->manager();
       Model* requester = m_it->first.second->manager();
-      typename std::vector< std::pair<Trade<T>, typename T::Ptr> >& trades =
-          m_it->second;
-      typename std::vector< std::pair<Trade<T>,
-          typename T::Ptr> >::iterator v_it;
+      typename std::vector< std::pair<Trade<T>, typename T::Ptr> >&
+          trades = m_it->second;
+      typename std::vector< std::pair<Trade<T>, typename T::Ptr> >::iterator
+          v_it;
       for (v_it = trades.begin(); v_it != trades.end(); ++v_it) {
         Trade<T>& trade = v_it->first;
         typename T::Ptr rsrc =  v_it->second;
@@ -84,16 +82,19 @@ class TradeExecutor {
             ->AddVal("ReceiverId", requester->id())
             ->AddVal("ResourceId", rsrc->id())
             ->AddVal("Commodity", trade.request->commodity())
-            ->AddVal("Price", trade.price)
             ->AddVal("Time", ctx->time())
             ->Record();
       }
     }
   }
 
-  inline const TradeExecutionContext<T>& trade_ctx() const { return trade_ctx_; }
-  inline TradeExecutionContext<T>& trade_ctx() { return trade_ctx_; }
-  
+  inline const TradeExecutionContext<T>& trade_ctx() const {
+    return trade_ctx_;
+  }
+  inline TradeExecutionContext<T>& trade_ctx() {
+    return trade_ctx_;
+  }
+
  private:
   const std::vector< Trade<T> >& trades_;
   TradeExecutionContext<T> trade_ctx_;
@@ -142,14 +143,13 @@ static void GetTradeResponses(TradeExecutionContext<T>& trade_ctx) {
 template <class T>
 static void SendTradeResources(TradeExecutionContext<T>& trade_ctx) {
   std::set<Trader*>::iterator it;
-  for (it = trade_ctx.requesters.begin();
-       it != trade_ctx.requesters.end();
+  for (it = trade_ctx.requesters.begin(); it != trade_ctx.requesters.end();
        ++it) {
     Trader* requester = *it;
     AcceptTrades(requester, trade_ctx.trades_by_requester[requester]);
   }
 }
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_EXECUTOR_TRADE_H_
+#endif  // CYCLUS_SRC_TRADE_EXECUTOR_H_

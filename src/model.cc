@@ -61,7 +61,7 @@ Model::Model(Context* ctx)
 Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << id_ << " {";
   context()->model_list_.erase(this);
-  // set died on date and record it in the table if it was ever deployed
+  // set died on date and record it in the table if it was ever built
   if (birthtime_ > -1) {
     deathtime_ = ctx_->time();
     ctx_->NewDatum("AgentExit")
@@ -105,7 +105,7 @@ std::string Model::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::Deploy(Model* parent) {
+void Model::Build(Model* parent) {
   if (parent == this)
     throw KeyError("Model " + name() +
                    "is trying to add itself as its own child.");

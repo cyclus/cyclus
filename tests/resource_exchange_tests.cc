@@ -153,7 +153,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   reqr->port_ = rp;
   
   FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
-  clone->Deploy();
+  clone->Build();
   Requester* rcast = dynamic_cast<Requester*>(clone);
   EXPECT_EQ(0, rcast->req_ctr_);
   exchng->AddAllRequests();
@@ -199,7 +199,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   bidr->port_ = bp;
   
   FacilityModel* clone = dynamic_cast<FacilityModel*>(bidr->Clone());
-  clone->Deploy();
+  clone->Build();
   Bidder* bcast = dynamic_cast<Bidder*>(clone);
 
   EXPECT_EQ(0, bcast->bid_ctr_);
@@ -233,8 +233,8 @@ TEST_F(ResourceExchangeTests, Bids) {
 TEST_F(ResourceExchangeTests, PrefCalls) {
   FacilityModel* parent = dynamic_cast<FacilityModel*>(reqr->Clone());
   FacilityModel* child = dynamic_cast<FacilityModel*>(reqr->Clone());
-  parent->Deploy();
-  child->Deploy(parent);
+  parent->Build();
+  child->Build(parent);
     
   Requester* pcast = dynamic_cast<Requester*>(parent);
   Requester* ccast = dynamic_cast<Requester*>(child);
@@ -278,8 +278,8 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
 TEST_F(ResourceExchangeTests, PrefValues) {
   FacilityModel* parent = dynamic_cast<FacilityModel*>(reqr->Clone());
   FacilityModel* child = dynamic_cast<FacilityModel*>(reqr->Clone());
-  parent->Deploy();
-  child->Deploy(parent);
+  parent->Build();
+  child->Build(parent);
     
   Requester* pcast = dynamic_cast<Requester*>(parent);
   Requester* ccast = dynamic_cast<Requester*>(child);
@@ -304,7 +304,7 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   bidr->port_ = bp;
   
   FacilityModel* bclone = dynamic_cast<FacilityModel*>(bidr->Clone());
-  bclone->Deploy();
+  bclone->Build();
   
   EXPECT_NO_THROW(exchng->AddAllRequests());
   EXPECT_NO_THROW(exchng->AddAllBids());
