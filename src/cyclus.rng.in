@@ -77,7 +77,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <ref name="duration"/>
         <ref name="startmonth"/>
         <ref name="startyear"/>
-        <ref name="simstart"/>
         <ref name="decay"/>
       </interleave>
     </element>
@@ -109,8 +108,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </element>
   </define>
 
-  <define name="simstart">
-    <element name="simstart">
       <data type="nonNegativeInteger"/>
     </element>
   </define>
