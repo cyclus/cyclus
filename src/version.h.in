@@ -1,5 +1,5 @@
-#ifndef VERSION_H_
-#define VERSION_H_
+#ifndef CYCLUS_VERSION_H_
+#define CYCLUS_VERSION_H_
 
 #include <sstream>
 
