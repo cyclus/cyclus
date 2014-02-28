@@ -103,13 +103,6 @@ void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
               prev - qty * unit_caps[i];
     CLOG(cyclus::LEV_DEBUG1) << "                          to: "
                              << caps[i];
-    
-    // if (IsNegative(caps[i])) {
-    //   std::stringstream msg;
-    //   msg << "Can't reduce a capacity from "
-    //       << prev << " to " << caps[i] << ".";
-    //   throw ValueError(msg.str());
-    // }
   }
 
   if (IsNegative(n.max_qty - qty)) {
