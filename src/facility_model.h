@@ -91,11 +91,11 @@ class FacilityModel : public TimeListener, public Model, public Trader {
   void InitFrom(FacilityModel* m);
 
   /**
-     @brief deploys the facility in the simulation
+     @brief builds the facility in the simulation
 
      @param parent the parent of this facility
    */
-  virtual void Deploy(Model* parent = NULL);
+  virtual void Build(Model* parent = NULL);
 
   /**
      decommissions the facility, default behavior is for the facility
@@ -168,25 +168,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
      @return true if the time is greater than the decommission date
    */
   bool LifetimeReached(int time);
-
-  /**
-     Each facility is prompted to do its beginning-of-time-step
-     stuff at the tick of the timer.
-
-     @param time is the time to perform the tick
-   */
-  virtual void Tick(int time) = 0;
-
-  /**
-     Each facility is prompted to its end-of-time-step
-     stuff on the tock of the timer.
-
-     By default, facilities are decommissioned if time is greater
-     than or equal to its end date.
-
-     @param time is the time to perform the tock
-   */
-  virtual void Tock(int time) = 0;
 
  private:
   /**

@@ -13,8 +13,8 @@ using cyclus::CompMap;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTest, SubSame) {
   CompMap v;
-  v[92235] = 1;
-  v[92238] = 2;
+  v[922350000] = 1;
+  v[922380000] = 2;
 
   v = cm::Sub(v, v);
 
@@ -27,7 +27,7 @@ TEST(CompMathTest, SubSame) {
 TEST(CompMathTest, SubCloseSize) {
   CompMap v;
   double qty = 0.1;
-  v[92235] = qty;
+  v[922350000] = qty;
 
   CompMap v2(v);
   cm::Normalize(&v2, qty - cyclus::eps_rsrc());
@@ -47,9 +47,9 @@ TEST(CompMathTest, SubCloseComp) {
   double qty = 0.1;
 
   CompMap v;
-  v[92235] = 1;
-  v[92241] = 1;
-  v[82208] = 1;
+  v[922350000] = 1;
+  v[922410000] = 1;
+  v[822080000] = 1;
   cm::Normalize(&v, qty);
 
   CompMap closev(v);

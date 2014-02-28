@@ -5,12 +5,10 @@
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityRecipeContext::AddInCommod(
-    std::string in_commod,
-    std::string in_recipe,
-    std::string out_commod,
-    std::string out_recipe) {
-
+void CommodityRecipeContext::AddInCommod(std::string in_commod,
+                                         std::string in_recipe,
+                                         std::string out_commod,
+                                         std::string out_recipe) {
   in_commods_.push_back(in_commod);
   out_commods_.push_back(out_commod);
   out_commod_map_.insert(std::make_pair(in_commod, out_commod));
@@ -34,9 +32,8 @@ void CommodityRecipeContext::UpdateRsrc(std::string commod, Resource::Ptr rsrc) 
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityRecipeContext::UpdateInRec(
-    std::string incommod,
-    std::string recipe) {
+void CommodityRecipeContext::UpdateInRec(std::string incommod,
+                                         std::string recipe) {
   out_recipes_[recipe] = out_recipes_[in_recipes_[incommod]];
   in_recipes_[incommod] = recipe;
 }

@@ -1,11 +1,11 @@
-#ifndef CYCLUS_CYCLOPTS_VARIABLE_H_
-#define CYCLUS_CYCLOPTS_VARIABLE_H_
+#ifndef CYCLUS_SRC_VARIABLE_H_
+#define CYCLUS_SRC_VARIABLE_H_
 
 #include <string>
 #include <utility>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace cyclus {
 
@@ -13,7 +13,7 @@ class Variable;
 
 /// Variable base class
 class Variable {
- public:  
+ public:
   /// a smart pointer to the base class
   typedef boost::shared_ptr<Variable> Ptr;
 
@@ -30,7 +30,7 @@ class Variable {
   Variable(Bound l, Bound u, VarType t);
 
   /// virtual destructor for a base class
-  virtual ~Variable() {};
+  virtual ~Variable() {}
 
   /// @return the variable's id
   int id();
@@ -89,17 +89,17 @@ class LinearVariable : public Variable {
   /// @param ub the non-finite upper bound type
   LinearVariable(Bound lb, Bound ub);
 
-  /// constructor 
+  /// constructor
   /// @param lb_val the value of the finite lower bound
   /// @param ub the non-finite upper bound type
   LinearVariable(double lb_val, Bound ub);
 
-  /// constructor 
+  /// constructor
   /// @param lb the non-finite lower bound type
   /// @param ub_val the value of the finite upper bound
   LinearVariable(Bound lb, double ub_val);
 
-  /// constructor 
+  /// constructor
   /// @param lb_val the value of the non-finite lower bound
   /// @param ub_val the value of the non-finite upper bound
   LinearVariable(double lb_val, double ub_val);
@@ -126,17 +126,17 @@ class IntegerVariable : public Variable {
   /// @param ub the non-finite upper bound type
   IntegerVariable(Bound lb, Bound ub);
 
-  /// constructor 
+  /// constructor
   /// @param lb_val the value of the finite lower bound
   /// @param ub the non-finite upper bound type
   IntegerVariable(int lb_val, Bound ub);
 
-  /// constructor 
+  /// constructor
   /// @param lb the non-finite lower bound type
   /// @param ub_val the value of the finite upper bound
   IntegerVariable(Bound lb, int ub_val);
 
-  /// constructor 
+  /// constructor
   /// @param lb_val the value of the non-finite lower bound
   /// @param ub_val the value of the non-finite upper bound
   IntegerVariable(int lb_val, int ub_val);
@@ -158,12 +158,11 @@ class IntegerVariable : public Variable {
 /// @return a pair of integers representing the lower and upper bounds of an
 /// integer variable
 std::pair<int, int> GetIntBounds(Variable::Ptr v);
-  
+
 /// @return a pair of doubles representing the lower and upper bounds of a
 /// linear variable
 std::pair<double, double> GetLinBounds(Variable::Ptr v);
-  
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_VARIABLE_H_

@@ -16,8 +16,6 @@
 class DieInst : public cyclus::InstModel {
  public:
   DieInst(cyclus::Context* ctx) : cyclus::InstModel(ctx) {
-    tickCount_ = 0;
-    tockCount_ = 0;
     tickDie_ = false;
     tockDie_ = false;
   };
@@ -29,35 +27,20 @@ class DieInst : public cyclus::InstModel {
   }
 
   virtual void Tick(int time) {
-    tickCount_++;
-    totalTicks++;
-
     if (tickDie_) {
       context()->DelModel(this);
     }
   }
 
   virtual void Tock(int time) {
-    tockCount_++;
-    totalTocks++;
-    
     if (tockDie_) {
       context()->DelModel(this);
     }
   }
 
-  int tickCount_;
-  int tockCount_;
-
   bool tickDie_;
   bool tockDie_;
-
-  static int totalTicks;
-  static int totalTocks;
 };
-
-int DieInst::totalTicks = 0;
-int DieInst::totalTocks = 0;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class RegionModelClassTests : public ::testing::Test {
@@ -84,51 +67,53 @@ class RegionModelClassTests : public ::testing::Test {
       child5_ = new DieInst(ctx_);
 
       reg_ = new MockRegion(ctx_);
-      child1_->Deploy(reg_);
-      child2_->Deploy(reg_);
-      child3_->Deploy(reg_);
-      child4_->Deploy(reg_);
-      child5_->Deploy(reg_);
+      child1_->Build(reg_);
+      child2_->Build(reg_);
+      child3_->Build(reg_);
+      child4_->Build(reg_);
+      child5_->Build(reg_);
     }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(RegionModelClassTests, TickIter) {
-  child2_->tickDie_ = true;
+  ASSERT_EQ(5, reg_->children().size());
 
-  ASSERT_NO_THROW(reg_->Tick(0));
-  EXPECT_EQ(DieInst::totalTicks, 5);
-  EXPECT_EQ(child1_->tickCount_, 1);
-  EXPECT_EQ(child3_->tickCount_, 1);
-  EXPECT_EQ(child4_->tickCount_, 1);
-  EXPECT_EQ(child5_->tickCount_, 1);
+  child2_->tickDie_ = true;
+  ASSERT_NO_THROW(child1_->Tick(0));
+  ASSERT_NO_THROW(child2_->Tick(0));
+  ASSERT_NO_THROW(child3_->Tick(0));
+  ASSERT_NO_THROW(child4_->Tick(0));
+  ASSERT_NO_THROW(child5_->Tick(0));
+  EXPECT_EQ(4, reg_->children().size());
 
   child1_->tickDie_ = true;
   child3_->tickDie_ = true;
-
-  ASSERT_NO_THROW(reg_->Tick(0));
-  EXPECT_EQ(DieInst::totalTicks, 9);
-  EXPECT_EQ(child4_->tickCount_, 2);
-  EXPECT_EQ(child5_->tickCount_, 2);
+  ASSERT_NO_THROW(child1_->Tick(0));
+  ASSERT_NO_THROW(child3_->Tick(0));
+  ASSERT_NO_THROW(child4_->Tick(0));
+  ASSERT_NO_THROW(child5_->Tick(0));
+  EXPECT_EQ(2, reg_->children().size());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_F(RegionModelClassTests, TockIter) {
-  child2_->tockDie_ = true;
+  ASSERT_EQ(5, reg_->children().size());
 
-  ASSERT_NO_THROW(reg_->Tock(0));
-  EXPECT_EQ(DieInst::totalTocks, 5);
-  EXPECT_EQ(child1_->tockCount_, 1);
-  EXPECT_EQ(child3_->tockCount_, 1);
-  EXPECT_EQ(child4_->tockCount_, 1);
-  EXPECT_EQ(child5_->tockCount_, 1);
+  child2_->tockDie_ = true;
+  ASSERT_NO_THROW(child1_->Tock(0));
+  ASSERT_NO_THROW(child2_->Tock(0));
+  ASSERT_NO_THROW(child3_->Tock(0));
+  ASSERT_NO_THROW(child4_->Tock(0));
+  ASSERT_NO_THROW(child5_->Tock(0));
+  EXPECT_EQ(4, reg_->children().size());
 
   child1_->tockDie_ = true;
   child3_->tockDie_ = true;
-
-  ASSERT_NO_THROW(reg_->Tock(0));
-  EXPECT_EQ(DieInst::totalTocks, 9);
-  EXPECT_EQ(child4_->tockCount_, 2);
-  EXPECT_EQ(child5_->tockCount_, 2);
+  ASSERT_NO_THROW(child1_->Tock(0));
+  ASSERT_NO_THROW(child3_->Tock(0));
+  ASSERT_NO_THROW(child4_->Tock(0));
+  ASSERT_NO_THROW(child5_->Tock(0));
+  EXPECT_EQ(2, reg_->children().size());
 }
 

@@ -18,8 +18,12 @@ struct Converter {
 
   /// @brief operator== is available for subclassing, see
   /// cyclus::TrivialConverter for an example
-  virtual bool operator==(Converter& other) const { return false; }
-  bool operator!=(Converter& other) const { return !operator==(other); }
+  virtual bool operator==(Converter& other) const {
+    return false;
+  }
+  bool operator!=(Converter& other) const {
+    return !operator==(other);
+  }
 };
 
 /// @class TrivialConverter
@@ -48,27 +52,27 @@ class CapacityConstraint {
   /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(double capacity, typename Converter<T>::Ptr converter)
       : capacity_(capacity),
-      converter_(converter),
-      id_(next_id_++) {
-        assert(capacity_ > 0);
-      }
+        converter_(converter),
+        id_(next_id_++) {
+    assert(capacity_ > 0);
+  }
 
   /// @brief constructor for a constraint with a trivial converter (i.e., one
   /// that simply returns 1)
   explicit CapacityConstraint(double capacity)
       : capacity_(capacity),
-      id_(next_id_++) {
-        converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
-        assert(capacity_ > 0);
-      }
+        id_(next_id_++) {
+    converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
+    assert(capacity_ > 0);
+  }
 
   /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(const CapacityConstraint& other)
       : capacity_(other.capacity_),
-      converter_(other.converter_),
-      id_(next_id_++) {
-        assert(capacity_ > 0);
-      }
+        converter_(other.converter_),
+        id_(next_id_++) {
+    assert(capacity_ > 0);
+  }
 
   /// @return the constraints capacity
   inline double capacity() const {

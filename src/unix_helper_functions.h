@@ -1,12 +1,12 @@
 // unix_helper_functions.h
 // This is the dynamic loading implementation for UNIX machines
-#ifndef UNIXHELPERFUNCTIONS_H
-#define UNIXHELPERFUNCTIONS_H
+#ifndef CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_
+#define CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_
 
 #include <dlfcn.h>
 
-#include "suffix.h"
 #include "error.h"
+#include "suffix.h"
 
 namespace cyclus {
 
@@ -20,12 +20,11 @@ void DynamicModule::OpenLibrary() {
     throw IOError(err_msg);
   }
 
-  dlerror(); // reset errors
+  dlerror();  // reset errors
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
-
   constructor_ = (ModelCtor*)
                  dlsym(module_library_, constructor_name_.c_str());
 
@@ -35,7 +34,7 @@ void DynamicModule::SetConstructor() {
     throw IOError(err_msg);
   }
 
-  dlerror(); // reset errors
+  dlerror();  // reset errors
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,9 +46,9 @@ void DynamicModule::CloseLibrary() {
       err_msg  += dlerror();
       throw IOError(err_msg);
     }
-    dlerror(); // reset errors
+    dlerror();  // reset errors
   }
 }
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_TRADER_H_
-#define CYCLUS_TRADER_H_
+#ifndef CYCLUS_SRC_TRADER_H_
+#define CYCLUS_SRC_TRADER_H_
 
 #include <set>
 
@@ -23,20 +23,22 @@ namespace cyclus {
 /// corresponding exchanges.
 class Trader {
  public:
-  Trader(Model* manager) : manager_(manager) {};
+  Trader(Model* manager) : manager_(manager) {}
 
-  virtual Model* manager() {return manager_;};
+  virtual Model* manager() {
+    return manager_;
+  }
 
   /// @brief default implementation for material requests
   virtual std::set<RequestPortfolio<Material>::Ptr>
       GetMatlRequests() {
     return std::set<RequestPortfolio<Material>::Ptr>();
   }
-  
+
   /// @brief default implementation for generic resource requests
   virtual std::set<RequestPortfolio<GenericResource>::Ptr>
       GetGenRsrcRequests() {
-    return std::set<RequestPortfolio<GenericResource>::Ptr >();
+    return std::set<RequestPortfolio<GenericResource>::Ptr>();
   }
 
   /// @brief default implementation for material requests
@@ -44,7 +46,7 @@ class Trader {
       GetMatlBids(const CommodMap<Material>::type& commod_requests) {
     return std::set<BidPortfolio<Material>::Ptr>();
   }
-  
+
   /// @brief default implementation for generic resource requests
   virtual std::set<BidPortfolio<GenericResource>::Ptr>
       GetGenRsrcBids(const CommodMap<GenericResource>::type&
@@ -52,20 +54,26 @@ class Trader {
     return std::set<BidPortfolio<GenericResource>::Ptr>();
   }
 
+  /// default implementation for material preferences.
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
+
+  /// default implementation for material preferences.
+  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) {}
+
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
   virtual void GetMatlTrades(
-    const std::vector< Trade<Material> >& trades,
-    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {}
-  
+      const std::vector< Trade<Material> >& trades,
+      std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {}
+
   /// @brief default implementation for responding to generic resource trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
   virtual void GetGenRsrcTrades(
-    const std::vector< Trade<GenericResource> >& trades,
-    std::vector<std::pair<Trade<GenericResource>,
-    GenericResource::Ptr> >& responses) {}
+      const std::vector< Trade<GenericResource> >& trades,
+      std::vector<std::pair<Trade<GenericResource>,
+      GenericResource::Ptr> >& responses) {}
 
   /// @brief default implementation for material trade acceptance
   virtual void AcceptMatlTrades(
@@ -76,10 +84,11 @@ class Trader {
   virtual void AcceptGenRsrcTrades(
       const std::vector<std::pair<Trade<GenericResource>,
       GenericResource::Ptr> >& responses) {}
+
  private:
   Model* manager_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_TRADER_H_
+#endif  // CYCLUS_SRC_TRADER_H_

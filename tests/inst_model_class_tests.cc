@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "recorder.h"
-#include "facility_model.h"
+#include "mock_facility.h"
 #include "inst_model.h"
 #include "mock_inst.h"
 #include "timer.h"
@@ -12,50 +12,14 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class DieModel : public cyclus::FacilityModel {
- public:
-  DieModel(cyclus::Context* ctx) : FacilityModel(ctx) {
-    tickCount_ = 0;
-    tockCount_ = 0;
-  };
-
-  virtual ~DieModel() {};
-
-  virtual void CloneModuleMembersFrom(FacilityModel* source) {};
-
-  virtual void Tick(int time) {
-    tickCount_++;
-    totalTicks++;
-  }
-
-  virtual void Tock(int time) {
-    tockCount_++;
-    totalTocks++;
-  }
-
-  virtual cyclus::Model* Clone() {
-    return new DieModel(context());
-  }
-
-  int tickCount_;
-  int tockCount_;
-
-  static int totalTicks;
-  static int totalTocks;
-};
-
-int DieModel::totalTicks = 0;
-int DieModel::totalTocks = 0;
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class InstModelClassTests : public ::testing::Test {
  protected:
 
-  DieModel* child1_;
-  DieModel* child2_;
-  DieModel* child3_;
-  DieModel* child4_;
-  DieModel* child5_;
+   cyclus::FacilityModel* child1_;
+   cyclus::FacilityModel* child2_;
+   cyclus::FacilityModel* child3_;
+   cyclus::FacilityModel* child4_;
+   cyclus::FacilityModel* child5_;
 
   cyclus::InstModel* inst_;
   cyclus::Recorder rec_;
@@ -65,40 +29,32 @@ class InstModelClassTests : public ::testing::Test {
   virtual void SetUp() {
     ctx_ = new cyclus::Context(&ti_, &rec_);
 
-    child1_ = new DieModel(ctx_);
-    child2_ = new DieModel(ctx_);
-    child3_ = new DieModel(ctx_);
-    child4_ = new DieModel(ctx_);
-    child5_ = new DieModel(ctx_);
+    child1_ = new MockFacility(ctx_);
+    child2_ = new MockFacility(ctx_);
+    child3_ = new MockFacility(ctx_);
+    child4_ = new MockFacility(ctx_);
+    child5_ = new MockFacility(ctx_);
 
     inst_ = new MockInst(ctx_);
-    child1_->Deploy(inst_);
-    child2_->Deploy(inst_);
-    child3_->Deploy(inst_);
-    child4_->Deploy(inst_);
-    child5_->Deploy(inst_);
+    child1_->Build(inst_);
+    child2_->Build(inst_);
+    child3_->Build(inst_);
+    child4_->Build(inst_);
+    child5_->Build(inst_);
   }
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(InstModelClassTests, TockIter) {
-  child2_->SetFacLifetime(0);
+  ASSERT_EQ(5, inst_->children().size());
 
-  EXPECT_EQ(inst_->children().size(), 5);
+  child2_->SetFacLifetime(0);
   ASSERT_NO_THROW(inst_->Tock(0));
-  EXPECT_EQ(DieModel::totalTocks, 5);
-  EXPECT_EQ(child1_->tockCount_, 1);
-  EXPECT_EQ(child3_->tockCount_, 1);
-  EXPECT_EQ(child4_->tockCount_, 1);
-  EXPECT_EQ(child5_->tockCount_, 1);
+  EXPECT_EQ(4, inst_->children().size());
 
   child1_->SetFacLifetime(0);
   child3_->SetFacLifetime(0);
-
-  EXPECT_EQ(inst_->children().size(), 4);
   ASSERT_NO_THROW(inst_->Tock(1));
-  EXPECT_EQ(DieModel::totalTocks, 9);
-  EXPECT_EQ(child4_->tockCount_, 2);
-  EXPECT_EQ(child5_->tockCount_, 2);
+  EXPECT_EQ(2, inst_->children().size());
 }
 

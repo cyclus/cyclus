@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
   rec.RegisterBackend(back);
 
   // Run the simulation
-  ti.RunSim(ctx);
+  ti.RunSim();
 
   if (!success) {
     std::cout << std::endl;

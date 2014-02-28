@@ -60,7 +60,7 @@ int DonutShop::destruct_count = 0;
 TEST_F(ContextTests, traders) {
   EXPECT_TRUE(ctx->traders().empty());
   Model* clone = fac->Clone();
-  clone->Deploy();
+  clone->Build();
   Trader* exr = dynamic_cast<Trader*>(clone);
   EXPECT_EQ(ctx->traders().size(), 1);
   EXPECT_EQ(*ctx->traders().begin(), exr);

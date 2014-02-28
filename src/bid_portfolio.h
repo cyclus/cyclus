@@ -33,7 +33,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @brief default constructor
   BidPortfolio()
       : bidder_(NULL),
-      commodity_("NO_COMMODITY_SET") {}
+        commodity_("NO_COMMODITY_SET") {}
 
   /// @brief add a bid to the portfolio
   /// @param request the request being responded to by this bid
@@ -62,14 +62,20 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
 
   /// @return the model associated with the portfolio. If no bids have
   /// been added, the bidder is NULL.
-  inline Trader* bidder() const { return bidder_; }
+  inline Trader* bidder() const {
+    return bidder_;
+  }
 
   /// @return the commodity associated with the portfolio. If no bids have
   /// been added, the commodity is 'NO_COMMODITY_SET'.
-  inline std::string commodity() const { return commodity_; }
+  inline std::string commodity() const {
+    return commodity_;
+  }
 
   /// @return const access to the bids
-  inline const std::set<typename Bid<T>::Ptr>& bids() const { return bids_; }
+  inline const std::set<typename Bid<T>::Ptr>& bids() const {
+    return bids_;
+  }
 
   /// @return the set of constraints over the bids
   inline const std::set< CapacityConstraint<T> >& constraints() const {

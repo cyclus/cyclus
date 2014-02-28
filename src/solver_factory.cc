@@ -29,7 +29,6 @@ void SolveProg(OsiSolverInterface* si) {
 bool HasInt(OsiSolverInterface* si) {
   int i = 0;
   for (i = 0; i != si->getNumCols(); i++) {
-    // std::cout << "hi mom!" << si->isInteger(i) << "\n";
     if(si->isInteger(i)) {
       return true;
     }
