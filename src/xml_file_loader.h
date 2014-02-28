@@ -38,7 +38,7 @@ class XMLFileLoader {
   XMLFileLoader(Context* ctx, std::string schema_path,
                 const std::string load_filename = "");
 
-  virtual ~XMLFileLoader();
+  virtual ~XMLFileLoader() {};
 
   /// applies a schema agaisnt the parser used by the file loader
   /// @param schema the schema representation
@@ -70,9 +70,6 @@ class XMLFileLoader {
   /// commodity
   void ProcessCommodities(std::map<std::string, double>* commodity_order);
 
-  /// Method to load all dyamic modules
-  void LoadDynamicModules();
-
   Context* ctx_;
 
   /// filepath to the schema
@@ -83,10 +80,6 @@ class XMLFileLoader {
 
   /// the parser
   boost::shared_ptr<XMLParser> parser_;
-
-  /// a map of loaded modules. all dynamically loaded modules are
-  /// registered with this map when loaded.
-  std::map< std::string, DynamicModule*> modules_;
 
   /// loads a specific recipe
   void LoadRecipe(QueryEngine* qe);

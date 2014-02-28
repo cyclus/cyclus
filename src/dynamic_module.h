@@ -3,6 +3,7 @@
 #define CYCLUS_SRC_DYNAMIC_MODULE_H_
 
 #include <string>
+#include <map>
 
 namespace cyclus {
 
@@ -13,22 +14,19 @@ typedef Model* ModelCtor(Context*);
 
 class DynamicModule {
  public:
+  /// Returns a newly constructed model for the given module name.
+  static Model* Make(Context* ctx, std::string name);
+
+  /// Closes all statically loaded dynamic modules. This should always be called
+  /// before process termination.  This must be called AFTER all models have
+  /// been destructed.
+  static void CloseAll();
+
   /// @return the global library suffix
   static const std::string Suffix();
 
-  /// Creates a new dynamically loadable module.
-  /// @param name the name of the module
-  DynamicModule(std::string name);
-
   /// @return the module name
   std::string name();
-
-  /// construct an instance of this module
-  /// @return a fresh instance
-  Model* ConstructInstance(Context* ctx);
-
-  /// closes the loaded module dynamic lib
-  void CloseLibrary();
 
   /// If this path for this module has not been discovered yet, path searches
   /// for it.
@@ -38,6 +36,21 @@ class DynamicModule {
   std::string path();
 
  private:
+  /// Creates a new dynamically loadable module.
+  /// @param name the name of the module
+  DynamicModule(std::string name);
+
+  /// construct an instance of this module
+  /// @return a fresh instance
+  Model* ConstructInstance(Context* ctx);
+
+  /// closes the loaded module dynamic lib
+  void CloseLibrary();
+
+  /// all dynamically loaded modules are
+  /// added to this map when loaded.
+  static std::map<std::string, DynamicModule*> modules_;
+
   /// the path to the library
   std::string abs_path_;
 

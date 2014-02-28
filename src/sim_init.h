@@ -41,6 +41,10 @@ class SimInit {
   void LoadInitialAgents();
   void LoadInventories();
 
+  /// a map of loaded modules. all dynamically loaded modules are
+  /// registered with this map when loaded.
+  std::map< std::string, DynamicModule*> modules_;
+
   SimEngine* se_;
   boost::uuids::uuid simid_;
   QueryBackend* b_;

@@ -51,13 +51,11 @@ std::string BuildMasterSchema(std::string schema_path) {
   std::vector<std::string> names = Env::ListModules();
   std::map<std::string, std::string> subschemas;
   for (int i = 0; i < names.size(); ++i) {
-    DynamicModule dyn(names[i]);
-    Model* m = dyn.ConstructInstance(&ctx);
+    Model* m = DynamicModule::Make(&ctx, names[i]);
     subschemas[m->model_type()] += "<element name=\"" + names[i] + "\">\n";
     subschemas[m->model_type()] += m->schema() + "\n";
     subschemas[m->model_type()] += "</element>\n";
     ctx.DelModel(m);
-    dyn.CloseLibrary();
   }
 
   // replace refs in master rng template file
@@ -126,15 +124,6 @@ XMLFileLoader::XMLFileLoader(Context* ctx,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::~XMLFileLoader() {
-  std::map<std::string, DynamicModule*>::iterator it;
-  for (it = modules_.begin(); it != modules_.end(); it++) {
-    it->second->CloseLibrary();
-    delete it->second;
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
   parser_->Validate(schema);
 }
@@ -179,19 +168,6 @@ void XMLFileLoader::LoadSolver() {
       ->Record();
   }
 }
-
-//void InitSolver() {
-//  // solver will delete conditioner
-//  GreedyPreconditioner* conditioner = new GreedyPreconditioner(
-//    commod_order,
-//    GreedyPreconditioner::REVERSE);
-//
-//  // context will delete solver
-//  bool exclusive_orders = false;
-//  GreedySolver* solver = new GreedySolver(exclusive_orders, conditioner);
-//
-//  ctx_->solver(solver);
-//}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::ProcessCommodities(
@@ -238,7 +214,6 @@ void XMLFileLoader::LoadRecipes() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadInitialAgents() {
-  LoadDynamicModules();
   std::set<std::string> module_types;
   module_types.insert("Region");
   module_types.insert("Inst");
@@ -257,7 +232,7 @@ void XMLFileLoader::LoadInitialAgents() {
       std::string module_name = module_data->GetElementName();
       std::string prototype = qe->GetElementContent("name");
 
-      Model* model = modules_[module_name]->ConstructInstance(ctx_);
+      Model* model = DynamicModule::Make(ctx_, module_name);
       proto_qes[prototype] = qe;
       model->SetModelImpl(module_name);
       model->InfileToDb(qe, di);
@@ -300,29 +275,6 @@ void XMLFileLoader::LoadInitialAgents() {
           fac->InfileToDb(proto_qes[fac_proto], di);
           inst->BuildNotify(fac);
         }
-      }
-    }
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadDynamicModules() { 
-  std::string name;
-  int nmods;
-  QueryEngine* qe;
-  DynamicModule* module;
-  std::map<std::string, std::string>::iterator m_it;
-  XMLQueryEngine xqe(*parser_);
-  for (m_it = schema_paths_.begin(); m_it != schema_paths_.end(); ++m_it) {
-    nmods = xqe.NElementsMatchingQuery(m_it->second);
-    for (int i = 0; i != nmods; i++) {
-      qe = xqe.QueryElement(m_it->second, i);
-      name = qe->QueryElement("model")->GetElementName(0);
-      if (modules_.find(name) == modules_.end()) {
-        CLOG(LEV_DEBUG1) << "Loading module '" << name << "'.";
-        module = new DynamicModule(name);
-        modules_[name] = module;
-        CLOG(LEV_DEBUG1) << "Module '" << name << "' has been loaded.";
       }
     }
   }

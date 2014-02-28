@@ -126,13 +126,11 @@ int main(int argc, char* argv[]) {
   } else if (vm.count("module-schema")) {
     std::string name(vm["module-schema"].as<std::string>());
     try {
-      DynamicModule dyn(name);
-      Model* m = dyn.ConstructInstance(ctx);
+      Model* m = DynamicModule::Make(ctx, name);
       std::cout << "<element name=\"" << name << "\">\n";
       std::cout << m->schema();
       std::cout << "</element>\n";
       ctx->DelModel(m);
-      dyn.CloseLibrary();
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
     }

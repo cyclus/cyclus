@@ -26,13 +26,11 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
   std::vector<std::string> names = Env::ListModules();
   std::string subschemas;
   for (int i = 0; i < names.size(); ++i) {
-    DynamicModule dyn(names[i]);
-    Model* m = dyn.ConstructInstance(&ctx);
+    Model* m = DynamicModule::Make(&ctx, names[i]);
     subschemas += "<element name=\"" + names[i] + "\">\n";
     subschemas += m->schema() + "\n";
     subschemas += "</element>\n";
     ctx.DelModel(m);
-    dyn.CloseLibrary();
   }
 
   // replace refs in master rng template file
@@ -52,7 +50,6 @@ std::string XMLFlatLoader::master_schema() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFlatLoader::LoadInitialAgents() {
-  LoadDynamicModules();
   XMLQueryEngine xqe(*parser_);
   DbInit di;
 
@@ -66,7 +63,7 @@ void XMLFlatLoader::LoadInitialAgents() {
     std::string prototype = qe->GetElementContent("name");
     proto_qes[prototype] = qe;
 
-    Model* model = modules_[module_name]->ConstructInstance(ctx_);
+    Model* model = DynamicModule::Make(ctx_, module_name);
     model->SetModelImpl(module_name);
     model->InfileToDb(qe, di);
     ctx_->AddPrototype(prototype, model);
