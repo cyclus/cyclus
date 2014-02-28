@@ -168,7 +168,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
 void ProgTranslator::FromProg() {
   const double* sol = iface_->getColSolution();
   std::vector<Arc>& arcs = g_->arcs();
-  doubel flow;
+  double flow;
   for (int i = 0; i < arcs.size(); i++) {
     Arc& a = g_->arc_by_id().at(i);
     flow = sol[i];
