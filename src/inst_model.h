@@ -62,40 +62,6 @@ class InstModel : public Model, public TimeListener {
    */
   virtual void Build(Model* parent);
 
-  /* ------------------- */
- 
-  /* --------------------
-   * all INSTMODEL classes have these members
-   * --------------------
-   */
-  /**
-     return the number of prototypes this inst can build
-   */
-  int NPrototypes() {
-    return prototypes_.size();
-  }
-
-  /**
-     return the first prototype
-   */
-  PrototypeIterator BeginPrototype() {
-    return prototypes_.begin();
-  }
-
-  /**
-     return the last prototype
-   */
-  PrototypeIterator EndPrototype() {
-    return prototypes_.end();
-  }
-
-  /**
-     Checks if prototype is in the prototype list
-   */
-  bool IsAvailablePrototype(std::string proto_name) {
-    return (prototypes_.find(proto_name) != prototypes_.end());
-  }
-
   virtual void Tick(int time) {};
 
   virtual void Tock(int time);
@@ -103,25 +69,6 @@ class InstModel : public Model, public TimeListener {
  protected:
   void InitFrom(InstModel* m);
 
-  /**
-     add a prototoype to the set of available prototypes
-     @param proto_name the name of the prototype to add
-   */
-  void AddAvailablePrototype(std::string proto_name);
-
-  /**
-     perform any actions required after prototype has been added to
-     the list of available prototypes
-     @param proto_name the name of prototype to register
-   */
-  virtual void RegisterAvailablePrototype(std::string proto_name);
-
-private:
-  /**
-     The Inst's set of available prototypes to build
-   */
-  PrototypeSet prototypes_;
-  /* ------------------- */
 };
 
 } // namespace cyclus

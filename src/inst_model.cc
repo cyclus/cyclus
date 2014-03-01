@@ -23,36 +23,12 @@ InstModel::InstModel(Context* ctx) : Model(ctx) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::InitFrom(InstModel* m) {
   Model::InitFrom(m);
-  this->prototypes_ = m->prototypes_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::InitFrom(QueryEngine* qe) {
   Model::InitFrom(qe);
-
-  std::string name, query;
-  int nEntries;
-
-  // populate prototypes_
-  query = "availableprototype";
-  nEntries = qe->NElementsMatchingQuery(query);
-  if (nEntries > 0) {
-    // populate prototypes_
-    for (int i = 0; i < nEntries; i++) {
-      name = qe->GetElementContent(query, i);
-      AddAvailablePrototype(name);
-    }
-  }
 }
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::AddAvailablePrototype(std::string proto_name) {
-  prototypes_.insert(proto_name);
-  RegisterAvailablePrototype(proto_name);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::RegisterAvailablePrototype(std::string proto_name) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InstModel::str() {

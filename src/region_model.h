@@ -93,18 +93,6 @@ class RegionModel : public Model, public TimeListener {
    */
   virtual std::string str();
 
-  /* --------------------
-   * all REGIONMODEL classes have these members
-   * --------------------
-   */
-  /**
-     returns if the facility is in this region's allowed facs
-   */
-  inline bool IsAllowedFacility(std::string proto_name) {
-    return (allowedFacilities_.find(proto_name)
-            != allowedFacilities_.end());
-  } ;
-
   virtual void Tick(int time) {};
 
   virtual void Tock(int time) {};
@@ -112,17 +100,6 @@ class RegionModel : public Model, public TimeListener {
  protected:
   void InitFrom(RegionModel* m);
 
-  /**
-     populate the region's list of allowed facilities
-   */
-  virtual void InitAllowedFacilities(QueryEngine* qe);
-
- private:
-  /**
-     every region has a list of allowed facilities
-   */
-  std::set<std::string> allowedFacilities_;
-  /* ------------------- */
 };
 
 } // namespace cyclus
