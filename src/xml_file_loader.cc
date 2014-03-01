@@ -125,8 +125,6 @@ XMLFileLoader::XMLFileLoader(RecBackend* b,
 }
 
 XMLFileLoader::~XMLFileLoader() {
-  // MUST be before delete context to avoid logging incorrect initial agent
-  // exit dates.
   rec_.Close();
   delete ctx_;
 }

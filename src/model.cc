@@ -61,14 +61,6 @@ Model::Model(Context* ctx)
 Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << id_ << " {";
   context()->model_list_.erase(this);
-  // set died on date and record it in the table if it was ever built
-  if (birthtime_ > -1) {
-    deathtime_ = ctx_->time();
-    ctx_->NewDatum("AgentExit")
-    ->AddVal("AgentId", id())
-    ->AddVal("ExitTime", deathtime_)
-    ->Record();
-  }
   
   if (parent_ != NULL) {
     CLOG(LEV_DEBUG2) << "Model '" << parent_->name() << "' ID=" << parent_->id()
@@ -131,6 +123,11 @@ void Model::Build(Model* parent) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Decommission() {
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
+  deathtime_ = ctx_->time();
+  ctx_->NewDatum("AgentExit")
+  ->AddVal("AgentId", id())
+  ->AddVal("ExitTime", deathtime_)
+  ->Record();
   ctx_->DelModel(this);
 }
 
