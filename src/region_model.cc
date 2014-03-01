@@ -23,7 +23,7 @@ void RegionModel::InitFrom(RegionModel* m) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RegionModel::RegionModel(Context* ctx) : Model(ctx) {
-  model_type_ = "Region";
+  kind_ = "Region";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,7 +63,7 @@ std::string RegionModel::str() {
   for (std::vector<Model*>::const_iterator inst = children().begin();
        inst != children().end();
        inst++) {
-    s += (*inst)->name() + ", ";
+    s += (*inst)->prototype() + ", ";
   }
   return s;
 }

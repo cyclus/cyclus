@@ -17,7 +17,7 @@ namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel::InstModel(Context* ctx) : Model(ctx) {
-  model_type_ = "Inst";
+  kind_ = "Inst";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,7 +57,7 @@ void InstModel::RegisterAvailablePrototype(std::string proto_name) {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InstModel::str() {
   if (parent() != NULL) {
-    return Model::str() + " in region" + parent()->name();
+    return Model::str() + " in region" + parent()->prototype();
   } else {
     return Model::str() + " with no region.";
   }
@@ -76,7 +76,7 @@ void InstModel::Tock(int time) {
     FacilityModel* child = dynamic_cast<FacilityModel*>(children().at(i));
     int lifetime = child->lifetime();
     if (lifetime != -1 && time >= child->birthtime() + lifetime) {
-      CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
+      CLOG(LEV_INFO3) << child->prototype() << " has reached the end of its lifetime";
       if (child->CheckDecommissionCondition()) {
         to_decomm.push_back(child);
       }

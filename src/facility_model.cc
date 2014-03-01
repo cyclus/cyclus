@@ -19,7 +19,7 @@ namespace cyclus {
 FacilityModel::FacilityModel(Context* ctx)
     : Trader(this),
       Model(ctx) {
-  model_type_ = "Facility";
+  kind_ = "Facility";
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -75,7 +75,7 @@ std::string FacilityModel::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::Decommission() {
   if (!CheckDecommissionCondition()) {
-    throw Error("Cannot decommission " + name());
+    throw Error("Cannot decommission " + prototype());
   }
 
   context()->UnregisterTrader(this);

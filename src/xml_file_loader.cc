@@ -50,9 +50,9 @@ std::string BuildMasterSchema(std::string schema_path) {
   std::map<std::string, std::string> subschemas;
   for (int i = 0; i < names.size(); ++i) {
     Model* m = DynamicModule::Make(&ctx, names[i]);
-    subschemas[m->model_type()] += "<element name=\"" + names[i] + "\">\n";
-    subschemas[m->model_type()] += m->schema() + "\n";
-    subschemas[m->model_type()] += "</element>\n";
+    subschemas[m->kind()] += "<element name=\"" + names[i] + "\">\n";
+    subschemas[m->kind()] += m->schema() + "\n";
+    subschemas[m->kind()] += "</element>\n";
     ctx.DelModel(m);
   }
 

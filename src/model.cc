@@ -20,8 +20,8 @@ int Model::next_id_ = 0;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::InitFrom(Model* m) {
   id_ = next_id_++;
-  name_ = m->name_;
-  model_type_ = m->model_type_;
+  prototype_ = m->prototype_;
+  kind_ = m->kind_;
   model_impl_ = m->model_impl_;
   lifetime_ = m->lifetime_;
   ctx_ = m->ctx_;
@@ -30,7 +30,7 @@ void Model::InitFrom(Model* m) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::InformErrorMsg(std::string msg) {
   std::stringstream ret;
-  ret << "A(n) " << model_impl_ << " named " << name_
+  ret << "A(n) " << model_impl_ << " named " << prototype_
       << " at time " << context()->time()
       << " received the following error:\n"
       << msg;
@@ -39,16 +39,16 @@ std::string Model::InformErrorMsg(std::string msg) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::InitFrom(QueryEngine* qe) {
-  name_ = qe->GetElementContent("name");
+  prototype_ = qe->GetElementContent("name");
   lifetime_ = GetOptionalQuery<int>(qe, "lifetime", -1);
-  CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
+  CLOG(LEV_DEBUG1) << "Model '" << prototype_ << "' just created.";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model(Context* ctx)
   : ctx_(ctx),
     id_(next_id_++),
-    model_type_("Model"),
+    kind_("Model"),
     parent_id_(-1),
     birthtime_(-1),
     lifetime_(-1),
@@ -60,12 +60,12 @@ Model::Model(Context* ctx)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
-  MLOG(LEV_DEBUG3) << "Deleting model '" << name() << "' ID=" << id_ << " {";
+  MLOG(LEV_DEBUG3) << "Deleting model '" << prototype() << "' ID=" << id_ << " {";
   context()->model_list_.erase(this);
   
   if (parent_ != NULL) {
-    CLOG(LEV_DEBUG2) << "Model '" << parent_->name() << "' ID=" << parent_->id()
-                     << " has removed child '" << name() << "' ID="
+    CLOG(LEV_DEBUG2) << "Model '" << parent_->prototype() << "' ID=" << parent_->id()
+                     << " has removed child '" << prototype() << "' ID="
                      << id() << " from its list of children.";
     std::vector<Model*>::iterator it;
     it = find(parent_->children_.begin(), parent_->children_.end(), this);
@@ -87,11 +87,11 @@ Model::~Model() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::str() {
   std::stringstream ss;
-  ss << model_type() << "_" << name_
+  ss << kind_ << "_" << prototype_
      << " ( "
      << "ID=" << id_
      << ", implementation=" << model_impl_
-     << ",  name=" << name_
+     << ",  name=" << prototype_
      << ",  parentID=" << parent_id_
      << " ) " ;
   return ss.str();
@@ -100,21 +100,21 @@ std::string Model::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Build(Model* parent) {
   if (parent == this)
-    throw KeyError("Model " + name() +
+    throw KeyError("Model " + prototype() +
                    "is trying to add itself as its own child.");
 
-  CLOG(LEV_DEBUG1) << "Model '" << name()
+  CLOG(LEV_DEBUG1) << "Model '" << prototype()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
-  CLOG(LEV_DEBUG3) << " * Implementation: " << ModelImpl();
+  CLOG(LEV_DEBUG3) << " * Implementation: " << model_impl_;
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
   if (parent != NULL) {
     parent_ = parent;
     parent_id_ = parent->id();
     parent->children_.push_back(this);
-    CLOG(LEV_DEBUG2) << "Model '" << parent->name() << "' ID=" << parent->id()
-                     << " has added child '" << name() << "' ID="
+    CLOG(LEV_DEBUG2) << "Model '" << parent->prototype() << "' ID=" << parent->id()
+                     << " has added child '" << prototype() << "' ID="
                      << id() << " to its list of children.";
   }
   birthtime_ = ctx_->time();
@@ -123,7 +123,7 @@ void Model::Build(Model* parent) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Decommission() {
-  CLOG(LEV_INFO3) << name() << " is being decommissioned";
+  CLOG(LEV_INFO3) << prototype() << " is being decommissioned";
   ctx_->NewDatum("AgentExit")
   ->AddVal("AgentId", id())
   ->AddVal("ExitTime", ctx_->time())
@@ -134,7 +134,7 @@ void Model::Decommission() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::PrintChildren() {
   std::stringstream ss("");
-  ss << "Children of " << name() << ":" << std::endl;
+  ss << "Children of " << prototype() << ":" << std::endl;
   for (int i = 0; i < children_.size(); i++) {
     std::vector<std::string> print_outs = GetTreePrintOuts(children_.at(i));
     for (int j = 0; j < print_outs.size(); j++) {
@@ -148,7 +148,7 @@ std::string Model::PrintChildren() {
 std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
   std::vector<std::string> ret;
   std::stringstream ss("");
-  ss << m->name() << std::endl;
+  ss << m->prototype() << std::endl;
   ret.push_back(ss.str());
   for (int i = 0; i < m->children().size(); i++) {
     std::vector<std::string> outs = GetTreePrintOuts(m->children().at(i));
@@ -169,12 +169,12 @@ const std::string Model::ModelImpl() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddToTable() {
   ctx_->NewDatum("AgentEntry")
-  ->AddVal("AgentId", id())
-  ->AddVal("Kind", model_type())
-  ->AddVal("Implementation", ModelImpl())
-  ->AddVal("Prototype", name())
+  ->AddVal("AgentId", id_)
+  ->AddVal("Kind", kind_)
+  ->AddVal("Implementation", model_impl_)
+  ->AddVal("Prototype", prototype_)
   ->AddVal("ParentId", parent_id_)
-  ->AddVal("EnterTime", birthtime())
+  ->AddVal("EnterTime", birthtime_)
   ->Record();
 }
 } // namespace cyclus

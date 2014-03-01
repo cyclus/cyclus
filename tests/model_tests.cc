@@ -43,11 +43,11 @@ TEST_P(ModelTests, InitAndGetName) {
   p.Init(ss);
   cyclus::XMLQueryEngine engine(p);
   model_->Model::InitFrom(&engine);
-  EXPECT_EQ(model_->name(),"fooname");
+  EXPECT_EQ(model_->prototype(),"fooname");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, GetModelType) {
-  EXPECT_NE(std::string("Model"), model_->model_type());
+  EXPECT_NE(std::string("Model"), model_->kind());
 }
 

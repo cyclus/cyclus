@@ -29,7 +29,7 @@ class GenericResource;
 /// code will break.
 ///
 /// @todo consider changing to a vector of strings & consolidating with
-/// the model_type instance variable of the model class
+/// the model type instance variable of the model class
 enum ModelType {REGION, INST, FACILITY, END_MODEL_TYPES};
 
 /// @class Model
@@ -157,7 +157,7 @@ class Model {
   };
 
   /// get model instance name
-  inline const std::string name() const { return name_; }
+  inline const std::string prototype() const { return prototype_; }
 
   /// get model instance ID
   inline const int id() const { return id_; }
@@ -168,7 +168,7 @@ class Model {
   }
 
   /// returns a string that describes the model subclass (e.g. Region, etc.)
-  inline const std::string model_type() const {return model_type_;};
+  inline const std::string kind() const {return kind_;};
 
   /// Returns this model's current simulation context.
   inline Context* context() const { return ctx_; }
@@ -226,7 +226,7 @@ class Model {
   
   /// describes the model subclass (e.g. Region, Inst, etc.). The in-core
   /// subclasses must set this variable in their constructor(s).
-  std::string model_type_;
+  std::string kind_;
 
  private:
   /// Prevents creation/use of copy constructors (including in subclasses).
@@ -256,8 +256,7 @@ class Model {
   /// length of time this model is intended to operate
   int lifetime_;
 
-  /// every instance of a model should have a name
-  std::string name_;
+  std::string prototype_;
 
   /// concrete type of a model (e.g. "MyReactorModel")
   std::string model_impl_;
