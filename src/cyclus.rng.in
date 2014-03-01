@@ -140,10 +140,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <text/>
       </element>
 
-      <optional>
-        <ref name="lifetime"/>
-      </optional>
-
       <element name="model">
       <choice> @Facility_REFS@
       </choice>

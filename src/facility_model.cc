@@ -18,8 +18,7 @@ namespace cyclus {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel(Context* ctx)
     : Trader(this),
-      Model(ctx),
-      fac_lifetime_(std::numeric_limits<int>::max()) {
+      Model(ctx) {
   model_type_ = "Facility";
 };
 
@@ -29,11 +28,6 @@ FacilityModel::~FacilityModel() {};
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::InitFrom(QueryEngine* qe) {
   Model::InitFrom(qe);
-
-  // get lifetime
-  int lifetime =
-      GetOptionalQuery<int>(qe, "lifetime", context()->sim_dur());
-  SetFacLifetime(lifetime);
 
   // get the incommodities
   std::string commod;
@@ -58,7 +52,6 @@ void FacilityModel::InitFrom(QueryEngine* qe) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::InitFrom(FacilityModel* m) {
   Model::InitFrom(m);
-  fac_lifetime_ = m->fac_lifetime_;
   in_commods_ = m->in_commods_;
   out_commods_ = m->out_commods_;
 }
@@ -74,16 +67,11 @@ void FacilityModel::Build(Model* parent) {
 std::string FacilityModel::str() {
   std::stringstream ss("");
   ss << Model::str() << " with: "
-     << " lifetime: " << FacLifetime()
+     << " lifetime: " << lifetime()
      << " build date: " << birthtime()
-     << " decommission date: " << birthtime() + fac_lifetime_;
+     << " decommission date: " << birthtime() + lifetime();
   return ss.str();
 };
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-InstModel* FacilityModel::FacInst() {
-  return dynamic_cast<InstModel*>(parent());
-}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::Decommission() {
@@ -109,11 +97,6 @@ std::vector<std::string> FacilityModel::InputCommodities() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<std::string> FacilityModel::OutputCommodities() {
   return out_commods_;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bool FacilityModel::LifetimeReached(int time) {
-  return (time >= birthtime() + fac_lifetime_);
 }
 
 } // namespace cyclus

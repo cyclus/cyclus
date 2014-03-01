@@ -115,36 +115,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
   virtual std::string str();
 
   /**
-     Returns the facility's name
-     @return fac_name_ the name of this facility, a string
-   */
-  virtual std::string FacName() {
-    return this->name();
-  };
-
-  /**
-     Returns this facility's institution
-     @return the institution assosicated with this facility
-   */
-  virtual InstModel* FacInst();
-
-  /**
-     Sets the facility's lifetime
-     @param lifetime is the new lifetime of the facility in months
-   */
-  virtual void SetFacLifetime(int lifetime) {
-    fac_lifetime_ = lifetime;
-  };
-
-  /**
-     Returns the facility's lifetime
-     @return fac_lifetime_ the lifetime of this facility, an int, in
-   */
-  virtual int FacLifetime() {
-    return fac_lifetime_;
-  };
-
-  /**
      @return the input commodities
   */
   std::vector<std::string> InputCommodities();
@@ -154,12 +124,7 @@ class FacilityModel : public TimeListener, public Model, public Trader {
   */
   std::vector<std::string> OutputCommodities();
 
-  /**
-     @param time the time used to query whether it is past the
-     facility's decommission date
-     @return true if the time is greater than the decommission date
-   */
-  bool LifetimeReached(int time);
+  virtual int lifetime() {return context()->sim_dur() + 1;};
 
  private:
   /**
@@ -177,12 +142,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
      For details, see issue #323 in cyclus/cyclus.
    */
   std::vector<std::string> out_commods_;
-
-  /**
-     each facility needs a lifetime
-   */
-  int fac_lifetime_;
-  /* ------------------- */
 };
 
 } // namespace cyclus

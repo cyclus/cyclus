@@ -35,12 +35,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional>
       <choice>
 
-        <optional>
-          <element name="lifetime">
-            <data type="nonNegativeInteger"/>
-          </element>
-        </optional>
-
         <oneOrMore>
           <element name="allowedfacility"><text/></element>
         </oneOrMore>
