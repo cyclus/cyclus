@@ -23,8 +23,8 @@ void Model::InitFrom(Model* m) {
   name_ = m->name_;
   model_type_ = m->model_type_;
   model_impl_ = m->model_impl_;
+  lifetime_ = m->lifetime_;
   ctx_ = m->ctx_;
-  ctx_->model_list_.insert(this); 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,6 +40,7 @@ std::string Model::InformErrorMsg(std::string msg) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::InitFrom(QueryEngine* qe) {
   name_ = qe->GetElementContent("name");
+  lifetime_ = GetOptionalQuery<int>(qe, "lifetime", -1);
   CLOG(LEV_DEBUG1) << "Model '" << name_ << "' just created.";
 }
 
@@ -50,7 +51,7 @@ Model::Model(Context* ctx)
     model_type_("Model"),
     parent_id_(-1),
     birthtime_(-1),
-    deathtime_(-1),
+    lifetime_(-1),
     parent_(NULL),
     model_impl_("UNSPECIFIED") {
   ctx_->model_list_.insert(this); 
@@ -123,10 +124,9 @@ void Model::Build(Model* parent) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Decommission() {
   CLOG(LEV_INFO3) << name() << " is being decommissioned";
-  deathtime_ = ctx_->time();
   ctx_->NewDatum("AgentExit")
   ->AddVal("AgentId", id())
-  ->AddVal("ExitTime", deathtime_)
+  ->AddVal("ExitTime", ctx_->time())
   ->Record();
   ctx_->DelModel(this);
 }

@@ -68,8 +68,7 @@ std::string FacilityModel::str() {
   std::stringstream ss("");
   ss << Model::str() << " with: "
      << " lifetime: " << lifetime()
-     << " build date: " << birthtime()
-     << " decommission date: " << birthtime() + lifetime();
+     << " build date: " << birthtime();
   return ss.str();
 };
 

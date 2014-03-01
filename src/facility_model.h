@@ -124,8 +124,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
   */
   std::vector<std::string> OutputCommodities();
 
-  virtual int lifetime() {return context()->sim_dur() + 1;};
-
  private:
   /**
      Most facilities will have a vector of incoming, request commodities.

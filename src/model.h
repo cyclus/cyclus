@@ -186,9 +186,9 @@ class Model {
   /// been built).
   inline const int birthtime() const { return birthtime_; }
 
-  /// returns the time this model ceased operation (-1 if the model is still
-  /// operating).
-  inline const int deathtime() const { return deathtime_; }
+  /// returns the time this model will cease operation (-1 if the model is still
+  /// operating). Returns -1 for indefinite lifetime.
+  inline const int lifetime() const { return lifetime_; }
 
   /// returns a list of children this model has
   inline const std::vector<Model*>& children() const { return children_; }
@@ -253,8 +253,8 @@ class Model {
   /// born on date of this model
   int birthtime_;
 
-  /// died on date of this model
-  int deathtime_;
+  /// length of time this model is intended to operate
+  int lifetime_;
 
   /// every instance of a model should have a name
   std::string name_;

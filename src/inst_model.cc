@@ -74,7 +74,8 @@ void InstModel::Tock(int time) {
   std::vector<Model*> to_decomm;
   for (int i = 0; i < children().size(); i++) {
     FacilityModel* child = dynamic_cast<FacilityModel*>(children().at(i));
-    if (time >= child->birthtime() + child->lifetime()) {
+    int lifetime = child->lifetime();
+    if (lifetime != -1 && time >= child->birthtime() + lifetime) {
       CLOG(LEV_INFO3) << child->name() << " has reached the end of its lifetime";
       if (child->CheckDecommissionCondition()) {
         to_decomm.push_back(child);

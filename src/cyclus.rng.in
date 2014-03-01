@@ -140,6 +140,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <text/>
       </element>
 
+      <ref name="lifetime" />
+
       <element name="model">
       <choice> @Facility_REFS@
       </choice>
@@ -223,9 +225,11 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   </define>
 
   <define name="lifetime">
+    <optional>
       <element name="lifetime">
         <data type="nonNegativeInteger"/>
       </element>
+    </optional>
   </define>
 
   <define name="name">
@@ -288,6 +292,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
          <text/>
       </element>
 
+      <ref name="lifetime" />
+
       <oneOrMore>
       <element name="allowedfacility">
           <text/>
@@ -319,6 +325,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
          <text/>
       </element>
       
+      <ref name="lifetime" />
+
       <optional>
         <oneOrMore>
           <element name="availableprototype">

@@ -33,23 +33,29 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <!-- For compatibility with nested schema format -->
       <!-- Facility/Inst/Region specific data -->
       <optional>
-      <choice>
 
-        <oneOrMore>
-          <element name="allowedfacility"><text/></element>
-        </oneOrMore>
+        <optional>
+          <element name="lifetime">
+            <data type="nonNegativeInteger"/>
+          </element>
+        </optional>
 
-        <group>
-          <optional>
-            <oneOrMore>
-              <element name="availableprototype">
-                <text/>
-              </element>
-            </oneOrMore>
-          </optional>
-        </group>
+        <choice>
+          <oneOrMore>
+            <element name="allowedfacility"><text/></element>
+          </oneOrMore>
 
-      </choice>
+          <group>
+            <optional>
+              <oneOrMore>
+                <element name="availableprototype">
+                  <text/>
+                </element>
+              </oneOrMore>
+            </optional>
+          </group>
+
+        </choice>
       </optional>
       <!-- end compatibility section -->
 
