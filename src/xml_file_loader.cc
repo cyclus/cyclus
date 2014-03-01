@@ -240,7 +240,7 @@ void XMLFileLoader::LoadInitialAgents() {
 
       Model* model = DynamicModule::Make(ctx_, module_name);
       proto_qes[prototype] = qe;
-      model->SetModelImpl(module_name);
+      model->set_model_impl(module_name);
       model->InfileToDb(qe, di);
       ctx_->AddPrototype(prototype, model);
       ctx_->NewDatum("Prototypes")

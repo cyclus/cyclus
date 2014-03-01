@@ -64,7 +64,7 @@ void XMLFlatLoader::LoadInitialAgents() {
     proto_qes[prototype] = qe;
 
     Model* model = DynamicModule::Make(ctx_, module_name);
-    model->SetModelImpl(module_name);
+    model->set_model_impl(module_name);
     model->InfileToDb(qe, di);
     ctx_->AddPrototype(prototype, model);
     ctx_->NewDatum("Prototypes")

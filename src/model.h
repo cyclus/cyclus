@@ -163,7 +163,7 @@ class Model {
   inline const int id() const { return id_; }
 
   /// set model implementation
-  inline void SetModelImpl(std::string new_impl) {
+  inline void set_model_impl(std::string new_impl) {
     model_impl_ = new_impl;
   }
 
