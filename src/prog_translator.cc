@@ -66,7 +66,7 @@ void ProgTranslator::Populate() {
     std::vector<Arc>& arcs = g_->arcs();
     for (int i = 0; i != arcs.size(); i++) {
       Arc& a = arcs[i];
-      if (a.exclusive) {
+      if (a.exclusive()) {
         iface_->setInteger(g_->arc_ids()[a]);
       }
     }
@@ -105,8 +105,8 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       // add each unit capacity coefficient
       for (int j = 0; j != ucaps.size(); j++) {
         double coeff = ucaps[j];
-        if (excl_ && a.exclusive) {
-          coeff *= a.excl_val;
+        if (excl_ && a.exclusive()) {
+          coeff *= a.excl_val();
         }
 
         cap_rows[j].insert(arc_id, coeff);
@@ -118,20 +118,20 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       }
       
       // add exclusive arc
-      if (excl_ && request && a.exclusive) {
+      if (excl_ && request && a.exclusive()) {
         excl_row.insert(arc_id, 1.0);
       }
 
       if (request) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
-        double obj_coeff = a.exclusive ? 1 / pref * a.excl_val : 1 / pref;
+        double obj_coeff = a.exclusive() ? a.excl_val() / pref  : 1 / pref;
         if (max_obj_coeff_ < obj_coeff) {
           max_obj_coeff_ = obj_coeff;
         }
         ctx_.obj_coeffs[arc_id] = obj_coeff;
         ctx_.col_lbs[arc_id] = 0;
-        ctx_.col_ubs[arc_id] = a.exclusive ? 1 : inf;
+        ctx_.col_ubs[arc_id] = a.exclusive() ? 1 : inf;
       }
     }
     
@@ -172,7 +172,7 @@ void ProgTranslator::FromProg() {
   for (int i = 0; i < arcs.size(); i++) {
     Arc& a = g_->arc_by_id().at(i);
     flow = sol[i];
-    flow = (a.exclusive) ? flow * a.excl_val : flow;
+    flow = (a.exclusive()) ? flow * a.excl_val() : flow;
     if (flow > cyclus::eps()) {
       g_->AddMatch(a, flow);
     }

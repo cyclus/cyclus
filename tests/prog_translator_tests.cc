@@ -50,7 +50,7 @@ TEST(ProgTranslatorTests, translation) {
   double dem_b [] = {4.0};
   double sup_c [] = {10.0};
   double sup_d [] = {10.1, 9.1};
-  
+
   int excl_arcs [] = {1, 2, 4};
   double excl_flow [] = {0, 2, 2, 0, 2, 0, 0};
 
@@ -70,8 +70,8 @@ TEST(ProgTranslatorTests, translation) {
   
   ExchangeNode::Ptr a0(new ExchangeNode());
   ExchangeNode::Ptr a1(new ExchangeNode());
-  ExchangeNode::Ptr b0(new ExchangeNode());
-  ExchangeNode::Ptr b1(new ExchangeNode());
+  ExchangeNode::Ptr b0(new ExchangeNode(excl_flow[1], true));
+  ExchangeNode::Ptr b1(new ExchangeNode(excl_flow[1], true));
   ExchangeNode::Ptr c0(new ExchangeNode());
   ExchangeNode::Ptr c1(new ExchangeNode());
   ExchangeNode::Ptr c2(new ExchangeNode());
@@ -79,10 +79,10 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNode::Ptr d1(new ExchangeNode());
 
   Arc x0(a0, c0);
-  Arc x1(b0, c1, true, excl_flow[1]);
-  Arc x2(b1, c2, true, excl_flow[2]);
+  Arc x1(b0, c1);
+  Arc x2(b1, c2);
   Arc x3(a1, d0);
-  Arc x4(b1, d1, true, excl_flow[4]);
+  Arc x4(b1, d1);
 
   a0->unit_capacities[x0] = std::vector<double>(
       ucaps_a_0, ucaps_a_0 + sizeof(ucaps_a_0) / sizeof(ucaps_a_0[0]) );
