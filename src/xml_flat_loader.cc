@@ -103,6 +103,8 @@ void XMLFlatLoader::LoadInitialAgents() {
       built[name] = BuildAgent(proto, built[parent]);
       ++it;
       agents.erase(name);
+    } else {
+      ++it;
     }
     if (it == agents.end()) {
       it = agents.begin();
