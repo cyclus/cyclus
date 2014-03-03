@@ -113,33 +113,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
      every model should be able to print a verbose description
    */
   virtual std::string str();
-
-  /**
-     @return the input commodities
-  */
-  std::vector<std::string> InputCommodities();
-
-  /**
-     @return the output commodities
-  */
-  std::vector<std::string> OutputCommodities();
-
- private:
-  /**
-     Most facilities will have a vector of incoming, request commodities.
-     Ultimately, it's up to the facility to utilize this list. However, the
-     user interface is assisted by this specificity in the input scheme.
-     For details, see issue #323 in cyclus/cyclus.
-   */
-  std::vector<std::string> in_commods_;
-
-  /**
-     most facilities will have a vector of outgoing, offer commodities
-     Ultimately, it's up to the facility to utilize this list. However, the
-     user interface is assisted by this specificity in the input scheme.
-     For details, see issue #323 in cyclus/cyclus.
-   */
-  std::vector<std::string> out_commods_;
 };
 
 } // namespace cyclus
