@@ -10,6 +10,11 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c) 
+  : conditioner_(c),
+    ExchangeSolver(exclusive_orders) { };
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GreedySolver::~GreedySolver() {
   if (conditioner_ != NULL)
     delete conditioner_;
