@@ -37,11 +37,19 @@ std::string Model::InformErrorMsg(std::string msg) {
   return ret.str();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Model::InitFrom(QueryEngine* qe) {
-  prototype_ = qe->GetElementContent("name");
-  lifetime_ = GetOptionalQuery<int>(qe, "lifetime", -1);
-  CLOG(LEV_DEBUG1) << "Model '" << prototype_ << "' just created.";
+void Model::InfileToDb(QueryEngine* qe, DbInit di) {
+  std::string proto = qe->GetElementContent("name");
+  int lifetime = GetOptionalQuery<int>(qe, "lifetime", -1);
+  di.NewDatum(this, "Model")
+    ->AddVal("Prototype", proto)
+    ->AddVal("Lifetime", lifetime)
+    ->Record();
+}
+
+void Model::InitFrom(QueryBackend* b) {
+  QueryResult qr = b->Query("Model", NULL);
+  prototype_ = qr.GetVal<std::string>(0, "Prototype");
+  lifetime_ = qr.GetVal<int>(0, "Lifetime");
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -173,6 +181,7 @@ void Model::AddToTable() {
   ->AddVal("Kind", kind_)
   ->AddVal("Implementation", model_impl_)
   ->AddVal("Prototype", prototype_)
+  ->AddVal("Lifetime", lifetime_)
   ->AddVal("ParentId", parent_id_)
   ->AddVal("EnterTime", birthtime_)
   ->Record();

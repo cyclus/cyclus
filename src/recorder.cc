@@ -73,6 +73,17 @@ Datum* Recorder::NewDatum(std::string title) {
 void Recorder::AddDatum(Datum* d) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Recorder::Flush() {
+  DatumList tmp = data_;
+  tmp.resize(index_);
+  index_ = 0;
+  std::list<RecBackend*>::iterator it;
+  for (it = backs_.begin(); it != backs_.end(); it++) {
+    (*it)->Notify(tmp);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::NotifyBackends() {
   index_ = 0;
   std::list<RecBackend*>::iterator it;
@@ -98,7 +109,7 @@ void Recorder::Close() {
     (*it)->Flush();
   }
   backs_.clear();
-  //set_dump_count(kDefaultDumpCount);
+  set_dump_count(kDefaultDumpCount);
 }
 } // namespace cyclus
 

@@ -36,7 +36,7 @@ TEST_P(ModelTests, Schema) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, InitAndGetName) {
+TEST_P(ModelTests, DISABLED_InitAndGetName) {
   cyclus::XMLParser p;
   std::stringstream ss;
   ss << "<start><name>fooname</name></start>";

@@ -86,6 +86,20 @@ class CondInjector: public QueryBackend {
   std::vector<Cond> to_inject_;
 };
 
+class PrefixInjector: public QueryBackend {
+ public:
+  PrefixInjector(QueryBackend* b, std::string prefix)
+    : b_(b), prefix_(prefix) {};
+
+  virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
+    return b_->Query(prefix_ + table, conds);
+  };
+
+ private:
+  QueryBackend* b_;
+  std::string prefix_;
+};
+
 } // namespace cyclus
 #endif
 

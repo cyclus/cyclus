@@ -152,6 +152,8 @@ void SimInit::LoadInitialAgents() {
       infos.push_back(ai);
     }
   }
+
+
 }
 
 void SimInit::LoadInventories() {

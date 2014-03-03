@@ -40,6 +40,8 @@ enum ModelType {REGION, INST, FACILITY, END_MODEL_TYPES};
 /// means that the basic process of loading and registering models can
 /// be implemented in a single place.
 class Model {
+  friend class SimInit;
+
  public:
   /// Initializes a model by reading parameters from the passed QueryEngine.
   /// This method must be implemented by all models.  This method must call the
@@ -72,15 +74,17 @@ class Model {
   ///   // ...
   /// };
   /// @endcode
-  virtual void InitFrom(QueryEngine* qe);
+  virtual void InitFrom(QueryEngine* qe) {};
 
   /// The simulation and agent id's are automatically included in all
   /// information transfered through di.
-  virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
+  //
+  /// @warning this method MUST NOT use any instance state for the translation.
+  virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
-  /// Appropriate simulation and agent id filters are automatically included in
-  /// all queries.
-  virtual void InitFrom(QueryBackend* b) {};
+  /// Appropriate simulation id, agent id, and time filters are automatically
+  /// included in all queries.
+  virtual void InitFrom(QueryBackend* b);
   
   typedef std::map<std::string, std::vector<Resource::Ptr> > Inventory;
   virtual Inventory GetInventory() {};

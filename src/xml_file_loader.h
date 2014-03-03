@@ -98,9 +98,6 @@ class XMLFileLoader {
   /// the input file name
   std::string file_;
 
-  // map of prototype names to query engines for infile->db init translation
-  std::map<std::string, QueryEngine*> proto_qes_;
-
 };
 } // namespace cyclus
 

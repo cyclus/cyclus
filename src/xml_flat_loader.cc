@@ -60,11 +60,17 @@ void XMLFlatLoader::LoadInitialAgents() {
     QueryEngine* module_data = qe->QueryElement("model");
     std::string module_name = module_data->GetElementName();
     std::string prototype = qe->GetElementContent("name");
-    proto_qes_[prototype] = qe;
 
     Model* model = DynamicModule::Make(ctx_, module_name);
     model->set_model_impl(module_name);
     model->InfileToDb(qe, di);
+    rec_.Flush();
+    std::vector<Cond> conds;
+    conds.push_back(Cond("SimId", "==", rec_.sim_id()));
+    conds.push_back(Cond("AgentId", "==", model->id()));
+    CondInjector ci(fb_, conds);
+    PrefixInjector pi(&ci, "AgentState_");
+    model->InitFrom(&pi);
     ctx_->AddPrototype(prototype, model);
     ctx_->NewDatum("Prototypes")
       ->AddVal("Prototype", prototype)

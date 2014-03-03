@@ -238,9 +238,15 @@ void XMLFileLoader::LoadInitialAgents() {
       std::string prototype = qe->GetElementContent("name");
 
       Model* model = DynamicModule::Make(ctx_, module_name);
-      proto_qes_[prototype] = qe;
       model->set_model_impl(module_name);
       model->InfileToDb(qe, di);
+      rec_.Flush();
+      std::vector<Cond> conds;
+      conds.push_back(Cond("SimId", "==", rec_.sim_id()));
+      conds.push_back(Cond("AgentId", "==", model->id()));
+      CondInjector ci(fb_, conds);
+      PrefixInjector pi(&ci, "AgentState_");
+      model->InitFrom(&pi);
       ctx_->AddPrototype(prototype, model);
       ctx_->NewDatum("Prototypes")
         ->AddVal("Prototype", prototype)
@@ -278,15 +284,7 @@ void XMLFileLoader::LoadInitialAgents() {
 }
 
 Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
-  DbInit di;
   Model* m = ctx_->CreateModel<Model>(proto);
-  m->InfileToDb(proto_qes_[proto], di);
-  fb_->Flush();
-  std::vector<Cond> conds;
-  conds.push_back(Cond("SimId", "==", rec_.sim_id()));
-  conds.push_back(Cond("AgentId", "==", m->id()));
-  CondInjector ci(fb_, conds);
-  m->InitFrom(&ci);
   m->Build(parent);
   if (parent != NULL) {
     parent->BuildNotify(m);

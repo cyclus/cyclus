@@ -85,8 +85,11 @@ class Recorder {
   /// @param b backend to receive Datum objects
   void RegisterBackend(RecBackend* b);
 
-  //// Flushes all buffered Datum objects and flushes all registered backends.
-  //// Unregisters all backends and resets.
+  /// Flushes all buffered Datum objects and flushes all registered backends.
+  void Flush();
+
+  /// Flushes all buffered Datum objects and flushes all registered backends.
+  /// Unregisters all backends and resets.
   void Close();
 
  private:
