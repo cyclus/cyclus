@@ -58,7 +58,6 @@ struct ExchangeNode {
   /// @brief a running total of the amount of resource associated with this
   /// node
   double qty;
-
 };
 
 /// @brief by convention, arc.unode() == request node, arc.vnode() == bid
@@ -115,19 +114,35 @@ class ExchangeNodeGroup {
   const std::vector<ExchangeNode::Ptr>& nodes() const { return nodes_; }
   std::vector<ExchangeNode::Ptr>& nodes() { return nodes_; }
 
+  /// @brief exclusive node groups represent nodes over which flow can only
+  /// exist on one arc
+  const std::vector< std::vector<ExchangeNode::Ptr> >&
+      excl_node_groups() const {
+    return excl_node_groups_;
+  }
+  std::vector< std::vector<ExchangeNode::Ptr> >& excl_node_groups() {
+    return excl_node_groups_;
+  }
+  
   /// @brief the flow capacities assocaited with this group
   const std::vector<double>& capacities() const { return capacities_; }
   std::vector<double>& capacities() { return capacities_; }
 
   /// @brief Add the node to the ExchangeNodeGroup and informs the node it is a
   /// member of this ExchangeNodeGroup
-  void AddExchangeNode(ExchangeNode::Ptr node);
+  virtual void AddExchangeNode(ExchangeNode::Ptr node);
+
+  /// @brief Adds a node grouping to the set of exclusive node groups
+  inline void AddExclGroup(std::vector<ExchangeNode::Ptr>& nodes) {
+    excl_node_groups_.push_back(nodes);
+  }
 
   /// @brief Add a flow capacity to the group
   inline void AddCapacity(double c) { capacities_.push_back(c); }
 
  private:
   std::vector<ExchangeNode::Ptr> nodes_;
+  std::vector< std::vector<ExchangeNode::Ptr> > excl_node_groups_;
   std::vector<double> capacities_;
 };
 
@@ -142,6 +157,11 @@ class RequestGroup : public ExchangeNodeGroup {
   explicit RequestGroup(double qty = 0.0);
   
   double qty() { return qty_; }
+
+  /// @brief Add the node to the ExchangeNodeGroup and informs the node it is a
+  /// member of this ExchangeNodeGroup, if the node is exclusive, also add it to
+  /// the group of exclusive nodes
+  virtual void AddExchangeNode(ExchangeNode::Ptr node);
   
  private:
   double qty_;
@@ -219,7 +239,11 @@ class ExchangeGraph {
     return supply_groups_;
   }
   
-  inline const std::map<ExchangeNode::Ptr, std::vector<Arc> >& node_arc_map() {
+  inline const std::map<ExchangeNode::Ptr, std::vector<Arc> >&
+      node_arc_map() const {
+    return node_arc_map_;
+  }
+  inline std::map<ExchangeNode::Ptr, std::vector<Arc> >& node_arc_map() {
     return node_arc_map_;
   }
   

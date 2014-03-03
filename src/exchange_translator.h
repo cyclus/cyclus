@@ -150,6 +150,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
                                          r->exclusive(),
                                          r->commodity()));
     rs->AddExchangeNode(n);
+
     AddRequest(translation_ctx, *r_it, n);
   }
 
@@ -172,7 +173,9 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
     ExchangeTranslationContext<T>& translation_ctx,
     const typename BidPortfolio<T>::Ptr bp) {
   ExchangeNodeGroup::Ptr bs(new ExchangeNodeGroup());
-    
+
+  //typename std::map<
+  
   typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
   for (b_it = bp->bids().begin();
        b_it != bp->bids().end();

@@ -64,6 +64,16 @@ void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 RequestGroup::RequestGroup(double qty) : qty_(qty) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
+  ExchangeNodeGroup::AddExchangeNode(node);
+  if (node->exclusive) {
+    std::vector<ExchangeNode::Ptr> nodes;
+    nodes.push_back(node);
+    ExchangeNodeGroup::AddExclGroup(nodes);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a) {
   double ucap = Capacity(a.unode(), a);
   double vcap = Capacity(a.vnode(), a);
