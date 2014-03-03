@@ -33,6 +33,7 @@ bool HasInt(OsiSolverInterface* si) {
       return true;
     }
   }
+  return false;
 }
 
 } // namespace cyclus
