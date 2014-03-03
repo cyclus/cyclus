@@ -155,7 +155,7 @@ TEST(ExGraphTests, ExchangeNodeUpdateThrow2) {
   s.AddCapacity(cap);
   s.AddExchangeNode(n);
   
-  EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);
+  // EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

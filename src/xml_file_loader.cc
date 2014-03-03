@@ -210,7 +210,7 @@ void XMLFileLoader::LoadSolver() {
 
   // context will delete solver
   bool exclusive_orders = false;
-  GreedySolver* solver = new GreedySolver(exclusive_orders, conditioner);
+  ExchangeSolver* solver = new GreedySolver(exclusive_orders, conditioner);
 
   ctx_->solver(solver);
 }

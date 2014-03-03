@@ -72,31 +72,28 @@ FIND_LIBRARY(COIN_CGL_LIBRARY
 MESSAGE("\tCOIN CGL: ${COIN_CGL_LIBRARY}")
 
 FIND_LIBRARY(COIN_CLP_LIBRARY
-  NAMES Clp libClp #libClp.so.0
+  NAMES Clp libClp libClp.so.0
   HINTS ${COIN_INCLUDE_DIR}/../../lib/
   HINTS "${COIN_ROOT_DIR}/lib"
 )
 MESSAGE("\tCOIN CLP: ${COIN_CLP_LIBRARY}")
 
 FIND_LIBRARY(COIN_COIN_UTILS_LIBRARY
-  NAMES CoinUtils libCoinUtils #libCoinUtils.so.0
+  NAMES CoinUtils libCoinUtils libCoinUtils.so.0
   HINTS ${COIN_INCLUDE_DIR}/../../lib/
   HINTS "${COIN_ROOT_DIR}/lib"
 )
 MESSAGE("\tCOIN UTILS: ${COIN_COIN_UTILS_LIBRARY}")
 
 FIND_LIBRARY(COIN_OSI_LIBRARY
-  NAMES Osi libOsi #libOsi.so.0
+  NAMES Osi libOsi libOsi.so.0
   HINTS ${COIN_INCLUDE_DIR}/../../lib/
   HINTS "${COIN_ROOT_DIR}/lib"
 )
 MESSAGE("\tCOIN OSI: ${COIN_OSI_LIBRARY}")
 
-#
-# Not required by cbc v2.5, but required by later versions
-#
 # FIND_LIBRARY(COIN_OSI_CBC_LIBRARY
-#   NAMES OsiCbc libOsiCbc libOsiCbc.so.0
+#   NAMES OsiCbc libOsiCbc #libOsiCbc.so.0
 #   HINTS ${COIN_INCLUDE_DIR}/../../lib/
 #   HINTS "${COIN_ROOT_DIR}/lib"
 # )

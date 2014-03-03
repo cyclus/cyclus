@@ -66,6 +66,9 @@ required library package names is:
 #. libhdf5-serial-dev
 #. libbz2-dev
 #. coinor-libcbc-dev
+#. coinor-libcoinutils-dev
+#. coinor-libosi-dev
+#. coinor-libclp-dev
 
 and (optionally):
 
