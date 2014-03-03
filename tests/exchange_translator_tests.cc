@@ -126,6 +126,8 @@ TEST(ExXlateTests, XlateReq) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>::Ptr req =
       rp->AddRequest(get_mat(u235, qty), trader, commod);
+  Request<Material>::Ptr ereq =
+      rp->AddRequest(get_mat(u235, qty), trader, commod, 0, true);
   rp->AddConstraint(cc1);
   rp->AddConstraint(cc2);
 
@@ -141,6 +143,12 @@ TEST(ExXlateTests, XlateReq) {
   EXPECT_EQ(
       xlator.translation_ctx().request_to_node.find(req)->second->commod,
       commod);
+
+  ASSERT_EQ(set->nodes().size(), 2);
+  ASSERT_EQ(set->excl_node_groups().size(), 1);
+  ASSERT_EQ(set->excl_node_groups()[0].size(), 1);
+  EXPECT_EQ(set->excl_node_groups()[0][0],
+            xlator.translation_ctx().request_to_node[ereq]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -162,6 +170,7 @@ TEST(ExXlateTests, XlateBid) {
   
   BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
   Bid<Material>::Ptr bid = port->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>::Ptr ebid = port->AddBid(req, get_mat(u235, qty), trader, true);
   port->AddConstraint(cc1);
   port->AddConstraint(cc2);
 
@@ -177,6 +186,11 @@ TEST(ExXlateTests, XlateBid) {
   EXPECT_EQ(
       xlator.translation_ctx().bid_to_node.find(bid)->second->commod,
       commod);
+  ASSERT_EQ(set->nodes().size(), 2);
+  ASSERT_EQ(set->excl_node_groups().size(), 1);
+  ASSERT_EQ(set->excl_node_groups()[0].size(), 1);
+  EXPECT_EQ(set->excl_node_groups()[0][0],
+            xlator.translation_ctx().bid_to_node[ebid]);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
