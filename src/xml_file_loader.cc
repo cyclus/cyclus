@@ -148,14 +148,38 @@ std::string XMLFileLoader::master_schema() {
 void XMLFileLoader::LoadSim() {
   try {
     LoadDynamicModules();
+  } catch (std::exception& e) {
+    std::string msg = "Error loading dynamic modules: ";
+    msg += e.what();
+    throw cyclus::Error(msg);
+  }
     std::stringstream ss(master_schema());
     parser_->Validate(ss);
+  try {
     LoadSolver();
+  } catch (std::exception& e) {
+    std::string msg = "Error loading solver from xml file: ";
+    msg += e.what();
+    throw cyclus::Error(msg);
+  }
+  try {
     LoadControlParams();
+  } catch (std::exception& e) {
+    std::string msg = "Error loading control parameters from xml file: ";
+    msg += e.what();
+    throw cyclus::Error(msg);
+  }
+  try {
     LoadRecipes();
+  } catch (std::exception& e) {
+    std::string msg = "Error loading recipes from xml file: ";
+    msg += e.what();
+    throw cyclus::Error(msg);
+  }
+  try {
     LoadInitialAgents();
   } catch (std::exception& e) {
-    std::string msg = "Error reading xml file: ";
+    std::string msg = "Error loading initial agents from xml file: ";
     msg += e.what();
     throw cyclus::Error(msg);
   }
@@ -267,6 +291,7 @@ void XMLFileLoader::LoadInitialAgents() {
 void XMLFileLoader::LoadDynamicModules() {
   std::vector<std::string> names = Env::ListModules();
   for (int i = 0; i < names.size(); ++i) {
+    CLOG(LEV_DEBUG1) << "Loading module '" << names[i] << "'.";
     DynamicModule* module = new DynamicModule(names[i]);
     modules_[names[i]] = module;
     CLOG(LEV_DEBUG1) << "Module '" << names[i]
