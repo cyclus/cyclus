@@ -174,7 +174,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
     const typename BidPortfolio<T>::Ptr bp) {
   ExchangeNodeGroup::Ptr bs(new ExchangeNodeGroup());
 
-  //typename std::map<
+  std::map<typename T::Ptr, std::vector<ExchangeNode::Ptr> > excl_bid_grps;
   
   typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
   for (b_it = bp->bids().begin();
@@ -186,8 +186,19 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
                                          b->request()->commodity()));
     bs->AddExchangeNode(n);
     AddBid(translation_ctx, *b_it, n);
+    if (b->exclusive()) {
+      excl_bid_grps[b->offer()].push_back(n);
+    }
   }
 
+  typename std::map<typename T::Ptr, std::vector<ExchangeNode::Ptr> >::iterator
+      m_it;
+  for (m_it = excl_bid_grps.begin();
+       m_it != excl_bid_grps.end();
+       ++m_it) {
+    bs->AddExclGroup(m_it->second);
+  }
+  
   CLOG(LEV_DEBUG4) << "adding " << bp->constraints().size()
                    << " bid capacities";    
 
