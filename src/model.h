@@ -74,8 +74,14 @@ class Model {
   /// @endcode
   virtual void InitFrom(QueryEngine* qe);
 
-  virtual void InitFrom(QueryBackend* b) {};
+  /// The simulation and agent id's are automatically included in all
+  /// information transfered through di.
   virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
+
+  /// Appropriate simulation and agent id filters are automatically included in
+  /// all queries.
+  virtual void InitFrom(QueryBackend* b) {};
+  
   typedef std::map<std::string, std::vector<Resource::Ptr> > Inventory;
   virtual Inventory GetInventory() {};
   virtual void SetInventory(const Inventory& inv) {};
@@ -136,7 +142,9 @@ class Model {
   virtual void DecomNotify(Model* m) {};
 
   /// Decommissions the model, removing it from the simulation. Results in
-  /// destruction of the model object.
+  /// destruction of the model object. If agents write their own Decommission
+  /// method, they must call their superclass' Decommission method at the END of
+  /// their Decommission method.
   virtual void Decommission();
 
   /// returns the ith child

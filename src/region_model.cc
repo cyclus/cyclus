@@ -36,6 +36,11 @@ void RegionModel::Build(Model* parent) {
   context()->RegisterTimeListener(this);
 }
 
+void RegionModel::Decommission() {
+  context()->UnregisterTimeListener(this);
+  Model::Decommission();
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string RegionModel::str() {
   std::string s = Model::str();

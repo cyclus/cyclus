@@ -58,6 +58,34 @@ class QueryBackend {
   /// conditions.  Conditions are AND'd together.
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) = 0;
 };
+
+class FullBackend: public QueryBackend, public RecBackend {
+ public:
+  virtual ~FullBackend() {};
+};
+
+class CondInjector: public QueryBackend {
+ public:
+  CondInjector(QueryBackend* b, std::vector<Cond> to_inject)
+    : b_(b), to_inject_(to_inject) {};
+
+  virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
+    if (conds == NULL) {
+      return b_->Query(table, &to_inject_);
+    }
+
+    std::vector<Cond> c = *conds;
+    for (int i = 0; i < to_inject_.size(); ++i) {
+      c.push_back(to_inject_[i]);
+    }
+    return b_->Query(table, &c);
+  };
+
+ private:
+  QueryBackend* b_;
+  std::vector<Cond> to_inject_;
+};
+
 } // namespace cyclus
 #endif
 

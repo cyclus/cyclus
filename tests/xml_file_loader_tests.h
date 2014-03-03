@@ -27,7 +27,7 @@ class XMLFileLoaderTests : public ::testing::Test {
  public:
   std::string controlFile, falseFile, moduleFile, recipeFile;
 
-  cyclus::RecBackend* b_;
+  cyclus::FullBackend* b_;
   std::string schema_path;
 
   virtual void SetUp();

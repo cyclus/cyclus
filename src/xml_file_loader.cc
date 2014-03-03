@@ -102,9 +102,9 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(RecBackend* b,
+XMLFileLoader::XMLFileLoader(FullBackend* b,
                              std::string schema_path,
-                             const std::string load_filename) {
+                             const std::string load_filename) : fb_(b) {
   rec_.RegisterBackend(b);
   ctx_ = new Context(&ti_, &rec_);
 
@@ -143,10 +143,10 @@ std::string XMLFileLoader::master_schema() {
 void XMLFileLoader::LoadSim() {
     std::stringstream ss(master_schema());
     parser_->Validate(ss);
-    LoadControlParams();
+    LoadControlParams(); // must be first
     LoadSolver();
     LoadRecipes();
-    LoadInitialAgents();
+    LoadInitialAgents(); // must be last
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -220,16 +220,15 @@ void XMLFileLoader::LoadRecipes() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadInitialAgents() {
+  DbInit di;
   std::set<std::string> module_types;
   module_types.insert("Region");
   module_types.insert("Inst");
   module_types.insert("Facility");
   std::set<std::string>::iterator it;
   XMLQueryEngine xqe(*parser_);
-  DbInit di;
 
   // create prototypes
-  std::map<std::string, QueryEngine*> proto_qes;
   for (it = module_types.begin(); it != module_types.end(); it++) {
     int num_models = xqe.NElementsMatchingQuery(schema_paths_[*it]);
     for (int i = 0; i < num_models; i++) {
@@ -239,7 +238,7 @@ void XMLFileLoader::LoadInitialAgents() {
       std::string prototype = qe->GetElementContent("name");
 
       Model* model = DynamicModule::Make(ctx_, module_name);
-      proto_qes[prototype] = qe;
+      proto_qes_[prototype] = qe;
       model->set_model_impl(module_name);
       model->InfileToDb(qe, di);
       ctx_->AddPrototype(prototype, model);
@@ -256,18 +255,13 @@ void XMLFileLoader::LoadInitialAgents() {
   for (int i = 0; i < nregions; ++i) {
     QueryEngine* qe = xqe.QueryElement(schema_paths_["Region"], i);
     std::string region_proto = qe->GetElementContent("name");
-    Model* reg = ctx_->CreateModel<Model>(region_proto);
-    reg->Build();
-    reg->InfileToDb(proto_qes[region_proto], di);
+    Model* reg = BuildAgent(region_proto, NULL);
 
     int ninsts = qe->NElementsMatchingQuery("institution");
     for (int j = 0; j < ninsts; ++j) {
       QueryEngine* qe2 = qe->QueryElement("institution", j);
       std::string inst_proto = qe2->GetElementContent("name");
-      Model* inst = ctx_->CreateModel<Model>(inst_proto);
-      inst->Build(reg);
-      inst->InfileToDb(proto_qes[inst_proto], di);
-      reg->BuildNotify(inst);
+      Model* inst = BuildAgent(inst_proto, reg);
 
       int nfac = qe2->NElementsMatchingQuery("initialfacilitylist/entry");
       for (int k = 0; k < nfac; ++k) {
@@ -276,14 +270,28 @@ void XMLFileLoader::LoadInitialAgents() {
 
         int number = atoi(qe3->GetElementContent("number").c_str());
         for (int z = 0; z < number; ++z) {
-          Model* fac = ctx_->CreateModel<Model>(fac_proto);
-          fac->Build(inst);
-          fac->InfileToDb(proto_qes[fac_proto], di);
-          inst->BuildNotify(fac);
+          Model* fac = BuildAgent(fac_proto, inst);
         }
       }
     }
   }
+}
+
+Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
+  DbInit di;
+  Model* m = ctx_->CreateModel<Model>(proto);
+  m->InfileToDb(proto_qes_[proto], di);
+  fb_->Flush();
+  std::vector<Cond> conds;
+  conds.push_back(Cond("SimId", "==", rec_.sim_id()));
+  conds.push_back(Cond("AgentId", "==", m->id()));
+  CondInjector ci(fb_, conds);
+  m->InitFrom(&ci);
+  m->Build(parent);
+  if (parent != NULL) {
+    parent->BuildNotify(m);
+  }
+  return m;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -62,6 +62,8 @@ class InstModel : public Model, public TimeListener {
    */
   virtual void Build(Model* parent);
 
+  virtual void Decommission();
+
   virtual void Tick(int time) {};
 
   virtual void Tock(int time);

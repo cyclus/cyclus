@@ -45,6 +45,11 @@ void InstModel::Build(Model* parent) {
   context()->RegisterTimeListener(this);
 }
 
+void InstModel::Decommission() {
+  context()->UnregisterTimeListener(this);
+  Model::Decommission();
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::Tock(int time) {
   std::vector<Model*> to_decomm;

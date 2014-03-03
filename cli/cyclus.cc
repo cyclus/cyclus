@@ -218,25 +218,27 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  FullBackend* fback = new SqliteBack(output_path);
+  rec.RegisterBackend(fback);
+
+  RecBackend* rback = NULL;
   std::string ext = fs::path(output_path).extension().generic_string();
-  RecBackend* back;
-  if (ext == ".h5") {
-    back = new Hdf5Back(output_path.c_str());
-  } else if (ext == ".csv") {
-    back = new CsvBack(output_path.c_str());
-  } else {
-    back = new SqliteBack(output_path);
+  if (ext == ".h5") { // not queryable
+    rback = new Hdf5Back(output_path.c_str());
+    rec.RegisterBackend(rback);
+  } else if (ext == ".csv") { // not queryable
+    rback = new CsvBack(output_path.c_str());
+    rec.RegisterBackend(rback);
   }
-  rec.RegisterBackend(back);
 
   // read input file and setup simulation
   std::string inputFile = vm["input-file"].as<std::string>();
   XMLFileLoader* loader;
   try {
     if (flat_schema) {
-      loader = new XMLFlatLoader(back, schema_path, inputFile);
+      loader = new XMLFlatLoader(fback, schema_path, inputFile);
     } else {
-      loader = new XMLFileLoader(back, schema_path, inputFile);
+      loader = new XMLFileLoader(fback, schema_path, inputFile);
     }
     loader->LoadSim();
   } catch (Error e) {
@@ -265,7 +267,10 @@ int main(int argc, char* argv[]) {
 
   delete ctx;
   rec.Close();
-  delete back;
+  delete fback;
+  if (rback != NULL) {
+    delete rback;
+  }
   delete loader;
 
   return 0;

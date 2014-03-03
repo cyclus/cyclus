@@ -125,12 +125,19 @@ struct AgentInfo {
 };
 
 void SimInit::LoadInitialAgents() {
+  // DO NOT call the agents' Build methods because the agents might modify the
+  // state of their children and/or the simulation in ways that are only meant
+  // to be done once; remember that we are initializing agents from a
+  // simulation that was already started.
+
   // find all agents that are alive at the current timestep
   std::vector<Cond> conds;
   conds.push_back(Cond("EnterTime", "<=", t_));
   QueryResult qentry = b_->Query("AgentEntry", &conds);
   std::vector<AgentInfo> infos;
   for (int i = 0; i < qentry.rows.size(); ++i) {
+
+    // if the agent wasn't decommissioned before t_
     int id = qentry.GetVal<int>(i, "AgentId");
     std::vector<Cond> conds;
     conds.push_back(Cond("AgentId", "==", id));

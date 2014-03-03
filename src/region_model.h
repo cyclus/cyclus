@@ -88,6 +88,8 @@ class RegionModel : public Model, public TimeListener {
    */
   virtual void Build(Model* parent);
 
+  virtual void Decommission();
+
   /**
      every model should be able to print a verbose description
    */

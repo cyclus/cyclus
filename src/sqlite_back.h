@@ -14,7 +14,7 @@ namespace cyclus {
 /// named Datum objects have their data placed as rows in a single table.  Handles the
 /// following datum value types: int, float, double, std::string, cyclus::Blob.
 /// Unsupported value types are stored as an empty string.
-class SqliteBack: public RecBackend, public QueryBackend {
+class SqliteBack: public FullBackend {
  public:
   /// Creates a new sqlite backend that will write to the database file
   /// specified by path. If the file doesn't exist, a new one is created.

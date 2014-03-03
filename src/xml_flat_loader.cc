@@ -55,13 +55,12 @@ void XMLFlatLoader::LoadInitialAgents() {
 
   // create prototypes
   int num_protos = xqe.NElementsMatchingQuery("/*/prototype");
-  std::map<std::string, QueryEngine*> proto_qes;
   for (int i = 0; i < num_protos; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/prototype", i);
     QueryEngine* module_data = qe->QueryElement("model");
     std::string module_name = module_data->GetElementName();
     std::string prototype = qe->GetElementContent("name");
-    proto_qes[prototype] = qe;
+    proto_qes_[prototype] = qe;
 
     Model* model = DynamicModule::Make(ctx_, module_name);
     model->set_model_impl(module_name);
@@ -74,32 +73,40 @@ void XMLFlatLoader::LoadInitialAgents() {
       ->Record();
   }
 
-  // build initial agents
+  // create initial agents
   int num_agents = xqe.NElementsMatchingQuery("/*/agent");
-  std::map<std::string, Model*> agents;  // map<name, agent>
   std::map<std::string, std::string> protos;  // map<name, prototype>
   std::map<std::string, std::string> parents;  // map<agent, parent>
+  std::set<std::string> agents; // set<agent_name>
   for (int i = 0; i < num_agents; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/agent", i);
     std::string name = qe->GetElementContent("name");
     std::string proto = qe->GetElementContent("prototype");
     std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
-    agents[name] = ctx_->CreateModel<Model>(proto);
     protos[name] = proto;
     parents[name] = parent;
+    agents.insert(name);
   }
 
-  std::map<std::string, Model*>::iterator it;
-  for (it = agents.begin(); it != agents.end(); ++it) {
-    std::string name = it->first;
-    Model* agent = it->second;
-    if (parents[name] == "") {
-      agent->Build();
-    } else {
-      agent->Build(agents[parents[name]]);
-      agents[parents[name]]->BuildNotify(agent);
+  // build agents starting at roots (no parent) down.
+  std::map<std::string, Model*> built; // map<agent_name, agent_ptr>
+  std::set<std::string>::iterator it = agents.begin();
+  while (agents.size() > 0) {
+    std::string name = *it;
+    std::string proto = protos[name];
+    std::string parent = parents[name];
+    if (parent == "") {
+      built[name] = BuildAgent(proto, NULL);
+      ++it;
+      agents.erase(name);
+    } else if (built.count(parent) > 0) {
+      built[name] = BuildAgent(proto, built[parent]);
+      ++it;
+      agents.erase(name);
     }
-    agent->InfileToDb(proto_qes[protos[name]], di);
+    if (it == agents.end()) {
+      it = agents.begin();
+    }
   }
 }
 

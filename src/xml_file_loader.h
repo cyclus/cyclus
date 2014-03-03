@@ -39,7 +39,7 @@ class XMLFileLoader {
   /// @param b backend to dump input file info to.
   /// @param load_filename The filename for the file to be loaded; defaults to
   /// an empty string.
-  XMLFileLoader(RecBackend* b, std::string schema_path,
+  XMLFileLoader(FullBackend* b, std::string schema_path,
                 const std::string load_filename = "");
 
   virtual ~XMLFileLoader();
@@ -74,9 +74,14 @@ class XMLFileLoader {
   /// commodity
   void ProcessCommodities(std::map<std::string, double>* commodity_order);
 
+  /// Creates and builds an agent, notifying its parent. The agent init info is
+  /// translated and stored in the output db.
+  Model* BuildAgent(std::string proto, Model* parent);
+
   Recorder rec_;
   Timer ti_;
   Context* ctx_;
+  FullBackend* fb_;
 
   /// filepath to the schema
   std::string schema_path_;
@@ -92,6 +97,9 @@ class XMLFileLoader {
 
   /// the input file name
   std::string file_;
+
+  // map of prototype names to query engines for infile->db init translation
+  std::map<std::string, QueryEngine*> proto_qes_;
 
 };
 } // namespace cyclus
