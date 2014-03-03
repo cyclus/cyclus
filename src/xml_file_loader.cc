@@ -210,7 +210,7 @@ void XMLFileLoader::LoadSolver() {
 
   // context will delete solver
   bool exclusive_orders = false;
-  GreedySolver* solver = new GreedySolver(exclusive_orders, conditioner);
+  ExchangeSolver* solver = new GreedySolver(exclusive_orders, conditioner);
 
   ctx_->solver(solver);
 }
@@ -288,14 +288,25 @@ void XMLFileLoader::LoadInitialAgents() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadDynamicModules() {
-  std::vector<std::string> names = Env::ListModules();
-  for (int i = 0; i < names.size(); ++i) {
-    CLOG(LEV_DEBUG1) << "Loading module '" << names[i] << "'.";
-    DynamicModule* module = new DynamicModule(names[i]);
-    modules_[names[i]] = module;
-    CLOG(LEV_DEBUG1) << "Module '" << names[i]
-                     << "' has been loaded.";
+void XMLFileLoader::LoadDynamicModules() { 
+  std::string name;
+  int nmods;
+  QueryEngine* qe;
+  DynamicModule* module;
+  std::map<std::string, std::string>::iterator m_it;
+  XMLQueryEngine xqe(*parser_);
+  for (m_it = schema_paths_.begin(); m_it != schema_paths_.end(); ++m_it) {
+    nmods = xqe.NElementsMatchingQuery(m_it->second);
+    for (int i = 0; i != nmods; i++) {
+      qe = xqe.QueryElement(m_it->second, i);
+      name = qe->QueryElement("model")->GetElementName(0);
+      if (modules_.find(name) == modules_.end()) {
+        CLOG(LEV_DEBUG1) << "Loading module '" << name << "'.";
+        module = new DynamicModule(name);
+        modules_[name] = module;
+        CLOG(LEV_DEBUG1) << "Module '" << name << "' has been loaded.";
+      }
+    }
   }
 }
 

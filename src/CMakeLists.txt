@@ -59,6 +59,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/builder.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/building_manager.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc" 
   "${CMAKE_CURRENT_SOURCE_DIR}/commodity.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager.cc"
@@ -88,6 +89,8 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/material.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/pyne.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc"
@@ -97,6 +100,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/resource.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/solver.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db.cc"
@@ -110,10 +114,12 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_flat_loader.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_parser.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
   )
 
 INSTALL(FILES
   any.hpp
+  OsiCbcSolverInterface.hpp
   bid.h
   bid_portfolio.h
   blob.h
@@ -121,6 +127,7 @@ INSTALL(FILES
   building_manager.h
   capacity_constraint.h
   cbc_solver.h
+  coin_helpers.h
   commodity.h
   commodity_producer.h
   commodity_producer_manager.h
@@ -158,6 +165,8 @@ INSTALL(FILES
   mat_query.h
   material.h
   model.h
+  prog_solver.h 
+  prog_translator.h 
   pyne.h
   query_engine.h 
   rec_backend.h
@@ -172,6 +181,7 @@ INSTALL(FILES
   resource_exchange.h
   solver.h
   solver_interface.h
+  solver_factory.h
   sqlite_back.h
   sqlite_db.h
   suffix.h
