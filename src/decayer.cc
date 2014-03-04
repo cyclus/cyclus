@@ -11,7 +11,6 @@
 
 namespace cyclus {
 
-bool Decayer::decay_info_loaded_ = false;
 ParentMap Decayer::parent_ = ParentMap();
 DaughtersMap Decayer::daughters_ = DaughtersMap();
 Matrix Decayer::decay_matrix_ = Matrix();
@@ -22,95 +21,56 @@ Decayer::Decayer(const CompMap& comp) {
   int nuc;
   int col;
   long double atom_count;
+  bool needs_build = false;
+
   pre_vect_ = Vector(parent_.size(), 1);
   std::map<int, double>::const_iterator comp_iter = comp.begin();
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
     nuc = comp_iter->first;
     atom_count = comp_iter->second;
 
-    // if the nuclide is tracked in the decay matrix
     if (parent_.count(nuc) > 0) {
-      int col = parent_[nuc].first;  // get Vector position
+      // if the nuclide is tracked in the decay matrix
+      int col = parent_[nuc].first;
       pre_vect_(col, 1) = atom_count;
-      // if it is not in the decay matrix, then it is added as a stable nuclide
     } else {
-      col = parent_.size() + 1;
-      parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));  // add nuclide to parent map
-
-      int nDaughters = 0;
-      std::vector< std::pair<int, double> > temp(nDaughters);
-      daughters_[col] = temp;  // add nuclide to daughters map
-
+      // if it is not in the decay matrix, then it is added
+      needs_build = true;
+      AddNucToMaps(nuc);
       std::vector<long double> row(1, atom_count);
-      pre_vect_.AddRow(row);  // add nuclide to the end of the Vector
+      pre_vect_.AddRow(row);
     }
   }
+
+  if (needs_build)
+    BuildDecayMatrix();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Decayer::LoadDecayInfo() {
-  std::string path = Env::GetBuildPath() + "/share/decayInfo.dat";
-  std::ifstream decayInfo(path.c_str());
+void Decayer::AddNucToMaps(int nuc) {
+  int i;
+  int col;
+  int daughter;
+  std::set<int> daughters;
+  std::set<int>::iterator d; 
 
-  if (!decayInfo.is_open()) {
-    throw IOError("Could not find file 'decayInfo.dat'.");
+  if (parent_.count(nuc) == 0)
+    return;
+
+  col = parent_.size() + 1;
+  parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));  
+  AddNucToList(nuc);
+
+  i = 0;
+  daughters = pyne::decay_children(nuc);
+  std::vector< std::pair<int, double> > dvec(daughters.size());
+  for (d = daughters.begin(); d != daughters.end(); ++d) {
+    daugther = *d;
+    AddNucToMaps(daughter);
+    dvec[i] = std::make_pair<int, double>(daughter, pyne::branch_ratio(nuc, daughter))
+    i++;
   }
-
-  int jcol = 1;
-  int nuc = 0;
-  int nDaughters = 0;
-  double decayConst = 0;  // decay constant, in inverse years
-  double branchRatio = 0;
-
-  decayInfo >> nuc;  // get first parent
-  nuc *= 10000;  // put in id form
-
-  // checks to see if there are nuclides in 'decayInfo.dat'
-  if (decayInfo.eof()) {
-    std::string err_msg = "There are no nuclides in the 'decayInfo.dat' file";
-    throw ValidationError(err_msg);
-  }
-
-  // processes 'decayInfo.dat'
-  while (!decayInfo.eof()) {
-    if (parent_.find(nuc) != parent_.end()) {
-      std::string err_msg;
-      err_msg = "A duplicate parent nuclide was found in 'decayInfo.dat'";
-      throw ValidationError(err_msg);
-    }
-
-    // make parent
-    decayInfo >> decayConst;
-    decayInfo >> nDaughters;
-    AddNucToList(nuc);
-
-    parent_[nuc] = std::make_pair(jcol, decayConst);
-
-    // make daughters
-    std::vector< std::pair<int, double> > temp(nDaughters);
-    for (int i = 0; i < nDaughters; ++i) {
-      decayInfo >> nuc;
-      nuc *= 10000;  // put in id form
-      decayInfo >> branchRatio;
-      AddNucToList(nuc);
-
-      // checks for duplicate daughter nuclides
-      for (int j = 0; j < nDaughters; ++j) {
-        if (temp[j].first == nuc) {
-          throw ValidationError(
-            std::string("A duplicate daughter nuclide, %i , was found in decayInfo.dat",
-                        nuc));
-        }
-      }
-      temp[i] = std::make_pair(nuc, branchRatio);
-    }
-
-    daughters_[jcol] = temp;
-    ++jcol;  // set next column
-    decayInfo >> nuc;  // get next parent
-    nuc *= 10000;  // put in id form
-  }
-  BuildDecayMatrix();
+  daughters_[col] = dvec;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
