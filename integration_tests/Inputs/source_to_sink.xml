@@ -6,7 +6,6 @@
     <duration>100</duration>
     <startmonth>1</startmonth>
     <startyear>2000</startyear>
-    <simstart>0</simstart>
     <decay>0</decay>
   </control>
 

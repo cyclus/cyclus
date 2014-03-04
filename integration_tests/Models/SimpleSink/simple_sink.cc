@@ -1,12 +1,19 @@
 #include <boost/lexical_cast.hpp>
 
+#include "capacity_constraint.h"
+#include "context.h"
+#include "cyc_limits.h"
+#include "error.h"
+#include "logger.h"
+
 #include "simple_sink.h"
 
 using cyclus::SimpleSink;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SimpleSink::SimpleSink(cyclus::Context* ctx)
-  : cyclus::FacilityModel(ctx) {};
+    : cyclus::FacilityModel(ctx),
+      capacity_(std::numeric_limits<double>::max()) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SimpleSink::~SimpleSink() {}
@@ -33,7 +40,9 @@ void SimpleSink::InitFrom(cyclus::QueryEngine* qe) {
 
   cyclus::QueryEngine* input = qe->QueryElement("input");
   incommodity_ = input->GetElementContent("incommodity", 0);
+  AddCommodity(incommodity_);
   capacity_ = lexical_cast<double>(input->GetElementContent("input_capacity", 0));
+  std::cout << capacity_ << std::endl;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,6 +76,7 @@ SimpleSink::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
   double amt = RequestAmt();
+  std::cout<< amt << std::endl;
   Material::Ptr mat = Material::CreateBlank(amt);
 
   if (amt > cyclus::eps()) {
@@ -75,16 +85,17 @@ SimpleSink::GetMatlRequests() {
 
     std::vector<std::string>::const_iterator it;
     for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
+      std::cout<< *it << std::endl;
       port->AddRequest(mat, this, *it);
     }
 
     ports.insert(port);
-  } // if amt > eps
+  }  // if amt > eps
 
   return ports;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::RequestPortfolio<cyclus::GenericResource>::Ptr>
 SimpleSink::GetGenRsrcRequests() {
   using cyclus::CapacityConstraint;
@@ -103,8 +114,8 @@ SimpleSink::GetGenRsrcRequests() {
 
     std::vector<std::string>::const_iterator it;
     for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
-      std::string quality = ""; // not clear what this should be..
-      std::string units = ""; // not clear what this should be..
+      std::string quality = "";  // not clear what this should be..
+      std::string units = "";  // not clear what this should be..
       GenericResource::Ptr rsrc = GenericResource::CreateUntracked(amt,
                                                                    quality,
                                                                    units);
@@ -112,12 +123,12 @@ SimpleSink::GetGenRsrcRequests() {
     }
 
     ports.insert(port);
-  } // if amt > eps
+  }  // if amt > eps
 
   return ports;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SimpleSink::AcceptMatlTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
     cyclus::Material::Ptr> >& responses) {
@@ -128,7 +139,7 @@ void SimpleSink::AcceptMatlTrades(
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SimpleSink::AcceptGenRsrcTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
     cyclus::GenericResource::Ptr> >& responses) {
@@ -144,7 +155,6 @@ void SimpleSink::AcceptGenRsrcTrades(
 void SimpleSink::Tick(int time) {
   using std::string;
   using std::vector;
-
   LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
 
   double requestAmt = RequestAmt();
@@ -161,7 +171,18 @@ void SimpleSink::Tick(int time) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SimpleSink::Tock(int time) {}
+void SimpleSink::Tock(int time) {
+  LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is tocking {";
+
+  // On the tock, the sink facility doesn't really do much.
+  // Maybe someday it will record things.
+  // For now, lets just print out what we have at each timestep.
+  LOG(cyclus::LEV_INFO4, "SnkFac") << "SinkFacility " << this->id()
+                                   << " is holding " << inventory_.quantity()
+                                   << " units of material at the close of month "
+                                   << time << ".";
+  LOG(cyclus::LEV_INFO3, "SnkFac") << "}";
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructSimpleSink(cyclus::Context* ctx) {

@@ -118,6 +118,13 @@ class SimpleSink : public cyclus::FacilityModel  {
    * _THIS_ FACILITYMODEL class has these members
    * --------------------
    */
+  /**
+     add a commodity to the set of input commodities
+     @param name the commodity name
+   */
+  inline void AddCommodity(std::string name) {
+    in_commods_.push_back(name);
+  }
 
   /**
     determines the amount to request
