@@ -65,9 +65,9 @@ void Decayer::AddNucToMaps(int nuc) {
   daughters = pyne::decay_children(nuc);
   std::vector< std::pair<int, double> > dvec(daughters.size());
   for (d = daughters.begin(); d != daughters.end(); ++d) {
-    daugther = *d;
+    daughter = *d;
     AddNucToMaps(daughter);
-    dvec[i] = std::make_pair<int, double>(daughter, pyne::branch_ratio(nuc, daughter))
+    dvec[i] = std::make_pair<int, double>(daughter, pyne::branch_ratio(nuc, daughter));
     i++;
   }
   daughters_[col] = dvec;
@@ -107,7 +107,7 @@ void Decayer::GetResult(CompMap& comp) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::BuildDecayMatrix() {
-  double decayConst = 0;  // decay constant, in inverse years
+  double decayConst = 0;  // decay constant, in inverse secs
   int jcol = 1;
   int n = parent_.size();
   decay_matrix_ = Matrix(n, n);

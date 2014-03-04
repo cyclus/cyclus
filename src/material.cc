@@ -77,7 +77,6 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   if (qty_ < qty) {
     throw ValueError("mass extraction causes negative quantity");
   }
-
   if (comp_ != c) {
     CompMap v(comp_->mass());
     compmath::Normalize(&v, qty_);
@@ -128,7 +127,8 @@ void Material::Decay(int curr_time) {
     CompMap::const_iterator it;
     for (it = c.end(); it != c.begin(); --it) {
       int nuc = it->first;
-      double lambda_months = Decayer::DecayConstant(nuc) / 12;
+      // 2419200 == secs / month
+      double lambda_months = pyne::decay_const(nuc) * 2419200;
 
       if (eps <= 1 - std::exp(-lambda_months * dt)) {
         decay = true;

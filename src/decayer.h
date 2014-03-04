@@ -2,10 +2,11 @@
 #ifndef CYCLUS_SRC_DECAYER_H_
 #define CYCLUS_SRC_DECAYER_H_
 
-#include <set>
 #include <map>
+#include <set>
 
 #include "composition.h"
+#include "pyne.h"
 #include "use_matrix_lib.h"
 
 namespace cyclus {
