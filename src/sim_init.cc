@@ -108,21 +108,21 @@ void SimInit::LoadPrototypes() {
   QueryResult qr = b_->Query("Prototypes", NULL);
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string proto = qr.GetVal<std::string>(i, "Prototype");
+    int agentid = qr.GetVal<int>(i, "AgentId");
     std::string impl = qr.GetVal<std::string>(i, "Implementation");
 
     Model* m = DynamicModule::Make(se_->ctx, impl);
-    m->InitFrom(b_);
+    m->set_model_impl(impl);
+
+    std::vector<Cond> conds;
+    conds.push_back(Cond("Time", "==", t_));
+    conds.push_back(Cond("AgentId", "==", agentid));
+    CondInjector ci(b_, conds);
+    PrefixInjector pi(&ci, "AgentState_");
+    m->InitFrom(&pi);
     se_->ctx->AddPrototype(proto, m);
   }
 }
-
-struct AgentInfo {
-  int id;
-  std::string impl;
-  std::string proto;
-  int entry;
-  int parent;
-};
 
 void SimInit::LoadInitialAgents() {
   // DO NOT call the agents' Build methods because the agents might modify the
@@ -130,30 +130,84 @@ void SimInit::LoadInitialAgents() {
   // to be done once; remember that we are initializing agents from a
   // simulation that was already started.
 
+  // find the max agent id
+  QueryResult qr = b_->Query("AgentEntry", NULL);
+  int maxid = 0;
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    int id = qr.GetVal<int>(i, "AgentId");
+    if (id > maxid) {
+      maxid = id;
+    }
+  }
+  Model::next_id_ = maxid + 5;
+  SHOW(maxid);
+
   // find all agents that are alive at the current timestep
   std::vector<Cond> conds;
   conds.push_back(Cond("EnterTime", "<=", t_));
   QueryResult qentry = b_->Query("AgentEntry", &conds);
-  std::vector<AgentInfo> infos;
+  std::map<int, int> parentmap; // map<agentid, parentid>
+  std::map<int, Model*> unbuilt; // map<agentid, agent_ptr>
   for (int i = 0; i < qentry.rows.size(); ++i) {
 
-    // if the agent wasn't decommissioned before t_
     int id = qentry.GetVal<int>(i, "AgentId");
+    SHOW(id);
     std::vector<Cond> conds;
     conds.push_back(Cond("AgentId", "==", id));
-    QueryResult qexit = b_->Query("AgentExit", &conds);
+    QueryResult qexit;
+    try {
+      qexit = b_->Query("AgentExit", &conds);
+    } catch(std::exception err) { } // table doesn't exist (okay)
+    // if the agent wasn't decommissioned before t_ create and init it
     if (qexit.rows.size() == 0) {
-      AgentInfo ai;
-      ai.id = id;
-      ai.impl = qentry.GetVal<std::string>(i, "Implementation");
-      ai.proto = qentry.GetVal<std::string>(i, "Prototype");
-      ai.entry = qentry.GetVal<int>(i, "EnterTime");
-      ai.parent = qentry.GetVal<int>(i, "ParentId");
-      infos.push_back(ai);
+      std::string proto = qentry.GetVal<std::string>(i, "Prototype");
+      Model* m = se_->ctx->CreateModel<Model>(proto);
+
+      // agent-kernel init
+      m->id_ = id;
+      m->set_model_impl(qentry.GetVal<std::string>(i, "Implementation"));
+      m->birthtime_ = qentry.GetVal<int>(i, "EnterTime");
+      unbuilt[id] = m;
+      parentmap[id] = qentry.GetVal<int>(i, "ParentId");
+
+      // agent-custom init
+      conds.push_back(Cond("Time", "==", t_));
+      CondInjector ci(b_, conds);
+      PrefixInjector pi(&ci, "AgentState_");
+      m->InitFrom(&pi);
+
+      SHOW(m->prototype());
+      SHOW(m->model_impl_);
+      SHOW(m->lifetime());
+      SHOW(m->kind());
+      SHOW(m->birthtime());
     }
   }
 
+  // construct agent hierarchy starting at roots (no parent) down
+  std::map<int, Model*>::iterator it = unbuilt.begin();
+  while (unbuilt.size() > 0) {
+    int id = it->first;
+    Model* m = it->second;
+    int parentid = parentmap[id];
 
+    if (parentid == -1) { // root agent
+      m->BuildInner(NULL);
+      agents_[id] = m;
+      ++it;
+      unbuilt.erase(id);
+    } else if (agents_.count(parentid) > 0) { // parent is built
+      m->BuildInner(agents_[parentid]);
+      agents_[id] = m;
+      ++it;
+      unbuilt.erase(id);
+    } else { // parent not built yet
+      ++it;
+    }
+    if (it == unbuilt.end()) {
+      it = unbuilt.begin();
+    }
+  }
 }
 
 void SimInit::LoadInventories() {
@@ -162,7 +216,10 @@ void SimInit::LoadInventories() {
 void SimInit::LoadBuildSched() {
   std::vector<Cond> conds;
   conds.push_back(Cond("BuildTime", ">", t_));
-  QueryResult qr = b_->Query("BuildSchedule", &conds);
+  QueryResult qr;
+  try {
+    qr = b_->Query("BuildSchedule", &conds);
+  } catch(std::exception err) { } // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>(i, "BuildTime");
@@ -175,7 +232,10 @@ void SimInit::LoadBuildSched() {
 void SimInit::LoadDecomSched() {
   std::vector<Cond> conds;
   conds.push_back(Cond("DecomTime", ">", t_));
-  QueryResult qr = b_->Query("DecomSchedule", &conds);
+  QueryResult qr;
+  try {
+    qr = b_->Query("DecomSchedule", &conds);
+  } catch(std::exception err) { } // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>(i, "DecomTime");

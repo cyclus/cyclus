@@ -52,6 +52,13 @@ void Model::InitFrom(QueryBackend* b) {
   lifetime_ = qr.GetVal<int>(0, "Lifetime");
 }
 
+void Model::Snapshot(DbInit di) {
+  di.NewDatum(this, "Model")
+    ->AddVal("Prototype", prototype_)
+    ->AddVal("Lifetime", lifetime_)
+    ->Record();
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model(Context* ctx)
   : ctx_(ctx),
@@ -107,26 +114,27 @@ std::string Model::str() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Build(Model* parent) {
-  if (parent == this)
-    throw KeyError("Model " + prototype() +
-                   "is trying to add itself as its own child.");
-
   CLOG(LEV_DEBUG1) << "Model '" << prototype()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
   CLOG(LEV_DEBUG3) << " * Implementation: " << model_impl_;
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
+  BuildInner(parent);
+  birthtime_ = ctx_->time();
+  this->AddToTable();
+}
+
+void Model::BuildInner(Model* parent) {
+  if (parent == this) {
+    throw KeyError("Model " + prototype() +
+                   "is trying to add itself as its own child.");
+  }
   if (parent != NULL) {
     parent_ = parent;
     parent_id_ = parent->id();
     parent->children_.push_back(this);
-    CLOG(LEV_DEBUG2) << "Model '" << parent->prototype() << "' ID=" << parent->id()
-                     << " has added child '" << prototype() << "' ID="
-                     << id() << " to its list of children.";
   }
-  birthtime_ = ctx_->time();
-  this->AddToTable();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

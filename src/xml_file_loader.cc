@@ -229,13 +229,14 @@ void XMLFileLoader::LoadInitialAgents() {
   XMLQueryEngine xqe(*parser_);
 
   // create prototypes
+  std::string prototype; // defined here for force-create AgentExit tbl
   for (it = module_types.begin(); it != module_types.end(); it++) {
     int num_models = xqe.NElementsMatchingQuery(schema_paths_[*it]);
     for (int i = 0; i < num_models; i++) {
       QueryEngine* qe = xqe.QueryElement(schema_paths_[*it], i);
       QueryEngine* module_data = qe->QueryElement("model");
       std::string module_name = module_data->GetElementName();
-      std::string prototype = qe->GetElementContent("name");
+      prototype = qe->GetElementContent("name");
 
       Model* model = DynamicModule::Make(ctx_, module_name);
       model->set_model_impl(module_name);
@@ -289,6 +290,8 @@ Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
   if (parent != NULL) {
     parent->BuildNotify(m);
   }
+  DbInit di;
+  m->Snapshot(di);
   return m;
 }
 

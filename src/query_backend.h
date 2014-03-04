@@ -31,7 +31,7 @@ struct QueryResult {
 
   template <class T>
   T GetVal(int row, std::string field) {
-    if (row > rows.size()) {
+    if (row >= rows.size()) {
       throw KeyError("index larger than number of query rows");
     }
 
@@ -55,7 +55,8 @@ class QueryBackend {
   virtual ~QueryBackend() {};
 
   /// Return a set of rows from the specificed table that match all given
-  /// conditions.  Conditions are AND'd together.
+  /// conditions.  Conditions are AND'd together.  Query should NOT error for
+  /// non-existing tables.  Rather, it should return an empty QueryResult.
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) = 0;
 };
 

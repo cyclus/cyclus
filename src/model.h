@@ -85,6 +85,9 @@ class Model {
   /// Appropriate simulation id, agent id, and time filters are automatically
   /// included in all queries.
   virtual void InitFrom(QueryBackend* b);
+
+  /// Snapshots agent-internal state to the output db via di.
+  virtual void Snapshot(DbInit di);
   
   typedef std::map<std::string, std::vector<Resource::Ptr> > Inventory;
   virtual Inventory GetInventory() {};
@@ -245,8 +248,11 @@ class Model {
   /// Cloning and InitFrom should be used instead.
   Model(const Model& m) {};
 
-  /// add an agent to the transactiont table
+  /// adds an agent to the transactiont table
   void AddToTable();
+
+  /// Builds an agent - without recording any output data
+  void BuildInner(Model* parent);
 
   /// Stores the next available facility ID
   static int next_id_;

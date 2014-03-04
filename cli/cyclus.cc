@@ -27,14 +27,14 @@ using namespace cyclus;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  //SimInit si;
-  //QueryBackend* qb = new SqliteBack("cyclus.sqlite");
-  //QueryResult qr = qb->Query("Info", NULL);
-  //std::string s = qr.GetVal<std::string>(0, "SimId");
-  //boost::uuids::string_generator gen;
-  //boost::uuids::uuid simid = gen(s);
-  //si.Init(qb, simid);
-  //return 0;
+  SimInit si;
+  FullBackend* b = new SqliteBack("cyclus.sqlite");
+  QueryResult qr = b->Query("Info", NULL);
+  std::string s = qr.GetVal<std::string>(0, "SimId");
+  boost::uuids::string_generator gen;
+  boost::uuids::uuid simid = gen(s);
+  si.Init(b, simid);
+  return 0;
 
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
