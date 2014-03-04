@@ -13,7 +13,7 @@ using cyclus::SimpleSink;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SimpleSink::SimpleSink(cyclus::Context* ctx)
     : cyclus::FacilityModel(ctx),
-      capacity_(std::numeric_limits<double>::max()) {}
+      capacity_(100){}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SimpleSink::~SimpleSink() {}
@@ -56,6 +56,8 @@ cyclus::Model* SimpleSink::Clone() {
 // not expected to be cloned
 void SimpleSink::InitFrom(SimpleSink* m) {
   cyclus::FacilityModel::InitFrom(m);
+  capacity_ = m->capacity_;
+  in_commods_ = m->in_commods_;
   // Initialize sinkfacility members for a cloned module here
 }
 
