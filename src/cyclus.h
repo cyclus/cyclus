@@ -29,7 +29,6 @@
 #include "generic_resource.h"
 #include "inst_model.h"
 #include "logger.h"
-#include "mass_table.h"
 #include "mat_query.h"
 #include "material.h"
 #include "model.h"

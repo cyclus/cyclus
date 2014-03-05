@@ -6,7 +6,6 @@
 #include "error.h"
 #include "cyc_limits.h"
 #include "logger.h"
-#include "mass_table.h"
 #include "mat_query.h"
 
 namespace cyclus {
