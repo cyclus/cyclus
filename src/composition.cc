@@ -107,9 +107,9 @@ Composition::Ptr Composition::NewDecay(int delta) {
   int tot_decay = prev_decay_ + delta;
   atom();  // force evaluation of atom-composition if not calculated already
 
-  // FIXME this is only here for testing
+  // FIXME this is only here for testing, see issue #761
   if (atom_.size() == 0)
-    return static_cast<Composition::Ptr>(new Composition(tot_decay, decay_line_));
+    return Composition::Ptr(new Composition(tot_decay, decay_line_));
 
   Decayer handler(atom_);
   handler.Decay(2419200.0 * delta);  // 2419200 == secs / month
