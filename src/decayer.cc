@@ -41,7 +41,6 @@ Decayer::Decayer(const CompMap& comp) {
     nuc = comp_iter->first;
     atom_count = comp_iter->second;
     col = parent_[nuc].first;
-    pre_vect_.Print();
     pre_vect_(col, 1) = atom_count;
   }
 }

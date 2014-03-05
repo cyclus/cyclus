@@ -68,7 +68,5 @@ TEST(CompositionTests, lineage) {
   EXPECT_EQ(dec2, dec3);
   EXPECT_EQ(chain[3 * dt], dec4);
   EXPECT_EQ(dec4, dec5);
-/*
-  */
 }
  
