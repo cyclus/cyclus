@@ -38,6 +38,9 @@ void FacilityModel::InitFrom(FacilityModel* m) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::Build(Model* parent) {
   Model::Build(parent);
+}
+
+void FacilityModel::DoRegistration() {
   context()->RegisterTrader(this);
   context()->RegisterTimeListener(this);
 }

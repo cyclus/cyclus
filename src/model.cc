@@ -122,6 +122,7 @@ void Model::Build(Model* parent) {
 
   BuildInner(parent);
   birthtime_ = ctx_->time();
+  DoRegistration();
   this->AddToTable();
 }
 

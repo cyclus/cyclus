@@ -31,6 +31,8 @@ class SimInit {
   /// The newly configured simulation will run with a new simulation id.
   SimEngine* Restart(QueryBackend* b, boost::uuids::uuid simid, int t);
 
+  static void Snapshot(Context* ctx);
+
  private:
   SimEngine* InitBase(QueryBackend* b, boost::uuids::uuid simid, int t);
 
@@ -42,6 +44,14 @@ class SimInit {
   void LoadInventories();
   void LoadBuildSched();
   void LoadDecomSched();
+  void LoadNextIds();
+
+  Resource::Ptr LoadResource(int resid);
+  Resource::Ptr LoadMaterial(int resid);
+  Resource::Ptr LoadGenericResource(int resid);
+  Composition::Ptr LoadComposition(int stateid);
+
+  static void SnapAgent(Model* m);
 
   // std::map<AgentId, Model*>
   std::map<int, Model*> agents_;

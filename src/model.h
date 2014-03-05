@@ -32,6 +32,9 @@ class GenericResource;
 /// the model type instance variable of the model class
 enum ModelType {REGION, INST, FACILITY, END_MODEL_TYPES};
 
+/// map<internal-inventory-name, vector<resources-inside-inventory> >
+typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
+
 /// @class Model
 ///
 /// @section desc Description
@@ -78,20 +81,22 @@ class Model {
 
   /// The simulation and agent id's are automatically included in all
   /// information transfered through di.
-  //
-  /// @warning this method MUST NOT use any instance state for the translation.
+  ///
+  /// @warning this method MUST NOT use or modify any instance state for the
+  /// translation.
   virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
   /// Appropriate simulation id, agent id, and time filters are automatically
-  /// included in all queries.
+  /// included in all queries. Agents should not create any resource objects in
+  /// this method.
   virtual void InitFrom(QueryBackend* b);
 
   /// Snapshots agent-internal state to the output db via di.
   virtual void Snapshot(DbInit di);
   
-  typedef std::map<std::string, std::vector<Resource::Ptr> > Inventory;
-  virtual Inventory GetInventory() {};
-  virtual void SetInventory(const Inventory& inv) {};
+  virtual void InitInv(const Inventories& inv) {};
+
+  virtual Inventories SnapshotInv() {return Inventories();};
 
   /// Constructor for the Model Class
   ///
@@ -135,14 +140,23 @@ class Model {
   /// @param m the model node to base as the root of this print tree
   std::vector<std::string> GetTreePrintOuts(Model* m);
 
-  /// creates the parent-child link and invokes the core-level and
-  /// module-level enter simulation methods
-  /// @param parent this model's parent
+  /// Called when the agent enters the smiulation as an active participant and
+  /// is only ever called once.  Agents should NOT register for services (such
+  /// as ticks/tocks and resource exchange) in this method. If agents implement
+  /// this method, they must call their superclass's Build method at the
+  /// BEGINING of their Build method.
+  ///
+  /// @param parent this agent's parent
   virtual void Build(Model* parent = NULL);
 
-  // Called when a new child of this agent has just been built. It is possible
-  // for this method to be called before the simulation has started when
-  // initially existing agents are being setup.
+  /// Called to give the agent an opportunity to register for services (e.g.
+  /// ticks/tocks and resource exchange).  Note that this may be called more
+  /// than once, and so agents should track their registrations carefully.
+  virtual void DoRegistration() {};
+
+  /// Called when a new child of this agent has just been built. It is possible
+  /// for this method to be called before the simulation has started when
+  /// initially existing agents are being setup.
   virtual void BuildNotify(Model* m) {};
 
   /// Called when a new child of this agent is about to be decommissioned.

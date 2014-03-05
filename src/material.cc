@@ -53,6 +53,12 @@ Resource::Ptr Material::Clone() const {
 }
 
 void Material::Record(Context* ctx) const {
+  ctx_->NewDatum("MaterialInfo")
+  ->AddVal("ResourceId", id())
+  ->AddVal("Time", ctx_->time())
+  ->AddVal("PrevDecayTime", prev_decay_time_)
+  ->Record();
+
   comp_->Record(ctx);
 }
 

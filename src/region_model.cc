@@ -33,6 +33,9 @@ void RegionModel::InitFrom(QueryEngine* qe) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::Build(Model* parent) {
   Model::Build(parent);
+}
+
+void RegionModel::DoRegistration() {
   context()->RegisterTimeListener(this);
 }
 

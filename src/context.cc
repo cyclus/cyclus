@@ -5,6 +5,7 @@
 #include "error.h"
 #include "exchange_solver.h"
 #include "logger.h"
+#include "sim_init.h"
 #include "timer.h"
 
 namespace cyclus {
@@ -107,6 +108,10 @@ void Context::UnregisterTimeListener(TimeListener* tl) {
 
 Datum* Context::NewDatum(std::string title) {
   return rec_->NewDatum(title);
+}
+
+void Context::Snapshot() {
+  SimInit::Snapshot(this);
 }
 
 }  // namespace cyclus

@@ -52,10 +52,9 @@ TEST(RequestTests, GenRsrcGetSet) {
   double pref = 2.4;
   double qty = 1.0;
   string quality = "qual";
-  string units = "units";
 
   GenericResource::Ptr rsrc =
-      GenericResource::CreateUntracked(qty, quality, units);
+      GenericResource::CreateUntracked(qty, quality);
   
   Request<GenericResource>::Ptr r =
       Request<GenericResource>::Create(rsrc, fac, commod, pref);

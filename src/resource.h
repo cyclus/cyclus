@@ -16,6 +16,8 @@ typedef std::string ResourceType;
 /// offered, requested, and transferred between simulation agents. Resources
 /// represent the lifeblood of a simulation.
 class Resource {
+  friend class SimInit;
+
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 

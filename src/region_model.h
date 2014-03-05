@@ -88,6 +88,8 @@ class RegionModel : public Model, public TimeListener {
    */
   virtual void Build(Model* parent);
 
+  virtual void DoRegistration();
+
   virtual void Decommission();
 
   /**

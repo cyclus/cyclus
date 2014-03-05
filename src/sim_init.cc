@@ -22,7 +22,69 @@ SimEngine* SimInit::Init(QueryBackend* b, boost::uuids::uuid simid) {
 
 SimEngine* SimInit::Restart(QueryBackend* b, boost::uuids::uuid simid, int t) {
   se_->rec = new Recorder();
-  return InitBase(b, simid, t);
+  SimEngine* se = InitBase(b, simid, t);
+  return se;
+}
+
+void SimInit::Snapshot(Context* ctx) {
+  // snapshot all agent internal state
+  std::set<Model*> mlist = ctx->model_list_;
+  std::set<Model*>::iterator it;
+  for (it = mlist.begin(); it != mlist.end(); ++it) {
+    Model* m = *it;
+    if (m->birthtime() == -1) { 
+      continue;
+    }
+    SimInit::SnapAgent(m);
+  }
+
+  // snapshot all next ids
+  ctx->NewDatum("NextIds")
+  ->AddVal("Time", ctx->time())
+  ->AddVal("Object", std::string("Agent"))
+  ->AddVal("NextId", Model::next_id_)
+  ->Record();
+  ctx->NewDatum("NextIds")
+  ->AddVal("Time", ctx->time())
+  ->AddVal("Object", std::string("Transaction"))
+  ->AddVal("NextId", ctx->trans_id_)
+  ->Record();
+  ctx->NewDatum("NextIds")
+  ->AddVal("Time", ctx->time())
+  ->AddVal("Object", std::string("Composition"))
+  ->AddVal("NextId", Composition::next_id_)
+  ->Record();
+  ctx->NewDatum("NextIds")
+  ->AddVal("Time", ctx->time())
+  ->AddVal("Object", std::string("Resource"))
+  ->AddVal("NextId", Resource::nextid_)
+  ->Record();
+  ctx->NewDatum("NextIds")
+  ->AddVal("Time", ctx->time())
+  ->AddVal("Object", std::string("GenericResource"))
+  ->AddVal("NextId", GenericResource::next_state_)
+  ->Record();
+};
+
+void SimInit::SnapAgent(Model* m) {
+  DbInit di;
+  m->Snapshot(di);
+  Inventories invs = m->SnapshotInv();
+  Context* ctx = m->context();
+
+  Inventories::iterator it;
+  for (it = invs.begin(); it != invs.end(); ++it) {
+    std::string name = it->first;
+    std::vector<Resource::Ptr> inv = it->second;
+    for (int i = 0; i < inv.size(); ++i) {
+      ctx->NewDatum("AgentState_Inventories")
+        ->AddVal("AgentId", m->id())
+        ->AddVal("Time", ctx->time())
+        ->AddVal("InventoryName", name)
+        ->AddVal("ResourceId", inv[i]->id())
+        ->Record();
+    }
+  }
 }
 
 SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
@@ -34,6 +96,7 @@ SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
 
   se_->ctx = new Context(se_->ti, se_->rec);
 
+  // this sequence is imporant!!!
   LoadControlParams();
   LoadRecipes();
   LoadSolverInfo();
@@ -42,9 +105,10 @@ SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
   LoadInventories();
   LoadBuildSched();
   LoadDecomSched();
+  LoadNextIds();
 
-  // use rec.set_dump_count to reset all buffered datums that we don't want
-  // to be eventually sent to backends that are to-be-added.
+  // use rec.set_dump_count to reset all buffered data that we don't want
+  // to be re-recorded in the output db
   se_->rec->set_dump_count(kDefaultDumpCount);
 
   return se_;
@@ -52,12 +116,10 @@ SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
 
 void SimInit::LoadControlParams() {
   QueryResult qr = b_->Query("Info", NULL);
-
   int dur = qr.GetVal<int>(0, "Duration");
   int dec = qr.GetVal<int>(0, "DecayInterval");
   int y0 = qr.GetVal<int>(0, "InitialYear");
   int m0 = qr.GetVal<int>(0, "InitialMonth");
-
   se_->ctx->InitTime(dur, dec, m0, y0);
 }
 
@@ -130,18 +192,6 @@ void SimInit::LoadInitialAgents() {
   // to be done once; remember that we are initializing agents from a
   // simulation that was already started.
 
-  // find the max agent id
-  QueryResult qr = b_->Query("AgentEntry", NULL);
-  int maxid = 0;
-  for (int i = 0; i < qr.rows.size(); ++i) {
-    int id = qr.GetVal<int>(i, "AgentId");
-    if (id > maxid) {
-      maxid = id;
-    }
-  }
-  Model::next_id_ = maxid + 5;
-  SHOW(maxid);
-
   // find all agents that are alive at the current timestep
   std::vector<Cond> conds;
   conds.push_back(Cond("EnterTime", "<=", t_));
@@ -157,7 +207,7 @@ void SimInit::LoadInitialAgents() {
     QueryResult qexit;
     try {
       qexit = b_->Query("AgentExit", &conds);
-    } catch(std::exception err) { } // table doesn't exist (okay)
+    } catch (std::exception err) { } // table doesn't exist (okay)
     // if the agent wasn't decommissioned before t_ create and init it
     if (qexit.rows.size() == 0) {
       std::string proto = qentry.GetVal<std::string>(i, "Prototype");
@@ -196,11 +246,13 @@ void SimInit::LoadInitialAgents() {
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
+      m->DoRegistration();
     } else if (agents_.count(parentid) > 0) { // parent is built
       m->BuildInner(agents_[parentid]);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
+      m->DoRegistration();
     } else { // parent not built yet
       ++it;
     }
@@ -211,6 +263,22 @@ void SimInit::LoadInitialAgents() {
 }
 
 void SimInit::LoadInventories() {
+  std::map<int, Model*>::iterator it;
+  for (it = agents_.begin(); it != agents_.end(); ++it) {
+    Model* m = it->second;
+    std::vector<Cond> conds;
+    conds.push_back(Cond("Time", "==", t_));
+    conds.push_back(Cond("AgentId", "==", m->id()));
+    QueryResult qr = b_->Query("AgentState_Inventories", &conds);
+
+    Inventories invs;
+    for (int i = 0; i < qr.rows.size(); ++i) {
+      std::string inv_name = qr.GetVal<std::string>(i, "InventoryName");
+      int resid = qr.GetVal<int>(i, "ResourceId");
+      invs[inv_name].push_back(LoadResource(resid));
+    }
+    m->InitInv(invs);
+  }
 }
 
 void SimInit::LoadBuildSched() {
@@ -219,7 +287,7 @@ void SimInit::LoadBuildSched() {
   QueryResult qr;
   try {
     qr = b_->Query("BuildSchedule", &conds);
-  } catch(std::exception err) { } // table doesn't exist (okay)
+  } catch (std::exception err) { } // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>(i, "BuildTime");
@@ -235,7 +303,7 @@ void SimInit::LoadDecomSched() {
   QueryResult qr;
   try {
     qr = b_->Query("DecomSchedule", &conds);
-  } catch(std::exception err) { } // table doesn't exist (okay)
+  } catch (std::exception err) { } // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>(i, "DecomTime");
@@ -244,4 +312,100 @@ void SimInit::LoadDecomSched() {
   }
 }
 
+void SimInit::LoadNextIds() {
+  std::vector<Cond> conds;
+  conds.push_back(Cond("Time", "==", t_));
+  QueryResult qr = b_->Query("NextIds", &conds);
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    std::string obj = qr.GetVal<std::string>(0, "Object");
+    if (obj == "Agent") {
+      Model::next_id_ = qr.GetVal<int>(i, "NextId");
+    } else if (obj == "Transaction") {
+      se_->ctx->trans_id_ = qr.GetVal<int>(i, "NextId");
+    } else if (obj == "Composition") {
+      Composition::next_id_ = qr.GetVal<int>(i, "NextId");
+    } else if (obj == "Resource") {
+      Resource::nextid_ = qr.GetVal<int>(i, "NextId");
+    } else if (obj == "GenericResource") {
+      GenericResource::next_state_ = qr.GetVal<int>(i, "NextId");
+    } else {
+      throw IOError("Unexpected value in NextIds table: " + obj);
+    }
+  }
+}
+
+Resource::Ptr SimInit::LoadResource(int resid) {
+  std::vector<Cond> conds;
+  conds.push_back(Cond("ResourceId", "==", resid));
+  QueryResult qr = b_->Query("Resources", &conds);
+  ResourceType type = qr.GetVal<ResourceType>(0, "Type");
+
+  if (type == Material::kType) {
+    return LoadMaterial(resid);
+  } else if (type == GenericResource::kType) {
+    return LoadGenericResource(resid);
+  }
+  throw IOError("Invalid resource type in output database: " + type);
+}
+
+Resource::Ptr SimInit::LoadMaterial(int resid) {
+  // get special material object state
+  std::vector<Cond> conds;
+  conds.push_back(Cond("ResourceId", "==", resid));
+  conds.push_back(Cond("Time", "==", t_));
+  QueryResult qr = b_->Query("MaterialInfo", &conds);
+  int prev_decay = qr.GetVal<int>(0, "PrevDecayTime");
+
+  // get general resource object info
+  conds.clear();
+  conds.push_back(Cond("ResourceId", "==", resid));
+  qr = b_->Query("Resources", &conds);
+  double qty = qr.GetVal<double>(0, "Quantity");
+  int stateid = qr.GetVal<int>(0, "StateId");
+
+  // create the composition and material
+  Composition::Ptr comp = LoadComposition(stateid);
+  Model* dummy;
+  Material::Ptr mat = Material::Create(dummy, qty, comp);
+  mat->id_ = resid;
+  mat->prev_decay_time_ = prev_decay;
+
+  return mat;
+}
+
+Composition::Ptr SimInit::LoadComposition(int stateid) {
+  std::vector<Cond> conds;
+  conds.push_back(Cond("StateId", "==", stateid));
+  QueryResult qr = b_->Query("Compositions", &conds);
+  CompMap cm;
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    int nucid = qr.GetVal<int>(i, "NucId");
+    double mass_frac = qr.GetVal<double>(i, "MassFrac");
+    cm[nucid] = mass_frac;
+  }
+  return Composition::CreateFromMass(cm);
+}
+
+Resource::Ptr SimInit::LoadGenericResource(int resid) {
+  // get general resource object info
+  std::vector<Cond> conds;
+  conds.push_back(Cond("ResourceId", "==", resid));
+  QueryResult qr = b_->Query("Resources", &conds);
+  double qty = qr.GetVal<double>(0, "Quantity");
+  int stateid = qr.GetVal<int>(0, "StateId");
+
+  // get special GenericResource internal state
+  conds.clear();
+  conds.push_back(Cond("StateId", "==", stateid));
+  qr = b_->Query("GenericResources", &conds);
+  std::string quality = qr.GetVal<std::string>(0, "Quality");
+
+  // set static quality-stateid map to have same vals as db
+  GenericResource::stateids_[quality] = stateid;
+
+  Model* dummy;
+  return GenericResource::Create(dummy, qty, quality);
+}
+
 } // namespace cyclus
+

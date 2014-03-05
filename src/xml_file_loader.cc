@@ -284,6 +284,10 @@ void XMLFileLoader::LoadInitialAgents() {
   }
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void XMLFileLoader::LoadInventories() {
+}
+
 Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
   Model* m = ctx_->CreateModel<Model>(proto);
   m->Build(parent);
@@ -325,6 +329,8 @@ void XMLFileLoader::LoadControlParams() {
   ->AddVal("InitialMonth", m0)
   ->AddVal("Duration", dur)
   ->AddVal("DecayInterval", dec)
+  ->AddVal("ParentSimId", -1)
+  ->AddVal("BranchTime", -1)
   ->Record();
 }
 

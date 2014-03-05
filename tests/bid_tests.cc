@@ -50,10 +50,9 @@ TEST(BidTests, GenRsrcGetSet) {
   MockFacility* fac = new MockFacility(tc.get());
   double qty = 1.0;
   string quality = "qual";
-  string units = "units";
 
   GenericResource::Ptr rsrc =
-      GenericResource::CreateUntracked(qty, quality, units);
+      GenericResource::CreateUntracked(qty, quality);
   
   Request<GenericResource>::Ptr req =
       Request<GenericResource>::Create(rsrc, trader);

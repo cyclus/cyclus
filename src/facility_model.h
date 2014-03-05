@@ -97,6 +97,8 @@ class FacilityModel : public TimeListener, public Model, public Trader {
    */
   virtual void Build(Model* parent = NULL);
 
+  virtual void DoRegistration();
+
   /**
      decommissions the facility, default behavior is for the facility
      to delete itself

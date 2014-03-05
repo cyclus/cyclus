@@ -18,6 +18,7 @@ class Recorder;
 class Trader;
 class Timer;
 class TimeListener;
+class SimInit;
 
 /// A simulation context that provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
@@ -32,6 +33,7 @@ class TimeListener;
 /// destruction.
 class Context {
  public:
+  friend class SimInit;
   friend class Model;
 
   /// Creates a new context working with the specified timer and datum manager.
@@ -130,6 +132,9 @@ class Context {
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
+
+  /// Makes a snapshot of the simulation state to the output database.
+  void Snapshot();
 
   /// @return the next transaction id
   inline int NextTransactionID() {

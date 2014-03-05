@@ -79,7 +79,7 @@ void XMLFlatLoader::LoadInitialAgents() {
       ->Record();
   }
 
-  // create initial agents
+  // retrieve agent hierarchy
   int num_agents = xqe.NElementsMatchingQuery("/*/agent");
   std::map<std::string, std::string> protos;  // map<name, prototype>
   std::map<std::string, std::string> parents;  // map<agent, parent>

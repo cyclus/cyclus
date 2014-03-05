@@ -108,11 +108,11 @@ TEST(CapacityConstraintTests, RsrcQty) {
   EXPECT_DOUBLE_EQ(cc.convert(mat), qty*fraction);
 
   string s = "";
-  GenericResource::Ptr gr = GenericResource::CreateUntracked(qty, s, s);
+  GenericResource::Ptr gr = GenericResource::CreateUntracked(qty, s);
   EXPECT_DOUBLE_EQ(cc.convert(gr), qty*fraction);
 
   qty = std::rand();
-  gr = GenericResource::CreateUntracked(qty, s, s);
+  gr = GenericResource::CreateUntracked(qty, s);
   EXPECT_DOUBLE_EQ(cc.convert(gr), qty*fraction);
 }
 
@@ -147,15 +147,14 @@ TEST(CapacityConstraintTests, MaterialQuality) {
 TEST(CapacityConstraintTests, GenGenRsrcQuality) {
   TestContext tc;
   double quan = 4.0;
-  string units = "kg";
   string qual = quality;
   
   Converter<GenericResource>::Ptr c(new GenRsrcQualConverter());
   CapacityConstraint<GenericResource> cc(val, c);
   
-  GenericResource::Ptr gr = GenericResource::CreateUntracked(quan, qual, units);
+  GenericResource::Ptr gr = GenericResource::CreateUntracked(quan, qual);
   EXPECT_DOUBLE_EQ(cc.convert(gr), val);
 
-  gr = GenericResource::CreateUntracked(quan, units, units);
+  gr = GenericResource::CreateUntracked(quan, "foo");
   EXPECT_DOUBLE_EQ(cc.convert(gr), 0.0);
 }

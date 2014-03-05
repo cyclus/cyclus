@@ -66,6 +66,9 @@ class XMLFileLoader {
   /// Creates all initial agent instances from the input file.
   virtual void LoadInitialAgents();
 
+  /// Creates all initial agent instances from the input file.
+  virtual void LoadInventories();
+
  protected:
   virtual std::string master_schema();
 

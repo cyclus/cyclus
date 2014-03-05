@@ -42,6 +42,9 @@ std::string InstModel::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::Build(Model* parent) {
   Model::Build(parent);
+}
+
+void InstModel::DoRegistration() {
   context()->RegisterTimeListener(this);
 }
 

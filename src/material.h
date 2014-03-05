@@ -69,6 +69,8 @@ const double ug = kg* .000000001;
 ///   @endcode
 ///
 class Material: public Resource {
+  friend class SimInit;
+
  public:
   typedef boost::shared_ptr<Material> Ptr;
   static const ResourceType kType;

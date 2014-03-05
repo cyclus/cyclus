@@ -65,6 +65,7 @@ class Recorder {
   /// will be flushed immediately as they come.
   ///
   /// @param count # Datum objects to buffer before flushing to backends.
+  /// @warning this deletes all buffered data from the recorder.
   void set_dump_count(unsigned int count);
 
   /// returns the unique id associated with this cyclus simulation.
