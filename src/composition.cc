@@ -106,6 +106,10 @@ Composition::Composition(int prev_decay, ChainPtr decay_line)
 Composition::Ptr Composition::NewDecay(int delta) {
   int tot_decay = prev_decay_ + delta;
 
+  if (atom_.size() == 0)
+    // FIXME this is only here for testing
+    return (Composition::Ptr) new Composition(tot_decay, decay_line_);
+
   Decayer handler(atom_);
   handler.Decay(2419200.0 * delta);  // 2419200 == secs / month
 
