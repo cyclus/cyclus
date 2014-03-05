@@ -2,6 +2,8 @@
 #ifndef CYCLUS_SRC_UNIFORM_TAYLOR_H_
 #define CYCLUS_SRC_UNIFORM_TAYLOR_H_
 
+#include <boost/lexical_cast.hpp>
+
 #include "use_matrix_lib.h"
 
 namespace cyclus {

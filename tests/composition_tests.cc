@@ -3,7 +3,9 @@
 #include <gtest/gtest.h>
 
 #include "composition.h"
+#include "env.h"
 #include "mass_table.h"
+#include "pyne.h"
 
 class TestComp : public cyclus::Composition {
  public:
@@ -46,6 +48,8 @@ TEST(CompositionTests, create_mass) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, lineage) {
   using cyclus::Composition;
+  // tell pyne about the path to nuc data
+  pyne::NUC_DATA_PATH = cyclus::Env::GetBuildPath() + "/share/cyclus_nuc_data.h5";
 
   TestComp c;
 
@@ -65,4 +69,4 @@ TEST(CompositionTests, lineage) {
   EXPECT_EQ(chain[3 * dt], dec4);
   EXPECT_EQ(dec4, dec5);
 }
-
+ 

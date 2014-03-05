@@ -11,7 +11,6 @@
 
 namespace cyclus {
 
-bool Decayer::decay_info_loaded_ = false;
 ParentMap Decayer::parent_ = ParentMap();
 DaughtersMap Decayer::daughters_ = DaughtersMap();
 Matrix Decayer::decay_matrix_ = Matrix();
@@ -19,120 +18,69 @@ NucList Decayer::nuclides_tracked_ = NucList();
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Decayer::Decayer(const CompMap& comp) {
-  if (!decay_info_loaded_) {
-    Decayer::LoadDecayInfo();
-    decay_info_loaded_ = true;
-  }
+  int nuc;
+  int col;
+  long double atom_count;
+  bool needs_build = false;
 
-  pre_vect_ = Vector(parent_.size(), 1);
   std::map<int, double>::const_iterator comp_iter = comp.begin();
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
-    int nuc = comp_iter->first;
-    long double atom_count = comp_iter->second;
-
-    // if the nuclide is tracked in the decay matrix
-    if (parent_.count(nuc) > 0) {
-      int col = parent_[nuc].first;  // get Vector position
-      pre_vect_(col, 1) = atom_count;
-      // if it is not in the decay matrix, then it is added as a stable nuclide
-    } else {
-      double decayConst = 0;
-      int col = parent_.size() + 1;
-      parent_[nuc] = std::make_pair(col, decayConst);  // add nuclide to parent map
-
-      int nDaughters = 0;
-      std::vector< std::pair<int, double> > temp(nDaughters);
-      daughters_[col] = temp;  // add nuclide to daughters map
-
-      std::vector<long double> row(1, atom_count);
-      pre_vect_.AddRow(row);  // add nuclide to the end of the Vector
+    nuc = comp_iter->first;
+    atom_count = comp_iter->second;
+    if (!IsNucTracked(nuc)) {
+      needs_build = true;
+      AddNucToMaps(nuc);
     }
+  }
+
+  if (needs_build)
+    BuildDecayMatrix();
+
+  pre_vect_ = Vector(parent_.size(), 1);
+  for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
+    nuc = comp_iter->first;
+    atom_count = comp_iter->second;
+    col = parent_[nuc].first;
+    pre_vect_(col, 1) = atom_count;
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Decayer::LoadDecayInfo() {
-  std::string path = Env::GetBuildPath() + "/share/decayInfo.dat";
-  std::ifstream decayInfo(path.c_str());
+void Decayer::AddNucToMaps(int nuc) {
+  int i;
+  int col;
+  int daughter;
+  std::set<int> daughters;
+  std::set<int>::iterator d; 
 
-  if (!decayInfo.is_open()) {
-    throw IOError("Could not find file 'decayInfo.dat'.");
+  if (IsNucTracked(nuc))
+    return;
+
+  col = parent_.size() + 1;
+  parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));  
+  AddNucToList(nuc);
+
+  i = 0;
+  daughters = pyne::decay_children(nuc);
+  std::vector< std::pair<int, double> > dvec(daughters.size());
+  for (d = daughters.begin(); d != daughters.end(); ++d) {
+    daughter = *d;
+    AddNucToMaps(daughter);
+    dvec[i] = std::make_pair<int, double>(daughter, pyne::branch_ratio(nuc, daughter));
+    i++;
   }
-
-  int jcol = 1;
-  int nuc = 0;
-  int nDaughters = 0;
-  double decayConst = 0;  // decay constant, in inverse years
-  double branchRatio = 0;
-
-  decayInfo >> nuc;  // get first parent
-  nuc *= 10000;  // put in id form
-
-  // checks to see if there are nuclides in 'decayInfo.dat'
-  if (decayInfo.eof()) {
-    std::string err_msg = "There are no nuclides in the 'decayInfo.dat' file";
-    throw ValidationError(err_msg);
-  }
-
-  // processes 'decayInfo.dat'
-  while (!decayInfo.eof()) {
-    if (parent_.find(nuc) != parent_.end()) {
-      std::string err_msg;
-      err_msg = "A duplicate parent nuclide was found in 'decayInfo.dat'";
-      throw ValidationError(err_msg);
-    }
-
-    // make parent
-    decayInfo >> decayConst;
-    decayInfo >> nDaughters;
-    AddNucToList(nuc);
-
-    parent_[nuc] = std::make_pair(jcol, decayConst);
-
-    // make daughters
-    std::vector< std::pair<int, double> > temp(nDaughters);
-    for (int i = 0; i < nDaughters; ++i) {
-      decayInfo >> nuc;
-      nuc *= 10000;  // put in id form
-      decayInfo >> branchRatio;
-      AddNucToList(nuc);
-
-      // checks for duplicate daughter nuclides
-      for (int j = 0; j < nDaughters; ++j) {
-        if (temp[j].first == nuc) {
-          throw ValidationError(
-            std::string("A duplicate daughter nuclide, %i , was found in decayInfo.dat",
-                        nuc));
-        }
-      }
-      temp[i] = std::make_pair(nuc, branchRatio);
-    }
-
-    daughters_[jcol] = temp;
-    ++jcol;  // set next column
-    decayInfo >> nuc;  // get next parent
-    nuc *= 10000;  // put in id form
-  }
-  BuildDecayMatrix();
+  daughters_[col] = dvec;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Decayer::DecayConstant(int nuc) {
-  if (!decay_info_loaded_) {
-    Decayer::LoadDecayInfo();
-    decay_info_loaded_ = true;
-  }
-  if (parent_.count(nuc) > 0) {
-    return parent_[nuc].second;
-  }
-  return 0;
+bool Decayer::IsNucTracked(int nuc) {
+  return (find(nuclides_tracked_.begin(), nuclides_tracked_.end(), nuc)
+          != nuclides_tracked_.end());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::AddNucToList(int nuc) {
-  bool exists = (find(nuclides_tracked_.begin(), nuclides_tracked_.end(), nuc)
-                 != nuclides_tracked_.end());
-  if (!exists) {
+  if (!IsNucTracked(nuc)) {
     nuclides_tracked_.push_back(nuc);
   }
 }
@@ -162,7 +110,7 @@ void Decayer::GetResult(CompMap& comp) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::BuildDecayMatrix() {
-  double decayConst = 0;  // decay constant, in inverse years
+  double decay_const = 0;  // decay constant, in inverse secs
   int jcol = 1;
   int n = parent_.size();
   decay_matrix_ = Matrix(n, n);
@@ -172,13 +120,16 @@ void Decayer::BuildDecayMatrix() {
   // populates the decay matrix column by column
   while (parent_iter != parent_.end()) {
     jcol = parent_iter->second.first;  // determines column index
-    decayConst = parent_iter->second.second;
-    decay_matrix_(jcol, jcol) = -1 * decayConst;  // sets A(i,i) value
+    decay_const = parent_iter->second.second;
+    // Gross heuristic for mostly stable nuclides 2903040000 sec / 100 years
+    if (static_cast<long double>(exp(-2903040000 * decay_const)) == 0.0)
+      decay_const = 0.0;
+    decay_matrix_(jcol, jcol) = -1 * decay_const;  // sets A(i,i) value
 
     // processes the vector in the daughters map if it is not empty
     if (!daughters_.find(jcol)->second.empty()) {
       // an iterator that points to 1st daughter in the vector
-      // pair<nuclide,branchratio>
+      // pair<nuclide,branch_ratio>
       std::vector< std::pair<int, double> >::const_iterator
       nuc_iter = daughters_.find(jcol)->second.begin();
 
@@ -186,8 +137,8 @@ void Decayer::BuildDecayMatrix() {
       while (nuc_iter != daughters_.find(jcol)->second.end()) {
         int nuc = nuc_iter->first;
         int irow = parent_.find(nuc)->second.first;  // determines row index
-        double branchRatio = nuc_iter->second;
-        decay_matrix_(irow, jcol) = branchRatio * decayConst;  // sets A(i,j) value
+        double branch_ratio = nuc_iter->second;
+        decay_matrix_(irow, jcol) = branch_ratio * decay_const;  // sets A(i,j) value
 
         ++nuc_iter;  // get next daughter
       }
@@ -197,9 +148,9 @@ void Decayer::BuildDecayMatrix() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Decayer::Decay(double years) {
+void Decayer::Decay(double secs) {
   // solves the decay equation for the final composition
-  post_vect_ = UniformTaylor::MatrixExpSolver(decay_matrix_, pre_vect_, years);
+  post_vect_ = UniformTaylor::MatrixExpSolver(decay_matrix_, pre_vect_, secs);
 }
 
 }  // namespace cyclus

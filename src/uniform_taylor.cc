@@ -17,7 +17,9 @@ Vector UniformTaylor::MatrixExpSolver(const Matrix& A, const Vector& x_o,
   // checks if the dimensions of A and x_o are compatible for matrix-vector
   // computations
   if (x_o.NumRows() != n) {
-    std::string error = "Error: Matrix-Vector dimensions are not compatible.";
+    std::string error = "Error: Matrix-Vector dimensions are not compatible: " + \
+                        boost::lexical_cast<std::string>( x_o.NumRows()) + \
+                        " rows vs " + boost::lexical_cast<std::string>(n) + " nuclides.";
     throw ValueError(error);
   }
 
