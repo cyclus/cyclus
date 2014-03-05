@@ -23,27 +23,27 @@ Decayer::Decayer(const CompMap& comp) {
   long double atom_count;
   bool needs_build = false;
 
-  pre_vect_ = Vector(parent_.size(), 1);
   std::map<int, double>::const_iterator comp_iter = comp.begin();
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
     nuc = comp_iter->first;
     atom_count = comp_iter->second;
-
-    if (parent_.count(nuc) > 0) {
-      // if the nuclide is tracked in the decay matrix
-      int col = parent_[nuc].first;
-      pre_vect_(col, 1) = atom_count;
-    } else {
-      // if it is not in the decay matrix, then it is added
+    if (!IsNucTracked(nuc)) {
       needs_build = true;
       AddNucToMaps(nuc);
-      std::vector<long double> row(1, atom_count);
-      pre_vect_.AddRow(row);
     }
   }
 
   if (needs_build)
     BuildDecayMatrix();
+
+  pre_vect_ = Vector(parent_.size(), 1);
+  for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
+    nuc = comp_iter->first;
+    atom_count = comp_iter->second;
+    col = parent_[nuc].first;
+    pre_vect_.Print();
+    pre_vect_(col, 1) = atom_count;
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,7 +54,7 @@ void Decayer::AddNucToMaps(int nuc) {
   std::set<int> daughters;
   std::set<int>::iterator d; 
 
-  if (parent_.count(nuc) == 0)
+  if (IsNucTracked(nuc))
     return;
 
   col = parent_.size() + 1;
@@ -74,10 +74,14 @@ void Decayer::AddNucToMaps(int nuc) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bool Decayer::IsNucTracked(int nuc) {
+  return (find(nuclides_tracked_.begin(), nuclides_tracked_.end(), nuc)
+          != nuclides_tracked_.end());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::AddNucToList(int nuc) {
-  bool exists = (find(nuclides_tracked_.begin(), nuclides_tracked_.end(), nuc)
-                 != nuclides_tracked_.end());
-  if (!exists) {
+  if (!IsNucTracked(nuc)) {
     nuclides_tracked_.push_back(nuc);
   }
 }
@@ -118,6 +122,9 @@ void Decayer::BuildDecayMatrix() {
   while (parent_iter != parent_.end()) {
     jcol = parent_iter->second.first;  // determines column index
     decayConst = parent_iter->second.second;
+    // Gross heuristic for mostly stable nuclides 2903040000 sec / 100 years
+    if ((long double) exp(-2903040000 * decayConst) == 0.0)
+      decayConst = 0.0;
     decay_matrix_(jcol, jcol) = -1 * decayConst;  // sets A(i,i) value
 
     // processes the vector in the daughters map if it is not empty

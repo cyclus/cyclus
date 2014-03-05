@@ -92,6 +92,9 @@ class Decayer {
 
   /// Add the nuclide to our list of tracked nuclides IFF it is not in the list.
   static void AddNucToList(int nuc);
+
+  /// Checks if the nuclide is tracked
+  static bool IsNucTracked(int nuc);
 };
 
 }  // namespace cyclus
