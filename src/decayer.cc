@@ -110,7 +110,7 @@ void Decayer::GetResult(CompMap& comp) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::BuildDecayMatrix() {
-  double decayConst = 0;  // decay constant, in inverse secs
+  double decay_const = 0;  // decay constant, in inverse secs
   int jcol = 1;
   int n = parent_.size();
   decay_matrix_ = Matrix(n, n);
@@ -120,16 +120,16 @@ void Decayer::BuildDecayMatrix() {
   // populates the decay matrix column by column
   while (parent_iter != parent_.end()) {
     jcol = parent_iter->second.first;  // determines column index
-    decayConst = parent_iter->second.second;
+    decay_const = parent_iter->second.second;
     // Gross heuristic for mostly stable nuclides 2903040000 sec / 100 years
-    if ((long double) exp(-2903040000 * decayConst) == 0.0)
-      decayConst = 0.0;
-    decay_matrix_(jcol, jcol) = -1 * decayConst;  // sets A(i,i) value
+    if (static_cast<long double>(exp(-2903040000 * decay_const)) == 0.0)
+      decay_const = 0.0;
+    decay_matrix_(jcol, jcol) = -1 * decay_const;  // sets A(i,i) value
 
     // processes the vector in the daughters map if it is not empty
     if (!daughters_.find(jcol)->second.empty()) {
       // an iterator that points to 1st daughter in the vector
-      // pair<nuclide,branchratio>
+      // pair<nuclide,branch_ratio>
       std::vector< std::pair<int, double> >::const_iterator
       nuc_iter = daughters_.find(jcol)->second.begin();
 
@@ -137,8 +137,8 @@ void Decayer::BuildDecayMatrix() {
       while (nuc_iter != daughters_.find(jcol)->second.end()) {
         int nuc = nuc_iter->first;
         int irow = parent_.find(nuc)->second.first;  // determines row index
-        double branchRatio = nuc_iter->second;
-        decay_matrix_(irow, jcol) = branchRatio * decayConst;  // sets A(i,j) value
+        double branch_ratio = nuc_iter->second;
+        decay_matrix_(irow, jcol) = branch_ratio * decay_const;  // sets A(i,j) value
 
         ++nuc_iter;  // get next daughter
       }
