@@ -4,7 +4,6 @@
 
 #include "composition.h"
 #include "env.h"
-#include "mass_table.h"
 #include "pyne.h"
 
 class TestComp : public cyclus::Composition {
@@ -18,6 +17,7 @@ class TestComp : public cyclus::Composition {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, create_atom) {
   using cyclus::Composition;
+  cyclus::Env::SetNucDataPath();
 
   cyclus::CompMap v;
   v[922350000] = 2;
@@ -27,12 +27,14 @@ TEST(CompositionTests, create_atom) {
   v = c->atom();
   EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 2 / 1);
   v = c->mass();
-  EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 2 * cyclus::MT->GramsPerMol(922350000) / cyclus::MT->GramsPerMol(922330000));
+  EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 
+                   2 * pyne::atomic_mass(922350000) / pyne::atomic_mass(922330000));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, create_mass) {
   using cyclus::Composition;
+  cyclus::Env::SetNucDataPath();
 
   cyclus::CompMap v;
   v[922350000] = 2;
@@ -42,14 +44,14 @@ TEST(CompositionTests, create_mass) {
   v = c->mass();
   EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 2 / 1);
   v = c->atom();
-  EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 2 / cyclus::MT->GramsPerMol(922350000) * cyclus::MT->GramsPerMol(922330000));
+  EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 
+                   2 / pyne::atomic_mass(922350000) * pyne::atomic_mass(922330000));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, lineage) {
   using cyclus::Composition;
-  // tell pyne about the path to nuc data
-  pyne::NUC_DATA_PATH = cyclus::Env::GetBuildPath() + "/share/cyclus_nuc_data.h5";
+  cyclus::Env::SetNucDataPath();
 
   TestComp c;
 

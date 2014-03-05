@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
   Env::SetCyclusRelPath(path);
 
   // tell pyne about the path to nuc data
-  pyne::NUC_DATA_PATH = Env::GetBuildPath() + "/share/cyclus_nuc_data.h5";
+  Env::SetNucDataPath();
 
   // read input file and setup simulation
   std::string inputFile = vm["input-file"].as<std::string>();

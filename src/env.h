@@ -5,6 +5,8 @@
 #include <string>
 #include "boost/filesystem.hpp"
 
+#include "pyne.h"
+
 namespace cyclus {
 
 /// @class Env
@@ -87,6 +89,16 @@ class Env {
   /// @return true if the library is found, false if not
   static bool FindModuleLib(std::string name,
                             boost::filesystem::path& path_found);
+
+  /// Initializes the path to the nuclear data library to a default location
+  inline static const void SetNucDataPath() {
+    pyne::NUC_DATA_PATH = Env::GetBuildPath() + "/share/cyclus_nuc_data.h5";
+  }
+
+  /// Initializes the path to the nuclear data library to p
+  inline static const void SetNucDataPath(std::string p) {
+    pyne::NUC_DATA_PATH = p;
+  }
 
  private:
   /// the relative path from cwd to cyclus

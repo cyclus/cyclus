@@ -19,12 +19,6 @@ else()
 endif()
 
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite"
-  "${CYCLUS_BINARY_DIR}/share/mass.sqlite"
-  COPYONLY
-  )
-
-CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5"
   "${CYCLUS_BINARY_DIR}/share/cyclus_nuc_data.h5"
   COPYONLY
@@ -39,7 +33,6 @@ CONFIGURE_FILE(
   )
 
 INSTALL(FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/mass.sqlite"
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus-flat.rng.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5"
@@ -95,7 +88,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/logger.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mass_table.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/material.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/model.cc"
@@ -171,7 +163,6 @@ INSTALL(FILES
   intrusive_base.h
   l_matrix.h
   logger.h
-  mass_table.h
   mat_query.h
   material.h
   model.h

@@ -3,8 +3,8 @@
 
 #include "comp_math.h"
 #include "cyc_limits.h"
-#include "mass_table.h"
 #include "material.h"
+#include "pyne.h"
 
 namespace cyclus {
 
