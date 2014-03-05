@@ -105,6 +105,7 @@ Composition::Composition(int prev_decay, ChainPtr decay_line)
 
 Composition::Ptr Composition::NewDecay(int delta) {
   int tot_decay = prev_decay_ + delta;
+  atom();  // force evaluation of atom-composition if not calculated already
 
   // FIXME this is only here for testing
   if (atom_.size() == 0)
