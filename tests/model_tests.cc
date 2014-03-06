@@ -36,17 +36,6 @@ TEST_P(ModelTests, Schema) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, DISABLED_InitAndGetName) {
-  cyclus::XMLParser p;
-  std::stringstream ss;
-  ss << "<start><name>fooname</name></start>";
-  p.Init(ss);
-  cyclus::XMLQueryEngine engine(p);
-  model_->Model::InitFrom(&engine);
-  EXPECT_EQ(model_->prototype(),"fooname");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, GetModelType) {
   EXPECT_NE(std::string("Model"), model_->kind());
 }

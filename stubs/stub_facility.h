@@ -3,9 +3,7 @@
 
 #include <string>
 
-#include "context.h"
-#include "facility_model.h"
-#include "query_engine.h"
+#include "cyclus.h"
 
 namespace stubs {
 
@@ -52,11 +50,9 @@ class StubFacility : public cyclus::FacilityModel  {
   virtual ~StubFacility();
 
   /**
-    Initialize members related to derived module class
-
-    @param qe a pointer to a QueryEngine object containing initialization data
+    Initialize db with input file info related to derived module class
     */
-  virtual void InitFrom(cyclus::QueryEngine* qe);
+  virtual void InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di);
 
   /**
     Initialize members for a cloned module.

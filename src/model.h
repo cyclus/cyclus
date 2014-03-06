@@ -46,11 +46,15 @@ class Model {
   friend class SimInit;
 
  public:
-  /// Initializes a model by reading parameters from the passed QueryEngine.
-  /// This method must be implemented by all models.  This method must call the
-  /// superclass' InitFrom(QueryEngine*) method. The InitFrom method should only
-  /// initialize this class' members - not inherited state. The superclass
-  /// InitFrom should generally be called before any other work is done.
+
+  //virtual void InitFrom(QueryEngine* qe) {};
+
+  /// Translates info for a model from an input file to the database by reading
+  /// parameters from the passed QueryEngine and recording data via the DbInit
+  /// variable.  The simulation and agent id's are automatically included in all
+  /// information transfered through di.  This method must be implemented by all
+  /// models.  This method must call the superclass' InfileToDb(QueryEngine*,
+  /// DbInit) method before doing any other work.
   ///
   /// Model parameters in the QueryEngine are scoped in the
   /// "model/[model-class-name]" path. The model's class-name can be retrieved
@@ -64,26 +68,28 @@ class Model {
   /// class MyModelClass : virtual public cyclus::FacilityModel {
   ///   // ...
   ///
-  ///   void InitFrom(QueryEngine* qe) {
+  ///   void InfileToDb(QueryEngine* qe, DbInit di) {
   ///     cyclus::FacilityModel::InitFrom(qe); // 
   ///     // now do MyModelClass' initialitions, e.g.:
   ///     qe = qe->QueryElement("model/" + ModelImpl()); // rescope the QueryEngine
   ///
   ///     // retrieve all model params
-  ///     in_commod_ = qe->GetElementContent("incommod");
+  ///     std::string recipe = qe->GetElementContent("recipe");
+  ///     std::string in_commod = qe->GetElementContent("in_commod");
+  ///     std::string out_commod = qe->GetElementContent("out_commod");
+  ///     di.NewDatum("MyModelTable1")
+  ///       ->AddVal("recipe", recipe)
+  ///       ->AddVal("in_commod", in_commod)
+  ///       ->AddVal("out_commod", out_commod)
+  ///       ->Record();
   ///     // ...
   ///   };
   ///
   ///   // ...
   /// };
   /// @endcode
-  virtual void InitFrom(QueryEngine* qe) {};
-
-  /// The simulation and agent id's are automatically included in all
-  /// information transfered through di.
   ///
-  /// @warning this method MUST NOT use or modify any instance state for the
-  /// translation.
+  /// @warning this method MUST NOT use or modify any instance state.
   virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
   /// Appropriate simulation id, agent id, and time filters are automatically

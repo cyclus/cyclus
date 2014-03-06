@@ -9,15 +9,18 @@ StubFacility::StubFacility(cyclus::Context* ctx)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::~StubFacility() {}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::InitFrom(cyclus::QueryEngine* qe) {
-  cyclus::FacilityModel::InitFrom(qe);
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StubFacility::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
+  Model::InfileToDb(qe, di);
   qe = qe->QueryElement(ModelImpl());
-
-  cyclus::QueryEngine* input = qe->QueryElement("input");
-  // retrieve input data members here. For example :
-  // string query = "incommodity";
-  // incommodity_ = lexical_cast<double>(input->getElementContent(query));
+  // retrieve input data members here. For example:
+  //
+  //   int cycle_len = lexical_cast<int>(input->getElementContent("cycle_length"));
+  //   ...
+  //   di.NewDatum("StubFacilityParams")
+  //     ->AddVal("cycle_length", cycle_len)
+  //     ...
+  //     ->Record();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

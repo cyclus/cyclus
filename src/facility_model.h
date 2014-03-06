@@ -74,11 +74,7 @@ class FacilityModel : public TimeListener, public Model, public Trader {
 
   virtual ~FacilityModel();
 
-  /**
-     Initalize the FacilityModel from xml. Calls the init function.
-     @param qe a pointer to a QueryEngine object containing intialization data
-   */
-  virtual void InitFrom(QueryEngine* qe);
+  virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
   /**
      Copy module members from a source model

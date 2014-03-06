@@ -6,7 +6,7 @@
 CONFIGURE_FILE(suffix.h.in "${CMAKE_CURRENT_SOURCE_DIR}/suffix.h" @ONLY)
 
 EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
-CONFIGURE_FILE(version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/version.h" @ONLY)
+CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5")
     message("-- Found '${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5'")
@@ -114,6 +114,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/timer.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/variable.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/version.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_flat_loader.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_parser.cc"

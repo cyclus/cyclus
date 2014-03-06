@@ -26,8 +26,8 @@ void InstModel::InitFrom(InstModel* m) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void InstModel::InitFrom(QueryEngine* qe) {
-  Model::InitFrom(qe);
+void InstModel::InfileToDb(QueryEngine* qe, DbInit di) {
+  Model::InfileToDb(qe, di);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

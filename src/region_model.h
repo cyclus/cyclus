@@ -76,12 +76,7 @@ class RegionModel : public Model, public TimeListener {
    */
   virtual ~RegionModel() {};
 
-  /**
-     Initalize the InstModel from a QueryEngine. Calls the init function.
-
-     @param qe A pointer to a QueryEngine object containing initialization data
-   */
-  virtual void InitFrom(QueryEngine* qe);
+  virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
   /**
      perform actions required when entering the simulation

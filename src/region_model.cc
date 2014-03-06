@@ -25,9 +25,9 @@ RegionModel::RegionModel(Context* ctx) : Model(ctx) {
   kind_ = "Region";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void RegionModel::InitFrom(QueryEngine* qe) {
-  Model::InitFrom(qe); // name_
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::InfileToDb(QueryEngine* qe, DbInit di) {
+  Model::InfileToDb(qe, di);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

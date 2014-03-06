@@ -10,13 +10,17 @@ StubRegion::StubRegion(cyclus::Context* ctx)
 StubRegion::~StubRegion() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::InitFrom(cyclus::QueryEngine* qe) {
-  cyclus::RegionModel::InitFrom(qe);
+void StubRegion::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
+  Model::InfileToDb(qe, di);
   qe = qe->QueryElement(ModelImpl());
-
-  // retrieve input data members here. For example :
-  // string query = "incommodity";
-  // incommodity_ = lexical_cast<double>(qe->getElementContent(query));
+  // retrieve input data members here. For example:
+  //
+  //   int cycle_len = lexical_cast<int>(input->getElementContent("cycle_length"));
+  //   ...
+  //   di.NewDatum("StubFacilityParams")
+  //     ->AddVal("cycle_length", cycle_len)
+  //     ...
+  //     ->Record();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

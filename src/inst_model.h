@@ -45,12 +45,7 @@ class InstModel : public Model, public TimeListener {
    */
   virtual ~InstModel() {};
 
-  /**
-     Initalize the InstModel from a QueryEngine. Calls the init function.
-
-     @param qe a pointer to a QueryEngine object containing intialization data
-   */
-  virtual void InitFrom(QueryEngine* qe);
+  virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
   /**
      every model should be able to print a verbose description
