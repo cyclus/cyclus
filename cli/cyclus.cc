@@ -128,13 +128,33 @@ int main(int argc, char* argv[]) {
   }
 
   // announce yourself
-  std::cout << std::endl;
-  std::cout << "|--------------------------------------------|" << std::endl;
-  std::cout << "|                  Cyclus                    |" << std::endl;
-  std::cout << "|       a nuclear fuel cycle simulator       |" << std::endl;
-  std::cout << "|  from the University of Wisconsin-Madison  |" << std::endl;
-  std::cout << "|--------------------------------------------|" << std::endl;
-  std::cout << std::endl;
+  std::cout << "              :                                                               " << std::endl;
+  std::cout << "          .CL:CC CC             _Q     _Q  _Q_Q    _Q    _Q              _Q   " << std::endl;
+  std::cout << "        CC;CCCCCCCC:C;         /_\\)   /_\\)/_/\\\\)  /_\\)  /_\\)            /_\\)  " << std::endl;
+  std::cout << "        CCCCCCCCCCCCCl       __O|/O___O|/O_OO|/O__O|/O__O|/O____________O|/O__" << std::endl;
+  std::cout << "     CCCCCCf     iCCCLCC     /////////////////////////////////////////////////" << std::endl;
+  std::cout << "     iCCCt  ;;;;;.  CCCC                                                      " << std::endl;
+  std::cout << "    CCCC  ;;;;;;;;;. CClL.                          c                         " << std::endl;
+  std::cout << "   CCCC ,;;       ;;: CCCC  ;                   : CCCCi                       " << std::endl;
+  std::cout << "    CCC ;;         ;;  CC   ;;:                CCC`   `C;                     " << std::endl;
+  std::cout << "  lCCC ;;              CCCC  ;;;:             :CC .;;. C;   ;    :   ;  :;;   " << std::endl;
+  std::cout << "  CCCC ;.              CCCC    ;;;,           CC ;    ; Ci  ;    :   ;  :  ;  " << std::endl;
+  std::cout << "   iCC :;               CC       ;;;,        ;C ;       CC  ;    :   ; .      " << std::endl;
+  std::cout << "  CCCi ;;               CCC        ;;;.      .C ;       tf  ;    :   ;  ;.    " << std::endl;
+  std::cout << "  CCC  ;;               CCC          ;;;;;;; fC :       lC  ;    :   ;    ;:  " << std::endl;
+  std::cout << "   iCf ;;               CC         :;;:      tC ;       CC  ;    :   ;     ;  " << std::endl;
+  std::cout << "  fCCC :;              LCCf      ;;;:         LC :.  ,: C   ;    ;   ; ;   ;  " << std::endl;
+  std::cout << "  CCCC  ;;             CCCC    ;;;:           CCi `;;` CC.  ;;;; :;.;.  ; ,;  " << std::endl;
+  std::cout << "    CCl ;;             CC    ;;;;              CCC    CCL                     " << std::endl;
+  std::cout << "   tCCC  ;;        ;; CCCL  ;;;                  tCCCCC.                      " << std::endl;
+  std::cout << "    CCCC  ;;     :;; CCCCf  ;                     ,L                          " << std::endl;
+  std::cout << "     lCCC   ;;;;;;  CCCL                                                      " << std::endl;
+  std::cout << "     CCCCCC  :;;  fCCCCC                                                      " << std::endl;
+  std::cout << "      . CCCC     CCCC .                                                       " << std::endl;
+  std::cout << "       .CCCCCCCCCCCCCi                                                        " << std::endl;
+  std::cout << "          iCCCCCLCf                                                           " << std::endl;
+  std::cout << "           .  C. ,                                                            " << std::endl;
+  std::cout << "              :                                                               " << std::endl;
 
   bool success = true;
 
@@ -212,23 +232,16 @@ int main(int argc, char* argv[]) {
 
   if (!success) {
     std::cout << std::endl;
-    std::cout << "|--------------------------------------------|" << std::endl;
-    std::cout << "|                  Cyclus                    |" << std::endl;
-    std::cout << "|           run *not* successful             |" << std::endl;
-    std::cout << "|--------------------------------------------|" << std::endl;
+    std::cout << "WARNING: Cyclus run *not* successful!" << std::endl;
     std::cout << std::endl;
     return 1;
   }
 
   std::cout << std::endl;
-  std::cout << "|--------------------------------------------|" << std::endl;
-  std::cout << "|                  Cyclus                    |" << std::endl;
-  std::cout << "|              run successful                |" << std::endl;
-  std::cout << "|--------------------------------------------|" << std::endl;
+  std::cout << "Status: Cyclus run successful!" << std::endl;
   std::cout << "Output location: " << output_path << std::endl;
   std::cout << "Simulation ID: " << boost::lexical_cast<std::string>
             (ctx->sim_id()) << std::endl;
-  std::cout << std::endl;
 
   delete ctx;
   rec.close();
