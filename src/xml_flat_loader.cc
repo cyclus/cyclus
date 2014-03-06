@@ -79,11 +79,12 @@ void XMLFlatLoader::LoadInitialAgents() {
       ->Record();
   }
 
-  // retrieve agent hierarchy
+  // retrieve agent hierarchy and initial inventories
   int num_agents = xqe.NElementsMatchingQuery("/*/agent");
   std::map<std::string, std::string> protos;  // map<name, prototype>
   std::map<std::string, std::string> parents;  // map<agent, parent>
   std::set<std::string> agents; // set<agent_name>
+  std::map<std::string, QueryEngine*> invs; // map<agent, qe>;
   for (int i = 0; i < num_agents; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/agent", i);
     std::string name = qe->GetElementContent("name");
@@ -91,6 +92,7 @@ void XMLFlatLoader::LoadInitialAgents() {
     std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
     protos[name] = proto;
     parents[name] = parent;
+    invs[name] = qe;
     agents.insert(name);
   }
 
@@ -103,10 +105,12 @@ void XMLFlatLoader::LoadInitialAgents() {
     std::string parent = parents[name];
     if (parent == "") {
       built[name] = BuildAgent(proto, NULL);
+      LoadInventory(built[name], invs[name]);
       ++it;
       agents.erase(name);
     } else if (built.count(parent) > 0) {
       built[name] = BuildAgent(proto, built[parent]);
+      LoadInventory(built[name], invs[name]);
       ++it;
       agents.erase(name);
     } else {

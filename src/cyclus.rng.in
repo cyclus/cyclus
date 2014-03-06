@@ -158,6 +158,22 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </element>
   </define>
 
+  <define name="inventories">
+    <element name="inventories">
+      <zeroOrMore>
+        <element name="inv">
+          <element name="name"><data type="string"/></element>
+          <element name="materials">
+            <zeroOrMore>
+              <element name="recipe"><data type="string"/></element>
+              <element name="quantity"><data type="double"/></element>
+            </zeroOrMore>
+          </element>
+        </element>
+      </zeroOrMore>
+    </element>
+  </define>
+
   <define name="facilitycatalog">
     <element name="facilitycatalog">
 
@@ -345,6 +361,9 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
               <element name="number">
                 <data type="nonNegativeInteger"/>
               </element>
+              <optional>
+                <ref name="inventories" />
+              </optional>
             </element>
           </oneOrMore>
         </element>

@@ -24,7 +24,7 @@ QueryEngine::~QueryEngine() {
 QueryEngine* QueryEngine::QueryElement(std::string query,
                                        int index) {
   QueryEngine* qe_child =
-    GetEngineFromQuery(query, index) ;
+    GetEngineFromQuery(query, index);
   spawned_children_.insert(qe_child);
   return qe_child;
 }

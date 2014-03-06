@@ -141,12 +141,13 @@ std::string XMLFileLoader::master_schema() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadSim() {
-    std::stringstream ss(master_schema());
-    parser_->Validate(ss);
-    LoadControlParams(); // must be first
-    LoadSolver();
-    LoadRecipes();
-    LoadInitialAgents(); // must be last
+  std::stringstream ss(master_schema());
+  parser_->Validate(ss);
+  LoadControlParams(); // must be first
+  LoadSolver();
+  LoadRecipes();
+  LoadInitialAgents(); // must be last
+  ctx_->Snapshot();
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -215,6 +216,7 @@ void XMLFileLoader::LoadRecipes() {
       ->AddVal("Recipe", name)
       ->AddVal("StateId", comp->id())
       ->Record();
+    ctx_->AddRecipe(name, comp);
   }
 }
 
@@ -278,6 +280,7 @@ void XMLFileLoader::LoadInitialAgents() {
         int number = atoi(qe3->GetElementContent("number").c_str());
         for (int z = 0; z < number; ++z) {
           Model* fac = BuildAgent(fac_proto, inst);
+          LoadInventory(fac, qe3);
         }
       }
     }
@@ -285,7 +288,22 @@ void XMLFileLoader::LoadInitialAgents() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadInventories() {
+void XMLFileLoader::LoadInventory(Model* m, QueryEngine* qe) {
+  Inventories invs;
+  int ninvs = qe->NElementsMatchingQuery("inventories/inv");
+  for (int i = 0; i < ninvs; ++i) {
+    QueryEngine* qe2 = qe->QueryElement("inventories/inv", i);
+    std::string name = qe2->GetElementContent("name");
+    int nmats = qe2->NElementsMatchingQuery("materials");
+    for (int j = 0; j < nmats; ++j) {
+      QueryEngine* qe3 = qe2->QueryElement("materials", j);
+      std::string recipe = qe3->GetElementContent("recipe");
+      double qty = GetOptionalQuery<double>(qe3, "quantity", 0);
+      Material::Ptr mat = Material::Create(m, qty, ctx_->GetRecipe(recipe));
+      invs[name].push_back(mat);
+    }
+  }
+  m->InitInv(invs);
 }
 
 Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
@@ -294,8 +312,6 @@ Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
   if (parent != NULL) {
     parent->BuildNotify(m);
   }
-  DbInit di;
-  m->Snapshot(di);
   return m;
 }
 

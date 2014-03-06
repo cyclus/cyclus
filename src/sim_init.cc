@@ -269,7 +269,10 @@ void SimInit::LoadInventories() {
     std::vector<Cond> conds;
     conds.push_back(Cond("Time", "==", t_));
     conds.push_back(Cond("AgentId", "==", m->id()));
-    QueryResult qr = b_->Query("AgentState_Inventories", &conds);
+    QueryResult qr;
+    try {
+      qr = b_->Query("AgentState_Inventories", &conds);
+    } catch (std::exception err) { } // table doesn't exist (okay)
 
     Inventories invs;
     for (int i = 0; i < qr.rows.size(); ++i) {
