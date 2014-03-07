@@ -28,8 +28,10 @@ void StubFacility::InitInv(const cyclus::Inventories& inv) {
 }
 
 cyclus::Inventories StubFacility::SnapshotInv() {
-  // return a map of container-name to groups of resources for every container
-  // in this agent
+  cyclus::Inventories invs;
+  // populate the inventories map of container-name to groups of resources for
+  // every container in this agent
+  return invs;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

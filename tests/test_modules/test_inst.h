@@ -1,10 +1,7 @@
 #ifndef CYCLUS_TESTS_TEST_MODULES_TEST_INST_H_
 #define CYCLUS_TESTS_TEST_MODULES_TEST_INST_H_
 
-#include "inst_model.h"
-
-#include "error.h"
-#include "context.h"
+#include "cyclus.h"
 
 #include <sstream>
 

@@ -1,8 +1,7 @@
 #ifndef CYCLUS_TESTS_TEST_MODULES_TEST_FACILITY_H_
 #define CYCLUS_TESTS_TEST_MODULES_TEST_FACILITY_H_
 
-#include "facility_model.h"
-#include "material.h"
+#include "cyclus.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Facility, for testing

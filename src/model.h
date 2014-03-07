@@ -23,25 +23,11 @@ namespace cyclus {
 class Material;
 class GenericResource;
   
-/// defines the possible model types
-///
-/// @warning DO NOT manually set int values for the constants - other
-/// code will break.
-///
-/// @todo consider changing to a vector of strings & consolidating with
-/// the model type instance variable of the model class
-enum ModelType {REGION, INST, FACILITY, END_MODEL_TYPES};
-
 /// map<internal-inventory-name, vector<resources-inside-inventory> >
 typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 
-/// @class Model
-///
-/// @section desc Description
-/// The Model class is the abstract class used by all types of models
-/// that will be available for dynamic loading.  This common interface
-/// means that the basic process of loading and registering models can
-/// be implemented in a single place.
+/// The abstract base class used by all types of models
+/// that live and interact in a simulation.
 class Model {
   friend class SimInit;
 
