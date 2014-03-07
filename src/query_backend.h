@@ -9,6 +9,7 @@ namespace cyclus {
 class Cond {
  public:
   Cond() {};
+
   Cond(std::string field, std::string op, boost::spirit::hold_any val)
     : field(field), op(op), val(val) {}
 
@@ -18,17 +19,38 @@ class Cond {
   /// One of: "<", ">", "<=", ">=", "=="
   std::string op;
 
-  /// value supported by backends
+  /// value supported by backend(s) in use
   boost::spirit::hold_any val;
 };
 
 typedef std::vector<boost::spirit::hold_any> QueryRow;
 
+/// Meta data and results of a query.
 struct QueryResult {
+  /// names of each field returned by a query
   std::vector<std::string> fields;
+
+  /// types of each field returned by a query. Possible values: INTEGER, REAL, BLOB, TEXT
   std::vector<std::string> types;
+
+  /// ordered results of a query
   std::vector<QueryRow> rows;
 
+  /// Convenience method for retrieving a value from a specific row and named
+  /// field (column). The caller is responsible for specifying a valid templated
+  /// type to cast to. Example use:
+  ///
+  /// @code
+  ///
+  /// QueryResult qr = ...
+  ///
+  /// for (int i = 0; i < qr.rows.size(); ++i) {
+  ///   std::cout << qr.GetVal(i, "field1") << "\n";
+  ///   std::cout << qr.GetVal(i, "field2") << "\n";
+  ///   std::cout << qr.GetVal(i, "field3") << "\n";
+  /// }
+  ///
+  /// @endcode
   template <class T>
   T GetVal(int row, std::string field) {
     if (row >= rows.size()) {
@@ -50,21 +72,24 @@ struct QueryResult {
   };
 };
 
+/// Interface implemented by backends that support rudimentary querying.
 class QueryBackend {
  public:
   virtual ~QueryBackend() {};
 
   /// Return a set of rows from the specificed table that match all given
-  /// conditions.  Conditions are AND'd together.  Query should NOT error for
-  /// non-existing tables.  Rather, it should return an empty QueryResult.
+  /// conditions.  Conditions are AND'd together.  conds may be NULL.
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) = 0;
 };
 
+/// Interface implemented by backends that support recording and querying.
 class FullBackend: public QueryBackend, public RecBackend {
  public:
   virtual ~FullBackend() {};
 };
 
+/// Wrapper class for QueryBackends that injects a set of Cond's into every
+/// query before being executed.
 class CondInjector: public QueryBackend {
  public:
   CondInjector(QueryBackend* b, std::vector<Cond> to_inject)
@@ -87,6 +112,10 @@ class CondInjector: public QueryBackend {
   std::vector<Cond> to_inject_;
 };
 
+/// Wrapper class for QueryBackends that injects prefix in front of the
+/// title/table for every query before being executed.  A query to the
+/// "MyAgentTable" table will actually be passed to the wrapped backend as
+/// [prefix] + "MyAgentTable".
 class PrefixInjector: public QueryBackend {
  public:
   PrefixInjector(QueryBackend* b, std::string prefix)
