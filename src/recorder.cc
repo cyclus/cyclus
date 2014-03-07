@@ -12,36 +12,30 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Recorder::Recorder() : index_(0) {
   uuid_ = boost::uuids::random_generator()();
   set_dump_count(kDefaultDumpCount);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Recorder::Recorder(boost::uuids::uuid simid)
     : index_(0), uuid_(simid) {
   set_dump_count(kDefaultDumpCount);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Recorder::~Recorder() {
   for (int i = 0; i < data_.size(); ++i) {
     delete data_[i];
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 unsigned int Recorder::dump_count() {
   return dump_count_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 boost::uuids::uuid Recorder::sim_id() {
   return uuid_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::set_dump_count(unsigned int count) {
   for (int i = 0; i < data_.size(); ++i) {
     delete data_[i];
@@ -56,7 +50,6 @@ void Recorder::set_dump_count(unsigned int count) {
   dump_count_ = count;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Datum* Recorder::NewDatum(std::string title) {
   Datum* d = data_[index_];
   d->title_ = title;
@@ -69,10 +62,8 @@ Datum* Recorder::NewDatum(std::string title) {
   return d;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::AddDatum(Datum* d) {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::Flush() {
   DatumList tmp = data_;
   tmp.resize(index_);
@@ -83,7 +74,6 @@ void Recorder::Flush() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::NotifyBackends() {
   index_ = 0;
   std::list<RecBackend*>::iterator it;
@@ -92,12 +82,10 @@ void Recorder::NotifyBackends() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::RegisterBackend(RecBackend* b) {
   backs_.push_back(b);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Recorder::Close() {
   for (int i = index_; i < data_.size(); ++i) {
     delete data_[i];

@@ -13,7 +13,6 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string BuildFlatMasterSchema(std::string schema_path) {
   Timer ti;
   Recorder rec;
@@ -43,12 +42,10 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
   return master;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFlatLoader::master_schema() {
   return BuildFlatMasterSchema(schema_path_);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFlatLoader::LoadInitialAgents() {
   XMLQueryEngine xqe(*parser_);
   DbInit di;

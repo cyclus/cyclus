@@ -31,6 +31,9 @@ class SimInit {
   /// The newly configured simulation will run with a new simulation id.
   SimEngine* Restart(QueryBackend* b, boost::uuids::uuid simid, int t);
 
+  SimEngine* Branch(QueryBackend* b, boost::uuids::uuid prev_simid,
+                    boost::uuids::uuid new_simid, int t);
+
   static void Snapshot(Context* ctx);
 
  private:
@@ -65,4 +68,5 @@ class SimInit {
 } // namespace cyclus
 
 #endif
+
 

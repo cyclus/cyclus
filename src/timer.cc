@@ -11,7 +11,6 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
                   << 0 << " to end=" << dur_;
@@ -36,7 +35,6 @@ void Timer::RunSim() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::DoBuild() {
   // build queued agents
   std::vector<std::pair<std::string, Model*> > build_list = build_queue_[time_];
@@ -48,7 +46,6 @@ void Timer::DoBuild() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::DoTick() {
   for (std::set<TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
@@ -57,14 +54,12 @@ void Timer::DoTick() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<GenericResource>* genmgr) {
   matmgr->Execute();
   genmgr->Execute();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::DoTock() {
   for (std::set<TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
@@ -73,7 +68,6 @@ void Timer::DoTock() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::DoDecom() {
   // decommission queued agents
   std::vector<Model*> decom_list = decom_queue_[time_];
@@ -84,17 +78,14 @@ void Timer::DoDecom() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::RegisterTimeListener(TimeListener* agent) {
   tickers_.insert(agent);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::UnregisterTimeListener(TimeListener* tl) {
   tickers_.erase(tl);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SchedBuild(Model* parent, std::string proto_name, int t) {
   if (t <= time_) {
     throw ValueError("Cannot schedule build for t < [current-time]");
@@ -102,7 +93,6 @@ void Timer::SchedBuild(Model* parent, std::string proto_name, int t) {
   build_queue_[t].push_back(std::make_pair(proto_name, parent));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::SchedDecom(Model* m, int t) {
   if (t < time_) {
     throw ValueError("Cannot schedule decommission for t < [current-time]");
@@ -110,7 +100,6 @@ void Timer::SchedDecom(Model* m, int t) {
   decom_queue_[t].push_back(m);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::time() {
   return time_;
 }
@@ -127,7 +116,6 @@ void Timer::Reset() {
   dur_ = 0;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int decay) {
   ctx_ = ctx;
 
@@ -156,12 +144,10 @@ void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int decay) {
   dur_ = dur;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::dur() {
   return dur_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Timer::Timer() :
   time_(0),
   dur_(0),

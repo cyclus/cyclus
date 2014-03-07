@@ -26,13 +26,18 @@ SimEngine* SimInit::Restart(QueryBackend* b, boost::uuids::uuid simid, int t) {
   return se;
 }
 
+SimEngine* SimInit::Branch(QueryBackend* b, boost::uuids::uuid prev_simid,
+                           boost::uuids::uuid new_simid, int t) {
+  throw StateError("feature-not-implemented");
+}
+
 void SimInit::Snapshot(Context* ctx) {
   // snapshot all agent internal state
   std::set<Model*> mlist = ctx->model_list_;
   std::set<Model*>::iterator it;
   for (it = mlist.begin(); it != mlist.end(); ++it) {
     Model* m = *it;
-    if (m->birthtime() == -1) { 
+    if (m->birthtime() == -1) {
       continue;
     }
     SimInit::SnapAgent(m);
@@ -78,11 +83,11 @@ void SimInit::SnapAgent(Model* m) {
     std::vector<Resource::Ptr> inv = it->second;
     for (int i = 0; i < inv.size(); ++i) {
       ctx->NewDatum("AgentState_Inventories")
-        ->AddVal("AgentId", m->id())
-        ->AddVal("Time", ctx->time())
-        ->AddVal("InventoryName", name)
-        ->AddVal("ResourceId", inv[i]->id())
-        ->Record();
+      ->AddVal("AgentId", m->id())
+      ->AddVal("Time", ctx->time())
+      ->AddVal("InventoryName", name)
+      ->AddVal("ResourceId", inv[i]->id())
+      ->Record();
     }
   }
 }
@@ -411,4 +416,5 @@ Resource::Ptr SimInit::LoadGenericResource(int resid) {
 }
 
 } // namespace cyclus
+
 

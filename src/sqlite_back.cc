@@ -15,7 +15,6 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> elems;
     std::stringstream ss(s);
@@ -31,7 +30,6 @@ SqliteBack::~SqliteBack() {
   db_.close();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteBack::SqliteBack(std::string path) : db_(path) {
   path_ = path;
   db_.open();
@@ -44,7 +42,6 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::Notify(DatumList data) {
   for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
     if (! TableExists((*it)->title())) {
@@ -55,7 +52,6 @@ void SqliteBack::Notify(DatumList data) {
   Flush();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
   QueryResult q = GetTableInfo(table);
 
@@ -116,12 +112,10 @@ QueryResult SqliteBack::GetTableInfo(std::string table) {
   return info;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::Name() {
   return path_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::CreateTable(Datum* d) {
   std::string name = d->title();
   tbl_names_.push_back(name);
@@ -140,7 +134,6 @@ void SqliteBack::CreateTable(Datum* d) {
   cmds_.push_back(cmd);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::ValType(boost::spirit::hold_any v) {
   if (v.type() == typeid(int)) {
     return "INTEGER";
@@ -152,12 +145,10 @@ std::string SqliteBack::ValType(boost::spirit::hold_any v) {
   return "TEXT";
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool SqliteBack::TableExists(std::string name) {
   return find(tbl_names_.begin(), tbl_names_.end(), name) != tbl_names_.end();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::WriteDatum(Datum* d) {
   std::stringstream colss, valss, cmd;
   Datum::Vals vals = d->vals();
@@ -177,7 +168,6 @@ void SqliteBack::WriteDatum(Datum* d) {
   cmds_.push_back(cmd.str());
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StringToHex(const std::string& s) {
   std::ostringstream ret;
   for (int i = 0; i < s.length(); ++i) {
@@ -186,7 +176,6 @@ std::string StringToHex(const std::string& s) {
   return ret.str();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StringFromHex(const std::string& in) {
     std::string output;
 
@@ -208,7 +197,6 @@ std::string StringFromHex(const std::string& in) {
     return output;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
   // NOTE: the ugly structure of this if block is for performance reasons
   if (v.type() == typeid(int)) {
@@ -238,7 +226,6 @@ std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
   return "";
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type) {
   boost::spirit::hold_any v;
   if (type == "INTEGER") {
@@ -256,7 +243,6 @@ boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type)
   return v;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteBack::Flush() {
   db_.Execute("BEGIN TRANSACTION");
   for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); ++it) {
