@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "cyc_limits.h"
+#include "env.h"
 #include "error.h"
 #include "mat_query.h"
 
@@ -253,6 +254,7 @@ TEST_F(MaterialTest, ExtractInGrams) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, DecayShortcut) {
   using cyclus::Composition;
+  cyclus::Env::SetNucDataPath();
   cyclus::CompMap mp;
   mp[922350000] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(mp);
