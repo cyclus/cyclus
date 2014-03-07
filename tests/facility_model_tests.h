@@ -6,7 +6,7 @@
 #include "facility_model.h"
 #include "suffix.h"
 #include "test_context.h"
-#include "mock_inst.h"
+#include "test_modules/test_inst.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -23,7 +23,7 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
  public:
   virtual void SetUp() {    
     facility_model_ = (*GetParam())(tc_.get());
-    test_inst_ = new MockInst(tc_.get());
+    test_inst_ = new TestInst(tc_.get());
     facility_model_->Build(test_inst_);
   }
   
@@ -31,7 +31,7 @@ class FacilityModelTests : public TestWithParam<FacilityModelConstructor*> {
     
  protected:
   cyclus::FacilityModel* facility_model_;
-  MockInst* test_inst_;
+  TestInst* test_inst_;
   cyclus::TestContext tc_;
 };
 

@@ -7,7 +7,7 @@
 #include "capacity_constraint.h"
 #include "error.h"
 #include "facility_model.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "request.h"
 #include "material.h"
 #include "resource_helpers.h"
@@ -32,8 +32,8 @@ using test_helpers::TestConverter;
 class BidPortfolioTests: public ::testing::Test {
  protected:
   TestContext tc;
-  MockFacility* fac1;
-  MockFacility* fac2;
+  TestFacility* fac1;
+  TestFacility* fac2;
   string commod1;
   string commod2;
   
@@ -41,8 +41,8 @@ class BidPortfolioTests: public ::testing::Test {
   Request<Material>::Ptr req2;
   
   virtual void SetUp() {
-    fac1 = new MockFacility(tc.get());
-    fac2 = new MockFacility(tc.get());
+    fac1 = new TestFacility(tc.get());
+    fac2 = new TestFacility(tc.get());
     commod1 = "commod1";
     commod2 = "commod2";
     req1 = get_req(commod1);

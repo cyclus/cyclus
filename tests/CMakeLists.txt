@@ -121,6 +121,9 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_region.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_inst.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_facility.cc"
   ${CYCLUS_STUB_TEST_SOURCE} # needed to test stubs 
   )
 

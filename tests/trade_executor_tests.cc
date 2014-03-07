@@ -8,7 +8,7 @@
 #include "bid.h"
 #include "context.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "model.h"
 #include "request.h"
 #include "resource_helpers.h"
