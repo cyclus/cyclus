@@ -150,18 +150,3 @@ TEST_F(XMLFileLoaderTests, throws) {
   EXPECT_THROW(XMLFileLoader file(b_, schema_path, "blah"), cyclus::IOError);
 }
 
-TEST_F(XMLFileLoaderTests, control) {
-  XMLFileLoader file(b_, schema_path, controlFile);
-  EXPECT_NO_THROW(file.LoadControlParams());
-}
-
-TEST_F(XMLFileLoaderTests, recipes) {
-  XMLFileLoader file(b_, schema_path, recipeFile);
-  EXPECT_NO_THROW(file.LoadRecipes());
-}
-
-TEST_F(XMLFileLoaderTests, schema) {
-  XMLFileLoader file(b_, schema_path, controlFile);
-  std::stringstream schema(ControlSchema());
-  EXPECT_NO_THROW(file.ApplySchema(schema););
-}

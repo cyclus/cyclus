@@ -99,13 +99,13 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
 }
 
 XMLFileLoader::XMLFileLoader(FullBackend* b,
-                             std::string schema_path,
-                             const std::string load_filename) : fb_(b) {
+                             std::string schema_file,
+                             const std::string input_file) : fb_(b) {
   rec_.RegisterBackend(b);
   ctx_ = new Context(&ti_, &rec_);
 
-  schema_path_ = schema_path;
-  file_ = load_filename;
+  schema_path_ = schema_file;
+  file_ = input_file;
   std::stringstream input;
   LoadStringstreamFromFile(input, file_);
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
@@ -114,19 +114,11 @@ XMLFileLoader::XMLFileLoader(FullBackend* b,
   ctx_->NewDatum("InputFiles")
   ->AddVal("Data", Blob(input.str()))
   ->Record();
-
-  schema_paths_["Region"] = "/*/region";
-  schema_paths_["Inst"] = "/*/region/institution";
-  schema_paths_["Facility"] = "/*/facility";
 }
 
 XMLFileLoader::~XMLFileLoader() {
   rec_.Close();
   delete ctx_;
-}
-
-void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
-  parser_->Validate(schema);
 }
 
 std::string XMLFileLoader::master_schema() {
@@ -206,6 +198,11 @@ void XMLFileLoader::LoadRecipes() {
 }
 
 void XMLFileLoader::LoadInitialAgents() {
+  std::map<std::string, std::string> schema_paths;
+  schema_paths["Region"] = "/*/region";
+  schema_paths["Inst"] = "/*/region/institution";
+  schema_paths["Facility"] = "/*/facility";
+
   DbInit di;
   std::set<std::string> module_types;
   module_types.insert("Region");
@@ -217,9 +214,9 @@ void XMLFileLoader::LoadInitialAgents() {
   // create prototypes
   std::string prototype; // defined here for force-create AgentExit tbl
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    int num_models = xqe.NElementsMatchingQuery(schema_paths_[*it]);
+    int num_models = xqe.NElementsMatchingQuery(schema_paths[*it]);
     for (int i = 0; i < num_models; i++) {
-      QueryEngine* qe = xqe.QueryElement(schema_paths_[*it], i);
+      QueryEngine* qe = xqe.QueryElement(schema_paths[*it], i);
       QueryEngine* module_data = qe->QueryElement("model");
       std::string module_name = module_data->GetElementName();
       prototype = qe->GetElementContent("name");
@@ -239,9 +236,9 @@ void XMLFileLoader::LoadInitialAgents() {
   }
 
   // build initial agent instances
-  int nregions = xqe.NElementsMatchingQuery(schema_paths_["Region"]);
+  int nregions = xqe.NElementsMatchingQuery(schema_paths["Region"]);
   for (int i = 0; i < nregions; ++i) {
-    QueryEngine* qe = xqe.QueryElement(schema_paths_["Region"], i);
+    QueryEngine* qe = xqe.QueryElement(schema_paths["Region"], i);
     std::string region_proto = qe->GetElementContent("name");
     Model* reg = BuildAgent(region_proto, NULL);
 
