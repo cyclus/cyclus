@@ -17,7 +17,6 @@ namespace cyclus {
 // static members
 int Model::next_id_ = 0;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::InitFrom(Model* m) {
   id_ = next_id_++;
   prototype_ = m->prototype_;
@@ -27,7 +26,6 @@ void Model::InitFrom(Model* m) {
   ctx_ = m->ctx_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::InformErrorMsg(std::string msg) {
   std::stringstream ret;
   ret << "A(n) " << model_impl_ << " named " << prototype_
@@ -59,7 +57,6 @@ void Model::Snapshot(DbInit di) {
     ->Record();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::Model(Context* ctx)
   : ctx_(ctx),
     id_(next_id_++),
@@ -73,7 +70,6 @@ Model::Model(Context* ctx)
   MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model::~Model() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << prototype() << "' ID=" << id_ << " {";
   context()->model_list_.erase(this);
@@ -99,7 +95,6 @@ Model::~Model() {
   MLOG(LEV_DEBUG3) << "}";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::str() {
   std::stringstream ss;
   ss << kind_ << "_" << prototype_
@@ -112,7 +107,6 @@ std::string Model::str() {
   return ss.str();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Build(Model* parent) {
   CLOG(LEV_DEBUG1) << "Model '" << prototype()
                    << "' is entering the simulation.";
@@ -138,7 +132,6 @@ void Model::BuildInner(Model* parent) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::Decommission() {
   CLOG(LEV_INFO3) << prototype() << " is being decommissioned";
   ctx_->NewDatum("AgentExit")
@@ -148,7 +141,6 @@ void Model::Decommission() {
   ctx_->DelModel(this);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Model::PrintChildren() {
   std::stringstream ss("");
   ss << "Children of " << prototype() << ":" << std::endl;
@@ -161,7 +153,6 @@ std::string Model::PrintChildren() {
   return ss.str();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
   std::vector<std::string> ret;
   std::stringstream ss("");
@@ -178,12 +169,10 @@ std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
   return ret;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const std::string Model::ModelImpl() {
   return model_impl_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Model::AddToTable() {
   ctx_->NewDatum("AgentEntry")
   ->AddVal("AgentId", id_)

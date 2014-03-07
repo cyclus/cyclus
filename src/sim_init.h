@@ -36,7 +36,7 @@ class SimInit {
  private:
   SimEngine* InitBase(QueryBackend* b, boost::uuids::uuid simid, int t);
 
-  void LoadControlParams();
+  void LoadInfo();
   void LoadRecipes();
   void LoadSolverInfo();
   void LoadPrototypes();

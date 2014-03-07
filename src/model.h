@@ -46,9 +46,6 @@ class Model {
   friend class SimInit;
 
  public:
-
-  //virtual void InitFrom(QueryEngine* qe) {};
-
   /// Translates info for a model from an input file to the database by reading
   /// parameters from the passed QueryEngine and recording data via the DbInit
   /// variable.  The simulation and agent id's are automatically included in all
@@ -197,10 +194,11 @@ class Model {
   /// get model instance ID
   inline const int id() const { return id_; }
 
+  /// get model implementation
+  inline std::string model_impl() {return model_impl_;}
+
   /// set model implementation
-  inline void set_model_impl(std::string new_impl) {
-    model_impl_ = new_impl;
-  }
+  inline void set_model_impl(std::string new_impl) {model_impl_ = new_impl;}
 
   /// returns a string that describes the model subclass (e.g. Region, etc.)
   inline const std::string kind() const {return kind_;};

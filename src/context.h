@@ -20,6 +20,28 @@ class Timer;
 class TimeListener;
 class SimInit;
 
+class SimInfo {
+ public:
+  SimInfo(int dur, int y0, int m0, int decay_period, std::string handle = "")
+    : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
+      branch_time(-1), handle(handle) {};
+
+  SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
+          int branch_time,
+          std::string handle = "")
+    : duration(dur), y0(-1), m0(-1), decay_period(decay_period),
+      parent_sim(parent_sim),
+      branch_time(branch_time), handle(handle) {};
+
+  std::string handle;
+  int duration;
+  int y0;
+  int m0;
+  int decay_period;
+  boost::uuids::uuid parent_sim;
+  int branch_time;
+};
+
 /// A simulation context that provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
 /// know simulation time, creates/builds facilities, and/or uses loaded
@@ -122,7 +144,7 @@ class Context {
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.
-  void InitTime(int duration, int decay, int m0 = 1, int y0 = 2010);
+  void InitSim(SimInfo si);
 
   /// Returns the current simulation timestep.
   int time();
@@ -156,7 +178,7 @@ class Context {
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Model*> model_list_;
   std::set<Trader*> traders_;
-  
+
   Timer* ti_;
   ExchangeSolver* solver_;
   Recorder* rec_;
@@ -166,3 +188,6 @@ class Context {
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_CONTEXT_H_
+
+
+

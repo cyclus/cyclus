@@ -97,7 +97,7 @@ SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
   se_->ctx = new Context(se_->ti, se_->rec);
 
   // this sequence is imporant!!!
-  LoadControlParams();
+  LoadInfo();
   LoadRecipes();
   LoadSolverInfo();
   LoadPrototypes();
@@ -107,20 +107,20 @@ SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
   LoadDecomSched();
   LoadNextIds();
 
-  // use rec.set_dump_count to reset all buffered data that we don't want
-  // to be re-recorded in the output db
-  se_->rec->set_dump_count(kDefaultDumpCount);
+  // delete all buffered data that we don't want to be re-recorded in the
+  // output db
+  se_->rec->Flush();
 
   return se_;
 }
 
-void SimInit::LoadControlParams() {
+void SimInit::LoadInfo() {
   QueryResult qr = b_->Query("Info", NULL);
   int dur = qr.GetVal<int>(0, "Duration");
   int dec = qr.GetVal<int>(0, "DecayInterval");
   int y0 = qr.GetVal<int>(0, "InitialYear");
   int m0 = qr.GetVal<int>(0, "InitialMonth");
-  se_->ctx->InitTime(dur, dec, m0, y0);
+  se_->ctx->InitSim(SimInfo(dur, y0, m0, dec));
 }
 
 void SimInit::LoadRecipes() {

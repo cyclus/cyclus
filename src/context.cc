@@ -72,11 +72,20 @@ boost::uuids::uuid Context::sim_id() {
 }
 
 void Context::AddPrototype(std::string name, Model* p) {
+  NewDatum("Prototypes")
+    ->AddVal("Prototype", name)
+    ->AddVal("AgentId", p->id())
+    ->AddVal("Implementation", p->model_impl())
+    ->Record();
   protos_[name] = p;
 }
 
 void Context::AddRecipe(std::string name, Composition::Ptr c) {
   recipes_[name] = c;
+  NewDatum("Recipes")
+    ->AddVal("Recipe", name)
+    ->AddVal("StateId", c->id())
+    ->Record();
 }
 
 Composition::Ptr Context::GetRecipe(std::string name) {
@@ -86,8 +95,17 @@ Composition::Ptr Context::GetRecipe(std::string name) {
   return recipes_[name];
 }
 
-void Context::InitTime(int duration, int decay, int m0, int y0) {
-  ti_->Initialize(this, duration, m0, y0, decay);
+void Context::InitSim(SimInfo si) {
+  NewDatum("Info")
+    ->AddVal("Handle", si.handle)
+    ->AddVal("InitialYear", si.y0)
+    ->AddVal("InitialMonth", si.m0)
+    ->AddVal("Duration", si.duration)
+    ->AddVal("DecayInterval", si.decay_period)
+    ->AddVal("ParentSimId", si.parent_sim)
+    ->AddVal("BranchTime", si.branch_time)
+    ->Record();
+  ti_->Initialize(this, si.duration, si.m0, si.y0, si.decay_period);
 }
 
 int Context::time() {

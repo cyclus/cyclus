@@ -24,7 +24,6 @@ namespace cyclus {
 
 namespace fs = boost::filesystem;
 
-// - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
 void LoadStringstreamFromFile(std::stringstream& stream,
                               std::string file) {
   std::ifstream file_stream(file.c_str());
@@ -36,7 +35,6 @@ void LoadStringstreamFromFile(std::stringstream& stream,
   file_stream.close();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string BuildMasterSchema(std::string schema_path) {
   Timer ti;
   Recorder rec;
@@ -69,7 +67,6 @@ std::string BuildMasterSchema(std::string schema_path) {
   return master;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Composition::Ptr ReadRecipe(QueryEngine* qe) {
   bool atom_basis;
   std::string basis_str = qe->GetElementContent("basis");
@@ -101,7 +98,6 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::XMLFileLoader(FullBackend* b,
                              std::string schema_path,
                              const std::string load_filename) : fb_(b) {
@@ -129,17 +125,14 @@ XMLFileLoader::~XMLFileLoader() {
   delete ctx_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
   parser_->Validate(schema);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFileLoader::master_schema() {
   return BuildMasterSchema(schema_path_);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadSim() {
   std::stringstream ss(master_schema());
   parser_->Validate(ss);
@@ -150,7 +143,6 @@ void XMLFileLoader::LoadSim() {
   ctx_->Snapshot();
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadSolver() {
   XMLQueryEngine xqe(*parser_);
   std::string query = "/*/commodity";
@@ -176,7 +168,6 @@ void XMLFileLoader::LoadSolver() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::ProcessCommodities(
   std::map<std::string, double>* commodity_order) {
   double max = std::max_element(
@@ -199,7 +190,6 @@ void XMLFileLoader::ProcessCommodities(
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadRecipes() {
   XMLQueryEngine xqe(*parser_);
 
@@ -211,16 +201,10 @@ void XMLFileLoader::LoadRecipes() {
     CLOG(LEV_DEBUG3) << "loading recipe: " << name;
     Composition::Ptr comp = ReadRecipe(qe);
     comp->Record(ctx_);
-
-    ctx_->NewDatum("Recipes")
-      ->AddVal("Recipe", name)
-      ->AddVal("StateId", comp->id())
-      ->Record();
     ctx_->AddRecipe(name, comp);
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadInitialAgents() {
   DbInit di;
   std::set<std::string> module_types;
@@ -251,11 +235,6 @@ void XMLFileLoader::LoadInitialAgents() {
       PrefixInjector pi(&ci, "AgentState_");
       model->InitFrom(&pi);
       ctx_->AddPrototype(prototype, model);
-      ctx_->NewDatum("Prototypes")
-        ->AddVal("Prototype", prototype)
-        ->AddVal("AgentId", model->id())
-        ->AddVal("Implementation", module_name)
-        ->Record();
     }
   }
 
@@ -287,7 +266,6 @@ void XMLFileLoader::LoadInitialAgents() {
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadInventory(Model* m, QueryEngine* qe) {
   Inventories invs;
   int ninvs = qe->NElementsMatchingQuery("inventories/inv");
@@ -315,7 +293,6 @@ Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
   return m;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadControlParams() {
   XMLQueryEngine xqe(*parser_);
   std::string query = "/*/control";
@@ -339,15 +316,7 @@ void XMLFileLoader::LoadControlParams() {
   std::string decay_str = qe->GetElementContent("decay");
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
-  ctx_->NewDatum("Info")
-  ->AddVal("Handle", handle)
-  ->AddVal("InitialYear", y0)
-  ->AddVal("InitialMonth", m0)
-  ->AddVal("Duration", dur)
-  ->AddVal("DecayInterval", dec)
-  ->AddVal("ParentSimId", -1)
-  ->AddVal("BranchTime", -1)
-  ->Record();
+  ctx_->InitSim(SimInfo(dur, y0, m0, dec, handle));
 }
 
 } // namespace cyclus
