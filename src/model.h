@@ -236,7 +236,7 @@ class Model {
 
   /// returns the time this model began operation (-1 if the model has never
   /// been built).
-  inline const int birthtime() const { return birthtime_; }
+  inline const int enter_time() const { return enter_time_; }
 
   /// returns the time this model will cease operation (-1 if the model is still
   /// operating). Returns -1 for indefinite lifetime.
@@ -306,7 +306,7 @@ class Model {
   int parent_id_;
 
   /// born on date of this model
-  int birthtime_;
+  int enter_time_;
 
   /// length of time this model is intended to operate
   int lifetime_;

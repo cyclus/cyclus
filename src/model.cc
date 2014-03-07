@@ -62,7 +62,7 @@ Model::Model(Context* ctx)
     id_(next_id_++),
     kind_("Model"),
     parent_id_(-1),
-    birthtime_(-1),
+    enter_time_(-1),
     lifetime_(-1),
     parent_(NULL),
     model_impl_("UNSPECIFIED") {
@@ -115,7 +115,7 @@ void Model::Build(Model* parent) {
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
   BuildInner(parent);
-  birthtime_ = ctx_->time();
+  enter_time_ = ctx_->time();
   DoRegistration();
   this->AddToTable();
 }
@@ -177,7 +177,7 @@ void Model::AddToTable() {
   ->AddVal("Prototype", prototype_)
   ->AddVal("Lifetime", lifetime_)
   ->AddVal("ParentId", parent_id_)
-  ->AddVal("EnterTime", birthtime_)
+  ->AddVal("EnterTime", enter_time_)
   ->Record();
 }
 } // namespace cyclus

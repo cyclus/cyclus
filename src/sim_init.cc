@@ -37,7 +37,7 @@ void SimInit::Snapshot(Context* ctx) {
   std::set<Model*>::iterator it;
   for (it = mlist.begin(); it != mlist.end(); ++it) {
     Model* m = *it;
-    if (m->birthtime() == -1) {
+    if (m->enter_time() == -1) {
       continue;
     }
     SimInit::SnapAgent(m);
@@ -221,7 +221,7 @@ void SimInit::LoadInitialAgents() {
       // agent-kernel init
       m->id_ = id;
       m->set_model_impl(qentry.GetVal<std::string>(i, "Implementation"));
-      m->birthtime_ = qentry.GetVal<int>(i, "EnterTime");
+      m->enter_time_ = qentry.GetVal<int>(i, "EnterTime");
       unbuilt[id] = m;
       parentmap[id] = qentry.GetVal<int>(i, "ParentId");
 
@@ -235,7 +235,7 @@ void SimInit::LoadInitialAgents() {
       SHOW(m->model_impl_);
       SHOW(m->lifetime());
       SHOW(m->kind());
-      SHOW(m->birthtime());
+      SHOW(m->enter_time());
     }
   }
 
