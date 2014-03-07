@@ -16,7 +16,7 @@
 #include "greedy_solver.h"
 #include "logger.h"
 #include "model.h"
-#include "xml_query_engine.h"
+#include "query_engine.h"
 
 #include "xml_file_loader.h"
 
@@ -144,7 +144,7 @@ void XMLFileLoader::LoadSim() {
 };
 
 void XMLFileLoader::LoadSolver() {
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
   std::string query = "/*/commodity";
 
   std::map<std::string, double> commod_order;
@@ -191,7 +191,7 @@ void XMLFileLoader::ProcessCommodities(
 }
 
 void XMLFileLoader::LoadRecipes() {
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
 
   std::string query = "/*/recipe";
   int num_recipes = xqe.NElementsMatchingQuery(query);
@@ -212,7 +212,7 @@ void XMLFileLoader::LoadInitialAgents() {
   module_types.insert("Inst");
   module_types.insert("Facility");
   std::set<std::string>::iterator it;
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
 
   // create prototypes
   std::string prototype; // defined here for force-create AgentExit tbl
@@ -294,7 +294,7 @@ Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
 }
 
 void XMLFileLoader::LoadControlParams() {
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
   std::string query = "/*/control";
   QueryEngine* qe = xqe.QueryElement(query);
 

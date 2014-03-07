@@ -5,7 +5,7 @@
 
 #include "model_tests.h"
 #include "xml_parser.h"
-#include "xml_query_engine.h"
+#include "query_engine.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, DISABLED_CreateFromXML) {

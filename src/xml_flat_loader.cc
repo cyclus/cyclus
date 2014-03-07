@@ -9,7 +9,7 @@
 #include "model.h"
 #include "recorder.h"
 #include "timer.h"
-#include "xml_query_engine.h"
+#include "query_engine.h"
 
 namespace cyclus {
 
@@ -47,7 +47,7 @@ std::string XMLFlatLoader::master_schema() {
 }
 
 void XMLFlatLoader::LoadInitialAgents() {
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
   DbInit di;
 
   // create prototypes

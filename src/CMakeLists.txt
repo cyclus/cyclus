@@ -118,7 +118,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_flat_loader.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_parser.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
   )
 
@@ -211,7 +210,6 @@ INSTALL(FILES
   xml_file_loader.h
   xml_flat_loader.h
   xml_parser.h
-  xml_query_engine.h
   DESTINATION include/cyclus
   COMPONENT core
   )
