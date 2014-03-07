@@ -9,26 +9,57 @@
 
 namespace cyclus {
 
-SimInit::SimInit() {
-  se_ = new SimEngine();
-  se_->ti = new Timer();
+SimInit::SimInit() : rec_(NULL), ctx_(NULL) {}
+
+SimInit::~SimInit() {
+  if (ctx_ != NULL) {
+    delete ctx_;
+  }
+  if (rec_ != NULL) {
+    rec_->Close();
+    delete rec_;
+  }
 }
 
-
-SimEngine* SimInit::Init(QueryBackend* b, boost::uuids::uuid simid) {
-  se_->rec = new Recorder(simid);
-  return InitBase(b, simid, 0);
+void SimInit::Init(QueryBackend* b, boost::uuids::uuid sim_id) {
+  rec_ = new Recorder(sim_id);
+  InitBase(b, sim_id, 0);
 }
 
-SimEngine* SimInit::Restart(QueryBackend* b, boost::uuids::uuid simid, int t) {
-  se_->rec = new Recorder();
-  SimEngine* se = InitBase(b, simid, t);
-  return se;
+void SimInit::Restart(QueryBackend* b, boost::uuids::uuid sim_id, int t) {
+  rec_ = new Recorder();
+  InitBase(b, sim_id, t);
 }
 
-SimEngine* SimInit::Branch(QueryBackend* b, boost::uuids::uuid prev_simid,
-                           boost::uuids::uuid new_simid, int t) {
+void SimInit::Branch(QueryBackend* b, boost::uuids::uuid prev_sim_id,
+                           int t,
+                           boost::uuids::uuid new_sim_id) {
   throw StateError("feature-not-implemented");
+}
+
+void SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
+  ctx_ = new Context(&ti_, rec_);
+
+  std::vector<Cond> conds;
+  conds.push_back(Cond("SimId", "==", simid));
+  b_ = new CondInjector(b, conds);
+  t_ = t;
+  simid_ = simid;
+
+  // this sequence is imporant!!!
+  LoadInfo();
+  LoadRecipes();
+  LoadSolverInfo();
+  LoadPrototypes();
+  LoadInitialAgents();
+  LoadInventories();
+  LoadBuildSched();
+  LoadDecomSched();
+  LoadNextIds();
+
+  // delete all buffered data that we don't want to be re-recorded in the
+  // output db
+  rec_->Flush();
 }
 
 void SimInit::Snapshot(Context* ctx) {
@@ -92,40 +123,13 @@ void SimInit::SnapAgent(Model* m) {
   }
 }
 
-SimEngine* SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
-  std::vector<Cond> conds;
-  conds.push_back(Cond("SimId", "==", simid));
-  b_ = new CondInjector(b, conds);
-  t_ = t;
-  simid_ = simid;
-
-  se_->ctx = new Context(se_->ti, se_->rec);
-
-  // this sequence is imporant!!!
-  LoadInfo();
-  LoadRecipes();
-  LoadSolverInfo();
-  LoadPrototypes();
-  LoadInitialAgents();
-  LoadInventories();
-  LoadBuildSched();
-  LoadDecomSched();
-  LoadNextIds();
-
-  // delete all buffered data that we don't want to be re-recorded in the
-  // output db
-  se_->rec->Flush();
-
-  return se_;
-}
-
 void SimInit::LoadInfo() {
   QueryResult qr = b_->Query("Info", NULL);
   int dur = qr.GetVal<int>(0, "Duration");
   int dec = qr.GetVal<int>(0, "DecayInterval");
   int y0 = qr.GetVal<int>(0, "InitialYear");
   int m0 = qr.GetVal<int>(0, "InitialMonth");
-  se_->ctx->InitSim(SimInfo(dur, y0, m0, dec));
+  ctx_->InitSim(SimInfo(dur, y0, m0, dec));
 }
 
 void SimInit::LoadRecipes() {
@@ -145,7 +149,7 @@ void SimInit::LoadRecipes() {
       m[nuc] = frac;
     }
     Composition::Ptr comp = Composition::CreateFromMass(m);
-    se_->ctx->AddRecipe(recipe, comp);
+    ctx_->AddRecipe(recipe, comp);
   }
 }
 
@@ -168,7 +172,7 @@ void SimInit::LoadSolverInfo() {
   bool exclusive_orders = false;
   GreedySolver* solver = new GreedySolver(exclusive_orders, conditioner);
 
-  se_->ctx->solver(solver);
+  ctx_->solver(solver);
 }
 
 void SimInit::LoadPrototypes() {
@@ -178,7 +182,7 @@ void SimInit::LoadPrototypes() {
     int agentid = qr.GetVal<int>(i, "AgentId");
     std::string impl = qr.GetVal<std::string>(i, "Implementation");
 
-    Model* m = DynamicModule::Make(se_->ctx, impl);
+    Model* m = DynamicModule::Make(ctx_, impl);
     m->set_model_impl(impl);
 
     std::vector<Cond> conds;
@@ -187,7 +191,7 @@ void SimInit::LoadPrototypes() {
     CondInjector ci(b_, conds);
     PrefixInjector pi(&ci, "AgentState_");
     m->InitFrom(&pi);
-    se_->ctx->AddPrototype(proto, m);
+    ctx_->AddPrototype(proto, m);
   }
 }
 
@@ -216,7 +220,7 @@ void SimInit::LoadInitialAgents() {
     // if the agent wasn't decommissioned before t_ create and init it
     if (qexit.rows.size() == 0) {
       std::string proto = qentry.GetVal<std::string>(i, "Prototype");
-      Model* m = se_->ctx->CreateModel<Model>(proto);
+      Model* m = ctx_->CreateModel<Model>(proto);
 
       // agent-kernel init
       m->id_ = id;
@@ -301,7 +305,7 @@ void SimInit::LoadBuildSched() {
     int t = qr.GetVal<int>(i, "BuildTime");
     int parentid = qr.GetVal<int>(i, "ParentId");
     std::string proto = qr.GetVal<std::string>(i, "Prototype");
-    se_->ctx->SchedBuild(agents_[parentid], proto, t);
+    ctx_->SchedBuild(agents_[parentid], proto, t);
   }
 }
 
@@ -316,7 +320,7 @@ void SimInit::LoadDecomSched() {
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>(i, "DecomTime");
     int agentid = qr.GetVal<int>(i, "AgentId");
-    se_->ctx->SchedDecom(agents_[agentid], t);
+    ctx_->SchedDecom(agents_[agentid], t);
   }
 }
 
@@ -329,7 +333,7 @@ void SimInit::LoadNextIds() {
     if (obj == "Agent") {
       Model::next_id_ = qr.GetVal<int>(i, "NextId");
     } else if (obj == "Transaction") {
-      se_->ctx->trans_id_ = qr.GetVal<int>(i, "NextId");
+      ctx_->trans_id_ = qr.GetVal<int>(i, "NextId");
     } else if (obj == "Composition") {
       Composition::next_id_ = qr.GetVal<int>(i, "NextId");
     } else if (obj == "Resource") {
@@ -416,5 +420,6 @@ Resource::Ptr SimInit::LoadGenericResource(int resid) {
 }
 
 } // namespace cyclus
+
 
 

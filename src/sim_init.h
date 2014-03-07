@@ -12,32 +12,53 @@ namespace cyclus {
 
 class Context;
 
-struct SimEngine {
-  Context* ctx;
-  Recorder* rec;
-  Timer* ti;
-};
-
-/// a class that encapsulates the methods needed to load input to
-/// a cyclus simulation from xml
+/// Handles initialization of a simulation from the output database. After
+/// calling Init, Restart, or Branch, the initialized Context, Timer, and
+/// Recorder can be retrieved.
+///
+/// @warning the Init, Restart, and Branch methods are NOT idempotent. Only one
+/// simulation should ever be initialized per SimInit object.
+///
+/// @warning the SimInit class manages the memory of the initialized Context,
+/// Timer, and Recorder.
 class SimInit {
  public:
   SimInit();
 
-  /// Initialize a simulation with data from b for the given simid.
-  SimEngine* Init(QueryBackend* b, boost::uuids::uuid simid);
+  ~SimInit();
+
+  /// Initialize a simulation with data from b for the given simulation id.
+  void Init(QueryBackend* b, boost::uuids::uuid sim_id);
 
   /// Restarts a simulation from time t with data from b identified by simid.
   /// The newly configured simulation will run with a new simulation id.
-  SimEngine* Restart(QueryBackend* b, boost::uuids::uuid simid, int t);
+  void Restart(QueryBackend* b, boost::uuids::uuid sim_id, int t);
 
-  SimEngine* Branch(QueryBackend* b, boost::uuids::uuid prev_simid,
-                    boost::uuids::uuid new_simid, int t);
+  /// NOT_IMPLEMENTED. Initializes a simulation branched from prev_sim_id at
+  /// time t with diverging state described in new_sim_id.
+  ///
+  /// TODO: implement
+  void Branch(QueryBackend* b, boost::uuids::uuid prev_sim_id, int t,
+                    boost::uuids::uuid new_sim_id);
 
+  /// Records a snapshot of the current state of the simulation being managed by
+  /// ctx into the simulations output database.
   static void Snapshot(Context* ctx);
 
+  /// Returns the initialized context. Note that either Init, Restart, or Branch
+  /// must be called first.
+  Context* context() {return ctx_;};
+  
+  /// Returns the initialized recorder with registered backends. Note that
+  /// either Init, Restart, or Branch must be called first.
+  Recorder* recorder() {return rec_;};
+
+  /// Returns the initialized timer. Note that either Init, Restart, or Branch
+  /// must be called first.
+  Timer* timer() {return &ti_;};
+
  private:
-  SimEngine* InitBase(QueryBackend* b, boost::uuids::uuid simid, int t);
+  void InitBase(QueryBackend* b, boost::uuids::uuid simid, int t);
 
   void LoadInfo();
   void LoadRecipes();
@@ -59,7 +80,9 @@ class SimInit {
   // std::map<AgentId, Model*>
   std::map<int, Model*> agents_;
 
-  SimEngine* se_;
+  Context* ctx_;
+  Recorder* rec_;
+  Timer ti_;
   boost::uuids::uuid simid_;
   QueryBackend* b_;
   int t_;
