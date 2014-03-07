@@ -13,14 +13,14 @@ namespace cyclus {
 
 void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << 0 << " to end=" << dur_;
+                  << 0 << " to end=" << si_.duration;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<GenericResource> genrsrc_manager(ctx_);
-  while (time_ < dur_) {
+  while (time_ < si_.duration) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
-    if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
+    if (si_.decay_period > 0 && time_ > 0 && time_ % si_.decay_period == 0) {
       Material::DecayAll(time_);
     }
 
@@ -108,52 +108,30 @@ void Timer::Reset() {
   tickers_.clear();
   build_queue_.clear();
   decom_queue_.clear();
-
-  decay_interval_ = 0;
-  month0_ = 0;
-  year0_ = 0;
-  time_ = 0;
-  dur_ = 0;
+  si_ = SimInfo(0);
 }
 
-void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int decay) {
-  ctx_ = ctx;
-
-  if (m0 < 1 || m0 > 12) {
+void Timer::Initialize(Context* ctx, SimInfo si) {
+  if (si.m0 < 1 || si.m0 > 12) {
     throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
-  }
-
-  if (y0 < 1942) {
+  } else if (si.y0 < 1942) {
     throw ValueError("Invalid year0; the first man-made nuclear reactor was build in 1942");
-  }
-
-  if (y0 > 2063) {
+  } else if (si.y0 > 2063) {
     throw ValueError("Invalid year0; why start a simulation after we've got warp drive?: http://en.wikipedia.org/wiki/Warp_drive#Development_of_the_backstory");
-  }
-
-  if (decay > dur) {
+  } else if (si.decay_period > si.duration) {
     throw ValueError("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
   }
 
-  decay_interval_ = decay;
-
-  month0_ = m0;
-  year0_ = y0;
-
+  ctx_ = ctx;
   time_ = 0;
-  dur_ = dur;
+  si_ = si;
 }
 
 int Timer::dur() {
-  return dur_;
+  return si_.duration;
 }
 
-Timer::Timer() :
-  time_(0),
-  dur_(0),
-  decay_interval_(0),
-  month0_(0),
-  year0_(0) {}
+Timer::Timer() : time_(0), si_(0) {}
 
 } // namespace cyclus
 

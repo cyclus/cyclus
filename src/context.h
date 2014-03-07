@@ -20,9 +20,11 @@ class Timer;
 class TimeListener;
 class SimInit;
 
+/// Container for a few static simulation-global parameters that both describe
+/// the simulation and affect its behavior.
 class SimInfo {
  public:
-  SimInfo(int dur, int y0, int m0, int decay_period, std::string handle = "")
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1, std::string handle = "")
     : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
       branch_time(-1), handle(handle) {};
 
@@ -33,16 +35,29 @@ class SimInfo {
       parent_sim(parent_sim),
       branch_time(branch_time), handle(handle) {};
 
+  /// user-defined label associated with a particular simulation
   std::string handle;
+
+  /// length of the simulation in timesteps (months)
   int duration;
+
+  /// start year for the simulation (e.g. 1973);
   int y0;
+
+  /// start month for the simulation: Jan = 1, ..., Dec = 12
   int m0;
+
+  /// interval between decay calculations in timesteps (months)
   int decay_period;
+
+  /// id for the parent simulation if any
   boost::uuids::uuid parent_sim;
+
+  /// timestep at which simulation branching occurs if any
   int branch_time;
 };
 
-/// A simulation context that provides access to necessary simulation-global
+/// A simulation context provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
 /// know simulation time, creates/builds facilities, and/or uses loaded
 /// composition recipes will need a context pointer. In general, all global

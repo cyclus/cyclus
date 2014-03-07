@@ -105,7 +105,7 @@ void Context::InitSim(SimInfo si) {
     ->AddVal("ParentSimId", si.parent_sim)
     ->AddVal("BranchTime", si.branch_time)
     ->Record();
-  ti_->Initialize(this, si.duration, si.m0, si.y0, si.decay_period);
+  ti_->Initialize(this, si);
 }
 
 int Context::time() {

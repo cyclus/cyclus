@@ -52,7 +52,6 @@
 #include "symbolic_function_factories.h"
 #include "symbolic_functions.h"
 #include "time_listener.h"
-#include "timer.h"
 #include "trade.h"
 #include "trader.h"
 #include "trader_management.h"
