@@ -169,10 +169,6 @@ std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
   return ret;
 }
 
-const std::string Model::ModelImpl() {
-  return model_impl_;
-}
-
 void Model::AddToTable() {
   ctx_->NewDatum("AgentEntry")
   ->AddVal("AgentId", id_)

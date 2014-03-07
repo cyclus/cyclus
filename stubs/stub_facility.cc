@@ -12,7 +12,7 @@ StubFacility::~StubFacility() {}
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubFacility::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
   Model::InfileToDb(qe, di);
-  qe = qe->QueryElement(ModelImpl());
+  qe = qe->QueryElement(model_impl());
   // retrieve input data members here. For example:
   //
   //   int cycle_len = lexical_cast<int>(input->getElementContent("cycle_length"));

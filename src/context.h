@@ -20,7 +20,7 @@ class Timer;
 class TimeListener;
 class SimInit;
 
-/// Container for a few static simulation-global parameters that both describe
+/// Container for a static simulation-global parameters that both describe
 /// the simulation and affect its behavior.
 class SimInfo {
  public:
@@ -164,8 +164,8 @@ class Context {
   /// Returns the current simulation timestep.
   int time();
 
-  /// Returns the number of timesteps in the entire simulation.
-  int sim_dur();
+  /// Return static simulation info.
+  inline SimInfo sim_info() const {return si_;};
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
@@ -194,6 +194,7 @@ class Context {
   std::set<Model*> model_list_;
   std::set<Trader*> traders_;
 
+  SimInfo si_;
   Timer* ti_;
   ExchangeSolver* solver_;
   Recorder* rec_;

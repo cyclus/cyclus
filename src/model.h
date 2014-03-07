@@ -46,77 +46,6 @@ class Model {
   friend class SimInit;
 
  public:
-  /// Translates info for a model from an input file to the database by reading
-  /// parameters from the passed QueryEngine and recording data via the DbInit
-  /// variable.  The simulation and agent id's are automatically included in all
-  /// information transfered through di.  This method must be implemented by all
-  /// models.  This method must call the superclass' InfileToDb(QueryEngine*,
-  /// DbInit) method before doing any other work.
-  ///
-  /// Model parameters in the QueryEngine are scoped in the
-  /// "model/[model-class-name]" path. The model's class-name can be retrieved
-  /// from the ModelImpl method. The superclass InitFrom expects the QueryEngine
-  /// passed to it to be scoped identically - do NOT pass a changed-scope
-  /// QueryEngine to the superclass.
-  ///
-  /// Example:
-  ///
-  /// @code
-  /// class MyModelClass : virtual public cyclus::FacilityModel {
-  ///   // ...
-  ///
-  ///   void InfileToDb(QueryEngine* qe, DbInit di) {
-  ///     cyclus::FacilityModel::InitFrom(qe); // 
-  ///     // now do MyModelClass' initialitions, e.g.:
-  ///     qe = qe->QueryElement("model/" + ModelImpl()); // rescope the QueryEngine
-  ///
-  ///     // retrieve all model params
-  ///     std::string recipe = qe->GetElementContent("recipe");
-  ///     std::string in_commod = qe->GetElementContent("in_commod");
-  ///     std::string out_commod = qe->GetElementContent("out_commod");
-  ///     di.NewDatum("MyModelTable1")
-  ///       ->AddVal("recipe", recipe)
-  ///       ->AddVal("in_commod", in_commod)
-  ///       ->AddVal("out_commod", out_commod)
-  ///       ->Record();
-  ///     // ...
-  ///   };
-  ///
-  ///   // ...
-  /// };
-  /// @endcode
-  ///
-  /// @warning this method MUST NOT use or modify any instance state.
-  virtual void InfileToDb(QueryEngine* qe, DbInit di);
-
-  /// Appropriate simulation id, agent id, and time filters are automatically
-  /// included in all queries.
-  ///
-  /// @warning Agents should NOT create any resource objects in this method.
-  virtual void InitFrom(QueryBackend* b);
-
-  /// Snapshots agent-internal state to the output db via di. This method MUST
-  /// call the superclass' Snapshot method before doing any work.
-  ///
-  /// @warning This method should NOT modify the agent's state.
-  virtual void Snapshot(DbInit di) = 0;
-
-  /// Provides an agent's initial inventory of resources before a simulation
-  /// begins. The resources are keyed in the same way the InitInv method
-  /// returned. Agents should iterate through each named inventory provided and
-  /// populate the corresponding resource containers.
-  ///
-  /// @warning agents should not modify any state outside the container filling
-  virtual void InitInv(const Inventories& inv) = 0;
-
-  /// Snapshots and agent's resource inventories to the output db. The set of
-  /// resources in each container should be stored under a string key specific
-  /// to that container that will be used when re-initializing inventories for
-  /// restarted simulations.
-  ///
-  /// @warning This method should NOT modify the agent's state.
-  virtual Inventories SnapshotInv() = 0;
-
   /// Constructor for the Model Class
   ///
   /// @warning all constructors must set id_ and increment next_id_
@@ -148,8 +77,82 @@ class Model {
   /// @endcode
   virtual Model* Clone() = 0;
 
-  /// get model implementation name
-  const std::string ModelImpl();
+  /// Translates info for a model from an input file to the database by reading
+  /// parameters from the passed QueryEngine and recording data via the DbInit
+  /// variable.  The simulation and agent id's are automatically injected in all
+  /// data transfered through di.  This method must be implemented by all
+  /// agents.  This method must call the superclass' InfileToDb method before
+  /// doing any other work.
+  ///
+  /// Model parameters in the QueryEngine are scoped in the
+  /// "model/[model-class-name]" path. The model's class-name can be retrieved
+  /// from the model_impl method. The superclass InitFrom expects the QueryEngine
+  /// passed to it to be scoped identically - do NOT pass a changed-scope
+  /// QueryEngine to the superclass.
+  ///
+  /// Example:
+  ///
+  /// @code
+  /// class MyModelClass : virtual public cyclus::FacilityModel {
+  ///   // ...
+  ///
+  ///   void InfileToDb(QueryEngine* qe, DbInit di) {
+  ///     cyclus::FacilityModel::InitFrom(qe); // 
+  ///     // now do MyModelClass' initialitions, e.g.:
+  ///     qe = qe->QueryElement("model/" + model_impl()); // rescope the QueryEngine
+  ///
+  ///     // retrieve all model params
+  ///     std::string recipe = qe->GetElementContent("recipe");
+  ///     std::string in_commod = qe->GetElementContent("in_commod");
+  ///     std::string out_commod = qe->GetElementContent("out_commod");
+  ///     di.NewDatum("MyModelTable1")
+  ///       ->AddVal("recipe", recipe)
+  ///       ->AddVal("in_commod", in_commod)
+  ///       ->AddVal("out_commod", out_commod)
+  ///       ->Record();
+  ///     // ...
+  ///   };
+  ///
+  ///   // ...
+  /// };
+  /// @endcode
+  ///
+  /// @warning this method MUST NOT use or modify any instance state.
+  virtual void InfileToDb(QueryEngine* qe, DbInit di);
+
+  /// Intializes an agent's internal state from an output database. Appropriate
+  /// simulation id, agent id, and time filters are automatically included in
+  /// all queries.
+  ///
+  /// @warning Agents must NOT create any resource objects in this method.
+  virtual void InitFrom(QueryBackend* b);
+
+  /// Snapshots agent-internal state to the output db via di. This method MUST
+  /// call the superclass' Snapshot method before doing any work. The simulation
+  /// and agent id's in addition to the snapshot time are automatically included
+  /// in all information transfered through di.
+  ///
+  /// @warning because a 'Time' field is automatically injected, that label
+  /// cannot be used for any other fields.
+  ///
+  /// @warning This method must NOT modify the agent's state.
+  virtual void Snapshot(DbInit di) = 0;
+
+  /// Provides an agent's initial inventory of resources before a simulation
+  /// begins. The resources are keyed in the same way the InitInv method
+  /// returned. Agents should iterate through each named inventory provided and
+  /// populate the corresponding resource containers.
+  ///
+  /// @warning agents should not modify any state outside the container filling
+  virtual void InitInv(const Inventories& inv) = 0;
+
+  /// Snapshots and agent's resource inventories to the output db. The set of
+  /// resources in each container should be stored under a string key specific
+  /// to that container that will be used when re-initializing inventories for
+  /// restarted simulations.
+  ///
+  /// @warning This method should NOT modify the agent's state.
+  virtual Inventories SnapshotInv() = 0;
 
   /// recursively prints the parent-child tree
   std::string PrintChildren();

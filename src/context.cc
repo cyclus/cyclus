@@ -14,7 +14,8 @@ Context::Context(Timer* ti, Recorder* rec)
   : ti_(ti),
     rec_(rec),
     solver_(NULL),
-    trans_id_(0) {}
+    trans_id_(0),
+    si_(0) {}
 
 Context::~Context() {
   if (solver_ != NULL) {
@@ -110,10 +111,6 @@ void Context::InitSim(SimInfo si) {
 
 int Context::time() {
   return ti_->time();
-}
-
-int Context::sim_dur() {
-  return ti_->dur();
 }
 
 void Context::RegisterTimeListener(TimeListener* tl) {
