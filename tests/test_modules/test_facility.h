@@ -12,6 +12,9 @@ class TestFacility: public cyclus::FacilityModel {
       
   virtual cyclus::Model* Clone() { return new TestFacility(context()); };
 
+  virtual void InitInv(const cyclus::Inventories& inv) {};
+  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
+
   void CloneModuleMembersFrom(cyclus::FacilityModel* source) {};
   void Tick(int time) {};
   void Tock(int time) {};

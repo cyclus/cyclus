@@ -76,6 +76,8 @@ class FacilityModel : public TimeListener, public Model, public Trader {
 
   virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
+  virtual void Snapshot(DbInit di);
+
   /**
      Copy module members from a source model
 

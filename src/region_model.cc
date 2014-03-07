@@ -15,22 +15,22 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::InitFrom(RegionModel* m) {
   Model::InitFrom(m);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RegionModel::RegionModel(Context* ctx) : Model(ctx) {
   kind_ = "Region";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RegionModel::InfileToDb(QueryEngine* qe, DbInit di) {
   Model::InfileToDb(qe, di);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RegionModel::Snapshot(DbInit di) {
+  Model::Snapshot(di);
+}
+
 void RegionModel::Build(Model* parent) {
   Model::Build(parent);
 }
@@ -44,7 +44,6 @@ void RegionModel::Decommission() {
   Model::Decommission();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string RegionModel::str() {
   std::string s = Model::str();
 

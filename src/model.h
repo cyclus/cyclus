@@ -90,16 +90,32 @@ class Model {
   virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
   /// Appropriate simulation id, agent id, and time filters are automatically
-  /// included in all queries. Agents should not create any resource objects in
-  /// this method.
+  /// included in all queries.
+  ///
+  /// @warning Agents should NOT create any resource objects in this method.
   virtual void InitFrom(QueryBackend* b);
 
-  /// Snapshots agent-internal state to the output db via di.
-  virtual void Snapshot(DbInit di);
-  
-  virtual void InitInv(const Inventories& inv) {};
+  /// Snapshots agent-internal state to the output db via di. This method MUST
+  /// call the superclass' Snapshot method before doing any work.
+  ///
+  /// @warning This method should NOT modify the agent's state.
+  virtual void Snapshot(DbInit di) = 0;
 
-  virtual Inventories SnapshotInv() {return Inventories();};
+  /// Provides an agent's initial inventory of resources before a simulation
+  /// begins. The resources are keyed in the same way the InitInv method
+  /// returned. Agents should iterate through each named inventory provided and
+  /// populate the corresponding resource containers.
+  ///
+  /// @warning agents should not modify any state outside the container filling
+  virtual void InitInv(const Inventories& inv) = 0;
+
+  /// Snapshots and agent's resource inventories to the output db. The set of
+  /// resources in each container should be stored under a string key specific
+  /// to that container that will be used when re-initializing inventories for
+  /// restarted simulations.
+  ///
+  /// @warning This method should NOT modify the agent's state.
+  virtual Inventories SnapshotInv() = 0;
 
   /// Constructor for the Model Class
   ///

@@ -50,6 +50,10 @@ class DonutShop : public Model {
     Model::InitFrom(m);
   };
 
+  virtual void Snapshot(cyclus::DbInit di) {};
+  virtual void InitInv(const cyclus::Inventories& inv) {};
+  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
+
   static int destruct_count;
   std::string donut_of_the_day;
 };

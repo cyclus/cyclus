@@ -15,22 +15,22 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InstModel::InstModel(Context* ctx) : Model(ctx) {
   kind_ = "Inst";
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::InitFrom(InstModel* m) {
   Model::InitFrom(m);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::InfileToDb(QueryEngine* qe, DbInit di) {
   Model::InfileToDb(qe, di);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void InstModel::Snapshot(DbInit di) {
+  Model::Snapshot(di);
+}
+
 std::string InstModel::str() {
   if (parent() != NULL) {
     return Model::str() + " in region" + parent()->prototype();
@@ -39,7 +39,6 @@ std::string InstModel::str() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::Build(Model* parent) {
   Model::Build(parent);
 }
@@ -53,7 +52,6 @@ void InstModel::Decommission() {
   Model::Decommission();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void InstModel::Tock(int time) {
   std::vector<Model*> to_decomm;
   for (int i = 0; i < children().size(); i++) {

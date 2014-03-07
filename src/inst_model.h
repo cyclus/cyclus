@@ -47,6 +47,12 @@ class InstModel : public Model, public TimeListener {
 
   virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
+  virtual void Snapshot(DbInit di);
+
+  virtual void InitInv(const Inventories& inv) {};
+
+  virtual Inventories SnapshotInv() {return Inventories();};
+
   /**
      every model should be able to print a verbose description
    */

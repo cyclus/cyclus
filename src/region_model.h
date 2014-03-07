@@ -78,6 +78,12 @@ class RegionModel : public Model, public TimeListener {
 
   virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
+  virtual void Snapshot(DbInit di);
+
+  virtual void InitInv(const Inventories& inv) {};
+
+  virtual Inventories SnapshotInv() {return Inventories();};
+
   /**
      perform actions required when entering the simulation
    */

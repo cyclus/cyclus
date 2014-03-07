@@ -15,27 +15,26 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::FacilityModel(Context* ctx)
     : Trader(this),
       Model(ctx) {
   kind_ = "Facility";
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FacilityModel::~FacilityModel() {};
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::InfileToDb(QueryEngine* qe, DbInit di) {
   Model::InfileToDb(qe, di);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void FacilityModel::Snapshot(DbInit di) {
+  Model::Snapshot(di);
+}
+
 void FacilityModel::InitFrom(FacilityModel* m) {
   Model::InitFrom(m);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::Build(Model* parent) {
   Model::Build(parent);
 }
@@ -45,7 +44,6 @@ void FacilityModel::DoRegistration() {
   context()->RegisterTimeListener(this);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string FacilityModel::str() {
   std::stringstream ss("");
   ss << Model::str() << " with: "
@@ -54,7 +52,6 @@ std::string FacilityModel::str() {
   return ss.str();
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void FacilityModel::Decommission() {
   if (!CheckDecommissionCondition()) {
     throw Error("Cannot decommission " + prototype());
@@ -65,7 +62,6 @@ void FacilityModel::Decommission() {
   Model::Decommission();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool FacilityModel::CheckDecommissionCondition() {
   return true;
 }

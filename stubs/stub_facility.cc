@@ -23,6 +23,15 @@ void StubFacility::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
   //     ->Record();
 }
 
+void StubFacility::InitInv(const cyclus::Inventories& inv) {
+  // populate all resource containers with resources in inv
+}
+
+cyclus::Inventories StubFacility::SnapshotInv() {
+  // return a map of container-name to groups of resources for every container
+  // in this agent
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Model* StubFacility::Clone() {
   StubFacility* m = new StubFacility(context());
