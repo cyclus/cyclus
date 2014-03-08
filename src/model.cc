@@ -36,7 +36,7 @@ std::string Model::InformErrorMsg(std::string msg) {
 }
 
 void Model::InfileToDb(QueryEngine* qe, DbInit di) {
-  std::string proto = qe->GetElementContent("name");
+  std::string proto = qe->GetString("name");
   int lifetime = GetOptionalQuery<int>(qe, "lifetime", -1);
   di.NewDatum(this, "Model")
     ->AddVal("Prototype", proto)

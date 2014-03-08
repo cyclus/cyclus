@@ -69,7 +69,7 @@ std::string BuildMasterSchema(std::string schema_path) {
 
 Composition::Ptr ReadRecipe(QueryEngine* qe) {
   bool atom_basis;
-  std::string basis_str = qe->GetElementContent("basis");
+  std::string basis_str = qe->GetString("basis");
   if (basis_str == "atom") {
     atom_basis = true;
   } else if (basis_str == "mass") {
@@ -85,8 +85,8 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   CompMap v;
   for (int i = 0; i < nnucs; i++) {
     QueryEngine* nuclide = qe->QueryElement(query, i);
-    key = strtol(nuclide->GetElementContent("id").c_str(), NULL, 10);
-    value = strtod(nuclide->GetElementContent("comp").c_str(), NULL);
+    key = strtol(nuclide->GetString("id").c_str(), NULL, 10);
+    value = strtod(nuclide->GetString("comp").c_str(), NULL);
     v[key] = value;
     CLOG(LEV_DEBUG3) << "  Nuclide: " << key << " Value: " << v[key];
   }
@@ -145,7 +145,7 @@ void XMLFileLoader::LoadSolver() {
   int num_commods = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < num_commods; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    name = qe->GetElementContent("name");
+    name = qe->GetString("name");
     order = GetOptionalQuery<double>(qe, "solution_order", -1);
     commod_order[name] = order;
   }
@@ -189,7 +189,7 @@ void XMLFileLoader::LoadRecipes() {
   int num_recipes = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < num_recipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    std::string name = qe->GetElementContent("name");
+    std::string name = qe->GetString("name");
     CLOG(LEV_DEBUG3) << "loading recipe: " << name;
     Composition::Ptr comp = ReadRecipe(qe);
     comp->Record(ctx_);
@@ -219,7 +219,7 @@ void XMLFileLoader::LoadInitialAgents() {
       QueryEngine* qe = xqe.QueryElement(schema_paths[*it], i);
       QueryEngine* module_data = qe->QueryElement("model");
       std::string module_name = module_data->GetElementName();
-      prototype = qe->GetElementContent("name");
+      prototype = qe->GetString("name");
 
       Model* model = DynamicModule::Make(ctx_, module_name);
       model->set_model_impl(module_name);
@@ -239,21 +239,21 @@ void XMLFileLoader::LoadInitialAgents() {
   int nregions = xqe.NElementsMatchingQuery(schema_paths["Region"]);
   for (int i = 0; i < nregions; ++i) {
     QueryEngine* qe = xqe.QueryElement(schema_paths["Region"], i);
-    std::string region_proto = qe->GetElementContent("name");
+    std::string region_proto = qe->GetString("name");
     Model* reg = BuildAgent(region_proto, NULL);
 
     int ninsts = qe->NElementsMatchingQuery("institution");
     for (int j = 0; j < ninsts; ++j) {
       QueryEngine* qe2 = qe->QueryElement("institution", j);
-      std::string inst_proto = qe2->GetElementContent("name");
+      std::string inst_proto = qe2->GetString("name");
       Model* inst = BuildAgent(inst_proto, reg);
 
       int nfac = qe2->NElementsMatchingQuery("initialfacilitylist/entry");
       for (int k = 0; k < nfac; ++k) {
         QueryEngine* qe3 = qe2->QueryElement("initialfacilitylist/entry", k);
-        std::string fac_proto = qe3->GetElementContent("prototype");
+        std::string fac_proto = qe3->GetString("prototype");
 
-        int number = atoi(qe3->GetElementContent("number").c_str());
+        int number = atoi(qe3->GetString("number").c_str());
         for (int z = 0; z < number; ++z) {
           Model* fac = BuildAgent(fac_proto, inst);
           LoadInventory(fac, qe3);
@@ -268,11 +268,11 @@ void XMLFileLoader::LoadInventory(Model* m, QueryEngine* qe) {
   int ninvs = qe->NElementsMatchingQuery("inventories/inv");
   for (int i = 0; i < ninvs; ++i) {
     QueryEngine* qe2 = qe->QueryElement("inventories/inv", i);
-    std::string name = qe2->GetElementContent("name");
+    std::string name = qe2->GetString("name");
     int nmats = qe2->NElementsMatchingQuery("materials");
     for (int j = 0; j < nmats; ++j) {
       QueryEngine* qe3 = qe2->QueryElement("materials", j);
-      std::string recipe = qe3->GetElementContent("recipe");
+      std::string recipe = qe3->GetString("recipe");
       double qty = GetOptionalQuery<double>(qe3, "quantity", 0);
       Material::Ptr mat = Material::Create(m, qty, ctx_->GetRecipe(recipe));
       invs[name].push_back(mat);
@@ -297,20 +297,20 @@ void XMLFileLoader::LoadControlParams() {
 
   std::string handle;
   if (qe->NElementsMatchingQuery("simhandle") > 0) {
-    handle = qe->GetElementContent("simhandle");
+    handle = qe->GetString("simhandle");
   }
 
   // get duration
-  std::string dur_str = qe->GetElementContent("duration");
+  std::string dur_str = qe->GetString("duration");
   int dur = strtol(dur_str.c_str(), NULL, 10);
   // get start month
-  std::string m0_str = qe->GetElementContent("startmonth");
+  std::string m0_str = qe->GetString("startmonth");
   int m0 = strtol(m0_str.c_str(), NULL, 10);
   // get start year
-  std::string y0_str = qe->GetElementContent("startyear");
+  std::string y0_str = qe->GetString("startyear");
   int y0 = strtol(y0_str.c_str(), NULL, 10);
   // get decay interval
-  std::string decay_str = qe->GetElementContent("decay");
+  std::string decay_str = qe->GetString("decay");
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
   ctx_->InitSim(SimInfo(dur, y0, m0, dec, handle));

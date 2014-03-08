@@ -72,10 +72,10 @@ TEST_F(QueryEngineTest, top_level_queries) {
   EXPECT_EQ(engine.NElementsMatchingQuery(content_node_),ncontent_);
   EXPECT_EQ(engine.NElementsMatchingQuery(inner_node_),1);
   EXPECT_EQ(engine.GetElementName(),content_node_);
-  EXPECT_EQ(engine.GetElementContent(content_node_),content_);
+  EXPECT_EQ(engine.GetString(content_node_),content_);
   for (int i = 0; i < ncontent_; i++) {
     EXPECT_EQ(engine.GetElementName(i),content_node_);
-    EXPECT_EQ(engine.GetElementContent(content_node_,i),content_);
+    EXPECT_EQ(engine.GetString(content_node_,i),content_);
   }
   EXPECT_EQ(engine.GetElementName(ncontent_),inner_node_);
 } 
@@ -84,8 +84,8 @@ TEST_F(QueryEngineTest, top_level_queries) {
 TEST_F(QueryEngineTest, top_level_throws) {  
   LoadParser();
   cyclus::QueryEngine engine(*parser_);
-  EXPECT_THROW(engine.GetElementContent(content_node_,ninner_nodes_+1), cyclus::ValueError);
-  EXPECT_THROW(engine.GetElementContent(inner_node_), cyclus::ValueError);
+  EXPECT_THROW(engine.GetString(content_node_,ninner_nodes_+1), cyclus::ValueError);
+  EXPECT_THROW(engine.GetString(inner_node_), cyclus::ValueError);
   EXPECT_THROW(engine.GetElementName(ninner_nodes_+1), cyclus::ValueError);
   EXPECT_THROW(engine.QueryElement(content_node_,ninner_nodes_+1), cyclus::ValueError);  
 }
@@ -96,7 +96,7 @@ TEST_F(QueryEngineTest, null_query) {
   cyclus::QueryEngine engine(*parser_);
   std::string query = "something_silly";
   EXPECT_EQ(engine.NElementsMatchingQuery(query), 0);
-  EXPECT_THROW(engine.GetElementContent(query), cyclus::KeyError);
+  EXPECT_THROW(engine.GetString(query), cyclus::KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -113,7 +113,7 @@ TEST_F(QueryEngineTest, low_level_queries) {
   cyclus::QueryEngine* qe = engine.QueryElement(inner_node_);
   EXPECT_EQ(qe->GetElementName(),unknown_node_);
   cyclus::QueryEngine* qe2 = qe->QueryElement(unknown_node_);
-  EXPECT_EQ(qe2->GetElementContent(content_node_),content_);
+  EXPECT_EQ(qe2->GetString(content_node_),content_);
 }
 
 

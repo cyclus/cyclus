@@ -38,11 +38,17 @@ class QueryEngine {
   /// @return the number of elements matching the query
   virtual int NElementsMatchingQuery(std::string query);
 
+  /// Same as GetString with auto-conversion to int.
+  virtual int GetInt(std::string query, int index = 0);
+
+  /// Same as GetString with auto-conversion to double.
+  virtual double GetDouble(std::string query, int index = 0);
+
   /// investigates the current status and returns a string representing
   /// the content of a query at a given index
   /// @param query the query
   /// @param index the index of the queried element
-  virtual std::string GetElementContent(std::string query, int index = 0);
+  virtual std::string GetString(std::string query, int index = 0);
 
   /// populates a child query engine based on a query and index
   /// @param query the query
@@ -82,7 +88,7 @@ template <class T> inline T GetOptionalQuery(QueryEngine* qe,
                                             T default_val) {
   T val;
   qe->NElementsMatchingQuery(query) == 1 ?
-      val = boost::lexical_cast<T>(qe->GetElementContent(query).c_str()) :
+      val = boost::lexical_cast<T>(qe->GetString(query).c_str()) :
       val = default_val;
   return val;
 };

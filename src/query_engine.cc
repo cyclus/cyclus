@@ -5,6 +5,7 @@
 
 #include "error.h"
 #include "query_engine.h"
+#include <boost/lexical_cast.hpp>
 
 namespace cyclus {
 
@@ -48,8 +49,16 @@ int QueryEngine::NElementsMatchingQuery(std::string query) {
   return current_node_->find(query).size();
 }
 
+int QueryEngine::GetInt(std::string query, int index) {
+  return boost::lexical_cast<int>(GetString(query, index));
+}
+
+double QueryEngine::GetDouble(std::string query, int index) {
+  return boost::lexical_cast<double>(GetString(query, index));
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string QueryEngine::GetElementContent(std::string query, int index) {
+std::string QueryEngine::GetString(std::string query, int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
   using xmlpp::TextNode;

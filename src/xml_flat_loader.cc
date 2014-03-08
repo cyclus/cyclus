@@ -56,7 +56,7 @@ void XMLFlatLoader::LoadInitialAgents() {
     QueryEngine* qe = xqe.QueryElement("/*/prototype", i);
     QueryEngine* module_data = qe->QueryElement("model");
     std::string module_name = module_data->GetElementName();
-    std::string prototype = qe->GetElementContent("name");
+    std::string prototype = qe->GetString("name");
 
     Model* model = DynamicModule::Make(ctx_, module_name);
     model->set_model_impl(module_name);
@@ -84,8 +84,8 @@ void XMLFlatLoader::LoadInitialAgents() {
   std::map<std::string, QueryEngine*> invs; // map<agent, qe>;
   for (int i = 0; i < num_agents; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/agent", i);
-    std::string name = qe->GetElementContent("name");
-    std::string proto = qe->GetElementContent("prototype");
+    std::string name = qe->GetString("name");
+    std::string proto = qe->GetString("prototype");
     std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
     protos[name] = proto;
     parents[name] = parent;

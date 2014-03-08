@@ -95,9 +95,9 @@ class Model {
   ///     qe = qe->QueryElement("model/" + model_impl()); // rescope the QueryEngine
   ///
   ///     // retrieve all model params
-  ///     std::string recipe = qe->GetElementContent("recipe");
-  ///     std::string in_commod = qe->GetElementContent("in_commod");
-  ///     std::string out_commod = qe->GetElementContent("out_commod");
+  ///     std::string recipe = qe->GetString("recipe");
+  ///     std::string in_commod = qe->GetString("in_commod");
+  ///     std::string out_commod = qe->GetString("out_commod");
   ///     di.NewDatum("MyModelTable1")
   ///       ->AddVal("recipe", recipe)
   ///       ->AddVal("in_commod", in_commod)
@@ -161,7 +161,7 @@ class Model {
   /// this method, they must call their superclass's Build method at the
   /// BEGINING of their Build method.
   ///
-  /// @param parent this agent's parent
+  /// @param parent this agent's parent. NULL if this agent has no parent.
   virtual void Build(Model* parent = NULL);
 
   /// Called to give the agent an opportunity to register for services (e.g.
