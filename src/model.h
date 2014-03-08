@@ -28,6 +28,13 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 
 /// The abstract base class used by all types of models
 /// that live and interact in a simulation.
+///
+/// There are several methods that must be implemented in support of simulation
+/// initialization, snapshotting and restart: InfileToDb,
+/// InitFrom(QueryBackend*), Snapshot, SnapshotInv, and InitInv.  These methods
+/// all do inter-related things.  Notably, the InfileToDb, InitFrom, and
+/// Snapshot methods must all write/read to/from the same database tables (and
+/// table schemas).
 class Model {
   friend class SimInit;
 
