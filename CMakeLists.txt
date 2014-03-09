@@ -2,6 +2,15 @@
 PROJECT( CYCLUS )
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+# quiets fortify_source warnings when not compiling with optimizations
+# in linux distros where compilers were compiled with fortify_source enabled by
+# default (e.g. Arch linux).
+MESSAGE("${CMAKE_BUILD_TYPE}")
+STRING(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
+IF(NOT ${BUILD_TYPE} STREQUAL "release")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0")
+ENDIF()
+
 IF(NOT CYCLUS_DOC_ONLY)
 
 ##############################################################################################

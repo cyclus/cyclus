@@ -4,7 +4,6 @@
 #include "context.h"
 #include "decayer.h"
 #include "error.h"
-#include "mass_table.h"
 #include "recorder.h"
 
 namespace cyclus {
@@ -12,9 +11,11 @@ namespace cyclus {
 int Composition::next_id_ = 0;
 
 Composition::Ptr Composition::CreateFromAtom(CompMap v) {
-  if (!compmath::ValidNucs(v) || !compmath::AllPositive(v)) {
-    throw ValueError("invalid nuclide or negative quantity in CompMap");
-  }
+  if (!compmath::ValidNucs(v))
+    throw ValueError("invalid nuclide in CompMap");
+
+  if (!compmath::AllPositive(v)) 
+    throw ValueError("negative quantity in CompMap");
 
   Composition::Ptr c(new Composition());
   c->atom_ = v;
@@ -22,9 +23,11 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
 }
 
 Composition::Ptr Composition::CreateFromMass(CompMap v) {
-  if (!compmath::ValidNucs(v) || !compmath::AllPositive(v)) {
-    throw ValueError("invalid nuclide or negative quantity in CompMap");
-  }
+  if (!compmath::ValidNucs(v))
+    throw ValueError("invalid nuclide in CompMap");
+
+  if (!compmath::AllPositive(v)) 
+    throw ValueError("negative quantity in CompMap");
 
   Composition::Ptr c(new Composition());
   c->mass_ = v;
@@ -40,7 +43,7 @@ const CompMap& Composition::atom() {
     CompMap::iterator it;
     for (it = mass_.begin(); it != mass_.end(); ++it) {
       Nuc nuc = it->first;
-      atom_[nuc] = mass_[nuc] / MT->GramsPerMol(nuc);
+      atom_[nuc] = mass_[nuc] / pyne::atomic_mass(nuc);
     }
   }
   return atom_;
@@ -51,7 +54,7 @@ const CompMap& Composition::mass() {
     CompMap::iterator it;
     for (it = atom_.begin(); it != atom_.end(); ++it) {
       Nuc nuc = it->first;
-      mass_[nuc] = atom_[nuc] * MT->GramsPerMol(nuc);
+      mass_[nuc] = atom_[nuc] * pyne::atomic_mass(nuc);
     }
   }
   return mass_;
@@ -105,11 +108,14 @@ Composition::Composition(int prev_decay, ChainPtr decay_line)
 
 Composition::Ptr Composition::NewDecay(int delta) {
   int tot_decay = prev_decay_ + delta;
-  double months_per_year = 12;
-  double years = double(delta) / months_per_year;
+  atom();  // force evaluation of atom-composition if not calculated already
+
+  // FIXME this is only here for testing, see issue #761
+  if (atom_.size() == 0)
+    return Composition::Ptr(new Composition(tot_decay, decay_line_));
 
   Decayer handler(atom_);
-  handler.Decay(years);
+  handler.Decay(2419200.0 * delta);  // 2419200 == secs / month
 
   // the new composition is a part of this decay chain and so is created with a
   // pointer to the exact same decay_line_.
