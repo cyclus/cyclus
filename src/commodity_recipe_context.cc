@@ -4,11 +4,15 @@
 
 namespace cyclus {
 
+#define SHOW(X) \
+  std::cout << __FILE__ << ":" << __LINE__ << ": "#X" = " << X << "\n"
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::AddInCommod(std::string in_commod,
                                          std::string in_recipe,
                                          std::string out_commod,
                                          std::string out_recipe) {
+  SHOW("AddedCommod: " + in_commod);
   in_commods_.push_back(in_commod);
   out_commods_.push_back(out_commod);
   out_commod_map_.insert(std::make_pair(in_commod, out_commod));
@@ -18,22 +22,26 @@ void CommodityRecipeContext::AddInCommod(std::string in_commod,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::AddRsrc(std::string commod, Resource::Ptr rsrc) {
+  SHOW("AddedRsrc: " + commod);
   rsrc_commod_map_[rsrc->id()] = commod;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::RemoveRsrc(Resource::Ptr rsrc) {
+  SHOW("RemovedRsrc");
   rsrc_commod_map_.erase(rsrc->id());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::UpdateRsrc(std::string commod, Resource::Ptr rsrc) {
+  SHOW("UpdatedRsrc");
   rsrc_commod_map_[rsrc->id()] = commod;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::UpdateInRec(std::string incommod,
                                          std::string recipe) {
+  SHOW("UpdatedRecipe: " + recipe);
   out_recipes_[recipe] = out_recipes_[in_recipes_[incommod]];
   in_recipes_[incommod] = recipe;
 }
