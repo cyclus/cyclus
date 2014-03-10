@@ -190,6 +190,7 @@ INSTALL(FILES
   solver_factory.h
   sqlite_back.h
   sqlite_db.h
+  state_wrangler.h
   suffix.h
   supply_demand.h
   supply_demand_manager.h

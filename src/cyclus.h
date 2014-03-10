@@ -38,6 +38,7 @@
 #include "request_portfolio.h"
 #include "resource.h"
 #include "resource_buff.h"
+#include "state_wrangler.h"
 #include "supply_demand.h"
 #include "supply_demand_manager.h"
 #include "symbolic_function_factories.h"

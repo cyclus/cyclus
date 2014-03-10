@@ -14,6 +14,7 @@
 #include "exchange_context.h"
 #include "query_backend.h"
 #include "db_init.h"
+#include "state_wrangler.h"
 
 #define SHOW(X) \
   std::cout << __FILE__ << ":" << __LINE__ << ": "#X" = " << X << "\n"
@@ -35,7 +36,7 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 /// all do inter-related things.  Notably, the InfileToDb, InitFrom, and
 /// Snapshot methods must all write/read to/from the same database tables (and
 /// table schemas).
-class Model {
+class Model : public StateWrangler {
   friend class SimInit;
 
  public:
