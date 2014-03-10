@@ -101,12 +101,10 @@ void XMLFlatLoader::LoadInitialAgents() {
     std::string parent = parents[name];
     if (parent == "") {
       built[name] = BuildAgent(proto, NULL);
-      LoadInventory(built[name], invs[name]);
       ++it;
       agents.erase(name);
     } else if (built.count(parent) > 0) {
       built[name] = BuildAgent(proto, built[parent]);
-      LoadInventory(built[name], invs[name]);
       ++it;
       agents.erase(name);
     } else {

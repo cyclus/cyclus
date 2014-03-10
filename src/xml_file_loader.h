@@ -66,9 +66,6 @@ class XMLFileLoader {
   /// Creates all initial agent instances from the input file.
   virtual void LoadInitialAgents();
 
-  /// Creates all initial agent instances from the input file.
-  virtual void LoadInventory(Model* m, QueryEngine* qe);
-
   virtual std::string master_schema();
 
   /// Processes commodity orders, such that any without a defined order (i.e.,

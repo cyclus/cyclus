@@ -81,23 +81,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional>
         <element name="parent"><text/></element>
       </optional>
-
-      <optional>
-        <element name="inventories">
-          <zeroOrMore>
-            <element name="inv">
-              <element name="name"><data type="string"/></element>
-              <element name="materials">
-                <zeroOrMore>
-                  <element name="recipe"><data type="string"/></element>
-                  <element name="quantity"><data type="double"/></element>
-                </zeroOrMore>
-              </element>
-            </element>
-          </zeroOrMore>
-        </element>
-      </optional>
-
     </element>
   </oneOrMore>
 
