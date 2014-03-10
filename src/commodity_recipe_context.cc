@@ -18,7 +18,7 @@ void CommodityRecipeContext::AddInCommod(std::string in_commod,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::AddRsrc(std::string commod, Resource::Ptr rsrc) {
-  rsrc_commod_map_.insert(std::make_pair(rsrc->id(), commod));
+  rsrc_commod_map_[rsrc->id()] = commod;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,7 +70,7 @@ void CommodityRecipeContext::InitFrom(QueryBackend* b) {
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string commod = qr.GetVal<std::string>(i, "commod");
     int id = qr.GetVal<int>(i, "id");
-    rsrc_commod_map_.insert(std::make_pair(id, commod));
+    rsrc_commod_map_[id] = commod;
   }
 }
 
