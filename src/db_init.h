@@ -12,10 +12,15 @@ class Model;
 /// recorded data.  The prefix 'AgentState_' is also added to the datum title.
 class DbInit {
  public:
+  DbInit(Model* m);
+
   /// Returns a new datum to be used exactly as the Context::NewDatum method.
   /// Users must not add fields to the datum that are automatically injected:
   /// 'SimId', 'AgentId', and 'Time'.
-  Datum* NewDatum(Model* m, std::string title);
+  Datum* NewDatum(std::string title);
+
+ private:
+  Model* m_;
 };
 
 } // namespace cyclus

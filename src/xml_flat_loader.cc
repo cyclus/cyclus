@@ -48,7 +48,6 @@ std::string XMLFlatLoader::master_schema() {
 
 void XMLFlatLoader::LoadInitialAgents() {
   QueryEngine xqe(*parser_);
-  DbInit di;
 
   // create prototypes
   int num_protos = xqe.NElementsMatchingQuery("/*/prototype");
@@ -60,7 +59,7 @@ void XMLFlatLoader::LoadInitialAgents() {
 
     Model* model = DynamicModule::Make(ctx_, module_name);
     model->set_model_impl(module_name);
-    model->InfileToDb(qe, di);
+    model->InfileToDb(qe, DbInit(model));
     rec_.Flush();
     std::vector<Cond> conds;
     conds.push_back(Cond("SimId", "==", rec_.sim_id()));

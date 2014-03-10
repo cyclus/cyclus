@@ -6,10 +6,12 @@
 
 namespace cyclus {
 
-Datum* DbInit::NewDatum(Model* m, std::string title) {
-  Datum* d = m->context()->NewDatum("AgentState_" + title);
-  d->AddVal("AgentId", m->id());
-  d->AddVal("Time", m->context()->time());
+DbInit::DbInit(Model* m) : m_(m) {}
+
+Datum* DbInit::NewDatum(std::string title) {
+  Datum* d = m_->context()->NewDatum("AgentState_" + title);
+  d->AddVal("AgentId", m_->id());
+  d->AddVal("Time", m_->context()->time());
   return d;
 }
 

@@ -110,7 +110,7 @@ class Model {
   /// };
   /// @endcode
   ///
-  /// @warning this method MUST NOT use or modify any instance state.
+  /// @warning this method MUST NOT modify the agent's state.
   virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
   /// Intializes an agent's internal state from an output database. Appropriate
@@ -128,7 +128,7 @@ class Model {
   /// @warning because a 'Time' field is automatically injected, that label
   /// cannot be used for any other fields.
   ///
-  /// @warning This method must NOT modify the agent's state.
+  /// @warning This method MUST NOT modify the agent's state.
   virtual void Snapshot(DbInit di) = 0;
 
   /// Provides an agent's initial inventory of resources before a simulation

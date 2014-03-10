@@ -203,7 +203,6 @@ void XMLFileLoader::LoadInitialAgents() {
   schema_paths["Inst"] = "/*/region/institution";
   schema_paths["Facility"] = "/*/facility";
 
-  DbInit di;
   std::set<std::string> module_types;
   module_types.insert("Region");
   module_types.insert("Inst");
@@ -223,7 +222,7 @@ void XMLFileLoader::LoadInitialAgents() {
 
       Model* model = DynamicModule::Make(ctx_, module_name);
       model->set_model_impl(module_name);
-      model->InfileToDb(qe, di);
+      model->InfileToDb(qe, DbInit(model));
       rec_.Flush();
       std::vector<Cond> conds;
       conds.push_back(Cond("SimId", "==", rec_.sim_id()));

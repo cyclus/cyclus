@@ -68,10 +68,9 @@ void SimInit::Snapshot(Context* ctx) {
   std::set<Model*>::iterator it;
   for (it = mlist.begin(); it != mlist.end(); ++it) {
     Model* m = *it;
-    if (m->enter_time() == -1) {
-      continue;
+    if (m->enter_time() != -1) {
+      SimInit::SnapAgent(m);
     }
-    SimInit::SnapAgent(m);
   }
 
   // snapshot all next ids
@@ -103,8 +102,7 @@ void SimInit::Snapshot(Context* ctx) {
 };
 
 void SimInit::SnapAgent(Model* m) {
-  DbInit di;
-  m->Snapshot(di);
+  m->Snapshot(DbInit(m));
   Inventories invs = m->SnapshotInv();
   Context* ctx = m->context();
 

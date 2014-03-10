@@ -38,7 +38,7 @@ std::string Model::InformErrorMsg(std::string msg) {
 void Model::InfileToDb(QueryEngine* qe, DbInit di) {
   std::string proto = qe->GetString("name");
   int lifetime = GetOptionalQuery<int>(qe, "lifetime", -1);
-  di.NewDatum(this, "Model")
+  di.NewDatum("Model")
     ->AddVal("Prototype", proto)
     ->AddVal("Lifetime", lifetime)
     ->Record();
@@ -51,7 +51,7 @@ void Model::InitFrom(QueryBackend* b) {
 }
 
 void Model::Snapshot(DbInit di) {
-  di.NewDatum(this, "Model")
+  di.NewDatum("Model")
     ->AddVal("Prototype", prototype_)
     ->AddVal("Lifetime", lifetime_)
     ->Record();
