@@ -111,7 +111,7 @@ void SimInit::SnapAgent(Model* m) {
     std::string name = it->first;
     std::vector<Resource::Ptr> inv = it->second;
     for (int i = 0; i < inv.size(); ++i) {
-      ctx->NewDatum("AgentState_Inventories")
+      ctx->NewDatum("AgentStateInventories")
       ->AddVal("AgentId", m->id())
       ->AddVal("Time", ctx->time())
       ->AddVal("InventoryName", name)
@@ -187,7 +187,7 @@ void SimInit::LoadPrototypes() {
     conds.push_back(Cond("Time", "==", t_));
     conds.push_back(Cond("AgentId", "==", agentid));
     CondInjector ci(b_, conds);
-    PrefixInjector pi(&ci, "AgentState_");
+    PrefixInjector pi(&ci, "AgentState" + impl);
     m->InitFrom(&pi);
     ctx_->AddPrototype(proto, m);
   }
@@ -230,7 +230,7 @@ void SimInit::LoadInitialAgents() {
       // agent-custom init
       conds.push_back(Cond("Time", "==", t_));
       CondInjector ci(b_, conds);
-      PrefixInjector pi(&ci, "AgentState_");
+      PrefixInjector pi(&ci, "AgentState");
       m->InitFrom(&pi);
 
       SHOW(m->prototype());
@@ -278,7 +278,7 @@ void SimInit::LoadInventories() {
     conds.push_back(Cond("AgentId", "==", m->id()));
     QueryResult qr;
     try {
-      qr = b_->Query("AgentState_Inventories", &conds);
+      qr = b_->Query("AgentStateInventories", &conds);
     } catch (std::exception err) { } // table doesn't exist (okay)
 
     Inventories invs;

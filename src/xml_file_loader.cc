@@ -228,7 +228,7 @@ void XMLFileLoader::LoadInitialAgents() {
       conds.push_back(Cond("SimId", "==", rec_.sim_id()));
       conds.push_back(Cond("AgentId", "==", model->id()));
       CondInjector ci(fb_, conds);
-      PrefixInjector pi(&ci, "AgentState_");
+      PrefixInjector pi(&ci, "AgentState" + module_name);
       model->InitFrom(&pi);
       ctx_->AddPrototype(prototype, model);
     }

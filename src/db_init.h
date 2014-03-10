@@ -9,7 +9,8 @@ class Model;
 
 /// DbInit provides an interface for agents to record data to the output db that
 /// automatically injects the agent's id and current timestep alongside all
-/// recorded data.  The prefix 'AgentState_' is also added to the datum title.
+/// recorded data.  The prefix 'AgentState' + [model_impl] (e.g.
+/// MyReactor) is also added to the datum title.
 class DbInit {
  public:
   DbInit(Model* m);
