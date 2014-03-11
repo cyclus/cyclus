@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
   //SimInit si;
   //FullBackend* b = new SqliteBack("cyclus.sqlite");
   //QueryResult qr = b->Query("Info", NULL);
-  //std::string s = qr.GetVal<std::string>(0, "SimId");
+  //std::string s = qr.GetVal<std::string>("SimId", 0);
   //boost::uuids::string_generator gen;
   //boost::uuids::uuid simid = gen(s);
   //si.Init(b, simid);

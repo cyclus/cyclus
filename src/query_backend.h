@@ -45,14 +45,14 @@ struct QueryResult {
   /// QueryResult qr = ...
   ///
   /// for (int i = 0; i < qr.rows.size(); ++i) {
-  ///   std::cout << qr.GetVal(i, "field1") << "\n";
-  ///   std::cout << qr.GetVal(i, "field2") << "\n";
-  ///   std::cout << qr.GetVal(i, "field3") << "\n";
+  ///   std::cout << qr.GetVal<int>("field1", i) << "\n";
+  ///   std::cout << qr.GetVal<double>("field2", i) << "\n";
+  ///   std::cout << qr.GetVal<std::string>("field3", i) << "\n";
   /// }
   ///
   /// @endcode
   template <class T>
-  T GetVal(int row, std::string field) {
+  T GetVal(std::string field, int row = 0) {
     if (row >= rows.size()) {
       throw KeyError("index larger than number of query rows");
     }
