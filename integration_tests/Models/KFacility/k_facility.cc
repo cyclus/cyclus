@@ -17,10 +17,11 @@ namespace cyclus {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KFacility::KFacility(cyclus::Context* ctx)
     : cyclus::FacilityModel(ctx),
-      out_commod_(""),
+      commod_(""),
       recipe_name_(""),
       commod_price_(0),
-      capacity_(std::numeric_limits<double>::max()) {}
+      k_factor_(1),
+      capacity_(100) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KFacility::~KFacility() {}
@@ -28,17 +29,20 @@ KFacility::~KFacility() {}
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string KFacility::schema() {
   return
-    "  <element name =\"setup\">               \n"
-    "    <element name =\"commodity\">       \n"
-    "      <text/>                             \n"
-    "    </element>                            \n"
+    "  <element name =\"setup\">              \n"
+    "    <element name =\"commodity\">        \n"
+    "      <text/>                            \n"
+    "    </element>                           \n"
+    "    <element name=\"recipe\">            \n"
+    "      <data type=\"string\"/>            \n"
+    "    </element>                           \n"
     "    <element name =\"init_capacity\">    \n"
-    "      <data type=\"double\"/>             \n"
-    "    </element>                            \n"
+    "      <data type=\"double\"/>            \n"
+    "    </element>                           \n"
     "    <element name =\"k_factor\">         \n"
     "      <data type=\"double\">             \n"
     "    </element>                           \n"
-    "  </element>                          \n";
+    "  </element>                             \n";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -49,30 +53,34 @@ void KFacility::InitFrom(cyclus::QueryEngine* qe) {
   using std::string;
   using std::numeric_limits;
   using boost::lexical_cast;
-  cyclus::QueryEngine* output = qe->QueryElement("output");
+  cyclus::QueryEngine* setup = qe->QueryElement("setup");
 
-  recipe(output->GetElementContent("recipe"));
+  recipe(setup->GetElementContent("recipe"));
 
-  string data = output->GetElementContent("outcommodity");
+  string data = setup->GetElementContent("commodity");
   commodity(data);
   cyclus::Commodity commod(data);
   cyclus::CommodityProducer::AddCommodity(commod);
+  KFacility::AddCommodity(data);
 
-  double cap = cyclus::GetOptionalQuery<double>(output,
-                                                "output_capacity",
-                                                numeric_limits<double>::max());
+  double cap = lexical_cast<double>(setup->GetElementContent("init_capacity"));
   cyclus::CommodityProducer::SetCapacity(commod, cap);
   capacity(cap);
+
+  double k = lexical_cast<double>(setup->GetElementContent("k_factor"));
+  k_factor(k);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string KFacility::str() {
   std::stringstream ss;
   ss << cyclus::FacilityModel::str()
-     << " supplies commodity '"
-     << out_commod_ << "' with recipe '"
+     << " supplies and requests commodity '"
+     << commod_ << "' with recipe '"
      << recipe_name_ << "' at a capacity of "
-     << capacity_ << " kg per time step ";
+     << capacity_ << " kg per time step "
+     << ", changing per step by a factor "
+     << k_factor_;
   return ss.str();
 }
 
@@ -89,23 +97,44 @@ void KFacility::InitFrom(KFacility* m) {
   commodity(m->commodity());
   capacity(m->capacity());
   recipe(m->recipe());
+  k_factor(m->k_factor());
   CopyProducedCommoditiesFrom(m);
   current_capacity_ = capacity();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void KFacility::Tick(int time) {
+  using std::string;
+  using std::vector;
   LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is ticking {";
   LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity_
                                    << " kg of "
-                                   << out_commod_ << ".";
+                                   << commod_ << ".";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
   current_capacity_ = capacity_; // reset capacity
+
+  LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
+
+  double requestAmt = RequestAmt();
+  // inform the simulation about what the sink facility will be requesting
+  if (requestAmt > cyclus::eps()) {
+    for (vector<string>::iterator commod = in_commods_.begin();
+         commod != in_commods_.end();
+         commod++) {
+      LOG(cyclus::LEV_INFO4, "SnkFac") << " will request " << requestAmt
+          << " kg of " << *commod << ".";
+    }
+  }
+  LOG(cyclus::LEV_INFO3, "SnkFac") << "}";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void KFacility::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is tocking {";
+  LOG(cyclus::LEV_INFO4, "SrcFac") << "KFacility " << this->id()
+                                   << " is holding " << inventory_.quantity()
+                                   << " units of material at the close of month "
+                                   << time << ".";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
 }
 
@@ -129,11 +158,11 @@ KFacility::GetMatlBids(
 
   std::set<BidPortfolio<Material>::Ptr> ports;
 
-  if (commod_requests.count(out_commod_) > 0) {
+  if (commod_requests.count(commod_) > 0) {
     BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
 
     const std::vector<Request<Material>::Ptr>& requests = commod_requests.at(
-        out_commod_);
+        commod_);
 
     std::vector<Request<Material>::Ptr>::const_iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
@@ -170,7 +199,7 @@ void KFacility::GetMatlTrades(
     responses.push_back(std::make_pair(*it, response));
     LOG(cyclus::LEV_INFO5, "SrcFac") << name() << " just received an order"
                                      << " for " << qty
-                                     << " of " << out_commod_;
+                                     << " of " << commod_;
   }
   if (cyclus::IsNegative(current_capacity_)) {
     std::stringstream ss;
@@ -179,6 +208,92 @@ void KFacility::GetMatlTrades(
     throw cyclus::ValueError(Model::InformErrorMsg(ss.str()));
   }
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
+KFacility::GetMatlRequests() {
+  using cyclus::CapacityConstraint;
+  using cyclus::Material;
+  using cyclus::RequestPortfolio;
+  using cyclus::Request;
+
+  std::set<RequestPortfolio<Material>::Ptr> ports;
+  RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
+  double amt = RequestAmt();
+  std::cout<< amt << std::endl;
+  Material::Ptr mat = Material::CreateBlank(amt);
+
+  if (amt > cyclus::eps()) {
+    CapacityConstraint<Material> cc(amt);
+    port->AddConstraint(cc);
+
+    std::vector<std::string>::const_iterator it;
+    for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
+      std::cout<< *it << std::endl;
+      port->AddRequest(mat, this, *it);
+    }
+
+    ports.insert(port);
+  }  // if amt > eps
+
+  return ports;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::set<cyclus::RequestPortfolio<cyclus::GenericResource>::Ptr>
+KFacility::GetGenRsrcRequests() {
+  using cyclus::CapacityConstraint;
+  using cyclus::GenericResource;
+  using cyclus::RequestPortfolio;
+  using cyclus::Request;
+
+  std::set<RequestPortfolio<GenericResource>::Ptr> ports;
+  RequestPortfolio<GenericResource>::Ptr
+      port(new RequestPortfolio<GenericResource>());
+  double amt = RequestAmt();
+
+  if (amt > cyclus::eps()) {
+    CapacityConstraint<GenericResource> cc(amt);
+    port->AddConstraint(cc);
+
+    std::vector<std::string>::const_iterator it;
+    for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
+      std::string quality = "";  // not clear what this should be..
+      std::string units = "";  // not clear what this should be..
+      GenericResource::Ptr rsrc = GenericResource::CreateUntracked(amt,
+                                                                   quality,
+                                                                   units);
+      port->AddRequest(rsrc, this, *it);
+    }
+
+    ports.insert(port);
+  }  // if amt > eps
+
+  return ports;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void KFacility::AcceptMatlTrades(
+    const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
+    cyclus::Material::Ptr> >& responses) {
+  std::vector< std::pair<cyclus::Trade<cyclus::Material>,
+  cyclus::Material::Ptr> >::const_iterator it;
+  for (it = responses.begin(); it != responses.end(); ++it) {
+    inventory_.Push(it->second);
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void KFacility::AcceptGenRsrcTrades(
+    const std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
+    cyclus::GenericResource::Ptr> >& responses) {
+  std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
+  cyclus::GenericResource::Ptr> >::const_iterator it;
+  for (it = responses.begin(); it != responses.end(); ++it) {
+    inventory_.Push(it->second);
+  }
+}
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Model* ConstructKFacility(cyclus::Context* ctx) {

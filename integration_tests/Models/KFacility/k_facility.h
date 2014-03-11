@@ -7,10 +7,15 @@
 
 #include "bid_portfolio.h"
 #include "commodity_producer.h"
+#include "context.h"
 #include "exchange_context.h"
 #include "facility_model.h"
+#include "generic_resource.h"
+#include "logger.h"
 #include "material.h"
 #include "query_engine.h"
+#include "request_portfolio.h"
+#include "resource_buff.h"
 #include "trade.h"
 
 namespace cyclus {
@@ -106,6 +111,27 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
       const std::vector< cyclus::Trade<cyclus::Material> >& trades,
       std::vector<std::pair<cyclus::Trade<cyclus::Material>,
       cyclus::Material::Ptr> >& responses);
+
+  /// @brief Request Materials of their given commodity. Note
+  /// that it is assumed the facility operates on a single resource type!
+  virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
+      GetMatlRequests();
+
+  /// @brief Request GenericResources of their given
+  /// commodity. Note that it is assumed the facility operates on a single
+  /// resource type!
+  virtual std::set<cyclus::RequestPortfolio<cyclus::GenericResource>::Ptr>
+      GetGenRsrcRequests();
+
+  /// @brief Place accepted trade Materials in their Inventory
+  virtual void AcceptMatlTrades(
+      const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
+      cyclus::Material::Ptr> >& responses);
+
+  /// @brief Place accepted trade Materials in their Inventory
+  virtual void AcceptGenRsrcTrades(
+      const std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
+      cyclus::GenericResource::Ptr> >& responses);
   /* --- */
 
   /* --- KFacility Members --- */
@@ -119,10 +145,14 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
     sets the output commodity name
     @param name the commodity name
     */
-  inline void commodity(std::string name) { out_commod_ = name; }
+  inline void commodity(std::string name) {
+    commod_ = name;
+  }
 
   /// @return the output commodity
-  inline std::string commodity() const { return out_commod_; }
+  inline std::string commodity() const {
+    return commod_;
+  }
 
   /**
     sets the capacity of a material generated at any given time step
@@ -134,25 +164,59 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
   }
 
   /// @return the production capacity at any given time step
-  inline double capacity() const { return capacity_; }
+  inline double capacity() const {
+    return capacity_;
+  }
 
   /**
     sets the name of the recipe to be produced
     @param name the recipe name
     */
-  inline void recipe(std::string name) { recipe_name_ = name; }
+  inline void recipe(std::string name) {
+    recipe_name_ = name;
+  }
 
   /// @return the name of the output recipe
-  inline std::string recipe() const { return recipe_name_; }
+  inline std::string recipe() const {
+    return recipe_name_;
+  }
 
   /// @return the current timestep's capacity
-  inline double current_capacity() const { return current_capacity_; }
+  inline double current_capacity() const {
+    return current_capacity_;
+  }
+
+  /**
+     add a commodity to the set of input commodities
+     @param name the commodity name
+   */
+  inline void AddCommodity(std::string name) {
+    in_commods_.push_back(name);
+  }
+
+  /**
+    determines the amount to request
+    */
+  inline double RequestAmt() const {
+    return capacity_;
+  }
+
+  /// @ return the conversion factor
+  inline double k_factor() const {
+    return k_factor_;
+  }
+
+  /// sets the conversion factor
+  /// @param new conversion factor
+  inline void k_factor(double k_factor){
+    k_factor_ = k_factor;
+  }
 
  private:
   /**
     This facility has only one output commodity
     */
-  std::string out_commod_;
+  std::string commod_;
 
   /**
     Name of the recipe this facility uses.
@@ -176,6 +240,17 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
     Units vary and are in dollars per inventory unit.
     */
   double commod_price_;
+
+  /**
+    Memebers for request operations.
+    */
+  std::vector<std::string> in_commods_;
+  cyclus::ResourceBuff inventory_;
+
+  /**
+    Conversion factor
+    */
+  double k_factor_;
   /* --- */
 };
 
