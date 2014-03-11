@@ -221,13 +221,13 @@ std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
     std::string s = v.cast<Blob>().str();
     return "X'" + StringToHex(s) + "'";
   }
-  CLOG(LEV_ERROR) << "attempted to record unsupported type in backend "
+  CLOG(LEV_ERROR) << "attempted to record unsupported type " << v.type().name() << " in backend "
                   << Name();
-  return "";
+  return "''";
 }
 
-boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type) {
-  boost::spirit::hold_any v;
+boost::any SqliteBack::StringAsVal(std::string s, std::string type) {
+  boost::any v;
   if (type == "INTEGER") {
     v = atoi(s.c_str());
   } else if (type == "REAL") {

@@ -126,8 +126,8 @@ class Model : public StateWrangler {
   /// and agent id's in addition to the snapshot time are automatically included
   /// in all information transfered through di.
   ///
-  /// @warning because a 'Time' field is automatically injected, that label
-  /// cannot be used for any other fields.
+  /// @warning because 'SimId' 'SimTime', and 'AgentId' fields are automatically
+  /// injected, those labels cannot be used for any other fields.
   ///
   /// @warning This method MUST NOT modify the agent's state.
   virtual void Snapshot(DbInit di) = 0;

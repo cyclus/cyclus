@@ -226,6 +226,7 @@ void XMLFileLoader::LoadInitialAgents() {
       rec_.Flush();
       std::vector<Cond> conds;
       conds.push_back(Cond("SimId", "==", rec_.sim_id()));
+      conds.push_back(Cond("SimTime", "==", static_cast<int>(0)));
       conds.push_back(Cond("AgentId", "==", model->id()));
       CondInjector ci(fb_, conds);
       PrefixInjector pi(&ci, "AgentState" + module_name);

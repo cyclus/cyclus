@@ -234,17 +234,17 @@ int main(int argc, char* argv[]) {
   // read input file and setup simulation
   std::string inputFile = vm["input-file"].as<std::string>();
   XMLFileLoader* loader;
-  try {
+  //try {
     if (flat_schema) {
       loader = new XMLFlatLoader(fback, schema_path, inputFile);
     } else {
       loader = new XMLFileLoader(fback, schema_path, inputFile);
     }
     loader->LoadSim();
-  } catch (Error e) {
-    CLOG(LEV_ERROR) << e.what();
-    return 1;
-  }
+  //} catch (Error e) {
+  //  CLOG(LEV_ERROR) << e.what();
+  //  return 1;
+  //}
 
   delete loader;
   return 0;

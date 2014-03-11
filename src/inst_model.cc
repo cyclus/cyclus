@@ -27,6 +27,10 @@ void InstModel::InfileToDb(QueryEngine* qe, DbInit di) {
   Model::InfileToDb(qe, di);
 }
 
+void InstModel::InitFrom(QueryBackend* b) {
+  Model::InitFrom(b);
+}
+
 void InstModel::Snapshot(DbInit di) {
   Model::Snapshot(di);
 }

@@ -73,12 +73,12 @@ boost::uuids::uuid Context::sim_id() {
 }
 
 void Context::AddPrototype(std::string name, Model* p) {
+  protos_[name] = p;
   NewDatum("Prototypes")
     ->AddVal("Prototype", name)
     ->AddVal("AgentId", p->id())
     ->AddVal("Implementation", p->model_impl())
     ->Record();
-  protos_[name] = p;
 }
 
 void Context::AddRecipe(std::string name, Composition::Ptr c) {

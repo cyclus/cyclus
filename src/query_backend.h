@@ -2,6 +2,8 @@
 #define CYCLUS_SRC_QUERY_BACKEND_H_
 
 #include "rec_backend.h"
+#include "any.hpp"
+#include <boost/any.hpp>
 
 namespace cyclus {
 
@@ -23,10 +25,11 @@ class Cond {
   boost::spirit::hold_any val;
 };
 
-typedef std::vector<boost::spirit::hold_any> QueryRow;
+typedef std::vector<boost::any> QueryRow;
 
 /// Meta data and results of a query.
-struct QueryResult {
+class QueryResult {
+ public:
   /// names of each field returned by a query
   std::vector<std::string> fields;
 
@@ -68,7 +71,7 @@ struct QueryResult {
       throw KeyError("query result has no such field " + field);
     }
 
-    return rows[row][field_idx].cast<T>();
+    return boost::any_cast<T>(rows[row][field_idx]);
   };
 };
 

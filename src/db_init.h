@@ -17,7 +17,7 @@ class DbInit {
 
   /// Returns a new datum to be used exactly as the Context::NewDatum method.
   /// Users must not add fields to the datum that are automatically injected:
-  /// 'SimId', 'AgentId', and 'Time'.
+  /// 'SimId', 'AgentId', and 'SimTime'.
   Datum* NewDatum(std::string title);
 
  private:

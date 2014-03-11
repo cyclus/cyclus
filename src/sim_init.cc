@@ -113,7 +113,7 @@ void SimInit::SnapAgent(Model* m) {
     for (int i = 0; i < inv.size(); ++i) {
       ctx->NewDatum("AgentStateInventories")
       ->AddVal("AgentId", m->id())
-      ->AddVal("Time", ctx->time())
+      ->AddVal("SimTime", ctx->time())
       ->AddVal("InventoryName", name)
       ->AddVal("ResourceId", inv[i]->id())
       ->Record();
@@ -184,7 +184,7 @@ void SimInit::LoadPrototypes() {
     m->set_model_impl(impl);
 
     std::vector<Cond> conds;
-    conds.push_back(Cond("Time", "==", t_));
+    conds.push_back(Cond("SimTime", "==", t_));
     conds.push_back(Cond("AgentId", "==", agentid));
     CondInjector ci(b_, conds);
     PrefixInjector pi(&ci, "AgentState" + impl);
@@ -228,7 +228,7 @@ void SimInit::LoadInitialAgents() {
       parentmap[id] = qentry.GetVal<int>("ParentId", i);
 
       // agent-custom init
-      conds.push_back(Cond("Time", "==", t_));
+      conds.push_back(Cond("SimTime", "==", t_));
       CondInjector ci(b_, conds);
       PrefixInjector pi(&ci, "AgentState");
       m->InitFrom(&pi);
@@ -274,12 +274,12 @@ void SimInit::LoadInventories() {
   for (it = agents_.begin(); it != agents_.end(); ++it) {
     Model* m = it->second;
     std::vector<Cond> conds;
-    conds.push_back(Cond("Time", "==", t_));
+    conds.push_back(Cond("SimTime", "==", t_));
     conds.push_back(Cond("AgentId", "==", m->id()));
     QueryResult qr;
     try {
       qr = b_->Query("AgentStateInventories", &conds);
-    } catch (std::exception err) { } // table doesn't exist (okay)
+    } catch (std::exception err) {return;} // table doesn't exist (okay)
 
     Inventories invs;
     for (int i = 0; i < qr.rows.size(); ++i) {
@@ -297,7 +297,7 @@ void SimInit::LoadBuildSched() {
   QueryResult qr;
   try {
     qr = b_->Query("BuildSchedule", &conds);
-  } catch (std::exception err) { } // table doesn't exist (okay)
+  } catch (std::exception err) {return;} // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>("BuildTime", i);
@@ -313,7 +313,7 @@ void SimInit::LoadDecomSched() {
   QueryResult qr;
   try {
     qr = b_->Query("DecomSchedule", &conds);
-  } catch (std::exception err) { } // table doesn't exist (okay)
+  } catch (std::exception err) {return;} // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>("DecomTime", i);

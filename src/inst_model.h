@@ -47,6 +47,8 @@ class InstModel : public Model, public TimeListener {
 
   virtual void InfileToDb(QueryEngine* qe, DbInit di);
 
+  virtual void InitFrom(QueryBackend* b);
+
   virtual void Snapshot(DbInit di);
 
   virtual void InitInv(const Inventories& inv) {};

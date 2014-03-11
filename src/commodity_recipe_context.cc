@@ -47,10 +47,10 @@ void CommodityRecipeContext::InfileToDb(QueryEngine* qe, DbInit di) {
   for (int i = 0; i < nfuel; i++) {
     QueryEngine* fuel = qe->QueryElement("fuel", i);
     di.NewDatum("CommodityRecipeContext_inoutmap")
-      ->AddVal("in_commod", qe->GetString("incommodity"))
-      ->AddVal("in_recipe", qe->GetString("inrecipe"))
-      ->AddVal("out_commod", qe->GetString("outcommodity"))
-      ->AddVal("out_recipe", qe->GetString("outrecipe"))
+      ->AddVal("in_commod", fuel->GetString("incommodity"))
+      ->AddVal("in_recipe", fuel->GetString("inrecipe"))
+      ->AddVal("out_commod", fuel->GetString("outcommodity"))
+      ->AddVal("out_recipe", fuel->GetString("outrecipe"))
       ->Record();
   }
 }
@@ -66,10 +66,10 @@ void CommodityRecipeContext::InitFrom(QueryBackend* b) {
 
   try {
     qr = b->Query("CommodityRecipeContext_resmap", NULL);
-  } catch(std::exception err) {} // table doesn't exist (okay)
+  } catch(std::exception err) {return;} // table doesn't exist (okay)
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string commod = qr.GetVal<std::string>("commod", i);
-    int id = qr.GetVal<int>("id", i);
+    int id = qr.GetVal<int>("res_id", i);
     rsrc_commod_map_[id] = commod;
   }
 }
