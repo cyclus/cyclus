@@ -28,14 +28,16 @@ KFacility::~KFacility() {}
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string KFacility::schema() {
   return
-    "  <element name =\"output\">          \n"
-    "    <ref name=\"outcommodity\"/>      \n"
-    "    <optional>                        \n"
-    "      <ref name=\"output_capacity\"/> \n"
-    "    </optional>                       \n"
-    "    <element name=\"recipe\">         \n"
-    "      <data type=\"string\"/>         \n"
-    "    </element>                        \n"
+    "  <element name =\"setup\">               \n"
+    "    <element name =\"commodity\">       \n"
+    "      <text/>                             \n"
+    "    </element>                            \n"
+    "    <element name =\"init_capacity\">    \n"
+    "      <data type=\"double\"/>             \n"
+    "    </element>                            \n"
+    "    <element name =\"k_factor\">         \n"
+    "      <data type=\"double\">             \n"
+    "    </element>                           \n"
     "  </element>                          \n";
 }
 

@@ -19,13 +19,10 @@ class Context;
 
 /**
   @class KFacility
-  This facility is a source of some commodity with some capacity.
-  This facility is sort of reduced copy of cycamore's source facility.
-  A lot of implementation code is barrowed from cycamore's source facility
-  implementation files.
+  This facility is a source and consumer of some commodity with capacity.
 
   This FacilityModel is intended
-  to be used for Cyclus integration tests as a basic source facility.
+  to be used for Cyclus trivial cycle integration tests.
 
   @section intro Introduction
   Place an introduction to the model here.
