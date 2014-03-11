@@ -46,8 +46,8 @@ void Model::InfileToDb(QueryEngine* qe, DbInit di) {
 
 void Model::InitFrom(QueryBackend* b) {
   QueryResult qr = b->Query("Model", NULL);
-  prototype_ = qr.GetVal<std::string>("Prototype", 0);
-  lifetime_ = qr.GetVal<int>("Lifetime", 0);
+  prototype_ = qr.GetVal<std::string>("Prototype");
+  lifetime_ = qr.GetVal<int>("Lifetime");
 }
 
 void Model::Snapshot(DbInit di) {

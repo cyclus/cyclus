@@ -123,10 +123,10 @@ void SimInit::SnapAgent(Model* m) {
 
 void SimInit::LoadInfo() {
   QueryResult qr = b_->Query("Info", NULL);
-  int dur = qr.GetVal<int>("Duration", 0);
-  int dec = qr.GetVal<int>("DecayInterval", 0);
-  int y0 = qr.GetVal<int>("InitialYear", 0);
-  int m0 = qr.GetVal<int>("InitialMonth", 0);
+  int dur = qr.GetVal<int>("Duration");
+  int dec = qr.GetVal<int>("DecayInterval");
+  int y0 = qr.GetVal<int>("InitialYear");
+  int m0 = qr.GetVal<int>("InitialMonth");
   ctx_->InitSim(SimInfo(dur, y0, m0, dec));
 }
 
@@ -327,7 +327,7 @@ void SimInit::LoadNextIds() {
   conds.push_back(Cond("Time", "==", t_));
   QueryResult qr = b_->Query("NextIds", &conds);
   for (int i = 0; i < qr.rows.size(); ++i) {
-    std::string obj = qr.GetVal<std::string>("Object", 0);
+    std::string obj = qr.GetVal<std::string>("Object");
     if (obj == "Agent") {
       Model::next_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Transaction") {
@@ -348,7 +348,7 @@ Resource::Ptr SimInit::LoadResource(int resid) {
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", resid));
   QueryResult qr = b_->Query("Resources", &conds);
-  ResourceType type = qr.GetVal<ResourceType>("Type", 0);
+  ResourceType type = qr.GetVal<ResourceType>("Type");
 
   if (type == Material::kType) {
     return LoadMaterial(resid);
@@ -364,14 +364,14 @@ Resource::Ptr SimInit::LoadMaterial(int resid) {
   conds.push_back(Cond("ResourceId", "==", resid));
   conds.push_back(Cond("Time", "==", t_));
   QueryResult qr = b_->Query("MaterialInfo", &conds);
-  int prev_decay = qr.GetVal<int>("PrevDecayTime", 0);
+  int prev_decay = qr.GetVal<int>("PrevDecayTime");
 
   // get general resource object info
   conds.clear();
   conds.push_back(Cond("ResourceId", "==", resid));
   qr = b_->Query("Resources", &conds);
-  double qty = qr.GetVal<double>("Quantity", 0);
-  int stateid = qr.GetVal<int>("StateId", 0);
+  double qty = qr.GetVal<double>("Quantity");
+  int stateid = qr.GetVal<int>("StateId");
 
   // create the composition and material
   Composition::Ptr comp = LoadComposition(stateid);
@@ -401,14 +401,14 @@ Resource::Ptr SimInit::LoadGenericResource(int resid) {
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", resid));
   QueryResult qr = b_->Query("Resources", &conds);
-  double qty = qr.GetVal<double>("Quantity", 0);
-  int stateid = qr.GetVal<int>("StateId", 0);
+  double qty = qr.GetVal<double>("Quantity");
+  int stateid = qr.GetVal<int>("StateId");
 
   // get special GenericResource internal state
   conds.clear();
   conds.push_back(Cond("StateId", "==", stateid));
   qr = b_->Query("GenericResources", &conds);
-  std::string quality = qr.GetVal<std::string>("Quality", 0);
+  std::string quality = qr.GetVal<std::string>("Quality");
 
   // set static quality-stateid map to have same vals as db
   GenericResource::stateids_[quality] = stateid;
