@@ -31,12 +31,6 @@ Material::Ptr Material::CreateUntracked(double quantity,
   return m;
 }
 
-Material::Ptr Material::CreateBlank(double quantity) {
-  CompMap cm;
-  Composition::Ptr comp = Composition::CreateFromMass(cm);  
-  return CreateUntracked(quantity, comp);
-}
-
 int Material::state_id() const {
   return comp_->id();
 }
@@ -170,6 +164,11 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c)
   } else {
     tracker_.DontTrack();
   }
+}
+
+Material::Ptr NewBlankMaterial(double quantity) {
+  Composition::Ptr comp = Composition::CreateFromMass(CompMap());  
+  return Material::CreateUntracked(quantity, comp);
 }
 
 } // namespace cyclus
