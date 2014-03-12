@@ -7,6 +7,29 @@ import tables
 import numpy as np
 from tools import check_cmd
 
+def create_sim_input(ref_input, k_factor):
+    """ Creates xml input file from a reference xml input file.
+    Changes k_factor.
+
+    Returns: the path to the created file
+    """
+    # File to be creted
+    fw_path = ref_input.split(".xml")[0] + "_" + str(k_factor) + ".xml"
+    fw = open(fw_path, "w")
+    fr = open(ref_input, "r")
+    for f in fr:
+        if f.count("k_factor"):
+            f = f.split("<")[0] + "<k_factor>" + str(k_factor) +"</k_factor>\n"
+
+        fw.write(f)
+
+    # Closing open files
+    fr.close()
+    fw.close()
+
+    return fw_path
+
+
 """ Tests """
 def test_source_to_sink():
     """ Tests simulations with a facilty that has a conversion factor.
@@ -16,15 +39,13 @@ def test_source_to_sink():
     code and tests.
     """
     # Cyclus simulation input for source_to_sink
-    sim_inputs = ["./Inputs/trivial_cycle_deplete.xml",
-                  "./Inputs/trivial_cycle_steady.xml",
-                  "./Inputs/trivial_cycle_growth.xml"]
+    ref_input = "./Inputs/trivial_cycle.xml"
     # Conversion factors for the three simulations
     k_factors = [0.5, 1, 2]
 
-    sim_info = zip(sim_inputs, k_factors)
+    for k_factor in k_factors:
+        sim_input = create_sim_input(ref_input, k_factor)
 
-    for sim_input, k_factor in sim_info:
         holdsrtn = [1]  # needed because nose does not send() to test generator
         cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
         check_cmd(cmd, '.', holdsrtn)
@@ -47,6 +68,7 @@ def test_source_to_sink():
         if not tables_there:
             output.close()
             os.remove("./output_temp.h5")
+            os.remove(sim_input)
             return
 
         # Get specific tables and columns
@@ -74,7 +96,7 @@ def test_source_to_sink():
         expected_sender_array = np.empty(sender_ids.size)
         expected_sender_array.fill(facility_id)
         expected_receiver_array = np.empty(receiver_ids.size)
-        expected_receiver_array.fill(sink_id)
+        expected_receiver_array.fill(facility_id)
         yield assert_array_equal, sender_ids, expected_sender_array
         yield assert_array_equal, receiver_ids, expected_receiver_array
 
@@ -96,3 +118,4 @@ def test_source_to_sink():
 
         output.close()
         os.remove("./output_temp.h5")
+        os.remove(sim_input)
