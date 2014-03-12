@@ -239,13 +239,13 @@ void SimInit::LoadInitialAgents() {
     int parentid = parentmap[id];
 
     if (parentid == -1) { // root agent
-      m->BuildInner(NULL);
+      m->Connect(NULL);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
       m->DoRegistration();
     } else if (agents_.count(parentid) > 0) { // parent is built
-      m->BuildInner(agents_[parentid]);
+      m->Connect(agents_[parentid]);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);

@@ -114,13 +114,13 @@ void Model::Build(Model* parent) {
   CLOG(LEV_DEBUG3) << " * Implementation: " << model_impl_;
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
-  BuildInner(parent);
+  Connect(parent);
   enter_time_ = ctx_->time();
   DoRegistration();
   this->AddToTable();
 }
 
-void Model::BuildInner(Model* parent) {
+void Model::Connect(Model* parent) {
   if (parent == this) {
     throw KeyError("Model " + prototype() +
                    "is trying to add itself as its own child.");

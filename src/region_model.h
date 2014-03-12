@@ -82,7 +82,7 @@ class RegionModel : public Model, public TimeListener {
 
   virtual void InitInv(const Inventories& inv) {};
 
-  virtual Inventories SnapshotInv() {return Inventories();};
+  virtual Inventories SnapshotInv() { return Inventories(); };
 
   /**
      perform actions required when entering the simulation

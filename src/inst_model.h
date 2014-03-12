@@ -53,7 +53,7 @@ class InstModel : public Model, public TimeListener {
 
   virtual void InitInv(const Inventories& inv) {};
 
-  virtual Inventories SnapshotInv() {return Inventories();};
+  virtual Inventories SnapshotInv() { return Inventories(); };
 
   /**
      every model should be able to print a verbose description

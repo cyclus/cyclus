@@ -74,7 +74,7 @@ class Model : public StateWrangler {
   /// Translates info for a model from an input file to the database by reading
   /// parameters from the passed QueryEngine and recording data via the DbInit
   /// variable.  The simulation and agent id's are automatically injected in all
-  /// data transfered through di.  This method must be implemented by all
+  /// data transfered through DbInit.  This method must be implemented by all
   /// agents.  This method must call the superclass' InfileToDb method before
   /// doing any other work.
   ///
@@ -121,10 +121,10 @@ class Model : public StateWrangler {
   /// @warning Agents must NOT create any resource objects in this method.
   virtual void InitFrom(QueryBackend* b);
 
-  /// Snapshots agent-internal state to the output db via di. This method MUST
+  /// Snapshots agent-internal state to the output db via DbInit. This method MUST
   /// call the superclass' Snapshot method before doing any work. The simulation
   /// and agent id's in addition to the snapshot time are automatically included
-  /// in all information transfered through di.
+  /// in all information transfered through DbInit.
   ///
   /// @warning because 'SimId' 'SimTime', and 'AgentId' fields are automatically
   /// injected, those labels cannot be used for any other fields.
@@ -282,8 +282,8 @@ class Model : public StateWrangler {
   /// adds an agent to the transactiont table
   void AddToTable();
 
-  /// Builds an agent - without recording any output data
-  void BuildInner(Model* parent);
+  /// connects an agent to its parent.
+  void Connect(Model* parent);
 
   /// Stores the next available facility ID
   static int next_id_;

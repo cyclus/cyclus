@@ -26,8 +26,12 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 SqliteBack::~SqliteBack() {
-  Flush();
-  db_.close();
+  try {
+    Flush();
+    db_.close();
+  } catch(Error err) {
+    CLOG(LEV_ERROR) << "Error in SqliteBack destructor: " << err.what();
+  }
 }
 
 SqliteBack::SqliteBack(std::string path) : db_(path) {
