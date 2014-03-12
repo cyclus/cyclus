@@ -61,7 +61,7 @@ void KFacility::InitFrom(cyclus::QueryEngine* qe) {
   commodity(data);
   cyclus::Commodity commod(data);
   cyclus::CommodityProducer::AddCommodity(commod);
-  KFacility::AddCommodity(data);
+  AddCommodity(commod_);
 
   double cap = lexical_cast<double>(setup->GetElementContent("init_capacity"));
   cyclus::CommodityProducer::SetCapacity(commod, cap);
@@ -98,6 +98,7 @@ void KFacility::InitFrom(KFacility* m) {
   capacity(m->capacity());
   recipe(m->recipe());
   k_factor(m->k_factor());
+  in_commods_ = m->in_commods_;
   CopyProducedCommoditiesFrom(m);
   current_capacity_ = capacity();
 }
@@ -220,7 +221,6 @@ KFacility::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
   double amt = RequestAmt();
-  std::cout<< amt << std::endl;
   Material::Ptr mat = Material::CreateBlank(amt);
 
   if (amt > cyclus::eps()) {
@@ -229,7 +229,6 @@ KFacility::GetMatlRequests() {
 
     std::vector<std::string>::const_iterator it;
     for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
-      std::cout<< *it << std::endl;
       port->AddRequest(mat, this, *it);
     }
 
