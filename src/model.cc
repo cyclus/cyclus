@@ -175,8 +175,8 @@ void Model::AddToTable() {
   ->AddVal("Kind", kind_)
   ->AddVal("Implementation", model_impl_)
   ->AddVal("Prototype", prototype_)
-  ->AddVal("Lifetime", lifetime_)
   ->AddVal("ParentId", parent_id_)
+  ->AddVal("Lifetime", lifetime_)
   ->AddVal("EnterTime", enter_time_)
   ->Record();
 }

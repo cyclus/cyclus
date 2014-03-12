@@ -35,6 +35,7 @@ void SimInit::Branch(QueryBackend* b, boost::uuids::uuid prev_sim_id,
 }
 
 void SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
+  rec_->set_dump_count(10000); // this recorder is "real" and gets bigger buf
   ctx_ = new Context(&ti_, rec_);
 
   std::vector<Cond> conds;
