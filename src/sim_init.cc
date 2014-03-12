@@ -4,9 +4,6 @@
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
 
-#define SHOW(X) \
-  std::cout << __FILE__ << ":" << __LINE__ << ": "#X" = " << X << "\n"
-
 namespace cyclus {
 
 SimInit::SimInit() : rec_(NULL), ctx_(NULL) {}
@@ -208,7 +205,6 @@ void SimInit::LoadInitialAgents() {
   for (int i = 0; i < qentry.rows.size(); ++i) {
 
     int id = qentry.GetVal<int>("AgentId", i);
-    SHOW(id);
     std::vector<Cond> conds;
     conds.push_back(Cond("AgentId", "==", id));
     QueryResult qexit;
@@ -232,12 +228,6 @@ void SimInit::LoadInitialAgents() {
       CondInjector ci(b_, conds);
       PrefixInjector pi(&ci, "AgentState");
       m->InitFrom(&pi);
-
-      SHOW(m->prototype());
-      SHOW(m->model_impl_);
-      SHOW(m->lifetime());
-      SHOW(m->kind());
-      SHOW(m->enter_time());
     }
   }
 
