@@ -26,7 +26,11 @@ CsvBack::CsvBack(std::string path, bool overwrite) : path_(path) {
 }
 
 CsvBack::~CsvBack() {
-  Flush();
+  try {
+    Flush();
+  } catch(std::exception err) {
+    CLOG(LEV_ERROR) << "Error in CsvBack destructor: " << err.what();
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
