@@ -14,6 +14,15 @@ typedef Model* ModelCtor(Context*);
 
 class DynamicModule {
  public:
+  /// Convenience class for using a stack variable to auto-destruct all loaded
+  /// dynamic modules.
+  class Closer {
+   public:
+    ~Closer() {
+      CloseAll();
+    };
+  };
+
   /// Returns a newly constructed model for the given module name.
   static Model* Make(Context* ctx, std::string name);
 

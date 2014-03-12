@@ -27,14 +27,8 @@ using namespace cyclus;
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  //SimInit si;
-  //FullBackend* b = new SqliteBack("cyclus.sqlite");
-  //QueryResult qr = b->Query("Info", NULL);
-  //std::string s = qr.GetVal<std::string>("SimId");
-  //boost::uuids::string_generator gen;
-  //boost::uuids::uuid simid = gen(s);
-  //si.Init(b, simid);
-  //return 0;
+  // close all dlopen'd modules AFTER everything else destructs
+  DynamicModule::Closer cl;
 
   // verbosity help msg
   std::string vmessage = "output log verbosity. Can be text:\n\n";
@@ -84,9 +78,6 @@ int main(int argc, char* argv[]) {
   po::notify(vm);
 
   // setup context
-  Recorder rec;
-  Timer ti;
-  Context* ctx = new Context(&ti, &rec);
 
   std::string schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
   bool flat_schema = false;
@@ -133,6 +124,9 @@ int main(int argc, char* argv[]) {
   } else if (vm.count("module-schema")) {
     std::string name(vm["module-schema"].as<std::string>());
     try {
+      Recorder rec;
+      Timer ti;
+      Context* ctx = new Context(&ti, &rec);
       Model* m = DynamicModule::Make(ctx, name);
       std::cout << "<element name=\"" << name << "\">\n";
       std::cout << m->schema();
@@ -172,8 +166,6 @@ int main(int argc, char* argv[]) {
   std::cout << "          iCCCCCLCf                                                           " << std::endl;
   std::cout << "           .  C. ,                                                            " << std::endl;
   std::cout << "              :                                                               " << std::endl;
-
-  bool success = true;
 
   if (vm.count("no-model")) {
     Logger::NoModel() = true;
@@ -218,60 +210,53 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  // create db backends
   FullBackend* fback = new SqliteBack(output_path);
-  rec.RegisterBackend(fback);
-
   RecBackend* rback = NULL;
   std::string ext = fs::path(output_path).extension().generic_string();
   if (ext == ".h5") { // not queryable
     rback = new Hdf5Back(output_path.c_str());
-    rec.RegisterBackend(rback);
   } else if (ext == ".csv") { // not queryable
     rback = new CsvBack(output_path.c_str());
-    rec.RegisterBackend(rback);
   }
 
-  // read input file and setup simulation
+  // read input file and initialize db from input file
   std::string inputFile = vm["input-file"].as<std::string>();
-  XMLFileLoader* loader;
-  //try {
+  boost::uuids::uuid simid;
+  try {
     if (flat_schema) {
-      loader = new XMLFlatLoader(fback, schema_path, inputFile);
+      XMLFlatLoader l(fback, schema_path, inputFile);
+      simid = l.LoadSim();
     } else {
-      loader = new XMLFileLoader(fback, schema_path, inputFile);
+      XMLFileLoader l(fback, schema_path, inputFile);
+      simid = l.LoadSim();
     }
-    loader->LoadSim();
-  //} catch (Error e) {
-  //  CLOG(LEV_ERROR) << e.what();
-  //  return 1;
-  //}
+  } catch (Error e) {
+    CLOG(LEV_ERROR) << e.what();
+    return 1;
+  }
 
-  delete loader;
-  return 0;
+  // initialize sim from output db
+  SimInit si;
+  si.Init(fback, simid);
+  si.recorder()->RegisterBackend(fback);
+  if (rback != NULL) {
+    si.recorder()->RegisterBackend(rback);
+  }
 
   // Run the simulation
-  ti.RunSim();
+  si.timer()->RunSim();
 
-  if (!success) {
-    std::cout << std::endl;
-    std::cout << "WARNING: Cyclus run *not* successful!" << std::endl;
-    std::cout << std::endl;
-    return 1;
+  delete fback;
+  if (rback != NULL) {
+    delete rback;
   }
 
   std::cout << std::endl;
   std::cout << "Status: Cyclus run successful!" << std::endl;
   std::cout << "Output location: " << output_path << std::endl;
   std::cout << "Simulation ID: " << boost::lexical_cast<std::string>
-            (ctx->sim_id()) << std::endl;
-
-  delete ctx;
-  rec.Close();
-  delete fback;
-  if (rback != NULL) {
-    delete rback;
-  }
-  delete loader;
+               (si.context()->sim_id()) << std::endl;
 
   return 0;
 }

@@ -125,7 +125,7 @@ std::string XMLFileLoader::master_schema() {
   return BuildMasterSchema(schema_path_);
 }
 
-void XMLFileLoader::LoadSim() {
+boost::uuids::uuid XMLFileLoader::LoadSim() {
   std::stringstream ss(master_schema());
   parser_->Validate(ss);
   LoadControlParams(); // must be first
@@ -133,6 +133,7 @@ void XMLFileLoader::LoadSim() {
   LoadRecipes();
   LoadInitialAgents(); // must be last
   ctx_->Snapshot();
+  return rec_.sim_id();
 };
 
 void XMLFileLoader::LoadSolver() {

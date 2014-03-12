@@ -47,7 +47,7 @@ class XMLFileLoader {
   /// Load an entire simulation from the inputfile.
   ///
   /// @param use_flat_schema whether or not to use the flat schema
-  virtual void LoadSim();
+  virtual boost::uuids::uuid LoadSim();
 
  protected:
   /// Method to load the simulation exchange solver.
