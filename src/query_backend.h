@@ -17,7 +17,7 @@ class Cond {
   /// table column name
   std::string field;
 
-  /// One of: "<", ">", "<=", ">=", "=="
+  /// One of: "<", ">", "<=", ">=", "==", "!="
   std::string op;
 
   /// value supported by backend(s) in use
