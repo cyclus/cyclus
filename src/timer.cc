@@ -8,6 +8,7 @@
 #include "error.h"
 #include "logger.h"
 #include "model.h"
+#include "sim_init.h"
 
 namespace cyclus {
 
@@ -30,6 +31,11 @@ void Timer::RunSim() {
     DoResEx(&matl_manager, &genrsrc_manager);
     DoTock();
     DoDecom();
+
+    if (want_snapshot_) {
+      want_snapshot_ = false;
+      SimInit::Snapshot(ctx_);
+    }
 
     time_++;
   }
@@ -131,7 +137,7 @@ int Timer::dur() {
   return si_.duration;
 }
 
-Timer::Timer() : time_(0), si_(0) {}
+Timer::Timer() : time_(0), si_(0), want_snapshot_(false) {}
 
 } // namespace cyclus
 

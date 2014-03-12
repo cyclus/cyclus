@@ -17,6 +17,7 @@
 #include "logger.h"
 #include "model.h"
 #include "query_engine.h"
+#include "sim_init.h"
 
 #include "xml_file_loader.h"
 
@@ -132,7 +133,7 @@ boost::uuids::uuid XMLFileLoader::LoadSim() {
   LoadSolver();
   LoadRecipes();
   LoadInitialAgents(); // must be last
-  ctx_->Snapshot();
+  SimInit::Snapshot(ctx_);
   return rec_.sim_id();
 };
 

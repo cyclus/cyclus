@@ -126,7 +126,7 @@ Datum* Context::NewDatum(std::string title) {
 }
 
 void Context::Snapshot() {
-  SimInit::Snapshot(this);
+  ti_->Snapshot();
 }
 
 }  // namespace cyclus

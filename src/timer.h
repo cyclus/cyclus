@@ -19,7 +19,6 @@ class Model;
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
  public:
-
   Timer();
 
   /// Sets intial time-related parameters for the simulation.
@@ -49,6 +48,9 @@ class Timer {
   /// Schedules the given Model to be decommissioned at the specified
   /// timestep t.
   void SchedDecom(Model* m, int time);
+
+  /// Makes a snapshot of the simulation state to the output database.
+  void Snapshot() { want_snapshot_ = true; };
 
   /// Returns the current time, in months since the simulation started.
   ///
@@ -86,6 +88,8 @@ class Timer {
   int time_;
 
   SimInfo si_;
+
+  bool want_snapshot_;
 
   /// Concrete models that desire to receive tick and tock notifications
   std::set<TimeListener*> tickers_;
