@@ -138,7 +138,7 @@ class Model : public StateWrangler {
   /// populate the corresponding resource containers.
   ///
   /// @warning agents should not modify any state outside the container filling
-  virtual void InitInv(const Inventories& inv) = 0;
+  virtual void InitInv(Inventories& inv) = 0;
 
   /// Snapshots and agent's resource inventories to the output db. The set of
   /// resources in each container should be stored under a string key specific

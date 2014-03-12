@@ -23,7 +23,7 @@ void StubFacility::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
   //     ->Record();
 }
 
-void StubFacility::InitInv(const cyclus::Inventories& inv) {
+void StubFacility::InitInv(cyclus::Inventories& inv) {
   // populate all resource containers with resources in inv
 }
 

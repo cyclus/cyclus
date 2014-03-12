@@ -51,7 +51,7 @@ class DonutShop : public Model {
   };
 
   virtual void Snapshot(cyclus::DbInit di) {};
-  virtual void InitInv(const cyclus::Inventories& inv) {};
+  virtual void InitInv(cyclus::Inventories& inv) {};
   virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
 
   static int destruct_count;

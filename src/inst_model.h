@@ -51,7 +51,7 @@ class InstModel : public Model, public TimeListener {
 
   virtual void Snapshot(DbInit di);
 
-  virtual void InitInv(const Inventories& inv) {};
+  virtual void InitInv(Inventories& inv) {};
 
   virtual Inventories SnapshotInv() { return Inventories(); };
 

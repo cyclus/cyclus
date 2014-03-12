@@ -54,7 +54,7 @@ class StubFacility : public cyclus::FacilityModel  {
     */
   virtual void InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di);
 
-  virtual void InitInv(const cyclus::Inventories& inv);
+  virtual void InitInv(cyclus::Inventories& inv);
 
   virtual cyclus::Inventories SnapshotInv();
 
