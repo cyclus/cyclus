@@ -137,6 +137,9 @@ void KFacility::Tock(int time) {
                                    << " units of material at the close of month "
                                    << time << ".";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
+  // Update capacity for the next step
+  capacity_ = capacity_ * k_factor_;
+  current_capacity_ = capacity_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
