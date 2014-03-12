@@ -40,7 +40,7 @@ std::string KFacility::schema() {
     "      <data type=\"double\"/>            \n"
     "    </element>                           \n"
     "    <element name =\"k_factor\">         \n"
-    "      <data type=\"double\">             \n"
+    "      <data type=\"double\"/>            \n"
     "    </element>                           \n"
     "  </element>                             \n";
 }
