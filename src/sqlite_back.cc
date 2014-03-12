@@ -226,8 +226,8 @@ std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
   return "''";
 }
 
-boost::any SqliteBack::StringAsVal(std::string s, std::string type) {
-  boost::any v;
+boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type) {
+  boost::spirit::hold_any v;
   if (type == "INTEGER") {
     v = atoi(s.c_str());
   } else if (type == "REAL") {

@@ -3,7 +3,6 @@
 
 #include "rec_backend.h"
 #include "any.hpp"
-#include <boost/any.hpp>
 
 namespace cyclus {
 
@@ -25,7 +24,7 @@ class Cond {
   boost::spirit::hold_any val;
 };
 
-typedef std::vector<boost::any> QueryRow;
+typedef std::vector<boost::spirit::hold_any> QueryRow;
 
 /// Meta data and results of a query.
 class QueryResult {
@@ -38,6 +37,12 @@ class QueryResult {
 
   /// ordered results of a query
   std::vector<QueryRow> rows;
+
+  void Reset() {
+    fields.clear();
+    types.clear();
+    rows.clear();
+  };
 
   /// Convenience method for retrieving a value from a specific row and named
   /// field (column). The caller is responsible for specifying a valid templated
@@ -71,7 +76,7 @@ class QueryResult {
       throw KeyError("query result has no such field " + field);
     }
 
-    return boost::any_cast<T>(rows[row][field_idx]);
+    return rows[row][field_idx].cast<T>();
   };
 };
 

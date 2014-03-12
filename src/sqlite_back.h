@@ -53,7 +53,7 @@ class SqliteBack: public FullBackend {
 
   /// converts the string value in s to a c++ value corresponding the the
   /// supported sqlite datatype type in a hold_any object.
-  boost::any StringAsVal(std::string s, std::string type);
+  boost::spirit::hold_any StringAsVal(std::string s, std::string type);
 
   /// Queue up a table-create command for d.
   void CreateTable(Datum* d);
