@@ -10,13 +10,11 @@
 #include "csv_back.h"
 #include "cyclus.h"
 #include "hdf5_back.h"
+#include "query_backend.h"
+#include "sim_init.h"
 #include "sqlite_back.h"
 #include "xml_file_loader.h"
 #include "xml_flat_loader.h"
-
-#include "sim_init.h"
-#include "query_backend.h"
-#include <boost/uuid/uuid_generators.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
