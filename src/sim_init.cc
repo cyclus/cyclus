@@ -226,7 +226,7 @@ void SimInit::LoadInitialAgents() {
       // agent-custom init
       conds.push_back(Cond("SimTime", "==", t_));
       CondInjector ci(b_, conds);
-      PrefixInjector pi(&ci, "AgentState");
+      PrefixInjector pi(&ci, "AgentState" + m->model_impl());
       m->InitFrom(&pi);
     }
   }

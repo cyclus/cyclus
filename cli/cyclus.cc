@@ -110,12 +110,15 @@ int main(int argc, char* argv[]) {
 
   // create db backends
   FullBackend* fback = new SqliteBack(ai.output_path);
+  RecBackend::Deleter bdel(fback);
   RecBackend* rback = NULL;
   std::string ext = fs::path(ai.output_path).extension().generic_string();
   if (ext == ".h5") { // not queryable
     rback = new Hdf5Back(ai.output_path.c_str());
+    bdel.Add(rback);
   } else if (ext == ".csv") { // not queryable
     rback = new CsvBack(ai.output_path.c_str());
+    bdel.Add(rback);
   }
 
   // read input file and initialize db from input file
@@ -143,11 +146,6 @@ int main(int argc, char* argv[]) {
 
   // Run the simulation
   si.timer()->RunSim();
-
-  delete fback;
-  if (rback != NULL) {
-    delete rback;
-  }
 
   std::cout << std::endl;
   std::cout << "Status: Cyclus run successful!" << std::endl;

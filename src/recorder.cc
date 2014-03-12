@@ -23,6 +23,7 @@ Recorder::Recorder(boost::uuids::uuid simid)
 }
 
 Recorder::~Recorder() {
+  Flush();
   for (int i = 0; i < data_.size(); ++i) {
     delete data_[i];
   }
@@ -71,6 +72,7 @@ void Recorder::Flush() {
   std::list<RecBackend*>::iterator it;
   for (it = backs_.begin(); it != backs_.end(); it++) {
     (*it)->Notify(tmp);
+    (*it)->Flush();
   }
 }
 
@@ -87,17 +89,8 @@ void Recorder::RegisterBackend(RecBackend* b) {
 }
 
 void Recorder::Close() {
-  for (int i = index_; i < data_.size(); ++i) {
-    delete data_[i];
-  }
-  data_.resize(index_);
-  NotifyBackends();
-  std::list<RecBackend*>::iterator it;
-  for (it = backs_.begin(); it != backs_.end(); it++) {
-    (*it)->Flush();
-  }
+  Flush();
   backs_.clear();
-  set_dump_count(kDefaultDumpCount);
 }
 } // namespace cyclus
 
