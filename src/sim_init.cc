@@ -3,8 +3,15 @@
 
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
+#include "region_model.h"
 
 namespace cyclus {
+
+class Dummy : public RegionModel {
+ public:
+  Dummy(Context* ctx) : RegionModel(ctx) {};
+  Dummy* Clone() { return NULL; };
+};
 
 SimInit::SimInit() : rec_(NULL), ctx_(NULL) {}
 
@@ -366,7 +373,7 @@ Resource::Ptr SimInit::LoadMaterial(int resid) {
 
   // create the composition and material
   Composition::Ptr comp = LoadComposition(stateid);
-  Model* dummy;
+  Model* dummy = new Dummy(ctx_);
   Material::Ptr mat = Material::Create(dummy, qty, comp);
   mat->id_ = resid;
   mat->prev_decay_time_ = prev_decay;
@@ -404,7 +411,7 @@ Resource::Ptr SimInit::LoadGenericResource(int resid) {
   // set static quality-stateid map to have same vals as db
   GenericResource::stateids_[quality] = stateid;
 
-  Model* dummy;
+  Model* dummy = new Dummy(ctx_);
   return GenericResource::Create(dummy, qty, quality);
 }
 

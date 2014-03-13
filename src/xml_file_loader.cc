@@ -134,6 +134,7 @@ boost::uuids::uuid XMLFileLoader::LoadSim() {
   LoadRecipes();
   LoadInitialAgents(); // must be last
   SimInit::Snapshot(ctx_);
+  rec_.Flush();
   return rec_.sim_id();
 };
 
