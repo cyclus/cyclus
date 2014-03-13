@@ -36,10 +36,11 @@ Composition::Ptr ReadRecipe(QueryEngine* qe);
 /// ever be initialized per XMLFileLoader object.
 class XMLFileLoader {
  public:
-  /// Create a new loader reading from the xml simulation input file and writing
-  /// to and initializing the backend database b. schema_file identifies the
-  /// master xml rng schema used to validate the input file.
-  XMLFileLoader(FullBackend* b, std::string schema_file,
+  // Create a new loader reading from the xml simulation input file and writing
+  // to and initializing the backends in r. r must already have b registered. r
+  // should NOT be used to run an actual simulation. schema_file identifies the
+  // master xml rng schema used to validate the input file.
+  XMLFileLoader(Recorder* r, QueryBackend* b, std::string schema_file,
                 const std::string input_file = "");
 
   virtual ~XMLFileLoader();
@@ -77,10 +78,10 @@ class XMLFileLoader {
   /// translated and stored in the output db.
   Model* BuildAgent(std::string proto, Model* parent);
 
-  Recorder rec_;
+  Recorder* rec_;
   Timer ti_;
   Context* ctx_;
-  FullBackend* fb_;
+  QueryBackend* b_;
 
   /// filepath to the schema
   std::string schema_path_;

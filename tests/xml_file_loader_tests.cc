@@ -18,6 +18,7 @@ using cyclus::XMLFileLoader;
 void XMLFileLoaderTests::SetUp() {
   schema_path = cyclus::Env::GetInstallPath() + "/share/cyclus.rng.in";
   b_ = new cyclus::SqliteBack("xmlfileloadtestdb.sqlite");
+  rec_.RegisterBackend(b_);
 
   falseFile = "false.xml";
   CreateTestInputFile(falseFile, FalseSequence());
@@ -143,10 +144,10 @@ std::string XMLFileLoaderTests::ControlSchema() {
 }
 
 TEST_F(XMLFileLoaderTests, openfile) {
-  EXPECT_NO_THROW(XMLFileLoader file(b_, schema_path, controlFile));
+  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, controlFile));
 }
 
 TEST_F(XMLFileLoaderTests, throws) {
-  EXPECT_THROW(XMLFileLoader file(b_, schema_path, "blah"), cyclus::IOError);
+  EXPECT_THROW(XMLFileLoader file(&rec_, b_, schema_path, "blah"), cyclus::IOError);
 }
 

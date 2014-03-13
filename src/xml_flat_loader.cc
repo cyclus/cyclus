@@ -60,11 +60,11 @@ void XMLFlatLoader::LoadInitialAgents() {
     Model* model = DynamicModule::Make(ctx_, module_name);
     model->set_model_impl(module_name);
     model->InfileToDb(qe, DbInit(model));
-    rec_.Flush();
+    rec_->Flush();
     std::vector<Cond> conds;
-    conds.push_back(Cond("SimId", "==", rec_.sim_id()));
+    conds.push_back(Cond("SimId", "==", rec_->sim_id()));
     conds.push_back(Cond("AgentId", "==", model->id()));
-    CondInjector ci(fb_, conds);
+    CondInjector ci(b_, conds);
     PrefixInjector pi(&ci, "AgentState" + module_name);
     model->InitFrom(&pi);
     ctx_->AddPrototype(prototype, model);

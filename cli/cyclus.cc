@@ -122,11 +122,16 @@ int main(int argc, char* argv[]) {
   // read input file and initialize db from input file
   boost::uuids::uuid simid;
   try {
+    Recorder temp_rec;
+    temp_rec.RegisterBackend(fback);
+    if (rback != NULL) {
+      temp_rec.RegisterBackend(rback);
+    }
     if (ai.flat_schema) {
-      XMLFlatLoader l(fback, ai.schema_path, infile);
+      XMLFlatLoader l(&temp_rec, fback, ai.schema_path, infile);
       simid = l.LoadSim();
     } else {
-      XMLFileLoader l(fback, ai.schema_path, infile);
+      XMLFileLoader l(&temp_rec, fback, ai.schema_path, infile);
       simid = l.LoadSim();
     }
   } catch (Error e) {

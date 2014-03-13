@@ -99,11 +99,11 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   }
 }
 
-XMLFileLoader::XMLFileLoader(FullBackend* b,
+XMLFileLoader::XMLFileLoader(Recorder* r,
+                             QueryBackend* b,
                              std::string schema_file,
-                             const std::string input_file) : fb_(b) {
-  rec_.RegisterBackend(b);
-  ctx_ = new Context(&ti_, &rec_);
+                             const std::string input_file) : b_(b), rec_(r) {
+  ctx_ = new Context(&ti_, rec_);
 
   schema_path_ = schema_file;
   file_ = input_file;
@@ -118,7 +118,7 @@ XMLFileLoader::XMLFileLoader(FullBackend* b,
 }
 
 XMLFileLoader::~XMLFileLoader() {
-  rec_.Close();
+  rec_->Close();
   delete ctx_;
 }
 
@@ -134,8 +134,8 @@ boost::uuids::uuid XMLFileLoader::LoadSim() {
   LoadRecipes();
   LoadInitialAgents(); // must be last
   SimInit::Snapshot(ctx_);
-  rec_.Flush();
-  return rec_.sim_id();
+  rec_->Flush();
+  return rec_->sim_id();
 };
 
 void XMLFileLoader::LoadSolver() {
@@ -231,13 +231,13 @@ void XMLFileLoader::LoadInitialAgents() {
       model->Model::InfileToDb(qe, DbInit(model, true));
 
       model->InfileToDb(qe, DbInit(model));
-      rec_.Flush();
+      rec_->Flush();
 
       std::vector<Cond> conds;
-      conds.push_back(Cond("SimId", "==", rec_.sim_id()));
+      conds.push_back(Cond("SimId", "==", rec_->sim_id()));
       conds.push_back(Cond("SimTime", "==", static_cast<int>(0)));
       conds.push_back(Cond("AgentId", "==", model->id()));
-      CondInjector ci(fb_, conds);
+      CondInjector ci(b_, conds);
       PrefixInjector pi(&ci, "AgentState");
 
       // call manually without agent impl injected
