@@ -107,6 +107,10 @@ void SimInit::Snapshot(Context* ctx) {
 };
 
 void SimInit::SnapAgent(Model* m) {
+  // call manually without agent impl injected to keep all Model state in a
+  // single, consolidated db table
+  m->Model::Snapshot(DbInit(m, true));
+
   m->Snapshot(DbInit(m));
   Inventories invs = m->SnapshotInv();
   Context* ctx = m->context();
@@ -192,7 +196,12 @@ void SimInit::LoadPrototypes() {
     conds.push_back(Cond("SimTime", "==", t_));
     conds.push_back(Cond("AgentId", "==", agentid));
     CondInjector ci(b_, conds);
-    PrefixInjector pi(&ci, "AgentState" + impl);
+    PrefixInjector pi(&ci, "AgentState");
+
+    // call manually without agent impl injected
+    m->Model::InitFrom(&pi);
+
+    pi = PrefixInjector(&ci, "AgentState" + impl);
     m->InitFrom(&pi);
     ctx_->AddPrototype(proto, m);
   }
@@ -234,7 +243,9 @@ void SimInit::LoadInitialAgents() {
       // agent-custom init
       conds.push_back(Cond("SimTime", "==", t_));
       CondInjector ci(b_, conds);
-      PrefixInjector pi(&ci, "AgentState" + m->model_impl());
+      PrefixInjector pi(&ci, "AgentState");
+      m->Model::InitFrom(&pi);
+      pi = PrefixInjector(&ci, "AgentState" + m->model_impl());
       m->InitFrom(&pi);
     }
   }

@@ -23,18 +23,6 @@ FacilityModel::FacilityModel(Context* ctx)
 
 FacilityModel::~FacilityModel() {};
 
-void FacilityModel::InfileToDb(QueryEngine* qe, DbInit di) {
-  Model::InfileToDb(qe, di);
-}
-
-void FacilityModel::InitFrom(QueryBackend* b) {
-  Model::InitFrom(b);
-}
-
-void FacilityModel::Snapshot(DbInit di) {
-  Model::Snapshot(di);
-}
-
 void FacilityModel::InitFrom(FacilityModel* m) {
   Model::InitFrom(m);
 }

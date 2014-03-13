@@ -23,14 +23,6 @@ RegionModel::RegionModel(Context* ctx) : Model(ctx) {
   kind_ = "Region";
 }
 
-void RegionModel::InfileToDb(QueryEngine* qe, DbInit di) {
-  Model::InfileToDb(qe, di);
-}
-
-void RegionModel::Snapshot(DbInit di) {
-  Model::Snapshot(di);
-}
-
 void RegionModel::Build(Model* parent) {
   Model::Build(parent);
 }

@@ -6,10 +6,16 @@
 
 namespace cyclus {
 
-DbInit::DbInit(Model* m) : m_(m) {}
+DbInit::DbInit(Model* m) : m_(m), full_prefix_(true) {}
+
+DbInit::DbInit(Model* m, bool dummy) : m_(m), full_prefix_(false) {}
 
 Datum* DbInit::NewDatum(std::string title) {
-  Datum* d = m_->context()->NewDatum("AgentState" + m_->model_impl() + title);
+  std::string prefix = "AgentState";
+  if (full_prefix_) {
+    prefix += m_->model_impl();
+  }
+  Datum* d = m_->context()->NewDatum(prefix + title);
   d->AddVal("AgentId", m_->id());
   d->AddVal("SimTime", m_->context()->time());
   return d;

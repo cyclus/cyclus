@@ -34,12 +34,12 @@ class SimInit {
   /// The newly configured simulation will run with a new simulation id.
   void Restart(QueryBackend* b, boost::uuids::uuid sim_id, int t);
 
-  /// NOT_IMPLEMENTED. Initializes a simulation branched from prev_sim_id at
+  /// NOT IMPLEMENTED. Initializes a simulation branched from prev_sim_id at
   /// time t with diverging state described in new_sim_id.
   ///
   /// TODO: implement
   void Branch(QueryBackend* b, boost::uuids::uuid prev_sim_id, int t,
-                    boost::uuids::uuid new_sim_id);
+              boost::uuids::uuid new_sim_id);
 
   /// Records a snapshot of the current state of the simulation being managed by
   /// ctx into the simulations output database.
@@ -47,15 +47,15 @@ class SimInit {
 
   /// Returns the initialized context. Note that either Init, Restart, or Branch
   /// must be called first.
-  Context* context() {return ctx_;};
-  
+  Context* context() { return ctx_; };
+
   /// Returns the initialized recorder with registered backends. Note that
   /// either Init, Restart, or Branch must be called first.
-  Recorder* recorder() {return rec_;};
+  Recorder* recorder() { return rec_; };
 
   /// Returns the initialized timer. Note that either Init, Restart, or Branch
   /// must be called first.
-  Timer* timer() {return &ti_;};
+  Timer* timer() { return &ti_; };
 
  private:
   void InitBase(QueryBackend* b, boost::uuids::uuid simid, int t);
@@ -91,5 +91,6 @@ class SimInit {
 } // namespace cyclus
 
 #endif
+
 
 

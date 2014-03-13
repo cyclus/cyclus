@@ -76,9 +76,14 @@ class RegionModel : public Model, public TimeListener {
    */
   virtual ~RegionModel() {};
 
-  virtual void InfileToDb(QueryEngine* qe, DbInit di);
+  // DO NOT call Model class implementation of this method
+  virtual void InfileToDb(QueryEngine* qe, DbInit di) {}
 
-  virtual void Snapshot(DbInit di);
+  // DO NOT call Model class implementation of this method
+  virtual void InitFrom(QueryBackend* b) {};
+
+  // DO NOT call Model class implementation of this method
+  virtual void Snapshot(DbInit di) {};
 
   virtual void InitInv(Inventories& inv) {};
 

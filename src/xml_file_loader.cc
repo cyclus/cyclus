@@ -225,14 +225,25 @@ void XMLFileLoader::LoadInitialAgents() {
 
       Model* model = DynamicModule::Make(ctx_, module_name);
       model->set_model_impl(module_name);
+
+      // call manually without agent impl injected to keep all Model state in a
+      // single, consolidated db table
+      model->Model::InfileToDb(qe, DbInit(model, true));
+
       model->InfileToDb(qe, DbInit(model));
       rec_.Flush();
+
       std::vector<Cond> conds;
       conds.push_back(Cond("SimId", "==", rec_.sim_id()));
       conds.push_back(Cond("SimTime", "==", static_cast<int>(0)));
       conds.push_back(Cond("AgentId", "==", model->id()));
       CondInjector ci(fb_, conds);
-      PrefixInjector pi(&ci, "AgentState" + module_name);
+      PrefixInjector pi(&ci, "AgentState");
+
+      // call manually without agent impl injected
+      model->Model::InitFrom(&pi);
+
+      pi = PrefixInjector(&ci, "AgentState" + module_name);
       model->InitFrom(&pi);
       ctx_->AddPrototype(prototype, model);
     }
