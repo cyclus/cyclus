@@ -36,10 +36,10 @@ Composition::Ptr ReadRecipe(QueryEngine* qe);
 /// ever be initialized per XMLFileLoader object.
 class XMLFileLoader {
  public:
-  // Create a new loader reading from the xml simulation input file and writing
-  // to and initializing the backends in r. r must already have b registered. r
-  // should NOT be used to run an actual simulation. schema_file identifies the
-  // master xml rng schema used to validate the input file.
+  /// Create a new loader reading from the xml simulation input file and writing
+  /// to and initializing the backends in r. r must already have b registered.
+  /// schema_file identifies the master xml rng schema used to validate the
+  /// input file.
   XMLFileLoader(Recorder* r, QueryBackend* b, std::string schema_file,
                 const std::string input_file = "");
 
@@ -48,7 +48,7 @@ class XMLFileLoader {
   /// Load an entire simulation from the inputfile.
   ///
   /// @param use_flat_schema whether or not to use the flat schema
-  virtual boost::uuids::uuid LoadSim();
+  virtual void LoadSim();
 
  protected:
   /// Method to load the simulation exchange solver.

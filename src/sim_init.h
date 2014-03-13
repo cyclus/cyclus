@@ -27,8 +27,9 @@ class SimInit {
 
   ~SimInit();
 
-  /// Initialize a simulation with data from b for the given simulation id.
-  void Init(QueryBackend* b, boost::uuids::uuid sim_id);
+  /// Initialize a simulation with data from b for simulation id in r. SimInit
+  /// takes ownership of r.
+  void Init(Recorder* r, QueryBackend* b);
 
   /// Restarts a simulation from time t with data from b identified by simid.
   /// The newly configured simulation will run with a new simulation id.

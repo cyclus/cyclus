@@ -10,7 +10,6 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
@@ -37,7 +36,6 @@ Hdf5Back::~Hdf5Back() {
   }
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::Notify(DatumList data) {
   std::map<std::string, DatumList> groups;
   for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
@@ -55,12 +53,10 @@ void Hdf5Back::Notify(DatumList data) {
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Hdf5Back::Name() {
   return path_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::CreateTable(Datum* d) {
   Datum::Vals vals = d->vals();
 
@@ -116,7 +112,6 @@ void Hdf5Back::CreateTable(Datum* d) {
   tbl_sizes_[d->title()] = dst_sizes;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
   herr_t status;
@@ -136,7 +131,6 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   delete[] buf;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::FillBuf(char* buf, DatumList& group, size_t* sizes,
                        size_t rowsize) {
   Datum::Vals header = group.front()->vals();

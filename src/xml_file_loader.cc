@@ -118,7 +118,7 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
 }
 
 XMLFileLoader::~XMLFileLoader() {
-  rec_->Close();
+  rec_->Flush();
   delete ctx_;
 }
 
@@ -126,7 +126,7 @@ std::string XMLFileLoader::master_schema() {
   return BuildMasterSchema(schema_path_);
 }
 
-boost::uuids::uuid XMLFileLoader::LoadSim() {
+void XMLFileLoader::LoadSim() {
   std::stringstream ss(master_schema());
   parser_->Validate(ss);
   LoadControlParams(); // must be first
@@ -135,7 +135,6 @@ boost::uuids::uuid XMLFileLoader::LoadSim() {
   LoadInitialAgents(); // must be last
   SimInit::Snapshot(ctx_);
   rec_->Flush();
-  return rec_->sim_id();
 };
 
 void XMLFileLoader::LoadSolver() {

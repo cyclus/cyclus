@@ -106,48 +106,40 @@ int main(int argc, char* argv[]) {
   std::cout << "           .  C. ,                                                            " << std::endl;
   std::cout << "              :                                                               " << std::endl;
 
-  // create db backends
+  // create db backends and recorder
+  Recorder* rec = new Recorder();
   FullBackend* fback = new SqliteBack(ai.output_path);
+  rec->RegisterBackend(fback);
   RecBackend::Deleter bdel(fback);
   RecBackend* rback = NULL;
   std::string ext = fs::path(ai.output_path).extension().generic_string();
   if (ext == ".h5") { // not queryable
     rback = new Hdf5Back(ai.output_path.c_str());
+    rec->RegisterBackend(rback);
     bdel.Add(rback);
   } else if (ext == ".csv") { // not queryable
     rback = new CsvBack(ai.output_path.c_str());
+    rec->RegisterBackend(rback);
     bdel.Add(rback);
   }
 
   // read input file and initialize db from input file
-  boost::uuids::uuid simid;
   try {
-    Recorder temp_rec;
-    temp_rec.RegisterBackend(fback);
-    if (rback != NULL) {
-      temp_rec.RegisterBackend(rback);
-    }
     if (ai.flat_schema) {
-      XMLFlatLoader l(&temp_rec, fback, ai.schema_path, infile);
-      simid = l.LoadSim();
+      XMLFlatLoader l(rec, fback, ai.schema_path, infile);
+      l.LoadSim();
     } else {
-      XMLFileLoader l(&temp_rec, fback, ai.schema_path, infile);
-      simid = l.LoadSim();
+      XMLFileLoader l(rec, fback, ai.schema_path, infile);
+      l.LoadSim();
     }
   } catch (Error e) {
     CLOG(LEV_ERROR) << e.what();
     return 1;
   }
 
-  // initialize sim from output db
+  // initialize sim from output db and run it
   SimInit si;
-  si.Init(fback, simid);
-  si.recorder()->RegisterBackend(fback);
-  if (rback != NULL) {
-    si.recorder()->RegisterBackend(rback);
-  }
-
-  // Run the simulation
+  si.Init(rec, fback);
   si.timer()->RunSim();
 
   std::cout << std::endl;
