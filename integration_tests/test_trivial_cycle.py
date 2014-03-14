@@ -6,6 +6,7 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
+from helper import table_exist, find_ids, exit_times
 
 def create_sim_input(ref_input, k_factor):
     """ Creates xml input file from a reference xml input file.
@@ -58,18 +59,11 @@ def test_source_to_sink():
         paths = ["/AgentEntry", "/AgentExit", "/Resources", "/Transactions",
                 "/Info"]
         # Check if these tables exist
-        tables_there = True
-        for path in paths:
-            yield assert_true, output.__contains__(path)
-            # Have to stop further operations after these tests
-            if tables_there and not output.__contains__(path):
-                tables_there = False
-
-        if not tables_there:
+        yield assert_true, table_exist(output, paths)
+        if not table_exist(output, paths):
             output.close()
             os.remove("./output_temp.h5")
-            os.remove(sim_input)
-            return
+            return  # don't execute further commands
 
         # Get specific tables and columns
         agent_entry = output.get_node("/AgentEntry")[:]
@@ -82,21 +76,20 @@ def test_source_to_sink():
         agent_ids = agent_entry["AgentId"]
         agent_impl = agent_entry["Implementation"]
         duration = info["Duration"][0]
-        facility_id = []
-        i = 0
-        for impl in agent_impl:
-            if impl == "KFacility":
-                facility_id.append(i)
-            i += 1
+
+        facility_id = find_ids("KFacility", agent_impl, agent_ids)
+        # Test for only one KFacility
         yield assert_equal, len(facility_id), 1
-        facility_id = agent_ids[facility_id[0]]
+
+        # Test if the agent exit at the end of the simulation
+        yield assert_equal, duration, exit_times(facility_id[0], agent_exit)
 
         sender_ids = transactions["SenderId"]
         receiver_ids = transactions["ReceiverId"]
         expected_sender_array = np.empty(sender_ids.size)
-        expected_sender_array.fill(facility_id)
+        expected_sender_array.fill(facility_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
-        expected_receiver_array.fill(facility_id)
+        expected_receiver_array.fill(facility_id[0])
         yield assert_array_equal, sender_ids, expected_sender_array
         yield assert_array_equal, receiver_ids, expected_receiver_array
 
@@ -109,9 +102,9 @@ def test_source_to_sink():
         quantities = resources["Quantity"]
         expected_quantities = np.empty(resource_ids.size)
         # Expect that every transaction quantity is the same amount
-        initial_inv = quantities[0]
+        initial_capacity = quantities[0]
         for i in range(expected_quantities.size):
-            expected_quantities[i] = initial_inv * k_factor ** i
+            expected_quantities[i] = initial_capacity * k_factor ** i
 
         # Should find a logic for almost equal cases
         yield assert_array_equal, quantities, expected_quantities
