@@ -18,10 +18,13 @@
     <model>
       <KFacility>
         <setup>
-          <commodity>commodity</commodity>
+          <incommodity>commodity</incommodity>
+          <in_capacity>1</in_capacity>
+          <k_factor_in>1</k_factor_in>
+          <outcommodity>commodity</outcommodity>
           <recipe>commod_recipe</recipe>
-          <init_capacity>1</init_capacity>
-          <k_factor>1</k_factor>
+          <out_capacity>1</out_capacity>
+          <k_factor_out>1</k_factor_out>
         </setup>
       </KFacility>
     </model>
