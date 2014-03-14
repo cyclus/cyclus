@@ -5,6 +5,7 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
+from helper import table_exist, find_ids, exit_times
 
 """ Tests """
 def test_null_sink():
@@ -19,7 +20,7 @@ def test_null_sink():
     sim_input = "./Inputs/null_sink.xml"
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
-    check_cmd(cmd, '.', holdsrtn)
+    yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands
@@ -28,16 +29,11 @@ def test_null_sink():
     legal_paths = ["/AgentEntry", "/AgentExit", "/Info"]
     illegal_paths = ["/Transactions"]  # this must contain tables to test
     # Check if these tables exist
-    tables_there = True
-    for path in legal_paths:
-        yield assert_true, output.__contains__(path)
-        if tables_there and not output.__contains__(path):
-            tables_there = False
-
-    if not tables_there:
+    yield assert_true, table_exist(output, legal_paths)
+    if not table_exist(output, legal_paths):
         output.close()
         os.remove("./output_temp.h5")
-        return
+        return  # don't execute further commands
 
     # Get specific data
     agent_entry = output.get_node("/AgentEntry")[:]
@@ -49,29 +45,16 @@ def test_null_sink():
     agent_impl = agent_entry["Implementation"]
     duration = info["Duration"][0]
 
-    sink_id = 0
-    i = 0
-    for agent in agent_impl:
-        if agent == "SimpleSink":
-            sink_id = agent_ids[i]
-            break
-        else:
-            i += 1
-    # Test if SimpleSink is actually deployed
-    yield assert_not_equal, sink_id, 0
+    sink_id = find_ids("SimpleSink", agent_impl, agent_ids)
+    # Test if one SimpleSink is deployed
+    yield assert_equal, len(sink_id), 1
 
     # Test if SimpleSink is decommissioned at the end of the simulation
-    i = 0
-    for index in agent_exit["AgentId"]:
-        if index == sink_id:
-            yield assert_equal, duration, agent_exit["ExitTime"][i]
-            break
-        else:
-            i += 1
+    yield assert_equal, duration, exit_times(sink_id[0], agent_exit)
+
 
     # No resource exchange is expected
-    for path in illegal_paths:
-        yield assert_false, output.__contains__(path)
+    yield assert_false, table_exist(output, illegal_paths)
 
     output.close()
     os.remove("./output_temp.h5")

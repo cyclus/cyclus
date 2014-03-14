@@ -6,6 +6,7 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
+from helper import table_exist, find_ids, exit_times
 
 """ Tests """
 def test_source_to_sink():
@@ -22,7 +23,7 @@ def test_source_to_sink():
     for sim_input in sim_inputs:
         holdsrtn = [1]  # needed because nose does not send() to test generator
         cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
-        check_cmd(cmd, '.', holdsrtn)
+        yield check_cmd, cmd, '.', holdsrtn
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
@@ -32,17 +33,11 @@ def test_source_to_sink():
         paths = ["/AgentEntry", "/AgentExit", "/Resources", "/Transactions",
                 "/Info"]
         # Check if these tables exist
-        tables_there = True
-        for path in paths:
-            yield assert_true, output.__contains__(path)
-            # Have to stop further operations after these tests
-            if tables_there and not output.__contains__(path):
-                tables_there = False
-
-        if not tables_there:
+        yield assert_true, table_exist(output, paths)
+        if not table_exist(output, paths):
             output.close()
             os.remove("./output_temp.h5")
-            return
+            return  # don't execute further commands
 
         # Get specific tables and columns
         agent_entry = output.get_node("/AgentEntry")[:]
@@ -55,29 +50,25 @@ def test_source_to_sink():
         agent_ids = agent_entry["AgentId"]
         agent_impl = agent_entry["Implementation"]
         duration = info["Duration"][0]
-        source_id = []
-        sink_id = []
-        i = 0
-        for impl in agent_impl:
-            if impl == "SimpleSource":
-                source_id.append(i)
-            elif impl == "SimpleSink":
-                sink_id.append(i)
-            i += 1
-        # Test for only one source and one sink
+
+        source_id = find_ids("SimpleSource", agent_impl, agent_ids)
+        sink_id = find_ids("SimpleSink", agent_impl, agent_ids)
+
+        # Test for only one source and one sink are deployed in the simulation
         yield assert_equal, len(source_id), 1
         yield assert_equal, len(sink_id), 1
-        # Get ids of the source and sink
-        source_id = agent_ids[source_id[0]]
-        sink_id = agent_ids[sink_id[0]]
+
+        # Check if the agents exit at the right time
+        yield assert_equal, duration, exit_times(source_id[0], agent_exit)
+        yield assert_equal, duration, exit_times(sink_id[0], agent_exit)
 
         # Check if transactions are only between source and sink
         sender_ids = transactions["SenderId"]
         receiver_ids = transactions["ReceiverId"]
         expected_sender_array = np.empty(sender_ids.size)
-        expected_sender_array.fill(source_id)
+        expected_sender_array.fill(source_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
-        expected_receiver_array.fill(sink_id)
+        expected_receiver_array.fill(sink_id[0])
         yield assert_array_equal, sender_ids, expected_sender_array
         yield assert_array_equal, receiver_ids, expected_receiver_array
 
