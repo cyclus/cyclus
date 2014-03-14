@@ -10,7 +10,11 @@
   </control>
 
   <commodity>
-    <name>commodity</name>
+    <name>commodityA</name>
+  </commodity>
+
+  <commodity>
+    <name>commodityB</name>
   </commodity>
 
   <facility>
@@ -18,10 +22,13 @@
     <model>
       <KFacility>
         <setup>
-          <commodity>commodity</commodity>
+          <incommodity>commodityB</incommodity>
+          <in_capacity>1</in_capacity>
+          <k_factor_in>1</k_factor_in>
+          <outcommodity>commodityA</outcommodity>
           <recipe>commod_recipe</recipe>
-          <init_capacity>1</init_capacity>
-          <k_factor>1</k_factor>
+          <out_capacity>1</out_capacity>
+          <k_factor_out>1</k_factor_out>
         </setup>
       </KFacility>
     </model>
@@ -33,10 +40,13 @@
     <model>
       <KFacility>
         <setup>
-          <commodity>commodity</commodity>
+          <incommodity>commodityA</incommodity>
+          <in_capacity>1</in_capacity>
+          <k_factor_in>1</k_factor_in>
+          <outcommodity>commodityB</outcommodity>
           <recipe>commod_recipe</recipe>
-          <init_capacity>1</init_capacity>
-          <k_factor>1</k_factor>
+          <out_capacity>1</out_capacity>
+          <k_factor_out>1</k_factor_out>
         </setup>
       </KFacility>
     </model>
