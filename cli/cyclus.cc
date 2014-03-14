@@ -107,29 +107,40 @@ int main(int argc, char* argv[]) {
   std::cout << "              :                                                               " << std::endl;
 
   // create db backends and recorder
-  Recorder* rec = new Recorder();
-  FullBackend* fback = new SqliteBack(ai.output_path);
-  rec->RegisterBackend(fback);
-  RecBackend::Deleter bdel(fback);
+  FullBackend* fback = NULL;
   RecBackend* rback = NULL;
+  RecBackend::Deleter bdel;
+  Recorder rec; // must be after backend deleter because ~Rec does flushing
+
   std::string ext = fs::path(ai.output_path).extension().generic_string();
+  std::string stem = fs::path(ai.output_path).stem().generic_string();
   if (ext == ".h5") { // not queryable
+    fback = new SqliteBack(stem + ".sqlite");
     rback = new Hdf5Back(ai.output_path.c_str());
-    rec->RegisterBackend(rback);
+    rec.RegisterBackend(rback);
+    rec.RegisterBackend(fback);
     bdel.Add(rback);
+    bdel.Add(fback);
   } else if (ext == ".csv") { // not queryable
+    fback = new SqliteBack(stem + ".sqlite");
     rback = new CsvBack(ai.output_path.c_str());
-    rec->RegisterBackend(rback);
+    rec.RegisterBackend(rback);
+    rec.RegisterBackend(fback);
     bdel.Add(rback);
+    bdel.Add(fback);
+  } else {
+    fback = new SqliteBack(ai.output_path);
+    rec.RegisterBackend(fback);
+    bdel.Add(fback);
   }
 
   // read input file and initialize db from input file
   try {
     if (ai.flat_schema) {
-      XMLFlatLoader l(rec, fback, ai.schema_path, infile);
+      XMLFlatLoader l(&rec, fback, ai.schema_path, infile);
       l.LoadSim();
     } else {
-      XMLFileLoader l(rec, fback, ai.schema_path, infile);
+      XMLFileLoader l(&rec, fback, ai.schema_path, infile);
       l.LoadSim();
     }
   } catch (Error e) {
@@ -139,7 +150,7 @@ int main(int argc, char* argv[]) {
 
   // initialize sim from output db and run it
   SimInit si;
-  si.Init(rec, fback);
+  si.Init(&rec, fback);
   si.timer()->RunSim();
 
   std::cout << std::endl;

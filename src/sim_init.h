@@ -27,8 +27,7 @@ class SimInit {
 
   ~SimInit();
 
-  /// Initialize a simulation with data from b for simulation id in r. SimInit
-  /// takes ownership of r.
+  /// Initialize a simulation with data from b for simulation id in r.
   void Init(Recorder* r, QueryBackend* b);
 
   /// Restarts a simulation from time t with data from b identified by simid.

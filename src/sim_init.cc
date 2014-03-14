@@ -28,7 +28,6 @@ void SimInit::Init(Recorder* r, QueryBackend* b) {
   rec_ = new Recorder(); // use dummy recorder to avoid re-recording
   InitBase(b, r->sim_id(), 0);
   ctx_->rec_ = r; // switch back before running sim
-  delete rec_;
 }
 
 void SimInit::Restart(QueryBackend* b, boost::uuids::uuid sim_id, int t) {

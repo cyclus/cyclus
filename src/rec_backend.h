@@ -19,11 +19,6 @@ class RecBackend {
   /// Convenience class for using a stack variable to auto-destruct a Recbackend
   class Deleter {
    public:
-    /// Creates a new Deleter that will delete b when destructed.
-    Deleter(RecBackend* b) {
-      backs_.push_back(b);
-    }
-
     /// Add another backend b to be deleted when the Deleter is destructed.
     void Add(RecBackend* b) {
       backs_.push_back(b);
