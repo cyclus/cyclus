@@ -5,7 +5,7 @@
 #include "recorder.h"
 #include "inst_model.h"
 #include "region_model.h"
-#include "mock_region.h"
+#include "test_modules/test_region.h"
 #include "timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -66,7 +66,7 @@ class RegionModelClassTests : public ::testing::Test {
       child4_ = new DieInst(ctx_);
       child5_ = new DieInst(ctx_);
 
-      reg_ = new MockRegion(ctx_);
+      reg_ = new TestRegion(ctx_);
       child1_->Build(reg_);
       child2_->Build(reg_);
       child3_->Build(reg_);

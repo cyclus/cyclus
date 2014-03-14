@@ -5,6 +5,7 @@
 #include "error.h"
 #include "exchange_solver.h"
 #include "logger.h"
+#include "sim_init.h"
 #include "timer.h"
 
 namespace cyclus {
@@ -13,7 +14,8 @@ Context::Context(Timer* ti, Recorder* rec)
   : ti_(ti),
     rec_(rec),
     solver_(NULL),
-    trans_id_(0) {}
+    trans_id_(0),
+    si_(0) {}
 
 Context::~Context() {
   if (solver_ != NULL) {
@@ -46,6 +48,12 @@ void Context::SchedBuild(Model* parent, std::string proto_name, int t) {
     t = time() + 1;
   }
   ti_->SchedBuild(parent, proto_name, t);
+  NewDatum("BuildSchedule")
+    ->AddVal("ParentId", parent->id())
+    ->AddVal("Prototype", proto_name)
+    ->AddVal("SchedTime", time())
+    ->AddVal("BuildTime", t)
+    ->Record();
 }
 
 void Context::SchedDecom(Model* m, int t) {
@@ -53,6 +61,11 @@ void Context::SchedDecom(Model* m, int t) {
     t = time();
   }
   ti_->SchedDecom(m, t);
+  NewDatum("DecomSchedule")
+    ->AddVal("AgentId", m->id())
+    ->AddVal("SchedTime", time())
+    ->AddVal("DecomTime", t)
+    ->Record();
 }
 
 boost::uuids::uuid Context::sim_id() {
@@ -61,10 +74,19 @@ boost::uuids::uuid Context::sim_id() {
 
 void Context::AddPrototype(std::string name, Model* p) {
   protos_[name] = p;
+  NewDatum("Prototypes")
+    ->AddVal("Prototype", name)
+    ->AddVal("AgentId", p->id())
+    ->AddVal("Implementation", p->model_impl())
+    ->Record();
 }
 
 void Context::AddRecipe(std::string name, Composition::Ptr c) {
   recipes_[name] = c;
+  NewDatum("Recipes")
+    ->AddVal("Recipe", name)
+    ->AddVal("StateId", c->id())
+    ->Record();
 }
 
 Composition::Ptr Context::GetRecipe(std::string name) {
@@ -74,17 +96,21 @@ Composition::Ptr Context::GetRecipe(std::string name) {
   return recipes_[name];
 }
 
-void Context::InitTime(int duration, int decay, int m0, int y0,
-                       std::string handle) {
-  ti_->Initialize(this, duration, m0, y0, decay, handle);
+void Context::InitSim(SimInfo si) {
+  NewDatum("Info")
+    ->AddVal("Handle", si.handle)
+    ->AddVal("InitialYear", si.y0)
+    ->AddVal("InitialMonth", si.m0)
+    ->AddVal("Duration", si.duration)
+    ->AddVal("DecayInterval", si.decay_period)
+    ->AddVal("ParentSimId", si.parent_sim)
+    ->AddVal("BranchTime", si.branch_time)
+    ->Record();
+  ti_->Initialize(this, si);
 }
 
 int Context::time() {
   return ti_->time();
-}
-
-int Context::sim_dur() {
-  return ti_->dur();
 }
 
 void Context::RegisterTimeListener(TimeListener* tl) {
@@ -97,6 +123,10 @@ void Context::UnregisterTimeListener(TimeListener* tl) {
 
 Datum* Context::NewDatum(std::string title) {
   return rec_->NewDatum(title);
+}
+
+void Context::Snapshot() {
+  ti_->Snapshot();
 }
 
 }  // namespace cyclus

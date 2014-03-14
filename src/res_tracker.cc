@@ -21,6 +21,8 @@ void ResTracker::Create(Model* creator) {
     return;
   }
 
+  parent1_ = 0;
+  parent2_ = 0;
   Record();
   ctx_->NewDatum("ResCreators")
     ->AddVal("ResourceId", res_->id())

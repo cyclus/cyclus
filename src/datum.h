@@ -5,8 +5,6 @@
 #include <list>
 #include <string>
 
-#include <boost/pool/singleton_pool.hpp>
-
 #include "any.hpp"
 #include "recorder.h"
 
@@ -56,7 +54,8 @@ class Datum {
   static void operator delete(void* rawMemory) throw();
 
  private:
-  /// Datum objects should only be created via an Recorder
+  /// Datum objects should generally not be created using a constructor (i.e.
+  /// use the recorder interface).
   Datum(Recorder* m, std::string title);
 
   Recorder* manager_;

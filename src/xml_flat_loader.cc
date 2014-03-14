@@ -9,11 +9,10 @@
 #include "model.h"
 #include "recorder.h"
 #include "timer.h"
-#include "xml_query_engine.h"
+#include "query_engine.h"
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string BuildFlatMasterSchema(std::string schema_path) {
   Timer ti;
   Recorder rec;
@@ -26,13 +25,11 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
   std::vector<std::string> names = Env::ListModules();
   std::string subschemas;
   for (int i = 0; i < names.size(); ++i) {
-    DynamicModule dyn(names[i]);
-    Model* m = dyn.ConstructInstance(&ctx);
+    Model* m = DynamicModule::Make(&ctx, names[i]);
     subschemas += "<element name=\"" + names[i] + "\">\n";
     subschemas += m->schema() + "\n";
     subschemas += "</element>\n";
     ctx.DelModel(m);
-    dyn.CloseLibrary();
   }
 
   // replace refs in master rng template file
@@ -45,55 +42,76 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
   return master;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFlatLoader::master_schema() {
   return BuildFlatMasterSchema(schema_path_);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFlatLoader::LoadInitialAgents() {
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
 
+  // create prototypes
   int num_protos = xqe.NElementsMatchingQuery("/*/prototype");
   for (int i = 0; i < num_protos; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/prototype", i);
     QueryEngine* module_data = qe->QueryElement("model");
     std::string module_name = module_data->GetElementName();
+    std::string prototype = qe->GetString("name");
 
-    Model* model = modules_[module_name]->ConstructInstance(ctx_);
-    model->SetModelImpl(module_name);
-    model->InitFrom(qe);
-
-    CLOG(LEV_DEBUG3) << "Module '" << model->name()
-                     << "' has had its module members initialized:";
-    CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
-    CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl();
-    CLOG(LEV_DEBUG3) << " * ID: " << model->id();
-
-    // register module
-    ctx_->AddPrototype(model->name(), model);
+    Model* model = DynamicModule::Make(ctx_, module_name);
+    model->set_model_impl(module_name);
+    model->InfileToDb(qe, DbInit(model));
+    rec_->Flush();
+    std::vector<Cond> conds;
+    conds.push_back(Cond("SimId", "==", rec_->sim_id()));
+    conds.push_back(Cond("AgentId", "==", model->id()));
+    CondInjector ci(b_, conds);
+    PrefixInjector pi(&ci, "AgentState" + module_name);
+    model->InitFrom(&pi);
+    ctx_->AddPrototype(prototype, model);
+    ctx_->NewDatum("Prototypes")
+      ->AddVal("Prototype", prototype)
+      ->AddVal("AgentId", model->id())
+      ->AddVal("Implementation", module_name)
+      ->Record();
   }
 
+  // retrieve agent hierarchy and initial inventories
   int num_agents = xqe.NElementsMatchingQuery("/*/agent");
-  std::map<std::string, Model*> agents;  // map<name, agent>
+  std::map<std::string, std::string> protos;  // map<name, prototype>
   std::map<std::string, std::string> parents;  // map<agent, parent>
+  std::set<std::string> agents; // set<agent_name>
+  std::map<std::string, QueryEngine*> invs; // map<agent, qe>;
   for (int i = 0; i < num_agents; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/agent", i);
-    std::string name = qe->GetElementContent("name");
-    std::string proto = qe->GetElementContent("prototype");
+    std::string name = qe->GetString("name");
+    std::string proto = qe->GetString("prototype");
     std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
-    agents[name] = ctx_->CreateModel<Model>(proto);
+    protos[name] = proto;
     parents[name] = parent;
+    invs[name] = qe;
+    agents.insert(name);
   }
 
-  std::map<std::string, Model*>::iterator it;
-  for (it = agents.begin(); it != agents.end(); ++it) {
-    std::string name = it->first;
-    Model* agent = it->second;
-    if (parents[name] == "") {
-      agent->Build();
+  // build agents starting at roots (no parent) down.
+  std::map<std::string, Model*> built; // map<agent_name, agent_ptr>
+  std::set<std::string>::iterator it = agents.begin();
+  while (agents.size() > 0) {
+    std::string name = *it;
+    std::string proto = protos[name];
+    std::string parent = parents[name];
+    if (parent == "") {
+      built[name] = BuildAgent(proto, NULL);
+      ++it;
+      agents.erase(name);
+    } else if (built.count(parent) > 0) {
+      built[name] = BuildAgent(proto, built[parent]);
+      ++it;
+      agents.erase(name);
     } else {
-      agent->Build(agents[parents[name]]);
+      ++it;
+    }
+    if (it == agents.end()) {
+      it = agents.begin();
     }
   }
 }

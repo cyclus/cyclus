@@ -33,6 +33,8 @@ typedef std::map<Nuc, double> CompMap;
 /// @endcode
 ///
 class Composition {
+  friend class SimInit;
+
  public:
   typedef boost::shared_ptr<Composition> Ptr;
 

@@ -42,7 +42,7 @@ TEST(CsvBackTest, ReadWrite) {
   ->AddVal("weight", 1000)
   ->AddVal("height", 7.2)
   ->Record();
-  m.close();
+  m.Close();
 
   // make sure append works
   cyclus::Recorder m2;
@@ -53,7 +53,7 @@ TEST(CsvBackTest, ReadWrite) {
   ->AddVal("weight", 1)
   ->AddVal("height", .4)
   ->Record();
-  m2.close();
+  m2.Close();
 
   std::string sid1 = boost::lexical_cast<std::string>(m.sim_id());
   std::string sid2 = boost::lexical_cast<std::string>(m2.sim_id());
@@ -97,7 +97,7 @@ TEST(CsvBackTest, Blob) {
   m.NewDatum("Blobs")
   ->AddVal("data", data)
   ->Record();
-  m.close();
+  m.Close();
 
   std::string fname = path + "/" + "Blobs.csv";
   std::ifstream file(fname.c_str());

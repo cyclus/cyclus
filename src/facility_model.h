@@ -74,11 +74,14 @@ class FacilityModel : public TimeListener, public Model, public Trader {
 
   virtual ~FacilityModel();
 
-  /**
-     Initalize the FacilityModel from xml. Calls the init function.
-     @param qe a pointer to a QueryEngine object containing intialization data
-   */
-  virtual void InitFrom(QueryEngine* qe);
+  // DO NOT call Model class implementation of this method
+  virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
+
+  // DO NOT call Model class implementation of this method
+  virtual void InitFrom(QueryBackend* b) {}
+
+  // DO NOT call Model class implementation of this method
+  virtual void Snapshot(DbInit di) {}
 
   /**
      Copy module members from a source model
@@ -97,6 +100,8 @@ class FacilityModel : public TimeListener, public Model, public Trader {
    */
   virtual void Build(Model* parent = NULL);
 
+  virtual void DoRegistration();
+
   /**
      decommissions the facility, default behavior is for the facility
      to delete itself
@@ -113,89 +118,6 @@ class FacilityModel : public TimeListener, public Model, public Trader {
      every model should be able to print a verbose description
    */
   virtual std::string str();
-
-  /**
-     Returns the facility's name
-     @return fac_name_ the name of this facility, a string
-   */
-  virtual std::string FacName() {
-    return this->name();
-  };
-
-  /**
-     Sets this facility's instutution name
-     @param name the name of the institution associated with this
-   */
-  virtual void SetInstName(std::string name) {
-    inst_name_ = name;
-  };
-
-  /**
-     Returns this facility's institution
-     @return the institution assosicated with this facility
-   */
-  virtual InstModel* FacInst();
-
-  /**
-     Sets the facility's lifetime
-     @param lifetime is the new lifetime of the facility in months
-   */
-  virtual void SetFacLifetime(int lifetime) {
-    fac_lifetime_ = lifetime;
-  };
-
-  /**
-     Returns the facility's lifetime
-     @return fac_lifetime_ the lifetime of this facility, an int, in
-   */
-  virtual int FacLifetime() {
-    return fac_lifetime_;
-  };
-
-  /**
-     @return the input commodities
-  */
-  std::vector<std::string> InputCommodities();
-
-  /**
-     @return the output commodities
-  */
-  std::vector<std::string> OutputCommodities();
-
-  /**
-     @param time the time used to query whether it is past the
-     facility's decommission date
-     @return true if the time is greater than the decommission date
-   */
-  bool LifetimeReached(int time);
-
- private:
-  /**
-     each facility should have an institution that manages it
-   */
-  std::string inst_name_;
-
-  /**
-     Most facilities will have a vector of incoming, request commodities.
-     Ultimately, it's up to the facility to utilize this list. However, the
-     user interface is assisted by this specificity in the input scheme.
-     For details, see issue #323 in cyclus/cyclus.
-   */
-  std::vector<std::string> in_commods_;
-
-  /**
-     most facilities will have a vector of outgoing, offer commodities
-     Ultimately, it's up to the facility to utilize this list. However, the
-     user interface is assisted by this specificity in the input scheme.
-     For details, see issue #323 in cyclus/cyclus.
-   */
-  std::vector<std::string> out_commods_;
-
-  /**
-     each facility needs a lifetime
-   */
-  int fac_lifetime_;
-  /* ------------------- */
 };
 
 } // namespace cyclus

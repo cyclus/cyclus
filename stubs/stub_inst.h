@@ -3,9 +3,7 @@
 
 #include <string>
 
-#include "context.h"
-#include "inst_model.h"
-#include "query_engine.h"
+#include "cyclus.h"
 
 namespace stubs {
 
@@ -52,11 +50,9 @@ class StubInst : public cyclus::InstModel {
   virtual ~StubInst();
 
   /**
-    Initializes the module member data from the data in a QueryEngine object
-
-    @param qe is a QueryEngine object that contains intialization data
+    Initialize db with input file info related to derived module class
     */
-  virtual void InitFrom(cyclus::QueryEngine* qe);
+  virtual void InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di);
 
   /**
     Initialize members for a cloned module.

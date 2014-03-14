@@ -60,7 +60,7 @@ TEST(SqliteBackTest, Regression) {
   ->AddVal("height", 1.2)
   ->Record();
 
-  m.close();
+  m.Close();
 
   std::string sid = boost::lexical_cast<std::string>(m.sim_id());
 

@@ -11,7 +11,7 @@
 #include "exchange_context.h"
 #include "facility_model.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "model.h"
 #include "request.h"
 #include "request_portfolio.h"
@@ -40,10 +40,10 @@ using test_helpers::get_req;
 using test_helpers::trader;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class Requester: public MockFacility {
+class Requester: public TestFacility {
  public:
   Requester(Context* ctx, int i = 1)
-      : MockFacility(ctx),
+      : TestFacility(ctx),
         i_(i),
         req_ctr_(0),
         pref_ctr_(0)
@@ -86,10 +86,10 @@ class Requester: public MockFacility {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class Bidder: public MockFacility {
+class Bidder: public TestFacility {
  public:
   Bidder(Context* ctx, std::string commod)
-      : MockFacility(ctx),
+      : TestFacility(ctx),
         commod_(commod),
         bid_ctr_(0)
   {};
