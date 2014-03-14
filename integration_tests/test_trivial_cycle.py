@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_almost_equal, assert_true
 from numpy.testing import assert_array_equal
 import os
 import tables
@@ -8,19 +8,24 @@ import numpy as np
 from tools import check_cmd
 from helper import table_exist, find_ids, exit_times
 
-def create_sim_input(ref_input, k_factor):
+def create_sim_input(ref_input, k_factor_in, k_factor_out):
     """ Creates xml input file from a reference xml input file.
-    Changes k_factor.
+    Changes k_factor_in and k_factor_out.
 
     Returns: the path to the created file
     """
     # File to be creted
-    fw_path = ref_input.split(".xml")[0] + "_" + str(k_factor) + ".xml"
+    fw_path = ref_input.split(".xml")[0] + "_" + str(k_factor_in) + \
+              "_" + str(k_factor_out) + ".xml"
     fw = open(fw_path, "w")
     fr = open(ref_input, "r")
     for f in fr:
-        if f.count("k_factor"):
-            f = f.split("<")[0] + "<k_factor>" + str(k_factor) +"</k_factor>\n"
+        if f.count("k_factor_in"):
+            f = f.split("<")[0] + "<k_factor_in>" + str(k_factor_in) + \
+                "</k_factor_in>\n"
+        elif f.count("k_factor_out"):
+            f = f.split("<")[0] + "<k_factor_out>" + str(k_factor_out) + \
+                "</k_factor_out>\n"
 
         fw.write(f)
 
@@ -42,14 +47,14 @@ def test_source_to_sink():
     # Cyclus simulation input for source_to_sink
     ref_input = "./Inputs/trivial_cycle.xml"
     # Conversion factors for the three simulations
-    k_factors = [0.5, 1, 2]
+    k_factors = [0.95, 1, 2]
 
     for k_factor in k_factors:
-        sim_input = create_sim_input(ref_input, k_factor)
+        sim_input = create_sim_input(ref_input, k_factor, k_factor)
 
         holdsrtn = [1]  # needed because nose does not send() to test generator
         cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
-        check_cmd(cmd, '.', holdsrtn)
+        yield check_cmd, cmd, '.', holdsrtn
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
@@ -100,14 +105,13 @@ def test_source_to_sink():
         # Track transacted resources
         resource_ids = resources["ResourceId"]
         quantities = resources["Quantity"]
-        expected_quantities = np.empty(resource_ids.size)
-        # Expect that every transaction quantity is the same amount
-        initial_capacity = quantities[0]
-        for i in range(expected_quantities.size):
-            expected_quantities[i] = initial_capacity * k_factor ** i
 
-        # Should find a logic for almost equal cases
-        yield assert_array_equal, quantities, expected_quantities
+        # Almost equal cases due to floating point k_factors
+        i = 0
+        initial_capacity = quantities[0]
+        for q in quantities:
+            yield assert_almost_equal, q, initial_capacity * k_factor ** i
+            i += 1
 
         output.close()
         os.remove("./output_temp.h5")
