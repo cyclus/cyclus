@@ -9,22 +9,31 @@ namespace cyclus {
 
 const ResourceType GenericResource::kType = "GenericResource";
 
+std::map<std::string, int> GenericResource::stateids_;
+int GenericResource::next_state_ = 1;
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenericResource::Ptr GenericResource::Create(Model* creator,
                                              double quantity,
-                                             std::string quality,
-                                             std::string units) {
+                                             std::string quality) {
   GenericResource::Ptr r(new GenericResource(creator->context(), quantity,
-                                             quality, units));
+                                             quality));
   r->tracker_.Create(creator);
+
+  if (stateids_.count(quality) == 0) {
+    stateids_[quality] = next_state_++;
+    creator->context()->NewDatum("GenericResources")
+    ->AddVal("StateId", stateids_[quality])
+    ->AddVal("Quality", quality)
+    ->Record();
+  }
   return r;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenericResource::Ptr GenericResource::CreateUntracked(double quantity,
-                                                      std::string quality,
-                                                      std::string units) {
-  GenericResource::Ptr r(new GenericResource(NULL, quantity, quality, units));
+                                                      std::string quality) {
+  GenericResource::Ptr r(new GenericResource(NULL, quantity, quality));
   r->tracker_.DontTrack();
   return r;
 }
@@ -39,7 +48,7 @@ Resource::Ptr GenericResource::Clone() const {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GenericResource::Absorb(GenericResource::Ptr other) {
-  if (other->units() != units() || other->quality() != quality()) {
+  if (other->quality() != quality()) {
     throw ValueError("incompatible resource types.");
   }
   quantity_ += other->quantity();
@@ -56,8 +65,7 @@ GenericResource::Ptr GenericResource::Extract(double quantity) {
 
   quantity_ -= quantity;
 
-  GenericResource::Ptr other(new GenericResource(ctx_, quantity, quality_, units_
-                                                ));
+  GenericResource::Ptr other(new GenericResource(ctx_, quantity, quality_));
   tracker_.Extract(&other->tracker_);
   return other;
 }
@@ -69,9 +77,9 @@ Resource::Ptr GenericResource::ExtractRes(double qty) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GenericResource::GenericResource(Context* ctx, double quantity,
-                                 std::string quality,
-                                 std::string units)
-  : units_(units), quality_(quality), quantity_(quantity), tracker_(ctx, this),
+                                 std::string quality)
+  : quality_(quality), quantity_(quantity), tracker_(ctx, this),
     ctx_(ctx) {}
 
 } // namespace cyclus
+

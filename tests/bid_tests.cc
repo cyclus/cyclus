@@ -7,7 +7,7 @@
 #include "facility_model.h"
 #include "generic_resource.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
@@ -29,7 +29,7 @@ using test_helpers::trader;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, MaterialGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = new TestFacility(tc.get());
   cyclus::CompMap cm;
   cm[92235] = 1.0;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
@@ -47,13 +47,12 @@ TEST(BidTests, MaterialGetSet) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, GenRsrcGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = new TestFacility(tc.get());
   double qty = 1.0;
   string quality = "qual";
-  string units = "units";
 
   GenericResource::Ptr rsrc =
-      GenericResource::CreateUntracked(qty, quality, units);
+      GenericResource::CreateUntracked(qty, quality);
   
   Request<GenericResource>::Ptr req =
       Request<GenericResource>::Create(rsrc, trader);

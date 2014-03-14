@@ -59,6 +59,7 @@ original Boost 1.54.0
 #include <typeinfo>
 #include <algorithm>
 #include <iosfwd>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
@@ -124,7 +125,6 @@ namespace boost { namespace spirit
                 }
                 static void move(void* const* src, void** dest)
                 {
-                    reinterpret_cast<T*>(dest)->~T();
                     *reinterpret_cast<T*>(dest) =
                         *reinterpret_cast<T const*>(src);
                 }
@@ -158,7 +158,6 @@ namespace boost { namespace spirit
                 }
                 static void move(void* const* src, void** dest)
                 {
-                    (*reinterpret_cast<T**>(dest))->~T();
                     **reinterpret_cast<T**>(dest) =
                         **reinterpret_cast<T* const*>(src);
                 }
@@ -203,6 +202,12 @@ namespace boost { namespace spirit
                 new (&object) T(x);
             else
                 object = new T(x);
+        }
+
+        basic_hold_any(const char* x)
+          : table(spirit::detail::get_table< ::std::string>::template get<Char>()), object(0)
+        {
+            new (&object) ::std::string(x);
         }
 
         basic_hold_any()
@@ -277,6 +282,12 @@ namespace boost { namespace spirit
         // assignment operator
         template <typename T>
         basic_hold_any& operator=(T const& x)
+        {
+            return assign(x);
+        }
+
+        // assignment operator
+        basic_hold_any& operator=(basic_hold_any const& x)
         {
             return assign(x);
         }

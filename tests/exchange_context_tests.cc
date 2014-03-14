@@ -6,7 +6,7 @@
 
 #include "bid.h"
 #include "bid_portfolio.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "request.h"
 #include "request_portfolio.h"
 #include "resource.h"
@@ -36,16 +36,16 @@ using test_helpers::get_req;
 class ExchangeContextTests: public ::testing::Test {
  protected:
   TestContext tc;
-  MockFacility* fac1;
-  MockFacility* fac2;
+  TestFacility* fac1;
+  TestFacility* fac2;
   Request<Resource>::Ptr req1, req2;
   RequestPortfolio<Resource>::Ptr rp1, rp2;
   string commod1, commod2;
   double pref;
   
   virtual void SetUp() {
-    fac1 = new MockFacility(tc.get());
-    fac2 = new MockFacility(tc.get());
+    fac1 = new TestFacility(tc.get());
+    fac2 = new TestFacility(tc.get());
 
     pref = 0.5;
     commod1 = "commod1";

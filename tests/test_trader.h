@@ -5,7 +5,7 @@
 #include "context.h"
 #include "exchange_context.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "model.h"
 #include "request_portfolio.h"
 #include "resource_helpers.h"
@@ -25,12 +25,12 @@ class TestObjFactory {
   std::string commod;
 };
   
-class TestTrader : public MockFacility {
+class TestTrader : public TestFacility {
  public:
  TestTrader(Context* ctx, TestObjFactory* fac = NULL, bool is_requester = true)
    : obj_fac(fac),
      is_requester(is_requester),
-     MockFacility(ctx),
+     TestFacility(ctx),
      offer(0),
      adjusts(0),
      requests(0),
@@ -44,7 +44,7 @@ class TestTrader : public MockFacility {
   }
 
   void InitFrom(TestTrader* m) {
-    MockFacility::InitFrom(this);
+    TestFacility::InitFrom(this);
     adjusts = m->adjusts;
     requests = m->requests;
     bids = m->bids;

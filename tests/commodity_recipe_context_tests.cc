@@ -14,7 +14,7 @@ TEST(CommodRecCtx, All) {
 
   std::string in_r2 = "in_r2";
   
-  Material::Ptr mat = Material::CreateBlank(42);
+  Material::Ptr mat = NewBlankMaterial(42);
 
   CommodityRecipeContext ctx;
   ctx.AddInCommod(in_c, in_r, out_c, out_r);

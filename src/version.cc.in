@@ -1,7 +1,7 @@
-#ifndef CYCLUS_SRC_VERSION_H_
-#define CYCLUS_SRC_VERSION_H_
 
 #include <sstream>
+
+#include "version.h"
 
 #include "CbcConfig.h"
 #include "boost/version.hpp"
@@ -51,4 +51,3 @@ const char* coincbc() {
 }  // namespace version
 }  // namespace cyclus
 
-#endif  // CYCLUS_SRC_VERSION_H_

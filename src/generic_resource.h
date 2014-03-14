@@ -15,6 +15,8 @@ namespace cyclus {
 /// class interface in a simple way usable for things such as: bananas,
 /// man-hours, water, buying power, etc.
 class GenericResource : public Resource {
+  friend class SimInit;
+
  public:
   typedef
   boost::shared_ptr<GenericResource> Ptr;
@@ -24,19 +26,17 @@ class GenericResource : public Resource {
   /// pointer to the model creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Model* creator, double quantity, std::string quality,
-                    std::string units);
+  static Ptr Create(Model* creator, double quantity, std::string quality);
+                    
 
   /// Creates a new generic resource that does not actually exist as part of
   /// the simulation and is untracked.
-  static Ptr CreateUntracked(double quantity, std::string quality, std::string
-                             units);
+  static Ptr CreateUntracked(double quantity, std::string quality);
 
   /// Returns 0 (for now).
   virtual int state_id() const {
     return 0;
   };
-  // TODO: give each quality its own state_id. and have it recorded in the output db.
 
   /// Returns GenericResource::kType.
   virtual const ResourceType type() const {
@@ -47,9 +47,7 @@ class GenericResource : public Resource {
 
   virtual void Record(Context* ctx) const {};
 
-  virtual std::string units() const {
-    return units_;
-  };
+  virtual std::string units() const {return "NONE";};
 
   virtual double quantity() const {
     return quantity_;
@@ -69,19 +67,20 @@ class GenericResource : public Resource {
   GenericResource::Ptr Extract(double quantity);
 
   /// Absorbs the contents of the given 'other' resource into this resource.
-  /// @throws ValueError 'other' resource is of different units and/or quality
+  /// @throws ValueError 'other' resource is of different quality
   void Absorb(GenericResource::Ptr other);
 
  private:
   /// @param ctx the simulation context
   /// @param quantity is a double indicating the quantity
   /// @param quality the resource quality
-  /// @param units is a string indicating the resource unit
-  GenericResource(Context* ctx, double quantity, std::string quality,
-                  std::string units);
+  GenericResource(Context* ctx, double quantity, std::string quality);
+
+  // map<quality, quality_id>
+  static std::map<std::string, int> stateids_;
+  static int next_state_;
 
   Context* ctx_;
-  std::string units_;
   std::string quality_;
   double quantity_;
   ResTracker tracker_;

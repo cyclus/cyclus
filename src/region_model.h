@@ -76,34 +76,32 @@ class RegionModel : public Model, public TimeListener {
    */
   virtual ~RegionModel() {};
 
-  /**
-     Initalize the InstModel from a QueryEngine. Calls the init function.
+  // DO NOT call Model class implementation of this method
+  virtual void InfileToDb(QueryEngine* qe, DbInit di) {}
 
-     @param qe A pointer to a QueryEngine object containing initialization data
-   */
-  virtual void InitFrom(QueryEngine* qe);
+  // DO NOT call Model class implementation of this method
+  virtual void InitFrom(QueryBackend* b) {};
+
+  // DO NOT call Model class implementation of this method
+  virtual void Snapshot(DbInit di) {};
+
+  virtual void InitInv(Inventories& inv) {};
+
+  virtual Inventories SnapshotInv() { return Inventories(); };
 
   /**
      perform actions required when entering the simulation
    */
   virtual void Build(Model* parent);
 
+  virtual void DoRegistration();
+
+  virtual void Decommission();
+
   /**
      every model should be able to print a verbose description
    */
   virtual std::string str();
-
-  /* --------------------
-   * all REGIONMODEL classes have these members
-   * --------------------
-   */
-  /**
-     returns if the facility is in this region's allowed facs
-   */
-  inline bool IsAllowedFacility(std::string proto_name) {
-    return (allowedFacilities_.find(proto_name)
-            != allowedFacilities_.end());
-  } ;
 
   virtual void Tick(int time) {};
 
@@ -112,38 +110,6 @@ class RegionModel : public Model, public TimeListener {
  protected:
   void InitFrom(RegionModel* m);
 
-  /**
-     populate the region's list of allowed facilities
-   */
-  virtual void InitAllowedFacilities(QueryEngine* qe);
-
-  /**
-     populate the region's list of institution names
-   */
-  virtual void InitInstitutionNames(QueryEngine* qe);
-
-  /**
-     set the parameters necessary for RegionModel to interact
-     with the simulation
-   */
-  virtual void AddRegionAsRootNode();
-
-  /**
-     populate the region's list of child institutions
-   */
-  virtual void AddChildrenToTree();
-
- private:
-  /**
-     every region has a list of allowed facilities
-   */
-  std::set<std::string> allowedFacilities_;
-
-  /**
-     the names of the institutions in this region
-   */
-  std::set<std::string> inst_names_;
-  /* ------------------- */
 };
 
 } // namespace cyclus

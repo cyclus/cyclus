@@ -16,9 +16,8 @@
 #include "greedy_solver.h"
 #include "logger.h"
 #include "model.h"
-#include "recorder.h"
-#include "timer.h"
-#include "xml_query_engine.h"
+#include "query_engine.h"
+#include "sim_init.h"
 
 #include "xml_file_loader.h"
 
@@ -26,7 +25,6 @@ namespace cyclus {
 
 namespace fs = boost::filesystem;
 
-// - - - - - - - - - - - - - - - -   - - - - - - - - - - - - - - - - - -
 void LoadStringstreamFromFile(std::stringstream& stream,
                               std::string file) {
   std::ifstream file_stream(file.c_str());
@@ -38,7 +36,6 @@ void LoadStringstreamFromFile(std::stringstream& stream,
   file_stream.close();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string BuildMasterSchema(std::string schema_path) {
   Timer ti;
   Recorder rec;
@@ -51,13 +48,11 @@ std::string BuildMasterSchema(std::string schema_path) {
   std::vector<std::string> names = Env::ListModules();
   std::map<std::string, std::string> subschemas;
   for (int i = 0; i < names.size(); ++i) {
-    DynamicModule dyn(names[i]);
-    Model* m = dyn.ConstructInstance(&ctx);
-    subschemas[m->model_type()] += "<element name=\"" + names[i] + "\">\n";
-    subschemas[m->model_type()] += m->schema() + "\n";
-    subschemas[m->model_type()] += "</element>\n";
+    Model* m = DynamicModule::Make(&ctx, names[i]);
+    subschemas[m->kind()] += "<element name=\"" + names[i] + "\">\n";
+    subschemas[m->kind()] += m->schema() + "\n";
+    subschemas[m->kind()] += "</element>\n";
     ctx.DelModel(m);
-    dyn.CloseLibrary();
   }
 
   // replace refs in master rng template file
@@ -73,10 +68,9 @@ std::string BuildMasterSchema(std::string schema_path) {
   return master;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Composition::Ptr ReadRecipe(QueryEngine* qe) {
   bool atom_basis;
-  std::string basis_str = qe->GetElementContent("basis");
+  std::string basis_str = qe->GetString("basis");
   if (basis_str == "atom") {
     atom_basis = true;
   } else if (basis_str == "mass") {
@@ -92,8 +86,8 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   CompMap v;
   for (int i = 0; i < nnucs; i++) {
     QueryEngine* nuclide = qe->QueryElement(query, i);
-    key = strtol(nuclide->GetElementContent("id").c_str(), NULL, 10);
-    value = strtod(nuclide->GetElementContent("comp").c_str(), NULL);
+    key = strtol(nuclide->GetString("id").c_str(), NULL, 10);
+    value = strtod(nuclide->GetString("comp").c_str(), NULL);
     v[key] = value;
     CLOG(LEV_DEBUG3) << "  Nuclide: " << key << " Value: " << v[key];
   }
@@ -105,12 +99,14 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLFileLoader::XMLFileLoader(Context* ctx,
-                             std::string schema_path,
-                             const std::string load_filename) : ctx_(ctx) {
-  schema_path_ = schema_path;
-  file_ = load_filename;
+XMLFileLoader::XMLFileLoader(Recorder* r,
+                             QueryBackend* b,
+                             std::string schema_file,
+                             const std::string input_file) : b_(b), rec_(r) {
+  ctx_ = new Context(&ti_, rec_);
+
+  schema_path_ = schema_file;
+  file_ = input_file;
   std::stringstream input;
   LoadStringstreamFromFile(input, file_);
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
@@ -119,103 +115,53 @@ XMLFileLoader::XMLFileLoader(Context* ctx,
   ctx_->NewDatum("InputFiles")
   ->AddVal("Data", Blob(input.str()))
   ->Record();
-
-  schema_paths_["Region"] = "/*/region";
-  schema_paths_["Inst"] = "/*/region/institution";
-  schema_paths_["Facility"] = "/*/facility";
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLFileLoader::~XMLFileLoader() {
-  std::map<std::string, DynamicModule*>::iterator it;
-  for (it = modules_.begin(); it != modules_.end(); it++) {
-    it->second->CloseLibrary();
-    delete it->second;
-  }
+  rec_->Flush();
+  delete ctx_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::ApplySchema(const std::stringstream& schema) {
-  parser_->Validate(schema);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFileLoader::master_schema() {
   return BuildMasterSchema(schema_path_);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadSim() {
-  try {
-    LoadDynamicModules();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading dynamic modules: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
-    std::stringstream ss(master_schema());
-    parser_->Validate(ss);
-  try {
-    LoadSolver();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading solver from xml file: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
-  try {
-    LoadControlParams();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading control parameters from xml file: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
-  try {
-    LoadRecipes();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading recipes from xml file: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
-  try {
-    LoadInitialAgents();
-  } catch (std::exception& e) {
-    std::string msg = "Error loading initial agents from xml file: ";
-    msg += e.what();
-    throw cyclus::Error(msg);
-  }
+  std::stringstream ss(master_schema());
+  parser_->Validate(ss);
+  LoadControlParams(); // must be first
+  LoadSolver();
+  LoadRecipes();
+  LoadInitialAgents(); // must be last
+  SimInit::Snapshot(ctx_);
+  rec_->Flush();
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadSolver() {
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
   std::string query = "/*/commodity";
 
-  std::map<std::string, double> commodity_order;
+  std::map<std::string, double> commod_order;
   std::string name;
   double order;
   int num_commods = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < num_commods; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    name = qe->GetElementContent("name");
+    name = qe->GetString("name");
     order = GetOptionalQuery<double>(qe, "solution_order", -1);
-    commodity_order[name] = order;
+    commod_order[name] = order;
   }
 
-  ProcessCommodities(&commodity_order);
-
-  // solver will delete conditioner
-  GreedyPreconditioner* conditioner = new GreedyPreconditioner(
-    commodity_order,
-    GreedyPreconditioner::REVERSE);
-
-  // context will delete solver
-  bool exclusive_orders = false;
-  ExchangeSolver* solver = new GreedySolver(exclusive_orders, conditioner);
-
-  ctx_->solver(solver);
+  ProcessCommodities(&commod_order);
+  std::map<std::string, double>::iterator it;
+  for (it = commod_order.begin(); it != commod_order.end(); ++it) {
+    ctx_->NewDatum("CommodPriority")
+      ->AddVal("Commodity", it->first)
+      ->AddVal("SolutionOrder", it->second)
+      ->Record();
+  }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::ProcessCommodities(
   std::map<std::string, double>* commodity_order) {
   double max = std::max_element(
@@ -238,105 +184,131 @@ void XMLFileLoader::ProcessCommodities(
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadRecipes() {
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
 
   std::string query = "/*/recipe";
   int num_recipes = xqe.NElementsMatchingQuery(query);
   for (int i = 0; i < num_recipes; i++) {
     QueryEngine* qe = xqe.QueryElement(query, i);
-    std::string name = qe->GetElementContent("name");
+    std::string name = qe->GetString("name");
     CLOG(LEV_DEBUG3) << "loading recipe: " << name;
-    ctx_->AddRecipe(name, ReadRecipe(qe));
+    Composition::Ptr comp = ReadRecipe(qe);
+    comp->Record(ctx_);
+    ctx_->AddRecipe(name, comp);
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadInitialAgents() {
+  std::map<std::string, std::string> schema_paths;
+  schema_paths["Region"] = "/*/region";
+  schema_paths["Inst"] = "/*/region/institution";
+  schema_paths["Facility"] = "/*/facility";
+
   std::set<std::string> module_types;
   module_types.insert("Region");
   module_types.insert("Inst");
   module_types.insert("Facility");
   std::set<std::string>::iterator it;
+  QueryEngine xqe(*parser_);
+
+  // create prototypes
+  std::string prototype; // defined here for force-create AgentExit tbl
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    XMLQueryEngine xqe(*parser_);
-    int num_models = xqe.NElementsMatchingQuery(schema_paths_[*it]);
+    int num_models = xqe.NElementsMatchingQuery(schema_paths[*it]);
     for (int i = 0; i < num_models; i++) {
-      QueryEngine* qe = xqe.QueryElement(schema_paths_[*it], i);
+      QueryEngine* qe = xqe.QueryElement(schema_paths[*it], i);
       QueryEngine* module_data = qe->QueryElement("model");
       std::string module_name = module_data->GetElementName();
+      prototype = qe->GetString("name");
 
-      Model* model = modules_[module_name]->ConstructInstance(ctx_);
-      model->SetModelImpl(module_name);
-      model->InitFrom(qe);
+      Model* model = DynamicModule::Make(ctx_, module_name);
+      model->set_model_impl(module_name);
 
-      CLOG(LEV_DEBUG3) << "Module '" << model->name()
-                       << "' has had its module members initialized:";
-      CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
-      CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
-      CLOG(LEV_DEBUG3) << " * ID: " << model->id();
+      // call manually without agent impl injected to keep all Model state in a
+      // single, consolidated db table
+      model->Model::InfileToDb(qe, DbInit(model, true));
 
-      // register module
-      ctx_->AddPrototype(model->name(), model);
-      if (*it == "Region") {
-        Model* clone = ctx_->CreateModel<Model>(model->name());
-        clone->Build();
+      model->InfileToDb(qe, DbInit(model));
+      rec_->Flush();
+
+      std::vector<Cond> conds;
+      conds.push_back(Cond("SimId", "==", rec_->sim_id()));
+      conds.push_back(Cond("SimTime", "==", static_cast<int>(0)));
+      conds.push_back(Cond("AgentId", "==", model->id()));
+      CondInjector ci(b_, conds);
+      PrefixInjector pi(&ci, "AgentState");
+
+      // call manually without agent impl injected
+      model->Model::InitFrom(&pi);
+
+      pi = PrefixInjector(&ci, "AgentState" + module_name);
+      model->InitFrom(&pi);
+      ctx_->AddPrototype(prototype, model);
+    }
+  }
+
+  // build initial agent instances
+  int nregions = xqe.NElementsMatchingQuery(schema_paths["Region"]);
+  for (int i = 0; i < nregions; ++i) {
+    QueryEngine* qe = xqe.QueryElement(schema_paths["Region"], i);
+    std::string region_proto = qe->GetString("name");
+    Model* reg = BuildAgent(region_proto, NULL);
+
+    int ninsts = qe->NElementsMatchingQuery("institution");
+    for (int j = 0; j < ninsts; ++j) {
+      QueryEngine* qe2 = qe->QueryElement("institution", j);
+      std::string inst_proto = qe2->GetString("name");
+      Model* inst = BuildAgent(inst_proto, reg);
+
+      int nfac = qe2->NElementsMatchingQuery("initialfacilitylist/entry");
+      for (int k = 0; k < nfac; ++k) {
+        QueryEngine* qe3 = qe2->QueryElement("initialfacilitylist/entry", k);
+        std::string fac_proto = qe3->GetString("prototype");
+
+        int number = atoi(qe3->GetString("number").c_str());
+        for (int z = 0; z < number; ++z) {
+          Model* fac = BuildAgent(fac_proto, inst);
+        }
       }
     }
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLFileLoader::LoadDynamicModules() { 
-  std::string name;
-  int nmods;
-  QueryEngine* qe;
-  DynamicModule* module;
-  std::map<std::string, std::string>::iterator m_it;
-  XMLQueryEngine xqe(*parser_);
-  for (m_it = schema_paths_.begin(); m_it != schema_paths_.end(); ++m_it) {
-    nmods = xqe.NElementsMatchingQuery(m_it->second);
-    for (int i = 0; i != nmods; i++) {
-      qe = xqe.QueryElement(m_it->second, i);
-      name = qe->QueryElement("model")->GetElementName(0);
-      if (modules_.find(name) == modules_.end()) {
-        CLOG(LEV_DEBUG1) << "Loading module '" << name << "'.";
-        module = new DynamicModule(name);
-        modules_[name] = module;
-        CLOG(LEV_DEBUG1) << "Module '" << name << "' has been loaded.";
-      }
-    }
+Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
+  Model* m = ctx_->CreateModel<Model>(proto);
+  m->Build(parent);
+  if (parent != NULL) {
+    parent->BuildNotify(m);
   }
+  return m;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFileLoader::LoadControlParams() {
-  XMLQueryEngine xqe(*parser_);
+  QueryEngine xqe(*parser_);
   std::string query = "/*/control";
   QueryEngine* qe = xqe.QueryElement(query);
 
   std::string handle;
   if (qe->NElementsMatchingQuery("simhandle") > 0) {
-    handle = qe->GetElementContent("simhandle");
+    handle = qe->GetString("simhandle");
   }
 
   // get duration
-  std::string dur_str = qe->GetElementContent("duration");
+  std::string dur_str = qe->GetString("duration");
   int dur = strtol(dur_str.c_str(), NULL, 10);
   // get start month
-  std::string m0_str = qe->GetElementContent("startmonth");
+  std::string m0_str = qe->GetString("startmonth");
   int m0 = strtol(m0_str.c_str(), NULL, 10);
   // get start year
-  std::string y0_str = qe->GetElementContent("startyear");
+  std::string y0_str = qe->GetString("startyear");
   int y0 = strtol(y0_str.c_str(), NULL, 10);
   // get decay interval
-  std::string decay_str = qe->GetElementContent("decay");
+  std::string decay_str = qe->GetString("decay");
   int dec = strtol(decay_str.c_str(), NULL, 10);
 
-  ctx_->InitTime(dur, dec, m0, y0, handle);
+  ctx_->InitSim(SimInfo(dur, y0, m0, dec, handle));
 }
 
 } // namespace cyclus
-
 

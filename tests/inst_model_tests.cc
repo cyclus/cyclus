@@ -19,10 +19,3 @@ TEST_P(InstModelTests, Tock) {
   EXPECT_NO_THROW(inst_model_->Tock(time));
 }
 
-// //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST_F(InstModelTests, AddPrototype) {
-//   EXPECT_FALSE( inst_model_->IsAvailablePrototype(test_facility_));
-//   EXPECT_NO_THROW( inst_model_->wrapAddPrototype(test_facility_) );
-//   EXPECT_TRUE( inst_model_->IsAvailablePrototype(test_facility_));
-// }
-

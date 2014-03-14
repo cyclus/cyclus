@@ -19,23 +19,12 @@ class Model;
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
  public:
-
   Timer();
 
   /// Sets intial time-related parameters for the simulation.
   ///
   /// @param ctx simulation context
-  /// @param dur duration of this simulation, in months
-  /// @param m0 month the simulation starts: Jan. = 1, ..., Dec. = 12
-  /// (default = 1)
-  /// @param y0 year the simulation starts (default = 2010)
-  /// @param start GENIUS time representing the first month of the
-  /// simulation (default = 0)
-  /// @param decay interval between decay calculations in months. <=0 if
-  /// decay is off (default = 0)
-  /// @param handle a user specified name for the simulation run
-  void Initialize(Context* ctx, int dur = 1, int m0 = 1, int y0 = 2010,
-                  int decay = 0, std::string handle = "");
+  void Initialize(Context* ctx, SimInfo si);
 
   /// resets all data (registered listeners, etc.) to empty or initial state
   void Reset();
@@ -60,6 +49,9 @@ class Timer {
   /// timestep t.
   void SchedDecom(Model* m, int time);
 
+  /// Makes a snapshot of the simulation state to the output database.
+  void Snapshot() { want_snapshot_ = true; };
+
   /// Returns the current time, in months since the simulation started.
   ///
   /// @return the current time
@@ -71,10 +63,6 @@ class Timer {
   int dur();
 
  private:
-  /// logs relevant time-related data with the output system, including:
-  /// the simulation start time and the simulation duration
-  void LogTimeData(Context* ctx, std::string handle);
-
   /// builds all agents queued for the current timestep.
   void DoBuild();
 
@@ -99,18 +87,9 @@ class Timer {
   /// started.
   int time_;
 
-  /// The duration of this simulation, in months.
-  int dur_;
+  SimInfo si_;
 
-  /// time steps between automated global material decay driving
-  int decay_interval_;
-
-  /// The number of the month (Jan = 1, etc.) corresponding to t = 0 for
-  /// the scenario being run.
-  int month0_;
-
-  /// The year corresponding to t = 0 for the scenario being run.
-  int year0_;
+  bool want_snapshot_;
 
   /// Concrete models that desire to receive tick and tock notifications
   std::set<TimeListener*> tickers_;

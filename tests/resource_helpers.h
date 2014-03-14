@@ -5,7 +5,7 @@
 #include "material.h"
 #include "generic_resource.h"
 #include "test_context.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "request.h"
 #include "bid.h"
 
@@ -28,7 +28,7 @@ static cyclus::Material::Ptr get_mat() {
 }
 
 static cyclus::TestContext helper_tc;
-static MockFacility* trader = new MockFacility(helper_tc.get());
+static TestFacility* trader = new TestFacility(helper_tc.get());
 
 static cyclus::Request<cyclus::Material>::Ptr get_req(std::string commod = "") {
   return cyclus::Request<cyclus::Material>::Create(get_mat(), trader, commod);

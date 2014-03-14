@@ -3,15 +3,12 @@
 
 namespace cyclus {
 
-const std::string Error::kPrefix("cyclus error: ");
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Error::Error(std::string msg) : msg_(msg) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const char* Error::what() const throw() {
-  std::string thrown = Error::kPrefix + msg_;
-  return thrown.c_str();
+  return msg_.c_str();
 }
 
 }  // namespace cyclus

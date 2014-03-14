@@ -10,7 +10,7 @@
 #include "exchange_translation_context.h"
 #include "equality_helpers.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "request.h"
 #include "request_portfolio.h"
 #include "resource.h"

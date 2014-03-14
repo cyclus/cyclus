@@ -45,72 +45,32 @@ class InstModel : public Model, public TimeListener {
    */
   virtual ~InstModel() {};
 
-  /**
-     Initalize the InstModel from a QueryEngine. Calls the init function.
+  // DO NOT call Model class implementation of this method
+  virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
 
-     @param qe a pointer to a QueryEngine object containing intialization data
-   */
-  virtual void InitFrom(QueryEngine* qe);
+  // DO NOT call Model class implementation of this method
+  virtual void InitFrom(QueryBackend* b) {};
+
+  // DO NOT call Model class implementation of this method
+  virtual void Snapshot(DbInit di) {};
+
+  virtual void InitInv(Inventories& inv) {};
+
+  virtual Inventories SnapshotInv() { return Inventories(); };
 
   /**
      every model should be able to print a verbose description
    */
   virtual std::string str();
 
- public:
   /**
      perform all tasks required when an inst enters the simulation
    */
   virtual void Build(Model* parent);
-  /* ------------------- */
- 
-  /* --------------------
-   * all INSTMODEL classes have these members
-   * --------------------
-   */
-  /**
-     return the number of prototypes this inst can build
-   */
-  int NPrototypes() {
-    return prototypes_.size();
-  }
 
-  /**
-     return the first prototype
-   */
-  PrototypeIterator BeginPrototype() {
-    return prototypes_.begin();
-  }
+  virtual void DoRegistration();
 
-  /**
-     return the last prototype
-   */
-  PrototypeIterator EndPrototype() {
-    return prototypes_.end();
-  }
-
-  /**
-     Checks if prototype is in the prototype list
-   */
-  bool IsAvailablePrototype(std::string proto_name) {
-    return (prototypes_.find(proto_name) != prototypes_.end());
-  }
-
-  /**
-     returns this institution's region
-   */
-  RegionModel* GetRegion() {
-    return (dynamic_cast<RegionModel*>(this->parent()));
-  };
-
-  /**
-     reports number of facilities in this inst
-   */
-  int GetNumFacilities() {
-    return children().size();
-  };
-
-  virtual void BuildNotify(Model* m);
+  virtual void Decommission();
 
   virtual void Tick(int time) {};
 
@@ -119,50 +79,6 @@ class InstModel : public Model, public TimeListener {
  protected:
   void InitFrom(InstModel* m);
 
-  /**
-     add a prototoype to the set of available prototypes
-     @param proto_name the name of the prototype to add
-   */
-  void AddAvailablePrototype(std::string proto_name);
-
-  /**
-     perform any actions required after prototype has been added to
-     the list of available prototypes
-     @param proto_name the name of prototype to register
-   */
-  virtual void RegisterAvailablePrototype(std::string proto_name);
-
-  /**
-     Adds a prototype build order to initial_build_order_
-     @param qe a pointer to a QueryEngine object containing intialization data
-   */
-  void AddPrototypeToInitialBuild(QueryEngine* qe);
-
-  /**
-     perform any registration functionality after a clone has been
-     built
-     @param clone the built (cloned) prototype
-   */
-  virtual void RegisterCloneAsBuilt(Model* clone);
-
-  /**
-     perform any registration functionality before a clone is
-     decommissioned(deleted)
-     @param clone the to-be-decommissioned
-   */
-  virtual void RegisterCloneAsDecommissioned(Model* clone);
-
-private:
-  /**
-     The Inst's set of available prototypes to build
-   */
-  PrototypeSet prototypes_;
-
-  /**
-     the initial prototypes to build
-   */
-  std::map<std::string, int> initial_build_order_;
-  /* ------------------- */
 };
 
 } // namespace cyclus
