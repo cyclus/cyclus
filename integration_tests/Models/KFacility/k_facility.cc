@@ -17,11 +17,14 @@ namespace cyclus {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KFacility::KFacility(cyclus::Context* ctx)
     : cyclus::FacilityModel(ctx),
-      commod_(""),
+      in_commod_(""),
+      out_commod_(""),
       recipe_name_(""),
       commod_price_(0),
-      k_factor_(1),
-      capacity_(100) {}
+      k_factor_in_(1),
+      k_factor_out_(1),
+      in_capacity_(100),
+      out_capacity_(100) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KFacility::~KFacility() {}
@@ -30,16 +33,25 @@ KFacility::~KFacility() {}
 std::string KFacility::schema() {
   return
     "  <element name =\"setup\">              \n"
-    "    <element name =\"commodity\">        \n"
+    "    <element name =\"incommodity\">      \n"
+    "      <text/>                            \n"
+    "    </element>                           \n"
+    "    <element name =\"in_capacity\">      \n"
+    "      <data type=\"double\"/>            \n"
+    "    </element>                           \n"
+    "    <element name =\"k_factor_in\">      \n"
+    "      <data type=\"double\"/>            \n"
+    "    </element>                           \n"
+    "    <element name =\"outcommodity\">     \n"
     "      <text/>                            \n"
     "    </element>                           \n"
     "    <element name=\"recipe\">            \n"
     "      <data type=\"string\"/>            \n"
     "    </element>                           \n"
-    "    <element name =\"init_capacity\">    \n"
+    "    <element name =\"out_capacity\">     \n"
     "      <data type=\"double\"/>            \n"
     "    </element>                           \n"
-    "    <element name =\"k_factor\">         \n"
+    "    <element name =\"k_factor_out\">     \n"
     "      <data type=\"double\"/>            \n"
     "    </element>                           \n"
     "  </element>                             \n";
@@ -55,32 +67,43 @@ void KFacility::InitFrom(cyclus::QueryEngine* qe) {
   using boost::lexical_cast;
   cyclus::QueryEngine* setup = qe->QueryElement("setup");
 
+  // Facility output configuraitons
   recipe(setup->GetElementContent("recipe"));
 
-  string data = setup->GetElementContent("commodity");
+  string data = setup->GetElementContent("outcommodity");
   commodity(data);
   cyclus::Commodity commod(data);
   cyclus::CommodityProducer::AddCommodity(commod);
-  AddCommodity(commod_);
 
-  double cap = lexical_cast<double>(setup->GetElementContent("init_capacity"));
+
+  double cap = lexical_cast<double>(setup->GetElementContent("out_capacity"));
   cyclus::CommodityProducer::SetCapacity(commod, cap);
   capacity(cap);
 
-  double k = lexical_cast<double>(setup->GetElementContent("k_factor"));
-  k_factor(k);
+  double k = lexical_cast<double>(setup->GetElementContent("k_factor_out"));
+  k_factor_out(k);
+
+  // Facility input configurations
+  AddCommodity(setup->GetElementContent("incommodity"));
+  k_factor_in(lexical_cast<double>(setup->GetElementContent("k_factor_in")));
+  in_capacity_ = lexical_cast<double>(setup->GetElementContent("in_capacity"));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string KFacility::str() {
   std::stringstream ss;
   ss << cyclus::FacilityModel::str()
-     << " supplies and requests commodity '"
-     << commod_ << "' with recipe '"
+     << " supplies commodity '"
+     << out_commod_ << "' with recipe '"
      << recipe_name_ << "' at a capacity of "
-     << capacity_ << " kg per time step "
+     << out_capacity_ << " kg per time step "
      << ", changing per step by a factor "
-     << k_factor_;
+     << k_factor_out_ << "\n"
+     << "This facility also requests '"
+     << in_commod_ << "' at a capacity of "
+     << in_capacity_ << " kg per time step "
+     << ", changing per step by a factor "
+     << k_factor_in_;
   return ss.str();
 }
 
@@ -95,9 +118,12 @@ cyclus::Model* KFacility::Clone() {
 void KFacility::InitFrom(KFacility* m) {
   FacilityModel::InitFrom(m);
   commodity(m->commodity());
+  in_commod_ = m->in_commod_;
   capacity(m->capacity());
+  in_capacity_ = m->in_capacity_;
   recipe(m->recipe());
-  k_factor(m->k_factor());
+  k_factor_in(m->k_factor_in());
+  k_factor_out(m->k_factor_out());
   in_commods_ = m->in_commods_;
   CopyProducedCommoditiesFrom(m);
   current_capacity_ = capacity();
@@ -108,11 +134,11 @@ void KFacility::Tick(int time) {
   using std::string;
   using std::vector;
   LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is ticking {";
-  LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity_
+  LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << out_capacity_
                                    << " kg of "
-                                   << commod_ << ".";
+                                   << out_commod_ << ".";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
-  current_capacity_ = capacity_; // reset capacity
+  current_capacity_ = out_capacity_;  // reset capacity
 
   LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
 
@@ -138,15 +164,16 @@ void KFacility::Tock(int time) {
                                    << time << ".";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
   // Update capacity for the next step
-  capacity_ = capacity_ * k_factor_;
-  current_capacity_ = capacity_;
+  in_capacity_ = in_capacity_ * k_factor_in_;
+  out_capacity_ = out_capacity_ * k_factor_out_;
+  current_capacity_ = out_capacity_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Material::Ptr KFacility::GetOffer(
     const cyclus::Material::Ptr target) const {
   using cyclus::Material;
-  double qty = std::min(target->quantity(), capacity_);
+  double qty = std::min(target->quantity(), out_capacity_);
   return Material::CreateUntracked(qty, context()->GetRecipe(recipe_name_));
 }
 
@@ -162,11 +189,11 @@ KFacility::GetMatlBids(
 
   std::set<BidPortfolio<Material>::Ptr> ports;
 
-  if (commod_requests.count(commod_) > 0) {
+  if (commod_requests.count(out_commod_) > 0) {
     BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
 
     const std::vector<Request<Material>::Ptr>& requests = commod_requests.at(
-        commod_);
+        out_commod_);
 
     std::vector<Request<Material>::Ptr>::const_iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
@@ -175,7 +202,7 @@ KFacility::GetMatlBids(
       port->AddBid(req, offer, this);
     }
 
-    CapacityConstraint<Material> cc(capacity_);
+    CapacityConstraint<Material> cc(out_capacity_);
     port->AddConstraint(cc);
     ports.insert(port);
   }
@@ -203,12 +230,12 @@ void KFacility::GetMatlTrades(
     responses.push_back(std::make_pair(*it, response));
     LOG(cyclus::LEV_INFO5, "SrcFac") << name() << " just received an order"
                                      << " for " << qty
-                                     << " of " << commod_;
+                                     << " of " << out_commod_;
   }
   if (cyclus::IsNegative(current_capacity_)) {
     std::stringstream ss;
     ss << "is being asked to provide " << provided
-       << " but its capacity is " << capacity_ << ".";
+       << " but its capacity is " <<out_capacity_ << ".";
     throw cyclus::ValueError(Model::InformErrorMsg(ss.str()));
   }
 }

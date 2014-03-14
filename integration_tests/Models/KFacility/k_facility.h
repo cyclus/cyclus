@@ -146,12 +146,12 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
     @param name the commodity name
     */
   inline void commodity(std::string name) {
-    commod_ = name;
+    out_commod_ = name;
   }
 
   /// @return the output commodity
   inline std::string commodity() const {
-    return commod_;
+    return out_commod_;
   }
 
   /**
@@ -159,13 +159,13 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
     @param capacity the production capacity
     */
   inline void capacity(double capacity) {
-    capacity_ = capacity;
-    current_capacity_ = capacity_;
+    out_capacity_ = capacity;
+    current_capacity_ = out_capacity_;
   }
 
   /// @return the production capacity at any given time step
   inline double capacity() const {
-    return capacity_;
+    return out_capacity_;
   }
 
   /**
@@ -198,25 +198,37 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
     determines the amount to request
     */
   inline double RequestAmt() const {
-    return capacity_;
+    return in_capacity_;
   }
 
-  /// @ return the conversion factor
-  inline double k_factor() const {
-    return k_factor_;
+  /// @ return the conversion factor input
+  inline double k_factor_in() const {
+    return k_factor_in_;
   }
 
-  /// sets the conversion factor
+  /// sets the conversion factor input
   /// @param new conversion factor
-  inline void k_factor(double k_factor){
-    k_factor_ = k_factor;
+  inline void k_factor_in(double k_factor){
+    k_factor_in_ = k_factor;
+  }
+
+  /// @ return the conversion factor for output
+  inline double k_factor_out() const {
+    return k_factor_out_;
+  }
+
+  /// sets the conversion factor for output
+  /// @param new conversion factor
+  inline void k_factor_out(double k_factor){
+    k_factor_out_ = k_factor;
   }
 
  private:
   /**
-    This facility has only one output commodity
+    This facility has one output commodity and one input commodity
     */
-  std::string commod_;
+  std::string in_commod_;
+  std::string out_commod_;
 
   /**
     Name of the recipe this facility uses.
@@ -227,8 +239,10 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
     The capacity is defined in terms of the number of units of the
     recipe that can be provided each time step.  A very large number
     can be provided to represent infinte capacity.
+    In and out commodity capacities are defined
     */
-  double capacity_;
+  double in_capacity_;
+  double out_capacity_;
 
   /**
     The capacity at the current time step
@@ -248,9 +262,10 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
   cyclus::ResourceBuff inventory_;
 
   /**
-    Conversion factor
+    Conversion factors
     */
-  double k_factor_;
+  double k_factor_in_;
+  double k_factor_out_;
   /* --- */
 };
 
