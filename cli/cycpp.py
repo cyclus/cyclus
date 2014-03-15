@@ -19,10 +19,14 @@ library. It requires Python 2.7+ or Python 3.3+ to run.
 """
 from __future__ import print_function
 import os
-from collections import Sequence
+import re
+from collections import Sequence, MutableMapping
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
+#
+# pass 1
+#
 def preprocess_file(filename, cpp_path='cpp', cpp_args=('-xc++', '-pipe')):
     """Preprocess a file using cpp.
 
@@ -54,6 +58,25 @@ def preprocess_file(filename, cpp_path='cpp', cpp_args=('-xc++', '-pipe')):
                             "correctly\nOriginal error: {0}").format(e))
     return text
 
+#
+# pass 2
+#
+class TypedefFilter(MutableMapping):
+    pass
+
+class StateAccumulator(object):
+    pass
+
+def accumulate_state(lines):
+    pass
+
+#
+# pass 3
+#
+
+#
+# meta
+#
 def main():
     parser = ArgumentParser(prog="cycpp", description=__doc__, 
                             formatter_class=RawDescriptionHelpFormatter)
