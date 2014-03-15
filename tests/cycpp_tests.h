@@ -14,3 +14,4 @@ class Spy {
   std::string name;
   double not_var;
 };
+
