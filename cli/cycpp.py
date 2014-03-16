@@ -144,6 +144,15 @@ class TypedefFilter(AliasFilter):
         depth = state.depth
         state.aliases |= {(depth, typ, a) for a in g0[-1:] + g[1:]}
 
+class UsingFilter(AliasFilter):
+    """Filter for accumumating using aliases."""
+    regex = re.compile("\s*using\s+(?!namespace\s+)([\w:]+)\s*")
+
+    def transform(self, statement, sep):
+        state = self.state
+        name = self.match.group(1)
+        state.aliases.add((state.depth, name, name.rsplit('::', 1)[1]))
+
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
     # handles anonymous namespaces as group(1) == None
@@ -305,6 +314,7 @@ class StateAccumulator(object):
         self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
                         NamespaceFilter(self), UsingNamespaceFilter(self),
                         NamespaceAliasFilter(self), TypedefFilter(self),
+                        UsingFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):
