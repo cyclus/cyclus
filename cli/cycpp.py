@@ -140,6 +140,25 @@ class NamespaceFilter(Filter):
         if state.depth == state.namespaces[-1][0]:
             del state.namespaces[-1]
 
+class UsingNamespaceFilter(Filter):
+    """Filter for accumumating using namespace statement."""
+    regex = re.compile("\s*using\s+namespace\s+([\w:]*)\s*")
+
+    def transform(self, statement, sep):
+        state = self.state
+        name = self.match.group(1)
+        state.using_namespaces.add((state.depth, name))
+
+    def revert(self, statement, sep):
+        super(UsingNamespaceFilter, self).revert(statement, sep)
+        state = self.state
+        if len(state.using_namespaces) == 0 or sep != '}':
+            return
+        # Only keep ns at or above current depth
+        depth = state.depth
+        state.using_namespaces -= {d_ns for d_ns in state.using_namespaces \
+                                   if d_ns[0] > depth}
+
 class ClassFilter(Filter):
     """Filter for picking out class names."""
     regex = re.compile("\s*class\s+([\w:]+)\s*")
@@ -247,10 +266,11 @@ class StateAccumulator(object):
         self.context = {}  # classes we have accumulated
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.access = {}   # map of (classnames, current access control flags)
-        self.namespaces = []  # stack of stack of (depth, ns name) tuples
+        self.namespaces = []  # stack of (depth, ns name) tuples
+        self.using_namespaces = set()  # set of (depth, ns name) tuples
         self.var_annotations = None
         self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
-                        NamespaceFilter(self),
+                        NamespaceFilter(self), UsingNamespaceFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):

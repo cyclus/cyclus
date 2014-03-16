@@ -7,6 +7,8 @@
 
 namespace mi6 {
 
+using namespace std;
+
 class Spy {
  public:
   #pragma cyclus var dict(\
