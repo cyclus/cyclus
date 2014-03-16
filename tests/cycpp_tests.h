@@ -2,6 +2,9 @@
 
 // Spies are secret agents, get it?!
 
+#pragma cyclus exec x = 5; import time
+#pragma cyclus exec import math
+
 class Spy {
  public:
   #pragma cyclus var dict(\
@@ -11,14 +14,15 @@ class Spy {
     tooltip="eg, 007",\
     help="The spy's agent number - TOP SECRET!",\
     )
-  int num;
+  int 
+num;
 
   #pragma cyclus var dict(\
     default="James Bond, 00" + str(num['default']),\
     units="unitless",\
-    userlevel=10,\
+    userlevel=x,\
     tooltip="eg, James Bond",\
-    help="The spy's name",\
+    help="time {0}".format(time.time()),\
     )
   std::string name;
 private:

@@ -30,6 +30,12 @@ or expressions.  See the following handy table!
 :var:  Add the following C++ statement as an Agent's state variable. There is one 
        argument which must be a Python expression that evaluates to a dictionary or
        other mapping.
+:exec: Executes arbitrary python code that is passed in as the arguments and loads 
+       this into the context. This is useful for importing handy modules, declaring
+       variables for later use, or any of the other things that Python is great for.
+       Any variables defined here are kept in a seperate namespace from the classes.
+       Since this gives you direct access to the Python interpreter, try to be a 
+       little careful.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
 library. It requires Python 2.7+ or Python 3.3+ to run.
@@ -40,13 +46,16 @@ import re
 from collections import Sequence, MutableMapping
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from pprint import pprint
 
 # This migh miss files which start with '#' - however, after canonization (through cpp)
 # it shouldn't matter.
 RE_STATEMENT = re.compile(
-    r'(\s*\n#)?'  # find the start of pragmas
+    #r'(\s*\n#)?'  # find the start of pragmas
+    r'(\s*#)?'  # find the start of pragmas
     r'(\s+(public|private|protected)\s*'  # consider access control as statements
-    r'|[^{};]*)?'  # or, consider statement until we hit '{', '}', or ';'
+    #r'|[^{};]*)?'  # or, consider statement until we hit '{', '}', or ';'
+    r'|(?(1)[^\n]|[^{};])*)?'  # or, consider statement until we hit '{', '}', or ';'
     # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
     r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE)
 
@@ -155,8 +164,9 @@ class VarDecorationFilter(Filter):
         context = state.context
         classname = state.classname()
         raw = self.match.group(1)
-        state.var_annotations = eval(raw, context, context.get(classname, {}))
-        del context['__builtins__']
+        glb = dict(state.execns)
+        glb.update(context)
+        state.var_annotations = eval(raw, glb, context.get(classname, {}))
 
 class VarDeclarationFilter(Filter):
     """State varible declaration.  Only oeprates if state.var_annotations is 
@@ -182,6 +192,24 @@ class VarDeclarationFilter(Filter):
         state.context[classname][vname] = annotations
         state.var_annotations = None
 
+class ExecFilter(Filter):
+    """Filter for executing arbitrary python code in the exec pragma and 
+    adding the results to the context.  This pragma has the form:
+
+        #pragma cyclus exec <code>
+
+    Any Python statement(s) are valid as part of the code block. Be a little
+    careful when using this pragma :).
+    """
+    regex = re.compile("#\s*pragma\s+cyclus\s+exec\s+(.*)")
+
+    def transform(self, statement, sep):
+        execns = self.state.execns
+        context = self.state.context
+        raw = self.match.group(1)
+        exec(raw, context, execns)
+        del context['__builtins__']
+
 class StateAccumulator(object):
     """This represents the state of the file as it is being traversed.  
     At the end of the traversal the will have acquired all of the information
@@ -197,11 +225,12 @@ class StateAccumulator(object):
     
     def __init__(self):
         self.depth = 0
+        self.execns = {}   # execution namespace we have accumulated
         self.context = {}  # classes we have accumulated
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.access = {}   # map of (classnames, current access control flags)
         self.var_annotations = None
-        self.filters = [ClassFilter(self), AccessFilter(self), 
+        self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):
@@ -257,7 +286,7 @@ def main():
 
     canon = preprocess_file(ns.path)  # pass 1
     state = accumulate_state(canon)   # pass 2
-    print(state.context)
+    pprint(state.context)
 
 if __name__ == "__main__":
     main()
