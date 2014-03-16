@@ -129,6 +129,10 @@ class ClassFilter(Filter):
             return
         if state.depth == state.classes[-1][0]:
             del state.classes[-1]
+            state.access = None
+
+class AccessFilter(Filter):
+    """Filter for setting the current access control flaf."""
 
 class VarDecorationFilter(Filter):
     """Filter for handling state variable decoration of the form:
@@ -181,6 +185,7 @@ class StateAccumulator(object):
         self.depth = 0
         self.context = {}  # classes we have accumulated
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
+        self.access = None  # current access control flag
         self.var_annotations = None
         self.filters = [ClassFilter(self), VarDecorationFilter(self), 
                         VarDeclarationFilter(self)]
