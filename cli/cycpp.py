@@ -266,7 +266,7 @@ class VarDeclarationFilter(Filter):
             raise ValueError(msg.format(vname, classname, access or 'private'))
         if classname not in state.context:
             state.context[classname] = {}
-        annotations['type'] = vtype.strip().replace('\n', '')
+        annotations['type'] = state.canonize_type(vtype, vname)
         state.context[classname][vname] = annotations
         state.var_annotations = None
 
@@ -290,10 +290,12 @@ class ExecFilter(Filter):
 
 class StateAccumulator(object):
     """This represents the state of the file as it is being traversed.  
-    At the end of the traversal the will have acquired all of the information
+    At the end of the traversal this will have acquired all of the information
     needed for pass 2. It manages both the decorators and other needed bits 
-    of C++ syntax.  It works by passing each statement through a sequence of 
+    of C++ syntax. It works by passing each statement through a sequence of 
     filters, and builds up or destroys context as it goes.
+
+    This class also functions as a typesystem for the types it sees.
 
     Attributes
     ----------
@@ -322,6 +324,9 @@ class StateAccumulator(object):
         return self.classes[-1][1]
 
     def accumulate(self, statement, sep):
+        """Modify the existing state by incoprorating the statement, which is 
+        partitioned from the next statement by sep.
+        """
         #print((repr(statement), repr(sep)))
         #print()
         # filters have to come before sep
@@ -337,6 +342,27 @@ class StateAccumulator(object):
         # revert what is needed
         for filter in self.filters: 
             filter.revert(statement, sep)
+
+    #
+    # type system
+    #
+    known_primitives = {"std::string", "float", "double", "int"}
+
+    def canonize_type(self, t, name="<member variable>"):
+        """Returns the canonical form for a type given the current state.
+        This should not be called for types other than state variables.
+        """
+        t = " ".join(t.split())
+        if '<' in t:
+            # template type
+            pass
+        else:
+            if t not in self.known_primitives:
+                msg = ("the type of {c}::{n} ({t}) is not a recognized primitive "
+                       "type: {p}.").format(t=t, n=name, c=self.classname(), 
+                                            p=", ".join(sorted(self.known_primitives)))
+                raise TypeError(msg)
+        return t
 
 def accumulate_state(canon):
     """Takes a canonical C++ source file and separates it out into statements

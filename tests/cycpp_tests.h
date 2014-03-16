@@ -33,6 +33,7 @@ num;
     help="time {0}".format(time.time()),\
     )
   std::string name;
+  //char * name;
 private:
   double not_var;
 };
