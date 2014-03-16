@@ -41,7 +41,13 @@ from collections import Sequence, MutableMapping
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-RE_STATEMENT = re.compile(r'(#?|[^{};]*?)(?(1)\n|[{};])', re.MULTILINE)
+#RE_STATEMENT = re.compile(r'(\n#)?([^{};]*?)(?(1)\n|[{};])', re.MULTILINE)
+RE_STATEMENT = re.compile(
+    r'(\n#)?'  # find the start of pragmas
+    r'(\s+(public|private|protected)\s*'  # consider access control as statements
+    r'|[^{};]*)?'  # or, consider statement until we hit '{', '}', or ';'
+    # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
+    r'((?(1)\n|[{};])|:)', re.MULTILINE)
 
 #
 # pass 1
@@ -96,9 +102,10 @@ def accumulate_state(canon):
     for m in RE_STATEMENT.finditer(canon):
         if m is None:
             continue
-        statement, sep = m.groups()
-        state.accumulate(statement)
-        #state.accumulate(sep)
+        #statement, sep = m.groups()
+        g = m.groups()
+        #state.accumulate(statement)
+        state.accumulate(g)
     return state
 
 #
