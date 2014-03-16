@@ -348,12 +348,15 @@ class StateAccumulator(object):
     #
     known_primitives = {"std::string", "float", "double", "int"}
 
+    scopz = "::"  # intern the scoping operator
+
     def canonize_type(self, t, name="<member variable>"):
         """Returns the canonical form for a type given the current state.
         This should not be called for types other than state variables.
         The name argument here is provided for debugging & reporting purposes.
         """
-        t = " ".join(t.split())
+        scopz = self.scopz
+        t = " ".join(t.strip().strip(scopz).split())
         if '<' in t:
             # template type
             pass
@@ -367,6 +370,14 @@ class StateAccumulator(object):
                 taliases.sort()  # gets the alias at the maximum nesting
                 talias = taliases[-1][1]
                 return self.canonize_type(talias, name)
+            depth = self.depth
+            for d, nsa in sorted(self.using_namespaces, reverse=True):
+                if len(t.split(scopz)) > len(nsa.split(scopz)):
+                    continue
+                try:
+                    return self.canonize_type(nsa + scopz + t, name)
+                except TypeError:
+                    pass  # This is the TypeError from below
             else:
                 msg = ("the type of {c}::{n} ({t}) is not a recognized primitive "
                        "type: {p}.").format(t=t, n=name, c=self.classname(), 

@@ -28,6 +28,9 @@ class Spy {
   int 
 num;
 
+  //using std::string;
+  using namespace std;
+
   #pragma cyclus var dict(\
     default="James Bond, 00" + str(num['default']),\
     units="unitless",\
@@ -35,7 +38,8 @@ num;
     tooltip="eg, James Bond",\
     help="time {0}".format(time.time()),\
     )
-  std::string name;
+  string name;
+  //std::string name;
   //char * name;
 
   #pragma cyclus var {\
