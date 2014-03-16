@@ -1,10 +1,11 @@
-#include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <string>
+
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 #include "csv_back.h"
@@ -22,8 +23,8 @@ namespace fs = boost::filesystem;
 using namespace cyclus;
 
 struct ArgInfo {
-  po::variables_map vm; // holds parsed/specified cli opts and values
-  po::options_description desc; // holds cli opts description;
+  po::variables_map vm;  // holds parsed/specified cli opts and values
+  po::options_description desc;  // holds cli opts description;
   bool flat_schema;
   std::string schema_path;
   std::string output_path;
@@ -59,12 +60,12 @@ int main(int argc, char* argv[]) {
   // handle cli option flags
   ArgInfo ai;
   int ret = ParseCliArgs(&ai, argc, argv);
-  if (ret > -1 ) {
+  if (ret > -1) {
     return ret;
   }
   GetSimInfo(&ai);
   ret = EarlyExitArgs(ai);
-  if (ret > -1 ) {
+  if (ret > -1) {
     return ret;
   }
 
@@ -110,18 +111,18 @@ int main(int argc, char* argv[]) {
   FullBackend* fback = NULL;
   RecBackend* rback = NULL;
   RecBackend::Deleter bdel;
-  Recorder rec; // must be after backend deleter because ~Rec does flushing
+  Recorder rec;  // must be after backend deleter because ~Rec does flushing
 
   std::string ext = fs::path(ai.output_path).extension().generic_string();
   std::string stem = fs::path(ai.output_path).stem().generic_string();
-  if (ext == ".h5") { // not queryable
+  if (ext == ".h5") {  // not queryable
     fback = new SqliteBack(stem + ".sqlite");
     rback = new Hdf5Back(ai.output_path.c_str());
     rec.RegisterBackend(rback);
     rec.RegisterBackend(fback);
     bdel.Add(rback);
     bdel.Add(fback);
-  } else if (ext == ".csv") { // not queryable
+  } else if (ext == ".csv") {  // not queryable
     fback = new SqliteBack(stem + ".sqlite");
     rback = new CsvBack(ai.output_path.c_str());
     rec.RegisterBackend(rback);
@@ -160,7 +161,7 @@ int main(int argc, char* argv[]) {
                (si.context()->sim_id()) << std::endl;
 
   return 0;
-};
+}
 
 int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
   // verbosity help msg
@@ -257,8 +258,8 @@ int EarlyExitArgs(const ArgInfo& ai) {
     }
     return 0;
   }
-  return -1; // main should not return early
-};
+  return -1;  // main should not return early
+}
 
 void GetSimInfo(ArgInfo* ai) {
   // schema info
@@ -294,4 +295,3 @@ void GetSimInfo(ArgInfo* ai) {
     ai->output_path = ai->vm["output-path"].as<std::string>();
   }
 }
-
