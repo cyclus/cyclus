@@ -25,8 +25,8 @@ class XMLFlatLoader : public XMLFileLoader {
 
  protected:
   virtual std::string master_schema();
-
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_XML_FLAT_LOADER_H_
