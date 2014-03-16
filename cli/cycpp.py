@@ -106,9 +106,9 @@ class Filter(object):
         raise NotImplementedError("no transformation function for "
                                   "{0}".format(self.__class__.__name__))
 
-    # Reverts state transformation, if needed.  None otherwise.
-    # Same signature as transform()
-    revert = None
+    def revert(self, statement, sep):
+        """Reverts state transformation."""
+        self.match = None
 
 class TypedefFilter(MutableMapping):
     pass
@@ -123,6 +123,7 @@ class ClassFilter(Filter):
         state.classes.append((state.depth, name))
 
     def revert(self, statement, sep):
+        super(ClassFilter, self).revert(statement, sep)
         state = self.state
         if len(state.classes) == 0:
             return
@@ -134,15 +135,34 @@ class VarDecorationFilter(Filter):
 
         #pragma cyclus var <dict>
 
-    This evals the contents of dict and puts them in the context.    
+    This evals the contents of dict and puts them in state.var_annotations, to be 
+    consumed by the next match with VarDeclarationFilter.
     """
     regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
 
     def transform(self, statement, sep):
         raw = self.match.group(1)
-        d = eval(raw)
-        classname = self.state.classes[-1][1]
-        self.state.context[classname] = d
+        self.state.var_annotations = eval(raw)
+
+class VarDeclarationFilter(Filter):
+    """State varible declaration.  Only oeprates if state.var_annotations is 
+    not None. Access for member variable must be public.
+    """
+    regex = re.compile("(.*\w+.*?)\s+(\w+)")
+
+    def transform(self, statement, sep):
+        state = self.state
+        annotations = state.var_annotations
+        if annotations is None:
+            return
+        # put access check here
+        classname = state.classes[-1][1]
+        if classname not in state.context:
+            state.context[classname] = {}
+        vtype, vname = self.match.groups()
+        annotations['type'] = vtype.strip().replace('\n', '')
+        state.context[classname][vname] = annotations
+        state.var_annotations = None
 
 class StateAccumulator(object):
     """This represents the state of the file as it is being traversed.  
@@ -161,7 +181,9 @@ class StateAccumulator(object):
         self.depth = 0
         self.context = {}  # classes we have accumulated
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
-        self.filters = [ClassFilter(self), VarDecorationFilter(self)]
+        self.var_annotations = None
+        self.filters = [ClassFilter(self), VarDecorationFilter(self), 
+                        VarDeclarationFilter(self)]
 
     def accumulate(self, statement, sep):
         #print((repr(statement), repr(sep)))
@@ -178,8 +200,7 @@ class StateAccumulator(object):
             self.depth -= 1
         # revert what is needed
         for filter in self.filters: 
-            if filter.revert is not None:
-                filter.revert(statement, sep)
+            filter.revert(statement, sep)
 
 def accumulate_state(canon):
     """Takes a canonical C++ source file and separates it out into statements
