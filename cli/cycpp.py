@@ -346,9 +346,15 @@ class StateAccumulator(object):
     #
     # type system
     #
-    known_primitives = {"std::string", "float", "double", "int"}
-
-    scopz = "::"  # intern the scoping operator
+    known_primitives = {'std::string', 'float', 'double', 'int'}
+    known_templates = {
+        'std::set': ('T',),
+        'std::map': ('Key', 'T'),
+        'std::pair': ('T1', 'T2'),
+        'std::list': ('T',),
+        'std::vector': ('T',),
+        }
+    scopz = '::'  # intern the scoping operator
 
     def canonize_type(self, t, name="<member variable>"):
         """Returns the canonical form for a type given the current state.
@@ -370,9 +376,10 @@ class StateAccumulator(object):
                 taliases.sort()  # gets the alias at the maximum nesting
                 talias = taliases[-1][1]
                 return self.canonize_type(talias, name)
-            depth = self.depth
             for d, nsa in sorted(self.using_namespaces, reverse=True):
                 if len(t.split(scopz)) > len(nsa.split(scopz)):
+                    # fixed point of reccursion when type would be more scoped than 
+                    # the alias - which is impossible.
                     continue
                 try:
                     return self.canonize_type(nsa + scopz + t, name)
