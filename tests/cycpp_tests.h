@@ -5,6 +5,8 @@
 #pragma cyclus exec x = 5; import time
 #pragma cyclus exec import math
 
+namespace mi6 {
+
 class Spy {
  public:
   #pragma cyclus var dict(\
@@ -28,4 +30,7 @@ num;
 private:
   double not_var;
 };
+
+}; // namespace mi6
+
 

@@ -122,6 +122,24 @@ class Filter(object):
 class TypedefFilter(MutableMapping):
     pass
 
+class NamespaceFilter(Filter):
+    """Filter for accumumating namespace encapsulations."""
+    # handles anonymous namespaces as group(1) == None
+    regex = re.compile("\s*namespace(\s+(\w*)?)?\s*$")
+
+    def transform(self, statement, sep):
+        state = self.state
+        name = self.match.group(2)
+        state.namespaces.append((state.depth, name))
+
+    def revert(self, statement, sep):
+        super(NamespaceFilter, self).revert(statement, sep)
+        state = self.state
+        if len(state.namespaces) == 0:
+            return
+        if state.depth == state.namespaces[-1][0]:
+            del state.namespaces[-1]
+
 class ClassFilter(Filter):
     """Filter for picking out class names."""
     regex = re.compile("\s*class\s+([\w:]+)\s*")
@@ -229,8 +247,10 @@ class StateAccumulator(object):
         self.context = {}  # classes we have accumulated
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.access = {}   # map of (classnames, current access control flags)
+        self.namespaces = []  # stack of stack of (depth, ns name) tuples
         self.var_annotations = None
         self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
+                        NamespaceFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):
@@ -241,7 +261,7 @@ class StateAccumulator(object):
         #print((repr(statement), repr(sep)))
         #print()
         # filters have to come before sep
-        for filter in (() if len(statement) == 0 else self.filters): 
+        for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
                 filter.transform(statement, sep)
                 break
