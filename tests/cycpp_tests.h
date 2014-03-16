@@ -12,6 +12,7 @@ class Spy {
     help="The spy's agent number - TOP SECRET!",\
     )
   int num;
+
   #pragma cyclus var dict(\
     default="James Bond, 00" + str(num['default']),\
     units="unitless",\

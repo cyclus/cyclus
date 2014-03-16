@@ -44,7 +44,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 # This migh miss files which start with '#' - however, after canonization (through cpp)
 # it shouldn't matter.
 RE_STATEMENT = re.compile(
-    r'(\n#)?'  # find the start of pragmas
+    r'(\s*\n#)?'  # find the start of pragmas
     r'(\s+(public|private|protected)\s*'  # consider access control as statements
     r'|[^{};]*)?'  # or, consider statement until we hit '{', '}', or ';'
     # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
