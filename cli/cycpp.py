@@ -43,7 +43,7 @@ library. It requires Python 2.7+ or Python 3.3+ to run.
 from __future__ import print_function
 import os
 import re
-from collections import Sequence, MutableMapping
+from collections import Sequence
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint
@@ -119,7 +119,19 @@ class Filter(object):
         """Reverts state transformation."""
         self.match = None
 
-class TypedefFilter(MutableMapping):
+class AliasFilter(Filter):
+    """Filter for managing alias scoping."""
+
+    def revert(self, statement, sep):
+        super(AliasFilter, self).revert(statement, sep)
+        state = self.state
+        if len(state.aliases) == 0 or sep != '}':
+            return
+        # Only keep alias at or above current depth
+        depth = state.depth
+        state.aliases -= {d_n_a for d_n_a in state.aliases if d_n_a[0] > depth}
+
+class TypedefFilter(AliasFilter):
     pass
 
 class NamespaceFilter(Filter):
@@ -159,7 +171,7 @@ class UsingNamespaceFilter(Filter):
         state.using_namespaces -= {d_ns for d_ns in state.using_namespaces \
                                    if d_ns[0] > depth}
 
-class NamespaceAliasFilter(Filter):
+class NamespaceAliasFilter(AliasFilter):
     """Filter for accumumating namespace renames."""
     regex = re.compile("\s*namespace\s+(\w+)\s*=\s*([\w:]+)\s*")
 
@@ -167,17 +179,7 @@ class NamespaceAliasFilter(Filter):
         state = self.state
         alias = self.match.group(1)
         name = self.match.group(2)
-        state.namespace_aliases.add((state.depth, name, alias))
-
-    def revert(self, statement, sep):
-        super(NamespaceAliasFilter, self).revert(statement, sep)
-        state = self.state
-        if len(state.namespace_aliases) == 0 or sep != '}':
-            return
-        # Only keep alias at or above current depth
-        depth = state.depth
-        state.namespace_aliases -= {d_ns_a for d_ns_a in state.namespace_aliases \
-                                    if d_ns_a[0] > depth}
+        state.aliases.add((state.depth, name, alias))
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
@@ -288,7 +290,7 @@ class StateAccumulator(object):
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.using_namespaces = set()  # set of (depth, ns name) tuples
-        self.namespace_aliases = set()  # set of (depth, ns name, alias) tuples
+        self.aliases = set()  # set of (depth, name, alias) tuples
         self.var_annotations = None
         self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
                         NamespaceFilter(self), UsingNamespaceFilter(self),
