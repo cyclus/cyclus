@@ -41,7 +41,8 @@ from collections import Sequence, MutableMapping
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-#RE_STATEMENT = re.compile(r'(\n#)?([^{};]*?)(?(1)\n|[{};])', re.MULTILINE)
+# This migh miss files which start with '#' - however, after canonization (through cpp)
+# it shouldn't matter.
 RE_STATEMENT = re.compile(
     r'(\n#)?'  # find the start of pragmas
     r'(\s+(public|private|protected)\s*'  # consider access control as statements
@@ -86,26 +87,113 @@ def preprocess_file(filename, cpp_path='cpp', cpp_args=('-xc++', '-pipe')):
 #
 # pass 2
 #
+class Filter(object):
+    """A basic, no-op filter."""
+
+    regex = re.compile('a^')  # neat regex which fails even against empty strings
+
+    def __init__(self, state=None, *args, **kwargs):
+        self.state = state
+        self.match = None
+
+    def isvalid(self, statement):
+        """Checks if a statement is valid for this fliter."""
+        self.match = m = self.regex.match(statement)
+        return m is not None
+
+    def transform(self, statement, sep):
+        """Performs a transformation given this."""
+        raise NotImplementedError("no transformation function for "
+                                  "{0}".format(self.__class__.__name__))
+
+    # Reverts state transformation, if needed.  None otherwise.
+    # Same signature as transform()
+    revert = None
+
 class TypedefFilter(MutableMapping):
     pass
 
-class StateAccumulator(object):
+class ClassFilter(Filter):
+    """Filter for picking out class names."""
+    regex = re.compile("\s*class\s+([\w:]+)\s*")
 
-    def accumulate(self, statement):
-        print(repr(statement))
+    def transform(self, statement, sep):
+        state = self.state
+        name = self.match.group(1)
+        state.classes.append((state.depth, name))
+
+    def revert(self, statement, sep):
+        state = self.state
+        if len(state.classes) == 0:
+            return
+        if state.depth == state.classes[-1][0]:
+            del state.classes[-1]
+
+class VarDecorationFilter(Filter):
+    """Filter for handling state variable decoration of the form:
+
+        #pragma cyclus var <dict>
+
+    This evals the contents of dict and puts them in the context.    
+    """
+    regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
+
+    def transform(self, statement, sep):
+        raw = self.match.group(1)
+        d = eval(raw)
+        classname = self.state.classes[-1][1]
+        self.state.context[classname] = d
+
+class StateAccumulator(object):
+    """This represents the state of the file as it is being traversed.  
+    At the end of the traversal the will have acquired all of the information
+    needed for pass 2. It manages both the decorators and other needed bits 
+    of C++ syntax.  It works by passing each statement through a sequence of 
+    filters, and builds up or destroys context as it goes.
+
+    Attributes
+    ----------
+    depth : int
+        The current nesting level.
+    """
+    
+    def __init__(self):
+        self.depth = 0
+        self.context = {}  # classes we have accumulated
+        self.classes = []  # stack of (depth, class name) tuples, most nested is last
+        self.filters = [ClassFilter(self), VarDecorationFilter(self)]
+
+    def accumulate(self, statement, sep):
+        #print((repr(statement), repr(sep)))
+        #print()
+        # filters have to come before sep
+        for filter in (() if len(statement) == 0 else self.filters): 
+            if filter.isvalid(statement):
+                filter.transform(statement, sep)
+                break
+        # seps must come before revert
+        if sep == '{':
+            self.depth += 1
+        elif sep == '}':
+            self.depth -= 1
+        # revert what is needed
+        for filter in self.filters: 
+            if filter.revert is not None:
+                filter.revert(statement, sep)
 
 def accumulate_state(canon):
     """Takes a canonical C++ source file and separates it out into statements
     which are fed into a state accumulator.  The state is returned.
     """
     state = StateAccumulator()
+    canon = '\n' + canon if canon.startswith('#') else canon
     for m in RE_STATEMENT.finditer(canon):
         if m is None:
             continue
-        #statement, sep = m.groups()
-        g = m.groups()
-        #state.accumulate(statement)
-        state.accumulate(g)
+        prefix, statement, _, sep = m.groups()
+        statement = statement if prefix is None else prefix + statement
+        statement = statement.strip()
+        state.accumulate(statement, sep)
     return state
 
 #
@@ -123,6 +211,7 @@ def main():
 
     canon = preprocess_file(ns.path)  # pass 1
     state = accumulate_state(canon)   # pass 2
+    print(state.context)
 
 if __name__ == "__main__":
     main()
