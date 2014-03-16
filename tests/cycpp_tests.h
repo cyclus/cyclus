@@ -3,7 +3,7 @@
 // Spies are secret agents, get it?!
 
 class Spy {
-public:
+ public:
   #pragma cyclus var dict(\
     default=7,\
     units="unitless",\
@@ -12,8 +12,15 @@ public:
     help="The spy's agent number - TOP SECRET!",\
     )
   int num;
-private:
+  #pragma cyclus var dict(\
+    default="James Bond, 00" + str(num['default']),\
+    units="unitless",\
+    userlevel=10,\
+    tooltip="eg, James Bond",\
+    help="The spy's name",\
+    )
   std::string name;
+private:
   double not_var;
 };
 

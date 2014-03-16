@@ -48,7 +48,7 @@ RE_STATEMENT = re.compile(
     r'(\s+(public|private|protected)\s*'  # consider access control as statements
     r'|[^{};]*)?'  # or, consider statement until we hit '{', '}', or ';'
     # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
-    r'((?(1)\n|[{};])|:)', re.MULTILINE)
+    r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE)
 
 #
 # pass 1
@@ -151,8 +151,12 @@ class VarDecorationFilter(Filter):
     regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
 
     def transform(self, statement, sep):
+        state = self.state
+        context = state.context
+        classname = state.classname()
         raw = self.match.group(1)
-        self.state.var_annotations = eval(raw)
+        state.var_annotations = eval(raw, context, context.get(classname, {}))
+        del context['__builtins__']
 
 class VarDeclarationFilter(Filter):
     """State varible declaration.  Only oeprates if state.var_annotations is 
@@ -165,7 +169,7 @@ class VarDeclarationFilter(Filter):
         annotations = state.var_annotations
         if annotations is None:
             return
-        classname = state.classes[-1][1]
+        classname = state.classname()
         vtype, vname = self.match.groups()
         access = state.access[tuple(state.classes)]
         if access != "public":
@@ -200,6 +204,10 @@ class StateAccumulator(object):
         self.filters = [ClassFilter(self), AccessFilter(self), 
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
+    def classname(self):
+        """Returns the current, most-nested class name."""
+        return self.classes[-1][1]
+
     def accumulate(self, statement, sep):
         #print((repr(statement), repr(sep)))
         #print()
@@ -227,6 +235,8 @@ def accumulate_state(canon):
         if m is None:
             continue
         prefix, statement, _, sep = m.groups()
+        #print((prefix, statement, _, sep))
+        #print()
         statement = statement if prefix is None else prefix + statement
         statement = statement.strip()
         state.accumulate(statement, sep)
