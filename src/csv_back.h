@@ -50,5 +50,7 @@ class CsvBack: public RecBackend {
   /// Stores the database's path, declared during construction.
   boost::filesystem::path path_;
 };
+
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_CSV_BACK_H_

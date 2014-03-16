@@ -70,4 +70,5 @@ double ValueFunc(double frac);
 
 }  // namespace enrichment
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_ENRICHMENT_H_

@@ -4,8 +4,8 @@
  */
 #include <iostream>
 
-#include "error.h"
 #include "cyc_arithmetic.h"
+#include "error.h"
 
 namespace cyclus {
 
@@ -47,4 +47,5 @@ std::vector<double> CycArithmetic::sort_ascending(std::map<int, double>
   }
   return sort_ascending(vec_to_sort);
 }
+
 }  // namespace cyclus

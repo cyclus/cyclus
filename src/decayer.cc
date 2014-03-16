@@ -23,7 +23,7 @@ Decayer::Decayer(const CompMap& comp) {
   long double atom_count;
   bool needs_build = false;
 
-  std::map<int, double>::const_iterator comp_iter = comp.begin();
+  std::map<int, double>::const_iterator comp_iter;
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
     nuc = comp_iter->first;
     atom_count = comp_iter->second;
@@ -33,8 +33,9 @@ Decayer::Decayer(const CompMap& comp) {
     }
   }
 
-  if (needs_build)
+  if (needs_build) {
     BuildDecayMatrix();
+  }
 
   pre_vect_ = Vector(parent_.size(), 1);
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
@@ -51,13 +52,14 @@ void Decayer::AddNucToMaps(int nuc) {
   int col;
   int daughter;
   std::set<int> daughters;
-  std::set<int>::iterator d; 
+  std::set<int>::iterator d;
 
-  if (IsNucTracked(nuc))
+  if (IsNucTracked(nuc)) {
     return;
+  }
 
   col = parent_.size() + 1;
-  parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));  
+  parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));
   AddNucToList(nuc);
 
   i = 0;
@@ -66,7 +68,8 @@ void Decayer::AddNucToMaps(int nuc) {
   for (d = daughters.begin(); d != daughters.end(); ++d) {
     daughter = *d;
     AddNucToMaps(daughter);
-    dvec[i] = std::make_pair<int, double>(daughter, pyne::branch_ratio(nuc, daughter));
+    dvec[i] = std::make_pair<int, double>(daughter,
+                                          pyne::branch_ratio(nuc, daughter));
     i++;
   }
   daughters_[col] = dvec;
@@ -122,8 +125,9 @@ void Decayer::BuildDecayMatrix() {
     jcol = parent_iter->second.first;  // determines column index
     decay_const = parent_iter->second.second;
     // Gross heuristic for mostly stable nuclides 2903040000 sec / 100 years
-    if (static_cast<long double>(exp(-2903040000 * decay_const)) == 0.0)
+    if (static_cast<long double>(exp(-2903040000 * decay_const)) == 0.0) {
       decay_const = 0.0;
+    }
     decay_matrix_(jcol, jcol) = -1 * decay_const;  // sets A(i,i) value
 
     // processes the vector in the daughters map if it is not empty

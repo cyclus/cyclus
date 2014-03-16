@@ -18,10 +18,8 @@ namespace cyclus {
 class CommodityRecipeContext : public StateWrangler {
  public:
   /// @brief add an input commodity and its relations
-  void AddInCommod(std::string in_commod,
-                   std::string in_recipe,
-                   std::string out_commod,
-                   std::string out_recipe);
+  void AddInCommod(std::string in_commod, std::string in_recipe,
+                   std::string out_commod, std::string out_recipe);
 
   /// @brief add a resource and its commodity affiliation
   void AddRsrc(std::string commod, Resource::Ptr rsrc);

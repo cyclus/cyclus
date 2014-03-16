@@ -1,6 +1,6 @@
-#include <utility>
-
 #include "commodity_recipe_context.h"
+
+#include <utility>
 
 namespace cyclus {
 
@@ -58,15 +58,17 @@ void CommodityRecipeContext::InfileToDb(QueryEngine* qe, DbInit di) {
 void CommodityRecipeContext::InitFrom(QueryBackend* b) {
   QueryResult qr = b->Query("CommodityRecipeContext_inoutmap", NULL);
   for (int i = 0; i < qr.rows.size(); ++i) {
-    AddInCommod(qr.GetVal<std::string>("in_commod", i), 
-                qr.GetVal<std::string>("in_recipe", i), 
-                qr.GetVal<std::string>("out_commod", i), 
+    AddInCommod(qr.GetVal<std::string>("in_commod", i),
+                qr.GetVal<std::string>("in_recipe", i),
+                qr.GetVal<std::string>("out_commod", i),
                 qr.GetVal<std::string>("out_recipe", i));
   }
 
   try {
     qr = b->Query("CommodityRecipeContext_resmap", NULL);
-  } catch(std::exception err) {return;} // table doesn't exist (okay)
+  } catch (std::exception err) {
+    return;  // table doesn't exist (okay)
+  }
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string commod = qr.GetVal<std::string>("commod", i);
     int id = qr.GetVal<int>("res_id", i);

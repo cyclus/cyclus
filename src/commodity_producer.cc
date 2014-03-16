@@ -6,9 +6,7 @@
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CommodInfo::CommodInfo()
-    : capacity(0),
-      cost(kModifierLimit) {}
+CommodInfo::CommodInfo() : capacity(0), cost(kModifierLimit) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 CommodInfo::CommodInfo(double a_capacity,

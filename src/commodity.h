@@ -5,7 +5,7 @@
 
 namespace cyclus {
 /**
-  a simple class defining a commodity; it is currently super simple.
+  A simple class defining a commodity; it is currently super simple.
   The reason this class exists is so that code may be cleaner and more straightforward
   while one could have chosen to typedef a string, there may be some reason to extend
   the class in the future.
@@ -46,5 +46,7 @@ struct CommodityCompare {
     return lhs.name() < rhs.name();
   }
 };
+
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_COMMODITY_H_

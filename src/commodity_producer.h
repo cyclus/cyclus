@@ -88,4 +88,5 @@ class CommodityProducer {
 };
 
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_COMMODITY_PRODUCER_H_

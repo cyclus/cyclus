@@ -9,13 +9,13 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <element name="simulation">
 
     <interleave>
-    
+
     <ref name="control"/>
 
     <oneOrMore>
     <ref name="commodity"/>
     </oneOrMore>
-      
+
     <oneOrMore>
     <choice>
     <ref name="facility"/>
@@ -318,13 +318,13 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- begin section for institutions -->
   <define name="institution">
     <element name="institution">
-      
+
       <interleave>
 
       <element name="name">
          <text/>
       </element>
-      
+
       <ref name="lifetime" />
 
       <optional>
@@ -354,7 +354,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <choice> @Inst_REFS@
       </choice>
       </element>
-      
+
       </interleave>
     </element>
   </define>
@@ -395,4 +395,3 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- end section for recipes -->
 
 </grammar>
-

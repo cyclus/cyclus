@@ -41,6 +41,7 @@ void DynamicModule::CloseLibrary() {
     FreeLibrary(module_library_);
   }
 }
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_WINDOWS_HELPER_FUNCTIONS_H_

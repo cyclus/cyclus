@@ -18,12 +18,10 @@ BuildOrder::BuildOrder(int n, Builder* b,
       producer(cp) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ProblemInstance::ProblemInstance(
-    Commodity& commod,
-    double demand,
-    SolverInterface& sinterface,
-    Constraint::Ptr constr,
-    std::vector<Variable::Ptr>& soln)
+ProblemInstance::ProblemInstance(Commodity& commod, double demand,
+                                 SolverInterface& sinterface,
+                                 Constraint::Ptr constr,
+                                 std::vector<Variable::Ptr>& soln)
     : commodity(commod),
       unmet_demand(demand),
       interface(sinterface),
@@ -70,15 +68,11 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(
     SolverInterface csi(solver);
 
     // set up objective function
-    ObjectiveFunction::Ptr obj(
-        new ObjectiveFunction(
-            ObjectiveFunction::MIN));
+    ObjectiveFunction::Ptr obj(new ObjectiveFunction(ObjectiveFunction::MIN));
     csi.RegisterObjFunction(obj);
 
     // set up constraint
-    Constraint::Ptr constraint(
-        new Constraint(
-            Constraint::GTEQ, unmet_demand));
+    Constraint::Ptr constraint(new Constraint(Constraint::GTEQ, unmet_demand));
     csi.RegisterConstraint(constraint);
 
     // set up variables, constraints, and objective function
@@ -121,12 +115,12 @@ void BuildingManager::SetUpProblem(ProblemInstance& problem) {
   std::set<Builder*>::iterator builder_it;
   for (builder_it = builders_.begin(); builder_it != builders_.end();
        builder_it++) {
-    Builder* builder = (*builder_it);
+    Builder* builder = *builder_it;
 
     std::set<CommodityProducer*>::iterator producer_it;
     for (producer_it = builder->BeginningProducer();
          producer_it != builder->EndingProducer(); producer_it++) {
-      CommodityProducer* producer = (*producer_it);
+      CommodityProducer* producer = *producer_it;
       if (producer->ProducesCommodity(problem.commodity)) {
         AddProducerVariableToProblem(producer, builder, problem);
       }
@@ -165,8 +159,7 @@ void BuildingManager::ConstructBuildOrdersFromSolution(
     int number = any_cast<int>(solution.at(i)->value());
     if (number > 0) {
       Builder* builder = solution_map_[solution.at(i)].first;
-      CommodityProducer* producer = \
-                                    solution_map_[solution.at(i)].second;
+      CommodityProducer* producer = solution_map_[solution.at(i)].second;
       BuildOrder order(number, builder, producer);
       orders.push_back(order);
     }

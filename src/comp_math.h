@@ -5,7 +5,7 @@
 
 namespace cyclus {
 
-/// Contains functions for performing fundamental operations on CompMap's
+/// Contains functions for performing fundamental operations on CompMaps
 namespace compmath {
 
 /// Does component-wise subtraction of the nuclide quantities of v1 and v2 and

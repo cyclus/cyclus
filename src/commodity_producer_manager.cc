@@ -44,4 +44,3 @@ void CommodityProducerManager::UnRegisterProducer(
 }
 
 }  // namespace cyclus
-

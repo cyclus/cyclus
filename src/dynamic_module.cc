@@ -1,5 +1,4 @@
 // dynamic_module.cc
-
 #include "dynamic_module.h"
 
 #include "boost/filesystem.hpp"

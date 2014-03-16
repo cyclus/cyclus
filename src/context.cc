@@ -11,11 +11,11 @@
 namespace cyclus {
 
 Context::Context(Timer* ti, Recorder* rec)
-  : ti_(ti),
-    rec_(rec),
-    solver_(NULL),
-    trans_id_(0),
-    si_(0) {}
+    : ti_(ti),
+      rec_(rec),
+      solver_(NULL),
+      trans_id_(0),
+      si_(0) {}
 
 Context::~Context() {
   if (solver_ != NULL) {
@@ -130,4 +130,3 @@ void Context::Snapshot() {
 }
 
 }  // namespace cyclus
-

@@ -49,6 +49,7 @@ void DynamicModule::CloseLibrary() {
     dlerror();  // reset errors
   }
 }
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_

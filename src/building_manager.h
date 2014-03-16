@@ -121,8 +121,7 @@ class BuildingManager {
     @param orders the set of orders to fill
     @param solution the solution determining how to fill the orders
     */
-  void ConstructBuildOrdersFromSolution(std::vector<BuildOrder>&
-                                        orders,
+  void ConstructBuildOrdersFromSolution(std::vector<BuildOrder>& orders,
                                         std::vector<Variable::Ptr>& solution);
 
   const std::set<Builder*>& builders() {
@@ -143,4 +142,5 @@ class BuildingManager {
 // @MJGFlag - removed for the same reason as above
 
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_BUILDING_MANAGER_H_

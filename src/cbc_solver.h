@@ -18,7 +18,7 @@ namespace cyclus {
 /// the coin branch-and-cut solver, see https://projects.coin-or.org/Cbc.
 class CBCSolver : public Solver {
  public:
-  /// Solve an Mixed-Integer Program.
+  /// Solve a Mixed-Integer Program.
   /// @param variables A container of variables. The solution is preserved in
   /// the value() member.
   /// @param obj A pointer to the objective function.
@@ -35,13 +35,11 @@ class CBCSolver : public Solver {
   std::pair<double, double> ConstraintBounds(Constraint::Ptr c);
 
   /// set variable/objective function values
-  void SetUpVariablesAndObj(
-      std::vector<Variable::Ptr>& variables,
-      ObjectiveFunction::Ptr obj);
+  void SetUpVariablesAndObj(std::vector<Variable::Ptr>& variables,
+                            ObjectiveFunction::Ptr obj);
 
   /// set up constraints
-  void SetUpConstraints(
-      std::vector<Constraint::Ptr>& constraints);
+  void SetUpConstraints(std::vector<Constraint::Ptr>& constraints);
 
   /// set the objective direction
   double ObjDirection(ObjectiveFunction::Ptr obj);

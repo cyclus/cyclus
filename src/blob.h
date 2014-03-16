@@ -18,6 +18,7 @@ class Blob {
  private:
   std::string str_;
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_BLOB_H_

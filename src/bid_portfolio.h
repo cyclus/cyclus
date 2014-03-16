@@ -111,7 +111,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   }
 
   /// @brief if the commodity has not been determined yet, it is set. Otherwise
-  /// VerifyCommodity() verifies the commodity is associated with the
+  /// VerifyCommodity() verifies the commodity associated with the
   /// portfolio's commodity
   /// @throws KeyError if a commodity is added that is a different commodity
   /// from the original

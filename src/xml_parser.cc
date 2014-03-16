@@ -45,5 +45,5 @@ void XMLParser::Validate(const std::stringstream& xml_schema_snippet) {
 xmlpp::Document* XMLParser::Document() {
   return parser_->get_document();
 }
-}  // namespace cyclus
 
+}  // namespace cyclus
