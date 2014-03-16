@@ -159,6 +159,26 @@ class UsingNamespaceFilter(Filter):
         state.using_namespaces -= {d_ns for d_ns in state.using_namespaces \
                                    if d_ns[0] > depth}
 
+class NamespaceAliasFilter(Filter):
+    """Filter for accumumating namespace renames."""
+    regex = re.compile("\s*namespace\s+(\w+)\s*=\s*([\w:]+)\s*")
+
+    def transform(self, statement, sep):
+        state = self.state
+        alias = self.match.group(1)
+        name = self.match.group(2)
+        state.namespace_aliases.add((state.depth, name, alias))
+
+    def revert(self, statement, sep):
+        super(NamespaceAliasFilter, self).revert(statement, sep)
+        state = self.state
+        if len(state.namespace_aliases) == 0 or sep != '}':
+            return
+        # Only keep alias at or above current depth
+        depth = state.depth
+        state.namespace_aliases -= {d_ns_a for d_ns_a in state.namespace_aliases \
+                                    if d_ns_a[0] > depth}
+
 class ClassFilter(Filter):
     """Filter for picking out class names."""
     regex = re.compile("\s*class\s+([\w:]+)\s*")
@@ -268,9 +288,11 @@ class StateAccumulator(object):
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.using_namespaces = set()  # set of (depth, ns name) tuples
+        self.namespace_aliases = set()  # set of (depth, ns name, alias) tuples
         self.var_annotations = None
         self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
                         NamespaceFilter(self), UsingNamespaceFilter(self),
+                        NamespaceAliasFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):

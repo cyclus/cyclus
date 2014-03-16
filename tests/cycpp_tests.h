@@ -5,9 +5,13 @@
 #pragma cyclus exec x = 5; import time
 #pragma cyclus exec import math
 
+namespace jolly_old_england {};
+
 namespace mi6 {
 
 using namespace std;
+
+namespace joe = jolly_old_england;
 
 class Spy {
  public:
