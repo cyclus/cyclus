@@ -351,13 +351,23 @@ class StateAccumulator(object):
     def canonize_type(self, t, name="<member variable>"):
         """Returns the canonical form for a type given the current state.
         This should not be called for types other than state variables.
+        The name argument here is provided for debugging & reporting purposes.
         """
         t = " ".join(t.split())
         if '<' in t:
             # template type
             pass
         else:
-            if t not in self.known_primitives:
+            # primitive type
+            if t in self.known_primitives:
+                return t
+            # grab aliases of t
+            taliases = [x for x in self.aliases if x[2] == t]
+            if len(taliases) > 0:
+                taliases.sort()  # gets the alias at the maximum nesting
+                talias = taliases[-1][1]
+                return self.canonize_type(talias, name)
+            else:
                 msg = ("the type of {c}::{n} ({t}) is not a recognized primitive "
                        "type: {p}.").format(t=t, n=name, c=self.classname(), 
                                             p=", ".join(sorted(self.known_primitives)))

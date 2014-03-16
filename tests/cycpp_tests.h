@@ -13,6 +13,9 @@ using namespace std;
 
 namespace joe = jolly_old_england;
 
+typedef double caliber_t;
+typedef caliber_t cbt;
+
 class Spy {
  public:
   #pragma cyclus var dict(\
@@ -34,6 +37,15 @@ num;
     )
   std::string name;
   //char * name;
+
+  #pragma cyclus var {\
+    "default": 0.22,\
+    "units": "unitless",\
+    "userlevel": 99,\
+    "tooltip": "weapon caliber",\
+    "help": "favored weapon size",\
+    }
+  cbt caliber;
 private:
   double not_var;
 };
