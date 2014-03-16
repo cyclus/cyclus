@@ -8,13 +8,53 @@ import numpy as np
 from tools import check_cmd
 from helper import table_exist, find_ids, exit_times
 
+def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
+    """Changes k_factor_in and k_factor_out for one facility.
+
+    It is assumed that k_factor_in will precede k_factor_out in
+    xml input file.
+
+    Args:
+        fs_read: stream from a xml input file.
+        fs_write: output stream
+        k_factor_in: a new conversion factor for requests.
+        k_factor_out: a new conversion factor for offers.
+        n: a number of sets of k_factors to be changed.
+
+    Returns:
+        a text with changed k_factors.
+
+    Raises:
+        AssertionError: if k_factor_in does not precede k_factor_out
+    """
+    k_in_changed = False
+    i = 0  # to tract a number of sets
+
+    while i != n:
+        for f in fs_read:
+            if f.count("k_factor_in"):
+                assert(not k_in_changed)
+                f = f.split("<")[0] + "<k_factor_in>" + str(k_factor_in) + \
+                    "</k_factor_in>\n"
+                k_in_changed = True
+
+            elif f.count("k_factor_out"):
+                assert(k_in_changed)
+                f = f.split("<")[0] + "<k_factor_out>" + str(k_factor_out) + \
+                    "</k_factor_out>\n"
+                k_in_changed = False
+                i += 1
+
+            fs_write.write(f)
+
 def create_sim_input(ref_input, k_factor_in, k_factor_out):
-    """ Creates xml input file from a reference xml input file.
+    """Creates xml input file from a reference xml input file.
     Changes k_factor_in and k_factor_out.
 
-    Returns: the path to the created file
+    Returns:
+        a path to the created file with updated k_factors.
     """
-    # File to be creted
+    # A file to be creted
     fw_path = ref_input.split(".xml")[0] + "_" + str(k_factor_in) + \
               "_" + str(k_factor_out) + ".xml"
     fw = open(fw_path, "w")
@@ -34,6 +74,28 @@ def create_sim_input(ref_input, k_factor_in, k_factor_out):
     fw.close()
 
     return fw_path
+
+def change_minimal_input(ref_input, k_factor_a, k_factor_b):
+    """Changes k_factors of facilities in the minimal cycle simulation.
+
+    Args:
+        k_factor_a: a new conversion factor for the KFacility A.
+        k_factor_b: a new conversion factor for the KFacility B.
+
+    Returns:
+        a path to a file with updated conversion factors.
+    """
+    # A file to be created
+    fw_path = ref_input.split(".xml")[0] + "_" + str(k_factor_a) + \
+              "_" + str(k_factor_b) + ".xml"
+    fw = open(fw_path, "w")
+    fr = open(ref_input, "r")
+    # change k_factors for the first facility
+    change_k_factors(fr, fw, k_factor_a, k_factor_b)
+    # reverse change k_factors for the second facility
+    change_k_factors(fr, fw, k_factor_b, k_factor_a)
+    # write the rest of the file
+    fw.write(fr.read())
 
 """ Tests """
 def tset_minimal_cycle():
