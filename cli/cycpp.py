@@ -121,6 +121,7 @@ class ClassFilter(Filter):
         state = self.state
         name = self.match.group(1)
         state.classes.append((state.depth, name))
+        state.access[tuple(state.classes)] = "private"
 
     def revert(self, statement, sep):
         super(ClassFilter, self).revert(statement, sep)
@@ -128,11 +129,16 @@ class ClassFilter(Filter):
         if len(state.classes) == 0:
             return
         if state.depth == state.classes[-1][0]:
+            del state.access[tuple(state.classes)]
             del state.classes[-1]
-            state.access = None
 
 class AccessFilter(Filter):
-    """Filter for setting the current access control flaf."""
+    """Filter for setting the current access control flag."""
+    regex = re.compile('\s*(public|private|protected)\s*')
+
+    def transform(self, statement, sep):
+        access = self.match.group(1)
+        self.state.access[tuple(self.state.classes)] = access
 
 class VarDecorationFilter(Filter):
     """Filter for handling state variable decoration of the form:
@@ -159,11 +165,15 @@ class VarDeclarationFilter(Filter):
         annotations = state.var_annotations
         if annotations is None:
             return
-        # put access check here
         classname = state.classes[-1][1]
+        vtype, vname = self.match.groups()
+        access = state.access[tuple(state.classes)]
+        if access != "public":
+            msg = ("access for state variable {0!r} on agent {1!r} must be public, "
+                   "got {2!r}")
+            raise ValueError(msg.format(vname, classname, access or 'private'))
         if classname not in state.context:
             state.context[classname] = {}
-        vtype, vname = self.match.groups()
         annotations['type'] = vtype.strip().replace('\n', '')
         state.context[classname][vname] = annotations
         state.var_annotations = None
@@ -185,10 +195,10 @@ class StateAccumulator(object):
         self.depth = 0
         self.context = {}  # classes we have accumulated
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
-        self.access = None  # current access control flag
+        self.access = {}   # map of (classnames, current access control flags)
         self.var_annotations = None
-        self.filters = [ClassFilter(self), VarDecorationFilter(self), 
-                        VarDeclarationFilter(self)]
+        self.filters = [ClassFilter(self), AccessFilter(self), 
+                        VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def accumulate(self, statement, sep):
         #print((repr(statement), repr(sep)))
