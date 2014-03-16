@@ -5,14 +5,15 @@
 #include <map>
 #include <string>
 #include <sstream>
+
 #include <boost/shared_ptr.hpp>
 
 #include "composition.h"
 #include "dynamic_module.h"
 #include "query_engine.h"
-#include "xml_parser.h"
-#include "timer.h"
 #include "recorder.h"
+#include "timer.h"
+#include "xml_parser.h"
 
 namespace cyclus {
 
@@ -91,9 +92,8 @@ class XMLFileLoader {
 
   /// the input file name
   std::string file_;
-
 };
-} // namespace cyclus
 
-#endif // ifndef CYCLUS_XML_FILE_LOADER_H_
+}  // namespace cyclus
 
+#endif  // CYCLUS_XML_FILE_LOADER_H_
