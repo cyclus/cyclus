@@ -51,10 +51,8 @@ from pprint import pprint
 # This migh miss files which start with '#' - however, after canonization (through cpp)
 # it shouldn't matter.
 RE_STATEMENT = re.compile(
-    #r'(\s*\n#)?'  # find the start of pragmas
     r'(\s*#)?'  # find the start of pragmas
     r'(\s+(public|private|protected)\s*'  # consider access control as statements
-    #r'|[^{};]*)?'  # or, consider statement until we hit '{', '}', or ';'
     r'|(?(1)[^\n]|[^{};])*)?'  # or, consider statement until we hit '{', '}', or ';'
     # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
     r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE)
@@ -120,7 +118,7 @@ class Filter(object):
         self.match = None
 
 class AliasFilter(Filter):
-    """Filter for managing alias scoping."""
+    """Filter for managing alias (de-)scoping."""
 
     def revert(self, statement, sep):
         super(AliasFilter, self).revert(statement, sep)
@@ -132,7 +130,19 @@ class AliasFilter(Filter):
         state.aliases -= {d_n_a for d_n_a in state.aliases if d_n_a[0] > depth}
 
 class TypedefFilter(AliasFilter):
-    pass
+    """Filter for handling typedef as aliases. Note that in-line compound typedefs of 
+    structs and unions are not supported.
+    """
+    regex = re.compile("\s*typedef\s+(.*?\s+.*)\s*$")
+
+    def transform(self, statement, sep):
+        state = self.state
+        g = self.match.group(1)
+        g = outter_split(g)
+        g0 = g[0].split()  # canonize the type name
+        typ = " ".join(g0[:-1])
+        depth = state.depth
+        state.aliases |= {(depth, typ, a) for a in g0[-1:] + g[1:]}
 
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
@@ -294,7 +304,7 @@ class StateAccumulator(object):
         self.var_annotations = None
         self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
                         NamespaceFilter(self), UsingNamespaceFilter(self),
-                        NamespaceAliasFilter(self),
+                        NamespaceAliasFilter(self), TypedefFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):
@@ -342,6 +352,24 @@ def accumulate_state(canon):
 #
 # meta
 #
+
+def outter_split(s, open_brace='(', close_brace=')', separator=','):
+    """Takes a string and only split the outter most level."""
+    outter = []
+    ns = s.split(separator)
+    count = 0
+    val = ''
+    for n in ns:
+        count += n.count(open_brace)
+        count -= n.count(close_brace)
+        val += n
+        if count == 0:
+            outter.append(val.strip())
+            val = ''
+        else:
+            val += separator
+    return outter
+
 def main():
     parser = ArgumentParser(prog="cycpp", description=__doc__, 
                             formatter_class=RawDescriptionHelpFormatter)
@@ -354,5 +382,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

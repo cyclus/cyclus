@@ -39,4 +39,6 @@ private:
 
 }; // namespace mi6
 
-
+typedef unsigned long ulong;
+typedef int int_t, *intp_t, (&fp)(int, ulong), arr_t[10];
+typedef struct {int a; int b;} S, *pS;
