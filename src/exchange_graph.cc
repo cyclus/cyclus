@@ -31,8 +31,7 @@ Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
          boost::shared_ptr<ExchangeNode> vnode)
     : unode_(unode),
       vnode_(vnode) {  
-  exclusive_ = unode->exclusive || vnode->exclusive;
-  if (exclusive_) {
+  if (unode->exclusive || vnode->exclusive) {
     double fqty = unode->max_qty;
     double sqty = vnode->max_qty;
     if (unode->exclusive && vnode->exclusive) {
