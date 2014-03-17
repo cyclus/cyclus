@@ -47,7 +47,7 @@ class CBCSolver : public Solver {
   double ObjDirection(ObjectiveFunction::Ptr obj);
 
   /// solve the model
-  void SolveModel(CbcModel& model);
+  void SolveAgent(CbcModel& model);
 
   /// populate the solution in the variable vector
   void PopulateSolution(CbcModel& model,

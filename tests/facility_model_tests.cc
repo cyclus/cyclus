@@ -4,14 +4,14 @@
 #include "facility_model_tests.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(FacilityModelTests, DISABLED_Tick) {
+TEST_P(FacilityAgentTests, DISABLED_Tick) {
   int time = 1;
   facility_model_->Tick(time);
     //EXPECT_NO_THROW();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(FacilityModelTests, DISABLED_Tock) {
+TEST_P(FacilityAgentTests, DISABLED_Tock) {
   int time = 1;
   EXPECT_NO_THROW(facility_model_->Tock(time));
 }

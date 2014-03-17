@@ -10,20 +10,20 @@
 namespace cyclus {
 
 /**
-   @class RegionModel
+   @class RegionAgent
 
-   The RegionModel class is the abstract class/interface used by all
+   The RegionAgent class is the abstract class/interface used by all
    region models
 
    This is all that is known externally about Regions
 
    @section intro Introduction
-   The RegionModel type assists in defining the region-institution-facility
-   hierarchy in Cyclus. A RegionModel region is an actor associated with a set
-   of institutions or facilities for which it is responsible. A RegionModel may
+   The RegionAgent type assists in defining the region-institution-facility
+   hierarchy in Cyclus. A RegionAgent region is an actor associated with a set
+   of institutions or facilities for which it is responsible. A RegionAgent may
    be used to adjust preferences in the ResourceExchange to make material
    routing decisions based on interfacility relationships. Deployment is a
-   primary differentiator between different RegionModel implementations.
+   primary differentiator between different RegionAgent implementations.
 
    Like all model implementations, there are a number of implementations
    that are distributed as part of the core Cyclus application as well
@@ -36,7 +36,7 @@ namespace cyclus {
 
    -# Schedule the deployment of facilities by either
    -# Determining when new facilities need to be built, or
-   -# Deferring to an InstModel to make this determination.
+   -# Deferring to an InstAgent to make this determination.
    -# Manage the deployment of facilities by interacting with the
    Institutions to select a specific facility type and facility
    parameters 
@@ -60,29 +60,29 @@ namespace cyclus {
    facility's allowability in the region). It makes no alterations to
    messages passed through it in either the up or down direction.
  */
-class RegionModel : public Model, public TimeListener {
+class RegionAgent : public Agent, public TimeListener {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
    */
  public:
   /**
-     Default constructor for RegionModel Class
+     Default constructor for RegionAgent Class
    */
-  RegionModel(Context* ctx);
+  RegionAgent(Context* ctx);
 
   /**
-     RegionModels should not be indestructible.
+     RegionAgents should not be indestructible.
    */
-  virtual ~RegionModel() {};
+  virtual ~RegionAgent() {};
 
-  // DO NOT call Model class implementation of this method
+  // DO NOT call Agent class implementation of this method
   virtual void InfileToDb(QueryEngine* qe, DbInit di) {}
 
-  // DO NOT call Model class implementation of this method
+  // DO NOT call Agent class implementation of this method
   virtual void InitFrom(QueryBackend* b) {};
 
-  // DO NOT call Model class implementation of this method
+  // DO NOT call Agent class implementation of this method
   virtual void Snapshot(DbInit di) {};
 
   virtual void InitInv(Inventories& inv) {};
@@ -92,7 +92,7 @@ class RegionModel : public Model, public TimeListener {
   /**
      perform actions required when entering the simulation
    */
-  virtual void Build(Model* parent);
+  virtual void Build(Agent* parent);
 
   virtual void DoRegistration();
 
@@ -108,7 +108,7 @@ class RegionModel : public Model, public TimeListener {
   virtual void Tock(int time) {};
 
  protected:
-  void InitFrom(RegionModel* m);
+  void InitFrom(RegionAgent* m);
 
 };
 

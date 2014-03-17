@@ -20,7 +20,7 @@ namespace cyclus {
     (Note initial version does not check names)
     May modify both models by cleaning up
 */
-int differentModel(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
+int differentAgent(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
                    bool ignoreNames=true);
   
 } // namespace cyclus

@@ -6,9 +6,9 @@
 
 namespace cyclus {
 
-DbInit::DbInit(Model* m) : m_(m), full_prefix_(true) {}
+DbInit::DbInit(Agent* m) : m_(m), full_prefix_(true) {}
 
-DbInit::DbInit(Model* m, bool dummy) : m_(m), full_prefix_(false) {}
+DbInit::DbInit(Agent* m, bool dummy) : m_(m), full_prefix_(false) {}
 
 Datum* DbInit::NewDatum(std::string title) {
   std::string prefix = "AgentState";

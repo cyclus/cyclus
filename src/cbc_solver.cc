@@ -89,7 +89,7 @@ double CBCSolver::ObjDirection(ObjectiveFunction::Ptr obj) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CBCSolver::SolveModel(CbcModel& model) {
+void CBCSolver::SolveAgent(CbcModel& model) {
   model.messageHandler()->setLogLevel(0);  // turn off all output
   model.solver()->messageHandler()->setLogLevel(0);  // turn off all output
   model.branchAndBound();
@@ -173,7 +173,7 @@ void CBCSolver::Solve(std::vector<Variable::Ptr>& variables,
   OsiSolverInterface* solver = &solver1;
   solver->loadFromCoinModel(builder_);
   CbcModel model(*solver);
-  SolveModel(model);
+  SolveAgent(model);
   PopulateSolution(model, variables);
 }
 

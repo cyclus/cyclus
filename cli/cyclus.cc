@@ -247,11 +247,11 @@ int EarlyExitArgs(const ArgInfo& ai) {
       Recorder rec;
       Timer ti;
       Context* ctx = new Context(&ti, &rec);
-      Model* m = DynamicModule::Make(ctx, name);
+      Agent* m = DynamicModule::Make(ctx, name);
       std::cout << "<element name=\"" << name << "\">\n";
       std::cout << m->schema();
       std::cout << "</element>\n";
-      ctx->DelModel(m);
+      ctx->DelAgent(m);
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
     }
@@ -274,7 +274,7 @@ void GetSimInfo(ArgInfo* ai) {
 
   // logging params
   if (ai->vm.count("no-model")) {
-    Logger::NoModel() = true;
+    Logger::NoAgent() = true;
   }
   if (ai->vm.count("no-mem")) {
     Logger::NoMem() = true;

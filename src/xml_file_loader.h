@@ -76,7 +76,7 @@ class XMLFileLoader {
 
   /// Creates and builds an agent, notifying its parent. The agent init info is
   /// translated and stored in the output db.
-  Model* BuildAgent(std::string proto, Model* parent);
+  Agent* BuildAgent(std::string proto, Agent* parent);
 
   Recorder* rec_;
   Timer ti_;

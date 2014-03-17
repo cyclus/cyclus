@@ -9,32 +9,32 @@
 #include "timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//- - - - - - - Tests specific to the InstModel class itself- - - - - - -
+//- - - - - - - Tests specific to the InstAgent class itself- - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class DieInst : public cyclus::InstModel {
+class DieInst : public cyclus::InstAgent {
  public:
-  DieInst(cyclus::Context* ctx) : cyclus::InstModel(ctx) {
+  DieInst(cyclus::Context* ctx) : cyclus::InstAgent(ctx) {
     tickDie_ = false;
     tockDie_ = false;
   };
   
   virtual ~DieInst() {};
   
-  virtual cyclus::Model* Clone() {
+  virtual cyclus::Agent* Clone() {
     return new DieInst(context());
   }
 
   virtual void Tick(int time) {
     if (tickDie_) {
-      context()->DelModel(this);
+      context()->DelAgent(this);
     }
   }
 
   virtual void Tock(int time) {
     if (tockDie_) {
-      context()->DelModel(this);
+      context()->DelAgent(this);
     }
   }
 
@@ -43,7 +43,7 @@ class DieInst : public cyclus::InstModel {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class RegionModelClassTests : public ::testing::Test {
+class RegionAgentClassTests : public ::testing::Test {
   protected:
 
     DieInst* child1_;
@@ -52,7 +52,7 @@ class RegionModelClassTests : public ::testing::Test {
     DieInst* child4_;
     DieInst* child5_;
 
-    cyclus::RegionModel* reg_;
+    cyclus::RegionAgent* reg_;
     cyclus::Recorder rec_;
     cyclus::Timer ti_;
     cyclus::Context* ctx_;
@@ -76,7 +76,7 @@ class RegionModelClassTests : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(RegionModelClassTests, TickIter) {
+TEST_F(RegionAgentClassTests, TickIter) {
   ASSERT_EQ(5, reg_->children().size());
 
   child2_->tickDie_ = true;
@@ -97,7 +97,7 @@ TEST_F(RegionModelClassTests, TickIter) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(RegionModelClassTests, TockIter) {
+TEST_F(RegionAgentClassTests, TockIter) {
   ASSERT_EQ(5, reg_->children().size());
 
   child2_->tockDie_ = true;

@@ -8,25 +8,25 @@
 #include "query_engine.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, DISABLED_CreateFromXML) {
+TEST_P(AgentTests, DISABLED_CreateFromXML) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, DISABLED_LoadConstructor) {
+TEST_P(AgentTests, DISABLED_LoadConstructor) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, DISABLED_InitFromXML) {
+TEST_P(AgentTests, DISABLED_InitFromXML) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, Print) {
+TEST_P(AgentTests, Print) {
   std::string s = model_->str();
   EXPECT_NO_THROW(std::string s = model_->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, Schema) {
+TEST_P(AgentTests, Schema) {
   std::stringstream schema;
   schema << ("<element name=\"foo\">\n");
   schema << model_->schema();
@@ -36,7 +36,7 @@ TEST_P(ModelTests, Schema) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, GetModelType) {
-  EXPECT_NE(std::string("Model"), model_->kind());
+TEST_P(AgentTests, GetAgentType) {
+  EXPECT_NE(std::string("Agent"), model_->kind());
 }
 

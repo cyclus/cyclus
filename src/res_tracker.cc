@@ -16,7 +16,7 @@ void ResTracker::DontTrack() {
   tracked_ = false;
 }
 
-void ResTracker::Create(Model* creator) {
+void ResTracker::Create(Agent* creator) {
   if (!tracked_) {
     return;
   }

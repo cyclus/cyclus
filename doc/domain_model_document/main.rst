@@ -1,7 +1,7 @@
-﻿Domain Model Document Outline
+﻿Domain Agent Document Outline
 =============================
 
-Within the Domain Model
+Within the Domain Agent
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 #. Introduction

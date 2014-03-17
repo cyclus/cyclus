@@ -10,16 +10,16 @@ namespace stubs {
 /**
   @class StubFacility
 
-  This FacilityModel is intended
-  as a skeleton to guide the implementation of new FacilityModel
+  This FacilityAgent is intended
+  as a skeleton to guide the implementation of new FacilityAgent
   models.
-  The StubFacility class inherits from the FacilityModel class and is
-  dynamically loaded by the Model class when requested.
+  The StubFacility class inherits from the FacilityAgent class and is
+  dynamically loaded by the Agent class when requested.
 
   @section intro Introduction
   Place an introduction to the model here.
 
-  @section modelparams Model Parameters
+  @section modelparams Agent Parameters
   Place a description of the required input parameters which define the
   model implementation.
 
@@ -32,7 +32,7 @@ namespace stubs {
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
-class StubFacility : public cyclus::FacilityModel  {
+class StubFacility : public cyclus::FacilityAgent  {
   /* --------------------
    * all FACILITYMODEL classes have these members
    * --------------------
@@ -71,7 +71,7 @@ class StubFacility : public cyclus::FacilityModel  {
   /**
     Initializes a StubFacility object by copying the members of another.
     */
-  virtual cyclus::Model* Clone();
+  virtual cyclus::Agent* Clone();
 
   /**
     The handleTick function specific to the StubFacility.

@@ -48,11 +48,11 @@ std::string BuildMasterSchema(std::string schema_path) {
   std::vector<std::string> names = Env::ListModules();
   std::map<std::string, std::string> subschemas;
   for (int i = 0; i < names.size(); ++i) {
-    Model* m = DynamicModule::Make(&ctx, names[i]);
+    Agent* m = DynamicModule::Make(&ctx, names[i]);
     subschemas[m->kind()] += "<element name=\"" + names[i] + "\">\n";
     subschemas[m->kind()] += m->schema() + "\n";
     subschemas[m->kind()] += "</element>\n";
-    ctx.DelModel(m);
+    ctx.DelAgent(m);
   }
 
   // replace refs in master rng template file
@@ -222,12 +222,12 @@ void XMLFileLoader::LoadInitialAgents() {
       std::string module_name = module_data->GetElementName();
       prototype = qe->GetString("name");
 
-      Model* model = DynamicModule::Make(ctx_, module_name);
+      Agent* model = DynamicModule::Make(ctx_, module_name);
       model->set_model_impl(module_name);
 
-      // call manually without agent impl injected to keep all Model state in a
+      // call manually without agent impl injected to keep all Agent state in a
       // single, consolidated db table
-      model->Model::InfileToDb(qe, DbInit(model, true));
+      model->Agent::InfileToDb(qe, DbInit(model, true));
 
       model->InfileToDb(qe, DbInit(model));
       rec_->Flush();
@@ -240,7 +240,7 @@ void XMLFileLoader::LoadInitialAgents() {
       PrefixInjector pi(&ci, "AgentState");
 
       // call manually without agent impl injected
-      model->Model::InitFrom(&pi);
+      model->Agent::InitFrom(&pi);
 
       pi = PrefixInjector(&ci, "AgentState" + module_name);
       model->InitFrom(&pi);
@@ -253,13 +253,13 @@ void XMLFileLoader::LoadInitialAgents() {
   for (int i = 0; i < nregions; ++i) {
     QueryEngine* qe = xqe.QueryElement(schema_paths["Region"], i);
     std::string region_proto = qe->GetString("name");
-    Model* reg = BuildAgent(region_proto, NULL);
+    Agent* reg = BuildAgent(region_proto, NULL);
 
     int ninsts = qe->NElementsMatchingQuery("institution");
     for (int j = 0; j < ninsts; ++j) {
       QueryEngine* qe2 = qe->QueryElement("institution", j);
       std::string inst_proto = qe2->GetString("name");
-      Model* inst = BuildAgent(inst_proto, reg);
+      Agent* inst = BuildAgent(inst_proto, reg);
 
       int nfac = qe2->NElementsMatchingQuery("initialfacilitylist/entry");
       for (int k = 0; k < nfac; ++k) {
@@ -268,15 +268,15 @@ void XMLFileLoader::LoadInitialAgents() {
 
         int number = atoi(qe3->GetString("number").c_str());
         for (int z = 0; z < number; ++z) {
-          Model* fac = BuildAgent(fac_proto, inst);
+          Agent* fac = BuildAgent(fac_proto, inst);
         }
       }
     }
   }
 }
 
-Model* XMLFileLoader::BuildAgent(std::string proto, Model* parent) {
-  Model* m = ctx_->CreateModel<Model>(proto);
+Agent* XMLFileLoader::BuildAgent(std::string proto, Agent* parent) {
+  Agent* m = ctx_->CreateAgent<Agent>(proto);
   m->Build(parent);
   if (parent != NULL) {
     parent->BuildNotify(m);

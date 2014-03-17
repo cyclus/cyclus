@@ -75,10 +75,10 @@ class SimInit {
   Resource::Ptr LoadGenericResource(int resid);
   Composition::Ptr LoadComposition(int stateid);
 
-  static void SnapAgent(Model* m);
+  static void SnapAgent(Agent* m);
 
-  // std::map<AgentId, Model*>
-  std::map<int, Model*> agents_;
+  // std::map<AgentId, Agent*>
+  std::map<int, Agent*> agents_;
 
   Context* ctx_;
   Recorder* rec_;

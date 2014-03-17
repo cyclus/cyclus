@@ -25,11 +25,11 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
   std::vector<std::string> names = Env::ListModules();
   std::string subschemas;
   for (int i = 0; i < names.size(); ++i) {
-    Model* m = DynamicModule::Make(&ctx, names[i]);
+    Agent* m = DynamicModule::Make(&ctx, names[i]);
     subschemas += "<element name=\"" + names[i] + "\">\n";
     subschemas += m->schema() + "\n";
     subschemas += "</element>\n";
-    ctx.DelModel(m);
+    ctx.DelAgent(m);
   }
 
   // replace refs in master rng template file
@@ -57,7 +57,7 @@ void XMLFlatLoader::LoadInitialAgents() {
     std::string module_name = module_data->GetElementName();
     std::string prototype = qe->GetString("name");
 
-    Model* model = DynamicModule::Make(ctx_, module_name);
+    Agent* model = DynamicModule::Make(ctx_, module_name);
     model->set_model_impl(module_name);
     model->InfileToDb(qe, DbInit(model));
     rec_->Flush();
@@ -93,7 +93,7 @@ void XMLFlatLoader::LoadInitialAgents() {
   }
 
   // build agents starting at roots (no parent) down.
-  std::map<std::string, Model*> built; // map<agent_name, agent_ptr>
+  std::map<std::string, Agent*> built; // map<agent_name, agent_ptr>
   std::set<std::string>::iterator it = agents.begin();
   while (agents.size() > 0) {
     std::string name = *it;

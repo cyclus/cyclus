@@ -25,7 +25,7 @@ void DynamicModule::OpenLibrary() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
-  constructor_ = (ModelCtor*)
+  constructor_ = (AgentCtor*)
                  dlsym(module_library_, constructor_name_.c_str());
 
   if (!constructor_) {

@@ -10,16 +10,16 @@ namespace stubs {
 /**
   @class StubInst
 
-  This InstModel is intended
-  as a skeleton to guide the implementation of new InstModel models.
+  This InstAgent is intended
+  as a skeleton to guide the implementation of new InstAgent models.
 
-  The StubInst class inherits from the InstModel class and is
-  dynamically loaded by the Model class when requested.
+  The StubInst class inherits from the InstAgent class and is
+  dynamically loaded by the Agent class when requested.
 
   @section intro Introduction
   Place an introduction to the model here.
 
-  @section modelparams Model Parameters
+  @section modelparams Agent Parameters
   Place a description of the required input parameters which define the
   model implementation.
 
@@ -32,7 +32,7 @@ namespace stubs {
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
-class StubInst : public cyclus::InstModel {
+class StubInst : public cyclus::InstAgent {
   /* --------------------
    * all INSTMODEL classes have these members
    * --------------------
@@ -62,7 +62,7 @@ class StubInst : public cyclus::InstModel {
   /**
     Initializes a StubInst object by copying the members of another.
     */
-  virtual cyclus::Model* Clone();
+  virtual cyclus::Agent* Clone();
 
   /**
     every model should be able to print a verbose description

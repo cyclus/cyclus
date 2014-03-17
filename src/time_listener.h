@@ -15,8 +15,8 @@ namespace cyclus {
 ///
 /// @begincode
 ///
-/// MyFacilityModel::Build(cyclus::Model* parent) {
-///   cyclus::FacilityModel::Build(parent);
+/// MyFacilityAgent::Build(cyclus::Agent* parent) {
+///   cyclus::FacilityAgent::Build(parent);
 ///   context()->RegisterTimeListener(this);
 /// }
 /// 

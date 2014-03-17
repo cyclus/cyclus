@@ -61,7 +61,7 @@ New features
 - change module install dir to not be split into separate fac, reg, inst subdirs. Still need to fix schema building and env class and dynamic_loading class correspondingly. made Env::ListModules more robust and include CYCLUS_MODULE_PATH env var dirs in search. Made BuildMasterSchema not care about model type namespacing subdirs.
 - fixed some gcsg issues and a typo
 - made timer init method not reset previous timer config (e.g. listeners) - this caused confusion and debugging for me in the past
-- made timer ticker registering more robust. Search env var dirs before install dirs for dyn modules. change default dyn module install dir to lib/cyclus instead of lib/Models
+- made timer ticker registering more robust. Search env var dirs before install dirs for dyn modules. change default dyn module install dir to lib/cyclus instead of lib/Agents
 - added hard coded version and more robust --tags flag to git describe for version.
 - this should make CI pass... not sure if its what we want, though.
 - updated install script with new structure
@@ -269,7 +269,7 @@ New features
 - fixes indent errors in DynamicModule.h described in #530.
 - added ns to roesources.
 - first cyclus ns changes.
-- made buildSchema private. Used Model class module type list instead of custom one.
+- made buildSchema private. Used Agent class module type list instead of custom one.
 - removed cyclus.rng.in generation - now done dynamically in cyclus core
 - modified XML loading to dynamically build the master schema by searching for installed modules
 - created csv backend.

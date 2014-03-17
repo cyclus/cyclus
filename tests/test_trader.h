@@ -37,7 +37,7 @@ class TestTrader : public TestFacility {
      bids(0),
      accept(0) {};
 
-  virtual Model* Clone() {
+  virtual Agent* Clone() {
     TestTrader* m = new TestTrader(context());
     m->InitFrom(this);
     return m;

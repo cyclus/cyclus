@@ -38,10 +38,10 @@ New features
   Gave model class a default val for model_impl_ to facilitate testing of xml init 
   methods. (3efb2b6)
 - renamed InitCoreMembers to InitFrom (f6e0add)
-- fixed deploy self as parent bug in xmlfileloader. Model class removes 'this' from 
+- fixed deploy self as parent bug in xmlfileloader. Agent class removes 'this' from 
   context model_list_ in destructor to prevent some segfaults when models are 
   allocated on the stack causing a double delete (one by runtime and one by context). 
-  Put guard on context::DelModel to only delete if the model is in the model_list_ 
+  Put guard on context::DelAgent to only delete if the model is in the model_list_ 
   (53ec514)
 - made context model management more universal. Made model_list_ a std::set. 
   added doc comment about context model management. minor tweaks (45efa47)

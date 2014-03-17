@@ -14,7 +14,7 @@
 
 namespace cyclus {
 
-class Model;
+class Agent;
 
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
@@ -43,11 +43,11 @@ class Timer {
 
   /// Schedules the named prototype to be built for the specified parent at
   /// timestep t.
-  void SchedBuild(Model* parent, std::string proto_name, int t);
+  void SchedBuild(Agent* parent, std::string proto_name, int t);
 
-  /// Schedules the given Model to be decommissioned at the specified
+  /// Schedules the given Agent to be decommissioned at the specified
   /// timestep t.
-  void SchedDecom(Model* m, int time);
+  void SchedDecom(Agent* m, int time);
 
   /// Makes a snapshot of the simulation state to the output database.
   void Snapshot() { want_snapshot_ = true; };
@@ -95,10 +95,10 @@ class Timer {
   std::set<TimeListener*> tickers_;
 
   // std::map<time,std::vector<std::pair<prototype, parent> > >
-  std::map<int, std::vector<std::pair<std::string, Model*> > > build_queue_;
+  std::map<int, std::vector<std::pair<std::string, Agent*> > > build_queue_;
 
   // std::map<time,std::vector<agent> >
-  std::map<int, std::vector<Model*> > decom_queue_;
+  std::map<int, std::vector<Agent*> > decom_queue_;
 };
 
 } // namespace cyclus

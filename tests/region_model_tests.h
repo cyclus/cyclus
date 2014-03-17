@@ -16,10 +16,10 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete RegionModel instance 
-typedef cyclus::RegionModel* RegionModelConstructor(cyclus::Context* ctx);
+// parameter is a pointer to a concrete RegionAgent instance 
+typedef cyclus::RegionAgent* RegionAgentConstructor(cyclus::Context* ctx);
 
-class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
+class RegionAgentTests : public TestWithParam<RegionAgentConstructor*> {
   public:
     virtual void SetUp() { 
       region_model_ = (*GetParam())(tc_.get());
@@ -28,7 +28,7 @@ class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
 
   protected:
     cyclus::TestContext tc_;
-    cyclus::RegionModel* region_model_;
+    cyclus::RegionAgent* region_model_;
 
 };
 

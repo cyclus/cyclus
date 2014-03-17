@@ -26,7 +26,7 @@ class GenericResource : public Resource {
   /// pointer to the model creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Model* creator, double quantity, std::string quality);
+  static Ptr Create(Agent* creator, double quantity, std::string quality);
                     
 
   /// Creates a new generic resource that does not actually exist as part of

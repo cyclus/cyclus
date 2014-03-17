@@ -18,11 +18,11 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete InstModel instance 
-typedef cyclus::InstModel* InstModelConstructor(cyclus::Context* ctx);
+// parameter is a pointer to a concrete InstAgent instance 
+typedef cyclus::InstAgent* InstAgentConstructor(cyclus::Context* ctx);
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class InstModelTests : public TestWithParam<InstModelConstructor*> {
+class InstAgentTests : public TestWithParam<InstAgentConstructor*> {
  protected:
   TestInst* inst_model_;
   TestFacility* test_facility_;

@@ -54,17 +54,17 @@ TEST_F(StubInstTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubInstModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new StubInst(ctx));
+cyclus::Agent* StubInstAgentConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Agent*>(new StubInst(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::InstModel* StubInstConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::InstModel*>(new StubInst(ctx));
+cyclus::InstAgent* StubInstConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::InstAgent*>(new StubInst(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(StubInst, InstModelTests,
+INSTANTIATE_TEST_CASE_P(StubInst, InstAgentTests,
                         ::testing::Values(&StubInstConstructor));
-INSTANTIATE_TEST_CASE_P(StubInst, ModelTests,
-                        ::testing::Values(&StubInstModelConstructor));
+INSTANTIATE_TEST_CASE_P(StubInst, AgentTests,
+                        ::testing::Values(&StubInstAgentConstructor));

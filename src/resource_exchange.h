@@ -17,14 +17,14 @@
 namespace cyclus {
 
 /// @brief Preference adjustment method helpers to convert from templates to the
-/// Model inheritance hierarchy
+/// Agent inheritance hierarchy
 template<class T>
-inline static void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) {}
-inline static void AdjustPrefs(Model* m,
+inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
+inline static void AdjustPrefs(Agent* m,
                                PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
 }
-inline static void AdjustPrefs(Model* m,
+inline static void AdjustPrefs(Agent* m,
                                PrefMap<GenericResource>::type& prefs) {
   m->AdjustGenRsrcPrefs(prefs);
 }
@@ -131,7 +131,7 @@ class ResourceExchange {
   void AdjustPrefs_(Trader* t) {
     typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[t];
     AdjustPrefs(t, prefs);
-    Model* m = t->manager()->parent();
+    Agent* m = t->manager()->parent();
     while (m != NULL) {
       AdjustPrefs(m, prefs);
       m = m->parent();

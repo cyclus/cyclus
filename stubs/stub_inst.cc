@@ -4,14 +4,14 @@ using stubs::StubInst;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::StubInst(cyclus::Context* ctx)
-    : cyclus::InstModel(ctx) {};
+    : cyclus::InstAgent(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::~StubInst() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
-  Model::InfileToDb(qe, di);
+  Agent::InfileToDb(qe, di);
   qe = qe->QueryElement(model_impl());
   // retrieve input data members here. For example:
   //
@@ -24,7 +24,7 @@ void StubInst::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubInst::Clone() {
+cyclus::Agent* StubInst::Clone() {
   StubInst* m = new StubInst(context());
   m->InitFrom(this);
   return m;
@@ -32,16 +32,16 @@ cyclus::Model* StubInst::Clone() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::InitFrom(StubInst* m) {
-  cyclus::InstModel::InitFrom(m);
+  cyclus::InstAgent::InitFrom(m);
   // Initialize stubinst members for a cloned module here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubInst::str() {
-  return InstModel::str();
+  return InstAgent::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructStubInst(cyclus::Context* ctx) {
+extern "C" cyclus::Agent* ConstructStubInst(cyclus::Context* ctx) {
   return new StubInst(ctx);
 }

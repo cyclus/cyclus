@@ -1,5 +1,5 @@
 /// Instmodel.cc
-// Implements the InstModel class
+// Implements the InstAgent class
 
 #include <iostream>
 #include <sstream>
@@ -15,39 +15,39 @@
 
 namespace cyclus {
 
-InstModel::InstModel(Context* ctx) : Model(ctx) {
+InstAgent::InstAgent(Context* ctx) : Agent(ctx) {
   kind_ = "Inst";
 }
 
-void InstModel::InitFrom(InstModel* m) {
-  Model::InitFrom(m);
+void InstAgent::InitFrom(InstAgent* m) {
+  Agent::InitFrom(m);
 }
 
-std::string InstModel::str() {
+std::string InstAgent::str() {
   if (parent() != NULL) {
-    return Model::str() + " in region" + parent()->prototype();
+    return Agent::str() + " in region" + parent()->prototype();
   } else {
-    return Model::str() + " with no region.";
+    return Agent::str() + " with no region.";
   }
 }
 
-void InstModel::Build(Model* parent) {
-  Model::Build(parent);
+void InstAgent::Build(Agent* parent) {
+  Agent::Build(parent);
 }
 
-void InstModel::DoRegistration() {
+void InstAgent::DoRegistration() {
   context()->RegisterTimeListener(this);
 }
 
-void InstModel::Decommission() {
+void InstAgent::Decommission() {
   context()->UnregisterTimeListener(this);
-  Model::Decommission();
+  Agent::Decommission();
 }
 
-void InstModel::Tock(int time) {
-  std::vector<Model*> to_decomm;
+void InstAgent::Tock(int time) {
+  std::vector<Agent*> to_decomm;
   for (int i = 0; i < children().size(); i++) {
-    FacilityModel* child = dynamic_cast<FacilityModel*>(children().at(i));
+    FacilityAgent* child = dynamic_cast<FacilityAgent*>(children().at(i));
     int lifetime = child->lifetime();
     if (lifetime != -1 && time >= child->enter_time() + lifetime) {
       CLOG(LEV_INFO3) << child->prototype() << " has reached the end of its lifetime";
@@ -58,7 +58,7 @@ void InstModel::Tock(int time) {
   }
 
   while (!to_decomm.empty()) {
-    Model* child = to_decomm.back();
+    Agent* child = to_decomm.back();
     to_decomm.pop_back();
     context()->SchedDecom(child);
   }

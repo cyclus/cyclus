@@ -7,10 +7,10 @@
 
 namespace cyclus {
 
-class Model;
+class Agent;
 class Context;
 
-typedef Model* ModelCtor(Context*);
+typedef Agent* AgentCtor(Context*);
 
 class DynamicModule {
  public:
@@ -24,7 +24,7 @@ class DynamicModule {
   };
 
   /// Returns a newly constructed model for the given module name.
-  static Model* Make(Context* ctx, std::string name);
+  static Agent* Make(Context* ctx, std::string name);
 
   /// Closes all statically loaded dynamic modules. This should always be called
   /// before process termination.  This must be called AFTER all models have
@@ -51,7 +51,7 @@ class DynamicModule {
 
   /// construct an instance of this module
   /// @return a fresh instance
-  Model* ConstructInstance(Context* ctx);
+  Agent* ConstructInstance(Context* ctx);
 
   /// closes the loaded module dynamic lib
   void CloseLibrary();
@@ -73,7 +73,7 @@ class DynamicModule {
   void* module_library_;
 
   /// a functor for the constructor
-  ModelCtor* constructor_;
+  AgentCtor* constructor_;
 
   /// uses dlopen to open the module shared lib
   void OpenLibrary();

@@ -7,9 +7,9 @@
 
 namespace cyclus {
 
-class Dummy : public RegionModel {
+class Dummy : public RegionAgent {
  public:
-  Dummy(Context* ctx) : RegionModel(ctx) {};
+  Dummy(Context* ctx) : RegionAgent(ctx) {};
   Dummy* Clone() { return NULL; };
 };
 
@@ -69,10 +69,10 @@ void SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
 
 void SimInit::Snapshot(Context* ctx) {
   // snapshot all agent internal state
-  std::set<Model*> mlist = ctx->model_list_;
-  std::set<Model*>::iterator it;
+  std::set<Agent*> mlist = ctx->model_list_;
+  std::set<Agent*>::iterator it;
   for (it = mlist.begin(); it != mlist.end(); ++it) {
-    Model* m = *it;
+    Agent* m = *it;
     if (m->enter_time() != -1) {
       SimInit::SnapAgent(m);
     }
@@ -82,7 +82,7 @@ void SimInit::Snapshot(Context* ctx) {
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
   ->AddVal("Object", std::string("Agent"))
-  ->AddVal("NextId", Model::next_id_)
+  ->AddVal("NextId", Agent::next_id_)
   ->Record();
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
@@ -106,10 +106,10 @@ void SimInit::Snapshot(Context* ctx) {
   ->Record();
 };
 
-void SimInit::SnapAgent(Model* m) {
-  // call manually without agent impl injected to keep all Model state in a
+void SimInit::SnapAgent(Agent* m) {
+  // call manually without agent impl injected to keep all Agent state in a
   // single, consolidated db table
-  m->Model::Snapshot(DbInit(m, true));
+  m->Agent::Snapshot(DbInit(m, true));
 
   m->Snapshot(DbInit(m));
   Inventories invs = m->SnapshotInv();
@@ -189,7 +189,7 @@ void SimInit::LoadPrototypes() {
     int agentid = qr.GetVal<int>("AgentId", i);
     std::string impl = qr.GetVal<std::string>("Implementation", i);
 
-    Model* m = DynamicModule::Make(ctx_, impl);
+    Agent* m = DynamicModule::Make(ctx_, impl);
     m->set_model_impl(impl);
 
     std::vector<Cond> conds;
@@ -199,7 +199,7 @@ void SimInit::LoadPrototypes() {
     PrefixInjector pi(&ci, "AgentState");
 
     // call manually without agent impl injected
-    m->Model::InitFrom(&pi);
+    m->Agent::InitFrom(&pi);
 
     pi = PrefixInjector(&ci, "AgentState" + impl);
     m->InitFrom(&pi);
@@ -218,7 +218,7 @@ void SimInit::LoadInitialAgents() {
   conds.push_back(Cond("EnterTime", "<=", t_));
   QueryResult qentry = b_->Query("AgentEntry", &conds);
   std::map<int, int> parentmap; // map<agentid, parentid>
-  std::map<int, Model*> unbuilt; // map<agentid, agent_ptr>
+  std::map<int, Agent*> unbuilt; // map<agentid, agent_ptr>
   for (int i = 0; i < qentry.rows.size(); ++i) {
 
     int id = qentry.GetVal<int>("AgentId", i);
@@ -231,7 +231,7 @@ void SimInit::LoadInitialAgents() {
     // if the agent wasn't decommissioned before t_ create and init it
     if (qexit.rows.size() == 0) {
       std::string proto = qentry.GetVal<std::string>("Prototype", i);
-      Model* m = ctx_->CreateModel<Model>(proto);
+      Agent* m = ctx_->CreateAgent<Agent>(proto);
 
       // agent-kernel init
       m->id_ = id;
@@ -244,17 +244,17 @@ void SimInit::LoadInitialAgents() {
       conds.push_back(Cond("SimTime", "==", t_));
       CondInjector ci(b_, conds);
       PrefixInjector pi(&ci, "AgentState");
-      m->Model::InitFrom(&pi);
+      m->Agent::InitFrom(&pi);
       pi = PrefixInjector(&ci, "AgentState" + m->model_impl());
       m->InitFrom(&pi);
     }
   }
 
   // construct agent hierarchy starting at roots (no parent) down
-  std::map<int, Model*>::iterator it = unbuilt.begin();
+  std::map<int, Agent*>::iterator it = unbuilt.begin();
   while (unbuilt.size() > 0) {
     int id = it->first;
-    Model* m = it->second;
+    Agent* m = it->second;
     int parentid = parentmap[id];
 
     if (parentid == -1) { // root agent
@@ -279,9 +279,9 @@ void SimInit::LoadInitialAgents() {
 }
 
 void SimInit::LoadInventories() {
-  std::map<int, Model*>::iterator it;
+  std::map<int, Agent*>::iterator it;
   for (it = agents_.begin(); it != agents_.end(); ++it) {
-    Model* m = it->second;
+    Agent* m = it->second;
     std::vector<Cond> conds;
     conds.push_back(Cond("SimTime", "==", t_));
     conds.push_back(Cond("AgentId", "==", m->id()));
@@ -338,7 +338,7 @@ void SimInit::LoadNextIds() {
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string obj = qr.GetVal<std::string>("Object");
     if (obj == "Agent") {
-      Model::next_id_ = qr.GetVal<int>("NextId", i);
+      Agent::next_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Transaction") {
       ctx_->trans_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Composition") {
@@ -384,7 +384,7 @@ Resource::Ptr SimInit::LoadMaterial(int resid) {
 
   // create the composition and material
   Composition::Ptr comp = LoadComposition(stateid);
-  Model* dummy = new Dummy(ctx_);
+  Agent* dummy = new Dummy(ctx_);
   Material::Ptr mat = Material::Create(dummy, qty, comp);
   mat->id_ = resid;
   mat->prev_decay_time_ = prev_decay;
@@ -422,7 +422,7 @@ Resource::Ptr SimInit::LoadGenericResource(int resid) {
   // set static quality-stateid map to have same vals as db
   GenericResource::stateids_[quality] = stateid;
 
-  Model* dummy = new Dummy(ctx_);
+  Agent* dummy = new Dummy(ctx_);
   return GenericResource::Create(dummy, qty, quality);
 }
 

@@ -23,9 +23,9 @@ namespace cyclus {
 /// corresponding exchanges.
 class Trader {
  public:
-  Trader(Model* manager) : manager_(manager) {}
+  Trader(Agent* manager) : manager_(manager) {}
 
-  virtual Model* manager() {
+  virtual Agent* manager() {
     return manager_;
   }
 
@@ -86,7 +86,7 @@ class Trader {
       GenericResource::Ptr> >& responses) {}
 
  private:
-  Model* manager_;
+  Agent* manager_;
 };
 
 }  // namespace cyclus

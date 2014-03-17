@@ -13,7 +13,7 @@ std::map<std::string, int> GenericResource::stateids_;
 int GenericResource::next_state_ = 1;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenericResource::Ptr GenericResource::Create(Model* creator,
+GenericResource::Ptr GenericResource::Create(Agent* creator,
                                              double quantity,
                                              std::string quality) {
   GenericResource::Ptr r(new GenericResource(creator->context(), quantity,

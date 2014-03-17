@@ -26,9 +26,9 @@ using cyclus::CommodMap;
 using cyclus::Composition;
 using cyclus::Context;
 using cyclus::ExchangeContext;
-using cyclus::FacilityModel;
+using cyclus::FacilityAgent;
 using cyclus::Material;
-using cyclus::Model;
+using cyclus::Agent;
 using cyclus::PrefMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
@@ -49,7 +49,7 @@ class Requester: public TestFacility {
         pref_ctr_(0)
   {};
 
-  virtual cyclus::Model* Clone() {
+  virtual cyclus::Agent* Clone() {
     Requester* m = new Requester(context());
     m->InitFrom(this);
     m->i_ = i_;
@@ -94,7 +94,7 @@ class Bidder: public TestFacility {
         bid_ctr_(0)
   {};
 
-  virtual cyclus::Model* Clone() {
+  virtual cyclus::Agent* Clone() {
     Bidder* m = new Bidder(context(), commod_);
     m->InitFrom(this);
     m->port_ = port_;
@@ -152,7 +152,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   req = rp->AddRequest(mat, reqr, commod, pref);
   reqr->port_ = rp;
   
-  FacilityModel* clone = dynamic_cast<FacilityModel*>(reqr->Clone());
+  FacilityAgent* clone = dynamic_cast<FacilityAgent*>(reqr->Clone());
   clone->Build();
   Requester* rcast = dynamic_cast<Requester*>(clone);
   EXPECT_EQ(0, rcast->req_ctr_);
@@ -198,7 +198,7 @@ TEST_F(ResourceExchangeTests, Bids) {
 
   bidr->port_ = bp;
   
-  FacilityModel* clone = dynamic_cast<FacilityModel*>(bidr->Clone());
+  FacilityAgent* clone = dynamic_cast<FacilityAgent*>(bidr->Clone());
   clone->Build();
   Bidder* bcast = dynamic_cast<Bidder*>(clone);
 
@@ -231,8 +231,8 @@ TEST_F(ResourceExchangeTests, Bids) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, PrefCalls) {
-  FacilityModel* parent = dynamic_cast<FacilityModel*>(reqr->Clone());
-  FacilityModel* child = dynamic_cast<FacilityModel*>(reqr->Clone());
+  FacilityAgent* parent = dynamic_cast<FacilityAgent*>(reqr->Clone());
+  FacilityAgent* child = dynamic_cast<FacilityAgent*>(reqr->Clone());
   parent->Build();
   child->Build(parent);
     
@@ -242,9 +242,9 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   ASSERT_TRUE(pcast != NULL);
   ASSERT_TRUE(ccast != NULL);
   ASSERT_TRUE(pcast->parent() == NULL);
-  ASSERT_TRUE(ccast->parent() == dynamic_cast<Model*>(pcast));
-  ASSERT_TRUE(pcast->manager() == dynamic_cast<Model*>(pcast));
-  ASSERT_TRUE(ccast->manager() == dynamic_cast<Model*>(ccast));
+  ASSERT_TRUE(ccast->parent() == dynamic_cast<Agent*>(pcast));
+  ASSERT_TRUE(pcast->manager() == dynamic_cast<Agent*>(pcast));
+  ASSERT_TRUE(ccast->manager() == dynamic_cast<Agent*>(ccast));
 
   // doin a little magic to simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
@@ -276,8 +276,8 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, PrefValues) {
-  FacilityModel* parent = dynamic_cast<FacilityModel*>(reqr->Clone());
-  FacilityModel* child = dynamic_cast<FacilityModel*>(reqr->Clone());
+  FacilityAgent* parent = dynamic_cast<FacilityAgent*>(reqr->Clone());
+  FacilityAgent* child = dynamic_cast<FacilityAgent*>(reqr->Clone());
   parent->Build();
   child->Build(parent);
     
@@ -303,7 +303,7 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   bids.push_back(cbid);
   bidr->port_ = bp;
   
-  FacilityModel* bclone = dynamic_cast<FacilityModel*>(bidr->Clone());
+  FacilityAgent* bclone = dynamic_cast<FacilityAgent*>(bidr->Clone());
   bclone->Build();
   
   EXPECT_NO_THROW(exchng->AddAllRequests());

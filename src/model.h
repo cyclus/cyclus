@@ -36,18 +36,18 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 /// all do inter-related things.  Notably, the InfileToDb, InitFrom, and
 /// Snapshot methods must all write/read to/from the same database tables (and
 /// table schemas).
-class Model : public StateWrangler {
+class Agent : public StateWrangler {
   friend class SimInit;
 
  public:
-  /// Constructor for the Model Class
+  /// Constructor for the Agent Class
   ///
   /// @warning all constructors must set id_ and increment next_id_
-  Model(Context* ctx);
+  Agent(Context* ctx);
 
   /// Recursively destructs all children and removes references to self form
   /// parent.
-  virtual ~Model();
+  virtual ~Agent();
 
   /// Return a newly created/allocated prototype that is an exact copy of this.
   /// All initialization and state cloning operations should be done in the
@@ -57,11 +57,11 @@ class Model : public StateWrangler {
   /// Example:
   ///
   /// @code
-  /// class MyModelClass : virtual public Model {
+  /// class MyAgentClass : virtual public Agent {
   ///   ...
   ///
-  ///   virtual Model* Clone() {
-  ///     MyModelClass* m = new MyModelClass(context());
+  ///   virtual Agent* Clone() {
+  ///     MyAgentClass* m = new MyAgentClass(context());
   ///     m->InitFrom(this);
   ///     return m;
   ///   };
@@ -69,7 +69,7 @@ class Model : public StateWrangler {
   ///   ...
   /// };
   /// @endcode
-  virtual Model* Clone() = 0;
+  virtual Agent* Clone() = 0;
 
   /// Translates info for a model from an input file to the database by reading
   /// parameters from the passed QueryEngine and recording data via the DbInit
@@ -78,7 +78,7 @@ class Model : public StateWrangler {
   /// agents.  This method must call the superclass' InfileToDb method before
   /// doing any other work.
   ///
-  /// Model parameters in the QueryEngine are scoped in the
+  /// Agent parameters in the QueryEngine are scoped in the
   /// "model/[model-class-name]" path. The model's class-name can be retrieved
   /// from the model_impl method. The superclass InitFrom expects the QueryEngine
   /// passed to it to be scoped identically - do NOT pass a changed-scope
@@ -87,19 +87,19 @@ class Model : public StateWrangler {
   /// Example:
   ///
   /// @code
-  /// class MyModelClass : virtual public cyclus::FacilityModel {
+  /// class MyAgentClass : virtual public cyclus::FacilityAgent {
   ///   // ...
   ///
   ///   void InfileToDb(QueryEngine* qe, DbInit di) {
-  ///     cyclus::FacilityModel::InitFrom(qe); // 
-  ///     // now do MyModelClass' initialitions, e.g.:
+  ///     cyclus::FacilityAgent::InitFrom(qe); // 
+  ///     // now do MyAgentClass' initialitions, e.g.:
   ///     qe = qe->QueryElement("model/" + model_impl()); // rescope the QueryEngine
   ///
   ///     // retrieve all model params
   ///     std::string recipe = qe->GetString("recipe");
   ///     std::string in_commod = qe->GetString("in_commod");
   ///     std::string out_commod = qe->GetString("out_commod");
-  ///     di.NewDatum("MyModelTable1")
+  ///     di.NewDatum("MyAgentTable1")
   ///       ->AddVal("recipe", recipe)
   ///       ->AddVal("in_commod", in_commod)
   ///       ->AddVal("out_commod", out_commod)
@@ -152,9 +152,9 @@ class Model : public StateWrangler {
   std::string PrintChildren();
 
   /// returns a vector of strings representing the parent-child tree
-  /// at the node for Model m
+  /// at the node for Agent m
   /// @param m the model node to base as the root of this print tree
-  std::vector<std::string> GetTreePrintOuts(Model* m);
+  std::vector<std::string> GetTreePrintOuts(Agent* m);
 
   /// Called when the agent enters the smiulation as an active participant and
   /// is only ever called once.  Agents should NOT register for services (such
@@ -163,7 +163,7 @@ class Model : public StateWrangler {
   /// BEGINING of their Build method.
   ///
   /// @param parent this agent's parent. NULL if this agent has no parent.
-  virtual void Build(Model* parent = NULL);
+  virtual void Build(Agent* parent = NULL);
 
   /// Called to give the agent an opportunity to register for services (e.g.
   /// ticks/tocks and resource exchange).  Note that this may be called more
@@ -173,10 +173,10 @@ class Model : public StateWrangler {
   /// Called when a new child of this agent has just been built. It is possible
   /// for this method to be called before the simulation has started when
   /// initially existing agents are being setup.
-  virtual void BuildNotify(Model* m) {};
+  virtual void BuildNotify(Agent* m) {};
 
   /// Called when a new child of this agent is about to be decommissioned.
-  virtual void DecomNotify(Model* m) {};
+  virtual void DecomNotify(Agent* m) {};
 
   /// Decommissions the model, removing it from the simulation. Results in
   /// destruction of the model object. If agents write their own Decommission
@@ -185,7 +185,7 @@ class Model : public StateWrangler {
   virtual void Decommission();
 
   /// returns the ith child
-  Model* children(int i) {
+  Agent* children(int i) {
     return children_[i];
   }
 
@@ -223,7 +223,7 @@ class Model : public StateWrangler {
   virtual std::string str();
 
   /// returns parent of this model
-  inline Model* parent() const { return parent_; }
+  inline Agent* parent() const { return parent_; }
 
   /// returns the parent's id
   inline const int parent_id() const { return parent_id_; }
@@ -237,7 +237,7 @@ class Model : public StateWrangler {
   inline const int lifetime() const { return lifetime_; }
 
   /// returns a list of children this model has
-  inline const std::vector<Model*>& children() const { return children_; }
+  inline const std::vector<Agent*>& children() const { return children_; }
   
  protected:
   /// Initializes a model by copying parameters from the passed model m. This
@@ -252,12 +252,12 @@ class Model : public StateWrangler {
   /// Example:
   ///
   /// @code
-  /// class MyModelClass : virtual public cyclus::FacilityModel {
+  /// class MyAgentClass : virtual public cyclus::FacilityAgent {
   ///   // ...
   ///
-  ///   void InitFrom(MyModelClass* m) {
-  ///     cyclus::FacilityModel::InitFrom(m); // call superclass' InitFrom
-  ///     // now do MyModelClass' initialitions, e.g.:
+  ///   void InitFrom(MyAgentClass* m) {
+  ///     cyclus::FacilityAgent::InitFrom(m); // call superclass' InitFrom
+  ///     // now do MyAgentClass' initialitions, e.g.:
   ///     my_var_ = m->my_var_;
   ///     // ...
   ///   };
@@ -265,7 +265,7 @@ class Model : public StateWrangler {
   ///   // ...
   /// };
   /// @endcode
-  void InitFrom(Model* m);
+  void InitFrom(Agent* m);
 
   /// adds model-specific information prefix to an error message
   virtual std::string InformErrorMsg(std::string msg);
@@ -277,22 +277,22 @@ class Model : public StateWrangler {
  private:
   /// Prevents creation/use of copy constructors (including in subclasses).
   /// Cloning and InitFrom should be used instead.
-  Model(const Model& m) {};
+  Agent(const Agent& m) {};
 
   /// adds an agent to the transactiont table
   void AddToTable();
 
   /// connects an agent to its parent.
-  void Connect(Model* parent);
+  void Connect(Agent* parent);
 
   /// Stores the next available facility ID
   static int next_id_;
 
   /// children of this model
-  std::vector<Model*> children_;
+  std::vector<Agent*> children_;
 
   /// parent of this model
-  Model* parent_;
+  Agent* parent_;
 
   /// parent's ID of this model
   /// Note: we keep the parent id in the model so we can reference it
@@ -307,7 +307,7 @@ class Model : public StateWrangler {
 
   std::string prototype_;
 
-  /// concrete type of a model (e.g. "MyReactorModel")
+  /// concrete type of a model (e.g. "MyReactorAgent")
   std::string model_impl_;
 
   /// an instance-unique ID for the model

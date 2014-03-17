@@ -17,7 +17,7 @@ namespace cyclus {
 
 std::map<std::string, DynamicModule*> DynamicModule::modules_;
 
-Model* DynamicModule::Make(Context* ctx, std::string name) {
+Agent* DynamicModule::Make(Context* ctx, std::string name) {
   if (modules_.count(name) == 0) {
     DynamicModule* dyn = new DynamicModule(name);
     modules_[name] = dyn;
@@ -56,7 +56,7 @@ DynamicModule::DynamicModule(std::string name)
   SetConstructor();
 }
 
-Model* DynamicModule::ConstructInstance(Context* ctx) {
+Agent* DynamicModule::ConstructInstance(Context* ctx) {
   return constructor_(ctx);
 }
 

@@ -23,7 +23,7 @@ static const double OsiCbcInfinity = COIN_DBL_MAX;
 
 /** Cbc Solver Interface
     
-Instantiation of OsiCbcSolverInterface for the Model Algorithm.
+Instantiation of OsiCbcSolverInterface for the Agent Algorithm.
 
 */
 
@@ -661,7 +661,7 @@ public:
   /**@name Cbc specific public interfaces */
   //@{
   /// Get pointer to Cbc model
-  inline CbcModel * getModelPtr() const 
+  inline CbcModel * getAgentPtr() const 
   { return modelPtr_;}
   /// Get pointer to underlying solver
   inline OsiSolverInterface * getRealSolverPtr() const 

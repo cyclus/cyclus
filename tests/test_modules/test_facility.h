@@ -5,16 +5,16 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /// This is the simplest possible Facility, for testing
-class TestFacility: public cyclus::FacilityModel {
+class TestFacility: public cyclus::FacilityAgent {
  public:
-  TestFacility(cyclus::Context* ctx) : cyclus::FacilityModel(ctx) {};
+  TestFacility(cyclus::Context* ctx) : cyclus::FacilityAgent(ctx) {};
       
-  virtual cyclus::Model* Clone() { return new TestFacility(context()); };
+  virtual cyclus::Agent* Clone() { return new TestFacility(context()); };
 
   virtual void InitInv(cyclus::Inventories& inv) {};
   virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
 
-  void CloneModuleMembersFrom(cyclus::FacilityModel* source) {};
+  void CloneModuleMembersFrom(cyclus::FacilityAgent* source) {};
   void Tick(int time) {};
   void Tock(int time) {};
 };

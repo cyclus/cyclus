@@ -21,7 +21,7 @@
 using cyclus::Bid;
 using cyclus::Context;
 using cyclus::Material;
-using cyclus::Model;
+using cyclus::Agent;
 using cyclus::Request;
 using cyclus::TestContext;
 using cyclus::TestObjFactory;

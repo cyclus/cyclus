@@ -19,39 +19,39 @@ typedef std::set<std::string> PrototypeSet;
 typedef std::set<std::string>::iterator PrototypeIterator;
 
 /**
-   The InstModel class is the abstract class/interface
+   The InstAgent class is the abstract class/interface
    used by all institution models
 
-   @section introduction Introduction The InstModel type assists in defining the
-   region-institution-facility hierarchy in Cyclus. A InstModel institution is
+   @section introduction Introduction The InstAgent type assists in defining the
+   region-institution-facility hierarchy in Cyclus. A InstAgent institution is
    an actor associated with a set of facilities for which it is responsible. An
-   InstModel may be used to adjust preferences in the ResourceExchange to make
+   InstAgent may be used to adjust preferences in the ResourceExchange to make
    material routing decisions based on interfacility relationships. Deployment
-   is a primary differentiator between different InstModel implementations.
+   is a primary differentiator between different InstAgent implementations.
  */
-class InstModel : public Model, public TimeListener {
+class InstAgent : public Agent, public TimeListener {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
    */
  public:
   /**
-     Default constructor for InstModel Class
+     Default constructor for InstAgent Class
    */
-  InstModel(Context* ctx);
+  InstAgent(Context* ctx);
 
   /**
      every model should be destructable
    */
-  virtual ~InstModel() {};
+  virtual ~InstAgent() {};
 
-  // DO NOT call Model class implementation of this method
+  // DO NOT call Agent class implementation of this method
   virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
 
-  // DO NOT call Model class implementation of this method
+  // DO NOT call Agent class implementation of this method
   virtual void InitFrom(QueryBackend* b) {};
 
-  // DO NOT call Model class implementation of this method
+  // DO NOT call Agent class implementation of this method
   virtual void Snapshot(DbInit di) {};
 
   virtual void InitInv(Inventories& inv) {};
@@ -66,7 +66,7 @@ class InstModel : public Model, public TimeListener {
   /**
      perform all tasks required when an inst enters the simulation
    */
-  virtual void Build(Model* parent);
+  virtual void Build(Agent* parent);
 
   virtual void DoRegistration();
 
@@ -77,7 +77,7 @@ class InstModel : public Model, public TimeListener {
   virtual void Tock(int time);
 
  protected:
-  void InitFrom(InstModel* m);
+  void InitFrom(InstAgent* m);
 
 };
 

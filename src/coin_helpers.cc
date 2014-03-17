@@ -18,7 +18,7 @@ namespace cyclus {
    May modify both models by cleaning up
 */
 int 
-differentModel(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
+differentAgent(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
                bool /*ignoreNames*/)
 {
   // set reasonable defaults

@@ -35,7 +35,7 @@ namespace cyclus {
    'level'.
  */
 #define LOG(level, prefix) \
-  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoModel()) ; \
+  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoAgent()) ; \
   else cyclus::Logger().Get(level, prefix)
 
 #define CLOG(level) \
@@ -95,7 +95,7 @@ class Logger {
   };
 
   /// Set whether or not agent/model log entries should be printed
-  static bool& NoModel() {
+  static bool& NoAgent() {
     return no_model;
   };
 

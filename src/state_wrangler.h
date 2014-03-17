@@ -29,7 +29,7 @@ class StateWrangler {
   /// variable.  The simulation and agent id's are automatically injected in all
   /// data transfered through di.
   ///
-  /// Model parameters in the QueryEngine are scoped in the
+  /// Agent parameters in the QueryEngine are scoped in the
   /// "model/[model-class-name]" path. The model's class-name can be retrieved
   /// from the model_impl method. The superclass InitFrom expects the QueryEngine
   /// passed to it to be scoped identically - do NOT pass a changed-scope

@@ -1,5 +1,5 @@
 // model.cc
-// Implements the Model Class
+// Implements the Agent Class
 #include "model.h"
 
 #include <algorithm>
@@ -15,9 +15,9 @@
 namespace cyclus {
 
 // static members
-int Model::next_id_ = 0;
+int Agent::next_id_ = 0;
 
-void Model::InitFrom(Model* m) {
+void Agent::InitFrom(Agent* m) {
   id_ = next_id_++;
   prototype_ = m->prototype_;
   kind_ = m->kind_;
@@ -26,7 +26,7 @@ void Model::InitFrom(Model* m) {
   ctx_ = m->ctx_;
 }
 
-std::string Model::InformErrorMsg(std::string msg) {
+std::string Agent::InformErrorMsg(std::string msg) {
   std::stringstream ret;
   ret << "A(n) " << model_impl_ << " named " << prototype_
       << " at time " << context()->time()
@@ -35,50 +35,50 @@ std::string Model::InformErrorMsg(std::string msg) {
   return ret.str();
 }
 
-void Model::InfileToDb(QueryEngine* qe, DbInit di) {
+void Agent::InfileToDb(QueryEngine* qe, DbInit di) {
   std::string proto = qe->GetString("name");
   int lifetime = GetOptionalQuery<int>(qe, "lifetime", -1);
-  di.NewDatum("Model")
+  di.NewDatum("Agent")
     ->AddVal("Prototype", proto)
     ->AddVal("Lifetime", lifetime)
     ->Record();
 }
 
-void Model::InitFrom(QueryBackend* b) {
-  QueryResult qr = b->Query("Model", NULL);
+void Agent::InitFrom(QueryBackend* b) {
+  QueryResult qr = b->Query("Agent", NULL);
   prototype_ = qr.GetVal<std::string>("Prototype");
   lifetime_ = qr.GetVal<int>("Lifetime");
 }
 
-void Model::Snapshot(DbInit di) {
-  di.NewDatum("Model")
+void Agent::Snapshot(DbInit di) {
+  di.NewDatum("Agent")
     ->AddVal("Prototype", prototype_)
     ->AddVal("Lifetime", lifetime_)
     ->Record();
 }
 
-Model::Model(Context* ctx)
+Agent::Agent(Context* ctx)
   : ctx_(ctx),
     id_(next_id_++),
-    kind_("Model"),
+    kind_("Agent"),
     parent_id_(-1),
     enter_time_(-1),
     lifetime_(-1),
     parent_(NULL),
     model_impl_("UNSPECIFIED") {
   ctx_->model_list_.insert(this); 
-  MLOG(LEV_DEBUG3) << "Model ID=" << id_ << ", ptr=" << this << " created.";
+  MLOG(LEV_DEBUG3) << "Agent ID=" << id_ << ", ptr=" << this << " created.";
 }
 
-Model::~Model() {
+Agent::~Agent() {
   MLOG(LEV_DEBUG3) << "Deleting model '" << prototype() << "' ID=" << id_ << " {";
   context()->model_list_.erase(this);
   
   if (parent_ != NULL) {
-    CLOG(LEV_DEBUG2) << "Model '" << parent_->prototype() << "' ID=" << parent_->id()
+    CLOG(LEV_DEBUG2) << "Agent '" << parent_->prototype() << "' ID=" << parent_->id()
                      << " has removed child '" << prototype() << "' ID="
                      << id() << " from its list of children.";
-    std::vector<Model*>::iterator it;
+    std::vector<Agent*>::iterator it;
     it = find(parent_->children_.begin(), parent_->children_.end(), this);
     if (it != parent_->children_.end()) {
       parent_->children_.erase(it);
@@ -87,15 +87,15 @@ Model::~Model() {
 
   // delete children
   while (children_.size() > 0) {
-    Model* child = children_.at(0);
+    Agent* child = children_.at(0);
     MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->id() << " {";
-    ctx_->DelModel(child);
+    ctx_->DelAgent(child);
     MLOG(LEV_DEBUG4) << "}";
   }
   MLOG(LEV_DEBUG3) << "}";
 }
 
-std::string Model::str() {
+std::string Agent::str() {
   std::stringstream ss;
   ss << kind_ << "_" << prototype_
      << " ( "
@@ -107,8 +107,8 @@ std::string Model::str() {
   return ss.str();
 }
 
-void Model::Build(Model* parent) {
-  CLOG(LEV_DEBUG1) << "Model '" << prototype()
+void Agent::Build(Agent* parent) {
+  CLOG(LEV_DEBUG1) << "Agent '" << prototype()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
   CLOG(LEV_DEBUG3) << " * Implementation: " << model_impl_;
@@ -120,9 +120,9 @@ void Model::Build(Model* parent) {
   this->AddToTable();
 }
 
-void Model::Connect(Model* parent) {
+void Agent::Connect(Agent* parent) {
   if (parent == this) {
-    throw KeyError("Model " + prototype() +
+    throw KeyError("Agent " + prototype() +
                    "is trying to add itself as its own child.");
   }
   if (parent != NULL) {
@@ -132,16 +132,16 @@ void Model::Connect(Model* parent) {
   }
 }
 
-void Model::Decommission() {
+void Agent::Decommission() {
   CLOG(LEV_INFO3) << prototype() << " is being decommissioned";
   ctx_->NewDatum("AgentExit")
   ->AddVal("AgentId", id())
   ->AddVal("ExitTime", ctx_->time())
   ->Record();
-  ctx_->DelModel(this);
+  ctx_->DelAgent(this);
 }
 
-std::string Model::PrintChildren() {
+std::string Agent::PrintChildren() {
   std::stringstream ss("");
   ss << "Children of " << prototype() << ":" << std::endl;
   for (int i = 0; i < children_.size(); i++) {
@@ -153,7 +153,7 @@ std::string Model::PrintChildren() {
   return ss.str();
 }
 
-std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
+std::vector<std::string> Agent::GetTreePrintOuts(Agent* m) {
   std::vector<std::string> ret;
   std::stringstream ss("");
   ss << m->prototype() << std::endl;
@@ -169,7 +169,7 @@ std::vector<std::string> Model::GetTreePrintOuts(Model* m) {
   return ret;
 }
 
-void Model::AddToTable() {
+void Agent::AddToTable() {
   ctx_->NewDatum("AgentEntry")
   ->AddVal("AgentId", id_)
   ->AddVal("Kind", kind_)
