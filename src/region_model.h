@@ -36,7 +36,7 @@ namespace cyclus {
 
    -# Schedule the deployment of facilities by either
    -# Determining when new facilities need to be built, or
-   -# Deferring to an InstAgent to make this determination.
+   -# Deferring to an Institution to make this determination.
    -# Manage the deployment of facilities by interacting with the
    Institutions to select a specific facility type and facility
    parameters 

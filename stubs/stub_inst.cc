@@ -4,7 +4,7 @@ using stubs::StubInst;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::StubInst(cyclus::Context* ctx)
-    : cyclus::InstAgent(ctx) {};
+    : cyclus::Institution(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::~StubInst() {}
@@ -32,13 +32,13 @@ cyclus::Agent* StubInst::Clone() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::InitFrom(StubInst* m) {
-  cyclus::InstAgent::InitFrom(m);
+  cyclus::Institution::InitFrom(m);
   // Initialize stubinst members for a cloned module here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubInst::str() {
-  return InstAgent::str();
+  return Institution::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

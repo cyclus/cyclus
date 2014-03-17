@@ -9,13 +9,13 @@
 #include "timer.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//- - - - - - - Tests specific to the InstAgent class itself- - - - - - -
+//- - - - - - - Tests specific to the Institution class itself- - - - - - -
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class DieInst : public cyclus::InstAgent {
+class DieInst : public cyclus::Institution {
  public:
-  DieInst(cyclus::Context* ctx) : cyclus::InstAgent(ctx) {
+  DieInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {
     tickDie_ = false;
     tockDie_ = false;
   };

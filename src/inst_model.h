@@ -19,31 +19,31 @@ typedef std::set<std::string> PrototypeSet;
 typedef std::set<std::string>::iterator PrototypeIterator;
 
 /**
-   The InstAgent class is the abstract class/interface
+   The Institution class is the abstract class/interface
    used by all institution models
 
-   @section introduction Introduction The InstAgent type assists in defining the
-   region-institution-facility hierarchy in Cyclus. A InstAgent institution is
+   @section introduction Introduction The Institution type assists in defining the
+   region-institution-facility hierarchy in Cyclus. A Institution institution is
    an actor associated with a set of facilities for which it is responsible. An
-   InstAgent may be used to adjust preferences in the ResourceExchange to make
+   Institution may be used to adjust preferences in the ResourceExchange to make
    material routing decisions based on interfacility relationships. Deployment
-   is a primary differentiator between different InstAgent implementations.
+   is a primary differentiator between different Institution implementations.
  */
-class InstAgent : public Agent, public TimeListener {
+class Institution : public Agent, public TimeListener {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
    */
  public:
   /**
-     Default constructor for InstAgent Class
+     Default constructor for Institution Class
    */
-  InstAgent(Context* ctx);
+  Institution(Context* ctx);
 
   /**
      every model should be destructable
    */
-  virtual ~InstAgent() {};
+  virtual ~Institution() {};
 
   // DO NOT call Agent class implementation of this method
   virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
@@ -77,7 +77,7 @@ class InstAgent : public Agent, public TimeListener {
   virtual void Tock(int time);
 
  protected:
-  void InitFrom(InstAgent* m);
+  void InitFrom(Institution* m);
 
 };
 

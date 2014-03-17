@@ -8,13 +8,13 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(InstAgentTests, Tick) {
+TEST_P(InstitutionTests, Tick) {
   int time = 1;
   EXPECT_NO_THROW(inst_model_->Tick(time));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(InstAgentTests, Tock) {
+TEST_P(InstitutionTests, Tock) {
   int time = 1;
   EXPECT_NO_THROW(inst_model_->Tock(time));
 }

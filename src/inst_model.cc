@@ -1,5 +1,5 @@
 /// Instmodel.cc
-// Implements the InstAgent class
+// Implements the Institution class
 
 #include <iostream>
 #include <sstream>
@@ -15,15 +15,15 @@
 
 namespace cyclus {
 
-InstAgent::InstAgent(Context* ctx) : Agent(ctx) {
+Institution::Institution(Context* ctx) : Agent(ctx) {
   kind_ = "Inst";
 }
 
-void InstAgent::InitFrom(InstAgent* m) {
+void Institution::InitFrom(Institution* m) {
   Agent::InitFrom(m);
 }
 
-std::string InstAgent::str() {
+std::string Institution::str() {
   if (parent() != NULL) {
     return Agent::str() + " in region" + parent()->prototype();
   } else {
@@ -31,20 +31,20 @@ std::string InstAgent::str() {
   }
 }
 
-void InstAgent::Build(Agent* parent) {
+void Institution::Build(Agent* parent) {
   Agent::Build(parent);
 }
 
-void InstAgent::DoRegistration() {
+void Institution::DoRegistration() {
   context()->RegisterTimeListener(this);
 }
 
-void InstAgent::Decommission() {
+void Institution::Decommission() {
   context()->UnregisterTimeListener(this);
   Agent::Decommission();
 }
 
-void InstAgent::Tock(int time) {
+void Institution::Tock(int time) {
   std::vector<Agent*> to_decomm;
   for (int i = 0; i < children().size(); i++) {
     Facility* child = dynamic_cast<Facility*>(children().at(i));

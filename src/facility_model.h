@@ -14,7 +14,7 @@ namespace cyclus {
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
-class InstAgent;
+class Institution;
 
 /**
    @class Facility

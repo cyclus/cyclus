@@ -10,10 +10,10 @@ namespace stubs {
 /**
   @class StubInst
 
-  This InstAgent is intended
-  as a skeleton to guide the implementation of new InstAgent models.
+  This Institution is intended
+  as a skeleton to guide the implementation of new Institution models.
 
-  The StubInst class inherits from the InstAgent class and is
+  The StubInst class inherits from the Institution class and is
   dynamically loaded by the Agent class when requested.
 
   @section intro Introduction
@@ -32,7 +32,7 @@ namespace stubs {
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
-class StubInst : public cyclus::InstAgent {
+class StubInst : public cyclus::Institution {
   /* --------------------
    * all INSTMODEL classes have these members
    * --------------------
