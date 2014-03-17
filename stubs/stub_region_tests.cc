@@ -57,17 +57,12 @@ TEST_F(StubRegionTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* StubRegionAgentConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Agent*>(new StubRegion(ctx));
+cyclus::Agent* StubRegionConstructor(cyclus::Context* ctx) {
+  return new StubRegion(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::RegionAgent* StubRegionConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::RegionAgent*>(new StubRegion(ctx));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(StubRegion, RegionAgentTests,
+INSTANTIATE_TEST_CASE_P(StubRegion, RegionTests,
                         ::testing::Values(&StubRegionConstructor));
 INSTANTIATE_TEST_CASE_P(StubRegion, AgentTests,
-                        ::testing::Values(&StubRegionAgentConstructor));
+                        ::testing::Values(&StubRegionConstructor));

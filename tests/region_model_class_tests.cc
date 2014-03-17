@@ -43,7 +43,7 @@ class DieInst : public cyclus::Institution {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class RegionAgentClassTests : public ::testing::Test {
+class RegionClassTests : public ::testing::Test {
   protected:
 
     DieInst* child1_;
@@ -52,7 +52,7 @@ class RegionAgentClassTests : public ::testing::Test {
     DieInst* child4_;
     DieInst* child5_;
 
-    cyclus::RegionAgent* reg_;
+    cyclus::Region* reg_;
     cyclus::Recorder rec_;
     cyclus::Timer ti_;
     cyclus::Context* ctx_;
@@ -76,7 +76,7 @@ class RegionAgentClassTests : public ::testing::Test {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(RegionAgentClassTests, TickIter) {
+TEST_F(RegionClassTests, TickIter) {
   ASSERT_EQ(5, reg_->children().size());
 
   child2_->tickDie_ = true;
@@ -97,7 +97,7 @@ TEST_F(RegionAgentClassTests, TickIter) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_F(RegionAgentClassTests, TockIter) {
+TEST_F(RegionClassTests, TockIter) {
   ASSERT_EQ(5, reg_->children().size());
 
   child2_->tockDie_ = true;

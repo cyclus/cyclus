@@ -9,6 +9,7 @@
 #include "test_modules/test_region.h"
 #include "suffix.h"
 #include "test_context.h"
+#include "model_tests.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -19,10 +20,9 @@ using ::testing::Values;
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
 // parameter is a pointer to a concrete Institution instance 
-typedef cyclus::Institution* InstitutionConstructor(cyclus::Context* ctx);
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class InstitutionTests : public TestWithParam<InstitutionConstructor*> {
+class InstitutionTests : public TestWithParam<AgentConstructor*> {
  protected:
   TestInst* inst_model_;
   TestFacility* test_facility_;

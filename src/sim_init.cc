@@ -7,9 +7,9 @@
 
 namespace cyclus {
 
-class Dummy : public RegionAgent {
+class Dummy : public Region {
  public:
-  Dummy(Context* ctx) : RegionAgent(ctx) {};
+  Dummy(Context* ctx) : Region(ctx) {};
   Dummy* Clone() { return NULL; };
 };
 

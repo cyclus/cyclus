@@ -58,13 +58,13 @@ TEST_F(StubFacilityTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* Constructor(cyclus::Context* ctx) {
+cyclus::Agent* StubFacilityConstructor(cyclus::Context* ctx) {
   return new StubFacility(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 INSTANTIATE_TEST_CASE_P(StubFac, FacilityTests,
-                        ::testing::Values(&Constructor));
+                        ::testing::Values(&StubFacilityConstructor));
 
 INSTANTIATE_TEST_CASE_P(StubFac, AgentTests,
-                        ::testing::Values(&Constructor));
+                        ::testing::Values(&StubFacilityConstructor));

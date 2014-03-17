@@ -6,13 +6,13 @@
 #include "region_model_tests.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(RegionAgentTests, Print) {
+TEST_P(RegionTests, Print) {
   int time = 1;
   EXPECT_NO_THROW(std::string s = region_model_->str());
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(RegionAgentTests, IsRegion) {
+TEST_P(RegionTests, IsRegion) {
   EXPECT_EQ("Region",region_model_->kind());
 }
 

@@ -7,6 +7,7 @@
 #include "region_model.h"
 #include "suffix.h"
 #include "test_context.h"
+#include "model_tests.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -16,19 +17,18 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete RegionAgent instance 
-typedef cyclus::RegionAgent* RegionAgentConstructor(cyclus::Context* ctx);
+// parameter is a pointer to a concrete Region instance 
 
-class RegionAgentTests : public TestWithParam<RegionAgentConstructor*> {
+class RegionTests : public TestWithParam<AgentConstructor*> {
   public:
     virtual void SetUp() { 
-      region_model_ = (*GetParam())(tc_.get());
+      region_model_ = dynamic_cast<cyclus::Region*>((*GetParam())(tc_.get()));
     }
     virtual void TearDown(){}
 
   protected:
     cyclus::TestContext tc_;
-    cyclus::RegionAgent* region_model_;
+    cyclus::Region* region_model_;
 
 };
 

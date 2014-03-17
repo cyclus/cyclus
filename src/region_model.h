@@ -10,20 +10,20 @@
 namespace cyclus {
 
 /**
-   @class RegionAgent
+   @class Region
 
-   The RegionAgent class is the abstract class/interface used by all
+   The Region class is the abstract class/interface used by all
    region models
 
    This is all that is known externally about Regions
 
    @section intro Introduction
-   The RegionAgent type assists in defining the region-institution-facility
-   hierarchy in Cyclus. A RegionAgent region is an actor associated with a set
-   of institutions or facilities for which it is responsible. A RegionAgent may
+   The Region type assists in defining the region-institution-facility
+   hierarchy in Cyclus. A Region region is an actor associated with a set
+   of institutions or facilities for which it is responsible. A Region may
    be used to adjust preferences in the ResourceExchange to make material
    routing decisions based on interfacility relationships. Deployment is a
-   primary differentiator between different RegionAgent implementations.
+   primary differentiator between different Region implementations.
 
    Like all model implementations, there are a number of implementations
    that are distributed as part of the core Cyclus application as well
@@ -60,21 +60,21 @@ namespace cyclus {
    facility's allowability in the region). It makes no alterations to
    messages passed through it in either the up or down direction.
  */
-class RegionAgent : public Agent, public TimeListener {
+class Region : public Agent, public TimeListener {
   /* --------------------
    * all MODEL classes have these members
    * --------------------
    */
  public:
   /**
-     Default constructor for RegionAgent Class
+     Default constructor for Region Class
    */
-  RegionAgent(Context* ctx);
+  Region(Context* ctx);
 
   /**
-     RegionAgents should not be indestructible.
+     Regions should not be indestructible.
    */
-  virtual ~RegionAgent() {};
+  virtual ~Region() {};
 
   // DO NOT call Agent class implementation of this method
   virtual void InfileToDb(QueryEngine* qe, DbInit di) {}
@@ -108,7 +108,7 @@ class RegionAgent : public Agent, public TimeListener {
   virtual void Tock(int time) {};
 
  protected:
-  void InitFrom(RegionAgent* m);
+  void InitFrom(Region* m);
 
 };
 

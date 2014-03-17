@@ -4,7 +4,7 @@ using stubs::StubRegion;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubRegion::StubRegion(cyclus::Context* ctx)
-    : cyclus::RegionAgent(ctx) {};
+    : cyclus::Region(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubRegion::~StubRegion() {}
@@ -32,13 +32,13 @@ cyclus::Agent* StubRegion::Clone() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubRegion::InitFrom(StubRegion* m) {
-  cyclus::RegionAgent::InitFrom(m);
+  cyclus::Region::InitFrom(m);
   // Initialize stubregion members for a cloned module here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubRegion::str() {
-  return RegionAgent::str();
+  return Region::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

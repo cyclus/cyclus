@@ -1,5 +1,5 @@
 // Regionmodel.cc
-// Implements the RegionAgent class
+// Implements the Region class
 
 #include <string>
 #include <iostream>
@@ -15,28 +15,28 @@
 
 namespace cyclus {
 
-void RegionAgent::InitFrom(RegionAgent* m) {
+void Region::InitFrom(Region* m) {
   Agent::InitFrom(m);
 }
 
-RegionAgent::RegionAgent(Context* ctx) : Agent(ctx) {
+Region::Region(Context* ctx) : Agent(ctx) {
   kind_ = "Region";
 }
 
-void RegionAgent::Build(Agent* parent) {
+void Region::Build(Agent* parent) {
   Agent::Build(parent);
 }
 
-void RegionAgent::DoRegistration() {
+void Region::DoRegistration() {
   context()->RegisterTimeListener(this);
 }
 
-void RegionAgent::Decommission() {
+void Region::Decommission() {
   context()->UnregisterTimeListener(this);
   Agent::Decommission();
 }
 
-std::string RegionAgent::str() {
+std::string Region::str() {
   std::string s = Agent::str();
 
   s += " has insts: ";

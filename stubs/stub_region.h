@@ -10,10 +10,10 @@ namespace stubs {
 /**
   @class StubRegion
 
-  This RegionAgent is intended
-  as a skeleton to guide the implementation of new RegionAgent models.
+  This Region is intended
+  as a skeleton to guide the implementation of new Region models.
 
-  The StubRegion class inherits from the RegionAgent class and is
+  The StubRegion class inherits from the Region class and is
   dynamically loaded by the Agent class when requested.
 
   @section intro Introduction
@@ -32,7 +32,7 @@ namespace stubs {
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
-class StubRegion : public cyclus::RegionAgent {
+class StubRegion : public cyclus::Region {
   /* --------------------
    * all REGIONMODEL classes have these members
    * --------------------
