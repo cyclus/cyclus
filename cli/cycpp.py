@@ -485,8 +485,8 @@ class CodeGeneratorFilter(Filter):
 
     def __init__(self, *args, **kwargs):
         super(CodeGeneratorFilter, self).__init__(*args, **kwargs)
-        classname = self.methodname.lower()
-        self.regex = re.compile(self.re_template.format(classname))
+        pragmaname = self.pragmaname
+        self.regex = re.compile(self.re_template.format(pragmaname))
         self.local_classname = None
 
     def transform(self, statement, sep):
@@ -515,7 +515,7 @@ class CodeGeneratorFilter(Filter):
         ind = 2 * (cg.depth - len(cg.namespaces))
         definition = self.def_template.format(ind=" "*ind, virt=virt, 
                         rtn=self.methodrtn, ns=ns, methodname=self.methodname,
-                        args=self.methodargs, sep=end)
+                        args=self.methodargs(), sep=end)
 
         # compute implementation
         impl = ""
@@ -533,6 +533,14 @@ class CodeGeneratorFilter(Filter):
         else:
             return definition + impl + end
 
+    def pragmaname(self):
+        #overwriteable
+        return self.methodname.lower()
+
+    def methodargs(self):
+        # overwriteable
+        return ""
+
     def in_class_decl(self): 
         classname = self.local_classname
         return (len(self.machine.classes) > 0 and 
@@ -547,44 +555,36 @@ class CloneFilter(CodeGeneratorFilter):
         #pragma cyclus [def|decl|impl] clone [classname]
     """
     methodname = "Clone"
-    methodargs = ""
+    pragmaname = "clone"
     methodrtn = "cyclus::Model*"
 
     def impl(self, ind="  "):
         classname = self.local_classname
-        impl = ind + "{0}* m = new {0}(context());\n".format(classname)
+        impl = ""
+        impl += ind + "{0}* m = new {0}(context());\n".format(classname)
         impl += ind + "m->InitFrom(this);\n"
         impl += ind + "return m;\n"
         return impl
 
-class InitFromFilter(Filter):
-    """Filter for handling InitFrom() code generation:
-
-        #pragma cyclus initfrom [classname]
-
-    The classname argument is optional and allow you to force the generation 
-    of a specific class. If not present, it takes the current class. If the class
-    is specified it must be the full namespace path to the class.
+class InitFromCopyFilter(CodeGeneratorFilter):
+    """Filter for handling copy-constructor-like InitFrom() code generation:
+        #pragma cyclus [def|decl|impl] initfromcopy [classname]
     """
-    regex = re.compile("\s*#\s*pragma\s+cyclus\s+initfrom(\s+.*)?")
+    methodname = "InitFrom"
+    pragmaname = "initfromcopy"
+    methodrtn = "void"
 
-    def transform(self, statement, sep):
+    def methodargs(self):
+        return "{0}* m".format(self.local_classname)
+
+    def impl(self, ind="  "):        
         cg = self.machine
-        classname = self.match.group(1)
-        if classname is None:
-            classname = cg.classname()
-        classname = classname.strip().replace('.', '::')
         context = cg.context
-        if classname not in context:
-            msg = "{0} not found! Options include: {1}."
-            raise KeyError(msg.format(classname, ", ".join(sorted(context.keys()))))
-        ctx = context[classname]
-        rtn = statement + sep + (
-            "  void InitFrom(stuff) {{\n"
-            "    // InitFrom for {0}\n"
-            "    default = {1};\n"
-            "  }};\n").format(classname, ctx.values()[0]['default'])
-        return rtn
+        ctx = context[self.local_classname]
+        impl = ""
+        for member in ctx.keys():
+            impl += ind + "{0} = m->{0}".format(member)
+        return impl
 
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
@@ -605,7 +605,7 @@ class CodeGenerator(object):
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self), 
-                        InitFromFilter(self), CloneFilter(self)]
+                        InitFromCopyFilter(self), CloneFilter(self)]
 
     def classname(self):
         """Returns the current, fully-expanded class name."""
