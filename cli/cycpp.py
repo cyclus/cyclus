@@ -106,7 +106,7 @@ class Filter(object):
     regex = re.compile('a^')  # neat regex which fails even against empty strings
 
     def __init__(self, machine=None, *args, **kwargs):
-        self.machine = state
+        self.machine = machine
         self.match = None
 
     def isvalid(self, statement):
@@ -128,7 +128,7 @@ class AliasFilter(Filter):
 
     def revert(self, statement, sep):
         super(AliasFilter, self).revert(statement, sep)
-        state = self.state
+        state = self.machine
         if len(state.aliases) == 0 or sep != '}':
             return
         # Only keep alias at or above current depth
@@ -142,7 +142,7 @@ class TypedefFilter(AliasFilter):
     regex = re.compile("\s*typedef\s+(.*?\s+.*)\s*$")
 
     def transform(self, statement, sep):
-        state = self.state
+        state = self.machine
         g = self.match.group(1)
         g = outter_split(g)
         g0 = g[0].split()  # canonize the type name
@@ -155,7 +155,7 @@ class UsingFilter(AliasFilter):
     regex = re.compile("\s*using\s+(?!namespace\s+)([\w:]+)\s*")
 
     def transform(self, statement, sep):
-        state = self.state
+        state = self.machine
         name = self.match.group(1)
         state.aliases.add((state.depth, name, name.rsplit('::', 1)[1]))
 
@@ -165,13 +165,13 @@ class NamespaceFilter(Filter):
     regex = re.compile("\s*namespace(\s+(\w*)?)?\s*$")
 
     def transform(self, statement, sep):
-        state = self.state
+        state = self.machine
         name = self.match.group(2)
         state.namespaces.append((state.depth, name))
 
     def revert(self, statement, sep):
         super(NamespaceFilter, self).revert(statement, sep)
-        state = self.state
+        state = self.machine
         if len(state.namespaces) == 0:
             return
         if state.depth == state.namespaces[-1][0]:
@@ -182,13 +182,13 @@ class UsingNamespaceFilter(Filter):
     regex = re.compile("\s*using\s+namespace\s+([\w:]*)\s*")
 
     def transform(self, statement, sep):
-        state = self.state
+        state = self.machine
         name = self.match.group(1)
         state.using_namespaces.add((state.depth, name))
 
     def revert(self, statement, sep):
         super(UsingNamespaceFilter, self).revert(statement, sep)
-        state = self.state
+        state = self.machine
         if len(state.using_namespaces) == 0 or sep != '}':
             return
         # Only keep ns at or above current depth
@@ -201,7 +201,7 @@ class NamespaceAliasFilter(AliasFilter):
     regex = re.compile("\s*namespace\s+(\w+)\s*=\s*([\w:]+)\s*")
 
     def transform(self, statement, sep):
-        state = self.state
+        state = self.machine
         alias = self.match.group(1)
         name = self.match.group(2)
         state.aliases.add((state.depth, name, alias))
@@ -211,14 +211,14 @@ class ClassFilter(Filter):
     regex = re.compile("\s*class\s+([\w:]+)\s*")
 
     def transform(self, statement, sep):
-        state = self.state
+        state = self.machine
         name = self.match.group(1)
         state.classes.append((state.depth, name))
         state.access[tuple(state.classes)] = "private"
 
     def revert(self, statement, sep):
         super(ClassFilter, self).revert(statement, sep)
-        state = self.state
+        state = self.machine
         if len(state.classes) == 0:
             return
         if state.depth == state.classes[-1][0]:
@@ -231,7 +231,7 @@ class AccessFilter(Filter):
 
     def transform(self, statement, sep):
         access = self.match.group(1)
-        self.state.access[tuple(self.state.classes)] = access
+        self.machine.access[tuple(self.machine.classes)] = access
 
 #
 # pass 2
@@ -247,7 +247,7 @@ class VarDecorationFilter(Filter):
     regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
 
     def transform(self, statement, sep):
-        state = self.state
+        state = self.machine
         context = state.context
         classname = state.classname()
         classpaths = classname.split('::')
@@ -290,7 +290,7 @@ class VarDeclarationFilter(Filter):
     regex = re.compile("(.*\w+.*?)\s+(\w+)")
 
     def transform(self, statement, sep):
-        state = self.state
+        state = self.machine
         annotations = state.var_annotations
         if annotations is None:
             return
@@ -319,8 +319,8 @@ class ExecFilter(Filter):
     regex = re.compile("#\s*pragma\s+cyclus\s+exec\s+(.*)")
 
     def transform(self, statement, sep):
-        execns = self.state.execns
-        context = self.state.context
+        execns = self.machine.execns
+        context = self.machine.context
         raw = self.match.group(1)
         exec(raw, context, execns)
         del context['__builtins__']
@@ -496,7 +496,7 @@ class CodeGenerator(object):
     state.
     """
     
-    def __init__(self, state):
+    def __init__(self, context):
         self.depth = 0
         self.context = context  # the results of pass 2
         self.statements = []    # the results of pass 3, waiting to be joined
