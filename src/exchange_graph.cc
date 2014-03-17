@@ -60,15 +60,20 @@ void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ExchangeNodeGroup::AddExclNode(ExchangeNode::Ptr node) {
+  std::vector<ExchangeNode::Ptr> nodes;
+  nodes.push_back(node);
+  excl_node_groups_.push_back(nodes);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RequestGroup::RequestGroup(double qty) : qty_(qty) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
   ExchangeNodeGroup::AddExchangeNode(node);
   if (node->exclusive) {
-    std::vector<ExchangeNode::Ptr> nodes;
-    nodes.push_back(node);
-    ExchangeNodeGroup::AddExclGroup(nodes);
+    ExchangeNodeGroup::AddExclNode(node);
   }
 }
 

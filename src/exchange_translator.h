@@ -80,7 +80,7 @@ class ExchangeTranslator {
         // need to make an issue
         
         CLOG(LEV_DEBUG5) << "Updating preference for one of "
-                         << req->requester()->manager()->prototype() << "'s trade nodes:";
+                         << req->requester()->manager()->prototype()
                          << "'s trade nodes:";
         CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
         CLOG(LEV_DEBUG5) << " average pref: " << a.unode()->avg_pref;

@@ -132,10 +132,15 @@ class ExchangeNodeGroup {
   /// member of this ExchangeNodeGroup
   virtual void AddExchangeNode(ExchangeNode::Ptr node);
 
-  /// @brief Adds a node grouping to the set of exclusive node groups
+  /// @brief Adds a node grouping to the set of exclusive node groups, in
+  /// general this function is used for request exclusivity
   inline void AddExclGroup(std::vector<ExchangeNode::Ptr>& nodes) {
     excl_node_groups_.push_back(nodes);
   }
+
+  /// @brief adds a single node to the set of exclusive node groupings, in
+  /// general this function is used for demand exclusivity
+  void AddExclNode(ExchangeNode::Ptr n);
 
   /// @brief Add a flow capacity to the group
   inline void AddCapacity(double c) { capacities_.push_back(c); }
