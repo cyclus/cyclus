@@ -1,15 +1,15 @@
-// model.cc
+// agent.cc
 // Implements the Agent Class
-#include "model.h"
+#include "agent.h"
 
 #include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
 
+#include "context.h"
 #include "error.h"
 #include "logger.h"
-#include "region_model.h"
 #include "resource.h"
 
 namespace cyclus {
@@ -21,14 +21,14 @@ void Agent::InitFrom(Agent* m) {
   id_ = next_id_++;
   prototype_ = m->prototype_;
   kind_ = m->kind_;
-  model_impl_ = m->model_impl_;
+  agent_impl_ = m->agent_impl_;
   lifetime_ = m->lifetime_;
   ctx_ = m->ctx_;
 }
 
 std::string Agent::InformErrorMsg(std::string msg) {
   std::stringstream ret;
-  ret << "A(n) " << model_impl_ << " named " << prototype_
+  ret << "A(n) " << agent_impl_ << " named " << prototype_
       << " at time " << context()->time()
       << " received the following error:\n"
       << msg;
@@ -65,14 +65,14 @@ Agent::Agent(Context* ctx)
     enter_time_(-1),
     lifetime_(-1),
     parent_(NULL),
-    model_impl_("UNSPECIFIED") {
-  ctx_->model_list_.insert(this); 
+    agent_impl_("UNSPECIFIED") {
+  ctx_->agent_list_.insert(this); 
   MLOG(LEV_DEBUG3) << "Agent ID=" << id_ << ", ptr=" << this << " created.";
 }
 
 Agent::~Agent() {
-  MLOG(LEV_DEBUG3) << "Deleting model '" << prototype() << "' ID=" << id_ << " {";
-  context()->model_list_.erase(this);
+  MLOG(LEV_DEBUG3) << "Deleting agent '" << prototype() << "' ID=" << id_ << " {";
+  context()->agent_list_.erase(this);
   
   if (parent_ != NULL) {
     CLOG(LEV_DEBUG2) << "Agent '" << parent_->prototype() << "' ID=" << parent_->id()
@@ -88,7 +88,7 @@ Agent::~Agent() {
   // delete children
   while (children_.size() > 0) {
     Agent* child = children_.at(0);
-    MLOG(LEV_DEBUG4) << "Deleting child model ID=" << child->id() << " {";
+    MLOG(LEV_DEBUG4) << "Deleting child agent ID=" << child->id() << " {";
     ctx_->DelAgent(child);
     MLOG(LEV_DEBUG4) << "}";
   }
@@ -100,7 +100,7 @@ std::string Agent::str() {
   ss << kind_ << "_" << prototype_
      << " ( "
      << "ID=" << id_
-     << ", implementation=" << model_impl_
+     << ", implementation=" << agent_impl_
      << ",  name=" << prototype_
      << ",  parentID=" << parent_id_
      << " ) " ;
@@ -111,7 +111,7 @@ void Agent::Build(Agent* parent) {
   CLOG(LEV_DEBUG1) << "Agent '" << prototype()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
-  CLOG(LEV_DEBUG3) << " * Implementation: " << model_impl_;
+  CLOG(LEV_DEBUG3) << " * Implementation: " << agent_impl_;
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
   Connect(parent);
@@ -173,7 +173,7 @@ void Agent::AddToTable() {
   ctx_->NewDatum("AgentEntry")
   ->AddVal("AgentId", id_)
   ->AddVal("Kind", kind_)
-  ->AddVal("Implementation", model_impl_)
+  ->AddVal("Implementation", agent_impl_)
   ->AddVal("Prototype", prototype_)
   ->AddVal("ParentId", parent_id_)
   ->AddVal("Lifetime", lifetime_)

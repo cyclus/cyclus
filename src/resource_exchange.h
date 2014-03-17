@@ -107,7 +107,7 @@ class ResourceExchange {
   }
 
  private:
-  /// @brief queries a given facility model for 
+  /// @brief queries a given facility agent for 
   void AddRequests_(Trader* t) {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
     typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;
@@ -116,7 +116,7 @@ class ResourceExchange {
     }
   };
 
-  /// @brief queries a given facility model for 
+  /// @brief queries a given facility agent for 
   void AddBids_(Trader* t) {
     std::set<typename BidPortfolio<T>::Ptr> bp =
         QueryBids<T>(t, ex_ctx_.commod_requests);

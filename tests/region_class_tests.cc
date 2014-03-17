@@ -1,10 +1,10 @@
-// Instmodel_tests.h
+// Instagent_tests.h
 #include <gtest/gtest.h>
 
 #include "context.h"
 #include "recorder.h"
-#include "inst_model.h"
-#include "region_model.h"
+#include "institution.h"
+#include "region.h"
 #include "test_modules/test_region.h"
 #include "timer.h"
 

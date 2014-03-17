@@ -2,7 +2,7 @@
 #include "db_init.h"
 
 #include "context.h"
-#include "model.h"
+#include "agent.h"
 
 namespace cyclus {
 
@@ -13,7 +13,7 @@ DbInit::DbInit(Agent* m, bool dummy) : m_(m), full_prefix_(false) {}
 Datum* DbInit::NewDatum(std::string title) {
   std::string prefix = "AgentState";
   if (full_prefix_) {
-    prefix += m_->model_impl();
+    prefix += m_->agent_impl();
   }
   Datum* d = m_->context()->NewDatum(prefix + title);
   d->AddVal("AgentId", m_->id());

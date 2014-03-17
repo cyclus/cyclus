@@ -6,7 +6,7 @@
 #include "exchange_context.h"
 #include "material.h"
 #include "test_modules/test_facility.h"
-#include "model.h"
+#include "agent.h"
 #include "request_portfolio.h"
 #include "resource_helpers.h"
 #include "trade.h"

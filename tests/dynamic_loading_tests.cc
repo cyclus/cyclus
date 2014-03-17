@@ -9,7 +9,7 @@
 #include "env.h"
 #include "error.h"
 #include "recorder.h"
-#include "model.h"
+#include "agent.h"
 #include "timer.h"
 #include "dynamic_module.h"
 

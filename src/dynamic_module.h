@@ -23,11 +23,11 @@ class DynamicModule {
     };
   };
 
-  /// Returns a newly constructed model for the given module name.
+  /// Returns a newly constructed agent for the given module name.
   static Agent* Make(Context* ctx, std::string name);
 
   /// Closes all statically loaded dynamic modules. This should always be called
-  /// before process termination.  This must be called AFTER all models have
+  /// before process termination.  This must be called AFTER all agents have
   /// been destructed.
   static void CloseAll();
 

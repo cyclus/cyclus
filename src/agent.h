@@ -1,4 +1,4 @@
-// model.h
+// agent.h
 #ifndef MODEL_H_
 #define MODEL_H_
 
@@ -27,7 +27,7 @@ class GenericResource;
 /// map<internal-inventory-name, vector<resources-inside-inventory> >
 typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 
-/// The abstract base class used by all types of models
+/// The abstract base class used by all types of agents
 /// that live and interact in a simulation.
 ///
 /// There are several methods that must be implemented in support of simulation
@@ -51,7 +51,7 @@ class Agent : public StateWrangler {
 
   /// Return a newly created/allocated prototype that is an exact copy of this.
   /// All initialization and state cloning operations should be done in the
-  /// model's InitFrom method. The new model instance should generally NOT be
+  /// agent's InitFrom method. The new agent instance should generally NOT be
   /// created using a default copy-constructor.
   /// 
   /// Example:
@@ -71,7 +71,7 @@ class Agent : public StateWrangler {
   /// @endcode
   virtual Agent* Clone() = 0;
 
-  /// Translates info for a model from an input file to the database by reading
+  /// Translates info for a agent from an input file to the database by reading
   /// parameters from the passed QueryEngine and recording data via the DbInit
   /// variable.  The simulation and agent id's are automatically injected in all
   /// data transfered through DbInit.  This method must be implemented by all
@@ -79,8 +79,8 @@ class Agent : public StateWrangler {
   /// doing any other work.
   ///
   /// Agent parameters in the QueryEngine are scoped in the
-  /// "model/[model-class-name]" path. The model's class-name can be retrieved
-  /// from the model_impl method. The superclass InitFrom expects the QueryEngine
+  /// "agent/[agent-class-name]" path. The agent's class-name can be retrieved
+  /// from the agent_impl method. The superclass InitFrom expects the QueryEngine
   /// passed to it to be scoped identically - do NOT pass a changed-scope
   /// QueryEngine to the superclass.
   ///
@@ -93,9 +93,9 @@ class Agent : public StateWrangler {
   ///   void InfileToDb(QueryEngine* qe, DbInit di) {
   ///     cyclus::Facility::InitFrom(qe); // 
   ///     // now do MyAgentClass' initialitions, e.g.:
-  ///     qe = qe->QueryElement("model/" + model_impl()); // rescope the QueryEngine
+  ///     qe = qe->QueryElement("agent/" + agent_impl()); // rescope the QueryEngine
   ///
-  ///     // retrieve all model params
+  ///     // retrieve all agent params
   ///     std::string recipe = qe->GetString("recipe");
   ///     std::string in_commod = qe->GetString("in_commod");
   ///     std::string out_commod = qe->GetString("out_commod");
@@ -153,7 +153,7 @@ class Agent : public StateWrangler {
 
   /// returns a vector of strings representing the parent-child tree
   /// at the node for Agent m
-  /// @param m the model node to base as the root of this print tree
+  /// @param m the agent node to base as the root of this print tree
   std::vector<std::string> GetTreePrintOuts(Agent* m);
 
   /// Called when the agent enters the smiulation as an active participant and
@@ -178,8 +178,8 @@ class Agent : public StateWrangler {
   /// Called when a new child of this agent is about to be decommissioned.
   virtual void DecomNotify(Agent* m) {};
 
-  /// Decommissions the model, removing it from the simulation. Results in
-  /// destruction of the model object. If agents write their own Decommission
+  /// Decommissions the agent, removing it from the simulation. Results in
+  /// destruction of the agent object. If agents write their own Decommission
   /// method, they must call their superclass' Decommission method at the END of
   /// their Decommission method.
   virtual void Decommission();
@@ -196,58 +196,58 @@ class Agent : public StateWrangler {
   virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) {};
 
   /// Returns a module's xml rng schema for initializing from input files. All
-  /// concrete models should override this method.
+  /// concrete agents should override this method.
   virtual std::string schema() {
     return "<text />\n";
   };
 
-  /// get model instance name
+  /// get agent instance name
   inline const std::string prototype() const { return prototype_; }
 
-  /// get model instance ID
+  /// get agent instance ID
   inline const int id() const { return id_; }
 
-  /// get model implementation
-  inline std::string model_impl() {return model_impl_;}
+  /// get agent implementation
+  inline std::string agent_impl() {return agent_impl_;}
 
-  /// set model implementation
-  inline void set_model_impl(std::string new_impl) {model_impl_ = new_impl;}
+  /// set agent implementation
+  inline void set_agent_impl(std::string new_impl) {agent_impl_ = new_impl;}
 
-  /// returns a string that describes the model subclass (e.g. Region, etc.)
+  /// returns a string that describes the agent subclass (e.g. Region, etc.)
   inline const std::string kind() const {return kind_;};
 
-  /// Returns this model's current simulation context.
+  /// Returns this agent's current simulation context.
   inline Context* context() const { return ctx_; }
 
-  /// every model should be able to print a verbose description
+  /// every agent should be able to print a verbose description
   virtual std::string str();
 
-  /// returns parent of this model
+  /// returns parent of this agent
   inline Agent* parent() const { return parent_; }
 
   /// returns the parent's id
   inline const int parent_id() const { return parent_id_; }
 
-  /// returns the time this model began operation (-1 if the model has never
+  /// returns the time this agent began operation (-1 if the agent has never
   /// been built).
   inline const int enter_time() const { return enter_time_; }
 
-  /// returns the time this model will cease operation (-1 if the model is still
+  /// returns the time this agent will cease operation (-1 if the agent is still
   /// operating). Returns -1 for indefinite lifetime.
   inline const int lifetime() const { return lifetime_; }
 
-  /// returns a list of children this model has
+  /// returns a list of children this agent has
   inline const std::vector<Agent*>& children() const { return children_; }
   
  protected:
-  /// Initializes a model by copying parameters from the passed model m. This
-  /// method must be implemented by all models.  This method must call the
+  /// Initializes a agent by copying parameters from the passed agent m. This
+  /// method must be implemented by all agents.  This method must call the
   /// superclass' InitFrom method. The InitFrom method should only initialize
   /// this class' members - not inherited state. The superclass InitFrom should
   /// generally be called before any other work is done.
   ///
-  /// @param m the model containing state that should be used to initialize this
-  /// model.
+  /// @param m the agent containing state that should be used to initialize this
+  /// agent.
   /// 
   /// Example:
   ///
@@ -267,10 +267,10 @@ class Agent : public StateWrangler {
   /// @endcode
   void InitFrom(Agent* m);
 
-  /// adds model-specific information prefix to an error message
+  /// adds agent-specific information prefix to an error message
   virtual std::string InformErrorMsg(std::string msg);
   
-  /// describes the model subclass (e.g. Region, Inst, etc.). The in-core
+  /// describes the agent subclass (e.g. Region, Inst, etc.). The in-core
   /// subclasses must set this variable in their constructor(s).
   std::string kind_;
 
@@ -288,29 +288,29 @@ class Agent : public StateWrangler {
   /// Stores the next available facility ID
   static int next_id_;
 
-  /// children of this model
+  /// children of this agent
   std::vector<Agent*> children_;
 
-  /// parent of this model
+  /// parent of this agent
   Agent* parent_;
 
-  /// parent's ID of this model
-  /// Note: we keep the parent id in the model so we can reference it
+  /// parent's ID of this agent
+  /// Note: we keep the parent id in the agent so we can reference it
   /// even if the parent is deallocated.
   int parent_id_;
 
-  /// born on date of this model
+  /// born on date of this agent
   int enter_time_;
 
-  /// length of time this model is intended to operate
+  /// length of time this agent is intended to operate
   int lifetime_;
 
   std::string prototype_;
 
-  /// concrete type of a model (e.g. "MyReactorAgent")
-  std::string model_impl_;
+  /// concrete type of a agent (e.g. "MyReactorAgent")
+  std::string agent_impl_;
 
-  /// an instance-unique ID for the model
+  /// an instance-unique ID for the agent
   int id_;
 
   Context* ctx_;

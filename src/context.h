@@ -7,7 +7,7 @@
 #include <string>
 
 #include "composition.h"
-#include "model.h"
+#include "agent.h"
 #include "recorder.h"
 
 namespace cyclus {
@@ -64,7 +64,7 @@ class SimInfo {
 /// state should be accessed through a simulation context.
 ///
 /// @warning the context takes ownership of and manages the lifetime/destruction
-/// of all models constructed with it (including Cloned models). Agents should
+/// of all agents constructed with it (including Cloned agents). Agents should
 /// generally NEVER be allocated on the stack.
 /// @warning the context takes ownership of the solver and will manage its
 /// destruction.
@@ -77,7 +77,7 @@ class Context {
   /// The timer does not have to be initialized (yet).
   Context(Timer* ti, Recorder* rec);
 
-  /// Clean up resources including destructing the solver and all models the
+  /// Clean up resources including destructing the solver and all agents the
   /// context is aware of.
   ~Context();
 
@@ -103,7 +103,7 @@ class Context {
     return traders_;
   }
 
-  /// Create a new model by cloning the named prototype. The returned model is
+  /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
   ///
   /// @warning this method should generally NOT be used by agents.
@@ -191,7 +191,7 @@ class Context {
  private:
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
-  std::set<Agent*> model_list_;
+  std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
 
   SimInfo si_;

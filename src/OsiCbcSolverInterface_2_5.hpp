@@ -651,7 +651,7 @@ public:
   
   /**@name Message handling (extra for Cbc messages).
      Normally I presume you would want the same language.
-     If not then you could use underlying model pointer */
+     If not then you could use underlying agent pointer */
   //@{
   /// Set language
   void newLanguage(CoinMessages::Language language);
@@ -662,48 +662,48 @@ public:
   
   /**@name Cbc specific public interfaces */
   //@{
-  /// Get pointer to Cbc model
+  /// Get pointer to Cbc agent
   inline CbcModel * getAgentPtr() const 
-  { return modelPtr_;}
+  { return agentPtr_;}
   /// Get pointer to underlying solver
   inline OsiSolverInterface * getRealSolverPtr() const 
-  { return modelPtr_->solver();}
+  { return agentPtr_->solver();}
   /// Set cutoff bound on the objective function.
   inline void setCutoff(double value) 
-  { modelPtr_->setCutoff(value);}
+  { agentPtr_->setCutoff(value);}
   /// Get the cutoff bound on the objective function - always as minimize
   inline double getCutoff() const
-  { return modelPtr_->getCutoff();}
+  { return agentPtr_->getCutoff();}
   /// Set the CbcModel::CbcMaxNumNode maximum node limit 
   inline void setMaximumNodes( int value)
-  { modelPtr_->setMaximumNodes(value);}
+  { agentPtr_->setMaximumNodes(value);}
   /// Get the CbcModel::CbcMaxNumNode maximum node limit
   inline int getMaximumNodes() const
-  { return modelPtr_->getMaximumNodes();}
+  { return agentPtr_->getMaximumNodes();}
   /// Set the CbcModel::CbcMaxNumSol maximum number of solutions
   inline void setMaximumSolutions( int value) 
-  { modelPtr_->setMaximumSolutions(value);}
+  { agentPtr_->setMaximumSolutions(value);}
   /// Get the CbcModel::CbcMaxNumSol maximum number of solutions 
   inline int getMaximumSolutions() const 
-  { return modelPtr_->getMaximumSolutions();}
+  { return agentPtr_->getMaximumSolutions();}
   /// Set the CbcModel::CbcMaximumSeconds maximum number of seconds 
   inline void setMaximumSeconds( double value) 
-  { modelPtr_->setMaximumSeconds(value);}
+  { agentPtr_->setMaximumSeconds(value);}
   /// Get the CbcModel::CbcMaximumSeconds maximum number of seconds 
   inline double getMaximumSeconds() const 
-  { return modelPtr_->getMaximumSeconds();}
+  { return agentPtr_->getMaximumSeconds();}
   /// Node limit reached?
   inline bool isNodeLimitReached() const
-  { return modelPtr_->isNodeLimitReached();}
+  { return agentPtr_->isNodeLimitReached();}
   /// Solution limit reached?
   inline bool isSolutionLimitReached() const
-  { return modelPtr_->isSolutionLimitReached();}
+  { return agentPtr_->isSolutionLimitReached();}
   /// Get how many Nodes it took to solve the problem.
   inline int getNodeCount() const
-  { return modelPtr_->getNodeCount();}
+  { return agentPtr_->getNodeCount();}
     /// Final status of problem - 0 finished, 1 stopped, 2 difficulties
     inline int status() const
-  { return modelPtr_->status();}
+  { return agentPtr_->status();}
   /** Pass in a message handler
   
     It is the client's responsibility to destroy a message handler installed
@@ -753,8 +753,8 @@ protected:
   //@}
   /**@name Protected member data */
   //@{
-  /// Cbc model represented by this class instance
-  mutable CbcModel * modelPtr_;
+  /// Cbc agent represented by this class instance
+  mutable CbcModel * agentPtr_;
   //@}
 };
 // So unit test can find out if NDEBUG set

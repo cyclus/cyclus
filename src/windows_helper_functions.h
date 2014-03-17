@@ -15,8 +15,8 @@ void DynamicModule::OpenLibrary() {
   module_library_ = LoadLibrary(abs_path_.c_str());
 
   if (!module_library_) {
-    std::string err_msg = "Unable to load model shared object file: ";
-    err_msg += model_name;
+    std::string err_msg = "Unable to load agent shared object file: ";
+    err_msg += agent_name;
     err_msg += ". Error code is: ";
     err_msg += GetLastError();
     throw IOError(err_msg);
@@ -29,7 +29,7 @@ void DynamicModule::SetConstructor() {
                  GetProcAddress(module_library_, constructor_name_.c_str());
 
   if (!constructor_) {
-    string err_msg = "Unable to load model constructor: ";
+    string err_msg = "Unable to load agent constructor: ";
     err_msg += GetLastError();
     throw IOError(err_msg);
   }

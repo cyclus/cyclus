@@ -7,7 +7,7 @@
 
 #include "error.h"
 #include "logger.h"
-#include "model.h"
+#include "agent.h"
 #include "sim_init.h"
 
 namespace cyclus {

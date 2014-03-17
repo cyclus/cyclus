@@ -28,7 +28,7 @@ Facility agents to which they are related.
 
 Flexibility is achieved by allowing users/developers to swap out
 implementations of different agents, thereby changing the way they
-interact with other agents, changing the way they model the physical
+interact with other agents, changing the way they agent the physical
 processes that affect their own inventories, or both.
 
 Core Simulation Objects
@@ -41,7 +41,7 @@ There are five core simulation objects:
  2. :doc:`Markets`: Implement a matching algorithm across a set of suppliers
     and consumers of a given commodity.
  3. :doc:`Agents`: Interact with each other by issuing requests for resources
-    of bids to provide resources, and by modeling physical processes
+    of bids to provide resources, and by agenting physical processes
     that change those resources.
  4. :doc:`Resources`: Describe the quantity and quality of a good to be
     traded among agents in the system.

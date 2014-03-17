@@ -6,7 +6,7 @@
 
 #include "context.h"
 #include "env.h"
-#include "model.h"
+#include "agent.h"
 #include "suffix.h"
 
 #include DYNAMICLOADLIB

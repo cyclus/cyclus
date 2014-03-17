@@ -2,8 +2,8 @@
 
 #include "stub_region.h"
 
-#include "region_model_tests.h"
-#include "model_tests.h"
+#include "region_tests.h"
+#include "agent_tests.h"
 
 using stubs::StubRegion;
 

@@ -15,7 +15,7 @@
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
 #include "logger.h"
-#include "model.h"
+#include "agent.h"
 #include "query_engine.h"
 #include "sim_init.h"
 
@@ -215,36 +215,36 @@ void XMLFileLoader::LoadInitialAgents() {
   // create prototypes
   std::string prototype; // defined here for force-create AgentExit tbl
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    int num_models = xqe.NElementsMatchingQuery(schema_paths[*it]);
-    for (int i = 0; i < num_models; i++) {
+    int num_agents = xqe.NElementsMatchingQuery(schema_paths[*it]);
+    for (int i = 0; i < num_agents; i++) {
       QueryEngine* qe = xqe.QueryElement(schema_paths[*it], i);
-      QueryEngine* module_data = qe->QueryElement("model");
+      QueryEngine* module_data = qe->QueryElement("agent");
       std::string module_name = module_data->GetElementName();
       prototype = qe->GetString("name");
 
-      Agent* model = DynamicModule::Make(ctx_, module_name);
-      model->set_model_impl(module_name);
+      Agent* agent = DynamicModule::Make(ctx_, module_name);
+      agent->set_agent_impl(module_name);
 
       // call manually without agent impl injected to keep all Agent state in a
       // single, consolidated db table
-      model->Agent::InfileToDb(qe, DbInit(model, true));
+      agent->Agent::InfileToDb(qe, DbInit(agent, true));
 
-      model->InfileToDb(qe, DbInit(model));
+      agent->InfileToDb(qe, DbInit(agent));
       rec_->Flush();
 
       std::vector<Cond> conds;
       conds.push_back(Cond("SimId", "==", rec_->sim_id()));
       conds.push_back(Cond("SimTime", "==", static_cast<int>(0)));
-      conds.push_back(Cond("AgentId", "==", model->id()));
+      conds.push_back(Cond("AgentId", "==", agent->id()));
       CondInjector ci(b_, conds);
       PrefixInjector pi(&ci, "AgentState");
 
       // call manually without agent impl injected
-      model->Agent::InitFrom(&pi);
+      agent->Agent::InitFrom(&pi);
 
       pi = PrefixInjector(&ci, "AgentState" + module_name);
-      model->InitFrom(&pi);
-      ctx_->AddPrototype(prototype, model);
+      agent->InitFrom(&pi);
+      ctx_->AddPrototype(prototype, agent);
     }
   }
 

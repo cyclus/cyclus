@@ -22,7 +22,7 @@ class Context;
 void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
 
 /// Builds and returns a master cyclus input xml schema that includes the
-/// sub-schemas defined by all installed cyclus modules (e.g. facility models).
+/// sub-schemas defined by all installed cyclus modules (e.g. facility agents).
 /// This is used to validate simulation input files.
 std::string BuildMasterSchema(std::string schema_path);
 

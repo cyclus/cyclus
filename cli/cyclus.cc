@@ -183,7 +183,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("schema-path", po::value<std::string>(),
        "manually specify the path to the cyclus master schema")
       ("flat-schema", "use the flat master simulation schema")
-      ("no-model", "only print log entries from cyclus core code")
+      ("no-agent", "only print log entries from cyclus core code")
       ("no-mem", "exclude memory log statement from logger output")
       ("verb,v", po::value<std::string>(), vmessage.c_str())
       ("output-path,o", po::value<std::string>(), "output path")
@@ -273,7 +273,7 @@ void GetSimInfo(ArgInfo* ai) {
   }
 
   // logging params
-  if (ai->vm.count("no-model")) {
+  if (ai->vm.count("no-agent")) {
     Logger::NoAgent() = true;
   }
   if (ai->vm.count("no-mem")) {

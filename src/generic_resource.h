@@ -23,7 +23,7 @@ class GenericResource : public Resource {
   static const ResourceType kType;
 
   /// Creates a new generic resource that is "live" and tracked. creator is a
-  /// pointer to the model creating the resource (usually will be the caller's
+  /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
   static Ptr Create(Agent* creator, double quantity, std::string quality);

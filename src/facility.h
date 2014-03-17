@@ -1,12 +1,12 @@
-// facility_model.h
-#ifndef CYCLUS_FACILITYMODEL_H_
-#define CYCLUS_FACILITYMODEL_H_
+// facility.h
+#ifndef CYCLUS_FACILITY_H_
+#define CYCLUS_FACILITY_H_
 
 #include <string>
 #include <vector>
 #include <set>
 
-#include "model.h"
+#include "agent.h"
 #include "time_listener.h"
 #include "trader.h"
 
@@ -19,7 +19,7 @@ class Institution;
 /**
    @class Facility
    The Facility class is the abstract class/interface used by all
-   facility models
+   facility agents
 
    This is all that is known externally about facilities
 
@@ -32,7 +32,7 @@ class Institution;
    how material shipments are handled are the primary differentiators between
    different Facility implementations.
 
-   Like all model implementations, there are a number of implementations that
+   Like all agent implementations, there are a number of implementations that
    are distributed as part of the core Cyclus application as well as
    implementations contributed by third-party developers.  The links below
    describe additional parameters necessary for the complete definition of a
@@ -51,7 +51,7 @@ class Institution;
    @section anticipated Anticipated Core Implementations
 
    Developers are encouraged to add to this list and create pages that
-   describe the detailed behavior of these models.
+   describe the detailed behavior of these agents.
 
    - RecipeReactor: A facility that consumes a fixed fresh fuel recipe
    one a time scale governed by reactor cycle lengths and batch sizes,
@@ -66,7 +66,7 @@ class Institution;
    @section thirdparty Third-party Implementations
 
    Collaborators are encouraged to add to this list and link to external
-   pages that describe how to get the models and the detailed behavior
+   pages that describe how to get the agents and the detailed behavior
  */
 class Facility : public TimeListener, public Agent, public Trader {
  public:
@@ -84,12 +84,12 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual void Snapshot(DbInit di) {}
 
   /**
-     Copy module members from a source model
+     Copy module members from a source agent
 
-     Any facility subclassing facility model should invoke their own InitFrom
+     Any facility subclassing facility agent should invoke their own InitFrom
      method, calling Facility's first!
      
-     @param m the model to copy from
+     @param m the agent to copy from
    */
   void InitFrom(Facility* m);
 
@@ -115,11 +115,11 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual bool CheckDecommissionCondition();
 
   /**
-     every model should be able to print a verbose description
+     every agent should be able to print a verbose description
    */
   virtual std::string str();
 };
 
 } // namespace cyclus
 
-#endif // ifndef CYCLUS_FACILITYMODEL_H_
+#endif // ifndef CYCLUS_FACILITY_H_

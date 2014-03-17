@@ -15,7 +15,7 @@ void DynamicModule::OpenLibrary() {
   module_library_ = dlopen(abs_path_.c_str(), RTLD_LAZY);
 
   if (!module_library_) {
-    std::string err_msg = "Unable to load model shared object file: ";
+    std::string err_msg = "Unable to load agent shared object file: ";
     err_msg  += dlerror();
     throw IOError(err_msg);
   }

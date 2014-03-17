@@ -180,8 +180,8 @@ of hundreds of thousands of material objects.
 Basis
 .....
 
-In order to accurately model tens of thousands of fuel cycle facilities
-and their associated material flows, the simulation must be capable of modeling
+In order to accurately agent tens of thousands of fuel cycle facilities
+and their associated material flows, the simulation must be capable of agenting
 at least a factor of fifty more material objects than facilities. That is, if a
 material object is the size of a batch of fuel, a reactor with an 18 month
 cycle will pass over fifty fuel batches in an 80 year lifetime.
@@ -268,7 +268,7 @@ Basis
 .....
 
 This supports all mission objectives involving the use of preconfigured
-storage and repository models, which will rely on decay data in order to
+storage and repository agents, which will rely on decay data in order to
 perform appropriate transmutations of material objects at runtime. 
 (Use Cases : :ref:`Technology Use Cases <tech_use_cases>` F1 F3-F10, :ref:`Strategy Use Cases <strategy_use_cases>` 2-S10, :ref:`Economics Use Cases <econ_use_cases>` 2, E3, E6-E13, :ref:`Multi-Regional Use Cases <regional_use_cases>` 2, 3, 6, 7, 14.) 
                                         
@@ -299,7 +299,7 @@ Basis
 .....
 
 This supports all mission objectives involving the use of preconfigured
-reprocessing facilities, which will rely on separations matrices modeling
+reprocessing facilities, which will rely on separations matrices agenting
 standard aqueous (i.e. PUREX, UREX and electrochemical), pyrolitic (e.g.
 electrolysis, voloxidation, or fluoride volatility), and other standard
 reprocessing methods to perform appropriate transmutations of material objects
@@ -317,7 +317,7 @@ Basis
 
 This supports all mission objectives concerned with waste
 characterization which rely on preconfigured repository, storage, and
-transportation models.
+transportation agents.
 [F1-F10, F12, F13, F15, F16, S1, S3-S10, E1-E3, E6, E7,
 E9, E11, M2, M3, M6, M7, U3-U5, Analysis Function 5.1.1, Operational Function
 5.2.1 and Performance Function 5.3.3] 

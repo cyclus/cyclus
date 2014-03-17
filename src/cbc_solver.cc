@@ -89,17 +89,17 @@ double CBCSolver::ObjDirection(ObjectiveFunction::Ptr obj) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CBCSolver::SolveAgent(CbcModel& model) {
-  model.messageHandler()->setLogLevel(0);  // turn off all output
-  model.solver()->messageHandler()->setLogLevel(0);  // turn off all output
-  model.branchAndBound();
+void CBCSolver::SolveAgent(CbcModel& agent) {
+  agent.messageHandler()->setLogLevel(0);  // turn off all output
+  agent.solver()->messageHandler()->setLogLevel(0);  // turn off all output
+  agent.branchAndBound();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CBCSolver::PopulateSolution(CbcModel& model,
+void CBCSolver::PopulateSolution(CbcModel& agent,
                                  std::vector<Variable::Ptr>& variables) {
-  int ncol = model.solver()->getNumCols();
-  const double* solution = model.solver()->getColSolution();
+  int ncol = agent.solver()->getNumCols();
+  const double* solution = agent.solver()->getColSolution();
 
   for (int i = 0; i < variables.size(); i++) {
     boost::any value = solution[i];
@@ -172,9 +172,9 @@ void CBCSolver::Solve(std::vector<Variable::Ptr>& variables,
   OsiClpSolverInterface solver1;
   OsiSolverInterface* solver = &solver1;
   solver->loadFromCoinModel(builder_);
-  CbcModel model(*solver);
-  SolveAgent(model);
-  PopulateSolution(model, variables);
+  CbcModel agent(*solver);
+  SolveAgent(agent);
+  PopulateSolution(agent, variables);
 }
 
 }  // namespace cyclus

@@ -5,7 +5,7 @@
 #include <string>
 
 #include "context.h"
-#include "model.h"
+#include "agent.h"
 
 namespace cyclus {
 

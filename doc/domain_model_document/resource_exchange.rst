@@ -2,7 +2,7 @@
 Overview
 ========
 
-The purpose of the resource exchange process is to model the
+The purpose of the resource exchange process is to agent the
 consumer-supplier interaction in a supply chain, more specifically the
 nuclear fuel cycle. The process is complicated by the dynamic nature
 of the simulation, i.e. actors can enter or leave the exchange at any

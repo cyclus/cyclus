@@ -80,24 +80,24 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/error.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/facility.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/function.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/institution.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/logger.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/material.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/agent.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/pyne.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/region.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/relax_ng_validator.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/resource.cc"
@@ -157,26 +157,26 @@ INSTALL(FILES
   exchange_solver.h 
   exchange_translator.h
   exchange_translation_context.h
-  facility_model.h
+  facility.h
   function.h
   generic_resource.h
   greedy_solver.h
   hdf5_back.h
   query_backend.h
-  inst_model.h
+  institution.h
   intrusive_base.h
   l_matrix.h
   logger.h
   mat_query.h
   material.h
-  model.h
+  agent.h
   prog_solver.h 
   prog_translator.h 
   pyne.h
   query_engine.h 
   rec_backend.h
   recorder.h
-  region_model.h
+  region.h
   relax_ng_validator.h 
   request.h
   request_portfolio.h

@@ -3,8 +3,8 @@
 #include "stub_facility.h"
 
 #include "context.h"
-#include "facility_model_tests.h"
-#include "model_tests.h"
+#include "facility_tests.h"
+#include "agent_tests.h"
 
 using stubs::StubFacility;
 

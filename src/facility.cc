@@ -1,11 +1,11 @@
-// Facilitymodel.cc
+// facility.cc
 // Implements the Facility class
 
-#include "facility_model.h"
+#include "facility.h"
 
 #include "timer.h"
 #include "query_engine.h"
-#include "inst_model.h"
+#include "institution.h"
 #include "error.h"
 
 #include <stdlib.h>

@@ -6,7 +6,7 @@
 #include "env.h"
 #include "error.h"
 #include "logger.h"
-#include "model.h"
+#include "agent.h"
 #include "recorder.h"
 #include "timer.h"
 #include "query_engine.h"
@@ -53,24 +53,24 @@ void XMLFlatLoader::LoadInitialAgents() {
   int num_protos = xqe.NElementsMatchingQuery("/*/prototype");
   for (int i = 0; i < num_protos; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/prototype", i);
-    QueryEngine* module_data = qe->QueryElement("model");
+    QueryEngine* module_data = qe->QueryElement("agent");
     std::string module_name = module_data->GetElementName();
     std::string prototype = qe->GetString("name");
 
-    Agent* model = DynamicModule::Make(ctx_, module_name);
-    model->set_model_impl(module_name);
-    model->InfileToDb(qe, DbInit(model));
+    Agent* agent = DynamicModule::Make(ctx_, module_name);
+    agent->set_agent_impl(module_name);
+    agent->InfileToDb(qe, DbInit(agent));
     rec_->Flush();
     std::vector<Cond> conds;
     conds.push_back(Cond("SimId", "==", rec_->sim_id()));
-    conds.push_back(Cond("AgentId", "==", model->id()));
+    conds.push_back(Cond("AgentId", "==", agent->id()));
     CondInjector ci(b_, conds);
     PrefixInjector pi(&ci, "AgentState" + module_name);
-    model->InitFrom(&pi);
-    ctx_->AddPrototype(prototype, model);
+    agent->InitFrom(&pi);
+    ctx_->AddPrototype(prototype, agent);
     ctx_->NewDatum("Prototypes")
       ->AddVal("Prototype", prototype)
-      ->AddVal("AgentId", model->id())
+      ->AddVal("AgentId", agent->id())
       ->AddVal("Implementation", module_name)
       ->Record();
   }

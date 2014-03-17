@@ -1,13 +1,13 @@
-// Regionmodel.cc
+// region.cc
 // Implements the Region class
 
 #include <string>
 #include <iostream>
 
-#include "region_model.h"
+#include "region.h"
 
-#include "model.h"
-#include "inst_model.h"
+#include "agent.h"
+#include "institution.h"
 #include "error.h"
 #include "timer.h"
 #include "logger.h"

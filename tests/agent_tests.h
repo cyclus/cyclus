@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "model.h"
+#include "agent.h"
 #include "suffix.h"
 #include "test_context.h"
 
@@ -21,12 +21,12 @@ typedef cyclus::Agent* AgentConstructor(cyclus::Context* ctx);
 class AgentTests : public TestWithParam<AgentConstructor*> {
   public:
     virtual void SetUp() { 
-      model_ = (*GetParam())(tc_.get());
+      agent_ = (*GetParam())(tc_.get());
     }
     virtual void TearDown(){}
 
   protected:
-    cyclus::Agent* model_;
+    cyclus::Agent* agent_;
     cyclus::TestContext tc_;
 };
 

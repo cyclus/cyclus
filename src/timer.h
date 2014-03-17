@@ -66,7 +66,7 @@ class Timer {
   /// builds all agents queued for the current timestep.
   void DoBuild();
 
-  /// sends the tick signal to all of the models receiving time
+  /// sends the tick signal to all of the agents receiving time
   /// notifications.
   void DoTick();
 
@@ -74,7 +74,7 @@ class Timer {
   void DoResEx(ExchangeManager<Material>* matmgr,
                ExchangeManager<GenericResource>* genmgr);
 
-  /// sends the tock signal to all of the models receiving time
+  /// sends the tock signal to all of the agents receiving time
   /// notifications.
   void DoTock();
 
@@ -91,7 +91,7 @@ class Timer {
 
   bool want_snapshot_;
 
-  /// Concrete models that desire to receive tick and tock notifications
+  /// Concrete agents that desire to receive tick and tock notifications
   std::set<TimeListener*> tickers_;
 
   // std::map<time,std::vector<std::pair<prototype, parent> > >

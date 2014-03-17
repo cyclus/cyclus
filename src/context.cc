@@ -22,11 +22,11 @@ Context::~Context() {
     delete solver_;
   }
 
-  // initiate deletion of models that don't have parents.
-  // dealloc will propagate through hierarchy as models delete their children
+  // initiate deletion of agents that don't have parents.
+  // dealloc will propagate through hierarchy as agents delete their children
   std::vector<Agent*> to_del;
   std::set<Agent*>::iterator it;
-  for (it = model_list_.begin(); it != model_list_.end(); ++it) {
+  for (it = agent_list_.begin(); it != agent_list_.end(); ++it) {
     if ((*it)->parent() == NULL) {
       to_del.push_back(*it);
     }
@@ -37,7 +37,7 @@ Context::~Context() {
 }
 
 void Context::DelAgent(Agent* m) {
-  int n = model_list_.erase(m);
+  int n = agent_list_.erase(m);
   if (n == 1) {
     delete m;
   }
@@ -77,7 +77,7 @@ void Context::AddPrototype(std::string name, Agent* p) {
   NewDatum("Prototypes")
     ->AddVal("Prototype", name)
     ->AddVal("AgentId", p->id())
-    ->AddVal("Implementation", p->model_impl())
+    ->AddVal("Implementation", p->agent_impl())
     ->Record();
 }
 

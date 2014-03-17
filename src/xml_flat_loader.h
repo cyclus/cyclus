@@ -8,7 +8,7 @@ namespace cyclus {
 
 /// Builds and returns a master cyclus input xml schema defining a flat
 /// prototype and instance structure that includes the sub-schemas defined by
-/// all installed cyclus modules (e.g. facility models).  This is used to
+/// all installed cyclus modules (e.g. facility agents).  This is used to
 /// validate simulation input files.
 std::string BuildFlatMasterSchema(std::string schema_path);
 

@@ -1,10 +1,10 @@
-// inst_model.h
-#ifndef CYCLUS_INST_MODEL_H_
-#define CYCLUS_INST_MODEL_H_
+// institution.h
+#ifndef CYCLUS_INSTITUTION_H_
+#define CYCLUS_INSTITUTION_H_
 
 #include "time_listener.h"
-#include "model.h"
-#include "region_model.h"
+#include "agent.h"
+#include "region.h"
 
 #include <map>
 #include <set>
@@ -20,7 +20,7 @@ typedef std::set<std::string>::iterator PrototypeIterator;
 
 /**
    The Institution class is the abstract class/interface
-   used by all institution models
+   used by all institution agents
 
    @section introduction Introduction The Institution type assists in defining the
    region-institution-facility hierarchy in Cyclus. A Institution institution is
@@ -41,7 +41,7 @@ class Institution : public Agent, public TimeListener {
   Institution(Context* ctx);
 
   /**
-     every model should be destructable
+     every agent should be destructable
    */
   virtual ~Institution() {};
 
@@ -59,7 +59,7 @@ class Institution : public Agent, public TimeListener {
   virtual Inventories SnapshotInv() { return Inventories(); };
 
   /**
-     every model should be able to print a verbose description
+     every agent should be able to print a verbose description
    */
   virtual std::string str();
 
@@ -83,5 +83,5 @@ class Institution : public Agent, public TimeListener {
 
 } // namespace cyclus
 
-#endif // ifndef CYCLUS_INST_MODEL_H_
+#endif // ifndef CYCLUS_INSTITUTION_H_
 

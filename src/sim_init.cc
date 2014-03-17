@@ -3,7 +3,7 @@
 
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
-#include "region_model.h"
+#include "region.h"
 
 namespace cyclus {
 
@@ -69,7 +69,7 @@ void SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
 
 void SimInit::Snapshot(Context* ctx) {
   // snapshot all agent internal state
-  std::set<Agent*> mlist = ctx->model_list_;
+  std::set<Agent*> mlist = ctx->agent_list_;
   std::set<Agent*>::iterator it;
   for (it = mlist.begin(); it != mlist.end(); ++it) {
     Agent* m = *it;
@@ -190,7 +190,7 @@ void SimInit::LoadPrototypes() {
     std::string impl = qr.GetVal<std::string>("Implementation", i);
 
     Agent* m = DynamicModule::Make(ctx_, impl);
-    m->set_model_impl(impl);
+    m->set_agent_impl(impl);
 
     std::vector<Cond> conds;
     conds.push_back(Cond("SimTime", "==", t_));
@@ -235,7 +235,7 @@ void SimInit::LoadInitialAgents() {
 
       // agent-kernel init
       m->id_ = id;
-      m->set_model_impl(qentry.GetVal<std::string>("Implementation", i));
+      m->set_agent_impl(qentry.GetVal<std::string>("Implementation", i));
       m->enter_time_ = qentry.GetVal<int>("EnterTime", i);
       unbuilt[id] = m;
       parentmap[id] = qentry.GetVal<int>("ParentId", i);
@@ -245,7 +245,7 @@ void SimInit::LoadInitialAgents() {
       CondInjector ci(b_, conds);
       PrefixInjector pi(&ci, "AgentState");
       m->Agent::InitFrom(&pi);
-      pi = PrefixInjector(&ci, "AgentState" + m->model_impl());
+      pi = PrefixInjector(&ci, "AgentState" + m->agent_impl());
       m->InitFrom(&pi);
     }
   }

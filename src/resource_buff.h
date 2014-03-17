@@ -36,7 +36,7 @@ typename T::Ptr ResCast(Resource::Ptr r) {
 };
 
 /// ResourceBuff is a helper function that provides semi-automated management of
-/// resource buffers (e.g. model stocks and inventories).
+/// resource buffers (e.g. agent stocks and inventories).
 /// 
 /// Methods that begin with a "set", "make", "push", or "pop" prefix change the
 /// state/behavior of the store; other methods do not.  Default constructed

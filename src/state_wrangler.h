@@ -30,8 +30,8 @@ class StateWrangler {
   /// data transfered through di.
   ///
   /// Agent parameters in the QueryEngine are scoped in the
-  /// "model/[model-class-name]" path. The model's class-name can be retrieved
-  /// from the model_impl method. The superclass InitFrom expects the QueryEngine
+  /// "agent/[agent-class-name]" path. The agent's class-name can be retrieved
+  /// from the agent_impl method. The superclass InitFrom expects the QueryEngine
   /// passed to it to be scoped identically - do NOT pass a changed-scope
   /// QueryEngine to the superclass.
   ///

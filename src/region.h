@@ -1,6 +1,6 @@
-// Regionmodel.h
-#ifndef CYCLUS_REGIONMODEL_H_
-#define CYCLUS_REGIONMODEL_H_
+// region.h
+#ifndef CYCLUS_REGION_H_
+#define CYCLUS_REGION_H_
 
 #include <set>
 
@@ -13,7 +13,7 @@ namespace cyclus {
    @class Region
 
    The Region class is the abstract class/interface used by all
-   region models
+   region agents
 
    This is all that is known externally about Regions
 
@@ -25,7 +25,7 @@ namespace cyclus {
    routing decisions based on interfacility relationships. Deployment is a
    primary differentiator between different Region implementations.
 
-   Like all model implementations, there are a number of implementations
+   Like all agent implementations, there are a number of implementations
    that are distributed as part of the core Cyclus application as well
    as implementations contributed by third-party developers. The links
    below describe additional parameters necessary for the complete
@@ -47,7 +47,7 @@ namespace cyclus {
    exponential growth as its driving factor for facility creation or one
    may wish to have pre-determined building order based on time step
    (e.g. the JAEA benchmark). Additionally, one may wish for there to be
-   a one-to-one region-to-instituion deployment for simple models and
+   a one-to-one region-to-instituion deployment for simple agents and
    thus demand that each instiution simply build a facility when its
    region determines the facility's necessity. However, one may instead
    wish to have two competing instiutions in one region and have the
@@ -99,7 +99,7 @@ class Region : public Agent, public TimeListener {
   virtual void Decommission();
 
   /**
-     every model should be able to print a verbose description
+     every agent should be able to print a verbose description
    */
   virtual std::string str();
 
@@ -114,4 +114,4 @@ class Region : public Agent, public TimeListener {
 
 } // namespace cyclus
 
-#endif // ifndef CYCLUS_REGIONMODEL_H_
+#endif // ifndef CYCLUS_REGION_H_

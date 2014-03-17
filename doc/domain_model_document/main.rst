@@ -10,7 +10,7 @@ Within the Domain Agent
 
    a. introduce concepts like current environment online doc....
 
-   b. common mental model of constructed simulation
+   b. common mental agent of constructed simulation
 
 #. (Sample) use cases & ecosystem needs
 #. Core Component Concepts
@@ -99,7 +99,7 @@ Within the Domain Agent
    h. Output & persistence
 
 
-Outside the domain model
+Outside the domain agent
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 #. Software Design expectations

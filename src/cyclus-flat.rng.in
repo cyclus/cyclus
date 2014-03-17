@@ -59,7 +59,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </optional>
       <!-- end compatibility section -->
 
-      <element name="model">
+      <element name="agent">
         <choice>
           @MODEL_SCHEMAS@
         </choice>

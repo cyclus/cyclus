@@ -1,16 +1,16 @@
-/// Instmodel.cc
+/// institution.cc
 // Implements the Institution class
 
 #include <iostream>
 #include <sstream>
 #include <string>
 
-#include "inst_model.h"
+#include "institution.h"
 
 #include "logger.h"
 #include "timer.h"
 #include "error.h"
-#include "facility_model.h"
+#include "facility.h"
 #include "query_engine.h"
 
 namespace cyclus {
