@@ -7,7 +7,7 @@
 
 #include "error.h"
 #include "logger.h"
-#include "model.h"
+#include "agent.h"
 #include "sim_init.h"
 
 namespace cyclus {
@@ -18,7 +18,7 @@ void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Beginning simulation";
 
   ExchangeManager<Material> matl_manager(ctx_);
-  ExchangeManager<GenericResource> genrsrc_manager(ctx_);
+  ExchangeManager<Product> genrsrc_manager(ctx_);
   while (time_ < si_.duration) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
     if (si_.decay_period > 0 && time_ > 0 && time_ % si_.decay_period == 0) {
@@ -43,10 +43,10 @@ void Timer::RunSim() {
 
 void Timer::DoBuild() {
   // build queued agents
-  std::vector<std::pair<std::string, Model*> > build_list = build_queue_[time_];
+  std::vector<std::pair<std::string, Agent*> > build_list = build_queue_[time_];
   for (int i = 0; i < build_list.size(); ++i) {
-    Model* m = ctx_->CreateModel<Model>(build_list[i].first);
-    Model* parent = build_list[i].second;
+    Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
+    Agent* parent = build_list[i].second;
     m->Build(parent);
     parent->BuildNotify(m);
   }
@@ -61,7 +61,7 @@ void Timer::DoTick() {
 }
 
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
-                    ExchangeManager<GenericResource>* genmgr) {
+                    ExchangeManager<Product>* genmgr) {
   matmgr->Execute();
   genmgr->Execute();
 }
@@ -76,9 +76,9 @@ void Timer::DoTock() {
 
 void Timer::DoDecom() {
   // decommission queued agents
-  std::vector<Model*> decom_list = decom_queue_[time_];
+  std::vector<Agent*> decom_list = decom_queue_[time_];
   for (int i = 0; i < decom_list.size(); ++i) {
-    Model* m = decom_list[i];
+    Agent* m = decom_list[i];
     m->parent()->DecomNotify(m);
     m->Decommission();
   }
@@ -92,14 +92,14 @@ void Timer::UnregisterTimeListener(TimeListener* tl) {
   tickers_.erase(tl);
 }
 
-void Timer::SchedBuild(Model* parent, std::string proto_name, int t) {
+void Timer::SchedBuild(Agent* parent, std::string proto_name, int t) {
   if (t <= time_) {
     throw ValueError("Cannot schedule build for t < [current-time]");
   }
   build_queue_[t].push_back(std::make_pair(proto_name, parent));
 }
 
-void Timer::SchedDecom(Model* m, int t) {
+void Timer::SchedDecom(Agent* m, int t) {
   if (t < time_) {
     throw ValueError("Cannot schedule decommission for t < [current-time]");
   }

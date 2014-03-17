@@ -4,8 +4,8 @@
 
 #include "stub_inst.h"
 
-#include "inst_model_tests.h"
-#include "model_tests.h"
+#include "institution_tests.h"
+#include "agent_tests.h"
 
 using stubs::StubInst;
 
@@ -54,17 +54,12 @@ TEST_F(StubInstTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubInstModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new StubInst(ctx));
+cyclus::Agent* StubInstitutionConstructor(cyclus::Context* ctx) {
+  return new StubInst(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::InstModel* StubInstConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::InstModel*>(new StubInst(ctx));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(StubInst, InstModelTests,
-                        ::testing::Values(&StubInstConstructor));
-INSTANTIATE_TEST_CASE_P(StubInst, ModelTests,
-                        ::testing::Values(&StubInstModelConstructor));
+INSTANTIATE_TEST_CASE_P(StubInst, InstitutionTests,
+                        ::testing::Values(&StubInstitutionConstructor));
+INSTANTIATE_TEST_CASE_P(StubInst, AgentTests,
+                        ::testing::Values(&StubInstitutionConstructor));

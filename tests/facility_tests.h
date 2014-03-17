@@ -1,12 +1,13 @@
-#ifndef CYCLUS_TESTS_REGION_MODEL_TESTS_H_
-#define CYCLUS_TESTS_REGION_MODEL_TESTS_H_
+#ifndef CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_
+#define CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_
 
 #include <gtest/gtest.h>
 
-#include "context.h"
-#include "region_model.h"
+#include "facility.h"
 #include "suffix.h"
 #include "test_context.h"
+#include "agent_tests.h"
+#include "test_modules/test_inst.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -16,20 +17,22 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete RegionModel instance 
-typedef cyclus::RegionModel* RegionModelConstructor(cyclus::Context* ctx);
+// parameter is a pointer to a concrete Facility instance 
 
-class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
-  public:
-    virtual void SetUp() { 
-      region_model_ = (*GetParam())(tc_.get());
-    }
-    virtual void TearDown(){}
-
-  protected:
-    cyclus::TestContext tc_;
-    cyclus::RegionModel* region_model_;
-
+class FacilityTests : public TestWithParam<AgentConstructor*> {
+ public:
+  virtual void SetUp() {    
+    facility_ = dynamic_cast<cyclus::Facility*>((*GetParam())(tc_.get()));
+    test_inst_ = new TestInst(tc_.get());
+    facility_->Build(test_inst_);
+  }
+  
+  virtual void TearDown(){}
+    
+ protected:
+  cyclus::Facility* facility_;
+  TestInst* test_inst_;
+  cyclus::TestContext tc_;
 };
 
 #else
@@ -42,7 +45,8 @@ class RegionModelTests : public TestWithParam<RegionModelConstructor*> {
 // must be defined). This dummy test keeps gtest_main linked in.
 TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
-#endif  // GTEST_HAS_PARAM_TEST
+#endif // GTEST_HAS_PARAM_TEST
 
-#endif // CYCLUS_TESTS_REGION_MODEL_TESTS_H_
+#endif // CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_
+
 

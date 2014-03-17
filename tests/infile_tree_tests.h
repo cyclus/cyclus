@@ -1,4 +1,4 @@
-// query_engine_tests.h
+// infile_tree_tests.h
 #ifndef CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_
 #define CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_
 
@@ -7,11 +7,11 @@
 #include <string>
 #include <sstream>
 
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "xml_parser.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class QueryEngineTest : public ::testing::Test {
+class InfileTreeTest : public ::testing::Test {
  protected:
   // equality checks
   std::string root_node_, content_node_, inner_node_, unknown_node_;

@@ -28,7 +28,7 @@ class CBCSolver : public Solver {
                      std::vector<Constraint::Ptr>& constraints);
 
  private:
-  /// the model builder
+  /// the agent builder
   CoinModel builder_;
 
   /// get coin-specific bound for a constraint
@@ -46,11 +46,11 @@ class CBCSolver : public Solver {
   /// set the objective direction
   double ObjDirection(ObjectiveFunction::Ptr obj);
 
-  /// solve the model
-  void SolveModel(CbcModel& model);
+  /// solve the agent
+  void SolveAgent(CbcModel& agent);
 
   /// populate the solution in the variable vector
-  void PopulateSolution(CbcModel& model,
+  void PopulateSolution(CbcModel& agent,
                         std::vector<Variable::Ptr>& variables);
 
   /// print variables info

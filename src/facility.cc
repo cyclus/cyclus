@@ -1,11 +1,11 @@
-// Facilitymodel.cc
-// Implements the FacilityModel class
+// facility.cc
+// Implements the Facility class
 
-#include "facility_model.h"
+#include "facility.h"
 
 #include "timer.h"
-#include "query_engine.h"
-#include "inst_model.h"
+#include "infile_tree.h"
+#include "institution.h"
 #include "error.h"
 
 #include <stdlib.h>
@@ -15,46 +15,46 @@
 
 namespace cyclus {
 
-FacilityModel::FacilityModel(Context* ctx)
+Facility::Facility(Context* ctx)
     : Trader(this),
-      Model(ctx) {
+      Agent(ctx) {
   kind_ = "Facility";
 };
 
-FacilityModel::~FacilityModel() {};
+Facility::~Facility() {};
 
-void FacilityModel::InitFrom(FacilityModel* m) {
-  Model::InitFrom(m);
+void Facility::InitFrom(Facility* m) {
+  Agent::InitFrom(m);
 }
 
-void FacilityModel::Build(Model* parent) {
-  Model::Build(parent);
+void Facility::Build(Agent* parent) {
+  Agent::Build(parent);
 }
 
-void FacilityModel::DoRegistration() {
+void Facility::DoRegistration() {
   context()->RegisterTrader(this);
   context()->RegisterTimeListener(this);
 }
 
-std::string FacilityModel::str() {
+std::string Facility::str() {
   std::stringstream ss("");
-  ss << Model::str() << " with: "
+  ss << Agent::str() << " with: "
      << " lifetime: " << lifetime()
      << " build date: " << enter_time();
   return ss.str();
 };
 
-void FacilityModel::Decommission() {
+void Facility::Decommission() {
   if (!CheckDecommissionCondition()) {
     throw Error("Cannot decommission " + prototype());
   }
 
   context()->UnregisterTrader(this);
   context()->UnregisterTimeListener(this);
-  Model::Decommission();
+  Agent::Decommission();
 }
 
-bool FacilityModel::CheckDecommissionCondition() {
+bool Facility::CheckDecommissionCondition() {
   return true;
 }
 

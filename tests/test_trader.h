@@ -6,7 +6,7 @@
 #include "exchange_context.h"
 #include "material.h"
 #include "test_modules/test_facility.h"
-#include "model.h"
+#include "agent.h"
 #include "request_portfolio.h"
 #include "resource_helpers.h"
 #include "trade.h"
@@ -37,7 +37,7 @@ class TestTrader : public TestFacility {
      bids(0),
      accept(0) {};
 
-  virtual Model* Clone() {
+  virtual Agent* Clone() {
     TestTrader* m = new TestTrader(context());
     m->InitFrom(this);
     return m;

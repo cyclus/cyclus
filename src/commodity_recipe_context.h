@@ -80,8 +80,8 @@ class CommodityRecipeContext : public StateWrangler {
   }
 
   virtual CommodityRecipeContext* Clone();
-  virtual void InfileToDb(QueryEngine* qe, DbInit di);
-  virtual void InitFrom(QueryBackend* b);
+  virtual void InfileToDb(InfileTree* qe, DbInit di);
+  virtual void InitFrom(QueryableBackend* b);
   virtual void Snapshot(DbInit di);
   virtual std::string schema();
 

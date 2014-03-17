@@ -3,12 +3,13 @@
 
 #include <gtest/gtest.h>
 
-#include "inst_model.h"
+#include "institution.h"
 #include "test_modules/test_facility.h"
 #include "test_modules/test_inst.h"
 #include "test_modules/test_region.h"
 #include "suffix.h"
 #include "test_context.h"
+#include "agent_tests.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -18,23 +19,22 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete InstModel instance 
-typedef cyclus::InstModel* InstModelConstructor(cyclus::Context* ctx);
+// parameter is a pointer to a concrete Institution instance 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class InstModelTests : public TestWithParam<InstModelConstructor*> {
+class InstitutionTests : public TestWithParam<AgentConstructor*> {
  protected:
-  TestInst* inst_model_;
+  TestInst* institution_;
   TestFacility* test_facility_;
   TestRegion* test_region_;
   cyclus::TestContext tc_;
   
  public:
   virtual void SetUp() { 
-    inst_model_ = new TestInst(tc_.get());
+    institution_ = new TestInst(tc_.get());
     test_facility_ = new TestFacility(tc_.get());
     test_region_ = new TestRegion(tc_.get());
-    inst_model_->Build(test_region_);
+    institution_->Build(test_region_);
   }
   virtual void TearDown(){}   
 };

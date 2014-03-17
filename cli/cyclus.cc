@@ -183,7 +183,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("schema-path", po::value<std::string>(),
        "manually specify the path to the cyclus master schema")
       ("flat-schema", "use the flat master simulation schema")
-      ("no-model", "only print log entries from cyclus core code")
+      ("no-agent", "only print log entries from cyclus core code")
       ("no-mem", "exclude memory log statement from logger output")
       ("verb,v", po::value<std::string>(), vmessage.c_str())
       ("output-path,o", po::value<std::string>(), "output path")
@@ -247,11 +247,11 @@ int EarlyExitArgs(const ArgInfo& ai) {
       Recorder rec;
       Timer ti;
       Context* ctx = new Context(&ti, &rec);
-      Model* m = DynamicModule::Make(ctx, name);
+      Agent* m = DynamicModule::Make(ctx, name);
       std::cout << "<element name=\"" << name << "\">\n";
       std::cout << m->schema();
       std::cout << "</element>\n";
-      ctx->DelModel(m);
+      ctx->DelAgent(m);
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
     }
@@ -273,8 +273,8 @@ void GetSimInfo(ArgInfo* ai) {
   }
 
   // logging params
-  if (ai->vm.count("no-model")) {
-    Logger::NoModel() = true;
+  if (ai->vm.count("no-agent")) {
+    Logger::NoAgent() = true;
   }
   if (ai->vm.count("no-mem")) {
     Logger::NoMem() = true;

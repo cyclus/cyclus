@@ -41,7 +41,7 @@ New features
 - moved function type pointers to function::ptr
 - moved VariablePtr to Variable::Ptr
 - removed additional cyclus:: prepends from implementation files
-- removed extraneous cyclus namespace from fac_model impl
+- removed extraneous cyclus namespace from fac_agent impl
 - removed extraneous cyclus namespace from comp_math impl
 - removed extraneous cyclus namespace from hdf_back impl
 - moved solver interface impl under cyclus namespace
@@ -58,14 +58,14 @@ New features
 - move symbolic functions into a different class name
 - moved all files out of optim dirs into their respective top levels
 - renamed cyclopts to optim
-- change module install dir to not be split into separate fac, reg, inst subdirs. Still need to fix schema building and env class and dynamic_loading class correspondingly. made Env::ListModules more robust and include CYCLUS_MODULE_PATH env var dirs in search. Made BuildMasterSchema not care about model type namespacing subdirs.
+- change module install dir to not be split into separate fac, reg, inst subdirs. Still need to fix schema building and env class and dynamic_loading class correspondingly. made Env::ListModules more robust and include CYCLUS_MODULE_PATH env var dirs in search. Made BuildMasterSchema not care about agent type namespacing subdirs.
 - fixed some gcsg issues and a typo
 - made timer init method not reset previous timer config (e.g. listeners) - this caused confusion and debugging for me in the past
-- made timer ticker registering more robust. Search env var dirs before install dirs for dyn modules. change default dyn module install dir to lib/cyclus instead of lib/Models
+- made timer ticker registering more robust. Search env var dirs before install dirs for dyn modules. change default dyn module install dir to lib/cyclus instead of lib/Agents
 - added hard coded version and more robust --tags flag to git describe for version.
 - this should make CI pass... not sure if its what we want, though.
 - updated install script with new structure
-- made model test files install to share dir, fixes #559
+- made agent test files install to share dir, fixes #559
 - docs now in the top level directory, and a little clean up. fixes #602
 - docs currently build
 - removed cyclus namespace from stubs
@@ -81,11 +81,11 @@ New features
 - added include guards
 - added stub market
 - added stub inst and region. updated stub facility.
-- removed any stubs that aren't facs, regions, insts, or models
+- removed any stubs that aren't facs, regions, insts, or agents
 - updated namespace name to reflect directory name
 - made mock fac/inst/region/market classes to be used with testing. added the stub facility in a new stub namespace and related tests.
 - added initial stub directory and adjusted cmake files to include their tests.
-- moved all dynamic loading into xml_file_loader. Added a method for listing installed/discoverable dynamic modules to env class. added rng schema methods to test models and removed rng files from them. removed rng installation from cmake module macro. added master and module schema dumping to cyclus binary. added schema model test (that schema parses). moved heavy stuff out of xml-file-loader constructor. renamed LoadAll to LoadSim.
+- moved all dynamic loading into xml_file_loader. Added a method for listing installed/discoverable dynamic modules to env class. added rng schema methods to test agents and removed rng files from them. removed rng installation from cmake module macro. added master and module schema dumping to cyclus binary. added schema agent test (that schema parses). moved heavy stuff out of xml-file-loader constructor. renamed LoadAll to LoadSim.
 - i think moving loglevel and the macros into the same namespace encapsulation is more promising... still unable to confirm.
 - finishes remaining doxygen warnings
 - I believe that this will fix the warning stemming from logger.h, but I do not see the warning on my machine, so I can't be sure
@@ -93,7 +93,7 @@ New features
 - removed verbose linking flag
 - fixes build error for macs, moves mac linker flag to top of cmake file to set the flag for all compiled libraries in the build
 - added cli flag for printing cyclus include dir
-- down-selected includes in cyclus.h.  Removed remaining vestiges of converter models
+- down-selected includes in cyclus.h.  Removed remaining vestiges of converter agents
 - create cyclus.h. added missing header install
 - as @gonuke suggested, adding a preprocessor directive was the right way to go. tested with coin-2.3 on insam
 - removed coin include prefix which causes problems on utk's darwin system
@@ -121,15 +121,15 @@ New features
 - improved clone and initfrom doc comments
 - fixed resource table name
 - have a working version of a ctest fix. need to clean it up and add python as a dependency before sending a PR
-- fixed inst model tests and fixed duplicate id bug in model class if implicit copy-constructor is used
+- fixed inst agent tests and fixed duplicate id bug in agent class if implicit copy-constructor is used
 - constructor initializer list
-- removed cruft from model class. fixed to not record on undeployed decommission. improved var/accessor names
+- removed cruft from agent class. fixed to not record on undeployed decommission. improved var/accessor names
 - removed unnecessary externed Destruct funcs
 - fixed inst class tests
 - fixed dynamic loading tests - removed redundant test with env class tests. Simplified dynamicModule further. Trying to fix inst class tests - still broken.
-- updated test models.  2 tests still failing
+- updated test agents.  2 tests still failing
 - updated tests to compile with new cloning and deploy semantics
-- move clone method into model class. Killed Clone[stuff] methods into single virtual clonefrom method. Change EnterSimulation[bla] methods into a single, virtual, Deploy method. Moved DynamicModule Init method into constructor. Removed redundant info from facility class (build date, etc.).
+- move clone method into agent class. Killed Clone[stuff] methods into single virtual clonefrom method. Change EnterSimulation[bla] methods into a single, virtual, Deploy method. Moved DynamicModule Init method into constructor. Removed redundant info from facility class (build date, etc.).
 - Combiined cyclopts dependency list into cyclus dependency list.
 - added file and cli flag for retrieving cyclus core and dependency versions. Fixes #578.
 - Simplifying names and correcting some rst grammar.
@@ -143,19 +143,19 @@ New features
 - added cyclus namespace qualifier to new function usage
 - moved the optional element query into its own nonmember, nonfriend templated function for easier, one-line usage.
 - added tests for null queries
-- removed try/catch blocks for fac model query engine usage
-- updated market model tests for context usage
+- removed try/catch blocks for fac agent query engine usage
+- updated market agent tests for context usage
 - added clarification to recipe add/get usage, closes #568
 - added clarification to recipe add/get usage
 - style guide names
 - style guide name changes.
 - renamed externed construct/destruct functions to be CapCase
 - updated facility tests to take the context constructor argument
-- made a separate test context for easier testing and updated appropriate model test files
-- updated facility model tests and fixed model tests
-- updated model tests
-- removed unncessary model registration from context - because markets will soon be superseded by CEP18 anyway.
-- updated prototype registration and model creation to use context. recipe library become so small I moved it into xml_file_loader. renamed xml_file_loader methods according to GCSG and added a LoadAll method.
+- made a separate test context for easier testing and updated appropriate agent test files
+- updated facility agent tests and fixed agent tests
+- updated agent tests
+- removed unncessary agent registration from context - because markets will soon be superseded by CEP18 anyway.
+- updated prototype registration and agent creation to use context. recipe library become so small I moved it into xml_file_loader. renamed xml_file_loader methods according to GCSG and added a LoadAll method.
 - moved control param xml parsing into xml_file_loader out of timer. Added timer init method to context.
 - removed EM macro and simplified recipe library and changed it to recipe namespace
 - fixed segfault issue. fiddled with includes and forward declarations
@@ -169,7 +169,7 @@ New features
 - unadded redundant neg comp element check. Added test to check for exception throwing
 - added missing neg quantity check
 - adds comments about composition decay chaining. Remove leftover recipe_lib constructor from debugging
-- fixed gcsg names in decay_handler and renamed class to decayer. fixed filename comments in generic_resource and improved a couple of guards
+- fixed gcsg names in decay_handler and renamed class to decayer. fixed filename comments in product and improved a couple of guards
 - fixes var names and comments to not refer/suggest anything 'vector' ish w.r.t. CompMap code. Change nextId to next_id
 - re-disabled test... need more time to investigate
 - added disabled building manager test
@@ -185,7 +185,7 @@ New features
 - made mat_query a proper implementation file. Removed contains for now and added almostEq to it.
 - polished doc comments for compmath namespace
 - fixed var name mistake in res_tracker
-- polished doc comments on generic_resource, material, res_tracker, and composition classes. Added more complete error check to GenericResource::Absorb
+- polished doc comments on product, material, res_tracker, and composition classes. Added more complete error check to Product::Absorb
 - polished resource class doc comments
 - moved resource table all to res_tracker
 - finished converting compmath tests
@@ -269,7 +269,7 @@ New features
 - fixes indent errors in DynamicModule.h described in #530.
 - added ns to roesources.
 - first cyclus ns changes.
-- made buildSchema private. Used Model class module type list instead of custom one.
+- made buildSchema private. Used Agent class module type list instead of custom one.
 - removed cyclus.rng.in generation - now done dynamically in cyclus core
 - modified XML loading to dynamically build the master schema by searching for installed modules
 - created csv backend.

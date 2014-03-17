@@ -4,8 +4,8 @@
 #include <string>
 
 #include "composition.h"
-#include "facility_model.h"
-#include "generic_resource.h"
+#include "facility.h"
+#include "product.h"
 #include "material.h"
 #include "test_modules/test_facility.h"
 #include "test_context.h"
@@ -14,7 +14,7 @@
 #include "request.h"
 
 using cyclus::Composition;
-using cyclus::GenericResource;
+using cyclus::Product;
 using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
@@ -45,7 +45,7 @@ TEST(RequestTests, MaterialGetSet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(RequestTests, GenRsrcGetSet) {
+TEST(RequestTests, ProductGetSet) {
   TestContext tc;
   TestFacility* fac = new TestFacility(tc.get());
   string commod = "name";
@@ -53,11 +53,11 @@ TEST(RequestTests, GenRsrcGetSet) {
   double qty = 1.0;
   string quality = "qual";
 
-  GenericResource::Ptr rsrc =
-      GenericResource::CreateUntracked(qty, quality);
+  Product::Ptr rsrc =
+      Product::CreateUntracked(qty, quality);
   
-  Request<GenericResource>::Ptr r =
-      Request<GenericResource>::Create(rsrc, fac, commod, pref);
+  Request<Product>::Ptr r =
+      Request<Product>::Create(rsrc, fac, commod, pref);
 
   EXPECT_EQ(commod, r->commodity());
   EXPECT_EQ(fac, r->requester());

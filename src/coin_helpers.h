@@ -15,12 +15,12 @@
 
 namespace cyclus {
 
-/** Check two models against each other.  Return nonzero if different.
+/** Check two agents against each other.  Return nonzero if different.
     Ignore names if that set.
     (Note initial version does not check names)
-    May modify both models by cleaning up
+    May modify both agents by cleaning up
 */
-int differentModel(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
+int differentAgent(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
                    bool ignoreNames=true);
   
 } // namespace cyclus

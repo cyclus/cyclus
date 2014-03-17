@@ -142,7 +142,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
       <ref name="lifetime" />
 
-      <element name="model">
+      <element name="agent">
       <choice> @Facility_REFS@
       </choice>
       </element>
@@ -300,7 +300,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       </element>
       </oneOrMore>
 
-      <element name="model">
+      <element name="agent">
       <choice> @Region_REFS@
       </choice>
       </element>
@@ -350,7 +350,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         </element>
       </optional>
 
-      <element name="model">
+      <element name="agent">
       <choice> @Inst_REFS@
       </choice>
       </element>

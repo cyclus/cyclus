@@ -73,7 +73,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     constraints_.insert(c);
   };
       
-  /// @return the model associated with the portfolio. if no reqeusts have
+  /// @return the agent associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
   inline Trader* requester() const { return requester_; }
 

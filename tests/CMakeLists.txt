@@ -95,7 +95,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/exchange_test_cases.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/facility_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/full_sim_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner_tests.cc"
@@ -103,9 +103,9 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/model_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/agent_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/region_class_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc"
@@ -120,7 +120,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/variable_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/query_engine_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/infile_tree_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_region.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_inst.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_facility.cc"
@@ -145,19 +145,23 @@ INSTALL(TARGETS cyclus_unit_tests
   )
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-FILE(GLOB test_models "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/*.h")
+FILE(GLOB test_agents "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/*.h")
 INSTALL(FILES ${header_files}
   DESTINATION include/cyclus
   COMPONENT testing
   )
 
-INSTALL(FILES ${test_models}
+INSTALL(FILES ${test_agents}
   DESTINATION include/cyclus/test_modules
   COMPONENT testing
   )
 
-FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*model_tests.cc")
-INSTALL(FILES ${model_test_files}
+FILE(GLOB agent_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*agent_tests.cc")
+INSTALL(FILES 
+  "${CMAKE_CURRENT_SOURCE_DIR}/agent_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/facility_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/institution_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/region_tests.cc"
   DESTINATION share
   COMPONENT testing
   )

@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "model.h"
+#include "agent.h"
 #include "suffix.h"
 #include "test_context.h"
 
@@ -15,18 +15,18 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete Model instance 
-typedef cyclus::Model* ModelConstructor(cyclus::Context* ctx);
+// parameter is a pointer to a concrete Agent instance 
+typedef cyclus::Agent* AgentConstructor(cyclus::Context* ctx);
 
-class ModelTests : public TestWithParam<ModelConstructor*> {
+class AgentTests : public TestWithParam<AgentConstructor*> {
   public:
     virtual void SetUp() { 
-      model_ = (*GetParam())(tc_.get());
+      agent_ = (*GetParam())(tc_.get());
     }
     virtual void TearDown(){}
 
   protected:
-    cyclus::Model* model_;
+    cyclus::Agent* agent_;
     cyclus::TestContext tc_;
 };
 

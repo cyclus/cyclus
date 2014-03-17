@@ -7,7 +7,7 @@
 #include <string>
 
 #include "composition.h"
-#include "model.h"
+#include "agent.h"
 #include "recorder.h"
 
 namespace cyclus {
@@ -64,20 +64,20 @@ class SimInfo {
 /// state should be accessed through a simulation context.
 ///
 /// @warning the context takes ownership of and manages the lifetime/destruction
-/// of all models constructed with it (including Cloned models). Models should
+/// of all agents constructed with it (including Cloned agents). Agents should
 /// generally NEVER be allocated on the stack.
 /// @warning the context takes ownership of the solver and will manage its
 /// destruction.
 class Context {
  public:
   friend class SimInit;
-  friend class Model;
+  friend class Agent;
 
   /// Creates a new context working with the specified timer and datum manager.
   /// The timer does not have to be initialized (yet).
   Context(Timer* ti, Recorder* rec);
 
-  /// Clean up resources including destructing the solver and all models the
+  /// Clean up resources including destructing the solver and all agents the
   /// context is aware of.
   ~Context();
 
@@ -85,7 +85,7 @@ class Context {
   boost::uuids::uuid sim_id();
 
   /// Adds a prototype to a simulation-wide accessible list.
-  void AddPrototype(std::string name, Model* m);
+  void AddPrototype(std::string name, Agent* m);
 
   /// Registers an agent as a participant in resource exchanges. Agents should
   /// register from their Deploy method.
@@ -103,22 +103,22 @@ class Context {
     return traders_;
   }
 
-  /// Create a new model by cloning the named prototype. The returned model is
+  /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
   ///
   /// @warning this method should generally NOT be used by agents.
   template <class T>
-  T* CreateModel(std::string proto_name) {
+  T* CreateAgent(std::string proto_name) {
     if (protos_.count(proto_name) == 0) {
       throw KeyError("Invalid prototype name " + proto_name);
     }
 
-    Model* m = protos_[proto_name];
+    Agent* m = protos_[proto_name];
     T* casted(NULL);
-    Model* clone = m->Clone();
+    Agent* clone = m->Clone();
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
-      DelModel(clone);
+      DelAgent(clone);
       throw CastError("Invalid cast for prototype " + proto_name);
     }
     return casted;
@@ -127,17 +127,17 @@ class Context {
   /// Destructs and cleans up m (and it's children recursively).
   ///
   /// @warning this method should generally NOT be used by agents.
-  void DelModel(Model* m);
+  void DelAgent(Agent* m);
 
   /// Schedules the named prototype to be built for the specified parent at
   /// timestep t. The default t=-1 results in the build being scheduled for the
   /// next build phase (i.e. the start of the next timestep).
-  void SchedBuild(Model* parent, std::string proto_name, int t = -1);
+  void SchedBuild(Agent* parent, std::string proto_name, int t = -1);
 
-  /// Schedules the given Model to be decommissioned at the specified timestep
+  /// Schedules the given Agent to be decommissioned at the specified timestep
   /// t. The default t=-1 results in the decommission being scheduled for the
   /// next decommission phase (i.e. the end of the current timestep).
-  void SchedDecom(Model* m, int time = -1);
+  void SchedDecom(Agent* m, int time = -1);
 
   /// Adds a composition recipe to a simulation-wide accessible list.
   /// Agents should NOT add their own recipes.
@@ -189,9 +189,9 @@ class Context {
   }
 
  private:
-  std::map<std::string, Model*> protos_;
+  std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
-  std::set<Model*> model_list_;
+  std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
 
   SimInfo si_;

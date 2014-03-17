@@ -1,7 +1,7 @@
 //relax_ng_validator.h
 
 /* relaxngvalidator.h
- * this class is modeled off of the schemavalidator in libxml++
+ * this class is agented off of the schemavalidator in libxml++
  * here is their license statement:
  *
  * libxml++ and this file are copyright (C) 2000 by Ari Johnson,

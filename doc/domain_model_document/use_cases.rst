@@ -18,7 +18,7 @@ Technology studies test the system effects of deploying a specific nuclear
 technology (usually at the facility level). These studies are performed by users 
 seeking to determine the promise of a certain innovative reactor technology, 
 separations process, or combination of technologies. The system-level aspects of 
-their introduction to fuel cycles, new mathematical models of facility process 
+their introduction to fuel cycles, new mathematical agents of facility process 
 dynamics, and other factors that may focus research and development goals or 
 inform policies.
 
@@ -28,15 +28,15 @@ inform policies.
   those facilities. Cyclus will provide a library of interchangeable facility 
   configurations and scenario specifications for user selection.
 - Cyclus will **allow end-user specification of the parametric configuration of 
-  supplied facility models.** These supplied models will be prepared to  constrain 
+  supplied facility agents.** These supplied agents will be prepared to  constrain 
   the user to appropriate input parameter ranges.
 - Cyclus will allow advanced user customization of process behaviors in supplied 
-  facility models. Input error checking is not possible for this use case, so 
+  facility agents. Input error checking is not possible for this use case, so 
   the user will be expected to constrain their input to appropriate functions 
   and values.
-- Cyclus **allows substitution of developer-generated facility models.** That is, 
+- Cyclus **allows substitution of developer-generated facility agents.** That is, 
   the developer will supply all specified databases and process information for 
-  the new facility model, Cycamore will supply databases and process information 
+  the new facility agent, Cycamore will supply databases and process information 
   for other facilities that surround it to complete the fuel cycle, and Cyclus 
   will provide a framework on which those facilities communicated.  
 
@@ -145,7 +145,7 @@ which affect simulation dynamics and even drive feedback behaviors.
   FCS-calculated cost metrics. Such FCS-calculated metrics may include Fuel 
   Cycle Costs, Levelized Cost of Electricity, Total Reactor Capital costs, etc. 
   The viewer will rely on FCS-calculated pricing and cash flow parameters for 
-  facilities and materials, including but not limited to uranium pricing models 
+  facilities and materials, including but not limited to uranium pricing agents 
   and facility capital and operating costs.
 - Cyclus will support **end user and advanced user specification of economic 
   facility parameters or material pricing information as well as customized 
@@ -155,12 +155,12 @@ which affect simulation dynamics and even drive feedback behaviors.
   affect facility deployment or material routing in any way. Due to the lack of 
   feedback, much cost analysis can be conducted as a post-processing function 
   external to the code functionality.
-- Cyclus will **allow the developer to extend the model to incorporate new 
+- Cyclus will **allow the developer to extend the agent to incorporate new 
   economic data** (e.g. regional taxes or interest rates and capital cost 
   depreciation schedules) in order to make cost calculations.
 - Cyclus will support economic analysis by being extensible enough to allow 
   **appropriately customizable system dynamics in the material routing and market 
-  structures.** The developer will supply new data models and all new business 
+  structures.** The developer will supply new data agents and all new business 
   logic for material trades, while Cyclus will supply an architecture that can 
   flexibly support new material routing and facility deployment logic.
 
@@ -218,8 +218,8 @@ and their interactions.
   decisions, international relations scenarios, synergistic fuel cycle options, 
   etc.).
 - A developer conducting a multi-regional analysis may be interested in 
-  **extending the model to incorporate new interregional trade rules to simulate 
-  their own political or economic models or incorporate new region specific data 
+  **extending the agent to incorporate new interregional trade rules to simulate 
+  their own political or economic agents or incorporate new region specific data 
   (such as location).**
 
 Example Use Cases
@@ -236,7 +236,7 @@ Cyclus will enable the multi-regional investigation and analysis of:
 #. Trade/technology symbiosis between regions with various indigenous 
    technologies.
 #. Deployment responses required by regionally differentiated demand growth.
-#. Employ market and political models (e.g. trade data or the Affinity of 
+#. Employ market and political agents (e.g. trade data or the Affinity of 
    Nations Index) to predict/direct interregional material and technology 
    transfers.
 #. Determine proliferation risk factors (e.g., capabilities and motivations) 

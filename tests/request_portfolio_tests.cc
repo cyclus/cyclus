@@ -6,8 +6,8 @@
 
 #include "capacity_constraint.h"
 #include "error.h"
-#include "facility_model.h"
-#include "generic_resource.h"
+#include "facility.h"
+#include "product.h"
 #include "material.h"
 #include "test_modules/test_facility.h"
 #include "request.h"
@@ -21,7 +21,7 @@ using std::string;
 
 using cyclus::CapacityConstraint;
 using cyclus::Converter;
-using cyclus::GenericResource;
+using cyclus::Product;
 using cyclus::KeyError;
 using cyclus::Material;
 using cyclus::Request;

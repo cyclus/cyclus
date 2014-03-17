@@ -13,37 +13,37 @@
   <market>
     <name>uo2market</name>
     <mktcommodity>uo2</mktcommodity>
-    <model>
+    <agent>
       <TestMarket/>
-    </model>
+    </agent>
   </market>
 
   <facility>
     <name>FrontEnd</name>
-    <model>
+    <agent>
       <TestFacility/>
-    </model>
+    </agent>
   </facility>
 
   <facility>
     <name>BackEnd</name>
-    <model>
+    <agent>
       <TestFacility/>
-    </model>
+    </agent>
   </facility>
 
   <region>
     <name>oneRegion</name>
     <allowedfacility>FrontEnd</allowedfacility>
     <allowedfacility>BackEnd</allowedfacility>
-    <model>
+    <agent>
       <TestRegion/>
-    </model>
+    </agent>
     <institution>
       <name>oneInst</name>
-      <model>
+      <agent>
         <TestInst/>
-      </model>
+      </agent>
     </institution>
   </region>
 

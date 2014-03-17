@@ -4,15 +4,15 @@ using stubs::StubInst;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::StubInst(cyclus::Context* ctx)
-    : cyclus::InstModel(ctx) {};
+    : cyclus::Institution(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::~StubInst() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
-  Model::InfileToDb(qe, di);
-  qe = qe->QueryElement(model_impl());
+void StubInst::InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {
+  Agent::InfileToDb(qe, di);
+  qe = qe->Query(agent_impl());
   // retrieve input data members here. For example:
   //
   //   int cycle_len = lexical_cast<int>(input->getElementContent("cycle_length"));
@@ -24,7 +24,7 @@ void StubInst::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubInst::Clone() {
+cyclus::Agent* StubInst::Clone() {
   StubInst* m = new StubInst(context());
   m->InitFrom(this);
   return m;
@@ -32,16 +32,16 @@ cyclus::Model* StubInst::Clone() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::InitFrom(StubInst* m) {
-  cyclus::InstModel::InitFrom(m);
+  cyclus::Institution::InitFrom(m);
   // Initialize stubinst members for a cloned module here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubInst::str() {
-  return InstModel::str();
+  return Institution::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructStubInst(cyclus::Context* ctx) {
+extern "C" cyclus::Agent* ConstructStubInst(cyclus::Context* ctx) {
   return new StubInst(ctx);
 }

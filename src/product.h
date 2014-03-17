@@ -1,4 +1,4 @@
-// generic_resource.h
+// product.h
 #ifndef GENERICRESOURCE_H_
 #define GENERICRESOURCE_H_
 
@@ -10,26 +10,26 @@
 
 namespace cyclus {
 
-/// A Generic Resource is a general type of resource in the Cyclus simulation,
+/// A Product is a general type of resource in the Cyclus simulation,
 /// and is a catch-all for non-standard resources.  It implements the Resource
 /// class interface in a simple way usable for things such as: bananas,
 /// man-hours, water, buying power, etc.
-class GenericResource : public Resource {
+class Product : public Resource {
   friend class SimInit;
 
  public:
   typedef
-  boost::shared_ptr<GenericResource> Ptr;
+  boost::shared_ptr<Product> Ptr;
   static const ResourceType kType;
 
-  /// Creates a new generic resource that is "live" and tracked. creator is a
-  /// pointer to the model creating the resource (usually will be the caller's
+  /// Creates a new product that is "live" and tracked. creator is a
+  /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Model* creator, double quantity, std::string quality);
+  static Ptr Create(Agent* creator, double quantity, std::string quality);
                     
 
-  /// Creates a new generic resource that does not actually exist as part of
+  /// Creates a new product that does not actually exist as part of
   /// the simulation and is untracked.
   static Ptr CreateUntracked(double quantity, std::string quality);
 
@@ -38,7 +38,7 @@ class GenericResource : public Resource {
     return 0;
   };
 
-  /// Returns GenericResource::kType.
+  /// Returns Product::kType.
   virtual const ResourceType type() const {
     return kType;
   };
@@ -61,20 +61,20 @@ class GenericResource : public Resource {
   virtual Resource::Ptr ExtractRes(double quantity);
 
   /// Extracts the specified mass from this resource and returns it as a
-  /// new generic resource object with the same quality/type.
+  /// new product object with the same quality/type.
   ///
   /// @throws ValueError tried to extract more than exists.
-  GenericResource::Ptr Extract(double quantity);
+  Product::Ptr Extract(double quantity);
 
   /// Absorbs the contents of the given 'other' resource into this resource.
   /// @throws ValueError 'other' resource is of different quality
-  void Absorb(GenericResource::Ptr other);
+  void Absorb(Product::Ptr other);
 
  private:
   /// @param ctx the simulation context
   /// @param quantity is a double indicating the quantity
   /// @param quality the resource quality
-  GenericResource(Context* ctx, double quantity, std::string quality);
+  Product(Context* ctx, double quantity, std::string quality);
 
   // map<quality, quality_id>
   static std::map<std::string, int> stateids_;
