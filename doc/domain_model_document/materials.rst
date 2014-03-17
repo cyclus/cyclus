@@ -15,14 +15,14 @@ cycle metrics.  Facility inventories, radio toxicity, decay heat, waste volumes,
 PRPP indices, etc. can all be found from mass flow data.  Many fuel cycle 
 simulation tools only track fuel materials for this reason. 
 
-Generic Resource Characteristics
+Product Characteristics
 ---------------------------------
 
 Materials are a well defined type of conserved :doc:`Resource <resources>` in 
 the Cyclus framework.  Thus, all materials posess a :ref:`generic  Resource 
 quantity <resource_quantity>` . That is, an amount and a default unit. For 
 Materials, the default unit is kilograms and the total mass of the material is 
-therefore the generic Resource amount of any material.
+therefore the Product amount of any material.
 
 Material Resource Characteristics
 ---------------------------------

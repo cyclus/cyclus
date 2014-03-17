@@ -10,7 +10,7 @@
 
 namespace cyclus {
 
-/// A Generic Resource is a general type of resource in the Cyclus simulation,
+/// A Product is a general type of resource in the Cyclus simulation,
 /// and is a catch-all for non-standard resources.  It implements the Resource
 /// class interface in a simple way usable for things such as: bananas,
 /// man-hours, water, buying power, etc.
@@ -22,14 +22,14 @@ class Product : public Resource {
   boost::shared_ptr<Product> Ptr;
   static const ResourceType kType;
 
-  /// Creates a new generic resource that is "live" and tracked. creator is a
+  /// Creates a new product that is "live" and tracked. creator is a
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
   static Ptr Create(Agent* creator, double quantity, std::string quality);
                     
 
-  /// Creates a new generic resource that does not actually exist as part of
+  /// Creates a new product that does not actually exist as part of
   /// the simulation and is untracked.
   static Ptr CreateUntracked(double quantity, std::string quality);
 
@@ -61,7 +61,7 @@ class Product : public Resource {
   virtual Resource::Ptr ExtractRes(double quantity);
 
   /// Extracts the specified mass from this resource and returns it as a
-  /// new generic resource object with the same quality/type.
+  /// new product object with the same quality/type.
   ///
   /// @throws ValueError tried to extract more than exists.
   Product::Ptr Extract(double quantity);
