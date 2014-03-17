@@ -43,10 +43,16 @@ library. It requires Python 2.7+ or Python 3.3+ to run.
 from __future__ import print_function
 import os
 import re
+import sys
 from collections import Sequence
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint
+
+if sys.version_info[0] == 2:
+    STRING_TYPES = (str, unicode, basestring)
+elif sys.version_info[0] >= 3:
+    STRING_TYPES = (str,)
 
 # This migh miss files which start with '#' - however, after canonization (through cpp)
 # it shouldn't matter.
@@ -362,12 +368,37 @@ class StateAccumulator(object):
         The name argument here is provided for debugging & reporting purposes.
         """
         scopz = self.scopz
-        t = " ".join(t.strip().strip(scopz).split())
-        if '<' in t:
+        if not isinstance(t, STRING_TYPES) and isinstance(t, Sequence):
             # template type
-            pass
+            tname, targs = t[0], t[1:]
+            if tname in self.known_templates:
+                return self._canonize_targs(tname, targs)
+            taliases = [x for x in self.aliases if x[2] == tname]
+            if len(taliases) > 0:
+                taliases.sort()  # gets the alias at the maximum nesting
+                talias = taliases[-1][1]
+                return self._canonize_targs(talias, targs)
+            for d, nsa in sorted(self.using_namespaces, reverse=True):
+                if len(tname.split(scopz)) > len(nsa.split(scopz)):
+                    # fixed point of reccursion when type would be more scoped than 
+                    # the alias - which is impossible.
+                    continue
+                try:
+                    return self.canonize_type([nsa + scopz + tname] + targs, name)
+                except TypeError:
+                    pass  # This is the TypeError from below
+            else:
+                msg = ("the type of {c}::{n} ({t}) is not a recognized template "
+                       "type: {p}.").format(t=t, n=name, c=self.classname(), 
+                                            p=", ".join(sorted(self.known_templates)))
+                raise TypeError(msg)
+        elif '<' in t:
+            # string version of template type
+            t = " ".join(t.strip().strip(scopz).split())
+            t = self.canonize_type(parse_template(t))
         else:
             # primitive type
+            t = " ".join(t.strip().strip(scopz).split())
             if t in self.known_primitives:
                 return t
             # grab aliases of t
@@ -391,6 +422,11 @@ class StateAccumulator(object):
                                             p=", ".join(sorted(self.known_primitives)))
                 raise TypeError(msg)
         return t
+
+    def _canonize_targs(self, newtname, targs):
+        newt = [newtname]
+        newt += [self.canonize_type(targ) for targ in targs]
+        return newt
 
 def accumulate_state(canon):
     """Takes a canonical C++ source file and separates it out into statements
@@ -433,6 +469,37 @@ def outter_split(s, open_brace='(', close_brace=')', separator=','):
         else:
             val += separator
     return outter
+
+def split_template_args(s, open_brace='<', close_brace='>', separator=','):
+    """Takes a string with template specialization and returns a list
+    of the argument values as strings. Mostly cribbed from xdress.
+    """
+    targs = []
+    ns = s.split(open_brace, 1)[-1].rsplit(close_brace, 1)[0].split(separator)
+    count = 0
+    targ_name = ''
+    for n in ns:
+        count += int(open_brace in n)
+        count -= int(close_brace in n)
+        targ_name += n
+        if count == 0:
+            targs.append(targ_name.strip())
+            targ_name = ''
+    return targs
+
+def parse_template(s, open_brace='<', close_brace='>', separator=','):
+    """Takes a string -- which may represent a template specialization --
+    and returns the corresponding type. Mostly cribbed from xdress.
+    """
+    if open_brace not in s and close_brace not in s:
+        return s
+    t = [s.split(open_brace, 1)[0]]
+    targs = split_template_args(s, open_brace=open_brace,
+                                close_brace=close_brace, separator=separator)
+    for targ in targs:
+        t.append(parse_template(targ, open_brace=open_brace,
+                                close_brace=close_brace, separator=separator))
+    return t
 
 def main():
     parser = ArgumentParser(prog="cycpp", description=__doc__, 

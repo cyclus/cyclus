@@ -50,6 +50,20 @@ num;
     "help": "favored weapon size",\
     }
   cbt caliber;
+
+  using std::pair;
+  typedef std::pair deuce;
+  #pragma cyclus var {\
+    "default": ("Goldfinger", ("Oddjob", "Jaws")),\
+    "units": "unitless",\
+    "userlevel": 0,\
+    "tooltip": "(name, name)",\
+    "help": "a villian and a lackey",\
+    }
+  //std::pair<std::string, std::list<std::string> > villan_minions;
+  //std::pair<std::string, list<std::string> > villan_minions;
+  //pair<std::string, list<std::string> > villan_minions;
+  deuce<std::string, list<std::string> > villan_minions;
 private:
   double not_var;
 };
