@@ -247,22 +247,38 @@ class VarDecorationFilter(Filter):
         state = self.state
         context = state.context
         classname = state.classname()
+        classpaths = classname.split('::')
         raw = self.match.group(1)
         glb = dict(state.execns)
-        #glb.update(context)
-        #print("context:", context.items())
         for cls, val in context.items():
             clspaths = cls.split('::')
-            self._make_proxies(glb, clspaths, val)
+            self._add_gbl_proxies(glb, clspaths, val)
+            self._add_lcl_proxies(glb, clspaths, classpaths)
         state.var_annotations = eval(raw, glb, context.get(classname, {}))
 
-    def _make_proxies(self, glb, path, val):
+    def _add_gbl_proxies(self, glb, path, val):
+        """Proxies for global C++ scope."""
         prx = glb
         for p in path[:-1]:
             if p not in prx:
                 prx[p] = Proxy({})
             prx = prx[p]
         prx[path[-1]] = Proxy(val)
+
+    def _add_lcl_proxies(self, glb, clspaths, classpaths):
+        """Proxy shortcuts for local C++ scope."""
+        same_keys = []
+        for x, y in zip(classpaths, clspaths):
+            if x != y:
+                break
+            same_keys.append(x)
+        if len(same_keys) == 0:
+            return
+        prx = glb
+        for sk in same_keys:
+            prx = prx[sk]
+        for k in prx:
+            glb[k] = prx[k]
 
 class VarDeclarationFilter(Filter):
     """State varible declaration.  Only oeprates if state.var_annotations is 

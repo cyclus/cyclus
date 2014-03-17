@@ -71,7 +71,7 @@ private:
 class Friend {
  public:
   #pragma cyclus var {\
-    "default": mi6.Spy.name['default'], \
+    "default": Spy.name['default'], \
     }
   std::string enemy;
 };
