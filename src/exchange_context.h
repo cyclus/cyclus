@@ -17,14 +17,13 @@ namespace cyclus {
 template <class T>
 struct PrefMap {
   typedef std::map< typename Request<T>::Ptr,
-          std::map< typename Bid<T>::Ptr, double > > type;
+                    std::map< typename Bid<T>::Ptr, double > > type;
 };
 
 template <class T>
 struct CommodMap {
   typedef std::map< std::string, std::vector<typename Request<T>::Ptr> > type;
 };
-
 
 /// @class ExchangeContext
 ///

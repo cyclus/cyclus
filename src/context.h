@@ -24,16 +24,16 @@ class SimInit;
 /// the simulation and affect its behavior.
 class SimInfo {
  public:
-  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1, std::string handle = "")
-    : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
-      branch_time(-1), handle(handle) {};
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1,
+          std::string handle = "")
+      : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
+        branch_time(-1), handle(handle) {}
 
   SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
-          int branch_time,
-          std::string handle = "")
-    : duration(dur), y0(-1), m0(-1), decay_period(decay_period),
-      parent_sim(parent_sim),
-      branch_time(branch_time), handle(handle) {};
+          int branch_time, std::string handle = "")
+      : duration(dur), y0(-1), m0(-1), decay_period(decay_period),
+        parent_sim(parent_sim),
+        branch_time(branch_time), handle(handle) {}
 
   /// user-defined label associated with a particular simulation
   std::string handle;
@@ -165,7 +165,9 @@ class Context {
   int time();
 
   /// Return static simulation info.
-  inline SimInfo sim_info() const {return si_;};
+  inline SimInfo sim_info() const {
+    return si_;
+  }
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
@@ -204,6 +206,3 @@ class Context {
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_CONTEXT_H_
-
-
-

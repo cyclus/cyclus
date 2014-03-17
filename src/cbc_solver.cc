@@ -39,9 +39,8 @@ std::pair<double, double> CBCSolver::ConstraintBounds(Constraint::Ptr c) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CBCSolver::SetUpVariablesAndObj(
-    std::vector<Variable::Ptr>& variables,
-    ObjectiveFunction::Ptr obj) {
+void CBCSolver::SetUpVariablesAndObj(std::vector<Variable::Ptr>& variables,
+                                     ObjectiveFunction::Ptr obj) {
   for (int i = 0; i < variables.size(); i++) {
     Variable::Ptr v = variables.at(i);
     std::pair<int, int> ibounds;

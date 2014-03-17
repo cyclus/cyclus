@@ -103,4 +103,5 @@ double enrichment::SwuRequired(double product_qty, const Assays& assays) {
     feed * ValueFunc(assays.Feed());
   return swu;
 }
+
 }  // namespace cyclus

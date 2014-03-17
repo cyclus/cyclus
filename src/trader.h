@@ -30,8 +30,7 @@ class Trader {
   }
 
   /// @brief default implementation for material requests
-  virtual std::set<RequestPortfolio<Material>::Ptr>
-      GetMatlRequests() {
+  virtual std::set<RequestPortfolio<Material>::Ptr> GetMatlRequests() {
     return std::set<RequestPortfolio<Material>::Ptr>();
   }
 
@@ -50,7 +49,7 @@ class Trader {
   /// @brief default implementation for generic resource requests
   virtual std::set<BidPortfolio<GenericResource>::Ptr>
       GetGenRsrcBids(const CommodMap<GenericResource>::type&
-                     commod_requests) {
+                        commod_requests) {
     return std::set<BidPortfolio<GenericResource>::Ptr>();
   }
 
@@ -73,17 +72,17 @@ class Trader {
   virtual void GetGenRsrcTrades(
       const std::vector< Trade<GenericResource> >& trades,
       std::vector<std::pair<Trade<GenericResource>,
-      GenericResource::Ptr> >& responses) {}
+                            GenericResource::Ptr> >& responses) {}
 
   /// @brief default implementation for material trade acceptance
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>,
-      Material::Ptr> >& responses) {}
+                                  Material::Ptr> >& responses) {}
 
   /// @brief default implementation for generic resource trade acceptance
   virtual void AcceptGenRsrcTrades(
       const std::vector<std::pair<Trade<GenericResource>,
-      GenericResource::Ptr> >& responses) {}
+          GenericResource::Ptr> >& responses) {}
 
  private:
   Model* manager_;

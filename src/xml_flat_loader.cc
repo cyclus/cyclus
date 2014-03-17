@@ -1,5 +1,4 @@
 // xml_flat_loader.cc
-
 #include "xml_flat_loader.h"
 
 #include "context.h"
@@ -7,9 +6,9 @@
 #include "error.h"
 #include "logger.h"
 #include "model.h"
+#include "query_engine.h"
 #include "recorder.h"
 #include "timer.h"
-#include "query_engine.h"
 
 namespace cyclus {
 
@@ -69,18 +68,18 @@ void XMLFlatLoader::LoadInitialAgents() {
     model->InitFrom(&pi);
     ctx_->AddPrototype(prototype, model);
     ctx_->NewDatum("Prototypes")
-      ->AddVal("Prototype", prototype)
-      ->AddVal("AgentId", model->id())
-      ->AddVal("Implementation", module_name)
-      ->Record();
+        ->AddVal("Prototype", prototype)
+        ->AddVal("AgentId", model->id())
+        ->AddVal("Implementation", module_name)
+        ->Record();
   }
 
   // retrieve agent hierarchy and initial inventories
   int num_agents = xqe.NElementsMatchingQuery("/*/agent");
   std::map<std::string, std::string> protos;  // map<name, prototype>
   std::map<std::string, std::string> parents;  // map<agent, parent>
-  std::set<std::string> agents; // set<agent_name>
-  std::map<std::string, QueryEngine*> invs; // map<agent, qe>;
+  std::set<std::string> agents;  // set<agent_name>
+  std::map<std::string, QueryEngine*> invs;  // map<agent, qe>
   for (int i = 0; i < num_agents; i++) {
     QueryEngine* qe = xqe.QueryElement("/*/agent", i);
     std::string name = qe->GetString("name");
@@ -93,7 +92,7 @@ void XMLFlatLoader::LoadInitialAgents() {
   }
 
   // build agents starting at roots (no parent) down.
-  std::map<std::string, Model*> built; // map<agent_name, agent_ptr>
+  std::map<std::string, Model*> built;  // map<agent_name, agent_ptr>
   std::set<std::string>::iterator it = agents.begin();
   while (agents.size() > 0) {
     std::string name = *it;

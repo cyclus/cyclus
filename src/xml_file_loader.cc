@@ -1,5 +1,7 @@
 // xml_file_loader.cc
 // Implements file reader for an XML format
+#include "xml_file_loader.h"
+
 #include <algorithm>
 #include <fstream>
 #include <set>
@@ -19,14 +21,11 @@
 #include "query_engine.h"
 #include "sim_init.h"
 
-#include "xml_file_loader.h"
-
 namespace cyclus {
 
 namespace fs = boost::filesystem;
 
-void LoadStringstreamFromFile(std::stringstream& stream,
-                              std::string file) {
+void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
   std::ifstream file_stream(file.c_str());
   if (!file_stream) {
     throw IOError("The file '" + file + "' could not be loaded.");
@@ -99,8 +98,7 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
   }
 }
 
-XMLFileLoader::XMLFileLoader(Recorder* r,
-                             QueryBackend* b,
+XMLFileLoader::XMLFileLoader(Recorder* r, QueryBackend* b,
                              std::string schema_file,
                              const std::string input_file) : b_(b), rec_(r) {
   ctx_ = new Context(&ti_, rec_);
@@ -113,8 +111,8 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
   parser_->Init(input);
 
   ctx_->NewDatum("InputFiles")
-  ->AddVal("Data", Blob(input.str()))
-  ->Record();
+      ->AddVal("Data", Blob(input.str()))
+      ->Record();
 }
 
 XMLFileLoader::~XMLFileLoader() {
@@ -129,13 +127,13 @@ std::string XMLFileLoader::master_schema() {
 void XMLFileLoader::LoadSim() {
   std::stringstream ss(master_schema());
   parser_->Validate(ss);
-  LoadControlParams(); // must be first
+  LoadControlParams();  // must be first
   LoadSolver();
   LoadRecipes();
-  LoadInitialAgents(); // must be last
+  LoadInitialAgents();  // must be last
   SimInit::Snapshot(ctx_);
   rec_->Flush();
-};
+}
 
 void XMLFileLoader::LoadSolver() {
   QueryEngine xqe(*parser_);
@@ -156,9 +154,9 @@ void XMLFileLoader::LoadSolver() {
   std::map<std::string, double>::iterator it;
   for (it = commod_order.begin(); it != commod_order.end(); ++it) {
     ctx_->NewDatum("CommodPriority")
-      ->AddVal("Commodity", it->first)
-      ->AddVal("SolutionOrder", it->second)
-      ->Record();
+        ->AddVal("Commodity", it->first)
+        ->AddVal("SolutionOrder", it->second)
+        ->Record();
   }
 }
 
@@ -173,8 +171,7 @@ void XMLFileLoader::ProcessCommodities(
   }
 
   std::map<std::string, double>::iterator it;
-  for (it = commodity_order->begin();
-       it != commodity_order->end();
+  for (it = commodity_order->begin(); it != commodity_order->end();
        ++it) {
     if (it->second < 1) {
       it->second = max + 1;
@@ -213,7 +210,7 @@ void XMLFileLoader::LoadInitialAgents() {
   QueryEngine xqe(*parser_);
 
   // create prototypes
-  std::string prototype; // defined here for force-create AgentExit tbl
+  std::string prototype;  // defined here for force-create AgentExit tbl
   for (it = module_types.begin(); it != module_types.end(); it++) {
     int num_models = xqe.NElementsMatchingQuery(schema_paths[*it]);
     for (int i = 0; i < num_models; i++) {
@@ -310,5 +307,4 @@ void XMLFileLoader::LoadControlParams() {
   ctx_->InitSim(SimInfo(dur, y0, m0, dec, handle));
 }
 
-} // namespace cyclus
-
+}  // namespace cyclus

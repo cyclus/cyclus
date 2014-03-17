@@ -46,4 +46,5 @@ class Builder {
 };
 
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_BUILDER_H_

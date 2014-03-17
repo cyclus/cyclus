@@ -3,6 +3,7 @@
 #define CYCLUS_SRC_XML_PARSER_H_
 
 #include <sstream>
+
 #include <libxml++/libxml++.h>
 #include <boost/shared_ptr.hpp>
 
@@ -41,6 +42,7 @@ class XMLParser {
   /// file parser
   boost::shared_ptr<xmlpp::DomParser> parser_;
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_XML_PARSER_H_

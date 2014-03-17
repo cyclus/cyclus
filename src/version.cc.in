@@ -1,7 +1,6 @@
+#include "version.h"
 
 #include <sstream>
-
-#include "version.h"
 
 #include "CbcConfig.h"
 #include "boost/version.hpp"
@@ -48,6 +47,7 @@ const char* xml2() {
 const char* coincbc() {
   return CBC_VERSION;
 }
+
 }  // namespace version
 }  // namespace cyclus
 

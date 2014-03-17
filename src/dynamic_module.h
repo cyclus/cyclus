@@ -2,8 +2,8 @@
 #ifndef CYCLUS_SRC_DYNAMIC_MODULE_H_
 #define CYCLUS_SRC_DYNAMIC_MODULE_H_
 
-#include <string>
 #include <map>
+#include <string>
 
 namespace cyclus {
 
@@ -20,7 +20,7 @@ class DynamicModule {
    public:
     ~Closer() {
       CloseAll();
-    };
+    }
   };
 
   /// Returns a newly constructed model for the given module name.
@@ -81,6 +81,7 @@ class DynamicModule {
   /// sets the constructor member
   void SetConstructor();
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_DYNAMIC_MODULE_H_

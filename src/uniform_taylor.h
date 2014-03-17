@@ -73,5 +73,7 @@ class UniformTaylor {
    */
   static int MaxNumTerms(long double alpha_t, double epsilon);
 };
+
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_UNIFORM_TAYLOR_H_

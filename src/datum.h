@@ -11,9 +11,9 @@
 namespace cyclus {
 
 /*!
-Used to specify and send a collection of key-value pairs to the
-Recorder for recording.
-*/
+  Used to specify and send a collection of key-value pairs to the
+  Recorder for recording.
+  */
 class Datum {
   friend class Recorder;
 
@@ -24,24 +24,24 @@ class Datum {
   virtual ~Datum();
 
   /*!
-  Add an arbitrary field-value pair to the datum.
+    Add an arbitrary field-value pair to the datum.
 
-  @param field a label or key for a value. Loosely analogous to a column
-  label.
+    @param field a label or key for a value. Loosely analogous to a column
+    label.
 
-  @param val a value of any type (int, bool, string, vector) supported by
-  the backends being used.
+    @param val a value of any type (int, bool, string, vector) supported by
+    the backends being used.
 
-  @warning for the val argument - what variable types are supported
-  depends on what the backend(s) in use are designed to handle.
-  */
+    @warning for the val argument - what variable types are supported
+    depends on what the backend(s) in use are designed to handle.
+    */
   Datum* AddVal(const char* field, boost::spirit::hold_any val);
 
   /*!
-  Record this datum to its Recorder. Recorded Datum objects of the same
-  title (e.g. same table) must not contain any fields that were not
-  present in the first datum recorded of that title.
-  */
+    Record this datum to its Recorder. Recorded Datum objects of the same
+    title (e.g. same table) must not contain any fields that were not
+    present in the first datum recorded of that title.
+    */
   void Record();
 
   /// Returns the datum's title as specified during the datum's creation.
@@ -62,5 +62,7 @@ class Datum {
   std::string title_;
   Vals vals_;
 };
+
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_DATUM_H_

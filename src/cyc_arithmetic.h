@@ -32,5 +32,7 @@ class CycArithmetic {
   /// @returns a set sorted from smallest to largest
   static std::vector<double> sort_ascending(std::map<int, double> to_sort);
 };
+
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_CYC_ARITHMETIC_H_

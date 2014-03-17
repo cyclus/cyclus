@@ -3,6 +3,7 @@
 #define CYCLUS_SRC_ENV_H_
 
 #include <string>
+
 #include "boost/filesystem.hpp"
 
 #include "pyne.h"
@@ -123,6 +124,7 @@ class Env {
                        const std::string& file_name,
                        boost::filesystem::path& path_found);
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_ENV_H_

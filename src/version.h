@@ -16,6 +16,7 @@ const char* hdf5();
 const char* xml2();
 
 const char* coincbc();
+
 }  // namespace version
 }  // namespace cyclus
 

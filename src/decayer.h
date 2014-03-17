@@ -83,7 +83,7 @@ class Decayer {
   Vector post_vect_;
 
   /**
-     the list of tracked nuclides
+     The list of tracked nuclides
    */
   static NucList nuclides_tracked_;
 
