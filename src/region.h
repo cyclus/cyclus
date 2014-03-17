@@ -80,7 +80,7 @@ class Region : public Agent, public TimeListener {
   virtual void InfileToDb(QueryEngine* qe, DbInit di) {}
 
   // DO NOT call Agent class implementation of this method
-  virtual void InitFrom(QueryBackend* b) {};
+  virtual void InitFrom(QueryableBackend* b) {};
 
   // DO NOT call Agent class implementation of this method
   virtual void Snapshot(DbInit di) {};

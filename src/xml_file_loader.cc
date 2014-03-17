@@ -100,7 +100,7 @@ Composition::Ptr ReadRecipe(QueryEngine* qe) {
 }
 
 XMLFileLoader::XMLFileLoader(Recorder* r,
-                             QueryBackend* b,
+                             QueryableBackend* b,
                              std::string schema_file,
                              const std::string input_file) : b_(b), rec_(r) {
   ctx_ = new Context(&ti_, rec_);

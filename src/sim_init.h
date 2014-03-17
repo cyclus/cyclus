@@ -28,17 +28,17 @@ class SimInit {
   ~SimInit();
 
   /// Initialize a simulation with data from b for simulation id in r.
-  void Init(Recorder* r, QueryBackend* b);
+  void Init(Recorder* r, QueryableBackend* b);
 
   /// Restarts a simulation from time t with data from b identified by simid.
   /// The newly configured simulation will run with a new simulation id.
-  void Restart(QueryBackend* b, boost::uuids::uuid sim_id, int t);
+  void Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t);
 
   /// NOT IMPLEMENTED. Initializes a simulation branched from prev_sim_id at
   /// time t with diverging state described in new_sim_id.
   ///
   /// TODO: implement
-  void Branch(QueryBackend* b, boost::uuids::uuid prev_sim_id, int t,
+  void Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id, int t,
               boost::uuids::uuid new_sim_id);
 
   /// Records a snapshot of the current state of the simulation being managed by
@@ -58,7 +58,7 @@ class SimInit {
   Timer* timer() { return &ti_; };
 
  private:
-  void InitBase(QueryBackend* b, boost::uuids::uuid simid, int t);
+  void InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t);
 
   void LoadInfo();
   void LoadRecipes();
@@ -84,7 +84,7 @@ class SimInit {
   Recorder* rec_;
   Timer ti_;
   boost::uuids::uuid simid_;
-  QueryBackend* b_;
+  QueryableBackend* b_;
   int t_;
 };
 

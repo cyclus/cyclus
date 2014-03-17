@@ -81,9 +81,9 @@ class QueryResult {
 };
 
 /// Interface implemented by backends that support rudimentary querying.
-class QueryBackend {
+class QueryableBackend {
  public:
-  virtual ~QueryBackend() {};
+  virtual ~QueryableBackend() {};
 
   /// Return a set of rows from the specificed table that match all given
   /// conditions.  Conditions are AND'd together.  conds may be NULL.
@@ -91,16 +91,16 @@ class QueryBackend {
 };
 
 /// Interface implemented by backends that support recording and querying.
-class FullBackend: public QueryBackend, public RecBackend {
+class FullBackend: public QueryableBackend, public RecBackend {
  public:
   virtual ~FullBackend() {};
 };
 
-/// Wrapper class for QueryBackends that injects a set of Cond's into every
+/// Wrapper class for QueryableBackends that injects a set of Cond's into every
 /// query before being executed.
-class CondInjector: public QueryBackend {
+class CondInjector: public QueryableBackend {
  public:
-  CondInjector(QueryBackend* b, std::vector<Cond> to_inject)
+  CondInjector(QueryableBackend* b, std::vector<Cond> to_inject)
     : b_(b), to_inject_(to_inject) {};
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
@@ -116,17 +116,17 @@ class CondInjector: public QueryBackend {
   };
 
  private:
-  QueryBackend* b_;
+  QueryableBackend* b_;
   std::vector<Cond> to_inject_;
 };
 
-/// Wrapper class for QueryBackends that injects prefix in front of the
+/// Wrapper class for QueryableBackends that injects prefix in front of the
 /// title/table for every query before being executed.  A query to the
 /// "MyAgentTable" table will actually be passed to the wrapped backend as
 /// [prefix] + "MyAgentTable".
-class PrefixInjector: public QueryBackend {
+class PrefixInjector: public QueryableBackend {
  public:
-  PrefixInjector(QueryBackend* b, std::string prefix)
+  PrefixInjector(QueryableBackend* b, std::string prefix)
     : b_(b), prefix_(prefix) {};
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
@@ -134,7 +134,7 @@ class PrefixInjector: public QueryBackend {
   };
 
  private:
-  QueryBackend* b_;
+  QueryableBackend* b_;
   std::string prefix_;
 };
 

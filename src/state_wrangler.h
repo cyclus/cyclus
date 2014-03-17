@@ -41,7 +41,7 @@ class StateWrangler {
   /// Intializes an agent's internal state from an output database. Appropriate
   /// simulation id, agent id, and time filters are automatically included in
   /// all queries.
-  virtual void InitFrom(QueryBackend* b) = 0;
+  virtual void InitFrom(QueryableBackend* b) = 0;
 
   /// Snapshots agent-internal state to the output db via di. This method MUST
   /// call the superclass' Snapshot method before doing any work. The simulation

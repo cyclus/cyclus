@@ -24,24 +24,24 @@ SimInit::~SimInit() {
   }
 }
 
-void SimInit::Init(Recorder* r, QueryBackend* b) {
+void SimInit::Init(Recorder* r, QueryableBackend* b) {
   rec_ = new Recorder(); // use dummy recorder to avoid re-recording
   InitBase(b, r->sim_id(), 0);
   ctx_->rec_ = r; // switch back before running sim
 }
 
-void SimInit::Restart(QueryBackend* b, boost::uuids::uuid sim_id, int t) {
+void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
   rec_ = new Recorder();
   InitBase(b, sim_id, t);
 }
 
-void SimInit::Branch(QueryBackend* b, boost::uuids::uuid prev_sim_id,
+void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
                            int t,
                            boost::uuids::uuid new_sim_id) {
   throw Error("simulation branching feature not implemented");
 }
 
-void SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
+void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   rec_->set_dump_count(10000); // this recorder is "real" and gets bigger buf
   ctx_ = new Context(&ti_, rec_);
 

@@ -32,7 +32,7 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 ///
 /// There are several methods that must be implemented in support of simulation
 /// initialization, snapshotting and restart: InfileToDb,
-/// InitFrom(QueryBackend*), Snapshot, SnapshotInv, and InitInv.  These methods
+/// InitFrom(QueryableBackend*), Snapshot, SnapshotInv, and InitInv.  These methods
 /// all do inter-related things.  Notably, the InfileToDb, InitFrom, and
 /// Snapshot methods must all write/read to/from the same database tables (and
 /// table schemas).
@@ -119,7 +119,7 @@ class Agent : public StateWrangler {
   /// all queries.
   ///
   /// @warning Agents must NOT create any resource objects in this method.
-  virtual void InitFrom(QueryBackend* b);
+  virtual void InitFrom(QueryableBackend* b);
 
   /// Snapshots agent-internal state to the output db via DbInit. This method MUST
   /// call the superclass' Snapshot method before doing any work. The simulation

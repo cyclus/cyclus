@@ -44,7 +44,7 @@ void Agent::InfileToDb(QueryEngine* qe, DbInit di) {
     ->Record();
 }
 
-void Agent::InitFrom(QueryBackend* b) {
+void Agent::InitFrom(QueryableBackend* b) {
   QueryResult qr = b->Query("Agent", NULL);
   prototype_ = qr.GetVal<std::string>("Prototype");
   lifetime_ = qr.GetVal<int>("Lifetime");
