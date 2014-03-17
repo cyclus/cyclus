@@ -36,7 +36,7 @@ class InfileTree {
   /// matching a query
   /// @param query the query
   /// @return the number of elements matching the query
-  virtual int NElementsMatchingQuery(std::string query);
+  virtual int NMatches(std::string query);
 
   /// Same as GetString with auto-conversion to int.
   virtual int GetInt(std::string query, int index = 0);
@@ -54,7 +54,7 @@ class InfileTree {
   /// @param query the query
   /// @param index the index of the queried element
   /// @return a initialized query engine based on the query and index
-  InfileTree* QueryElement(std::string query, int index = 0);
+  InfileTree* Query(std::string query, int index = 0);
 
  protected:
   /// constructor given a node
@@ -87,7 +87,7 @@ template <class T> inline T GetOptionalQuery(InfileTree* qe,
                                             std::string query,
                                             T default_val) {
   T val;
-  qe->NElementsMatchingQuery(query) == 1 ?
+  qe->NMatches(query) == 1 ?
       val = boost::lexical_cast<T>(qe->GetString(query).c_str()) :
       val = default_val;
   return val;

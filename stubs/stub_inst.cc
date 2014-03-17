@@ -12,7 +12,7 @@ StubInst::~StubInst() {}
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubInst::InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {
   Agent::InfileToDb(qe, di);
-  qe = qe->QueryElement(agent_impl());
+  qe = qe->Query(agent_impl());
   // retrieve input data members here. For example:
   //
   //   int cycle_len = lexical_cast<int>(input->getElementContent("cycle_length"));

@@ -93,7 +93,7 @@ class Agent : public StateWrangler {
   ///   void InfileToDb(InfileTree* qe, DbInit di) {
   ///     cyclus::Facility::InitFrom(qe); // 
   ///     // now do MyAgentClass' initialitions, e.g.:
-  ///     qe = qe->QueryElement("agent/" + agent_impl()); // rescope the InfileTree
+  ///     qe = qe->Query("agent/" + agent_impl()); // rescope the InfileTree
   ///
   ///     // retrieve all agent params
   ///     std::string recipe = qe->GetString("recipe");

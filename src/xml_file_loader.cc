@@ -82,10 +82,10 @@ Composition::Ptr ReadRecipe(InfileTree* qe) {
   double value;
   int key;
   std::string query = "nuclide";
-  int nnucs = qe->NElementsMatchingQuery(query);
+  int nnucs = qe->NMatches(query);
   CompMap v;
   for (int i = 0; i < nnucs; i++) {
-    InfileTree* nuclide = qe->QueryElement(query, i);
+    InfileTree* nuclide = qe->Query(query, i);
     key = strtol(nuclide->GetString("id").c_str(), NULL, 10);
     value = strtod(nuclide->GetString("comp").c_str(), NULL);
     v[key] = value;
@@ -144,9 +144,9 @@ void XMLFileLoader::LoadSolver() {
   std::map<std::string, double> commod_order;
   std::string name;
   double order;
-  int num_commods = xqe.NElementsMatchingQuery(query);
+  int num_commods = xqe.NMatches(query);
   for (int i = 0; i < num_commods; i++) {
-    InfileTree* qe = xqe.QueryElement(query, i);
+    InfileTree* qe = xqe.Query(query, i);
     name = qe->GetString("name");
     order = GetOptionalQuery<double>(qe, "solution_order", -1);
     commod_order[name] = order;
@@ -188,9 +188,9 @@ void XMLFileLoader::LoadRecipes() {
   InfileTree xqe(*parser_);
 
   std::string query = "/*/recipe";
-  int num_recipes = xqe.NElementsMatchingQuery(query);
+  int num_recipes = xqe.NMatches(query);
   for (int i = 0; i < num_recipes; i++) {
-    InfileTree* qe = xqe.QueryElement(query, i);
+    InfileTree* qe = xqe.Query(query, i);
     std::string name = qe->GetString("name");
     CLOG(LEV_DEBUG3) << "loading recipe: " << name;
     Composition::Ptr comp = ReadRecipe(qe);
@@ -215,10 +215,10 @@ void XMLFileLoader::LoadInitialAgents() {
   // create prototypes
   std::string prototype; // defined here for force-create AgentExit tbl
   for (it = module_types.begin(); it != module_types.end(); it++) {
-    int num_agents = xqe.NElementsMatchingQuery(schema_paths[*it]);
+    int num_agents = xqe.NMatches(schema_paths[*it]);
     for (int i = 0; i < num_agents; i++) {
-      InfileTree* qe = xqe.QueryElement(schema_paths[*it], i);
-      InfileTree* module_data = qe->QueryElement("agent");
+      InfileTree* qe = xqe.Query(schema_paths[*it], i);
+      InfileTree* module_data = qe->Query("agent");
       std::string module_name = module_data->GetElementName();
       prototype = qe->GetString("name");
 
@@ -249,21 +249,21 @@ void XMLFileLoader::LoadInitialAgents() {
   }
 
   // build initial agent instances
-  int nregions = xqe.NElementsMatchingQuery(schema_paths["Region"]);
+  int nregions = xqe.NMatches(schema_paths["Region"]);
   for (int i = 0; i < nregions; ++i) {
-    InfileTree* qe = xqe.QueryElement(schema_paths["Region"], i);
+    InfileTree* qe = xqe.Query(schema_paths["Region"], i);
     std::string region_proto = qe->GetString("name");
     Agent* reg = BuildAgent(region_proto, NULL);
 
-    int ninsts = qe->NElementsMatchingQuery("institution");
+    int ninsts = qe->NMatches("institution");
     for (int j = 0; j < ninsts; ++j) {
-      InfileTree* qe2 = qe->QueryElement("institution", j);
+      InfileTree* qe2 = qe->Query("institution", j);
       std::string inst_proto = qe2->GetString("name");
       Agent* inst = BuildAgent(inst_proto, reg);
 
-      int nfac = qe2->NElementsMatchingQuery("initialfacilitylist/entry");
+      int nfac = qe2->NMatches("initialfacilitylist/entry");
       for (int k = 0; k < nfac; ++k) {
-        InfileTree* qe3 = qe2->QueryElement("initialfacilitylist/entry", k);
+        InfileTree* qe3 = qe2->Query("initialfacilitylist/entry", k);
         std::string fac_proto = qe3->GetString("prototype");
 
         int number = atoi(qe3->GetString("number").c_str());
@@ -287,10 +287,10 @@ Agent* XMLFileLoader::BuildAgent(std::string proto, Agent* parent) {
 void XMLFileLoader::LoadControlParams() {
   InfileTree xqe(*parser_);
   std::string query = "/*/control";
-  InfileTree* qe = xqe.QueryElement(query);
+  InfileTree* qe = xqe.Query(query);
 
   std::string handle;
-  if (qe->NElementsMatchingQuery("simhandle") > 0) {
+  if (qe->NMatches("simhandle") > 0) {
     handle = qe->GetString("simhandle");
   }
 

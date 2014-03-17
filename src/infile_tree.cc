@@ -45,7 +45,7 @@ int InfileTree::NElements() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int InfileTree::NElementsMatchingQuery(std::string query) {
+int InfileTree::NMatches(std::string query) {
   return current_node_->find(query).size();
 }
 
@@ -136,7 +136,7 @@ InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
   return new InfileTree(element);
 }
 
-InfileTree* InfileTree::QueryElement(std::string query,
+InfileTree* InfileTree::Query(std::string query,
                                        int index) {
   InfileTree* qe_child =
     GetEngineFromQuery(query, index);

@@ -69,8 +69,8 @@ TEST_F(InfileTreeTest, top_level_queries) {
   LoadParser();
   cyclus::InfileTree engine(*parser_);
   EXPECT_EQ(engine.NElements(),ninner_nodes_);
-  EXPECT_EQ(engine.NElementsMatchingQuery(content_node_),ncontent_);
-  EXPECT_EQ(engine.NElementsMatchingQuery(inner_node_),1);
+  EXPECT_EQ(engine.NMatches(content_node_),ncontent_);
+  EXPECT_EQ(engine.NMatches(inner_node_),1);
   EXPECT_EQ(engine.GetElementName(),content_node_);
   EXPECT_EQ(engine.GetString(content_node_),content_);
   for (int i = 0; i < ncontent_; i++) {
@@ -87,7 +87,7 @@ TEST_F(InfileTreeTest, top_level_throws) {
   EXPECT_THROW(engine.GetString(content_node_,ninner_nodes_+1), cyclus::ValueError);
   EXPECT_THROW(engine.GetString(inner_node_), cyclus::ValueError);
   EXPECT_THROW(engine.GetElementName(ninner_nodes_+1), cyclus::ValueError);
-  EXPECT_THROW(engine.QueryElement(content_node_,ninner_nodes_+1), cyclus::ValueError);  
+  EXPECT_THROW(engine.Query(content_node_,ninner_nodes_+1), cyclus::ValueError);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -95,7 +95,7 @@ TEST_F(InfileTreeTest, null_query) {
   LoadParser();
   cyclus::InfileTree engine(*parser_);
   std::string query = "something_silly";
-  EXPECT_EQ(engine.NElementsMatchingQuery(query), 0);
+  EXPECT_EQ(engine.NMatches(query), 0);
   EXPECT_THROW(engine.GetString(query), cyclus::KeyError);
 }
 
@@ -103,16 +103,16 @@ TEST_F(InfileTreeTest, null_query) {
 TEST_F(InfileTreeTest, mid_level_queries) {  
   LoadParser();
   cyclus::InfileTree engine(*parser_);
-  EXPECT_NO_THROW(cyclus::InfileTree* qe = engine.QueryElement(inner_node_));
+  EXPECT_NO_THROW(cyclus::InfileTree* qe = engine.Query(inner_node_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(InfileTreeTest, low_level_queries) {  
   LoadParser();
   cyclus::InfileTree engine(*parser_);
-  cyclus::InfileTree* qe = engine.QueryElement(inner_node_);
+  cyclus::InfileTree* qe = engine.Query(inner_node_);
   EXPECT_EQ(qe->GetElementName(),unknown_node_);
-  cyclus::InfileTree* qe2 = qe->QueryElement(unknown_node_);
+  cyclus::InfileTree* qe2 = qe->Query(unknown_node_);
   EXPECT_EQ(qe2->GetString(content_node_),content_);
 }
 
