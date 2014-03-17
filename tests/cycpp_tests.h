@@ -78,6 +78,9 @@ class Friend {
 
 }; // namespace mi6
 
+typedef unsigned long ulong;
+typedef int int_t, *intp_t, (&fp)(int, ulong), arr_t[10];
+typedef struct {int a; int b;} S, *pS;
 
 class Villan {
  public:
@@ -85,9 +88,6 @@ class Villan {
     "default": mi6.Spy.name['default'],\
     }
   std::string enemy;
+
+  #pragma cyclus initfrom
 };
-
-
-typedef unsigned long ulong;
-typedef int int_t, *intp_t, (&fp)(int, ulong), arr_t[10];
-typedef struct {int a; int b;} S, *pS;

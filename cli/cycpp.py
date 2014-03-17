@@ -105,8 +105,8 @@ class Filter(object):
 
     regex = re.compile('a^')  # neat regex which fails even against empty strings
 
-    def __init__(self, state=None, *args, **kwargs):
-        self.state = state
+    def __init__(self, machine=None, *args, **kwargs):
+        self.machine = state
         self.match = None
 
     def isvalid(self, statement):
@@ -326,7 +326,9 @@ class ExecFilter(Filter):
         del context['__builtins__']
 
 class StateAccumulator(object):
-    """This represents the state of the file as it is being traversed.  
+    """The StateAccumulator class is the pass 2 state machine.
+
+    This represents the state of the file as it is being traversed.  
     At the end of the traversal this will have acquired all of the information
     needed for pass 2. It manages both the decorators and other needed bits 
     of C++ syntax. It works by passing each statement through a sequence of 
@@ -466,13 +468,27 @@ def accumulate_state(canon):
         statement = statement if prefix is None else prefix + statement
         statement = statement.strip()
         state.accumulate(statement, sep)
-    return state
+    return state.context
 
 #
 # pass 3
 #
+class InitFromFilter(Filter):
+    """Filter for handling InitFrom() code generation:
+
+        #pragma cyclus initfrom [classname]
+
+    The classname argument is optional and allow you to force the generation 
+    """
+    regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
+
+    def transform(self, statement, sep):
+        cg = self.machine
+
 class CodeGenerator(object):
-    """This represents the file as code is being injected into it.  
+    """The CodeGenerator class is the pass 3 state machine.
+
+    This represents the file as code is being injected into it.  
     At the end of the traversal this final stage it will built up a brand new
     file for pass 3. It manages both the code insertion pragmas and other bits 
     of C++ syntax as needed to determine locality. It works by passing each statement 
@@ -482,8 +498,8 @@ class CodeGenerator(object):
     
     def __init__(self, state):
         self.depth = 0
-        self.state = state    # the results of pass 2
-        self.statements = []  # the results of pass 3, waiting to be joined
+        self.context = context  # the results of pass 2
+        self.statements = []    # the results of pass 3, waiting to be joined
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
@@ -503,8 +519,14 @@ class CodeGenerator(object):
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
-                filter.transform(statement, sep)
+                transformed = filter.transform(statement, sep)
                 break
+        else:
+            transformed = None
+        # assign transformation to the new statements.
+        if transformed is None:
+            transformed = statement + sep
+        self.statements.append(transformed)
         # seps must come before revert
         if sep == '{':
             self.depth += 1
@@ -514,17 +536,16 @@ class CodeGenerator(object):
         for filter in self.filters: 
             filter.revert(statement, sep)
 
-def generate_code(orig, state):
+def generate_code(orig, context):
     """Takes a canonical C++ source file and separates it out into statements
     which are fed into a code generator. The new file is returned.
     """
-    cg = CodeGenerator(state)
-    for m in RE_STATEMENT.finditer(canon):
+    cg = CodeGenerator(context)
+    for m in RE_STATEMENT.finditer(orig):
         if m is None:
             continue
         prefix, statement, _, sep = m.groups()
         statement = statement if prefix is None else prefix + statement
-        statement = statement.strip()
         cg.generate(statement, sep)
     newfile = "".join(cg.statements)
     return newfile
@@ -645,12 +666,12 @@ def main():
     
     canon = preprocess_file(ns.path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
-    state = accumulate_state(canon)   # pass 2
+    context = accumulate_state(canon)   # pass 2
     if not ns.pass3_use_pp:
         with open(ns.path) as f:
             orig = f.read()
         orig = ensure_startswith_newlinehash(orig)
-    newfile = generate_code(canon if ns.pass3_use_pp else orig, state)  # pass 3
+    newfile = generate_code(canon if ns.pass3_use_pp else orig, context)  # pass 3
     print(newfile)
 
 if __name__ == "__main__":
