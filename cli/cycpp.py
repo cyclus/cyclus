@@ -479,11 +479,28 @@ class InitFromFilter(Filter):
         #pragma cyclus initfrom [classname]
 
     The classname argument is optional and allow you to force the generation 
+    of a specific class. If not present, it takes the current class. If the class
+    is specified it must be the full namespace path to the class.
     """
-    regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
+    regex = re.compile("\s*#\s*pragma\s+cyclus\s+initfrom(\s+.*)?")
 
     def transform(self, statement, sep):
         cg = self.machine
+        classname = self.match.group(1)
+        if classname is None:
+            classname = cg.classname()
+        classname = classname.strip().replace('.', '::')
+        context = cg.context
+        if classname not in context:
+            msg = "{0} not found! Options include: {1}."
+            raise KeyError(msg.format(classname, ", ".join(sorted(context.keys()))))
+        ctx = context[classname]
+        rtn = statement + sep + (
+            "  void InitFrom(stuff) {{\n"
+            "    // InitFrom for {0}\n"
+            "    default = {1};\n"
+            "  }};\n").format(classname, ctx.values()[0]['default'])
+        return rtn
 
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
@@ -504,7 +521,7 @@ class CodeGenerator(object):
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self), 
-                        ]
+                        InitFromFilter(self)]
 
     def classname(self):
         """Returns the current, fully-expanded class name."""
@@ -532,6 +549,9 @@ class CodeGenerator(object):
             self.depth += 1
         elif sep == '}':
             self.depth -= 1
+        elif sep == "\n" and "pragma" in statement:
+            # gross fix for not using cpp
+            self.depth += statement.count('{') - statement.count('}')
         # revert what is needed
         for filter in self.filters: 
             filter.revert(statement, sep)
@@ -546,6 +566,7 @@ def generate_code(orig, context):
             continue
         prefix, statement, _, sep = m.groups()
         statement = statement if prefix is None else prefix + statement
+        #print(cg.depth, repr(statement + sep))
         cg.generate(statement, sep)
     newfile = "".join(cg.statements)
     return newfile
@@ -667,6 +688,7 @@ def main():
     canon = preprocess_file(ns.path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
     context = accumulate_state(canon)   # pass 2
+    #pprint(context)
     if not ns.pass3_use_pp:
         with open(ns.path) as f:
             orig = f.read()

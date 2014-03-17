@@ -71,9 +71,9 @@ private:
 class Friend {
  public:
   #pragma cyclus var {\
-    "default": Spy.name['default'], \
+    "default": "friend of " + Spy.name['default'], \
     }
-  std::string enemy;
+  std::string friend;
 };
 
 }; // namespace mi6
@@ -85,9 +85,11 @@ typedef struct {int a; int b;} S, *pS;
 class Villan {
  public:
   #pragma cyclus var {\
-    "default": mi6.Spy.name['default'],\
+    "default": "enemy of " + mi6.Spy.name['default'],\
     }
   std::string enemy;
 
   #pragma cyclus initfrom
+
+  #pragma cyclus initfrom mi6.Friend
 };
