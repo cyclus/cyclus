@@ -478,21 +478,17 @@ def accumulate_state(canon):
 #
 class CloneFilter(Filter):
     """Filter for handling Clone() code generation:
-
         #pragma cyclus [def|decl|impl] clone [classname]
     """
-    # regexp = re.compile("\s*#\s*pragma\s+cyclus\s+(def\s|decl\s|impl\s|)+clone(\s+.*)?")
-    regex = re.compile("\s*#\s*pragma\s+cyclus\s+clone(\s+.*)?")
+    regex = re.compile("\s*#\s*pragma\s+cyclus+(\sdef\s|\sdecl\s|\simpl\s|\s)+clone(\s+.*)?")
 
     def transform(self, statement, sep):
         cg = self.machine
-        # mode = self.match.group(1)
-        mode = None
-        if mode is None:
+        mode = self.match.group(1)
+        if mode is None or mode is ' ':
             mode = "def"
         mode = mode.strip()
-        # classname = self.match.group(2)
-        classname = self.match.group(1)
+        classname = self.match.group(2)
         if classname is None:
             classname = cg.classname()
         classname = classname.strip().replace('.', '::')
@@ -502,17 +498,26 @@ class CloneFilter(Filter):
             raise KeyError(msg.format(classname, ", ".join(sorted(context.keys()))))
         ctx = context[classname]
 
-        header = len(self.machine.classes) > 0 and self.machine.classes[-1][1] == classname
+        in_class_decl = len(self.machine.classes) > 0 and self.machine.classes[-1][1] == classname
 
-        ns = "" if header else classname + "::"
-        virt = "virtual " if header else ""
-        end = ";" if mode is "decl" else " {"
+        ns = "" if in_class_decl else classname + "::"
+        virt = "virtual " if in_class_decl else ""
+        end = ";" if mode == "decl" else " {"
         ind = 2 * (self.machine.depth - len(self.machine.namespaces))
         definition = " " * ind + "{0}cyc::Model* {1}Clone(){2}\n".format(virt, ns, end)
 
-        end = "" if mode is "decl" else " " * ind + "};\n"
-        
-        rtn = statement + sep + definition + end
+        ind += 2
+        impl = " " * ind + "{0}* m = new {0}(context());\n".format(classname)
+        impl += " " * ind + "m->InitFrom(this);\n"
+        impl += " " * ind + "return m;\n"
+
+        ind -= 2
+        end = "" if mode == "decl" else " " * ind + "};\n"
+
+        rtn = statement + sep + definition
+        if mode != "decl":
+            rtn += impl 
+        rtn += end
         return rtn
 
 class InitFromFilter(Filter):
