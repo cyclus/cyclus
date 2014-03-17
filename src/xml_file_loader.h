@@ -9,7 +9,7 @@
 
 #include "composition.h"
 #include "dynamic_module.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "xml_parser.h"
 #include "timer.h"
 #include "recorder.h"
@@ -27,7 +27,7 @@ void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
 std::string BuildMasterSchema(std::string schema_path);
 
 /// Creates a composition from the recipe in the query engine.
-Composition::Ptr ReadRecipe(QueryEngine* qe);
+Composition::Ptr ReadRecipe(InfileTree* qe);
 
 /// Handles initialization of a database with information from
 /// a cyclus xml input file. 
@@ -62,7 +62,7 @@ class XMLFileLoader {
   void LoadRecipes();
 
   /// loads a specific recipe
-  void LoadRecipe(QueryEngine* qe);
+  void LoadRecipe(InfileTree* qe);
 
   /// Creates all initial agent instances from the input file.
   virtual void LoadInitialAgents();

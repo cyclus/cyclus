@@ -95,7 +95,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/pyne.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/infile_tree.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/region.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/relax_ng_validator.cc"
@@ -173,7 +173,7 @@ INSTALL(FILES
   prog_solver.h 
   prog_translator.h 
   pyne.h
-  query_engine.h 
+  infile_tree.h 
   rec_backend.h
   recorder.h
   region.h

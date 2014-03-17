@@ -52,7 +52,7 @@ class StubFacility : public cyclus::Facility  {
   /**
     Initialize db with input file info related to derived module class
     */
-  virtual void InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di);
+  virtual void InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di);
 
   virtual void InitInv(cyclus::Inventories& inv);
 

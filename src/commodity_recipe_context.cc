@@ -42,10 +42,10 @@ CommodityRecipeContext* CommodityRecipeContext::Clone() {
   return new CommodityRecipeContext(*this);
 }
 
-void CommodityRecipeContext::InfileToDb(QueryEngine* qe, DbInit di) {
+void CommodityRecipeContext::InfileToDb(InfileTree* qe, DbInit di) {
   int nfuel = qe->NElementsMatchingQuery("fuel");
   for (int i = 0; i < nfuel; i++) {
-    QueryEngine* fuel = qe->QueryElement("fuel", i);
+    InfileTree* fuel = qe->QueryElement("fuel", i);
     di.NewDatum("CommodityRecipeContext_inoutmap")
       ->AddVal("in_commod", fuel->GetString("incommodity"))
       ->AddVal("in_recipe", fuel->GetString("inrecipe"))

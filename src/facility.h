@@ -75,7 +75,7 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual ~Facility();
 
   // DO NOT call Agent class implementation of this method
-  virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
+  virtual void InfileToDb(InfileTree* qe, DbInit di) {};
 
   // DO NOT call Agent class implementation of this method
   virtual void InitFrom(QueryableBackend* b) {}

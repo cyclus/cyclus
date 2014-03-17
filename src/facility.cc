@@ -4,7 +4,7 @@
 #include "facility.h"
 
 #include "timer.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "institution.h"
 #include "error.h"
 

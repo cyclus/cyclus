@@ -10,7 +10,7 @@ StubRegion::StubRegion(cyclus::Context* ctx)
 StubRegion::~StubRegion() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubRegion::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
+void StubRegion::InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {
   Agent::InfileToDb(qe, di);
   qe = qe->QueryElement(agent_impl());
   // retrieve input data members here. For example:

@@ -12,7 +12,7 @@
 
 namespace cyclus {
 
-class QueryEngine;
+class InfileTree;
 
 // Usefull Typedefs
 typedef std::set<std::string> PrototypeSet;
@@ -46,7 +46,7 @@ class Institution : public Agent, public TimeListener {
   virtual ~Institution() {};
 
   // DO NOT call Agent class implementation of this method
-  virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
+  virtual void InfileToDb(InfileTree* qe, DbInit di) {};
 
   // DO NOT call Agent class implementation of this method
   virtual void InitFrom(QueryableBackend* b) {};

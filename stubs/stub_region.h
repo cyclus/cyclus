@@ -52,7 +52,7 @@ class StubRegion : public cyclus::Region {
   /**
     Initialize db with input file info related to derived module class
     */
-  virtual void InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di);
+  virtual void InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di);
 
   /**
     Initialize members for a cloned module.

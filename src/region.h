@@ -5,7 +5,7 @@
 #include <set>
 
 #include "time_listener.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 
 namespace cyclus {
 
@@ -77,7 +77,7 @@ class Region : public Agent, public TimeListener {
   virtual ~Region() {};
 
   // DO NOT call Agent class implementation of this method
-  virtual void InfileToDb(QueryEngine* qe, DbInit di) {}
+  virtual void InfileToDb(InfileTree* qe, DbInit di) {}
 
   // DO NOT call Agent class implementation of this method
   virtual void InitFrom(QueryableBackend* b) {};

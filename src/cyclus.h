@@ -31,7 +31,7 @@
 #include "agent.h"
 #include "pyne.h"
 #include "query_backend.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "recorder.h"
 #include "region.h"
 #include "request.h"

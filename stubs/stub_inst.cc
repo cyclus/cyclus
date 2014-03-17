@@ -10,7 +10,7 @@ StubInst::StubInst(cyclus::Context* ctx)
 StubInst::~StubInst() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
+void StubInst::InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {
   Agent::InfileToDb(qe, di);
   qe = qe->QueryElement(agent_impl());
   // retrieve input data members here. For example:

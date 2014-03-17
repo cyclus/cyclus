@@ -9,7 +9,7 @@
 #include "agent.h"
 #include "recorder.h"
 #include "timer.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 
 namespace cyclus {
 
@@ -47,13 +47,13 @@ std::string XMLFlatLoader::master_schema() {
 }
 
 void XMLFlatLoader::LoadInitialAgents() {
-  QueryEngine xqe(*parser_);
+  InfileTree xqe(*parser_);
 
   // create prototypes
   int num_protos = xqe.NElementsMatchingQuery("/*/prototype");
   for (int i = 0; i < num_protos; i++) {
-    QueryEngine* qe = xqe.QueryElement("/*/prototype", i);
-    QueryEngine* module_data = qe->QueryElement("agent");
+    InfileTree* qe = xqe.QueryElement("/*/prototype", i);
+    InfileTree* module_data = qe->QueryElement("agent");
     std::string module_name = module_data->GetElementName();
     std::string prototype = qe->GetString("name");
 
@@ -80,9 +80,9 @@ void XMLFlatLoader::LoadInitialAgents() {
   std::map<std::string, std::string> protos;  // map<name, prototype>
   std::map<std::string, std::string> parents;  // map<agent, parent>
   std::set<std::string> agents; // set<agent_name>
-  std::map<std::string, QueryEngine*> invs; // map<agent, qe>;
+  std::map<std::string, InfileTree*> invs; // map<agent, qe>;
   for (int i = 0; i < num_agents; i++) {
-    QueryEngine* qe = xqe.QueryElement("/*/agent", i);
+    InfileTree* qe = xqe.QueryElement("/*/agent", i);
     std::string name = qe->GetString("name");
     std::string proto = qe->GetString("prototype");
     std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");

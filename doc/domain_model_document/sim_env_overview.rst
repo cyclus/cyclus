@@ -53,7 +53,7 @@ Cyclus Utilities
 
 A number of utilities provide services for support of common simulation needs:
 
- * XMLQueryEngine: facilitate parsing of input 
+ * XMLInfileTree: facilitate parsing of input 
  * BookKeeper: facilitate recording output to a database
  * CycException: error handling
  * Logger: interactive user feedback

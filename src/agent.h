@@ -10,7 +10,7 @@
 
 #include "dynamic_module.h"
 #include "resource.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "exchange_context.h"
 #include "query_backend.h"
 #include "db_init.h"
@@ -72,17 +72,17 @@ class Agent : public StateWrangler {
   virtual Agent* Clone() = 0;
 
   /// Translates info for a agent from an input file to the database by reading
-  /// parameters from the passed QueryEngine and recording data via the DbInit
+  /// parameters from the passed InfileTree and recording data via the DbInit
   /// variable.  The simulation and agent id's are automatically injected in all
   /// data transfered through DbInit.  This method must be implemented by all
   /// agents.  This method must call the superclass' InfileToDb method before
   /// doing any other work.
   ///
-  /// Agent parameters in the QueryEngine are scoped in the
+  /// Agent parameters in the InfileTree are scoped in the
   /// "agent/[agent-class-name]" path. The agent's class-name can be retrieved
-  /// from the agent_impl method. The superclass InitFrom expects the QueryEngine
+  /// from the agent_impl method. The superclass InitFrom expects the InfileTree
   /// passed to it to be scoped identically - do NOT pass a changed-scope
-  /// QueryEngine to the superclass.
+  /// InfileTree to the superclass.
   ///
   /// Example:
   ///
@@ -90,10 +90,10 @@ class Agent : public StateWrangler {
   /// class MyAgentClass : virtual public cyclus::Facility {
   ///   // ...
   ///
-  ///   void InfileToDb(QueryEngine* qe, DbInit di) {
+  ///   void InfileToDb(InfileTree* qe, DbInit di) {
   ///     cyclus::Facility::InitFrom(qe); // 
   ///     // now do MyAgentClass' initialitions, e.g.:
-  ///     qe = qe->QueryElement("agent/" + agent_impl()); // rescope the QueryEngine
+  ///     qe = qe->QueryElement("agent/" + agent_impl()); // rescope the InfileTree
   ///
   ///     // retrieve all agent params
   ///     std::string recipe = qe->GetString("recipe");
@@ -112,7 +112,7 @@ class Agent : public StateWrangler {
   /// @endcode
   ///
   /// @warning this method MUST NOT modify the agent's state.
-  virtual void InfileToDb(QueryEngine* qe, DbInit di);
+  virtual void InfileToDb(InfileTree* qe, DbInit di);
 
   /// Intializes an agent's internal state from an output database. Appropriate
   /// simulation id, agent id, and time filters are automatically included in

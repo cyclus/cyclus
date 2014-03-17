@@ -35,7 +35,7 @@ std::string Agent::InformErrorMsg(std::string msg) {
   return ret.str();
 }
 
-void Agent::InfileToDb(QueryEngine* qe, DbInit di) {
+void Agent::InfileToDb(InfileTree* qe, DbInit di) {
   std::string proto = qe->GetString("name");
   int lifetime = GetOptionalQuery<int>(qe, "lifetime", -1);
   di.NewDatum("Agent")

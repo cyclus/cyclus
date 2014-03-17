@@ -9,7 +9,7 @@
 #include "exchange_manager.h"
 #include "product.h"
 #include "material.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "time_listener.h"
 
 namespace cyclus {

@@ -1,27 +1,27 @@
-// query_engine.cc
+// infile_tree.cc
 // Implements class for querying XML snippets
 #include <iostream>
 #include <sstream>
 
 #include "error.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include <boost/lexical_cast.hpp>
 
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-QueryEngine::QueryEngine(XMLParser& parser) : current_node_(0) {
+InfileTree::InfileTree(XMLParser& parser) : current_node_(0) {
   current_node_ = parser.Document()->get_root_node();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-QueryEngine::QueryEngine(xmlpp::Node* node) : current_node_(0) {
+InfileTree::InfileTree(xmlpp::Node* node) : current_node_(0) {
   current_node_ = node;
 }
 
-QueryEngine::~QueryEngine() {
+InfileTree::~InfileTree() {
   while (!spawned_children_.empty()) {
-    QueryEngine* qe_child = *spawned_children_.begin();
+    InfileTree* qe_child = *spawned_children_.begin();
     spawned_children_.erase(spawned_children_.begin());
     if (qe_child) {
       delete qe_child;
@@ -30,7 +30,7 @@ QueryEngine::~QueryEngine() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int QueryEngine::NElements() {
+int InfileTree::NElements() {
   using xmlpp::Element;
   int n = 0;
   const xmlpp::Node::NodeList nodelist = current_node_->get_children();
@@ -45,20 +45,20 @@ int QueryEngine::NElements() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int QueryEngine::NElementsMatchingQuery(std::string query) {
+int InfileTree::NElementsMatchingQuery(std::string query) {
   return current_node_->find(query).size();
 }
 
-int QueryEngine::GetInt(std::string query, int index) {
+int InfileTree::GetInt(std::string query, int index) {
   return boost::lexical_cast<int>(GetString(query, index));
 }
 
-double QueryEngine::GetDouble(std::string query, int index) {
+double InfileTree::GetDouble(std::string query, int index) {
   return boost::lexical_cast<double>(GetString(query, index));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string QueryEngine::GetString(std::string query, int index) {
+std::string InfileTree::GetString(std::string query, int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
   using xmlpp::TextNode;
@@ -97,7 +97,7 @@ std::string QueryEngine::GetString(std::string query, int index) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string QueryEngine::GetElementName(int index) {
+std::string InfileTree::GetElementName(int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
   std::vector<xmlpp::Element*> elements;
@@ -117,7 +117,7 @@ std::string QueryEngine::GetElementName(int index) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-QueryEngine* QueryEngine::GetEngineFromQuery(std::string query, int index) {
+InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
   using xmlpp::Node;
   using xmlpp::NodeSet;
   const NodeSet nodeset = current_node_->find(query);
@@ -133,12 +133,12 @@ QueryEngine* QueryEngine::GetEngineFromQuery(std::string query, int index) {
                     " is not an Element node.");
   }
 
-  return new QueryEngine(element);
+  return new InfileTree(element);
 }
 
-QueryEngine* QueryEngine::QueryElement(std::string query,
+InfileTree* InfileTree::QueryElement(std::string query,
                                        int index) {
-  QueryEngine* qe_child =
+  InfileTree* qe_child =
     GetEngineFromQuery(query, index);
   spawned_children_.insert(qe_child);
   return qe_child;

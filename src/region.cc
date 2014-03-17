@@ -11,7 +11,7 @@
 #include "error.h"
 #include "timer.h"
 #include "logger.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 
 namespace cyclus {
 

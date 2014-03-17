@@ -5,7 +5,7 @@
 
 #include "agent_tests.h"
 #include "xml_parser.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(AgentTests, DISABLED_CreateFromXML) {
