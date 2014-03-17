@@ -476,13 +476,21 @@ def accumulate_state(canon):
 #
 # pass 3
 #
-class CloneFilter(Filter):
-    """Filter for handling Clone() code generation:
-        #pragma cyclus [def|decl|impl] clone [classname]
-    """
-    regex = re.compile("\s*#\s*pragma\s+cyclus+(\sdef\s|\sdecl\s|\simpl\s|\s)+clone(\s+.*)?")
+class CodeGeneratorFilter(Filter):
+    re_template = ("\s*#\s*pragma\s+cyclus+"
+                   "(\sdef\s|\sdecl\s|\simpl\s|\s)+"
+                   "{0}(\s+.*)?")
+
+    def_template = "{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
+
+    def __init__(self, *args, **kwargs):
+        super(CodeGeneratorFilter, self).__init__(*args, **kwargs)
+        classname = self.methodname.lower()
+        self.regex = re.compile(self.re_template.format(classname))
+        self.local_classname = None
 
     def transform(self, statement, sep):
+        # basic setup
         cg = self.machine
         mode = self.match.group(1)
         if mode is None or mode is ' ':
@@ -496,29 +504,58 @@ class CloneFilter(Filter):
         if classname not in context:
             msg = "{0} not found! Options include: {1}."
             raise KeyError(msg.format(classname, ", ".join(sorted(context.keys()))))
+        self.local_classname = classname
+
+        # compute def line
         ctx = context[classname]
-
-        in_class_decl = len(self.machine.classes) > 0 and self.machine.classes[-1][1] == classname
-
+        in_class_decl = self.in_class_decl() 
         ns = "" if in_class_decl else classname + "::"
         virt = "virtual " if in_class_decl else ""
         end = ";" if mode == "decl" else " {"
-        ind = 2 * (self.machine.depth - len(self.machine.namespaces))
-        definition = " " * ind + "{0}cyc::Model* {1}Clone(){2}\n".format(virt, ns, end)
+        ind = 2 * (cg.depth - len(cg.namespaces))
+        definition = self.def_template.format(ind=" "*ind, virt=virt, 
+                        rtn=self.methodrtn, ns=ns, methodname=self.methodname,
+                        args=self.methodargs, sep=end)
 
+        # compute implementation
+        impl = ""
         ind += 2
-        impl = " " * ind + "{0}* m = new {0}(context());\n".format(classname)
-        impl += " " * ind + "m->InitFrom(this);\n"
-        impl += " " * ind + "return m;\n"
-
+        if mode != "decl":
+            impl = self.impl(ind=ind * " ")
         ind -= 2
+        if not impl.endswith("\n") and 0 != len(impl): 
+            impl += '\n'
         end = "" if mode == "decl" else " " * ind + "};\n"
 
-        rtn = statement + sep + definition
-        if mode != "decl":
-            rtn += impl 
-        rtn += end
-        return rtn
+        # compute return 
+        if mode == 'impl':
+            return impl
+        else:
+            return definition + impl + end
+
+    def in_class_decl(self): 
+        classname = self.local_classname
+        return (len(self.machine.classes) > 0 and 
+                self.machine.classes[-1][1] == classname)
+
+    def revert(self, statement, sep):
+        super(CodeGeneratorFilter, self).revert(statement, sep)
+        self.local_classname = None
+
+class CloneFilter(CodeGeneratorFilter):
+    """Filter for handling Clone() code generation:
+        #pragma cyclus [def|decl|impl] clone [classname]
+    """
+    methodname = "Clone"
+    methodargs = ""
+    methodrtn = "cyclus::Model*"
+
+    def impl(self, ind="  "):
+        classname = self.local_classname
+        impl = ind + "{0}* m = new {0}(context());\n".format(classname)
+        impl += ind + "m->InitFrom(this);\n"
+        impl += ind + "return m;\n"
+        return impl
 
 class InitFromFilter(Filter):
     """Filter for handling InitFrom() code generation:
