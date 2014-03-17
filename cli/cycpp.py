@@ -44,7 +44,7 @@ from __future__ import print_function
 import os
 import re
 import sys
-from collections import Sequence
+from collections import Sequence, MutableMapping
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint
@@ -249,8 +249,20 @@ class VarDecorationFilter(Filter):
         classname = state.classname()
         raw = self.match.group(1)
         glb = dict(state.execns)
-        glb.update(context)
+        #glb.update(context)
+        #print("context:", context.items())
+        for cls, val in context.items():
+            clspaths = cls.split('::')
+            self._make_proxies(glb, clspaths, val)
         state.var_annotations = eval(raw, glb, context.get(classname, {}))
+
+    def _make_proxies(self, glb, path, val):
+        prx = glb
+        for p in path[:-1]:
+            if p not in prx:
+                prx[p] = Proxy({})
+            prx = prx[p]
+        prx[path[-1]] = Proxy(val)
 
 class VarDeclarationFilter(Filter):
     """State varible declaration.  Only oeprates if state.var_annotations is 
@@ -302,11 +314,6 @@ class StateAccumulator(object):
     filters, and builds up or destroys context as it goes.
 
     This class also functions as a typesystem for the types it sees.
-
-    Attributes
-    ----------
-    depth : int
-        The current nesting level.
     """
     
     def __init__(self):
@@ -326,8 +333,10 @@ class StateAccumulator(object):
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):
-        """Returns the current, most-nested class name."""
-        return self.classes[-1][1]
+        """Returns the current, fully-expanded class name."""
+        names = [n for d, n in self.namespaces]
+        names += [n for d, n in self.classes]
+        return "::".join(names)
 
     def accumulate(self, statement, sep):
         """Modify the existing state by incoprorating the statement, which is 
@@ -452,6 +461,52 @@ def accumulate_state(canon):
 #
 # meta
 #
+
+class Proxy(MutableMapping):
+    """A porxy object for scoping purposes."""
+
+    def __init__(self, d):
+        """d is a dict-like object"""
+        self.__dict__['_d'] = d if isinstance(d, MutableMapping) else dict(d)
+
+    #
+    # object interface
+    #
+    def __getattr__(self, key):
+        d = self.__dict__['_d']
+        return d[key] if key in d else self.__dict__[key]
+
+    def __setattr__(self, key, value):
+        self.__dict__['_d'][key] = value
+
+    def __delattr__(self, key):
+        d = self.__dict__['_d']
+        if key in d:
+            del d[key] 
+        else:
+            del self.__dict__[key]
+
+    #
+    # mapping interface
+    #
+    def __getitem__(self, key):
+        return self.__dict__['_d'][key]
+
+    def __setitem__(self, key, value):
+        self.__dict__['_d'][key] = value
+
+    def __delitem__(self, key, value):
+        del self.__dict__['_d'][key]
+
+    def __len__(self):
+        return len(self.__dict__['_d'])
+
+    def __iter__(self):
+        return iter(self.__dict__['_d'])
+
+    def __contains__(self, key):
+        return key in self.__dict__['_d']
+
 
 def outter_split(s, open_brace='(', close_brace=')', separator=','):
     """Takes a string and only split the outter most level."""

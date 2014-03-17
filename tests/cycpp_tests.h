@@ -68,9 +68,25 @@ private:
   double not_var;
 };
 
+class Friend {
+ public:
+  #pragma cyclus var {\
+    "default": mi6.Spy.name['default'], \
+    }
+  std::string enemy;
+};
+
 }; // namespace mi6
 
-using std::string;
+
+class Villan {
+ public:
+  #pragma cyclus var {\
+    "default": mi6.Spy.name['default'],\
+    }
+  std::string enemy;
+};
+
 
 typedef unsigned long ulong;
 typedef int int_t, *intp_t, (&fp)(int, ulong), arr_t[10];
