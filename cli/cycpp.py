@@ -63,6 +63,7 @@ RE_STATEMENT = re.compile(
     # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
     r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE)
 
+
 #
 # pass 1
 #
