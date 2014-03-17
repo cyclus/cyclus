@@ -6,6 +6,7 @@
 #include "facility_model.h"
 #include "suffix.h"
 #include "test_context.h"
+#include "model_tests.h"
 #include "test_modules/test_inst.h"
 
 #if GTEST_HAS_PARAM_TEST
@@ -16,13 +17,12 @@ using ::testing::Values;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete FacilityAgent instance 
-typedef cyclus::FacilityAgent* FacilityAgentConstructor(cyclus::Context* ctx);
+// parameter is a pointer to a concrete Facility instance 
 
-class FacilityAgentTests : public TestWithParam<FacilityAgentConstructor*> {
+class FacilityTests : public TestWithParam<AgentConstructor*> {
  public:
   virtual void SetUp() {    
-    facility_model_ = (*GetParam())(tc_.get());
+    facility_model_ = dynamic_cast<cyclus::Facility*>((*GetParam())(tc_.get()));
     test_inst_ = new TestInst(tc_.get());
     facility_model_->Build(test_inst_);
   }
@@ -30,7 +30,7 @@ class FacilityAgentTests : public TestWithParam<FacilityAgentConstructor*> {
   virtual void TearDown(){}
     
  protected:
-  cyclus::FacilityAgent* facility_model_;
+  cyclus::Facility* facility_model_;
   TestInst* test_inst_;
   cyclus::TestContext tc_;
 };

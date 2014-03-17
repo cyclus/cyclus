@@ -87,11 +87,11 @@ class Agent : public StateWrangler {
   /// Example:
   ///
   /// @code
-  /// class MyAgentClass : virtual public cyclus::FacilityAgent {
+  /// class MyAgentClass : virtual public cyclus::Facility {
   ///   // ...
   ///
   ///   void InfileToDb(QueryEngine* qe, DbInit di) {
-  ///     cyclus::FacilityAgent::InitFrom(qe); // 
+  ///     cyclus::Facility::InitFrom(qe); // 
   ///     // now do MyAgentClass' initialitions, e.g.:
   ///     qe = qe->QueryElement("model/" + model_impl()); // rescope the QueryEngine
   ///
@@ -252,11 +252,11 @@ class Agent : public StateWrangler {
   /// Example:
   ///
   /// @code
-  /// class MyAgentClass : virtual public cyclus::FacilityAgent {
+  /// class MyAgentClass : virtual public cyclus::Facility {
   ///   // ...
   ///
   ///   void InitFrom(MyAgentClass* m) {
-  ///     cyclus::FacilityAgent::InitFrom(m); // call superclass' InitFrom
+  ///     cyclus::Facility::InitFrom(m); // call superclass' InitFrom
   ///     // now do MyAgentClass' initialitions, e.g.:
   ///     my_var_ = m->my_var_;
   ///     // ...

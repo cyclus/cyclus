@@ -47,7 +47,7 @@ void InstAgent::Decommission() {
 void InstAgent::Tock(int time) {
   std::vector<Agent*> to_decomm;
   for (int i = 0; i < children().size(); i++) {
-    FacilityAgent* child = dynamic_cast<FacilityAgent*>(children().at(i));
+    Facility* child = dynamic_cast<Facility*>(children().at(i));
     int lifetime = child->lifetime();
     if (lifetime != -1 && time >= child->enter_time() + lifetime) {
       CLOG(LEV_INFO3) << child->prototype() << " has reached the end of its lifetime";

@@ -17,20 +17,20 @@ class Material;
 class InstAgent;
 
 /**
-   @class FacilityAgent
-   The FacilityAgent class is the abstract class/interface used by all
+   @class Facility
+   The Facility class is the abstract class/interface used by all
    facility models
 
    This is all that is known externally about facilities
 
    @section intro Introduction
 
-   The FacilityAgent type plays a primary role in Cyclus.  A FacilityAgent
+   The Facility type plays a primary role in Cyclus.  A Facility
    facility is where offers and requests are generated and transmitted to a
    ResourceExchange and where shipments of material, issued by the exchange, are
    executed. The algorithms to determine what offers and requests are issued and
    how material shipments are handled are the primary differentiators between
-   different FacilityAgent implementations.
+   different Facility implementations.
 
    Like all model implementations, there are a number of implementations that
    are distributed as part of the core Cyclus application as well as
@@ -68,11 +68,11 @@ class InstAgent;
    Collaborators are encouraged to add to this list and link to external
    pages that describe how to get the models and the detailed behavior
  */
-class FacilityAgent : public TimeListener, public Agent, public Trader {
+class Facility : public TimeListener, public Agent, public Trader {
  public:
-  FacilityAgent(Context* ctx);
+  Facility(Context* ctx);
 
-  virtual ~FacilityAgent();
+  virtual ~Facility();
 
   // DO NOT call Agent class implementation of this method
   virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
@@ -87,11 +87,11 @@ class FacilityAgent : public TimeListener, public Agent, public Trader {
      Copy module members from a source model
 
      Any facility subclassing facility model should invoke their own InitFrom
-     method, calling FacilityAgent's first!
+     method, calling Facility's first!
      
      @param m the model to copy from
    */
-  void InitFrom(FacilityAgent* m);
+  void InitFrom(Facility* m);
 
   /**
      @brief builds the facility in the simulation

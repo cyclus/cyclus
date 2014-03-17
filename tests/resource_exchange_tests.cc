@@ -26,7 +26,7 @@ using cyclus::CommodMap;
 using cyclus::Composition;
 using cyclus::Context;
 using cyclus::ExchangeContext;
-using cyclus::FacilityAgent;
+using cyclus::Facility;
 using cyclus::Material;
 using cyclus::Agent;
 using cyclus::PrefMap;
@@ -152,7 +152,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   req = rp->AddRequest(mat, reqr, commod, pref);
   reqr->port_ = rp;
   
-  FacilityAgent* clone = dynamic_cast<FacilityAgent*>(reqr->Clone());
+  Facility* clone = dynamic_cast<Facility*>(reqr->Clone());
   clone->Build();
   Requester* rcast = dynamic_cast<Requester*>(clone);
   EXPECT_EQ(0, rcast->req_ctr_);
@@ -198,7 +198,7 @@ TEST_F(ResourceExchangeTests, Bids) {
 
   bidr->port_ = bp;
   
-  FacilityAgent* clone = dynamic_cast<FacilityAgent*>(bidr->Clone());
+  Facility* clone = dynamic_cast<Facility*>(bidr->Clone());
   clone->Build();
   Bidder* bcast = dynamic_cast<Bidder*>(clone);
 
@@ -231,8 +231,8 @@ TEST_F(ResourceExchangeTests, Bids) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, PrefCalls) {
-  FacilityAgent* parent = dynamic_cast<FacilityAgent*>(reqr->Clone());
-  FacilityAgent* child = dynamic_cast<FacilityAgent*>(reqr->Clone());
+  Facility* parent = dynamic_cast<Facility*>(reqr->Clone());
+  Facility* child = dynamic_cast<Facility*>(reqr->Clone());
   parent->Build();
   child->Build(parent);
     
@@ -276,8 +276,8 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, PrefValues) {
-  FacilityAgent* parent = dynamic_cast<FacilityAgent*>(reqr->Clone());
-  FacilityAgent* child = dynamic_cast<FacilityAgent*>(reqr->Clone());
+  Facility* parent = dynamic_cast<Facility*>(reqr->Clone());
+  Facility* child = dynamic_cast<Facility*>(reqr->Clone());
   parent->Build();
   child->Build(parent);
     
@@ -303,7 +303,7 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   bids.push_back(cbid);
   bidr->port_ = bp;
   
-  FacilityAgent* bclone = dynamic_cast<FacilityAgent*>(bidr->Clone());
+  Facility* bclone = dynamic_cast<Facility*>(bidr->Clone());
   bclone->Build();
   
   EXPECT_NO_THROW(exchng->AddAllRequests());

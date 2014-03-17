@@ -58,18 +58,13 @@ TEST_F(StubFacilityTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* StubFacilityAgentConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Agent*>(new StubFacility(ctx));
+cyclus::Agent* Constructor(cyclus::Context* ctx) {
+  return new StubFacility(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::FacilityAgent* StubFacilityConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::FacilityAgent*>(new StubFacility(ctx));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(StubFac, FacilityAgentTests,
-                        ::testing::Values(&StubFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(StubFac, FacilityTests,
+                        ::testing::Values(&Constructor));
 
 INSTANTIATE_TEST_CASE_P(StubFac, AgentTests,
-                        ::testing::Values(&StubFacilityAgentConstructor));
+                        ::testing::Values(&Constructor));

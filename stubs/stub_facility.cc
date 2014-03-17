@@ -4,7 +4,7 @@ using stubs::StubFacility;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::StubFacility(cyclus::Context* ctx)
-    : cyclus::FacilityAgent(ctx) {};
+    : cyclus::Facility(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::~StubFacility() {}
@@ -43,13 +43,13 @@ cyclus::Agent* StubFacility::Clone() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubFacility::InitFrom(StubFacility* m) {
-  cyclus::FacilityAgent::InitFrom(m);
+  cyclus::Facility::InitFrom(m);
   // Initialize stubfacility members for a cloned module here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubFacility::str() {
-  return FacilityAgent::str();
+  return Facility::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
