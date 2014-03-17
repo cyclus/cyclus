@@ -1,6 +1,6 @@
-// generic_resource.cc
+// product.cc
 
-#include "generic_resource.h"
+#include "product.h"
 
 #include "error.h"
 #include "logger.h"

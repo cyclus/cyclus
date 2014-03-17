@@ -8,7 +8,7 @@
 #include "bid_portfolio.h"
 #include "context.h"
 #include "exchange_context.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "request_portfolio.h"
 #include "trader.h"

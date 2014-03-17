@@ -9,7 +9,7 @@
 
 #include "cyc_limits.h"
 #include "error.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "resource.h"
 

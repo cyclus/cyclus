@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "generic_resource.h"
+#include "product.h"
 #include "resource_buff.h"
 #include "error.h"
 #include "cyc_limits.h"

@@ -7,7 +7,7 @@
 #include "capacity_constraint.h"
 #include "error.h"
 #include "facility.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "test_modules/test_facility.h"
 #include "request.h"

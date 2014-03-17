@@ -7,7 +7,7 @@
 
 #include "composition.h"
 #include "cyc_limits.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "resource.h"
 #include "test_context.h"

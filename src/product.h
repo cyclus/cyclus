@@ -1,4 +1,4 @@
-// generic_resource.h
+// product.h
 #ifndef GENERICRESOURCE_H_
 #define GENERICRESOURCE_H_
 

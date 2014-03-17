@@ -169,7 +169,7 @@ New features
 - unadded redundant neg comp element check. Added test to check for exception throwing
 - added missing neg quantity check
 - adds comments about composition decay chaining. Remove leftover recipe_lib constructor from debugging
-- fixed gcsg names in decay_handler and renamed class to decayer. fixed filename comments in generic_resource and improved a couple of guards
+- fixed gcsg names in decay_handler and renamed class to decayer. fixed filename comments in product and improved a couple of guards
 - fixes var names and comments to not refer/suggest anything 'vector' ish w.r.t. CompMap code. Change nextId to next_id
 - re-disabled test... need more time to investigate
 - added disabled building manager test
@@ -185,7 +185,7 @@ New features
 - made mat_query a proper implementation file. Removed contains for now and added almostEq to it.
 - polished doc comments for compmath namespace
 - fixed var name mistake in res_tracker
-- polished doc comments on generic_resource, material, res_tracker, and composition classes. Added more complete error check to Product::Absorb
+- polished doc comments on product, material, res_tracker, and composition classes. Added more complete error check to Product::Absorb
 - polished resource class doc comments
 - moved resource table all to res_tracker
 - finished converting compmath tests

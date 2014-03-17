@@ -82,7 +82,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/facility.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/function.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/product.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
@@ -159,7 +159,7 @@ INSTALL(FILES
   exchange_translation_context.h
   facility.h
   function.h
-  generic_resource.h
+  product.h
   greedy_solver.h
   hdf5_back.h
   query_backend.h

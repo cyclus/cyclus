@@ -3,7 +3,7 @@
 
 #include "error.h"
 #include "exchange_context.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "trader.h"
 

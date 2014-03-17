@@ -7,7 +7,7 @@
 
 #include "context.h"
 #include "exchange_manager.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "query_engine.h"
 #include "time_listener.h"

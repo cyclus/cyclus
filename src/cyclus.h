@@ -23,7 +23,7 @@
 #include "error.h"
 #include "facility.h"
 #include "function.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "institution.h"
 #include "logger.h"
 #include "mat_query.h"
