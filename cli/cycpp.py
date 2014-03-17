@@ -169,7 +169,7 @@ class NamespaceFilter(Filter):
         state = self.machine
         name = self.match.group(1)
         if name is not None:
-            name = name.strip()
+            name = name.strip() or None
         state.namespaces.append((state.depth, name))
 
     def revert(self, statement, sep):
