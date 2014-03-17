@@ -98,7 +98,7 @@ def preprocess_file(filename, cpp_path='cpp', cpp_args=('-xc++', '-pipe')):
     return text
 
 #
-# pass 2
+# generic filters
 #
 class Filter(object):
     """A basic, no-op filter."""
@@ -233,6 +233,9 @@ class AccessFilter(Filter):
         access = self.match.group(1)
         self.state.access[tuple(self.state.classes)] = access
 
+#
+# pass 2
+#
 class VarDecorationFilter(Filter):
     """Filter for handling state variable decoration of the form:
 
@@ -358,8 +361,6 @@ class StateAccumulator(object):
         """Modify the existing state by incoprorating the statement, which is 
         partitioned from the next statement by sep.
         """
-        #print((repr(statement), repr(sep)))
-        #print()
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
@@ -455,16 +456,13 @@ class StateAccumulator(object):
 
 def accumulate_state(canon):
     """Takes a canonical C++ source file and separates it out into statements
-    which are fed into a state accumulator.  The state is returned.
+    which are fed into a state accumulator. The state is returned.
     """
     state = StateAccumulator()
-    canon = '\n' + canon if canon.startswith('#') else canon
     for m in RE_STATEMENT.finditer(canon):
         if m is None:
             continue
         prefix, statement, _, sep = m.groups()
-        #print((prefix, statement, _, sep))
-        #print()
         statement = statement if prefix is None else prefix + statement
         statement = statement.strip()
         state.accumulate(statement, sep)
@@ -473,6 +471,63 @@ def accumulate_state(canon):
 #
 # pass 3
 #
+class CodeGenerator(object):
+    """This represents the file as code is being injected into it.  
+    At the end of the traversal this final stage it will built up a brand new
+    file for pass 3. It manages both the code insertion pragmas and other bits 
+    of C++ syntax as needed to determine locality. It works by passing each statement 
+    through a sequence of filters, and injects code based on the directive and the 
+    state.
+    """
+    
+    def __init__(self, state):
+        self.depth = 0
+        self.state = state    # the results of pass 2
+        self.statements = []  # the results of pass 3, waiting to be joined
+        self.classes = []  # stack of (depth, class name) tuples, most nested is last
+        self.access = {}   # map of (classnames, current access control flags)
+        self.namespaces = []  # stack of (depth, ns name) tuples
+        self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self), 
+                        ]
+
+    def classname(self):
+        """Returns the current, fully-expanded class name."""
+        names = [n for d, n in self.namespaces]
+        names += [n for d, n in self.classes]
+        return "::".join(names)
+
+    def generate(self, statement, sep):
+        """Modify the existing statements list by incoprorating, modifying, or 
+        ignoring this statement, which is partitioned from the next statement by sep.
+        """
+        # filters have to come before sep
+        for filter in (() if len(statement) == 0 else self.filters):
+            if filter.isvalid(statement):
+                filter.transform(statement, sep)
+                break
+        # seps must come before revert
+        if sep == '{':
+            self.depth += 1
+        elif sep == '}':
+            self.depth -= 1
+        # revert what is needed
+        for filter in self.filters: 
+            filter.revert(statement, sep)
+
+def generate_code(orig, state):
+    """Takes a canonical C++ source file and separates it out into statements
+    which are fed into a code generator. The new file is returned.
+    """
+    cg = CodeGenerator(state)
+    for m in RE_STATEMENT.finditer(canon):
+        if m is None:
+            continue
+        prefix, statement, _, sep = m.groups()
+        statement = statement if prefix is None else prefix + statement
+        statement = statement.strip()
+        cg.generate(statement, sep)
+    newfile = "".join(cg.statements)
+    return newfile
 
 #
 # meta
@@ -572,15 +627,31 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
                                 close_brace=close_brace, separator=separator))
     return t
 
+ensure_startswith_newlinehash = lambda x: '\n' + x if x.startswith('#') else x
+
 def main():
     parser = ArgumentParser(prog="cycpp", description=__doc__, 
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('path', help="path to source file")
+    parser.add_argument('--pass3-use-pp', action="store_true", default=True,
+                        help=("On pass 3, use the preproccessed version of the "
+                              "original file. This options is mutually exclusive"
+                              "with --pass3-use-orig."), dest="pass3_use_pp")
+    parser.add_argument('--pass3-use-orig', action="store_false", 
+                        help=("On pass 3, use the preproccessed version of the "
+                              "original file. This options is mutually exclusive"
+                              "with --pass3-use-pp."), dest="pass3_use_pp")
     ns = parser.parse_args()
-
+    
     canon = preprocess_file(ns.path)  # pass 1
+    canon = ensure_startswith_newlinehash(canon)
     state = accumulate_state(canon)   # pass 2
-    pprint(state.context)
+    if not ns.pass3_use_pp:
+        with open(ns.path) as f:
+            orig = f.read()
+        orig = ensure_startswith_newlinehash(orig)
+    newfile = generate_code(canon if ns.pass3_use_pp else orig, state)  # pass 3
+    print(newfile)
 
 if __name__ == "__main__":
     main()
