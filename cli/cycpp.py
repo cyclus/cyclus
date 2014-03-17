@@ -476,6 +476,45 @@ def accumulate_state(canon):
 #
 # pass 3
 #
+class CloneFilter(Filter):
+    """Filter for handling Clone() code generation:
+
+        #pragma cyclus [def|decl|impl] clone [classname]
+    """
+    # regexp = re.compile("\s*#\s*pragma\s+cyclus\s+(def\s|decl\s|impl\s|)+clone(\s+.*)?")
+    regex = re.compile("\s*#\s*pragma\s+cyclus\s+clone(\s+.*)?")
+
+    def transform(self, statement, sep):
+        cg = self.machine
+        # mode = self.match.group(1)
+        mode = None
+        if mode is None:
+            mode = "def"
+        mode = mode.strip()
+        # classname = self.match.group(2)
+        classname = self.match.group(1)
+        if classname is None:
+            classname = cg.classname()
+        classname = classname.strip().replace('.', '::')
+        context = cg.context
+        if classname not in context:
+            msg = "{0} not found! Options include: {1}."
+            raise KeyError(msg.format(classname, ", ".join(sorted(context.keys()))))
+        ctx = context[classname]
+
+        header = len(self.machine.classes) > 0 and self.machine.classes[-1][1] == classname
+
+        ns = "" if header else classname + "::"
+        virt = "virtual " if header else ""
+        end = ";" if mode is "decl" else " {"
+        ind = 2 * (self.machine.depth - len(self.machine.namespaces))
+        definition = " " * ind + "{0}cyc::Model* {1}Clone(){2}\n".format(virt, ns, end)
+
+        end = "" if mode is "decl" else " " * ind + "};\n"
+        
+        rtn = statement + sep + definition + end
+        return rtn
+
 class InitFromFilter(Filter):
     """Filter for handling InitFrom() code generation:
 
@@ -524,7 +563,7 @@ class CodeGenerator(object):
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self), 
-                        InitFromFilter(self)]
+                        InitFromFilter(self), CloneFilter(self)]
 
     def classname(self):
         """Returns the current, fully-expanded class name."""

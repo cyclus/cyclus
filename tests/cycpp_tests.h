@@ -90,6 +90,7 @@ class Villan {
   std::string enemy;
 
   #pragma cyclus initfrom
+  #pragma cyclus clone
 
   #pragma cyclus initfrom mi6.Friend
 };
