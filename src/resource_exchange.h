@@ -8,7 +8,7 @@
 #include "bid_portfolio.h"
 #include "context.h"
 #include "exchange_context.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "request_portfolio.h"
 #include "trader.h"
@@ -17,24 +17,24 @@
 namespace cyclus {
 
 /// @brief Preference adjustment method helpers to convert from templates to the
-/// Model inheritance hierarchy
+/// Agent inheritance hierarchy
 template<class T>
-inline static void AdjustPrefs(Model* m, typename PrefMap<T>::type& prefs) {}
-inline static void AdjustPrefs(Model* m,
+inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
+inline static void AdjustPrefs(Agent* m,
                                PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
 }
-inline static void AdjustPrefs(Model* m,
-                               PrefMap<GenericResource>::type& prefs) {
-  m->AdjustGenRsrcPrefs(prefs);
+inline static void AdjustPrefs(Agent* m,
+                               PrefMap<Product>::type& prefs) {
+  m->AdjustProductPrefs(prefs);
 }
 inline static void AdjustPrefs(Trader* t,
                                PrefMap<Material>::type& prefs) {
   t->AdjustMatlPrefs(prefs);
 }
 inline static void AdjustPrefs(Trader* t,
-                               PrefMap<GenericResource>::type& prefs) {
-  t->AdjustGenRsrcPrefs(prefs);
+                               PrefMap<Product>::type& prefs) {
+  t->AdjustProductPrefs(prefs);
 }
 
 /// @class ResourceExchange
@@ -107,7 +107,7 @@ class ResourceExchange {
   }
 
  private:
-  /// @brief queries a given facility model for 
+  /// @brief queries a given facility agent for 
   void AddRequests_(Trader* t) {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
     typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;
@@ -116,7 +116,7 @@ class ResourceExchange {
     }
   };
 
-  /// @brief queries a given facility model for 
+  /// @brief queries a given facility agent for 
   void AddBids_(Trader* t) {
     std::set<typename BidPortfolio<T>::Ptr> bp =
         QueryBids<T>(t, ex_ctx_.commod_requests);
@@ -131,7 +131,7 @@ class ResourceExchange {
   void AdjustPrefs_(Trader* t) {
     typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[t];
     AdjustPrefs(t, prefs);
-    Model* m = t->manager()->parent();
+    Agent* m = t->manager()->parent();
     while (m != NULL) {
       AdjustPrefs(m, prefs);
       m = m->parent();

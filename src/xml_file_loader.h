@@ -9,7 +9,7 @@
 
 #include "composition.h"
 #include "dynamic_module.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "xml_parser.h"
 #include "timer.h"
 #include "recorder.h"
@@ -22,12 +22,12 @@ class Context;
 void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
 
 /// Builds and returns a master cyclus input xml schema that includes the
-/// sub-schemas defined by all installed cyclus modules (e.g. facility models).
+/// sub-schemas defined by all installed cyclus modules (e.g. facility agents).
 /// This is used to validate simulation input files.
 std::string BuildMasterSchema(std::string schema_path);
 
 /// Creates a composition from the recipe in the query engine.
-Composition::Ptr ReadRecipe(QueryEngine* qe);
+Composition::Ptr ReadRecipe(InfileTree* qe);
 
 /// Handles initialization of a database with information from
 /// a cyclus xml input file. 
@@ -40,7 +40,7 @@ class XMLFileLoader {
   /// to and initializing the backends in r. r must already have b registered.
   /// schema_file identifies the master xml rng schema used to validate the
   /// input file.
-  XMLFileLoader(Recorder* r, QueryBackend* b, std::string schema_file,
+  XMLFileLoader(Recorder* r, QueryableBackend* b, std::string schema_file,
                 const std::string input_file = "");
 
   virtual ~XMLFileLoader();
@@ -62,7 +62,7 @@ class XMLFileLoader {
   void LoadRecipes();
 
   /// loads a specific recipe
-  void LoadRecipe(QueryEngine* qe);
+  void LoadRecipe(InfileTree* qe);
 
   /// Creates all initial agent instances from the input file.
   virtual void LoadInitialAgents();
@@ -76,12 +76,12 @@ class XMLFileLoader {
 
   /// Creates and builds an agent, notifying its parent. The agent init info is
   /// translated and stored in the output db.
-  Model* BuildAgent(std::string proto, Model* parent);
+  Agent* BuildAgent(std::string proto, Agent* parent);
 
   Recorder* rec_;
   Timer ti_;
   Context* ctx_;
-  QueryBackend* b_;
+  QueryableBackend* b_;
 
   /// filepath to the schema
   std::string schema_path_;

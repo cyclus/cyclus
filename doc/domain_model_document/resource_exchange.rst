@@ -2,7 +2,7 @@
 Overview
 ========
 
-The purpose of the resource exchange process is to model the
+The purpose of the resource exchange process is to agent the
 consumer-supplier interaction in a supply chain, more specifically the
 nuclear fuel cycle. The process is complicated by the dynamic nature
 of the simulation, i.e. actors can enter or leave the exchange at any
@@ -120,5 +120,5 @@ the timer's :ref:`orders_phase`.
 
 .. [Holmgren] Holmgren, J., P. Davidsson, J. A. Persson, and L. Ramstedt. “An Agent Based Simulator for Production and Transportation of Products.” In The 11th World Conference on Transport Research, Berkeley, USA, 8–12, 2007.
 .. [Julka] Julka, N., R. Srinivasan, and I. Karimi. “Agent-based Supply Chain Management-1: Framework.” Computers & Chemical Engineering 26, no. 12 (2002): 1755–1769.
-.. [Quelhas] Quelhas, A., E. Gil, J. D. McCalley, and S. M. Ryan. “A Multiperiod Generalized Network Flow Model of the US Integrated Energy System: Part I—Model Description.” Power Systems, IEEE Transactions On 22, no. 2 (2007): 829–836.
+.. [Quelhas] Quelhas, A., E. Gil, J. D. McCalley, and S. M. Ryan. “A Multiperiod Generalized Network Flow Agent of the US Integrated Energy System: Part I—Agent Description.” Power Systems, IEEE Transactions On 22, no. 2 (2007): 829–836.
 

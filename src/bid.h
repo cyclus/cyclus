@@ -53,7 +53,7 @@ class Bid {
     return offer_;
   }
 
-  /// @return the model responding the request
+  /// @return the agent responding the request
   inline Trader* bidder() const {
     return bidder_;
   }

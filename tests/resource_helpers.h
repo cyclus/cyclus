@@ -3,7 +3,7 @@
 
 #include "composition.h"
 #include "material.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "test_context.h"
 #include "test_modules/test_facility.h"
 #include "request.h"

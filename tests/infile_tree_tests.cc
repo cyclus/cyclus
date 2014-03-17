@@ -1,12 +1,12 @@
-// query_engine_tests.cc
-#include "query_engine_tests.h"
+// infile_tree_tests.cc
+#include "infile_tree_tests.h"
 
 #include <iostream>
 #include "xml_parser.h"
 #include "error.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string QueryEngineTest::Unknowncontent() {
+std::string InfileTreeTest::Unknowncontent() {
   std::stringstream ss("");
   ss << "    <" << unknown_node_ << ">" << std::endl
      << "      <" << content_node_ << ">" << content_ << "</" << content_node_ << ">" << std::endl
@@ -15,14 +15,14 @@ std::string QueryEngineTest::Unknowncontent() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-std::string QueryEngineTest::Subcontent() {
+std::string InfileTreeTest::Subcontent() {
   std::stringstream ss("");
   ss  << "  <" << content_node_ << ">" << content_ << "</" << content_node_ << ">" << std::endl;
   return ss.str();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void QueryEngineTest::GetContent(std::stringstream &ss) {  
+void InfileTreeTest::GetContent(std::stringstream &ss) {  
   ss << "<" << root_node_ << ">" << std::endl;
   for (int i = 0; i < ncontent_; i++) {
     ss << Subcontent();
@@ -34,7 +34,7 @@ void QueryEngineTest::GetContent(std::stringstream &ss) {
 }
  
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void QueryEngineTest::SetUp() {
+void InfileTreeTest::SetUp() {
   root_node_ = "facility";
   content_node_ = "name";
   content_ = "the_name";
@@ -46,12 +46,12 @@ void QueryEngineTest::SetUp() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void QueryEngineTest::TearDown() {
+void InfileTreeTest::TearDown() {
   delete parser_;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void QueryEngineTest::LoadParser() {
+void InfileTreeTest::LoadParser() {
   std::stringstream ss("");
   GetContent(ss);
   //std::cout << ss.str() << std::endl;
@@ -59,18 +59,18 @@ void QueryEngineTest::LoadParser() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(QueryEngineTest, constructor) {  
+TEST_F(InfileTreeTest, constructor) {  
   LoadParser();
-  EXPECT_NO_THROW(cyclus::QueryEngine engine(*parser_));
+  EXPECT_NO_THROW(cyclus::InfileTree engine(*parser_));
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(QueryEngineTest, top_level_queries) {  
+TEST_F(InfileTreeTest, top_level_queries) {  
   LoadParser();
-  cyclus::QueryEngine engine(*parser_);
+  cyclus::InfileTree engine(*parser_);
   EXPECT_EQ(engine.NElements(),ninner_nodes_);
-  EXPECT_EQ(engine.NElementsMatchingQuery(content_node_),ncontent_);
-  EXPECT_EQ(engine.NElementsMatchingQuery(inner_node_),1);
+  EXPECT_EQ(engine.NMatches(content_node_),ncontent_);
+  EXPECT_EQ(engine.NMatches(inner_node_),1);
   EXPECT_EQ(engine.GetElementName(),content_node_);
   EXPECT_EQ(engine.GetString(content_node_),content_);
   for (int i = 0; i < ncontent_; i++) {
@@ -81,44 +81,44 @@ TEST_F(QueryEngineTest, top_level_queries) {
 } 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(QueryEngineTest, top_level_throws) {  
+TEST_F(InfileTreeTest, top_level_throws) {  
   LoadParser();
-  cyclus::QueryEngine engine(*parser_);
+  cyclus::InfileTree engine(*parser_);
   EXPECT_THROW(engine.GetString(content_node_,ninner_nodes_+1), cyclus::ValueError);
   EXPECT_THROW(engine.GetString(inner_node_), cyclus::ValueError);
   EXPECT_THROW(engine.GetElementName(ninner_nodes_+1), cyclus::ValueError);
-  EXPECT_THROW(engine.QueryElement(content_node_,ninner_nodes_+1), cyclus::ValueError);  
+  EXPECT_THROW(engine.Query(content_node_,ninner_nodes_+1), cyclus::ValueError);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(QueryEngineTest, null_query) {  
+TEST_F(InfileTreeTest, null_query) {  
   LoadParser();
-  cyclus::QueryEngine engine(*parser_);
+  cyclus::InfileTree engine(*parser_);
   std::string query = "something_silly";
-  EXPECT_EQ(engine.NElementsMatchingQuery(query), 0);
+  EXPECT_EQ(engine.NMatches(query), 0);
   EXPECT_THROW(engine.GetString(query), cyclus::KeyError);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(QueryEngineTest, mid_level_queries) {  
+TEST_F(InfileTreeTest, mid_level_queries) {  
   LoadParser();
-  cyclus::QueryEngine engine(*parser_);
-  EXPECT_NO_THROW(cyclus::QueryEngine* qe = engine.QueryElement(inner_node_));
+  cyclus::InfileTree engine(*parser_);
+  EXPECT_NO_THROW(cyclus::InfileTree* qe = engine.Query(inner_node_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(QueryEngineTest, low_level_queries) {  
+TEST_F(InfileTreeTest, low_level_queries) {  
   LoadParser();
-  cyclus::QueryEngine engine(*parser_);
-  cyclus::QueryEngine* qe = engine.QueryElement(inner_node_);
+  cyclus::InfileTree engine(*parser_);
+  cyclus::InfileTree* qe = engine.Query(inner_node_);
   EXPECT_EQ(qe->GetElementName(),unknown_node_);
-  cyclus::QueryEngine* qe2 = qe->QueryElement(unknown_node_);
+  cyclus::InfileTree* qe2 = qe->Query(unknown_node_);
   EXPECT_EQ(qe2->GetString(content_node_),content_);
 }
 
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(QueryEngineTest, optional_queries) {
+TEST_F(InfileTreeTest, optional_queries) {
   using std::string;
   using cyclus::GetOptionalQuery;
   
@@ -141,7 +141,7 @@ TEST_F(QueryEngineTest, optional_queries) {
 
   cyclus::XMLParser parser;
   parser.Init(ss);
-  cyclus::QueryEngine qe(parser);
+  cyclus::InfileTree qe(parser);
 
   EXPECT_DOUBLE_EQ(dbl_val, GetOptionalQuery<double>(&qe, dbl_str, dbl_other));
   EXPECT_DOUBLE_EQ(dbl_other, GetOptionalQuery<double>(&qe, other, dbl_other));

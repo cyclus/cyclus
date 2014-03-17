@@ -1,12 +1,12 @@
-// facility_model.h
-#ifndef CYCLUS_FACILITYMODEL_H_
-#define CYCLUS_FACILITYMODEL_H_
+// facility.h
+#ifndef CYCLUS_FACILITY_H_
+#define CYCLUS_FACILITY_H_
 
 #include <string>
 #include <vector>
 #include <set>
 
-#include "model.h"
+#include "agent.h"
 #include "time_listener.h"
 #include "trader.h"
 
@@ -14,25 +14,25 @@ namespace cyclus {
 
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
-class InstModel;
+class Institution;
 
 /**
-   @class FacilityModel
-   The FacilityModel class is the abstract class/interface used by all
-   facility models
+   @class Facility
+   The Facility class is the abstract class/interface used by all
+   facility agents
 
    This is all that is known externally about facilities
 
    @section intro Introduction
 
-   The FacilityModel type plays a primary role in Cyclus.  A FacilityModel
+   The Facility type plays a primary role in Cyclus.  A Facility
    facility is where offers and requests are generated and transmitted to a
    ResourceExchange and where shipments of material, issued by the exchange, are
    executed. The algorithms to determine what offers and requests are issued and
    how material shipments are handled are the primary differentiators between
-   different FacilityModel implementations.
+   different Facility implementations.
 
-   Like all model implementations, there are a number of implementations that
+   Like all agent implementations, there are a number of implementations that
    are distributed as part of the core Cyclus application as well as
    implementations contributed by third-party developers.  The links below
    describe additional parameters necessary for the complete definition of a
@@ -51,7 +51,7 @@ class InstModel;
    @section anticipated Anticipated Core Implementations
 
    Developers are encouraged to add to this list and create pages that
-   describe the detailed behavior of these models.
+   describe the detailed behavior of these agents.
 
    - RecipeReactor: A facility that consumes a fixed fresh fuel recipe
    one a time scale governed by reactor cycle lengths and batch sizes,
@@ -66,39 +66,39 @@ class InstModel;
    @section thirdparty Third-party Implementations
 
    Collaborators are encouraged to add to this list and link to external
-   pages that describe how to get the models and the detailed behavior
+   pages that describe how to get the agents and the detailed behavior
  */
-class FacilityModel : public TimeListener, public Model, public Trader {
+class Facility : public TimeListener, public Agent, public Trader {
  public:
-  FacilityModel(Context* ctx);
+  Facility(Context* ctx);
 
-  virtual ~FacilityModel();
+  virtual ~Facility();
 
-  // DO NOT call Model class implementation of this method
-  virtual void InfileToDb(QueryEngine* qe, DbInit di) {};
+  // DO NOT call Agent class implementation of this method
+  virtual void InfileToDb(InfileTree* qe, DbInit di) {};
 
-  // DO NOT call Model class implementation of this method
-  virtual void InitFrom(QueryBackend* b) {}
+  // DO NOT call Agent class implementation of this method
+  virtual void InitFrom(QueryableBackend* b) {}
 
-  // DO NOT call Model class implementation of this method
+  // DO NOT call Agent class implementation of this method
   virtual void Snapshot(DbInit di) {}
 
   /**
-     Copy module members from a source model
+     Copy module members from a source agent
 
-     Any facility subclassing facility model should invoke their own InitFrom
-     method, calling FacilityModel's first!
+     Any facility subclassing facility agent should invoke their own InitFrom
+     method, calling Facility's first!
      
-     @param m the model to copy from
+     @param m the agent to copy from
    */
-  void InitFrom(FacilityModel* m);
+  void InitFrom(Facility* m);
 
   /**
      @brief builds the facility in the simulation
 
      @param parent the parent of this facility
    */
-  virtual void Build(Model* parent = NULL);
+  virtual void Build(Agent* parent = NULL);
 
   virtual void DoRegistration();
 
@@ -115,11 +115,11 @@ class FacilityModel : public TimeListener, public Model, public Trader {
   virtual bool CheckDecommissionCondition();
 
   /**
-     every model should be able to print a verbose description
+     every agent should be able to print a verbose description
    */
   virtual std::string str();
 };
 
 } // namespace cyclus
 
-#endif // ifndef CYCLUS_FACILITYMODEL_H_
+#endif // ifndef CYCLUS_FACILITY_H_

@@ -5,7 +5,7 @@
 #include <string>
 
 #include "context.h"
-#include "model.h"
+#include "agent.h"
 
 namespace cyclus {
 
@@ -15,8 +15,8 @@ namespace cyclus {
 ///
 /// @begincode
 ///
-/// MyFacilityModel::Build(cyclus::Model* parent) {
-///   cyclus::FacilityModel::Build(parent);
+/// MyFacility::Build(cyclus::Agent* parent) {
+///   cyclus::Facility::Build(parent);
 ///   context()->RegisterTimeListener(this);
 /// }
 /// 

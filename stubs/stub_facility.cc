@@ -4,15 +4,15 @@ using stubs::StubFacility;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::StubFacility(cyclus::Context* ctx)
-    : cyclus::FacilityModel(ctx) {};
+    : cyclus::Facility(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::~StubFacility() {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
-  Model::InfileToDb(qe, di);
-  qe = qe->QueryElement(model_impl());
+void StubFacility::InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {
+  Agent::InfileToDb(qe, di);
+  qe = qe->Query(agent_impl());
   // retrieve input data members here. For example:
   //
   //   int cycle_len = lexical_cast<int>(input->getElementContent("cycle_length"));
@@ -35,7 +35,7 @@ cyclus::Inventories StubFacility::SnapshotInv() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubFacility::Clone() {
+cyclus::Agent* StubFacility::Clone() {
   StubFacility* m = new StubFacility(context());
   m->InitFrom(this);
   return m;
@@ -43,13 +43,13 @@ cyclus::Model* StubFacility::Clone() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StubFacility::InitFrom(StubFacility* m) {
-  cyclus::FacilityModel::InitFrom(m);
+  cyclus::Facility::InitFrom(m);
   // Initialize stubfacility members for a cloned module here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubFacility::str() {
-  return FacilityModel::str();
+  return Facility::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,6 +59,6 @@ void StubFacility::Tick(int time) {}
 void StubFacility::Tock(int time) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructStubFacility(cyclus::Context* ctx) {
+extern "C" cyclus::Agent* ConstructStubFacility(cyclus::Context* ctx) {
   return new StubFacility(ctx);
 }

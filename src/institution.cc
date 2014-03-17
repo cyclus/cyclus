@@ -1,53 +1,53 @@
-/// Instmodel.cc
-// Implements the InstModel class
+/// institution.cc
+// Implements the Institution class
 
 #include <iostream>
 #include <sstream>
 #include <string>
 
-#include "inst_model.h"
+#include "institution.h"
 
 #include "logger.h"
 #include "timer.h"
 #include "error.h"
-#include "facility_model.h"
-#include "query_engine.h"
+#include "facility.h"
+#include "infile_tree.h"
 
 namespace cyclus {
 
-InstModel::InstModel(Context* ctx) : Model(ctx) {
+Institution::Institution(Context* ctx) : Agent(ctx) {
   kind_ = "Inst";
 }
 
-void InstModel::InitFrom(InstModel* m) {
-  Model::InitFrom(m);
+void Institution::InitFrom(Institution* m) {
+  Agent::InitFrom(m);
 }
 
-std::string InstModel::str() {
+std::string Institution::str() {
   if (parent() != NULL) {
-    return Model::str() + " in region" + parent()->prototype();
+    return Agent::str() + " in region" + parent()->prototype();
   } else {
-    return Model::str() + " with no region.";
+    return Agent::str() + " with no region.";
   }
 }
 
-void InstModel::Build(Model* parent) {
-  Model::Build(parent);
+void Institution::Build(Agent* parent) {
+  Agent::Build(parent);
 }
 
-void InstModel::DoRegistration() {
+void Institution::DoRegistration() {
   context()->RegisterTimeListener(this);
 }
 
-void InstModel::Decommission() {
+void Institution::Decommission() {
   context()->UnregisterTimeListener(this);
-  Model::Decommission();
+  Agent::Decommission();
 }
 
-void InstModel::Tock(int time) {
-  std::vector<Model*> to_decomm;
+void Institution::Tock(int time) {
+  std::vector<Agent*> to_decomm;
   for (int i = 0; i < children().size(); i++) {
-    FacilityModel* child = dynamic_cast<FacilityModel*>(children().at(i));
+    Facility* child = dynamic_cast<Facility*>(children().at(i));
     int lifetime = child->lifetime();
     if (lifetime != -1 && time >= child->enter_time() + lifetime) {
       CLOG(LEV_INFO3) << child->prototype() << " has reached the end of its lifetime";
@@ -58,7 +58,7 @@ void InstModel::Tock(int time) {
   }
 
   while (!to_decomm.empty()) {
-    Model* child = to_decomm.back();
+    Agent* child = to_decomm.back();
     to_decomm.pop_back();
     context()->SchedDecom(child);
   }

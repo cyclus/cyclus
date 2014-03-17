@@ -6,7 +6,7 @@
 #include "bid_portfolio.h"
 #include "composition.h"
 #include "exchange_context.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "request_portfolio.h"
 #include "trade.h"
@@ -23,9 +23,9 @@ namespace cyclus {
 /// corresponding exchanges.
 class Trader {
  public:
-  Trader(Model* manager) : manager_(manager) {}
+  Trader(Agent* manager) : manager_(manager) {}
 
-  virtual Model* manager() {
+  virtual Agent* manager() {
     return manager_;
   }
 
@@ -35,10 +35,10 @@ class Trader {
     return std::set<RequestPortfolio<Material>::Ptr>();
   }
 
-  /// @brief default implementation for generic resource requests
-  virtual std::set<RequestPortfolio<GenericResource>::Ptr>
-      GetGenRsrcRequests() {
-    return std::set<RequestPortfolio<GenericResource>::Ptr>();
+  /// @brief default implementation for product requests
+  virtual std::set<RequestPortfolio<Product>::Ptr>
+      GetProductRequests() {
+    return std::set<RequestPortfolio<Product>::Ptr>();
   }
 
   /// @brief default implementation for material requests
@@ -47,18 +47,18 @@ class Trader {
     return std::set<BidPortfolio<Material>::Ptr>();
   }
 
-  /// @brief default implementation for generic resource requests
-  virtual std::set<BidPortfolio<GenericResource>::Ptr>
-      GetGenRsrcBids(const CommodMap<GenericResource>::type&
+  /// @brief default implementation for product requests
+  virtual std::set<BidPortfolio<Product>::Ptr>
+      GetProductBids(const CommodMap<Product>::type&
                      commod_requests) {
-    return std::set<BidPortfolio<GenericResource>::Ptr>();
+    return std::set<BidPortfolio<Product>::Ptr>();
   }
 
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
 
   /// default implementation for material preferences.
-  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) {}
+  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
 
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
@@ -67,26 +67,26 @@ class Trader {
       const std::vector< Trade<Material> >& trades,
       std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {}
 
-  /// @brief default implementation for responding to generic resource trades
+  /// @brief default implementation for responding to product trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
-  virtual void GetGenRsrcTrades(
-      const std::vector< Trade<GenericResource> >& trades,
-      std::vector<std::pair<Trade<GenericResource>,
-      GenericResource::Ptr> >& responses) {}
+  virtual void GetProductTrades(
+      const std::vector< Trade<Product> >& trades,
+      std::vector<std::pair<Trade<Product>,
+      Product::Ptr> >& responses) {}
 
   /// @brief default implementation for material trade acceptance
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>,
       Material::Ptr> >& responses) {}
 
-  /// @brief default implementation for generic resource trade acceptance
-  virtual void AcceptGenRsrcTrades(
-      const std::vector<std::pair<Trade<GenericResource>,
-      GenericResource::Ptr> >& responses) {}
+  /// @brief default implementation for product trade acceptance
+  virtual void AcceptProductTrades(
+      const std::vector<std::pair<Trade<Product>,
+      Product::Ptr> >& responses) {}
 
  private:
-  Model* manager_;
+  Agent* manager_;
 };
 
 }  // namespace cyclus

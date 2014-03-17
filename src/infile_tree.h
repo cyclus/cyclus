@@ -1,4 +1,4 @@
-//query_engine.h
+//infile_tree.h
 #ifndef CYCLUS_SRC_QUERY_ENGINE_H_
 #define CYCLUS_SRC_QUERY_ENGINE_H_
 
@@ -13,16 +13,16 @@
 
 namespace cyclus {
 
-/// @class QueryEngine
+/// @class InfileTree
 ///
 /// A class for extracting information from a given XML parser
-class QueryEngine {
+class InfileTree {
  public:
   /// constructor given a parser
   /// @param parser the xml parser
-  QueryEngine(XMLParser& parser);
+  InfileTree(XMLParser& parser);
 
-  virtual ~QueryEngine();
+  virtual ~InfileTree();
 
   /// @return the number of elements in the current query state
   virtual int NElements();
@@ -36,7 +36,7 @@ class QueryEngine {
   /// matching a query
   /// @param query the query
   /// @return the number of elements matching the query
-  virtual int NElementsMatchingQuery(std::string query);
+  virtual int NMatches(std::string query);
 
   /// Same as GetString with auto-conversion to int.
   virtual int GetInt(std::string query, int index = 0);
@@ -54,26 +54,26 @@ class QueryEngine {
   /// @param query the query
   /// @param index the index of the queried element
   /// @return a initialized query engine based on the query and index
-  QueryEngine* QueryElement(std::string query, int index = 0);
+  InfileTree* Query(std::string query, int index = 0);
 
  protected:
   /// constructor given a node
   /// @param node the node to set as the current node
-  QueryEngine(xmlpp::Node* node);
+  InfileTree(xmlpp::Node* node);
 
   /// every derived query engine must return a new instance initialized
   /// by a query.
   /// @param query the query
   /// @param index the index of the queried element
   /// @return a query engine initialized via the snippet
-  virtual QueryEngine* GetEngineFromQuery(std::string query, int index);
+  virtual InfileTree* GetEngineFromQuery(std::string query, int index);
 
   /// sets the current node to a given node
   /// @param node the new current node
   void SetCurrentNode(xmlpp::Node* node);
 
  private:
-  std::set<QueryEngine*> spawned_children_;
+  std::set<InfileTree*> spawned_children_;
   xmlpp::Node* current_node_;
 };
 
@@ -83,11 +83,11 @@ class QueryEngine {
 /// @param default_val the default value to use
 /// @return either return the optional value if it exists or return the default
 /// value
-template <class T> inline T GetOptionalQuery(QueryEngine* qe,
+template <class T> inline T GetOptionalQuery(InfileTree* qe,
                                             std::string query,
                                             T default_val) {
   T val;
-  qe->NElementsMatchingQuery(query) == 1 ?
+  qe->NMatches(query) == 1 ?
       val = boost::lexical_cast<T>(qe->GetString(query).c_str()) :
       val = default_val;
   return val;

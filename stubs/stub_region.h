@@ -10,29 +10,29 @@ namespace stubs {
 /**
   @class StubRegion
 
-  This RegionModel is intended
-  as a skeleton to guide the implementation of new RegionModel models.
+  This Region is intended
+  as a skeleton to guide the implementation of new Region agents.
 
-  The StubRegion class inherits from the RegionModel class and is
-  dynamically loaded by the Model class when requested.
+  The StubRegion class inherits from the Region class and is
+  dynamically loaded by the Agent class when requested.
 
   @section intro Introduction
-  Place an introduction to the model here.
+  Place an introduction to the agent here.
 
-  @section modelparams Model Parameters
+  @section agentparams Agent Parameters
   Place a description of the required input parameters which define the
-  model implementation.
+  agent implementation.
 
   @section optionalparams Optional Parameters
   Place a description of the optional input parameters to define the
-  model implementation.
+  agent implementation.
 
   @section detailed Detailed Behavior
-  Place a description of the detailed behavior of the model. Consider
+  Place a description of the detailed behavior of the agent. Consider
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
-class StubRegion : public cyclus::RegionModel {
+class StubRegion : public cyclus::Region {
   /* --------------------
    * all REGIONMODEL classes have these members
    * --------------------
@@ -45,14 +45,14 @@ class StubRegion : public cyclus::RegionModel {
   explicit StubRegion(cyclus::Context* ctx);
 
   /**
-    every model should be destructable
+    every agent should be destructable
     */
   virtual ~StubRegion();
 
   /**
     Initialize db with input file info related to derived module class
     */
-  virtual void InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di);
+  virtual void InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di);
 
   /**
     Initialize members for a cloned module.
@@ -67,7 +67,7 @@ class StubRegion : public cyclus::RegionModel {
   /**
     Initializes a StubRegion object by copying the members of another.
     */
-  virtual cyclus::Model* Clone();
+  virtual cyclus::Agent* Clone();
 
   /* -------------------- */
 

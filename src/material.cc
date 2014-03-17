@@ -17,7 +17,7 @@ Material::~Material() {
   all_mats_.erase(this);
 }
 
-Material::Ptr Material::Create(Model* creator, double quantity,
+Material::Ptr Material::Create(Agent* creator, double quantity,
                                Composition::Ptr c) {
   Material::Ptr m(new Material(creator->context(), quantity, c));
   all_mats_[m.get()] = true;

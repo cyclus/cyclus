@@ -22,28 +22,28 @@ Context::~Context() {
     delete solver_;
   }
 
-  // initiate deletion of models that don't have parents.
-  // dealloc will propagate through hierarchy as models delete their children
-  std::vector<Model*> to_del;
-  std::set<Model*>::iterator it;
-  for (it = model_list_.begin(); it != model_list_.end(); ++it) {
+  // initiate deletion of agents that don't have parents.
+  // dealloc will propagate through hierarchy as agents delete their children
+  std::vector<Agent*> to_del;
+  std::set<Agent*>::iterator it;
+  for (it = agent_list_.begin(); it != agent_list_.end(); ++it) {
     if ((*it)->parent() == NULL) {
       to_del.push_back(*it);
     }
   }
   for (int i = 0; i < to_del.size(); ++i) {
-    DelModel(to_del[i]);
+    DelAgent(to_del[i]);
   }
 }
 
-void Context::DelModel(Model* m) {
-  int n = model_list_.erase(m);
+void Context::DelAgent(Agent* m) {
+  int n = agent_list_.erase(m);
   if (n == 1) {
     delete m;
   }
 }
 
-void Context::SchedBuild(Model* parent, std::string proto_name, int t) {
+void Context::SchedBuild(Agent* parent, std::string proto_name, int t) {
   if (t == -1) {
     t = time() + 1;
   }
@@ -56,7 +56,7 @@ void Context::SchedBuild(Model* parent, std::string proto_name, int t) {
     ->Record();
 }
 
-void Context::SchedDecom(Model* m, int t) {
+void Context::SchedDecom(Agent* m, int t) {
   if (t == -1) {
     t = time();
   }
@@ -72,12 +72,12 @@ boost::uuids::uuid Context::sim_id() {
   return rec_->sim_id();
 }
 
-void Context::AddPrototype(std::string name, Model* p) {
+void Context::AddPrototype(std::string name, Agent* p) {
   protos_[name] = p;
   NewDatum("Prototypes")
     ->AddVal("Prototype", name)
     ->AddVal("AgentId", p->id())
-    ->AddVal("Implementation", p->model_impl())
+    ->AddVal("Implementation", p->agent_impl())
     ->Record();
 }
 

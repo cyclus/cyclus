@@ -16,8 +16,8 @@ of the cyclus ecosystem!  This includes over 415 commits by
 - Continuous integration for all pull requests now occurs via BaTLab though 
   polyphemus.
 
-- Cleaned up API for model instantiation and deallocation.  Users no longer should
-  worry about memory management of their models.
+- Cleaned up API for agent instantiation and deallocation.  Users no longer should
+  worry about memory management of their agents.
 
 - Added regression tests to the test suite.
 
@@ -32,20 +32,20 @@ Changes from 0.3 to 0.4
 New features
 ------------
 
-- added more detail about context model ownership and stack models are bad. (7682c6c)
+- added more detail about context agent ownership and stack agents are bad. (7682c6c)
 - changed clone methods to use context-arg constructor (eaede68)
 - changed xml Init[Core/Module]Member fan methods to be InitFrom chain. 
-  Gave model class a default val for model_impl_ to facilitate testing of xml init 
+  Gave agent class a default val for agent_impl_ to facilitate testing of xml init 
   methods. (3efb2b6)
 - renamed InitCoreMembers to InitFrom (f6e0add)
-- fixed deploy self as parent bug in xmlfileloader. Model class removes 'this' from 
-  context model_list_ in destructor to prevent some segfaults when models are 
+- fixed deploy self as parent bug in xmlfileloader. Agent class removes 'this' from 
+  context agent_list_ in destructor to prevent some segfaults when agents are 
   allocated on the stack causing a double delete (one by runtime and one by context). 
-  Put guard on context::DelModel to only delete if the model is in the model_list_ 
+  Put guard on context::DelAgent to only delete if the agent is in the agent_list_ 
   (53ec514)
-- made context model management more universal. Made model_list_ a std::set. 
-  added doc comment about context model management. minor tweaks (45efa47)
-- removed model_list getters from context class. model list is now entirely 
+- made context agent management more universal. Made agent_list_ a std::set. 
+  added doc comment about context agent management. minor tweaks (45efa47)
+- removed agent_list getters from context class. agent list is now entirely 
   context-private (4b18f0d)
 - updated exclusivity adjustment. this bug wasn't evident (or testable) because 
   capacity-constraints will cause tomatch < remain which then will by definition 

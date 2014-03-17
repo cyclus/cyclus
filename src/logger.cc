@@ -8,7 +8,7 @@ namespace cyclus {
 std::vector<std::string> Logger::level_to_string;
 std::map<std::string, LogLevel> Logger::string_to_level;
 LogLevel Logger::report_level = (Logger::Initialize(), LEV_ERROR);
-bool Logger::no_model = false;
+bool Logger::no_agent = false;
 bool Logger::no_mem = false;
 
 int Logger::spc_per_lev_ = 2;

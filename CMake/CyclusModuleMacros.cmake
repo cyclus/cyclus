@@ -15,7 +15,7 @@ macro(cyclus_init  _path _dir _name)
     )
 endmacro()
   
-macro(cyclus_init_model _dir _name)
+macro(cyclus_init_agent _dir _name)
   SET(MODEL_PATH "/cyclus/${_dir}")
   cyclus_init(${MODEL_PATH} ${_dir} ${_name})
 

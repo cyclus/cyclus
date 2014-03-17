@@ -78,10 +78,10 @@ class Material: public Resource {
   virtual ~Material();
 
   /// Creates a new material resource that is "live" and tracked. creator is a
-  /// pointer to the model creating the resource (usually will be the caller's
+  /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Model* creator, double quantity, Composition::Ptr c);
+  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c);
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.

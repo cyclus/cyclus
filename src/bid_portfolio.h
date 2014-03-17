@@ -60,7 +60,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
     constraints_.insert(c);
   }
 
-  /// @return the model associated with the portfolio. If no bids have
+  /// @return the agent associated with the portfolio. If no bids have
   /// been added, the bidder is NULL.
   inline Trader* bidder() const {
     return bidder_;

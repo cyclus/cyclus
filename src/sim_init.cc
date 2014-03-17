@@ -3,13 +3,13 @@
 
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
-#include "region_model.h"
+#include "region.h"
 
 namespace cyclus {
 
-class Dummy : public RegionModel {
+class Dummy : public Region {
  public:
-  Dummy(Context* ctx) : RegionModel(ctx) {};
+  Dummy(Context* ctx) : Region(ctx) {};
   Dummy* Clone() { return NULL; };
 };
 
@@ -24,24 +24,24 @@ SimInit::~SimInit() {
   }
 }
 
-void SimInit::Init(Recorder* r, QueryBackend* b) {
+void SimInit::Init(Recorder* r, QueryableBackend* b) {
   rec_ = new Recorder(); // use dummy recorder to avoid re-recording
   InitBase(b, r->sim_id(), 0);
   ctx_->rec_ = r; // switch back before running sim
 }
 
-void SimInit::Restart(QueryBackend* b, boost::uuids::uuid sim_id, int t) {
+void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
   rec_ = new Recorder();
   InitBase(b, sim_id, t);
 }
 
-void SimInit::Branch(QueryBackend* b, boost::uuids::uuid prev_sim_id,
+void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
                            int t,
                            boost::uuids::uuid new_sim_id) {
   throw Error("simulation branching feature not implemented");
 }
 
-void SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
+void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   rec_->set_dump_count(10000); // this recorder is "real" and gets bigger buf
   ctx_ = new Context(&ti_, rec_);
 
@@ -69,10 +69,10 @@ void SimInit::InitBase(QueryBackend* b, boost::uuids::uuid simid, int t) {
 
 void SimInit::Snapshot(Context* ctx) {
   // snapshot all agent internal state
-  std::set<Model*> mlist = ctx->model_list_;
-  std::set<Model*>::iterator it;
+  std::set<Agent*> mlist = ctx->agent_list_;
+  std::set<Agent*>::iterator it;
   for (it = mlist.begin(); it != mlist.end(); ++it) {
-    Model* m = *it;
+    Agent* m = *it;
     if (m->enter_time() != -1) {
       SimInit::SnapAgent(m);
     }
@@ -82,7 +82,7 @@ void SimInit::Snapshot(Context* ctx) {
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
   ->AddVal("Object", std::string("Agent"))
-  ->AddVal("NextId", Model::next_id_)
+  ->AddVal("NextId", Agent::next_id_)
   ->Record();
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
@@ -101,15 +101,15 @@ void SimInit::Snapshot(Context* ctx) {
   ->Record();
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("GenericResource"))
-  ->AddVal("NextId", GenericResource::next_state_)
+  ->AddVal("Object", std::string("Product"))
+  ->AddVal("NextId", Product::next_state_)
   ->Record();
 };
 
-void SimInit::SnapAgent(Model* m) {
-  // call manually without agent impl injected to keep all Model state in a
+void SimInit::SnapAgent(Agent* m) {
+  // call manually without agent impl injected to keep all Agent state in a
   // single, consolidated db table
-  m->Model::Snapshot(DbInit(m, true));
+  m->Agent::Snapshot(DbInit(m, true));
 
   m->Snapshot(DbInit(m));
   Inventories invs = m->SnapshotInv();
@@ -189,8 +189,8 @@ void SimInit::LoadPrototypes() {
     int agentid = qr.GetVal<int>("AgentId", i);
     std::string impl = qr.GetVal<std::string>("Implementation", i);
 
-    Model* m = DynamicModule::Make(ctx_, impl);
-    m->set_model_impl(impl);
+    Agent* m = DynamicModule::Make(ctx_, impl);
+    m->set_agent_impl(impl);
 
     std::vector<Cond> conds;
     conds.push_back(Cond("SimTime", "==", t_));
@@ -199,7 +199,7 @@ void SimInit::LoadPrototypes() {
     PrefixInjector pi(&ci, "AgentState");
 
     // call manually without agent impl injected
-    m->Model::InitFrom(&pi);
+    m->Agent::InitFrom(&pi);
 
     pi = PrefixInjector(&ci, "AgentState" + impl);
     m->InitFrom(&pi);
@@ -218,7 +218,7 @@ void SimInit::LoadInitialAgents() {
   conds.push_back(Cond("EnterTime", "<=", t_));
   QueryResult qentry = b_->Query("AgentEntry", &conds);
   std::map<int, int> parentmap; // map<agentid, parentid>
-  std::map<int, Model*> unbuilt; // map<agentid, agent_ptr>
+  std::map<int, Agent*> unbuilt; // map<agentid, agent_ptr>
   for (int i = 0; i < qentry.rows.size(); ++i) {
 
     int id = qentry.GetVal<int>("AgentId", i);
@@ -231,11 +231,11 @@ void SimInit::LoadInitialAgents() {
     // if the agent wasn't decommissioned before t_ create and init it
     if (qexit.rows.size() == 0) {
       std::string proto = qentry.GetVal<std::string>("Prototype", i);
-      Model* m = ctx_->CreateModel<Model>(proto);
+      Agent* m = ctx_->CreateAgent<Agent>(proto);
 
       // agent-kernel init
       m->id_ = id;
-      m->set_model_impl(qentry.GetVal<std::string>("Implementation", i));
+      m->set_agent_impl(qentry.GetVal<std::string>("Implementation", i));
       m->enter_time_ = qentry.GetVal<int>("EnterTime", i);
       unbuilt[id] = m;
       parentmap[id] = qentry.GetVal<int>("ParentId", i);
@@ -244,17 +244,17 @@ void SimInit::LoadInitialAgents() {
       conds.push_back(Cond("SimTime", "==", t_));
       CondInjector ci(b_, conds);
       PrefixInjector pi(&ci, "AgentState");
-      m->Model::InitFrom(&pi);
-      pi = PrefixInjector(&ci, "AgentState" + m->model_impl());
+      m->Agent::InitFrom(&pi);
+      pi = PrefixInjector(&ci, "AgentState" + m->agent_impl());
       m->InitFrom(&pi);
     }
   }
 
   // construct agent hierarchy starting at roots (no parent) down
-  std::map<int, Model*>::iterator it = unbuilt.begin();
+  std::map<int, Agent*>::iterator it = unbuilt.begin();
   while (unbuilt.size() > 0) {
     int id = it->first;
-    Model* m = it->second;
+    Agent* m = it->second;
     int parentid = parentmap[id];
 
     if (parentid == -1) { // root agent
@@ -279,9 +279,9 @@ void SimInit::LoadInitialAgents() {
 }
 
 void SimInit::LoadInventories() {
-  std::map<int, Model*>::iterator it;
+  std::map<int, Agent*>::iterator it;
   for (it = agents_.begin(); it != agents_.end(); ++it) {
-    Model* m = it->second;
+    Agent* m = it->second;
     std::vector<Cond> conds;
     conds.push_back(Cond("SimTime", "==", t_));
     conds.push_back(Cond("AgentId", "==", m->id()));
@@ -338,15 +338,15 @@ void SimInit::LoadNextIds() {
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string obj = qr.GetVal<std::string>("Object");
     if (obj == "Agent") {
-      Model::next_id_ = qr.GetVal<int>("NextId", i);
+      Agent::next_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Transaction") {
       ctx_->trans_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Composition") {
       Composition::next_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Resource") {
       Resource::nextid_ = qr.GetVal<int>("NextId", i);
-    } else if (obj == "GenericResource") {
-      GenericResource::next_state_ = qr.GetVal<int>("NextId", i);
+    } else if (obj == "Product") {
+      Product::next_state_ = qr.GetVal<int>("NextId", i);
     } else {
       throw IOError("Unexpected value in NextIds table: " + obj);
     }
@@ -361,8 +361,8 @@ Resource::Ptr SimInit::LoadResource(int resid) {
 
   if (type == Material::kType) {
     return LoadMaterial(resid);
-  } else if (type == GenericResource::kType) {
-    return LoadGenericResource(resid);
+  } else if (type == Product::kType) {
+    return LoadProduct(resid);
   }
   throw IOError("Invalid resource type in output database: " + type);
 }
@@ -384,7 +384,7 @@ Resource::Ptr SimInit::LoadMaterial(int resid) {
 
   // create the composition and material
   Composition::Ptr comp = LoadComposition(stateid);
-  Model* dummy = new Dummy(ctx_);
+  Agent* dummy = new Dummy(ctx_);
   Material::Ptr mat = Material::Create(dummy, qty, comp);
   mat->id_ = resid;
   mat->prev_decay_time_ = prev_decay;
@@ -405,7 +405,7 @@ Composition::Ptr SimInit::LoadComposition(int stateid) {
   return Composition::CreateFromMass(cm);
 }
 
-Resource::Ptr SimInit::LoadGenericResource(int resid) {
+Resource::Ptr SimInit::LoadProduct(int resid) {
   // get general resource object info
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", resid));
@@ -413,17 +413,17 @@ Resource::Ptr SimInit::LoadGenericResource(int resid) {
   double qty = qr.GetVal<double>("Quantity");
   int stateid = qr.GetVal<int>("StateId");
 
-  // get special GenericResource internal state
+  // get special Product internal state
   conds.clear();
   conds.push_back(Cond("StateId", "==", stateid));
-  qr = b_->Query("GenericResources", &conds);
+  qr = b_->Query("Products", &conds);
   std::string quality = qr.GetVal<std::string>("Quality");
 
   // set static quality-stateid map to have same vals as db
-  GenericResource::stateids_[quality] = stateid;
+  Product::stateids_[quality] = stateid;
 
-  Model* dummy = new Dummy(ctx_);
-  return GenericResource::Create(dummy, qty, quality);
+  Agent* dummy = new Dummy(ctx_);
+  return Product::Create(dummy, qty, quality);
 }
 
 } // namespace cyclus

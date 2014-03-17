@@ -9,13 +9,13 @@
 #include "env.h"
 #include "error.h"
 #include "recorder.h"
-#include "model.h"
+#include "agent.h"
 #include "timer.h"
 #include "dynamic_module.h"
 
 namespace fs = boost::filesystem;
 using cyclus::DynamicModule;
-using cyclus::Model;
+using cyclus::Agent;
 
 TEST(DynamicLoadingTests, ConstructTestFacility) {
   cyclus::Recorder rec;
@@ -37,8 +37,8 @@ TEST(DynamicLoadingTests, CloneTestFacility) {
   cyclus::Timer ti;
   cyclus::Context* ctx = new cyclus::Context(&ti, &rec);
   EXPECT_NO_THROW(
-                  Model* fac = DynamicModule::Make(ctx, "TestFacility");
-                  Model* clone = fac->Clone();
+                  Agent* fac = DynamicModule::Make(ctx, "TestFacility");
+                  Agent* clone = fac->Clone();
                   );
   DynamicModule::CloseAll();
 }

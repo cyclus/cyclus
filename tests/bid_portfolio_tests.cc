@@ -6,7 +6,7 @@
 
 #include "capacity_constraint.h"
 #include "error.h"
-#include "facility_model.h"
+#include "facility.h"
 #include "test_modules/test_facility.h"
 #include "request.h"
 #include "material.h"
