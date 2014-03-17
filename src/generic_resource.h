@@ -14,12 +14,12 @@ namespace cyclus {
 /// and is a catch-all for non-standard resources.  It implements the Resource
 /// class interface in a simple way usable for things such as: bananas,
 /// man-hours, water, buying power, etc.
-class GenericResource : public Resource {
+class Product : public Resource {
   friend class SimInit;
 
  public:
   typedef
-  boost::shared_ptr<GenericResource> Ptr;
+  boost::shared_ptr<Product> Ptr;
   static const ResourceType kType;
 
   /// Creates a new generic resource that is "live" and tracked. creator is a
@@ -38,7 +38,7 @@ class GenericResource : public Resource {
     return 0;
   };
 
-  /// Returns GenericResource::kType.
+  /// Returns Product::kType.
   virtual const ResourceType type() const {
     return kType;
   };
@@ -64,17 +64,17 @@ class GenericResource : public Resource {
   /// new generic resource object with the same quality/type.
   ///
   /// @throws ValueError tried to extract more than exists.
-  GenericResource::Ptr Extract(double quantity);
+  Product::Ptr Extract(double quantity);
 
   /// Absorbs the contents of the given 'other' resource into this resource.
   /// @throws ValueError 'other' resource is of different quality
-  void Absorb(GenericResource::Ptr other);
+  void Absorb(Product::Ptr other);
 
  private:
   /// @param ctx the simulation context
   /// @param quantity is a double indicating the quantity
   /// @param quality the resource quality
-  GenericResource(Context* ctx, double quantity, std::string quality);
+  Product(Context* ctx, double quantity, std::string quality);
 
   // map<quality, quality_id>
   static std::map<std::string, int> stateids_;

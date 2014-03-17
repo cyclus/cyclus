@@ -23,8 +23,8 @@ inline std::set<RequestPortfolio<Material>::Ptr>
 }
 
 template<>
-inline std::set<RequestPortfolio<GenericResource>::Ptr>
-    QueryRequests<GenericResource>(Trader* t) {
+inline std::set<RequestPortfolio<Product>::Ptr>
+    QueryRequests<Product>(Trader* t) {
   return t->GetGenRsrcRequests();
 }
 
@@ -41,9 +41,9 @@ inline std::set<BidPortfolio<Material>::Ptr>
 }
 
 template<>
-inline std::set<BidPortfolio<GenericResource>::Ptr>
-    QueryBids<GenericResource>(Trader* t,
-                               const CommodMap<GenericResource>::type& map) {
+inline std::set<BidPortfolio<Product>::Ptr>
+    QueryBids<Product>(Trader* t,
+                               const CommodMap<Product>::type& map) {
   return t->GetGenRsrcBids(map);
 }
 
@@ -65,11 +65,11 @@ inline void PopulateTradeResponses<Material>(
 }
 
 template<>
-inline void PopulateTradeResponses<GenericResource>(
+inline void PopulateTradeResponses<Product>(
     Trader* trader,
-    const std::vector< Trade<GenericResource> >& trades,
-    std::vector<std::pair<Trade<GenericResource>,
-        GenericResource::Ptr> >& responses) {
+    const std::vector< Trade<Product> >& trades,
+    std::vector<std::pair<Trade<Product>,
+        Product::Ptr> >& responses) {
   trader->GetGenRsrcTrades(trades, responses);
 }
 
@@ -91,8 +91,8 @@ inline void AcceptTrades(
 template<>
 inline void AcceptTrades(
     Trader* trader,
-    const std::vector< std::pair<Trade<GenericResource>,
-        typename GenericResource::Ptr> >& responses) {
+    const std::vector< std::pair<Trade<Product>,
+        typename Product::Ptr> >& responses) {
   trader->AcceptGenRsrcTrades(responses);
 }
 

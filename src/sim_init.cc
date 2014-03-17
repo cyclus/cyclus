@@ -101,8 +101,8 @@ void SimInit::Snapshot(Context* ctx) {
   ->Record();
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("GenericResource"))
-  ->AddVal("NextId", GenericResource::next_state_)
+  ->AddVal("Object", std::string("Product"))
+  ->AddVal("NextId", Product::next_state_)
   ->Record();
 };
 
@@ -345,8 +345,8 @@ void SimInit::LoadNextIds() {
       Composition::next_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Resource") {
       Resource::nextid_ = qr.GetVal<int>("NextId", i);
-    } else if (obj == "GenericResource") {
-      GenericResource::next_state_ = qr.GetVal<int>("NextId", i);
+    } else if (obj == "Product") {
+      Product::next_state_ = qr.GetVal<int>("NextId", i);
     } else {
       throw IOError("Unexpected value in NextIds table: " + obj);
     }
@@ -361,8 +361,8 @@ Resource::Ptr SimInit::LoadResource(int resid) {
 
   if (type == Material::kType) {
     return LoadMaterial(resid);
-  } else if (type == GenericResource::kType) {
-    return LoadGenericResource(resid);
+  } else if (type == Product::kType) {
+    return LoadProduct(resid);
   }
   throw IOError("Invalid resource type in output database: " + type);
 }
@@ -405,7 +405,7 @@ Composition::Ptr SimInit::LoadComposition(int stateid) {
   return Composition::CreateFromMass(cm);
 }
 
-Resource::Ptr SimInit::LoadGenericResource(int resid) {
+Resource::Ptr SimInit::LoadProduct(int resid) {
   // get general resource object info
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", resid));
@@ -413,17 +413,17 @@ Resource::Ptr SimInit::LoadGenericResource(int resid) {
   double qty = qr.GetVal<double>("Quantity");
   int stateid = qr.GetVal<int>("StateId");
 
-  // get special GenericResource internal state
+  // get special Product internal state
   conds.clear();
   conds.push_back(Cond("StateId", "==", stateid));
-  qr = b_->Query("GenericResources", &conds);
+  qr = b_->Query("Products", &conds);
   std::string quality = qr.GetVal<std::string>("Quality");
 
   // set static quality-stateid map to have same vals as db
-  GenericResource::stateids_[quality] = stateid;
+  Product::stateids_[quality] = stateid;
 
   Agent* dummy = new Dummy(ctx_);
-  return GenericResource::Create(dummy, qty, quality);
+  return Product::Create(dummy, qty, quality);
 }
 
 } // namespace cyclus

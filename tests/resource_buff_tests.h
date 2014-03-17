@@ -29,12 +29,12 @@ class ResourceBuffTest : public ::testing::Test {
 
   virtual void SetUp() {
     using cyclus::Resource;
-    using cyclus::GenericResource;
+    using cyclus::Product;
     try {
       mass1 = 111;
-      mat1_ = GenericResource::CreateUntracked(mass1, "bananas")->Clone();
+      mat1_ = Product::CreateUntracked(mass1, "bananas")->Clone();
       mass2 = 222;
-      mat2_ = GenericResource::CreateUntracked(mass2, "bananas")->Clone();
+      mat2_ = Product::CreateUntracked(mass2, "bananas")->Clone();
       mats.push_back(mat1_);
       mats.push_back(mat2_);
 

@@ -72,7 +72,7 @@ class SimInit {
 
   Resource::Ptr LoadResource(int resid);
   Resource::Ptr LoadMaterial(int resid);
-  Resource::Ptr LoadGenericResource(int resid);
+  Resource::Ptr LoadProduct(int resid);
   Composition::Ptr LoadComposition(int stateid);
 
   static void SnapAgent(Agent* m);

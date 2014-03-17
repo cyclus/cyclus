@@ -22,7 +22,7 @@
 namespace cyclus {
 
 class Material;
-class GenericResource;
+class Product;
   
 /// map<internal-inventory-name, vector<resources-inside-inventory> >
 typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
@@ -193,7 +193,7 @@ class Agent : public StateWrangler {
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};
   
   /// default implementation for material preferences.
-  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) {};
+  virtual void AdjustGenRsrcPrefs(PrefMap<Product>::type& prefs) {};
 
   /// Returns a module's xml rng schema for initializing from input files. All
   /// concrete agents should override this method.

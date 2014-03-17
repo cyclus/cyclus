@@ -36,9 +36,9 @@ class Trader {
   }
 
   /// @brief default implementation for generic resource requests
-  virtual std::set<RequestPortfolio<GenericResource>::Ptr>
+  virtual std::set<RequestPortfolio<Product>::Ptr>
       GetGenRsrcRequests() {
-    return std::set<RequestPortfolio<GenericResource>::Ptr>();
+    return std::set<RequestPortfolio<Product>::Ptr>();
   }
 
   /// @brief default implementation for material requests
@@ -48,17 +48,17 @@ class Trader {
   }
 
   /// @brief default implementation for generic resource requests
-  virtual std::set<BidPortfolio<GenericResource>::Ptr>
-      GetGenRsrcBids(const CommodMap<GenericResource>::type&
+  virtual std::set<BidPortfolio<Product>::Ptr>
+      GetGenRsrcBids(const CommodMap<Product>::type&
                      commod_requests) {
-    return std::set<BidPortfolio<GenericResource>::Ptr>();
+    return std::set<BidPortfolio<Product>::Ptr>();
   }
 
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
 
   /// default implementation for material preferences.
-  virtual void AdjustGenRsrcPrefs(PrefMap<GenericResource>::type& prefs) {}
+  virtual void AdjustGenRsrcPrefs(PrefMap<Product>::type& prefs) {}
 
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
@@ -71,9 +71,9 @@ class Trader {
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
   virtual void GetGenRsrcTrades(
-      const std::vector< Trade<GenericResource> >& trades,
-      std::vector<std::pair<Trade<GenericResource>,
-      GenericResource::Ptr> >& responses) {}
+      const std::vector< Trade<Product> >& trades,
+      std::vector<std::pair<Trade<Product>,
+      Product::Ptr> >& responses) {}
 
   /// @brief default implementation for material trade acceptance
   virtual void AcceptMatlTrades(
@@ -82,8 +82,8 @@ class Trader {
 
   /// @brief default implementation for generic resource trade acceptance
   virtual void AcceptGenRsrcTrades(
-      const std::vector<std::pair<Trade<GenericResource>,
-      GenericResource::Ptr> >& responses) {}
+      const std::vector<std::pair<Trade<Product>,
+      Product::Ptr> >& responses) {}
 
  private:
   Agent* manager_;

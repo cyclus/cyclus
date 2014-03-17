@@ -18,7 +18,7 @@ void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Beginning simulation";
 
   ExchangeManager<Material> matl_manager(ctx_);
-  ExchangeManager<GenericResource> genrsrc_manager(ctx_);
+  ExchangeManager<Product> genrsrc_manager(ctx_);
   while (time_ < si_.duration) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
     if (si_.decay_period > 0 && time_ > 0 && time_ % si_.decay_period == 0) {
@@ -61,7 +61,7 @@ void Timer::DoTick() {
 }
 
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
-                    ExchangeManager<GenericResource>* genmgr) {
+                    ExchangeManager<Product>* genmgr) {
   matmgr->Execute();
   genmgr->Execute();
 }

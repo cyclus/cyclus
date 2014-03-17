@@ -25,7 +25,7 @@ inline static void AdjustPrefs(Agent* m,
   m->AdjustMatlPrefs(prefs);
 }
 inline static void AdjustPrefs(Agent* m,
-                               PrefMap<GenericResource>::type& prefs) {
+                               PrefMap<Product>::type& prefs) {
   m->AdjustGenRsrcPrefs(prefs);
 }
 inline static void AdjustPrefs(Trader* t,
@@ -33,7 +33,7 @@ inline static void AdjustPrefs(Trader* t,
   t->AdjustMatlPrefs(prefs);
 }
 inline static void AdjustPrefs(Trader* t,
-                               PrefMap<GenericResource>::type& prefs) {
+                               PrefMap<Product>::type& prefs) {
   t->AdjustGenRsrcPrefs(prefs);
 }
 

@@ -7,22 +7,22 @@
 
 namespace cyclus {
 
-const ResourceType GenericResource::kType = "GenericResource";
+const ResourceType Product::kType = "Product";
 
-std::map<std::string, int> GenericResource::stateids_;
-int GenericResource::next_state_ = 1;
+std::map<std::string, int> Product::stateids_;
+int Product::next_state_ = 1;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenericResource::Ptr GenericResource::Create(Agent* creator,
+Product::Ptr Product::Create(Agent* creator,
                                              double quantity,
                                              std::string quality) {
-  GenericResource::Ptr r(new GenericResource(creator->context(), quantity,
+  Product::Ptr r(new Product(creator->context(), quantity,
                                              quality));
   r->tracker_.Create(creator);
 
   if (stateids_.count(quality) == 0) {
     stateids_[quality] = next_state_++;
-    creator->context()->NewDatum("GenericResources")
+    creator->context()->NewDatum("Products")
     ->AddVal("StateId", stateids_[quality])
     ->AddVal("Quality", quality)
     ->Record();
@@ -31,23 +31,23 @@ GenericResource::Ptr GenericResource::Create(Agent* creator,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenericResource::Ptr GenericResource::CreateUntracked(double quantity,
+Product::Ptr Product::CreateUntracked(double quantity,
                                                       std::string quality) {
-  GenericResource::Ptr r(new GenericResource(NULL, quantity, quality));
+  Product::Ptr r(new Product(NULL, quantity, quality));
   r->tracker_.DontTrack();
   return r;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Resource::Ptr GenericResource::Clone() const {
-  GenericResource* g = new GenericResource(*this);
+Resource::Ptr Product::Clone() const {
+  Product* g = new Product(*this);
   Resource::Ptr c = Resource::Ptr(g);
   g->tracker_.DontTrack();
   return c;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GenericResource::Absorb(GenericResource::Ptr other) {
+void Product::Absorb(Product::Ptr other) {
   if (other->quality() != quality()) {
     throw ValueError("incompatible resource types.");
   }
@@ -58,25 +58,25 @@ void GenericResource::Absorb(GenericResource::Ptr other) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenericResource::Ptr GenericResource::Extract(double quantity) {
+Product::Ptr Product::Extract(double quantity) {
   if (quantity > quantity_) {
     throw ValueError("Attempted to extract more quantity than exists.");
   }
 
   quantity_ -= quantity;
 
-  GenericResource::Ptr other(new GenericResource(ctx_, quantity, quality_));
+  Product::Ptr other(new Product(ctx_, quantity, quality_));
   tracker_.Extract(&other->tracker_);
   return other;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Resource::Ptr GenericResource::ExtractRes(double qty) {
+Resource::Ptr Product::ExtractRes(double qty) {
   return boost::static_pointer_cast<Resource>(Extract(qty));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GenericResource::GenericResource(Context* ctx, double quantity,
+Product::Product(Context* ctx, double quantity,
                                  std::string quality)
   : quality_(quality), quantity_(quantity), tracker_(ctx, this),
     ctx_(ctx) {}

@@ -185,7 +185,7 @@ New features
 - made mat_query a proper implementation file. Removed contains for now and added almostEq to it.
 - polished doc comments for compmath namespace
 - fixed var name mistake in res_tracker
-- polished doc comments on generic_resource, material, res_tracker, and composition classes. Added more complete error check to GenericResource::Absorb
+- polished doc comments on generic_resource, material, res_tracker, and composition classes. Added more complete error check to Product::Absorb
 - polished resource class doc comments
 - moved resource table all to res_tracker
 - finished converting compmath tests

@@ -72,7 +72,7 @@ class Timer {
 
   /// Runs the resource exchange process for all traders.
   void DoResEx(ExchangeManager<Material>* matmgr,
-               ExchangeManager<GenericResource>* genmgr);
+               ExchangeManager<Product>* genmgr);
 
   /// sends the tock signal to all of the agents receiving time
   /// notifications.

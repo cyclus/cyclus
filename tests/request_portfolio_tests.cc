@@ -21,7 +21,7 @@ using std::string;
 
 using cyclus::CapacityConstraint;
 using cyclus::Converter;
-using cyclus::GenericResource;
+using cyclus::Product;
 using cyclus::KeyError;
 using cyclus::Material;
 using cyclus::Request;
