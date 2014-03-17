@@ -163,11 +163,13 @@ class UsingFilter(AliasFilter):
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
     # handles anonymous namespaces as group(1) == None
-    regex = re.compile("\s*namespace(\s+(\w*)?)?\s*$")
+    regex = re.compile("\s*namespace(\s+\w*)?\s*$")
 
     def transform(self, statement, sep):
         state = self.machine
-        name = self.match.group(2)
+        name = self.match.group(1)
+        if name is not None:
+            name = name.strip()
         state.namespaces.append((state.depth, name))
 
     def revert(self, statement, sep):
