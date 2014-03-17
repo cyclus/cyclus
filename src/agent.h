@@ -193,7 +193,7 @@ class Agent : public StateWrangler {
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};
   
   /// default implementation for material preferences.
-  virtual void AdjustGenRsrcPrefs(PrefMap<Product>::type& prefs) {};
+  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {};
 
   /// Returns a module's xml rng schema for initializing from input files. All
   /// concrete agents should override this method.

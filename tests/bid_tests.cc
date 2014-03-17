@@ -45,7 +45,7 @@ TEST(BidTests, MaterialGetSet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(BidTests, GenRsrcGetSet) {
+TEST(BidTests, ProductGetSet) {
   TestContext tc;
   TestFacility* fac = new TestFacility(tc.get());
   double qty = 1.0;

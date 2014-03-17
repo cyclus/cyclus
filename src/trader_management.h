@@ -25,7 +25,7 @@ inline std::set<RequestPortfolio<Material>::Ptr>
 template<>
 inline std::set<RequestPortfolio<Product>::Ptr>
     QueryRequests<Product>(Trader* t) {
-  return t->GetGenRsrcRequests();
+  return t->GetProductRequests();
 }
 
 template<class T>
@@ -44,7 +44,7 @@ template<>
 inline std::set<BidPortfolio<Product>::Ptr>
     QueryBids<Product>(Trader* t,
                                const CommodMap<Product>::type& map) {
-  return t->GetGenRsrcBids(map);
+  return t->GetProductBids(map);
 }
 
 template<class T>
@@ -70,7 +70,7 @@ inline void PopulateTradeResponses<Product>(
     const std::vector< Trade<Product> >& trades,
     std::vector<std::pair<Trade<Product>,
         Product::Ptr> >& responses) {
-  trader->GetGenRsrcTrades(trades, responses);
+  trader->GetProductTrades(trades, responses);
 }
 
 template<class T>
@@ -93,7 +93,7 @@ inline void AcceptTrades(
     Trader* trader,
     const std::vector< std::pair<Trade<Product>,
         typename Product::Ptr> >& responses) {
-  trader->AcceptGenRsrcTrades(responses);
+  trader->AcceptProductTrades(responses);
 }
 
 }  // namespace cyclus

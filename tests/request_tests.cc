@@ -45,7 +45,7 @@ TEST(RequestTests, MaterialGetSet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(RequestTests, GenRsrcGetSet) {
+TEST(RequestTests, ProductGetSet) {
   TestContext tc;
   TestFacility* fac = new TestFacility(tc.get());
   string commod = "name";

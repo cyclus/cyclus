@@ -37,7 +37,7 @@ class Trader {
 
   /// @brief default implementation for generic resource requests
   virtual std::set<RequestPortfolio<Product>::Ptr>
-      GetGenRsrcRequests() {
+      GetProductRequests() {
     return std::set<RequestPortfolio<Product>::Ptr>();
   }
 
@@ -49,7 +49,7 @@ class Trader {
 
   /// @brief default implementation for generic resource requests
   virtual std::set<BidPortfolio<Product>::Ptr>
-      GetGenRsrcBids(const CommodMap<Product>::type&
+      GetProductBids(const CommodMap<Product>::type&
                      commod_requests) {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
@@ -58,7 +58,7 @@ class Trader {
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
 
   /// default implementation for material preferences.
-  virtual void AdjustGenRsrcPrefs(PrefMap<Product>::type& prefs) {}
+  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
 
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
@@ -70,7 +70,7 @@ class Trader {
   /// @brief default implementation for responding to generic resource trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
-  virtual void GetGenRsrcTrades(
+  virtual void GetProductTrades(
       const std::vector< Trade<Product> >& trades,
       std::vector<std::pair<Trade<Product>,
       Product::Ptr> >& responses) {}
@@ -81,7 +81,7 @@ class Trader {
       Material::Ptr> >& responses) {}
 
   /// @brief default implementation for generic resource trade acceptance
-  virtual void AcceptGenRsrcTrades(
+  virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>,
       Product::Ptr> >& responses) {}
 

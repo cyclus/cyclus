@@ -54,9 +54,9 @@ struct MatQualConverter : public Converter<Material> {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-struct GenRsrcQualConverter : public Converter<Product> {
-  GenRsrcQualConverter() {}
-  virtual ~GenRsrcQualConverter() {}
+struct ProductQualConverter : public Converter<Product> {
+  ProductQualConverter() {}
+  virtual ~ProductQualConverter() {}
   
   virtual double convert(Product::Ptr r) {
     if (r->quality().compare(quality) == 0) {
@@ -144,12 +144,12 @@ TEST(CapacityConstraintTests, MaterialQuality) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CapacityConstraintTests, GenGenRsrcQuality) {
+TEST(CapacityConstraintTests, GenProductQuality) {
   TestContext tc;
   double quan = 4.0;
   string qual = quality;
   
-  Converter<Product>::Ptr c(new GenRsrcQualConverter());
+  Converter<Product>::Ptr c(new ProductQualConverter());
   CapacityConstraint<Product> cc(val, c);
   
   Product::Ptr gr = Product::CreateUntracked(quan, qual);

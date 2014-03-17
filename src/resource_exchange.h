@@ -26,7 +26,7 @@ inline static void AdjustPrefs(Agent* m,
 }
 inline static void AdjustPrefs(Agent* m,
                                PrefMap<Product>::type& prefs) {
-  m->AdjustGenRsrcPrefs(prefs);
+  m->AdjustProductPrefs(prefs);
 }
 inline static void AdjustPrefs(Trader* t,
                                PrefMap<Material>::type& prefs) {
@@ -34,7 +34,7 @@ inline static void AdjustPrefs(Trader* t,
 }
 inline static void AdjustPrefs(Trader* t,
                                PrefMap<Product>::type& prefs) {
-  t->AdjustGenRsrcPrefs(prefs);
+  t->AdjustProductPrefs(prefs);
 }
 
 /// @class ResourceExchange
