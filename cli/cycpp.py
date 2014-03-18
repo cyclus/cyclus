@@ -211,12 +211,30 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile("\s*class\s+([\w:]+)\s*")
+    regex = re.compile("\s*class\s+(\w+)(\s*:[\s\w,:]+)?\s*")
 
     def transform(self, statement, sep):
         state = self.machine
         name = self.match.group(1)
         state.classes.append((state.depth, name))
+        classname = state.classname()
+        supers = self.match.group(2)
+        state.superclasses[classname] = sc = state.superclasses.get(classname, set())
+        if supers is not None:
+            supers = [s.strip().split()[-1] for s in supers.split(',')]
+            for sup in supers:
+                if sup not in state.superclasses:
+                    scope = [ns for d, ns in state.namespaces] + \
+                            [c for d, c in state.classes[:-1]]
+                    for i in range(-1, -len(scope)-1, -1):
+                        trysup = "::".join(scope[:i])
+                        if trysup in state.superclasses:
+                            sup = trysup
+                            break
+                    else:
+                        msg = "Super class {0} not found for {1}"
+                        TypeError(msg.format(sup, classname))
+                sc.add(sup)
         state.access[tuple(state.classes)] = "private"
 
     def revert(self, statement, sep):
@@ -345,6 +363,7 @@ class StateAccumulator(object):
         self.execns = {}   # execution namespace we have accumulated
         self.context = {}  # classes we have accumulated
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
+        self.superclasses = {}  # map from classes to set of super classes.
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.using_namespaces = set()  # set of (depth, ns name) tuples
@@ -366,6 +385,7 @@ class StateAccumulator(object):
         """Modify the existing state by incoprorating the statement, which is 
         partitioned from the next statement by sep.
         """
+        print(statement)
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
@@ -471,7 +491,7 @@ def accumulate_state(canon):
         statement = statement if prefix is None else prefix + statement
         statement = statement.strip()
         state.accumulate(statement, sep)
-    return state.context
+    return state.context, state.superclasses
 
 #
 # pass 3
@@ -602,6 +622,7 @@ class CodeGenerator(object):
         self.context = context  # the results of pass 2
         self.statements = []    # the results of pass 3, waiting to be joined
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
+        self.superclasses = {}  # map from classes to set of super classes.
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self), 
@@ -771,14 +792,15 @@ def main():
     
     canon = preprocess_file(ns.path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
-    context = accumulate_state(canon)   # pass 2
+    context, supers = accumulate_state(canon)   # pass 2
     #pprint(context)
+    pprint(supers)
     if not ns.pass3_use_pp:
         with open(ns.path) as f:
             orig = f.read()
         orig = ensure_startswith_newlinehash(orig)
     newfile = generate_code(canon if ns.pass3_use_pp else orig, context)  # pass 3
-    print(newfile)
+    #print(newfile)
 
 if __name__ == "__main__":
     main()
