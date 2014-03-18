@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """The cyclus preprocessor.
 
-cycpp is a 3-pass preprocessor which adds reflection-like semantics to cyclus 
+cycpp is a 3-pass preprocessor which adds reflection-like semantics to cyclus
 agents. This is needed to provide a high-level, user-facing API to cyclus.
 Code that uses cycpp is entirely valid C++ code and will compile normally even
-without first running it through the cycpp. This is because cycpp relies on 
-custom #pragma decoration to annotate or inject into the code. These pragmas 
+without first running it through the cycpp. This is because cycpp relies on
+custom #pragma decoration to annotate or inject into the code. These pragmas
 are skipped - by definition - by the C preprocessor and the C/C++ compiler.
 
 The three passes of cycpp are:
@@ -19,7 +19,7 @@ All decorators have the following form::
     #pragma cyclus <decorator name> [args]
 
 The ``#pragma cyclus`` portion is a flag so that *only* cycpp consumes this directive.
-This is followed by the actual ``<decorator name>`` which tells cycpp what to do with 
+This is followed by the actual ``<decorator name>`` which tells cycpp what to do with
 this pragma. Lastly, optionals arguments may be passed to this decorator but all options
 *must* be on the same logical line as the directive.  How the arguments are interpreted
 is a function of the decorators themselves.  Most of them are simple Python statements
@@ -27,14 +27,14 @@ or expressions.  See the following handy table!
 
 **Decorator Arguments:**
 
-:var:  Add the following C++ statement as an Agent's state variable. There is one 
+:var:  Add the following C++ statement as an Agent's state variable. There is one
        argument which must be a Python expression that evaluates to a dictionary or
        other mapping.
-:exec: Executes arbitrary python code that is passed in as the arguments and loads 
+:exec: Executes arbitrary python code that is passed in as the arguments and loads
        this into the context. This is useful for importing handy modules, declaring
        variables for later use, or any of the other things that Python is great for.
        Any variables defined here are kept in a seperate namespace from the classes.
-       Since this gives you direct access to the Python interpreter, try to be a 
+       Since this gives you direct access to the Python interpreter, try to be a
        little careful.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
@@ -141,7 +141,7 @@ class AliasFilter(Filter):
         state.aliases -= {d_n_a for d_n_a in state.aliases if d_n_a[0] > depth}
 
 class TypedefFilter(AliasFilter):
-    """Filter for handling typedef as aliases. Note that in-line compound typedefs of 
+    """Filter for handling typedef as aliases. Note that in-line compound typedefs of
     structs and unions are not supported.
     """
     regex = re.compile("\s*typedef\s+(.*?\s+.*)\s*$")
@@ -248,7 +248,7 @@ class VarDecorationFilter(Filter):
 
         #pragma cyclus var <dict>
 
-    This evals the contents of dict and puts them in state.var_annotations, to be 
+    This evals the contents of dict and puts them in state.var_annotations, to be
     consumed by the next match with VarDeclarationFilter.
     """
     regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
@@ -291,7 +291,7 @@ class VarDecorationFilter(Filter):
             glb[k] = prx[k]
 
 class VarDeclarationFilter(Filter):
-    """State varible declaration.  Only oeprates if state.var_annotations is 
+    """State varible declaration.  Only oeprates if state.var_annotations is
     not None. Access for member variable must be public.
     """
     regex = re.compile("(.*\w+.*?)\s+(\w+)")
@@ -315,7 +315,7 @@ class VarDeclarationFilter(Filter):
         state.var_annotations = None
 
 class ExecFilter(Filter):
-    """Filter for executing arbitrary python code in the exec pragma and 
+    """Filter for executing arbitrary python code in the exec pragma and
     adding the results to the context.  This pragma has the form:
 
         #pragma cyclus exec <code>
@@ -335,15 +335,15 @@ class ExecFilter(Filter):
 class StateAccumulator(object):
     """The StateAccumulator class is the pass 2 state machine.
 
-    This represents the state of the file as it is being traversed.  
+    This represents the state of the file as it is being traversed.
     At the end of the traversal this will have acquired all of the information
-    needed for pass 2. It manages both the decorators and other needed bits 
-    of C++ syntax. It works by passing each statement through a sequence of 
+    needed for pass 2. It manages both the decorators and other needed bits
+    of C++ syntax. It works by passing each statement through a sequence of
     filters, and builds up or destroys context as it goes.
 
     This class also functions as a typesystem for the types it sees.
     """
-    
+
     def __init__(self):
         self.depth = 0
         self.execns = {}   # execution namespace we have accumulated
@@ -367,7 +367,7 @@ class StateAccumulator(object):
         return "::".join(names)
 
     def accumulate(self, statement, sep):
-        """Modify the existing state by incoprorating the statement, which is 
+        """Modify the existing state by incoprorating the statement, which is
         partitioned from the next statement by sep.
         """
         # filters have to come before sep
@@ -381,7 +381,7 @@ class StateAccumulator(object):
         elif sep == '}':
             self.depth -= 1
         # revert what is needed
-        for filter in self.filters: 
+        for filter in self.filters:
             filter.revert(statement, sep)
 
     #
@@ -415,7 +415,7 @@ class StateAccumulator(object):
                 return self._canonize_targs(talias, targs)
             for d, nsa in sorted(self.using_namespaces, reverse=True):
                 if len(tname.split(scopz)) > len(nsa.split(scopz)):
-                    # fixed point of reccursion when type would be more scoped than 
+                    # fixed point of reccursion when type would be more scoped than
                     # the alias - which is impossible.
                     continue
                 try:
@@ -424,7 +424,7 @@ class StateAccumulator(object):
                     pass  # This is the TypeError from below
             else:
                 msg = ("the type of {c}::{n} ({t}) is not a recognized template "
-                       "type: {p}.").format(t=t, n=name, c=self.classname(), 
+                       "type: {p}.").format(t=t, n=name, c=self.classname(),
                                             p=", ".join(sorted(self.known_templates)))
                 raise TypeError(msg)
         elif '<' in t:
@@ -444,7 +444,7 @@ class StateAccumulator(object):
                 return self.canonize_type(talias, name)
             for d, nsa in sorted(self.using_namespaces, reverse=True):
                 if len(t.split(scopz)) > len(nsa.split(scopz)):
-                    # fixed point of reccursion when type would be more scoped than 
+                    # fixed point of reccursion when type would be more scoped than
                     # the alias - which is impossible.
                     continue
                 try:
@@ -453,7 +453,7 @@ class StateAccumulator(object):
                     pass  # This is the TypeError from below
             else:
                 msg = ("the type of {c}::{n} ({t}) is not a recognized primitive "
-                       "type: {p}.").format(t=t, n=name, c=self.classname(), 
+                       "type: {p}.").format(t=t, n=name, c=self.classname(),
                                             p=", ".join(sorted(self.known_primitives)))
                 raise TypeError(msg)
         return t
@@ -512,12 +512,12 @@ class CodeGeneratorFilter(Filter):
 
         # compute def line
         ctx = context[classname]
-        in_class_decl = self.in_class_decl() 
+        in_class_decl = self.in_class_decl()
         ns = "" if in_class_decl else classname + "::"
         virt = "virtual " if in_class_decl else ""
         end = ";" if mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
-        definition = self.def_template.format(ind=" "*ind, virt=virt, 
+        definition = self.def_template.format(ind=" "*ind, virt=virt,
                         rtn=self.methodrtn, ns=ns, methodname=self.methodname,
                         args=self.methodargs(), sep=end)
 
@@ -527,11 +527,11 @@ class CodeGeneratorFilter(Filter):
         if mode != "decl":
             impl = self.impl(ind=ind * " ")
         ind -= 2
-        if not impl.endswith("\n") and 0 != len(impl): 
+        if not impl.endswith("\n") and 0 != len(impl):
             impl += '\n'
         end = "" if mode == "decl" else " " * ind + "};\n"
 
-        # compute return 
+        # compute return
         if mode == 'impl':
             return impl
         else:
@@ -541,9 +541,9 @@ class CodeGeneratorFilter(Filter):
         # overwriteable
         return ""
 
-    def in_class_decl(self): 
+    def in_class_decl(self):
         classname = self.local_classname
-        return (len(self.machine.classes) > 0 and 
+        return (len(self.machine.classes) > 0 and
                 self.machine.classes[-1][1] == classname)
 
     def revert(self, statement, sep):
@@ -577,7 +577,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
     def methodargs(self):
         return "{0}* m".format(self.local_classname)
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.local_classname]
@@ -597,7 +597,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
     def methodargs(self):
         return "{0}::QueryBackend* b".format(CYCNS)
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.local_classname]
@@ -621,14 +621,14 @@ class InitFromDbFilter(CodeGeneratorFilter):
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
 
-    This represents the file as code is being injected into it.  
+    This represents the file as code is being injected into it.
     At the end of the traversal this final stage it will built up a brand new
-    file for pass 3. It manages both the code insertion pragmas and other bits 
-    of C++ syntax as needed to determine locality. It works by passing each statement 
-    through a sequence of filters, and injects code based on the directive and the 
+    file for pass 3. It manages both the code insertion pragmas and other bits
+    of C++ syntax as needed to determine locality. It works by passing each statement
+    through a sequence of filters, and injects code based on the directive and the
     state.
     """
-    
+
     def __init__(self, context):
         self.depth = 0
         self.context = context  # the results of pass 2
@@ -636,9 +636,9 @@ class CodeGenerator(object):
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
-        self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self), 
+        self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self),
                         InitFromCopyFilter(self), InitFromDbFilter(self), CloneFilter(self)]
-        
+
     def classname(self):
         """Returns the current, fully-expanded class name."""
         names = [n for d, n in self.namespaces]
@@ -646,7 +646,7 @@ class CodeGenerator(object):
         return "::".join(names)
 
     def generate(self, statement, sep):
-        """Modify the existing statements list by incoprorating, modifying, or 
+        """Modify the existing statements list by incoprorating, modifying, or
         ignoring this statement, which is partitioned from the next statement by sep.
         """
         # filters have to come before sep
@@ -669,7 +669,7 @@ class CodeGenerator(object):
             # gross fix for not using cpp
             self.depth += statement.count('{') - statement.count('}')
         # revert what is needed
-        for filter in self.filters: 
+        for filter in self.filters:
             filter.revert(statement, sep)
 
 def generate_code(orig, context):
@@ -711,7 +711,7 @@ class Proxy(MutableMapping):
     def __delattr__(self, key):
         d = self.__dict__['_d']
         if key in d:
-            del d[key] 
+            del d[key]
         else:
             del self.__dict__[key]
 
@@ -788,19 +788,19 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
 ensure_startswith_newlinehash = lambda x: '\n' + x if x.startswith('#') else x
 
 def main():
-    parser = ArgumentParser(prog="cycpp", description=__doc__, 
+    parser = ArgumentParser(prog="cycpp", description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('path', help="path to source file")
     parser.add_argument('--pass3-use-pp', action="store_true", default=True,
                         help=("On pass 3, use the preproccessed version of the "
                               "original file. This options is mutually exclusive"
                               "with --pass3-use-orig."), dest="pass3_use_pp")
-    parser.add_argument('--pass3-use-orig', action="store_false", 
-                        help=("On pass 3, use the preproccessed version of the "
-                              "original file. This options is mutually exclusive"
+    parser.add_argument('--pass3-use-orig', action="store_false",
+                        help=("On pass 3, use the original version of the "
+                              "file. This options is mutually exclusive"
                               "with --pass3-use-pp."), dest="pass3_use_pp")
     ns = parser.parse_args()
-    
+
     canon = preprocess_file(ns.path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
     context = accumulate_state(canon)   # pass 2
