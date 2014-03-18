@@ -7,9 +7,14 @@ from nose.tools import assert_equal, assert_true, assert_false
 cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'cli'))
 
+# pass 1 Filters
 from cycpp import NamespaceFilter, TypedefFilter, UsingFilter,\
         UsingNamespaceFilter, NamespaceAliasFilter, ClassFilter, \
         AccessFilter
+
+# pass 2 Filters
+from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter
+
 
 class MockMachine(object):
     def __init__(self):
@@ -24,6 +29,10 @@ class MockMachine(object):
         self.aliases = set()
         self.var_annotations = None
         self.filters = []
+
+    def classname(self):
+        """Implemented just for testing"""
+        return ""
 
 #
 # pass 1 Filters
@@ -132,6 +141,47 @@ def test_afilter():
     yield assert_true, f.isvalid(statement)
     f.transform(statement, sep)
     yield assert_equal, m.access[tuple(m.classes)], "private"
+
+#
+# pass 2 Filters
+#
+def test_vdecorfilter():
+    """Test VarDecorationFilter"""
+    m = MockMachine()
+    f = VarDecorationFilter(m)
+    yield assert_false, f.isvalid("#pragma cyclus")
+
+    statement, sep = "#pragma cyclus var {'name': 'James Bond'} ", "\n"
+    yield assert_true, f.isvalid(statement)
+    f.transform(statement, sep)
+    yield assert_equal, m.var_annotations, {'name': 'James Bond'}
+
+def test_vdeclarfilter():
+    """Test VarDeclarationFilter"""
+    m = MockMachine()
+    f = VarDeclarationFilter(m)
+    yield assert_false, f.isvalid("one ")
+
+    statement, sep = "one two", "\n"
+    yield assert_true, f.isvalid(statement)
+    m.classes = [(0, "trader")]
+    m.access = {"trader": "public"}
+   # m.var_annotations = {'name': 'James Bond'}
+    f.transform(statement, sep)
+    yield assert_equal, m.var_annotations, None
+
+def test_execfilter():
+    """Test ExecFilter"""
+    m = MockMachine()
+    f = ExecFilter(m)
+    yield assert_false, f.isvalid("#pragma cyclus")
+
+    statement, sep = "#pragma cyclus exec print('Hello World!')", "\n"
+    yield assert_true, f.isvalid(statement)
+    f.transform(statement, sep)
+    # What are the other possible tests
+
+
 
 if __name__ == "__main__":
     nose.runmodule()
