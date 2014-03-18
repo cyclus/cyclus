@@ -166,7 +166,7 @@ def test_vdeclarfilter():
     yield assert_true, f.isvalid(statement)
     m.classes = [(0, "trader")]
     m.access = {"trader": "public"}
-   # m.var_annotations = {'name': 'James Bond'}
+    # m.var_annotations = {'name': 'James Bond'}
     f.transform(statement, sep)
     yield assert_equal, m.var_annotations, None
 
@@ -176,11 +176,11 @@ def test_execfilter():
     f = ExecFilter(m)
     yield assert_false, f.isvalid("#pragma cyclus")
 
-    statement, sep = "#pragma cyclus exec print('Hello World!')", "\n"
+    statement, sep = "#pragma cyclus exec x = 42", "\n"
     yield assert_true, f.isvalid(statement)
     f.transform(statement, sep)
     # What are the other possible tests
-
+    yield assert_equal, m.execns["x"], 42
 
 
 if __name__ == "__main__":
