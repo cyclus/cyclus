@@ -87,7 +87,7 @@ TEST_F(InfileTreeTest, top_level_throws) {
   EXPECT_THROW(engine.GetString(content_node_,ninner_nodes_+1), cyclus::ValueError);
   EXPECT_THROW(engine.GetString(inner_node_), cyclus::ValueError);
   EXPECT_THROW(engine.GetElementName(ninner_nodes_+1), cyclus::ValueError);
-  EXPECT_THROW(engine.Query(content_node_,ninner_nodes_+1), cyclus::ValueError);  
+  EXPECT_THROW(engine.SubTree(content_node_,ninner_nodes_+1), cyclus::ValueError);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -103,16 +103,16 @@ TEST_F(InfileTreeTest, null_query) {
 TEST_F(InfileTreeTest, mid_level_queries) {  
   LoadParser();
   cyclus::InfileTree engine(*parser_);
-  EXPECT_NO_THROW(cyclus::InfileTree* qe = engine.Query(inner_node_));
+  EXPECT_NO_THROW(cyclus::InfileTree* qe = engine.SubTree(inner_node_));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(InfileTreeTest, low_level_queries) {  
   LoadParser();
   cyclus::InfileTree engine(*parser_);
-  cyclus::InfileTree* qe = engine.Query(inner_node_);
+  cyclus::InfileTree* qe = engine.SubTree(inner_node_);
   EXPECT_EQ(qe->GetElementName(),unknown_node_);
-  cyclus::InfileTree* qe2 = qe->Query(unknown_node_);
+  cyclus::InfileTree* qe2 = qe->SubTree(unknown_node_);
   EXPECT_EQ(qe2->GetString(content_node_),content_);
 }
 
@@ -120,7 +120,7 @@ TEST_F(InfileTreeTest, low_level_queries) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(InfileTreeTest, optional_queries) {
   using std::string;
-  using cyclus::GetOptionalQuery;
+  using cyclus::OptionalQuery;
   
   std::stringstream ss;
   string other = "other";
@@ -143,12 +143,12 @@ TEST_F(InfileTreeTest, optional_queries) {
   parser.Init(ss);
   cyclus::InfileTree qe(parser);
 
-  EXPECT_DOUBLE_EQ(dbl_val, GetOptionalQuery<double>(&qe, dbl_str, dbl_other));
-  EXPECT_DOUBLE_EQ(dbl_other, GetOptionalQuery<double>(&qe, other, dbl_other));
+  EXPECT_DOUBLE_EQ(dbl_val, OptionalQuery<double>(&qe, dbl_str, dbl_other));
+  EXPECT_DOUBLE_EQ(dbl_other, OptionalQuery<double>(&qe, other, dbl_other));
   
-  EXPECT_EQ(int_val, GetOptionalQuery<int>(&qe, int_str, int_other));
-  EXPECT_EQ(int_other, GetOptionalQuery<int>(&qe, other, int_other));
+  EXPECT_EQ(int_val, OptionalQuery<int>(&qe, int_str, int_other));
+  EXPECT_EQ(int_other, OptionalQuery<int>(&qe, other, int_other));
   
-  EXPECT_EQ(str_val, GetOptionalQuery<string>(&qe, str_str, str_other));
-  EXPECT_EQ(str_other, GetOptionalQuery<string>(&qe, other, str_other));
+  EXPECT_EQ(str_val, OptionalQuery<string>(&qe, str_str, str_other));
+  EXPECT_EQ(str_other, OptionalQuery<string>(&qe, other, str_other));
 }

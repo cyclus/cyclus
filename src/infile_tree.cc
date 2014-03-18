@@ -49,14 +49,6 @@ int InfileTree::NMatches(std::string query) {
   return current_node_->find(query).size();
 }
 
-int InfileTree::GetInt(std::string query, int index) {
-  return boost::lexical_cast<int>(GetString(query, index));
-}
-
-double InfileTree::GetDouble(std::string query, int index) {
-  return boost::lexical_cast<double>(GetString(query, index));
-}
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InfileTree::GetString(std::string query, int index) {
   using xmlpp::Node;
@@ -136,8 +128,7 @@ InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
   return new InfileTree(element);
 }
 
-InfileTree* InfileTree::Query(std::string query,
-                                       int index) {
+InfileTree* InfileTree::SubTree(std::string query, int index) {
   InfileTree* qe_child =
     GetEngineFromQuery(query, index);
   spawned_children_.insert(qe_child);
