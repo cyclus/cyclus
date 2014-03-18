@@ -397,7 +397,6 @@ class StateAccumulator(object):
         """Modify the existing state by incoprorating the statement, which is 
         partitioned from the next statement by sep.
         """
-        print(statement)
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
@@ -635,27 +634,47 @@ class InitFromDbFilter(CodeGeneratorFilter):
         cg = self.machine
         context = cg.context
         ctx = context[self.local_classname]
-        impl = ""
+        impl = ''
         pods = []
-        lists = []
-        for member, info in ctx.items():
-            t = info['type']
-            if t in PRIMITIVES:
-                pods.append((member, t))
-            else:
-                pass # add lists appropriately
 
-        impl = ""
-        
         # add inheritance init froms
         rents = parent_intersection(self.local_classname, WRANGLERS, self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
 
+        for member, info in ctx.items():
+            t = info['type']
+            if isinstance(t, list):
+                if t[0] == 'std::map':
+                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
+                else:
+                    table = 'ListOf' + t[0].split('::')[-1].title()
+                impl += ind + '{\n'
+                impl += ind + '  std::vector<{0}::Cond> conds;\n'.format(CYCNS)
+                impl += ind + '  conds.push_back({0}::Cond("Member", "==", "{1}"));\n'.format(CYCNS, member)
+                impl += ind + '  {0}::QueryResult qr = b->Query("{1}", &conds);\n'.format(CYCNS, table)
+                impl += ind + '  for (int i = 0; i < qr.rows.size(); ++i) {\n'
+                ind += '    '
+                if t[0] == 'std::map':
+                    impl += ind + '{0} {1}_k = qr.GetVal<{0}>("Key", i);\n'.format(t[1], member)
+                    impl += ind + '{0} {1}_v = qr.GetVal<{0}>("Value", i);\n'.format(t[2], member)
+                    impl += ind + '{0}[{0}_k] = {0}_v;\n'.format(member)
+                elif t[0] == 'std::set':
+                    impl += ind + '{0}.insert(qr.GetVal<{1}>("Value", i);\n'.format(member, t[1])
+                else:
+                    impl += ind + '{0}.push_back(qr.GetVal<{1}>("Value", i);\n'.format(member, t[1])
+                ind = ind[:-4]
+                impl += ind + '  }\n'
+                impl += ind + '}\n'
+            elif isinstance(t, str) and t in PRIMITIVES:
+                pods.append((member, t))
+            else:
+                raise RuntimeError('Unsupported type {0}'.format(t))
+        
+        # add pod
         impl += ind + "cyc::QueryResult qr = b->Query(\"Info\", NULL);\n"
         for pod in pods:
             impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(pod[0], pod[1])
-        # add lists appropriately
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
@@ -679,10 +698,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         for member, info in ctx.items():
             t = info['type']
             d = info['default'] if 'default' in info else None
-            if t in PRIMITIVES:
+            if isinstance(t, list):
+                pass # add lists appropriately
+            elif isinstance(t, str) and t in PRIMITIVES:
                 pods.append([member, t, d])
             else:
-                pass # add lists appropriately
+                raise RuntimeError('Unsupported type {0}'.format(t))
 
         impl = ""
 
@@ -730,10 +751,12 @@ class SchemaFilter(CodeGeneratorFilter):
         for member, info in ctx.items():
             opt = True if 'default' in info else False
             t = info['type']
-            if t in PRIMITIVES:
+            if isinstance(t, list):
+                pass # add lists appropriately
+            elif isinstance(t, str) and t in PRIMITIVES:
                 pods.append([member, opt])
             else:
-                pass # add lists appropriately
+                raise RuntimeError('Unsupported type {0}'.format(t))
         impl = ind + "return\n"
         ind += "  "
         impl += ind + "\"  <element name =\\\"input\\\">\\n\"\n"
@@ -751,11 +774,81 @@ class SchemaFilter(CodeGeneratorFilter):
 
         # add lists appropriately
         
-        impl += ind + "\"  </element>\\n\";\n";
+        impl += ind + ";\n";
         return impl
 
+class SnapshotFilter(CodeGeneratorFilter):
+    """Filter for handling copy-constructor-like InitFrom() code generation:
+        #pragma cyclus [def|decl|impl] snapshot [classname]
+    """
+    methodname = 'Snapshot'
+    pragmaname = 'snapshot'
+    methodrtn = 'void'
 
-        
+    def methodargs(self):
+        return CYCNS + '::DbInit di'
+
+    def impl(self, ind='  '):        
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.local_classname]
+        impl = ''
+        pod = {}
+        for member, params in ctx.items():
+            t = params['type']
+            if isinstance(t, list):
+                supert = t[0]
+                if supert in ['std::vector', 'std::list', 'std::set']:
+                    suffix = t[0].split('::')[-1].title()
+                    impl += ind + '{\n'
+                    impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
+                    impl += ind + '  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n'.format(member)
+                    impl += ind + '    di.NewDatum("ListOf{0}")\n'.format(suffix)
+                    impl += ind + '    ->AddVal("Member", "{0}")\n'.format(member)
+                    impl += ind + '    ->AddVal("Value", *it)\n'
+                    impl += ind + '    ->Record();\n'
+                    impl += ind + '  }\n'
+                    impl += ind + '}\n'
+                elif supert == 'std::map':
+                    suffix = t[1].replace('std::', '').title() + 'To' + t[1].replace('std::', '').title()
+                    impl += ind + '{\n'
+                    impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
+                    impl += ind + '  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n'.format(member)
+                    impl += ind + '    di.NewDatum("MapOf{0}")\n'.format(suffix)
+                    impl += ind + '    ->AddVal("Member", "{0}")\n'.format(member)
+                    impl += ind + '    ->AddVal("Key", it->first)\n'
+                    impl += ind + '    ->AddVal("Value", it->second)\n'
+                    impl += ind + '    ->Record();\n'
+                    impl += ind + '  }\n'
+                    impl += ind + '}\n'
+                elif supert == 'std::pair':
+                    pod[member] = t
+            elif isinstance(t, str) and t in PRIMITIVES:
+                pod[member] = t
+            else:
+                raise RuntimeError('Unsupported type {0}'.format(t))
+
+        impl += ind + 'di.NewDatum("Info")\n'
+        for member, tp in pod.items():
+            if t == 'std::pair':
+                impl += ind + '->AddVal("{0}A", {0}.first)\n'.format(member)
+                impl += ind + '->AddVal("{0}B", {0}.second)\n'.format(member)
+            else:
+                impl += ind + '->AddVal("{0}", {0})\n'.format(member)
+        impl += ind + '->Record();\n'
+
+        return impl
+
+def type_to_str(type):
+    if isinstance(type, list):
+        s = type[0] + '< '
+        s += type_to_str(type[1])
+        for t in type[2:]:
+            s += ', ' + type_to_str(t)
+        s += ' >'
+        return s
+    else:
+        return type
 
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
@@ -780,7 +873,8 @@ class CodeGenerator(object):
         self.filters = [ClassFilter(self), AccessFilter(self), 
                         NamespaceFilter(self), InitFromCopyFilter(self), 
                         InitFromDbFilter(self), InfileToDbFilter(self), 
-                        CloneFilter(self), SchemaFilter(self)]
+                        CloneFilter(self), SchemaFilter(self),
+                        SnapshotFilter(self)]
         
     def classname(self):
         """Returns the current, fully-expanded class name."""
@@ -825,7 +919,6 @@ def generate_code(orig, context, superclasses):
             continue
         prefix, statement, _, sep = m.groups()
         statement = statement if prefix is None else prefix + statement
-        #print(cg.depth, repr(statement + sep))
         cg.generate(statement, sep)
     newfile = "".join(cg.statements)
     return newfile
@@ -965,10 +1058,7 @@ def main():
     canon = ensure_startswith_newlinehash(canon)
     context, superclasses = accumulate_state(canon)   # pass 2
     #pprint(context)
-    # pprint(superclasses)
-    # print(parent_classes('OtherFriend', superclasses))
-    # classset = {'mi6::Friend'}
-    # print(parent_intersection('OtherFriend', classset, superclasses))
+    #pprint(supers)
     if not ns.pass3_use_pp:
         with open(ns.path) as f:
             orig = f.read()

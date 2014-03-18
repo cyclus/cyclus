@@ -96,11 +96,22 @@ class Villan: public mi6::Spy {
     }
   std::string enemy;
 
+  #pragma cyclus var {\
+    "default": [1, 2, 5],\
+    }
+  std::vector<int> cheese;
+
+  #pragma cyclus var {\
+    "default": [1, 2, 5],\
+    }
+  std::map<int, std::string> foos;
+
   #pragma cyclus clone
   #pragma cyclus initfromcopy
   #pragma cyclus initfromdb
   #pragma cyclus infiletodb
   #pragma cyclus schema
+  #pragma cyclus snapshot
 
   #pragma cyclus initfromcopy mi6.Friend
 };
