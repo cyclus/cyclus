@@ -87,7 +87,9 @@ typedef unsigned long ulong;
 typedef int int_t, *intp_t, (&fp)(int, ulong), arr_t[10];
 typedef struct {int a; int b;} S, *pS;
 
-class Villan {
+
+// we have an infiltrator!
+class Villan: public mi6::Spy {
  public:
   #pragma cyclus var {\
     "default": "enemy of " + mi6.Spy.name['default'],\

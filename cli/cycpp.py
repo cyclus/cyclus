@@ -68,7 +68,13 @@ CYCNS = "cyclus"
 
 PRIMITIVES = {'std::string', 'float', 'double', 'int'}
 
-STATE_WRANGLERS = {}
+WRANGLERS = {
+    "{0}::Agent".format(CYCNS), 
+    "{0}::Facility".format(CYCNS), 
+    "{0}::Institution".format(CYCNS), 
+    "{0}::Region".format(CYCNS), 
+    "mi6::Spy", 
+}
 
 #
 # pass 1
@@ -224,11 +230,11 @@ class ClassFilter(Filter):
         name = self.match.group(1)
         state.classes.append((state.depth, name))
         classname = state.classname()
-        supers = self.match.group(2)
+        superclasses = self.match.group(2)
         state.superclasses[classname] = sc = state.superclasses.get(classname, set())
-        if supers is not None:
-            supers = [s.strip().split()[-1] for s in supers.split(',')]
-            for sup in supers:
+        if superclasses is not None:
+            superclasses = [s.strip().split()[-1] for s in superclasses.split(',')]
+            for sup in superclasses:
                 if sup not in state.superclasses:
                     scope = [ns for d, ns in state.namespaces] + \
                             [c for d, c in state.classes[:-1]]
@@ -604,6 +610,12 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         context = cg.context
         ctx = context[self.local_classname]
         impl = ""
+        
+        # add inheritance init froms
+        rents = parent_intersection(self.local_classname, WRANGLERS, self.machine.superclasses)
+        for rent in rents:
+            impl += ind + "{0}::InitFrom(m);\n".format(rent)
+
         for member in ctx.keys():
             impl += ind + "{0} = m->{0}".format(member)
         return impl
@@ -632,8 +644,14 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 pods.append((member, t))
             else:
                 pass # add lists appropriately
+
         impl = ""
-        # add most-derived agent class call, e.g. cyc::FacilityModel::InitFrom(b);
+        
+        # add inheritance init froms
+        rents = parent_intersection(self.local_classname, WRANGLERS, self.machine.superclasses)
+        for rent in rents:
+            impl += ind + "{0}::InitFrom(b);\n".format(rent)
+
         impl += ind + "cyc::QueryResult qr = b->Query(\"Info\", NULL);\n"
         for pod in pods:
             impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(pod[0], pod[1])
@@ -641,7 +659,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
-    """Filter for handling InFileToDb() code generation:
+    """Filter for handling InfileToDb() code generation:
         #pragma cyclus [def|decl|impl] infiletodb [classname]
     """
     methodname = "InfileToDb"
@@ -649,7 +667,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
     methodrtn = "void"
 
     def methodargs(self):
-        return "{0}::InFileTree* tree, {0}::DbInit di".format(CYCNS)
+        return "{0}::InfileTree* tree, {0}::DbInit di".format(CYCNS)
 
     def impl(self, ind="  "):        
         cg = self.machine
@@ -667,9 +685,15 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 pass # add lists appropriately
 
         impl = ""
-        # add most-derived agent class call, e.g. cyc::FacilityModel::InitFrom(b);
+
+        
+        # add inheritance init froms
+        rents = parent_intersection(self.local_classname, WRANGLERS, self.machine.superclasses)
+        for rent in rents:
+            impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
+
         impl += ind + "tree = tree->SubTree(\"model/\" + model_impl());\n"
-        impl += ind + ("{0}::InFileTree* input = "
+        impl += ind + ("{0}::InfileTree* input = "
                        "tree->SubTree(\"input\");\n").format(CYCNS)
         for pod in pods:
             methname = "Query" if pod[2] is None else "OptionalQuery"
@@ -727,7 +751,7 @@ class SchemaFilter(CodeGeneratorFilter):
 
         # add lists appropriately
         
-        impl += ind + "\"  </element>\\n\"\n;";
+        impl += ind + "\"  </element>\\n\";\n";
         return impl
 
 
@@ -791,11 +815,11 @@ class CodeGenerator(object):
         for filter in self.filters: 
             filter.revert(statement, sep)
 
-def generate_code(orig, context, supers):
+def generate_code(orig, context, superclasses):
     """Takes a canonical C++ source file and separates it out into statements
     which are fed into a code generator. The new file is returned.
     """
-    cg = CodeGenerator(context, supers)
+    cg = CodeGenerator(context, superclasses)
     for m in RE_STATEMENT.finditer(orig):
         if m is None:
             continue
@@ -911,14 +935,14 @@ def parent_classes(classname, pdict):
         rents |= parent_classes(val, pdict)
     return rents
 
-def parent_intersection(classname, queryset, supers):
+def parent_intersection(classname, queryset, superclasses):
     """returns all elements in query_set which are parents of classname and not
     parents of any other class in query_set
     """
-    rents = queryset.intersection(supers[classname])
+    rents = queryset.intersection(superclasses[classname])
     grents = set()
     for parent in rents:
-        grents |= parent_classes(parent, supers)
+        grents |= parent_classes(parent, superclasses)
     return rents - grents
 
 ensure_startswith_newlinehash = lambda x: '\n' + x if x.startswith('#') else x
@@ -939,17 +963,17 @@ def main():
     
     canon = preprocess_file(ns.path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
-    context, supers = accumulate_state(canon)   # pass 2
+    context, superclasses = accumulate_state(canon)   # pass 2
     #pprint(context)
-    # pprint(supers)
-    # print(parent_classes('OtherFriend', supers))
+    # pprint(superclasses)
+    # print(parent_classes('OtherFriend', superclasses))
     # classset = {'mi6::Friend'}
-    # print(parent_intersection('OtherFriend', classset, supers))
+    # print(parent_intersection('OtherFriend', classset, superclasses))
     if not ns.pass3_use_pp:
         with open(ns.path) as f:
             orig = f.read()
         orig = ensure_startswith_newlinehash(orig)
-    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, supers)  # pass 3
+    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)  # pass 3
     print(newfile)
 
 if __name__ == "__main__":
