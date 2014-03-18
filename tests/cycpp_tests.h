@@ -68,7 +68,7 @@ private:
   double not_var;
 };
 
-class Friend {
+class Friend: public Spy {
  public:
   #pragma cyclus var {\
     "default": "friend of " + Spy.name['default'], \
@@ -77,6 +77,11 @@ class Friend {
 };
 
 }; // namespace mi6
+
+class OtherFriend: public mi6::Friend {
+ public:
+  int i;
+}
 
 typedef unsigned long ulong;
 typedef int int_t, *intp_t, (&fp)(int, ulong), arr_t[10];

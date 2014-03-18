@@ -68,6 +68,8 @@ CYCNS = "cyclus"
 
 PRIMITIVES = {'std::string', 'float', 'double', 'int'}
 
+STATE_WRANGLERS = {}
+
 #
 # pass 1
 #
@@ -230,8 +232,8 @@ class ClassFilter(Filter):
                 if sup not in state.superclasses:
                     scope = [ns for d, ns in state.namespaces] + \
                             [c for d, c in state.classes[:-1]]
-                    for i in range(-1, -len(scope)-1, -1):
-                        trysup = "::".join(scope[:i])
+                    for i in range(1, len(scope) + 1)[::-1]:
+                        trysup = "::".join(scope[:i]) + "::" + sup
                         if trysup in state.superclasses:
                             sup = trysup
                             break
@@ -725,7 +727,7 @@ class SchemaFilter(CodeGeneratorFilter):
 
         # add lists appropriately
         
-        impl += ind + "\"  </element>\\n\"\n";
+        impl += ind + "\"  </element>\\n\"\n;";
         return impl
 
 
@@ -742,9 +744,10 @@ class CodeGenerator(object):
     state.
     """
     
-    def __init__(self, context):
+    def __init__(self, context, superclasses):
         self.depth = 0
         self.context = context  # the results of pass 2
+        self.superclasses = superclasses  # the results of pass 2
         self.statements = []    # the results of pass 3, waiting to be joined
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.superclasses = {}  # map from classes to set of super classes.
@@ -788,11 +791,11 @@ class CodeGenerator(object):
         for filter in self.filters: 
             filter.revert(statement, sep)
 
-def generate_code(orig, context):
+def generate_code(orig, context, supers):
     """Takes a canonical C++ source file and separates it out into statements
     which are fed into a code generator. The new file is returned.
     """
-    cg = CodeGenerator(context)
+    cg = CodeGenerator(context, supers)
     for m in RE_STATEMENT.finditer(orig):
         if m is None:
             continue
@@ -901,6 +904,23 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
                                 close_brace=close_brace, separator=separator))
     return t
 
+def parent_classes(classname, pdict):
+    rents = set()
+    for val in pdict[classname]:
+        rents.add(val)
+        rents |= parent_classes(val, pdict)
+    return rents
+
+def parent_intersection(classname, queryset, supers):
+    """returns all elements in query_set which are parents of classname and not
+    parents of any other class in query_set
+    """
+    rents = queryset.intersection(supers[classname])
+    grents = set()
+    for parent in rents:
+        grents |= parent_classes(parent, supers)
+    return rents - grents
+
 ensure_startswith_newlinehash = lambda x: '\n' + x if x.startswith('#') else x
 
 def main():
@@ -921,13 +941,16 @@ def main():
     canon = ensure_startswith_newlinehash(canon)
     context, supers = accumulate_state(canon)   # pass 2
     #pprint(context)
-    pprint(supers)
+    # pprint(supers)
+    # print(parent_classes('OtherFriend', supers))
+    # classset = {'mi6::Friend'}
+    # print(parent_intersection('OtherFriend', classset, supers))
     if not ns.pass3_use_pp:
         with open(ns.path) as f:
             orig = f.read()
         orig = ensure_startswith_newlinehash(orig)
-    newfile = generate_code(canon if ns.pass3_use_pp else orig, context)  # pass 3
-    #print(newfile)
+    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, supers)  # pass 3
+    print(newfile)
 
 if __name__ == "__main__":
     main()
