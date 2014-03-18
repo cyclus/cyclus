@@ -531,7 +531,7 @@ class CodeGeneratorFilter(Filter):
         if mode is None or mode is ' ':
             mode = "def"
         mode = mode.strip()
-        classname = self.match.group(2)
+        classname = self.match.group(2) if self.match.lastindex > 1 else None
         if classname is None:
             classname = cg.classname()
         classname = classname.strip().replace('.', '::')
@@ -859,10 +859,11 @@ class SnapshotInvFilter(CodeGeneratorFilter):
         buffs = []
         for member, info in ctx.items():
             t = info['type']
-            if t in BUFFERS:
+            if not isinstance(t, list) and t in BUFFERS:
                 buffs.append(member)
 
         impl = ind + "{0}::Inventories invs;\n".format(CYCNS)
+
         for buff in buffs:
             impl += ind + ("invs[\"{0}\"] = "
                            "{0}.PopN({0}.count());\n").format(buff)
@@ -888,7 +889,7 @@ class InitInvFilter(CodeGeneratorFilter):
         buffs = []
         for member, info in ctx.items():
             t = info['type']
-            if t in BUFFERS:
+            if not isinstance(t, list) and t in BUFFERS:
                 buffs.append(member)
 
         impl = ""
@@ -896,12 +897,23 @@ class InitInvFilter(CodeGeneratorFilter):
             impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(member)
         return impl
 
-class DefaultPragmaFilter(CodeGeneratorFilter):
+class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
         #pragma cyclus [def|decl|impl]
     """
-    regex = "\s*#\s*pragma\s+cyclus+(\sdef\s|\sdecl\s|\simpl\s|\s)\s+.*?"
-    pass
+    regex = re.compile("\s*#\s*pragma\s+cyclus+(\sdef|\sdecl|\simpl|)$")
+
+    def transform(self, statement, sep):
+        rtn = ""
+        for f in self.machine.codegen_filters:
+            f.match = self.match
+            rtn += f.transform(statement, sep)
+        return rtn
+
+    def revert(self, statement, sep):
+        for f in self.machine.codegen_filters:
+            f.revert(statement, sep)
+    # pass
 
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
@@ -923,12 +935,15 @@ class CodeGenerator(object):
         self.superclasses = {}  # map from classes to set of super classes.
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
-        self.filters = [ClassFilter(self), AccessFilter(self), 
-                        NamespaceFilter(self), InitFromCopyFilter(self), 
-                        InitFromDbFilter(self), InfileToDbFilter(self), 
-                        CloneFilter(self), SchemaFilter(self),
-                        SnapshotFilter(self), InitInvFilter(self), 
-                        SnapshotInvFilter(self), DefaultPragmaFilter(self)]
+        self.codegen_filters = [InitFromCopyFilter(self), 
+                                InitFromDbFilter(self), InfileToDbFilter(self),
+                                CloneFilter(self), SchemaFilter(self),
+                                SnapshotFilter(self), InitInvFilter(self), 
+                                SnapshotInvFilter(self)] # all basic code generating filters
+        self.filters = self.codegen_filters + [ClassFilter(self), 
+                                               AccessFilter(self), 
+                                               NamespaceFilter(self), 
+                                               DefaultPragmaFilter(self)]
         
     def classname(self):
         """Returns the current, fully-expanded class name."""
