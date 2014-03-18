@@ -93,6 +93,7 @@ class Villan {
   #pragma cyclus initfromcopy
   #pragma cyclus initfromdb
   #pragma cyclus infiletodb
+  #pragma cyclus schema
 
   #pragma cyclus initfromcopy mi6.Friend
 };

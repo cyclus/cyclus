@@ -686,6 +686,51 @@ class InfileToDbFilter(CodeGeneratorFilter):
         impl += ind + 2 * " " + "->Record();\n"
         return impl
 
+class SchemaFilter(CodeGeneratorFilter):
+    """Filter for handling Schema() code generation:
+        #pragma cyclus [def|decl|impl] schema [classname]
+    """
+    methodname = "Schema"
+    pragmaname = "schema"
+    methodrtn = "std::string"
+
+    def impl(self, ind="  "):        
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.local_classname]
+        impl = ""
+        pods = []
+        lists = []
+        for member, info in ctx.items():
+            opt = True if 'default' in info else False
+            t = info['type']
+            if t in PRIMITIVES:
+                pods.append([member, opt])
+            else:
+                pass # add lists appropriately
+        impl = ind + "return\n"
+        ind += "  "
+        impl += ind + "\"  <element name =\\\"input\\\">\\n\"\n"
+        xmlind = 4
+        
+        for pod in pods:
+            if pod[1]:
+                impl += ind + "\"{0}<optional>\\n\"\n".format(" " * xmlind)
+                xmlind += 2
+            impl += ind + ("\"{0}<element name ="
+                           "\\\"{1}\\\"/>\\n\"\n").format(" " * xmlind, pod[0])
+            if pod[1]:
+                xmlind -= 2
+                impl += ind + "\"{0}</optional>\\n\"\n".format(" " * xmlind)
+
+        # add lists appropriately
+        
+        impl += ind + "\"  </element>\\n\"\n";
+        return impl
+
+
+        
+
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
 
@@ -708,7 +753,7 @@ class CodeGenerator(object):
         self.filters = [ClassFilter(self), AccessFilter(self), 
                         NamespaceFilter(self), InitFromCopyFilter(self), 
                         InitFromDbFilter(self), InfileToDbFilter(self), 
-                        CloneFilter(self)]
+                        CloneFilter(self), SchemaFilter(self)]
         
     def classname(self):
         """Returns the current, fully-expanded class name."""
