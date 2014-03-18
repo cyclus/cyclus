@@ -67,10 +67,6 @@ RE_STATEMENT = re.compile(
 CYCNS = "cyclus"
 
 PRIMITIVES = {'std::string', 'float', 'double', 'int'}
-PRIMITIVES_TO_NAMES = {'std::string': 'string', 
-                       'float': 'double', 
-                       'double': 'double',
-                       'int': 'int'}
 
 #
 # pass 1
@@ -631,7 +627,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
     methodrtn = "void"
 
     def methodargs(self):
-        return "{0}::InFileTree* qe, {0}::DbInit di".format(CYCNS)
+        return "{0}::InFileTree* tree, {0}::DbInit di".format(CYCNS)
 
     def impl(self, ind="  "):        
         cg = self.machine
@@ -650,19 +646,19 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
         impl = ""
         # add most-derived agent class call, e.g. cyc::FacilityModel::InitFrom(b);
-        impl += ind + "qe = qe->QueryElement(\"model/\" + model_impl());\n"
+        impl += ind + "tree = tree->SubTree(\"model/\" + model_impl());\n"
         impl += ind + ("{0}::InFileTree* input = "
-                       "qe->QueryElement(\"input\");\n").format(CYCNS)
+                       "tree->SubTree(\"input\");\n").format(CYCNS)
         for pod in pods:
+            methname = "Query" if pod[2] is None else "OptionalQuery"
+            pod += [CYCNS, methname]
             if pod[2] is None:
-                methname = "Get{0}".format(PRIMITIVES_TO_NAMES[pod[1]].upper())
-                pod += [methname]
-                impl += ind + ("{1} {0} = input->{3}({0});\n").format(*pod)
+                impl += ind + ("{1} {0} = {3}::{4}<{1}>"
+                               "(input, \"{0}\");\n").format(*pod)
             else:
                 pod[2] = "\"" + pod[2] + "\"" if pod[1] == "std::string" else pod[2]
-                pod += [CYCNS]
-                impl += ind + ("{1} {0} = {3}::GetOptionalQuery<{1}>"
-                               "({0}, \"{0}\", {2});\n").format(*pod)
+                impl += ind + ("{1} {0} = {3}::{4}<{1}>"
+                               "(input, \"{0}\", {2});\n").format(*pod)
         # add lists appropriately
         impl += ind + "di.NewDatum(\"Info\")\n"
         for pod in pods:
