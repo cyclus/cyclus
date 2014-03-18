@@ -749,36 +749,58 @@ class SchemaFilter(CodeGeneratorFilter):
         cg = self.machine
         context = cg.context
         ctx = context[self.local_classname]
-        impl = ""
-        pods = []
-        lists = []
+        i = Indenter(level=len(ind) / 2)
+        xi = Indenter(n=4)
+        impl = i + "return\n"
+        i.up()
         for member, info in ctx.items():
             opt = True if 'default' in info else False
             t = info['type']
             if isinstance(t, list):
-                pass # add lists appropriately
+                impl += i + '"{0}<element name="{1}">\\n"\n'.format(xi, member)
+                xi.up()
+                impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi)
+                xi.up()
+
+                if t[0] in ['std::set', 'std::vector', 'std::list']:
+                    el_type = t[1].replace('std::', '')
+                    impl += i + '"{0}<element name="val">\\n"\n'.format(xi)
+                    xi.up()
+                    impl += i + '"{0}<data type="{1}">\\n"\n'.format(xi, el_type)
+                    xi.down()
+                    impl += i + '"{0}</element>\\n"\n'.format(xi)
+                else: # map
+                    k_type = t[1].replace('std::', '')
+                    v_type = t[2].replace('std::', '')
+                    impl += i + '"{0}<element name="key">\\n"\n'.format(xi)
+                    xi.up()
+                    impl += i + '"{0}<data type="{1}">\\n"\n'.format(xi, k_type)
+                    xi.down()
+                    impl += i + '"{0}</element>\\n"\n'.format(xi)
+                    impl += i + '"{0}<element name="val">\\n"\n'.format(xi)
+                    xi.up()
+                    impl += i + '"{0}<data type="{1}">\\n"\n'.format(xi, v_type)
+                    xi.down()
+                    impl += i + '"{0}</element>\\n"\n'.format(xi)
+
+                xi.down()
+                impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi)
+                xi.down()
+                impl += i + '"{0}</element>\\n"\n'.format(xi, member)
             elif isinstance(t, str) and t in PRIMITIVES:
-                pods.append([member, opt])
+                if opt:
+                    impl += i + '"{0}<optional>\\n"\n'.format(xi)
+                    xi.up()
+
+                impl += i + ('"{0}<element name ='
+                               '\\"{1}\\"/>\\n"\n').format(xi, member)
+                if opt:
+                    xi.down()
+                    impl += i + '"{0}</optional>\\n"\n'.format(xi)
             else:
                 raise RuntimeError('Unsupported type {0}'.format(t))
-        impl = ind + "return\n"
-        ind += "  "
-        impl += ind + "\"  <element name =\\\"input\\\">\\n\"\n"
-        xmlind = 4
         
-        for pod in pods:
-            if pod[1]:
-                impl += ind + "\"{0}<optional>\\n\"\n".format(" " * xmlind)
-                xmlind += 2
-            impl += ind + ("\"{0}<element name ="
-                           "\\\"{1}\\\"/>\\n\"\n").format(" " * xmlind, pod[0])
-            if pod[1]:
-                xmlind -= 2
-                impl += ind + "\"{0}</optional>\\n\"\n".format(" " * xmlind)
-
-        # add lists appropriately
-        
-        impl += ind + ";\n";
+        impl += i + ";\n";
         return impl
 
 class SnapshotFilter(CodeGeneratorFilter):
@@ -914,6 +936,33 @@ class DefaultPragmaFilter(Filter):
         for f in self.machine.codegen_filters:
             f.revert(statement, sep)
     # pass
+
+class Indenter(object):
+    def __init__(self, n=2, level=0):
+        str.__init__(self)
+        self._n = int(n)
+        self._level = int(level)
+
+    def __add__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __radd__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __concat__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __str__(self):
+        return ' '*self._n*self._level
+
+    def __repr__(self):
+        return ' '*self._n*self._level
+
+    def up(self):
+        self._level += 1
+
+    def down(self):
+        self._level -= 1
 
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
