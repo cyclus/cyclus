@@ -896,6 +896,13 @@ class InitInvFilter(CodeGeneratorFilter):
             impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(member)
         return impl
 
+class DefaultPragmaFilter(CodeGeneratorFilter):
+    """Filter for handling default pragma code generation:
+        #pragma cyclus [def|decl|impl]
+    """
+    regex = "\s*#\s*pragma\s+cyclus+(\sdef\s|\sdecl\s|\simpl\s|\s)\s+.*?"
+    pass
+
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
 
@@ -920,7 +927,8 @@ class CodeGenerator(object):
                         NamespaceFilter(self), InitFromCopyFilter(self), 
                         InitFromDbFilter(self), InfileToDbFilter(self), 
                         CloneFilter(self), SchemaFilter(self),
-                        SnapshotFilter(self)]
+                        SnapshotFilter(self), InitInvFilter(self), 
+                        SnapshotInvFilter(self), DefaultPragmaFilter(self)]
         
     def classname(self):
         """Returns the current, fully-expanded class name."""
