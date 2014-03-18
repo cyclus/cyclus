@@ -64,16 +64,20 @@ RE_STATEMENT = re.compile(
     r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE)
 
 
-CYCNS = "cyclus"
+CYCNS = 'cyclus'
 
 PRIMITIVES = {'std::string', 'float', 'double', 'int'}
 
+BUFFERS = {
+    '{0}::ResourceBuff'.format(CYCNS),
+}
+
 WRANGLERS = {
-    "{0}::Agent".format(CYCNS), 
-    "{0}::Facility".format(CYCNS), 
-    "{0}::Institution".format(CYCNS), 
-    "{0}::Region".format(CYCNS), 
-    "mi6::Spy", 
+    '{0}::Agent'.format(CYCNS), 
+    '{0}::Facility'.format(CYCNS), 
+    '{0}::Institution'.format(CYCNS), 
+    '{0}::Region'.format(CYCNS), 
+    'mi6::Spy', # for testing!
 }
 
 #
@@ -839,16 +843,58 @@ class SnapshotFilter(CodeGeneratorFilter):
 
         return impl
 
-def type_to_str(type):
-    if isinstance(type, list):
-        s = type[0] + '< '
-        s += type_to_str(type[1])
-        for t in type[2:]:
-            s += ', ' + type_to_str(t)
-        s += ' >'
-        return s
-    else:
-        return type
+class SnapshotInvFilter(CodeGeneratorFilter):
+    """Filter for handling SnapshotInv() code generation:
+        #pragma cyclus [def|decl|impl] snapshotinv [classname]
+    """
+    methodname = "SnapshotInv"
+    pragmaname = "snapshotinv"
+    methodrtn = "{0}::Inventories".format(CYCNS)
+
+    def impl(self, ind="  "):        
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.local_classname]
+        impl = ""
+        buffs = []
+        for member, info in ctx.items():
+            t = info['type']
+            if t in BUFFERS:
+                buffs.append(member)
+
+        impl = ind + "{0}::Inventories invs;\n".format(CYCNS)
+        for buff in buffs:
+            impl += ind + ("invs[\"{0}\"] = "
+                           "{0}.PopN({0}.count());\n").format(buff)
+        impl += ind + "return invs;\n"
+        return impl
+
+class InitInvFilter(CodeGeneratorFilter):
+    """Filter for handling InitInv() code generation:
+        #pragma cyclus [def|decl|impl] initinv [classname]
+    """
+    methodname = "InitInv"
+    pragmaname = "initinv"
+    methodrtn = "void"
+
+    def methodargs(self):
+        return "{0}::Inventories& inv".format(CYCNS)
+
+    def impl(self, ind="  "):        
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.local_classname]
+        impl = ""
+        buffs = []
+        for member, info in ctx.items():
+            t = info['type']
+            if t in BUFFERS:
+                buffs.append(member)
+
+        impl = ""
+        for buff in buffs:
+            impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(member)
+        return impl
 
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
@@ -1020,6 +1066,17 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
         t.append(parse_template(targ, open_brace=open_brace,
                                 close_brace=close_brace, separator=separator))
     return t
+
+def type_to_str(type):
+    if isinstance(type, list):
+        s = type[0] + '< '
+        s += type_to_str(type[1])
+        for t in type[2:]:
+            s += ', ' + type_to_str(t)
+        s += ' >'
+        return s
+    else:
+        return type
 
 def parent_classes(classname, pdict):
     rents = set()
