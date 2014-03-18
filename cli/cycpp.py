@@ -67,6 +67,10 @@ RE_STATEMENT = re.compile(
 CYCNS = "cyclus"
 
 PRIMITIVES = {'std::string', 'float', 'double', 'int'}
+PRIMITIVES_TO_NAMES = {'std::string': 'string', 
+                       'float': 'double', 
+                       'double': 'double',
+                       'int': 'int'}
 
 #
 # pass 1
@@ -485,7 +489,7 @@ class CodeGeneratorFilter(Filter):
                    "(\sdef\s|\sdecl\s|\simpl\s|\s)+"
                    "{0}(\s+.*)?")
 
-    def_template = "{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
+    def_template = "\n{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
 
     def __init__(self, *args, **kwargs):
         super(CodeGeneratorFilter, self).__init__(*args, **kwargs)
@@ -595,7 +599,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
     methodrtn = "void"
 
     def methodargs(self):
-        return "{0}::QueryBackend* b".format(CYCNS)
+        return "{0}::QueryableBackend* b".format(CYCNS)
 
     def impl(self, ind="  "):        
         cg = self.machine
@@ -618,6 +622,54 @@ class InitFromDbFilter(CodeGeneratorFilter):
         # add lists appropriately
         return impl
 
+class InfileToDbFilter(CodeGeneratorFilter):
+    """Filter for handling InFileToDb() code generation:
+        #pragma cyclus [def|decl|impl] infiletodb [classname]
+    """
+    methodname = "InfileToDb"
+    pragmaname = "infiletodb"
+    methodrtn = "void"
+
+    def methodargs(self):
+        return "{0}::InFileTree* qe, {0}::DbInit di".format(CYCNS)
+
+    def impl(self, ind="  "):        
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.local_classname]
+        impl = ""
+        pods = []
+        lists = []
+        for member, info in ctx.items():
+            t = info['type']
+            d = info['default'] if 'default' in info else None
+            if t in PRIMITIVES:
+                pods.append([member, t, d])
+            else:
+                pass # add lists appropriately
+
+        impl = ""
+        # add most-derived agent class call, e.g. cyc::FacilityModel::InitFrom(b);
+        impl += ind + "qe = qe->QueryElement(\"model/\" + model_impl());\n"
+        impl += ind + ("{0}::InFileTree* input = "
+                       "qe->QueryElement(\"input\");\n").format(CYCNS)
+        for pod in pods:
+            if pod[2] is None:
+                methname = "Get{0}".format(PRIMITIVES_TO_NAMES[pod[1]].upper())
+                pod += [methname]
+                impl += ind + ("{1} {0} = input->{3}({0});\n").format(*pod)
+            else:
+                pod[2] = "\"" + pod[2] + "\"" if pod[1] == "std::string" else pod[2]
+                pod += [CYCNS]
+                impl += ind + ("{1} {0} = {3}::GetOptionalQuery<{1}>"
+                               "({0}, \"{0}\", {2});\n").format(*pod)
+        # add lists appropriately
+        impl += ind + "di.NewDatum(\"Info\")\n"
+        for pod in pods:
+            impl += ind + 2 * " " + "->AddVal(\"{0}\", {0})\n".format(pod[0])
+        impl += ind + 2 * " " + "->Record();\n"
+        return impl
+
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
 
@@ -636,8 +688,10 @@ class CodeGenerator(object):
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
-        self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self), 
-                        InitFromCopyFilter(self), InitFromDbFilter(self), CloneFilter(self)]
+        self.filters = [ClassFilter(self), AccessFilter(self), 
+                        NamespaceFilter(self), InitFromCopyFilter(self), 
+                        InitFromDbFilter(self), InfileToDbFilter(self), 
+                        CloneFilter(self)]
         
     def classname(self):
         """Returns the current, fully-expanded class name."""
