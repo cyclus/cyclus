@@ -620,7 +620,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
 
         for member in ctx.keys():
-            impl += ind + "{0} = m->{0}".format(member)
+            impl += ind + "{0} = m->{0};\n".format(member)
         return impl
 
 class InitFromDbFilter(CodeGeneratorFilter):

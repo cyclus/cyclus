@@ -106,9 +106,9 @@ class Villan: public mi6::Spy {
     }
   std::map<int, std::string> foos;
 
-  #pragma cyclus
+  /// #pragma cyclus
   /// #pragma cyclus clone
-  /// #pragma cyclus initfromcopy
+  #pragma cyclus initfromcopy
   /// #pragma cyclus initfromdb
   /// #pragma cyclus infiletodb
   /// #pragma cyclus schema
