@@ -64,6 +64,10 @@ RE_STATEMENT = re.compile(
     r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE)
 
 
+CYCNS = "cyclus"
+
+PRIMITIVES = {'std::string', 'float', 'double', 'int'}
+
 #
 # pass 1
 #
@@ -533,10 +537,6 @@ class CodeGeneratorFilter(Filter):
         else:
             return definition + impl + end
 
-    def pragmaname(self):
-        #overwriteable
-        return self.methodname.lower()
-
     def methodargs(self):
         # overwriteable
         return ""
@@ -556,7 +556,7 @@ class CloneFilter(CodeGeneratorFilter):
     """
     methodname = "Clone"
     pragmaname = "clone"
-    methodrtn = "cyclus::Model*"
+    methodrtn = "{0}::Model*".format(CYCNS)
 
     def impl(self, ind="  "):
         classname = self.local_classname
@@ -586,6 +586,38 @@ class InitFromCopyFilter(CodeGeneratorFilter):
             impl += ind + "{0} = m->{0}".format(member)
         return impl
 
+class InitFromDbFilter(CodeGeneratorFilter):
+    """Filter for handling db-constructor-like InitFrom() code generation:
+        #pragma cyclus [def|decl|impl] initfromdb [classname]
+    """
+    methodname = "InitFrom"
+    pragmaname = "initfromdb"
+    methodrtn = "void"
+
+    def methodargs(self):
+        return "{0}::QueryBackend* b".format(CYCNS)
+
+    def impl(self, ind="  "):        
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.local_classname]
+        impl = ""
+        pods = []
+        lists = []
+        for member, info in ctx.items():
+            t = info['type']
+            if t in PRIMITIVES:
+                pods.append((member, t))
+            else:
+                pass # add lists appropriately
+        impl = ""
+        # add most-derived agent class call, e.g. cyc::FacilityModel::InitFrom(b);
+        impl += ind + "cyc::QueryResult qr = b->Query(\"Info\", NULL);\n"
+        for pod in pods:
+            impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(pod[0], pod[1])
+        # add lists appropriately
+        return impl
+
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
 
@@ -605,8 +637,8 @@ class CodeGenerator(object):
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.filters = [ClassFilter(self), AccessFilter(self), NamespaceFilter(self), 
-                        InitFromCopyFilter(self), CloneFilter(self)]
-
+                        InitFromCopyFilter(self), InitFromDbFilter(self), CloneFilter(self)]
+        
     def classname(self):
         """Returns the current, fully-expanded class name."""
         names = [n for d, n in self.namespaces]
