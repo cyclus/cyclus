@@ -68,7 +68,7 @@ LIST(APPEND CMAKE_MODULE_PATH
      "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/CMake")
 
 # Include macros
-INCLUDE(CyclusModuleMacros)
+INCLUDE(UseCyclus)
 
 # set configuration for all library builds
 IF (WIN32)

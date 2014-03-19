@@ -1286,7 +1286,6 @@ def main():
                               "directories (a la CMake)."))
     ns = parser.parse_args()
 
-    print("includes:", ns.includes)
     includes = [] if ns.includes is None else ns.includes
     if len(includes) == 1 and ";" in includes[0]:
         includes = includes[0].split(";")
