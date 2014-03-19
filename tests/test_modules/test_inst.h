@@ -12,7 +12,9 @@ class TestInst: public cyclus::Institution {
  public:
   TestInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {};
   virtual ~TestInst() {};
-  #pragma cyclus
+
+  virtual cyclus::Agent* Clone() {return new TestInst(context());};
+  //#pragma cyclus
 };
 
 #endif  // CYCLUS_TESTS_TEST_MODULES_TEST_INST_H_
