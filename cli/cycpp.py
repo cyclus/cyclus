@@ -83,13 +83,15 @@ WRANGLERS = {
 #
 # pass 1
 #
-def preprocess_file(filename, cpp_path='cpp', cpp_args=('-xc++', '-pipe')):
+def preprocess_file(filename, includes = [], cpp_path='cpp', cpp_args=('-xc++', '-pipe')):
     """Preprocess a file using cpp.
 
     Parameters
     ----------
     filename : str
         Name of the file you want to preprocess.
+    includes : list
+        A list of all include directories to tell the preprocessor about
     cpp_path : str, optional
     cpp_args : str, optional
         Refer to the documentation of parse_file for the meaning of these arguments.
@@ -98,7 +100,9 @@ def preprocess_file(filename, cpp_path='cpp', cpp_args=('-xc++', '-pipe')):
     -----
     This was forked from pycparser: https://github.com/eliben/pycparser
     """
-    path_list = [cpp_path]
+    path_list = [cpp_path] 
+    for include in includes:
+        path_list += ['-I', include]
     if isinstance(cpp_args, Sequence):
         path_list += cpp_args
     elif cpp_args != '':
@@ -1277,9 +1281,21 @@ def main():
                               "original file. This options is mutually exclusive"
                               "with --pass3-use-pp."), dest="pass3_use_pp")
     parser.add_argument('-o', '--output', help=("output file name"))
+    parser.add_argument('-I', '--includes', nargs="+",
+                        help=("include directories for preprocessing. Can be "
+                              "a variable number of arguments (i.e., list of "
+                              "include directories), a single argument. If it "
+                              "is a single argument, it can either be a single "
+                              "directory or a semi-colon separated list of "
+                              "directories (a la CMake)."))
     ns = parser.parse_args()
+
+    print("includes:", ns.includes)
+    includes = [] if ns.includes is None else ns.includes
+    if len(includes) == 1 and ";" in includes[0]:
+        includes = includes[0].split(";")
     
-    canon = preprocess_file(ns.path)  # pass 1
+    canon = preprocess_file(ns.path, includes)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
     context, superclasses = accumulate_state(canon)   # pass 2
     #pprint(context)
@@ -1294,7 +1310,6 @@ def main():
     else:
         with open(ns.output, "w") as f:
             f.write(newfile)
-
 
 if __name__ == "__main__":
     main()
