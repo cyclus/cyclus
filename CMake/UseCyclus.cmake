@@ -44,15 +44,15 @@ macro(use_cyclus _dir _name)
 
   # install library
   install(TARGETS ${_dir}
-    LIBRARY DESTINATION lib${AGENT_PATH}
-    COMPONENT ${AGENT_PATH}
+    LIBRARY DESTINATION lib${_dir}
+    COMPONENT ${_dir}
     )
   
   # install headers
   IF(EXISTS "${BUILD_DIR}/${_name}.h")
     install(FILES ${BUILD_DIR}/${_name}.h
       DESTINATION include/cyclus
-      COMPONENT ${AGENT_PATH}
+      COMPONENT ${_dir}
       )
   ENDIF(EXISTS "${BUILD_DIR}/${_name}.h")
 
