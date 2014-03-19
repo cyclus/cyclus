@@ -8,13 +8,8 @@
 class TestFacility: public cyclus::Facility {
  public:
   TestFacility(cyclus::Context* ctx) : cyclus::Facility(ctx) {};
-      
-  virtual cyclus::Agent* Clone() { return new TestFacility(context()); };
-
-  virtual void InitInv(cyclus::Inventories& inv) {};
-  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
-
-  void CloneModuleMembersFrom(cyclus::Facility* source) {};
+  virtual ~TestFacility() {};
+  #pragma cyclus
   void Tick(int time) {};
   void Tock(int time) {};
 };

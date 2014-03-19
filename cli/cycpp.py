@@ -571,14 +571,10 @@ class CodeGeneratorFilter(Filter):
             classname = cg.classname()
         classname = classname.strip().replace('.', '::')
         context = cg.context
-        if classname not in context:
-            msg = "{2}{0} not found! Options include: {1}."
-            raise KeyError(msg.format(classname, ", ".join(sorted(context.keys())), 
-                           cg.includeloc()))
         self.local_classname = classname
 
         # compute def line
-        ctx = context[classname]
+        ctx = context[classname] = context.get(classname, {})
         in_class_decl = self.in_class_decl() 
         ns = "" if in_class_decl else classname + "::"
         virt = "virtual " if in_class_decl else ""
@@ -623,7 +619,7 @@ class CloneFilter(CodeGeneratorFilter):
     """
     methodname = "Clone"
     pragmaname = "clone"
-    methodrtn = "{0}::Model*".format(CYCNS)
+    methodrtn = "{0}::Agent*".format(CYCNS)
 
     def impl(self, ind="  "):
         classname = self.local_classname
@@ -714,7 +710,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
         
         # add pod
-        impl += ind + "cyc::QueryResult qr = b->Query(\"Info\", NULL);\n"
+        impl += ind + "{0}::QueryResult qr = b->Query(\"Info\", NULL);\n".format(CYCNS)
         for (member, t) in pods:
             if isinstance(t, Sequence) and t[0] == 'std::pair':
                 impl += ind + "{0}.first = qr.GetVal<{1}>(\"{0}A\");\n".format(member, t[1])
