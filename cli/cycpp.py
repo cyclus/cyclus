@@ -364,10 +364,6 @@ class VarDeclarationFilter(Filter):
         classname = state.classname()
         vtype, vname = self.match.groups()
         access = state.access[tuple(state.classes)]
-        if access != "public":
-            msg = ("access for state variable {0!r} on agent {1!r} must be public, "
-                   "got {2!r}")
-            raise ValueError(msg.format(vname, classname, access or 'private'))
         if classname not in state.context:
             state.context[classname] = {}
         annotations['type'] = state.canonize_type(vtype, vname)
@@ -578,7 +574,7 @@ class CodeGeneratorFilter(Filter):
         if classname not in context:
             msg = "{2}{0} not found! Options include: {1}."
             raise KeyError(msg.format(classname, ", ".join(sorted(context.keys())), 
-                           self.includeloc()))
+                           cg.includeloc()))
         self.local_classname = classname
 
         # compute def line
@@ -715,7 +711,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
             elif isinstance(t, Sequence) and t[0] == 'std::pair':
                 pods.append((member, t))
             else:
-                raise RuntimeError('Unsupported type {0}'.format(t))
+                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
         
         # add pod
         impl += ind + "cyc::QueryResult qr = b->Query(\"Info\", NULL);\n"
@@ -808,7 +804,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             elif isinstance(t, Sequence) and t[0] == 'std::pair':
                 pods.append((member, t, d))
             else:
-                raise RuntimeError('Unsupported type {0}'.format(t))
+                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
 
         # handle pod in a single datum/table
         impl += ind + 'di.NewDatum("Info")\n'
@@ -885,7 +881,7 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             else:
-                raise RuntimeError('Unsupported type {0}'.format(t))
+                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
 
             if opt:
                 impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
@@ -912,39 +908,39 @@ class SnapshotFilter(CodeGeneratorFilter):
         pod = {}
         for member, params in ctx.items():
             t = params['type']
-            if isinstance(t, Sequence):
-                supert = t[0]
-                if supert in ['std::vector', 'std::list', 'std::set']:
-                    suffix = t[0].split('::')[-1].title()
-                    impl += ind + '{\n'
-                    impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
-                    impl += ind + '  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n'.format(member)
-                    impl += ind + '    di.NewDatum("ListOf{0}")\n'.format(suffix)
-                    impl += ind + '    ->AddVal("Member", "{0}")\n'.format(member)
-                    impl += ind + '    ->AddVal("Value", *it)\n'
-                    impl += ind + '    ->Record();\n'
-                    impl += ind + '  }\n'
-                    impl += ind + '}\n'
-                elif supert == 'std::map':
-                    suffix = t[1].replace('std::', '').title() + 'To' + t[1].replace('std::', '').title()
-                    impl += ind + '{\n'
-                    impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
-                    impl += ind + '  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n'.format(member)
-                    impl += ind + '    di.NewDatum("MapOf{0}")\n'.format(suffix)
-                    impl += ind + '    ->AddVal("Member", "{0}")\n'.format(member)
-                    impl += ind + '    ->AddVal("Key", it->first)\n'
-                    impl += ind + '    ->AddVal("Value", it->second)\n'
-                    impl += ind + '    ->Record();\n'
-                    impl += ind + '  }\n'
-                    impl += ind + '}\n'
-            elif isinstance(t, str) and t in PRIMITIVES or isinstance(t, Sequence) and t[0] == 'std::pair':
+            if isinstance(t, Sequence) and t[0] in ['std::vector', 'std::list', 'std::set']:
+                suffix = t[1].replace('std::', '').title()
+                impl += ind + '{\n'
+                impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
+                impl += ind + '  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n'.format(member)
+                impl += ind + '    di.NewDatum("ListOf{0}")\n'.format(suffix)
+                impl += ind + '    ->AddVal("Member", "{0}")\n'.format(member)
+                impl += ind + '    ->AddVal("Value", *it)\n'
+                impl += ind + '    ->Record();\n'
+                impl += ind + '  }\n'
+                impl += ind + '}\n'
+            elif isinstance(t, Sequence) and t[0] == 'std::map':
+                suffix = t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
+                impl += ind + '{\n'
+                impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
+                impl += ind + '  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n'.format(member)
+                impl += ind + '    di.NewDatum("MapOf{0}")\n'.format(suffix)
+                impl += ind + '    ->AddVal("Member", "{0}")\n'.format(member)
+                impl += ind + '    ->AddVal("Key", it->first)\n'
+                impl += ind + '    ->AddVal("Value", it->second)\n'
+                impl += ind + '    ->Record();\n'
+                impl += ind + '  }\n'
+                impl += ind + '}\n'
+            elif isinstance(t, Sequence) and t[0] == 'std::pair':
+                pod[member] = t
+            elif isinstance(t, str) and t in PRIMITIVES or isinstance(t, Sequence) and t[0] in PRIMITIVES:
                 pod[member] = t
             else:
-                raise RuntimeError('Unsupported type {0}'.format(t))
+                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
 
         impl += ind + 'di.NewDatum("Info")\n'
-        for member, tp in pod.items():
-            if t == 'std::pair':
+        for member, t in pod.items():
+            if isinstance(t, Sequence) and t[0] == 'std::pair':
                 impl += ind + '->AddVal("{0}A", {0}.first)\n'.format(member)
                 impl += ind + '->AddVal("{0}B", {0}.second)\n'.format(member)
             else:

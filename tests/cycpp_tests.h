@@ -118,7 +118,7 @@ class Villan: public mi6::Spy {
   #pragma cyclus initfromdb
   #pragma cyclus infiletodb
   #pragma cyclus schema
-  /// #pragma cyclus snapshot
+  #pragma cyclus snapshot
 
   /// #pragma cyclus initfromcopy mi6.Friend
 };
