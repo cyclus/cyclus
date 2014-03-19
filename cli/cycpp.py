@@ -140,6 +140,32 @@ class Filter(object):
         """Reverts state transformation."""
         self.match = None
 
+class LinemarkerFilter(Filter):
+    """Filter for computing the current source code line
+    from preprocessor line marker directives.
+
+        # linenum filename [flags]
+
+    This is useful for debugging. See the cpp for more info:
+    http://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html
+    """
+    regex = re.compile(r'#\s+(\d+)\s+"(.*?)"(\s+\d+)*?')
+    allowed_flags = {'1', '2'}
+    last_was_linemarker = False
+
+    def transform(self, statement, sep):
+        lineno, fname, flags = self.match.groups()
+        if len(set((flags or '1').split()) ^ self.allowed_flags) == 0:
+            return
+        lms = self.machine.linemarkers
+        if not self.last_was_linemarker:
+            del lms[:]
+        lms.append(fname + ":" + lineno)
+
+    def revert(self, statement, sep):
+        self.last_was_linemarker = self.match is not None
+        super(LinemarkerFilter, self).revert(statement, sep)
+
 class AliasFilter(Filter):
     """Filter for managing alias (de-)scoping."""
 
@@ -385,10 +411,11 @@ class StateAccumulator(object):
         self.using_namespaces = set()  # set of (depth, ns name) tuples
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.var_annotations = None
+        self.linemarkers = []
         self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
                         NamespaceFilter(self), UsingNamespaceFilter(self),
                         NamespaceAliasFilter(self), TypedefFilter(self),
-                        UsingFilter(self),
+                        UsingFilter(self), LinemarkerFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):
@@ -414,6 +441,13 @@ class StateAccumulator(object):
         # revert what is needed
         for filter in self.filters: 
             filter.revert(statement, sep)
+
+    def includeloc(self):
+        """Current location of the file from includes as a string."""
+        if len(self.linemarkers) == 0:
+            return ""
+        s = "\n Included from:\n  " + "\n  ".join(self.linemarkers)
+        return s + "\n"
 
     #
     # type system
@@ -454,9 +488,10 @@ class StateAccumulator(object):
                 except TypeError:
                     pass  # This is the TypeError from below
             else:
-                msg = ("the type of {c}::{n} ({t}) is not a recognized template "
-                       "type: {p}.").format(t=t, n=name, c=self.classname(), 
-                                            p=", ".join(sorted(self.known_templates)))
+                msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
+                       "template type: {p}.").format(i=self.includeloc(), t=t,
+                                                     n=name, c=self.classname(), 
+                                                     p=", ".join(sorted(self.known_templates)))
                 raise TypeError(msg)
         elif '<' in t:
             # string version of template type
@@ -483,8 +518,8 @@ class StateAccumulator(object):
                 except TypeError:
                     pass  # This is the TypeError from below
             else:
-                msg = ("the type of {c}::{n} ({t}) is not a recognized primitive "
-                       "type: {p}.").format(t=t, n=name, c=self.classname(), 
+                msg = ("{i}The type of {c}::{n} ({t}) is not a recognized primitive "
+                       "type: {p}.").format(i=self.includeloc(), t=t, n=name, c=self.classname(), 
                                             p=", ".join(sorted(self.known_primitives)))
                 raise TypeError(msg)
         return t
@@ -537,8 +572,9 @@ class CodeGeneratorFilter(Filter):
         classname = classname.strip().replace('.', '::')
         context = cg.context
         if classname not in context:
-            msg = "{0} not found! Options include: {1}."
-            raise KeyError(msg.format(classname, ", ".join(sorted(context.keys()))))
+            msg = "{2}{0} not found! Options include: {1}."
+            raise KeyError(msg.format(classname, ", ".join(sorted(context.keys())), 
+                           self.includeloc()))
         self.local_classname = classname
 
         # compute def line
@@ -984,6 +1020,7 @@ class CodeGenerator(object):
         self.superclasses = {}  # map from classes to set of super classes.
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
+        self.linemarkers = []
         self.codegen_filters = [InitFromCopyFilter(self), 
                                 InitFromDbFilter(self), InfileToDbFilter(self),
                                 CloneFilter(self), SchemaFilter(self),
@@ -992,13 +1029,21 @@ class CodeGenerator(object):
         self.filters = self.codegen_filters + [ClassFilter(self), 
                                                AccessFilter(self), 
                                                NamespaceFilter(self), 
-                                               DefaultPragmaFilter(self)]
+                                               DefaultPragmaFilter(self),
+                                               LinemarkerFilter(self)]
         
     def classname(self):
         """Returns the current, fully-expanded class name."""
         names = [n for d, n in self.namespaces]
         names += [n for d, n in self.classes]
         return "::".join(names)
+
+    def includeloc(self):
+        """Current location of the file from includes as a string."""
+        if len(self.linemarkers) == 0:
+            return ""
+        s = "\n Included from:\n  " + "\n  ".join(self.linemarkers)
+        return s + "\n"
 
     def generate(self, statement, sep):
         """Modify the existing statements list by incoprorating, modifying, or 
