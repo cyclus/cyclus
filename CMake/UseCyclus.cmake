@@ -23,20 +23,26 @@ macro(use_cyclus _dir _name)
   ENDFOREACH(DIR ${DIRS})
   SET(ENV{CPLUS_INCLUDE_PATH} ${INCL_ARG})
 
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    SET(PREPROCESSOR "-cpp-path clang++")
+  else()
+    SET(PREPROCESSOR "-cpp-path cpp")
+  endif()
+
   # process header
   SET(HIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
   SET(HOUT "-o=${BUILD_DIR}/${_name}.h")
   IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
-    EXECUTE_PROCESS(COMMAND ${CYCPLUS} ${HIN} ${HOUT})
-    MESSAGE(STATUS "Executing ${CYCPLUS} ${HIN} ${HOUT}")
+    EXECUTE_PROCESS(COMMAND ${HIN} ${CYCPLUS} ${PREPROCESSOR} ${HOUT})
+    MESSAGE(STATUS "Executing ${HIN} ${CYCPLUS} ${PREPROCESSOR} ${HOUT}")
   ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
 
   # process impl
   SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc")
   SET(CCOUT "-o=${BUILD_DIR}/${_name}.cc")
   SET(ORIG "--pass3-use-orig")
-  MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${CCOUT} ${ORIG}")
-  EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${CCOUT} ${ORIG})
+  MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCOUT} ${ORIG}")
+  EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCOUT} ${ORIG})
 
   # add library
   ADD_LIBRARY(${_dir} ${BUILD_DIR}/${_name}.cc)

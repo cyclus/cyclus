@@ -83,7 +83,7 @@ WRANGLERS = {
 #
 # pass 1
 #
-def preprocess_file(filename, includes = [], cpp_path='cpp', cpp_args=('-xc++', '-pipe')):
+def preprocess_file(filename, includes = [], cpp_path='cpp', cpp_args=('-xc++', '-pipe', '-E')):
     """Preprocess a file using cpp.
 
     Parameters
@@ -742,7 +742,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
 
-        impl += ind + "tree = tree->SubTree(\"model/\" + model_impl());\n"
+        impl += ind + "tree = tree->SubTree(\"agent/\" + agent_impl());\n"
 
         for member, info in ctx.items():
             t = info['type']
@@ -826,7 +826,7 @@ class SchemaFilter(CodeGeneratorFilter):
     """Filter for handling Schema() code generation:
         #pragma cyclus [def|decl|impl] schema [classname]
     """
-    methodname = "Schema"
+    methodname = "schema"
     pragmaname = "schema"
     methodrtn = "std::string"
 
@@ -836,7 +836,7 @@ class SchemaFilter(CodeGeneratorFilter):
         ctx = context[self.local_classname]
         i = Indenter(level=len(ind) / 2)
         xi = Indenter(n=4)
-        impl = i.up() + "return\n"
+        impl = i.up() + 'return ""\n'
         for member, info in ctx.items():
             opt = True if 'default' in info else False
             if opt:
@@ -1273,6 +1273,8 @@ def main():
                               "original file. This options is mutually exclusive"
                               "with --pass3-use-pp."), dest="pass3_use_pp")
     parser.add_argument('-o', '--output', help=("output file name"))
+    parser.add_argument('--cpp-path', dest='cpp_path', help=("preprocessor to use"),
+                        default='cpp')
     parser.add_argument('-I', '--includes', nargs="+",
                         help=("include directories for preprocessing. Can be "
                               "a variable number of arguments (i.e., list of "
@@ -1286,7 +1288,7 @@ def main():
     if len(includes) == 1 and ";" in includes[0]:
         includes = includes[0].split(";")
     
-    canon = preprocess_file(ns.path, includes)  # pass 1
+    canon = preprocess_file(ns.path, includes, cpp_path=ns.cpp_path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
     context, superclasses = accumulate_state(canon)   # pass 2
     #pprint(context)
