@@ -52,8 +52,8 @@ void XMLFlatLoader::LoadInitialAgents() {
   // create prototypes
   int num_protos = xqe.NMatches("/*/prototype");
   for (int i = 0; i < num_protos; i++) {
-    InfileTree* qe = xqe.Query("/*/prototype", i);
-    InfileTree* module_data = qe->Query("agent");
+    InfileTree* qe = xqe.SubTree("/*/prototype", i);
+    InfileTree* module_data = qe->SubTree("agent");
     std::string module_name = module_data->GetElementName();
     std::string prototype = qe->GetString("name");
 
@@ -82,10 +82,10 @@ void XMLFlatLoader::LoadInitialAgents() {
   std::set<std::string> agents; // set<agent_name>
   std::map<std::string, InfileTree*> invs; // map<agent, qe>;
   for (int i = 0; i < num_agents; i++) {
-    InfileTree* qe = xqe.Query("/*/agent", i);
+    InfileTree* qe = xqe.SubTree("/*/agent", i);
     std::string name = qe->GetString("name");
     std::string proto = qe->GetString("prototype");
-    std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
+    std::string parent = OptionalQuery<std::string>(qe, "parent", "");
     protos[name] = proto;
     parents[name] = parent;
     invs[name] = qe;
