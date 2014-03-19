@@ -1181,6 +1181,7 @@ def main():
                         help=("On pass 3, use the preproccessed version of the "
                               "original file. This options is mutually exclusive"
                               "with --pass3-use-pp."), dest="pass3_use_pp")
+    parser.add_argument('-o', '--output', help=("output file name"))
     ns = parser.parse_args()
     
     canon = preprocess_file(ns.path)  # pass 1
@@ -1193,7 +1194,12 @@ def main():
             orig = f.read()
         orig = ensure_startswith_newlinehash(orig)
     newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)  # pass 3
-    print(newfile)
+    if ns.output is None:
+        print(newfile)
+    else:
+        with open(ns.output, "w") as f:
+            f.write(newfile)
+
 
 if __name__ == "__main__":
     main()
