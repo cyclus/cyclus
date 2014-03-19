@@ -648,7 +648,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
 
         for member, info in ctx.items():
             t = info['type']
-            if isinstance(t, list):
+            if isinstance(t, Sequence):
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
                 else:
@@ -702,7 +702,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         for member, info in ctx.items():
             t = info['type']
             d = info['default'] if 'default' in info else None
-            if isinstance(t, list):
+            if isinstance(t, Sequence):
                 pass # add lists appropriately
             elif isinstance(t, str) and t in PRIMITIVES:
                 pods.append([member, t, d])
@@ -756,7 +756,7 @@ class SchemaFilter(CodeGeneratorFilter):
         for member, info in ctx.items():
             opt = True if 'default' in info else False
             t = info['type']
-            if isinstance(t, list):
+            if isinstance(t, Sequence):
                 impl += i + '"{0}<element name="{1}">\\n"\n'.format(xi, member)
                 xi.up()
                 impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi)
@@ -822,7 +822,7 @@ class SnapshotFilter(CodeGeneratorFilter):
         pod = {}
         for member, params in ctx.items():
             t = params['type']
-            if isinstance(t, list):
+            if isinstance(t, Sequence):
                 supert = t[0]
                 if supert in ['std::vector', 'std::list', 'std::set']:
                     suffix = t[0].split('::')[-1].title()
@@ -881,7 +881,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
         buffs = []
         for member, info in ctx.items():
             t = info['type']
-            if not isinstance(t, list) and t in BUFFERS:
+            if not isinstance(t, Sequence) and t in BUFFERS:
                 buffs.append(member)
 
         impl = ind + "{0}::Inventories invs;\n".format(CYCNS)
@@ -911,7 +911,7 @@ class InitInvFilter(CodeGeneratorFilter):
         buffs = []
         for member, info in ctx.items():
             t = info['type']
-            if not isinstance(t, list) and t in BUFFERS:
+            if not isinstance(t, Sequence) and t in BUFFERS:
                 buffs.append(member)
 
         impl = ""
