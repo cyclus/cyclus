@@ -684,11 +684,11 @@ class InitFromDbFilter(CodeGeneratorFilter):
 
         for member, info in ctx.items():
             t = info['type']
-            if isinstance(t, Sequence):
+            if isinstance(t, Sequence) and t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
                 else:
-                    table = 'ListOf' + t[0].split('::')[-1].title()
+                    table = 'ListOf' + t[1].replace('std::', '').title()
                 impl += ind + '{\n'
                 impl += ind + '  std::vector<{0}::Cond> conds;\n'.format(CYCNS)
                 impl += ind + '  conds.push_back({0}::Cond("Member", "==", "{1}"));\n'.format(CYCNS, member)
@@ -706,15 +706,21 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 ind = ind[:-4]
                 impl += ind + '  }\n'
                 impl += ind + '}\n'
-            elif isinstance(t, str) and t in PRIMITIVES:
+            elif isinstance(t, Sequence) and t[0] in PRIMITIVES or isinstance(t, str) and t in PRIMITIVES:
+                pods.append((member, t))
+            elif isinstance(t, Sequence) and t[0] == 'std::pair':
                 pods.append((member, t))
             else:
                 raise RuntimeError('Unsupported type {0}'.format(t))
         
         # add pod
         impl += ind + "cyc::QueryResult qr = b->Query(\"Info\", NULL);\n"
-        for pod in pods:
-            impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(pod[0], pod[1])
+        for (member, t) in pods:
+            if isinstance(t, Sequence) and t[0] == 'std::pair':
+                impl += ind + "{0}.first = qr.GetVal<{1}>(\"{0}A\");\n".format(member, t[1])
+                impl += ind + "{0}.second = qr.GetVal<{1}>(\"{0}B\");\n".format(member, t[2])
+            else:
+                impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(member, t)
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
@@ -732,45 +738,92 @@ class InfileToDbFilter(CodeGeneratorFilter):
         cg = self.machine
         context = cg.context
         ctx = context[self.local_classname]
-        impl = ""
         pods = []
-        lists = []
-        for member, info in ctx.items():
-            t = info['type']
-            d = info['default'] if 'default' in info else None
-            if isinstance(t, Sequence):
-                pass # add lists appropriately
-            elif isinstance(t, str) and t in PRIMITIVES:
-                pods.append([member, t, d])
-            else:
-                raise RuntimeError('Unsupported type {0}'.format(t))
-
         impl = ""
 
-        
         # add inheritance init froms
         rents = parent_intersection(self.local_classname, WRANGLERS, self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
 
         impl += ind + "tree = tree->SubTree(\"model/\" + model_impl());\n"
-        impl += ind + ("{0}::InfileTree* input = "
-                       "tree->SubTree(\"input\");\n").format(CYCNS)
-        for pod in pods:
-            methname = "Query" if pod[2] is None else "OptionalQuery"
-            pod += [CYCNS, methname]
-            if pod[2] is None:
-                impl += ind + ("{1} {0} = {3}::{4}<{1}>"
-                               "(input, \"{0}\");\n").format(*pod)
+
+        for member, info in ctx.items():
+            t = info['type']
+            d = info['default'] if 'default' in info else None
+            if isinstance(t, Sequence) and t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
+                if t[0] == 'std::map':
+                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
+                else:
+                    table = 'ListOf' + t[1].split('::')[-1].title()
+
+                if d is not None:
+                    impl += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+                else:
+                    impl += ind + '{\n'
+                ind += '  '
+
+                impl += ind + '{0}::InfileTree sub = tree->SubTree("{1}");\n'.format(CYCNS, member)
+                impl += ind + 'int n = sub->NMatches("val");\n'
+                impl += ind + 'for (int i = 0; i < n; ++i) {\n'
+                impl += ind + '  di.NewDatum("{0}")\n'.format(table)
+                impl += ind + '  ->AddVal("Member", "{0}")\n'.format(member)
+                if t[0] == 'std::map':
+                    impl += ind + '  ->AddVal("Key", {0}::Query(sub, "key", i))\n'.format(CYCNS)
+                else:
+                    impl += ind + '  ->AddVal("Value", {0}::Query(sub, "val", i))\n'.format(CYCNS)
+                impl += ind + '  ->Record();\n'
+                impl += ind + '}\n'
+
+                if d is not None:
+                    ind = ind[:-2]
+                    impl += ind + '} else {\n'
+                    ind += '  '
+                    if t[0] == 'std::map':
+                        for k, v in d.items():
+                            ktext = '"{0}"'.format(k) if t[1] == 'std::string' else '{0}'.format(k)
+                            vtext = '"{0}"'.format(v) if t[2] == 'std::string' else '{0}'.format(v)
+                            impl += ind + 'di.NewDatum("{0}")\n'.format(table)
+                            impl += ind + '->AddVal("Member", "{0}")\n'.format(member)
+                            impl += ind + '->AddVal("Key", {0})\n'.format(ktext)
+                            impl += ind + '->AddVal("Value", {0})\n'.format(vtext)
+                            impl += ind + '->Record();\n'
+                    else:
+                        for v in d:
+                            vtext = '"{0}"'.format(v) if t[1] == 'std::string' else '{0}'.format(v)
+                            impl += ind + 'di.NewDatum("{0}")\n'.format(table)
+                            impl += ind + '->AddVal("Member", "{0}")\n'.format(member)
+                            impl += ind + '->AddVal("Value", {0})\n'.format(vtext)
+                            impl += ind + '->Record();\n'
+
+                ind = ind[:-2]
+                impl += ind + '}\n'
+
+            elif isinstance(t, str) and t in PRIMITIVES or isinstance(t, Sequence) and t[0] in PRIMITIVES:
+                pods.append((member, t, d))
+            elif isinstance(t, Sequence) and t[0] == 'std::pair':
+                pods.append((member, t, d))
             else:
-                pod[2] = "\"" + pod[2] + "\"" if pod[1] == "std::string" else pod[2]
-                impl += ind + ("{1} {0} = {3}::{4}<{1}>"
-                               "(input, \"{0}\", {2});\n").format(*pod)
-        # add lists appropriately
-        impl += ind + "di.NewDatum(\"Info\")\n"
-        for pod in pods:
-            impl += ind + 2 * " " + "->AddVal(\"{0}\", {0})\n".format(pod[0])
-        impl += ind + 2 * " " + "->Record();\n"
+                raise RuntimeError('Unsupported type {0}'.format(t))
+
+        # handle pod in a single datum/table
+        impl += ind + 'di.NewDatum("Info")\n'
+        for (member, t, d) in pods:
+            methname = "Query" if d is None else "OptionalQuery"
+            opt = ''
+            if isinstance(t, Sequence) and t[0] == 'std::pair':
+                opt2 = ''
+                if d is not None:
+                    opt = ', ' + d[0]
+                    opt2 = ', ' + d[1]
+                impl += ind + '->AddVal("{0}A", {1}::{2}<{3}>(tree, "{0}/first"{4}))\n'.format(member, CYCNS, methname, t[1], opt)
+                impl += ind + '->AddVal("{0}B", {1}::{2}<{3}>(tree, "{0}/second"{4}))\n'.format(member, CYCNS, methname, t[2], opt2)
+            else:
+                if d is not None:
+                    opt = ', "' + d + '"' if t == "std::string" else ', ' + d 
+                impl += ind + '->AddVal("{0}", {1}::{2}<{3}>(tree, "{0}"{4}))\n'.format(member, CYCNS, methname, t, opt)
+        impl += ind + '->Record();\n'
+
         return impl
 
 class SchemaFilter(CodeGeneratorFilter):
@@ -787,54 +840,51 @@ class SchemaFilter(CodeGeneratorFilter):
         ctx = context[self.local_classname]
         i = Indenter(level=len(ind) / 2)
         xi = Indenter(n=4)
-        impl = i + "return\n"
-        i.up()
+        impl = i.up() + "return\n"
         for member, info in ctx.items():
             opt = True if 'default' in info else False
-            t = info['type']
-            if isinstance(t, Sequence):
-                impl += i + '"{0}<element name="{1}">\\n"\n'.format(xi, member)
-                xi.up()
-                impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi)
-                xi.up()
+            if opt:
+                impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
 
+            t = info['type']
+            if isinstance(t, Sequence) and t[0] in ['std::list', 'std::map', 'std::set', 'std::vector']:
+                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
+                impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
                 if t[0] in ['std::set', 'std::vector', 'std::list']:
                     el_type = t[1].replace('std::', '')
-                    impl += i + '"{0}<element name="val">\\n"\n'.format(xi)
-                    xi.up()
-                    impl += i + '"{0}<data type="{1}">\\n"\n'.format(xi, el_type)
-                    xi.down()
-                    impl += i + '"{0}</element>\\n"\n'.format(xi)
+                    impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
+                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, el_type)
+                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
                 else: # map
                     k_type = t[1].replace('std::', '')
                     v_type = t[2].replace('std::', '')
-                    impl += i + '"{0}<element name="key">\\n"\n'.format(xi)
-                    xi.up()
-                    impl += i + '"{0}<data type="{1}">\\n"\n'.format(xi, k_type)
-                    xi.down()
-                    impl += i + '"{0}</element>\\n"\n'.format(xi)
-                    impl += i + '"{0}<element name="val">\\n"\n'.format(xi)
-                    xi.up()
-                    impl += i + '"{0}<data type="{1}">\\n"\n'.format(xi, v_type)
-                    xi.down()
-                    impl += i + '"{0}</element>\\n"\n'.format(xi)
+                    impl += i + '"{0}<element name=\\"key\\">\\n"\n'.format(xi.up())
+                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, k_type)
+                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
+                    impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
+                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, v_type)
+                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
 
-                xi.down()
-                impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi)
-                xi.down()
-                impl += i + '"{0}</element>\\n"\n'.format(xi, member)
-            elif isinstance(t, str) and t in PRIMITIVES:
-                if opt:
-                    impl += i + '"{0}<optional>\\n"\n'.format(xi)
-                    xi.up()
-
-                impl += i + ('"{0}<element name ='
-                               '\\"{1}\\"/>\\n"\n').format(xi, member)
-                if opt:
-                    xi.down()
-                    impl += i + '"{0}</optional>\\n"\n'.format(xi)
+                impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
+                impl += i + '"{0}</element>\\n"\n'.format(xi.down(), member)
+            elif isinstance(t, str) and t in PRIMITIVES or isinstance(t, Sequence) and t[0] == 'std::string':
+                impl += i + '"{0}<element name=\\"{1}\\"/>\\n"\n'.format(xi.up(), member)
+                impl += i + '"{0}<data type=\\"string\\" />\\n"\n'.format(xi)
+                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
+            elif isinstance(t, Sequence) and t[0] == 'std::pair':
+                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
+                impl += i + '"{0}<element name=\\"first\\">\\n"\n'.format(xi.up())
+                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t[1].replace('std::', ''))
+                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
+                impl += i + '"{0}<element name=\\"second\\">\\n"\n'.format(xi.up())
+                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t[2].replace('std::', ''))
+                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
+                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             else:
                 raise RuntimeError('Unsupported type {0}'.format(t))
+
+            if opt:
+                impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
         
         impl += i + ";\n";
         return impl
@@ -883,9 +933,7 @@ class SnapshotFilter(CodeGeneratorFilter):
                     impl += ind + '    ->Record();\n'
                     impl += ind + '  }\n'
                     impl += ind + '}\n'
-                elif supert == 'std::pair':
-                    pod[member] = t
-            elif isinstance(t, str) and t in PRIMITIVES:
+            elif isinstance(t, str) and t in PRIMITIVES or isinstance(t, Sequence) and t[0] == 'std::pair':
                 pod[member] = t
             else:
                 raise RuntimeError('Unsupported type {0}'.format(t))
@@ -996,9 +1044,11 @@ class Indenter(object):
 
     def up(self):
         self._level += 1
+        return Indenter(n=self._n, level=self._level-1)
 
     def down(self):
         self._level -= 1
+        return Indenter(n=self._n, level=self._level)
 
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
