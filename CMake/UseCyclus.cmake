@@ -8,7 +8,7 @@ MACRO(use_cyclus _dir _name)
   
   # get preprocessor script
   IF(NOT DEFINED CYCPP)
-    SET(CYCPP "${CYCLUS_CORE_INCLUDE_DIRS}/../cycpp.py")
+    SET(CYCPP "${CYCLUS_CORE_INCLUDE_DIRS}/../../bin/cycpp.py")
   ENDIF(NOT DEFINED CYCPP)
 
   # make a build directory
