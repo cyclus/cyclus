@@ -30,13 +30,14 @@ MACRO(use_cyclus _dir _name)
   ENDIF()
 
   # process header
+  SET(ORIG "--pass3-use-orig")
   SET(HIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
   SET(HOUT "${BUILD_DIR}/${_name}.h")
   SET(HFLAG "-o=${HOUT}")
   IF(EXISTS "${HIN}")
     IF(NOT EXISTS ${HOUT})
-      MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS}")
-      EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS})
+      MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
+      EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
     ENDIF(NOT EXISTS ${HOUT})
   ENDIF(EXISTS "${HIN}")
 
@@ -44,7 +45,6 @@ MACRO(use_cyclus _dir _name)
   SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc")
   SET(CCOUT "${BUILD_DIR}/${_name}.cc")
   SET(CCFLAG "-o=${CCOUT}")
-  SET(ORIG "--pass3-use-orig")
   IF(NOT EXISTS ${CCOUT})
     MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
     EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
@@ -61,7 +61,7 @@ MACRO(use_cyclus _dir _name)
       OUTPUT ${HOUT}
       COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
       DEPENDS ${HIN}
-      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS}"
+      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
       )
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CCOUT}
