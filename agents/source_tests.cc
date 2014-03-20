@@ -3,8 +3,8 @@
 #include "source_facility.h"
 
 #include "context.h"
-#include "facility_model_tests.h"
-#include "model_tests.h"
+#include "facility_agent_tests.h"
+#include "agent_tests.h"
 
 using cyclus::SimpleSource;
 
@@ -59,18 +59,18 @@ TEST_F(SimpleSourceTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* SimpleSourceModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new SimpleSource(ctx));
+cyclus::Agent* SimpleSourceAgentConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Agent*>(new SimpleSource(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::FacilityModel* SimpleSourceConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::FacilityModel*>(new SimpleSource(ctx));
+cyclus::FacilityAgent* SimpleSourceConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::FacilityAgent*>(new SimpleSource(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(SourceFac, FacilityModelTests,
+INSTANTIATE_TEST_CASE_P(SourceFac, FacilityAgentTests,
                         ::testing::Values(&SimpleSourceConstructor));
 
-INSTANTIATE_TEST_CASE_P(SourceFac, ModelTests,
-                        ::testing::Values(&SimpleSourceModelConstructor));
+INSTANTIATE_TEST_CASE_P(SourceFac, AgentTests,
+                        ::testing::Values(&SimpleSourceAgentConstructor));

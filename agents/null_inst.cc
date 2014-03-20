@@ -2,17 +2,13 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NullInst::NullInst(cyclus::Context* ctx)
-    : cyclus::InstModel(ctx) {}
+    : cyclus::InstAgent(ctx) {}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NullInst::~NullInst() {}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructNullInst(cyclus::Context* ctx) {
+extern "C" cyclus::Agent* ConstructNullInst(cyclus::Context* ctx) {
   return new NullInst(ctx);
 }
-/* ------------------- */
 
 }  // namespace cyclus

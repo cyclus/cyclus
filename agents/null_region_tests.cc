@@ -2,8 +2,8 @@
 
 #include "null_region.h"
 
-#include "region_model_tests.h"
-#include "model_tests.h"
+#include "region_agent_tests.h"
+#include "agent_tests.h"
 
 using cyclus::NullRegion;
 
@@ -58,17 +58,17 @@ TEST_F(NullRegionTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* NullRegionModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new NullRegion(ctx));
+cyclus::Agent* NullRegionAgentConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Agent*>(new NullRegion(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::RegionModel* NullRegionConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::RegionModel*>(new NullRegion(ctx));
+cyclus::RegionAgent* NullRegionConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::RegionAgent*>(new NullRegion(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(NullRegion, RegionModelTests,
+INSTANTIATE_TEST_CASE_P(NullRegion, RegionAgentTests,
                         ::testing::Values(&NullRegionConstructor));
-INSTANTIATE_TEST_CASE_P(NullRegion, ModelTests,
-                        ::testing::Values(&NullRegionModelConstructor));
+INSTANTIATE_TEST_CASE_P(NullRegion, AgentTests,
+                        ::testing::Values(&NullRegionAgentConstructor));

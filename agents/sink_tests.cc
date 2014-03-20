@@ -3,8 +3,8 @@
 #include "sink_facility.h"
 
 #include "context.h"
-#include "facility_model_tests.h"
-#include "model_tests.h"
+#include "facility_agent_tests.h"
+#include "agent_tests.h"
 
 using cyclus::SimpleSink;
 
@@ -59,18 +59,18 @@ TEST_F(SimpleSinkTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* SimpleSinkModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new SimpleSink(ctx));
+cyclus::Agent* SimpleSinkAgentConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Agent*>(new SimpleSink(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::FacilityModel* SimpleSinkConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::FacilityModel*>(new SimpleSink(ctx));
+cyclus::FacilityAgent* SimpleSinkConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::FacilityAgent*>(new SimpleSink(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(SinkFac, FacilityModelTests,
+INSTANTIATE_TEST_CASE_P(SinkFac, FacilityAgentTests,
                         ::testing::Values(&SimpleSinkConstructor));
 
-INSTANTIATE_TEST_CASE_P(SinkFac, ModelTests,
-                        ::testing::Values(&SimpleSinkModelConstructor));
+INSTANTIATE_TEST_CASE_P(SinkFac, AgentTests,
+                        ::testing::Values(&SimpleSinkAgentConstructor));

@@ -2,15 +2,12 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NullRegion::NullRegion(cyclus::Context* ctx)
-    : cyclus::RegionModel(ctx) {};
+    : cyclus::RegionAgent(ctx) {};
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 NullRegion::~NullRegion() {}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructNullRegion(cyclus::Context* ctx) {
+extern "C" cyclus::Agent* ConstructNullRegion(cyclus::Context* ctx) {
   return new NullRegion(ctx);
 }
 

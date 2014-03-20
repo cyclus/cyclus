@@ -24,7 +24,7 @@ SET(CYCLUS_DOC_DIR "${PROJECT_SOURCE_DIR}/doc")
 SET(CYCLUS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 SET(CYCLUS_STUB_DIR "${PROJECT_SOURCE_DIR}/stubs")
 SET(CYCLUS_TEST_DIR "${PROJECT_SOURCE_DIR}/tests")
-SET(CYCLUS_INTEGRATION_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/integration_tests")
+SET(CYCLUS_AGENTS_DIR "${PROJECT_SOURCE_DIR}/agents")
 
 # set cycpp var
 SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
@@ -167,7 +167,7 @@ ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
-ADD_SUBDIRECTORY("${CYCLUS_INTEGRATION_TEST_DIR}")
+ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
 
 ##############################################################################################
 ####################################### end includes #########################################

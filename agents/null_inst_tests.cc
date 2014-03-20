@@ -4,8 +4,8 @@
 
 #include "null_inst.h"
 
-#include "inst_model_tests.h"
-#include "model_tests.h"
+#include "inst_agent_tests.h"
+#include "agent_tests.h"
 
 using cyclus::NullInst;
 
@@ -54,17 +54,17 @@ TEST_F(NullInstTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* NullInstModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new NullInst(ctx));
+cyclus::Agent* NullInstAgentConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Agent*>(new NullInst(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::InstModel* NullInstConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::InstModel*>(new NullInst(ctx));
+cyclus::InstAgent* NullInstConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::InstAgent*>(new NullInst(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(NullInst, InstModelTests,
+INSTANTIATE_TEST_CASE_P(NullInst, InstAgentTests,
                         ::testing::Values(&NullInstConstructor));
-INSTANTIATE_TEST_CASE_P(NullInst, ModelTests,
-                        ::testing::Values(&NullInstModelConstructor));
+INSTANTIATE_TEST_CASE_P(NullInst, AgentTests,
+                        ::testing::Values(&NullInstAgentConstructor));

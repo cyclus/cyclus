@@ -1,75 +1,30 @@
 #include <boost/lexical_cast.hpp>
 
-#include "capacity_constraint.h"
-#include "context.h"
-#include "cyc_limits.h"
-#include "error.h"
-#include "logger.h"
+#include "sink.h"
 
-#include "simple_sink.h"
+using cyclus::Sink;
 
-using cyclus::SimpleSink;
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SimpleSink::SimpleSink(cyclus::Context* ctx)
-    : cyclus::FacilityModel(ctx),
+Sink::Sink(cyclus::Context* ctx)
+    : cyclus::FacilityAgent(ctx),
       capacity_(100){}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SimpleSink::~SimpleSink() {}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SimpleSink::schema() {
-  return
-      "  <element name =\"input\">               \n"
-      "    <element name =\"incommodity\">       \n"
-      "      <text/>                             \n"
-      "    </element>                            \n"
-      "    <element name =\"input_capacity\">    \n"
-      "      <data type=\"double\"/>             \n"
-      "    </element>                            \n"
-      "  </element>                              \n";
+void SinkFacility::InitInv(cyc::Inventories& inv) {
+  inventory_.PushAll(inv["inventory"]);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SimpleSink::InitFrom(cyclus::QueryEngine* qe) {
-  cyclus::FacilityModel::InitFrom(qe);
-  qe = qe->QueryElement("model/" + ModelImpl());
-
-  using boost::lexical_cast;
-
-  cyclus::QueryEngine* input = qe->QueryElement("input");
-  incommodity_ = input->GetElementContent("incommodity", 0);
-  AddCommodity(incommodity_);
-  capacity_ = lexical_cast<double>(input->GetElementContent("input_capacity", 0));
-  std::cout << capacity_ << std::endl;
+cyc::Inventories SinkFacility::SnapshotInv() {
+  cyc::Inventories invs;
+  invs["inventory"] = inventory_.PopN(inventory_.count());
+  return invs;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* SimpleSink::Clone() {
-  SimpleSink* m = new SimpleSink(context());
-  m->InitFrom(this);
-  return m;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// not expected to be cloned
-void SimpleSink::InitFrom(SimpleSink* m) {
-  cyclus::FacilityModel::InitFrom(m);
-  capacity_ = m->capacity_;
-  in_commods_ = m->in_commods_;
-  // Initialize sinkfacility members for a cloned module here
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string SimpleSink::str() {
+std::string Sink::str() {
   // no info for now. Change later
-  return FacilityModel::str();
+  return FacilityAgent::str();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
-SimpleSink::GetMatlRequests() {
+Sink::GetMatlRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::Material;
   using cyclus::RequestPortfolio;
@@ -97,9 +52,8 @@ SimpleSink::GetMatlRequests() {
   return ports;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::RequestPortfolio<cyclus::GenericResource>::Ptr>
-SimpleSink::GetGenRsrcRequests() {
+Sink::GetGenRsrcRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::GenericResource;
   using cyclus::RequestPortfolio;
@@ -130,8 +84,7 @@ SimpleSink::GetGenRsrcRequests() {
   return ports;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SimpleSink::AcceptMatlTrades(
+void Sink::AcceptMatlTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
     cyclus::Material::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Material>,
@@ -141,8 +94,7 @@ void SimpleSink::AcceptMatlTrades(
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SimpleSink::AcceptGenRsrcTrades(
+void Sink::AcceptGenRsrcTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
     cyclus::GenericResource::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
@@ -153,8 +105,7 @@ void SimpleSink::AcceptGenRsrcTrades(
 }
 
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SimpleSink::Tick(int time) {
+void Sink::Tick(int time) {
   using std::string;
   using std::vector;
   LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
@@ -172,8 +123,7 @@ void SimpleSink::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "SnkFac") << "}";
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SimpleSink::Tock(int time) {
+void Sink::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is tocking {";
 
   // On the tock, the sink facility doesn't really do much.
@@ -186,7 +136,6 @@ void SimpleSink::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "SnkFac") << "}";
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Model* ConstructSimpleSink(cyclus::Context* ctx) {
-  return new SimpleSink(ctx);
+extern "C" cyclus::Agent* ConstructSink(cyclus::Context* ctx) {
+  return new Sink(ctx);
 }
