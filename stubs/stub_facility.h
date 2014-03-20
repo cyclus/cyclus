@@ -49,29 +49,12 @@ class StubFacility : public cyclus::Facility  {
     */
   virtual ~StubFacility();
 
-  /**
-    Initialize db with input file info related to derived module class
-    */
-  virtual void InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di);
-
-  virtual void InitInv(cyclus::Inventories& inv);
-
-  virtual cyclus::Inventories SnapshotInv();
-
-  /**
-    Initialize members for a cloned module.
-    */
-  virtual void InitFrom(StubFacility* m);
+  #pragma cyclus
 
   /**
     A verbose printer for the StubFacility
     */
   virtual std::string str();
-
-  /**
-    Initializes a StubFacility object by copying the members of another.
-    */
-  virtual cyclus::Agent* Clone();
 
   /**
     The handleTick function specific to the StubFacility.

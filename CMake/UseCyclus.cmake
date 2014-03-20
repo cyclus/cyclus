@@ -33,8 +33,8 @@ macro(use_cyclus _dir _name)
   SET(HIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
   SET(HOUT "-o=${BUILD_DIR}/${_name}.h")
   IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
-    EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HOUT})
     MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HOUT}")
+    EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HOUT})
   ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
 
   # process impl
