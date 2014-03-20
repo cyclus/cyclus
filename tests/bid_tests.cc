@@ -4,10 +4,10 @@
 #include <string>
 
 #include "composition.h"
-#include "facility_model.h"
-#include "generic_resource.h"
+#include "facility.h"
+#include "product.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
@@ -16,7 +16,7 @@
 
 using cyclus::Bid;
 using cyclus::Composition;
-using cyclus::GenericResource;
+using cyclus::Product;
 using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
@@ -29,7 +29,7 @@ using test_helpers::trader;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, MaterialGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = new TestFacility(tc.get());
   cyclus::CompMap cm;
   cm[92235] = 1.0;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
@@ -45,20 +45,19 @@ TEST(BidTests, MaterialGetSet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(BidTests, GenRsrcGetSet) {
+TEST(BidTests, ProductGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = new TestFacility(tc.get());
   double qty = 1.0;
   string quality = "qual";
-  string units = "units";
 
-  GenericResource::Ptr rsrc =
-      GenericResource::CreateUntracked(qty, quality, units);
+  Product::Ptr rsrc =
+      Product::CreateUntracked(qty, quality);
   
-  Request<GenericResource>::Ptr req =
-      Request<GenericResource>::Create(rsrc, trader);
+  Request<Product>::Ptr req =
+      Request<Product>::Create(rsrc, trader);
   
-  Bid<GenericResource>::Ptr r = Bid<GenericResource>::Create(req, rsrc, fac);
+  Bid<Product>::Ptr r = Bid<Product>::Create(req, rsrc, fac);
 
   EXPECT_EQ(fac, r->bidder());
   EXPECT_EQ(req, r->request());

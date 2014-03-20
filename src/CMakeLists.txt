@@ -6,7 +6,7 @@
 CONFIGURE_FILE(suffix.h.in "${CMAKE_CURRENT_SOURCE_DIR}/suffix.h" @ONLY)
 
 EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
-CONFIGURE_FILE(version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/version.h" @ONLY)
+CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5")
     message("-- Found '${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5'")
@@ -73,34 +73,36 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/datum.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/db_init.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/decayer.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/dynamic_module.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/enrichment.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/error.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/facility_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/facility.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/function.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/generic_resource.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/product.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/inst_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/institution.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/l_matrix.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/logger.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/mat_query.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/material.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/agent.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/pyne.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/query_engine.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/infile_tree.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/recorder.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/region_model.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/region.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/relax_ng_validator.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/res_tracker.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/resource.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/resource_buff.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/sim_init.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/solver.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/solver_interface.cc"
@@ -112,10 +114,10 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/timer.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/uniform_taylor.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/variable.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/version.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_flat_loader.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/xml_parser.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
   )
 
@@ -143,6 +145,7 @@ INSTALL(FILES
   cyc_std.h
   cyclus.h
   datum.h
+  db_init.h
   decayer.h
   dynamic_module.h
   enrichment.h
@@ -154,25 +157,26 @@ INSTALL(FILES
   exchange_solver.h 
   exchange_translator.h
   exchange_translation_context.h
-  facility_model.h
+  facility.h
   function.h
-  generic_resource.h
+  product.h
   greedy_solver.h
   hdf5_back.h
-  inst_model.h
+  query_backend.h
+  institution.h
   intrusive_base.h
   l_matrix.h
   logger.h
   mat_query.h
   material.h
-  model.h
+  agent.h
   prog_solver.h 
   prog_translator.h 
   pyne.h
-  query_engine.h 
+  infile_tree.h 
   rec_backend.h
   recorder.h
-  region_model.h
+  region.h
   relax_ng_validator.h 
   request.h
   request_portfolio.h
@@ -180,11 +184,13 @@ INSTALL(FILES
   resource.h
   resource_buff.h
   resource_exchange.h
+  sim_init.h
   solver.h
   solver_interface.h
   solver_factory.h
   sqlite_back.h
   sqlite_db.h
+  state_wrangler.h
   suffix.h
   supply_demand.h
   supply_demand_manager.h
@@ -205,7 +211,6 @@ INSTALL(FILES
   xml_file_loader.h
   xml_flat_loader.h
   xml_parser.h
-  xml_query_engine.h
   DESTINATION include/cyclus
   COMPONENT core
   )

@@ -16,11 +16,13 @@ void ResTracker::DontTrack() {
   tracked_ = false;
 }
 
-void ResTracker::Create(Model* creator) {
+void ResTracker::Create(Agent* creator) {
   if (!tracked_) {
     return;
   }
 
+  parent1_ = 0;
+  parent2_ = 0;
   Record();
   ctx_->NewDatum("ResCreators")
     ->AddVal("ResourceId", res_->id())

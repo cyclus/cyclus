@@ -35,7 +35,7 @@ namespace cyclus {
    'level'.
  */
 #define LOG(level, prefix) \
-  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoModel()) ; \
+  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoAgent()) ; \
   else cyclus::Logger().Get(level, prefix)
 
 #define CLOG(level) \
@@ -52,7 +52,7 @@ namespace cyclus {
    categorical (verbosity) levels for log statements.
  */
 enum LogLevel {
-  LEV_ERROR, //!< Use for errors that require model code or input file modification (use extremely sparingly)
+  LEV_ERROR, //!< Use for errors that require agent code or input file modification (use extremely sparingly)
   LEV_WARN, //!< Use to report questionable simulation state (use extremely sparingly)
   LEV_INFO1, //!< Information helpful for simulation users and developers alike - least verbose.
   LEV_INFO2, //!< Information helpful for simulation users and developers alike.
@@ -94,12 +94,12 @@ class Logger {
     return report_level;
   };
 
-  /// Set whether or not agent/model log entries should be printed
-  static bool& NoModel() {
-    return no_model;
+  /// Set whether or not agent/agent log entries should be printed
+  static bool& NoAgent() {
+    return no_agent;
   };
 
-  /// Set whether or not agent/model log entries should be printed
+  /// Set whether or not agent/agent log entries should be printed
   static bool& NoMem() {
     return no_mem;
   };
@@ -137,8 +137,8 @@ class Logger {
   */
   static LogLevel report_level;
 
-  /// Indicates whether or not agent/model log entries should be printed
-  static bool no_model;
+  /// Indicates whether or not agent/agent log entries should be printed
+  static bool no_agent;
 
   /// Indicates whether or not memory management log entries should be printed
   static bool no_mem;

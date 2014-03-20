@@ -7,7 +7,7 @@
 
 #include "composition.h"
 #include "cyc_limits.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "resource.h"
 #include "test_context.h"
@@ -18,7 +18,7 @@ using cyclus::CapacityConstraint;
 using cyclus::CompMap;
 using cyclus::Composition;
 using cyclus::Converter;
-using cyclus::GenericResource;
+using cyclus::Product;
 using cyclus::Material;
 using cyclus::Resource;
 using cyclus::TestContext;
@@ -54,11 +54,11 @@ struct MatQualConverter : public Converter<Material> {
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-struct GenRsrcQualConverter : public Converter<GenericResource> {
-  GenRsrcQualConverter() {}
-  virtual ~GenRsrcQualConverter() {}
+struct ProductQualConverter : public Converter<Product> {
+  ProductQualConverter() {}
+  virtual ~ProductQualConverter() {}
   
-  virtual double convert(GenericResource::Ptr r) {
+  virtual double convert(Product::Ptr r) {
     if (r->quality().compare(quality) == 0) {
       return val;
     } else {
@@ -79,7 +79,7 @@ TEST(CapacityConstraintTests, RsrcGetSet) {
 TEST(CapacityConstraintTests, Trivial) {
   CapacityConstraint<Resource> cc(val);
   double val = 42;
-  EXPECT_EQ(val, cc.convert(Material::CreateBlank(val))); // some magic number
+  EXPECT_EQ(val, cc.convert(cyclus::NewBlankMaterial(val))); // some magic number
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -108,11 +108,11 @@ TEST(CapacityConstraintTests, RsrcQty) {
   EXPECT_DOUBLE_EQ(cc.convert(mat), qty*fraction);
 
   string s = "";
-  GenericResource::Ptr gr = GenericResource::CreateUntracked(qty, s, s);
+  Product::Ptr gr = Product::CreateUntracked(qty, s);
   EXPECT_DOUBLE_EQ(cc.convert(gr), qty*fraction);
 
   qty = std::rand();
-  gr = GenericResource::CreateUntracked(qty, s, s);
+  gr = Product::CreateUntracked(qty, s);
   EXPECT_DOUBLE_EQ(cc.convert(gr), qty*fraction);
 }
 
@@ -144,18 +144,17 @@ TEST(CapacityConstraintTests, MaterialQuality) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CapacityConstraintTests, GenGenRsrcQuality) {
+TEST(CapacityConstraintTests, GenProductQuality) {
   TestContext tc;
   double quan = 4.0;
-  string units = "kg";
   string qual = quality;
   
-  Converter<GenericResource>::Ptr c(new GenRsrcQualConverter());
-  CapacityConstraint<GenericResource> cc(val, c);
+  Converter<Product>::Ptr c(new ProductQualConverter());
+  CapacityConstraint<Product> cc(val, c);
   
-  GenericResource::Ptr gr = GenericResource::CreateUntracked(quan, qual, units);
+  Product::Ptr gr = Product::CreateUntracked(quan, qual);
   EXPECT_DOUBLE_EQ(cc.convert(gr), val);
 
-  gr = GenericResource::CreateUntracked(quan, units, units);
+  gr = Product::CreateUntracked(quan, "foo");
   EXPECT_DOUBLE_EQ(cc.convert(gr), 0.0);
 }

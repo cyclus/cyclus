@@ -145,7 +145,7 @@ class Query(object) :
     def allReceivedBy(self, recID) :
         """
         This filters the data to include only the material or resources received 
-        by the model with ID = recID
+        by the agent with ID = recID
         """
         try :
             toDim = self.dataAxes.index('to')

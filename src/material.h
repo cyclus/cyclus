@@ -69,6 +69,8 @@ const double ug = kg* .000000001;
 ///   @endcode
 ///
 class Material: public Resource {
+  friend class SimInit;
+
  public:
   typedef boost::shared_ptr<Material> Ptr;
   static const ResourceType kType;
@@ -76,18 +78,14 @@ class Material: public Resource {
   virtual ~Material();
 
   /// Creates a new material resource that is "live" and tracked. creator is a
-  /// pointer to the model creating the resource (usually will be the caller's
+  /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Model* creator, double quantity, Composition::Ptr c);
+  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c);
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
   static Ptr CreateUntracked(double quantity, Composition::Ptr c);
-
-  /// Creates a new material resource that does not actually exist as part of
-  /// the simulation, is untracked, and does not have a known composition.
-  static Ptr CreateBlank(double quantity);
 
   /// Returns the id of the material's internal nuclide composition.
   virtual int state_id() const;
@@ -153,6 +151,11 @@ class Material: public Resource {
   ResTracker tracker_;
 
 };
+
+/// Creates and returns a new material with the specified quantity and a
+/// default, meaningless composition.  This is intended only for testing
+/// purposes.
+Material::Ptr NewBlankMaterial(double qty);
 
 } // namespace cyclus
 

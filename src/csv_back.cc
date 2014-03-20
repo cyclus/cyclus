@@ -25,6 +25,14 @@ CsvBack::CsvBack(std::string path, bool overwrite) : path_(path) {
   fs::create_directory(path);
 }
 
+CsvBack::~CsvBack() {
+  try {
+    Flush();
+  } catch(std::exception err) {
+    CLOG(LEV_ERROR) << "Error in CsvBack destructor: " << err.what();
+  }
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CsvBack::Notify(DatumList data) {
   for (DatumList::iterator it = data.begin(); it != data.end(); it++) {
@@ -34,8 +42,19 @@ void CsvBack::Notify(DatumList data) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::Close() {
-  Flush();
+void CsvBack::Flush() {
+  std::map<std::string, LineList>::iterator it;
+  for (it = file_data_.begin(); it != file_data_.end(); it++) {
+    LineList lines = it->second;
+
+    std::ofstream file;
+    file.open(it->first.c_str(), std::fstream::in | std::fstream::app);
+    for (int i = 0; i < lines.size(); ++i) {
+      file << lines[i] << std::endl;
+    }
+    file.close();
+    file_data_[it->first].clear();
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -112,22 +131,6 @@ std::string CsvBack::ValAsString(boost::spirit::hold_any& v) {
                     << Name();
   }
   return ss.str();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CsvBack::Flush() {
-  std::map<std::string, LineList>::iterator it;
-  for (it = file_data_.begin(); it != file_data_.end(); it++) {
-    LineList lines = it->second;
-
-    std::ofstream file;
-    file.open(it->first.c_str(), std::fstream::in | std::fstream::app);
-    for (int i = 0; i < lines.size(); ++i) {
-      file << lines[i] << std::endl;
-    }
-    file.close();
-    file_data_[it->first].clear();
-  }
 }
 
 }  // namespace cyclus

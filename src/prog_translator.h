@@ -12,7 +12,7 @@ namespace cyclus {
 class ExchangeGraph;
 class ExchangeNodeGroup;
 
-/// a helper class to translate a generic resource exchange into a mathematical
+/// a helper class to translate a product exchange into a mathematical
 /// program.
 ///
 /// use as follows:

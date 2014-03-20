@@ -2,8 +2,8 @@
 
 #include "stub_region.h"
 
-#include "region_model_tests.h"
-#include "model_tests.h"
+#include "region_tests.h"
+#include "agent_tests.h"
 
 using stubs::StubRegion;
 
@@ -57,17 +57,12 @@ TEST_F(StubRegionTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* StubRegionModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new StubRegion(ctx));
+cyclus::Agent* StubRegionConstructor(cyclus::Context* ctx) {
+  return new StubRegion(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::RegionModel* StubRegionConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::RegionModel*>(new StubRegion(ctx));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(StubRegion, RegionModelTests,
+INSTANTIATE_TEST_CASE_P(StubRegion, RegionTests,
                         ::testing::Values(&StubRegionConstructor));
-INSTANTIATE_TEST_CASE_P(StubRegion, ModelTests,
-                        ::testing::Values(&StubRegionModelConstructor));
+INSTANTIATE_TEST_CASE_P(StubRegion, AgentTests,
+                        ::testing::Values(&StubRegionConstructor));

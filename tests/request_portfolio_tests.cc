@@ -6,10 +6,10 @@
 
 #include "capacity_constraint.h"
 #include "error.h"
-#include "facility_model.h"
-#include "generic_resource.h"
+#include "facility.h"
+#include "product.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
@@ -21,7 +21,7 @@ using std::string;
 
 using cyclus::CapacityConstraint;
 using cyclus::Converter;
-using cyclus::GenericResource;
+using cyclus::Product;
 using cyclus::KeyError;
 using cyclus::Material;
 using cyclus::Request;
@@ -34,12 +34,12 @@ using test_helpers::TestConverter;
 class RequestPortfolioTests: public ::testing::Test {
  protected:
   TestContext tc;
-  MockFacility* fac1;
-  MockFacility* fac2;
+  TestFacility* fac1;
+  TestFacility* fac2;
 
   virtual void SetUp() {
-    fac1 = new MockFacility(tc.get());
-    fac2 = new MockFacility(tc.get());
+    fac1 = new TestFacility(tc.get());
+    fac2 = new TestFacility(tc.get());
   };
   
   virtual void TearDown() {

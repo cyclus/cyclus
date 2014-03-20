@@ -4,17 +4,17 @@
 #include <string>
 
 #include "composition.h"
-#include "facility_model.h"
-#include "generic_resource.h"
+#include "facility.h"
+#include "product.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "test_context.h"
 #include "trader.h"
 
 #include "request.h"
 
 using cyclus::Composition;
-using cyclus::GenericResource;
+using cyclus::Product;
 using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
@@ -24,7 +24,7 @@ using std::string;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RequestTests, MaterialGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = new TestFacility(tc.get());
   Trader* excast = dynamic_cast<Trader*>(fac);
   
   string commod = "name";
@@ -45,20 +45,19 @@ TEST(RequestTests, MaterialGetSet) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(RequestTests, GenRsrcGetSet) {
+TEST(RequestTests, ProductGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = new TestFacility(tc.get());
   string commod = "name";
   double pref = 2.4;
   double qty = 1.0;
   string quality = "qual";
-  string units = "units";
 
-  GenericResource::Ptr rsrc =
-      GenericResource::CreateUntracked(qty, quality, units);
+  Product::Ptr rsrc =
+      Product::CreateUntracked(qty, quality);
   
-  Request<GenericResource>::Ptr r =
-      Request<GenericResource>::Create(rsrc, fac, commod, pref);
+  Request<Product>::Ptr r =
+      Request<Product>::Create(rsrc, fac, commod, pref);
 
   EXPECT_EQ(commod, r->commodity());
   EXPECT_EQ(fac, r->requester());

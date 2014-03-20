@@ -17,7 +17,7 @@ Material::~Material() {
   all_mats_.erase(this);
 }
 
-Material::Ptr Material::Create(Model* creator, double quantity,
+Material::Ptr Material::Create(Agent* creator, double quantity,
                                Composition::Ptr c) {
   Material::Ptr m(new Material(creator->context(), quantity, c));
   all_mats_[m.get()] = true;
@@ -29,12 +29,6 @@ Material::Ptr Material::CreateUntracked(double quantity,
                                         Composition::Ptr c) {
   Material::Ptr m(new Material(NULL, quantity, c));
   return m;
-}
-
-Material::Ptr Material::CreateBlank(double quantity) {
-  CompMap cm;
-  Composition::Ptr comp = Composition::CreateFromMass(cm);  
-  return CreateUntracked(quantity, comp);
 }
 
 int Material::state_id() const {
@@ -53,6 +47,12 @@ Resource::Ptr Material::Clone() const {
 }
 
 void Material::Record(Context* ctx) const {
+  ctx_->NewDatum("MaterialInfo")
+  ->AddVal("ResourceId", id())
+  ->AddVal("Time", ctx_->time())
+  ->AddVal("PrevDecayTime", prev_decay_time_)
+  ->Record();
+
   comp_->Record(ctx);
 }
 
@@ -164,6 +164,11 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c)
   } else {
     tracker_.DontTrack();
   }
+}
+
+Material::Ptr NewBlankMaterial(double quantity) {
+  Composition::Ptr comp = Composition::CreateFromMass(CompMap());  
+  return Material::CreateUntracked(quantity, comp);
 }
 
 } // namespace cyclus

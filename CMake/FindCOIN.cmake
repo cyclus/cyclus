@@ -1,4 +1,4 @@
-# modeled after FindCOIN.cmake in the lemon project
+# agented after FindCOIN.cmake in the lemon project
 
 # Written by: Matthew Gidden
 # Last updated: 12/17/12

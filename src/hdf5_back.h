@@ -20,14 +20,14 @@ class Hdf5Back : public RecBackend {
   /// @param path the file to write to. If it exists, it will be overwritten.
   Hdf5Back(std::string path);
 
+  /// cleans up resources and closes the file.
+  virtual ~Hdf5Back();
+
   virtual void Notify(DatumList data);
 
   virtual std::string Name();
 
-  /// cleans up resources and closes the file.
-  virtual void Close();
-
-  virtual ~Hdf5Back() {};
+  virtual void Flush() {};
 
  private:
   /// creates and initializes an hdf5 table
