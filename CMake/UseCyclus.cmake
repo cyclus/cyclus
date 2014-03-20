@@ -87,6 +87,10 @@ MACRO(use_cyclus _dir _name)
     COMPONENT ${_dir}
     )
   
+  SET("Lib${_dir}" "${_dir}" 
+    CACHE INTERNAL "CMake is really silly, the silliest, in fact" FORCE
+    )
+  
   # install headers
   IF(EXISTS "${HOUT}")
     install(FILES ${HOUT}
@@ -97,9 +101,11 @@ MACRO(use_cyclus _dir _name)
 
   # add tests
   IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
-    SET(TestSource ${TestSource} 
-      ${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc
-      PARENT_SCOPE)
+    SET("${_dir}TestSource" 
+      "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc" 
+      "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc" 
+      CACHE INTERNAL "CMake is really silly, the silliest, in fact" FORCE
+      )
   ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
 
   MESSAGE(STATUS "Finished construction of build files for agent: ${_dir}")
