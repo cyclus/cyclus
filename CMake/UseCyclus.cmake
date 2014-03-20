@@ -36,7 +36,7 @@ macro(use_cyclus _dir _name)
   SET(CCOUT "-o=${BUILD_DIR}/${_name}.cc")
   SET(ORIG "--pass3-use-orig")
   MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${CCOUT} ${ORIG}")
-  EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${CCOUT})
+  EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${CCOUT} ${ORIG})
 
   # add library
   ADD_LIBRARY(${_dir} ${BUILD_DIR}/${_name}.cc)
