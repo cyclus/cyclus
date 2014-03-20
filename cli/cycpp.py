@@ -1273,7 +1273,7 @@ def main():
                               "original file. This options is mutually exclusive"
                               "with --pass3-use-pp."), dest="pass3_use_pp")
     parser.add_argument('-o', '--output', help=("output file name"))
-    parser.add_argument('--cpp-path', dest='cpp_path', help=("preprocessor to use"),
+    parser.add_argument('--cpp-path', dest='cpp_path', help="preprocessor to use",
                         default='cpp')
     parser.add_argument('-I', '--includes', nargs="+",
                         help=("include directories for preprocessing. Can be "
