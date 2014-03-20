@@ -9,7 +9,6 @@ class TestFacility: public cyclus::Facility {
  public:
   TestFacility(cyclus::Context* ctx) : cyclus::Facility(ctx) {};
   virtual ~TestFacility() {};
-  //#pragma cyclus
   
   virtual cyclus::Agent* Clone() { return new TestFacility(context()); };
   virtual void InitInv(cyclus::Inventories& inv) {};
