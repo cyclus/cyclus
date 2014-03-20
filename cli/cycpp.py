@@ -606,6 +606,7 @@ class CodeGeneratorFilter(Filter):
 
     def in_class_decl(self): 
         classname = self.local_classname
+        #import pdb; pdb.set_trace()
         return (len(self.machine.classes) > 0 and 
                 self.machine.classes[-1][1] == classname)
 
@@ -1275,7 +1276,7 @@ def main():
     parser.add_argument('-o', '--output', help=("output file name"))
     parser.add_argument('--cpp-path', dest='cpp_path', help="preprocessor to use",
                         default='cpp')
-    parser.add_argument('-I', '--includes', nargs="+",
+    parser.add_argument('-I', '--includes', action="append",
                         help=("include directories for preprocessing. Can be "
                               "a variable number of arguments (i.e., list of "
                               "include directories), a single argument. If it "
