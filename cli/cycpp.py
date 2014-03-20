@@ -77,8 +77,8 @@ WRANGLERS = {
     '{0}::Facility'.format(CYCNS), 
     '{0}::Institution'.format(CYCNS), 
     '{0}::Region'.format(CYCNS), 
-    'mi6::Spy', # for testing!
-}
+    'mi6::Spy',  # for testing!!
+    }
 
 #
 # pass 1
