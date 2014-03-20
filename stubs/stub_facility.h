@@ -49,7 +49,14 @@ class StubFacility : public cyclus::Facility  {
     */
   virtual ~StubFacility();
 
-  #pragma cyclus
+  virtual void InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {};
+  
+  virtual void InitInv(cyclus::Inventories& inv) {};
+  virtual cyclus::Agent* Clone();
+  
+  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();}
+  virtual void InitFrom(StubFacility* m) {};
+  /// #pragma cyclus
 
   /**
     A verbose printer for the StubFacility

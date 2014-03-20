@@ -1,4 +1,4 @@
-macro(use_cyclus _dir _name)
+MACRO(use_cyclus _dir _name)
   MESSAGE(STATUS "Starting construction of build files for agent: ${_dir}")
 
   # output directory
@@ -15,39 +15,71 @@ macro(use_cyclus _dir _name)
   SET(BUILD_DIR ${PROJECT_BINARY_DIR}/${_dir})
   FILE(MAKE_DIRECTORY ${BUILD_DIR})
 
-  # set CPLUS_INCLUDE_PATH to include our include paths
-  GET_PROPERTY(DIRS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)  
-  SET(INCL_ARG "$ENV{CPLUS_INCLUDE_PATH}")
+  # collect include directories argument
+  GET_PROPERTY(DIRS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+  SET(INCL_ARGS "-I=")
   FOREACH(DIR ${DIRS})
-    SET(INCL_ARG "${INCL_ARG}:${DIR}")
+    SET(INCL_ARGS "${INCL_ARGS}:${DIR}")
   ENDFOREACH(DIR ${DIRS})
-  SET(ENV{CPLUS_INCLUDE_PATH} ${INCL_ARG})
 
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # set cpp path
+  IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     SET(PREPROCESSOR "--cpp-path=clang++")
-  else()
+  ELSE()
     SET(PREPROCESSOR "--cpp-path=cpp")
-  endif()
+  ENDIF()
 
   # process header
   SET(HIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
-  SET(HOUT "-o=${BUILD_DIR}/${_name}.h")
-  IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
-    MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HOUT}")
-    EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HOUT})
-  ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
+  SET(HOUT "${BUILD_DIR}/${_name}.h")
+  SET(HFLAG "-o=${HOUT}")
+  IF(EXISTS "${HIN}")
+    IF(NOT EXISTS ${HOUT})
+      MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS}")
+      EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS})
+    ENDIF(NOT EXISTS ${HOUT})
+  ENDIF(EXISTS "${HIN}")
 
   # process impl
   SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc")
-  SET(CCOUT "-o=${BUILD_DIR}/${_name}.cc")
+  SET(CCOUT "${BUILD_DIR}/${_name}.cc")
+  SET(CCFLAG "-o=${CCOUT}")
   SET(ORIG "--pass3-use-orig")
-  MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCOUT} ${ORIG}")
-  EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCOUT} ${ORIG})
+  IF(NOT EXISTS ${CCOUT})
+    MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
+    EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
+  ENDIF(NOT EXISTS ${CCOUT})
 
   # add library
-  ADD_LIBRARY(${_dir} ${BUILD_DIR}/${_name}.cc)
+  ADD_LIBRARY(${_dir} ${CCOUT})
   TARGET_LINK_LIBRARIES(${_dir} dl cycluscore)
   SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${_dir})
+  ADD_DEPENDENCIES(${_dir} ${HIN} ${HOUT} ${CCIN} ${CCOUT})
+
+  IF(EXISTS "${HIN}")
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${HOUT}
+      COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
+      DEPENDS ${HIN}
+      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS}"
+      )
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CCOUT}
+      COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
+      COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
+      DEPENDS ${CCIN}
+      DEPENDS ${HIN}
+      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
+      COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
+      )
+  ELSE(EXISTS "${HIN}")
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CCOUT}
+      COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
+      DEPENDS ${CCIN}
+      COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
+      )
+  ENDIF(EXISTS "${HIN}")
 
   # install library
   install(TARGETS ${_dir}
@@ -56,12 +88,12 @@ macro(use_cyclus _dir _name)
     )
   
   # install headers
-  IF(EXISTS "${BUILD_DIR}/${_name}.h")
-    install(FILES ${BUILD_DIR}/${_name}.h
+  IF(EXISTS "${HOUT}")
+    install(FILES ${HOUT}
       DESTINATION include/cyclus
       COMPONENT ${_dir}
       )
-  ENDIF(EXISTS "${BUILD_DIR}/${_name}.h")
+  ENDIF(EXISTS "${HOUT}")
 
   # add tests
   IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
@@ -71,7 +103,7 @@ macro(use_cyclus _dir _name)
   ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
 
   MESSAGE(STATUS "Finished construction of build files for agent: ${_dir}")
-endmacro()
+ENDMACRO()
 
 macro(add_all_subdirs)
   file(GLOB all_valid_subdirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/CMakeLists.txt")
