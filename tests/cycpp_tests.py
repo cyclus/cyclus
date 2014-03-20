@@ -15,6 +15,12 @@ from cycpp import NamespaceFilter, TypedefFilter, UsingFilter,\
 # pass 2 Filters
 from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter
 
+# pass 3 Filters
+from cycpp import CloneFilter, InitFromCopyFilter, \
+        InitFromDbFilter, InfileToDbFilter, SchemaFilter, SnapshotFilter, \
+        SnapshotInvFilter, InitInvFilter, DefaultPragmaFilter
+
+
 
 class MockMachine(object):
     def __init__(self):
@@ -23,6 +29,7 @@ class MockMachine(object):
         self.context = {}
         self.statements = []
         self.classes = []
+        self.superclasses = {}
         self.access = {}
         self.namespaces = []
         self.using_namespaces = set()
@@ -33,6 +40,7 @@ class MockMachine(object):
     def classname(self):
         """Implemented just for testing"""
         return ""
+
 
 #
 # pass 1 Filters
@@ -181,6 +189,85 @@ def test_execfilter():
     f.transform(statement, sep)
     # What are the other possible tests
     yield assert_equal, m.execns["x"], 42
+
+#
+# pass 3 Filters
+#
+class MockCodeGenMachine(object):
+    """Mock machine for testing pass 3 filters"""
+    def __init__(self):
+        self.depth = 0
+        self.execns = {}
+        self.context = {"MyFactory": "Cyclus::Facility" }
+        self.statements = []
+        self.classes = []
+        self.superclasses = {}
+        self.access = {}
+        self.namespaces = []
+        self.using_namespaces = set()
+        self.aliases = set()
+        self.var_annotations = None
+        self.filters = []
+        self.local_classname = "MyFactory"
+
+    def classname(self):
+        return self.local_classname
+
+def test_clonefilter():
+    """Test CloneFilter"""
+    m = MockCodeGenMachine()
+    f = CloneFilter(m)
+    impl = f.impl()
+    exp_impl = "  MyFactory* m = new MyFactory(context());\n" + \
+               "  m->InitFrom(this);\n  return m;\n"
+    yield assert_equal, exp_impl, impl
+
+def test_ifcfilter():
+    """Test InitFromCopyFilter"""
+    m = MockCodeGenMachine()
+    f = InitFromCopyFilter(m)
+    args = f.methodargs()
+    exp_args = "MyFactory* m"
+    yield assert_equal, exp_args, args
+
+    impl = f.impl()
+    exp_impl = ""
+    yield assert_equal, exp_impl, impl
+
+def test_ifdbfilter():
+    """Test InitFromDbFilter"""
+    m = MockCodeGenMachine()
+    f = InitFromDbFilter(m)
+
+def test_itdbfilter():
+    """Test InfileToDbFilter"""
+    m = MockCodeGenMachine()
+    f = InfileToDbFilter(m)
+
+def test_schemafilter():
+    """Test SchemaFilter"""
+    m = MockCodeGenMachine()
+    f = SchemaFilter(m)
+
+def test_snapshotfilter():
+    """Test SnapshotFilter"""
+    m = MockCodeGenMachine()
+    f = SnapshotFilter(m)
+
+def test_sshinvfilter():
+    """Test SnapshotInvFilter"""
+    m = MockCodeGenMachine()
+    f = SnapshotInvFilter(m)
+
+def test_intinvfilter():
+    """Test InitInvFilter"""
+    m = MockCodeGenMachine()
+    f = InitInvFilter(m)
+
+def test_defpragmafilter():
+    """Test DefaultPragmaFilter"""
+    m = MockCodeGenMachine()
+    #f = DefaultPragmaFilter(m)
 
 
 if __name__ == "__main__":
