@@ -34,7 +34,8 @@ macro(use_cyclus _dir _name)
   # process impl
   SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc")
   SET(CCOUT "-o=${BUILD_DIR}/${_name}.cc")
-  MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${CCOUT}")
+  SET(ORIG "--pass3-use-orig")
+  MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${CCOUT} ${ORIG}")
   EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${CCOUT})
 
   # add library
