@@ -1,3 +1,3 @@
-cyclus_init_model("TestFacility" "test_facility")
-cyclus_init_model("TestInst" "test_inst")
-cyclus_init_model("TestRegion" "test_region")
+use_cyclus("TestFacility" "test_facility")
+use_cyclus("TestInst" "test_inst")
+use_cyclus("TestRegion" "test_region")

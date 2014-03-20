@@ -8,8 +8,8 @@
 #include "bid.h"
 #include "context.h"
 #include "material.h"
-#include "mock_facility.h"
-#include "model.h"
+#include "test_modules/test_facility.h"
+#include "agent.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
@@ -21,7 +21,7 @@
 using cyclus::Bid;
 using cyclus::Context;
 using cyclus::Material;
-using cyclus::Model;
+using cyclus::Agent;
 using cyclus::Request;
 using cyclus::TestContext;
 using cyclus::TestObjFactory;

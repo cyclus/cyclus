@@ -7,35 +7,24 @@
 
 #include "context.h"
 #include "exchange_manager.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "time_listener.h"
 
 namespace cyclus {
 
-class Model;
+class Agent;
 
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
  public:
-
   Timer();
 
   /// Sets intial time-related parameters for the simulation.
   ///
   /// @param ctx simulation context
-  /// @param dur duration of this simulation, in months
-  /// @param m0 month the simulation starts: Jan. = 1, ..., Dec. = 12
-  /// (default = 1)
-  /// @param y0 year the simulation starts (default = 2010)
-  /// @param start GENIUS time representing the first month of the
-  /// simulation (default = 0)
-  /// @param decay interval between decay calculations in months. <=0 if
-  /// decay is off (default = 0)
-  /// @param handle a user specified name for the simulation run
-  void Initialize(Context* ctx, int dur = 1, int m0 = 1, int y0 = 2010,
-                  int decay = 0, std::string handle = "");
+  void Initialize(Context* ctx, SimInfo si);
 
   /// resets all data (registered listeners, etc.) to empty or initial state
   void Reset();
@@ -54,11 +43,14 @@ class Timer {
 
   /// Schedules the named prototype to be built for the specified parent at
   /// timestep t.
-  void SchedBuild(Model* parent, std::string proto_name, int t);
+  void SchedBuild(Agent* parent, std::string proto_name, int t);
 
-  /// Schedules the given Model to be decommissioned at the specified
+  /// Schedules the given Agent to be decommissioned at the specified
   /// timestep t.
-  void SchedDecom(Model* m, int time);
+  void SchedDecom(Agent* m, int time);
+
+  /// Makes a snapshot of the simulation state to the output database.
+  void Snapshot() { want_snapshot_ = true; };
 
   /// Returns the current time, in months since the simulation started.
   ///
@@ -71,22 +63,18 @@ class Timer {
   int dur();
 
  private:
-  /// logs relevant time-related data with the output system, including:
-  /// the simulation start time and the simulation duration
-  void LogTimeData(Context* ctx, std::string handle);
-
   /// builds all agents queued for the current timestep.
   void DoBuild();
 
-  /// sends the tick signal to all of the models receiving time
+  /// sends the tick signal to all of the agents receiving time
   /// notifications.
   void DoTick();
 
   /// Runs the resource exchange process for all traders.
   void DoResEx(ExchangeManager<Material>* matmgr,
-               ExchangeManager<GenericResource>* genmgr);
+               ExchangeManager<Product>* genmgr);
 
-  /// sends the tock signal to all of the models receiving time
+  /// sends the tock signal to all of the agents receiving time
   /// notifications.
   void DoTock();
 
@@ -99,27 +87,18 @@ class Timer {
   /// started.
   int time_;
 
-  /// The duration of this simulation, in months.
-  int dur_;
+  SimInfo si_;
 
-  /// time steps between automated global material decay driving
-  int decay_interval_;
+  bool want_snapshot_;
 
-  /// The number of the month (Jan = 1, etc.) corresponding to t = 0 for
-  /// the scenario being run.
-  int month0_;
-
-  /// The year corresponding to t = 0 for the scenario being run.
-  int year0_;
-
-  /// Concrete models that desire to receive tick and tock notifications
+  /// Concrete agents that desire to receive tick and tock notifications
   std::set<TimeListener*> tickers_;
 
   // std::map<time,std::vector<std::pair<prototype, parent> > >
-  std::map<int, std::vector<std::pair<std::string, Model*> > > build_queue_;
+  std::map<int, std::vector<std::pair<std::string, Agent*> > > build_queue_;
 
   // std::map<time,std::vector<agent> >
-  std::map<int, std::vector<Model*> > decom_queue_;
+  std::map<int, std::vector<Agent*> > decom_queue_;
 };
 
 } // namespace cyclus

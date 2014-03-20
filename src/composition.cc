@@ -77,18 +77,20 @@ Composition::Ptr Composition::Decay(int delta) {
 }
 
 void Composition::Record(Context* ctx) {
-  if (!recorded_) {
-    CompMap::const_iterator it;
-    mass();  // force lazy evaluation now
-    compmath::Normalize(&mass_, 1);
-    for (it = mass().begin(); it != mass().end(); ++it) {
-      ctx->NewDatum("Compositions")
-         ->AddVal("StateId", id())
-         ->AddVal("NucId", it->first)
-         ->AddVal("MassFrac", it->second)
-         ->Record();
-    }
-    recorded_ = true;
+  if (recorded_) {
+    return;
+  }
+  recorded_ = true;
+
+  CompMap::const_iterator it;
+  mass();  // force lazy evaluation now
+  compmath::Normalize(&mass_, 1);
+  for (it = mass().begin(); it != mass().end(); ++it) {
+    ctx->NewDatum("Compositions")
+       ->AddVal("StateId", id())
+       ->AddVal("NucId", it->first)
+       ->AddVal("MassFrac", it->second)
+       ->Record();
   }
 }
 

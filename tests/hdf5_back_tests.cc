@@ -46,7 +46,7 @@ TEST(Hdf5BackTest, ReadWrite) {
   ->AddVal("double", d)
   ->AddVal("blob", cyclus::Blob(blob))
   ->Record();
-  m.close();
+  m.Close();
 
   hid_t file = H5Fopen(path, H5F_ACC_RDONLY, H5P_DEFAULT);
   herr_t status = H5TBread_fields_name(file, "DumbTitle", field_names, 0, 1, size,

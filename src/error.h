@@ -34,9 +34,6 @@ class Error : public std::exception {
  protected:
   /// The message associated with this exception.
   std::string msg_;
-
- private:
-  static const std::string kPrefix;
 };
 
 /// For values that are too big, too small, etc.

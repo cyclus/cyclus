@@ -26,6 +26,9 @@ SET(CYCLUS_STUB_DIR "${PROJECT_SOURCE_DIR}/stubs")
 SET(CYCLUS_TEST_DIR "${PROJECT_SOURCE_DIR}/tests")
 SET(CYCLUS_INTEGRATION_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/integration_tests")
 
+# set cycpp var
+SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
+
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
 
@@ -66,7 +69,7 @@ LIST(APPEND CMAKE_MODULE_PATH
      "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/CMake")
 
 # Include macros
-INCLUDE(CyclusModuleMacros)
+INCLUDE(UseCyclus)
 
 # set configuration for all library builds
 IF (WIN32)

@@ -33,7 +33,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <!-- For compatibility with nested schema format -->
       <!-- Facility/Inst/Region specific data -->
       <optional>
-      <choice>
 
         <optional>
           <element name="lifetime">
@@ -41,39 +40,26 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
           </element>
         </optional>
 
-        <oneOrMore>
-          <element name="allowedfacility"><text/></element>
-        </oneOrMore>
+        <choice>
+          <oneOrMore>
+            <element name="allowedfacility"><text/></element>
+          </oneOrMore>
 
-        <group>
-          <optional>
-            <oneOrMore>
-              <element name="availableprototype">
-                <text/>
-              </element>
-            </oneOrMore>
-          </optional>
-          <optional>
-            <element name="initialfacilitylist">
+          <group>
+            <optional>
               <oneOrMore>
-                <element name="entry">
-                  <element name="prototype">
-                    <text/>
-                  </element>
-                  <element name="number">
-                    <data type="nonNegativeInteger"/>
-                  </element>
+                <element name="availableprototype">
+                  <text/>
                 </element>
               </oneOrMore>
-            </element>
-          </optional>
-        </group>
+            </optional>
+          </group>
 
-      </choice>
+        </choice>
       </optional>
       <!-- end compatibility section -->
 
-      <element name="model">
+      <element name="agent">
         <choice>
           @MODEL_SCHEMAS@
         </choice>
@@ -104,8 +90,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="basis"><text/></element>
       <oneOrMore>
         <element name="nuclide">
-          <element name="id"><text/></element>
-          <element name="comp"><text/></element>
+          <element name="id"><data type="integer"/></element>
+          <element name="comp"><data type="double"/></element>
         </element>
       </oneOrMore>
     </element>

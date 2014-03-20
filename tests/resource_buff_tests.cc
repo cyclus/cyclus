@@ -257,7 +257,7 @@ TEST_F(ResourceBuffTest, Push_Empty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, Push_OverCapacityEmpty) {
-  using cyclus::GenericResource;
+  using cyclus::Product;
   using cyclus::Resource;
   ASSERT_NO_THROW(store_.set_capacity(cap));
 
@@ -265,13 +265,13 @@ TEST_F(ResourceBuffTest, Push_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.Push(mat2_));
 
   double topush = cap - store_.quantity();
-  Resource::Ptr overmat = GenericResource::CreateUntracked(topush + overeps, "food", "kg")->Clone();
+  Resource::Ptr overmat = Product::CreateUntracked(topush + overeps, "food")->Clone();
 
   ASSERT_THROW(store_.Push(overmat), cyclus::ValueError);
   ASSERT_EQ(store_.count(), 2);
   ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
-  overmat = GenericResource::CreateUntracked(topush + undereps, "food", "kg")->Clone();
+  overmat = Product::CreateUntracked(topush + undereps, "food")->Clone();
   ASSERT_NO_THROW(store_.Push(overmat));
   ASSERT_EQ(store_.count(), 3);
 
@@ -323,14 +323,14 @@ TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
 TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
-  using cyclus::GenericResource;
+  using cyclus::Product;
   using cyclus::Resource;
   using cyclus::Manifest;
   ASSERT_NO_THROW(store_.set_capacity(cap));
   ASSERT_NO_THROW(store_.PushAll(mats));
 
   double topush = cap - store_.quantity();
-  Resource::Ptr overmat = GenericResource::CreateUntracked(topush + overeps, "food", "kg")->Clone();
+  Resource::Ptr overmat = Product::CreateUntracked(topush + overeps, "food")->Clone();
   Manifest overmats;
   overmats.push_back(overmat);
 
@@ -339,7 +339,7 @@ TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   ASSERT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 
   overmats.clear();
-  overmat = GenericResource::CreateUntracked(topush + undereps, "food", "kg")->Clone();
+  overmat = Product::CreateUntracked(topush + undereps, "food")->Clone();
   overmats.push_back(overmat);
 
   ASSERT_NO_THROW(store_.PushAll(overmats));

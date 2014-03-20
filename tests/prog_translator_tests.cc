@@ -220,8 +220,8 @@ TEST(ProgTranslatorTests, translation) {
   for (int i = 0; i != nexcl; i++) {
     checkface.setInteger(excl_arcs[i]);
   }
-  EXPECT_EQ(0, differentModel(*iface, checkface));
-  differentModel(*iface, checkface);
+  EXPECT_EQ(0, differentAgent(*iface, checkface));
+  differentAgent(*iface, checkface);
 
   checkface.passInMessageHandler(&h);
   checkface.setObjSense(1.0);

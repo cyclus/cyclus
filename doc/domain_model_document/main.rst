@@ -1,7 +1,7 @@
-﻿Domain Model Document Outline
+﻿Domain Agent Document Outline
 =============================
 
-Within the Domain Model
+Within the Domain Agent
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 #. Introduction
@@ -10,7 +10,7 @@ Within the Domain Model
 
    a. introduce concepts like current environment online doc....
 
-   b. common mental model of constructed simulation
+   b. common mental agent of constructed simulation
 
 #. (Sample) use cases & ecosystem needs
 #. Core Component Concepts
@@ -99,7 +99,7 @@ Within the Domain Model
    h. Output & persistence
 
 
-Outside the domain model
+Outside the domain agent
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 #. Software Design expectations

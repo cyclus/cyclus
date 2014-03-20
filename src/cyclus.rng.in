@@ -140,11 +140,9 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <text/>
       </element>
 
-      <optional>
-        <ref name="lifetime"/>
-      </optional>
+      <ref name="lifetime" />
 
-      <element name="model">
+      <element name="agent">
       <choice> @Facility_REFS@
       </choice>
       </element>
@@ -227,9 +225,11 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   </define>
 
   <define name="lifetime">
+    <optional>
       <element name="lifetime">
         <data type="nonNegativeInteger"/>
       </element>
+    </optional>
   </define>
 
   <define name="name">
@@ -292,13 +292,15 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
          <text/>
       </element>
 
+      <ref name="lifetime" />
+
       <oneOrMore>
       <element name="allowedfacility">
           <text/>
       </element>
       </oneOrMore>
 
-      <element name="model">
+      <element name="agent">
       <choice> @Region_REFS@
       </choice>
       </element>
@@ -323,6 +325,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
          <text/>
       </element>
       
+      <ref name="lifetime" />
+
       <optional>
         <oneOrMore>
           <element name="availableprototype">
@@ -346,7 +350,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         </element>
       </optional>
 
-      <element name="model">
+      <element name="agent">
       <choice> @Inst_REFS@
       </choice>
       </element>
@@ -360,34 +364,14 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <!-- begin section for recipes -->
   <define name="recipe">
     <element name="recipe">
-
-      <element name="name">
-        <text/>
-      </element>
-
-      <element name="basis">
-        <text/>
-      </element>
-<!--
-      <element name="unit">
-        <text/>
-      </element>
-
-      <element name="total">
-        <text/>
-      </element>
--->
+      <element name="name"><text/></element>
+      <element name="basis"><text/></element>
       <oneOrMore>
-      <element name="nuclide">
-        <element name="id">
-          <text/>
+        <element name="nuclide">
+          <element name="id"><data type="integer"/></element>
+          <element name="comp"><data type="double"/></element>
         </element>
-        <element name="comp">
-          <text/>
-        </element>
-      </element>
       </oneOrMore>
-
     </element>
   </define>
 

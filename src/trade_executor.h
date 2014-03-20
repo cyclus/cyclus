@@ -67,8 +67,8 @@ class TradeExecutor {
         std::vector< std::pair<Trade<T>, typename T::Ptr> > >::iterator m_it;
     for (m_it = trade_ctx_.all_trades.begin();
          m_it != trade_ctx_.all_trades.end(); ++m_it) {
-      Model* supplier = m_it->first.first->manager();
-      Model* requester = m_it->first.second->manager();
+      Agent* supplier = m_it->first.first->manager();
+      Agent* requester = m_it->first.second->manager();
       typename std::vector< std::pair<Trade<T>, typename T::Ptr> >&
           trades = m_it->second;
       typename std::vector< std::pair<Trade<T>, typename T::Ptr> >::iterator

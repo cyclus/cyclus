@@ -3,7 +3,7 @@
 
 #include "error.h"
 #include "exchange_context.h"
-#include "generic_resource.h"
+#include "product.h"
 #include "material.h"
 #include "trader.h"
 
@@ -23,9 +23,9 @@ inline std::set<RequestPortfolio<Material>::Ptr>
 }
 
 template<>
-inline std::set<RequestPortfolio<GenericResource>::Ptr>
-    QueryRequests<GenericResource>(Trader* t) {
-  return t->GetGenRsrcRequests();
+inline std::set<RequestPortfolio<Product>::Ptr>
+    QueryRequests<Product>(Trader* t) {
+  return t->GetProductRequests();
 }
 
 template<class T>
@@ -41,10 +41,10 @@ inline std::set<BidPortfolio<Material>::Ptr>
 }
 
 template<>
-inline std::set<BidPortfolio<GenericResource>::Ptr>
-    QueryBids<GenericResource>(Trader* t,
-                               const CommodMap<GenericResource>::type& map) {
-  return t->GetGenRsrcBids(map);
+inline std::set<BidPortfolio<Product>::Ptr>
+    QueryBids<Product>(Trader* t,
+                               const CommodMap<Product>::type& map) {
+  return t->GetProductBids(map);
 }
 
 template<class T>
@@ -65,12 +65,12 @@ inline void PopulateTradeResponses<Material>(
 }
 
 template<>
-inline void PopulateTradeResponses<GenericResource>(
+inline void PopulateTradeResponses<Product>(
     Trader* trader,
-    const std::vector< Trade<GenericResource> >& trades,
-    std::vector<std::pair<Trade<GenericResource>,
-        GenericResource::Ptr> >& responses) {
-  trader->GetGenRsrcTrades(trades, responses);
+    const std::vector< Trade<Product> >& trades,
+    std::vector<std::pair<Trade<Product>,
+        Product::Ptr> >& responses) {
+  trader->GetProductTrades(trades, responses);
 }
 
 template<class T>
@@ -91,9 +91,9 @@ inline void AcceptTrades(
 template<>
 inline void AcceptTrades(
     Trader* trader,
-    const std::vector< std::pair<Trade<GenericResource>,
-        typename GenericResource::Ptr> >& responses) {
-  trader->AcceptGenRsrcTrades(responses);
+    const std::vector< std::pair<Trade<Product>,
+        typename Product::Ptr> >& responses) {
+  trader->AcceptProductTrades(responses);
 }
 
 }  // namespace cyclus
