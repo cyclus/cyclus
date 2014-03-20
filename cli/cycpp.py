@@ -1285,10 +1285,17 @@ def main():
                               "directories (a la CMake)."))
     ns = parser.parse_args()
 
+    # print("includes", ns.includes)
+    # print("path", ns.path)
+    # print("output", ns.output)
+
     includes = [] if ns.includes is None else ns.includes
-    if len(includes) == 1 and ";" in includes[0]:
-        includes = includes[0].split(";")
-    
+    if len(includes) == 1:
+        if ";" in includes[0]:
+            includes = includes[0].split(";")
+        elif ":" in includes[0]:
+            includes = includes[0].split(":")
+        
     canon = preprocess_file(ns.path, includes, cpp_path=ns.cpp_path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
     context, superclasses = accumulate_state(canon)   # pass 2
