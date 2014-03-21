@@ -64,11 +64,12 @@ MACRO(use_cyclus _dir _name)
       COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
       )
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${CCOUT}
+      OUTPUT ${CCOUT} 
+      OUTPUT ${HOUT}
       COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
       COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
-      DEPENDS ${CCIN}
       DEPENDS ${HIN}
+      DEPENDS ${CCIN}
       COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
       COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
       )
@@ -100,13 +101,67 @@ MACRO(use_cyclus _dir _name)
   ENDIF(EXISTS "${HOUT}")
 
   # add tests
-  IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
+  SET(CCTIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
+  SET(CCTOUT "${BUILD_DIR}/${_name}_tests.cc")
+  SET(HTIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.h")
+  SET(HTOUT "${BUILD_DIR}/${_name}_tests.h")
+  SET(CMD "cp")
+  IF(EXISTS "${CCTIN}")
+    MESSAGE(STATUS "Copying ${CCTIN} to ${CCTOUT}.")
+    # FILE(COPY ${CCTIN} DESTINATION ${BUILD_DIR})
+    EXECUTE_PROCESS(COMMAND ${CMD} ${CCTIN} ${CCTOUT})
+    IF(EXISTS "${HTIN}")
+      MESSAGE(STATUS "Copying ${HTIN} to ${HTOUT}.")
+      # FILE(COPY ${HTIN} DESTINATION ${BUILD_DIR})
+      EXECUTE_PROCESS(COMMAND ${CMD} ${HTIN} ${HTOUT})
+      ADD_CUSTOM_COMMAND(
+      	OUTPUT ${HTOUT}
+      	OUTPUT ${CCTOUT}
+	COMMAND ${CMD} ${HTIN} ${HTOUT}
+	COMMAND ${CMD} ${CCTIN} ${CCTOUT}
+	DEPENDS ${HIN}
+	DEPENDS ${CCIN}
+	DEPENDS ${HTIN}
+	DEPENDS ${CCTIN}
+	COMMENT "Copying ${HTIN} to ${HTOUT}."
+	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+	)
+      # ADD_CUSTOM_TARGET(
+      # 	${_dir}TestCp ALL
+      # 	COMMAND ${CMD} ${HTIN} ${HTOUT}
+      # 	COMMAND ${CMD} ${CCTIN} ${CCTOUT}
+      # 	DEPENDS ${HTIN} 
+      # 	DEPENDS ${CCTIN}
+      # 	COMMENT "Copying ${HTIN} to ${HTOUT}."
+      # 	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+      # 	)
+      SET("${_dir}TestHeader" 
+	"${HTOUT}"
+	CACHE INTERNAL "CMake is really silly, the silliest, tin fact" FORCE
+	)
+    ELSE(EXISTS "${HTIN}")
+      ADD_CUSTOM_COMMAND(
+	OUTPUT ${CCTOUT}
+	COMMAND ${CMD} ${CCTIN} ${CCTOUT}
+	DEPENDS ${CCTIN} 
+	DEPENDS ${CCIN}
+	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+	)
+      # ADD_CUSTOM_TARGET(
+      # 	${_dir}TestCp ALL
+      # 	COMMAND ${CMD} ${CCTIN} ${CCTOUT}
+      # 	DEPENDS ${CCTIN}
+      # 	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+      # 	)
+    ENDIF(EXISTS "${HTIN}")
     SET("${_dir}TestSource" 
-      "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc" 
-      "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc" 
-      CACHE INTERNAL "CMake is really silly, the silliest, in fact" FORCE
+      "${CCOUT}"
+      "${CCTOUT}"
+      CACHE INTERNAL "CMake is really silly, the silliest, tin fact" FORCE
       )
-  ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
+    ADD_LIBRARY(${_dir}Tests ${${_dir}TestSource})
+    TARGET_LINK_LIBRARIES(${_dir}Tests dl cycluscore ${CYCLUS_GTEST_LIBRARIES})
+  ENDIF(EXISTS "${CCTIN}")
 
   MESSAGE(STATUS "Finished construction of build files for agent: ${_dir}")
 ENDMACRO()
