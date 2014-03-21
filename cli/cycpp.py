@@ -571,10 +571,9 @@ class CodeGeneratorFilter(Filter):
     def transform(self, statement, sep):
         # basic setup
         cg = self.machine
-        mode = self.match.group(1)
-        if mode is None or mode is ' ':
+        mode = (self.match.group(1) or '').strip()
+        if len(mode) == 0:
             mode = "def"
-        mode = mode.strip()
         classname = self.match.group(2) if self.match.lastindex > 1 else None
         if classname is None:
             if len(cg.classes) == 0:
@@ -606,7 +605,6 @@ class CodeGeneratorFilter(Filter):
             impl += '\n'
         end = "" if mode == "decl" else " " * ind + "};\n"
 
-        import pdb; pdb.set_trace()
         # compute return 
         if mode == 'impl':
             return impl
