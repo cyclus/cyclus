@@ -7,10 +7,10 @@ StubFacility::StubFacility(cyclus::Context* ctx)
     : cyclus::Facility(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubFacility::~StubFacility() {}
+//StubFacility::~StubFacility() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* StubFacility::Clone() {return this;}
+//cyclus::Agent* StubFacility::Clone() {return this;}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubFacility::str() {

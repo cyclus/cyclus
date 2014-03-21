@@ -8,7 +8,7 @@ MACRO(use_cyclus _dir _name)
   
   # get preprocessor script
   IF(NOT DEFINED CYCPP)
-    SET(CYCPP "${CYCLUS_CORE_INCLUDE_DIRS}/../cycpp.py")
+    SET(CYCPP "${CYCLUS_CORE_INCLUDE_DIRS}/../../bin/cycpp.py")
   ENDIF(NOT DEFINED CYCPP)
 
   # make a build directory
@@ -30,13 +30,14 @@ MACRO(use_cyclus _dir _name)
   ENDIF()
 
   # process header
+  SET(ORIG "--pass3-use-orig")
   SET(HIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
   SET(HOUT "${BUILD_DIR}/${_name}.h")
   SET(HFLAG "-o=${HOUT}")
   IF(EXISTS "${HIN}")
     IF(NOT EXISTS ${HOUT})
-      MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS}")
-      EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS})
+      MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
+      EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
     ENDIF(NOT EXISTS ${HOUT})
   ENDIF(EXISTS "${HIN}")
 
@@ -44,7 +45,6 @@ MACRO(use_cyclus _dir _name)
   SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc")
   SET(CCOUT "${BUILD_DIR}/${_name}.cc")
   SET(CCFLAG "-o=${CCOUT}")
-  SET(ORIG "--pass3-use-orig")
   IF(NOT EXISTS ${CCOUT})
     MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
     EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
@@ -61,7 +61,7 @@ MACRO(use_cyclus _dir _name)
       OUTPUT ${HOUT}
       COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
       DEPENDS ${HIN}
-      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${INCL_ARGS}"
+      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
       )
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CCOUT}
@@ -87,6 +87,10 @@ MACRO(use_cyclus _dir _name)
     COMPONENT ${_dir}
     )
   
+  SET("Lib${_dir}" "${_dir}" 
+    CACHE INTERNAL "CMake is really silly, the silliest, in fact" FORCE
+    )
+  
   # install headers
   IF(EXISTS "${HOUT}")
     install(FILES ${HOUT}
@@ -97,9 +101,11 @@ MACRO(use_cyclus _dir _name)
 
   # add tests
   IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
-    SET(TestSource ${TestSource} 
-      ${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc
-      PARENT_SCOPE)
+    SET("${_dir}TestSource" 
+      "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc" 
+      "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc" 
+      CACHE INTERNAL "CMake is really silly, the silliest, in fact" FORCE
+      )
   ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
 
   MESSAGE(STATUS "Finished construction of build files for agent: ${_dir}")
