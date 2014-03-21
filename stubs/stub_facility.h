@@ -32,6 +32,8 @@ namespace stubs {
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
+
+// hello Mom
 class StubFacility : public cyclus::Facility  {
   /* --------------------
    * all FACILITYMODEL classes have these members
@@ -56,7 +58,8 @@ class StubFacility : public cyclus::Facility  {
   
   virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();}
   virtual void InitFrom(StubFacility* m) {};
-  /// #pragma cyclus
+
+  #pragma cyclus
 
   /**
     A verbose printer for the StubFacility

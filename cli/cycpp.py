@@ -63,6 +63,10 @@ RE_STATEMENT = re.compile(
     # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
     r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE)
 
+# Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE! 
+RE_MULTILINE_COMMENT = "(?:\s*/\*.*?\*/)"
+RE_SINGLE_LINE_COMMENT = "(?:\s*//.*?\n\s*)"
+RE_COMMENTS = "(?:" + RE_MULTILINE_COMMENT + "|" + RE_SINGLE_LINE_COMMENT + ")"
 
 CYCNS = 'cyclus'
 
@@ -257,10 +261,11 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile("\s*class\s+(\w+)(\s*:[\s\w,:]+)?\s*")
+    regex = re.compile(RE_COMMENTS + "*\s*class\s+(\w+)(\s*:[\s\w,:]+)?\s*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
+        print("current class",  state.classname())
         name = self.match.group(1)
         state.classes.append((state.depth, name))
         classname = state.classname()
@@ -571,7 +576,9 @@ class CodeGeneratorFilter(Filter):
             classname = cg.classname()
         classname = classname.strip().replace('.', '::')
         context = cg.context
-        self.local_classname = classname
+        self.local_classname = cg.classname()
+        print(classname, self.local_classname)
+        import pdb; pdb.set_trace()
 
         # compute def line
         ctx = context[classname] = context.get(classname, {})
@@ -1129,6 +1136,7 @@ def generate_code(orig, context, superclasses):
             continue
         prefix, statement, _, sep = m.groups()
         statement = statement if prefix is None else prefix + statement
+        print(repr(statement))
         cg.generate(statement, sep)
     newfile = "".join(cg.statements)
     return newfile
