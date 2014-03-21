@@ -1244,14 +1244,14 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
                                 close_brace=close_brace, separator=separator))
     return t
 
-def type_to_str(type):
+def type_to_str(t):
     if type in PRIMITIVES:
-        return type
+        return t
     else:
-        s = type[0] + '< '
-        s += type_to_str(type[1])
-        for t in type[2:]:
-            s += ', ' + type_to_str(t)
+        s = t[0] + '< '
+        s += type_to_str(t[1])
+        for thing in t[2:]:
+            s += ', ' + type_to_str(thing)
         s += ' >'
         return s
 
