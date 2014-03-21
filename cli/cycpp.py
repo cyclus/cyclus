@@ -53,20 +53,19 @@ if sys.version_info[0] == 2:
     STRING_TYPES = (str, unicode, basestring)
 elif sys.version_info[0] >= 3:
     STRING_TYPES = (str,)
-
-# This migh miss files which start with '#' - however, after canonization (through cpp)
-# it shouldn't matter.
-RE_STATEMENT = re.compile(
-    r'(\s*#)?'  # find the start of pragmas
-    r'(\s+(public|private|protected)\s*'  # consider access control as statements
-    r'|(?(1)[^\n]|[^{};])*)?'  # or, consider statement until we hit '{', '}', or ';'
-    # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
-    r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE)
-
 # Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE! 
 RE_MULTILINE_COMMENT = "(?:\s*/\*.*?\*/)"
 RE_SINGLE_LINE_COMMENT = "(?:\s*//.*?\n\s*)"
 RE_COMMENTS = "(?:" + RE_MULTILINE_COMMENT + "|" + RE_SINGLE_LINE_COMMENT + ")"
+
+# This migh miss files which start with '#' - however, after canonization (through cpp)
+# it shouldn't matter.
+RE_STATEMENT = re.compile("(" + RE_COMMENTS + "*" + \
+    r'(?:\s*#))?'  # find the start of pragmas
+    r'(\s+(public|private|protected)\s*'  # consider access control as statements
+    r'|(?(1)[^\n]|[^{};])*)?'  # or, consider statement until we hit '{', '}', or ';'
+    # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
+    r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE | re.DOTALL)
 
 CYCNS = 'cyclus'
 
