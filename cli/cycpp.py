@@ -265,7 +265,6 @@ class ClassFilter(Filter):
 
     def transform(self, statement, sep):
         state = self.machine
-        print("current class",  state.classname())
         name = self.match.group(1)
         state.classes.append((state.depth, name))
         classname = state.classname()
@@ -577,8 +576,6 @@ class CodeGeneratorFilter(Filter):
         classname = classname.strip().replace('.', '::')
         context = cg.context
         self.local_classname = cg.classname()
-        print(classname, self.local_classname)
-        import pdb; pdb.set_trace()
 
         # compute def line
         ctx = context[classname] = context.get(classname, {})
@@ -655,7 +652,8 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         impl = ""
         
         # add inheritance init froms
-        rents = parent_intersection(self.local_classname, WRANGLERS, self.machine.superclasses)
+        rents = parent_intersection(self.local_classname, WRANGLERS, 
+                                    self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
 
@@ -682,7 +680,8 @@ class InitFromDbFilter(CodeGeneratorFilter):
         pods = []
 
         # add inheritance init froms
-        rents = parent_intersection(self.local_classname, WRANGLERS, self.machine.superclasses)
+        rents = parent_intersection(self.local_classname, WRANGLERS, 
+                                    self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
 
@@ -1136,7 +1135,6 @@ def generate_code(orig, context, superclasses):
             continue
         prefix, statement, _, sep = m.groups()
         statement = statement if prefix is None else prefix + statement
-        print(repr(statement))
         cg.generate(statement, sep)
     newfile = "".join(cg.statements)
     return newfile
@@ -1252,6 +1250,7 @@ def type_to_str(type):
 
 def parent_classes(classname, pdict):
     rents = set()
+    vals = pdict[classname] = pdict.get(classname, set())
     for val in pdict[classname]:
         rents.add(val)
         rents |= parent_classes(val, pdict)

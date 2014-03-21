@@ -32,8 +32,6 @@ namespace stubs {
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
-
-// hello Mom
 class StubFacility : public cyclus::Facility  {
   /* --------------------
    * all FACILITYMODEL classes have these members
