@@ -6,6 +6,7 @@
 #include "facility_tests.h"
 #include "agent_tests.h"
 
+namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class SourceTest : public ::testing::Test {
@@ -68,3 +69,5 @@ INSTANTIATE_TEST_CASE_P(SourceFac, FacilityTests,
 
 INSTANTIATE_TEST_CASE_P(SourceFac, AgentTests,
                         ::testing::Values(&SourceConstructor));
+
+}; // namespace cyclus 
