@@ -550,8 +550,8 @@ def accumulate_state(canon):
 # pass 3
 #
 class CodeGeneratorFilter(Filter):
-    re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus"
-                                 "(\sdef\s|\sdecl\s|\simpl\s|\s)+"
+    re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus\s*"
+                                 "(\s+def\s+|\s+decl\s+|\s+impl\s+|\s+)?"
                                  "{0}(\s+(?:[\w:\.]+)?)?")
 
     def_template = "\n{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
@@ -586,7 +586,7 @@ class CodeGeneratorFilter(Filter):
         # compute def line
         ctx = context[classname] = context.get(classname, {})
         in_class_decl = self.in_class_decl() 
-        ns = "" if in_class_decl else classname + "::"
+        ns = "" if in_class_decl else classname.split('::')[-1] + "::"
         virt = "virtual " if in_class_decl else ""
         end = ";" if mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
