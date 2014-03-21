@@ -561,7 +561,12 @@ class CodeGeneratorFilter(Filter):
         super(CodeGeneratorFilter, self).__init__(*args, **kwargs)
         pragmaname = self.pragmaname
         self.regex = re.compile(self.re_template.format(pragmaname))
-        self.local_classname = None
+        self.local_classname = None  # class we are currently in, if any
+        # class we determine from pragma, if any, Note that we have no way of 
+        # reliably guessing scope on pass 3. Users will either *have* to give 
+        # class names that are in the current namespace (Spy) or use classnames
+        # that are fully qualified (mi6::Spy).
+        self.given_classname = None  
 
     def transform(self, statement, sep):
         # basic setup
@@ -572,9 +577,12 @@ class CodeGeneratorFilter(Filter):
         mode = mode.strip()
         classname = self.match.group(2) if self.match.lastindex > 1 else None
         if classname is None:
+            if len(cg.classes) == 0:
+                TypeError("{0}Classname could not determined".format(cg.includeloc()))
             classname = cg.classname()
         classname = classname.strip().replace('.', '::')
         context = cg.context
+        self.given_classname = classname
         self.local_classname = cg.classname()
 
         # compute def line
@@ -609,14 +617,13 @@ class CodeGeneratorFilter(Filter):
         return ""
 
     def in_class_decl(self): 
-        classname = self.local_classname
-        #import pdb; pdb.set_trace()
         return (len(self.machine.classes) > 0 and 
-                self.machine.classes[-1][1] == classname)
+                self.given_classname == self.local_classname)
 
     def revert(self, statement, sep):
         super(CodeGeneratorFilter, self).revert(statement, sep)
         self.local_classname = None
+        self.given_classname = None
 
 class CloneFilter(CodeGeneratorFilter):
     """Filter for handling Clone() code generation:
@@ -627,7 +634,7 @@ class CloneFilter(CodeGeneratorFilter):
     methodrtn = "{0}::Agent*".format(CYCNS)
 
     def impl(self, ind="  "):
-        classname = self.local_classname
+        classname = self.given_classname
         impl = ""
         impl += ind + "{0}* m = new {0}(context());\n".format(classname)
         impl += ind + "m->InitFrom(this);\n"
@@ -643,16 +650,16 @@ class InitFromCopyFilter(CodeGeneratorFilter):
     methodrtn = "void"
 
     def methodargs(self):
-        return "{0}* m".format(self.local_classname)
+        return "{0}* m".format(self.given_classname)
 
     def impl(self, ind="  "):        
         cg = self.machine
         context = cg.context
-        ctx = context[self.local_classname]
+        ctx = context[self.given_classname]
         impl = ""
         
         # add inheritance init froms
-        rents = parent_intersection(self.local_classname, WRANGLERS, 
+        rents = parent_intersection(self.given_classname, WRANGLERS, 
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
@@ -675,12 +682,12 @@ class InitFromDbFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):        
         cg = self.machine
         context = cg.context
-        ctx = context[self.local_classname]
+        ctx = context[self.given_classname]
         impl = ''
         pods = []
 
         # add inheritance init froms
-        rents = parent_intersection(self.local_classname, WRANGLERS, 
+        rents = parent_intersection(self.given_classname, WRANGLERS, 
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
@@ -740,12 +747,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):        
         cg = self.machine
         context = cg.context
-        ctx = context[self.local_classname]
+        ctx = context[self.given_classname]
         pods = []
         impl = ""
 
         # add inheritance init froms
-        rents = parent_intersection(self.local_classname, WRANGLERS, self.machine.superclasses)
+        rents = parent_intersection(self.given_classname, WRANGLERS, self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
 
@@ -840,7 +847,7 @@ class SchemaFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):        
         cg = self.machine
         context = cg.context
-        ctx = context[self.local_classname]
+        ctx = context[self.given_classname]
         i = Indenter(level=len(ind) / 2)
         xi = Indenter(n=4)
         impl = i.up() + 'return ""\n'
@@ -906,7 +913,7 @@ class SnapshotFilter(CodeGeneratorFilter):
     def impl(self, ind='  '):        
         cg = self.machine
         context = cg.context
-        ctx = context[self.local_classname]
+        ctx = context[self.given_classname]
         impl = ''
         pod = {}
         for member, params in ctx.items():
@@ -963,7 +970,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):        
         cg = self.machine
         context = cg.context
-        ctx = context[self.local_classname]
+        ctx = context[self.given_classname]
         impl = ""
         buffs = []
         for member, info in ctx.items():
@@ -993,7 +1000,7 @@ class InitInvFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):        
         cg = self.machine
         context = cg.context
-        ctx = context[self.local_classname]
+        ctx = context[self.given_classname]
         impl = ""
         buffs = []
         for member, info in ctx.items():
