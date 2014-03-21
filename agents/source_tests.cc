@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "source_facility.h"
+#include "source.h"
 
 #include "context.h"
 #include "facility_tests.h"

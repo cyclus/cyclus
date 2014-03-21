@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "sink_facility.h"
+#include "sink.h"
 
 #include "context.h"
 #include "facility_tests.h"
