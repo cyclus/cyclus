@@ -850,7 +850,7 @@ class SchemaFilter(CodeGeneratorFilter):
         xi = Indenter(n=4)
 
         if len(ctx.keys()) == 0:
-            return i + 'return "<text/>";\n"'
+            return i + 'return "<text/>";\n'
 
         impl = i.up() + 'return ""\n'
         for member, info in ctx.items():
