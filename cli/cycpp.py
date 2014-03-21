@@ -157,7 +157,7 @@ class LinemarkerFilter(Filter):
     This is useful for debugging. See the cpp for more info:
     http://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html
     """
-    regex = re.compile(RE_COMMENTS + r'*#\s+(\d+)\s+"(.*?)"(\s+\d+)*?')
+    regex = re.compile(RE_COMMENTS + r'*#\s+(\d+)\s+"(.*?)"(\s+\d+)*?', re.DOTALL)
     allowed_flags = {'1', '2'}
     last_was_linemarker = False
 
@@ -213,7 +213,7 @@ class UsingFilter(AliasFilter):
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
     # handles anonymous namespaces as group(1) == None
-    regex = re.compile(RE_COMMENTS + "*\s*namespace(\s+\w*)?\s*$")
+    regex = re.compile(RE_COMMENTS + "*\s*namespace(\s+\w*)?\s*$", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -298,7 +298,7 @@ class ClassFilter(Filter):
 
 class AccessFilter(Filter):
     """Filter for setting the current access control flag."""
-    regex = re.compile(RE_COMMENTS + '*\s*(public|private|protected)\s*')
+    regex = re.compile(RE_COMMENTS + '*\s*(public|private|protected)\s*', re.DOTALL)
 
     def transform(self, statement, sep):
         access = self.match.group(1)
@@ -551,16 +551,16 @@ def accumulate_state(canon):
 # pass 3
 #
 class CodeGeneratorFilter(Filter):
-    re_template = RE_COMMENTS + ("\s*#\s*pragma\s+cyclus+"
+    re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus+"
                                  "(\sdef\s|\sdecl\s|\simpl\s|\s)+"
-                                 "{0}(\s+.*)?")
+                                 "{0}(\s+.*?)?")
 
     def_template = "\n{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
 
     def __init__(self, *args, **kwargs):
         super(CodeGeneratorFilter, self).__init__(*args, **kwargs)
         pragmaname = self.pragmaname
-        self.regex = re.compile(self.re_template.format(pragmaname))
+        self.regex = re.compile(self.re_template.format(pragmaname), re.DOTALL)
         self.local_classname = None  # class we are currently in, if any
         # class we determine from pragma, if any, Note that we have no way of 
         # reliably guessing scope on pass 3. Users will either *have* to give 
@@ -1016,7 +1016,8 @@ class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
         #pragma cyclus [def|decl|impl]
     """
-    regex = re.compile(RE_COMMENTS + "*\s*#\s*pragma\s+cyclus+(\sdef|\sdecl|\simpl|)$")
+    regex = re.compile(RE_COMMENTS + "*\s*#\s*pragma\s+cyclus+(\sdef|\sdecl|\simpl|)$",
+                       re.DOTALL)
 
     def transform(self, statement, sep):
         rtn = ""

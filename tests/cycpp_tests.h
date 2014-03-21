@@ -121,4 +121,6 @@ class Villan: public mi6::Spy {
   #pragma cyclus snapshot
 
   /// #pragma cyclus initfromcopy mi6.Friend
+
+  #pragma cyclus
 };
