@@ -63,6 +63,12 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
 ADD_SUBDIRECTORY(test_modules)
 
+SET(
+  CYCLUS_CORE_TEST_INCLUDE_DIRS ${CYCLUS_CORE_TEST_INCLUDE_DIRS}
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  PARENT_SCOPE
+  )
+
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
 set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
