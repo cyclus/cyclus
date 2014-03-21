@@ -117,7 +117,7 @@ MACRO(USE_CYCLUS lib_root src_root)
   # install library
   install(
     TARGETS ${lib_root}
-    LIBRARY DESTINATION cyclus/lib${lib_root}
+    LIBRARY DESTINATION lib/cyclus/lib${lib_root}
     COMPONENT ${lib_root}
     )
   SET(
