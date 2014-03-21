@@ -494,8 +494,8 @@ class StateAccumulator(object):
             else:
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
                        "template type: {p}.").format(i=self.includeloc(), t=t,
-                                                     n=name, c=self.classname(), 
-                                                     p=", ".join(sorted(self.known_templates)))
+                       n=name, c=self.classname(),
+                       p=", ".join(sorted(self.known_templates)))
                 raise TypeError(msg)
         elif '<' in t:
             # string version of template type
@@ -531,7 +531,7 @@ class StateAccumulator(object):
     def _canonize_targs(self, newtname, targs):
         newt = [newtname]
         newt += [self.canonize_type(targ) for targ in targs]
-        return newt
+        return tuple(newt)
 
 def accumulate_state(canon):
     """Takes a canonical C++ source file and separates it out into statements
