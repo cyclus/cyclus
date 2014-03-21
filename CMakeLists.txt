@@ -164,8 +164,8 @@ INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
 
 ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
-ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
+ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
 
 ##############################################################################################
 ####################################### end includes #########################################
