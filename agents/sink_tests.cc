@@ -6,71 +6,66 @@
 #include "facility_tests.h"
 #include "agent_tests.h"
 
-using cyclus::SimpleSink;
+using cyclus::Sink;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class SimpleSinkTest : public ::testing::Test {
+class SinkTest : public ::testing::Test {
  protected:
   cyclus::TestContext tc_;
-  SimpleSink* src_facility_;
+  Sink* src_facility_;
 
   virtual void SetUp() {
-    src_facility_ = new SimpleSink(tc_.get());
+    src_facility_ = new Sink(tc_.get());
   }
 
   virtual void TearDown() {}
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SimpleSinkTest, clone) {
-  SimpleSink* cloned_fac =
-      dynamic_cast<SimpleSink*> (src_facility_->Clone());
+TEST_F(SinkTest, clone) {
+  Sink* cloned_fac =
+      dynamic_cast<Sink*> (src_facility_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SimpleSinkTest, InitialState) {
+TEST_F(SinkTest, InitialState) {
   // Test things about the initial state of the facility here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SimpleSinkTest, Print) {
+TEST_F(SinkTest, Print) {
   EXPECT_NO_THROW(std::string s = src_facility_->str());
-  // Test SimpleSink specific aspects of the print method here
+  // Test Sink specific aspects of the print method here
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SimpleSinkTest, ReceiveMessage) {
-  // Test SimpleSink specific behaviors of the ReceiveMessage function here
+TEST_F(SinkTest, ReceiveMessage) {
+  // Test Sink specific behaviors of the ReceiveMessage function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SimpleSinkTest, Tick) {
+TEST_F(SinkTest, Tick) {
   int time = 1;
   ASSERT_NO_THROW(src_facility_->Tick(time));
-  // Test SimpleSink specific behaviors of the Tick function here
+  // Test Sink specific behaviors of the Tick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SimpleSinkTest, Tock) {
+TEST_F(SinkTest, Tock) {
   int time = 1;
   EXPECT_NO_THROW(src_facility_->Tock(time));
-  // Test SimpleSink specific behaviors of the Tock function here
+  // Test Sink specific behaviors of the Tock function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* SimpleSinkAgentConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Agent*>(new SimpleSink(ctx));
+cyclus::Agent* SinkConstructor(cyclus::Context* ctx) {
+  return new Sink(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::FacilityAgent* SimpleSinkConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::FacilityAgent*>(new SimpleSink(ctx));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(SinkFac, FacilityAgentTests,
-                        ::testing::Values(&SimpleSinkConstructor));
+INSTANTIATE_TEST_CASE_P(SinkFac, FacilityTests,
+                        ::testing::Values(&SinkConstructor));
 
 INSTANTIATE_TEST_CASE_P(SinkFac, AgentTests,
-                        ::testing::Values(&SimpleSinkAgentConstructor));
+                        ::testing::Values(&SinkConstructor));

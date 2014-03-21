@@ -54,17 +54,12 @@ TEST_F(NullInstTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* NullInstAgentConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Agent*>(new NullInst(ctx));
+cyclus::Agent* NullInstConstructor(cyclus::Context* ctx) {
+  return new NullInst(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::InstAgent* NullInstConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::InstAgent*>(new NullInst(ctx));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(NullInst, InstAgentTests,
+INSTANTIATE_TEST_CASE_P(NullInst, InstitutionTests,
                         ::testing::Values(&NullInstConstructor));
 INSTANTIATE_TEST_CASE_P(NullInst, AgentTests,
-                        ::testing::Values(&NullInstAgentConstructor));
+                        ::testing::Values(&NullInstConstructor));

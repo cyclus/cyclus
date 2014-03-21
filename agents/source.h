@@ -17,7 +17,7 @@ class Context;
 /// A lot of implementation code is barrowed from cycamore's source facility
 /// implementation files.
 ///
-/// This FacilityAgent is intended
+/// This Facility is intended
 /// to be used for Cyclus integration tests as a basic source facility.
 class Source : public cyclus::Facility {
  public:

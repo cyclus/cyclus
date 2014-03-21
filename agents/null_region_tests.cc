@@ -58,17 +58,12 @@ TEST_F(NullRegionTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* NullRegionAgentConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Agent*>(new NullRegion(ctx));
+cyclus::Agent* NullRegionConstructor(cyclus::Context* ctx) {
+  return new NullRegion(ctx);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::RegionAgent* NullRegionConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::RegionAgent*>(new NullRegion(ctx));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(NullRegion, RegionAgentTests,
+INSTANTIATE_TEST_CASE_P(NullRegion, RegionTests,
                         ::testing::Values(&NullRegionConstructor));
 INSTANTIATE_TEST_CASE_P(NullRegion, AgentTests,
-                        ::testing::Values(&NullRegionAgentConstructor));
+                        ::testing::Values(&NullRegionConstructor));
