@@ -1,10 +1,38 @@
-MACRO(use_cyclus _dir _name)
-  MESSAGE(STATUS "Starting construction of build files for agent: ${_dir}")
+#
+# The USE_CYCLUS macro builds agent libraries for Cyclus given some source
+# files.
+#
+# Arguments:
+#   lib_root : the root library name, e.g., MyAgent
+#   src_root : the root name of source files, e.g., my_agent for my_agent.h 
+#              and my_agent.cc
+#
+# The following vars are updated.
+#
+# CYCLUS_LIBRARIES   : updated to include <lib_root>_LIB
+#
+# The following vars are set.
+# 
+# <lib_root>_H       : the headers used for the agent
+# <lib_root>_CC      : the srcs used for the agent
+# <lib_root>_TEST_H  : the headers used for the agent tests, if it exists
+# <lib_root>_TEST_CC : the srcs used for the agent tests, if it exists
+#
+# Target names that are valid:
+#
+# <lib_root>_LIB      : the name of the library target
+# <lib_root>_TEST_LIB : the name of the test library target, if test source 
+#                       exists
+#
+MACRO(USE_CYCLUS lib_root src_root)
+  MESSAGE(STATUS "Starting construction of build files for agent: ${lib_root}")
 
   # output directory
-  SET(AGENT_PATH "/cyclus/${_dir}")
-  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${AGENT_PATH})
+  SET(AGENT_PATH "cyclus/${lib_root}")
+  SET(
+    CMAKE_LIBRARY_OUTPUT_DIRECTORY
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${AGENT_PATH}
+    )
   
   # get preprocessor script
   IF(NOT DEFINED CYCPP)
@@ -12,7 +40,7 @@ MACRO(use_cyclus _dir _name)
   ENDIF(NOT DEFINED CYCPP)
 
   # make a build directory
-  SET(BUILD_DIR ${PROJECT_BINARY_DIR}/${_dir})
+  SET(BUILD_DIR ${PROJECT_BINARY_DIR}/${lib_root})
   FILE(MAKE_DIRECTORY ${BUILD_DIR})
 
   # collect include directories argument
@@ -31,38 +59,42 @@ MACRO(use_cyclus _dir _name)
 
   # process header
   SET(ORIG "--pass3-use-orig")
-  SET(HIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.h")
-  SET(HOUT "${BUILD_DIR}/${_name}.h")
+  SET(HIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}.h")
+  SET(HOUT "${BUILD_DIR}/${src_root}.h")
   SET(HFLAG "-o=${HOUT}")
   IF(EXISTS "${HIN}")
     IF(NOT EXISTS ${HOUT})
       MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
       EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
     ENDIF(NOT EXISTS ${HOUT})
+    SET(
+      "${lib_root}_H" 
+      "${HOUT}"
+      CACHE INTERNAL "Agent header" FORCE
+      )
   ENDIF(EXISTS "${HIN}")
 
   # process impl
-  SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}.cc")
-  SET(CCOUT "${BUILD_DIR}/${_name}.cc")
+  SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}.cc")
+  SET(CCOUT "${BUILD_DIR}/${src_root}.cc")
   SET(CCFLAG "-o=${CCOUT}")
   IF(NOT EXISTS ${CCOUT})
     MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
     EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
   ENDIF(NOT EXISTS ${CCOUT})
+  SET(
+    "${lib_root}_CC" 
+    "${CCOUT}"
+    CACHE INTERNAL "Agent source" FORCE
+    )
 
   # add library
-  ADD_LIBRARY(${_dir} ${CCOUT})
-  TARGET_LINK_LIBRARIES(${_dir} dl cycluscore)
-  SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${_dir})
-  ADD_DEPENDENCIES(${_dir} ${HIN} ${HOUT} ${CCIN} ${CCOUT})
+  ADD_LIBRARY(${lib_root} ${CCOUT})
+  TARGET_LINK_LIBRARIES(${lib_root} dl cycluscore)
+  SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${lib_root})
+  ADD_DEPENDENCIES(${lib_root} ${HIN} ${HOUT} ${CCIN} ${CCOUT})
 
   IF(EXISTS "${HIN}")
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${HOUT}
-      COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
-      DEPENDS ${HIN}
-      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
-      )
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CCOUT} 
       OUTPUT ${HOUT}
@@ -83,36 +115,36 @@ MACRO(use_cyclus _dir _name)
   ENDIF(EXISTS "${HIN}")
 
   # install library
-  install(TARGETS ${_dir}
-    LIBRARY DESTINATION lib${_dir}
-    COMPONENT ${_dir}
+  install(
+    TARGETS ${lib_root}
+    LIBRARY DESTINATION lib${lib_root}
+    COMPONENT ${lib_root}
     )
-  
-  SET("Lib${_dir}" "${_dir}" 
-    CACHE INTERNAL "CMake is really silly, the silliest, in fact" FORCE
+  SET(
+    "${lib_root}_LIB" 
+    "${lib_root}" 
+    CACHE INTERNAL "Agent library alias." FORCE
     )
   
   # install headers
   IF(EXISTS "${HOUT}")
-    install(FILES ${HOUT}
+    INSTALL(
+      FILES ${HOUT}
       DESTINATION include/cyclus
-      COMPONENT ${_dir}
+      COMPONENT ${lib_root}
       )
   ENDIF(EXISTS "${HOUT}")
 
   # add tests
-  SET(CCTIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.cc")
-  SET(CCTOUT "${BUILD_DIR}/${_name}_tests.cc")
-  SET(HTIN "${CMAKE_CURRENT_SOURCE_DIR}/${_name}_tests.h")
-  SET(HTOUT "${BUILD_DIR}/${_name}_tests.h")
+  SET(CCTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.cc")
+  SET(CCTOUT "${BUILD_DIR}/${src_root}_tests.cc")
+  SET(HTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.h")
+  SET(HTOUT "${BUILD_DIR}/${src_root}_tests.h")
   SET(CMD "cp")
   IF(EXISTS "${CCTIN}")
-    MESSAGE(STATUS "Copying ${CCTIN} to ${CCTOUT}.")
-    # FILE(COPY ${CCTIN} DESTINATION ${BUILD_DIR})
-    EXECUTE_PROCESS(COMMAND ${CMD} ${CCTIN} ${CCTOUT})
     IF(EXISTS "${HTIN}")
+      # install test headers
       MESSAGE(STATUS "Copying ${HTIN} to ${HTOUT}.")
-      # FILE(COPY ${HTIN} DESTINATION ${BUILD_DIR})
       EXECUTE_PROCESS(COMMAND ${CMD} ${HTIN} ${HTOUT})
       ADD_CUSTOM_COMMAND(
       	OUTPUT ${HTOUT}
@@ -126,44 +158,41 @@ MACRO(use_cyclus _dir _name)
 	COMMENT "Copying ${HTIN} to ${HTOUT}."
 	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
 	)
-      # ADD_CUSTOM_TARGET(
-      # 	${_dir}TestCp ALL
-      # 	COMMAND ${CMD} ${HTIN} ${HTOUT}
-      # 	COMMAND ${CMD} ${CCTIN} ${CCTOUT}
-      # 	DEPENDS ${HTIN} 
-      # 	DEPENDS ${CCTIN}
-      # 	COMMENT "Copying ${HTIN} to ${HTOUT}."
-      # 	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
-      # 	)
-      SET("${_dir}TestHeader" 
+      SET(
+	"${lib_root}_Test_H" 
 	"${HTOUT}"
-	CACHE INTERNAL "CMake is really silly, the silliest, tin fact" FORCE
+	CACHE INTERNAL "Agent test headers" FORCE
 	)
-    ELSE(EXISTS "${HTIN}")
-      ADD_CUSTOM_COMMAND(
-	OUTPUT ${CCTOUT}
-	COMMAND ${CMD} ${CCTIN} ${CCTOUT}
-	DEPENDS ${CCTIN} 
-	DEPENDS ${CCIN}
-	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
-	)
-      # ADD_CUSTOM_TARGET(
-      # 	${_dir}TestCp ALL
-      # 	COMMAND ${CMD} ${CCTIN} ${CCTOUT}
-      # 	DEPENDS ${CCTIN}
-      # 	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
-      # 	)
     ENDIF(EXISTS "${HTIN}")
-    SET("${_dir}TestSource" 
+
+    # install test impl
+    MESSAGE(STATUS "Copying ${CCTIN} to ${CCTOUT}.")
+    EXECUTE_PROCESS(COMMAND ${CMD} ${CCTIN} ${CCTOUT})
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CCTOUT}
+      COMMAND ${CMD} ${CCTIN} ${CCTOUT}
+      DEPENDS ${CCTIN} 
+      DEPENDS ${CCIN}
+      COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+      )
+    SET(
+      "${lib_root}_Test_CC" 
       "${CCOUT}"
       "${CCTOUT}"
-      CACHE INTERNAL "CMake is really silly, the silliest, tin fact" FORCE
+      CACHE INTERNAL "Agent test source" FORCE
       )
-    ADD_LIBRARY(${_dir}Tests ${${_dir}TestSource})
-    TARGET_LINK_LIBRARIES(${_dir}Tests dl cycluscore ${CYCLUS_GTEST_LIBRARIES})
+    ADD_LIBRARY(${lib_root}Tests ${${lib_root}TestSource})
+    TARGET_LINK_LIBRARIES(${lib_root}Tests dl cycluscore ${CYCLUS_GTEST_LIBRARIES})
+    SET_TARGET_PROPERTIES(${lib_root}Tests PROPERTIES LINKER_LANGUAGE C)
+    SET(
+      "${lib_root}_TEST_LIB" 
+      "${lib_root}Tests" 
+      CACHE INTERNAL "Agent test library alias." FORCE
+      )
+
   ENDIF(EXISTS "${CCTIN}")
 
-  MESSAGE(STATUS "Finished construction of build files for agent: ${_dir}")
+  MESSAGE(STATUS "Finished construction of build files for agent: ${lib_root}")
 ENDMACRO()
 
 macro(add_all_subdirs)
