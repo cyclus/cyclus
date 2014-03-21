@@ -7,12 +7,6 @@ StubFacility::StubFacility(cyclus::Context* ctx)
     : cyclus::Facility(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//StubFacility::~StubFacility() {}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//cyclus::Agent* StubFacility::Clone() {return this;}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubFacility::str() {
   return Facility::str();
 }

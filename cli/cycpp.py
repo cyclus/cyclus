@@ -157,7 +157,7 @@ class LinemarkerFilter(Filter):
     This is useful for debugging. See the cpp for more info:
     http://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html
     """
-    regex = re.compile(r'#\s+(\d+)\s+"(.*?)"(\s+\d+)*?')
+    regex = re.compile(RE_COMMENTS + r'*#\s+(\d+)\s+"(.*?)"(\s+\d+)*?')
     allowed_flags = {'1', '2'}
     last_was_linemarker = False
 
@@ -213,7 +213,7 @@ class UsingFilter(AliasFilter):
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
     # handles anonymous namespaces as group(1) == None
-    regex = re.compile("\s*namespace(\s+\w*)?\s*$")
+    regex = re.compile(RE_COMMENTS + "*\s*namespace(\s+\w*)?\s*$")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -298,7 +298,7 @@ class ClassFilter(Filter):
 
 class AccessFilter(Filter):
     """Filter for setting the current access control flag."""
-    regex = re.compile('\s*(public|private|protected)\s*')
+    regex = re.compile(RE_COMMENTS + '*\s*(public|private|protected)\s*')
 
     def transform(self, statement, sep):
         access = self.match.group(1)
@@ -551,9 +551,9 @@ def accumulate_state(canon):
 # pass 3
 #
 class CodeGeneratorFilter(Filter):
-    re_template = ("\s*#\s*pragma\s+cyclus+"
-                   "(\sdef\s|\sdecl\s|\simpl\s|\s)+"
-                   "{0}(\s+.*)?")
+    re_template = RE_COMMENTS + ("\s*#\s*pragma\s+cyclus+"
+                                 "(\sdef\s|\sdecl\s|\simpl\s|\s)+"
+                                 "{0}(\s+.*)?")
 
     def_template = "\n{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
 
@@ -1016,7 +1016,7 @@ class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
         #pragma cyclus [def|decl|impl]
     """
-    regex = re.compile("\s*#\s*pragma\s+cyclus+(\sdef|\sdecl|\simpl|)$")
+    regex = re.compile(RE_COMMENTS + "*\s*#\s*pragma\s+cyclus+(\sdef|\sdecl|\simpl|)$")
 
     def transform(self, statement, sep):
         rtn = ""
