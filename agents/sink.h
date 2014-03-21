@@ -1,5 +1,5 @@
-#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_SINK_FACILITY_H_
-#define CYCLUS_INTEGRATION_TESTS_MODELS_SINK_FACILITY_H_
+#ifndef CYCLUS_AGENTS_SINK_H_
+#define CYCLUS_AGENTS_SINK_H_
 
 #include <string>
 
@@ -12,16 +12,21 @@ namespace cyclus {
 /// This sink facility is similar to Sink provided in cycamore, but it
 /// has minimum implementation to run integration tests.
 /// Some parts of the code is directrly copied from cycamore Sink.
-class Sink : public cyclus::Agent  {
+class Sink : public cyclus::Facility  {
  public:
   Sink(cyclus::Context* ctx);
   virtual ~Sink() {};
 
-  #pragma cyclus
+  #pragma cyclus clone
+  #pragma cyclus initfromcopy
+  #pragma cyclus initfromdb
+  #pragma cyclus infiletodb
+  #pragma cyclus snapshot
+  #pragma cyclus schema
 
-  virtual void InitInv(cyc::Inventories& inv);
+  virtual void InitInv(cyclus::Inventories& inv);
   
-  virtual cyc::Inventories SnapshotInv();
+  virtual cyclus::Inventories SnapshotInv();
 
   virtual std::string str();
 
@@ -34,10 +39,10 @@ class Sink : public cyclus::Agent  {
   virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
       GetMatlRequests();
 
-  /// @brief SinkFacilities request GenericResources of their given
+  /// @brief SinkFacilities request Product of their given
   /// commodity. Note that it is assumed the Sink operates on a single
   /// resource type!
-  virtual std::set<cyclus::RequestPortfolio<cyclus::GenericResource>::Ptr>
+  virtual std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
       GetGenRsrcRequests();
 
   /// @brief SinkFacilities place accepted trade Materials in their Inventory
@@ -47,8 +52,8 @@ class Sink : public cyclus::Agent  {
 
   /// @brief SinkFacilities place accepted trade Materials in their Inventory
   virtual void AcceptGenRsrcTrades(
-      const std::vector< std::pair<cyclus::Trade<cyclus::GenericResource>,
-      cyclus::GenericResource::Ptr> >& responses);
+      const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
+      cyclus::Product::Ptr> >& responses);
   /**
      add a commodity to the set of input commodities
      @param name the commodity name
@@ -61,12 +66,18 @@ class Sink : public cyclus::Agent  {
   inline double capacity() const { return capacity_; }
 
  private:
+  #pragma cyclus var {}
   std::vector<std::string> in_commods_;
+
+  #pragma cyclus var {}
   std::string incommodity_;
+
+  #pragma cyclus var {}
   double capacity_;
+
   cyclus::ResourceBuff inventory_;
 };
 
 }  // namespace cyclus
 
-#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_SINK_FACILITY_H_
+#endif  // CYCLUS_AGENTS_SINK_H_

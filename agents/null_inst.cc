@@ -3,7 +3,7 @@
 namespace cyclus {
 
 NullInst::NullInst(cyclus::Context* ctx)
-    : cyclus::InstAgent(ctx) {}
+    : cyclus::Institution(ctx) {}
 
 NullInst::~NullInst() {}
 

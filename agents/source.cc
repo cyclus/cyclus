@@ -8,15 +8,14 @@
 namespace cyclus {
 
 Source::Source(cyclus::Context* ctx)
-    : cyclus::FacilityAgent(ctx),
+    : cyclus::Facility(ctx),
       commod_(""),
       recipe_name_(""),
-      commod_price_(0),
       capacity_(std::numeric_limits<double>::max()) {}
 
 std::string Source::str() {
   std::stringstream ss;
-  ss << cyclus::FacilityAgent::str()
+  ss << cyclus::Facility::str()
      << " supplies commodity '"
      << commod_ << "' with recipe '"
      << recipe_name_ << "' at a capacity of "
@@ -25,7 +24,7 @@ std::string Source::str() {
 }
 
 void Source::Tick(int time) {
-  LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is ticking {";
+  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is ticking {";
   LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity_
                                    << " kg of "
                                    << commod_ << ".";
@@ -33,7 +32,7 @@ void Source::Tick(int time) {
 }
 
 void Source::Tock(int time) {
-  LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is tocking {";
+  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is tocking {";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
 }
 
@@ -94,7 +93,7 @@ void Source::GetMatlTrades(
                                               qty,
                                               context()->GetRecipe(recipe_name_));
     responses.push_back(std::make_pair(*it, response));
-    LOG(cyclus::LEV_INFO5, "SrcFac") << name() << " just received an order"
+    LOG(cyclus::LEV_INFO5, "SrcFac") << prototype() << " just received an order"
                                      << " for " << qty
                                      << " of " << commod_;
   }

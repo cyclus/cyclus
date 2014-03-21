@@ -1,5 +1,5 @@
-#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_NULL_INST_H_
-#define CYCLUS_INTEGRATION_TESTS_MODELS_NULL_INST_H_
+#ifndef CYCLUS_AGENTS_NULL_INST_H_
+#define CYCLUS_AGENTS_NULL_INST_H_
 
 #include <string>
 
@@ -17,4 +17,4 @@ class NullInst : public cyclus::Institution {
 
 }  // namespace cyclus
 
-#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_NULL_INST_H_
+#endif  // CYCLUS_AGENTS_NULL_INST_H_

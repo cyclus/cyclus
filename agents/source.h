@@ -24,13 +24,18 @@ class Source : public cyclus::Facility {
   Source(cyclus::Context* ctx);
   virtual ~Source() {};
 
-  #pragma cyclus
+  #pragma cyclus clone
+  #pragma cyclus initfromcopy
+  #pragma cyclus initfromdb
+  #pragma cyclus infiletodb
+  #pragma cyclus snapshot
+  #pragma cyclus schema
 
   virtual std::string str();
 
-  virtual void InitInv(cyc::Inventories& inv) {};
+  virtual void InitInv(cyclus::Inventories& inv) {};
 
-  virtual cyclus::Inventories SnapshotInv() { return cyc::Inventories(); }
+  virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
 
   virtual void Tick(int time);
 
@@ -87,8 +92,11 @@ class Source : public cyclus::Facility {
   inline std::string recipe() const { return recipe_name_; }
 
  private:
+
+  #pragma cyclus var {}
   std::string commod_;
 
+  #pragma cyclus var {}
   std::string recipe_name_;
 
   /**
@@ -96,6 +104,7 @@ class Source : public cyclus::Facility {
     recipe that can be provided each time step.  A very large number
     can be provided to represent infinte capacity.
     */
+  #pragma cyclus var {}
   double capacity_;
 
 };

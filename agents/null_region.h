@@ -1,5 +1,5 @@
-#ifndef CYCLUS_INTEGRATION_TESTS_MODELS_NULL_REGION_H_
-#define CYCLUS_INTEGRATION_TESTS_MODELS_NULL_REGION_H_
+#ifndef CYCLUS_AGENTS_NULL_REGION_H_
+#define CYCLUS_AGENTS_NULL_REGION_H_
 
 #include <string>
 
@@ -17,4 +17,4 @@ class NullRegion : public cyclus::Region {
 
 }  // namespace cyclus
 
-#endif  // CYCLUS_INTEGRATION_TESTS_MODELS_NULL_REGION_H_
+#endif  // CYCLUS_AGENTS_NULL_REGION_H_
