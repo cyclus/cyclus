@@ -18,24 +18,25 @@ All decorators have the following form::
 
     #pragma cyclus <decorator name> [args]
 
-The ``#pragma cyclus`` portion is a flag so that *only* cycpp consumes this directive.
-This is followed by the actual ``<decorator name>`` which tells cycpp what to do with 
-this pragma. Lastly, optionals arguments may be passed to this decorator but all options
-*must* be on the same logical line as the directive.  How the arguments are interpreted
-is a function of the decorators themselves.  Most of them are simple Python statements
-or expressions.  See the following handy table!
+The ``#pragma cyclus`` portion is a flag so that *only* cycpp consumes this
+#directive. This is followed by the actual ``<decorator name>`` which tells
+cycpp what to do with this pragma. Lastly, optionals arguments may be passed to
+this decorator but all options *must* be on the same logical line as the
+directive.  How the arguments are interpreted is a function of the decorators
+themselves.  Most of them are simple Python statements or expressions.  See the
+following handy table!
 
 **Decorator Arguments:**
 
 :var:  Add the following C++ statement as an Agent's state variable. There is one 
        argument which must be a Python expression that evaluates to a dictionary or
        other mapping.
-:exec: Executes arbitrary python code that is passed in as the arguments and loads 
-       this into the context. This is useful for importing handy modules, declaring
-       variables for later use, or any of the other things that Python is great for.
-       Any variables defined here are kept in a seperate namespace from the classes.
-       Since this gives you direct access to the Python interpreter, try to be a 
-       little careful.
+:exec: Executes arbitrary python code that is passed in as the arguments and
+       loads this into the context. This is useful for importing handy modules,
+       declaring variables for later use, or any of the other things that Python
+       is great for. Any variables defined here are kept in a seperate
+       namespace from the classes.  Since this gives you direct access to the
+       Python interpreter, try to be a little careful.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
 library. It requires Python 2.7+ or Python 3.3+ to run.
@@ -58,13 +59,15 @@ RE_MULTILINE_COMMENT = "(?:\s*?/\*.*?\*/)"
 RE_SINGLE_LINE_COMMENT = "(?:\s*?//[^\n]*?\n\s*?)"
 RE_COMMENTS = "(?:" + RE_MULTILINE_COMMENT + "|" + RE_SINGLE_LINE_COMMENT + ")"
 
-# This migh miss files which start with '#' - however, after canonization (through cpp)
-# it shouldn't matter.
+# This migh miss files which start with '#' - however, after canonization
+# (through cpp) it shouldn't matter.
 RE_STATEMENT = re.compile("(" + RE_COMMENTS + "*" + \
     r'(?:\s*#))?'  # find the start of pragmas
     r'(\s+(public|private|protected)\s*'  # consider access control as statements
-    r'|(?(1)[^\n]|[^{};])*)?'  # or, consider statement until we hit '{', '}', or ';'
-    # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';' otherwise
+    # or, consider statement until we hit '{', '}', or ';'
+    r'|(?(1)[^\n]|[^{};])*)?'  
+    # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';'
+    # otherwise
     r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE | re.DOTALL)
 
 CYCNS = 'cyclus'
@@ -96,8 +99,9 @@ def preprocess_file(filename, includes = [], cpp_path='cpp', cpp_args=('-xc++', 
     includes : list
         A list of all include directories to tell the preprocessor about
     cpp_path : str, optional
-    cpp_args : str, optional
-        Refer to the documentation of parse_file for the meaning of these arguments.
+    cpp_args : str, optional 
+        Refer to the documentation of parse_file for the meaning of these 
+        arguments.
 
     Notes
     -----
@@ -117,8 +121,8 @@ def preprocess_file(filename, includes = [], cpp_path='cpp', cpp_args=('-xc++', 
         pipe = Popen(path_list, stdout=PIPE, universal_newlines=True)
         text = pipe.communicate()[0]
     except OSError as e:
-        raise RuntimeError(("Unable to invoke 'cpp'.  Make sure its path was passed "
-                            "correctly\nOriginal error: {0}").format(e))
+        raise RuntimeError(("Unable to invoke 'cpp'.  Make sure its path was "
+                            "passed correctly\nOriginal error: {0}").format(e))
     return text
 
 #
@@ -186,8 +190,8 @@ class AliasFilter(Filter):
         state.aliases -= {d_n_a for d_n_a in state.aliases if d_n_a[0] > depth}
 
 class TypedefFilter(AliasFilter):
-    """Filter for handling typedef as aliases. Note that in-line compound typedefs of 
-    structs and unions are not supported.
+    """Filter for handling typedef as aliases. Note that in-line compound
+    typedefs of structs and unions are not supported.
     """
     regex = re.compile("\s*typedef\s+(.*?\s+.*)\s*$")
 
@@ -260,7 +264,8 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile(RE_COMMENTS + "*\s*class\s+(\w+)(\s*:[\s\w,:]+)?\s*", re.DOTALL)
+    regex = re.compile(
+        RE_COMMENTS + "*\s*class\s+(\w+)(\s*:[\s\w,:]+)?\s*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -268,7 +273,8 @@ class ClassFilter(Filter):
         state.classes.append((state.depth, name))
         classname = state.classname()
         superclasses = self.match.group(2)
-        state.superclasses[classname] = sc = state.superclasses.get(classname, set())
+        state.superclasses[classname] = sc = state.superclasses.get(classname, 
+                                                                    set())
         if superclasses is not None:
             superclasses = [s.strip().split()[-1] for s in superclasses.split(',')]
             for sup in superclasses:
@@ -297,7 +303,8 @@ class ClassFilter(Filter):
 
 class AccessFilter(Filter):
     """Filter for setting the current access control flag."""
-    regex = re.compile(RE_COMMENTS + '*\s*(public|private|protected)\s*', re.DOTALL)
+    regex = re.compile(
+        RE_COMMENTS + '*\s*(public|private|protected)\s*', re.DOTALL)
 
     def transform(self, statement, sep):
         access = self.match.group(1)
@@ -407,7 +414,8 @@ class StateAccumulator(object):
         self.depth = 0
         self.execns = {}   # execution namespace we have accumulated
         self.context = {}  # classes we have accumulated
-        self.classes = []  # stack of (depth, class name) tuples, most nested is last
+        # stack of (depth, class name) tuples, most nested is last
+        self.classes = []  
         self.superclasses = {}  # map from classes to set of super classes.
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
@@ -521,9 +529,10 @@ class StateAccumulator(object):
                 except TypeError:
                     pass  # This is the TypeError from below
             else:
-                msg = ("{i}The type of {c}::{n} ({t}) is not a recognized primitive "
-                       "type: {p}.").format(i=self.includeloc(), t=t, n=name, c=self.classname(), 
-                                            p=", ".join(sorted(self.known_primitives)))
+                msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
+                       "primitive type: {p}.").format(
+                    i=self.includeloc(), t=t, n=name, c=self.classname(), 
+                    p=", ".join(sorted(self.known_primitives)))
                 raise TypeError(msg)
         return t
 
@@ -576,7 +585,8 @@ class CodeGeneratorFilter(Filter):
         classname = self.match.group(2) if self.match.lastindex > 1 else None
         if classname is None:
             if len(cg.classes) == 0:
-                TypeError("{0}Classname could not determined".format(cg.includeloc()))
+                TypeError("{0}Classname could not determined".format(
+                        cg.includeloc()))
             classname = cg.classname()
         classname = classname.strip().replace('.', '::')
         context = cg.context
@@ -667,8 +677,9 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         return impl
 
 class InitFromDbFilter(CodeGeneratorFilter):
-    """Filter for handling db-constructor-like InitFrom() code generation:
-        #pragma cyclus [def|decl|impl] initfromdb [classname]
+    """Filter for handling db-constructor-like InitFrom() code 
+    generation:
+    #pragma cyclus [def|decl|impl] initfromdb [classname]
     """
     methodname = "InitFrom"
     pragmaname = "initfromdb"
@@ -750,7 +761,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         impl = ""
 
         # add inheritance init froms
-        rents = parent_intersection(self.given_classname, WRANGLERS, self.machine.superclasses)
+        rents = parent_intersection(self.given_classname, WRANGLERS, 
+                                    self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
 
@@ -912,52 +924,52 @@ class SnapshotFilter(CodeGeneratorFilter):
     def methodargs(self):
         return CYCNS + '::DbInit di'
 
-    def impl(self, ind='  '):        
+    def impl(self, ind="  "):        
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
-        impl = ''
+        impl = ""
         pod = {}
         for member, params in ctx.items():
-            t = params['type']
-            if t[0] in ['std::vector', 'std::list', 'std::set']:
-                suffix = t[1].replace('std::', '').title()
-                impl += ind + '{\n'
-                impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
-                impl += ind + '  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n'.format(member)
-                impl += ind + '    di.NewDatum("ListOf{0}")\n'.format(suffix)
-                impl += ind + '    ->AddVal("Member", "{0}")\n'.format(member)
-                impl += ind + '    ->AddVal("Value", *it)\n'
-                impl += ind + '    ->Record();\n'
-                impl += ind + '  }\n'
-                impl += ind + '}\n'
-            elif t[0] == 'std::map':
-                suffix = t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
-                impl += ind + '{\n'
-                impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
-                impl += ind + '  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n'.format(member)
-                impl += ind + '    di.NewDatum("MapOf{0}")\n'.format(suffix)
-                impl += ind + '    ->AddVal("Member", "{0}")\n'.format(member)
-                impl += ind + '    ->AddVal("Key", it->first)\n'
-                impl += ind + '    ->AddVal("Value", it->second)\n'
-                impl += ind + '    ->Record();\n'
-                impl += ind + '  }\n'
-                impl += ind + '}\n'
-            elif t[0] == 'std::pair':
+            t = params["type"]
+            if t[0] in ["std::vector", "std::list", "std::set"]:
+                suffix = t[1].replace("std::", "").title()
+                impl += ind + "{\n"
+                impl += ind + "  {0}::iterator it;\n".format(type_to_str(t))
+                impl += ind + "  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n".format(member)
+                impl += ind + "    di.NewDatum(\"ListOf{0}\")\n".format(suffix)
+                impl += ind + "    ->AddVal(\"Member\", \"{0}\")\n".format(member)
+                impl += ind + "    ->AddVal(\"Value\", *it)\n"
+                impl += ind + "    ->Record();\n"
+                impl += ind + "  }\n"
+                impl += ind + "}\n"
+            elif t[0] == "std::map":
+                suffix = t[1].replace("std::", "").title() + "To" + t[2].replace("std::", "").title()
+                impl += ind + "{\n"
+                impl += ind + "  {0}::iterator it;\n".format(type_to_str(t))
+                impl += ind + "  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n".format(member)
+                impl += ind + "    di.NewDatum(\"MapOf{0}\")\n".format(suffix)
+                impl += ind + "    ->AddVal(\"Member\", \"{0}\")\n".format(member)
+                impl += ind + "    ->AddVal(\"Key\", it->first)\n"
+                impl += ind + "    ->AddVal(\"Value\", it->second)\n"
+                impl += ind + "    ->Record();\n"
+                impl += ind + "  }\n"
+                impl += ind + "}\n"
+            elif t[0] == "std::pair":
                 pod[member] = t
             elif t in PRIMITIVES:
                 pod[member] = t
             else:
-                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
+                raise RuntimeError("{0}Unsupported type {1}".format(self.machine.includeloc(), t))
 
-        impl += ind + 'di.NewDatum("Info")\n'
+        impl += ind + "di.NewDatum(\"Info\")\n"
         for member, t in pod.items():
-            if t[0] == 'std::pair':
-                impl += ind + '->AddVal("{0}A", {0}.first)\n'.format(member)
-                impl += ind + '->AddVal("{0}B", {0}.second)\n'.format(member)
+            if t[0] == "std::pair":
+                impl += ind + "->AddVal(\"{0}A\", {0}.first)\n".format(member)
+                impl += ind + "->AddVal(\"{0}B\", {0}.second)\n".format(member)
             else:
-                impl += ind + '->AddVal("{0}", {0})\n'.format(member)
-        impl += ind + '->Record();\n'
+                impl += ind + "->AddVal(\"{0}\", {0})\n".format(member)
+        impl += ind + "->Record();\n"
 
         return impl
 
@@ -1019,8 +1031,9 @@ class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
         #pragma cyclus [def|decl|impl]
     """
-    regex = re.compile(RE_COMMENTS + "*\s*#\s*pragma\s+cyclus+(\sdef|\sdecl|\simpl|)$",
-                       re.DOTALL)
+    regex = re.compile(
+        RE_COMMENTS + "*\s*#\s*pragma\s+cyclus+(\sdef|\sdecl|\simpl|)$", 
+        re.DOTALL)
 
     def transform(self, statement, sep):
         rtn = ""
@@ -1066,11 +1079,11 @@ class Indenter(object):
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
 
-    This represents the file as code is being injected into it.  
-    At the end of the traversal this final stage it will built up a brand new
-    file for pass 3. It manages both the code insertion pragmas and other bits 
-    of C++ syntax as needed to determine locality. It works by passing each statement 
-    through a sequence of filters, and injects code based on the directive and the 
+    This represents the file as code is being injected into it.  At the end of
+    the traversal this final stage it will built up a brand new file for pass
+    3. It manages both the code insertion pragmas and other bits of C++ syntax
+    as needed to determine locality. It works by passing each statement through
+    a sequence of filters, and injects code based on the directive and the
     state.
     """
     
@@ -1079,16 +1092,18 @@ class CodeGenerator(object):
         self.context = context  # the results of pass 2
         self.superclasses = superclasses  # the results of pass 2
         self.statements = []    # the results of pass 3, waiting to be joined
-        self.classes = []  # stack of (depth, class name) tuples, most nested is last
+        # stack of (depth, class name) tuples, most nested is last
+        self.classes = []  
         self.superclasses = {}  # map from classes to set of super classes.
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.linemarkers = []
+        # all basic code generating filters
         self.codegen_filters = [InitFromCopyFilter(self), 
                                 InitFromDbFilter(self), InfileToDbFilter(self),
                                 CloneFilter(self), SchemaFilter(self),
                                 SnapshotFilter(self), InitInvFilter(self), 
-                                SnapshotInvFilter(self)] # all basic code generating filters
+                                SnapshotInvFilter(self)] 
         self.filters = self.codegen_filters + [ClassFilter(self), 
                                                AccessFilter(self), 
                                                NamespaceFilter(self), 
@@ -1109,8 +1124,9 @@ class CodeGenerator(object):
         return s + "\n"
 
     def generate(self, statement, sep):
-        """Modify the existing statements list by incoprorating, modifying, or 
-        ignoring this statement, which is partitioned from the next statement by sep.
+        """Modify the existing statements list by incoprorating, modifying, or
+        ignoring this statement, which is partitioned from the next statement by
+        sep.
         """
         #print(repr(statement))
         # filters have to come before sep
@@ -1153,9 +1169,8 @@ def generate_code(orig, context, superclasses):
 #
 # meta
 #
-
 class Proxy(MutableMapping):
-    """A porxy object for scoping purposes."""
+    """A proxy object for scoping purposes."""
 
     def __init__(self, d):
         """d is a dict-like object"""
@@ -1249,7 +1264,7 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
     return t
 
 def type_to_str(t):
-    if type in PRIMITIVES:
+    if t in PRIMITIVES:
         return t
     else:
         s = t[0] + '< '
