@@ -7,7 +7,7 @@
 
 namespace cyclus {
 
-class NullRegion : public cyclus::RegionAgent  {
+class NullRegion : public cyclus::Region {
  public:
   NullRegion(cyclus::Context* ctx);
   virtual ~NullRegion();

@@ -7,7 +7,7 @@
 
 namespace cyclus {
 
-class NullInst : public cyclus::InstAgent {
+class NullInst : public cyclus::Institution {
  public:
   NullInst(cyclus::Context* ctx);
   virtual ~NullInst();

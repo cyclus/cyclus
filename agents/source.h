@@ -19,7 +19,7 @@ class Context;
 ///
 /// This FacilityAgent is intended
 /// to be used for Cyclus integration tests as a basic source facility.
-class Source : public cyclus::FacilityAgent {
+class Source : public cyclus::Facility {
  public:
   Source(cyclus::Context* ctx);
   virtual ~Source() {};

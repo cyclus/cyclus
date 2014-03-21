@@ -12,7 +12,7 @@ namespace cyclus {
 /// This sink facility is similar to Sink provided in cycamore, but it
 /// has minimum implementation to run integration tests.
 /// Some parts of the code is directrly copied from cycamore Sink.
-class Sink : public cyclus::FacilityAgent  {
+class Sink : public cyclus::Agent  {
  public:
   Sink(cyclus::Context* ctx);
   virtual ~Sink() {};
