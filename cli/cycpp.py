@@ -260,7 +260,7 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile(RE_COMMENTS + "*\s*class\s+(\w+)(\s*:[\s\w,:]+)?\s*", re.DOTALL)
+    regex = re.compile(RE_COMMENTS + "*\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -550,9 +550,9 @@ def accumulate_state(canon):
 # pass 3
 #
 class CodeGeneratorFilter(Filter):
-    re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus+"
+    re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus"
                                  "(\sdef\s|\sdecl\s|\simpl\s|\s)+"
-                                 "{0}(\s+.*?)?")
+                                 "{0}(\s+(?:[\w:\.]+)?)?")
 
     def_template = "\n{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
 
@@ -828,7 +828,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 impl += ind + '->AddVal("{0}B", {1}::{2}<{3}>(tree, "{0}/second"{4}))\n'.format(member, CYCNS, methname, t[2], opt2)
             else:
                 if d is not None:
-                    opt = ', "' + d + '"' if t == "std::string" else ', ' + d 
+                    opt = ', "' + str(d) + '"' if t == "std::string" else ', ' + str(d) 
                 impl += ind + '->AddVal("{0}", {1}::{2}<{3}>(tree, "{0}"{4}))\n'.format(member, CYCNS, methname, t, opt)
         impl += ind + '->Record();\n'
 
@@ -1080,7 +1080,6 @@ class CodeGenerator(object):
         self.superclasses = superclasses  # the results of pass 2
         self.statements = []    # the results of pass 3, waiting to be joined
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
-        self.superclasses = {}  # map from classes to set of super classes.
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.linemarkers = []
@@ -1112,7 +1111,6 @@ class CodeGenerator(object):
         """Modify the existing statements list by incoprorating, modifying, or 
         ignoring this statement, which is partitioned from the next statement by sep.
         """
-        #print(repr(statement))
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
