@@ -2,7 +2,7 @@
 
 #include "sink.h"
 
-using cyclus::Sink;
+namespace cyclus {
 
 Sink::Sink(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
@@ -136,3 +136,5 @@ void Sink::Tock(int time) {
 extern "C" cyclus::Agent* ConstructSink(cyclus::Context* ctx) {
   return new Sink(ctx);
 }
+
+} // namespace cyclus
