@@ -1249,7 +1249,7 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
     return t
 
 def type_to_str(t):
-    if type in PRIMITIVES:
+    if t in PRIMITIVES:
         return t
     else:
         s = t[0] + '< '
