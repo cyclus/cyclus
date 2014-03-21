@@ -47,15 +47,15 @@ class StubFacility : public cyclus::Facility  {
   /**
     every agent should be destructable
     */
-  virtual ~StubFacility();
+//  virtual ~StubFacility();
 
-  virtual void InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {};
+//  virtual void InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {};
   
-  virtual void InitInv(cyclus::Inventories& inv) {};
-  virtual cyclus::Agent* Clone();
+//  virtual void InitInv(cyclus::Inventories& inv) {};
+//  virtual cyclus::Agent* Clone();
   
-  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();}
-  virtual void InitFrom(StubFacility* m) {};
+//  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();}
+//  virtual void InitFrom(StubFacility* m) {};
 
   #pragma cyclus
 
