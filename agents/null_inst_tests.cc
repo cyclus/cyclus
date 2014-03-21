@@ -4,7 +4,7 @@
 
 #include "null_inst.h"
 
-#include "inst_agent_tests.h"
+#include "institution_tests.h"
 #include "agent_tests.h"
 
 using cyclus::NullInst;

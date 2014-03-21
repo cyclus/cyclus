@@ -2,7 +2,7 @@
 
 #include "null_region.h"
 
-#include "region_agent_tests.h"
+#include "region_tests.h"
 #include "agent_tests.h"
 
 using cyclus::NullRegion;

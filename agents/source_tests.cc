@@ -3,7 +3,7 @@
 #include "source_facility.h"
 
 #include "context.h"
-#include "facility_agent_tests.h"
+#include "facility_tests.h"
 #include "agent_tests.h"
 
 using cyclus::SimpleSource;
