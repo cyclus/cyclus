@@ -102,6 +102,7 @@ MACRO(USE_CYCLUS lib_root src_root)
       COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
       DEPENDS ${HIN}
       DEPENDS ${CCIN}
+      DEPENDS ${CYCPP}
       COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
       COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
       )
@@ -110,6 +111,7 @@ MACRO(USE_CYCLUS lib_root src_root)
       OUTPUT ${CCOUT}
       COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
       DEPENDS ${CCIN}
+      DEPENDS ${CYCPP}
       COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
       )
   ENDIF(EXISTS "${HIN}")
