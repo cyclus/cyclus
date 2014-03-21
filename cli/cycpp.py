@@ -876,7 +876,7 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down(), member)
             elif t in PRIMITIVES:
-                impl += i + '"{0}<element name=\\"{1}\\"/>\\n"\n'.format(xi.up(), member)
+                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
                 impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t[0] == 'std::pair':
