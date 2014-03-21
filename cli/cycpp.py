@@ -693,7 +693,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
 
         for member, info in ctx.items():
             t = info['type']
-            if isinstance(t, Sequence) and t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
+            if t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
                 else:
@@ -711,13 +711,13 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 elif t[0] == 'std::set':
                     impl += ind + '{0}.insert(qr.GetVal<{1}>("Value", i);\n'.format(member, t[1])
                 else:
-                    impl += ind + '{0}.push_back(qr.GetVal<{1}>("Value", i);\n'.format(member, t[1])
+                    impl += ind + '{0}.push_back(qr.GetVal<{1}>("Value", i));\n'.format(member, t[1])
                 ind = ind[:-4]
                 impl += ind + '  }\n'
                 impl += ind + '}\n'
-            elif isinstance(t, Sequence) and t[0] in PRIMITIVES or isinstance(t, str) and t in PRIMITIVES:
+            elif t in PRIMITIVES:
                 pods.append((member, t))
-            elif isinstance(t, Sequence) and t[0] == 'std::pair':
+            elif t[0] == 'std::pair':
                 pods.append((member, t))
             else:
                 raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
@@ -725,7 +725,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
         # add pod
         impl += ind + "{0}::QueryResult qr = b->Query(\"Info\", NULL);\n".format(CYCNS)
         for (member, t) in pods:
-            if isinstance(t, Sequence) and t[0] == 'std::pair':
+            if t[0] == 'std::pair':
                 impl += ind + "{0}.first = qr.GetVal<{1}>(\"{0}A\");\n".format(member, t[1])
                 impl += ind + "{0}.second = qr.GetVal<{1}>(\"{0}B\");\n".format(member, t[2])
             else:
@@ -760,7 +760,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         for member, info in ctx.items():
             t = info['type']
             d = info['default'] if 'default' in info else None
-            if isinstance(t, Sequence) and t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
+            if t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
                 else:
@@ -772,15 +772,16 @@ class InfileToDbFilter(CodeGeneratorFilter):
                     impl += ind + '{\n'
                 ind += '  '
 
-                impl += ind + '{0}::InfileTree sub = tree->SubTree("{1}");\n'.format(CYCNS, member)
+                impl += ind + '{0}::InfileTree* sub = tree->SubTree("{1}");\n'.format(CYCNS, member)
                 impl += ind + 'int n = sub->NMatches("val");\n'
                 impl += ind + 'for (int i = 0; i < n; ++i) {\n'
                 impl += ind + '  di.NewDatum("{0}")\n'.format(table)
                 impl += ind + '  ->AddVal("Member", "{0}")\n'.format(member)
                 if t[0] == 'std::map':
-                    impl += ind + '  ->AddVal("Key", {0}::Query(sub, "key", i))\n'.format(CYCNS)
+                    impl += ind + '  ->AddVal("Key", {0}::Query<{1}>(sub, "key", i))\n'.format(CYCNS, t[1])
+                    impl += ind + '  ->AddVal("Value", {0}::Query<{1}>(sub, "val", i))\n'.format(CYCNS, t[2])
                 else:
-                    impl += ind + '  ->AddVal("Value", {0}::Query(sub, "val", i))\n'.format(CYCNS)
+                    impl += ind + '  ->AddVal("Value", {0}::Query<{1}>(sub, "val", i))\n'.format(CYCNS, t[1])
                 impl += ind + '  ->Record();\n'
                 impl += ind + '}\n'
 
@@ -807,10 +808,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
                 ind = ind[:-2]
                 impl += ind + '}\n'
-
-            elif isinstance(t, str) and t in PRIMITIVES or isinstance(t, Sequence) and t[0] in PRIMITIVES:
+            elif t in PRIMITIVES:
                 pods.append((member, t, d))
-            elif isinstance(t, Sequence) and t[0] == 'std::pair':
+            elif t[0] == 'std::pair':
                 pods.append((member, t, d))
             else:
                 raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
@@ -820,7 +820,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         for (member, t, d) in pods:
             methname = "Query" if d is None else "OptionalQuery"
             opt = ''
-            if isinstance(t, Sequence) and t[0] == 'std::pair':
+            if t[0] == 'std::pair':
                 opt2 = ''
                 if d is not None:
                     opt = ', ' + d[0]
@@ -856,7 +856,7 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
 
             t = info['type']
-            if isinstance(t, Sequence) and t[0] in ['std::list', 'std::map', 'std::set', 'std::vector']:
+            if t[0] in ['std::list', 'std::map', 'std::set', 'std::vector']:
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
                 impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
                 if t[0] in ['std::set', 'std::vector', 'std::list']:
@@ -876,11 +876,11 @@ class SchemaFilter(CodeGeneratorFilter):
 
                 impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down(), member)
-            elif isinstance(t, str) and t in PRIMITIVES or isinstance(t, Sequence) and t[0] == 'std::string':
+            elif t in PRIMITIVES:
                 impl += i + '"{0}<element name=\\"{1}\\"/>\\n"\n'.format(xi.up(), member)
-                impl += i + '"{0}<data type=\\"string\\" />\\n"\n'.format(xi)
+                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-            elif isinstance(t, Sequence) and t[0] == 'std::pair':
+            elif t[0] == 'std::pair':
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
                 impl += i + '"{0}<element name=\\"first\\">\\n"\n'.format(xi.up())
                 impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t[1].replace('std::', ''))
@@ -917,7 +917,7 @@ class SnapshotFilter(CodeGeneratorFilter):
         pod = {}
         for member, params in ctx.items():
             t = params['type']
-            if isinstance(t, Sequence) and t[0] in ['std::vector', 'std::list', 'std::set']:
+            if t[0] in ['std::vector', 'std::list', 'std::set']:
                 suffix = t[1].replace('std::', '').title()
                 impl += ind + '{\n'
                 impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
@@ -928,7 +928,7 @@ class SnapshotFilter(CodeGeneratorFilter):
                 impl += ind + '    ->Record();\n'
                 impl += ind + '  }\n'
                 impl += ind + '}\n'
-            elif isinstance(t, Sequence) and t[0] == 'std::map':
+            elif t[0] == 'std::map':
                 suffix = t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
                 impl += ind + '{\n'
                 impl += ind + '  {0}::iterator it;\n'.format(type_to_str(t))
@@ -940,16 +940,16 @@ class SnapshotFilter(CodeGeneratorFilter):
                 impl += ind + '    ->Record();\n'
                 impl += ind + '  }\n'
                 impl += ind + '}\n'
-            elif isinstance(t, Sequence) and t[0] == 'std::pair':
+            elif t[0] == 'std::pair':
                 pod[member] = t
-            elif isinstance(t, str) and t in PRIMITIVES or isinstance(t, Sequence) and t[0] in PRIMITIVES:
+            elif t in PRIMITIVES:
                 pod[member] = t
             else:
                 raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
 
         impl += ind + 'di.NewDatum("Info")\n'
         for member, t in pod.items():
-            if isinstance(t, Sequence) and t[0] == 'std::pair':
+            if t[0] == 'std::pair':
                 impl += ind + '->AddVal("{0}A", {0}.first)\n'.format(member)
                 impl += ind + '->AddVal("{0}B", {0}.second)\n'.format(member)
             else:
@@ -974,7 +974,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
         buffs = []
         for member, info in ctx.items():
             t = info['type']
-            if not isinstance(t, Sequence) and t in BUFFERS:
+            if t in BUFFERS:
                 buffs.append(member)
 
         impl = ind + "{0}::Inventories invs;\n".format(CYCNS)
@@ -1004,7 +1004,7 @@ class InitInvFilter(CodeGeneratorFilter):
         buffs = []
         for member, info in ctx.items():
             t = info['type']
-            if not isinstance(t, Sequence) and t in BUFFERS:
+            if t in BUFFERS:
                 buffs.append(member)
 
         impl = ""
@@ -1244,15 +1244,15 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
     return t
 
 def type_to_str(type):
-    if isinstance(type, list):
+    if type in PRIMITIVES:
+        return type
+    else:
         s = type[0] + '< '
         s += type_to_str(type[1])
         for t in type[2:]:
             s += ', ' + type_to_str(t)
         s += ' >'
         return s
-    else:
-        return type
 
 def parent_classes(classname, pdict):
     rents = set()
