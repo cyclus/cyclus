@@ -54,8 +54,8 @@ if sys.version_info[0] == 2:
 elif sys.version_info[0] >= 3:
     STRING_TYPES = (str,)
 # Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE! 
-RE_MULTILINE_COMMENT = "(?:\s*/\*.*?\*/)"
-RE_SINGLE_LINE_COMMENT = "(?:\s*//.*?\n\s*)"
+RE_MULTILINE_COMMENT = "(?:\s*?/\*.*?\*/)"
+RE_SINGLE_LINE_COMMENT = "(?:\s*?//[^\n]*?\n\s*?)"
 RE_COMMENTS = "(?:" + RE_MULTILINE_COMMENT + "|" + RE_SINGLE_LINE_COMMENT + ")"
 
 # This migh miss files which start with '#' - however, after canonization (through cpp)
@@ -1108,6 +1108,7 @@ class CodeGenerator(object):
         """Modify the existing statements list by incoprorating, modifying, or 
         ignoring this statement, which is partitioned from the next statement by sep.
         """
+        #print(repr(statement))
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
