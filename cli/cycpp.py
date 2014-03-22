@@ -575,7 +575,15 @@ def accumulate_state(canon):
 class CodeGeneratorFilter(Filter):
     re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus\s*"
                                  "(\s+def\s+|\s+decl\s+|\s+impl\s+|\s+)?"
-                                 "{0}(\s+(?:[\w:\.]+)?)?")
+                                 #"(?:\s*{0}\s*)(\s+(?:[\w:\.]+)?)?")
+                                 "(?:\s*{0}\s*)(\s+(?:[\w:\.]+))")
+
+    #re_template = RE_COMMENTS + 
+    #     '*?\\s*#\\s*pragma\\s+cyclus\\s*?(\\s+def\\s+|\\s+decl\\s+|\\s+impl\\s+|\\s*?)?(?:\\s*?{0}\\s*?)?(\\s+?(?:[\\w:\\.]+)?)?')
+
+    re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus\s*?"
+                                 "(\s+def\s+|\s+decl\s+|\s+impl\s+|\s*?)?"
+                                 "(?:\s*?{0}\s*?)(\s+?(?:[\w:\.]+)?)?")
 
     def_template = "\n{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
 
@@ -592,7 +600,6 @@ class CodeGeneratorFilter(Filter):
 
     def transform(self, statement, sep):
         # basic setup
-        #import pdb; pdb.set_trace()
         cg = self.machine
         mode = (self.match.group(1) or '').strip()
         if len(mode) == 0:
@@ -612,7 +619,7 @@ class CodeGeneratorFilter(Filter):
         ctx = context[classname] = context.get(classname, {})
         in_class_decl = self.in_class_decl() 
         #ns = "" if in_class_decl else classname.split('::')[-1] + "::"
-        ns = "" if in_class_decl else self.scoped_classname(classname) + "::"
+        ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
         virt = "virtual " if in_class_decl else ""
         end = ";" if mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
@@ -997,7 +1004,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
     pragmaname = "snapshotinv"
     methodrtn = "{0}::Inventories".format(CYCNS)
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
