@@ -56,33 +56,23 @@ if sys.version_info[0] == 2:
 elif sys.version_info[0] >= 3:
     STRING_TYPES = (str,)
 # Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE! 
-#RE_MULTILINE_COMMENT = "(?:\s*?/\*.*?\*/)"
 RE_MULTILINE_COMMENT = "(?:\s*?/\*(?!\*/)*?\*/)"
 RE_SINGLE_LINE_COMMENT = "(?:\s*?//[^\n]*?\n\s*?)"
 RE_COMMENTS = "(?:" + RE_MULTILINE_COMMENT + "|" + RE_SINGLE_LINE_COMMENT + ")"
 
 # This migh miss files which start with '#' - however, after canonization
 # (through cpp) it shouldn't matter.
-RE_STATEMENT = re.compile("(" + RE_COMMENTS + "*?" + \
-    r'(?:\s*#))?'  # find the start of pragmas
-    r'(\s+(public|private|protected)\s*'  # consider access control as statements
-    # or, consider statement until we hit '{', '}', or ';'
-    r'|(?(1)[^\n]|[^{};])*)?'  
-    # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';'
-    # otherwise
-    r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE | re.DOTALL)
-
 RE_STATEMENT = re.compile(
-    r'(?:(\s*#|\s*//)|(\s*/\*))?'  # find the start of pragmas
-    r'(\s+(public|private|protected)\s*'  # consider access control as statements
+    # find the start of pragmas and comments
+    r'(?:(\s*#|\s*//)|\s*(/\*))?'
+    # consider access control as statements
+    r'(\s+(public|private|protected)\s*|'  
     # or, consider statement until we hit '{', '}', or ';'
-    r'|(?(1)[^\n]|(?(2)(?!\*/)|[^{};]))*)?'  
-    # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';'
-    # otherwise
-    r'((?(1)\n|(?(2)\*/|(?(4):|[{};]))))', re.MULTILINE | re.DOTALL)
-
-#RE_STATEMENT = re.compile(r'(?:(\s*#|\s*//)|\s*(/\*))?(\s+(public|private|protected)\s*|(?(1)[^\n]|(?(2).|[^{};]))*)?((?(1)\n|(?(2)\*/|(?(4):|[{};]))))', re.MULTILINE | re.DOTALL)
-RE_STATEMENT = re.compile(r'(?:(\s*#|\s*//)|\s*(/\*))?(\s+(public|private|protected)\s*|(?(1)[^\n]|(?(2).|[^{};]))*?)((?(1)\n|(?(2)\*/|(?(4):|[{};]))))', re.MULTILINE | re.DOTALL)
+    r'(?(1)[^\n]|(?(2).|[^{};]))*?)' 
+    # find end condition, '\n' for pragma and single line commentd, 
+    # ':' for access, '*/' for multiline comments, and '{', '}', ';' otherwise
+    r'((?(1)\n|(?(2)\*/|(?(4):|[{};]))))', 
+    re.MULTILINE | re.DOTALL)
 
 CYCNS = 'cyclus'
 
@@ -278,7 +268,8 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile(RE_COMMENTS + "*\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
+    regex = re.compile(RE_COMMENTS + "*\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", 
+                       re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -316,8 +307,8 @@ class ClassFilter(Filter):
 
 class AccessFilter(Filter):
     """Filter for setting the current access control flag."""
-    regex = re.compile(
-        RE_COMMENTS + '*\s*(public|private|protected)\s*', re.DOTALL)
+    regex = re.compile(RE_COMMENTS + '*\s*(public|private|protected)\s*', 
+                       re.DOTALL)
 
     def transform(self, statement, sep):
         access = self.match.group(1)
@@ -573,14 +564,6 @@ def accumulate_state(canon):
 # pass 3
 #
 class CodeGeneratorFilter(Filter):
-    re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus\s*"
-                                 "(\s+def\s+|\s+decl\s+|\s+impl\s+|\s+)?"
-                                 #"(?:\s*{0}\s*)(\s+(?:[\w:\.]+)?)?")
-                                 "(?:\s*{0}\s*)(\s+(?:[\w:\.]+))")
-
-    #re_template = RE_COMMENTS + 
-    #     '*?\\s*#\\s*pragma\\s+cyclus\\s*?(\\s+def\\s+|\\s+decl\\s+|\\s+impl\\s+|\\s*?)?(?:\\s*?{0}\\s*?)?(\\s+?(?:[\\w:\\.]+)?)?')
-
     re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus\s*?"
                                  "(\s+def\s+|\s+decl\s+|\s+impl\s+|\s*?)?"
                                  "(?:\s*?{0}\s*?)(\s+?(?:[\w:\.]+)?)?")
@@ -1054,9 +1037,9 @@ class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
         #pragma cyclus [def|decl|impl]
     """
-    regex = re.compile(
-        RE_COMMENTS + "*\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$", 
-        re.DOTALL)
+    regex = re.compile(RE_COMMENTS + \
+                       "*\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$", 
+                       re.DOTALL)
 
     def transform(self, statement, sep):
         rtn = ""
@@ -1124,6 +1107,8 @@ class CodeGenerator(object):
                                 InitFromDbFilter(self), InfileToDbFilter(self),
                                 CloneFilter(self), SchemaFilter(self),
                                 InitInvFilter(self), 
+                                # SnapshotInv has to come before Snapshot for some 
+                                # regex reason I don't understand
                                 SnapshotInvFilter(self),
                                 SnapshotFilter(self), 
                                 ] 
@@ -1195,15 +1180,7 @@ def generate_code(orig, context, superclasses):
     for m in RE_STATEMENT.finditer(orig):
         if m is None:
             continue
-        #prefix, statement, _, sep = m.groups()
         prefix1, prefix2, statement, _, sep = m.groups()
-        #print("PRE1: ", repr(prefix1))
-        #print("PRE2: ", repr(prefix2))
-        #print("STAT: ", repr(statement))
-        #print("_: ", repr(_))
-        #print("SEP: ", repr(sep))
-        #print("----")
-        #statement = statement if prefix is None else prefix + statement
         statement = statement if prefix2 is None else prefix2 + statement
         statement = statement if prefix1 is None else prefix1 + statement
         cg.generate(statement, sep)
@@ -1330,7 +1307,6 @@ def parent_intersection(classname, queryset, superclasses):
     """returns all elements in query_set which are parents of classname and not
     parents of any other class in query_set
     """
-    #import pdb; pdb.set_trace()
     rents = queryset.intersection(superclasses[classname])
     grents = set()
     for parent in rents:
@@ -1363,10 +1339,6 @@ def main():
                               "directories (a la CMake)."))
     ns = parser.parse_args()
 
-    # print("includes", ns.includes)
-    # print("path", ns.path)
-    # print("output", ns.output)
-
     includes = [] if ns.includes is None else ns.includes
     if len(includes) == 1:
         if ";" in includes[0]:
@@ -1377,8 +1349,6 @@ def main():
     canon = preprocess_file(ns.path, includes, cpp_path=ns.cpp_path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
     context, superclasses = accumulate_state(canon)   # pass 2
-    #pprint(context)
-    #pprint(supers)
     if not ns.pass3_use_pp:
         with open(ns.path) as f:
             orig = f.read()
