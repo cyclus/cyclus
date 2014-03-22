@@ -5,6 +5,7 @@ debug
 doxygen.conf
 suffix.h
 *.pdf
+*.pyc
 *.dvi
 *.toc
 *.aux
