@@ -55,13 +55,14 @@ if sys.version_info[0] == 2:
 elif sys.version_info[0] >= 3:
     STRING_TYPES = (str,)
 # Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE! 
-RE_MULTILINE_COMMENT = "(?:\s*?/\*.*?\*/)"
+#RE_MULTILINE_COMMENT = "(?:\s*?/\*.*?\*/)"
+RE_MULTILINE_COMMENT = "(?:\s*?/\*(?!\*/)*?\*/)"
 RE_SINGLE_LINE_COMMENT = "(?:\s*?//[^\n]*?\n\s*?)"
 RE_COMMENTS = "(?:" + RE_MULTILINE_COMMENT + "|" + RE_SINGLE_LINE_COMMENT + ")"
 
 # This migh miss files which start with '#' - however, after canonization
 # (through cpp) it shouldn't matter.
-RE_STATEMENT = re.compile("(" + RE_COMMENTS + "*" + \
+RE_STATEMENT = re.compile("(" + RE_COMMENTS + "*?" + \
     r'(?:\s*#))?'  # find the start of pragmas
     r'(\s+(public|private|protected)\s*'  # consider access control as statements
     # or, consider statement until we hit '{', '}', or ';'
@@ -69,6 +70,18 @@ RE_STATEMENT = re.compile("(" + RE_COMMENTS + "*" + \
     # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';'
     # otherwise
     r'((?(1)\n|(?(3):|[{};])))', re.MULTILINE | re.DOTALL)
+
+RE_STATEMENT = re.compile(
+    r'(?:(\s*#|\s*//)|(\s*/\*))?'  # find the start of pragmas
+    r'(\s+(public|private|protected)\s*'  # consider access control as statements
+    # or, consider statement until we hit '{', '}', or ';'
+    r'|(?(1)[^\n]|(?(2)(?!\*/)|[^{};]))*)?'  
+    # find end condition, '\n' for pragma, ':' for access, and '{', '}', ';'
+    # otherwise
+    r'((?(1)\n|(?(2)\*/|(?(4):|[{};]))))', re.MULTILINE | re.DOTALL)
+
+#RE_STATEMENT = re.compile(r'(?:(\s*#|\s*//)|\s*(/\*))?(\s+(public|private|protected)\s*|(?(1)[^\n]|(?(2).|[^{};]))*)?((?(1)\n|(?(2)\*/|(?(4):|[{};]))))', re.MULTILINE | re.DOTALL)
+RE_STATEMENT = re.compile(r'(?:(\s*#|\s*//)|\s*(/\*))?(\s+(public|private|protected)\s*|(?(1)[^\n]|(?(2).|[^{};]))*?)((?(1)\n|(?(2)\*/|(?(4):|[{};]))))', re.MULTILINE | re.DOTALL)
 
 CYCNS = 'cyclus'
 
@@ -548,8 +561,9 @@ def accumulate_state(canon):
     for m in RE_STATEMENT.finditer(canon):
         if m is None:
             continue
-        prefix, statement, _, sep = m.groups()
-        statement = statement if prefix is None else prefix + statement
+        prefix1, prefix2, statement, _, sep = m.groups()
+        statement = statement if prefix2 is None else prefix2 + statement
+        statement = statement if prefix1 is None else prefix1 + statement
         statement = statement.strip()
         state.accumulate(statement, sep)
     return state.context, state.superclasses
@@ -577,6 +591,7 @@ class CodeGeneratorFilter(Filter):
 
     def transform(self, statement, sep):
         # basic setup
+        #import pdb; pdb.set_trace()
         cg = self.machine
         mode = (self.match.group(1) or '').strip()
         if len(mode) == 0:
@@ -591,12 +606,12 @@ class CodeGeneratorFilter(Filter):
         context = cg.context
         self.given_classname = classname
         self.local_classname = cg.classname()
-        #import pdb; pdb.set_trace()
 
         # compute def line
         ctx = context[classname] = context.get(classname, {})
         in_class_decl = self.in_class_decl() 
-        ns = "" if in_class_decl else classname.split('::')[-1] + "::"
+        #ns = "" if in_class_decl else classname.split('::')[-1] + "::"
+        ns = "" if in_class_decl else classname + "::"
         virt = "virtual " if in_class_decl else ""
         end = ";" if mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
@@ -1032,7 +1047,7 @@ class DefaultPragmaFilter(Filter):
         #pragma cyclus [def|decl|impl]
     """
     regex = re.compile(
-        RE_COMMENTS + "*\s*#\s*pragma\s+cyclus+(\sdef|\sdecl|\simpl|)$", 
+        RE_COMMENTS + "*\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$", 
         re.DOTALL)
 
     def transform(self, statement, sep):
@@ -1157,9 +1172,17 @@ def generate_code(orig, context, superclasses):
     for m in RE_STATEMENT.finditer(orig):
         if m is None:
             continue
-        prefix, statement, _, sep = m.groups()
-        print(repr(statement))
-        statement = statement if prefix is None else prefix + statement
+        #prefix, statement, _, sep = m.groups()
+        prefix1, prefix2, statement, _, sep = m.groups()
+        #print("PRE1: ", repr(prefix1))
+        #print("PRE2: ", repr(prefix2))
+        #print("STAT: ", repr(statement))
+        #print("_: ", repr(_))
+        #print("SEP: ", repr(sep))
+        #print("----")
+        #statement = statement if prefix is None else prefix + statement
+        statement = statement if prefix2 is None else prefix2 + statement
+        statement = statement if prefix1 is None else prefix1 + statement
         cg.generate(statement, sep)
     newfile = "".join(cg.statements)
     return newfile
@@ -1284,6 +1307,7 @@ def parent_intersection(classname, queryset, superclasses):
     """returns all elements in query_set which are parents of classname and not
     parents of any other class in query_set
     """
+    #import pdb; pdb.set_trace()
     rents = queryset.intersection(superclasses[classname])
     grents = set()
     for parent in rents:
