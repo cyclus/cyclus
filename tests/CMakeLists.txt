@@ -63,6 +63,13 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
 ADD_SUBDIRECTORY(test_modules)
 
+SET(
+  CYCLUS_CORE_TEST_INCLUDE_DIRS ${CYCLUS_CORE_TEST_INCLUDE_DIRS}
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${GTEST_INCLUDE_DIRS}"
+  PARENT_SCOPE
+  )
+
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
 set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
@@ -124,7 +131,6 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_region.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_inst.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_facility.cc"
-  ${CYCLUS_STUB_TEST_SOURCE} # needed to test stubs 
   )
 
 ADD_EXECUTABLE( cyclus_unit_tests
@@ -136,7 +142,6 @@ TARGET_LINK_LIBRARIES( cyclus_unit_tests dl
   ${LIBS} 
   cycluscore 
   gtest
-  cyclusstubs # needed to test stubs 
   )
 
 INSTALL(TARGETS cyclus_unit_tests

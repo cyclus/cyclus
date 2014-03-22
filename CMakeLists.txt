@@ -24,6 +24,10 @@ SET(CYCLUS_DOC_DIR "${PROJECT_SOURCE_DIR}/doc")
 SET(CYCLUS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 SET(CYCLUS_STUB_DIR "${PROJECT_SOURCE_DIR}/stubs")
 SET(CYCLUS_TEST_DIR "${PROJECT_SOURCE_DIR}/tests")
+SET(CYCLUS_AGENTS_DIR "${PROJECT_SOURCE_DIR}/agents")
+
+# set cycpp var
+SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
 
 # This makes all the libraries build as SHARED
 SET(BUILD_SHARED_LIBS true)
@@ -65,7 +69,7 @@ LIST(APPEND CMAKE_MODULE_PATH
      "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/CMake")
 
 # Include macros
-INCLUDE(CyclusModuleMacros)
+INCLUDE(UseCyclus)
 
 # set configuration for all library builds
 IF (WIN32)
@@ -161,8 +165,9 @@ INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
 
 ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
-ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
+ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
+ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
 
 ##############################################################################################
 ####################################### end includes #########################################

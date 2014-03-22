@@ -11,9 +11,7 @@
 class TestInst: public cyclus::Institution {
  public:
   TestInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {};
-
   virtual ~TestInst() {};
-
   virtual cyclus::Agent* Clone() {return new TestInst(context());};
 };
 
