@@ -1123,8 +1123,10 @@ class CodeGenerator(object):
         self.codegen_filters = [InitFromCopyFilter(self), 
                                 InitFromDbFilter(self), InfileToDbFilter(self),
                                 CloneFilter(self), SchemaFilter(self),
-                                SnapshotFilter(self), InitInvFilter(self), 
-                                SnapshotInvFilter(self)] 
+                                InitInvFilter(self), 
+                                SnapshotInvFilter(self),
+                                SnapshotFilter(self), 
+                                ] 
         self.filters = self.codegen_filters + [ClassFilter(self), 
                                                AccessFilter(self), 
                                                NamespaceFilter(self), 
