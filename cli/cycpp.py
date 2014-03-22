@@ -582,6 +582,7 @@ class CodeGeneratorFilter(Filter):
         context = cg.context
         self.given_classname = classname
         self.local_classname = cg.classname()
+        #import pdb; pdb.set_trace()
 
         # compute def line
         ctx = context[classname] = context.get(classname, {})
@@ -1143,6 +1144,7 @@ def generate_code(orig, context, superclasses):
         if m is None:
             continue
         prefix, statement, _, sep = m.groups()
+        print(repr(statement))
         statement = statement if prefix is None else prefix + statement
         cg.generate(statement, sep)
     newfile = "".join(cg.statements)
