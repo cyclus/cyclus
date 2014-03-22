@@ -46,6 +46,7 @@ import os
 import re
 import sys
 from collections import Sequence, MutableMapping
+from itertools import takewhile
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint
@@ -611,7 +612,7 @@ class CodeGeneratorFilter(Filter):
         ctx = context[classname] = context.get(classname, {})
         in_class_decl = self.in_class_decl() 
         #ns = "" if in_class_decl else classname.split('::')[-1] + "::"
-        ns = "" if in_class_decl else classname + "::"
+        ns = "" if in_class_decl else self.scoped_classname(classname) + "::"
         virt = "virtual " if in_class_decl else ""
         end = ";" if mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
@@ -1128,6 +1129,19 @@ class CodeGenerator(object):
         names = [n for d, n in self.namespaces]
         names += [n for d, n in self.classes]
         return "::".join(names)
+
+    def scoped_classname(self, classname=None):
+        if classname is None:
+            classname = self.classname()
+        scope = [n for d, n in self.namespaces] + [n for d, n in self.classes[:-1]]
+        clspath = classname.split('::')
+        clspath, clsname = clspath[:-1], clspath[-1]
+        same_prefix = []
+        for s, c in zip(scope, clspath):
+            if s != c:
+                break
+            same_prefix.append(s)
+        return "::".join(clspath[len(same_prefix):] + [clsname])
 
     def includeloc(self):
         """Current location of the file from includes as a string."""
