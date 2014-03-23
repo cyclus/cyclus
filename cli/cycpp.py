@@ -871,6 +871,7 @@ class SchemaFilter(CodeGeneratorFilter):
             return i + 'return "<text/>";\n'
 
         impl = i.up() + 'return ""\n'
+        impl += i +  '"<interleave>\\n"\n'
         for member, info in ctx.items():
             opt = True if 'default' in info else False
             if opt:
@@ -916,6 +917,7 @@ class SchemaFilter(CodeGeneratorFilter):
             if opt:
                 impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
         
+        impl += i +  '"</interleave>\\n"\n'
         impl += i + ";\n";
         return impl
 
