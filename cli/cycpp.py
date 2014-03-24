@@ -784,6 +784,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             if t in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
+            code = info['derivation'] if 'derivation' in info else None
             if t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
@@ -831,17 +832,21 @@ class InfileToDbFilter(CodeGeneratorFilter):
                             impl += ind + '->Record();\n'
 
                 ind = ind[:-2]
-                impl += ind + '}\n'
+                impl += ind + '}\n'            
             elif t in PRIMITIVES:
-                pods.append((member, t, d))
+                pods.append((member, t, d, code))
             elif t[0] == 'std::pair':
-                pods.append((member, t, d))
+                pods.append((member, t, d, code))
             else:
                 raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
 
+        head = "" # from input to var
+        body = "" # derive vars
+        tail = "" # from far to db
+
         # handle pod in a single datum/table
-        impl += ind + 'di.NewDatum("Info")\n'
-        for (member, t, d) in pods:
+        tail += ind + 'di.NewDatum("Info")\n'
+        for (member, t, d, code) in pods:
             methname = "Query" if d is None else "OptionalQuery"
             opt = ''
             if t[0] == 'std::pair':
@@ -849,14 +854,25 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 if d is not None:
                     opt = ', ' + d[0]
                     opt2 = ', ' + d[1]
-                impl += ind + '->AddVal("{0}A", {1}::{2}<{3}>(tree, "{0}/first"{4}))\n'.format(member, CYCNS, methname, t[1], opt)
-                impl += ind + '->AddVal("{0}B", {1}::{2}<{3}>(tree, "{0}/second"{4}))\n'.format(member, CYCNS, methname, t[2], opt2)
+                if code is None:
+                    head += ind + ("{0}A = {1}::{2}<{3}>(tree, \"{0}/first\"{4});\n").format(member, CYCNS, methname, t[1], opt)
+                    head += ind + ("{0}B = {1}::{2}<{3}>(tree, \"{0}/second\"{4});\n").format(member, CYCNS, methname, t[2], opt)
+                    tail += ind + ("->AddVal(\"{0}A\", {0}A)\n\"").format(member)
+                    tail += ind + ("->AddVal(\"{0}B\", {0}B)\n\"").format(member)
+                else:
+                    tail += ind + ("->AddVal(\"{0}A\", {0}.first)\n\"").format(member)
+                    tail += ind + ("->AddVal(\"{0}B\", {0}.second)\n\"").format(member)
             else:
                 if d is not None:
                     opt = ', "' + str(d) + '"' if t == "std::string" else ', ' + str(d) 
-                impl += ind + '->AddVal("{0}", {1}::{2}<{3}>(tree, "{0}"{4}))\n'.format(member, CYCNS, methname, t, opt)
-        impl += ind + '->Record();\n'
+                if code is None:
+                    head += ind + ("{0} = {1}::{2}<{3}>(tree, \"{0}\"{4});\n").format(member, CYCNS, methname, t, opt)
+                tail += ind + ("->AddVal(\"{0}\", {0})\n").format(member)
+            if code is not None:
+                body += ind + code + '\n'
 
+        tail += ind + '->Record();\n'
+        impl += head + body + tail 
         return impl
 
 class SchemaFilter(CodeGeneratorFilter):
@@ -881,7 +897,9 @@ class SchemaFilter(CodeGeneratorFilter):
         impl += i +  '"<interleave>\\n"\n'
         for member, info in ctx.items():
             t = info['type']
-            if t in BUFFERS:
+            if t in BUFFERS: # buffer state, skip
+                continue
+            if 'derivation' in info: # derived state, skip
                 continue
             opt = True if 'default' in info else False
             if opt:
