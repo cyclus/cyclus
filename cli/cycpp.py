@@ -467,7 +467,8 @@ class StateAccumulator(object):
     #
     # type system
     #
-    known_primitives = {'std::string', 'float', 'double', 'int'}
+    known_primitives = PRIMITIVES
+    known_primitives |= BUFFERS
     known_templates = {
         'std::set': ('T',),
         'std::map': ('Key', 'T'),
@@ -678,7 +679,9 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
 
-        for member in ctx.keys():
+        for member, info in ctx.items():
+            if info['type'] in BUFFERS:
+                continue
             impl += ind + "{0} = m->{0};\n".format(member)
         return impl
 
@@ -709,6 +712,8 @@ class InitFromDbFilter(CodeGeneratorFilter):
 
         for member, info in ctx.items():
             t = info['type']
+            if t in BUFFERS:
+                continue
             if t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
@@ -776,6 +781,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
         for member, info in ctx.items():
             t = info['type']
+            if t in BUFFERS:
+                continue
             d = info['default'] if 'default' in info else None
             if t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
                 if t[0] == 'std::map':
@@ -873,6 +880,9 @@ class SchemaFilter(CodeGeneratorFilter):
         impl = i.up() + 'return ""\n'
         impl += i +  '"<interleave>\\n"\n'
         for member, info in ctx.items():
+            t = info['type']
+            if t in BUFFERS:
+                continue
             opt = True if 'default' in info else False
             if opt:
                 impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
@@ -940,6 +950,8 @@ class SnapshotFilter(CodeGeneratorFilter):
         pod = {}
         for member, params in ctx.items():
             t = params["type"]
+            if t in BUFFERS:
+                continue
             if t[0] in ["std::vector", "std::list", "std::set"]:
                 suffix = t[1].replace("std::", "").title()
                 impl += ind + "{\n"
@@ -1032,7 +1044,7 @@ class InitInvFilter(CodeGeneratorFilter):
 
         impl = ""
         for buff in buffs:
-            impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(member)
+            impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(buff)
         return impl
 
 class DefaultPragmaFilter(Filter):
