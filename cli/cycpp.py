@@ -678,11 +678,18 @@ class InitFromCopyFilter(CodeGeneratorFilter):
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
+            
+        cap_buffs = []
 
         for member, info in ctx.items():
-            if info['type'] in BUFFERS:
-                continue
-            impl += ind + "{0} = m->{0};\n".format(member)
+            if info['type'] not in BUFFERS:
+                impl += ind + "{0} = m->{0};\n".format(member)
+            elif 'capacity' in info:
+                cap_buffs.append((member,))
+
+        for b in cap_buffs:
+            impl += ind + "{0}.set_capacity(m->{0}.capacity());\n".format(b[0])
+
         return impl
 
 class InitFromDbFilter(CodeGeneratorFilter):
@@ -710,9 +717,13 @@ class InitFromDbFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
 
+        cap_buffs = []
+            
         for member, info in ctx.items():
             t = info['type']
             if t in BUFFERS:
+                if 'capacity' in info:
+                    cap_buffs.append((member, info['capacity']))
                 continue
             if t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
                 if t[0] == 'std::map':
@@ -751,6 +762,9 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 impl += ind + "{0}.second = qr.GetVal<{1}>(\"{0}B\");\n".format(member, t[2])
             else:
                 impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(member, t)
+
+        for b in cap_buffs:
+            impl += ind + "{0}.set_capacity(qr.GetVal<double>(\"{1}\"));\n".format(b[0], b[1])
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
