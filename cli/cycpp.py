@@ -798,7 +798,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             if t in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
-            code = info['derivation'] if 'derivation' in info else None
+            code = info['derived_init'] if 'derived_init' in info else None
             if t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
@@ -913,7 +913,7 @@ class SchemaFilter(CodeGeneratorFilter):
             t = info['type']
             if t in BUFFERS: # buffer state, skip
                 continue
-            if 'derivation' in info: # derived state, skip
+            if 'derived_init' in info: # derived state, skip
                 continue
             opt = True if 'default' in info else False
             if opt:
