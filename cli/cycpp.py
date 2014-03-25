@@ -467,8 +467,8 @@ class StateAccumulator(object):
     #
     # type system
     #
-    known_primitives = PRIMITIVES
-    known_primitives |= BUFFERS
+    supported_types = PRIMITIVES
+    supported_types |= BUFFERS
     known_templates = {
         'std::set': ('T',),
         'std::map': ('Key', 'T'),
@@ -516,7 +516,7 @@ class StateAccumulator(object):
         else:
             # primitive type
             t = " ".join(t.strip().strip(scopz).split())
-            if t in self.known_primitives:
+            if t in self.supported_types:
                 return t
             # grab aliases of t
             taliases = [x for x in self.aliases if x[2] == t]
@@ -537,7 +537,7 @@ class StateAccumulator(object):
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
                        "primitive type: {p}.").format(
                     i=self.includeloc(), t=t, n=name, c=self.classname(), 
-                    p=", ".join(sorted(self.known_primitives)))
+                    p=", ".join(sorted(self.supported_types)))
                 raise TypeError(msg)
         return t
 
