@@ -854,9 +854,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
             else:
                 raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
 
-        head = "" # from input to var
-        body = "" # derive vars
-        tail = "" # from far to db
+        head = ""  # from input to var
+        body = ""  # derive vars
+        tail = ""  # from far to db
 
         # handle pod in a single datum/table
         tail += ind + 'di.NewDatum("Info")\n'
