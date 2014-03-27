@@ -60,8 +60,11 @@ struct ExchangeNode {
   double qty;
 };
 
-/// @brief by convention, arc.unode() == request node, arc.vnode() == bid
-/// node
+/// @brief An arc represents a possible connection between two nodes in the
+/// bipartite resource exchange graph. It is common to refer to the two sets of
+/// nodes in a bipartite graph by the set variables U and V (see
+/// http://en.wikipedia.org/wiki/Bipartite_graph). By convention, arc.unode() ==
+/// request node, arc.vnode() == bid node.
 class Arc {
  public:
   Arc(boost::shared_ptr<ExchangeNode> unode,
