@@ -191,8 +191,16 @@ TEST(ExXlateTests, XlateBid) {
   ASSERT_EQ(set->nodes().size(), 3);
   ASSERT_EQ(set->excl_node_groups().size(), 2);
   ASSERT_EQ(set->excl_node_groups()[0].size(), 1);
-  EXPECT_EQ(set->excl_node_groups()[0][0],
-            xlator.translation_ctx().bid_to_node[ebid]);
+  ExchangeNode::Ptr test;
+  bool t;
+  test = set->excl_node_groups()[0][0];
+  t = (test == xlator.translation_ctx().bid_to_node[ebid2] ||
+       test == xlator.translation_ctx().bid_to_node[ebid]);
+  EXPECT_TRUE(t);
+  test = set->excl_node_groups()[1][0];
+  t = (test == xlator.translation_ctx().bid_to_node[ebid2] ||
+       test == xlator.translation_ctx().bid_to_node[ebid]);
+  EXPECT_TRUE(t);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

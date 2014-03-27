@@ -30,8 +30,9 @@ bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
 Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
          boost::shared_ptr<ExchangeNode> vnode)
     : unode_(unode),
-      vnode_(vnode) {  
-  if (unode->exclusive || vnode->exclusive) {
+      vnode_(vnode) {
+  exclusive_ = unode->exclusive || vnode->exclusive;
+  if (exclusive_) {
     double fqty = unode->max_qty;
     double sqty = vnode->max_qty;
     if (unode->exclusive && vnode->exclusive) {
