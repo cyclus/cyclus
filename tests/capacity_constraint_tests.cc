@@ -36,7 +36,9 @@ struct RsrcQtyConverter : public Converter<Resource> {
   RsrcQtyConverter() {}
   virtual ~RsrcQtyConverter() {}
   
-  virtual double convert(Resource::Ptr r) {
+  virtual double convert(Resource::Ptr r,
+                         cyclus::Arc const * a = NULL,
+                         cyclus::ExchangeTranslationContext<Resource> const * ctx = NULL) const {
     return r->quantity() * fraction;
   }
 };
@@ -46,7 +48,9 @@ struct MatQualConverter : public Converter<Material> {
   MatQualConverter() {}
   virtual ~MatQualConverter() {}
   
-  virtual double convert(Material::Ptr r) {
+  virtual double convert(Material::Ptr r,
+                         cyclus::Arc const * a = NULL,
+                         cyclus::ExchangeTranslationContext<Material> const * ctx = NULL) const {
     const CompMap& comp = r->comp()->mass();
     double uamt = comp.find(u235)->second;
     return comp.find(u235)->second * fraction;
@@ -58,7 +62,9 @@ struct ProductQualConverter : public Converter<Product> {
   ProductQualConverter() {}
   virtual ~ProductQualConverter() {}
   
-  virtual double convert(Product::Ptr r) {
+  virtual double convert(Product::Ptr r,
+                         cyclus::Arc const * a = NULL,
+                         cyclus::ExchangeTranslationContext<Product> const * ctx = NULL) const {
     if (r->quality().compare(quality) == 0) {
       return val;
     } else {

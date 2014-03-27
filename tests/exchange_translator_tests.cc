@@ -53,7 +53,9 @@ struct MatConverter1 : public Converter<Material> {
   MatConverter1() {}
   virtual ~MatConverter1() {}
   
-  virtual double convert(Material::Ptr r) {
+  virtual double convert(Material::Ptr r,
+                         cyclus::Arc const * a = NULL,
+                         cyclus::ExchangeTranslationContext<cyclus::Material> const *  ctx = NULL) const {
     const CompMap& comp = r->comp()->mass();
     double uamt = comp.find(u235)->second;
     return comp.find(u235)->second * fraction;
@@ -65,7 +67,9 @@ struct MatConverter2 : public Converter<Material> {
   MatConverter2() {}
   virtual ~MatConverter2() {}
   
-  virtual double convert(Material::Ptr r) {
+  virtual double convert(Material::Ptr r,
+                         cyclus::Arc const * a = NULL,
+                         cyclus::ExchangeTranslationContext<cyclus::Material> const *  ctx = NULL) const {
     const CompMap& comp = r->comp()->mass();
     double uamt = comp.find(u235)->second;
     return comp.find(u235)->second * fraction * fraction;
@@ -101,11 +105,12 @@ TEST(ExXlateTests, XlateCapacities) {
       
   double barr[] = {(c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
-      
-  TranslateCapacities<Material>(mat, rconstrs, rnode, arc);
+
+  cyclus::ExchangeTranslationContext<Material> ctx;
+  TranslateCapacities<Material>(mat, rconstrs, rnode, arc, ctx);
   TestVecEq(rexp, rnode->unit_capacities[arc]);
 
-  TranslateCapacities<Material>(mat, bconstrs, bnode, arc);
+  TranslateCapacities<Material>(mat, bconstrs, bnode, arc, ctx);
   TestVecEq(bexp, bnode->unit_capacities[arc]);
 }
 

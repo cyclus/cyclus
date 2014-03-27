@@ -43,7 +43,9 @@ struct TestConverter : public cyclus::Converter<cyclus::Material> {
   TestConverter() {}
   virtual ~TestConverter() {}
   
-  virtual double convert(cyclus::Material::Ptr r) {
+  virtual double convert(cyclus::Material::Ptr r,
+                         cyclus::Arc const * a = NULL,
+                         cyclus::ExchangeTranslationContext<cyclus::Material> const *  ctx = NULL) const {
     return r->quantity() * helper_qty;
   }
 

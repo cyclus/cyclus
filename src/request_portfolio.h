@@ -1,6 +1,7 @@
 #ifndef CYCLUS_REQUEST_PORTFOLIO_H_
 #define CYCLUS_REQUEST_PORTFOLIO_H_
 
+#include <numeric>
 #include <set>
 #include <string>
 #include <vector>
@@ -16,7 +17,32 @@
 namespace cyclus {
 
 class Trader;
-  
+
+/// @brief accumulator sum for request quantities
+template<class T>
+    inline double Sum(int total, typename Request<T>::Ptr r) {
+  return total += r->target()->quantity();
+};
+
+/// @brief a default coefficient converter applies default mass constraint
+/// coefficients as conversion coefficients for a constraint
+template<class T>
+struct DefaultCoeffConverter: public Converter<T> {
+
+  DefaultCoeffConverter(
+      const std::map<typename Request<T>::Ptr, double>& coeffs)
+      : coeffs(coeffs) { };
+
+  inline virtual double convert(boost::shared_ptr<T> offer, 
+                                const Arc& a,
+                                const ExchangeTranslationContext<T>& ctx) {
+    return offer->quantity() * coeffs[ctx.node_to_request[a.unode()]];
+  }
+
+  std::map<typename Request<T>::Ptr, double> coeffs;
+};
+
+
 /// @class RequestPortfolio
 /// 
 /// @brief A RequestPortfolio is a group of (possibly constrainted) requests for
@@ -29,10 +55,18 @@ class Trader;
 /// the facility's needs, then requests for both would be added to the portfolio
 /// along with a capacity constraint.
 ///
-/// @TODO revise the request portfolio API/underlying data structures to allow
-/// exclusive constraints. Perhaps the easiest option would be to allow the
-/// AddRequest interface have an option boolean for exclusivity. This utility needs
-/// to be used first to determine what the appropriate way forward is.
+/// An option exists to add a default mass based constraint that incorporates
+/// multicommodity requests, but it must be called manually once all requests
+/// have been added, e.g.,
+/// @begincode
+/// 
+/// RequestPortfolio<SomeResource>::Ptr rp(new RequestPortfolio<SomeResource>());
+/// // add some requests
+/// // declare some of them as multicommodity requsts (i.e., any one will
+/// // satisfy this demand).
+/// rp->AddDefaultConstraint();
+/// 
+/// @endcode
 template<class T>
 class RequestPortfolio :
 public boost::enable_shared_from_this< RequestPortfolio<T> > {
@@ -63,13 +97,36 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     VerifyRequester_(r);
     VerifyQty_(r);
     requests_.push_back(r);
+    default_constr_coeffs_[r] = 1;
     return r;
   };
 
+  /// @brief adds a collection of requests registered with this portfolio as
+  /// multicommodity requests
+  /// @param rs the collection of requests to add
+  inline void AddMutualReqs(
+      const std::vector<typename Request<T>::Ptr>& rs) {
+    double norm_const =
+        std::accumulate(rs.begin(), rs.end(), 0, Sum) / rs.size();
+    for (int i = 0; i < rs.size(); i++) {
+      typename Request<T>::Ptr r = rs[i];
+      default_constr_coeffs_[r] = r->target()->quantity() / norm_const;
+    }
+  }
+  
   /// @brief add a capacity constraint associated with the portfolio, if it
   /// doesn't already exist
   /// @param c the constraint to add
   inline void AddConstraint(const CapacityConstraint<T>& c) {
+    constraints_.insert(c);
+  };
+
+  /// @brief adds a default mass constraint based on the current requests and
+  /// multicommodity requests
+  inline void AddDefaultConstraint() { 
+    typename Converter<T>::Ptr conv(
+        new DefaultCoeffConverter<T>(default_constr_coeffs_));
+    CapacityConstraint<T> c(qty_, conv); // @TODO fix qty_ so this is correct
     constraints_.insert(c);
   };
       
@@ -138,6 +195,9 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
   std::vector<typename Request<T>::Ptr> requests_;
+
+  /// coefficients for the default mass constraint for known resources
+  std::map<typename Request<T>::Ptr, double> default_constr_coeffs_;
 
   /// constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;

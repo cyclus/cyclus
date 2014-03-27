@@ -5,6 +5,9 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "exchange_graph.h"
+#include "exchange_translation_context.h"
+
 namespace cyclus {
 
 /// @class Converter
@@ -14,7 +17,15 @@ template<class T>
 struct Converter {
   typedef boost::shared_ptr< Converter<T> > Ptr;
 
-  virtual double convert(boost::shared_ptr<T>) = 0;
+  /// @brief convert a capacitated quantity for an offer in its exchange context
+  /// @param offer the resource being offered
+  /// @param a the associated arc for the potential offer
+  /// @param ctx the exchange context in which the offer is being made
+  ///
+  /// @warning it is up to the user to inherit default parameters 
+  virtual double convert(boost::shared_ptr<T> offer,
+                         Arc const * a = NULL,
+                         ExchangeTranslationContext<T> const * ctx = NULL) const = 0;
 
   /// @brief operator== is available for subclassing, see
   /// cyclus::TrivialConverter for an example
@@ -31,9 +42,11 @@ struct Converter {
 /// @brief The default converter returns the resource's quantity
 template<class T>
 struct TrivialConverter : public Converter<T> {
-  /// @returns the quantity of rsrc
-  inline virtual double convert(boost::shared_ptr<T> rsrc) {
-    return rsrc->quantity();
+  /// @returns the quantity of resource offer
+  inline virtual double convert(boost::shared_ptr<T> offer,
+                                Arc const * a = NULL,
+                                ExchangeTranslationContext<T> const * ctx = NULL) const  {
+    return offer->quantity();
   }
 
   /// @returns true if a dynamic cast succeeds
@@ -84,8 +97,10 @@ class CapacityConstraint {
     return converter_;
   }
 
-  inline double convert(boost::shared_ptr<T> item) const {
-    return converter_->convert(item);
+  inline double convert(boost::shared_ptr<T> offer,
+                        Arc const * a = NULL,
+                        ExchangeTranslationContext<T> const * ctx = NULL) const {
+    return converter_->convert(offer, a, ctx);
   }
 
   /// @return a unique id for the constraint
