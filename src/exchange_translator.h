@@ -70,19 +70,20 @@ class ExchangeTranslator {
         typename Request<T>::Ptr req = bid->request();
         double pref =
             ex_ctx_->trader_prefs.at(req->requester())[req][bid];
-        a.first->prefs[a] = pref; // request node is a.first
-        int n_prefs = a.first->prefs.size();
-        a.first->avg_pref = (
+        a.unode()->prefs[a] = pref; // request node is a.unode()
+        int n_prefs = a.unode()->prefs.size();
+        a.unode()->avg_pref = (
             (n_prefs == 0) ?
             pref :
-            ((n_prefs - 1) * a.first->avg_pref + pref)/ n_prefs);
+            ((n_prefs - 1) * a.unode()->avg_pref + pref)/ n_prefs);
         // @MJGFlag this^ would be easier if ExchangeNode was a class,
         // need to make an issue
         
         CLOG(LEV_DEBUG5) << "Updating preference for one of "
-                         << req->requester()->manager()->prototype() << "'s trade nodes:";
-        CLOG(LEV_DEBUG5) << "   preference: " << a.first->prefs[a];
-        CLOG(LEV_DEBUG5) << " average pref: " << a.first->avg_pref;
+                         << req->requester()->manager()->prototype()
+                         << "'s trade nodes:";
+        CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
+        CLOG(LEV_DEBUG5) << " average pref: " << a.unode()->avg_pref;
             
         graph->AddArc(a);
       }
@@ -144,9 +145,12 @@ RequestGroup::Ptr TranslateRequestPortfolio(
   for (r_it = rp->requests().begin();
        r_it != rp->requests().end();
        ++r_it) {
-    ExchangeNode::Ptr n(new ExchangeNode());
-    n->commod = (*r_it)->commodity();
+    typename Request<T>::Ptr r = *r_it;
+    ExchangeNode::Ptr n(new ExchangeNode(r->target()->quantity(),
+                                         r->exclusive(),
+                                         r->commodity()));
     rs->AddExchangeNode(n);
+
     AddRequest(translation_ctx, *r_it, n);
   }
 
@@ -169,17 +173,32 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
     ExchangeTranslationContext<T>& translation_ctx,
     const typename BidPortfolio<T>::Ptr bp) {
   ExchangeNodeGroup::Ptr bs(new ExchangeNodeGroup());
-    
+
+  std::map<typename T::Ptr, std::vector<ExchangeNode::Ptr> > excl_bid_grps;
+  
   typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
   for (b_it = bp->bids().begin();
        b_it != bp->bids().end();
        ++b_it) {
-    ExchangeNode::Ptr n(new ExchangeNode());
-    n->commod = (*b_it)->request()->commodity();
+    typename Bid<T>::Ptr b = *b_it;
+    ExchangeNode::Ptr n(new ExchangeNode(b->offer()->quantity(),
+                                         b->exclusive(),
+                                         b->request()->commodity()));
     bs->AddExchangeNode(n);
     AddBid(translation_ctx, *b_it, n);
+    if (b->exclusive()) {
+      excl_bid_grps[b->offer()].push_back(n);
+    }
   }
 
+  typename std::map<typename T::Ptr, std::vector<ExchangeNode::Ptr> >::iterator
+      m_it;
+  for (m_it = excl_bid_grps.begin();
+       m_it != excl_bid_grps.end();
+       ++m_it) {
+    bs->AddExclGroup(m_it->second);
+  }
+  
   CLOG(LEV_DEBUG4) << "adding " << bp->constraints().size()
                    << " bid capacities";    
 
@@ -193,30 +212,6 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   return bs;
 }
 
-/// @brief information container for the exclusive status of an arc
-template <class T>
-struct ExclusiveStatus {
-  bool exclusive;
-  double qty;
-  
- ExclusiveStatus(typename Request<T>::Ptr r, typename Bid<T>::Ptr b) : qty(0) {
-   bool rexcl = r->exclusive();
-   bool bexcl = b->exclusive();
-   exclusive = rexcl || bexcl;
-   if (exclusive) {
-     double rqty = r->target()->quantity();
-     double bqty = b->offer()->quantity();
-     if (rexcl && bexcl) {
-       qty = (rqty != bqty) ? 0 : rqty;
-     } else if (rexcl) {
-       qty = (rqty > bqty) ? 0 : rqty;
-     } else if (bexcl) {
-       qty = (rqty < bqty) ? 0 : bqty;
-     }
-   }
-  }
-};
-
 /// @brief translates an arc given a bid and subsequent data, and also
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
@@ -226,8 +221,7 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
     
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
-  ExclusiveStatus<T> es(req, bid);
-  Arc arc(unode, vnode, es.exclusive, es.qty);
+  Arc arc(unode, vnode);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
@@ -243,8 +237,8 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
 template <class T>
 Trade<T> BackTranslateMatch(const ExchangeTranslationContext<T>& translation_ctx,
                             const Match& match) {
-  ExchangeNode::Ptr req_node = match.first.first;
-  ExchangeNode::Ptr bid_node = match.first.second;
+  ExchangeNode::Ptr req_node = match.first.unode();
+  ExchangeNode::Ptr bid_node = match.first.vnode();
     
   Trade<T> t;
   t.request = translation_ctx.node_to_request.at(req_node);

@@ -9,20 +9,51 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ExchangeNode::ExchangeNode(double max_qty)
+ExchangeNode::ExchangeNode(double max_qty, bool exclusive, std::string commod)
   : max_qty(max_qty),
+    exclusive(exclusive),
+    commod(commod),
     qty(0),
     avg_pref(0),
-    commod(""),
     group(NULL) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
   return (lhs.unit_capacities == rhs.unit_capacities &&
           lhs.max_qty == rhs.max_qty &&
-          lhs.group == rhs.group);
+          lhs.exclusive == rhs.exclusive &&
+          lhs.group == rhs.group &&
+          lhs.commod == rhs.commod);
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
+         boost::shared_ptr<ExchangeNode> vnode)
+    : unode_(unode),
+      vnode_(vnode) {
+  exclusive_ = unode->exclusive || vnode->exclusive;
+  if (exclusive_) {
+    double fqty = unode->max_qty;
+    double sqty = vnode->max_qty;
+    if (unode->exclusive && vnode->exclusive) {
+      excl_val_ = fqty == sqty ? fqty : 0;
+    } else if (unode->exclusive) {
+      excl_val_ = sqty >= fqty ? fqty : 0;
+    } else {
+      excl_val_ = fqty >= sqty ? sqty : 0;
+    }
+  } else {
+    excl_val_ = 0;
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Arc::Arc(const Arc& other)
+    : unode_(other.unode()),
+      vnode_(other.vnode()),
+      exclusive_(other.exclusive()),
+      excl_val_(other.excl_val()) { }
+    
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
   node->group = this;
@@ -30,12 +61,27 @@ void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ExchangeNodeGroup::AddExclNode(ExchangeNode::Ptr node) {
+  std::vector<ExchangeNode::Ptr> nodes;
+  nodes.push_back(node);
+  excl_node_groups_.push_back(nodes);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RequestGroup::RequestGroup(double qty) : qty_(qty) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
+  ExchangeNodeGroup::AddExchangeNode(node);
+  if (node->exclusive) {
+    ExchangeNodeGroup::AddExclNode(node);
+  }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a) {
-  double ucap = Capacity(a.first, a);
-  double vcap = Capacity(a.second, a);
+  double ucap = Capacity(a.unode(), a);
+  double vcap = Capacity(a.vnode(), a);
 
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
@@ -136,14 +182,14 @@ void ExchangeGraph::AddArc(const Arc& a) {
   int id = next_arc_id_++;
   arc_ids_.insert(std::pair<Arc, int>(a, id));
   arc_by_id_.insert(std::pair<int, Arc>(id, a));
-  node_arc_map_[a.first].push_back(a);
-  node_arc_map_[a.second].push_back(a);
+  node_arc_map_[a.unode()].push_back(a);
+  node_arc_map_[a.vnode()].push_back(a);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddMatch(const Arc& a, double qty) {
-  UpdateCapacity(a.first, a, qty);
-  UpdateCapacity(a.second, a, qty);
+  UpdateCapacity(a.unode(), a, qty);
+  UpdateCapacity(a.vnode(), a, qty);
   matches_.push_back(std::make_pair(a, qty));
 }
 

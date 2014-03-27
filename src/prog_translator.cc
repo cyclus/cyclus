@@ -66,7 +66,7 @@ void ProgTranslator::Populate() {
     std::vector<Arc>& arcs = g_->arcs();
     for (int i = 0; i != arcs.size(); i++) {
       Arc& a = arcs[i];
-      if (a.exclusive) {
+      if (a.exclusive()) {
         iface_->setInteger(g_->arc_ids()[a]);
       }
     }
@@ -94,7 +94,6 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
   for (int i = 0; i != nodes.size(); i++) {
     std::map<Arc, std::vector<double> >& ucap_map = nodes[i]->unit_capacities;
     std::map<Arc, std::vector<double> >::iterator cap_it;
-    CoinPackedVector excl_row;
 
     // add each arc
     for (cap_it = ucap_map.begin(); cap_it != ucap_map.end(); ++cap_it) {
@@ -105,8 +104,8 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       // add each unit capacity coefficient
       for (int j = 0; j != ucaps.size(); j++) {
         double coeff = ucaps[j];
-        if (excl_ && a.exclusive) {
-          coeff *= a.excl_val;
+        if (excl_ && a.exclusive()) {
+          coeff *= a.excl_val();
         }
 
         cap_rows[j].insert(arc_id, coeff);
@@ -116,27 +115,18 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
           min_row_coeff_ = compare;
         }
       }
-      
-      // add exclusive arc
-      if (excl_ && request && a.exclusive) {
-        excl_row.insert(arc_id, 1.0);
-      }
-
+     
       if (request) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
-        double obj_coeff = a.exclusive ? 1 / pref * a.excl_val : 1 / pref;
+        double obj_coeff = a.exclusive() ? a.excl_val() / pref  : 1 / pref;
         if (max_obj_coeff_ < obj_coeff) {
           max_obj_coeff_ = obj_coeff;
         }
         ctx_.obj_coeffs[arc_id] = obj_coeff;
         ctx_.col_lbs[arc_id] = 0;
-        ctx_.col_ubs[arc_id] = a.exclusive ? 1 : inf;
+        ctx_.col_ubs[arc_id] = a.exclusive() ? 1 : inf;
       }
-    }
-    
-    if (excl_row.getNumElements() > 0) {
-      excl_rows.push_back(excl_row);
     }
   }
 
@@ -156,6 +146,23 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
     ctx_.m.appendRow(cap_rows[i]);
   }
 
+  // add exclusive arcs
+  std::vector< std::vector<ExchangeNode::Ptr> >& exngs =
+      grp->excl_node_groups();
+  for (int i = 0; i != exngs.size(); i++) {
+    CoinPackedVector excl_row;
+    std::vector<ExchangeNode::Ptr>& nodes = exngs[i];
+    for (int j = 0; j != nodes.size(); j++) {
+      std::vector<Arc>& arcs = g_->node_arc_map()[nodes[j]];
+      for (int k = 0; k != arcs.size(); k++) {
+        excl_row.insert(g_->arc_ids()[arcs[k]], 1.0);
+      }
+    }
+    if (excl_row.getNumElements() > 0) {
+      excl_rows.push_back(excl_row);
+    }
+  }
+
   // add all exclusive rows
   for (int i = 0; i != excl_rows.size(); i++) {
     ctx_.row_lbs.push_back(0.0);
@@ -172,7 +179,7 @@ void ProgTranslator::FromProg() {
   for (int i = 0; i < arcs.size(); i++) {
     Arc& a = g_->arc_by_id().at(i);
     flow = sol[i];
-    flow = (a.exclusive) ? flow * a.excl_val : flow;
+    flow = (a.exclusive()) ? flow * a.excl_val() : flow;
     if (flow > cyclus::eps()) {
       g_->AddMatch(a, flow);
     }
