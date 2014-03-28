@@ -24,8 +24,11 @@ template<class T>
   return total += r->target()->quantity();
 };
 
-/// @brief a default coefficient converter applies default mass constraint
-/// coefficients as conversion coefficients for a constraint
+/// @brief provide coefficients for default mass constraints
+///
+/// Coefficients are determiend by the request portfolio and are provided to the
+/// converter. The arc and exchange context are used in order to reference the
+/// original request so that the request's coefficient can be applied.
 template<class T>
 struct DefaultCoeffConverter: public Converter<T> {
   DefaultCoeffConverter(
