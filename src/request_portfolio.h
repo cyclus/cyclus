@@ -120,21 +120,22 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     return r;
   };
 
-  /// @brief adds a collection of requests registered with this portfolio as
-  /// multicommodity requests
+  /// @brief adds a collection of requests (already having been registered with
+  /// this portfolio) as multicommodity requests
   /// @param rs the collection of requests to add
   inline void AddMutualReqs(
       const std::vector<typename Request<T>::Ptr>& rs) {
-    double norm_const =
+    double avg_qty =
         std::accumulate(rs.begin(), rs.end(), 0.0, SumQty<T>) / rs.size();
     double qty;
+    typename Request<T>::Ptr r;
     for (int i = 0; i < rs.size(); i++) {
-      typename Request<T>::Ptr r = rs[i];
+      r = rs[i];
       qty = r->target()->quantity();
-      default_constr_coeffs_[r] = qty / norm_const;
+      default_constr_coeffs_[r] = r->target()->quantity() / avg_qty;
       qty_ -= qty;
     }
-    qty_ += norm_const;
+    qty_ += avg_qty;
   }
   
   /// @brief add a capacity constraint associated with the portfolio, if it
