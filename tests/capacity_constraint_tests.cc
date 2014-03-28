@@ -53,9 +53,10 @@ struct MatQualConverter : public Converter<Material> {
   MatQualConverter() {}
   virtual ~MatQualConverter() {}
   
-  virtual double convert(Material::Ptr r,
-                         Arc const * a = NULL,
-                         ExchangeTranslationContext<Material> const * ctx = NULL) const {
+  virtual double convert(
+      Material::Ptr r,
+      Arc const * a = NULL,
+      ExchangeTranslationContext<Material> const * ctx = NULL) const {
     const CompMap& comp = r->comp()->mass();
     double uamt = comp.find(u235)->second;
     return comp.find(u235)->second * fraction;
@@ -67,9 +68,10 @@ struct ProductQualConverter : public Converter<Product> {
   ProductQualConverter() {}
   virtual ~ProductQualConverter() {}
   
-  virtual double convert(Product::Ptr r,
-                         Arc const * a = NULL,
-                         ExchangeTranslationContext<Product> const * ctx = NULL) const {
+  virtual double convert(
+      Product::Ptr r,
+      Arc const * a = NULL,
+      ExchangeTranslationContext<Product> const * ctx = NULL) const {
     if (r->quality().compare(quality) == 0) {
       return val;
     } else {
