@@ -19,7 +19,7 @@ using cyclus::Material;
 using cyclus::ExchangeTranslationContext;
 using cyclus::TestContext;
 
-namespace rsrc_helpers {
+namespace test_helpers {
 
 /// @brief just some simple helper functions when dealing with resources and
 /// exchanges
@@ -66,6 +66,6 @@ struct TestConverter : public Converter<Material> {
   }
 };
 
-} // namespace rsrc_helpers
+} // namespace test_helpers
 
 #endif // ifndef CYCLUS_TESTS_RESOURCE_HELPERS_H_

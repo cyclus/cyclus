@@ -21,10 +21,10 @@ using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
 using std::string;
-using rsrc_helpers::get_bid;
-using rsrc_helpers::get_mat;
-using rsrc_helpers::get_req;
-using rsrc_helpers::trader;
+using test_helpers::get_bid;
+using test_helpers::get_mat;
+using test_helpers::get_req;
+using test_helpers::trader;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, MaterialGetSet) {

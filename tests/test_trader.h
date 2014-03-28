@@ -17,7 +17,7 @@ class TestObjFactory {
  public:
 
   TestObjFactory() {
-    mat = rsrc_helpers::get_mat();
+    mat = test_helpers::get_mat();
     commod = "commod";
   }
 

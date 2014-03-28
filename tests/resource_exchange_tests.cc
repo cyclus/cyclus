@@ -36,8 +36,8 @@ using cyclus::ResourceExchange;
 using cyclus::TestContext;
 using std::set;
 using std::string;
-using rsrc_helpers::get_req;
-using rsrc_helpers::trader;
+using test_helpers::get_req;
+using test_helpers::trader;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Requester: public TestFacility {

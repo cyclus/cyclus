@@ -29,8 +29,8 @@ using cyclus::RequestPortfolio;
 using cyclus::Resource;
 using cyclus::TestContext;
 using cyclus::Trader;
-using rsrc_helpers::get_mat;
-using rsrc_helpers::get_req;
+using test_helpers::get_mat;
+using test_helpers::get_req;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ExchangeContextTests: public ::testing::Test {

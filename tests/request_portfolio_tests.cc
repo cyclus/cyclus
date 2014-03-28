@@ -28,8 +28,8 @@ using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::TestContext;
 using cyclus::DefaultCoeffConverter;
-using rsrc_helpers::get_mat;
-using rsrc_helpers::TestConverter;
+using test_helpers::get_mat;
+using test_helpers::TestConverter;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class RequestPortfolioTests: public ::testing::Test {
