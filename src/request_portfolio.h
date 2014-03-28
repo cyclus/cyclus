@@ -23,23 +23,32 @@ template<class T>
     inline double Sum(int total, typename Request<T>::Ptr r) {
   return total += r->target()->quantity();
 };
+/// template<class T>
+///     inline double Sum(typename Request<T>::Ptr r1,
+///                       typename Request<T>::Ptr r2) {
+///   return r1->target()->quantity() + r2->target()->quantity();
+/// };
 
 /// @brief a default coefficient converter applies default mass constraint
 /// coefficients as conversion coefficients for a constraint
 template<class T>
 struct DefaultCoeffConverter: public Converter<T> {
-
   DefaultCoeffConverter(
       const std::map<typename Request<T>::Ptr, double>& coeffs)
       : coeffs(coeffs) { };
 
   inline virtual double convert(
       boost::shared_ptr<T> offer, 
-      const Arc& a,
-      const ExchangeTranslationContext<T>& ctx) {
-    return offer->quantity() * coeffs[ctx.node_to_request[a.unode()]];
+      Arc const * a,
+      ExchangeTranslationContext<T> const * ctx) const {
+    return offer->quantity() * coeffs.at(ctx->node_to_request.at(a->unode()));
   }
 
+  /// virtual bool operator==(Converter<T>& other) const {
+  ///   return dynamic_cast<DefaultCoeffConverter<T>*>(&other) != NULL &&
+  ///   coeffs == other.coeffs;
+  /// }
+  
   std::map<typename Request<T>::Ptr, double> coeffs;
 };
 
@@ -108,7 +117,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline void AddMutualReqs(
       const std::vector<typename Request<T>::Ptr>& rs) {
     double norm_const =
-        std::accumulate(rs.begin(), rs.end(), 0, Sum) / rs.size();
+        std::accumulate(rs.begin(), rs.end(), 0, Sum<T>) / rs.size();
     for (int i = 0; i < rs.size(); i++) {
       typename Request<T>::Ptr r = rs[i];
       default_constr_coeffs_[r] = r->target()->quantity() / norm_const;
