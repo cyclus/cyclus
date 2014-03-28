@@ -33,9 +33,10 @@ struct DefaultCoeffConverter: public Converter<T> {
       const std::map<typename Request<T>::Ptr, double>& coeffs)
       : coeffs(coeffs) { };
 
-  inline virtual double convert(boost::shared_ptr<T> offer, 
-                                const Arc& a,
-                                const ExchangeTranslationContext<T>& ctx) {
+  inline virtual double convert(
+      boost::shared_ptr<T> offer, 
+      const Arc& a,
+      const ExchangeTranslationContext<T>& ctx) {
     return offer->quantity() * coeffs[ctx.node_to_request[a.unode()]];
   }
 
