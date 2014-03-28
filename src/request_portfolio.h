@@ -115,7 +115,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
                            commodity, preference, exclusive);
     VerifyRequester_(r);
     requests_.push_back(r);
-    default_constr_coeffs_[r] = 1;
+    mass_coeffs_[r] = 1;
     qty_ += target->quantity();
     return r;
   };
@@ -132,7 +132,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     for (int i = 0; i < rs.size(); i++) {
       r = rs[i];
       qty = r->target()->quantity();
-      default_constr_coeffs_[r] = r->target()->quantity() / avg_qty;
+      mass_coeffs_[r] = r->target()->quantity() / avg_qty;
       qty_ -= qty;
     }
     qty_ += avg_qty;
@@ -149,8 +149,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// multicommodity requests
   inline void AddDefaultConstraint() { 
     typename Converter<T>::Ptr conv(
-        new DefaultCoeffConverter<T>(default_constr_coeffs_));
-    CapacityConstraint<T> c(qty_, conv); // @TODO fix qty_ so this is correct
+        new DefaultCoeffConverter<T>(mass_coeffs_));
+    CapacityConstraint<T> c(qty_, conv);
     constraints_.insert(c);
   };
       
@@ -207,7 +207,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   std::vector<typename Request<T>::Ptr> requests_;
 
   /// coefficients for the default mass constraint for known resources
-  std::map<typename Request<T>::Ptr, double> default_constr_coeffs_;
+  std::map<typename Request<T>::Ptr, double> mass_coeffs_;
 
   /// constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;
