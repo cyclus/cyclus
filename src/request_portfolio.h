@@ -20,14 +20,9 @@ class Trader;
 
 /// @brief accumulator sum for request quantities
 template<class T>
-    inline double Sum(int total, typename Request<T>::Ptr r) {
+    inline double Sum(double total, typename Request<T>::Ptr r) {
   return total += r->target()->quantity();
 };
-/// template<class T>
-///     inline double Sum(typename Request<T>::Ptr r1,
-///                       typename Request<T>::Ptr r2) {
-///   return r1->target()->quantity() + r2->target()->quantity();
-/// };
 
 /// @brief a default coefficient converter applies default mass constraint
 /// coefficients as conversion coefficients for a constraint
@@ -35,7 +30,7 @@ template<class T>
 struct DefaultCoeffConverter: public Converter<T> {
   DefaultCoeffConverter(
       const std::map<typename Request<T>::Ptr, double>& coeffs)
-      : coeffs(coeffs) { };
+       : coeffs(coeffs) { };
 
   inline virtual double convert(
       boost::shared_ptr<T> offer, 
@@ -44,14 +39,14 @@ struct DefaultCoeffConverter: public Converter<T> {
     return offer->quantity() * coeffs.at(ctx->node_to_request.at(a->unode()));
   }
 
-  /// virtual bool operator==(Converter<T>& other) const {
-  ///   return dynamic_cast<DefaultCoeffConverter<T>*>(&other) != NULL &&
-  ///   coeffs == other.coeffs;
-  /// }
+  virtual bool operator==(Converter<T>& other) const {
+    DefaultCoeffConverter<T>* cast =
+        dynamic_cast<DefaultCoeffConverter<T>*>(&other);
+    return cast != NULL && coeffs == cast->coeffs;
+  }
   
   std::map<typename Request<T>::Ptr, double> coeffs;
 };
-
 
 /// @class RequestPortfolio
 /// 
@@ -84,7 +79,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
 
   /// @brief default constructor
-  RequestPortfolio() : requester_(NULL), qty_(-1) {};
+  RequestPortfolio() : requester_(NULL), qty_(0) {};
 
   /// @brief add a request to the portfolio
   /// @param target the target resource associated with this request
@@ -105,9 +100,10 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
         Request<T>::Create(target, requester, this->shared_from_this(),
                            commodity, preference, exclusive);
     VerifyRequester_(r);
-    VerifyQty_(r);
+    //VerifyQty_(r);
     requests_.push_back(r);
     default_constr_coeffs_[r] = 1;
+    qty_ += target->quantity();
     return r;
   };
 
@@ -117,11 +113,15 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline void AddMutualReqs(
       const std::vector<typename Request<T>::Ptr>& rs) {
     double norm_const =
-        std::accumulate(rs.begin(), rs.end(), 0, Sum<T>) / rs.size();
+        std::accumulate(rs.begin(), rs.end(), 0.0, Sum<T>) / rs.size();
+    double qty;
     for (int i = 0; i < rs.size(); i++) {
       typename Request<T>::Ptr r = rs[i];
-      default_constr_coeffs_[r] = r->target()->quantity() / norm_const;
+      qty = r->target()->quantity();
+      default_constr_coeffs_[r] = qty / norm_const;
+      qty_ -= qty;
     }
+    qty_ += norm_const;
   }
   
   /// @brief add a capacity constraint associated with the portfolio, if it

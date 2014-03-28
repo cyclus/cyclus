@@ -58,7 +58,6 @@ TEST_F(RequestPortfolioTests, ReqAdd){
   EXPECT_EQ(rp->qty(), get_mat()->quantity());
   EXPECT_EQ(rp->requests()[0], r1);
   EXPECT_THROW(rp->AddRequest(get_mat(), fac2), KeyError); // a different requester
-  EXPECT_THROW(rp->AddRequest(get_mat(92235, 150051.0), fac1), KeyError); // some different quantity
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -103,7 +102,7 @@ TEST_F(RequestPortfolioTests, Sets) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(RequestPortfolioTests, DISABLED_DefaultConstraint) {
+TEST_F(RequestPortfolioTests, DefaultConstraint) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
 
   double rqty = 3;
@@ -128,8 +127,9 @@ TEST_F(RequestPortfolioTests, DISABLED_DefaultConstraint) {
   
   Converter<Material>::Ptr conv(new DefaultCoeffConverter<Material>(coeffs));
   CapacityConstraint<Material> exp(totalqty, conv);
-
+      
   rp->AddDefaultConstraint();
   ASSERT_EQ(rp->constraints().size(), 1);
-  EXPECT_EQ(*rp->constraints().begin(), exp);
+  CapacityConstraint<Material> obs = *(rp->constraints().begin());
+  EXPECT_EQ(obs, exp);
 }

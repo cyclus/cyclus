@@ -144,7 +144,7 @@ TEST(ExXlateTests, XlateReq) {
 
   RequestGroup::Ptr set = TranslateRequestPortfolio(xlator.translation_ctx(), rp);
 
-  EXPECT_DOUBLE_EQ(qty, set->qty());
+  EXPECT_DOUBLE_EQ(qty * 2, set->qty());
   TestVecEq(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().request_to_node.find(req)
               != xlator.translation_ctx().request_to_node.end());
