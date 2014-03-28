@@ -114,7 +114,6 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
         Request<T>::Create(target, requester, this->shared_from_this(),
                            commodity, preference, exclusive);
     VerifyRequester_(r);
-    //VerifyQty_(r);
     requests_.push_back(r);
     default_constr_coeffs_[r] = 1;
     qty_ += target->quantity();
@@ -202,20 +201,6 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     }
   };
 
-  /// @brief if the quantity has not been determined yet, it is set. otherwise
-  /// VerifyRequester() verifies the the quantity is the same as all others in
-  /// the portfolio
-  /// @throws KeyError if a quantity is different than the original
-  void VerifyQty_(const typename Request<T>::Ptr r) {
-    double qty = r->target()->quantity();
-    if (qty_ == -1) {
-      qty_ = qty;
-    } else if (qty_ != qty) {
-      std::string msg = "Insertion error: request quantity do not match.";
-      throw KeyError(msg);
-    }
-  };
-
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
   std::vector<typename Request<T>::Ptr> requests_;
@@ -226,6 +211,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;
 
+  /// the total quantity of resources assocaited with the portfolio
   double qty_;
   Trader* requester_;
 };
