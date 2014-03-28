@@ -20,7 +20,7 @@ class Trader;
 
 /// @brief accumulator sum for request quantities
 template<class T>
-    inline double Sum(double total, typename Request<T>::Ptr r) {
+    inline double SumQty(double total, typename Request<T>::Ptr r) {
   return total += r->target()->quantity();
 };
 
@@ -113,7 +113,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline void AddMutualReqs(
       const std::vector<typename Request<T>::Ptr>& rs) {
     double norm_const =
-        std::accumulate(rs.begin(), rs.end(), 0.0, Sum<T>) / rs.size();
+        std::accumulate(rs.begin(), rs.end(), 0.0, SumQty<T>) / rs.size();
     double qty;
     for (int i = 0; i < rs.size(); i++) {
       typename Request<T>::Ptr r = rs[i];
