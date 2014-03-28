@@ -27,8 +27,8 @@ using cyclus::Material;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::TestContext;
-using test_helpers::get_mat;
-using test_helpers::TestConverter;
+using rsrc_helpers::get_mat;
+using rsrc_helpers::TestConverter;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class RequestPortfolioTests: public ::testing::Test {

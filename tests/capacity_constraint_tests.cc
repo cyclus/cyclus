@@ -34,7 +34,6 @@ static int u235 = 92235;
 static std::string quality = "qual";
 static double fraction = 0.5;
 
-// some helper functions to use
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 struct RsrcQtyConverter : public Converter<Resource> {
   RsrcQtyConverter() {}

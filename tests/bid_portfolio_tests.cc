@@ -24,9 +24,9 @@ using cyclus::Request;
 using cyclus::Material;
 using cyclus::TestContext;
 using std::string;
-using test_helpers::get_mat;
-using test_helpers::get_req;
-using test_helpers::TestConverter;
+using rsrc_helpers::get_mat;
+using rsrc_helpers::get_req;
+using rsrc_helpers::TestConverter;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BidPortfolioTests: public ::testing::Test {

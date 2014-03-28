@@ -40,10 +40,10 @@ using cyclus::Resource;
 using cyclus::TestContext;
 using cyclus::Trade;
 using cyclus::TranslateCapacities;
-using test_helpers::get_bid;
-using test_helpers::get_mat;
-using test_helpers::get_req;
-using test_helpers::trader;
+using rsrc_helpers::get_bid;
+using rsrc_helpers::get_mat;
+using rsrc_helpers::get_req;
+using rsrc_helpers::trader;
 
 double fraction = 0.7;
 int u235 = 92235;
