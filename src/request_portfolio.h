@@ -70,11 +70,22 @@ struct DefaultCoeffConverter: public Converter<T> {
 /// 
 /// RequestPortfolio<SomeResource>::Ptr rp(new RequestPortfolio<SomeResource>());
 /// // add some requests
+/// rp->AddRequest(/* args */);
 /// // declare some of them as multicommodity requsts (i.e., any one will
 /// // satisfy this demand).
+/// rp->AddMutualReqs(/* args */);
+/// // add the default constraint
 /// rp->AddDefaultConstraint();
 /// 
 /// @endcode
+///
+/// A default constraint will add unity for normal requests in the portfolio,
+/// but will add a weighted coefficient for requests that meet the same mutual
+/// demand. For example, if 10 kg of MOX and 9 kg of UOX meet the same demand
+/// for fuel, coefficients are added such that a full order of either will
+/// determine the demand as "met". In this case, the total demand is 9.5, the
+/// MOX order is given a coefficient of 9.5 / 10, and the UOX order is given a
+/// coefficient of 9.5 / 9.
 template<class T>
 class RequestPortfolio :
 public boost::enable_shared_from_this< RequestPortfolio<T> > {
