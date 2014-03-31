@@ -3,7 +3,7 @@
 
 #include "context.h"
 #include "recorder.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "timer.h"
 
 using cyclus::Context;
@@ -18,11 +18,11 @@ class ContextTests: public ::testing::Test {
   Timer ti;
   Recorder rec;
   Context* ctx;
-  MockFacility* fac;
+  TestFacility* fac;
 
   virtual void SetUp() {
     ctx = new Context(&ti, &rec);
-    fac = new MockFacility(ctx);
+    fac = new TestFacility(ctx);
   };
 
   virtual void TearDown() {
@@ -49,6 +49,10 @@ class DonutShop : public Model {
   void InitFrom(DonutShop* m) {
     Model::InitFrom(m);
   };
+
+  virtual void Snapshot(cyclus::DbInit di) {};
+  virtual void InitInv(cyclus::Inventories& inv) {};
+  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
 
   static int destruct_count;
   std::string donut_of_the_day;

@@ -5,7 +5,7 @@
 
 #include "model_tests.h"
 #include "xml_parser.h"
-#include "xml_query_engine.h"
+#include "query_engine.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, DISABLED_CreateFromXML) {
@@ -36,18 +36,7 @@ TEST_P(ModelTests, Schema) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST_P(ModelTests, InitAndGetName) {
-  cyclus::XMLParser p;
-  std::stringstream ss;
-  ss << "<start><name>fooname</name></start>";
-  p.Init(ss);
-  cyclus::XMLQueryEngine engine(p);
-  model_->Model::InitFrom(&engine);
-  EXPECT_EQ(model_->name(),"fooname");
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST_P(ModelTests, GetModelType) {
-  EXPECT_NE(std::string("Model"), model_->model_type());
+  EXPECT_NE(std::string("Model"), model_->kind());
 }
 

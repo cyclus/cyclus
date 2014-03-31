@@ -18,8 +18,46 @@ class Recorder;
 class Trader;
 class Timer;
 class TimeListener;
+class SimInit;
 
-/// A simulation context that provides access to necessary simulation-global
+/// Container for a static simulation-global parameters that both describe
+/// the simulation and affect its behavior.
+class SimInfo {
+ public:
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1, std::string handle = "")
+    : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
+      branch_time(-1), handle(handle) {};
+
+  SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
+          int branch_time,
+          std::string handle = "")
+    : duration(dur), y0(-1), m0(-1), decay_period(decay_period),
+      parent_sim(parent_sim),
+      branch_time(branch_time), handle(handle) {};
+
+  /// user-defined label associated with a particular simulation
+  std::string handle;
+
+  /// length of the simulation in timesteps (months)
+  int duration;
+
+  /// start year for the simulation (e.g. 1973);
+  int y0;
+
+  /// start month for the simulation: Jan = 1, ..., Dec = 12
+  int m0;
+
+  /// interval between decay calculations in timesteps (months)
+  int decay_period;
+
+  /// id for the parent simulation if any
+  boost::uuids::uuid parent_sim;
+
+  /// timestep at which simulation branching occurs if any
+  int branch_time;
+};
+
+/// A simulation context provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
 /// know simulation time, creates/builds facilities, and/or uses loaded
 /// composition recipes will need a context pointer. In general, all global
@@ -32,6 +70,7 @@ class TimeListener;
 /// destruction.
 class Context {
  public:
+  friend class SimInit;
   friend class Model;
 
   /// Creates a new context working with the specified timer and datum manager.
@@ -120,17 +159,19 @@ class Context {
 
   /// Initializes the simulation time parameters. Should only be called once -
   /// NOT idempotent.
-  void InitTime(int duration, int decay, int m0 = 1, int y0 = 2010,
-                std::string handle = "");
+  void InitSim(SimInfo si);
 
   /// Returns the current simulation timestep.
   int time();
 
-  /// Returns the number of timesteps in the entire simulation.
-  int sim_dur();
+  /// Return static simulation info.
+  inline SimInfo sim_info() const {return si_;};
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
+
+  /// Makes a snapshot of the simulation state to the output database.
+  void Snapshot();
 
   /// @return the next transaction id
   inline int NextTransactionID() {
@@ -152,7 +193,8 @@ class Context {
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Model*> model_list_;
   std::set<Trader*> traders_;
-  
+
+  SimInfo si_;
   Timer* ti_;
   ExchangeSolver* solver_;
   Recorder* rec_;
@@ -162,3 +204,6 @@ class Context {
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_CONTEXT_H_
+
+
+

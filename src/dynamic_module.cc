@@ -15,12 +15,31 @@ namespace fs = boost::filesystem;
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::map<std::string, DynamicModule*> DynamicModule::modules_;
+
+Model* DynamicModule::Make(Context* ctx, std::string name) {
+  if (modules_.count(name) == 0) {
+    DynamicModule* dyn = new DynamicModule(name);
+    modules_[name] = dyn;
+  }
+
+  DynamicModule* dyn = modules_[name];
+  return dyn->ConstructInstance(ctx);
+}
+
+void DynamicModule::CloseAll() {
+  std::map<std::string, DynamicModule*>::iterator it;
+  for (it = modules_.begin(); it != modules_.end(); it++) {
+    it->second->CloseLibrary();
+    delete it->second;
+  }
+  modules_.clear();
+}
+
 const std::string DynamicModule::Suffix() {
   return SUFFIX;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DynamicModule::DynamicModule(std::string name)
     : module_name_(name),
       constructor_name_("Construct" + name),
@@ -37,18 +56,16 @@ DynamicModule::DynamicModule(std::string name)
   SetConstructor();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Model* DynamicModule::ConstructInstance(Context* ctx) {
   return constructor_(ctx);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string DynamicModule::name() {
   return module_name_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string DynamicModule::path() {
   return abs_path_;
 }
+
 }  // namespace cyclus

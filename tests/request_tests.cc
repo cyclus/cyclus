@@ -7,7 +7,7 @@
 #include "facility_model.h"
 #include "generic_resource.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "test_modules/test_facility.h"
 #include "test_context.h"
 #include "trader.h"
 
@@ -24,7 +24,7 @@ using std::string;
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RequestTests, MaterialGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = new TestFacility(tc.get());
   Trader* excast = dynamic_cast<Trader*>(fac);
   
   string commod = "name";
@@ -47,15 +47,14 @@ TEST(RequestTests, MaterialGetSet) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RequestTests, GenRsrcGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = new TestFacility(tc.get());
   string commod = "name";
   double pref = 2.4;
   double qty = 1.0;
   string quality = "qual";
-  string units = "units";
 
   GenericResource::Ptr rsrc =
-      GenericResource::CreateUntracked(qty, quality, units);
+      GenericResource::CreateUntracked(qty, quality);
   
   Request<GenericResource>::Ptr r =
       Request<GenericResource>::Create(rsrc, fac, commod, pref);

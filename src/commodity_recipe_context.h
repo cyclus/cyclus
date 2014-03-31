@@ -7,6 +7,7 @@
 
 #include "cyc_std.h"
 #include "resource.h"
+#include "state_wrangler.h"
 
 namespace cyclus {
 
@@ -14,7 +15,7 @@ namespace cyclus {
 ///
 /// @brief a CommodityRecipeContext contains relationships between commodities,
 /// recipes and resources
-class CommodityRecipeContext {
+class CommodityRecipeContext : public StateWrangler {
  public:
   /// @brief add an input commodity and its relations
   void AddInCommod(std::string in_commod,
@@ -62,7 +63,7 @@ class CommodityRecipeContext {
   /// @return commodity of a material
   /// @warning returns a blank string if material isn't found
   inline std::string commod(Resource::Ptr rsrc) {
-    return rsrc_commod_map_[rsrc];
+    return rsrc_commod_map_[rsrc->id()];
   }
 
   inline bool operator==(const CommodityRecipeContext& other) const {
@@ -78,13 +79,19 @@ class CommodityRecipeContext {
     return !operator==(other);
   }
 
+  virtual CommodityRecipeContext* Clone();
+  virtual void InfileToDb(QueryEngine* qe, DbInit di);
+  virtual void InitFrom(QueryBackend* b);
+  virtual void Snapshot(DbInit di);
+  virtual std::string schema();
+
  private:
   std::vector<std::string> in_commods_;
   std::vector<std::string> out_commods_;
   std::map<std::string, std::string> out_commod_map_;
   std::map<std::string, std::string> in_recipes_;
   std::map<std::string, std::string> out_recipes_;
-  std::map<Resource::Ptr, std::string> rsrc_commod_map_;
+  std::map<int, std::string> rsrc_commod_map_;
 };
 
 }  // namespace cyclus

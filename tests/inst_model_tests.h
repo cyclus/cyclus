@@ -4,9 +4,9 @@
 #include <gtest/gtest.h>
 
 #include "inst_model.h"
-#include "mock_facility.h"
-#include "mock_inst.h"
-#include "mock_region.h"
+#include "test_modules/test_facility.h"
+#include "test_modules/test_inst.h"
+#include "test_modules/test_region.h"
 #include "suffix.h"
 #include "test_context.h"
 
@@ -24,16 +24,16 @@ typedef cyclus::InstModel* InstModelConstructor(cyclus::Context* ctx);
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class InstModelTests : public TestWithParam<InstModelConstructor*> {
  protected:
-  MockInst* inst_model_;
-  MockFacility* test_facility_;
-  MockRegion* test_region_;
+  TestInst* inst_model_;
+  TestFacility* test_facility_;
+  TestRegion* test_region_;
   cyclus::TestContext tc_;
   
  public:
   virtual void SetUp() { 
-    inst_model_ = new MockInst(tc_.get());
-    test_facility_ = new MockFacility(tc_.get());
-    test_region_ = new MockRegion(tc_.get());
+    inst_model_ = new TestInst(tc_.get());
+    test_facility_ = new TestFacility(tc_.get());
+    test_region_ = new TestRegion(tc_.get());
     inst_model_->Build(test_region_);
   }
   virtual void TearDown(){}   

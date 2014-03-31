@@ -10,7 +10,6 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
@@ -22,7 +21,21 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   H5Tset_size(blob_type_, H5T_VARIABLE);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Hdf5Back::~Hdf5Back() {
+  Flush();
+  H5Fclose(file_);
+  H5Tclose(string_type_);
+  H5Tclose(blob_type_);
+
+  std::map<std::string, size_t*>::iterator it;
+  for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
+    delete[](it->second);
+  }
+  for (it = tbl_sizes_.begin(); it != tbl_sizes_.end(); ++it) {
+    delete[](it->second);
+  }
+};
+
 void Hdf5Back::Notify(DatumList data) {
   std::map<std::string, DatumList> groups;
   for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
@@ -40,27 +53,10 @@ void Hdf5Back::Notify(DatumList data) {
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Hdf5Back::Close() {
-  H5Fclose(file_);
-  H5Tclose(string_type_);
-  H5Tclose(blob_type_);
-
-  std::map<std::string, size_t*>::iterator it;
-  for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
-    delete[](it->second);
-  }
-  for (it = tbl_sizes_.begin(); it != tbl_sizes_.end(); ++it) {
-    delete[](it->second);
-  }
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Hdf5Back::Name() {
   return path_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::CreateTable(Datum* d) {
   Datum::Vals vals = d->vals();
 
@@ -116,7 +112,6 @@ void Hdf5Back::CreateTable(Datum* d) {
   tbl_sizes_[d->title()] = dst_sizes;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
   herr_t status;
@@ -136,7 +131,6 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   delete[] buf;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Hdf5Back::FillBuf(char* buf, DatumList& group, size_t* sizes,
                        size_t rowsize) {
   Datum::Vals header = group.front()->vals();

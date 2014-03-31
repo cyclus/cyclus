@@ -16,10 +16,12 @@ typedef std::string ResourceType;
 /// offered, requested, and transferred between simulation agents. Resources
 /// represent the lifeblood of a simulation.
 class Resource {
+  friend class SimInit;
+
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 
-  Resource() : id_(0) {};
+  Resource() : id_(nextid_++) {};
 
   virtual ~Resource() {};
 
@@ -32,13 +34,13 @@ class Resource {
 
   /// Assigns a new, unique id to this resource and its state. This should be
   /// called by resource implementations whenever their state changes.  A call to
-  /// BumpId is not always accompanied by a change to the state id.
+  /// BumpId is not necessarily accompanied by a change to the state id.
+  /// This should NEVER be called by agents.
   void BumpId();
 
-  /// Returns an id representing the specific resource implementation's
-  /// internal state that is not accessible via the Resource class public
-  /// interface.  Any change to the state_id should be accompanied by a call to
-  /// BumpId.
+  /// Returns an id representing the specific resource implementation's internal
+  /// state that is not accessible via the Resource class public interface.  Any
+  /// change to the state_id should always be accompanied by a call to BumpId.
   virtual int state_id() const = 0;
 
   /// A unique type/name for the concrete resource implementation.
