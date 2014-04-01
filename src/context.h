@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <boost/uuid/uuid_generators.hpp>
 
 #include "composition.h"
 #include "agent.h"
@@ -26,7 +27,7 @@ class SimInfo {
  public:
   SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1, std::string handle = "")
     : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
-      branch_time(-1), handle(handle) {};
+      branch_time(-1), handle(handle), parent_sim(boost::uuids::nil_uuid()) {};
 
   SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
           int branch_time,
