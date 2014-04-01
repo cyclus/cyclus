@@ -5,13 +5,6 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "capacity_constraint.h"
-#include "cyc_limits.h"
-#include "context.h"
-#include "error.h"
-#include "logger.h"
-#include "request.h"
-
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,37 +51,98 @@ std::string KFacility::schema() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void KFacility::InitFrom(cyclus::QueryEngine* qe) {
-  cyclus::FacilityModel::InitFrom(qe);
-  qe = qe->QueryElement("model/" + ModelImpl());
+void KFacility::InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di) {
+  cyclus::FacilityModel::InfileToDb(qe, di);
+  qe = qe->QueryElement("model/" + model_impl());
 
   using std::string;
-  using std::numeric_limits;
   using boost::lexical_cast;
+
   cyclus::QueryEngine* setup = qe->QueryElement("setup");
 
   // Facility output configuraitons
-  recipe(setup->GetElementContent("recipe"));
+  recipe(setup->GetString("recipe"));
 
-  string data = setup->GetElementContent("outcommodity");
+  string data = setup->GetString("outcommodity");
   commodity(data);
   cyclus::Commodity commod(data);
   cyclus::CommodityProducer::AddCommodity(commod);
 
-
-  double cap = lexical_cast<double>(setup->GetElementContent("out_capacity"));
+  double cap = lexical_cast<double>(setup->GetString("out_capacity"));
   cyclus::CommodityProducer::SetCapacity(commod, cap);
   capacity(cap);
 
-  double k = lexical_cast<double>(setup->GetElementContent("k_factor_out"));
+  double k = lexical_cast<double>(setup->GetString("k_factor_out"));
   k_factor_out(k);
 
   // Facility input configurations
-  AddCommodity(setup->GetElementContent("incommodity"));
-  k_factor_in(lexical_cast<double>(setup->GetElementContent("k_factor_in")));
-  in_capacity_ = lexical_cast<double>(setup->GetElementContent("in_capacity"));
+  AddCommodity(setup->GetString("incommodity"));
+  k_factor_in(lexical_cast<double>(setup->GetString("k_factor_in")));
+  in_capacity_ = lexical_cast<double>(setup->GetString("in_capacity"));
+
+  // di.NewDatum("Info")
+  //     ->AddVal("recipe", recipe)
+  //     ->AddVal("out_commod", out_commod)
+  //     ->AddVal("capacity", cap)
+  //     ->AddVal("curr_capacity", cap)
+  //     ->Record();
 }
 
+void KFacility::InitFrom(cyclus::QueryBackend* b) {
+  cyclus::FacilityModel::InitFrom(b);
+  // cyclus::QueryResult qr = b->Query("Info", NULL);
+  // recipe_name_ = qr.GetVal<std::string>("recipe");
+  // out_commod_ = qr.GetVal<std::string>("out_commod");
+  // capacity_ = qr.GetVal<double>("capacity");
+  // current_capacity_ = qr.GetVal<double>("curr_capacity");
+
+  // cyclus::Commodity commod(out_commod_);
+  // cyclus::CommodityProducer::AddCommodity(commod);
+  // cyclus::CommodityProducer::SetCapacity(commod, capacity_);
+}
+
+void KFacility::Snapshot(cyclus::DbInit di) {
+  cyclus::FacilityModel::Snapshot(di);
+//  di.NewDatum("Info")
+//      ->AddVal("recipe", recipe_name_)
+//      ->AddVal("out_commod", out_commod_)
+//      ->AddVal("capacity", capacity_)
+//      ->AddVal("curr_capacity", current_capacity_)
+//      ->Record();
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// void KFacility::InitFrom(cyclus::QueryEngine* qe) {
+//   cyclus::FacilityModel::InitFrom(qe);
+//   qe = qe->QueryElement("model/" + ModelImpl());
+//
+//   using std::string;
+//   using std::numeric_limits;
+//   using boost::lexical_cast;
+//   cyclus::QueryEngine* setup = qe->QueryElement("setup");
+//
+//   // Facility output configuraitons
+//   recipe(setup->GetElementContent("recipe"));
+//
+//   string data = setup->GetElementContent("outcommodity");
+//   commodity(data);
+//   cyclus::Commodity commod(data);
+//   cyclus::CommodityProducer::AddCommodity(commod);
+//
+//
+//   double cap = lexical_cast<double>(setup->GetElementContent("out_capacity"));
+//   cyclus::CommodityProducer::SetCapacity(commod, cap);
+//   capacity(cap);
+//
+//   double k = lexical_cast<double>(setup->GetElementContent("k_factor_out"));
+//   k_factor_out(k);
+//
+//   // Facility input configurations
+//   AddCommodity(setup->GetElementContent("incommodity"));
+//   k_factor_in(lexical_cast<double>(setup->GetElementContent("k_factor_in")));
+//   in_capacity_ = lexical_cast<double>(setup->GetElementContent("in_capacity"));
+// }
+//
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string KFacility::str() {
   std::stringstream ss;
@@ -133,14 +187,14 @@ void KFacility::InitFrom(KFacility* m) {
 void KFacility::Tick(int time) {
   using std::string;
   using std::vector;
-  LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is ticking {";
+  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is ticking {";
   LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << out_capacity_
                                    << " kg of "
                                    << out_commod_ << ".";
   LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
   current_capacity_ = out_capacity_;  // reset capacity
 
-  LOG(cyclus::LEV_INFO3, "SnkFac") << FacName() << " is ticking {";
+  LOG(cyclus::LEV_INFO3, "SnkFac") << prototype() << " is ticking {";
 
   double requestAmt = RequestAmt();
   // inform the simulation about what the sink facility will be requesting
@@ -157,7 +211,7 @@ void KFacility::Tick(int time) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void KFacility::Tock(int time) {
-  LOG(cyclus::LEV_INFO3, "SrcFac") << FacName() << " is tocking {";
+  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is tocking {";
   LOG(cyclus::LEV_INFO4, "SrcFac") << "KFacility " << this->id()
                                    << " is holding " << inventory_.quantity()
                                    << " units of material at the close of month "
@@ -228,7 +282,7 @@ void KFacility::GetMatlTrades(
                                               qty,
                                               context()->GetRecipe(recipe_name_));
     responses.push_back(std::make_pair(*it, response));
-    LOG(cyclus::LEV_INFO5, "SrcFac") << name() << " just received an order"
+    LOG(cyclus::LEV_INFO5, "SrcFac") << prototype() << " just received an order"
                                      << " for " << qty
                                      << " of " << out_commod_;
   }
@@ -251,7 +305,7 @@ KFacility::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
   double amt = RequestAmt();
-  Material::Ptr mat = Material::CreateBlank(amt);
+  Material::Ptr mat = cyclus::NewBlankMaterial(amt);
 
   if (amt > cyclus::eps()) {
     CapacityConstraint<Material> cc(amt);
@@ -290,8 +344,7 @@ KFacility::GetGenRsrcRequests() {
       std::string quality = "";  // not clear what this should be..
       std::string units = "";  // not clear what this should be..
       GenericResource::Ptr rsrc = GenericResource::CreateUntracked(amt,
-                                                                   quality,
-                                                                   units);
+                                                                   quality);
       port->AddRequest(rsrc, this, *it);
     }
 

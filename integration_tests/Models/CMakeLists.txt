@@ -5,9 +5,9 @@
 
 FILE(GLOB all_valid_subdirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/CMakeLists.txt")
 
-ADD_SUBDIRECTORY(SimpleSink)
+# ADD_SUBDIRECTORY(SimpleSink)
 
-ADD_SUBDIRECTORY(SimpleSource)
+# ADD_SUBDIRECTORY(SimpleSource)
 
 ADD_SUBDIRECTORY(NullInst)
 
@@ -16,4 +16,3 @@ ADD_SUBDIRECTORY(NullRegion)
 ADD_SUBDIRECTORY(KFacility)
 
 SET(TestSource ${TestSource} PARENT_SCOPE)
-

@@ -5,18 +5,7 @@
 #include <set>
 #include <vector>
 
-#include "bid_portfolio.h"
-#include "commodity_producer.h"
-#include "context.h"
-#include "exchange_context.h"
-#include "facility_model.h"
-#include "generic_resource.h"
-#include "logger.h"
-#include "material.h"
-#include "query_engine.h"
-#include "request_portfolio.h"
-#include "resource_buff.h"
-#include "trade.h"
+#include "cyclus.h"
 
 namespace cyclus {
 
@@ -45,7 +34,9 @@ class Context;
   describing the behavior at the tick and tock as well as the behavior
   upon sending and receiving materials and messages.
   */
-class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer {
+class KFacility
+    : public cyclus::FacilityModel,
+      public cyclus::CommodityProducer {
 
   /* --------------------
    * all FACILITYMODEL classes have these members
@@ -62,14 +53,24 @@ class KFacility : public cyclus::FacilityModel, public cyclus::CommodityProducer
     every model should be destructable
     */
   virtual ~KFacility();
+
   virtual std::string schema();
+
   virtual cyclus::Model* Clone();
   /**
     Initialize members related to derived module class
 
     @param qe a pointer to a QueryEngine object containing initialization data
     */
-  virtual void InitFrom(cyclus::QueryEngine* qe);
+  virtual void InfileToDb(cyclus::QueryEngine* qe, cyclus::DbInit di);
+
+  virtual void InitFrom(cyclus::QueryBackend* b);
+
+  virtual void Snapshot(cyclus::DbInit di);
+
+  virtual void InitInv(cyclus::Inventories& inv) {};
+
+  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();}
 
   /**
     Initialize members for a cloned module.
