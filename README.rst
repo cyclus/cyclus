@@ -58,6 +58,7 @@ The command to install a dependency takes the form of:
 where "package" is replaced by the correct package name. The minimal list of
 required library package names is:
 
+#. make
 #. cmake
 #. libboost-all-dev (see note below)
 #. libxml2-dev
@@ -69,6 +70,7 @@ required library package names is:
 #. coinor-libcoinutils-dev
 #. coinor-libosi-dev
 #. coinor-libclp-dev
+#. coinor-libcgl-dev
 
 and (optionally):
 
@@ -79,6 +81,13 @@ For example, in order to install libxml++ (and libxml2) on your system, type:
 .. code-block:: bash
 
   sudo apt-get install libxml++2.6-dev
+
+If you'd prefer to copy/paste, the following line will install all *Cyclus*
+dependencies:
+
+.. code-block:: bash
+  
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
 
 Boost Note
 ----------
