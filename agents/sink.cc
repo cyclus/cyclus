@@ -33,7 +33,6 @@ Sink::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
   double amt = capacity();
-  std::cout<< amt << std::endl;
   Material::Ptr mat = cyclus::NewBlankMaterial(amt);
 
   if (amt > cyclus::eps()) {
@@ -42,7 +41,6 @@ Sink::GetMatlRequests() {
 
     std::vector<std::string>::const_iterator it;
     for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
-      std::cout<< *it << std::endl;
       port->AddRequest(mat, this, *it);
     }
 

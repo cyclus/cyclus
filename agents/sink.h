@@ -70,9 +70,6 @@ class Sink : public cyclus::Facility  {
   std::vector<std::string> in_commods_;
 
   #pragma cyclus var {}
-  std::string incommodity_;
-
-  #pragma cyclus var {}
   double capacity_;
 
   cyclus::ResourceBuff inventory_;
