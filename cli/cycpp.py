@@ -1143,6 +1143,7 @@ class CodeGenerator(object):
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
+        self.aliases = set()  # set of (depth, name, alias) tuples
         self.linemarkers = []
         # all basic code generating filters
         self.codegen_filters = [InitFromCopyFilter(self), 
@@ -1157,6 +1158,7 @@ class CodeGenerator(object):
         self.filters = self.codegen_filters + [ClassFilter(self), 
                                                AccessFilter(self), 
                                                NamespaceFilter(self), 
+                                               NamespaceAliasFilter(self), 
                                                DefaultPragmaFilter(self),
                                                LinemarkerFilter(self)]
         
