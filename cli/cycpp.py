@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 """The cyclus preprocessor.
 
 cycpp is a 3-pass preprocessor which adds reflection-like semantics to cyclus 
@@ -583,10 +583,11 @@ class CodeGeneratorFilter(Filter):
     def transform(self, statement, sep):
         # basic setup
         cg = self.machine
-        mode = (self.match.group(1) or '').strip()
+        groups = self.match.groups()
+        mode = (groups[0] or '').strip()
         if len(mode) == 0:
             mode = "def"
-        classname = self.match.group(2) if self.match.lastindex > 1 else None
+        classname = groups[1] if len(groups) > 1 else None
         if classname is None:
             if len(cg.classes) == 0:
                 TypeError("{0}Classname could not determined".format(
