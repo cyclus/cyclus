@@ -14,6 +14,7 @@
 
 #include "capacity_constraint.h"
 
+using cyclus::Arc;
 using cyclus::CapacityConstraint;
 using cyclus::CompMap;
 using cyclus::Composition;
@@ -22,6 +23,9 @@ using cyclus::Product;
 using cyclus::Material;
 using cyclus::Resource;
 using cyclus::TestContext;
+using cyclus::ExchangeTranslationContext;
+using cyclus::NewBlankMaterial;
+
 using std::string;
 
 static double quantity = 2.7;
@@ -30,13 +34,15 @@ static int u235 = 92235;
 static std::string quality = "qual";
 static double fraction = 0.5;
 
-// some helper functions to use
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 struct RsrcQtyConverter : public Converter<Resource> {
   RsrcQtyConverter() {}
   virtual ~RsrcQtyConverter() {}
   
-  virtual double convert(Resource::Ptr r) {
+  virtual double convert(
+      Resource::Ptr r,
+      Arc const * a = NULL,
+      ExchangeTranslationContext<Resource> const * ctx = NULL) const {
     return r->quantity() * fraction;
   }
 };
@@ -46,7 +52,10 @@ struct MatQualConverter : public Converter<Material> {
   MatQualConverter() {}
   virtual ~MatQualConverter() {}
   
-  virtual double convert(Material::Ptr r) {
+  virtual double convert(
+      Material::Ptr r,
+      Arc const * a = NULL,
+      ExchangeTranslationContext<Material> const * ctx = NULL) const {
     const CompMap& comp = r->comp()->mass();
     double uamt = comp.find(u235)->second;
     return comp.find(u235)->second * fraction;
@@ -58,7 +67,10 @@ struct ProductQualConverter : public Converter<Product> {
   ProductQualConverter() {}
   virtual ~ProductQualConverter() {}
   
-  virtual double convert(Product::Ptr r) {
+  virtual double convert(
+      Product::Ptr r,
+      Arc const * a = NULL,
+      ExchangeTranslationContext<Product> const * ctx = NULL) const {
     if (r->quality().compare(quality) == 0) {
       return val;
     } else {
@@ -79,7 +91,7 @@ TEST(CapacityConstraintTests, RsrcGetSet) {
 TEST(CapacityConstraintTests, Trivial) {
   CapacityConstraint<Resource> cc(val);
   double val = 42;
-  EXPECT_EQ(val, cc.convert(cyclus::NewBlankMaterial(val))); // some magic number
+  EXPECT_EQ(val, cc.convert(NewBlankMaterial(val))); // some magic number
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -92,7 +104,7 @@ TEST(CapacityConstraintTests, Equality) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CapacityConstraintTests, RsrcQty) {
   TestContext tc;
-  cyclus::CompMap cm;
+  CompMap cm;
   double qty = quantity;
   cm[92235] = val;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
@@ -119,7 +131,7 @@ TEST(CapacityConstraintTests, RsrcQty) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CapacityConstraintTests, MaterialQuality) {
   TestContext tc;
-  cyclus::CompMap cm;
+  CompMap cm;
   double qty = quantity;
   cm[92235] = val;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
