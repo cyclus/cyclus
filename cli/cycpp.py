@@ -164,7 +164,7 @@ class LinemarkerFilter(Filter):
     This is useful for debugging. See the cpp for more info:
     http://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html
     """
-    regex = re.compile(RE_COMMENTS + r'*#\s+(\d+)\s+"(.*?)"(\s+\d+)*?', re.DOTALL)
+    regex = re.compile(r'\s*#\s+(\d+)\s+"(.*?)"(\s+\d+)*?', re.DOTALL)
     allowed_flags = {'1', '2'}
     last_was_linemarker = False
 
@@ -220,7 +220,7 @@ class UsingFilter(AliasFilter):
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
     # handles anonymous namespaces as group(1) == None
-    regex = re.compile(RE_COMMENTS + "*\s*namespace(\s+\w*)?\s*$", re.DOTALL)
+    regex = re.compile("\s*namespace(\s+\w*)?\s*$", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -268,8 +268,7 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile(RE_COMMENTS + "*\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", 
-                       re.DOTALL)
+    regex = re.compile("\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -307,8 +306,7 @@ class ClassFilter(Filter):
 
 class AccessFilter(Filter):
     """Filter for setting the current access control flag."""
-    regex = re.compile(RE_COMMENTS + '*\s*(public|private|protected)\s*', 
-                       re.DOTALL)
+    regex = re.compile('\s*(public|private|protected)\s*', re.DOTALL)
 
     def transform(self, statement, sep):
         access = self.match.group(1)
@@ -564,9 +562,9 @@ def accumulate_state(canon):
 # pass 3
 #
 class CodeGeneratorFilter(Filter):
-    re_template = RE_COMMENTS + ("*?\s*#\s*pragma\s+cyclus\s*?"
-                                 "(\s+def\s+|\s+decl\s+|\s+impl\s+|\s*?)?"
-                                 "(?:\s*?{0}\s*?)(\s+?(?:[\w:\.]+)?)?")
+    re_template = ("\s*#\s*pragma\s+cyclus\s*?"
+                   "(\s+def\s+|\s+decl\s+|\s+impl\s+|\s*?)?"
+                   "(?:\s*?{0}\s*?)(\s+?(?:[\w:\.]+)?)?")
 
     def_template = "\n{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
 
@@ -1037,8 +1035,7 @@ class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
         #pragma cyclus [def|decl|impl]
     """
-    regex = re.compile(RE_COMMENTS + \
-                       "*\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$", 
+    regex = re.compile("\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$", 
                        re.DOTALL)
 
     def transform(self, statement, sep):
@@ -1051,7 +1048,6 @@ class DefaultPragmaFilter(Filter):
     def revert(self, statement, sep):
         for f in self.machine.codegen_filters:
             f.revert(statement, sep)
-    # pass
 
 class Indenter(object):
     def __init__(self, n=2, level=0):
