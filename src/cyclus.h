@@ -19,6 +19,8 @@
 #include "datum.h"
 #include "db_init.h"
 #include "enrichment.h"
+#include "exchange_graph.h"
+#include "exchange_translation_context.h"
 #include "env.h"
 #include "error.h"
 #include "facility.h"

@@ -28,6 +28,7 @@ using cyclus::Converter;
 using cyclus::ExchangeContext;
 using cyclus::ExchangeGraph;
 using cyclus::ExchangeTranslator;
+using cyclus::ExchangeTranslationContext;
 using cyclus::Match;
 using cyclus::Material;
 using cyclus::ExchangeNode;
@@ -53,7 +54,10 @@ struct MatConverter1 : public Converter<Material> {
   MatConverter1() {}
   virtual ~MatConverter1() {}
   
-  virtual double convert(Material::Ptr r) {
+  virtual double convert(
+      Material::Ptr r,
+      Arc const * a = NULL,
+      ExchangeTranslationContext<Material> const *  ctx = NULL) const {
     const CompMap& comp = r->comp()->mass();
     double uamt = comp.find(u235)->second;
     return comp.find(u235)->second * fraction;
@@ -65,7 +69,10 @@ struct MatConverter2 : public Converter<Material> {
   MatConverter2() {}
   virtual ~MatConverter2() {}
   
-  virtual double convert(Material::Ptr r) {
+  virtual double convert(
+      Material::Ptr r,
+      Arc const * a = NULL,
+      ExchangeTranslationContext<Material> const *  ctx = NULL) const {
     const CompMap& comp = r->comp()->mass();
     double uamt = comp.find(u235)->second;
     return comp.find(u235)->second * fraction * fraction;
@@ -101,11 +108,12 @@ TEST(ExXlateTests, XlateCapacities) {
       
   double barr[] = {(c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
-      
-  TranslateCapacities<Material>(mat, rconstrs, rnode, arc);
+
+  ExchangeTranslationContext<Material> ctx;
+  TranslateCapacities<Material>(mat, rconstrs, rnode, arc, ctx);
   TestVecEq(rexp, rnode->unit_capacities[arc]);
 
-  TranslateCapacities<Material>(mat, bconstrs, bnode, arc);
+  TranslateCapacities<Material>(mat, bconstrs, bnode, arc, ctx);
   TestVecEq(bexp, bnode->unit_capacities[arc]);
 }
 
@@ -136,7 +144,7 @@ TEST(ExXlateTests, XlateReq) {
 
   RequestGroup::Ptr set = TranslateRequestPortfolio(xlator.translation_ctx(), rp);
 
-  EXPECT_DOUBLE_EQ(qty, set->qty());
+  EXPECT_DOUBLE_EQ(qty * 2, set->qty());
   TestVecEq(cexp, set->capacities());
   EXPECT_TRUE(xlator.translation_ctx().request_to_node.find(req)
               != xlator.translation_ctx().request_to_node.end());
