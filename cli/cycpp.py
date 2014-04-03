@@ -268,7 +268,6 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    #regex = re.compile("\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
     regex = re.compile("(?:\s*template\s*<[\s\w,]*>)?"
                        "\s*(?:class|struct)\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
 
