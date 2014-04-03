@@ -180,11 +180,9 @@ double Capacity(const Arc& a);
 /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
 /// @param n the node
 /// @param n_qty the currently allocated node quantity
-/// @param grp_qty the currently allocated group quantity
 /// @return The minimum of the node's nodegroup capacities / the node's unit
 /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller. 
-double Capacity(ExchangeNode::Ptr n, const Arc& a,
-                double n_qty = 0.0, double grp_qty = 0.0);
+double Capacity(ExchangeNode::Ptr n, const Arc& a, double n_qty = 0.0);
 
 typedef std::pair<Arc, double> Match;
 

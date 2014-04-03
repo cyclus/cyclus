@@ -92,7 +92,7 @@ double Capacity(const Arc& a) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(ExchangeNode::Ptr n, const Arc& a,
-                double n_qty, double grp_qty) {
+                double n_qty) {
   if (n->group == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
@@ -110,14 +110,15 @@ double Capacity(ExchangeNode::Ptr n, const Arc& a,
   for (int i = 0; i < unit_caps.size(); i++) {
     grp_cap = group_caps[i];
     u_cap = unit_caps[i];
-    cap = grp_cap / u_cap - n_qty;
+    cap = grp_cap / u_cap;
+    assert(cap >= 0);
     CLOG(cyclus::LEV_DEBUG1) << "Capacity for node: ";
     CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << grp_cap;
     CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << u_cap;
     CLOG(cyclus::LEV_DEBUG1) << "         capacity: " << cap;
     
     // special case for unlimited capacities
-    if (group_caps[i] == std::numeric_limits<double>::max()) {
+    if (grp_cap == std::numeric_limits<double>::max()) {
       caps.push_back(std::numeric_limits<double>::max());
     } else {
       caps.push_back(cap);
