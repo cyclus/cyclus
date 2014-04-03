@@ -33,6 +33,10 @@ class MatQuery {
   /// are the same within threshold.
   bool AlmostEq(Material::Ptr other, double threshold = eps_rsrc());
 
+  /// Returns the maximum mass quantity of composition c that can be extracted
+  /// from the material.
+  double Amount(Composition::Ptr c);
+
  private:
   Material::Ptr m_;
 };
