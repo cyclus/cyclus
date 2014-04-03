@@ -49,7 +49,7 @@ from collections import Sequence, MutableMapping
 from itertools import takewhile
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from pprint import pprint
+from pprint import pprint, pformat
 
 if sys.version_info[0] == 2:
     STRING_TYPES = (str, unicode, basestring)
@@ -220,7 +220,7 @@ class UsingFilter(AliasFilter):
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
     # handles anonymous namespaces as group(1) == None
-    regex = re.compile("\s*namespace(\s+\w*)?\s*$", re.DOTALL)
+    regex = re.compile("\s*namespace(\s+\w*)?\s*[^=]*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -268,31 +268,14 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile("\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
+    #regex = re.compile("\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
+    regex = re.compile("(?:\s*template\s*<[\s\w,]*>)?"
+                       "\s*(?:class|struct)\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
         name = self.match.group(1)
         state.classes.append((state.depth, name))
-        classname = state.classname()
-        superclasses = self.match.group(2)
-        state.superclasses[classname] = sc = state.superclasses.get(classname, 
-                                                                    set())
-        if superclasses is not None:
-            superclasses = [s.strip().split()[-1] for s in superclasses.split(',')]
-            for sup in superclasses:
-                if sup not in state.superclasses:
-                    scope = [ns for d, ns in state.namespaces] + \
-                            [c for d, c in state.classes[:-1]]
-                    for i in range(1, len(scope) + 1)[::-1]:
-                        trysup = "::".join(scope[:i]) + "::" + sup
-                        if trysup in state.superclasses:
-                            sup = trysup
-                            break
-                    else:
-                        msg = "Super class {0} not found for {1}"
-                        TypeError(msg.format(sup, classname))
-                sc.add(sup)
         state.access[tuple(state.classes)] = "private"
 
     def revert(self, statement, sep):
@@ -303,6 +286,26 @@ class ClassFilter(Filter):
         if state.depth == state.classes[-1][0]:
             del state.access[tuple(state.classes)]
             del state.classes[-1]
+
+class ClassAndSuperclassFilter(ClassFilter):
+    """This accumulates superclass information as well as class information."""
+
+    def transform(self, statement, sep):
+        super(ClassAndSuperclassFilter, self).transform(statement, sep)
+        state = self.machine
+        classname = state.classname()
+        superclasses = self.match.group(2)
+        state.superclasses[classname] = sc = state.superclasses.get(classname,
+                                                                    set())
+        if superclasses is not None:
+            superclasses = [s.strip().split()[-1] for s in superclasses.split(',')]
+            for sup in superclasses:
+                trysup = state.canonize_class(sup)
+                if trysup is None:
+                    # We cannot raise an error here becuase there are too many 
+                    # corner cases we do not and should not support in C++
+                    continue
+                sc.add(trysup)
 
 class AccessFilter(Filter):
     """Filter for setting the current access control flag."""
@@ -425,10 +428,10 @@ class StateAccumulator(object):
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.var_annotations = None
         self.linemarkers = []
-        self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
-                        NamespaceFilter(self), UsingNamespaceFilter(self),
-                        NamespaceAliasFilter(self), TypedefFilter(self),
-                        UsingFilter(self), LinemarkerFilter(self),
+        self.filters = [ClassAndSuperclassFilter(self), AccessFilter(self), 
+                        ExecFilter(self), UsingNamespaceFilter(self), 
+                        NamespaceAliasFilter(self), NamespaceFilter(self), 
+                        TypedefFilter(self), UsingFilter(self), LinemarkerFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):
@@ -543,6 +546,36 @@ class StateAccumulator(object):
         newt = [newtname]
         newt += [self.canonize_type(targ) for targ in targs]
         return tuple(newt)
+
+    def canonize_class(self, cls, _usens=True):
+        """This canonizes a classname.  The class name need not be the current 
+        class whose scope we are in, but may be any class whatsoever. Returns 
+        None if the class could not be canonized.
+        """
+        #if cls == 'cyc::Facility':
+        #    import pdb; pdb.set_trace()
+        if cls in self.superclasses:
+            return cls
+        cls = cls.strip("::")
+        scope = [ns for d, ns in self.namespaces] + [c for d, c in self.classes]
+                #[c for d, c in self.classes[:-1]]
+        # see if the class in in scope somehow
+        for i in range(1, len(scope) + 1)[::-1]:
+            trycls = "::".join(scope[:i]) + "::" + cls
+            if trycls in self.superclasses:
+                return trycls
+        # see if there are usings that modify the scope
+        if _usens:
+            for d, ns in self.using_namespaces:
+                trycls = self.canonize_class(ns + '::' + cls, _usens=False)
+                if trycls is not None:
+                    return trycls
+        # see if there is an alias that applies
+        for d, name, alias in sorted(self.aliases, key=len, reverse=True):
+            if cls.startswith(alias):
+                trycls = self.canonize_class(cls.replace(alias, name, 1))
+                if trycls in self.superclasses:
+                    return trycls
 
 def accumulate_state(canon):
     """Takes a canonical C++ source file and separates it out into statements
@@ -1157,8 +1190,8 @@ class CodeGenerator(object):
                                 ] 
         self.filters = self.codegen_filters + [ClassFilter(self), 
                                                AccessFilter(self), 
-                                               NamespaceFilter(self), 
                                                NamespaceAliasFilter(self), 
+                                               NamespaceFilter(self), 
                                                DefaultPragmaFilter(self),
                                                LinemarkerFilter(self)]
         
@@ -1397,7 +1430,8 @@ def main():
         with open(ns.path) as f:
             orig = f.read()
         orig = ensure_startswith_newlinehash(orig)
-    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)  # pass 3
+    # pass 3
+    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)
     if ns.output is None:
         print(newfile)
     else:
