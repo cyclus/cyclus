@@ -27,7 +27,7 @@ struct ExchangeNode {
  public:
   typedef boost::shared_ptr<ExchangeNode> Ptr;
   
-  ExchangeNode(double max_qty = std::numeric_limits<double>::max(),
+  ExchangeNode(double qty = std::numeric_limits<double>::max(),
                bool exclusive = false,
                std::string commod = "");
 
@@ -41,9 +41,6 @@ struct ExchangeNode {
 
   /// @brief preference values for arcs
   std::map<Arc, double> prefs;
-
-  /// @brief the average preference this node has across its arcs
-  double avg_pref;
   
   /// @brief whether this node represents an exclusive request or offer
   bool exclusive;
@@ -52,10 +49,6 @@ struct ExchangeNode {
   std::string commod;
   
   /// @brief the maximum amount of a resource that can be associated with this
-  /// node
-  double max_qty;
-
-  /// @brief a running total of the amount of resource associated with this
   /// node
   double qty;
 };
@@ -186,21 +179,12 @@ double Capacity(const Arc& a);
 ///
 /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
 /// @param n the node
+/// @param n_qty the currently allocated node quantity
+/// @param grp_qty the currently allocated group quantity
 /// @return The minimum of the node's nodegroup capacities / the node's unit
 /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller. 
-double Capacity(ExchangeNode& n, const Arc& a);
-double Capacity(ExchangeNode::Ptr pn, const Arc& a);
-
-/// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
-/// capacities of its ExchangeNodeGroup)
-///
-/// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
-/// @throws ValueError if the update results in a negative ExchangeNodeGroup
-/// capacity or a negative ExchangeNode max_qty
-/// @param n the ExchangeNode
-/// @param qty the quantity for the node to update
-void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty);
-void UpdateCapacity(ExchangeNode::Ptr pn, const Arc& a, double qty);
+double Capacity(ExchangeNode::Ptr n, const Arc& a,
+                double n_qty = 0.0, double grp_qty = 0.0);
 
 typedef std::pair<Arc, double> Match;
 

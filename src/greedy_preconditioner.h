@@ -10,11 +10,13 @@ namespace cyclus {
 
 /// @returns the node's weight given the node and commodity weight
 double NodeWeight(ExchangeNode::Ptr n,
-                  std::map<std::string, double>* weights);
+                  std::map<std::string, double>* weights,
+                  double avg_pref);
 
 /// @returns average RequestGroup weight
 double GroupWeight(RequestGroup::Ptr g,
-                   std::map<std::string, double>* weights);
+                   std::map<std::string, double>* weights,
+                   std::map<ExchangeNode::Ptr, double>* avg_prefs);
 
 /// @class GreedyPreconditioner
 ///
@@ -74,7 +76,9 @@ class GreedyPreconditioner {
   /// descending order based on their commodity's weight
   inline bool NodeComp(const ExchangeNode::Ptr l,
                        const ExchangeNode::Ptr r) {
-    return NodeWeight(l, &commod_weights_) > NodeWeight(r, &commod_weights_);
+    return
+        NodeWeight(l, &commod_weights_, avg_prefs_[l]) >
+        NodeWeight(r, &commod_weights_, avg_prefs_[r]);
   }
 
   /// @brief a comparitor for ordering containers of Request::Ptrs in
@@ -89,6 +93,7 @@ class GreedyPreconditioner {
   /// direction
   void ProcessWeights_(WgtOrder order);
   
+  std::map<ExchangeNode::Ptr, double> avg_prefs_;
   std::map<std::string, double> commod_weights_;
   std::map<RequestGroup::Ptr, double> group_weights_;
 };

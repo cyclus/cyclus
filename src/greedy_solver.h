@@ -44,8 +44,20 @@ class GreedySolver: public ExchangeSolver {
   virtual void Solve();
 
  private:
+  /// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
+  /// capacities of its ExchangeNodeGroup)
+  ///
+  /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
+  /// @throws ValueError if the update results in a negative ExchangeNodeGroup
+  /// capacity or a negative ExchangeNode max_qty
+  /// @param n the ExchangeNode
+  /// @param qty the quantity for the node to update
+  void Init_(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet_(RequestGroup::Ptr prs);
+  void UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty);
+  
   GreedyPreconditioner* conditioner_;
+  std::map<ExchangeNode::Ptr, double> n_qty_;
 };
 
 } // namespace cyclus
