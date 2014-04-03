@@ -551,13 +551,10 @@ class StateAccumulator(object):
         class whose scope we are in, but may be any class whatsoever. Returns 
         None if the class could not be canonized.
         """
-        #if cls == 'cyc::Facility':
-        #    import pdb; pdb.set_trace()
         if cls in self.superclasses:
             return cls
         cls = cls.strip("::")
         scope = [ns for d, ns in self.namespaces] + [c for d, c in self.classes]
-                #[c for d, c in self.classes[:-1]]
         # see if the class in in scope somehow
         for i in range(1, len(scope) + 1)[::-1]:
             trycls = "::".join(scope[:i]) + "::" + cls
