@@ -12,9 +12,6 @@
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(MatQueryTests, MassAndMoles) { 
-  cyclus::Recorder rec;
-  cyclus::Timer ti;
-  cyclus::Context ctx(&ti, &rec);
   cyclus::CompMap v;
   cyclus::Env::SetNucDataPath();
 
@@ -38,9 +35,6 @@ TEST(MatQueryTests, MassAndMoles) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 TEST(MatQueryTests, AlmostEq) { 
-  cyclus::Recorder rec;
-  cyclus::Timer ti;
-  cyclus::Context ctx(&ti, &rec);
   cyclus::CompMap v;
   cyclus::Composition::Ptr c;
 
@@ -68,5 +62,38 @@ TEST(MatQueryTests, AlmostEq) {
   cyclus::Material::Ptr m5 = cyclus::Material::CreateUntracked(4.0, c);
   EXPECT_FALSE(mq.AlmostEq(m5, cyclus::eps_rsrc()));
   EXPECT_TRUE(mq.AlmostEq(m5, 4.0 * cyclus::eps_rsrc()));
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TEST(MatQueryTests, Amount) { 
+  cyclus::Env::SetNucDataPath();
+
+  cyclus::CompMap v;
+  cyclus::CompMap v2;
+  cyclus::CompMap v3;
+  cyclus::CompMap v4;
+  cyclus::CompMap v5;
+
+  double qty = 4;
+  v[922350000] = 1.5;
+  v[10070000] = 2.5;
+  v2[922350000] = 1;
+  v3[10070000] = 1;
+  v4[922350000] = 1;
+  v4[10070000] = 10;
+  v5[942490000] = 1;
+
+  cyclus::Composition::Ptr c = cyclus::Composition::CreateFromMass(v);
+  cyclus::Composition::Ptr c2 = cyclus::Composition::CreateFromMass(v2);
+  cyclus::Composition::Ptr c3 = cyclus::Composition::CreateFromMass(v3);
+  cyclus::Composition::Ptr c4 = cyclus::Composition::CreateFromMass(v4);
+  cyclus::Composition::Ptr c5 = cyclus::Composition::CreateFromMass(v5);
+  cyclus::Material::Ptr m = cyclus::Material::CreateUntracked(qty, c);
+  cyclus::MatQuery mq(m);
+
+  EXPECT_DOUBLE_EQ(1.5, mq.Amount(c2));
+  EXPECT_DOUBLE_EQ(2.5, mq.Amount(c3));
+  EXPECT_DOUBLE_EQ(2.75, mq.Amount(c4));
+  EXPECT_DOUBLE_EQ(0, mq.Amount(c5));
 }
 
