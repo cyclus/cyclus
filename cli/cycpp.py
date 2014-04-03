@@ -45,7 +45,7 @@ from __future__ import print_function
 import os
 import re
 import sys
-from collections import Sequence, MutableMapping
+from collections import Sequence, MutableMapping, OrderedDict
 from itertools import takewhile
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
@@ -336,7 +336,7 @@ class VarDecorationFilter(Filter):
             clspaths = cls.split('::')
             self._add_gbl_proxies(glb, clspaths, val)
             self._add_lcl_proxies(glb, clspaths, classpaths)
-        state.var_annotations = eval(raw, glb, context.get(classname, {}))
+        state.var_annotations = eval(raw, glb, context.get(classname, OrderedDict()))
 
     def _add_gbl_proxies(self, glb, path, val):
         """Proxies for global C++ scope."""
@@ -377,7 +377,7 @@ class VarDeclarationFilter(Filter):
         vtype, vname = self.match.groups()
         access = state.access[tuple(state.classes)]
         if classname not in state.context:
-            state.context[classname] = {}
+            state.context[classname] = OrderedDict()
         annotations['type'] = state.canonize_type(vtype, vname)
         state.context[classname][vname] = annotations
         state.var_annotations = None
@@ -599,7 +599,7 @@ class CodeGeneratorFilter(Filter):
         self.local_classname = cg.classname()
 
         # compute def line
-        ctx = context[classname] = context.get(classname, {})
+        ctx = context[classname] = context.get(classname, OrderedDict())
         in_class_decl = self.in_class_decl() 
         #ns = "" if in_class_decl else classname.split('::')[-1] + "::"
         ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
