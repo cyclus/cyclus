@@ -303,6 +303,15 @@ void Case3e::Construct(ExchangeGraph* g, bool exclusive_orders) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Case3e::Test(std::string solver_type, ExchangeGraph* g) {
+  ASSERT_TRUE(g->matches().size() > 0);
+  ASSERT_TRUE(g->arcs().size() > 1);
+  std::vector<Match> vexp;
+  vexp.push_back(Match(g->arcs().at(1), f2));
+  EXPECT_EQ(vexp, g->matches());
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case3f::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 3;

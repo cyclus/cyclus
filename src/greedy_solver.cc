@@ -47,6 +47,7 @@ void GreedySolver::Solve() {
                 std::bind1st(
                     std::mem_fun(&GreedySolver::GreedilySatisfySet_),
                     this));
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -116,7 +117,7 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
     
     ++req_it;
   } // while( (match =< target) && (req_it != nodes.end()) )
-  
+
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

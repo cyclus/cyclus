@@ -199,7 +199,10 @@ class Case3d: public Case3 {
 class Case3e: public Case3 {
  public:
   virtual ~Case3e() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
+
+  /// overrides case3 Test
+  virtual void Test(std::string solver_type, ExchangeGraph* g);   
 };
 
 /// Case3f:
