@@ -64,9 +64,6 @@ TEST(ExGraphTests, ExchangeNodeCaps1) {
   s.AddExchangeNode(n);
 
   EXPECT_DOUBLE_EQ(scap, Capacity(n, a));  
-  double qty = 1.0;
-  UpdateCapacity(n, a, qty);
-  EXPECT_DOUBLE_EQ(scap - qty, Capacity(n, a));  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,11 +95,6 @@ TEST(ExGraphTests, ExchangeNodeCaps2) {
   s.AddExchangeNode(n);
   double min_exp = cap / ucap;
   EXPECT_EQ(min_exp, Capacity(n, a));
-
-  UpdateCapacity(n, a, qty);
-  EXPECT_EQ(exp, s.capacities());
-  min_exp = (cap - qty * ucap) / ucap;
-  EXPECT_DOUBLE_EQ(min_exp, Capacity(n, a));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -112,7 +104,7 @@ TEST(ExGraphTests, ExchangeNodeCaps3) {
 
   ExchangeNode::Ptr m(new ExchangeNode());
   ExchangeNode::Ptr n(new ExchangeNode(0.5));
-  EXPECT_EQ(n->max_qty, 0.5);
+  EXPECT_EQ(n->qty, 0.5);
   
   Arc a(m, n);
   n->unit_capacities[a].push_back(ncap);
@@ -123,53 +115,6 @@ TEST(ExGraphTests, ExchangeNodeCaps3) {
   s.AddExchangeNode(n);
 
   EXPECT_DOUBLE_EQ(qty, Capacity(n, a));  
-  UpdateCapacity(n, a, qty);
-  EXPECT_EQ(n->qty, 0.5);
-  EXPECT_DOUBLE_EQ(0, Capacity(n, a));  
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, ExchangeNodeUpdateThrow1) {
-  ExchangeNode::Ptr m(new ExchangeNode());
-  ExchangeNode::Ptr n(new ExchangeNode());
-  Arc a(m, n);
-
-  double qty = 5;
-  EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::StateError);  
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, ExchangeNodeUpdateThrow2) {
-  double qty = 10;
-  double unit = 2;
-  double min_diff = cyclus::eps() * (1 + cyclus::eps());
-  double cap = qty * unit - min_diff;
-  ASSERT_TRUE(cyclus::IsNegative(cap - qty * unit));
-  
-  ExchangeNode::Ptr m(new ExchangeNode());
-  ExchangeNode::Ptr n(new ExchangeNode());
-  Arc a(m, n);
-  n->unit_capacities[a].push_back(unit);
-
-  ExchangeNodeGroup s;
-  s.AddCapacity(cap);
-  s.AddExchangeNode(n);
-  
-  // EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExGraphTests, ExchangeNodeUpdateThrow3) {
-  double qty = 5;
-  
-  ExchangeNode::Ptr m(new ExchangeNode());
-  ExchangeNode::Ptr n(new ExchangeNode(qty - 1));
-  Arc a(m, n);
-
-  ExchangeNodeGroup s;
-  s.AddExchangeNode(n);
-
-  EXPECT_THROW(UpdateCapacity(n, a, qty), cyclus::ValueError);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -197,12 +142,6 @@ TEST(ExGraphTests, ArcCap) {
   
   
   EXPECT_DOUBLE_EQ(Capacity(a), 1.0);
-
-  UpdateCapacity(u, a, uval);
-  EXPECT_DOUBLE_EQ(Capacity(a), 0.5);  
-
-  UpdateCapacity(v, a, 1.0);
-  EXPECT_DOUBLE_EQ(Capacity(a), 0.0);  
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

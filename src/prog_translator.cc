@@ -119,7 +119,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       if (request) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
-        double col_ub = std::min(nodes[i]->max_qty, inf);
+        double col_ub = std::min(nodes[i]->qty, inf);
         double obj_coeff = a.exclusive() ? a.excl_val() / pref  : 1 / pref;
         if (max_obj_coeff_ < obj_coeff) {
           max_obj_coeff_ = obj_coeff;

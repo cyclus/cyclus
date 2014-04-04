@@ -72,18 +72,11 @@ class ExchangeTranslator {
             ex_ctx_->trader_prefs.at(req->requester())[req][bid];
         a.unode()->prefs[a] = pref; // request node is a.unode()
         int n_prefs = a.unode()->prefs.size();
-        a.unode()->avg_pref = (
-            (n_prefs == 0) ?
-            pref :
-            ((n_prefs - 1) * a.unode()->avg_pref + pref)/ n_prefs);
-        // @MJGFlag this^ would be easier if ExchangeNode was a class,
-        // need to make an issue
         
         CLOG(LEV_DEBUG5) << "Updating preference for one of "
                          << req->requester()->manager()->prototype()
                          << "'s trade nodes:";
         CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-        CLOG(LEV_DEBUG5) << " average pref: " << a.unode()->avg_pref;
             
         graph->AddArc(a);
       }
