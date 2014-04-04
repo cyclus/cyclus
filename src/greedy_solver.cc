@@ -68,7 +68,7 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
   ExchangeNode::Ptr u, v;
   std::vector<Arc>::const_iterator arc_it;
   std::vector<Arc> sorted;
-  double remain, tomatch, node_max, excl_val;
+  double remain, tomatch, excl_val;
   
   CLOG(LEV_DEBUG1) << "Greedy Solving for " << target
                    << " amount of a resource.";
@@ -90,9 +90,7 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
         v = a.vnode();
         
         // capacity adjustment
-        node_max = std::min(Capacity(u, a, n_qty_[u]),
-                            Capacity(v, a, n_qty_[v]));
-        tomatch = std::min(remain, node_max);
+        tomatch = std::min(remain, Capacity(a, n_qty_[u], n_qty_[v]));
 
         // exclusivity adjustment
         if (arc_it->exclusive()) {
