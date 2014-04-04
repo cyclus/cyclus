@@ -20,6 +20,12 @@ inline double SumPref(double total, std::pair<Arc, double> pref) {
   return total += pref.second;
 };
 
+inline double AvgPref(ExchangeNode::Ptr n) {
+  std::map<Arc, double>& prefs = n->prefs;
+  return std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) /
+      prefs.size();
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
   avg_prefs_.clear();
@@ -34,10 +40,7 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
 
     // get avg prefs
     for (int i = 0; i != nodes.size(); i++) {
-      std::map<Arc, double>& prefs = nodes[i]->prefs;
-      avg_prefs_[nodes[i]] = 
-          std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) /
-          nodes.size();
+      avg_prefs_[nodes[i]] = AvgPref(nodes[i]);
     }
     
     // sort nodes by weight

@@ -24,22 +24,25 @@ double GroupWeight(RequestGroup::Ptr g,
 /// by ordering the RequestGroups and ExchangeNodes within each RequestGroup
 /// weighted by their commodity's importance. The Graph is conditioned in-place.
 ///
-/// @section weighting Weighting
-/// Weights are provided to the conditioner via its constructor. A larger weight
-/// implies a higher level of importance for solving. First, the ExchangeNodes
-/// of each RequestGroup are sorted according to their weights. Then, the
-/// average weight of each RequestGroup is determined. Finally, each
-/// RequestGroup is sorted according to their average weight.
+/// @section weighting Weighting Weights are provided to the conditioner via its
+/// constructor. A larger weight implies a higher level of importance for
+/// solving. First, the ExchangeNodes of each RequestGroup are sorted according
+/// to their weights. Node weights are determined by Commodity weights and
+/// average preference. Then, the average weight of each RequestGroup is
+/// determined. Finally, each RequestGroup is sorted according to their average
+/// weight.
 ///
 /// @section example Example
 /// Consider the following commodity-to-weight mapping: {"spam": 5, "eggs": 2}.
 /// Now consider two RequestGroups with the following commodities:
 ///   #. g1 = {"eggs", "spam", "eggs"}
 ///   #. g2 = {"eggs", "spam"}
+/// And the following preference-commodity  mapping:
+/// {g1: {"spam": 0.75, "eggs": 0.25}, g2: {"spam": 1, "eggs": 1}.
 ///
 /// First, the groups will be ordered and averaged weights will be determined:
-///   #. g1 = {"spam", "eggs", "eggs"}, weight = 9/3
-///   #. g2 = {"spam", "eggs"}, weight = 7/2
+///   #. g1 = {"spam", "eggs", "eggs"}, weight with prefs = 9/3 * 4/3 = 4
+///   #. g2 = {"spam", "eggs"}, weight with prefs = 7/2 * 3/2 = 5.25
 ///
 /// Finally, the groups themselves will be ordered by average weight:
 ///   #. {g2, g1}
