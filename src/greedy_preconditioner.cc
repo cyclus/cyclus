@@ -20,7 +20,7 @@ inline double SumPref(double total, std::pair<Arc, double> pref) {
   return total += pref.second;
 };
 
-inline double AvgPref(ExchangeNode::Ptr n) {
+double AvgPref(ExchangeNode::Ptr n) {
   std::map<Arc, double>& prefs = n->prefs;
   return std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) /
       prefs.size();
@@ -112,11 +112,13 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
 double GroupWeight(RequestGroup::Ptr g,
                    std::map<std::string, double>* weights,
                    std::map<ExchangeNode::Ptr, double>* avg_prefs) {
-  const std::vector<ExchangeNode::Ptr>& nodes = g->nodes();
+  std::vector<ExchangeNode::Ptr>& nodes = g->nodes();
   double sum = 0;
-  std::vector<ExchangeNode::Ptr>::const_iterator it;
-  for (it = nodes.begin(); it != nodes.end(); ++it) {
-    sum += NodeWeight(*it, weights, (*avg_prefs)[*it]);
+
+  ExchangeNode::Ptr n;
+  for (int i = 0; i != nodes.size(); i++) {
+    n = nodes[i];
+    sum += NodeWeight(n, weights, (*avg_prefs)[n]);
   }
   return sum / nodes.size();
 }

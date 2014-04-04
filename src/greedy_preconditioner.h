@@ -18,6 +18,9 @@ double GroupWeight(RequestGroup::Ptr g,
                    std::map<std::string, double>* weights,
                    std::map<ExchangeNode::Ptr, double>* avg_prefs);
 
+/// @returns the average preference across arcs for a node
+double AvgPref(ExchangeNode::Ptr n);
+  
 /// @class GreedyPreconditioner
 ///
 /// @brief A GreedyPreconditioner conditions an ExchangeGraph for a GreedySolver
