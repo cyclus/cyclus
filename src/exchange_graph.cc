@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cassert>
 
 #include "cyc_limits.h"
 #include "error.h"
@@ -105,12 +104,10 @@ double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
   std::vector<double> caps;
   double grp_cap, u_cap, cap;
 
-  assert(unit_caps.size() == group_caps.size());
   for (int i = 0; i < unit_caps.size(); i++) {
     grp_cap = group_caps[i];
     u_cap = unit_caps[i];
     cap = grp_cap / u_cap;
-    assert(cap >= 0);
     CLOG(cyclus::LEV_DEBUG1) << "Capacity for node: ";
     CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << grp_cap;
     CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << u_cap;

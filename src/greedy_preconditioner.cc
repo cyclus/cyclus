@@ -15,7 +15,6 @@ namespace l = boost::lambda;
 
 namespace cyclus {
 
-/// @brief accumulator sum for node prefs
 inline double SumPref(double total, std::pair<Arc, double> pref) {
   return total += pref.second;
 };
@@ -99,13 +98,6 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
                     << " is " << it->second;
   }
   
-  // @MJGFlag not sure if this is needed..
-  // std::map<std::string, double>::iterator it;
-  // for (it = commod_weights_.begin();
-  //      it != commod_weights_.end();
-  //      ++it) {
-  //   it->second /= min; // normalize to 1
-  // }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

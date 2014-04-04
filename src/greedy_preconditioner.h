@@ -27,11 +27,13 @@ double AvgPref(ExchangeNode::Ptr n);
 /// by ordering the RequestGroups and ExchangeNodes within each RequestGroup
 /// weighted by their commodity's importance. The Graph is conditioned in-place.
 ///
-/// @section weighting Weighting Weights are provided to the conditioner via its
-/// constructor. A larger weight implies a higher level of importance for
-/// solving. First, the ExchangeNodes of each RequestGroup are sorted according
-/// to their weights. Node weights are determined by Commodity weights and
-/// average preference. Then, the average weight of each RequestGroup is
+/// @section weighting Weighting
+/// Commodity weights are provided to the conditioner via its constructor. A
+/// larger weight implies a higher level of importance for solving. Conditioning
+/// weight for each node is then determined by the product of the node's
+/// commodity and a measure of the average preferences for arcs coming into the
+/// node.  First, the ExchangeNodes of each RequestGroup are sorted according to
+/// their conditioning weights. Then, the average weight of each RequestGroup is
 /// determined. Finally, each RequestGroup is sorted according to their average
 /// weight.
 ///
@@ -43,11 +45,9 @@ double AvgPref(ExchangeNode::Ptr n);
 /// And the following preference-commodity  mapping:
 /// {g1: {"spam": 3/4, "eggs": 1/4}, g2: {"spam": 1, "eggs": 1}.
 ///
-/// First, the groups will be ordered and averaged weights will be determined:
-///   #. g1 = {"spam", "eggs", "eggs"}, avg pref = 5/12
-///      weight with prefs = 9/3 * (1 + 5/12/(1 + 5/12)) = 3.88
-///   #. g2 = {"spam", "eggs"}, avg pref = 2/2
-///      weight with prefs = 7/2 * (1 + 2/2/(1 + 2/2)) = 5.25
+/// First, the groups will be ordered by conditioning weights:
+///   #. g1 = {"spam", "eggs", "eggs"}
+///   #. g2 = {"spam", "eggs"}
 ///
 /// Finally, the groups themselves will be ordered by average weight:
 ///   #. {g2, g1}
