@@ -78,7 +78,7 @@ void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(const Arc& a, double u_curr_qty = 0, double v_curr_qty = 0) {
+double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
   double ucap = Capacity(a.unode(), a, u_curr_qty);
   double vcap = Capacity(a.vnode(), a, v_curr_qty);
 
@@ -91,8 +91,7 @@ double Capacity(const Arc& a, double u_curr_qty = 0, double v_curr_qty = 0) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(ExchangeNode::Ptr n, const Arc& a,
-                double curr_qty) {
+double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
   if (n->group == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
