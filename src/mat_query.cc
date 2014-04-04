@@ -37,4 +37,38 @@ bool MatQuery::AlmostEq(Material::Ptr other, double threshold) {
   compmath::Normalize(&n2);
   return compmath::AlmostEq(n1, n2, threshold);
 };
+
+double MatQuery::Amount(Composition::Ptr c) {
+  CompMap m = m_->comp()->mass();
+  CompMap m_other = c->mass();
+
+  compmath::Normalize(&m);
+  compmath::Normalize(&m_other);
+
+  Nuc limiter;
+  double min_ratio = 1e300;
+  CompMap::iterator it;
+  for (it = m_other.begin(); it != m_other.end(); ++it) {
+    Nuc nuc = it->first;
+    double qty_other = it->second;
+    if (m.count(nuc) == 0 && qty_other > 0) {
+      return 0;
+    }
+    double qty = m[nuc];
+
+    double ratio = qty / qty_other;
+    if (ratio < min_ratio) {
+      min_ratio = ratio;
+      limiter = nuc;
+    }
+  }
+
+  double mult = min_ratio * qty();
+  compmath::Normalize(&m_other, mult);
+  double sum = 0;
+  for (it = m_other.begin(); it != m_other.end(); ++it) {
+    sum += it->second;
+  }
+  return sum;
+}
 } // namespace cyclus

@@ -59,20 +59,27 @@ void XMLFlatLoader::LoadInitialAgents() {
 
     Agent* agent = DynamicModule::Make(ctx_, module_name);
     agent->set_agent_impl(module_name);
+
+    // call manually without agent impl injected to keep all Agent state in a
+    // single, consolidated db table
+    agent->Agent::InfileToDb(qe, DbInit(agent, true));
+
     agent->InfileToDb(qe, DbInit(agent));
     rec_->Flush();
+
     std::vector<Cond> conds;
     conds.push_back(Cond("SimId", "==", rec_->sim_id()));
     conds.push_back(Cond("AgentId", "==", agent->id()));
+    conds.push_back(Cond("SimTime", "==", static_cast<int>(0)));
     CondInjector ci(b_, conds);
-    PrefixInjector pi(&ci, "AgentState" + module_name);
+    PrefixInjector pi(&ci, "AgentState");
+
+    // call manually without agent impl injected
+    agent->Agent::InitFrom(&pi);
+
+    pi = PrefixInjector(&ci, "AgentState" + module_name);
     agent->InitFrom(&pi);
     ctx_->AddPrototype(prototype, agent);
-    ctx_->NewDatum("Prototypes")
-      ->AddVal("Prototype", prototype)
-      ->AddVal("AgentId", agent->id())
-      ->AddVal("Implementation", module_name)
-      ->Record();
   }
 
   // retrieve agent hierarchy and initial inventories

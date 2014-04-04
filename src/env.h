@@ -5,6 +5,7 @@
 #include <string>
 #include "boost/filesystem.hpp"
 
+#include "error.h"
 #include "pyne.h"
 
 namespace cyclus {
@@ -92,12 +93,21 @@ class Env {
 
   /// Initializes the path to the nuclear data library to a default location
   inline static const void SetNucDataPath() {
+    pyne::NUC_DATA_PATH = Env::GetInstallPath() + "/share/cyclus_nuc_data.h5";
+    if (boost::filesystem::exists(pyne::NUC_DATA_PATH))
+      return;
     pyne::NUC_DATA_PATH = Env::GetBuildPath() + "/share/cyclus_nuc_data.h5";
+    if (boost::filesystem::exists(pyne::NUC_DATA_PATH))
+      return;
+    throw IOError("cyclus_nuc_data.h5 not found in " + Env::GetInstallPath() +
+                  "/share or" + Env::GetBuildPath() + "/share.");
   }
 
   /// Initializes the path to the nuclear data library to p
   inline static const void SetNucDataPath(std::string p) {
     pyne::NUC_DATA_PATH = p;
+    if (!boost::filesystem::exists(p))
+      throw IOError("cyclus_nuc_data.h5 not found at " + p);
   }
 
  private:

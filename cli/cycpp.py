@@ -45,11 +45,11 @@ from __future__ import print_function
 import os
 import re
 import sys
-from collections import Sequence, MutableMapping
+from collections import Sequence, MutableMapping, OrderedDict
 from itertools import takewhile
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from pprint import pprint
+from pprint import pprint, pformat
 
 if sys.version_info[0] == 2:
     STRING_TYPES = (str, unicode, basestring)
@@ -220,7 +220,7 @@ class UsingFilter(AliasFilter):
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
     # handles anonymous namespaces as group(1) == None
-    regex = re.compile("\s*namespace(\s+\w*)?\s*$", re.DOTALL)
+    regex = re.compile("\s*namespace(\s+\w*)?\s*[^=]*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -268,31 +268,13 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile("\s*class\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
+    regex = re.compile("(?:\s*template\s*<[\s\w,]*>)?"
+                       "\s*(?:class|struct)\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
         name = self.match.group(1)
         state.classes.append((state.depth, name))
-        classname = state.classname()
-        superclasses = self.match.group(2)
-        state.superclasses[classname] = sc = state.superclasses.get(classname, 
-                                                                    set())
-        if superclasses is not None:
-            superclasses = [s.strip().split()[-1] for s in superclasses.split(',')]
-            for sup in superclasses:
-                if sup not in state.superclasses:
-                    scope = [ns for d, ns in state.namespaces] + \
-                            [c for d, c in state.classes[:-1]]
-                    for i in range(1, len(scope) + 1)[::-1]:
-                        trysup = "::".join(scope[:i]) + "::" + sup
-                        if trysup in state.superclasses:
-                            sup = trysup
-                            break
-                    else:
-                        msg = "Super class {0} not found for {1}"
-                        TypeError(msg.format(sup, classname))
-                sc.add(sup)
         state.access[tuple(state.classes)] = "private"
 
     def revert(self, statement, sep):
@@ -303,6 +285,26 @@ class ClassFilter(Filter):
         if state.depth == state.classes[-1][0]:
             del state.access[tuple(state.classes)]
             del state.classes[-1]
+
+class ClassAndSuperclassFilter(ClassFilter):
+    """This accumulates superclass information as well as class information."""
+
+    def transform(self, statement, sep):
+        super(ClassAndSuperclassFilter, self).transform(statement, sep)
+        state = self.machine
+        classname = state.classname()
+        superclasses = self.match.group(2)
+        state.superclasses[classname] = sc = state.superclasses.get(classname,
+                                                                    set())
+        if superclasses is not None:
+            superclasses = [s.strip().split()[-1] for s in superclasses.split(',')]
+            for sup in superclasses:
+                trysup = state.canonize_class(sup)
+                if trysup is None:
+                    # We cannot raise an error here becuase there are too many 
+                    # corner cases we do not and should not support in C++
+                    continue
+                sc.add(trysup)
 
 class AccessFilter(Filter):
     """Filter for setting the current access control flag."""
@@ -336,7 +338,7 @@ class VarDecorationFilter(Filter):
             clspaths = cls.split('::')
             self._add_gbl_proxies(glb, clspaths, val)
             self._add_lcl_proxies(glb, clspaths, classpaths)
-        state.var_annotations = eval(raw, glb, context.get(classname, {}))
+        state.var_annotations = eval(raw, glb, context.get(classname, OrderedDict()))
 
     def _add_gbl_proxies(self, glb, path, val):
         """Proxies for global C++ scope."""
@@ -377,7 +379,7 @@ class VarDeclarationFilter(Filter):
         vtype, vname = self.match.groups()
         access = state.access[tuple(state.classes)]
         if classname not in state.context:
-            state.context[classname] = {}
+            state.context[classname] = OrderedDict()
         annotations['type'] = state.canonize_type(vtype, vname)
         state.context[classname][vname] = annotations
         state.var_annotations = None
@@ -425,10 +427,10 @@ class StateAccumulator(object):
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.var_annotations = None
         self.linemarkers = []
-        self.filters = [ClassFilter(self), AccessFilter(self), ExecFilter(self),
-                        NamespaceFilter(self), UsingNamespaceFilter(self),
-                        NamespaceAliasFilter(self), TypedefFilter(self),
-                        UsingFilter(self), LinemarkerFilter(self),
+        self.filters = [ClassAndSuperclassFilter(self), AccessFilter(self), 
+                        ExecFilter(self), UsingNamespaceFilter(self), 
+                        NamespaceAliasFilter(self), NamespaceFilter(self), 
+                        TypedefFilter(self), UsingFilter(self), LinemarkerFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
     def classname(self):
@@ -465,7 +467,8 @@ class StateAccumulator(object):
     #
     # type system
     #
-    known_primitives = {'std::string', 'float', 'double', 'int'}
+    supported_types = PRIMITIVES
+    supported_types |= BUFFERS
     known_templates = {
         'std::set': ('T',),
         'std::map': ('Key', 'T'),
@@ -513,7 +516,7 @@ class StateAccumulator(object):
         else:
             # primitive type
             t = " ".join(t.strip().strip(scopz).split())
-            if t in self.known_primitives:
+            if t in self.supported_types:
                 return t
             # grab aliases of t
             taliases = [x for x in self.aliases if x[2] == t]
@@ -534,7 +537,7 @@ class StateAccumulator(object):
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
                        "primitive type: {p}.").format(
                     i=self.includeloc(), t=t, n=name, c=self.classname(), 
-                    p=", ".join(sorted(self.known_primitives)))
+                    p=", ".join(sorted(self.supported_types)))
                 raise TypeError(msg)
         return t
 
@@ -542,6 +545,33 @@ class StateAccumulator(object):
         newt = [newtname]
         newt += [self.canonize_type(targ) for targ in targs]
         return tuple(newt)
+
+    def canonize_class(self, cls, _usens=True):
+        """This canonizes a classname.  The class name need not be the current 
+        class whose scope we are in, but may be any class whatsoever. Returns 
+        None if the class could not be canonized.
+        """
+        if cls in self.superclasses:
+            return cls
+        cls = cls.strip("::")
+        scope = [ns for d, ns in self.namespaces] + [c for d, c in self.classes]
+        # see if the class in in scope somehow
+        for i in range(1, len(scope) + 1)[::-1]:
+            trycls = "::".join(scope[:i]) + "::" + cls
+            if trycls in self.superclasses:
+                return trycls
+        # see if there are usings that modify the scope
+        if _usens:
+            for d, ns in self.using_namespaces:
+                trycls = self.canonize_class(ns + '::' + cls, _usens=False)
+                if trycls is not None:
+                    return trycls
+        # see if there is an alias that applies
+        for d, name, alias in sorted(self.aliases, key=len, reverse=True):
+            if cls.startswith(alias):
+                trycls = self.canonize_class(cls.replace(alias, name, 1))
+                if trycls in self.superclasses:
+                    return trycls
 
 def accumulate_state(canon):
     """Takes a canonical C++ source file and separates it out into statements
@@ -582,10 +612,11 @@ class CodeGeneratorFilter(Filter):
     def transform(self, statement, sep):
         # basic setup
         cg = self.machine
-        mode = (self.match.group(1) or '').strip()
+        groups = self.match.groups()
+        mode = (groups[0] or '').strip()
         if len(mode) == 0:
             mode = "def"
-        classname = self.match.group(2) if self.match.lastindex > 1 else None
+        classname = groups[1] if len(groups) > 1 else None
         if classname is None:
             if len(cg.classes) == 0:
                 TypeError("{0}Classname could not determined".format(
@@ -597,7 +628,7 @@ class CodeGeneratorFilter(Filter):
         self.local_classname = cg.classname()
 
         # compute def line
-        ctx = context[classname] = context.get(classname, {})
+        ctx = context[classname] = context.get(classname, OrderedDict())
         in_class_decl = self.in_class_decl() 
         #ns = "" if in_class_decl else classname.split('::')[-1] + "::"
         ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
@@ -675,9 +706,18 @@ class InitFromCopyFilter(CodeGeneratorFilter):
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
+            
+        cap_buffs = []
 
-        for member in ctx.keys():
-            impl += ind + "{0} = m->{0};\n".format(member)
+        for member, info in ctx.items():
+            if info['type'] not in BUFFERS:
+                impl += ind + "{0} = m->{0};\n".format(member)
+            elif 'capacity' in info:
+                cap_buffs.append((member,))
+
+        for b in cap_buffs:
+            impl += ind + "{0}.set_capacity(m->{0}.capacity());\n".format(b[0])
+
         return impl
 
 class InitFromDbFilter(CodeGeneratorFilter):
@@ -705,8 +745,14 @@ class InitFromDbFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
 
+        cap_buffs = []
+            
         for member, info in ctx.items():
             t = info['type']
+            if t in BUFFERS:
+                if 'capacity' in info:
+                    cap_buffs.append((member, info['capacity']))
+                continue
             if t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
@@ -744,6 +790,9 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 impl += ind + "{0}.second = qr.GetVal<{1}>(\"{0}B\");\n".format(member, t[2])
             else:
                 impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(member, t)
+
+        for b in cap_buffs:
+            impl += ind + "{0}.set_capacity(qr.GetVal<double>(\"{1}\"));\n".format(b[0], b[1])
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
@@ -774,7 +823,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
         for member, info in ctx.items():
             t = info['type']
+            if t in BUFFERS:
+                continue
             d = info['default'] if 'default' in info else None
+            code = info['derived_init'] if 'derived_init' in info else None
             if t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
                 if t[0] == 'std::map':
                     table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
@@ -822,17 +874,21 @@ class InfileToDbFilter(CodeGeneratorFilter):
                             impl += ind + '->Record();\n'
 
                 ind = ind[:-2]
-                impl += ind + '}\n'
+                impl += ind + '}\n'            
             elif t in PRIMITIVES:
-                pods.append((member, t, d))
+                pods.append((member, t, d, code))
             elif t[0] == 'std::pair':
-                pods.append((member, t, d))
+                pods.append((member, t, d, code))
             else:
                 raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
 
+        head = ""  # from input to var
+        body = ""  # derive vars
+        tail = ""  # from far to db
+
         # handle pod in a single datum/table
-        impl += ind + 'di.NewDatum("Info")\n'
-        for (member, t, d) in pods:
+        tail += ind + 'di.NewDatum("Info")\n'
+        for (member, t, d, code) in pods:
             methname = "Query" if d is None else "OptionalQuery"
             opt = ''
             if t[0] == 'std::pair':
@@ -840,14 +896,25 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 if d is not None:
                     opt = ', ' + d[0]
                     opt2 = ', ' + d[1]
-                impl += ind + '->AddVal("{0}A", {1}::{2}<{3}>(tree, "{0}/first"{4}))\n'.format(member, CYCNS, methname, t[1], opt)
-                impl += ind + '->AddVal("{0}B", {1}::{2}<{3}>(tree, "{0}/second"{4}))\n'.format(member, CYCNS, methname, t[2], opt2)
+                if code is None:
+                    head += ind + ("{0}A = {1}::{2}<{3}>(tree, \"{0}/first\"{4});\n").format(member, CYCNS, methname, t[1], opt)
+                    head += ind + ("{0}B = {1}::{2}<{3}>(tree, \"{0}/second\"{4});\n").format(member, CYCNS, methname, t[2], opt)
+                    tail += ind + ("->AddVal(\"{0}A\", {0}A)\n\"").format(member)
+                    tail += ind + ("->AddVal(\"{0}B\", {0}B)\n\"").format(member)
+                else:
+                    tail += ind + ("->AddVal(\"{0}A\", {0}.first)\n\"").format(member)
+                    tail += ind + ("->AddVal(\"{0}B\", {0}.second)\n\"").format(member)
             else:
                 if d is not None:
                     opt = ', "' + str(d) + '"' if t == "std::string" else ', ' + str(d) 
-                impl += ind + '->AddVal("{0}", {1}::{2}<{3}>(tree, "{0}"{4}))\n'.format(member, CYCNS, methname, t, opt)
-        impl += ind + '->Record();\n'
+                if code is None:
+                    head += ind + ("{0} = {1}::{2}<{3}>(tree, \"{0}\"{4});\n").format(member, CYCNS, methname, t, opt)
+                tail += ind + ("->AddVal(\"{0}\", {0})\n").format(member)
+            if code is not None:
+                body += ind + code + '\n'
 
+        tail += ind + '->Record();\n'
+        impl += head + body + tail 
         return impl
 
 class SchemaFilter(CodeGeneratorFilter):
@@ -869,7 +936,13 @@ class SchemaFilter(CodeGeneratorFilter):
             return i + 'return "<text/>";\n'
 
         impl = i.up() + 'return ""\n'
+        impl += i +  '"<interleave>\\n"\n'
         for member, info in ctx.items():
+            t = info['type']
+            if t in BUFFERS: # buffer state, skip
+                continue
+            if 'derived_init' in info: # derived state, skip
+                continue
             opt = True if 'default' in info else False
             if opt:
                 impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
@@ -914,6 +987,7 @@ class SchemaFilter(CodeGeneratorFilter):
             if opt:
                 impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
         
+        impl += i +  '"</interleave>\\n"\n'
         impl += i + ";\n";
         return impl
 
@@ -936,6 +1010,8 @@ class SnapshotFilter(CodeGeneratorFilter):
         pod = {}
         for member, params in ctx.items():
             t = params["type"]
+            if t in BUFFERS:
+                continue
             if t[0] in ["std::vector", "std::list", "std::set"]:
                 suffix = t[1].replace("std::", "").title()
                 impl += ind + "{\n"
@@ -1028,7 +1104,7 @@ class InitInvFilter(CodeGeneratorFilter):
 
         impl = ""
         for buff in buffs:
-            impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(member)
+            impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(buff)
         return impl
 
 class DefaultPragmaFilter(Filter):
@@ -1097,6 +1173,7 @@ class CodeGenerator(object):
         self.classes = []  # stack of (depth, class name) tuples, most nested is last
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
+        self.aliases = set()  # set of (depth, name, alias) tuples
         self.linemarkers = []
         # all basic code generating filters
         self.codegen_filters = [InitFromCopyFilter(self), 
@@ -1110,6 +1187,7 @@ class CodeGenerator(object):
                                 ] 
         self.filters = self.codegen_filters + [ClassFilter(self), 
                                                AccessFilter(self), 
+                                               NamespaceAliasFilter(self), 
                                                NamespaceFilter(self), 
                                                DefaultPragmaFilter(self),
                                                LinemarkerFilter(self)]
@@ -1349,7 +1427,8 @@ def main():
         with open(ns.path) as f:
             orig = f.read()
         orig = ensure_startswith_newlinehash(orig)
-    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)  # pass 3
+    # pass 3
+    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)
     if ns.output is None:
         print(newfile)
     else:

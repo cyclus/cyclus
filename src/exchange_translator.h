@@ -72,18 +72,11 @@ class ExchangeTranslator {
             ex_ctx_->trader_prefs.at(req->requester())[req][bid];
         a.unode()->prefs[a] = pref; // request node is a.unode()
         int n_prefs = a.unode()->prefs.size();
-        a.unode()->avg_pref = (
-            (n_prefs == 0) ?
-            pref :
-            ((n_prefs - 1) * a.unode()->avg_pref + pref)/ n_prefs);
-        // @MJGFlag this^ would be easier if ExchangeNode was a class,
-        // need to make an issue
         
         CLOG(LEV_DEBUG5) << "Updating preference for one of "
                          << req->requester()->manager()->prototype()
                          << "'s trade nodes:";
         CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-        CLOG(LEV_DEBUG5) << " average pref: " << a.unode()->avg_pref;
             
         graph->AddArc(a);
       }
@@ -227,8 +220,10 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
   typename RequestPortfolio<T>::Ptr rp = req->portfolio();
 
-  TranslateCapacities(offer, bp->constraints(), vnode, arc); // bid is v
-  TranslateCapacities(offer, rp->constraints(), unode, arc); // req is u
+  // bid is v
+  TranslateCapacities(offer, bp->constraints(), vnode, arc, translation_ctx);
+  // req is u
+  TranslateCapacities(offer, rp->constraints(), unode, arc, translation_ctx);
     
   return arc;
 }
@@ -254,12 +249,14 @@ void TranslateCapacities(
     typename T::Ptr offer,
     const typename std::set< CapacityConstraint<T> >& constr,
     ExchangeNode::Ptr n,
-    const Arc& a) {
+    const Arc& a,
+    const ExchangeTranslationContext<T>& ctx) {
   typename std::set< CapacityConstraint<T> >::const_iterator it;
   for (it = constr.begin(); it != constr.end(); ++it) {
     CLOG(cyclus::LEV_DEBUG1) << "Additing unit capacity: "
-                             << it->convert(offer) / offer->quantity();
-    n->unit_capacities[a].push_back(it->convert(offer) / offer->quantity());
+                             << it->convert(offer, &a, &ctx) / offer->quantity();
+    n->unit_capacities[a].push_back(it->convert(offer, &a, &ctx) / 
+                                    offer->quantity());
   }
 }
 

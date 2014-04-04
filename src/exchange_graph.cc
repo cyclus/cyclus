@@ -9,18 +9,16 @@
 namespace cyclus {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ExchangeNode::ExchangeNode(double max_qty, bool exclusive, std::string commod)
-  : max_qty(max_qty),
+ExchangeNode::ExchangeNode(double qty, bool exclusive, std::string commod)
+  : qty(qty),
     exclusive(exclusive),
     commod(commod),
-    qty(0),
-    avg_pref(0),
     group(NULL) {}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
   return (lhs.unit_capacities == rhs.unit_capacities &&
-          lhs.max_qty == rhs.max_qty &&
+          lhs.qty == rhs.qty &&
           lhs.exclusive == rhs.exclusive &&
           lhs.group == rhs.group &&
           lhs.commod == rhs.commod);
@@ -33,8 +31,8 @@ Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
       vnode_(vnode) {
   exclusive_ = unode->exclusive || vnode->exclusive;
   if (exclusive_) {
-    double fqty = unode->max_qty;
-    double sqty = vnode->max_qty;
+    double fqty = unode->qty;
+    double sqty = vnode->qty;
     if (unode->exclusive && vnode->exclusive) {
       excl_val_ = fqty == sqty ? fqty : 0;
     } else if (unode->exclusive) {
@@ -79,9 +77,9 @@ void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(const Arc& a) {
-  double ucap = Capacity(a.unode(), a);
-  double vcap = Capacity(a.vnode(), a);
+double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
+  double ucap = Capacity(a.unode(), a, u_curr_qty);
+  double vcap = Capacity(a.vnode(), a, v_curr_qty);
 
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
@@ -92,75 +90,39 @@ double Capacity(const Arc& a) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(ExchangeNode& n, const Arc& a) {
-  if (n.group == NULL) {
+double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
+  if (n->group == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
 
-  if (n.unit_capacities[a].size() == 0) {
+  if (n->unit_capacities[a].size() == 0) {
     return std::numeric_limits<double>::max();
   }
 
-  std::vector<double>& unit_caps = n.unit_capacities[a];
-  const std::vector<double>& group_caps = n.group->capacities();
+  std::vector<double>& unit_caps = n->unit_capacities[a];
+  const std::vector<double>& group_caps = n->group->capacities();
   std::vector<double> caps;
+  double grp_cap, u_cap, cap;
+
   for (int i = 0; i < unit_caps.size(); i++) {
+    grp_cap = group_caps[i];
+    u_cap = unit_caps[i];
+    cap = grp_cap / u_cap;
     CLOG(cyclus::LEV_DEBUG1) << "Capacity for node: ";
-    CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << group_caps[i];
-    CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << unit_caps[i];
-    CLOG(cyclus::LEV_DEBUG1) << "         capacity: "
-                             << group_caps[i] / unit_caps[i];
+    CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << grp_cap;
+    CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << u_cap;
+    CLOG(cyclus::LEV_DEBUG1) << "         capacity: " << cap;
     
     // special case for unlimited capacities
-    if (group_caps[i] == std::numeric_limits<double>::max()) {
+    if (grp_cap == std::numeric_limits<double>::max()) {
       caps.push_back(std::numeric_limits<double>::max());
     } else {
-      caps.push_back(group_caps[i] / unit_caps[i]);
+      caps.push_back(cap);
     }
   }
 
-  return std::min(*std::min_element(caps.begin(), caps.end()), n.max_qty - n.qty);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(ExchangeNode::Ptr pn, const Arc& a) {
-  return Capacity(*pn.get(), a);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void UpdateCapacity(ExchangeNode& n, const Arc& a, double qty) {
-  using std::vector;
-  using cyclus::IsNegative;
-  using cyclus::ValueError;
-
-  if (n.group == NULL) {
-    throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
-  }
-  
-  vector<double>& unit_caps = n.unit_capacities[a];
-  vector<double>& caps = n.group->capacities();
-  for (int i = 0; i < caps.size(); i++) {
-    double prev = caps[i];
-    // special case for unlimited capacities
-    CLOG(cyclus::LEV_DEBUG1) << "Updating capacity value from: "
-                             << prev;
-    caps[i] = (prev == std::numeric_limits<double>::max()) ?
-              std::numeric_limits<double>::max() :
-              prev - qty * unit_caps[i];
-    CLOG(cyclus::LEV_DEBUG1) << "                          to: "
-                             << caps[i];
-  }
-
-  if (IsNegative(n.max_qty - qty)) {
-    throw ValueError("ExchangeNode quantities can not be reduced below 0.");
-  }
-
-  n.qty += qty;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void UpdateCapacity(ExchangeNode::Ptr pn, const Arc& a, double qty) {
-  return UpdateCapacity(*pn.get(), a, qty);
+  return std::min(*std::min_element(caps.begin(), caps.end()),
+                  n->qty - curr_qty);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -188,8 +150,6 @@ void ExchangeGraph::AddArc(const Arc& a) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddMatch(const Arc& a, double qty) {
-  UpdateCapacity(a.unode(), a, qty);
-  UpdateCapacity(a.vnode(), a, qty);
   matches_.push_back(std::make_pair(a, qty));
 }
 

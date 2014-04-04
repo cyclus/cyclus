@@ -64,15 +64,13 @@ def install_cyclus(args):
                                 shell=(os.name == 'nt'))
 
     if args.test:
-        make_cmd = ['make', 'test']
-        rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
-                                    shell=(os.name == 'nt'))
-
-    if not args.build_only:
-        make_cmd = ['make', 'install']
-        rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
-                                    shell=(os.name == 'nt'))
-
+        make_cmd += ['test']
+    elif not args.build_only:
+        make_cmd += ['install']
+    
+    rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
+                                shell=(os.name == 'nt'))
+        
 def uninstall_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
     if not os.path.exists(args.build_dir) or not os.path.exists(makefile):

@@ -10,12 +10,17 @@ namespace cyclus {
 
 /// @returns the node's weight given the node and commodity weight
 double NodeWeight(ExchangeNode::Ptr n,
-                  std::map<std::string, double>* weights);
+                  std::map<std::string, double>* weights,
+                  double avg_pref);
 
 /// @returns average RequestGroup weight
 double GroupWeight(RequestGroup::Ptr g,
-                   std::map<std::string, double>* weights);
+                   std::map<std::string, double>* weights,
+                   std::map<ExchangeNode::Ptr, double>* avg_prefs);
 
+/// @returns the average preference across arcs for a node
+double AvgPref(ExchangeNode::Ptr n);
+  
 /// @class GreedyPreconditioner
 ///
 /// @brief A GreedyPreconditioner conditions an ExchangeGraph for a GreedySolver
@@ -23,21 +28,26 @@ double GroupWeight(RequestGroup::Ptr g,
 /// weighted by their commodity's importance. The Graph is conditioned in-place.
 ///
 /// @section weighting Weighting
-/// Weights are provided to the conditioner via its constructor. A larger weight
-/// implies a higher level of importance for solving. First, the ExchangeNodes
-/// of each RequestGroup are sorted according to their weights. Then, the
-/// average weight of each RequestGroup is determined. Finally, each
-/// RequestGroup is sorted according to their average weight.
+/// Commodity weights are provided to the conditioner via its constructor. A
+/// larger weight implies a higher level of importance for solving. Conditioning
+/// weight for each node is then determined by the product of the node's
+/// commodity and a measure of the average preferences for arcs coming into the
+/// node.  First, the ExchangeNodes of each RequestGroup are sorted according to
+/// their conditioning weights. Then, the average weight of each RequestGroup is
+/// determined. Finally, each RequestGroup is sorted according to their average
+/// weight.
 ///
 /// @section example Example
 /// Consider the following commodity-to-weight mapping: {"spam": 5, "eggs": 2}.
 /// Now consider two RequestGroups with the following commodities:
 ///   #. g1 = {"eggs", "spam", "eggs"}
 ///   #. g2 = {"eggs", "spam"}
+/// And the following preference-commodity  mapping:
+/// {g1: {"spam": 3/4, "eggs": 1/4}, g2: {"spam": 1, "eggs": 1}.
 ///
-/// First, the groups will be ordered and averaged weights will be determined:
-///   #. g1 = {"spam", "eggs", "eggs"}, weight = 9/3
-///   #. g2 = {"spam", "eggs"}, weight = 7/2
+/// First, the groups will be ordered by conditioning weights:
+///   #. g1 = {"spam", "eggs", "eggs"}
+///   #. g2 = {"spam", "eggs"}
 ///
 /// Finally, the groups themselves will be ordered by average weight:
 ///   #. {g2, g1}
@@ -74,7 +84,9 @@ class GreedyPreconditioner {
   /// descending order based on their commodity's weight
   inline bool NodeComp(const ExchangeNode::Ptr l,
                        const ExchangeNode::Ptr r) {
-    return NodeWeight(l, &commod_weights_) > NodeWeight(r, &commod_weights_);
+    return
+        NodeWeight(l, &commod_weights_, avg_prefs_[l]) >
+        NodeWeight(r, &commod_weights_, avg_prefs_[r]);
   }
 
   /// @brief a comparitor for ordering containers of Request::Ptrs in
@@ -89,6 +101,7 @@ class GreedyPreconditioner {
   /// direction
   void ProcessWeights_(WgtOrder order);
   
+  std::map<ExchangeNode::Ptr, double> avg_prefs_;
   std::map<std::string, double> commod_weights_;
   std::map<RequestGroup::Ptr, double> group_weights_;
 };
