@@ -38,11 +38,13 @@ double GroupWeight(RequestGroup::Ptr g,
 ///   #. g1 = {"eggs", "spam", "eggs"}
 ///   #. g2 = {"eggs", "spam"}
 /// And the following preference-commodity  mapping:
-/// {g1: {"spam": 0.75, "eggs": 0.25}, g2: {"spam": 1, "eggs": 1}.
+/// {g1: {"spam": 3/4, "eggs": 1/4}, g2: {"spam": 1, "eggs": 1}.
 ///
 /// First, the groups will be ordered and averaged weights will be determined:
-///   #. g1 = {"spam", "eggs", "eggs"}, weight with prefs = 9/3 * 4/3 = 4
-///   #. g2 = {"spam", "eggs"}, weight with prefs = 7/2 * 3/2 = 5.25
+///   #. g1 = {"spam", "eggs", "eggs"}, avg pref = 5/12
+///      weight with prefs = 9/3 * (1 + 5/12/(1 + 5/12)) = 3.88
+///   #. g2 = {"spam", "eggs"}, avg pref = 2/2
+///      weight with prefs = 7/2 * (1 + 2/2/(1 + 2/2)) = 5.25
 ///
 /// Finally, the groups themselves will be ordered by average weight:
 ///   #. {g2, g1}
