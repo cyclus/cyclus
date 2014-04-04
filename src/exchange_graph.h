@@ -67,7 +67,9 @@ struct ExchangeNode {
 /// request node, arc.vnode() == bid node.
 class Arc {
  public:
-  // default required for usage in maps
+  /// default required for usage in maps
+  /// @warning, in general do not use this constructor; it exists for arcs to be
+  /// map values
   Arc() {};
 
   Arc(boost::shared_ptr<ExchangeNode> unode,
