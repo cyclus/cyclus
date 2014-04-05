@@ -140,12 +140,6 @@ class KFacility : public cyclus::Facility {
   inline double current_capacity() const { return current_capacity_; }
 
   /**
-     add a commodity to the set of input commodities
-     @param name the commodity name
-   */
-  // inline void AddCommodity(std::string name) { in_commods_.push_back(name); }
-
-  /**
      determines the amount to request
    */
   inline double RequestAmt() const { return in_capacity_; }
