@@ -19,47 +19,41 @@
 
   <facility>
     <name>FacilityA</name>
-    <model>
+    <agent>
       <KFacility>
-        <setup>
-          <incommodity>commodityB</incommodity>
-          <in_capacity>1</in_capacity>
-          <k_factor_in>1</k_factor_in>
-          <outcommodity>commodityA</outcommodity>
-          <recipe>commod_recipe</recipe>
-          <out_capacity>1</out_capacity>
-          <k_factor_out>1</k_factor_out>
-        </setup>
+        <in_commod_>commodityB</in_commod_>
+        <in_capacity_>1</in_capacity_>
+        <k_factor_in_>1</k_factor_in_>
+        <out_commod_>commodityA</out_commod_>
+        <recipe_name_>commod_recipe</recipe_name_>
+        <out_capacity_>1</out_capacity_>
+        <k_factor_out_>1</k_factor_out_>
       </KFacility>
-    </model>
-    <outcommodity>commodity</outcommodity>
+    </agent>
   </facility>
 
   <facility>
     <name>FacilityB</name>
-    <model>
+    <agent>
       <KFacility>
-        <setup>
-          <incommodity>commodityA</incommodity>
-          <in_capacity>1</in_capacity>
-          <k_factor_in>1</k_factor_in>
-          <outcommodity>commodityB</outcommodity>
-          <recipe>commod_recipe</recipe>
-          <out_capacity>1</out_capacity>
-          <k_factor_out>1</k_factor_out>
-        </setup>
+        <in_commod_>commodityA</in_commod_>
+        <in_capacity_>1</in_capacity_>
+        <k_factor_in_>1</k_factor_in_>
+        <out_commod_>commodityB</out_commod_>
+        <recipe_name_>commod_recipe</recipe_name_>
+        <out_capacity_>1</out_capacity_>
+        <k_factor_out_>1</k_factor_out_>
       </KFacility>
-    </model>
-    <outcommodity>commodity</outcommodity>
+    </agent>
   </facility>
 
   <region>
     <name>SingleRegion</name>
     <allowedfacility>FacilityA</allowedfacility>
     <allowedfacility>FacilityB</allowedfacility>
-    <model>
+    <agent>
       <NullRegion/>
-    </model>
+    </agent>
     <institution>
       <name>SingleInstitution</name>
       <availableprototype>FacilityA</availableprototype>
@@ -74,9 +68,9 @@
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <model>
+      <agent>
         <NullInst/>
-      </model>
+      </agent>
     </institution>
   </region>
 

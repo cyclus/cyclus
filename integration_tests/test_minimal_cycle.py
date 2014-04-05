@@ -31,16 +31,16 @@ def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
     i = 0  # to tract a number of sets
 
     for f in fs_read:
-        if f.count("k_factor_in"):
+        if f.count("k_factor_in_"):
             assert(not k_in_changed)
-            f = f.split("<")[0] + "<k_factor_in>" + str(k_factor_in) + \
-                "</k_factor_in>\n"
+            f = f.split("<")[0] + "<k_factor_in_>" + str(k_factor_in) + \
+                "</k_factor_in_>\n"
             k_in_changed = True
 
-        elif f.count("k_factor_out"):
+        elif f.count("k_factor_out_"):
             assert(k_in_changed)
-            f = f.split("<")[0] + "<k_factor_out>" + str(k_factor_out) + \
-                "</k_factor_out>\n"
+            f = f.split("<")[0] + "<k_factor_out_>" + str(k_factor_out) + \
+                "</k_factor_out_>\n"
             k_in_changed = False
             i += 1
 
@@ -61,12 +61,12 @@ def create_sim_input(ref_input, k_factor_in, k_factor_out):
     fw = open(fw_path, "w")
     fr = open(ref_input, "r")
     for f in fr:
-        if f.count("k_factor_in"):
-            f = f.split("<")[0] + "<k_factor_in>" + str(k_factor_in) + \
-                "</k_factor_in>\n"
-        elif f.count("k_factor_out"):
-            f = f.split("<")[0] + "<k_factor_out>" + str(k_factor_out) + \
-                "</k_factor_out>\n"
+        if f.count("k_factor_in_"):
+            f = f.split("<")[0] + "<k_factor_in_>" + str(k_factor_in) + \
+                "</k_factor_in_>\n"
+        elif f.count("k_factor_out_"):
+            f = f.split("<")[0] + "<k_factor_out_>" + str(k_factor_out) + \
+                "</k_factor_out_>\n"
 
         fw.write(f)
 
@@ -133,7 +133,7 @@ def test_minimal_cycle():
 
             output = tables.open_file("./output_temp.h5", mode = "r")
             # tables of interest
-            paths = ["/AgentEntry", "/AgentExit", "/Resources", "/Transactions",
+            paths = ["/AgentEntry", "/Resources", "/Transactions",
                     "/Info"]
             # Check if these tables exist
             yield assert_true, table_exist(output, paths)
@@ -144,7 +144,6 @@ def test_minimal_cycle():
 
             # Get specific tables and columns
             agent_entry = output.get_node("/AgentEntry")[:]
-            agent_exit = output.get_node("/AgentExit")[:]
             info = output.get_node("/Info")[:]
             resources = output.get_node("/Resources")[:]
             transactions = output.get_node("/Transactions")[:]
@@ -169,10 +168,6 @@ def test_minimal_cycle():
             # Assume FacilityA is deployed first according to the schema
             yield assert_equal, facility_a[0], facility_id[0]
             yield assert_equal, facility_b[0], facility_id[1]
-
-            # Test if the agents exit at the end of the simulation
-            yield assert_equal, duration, exit_times(facility_a[0], agent_exit)
-            yield assert_equal, duration, exit_times(facility_b[0], agent_exit)
 
             # Test if the transactions are strictly between Facility A and
             # Facility B. There are no Facility A to Facility A or vice versa.
