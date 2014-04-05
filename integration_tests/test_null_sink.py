@@ -12,7 +12,7 @@ def test_null_sink():
     """ Testing for null sink case without a source facility.
     No transactions are expected in this test; therefore, a table with
     transaction records must not exist in order to pass this test.
-    In addition, tests check if SimpleSink is deployed and decommissioned for
+    In addition, tests check if Sink is deployed and decommissioned for
     this simulation. This may be removed in future.
     May also consider breaking this test into multiple tests.
     """
@@ -26,7 +26,7 @@ def test_null_sink():
         return  # don't execute further commands
 
     output = tables.open_file("./output_temp.h5", mode = "r")
-    legal_paths = ["/AgentEntry", "/AgentExit", "/Info"]
+    legal_paths = ["/AgentEntry", "/Info"]
     illegal_paths = ["/Transactions"]  # this must contain tables to test
     # Check if these tables exist
     yield assert_true, table_exist(output, legal_paths)
@@ -37,7 +37,6 @@ def test_null_sink():
 
     # Get specific data
     agent_entry = output.get_node("/AgentEntry")[:]
-    agent_exit = output.get_node("/AgentExit")[:]
     info = output.get_node("/Info")[:]
 
     # SimpleSink's deployment and decommissioning
@@ -45,13 +44,9 @@ def test_null_sink():
     agent_impl = agent_entry["Implementation"]
     duration = info["Duration"][0]
 
-    sink_id = find_ids("SimpleSink", agent_impl, agent_ids)
+    sink_id = find_ids("Sink", agent_impl, agent_ids)
     # Test if one SimpleSink is deployed
     yield assert_equal, len(sink_id), 1
-
-    # Test if SimpleSink is decommissioned at the end of the simulation
-    yield assert_equal, duration, exit_times(sink_id[0], agent_exit)
-
 
     # No resource exchange is expected
     yield assert_false, table_exist(output, illegal_paths)
