@@ -33,6 +33,8 @@ def test_null_sink():
     if not table_exist(output, legal_paths):
         output.close()
         os.remove("./output_temp.h5")
+        # This is a starter sqlite db created implicitly
+        os.remove("./output_temp.sqlite")
         return  # don't execute further commands
 
     # Get specific data
@@ -53,3 +55,5 @@ def test_null_sink():
 
     output.close()
     os.remove("./output_temp.h5")
+    # This is a starter sqlite db created implicitly
+    os.remove("./output_temp.sqlite")
