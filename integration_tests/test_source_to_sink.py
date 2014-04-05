@@ -30,8 +30,7 @@ def test_source_to_sink():
 
         output = tables.open_file("./output_temp.h5", mode = "r")
         # tables of interest
-        paths = ["/AgentEntry", "/AgentExit", "/Resources", "/Transactions",
-                "/Info"]
+        paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
         # Check if these tables exist
         yield assert_true, table_exist(output, paths)
         if not table_exist(output, paths):
@@ -41,7 +40,6 @@ def test_source_to_sink():
 
         # Get specific tables and columns
         agent_entry = output.get_node("/AgentEntry")[:]
-        agent_exit = output.get_node("/AgentExit")[:]
         info = output.get_node("/Info")[:]
         resources = output.get_node("/Resources")[:]
         transactions = output.get_node("/Transactions")[:]
@@ -51,16 +49,12 @@ def test_source_to_sink():
         agent_impl = agent_entry["Implementation"]
         duration = info["Duration"][0]
 
-        source_id = find_ids("SimpleSource", agent_impl, agent_ids)
-        sink_id = find_ids("SimpleSink", agent_impl, agent_ids)
+        source_id = find_ids("Source", agent_impl, agent_ids)
+        sink_id = find_ids("Sink", agent_impl, agent_ids)
 
         # Test for only one source and one sink are deployed in the simulation
         yield assert_equal, len(source_id), 1
         yield assert_equal, len(sink_id), 1
-
-        # Check if the agents exit at the right time
-        yield assert_equal, duration, exit_times(source_id[0], agent_exit)
-        yield assert_equal, duration, exit_times(sink_id[0], agent_exit)
 
         # Check if transactions are only between source and sink
         sender_ids = transactions["SenderId"]
