@@ -3,8 +3,8 @@
 #include "k_facility.h"
 
 #include "context.h"
-#include "facility_model_tests.h"
-#include "model_tests.h"
+#include "facility_tests.h"
+#include "agent_tests.h"
 
 using cyclus::KFacility;
 
@@ -59,18 +59,13 @@ TEST_F(KFacilityTest, Tock) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Model* KFacilityModelConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::Model*>(new KFacility(ctx));
+cyclus::Agent* KFacilityConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Agent*>(new KFacility(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::FacilityModel* KFacilityConstructor(cyclus::Context* ctx) {
-  return dynamic_cast<cyclus::FacilityModel*>(new KFacility(ctx));
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(SourceFac, FacilityModelTests,
+INSTANTIATE_TEST_CASE_P(KFac, FacilityTests,
                         ::testing::Values(&KFacilityConstructor));
 
-INSTANTIATE_TEST_CASE_P(SourceFac, ModelTests,
-                        ::testing::Values(&KFacilityModelConstructor));
+INSTANTIATE_TEST_CASE_P(KFac, AgentTests,
+                        ::testing::Values(&KFacilityConstructor));
