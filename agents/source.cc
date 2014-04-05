@@ -1,7 +1,7 @@
 #include "source.h"
 
-#include <sstream>
 #include <limits>
+#include <sstream>
 
 #include <boost/lexical_cast.hpp>
 
@@ -11,7 +11,7 @@ Source::Source(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
       commod_(""),
       recipe_name_(""),
-      capacity_(std::numeric_limits<double>::max()) {}
+      capacity_(100) {}
 
 std::string Source::str() {
   std::stringstream ss;

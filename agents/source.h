@@ -1,8 +1,8 @@
 #ifndef CYCLUS_AGENTS_SOURCE_H_
 #define CYCLUS_AGENTS_SOURCE_H_
 
-#include <string>
 #include <set>
+#include <string>
 #include <vector>
 
 #include "cyclus.h"

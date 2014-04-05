@@ -2,8 +2,7 @@
 
 namespace cyclus {
 
-NullInst::NullInst(cyclus::Context* ctx)
-    : cyclus::Institution(ctx) {}
+NullInst::NullInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {}
 
 NullInst::~NullInst() {}
 
