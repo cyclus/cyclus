@@ -54,13 +54,6 @@ class Sink : public cyclus::Facility  {
   virtual void AcceptGenRsrcTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
       cyclus::Product::Ptr> >& responses);
-  /**
-     add a commodity to the set of input commodities
-     @param name the commodity name
-   */
-  inline void AddCommodity(std::string name) {
-    in_commods_.push_back(name);
-  }
 
   /// determines the amount to request
   inline double capacity() const { return capacity_; }
