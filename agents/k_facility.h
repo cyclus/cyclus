@@ -143,7 +143,7 @@ class KFacility : public cyclus::Facility {
      add a commodity to the set of input commodities
      @param name the commodity name
    */
-  inline void AddCommodity(std::string name) { in_commods_.push_back(name); }
+  // inline void AddCommodity(std::string name) { in_commods_.push_back(name); }
 
   /**
      determines the amount to request
@@ -195,18 +195,8 @@ class KFacility : public cyclus::Facility {
   /**
      The output capacity at the current time step.
    */
+  #pragma cyclus var {"default": 0}
   double current_capacity_;
-
-  /**
-     The price that the facility will charge for its output commodity.
-     Units vary and are in dollars per inventory unit.
-   */
-  double commod_price_;
-
-  /**
-     Memebers for request operations.
-   */
-  std::vector<std::string> in_commods_;
 
   cyclus::ResourceBuff inventory_;
 

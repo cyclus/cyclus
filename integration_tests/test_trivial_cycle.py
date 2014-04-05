@@ -10,7 +10,7 @@ from helper import table_exist, find_ids, exit_times
 
 def create_sim_input(ref_input, k_factor_in, k_factor_out):
     """ Creates xml input file from a reference xml input file.
-    Changes k_factor_in and k_factor_out.
+    Changes k_factor_in_ and k_factor_out_.
 
     Returns: the path to the created file
     """
@@ -20,12 +20,12 @@ def create_sim_input(ref_input, k_factor_in, k_factor_out):
     fw = open(fw_path, "w")
     fr = open(ref_input, "r")
     for f in fr:
-        if f.count("k_factor_in"):
-            f = f.split("<")[0] + "<k_factor_in>" + str(k_factor_in) + \
-                "</k_factor_in>\n"
-        elif f.count("k_factor_out"):
-            f = f.split("<")[0] + "<k_factor_out>" + str(k_factor_out) + \
-                "</k_factor_out>\n"
+        if f.count("k_factor_in_"):
+            f = f.split("<")[0] + "<k_factor_in_>" + str(k_factor_in) + \
+                "</k_factor_in_>\n"
+        elif f.count("k_factor_out_"):
+            f = f.split("<")[0] + "<k_factor_out_>" + str(k_factor_out) + \
+                "</k_factor_out_>\n"
 
         fw.write(f)
 
@@ -61,7 +61,7 @@ def test_source_to_sink():
 
         output = tables.open_file("./output_temp.h5", mode = "r")
         # tables of interest
-        paths = ["/AgentEntry", "/AgentExit", "/Resources", "/Transactions",
+        paths = ["/AgentEntry", "/Resources", "/Transactions",
                 "/Info"]
         # Check if these tables exist
         yield assert_true, table_exist(output, paths)
@@ -72,7 +72,6 @@ def test_source_to_sink():
 
         # Get specific tables and columns
         agent_entry = output.get_node("/AgentEntry")[:]
-        agent_exit = output.get_node("/AgentExit")[:]
         info = output.get_node("/Info")[:]
         resources = output.get_node("/Resources")[:]
         transactions = output.get_node("/Transactions")[:]
@@ -85,9 +84,6 @@ def test_source_to_sink():
         facility_id = find_ids("KFacility", agent_impl, agent_ids)
         # Test for only one KFacility
         yield assert_equal, len(facility_id), 1
-
-        # Test if the agent exit at the end of the simulation
-        yield assert_equal, duration, exit_times(facility_id[0], agent_exit)
 
         sender_ids = transactions["SenderId"]
         receiver_ids = transactions["ReceiverId"]

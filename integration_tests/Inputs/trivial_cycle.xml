@@ -15,28 +15,25 @@
 
   <facility>
     <name>KFacility</name>
-    <model>
+    <agent>
       <KFacility>
-        <setup>
-          <incommodity>commodity</incommodity>
-          <in_capacity>1</in_capacity>
-          <k_factor_in>1</k_factor_in>
-          <outcommodity>commodity</outcommodity>
-          <recipe>commod_recipe</recipe>
-          <out_capacity>1</out_capacity>
-          <k_factor_out>1</k_factor_out>
-        </setup>
+        <in_commod_>commodity</in_commod_>
+        <in_capacity_>1</in_capacity_>
+        <k_factor_in_>1</k_factor_in_>
+        <out_commod_>commodity</out_commod_>
+        <recipe_name_>commod_recipe</recipe_name_>
+        <out_capacity_>1</out_capacity_>
+        <k_factor_out_>1</k_factor_out_>
       </KFacility>
-    </model>
-    <outcommodity>commodity</outcommodity>
+    </agent>
   </facility>
 
   <region>
     <name>SingleRegion</name>
     <allowedfacility>KFacility</allowedfacility>
-    <model>
+    <agent>
       <NullRegion/>
-    </model>
+    </agent>
     <institution>
       <name>SingleInstitution</name>
       <availableprototype>KFacility</availableprototype>
@@ -46,9 +43,9 @@
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <model>
+      <agent>
         <NullInst/>
-      </model>
+      </agent>
     </institution>
   </region>
 

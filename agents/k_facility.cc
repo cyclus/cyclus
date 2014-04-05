@@ -13,7 +13,6 @@ KFacility::KFacility(cyclus::Context* ctx)
       in_commod_(""),
       out_commod_(""),
       recipe_name_(""),
-      commod_price_(0),
       k_factor_in_(1),
       k_factor_out_(1),
       in_capacity_(100),
@@ -199,12 +198,8 @@ void KFacility::Tick(int time) {
   double requestAmt = RequestAmt();
   // inform the simulation about what the sink facility will be requesting
   if (requestAmt > cyclus::eps()) {
-    for (vector<string>::iterator commod = in_commods_.begin();
-         commod != in_commods_.end();
-         commod++) {
-      LOG(cyclus::LEV_INFO4, "SnkFac") << " will request " << requestAmt
-          << " kg of " << *commod << ".";
-    }
+    LOG(cyclus::LEV_INFO4, "SnkFac") << " will request " << requestAmt
+        << " kg of " << in_commod_ << ".";
   }
   LOG(cyclus::LEV_INFO3, "SnkFac") << "}";
 }
@@ -311,10 +306,7 @@ KFacility::GetMatlRequests() {
     CapacityConstraint<Material> cc(amt);
     port->AddConstraint(cc);
 
-    std::vector<std::string>::const_iterator it;
-    for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
-      port->AddRequest(mat, this, *it);
-    }
+    port->AddRequest(mat, this, in_commod_);
 
     ports.insert(port);
   }  // if amt > eps
@@ -339,14 +331,9 @@ KFacility::GetGenRsrcRequests() {
     CapacityConstraint<Product> cc(amt);
     port->AddConstraint(cc);
 
-    std::vector<std::string>::const_iterator it;
-    for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
-      std::string quality = "";  // not clear what this should be..
-      std::string units = "";  // not clear what this should be..
-      Product::Ptr rsrc = Product::CreateUntracked(amt,
-                                                                   quality);
-      port->AddRequest(rsrc, this, *it);
-    }
+    std::string quality = "";  // not clear what this should be..
+    Product::Ptr rsrc = Product::CreateUntracked(amt, quality);
+    port->AddRequest(rsrc, this, in_commod_);
 
     ports.insert(port);
   }  // if amt > eps
