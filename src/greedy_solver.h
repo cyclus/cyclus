@@ -13,6 +13,12 @@ namespace cyclus {
 inline bool ReqPrefComp(const Arc& l, const Arc& r) {
   return l.unode()->prefs[l] > r.unode()->prefs[r];
 }
+
+/// @brief A comparison function for sorting a container of Nodes by the nodes
+/// preference in decensing order (i.e., most preferred Node first)
+inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
+  return AvgPref(l) > AvgPref(r);
+}
   
 class ExchangeGraph;
 class GreedyPreconditioner;
