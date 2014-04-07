@@ -3,10 +3,8 @@
 #include "exchange_graph.h"
 
 #include "greedy_preconditioner.h"
-#include "greedy_solver.h"
 
 using cyclus::Arc;
-using cyclus::AvgPrefComp;
 using cyclus::ExchangeNode;
 using cyclus::ExchangeNodeGroup;
 using cyclus::ExchangeGraph;
