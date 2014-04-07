@@ -21,8 +21,9 @@ inline double SumPref(double total, std::pair<Arc, double> pref) {
 
 double AvgPref(ExchangeNode::Ptr n) {
   std::map<Arc, double>& prefs = n->prefs;
-  return std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) /
-      prefs.size();
+  return prefs.size() > 0 ?
+      std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) / prefs.size() :
+      0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -112,7 +113,7 @@ double GroupWeight(RequestGroup::Ptr g,
     n = nodes[i];
     sum += NodeWeight(n, weights, (*avg_prefs)[n]);
   }
-  return sum / nodes.size();
+  return nodes.size() > 0 ? sum / nodes.size() : 0;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
