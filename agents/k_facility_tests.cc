@@ -23,8 +23,7 @@ class KFacilityTest : public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(KFacilityTest, clone) {
-  KFacility* cloned_fac =
-      dynamic_cast<KFacility*> (src_facility_->Clone());
+  KFacility* cloned_fac = dynamic_cast<KFacility*> (src_facility_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

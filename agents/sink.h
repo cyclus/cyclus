@@ -15,7 +15,7 @@ namespace cyclus {
 class Sink : public cyclus::Facility  {
  public:
   Sink(cyclus::Context* ctx);
-  virtual ~Sink() {};
+  virtual ~Sink() {}
 
   #pragma cyclus clone
   #pragma cyclus initfromcopy
@@ -55,7 +55,7 @@ class Sink : public cyclus::Facility  {
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
       cyclus::Product::Ptr> >& responses);
 
-  /// determines the amount to request
+  /// @brief determines the amount to request
   inline double capacity() const { return capacity_; }
 
  private:

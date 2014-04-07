@@ -1,20 +1,18 @@
 #! /usr/bin/python
 
-from nose.tools import assert_false, assert_true, assert_equal, assert_not_equal
+from nose.tools import assert_false, assert_true, assert_equal
 import os
 import tables
 import numpy as np
 from tools import check_cmd
 from helper import table_exist, find_ids, exit_times
 
-""" Tests """
+"""Tests"""
 def test_null_sink():
-    """ Testing for null sink case without a source facility.
+    """Testing for null sink case without a source facility.
+
     No transactions are expected in this test; therefore, a table with
     transaction records must not exist in order to pass this test.
-    In addition, tests check if Sink is deployed and decommissioned for
-    this simulation. This may be removed in future.
-    May also consider breaking this test into multiple tests.
     """
     # Cyclus simulation input for null sink testing
     sim_input = "./Inputs/null_sink.xml"
@@ -41,10 +39,9 @@ def test_null_sink():
     agent_entry = output.get_node("/AgentEntry")[:]
     info = output.get_node("/Info")[:]
 
-    # SimpleSink's deployment and decommissioning
+    # Sink's deployment
     agent_ids = agent_entry["AgentId"]
     agent_impl = agent_entry["Implementation"]
-    duration = info["Duration"][0]
 
     sink_id = find_ids("Sink", agent_impl, agent_ids)
     # Test if one SimpleSink is deployed

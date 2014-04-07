@@ -13,31 +13,27 @@ class Context;
 
 /**
    @class KFacility
-   This facility is a source and consumer of some commodity with capacity.
-
-   This Facility is intended
-   to be used for Cyclus trivial cycle integration tests.
 
    @section intro Introduction
-   Place an introduction to the model here.
+   The KFacility is a source and consumer of commodities.
+   The facility changes its request and offer amount according to a power law.
 
-   @section modelparams Model Parameters
-   Place a description of the required input parameters which define the
-   model implementation.
+   Amount = Capacity(T=0) * ConversionFactor ^ Time
 
-   @section optionalparams Optional Parameters
-   Place a description of the optional input parameters to define the
-   model implementation.
+   This facility is intended to be used for Cyclus trivial and
+   minimal cycle integration tests.
 
-   @section detailed Detailed Behavior
-   Place a description of the detailed behavior of the model. Consider
-   describing the behavior at the tick and tock as well as the behavior
-   upon sending and receiving materials and messages.
+   @section params Parameters
+   The parameters relevant to simulation tests:
+      #. k_factor_in_ : a conversion factor for input commodity or request.
+      #. k_factor_out_ : a conversion factor for output commodity or bid.
+      #. in_capacity_ : an initial capacity for input commodity.
+      #. out_capacity_ : an initial capacity for output commodity.
  */
 class KFacility : public cyclus::Facility {
  public:
   /**
-     Constructor for KFacility Class
+     @brief Constructor for KFacility Class
      @param ctx the cyclus context for access to simulation-wide parameters
    */
   KFacility(cyclus::Context* ctx);
@@ -50,7 +46,7 @@ class KFacility : public cyclus::Facility {
   #pragma cyclus snapshot
   #pragma cyclus schema
 
-  virtual void InitInv(cyclus::Inventories& inv) {};
+  virtual void InitInv(cyclus::Inventories& inv) {}
 
   virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();}
 
@@ -97,7 +93,6 @@ class KFacility : public cyclus::Facility {
   virtual void AcceptGenRsrcTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
       cyclus::Product::Ptr> >& responses);
-  /* --- */
 
   /* --- KFacility Members --- */
   /**
@@ -107,7 +102,7 @@ class KFacility : public cyclus::Facility {
   cyclus::Material::Ptr GetOffer(const cyclus::Material::Ptr target) const;
 
   /**
-     sets the output commodity name
+     @brief sets the output commodity name
      @param name the commodity name
    */
   inline void commodity(std::string name) { out_commod_ = name; }
@@ -116,7 +111,7 @@ class KFacility : public cyclus::Facility {
   inline std::string commodity() const { return out_commod_; }
 
   /**
-     sets the capacity of a material generated at any given time step
+     @brief sets the capacity of a material generated at any given time step
      @param capacity the production capacity
    */
   inline void capacity(double capacity) {
@@ -128,7 +123,7 @@ class KFacility : public cyclus::Facility {
   inline double capacity() const { return out_capacity_; }
 
   /**
-     sets the name of the recipe to be produced
+     @brief sets the name of the recipe to be produced
      @param name the recipe name
    */
   inline void recipe(std::string name) { recipe_name_ = name; }
@@ -140,21 +135,21 @@ class KFacility : public cyclus::Facility {
   inline double current_capacity() const { return current_capacity_; }
 
   /**
-     determines the amount to request
+     @brief determines the amount to request
    */
   inline double RequestAmt() const { return in_capacity_; }
 
   /// @ return the conversion factor input
   inline double k_factor_in() const { return k_factor_in_; }
 
-  /// sets the conversion factor input
+  /// @brief sets the conversion factor input
   /// @param new conversion factor
   inline void k_factor_in(double k_factor) { k_factor_in_ = k_factor; }
 
   /// @ return the conversion factor for output
   inline double k_factor_out() const { return k_factor_out_; }
 
-  /// sets the conversion factor for output
+  /// @brief sets the conversion factor for output
   /// @param new conversion factor
   inline void k_factor_out(double k_factor) { k_factor_out_ = k_factor; }
 
@@ -178,7 +173,7 @@ class KFacility : public cyclus::Facility {
      The capacity is defined in terms of the number of units of the
      recipe that can be provided each time step.  A very large number
      can be provided to represent infinte capacity.
-     In and out commodity capacities are defined
+     In and out commodity capacities are defined.
    */
   #pragma cyclus var {}
   double in_capacity_;
@@ -202,7 +197,6 @@ class KFacility : public cyclus::Facility {
 
   #pragma cyclus var {}
   double k_factor_out_;
-  /* --- */
 };
 
 }  // namespace cyclus

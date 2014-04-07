@@ -22,8 +22,7 @@ class NullRegionTest : public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(NullRegionTest, clone) {
-  NullRegion* cloned_fac =
-      dynamic_cast<NullRegion*> (src_region_->Clone());
+  NullRegion* cloned_fac = dynamic_cast<NullRegion*> (src_region_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

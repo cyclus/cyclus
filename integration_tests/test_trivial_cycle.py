@@ -6,45 +6,22 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times
+from helper import table_exist, find_ids, exit_times, create_sim_input
 
-def create_sim_input(ref_input, k_factor_in, k_factor_out):
-    """ Creates xml input file from a reference xml input file.
-    Changes k_factor_in_ and k_factor_out_.
-
-    Returns: the path to the created file
-    """
-    # File to be creted
-    fw_path = ref_input.split(".xml")[0] + "_" + str(k_factor_in) + \
-              "_" + str(k_factor_out) + ".xml"
-    fw = open(fw_path, "w")
-    fr = open(ref_input, "r")
-    for f in fr:
-        if f.count("k_factor_in_"):
-            f = f.split("<")[0] + "<k_factor_in_>" + str(k_factor_in) + \
-                "</k_factor_in_>\n"
-        elif f.count("k_factor_out_"):
-            f = f.split("<")[0] + "<k_factor_out_>" + str(k_factor_out) + \
-                "</k_factor_out_>\n"
-
-        fw.write(f)
-
-    # Closing open files
-    fr.close()
-    fw.close()
-
-    return fw_path
-
-
-""" Tests """
+"""Tests"""
 def test_source_to_sink():
-    """ Tests simulations with a facilty that has a conversion factor.
-    In future, may eliminate checks if needed tables exist, and rely on errors.
-    In future, may eliminate tests for the existance and uniqueness of the
-    facilities. In addition, may eliminate other non-integration testing relevant
-    code and tests.
+    """Tests simulations with one facility that has a conversion factor.
+
+    The trivial cycle simulation involves only one KFacility which provides
+    what it requests itself. The conversion factors for requests and bids
+    are kept the same so that the facility provides exactly what it requests.
+    The amount of the transactions follow a power law.
+
+    Amount = InitialAmount * ConversionFactor ^ Time
+
+    This equation is used to test each transaction amount.
     """
-    # Cyclus simulation input for source_to_sink
+    # A reference simulation input for the trivial cycle simulation.
     ref_input = "./Inputs/trivial_cycle.xml"
     # Conversion factors for the three simulations
     k_factors = [0.95, 1, 2]
@@ -81,7 +58,6 @@ def test_source_to_sink():
         # Find agent ids
         agent_ids = agent_entry["AgentId"]
         agent_impl = agent_entry["Implementation"]
-        duration = info["Duration"][0]
 
         facility_id = find_ids("KFacility", agent_impl, agent_ids)
         # Test for only one KFacility

@@ -23,8 +23,7 @@ class SinkTest : public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SinkTest, clone) {
-  Sink* cloned_fac =
-      dynamic_cast<Sink*> (src_facility_->Clone());
+  Sink* cloned_fac = dynamic_cast<Sink*> (src_facility_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

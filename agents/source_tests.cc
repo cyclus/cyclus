@@ -23,8 +23,7 @@ class SourceTest : public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SourceTest, clone) {
-  Source* cloned_fac =
-      dynamic_cast<Source*> (src_facility_->Clone());
+  Source* cloned_fac = dynamic_cast<Source*> (src_facility_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,4 +69,4 @@ INSTANTIATE_TEST_CASE_P(SourceFac, FacilityTests,
 INSTANTIATE_TEST_CASE_P(SourceFac, AgentTests,
                         ::testing::Values(&SourceConstructor));
 
-}; // namespace cyclus 
+};  // namespace cyclus

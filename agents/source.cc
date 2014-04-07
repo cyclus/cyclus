@@ -89,8 +89,7 @@ void Source::GetMatlTrades(
     current_capacity -= qty;
     provided += qty;
     // @TODO we need a policy on negatives..
-    Material::Ptr response = Material::Create(this,
-                                              qty,
+    Material::Ptr response = Material::Create(this, qty,
                                               context()->GetRecipe(recipe_name_));
     responses.push_back(std::make_pair(*it, response));
     LOG(cyclus::LEV_INFO5, "SrcFac") << prototype() << " just received an order"

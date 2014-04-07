@@ -22,7 +22,7 @@ class Context;
 class Source : public cyclus::Facility {
  public:
   Source(cyclus::Context* ctx);
-  virtual ~Source() {};
+  virtual ~Source() {}
 
   #pragma cyclus clone
   #pragma cyclus initfromcopy
@@ -33,7 +33,7 @@ class Source : public cyclus::Facility {
 
   virtual std::string str();
 
-  virtual void InitInv(cyclus::Inventories& inv) {};
+  virtual void InitInv(cyclus::Inventories& inv) {}
 
   virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
 
@@ -59,40 +59,39 @@ class Source : public cyclus::Facility {
       cyclus::Material::Ptr> >& responses);
 
   /**
-    @brief creates a material object to offer to a requester
-    @param target the material target a request desires
-    */
+     @brief creates a material object to offer to a requester
+     @param target the material target a request desires
+   */
   cyclus::Material::Ptr GetOffer(const cyclus::Material::Ptr target) const;
 
   /**
-    sets the output commodity name
-    @param name the commodity name
-    */
+     @brief sets the output commodity name
+     @param name the commodity name
+   */
   inline void commodity(std::string name) { commod_ = name; }
 
   /// @return the output commodity
   inline std::string commodity() const { return commod_; }
 
   /**
-    sets the capacity of a material generated at any given time step
-    @param capacity the production capacity
-    */
+     @brief sets the capacity of a material generated at any given time step
+     @param capacity the production capacity
+   */
   inline void capacity(double capacity) { capacity_ = capacity; }
 
   /// @return the production capacity at any given time step
   inline double capacity() const { return capacity_; }
 
   /**
-    sets the name of the recipe to be produced
-    @param name the recipe name
-    */
+     @brief sets the name of the recipe to be produced
+     @param name the recipe name
+   */
   inline void recipe(std::string name) { recipe_name_ = name; }
 
   /// @return the name of the output recipe
   inline std::string recipe() const { return recipe_name_; }
 
  private:
-
   #pragma cyclus var {}
   std::string commod_;
 
@@ -100,13 +99,12 @@ class Source : public cyclus::Facility {
   std::string recipe_name_;
 
   /**
-    The capacity is defined in terms of the number of units of the
-    recipe that can be provided each time step.  A very large number
-    can be provided to represent infinte capacity.
-    */
+     The capacity is defined in terms of the number of units of the
+     recipe that can be provided each time step.  A very large number
+     can be provided to represent infinte capacity.
+   */
   #pragma cyclus var {}
   double capacity_;
-
 };
 
 }  // namespace cyclus

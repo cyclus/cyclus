@@ -3,8 +3,6 @@
 #include <limits>
 #include <sstream>
 
-#include <boost/lexical_cast.hpp>
-
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,32 +41,32 @@ std::string KFacility::str() {
 void KFacility::Tick(int time) {
   using std::string;
   using std::vector;
-  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is ticking {";
-  LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << out_capacity_
+  LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is ticking {";
+  LOG(cyclus::LEV_INFO4, "KFac") << "will offer " << out_capacity_
                                    << " kg of "
                                    << out_commod_ << ".";
-  LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
+  LOG(cyclus::LEV_INFO3, "KFac") << "}";
   current_capacity_ = out_capacity_;  // reset capacity
 
-  LOG(cyclus::LEV_INFO3, "SnkFac") << prototype() << " is ticking {";
+  LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is ticking {";
 
   double requestAmt = RequestAmt();
   // inform the simulation about what the sink facility will be requesting
   if (requestAmt > cyclus::eps()) {
-    LOG(cyclus::LEV_INFO4, "SnkFac") << " will request " << requestAmt
+    LOG(cyclus::LEV_INFO4, "KFac") << " will request " << requestAmt
         << " kg of " << in_commod_ << ".";
   }
-  LOG(cyclus::LEV_INFO3, "SnkFac") << "}";
+  LOG(cyclus::LEV_INFO3, "KFac") << "}";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void KFacility::Tock(int time) {
-  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is tocking {";
-  LOG(cyclus::LEV_INFO4, "SrcFac") << "KFacility " << this->id()
+  LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is tocking {";
+  LOG(cyclus::LEV_INFO4, "KFac") << "KFacility " << this->id()
                                    << " is holding " << inventory_.quantity()
                                    << " units of material at the close of month "
                                    << time << ".";
-  LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
+  LOG(cyclus::LEV_INFO3, "KFac") << "}";
   // Update capacity for the next step
   in_capacity_ = in_capacity_ * k_factor_in_;
   out_capacity_ = out_capacity_ * k_factor_out_;
@@ -130,11 +128,10 @@ void KFacility::GetMatlTrades(
     current_capacity_ -= qty;
     provided += qty;
     // @TODO we need a policy on negatives..
-    Material::Ptr response = Material::Create(this,
-                                              qty,
+    Material::Ptr response = Material::Create(this, qty,
                                               context()->GetRecipe(recipe_name_));
     responses.push_back(std::make_pair(*it, response));
-    LOG(cyclus::LEV_INFO5, "SrcFac") << prototype() << " just received an order"
+    LOG(cyclus::LEV_INFO5, "KFac") << prototype() << " just received an order"
                                      << " for " << qty
                                      << " of " << out_commod_;
   }
@@ -180,8 +177,7 @@ KFacility::GetGenRsrcRequests() {
   using cyclus::Request;
 
   std::set<RequestPortfolio<Product>::Ptr> ports;
-  RequestPortfolio<Product>::Ptr
-      port(new RequestPortfolio<Product>());
+  RequestPortfolio<Product>::Ptr port(new RequestPortfolio<Product>());
   double amt = RequestAmt();
 
   if (amt > cyclus::eps()) {
@@ -219,7 +215,6 @@ void KFacility::AcceptGenRsrcTrades(
     inventory_.Push(it->second);
   }
 }
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 extern "C" cyclus::Agent* ConstructKFacility(cyclus::Context* ctx) {

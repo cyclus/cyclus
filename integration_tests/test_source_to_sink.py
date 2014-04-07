@@ -8,16 +8,12 @@ import numpy as np
 from tools import check_cmd
 from helper import table_exist, find_ids, exit_times
 
-""" Tests """
+"""Tests"""
 def test_source_to_sink():
-    """ Tests linear growth of sink inventory by checking if the transactions
-    were of equal quantities and only between these two facilities.
-    In future, may eliminate checks if needed tables exist, and rely on errors.
-    In future, may eliminate tests for the existance and uniqueness of the
-    facilities. In addition, may eliminate other non-integration testing relevant
-    code and tests.
+    """Tests linear growth of sink inventory by checking if the transactions
+    were of equal quantities and only between sink and source facilities.
     """
-    # Cyclus simulation input for source_to_sink
+    # Cyclus simulation input for Source and Sink
     sim_inputs = ["./Inputs/source_to_sink.xml"]
 
     for sim_input in sim_inputs:
@@ -29,7 +25,7 @@ def test_source_to_sink():
             return  # don't execute further commands
 
         output = tables.open_file("./output_temp.h5", mode = "r")
-        # tables of interest
+        # Tables of interest
         paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
         # Check if these tables exist
         yield assert_true, table_exist(output, paths)
@@ -49,7 +45,6 @@ def test_source_to_sink():
         # Find agent ids of source and sink facilities
         agent_ids = agent_entry["AgentId"]
         agent_impl = agent_entry["Implementation"]
-        duration = info["Duration"][0]
 
         source_id = find_ids("Source", agent_impl, agent_ids)
         sink_id = find_ids("Sink", agent_impl, agent_ids)
