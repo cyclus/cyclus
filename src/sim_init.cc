@@ -231,9 +231,11 @@ void SimInit::LoadInitialAgents() {
     // if the agent wasn't decommissioned before t_ create and init it
     if (qexit.rows.size() == 0) {
       std::string proto = qentry.GetVal<std::string>("Prototype", i);
-      Agent* m = ctx_->CreateAgent<Agent>(proto);
+      std::string impl = qentry.GetVal<std::string>("Implementation", i);
+      Agent* m = DynamicModule::Make(ctx_, impl);
 
       // agent-kernel init
+      m->prototype_ = proto;
       m->id_ = id;
       m->set_agent_impl(qentry.GetVal<std::string>("Implementation", i));
       m->enter_time_ = qentry.GetVal<int>("EnterTime", i);

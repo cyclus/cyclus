@@ -81,7 +81,7 @@ void CommodityRecipeContext::Snapshot(DbInit di) {
       ->AddVal("in_commod", c)
       ->AddVal("in_recipe", in_recipes_[c])
       ->AddVal("out_commod", out_commod_map_[c])
-      ->AddVal("out_recipe", out_recipes_[c])
+      ->AddVal("out_recipe", out_recipes_[in_recipes_[c]])
       ->Record();
   }
 
