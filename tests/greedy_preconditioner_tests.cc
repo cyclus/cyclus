@@ -5,11 +5,25 @@
 #include "greedy_preconditioner.h"
 
 using cyclus::Arc;
+using cyclus::AvgPref;
 using cyclus::ExchangeNode;
 using cyclus::ExchangeNodeGroup;
 using cyclus::ExchangeGraph;
 using cyclus::GreedyPreconditioner;
 using cyclus::RequestGroup;
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ConditionerTests, AvgPref) {
+  ExchangeNode::Ptr u1(new ExchangeNode());
+  ExchangeNode::Ptr u2(new ExchangeNode());
+  ExchangeNode::Ptr v(new ExchangeNode());
+
+  Arc a(u1, v);
+
+  u1->prefs[a] = 1;
+
+  EXPECT_TRUE(AvgPref(u1) > AvgPref(u2));
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ConditionerTests, Conditioning) {
