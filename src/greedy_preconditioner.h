@@ -28,11 +28,17 @@ double AvgPref(ExchangeNode::Ptr n);
 /// weighted by their commodity's importance. The Graph is conditioned in-place.
 ///
 /// @section weighting Weighting
+///
 /// Commodity weights are provided to the conditioner via its constructor. A
-/// larger weight implies a higher level of importance for solving. Conditioning
-/// weight for each node is then determined by the product of the node's
-/// commodity and a measure of the average preferences for arcs coming into the
-/// node.  First, the ExchangeNodes of each RequestGroup are sorted according to
+/// larger weight implies a higher level of importance for solving.
+///
+/// The conditioning weight for a node is calculated as $w_cond_i = w_commod_i *
+/// (1 + \frac{\overline{p_i}}{1 + \overline{p_i}})$, where $w_cond_i$ is the
+/// calculated conditioning weight, $w_commod_i$ is node $i$'s commodity's
+/// weight, and $\overline{p_i}$ is the average preference of all bid arcs
+/// associated with node $i$.
+///
+/// First, the ExchangeNodes of each RequestGroup are sorted according to
 /// their conditioning weights. Then, the average weight of each RequestGroup is
 /// determined. Finally, each RequestGroup is sorted according to their average
 /// weight.
