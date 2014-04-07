@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- 1 Sink -->
+<!-- 1 SimpleSource Source, 1 SimpleSink Sink -->
 
 <simulation>
   <control>
@@ -14,29 +14,32 @@
   </commodity>
 
   <facility>
-    <name>Sink</name>
+    <name>KFacility</name>
     <agent>
-      <Sink>
-        <in_commods_>
-          <val>commodity</val>
-        </in_commods_>
-        <capacity_>1.00</capacity_>
-      </Sink>
+      <KFacility>
+        <in_commod_>commodity</in_commod_>
+        <in_capacity_>1</in_capacity_>
+        <k_factor_in_>1</k_factor_in_>
+        <out_commod_>commodity</out_commod_>
+        <recipe_name_>commod_recipe</recipe_name_>
+        <out_capacity_>1</out_capacity_>
+        <k_factor_out_>1</k_factor_out_>
+      </KFacility>
     </agent>
   </facility>
 
   <region>
     <name>SingleRegion</name>
-    <allowedfacility>Sink</allowedfacility>
+    <allowedfacility>KFacility</allowedfacility>
     <agent>
       <NullRegion/>
     </agent>
     <institution>
       <name>SingleInstitution</name>
-      <availableprototype>Sink</availableprototype>
+      <availableprototype>KFacility</availableprototype>
       <initialfacilitylist>
         <entry>
-          <prototype>Sink</prototype>
+          <prototype>KFacility</prototype>
           <number>1</number>
         </entry>
       </initialfacilitylist>

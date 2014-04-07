@@ -24,8 +24,7 @@ class NullInstTest : public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(NullInstTest, clone) {
-  NullInst* cloned_fac =
-      dynamic_cast<NullInst*> (src_inst_->Clone());
+  NullInst* cloned_fac = dynamic_cast<NullInst*> (src_inst_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

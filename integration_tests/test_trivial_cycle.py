@@ -1,22 +1,34 @@
 #! /usr/bin/python
 
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_almost_equal, assert_true
 from numpy.testing import assert_array_equal
 import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times
+from helper import table_exist, find_ids, exit_times, create_sim_input
 
 """Tests"""
 def test_source_to_sink():
-    """Tests linear growth of sink inventory by checking if the transactions
-    were of equal quantities and only between sink and source facilities.
-    """
-    # Cyclus simulation input for Source and Sink
-    sim_inputs = ["./Inputs/source_to_sink.xml"]
+    """Tests simulations with one facility that has a conversion factor.
 
-    for sim_input in sim_inputs:
+    The trivial cycle simulation involves only one KFacility which provides
+    what it requests itself. The conversion factors for requests and bids
+    are kept the same so that the facility provides exactly what it requests.
+    The amount of the transactions follow a power law.
+
+    Amount = InitialAmount * ConversionFactor ^ Time
+
+    This equation is used to test each transaction amount.
+    """
+    # A reference simulation input for the trivial cycle simulation.
+    ref_input = "./Inputs/trivial_cycle.xml"
+    # Conversion factors for the three simulations
+    k_factors = [0.95, 1, 2]
+
+    for k_factor in k_factors:
+        sim_input = create_sim_input(ref_input, k_factor, k_factor)
+
         holdsrtn = [1]  # needed because nose does not send() to test generator
         cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
         yield check_cmd, cmd, '.', holdsrtn
@@ -25,8 +37,9 @@ def test_source_to_sink():
             return  # don't execute further commands
 
         output = tables.open_file("./output_temp.h5", mode = "r")
-        # Tables of interest
-        paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
+        # tables of interest
+        paths = ["/AgentEntry", "/Resources", "/Transactions",
+                "/Info"]
         # Check if these tables exist
         yield assert_true, table_exist(output, paths)
         if not table_exist(output, paths):
@@ -42,24 +55,20 @@ def test_source_to_sink():
         resources = output.get_node("/Resources")[:]
         transactions = output.get_node("/Transactions")[:]
 
-        # Find agent ids of source and sink facilities
+        # Find agent ids
         agent_ids = agent_entry["AgentId"]
         agent_impl = agent_entry["Implementation"]
 
-        source_id = find_ids("Source", agent_impl, agent_ids)
-        sink_id = find_ids("Sink", agent_impl, agent_ids)
+        facility_id = find_ids("KFacility", agent_impl, agent_ids)
+        # Test for only one KFacility
+        yield assert_equal, len(facility_id), 1
 
-        # Test for only one source and one sink are deployed in the simulation
-        yield assert_equal, len(source_id), 1
-        yield assert_equal, len(sink_id), 1
-
-        # Check if transactions are only between source and sink
         sender_ids = transactions["SenderId"]
         receiver_ids = transactions["ReceiverId"]
         expected_sender_array = np.empty(sender_ids.size)
-        expected_sender_array.fill(source_id[0])
+        expected_sender_array.fill(facility_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
-        expected_receiver_array.fill(sink_id[0])
+        expected_receiver_array.fill(facility_id[0])
         yield assert_array_equal, sender_ids, expected_sender_array
         yield assert_array_equal, receiver_ids, expected_receiver_array
 
@@ -70,13 +79,16 @@ def test_source_to_sink():
         # Track transacted resources
         resource_ids = resources["ResourceId"]
         quantities = resources["Quantity"]
-        expected_quantities = np.empty(resource_ids.size)
-        # Expect that every transaction quantity is the same amount
-        expected_quantities.fill(quantities[0])
 
-        yield assert_array_equal, quantities, expected_quantities
+        # Almost equal cases due to floating point k_factors
+        i = 0
+        initial_capacity = quantities[0]
+        for q in quantities:
+            yield assert_almost_equal, q, initial_capacity * k_factor ** i
+            i += 1
 
         output.close()
         os.remove("./output_temp.h5")
+        os.remove(sim_input)
         # This is a starter sqlite db created implicitly
         os.remove("./output_temp.sqlite")

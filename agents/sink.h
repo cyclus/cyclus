@@ -15,7 +15,7 @@ namespace cyclus {
 class Sink : public cyclus::Facility  {
  public:
   Sink(cyclus::Context* ctx);
-  virtual ~Sink() {};
+  virtual ~Sink() {}
 
   #pragma cyclus clone
   #pragma cyclus initfromcopy
@@ -25,7 +25,7 @@ class Sink : public cyclus::Facility  {
   #pragma cyclus schema
 
   virtual void InitInv(cyclus::Inventories& inv);
-  
+
   virtual cyclus::Inventories SnapshotInv();
 
   virtual std::string str();
@@ -34,35 +34,28 @@ class Sink : public cyclus::Facility  {
 
   virtual void Tock(int time);
 
-  /// @brief SinkFacilities request Materials of their given commodity. Note
+  /// @brief Sink request Materials of their given commodity. Note
   /// that it is assumed the Sink operates on a single resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
       GetMatlRequests();
 
-  /// @brief SinkFacilities request Product of their given
+  /// @brief Sink request Product of their given
   /// commodity. Note that it is assumed the Sink operates on a single
   /// resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
       GetGenRsrcRequests();
 
-  /// @brief SinkFacilities place accepted trade Materials in their Inventory
+  /// @brief Sink place accepted trade Materials in their Inventory
   virtual void AcceptMatlTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
       cyclus::Material::Ptr> >& responses);
 
-  /// @brief SinkFacilities place accepted trade Materials in their Inventory
+  /// @brief Sink place accepted trade Materials in their Inventory
   virtual void AcceptGenRsrcTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
       cyclus::Product::Ptr> >& responses);
-  /**
-     add a commodity to the set of input commodities
-     @param name the commodity name
-   */
-  inline void AddCommodity(std::string name) {
-    in_commods_.push_back(name);
-  }
 
-  /// determines the amount to request
+  /// @brief determines the amount to request
   inline double capacity() const { return capacity_; }
 
  private:

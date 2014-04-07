@@ -1,7 +1,7 @@
 #include "source.h"
 
-#include <sstream>
 #include <limits>
+#include <sstream>
 
 #include <boost/lexical_cast.hpp>
 
@@ -11,7 +11,7 @@ Source::Source(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
       commod_(""),
       recipe_name_(""),
-      capacity_(std::numeric_limits<double>::max()) {}
+      capacity_(100) {}
 
 std::string Source::str() {
   std::stringstream ss;
@@ -89,8 +89,7 @@ void Source::GetMatlTrades(
     current_capacity -= qty;
     provided += qty;
     // @TODO we need a policy on negatives..
-    Material::Ptr response = Material::Create(this,
-                                              qty,
+    Material::Ptr response = Material::Create(this, qty,
                                               context()->GetRecipe(recipe_name_));
     responses.push_back(std::make_pair(*it, response));
     LOG(cyclus::LEV_INFO5, "SrcFac") << prototype() << " just received an order"

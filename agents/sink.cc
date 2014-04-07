@@ -1,6 +1,6 @@
-#include <boost/lexical_cast.hpp>
-
 #include "sink.h"
+
+#include <boost/lexical_cast.hpp>
 
 namespace cyclus {
 
@@ -135,4 +135,4 @@ extern "C" cyclus::Agent* ConstructSink(cyclus::Context* ctx) {
   return new Sink(ctx);
 }
 
-} // namespace cyclus
+}  // namespace cyclus

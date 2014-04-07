@@ -2,8 +2,7 @@
 
 namespace cyclus {
 
-NullRegion::NullRegion(cyclus::Context* ctx)
-    : cyclus::Region(ctx) {};
+NullRegion::NullRegion(cyclus::Context* ctx) : cyclus::Region(ctx) {}
 
 NullRegion::~NullRegion() {}
 

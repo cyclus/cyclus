@@ -1,72 +1,70 @@
 #include <gtest/gtest.h>
 
-#include "source.h"
+#include "k_facility.h"
 
 #include "context.h"
 #include "facility_tests.h"
 #include "agent_tests.h"
 
-namespace cyclus {
+using cyclus::KFacility;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class SourceTest : public ::testing::Test {
+class KFacilityTest : public ::testing::Test {
  protected:
   cyclus::TestContext tc_;
-  Source* src_facility_;
+  KFacility* src_facility_;
 
   virtual void SetUp() {
-    src_facility_ = new Source(tc_.get());
+    src_facility_ = new KFacility(tc_.get());
   }
 
   virtual void TearDown() {}
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceTest, clone) {
-  Source* cloned_fac = dynamic_cast<Source*> (src_facility_->Clone());
+TEST_F(KFacilityTest, clone) {
+  KFacility* cloned_fac = dynamic_cast<KFacility*> (src_facility_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceTest, InitialState) {
+TEST_F(KFacilityTest, InitialState) {
   // Test things about the initial state of the facility here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceTest, Print) {
+TEST_F(KFacilityTest, Print) {
   EXPECT_NO_THROW(std::string s = src_facility_->str());
-  // Test Source specific aspects of the print method here
+  // Test KFacility specific aspects of the print method here
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceTest, ReceiveMessage) {
-  // Test Source specific behaviors of the ReceiveMessage function here
+TEST_F(KFacilityTest, ReceiveMessage) {
+  // Test KFacility specific behaviors of the ReceiveMessage function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceTest, Tick) {
+TEST_F(KFacilityTest, Tick) {
   int time = 1;
   ASSERT_NO_THROW(src_facility_->Tick(time));
-  // Test Source specific behaviors of the Tick function here
+  // Test KFacility specific behaviors of the Tick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SourceTest, Tock) {
+TEST_F(KFacilityTest, Tock) {
   int time = 1;
   EXPECT_NO_THROW(src_facility_->Tock(time));
-  // Test Source specific behaviors of the Tock function here
+  // Test KFacility specific behaviors of the Tock function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* SourceConstructor(cyclus::Context* ctx) {
-  return new Source(ctx);
+cyclus::Agent* KFacilityConstructor(cyclus::Context* ctx) {
+  return dynamic_cast<cyclus::Agent*>(new KFacility(ctx));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(SourceFac, FacilityTests,
-                        ::testing::Values(&SourceConstructor));
+INSTANTIATE_TEST_CASE_P(KFac, FacilityTests,
+                        ::testing::Values(&KFacilityConstructor));
 
-INSTANTIATE_TEST_CASE_P(SourceFac, AgentTests,
-                        ::testing::Values(&SourceConstructor));
-
-};  // namespace cyclus
+INSTANTIATE_TEST_CASE_P(KFac, AgentTests,
+                        ::testing::Values(&KFacilityConstructor));
