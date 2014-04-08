@@ -9,11 +9,11 @@ void CommodityRecipeContext::AddInCommod(std::string in_commod,
                                          std::string in_recipe,
                                          std::string out_commod,
                                          std::string out_recipe) {
-  in_commods_.push_back(in_commod);
-  out_commods_.push_back(out_commod);
-  out_commod_map_.insert(std::make_pair(in_commod, out_commod));
-  in_recipes_.insert(std::make_pair(in_commod, in_recipe));
-  out_recipes_.insert(std::make_pair(in_recipe, out_recipe));
+  in_commods_.insert(in_commod);
+  out_commods_.insert(out_commod);
+  out_commod_map_[in_commod] = out_commod;
+  in_recipes_[in_commod] = in_recipe;
+  out_recipes_[in_recipe]  = out_recipe;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -75,8 +75,9 @@ void CommodityRecipeContext::InitFrom(QueryableBackend* b) {
 }
 
 void CommodityRecipeContext::Snapshot(DbInit di) {
-  for (int i = 0; i < in_commods_.size(); ++i) {
-    std::string c = in_commods_[i];
+  std::set<std::string>::iterator it2;
+  for (it2 = in_commods_.begin(); it2 != in_commods_.end(); ++it2) {
+    std::string c = *it2;
     di.NewDatum("CommodityRecipeContext_inoutmap")
       ->AddVal("in_commod", c)
       ->AddVal("in_recipe", in_recipes_[c])
