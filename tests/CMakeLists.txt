@@ -176,7 +176,7 @@ INSTALL(FILES
 set( tgt "cyclus_unit_tests" )
 add_custom_command(TARGET ${tgt}
   POST_BUILD
-  COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/generate_test_macros.py"
+  COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/generate_gtest_macros.py"
           "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}"
           "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake"
   COMMENT "adding tests from ${tgt}"
