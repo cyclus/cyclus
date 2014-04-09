@@ -36,12 +36,12 @@ class CommodityRecipeContext : public StateWrangler {
   void UpdateInRec(std::string in_commod, std::string recipe);
 
   /// @return input commodities
-  inline const std::vector<std::string>& in_commods() const {
+  inline const std::set<std::string>& in_commods() const {
     return in_commods_;
   }
 
   /// @return output commodities
-  inline const std::vector<std::string>& out_commods() const {
+  inline const std::set<std::string>& out_commods() const {
     return out_commods_;
   }
 
@@ -86,8 +86,8 @@ class CommodityRecipeContext : public StateWrangler {
   virtual std::string schema();
 
  private:
-  std::vector<std::string> in_commods_;
-  std::vector<std::string> out_commods_;
+  std::set<std::string> in_commods_;
+  std::set<std::string> out_commods_;
   std::map<std::string, std::string> out_commod_map_;
   std::map<std::string, std::string> in_recipes_;
   std::map<std::string, std::string> out_recipes_;
