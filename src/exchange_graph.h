@@ -115,8 +115,8 @@ class ExchangeNodeGroup {
   const std::vector<ExchangeNode::Ptr>& nodes() const { return nodes_; }
   std::vector<ExchangeNode::Ptr>& nodes() { return nodes_; }
 
-  /// @brief exclusive node groups represent nodes over which flow can only
-  /// exist on one arc
+  /// @brief exclusive node groups represent nodes over whose combined arcs flow
+  /// can only exist on one arc
   const std::vector< std::vector<ExchangeNode::Ptr> >&
       excl_node_groups() const {
     return excl_node_groups_;
@@ -134,7 +134,9 @@ class ExchangeNodeGroup {
   virtual void AddExchangeNode(ExchangeNode::Ptr node);
 
   /// @brief Adds a node grouping to the set of exclusive node groups, in
-  /// general this function is used for request exclusivity
+  /// general this function is used for request exclusivity. An exclusive group
+  /// implies that for all nodes in that group, flow is only allowed to flow
+  /// over one.
   inline void AddExclGroup(std::vector<ExchangeNode::Ptr>& nodes) {
     excl_node_groups_.push_back(nodes);
   }
