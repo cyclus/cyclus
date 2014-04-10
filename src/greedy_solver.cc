@@ -60,8 +60,10 @@ void GreedySolver::Init_(ExchangeNodeGroup::Ptr g) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) { 
 
-  const std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
-  std::vector<ExchangeNode::Ptr>::const_iterator req_it = nodes.begin();
+  std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
+  std::sort(nodes.begin(), nodes.end(), AvgPrefComp);
+  
+  std::vector<ExchangeNode::Ptr>::iterator req_it = nodes.begin();
   double target = prs->qty();
   double match = 0;
   
