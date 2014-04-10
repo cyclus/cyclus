@@ -769,7 +769,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
                     impl += ind + '{0} {1}_v = qr.GetVal<{0}>("Value", i);\n'.format(t[2], member)
                     impl += ind + '{0}[{0}_k] = {0}_v;\n'.format(member)
                 elif t[0] == 'std::set':
-                    impl += ind + '{0}.insert(qr.GetVal<{1}>("Value", i);\n'.format(member, t[1])
+                    impl += ind + '{0}.insert(qr.GetVal<{1}>("Value", i));\n'.format(member, t[1])
                 else:
                     impl += ind + '{0}.push_back(qr.GetVal<{1}>("Value", i));\n'.format(member, t[1])
                 ind = ind[:-4]
