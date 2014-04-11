@@ -47,4 +47,12 @@ TEST(CommodRecCtx, All) {
   EXPECT_NE(one, other_one);
 }
 
+TEST(CommodRecCtx, DuplicateOutcommod) {
+  CommodityRecipeContext ctx;
+  ctx.AddInCommod("in1", "foo", "out1", "bar");
+  ctx.AddInCommod("in2", "foo", "out1", "bar");
+
+  EXPECT_EQ(1, ctx.out_commods().size());
+}
+
 } // namespace cyclus
