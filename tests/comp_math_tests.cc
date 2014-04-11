@@ -11,7 +11,7 @@ using cyclus::Composition;
 using cyclus::CompMap;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, SubSame) {
+TEST(CompMathTests, SubSame) {
   CompMap v;
   v[922350000] = 1;
   v[922380000] = 2;
@@ -24,7 +24,7 @@ TEST(CompMathTest, SubSame) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, SubCloseSize) {
+TEST(CompMathTests, SubCloseSize) {
   CompMap v;
   double qty = 0.1;
   v[922350000] = qty;
@@ -43,7 +43,7 @@ TEST(CompMathTest, SubCloseSize) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, SubCloseComp) {
+TEST(CompMathTests, SubCloseComp) {
   double qty = 0.1;
 
   CompMap v;
@@ -69,7 +69,7 @@ TEST(CompMathTest, SubCloseComp) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, ApplyThresholdZero) {
+TEST(CompMathTests, ApplyThresholdZero) {
   // if the threshold is 0, applying the threshold should do nothing
   CompMap v;
   v[1] = 1.0;
@@ -85,7 +85,7 @@ TEST(CompMathTest, ApplyThresholdZero) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, ApplyThresholdInf) {
+TEST(CompMathTests, ApplyThresholdInf) {
   CompMap v;
   v[1] = 1.0;
   v[2] = 2.0;
@@ -102,7 +102,7 @@ TEST(CompMathTest, ApplyThresholdInf) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, ApplyThresholdNegative) {
+TEST(CompMathTests, ApplyThresholdNegative) {
   CompMap v;
   v[1] = 1.0;
   v[2] = 2.0;
@@ -112,7 +112,7 @@ TEST(CompMathTest, ApplyThresholdNegative) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, ApplyThresholdMedium) {
+TEST(CompMathTests, ApplyThresholdMedium) {
   CompMap v;
   v[1] = 1.0;
   v[2] = 2.0;
@@ -126,8 +126,26 @@ TEST(CompMathTest, ApplyThresholdMedium) {
   }
 }
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CompMathTests, ApplyThresholdSeqIter) {
+  // tests for a bug caused by improper iteration over CompMap
+  CompMap v;
+  v[0] = 2.0;
+  v[1] = 0.1;
+  v[2] = 0.1;
+  v[3] = 0.1;
+  v[4] = 3.0;
+
+  EXPECT_NO_THROW(cm::ApplyThreshold(&v, 1.0));
+  EXPECT_FLOAT_EQ(2, v[0]);
+  EXPECT_FLOAT_EQ(0, v[1]);
+  EXPECT_FLOAT_EQ(0, v[2]);
+  EXPECT_FLOAT_EQ(0, v[3]);
+  EXPECT_FLOAT_EQ(3, v[4]);
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, AlmostEq) {
+TEST(CompMathTests, AlmostEq) {
   CompMap v1;
   v1[1] = 0.1;
   v1[2] = 0.1;
@@ -143,7 +161,7 @@ TEST(CompMathTest, AlmostEq) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, AlmostEqualZeroEntry) {
+TEST(CompMathTests, AlmostEqualZeroEntry) {
   CompMap v1;
   v1[1] = 0.1;
   v1[2] = 0.1;
@@ -159,7 +177,7 @@ TEST(CompMathTest, AlmostEqualZeroEntry) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(CompMathTest, AlmostEqualNegThresh) {
+TEST(CompMathTests, AlmostEqualNegThresh) {
   CompMap v1, v2;
   EXPECT_THROW(cm::AlmostEq(v1, v2, -1.0), cyclus::ValueError);
 }
