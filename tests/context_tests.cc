@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include "context.h"
@@ -34,7 +33,7 @@ class ContextTests: public ::testing::Test {
 class DonutShop : public Agent {
  public:
   DonutShop(Context* ctx, std::string dotd)
-    : Agent(ctx), donut_of_the_day(dotd) { };
+      : Agent(ctx), donut_of_the_day(dotd) {};
 
   virtual ~DonutShop() {
     destruct_count++;
@@ -101,5 +100,3 @@ TEST_F(ContextTests, CreateAgent) {
 
   EXPECT_EQ(6, DonutShop::destruct_count);
 }
-
-

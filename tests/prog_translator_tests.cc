@@ -26,12 +26,12 @@ TEST(ProgTranslatorTests, translation) {
   h.setLogLevel(0);
   iface->passInMessageHandler(&h);
   double inf = iface->getInfinity();
-  
+
   int narcs = 5;
   int nfaux = 2;
   int nrows = 8;
   int nexcl = 3;
-  
+
   double prefs [] = {0.2, 1.2, 4, 5, 1.3};
   double ucaps_a_0 [] = {0.5, 0.4};
   double ucaps_a_3 [] = {0.3, 0.6};
@@ -67,7 +67,7 @@ TEST(ProgTranslatorTests, translation) {
   for (int i = 0; i != nfaux; i++) {
     obj_coeffs.push_back(max_cost);
   }
-  
+
   ExchangeNode::Ptr a0(new ExchangeNode());
   ExchangeNode::Ptr a1(new ExchangeNode());
   ExchangeNode::Ptr b0(new ExchangeNode(excl_flow[1], true));
@@ -110,7 +110,7 @@ TEST(ProgTranslatorTests, translation) {
   b1->prefs[x2] = prefs[2];
   a1->prefs[x3] = prefs[3];
   b1->prefs[x4] = prefs[4];
-  
+
   RequestGroup::Ptr a(new RequestGroup()); // new RequestGroup(dem_a[0])?
   a->AddExchangeNode(a0);
   a->AddExchangeNode(a1);
@@ -160,11 +160,11 @@ TEST(ProgTranslatorTests, translation) {
   for (int i = 0; i != 7; i++) {
     EXPECT_DOUBLE_EQ(col_lbs[i], pt.ctx().col_lbs[i]);
   }
-  
+
   // test coin xlate members
   CoinPackedMatrix m(false, 0, 0);
   m.setDimensions(0, narcs + nfaux);
-  
+
   int row_ind_0 [] = {0, 1, 2};
   double row_val_0 [] = {ucaps_c_0[0],
                          ucaps_c_1[0] * excl_flow[1],
@@ -175,12 +175,12 @@ TEST(ProgTranslatorTests, translation) {
   double row_val_1 [] = {ucaps_d_3[0],
                          ucaps_d_4[0] * excl_flow[4]};
   m.appendRow(2, row_ind_1, row_val_1);
-  
+
   int row_ind_2 [] = {3, 4};
   double row_val_2 [] = {ucaps_d_3[1],
                          ucaps_d_4[1] * excl_flow[4]};
   m.appendRow(2, row_ind_2, row_val_2);
-  
+
   int row_ind_3 [] = {0, 3, 5};
   double row_val_3 [] = {ucaps_a_0[0], ucaps_a_3[0], 1};
   m.appendRow(3, row_ind_3, row_val_3);
@@ -188,7 +188,7 @@ TEST(ProgTranslatorTests, translation) {
   int row_ind_4 [] = {0, 3, 5};
   double row_val_4 [] = {ucaps_a_0[1], ucaps_a_3[1], 1};
   m.appendRow(3, row_ind_4, row_val_4);
-  
+
   int row_ind_5 [] = {1, 2, 4, 6};
   double row_val_5 [] = {ucaps_b_1[0] * excl_flow[1],
                          ucaps_b_2[0] * excl_flow[2],
@@ -208,7 +208,7 @@ TEST(ProgTranslatorTests, translation) {
 
   // test population
   EXPECT_NO_THROW(pt.Populate());
-  
+
   for (int i = 0; i != nexcl; i++) {
     EXPECT_TRUE(iface->isInteger(excl_arcs[i]));
   }
@@ -229,11 +229,11 @@ TEST(ProgTranslatorTests, translation) {
   checkface.branchAndBound();
 
   // verify solution
-  EXPECT_NO_THROW(SolveProg(iface));  
+  EXPECT_NO_THROW(SolveProg(iface));
   const double* soln = iface->getColSolution();
   const double* check = checkface.getColSolution();
   array_double_eq(soln, check, narcs + nfaux);
-  
+
   // validate solution
   double x1_flow = excl_flow[1];
   double x2_flow = excl_flow[2];
@@ -243,11 +243,11 @@ TEST(ProgTranslatorTests, translation) {
 
   // first faux arc
   double x5_flow = 0;
-  // second faux arc 
+  // second faux arc
   double x6_flow = dem_b[0] -
                    ucaps_b_1[0] * excl_flow[1] -
-                   ucaps_b_2[0] * excl_flow[2]; // 0.6; 
-  
+                   ucaps_b_2[0] * excl_flow[2]; // 0.6;
+
   EXPECT_DOUBLE_EQ(soln[0], x0_flow);
   EXPECT_EQ(soln[1], 1);
   EXPECT_EQ(soln[2], 1);
@@ -264,7 +264,7 @@ TEST(ProgTranslatorTests, translation) {
   pair_double_eq(matches[1], std::pair<Arc, double>(x1, x1_flow));
   pair_double_eq(matches[2], std::pair<Arc, double>(x2, x2_flow));
   pair_double_eq(matches[3], std::pair<Arc, double>(x3, x3_flow));
-  
+
   delete iface;
 };
 

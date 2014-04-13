@@ -14,21 +14,21 @@
 using ::testing::TestWithParam;
 using ::testing::Values;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete Facility instance 
+// parameter is a pointer to a concrete Facility instance
 
 class FacilityTests : public TestWithParam<AgentConstructor*> {
  public:
-  virtual void SetUp() {    
+  virtual void SetUp() {
     facility_ = dynamic_cast<cyclus::Facility*>((*GetParam())(tc_.get()));
     test_inst_ = new TestInst(tc_.get());
     facility_->Build(test_inst_);
   }
-  
+
   virtual void TearDown(){}
-    
+
  protected:
   cyclus::Facility* facility_;
   TestInst* test_inst_;
@@ -48,5 +48,3 @@ TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 #endif // GTEST_HAS_PARAM_TEST
 
 #endif // CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_
-
-

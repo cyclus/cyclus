@@ -24,7 +24,7 @@ class TestObjFactory {
   Material::Ptr mat;
   std::string commod;
 };
-  
+
 class TestTrader : public TestFacility {
  public:
  TestTrader(Context* ctx, TestObjFactory* fac = NULL, bool is_requester = true)
@@ -68,7 +68,7 @@ class TestTrader : public TestFacility {
       return ports;
     }
   }
-  
+
   virtual std::set<BidPortfolio<Material>::Ptr>
       GetMatlBids(const CommodMap<Material>::type& commod_requests) {
     bids++;
@@ -76,7 +76,7 @@ class TestTrader : public TestFacility {
       return std::set<BidPortfolio<Material>::Ptr>();
     } else {
       req = commod_requests.at(obj_fac->commod)[0]; // obs request
-    
+
       std::set<BidPortfolio<Material>::Ptr> ports;
       BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
       bid = port->AddBid(req, obj_fac->mat, this); // exp bid
@@ -100,7 +100,7 @@ class TestTrader : public TestFacility {
       offer++;
     }
   }
-  
+
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>,
       Material::Ptr> >& responses) {

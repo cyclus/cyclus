@@ -14,14 +14,14 @@ using cyclus::CompMap;
 using cyclus::Composition;
 using cyclus::Material;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, Constructors) {
   EXPECT_EQ(default_mat_->units(), "kg");
   EXPECT_EQ(default_mat_->type(), cyclus::Material::kType);
   EXPECT_GE(default_mat_->id(), 0);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, Clone) {
   cyclus::Resource::Ptr clone_mat;
   ASSERT_NO_THROW(clone_mat = test_mat_->Clone());
@@ -31,7 +31,7 @@ TEST_F(MaterialTest, Clone) {
   EXPECT_DOUBLE_EQ(test_mat_->quantity(), clone_mat->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractRes) {
   EXPECT_DOUBLE_EQ(test_size_, test_mat_->quantity());
   double other_size = test_size_ / 3;
@@ -41,7 +41,7 @@ TEST_F(MaterialTest, ExtractRes) {
   EXPECT_DOUBLE_EQ(other_size, other->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, SimpleAbsorb) {
   double val = 1.5 * units::kg;
   cyclus::Material::Ptr m1 = cyclus::Material::CreateUntracked(val, test_comp_);
@@ -56,7 +56,7 @@ TEST_F(MaterialTest, SimpleAbsorb) {
   ///EXPECT_EQ(m2->quantity(), 2 * val);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbLikeMaterial) {
   cyclus::Material::Ptr mat1;
   cyclus::Material::Ptr mat2;
@@ -83,7 +83,7 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
   EXPECT_DOUBLE_EQ(test_mat_->quantity(), factor * orig);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   // make a number of materials masses 1, 2, and 10
   cyclus::Material::Ptr same_as_orig_test_mat = cyclus::Material::CreateUntracked(0,
@@ -115,21 +115,21 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   EXPECT_DOUBLE_EQ(orig + origdiff, default_mat_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbZeroMaterial) {
   Material::Ptr same_as_test_mat = Material::CreateUntracked(0, test_comp_);
   EXPECT_NO_THROW(test_mat_->Absorb(same_as_test_mat));
   EXPECT_FLOAT_EQ(test_size_, test_mat_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbIntoZeroMaterial) {
   Material::Ptr same_as_test_mat = Material::CreateUntracked(0, test_comp_);
   EXPECT_NO_THROW(same_as_test_mat->Absorb(test_mat_));
   EXPECT_FLOAT_EQ(test_size_, same_as_test_mat->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractMass) {
   double amt = test_size_ / 3;
   double diff = test_size_ - amt;
@@ -143,7 +143,7 @@ TEST_F(MaterialTest, ExtractMass) {
                cyclus::Error);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractComplete) {
   cyclus::Material::Ptr m1;
   EXPECT_NO_THROW(m1 = test_mat_->ExtractComp(test_size_, test_comp_));
@@ -152,7 +152,7 @@ TEST_F(MaterialTest, ExtractComplete) {
   EXPECT_DOUBLE_EQ(test_size_, m1->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractOverQty) {
   EXPECT_THROW(diff_mat_->ExtractComp(2 * test_size_, test_comp_),
                cyclus::ValueError);
@@ -160,7 +160,7 @@ TEST_F(MaterialTest, ExtractOverQty) {
                cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractOverComp) {
   Material::Ptr m;
 
@@ -172,7 +172,7 @@ TEST_F(MaterialTest, ExtractOverComp) {
                cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractCompleteInexactComp) {
   // Complete extraction
   // this should succeed even if inexact, within eps.
@@ -191,13 +191,13 @@ TEST_F(MaterialTest, ExtractCompleteInexactComp) {
   EXPECT_NEAR(0, mq.mass(am241_), cyclus::eps_rsrc());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractHalf) {
   cyclus::Material::Ptr m1 = two_test_mat_->ExtractComp(test_size_, test_comp_);
   EXPECT_DOUBLE_EQ(test_size_, m1->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractDiffComp) {
   // differing comp minus one element equals old comp minus new
   cyclus::Material::Ptr m1;
@@ -218,7 +218,7 @@ TEST_F(MaterialTest, ExtractDiffComp) {
   EXPECT_NE(orig_u235, mq.mass(u235_));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbThenExtract) {
   cyclus::Composition::Ptr comp_to_rem = cyclus::Composition::Ptr(test_comp_);
   double kg_to_rem = 0.25 * test_size_;
@@ -234,7 +234,7 @@ TEST_F(MaterialTest, AbsorbThenExtract) {
   EXPECT_DOUBLE_EQ(test_size_ - kg_to_rem, default_mat_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractInGrams) {
   cyclus::Composition::Ptr comp_to_rem = cyclus::Composition::Ptr(test_comp_);
   double kg_to_rem = 0.25 * test_size_;
@@ -251,7 +251,7 @@ TEST_F(MaterialTest, ExtractInGrams) {
   EXPECT_DOUBLE_EQ(test_size_ - kg_to_rem, default_mat_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, DecayShortcut) {
   using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
@@ -266,4 +266,3 @@ TEST_F(MaterialTest, DecayShortcut) {
   m->Decay(threshold * 0.9);
   EXPECT_EQ(c, m->comp());
 }
-

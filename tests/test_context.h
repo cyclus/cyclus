@@ -16,7 +16,7 @@ class TestContext {
   ~TestContext() {
     delete ctx_;
   };
-  
+
   Context* get() {return ctx_;}
   Timer* timer() {return &ti_;}
   Recorder* recorder() {return &rec_;}

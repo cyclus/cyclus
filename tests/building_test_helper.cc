@@ -1,6 +1,6 @@
 #include "building_test_helper.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BuildingTestHelper::BuildingTestHelper()
 {
   using cyclus::Builder;
@@ -8,8 +8,8 @@ BuildingTestHelper::BuildingTestHelper()
   builder2 = new Builder();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-BuildingTestHelper::~BuildingTestHelper() 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+BuildingTestHelper::~BuildingTestHelper()
 {
   delete builder1;
   delete builder2;

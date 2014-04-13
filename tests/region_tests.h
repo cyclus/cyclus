@@ -14,14 +14,14 @@
 using ::testing::TestWithParam;
 using ::testing::Values;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete Region instance 
+// parameter is a pointer to a concrete Region instance
 
 class RegionTests : public TestWithParam<AgentConstructor*> {
   public:
-    virtual void SetUp() { 
+    virtual void SetUp() {
       region_ = dynamic_cast<cyclus::Region*>((*GetParam())(tc_.get()));
     }
     virtual void TearDown(){}
@@ -45,4 +45,3 @@ TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 #endif  // GTEST_HAS_PARAM_TEST
 
 #endif // CYCLUS_TESTS_REGION_MODEL_TESTS_H_
-

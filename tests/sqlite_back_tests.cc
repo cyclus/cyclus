@@ -35,7 +35,7 @@ private:
   std::string path_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(SqliteBackTest, Regression) {
   using cyclus::Recorder;
   FileDeleter fd(path);
@@ -77,4 +77,3 @@ TEST(SqliteBackTest, Regression) {
             "INSERT INTO DumbTitle (SimId, animal, height) VALUES ('" + sid +
             "', 'sea cucumber', 1.2);");
 }
-

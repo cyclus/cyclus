@@ -10,7 +10,7 @@
 #include "infile_tree.h"
 #include "xml_parser.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class InfileTreeTest : public ::testing::Test {
  protected:
   // equality checks
@@ -30,6 +30,6 @@ class InfileTreeTest : public ::testing::Test {
   virtual void SetUp();
   virtual void TearDown();
 
-}; 
+};
 
 #endif  // CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_

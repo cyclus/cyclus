@@ -9,7 +9,7 @@
 #include "cyc_limits.h"
 #include "logger.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ResourceBuffTest : public ::testing::Test {
  protected:
   cyclus::Resource::Ptr mat1_, mat2_;

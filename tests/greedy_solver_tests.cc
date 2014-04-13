@@ -10,7 +10,7 @@ using cyclus::Arc;
 using cyclus::AvgPrefComp;
 using cyclus::ExchangeNode;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(GreedySolverTests, AvgPref) {
   ExchangeNode::Ptr u1(new ExchangeNode());
   ExchangeNode::Ptr u2(new ExchangeNode());

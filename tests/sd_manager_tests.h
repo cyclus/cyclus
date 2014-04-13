@@ -8,14 +8,14 @@
 #include "supply_demand_manager.h"
 #include "symbolic_functions.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class SDManagerTests : public ::testing::Test {
  public:
   cyclus::SupplyDemandManager manager;
   cyclus::SymFunction::Ptr demand;
   CommodityTestHelper* helper;
 
-  virtual void SetUp();  
+  virtual void SetUp();
   virtual void TearDown();
 };
 

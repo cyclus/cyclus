@@ -25,7 +25,7 @@ namespace test_helpers {
 /// exchanges
 static int u235 = 92235;
 static double helper_qty = 4.5;
-    
+
 static Material::Ptr get_mat(int nuc, double qty) {
   CompMap cm;
   cm[nuc] = qty;
@@ -52,7 +52,7 @@ static Bid<Material>::Ptr get_bid() {
 struct TestConverter : public Converter<Material> {
   TestConverter() {}
   virtual ~TestConverter() {}
-  
+
   virtual double convert(
       Material::Ptr r,
       Arc const * a = NULL,

@@ -7,7 +7,7 @@
 
 #include "commodity_producer_manager.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CommodityProducerManagerTests : public ::testing::Test {
  public:
   cyclus::CommodityProducerManager manager;

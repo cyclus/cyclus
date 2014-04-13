@@ -1,37 +1,31 @@
 #include "commodity_test_helper.h"
 
-//using namespace supply_demand;
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CommodityTestHelper::CommodityTestHelper() :
-  commodity_name("commod"),
-  commodity(commodity_name),
-  capacity(5.0),
-  nproducers(2)
-{
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+CommodityTestHelper::CommodityTestHelper()
+    : commodity_name("commod"),
+      commodity(commodity_name),
+      capacity(5.0),
+      nproducers(2) {
   using cyclus::CommodityProducer;
   producer1 = new CommodityProducer();
   producer2 = new CommodityProducer();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-CommodityTestHelper::~CommodityTestHelper() 
-{
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+CommodityTestHelper::~CommodityTestHelper() {
   delete producer1;
   delete producer2;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityTestHelper::SetUpProducerManager()
-{
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void CommodityTestHelper::SetUpProducerManager() {
   SetUpProducers();
   manager.RegisterProducer(producer1);
   manager.RegisterProducer(producer2);
-} 
+}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-void CommodityTestHelper::SetUpProducers()
-{
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void CommodityTestHelper::SetUpProducers() {
   producer1->AddCommodity(commodity);
   producer1->SetCapacity(commodity,capacity);
   producer2->AddCommodity(commodity);

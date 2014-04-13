@@ -20,11 +20,11 @@ class SolverFactoryTests : public ::testing::Test  {
 
  protected:
   SolverFactory sf_;
-  
+
   int n_vars_;
   int n_int_vars_;
   int n_rows_;
-  
+
   double lp_obj_;
   double* lp_exp_;
 
@@ -42,7 +42,7 @@ void SolverFactoryTests::SetUp() {
   lp_exp_[0] = 1.7; lp_exp_[1] = 2.7; lp_exp_[2] = 0.4;
   mip_obj_ = 7.6;
   mip_exp_ = new double[n_vars_];
-  mip_exp_[0] = 2.4; mip_exp_[1] = 2; mip_exp_[2] = 1; 
+  mip_exp_[0] = 2.4; mip_exp_[1] = 2; mip_exp_[2] = 1;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -137,7 +137,7 @@ TEST_F(SolverFactoryTests, Cbc) {
   SolveProg(si);
   const double* exp = &mip_exp_[0];
   array_double_eq(&exp[0], si->getColSolution(), n_vars_);
-  EXPECT_DOUBLE_EQ(mip_obj_, si->getObjValue());  
+  EXPECT_DOUBLE_EQ(mip_obj_, si->getObjValue());
 }
 
 TEST_F(SolverFactoryTests, CbcRedundant) {

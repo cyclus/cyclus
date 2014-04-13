@@ -8,7 +8,7 @@
 
 #include <sstream>
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class XMLParserTests : public ::testing::Test {
  protected:
   void FillSnippet(std::stringstream &ss);

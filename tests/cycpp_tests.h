@@ -25,7 +25,7 @@ class Spy {
     tooltip="eg, 007",\
     help="The spy's agent number - TOP SECRET!",\
     )
-  int 
+  int
 num;
 
   //using std::string;

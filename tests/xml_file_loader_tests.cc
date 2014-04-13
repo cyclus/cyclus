@@ -150,4 +150,3 @@ TEST_F(XMLFileLoaderTests, openfile) {
 TEST_F(XMLFileLoaderTests, throws) {
   EXPECT_THROW(XMLFileLoader file(&rec_, b_, schema_path, "blah"), cyclus::IOError);
 }
-

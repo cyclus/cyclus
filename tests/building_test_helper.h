@@ -5,7 +5,7 @@
 
 #include "builder.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BuildingTestHelper {
  public:
   /// constructor
@@ -13,7 +13,7 @@ class BuildingTestHelper {
 
   /// destructor
   ~BuildingTestHelper();
-  
+
   /// first builder
   cyclus::Builder* builder1;
 

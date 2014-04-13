@@ -9,22 +9,22 @@
 // ResourceBuff. The "Filled" suffix indicates the test uses the
 // filled_store_ instance of ResourceBuff.
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-//- - - - - - - Getters, Setters, and Property changers - - - - - - - - - - - -    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - Getters, Setters, and Property changers - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, set_capacity_ExceptionsEmpty) {
   EXPECT_THROW(store_.set_capacity(neg_cap), cyclus::ValueError);
   EXPECT_NO_THROW(store_.set_capacity(zero_cap));
   EXPECT_NO_THROW(store_.set_capacity(cap));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, set_capacity_ExceptionsFilled) {
   EXPECT_THROW(filled_store_.set_capacity(low_cap), cyclus::ValueError);
   EXPECT_NO_THROW(filled_store_.set_capacity(cap));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, GetCapacity_ExceptionsEmpty) {
   ASSERT_NO_THROW(store_.capacity());
   store_.set_capacity(zero_cap);
@@ -33,12 +33,12 @@ TEST_F(ResourceBuffTest, GetCapacity_ExceptionsEmpty) {
   ASSERT_NO_THROW(store_.capacity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, GetCapacity_InitialEmpty) {
   EXPECT_DOUBLE_EQ(store_.capacity(), cyclus::kBuffInfinity);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, Getset_capacityEmpty) {
   store_.set_capacity(zero_cap);
   EXPECT_DOUBLE_EQ(store_.capacity(), zero_cap);
@@ -47,7 +47,7 @@ TEST_F(ResourceBuffTest, Getset_capacityEmpty) {
   EXPECT_DOUBLE_EQ(store_.capacity(), cap);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, GetSpace_Empty) {
   ASSERT_NO_THROW(store_.space());
   EXPECT_DOUBLE_EQ(store_.space(), cyclus::kBuffInfinity);
@@ -61,41 +61,41 @@ TEST_F(ResourceBuffTest, GetSpace_Empty) {
   EXPECT_DOUBLE_EQ(store_.space(), cap);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, GetSpace_Filled) {
   double space = cap - (mat1_->quantity() + mat2_->quantity());
   ASSERT_NO_THROW(filled_store_.space());
   EXPECT_DOUBLE_EQ(filled_store_.space(), space);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, GetQuantity_Empty) {
   ASSERT_NO_THROW(store_.quantity());
   EXPECT_DOUBLE_EQ(store_.quantity(), 0.0);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, GetQuantity_Filled) {
   ASSERT_NO_THROW(filled_store_.quantity());
   double quantity = mat1_->quantity() + mat2_->quantity();
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), quantity);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, GetCount_Empty) {
   ASSERT_NO_THROW(store_.count());
   EXPECT_EQ(store_.count(), 0);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, GetCount_Filled) {
   ASSERT_NO_THROW(filled_store_.count());
   EXPECT_DOUBLE_EQ(filled_store_.count(), 2);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-//- - - - - - Removing from buffer  - - - - - - - - - - - - - - - - - - - - - -    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - Removing from buffer  - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveQty_ExceptionsEmpty) {
   using cyclus::Manifest;
   Manifest manifest;
@@ -103,7 +103,7 @@ TEST_F(ResourceBuffTest, RemoveQty_ExceptionsEmpty) {
   ASSERT_THROW(manifest = filled_store_.PopQty(qty), cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveQty_ExceptionsFilled) {
   using cyclus::Manifest;
   Manifest manifest;
@@ -111,7 +111,7 @@ TEST_F(ResourceBuffTest, RemoveQty_ExceptionsFilled) {
   ASSERT_THROW(manifest = store_.PopQty(qty), cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveQty_SingleNoSplit) {
   using cyclus::Manifest;
   // pop one no splitting leaving one mat in the store
@@ -124,7 +124,7 @@ TEST_F(ResourceBuffTest, RemoveQty_SingleNoSplit) {
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveQty_SingleWithSplit) {
   // pop one no splitting leaving one mat in the store
   using cyclus::Manifest;
@@ -138,7 +138,7 @@ TEST_F(ResourceBuffTest, RemoveQty_SingleWithSplit) {
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), orig_qty - exact_qty_under);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveQty_DoubleWithSplit) {
   // pop one no splitting leaving one mat in the store
   using cyclus::Manifest;
@@ -152,7 +152,7 @@ TEST_F(ResourceBuffTest, RemoveQty_DoubleWithSplit) {
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), orig_qty - exact_qty_over);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveNum_ExceptionsFilled) {
   using cyclus::Manifest;
   Manifest manifest;
@@ -160,7 +160,7 @@ TEST_F(ResourceBuffTest, RemoveNum_ExceptionsFilled) {
   ASSERT_THROW(manifest = filled_store_.PopN(-1), cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveNum_ZeroFilled) {
   using cyclus::Manifest;
   Manifest manifest;
@@ -172,7 +172,7 @@ TEST_F(ResourceBuffTest, RemoveNum_ZeroFilled) {
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), tot_qty);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveNum_OneFilled) {
   using cyclus::Manifest;
   Manifest manifest;
@@ -185,7 +185,7 @@ TEST_F(ResourceBuffTest, RemoveNum_OneFilled) {
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), mat2_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveNum_TwoFilled) {
   using cyclus::Manifest;
   Manifest manifest;
@@ -200,7 +200,7 @@ TEST_F(ResourceBuffTest, RemoveNum_TwoFilled) {
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), 0.0);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveOne_Filled) {
   using cyclus::Resource;
   Resource::Ptr mat;
@@ -220,11 +220,11 @@ TEST_F(ResourceBuffTest, RemoveOne_Filled) {
   ASSERT_THROW(mat = filled_store_.Pop(), cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, PopBack) {
   cyclus::Resource::Ptr mat;
   cyclus::ResourceBuff::AccessDir dir = cyclus::ResourceBuff::BACK;
-  
+
   ASSERT_NO_THROW(mat = filled_store_.Pop(dir));
   EXPECT_DOUBLE_EQ(mat->quantity(), mat2_->quantity());
   EXPECT_EQ(mat, mat2_);
@@ -240,9 +240,9 @@ TEST_F(ResourceBuffTest, PopBack) {
   ASSERT_THROW(mat = filled_store_.Pop(dir), cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-//- - - - - - Pushing into buffer - - - - - - - - - - - - - - - - - - - - - - -    
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - Pushing into buffer - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, Push_Empty) {
   ASSERT_NO_THROW(store_.set_capacity(cap));
 
@@ -255,7 +255,7 @@ TEST_F(ResourceBuffTest, Push_Empty) {
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, Push_OverCapacityEmpty) {
   using cyclus::Product;
   using cyclus::Resource;
@@ -279,7 +279,7 @@ TEST_F(ResourceBuffTest, Push_OverCapacityEmpty) {
   ASSERT_DOUBLE_EQ(store_.quantity(), expected);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, Push_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.set_capacity(cap));
 
@@ -290,7 +290,7 @@ TEST_F(ResourceBuffTest, Push_DuplicateEmpty) {
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, PushAll_Empty) {
   ASSERT_NO_THROW(store_.set_capacity(cap));
   ASSERT_NO_THROW(store_.PushAll(mats));
@@ -298,7 +298,7 @@ TEST_F(ResourceBuffTest, PushAll_Empty) {
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, PushAll_NoneEmpty) {
   using cyclus::Manifest;
   Manifest manifest;
@@ -308,7 +308,7 @@ TEST_F(ResourceBuffTest, PushAll_NoneEmpty) {
   EXPECT_DOUBLE_EQ(store_.quantity(), 0);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
   using cyclus::Resource;
   Resource::Ptr mat;
@@ -321,7 +321,7 @@ TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
   ASSERT_EQ(mat, mat2_);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   using cyclus::Product;
   using cyclus::Resource;
@@ -349,7 +349,7 @@ TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
   ASSERT_DOUBLE_EQ(store_.quantity(), expected);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, PushAll_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.set_capacity(2 * cap));
 
@@ -361,4 +361,3 @@ TEST_F(ResourceBuffTest, PushAll_DuplicateEmpty) {
   ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 }
-

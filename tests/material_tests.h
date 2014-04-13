@@ -9,7 +9,7 @@
 
 namespace units = cyclus::units;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MaterialTest : public ::testing::Test {
  protected:
   cyclus::Nuc u235_, am241_, th228_, pb208_, pu239_;

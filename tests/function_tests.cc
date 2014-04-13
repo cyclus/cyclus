@@ -13,7 +13,7 @@ TEST(CycloptsFunctionTests, AddVars) {
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
   Variable::VarType type(Variable::LINEAR);
-  
+
   double val1 = 1.5, val2 = 2.3;
   Variable::Ptr var1(new Variable(lbound, ubound, type));
   Variable::Ptr var2(new Variable(lbound, ubound, type));
@@ -34,7 +34,7 @@ TEST(CycloptsFunctionTests, GetModifiers) {
   Variable::Bound lbound(Variable::NEG_INF);
   Variable::Bound ubound(Variable::INF);
   Variable::VarType type(Variable::LINEAR);
-  
+
   double val1 = 1.5;
   Variable::Ptr var1(new Variable(lbound, ubound, type));
   Function f;
@@ -53,7 +53,7 @@ TEST(CycloptsObjectiveFunctionTests, Constructor) {
   dir = ObjectiveFunction::MIN;
   ObjectiveFunction o(dir);
   EXPECT_EQ(dir, o.dir());
-  
+
   dir = ObjectiveFunction::MAX;
   o = ObjectiveFunction(dir);
   EXPECT_EQ(dir, o.dir());

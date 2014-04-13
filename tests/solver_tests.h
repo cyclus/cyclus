@@ -37,7 +37,7 @@ namespace cyclus {
 ///   @endcode
 
 class ExchangeCase;
-  
+
 template <class T>
 ExchangeCase* CreateExchangeCase();
 

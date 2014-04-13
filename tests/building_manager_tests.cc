@@ -3,7 +3,7 @@
 #include "building_manager_tests.h"
 #include "error.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManagerTests::SetUp() {
   using cyclus::Builder;
   demand = 1001;
@@ -11,11 +11,11 @@ void BuildingManagerTests::SetUp() {
   cost1 = capacity1, cost2 = capacity2;
   build1 = 1, build2 = 2;
 }
-  
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManagerTests::TearDown() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BuildingManagerTests::SetUpProblem() {
   helper.producer1->AddCommodity(helper.commodity);
   helper.producer2->AddCommodity(helper.commodity);
@@ -29,12 +29,12 @@ void BuildingManagerTests::SetUpProblem() {
   manager.RegisterBuilder(&builder2);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests, init) {
   EXPECT_THROW(manager.UnRegisterBuilder(&builder1), cyclus::KeyError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests, registration) {
   EXPECT_NO_THROW(manager.RegisterBuilder(&builder1));
   EXPECT_THROW(manager.RegisterBuilder(&builder1), cyclus::KeyError);
@@ -42,7 +42,7 @@ TEST_F(BuildingManagerTests, registration) {
   EXPECT_THROW(manager.UnRegisterBuilder(&builder1), cyclus::KeyError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests, problem) {
   using cyclus::BuildOrder;
   SetUpProblem();
@@ -54,16 +54,16 @@ TEST_F(BuildingManagerTests, problem) {
 
   BuildOrder order1 = orders.at(0);
   EXPECT_EQ(order1.number,build1);
-  EXPECT_EQ(order1.builder,&builder1); 
+  EXPECT_EQ(order1.builder,&builder1);
   EXPECT_EQ(order1.producer,helper.producer1);
 
   BuildOrder order2 = orders.at(1);
   EXPECT_EQ(order2.number,build2);
-  EXPECT_EQ(order2.builder,&builder2); 
-  EXPECT_EQ(order2.producer,helper.producer2); 
+  EXPECT_EQ(order2.builder,&builder2);
+  EXPECT_EQ(order2.producer,helper.producer2);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BuildingManagerTests, emptyorder) {
   using cyclus::BuildOrder;
   SetUpProblem();

@@ -7,7 +7,7 @@
 #include "commodity_producer.h"
 #include <string>
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CommodityProducerTests : public ::testing::Test {
  protected:
   std::string commodity_name_;

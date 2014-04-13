@@ -42,4 +42,3 @@ TEST(DynamicLoadingTests, CloneTestFacility) {
                   );
   DynamicModule::CloseAll();
 }
-

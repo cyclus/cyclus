@@ -8,20 +8,20 @@
 #include "test_modules/test_region.h"
 #include "timer.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//- - - - - - - Tests specific to the Institution class itself- - - - - - -
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - Tests specific to the Institution class itself- - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieInst : public cyclus::Institution {
  public:
   DieInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {
     tickDie_ = false;
     tockDie_ = false;
   };
-  
+
   virtual ~DieInst() {};
-  
+
   virtual cyclus::Agent* Clone() {
     return new DieInst(context());
   }
@@ -42,7 +42,7 @@ class DieInst : public cyclus::Institution {
   bool tockDie_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class RegionClassTests : public ::testing::Test {
   protected:
 
@@ -75,7 +75,7 @@ class RegionClassTests : public ::testing::Test {
     }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RegionClassTests, TickIter) {
   ASSERT_EQ(5, reg_->children().size());
 
@@ -96,7 +96,7 @@ TEST_F(RegionClassTests, TickIter) {
   EXPECT_EQ(2, reg_->children().size());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RegionClassTests, TockIter) {
   ASSERT_EQ(5, reg_->children().size());
 
@@ -116,4 +116,3 @@ TEST_F(RegionClassTests, TockIter) {
   ASSERT_NO_THROW(child5_->Tock(0));
   EXPECT_EQ(2, reg_->children().size());
 }
-

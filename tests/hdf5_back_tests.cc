@@ -17,7 +17,7 @@ class FileDeleter {
   const char* path_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(Hdf5BackTest, ReadWrite) {
   using cyclus::Recorder;
   using cyclus::Hdf5Back;

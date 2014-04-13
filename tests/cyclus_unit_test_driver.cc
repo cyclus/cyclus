@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     test_env += ":" + curr_var;
   }
   putenv(const_cast<char *>(test_env.c_str()));
-    
+
   for ( int i = 0; i < argc; i++ ) {
     std::string arg = argv[i];
     if ( arg == "--help" ) {

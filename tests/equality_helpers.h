@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-#include "bid_portfolio.h" 
-#include "request_portfolio.h" 
+#include "bid_portfolio.h"
+#include "request_portfolio.h"
 
 template<class T>
 inline void TestVecEq(const std::vector<T>& lhs,

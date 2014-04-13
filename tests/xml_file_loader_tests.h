@@ -12,7 +12,7 @@
 #include "recorder.h"
 #include "xml_file_loader.h"
 
-//- - - - - - - - 
+// - - - - - - -
 class XMLFileLoaderTests : public ::testing::Test {
 
  private:
