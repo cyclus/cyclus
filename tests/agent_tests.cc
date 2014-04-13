@@ -1,24 +1,22 @@
 // agent_tests.cc
+#include "agent_tests.h"
+
 #include <sstream>
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include "agent_tests.h"
 #include "infile_tree.h"
 #include "xml_parser.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(AgentTests, DISABLED_CreateFromXML) {
-}
+TEST_P(AgentTests, DISABLED_CreateFromXML) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(AgentTests, DISABLED_LoadConstructor) {
-}
+TEST_P(AgentTests, DISABLED_LoadConstructor) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(AgentTests, DISABLED_InitFromXML) {
-}
+TEST_P(AgentTests, DISABLED_InitFromXML) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(AgentTests, Print) {

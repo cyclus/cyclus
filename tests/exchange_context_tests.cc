@@ -1,20 +1,19 @@
-#include <gtest/gtest.h>
-
 #include <string>
 #include <set>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include "bid.h"
 #include "bid_portfolio.h"
-#include "test_modules/test_facility.h"
+#include "exchange_context.h"
 #include "request.h"
 #include "request_portfolio.h"
 #include "resource.h"
 #include "resource_helpers.h"
 #include "test_context.h"
+#include "test_modules/test_facility.h"
 #include "trader.h"
-
-#include "exchange_context.h"
 
 using std::set;
 using std::string;

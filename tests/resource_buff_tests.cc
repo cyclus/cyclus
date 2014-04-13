@@ -1,7 +1,6 @@
+#include "resource_buff_tests.h"
 
 #include <gtest/gtest.h>
-
-#include "resource_buff_tests.h"
 
 // Test order MATTERS.  Beware of reordering.
 

@@ -1,17 +1,15 @@
+#include <string>
 
 #include <gtest/gtest.h>
 
-#include <string>
-
 #include "composition.h"
 #include "facility.h"
-#include "product.h"
 #include "material.h"
-#include "test_modules/test_facility.h"
-#include "test_context.h"
-#include "trader.h"
-
+#include "product.h"
 #include "request.h"
+#include "test_context.h"
+#include "test_modules/test_facility.h"
+#include "trader.h"
 
 using cyclus::Composition;
 using cyclus::Product;

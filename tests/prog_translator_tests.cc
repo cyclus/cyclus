@@ -2,10 +2,10 @@
 
 #include <utility>
 
-#include "OsiSolverInterface.hpp"
-#include "OsiClpSolverInterface.hpp"
-#include "CoinPackedMatrix.hpp"
 #include "CoinModel.hpp"
+#include "CoinPackedMatrix.hpp"
+#include "OsiClpSolverInterface.hpp"
+#include "OsiSolverInterface.hpp"
 
 #include "coin_helpers.h"
 #include "equality_helpers.h"

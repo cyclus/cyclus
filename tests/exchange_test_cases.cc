@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "exchange_test_cases.h"
+
+#include <gtest/gtest.h>
 
 #include "exchange_graph.h"
 

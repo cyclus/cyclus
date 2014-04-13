@@ -1,9 +1,9 @@
-#include "blob.h"
-#include "sqlite_back.h"
-
 #include "boost/lexical_cast.hpp"
 #include <boost/uuid/uuid_io.hpp>
 #include <gtest/gtest.h>
+
+#include "blob.h"
+#include "sqlite_back.h"
 
 static std::string const path = "testdb.sqlite";
 

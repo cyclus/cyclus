@@ -1,9 +1,9 @@
 // Regionagent_tests.cc
-#include <gtest/gtest.h>
+#include "region_tests.h"
 
 #include <string>
 
-#include "region_tests.h"
+#include <gtest/gtest.h>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(RegionTests, Print) {

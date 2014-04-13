@@ -2,8 +2,9 @@
 #include "infile_tree_tests.h"
 
 #include <iostream>
-#include "xml_parser.h"
+
 #include "error.h"
+#include "xml_parser.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InfileTreeTest::Unknowncontent() {

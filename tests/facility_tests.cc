@@ -1,7 +1,7 @@
 // facility_tests.cc
-#include <gtest/gtest.h>
-
 #include "facility_tests.h"
+
+#include <gtest/gtest.h>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(FacilityTests, DISABLED_Tick) {

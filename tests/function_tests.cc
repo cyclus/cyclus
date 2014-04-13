@@ -1,8 +1,8 @@
-#include "function.h"
-
 #include <stdlib.h>
 
 #include <gtest/gtest.h>
+
+#include "function.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsFunctionTests, AddVars) {

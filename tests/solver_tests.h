@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <gtest/gtest.h>
+
 namespace cyclus {
 
 /// This testing suite uses <a

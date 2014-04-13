@@ -2,7 +2,6 @@
 
 #include "cyc_limits.h"
 #include "error.h"
-
 #include "exchange_graph.h"
 
 using cyclus::Arc;

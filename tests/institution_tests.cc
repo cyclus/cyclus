@@ -1,7 +1,8 @@
 // institution_tests.cc
+#include "institution_tests.h"
+
 #include <gtest/gtest.h>
 
-#include "institution_tests.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - Param per-Inst Tests  - - - - - - - - - - - - - - -

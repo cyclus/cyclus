@@ -1,10 +1,11 @@
+#include "symbolic_function_tests.h"
+
 #include <math.h>
 #include <limits>
 
 #include <gtest/gtest.h>
 
 #include "symbolic_function_factories.h"
-#include "symbolic_function_tests.h"
 
 using namespace std;
 

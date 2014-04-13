@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "recorder.h"
 #include "rec_backend.h"
+#include "recorder.h"
 
 class TestBack : public cyclus::RecBackend {
  public:

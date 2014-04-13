@@ -1,20 +1,18 @@
-
-#include <gtest/gtest.h>
-
 #include <string>
 #include <set>
+
+#include <gtest/gtest.h>
 
 #include "capacity_constraint.h"
 #include "error.h"
 #include "facility.h"
-#include "product.h"
 #include "material.h"
-#include "test_modules/test_facility.h"
+#include "product.h"
 #include "request.h"
+#include "request_portfolio.h"
 #include "resource_helpers.h"
 #include "test_context.h"
-
-#include "request_portfolio.h"
+#include "test_modules/test_facility.h"
 
 using std::set;
 using std::string;

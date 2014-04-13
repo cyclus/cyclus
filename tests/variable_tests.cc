@@ -1,9 +1,8 @@
 #include <stdlib.h>
 #include <utility>
 
-#include <gtest/gtest.h>
-
 #include "boost/any.hpp"
+#include <gtest/gtest.h>
 
 #include "cyc_limits.h"
 #include "variable.h"

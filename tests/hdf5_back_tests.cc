@@ -1,10 +1,11 @@
-#include <gtest/gtest.h>
 #include <string>
-#include "hdf5.h"
-#include "hdf5_hl.h"
 
-#include "hdf5_back.h"
+#include <gtest/gtest.h>
+
 #include "blob.h"
+#include "hdf5.h"
+#include "hdf5_back.h"
+#include "hdf5_hl.h"
 
 static const char* path = "testdb.h5";
 

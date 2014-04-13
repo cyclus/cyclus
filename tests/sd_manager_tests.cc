@@ -1,7 +1,8 @@
+#include "sd_manager_tests.h"
+
 #include <gtest/gtest.h>
 
 #include "error.h"
-#include "sd_manager_tests.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SDManagerTests::SetUp() {

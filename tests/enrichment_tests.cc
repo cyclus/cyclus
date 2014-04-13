@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
-
 #include "enrichment_tests.h"
 
 #include <cmath>
+
+#include <gtest/gtest.h>
 
 #include "composition.h"
 #include "context.h"

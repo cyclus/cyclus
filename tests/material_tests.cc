@@ -2,6 +2,7 @@
 #include "material_tests.h"
 
 #include <cmath>
+
 #include <gtest/gtest.h>
 
 #include "cyc_limits.h"

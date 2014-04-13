@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "exchange_graph.h"
-
 #include "greedy_preconditioner.h"
 
 using cyclus::Arc;

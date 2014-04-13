@@ -2,8 +2,8 @@
 #include <gtest/gtest.h>
 
 #include "context.h"
-#include "recorder.h"
 #include "institution.h"
+#include "recorder.h"
 #include "region.h"
 #include "test_modules/test_region.h"
 #include "timer.h"
