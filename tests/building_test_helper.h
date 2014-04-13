@@ -1,5 +1,5 @@
-#ifndef CYCLUS_TESTS_BUILD_TEST_HELPER_H_
-#define CYCLUS_TESTS_BUILD_TEST_HELPER_H_
+#ifndef CYCLUS_TESTS_BUILDING_TEST_HELPER_H_
+#define CYCLUS_TESTS_BUILDING_TEST_HELPER_H_
 
 #include <string>
 
@@ -21,4 +21,4 @@ class BuildingTestHelper {
   cyclus::Builder* builder2;
 };
 
-#endif  // CYCLUS_TESTS_BUILD_TEST_HELPER_H_
+#endif  // CYCLUS_TESTS_BUILDING_TEST_HELPER_H_

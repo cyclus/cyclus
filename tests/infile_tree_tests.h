@@ -1,6 +1,6 @@
 // infile_tree_tests.h
-#ifndef CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_
-#define CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_
+#ifndef CYCLUS_TESTS_INFILE_TREE_TESTS_H_
+#define CYCLUS_TESTS_INFILE_TREE_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -31,4 +31,4 @@ class InfileTreeTest : public ::testing::Test {
   std::string Unknowncontent();
 };
 
-#endif  // CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_
+#endif  // CYCLUS_TESTS_INFILE_TREE_TESTS_H_
