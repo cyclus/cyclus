@@ -7,8 +7,7 @@
 #include "symbolic_functions.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class SymbolicFunctionTests : public ::testing::Test
-{
+class SymbolicFunctionTests : public ::testing::Test {
  public:
   cyclus::SymFunction::Ptr linear_func, exp_func;
 

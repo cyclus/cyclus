@@ -3,9 +3,9 @@
 #define CYCLUS_TESTS_COMMODITY_PRODUCER_MANAGER_TESTS_H_
 
 #include <gtest/gtest.h>
-#include "commodity_test_helper.h"
 
 #include "commodity_producer_manager.h"
+#include "commodity_test_helper.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CommodityProducerManagerTests : public ::testing::Test {

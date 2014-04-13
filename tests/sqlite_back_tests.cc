@@ -1,11 +1,9 @@
-
-
-#include "sqlite_back.h"
 #include "blob.h"
+#include "sqlite_back.h"
 
-#include <gtest/gtest.h>
 #include "boost/lexical_cast.hpp"
 #include <boost/uuid/uuid_io.hpp>
+#include <gtest/gtest.h>
 
 static std::string const path = "testdb.sqlite";
 
@@ -44,21 +42,21 @@ TEST(SqliteBackTest, Regression) {
   m.RegisterBackend(&back);
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("monkey"))
-  ->AddVal("weight", 10)
-  ->AddVal("height", 5.5)
-  ->AddVal("data", cyclus::Blob("banana"))
-  ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->AddVal("weight", 10)
+      ->AddVal("height", 5.5)
+      ->AddVal("data", cyclus::Blob("banana"))
+      ->Record();
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("elephant"))
-  ->AddVal("weight", 1000)
-  ->Record();
+      ->AddVal("animal", std::string("elephant"))
+      ->AddVal("weight", 1000)
+      ->Record();
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("sea cucumber"))
-  ->AddVal("height", 1.2)
-  ->Record();
+      ->AddVal("animal", std::string("sea cucumber"))
+      ->AddVal("height", 1.2)
+      ->Record();
 
   m.Close();
 

@@ -7,9 +7,9 @@
 #include <string>
 
 #include "agent.h"
+#include "dynamic_module.h"
 #include "env.h"
 #include "error.h"
-#include "dynamic_module.h"
 #include "sqlite_back.h"
 
 using namespace std;

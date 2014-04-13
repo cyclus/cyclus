@@ -42,4 +42,4 @@ TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
 #endif  // GTEST_HAS_PARAM_TEST
 
-#endif // CYCLUS_TESTS_MODEL_TESTS_H_
+#endif  // CYCLUS_TESTS_MODEL_TESTS_H_

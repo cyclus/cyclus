@@ -12,6 +12,10 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class InfileTreeTest : public ::testing::Test {
+ public:
+  virtual void SetUp();
+  virtual void TearDown();
+
  protected:
   // equality checks
   std::string root_node_, content_node_, inner_node_, unknown_node_;
@@ -25,11 +29,6 @@ class InfileTreeTest : public ::testing::Test {
   void GetContent(std::stringstream &ss);
   std::string Subcontent();
   std::string Unknowncontent();
-
- public:
-  virtual void SetUp();
-  virtual void TearDown();
-
 };
 
 #endif  // CYCLUS_TESTS_QUERY_ENGINE_TESTS_H_

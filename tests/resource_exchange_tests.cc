@@ -1,9 +1,10 @@
-#include <gtest/gtest.h>
-
 #include <set>
 #include <string>
 #include <math.h>
 
+#include <gtest/gtest.h>
+
+#include "agent.h"
 #include "bid.h"
 #include "bid_portfolio.h"
 #include "composition.h"
@@ -11,14 +12,12 @@
 #include "exchange_context.h"
 #include "facility.h"
 #include "material.h"
-#include "test_modules/test_facility.h"
-#include "agent.h"
 #include "request.h"
 #include "request_portfolio.h"
+#include "resource_exchange.h"
 #include "resource_helpers.h"
 #include "test_context.h"
-
-#include "resource_exchange.h"
+#include "test_modules/test_facility.h"
 
 using cyclus::Bid;
 using cyclus::BidPortfolio;
@@ -46,8 +45,7 @@ class Requester: public TestFacility {
       : TestFacility(ctx),
         i_(i),
         req_ctr_(0),
-        pref_ctr_(0)
-  {};
+        pref_ctr_(0) {};
 
   virtual cyclus::Agent* Clone() {
     Requester* m = new Requester(context());
@@ -91,8 +89,7 @@ class Bidder: public TestFacility {
   Bidder(Context* ctx, std::string commod)
       : TestFacility(ctx),
         commod_(commod),
-        bid_ctr_(0)
-  {};
+        bid_ctr_(0) {};
 
   virtual cyclus::Agent* Clone() {
     Bidder* m = new Bidder(context(), commod_);
@@ -143,7 +140,6 @@ class ResourceExchangeTests: public ::testing::Test {
   virtual void TearDown() {
     delete exchng;
   };
-
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

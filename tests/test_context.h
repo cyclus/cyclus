@@ -26,6 +26,7 @@ class TestContext {
   Recorder rec_;
   Context* ctx_;
 };
-} // namespace cyclus
+
+}  // namespace cyclus
 
 #endif  // CYCLUS_TESTS_TEST_CONTEXT_H_

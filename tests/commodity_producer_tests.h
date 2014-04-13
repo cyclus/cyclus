@@ -2,10 +2,11 @@
 #ifndef CYCLUS_TESTS_COMMODITY_PRODUCER_TESTS_H_
 #define CYCLUS_TESTS_COMMODITY_PRODUCER_TESTS_H_
 
+#include <string>
+
 #include <gtest/gtest.h>
 
 #include "commodity_producer.h"
-#include <string>
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CommodityProducerTests : public ::testing::Test {

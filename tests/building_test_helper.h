@@ -19,7 +19,6 @@ class BuildingTestHelper {
 
   /// second builder
   cyclus::Builder* builder2;
-
 };
 
-#endif //  ifndef CYCLUS_TESTS_BUILD_TEST_HELPER_H_
+#endif  // CYCLUS_TESTS_BUILD_TEST_HELPER_H_

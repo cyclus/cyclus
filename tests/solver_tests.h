@@ -50,6 +50,6 @@ class ExchangeSolverTest : public testing::Test {
   ExchangeCase* const case_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_TESTS_SOLVER_TESTS_H_
+#endif  // CYCLUS_TESTS_SOLVER_TESTS_H_

@@ -2,28 +2,18 @@
 #ifndef CYCLUS_TESTS_XML_FILE_LOADER_TESTS_H_
 #define CYCLUS_TESTS_XML_FILE_LOADER_TESTS_H_
 
-#include <gtest/gtest.h>
-
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <unistd.h>
 
+#include <gtest/gtest.h>
+
 #include "recorder.h"
 #include "xml_file_loader.h"
 
-// - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class XMLFileLoaderTests : public ::testing::Test {
-
- private:
-
-
-  void CreateTestInputFile(std::string fname, std::string contents) {
-    std::ofstream outFile(fname.c_str());
-    outFile<<contents;
-    outFile.close();
-  }
-
  public:
   std::string controlFile, falseFile, moduleFile, recipeFile;
 
@@ -41,6 +31,12 @@ class XMLFileLoaderTests : public ::testing::Test {
   std::string ModuleSequence();
   std::string ControlSchema();
 
+ private:
+  void CreateTestInputFile(std::string fname, std::string contents) {
+    std::ofstream outFile(fname.c_str());
+    outFile<<contents;
+    outFile.close();
+  }
 };
 
 #endif  // CYCLUS_TESTS_XML_FILE_LOADER_TESTS_H_

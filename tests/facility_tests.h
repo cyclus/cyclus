@@ -3,10 +3,10 @@
 
 #include <gtest/gtest.h>
 
+#include "agent_tests.h"
 #include "facility.h"
 #include "suffix.h"
 #include "test_context.h"
-#include "agent_tests.h"
 #include "test_modules/test_inst.h"
 
 #if GTEST_HAS_PARAM_TEST
@@ -45,6 +45,6 @@ class FacilityTests : public TestWithParam<AgentConstructor*> {
 // must be defined). This dummy test keeps gtest_main linked in.
 TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
-#endif // GTEST_HAS_PARAM_TEST
+#endif  // GTEST_HAS_PARAM_TEST
 
-#endif // CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_
+#endif  // CYCLUS_TESTS_FACILITY_MODEL_TESTS_H_

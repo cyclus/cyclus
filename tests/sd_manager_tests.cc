@@ -1,22 +1,17 @@
 #include <gtest/gtest.h>
 
+#include "error.h"
 #include "sd_manager_tests.h"
 
-#include "error.h"
-
-//using namespace supply_demand;
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SDManagerTests::SetUp()
-{
+void SDManagerTests::SetUp() {
   helper = new CommodityTestHelper();
   helper->SetUpProducerManager();
   demand = cyclus::SymFunction::Ptr(new cyclus::LinearFunction(100,100));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void SDManagerTests::TearDown()
-{
+void SDManagerTests::TearDown() {
   delete helper;
 }
 

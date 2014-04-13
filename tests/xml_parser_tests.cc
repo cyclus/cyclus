@@ -1,8 +1,9 @@
+#include "xml_parser_tests.h"
+
+#include <iostream>
 #include <gtest/gtest.h>
 
-#include "xml_parser_tests.h"
 #include "error.h"
-#include <iostream>
 
 using namespace std;
 

@@ -1,18 +1,18 @@
-#include <gtest/gtest.h>
-
 #include <map>
 #include <set>
 #include <utility>
 #include <vector>
 
+#include <gtest/gtest.h>
+
+#include "agent.h"
 #include "bid.h"
 #include "context.h"
 #include "material.h"
-#include "test_modules/test_facility.h"
-#include "agent.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
+#include "test_modules/test_facility.h"
 #include "test_trader.h"
 #include "trade.h"
 #include "trade_executor.h"
@@ -47,7 +47,7 @@ class TradeExecutorTests : public ::testing::Test {
   std::vector< Trade<Material> > trades;
 
   virtual void SetUp() {
-    amt = 4.5; // some magic number..
+    amt = 4.5;  // some magic number..
     s1 = new TestTrader(tc.get(), &fac);
     s2 = new TestTrader(tc.get(), &fac);
     r1 = new TestTrader(tc.get(), &fac);

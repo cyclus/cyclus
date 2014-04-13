@@ -3,11 +3,11 @@
 
 #include <gtest/gtest.h>
 
+#include "agent_tests.h"
 #include "context.h"
 #include "region.h"
 #include "suffix.h"
 #include "test_context.h"
-#include "agent_tests.h"
 
 #if GTEST_HAS_PARAM_TEST
 
@@ -29,7 +29,6 @@ class RegionTests : public TestWithParam<AgentConstructor*> {
   protected:
     cyclus::TestContext tc_;
     cyclus::Region* region_;
-
 };
 
 #else
@@ -44,4 +43,4 @@ TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
 #endif  // GTEST_HAS_PARAM_TEST
 
-#endif // CYCLUS_TESTS_REGION_MODEL_TESTS_H_
+#endif  // CYCLUS_TESTS_REGION_MODEL_TESTS_H_

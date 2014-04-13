@@ -1,13 +1,12 @@
 #include <gtest/gtest.h>
 
-#include "solver_factory.h"
-
 #include "CoinMessageHandler.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "CoinPackedVector.hpp"
 #include "OsiSolverInterface.hpp"
 
 #include "equality_helpers.h"
+#include "solver_factory.h"
 
 namespace cyclus {
 
@@ -65,11 +64,11 @@ void SolverFactoryTests::Init(OsiSolverInterface* si) {
   double row_lb [] = {4.4, -1.0*inf};
   double row_ub [] = {inf, 3.1};
   CoinPackedVector row1;
-  row1.insert(0, 1.0); // x
-  row1.insert(1, 1.0); // y
+  row1.insert(0, 1.0);  // x
+  row1.insert(1, 1.0);  // y
   CoinPackedVector row2;
-  row2.insert(1, 1); // y
-  row2.insert(2, 1); // z
+  row2.insert(1, 1);  // y
+  row2.insert(2, 1);  // z
   CoinPackedMatrix m(false, 0, 0);
   m.setDimensions(0, n_vars_);
   m.appendRow(row1);
@@ -89,8 +88,8 @@ void SolverFactoryTests::InitRedundant(OsiSolverInterface* si) {
   double row_lb [] = {1.0};
   double row_ub [] = {inf};
   CoinPackedVector row1;
-  row1.insert(0, 1.0); // x
-  row1.insert(1, 1.0); // y
+  row1.insert(0, 1.0);  // x
+  row1.insert(1, 1.0);  // y
   CoinPackedMatrix m(false, 0, 0);
   m.setDimensions(0, 2);
   m.appendRow(row1);
@@ -132,8 +131,8 @@ TEST_F(SolverFactoryTests, Cbc) {
   h.setLogLevel(0);
   si->passInMessageHandler(&h);
   Init(si);
-  si->setInteger(1); // y
-  si->setInteger(2); // z
+  si->setInteger(1);  // y
+  si->setInteger(2);  // z
   SolveProg(si);
   const double* exp = &mip_exp_[0];
   array_double_eq(&exp[0], si->getColSolution(), n_vars_);
@@ -147,8 +146,8 @@ TEST_F(SolverFactoryTests, CbcRedundant) {
   h.setLogLevel(0);
   si->passInMessageHandler(&h);
   InitRedundant(si);
-  si->setInteger(0); // x
-  si->setInteger(1); // y
+  si->setInteger(0);  // x
+  si->setInteger(1);  // y
   SolveProg(si);
   double exp [] = {1, 0};
   array_double_eq(exp, si->getColSolution(), 2);
@@ -156,4 +155,4 @@ TEST_F(SolverFactoryTests, CbcRedundant) {
   delete si;
 }
 
-} // namespace cyclus
+}  // namespace cyclus

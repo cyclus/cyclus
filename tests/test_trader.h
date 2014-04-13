@@ -1,21 +1,20 @@
 #ifndef CYCLUS_TESTS_TEST_TRADER_H_
 #define CYCLUS_TESTS_TEST_TRADER_H_
 
+#include "agent.h"
 #include "bid_portfolio.h"
 #include "context.h"
 #include "exchange_context.h"
 #include "material.h"
-#include "test_modules/test_facility.h"
-#include "agent.h"
 #include "request_portfolio.h"
 #include "resource_helpers.h"
+#include "test_modules/test_facility.h"
 #include "trade.h"
 
 namespace cyclus {
 
 class TestObjFactory {
  public:
-
   TestObjFactory() {
     mat = test_helpers::get_mat();
     commod = "commod";
@@ -27,15 +26,15 @@ class TestObjFactory {
 
 class TestTrader : public TestFacility {
  public:
- TestTrader(Context* ctx, TestObjFactory* fac = NULL, bool is_requester = true)
-   : obj_fac(fac),
-     is_requester(is_requester),
-     TestFacility(ctx),
-     offer(0),
-     adjusts(0),
-     requests(0),
-     bids(0),
-     accept(0) {};
+  TestTrader(Context* ctx, TestObjFactory* fac = NULL, bool is_requester = true)
+      : obj_fac(fac),
+        is_requester(is_requester),
+        TestFacility(ctx),
+        offer(0),
+        adjusts(0),
+        requests(0),
+        bids(0),
+        accept(0) {};
 
   virtual Agent* Clone() {
     TestTrader* m = new TestTrader(context());
@@ -75,18 +74,18 @@ class TestTrader : public TestFacility {
     if (obj_fac == NULL || is_requester) {
       return std::set<BidPortfolio<Material>::Ptr>();
     } else {
-      req = commod_requests.at(obj_fac->commod)[0]; // obs request
+      req = commod_requests.at(obj_fac->commod)[0];  // obs request
 
       std::set<BidPortfolio<Material>::Ptr> ports;
       BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
-      bid = port->AddBid(req, obj_fac->mat, this); // exp bid
+      bid = port->AddBid(req, obj_fac->mat, this);  // exp bid
       ports.insert(port);
       return ports;
     }
   }
 
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
-    bid = (*prefs[req].begin()).first; // obs bid
+    bid = (*prefs[req].begin()).first;  // obs bid
     adjusts++;
   };
 
@@ -112,14 +111,14 @@ class TestTrader : public TestFacility {
   }
 
   TestObjFactory* obj_fac;
-  Request<Material>::Ptr req; // obs or exp
-  Bid<Material>::Ptr bid; // obs or exp
-  Trade<Material> obs_trade; // obs trade
-  Material::Ptr mat; // obs mat
+  Request<Material>::Ptr req;  // obs or exp
+  Bid<Material>::Ptr bid;  // obs or exp
+  Trade<Material> obs_trade;  // obs trade
+  Material::Ptr mat;  // obs mat
   bool is_requester;
   int accept, offer, requests, bids, adjusts;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_TESTS_TEST_TRADER_H_
+#endif  // CYCLUS_TESTS_TEST_TRADER_H_

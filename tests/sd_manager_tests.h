@@ -3,8 +3,8 @@
 
 // sd_manager_tests.h
 #include <gtest/gtest.h>
-#include "commodity_test_helper.h"
 
+#include "commodity_test_helper.h"
 #include "supply_demand_manager.h"
 #include "symbolic_functions.h"
 

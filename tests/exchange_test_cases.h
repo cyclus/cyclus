@@ -7,7 +7,6 @@ namespace cyclus {
 
 class ExchangeGraph;
 
-
 /// ExchangeCase, a class that provides a virtual interface for constructing
 /// and testing a variety of ExchangeGraph/ExchangeSolver test instances.
 ///
@@ -395,7 +394,6 @@ class Case7: public ExchangeCase {
   int N;
 };
 
+}  // namespace cyclus
 
-} // namespace cyclus
-
-#endif // ifndef CYCLUS_TESTS_EXCHANGE_TEST_CASES_H_
+#endif  // CYCLUS_TESTS_EXCHANGE_TEST_CASES_H_

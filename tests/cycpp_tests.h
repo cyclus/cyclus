@@ -60,9 +60,9 @@ num;
     "tooltip": "(name, name)",\
     "help": "a villian and a lackey",\
     }
-  //std::pair<std::string, std::list<std::string> > villan_minions;
-  //std::pair<std::string, list<std::string> > villan_minions;
-  //pair<std::string, list<std::string> > villan_minions;
+  // std::pair<std::string, std::list<std::string> > villan_minions;
+  // std::pair<std::string, list<std::string> > villan_minions;
+  // pair<std::string, list<std::string> > villan_minions;
   deuce<std::string, list<std::string> > villan_minions;
 private:
   double not_var;
@@ -76,7 +76,7 @@ class Friend: public Spy {
   std::string friend;
 };
 
-}; // namespace mi6
+};  // namespace mi6
 
 class OtherFriend: public mi6::Friend {
  public:
@@ -112,7 +112,7 @@ class Villan: public mi6::Spy {
   #pragma cyclus var {}
   std::set<int> intset;
 
-  //#pragma cyclus
+  // #pragma cyclus
   #pragma cyclus clone
   #pragma cyclus initfromcopy
   #pragma cyclus initfromdb
@@ -122,5 +122,5 @@ class Villan: public mi6::Spy {
 
   /// #pragma cyclus initfromcopy mi6.Friend
 
-  //#pragma cyclus
+  // #pragma cyclus
 };

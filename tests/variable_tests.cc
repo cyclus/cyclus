@@ -1,13 +1,12 @@
-#include "variable.h"
-
-#include <gtest/gtest.h>
-
 #include <stdlib.h>
 #include <utility>
+
+#include <gtest/gtest.h>
 
 #include "boost/any.hpp"
 
 #include "cyc_limits.h"
+#include "variable.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CycloptsVariableTests, UnboundedLinearConstructors) {
