@@ -34,7 +34,7 @@ class TestTrader : public TestFacility {
         adjusts(0),
         requests(0),
         bids(0),
-        accept(0) {};
+        accept(0) {}
 
   virtual Agent* Clone() {
     TestTrader* m = new TestTrader(context());
@@ -52,7 +52,7 @@ class TestTrader : public TestFacility {
     obj_fac = m->obj_fac;
     is_requester = m->is_requester;
     context()->RegisterTimeListener(this);
-  };
+  }
 
   virtual std::set<RequestPortfolio<Material>::Ptr>
       GetMatlRequests() {
@@ -62,7 +62,7 @@ class TestTrader : public TestFacility {
     } else {
       std::set<RequestPortfolio<Material>::Ptr> ports;
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-      req = port->AddRequest(obj_fac->mat, this, obj_fac->commod);; // exp request
+      req = port->AddRequest(obj_fac->mat, this, obj_fac->commod);  // exp request
       ports.insert(port);
       return ports;
     }
@@ -87,7 +87,7 @@ class TestTrader : public TestFacility {
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
     bid = (*prefs[req].begin()).first;  // obs bid
     adjusts++;
-  };
+  }
 
   virtual void GetMatlTrades(
     const std::vector< Trade<Material> >& trades,

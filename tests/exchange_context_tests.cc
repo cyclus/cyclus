@@ -54,10 +54,10 @@ class ExchangeContextTests: public ::testing::Test {
     req1 = rp1->AddRequest(get_mat(), fac1, commod1, pref);
     rp2 = RequestPortfolio<Resource>::Ptr(new RequestPortfolio<Resource>());
     req2 = rp2->AddRequest(get_mat(), fac2, commod1, pref);
-  };
+  }
 
   virtual void TearDown() {
-  };
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -45,14 +45,13 @@ class BidPortfolioTests: public ::testing::Test {
     commod2 = "commod2";
     req1 = get_req(commod1);
     req2 = get_req(commod2);
-  };
+  }
 
-  virtual void TearDown() {};
+  virtual void TearDown() {}
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BidPortfolioTests, RespAdd) {
-
   BidPortfolio<Material>::Ptr rp(new BidPortfolio<Material>());
   EXPECT_EQ(rp->bids().size(), 0);
   Bid<Material>::Ptr r1 = rp->AddBid(req1, get_mat(), fac1);

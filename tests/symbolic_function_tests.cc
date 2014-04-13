@@ -73,8 +73,8 @@ cyclus::SymFunction::Ptr SymbolicFunctionTests::GetPiecewiseFunction() {
   cyclus::SymFunction::Ptr exp = GetExpFunction();
 
   cyclus::PiecewiseFunctionFactory pff;
-  pff.AddFunction(lin,check_points.at(1));
-  pff.AddFunction(exp,check_points.at(3));
+  pff.AddFunction(lin, check_points.at(1));
+  pff.AddFunction(exp, check_points.at(3));
 
   return pff.GetFunctionPtr();
 }
@@ -92,7 +92,7 @@ double SymbolicFunctionTests::exp_value(double value) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double SymbolicFunctionTests::piecewise_value(double value, int index) {
   double ret = -1;
-  switch(index) {
+  switch (index) {
     case(0):
       ret = 0;
       break;
@@ -109,7 +109,7 @@ double SymbolicFunctionTests::piecewise_value(double value, int index) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SymbolicFunctionTests,linearfunc) {
+TEST_F(SymbolicFunctionTests, linearfunc) {
   cyclus::SymFunction::Ptr f = GetLinFunction();
 
   int n = 10;
@@ -118,12 +118,12 @@ TEST_F(SymbolicFunctionTests,linearfunc) {
 
   for (int i = start; i < n; i++) {
     double x = i*step;
-    EXPECT_DOUBLE_EQ(linear_value(x),f->value(x));
+    EXPECT_DOUBLE_EQ(linear_value(x), f->value(x));
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SymbolicFunctionTests,expfunc) {
+TEST_F(SymbolicFunctionTests, expfunc) {
   cyclus::SymFunction::Ptr f = GetExpFunction();
 
   int n = 10;
@@ -132,14 +132,14 @@ TEST_F(SymbolicFunctionTests,expfunc) {
 
   for (int i = start; i < n; i++) {
     double x = i*step;
-    EXPECT_DOUBLE_EQ(exp_value(x),f->value(x));
+    EXPECT_DOUBLE_EQ(exp_value(x), f->value(x));
   }
 }
 
 // #include <iostream>
 // #include <fstream>
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SymbolicFunctionTests,piecewisefunc) {
+TEST_F(SymbolicFunctionTests, piecewisefunc) {
   // ofstream output;
   // output.open ("out");
 
@@ -153,7 +153,7 @@ TEST_F(SymbolicFunctionTests,piecewisefunc) {
 
     for (int j = 0; j < n; j++) {
       double x = j*step + check_points.at(i);
-      EXPECT_DOUBLE_EQ(piecewise_value(x,i),f->value(x));
+      EXPECT_DOUBLE_EQ(piecewise_value(x, i), f->value(x));
       // output << x << ", " << piecewise_value(x,i) << ", " << f->value(x) << endl;
     }
   }

@@ -51,9 +51,9 @@ TEST_F(MaterialTest, SimpleAbsorb) {
 
   m2->Absorb(m1);
 
-  ///ASSERT_EQ(m1->comp(), m2->comp());
-  ///EXPECT_EQ(m1->quantity(), 0);
-  ///EXPECT_EQ(m2->quantity(), 2 * val);
+  /// ASSERT_EQ(m1->comp(), m2->comp());
+  /// EXPECT_EQ(m1->quantity(), 0);
+  /// EXPECT_EQ(m2->quantity(), 2 * val);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -134,10 +134,10 @@ TEST_F(MaterialTest, ExtractMass) {
   double amt = test_size_ / 3;
   double diff = test_size_ - amt;
   cyclus::Material::Ptr extracted;
-  EXPECT_DOUBLE_EQ(test_mat_->quantity(), test_size_); // we expect this amt
-  EXPECT_NO_THROW(extracted = test_mat_->ExtractQty(amt)); // extract an amt
-  EXPECT_DOUBLE_EQ(extracted->quantity(), amt); // check correctness
-  EXPECT_DOUBLE_EQ(test_mat_->quantity(), diff); // check correctness
+  EXPECT_DOUBLE_EQ(test_mat_->quantity(), test_size_);  // we expect this amt
+  EXPECT_NO_THROW(extracted = test_mat_->ExtractQty(amt));  // extract an amt
+  EXPECT_DOUBLE_EQ(extracted->quantity(), amt);  // check correctness
+  EXPECT_DOUBLE_EQ(test_mat_->quantity(), diff);  // check correctness
   EXPECT_EQ(test_mat_->comp(), extracted->comp());
   EXPECT_THROW(two_test_mat_->ExtractQty(2 * two_test_mat_->quantity()),
                cyclus::Error);
@@ -260,7 +260,7 @@ TEST_F(MaterialTest, DecayShortcut) {
   Composition::Ptr c = Composition::CreateFromAtom(mp);
   cyclus::Material::Ptr m = Material::CreateUntracked(1.0, c);
 
-  double u235_decay_const = 8.087e-11; // per month
+  double u235_decay_const = 8.087e-11;  // per month
   double eps = 1e-3;
   double threshold = -1 * std::log(1-eps) / u235_decay_const;
   m->Decay(threshold * 0.9);

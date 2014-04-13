@@ -34,7 +34,7 @@ class XMLFileLoaderTests : public ::testing::Test {
  private:
   void CreateTestInputFile(std::string fname, std::string contents) {
     std::ofstream outFile(fname.c_str());
-    outFile<<contents;
+    outFile << contents;
     outFile.close();
   }
 };

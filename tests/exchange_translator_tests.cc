@@ -387,7 +387,7 @@ TEST(ExXlateTests, BackXlate) {
   Arc a(u, v);
   Arc b(x, y);
 
-  double qty = 2.5; // some magic numbers
+  double qty = 2.5;  // some magic numbers
   double aqty = qty * 0.1;
   double bqty = qty * 1.5;
 

@@ -27,7 +27,7 @@ class FacilityTests : public TestWithParam<AgentConstructor*> {
     facility_->Build(test_inst_);
   }
 
-  virtual void TearDown(){}
+  virtual void TearDown() {}
 
  protected:
   cyclus::Facility* facility_;

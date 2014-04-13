@@ -19,15 +19,15 @@ using ::testing::Values;
 typedef cyclus::Agent* AgentConstructor(cyclus::Context* ctx);
 
 class AgentTests : public TestWithParam<AgentConstructor*> {
-  public:
-    virtual void SetUp() {
-      agent_ = (*GetParam())(tc_.get());
-    }
-    virtual void TearDown(){}
+ public:
+  virtual void SetUp() {
+    agent_ = (*GetParam())(tc_.get());
+  }
+  virtual void TearDown() {}
 
-  protected:
-    cyclus::Agent* agent_;
-    cyclus::TestContext tc_;
+ protected:
+  cyclus::Agent* agent_;
+  cyclus::TestContext tc_;
 };
 
 #else

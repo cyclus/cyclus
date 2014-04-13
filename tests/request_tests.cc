@@ -41,7 +41,6 @@ TEST(RequestTests, MaterialGetSet) {
   EXPECT_EQ(excast, r->requester());
   EXPECT_EQ(mat, r->target());
   EXPECT_EQ(pref, r->preference());
-
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,5 +62,4 @@ TEST(RequestTests, ProductGetSet) {
   EXPECT_EQ(fac, r->requester());
   EXPECT_EQ(rsrc, r->target());
   EXPECT_EQ(pref, r->preference());
-
 }

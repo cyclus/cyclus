@@ -10,7 +10,7 @@ namespace cyclus {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(FullSimTests, LoneTrader) {
   TestContext tc;
-  GreedySolver* solver = new GreedySolver(); // context deletes
+  GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
   TestObjFactory fac;
 
@@ -34,7 +34,7 @@ TEST(FullSimTests, LoneTrader) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(FullSimTests, NullTrade) {
   TestContext tc;
-  GreedySolver* solver = new GreedySolver(); // context deletes
+  GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
 
   TestTrader* base_supplier = new TestTrader(tc.get());
@@ -66,12 +66,12 @@ TEST(FullSimTests, NullTrade) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(FullSimTests, Trade) {
   TestContext tc;
-  GreedySolver* solver = new GreedySolver(); // context deletes
+  GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
   TestObjFactory fac;
   bool is_requester = true;
 
-  //  Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
+  // Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
 
   TestTrader* base_supplier = new TestTrader(tc.get(), &fac, !is_requester);
   TestTrader* supplier =
@@ -111,4 +111,4 @@ TEST(FullSimTests, Trade) {
   EXPECT_EQ(requester->mat, exp_mat);
 }
 
-}// namespace cyclus
+}  // namespace cyclus

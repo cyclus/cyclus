@@ -105,7 +105,7 @@ std::string XMLFileLoaderTests::ModuleSequence() {
           "    <!-- institution definitions -->"
           "    <institution>"
           "      <name>inst</name>"
-          "	 <availableprototype>fac</availableprototype>"
+          "      <availableprototype>fac</availableprototype>"
           "      <agent>"
           "        <TestInst/>"
           "      </agent>"

@@ -4,31 +4,31 @@
 #include "rec_backend.h"
 
 class TestBack : public cyclus::RecBackend {
-  public:
-    TestBack() {
-      flush_count = 0;
-      notify_count = 0;
-      flushed = false;
-    };
+ public:
+  TestBack() {
+    flush_count = 0;
+    notify_count = 0;
+    flushed = false;
+  }
 
-    virtual void Notify(cyclus::DatumList data) {
-      flush_count = data.size();
-      this->data = data;
-      notify_count++;
-    };
+  virtual void Notify(cyclus::DatumList data) {
+    flush_count = data.size();
+    this->data = data;
+    notify_count++;
+  }
 
-    virtual std::string Name() {
-      return "TestBack";
-    };
+  virtual std::string Name() {
+    return "TestBack";
+  }
 
-    virtual void Flush() {
-      flushed = true;
-    };
+  virtual void Flush() {
+    flushed = true;
+  }
 
-    int flush_count; // # Datum objects in last notify
-    int notify_count; // # times notify called
-    bool flushed;
-    cyclus::DatumList data; // last receive list
+  int flush_count;  // # Datum objects in last notify
+  int notify_count;  // # times notify called
+  bool flushed;
+  cyclus::DatumList data;  // last receive list
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -84,15 +84,15 @@ TEST(RecorderTest, Manager_Buffering) {
   m.RegisterBackend(&back1);
 
   m.NewDatum("DumbTitle")
-   ->AddVal("animal", std::string("monkey"))
-   ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->Record();
 
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);
 
   m.NewDatum("DumbTitle")
-   ->AddVal("animal", std::string("elephant"))
-   ->Record();
+      ->AddVal("animal", std::string("elephant"))
+      ->Record();
 
   EXPECT_EQ(back1.flush_count, 2);
   EXPECT_EQ(back1.notify_count, 1);
@@ -108,8 +108,8 @@ TEST(RecorderTest, Manager_CloseFlushing) {
   m.RegisterBackend(&back1);
 
   m.NewDatum("DumbTitle")
-   ->AddVal("animal", std::string("monkey"))
-   ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->Record();
 
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);

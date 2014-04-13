@@ -46,7 +46,7 @@ void XMLParserTests::SetUp() {
 void XMLParserTests::TearDown() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLParserTests,WithoutSchema) {
+TEST_F(XMLParserTests, WithoutSchema) {
   std::stringstream snippet("");
   FillSnippet(snippet);
   cyclus::XMLParser parser;
@@ -54,7 +54,7 @@ TEST_F(XMLParserTests,WithoutSchema) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLParserTests,WithSchema) {
+TEST_F(XMLParserTests, WithSchema) {
   std::stringstream snippet("");
   FillSnippet(snippet);
   stringstream schema("");
@@ -65,7 +65,7 @@ TEST_F(XMLParserTests,WithSchema) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(XMLParserTests,WithError) {
+TEST_F(XMLParserTests, WithError) {
   stringstream snippet("");
   FillBadSnippet(snippet);
   std::stringstream schema("");

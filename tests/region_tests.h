@@ -20,15 +20,15 @@ using ::testing::Values;
 // parameter is a pointer to a concrete Region instance
 
 class RegionTests : public TestWithParam<AgentConstructor*> {
-  public:
-    virtual void SetUp() {
-      region_ = dynamic_cast<cyclus::Region*>((*GetParam())(tc_.get()));
-    }
-    virtual void TearDown(){}
+ public:
+  virtual void SetUp() {
+    region_ = dynamic_cast<cyclus::Region*>((*GetParam())(tc_.get()));
+  }
+  virtual void TearDown() {}
 
-  protected:
-    cyclus::TestContext tc_;
-    cyclus::Region* region_;
+ protected:
+  cyclus::TestContext tc_;
+  cyclus::Region* region_;
 };
 
 #else

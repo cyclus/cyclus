@@ -7,7 +7,7 @@
 TEST_P(FacilityTests, DISABLED_Tick) {
   int time = 1;
   facility_->Tick(time);
-    //EXPECT_NO_THROW();
+    // EXPECT_NO_THROW();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

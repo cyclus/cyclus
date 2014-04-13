@@ -8,28 +8,28 @@
 static std::string const path = "testdb.sqlite";
 
 class FlushCatcher: public cyclus::SqliteBack {
-public:
-  FlushCatcher(std::string path) : SqliteBack(path) {};
+ public:
+  FlushCatcher(std::string path) : SqliteBack(path) {}
   cyclus::StrList cmds;
 
-protected:
+ protected:
   virtual void Flush() {
     cmds.insert(cmds.end(), cmds_.begin(), cmds_.end());
     cyclus::SqliteBack::Flush();
-  };
+  }
 };
 
 class FileDeleter {
-public:
+ public:
   FileDeleter(std::string path) {
     path_ = path;
-  };
+  }
 
   ~FileDeleter() {
     remove(path_.c_str());
-  };
+  }
 
-private:
+ private:
   std::string path_;
 };
 

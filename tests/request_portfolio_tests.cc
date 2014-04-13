@@ -41,15 +41,14 @@ class RequestPortfolioTests: public ::testing::Test {
   virtual void SetUp() {
     fac1 = new TestFacility(tc.get());
     fac2 = new TestFacility(tc.get());
-  };
+  }
 
   virtual void TearDown() {
-  };
-
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(RequestPortfolioTests, ReqAdd){
+TEST_F(RequestPortfolioTests, ReqAdd) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   EXPECT_EQ(rp->requests().size(), 0);
   Request<Material>::Ptr r1 = rp->AddRequest(get_mat(), fac1);
@@ -57,7 +56,7 @@ TEST_F(RequestPortfolioTests, ReqAdd){
   EXPECT_EQ(rp->requests().size(), 1);
   EXPECT_EQ(rp->qty(), get_mat()->quantity());
   EXPECT_EQ(rp->requests()[0], r1);
-  EXPECT_THROW(rp->AddRequest(get_mat(), fac2), KeyError); // a different requester
+  EXPECT_THROW(rp->AddRequest(get_mat(), fac2), KeyError);  // a different requester
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

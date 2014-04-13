@@ -74,8 +74,8 @@ class Case2a: public Case2 {
 };
 
 /// Case2b:
-///q = c, u_s = 1
-///f = c
+/// q = c, u_s = 1
+/// f = c
 class Case2b: public Case2 {
  public:
   virtual ~Case2b() {}
@@ -83,8 +83,8 @@ class Case2b: public Case2 {
 };
 
 /// Case2c:
-///q > c, u_s = 1, u_r = 1
-///f = c
+/// q > c, u_s = 1, u_r = 1
+/// f = c
 class Case2c: public Case2 {
  public:
   virtual ~Case2c() {}
@@ -92,8 +92,8 @@ class Case2c: public Case2 {
 };
 
 /// Case2d:
-///q > c, u_s < 1, c/u_s > q, u_r = 1
-///f = q
+/// q > c, u_s < 1, c/u_s > q, u_r = 1
+/// f = q
 class Case2d: public Case2 {
  public:
   virtual ~Case2d() {}
@@ -101,8 +101,8 @@ class Case2d: public Case2 {
 };
 
 /// Case2e:
-///q = c, u_s < 1 ( => c/u_s > q ), u_r = 1
-///f = q
+/// q = c, u_s < 1 ( => c/u_s > q ), u_r = 1
+/// f = q
 class Case2e: public Case2 {
  public:
   virtual ~Case2e() {}

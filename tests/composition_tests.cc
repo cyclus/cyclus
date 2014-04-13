@@ -9,7 +9,7 @@
 
 class TestComp : public cyclus::Composition {
  public:
-  TestComp() {};
+  TestComp() {}
   cyclus::Composition::Chain DecayLine() {
     return *decay_line_.get();
   }

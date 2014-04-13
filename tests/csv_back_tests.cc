@@ -17,10 +17,10 @@ namespace fs = boost::filesystem;
 
 class DirDel {
  public:
-  DirDel(std::string path) : path_(path) {};
+  DirDel(std::string path) : path_(path) {}
   ~DirDel() {
     fs::remove_all(path);
-  };
+  }
 
  private:
   std::string path_;
@@ -81,7 +81,7 @@ std::string ReadAll(std::string fname) {
     return (std::string(std::istreambuf_iterator<char>(in),
                         std::istreambuf_iterator<char>()));
   }
-  throw (errno);
+  throw(errno);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

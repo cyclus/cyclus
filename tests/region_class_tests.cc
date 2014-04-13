@@ -18,9 +18,9 @@ class DieInst : public cyclus::Institution {
   DieInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {
     tickDie_ = false;
     tockDie_ = false;
-  };
+  }
 
-  virtual ~DieInst() {};
+  virtual ~DieInst() {}
 
   virtual cyclus::Agent* Clone() {
     return new DieInst(context());
@@ -44,35 +44,34 @@ class DieInst : public cyclus::Institution {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class RegionClassTests : public ::testing::Test {
-  protected:
+ protected:
+  DieInst* child1_;
+  DieInst* child2_;
+  DieInst* child3_;
+  DieInst* child4_;
+  DieInst* child5_;
 
-    DieInst* child1_;
-    DieInst* child2_;
-    DieInst* child3_;
-    DieInst* child4_;
-    DieInst* child5_;
+  cyclus::Region* reg_;
+  cyclus::Recorder rec_;
+  cyclus::Timer ti_;
+  cyclus::Context* ctx_;
 
-    cyclus::Region* reg_;
-    cyclus::Recorder rec_;
-    cyclus::Timer ti_;
-    cyclus::Context* ctx_;
+  virtual void SetUp() {
+    ctx_ = new cyclus::Context(&ti_, &rec_);
 
-    virtual void SetUp() {
-      ctx_ = new cyclus::Context(&ti_, &rec_);
+    child1_ = new DieInst(ctx_);
+    child2_ = new DieInst(ctx_);
+    child3_ = new DieInst(ctx_);
+    child4_ = new DieInst(ctx_);
+    child5_ = new DieInst(ctx_);
 
-      child1_ = new DieInst(ctx_);
-      child2_ = new DieInst(ctx_);
-      child3_ = new DieInst(ctx_);
-      child4_ = new DieInst(ctx_);
-      child5_ = new DieInst(ctx_);
-
-      reg_ = new TestRegion(ctx_);
-      child1_->Build(reg_);
-      child2_->Build(reg_);
-      child3_->Build(reg_);
-      child4_->Build(reg_);
-      child5_->Build(reg_);
-    }
+    reg_ = new TestRegion(ctx_);
+    child1_->Build(reg_);
+    child2_->Build(reg_);
+    child3_->Build(reg_);
+    child4_->Build(reg_);
+    child5_->Build(reg_);
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -36,9 +36,7 @@ TEST(DynamicLoadingTests, CloneTestFacility) {
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context* ctx = new cyclus::Context(&ti, &rec);
-  EXPECT_NO_THROW(
-                  Agent* fac = DynamicModule::Make(ctx, "TestFacility");
-                  Agent* clone = fac->Clone();
-                  );
+  EXPECT_NO_THROW(Agent* fac = DynamicModule::Make(ctx, "TestFacility");
+                  Agent* clone = fac->Clone(););
   DynamicModule::CloseAll();
 }

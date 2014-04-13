@@ -54,7 +54,7 @@ void InfileTreeTest::TearDown() {
 void InfileTreeTest::LoadParser() {
   std::stringstream ss("");
   GetContent(ss);
-  //std::cout << ss.str() << std::endl;
+  // std::cout << ss.str() << std::endl;
   parser_->Init(ss);
 }
 
@@ -68,26 +68,26 @@ TEST_F(InfileTreeTest, constructor) {
 TEST_F(InfileTreeTest, top_level_queries) {
   LoadParser();
   cyclus::InfileTree engine(*parser_);
-  EXPECT_EQ(engine.NElements(),ninner_nodes_);
-  EXPECT_EQ(engine.NMatches(content_node_),ncontent_);
-  EXPECT_EQ(engine.NMatches(inner_node_),1);
-  EXPECT_EQ(engine.GetElementName(),content_node_);
-  EXPECT_EQ(engine.GetString(content_node_),content_);
+  EXPECT_EQ(engine.NElements(), ninner_nodes_);
+  EXPECT_EQ(engine.NMatches(content_node_), ncontent_);
+  EXPECT_EQ(engine.NMatches(inner_node_), 1);
+  EXPECT_EQ(engine.GetElementName(), content_node_);
+  EXPECT_EQ(engine.GetString(content_node_), content_);
   for (int i = 0; i < ncontent_; i++) {
-    EXPECT_EQ(engine.GetElementName(i),content_node_);
-    EXPECT_EQ(engine.GetString(content_node_,i),content_);
+    EXPECT_EQ(engine.GetElementName(i), content_node_);
+    EXPECT_EQ(engine.GetString(content_node_, i), content_);
   }
-  EXPECT_EQ(engine.GetElementName(ncontent_),inner_node_);
+  EXPECT_EQ(engine.GetElementName(ncontent_), inner_node_);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(InfileTreeTest, top_level_throws) {
   LoadParser();
   cyclus::InfileTree engine(*parser_);
-  EXPECT_THROW(engine.GetString(content_node_,ninner_nodes_+1), cyclus::ValueError);
+  EXPECT_THROW(engine.GetString(content_node_, ninner_nodes_+1), cyclus::ValueError);
   EXPECT_THROW(engine.GetString(inner_node_), cyclus::ValueError);
   EXPECT_THROW(engine.GetElementName(ninner_nodes_+1), cyclus::ValueError);
-  EXPECT_THROW(engine.SubTree(content_node_,ninner_nodes_+1), cyclus::ValueError);
+  EXPECT_THROW(engine.SubTree(content_node_, ninner_nodes_+1), cyclus::ValueError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -111,9 +111,9 @@ TEST_F(InfileTreeTest, low_level_queries) {
   LoadParser();
   cyclus::InfileTree engine(*parser_);
   cyclus::InfileTree* qe = engine.SubTree(inner_node_);
-  EXPECT_EQ(qe->GetElementName(),unknown_node_);
+  EXPECT_EQ(qe->GetElementName(), unknown_node_);
   cyclus::InfileTree* qe2 = qe->SubTree(unknown_node_);
-  EXPECT_EQ(qe2->GetString(content_node_),content_);
+  EXPECT_EQ(qe2->GetString(content_node_), content_);
 }
 
 

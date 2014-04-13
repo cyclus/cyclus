@@ -13,5 +13,5 @@ TEST_P(RegionTests, Print) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(RegionTests, IsRegion) {
-  EXPECT_EQ("Region",region_->kind());
+  EXPECT_EQ("Region", region_->kind());
 }

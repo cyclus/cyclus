@@ -30,7 +30,7 @@ class InstitutionTests : public TestWithParam<AgentConstructor*> {
     test_region_ = new TestRegion(tc_.get());
     institution_->Build(test_region_);
   }
-  virtual void TearDown(){}
+  virtual void TearDown() {}
 
  protected:
   TestInst* institution_;

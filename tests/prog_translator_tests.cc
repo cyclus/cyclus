@@ -32,27 +32,27 @@ TEST(ProgTranslatorTests, translation) {
   int nrows = 8;
   int nexcl = 3;
 
-  double prefs [] = {0.2, 1.2, 4, 5, 1.3};
-  double ucaps_a_0 [] = {0.5, 0.4};
-  double ucaps_a_3 [] = {0.3, 0.6};
-  double ucaps_b_1 [] = {0.9};
-  double ucaps_b_2 [] = {0.8};
-  double ucaps_b_4 [] = {0.7};
-  double ucaps_c_0 [] = {0.7};
-  double ucaps_c_1 [] = {0.8};
-  double ucaps_c_2 [] = {0.9};
-  double ucaps_d_3 [] = {1.3, 2};
-  double ucaps_d_4 [] = {1.4, 1.9};
-  double ucaps_5 [] = {1.0};
-  double ucaps_6 [] = {1.0};
+  double prefs[] = {0.2, 1.2, 4, 5, 1.3};
+  double ucaps_a_0[] = {0.5, 0.4};
+  double ucaps_a_3[] = {0.3, 0.6};
+  double ucaps_b_1[] = {0.9};
+  double ucaps_b_2[] = {0.8};
+  double ucaps_b_4[] = {0.7};
+  double ucaps_c_0[] = {0.7};
+  double ucaps_c_1[] = {0.8};
+  double ucaps_c_2[] = {0.9};
+  double ucaps_d_3[] = {1.3, 2};
+  double ucaps_d_4[] = {1.4, 1.9};
+  double ucaps_5[] = {1.0};
+  double ucaps_6[] = {1.0};
 
-  double dem_a [] = {5.0, 4.9};
-  double dem_b [] = {4.0};
-  double sup_c [] = {10.0};
-  double sup_d [] = {10.1, 9.1};
+  double dem_a[] = {5.0, 4.9};
+  double dem_b[] = {4.0};
+  double sup_c[] = {10.0};
+  double sup_d[] = {10.1, 9.1};
 
-  int excl_arcs [] = {1, 2, 4};
-  double excl_flow [] = {0, 2, 2, 0, 2, 0, 0};
+  int excl_arcs[] = {1, 2, 4};
+  double excl_flow[] = {0, 2, 2, 0, 2, 0, 0};
 
   std::vector<double> obj_coeffs;
   for (int i = 0; i != narcs; i++) {
@@ -61,8 +61,8 @@ TEST(ProgTranslatorTests, translation) {
   }
 
   double cost_add = 1;
-  double max_obj_coeff = 1 / 0.2; // 1 / prefs[0]
-  double min_row_coeff = 0.3; // ucaps_a_3
+  double max_obj_coeff = 1 / 0.2;  // 1 / prefs[0]
+  double min_row_coeff = 0.3;  // ucaps_a_3
   double max_cost = max_obj_coeff / min_row_coeff + cost_add;
   for (int i = 0; i != nfaux; i++) {
     obj_coeffs.push_back(max_cost);
@@ -111,12 +111,12 @@ TEST(ProgTranslatorTests, translation) {
   a1->prefs[x3] = prefs[3];
   b1->prefs[x4] = prefs[4];
 
-  RequestGroup::Ptr a(new RequestGroup()); // new RequestGroup(dem_a[0])?
+  RequestGroup::Ptr a(new RequestGroup());  // new RequestGroup(dem_a[0])?
   a->AddExchangeNode(a0);
   a->AddExchangeNode(a1);
   a->AddCapacity(dem_a[0]);
   a->AddCapacity(dem_a[1]);
-  RequestGroup::Ptr b(new RequestGroup()); // new RequestGroup(dem_b[0])?
+  RequestGroup::Ptr b(new RequestGroup());  // new RequestGroup(dem_b[0])?
   b->AddExchangeNode(b0);
   b->AddExchangeNode(b1);
   b->AddCapacity(dem_b[0]);
@@ -147,10 +147,10 @@ TEST(ProgTranslatorTests, translation) {
   ASSERT_NO_THROW(pt.Translate());
 
   // test non-coin xlate members
-  double col_lbs [] = {0, 0, 0, 0, 0, 0, 0};
-  double col_ubs [] = {inf, 1, 1, inf, 1, inf, inf};
-  double row_lbs [] = {0, 0, 0, dem_a[0], dem_a[1], dem_b[0], 0, 0};
-  double row_ubs [] = {sup_c[0], sup_d[0], sup_d[1], inf, inf, inf, 1, 1};
+  double col_lbs[] = {0, 0, 0, 0, 0, 0, 0};
+  double col_ubs[] = {inf, 1, 1, inf, 1, inf, inf};
+  double row_lbs[] = {0, 0, 0, dem_a[0], dem_a[1], dem_b[0], 0, 0};
+  double row_ubs[] = {sup_c[0], sup_d[0], sup_d[1], inf, inf, inf, 1, 1};
   array_double_eq(&obj_coeffs[0], &pt.ctx().obj_coeffs[0], narcs + nfaux, "obj");
   array_double_eq(col_ubs, &pt.ctx().col_ubs[0], narcs + nfaux, "col_ub");
   array_double_eq(col_lbs, &pt.ctx().col_lbs[0], narcs + nfaux, "col_lb");
@@ -165,43 +165,43 @@ TEST(ProgTranslatorTests, translation) {
   CoinPackedMatrix m(false, 0, 0);
   m.setDimensions(0, narcs + nfaux);
 
-  int row_ind_0 [] = {0, 1, 2};
-  double row_val_0 [] = {ucaps_c_0[0],
-                         ucaps_c_1[0] * excl_flow[1],
-                         ucaps_c_2[0] * excl_flow[2]};
+  int row_ind_0[] = {0, 1, 2};
+  double row_val_0[] = {ucaps_c_0[0],
+                        ucaps_c_1[0] * excl_flow[1],
+                        ucaps_c_2[0] * excl_flow[2]};
   m.appendRow(3, row_ind_0, row_val_0);
 
-  int row_ind_1 [] = {3, 4};
-  double row_val_1 [] = {ucaps_d_3[0],
-                         ucaps_d_4[0] * excl_flow[4]};
+  int row_ind_1[] = {3, 4};
+  double row_val_1[] = {ucaps_d_3[0],
+                        ucaps_d_4[0] * excl_flow[4]};
   m.appendRow(2, row_ind_1, row_val_1);
 
-  int row_ind_2 [] = {3, 4};
-  double row_val_2 [] = {ucaps_d_3[1],
-                         ucaps_d_4[1] * excl_flow[4]};
+  int row_ind_2[] = {3, 4};
+  double row_val_2[] = {ucaps_d_3[1],
+                        ucaps_d_4[1] * excl_flow[4]};
   m.appendRow(2, row_ind_2, row_val_2);
 
-  int row_ind_3 [] = {0, 3, 5};
-  double row_val_3 [] = {ucaps_a_0[0], ucaps_a_3[0], 1};
+  int row_ind_3[] = {0, 3, 5};
+  double row_val_3[] = {ucaps_a_0[0], ucaps_a_3[0], 1};
   m.appendRow(3, row_ind_3, row_val_3);
 
-  int row_ind_4 [] = {0, 3, 5};
-  double row_val_4 [] = {ucaps_a_0[1], ucaps_a_3[1], 1};
+  int row_ind_4[] = {0, 3, 5};
+  double row_val_4[] = {ucaps_a_0[1], ucaps_a_3[1], 1};
   m.appendRow(3, row_ind_4, row_val_4);
 
-  int row_ind_5 [] = {1, 2, 4, 6};
-  double row_val_5 [] = {ucaps_b_1[0] * excl_flow[1],
-                         ucaps_b_2[0] * excl_flow[2],
-                         ucaps_b_4[0] * excl_flow[4],
-                         1};
+  int row_ind_5[] = {1, 2, 4, 6};
+  double row_val_5[] = {ucaps_b_1[0] * excl_flow[1],
+                        ucaps_b_2[0] * excl_flow[2],
+                        ucaps_b_4[0] * excl_flow[4],
+                        1};
   m.appendRow(4, row_ind_5, row_val_5);
 
-  int row_ind_6 [] = {1};
-  double row_val_6 [] = {1};
+  int row_ind_6[] = {1};
+  double row_val_6[] = {1};
   m.appendRow(1, row_ind_6, row_val_6);
 
-  int row_ind_7 [] = {2, 4};
-  double row_val_7 [] = {1, 1};
+  int row_ind_7[] = {2, 4};
+  double row_val_7[] = {1, 1};
   m.appendRow(2, row_ind_7, row_val_7);
 
   EXPECT_TRUE(m.isEquivalent2(pt.ctx().m));
@@ -237,16 +237,16 @@ TEST(ProgTranslatorTests, translation) {
   // validate solution
   double x1_flow = excl_flow[1];
   double x2_flow = excl_flow[2];
-  double x3_flow = sup_d[1] / ucaps_d_3[1]; // 4.55
+  double x3_flow = sup_d[1] / ucaps_d_3[1];  // 4.55
   double x4_flow = 0;
-  double x0_flow = (dem_a[0] - ucaps_a_3[0] * x3_flow) /  ucaps_a_0[0]; // 7.27
+  double x0_flow = (dem_a[0] - ucaps_a_3[0] * x3_flow) /  ucaps_a_0[0];  // 7.27
 
   // first faux arc
   double x5_flow = 0;
   // second faux arc
   double x6_flow = dem_b[0] -
                    ucaps_b_1[0] * excl_flow[1] -
-                   ucaps_b_2[0] * excl_flow[2]; // 0.6;
+                   ucaps_b_2[0] * excl_flow[2];  // 0.6;
 
   EXPECT_DOUBLE_EQ(soln[0], x0_flow);
   EXPECT_EQ(soln[1], 1);
@@ -266,6 +266,6 @@ TEST(ProgTranslatorTests, translation) {
   pair_double_eq(matches[3], std::pair<Arc, double>(x3, x3_flow));
 
   delete iface;
-};
+}
 
-} // namespace cyclus
+}  // namespace cyclus

@@ -11,11 +11,11 @@ class TestContext {
  public:
   TestContext() {
     ctx_ = new Context(&ti_, &rec_);
-  };
+  }
 
   ~TestContext() {
     delete ctx_;
-  };
+  }
 
   Context* get() {return ctx_;}
   Timer* timer() {return &ti_;}

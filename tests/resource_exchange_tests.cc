@@ -45,7 +45,7 @@ class Requester: public TestFacility {
       : TestFacility(ctx),
         i_(i),
         req_ctr_(0),
-        pref_ctr_(0) {};
+        pref_ctr_(0) {}
 
   virtual cyclus::Agent* Clone() {
     Requester* m = new Requester(context());
@@ -53,7 +53,7 @@ class Requester: public TestFacility {
     m->i_ = i_;
     m->port_ = port_;
     return m;
-  };
+  }
 
   set<RequestPortfolio<Material>::Ptr> GetMatlRequests() {
     set<RequestPortfolio<Material>::Ptr> rps;
@@ -89,14 +89,14 @@ class Bidder: public TestFacility {
   Bidder(Context* ctx, std::string commod)
       : TestFacility(ctx),
         commod_(commod),
-        bid_ctr_(0) {};
+        bid_ctr_(0) {}
 
   virtual cyclus::Agent* Clone() {
     Bidder* m = new Bidder(context(), commod_);
     m->InitFrom(this);
     m->port_ = port_;
     return m;
-  };
+  }
 
   set<BidPortfolio<Material>::Ptr> GetMatlBids(
       const CommodMap<Material>::type& commod_requests) {
@@ -135,11 +135,11 @@ class ResourceExchangeTests: public ::testing::Test {
 
     reqr = new Requester(tc.get());
     exchng = new ResourceExchange<Material>(tc.get());
-  };
+  }
 
   virtual void TearDown() {
     delete exchng;
-  };
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

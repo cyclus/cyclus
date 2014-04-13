@@ -28,7 +28,7 @@ class Spy {
   int
 num;
 
-  //using std::string;
+  // using std::string;
   using namespace std;
 
   #pragma cyclus var dict(\
@@ -39,8 +39,8 @@ num;
     help="time {0}".format(time.time()),\
     )
   string name;
-  //std::string name;
-  //char * name;
+  // std::string name;
+  // char * name;
 
   #pragma cyclus var {\
     "default": 0.22,\
@@ -64,7 +64,8 @@ num;
   // std::pair<std::string, list<std::string> > villan_minions;
   // pair<std::string, list<std::string> > villan_minions;
   deuce<std::string, list<std::string> > villan_minions;
-private:
+
+ private:
   double not_var;
 };
 

@@ -212,7 +212,7 @@ void Case3::Construct(ExchangeGraph* g, bool exclusive_orders) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case3::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy-excl") { // 0 out non-exclusive flows
+  if (solver_type == "greedy-excl") {  // 0 out non-exclusive flows
     if (f1 < q) {
       f1 = 0;
     }
@@ -337,7 +337,7 @@ void Case3f::Test(std::string solver_type, ExchangeGraph* g) {
       Match arr[] = {exp1, exp2};
       std::vector<Match> vexp(arr, arr + sizeof(arr) / sizeof(arr[0]));
       EXPECT_EQ(vexp, g->matches());
-  } else if(solver_type == "greedy-excl") {
+  } else if (solver_type == "greedy-excl") {
     EXPECT_TRUE(g->matches().empty());
   }
 }
@@ -404,7 +404,7 @@ void Case4a::Construct(ExchangeGraph* g, bool exclusive_orders) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case4a::Test(std::string solver_type, ExchangeGraph* g) {
   if (solver_type == "greedy-excl") {
-    f1 = 0; // q1 > c => not a full order
+    f1 = 0;  // q1 > c => not a full order
     f2 = c;
   }
 
@@ -436,7 +436,7 @@ void Case4c::Construct(ExchangeGraph* g, bool exclusive_orders) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case4c::Test(std::string solver_type, ExchangeGraph* g) {
   if (solver_type == "greedy-excl") {
-    f2 = 0; // q2 > c - q1 => not a full order
+    f2 = 0;  // q2 > c - q1 => not a full order
   }
 
   Case4::Test(solver_type, g);
@@ -500,7 +500,7 @@ void Case5::Construct(ExchangeGraph* g, bool exclusive_orders) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Case5::Test(std::string solver_type, ExchangeGraph* g) {
-  if (solver_type == "greedy-excl") { // 0 out non-exclusive flows
+  if (solver_type == "greedy-excl") {  // 0 out non-exclusive flows
     if (f1 < q) {
       f1 = 0;
     }
@@ -741,4 +741,4 @@ void Case7::Test(std::string solver_type, ExchangeGraph* g) {
   }
 }
 
-} // namespace cyclus
+}  // namespace cyclus
