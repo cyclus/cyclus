@@ -21,16 +21,14 @@ std::string Source::str() {
 }
 
 void Source::Tick(int time) {
-  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is ticking {";
+  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is ticking";
   LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity_
                                    << " kg of "
                                    << commod_ << ".";
-  LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
 }
 
 void Source::Tock(int time) {
-  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is tocking {";
-  LOG(cyclus::LEV_INFO3, "SrcFac") << "}";
+  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is tocking";
 }
 
 cyclus::Material::Ptr Source::GetOffer(
