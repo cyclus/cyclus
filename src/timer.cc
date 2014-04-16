@@ -79,7 +79,9 @@ void Timer::DoDecom() {
   std::vector<Agent*> decom_list = decom_queue_[time_];
   for (int i = 0; i < decom_list.size(); ++i) {
     Agent* m = decom_list[i];
-    m->parent()->DecomNotify(m);
+    if (m->parent() != NULL) {
+      m->parent()->DecomNotify(m);
+    }
     m->Decommission();
   }
 }

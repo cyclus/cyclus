@@ -23,6 +23,7 @@ Facility::Facility(Context* ctx)
 
 Facility::~Facility() {};
 
+
 void Facility::InitFrom(Facility* m) {
   Agent::InitFrom(m);
 }

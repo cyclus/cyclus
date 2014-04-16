@@ -132,6 +132,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_region.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_inst.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_facility.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/timer_tests.cc"
   )
 
 ADD_EXECUTABLE( cyclus_unit_tests
