@@ -338,7 +338,7 @@ void SimInit::LoadNextIds() {
   conds.push_back(Cond("Time", "==", t_));
   QueryResult qr = b_->Query("NextIds", &conds);
   for (int i = 0; i < qr.rows.size(); ++i) {
-    std::string obj = qr.GetVal<std::string>("Object");
+    std::string obj = qr.GetVal<std::string>("Object", i);
     if (obj == "Agent") {
       Agent::next_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Transaction") {

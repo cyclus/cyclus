@@ -71,7 +71,7 @@ Agent::Agent(Context* ctx)
 }
 
 Agent::~Agent() {
-  MLOG(LEV_DEBUG3) << "Deleting agent '" << prototype() << "' ID=" << id_ << " {";
+  MLOG(LEV_DEBUG3) << "Deleting agent '" << prototype() << "' ID=" << id_;
   context()->agent_list_.erase(this);
   
   if (parent_ != NULL) {
@@ -85,14 +85,12 @@ Agent::~Agent() {
     }
   }
 
-  // delete children
-  while (children_.size() > 0) {
-    Agent* child = children_.at(0);
-    MLOG(LEV_DEBUG4) << "Deleting child agent ID=" << child->id() << " {";
-    ctx_->DelAgent(child);
-    MLOG(LEV_DEBUG4) << "}";
+  // set children's parents to NULL
+  for (int i = 0; i < children_.size(); ++i) {
+    Agent* child = children_[i];
+    child->parent_ = NULL;
+    child->parent_id_ = -1;
   }
-  MLOG(LEV_DEBUG3) << "}";
 }
 
 std::string Agent::str() {
