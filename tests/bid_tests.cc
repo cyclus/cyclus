@@ -1,18 +1,16 @@
+#include <string>
 
 #include <gtest/gtest.h>
 
-#include <string>
-
+#include "bid.h"
 #include "composition.h"
 #include "facility.h"
-#include "product.h"
 #include "material.h"
-#include "test_modules/test_facility.h"
+#include "product.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
-
-#include "bid.h"
+#include "test_modules/test_facility.h"
 
 using cyclus::Bid;
 using cyclus::Composition;
@@ -26,7 +24,7 @@ using test_helpers::get_mat;
 using test_helpers::get_req;
 using test_helpers::trader;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, MaterialGetSet) {
   TestContext tc;
   TestFacility* fac = new TestFacility(tc.get());
@@ -36,7 +34,7 @@ TEST(BidTests, MaterialGetSet) {
   double qty = 1.0;
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
   Request<Material>::Ptr req = get_req();
-  
+
   Bid<Material>::Ptr r = Bid<Material>::Create(req, mat, fac);
 
   EXPECT_EQ(fac, r->bidder());
@@ -44,19 +42,17 @@ TEST(BidTests, MaterialGetSet) {
   EXPECT_EQ(mat, r->offer());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, ProductGetSet) {
   TestContext tc;
   TestFacility* fac = new TestFacility(tc.get());
   double qty = 1.0;
   string quality = "qual";
 
-  Product::Ptr rsrc =
-      Product::CreateUntracked(qty, quality);
-  
-  Request<Product>::Ptr req =
-      Request<Product>::Create(rsrc, trader);
-  
+  Product::Ptr rsrc = Product::CreateUntracked(qty, quality);
+
+  Request<Product>::Ptr req = Request<Product>::Create(rsrc, trader);
+
   Bid<Product>::Ptr r = Bid<Product>::Create(req, rsrc, fac);
 
   EXPECT_EQ(fac, r->bidder());

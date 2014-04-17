@@ -6,7 +6,7 @@
 #include "commodity_producer.h"
 #include "commodity_producer_manager.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CommodityTestHelper {
  public:
   /// constructor
@@ -26,13 +26,13 @@ class CommodityTestHelper {
 
   /// second producer
   cyclus::CommodityProducer* producer2;
-  
+
   /// production capacity
   double capacity;
 
   /// number of producers
   int nproducers;
-  
+
   /// a manager of commodity producers
   cyclus::CommodityProducerManager manager;
 

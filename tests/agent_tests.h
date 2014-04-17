@@ -1,5 +1,5 @@
-#ifndef CYCLUS_TESTS_MODEL_TESTS_H_
-#define CYCLUS_TESTS_MODEL_TESTS_H_
+#ifndef CYCLUS_TESTS_AGENT_TESTS_H_
+#define CYCLUS_TESTS_AGENT_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -12,22 +12,22 @@
 using ::testing::TestWithParam;
 using ::testing::Values;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Inside the test body, fixture constructor, SetUp(), and TearDown() we
 // can refer to the test parameter by GetParam().  In this case, the test
-// parameter is a pointer to a concrete Agent instance 
+// parameter is a pointer to a concrete Agent instance
 typedef cyclus::Agent* AgentConstructor(cyclus::Context* ctx);
 
 class AgentTests : public TestWithParam<AgentConstructor*> {
-  public:
-    virtual void SetUp() { 
-      agent_ = (*GetParam())(tc_.get());
-    }
-    virtual void TearDown(){}
+ public:
+  virtual void SetUp() {
+    agent_ = (*GetParam())(tc_.get());
+  }
+  virtual void TearDown() {}
 
-  protected:
-    cyclus::Agent* agent_;
-    cyclus::TestContext tc_;
+ protected:
+  cyclus::Agent* agent_;
+  cyclus::TestContext tc_;
 };
 
 #else
@@ -42,5 +42,4 @@ TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
 #endif  // GTEST_HAS_PARAM_TEST
 
-#endif // CYCLUS_TESTS_MODEL_TESTS_H_
-
+#endif  // CYCLUS_TESTS_AGENT_TESTS_H_

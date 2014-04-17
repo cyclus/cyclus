@@ -6,12 +6,11 @@
 
 #include "symbolic_functions.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class SymbolicFunctionTests : public ::testing::Test 
-{
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class SymbolicFunctionTests : public ::testing::Test {
  public:
   cyclus::SymFunction::Ptr linear_func, exp_func;
-  
+
   double lin_xoffset, lin_yoffset;
   double slope, intercept;
 
@@ -19,8 +18,8 @@ class SymbolicFunctionTests : public ::testing::Test
   double constant, exponent;
 
   std::vector<double> check_points;
-  
-  virtual void SetUp();  
+
+  virtual void SetUp();
   virtual void TearDown();
 
   void SetUpPiecewiseEnvironment();

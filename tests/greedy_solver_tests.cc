@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "exchange_graph.h"
-
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
 
@@ -10,7 +9,7 @@ using cyclus::Arc;
 using cyclus::AvgPrefComp;
 using cyclus::ExchangeNode;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(GreedySolverTests, AvgPref) {
   ExchangeNode::Ptr u1(new ExchangeNode());
   ExchangeNode::Ptr u2(new ExchangeNode());

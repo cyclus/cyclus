@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "material.h"
-
 #include "commodity_recipe_context.h"
+#include "material.h"
 
 namespace cyclus {
 
@@ -13,7 +12,7 @@ TEST(CommodRecCtx, All) {
   std::string out_r = "out_r";
 
   std::string in_r2 = "in_r2";
-  
+
   Material::Ptr mat = NewBlankMaterial(42);
 
   CommodityRecipeContext ctx;
@@ -55,4 +54,4 @@ TEST(CommodRecCtx, DuplicateOutcommod) {
   EXPECT_EQ(1, ctx.out_commods().size());
 }
 
-} // namespace cyclus
+}  // namespace cyclus

@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include "context.h"
@@ -23,18 +22,18 @@ class ContextTests: public ::testing::Test {
   virtual void SetUp() {
     ctx = new Context(&ti, &rec);
     fac = new TestFacility(ctx);
-  };
+  }
 
   virtual void TearDown() {
     delete ctx;
-  };
-
+  }
 };
 
 class DonutShop : public Agent {
  public:
   DonutShop(Context* ctx, std::string dotd)
-    : Agent(ctx), donut_of_the_day(dotd) { };
+      : Agent(ctx),
+        donut_of_the_day(dotd) {}
 
   virtual ~DonutShop() {
     destruct_count++;
@@ -44,15 +43,15 @@ class DonutShop : public Agent {
     DonutShop* m = new DonutShop(context(), donut_of_the_day);
     m->InitFrom(this);
     return m;
-  };
+  }
 
   void InitFrom(DonutShop* m) {
     Agent::InitFrom(m);
-  };
+  }
 
-  virtual void Snapshot(cyclus::DbInit di) {};
-  virtual void InitInv(cyclus::Inventories& inv) {};
-  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
+  virtual void Snapshot(cyclus::DbInit di) {}
+  virtual void InitInv(cyclus::Inventories& inv) {}
+  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();}
 
   static int destruct_count;
   std::string donut_of_the_day;
@@ -101,5 +100,3 @@ TEST_F(ContextTests, CreateAgent) {
 
   EXPECT_EQ(6, DonutShop::destruct_count);
 }
-
-

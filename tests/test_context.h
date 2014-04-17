@@ -11,12 +11,12 @@ class TestContext {
  public:
   TestContext() {
     ctx_ = new Context(&ti_, &rec_);
-  };
+  }
 
   ~TestContext() {
     delete ctx_;
-  };
-  
+  }
+
   Context* get() {return ctx_;}
   Timer* timer() {return &ti_;}
   Recorder* recorder() {return &rec_;}
@@ -26,6 +26,7 @@ class TestContext {
   Recorder rec_;
   Context* ctx_;
 };
-} // namespace cyclus
+
+}  // namespace cyclus
 
 #endif  // CYCLUS_TESTS_TEST_CONTEXT_H_

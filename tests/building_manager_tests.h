@@ -7,7 +7,7 @@
 #include "building_manager.h"
 #include "commodity_test_helper.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BuildingManagerTests : public ::testing::Test {
  protected:
   CommodityTestHelper helper;
@@ -18,7 +18,7 @@ class BuildingManagerTests : public ::testing::Test {
   int build1, build2;
 
  public:
-  virtual void SetUp();  
+  virtual void SetUp();
   virtual void TearDown();
   void SetUpProblem();
 };

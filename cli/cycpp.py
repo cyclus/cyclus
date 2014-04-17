@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """The cyclus preprocessor.
 
-cycpp is a 3-pass preprocessor which adds reflection-like semantics to cyclus 
+cycpp is a 3-pass preprocessor which adds reflection-like semantics to cyclus
 agents. This is needed to provide a high-level, user-facing API to cyclus.
 Code that uses cycpp is entirely valid C++ code and will compile normally even
-without first running it through the cycpp. This is because cycpp relies on 
-custom #pragma decoration to annotate or inject into the code. These pragmas 
+without first running it through the cycpp. This is because cycpp relies on
+custom #pragma decoration to annotate or inject into the code. These pragmas
 are skipped - by definition - by the C preprocessor and the C/C++ compiler.
 
 The three passes of cycpp are:
@@ -20,21 +20,21 @@ All decorators have the following form::
 
 The ``#pragma cyclus`` portion is a flag so that *only* cycpp consumes this
 #directive. This is followed by the actual ``<decorator name>`` which tells
-cycpp what to do with this pragma. Lastly, optionals arguments may be passed to
+cycpp what to do with this pragma. Lastly, optional arguments may be passed to
 this decorator but all options *must* be on the same logical line as the
 directive.  How the arguments are interpreted is a function of the decorators
-themselves.  Most of them are simple Python statements or expressions.  See the
+themselves.  Most of them are simple Python statements or expressions. See the
 following handy table!
 
 **Decorator Arguments:**
 
-:var:  Add the following C++ statement as an Agent's state variable. There is one 
-       argument which must be a Python expression that evaluates to a dictionary or
-       other mapping.
+:var:  Add the following C++ statement as an Agent's state variable. There is
+       one argument which must be a Python expression that evaluates to
+       a dictionary or other mapping.
 :exec: Executes arbitrary python code that is passed in as the arguments and
        loads this into the context. This is useful for importing handy modules,
        declaring variables for later use, or any of the other things that Python
-       is great for. Any variables defined here are kept in a seperate
+       is great for. Any variables defined here are kept in a separate
        namespace from the classes.  Since this gives you direct access to the
        Python interpreter, try to be a little careful.
 
@@ -55,23 +55,23 @@ if sys.version_info[0] == 2:
     STRING_TYPES = (str, unicode, basestring)
 elif sys.version_info[0] >= 3:
     STRING_TYPES = (str,)
-# Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE! 
+# Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE!
 RE_MULTILINE_COMMENT = "(?:\s*?/\*(?!\*/)*?\*/)"
 RE_SINGLE_LINE_COMMENT = "(?:\s*?//[^\n]*?\n\s*?)"
 RE_COMMENTS = "(?:" + RE_MULTILINE_COMMENT + "|" + RE_SINGLE_LINE_COMMENT + ")"
 
-# This migh miss files which start with '#' - however, after canonization
+# This might miss files which start with '#' - however, after canonization
 # (through cpp) it shouldn't matter.
 RE_STATEMENT = re.compile(
     # find the start of pragmas and comments
     r'(?:(\s*#|\s*//)|\s*(/\*))?'
     # consider access control as statements
-    r'(\s+(public|private|protected)\s*|'  
+    r'(\s+(public|private|protected)\s*|'
     # or, consider statement until we hit '{', '}', or ';'
-    r'(?(1)[^\n]|(?(2).|[^{};]))*?)' 
-    # find end condition, '\n' for pragma and single line commentd, 
+    r'(?(1)[^\n]|(?(2).|[^{};]))*?)'
+    # find end condition, '\n' for pragma and single line commentd,
     # ':' for access, '*/' for multiline comments, and '{', '}', ';' otherwise
-    r'((?(1)\n|(?(2)\*/|(?(4):|[{};]))))', 
+    r'((?(1)\n|(?(2)\*/|(?(4):|[{};]))))',
     re.MULTILINE | re.DOTALL)
 
 CYCNS = 'cyclus'
@@ -83,10 +83,10 @@ BUFFERS = {
 }
 
 WRANGLERS = {
-    '{0}::Agent'.format(CYCNS), 
-    '{0}::Facility'.format(CYCNS), 
-    '{0}::Institution'.format(CYCNS), 
-    '{0}::Region'.format(CYCNS), 
+    '{0}::Agent'.format(CYCNS),
+    '{0}::Facility'.format(CYCNS),
+    '{0}::Institution'.format(CYCNS),
+    '{0}::Region'.format(CYCNS),
     'mi6::Spy',  # for testing!!
     }
 
@@ -103,15 +103,15 @@ def preprocess_file(filename, includes = [], cpp_path='cpp', cpp_args=('-xc++', 
     includes : list
         A list of all include directories to tell the preprocessor about
     cpp_path : str, optional
-    cpp_args : str, optional 
-        Refer to the documentation of parse_file for the meaning of these 
+    cpp_args : str, optional
+        Refer to the documentation of parse_file for the meaning of these
         arguments.
 
     Notes
     -----
     This was forked from pycparser: https://github.com/eliben/pycparser
     """
-    path_list = [cpp_path] 
+    path_list = [cpp_path]
     for include in includes:
         path_list += ['-I', include]
     if isinstance(cpp_args, Sequence):
@@ -301,7 +301,7 @@ class ClassAndSuperclassFilter(ClassFilter):
             for sup in superclasses:
                 trysup = state.canonize_class(sup)
                 if trysup is None:
-                    # We cannot raise an error here becuase there are too many 
+                    # We cannot raise an error here becuase there are too many
                     # corner cases we do not and should not support in C++
                     continue
                 sc.add(trysup)
@@ -322,7 +322,7 @@ class VarDecorationFilter(Filter):
 
         #pragma cyclus var <dict>
 
-    This evals the contents of dict and puts them in state.var_annotations, to be 
+    This evals the contents of dict and puts them in state.var_annotations, to be
     consumed by the next match with VarDeclarationFilter.
     """
     regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
@@ -365,7 +365,7 @@ class VarDecorationFilter(Filter):
             glb[k] = prx[k]
 
 class VarDeclarationFilter(Filter):
-    """State varible declaration.  Only oeprates if state.var_annotations is 
+    """State varible declaration.  Only oeprates if state.var_annotations is
     not None. Access for member variable must be public.
     """
     regex = re.compile("(.*\w+.*?)\s+(\w+)")
@@ -385,7 +385,7 @@ class VarDeclarationFilter(Filter):
         state.var_annotations = None
 
 class ExecFilter(Filter):
-    """Filter for executing arbitrary python code in the exec pragma and 
+    """Filter for executing arbitrary python code in the exec pragma and
     adding the results to the context.  This pragma has the form:
 
         #pragma cyclus exec <code>
@@ -405,21 +405,21 @@ class ExecFilter(Filter):
 class StateAccumulator(object):
     """The StateAccumulator class is the pass 2 state machine.
 
-    This represents the state of the file as it is being traversed.  
+    This represents the state of the file as it is being traversed.
     At the end of the traversal this will have acquired all of the information
-    needed for pass 2. It manages both the decorators and other needed bits 
-    of C++ syntax. It works by passing each statement through a sequence of 
+    needed for pass 2. It manages both the decorators and other needed bits
+    of C++ syntax. It works by passing each statement through a sequence of
     filters, and builds up or destroys context as it goes.
 
     This class also functions as a typesystem for the types it sees.
     """
-    
+
     def __init__(self):
         self.depth = 0
         self.execns = {}   # execution namespace we have accumulated
         self.context = {}  # classes we have accumulated
         # stack of (depth, class name) tuples, most nested is last
-        self.classes = []  
+        self.classes = []
         self.superclasses = {}  # map from classes to set of super classes.
         self.access = {}   # map of (classnames, current access control flags)
         self.namespaces = []  # stack of (depth, ns name) tuples
@@ -427,9 +427,9 @@ class StateAccumulator(object):
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.var_annotations = None
         self.linemarkers = []
-        self.filters = [ClassAndSuperclassFilter(self), AccessFilter(self), 
-                        ExecFilter(self), UsingNamespaceFilter(self), 
-                        NamespaceAliasFilter(self), NamespaceFilter(self), 
+        self.filters = [ClassAndSuperclassFilter(self), AccessFilter(self),
+                        ExecFilter(self), UsingNamespaceFilter(self),
+                        NamespaceAliasFilter(self), NamespaceFilter(self),
                         TypedefFilter(self), UsingFilter(self), LinemarkerFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self)]
 
@@ -440,7 +440,7 @@ class StateAccumulator(object):
         return "::".join(names)
 
     def accumulate(self, statement, sep):
-        """Modify the existing state by incoprorating the statement, which is 
+        """Modify the existing state by incoprorating the statement, which is
         partitioned from the next statement by sep.
         """
         # filters have to come before sep
@@ -454,7 +454,7 @@ class StateAccumulator(object):
         elif sep == '}':
             self.depth -= 1
         # revert what is needed
-        for filter in self.filters: 
+        for filter in self.filters:
             filter.revert(statement, sep)
 
     def includeloc(self):
@@ -496,7 +496,7 @@ class StateAccumulator(object):
                 return self._canonize_targs(talias, targs)
             for d, nsa in sorted(self.using_namespaces, reverse=True):
                 if len(tname.split(scopz)) > len(nsa.split(scopz)):
-                    # fixed point of reccursion when type would be more scoped than 
+                    # fixed point of reccursion when type would be more scoped than
                     # the alias - which is impossible.
                     continue
                 try:
@@ -526,7 +526,7 @@ class StateAccumulator(object):
                 return self.canonize_type(talias, name)
             for d, nsa in sorted(self.using_namespaces, reverse=True):
                 if len(t.split(scopz)) > len(nsa.split(scopz)):
-                    # fixed point of reccursion when type would be more scoped than 
+                    # fixed point of reccursion when type would be more scoped than
                     # the alias - which is impossible.
                     continue
                 try:
@@ -536,7 +536,7 @@ class StateAccumulator(object):
             else:
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
                        "primitive type: {p}.").format(
-                    i=self.includeloc(), t=t, n=name, c=self.classname(), 
+                    i=self.includeloc(), t=t, n=name, c=self.classname(),
                     p=", ".join(sorted(self.supported_types)))
                 raise TypeError(msg)
         return t
@@ -547,8 +547,8 @@ class StateAccumulator(object):
         return tuple(newt)
 
     def canonize_class(self, cls, _usens=True):
-        """This canonizes a classname.  The class name need not be the current 
-        class whose scope we are in, but may be any class whatsoever. Returns 
+        """This canonizes a classname.  The class name need not be the current
+        class whose scope we are in, but may be any class whatsoever. Returns
         None if the class could not be canonized.
         """
         if cls in self.superclasses:
@@ -603,11 +603,11 @@ class CodeGeneratorFilter(Filter):
         pragmaname = self.pragmaname
         self.regex = re.compile(self.re_template.format(pragmaname), re.DOTALL)
         self.local_classname = None  # class we are currently in, if any
-        # class we determine from pragma, if any, Note that we have no way of 
-        # reliably guessing scope on pass 3. Users will either *have* to give 
+        # class we determine from pragma, if any, Note that we have no way of
+        # reliably guessing scope on pass 3. Users will either *have* to give
         # class names that are in the current namespace (Spy) or use classnames
         # that are fully qualified (mi6::Spy).
-        self.given_classname = None  
+        self.given_classname = None
 
     def transform(self, statement, sep):
         # basic setup
@@ -629,13 +629,13 @@ class CodeGeneratorFilter(Filter):
 
         # compute def line
         ctx = context[classname] = context.get(classname, OrderedDict())
-        in_class_decl = self.in_class_decl() 
+        in_class_decl = self.in_class_decl()
         #ns = "" if in_class_decl else classname.split('::')[-1] + "::"
         ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
         virt = "virtual " if in_class_decl else ""
         end = ";" if mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
-        definition = self.def_template.format(ind=" "*ind, virt=virt, 
+        definition = self.def_template.format(ind=" "*ind, virt=virt,
                         rtn=self.methodrtn, ns=ns, methodname=self.methodname,
                         args=self.methodargs(), sep=end)
 
@@ -645,11 +645,11 @@ class CodeGeneratorFilter(Filter):
         if mode != "decl":
             impl = self.impl(ind=ind * " ")
         ind -= 2
-        if not impl.endswith("\n") and 0 != len(impl): 
+        if not impl.endswith("\n") and 0 != len(impl):
             impl += '\n'
         end = "" if mode == "decl" else " " * ind + "};\n"
 
-        # compute return 
+        # compute return
         if mode == 'impl':
             return impl
         else:
@@ -659,8 +659,8 @@ class CodeGeneratorFilter(Filter):
         # overwriteable
         return ""
 
-    def in_class_decl(self): 
-        return (len(self.machine.classes) > 0 and 
+    def in_class_decl(self):
+        return (len(self.machine.classes) > 0 and
                 self.given_classname == self.local_classname)
 
     def revert(self, statement, sep):
@@ -695,18 +695,18 @@ class InitFromCopyFilter(CodeGeneratorFilter):
     def methodargs(self):
         return "{0}* m".format(self.given_classname)
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
         impl = ""
-        
+
         # add inheritance init froms
-        rents = parent_intersection(self.given_classname, WRANGLERS, 
+        rents = parent_intersection(self.given_classname, WRANGLERS,
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
-            
+
         cap_buffs = []
 
         for member, info in ctx.items():
@@ -721,7 +721,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         return impl
 
 class InitFromDbFilter(CodeGeneratorFilter):
-    """Filter for handling db-constructor-like InitFrom() code 
+    """Filter for handling db-constructor-like InitFrom() code
     generation:
     #pragma cyclus [def|decl|impl] initfromdb [classname]
     """
@@ -732,7 +732,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
     def methodargs(self):
         return "{0}::QueryableBackend* b".format(CYCNS)
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
@@ -740,13 +740,13 @@ class InitFromDbFilter(CodeGeneratorFilter):
         pods = []
 
         # add inheritance init froms
-        rents = parent_intersection(self.given_classname, WRANGLERS, 
+        rents = parent_intersection(self.given_classname, WRANGLERS,
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
 
         cap_buffs = []
-            
+
         for member, info in ctx.items():
             t = info['type']
             if t in BUFFERS:
@@ -755,7 +755,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 continue
             if t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
                 if t[0] == 'std::map':
-                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
+                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
                 else:
                     table = 'ListOf' + t[1].replace('std::', '').title()
                 impl += ind + '{\n'
@@ -781,7 +781,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 pods.append((member, t))
             else:
                 raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
-        
+
         # add pod
         impl += ind + "{0}::QueryResult qr = b->Query(\"Info\", NULL);\n".format(CYCNS)
         for (member, t) in pods:
@@ -806,7 +806,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
     def methodargs(self):
         return "{0}::InfileTree* tree, {0}::DbInit di".format(CYCNS)
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
@@ -814,7 +814,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         impl = ""
 
         # add inheritance init froms
-        rents = parent_intersection(self.given_classname, WRANGLERS, 
+        rents = parent_intersection(self.given_classname, WRANGLERS,
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
@@ -829,7 +829,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             code = info['derived_init'] if 'derived_init' in info else None
             if t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
                 if t[0] == 'std::map':
-                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title() 
+                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
                 else:
                     table = 'ListOf' + t[1].split('::')[-1].title()
 
@@ -874,7 +874,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
                             impl += ind + '->Record();\n'
 
                 ind = ind[:-2]
-                impl += ind + '}\n'            
+                impl += ind + '}\n'
             elif t in PRIMITIVES:
                 pods.append((member, t, d, code))
             elif t[0] == 'std::pair':
@@ -906,7 +906,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
                     tail += ind + ("->AddVal(\"{0}B\", {0}.second)\n\"").format(member)
             else:
                 if d is not None:
-                    opt = ', "' + str(d) + '"' if t == "std::string" else ', ' + str(d) 
+                    opt = ', "' + str(d) + '"' if t == "std::string" else ', ' + str(d)
                 if code is None:
                     head += ind + ("{0} = {1}::{2}<{3}>(tree, \"{0}\"{4});\n").format(member, CYCNS, methname, t, opt)
                 tail += ind + ("->AddVal(\"{0}\", {0})\n").format(member)
@@ -914,7 +914,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 body += ind + code + '\n'
 
         tail += ind + '->Record();\n'
-        impl += head + body + tail 
+        impl += head + body + tail
         return impl
 
 class SchemaFilter(CodeGeneratorFilter):
@@ -925,7 +925,7 @@ class SchemaFilter(CodeGeneratorFilter):
     pragmaname = "schema"
     methodrtn = "std::string"
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
@@ -986,9 +986,9 @@ class SchemaFilter(CodeGeneratorFilter):
 
             if opt:
                 impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
-        
+
         impl += i +  '"</interleave>\\n"\n'
-        impl += i + ";\n";
+        impl += i + ";\n"
         return impl
 
 class SnapshotFilter(CodeGeneratorFilter):
@@ -1002,7 +1002,7 @@ class SnapshotFilter(CodeGeneratorFilter):
     def methodargs(self):
         return CYCNS + '::DbInit di'
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
@@ -1091,7 +1091,7 @@ class InitInvFilter(CodeGeneratorFilter):
     def methodargs(self):
         return "{0}::Inventories& inv".format(CYCNS)
 
-    def impl(self, ind="  "):        
+    def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
@@ -1111,7 +1111,7 @@ class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
         #pragma cyclus [def|decl|impl]
     """
-    regex = re.compile("\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$", 
+    regex = re.compile("\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$",
                        re.DOTALL)
 
     def transform(self, statement, sep):
@@ -1164,7 +1164,7 @@ class CodeGenerator(object):
     a sequence of filters, and injects code based on the directive and the
     state.
     """
-    
+
     def __init__(self, context, superclasses):
         self.depth = 0
         self.context = context  # the results of pass 2
@@ -1176,22 +1176,22 @@ class CodeGenerator(object):
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.linemarkers = []
         # all basic code generating filters
-        self.codegen_filters = [InitFromCopyFilter(self), 
+        self.codegen_filters = [InitFromCopyFilter(self),
                                 InitFromDbFilter(self), InfileToDbFilter(self),
                                 CloneFilter(self), SchemaFilter(self),
-                                InitInvFilter(self), 
-                                # SnapshotInv has to come before Snapshot for some 
+                                InitInvFilter(self),
+                                # SnapshotInv has to come before Snapshot for some
                                 # regex reason I don't understand
                                 SnapshotInvFilter(self),
-                                SnapshotFilter(self), 
-                                ] 
-        self.filters = self.codegen_filters + [ClassFilter(self), 
-                                               AccessFilter(self), 
-                                               NamespaceAliasFilter(self), 
-                                               NamespaceFilter(self), 
+                                SnapshotFilter(self),
+                                ]
+        self.filters = self.codegen_filters + [ClassFilter(self),
+                                               AccessFilter(self),
+                                               NamespaceAliasFilter(self),
+                                               NamespaceFilter(self),
                                                DefaultPragmaFilter(self),
                                                LinemarkerFilter(self)]
-        
+
     def classname(self):
         """Returns the current, fully-expanded class name."""
         names = [n for d, n in self.namespaces]
@@ -1243,7 +1243,7 @@ class CodeGenerator(object):
             # gross fix for not using cpp
             self.depth += statement.count('{') - statement.count('}')
         # revert what is needed
-        for filter in self.filters: 
+        for filter in self.filters:
             filter.revert(statement, sep)
 
 def generate_code(orig, context, superclasses):
@@ -1284,7 +1284,7 @@ class Proxy(MutableMapping):
     def __delattr__(self, key):
         d = self.__dict__['_d']
         if key in d:
-            del d[key] 
+            del d[key]
         else:
             del self.__dict__[key]
 
@@ -1378,7 +1378,7 @@ def parent_classes(classname, pdict):
     return rents
 
 def parent_intersection(classname, queryset, superclasses):
-    """returns all elements in query_set which are parents of classname and not
+    """Returns all elements in query_set which are parents of classname and not
     parents of any other class in query_set
     """
     rents = queryset.intersection(superclasses[classname])
@@ -1390,14 +1390,14 @@ def parent_intersection(classname, queryset, superclasses):
 ensure_startswith_newlinehash = lambda x: '\n' + x if x.startswith('#') else x
 
 def main():
-    parser = ArgumentParser(prog="cycpp", description=__doc__, 
+    parser = ArgumentParser(prog="cycpp", description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('path', help="path to source file")
     parser.add_argument('--pass3-use-pp', action="store_true", default=True,
                         help=("On pass 3, use the preproccessed version of the "
                               "original file. This options is mutually exclusive"
                               "with --pass3-use-orig."), dest="pass3_use_pp")
-    parser.add_argument('--pass3-use-orig', action="store_false", 
+    parser.add_argument('--pass3-use-orig', action="store_false",
                         help=("On pass 3, use the preproccessed version of the "
                               "original file. This options is mutually exclusive"
                               "with --pass3-use-pp."), dest="pass3_use_pp")
@@ -1419,7 +1419,7 @@ def main():
             includes = includes[0].split(";")
         elif ":" in includes[0]:
             includes = includes[0].split(":")
-        
+
     canon = preprocess_file(ns.path, includes, cpp_path=ns.cpp_path)  # pass 1
     canon = ensure_startswith_newlinehash(canon)
     context, superclasses = accumulate_state(canon)   # pass 2

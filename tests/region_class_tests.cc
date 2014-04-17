@@ -2,26 +2,26 @@
 #include <gtest/gtest.h>
 
 #include "context.h"
-#include "recorder.h"
 #include "institution.h"
+#include "recorder.h"
 #include "region.h"
 #include "test_modules/test_region.h"
 #include "timer.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//- - - - - - - Tests specific to the Institution class itself- - - - - - -
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - Tests specific to the Institution class itself- - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class DieInst : public cyclus::Institution {
  public:
   DieInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {
     tickDie_ = false;
     tockDie_ = false;
-  };
-  
-  virtual ~DieInst() {};
-  
+  }
+
+  virtual ~DieInst() {}
+
   virtual cyclus::Agent* Clone() {
     return new DieInst(context());
   }
@@ -42,40 +42,39 @@ class DieInst : public cyclus::Institution {
   bool tockDie_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class RegionClassTests : public ::testing::Test {
-  protected:
+ protected:
+  DieInst* child1_;
+  DieInst* child2_;
+  DieInst* child3_;
+  DieInst* child4_;
+  DieInst* child5_;
 
-    DieInst* child1_;
-    DieInst* child2_;
-    DieInst* child3_;
-    DieInst* child4_;
-    DieInst* child5_;
+  cyclus::Region* reg_;
+  cyclus::Recorder rec_;
+  cyclus::Timer ti_;
+  cyclus::Context* ctx_;
 
-    cyclus::Region* reg_;
-    cyclus::Recorder rec_;
-    cyclus::Timer ti_;
-    cyclus::Context* ctx_;
+  virtual void SetUp() {
+    ctx_ = new cyclus::Context(&ti_, &rec_);
 
-    virtual void SetUp() {
-      ctx_ = new cyclus::Context(&ti_, &rec_);
+    child1_ = new DieInst(ctx_);
+    child2_ = new DieInst(ctx_);
+    child3_ = new DieInst(ctx_);
+    child4_ = new DieInst(ctx_);
+    child5_ = new DieInst(ctx_);
 
-      child1_ = new DieInst(ctx_);
-      child2_ = new DieInst(ctx_);
-      child3_ = new DieInst(ctx_);
-      child4_ = new DieInst(ctx_);
-      child5_ = new DieInst(ctx_);
-
-      reg_ = new TestRegion(ctx_);
-      child1_->Build(reg_);
-      child2_->Build(reg_);
-      child3_->Build(reg_);
-      child4_->Build(reg_);
-      child5_->Build(reg_);
-    }
+    reg_ = new TestRegion(ctx_);
+    child1_->Build(reg_);
+    child2_->Build(reg_);
+    child3_->Build(reg_);
+    child4_->Build(reg_);
+    child5_->Build(reg_);
+  }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RegionClassTests, TickIter) {
   ASSERT_EQ(5, reg_->children().size());
 
@@ -96,7 +95,7 @@ TEST_F(RegionClassTests, TickIter) {
   EXPECT_EQ(2, reg_->children().size());
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(RegionClassTests, TockIter) {
   ASSERT_EQ(5, reg_->children().size());
 
@@ -116,4 +115,3 @@ TEST_F(RegionClassTests, TockIter) {
   ASSERT_NO_THROW(child5_->Tock(0));
   EXPECT_EQ(2, reg_->children().size());
 }
-

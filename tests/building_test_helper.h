@@ -1,11 +1,11 @@
-#ifndef CYCLUS_TESTS_BUILD_TEST_HELPER_H_
-#define CYCLUS_TESTS_BUILD_TEST_HELPER_H_
+#ifndef CYCLUS_TESTS_BUILDING_TEST_HELPER_H_
+#define CYCLUS_TESTS_BUILDING_TEST_HELPER_H_
 
 #include <string>
 
 #include "builder.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BuildingTestHelper {
  public:
   /// constructor
@@ -13,13 +13,12 @@ class BuildingTestHelper {
 
   /// destructor
   ~BuildingTestHelper();
-  
+
   /// first builder
   cyclus::Builder* builder1;
 
   /// second builder
   cyclus::Builder* builder2;
-
 };
 
-#endif //  ifndef CYCLUS_TESTS_BUILD_TEST_HELPER_H_
+#endif  // CYCLUS_TESTS_BUILDING_TEST_HELPER_H_

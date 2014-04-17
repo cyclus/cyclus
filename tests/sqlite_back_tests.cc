@@ -1,41 +1,39 @@
-
-
-#include "sqlite_back.h"
-#include "blob.h"
-
-#include <gtest/gtest.h>
 #include "boost/lexical_cast.hpp"
 #include <boost/uuid/uuid_io.hpp>
+#include <gtest/gtest.h>
+
+#include "blob.h"
+#include "sqlite_back.h"
 
 static std::string const path = "testdb.sqlite";
 
 class FlushCatcher: public cyclus::SqliteBack {
-public:
-  FlushCatcher(std::string path) : SqliteBack(path) {};
+ public:
+  FlushCatcher(std::string path) : SqliteBack(path) {}
   cyclus::StrList cmds;
 
-protected:
+ protected:
   virtual void Flush() {
     cmds.insert(cmds.end(), cmds_.begin(), cmds_.end());
     cyclus::SqliteBack::Flush();
-  };
+  }
 };
 
 class FileDeleter {
-public:
+ public:
   FileDeleter(std::string path) {
     path_ = path;
-  };
+  }
 
   ~FileDeleter() {
     remove(path_.c_str());
-  };
+  }
 
-private:
+ private:
   std::string path_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(SqliteBackTest, Regression) {
   using cyclus::Recorder;
   FileDeleter fd(path);
@@ -44,21 +42,21 @@ TEST(SqliteBackTest, Regression) {
   m.RegisterBackend(&back);
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("monkey"))
-  ->AddVal("weight", 10)
-  ->AddVal("height", 5.5)
-  ->AddVal("data", cyclus::Blob("banana"))
-  ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->AddVal("weight", 10)
+      ->AddVal("height", 5.5)
+      ->AddVal("data", cyclus::Blob("banana"))
+      ->Record();
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("elephant"))
-  ->AddVal("weight", 1000)
-  ->Record();
+      ->AddVal("animal", std::string("elephant"))
+      ->AddVal("weight", 1000)
+      ->Record();
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("sea cucumber"))
-  ->AddVal("height", 1.2)
-  ->Record();
+      ->AddVal("animal", std::string("sea cucumber"))
+      ->AddVal("height", 1.2)
+      ->Record();
 
   m.Close();
 
@@ -77,4 +75,3 @@ TEST(SqliteBackTest, Regression) {
             "INSERT INTO DumbTitle (SimId, animal, height) VALUES ('" + sid +
             "', 'sea cucumber', 1.2);");
 }
-

@@ -1,16 +1,14 @@
-
-#include <gtest/gtest.h>
-
 #include <boost/any.hpp>
+#include <gtest/gtest.h>
 
 #include "CoinModel.hpp"
 
 #include "cbc_solver.h"
+#include "cyc_limits.h"
 #include "function.h"
 #include "solver.h"
 #include "solver_interface.h"
 #include "variable.h"
-#include "cyc_limits.h"
 
 // usings
 using boost::any_cast;
@@ -28,7 +26,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
   int x_exp = 0;
   int lower = 0;
   double obj_mod = 1.0;
-  
+
   // set up solver and interface
   Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
@@ -43,7 +41,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPLowerBoundMin) {
 
   // objective function
   csi.AddVarToObjFunction(x, obj_mod);
-  
+
   // solve and get solution
   csi.Solve();
 
@@ -58,7 +56,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMin) {
   int upper = 1;
   int lower = 0;
   double obj_mod = 1.0;
-  
+
   // set up solver and interface
   Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
@@ -73,7 +71,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMin) {
 
   // objective function
   csi.AddVarToObjFunction(x, obj_mod);
-  
+
   // solve and get solution
   csi.Solve();
 
@@ -87,7 +85,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPUpperBoundMax) {
   int x_exp = 1;
   int upper = 1;
   double obj_mod = 1.0;
-  
+
   // set up solver and interface
   Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
@@ -102,7 +100,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPUpperBoundMax) {
 
   // objective function
   csi.AddVarToObjFunction(x, obj_mod);
-  
+
   // solve and get solution
   csi.Solve();
 
@@ -117,7 +115,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
   int lower = 0;
   int upper = 1;
   double obj_mod = 1.0;
-  
+
   // set up solver and interface
   Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
@@ -132,7 +130,7 @@ TEST(CycloptsCBCSolverTests, 1VarIPBothBoundsMax) {
 
   // objective function
   csi.AddVarToObjFunction(x, obj_mod);
-  
+
   // solve and get solution
   csi.Solve();
 
@@ -146,7 +144,7 @@ TEST(CycloptsCBCSolverTests, 2VarIP) {
   int x_exp = 1, y_exp = 2;
   double cap_x = 3.0, cap_y = 10.0, cost_x = 1.0, cost_y = 2.0;
   double unmet_demand = 22.0;
-  
+
   // set up solver and interface
   Solver::Ptr solver(new CBCSolver());
   SolverInterface csi(solver);
@@ -170,7 +168,7 @@ TEST(CycloptsCBCSolverTests, 2VarIP) {
   csi.AddVarToConstraint(y, cap_y, c);
   csi.AddVarToObjFunction(x, cost_x);
   csi.AddVarToObjFunction(y, cost_y);
-  
+
   // solve and get solution
   csi.Solve();
 

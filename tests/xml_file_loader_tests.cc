@@ -7,9 +7,9 @@
 #include <string>
 
 #include "agent.h"
+#include "dynamic_module.h"
 #include "env.h"
 #include "error.h"
-#include "dynamic_module.h"
 #include "sqlite_back.h"
 
 using namespace std;
@@ -105,7 +105,7 @@ std::string XMLFileLoaderTests::ModuleSequence() {
           "    <!-- institution definitions -->"
           "    <institution>"
           "      <name>inst</name>"
-          "	 <availableprototype>fac</availableprototype>"
+          "      <availableprototype>fac</availableprototype>"
           "      <agent>"
           "        <TestInst/>"
           "      </agent>"
@@ -150,4 +150,3 @@ TEST_F(XMLFileLoaderTests, openfile) {
 TEST_F(XMLFileLoaderTests, throws) {
   EXPECT_THROW(XMLFileLoader file(&rec_, b_, schema_path, "blah"), cyclus::IOError);
 }
-

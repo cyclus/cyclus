@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-#include "bid_portfolio.h" 
-#include "request_portfolio.h" 
+#include "bid_portfolio.h"
+#include "request_portfolio.h"
 
 template<class T>
 inline void TestVecEq(const std::vector<T>& lhs,
@@ -44,7 +44,7 @@ inline bool BPEq(const cyclus::BidPortfolio<T>& lhs,
            lhs.constraints() == rhs.constraints() &&
            lhs.commodity() == rhs.commodity() &&
            lhs.bidder() == rhs.bidder());
-};
+}
 
 /// @brief RequestPortfolio-RequestPortfolio equality
 template<class T>
@@ -54,7 +54,7 @@ inline bool RPEq(const cyclus::RequestPortfolio<T>& lhs,
            lhs.constraints() == rhs.constraints() &&
            lhs.qty() == rhs.qty() &&
            lhs.requester() == rhs.requester());
-};
+}
 
 // -----------
 // Copied mostly from:

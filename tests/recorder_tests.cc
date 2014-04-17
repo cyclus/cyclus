@@ -1,51 +1,51 @@
 #include <gtest/gtest.h>
 
-#include "recorder.h"
 #include "rec_backend.h"
+#include "recorder.h"
 
 class TestBack : public cyclus::RecBackend {
-  public:
-    TestBack() {
-      flush_count = 0;
-      notify_count = 0;
-      flushed = false;
-    };
+ public:
+  TestBack() {
+    flush_count = 0;
+    notify_count = 0;
+    flushed = false;
+  }
 
-    virtual void Notify(cyclus::DatumList data) {
-      flush_count = data.size();
-      this->data = data;
-      notify_count++;
-    };
+  virtual void Notify(cyclus::DatumList data) {
+    flush_count = data.size();
+    this->data = data;
+    notify_count++;
+  }
 
-    virtual std::string Name() {
-      return "TestBack";
-    };
+  virtual std::string Name() {
+    return "TestBack";
+  }
 
-    virtual void Flush() {
-      flushed = true;
-    };
+  virtual void Flush() {
+    flushed = true;
+  }
 
-    int flush_count; // # Datum objects in last notify
-    int notify_count; // # times notify called
-    bool flushed;
-    cyclus::DatumList data; // last receive list
+  int flush_count;  // # Datum objects in last notify
+  int notify_count;  // # times notify called
+  bool flushed;
+  cyclus::DatumList data;  // last receive list
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Manager_NewDatum) {
   cyclus::Recorder m;
   cyclus::Datum* d = m.NewDatum("DumbTitle");
   EXPECT_EQ(d->title(), "DumbTitle");
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Manager_CreateDefault) {
   using cyclus::Recorder;
   Recorder m;
   EXPECT_EQ(m.dump_count(), cyclus::kDefaultDumpCount);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Manager_GetSetDumpFreq) {
   using cyclus::Recorder;
   Recorder m;
@@ -56,7 +56,7 @@ TEST(RecorderTest, Manager_GetSetDumpFreq) {
   EXPECT_EQ(m.dump_count(), cyclus::kDefaultDumpCount);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Manager_Closing) {
   using cyclus::Recorder;
   Recorder m;
@@ -74,7 +74,7 @@ TEST(RecorderTest, Manager_Closing) {
   EXPECT_TRUE(back2.flushed);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Manager_Buffering) {
   using cyclus::Recorder;
   TestBack back1;
@@ -84,21 +84,21 @@ TEST(RecorderTest, Manager_Buffering) {
   m.RegisterBackend(&back1);
 
   m.NewDatum("DumbTitle")
-   ->AddVal("animal", std::string("monkey"))
-   ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->Record();
 
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);
 
   m.NewDatum("DumbTitle")
-   ->AddVal("animal", std::string("elephant"))
-   ->Record();
+      ->AddVal("animal", std::string("elephant"))
+      ->Record();
 
   EXPECT_EQ(back1.flush_count, 2);
   EXPECT_EQ(back1.notify_count, 1);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Manager_CloseFlushing) {
   using cyclus::Recorder;
   TestBack back1;
@@ -108,8 +108,8 @@ TEST(RecorderTest, Manager_CloseFlushing) {
   m.RegisterBackend(&back1);
 
   m.NewDatum("DumbTitle")
-   ->AddVal("animal", std::string("monkey"))
-   ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->Record();
 
   EXPECT_EQ(back1.flush_count, 0);
   EXPECT_EQ(back1.notify_count, 0);
@@ -120,7 +120,7 @@ TEST(RecorderTest, Manager_CloseFlushing) {
   EXPECT_EQ(back1.notify_count, 1);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Datum_record) {
   using cyclus::Datum;
   using cyclus::Recorder;
@@ -138,7 +138,7 @@ TEST(RecorderTest, Datum_record) {
   EXPECT_EQ(back.flush_count, 1);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Datum_addVal) {
   using cyclus::Datum;
   using cyclus::Recorder;
@@ -172,4 +172,3 @@ TEST(RecorderTest, Datum_addVal) {
   cyclus::Datum::Vals vals = back.data.back()->vals();
   EXPECT_EQ(d, back.data.back());
 }
-

@@ -1,5 +1,6 @@
 // CompositionTests.cpp
 #include <map>
+
 #include <gtest/gtest.h>
 
 #include "composition.h"
@@ -8,13 +9,13 @@
 
 class TestComp : public cyclus::Composition {
  public:
-  TestComp() {};
+  TestComp() {}
   cyclus::Composition::Chain DecayLine() {
     return *decay_line_.get();
-  };
+  }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, create_atom) {
   using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
@@ -27,11 +28,11 @@ TEST(CompositionTests, create_atom) {
   v = c->atom();
   EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 2 / 1);
   v = c->mass();
-  EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 
+  EXPECT_DOUBLE_EQ(v[922350000] / v[922330000],
                    2 * pyne::atomic_mass(922350000) / pyne::atomic_mass(922330000));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, create_mass) {
   using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
@@ -44,11 +45,11 @@ TEST(CompositionTests, create_mass) {
   v = c->mass();
   EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 2 / 1);
   v = c->atom();
-  EXPECT_DOUBLE_EQ(v[922350000] / v[922330000], 
+  EXPECT_DOUBLE_EQ(v[922350000] / v[922330000],
                    2 / pyne::atomic_mass(922350000) * pyne::atomic_mass(922330000));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, lineage) {
   using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
@@ -71,4 +72,3 @@ TEST(CompositionTests, lineage) {
   EXPECT_EQ(chain[3 * dt], dec4);
   EXPECT_EQ(dec4, dec5);
 }
- 
