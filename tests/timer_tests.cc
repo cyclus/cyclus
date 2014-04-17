@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include "context.h"
@@ -8,23 +7,23 @@
 #include "recorder.h"
 #include "timer.h"
 
-class Dier: public cyclus::Facility {
+class Dier : public cyclus::Facility {
  public:
-  Dier(cyclus::Context* ctx) : cyclus::Facility(ctx) {};
-  virtual ~Dier() {};
-  
-  virtual cyclus::Agent* Clone() { return new Dier(context()); };
-  virtual void InitInv(cyclus::Inventories& inv) {};
-  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
+  Dier(cyclus::Context* ctx) : cyclus::Facility(ctx) {}
+  virtual ~Dier() {}
+
+  virtual cyclus::Agent* Clone() { return new Dier(context()); }
+  virtual void InitInv(cyclus::Inventories& inv) {}
+  virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
 
   void Tick(int time) {
     context()->SchedDecom(this);
-  };
+  }
 
   void Decommission() {
     cyclus::Facility::Decommission();
   }
-  void Tock(int time) {};
+  void Tock(int time) {}
 };
 
 TEST(TimerTests, NullParentDecomSegfault) {
