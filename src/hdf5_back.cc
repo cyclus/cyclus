@@ -54,8 +54,48 @@ void Hdf5Back::Notify(DatumList data) {
 }
 
 QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
-  QueryResult q = GetTableInfo(table);
-  return q;
+  hid_t tb_set = H5Dopen2(file_, table.c_str(), H5P_DEFAULT);
+  hid_t tb_space = H5Dget_space(tb_set);
+  int tb_length = H5Sget_simple_extent_npoints(tb_space);
+
+  QueryResult qr = GetTableInfo(tb_set);
+
+  // close and return
+  H5Dclose(tb_set);
+  return qr;
+}
+
+QueryResult Hdf5Back::GetTableInfo(hid_t dset) {
+  int i;
+  char * colname;
+  hid_t coltype;
+  std::string fieldname;
+  std::string fieldtype;
+  hid_t dt = H5Dget_type(dset);
+  QueryResult qr;
+  for (i = 0; i < H5Tget_nmembers(dt); i++) {
+    colname = H5Tget_member_name(dt, i);
+    fieldname = std::string(colname);
+    free(colname);
+    qr.fields.push_back(fieldname);
+    coltype = H5Tget_member_type(dt, i);
+    if (0 < H5Tequal(coltype, H5T_NATIVE_INT))
+      fieldtype = "INTEGER";
+    else if (0 < H5Tequal(coltype, H5T_NATIVE_DOUBLE))
+      fieldtype = "REAL";
+    else if (0 < H5Tequal(coltype, H5T_NATIVE_FLOAT))
+      fieldtype = "REAL";
+    else if (0 < H5Tequal(coltype, blob_type_))
+      fieldtype = "BLOB";
+    else if (0 < H5Tequal(coltype, string_type_))
+      fieldtype = "TEXT";
+    else 
+      throw IOError("Unsupported type for querying in HDF5 " + fieldname);;
+    H5Tclose(coltype);
+    qr.types.push_back(fieldtype);
+  }
+  H5Tclose(dt);
+  return qr;
 }
 
 std::string Hdf5Back::Name() {

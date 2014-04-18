@@ -32,6 +32,9 @@ class Hdf5Back : public FullBackend {
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
  private:
+  /// Creates a QueryResult from a table description.
+  QueryResult GetTableInfo(hid_t dset);
+
   /// creates and initializes an hdf5 table
   void CreateTable(Datum* d);
 
@@ -41,7 +44,7 @@ class Hdf5Back : public FullBackend {
   /// fill a contiguous memory buffer with data from group for writing to an hdf5 dataset.
   void FillBuf(char* buf, DatumList& group, size_t* sizes, size_t rowsize);
 
-  /// An interface to a sqlite db managed by the SqliteBack class.
+  /// An reference to a database.
   hid_t file_;
 
   hid_t string_type_;

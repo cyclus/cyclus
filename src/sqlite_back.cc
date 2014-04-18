@@ -108,7 +108,8 @@ QueryResult SqliteBack::GetTableInfo(std::string table) {
         type != "REAL" &&
         type != "BLOB" &&
         type != "TEXT") {
-      throw IOError("Unsupported type for querying " + type);
+      throw IOError("Unsupported type " + type + \
+                    " for querying in SQLite for field " + name);
     }
     info.types.push_back(type);
     info.fields.push_back(name);

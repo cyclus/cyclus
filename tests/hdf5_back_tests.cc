@@ -19,6 +19,8 @@ class FileDeleter {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(Hdf5BackTest, ReadWrite) {
+  using std::vector;
+  using std::string;
   using cyclus::Recorder;
   using cyclus::Hdf5Back;
   FileDeleter fd(path);
@@ -36,6 +38,7 @@ TEST(Hdf5BackTest, ReadWrite) {
   const char* field_names = "string,int,float,double,blob";
   char buf[size];
 
+  // creation
   Recorder m;
   Hdf5Back back(path);
   m.RegisterBackend(&back);
@@ -48,6 +51,7 @@ TEST(Hdf5BackTest, ReadWrite) {
   ->Record();
   m.Close();
 
+  // raw read
   hid_t file = H5Fopen(path, H5F_ACC_RDONLY, H5P_DEFAULT);
   herr_t status = H5TBread_fields_name(file, "DumbTitle", field_names, 0, 1, size,
                                        offsets, sizes, buf);
@@ -70,4 +74,13 @@ TEST(Hdf5BackTest, ReadWrite) {
   EXPECT_STREQ(blob, blob2);
 
   H5Fclose(file);
+
+  // query read
+  string expfields[] = {"SimId", "string", "int", "float", "double", "blob"};
+  string exptypes[] = {"TEXT", "TEXT", "INTEGER", "REAL", "REAL", "BLOB"};
+  cyclus::QueryResult qr = back.Query("DumbTitle", NULL);
+  for (int i = 0; i < qr.fields.size(); i++) {
+    EXPECT_STREQ(qr.fields[i].c_str(), expfields[i].c_str());
+    EXPECT_STREQ(qr.types[i].c_str(), exptypes[i].c_str());
+  }
 }
