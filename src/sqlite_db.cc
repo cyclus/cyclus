@@ -29,7 +29,7 @@ void SqliteDb::Overwrite() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteDb::close() {
   if (isOpen_) {
-    if (sqlite3_close(db_) == SQLITE_OK) {
+    if (sqlite3_close_v2(db_) == SQLITE_OK) {
       isOpen_ = false;
     } else {
       throw IOError("Failed to close database: " + path_);
@@ -63,65 +63,73 @@ void SqliteDb::open() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+SqlStatement::Ptr SqliteDb::Prepare(std::string sql) {
+  open();
+  return SqlStatement::Ptr(new SqlStatement(db_, sql));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteDb::Execute(std::string sql) {
   open();
 
   sqlite3_stmt* statement;
-  int check_query =
+  int result =
     sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, NULL);
-  if (check_query == SQLITE_OK) {
-    int result = sqlite3_step(statement);
-    sqlite3_finalize(statement);
-  }
-
-  // collect sqlite errors
-  std::string error = sqlite3_errmsg(db_);
-  if (error != "not an error") {
+  if (result != SQLITE_OK) {
+    std::string error = sqlite3_errmsg(db_);
     throw IOError("SQL error: " + sql + " " + error);
   }
+
+  result = sqlite3_step(statement);
+  if (result != SQLITE_DONE && result != SQLITE_ROW && result != SQLITE_OK) {
+    std::string error = sqlite3_errmsg(db_);
+    throw IOError("SQL error: " + sql + " " + error);
+  }
+
+  sqlite3_finalize(statement);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<StrList> SqliteDb::Query(std::string sql) {
   open();
-
   sqlite3_stmt* statement;
-  std::vector<StrList> results;
-
   // query the database
   int check_query =
     sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, NULL);
-  if (check_query == SQLITE_OK) {
-    int cols = sqlite3_column_count(statement);
-    int result = 0;
-    while (true) {
-      result = sqlite3_step(statement);
-      if (result != SQLITE_ROW) {
-        break;
-      }
+  if (check_query != SQLITE_OK) {
+    std::string error = sqlite3_errmsg(db_);
+    throw IOError("SQL error: " + error);
+  }
 
-      StrList values;
-      for (int col = 0; col < cols; col++) {
-        std::string  val;
-        char* ptr = (char*)sqlite3_column_text(statement, col);
-        if (ptr) {
-          val = ptr;
-        } else {
-          val = "";
-        }
-        values.push_back(val);  // now we will never push NULL
-      }
-      results.push_back(values);
+  std::vector<StrList> results;
+  int cols = sqlite3_column_count(statement);
+  int result = 0;
+  while (true) {
+    result = sqlite3_step(statement);
+    if (result != SQLITE_ROW) {
+      break;
     }
-    sqlite3_finalize(statement);
+
+    StrList values;
+    for (int col = 0; col < cols; col++) {
+      std::string  val;
+      char* ptr = (char*)sqlite3_column_text(statement, col);
+      if (ptr) {
+        val = ptr;
+      } else {
+        val = "";
+      }
+      values.push_back(val);  // now we will never push NULL
+    }
+    results.push_back(values);
   }
 
   // collect errors
-  std::string error = sqlite3_errmsg(db_);
-  if (error != "not an error") {
-    throw IOError("SQL error: " + sql + " " + error);
+  if (result != SQLITE_DONE && result != SQLITE_OK) {
+    std::string error = sqlite3_errmsg(db_);
+    throw IOError("SQL error: " + error);
   }
-
+  sqlite3_finalize(statement);
   return results;
 }
 

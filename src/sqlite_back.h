@@ -2,8 +2,9 @@
 #ifndef CYCLUS_CORE_UTILITY_SQLITE_BACK_H_
 #define CYCLUS_CORE_UTILITY_SQLITE_BACK_H_
 
-#include <list>
 #include <string>
+#include <map>
+#include <set>
 
 #include "query_backend.h"
 #include "sqlite_db.h"
@@ -35,21 +36,11 @@ class SqliteBack: public FullBackend {
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
- protected: // for testing
-  /// pending sql commands.
-  StrList cmds_;
-
  private:
-  /// returns true if the table name already exists.
-  bool TableExists(std::string name);
-
   QueryResult GetTableInfo(std::string table);
 
   /// returns a valid sql data type name for v (e.g.  INTEGER, REAL, TEXT, etc).
   std::string ValType(boost::spirit::hold_any v);
-
-  /// converts the value to a string insertable into the sqlite db.
-  std::string ValAsString(boost::spirit::hold_any v);
 
   /// converts the string value in s to a c++ value corresponding the the
   /// supported sqlite datatype type in a hold_any object.
@@ -57,6 +48,8 @@ class SqliteBack: public FullBackend {
 
   /// Queue up a table-create command for d.
   void CreateTable(Datum* d);
+
+  void BuildStmt(Datum* d);
 
   /// constructs an SQL INSERT command for d and queues it for db insertion.
   void WriteDatum(Datum* d);
@@ -68,7 +61,10 @@ class SqliteBack: public FullBackend {
   std::string path_;
 
   /// table names already existing (created) in the sqlite db.
-  StrList tbl_names_;
+  std::set<std::string> tbl_names_;
+
+  std::map<std::string, SqlStatement::Ptr> stmts_;
+  std::map<std::string, std::map<const char*, int> > field_order_;
 };
 } // namespace cyclus
 #endif

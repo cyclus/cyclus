@@ -14,7 +14,6 @@ class FlushCatcher: public cyclus::SqliteBack {
 
  protected:
   virtual void Flush() {
-    cmds.insert(cmds.end(), cmds_.begin(), cmds_.end());
     cyclus::SqliteBack::Flush();
   }
 };
