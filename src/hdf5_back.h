@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 
-#include "rec_backend.h"
+#include "query_backend.h"
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
@@ -13,7 +13,7 @@ namespace cyclus {
 /// An Recorder backend that writes data to an hdf5 file.  Identically named
 /// Datum objects have their data placed as rows in a single table.  Handles the following
 /// datum value types: int, float, double, std::string, cyclus::Blob
-class Hdf5Back : public RecBackend {
+class Hdf5Back : public FullBackend {
  public:
   /// Creates a new backend writing data to the specified file.
   ///
@@ -28,6 +28,8 @@ class Hdf5Back : public RecBackend {
   virtual std::string Name();
 
   virtual void Flush() {};
+
+  virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
  private:
   /// creates and initializes an hdf5 table

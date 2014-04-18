@@ -53,6 +53,11 @@ void Hdf5Back::Notify(DatumList data) {
   }
 }
 
+QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
+  QueryResult q = GetTableInfo(table);
+  return q;
+}
+
 std::string Hdf5Back::Name() {
   return path_;
 }
