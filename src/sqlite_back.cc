@@ -15,21 +15,21 @@
 
 namespace cyclus {
 
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
+std::vector<std::string> split(const std::string& s, char delim) {
+  std::vector<std::string> elems;
+  std::stringstream ss(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    elems.push_back(item);
+  }
+  return elems;
 }
 
 SqliteBack::~SqliteBack() {
   try {
     Flush();
     db_.close();
-  } catch(Error err) {
+  } catch (Error err) {
     CLOG(LEV_ERROR) << "Error in SqliteBack destructor: " << err.what();
   }
 }
@@ -90,21 +90,7 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
   if (conds != NULL) {
     for (int i = 0; i < conds->size(); ++i) {
       boost::spirit::hold_any v = (*conds)[i].val;
-      if (v.type() == typeid(int)) {
-        stmt->BindInt(i+1, v.cast<int>());
-      } else if (v.type() == typeid(double)) {
-        stmt->BindDouble(i+1, v.cast<double>());
-      } else if (v.type() == typeid(std::string)) {
-        stmt->BindText(i+1, v.cast<std::string>().c_str());
-      } else if (v.type() == typeid(boost::uuids::uuid)) {
-        boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
-        stmt->BindBlob(i+1, ui.data, 16);
-      } else if (v.type() == typeid(float)) {
-        stmt->BindDouble(i+1, v.cast<float>());
-      } else if (v.type() == typeid(Blob)) {
-        std::string s = v.cast<Blob>().str();
-        stmt->BindBlob(i+1, s.c_str(), s.size());
-      }
+      Bind(v, stmt, i+1);
     }
   }
 
@@ -120,7 +106,8 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
 }
 
 QueryResult SqliteBack::GetTableInfo(std::string table) {
-  std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" + table + "';";
+  std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" +
+                    table + "';";
   std::vector<StrList> rows = db_.Query(sql);
   if (rows.size() == 0) {
     throw ValueError("Invalid table name " + table);
@@ -145,7 +132,7 @@ void SqliteBack::BuildStmt(Datum* d) {
   std::string insert = "INSERT INTO " + name + " VALUES (?";
   field_order_[name][vals[0].first] = 1;
   for (int i = 1; i < vals.size(); ++i) {
-    field_order_[name][vals[i].first] = i+1;
+    field_order_[name][vals[i].first] = i + 1;
     insert += ", ?";
   }
   insert += ");";
@@ -161,7 +148,7 @@ void SqliteBack::CreateTable(Datum* d) {
   Datum::Vals::iterator it = vals.begin();
 
   std::string types = "INSERT INTO FieldTypes VALUES ('" + name + "','"
-                    + it->first + "','" + Type(it->second) + "');";
+                      + it->first + "','" + Type(it->second) + "');";
   db_.Execute(types);
 
   std::string cmd = "CREATE TABLE " + name + " (";
@@ -171,7 +158,7 @@ void SqliteBack::CreateTable(Datum* d) {
   while (it != vals.end()) {
     cmd += ", " + std::string(it->first) + " " + SqlType(it->second);
     types = "INSERT INTO FieldTypes VALUES ('" + name + "','"
-          + it->first + "','" + Type(it->second) + "');";
+            + it->first + "','" + Type(it->second) + "');";
     db_.Execute(types);
     ++it;
   }
@@ -210,6 +197,25 @@ std::string SqliteBack::Type(boost::spirit::hold_any v) {
   return std::string("UNKNOWN_") + v.type().name();
 }
 
+void SqliteBack::Bind(boost::spirit::hold_any v, SqlStatement::Ptr stmt,
+                      int index) {
+  if (v.type() == typeid(int)) {
+    stmt->BindInt(index, v.cast<int>());
+  } else if (v.type() == typeid(double)) {
+    stmt->BindDouble(index, v.cast<double>());
+  } else if (v.type() == typeid(std::string)) {
+    stmt->BindText(index, v.cast<std::string>().c_str());
+  } else if (v.type() == typeid(boost::uuids::uuid)) {
+    boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
+    stmt->BindBlob(index, ui.data, 16);
+  } else if (v.type() == typeid(float)) {
+    stmt->BindDouble(index, v.cast<float>());
+  } else if (v.type() == typeid(Blob)) {
+    std::string s = v.cast<Blob>().str();
+    stmt->BindBlob(index, s.c_str(), s.size());
+  }
+}
+
 void SqliteBack::WriteDatum(Datum* d) {
   Datum::Vals vals = d->vals();
   SqlStatement::Ptr stmt = stmts_[d->title()];
@@ -217,27 +223,14 @@ void SqliteBack::WriteDatum(Datum* d) {
 
   for (int i = 0; i < vals.size(); ++i) {
     boost::spirit::hold_any v = vals[i].second;
-    if (v.type() == typeid(int)) {
-      stmt->BindInt(index[vals[i].first], v.cast<int>());
-    } else if (v.type() == typeid(double)) {
-      stmt->BindDouble(index[vals[i].first], v.cast<double>());
-    } else if (v.type() == typeid(std::string)) {
-      stmt->BindText(index[vals[i].first], v.cast<std::string>().c_str());
-    } else if (v.type() == typeid(boost::uuids::uuid)) {
-      boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
-      stmt->BindBlob(index[vals[i].first], ui.data, 16);
-    } else if (v.type() == typeid(float)) {
-      stmt->BindDouble(index[vals[i].first], v.cast<float>());
-    } else if (v.type() == typeid(Blob)) {
-      std::string s = v.cast<Blob>().str();
-      stmt->BindBlob(index[vals[i].first], s.c_str(), s.size());
-    }
+    Bind(v, stmt, index[vals[i].first]);
   }
 
   stmt->Exec();
 }
 
-boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type) {
+boost::spirit::hold_any SqliteBack::StringAsVal(std::string s,
+                                                std::string type) {
   boost::spirit::hold_any v;
   if (type == "int") {
     v = atoi(s.c_str());

@@ -46,25 +46,6 @@ static std::string usage = "Usage:   cyclus [opts] [input-file]";
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  //Recorder r;
-  //SqliteBack b("speed-test.sqlite");
-  ////Hdf5Back b("speed-test.h5");
-  //r.RegisterBackend(&b);
-  //for (int i = 0; i < 100000; ++i) {
-  //  if (i%10000 == 0) {
-  //    std::cout << "iter " << i << "\n";
-  //  }
-  //  r.NewDatum("Table1")
-  //    ->AddVal("field1", "hello1")
-  //    ->AddVal("field2", "hello2")
-  //    ->AddVal("field3", 1)
-  //    ->AddVal("field4", 123456)
-  //    ->AddVal("field5", 2.3)
-  //    ->AddVal("field6", 2.3e11)
-  //    ->Record();
-  //}
-  //return 0;
-
   // close all dlopen'd modules AFTER everything else destructs
   DynamicModule::Closer cl;
 

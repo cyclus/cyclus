@@ -27,6 +27,7 @@ class SqlStatement {
   void Exec() {
     Must(sqlite3_step(stmt_));
     Must(sqlite3_reset(stmt_));
+    Must(sqlite3_clear_bindings(stmt_));
   }
 
   std::vector<StrList> Query() {
