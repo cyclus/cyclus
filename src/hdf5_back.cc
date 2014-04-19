@@ -114,7 +114,6 @@ void Hdf5Back::CreateTable(Datum* d) {
 
 void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
-  herr_t status;
 
   size_t* offsets = tbl_offset_[title];
   size_t* sizes = tbl_sizes_[title];
@@ -123,7 +122,7 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   char* buf = new char[group.size() * rowsize];
   FillBuf(buf, group, sizes, rowsize);
 
-  status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
+  herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
                               offsets, sizes, buf);
   if (status < 0) {
     throw IOError("Failed to write some data to hdf5 output db");
@@ -168,8 +167,12 @@ void Hdf5Back::FillBuf(char* buf, DatumList& group, size_t* sizes,
           break;
         }
         case BLOB: {
-          const char* data = a->cast<Blob>().str().c_str();
-          memcpy(buf + offset, &data, sizes[col]);
+          // TODO: fix this memory leak, but the copied bytes must remain
+          // valid until the hdf5 file is flushed or closed.
+          std::string s = a->cast<Blob>().str();
+          char* v = new char[strlen(s.c_str())];
+          strcpy(v, s.c_str());
+          memcpy(buf + offset, &v, sizes[col]);
           break;
         }
         case UUID: {
