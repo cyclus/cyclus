@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 from nose.tools import assert_false, assert_true, assert_equal
 import os
