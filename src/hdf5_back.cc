@@ -131,6 +131,8 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   delete[] buf;
 }
 
+static int count = 0;
+
 void Hdf5Back::FillBuf(char* buf, DatumList& group, size_t* sizes,
                        size_t rowsize) {
   Datum::Vals header = group.front()->vals();
@@ -152,6 +154,7 @@ void Hdf5Back::FillBuf(char* buf, DatumList& group, size_t* sizes,
   const void* val;
   DatumList::iterator it;
   for (it = group.begin(); it != group.end(); ++it) {
+    count++;
     for (int col = 0; col < header.size(); ++col) {
       const boost::spirit::hold_any* a = &((*it)->vals()[col].second);
       switch (valtype[col]) {

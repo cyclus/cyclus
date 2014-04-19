@@ -40,7 +40,10 @@ class SqliteBack: public FullBackend {
   QueryResult GetTableInfo(std::string table);
 
   /// returns a valid sql data type name for v (e.g.  INTEGER, REAL, TEXT, etc).
-  std::string ValType(boost::spirit::hold_any v);
+  std::string SqlType(boost::spirit::hold_any v);
+
+  /// returns a canonical string name for the type in v
+  std::string Type(boost::spirit::hold_any v);
 
   /// converts the string value in s to a c++ value corresponding the the
   /// supported sqlite datatype type in a hold_any object.

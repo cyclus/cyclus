@@ -46,6 +46,25 @@ static std::string usage = "Usage:   cyclus [opts] [input-file]";
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+  //Recorder r;
+  //SqliteBack b("speed-test.sqlite");
+  ////Hdf5Back b("speed-test.h5");
+  //r.RegisterBackend(&b);
+  //for (int i = 0; i < 100000; ++i) {
+  //  if (i%10000 == 0) {
+  //    std::cout << "iter " << i << "\n";
+  //  }
+  //  r.NewDatum("Table1")
+  //    ->AddVal("field1", "hello1")
+  //    ->AddVal("field2", "hello2")
+  //    ->AddVal("field3", 1)
+  //    ->AddVal("field4", 123456)
+  //    ->AddVal("field5", 2.3)
+  //    ->AddVal("field6", 2.3e11)
+  //    ->Record();
+  //}
+  //return 0;
+
   // close all dlopen'd modules AFTER everything else destructs
   DynamicModule::Closer cl;
 
@@ -135,6 +154,7 @@ int main(int argc, char* argv[]) {
   }
 
   // read input file and initialize db from input file
+  std::cout << "spot1\n";
   try {
     if (ai.flat_schema) {
       XMLFlatLoader l(&rec, fback, ai.schema_path, infile);
@@ -143,7 +163,9 @@ int main(int argc, char* argv[]) {
       XMLFileLoader l(&rec, fback, ai.schema_path, infile);
       l.LoadSim();
     }
-  } catch (Error e) {
+  std::cout << "spot2\n";
+  } catch (cyclus::Error e) {
+    std::cout << "spot3\n";
     CLOG(LEV_ERROR) << e.what();
     return 1;
   }
