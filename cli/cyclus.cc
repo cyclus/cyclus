@@ -154,7 +154,6 @@ int main(int argc, char* argv[]) {
   }
 
   // read input file and initialize db from input file
-  std::cout << "spot1\n";
   try {
     if (ai.flat_schema) {
       XMLFlatLoader l(&rec, fback, ai.schema_path, infile);
@@ -163,9 +162,7 @@ int main(int argc, char* argv[]) {
       XMLFileLoader l(&rec, fback, ai.schema_path, infile);
       l.LoadSim();
     }
-  std::cout << "spot2\n";
   } catch (cyclus::Error e) {
-    std::cout << "spot3\n";
     CLOG(LEV_ERROR) << e.what();
     return 1;
   }

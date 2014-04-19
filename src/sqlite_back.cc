@@ -120,33 +120,16 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
 }
 
 QueryResult SqliteBack::GetTableInfo(std::string table) {
-  std::string sql = "SELECT sql FROM sqlite_master WHERE tbl_name = '" + table + "';";
+  std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" + table + "';";
   std::vector<StrList> rows = db_.Query(sql);
   if (rows.size() == 0) {
     throw ValueError("Invalid table name " + table);
   }
 
-  std::string s = rows[0][0];
-  size_t start = s.find("(") + 1;
-  size_t n = s.find(")") - start;
-  std::string type_data = s.substr(start, n);
-  std::vector<std::string> fields = split(type_data, ',');
   QueryResult info;
-  for (int i = 0; i < fields.size(); ++i) {
-    std::string field = fields[i];
-    boost::algorithm::trim(field);
-    size_t pos = field.rfind(" ") + 1;
-    std::string type = field.substr(pos);
-    pos = field.find(" ");
-    std::string name = field.substr(0, pos);
-    if (type != "INTEGER" &&
-        type != "REAL" &&
-        type != "BLOB" &&
-        type != "TEXT") {
-      throw IOError("Unsupported type for querying " + type);
-    }
-    info.types.push_back(type);
-    info.fields.push_back(name);
+  for (int i = 0; i < rows.size(); ++i) {
+    info.fields.push_back(rows[i][0]);
+    info.types.push_back(rows[i][1]);
   }
   return info;
 }
@@ -256,14 +239,20 @@ void SqliteBack::WriteDatum(Datum* d) {
 
 boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type) {
   boost::spirit::hold_any v;
-  if (type == "INTEGER") {
+  if (type == "int") {
     v = atoi(s.c_str());
-  } else if (type == "REAL") {
+  } else if (type == "double") {
     v = atof(s.c_str());
-  } else if (type == "TEXT") {
+  } else if (type == "float") {
+    v = (float)atof(s.c_str());
+  } else if (type == "std::string") {
     v = s;
-  } else if (type == "BLOB") {
-    v = s;
+  } else if (type == "blob") {
+    v = Blob(s);
+  } else if (type == "uuid") {
+    boost::uuids::uuid u;
+    memcpy(&u, s.c_str(), 16);
+    v = u;
   } else {
     CLOG(LEV_ERROR) << "attempted to retrieve unsupported type from backend "
                     << Name();
