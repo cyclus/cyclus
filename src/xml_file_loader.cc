@@ -121,7 +121,7 @@ XMLFileLoader::~XMLFileLoader() {
   try {
     rec_->Flush();
   } catch (Error e) {
-    CLOG(LEV_ERROR) << "Error in SqliteBack destructor: " << e.what();
+    CLOG(LEV_ERROR) << "Error in XMLFileLoader destructor: " << e.what();
   }
   delete ctx_;
 }
