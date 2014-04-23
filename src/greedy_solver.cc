@@ -22,13 +22,19 @@ GreedySolver::~GreedySolver() {
     delete conditioner_;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GreedySolver::Solve() {
+void GreedySolver::Condition() {
   if (conditioner_ == NULL)
     conditioner_ = new GreedyPreconditioner(std::map<std::string, double>());
   
   conditioner_->Condition(graph_);
 
+}
+
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void GreedySolver::SolveGraph() {
+  Condition();
+  
   n_qty_.clear();
   
   std::for_each(graph_->request_groups().begin(),

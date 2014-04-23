@@ -15,7 +15,7 @@ ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
 ProgSolver::~ProgSolver() { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void ProgSolver::Solve() {
+void ProgSolver::SolveGraph() {
   SolverFactory sf(solver_t_);
   OsiSolverInterface* iface = sf.get();
   try {
