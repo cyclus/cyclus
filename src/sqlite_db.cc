@@ -29,7 +29,7 @@ void SqliteDb::Overwrite() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SqliteDb::close() {
   if (isOpen_) {
-    if (sqlite3_close_v2(db_) == SQLITE_OK) {
+    if (sqlite3_close(db_) == SQLITE_OK) {
       isOpen_ = false;
     } else {
       throw IOError("Failed to close database: " + path_);
