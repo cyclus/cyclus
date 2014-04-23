@@ -24,9 +24,10 @@ GreedySolver::~GreedySolver() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::Solve() {
-  if (conditioner_ != NULL) {
-    conditioner_->Condition(graph_);
-  }
+  if (conditioner_ == NULL)
+    conditioner_ = new GreedyPreconditioner(std::map<std::string, double>());
+  
+  conditioner_->Condition(graph_);
 
   n_qty_.clear();
   

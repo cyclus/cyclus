@@ -65,7 +65,9 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
-
+  if (commod_weights_.size() == 0)
+    commod_weights_[""] = 0; // add at least one weight
+  
   double min = std::min_element(
       commod_weights_.begin(),
       commod_weights_.end(),
