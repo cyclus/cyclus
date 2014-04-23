@@ -18,7 +18,7 @@ class RecBackend;
 typedef std::vector<Datum*> DatumList;
 
 /// default number of Datum objects to collect before flushing to backends.
-static unsigned int const kDefaultDumpCount = 500;
+static unsigned int const kDefaultDumpCount = 10000;
 
 /// Collects and manages output data generation for the cyclus core and agents
 /// during a simulation.  By default, datum managers are auto-initialized with a

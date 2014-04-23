@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
       XMLFileLoader l(&rec, fback, ai.schema_path, infile);
       l.LoadSim();
     }
-  } catch (Error e) {
+  } catch (cyclus::Error e) {
     CLOG(LEV_ERROR) << e.what();
     return 1;
   }

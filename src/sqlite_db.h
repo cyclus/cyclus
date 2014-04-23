@@ -5,67 +5,144 @@
 #include <vector>
 #include <string>
 #include <sqlite3.h>
+#include <boost/shared_ptr.hpp>
+
+#include "error.h"
 
 namespace cyclus {
 
 typedef std::vector<std::string> StrList;
 
-/*!
-An abstraction over the Sqlite native C interface to simplify database
-creation and data insertion.
-*/
+class SqliteDb;
+
+/// Thin wrapper class over sqlite3 prepared statements.  See
+/// http://sqlite.org/cintro.html for an overview of how prepared statements
+/// work.
+class SqlStatement {
+  friend class SqliteDb;
+ public:
+  typedef boost::shared_ptr<SqlStatement> Ptr;
+
+  ~SqlStatement() {
+    Must(sqlite3_finalize(stmt_));
+  }
+
+  /// Executes the prepared statement.
+  void Exec() {
+    Must(sqlite3_step(stmt_));
+    Must(sqlite3_reset(stmt_));
+    Must(sqlite3_clear_bindings(stmt_));
+  }
+
+  /// Returns the result of executing the prepared statement
+  std::vector<StrList> Query() {
+    std::vector<StrList> results;
+    int cols = sqlite3_column_count(stmt_);
+    while (true) {
+      if(sqlite3_step(stmt_) != SQLITE_ROW) {
+        break;
+      }
+
+      StrList values;
+      for (int col = 0; col < cols; col++) {
+        char* val = (char*)sqlite3_column_text(stmt_, col);
+        if (val == NULL) {
+          values.push_back("");
+        } else {
+          values.push_back(val);
+        }
+      }
+      results.push_back(values);
+    }
+    return results;
+  }
+
+  /// Binds the templated sql parameter at index i to val.
+  void BindInt(int i, int val) {
+    Must(sqlite3_bind_int(stmt_, i, val));
+  }
+
+  /// Binds the templated sql parameter at index i to val.
+  void BindDouble(int i, double val) {
+    Must(sqlite3_bind_double(stmt_, i, val));
+  }
+
+  /// Binds the templated sql parameter at index i to val.
+  void BindText(int i, const char* val) {
+    Must(sqlite3_bind_text(stmt_, i, val, -1, SQLITE_TRANSIENT));
+  }
+
+  /// Binds the templated sql parameter at index i to the value pointed to by
+  /// val. n is the length in bytes of the value.
+  void BindBlob(int i, const void* val, int n) {
+    Must(sqlite3_bind_blob(stmt_, i, val, n, SQLITE_TRANSIENT));
+  }
+
+ private:
+  SqlStatement(sqlite3* db, std::string zSql) : db_(db), zSql_(zSql) {
+    Must(sqlite3_prepare_v2(db_, zSql.c_str(), -1, &stmt_, NULL));
+  }
+
+  /// throws an exception if status (the return value of an sqlite function)
+  /// does not represent success.
+  void Must(int status) {
+    if (status != SQLITE_OK && status != SQLITE_DONE && status != SQLITE_ROW) {
+      std::string err = sqlite3_errmsg(db_);
+      throw IOError("SQL error [" + zSql_ + "]: " + err);
+    }
+  }
+
+  sqlite3* db_;
+  std::string zSql_;
+  sqlite3_stmt* stmt_;
+};
+
+/// An abstraction over the Sqlite native C interface to simplify database
+/// creation and data insertion.
 class SqliteDb {
  public:
 
-  /*!
-  Creates a new Sqlite database to be stored at the specified path.
-
-  @param path the path+name for the sqlite database file
-  @param readonly a boolean indicating true if db is readonly
-  */
+  /// Creates a new Sqlite database to be stored at the specified path.
+  ///
+  /// @param path the path+name for the sqlite database file
+  /// @param readonly a boolean indicating true if db is readonly
   SqliteDb(std::string path, bool readonly = false);
 
   virtual ~SqliteDb();
 
-  /*!
-  Finishes any incomplete operations and closes the database.
-  @throw IOError if failed to close the database properly
-  */
+  /// Finishes any incomplete operations and closes the database.
+  /// @throw IOError if failed to close the database properly
   void close();
 
-  /*!
-  Opens the sqlite database by either opening/creating a file (default) or
-  creating/overwriting a file (see the overwrite method).
-
-  @throw IOError if failed to open existing database
-  */
+  /// Opens the sqlite database by either opening/creating a file (default) or
+  /// creating/overwriting a file (see the overwrite method).
+  ///
+  /// @throw IOError if failed to open existing database
   void open();
 
-  /*!
-  Instead of opening a file of the specified name (if it already exists),
-  overwrite it with a new empty database.
-  */
+  /// Instead of opening a file of the specified name (if it already exists),
+  /// overwrite it with a new empty database.
   void Overwrite();
 
-  /*!
-  Execute an SQL command.
+  /// Creates a sqlite prepared statement for the given sql.  See
+  /// http://sqlite.org/cintro.html for an overview of how prepared statements
+  /// work.
+  SqlStatement::Ptr Prepare(std::string sql);
 
-  @param cmd an Sqlite compatible SQL command
-  @throw IOError SQL command execution failed (e.g. invalid SQL)
-  */
+  /// Execute an SQL command.
+  ///
+  /// @param cmd an Sqlite compatible SQL command
+  /// @throw IOError SQL command execution failed (e.g. invalid SQL)
   void Execute(std::string cmd);
 
-  /*!
-  Execute an SQL query and return its results
-
-  @param cmd an Sqlite compatible SQL query
-  @return a list of row entries
-  @throw IOError SQL command execution failed (e.g. invalid SQL)
-  */
+  /// Execute an SQL query and return its results
+  ///
+  /// @param cmd an Sqlite compatible SQL query
+  /// @return a list of row entries
+  /// @throw IOError SQL command execution failed (e.g. invalid SQL)
   std::vector<StrList> Query(std::string cmd);
 
  private:
-
   sqlite3* db_;
 
   bool isOpen_;
