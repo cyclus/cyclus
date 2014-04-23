@@ -31,8 +31,6 @@ void SqliteDb::close() {
   if (isOpen_) {
     if (sqlite3_close(db_) == SQLITE_OK) {
       isOpen_ = false;
-    } else {
-      throw IOError("Failed to close database: " + path_);
     }
   }
 }
