@@ -161,6 +161,7 @@ INSTALL(FILES
   function.h
   product.h
   greedy_solver.h
+  greedy_preconditioner.h
   hdf5_back.h
   query_backend.h
   institution.h
