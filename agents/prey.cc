@@ -1,96 +1,165 @@
 #include "prey.h"
-#include <time.h>
 
-#define LG(X) LOG(cyclus::LEV_##X, "Prey")
+#include <limits>
+#include <sstream>
 
-using cyclus::ResCast;
-using cyclus::Material;
+namespace cyclus {
 
 Prey::Prey(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      bufsize_(0),
-      birth_freq_(0),
-      lifespan_(0),
-      capture_prob_(0),
-      for_sale_(0) {}
-      // inpolicy_(this),
-      // outpolicy_(this) {}
+      commod_(""),
+      recipe_(""),
+      capacity_(1),
+      nchildren_(1),
+      birth_freq_(1),
+      lifespan_(4),
+      age_(0) {}
+
+std::string Prey::str() {
+  std::stringstream ss;
+  ss << cyclus::Facility::str()
+     << " supplies commodity '"
+     << commod_ << "' with recipe '"
+     << recipe_ << "' at a capacity of "
+     << capacity_ << " units per time step ";
+  return ss.str();
+}
 
 void Prey::DoRegistration() {
   cyclus::Facility::DoRegistration();
-  // outpolicy_.Init(&outbuf_, outcommod_);
-  // inpolicy_.Init(&inbuf_, incommod_, context()->GetRecipe(inrecipe_), 0);
-  // context()->RegisterTrader(&outpolicy_);
-  // context()->RegisterTrader(&inpolicy_);
   context()->RegisterTrader(this);
 }
 
 void Prey::Build(cyclus::Agent* parent) {
   cyclus::Facility::Build();
-  Material::Ptr m;
-  m = Material::Create(this, bufsize_, context()->GetRecipe(inrecipe_));
-  inbuf_.Push(m);
 }
 
 void Prey::Decommission() {
-  // context()->UnregisterTrader(&outpolicy_);
-  // context()->UnregisterTrader(&inpolicy_);
   context()->UnregisterTrader(this);
   cyclus::Facility::Decommission();
 }
 
-#define LABEL "Ainimal (id=" << id() << ", proto=" << prototype() << ") "
+void Prey::Tick(int time) {
+  LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is ticking {";
+  LOG(cyclus::LEV_INFO4, "Prey") << "will offer " << capacity_
+                                   << " units of "
+                                   << commod_ << ".";
+  LOG(cyclus::LEV_INFO3, "Prey") << "}";
+}
 
-void Prey::Tock(int t) {
-  LG(INFO3) << LABEL << "is tocking";
-  LG(INFO4) << "inbuf quantity = " << inbuf_.quantity();
-  LG(INFO4) << "outbuf quantity = " << outbuf_.quantity();
-  int age = context()->time() - enter_time();
-  if (inbuf_.space() > cyclus::eps()) {
-    LG(INFO3) << LABEL << "is dying of starvation";
-    context()->NewDatum("LifeEvents")
-        ->AddVal("AgentId", id())
-        ->AddVal("Stat", "starved")
-        ->Record();
-    context()->SchedDecom(this);
-    return;
-  } else if (age >= lifespan_) {
-    context()->NewDatum("LifeEvents")
-        ->AddVal("AgentId", id())
-        ->AddVal("Stat", "died")
-        ->Record();
-    LG(INFO3) << LABEL << "is dying of old age";
-    context()->SchedDecom(this);
-    return;
-  } else if (outbuf_.quantity() < cyclus::eps() && age > 0 && for_sale_ != 0) {
+void Prey::Tock(int time) {
+  LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is tocking {";
+
+  if (capacity_ < cyclus::eps()) {
     context()->NewDatum("LifeEvents")
         ->AddVal("AgentId", id())
         ->AddVal("Stat", "eaten")
         ->Record();
-    LG(INFO3) << LABEL << "got eaten";
+    LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " got eaten";
     context()->SchedDecom(this);
     return;
   }
 
-  if (age > 0 && age % birth_freq_ == 0) {
+  assert(age_ >= 0);
+
+  if (age_ >= lifespan_) {
+    context()->NewDatum("LifeEvents")
+        ->AddVal("AgentId", id())
+        ->AddVal("Stat", "died")
+        ->Record();
+    LOG(cyclus::LEV_INFO3, "Prey") << prototype() << "is dying of old age";
+    context()->SchedDecom(this);
+    return;
+  }
+
+  if (age_ % birth_freq_ == 0) {
     context()->NewDatum("LifeEvents")
         ->AddVal("AgentId", id())
         ->AddVal("Stat", "reproduced")
         ->Record();
-    LG(INFO3) << LABEL << "is having 1 child";
-    context()->SchedBuild(this, prototype());
+    LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is having children";
+    for (int i = 0; i < nchildren_; ++i) {
+      context()->SchedBuild(this, prototype());
+    }
   }
 
-  for_sale_ = 0;
-  outbuf_.PopN(outbuf_.count());
-  cyclus::Manifest mats = inbuf_.PopN(inbuf_.count());
-  double r = ((double)(rand() % 1000000)) / 1000000; // between 0 and 1
-  if (r < capture_prob_ * ((double)age / lifespan_)) {
-    for_sale_ = 1;
-    outbuf_.PushAll(mats);
+  age_++;  // getting older
+
+  LOG(cyclus::LEV_INFO3, "Prey") << "}";
+}
+
+cyclus::Material::Ptr Prey::GetOffer(
+    const cyclus::Material::Ptr target) const {
+  using cyclus::Material;
+  double qty = std::min(target->quantity(), capacity_);
+  return Material::CreateUntracked(qty, context()->GetRecipe(recipe_));
+}
+
+std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
+Prey::GetMatlBids(
+    const cyclus::CommodMap<cyclus::Material>::type& commod_requests) {
+  using cyclus::Bid;
+  using cyclus::BidPortfolio;
+  using cyclus::CapacityConstraint;
+  using cyclus::Material;
+  using cyclus::Request;
+
+  std::set<BidPortfolio<Material>::Ptr> ports;
+
+  if (commod_requests.count(commod_) > 0) {
+    BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
+
+    const std::vector<Request<Material>::Ptr>& requests = commod_requests.at(
+        commod_);
+
+    std::vector<Request<Material>::Ptr>::const_iterator it;
+    for (it = requests.begin(); it != requests.end(); ++it) {
+      const Request<Material>::Ptr req = *it;
+      Material::Ptr offer = GetOffer(req->target());
+      port->AddBid(req, offer, this);
+    }
+
+    CapacityConstraint<Material> cc(capacity_);
+    port->AddConstraint(cc);
+    ports.insert(port);
   }
+  return ports;
+}
+
+void Prey::GetMatlTrades(
+    const std::vector< cyclus::Trade<cyclus::Material> >& trades,
+    std::vector<std::pair<cyclus::Trade<cyclus::Material>,
+                          cyclus::Material::Ptr> >& responses) {
+  using cyclus::Material;
+  using cyclus::Trade;
+
+  double provided = 0;
+  double current_capacity = capacity_;
+  std::vector< cyclus::Trade<cyclus::Material> >::const_iterator it;
+  for (it = trades.begin(); it != trades.end(); ++it) {
+    double qty = it->amt;
+    current_capacity -= qty;
+    provided += qty;
+    // @TODO we need a policy on negatives..
+    Material::Ptr response = Material::Create(this, qty,
+                                              context()->GetRecipe(recipe_));
+    responses.push_back(std::make_pair(*it, response));
+    LOG(cyclus::LEV_INFO5, "Prey") << prototype() << " just received an order"
+                                     << " for " << qty
+                                     << " of " << commod_;
+  }
+  if (cyclus::IsNegative(current_capacity)) {
+    std::stringstream ss;
+    ss << "is being asked to provide " << provided
+       << " but its capacity is " << capacity_ << ".";
+    throw cyclus::ValueError(Agent::InformErrorMsg(ss.str()));
+  }
+  // update its capacity for future offers
+  capacity_= current_capacity;
 }
 
 extern "C" cyclus::Agent* ConstructPrey(cyclus::Context* ctx) {
   return new Prey(ctx);
 }
+
+}  // namespace cyclus

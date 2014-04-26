@@ -20,8 +20,8 @@ def test_minimal_cycle():
     predators and preys respectively.
 
     Oscillating behavior is expected.
-
     """
+
     # A reference simulation input for Lotka-Volterra simulation
     sim_input = "./Inputs/lotka_volterra.xml"
 
