@@ -10,6 +10,8 @@ Prey::Prey(cyclus::Context* ctx)
       commod_(""),
       recipe_(""),
       capacity_(1),
+      //born_(1),
+      killed_(0),
       nchildren_(1),
       birth_freq_(1),
       lifespan_(4),
@@ -45,38 +47,45 @@ void Prey::Tick(int time) {
                                    << " units of "
                                    << commod_ << ".";
   LOG(cyclus::LEV_INFO3, "Prey") << "}";
+  // if (born_) {
+  //   g_nPrey++;
+  //   std::cout << g_nPrey << std::endl;
+  //   born_ = 0;
+  // }
 }
 
 void Prey::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is tocking {";
 
-  if (capacity_ < cyclus::eps()) {
-    context()->NewDatum("LifeEvents")
-        ->AddVal("AgentId", id())
-        ->AddVal("Stat", "eaten")
-        ->Record();
+  if (killed_) {
+    // context()->NewDatum("LifeEvents")
+    //     ->AddVal("AgentId", id())
+    //     ->AddVal("Stat", "eaten")
+    //     ->Record();
     LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " got eaten";
     context()->SchedDecom(this);
+    g_nPrey--;
     return;
   }
 
   assert(age_ >= 0);
 
   if (age_ >= lifespan_) {
-    context()->NewDatum("LifeEvents")
-        ->AddVal("AgentId", id())
-        ->AddVal("Stat", "died")
-        ->Record();
+    // context()->NewDatum("LifeEvents")
+    //     ->AddVal("AgentId", id())
+    //     ->AddVal("Stat", "died")
+    //     ->Record();
     LOG(cyclus::LEV_INFO3, "Prey") << prototype() << "is dying of old age";
     context()->SchedDecom(this);
+    g_nPrey--;
     return;
   }
 
   if (age_ % birth_freq_ == 0) {
-    context()->NewDatum("LifeEvents")
-        ->AddVal("AgentId", id())
-        ->AddVal("Stat", "reproduced")
-        ->Record();
+    // context()->NewDatum("LifeEvents")
+    //     ->AddVal("AgentId", id())
+    //     ->AddVal("Stat", "reproduced")
+    //     ->Record();
     LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is having children";
     for (int i = 0; i < nchildren_; ++i) {
       context()->SchedBuild(this, prototype());
@@ -154,8 +163,8 @@ void Prey::GetMatlTrades(
        << " but its capacity is " << capacity_ << ".";
     throw cyclus::ValueError(Agent::InformErrorMsg(ss.str()));
   }
-  // update its capacity for future offers
-  capacity_= current_capacity;
+  // indicate that this prey was hunted down
+  if (capacity_ > current_capacity) killed_ = 1;
 }
 
 extern "C" cyclus::Agent* ConstructPrey(cyclus::Context* ctx) {
