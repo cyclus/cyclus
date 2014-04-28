@@ -262,10 +262,10 @@ int EarlyExitArgs(const ArgInfo& ai) {
 
 void GetSimInfo(ArgInfo* ai) {
   // schema info
-  ai->schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
+  ai->schema_path = Env::GetRNGPath() + "/cyclus.rng.in";
   ai->flat_schema = false;
   if (ai->vm.count("flat-schema")) {
-    ai->schema_path = Env::GetInstallPath() + "/share/cyclus-flat.rng.in";
+    ai->schema_path = Env::GetRNGPath() + "/cyclus-flat.rng.in";
     ai->flat_schema = true;
   }
   if (ai->vm.count("schema-path")) {
