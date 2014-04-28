@@ -62,7 +62,7 @@ class Env {
   static std::string CheckEnv(std::string var);
 
   /// @return the name of the environment variable used for data
-  /// installations, currently set to CYCLUS_DATA_PATH
+  /// installations, currently set to CYCLUS_NUC_DATA_PATH
   static const std::string DataEnvVarName();
 
   /// @return the current value of the data environment variable
