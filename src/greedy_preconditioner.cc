@@ -75,8 +75,8 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
       commod_weights_.begin(),
       commod_weights_.end(),
       SecondLT< std::pair<std::string, double> >())->second;
-  
-  assert(min >= 0);
+
+  assert(commod_weights_.size() == 0 || min >= 0);
   
   std::map<std::string, double>::iterator it;
   switch(order) {
