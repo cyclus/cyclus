@@ -24,7 +24,7 @@ class Env {
   /// @param delim the delimeter character
   /// @param elems the vector of split strings
   static void SplitPath(const std::string &s, char delim,
-                 std::vector<std::string> &elems) {
+                        std::vector<std::string> &elems) {
     std::stringstream ss(s);
     std::string item;
     while (std::getline(ss, item, delim)) {
