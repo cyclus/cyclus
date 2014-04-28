@@ -84,8 +84,7 @@ class Env {
   /// @return the absolute path to the rng directory
   static const std::string GetRNGPath() {
     std::string path;
-    std::string fpath;
-    fpath =  "/cyclus.rng.in";
+    std::string fpath = "/cyclus.rng.in";
     path = RngEnvVar();
     if (boost::filesystem::exists(path + fpath))
       return path;
