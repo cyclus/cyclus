@@ -7,7 +7,10 @@
 
 #include "cyclus.h"
 
+
 namespace cyclus {
+
+static int g_nPrey = 0;  // to track prey population
 
 class Context;
 
@@ -105,6 +108,12 @@ class Prey : public cyclus::Facility {
    */
   #pragma cyclus var {'default': 1}
   double capacity_;
+
+  //#pragma cyclus var {'default': 0}
+  //int born_;
+
+  #pragma cyclus var {'default': 0}
+  int killed_;
 
   /// number of timsteps between having children
   #pragma cyclus var {'default': 1}

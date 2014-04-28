@@ -4,14 +4,14 @@
 #include <string>
 
 #include "cyclus.h"
+#include "prey.h"
+
+// extern int g_nPrey;
 
 namespace cyclus {
 
 /// @class Predator
-/// This Predator facility accepts specified amount of commodity.
-/// This Predator facility is similar to Sink provided in cycamore, but it
-/// has minimum implementation to run integration tests.
-/// Some parts of the code is directrly copied from cycamore Sink.
+/// This Predator facility simulates hunters on preys.
 class Predator : public cyclus::Facility  {
  public:
   Predator(cyclus::Context* ctx);
@@ -60,44 +60,40 @@ class Predator : public cyclus::Facility  {
       cyclus::Product::Ptr> >& responses);
 
   /// @brief determines the amount to request
-  inline double capacity() const { return capacity_; }
+  inline double capacity() const {
+    std::cout << cyclus::g_nPrey << std::endl;
+    return success_ * g_nPrey; }
 
  private:
-  #pragma cyclus var {}
-  std::vector<std::string> in_commods_;
-
-  #pragma cyclus var {}
-  double capacity_;
-
   cyclus::ResourceBuff inventory_;
 
-  /// food eaten per timestep to live
-  #pragma cyclus var {'default': 1}
-  double bufsize_;
-  /// number of timsteps between having a single child
-  #pragma cyclus var {'default': 1}
-  int birth_freq_;
-  /// age
-  #pragma cyclus var {'default': 4}
-  int age_;
-  /// probability of being captured
-  #pragma cyclus var {'default': 0.9}
-  double capture_prob_;
+  #pragma cyclus var {}
+  std::string commod_;
 
+  #pragma cyclus var {}
+  std::string recipe_;
+
+  /**
+    Capacity is the number of members in the predator.
+    The default represents only one entity.
+    It may also be modeled as a group of several predators.
+   */
+  #pragma cyclus var {'default': 1}
+  double capacity_;
+
+  /// hunting success
+  #pragma cyclus var {'default': 0.1}
+  double success_;
+
+  // efficiency of converting food into children
+  #pragma cyclus var {'default': 1}
+  double birth_factor_;
+  /// age of a prey
   #pragma cyclus var {'default': 0}
-  int for_sale_;
+  int age_;
 
-  #pragma cyclus var {}
-  std::string incommod_;
-  #pragma cyclus var {}
-  std::string inrecipe_;
-  #pragma cyclus var {'capacity': 'bufsize_'}
-  cyclus::ResourceBuff inbuf_;
-
-  #pragma cyclus var {}
-  std::string outcommod_;
-  #pragma cyclus var {'capacity': 'bufsize_'}
-  cyclus::ResourceBuff outbuf_;
+  #pragma cyclus var {'default': 12}
+  int lifespan_;
 };
 
 }  // namespace cyclus

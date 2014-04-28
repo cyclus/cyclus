@@ -4,12 +4,12 @@ namespace cyclus {
 
 Predator::Predator(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      bufsize_(0),
-      birth_freq_(0),
+      birth_factor_(0.1),
       age_(0),
-      capture_prob_(0),
-      for_sale_(0),
-      capacity_(100){}
+      lifespan_(12),
+      success_(0.1),
+      capacity_(1) {
+}
 
 void Predator::InitInv(cyclus::Inventories& inv) {
   inventory_.PushAll(inv["inventory"]);
@@ -33,9 +33,6 @@ void Predator::DoRegistration() {
 
 void Predator::Build(cyclus::Agent* parent) {
   cyclus::Facility::Build();
-  Material::Ptr m;
-  m = Material::Create(this, bufsize_, context()->GetRecipe(inrecipe_));
-  inbuf_.Push(m);
 }
 
 void Predator::Decommission() {
@@ -60,9 +57,7 @@ Predator::GetMatlRequests() {
     port->AddConstraint(cc);
 
     std::vector<std::string>::const_iterator it;
-    for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
-      port->AddRequest(mat, this, *it);
-    }
+    port->AddRequest(mat, this, commod_);
 
     ports.insert(port);
   }  // if amt > eps
@@ -87,11 +82,9 @@ Predator::GetGenRsrcRequests() {
     port->AddConstraint(cc);
 
     std::vector<std::string>::const_iterator it;
-    for (it = in_commods_.begin(); it != in_commods_.end(); ++it) {
-      std::string quality = "";  // not clear what this should be..
-      Product::Ptr rsrc = Product::CreateUntracked(amt, quality);
-      port->AddRequest(rsrc, this, *it);
-    }
+    std::string quality = "";  // not clear what this should be..
+    Product::Ptr rsrc = Product::CreateUntracked(amt, quality);
+    port->AddRequest(rsrc, this, commod_);
 
     ports.insert(port);
   }  // if amt > eps
@@ -128,12 +121,8 @@ void Predator::Tick(int time) {
   double requestAmt = capacity();
   // inform the simulation about what the Predator facility will be requesting
   if (requestAmt > cyclus::eps()) {
-    for (vector<string>::iterator commod = in_commods_.begin();
-         commod != in_commods_.end();
-         commod++) {
-      LOG(cyclus::LEV_INFO4, "Predator") << " will request " << requestAmt
-          << " kg of " << *commod << ".";
-    }
+    LOG(cyclus::LEV_INFO4, "Predator") << " will request " << requestAmt
+        << " units of " << commod_ << ".";
   }
   LOG(cyclus::LEV_INFO3, "Predator") << "}";
 }
@@ -141,13 +130,45 @@ void Predator::Tick(int time) {
 void Predator::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "Predator") << prototype() << " is tocking {";
 
-  // On the tock, the Predator facility doesn't really do much.
-  // Maybe someday it will record things.
-  // For now, lets just print out what we have at each timestep.
   LOG(cyclus::LEV_INFO4, "Predator") << "Predator " << this->id()
                                    << " is holding " << inventory_.quantity()
                                    << " units of material at the close of month "
                                    << time << ".";
+  assert(age_ >= 0);
+
+  if (age_ >= lifespan_) {
+    // context()->NewDatum("LifeEvents")
+    //     ->AddVal("AgentId", id())
+    //     ->AddVal("Stat", "died")
+    //     ->Record();
+    LOG(cyclus::LEV_INFO3, "Predator") << prototype() << "is dying of old age}";
+    context()->SchedDecom(this);
+    return;
+  }
+
+  // context()->NewDatum("LifeEvents")
+  //     ->AddVal("AgentId", id())
+  //     ->AddVal("Stat", "ate")
+  //     ->Record();
+  LOG(cyclus::LEV_INFO3, "Predator") << prototype() << " ate";
+
+
+  // give birth if enough food is eaten
+  if (inventory_.quantity() * birth_factor_ > 1) {
+    // context()->NewDatum("LifeEvents")
+    //     ->AddVal("AgentId", id())
+    //     ->AddVal("Stat", "reproduced")
+    //     ->Record();
+    LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is having children";
+    int nchildren = inventory_.quantity() * birth_factor_;
+    inventory_.PopQty(nchildren);
+    for (int i = 0; i < nchildren; ++i) {
+      context()->SchedBuild(this, prototype());
+    }
+  }
+
+  age_++;  // getting older
+
   LOG(cyclus::LEV_INFO3, "Predator") << "}";
 }
 
