@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 #include <string>
+#include <vector>
 #include "boost/filesystem.hpp"
 
 #include "error.h"
@@ -17,6 +18,32 @@ namespace cyclus {
 /// simulation's Context.
 class Env {
  public:
+  /// splits a string of paths by a delimeter
+  ///
+  /// @param s string of paths
+  /// @param delim the delimeter character
+  /// @param elems the vector of split strings
+  static void SplitPath(const std::string &s, char delim,
+                 std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+      elems.push_back(item);
+    }
+  }
+
+  /// splits a string of paths by a delimeter
+  ///
+  /// @param s string of paths
+  /// @param delim the delimeter character
+  ///
+  /// @return the vector of split strings
+  static std::vector<std::string> SplitPath(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    Env::SplitPath(s, delim, elems);
+    return elems;
+  }
+
   /// the path basis
   /// @return path with the last item removed
   static std::string PathBase(std::string path);
@@ -75,24 +102,25 @@ class Env {
   /// @return the current value of the rng environment variable
   static const std::string RngEnvVar();
 
-  /// the relative path to the folder containing RNG files
+  /// the full path to an rng file
   ///
-  /// By default, the path is assumed to be GetInstallPath()/share; however,
+  /// By default, the file is assumed to be GetInstallPath()/share; however,
   /// users can override this by setting the envrionment variable described in
   /// RngEnvVarName().
   ///
-  /// @return the absolute path to the rng directory
-  static const std::string GetRNGPath() {
-    std::string path;
-    std::string fpath = "/cyclus.rng.in";
-    path = RngEnvVar();
-    if (boost::filesystem::exists(path + fpath))
-      return path;
-    path = Env::GetInstallPath() + "/share";
-    if (boost::filesystem::exists(path + fpath))
-      return path;
+  /// @param file the rng file to find the path for
+  static const std::string GetRNGPath(std::string file = "cyclus.rng.in") {
+    namespace fs = boost::filesystem;
+    std::string paths = Env::RngEnvVar()
+                        + ":" + Env::GetInstallPath() + "/share";
+    std::vector<std::string> dirs = Env::SplitPath(paths, ':');
+    for (int i = 0; i != dirs.size(); i++) {
+      fs::path path = fs::path(dirs[i]) / fs::path(file);
+      if (fs::exists(path))
+        return path.string();
+    }
     throw IOError("cyclus.rng.in not found in "
-                  + RngEnvVarName() + " or "
+                  + Env::RngEnvVarName() + " or "
                   + Env::GetInstallPath() + "/share.");
   };
 
@@ -133,19 +161,22 @@ class Env {
   /// GetInstallPath()/share; however, environment variables set in
   /// DataEnvVarName() is checked first.
   inline static const void SetNucDataPath() {
-    pyne::NUC_DATA_PATH = DataEnvVar() + "/cyclus_nuc_data.h5";
-    if (boost::filesystem::exists(pyne::NUC_DATA_PATH))
-      return;
-    pyne::NUC_DATA_PATH = Env::GetInstallPath() + "/share/cyclus_nuc_data.h5";
-    if (boost::filesystem::exists(pyne::NUC_DATA_PATH))
-      return;
-    pyne::NUC_DATA_PATH = Env::GetBuildPath() + "/share/cyclus_nuc_data.h5";
-    if (boost::filesystem::exists(pyne::NUC_DATA_PATH))
-      return;
+    namespace fs = boost::filesystem;
+    std::string paths = Env::DataEnvVar()
+                        + ":" + Env::GetInstallPath() + "/share"
+                        + ":" + Env::GetBuildPath() + "/share";
+    std::string file = "cyclus_nuc_data.h5";
+    std::vector<std::string> dirs = Env::SplitPath(paths, ':');
+    for (int i = 0; i != dirs.size(); i++) {
+      fs::path path = fs::path(dirs[i]) / fs::path(file);
+      pyne::NUC_DATA_PATH = path.string();
+      if (fs::exists(path))
+        return;
+    }
     throw IOError("cyclus_nuc_data.h5 not found in "
                   + Env::DataEnvVarName() + " or "
                   + Env::GetInstallPath() + "/share or "
-                  + Env::GetBuildPath() + "/share or.");
+                  + Env::GetBuildPath() + "/share.");
   }
 
   /// Initializes the path to the nuclear data library to p
@@ -178,6 +209,7 @@ class Env {
                        const std::string& file_name,
                        boost::filesystem::path& path_found);
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_ENV_H_
