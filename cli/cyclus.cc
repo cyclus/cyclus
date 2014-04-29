@@ -267,7 +267,7 @@ void GetSimInfo(ArgInfo* ai) {
                          "cyclus-flat.rng.in" : "cyclus.rng.in";
   ai->schema_path = ai->vm.count("schema-path") ?
                     ai->vm["schema-path"].as<std::string>() :
-                    Env::GetRNGPath(inschema);
+                    Env::GetRNGFile(inschema);
 
   // logging params
   if (ai->vm.count("no-agent")) {

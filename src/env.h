@@ -89,7 +89,7 @@ class Env {
   static std::string CheckEnv(std::string var);
 
   /// @return the name of the environment variable used for data
-  /// installations, currently set to CYCLUS_NUC_DATA_PATH
+  /// installations, currently set to CYCLUS_NUC_DATA
   static const std::string DataEnvVarName();
 
   /// @return the current value of the data environment variable
@@ -109,19 +109,25 @@ class Env {
   /// RngEnvVarName().
   ///
   /// @param file the rng file to find the path for
-  static const std::string GetRNGPath(std::string file = "cyclus.rng.in") {
+  static const std::string GetRNGFile(std::string file = "cyclus.rng.in") {
     namespace fs = boost::filesystem;
-    std::string paths = Env::RngEnvVar()
-                        + ":" + Env::GetInstallPath() + "/share";
+    
+    if (fs::exists(Env::RngEnvVar())) 
+      return Env::RngEnvVar();
+          
+    std::string paths = Env::GetInstallPath() + "/share"
+                        + ":" + Env::GetBuildPath() + "/share";
     std::vector<std::string> dirs = Env::SplitPath(paths, ':');
     for (int i = 0; i != dirs.size(); i++) {
       fs::path path = fs::path(dirs[i]) / fs::path(file);
       if (fs::exists(path))
         return path.string();
     }
+    
     throw IOError("cyclus.rng.in not found in "
-                  + Env::RngEnvVarName() + " or "
-                  + Env::GetInstallPath() + "/share.");
+                  + " environment variable " + Env::RngEnvVarName() + " or "
+                  + Env::GetInstallPath() + "/share or "
+                  + Env::GetBuildPath() + "/share.");
   };
 
   /// @return the name of the environment variable used for module
@@ -162,19 +168,23 @@ class Env {
   /// DataEnvVarName() is checked first.
   inline static const void SetNucDataPath() {
     namespace fs = boost::filesystem;
-    std::string paths = Env::DataEnvVar()
-                        + ":" + Env::GetInstallPath() + "/share"
+    pyne::NUC_DATA_PATH = DataEnvVar(); // env var first
+    if (fs::exists(pyne::NUC_DATA_PATH))
+      return;
+    
+    std::string paths = Env::GetInstallPath() + "/share"
                         + ":" + Env::GetBuildPath() + "/share";
     std::string file = "cyclus_nuc_data.h5";
     std::vector<std::string> dirs = Env::SplitPath(paths, ':');
     for (int i = 0; i != dirs.size(); i++) {
       fs::path path = fs::path(dirs[i]) / fs::path(file);
       pyne::NUC_DATA_PATH = path.string();
-      if (fs::exists(path))
+      if (fs::exists(pyne::NUC_DATA_PATH))
         return;
     }
+    
     throw IOError("cyclus_nuc_data.h5 not found in "
-                  + Env::DataEnvVarName() + " or "
+                  + " environment variable " + Env::DataEnvVarName() + " or "
                   + Env::GetInstallPath() + "/share or "
                   + Env::GetBuildPath() + "/share.");
   }
