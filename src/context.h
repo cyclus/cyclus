@@ -87,6 +87,18 @@ class Context {
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Agent* m);
 
+  /// Registers an agent as a participant in the simulation. 
+  inline void RegisterAgent(Agent* a) {
+    n_prototypes_[a->prototype()]++;
+    n_agent_impls_[a->agent_impl()]++;
+  }
+
+  /// Unregisters an agent as a participant in the simulation.
+  inline void UnregisterAgent(Agent* a) {
+    n_prototypes_[a->prototype()]--;
+    n_agent_impls_[a->agent_impl()]--;
+  }
+
   /// Registers an agent as a participant in resource exchanges. Agents should
   /// register from their Deploy method.
   inline void RegisterTrader(Trader* e) {
@@ -188,12 +200,26 @@ class Context {
     solver_ = solver;
   }
 
+  /// @return the number of agents of a given prototype currently in the
+  /// simulation
+  inline int n_prototypes(std::string type) {
+    return n_prototypes_[type];
+  }
+
+  /// @return the number of agents of a given implementation currently in the
+  /// simulation
+  inline int n_agent_impls(std::string impl) {
+    return n_agent_impls_[impl];
+  }
+  
  private:
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
-
+  std::map<std::string, int> n_prototypes_;
+  std::map<std::string, int> n_agent_impls_;
+  
   SimInfo si_;
   Timer* ti_;
   ExchangeSolver* solver_;
