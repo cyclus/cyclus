@@ -19,6 +19,22 @@ KFacility::KFacility(cyclus::Context* ctx)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KFacility::~KFacility() {}
 
+#pragma cyclus def clone cyclus::KFacility
+
+#pragma cyclus def schema cyclus::KFacility
+
+#pragma cyclus def initinv cyclus::KFacility
+
+#pragma cyclus def snapshotinv cyclus::KFacility
+
+#pragma cyclus def initfromdb cyclus::KFacility
+
+#pragma cyclus def initfromcopy cyclus::KFacility
+
+#pragma cyclus def infiletodb cyclus::KFacility
+
+#pragma cyclus def snapshot cyclus::KFacility
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string KFacility::str() {
   std::stringstream ss;
