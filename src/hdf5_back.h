@@ -28,7 +28,7 @@ class Hdf5Back : public RecBackend {
 
   virtual std::string Name();
 
-  virtual void Flush() {};
+  virtual void Flush() {H5Fflush(file_, H5F_SCOPE_GLOBAL);};
 
  private:
   /// creates and initializes an hdf5 table with schema defined by d.
