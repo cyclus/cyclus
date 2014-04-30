@@ -70,7 +70,8 @@ class GreedyPreconditioner {
   /// @warning weights are assumed to be positive
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights)
     : commod_weights_(commod_weights) {
-    ProcessWeights_(END);
+    if (commod_weights_.size() != 0)
+      ProcessWeights_(END);
   }
   
   /// @brief constructor if weights may not be given in heaviest-first order
@@ -78,7 +79,8 @@ class GreedyPreconditioner {
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights,
                        WgtOrder order)
     : commod_weights_(commod_weights) {
-    ProcessWeights_(order);
+    if (commod_weights_.size() != 0)
+      ProcessWeights_(order);
   };
 
   /// @brief conditions the graph as described above
@@ -107,6 +109,7 @@ class GreedyPreconditioner {
   /// direction
   void ProcessWeights_(WgtOrder order);
   
+  bool apply_commod_weights_;
   std::map<ExchangeNode::Ptr, double> avg_prefs_;
   std::map<std::string, double> commod_weights_;
   std::map<RequestGroup::Ptr, double> group_weights_;
