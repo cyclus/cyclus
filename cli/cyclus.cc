@@ -262,15 +262,12 @@ int EarlyExitArgs(const ArgInfo& ai) {
 
 void GetSimInfo(ArgInfo* ai) {
   // schema info
-  ai->schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
-  ai->flat_schema = false;
-  if (ai->vm.count("flat-schema")) {
-    ai->schema_path = Env::GetInstallPath() + "/share/cyclus-flat.rng.in";
-    ai->flat_schema = true;
-  }
-  if (ai->vm.count("schema-path")) {
-    ai->schema_path = ai->vm["schema-path"].as<std::string>();
-  }
+  ai->flat_schema = ai->vm.count("flat-schema") ? true : false;
+  std::string inschema = ai->vm.count("flat-schema") ?
+                         "cyclus-flat.rng.in" : "cyclus.rng.in";
+  ai->schema_path = ai->vm.count("schema-path") ?
+                    ai->vm["schema-path"].as<std::string>() :
+                    Env::GetRNGFile(inschema);
 
   // logging params
   if (ai->vm.count("no-agent")) {
