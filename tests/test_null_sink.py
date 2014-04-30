@@ -33,9 +33,7 @@ def test_null_sink():
     yield assert_true, table_exist(output, legal_paths)
     if not table_exist(output, legal_paths):
         output.close()
-        os.remove(h5out)
-        # This is a starter sqlite db created implicitly
-        os.remove(sqliteout)
+        clean_outs()
         return  # don't execute further commands
 
     # Get specific data
