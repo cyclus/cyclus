@@ -13,7 +13,7 @@
 
 namespace cyclus {
 
-std::string BuildFlatMasterSchema(std::string schema_path) {
+std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -22,11 +22,11 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
-  std::vector<std::string> names = Env::ListModules();
+  std::vector<AgentSpec> modules = ParseModules(infile);
   std::string subschemas;
-  for (int i = 0; i < names.size(); ++i) {
-    Agent* m = DynamicModule::Make(&ctx, names[i]);
-    subschemas += "<element name=\"" + names[i] + "\">\n";
+  for (int i = 0; i < modules.size(); ++i) {
+    Agent* m = DynamicModule::Make(&ctx, modules[i]);
+    subschemas += "<element name=\"" + modules[i].alias() + "\">\n";
     subschemas += m->schema() + "\n";
     subschemas += "</element>\n";
     ctx.DelAgent(m);
@@ -43,7 +43,7 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
 }
 
 std::string XMLFlatLoader::master_schema() {
-  return BuildFlatMasterSchema(schema_path_);
+  return BuildFlatMasterSchema(schema_path_, file_);
 }
 
 void XMLFlatLoader::LoadInitialAgents() {
@@ -53,12 +53,10 @@ void XMLFlatLoader::LoadInitialAgents() {
   int num_protos = xqe.NMatches("/*/prototype");
   for (int i = 0; i < num_protos; i++) {
     InfileTree* qe = xqe.SubTree("/*/prototype", i);
-    InfileTree* module_data = qe->SubTree("agent");
-    std::string module_name = module_data->GetElementName();
     std::string prototype = qe->GetString("name");
+    AgentSpec spec(qe->SubTree("module"));
 
-    Agent* agent = DynamicModule::Make(ctx_, module_name);
-    agent->agent_impl(module_name);
+    Agent* agent = DynamicModule::Make(ctx_, spec);
 
     // call manually without agent impl injected to keep all Agent state in a
     // single, consolidated db table
@@ -77,7 +75,7 @@ void XMLFlatLoader::LoadInitialAgents() {
     // call manually without agent impl injected
     agent->Agent::InitFrom(&pi);
 
-    pi = PrefixInjector(&ci, "AgentState" + module_name);
+    pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
     agent->InitFrom(&pi);
     ctx_->AddPrototype(prototype, agent);
   }

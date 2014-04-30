@@ -48,103 +48,30 @@ class Env {
   /// @return path with the last item removed
   static std::string PathBase(std::string path);
 
-  /// the relative cyclus path
-  /// @return the relative path from the cwd to the cyclus executable
-  static std::string GetCyclusPath();
-
-  /// the cyclus output path
-  /// @return the full path to the directory of the cyclus output
-  static std::string GetCyclusOutputPath();
-
   /// the relative path to the root install directory (containing bin, lib, etc.)
   /// @return the absolute path to the build directory
   static const std::string GetInstallPath();
-
-  /// Returns the default path for installed cyclus simulation agent
-  /// modules.
-  inline static const std::string module_install_path() {
-    return Env::GetInstallPath() + "/lib/cyclus";
-  }
 
   /// the relative path to the root build directory (containing bin, lib, etc.)
   /// @return the absolute path to the build directory
   static const std::string GetBuildPath();
 
-  /// Allows configuration and other files to be located independent
-  /// of the working directory from which cyclus is executed.
-  ///
-  /// @param path this should be argv[0] as passed to the main function
-  /// (i.e. the relative path from the cwd to cyclus including
-  /// the name of the cyclus executable)
-  static void SetCyclusRelPath(std::string path);
-
-  /// Allows the user to set the cyclus output path
-  /// @param path this should be an argument flagged -o as passed to the
-  /// main function (i.e. the relative path from the cwd to the desired
-  /// output directory)
-  static void SetCyclusOutputPath(std::string path);
-
   /// Method to check the existence of and return an environment variable
   /// @param var is the variable to check and return
-  static std::string CheckEnv(std::string var);
-
-  /// @return the name of the environment variable used for data
-  /// installations, currently set to CYCLUS_NUC_DATA
-  static const std::string DataEnvVarName();
+  static std::string GetEnv(std::string var);
 
   /// @return the current value of the data environment variable
-  static const std::string DataEnvVar();
+  /// CYCLUS_NUC_DATA
+  static const std::string nuc_data();
 
-  /// @return the name of the environment variable used for rng
-  /// installations, currently set to CYCLUS_RNG_PATH
-  static const std::string RngEnvVarName();
-
-  /// @return the current value of the rng environment variable
-  static const std::string RngEnvVar();
-
-  /// the full path to an rng file
-  ///
-  /// By default, the file is assumed to be GetInstallPath()/share; however,
-  /// users can override this by setting the envrionment variable described in
-  /// RngEnvVarName().
-  ///
-  /// @param file the rng file to find the path for
-  static const std::string GetRNGFile(std::string file = "cyclus.rng.in") {
-    namespace fs = boost::filesystem;
-    
-    if (fs::exists(Env::RngEnvVar())) 
-      return Env::RngEnvVar();
-          
-    std::string paths = Env::GetInstallPath() + "/share"
-                        + ":" + Env::GetBuildPath() + "/share";
-    std::vector<std::string> dirs = Env::SplitPath(paths, ':');
-    for (int i = 0; i != dirs.size(); i++) {
-      fs::path path = fs::path(dirs[i]) / fs::path(file);
-      if (fs::exists(path))
-        return path.string();
-    }
-    
-    throw IOError("cyclus.rng.in not found in "
-                  "environment variable " + Env::RngEnvVarName() + " or "
-                  + Env::GetInstallPath() + "/share or "
-                  + Env::GetBuildPath() + "/share.");
-  };
-
-  /// @return the name of the environment variable used for module
-  /// installations, currently set to CYCLUS_MODULE_PATH
-  static const std::string ModuleEnvVarName();
+  /// Returns the current rng schema.  Uses CYCLUS_RNG_SCHEMA env var if
+  /// set; otherwise uses the default install location. If using the default
+  /// location, set flat=true for the default flat schema.
+  static const std::string rng_schema(bool flat = false);
 
   /// @return the current value of the module environment variable
-  static const std::string ModuleEnvVar();
-
-  /// Returns names of all dynamically loadable, discoverable modules.
-  /// Returned lists includes modules installed in the default location
-  /// (module_install_path) as well as modules in directories listed in the
-  /// CYCLUS_MODULE_PATH environment variable.
-  ///
-  /// @return module names without the "lib" prefix or file extension.
-  /// Equivalent to the module class name (e.g. SourceFacility).
-  static std::vector<std::string> ListModules();
+  /// CYCLUS_PATH
+  static const std::vector<std::string> cyclus_path();
 
   /// @return the correct environment variable delimiter based on the file system
   static const std::string EnvDelimiter();
@@ -152,41 +79,13 @@ class Env {
   /// @return the correct path delimiter based on the file system
   static const std::string PathDelimiter();
 
-  /// Environment searches for a library and, if found, sets the path. The search
-  /// occurs across the default install location as well as any included in the
-  /// CYCLUS_MODULE_PATH environment variable.
-  /// @param name the name of the library to search for
-  /// @param path_found the variable to set with the path to the library
-  /// @return true if the library is found, false if not
-  static bool FindModuleLib(std::string name,
-                            boost::filesystem::path& path_found);
-
   /// Initializes the path to the cyclus_nuc_data.h5 file
   ///
   /// By default, it is assumed to be located in the path given by
-  /// GetInstallPath()/share; however, environment variables set in
-  /// DataEnvVarName() is checked first.
+  /// GetInstallPath()/share; however, paths in environment variable
+  /// CYCLUS_NUC_DATA are checked first.
   inline static const void SetNucDataPath() {
-    namespace fs = boost::filesystem;
-    pyne::NUC_DATA_PATH = DataEnvVar(); // env var first
-    if (fs::exists(pyne::NUC_DATA_PATH))
-      return;
-    
-    std::string paths = Env::GetInstallPath() + "/share"
-                        + ":" + Env::GetBuildPath() + "/share";
-    std::string file = "cyclus_nuc_data.h5";
-    std::vector<std::string> dirs = Env::SplitPath(paths, ':');
-    for (int i = 0; i != dirs.size(); i++) {
-      fs::path path = fs::path(dirs[i]) / fs::path(file);
-      pyne::NUC_DATA_PATH = path.string();
-      if (fs::exists(pyne::NUC_DATA_PATH))
-        return;
-    }
-    
-    throw IOError("cyclus_nuc_data.h5 not found in "
-                  " environment variable " + Env::DataEnvVarName() + " or "
-                  + Env::GetInstallPath() + "/share or "
-                  + Env::GetBuildPath() + "/share.");
+    pyne::NUC_DATA_PATH = nuc_data();
   }
 
   /// Initializes the path to the nuclear data library to p
@@ -196,28 +95,14 @@ class Env {
       throw IOError("cyclus_nuc_data.h5 not found at " + p);
   }
 
+  /// Returns the full path to a module by searching through default install
+  /// and CYCLUS_PATH directories.
+  static std::string FindModule(std::string path);
+
  private:
-  /// the relative path from cwd to cyclus
-  static boost::filesystem::path path_from_cwd_to_cyclus_;
 
   /// the cwd path
   static boost::filesystem::path cwd_;
-
-  /// the cwd path
-  static boost::filesystem::path path_to_output_dir_;
-
-  /// Taken directly from
-  /// http://www.boost.org/doc/libs/1_31_0/libs/filesystem/doc/index.htm. This
-  /// function recursively searches a directory and its sub-directories for the
-  /// file name, returning a bool, and if successful, the path to the file that
-  /// was found.
-  /// @param dir_path the directory path to search
-  /// @param file_name the file to search for
-  /// @param path_found the path, which is populated if the file is found
-  /// @return true if the file is found, false if it isn't
-  static bool FindFile(const boost::filesystem::path& dir_path,
-                       const std::string& file_name,
-                       boost::filesystem::path& path_found);
 };
 
 }  // namespace cyclus

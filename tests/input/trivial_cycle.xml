@@ -15,6 +15,10 @@
 
   <facility>
     <name>KFacility</name>
+    <module>
+      <path>KFacility</path>
+      <agent>KFacility</agent>
+    </module>
     <agent>
       <KFacility>
         <in_commod_>commodity</in_commod_>
@@ -30,12 +34,20 @@
 
   <region>
     <name>SingleRegion</name>
+    <module>
+      <path>NullRegion</path>
+      <agent>NullRegion</agent>
+    </module>
     <allowedfacility>KFacility</allowedfacility>
     <agent>
       <NullRegion/>
     </agent>
     <institution>
       <name>SingleInstitution</name>
+      <module>
+        <path>NullInst</path>
+        <agent>NullInst</agent>
+      </module>
       <availableprototype>KFacility</availableprototype>
       <initialfacilitylist>
         <entry>

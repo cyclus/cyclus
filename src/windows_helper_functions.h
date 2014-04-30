@@ -12,11 +12,10 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::OpenLibrary() {
-  module_library_ = LoadLibrary(abs_path_.c_str());
+  module_library_ = LoadLibrary(path_.c_str());
 
   if (!module_library_) {
     std::string err_msg = "Unable to load agent shared object file: ";
-    err_msg += agent_name;
     err_msg += ". Error code is: ";
     err_msg += GetLastError();
     throw IOError(err_msg);
@@ -25,10 +24,10 @@ void DynamicModule::OpenLibrary() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
-  constructor_ = (AgentCtor*)
-                 GetProcAddress(module_library_, constructor_name_.c_str());
+  ctor_ = (AgentCtor*)
+                 GetProcAddress(module_library_, ctor_name_.c_str());
 
-  if (!constructor_) {
+  if (!ctor_) {
     string err_msg = "Unable to load agent constructor: ";
     err_msg += GetLastError();
     throw IOError(err_msg);

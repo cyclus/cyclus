@@ -21,10 +21,14 @@ class Context;
 /// Reads the given file path into the passed stream.
 void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
 
+/// Returns a list of the full module+agent spec for all agents in the given
+/// input file.
+std::vector<AgentSpec> ParseModules(std::string infile);
+
 /// Builds and returns a master cyclus input xml schema that includes the
 /// sub-schemas defined by all installed cyclus modules (e.g. facility agents).
 /// This is used to validate simulation input files.
-std::string BuildMasterSchema(std::string schema_path);
+std::string BuildMasterSchema(std::string schema_path, std::string infile);
 
 /// Creates a composition from the recipe in the query engine.
 Composition::Ptr ReadRecipe(InfileTree* qe);

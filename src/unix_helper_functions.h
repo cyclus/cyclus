@@ -12,7 +12,7 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::OpenLibrary() {
-  module_library_ = dlopen(abs_path_.c_str(), RTLD_LAZY);
+  module_library_ = dlopen(path_.c_str(), RTLD_LAZY);
 
   if (!module_library_) {
     std::string err_msg = "Unable to load agent shared object file: ";
@@ -25,10 +25,10 @@ void DynamicModule::OpenLibrary() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
-  constructor_ = (AgentCtor*)
-                 dlsym(module_library_, constructor_name_.c_str());
+  ctor_ = (AgentCtor*)
+                 dlsym(module_library_, ctor_name_.c_str());
 
-  if (!constructor_) {
+  if (!ctor_) {
     std::string err_msg = "Unable to load module constructor: ";
     err_msg  += dlerror();
     throw IOError(err_msg);

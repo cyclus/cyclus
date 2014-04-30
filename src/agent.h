@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "dynamic_module.h"
 #include "resource.h"
