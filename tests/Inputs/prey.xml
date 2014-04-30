@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- Lotka-Volterra simulation with Preys and Predators -->
+<!-- Lotka-Volterra simulation with Preys only. -->
 
 <simulation>
   <control>
@@ -24,36 +24,18 @@
     </agent>
   </facility>
 
-  <facility>
-    <name>Sink</name>
-    <agent>
-      <Sink>
-        <in_commods_>
-          <val>commodity</val>
-        </in_commods_>
-        <capacity_>1.00</capacity_>
-      </Sink>
-    </agent>
-  </facility>
-
   <region>
     <name>SingleRegion</name>
     <allowedfacility>Prey</allowedfacility>
-    <allowedfacility>Sink</allowedfacility>
     <agent>
       <NullRegion/>
     </agent>
     <institution>
       <name>SingleInstitution</name>
       <availableprototype>Prey</availableprototype>
-      <availableprototype>Sink</availableprototype>
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
-          <number>1</number>
-        </entry>
-        <entry>
-          <prototype>Sink</prototype>
           <number>1</number>
         </entry>
       </initialfacilitylist>

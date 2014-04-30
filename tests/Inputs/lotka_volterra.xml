@@ -17,9 +17,9 @@
     <name>Prey</name>
     <agent>
       <Prey>
-        <out_commod_>commodity</out_commod_>
-        <recipe_name_>commod_recipe</recipe_name_>
-        <out_capacity_>1</out_capacity_>
+        <commod_>commodity</commod_>
+        <recipe_>commod_recipe</recipe_>
+        <capacity_>1</capacity_>
       </Prey>
     </agent>
   </facility>
@@ -28,8 +28,9 @@
     <name>Predator</name>
     <agent>
       <Predator>
-        <in_commod_>commodity</in_commod_>
-        <in_capacity_>1</in_capacity_>
+        <commod_>commodity</commod_>
+        <recipe_>commod_recipe</recipe_>
+        <prey_>none</prey_>
       </Predator>
     </agent>
   </facility>
