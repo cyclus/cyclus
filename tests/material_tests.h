@@ -9,11 +9,11 @@
 
 namespace units = cyclus::units;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MaterialTest : public ::testing::Test {
  protected:
   cyclus::Nuc u235_, am241_, th228_, pb208_, pu239_;
-  int one_g_; // grams
+  int one_g_;  // grams
   cyclus::Composition::Ptr test_comp_, diff_comp_;
   double test_size_, fraction;
   cyclus::Material::Ptr test_mat_, two_test_mat_, ten_test_mat_;
@@ -50,8 +50,8 @@ class MaterialTest : public ::testing::Test {
 
     // test info
     u235_g_per_mol_ = 235.044;
-    u235_halflife_ = 8445600000; // approximate, in months
-    th228_halflife_ = 2 * 11; // approximate, in months
+    u235_halflife_ = 8445600000;  // approximate, in months
+    th228_halflife_ = 2 * 11;  // approximate, in months
   }
 
   virtual void TearDown() {}

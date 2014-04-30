@@ -1,12 +1,11 @@
+#include "solver_tests.h"
+
 #include <gtest/gtest.h>
 
 #include "exchange_graph.h"
+#include "exchange_test_cases.h"
 #include "greedy_solver.h"
 #include "prog_solver.h"
-
-#include "exchange_test_cases.h"
-
-#include "solver_tests.h"
 
 namespace cyclus {
 
@@ -142,4 +141,4 @@ TYPED_TEST(ExchangeSolverTest, ExclusiveGreedySolver) {
 
 #endif  // GTEST_HAS_TYPED_TEST
 
-} // namespace cyclus
+}  // namespace cyclus

@@ -22,14 +22,14 @@ namespace fs = boost::filesystem;
 using namespace cyclus;
 
 struct ArgInfo {
-  po::variables_map vm; // holds parsed/specified cli opts and values
-  po::options_description desc; // holds cli opts description;
+  po::variables_map vm;  // holds parsed/specified cli opts and values
+  po::options_description desc;  // holds cli opts description;
   bool flat_schema;
   std::string schema_path;
   std::string output_path;
 };
 
-// Describes and parses cli arguments.  Returns the error code that main should
+// Describes and parses cli arguments. Returns the error code that main should
 // return early OR -1 if main should not return early.
 int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]);
 
@@ -59,12 +59,12 @@ int main(int argc, char* argv[]) {
   // handle cli option flags
   ArgInfo ai;
   int ret = ParseCliArgs(&ai, argc, argv);
-  if (ret > -1 ) {
+  if (ret > -1) {
     return ret;
   }
   GetSimInfo(&ai);
   ret = EarlyExitArgs(ai);
-  if (ret > -1 ) {
+  if (ret > -1) {
     return ret;
   }
 
@@ -110,18 +110,18 @@ int main(int argc, char* argv[]) {
   FullBackend* fback = NULL;
   RecBackend* rback = NULL;
   RecBackend::Deleter bdel;
-  Recorder rec; // must be after backend deleter because ~Rec does flushing
+  Recorder rec;  // must be after backend deleter because ~Rec does flushing
 
   std::string ext = fs::path(ai.output_path).extension().generic_string();
   std::string stem = fs::path(ai.output_path).stem().generic_string();
-  if (ext == ".h5") { // not queryable
+  if (ext == ".h5") {  // not queryable
     fback = new SqliteBack(stem + ".sqlite");
     rback = new Hdf5Back(ai.output_path.c_str());
     rec.RegisterBackend(rback);
     rec.RegisterBackend(fback);
     bdel.Add(rback);
     bdel.Add(fback);
-  } else if (ext == ".csv") { // not queryable
+  } else if (ext == ".csv") {  // not queryable
     fback = new SqliteBack(stem + ".sqlite");
     rback = new CsvBack(ai.output_path.c_str());
     rec.RegisterBackend(rback);
@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
       XMLFileLoader l(&rec, fback, ai.schema_path, infile);
       l.LoadSim();
     }
-  } catch (Error e) {
+  } catch (cyclus::Error e) {
     CLOG(LEV_ERROR) << e.what();
     return 1;
   }
@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
                (si.context()->sim_id()) << std::endl;
 
   return 0;
-};
+}
 
 int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
   // verbosity help msg
@@ -257,20 +257,17 @@ int EarlyExitArgs(const ArgInfo& ai) {
     }
     return 0;
   }
-  return -1; // main should not return early
-};
+  return -1;  // main should not return early
+}
 
 void GetSimInfo(ArgInfo* ai) {
   // schema info
-  ai->schema_path = Env::GetInstallPath() + "/share/cyclus.rng.in";
-  ai->flat_schema = false;
-  if (ai->vm.count("flat-schema")) {
-    ai->schema_path = Env::GetInstallPath() + "/share/cyclus-flat.rng.in";
-    ai->flat_schema = true;
-  }
-  if (ai->vm.count("schema-path")) {
-    ai->schema_path = ai->vm["schema-path"].as<std::string>();
-  }
+  ai->flat_schema = ai->vm.count("flat-schema") ? true : false;
+  std::string inschema = ai->vm.count("flat-schema") ?
+                         "cyclus-flat.rng.in" : "cyclus.rng.in";
+  ai->schema_path = ai->vm.count("schema-path") ?
+                    ai->vm["schema-path"].as<std::string>() :
+                    Env::GetRNGFile(inschema);
 
   // logging params
   if (ai->vm.count("no-agent")) {
@@ -294,4 +291,3 @@ void GetSimInfo(ArgInfo* ai) {
     ai->output_path = ai->vm["output-path"].as<std::string>();
   }
 }
-

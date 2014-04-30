@@ -64,8 +64,7 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
-
+void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {  
   double min = std::min_element(
       commod_weights_.begin(),
       commod_weights_.end(),
@@ -75,8 +74,8 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
       commod_weights_.begin(),
       commod_weights_.end(),
       SecondLT< std::pair<std::string, double> >())->second;
-  
-  assert(min >= 0);
+
+  assert(commod_weights_.size() == 0 || min >= 0);
   
   std::map<std::string, double>::iterator it;
   switch(order) {
@@ -120,7 +119,7 @@ double GroupWeight(RequestGroup::Ptr g,
 double NodeWeight(ExchangeNode::Ptr n,
                   std::map<std::string, double>* weights,
                   double avg_pref) {
-  double commod_weight = (*weights)[n->commod];
+  double commod_weight = (weights->size() != 0) ? (*weights)[n->commod] : 1;
   double node_weight = commod_weight * ( 1 + avg_pref / ( 1 + avg_pref));
   
   CLOG(LEV_DEBUG5) << "Determining node weight: ";

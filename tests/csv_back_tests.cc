@@ -1,31 +1,32 @@
-#include <gtest/gtest.h>
-
-#include "csv_back.h"
-#include "blob.h"
-
-#include "boost/algorithm/string.hpp"
-#include "boost/lexical_cast.hpp"
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/filesystem.hpp>
+#include <cerrno>
 #include <fstream>
 #include <streambuf>
 #include <string>
-#include <cerrno>
+
+#include "boost/algorithm/string.hpp"
+#include "boost/lexical_cast.hpp"
+#include <boost/filesystem.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <gtest/gtest.h>
+
+#include "blob.h"
+#include "csv_back.h"
 
 static std::string const path = "testdb.csv";
 namespace fs = boost::filesystem;
 
 class DirDel {
  public:
-  DirDel(std::string path) : path_(path) {};
+  DirDel(std::string path) : path_(path) {}
   ~DirDel() {
     fs::remove_all(path);
-  };
+  }
+
  private:
   std::string path_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CsvBackTest, ReadWrite) {
   DirDel dd(path);
 
@@ -33,15 +34,15 @@ TEST(CsvBackTest, ReadWrite) {
   cyclus::CsvBack back(path);
   m.RegisterBackend(&back);
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("monkey"))
-  ->AddVal("weight", 10)
-  ->AddVal("height", 5.5)
-  ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->AddVal("weight", 10)
+      ->AddVal("height", 5.5)
+      ->Record();
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("elephant"))
-  ->AddVal("weight", 1000)
-  ->AddVal("height", 7.2)
-  ->Record();
+      ->AddVal("animal", std::string("elephant"))
+      ->AddVal("weight", 1000)
+      ->AddVal("height", 7.2)
+      ->Record();
   m.Close();
 
   // make sure append works
@@ -49,10 +50,10 @@ TEST(CsvBackTest, ReadWrite) {
   cyclus::CsvBack back2(path);
   m2.RegisterBackend(&back2);
   m2.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("sea cucumber"))
-  ->AddVal("weight", 1)
-  ->AddVal("height", .4)
-  ->Record();
+      ->AddVal("animal", std::string("sea cucumber"))
+      ->AddVal("weight", 1)
+      ->AddVal("height", .4)
+      ->Record();
   m2.Close();
 
   std::string sid1 = boost::lexical_cast<std::string>(m.sim_id());
@@ -73,17 +74,17 @@ TEST(CsvBackTest, ReadWrite) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string ReadAll(std::string fname) {
   std::ifstream in(fname.c_str(), std::ios::in | std::ios::binary);
   if (in) {
-    return (std::string((std::istreambuf_iterator<char>(in)),
+    return (std::string(std::istreambuf_iterator<char>(in),
                         std::istreambuf_iterator<char>()));
   }
-  throw (errno);
+  throw(errno);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CsvBackTest, Blob) {
   using cyclus::Recorder;
   using cyclus::CsvBack;
@@ -95,8 +96,8 @@ TEST(CsvBackTest, Blob) {
   CsvBack back(path);
   m.RegisterBackend(&back);
   m.NewDatum("Blobs")
-  ->AddVal("data", data)
-  ->Record();
+      ->AddVal("data", data)
+      ->Record();
   m.Close();
 
   std::string fname = path + "/" + "Blobs.csv";
@@ -117,4 +118,3 @@ TEST(CsvBackTest, Blob) {
   }
   EXPECT_EQ(data.str(), rdata);
 }
-

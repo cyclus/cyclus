@@ -1,13 +1,13 @@
 #ifndef CYCLUS_TESTS_RESOURCE_HELPERS_H_
 #define CYCLUS_TESTS_RESOURCE_HELPERS_H_
 
+#include "bid.h"
 #include "composition.h"
 #include "material.h"
 #include "product.h"
+#include "request.h"
 #include "test_context.h"
 #include "test_modules/test_facility.h"
-#include "request.h"
-#include "bid.h"
 
 using cyclus::Arc;
 using cyclus::Bid;
@@ -25,7 +25,7 @@ namespace test_helpers {
 /// exchanges
 static int u235 = 92235;
 static double helper_qty = 4.5;
-    
+
 static Material::Ptr get_mat(int nuc, double qty) {
   CompMap cm;
   cm[nuc] = qty;
@@ -52,7 +52,7 @@ static Bid<Material>::Ptr get_bid() {
 struct TestConverter : public Converter<Material> {
   TestConverter() {}
   virtual ~TestConverter() {}
-  
+
   virtual double convert(
       Material::Ptr r,
       Arc const * a = NULL,
@@ -66,6 +66,6 @@ struct TestConverter : public Converter<Material> {
   }
 };
 
-} // namespace test_helpers
+}  // namespace test_helpers
 
-#endif // ifndef CYCLUS_TESTS_RESOURCE_HELPERS_H_
+#endif  // CYCLUS_TESTS_RESOURCE_HELPERS_H_

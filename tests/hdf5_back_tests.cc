@@ -1,23 +1,24 @@
-#include <gtest/gtest.h>
 #include <string>
-#include "hdf5.h"
-#include "hdf5_hl.h"
 
-#include "hdf5_back.h"
+#include <gtest/gtest.h>
+
 #include "blob.h"
+#include "hdf5.h"
+#include "hdf5_back.h"
+#include "hdf5_hl.h"
 
 static const char* path = "testdb.h5";
 
 class FileDeleter {
  public:
-  FileDeleter(const char* path) : path_(path) {};
+  FileDeleter(const char* path) : path_(path) {}
   ~FileDeleter() {
     remove(path_);
-  };
+  }
   const char* path_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(Hdf5BackTest, ReadWrite) {
   using std::vector;
   using std::string;
@@ -33,7 +34,8 @@ TEST(Hdf5BackTest, ReadWrite) {
 
   size_t strsize = str.size() + 1;
   size_t sizes[] = {16, sizeof(int), sizeof(float), sizeof(double), sizeof(char*)};
-  size_t offsets[] = {0, sizes[0], sizes[0] + sizes[1], sizes[0] + sizes[1] + sizes[2], sizes[0] + sizes[1] + sizes[2] + sizes[3]};
+  size_t offsets[] = {0, sizes[0], sizes[0] + sizes[1], sizes[0] + sizes[1] +
+                      sizes[2], sizes[0] + sizes[1] + sizes[2] + sizes[3]};
   size_t size = sizes[0] + sizes[1] + sizes[2] + sizes[3] + sizes[4];
   const char* field_names = "string,int,float,double,blob";
   char buf[size];

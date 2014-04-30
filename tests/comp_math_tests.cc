@@ -1,4 +1,3 @@
-
 #include "gtest/gtest.h"
 
 #include "comp_math.h"
@@ -10,7 +9,7 @@ namespace cm = cyclus::compmath;
 using cyclus::Composition;
 using cyclus::CompMap;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, SubSame) {
   CompMap v;
   v[922350000] = 1;
@@ -23,7 +22,7 @@ TEST(CompMathTests, SubSame) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, SubCloseSize) {
   CompMap v;
   double qty = 0.1;
@@ -42,7 +41,7 @@ TEST(CompMathTests, SubCloseSize) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, SubCloseComp) {
   double qty = 0.1;
 
@@ -68,7 +67,7 @@ TEST(CompMathTests, SubCloseComp) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, ApplyThresholdZero) {
   // if the threshold is 0, applying the threshold should do nothing
   CompMap v;
@@ -84,7 +83,7 @@ TEST(CompMathTests, ApplyThresholdZero) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, ApplyThresholdInf) {
   CompMap v;
   v[1] = 1.0;
@@ -101,7 +100,7 @@ TEST(CompMathTests, ApplyThresholdInf) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, ApplyThresholdNegative) {
   CompMap v;
   v[1] = 1.0;
@@ -111,7 +110,7 @@ TEST(CompMathTests, ApplyThresholdNegative) {
   EXPECT_THROW(cm::ApplyThreshold(&v, -1), cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, ApplyThresholdMedium) {
   CompMap v;
   v[1] = 1.0;
@@ -126,7 +125,7 @@ TEST(CompMathTests, ApplyThresholdMedium) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, ApplyThresholdSeqIter) {
   // tests for a bug caused by improper iteration over CompMap
   CompMap v;
@@ -144,7 +143,7 @@ TEST(CompMathTests, ApplyThresholdSeqIter) {
   EXPECT_FLOAT_EQ(3, v[4]);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, AlmostEq) {
   CompMap v1;
   v1[1] = 0.1;
@@ -160,7 +159,7 @@ TEST(CompMathTests, AlmostEq) {
   EXPECT_TRUE(cm::AlmostEq(v1, v2, 0.1));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, AlmostEqualZeroEntry) {
   CompMap v1;
   v1[1] = 0.1;
@@ -176,13 +175,13 @@ TEST(CompMathTests, AlmostEqualZeroEntry) {
   EXPECT_TRUE(cm::AlmostEq(v1, v2, 1.1));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, AlmostEqualNegThresh) {
   CompMap v1, v2;
   EXPECT_THROW(cm::AlmostEq(v1, v2, -1.0), cyclus::ValueError);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, SimpleAdd) {
   CompMap v1;
   v1[1] = 1.1;
@@ -197,7 +196,7 @@ TEST(CompMathTests, SimpleAdd) {
   EXPECT_TRUE(cm::AlmostEq(v1, result, 1e-15));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, Add) {
   CompMap v1;
   v1[1] = 1.0;
@@ -224,4 +223,3 @@ TEST(CompMathTests, Add) {
     EXPECT_DOUBLE_EQ(it->second, expect[it->first]);
   }
 }
-

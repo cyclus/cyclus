@@ -49,11 +49,11 @@ double fraction = 0.7;
 int u235 = 92235;
 double qty = 6.3;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 struct MatConverter1 : public Converter<Material> {
   MatConverter1() {}
   virtual ~MatConverter1() {}
-  
+
   virtual double convert(
       Material::Ptr r,
       Arc const * a = NULL,
@@ -64,11 +64,11 @@ struct MatConverter1 : public Converter<Material> {
   }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 struct MatConverter2 : public Converter<Material> {
   MatConverter2() {}
   virtual ~MatConverter2() {}
-  
+
   virtual double convert(
       Material::Ptr r,
       Arc const * a = NULL,
@@ -79,7 +79,7 @@ struct MatConverter2 : public Converter<Material> {
   }
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateCapacities) {
   Material::Ptr mat = get_mat(u235, qty);
 
@@ -90,7 +90,7 @@ TEST(ExXlateTests, XlateCapacities) {
   Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
   CapacityConstraint<Material> cc2(qty2, c2);
-  
+
   CapacityConstraint<Material> carr1[] = {cc1, cc2};
   std::set< CapacityConstraint<Material> >
       rconstrs(carr1, carr1 + sizeof(carr1) / sizeof(carr1[0]));
@@ -105,7 +105,7 @@ TEST(ExXlateTests, XlateCapacities) {
 
   double rarr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
-      
+
   double barr[] = {(c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
 
@@ -117,7 +117,7 @@ TEST(ExXlateTests, XlateCapacities) {
   TestVecEq(bexp, bnode->unit_capacities[arc]);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateReq) {
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
@@ -126,7 +126,7 @@ TEST(ExXlateTests, XlateReq) {
   Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
   CapacityConstraint<Material> cc2(qty2, c2);
-    
+
   double carr[] = {qty2, qty1};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
@@ -159,12 +159,12 @@ TEST(ExXlateTests, XlateReq) {
             xlator.translation_ctx().request_to_node[ereq]);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateBid) {
   std::string commod = "commod";
   Request<Material>::Ptr req =
       Request<Material>::Create(get_mat(u235, qty), trader, commod);
-  
+
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
   CapacityConstraint<Material> cc1(qty1, c1);
@@ -172,10 +172,10 @@ TEST(ExXlateTests, XlateBid) {
   Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
   CapacityConstraint<Material> cc2(qty2, c2);
-  
+
   double carr[] = {qty2, qty1};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
-  
+
   BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
   Bid<Material>::Ptr bid = port->AddBid(req, get_mat(u235, qty), trader);
   Bid<Material>::Ptr ebid = port->AddBid(req, get_mat(u235, qty), trader, true);
@@ -211,7 +211,7 @@ TEST(ExXlateTests, XlateBid) {
   EXPECT_TRUE(t);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateArc) {
   Material::Ptr mat = get_mat(u235, qty);
 
@@ -222,19 +222,19 @@ TEST(ExXlateTests, XlateArc) {
   Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
   CapacityConstraint<Material> cc2(qty2, c2);
-  
+
   double carr[] = {qty1, qty2};
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
   Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), trader);
   rport->AddConstraint(cc1);
-  
+
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
   Bid<Material>::Ptr bid = bport->AddBid(req, get_mat(u235, qty), trader);
   bport->AddConstraint(cc1);
   bport->AddConstraint(cc2);
-    
+
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
@@ -249,17 +249,17 @@ TEST(ExXlateTests, XlateArc) {
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.unode());
   EXPECT_FALSE(a.exclusive());
-  
+
   double barr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
   TestVecEq(bexp, a.vnode()->unit_capacities[a]);
-      
+
   double rarr[] = {(c1->convert(mat) / qty)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
   TestVecEq(rexp, a.unode()->unit_capacities[a]);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateArcExclusive) {
   bool exclusive = true;
 
@@ -286,7 +286,7 @@ TEST(ExXlateTests, XlateArcExclusive) {
                                           exclusive);
   Bid<Material>::Ptr bid8 = bport->AddBid(req2, get_mat(u235, qty + 1), trader,
                                           exclusive);
-  
+
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
   TranslateRequestPortfolio(xlator.translation_ctx(), rport);
@@ -336,7 +336,7 @@ TEST(ExXlateTests, XlateArcExclusive) {
   EXPECT_DOUBLE_EQ(a8.excl_val(), 0);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, SimpleXlate) {
   std::string commod = "c";
   double pref = 4.5;
@@ -350,9 +350,9 @@ TEST(ExXlateTests, SimpleXlate) {
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rport);
   ctx.AddBidPortfolio(bport);
-  
+
   ExchangeTranslator<Material> xlator(&ctx);
-  
+
   ExchangeGraph::Ptr graph;
   EXPECT_NO_THROW(graph = xlator.Translate());
   EXPECT_EQ(1, graph->request_groups().size());
@@ -364,42 +364,42 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(pref, a.unode()->prefs[a]);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, BackXlate) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
-  
+
   Request<Material>::Ptr ur(get_req());
   Request<Material>::Ptr xr(get_req());
   Bid<Material>::Ptr vb(get_bid());
   Bid<Material>::Ptr yb(get_bid());
-  
-  ExchangeNode::Ptr u(new ExchangeNode());  
+
+  ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
-  ExchangeNode::Ptr x(new ExchangeNode());  
+  ExchangeNode::Ptr x(new ExchangeNode());
   ExchangeNode::Ptr y(new ExchangeNode());
 
   AddRequest(xlator.translation_ctx(), ur, u);
   AddRequest(xlator.translation_ctx(), xr, x);
   AddBid(xlator.translation_ctx(), vb, v);
   AddBid(xlator.translation_ctx(), yb, y);
-  
+
   Arc a(u, v);
   Arc b(x, y);
 
-  double qty = 2.5; // some magic numbers
+  double qty = 2.5;  // some magic numbers
   double aqty = qty * 0.1;
   double bqty = qty * 1.5;
 
   Trade<Material> aexp(ur, vb, aqty);
   Trade<Material> bexp(xr, yb, bqty);
-  
+
   Trade<Material> tarr[] = {aexp, bexp};
   std::vector< Trade<Material> > exp(tarr, tarr + sizeof(tarr) / sizeof(tarr[0]));
-  
+
   Match amatch(std::make_pair(a, aqty));
   Match bmatch(std::make_pair(b, bqty));
-  
+
   Match marr[] = {amatch, bmatch};
   std::vector<Match> matches(marr, marr + sizeof(marr) / sizeof(marr[0]));
 

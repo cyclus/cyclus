@@ -10,8 +10,8 @@
 #include "recorder.h"
 #include "timer.h"
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(MatQueryTests, MassAndMoles) { 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(MatQueryTests, MassAndMoles) {
   cyclus::CompMap v;
   cyclus::Env::SetNucDataPath();
 
@@ -33,8 +33,8 @@ TEST(MatQueryTests, MassAndMoles) {
   EXPECT_DOUBLE_EQ(mq.atom_frac(10070000), 2500 / pyne::atomic_mass(10070000) / nmoles);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(MatQueryTests, AlmostEq) { 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(MatQueryTests, AlmostEq) {
   cyclus::CompMap v;
   cyclus::Composition::Ptr c;
 
@@ -64,8 +64,8 @@ TEST(MatQueryTests, AlmostEq) {
   EXPECT_TRUE(mq.AlmostEq(m5, 4.0 * cyclus::eps_rsrc()));
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-TEST(MatQueryTests, Amount) { 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(MatQueryTests, Amount) {
   cyclus::Env::SetNucDataPath();
 
   cyclus::CompMap v;
@@ -96,4 +96,3 @@ TEST(MatQueryTests, Amount) {
   EXPECT_DOUBLE_EQ(2.75, mq.Amount(c4));
   EXPECT_DOUBLE_EQ(0, mq.Amount(c5));
 }
-

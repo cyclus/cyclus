@@ -12,7 +12,8 @@
 namespace cyclus {
 /// An Recorder backend that writes data to an hdf5 file.  Identically named
 /// Datum objects have their data placed as rows in a single table.  Handles the following
-/// datum value types: int, float, double, std::string, cyclus::Blob
+/// datum value types: int, float, double, std::string, cyclus::Blob,
+/// boost::uuids::uuid.
 class Hdf5Back : public FullBackend {
  public:
   /// Creates a new backend writing data to the specified file.
@@ -27,7 +28,7 @@ class Hdf5Back : public FullBackend {
 
   virtual std::string Name();
 
-  virtual void Flush() {};
+  virtual void Flush() {H5Fflush(file_, H5F_SCOPE_GLOBAL);};
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
@@ -35,18 +36,19 @@ class Hdf5Back : public FullBackend {
   /// Creates a QueryResult from a table description.
   QueryResult GetTableInfo(hid_t dset);
 
-  /// creates and initializes an hdf5 table
+  /// creates and initializes an hdf5 table with schema defined by d.
   void CreateTable(Datum* d);
 
-  /// write a group of Datum objects with the same title to their corresponding hdf5 dataset
+  /// writes a group of Datum objects with the same title to their
+  /// corresponding hdf5 dataset.
   void WriteGroup(DatumList& group);
 
-  /// fill a contiguous memory buffer with data from group for writing to an hdf5 dataset.
+  /// fill a contiguous memory buffer with data from group for writing to an
+  /// hdf5 dataset.
   void FillBuf(char* buf, DatumList& group, size_t* sizes, size_t rowsize);
 
   /// An reference to a database.
   hid_t file_;
-
   hid_t string_type_;
   hid_t blob_type_;
 

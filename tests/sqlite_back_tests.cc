@@ -1,80 +1,71 @@
-
-
-#include "sqlite_back.h"
-#include "blob.h"
-
-#include <gtest/gtest.h>
 #include "boost/lexical_cast.hpp"
 #include <boost/uuid/uuid_io.hpp>
+#include <gtest/gtest.h>
+
+#include "blob.h"
+#include "sqlite_back.h"
 
 static std::string const path = "testdb.sqlite";
 
-class FlushCatcher: public cyclus::SqliteBack {
-public:
-  FlushCatcher(std::string path) : SqliteBack(path) {};
-  cyclus::StrList cmds;
-
-protected:
-  virtual void Flush() {
-    cmds.insert(cmds.end(), cmds_.begin(), cmds_.end());
-    cyclus::SqliteBack::Flush();
-  };
-};
-
 class FileDeleter {
-public:
+ public:
   FileDeleter(std::string path) {
     path_ = path;
-  };
+  }
 
   ~FileDeleter() {
     remove(path_.c_str());
-  };
+  }
 
-private:
+ private:
   std::string path_;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(SqliteBackTest, Regression) {
   using cyclus::Recorder;
   FileDeleter fd(path);
   Recorder m;
-  FlushCatcher back(path);
+  cyclus::SqliteBack back(path);
   m.RegisterBackend(&back);
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("monkey"))
-  ->AddVal("weight", 10)
-  ->AddVal("height", 5.5)
-  ->AddVal("data", cyclus::Blob("banana"))
-  ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->AddVal("weight", 10)
+      ->AddVal("height", 5.5)
+      ->AddVal("data", cyclus::Blob("banana"))
+      ->Record();
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("elephant"))
-  ->AddVal("weight", 1000)
-  ->Record();
+      ->AddVal("animal", std::string("elephant"))
+      ->AddVal("weight", 1000)
+      ->Record();
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("sea cucumber"))
-  ->AddVal("height", 1.2)
-  ->Record();
+      ->AddVal("animal", std::string("sea cucumber"))
+      ->AddVal("height", 1.2)
+      ->Record();
 
   m.Close();
 
-  std::string sid = boost::lexical_cast<std::string>(m.sim_id());
+  cyclus::QueryResult qr = back.Query("DumbTitle", NULL);
 
-  ASSERT_EQ(back.cmds.size(), 4);
-  EXPECT_EQ(back.cmds.at(0),
-            "CREATE TABLE DumbTitle (SimId TEXT, animal TEXT, weight INTEGER, height REAL, data BLOB);");
-  EXPECT_EQ(back.cmds.at(1),
-            "INSERT INTO DumbTitle (SimId, animal, weight, height, data) VALUES ('" + sid +
-            "', 'monkey', 10, 5.5, X'62616e616e61');");
-  EXPECT_EQ(back.cmds.at(2),
-            "INSERT INTO DumbTitle (SimId, animal, weight) VALUES ('" + sid +
-            "', 'elephant', 1000);");
-  EXPECT_EQ(back.cmds.at(3),
-            "INSERT INTO DumbTitle (SimId, animal, height) VALUES ('" + sid +
-            "', 'sea cucumber', 1.2);");
+  std::string animal = qr.GetVal<std::string>("animal", 0);
+  int weight = qr.GetVal<int>("weight", 0);
+  double height = qr.GetVal<double>("height", 0);
+  cyclus::Blob data = qr.GetVal<cyclus::Blob>("data", 0);
+  EXPECT_EQ("monkey", animal);
+  EXPECT_EQ(10, weight);
+  EXPECT_EQ(5.5, height);
+  EXPECT_EQ("banana", data.str());
+
+  animal = qr.GetVal<std::string>("animal", 1);
+  weight = qr.GetVal<int>("weight", 1);
+  EXPECT_EQ("elephant", animal);
+  EXPECT_EQ(1000, weight);
+
+  animal = qr.GetVal<std::string>("animal", 2);
+  height = qr.GetVal<double>("height", 2);
+  EXPECT_EQ("sea cucumber", animal);
+  EXPECT_EQ(1.2, height);
 }
-

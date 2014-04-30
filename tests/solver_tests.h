@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <gtest/gtest.h>
+
 namespace cyclus {
 
 /// This testing suite uses <a
@@ -37,7 +39,7 @@ namespace cyclus {
 ///   @endcode
 
 class ExchangeCase;
-  
+
 template <class T>
 ExchangeCase* CreateExchangeCase();
 
@@ -50,6 +52,6 @@ class ExchangeSolverTest : public testing::Test {
   ExchangeCase* const case_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_TESTS_SOLVER_TESTS_H_
+#endif  // CYCLUS_TESTS_SOLVER_TESTS_H_

@@ -1,18 +1,18 @@
-#include <gtest/gtest.h>
-
 #include <map>
 #include <set>
 #include <utility>
 #include <vector>
 
+#include <gtest/gtest.h>
+
+#include "agent.h"
 #include "bid.h"
 #include "context.h"
 #include "material.h"
-#include "test_modules/test_facility.h"
-#include "agent.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
+#include "test_modules/test_facility.h"
 #include "test_trader.h"
 #include "trade.h"
 #include "trade_executor.h"
@@ -30,7 +30,7 @@ using cyclus::Trade;
 using cyclus::TradeExecutor;
 using cyclus::Trader;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class TradeExecutorTests : public ::testing::Test {
  public:
   TestContext tc;
@@ -39,15 +39,15 @@ class TradeExecutorTests : public ::testing::Test {
   TestTrader* r1;
   TestTrader* r2;
   TestObjFactory fac;
-  
+
   double amt;
   Request<Material>::Ptr req1, req2;
   Bid<Material>::Ptr bid1, bid2, bid3;
   Trade<Material> t1, t2, t3;
   std::vector< Trade<Material> > trades;
-  
+
   virtual void SetUp() {
-    amt = 4.5; // some magic number..
+    amt = 4.5;  // some magic number..
     s1 = new TestTrader(tc.get(), &fac);
     s2 = new TestTrader(tc.get(), &fac);
     r1 = new TestTrader(tc.get(), &fac);
@@ -68,7 +68,7 @@ class TradeExecutorTests : public ::testing::Test {
     trades.push_back(t2);
     trades.push_back(t3);
   }
-  
+
   virtual void TearDown() {}
 };
 
@@ -108,7 +108,7 @@ TEST_F(TradeExecutorTests, SupplierResponses) {
   trades_by_requester[r1].push_back(std::make_pair(t2, fac.mat));
   trades_by_requester[r2].push_back(std::make_pair(t3, fac.mat));
   EXPECT_EQ(exec.trade_ctx().trades_by_requester, trades_by_requester);
-  
+
   std::map<std::pair<Trader*, Trader*>,
            std::vector< std::pair<Trade<Material>, Material::Ptr> > > all_trades;
   all_trades[std::make_pair(s1, r1)].push_back(std::make_pair(t1, fac.mat));
@@ -144,14 +144,14 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
 // // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // TEST(TradeTests, OfferThrow) {
 //   TestContext tc;
-  
+
 //   Material::Ptr mat = get_mat();
 //   Receiver* r = new Receiver(tc.get(), mat);
 //   Request<Material>::Ptr req = Request<Material>::Create(mat, r);
-  
+
 //   Sender* s = new Sender(tc.get(), true);
 //   Bid<Material>::Ptr bid = Bid<Material>::Create(req, mat, s);
-  
+
 //   Trade<Material> trade(req, bid, mat->quantity());
 //   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);
 //   delete s;

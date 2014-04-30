@@ -15,21 +15,21 @@
 
 namespace cyclus {
 
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
+std::vector<std::string> split(const std::string& s, char delim) {
+  std::vector<std::string> elems;
+  std::stringstream ss(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    elems.push_back(item);
+  }
+  return elems;
 }
 
 SqliteBack::~SqliteBack() {
   try {
     Flush();
     db_.close();
-  } catch(Error err) {
+  } catch (Error err) {
     CLOG(LEV_ERROR) << "Error in SqliteBack destructor: " << err.what();
   }
 }
@@ -42,17 +42,29 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
   std::string cmd = "SELECT name FROM sqlite_master WHERE type='table';";
   std::vector<StrList> rows = db_.Query(cmd);
   for (int i = 0; i < rows.size(); ++i) {
-    tbl_names_.push_back(rows.at(i).at(0));
+    tbl_names_.insert(rows.at(i).at(0));
+  }
+
+  if (tbl_names_.count("FieldTypes") == 0) {
+    cmd = "CREATE TABLE IF NOT EXISTS FieldTypes";
+    cmd += "(TableName TEXT,Field TEXT,Type TEXT);";
+    db_.Execute(cmd);
   }
 }
 
 void SqliteBack::Notify(DatumList data) {
+  db_.Execute("BEGIN TRANSACTION;");
   for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
-    if (! TableExists((*it)->title())) {
+    std::string tbl = (*it)->title();
+    if (tbl_names_.count(tbl) == 0) {
       CreateTable(*it);
+    }
+    if (stmts_.count(tbl) == 0) {
+      BuildStmt(*it);
     }
     WriteDatum(*it);
   }
+  db_.Execute("END TRANSACTION;");
   Flush();
 }
 
@@ -68,12 +80,21 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
         sql << " AND ";
       }
       Cond c = (*conds)[i];
-      sql << c.field << " " << c.op << " " << ValAsString(c.val);
+      sql << c.field << " " << c.op << " ?";
     }
   }
   sql << ";";
 
-  std::vector<StrList> rows = db_.Query(sql.str());
+  SqlStatement::Ptr stmt = db_.Prepare(sql.str());
+
+  if (conds != NULL) {
+    for (int i = 0; i < conds->size(); ++i) {
+      boost::spirit::hold_any v = (*conds)[i].val;
+      Bind(v, stmt, i+1);
+    }
+  }
+
+  std::vector<StrList> rows = stmt->Query();
   for (int i = 0; i < rows.size(); ++i) {
     QueryRow r;
     for (int j = 0; j < q.fields.size(); ++j) {
@@ -85,34 +106,17 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
 }
 
 QueryResult SqliteBack::GetTableInfo(std::string table) {
-  std::string sql = "SELECT sql FROM sqlite_master WHERE tbl_name = '" + table + "';";
+  std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" +
+                    table + "';";
   std::vector<StrList> rows = db_.Query(sql);
   if (rows.size() == 0) {
     throw ValueError("Invalid table name " + table);
   }
 
-  std::string s = rows[0][0];
-  size_t start = s.find("(") + 1;
-  size_t n = s.find(")") - start;
-  std::string type_data = s.substr(start, n);
-  std::vector<std::string> fields = split(type_data, ',');
   QueryResult info;
-  for (int i = 0; i < fields.size(); ++i) {
-    std::string field = fields[i];
-    boost::algorithm::trim(field);
-    size_t pos = field.rfind(" ") + 1;
-    std::string type = field.substr(pos);
-    pos = field.find(" ");
-    std::string name = field.substr(0, pos);
-    if (type != "INTEGER" &&
-        type != "REAL" &&
-        type != "BLOB" &&
-        type != "TEXT") {
-      throw IOError("Unsupported type " + type + \
-                    " for querying in SQLite for field " + name);
-    }
-    info.types.push_back(type);
-    info.fields.push_back(name);
+  for (int i = 0; i < rows.size(); ++i) {
+    info.fields.push_back(rows[i][0]);
+    info.types.push_back(rows[i][1]);
   }
   return info;
 }
@@ -121,126 +125,127 @@ std::string SqliteBack::Name() {
   return path_;
 }
 
+void SqliteBack::BuildStmt(Datum* d) {
+  std::string name = d->title();
+  Datum::Vals vals = d->vals();
+
+  std::string insert = "INSERT INTO " + name + " VALUES (?";
+  field_order_[name][vals[0].first] = 1;
+  for (int i = 1; i < vals.size(); ++i) {
+    field_order_[name][vals[i].first] = i + 1;
+    insert += ", ?";
+  }
+  insert += ");";
+
+  stmts_[name] = db_.Prepare(insert);
+}
+
 void SqliteBack::CreateTable(Datum* d) {
   std::string name = d->title();
-  tbl_names_.push_back(name);
+  tbl_names_.insert(name);
 
   Datum::Vals vals = d->vals();
   Datum::Vals::iterator it = vals.begin();
+
+  std::string types = "INSERT INTO FieldTypes VALUES ('" + name + "','"
+                      + it->first + "','" + Type(it->second) + "');";
+  db_.Execute(types);
+
   std::string cmd = "CREATE TABLE " + name + " (";
-  cmd += std::string(it->first) + " " + ValType(it->second);
+  cmd += std::string(it->first) + " " + SqlType(it->second);
   ++it;
+
   while (it != vals.end()) {
-    cmd += ", " + std::string(it->first) + " " + ValType(it->second);
+    cmd += ", " + std::string(it->first) + " " + SqlType(it->second);
+    types = "INSERT INTO FieldTypes VALUES ('" + name + "','"
+            + it->first + "','" + Type(it->second) + "');";
+    db_.Execute(types);
     ++it;
   }
 
   cmd += ");";
-  cmds_.push_back(cmd);
+  db_.Execute(cmd);
 }
 
-std::string SqliteBack::ValType(boost::spirit::hold_any v) {
+std::string SqliteBack::SqlType(boost::spirit::hold_any v) {
   if (v.type() == typeid(int)) {
     return "INTEGER";
   } else if (v.type() == typeid(float) || v.type() == typeid(double)) {
     return "REAL";
   } else if (v.type() == typeid(Blob)) {
     return "BLOB";
+  } else if (v.type() == typeid(boost::uuids::uuid)) {
+    return "BLOB";
   }
   return "TEXT";
 }
 
-bool SqliteBack::TableExists(std::string name) {
-  return find(tbl_names_.begin(), tbl_names_.end(), name) != tbl_names_.end();
+std::string SqliteBack::Type(boost::spirit::hold_any v) {
+  if (v.type() == typeid(int)) {
+    return "int";
+  } else if (v.type() == typeid(double)) {
+    return "double";
+  } else if (v.type() == typeid(float)) {
+    return "float";
+  } else if (v.type() == typeid(Blob)) {
+    return "blob";
+  } else if (v.type() == typeid(boost::uuids::uuid)) {
+    return "uuid";
+  } else if (v.type() == typeid(std::string)) {
+    return "std::string";
+  }
+  return std::string("UNKNOWN_") + v.type().name();
+}
+
+void SqliteBack::Bind(boost::spirit::hold_any v, SqlStatement::Ptr stmt,
+                      int index) {
+  if (v.type() == typeid(int)) {
+    stmt->BindInt(index, v.cast<int>());
+  } else if (v.type() == typeid(double)) {
+    stmt->BindDouble(index, v.cast<double>());
+  } else if (v.type() == typeid(std::string)) {
+    stmt->BindText(index, v.cast<std::string>().c_str());
+  } else if (v.type() == typeid(boost::uuids::uuid)) {
+    boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
+    stmt->BindBlob(index, ui.data, 16);
+  } else if (v.type() == typeid(float)) {
+    stmt->BindDouble(index, v.cast<float>());
+  } else if (v.type() == typeid(Blob)) {
+    std::string s = v.cast<Blob>().str();
+    stmt->BindBlob(index, s.c_str(), s.size());
+  }
 }
 
 void SqliteBack::WriteDatum(Datum* d) {
-  std::stringstream colss, valss, cmd;
   Datum::Vals vals = d->vals();
+  SqlStatement::Ptr stmt = stmts_[d->title()];
+  std::map<const char*, int> index = field_order_[d->title()];
 
-  Datum::Vals::iterator it = vals.begin();
-  colss << it->first;
-  valss << ValAsString(it->second);
-  ++it;
-  while (it != vals.end()) {
-    colss << ", " << it->first;
-    valss << ", " << ValAsString(it->second);
-    ++it;
+  for (int i = 0; i < vals.size(); ++i) {
+    boost::spirit::hold_any v = vals[i].second;
+    Bind(v, stmt, index[vals[i].first]);
   }
 
-  cmd << "INSERT INTO " << d->title() << " (" << colss.str() << ") "
-      << "VALUES (" << valss.str() << ");";
-  cmds_.push_back(cmd.str());
+  stmt->Exec();
 }
 
-std::string StringToHex(const std::string& s) {
-  std::ostringstream ret;
-  for (int i = 0; i < s.length(); ++i) {
-    ret << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(s[i]);
-  }
-  return ret.str();
-}
-
-std::string StringFromHex(const std::string& in) {
-    std::string output;
-
-    if ((in.length() % 2) != 0) {
-        throw std::runtime_error("String is not valid length ...");
-    }
-
-    size_t cnt = in.length() / 2;
-
-    for (size_t i = 0; cnt > i; ++i) {
-        uint32_t s = 0;
-        std::stringstream ss;
-        ss << std::hex << in.substr(i * 2, 2);
-        ss >> s;
-
-        output.push_back(static_cast<unsigned char>(s));
-    }
-
-    return output;
-}
-
-std::string SqliteBack::ValAsString(boost::spirit::hold_any v) {
-  // NOTE: the ugly structure of this if block is for performance reasons
-  if (v.type() == typeid(int)) {
-    std::stringstream ss;
-    ss << v.cast<int>();
-    return ss.str();
-  } else if (v.type() == typeid(double)) {
-    std::stringstream ss;
-    ss << v.cast<double>();
-    return ss.str();
-  } else if (v.type() == typeid(std::string)) {
-    return "'" + v.cast<std::string>() + "'";
-  } else if (v.type() == typeid(boost::uuids::uuid)) {
-    char data[16];
-    boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
-    return "'" + boost::lexical_cast<std::string>(ui) + "'";
-  } else if (v.type() == typeid(float)) {
-    std::stringstream ss;
-    ss << v.cast<float>();
-    return ss.str();
-  } else if (v.type() == typeid(Blob)) {
-    std::string s = v.cast<Blob>().str();
-    return "X'" + StringToHex(s) + "'";
-  }
-  CLOG(LEV_ERROR) << "attempted to record unsupported type " << v.type().name() << " in backend "
-                  << Name();
-  return "''";
-}
-
-boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type) {
+boost::spirit::hold_any SqliteBack::StringAsVal(std::string s,
+                                                std::string type) {
   boost::spirit::hold_any v;
-  if (type == "INTEGER") {
+  if (type == "int") {
     v = atoi(s.c_str());
-  } else if (type == "REAL") {
+  } else if (type == "double") {
     v = atof(s.c_str());
-  } else if (type == "TEXT") {
+  } else if (type == "float") {
+    v = (float)atof(s.c_str());
+  } else if (type == "std::string") {
     v = s;
-  } else if (type == "BLOB") {
-    v = s;
+  } else if (type == "blob") {
+    v = Blob(s);
+  } else if (type == "uuid") {
+    boost::uuids::uuid u;
+    memcpy(&u, s.c_str(), 16);
+    v = u;
   } else {
     CLOG(LEV_ERROR) << "attempted to retrieve unsupported type from backend "
                     << Name();
@@ -248,13 +253,6 @@ boost::spirit::hold_any SqliteBack::StringAsVal(std::string s, std::string type)
   return v;
 }
 
-void SqliteBack::Flush() {
-  db_.Execute("BEGIN TRANSACTION");
-  for (StrList::iterator it = cmds_.begin(); it != cmds_.end(); ++it) {
-    db_.Execute(*it);
-  }
-  db_.Execute("END TRANSACTION");
-  cmds_.clear();
-}
+void SqliteBack::Flush() { }
 
 } // namespace cyclus

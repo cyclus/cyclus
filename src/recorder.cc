@@ -57,13 +57,14 @@ Datum* Recorder::NewDatum(std::string title) {
   d->vals_.resize(1);
 
   index_++;
-  if (index_ >= data_.size()) {
-    NotifyBackends();
-  }
   return d;
 }
 
-void Recorder::AddDatum(Datum* d) {}
+void Recorder::AddDatum(Datum* d) {
+  if (index_ >= data_.size()) {
+    NotifyBackends();
+  }
+}
 
 void Recorder::Flush() {
   DatumList tmp = data_;

@@ -46,7 +46,7 @@ def write_macros_to_output(tests, executable, output=None):
     Arguments
     tests -- a list of all test names to be added as ADD_TEST macros
     to the output file
-    exectuable -- the name of the test executable
+    executable -- the name of the test executable
     output -- the output file to write to, if output is not
     specified, the list of ADD_TEST macros will be written to stdout
     """
@@ -67,7 +67,7 @@ def main():
         "file for every test in a google-test executable."
     parser = ap.ArgumentParser(description=description)
 
-    executable = 'the path to the test exectuable to call'
+    executable = 'the path to the test executable to call'
     parser.add_argument('--executable', help=executable, required=True)
 
     output = "the file to write the ADD_TEST macros to "+\
