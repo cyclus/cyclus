@@ -54,24 +54,43 @@ void Hdf5Back::Notify(DatumList data) {
 }
 
 QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
+  herr_t status = 0;
   hid_t tb_set = H5Dopen2(file_, table.c_str(), H5P_DEFAULT);
   hid_t tb_space = H5Dget_space(tb_set);
+  hid_t tb_plist = H5Dget_create_plist(tb_set);
+  hid_t tb_type = H5Dget_type(tb_set);
+  size_t tb_typesize = H5Tget_size(tb_type);
   int tb_length = H5Sget_simple_extent_npoints(tb_space);
+  hsize_t tb_chunksize;
+  H5Pget_chunk(tb_plist, 1, &tb_chunksize);
+  unsigned int nchunks = (tb_length/tb_chunksize) + (tb_length%tb_chunksize == 0?0:1);
+  unsigned int n = 0;
 
-  QueryResult qr = GetTableInfo(tb_set);
+  std::cout << "tb_length " << tb_length << "\n";
+  std::cout << "chunksize " << tb_chunksize << "\n";
+  std::cout << "nchunks " << nchunks << "\n";
+
+  QueryResult qr = GetTableInfo(tb_type);
+  for (n; n <= nchunks; n++) {
+    void * buf = new (tb_typesize * tb_chunksize);
+    status = H5Dread(tb_set, tb_type, hid_t mem_space_id, tb_space, H5P_DEFAULT, buf);
+    delete buf;
+  }
 
   // close and return
+  H5Tclose(tb_type);
+  H5Pclose(tb_plist);
+  H5Sclose(tb_space);
   H5Dclose(tb_set);
   return qr;
 }
 
-QueryResult Hdf5Back::GetTableInfo(hid_t dset) {
+QueryResult Hdf5Back::GetTableInfo(hid_t dt) {
   int i;
   char * colname;
   hid_t coltype;
   std::string fieldname;
   std::string fieldtype;
-  hid_t dt = H5Dget_type(dset);
   QueryResult qr;
   for (i = 0; i < H5Tget_nmembers(dt); i++) {
     colname = H5Tget_member_name(dt, i);
@@ -94,7 +113,6 @@ QueryResult Hdf5Back::GetTableInfo(hid_t dset) {
     H5Tclose(coltype);
     qr.types.push_back(fieldtype);
   }
-  H5Tclose(dt);
   return qr;
 }
 
