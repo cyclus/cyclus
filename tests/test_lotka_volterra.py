@@ -8,7 +8,105 @@ import numpy as np
 from tools import check_cmd
 from helper import table_exist, find_ids, exit_times
 
-def test_minimal_cycle():
+def test_prey_only():
+    """Tests simulations with Preys only.
+
+    The population is expected to grow exponentially.
+    """
+
+    # A reference simulation input for Lotka-Volterra simulation
+    sim_input = "./Inputs/prey.xml"
+
+    holdsrtn = [1]  # needed because nose does not send() to test generator
+    cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+    yield check_cmd, cmd, '.', holdsrtn
+    rtn = holdsrtn[0]
+    if rtn != 0:
+        return  # don't execute further commands
+
+    output = tables.open_file("./output_temp.h5", mode = "r")
+    # tables of interest
+    paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
+    # Check if these tables exist
+    yield assert_true, table_exist(output, paths)
+    if not table_exist(output, paths):
+        output.close()
+        os.remove("./output_temp.h5")
+        # This is a starter sqlite db created implicitly
+        os.remove("./output_temp.sqlite")
+        return  # don't execute further commands
+
+    # Get specific tables and columns
+    agent_entry = output.get_node("/AgentEntry")[:]
+    info = output.get_node("/Info")[:]
+    resources = output.get_node("/Resources")[:]
+    transactions = output.get_node("/Transactions")[:]
+
+    # Find agent ids
+    agent_ids = agent_entry["AgentId"]
+    agent_impl = agent_entry["Implementation"]
+    agent_protos = agent_entry["Prototype"]
+    duration = info["Duration"][0]
+
+    # Track transacted resources
+    quantities = resources["Quantity"]
+
+    output.close()
+    os.remove("./output_temp.h5")
+    # This is a starter sqlite db created implicitly
+    os.remove("./output_temp.sqlite")
+
+
+def test_predator_only():
+    """Tests simulations with Predators only.
+
+    The population is expected to decrease exponentially.
+    """
+
+    # A reference simulation input for Lotka-Volterra simulation
+    sim_input = "./Inputs/predator.xml"
+
+    holdsrtn = [1]  # needed because nose does not send() to test generator
+    cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+    yield check_cmd, cmd, '.', holdsrtn
+    rtn = holdsrtn[0]
+    if rtn != 0:
+        return  # don't execute further commands
+
+    output = tables.open_file("./output_temp.h5", mode = "r")
+    # tables of interest
+    paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
+    # Check if these tables exist
+    yield assert_true, table_exist(output, paths)
+    if not table_exist(output, paths):
+        output.close()
+        os.remove("./output_temp.h5")
+        # This is a starter sqlite db created implicitly
+        os.remove("./output_temp.sqlite")
+        return  # don't execute further commands
+
+    # Get specific tables and columns
+    agent_entry = output.get_node("/AgentEntry")[:]
+    info = output.get_node("/Info")[:]
+    resources = output.get_node("/Resources")[:]
+    transactions = output.get_node("/Transactions")[:]
+
+    # Find agent ids
+    agent_ids = agent_entry["AgentId"]
+    agent_impl = agent_entry["Implementation"]
+    agent_protos = agent_entry["Prototype"]
+    duration = info["Duration"][0]
+
+    # Track transacted resources
+    quantities = resources["Quantity"]
+
+    output.close()
+    os.remove("./output_temp.h5")
+    # This is a starter sqlite db created implicitly
+    os.remove("./output_temp.sqlite")
+
+
+def test_lotka_volterra():
     """Tests simulations with Preys and Predators
 
     Preys offer a resource representing itself. Predators acquire the resources
@@ -19,7 +117,9 @@ def test_minimal_cycle():
     After certain time steps, predators and preys reproduce and deploy new
     predators and preys respectively.
 
-    Oscillating behavior is expected.
+    Oscillating behavior is expected when both species are in the simulation.
+    If only one specie is in the environment, its population should show
+    exponential growth or decay.
     """
 
     # A reference simulation input for Lotka-Volterra simulation
