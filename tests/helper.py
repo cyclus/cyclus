@@ -1,5 +1,16 @@
 """A set of tools for use in integration tests."""
 import tables
+import os
+
+h5out = "output_temp.h5"
+sqliteout = "output_temp.sqlite"
+
+def clean_outs():
+    """Removes output files if they exist."""
+    if os.path.exists(h5out):
+        os.remove(h5out)
+        os.remove(sqliteout)
+        
 
 def table_exist(db, tables):
     """Checks if hdf5 database contains the specified tables.
