@@ -171,8 +171,10 @@ void Hdf5Back::FillBuf(char* buf, DatumList& group, size_t* sizes,
           // valid until the hdf5 file is flushed or closed.
           std::string s = a->cast<Blob>().str();
           char* v = new char[strlen(s.c_str())];
+          char** vv = new char*;
+          *vv = v;
           strcpy(v, s.c_str());
-          memcpy(buf + offset, &v, sizes[col]);
+          memcpy(buf + offset, vv, sizes[col]);
           break;
         }
         case UUID: {
