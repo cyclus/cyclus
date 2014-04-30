@@ -10,7 +10,6 @@ Prey::Prey(cyclus::Context* ctx)
       commod_(""),
       recipe_(""),
       capacity_(1),
-      //born_(1),
       killed_(0),
       nchildren_(1),
       birth_freq_(1),
@@ -47,45 +46,41 @@ void Prey::Tick(int time) {
                                    << " units of "
                                    << commod_ << ".";
   LOG(cyclus::LEV_INFO3, "Prey") << "}";
-  // if (born_) {
-  //   g_nPrey++;
-  //   std::cout << g_nPrey << std::endl;
-  //   born_ = 0;
-  // }
 }
 
 void Prey::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is tocking {";
 
   if (killed_) {
-    // context()->NewDatum("LifeEvents")
-    //     ->AddVal("AgentId", id())
-    //     ->AddVal("Stat", "eaten")
-    //     ->Record();
+    context()->NewDatum("LifeEvents")
+        ->AddVal("AgentId", id())
+        ->AddVal("Stat", "eaten")
+        ->Record();
     LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " got eaten";
     context()->SchedDecom(this);
-    g_nPrey--;
+    LOG(cyclus::LEV_INFO3, "Prey") << "}";
     return;
   }
 
   assert(age_ >= 0);
-
+  assert(lifespan_ >= 0);
   if (age_ >= lifespan_) {
-    // context()->NewDatum("LifeEvents")
-    //     ->AddVal("AgentId", id())
-    //     ->AddVal("Stat", "died")
-    //     ->Record();
+    context()->NewDatum("LifeEvents")
+        ->AddVal("AgentId", id())
+        ->AddVal("Stat", "died")
+        ->Record();
     LOG(cyclus::LEV_INFO3, "Prey") << prototype() << "is dying of old age";
     context()->SchedDecom(this);
-    g_nPrey--;
+    LOG(cyclus::LEV_INFO3, "Prey") << "}";
     return;
   }
 
+  assert(birth_freq_ > 0);
   if (age_ % birth_freq_ == 0) {
-    // context()->NewDatum("LifeEvents")
-    //     ->AddVal("AgentId", id())
-    //     ->AddVal("Stat", "reproduced")
-    //     ->Record();
+    context()->NewDatum("LifeEvents")
+        ->AddVal("AgentId", id())
+        ->AddVal("Stat", "reproduced")
+        ->Record();
     LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is having children";
     for (int i = 0; i < nchildren_; ++i) {
       context()->SchedBuild(this, prototype());
