@@ -125,7 +125,7 @@ class Env {
     }
     
     throw IOError("cyclus.rng.in not found in "
-                  + " environment variable " + Env::RngEnvVarName() + " or "
+                  "environment variable " + Env::RngEnvVarName() + " or "
                   + Env::GetInstallPath() + "/share or "
                   + Env::GetBuildPath() + "/share.");
   };
@@ -184,7 +184,7 @@ class Env {
     }
     
     throw IOError("cyclus_nuc_data.h5 not found in "
-                  + " environment variable " + Env::DataEnvVarName() + " or "
+                  " environment variable " + Env::DataEnvVarName() + " or "
                   + Env::GetInstallPath() + "/share or "
                   + Env::GetBuildPath() + "/share.");
   }
