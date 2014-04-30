@@ -43,11 +43,19 @@ class GreedySolver: public ExchangeSolver {
   
   virtual ~GreedySolver();
 
+  /// Uses the provided (or a default) GreedyPreconditioner to condition the
+  /// solver's ExchangeGraph so that RequestGroups are ordered by average
+  /// preference and commodity weight.
+  ///
+  /// @warning this function is called during the Solve step and should most
+  /// likely not be called independently thereof (except for testing)
+  void Condition();
+  
  protected:
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
   /// RequestGroup and matching requests with the minimum bids possible, starting
   /// from the beginning of the the respective request and bid containers.
-  virtual void Solve();
+  virtual void SolveGraph();
 
  private:
   /// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
