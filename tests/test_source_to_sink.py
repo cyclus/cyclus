@@ -6,34 +6,35 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times
+from helper import table_exist, find_ids, exit_times, \
+    h5out, sqliteout, clean_outs
 
 """Tests"""
 def test_source_to_sink():
     """Tests linear growth of sink inventory by checking if the transactions
     were of equal quantities and only between sink and source facilities.
     """
+    clean_outs()
+
     # Cyclus simulation input for Source and Sink
     sim_inputs = ["./Inputs/source_to_sink.xml"]
 
     for sim_input in sim_inputs:
         holdsrtn = [1]  # needed because nose does not send() to test generator
-        cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+        cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
         yield check_cmd, cmd, '.', holdsrtn
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
 
-        output = tables.open_file("./output_temp.h5", mode = "r")
+        output = tables.open_file(h5out, mode = "r")
         # Tables of interest
         paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
         # Check if these tables exist
         yield assert_true, table_exist(output, paths)
         if not table_exist(output, paths):
             output.close()
-            os.remove("./output_temp.h5")
-            # This is a starter sqlite db created implicitly
-            os.remove("./output_temp.sqlite")
+            clean_outs()
             return  # don't execute further commands
 
         # Get specific tables and columns
@@ -77,6 +78,4 @@ def test_source_to_sink():
         yield assert_array_equal, quantities, expected_quantities
 
         output.close()
-        os.remove("./output_temp.h5")
-        # This is a starter sqlite db created implicitly
-        os.remove("./output_temp.sqlite")
+        clean_outs()
