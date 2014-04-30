@@ -9,6 +9,7 @@ def clean_outs():
     """Removes output files if they exist."""
     if os.path.exists(h5out):
         os.remove(h5out)
+    if os.path.exists(sqliteout):
         os.remove(sqliteout)
         
 
