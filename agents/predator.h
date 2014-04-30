@@ -4,9 +4,6 @@
 #include <string>
 
 #include "cyclus.h"
-#include "prey.h"
-
-// extern int g_nPrey;
 
 namespace cyclus {
 
@@ -60,9 +57,7 @@ class Predator : public cyclus::Facility  {
       cyclus::Product::Ptr> >& responses);
 
   /// @brief determines the amount to request
-  inline double capacity() const {
-    std::cout << cyclus::g_nPrey << std::endl;
-    return success_ * g_nPrey; }
+  double capacity();
 
  private:
   cyclus::ResourceBuff inventory_;
@@ -80,6 +75,9 @@ class Predator : public cyclus::Facility  {
    */
   #pragma cyclus var {'default': 1}
   double capacity_;
+
+  #pragma cyclus var {}
+  std::string prey_;
 
   /// hunting success
   #pragma cyclus var {'default': 0.1}
