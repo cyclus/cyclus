@@ -79,10 +79,11 @@ TEST(Hdf5BackTest, ReadWrite) {
 
   // query read
   string expfields[] = {"SimId", "string", "int", "float", "double", "blob"};
-  string exptypes[] = {"TEXT", "TEXT", "INTEGER", "REAL", "REAL", "BLOB"};
+  cyclus::DbTypes exptypes[] = {cyclus::UUID, cyclus::STRING, cyclus::INT, 
+                                cyclus::FLOAT, cyclus::DOUBLE, cyclus::BLOB};
   cyclus::QueryResult qr = back.Query("DumbTitle", NULL);
   for (int i = 0; i < qr.fields.size(); i++) {
     EXPECT_STREQ(qr.fields[i].c_str(), expfields[i].c_str());
-    EXPECT_STREQ(qr.types[i].c_str(), exptypes[i].c_str());
+    EXPECT_EQ(qr.types[i], exptypes[i]);
   }
 }

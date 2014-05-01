@@ -98,7 +98,7 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
   for (int i = 0; i < rows.size(); ++i) {
     QueryRow r;
     for (int j = 0; j < q.fields.size(); ++j) {
-      r.push_back(StringAsVal(rows[i][j], q.types[j]));
+      //FIXME r.push_back(StringAsVal(rows[i][j], q.types[j]));
     }
     q.rows.push_back(r);
   }
@@ -116,7 +116,7 @@ QueryResult SqliteBack::GetTableInfo(std::string table) {
   QueryResult info;
   for (int i = 0; i < rows.size(); ++i) {
     info.fields.push_back(rows[i][0]);
-    info.types.push_back(rows[i][1]);
+    //FIXME info.types.push_back(rows[i][1]);
   }
   return info;
 }
