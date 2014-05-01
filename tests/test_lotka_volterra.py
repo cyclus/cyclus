@@ -6,34 +6,33 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times
+from helper import table_exist, find_ids, exit_times, h5out, clean_outs
 
 def test_prey_only():
     """Tests simulations with Preys only.
 
     The population is expected to grow exponentially.
     """
+    clean_outs()
 
     # A reference simulation input for Lotka-Volterra simulation
     sim_input = "./Inputs/prey.xml"
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands
 
-    output = tables.open_file("./output_temp.h5", mode = "r")
+    output = tables.open_file(h5out, mode = "r")
     # tables of interest
     paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
     # Check if these tables exist
     yield assert_true, table_exist(output, paths)
     if not table_exist(output, paths):
         output.close()
-        os.remove("./output_temp.h5")
-        # This is a starter sqlite db created implicitly
-        os.remove("./output_temp.sqlite")
+        clean_outs()
         return  # don't execute further commands
 
     # Get specific tables and columns
@@ -52,9 +51,7 @@ def test_prey_only():
     quantities = resources["Quantity"]
 
     output.close()
-    os.remove("./output_temp.h5")
-    # This is a starter sqlite db created implicitly
-    os.remove("./output_temp.sqlite")
+    clean_outs()
 
 
 def test_predator_only():
@@ -62,27 +59,26 @@ def test_predator_only():
 
     The population is expected to decrease exponentially.
     """
+    clean_outs()
 
     # A reference simulation input for Lotka-Volterra simulation
     sim_input = "./Inputs/predator.xml"
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands
 
-    output = tables.open_file("./output_temp.h5", mode = "r")
+    output = tables.open_file(h5out, mode = "r")
     # tables of interest
     paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
     # Check if these tables exist
     yield assert_true, table_exist(output, paths)
     if not table_exist(output, paths):
         output.close()
-        os.remove("./output_temp.h5")
-        # This is a starter sqlite db created implicitly
-        os.remove("./output_temp.sqlite")
+        clean_outs()
         return  # don't execute further commands
 
     # Get specific tables and columns
@@ -101,9 +97,7 @@ def test_predator_only():
     quantities = resources["Quantity"]
 
     output.close()
-    os.remove("./output_temp.h5")
-    # This is a starter sqlite db created implicitly
-    os.remove("./output_temp.sqlite")
+    clean_outs()
 
 
 def test_lotka_volterra():
@@ -121,27 +115,26 @@ def test_lotka_volterra():
     If only one specie is in the environment, its population should show
     exponential growth or decay.
     """
+    clean_outs()
 
     # A reference simulation input for Lotka-Volterra simulation
     sim_input = "./Inputs/lotka_volterra.xml"
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands
 
-    output = tables.open_file("./output_temp.h5", mode = "r")
+    output = tables.open_file(h5out, mode = "r")
     # tables of interest
     paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
     # Check if these tables exist
     yield assert_true, table_exist(output, paths)
     if not table_exist(output, paths):
         output.close()
-        os.remove("./output_temp.h5")
-        # This is a starter sqlite db created implicitly
-        os.remove("./output_temp.sqlite")
+        clean_outs()
         return  # don't execute further commands
 
     # Get specific tables and columns
@@ -160,6 +153,4 @@ def test_lotka_volterra():
     quantities = resources["Quantity"]
 
     output.close()
-    os.remove("./output_temp.h5")
-    # This is a starter sqlite db created implicitly
-    os.remove("./output_temp.sqlite")
+    clean_outs()
