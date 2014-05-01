@@ -20,18 +20,9 @@ class Prey : public cyclus::Facility {
   Prey(cyclus::Context* ctx);
   virtual ~Prey() {}
 
-  #pragma cyclus clone
-  #pragma cyclus initfromcopy
-  #pragma cyclus initfromdb
-  #pragma cyclus infiletodb
-  #pragma cyclus snapshot
-  #pragma cyclus schema
+  #pragma cyclus
 
   virtual std::string str();
-
-  virtual void InitInv(cyclus::Inventories& inv) {}
-
-  virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
 
   virtual void DoRegistration();
   virtual void Build(cyclus::Agent* parent = NULL);
