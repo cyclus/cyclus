@@ -39,7 +39,7 @@ class KFacility : public cyclus::Facility {
   KFacility(cyclus::Context* ctx);
   virtual ~KFacility();
 
-  #pragma cyclus decl
+  #pragma cyclus
 
   virtual std::string str();
 

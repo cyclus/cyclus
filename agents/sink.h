@@ -17,16 +17,7 @@ class Sink : public cyclus::Facility  {
   Sink(cyclus::Context* ctx);
   virtual ~Sink() {}
 
-  #pragma cyclus clone
-  #pragma cyclus initfromcopy
-  #pragma cyclus initfromdb
-  #pragma cyclus infiletodb
-  #pragma cyclus snapshot
-  #pragma cyclus schema
-
-  virtual void InitInv(cyclus::Inventories& inv);
-
-  virtual cyclus::Inventories SnapshotInv();
+  #pragma cyclus
 
   virtual std::string str();
 
@@ -65,6 +56,10 @@ class Sink : public cyclus::Facility  {
   #pragma cyclus var {}
   double capacity_;
 
+  #pragma cyclus var {"default": 1e299}
+  double max_inv_size_;
+
+  #pragma cyclus var {'capacity': 'max_inv_size_'}
   cyclus::ResourceBuff inventory_;
 };
 
