@@ -1,6 +1,5 @@
 #include "prey.h"
 
-#include <limits>
 #include <sstream>
 
 namespace cyclus {

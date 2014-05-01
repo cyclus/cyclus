@@ -8,18 +8,7 @@ Predator::Predator(cyclus::Context* ctx)
       age_(0),
       lifespan_(12),
       success_(0.1),
-      capacity_(1) {
-}
-
-void Predator::InitInv(cyclus::Inventories& inv) {
-  inventory_.PushAll(inv["inventory"]);
-}
-
-cyclus::Inventories Predator::SnapshotInv() {
-  cyclus::Inventories invs;
-  invs["inventory"] = inventory_.PopN(inventory_.count());
-  return invs;
-}
+      capacity_(1) {}
 
 std::string Predator::str() {
   // no info for now. Change later
@@ -39,6 +28,7 @@ void Predator::Decommission() {
   context()->UnregisterTrader(this);
   cyclus::Facility::Decommission();
 }
+
 double Predator::capacity() {
   // Query the number of the prey
   // Determine the request

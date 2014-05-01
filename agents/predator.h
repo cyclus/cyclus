@@ -14,16 +14,7 @@ class Predator : public cyclus::Facility  {
   Predator(cyclus::Context* ctx);
   virtual ~Predator() {}
 
-  #pragma cyclus clone
-  #pragma cyclus initfromcopy
-  #pragma cyclus initfromdb
-  #pragma cyclus infiletodb
-  #pragma cyclus snapshot
-  #pragma cyclus schema
-
-  virtual void InitInv(cyclus::Inventories& inv);
-
-  virtual cyclus::Inventories SnapshotInv();
+  #pragma cyclus
 
   virtual void DoRegistration();
   virtual void Build(cyclus::Agent* parent = NULL);
@@ -60,8 +51,6 @@ class Predator : public cyclus::Facility  {
   double capacity();
 
  private:
-  cyclus::ResourceBuff inventory_;
-
   #pragma cyclus var {}
   std::string commod_;
 
@@ -92,6 +81,12 @@ class Predator : public cyclus::Facility  {
 
   #pragma cyclus var {'default': 12}
   int lifespan_;
+
+  #pragma cyclus var {"default": 1e299}
+  double max_inv_size_;
+
+  #pragma cyclus var {'capacity': 'max_inv_size_'}
+  cyclus::ResourceBuff inventory_;
 };
 
 }  // namespace cyclus
