@@ -6,7 +6,8 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times, create_sim_input
+from helper import table_exist, find_ids, exit_times, create_sim_input, \
+    h5out, sqliteout, clean_outs
 
 """Tests"""
 def test_source_to_sink():
@@ -27,16 +28,18 @@ def test_source_to_sink():
     k_factors = [0.95, 1, 2]
 
     for k_factor in k_factors:
+        clean_outs()
+
         sim_input = create_sim_input(ref_input, k_factor, k_factor)
 
         holdsrtn = [1]  # needed because nose does not send() to test generator
-        cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+        cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
         yield check_cmd, cmd, '.', holdsrtn
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
 
-        output = tables.open_file("./output_temp.h5", mode = "r")
+        output = tables.open_file(h5out, mode = "r")
         # tables of interest
         paths = ["/AgentEntry", "/Resources", "/Transactions",
                 "/Info"]
@@ -44,9 +47,7 @@ def test_source_to_sink():
         yield assert_true, table_exist(output, paths)
         if not table_exist(output, paths):
             output.close()
-            os.remove("./output_temp.h5")
-            # This is a starter sqlite db created implicitly
-            os.remove("./output_temp.sqlite")
+            clean_outs()
             return  # don't execute further commands
 
         # Get specific tables and columns
@@ -88,7 +89,5 @@ def test_source_to_sink():
             i += 1
 
         output.close()
-        os.remove("./output_temp.h5")
+        clean_outs()
         os.remove(sim_input)
-        # This is a starter sqlite db created implicitly
-        os.remove("./output_temp.sqlite")

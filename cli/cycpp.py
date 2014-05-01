@@ -820,7 +820,6 @@ class InfileToDbFilter(CodeGeneratorFilter):
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
 
         impl += ind + "tree = tree->SubTree(\"agent/\" + agent_impl());\n"
-
         for member, info in ctx.items():
             t = info['type']
             if t in BUFFERS:
@@ -1007,7 +1006,8 @@ class SnapshotFilter(CodeGeneratorFilter):
         context = cg.context
         ctx = context[self.given_classname]
         impl = ""
-        pod = {}
+        # TODO This should all be in one loop
+        pod = OrderedDict()
         for member, params in ctx.items():
             t = params["type"]
             if t in BUFFERS:

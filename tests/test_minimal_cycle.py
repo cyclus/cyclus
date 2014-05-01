@@ -6,7 +6,8 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times, create_sim_input
+from helper import table_exist, find_ids, exit_times, create_sim_input, \
+    h5out, sqliteout, clean_outs
 
 def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
     """Changes k_factor_in and k_factor_out for one facility.
@@ -99,16 +100,17 @@ def test_minimal_cycle():
 
     for k_factor_a in k_factors:
         for k_factor_b in k_factors:
+            clean_outs()
             sim_input = change_minimal_input(ref_input, k_factor_a, k_factor_b)
 
             holdsrtn = [1]  # needed because nose does not send() to test generator
-            cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+            cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
             yield check_cmd, cmd, '.', holdsrtn
             rtn = holdsrtn[0]
             if rtn != 0:
                 return  # don't execute further commands
 
-            output = tables.open_file("./output_temp.h5", mode = "r")
+            output = tables.open_file(h5out, mode = "r")
             # tables of interest
             paths = ["/AgentEntry", "/Resources", "/Transactions",
                     "/Info"]
@@ -116,9 +118,7 @@ def test_minimal_cycle():
             yield assert_true, table_exist(output, paths)
             if not table_exist(output, paths):
                 output.close()
-                os.remove("./output_temp.h5")
-                # This is a starter sqlite db created implicitly
-                os.remove("./output_temp.sqlite")
+                clean_outs()
                 return  # don't execute further commands
 
             # Get specific tables and columns
@@ -202,7 +202,5 @@ def test_minimal_cycle():
                 j += 1
 
             output.close()
-            os.remove("./output_temp.h5")
+            clean_outs()
             os.remove(sim_input)
-            # This is a starter sqlite db created implicitly
-            os.remove("./output_temp.sqlite")

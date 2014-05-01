@@ -5,7 +5,8 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times
+from helper import table_exist, find_ids, exit_times, \
+    h5out, sqliteout, clean_outs
 
 """Tests"""
 def test_null_sink():
@@ -14,25 +15,25 @@ def test_null_sink():
     No transactions are expected in this test; therefore, a table with
     transaction records must not exist in order to pass this test.
     """
+    clean_outs()
+
     # Cyclus simulation input for null sink testing
     sim_input = "./Inputs/null_sink.xml"
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    cmd = ["cyclus", "-o", "./output_temp.h5", "--input-file", sim_input]
+    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands
 
-    output = tables.open_file("./output_temp.h5", mode = "r")
+    output = tables.open_file(h5out, mode = "r")
     legal_paths = ["/AgentEntry", "/Info"]
     illegal_paths = ["/Transactions"]  # this must contain tables to test
     # Check if these tables exist
     yield assert_true, table_exist(output, legal_paths)
     if not table_exist(output, legal_paths):
         output.close()
-        os.remove("./output_temp.h5")
-        # This is a starter sqlite db created implicitly
-        os.remove("./output_temp.sqlite")
+        clean_outs()
         return  # don't execute further commands
 
     # Get specific data
@@ -51,6 +52,4 @@ def test_null_sink():
     yield assert_false, table_exist(output, illegal_paths)
 
     output.close()
-    os.remove("./output_temp.h5")
-    # This is a starter sqlite db created implicitly
-    os.remove("./output_temp.sqlite")
+    clean_outs()
