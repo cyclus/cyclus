@@ -132,29 +132,17 @@ void Predator::Tock(int time) {
   assert(age_ >= 0);
   assert(lifespan_ > 0);
   if (age_ >= lifespan_) {
-    context()->NewDatum("LifeEvents")
-        ->AddVal("AgentId", id())
-        ->AddVal("Stat", "died")
-        ->Record();
     LOG(cyclus::LEV_INFO3, "Predator") << prototype() << "is dying of old age}";
     context()->SchedDecom(this);
     LOG(cyclus::LEV_INFO3, "Predator") << "}";
     return;
   }
 
-  context()->NewDatum("LifeEvents")
-      ->AddVal("AgentId", id())
-      ->AddVal("Stat", "ate")
-      ->Record();
   LOG(cyclus::LEV_INFO3, "Predator") << prototype() << " ate";
 
   // give birth if enough food is eaten
   assert(birth_factor_ > 0);
   if (inventory_.quantity() * birth_factor_ > 1) {
-    context()->NewDatum("LifeEvents")
-        ->AddVal("AgentId", id())
-        ->AddVal("Stat", "reproduced")
-        ->Record();
     LOG(cyclus::LEV_INFO3, "Prey") << prototype() << " is having children";
     int nchildren = inventory_.quantity() * birth_factor_;
     inventory_.PopQty(nchildren);
