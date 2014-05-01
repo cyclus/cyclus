@@ -24,18 +24,9 @@ class Source : public cyclus::Facility {
   Source(cyclus::Context* ctx);
   virtual ~Source() {}
 
-  #pragma cyclus clone
-  #pragma cyclus initfromcopy
-  #pragma cyclus initfromdb
-  #pragma cyclus infiletodb
-  #pragma cyclus snapshot
-  #pragma cyclus schema
+  #pragma cyclus
 
   virtual std::string str();
-
-  virtual void InitInv(cyclus::Inventories& inv) {}
-
-  virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
 
   virtual void Tick(int time);
 

@@ -1,9 +1,6 @@
 #include "source.h"
 
-#include <limits>
 #include <sstream>
-
-#include <boost/lexical_cast.hpp>
 
 namespace cyclus {
 

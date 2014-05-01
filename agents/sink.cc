@@ -1,22 +1,10 @@
 #include "sink.h"
 
-#include <boost/lexical_cast.hpp>
-
 namespace cyclus {
 
 Sink::Sink(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
       capacity_(100){}
-
-void Sink::InitInv(cyclus::Inventories& inv) {
-  inventory_.PushAll(inv["inventory"]);
-}
-
-cyclus::Inventories Sink::SnapshotInv() {
-  cyclus::Inventories invs;
-  invs["inventory"] = inventory_.PopN(inventory_.count());
-  return invs;
-}
 
 std::string Sink::str() {
   // no info for now. Change later
