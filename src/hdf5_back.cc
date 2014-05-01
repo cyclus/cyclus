@@ -83,8 +83,23 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
       offset = i * tb_typesize;
       std::cout << i << "/" << count << "  ";
       for (int j = 0; j < qr.types.size(); j++) {
-        if (qr.types[j] == DOUBLE) {
-          std::cout << *reinterpret_cast<double*>(buf + offset) << "  ";
+        switch (qr.types[j]) {
+          case INT: {
+            std::cout << *reinterpret_cast<int*>(buf + offset) << "  ";
+            break;
+          }
+          case FLOAT: {
+            std::cout << *reinterpret_cast<float*>(buf + offset) << "  ";
+            break;
+          }
+          case DOUBLE: {
+            std::cout << *reinterpret_cast<double*>(buf + offset) << "  ";
+            break;
+          }
+          //case UUID: {
+          //  std::cout << *reinterpret_cast<boost::uuids::uuid*>(buf + offset) << "  ";
+          //  break;
+          //}
         }
         offset += tbl_sizes_[table][j];
       }

@@ -11,7 +11,8 @@ namespace cyclus {
 /// for "variable length" or are implicitly variable length, such as blob.
 /// Changing the order here may invalidate previously created databases.
 enum DbTypes {
-  INT = 0,
+  BOOL = 0,
+  INT,
   FLOAT,
   DOUBLE,
   STRING,
