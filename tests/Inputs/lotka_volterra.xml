@@ -30,7 +30,7 @@
       <Predator>
         <commod_>commodity</commod_>
         <recipe_>commod_recipe</recipe_>
-        <prey_>none</prey_>
+        <prey_>Prey</prey_>
       </Predator>
     </agent>
   </facility>
@@ -49,7 +49,7 @@
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
-          <number>100</number>
+          <number>10</number>
         </entry>
         <entry>
           <prototype>Predator</prototype>

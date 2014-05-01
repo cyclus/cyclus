@@ -27,7 +27,7 @@ def test_prey_only():
 
     output = tables.open_file(h5out, mode = "r")
     # tables of interest
-    paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
+    paths = ["/AgentEntry"]
     # Check if these tables exist
     yield assert_true, table_exist(output, paths)
     if not table_exist(output, paths):
@@ -37,18 +37,11 @@ def test_prey_only():
 
     # Get specific tables and columns
     agent_entry = output.get_node("/AgentEntry")[:]
-    info = output.get_node("/Info")[:]
-    resources = output.get_node("/Resources")[:]
-    transactions = output.get_node("/Transactions")[:]
 
     # Find agent ids
     agent_ids = agent_entry["AgentId"]
     agent_impl = agent_entry["Implementation"]
     agent_protos = agent_entry["Prototype"]
-    duration = info["Duration"][0]
-
-    # Track transacted resources
-    quantities = resources["Quantity"]
 
     output.close()
     clean_outs()
@@ -73,7 +66,7 @@ def test_predator_only():
 
     output = tables.open_file(h5out, mode = "r")
     # tables of interest
-    paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
+    paths = ["/AgentEntry"]
     # Check if these tables exist
     yield assert_true, table_exist(output, paths)
     if not table_exist(output, paths):
@@ -83,18 +76,11 @@ def test_predator_only():
 
     # Get specific tables and columns
     agent_entry = output.get_node("/AgentEntry")[:]
-    info = output.get_node("/Info")[:]
-    resources = output.get_node("/Resources")[:]
-    transactions = output.get_node("/Transactions")[:]
 
     # Find agent ids
     agent_ids = agent_entry["AgentId"]
     agent_impl = agent_entry["Implementation"]
     agent_protos = agent_entry["Prototype"]
-    duration = info["Duration"][0]
-
-    # Track transacted resources
-    quantities = resources["Quantity"]
 
     output.close()
     clean_outs()
