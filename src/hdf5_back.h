@@ -34,7 +34,7 @@ class Hdf5Back : public FullBackend {
 
  private:
   /// Creates a QueryResult from a table description.
-  QueryResult GetTableInfo(hid_t dt);
+  QueryResult GetTableInfo(hid_t dset, hid_t dt);
 
   /// creates and initializes an hdf5 table with schema defined by d.
   void CreateTable(Datum* d);

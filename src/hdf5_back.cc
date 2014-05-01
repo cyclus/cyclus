@@ -70,11 +70,28 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   std::cout << "chunksize " << tb_chunksize << "\n";
   std::cout << "nchunks " << nchunks << "\n";
 
-  QueryResult qr = GetTableInfo(tb_type);
+  QueryResult qr = GetTableInfo(tb_set, tb_type);
   for (n; n <= nchunks; n++) {
-    void * buf = new (tb_typesize * tb_chunksize);
-    status = H5Dread(tb_set, tb_type, hid_t mem_space_id, tb_space, H5P_DEFAULT, buf);
-    delete buf;
+    hsize_t start = n * tb_chunksize;
+    hsize_t count = (tb_length - start) < tb_chunksize ? tb_length - start : tb_chunksize;
+    char* buf = new char [tb_typesize * count];
+    hid_t memspace = H5Screate_simple(1, &count, NULL);
+    status = H5Sselect_hyperslab(tb_space, H5S_SELECT_SET,  &start, NULL, &count, NULL);
+    status = H5Dread(tb_set, tb_type, memspace, tb_space, H5P_DEFAULT, buf);
+    int offset = 0;
+    for (int i = 0; i < count; i++) {
+      offset = i * tb_typesize;
+      std::cout << i << "/" << count << "  ";
+      for (int j = 0; j < qr.types.size(); j++) {
+        if (qr.types[j] == DOUBLE) {
+          std::cout << *reinterpret_cast<double*>(buf + offset) << "  ";
+        }
+        offset += tbl_sizes_[table][j];
+      }
+      std::cout << "\n";
+    }
+    delete[] buf;
+    H5Sclose(memspace);
   }
 
   // close and return
@@ -85,33 +102,28 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   return qr;
 }
 
-QueryResult Hdf5Back::GetTableInfo(hid_t dt) {
+QueryResult Hdf5Back::GetTableInfo(hid_t dset, hid_t dt) {
   int i;
   char * colname;
-  hid_t coltype;
+  hsize_t ncols = H5Tget_nmembers(dt);
   std::string fieldname;
   std::string fieldtype;
+
+  // get types from db
+  int dbtypes[ncols];
+  hid_t dbtypes_attr = H5Aopen(dset, "cyclus_dbtypes", H5P_DEFAULT);
+  hid_t dbtypes_type = H5Aget_type(dbtypes_attr);
+  H5Aread(dbtypes_attr, dbtypes_type, dbtypes);
+  H5Tclose(dbtypes_type);
+  H5Aclose(dbtypes_attr);
+
   QueryResult qr;
-  for (i = 0; i < H5Tget_nmembers(dt); i++) {
+  for (i = 0; i < ncols; i++) {
     colname = H5Tget_member_name(dt, i);
     fieldname = std::string(colname);
     free(colname);
     qr.fields.push_back(fieldname);
-    coltype = H5Tget_member_type(dt, i);
-    if (0 < H5Tequal(coltype, H5T_NATIVE_INT))
-      fieldtype = "INTEGER";
-    else if (0 < H5Tequal(coltype, H5T_NATIVE_DOUBLE))
-      fieldtype = "REAL";
-    else if (0 < H5Tequal(coltype, H5T_NATIVE_FLOAT))
-      fieldtype = "REAL";
-    else if (0 < H5Tequal(coltype, blob_type_))
-      fieldtype = "BLOB";
-    else if (0 < H5Tequal(coltype, string_type_))
-      fieldtype = "TEXT";
-    else 
-      throw IOError("Unsupported type for querying in HDF5 " + fieldname);;
-    H5Tclose(coltype);
-    qr.types.push_back(fieldtype);
+    qr.types.push_back(static_cast<DbTypes>(dbtypes[i]));
   }
   return qr;
 }
@@ -122,40 +134,49 @@ std::string Hdf5Back::Name() {
 
 void Hdf5Back::CreateTable(Datum* d) {
   Datum::Vals vals = d->vals();
+  hsize_t nvals = vals.size();
 
   size_t dst_size = 0;
-  size_t* dst_offset = new size_t[vals.size()];
-  size_t* dst_sizes = new size_t[vals.size()];
-  hid_t field_types[vals.size()];
-  const char* field_names[vals.size()];
-  for (int i = 0; i < vals.size(); ++i) {
+  size_t* dst_offset = new size_t[nvals];
+  size_t* dst_sizes = new size_t[nvals];
+  hid_t field_types[nvals];
+  DbTypes dbtypes[nvals];
+  const char* field_names[nvals];
+  for (int i = 0; i < nvals; ++i) {
     dst_offset[i] = dst_size;
     field_names[i] = vals[i].first;
-    if (vals[i].second.type() == typeid(int)) {
+    const std::type_info& valtype = vals[i].second.type();
+    if (valtype == typeid(int)) {
+      dbtypes[i] = INT;
       field_types[i] = H5T_NATIVE_INT;
       dst_sizes[i] = sizeof(int);
       dst_size += sizeof(int);
-    } else if (vals[i].second.type() == typeid(double)) {
-      field_types[i] = H5T_NATIVE_DOUBLE;
-      dst_sizes[i] = sizeof(double);
-      dst_size += sizeof(double);
-    } else if (vals[i].second.type() == typeid(std::string)) {
-      field_types[i] = string_type_;
-      dst_sizes[i] = STR_SIZE;
-      dst_size += STR_SIZE;
-    } else if (vals[i].second.type() == typeid(Blob)) {
-      field_types[i] = blob_type_;
-      dst_sizes[i] = sizeof(char*);
-      dst_size += sizeof(char*);
-    } else if (vals[i].second.type() == typeid(boost::uuids::uuid)) {
-      field_types[i] = string_type_;
-      dst_sizes[i] = STR_SIZE;
-      dst_size += STR_SIZE;
-    } else if (vals[i].second.type() == typeid(float)) {
+    } else if (valtype == typeid(float)) {
+      dbtypes[i] = FLOAT;
       field_types[i] = H5T_NATIVE_FLOAT;
       dst_sizes[i] = sizeof(float);
       dst_size += sizeof(float);
-    }
+    } else if (valtype == typeid(double)) {
+      dbtypes[i] = DOUBLE;
+      field_types[i] = H5T_NATIVE_DOUBLE;
+      dst_sizes[i] = sizeof(double);
+      dst_size += sizeof(double);
+    } else if (valtype == typeid(std::string)) {
+      dbtypes[i] = STRING;
+      field_types[i] = string_type_;
+      dst_sizes[i] = STR_SIZE;
+      dst_size += STR_SIZE;
+    } else if (valtype == typeid(Blob)) {
+      dbtypes[i] = BLOB;
+      field_types[i] = blob_type_;
+      dst_sizes[i] = sizeof(char*);
+      dst_size += sizeof(char*);
+    } else if (valtype == typeid(boost::uuids::uuid)) {
+      dbtypes[i] = UUID;
+      field_types[i] = string_type_;
+      dst_sizes[i] = STR_SIZE;
+      dst_size += STR_SIZE;
+    } 
   }
 
   herr_t status;
@@ -165,9 +186,21 @@ void Hdf5Back::CreateTable(Datum* d) {
   void* fill_data = NULL;
   void* data = NULL;
 
-  status = H5TBmake_table(title, file_, title, vals.size(), 0, dst_size,
-                          field_names, dst_offset, field_types, chunk_size, fill_data, compress,
-                          data);
+  // Make the table
+  status = H5TBmake_table(title, file_, title, nvals, 0, dst_size,
+                          field_names, dst_offset, field_types, chunk_size, 
+                          fill_data, compress, data);
+
+  // add dbtypes attribute
+  hid_t tb_set = H5Dopen2(file_, title, H5P_DEFAULT);
+  hid_t attr_space = H5Screate(H5S_SCALAR);
+  hid_t dbtypes_type = H5Tarray_create2(H5T_NATIVE_INT, 1, &nvals);
+  hid_t dbtypes_attr = H5Acreate2(tb_set, "cyclus_dbtypes", dbtypes_type, attr_space, H5P_DEFAULT, H5P_DEFAULT);
+  H5Awrite(dbtypes_attr, dbtypes_type, dbtypes);
+  H5Aclose(dbtypes_attr);
+  H5Tclose(dbtypes_type);
+  H5Sclose(attr_space);
+  H5Dclose(tb_set);
 
   // record everything for later
   tbl_offset_[d->title()] = dst_offset;

@@ -6,6 +6,20 @@
 
 namespace cyclus {
 
+/// This is the master list of all supported database types.  All types must 
+/// have a constant length unless they begin with the prefix VL_, which stand
+/// for "variable length" or are implicitly variable length, such as blob.
+/// Changing the order here may invalidate previously created databases.
+enum DbTypes {
+  INT = 0,
+  FLOAT,
+  DOUBLE,
+  STRING,
+  VL_STRING,
+  BLOB,
+  UUID,
+};
+
 /// Represents a condition used to filter rows returned by a query.
 class Cond {
  public:
@@ -33,7 +47,7 @@ class QueryResult {
   std::vector<std::string> fields;
 
   /// types of each field returned by a query. Possible values: INTEGER, REAL, BLOB, TEXT
-  std::vector<std::string> types;
+  std::vector<DbTypes> types;
 
   /// ordered results of a query
   std::vector<QueryRow> rows;
