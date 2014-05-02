@@ -71,7 +71,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   std::cout << "nchunks " << nchunks << "\n";
 
   QueryResult qr = GetTableInfo(tb_set, tb_type);
-  for (n; n <= nchunks; n++) {
+  for (n; n < nchunks; n++) {
     hsize_t start = n * tb_chunksize;
     hsize_t count = (tb_length - start) < tb_chunksize ? tb_length - start : tb_chunksize;
     char* buf = new char [tb_typesize * count];
@@ -180,7 +180,13 @@ void Hdf5Back::CreateTable(Datum* d) {
     dst_offset[i] = dst_size;
     field_names[i] = vals[i].first;
     const std::type_info& valtype = vals[i].second.type();
-    if (valtype == typeid(int)) {
+    if (valtype == typeid(bool)) {
+      dbtypes[i] = BOOL;
+      field_types[i] = H5T_NATIVE_CHAR;
+      dst_sizes[i] = sizeof(char);
+      dst_size += sizeof(char);
+    }
+    else if (valtype == typeid(int)) {
       dbtypes[i] = INT;
       field_types[i] = H5T_NATIVE_INT;
       dst_sizes[i] = sizeof(int);
