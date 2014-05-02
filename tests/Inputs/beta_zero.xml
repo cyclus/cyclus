@@ -31,8 +31,7 @@
         <commod_>commodity</commod_>
         <recipe_>commod_recipe</recipe_>
         <prey_>Prey</prey_>
-        <success_>0.01</success_>
-        <birth_factor_>0.1</birth_factor_>
+        <success_>0.00</success_>
       </Predator>
     </agent>
   </facility>
@@ -51,11 +50,11 @@
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
-          <number>400</number>
+          <number>1</number>
         </entry>
         <entry>
           <prototype>Predator</prototype>
-          <number>2</number>
+          <number>100</number>
         </entry>
       </initialfacilitylist>
       <agent>
