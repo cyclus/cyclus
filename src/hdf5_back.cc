@@ -84,6 +84,10 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
       std::cout << i << "/" << count << "  ";
       for (int j = 0; j < qr.types.size(); j++) {
         switch (qr.types[j]) {
+          case BOOL: {
+            throw IOError("booleans not yet implemented for HDF5.");
+            break;
+          }
           case INT: {
             std::cout << *reinterpret_cast<int*>(buf + offset) << "  ";
             break;
@@ -96,10 +100,19 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             std::cout << *reinterpret_cast<double*>(buf + offset) << "  ";
             break;
           }
-          //case UUID: {
-          //  std::cout << *reinterpret_cast<boost::uuids::uuid*>(buf + offset) << "  ";
-          //  break;
-          //}
+          case STRING: {
+            std::cout << "'" << std::string(buf + offset, STR_SIZE) << "'  ";
+            break;
+          }
+          case VL_STRING: {
+            throw IOError("variable length strings not yet implemented for HDF5.");
+            break;
+          }
+          case BLOB: {
+            Blob b (std::string(buf + offset, sizeof(char *)));
+            std::cout << b.str() << "  ";
+            break;
+          }
           case UUID: {
             boost::uuids::uuid u;
             memcpy(buf + offset, &u, 16);

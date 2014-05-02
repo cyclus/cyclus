@@ -26,10 +26,10 @@ TEST(Hdf5BackTest, ReadWrite) {
   using cyclus::Hdf5Back;
   FileDeleter fd(path);
 
-  int i = 1;
+  int i = 42;
   double d = 2.2;
   float f = 3.3;
-  std::string str = "4.4";
+  std::string str = "apple";
   const char* blob = "banana";
 
   size_t strsize = str.size() + 1;
