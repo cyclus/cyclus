@@ -32,7 +32,7 @@ void Predator::Decommission() {
 double Predator::capacity() {
   // Query the number of the prey
   // Determine the request
-  return capacity_;  // faking for now
+  return success_ * context()->n_prototypes(prey_);
 }
 
 std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
