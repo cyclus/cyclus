@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!-- Lotka-Volterra simulation with Preys and Predators -->
+
+<simulation>
+  <control>
+    <duration>20</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+    <decay>0</decay>
+  </control>
+
+  <commodity>
+    <name>commodity</name>
+  </commodity>
+
+  <facility>
+    <name>Prey</name>
+    <agent>
+      <Prey>
+        <commod_>commodity</commod_>
+        <recipe_>commod_recipe</recipe_>
+        <capacity_>1</capacity_>
+      </Prey>
+    </agent>
+  </facility>
+
+  <facility>
+    <name>Predator</name>
+    <agent>
+      <Predator>
+        <commod_>commodity</commod_>
+        <recipe_>commod_recipe</recipe_>
+        <prey_>Prey</prey_>
+        <success_>0.01</success_>
+        <birth_factor_>0.1</birth_factor_>
+      </Predator>
+    </agent>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <allowedfacility>Prey</allowedfacility>
+    <allowedfacility>Predator</allowedfacility>
+    <agent>
+      <NullRegion/>
+    </agent>
+    <institution>
+      <name>SingleInstitution</name>
+      <availableprototype>Prey</availableprototype>
+      <availableprototype>Predator</availableprototype>
+      <initialfacilitylist>
+        <entry>
+          <prototype>Prey</prototype>
+          <number>400</number>
+        </entry>
+        <entry>
+          <prototype>Predator</prototype>
+          <number>2</number>
+        </entry>
+      </initialfacilitylist>
+      <agent>
+        <NullInst/>
+      </agent>
+    </institution>
+  </region>
+
+  <recipe>
+    <name>commod_recipe</name>
+    <basis>mass</basis>
+    <nuclide>
+      <id>010010000</id>
+      <comp>1</comp>
+    </nuclide>
+  </recipe>
+
+</simulation>

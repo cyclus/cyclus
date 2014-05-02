@@ -60,14 +60,21 @@ class DonutShop : public Agent {
 int DonutShop::destruct_count = 0;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ContextTests, traders) {
+TEST_F(ContextTests, EnterLeave) {
   EXPECT_TRUE(ctx->traders().empty());
   Agent* clone = fac->Clone();
+  EXPECT_EQ(ctx->n_prototypes(TestFacility::proto_name()), 0);
+  EXPECT_EQ(ctx->n_agent_impls(TestFacility::agent_impl()), 0);
   clone->Build();
   Trader* exr = dynamic_cast<Trader*>(clone);
   EXPECT_EQ(ctx->traders().size(), 1);
   EXPECT_EQ(*ctx->traders().begin(), exr);
+  EXPECT_EQ(ctx->n_prototypes(TestFacility::proto_name()), 1);
+  EXPECT_EQ(ctx->n_agent_impls(TestFacility::agent_impl()), 1);
+  EXPECT_EQ(*ctx->traders().begin(), exr);
   clone->Decommission();
+  EXPECT_EQ(ctx->n_prototypes(TestFacility::proto_name()), 0);
+  EXPECT_EQ(ctx->n_agent_impls(TestFacility::agent_impl()), 0);
   EXPECT_TRUE(ctx->traders().empty());
 }
 

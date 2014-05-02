@@ -204,6 +204,9 @@ class Agent : public StateWrangler {
   /// get agent instance name
   inline const std::string prototype() const { return prototype_; }
 
+  /// set agent instance name
+  inline void prototype(std::string p) { prototype_ = p; }
+
   /// get agent instance ID
   inline const int id() const { return id_; }
 
@@ -211,7 +214,7 @@ class Agent : public StateWrangler {
   inline std::string agent_impl() {return agent_impl_;}
 
   /// set agent implementation
-  inline void set_agent_impl(std::string new_impl) {agent_impl_ = new_impl;}
+  inline void agent_impl(std::string new_impl) {agent_impl_ = new_impl;}
 
   /// returns a string that describes the agent subclass (e.g. Region, etc.)
   inline const std::string kind() const {return kind_;};
