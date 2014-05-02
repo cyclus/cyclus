@@ -28,11 +28,15 @@ Hdf5Back::~Hdf5Back() {
   H5Tclose(blob_type_);
 
   std::map<std::string, size_t*>::iterator it;
+  std::map<std::string, DbTypes*>::iterator dbtit;
   for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
     delete[](it->second);
   }
   for (it = tbl_sizes_.begin(); it != tbl_sizes_.end(); ++it) {
     delete[](it->second);
+  }
+  for (dbtit = tbl_types_.begin(); dbtit != tbl_types_.end(); ++dbtit) {
+    delete[](dbtit->second);
   }
 };
 
@@ -70,7 +74,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   std::cout << "chunksize " << tb_chunksize << "\n";
   std::cout << "nchunks " << nchunks << "\n";
 
-  QueryResult qr = GetTableInfo(tb_set, tb_type);
+  QueryResult qr = GetTableInfo(table, tb_set, tb_type);
   for (n; n < nchunks; n++) {
     hsize_t start = n * tb_chunksize;
     hsize_t count = (tb_length - start) < tb_chunksize ? tb_length - start : tb_chunksize;
@@ -136,20 +140,14 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   return qr;
 }
 
-QueryResult Hdf5Back::GetTableInfo(hid_t dset, hid_t dt) {
+QueryResult Hdf5Back::GetTableInfo(std::string title, hid_t dset, hid_t dt) {
   int i;
   char * colname;
   hsize_t ncols = H5Tget_nmembers(dt);
   std::string fieldname;
   std::string fieldtype;
-
-  // get types from db
-  int dbtypes[ncols];
-  hid_t dbtypes_attr = H5Aopen(dset, "cyclus_dbtypes", H5P_DEFAULT);
-  hid_t dbtypes_type = H5Aget_type(dbtypes_attr);
-  H5Aread(dbtypes_attr, dbtypes_type, dbtypes);
-  H5Tclose(dbtypes_type);
-  H5Aclose(dbtypes_attr);
+  LoadTableTypes(title, dset, ncols);
+  DbTypes* dbtypes = tbl_types_[title];
 
   QueryResult qr;
   for (i = 0; i < ncols; i++) {
@@ -157,9 +155,36 @@ QueryResult Hdf5Back::GetTableInfo(hid_t dset, hid_t dt) {
     fieldname = std::string(colname);
     free(colname);
     qr.fields.push_back(fieldname);
-    qr.types.push_back(static_cast<DbTypes>(dbtypes[i]));
+    qr.types.push_back(dbtypes[i]);
   }
   return qr;
+}
+
+void Hdf5Back::LoadTableTypes(std::string title, hsize_t ncols) {
+  if (tbl_types_.count(title) > 0)
+    return;
+  hid_t dset = H5Dopen2(file_, title.c_str(), H5P_DEFAULT);
+  LoadTableTypes(title, dset, ncols);
+  H5Dclose(dset);
+}
+
+void Hdf5Back::LoadTableTypes(std::string title, hid_t dset, hsize_t ncols) {
+  if (tbl_types_.count(title) > 0)
+    return;
+
+  // get types from db
+  int dbt[ncols];
+  hid_t dbtypes_attr = H5Aopen(dset, "cyclus_dbtypes", H5P_DEFAULT);
+  hid_t dbtypes_type = H5Aget_type(dbtypes_attr);
+  H5Aread(dbtypes_attr, dbtypes_type, dbt);
+  H5Tclose(dbtypes_type);
+  H5Aclose(dbtypes_attr);
+
+  // store types on class
+  DbTypes* dbtypes = new DbTypes[ncols];
+  for (int i = 0; i < ncols; i++)
+    dbtypes[i] = static_cast<DbTypes>(dbt[i]);
+  tbl_types_[title] = dbtypes;
 }
 
 std::string Hdf5Back::Name() {
@@ -174,7 +199,7 @@ void Hdf5Back::CreateTable(Datum* d) {
   size_t* dst_offset = new size_t[nvals];
   size_t* dst_sizes = new size_t[nvals];
   hid_t field_types[nvals];
-  DbTypes dbtypes[nvals];
+  DbTypes* dbtypes = new DbTypes[nvals];
   const char* field_names[nvals];
   for (int i = 0; i < nvals; ++i) {
     dst_offset[i] = dst_size;
@@ -246,6 +271,7 @@ void Hdf5Back::CreateTable(Datum* d) {
   tbl_offset_[d->title()] = dst_offset;
   tbl_size_[d->title()] = dst_size;
   tbl_sizes_[d->title()] = dst_sizes;
+  tbl_types_[d->title()] = dbtypes;
 }
 
 void Hdf5Back::WriteGroup(DatumList& group) {
@@ -256,7 +282,7 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   size_t rowsize = tbl_size_[title];
 
   char* buf = new char[group.size() * rowsize];
-  FillBuf(buf, group, sizes, rowsize);
+  FillBuf(title, buf, group, sizes, rowsize);
 
   herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
                               offsets, sizes, buf);
@@ -266,40 +292,42 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   delete[] buf;
 }
 
-void Hdf5Back::FillBuf(char* buf, DatumList& group, size_t* sizes,
-                       size_t rowsize) {
+void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group, 
+                       size_t* sizes, size_t rowsize) {
+  Datum::Vals vals;
   Datum::Vals header = group.front()->vals();
-  int valtype[header.size()];
-  enum Type {STR, NUM, UUID, BLOB};
-  for (int col = 0; col < header.size(); ++col) {
-    if (header[col].second.type() == typeid(std::string)) {
-      valtype[col] = STR;
-    } else if (header[col].second.type() == typeid(boost::uuids::uuid)) {
-      valtype[col] = UUID;
-    } else if (header[col].second.type() == typeid(Blob)) {
-      valtype[col] = BLOB;
-    } else {
-      valtype[col] = NUM;
-    }
-  }
+  int ncols = header.size();
+  LoadTableTypes(title, ncols);
+  DbTypes* dbtypes = tbl_types_[title];
 
   size_t offset = 0;
   const void* val;
   DatumList::iterator it;
   for (it = group.begin(); it != group.end(); ++it) {
-    for (int col = 0; col < header.size(); ++col) {
-      const boost::spirit::hold_any* a = &((*it)->vals()[col].second);
-      switch (valtype[col]) {
-        case NUM: {
+    for (int col = 0; col < ncols; ++col) {
+      vals = (*it)->vals();
+      const boost::spirit::hold_any* a = &(vals[col].second);
+      switch (dbtypes[col]) {
+        case BOOL: {
+          throw IOError("booleans not yet implemented for HDF5.");
+          break;
+        }
+        case INT:
+        case FLOAT:
+        case DOUBLE: {
           val = a->castsmallvoid();
           memcpy(buf + offset, val, sizes[col]);
           break;
         }
-        case STR: {
+        case STRING: {
           const std::string s = a->cast<std::string>();
           size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
           memcpy(buf + offset, s.c_str(), slen);
           memset(buf + offset + slen, 0, STR_SIZE - slen);
+          break;
+        }
+        case VL_STRING: {
+          throw IOError("variable length strings not yet implemented for HDF5.");
           break;
         }
         case BLOB: {

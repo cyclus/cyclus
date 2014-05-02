@@ -34,7 +34,13 @@ class Hdf5Back : public FullBackend {
 
  private:
   /// Creates a QueryResult from a table description.
-  QueryResult GetTableInfo(hid_t dset, hid_t dt);
+  QueryResult GetTableInfo(std::string title, hid_t dset, hid_t dt);
+
+  /// Reads a table's column types into tbl_types_ if they aren't already there
+  /// {
+  void LoadTableTypes(std::string title, hsize_t ncols);
+  void LoadTableTypes(std::string title, hid_t dset, hsize_t ncols);
+  /// }
 
   /// creates and initializes an hdf5 table with schema defined by d.
   void CreateTable(Datum* d);
@@ -45,7 +51,8 @@ class Hdf5Back : public FullBackend {
 
   /// fill a contiguous memory buffer with data from group for writing to an
   /// hdf5 dataset.
-  void FillBuf(char* buf, DatumList& group, size_t* sizes, size_t rowsize);
+  void FillBuf(std::string title, char* buf, DatumList& group, size_t* sizes, 
+               size_t rowsize);
 
   /// An reference to a database.
   hid_t file_;
@@ -58,6 +65,7 @@ class Hdf5Back : public FullBackend {
   std::map<std::string, size_t*> tbl_offset_;
   std::map<std::string, size_t*> tbl_sizes_;
   std::map<std::string, size_t> tbl_size_;
+  std::map<std::string, DbTypes*> tbl_types_;
 };
 } // namespace cyclus
 #endif
