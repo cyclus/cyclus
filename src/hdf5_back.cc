@@ -100,6 +100,12 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           //  std::cout << *reinterpret_cast<boost::uuids::uuid*>(buf + offset) << "  ";
           //  break;
           //}
+          case UUID: {
+            boost::uuids::uuid u;
+            memcpy(buf + offset, &u, 16);
+            std::cout << u << "  ";
+            break;
+          }
         }
         offset += tbl_sizes_[table][j];
       }
