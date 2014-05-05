@@ -85,7 +85,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
     int offset = 0;
     for (int i = 0; i < count; i++) {
       offset = i * tb_typesize;
-      std::cout << i << "/" << count << "  ";
+      std::cout << i+1 << "/" << count << "  ";
       for (int j = 0; j < qr.types.size(); j++) {
         switch (qr.types[j]) {
           case BOOL: {
@@ -114,7 +114,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           }
           case BLOB: {
             Blob b (std::string(buf + offset, sizeof(char *)));
-            std::cout << b.str() << "  ";
+            std::cout << b << "  ";
             break;
           }
           case UUID: {

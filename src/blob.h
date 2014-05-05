@@ -20,4 +20,8 @@ class Blob {
 };
 }  // namespace cyclus
 
+inline std::ostream& operator<<(std::ostream& out, const cyclus::Blob& b) {
+   return out << b.str();
+}
+
 #endif  // CYCLUS_SRC_BLOB_H_
