@@ -58,6 +58,9 @@ void Hdf5Back::Notify(DatumList data) {
 }
 
 QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
+  int i;
+  int j;
+  int k;
   herr_t status = 0;
   hid_t tb_set = H5Dopen2(file_, table.c_str(), H5P_DEFAULT);
   hid_t tb_space = H5Dget_space(tb_set);
@@ -70,11 +73,28 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   unsigned int nchunks = (tb_length/tb_chunksize) + (tb_length%tb_chunksize == 0?0:1);
   unsigned int n = 0;
 
+  // set up field-conditions map
+  std::map<std::string, std::vector<Cond*> > field_conds = std::map<std::string, 
+                                                             std::vector<Cond*> >();
+  if (conds != NULL) {
+    Cond* cond;
+    for (i = 0; i < conds->size(); i++) {
+      cond = &((*conds)[i]);
+      if (field_conds.count(cond->field) == 0)
+        field_conds[cond->field] = std::vector<Cond*>();
+      field_conds[cond->field].push_back(cond);
+    }
+  }
+
   std::cout << "tb_length " << tb_length << "\n";
   std::cout << "chunksize " << tb_chunksize << "\n";
   std::cout << "nchunks " << nchunks << "\n";
 
   QueryResult qr = GetTableInfo(table, tb_set, tb_type);
+  int nfields = qr.fields.size();
+  for (i = 0; i < nfields; i++)
+    if (field_conds.count(qr.fields[i]) == 0)
+      field_conds[qr.fields[i]] = std::vector<Cond*>();
   for (n; n < nchunks; n++) {
     hsize_t start = n * tb_chunksize;
     hsize_t count = (tb_length - start) < tb_chunksize ? tb_length - start : tb_chunksize;
@@ -83,17 +103,24 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
     status = H5Sselect_hyperslab(tb_space, H5S_SELECT_SET,  &start, NULL, &count, NULL);
     status = H5Dread(tb_set, tb_type, memspace, tb_space, H5P_DEFAULT, buf);
     int offset = 0;
-    for (int i = 0; i < count; i++) {
+    bool is_valid_row;
+    QueryRow row = QueryRow(nfields);
+    for (i = 0; i < count; i++) {
       offset = i * tb_typesize;
+      is_valid_row = true;
       std::cout << i+1 << "/" << count << "  ";
-      for (int j = 0; j < qr.types.size(); j++) {
+      for (j = 0; j < nfields; j++) {
         switch (qr.types[j]) {
           case BOOL: {
             throw IOError("booleans not yet implemented for HDF5.");
             break;
           }
           case INT: {
-            std::cout << *reinterpret_cast<int*>(buf + offset) << "  ";
+            int x = *reinterpret_cast<int*>(buf + offset);
+            is_valid_row = CmpConds<int>(&x, &(field_conds[qr.fields[j]]));
+            if (!is_valid_row)
+              break;
+            std::cout << x << "  ";
             break;
           }
           case FLOAT: {
@@ -127,6 +154,8 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
         offset += tbl_sizes_[table][j];
       }
       std::cout << "\n";
+      if (is_valid_row)
+        qr.rows.push_back(row);
     }
     delete[] buf;
     H5Sclose(memspace);
@@ -349,5 +378,4 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
     }
   }
 }
-
 } // namespace cyclus

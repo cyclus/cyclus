@@ -21,19 +21,48 @@ enum DbTypes {
   UUID,
 };
 
+/// Represents operation codes for condition checking.
+enum CmpOpCode {
+  LT = 0,
+  GT,
+  LE,
+  GE,
+  EQ,
+  NE,
+};
+
 /// Represents a condition used to filter rows returned by a query.
 class Cond {
  public:
   Cond() {};
 
   Cond(std::string field, std::string op, boost::spirit::hold_any val)
-    : field(field), op(op), val(val) {}
+    : field(field), op(op), val(val) {
+    if (op == "<")
+      opcode = LT;
+    else if (op == ">")
+      opcode = GT;
+    else if (op == "<=")
+      opcode = LE;
+    else if (op == ">=")
+      opcode = GE;
+    else if (op == "==")
+      opcode = EQ;
+    else if (op == "!=")
+      opcode = NE;
+    else
+      throw ValueError("operation '" + op + "' not valid for field '" + \
+                       field + "'.");
+  };
 
   /// table column name
   std::string field;
 
   /// One of: "<", ">", "<=", ">=", "==", "!="
   std::string op;
+
+  /// The CmpOpCode cooresponding to op.
+  CmpOpCode opcode;
 
   /// value supported by backend(s) in use
   boost::spirit::hold_any val;
