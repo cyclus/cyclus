@@ -39,11 +39,15 @@ TEST(SqliteBackTest, Regression) {
   m.NewDatum("DumbTitle")
       ->AddVal("animal", std::string("elephant"))
       ->AddVal("weight", 1000)
+      ->AddVal("height", 4.2)
+      ->AddVal("data", cyclus::Blob("a very large mammal"))
       ->Record();
 
   m.NewDatum("DumbTitle")
       ->AddVal("animal", std::string("sea cucumber"))
+      ->AddVal("weight", 200)
       ->AddVal("height", 1.2)
+      ->AddVal("data", cyclus::Blob("a very small vegetable"))
       ->Record();
 
   m.Close();
@@ -61,11 +65,19 @@ TEST(SqliteBackTest, Regression) {
 
   animal = qr.GetVal<std::string>("animal", 1);
   weight = qr.GetVal<int>("weight", 1);
+  height = qr.GetVal<double>("height", 1);
+  data = qr.GetVal<cyclus::Blob>("data", 1);
   EXPECT_EQ("elephant", animal);
   EXPECT_EQ(1000, weight);
+  EXPECT_DOUBLE_EQ(4.2, height);
+  EXPECT_EQ("a very large mammal", data.str());
 
   animal = qr.GetVal<std::string>("animal", 2);
+  weight = qr.GetVal<int>("weight", 2);
   height = qr.GetVal<double>("height", 2);
+  data = qr.GetVal<cyclus::Blob>("data", 2);
   EXPECT_EQ("sea cucumber", animal);
-  EXPECT_EQ(1.2, height);
+  EXPECT_EQ(200, weight);
+  EXPECT_DOUBLE_EQ(1.2, height);
+  EXPECT_EQ("a very small vegetable", data.str());
 }
