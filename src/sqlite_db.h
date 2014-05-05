@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 #include <sqlite3.h>
-#include <string.h>
 #include <boost/shared_ptr.hpp>
 
 #include "error.h"
@@ -57,7 +56,8 @@ class SqlStatement {
     return sqlite3_column_double(stmt_, col);
   }
 
-  /// Returns a double value for the specified column of the current query row.
+  /// Returns a byte array value for the specified column of the current query
+  /// row. This can be used for retrieving TEXT and BLOB column data.
   char* GetText(int col, int* n) {
     char* v = (char*)sqlite3_column_text(stmt_, col);
     if (n != NULL) {
