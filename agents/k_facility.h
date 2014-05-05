@@ -39,16 +39,7 @@ class KFacility : public cyclus::Facility {
   KFacility(cyclus::Context* ctx);
   virtual ~KFacility();
 
-  #pragma cyclus clone
-  #pragma cyclus initfromcopy
-  #pragma cyclus initfromdb
-  #pragma cyclus infiletodb
-  #pragma cyclus snapshot
-  #pragma cyclus schema
-
-  virtual void InitInv(cyclus::Inventories& inv) {}
-
-  virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();}
+  #pragma cyclus
 
   virtual std::string str();
 
@@ -187,6 +178,10 @@ class KFacility : public cyclus::Facility {
   #pragma cyclus var {"default": 0}
   double current_capacity_;
 
+  #pragma cyclus var {"default": 1e299}
+  double max_inv_size_;
+
+  #pragma cyclus var {'capacity': 'max_inv_size_'}
   cyclus::ResourceBuff inventory_;
 
   /**
