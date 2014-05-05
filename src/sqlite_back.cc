@@ -39,15 +39,16 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
   db_.open();
 
   // cache pre-existing table names
-  std::string cmd = "SELECT name FROM sqlite_master WHERE type='table';";
-  std::vector<StrList> rows = db_.Query(cmd);
-  for (int i = 0; i < rows.size(); ++i) {
-    tbl_names_.insert(rows.at(i).at(0));
+  SqlStatement::Ptr stmt;
+  stmt = db_.Prepare("SELECT name FROM sqlite_master WHERE type='table';");
+
+  for(int i = 0; stmt->Step(); ++i) {
+    tbl_names_.insert(stmt->GetText(0, NULL));
   }
 
   if (tbl_names_.count("FieldTypes") == 0) {
-    cmd = "CREATE TABLE IF NOT EXISTS FieldTypes";
-    cmd += "(TableName TEXT,Field TEXT,Type TEXT);";
+    std::string cmd = "CREATE TABLE IF NOT EXISTS FieldTypes";
+    cmd += "(TableName TEXT,Field TEXT,Type INTEGER);";
     db_.Execute(cmd);
   }
 }
@@ -94,11 +95,10 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
     }
   }
 
-  std::vector<StrList> rows = stmt->Query();
-  for (int i = 0; i < rows.size(); ++i) {
+  for (int i = 0; stmt->Step(); ++i) {
     QueryRow r;
     for (int j = 0; j < q.fields.size(); ++j) {
-      //FIXME r.push_back(StringAsVal(rows[i][j], q.types[j]));
+      r.push_back(ColAsVal(stmt, j, q.types[j]));
     }
     q.rows.push_back(r);
   }
@@ -108,15 +108,17 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
 QueryResult SqliteBack::GetTableInfo(std::string table) {
   std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" +
                     table + "';";
-  std::vector<StrList> rows = db_.Query(sql);
-  if (rows.size() == 0) {
-    throw ValueError("Invalid table name " + table);
-  }
+  SqlStatement::Ptr stmt;
+  stmt = db_.Prepare(sql);
 
+  int i = 0;
   QueryResult info;
-  for (int i = 0; i < rows.size(); ++i) {
-    info.fields.push_back(rows[i][0]);
-    //FIXME info.types.push_back(rows[i][1]);
+  for (i = 0; stmt->Step(); ++i) {
+    info.fields.push_back(stmt->GetText(0, NULL));
+    info.types.push_back((DbTypes)stmt->GetInt(1));
+  }
+  if (i == 0) {
+    throw ValueError("Invalid table name " + table);
   }
   return info;
 }
@@ -130,9 +132,7 @@ void SqliteBack::BuildStmt(Datum* d) {
   Datum::Vals vals = d->vals();
 
   std::string insert = "INSERT INTO " + name + " VALUES (?";
-  field_order_[name][vals[0].first] = 1;
   for (int i = 1; i < vals.size(); ++i) {
-    field_order_[name][vals[i].first] = i + 1;
     insert += ", ?";
   }
   insert += ");";
@@ -147,9 +147,11 @@ void SqliteBack::CreateTable(Datum* d) {
   Datum::Vals vals = d->vals();
   Datum::Vals::iterator it = vals.begin();
 
-  std::string types = "INSERT INTO FieldTypes VALUES ('" + name + "','"
-                      + it->first + "','" + Type(it->second) + "');";
-  db_.Execute(types);
+  std::stringstream types;
+  types << "INSERT INTO FieldTypes VALUES ('"
+        << name << "','" << it->first << "','"
+        << Type(it->second) << "');";
+  db_.Execute(types.str());
 
   std::string cmd = "CREATE TABLE " + name + " (";
   cmd += std::string(it->first) + " " + SqlType(it->second);
@@ -157,9 +159,11 @@ void SqliteBack::CreateTable(Datum* d) {
 
   while (it != vals.end()) {
     cmd += ", " + std::string(it->first) + " " + SqlType(it->second);
-    types = "INSERT INTO FieldTypes VALUES ('" + name + "','"
-            + it->first + "','" + Type(it->second) + "');";
-    db_.Execute(types);
+    std::stringstream types;
+    types << "INSERT INTO FieldTypes VALUES ('"
+          << name << "','" << it->first << "','"
+          << Type(it->second) << "');";
+    db_.Execute(types.str());
     ++it;
   }
 
@@ -180,21 +184,21 @@ std::string SqliteBack::SqlType(boost::spirit::hold_any v) {
   return "TEXT";
 }
 
-std::string SqliteBack::Type(boost::spirit::hold_any v) {
+DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
   if (v.type() == typeid(int)) {
-    return "int";
+    return INT;
   } else if (v.type() == typeid(double)) {
-    return "double";
+    return DOUBLE;
   } else if (v.type() == typeid(float)) {
-    return "float";
+    return FLOAT;
   } else if (v.type() == typeid(Blob)) {
-    return "blob";
+    return BLOB;
   } else if (v.type() == typeid(boost::uuids::uuid)) {
-    return "uuid";
+    return UUID;
   } else if (v.type() == typeid(std::string)) {
-    return "std::string";
+    return VL_STRING;
   }
-  return std::string("UNKNOWN_") + v.type().name();
+  throw ValueError(std::string("Unsupported backend type ") + v.type().name());
 }
 
 void SqliteBack::Bind(boost::spirit::hold_any v, SqlStatement::Ptr stmt,
@@ -219,36 +223,37 @@ void SqliteBack::Bind(boost::spirit::hold_any v, SqlStatement::Ptr stmt,
 void SqliteBack::WriteDatum(Datum* d) {
   Datum::Vals vals = d->vals();
   SqlStatement::Ptr stmt = stmts_[d->title()];
-  std::map<const char*, int> index = field_order_[d->title()];
 
   for (int i = 0; i < vals.size(); ++i) {
     boost::spirit::hold_any v = vals[i].second;
-    Bind(v, stmt, index[vals[i].first]);
+    Bind(v, stmt, i+1);
   }
 
   stmt->Exec();
 }
 
-boost::spirit::hold_any SqliteBack::StringAsVal(std::string s,
-                                                std::string type) {
+boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
+                                                int col,
+                                                DbTypes type) {
   boost::spirit::hold_any v;
-  if (type == "int") {
-    v = atoi(s.c_str());
-  } else if (type == "double") {
-    v = atof(s.c_str());
-  } else if (type == "float") {
-    v = (float)atof(s.c_str());
-  } else if (type == "std::string") {
-    v = s;
-  } else if (type == "blob") {
-    v = Blob(s);
-  } else if (type == "uuid") {
+  if (type == INT) {
+    v = stmt->GetInt(col);
+  } else if (type == DOUBLE) {
+    v = stmt->GetDouble(col);
+  } else if (type == FLOAT) {
+    v = (float)stmt->GetDouble(col);
+  } else if (type == VL_STRING) {
+    v = std::string(stmt->GetText(col, NULL));
+  } else if (type == BLOB) {
+    int n;
+    char* s = stmt->GetText(col, &n);
+    v = Blob(std::string(s, n));
+  } else if (type == UUID) {
     boost::uuids::uuid u;
-    memcpy(&u, s.c_str(), 16);
+    memcpy(&u, stmt->GetText(col, NULL), 16);
     v = u;
   } else {
-    CLOG(LEV_ERROR) << "attempted to retrieve unsupported type from backend "
-                    << Name();
+    throw ValueError("Attempted to retrieve unsupported backend type");
   }
   return v;
 }

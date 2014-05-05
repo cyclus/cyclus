@@ -47,7 +47,7 @@ class QueryResult {
   /// names of each field returned by a query
   std::vector<std::string> fields;
 
-  /// types of each field returned by a query. Possible values: INTEGER, REAL, BLOB, TEXT
+  /// types of each field returned by a query.
   std::vector<DbTypes> types;
 
   /// ordered results of a query
