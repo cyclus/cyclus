@@ -60,7 +60,6 @@ void Hdf5Back::Notify(DatumList data) {
 QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   int i;
   int j;
-  int k;
   herr_t status = 0;
   hid_t tb_set = H5Dopen2(file_, table.c_str(), H5P_DEFAULT);
   hid_t tb_space = H5Dget_space(tb_set);
@@ -86,10 +85,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
     }
   }
 
-  std::cout << "tb_length " << tb_length << "\n";
-  std::cout << "chunksize " << tb_chunksize << "\n";
-  std::cout << "nchunks " << nchunks << "\n";
-
+  // read in data
   QueryResult qr = GetTableInfo(table, tb_set, tb_type);
   int nfields = qr.fields.size();
   for (i = 0; i < nfields; i++)
@@ -108,7 +104,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
     for (i = 0; i < count; i++) {
       offset = i * tb_typesize;
       is_valid_row = true;
-      std::cout << i+1 << "/" << count << "  ";
       for (j = 0; j < nfields; j++) {
         switch (qr.types[j]) {
           case BOOL: {
@@ -120,7 +115,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             is_valid_row = CmpConds<int>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
-            std::cout << x << "  ";
             break;
           }
           case FLOAT: {
@@ -128,8 +122,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             is_valid_row = CmpConds<float>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
-            std::cout << x << "  ";
-            //std::cout << *reinterpret_cast<float*>(buf + offset) << "  ";
             break;
           }
           case DOUBLE: {
@@ -137,8 +129,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             is_valid_row = CmpConds<double>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
-            std::cout << x << "  ";
-            //std::cout << *reinterpret_cast<double*>(buf + offset) << "  ";
             break;
           }
           case STRING: {
@@ -149,8 +139,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             is_valid_row = CmpConds<std::string>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
-            std::cout << x << "  ";
-            //std::cout << "'" << std::string(buf + offset, STR_SIZE) << "'  ";
             break;
           }
           case VL_STRING: {
@@ -162,8 +150,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             is_valid_row = CmpConds<Blob>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
-            std::cout << x << "  ";
-            //std::cout << b << "  ";
             break;
           }
           case UUID: {
@@ -172,8 +158,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             is_valid_row = CmpConds<boost::uuids::uuid>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
-            std::cout << x << "  ";
-            //std::cout << u << "  ";
             break;
           }
         }
@@ -181,13 +165,8 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           break;
         offset += tbl_sizes_[table][j];
       }
-      std::cout << "\n";
-      if (is_valid_row) {
+      if (is_valid_row) 
         qr.rows.push_back(row);
-        std::cout << "row " << i << " is valid\n";
-      }
-      else
-        std::cout << "row " << i << " invalid\n";
       row.clear();
       row.reserve(nfields);
     }
