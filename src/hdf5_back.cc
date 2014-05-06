@@ -118,21 +118,39 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           case INT: {
             int x = *reinterpret_cast<int*>(buf + offset);
             is_valid_row = CmpConds<int>(&x, &(field_conds[qr.fields[j]]));
-            if (!is_valid_row)
-              break;
+            if (is_valid_row)
+              row[j] = x;
             std::cout << x << "  ";
             break;
           }
           case FLOAT: {
-            std::cout << *reinterpret_cast<float*>(buf + offset) << "  ";
+            float x = *reinterpret_cast<float*>(buf + offset);
+            is_valid_row = CmpConds<float>(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            std::cout << x << "  ";
+            //std::cout << *reinterpret_cast<float*>(buf + offset) << "  ";
             break;
           }
           case DOUBLE: {
-            std::cout << *reinterpret_cast<double*>(buf + offset) << "  ";
+            double x = *reinterpret_cast<double*>(buf + offset);
+            is_valid_row = CmpConds<double>(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            std::cout << x << "  ";
+            //std::cout << *reinterpret_cast<double*>(buf + offset) << "  ";
             break;
           }
           case STRING: {
-            std::cout << "'" << std::string(buf + offset, STR_SIZE) << "'  ";
+            std::string x = std::string(buf + offset, STR_SIZE);
+            size_t nullpos = x.find('\0');
+            if (nullpos >= 0)
+              x.resize(nullpos);
+            is_valid_row = CmpConds<std::string>(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            std::cout << x << "  ";
+            //std::cout << "'" << std::string(buf + offset, STR_SIZE) << "'  ";
             break;
           }
           case VL_STRING: {
@@ -140,22 +158,38 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case BLOB: {
-            Blob b (std::string(buf + offset, sizeof(char *)));
-            std::cout << b << "  ";
+            Blob x (std::string(buf + offset, sizeof(char *)));
+            is_valid_row = CmpConds<Blob>(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            std::cout << x << "  ";
+            //std::cout << b << "  ";
             break;
           }
           case UUID: {
-            boost::uuids::uuid u;
-            memcpy(buf + offset, &u, 16);
-            std::cout << u << "  ";
+            boost::uuids::uuid x;
+            memcpy(buf + offset, &x, 16);
+            is_valid_row = CmpConds<boost::uuids::uuid>(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            std::cout << x << "  ";
+            //std::cout << u << "  ";
             break;
           }
         }
+        if (!is_valid_row)
+          break;
         offset += tbl_sizes_[table][j];
       }
       std::cout << "\n";
-      if (is_valid_row)
+      if (is_valid_row) {
         qr.rows.push_back(row);
+        std::cout << "row " << i << " is valid\n";
+      }
+      else
+        std::cout << "row " << i << " invalid\n";
+      row.clear();
+      row.reserve(nfields);
     }
     delete[] buf;
     H5Sclose(memspace);

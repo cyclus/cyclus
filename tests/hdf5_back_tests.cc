@@ -24,6 +24,7 @@ TEST(Hdf5BackTest, ReadWrite) {
   using std::string;
   using cyclus::Recorder;
   using cyclus::Hdf5Back;
+  using cyclus::Cond;
   FileDeleter fd(path);
 
   int i = 42;
@@ -86,4 +87,16 @@ TEST(Hdf5BackTest, ReadWrite) {
     EXPECT_STREQ(qr.fields[i].c_str(), expfields[i].c_str());
     EXPECT_EQ(qr.types[i], exptypes[i]);
   }
+  std::vector<Cond> conds = std::vector<Cond>();
+  conds.push_back(Cond("int", "==", 42));
+  qr = back.Query("DumbTitle", &conds);
+  EXPECT_EQ(qr.rows.size(), 1);
+
+  conds.push_back(Cond("int", ">=", 43));
+  qr = back.Query("DumbTitle", &conds);
+  EXPECT_EQ(qr.rows.size(), 0);
+
+  conds[1] = Cond("string", "==", str);
+  qr = back.Query("DumbTitle", &conds);
+  EXPECT_EQ(qr.rows.size(), 1);
 }

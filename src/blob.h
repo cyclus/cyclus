@@ -24,4 +24,29 @@ inline std::ostream& operator<<(std::ostream& out, const cyclus::Blob& b) {
    return out << b.str();
 }
 
+inline bool operator< (const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
+  return lhs.str() < rhs.str();
+}
+
+inline bool operator> (const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
+  return rhs < lhs;
+}
+
+inline bool operator<=(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
+  return !(lhs > rhs);
+}
+
+inline bool operator>=(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
+  return !(lhs < rhs);
+}
+
+inline bool operator==(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
+  return lhs.str() == rhs.str();
+}
+
+inline bool operator!=(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
+  return !(lhs == rhs);
+}
+
+
 #endif  // CYCLUS_SRC_BLOB_H_
