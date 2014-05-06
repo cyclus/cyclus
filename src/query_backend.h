@@ -189,28 +189,27 @@ inline bool CmpCond(T* x, Cond* cond) {
   bool rtn;
   switch (cond->opcode) {
     case LT: {
-      //rtn = (*x) < cond->val.cast<T>() ? true : false;
       rtn = (*x) < cond->val.cast<T>();
       break;
     }
     case GT: {
-      rtn = (*x) > cond->val.cast<T>() ? true : false;
+      rtn = (*x) > cond->val.cast<T>();
       break;
     }
     case LE: {
-      rtn = (*x) <= cond->val.cast<T>() ? true : false;
+      rtn = (*x) <= cond->val.cast<T>();
       break;
     }
     case GE: {
-      rtn = (*x) >= cond->val.cast<T>() ? true : false;
+      rtn = (*x) >= cond->val.cast<T>();
       break;
     }
     case EQ: {
-      rtn = (*x) == cond->val.cast<T>() ? true : false;
+      rtn = (*x) == cond->val.cast<T>();
       break;
     }
     case NE: {
-      rtn = (*x) != cond->val.cast<T>() ? true : false;
+      rtn = (*x) != cond->val.cast<T>();
       break;
     }
   }
