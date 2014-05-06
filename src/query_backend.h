@@ -182,6 +182,49 @@ class PrefixInjector: public QueryableBackend {
   std::string prefix_;
 };
 
+/// Compares a condiontion for a single value 
+template <typename T>
+inline bool CmpCond(T* x, Cond* cond) {
+  bool rtn;
+  switch (cond->opcode) {
+    case LT: {
+      rtn = (*x) < cond->val.cast<T>() ? true : false;
+      break;
+    }
+    case GT: {
+      rtn = (*x) > cond->val.cast<T>() ? true : false;
+      break;
+    }
+    case LE: {
+      rtn = (*x) <= cond->val.cast<T>() ? true : false;
+      break;
+    }
+    case GE: {
+      rtn = (*x) >= cond->val.cast<T>() ? true : false;
+      break;
+    }
+    case EQ: {
+      rtn = (*x) == cond->val.cast<T>() ? true : false;
+      break;
+    }
+    case NE: {
+      rtn = (*x) != cond->val.cast<T>() ? true : false;
+      break;
+    }
+  }
+  return rtn;
+};
+
+/// Compares all condiontions for a value 
+template <typename T>
+inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
+  int i;
+  for (i = 0; i < conds->size(); ++i)
+    if (!CmpCond<T>(&(*x), (*conds)[i]))
+      return false;
+  return true;
+};
+
 } // namespace cyclus
 #endif
 
