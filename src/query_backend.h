@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_QUERY_BACKEND_H_
 #define CYCLUS_SRC_QUERY_BACKEND_H_
 
+#include "blob.h"
 #include "rec_backend.h"
 #include "any.hpp"
 
@@ -188,7 +189,8 @@ inline bool CmpCond(T* x, Cond* cond) {
   bool rtn;
   switch (cond->opcode) {
     case LT: {
-      rtn = (*x) < cond->val.cast<T>() ? true : false;
+      //rtn = (*x) < cond->val.cast<T>() ? true : false;
+      rtn = (*x) < cond->val.cast<T>();
       break;
     }
     case GT: {

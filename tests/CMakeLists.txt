@@ -113,6 +113,7 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/agent_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator_tests.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/query_backend_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/region_class_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc"
