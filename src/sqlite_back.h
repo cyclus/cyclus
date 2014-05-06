@@ -37,7 +37,7 @@ class SqliteBack: public FullBackend {
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
  private:
-  void Bind(boost::spirit::hold_any v, SqlStatement::Ptr stmt, int index);
+  void Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt, int index);
 
   QueryResult GetTableInfo(std::string table);
 
@@ -69,6 +69,7 @@ class SqliteBack: public FullBackend {
   std::set<std::string> tbl_names_;
 
   std::map<std::string, SqlStatement::Ptr> stmts_;
+  std::map<std::string, std::vector<DbTypes> > schemas_;
 };
 } // namespace cyclus
 #endif
