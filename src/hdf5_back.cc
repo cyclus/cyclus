@@ -77,7 +77,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
                                                              std::vector<Cond*> >();
   if (conds != NULL) {
     Cond* cond;
-    for (i = 0; i < conds->size(); i++) {
+    for (i = 0; i < conds->size(); ++i) {
       cond = &((*conds)[i]);
       if (field_conds.count(cond->field) == 0)
         field_conds[cond->field] = std::vector<Cond*>();
@@ -88,10 +88,10 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   // read in data
   QueryResult qr = GetTableInfo(table, tb_set, tb_type);
   int nfields = qr.fields.size();
-  for (i = 0; i < nfields; i++)
+  for (i = 0; i < nfields; ++i)
     if (field_conds.count(qr.fields[i]) == 0)
       field_conds[qr.fields[i]] = std::vector<Cond*>();
-  for (n; n < nchunks; n++) {
+  for (n; n < nchunks; ++n) {
     hsize_t start = n * tb_chunksize;
     hsize_t count = (tb_length-start)<tb_chunksize ? tb_length - start : tb_chunksize;
     char* buf = new char [tb_typesize * count];
@@ -101,10 +101,10 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
     int offset = 0;
     bool is_valid_row;
     QueryRow row = QueryRow(nfields);
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; ++i) {
       offset = i * tb_typesize;
       is_valid_row = true;
-      for (j = 0; j < nfields; j++) {
+      for (j = 0; j < nfields; ++j) {
         switch (qr.types[j]) {
           case BOOL: {
             throw IOError("booleans not yet implemented for HDF5.");
@@ -192,7 +192,7 @@ QueryResult Hdf5Back::GetTableInfo(std::string title, hid_t dset, hid_t dt) {
   DbTypes* dbtypes = tbl_types_[title];
 
   QueryResult qr;
-  for (i = 0; i < ncols; i++) {
+  for (i = 0; i < ncols; ++i) {
     colname = H5Tget_member_name(dt, i);
     fieldname = std::string(colname);
     free(colname);
@@ -224,7 +224,7 @@ void Hdf5Back::LoadTableTypes(std::string title, hid_t dset, hsize_t ncols) {
 
   // store types on class
   DbTypes* dbtypes = new DbTypes[ncols];
-  for (int i = 0; i < ncols; i++)
+  for (int i = 0; i < ncols; ++i)
     dbtypes[i] = static_cast<DbTypes>(dbt[i]);
   tbl_types_[title] = dbtypes;
 }
@@ -236,6 +236,7 @@ std::string Hdf5Back::Name() {
 void Hdf5Back::CreateTable(Datum* d) {
   Datum::Vals vals = d->vals();
   hsize_t nvals = vals.size();
+  Datum::Shapes shapes = d->shapes();
 
   size_t dst_size = 0;
   size_t* dst_offset = new size_t[nvals];
