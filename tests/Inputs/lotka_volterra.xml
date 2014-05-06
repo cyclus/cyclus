@@ -3,7 +3,7 @@
 
 <simulation>
   <control>
-    <duration>20</duration>
+    <duration>10</duration>
     <startmonth>1</startmonth>
     <startyear>2000</startyear>
     <decay>0</decay>
@@ -51,7 +51,7 @@
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
-          <number>400</number>
+          <number>5</number>
         </entry>
         <entry>
           <prototype>Predator</prototype>
