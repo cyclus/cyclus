@@ -44,9 +44,11 @@ TEST(Hdf5BackTest, ReadWrite) {
   // creation
   Recorder m;
   Hdf5Back back(path);
+  vector<int> string_shape = vector<int>(1);
+  string_shape[0] = 16;
   m.RegisterBackend(&back);
   m.NewDatum("DumbTitle")
-  ->AddVal("string", str)
+  ->AddVal("string", str, &string_shape)
   ->AddVal("int", i)
   ->AddVal("float", f)
   ->AddVal("double", d)

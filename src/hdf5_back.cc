@@ -6,26 +6,34 @@
 
 #include "blob.h"
 
-#define STR_SIZE 16
-
 namespace cyclus {
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  opened_types_ = std::set<hid_t>();
 
-  string_type_ = H5Tcopy(H5T_C_S1);
-  H5Tset_size(string_type_, STR_SIZE);
-  H5Tset_strpad(string_type_, H5T_STR_NULLPAD);
+  uuid_type_ = H5Tcopy(H5T_C_S1);
+  H5Tset_size(uuid_type_, CYCLUS_UUID_SIZE);
+  H5Tset_strpad(uuid_type_, H5T_STR_NULLPAD);
+  opened_types_.insert(uuid_type_);
 
-  blob_type_ = H5Tcopy(H5T_C_S1);
-  H5Tset_size(blob_type_, H5T_VARIABLE);
+  hsize_t sha1_len = 5;  // 160 bits == 32 bits / int  * 5 ints
+  sha1_type_ = H5Tarray_create2(H5T_NATIVE_INT, 1, &sha1_len);
+  opened_types_.insert(sha1_type_);
+
+  vlstr_type_ = H5Tcopy(H5T_C_S1);
+  H5Tset_size(vlstr_type_, H5T_VARIABLE);
+  opened_types_.insert(vlstr_type_);
+
+  blob_type_ = vlstr_type_;
 }
 
 Hdf5Back::~Hdf5Back() {
   Flush();
   H5Fclose(file_);
-  H5Tclose(string_type_);
-  H5Tclose(blob_type_);
+  std::set<hid_t>::iterator t;
+  for (t = opened_types_.begin(); t != opened_types_.end(); ++t) 
+    H5Tclose(*t);
 
   std::map<std::string, size_t*>::iterator it;
   std::map<std::string, DbTypes*>::iterator dbtit;
@@ -132,7 +140,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case STRING: {
-            std::string x = std::string(buf + offset, STR_SIZE);
+            std::string x = std::string(buf + offset, tbl_sizes_[table][j]);
             size_t nullpos = x.find('\0');
             if (nullpos >= 0)
               x.resize(nullpos);
@@ -236,6 +244,7 @@ std::string Hdf5Back::Name() {
 void Hdf5Back::CreateTable(Datum* d) {
   Datum::Vals vals = d->vals();
   hsize_t nvals = vals.size();
+  Datum::Shape shape;
   Datum::Shapes shapes = d->shapes();
 
   size_t dst_size = 0;
@@ -270,20 +279,32 @@ void Hdf5Back::CreateTable(Datum* d) {
       dst_sizes[i] = sizeof(double);
       dst_size += sizeof(double);
     } else if (valtype == typeid(std::string)) {
-      dbtypes[i] = STRING;
-      field_types[i] = string_type_;
-      dst_sizes[i] = STR_SIZE;
-      dst_size += STR_SIZE;
+      shape = shapes[i];
+      if (shape == NULL || (*shape)[0] < 1) {
+        dbtypes[i] = VL_STRING;
+        field_types[i] = vlstr_type_;
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+        dst_size += CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = STRING;
+        field_types[i] = H5Tcopy(H5T_C_S1);
+        H5Tset_size(field_types[i], (*shape)[0]);
+        H5Tset_strpad(field_types[i], H5T_STR_NULLPAD);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = sizeof(char) * (*shape)[0];
+        dst_size += sizeof(char) * (*shape)[0];
+        std::cout << "dst_sizes[i] = " << dst_sizes[i] << "\n";
+      }
     } else if (valtype == typeid(Blob)) {
       dbtypes[i] = BLOB;
       field_types[i] = blob_type_;
-      dst_sizes[i] = sizeof(char*);
-      dst_size += sizeof(char*);
+      dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      dst_size += CYCLUS_SHA1_SIZE;
     } else if (valtype == typeid(boost::uuids::uuid)) {
       dbtypes[i] = UUID;
-      field_types[i] = string_type_;
-      dst_sizes[i] = STR_SIZE;
-      dst_size += STR_SIZE;
+      field_types[i] = uuid_type_;
+      dst_sizes[i] = CYCLUS_UUID_SIZE;
+      dst_size += CYCLUS_UUID_SIZE;
     } 
   }
 
@@ -364,9 +385,10 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         }
         case STRING: {
           const std::string s = a->cast<std::string>();
-          size_t slen = std::min(s.size(), static_cast<size_t>(STR_SIZE));
+          size_t fieldlen = sizes[col];
+          size_t slen = std::min(s.size(), fieldlen);
           memcpy(buf + offset, s.c_str(), slen);
-          memset(buf + offset + slen, 0, STR_SIZE - slen);
+          memset(buf + offset + slen, 0, fieldlen - slen);
           break;
         }
         case VL_STRING: {
@@ -384,7 +406,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         }
         case UUID: {
           boost::uuids::uuid uuid = a->cast<boost::uuids::uuid>();
-          memcpy(buf + offset, &uuid, STR_SIZE);
+          memcpy(buf + offset, &uuid, CYCLUS_UUID_SIZE);
           break;
         }
       }

@@ -5,6 +5,9 @@
 #include "rec_backend.h"
 #include "any.hpp"
 
+#define CYCLUS_UUID_SIZE 16
+#define CYCLUS_SHA1_SIZE 20
+
 namespace cyclus {
 
 /// This is the master list of all supported database types.  All types must 

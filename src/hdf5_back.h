@@ -3,6 +3,7 @@
 #define CYCLUS_CORE_UTILITY_HDF5_BACK_H_
 
 #include <map>
+#include <set>
 #include <string>
 
 #include "query_backend.h"
@@ -54,10 +55,19 @@ class Hdf5Back : public FullBackend {
   void FillBuf(std::string title, char* buf, DatumList& group, size_t* sizes, 
                size_t rowsize);
 
-  /// An reference to a database.
+  /// A reference to a database.
   hid_t file_;
-  hid_t string_type_;
+  /// The HDF5 UUID type, 16 byte char string.
+  hid_t uuid_type_;
+  /// The HDF5 SHA1 type, len-5 int array.
+  hid_t sha1_type_;
+  /// The HDF5 variable length string type.
+  hid_t vlstr_type_;
+  /// The HDF5 Blob type, variable length string.
   hid_t blob_type_;
+
+  /// Listing of types opened here so that we may close them.
+  std::set<hid_t> opened_types_;
 
   /// Stores the database's path+name, declared during construction.
   std::string path_;
