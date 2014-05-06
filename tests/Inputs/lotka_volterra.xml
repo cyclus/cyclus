@@ -10,16 +10,14 @@
   </control>
 
   <commodity>
-    <name>commodity</name>
+    <name>wabbit</name>
   </commodity>
 
   <facility>
     <name>Prey</name>
     <agent>
       <Prey>
-        <commod_>commodity</commod_>
-        <recipe_>commod_recipe</recipe_>
-        <capacity_>1</capacity_>
+        <commod_>wabbit</commod_>
       </Prey>
     </agent>
   </facility>
@@ -28,11 +26,8 @@
     <name>Predator</name>
     <agent>
       <Predator>
-        <commod_>commodity</commod_>
-        <recipe_>commod_recipe</recipe_>
+        <commod_>wabbit</commod_>
         <prey_>Prey</prey_>
-        <success_>0.01</success_>
-        <birth_factor_>0.1</birth_factor_>
       </Predator>
     </agent>
   </facility>
@@ -51,7 +46,7 @@
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
-          <number>5</number>
+          <number>6</number>
         </entry>
         <entry>
           <prototype>Predator</prototype>
@@ -64,6 +59,7 @@
     </institution>
   </region>
 
+  <!-- cyclus requires a recipe to not core dump...-->
   <recipe>
     <name>commod_recipe</name>
     <basis>mass</basis>
@@ -72,5 +68,4 @@
       <comp>1</comp>
     </nuclide>
   </recipe>
-
 </simulation>

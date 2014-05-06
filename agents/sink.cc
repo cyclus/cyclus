@@ -39,7 +39,7 @@ Sink::GetMatlRequests() {
 }
 
 std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
-Sink::GetGenRsrcRequests() {
+Sink::GetProductRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::Product;
   using cyclus::RequestPortfolio;
@@ -77,7 +77,7 @@ void Sink::AcceptMatlTrades(
   }
 }
 
-void Sink::AcceptGenRsrcTrades(
+void Sink::AcceptProductTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
     cyclus::Product::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Product>,
