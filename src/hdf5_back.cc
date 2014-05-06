@@ -93,10 +93,10 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
       field_conds[qr.fields[i]] = std::vector<Cond*>();
   for (n; n < nchunks; n++) {
     hsize_t start = n * tb_chunksize;
-    hsize_t count = (tb_length - start) < tb_chunksize ? tb_length - start : tb_chunksize;
+    hsize_t count = (tb_length-start)<tb_chunksize ? tb_length - start : tb_chunksize;
     char* buf = new char [tb_typesize * count];
     hid_t memspace = H5Screate_simple(1, &count, NULL);
-    status = H5Sselect_hyperslab(tb_space, H5S_SELECT_SET,  &start, NULL, &count, NULL);
+    status = H5Sselect_hyperslab(tb_space, H5S_SELECT_SET, &start, NULL, &count, NULL);
     status = H5Dread(tb_set, tb_type, memspace, tb_space, H5P_DEFAULT, buf);
     int offset = 0;
     bool is_valid_row;

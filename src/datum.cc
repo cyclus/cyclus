@@ -10,8 +10,10 @@ namespace cyclus {
 typedef boost::singleton_pool<Datum, sizeof(Datum)> DatumPool;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val) {
+Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val,
+                     std::vector<int>* shape) {
   vals_.push_back(std::pair<const char*, boost::spirit::hold_any>(field, val));
+  shapes_.push_back(shape);
   return this;
 }
 
@@ -26,19 +28,22 @@ Datum::Datum(Recorder* m, std::string title) : title_(title), manager_(m) {
   // core tables.  This prevents extra reallocations in the underlying
   // vector as vals are added to the datum.
   vals_.reserve(10);
+  shapes_.reserve(10);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Datum::~Datum() {}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Datum::title() {
   return title_;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const Datum::Vals& Datum::vals() {
   return vals_;
+}
+
+const Datum::Shapes& Datum::shapes() {
+  return shapes_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
