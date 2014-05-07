@@ -66,7 +66,10 @@ void Predator::AdjustProductPrefs(
   }
   
   std::sort(bids.begin(), bids.end(), Predator::SortById);
-  int n_drop = std::floor(prefs.size() * (1 - success_));
+  int n_drop = std::floor(prefs[req].size() * (1 - success_));
+  LOG(cyclus::LEV_INFO3, "Predator") << name()
+                                     << " removing " << n_drop << " bids "
+                                     << " out of " << prefs[req].size();
   for (int i = 0; i != n_drop; i++) {
     prefs[req][bids[i]] = -1;
   }
