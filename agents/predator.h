@@ -12,6 +12,12 @@ namespace cyclus {
 /// This Predator facility simulates hunters on preys.
 class Predator : public cyclus::Facility  {
  public:
+  /// smallest first! 
+  static inline bool SortById(cyclus::Bid<cyclus::Product>::Ptr l,
+                              cyclus::Bid<cyclus::Product>::Ptr r) {
+    return l->bidder()->manager()->id() < r->bidder()->manager()->id();
+  }
+
   Predator(cyclus::Context* ctx);
   virtual ~Predator() {}
 
@@ -29,6 +35,8 @@ class Predator : public cyclus::Facility  {
   /// resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
       GetProductRequests();
+
+  virtual void AdjustProductPrefs(cyclus::PrefMap<cyclus::Product>::type& prefs);
 
   /// @brief Predator place accepted trade Materials in their Inventory
   virtual void AcceptProductTrades(
@@ -53,16 +61,14 @@ class Predator : public cyclus::Facility  {
   #pragma cyclus var {}
   std::string prey_;
 
-  /**
-    Capacity is the number of members in the predator.
-    The default represents only one entity.
-    It may also be modeled as a group of several predators.
-   */
+  /// Capacity is the number of members in the predator.
+  /// The default represents only one entity.
+  /// It may also be modeled as a group of several predators.
   #pragma cyclus var {'default': 1}
   double capacity_;
 
-  /// hunting success
-  #pragma cyclus var {'default': 0.1}
+  /// hunting success on a scale from 1 to 0
+  #pragma cyclus var {'default': 1}
   double success_;
 
   // efficiency of converting food into children

@@ -17,7 +17,7 @@
     <name>Prey</name>
     <agent>
       <Prey>
-        <!-- <birth_and_death_>0</birth_and_death_> -->
+        <!-- <birth_and_death_>1</birth_and_death_> -->
         <commod_>wabbit</commod_>
       </Prey>
     </agent>
@@ -29,6 +29,7 @@
       <Predator>
         <commod_>wabbit</commod_>
         <!-- <birth_and_death_>0</birth_and_death_> -->
+        <!-- <success_>1/</success_> -->
         <prey_>Prey</prey_>
       </Predator>
     </agent>

@@ -1,5 +1,7 @@
 #include "predator.h"
 
+#include <math.h>
+
 namespace cyclus {
 
 Predator::Predator(cyclus::Context* ctx)
@@ -30,10 +32,6 @@ void Predator::Decommission() {
 }
 
 double Predator::capacity() {
-  // Query the number of the prey
-  // Determine the request
-
-  //return success_ * context()->n_prototypes(prey_);
   return capacity_;
 }
 
@@ -56,6 +54,22 @@ Predator::GetProductRequests() {
   }
 
   return ports;
+}
+
+void Predator::AdjustProductPrefs(
+    cyclus::PrefMap<cyclus::Product>::type& prefs) {
+  Request<Product>::Ptr req = prefs.begin()->first;
+  std::map<Bid<Product>::Ptr, double>::iterator it;
+  std::vector<Bid<Product>::Ptr> bids;
+  for (it = prefs[req].begin(); it != prefs[req].end(); ++it) {
+    bids.push_back(it->first);
+  }
+  
+  std::sort(bids.begin(), bids.end(), Predator::SortById);
+  int n_drop = std::floor(prefs.size() * (1 - success_));
+  for (int i = 0; i != n_drop; i++) {
+    prefs[req][bids[i]] = -1;
+  }
 }
 
 void Predator::AcceptProductTrades(
@@ -86,9 +100,10 @@ void Predator::Tick(int time) {
 
 void Predator::GiveBirth() {
   bool policy = dead_ ? birth_and_death_ : true;
-  if (consumed_ * birth_factor_ >= 1 && policy) {
-    LOG(cyclus::LEV_INFO3, "Prey") << name() << " is having children";
-    int nchildren = consumed_ * birth_factor_;
+  if (consumed_ >= capacity() && policy) {
+    int nchildren = std::floor(consumed_ * birth_factor_);
+    LOG(cyclus::LEV_INFO3, "Predator") << name() << " is having "
+                                       << nchildren << " children";
     for (int i = 0; i < nchildren; ++i) {
       context()->SchedBuild(NULL, prototype());
     }
