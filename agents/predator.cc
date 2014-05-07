@@ -84,26 +84,29 @@ void Predator::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "Predator") << "}";
 }
 
-void Predator::Tock(int time) {
-  LOG(cyclus::LEV_INFO3, "Predator") << name() << " is tocking {";
-
-  // give birth if enough food is eaten
-  if (consumed_ * birth_factor_ >= 1) {
+void Predator::GiveBirth() {
+  bool policy = dead_ ? birth_and_death_ : true;
+  if (consumed_ * birth_factor_ >= 1 && policy) {
     LOG(cyclus::LEV_INFO3, "Prey") << name() << " is having children";
     int nchildren = consumed_ * birth_factor_;
     for (int i = 0; i < nchildren; ++i) {
-      context()->SchedBuild(this, prototype());
+      context()->SchedBuild(NULL, prototype());
     }
     consumed_ = 0;
   }
+}
+
+void Predator::Tock(int time) {
+  LOG(cyclus::LEV_INFO3, "Predator") << name() << " is tocking {";
 
   if (age_ >= lifespan_) {
-    LOG(cyclus::LEV_INFO3, "Predator") << name() << "is dying of old age}";
+    LOG(cyclus::LEV_INFO3, "Predator") << name() << " is dying of old age";
+    dead_ = 1;
     context()->SchedDecom(this);
-    LOG(cyclus::LEV_INFO3, "Predator") << "}";
-    return;
   }
-
+  
+  GiveBirth();
+  
   age_++;  // getting older
 
   LOG(cyclus::LEV_INFO3, "Predator") << "}";

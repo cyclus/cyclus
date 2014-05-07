@@ -7,10 +7,9 @@ namespace cyclus {
 Prey::Prey(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
       commod_(""),
-      killed_(0),
+      dead_(0),
       nchildren_(1),
       birth_freq_(1),
-      lifespan_(1),
       age_(0) {}
 
 std::string Prey::str() {
@@ -42,29 +41,27 @@ void Prey::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "Prey") << "}";
 }
 
-void Prey::Tock(int time) {
-  LOG(cyclus::LEV_INFO3, "Prey") << name() << " is tocking {";
-
-  if (age_ % birth_freq_ == 0) {
+void Prey::GiveBirth() {
+  bool policy = dead_ ? birth_and_death_ : true;
+  if (age_ % birth_freq_ == 0 && policy) {
     LOG(cyclus::LEV_INFO3, "Prey") << name() << " is having children";
     for (int i = 0; i < nchildren_; ++i) {
       context()->SchedBuild(NULL, prototype());
     }
   }
+}
 
-  if (killed_) {
+void Prey::Tock(int time) {
+  LOG(cyclus::LEV_INFO3, "Prey") << name() << " is tocking {";
+    
+  if (dead_) {
     LOG(cyclus::LEV_INFO3, "Prey") << name() << " got eaten";
     context()->SchedDecom(this);
     LOG(cyclus::LEV_INFO3, "Prey") << "}";
-    return;
   }
-  if (age_ >= lifespan_) {
-    LOG(cyclus::LEV_INFO3, "Prey") << name() << "is dying of old age";
-    context()->SchedDecom(this);
-    LOG(cyclus::LEV_INFO3, "Prey") << "}";
-    return;
-  }
-
+  
+  GiveBirth();
+  
   age_++;  // getting older
 
   LOG(cyclus::LEV_INFO3, "Prey") << "}";
@@ -124,7 +121,7 @@ void Prey::GetProductTrades(
     throw cyclus::ValueError(Agent::InformErrorMsg(ss.str()));
   }
 
-  if (provided > 0) killed_ = 1; // They came from... behind! 
+  if (provided > 0) dead_ = 1; // They came from... behind! 
 }
 
 extern "C" cyclus::Agent* ConstructPrey(cyclus::Context* ctx) {

@@ -43,6 +43,8 @@ class Predator : public cyclus::Facility  {
     ss << prototype() << "_" << id();
     return ss.str();
   };
+
+  void GiveBirth();
   
  private:
   #pragma cyclus var {}
@@ -73,6 +75,13 @@ class Predator : public cyclus::Facility  {
 
   #pragma cyclus var {'default': 1}
   int lifespan_;
+
+  #pragma cyclus var {'default': 0}
+  int dead_;
+
+  /// whether or not an agent can give birth and die in the same timestep  
+  #pragma cyclus var {'default': 1} // true
+  int birth_and_death_;
 
   /// consumption this time step
   #pragma cyclus var {'default': 0}
