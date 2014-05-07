@@ -57,7 +57,10 @@ void Predator::AdjustProductPrefs(
   }
   
   std::sort(bids.begin(), bids.end(), Predator::SortById);
-  int n_drop = std::floor(prefs[req].size() * (1 - success_));
+  int nprey = context()->n_prototypes(prey_);
+  int npred = context()->n_prototypes(prototype());
+  double factor = (hunt_factor_ && nprey < npred) ? double(nprey) / npred : 1;
+  int n_drop = std::floor(prefs[req].size() * (1 - success_ * factor));
   LOG(cyclus::LEV_INFO3, "Predator") << name()
                                      << " removing " << n_drop << " bids "
                                      << " out of " << prefs[req].size();
