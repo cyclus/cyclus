@@ -43,9 +43,6 @@ class Predator : public cyclus::Facility  {
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
       cyclus::Product::Ptr> >& responses);
 
-  /// @brief determines the amount to request
-  double capacity();
-
   inline std::string name() {
     std::stringstream ss;
     ss << prototype() << "_" << id();
@@ -61,19 +58,20 @@ class Predator : public cyclus::Facility  {
   #pragma cyclus var {}
   std::string prey_;
 
-  /// Capacity is the number of members in the predator.
-  /// The default represents only one entity.
-  /// It may also be modeled as a group of several predators.
+  /// how many prey until we're full
   #pragma cyclus var {'default': 1}
-  double capacity_;
+  double full_;
+  
+  /// how many prey we can catch on the hunt
+  #pragma cyclus var {'default': 1}
+  double hunt_;
 
   /// hunting success on a scale from 1 to 0
   #pragma cyclus var {'default': 1}
   double success_;
 
-  // efficiency of converting food into children
   #pragma cyclus var {'default': 1}
-  double birth_factor_;
+  double nchildren_;
 
   /// age of a prey
   #pragma cyclus var {'default': 0}

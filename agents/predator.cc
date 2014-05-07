@@ -4,13 +4,7 @@
 
 namespace cyclus {
 
-Predator::Predator(cyclus::Context* ctx)
-    : cyclus::Facility(ctx),
-      birth_factor_(0.1),
-      age_(0),
-      lifespan_(2),
-      success_(0.1),
-      capacity_(1) {}
+Predator::Predator(cyclus::Context* ctx) : cyclus::Facility(ctx) {}
 
 std::string Predator::str() {
   // no info for now. Change later
@@ -31,10 +25,6 @@ void Predator::Decommission() {
   cyclus::Facility::Decommission();
 }
 
-double Predator::capacity() {
-  return capacity_;
-}
-
 std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
 Predator::GetProductRequests() {
   using cyclus::CapacityConstraint;
@@ -45,7 +35,7 @@ Predator::GetProductRequests() {
   std::set<RequestPortfolio<Product>::Ptr> ports;
   RequestPortfolio<Product>::Ptr
       port(new RequestPortfolio<Product>());
-  double amt = capacity();
+  double amt = hunt_;
 
   if (amt > cyclus::eps()) {
     port->AddRequest(Product::CreateUntracked(amt, ""), this, commod_);
@@ -94,7 +84,7 @@ void Predator::AcceptProductTrades(
 void Predator::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "Predator") << name() << " is ticking {";
 
-  double amt = capacity();
+  double amt = hunt_;
   // inform the simulation about what the Predator facility will be requesting
   if (amt > cyclus::eps()) {
     LOG(cyclus::LEV_INFO4, "Predator") << " will request " << amt
@@ -105,8 +95,8 @@ void Predator::Tick(int time) {
 
 void Predator::GiveBirth() {
   bool policy = dead_ ? birth_and_death_ : true;
-  if (consumed_ >= capacity() && policy) {
-    int nchildren = std::floor(consumed_ * birth_factor_);
+  if (consumed_ >= full_ && policy) {
+    int nchildren = nchildren_;
     LOG(cyclus::LEV_INFO3, "Predator") << name() << " is having "
                                        << nchildren << " children";
     for (int i = 0; i < nchildren; ++i) {
