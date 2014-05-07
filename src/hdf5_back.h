@@ -61,7 +61,7 @@ class Hdf5Back : public FullBackend {
   /// @param x the data to write.
   /// @return the key of x, which is a SHA1 hash as len-5 an array of ints.
   /// \{
-  int[5] VLWrite(std::string x);
+  Digest VLWrite(std::string x);
   /// \}
 
   /// Gets an HDF5 reference dataset for a variable length datatype

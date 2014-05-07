@@ -21,8 +21,8 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   H5Tset_strpad(uuid_type_, H5T_STR_NULLPAD);
   opened_types_.insert(uuid_type_);
 
-  hsize_t sha1_len = 5;  // 160 bits == 32 bits / int  * 5 ints
-  sha1_type_ = H5Tarray_create2(H5T_NATIVE_INT, 1, &sha1_len);
+  hsize_t sha1_len = CYCLUS_SHA1_NINT;  // 160 bits == 32 bits / int  * 5 ints
+  sha1_type_ = H5Tarray_create2(H5T_NATIVE_UINT, 1, &sha1_len);
   opened_types_.insert(sha1_type_);
 
   vlstr_type_ = H5Tcopy(H5T_C_S1);
@@ -423,14 +423,14 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
   }
 }
 
-int[5] Hdf5Back::VLWrite(std::string x) {
-  int key[5] = {42, 42, 42, 42, 42};
+Digest Hdf5Back::VLWrite(std::string x) {
+  Digest key = {42, 42, 42, 42, 42};
   hid_t keysds = VLDataset(VL_STRING, true);
   hid_t valsds = VLDataset(VL_STRING, false);
   return key;
 }
 
-hid_t VLDataset(DbTypes dbtype, bool forkeys) {
+hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
   std::string name;
   switch (dbtype) {
     case VL_STRING: {
@@ -466,7 +466,7 @@ hid_t VLDataset(DbTypes dbtype, bool forkeys) {
     hsize_t maxdims[1] = {H5S_UNLIMITED};
     hsize_t chunkdims[1] = {512};  // this is a 10 kb chunksize
     dt = sha1_type_;
-    dataspace = H5Screate_simple(1, dims, maxdims);
+    dspace = H5Screate_simple(1, dims, maxdims);
     prop = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_chunk(prop, 1, chunkdims);
     if (status > 0) 

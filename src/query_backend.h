@@ -1,12 +1,15 @@
 #ifndef CYCLUS_SRC_QUERY_BACKEND_H_
 #define CYCLUS_SRC_QUERY_BACKEND_H_
 
+#include <boost/uuid/sha1.hpp>
+
 #include "blob.h"
 #include "rec_backend.h"
 #include "any.hpp"
 
 #define CYCLUS_UUID_SIZE 16
 #define CYCLUS_SHA1_SIZE 20
+#define CYCLUS_SHA1_NINT 5
 
 namespace cyclus {
 
@@ -269,6 +272,30 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
     if (!CmpCond<T>(&(*x), (*conds)[i]))
       return false;
   return true;
+};
+
+/// The digest type for SHA1s
+struct Digest {
+  unsigned int val[CYCLUS_SHA1_NINT];
+};
+
+class Sha1 {
+ public:
+  Sha1() {hash_ = boost::uuids::detail::sha1();};
+
+  /// Updates the hash value with a string.
+  void Update(std::string s) {
+    hash_.process_bytes(s.c_str(), s.size());
+  };
+
+  Digest digest() {
+    Digest d;
+    hash_.get_digest(d.val);
+    return d;
+  };
+
+ private:
+  boost::uuids::detail::sha1 hash_;
 };
 
 } // namespace cyclus
