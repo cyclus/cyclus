@@ -88,11 +88,11 @@ class Predator : public cyclus::Facility  {
   int dead_;
 
   /// whether or not to base hunt succes on relative prey/predator populations
-  #pragma cyclus var {'default': 1} // true
+  #pragma cyclus var {'default': 0} // false
   int hunt_factor_;
 
   /// whether or not an agent can give birth and die in the same timestep  
-  #pragma cyclus var {'default': 1} // true
+  #pragma cyclus var {'default': 0} // false
   int birth_and_death_;
 
   /// consumption this time step
