@@ -46,7 +46,7 @@
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
-          <number>6</number>
+          <number>2</number>
         </entry>
         <entry>
           <prototype>Predator</prototype>

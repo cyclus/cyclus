@@ -45,25 +45,24 @@ void Prey::Tick(int time) {
 void Prey::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "Prey") << name() << " is tocking {";
 
+  if (age_ % birth_freq_ == 0) {
+    LOG(cyclus::LEV_INFO3, "Prey") << name() << " is having children";
+    for (int i = 0; i < nchildren_; ++i) {
+      context()->SchedBuild(NULL, prototype());
+    }
+  }
+
   if (killed_) {
     LOG(cyclus::LEV_INFO3, "Prey") << name() << " got eaten";
     context()->SchedDecom(this);
     LOG(cyclus::LEV_INFO3, "Prey") << "}";
     return;
   }
-
   if (age_ >= lifespan_) {
     LOG(cyclus::LEV_INFO3, "Prey") << name() << "is dying of old age";
     context()->SchedDecom(this);
     LOG(cyclus::LEV_INFO3, "Prey") << "}";
     return;
-  }
-
-  if (age_ % birth_freq_ == 0) {
-    LOG(cyclus::LEV_INFO3, "Prey") << name() << " is having children";
-    for (int i = 0; i < nchildren_; ++i) {
-      context()->SchedBuild(this, prototype());
-    }
   }
 
   age_++;  // getting older

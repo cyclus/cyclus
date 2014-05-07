@@ -57,6 +57,8 @@ void Timer::DoBuild() {
   for (int i = 0; i < build_list.size(); ++i) {
     Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
     Agent* parent = build_list[i].second;
+    CLOG(LEV_INFO3) << "Building a " << build_list[i].first
+                    << " from parent " << build_list[i].second;
     m->Build(parent);
     if (parent != NULL) {
       parent->BuildNotify(m);

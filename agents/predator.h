@@ -71,7 +71,7 @@ class Predator : public cyclus::Facility  {
   #pragma cyclus var {'default': 0}
   int age_;
 
-  #pragma cyclus var {'default': 2}
+  #pragma cyclus var {'default': 1}
   int lifespan_;
 
   /// consumption this time step
