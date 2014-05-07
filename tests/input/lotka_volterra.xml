@@ -3,7 +3,7 @@
 
 <simulation>
   <control>
-    <duration>30</duration>
+    <duration>34</duration>
     <startmonth>1</startmonth>
     <startyear>2000</startyear>
     <decay>0</decay>
@@ -34,7 +34,7 @@
         <full_>2</full_>
         <lifespan_>6</lifespan_>
         <commod_>wabbit</commod_>
-        <success_>0.6</success_>
+        <success_>0.575</success_>
         <birth_and_death_>0</birth_and_death_>
         <prey_>Prey</prey_>
       </Predator>
@@ -55,7 +55,7 @@
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
-          <number>100</number>
+          <number>95</number>
         </entry>
         <entry>
           <prototype>Predator</prototype>
