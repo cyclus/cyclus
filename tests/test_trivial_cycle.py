@@ -23,7 +23,7 @@ def test_source_to_sink():
     This equation is used to test each transaction amount.
     """
     # A reference simulation input for the trivial cycle simulation.
-    ref_input = "./Inputs/trivial_cycle.xml"
+    ref_input = "./input/trivial_cycle.xml"
     # Conversion factors for the three simulations
     k_factors = [0.95, 1, 2]
 
