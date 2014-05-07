@@ -94,7 +94,7 @@ def test_minimal_cycle():
     This equation is used to test each transaction amount.
     """
     # A reference simulation input for minimal cycle with different commodities
-    ref_input = "./Inputs/minimal_cycle.xml"
+    ref_input = "./input/minimal_cycle.xml"
     # Conversion factors for the simulations
     k_factors = [0.95, 1, 2]
 

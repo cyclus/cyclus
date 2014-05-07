@@ -17,7 +17,7 @@ def test_source_to_sink():
     clean_outs()
 
     # Cyclus simulation input for Source and Sink
-    sim_inputs = ["./Inputs/source_to_sink.xml"]
+    sim_inputs = ["./input/source_to_sink.xml"]
 
     for sim_input in sim_inputs:
         holdsrtn = [1]  # needed because nose does not send() to test generator

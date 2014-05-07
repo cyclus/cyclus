@@ -18,7 +18,7 @@ def test_null_sink():
     clean_outs()
 
     # Cyclus simulation input for null sink testing
-    sim_input = "./Inputs/null_sink.xml"
+    sim_input = "./input/null_sink.xml"
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
