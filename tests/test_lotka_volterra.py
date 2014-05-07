@@ -16,7 +16,7 @@ def test_prey_only():
     clean_outs()
 
     # A reference simulation input for Lotka-Volterra simulation
-    sim_input = "./Inputs/prey.xml"
+    sim_input = "./input/prey.xml"
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
@@ -55,7 +55,7 @@ def test_predator_only():
     clean_outs()
 
     # A reference simulation input for Lotka-Volterra simulation
-    sim_input = "./Inputs/predator.xml"
+    sim_input = "./input/predator.xml"
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
@@ -104,7 +104,7 @@ def test_lotka_volterra():
     clean_outs()
 
     # A reference simulation input for Lotka-Volterra simulation
-    sim_input = "./Inputs/lotka_volterra.xml"
+    sim_input = "./input/lotka_volterra.xml"
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]

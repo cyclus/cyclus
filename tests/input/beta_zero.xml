@@ -18,8 +18,6 @@
     <agent>
       <Prey>
         <commod_>commodity</commod_>
-        <recipe_>commod_recipe</recipe_>
-        <capacity_>1</capacity_>
       </Prey>
     </agent>
   </facility>
@@ -29,9 +27,8 @@
     <agent>
       <Predator>
         <commod_>commodity</commod_>
-        <recipe_>commod_recipe</recipe_>
         <prey_>Prey</prey_>
-        <success_>0.00</success_>
+        <capacity_>0.00</capacity_>
       </Predator>
     </agent>
   </facility>

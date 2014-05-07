@@ -18,7 +18,6 @@
     <agent>
       <Predator>
         <commod_>commodity</commod_>
-        <recipe_>commod_recipe</recipe_>
         <prey_>none</prey_>
       </Predator>
     </agent>
