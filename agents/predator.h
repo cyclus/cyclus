@@ -64,7 +64,11 @@ class Predator : public cyclus::Facility  {
   
   /// how many prey we can catch on the hunt
   #pragma cyclus var {'default': 1}
-  double hunt_;
+  double hunt_cap_;
+  
+  /// how often we hunt
+  #pragma cyclus var {'default': 1}
+  int hunt_freq_;
 
   /// hunting success on a scale from 1 to 0
   #pragma cyclus var {'default': 1}

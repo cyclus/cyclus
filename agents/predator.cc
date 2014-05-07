@@ -35,10 +35,9 @@ Predator::GetProductRequests() {
   std::set<RequestPortfolio<Product>::Ptr> ports;
   RequestPortfolio<Product>::Ptr
       port(new RequestPortfolio<Product>());
-  double amt = hunt_;
 
-  if (amt > cyclus::eps()) {
-    port->AddRequest(Product::CreateUntracked(amt, ""), this, commod_);
+  if (age_ % hunt_freq_  == 0) {
+    port->AddRequest(Product::CreateUntracked(hunt_cap_, ""), this, commod_);
     port->AddDefaultConstraint();
     ports.insert(port);
   }
@@ -84,10 +83,10 @@ void Predator::AcceptProductTrades(
 void Predator::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "Predator") << name() << " is ticking {";
 
-  double amt = hunt_;
   // inform the simulation about what the Predator facility will be requesting
-  if (amt > cyclus::eps()) {
-    LOG(cyclus::LEV_INFO4, "Predator") << " will request " << amt
+  if (age_ % hunt_freq_ == 0) {
+    LOG(cyclus::LEV_INFO4, "Predator")
+        << " will request " << hunt_cap_
         << " units of " << commod_ << ".";
   }
   LOG(cyclus::LEV_INFO3, "Predator") << "}";
