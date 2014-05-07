@@ -9,8 +9,12 @@
 namespace cyclus {
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
-  file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  if (boost::filesystem::exists(path_))
+    file_ = H5Fopen(path_.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+  else  
+    file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   opened_types_ = std::set<hid_t>();
+  vldatasets_ = std::map<std::string, hid_t>();
 
   uuid_type_ = H5Tcopy(H5T_C_S1);
   H5Tset_size(uuid_type_, CYCLUS_UUID_SIZE);
@@ -29,12 +33,17 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
 }
 
 Hdf5Back::~Hdf5Back() {
+  // cleanup HDF5
   Flush();
   H5Fclose(file_);
   std::set<hid_t>::iterator t;
   for (t = opened_types_.begin(); t != opened_types_.end(); ++t) 
     H5Tclose(*t);
+  std::map<std::string, hid_t>::iterator vldsit;
+  for (vldsit = vldatasets_.begin(); vldsit != vldatasets_.end(); ++vldsit)
+    H5Dclose(vldsit->second);
 
+  // cleanup memory
   std::map<std::string, size_t*>::iterator it;
   std::map<std::string, DbTypes*>::iterator dbtit;
   for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
@@ -293,7 +302,6 @@ void Hdf5Back::CreateTable(Datum* d) {
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(char) * (*shape)[0];
         dst_size += sizeof(char) * (*shape)[0];
-        std::cout << "dst_sizes[i] = " << dst_sizes[i] << "\n";
       }
     } else if (valtype == typeid(Blob)) {
       dbtypes[i] = BLOB;
@@ -414,4 +422,60 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
     }
   }
 }
+
+int[5] Hdf5Back::VLWrite(std::string x) {
+  int key[5] = {42, 42, 42, 42, 42};
+  hid_t keysds = VLDataset(VL_STRING, true);
+  hid_t valsds = VLDataset(VL_STRING, false);
+  return key;
+}
+
+hid_t VLDataset(DbTypes dbtype, bool forkeys) {
+  std::string name;
+  switch (dbtype) {
+    case VL_STRING: {
+      name = "String";
+      break;
+    }
+    case BLOB: {
+      name = "Blob";
+      break;
+    }
+  }
+  name += forkeys ? "Keys" : "Vals";
+
+  // already opened
+  if (vldatasets_.count(name) > 0)
+    return vldatasets_[name];
+
+  // already in db
+  hid_t dset;
+  if (H5Lexists(file_, name.c_str(), H5P_DEFAULT)) {
+    dset = H5Dopen2(file_, name.c_str(), H5P_DEFAULT);
+    vldatasets_[name] = dset;
+    return dset;
+  }
+
+  // doesn't exist at all
+  hid_t dt;
+  hid_t dspace;
+  hid_t prop;
+  herr_t status;
+  if (forkeys) {
+    hsize_t dims[1] = {0};
+    hsize_t maxdims[1] = {H5S_UNLIMITED};
+    hsize_t chunkdims[1] = {512};  // this is a 10 kb chunksize
+    dt = sha1_type_;
+    dataspace = H5Screate_simple(1, dims, maxdims);
+    prop = H5Pcreate(H5P_DATASET_CREATE);
+    status = H5Pset_chunk(prop, 1, chunkdims);
+    if (status > 0) 
+      throw IOError("could not create table " + name);
+  } else {
+  }
+  dset = H5Dcreate2(file_, name.c_str(), dt, dspace, H5P_DEFAULT, prop, H5P_DEFAULT);
+  vldatasets_[name] = dset;
+  return dset;  
+}
+
 } // namespace cyclus

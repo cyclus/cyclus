@@ -6,6 +6,8 @@
 #include <set>
 #include <string>
 
+#include "boost/filesystem.hpp"
+
 #include "query_backend.h"
 #include "hdf5.h"
 #include "hdf5_hl.h"
@@ -38,22 +40,40 @@ class Hdf5Back : public FullBackend {
   QueryResult GetTableInfo(std::string title, hid_t dset, hid_t dt);
 
   /// Reads a table's column types into tbl_types_ if they aren't already there
-  /// {
+  /// \{
   void LoadTableTypes(std::string title, hsize_t ncols);
   void LoadTableTypes(std::string title, hid_t dset, hsize_t ncols);
-  /// }
+  /// \}
 
-  /// creates and initializes an hdf5 table with schema defined by d.
+  /// Creates and initializes an hdf5 table with schema defined by d.
   void CreateTable(Datum* d);
 
-  /// writes a group of Datum objects with the same title to their
+  /// Writes a group of Datum objects with the same title to their
   /// corresponding hdf5 dataset.
   void WriteGroup(DatumList& group);
 
-  /// fill a contiguous memory buffer with data from group for writing to an
+  /// Fill a contiguous memory buffer with data from group for writing to an
   /// hdf5 dataset.
   void FillBuf(std::string title, char* buf, DatumList& group, size_t* sizes, 
                size_t rowsize);
+
+  /// Writes a variable length data to its on-disk bidirectional hash map.
+  /// @param x the data to write.
+  /// @return the key of x, which is a SHA1 hash as len-5 an array of ints.
+  /// \{
+  int[5] VLWrite(std::string x);
+  /// \}
+
+  /// Gets an HDF5 reference dataset for a variable length datatype
+  /// If the dataset does not exist in the database, it will create it.
+  ///
+  /// @param dbtype the datatype to retrive
+  ///
+  /// @param forkeys specifies whether to retrieve the keys (true) or 
+  /// values (false) dataset, optional
+  ///
+  /// @return the dataset identifier
+  hid_t VLDataset(DbTypes dbtype, bool forkeys=true);
 
   /// A reference to a database.
   hid_t file_;
@@ -76,6 +96,7 @@ class Hdf5Back : public FullBackend {
   std::map<std::string, size_t*> tbl_sizes_;
   std::map<std::string, size_t> tbl_size_;
   std::map<std::string, DbTypes*> tbl_types_;
+  std::map<std::string, hid_t> vldatasets_;
 };
 
 } // namespace cyclus
