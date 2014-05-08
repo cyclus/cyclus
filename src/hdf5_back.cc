@@ -466,7 +466,7 @@ Digest Hdf5Back::VLWrite(T x) {
   hid_t valsds = VLDataset(U, false);
   if (vlkeys_[U].count(key) == 1)
     return key;
-  //AppendVLKey(keysds, U, key);
+  AppendVLKey(keysds, U, key);
   //InsertVLVal(valsds, U, key, x);
   return key;
 }
