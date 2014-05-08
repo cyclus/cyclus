@@ -437,6 +437,9 @@ Digest Hdf5Back::VLWrite(std::string x) {
   if (vlkeys_[VL_STRING].count(key) == 1)
     return key;
 
+  AppendVLKey(keysds, VL_STRING, key);
+  // add value to dataset 
+
   return key;
 }
 
@@ -511,6 +514,27 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
   dset = H5Dcreate2(file_, name.c_str(), dt, dspace, H5P_DEFAULT, prop, H5P_DEFAULT);
   vldatasets_[name] = dset;
   return dset;  
+}
+
+void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, Digest key) {
+  hid_t dspace = H5Dget_space(dset);
+  hsize_t origlen = H5Sget_simple_extent_npoints(dspace);
+  hsize_t newlen[1] = {origlen + 1};
+  hsize_t offset[1] = {origlen};
+  hsize_t extent[1] = {1};
+  hid_t mspace = H5Screate_simple(1, extent, NULL);
+  herr_t status = H5Dset_extent(dset, newlen);
+  if (status < 0)
+    throw IOError("could not resize key array.");
+  status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, offset, NULL, extent, NULL);
+  if (status < 0)
+    throw IOError("could not select hyperslab of key array.");
+  status = H5Dwrite(dset, sha1_type_, mspace, dspace, H5P_DEFAULT, key.val);
+  if (status < 0)
+    throw IOError("could not write digest to key array.");
+  H5Sclose(mspace);
+  H5Sclose(dspace);
+  vlkeys_[dbtype].insert(key);
 }
 
 } // namespace cyclus

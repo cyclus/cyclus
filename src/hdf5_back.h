@@ -75,6 +75,13 @@ class Hdf5Back : public FullBackend {
   /// @return the dataset identifier
   hid_t VLDataset(DbTypes dbtype, bool forkeys=true);
 
+  /// Appends a key to a variable lengeth key dataset
+  ///
+  /// @param dset an open HDF5 dataset
+  /// @param dbtype the variable length data type
+  /// @param key the SHA1 digest to append
+  void AppendVLKey(hid_t dset, DbTypes dbtype, Digest key);
+
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;
 
