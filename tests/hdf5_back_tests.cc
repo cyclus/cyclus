@@ -102,3 +102,22 @@ TEST(Hdf5BackTest, ReadWrite) {
   qr = back.Query("DumbTitle", &conds);
   EXPECT_EQ(qr.rows.size(), 1);
 }
+
+TEST(Hdf5BackTest, ReadWriteVLString) {
+  using std::string;
+  using cyclus::Recorder;
+  using cyclus::Hdf5Back;
+  const char* fpath = "vlstring.h5";
+  FileDeleter fd(fpath);
+
+  string x = "wakka";
+
+  // creation
+  Recorder m;
+  Hdf5Back back(fpath);
+  m.RegisterBackend(&back);
+  m.NewDatum("data")
+  ->AddVal("x", x)
+  ->Record();
+  m.Close();
+}

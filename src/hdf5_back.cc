@@ -39,7 +39,7 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
 
 Hdf5Back::~Hdf5Back() {
   // cleanup HDF5
-  Flush();
+  Hdf5Back::Flush();
   H5Fclose(file_);
   std::set<hid_t>::iterator t;
   for (t = opened_types_.begin(); t != opened_types_.end(); ++t) 
@@ -299,7 +299,7 @@ void Hdf5Back::CreateTable(Datum* d) {
       shape = shapes[i];
       if (shape == NULL || (*shape)[0] < 1) {
         dbtypes[i] = VL_STRING;
-        field_types[i] = vlstr_type_;
+        field_types[i] = sha1_type_;
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
         dst_size += CYCLUS_SHA1_SIZE;
       } else {
@@ -466,8 +466,8 @@ Digest Hdf5Back::VLWrite(T x) {
   hid_t valsds = VLDataset(U, false);
   if (vlkeys_[U].count(key) == 1)
     return key;
-  AppendVLKey(keysds, U, key);
-  InsertVLVal(valsds, U, key, x);
+  //AppendVLKey(keysds, U, key);
+  //InsertVLVal(valsds, U, key, x);
   return key;
 }
 

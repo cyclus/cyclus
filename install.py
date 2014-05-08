@@ -53,6 +53,8 @@ def install_cyclus(args):
             cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
             cmake_cmd += ['-DBOOST_ROOT=' + absexpanduser(args.boost_root)]
+        if args.build_type:
+            cmake_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
@@ -116,6 +118,9 @@ def main():
     cmake_prefix_path = "the cmake prefix path for use with FIND_PACKAGE, " + \
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
     parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
+
+    build_type = "the CMAKE_BUILD_TYPE" 
+    parser.add_argument('--build_type', help=build_type)
 
     args = parser.parse_args()
     if args.uninstall:

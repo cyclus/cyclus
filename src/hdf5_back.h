@@ -31,7 +31,7 @@ class Hdf5Back : public FullBackend {
 
   virtual std::string Name();
 
-  virtual void Flush() {H5Fflush(file_, H5F_SCOPE_GLOBAL);};
+  virtual inline void Flush() {H5Fflush(file_, H5F_SCOPE_GLOBAL);};
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
