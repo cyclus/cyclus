@@ -51,7 +51,7 @@ void Timer::DoBuild() {
     if (parent != NULL) {
       parent->BuildNotify(m);
     } else {
-      CLOG(LEV_INFO1) << "Hey! Listen! Built an Agent without a Parent."
+      CLOG(LEV_INFO1) << "Hey! Listen! Built an Agent without a Parent.";
     }
   }
 }
