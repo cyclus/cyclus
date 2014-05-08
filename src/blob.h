@@ -48,5 +48,4 @@ inline bool operator!=(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
   return !(lhs == rhs);
 }
 
-
 #endif  // CYCLUS_SRC_BLOB_H_

@@ -1,6 +1,8 @@
 #ifndef CYCLUS_SRC_QUERY_BACKEND_H_
 #define CYCLUS_SRC_QUERY_BACKEND_H_
 
+#include <climits>
+
 #include <boost/uuid/sha1.hpp>
 
 #include "blob.h"
@@ -337,13 +339,17 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
 };
 
 /// The digest type for SHA1s
-struct Digest {
+class Digest {
+ public:
   unsigned int val[CYCLUS_SHA1_NINT];
 };
 
 class Sha1 {
  public:
   Sha1() {hash_ = boost::uuids::detail::sha1();};
+
+  /// Clears the current hash value to its default state.
+  inline void Clear() {hash_.reset();};
 
   /// Updates the hash value with a string.
   void Update(std::string s) {
@@ -361,5 +367,55 @@ class Sha1 {
 };
 
 } // namespace cyclus
+
+//
+// Digest functions
+//
+inline std::ostream& operator<<(std::ostream& out, const cyclus::Digest& d) {
+   return out << "[" << d.val[0] << ", " << d.val[1] << ", " <<  d.val[2] << \
+                 ", " << d.val[3] << ", " << d.val[4] << "]";
+}
+
+inline bool operator< (const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+  bool rtn = false;
+  for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
+    if (lhs.val[i] < rhs.val[i]) {
+      rtn = true;
+      break;
+    } else if (lhs.val[i] > rhs.val[i]) {
+      rtn = false;
+      break;
+    } // else they are equal and we need to check the next index
+  }
+  return rtn;
+}
+
+inline bool operator> (const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+  return rhs < lhs;
+}
+
+inline bool operator<=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+  return !(lhs > rhs);
+}
+
+inline bool operator>=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+  return !(lhs < rhs);
+}
+
+inline bool operator==(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+  bool rtn = true;
+  for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
+    if (lhs.val[i] != rhs.val[i]) {
+      rtn = false;
+      break;
+    } // else they are equal and we need to check the next index.
+  }
+  return rtn;
+}
+
+inline bool operator!=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+  return !(lhs == rhs);
+}
+
 #endif
 

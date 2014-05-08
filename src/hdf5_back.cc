@@ -9,12 +9,15 @@
 namespace cyclus {
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
+  hasher_ = Sha1();
   if (boost::filesystem::exists(path_))
     file_ = H5Fopen(path_.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
   else  
     file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   opened_types_ = std::set<hid_t>();
   vldatasets_ = std::map<std::string, hid_t>();
+  vldts_ = std::map<DbTypes, hid_t>();
+  vlkeys_ = std::map<DbTypes, std::set<Digest> >();
 
   uuid_type_ = H5Tcopy(H5T_C_S1);
   H5Tset_size(uuid_type_, CYCLUS_UUID_SIZE);
@@ -28,8 +31,10 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   vlstr_type_ = H5Tcopy(H5T_C_S1);
   H5Tset_size(vlstr_type_, H5T_VARIABLE);
   opened_types_.insert(vlstr_type_);
+  vldts_[VL_STRING] = vlstr_type_;
 
   blob_type_ = vlstr_type_;
+  vldts_[BLOB] = blob_type_;
 }
 
 Hdf5Back::~Hdf5Back() {
@@ -424,9 +429,14 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
 }
 
 Digest Hdf5Back::VLWrite(std::string x) {
-  Digest key = {42, 42, 42, 42, 42};
+  hasher_.Clear();
+  hasher_.Update(x);
+  Digest key = hasher_.digest();
   hid_t keysds = VLDataset(VL_STRING, true);
   hid_t valsds = VLDataset(VL_STRING, false);
+  if (vlkeys_[VL_STRING].count(key) == 1)
+    return key;
+
   return key;
 }
 
@@ -450,17 +460,33 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
 
   // already in db
   hid_t dset;
+  hid_t dspace;
+  herr_t status;
   if (H5Lexists(file_, name.c_str(), H5P_DEFAULT)) {
     dset = H5Dopen2(file_, name.c_str(), H5P_DEFAULT);
+    if (forkeys) {
+      // read in existing keys to vlkeys_
+      dspace = H5Dget_space(dset);
+      unsigned int nkeys = H5Sget_simple_extent_npoints(dspace);
+      char* buf = new char [CYCLUS_SHA1_SIZE * nkeys];
+      status = H5Dread(dset, sha1_type_, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf);
+      if (status < 0)
+        throw IOError("failed to read in keys for " + name);
+      for (int n = 0; n < nkeys; ++n) {
+        Digest d = Digest();
+        memcpy(buf + (n * CYCLUS_SHA1_SIZE), &d.val, CYCLUS_SHA1_SIZE);
+        vlkeys_[dbtype].insert(d);
+      }
+      H5Sclose(dspace);
+      delete[] buf;
+    }
     vldatasets_[name] = dset;
     return dset;
   }
 
   // doesn't exist at all
   hid_t dt;
-  hid_t dspace;
   hid_t prop;
-  herr_t status;
   if (forkeys) {
     hsize_t dims[1] = {0};
     hsize_t maxdims[1] = {H5S_UNLIMITED};
@@ -469,9 +495,18 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
     dspace = H5Screate_simple(1, dims, maxdims);
     prop = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_chunk(prop, 1, chunkdims);
-    if (status > 0) 
-      throw IOError("could not create table " + name);
+    if (status < 0) 
+      throw IOError("could not create HDF5 array " + name);
   } else {
+    hsize_t dims[CYCLUS_SHA1_NINT] = {0, 0, 0, 0, 0};
+    hsize_t maxdims[CYCLUS_SHA1_NINT] = {UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX};
+    hsize_t chunkdims[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};  // this is a single element
+    dt = vldts_[dbtype];
+    dspace = H5Screate_simple(CYCLUS_SHA1_NINT, dims, maxdims);
+    prop = H5Pcreate(H5P_DATASET_CREATE);
+    status = H5Pset_chunk(prop, CYCLUS_SHA1_NINT, chunkdims);
+    if (status < 0) 
+      throw IOError("could not create HDF5 array " + name);
   }
   dset = H5Dcreate2(file_, name.c_str(), dt, dspace, H5P_DEFAULT, prop, H5P_DEFAULT);
   vldatasets_[name] = dset;

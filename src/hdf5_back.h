@@ -75,6 +75,9 @@ class Hdf5Back : public FullBackend {
   /// @return the dataset identifier
   hid_t VLDataset(DbTypes dbtype, bool forkeys=true);
 
+  /// A class to help with hashing variable length datatypes
+  Sha1 hasher_;
+
   /// A reference to a database.
   hid_t file_;
   /// The HDF5 UUID type, 16 byte char string.
@@ -97,6 +100,8 @@ class Hdf5Back : public FullBackend {
   std::map<std::string, size_t> tbl_size_;
   std::map<std::string, DbTypes*> tbl_types_;
   std::map<std::string, hid_t> vldatasets_;
+  std::map<DbTypes, hid_t> vldts_;
+  std::map<DbTypes, std::set<Digest> > vlkeys_;
 };
 
 } // namespace cyclus
