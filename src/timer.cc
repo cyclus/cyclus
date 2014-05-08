@@ -37,6 +37,10 @@ void Timer::RunSim() {
       SimInit::Snapshot(ctx_);
     }
 
+    if (want_kill_) {
+      break;
+    }
+
     time_++;
   }
 }
@@ -139,7 +143,7 @@ int Timer::dur() {
   return si_.duration;
 }
 
-Timer::Timer() : time_(0), si_(0), want_snapshot_(false) {}
+Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
 } // namespace cyclus
 
