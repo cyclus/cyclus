@@ -264,13 +264,13 @@ void SimInit::LoadInitialAgents() {
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
-      m->DoRegistration();
+      m->EnterNotify();
     } else if (agents_.count(parentid) > 0) { // parent is built
       m->Connect(agents_[parentid]);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
-      m->DoRegistration();
+      m->EnterNotify();
     } else { // parent not built yet
       ++it;
     }

@@ -32,8 +32,8 @@ void Facility::Build(Agent* parent) {
   Agent::Build(parent);
 }
 
-void Facility::DoRegistration() {
-  Agent::DoRegistration();
+void Facility::EnterNotify() {
+  Agent::EnterNotify();
   context()->RegisterTrader(this);
   context()->RegisterTimeListener(this);
 }

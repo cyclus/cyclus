@@ -68,7 +68,7 @@ class Institution : public Agent, public TimeListener {
    */
   virtual void Build(Agent* parent);
 
-  virtual void DoRegistration();
+  virtual void EnterNotify();
 
   virtual void Decommission();
 

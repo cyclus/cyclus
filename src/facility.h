@@ -100,7 +100,7 @@ class Facility : public TimeListener, public Agent, public Trader {
    */
   virtual void Build(Agent* parent = NULL);
 
-  virtual void DoRegistration();
+  virtual void EnterNotify();
 
   /**
      decommissions the facility, default behavior is for the facility

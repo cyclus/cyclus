@@ -169,8 +169,8 @@ class Agent : public StateWrangler {
   /// ticks/tocks and resource exchange).  Note that this may be called more
   /// than once, and so agents should track their registrations carefully. If
   /// agents implement this method, they must call their superclass's
-  /// DoRegistration method at the BEGINNING of their DoRegistration method.
-  virtual void DoRegistration();
+  /// EnterNotify method at the BEGINNING of their EnterNotify method.
+  virtual void EnterNotify();
 
   /// Called when a new child of this agent has just been built. It is possible
   /// for this method to be called before the simulation has started when
