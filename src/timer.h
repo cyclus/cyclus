@@ -49,8 +49,12 @@ class Timer {
   /// timestep t.
   void SchedDecom(Agent* m, int time);
 
-  /// Makes a snapshot of the simulation state to the output database.
+  /// Schedules a snapshot of simulation state to output database to occur at
+  /// the end of this timestep.
   void Snapshot() { want_snapshot_ = true; };
+
+  /// Schedules the simulation to be terminated at the end of this timestep.
+  void KillSim() { want_kill_ = true; };
 
   /// Returns the current time, in months since the simulation started.
   ///
@@ -90,6 +94,7 @@ class Timer {
   SimInfo si_;
 
   bool want_snapshot_;
+  bool want_kill_;
 
   /// Concrete agents that desire to receive tick and tock notifications
   std::set<TimeListener*> tickers_;

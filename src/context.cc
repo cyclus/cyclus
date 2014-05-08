@@ -130,5 +130,9 @@ void Context::Snapshot() {
   ti_->Snapshot();
 }
 
+void Context::KillSim() {
+  ti_->KillSim();
+}
+
 }  // namespace cyclus
 
