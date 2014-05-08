@@ -214,6 +214,7 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
     boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
     stmt->BindBlob(index, ui.data, 16);
     break;
+  default: // templated type
   }
 }
 
@@ -320,8 +321,6 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
     type_map[&typeid(std::map<std::string, boost::uuids::uuid>)] = MAP_VL_STRING_UUID;
     type_map[&typeid(std::map<std::string, std::string>)] = MAP_VL_STRING_VL_STRING;
   }
-
-  boost::spirit::hold_any m = 1;
 
   const std::type_info* ti = &v.type();
   if (type_map.count(ti) == 0) {
