@@ -64,6 +64,11 @@ class Hdf5Back : public FullBackend {
   /// \{
   template <typename T, DbTypes U>
   Digest VLWrite(T x);
+
+  template <typename T, DbTypes U>
+  inline Digest VLWrite(const boost::spirit::hold_any* x) {
+    return VLWrite<T, U>(x->cast<T>());
+  };
   /// \}
 
   /// Gets an HDF5 reference dataset for a variable length datatype

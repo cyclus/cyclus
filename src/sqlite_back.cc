@@ -193,28 +193,33 @@ void SqliteBack::WriteDatum(Datum* d) {
 void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt,
                       int index) {
   switch (type) {
-  case INT:
+  case INT: {
     stmt->BindInt(index, v.cast<int>());
     break;
-  case DOUBLE:
+  }
+  case DOUBLE: {
     stmt->BindDouble(index, v.cast<double>());
     break;
-  case FLOAT:
+  }
+  case FLOAT: {
     stmt->BindDouble(index, v.cast<float>());
     break;
+  }
   case BLOB: {
       std::string s = v.cast<Blob>().str();
       stmt->BindBlob(index, s.c_str(), s.size());
       break;
     }
-  case VL_STRING:
+  case VL_STRING: {
     stmt->BindText(index, v.cast<std::string>().c_str());
     break;
-  case UUID:
+  }
+  case UUID: {
     boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
     stmt->BindBlob(index, ui.data, 16);
     break;
-  default: // templated type
+  }
+  default: {}// templated type
   }
 }
 

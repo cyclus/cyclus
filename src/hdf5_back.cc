@@ -405,7 +405,8 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           break;
         }
         case VL_STRING: {
-          throw IOError("variable length strings not yet implemented for HDF5.");
+          Digest key = VLWrite<std::string, VL_STRING>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
         case BLOB: {
@@ -438,7 +439,7 @@ Digest Hdf5Back::VLWrite(T x) {
   if (vlkeys_[U].count(key) == 1)
     return key;
   AppendVLKey(keysds, U, key);
-  InsertVLVal(valsds, U, x);
+  InsertVLVal(valsds, U, key, x);
   return key;
 }
 
