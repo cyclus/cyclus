@@ -164,7 +164,10 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case VL_STRING: {
-            throw IOError("variable length strings not yet implemented for HDF5.");
+            std::string x = VLRead<std::string, VL_STRING>(buf + offset);
+            is_valid_row = CmpConds<std::string>(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
             break;
           }
           case BLOB: {
@@ -176,7 +179,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           }
           case UUID: {
             boost::uuids::uuid x;
-            memcpy(buf + offset, &x, 16);
+            memcpy(&x, buf + offset, 16);
             is_valid_row = CmpConds<boost::uuids::uuid>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
@@ -427,6 +430,31 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
       offset += sizes[col];
     }
   }
+}
+
+template <typename T, DbTypes U>
+T Hdf5Back::VLRead(const char* rawkey) { 
+  hsize_t key[CYCLUS_SHA1_NINT];  // key is used as offset
+  memcpy(key, rawkey, CYCLUS_SHA1_SIZE);
+  hid_t dset = VLDataset(U, false);
+  hid_t dspace = H5Dget_space(dset);
+  hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+  hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
+  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, key, NULL, extent, NULL);
+  if (status < 0)
+    throw IOError("could not select hyperslab of value array for reading.");
+  char** buf = new char* [sizeof(char *)];
+  status = H5Dread(dset, vldts_[U], mspace, dspace, H5P_DEFAULT, buf);
+  if (status < 0)
+    throw IOError("failed to read in variable length data.");
+  T val = T(buf[0]);
+  status = H5Dvlen_reclaim(vldts_[U], dspace, H5P_DEFAULT, buf);
+  if (status < 0)
+    throw IOError("failed to reclaim variable lenght data space.");
+  delete[] buf;
+  H5Sclose(mspace);
+  H5Sclose(dspace);
+  return val;
 }
 
 template <typename T, DbTypes U>

@@ -57,6 +57,12 @@ class Hdf5Back : public FullBackend {
   void FillBuf(std::string title, char* buf, DatumList& group, size_t* sizes, 
                size_t rowsize);
 
+  /// Read variable length data from the database.
+  /// @param rawkey the SHA1 digest key as a byte array.
+  /// @return the value indicated by this type at this location.
+  template <typename T, DbTypes U>
+  T VLRead(const char* rawkey);
+
   /// Writes a variable length data to its on-disk bidirectional hash map.
   /// @param x the data to write.
   /// @param dbtype the data type of x.
