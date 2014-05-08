@@ -8,6 +8,7 @@
 
 #include "composition.h"
 #include "agent.h"
+#include "greedy_solver.h"
 #include "recorder.h"
 
 namespace cyclus {
@@ -170,8 +171,12 @@ class Context {
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
 
-  /// Makes a snapshot of the simulation state to the output database.
+  /// Schedules a snapshot of simulation state to output database to occur at
+  /// the end of the current timestep.
   void Snapshot();
+
+  /// Schedules the simulation to be terminated at the end of this timestep.
+  void KillSim();
 
   /// @return the next transaction id
   inline int NextTransactionID() {
@@ -180,6 +185,9 @@ class Context {
 
   /// Returns the exchange solver associated with this context
   ExchangeSolver* solver() {
+    if (solver_ == NULL) {
+      solver_ = new GreedySolver(false, NULL);
+    }
     return solver_;
   }
 
