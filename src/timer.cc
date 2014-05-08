@@ -37,8 +37,18 @@ void Timer::RunSim() {
       SimInit::Snapshot(ctx_);
     }
 
+    if (want_kill_) {
+      break;
+    }
+
     time_++;
   }
+
+  // FIXME: make the want_kill_ be stored as bool when backends support it
+  ctx_->NewDatum("Finish")
+      ->AddVal("EarlyTerm", (int)want_kill_)
+      ->AddVal("EndTime", time_)
+      ->Record();
 }
 
 void Timer::DoBuild() {
@@ -134,6 +144,7 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
     throw ValueError("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
   }
 
+  want_kill_ = false;
   ctx_ = ctx;
   time_ = 0;
   si_ = si;
@@ -143,7 +154,7 @@ int Timer::dur() {
   return si_.duration;
 }
 
-Timer::Timer() : time_(0), si_(0), want_snapshot_(false) {}
+Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
 } // namespace cyclus
 
