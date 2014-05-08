@@ -249,7 +249,6 @@ void SimInit::LoadInitialAgents() {
       m->Agent::InitFrom(&pi);
       pi = PrefixInjector(&ci, "AgentState" + m->agent_impl());
       m->InitFrom(&pi);
-      ctx_->RegisterAgent(m);
     }
   }
 

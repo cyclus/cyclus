@@ -33,6 +33,7 @@ void Facility::Build(Agent* parent) {
 }
 
 void Facility::DoRegistration() {
+  Agent::DoRegistration();
   context()->RegisterTrader(this);
   context()->RegisterTimeListener(this);
 }

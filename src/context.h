@@ -87,18 +87,6 @@ class Context {
   /// Adds a prototype to a simulation-wide accessible list.
   void AddPrototype(std::string name, Agent* m);
 
-  /// Registers an agent as a participant in the simulation. 
-  inline void RegisterAgent(Agent* a) {
-    n_prototypes_[a->prototype()]++;
-    n_agent_impls_[a->agent_impl()]++;
-  }
-
-  /// Unregisters an agent as a participant in the simulation.
-  inline void UnregisterAgent(Agent* a) {
-    n_prototypes_[a->prototype()]--;
-    n_agent_impls_[a->agent_impl()]--;
-  }
-
   /// Registers an agent as a participant in resource exchanges. Agents should
   /// register from their Deploy method.
   inline void RegisterTrader(Trader* e) {
@@ -213,6 +201,18 @@ class Context {
   }
   
  private:
+  /// Registers an agent as a participant in the simulation. 
+  inline void RegisterAgent(Agent* a) {
+    n_prototypes_[a->prototype()]++;
+    n_agent_impls_[a->agent_impl()]++;
+  }
+
+  /// Unregisters an agent as a participant in the simulation.
+  inline void UnregisterAgent(Agent* a) {
+    n_prototypes_[a->prototype()]--;
+    n_agent_impls_[a->agent_impl()]--;
+  }
+
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Agent*> agent_list_;
