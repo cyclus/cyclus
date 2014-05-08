@@ -59,9 +59,11 @@ class Hdf5Back : public FullBackend {
 
   /// Writes a variable length data to its on-disk bidirectional hash map.
   /// @param x the data to write.
+  /// @param dbtype the data type of x.
   /// @return the key of x, which is a SHA1 hash as len-5 an array of ints.
   /// \{
-  Digest VLWrite(std::string x);
+  template <typename T, DbTypes U>
+  Digest VLWrite(T x);
   /// \}
 
   /// Gets an HDF5 reference dataset for a variable length datatype
@@ -81,6 +83,8 @@ class Hdf5Back : public FullBackend {
   /// @param dbtype the variable length data type
   /// @param key the SHA1 digest to append
   void AppendVLKey(hid_t dset, DbTypes dbtype, Digest key);
+
+  void InsertVLVal(hid_t dset, DbTypes dbtype, Digest key, std::string val);
 
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;

@@ -428,18 +428,17 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
   }
 }
 
-Digest Hdf5Back::VLWrite(std::string x) {
+template <typename T, DbTypes U>
+Digest Hdf5Back::VLWrite(T x) {
   hasher_.Clear();
   hasher_.Update(x);
   Digest key = hasher_.digest();
-  hid_t keysds = VLDataset(VL_STRING, true);
-  hid_t valsds = VLDataset(VL_STRING, false);
-  if (vlkeys_[VL_STRING].count(key) == 1)
+  hid_t keysds = VLDataset(U, true);
+  hid_t valsds = VLDataset(U, false);
+  if (vlkeys_[U].count(key) == 1)
     return key;
-
-  AppendVLKey(keysds, VL_STRING, key);
-  // add value to dataset 
-
+  AppendVLKey(keysds, U, key);
+  InsertVLVal(valsds, U, x);
   return key;
 }
 
@@ -536,5 +535,20 @@ void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, Digest key) {
   H5Sclose(dspace);
   vlkeys_[dbtype].insert(key);
 }
+
+void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, Digest key, std::string val) {
+  hid_t dspace = H5Dget_space(dset);
+  hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+  hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
+  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) key.val, 
+                                      NULL, extent, NULL);
+  if (status < 0)
+    throw IOError("could not select hyperslab of value array.");
+  status = H5Dwrite(dset, vldts_[dbtype], mspace, dspace, H5P_DEFAULT, val.c_str());
+  if (status < 0)
+    throw IOError("could not write string to value array.");
+  H5Sclose(mspace);
+  H5Sclose(dspace);
+};
 
 } // namespace cyclus
