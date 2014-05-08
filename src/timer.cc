@@ -48,7 +48,11 @@ void Timer::DoBuild() {
     Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
     Agent* parent = build_list[i].second;
     m->Build(parent);
-    parent->BuildNotify(m);
+    if (parent != NULL) {
+      parent->BuildNotify(m);
+    } else {
+      CLOG(LEV_INFO1) << "Hey! Listen! Built an Agent without a Parent.";
+    }
   }
 }
 

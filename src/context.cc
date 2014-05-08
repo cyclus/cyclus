@@ -40,6 +40,7 @@ void Context::DelAgent(Agent* m) {
   int n = agent_list_.erase(m);
   if (n == 1) {
     delete m;
+    m = NULL;
   }
 }
 
