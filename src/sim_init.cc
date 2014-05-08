@@ -190,7 +190,7 @@ void SimInit::LoadPrototypes() {
     std::string impl = qr.GetVal<std::string>("Implementation", i);
 
     Agent* m = DynamicModule::Make(ctx_, impl);
-    m->set_agent_impl(impl);
+    m->agent_impl(impl);
 
     std::vector<Cond> conds;
     conds.push_back(Cond("SimTime", "==", t_));
@@ -237,7 +237,7 @@ void SimInit::LoadInitialAgents() {
       // agent-kernel init
       m->prototype_ = proto;
       m->id_ = id;
-      m->set_agent_impl(qentry.GetVal<std::string>("Implementation", i));
+      m->agent_impl(qentry.GetVal<std::string>("Implementation", i));
       m->enter_time_ = qentry.GetVal<int>("EnterTime", i);
       unbuilt[id] = m;
       parentmap[id] = qentry.GetVal<int>("ParentId", i);
@@ -264,13 +264,13 @@ void SimInit::LoadInitialAgents() {
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
-      m->DoRegistration();
+      m->EnterNotify();
     } else if (agents_.count(parentid) > 0) { // parent is built
       m->Connect(agents_[parentid]);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
-      m->DoRegistration();
+      m->EnterNotify();
     } else { // parent not built yet
       ++it;
     }

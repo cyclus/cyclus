@@ -167,8 +167,10 @@ class Agent : public StateWrangler {
 
   /// Called to give the agent an opportunity to register for services (e.g.
   /// ticks/tocks and resource exchange).  Note that this may be called more
-  /// than once, and so agents should track their registrations carefully.
-  virtual void DoRegistration() {};
+  /// than once, and so agents should track their registrations carefully. If
+  /// agents implement this method, they must call their superclass's
+  /// EnterNotify method at the BEGINNING of their EnterNotify method.
+  virtual void EnterNotify();
 
   /// Called when a new child of this agent has just been built. It is possible
   /// for this method to be called before the simulation has started when
@@ -204,6 +206,9 @@ class Agent : public StateWrangler {
   /// get agent instance name
   inline const std::string prototype() const { return prototype_; }
 
+  /// set agent instance name
+  inline void prototype(std::string p) { prototype_ = p; }
+
   /// get agent instance ID
   inline const int id() const { return id_; }
 
@@ -211,7 +216,7 @@ class Agent : public StateWrangler {
   inline std::string agent_impl() {return agent_impl_;}
 
   /// set agent implementation
-  inline void set_agent_impl(std::string new_impl) {agent_impl_ = new_impl;}
+  inline void agent_impl(std::string new_impl) {agent_impl_ = new_impl;}
 
   /// returns a string that describes the agent subclass (e.g. Region, etc.)
   inline const std::string kind() const {return kind_;};

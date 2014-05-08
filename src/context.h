@@ -8,6 +8,7 @@
 
 #include "composition.h"
 #include "agent.h"
+#include "greedy_solver.h"
 #include "recorder.h"
 
 namespace cyclus {
@@ -170,8 +171,12 @@ class Context {
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
 
-  /// Makes a snapshot of the simulation state to the output database.
+  /// Schedules a snapshot of simulation state to output database to occur at
+  /// the end of the current timestep.
   void Snapshot();
+
+  /// Schedules the simulation to be terminated at the end of this timestep.
+  void KillSim();
 
   /// @return the next transaction id
   inline int NextTransactionID() {
@@ -180,6 +185,9 @@ class Context {
 
   /// Returns the exchange solver associated with this context
   ExchangeSolver* solver() {
+    if (solver_ == NULL) {
+      solver_ = new GreedySolver(false, NULL);
+    }
     return solver_;
   }
 
@@ -188,12 +196,38 @@ class Context {
     solver_ = solver;
   }
 
+  /// @return the number of agents of a given prototype currently in the
+  /// simulation
+  inline int n_prototypes(std::string type) {
+    return n_prototypes_[type];
+  }
+
+  /// @return the number of agents of a given implementation currently in the
+  /// simulation
+  inline int n_agent_impls(std::string impl) {
+    return n_agent_impls_[impl];
+  }
+  
  private:
+  /// Registers an agent as a participant in the simulation. 
+  inline void RegisterAgent(Agent* a) {
+    n_prototypes_[a->prototype()]++;
+    n_agent_impls_[a->agent_impl()]++;
+  }
+
+  /// Unregisters an agent as a participant in the simulation.
+  inline void UnregisterAgent(Agent* a) {
+    n_prototypes_[a->prototype()]--;
+    n_agent_impls_[a->agent_impl()]--;
+  }
+
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
-
+  std::map<std::string, int> n_prototypes_;
+  std::map<std::string, int> n_agent_impls_;
+  
   SimInfo si_;
   Timer* ti_;
   ExchangeSolver* solver_;

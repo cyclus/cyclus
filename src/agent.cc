@@ -114,8 +114,12 @@ void Agent::Build(Agent* parent) {
 
   Connect(parent);
   enter_time_ = ctx_->time();
-  DoRegistration();
+  EnterNotify();
   this->AddToTable();
+}
+
+void Agent::EnterNotify() {
+  ctx_->RegisterAgent(this);
 }
 
 void Agent::Connect(Agent* parent) {
@@ -136,6 +140,7 @@ void Agent::Decommission() {
   ->AddVal("AgentId", id())
   ->AddVal("ExitTime", ctx_->time())
   ->Record();
+  ctx_->UnregisterAgent(this);
   ctx_->DelAgent(this);
 }
 

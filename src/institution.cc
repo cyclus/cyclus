@@ -35,7 +35,7 @@ void Institution::Build(Agent* parent) {
   Agent::Build(parent);
 }
 
-void Institution::DoRegistration() {
+void Institution::EnterNotify() {
   context()->RegisterTimeListener(this);
 }
 

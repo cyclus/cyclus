@@ -80,6 +80,25 @@ struct MatConverter2 : public Converter<Material> {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExXlateTests, NegPref) {
+  double pref = -1;
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  Request<Material>::Ptr req =
+      rp->AddRequest(get_mat(u235, qty), trader, "", pref);
+  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+  Bid<Material>::Ptr bid = bp->AddBid(req, get_mat(u235, qty), trader);
+  ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());  
+
+  ExchangeContext<Material> ctx;
+  ctx.AddRequestPortfolio(rp);
+  ctx.AddBidPortfolio(bp);
+  ExchangeTranslator<Material> xlator(&ctx);
+    
+  xlator.AddArc(req, bid, graph);
+  EXPECT_EQ(graph->arcs().size(), 0);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateCapacities) {
   Material::Ptr mat = get_mat(u235, qty);
 

@@ -58,7 +58,7 @@ void XMLFlatLoader::LoadInitialAgents() {
     std::string prototype = qe->GetString("name");
 
     Agent* agent = DynamicModule::Make(ctx_, module_name);
-    agent->set_agent_impl(module_name);
+    agent->agent_impl(module_name);
 
     // call manually without agent impl injected to keep all Agent state in a
     // single, consolidated db table

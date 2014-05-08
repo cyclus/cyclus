@@ -40,6 +40,7 @@ void Context::DelAgent(Agent* m) {
   int n = agent_list_.erase(m);
   if (n == 1) {
     delete m;
+    m = NULL;
   }
 }
 
@@ -127,6 +128,10 @@ Datum* Context::NewDatum(std::string title) {
 
 void Context::Snapshot() {
   ti_->Snapshot();
+}
+
+void Context::KillSim() {
+  ti_->KillSim();
 }
 
 }  // namespace cyclus
