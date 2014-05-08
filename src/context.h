@@ -8,6 +8,7 @@
 
 #include "composition.h"
 #include "agent.h"
+#include "greedy_solver.h"
 #include "recorder.h"
 
 namespace cyclus {
@@ -184,6 +185,9 @@ class Context {
 
   /// Returns the exchange solver associated with this context
   ExchangeSolver* solver() {
+    if (solver_ == NULL) {
+      solver_ = new GreedySolver(false, NULL);
+    }
     return solver_;
   }
 
