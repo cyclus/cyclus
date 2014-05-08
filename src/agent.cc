@@ -114,9 +114,12 @@ void Agent::Build(Agent* parent) {
 
   Connect(parent);
   enter_time_ = ctx_->time();
-  ctx_->RegisterAgent(this);
-  DoRegistration();
+  EnterNotify();
   this->AddToTable();
+}
+
+void Agent::EnterNotify() {
+  ctx_->RegisterAgent(this);
 }
 
 void Agent::Connect(Agent* parent) {

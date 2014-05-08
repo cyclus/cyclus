@@ -27,7 +27,7 @@ void Region::Build(Agent* parent) {
   Agent::Build(parent);
 }
 
-void Region::DoRegistration() {
+void Region::EnterNotify() {
   context()->RegisterTimeListener(this);
 }
 

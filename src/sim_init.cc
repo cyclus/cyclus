@@ -249,7 +249,6 @@ void SimInit::LoadInitialAgents() {
       m->Agent::InitFrom(&pi);
       pi = PrefixInjector(&ci, "AgentState" + m->agent_impl());
       m->InitFrom(&pi);
-      ctx_->RegisterAgent(m);
     }
   }
 
@@ -265,13 +264,13 @@ void SimInit::LoadInitialAgents() {
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
-      m->DoRegistration();
+      m->EnterNotify();
     } else if (agents_.count(parentid) > 0) { // parent is built
       m->Connect(agents_[parentid]);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
-      m->DoRegistration();
+      m->EnterNotify();
     } else { // parent not built yet
       ++it;
     }
