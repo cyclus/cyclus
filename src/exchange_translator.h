@@ -63,7 +63,7 @@ class ExchangeTranslator {
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
         typename Bid<T>::Ptr bid = *b_it;
         typename Request<T>::Ptr req = bid->request();
-        AddArc(bid, req, graph);
+        AddArc(req, bid, graph);
       }
     }
     
@@ -72,7 +72,7 @@ class ExchangeTranslator {
 
   /// @brief adds a bid-request arc to a graph, if the preference for the arc is
   /// non-negative
-  void AddArc(typename Bid<T>::Ptr bid, typename Request<T>::Ptr req,
+  void AddArc(typename Request<T>::Ptr req, typename Bid<T>::Ptr bid, 
               ExchangeGraph::Ptr graph) {
     double pref =
         ex_ctx_->trader_prefs.at(req->requester())[req][bid];
