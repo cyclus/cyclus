@@ -63,30 +63,36 @@ class ExchangeTranslator {
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
         typename Bid<T>::Ptr bid = *b_it;
         typename Request<T>::Ptr req = bid->request();
-        double pref =
-            ex_ctx_->trader_prefs.at(req->requester())[req][bid];
-        
-        if (pref < 0) {
-          CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
-        } else {
-          // get translated arc
-          Arc a = TranslateArc(xlation_ctx_, bid);
-          
-          a.unode()->prefs[a] = pref; // request node is a.unode()
-          int n_prefs = a.unode()->prefs.size();
-          
-          CLOG(LEV_DEBUG5) << "Updating preference for one of "
-                           << req->requester()->manager()->prototype()
-                           << "'s trade nodes:";
-          CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-          
-          graph->AddArc(a);
-        }
+        AddArc(bid, req, graph);
       }
     }
     
     return graph;
   };
+
+  /// @brief adds a bid-request arc to a graph, if the preference for the arc is
+  /// non-negative
+  void AddArc(typename Bid<T>::Ptr bid, typename Request<T>::Ptr req,
+              ExchangeGraph::Ptr graph) {
+    double pref =
+        ex_ctx_->trader_prefs.at(req->requester())[req][bid];
+    if (pref < 0) {
+      CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
+    } else {
+      // get translated arc
+      Arc a = TranslateArc(xlation_ctx_, bid);
+          
+      a.unode()->prefs[a] = pref; // request node is a.unode()
+      int n_prefs = a.unode()->prefs.size();
+          
+      CLOG(LEV_DEBUG5) << "Updating preference for one of "
+                       << req->requester()->manager()->prototype()
+                       << "'s trade nodes:";
+      CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
+          
+      graph->AddArc(a);
+    }
+  }
   
   /// @brief Provide a vector of Trades given a vector of Matches
   void BackTranslateSolution(const std::vector<Match>& matches,
@@ -125,7 +131,6 @@ template <class T>
   translation_ctx.bid_to_node[b] = n;
   translation_ctx.node_to_bid[n] = b;
 }
-  
 
 /// @brief translates a request portfolio by adding request nodes and
 /// accounting for capacities. Request unit capcities must be added when arcs
