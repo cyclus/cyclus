@@ -342,6 +342,53 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
 class Digest {
  public:
   unsigned int val[CYCLUS_SHA1_NINT];
+
+  // operators
+  inline friend std::ostream& operator<<(std::ostream& out, const cyclus::Digest& d) {
+    return out << "[" << d.val[0] << ", " << d.val[1] << ", " <<  d.val[2] << \
+                  ", " << d.val[3] << ", " << d.val[4] << "]";
+  };
+
+  inline friend bool operator< (const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+    bool rtn = false;
+    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
+      if (lhs.val[i] < rhs.val[i]) {
+        rtn = true;
+        break;
+      } else if (lhs.val[i] > rhs.val[i]) {
+        rtn = false;
+        break;
+      } // else they are equal and we need to check the next index
+    }
+    return rtn;
+  };
+
+  inline friend bool operator> (const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+    return rhs < lhs;
+  };
+
+  inline friend bool operator<=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+    return !(lhs > rhs);
+  };
+
+  inline friend bool operator>=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+    return !(lhs < rhs);
+  };
+
+  inline friend bool operator==(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+    bool rtn = true;
+    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
+      if (lhs.val[i] != rhs.val[i]) {
+        rtn = false;
+        break;
+      } // else they are equal and we need to check the next index.
+    }
+    return rtn;
+  };
+
+  inline friend bool operator!=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+    return !(lhs == rhs);
+  };
 };
 
 class Sha1 {
@@ -366,56 +413,5 @@ class Sha1 {
   boost::uuids::detail::sha1 hash_;
 };
 
-} // namespace cyclus
-
-//
-// Digest functions
-//
-inline std::ostream& operator<<(std::ostream& out, const cyclus::Digest& d) {
-   return out << "[" << d.val[0] << ", " << d.val[1] << ", " <<  d.val[2] << \
-                 ", " << d.val[3] << ", " << d.val[4] << "]";
-}
-
-inline bool operator< (const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-  bool rtn = false;
-  for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-    if (lhs.val[i] < rhs.val[i]) {
-      rtn = true;
-      break;
-    } else if (lhs.val[i] > rhs.val[i]) {
-      rtn = false;
-      break;
-    } // else they are equal and we need to check the next index
-  }
-  return rtn;
-}
-
-inline bool operator> (const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-  return rhs < lhs;
-}
-
-inline bool operator<=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-  return !(lhs > rhs);
-}
-
-inline bool operator>=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-  return !(lhs < rhs);
-}
-
-inline bool operator==(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-  bool rtn = true;
-  for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-    if (lhs.val[i] != rhs.val[i]) {
-      rtn = false;
-      break;
-    } // else they are equal and we need to check the next index.
-  }
-  return rtn;
-}
-
-inline bool operator!=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-  return !(lhs == rhs);
-}
-
+}; // namespace cyclus
 #endif
-
