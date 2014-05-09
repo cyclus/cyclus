@@ -156,7 +156,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           case STRING: {
             std::string x = std::string(buf + offset, tbl_sizes_[table][j]);
             size_t nullpos = x.find('\0');
-            if (nullpos >= 0)
+            if (nullpos != std::string::npos)
               x.resize(nullpos);
             is_valid_row = CmpConds<std::string>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)

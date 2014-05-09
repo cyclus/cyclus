@@ -103,30 +103,62 @@ TEST(Hdf5BackTest, ReadWrite) {
   EXPECT_EQ(qr.rows.size(), 1);
 }
 
+//
+// Test helpers
+//
+
 template <typename T>
-cyclus::QueryResult Hdf5ReadWriteResultBasic(const char* fpath, T x, T y) {
+cyclus::QueryResult Hdf5ReadWriteResultBasic(const char* fpath, T x, T y, 
+                                             cyclus::Datum::Shape shape = NULL) {
   FileDeleter fd(fpath);
   cyclus::Recorder m;
   cyclus::Hdf5Back back(fpath);
   m.RegisterBackend(&back);
   m.NewDatum("data")
-  ->AddVal("x", x)
+  ->AddVal("x", x, shape)
   ->Record();
   m.NewDatum("data")
-  ->AddVal("x", y)
+  ->AddVal("x", y, shape)
   ->Record();
   m.Close();
   return back.Query("data", NULL);
 }
 
 template <typename T>
-void Hdf5ReadWriteTestBasic(const char* fpath, T x, T y) {
-  cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<T>(fpath, x, y);
-  int obsx = qr.GetVal<T>("x", 0);
+void Hdf5ReadWriteTestBasic(const char* fpath, T x, T y, 
+                            cyclus::Datum::Shape shape = NULL) {
+  cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<T>(fpath, x, y, shape);
+  T obsx = qr.GetVal<T>("x", 0);
   EXPECT_EQ(x, obsx);
-  int obsy = qr.GetVal<T>("x", 1);
+  T obsy = qr.GetVal<T>("x", 1);
   EXPECT_EQ(y, obsy);
 }
+
+template <>
+void Hdf5ReadWriteTestBasic<std::string>(const char* fpath, std::string x, std::string y, 
+                                         cyclus::Datum::Shape shape) {
+  cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<std::string>(fpath, x, y, shape);
+  std::string obsx = qr.GetVal<std::string>("x", 0);
+  EXPECT_STREQ(x.c_str(), obsx.c_str());
+  std::string obsy = qr.GetVal<std::string>("x", 1);
+  EXPECT_STREQ(y.c_str(), obsy.c_str());
+}
+
+template <>
+void Hdf5ReadWriteTestBasic<cyclus::Blob>(const char* fpath, cyclus::Blob x, 
+                                          cyclus::Blob y, 
+                                          cyclus::Datum::Shape shape) {
+  using cyclus::Blob;
+  cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<Blob>(fpath, x, y, shape);
+  Blob obsx = qr.GetVal<Blob>("x", 0);
+  EXPECT_STREQ(x.str().c_str(), obsx.str().c_str());
+  Blob obsy = qr.GetVal<Blob>("x", 1);
+  EXPECT_STREQ(y.str().c_str(), obsy.str().c_str());
+}
+
+//
+// Actual unit tests
+//
 
 TEST(Hdf5BackTest, ReadWriteInt) {
   Hdf5ReadWriteTestBasic<int>("int.h5", 42, 43);
@@ -140,31 +172,27 @@ TEST(Hdf5BackTest, ReadWriteDouble) {
   Hdf5ReadWriteTestBasic<double>("double.h5", 42.0, 43.0);
 }
 
-TEST(Hdf5BackTest, ReadWriteVLString) {
-  using std::string;
-  using cyclus::Recorder;
-  using cyclus::Hdf5Back;
-  const char* fpath = "vlstring.h5";
-  FileDeleter fd(fpath);
-
-  string x = "wakka";
-  string y = "jawaka";
-
-  // creation
-  Recorder m;
-  Hdf5Back back(fpath);
-  m.RegisterBackend(&back);
-  m.NewDatum("data")
-  ->AddVal("x", x)
-  ->Record();
-  //m.NewDatum("data")
-  //->AddVal("x", y)
-  //->Record();
-  m.Close();
-
-  cyclus::QueryResult qr = back.Query("data", NULL);
-  std::string obsx = qr.GetVal<std::string>("x", 0);
-  EXPECT_STREQ(x.c_str(), obsx.c_str());
-  //std::string obsy = qr.GetVal<std::string>("x", 1);
-  //EXPECT_STREQ(y.c_str(), obsy.c_str());
+TEST(Hdf5BackTest, ReadWriteString) {
+  std::vector<int> shape(1);
+  shape[0] = 6;
+  Hdf5ReadWriteTestBasic<std::string>("string.h5", "wakka", "jawaka", &shape);
 }
+
+TEST(Hdf5BackTest, ReadWriteVLString) {
+  Hdf5ReadWriteTestBasic<std::string>("vlstring.h5", "wakka", "jawaka", NULL);
+}
+
+TEST(Hdf5BackTest, ReadWriteBlob) {
+  using cyclus::Blob;
+  Hdf5ReadWriteTestBasic<Blob>("blob.h5", Blob("wakka"), Blob("jawaka"), NULL);
+}
+
+TEST(Hdf5BackTest, ReadWriteUuid) {
+  using boost::uuids::uuid;
+  uuid x = {0x12 ,0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56,
+            0x78, 0x90, 0xab, 0xcd, 0xef};
+  uuid y = {0x42 ,0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
+            0x42, 0x42, 0x42, 0x42, 0x42};
+  Hdf5ReadWriteTestBasic<uuid>("uuid.h5", x, y);
+}
+
