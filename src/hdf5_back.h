@@ -109,9 +109,15 @@ class Hdf5Back : public FullBackend {
                    hvl_t buf);
   /// \}
 
+  /// Converts a value to a variable length buffer for HDF5.
+  /// \{
   hvl_t VLValToBuf(const std::vector<int>& x);
+  /// \}
 
+  /// Converts a variable length buffer to a value for HDF5.
+  /// \{
   std::vector<int> VLBufToVal(const hvl_t& buf);
+  /// \}
 
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;

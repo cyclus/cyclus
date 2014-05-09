@@ -213,7 +213,7 @@ TEST(Hdf5BackTest, ReadWriteVLVectorInt) {
   vector<int> y = vector<int>(42);
   for (int i = 0; i < 42; ++i)
     y[i] = 42;
-  Hdf5ReadWriteTestBasic<vector<int> >("vector_int.h5", x, y);
+  Hdf5ReadWriteTestBasic<vector<int> >("vl_vector_int.h5", x, y);
 }
 
 
