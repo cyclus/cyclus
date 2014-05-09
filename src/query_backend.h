@@ -345,7 +345,7 @@ class Digest {
 
   /// Casts the value of this digest to a vector of the templated type.
   template <typename T>
-  inline std::vector<T> cast() {
+  inline std::vector<T> cast() const {
     std::vector<T> rtn = std::vector<T>(CYCLUS_SHA1_NINT);
     for (unsigned int i = 0; i < CYCLUS_SHA1_NINT; ++i)
       rtn[i] = (T) val[i];
@@ -408,10 +408,10 @@ class Sha1 {
   inline void Clear() {hash_.reset();};
 
   /// Updates the hash value with a string.
-  inline void Update(std::string s) {
+  inline void Update(const std::string& s) {
     hash_.process_bytes(s.c_str(), s.size());
   };
-  inline void Update(Blob b) { Update(b.str()); };
+  inline void Update(const Blob& b) { Update(b.str()); };
 
   Digest digest() {
     Digest d;

@@ -69,7 +69,7 @@ class Hdf5Back : public FullBackend {
   /// @return the key of x, which is a SHA1 hash as len-5 an array of ints.
   /// \{
   template <typename T, DbTypes U>
-  Digest VLWrite(T x);
+  Digest VLWrite(const T& x);
 
   template <typename T, DbTypes U>
   inline Digest VLWrite(const boost::spirit::hold_any* x) {
@@ -93,9 +93,9 @@ class Hdf5Back : public FullBackend {
   /// @param dset an open HDF5 dataset
   /// @param dbtype the variable length data type
   /// @param key the SHA1 digest to append
-  void AppendVLKey(hid_t dset, DbTypes dbtype, Digest key);
+  void AppendVLKey(hid_t dset, DbTypes dbtype, const Digest& key);
 
-  void InsertVLVal(hid_t dset, DbTypes dbtype, Digest key, std::string val);
+  void InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key, const std::string& val);
 
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;

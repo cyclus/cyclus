@@ -460,7 +460,7 @@ T Hdf5Back::VLRead(const char* rawkey) {
 }
 
 template <typename T, DbTypes U>
-Digest Hdf5Back::VLWrite(T x) {
+Digest Hdf5Back::VLWrite(const T& x) {
   hasher_.Clear();
   hasher_.Update(x);
   Digest key = hasher_.digest();
@@ -474,7 +474,7 @@ Digest Hdf5Back::VLWrite(T x) {
 }
 
 template <>
-Digest Hdf5Back::VLWrite<std::string, VL_STRING>(std::string x) {
+Digest Hdf5Back::VLWrite<std::string, VL_STRING>(const std::string& x) {
   hasher_.Clear();
   hasher_.Update(x);
   Digest key = hasher_.digest();
@@ -488,7 +488,7 @@ Digest Hdf5Back::VLWrite<std::string, VL_STRING>(std::string x) {
 }
 
 template <>
-Digest Hdf5Back::VLWrite<Blob, BLOB>(Blob x) {
+Digest Hdf5Back::VLWrite<Blob, BLOB>(const Blob& x) {
   hasher_.Clear();
   hasher_.Update(x);
   Digest key = hasher_.digest();
@@ -573,7 +573,7 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
   return dset;  
 }
 
-void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, Digest key) {
+void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, const Digest& key) {
   hid_t dspace = H5Dget_space(dset);
   hsize_t origlen = H5Sget_simple_extent_npoints(dspace);
   hsize_t newlen[1] = {origlen + 1};
@@ -595,7 +595,8 @@ void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, Digest key) {
   vlkeys_[dbtype].insert(key);
 }
 
-void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, Digest key, std::string val) {
+void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key, 
+                           const std::string& val) {
   hid_t dspace = H5Dget_space(dset);
   hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
   hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
