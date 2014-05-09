@@ -103,6 +103,43 @@ TEST(Hdf5BackTest, ReadWrite) {
   EXPECT_EQ(qr.rows.size(), 1);
 }
 
+template <typename T>
+cyclus::QueryResult Hdf5ReadWriteResultBasic(const char* fpath, T x, T y) {
+  FileDeleter fd(fpath);
+  cyclus::Recorder m;
+  cyclus::Hdf5Back back(fpath);
+  m.RegisterBackend(&back);
+  m.NewDatum("data")
+  ->AddVal("x", x)
+  ->Record();
+  m.NewDatum("data")
+  ->AddVal("x", y)
+  ->Record();
+  m.Close();
+  return back.Query("data", NULL);
+}
+
+template <typename T>
+void Hdf5ReadWriteTestBasic(const char* fpath, T x, T y) {
+  cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<T>(fpath, x, y);
+  int obsx = qr.GetVal<T>("x", 0);
+  EXPECT_EQ(x, obsx);
+  int obsy = qr.GetVal<T>("x", 1);
+  EXPECT_EQ(y, obsy);
+}
+
+TEST(Hdf5BackTest, ReadWriteInt) {
+  Hdf5ReadWriteTestBasic<int>("int.h5", 42, 43);
+}
+
+TEST(Hdf5BackTest, ReadWriteFloat) {
+  Hdf5ReadWriteTestBasic<float>("float.h5", 42.0, 43.0);
+}
+
+TEST(Hdf5BackTest, ReadWriteDouble) {
+  Hdf5ReadWriteTestBasic<double>("double.h5", 42.0, 43.0);
+}
+
 TEST(Hdf5BackTest, ReadWriteVLString) {
   using std::string;
   using cyclus::Recorder;
@@ -111,6 +148,7 @@ TEST(Hdf5BackTest, ReadWriteVLString) {
   FileDeleter fd(fpath);
 
   string x = "wakka";
+  string y = "jawaka";
 
   // creation
   Recorder m;
@@ -119,9 +157,14 @@ TEST(Hdf5BackTest, ReadWriteVLString) {
   m.NewDatum("data")
   ->AddVal("x", x)
   ->Record();
+  //m.NewDatum("data")
+  //->AddVal("x", y)
+  //->Record();
   m.Close();
 
   cyclus::QueryResult qr = back.Query("data", NULL);
-  std::string obs = qr.GetVal<std::string>("x", 0);
-  EXPECT_STREQ(x.c_str(), obs.c_str());
+  std::string obsx = qr.GetVal<std::string>("x", 0);
+  EXPECT_STREQ(x.c_str(), obsx.c_str());
+  //std::string obsy = qr.GetVal<std::string>("x", 1);
+  //EXPECT_STREQ(y.c_str(), obsy.c_str());
 }

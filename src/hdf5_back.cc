@@ -190,10 +190,13 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           break;
         offset += tbl_sizes_[table][j];
       }
-      if (is_valid_row) 
+      if (is_valid_row) {
         qr.rows.push_back(row);
-      row.clear();
-      row.reserve(nfields);
+        QueryRow row = QueryRow(nfields);
+      } else {
+        row.clear();
+        row.reserve(nfields);
+      }
     }
     delete[] buf;
     H5Sclose(memspace);
