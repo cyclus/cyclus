@@ -31,14 +31,13 @@ TEST(Hdf5BackTest, ReadWrite) {
   double d = 2.2;
   float f = 3.3;
   std::string str = "apple";
-  const char* blob = "banana";
 
   size_t strsize = str.size() + 1;
-  size_t sizes[] = {16, sizeof(int), sizeof(float), sizeof(double), sizeof(char*)};
+  size_t sizes[] = {16, sizeof(int), sizeof(float), sizeof(double)};
   size_t offsets[] = {0, sizes[0], sizes[0] + sizes[1], sizes[0] + sizes[1] +
-                      sizes[2], sizes[0] + sizes[1] + sizes[2] + sizes[3]};
-  size_t size = sizes[0] + sizes[1] + sizes[2] + sizes[3] + sizes[4];
-  const char* field_names = "string,int,float,double,blob";
+                      sizes[2]};
+  size_t size = sizes[0] + sizes[1] + sizes[2] + sizes[3];
+  const char* field_names = "string,int,float,double";
   char buf[size];
 
   // creation
@@ -52,7 +51,6 @@ TEST(Hdf5BackTest, ReadWrite) {
   ->AddVal("int", i)
   ->AddVal("float", f)
   ->AddVal("double", d)
-  ->AddVal("blob", cyclus::Blob(blob))
   ->Record();
   m.Close();
 
@@ -65,25 +63,22 @@ TEST(Hdf5BackTest, ReadWrite) {
   float f2 = 0;
   double d2 = 0;
   char str2[strsize];
-  char* blob2;
   memcpy(&str2, buf + offsets[0], strsize);
   memcpy(&i2, buf + offsets[1], sizes[1]);
   memcpy(&f2, buf + offsets[2], sizes[2]);
   memcpy(&d2, buf + offsets[3], sizes[3]);
-  memcpy(&blob2, buf + offsets[4], sizes[4]);
 
   EXPECT_STREQ(str.c_str(), str2);
   EXPECT_EQ(i, i2);
   EXPECT_FLOAT_EQ(f, f2);
   EXPECT_DOUBLE_EQ(d, d2);
-  EXPECT_STREQ(blob, blob2);
 
   H5Fclose(file);
 
   // query read
-  string expfields[] = {"SimId", "string", "int", "float", "double", "blob"};
+  string expfields[] = {"SimId", "string", "int", "float", "double"};
   cyclus::DbTypes exptypes[] = {cyclus::UUID, cyclus::STRING, cyclus::INT, 
-                                cyclus::FLOAT, cyclus::DOUBLE, cyclus::BLOB};
+                                cyclus::FLOAT, cyclus::DOUBLE};
   cyclus::QueryResult qr = back.Query("DumbTitle", NULL);
   for (int i = 0; i < qr.fields.size(); i++) {
     EXPECT_STREQ(qr.fields[i].c_str(), expfields[i].c_str());

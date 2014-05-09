@@ -408,9 +408,10 @@ class Sha1 {
   inline void Clear() {hash_.reset();};
 
   /// Updates the hash value with a string.
-  void Update(std::string s) {
+  inline void Update(std::string s) {
     hash_.process_bytes(s.c_str(), s.size());
   };
+  inline void Update(Blob b) { Update(b.str()); };
 
   Digest digest() {
     Digest d;

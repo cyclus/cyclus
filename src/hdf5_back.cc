@@ -416,7 +416,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           break;
         }
         case BLOB: {
-          Digest key = VLWrite<Blob, Blob>(a);
+          Digest key = VLWrite<Blob, BLOB>(a);
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
@@ -470,6 +470,34 @@ Digest Hdf5Back::VLWrite(T x) {
     return key;
   AppendVLKey(keysds, U, key);
   InsertVLVal(valsds, U, key, x);
+  return key;
+}
+
+template <>
+Digest Hdf5Back::VLWrite<std::string, VL_STRING>(std::string x) {
+  hasher_.Clear();
+  hasher_.Update(x);
+  Digest key = hasher_.digest();
+  hid_t keysds = VLDataset(VL_STRING, true);
+  hid_t valsds = VLDataset(VL_STRING, false);
+  if (vlkeys_[VL_STRING].count(key) == 1)
+    return key;
+  AppendVLKey(keysds, VL_STRING, key);
+  InsertVLVal(valsds, VL_STRING, key, x);
+  return key;
+}
+
+template <>
+Digest Hdf5Back::VLWrite<Blob, BLOB>(Blob x) {
+  hasher_.Clear();
+  hasher_.Update(x);
+  Digest key = hasher_.digest();
+  hid_t keysds = VLDataset(BLOB, true);
+  hid_t valsds = VLDataset(BLOB, false);
+  if (vlkeys_[BLOB].count(key) == 1)
+    return key;
+  AppendVLKey(keysds, BLOB, key);
+  InsertVLVal(valsds, BLOB, key, x.str());
   return key;
 }
 
