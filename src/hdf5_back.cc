@@ -129,7 +129,10 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
       for (j = 0; j < nfields; ++j) {
         switch (qr.types[j]) {
           case BOOL: {
-            throw IOError("booleans not yet implemented for HDF5.");
+            bool x = *reinterpret_cast<bool*>(buf + offset);
+            is_valid_row = CmpConds<bool>(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
             break;
           }
           case INT: {
@@ -391,10 +394,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
       vals = (*it)->vals();
       const boost::spirit::hold_any* a = &(vals[col].second);
       switch (dbtypes[col]) {
-        case BOOL: {
-          throw IOError("booleans not yet implemented for HDF5.");
-          break;
-        }
+        case BOOL:
         case INT:
         case FLOAT:
         case DOUBLE: {
