@@ -171,7 +171,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case BLOB: {
-            Blob x (std::string(buf + offset, sizeof(char *)));
+            Blob x = VLRead<Blob, BLOB>(buf + offset);
             is_valid_row = CmpConds<Blob>(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
@@ -316,7 +316,7 @@ void Hdf5Back::CreateTable(Datum* d) {
       }
     } else if (valtype == typeid(Blob)) {
       dbtypes[i] = BLOB;
-      field_types[i] = blob_type_;
+      field_types[i] = sha1_type_;
       dst_sizes[i] = CYCLUS_SHA1_SIZE;
       dst_size += CYCLUS_SHA1_SIZE;
     } else if (valtype == typeid(boost::uuids::uuid)) {
@@ -416,12 +416,8 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           break;
         }
         case BLOB: {
-          // TODO: fix this memory leak, but the copied bytes must remain
-          // valid until the hdf5 file is flushed or closed.
-          std::string s = a->cast<Blob>().str();
-          char* v = new char[strlen(s.c_str())];
-          strcpy(v, s.c_str());
-          memcpy(buf + offset, &v, sizes[col]);
+          Digest key = VLWrite<Blob, Blob>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
         case UUID: {
