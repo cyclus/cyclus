@@ -188,6 +188,19 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case VECTOR_INT: {
+            std::vector<int> x = std::vector<int>(tbl_sizes_[table][j] / sizeof(int));
+            memcpy(&x[0], buf + offset, tbl_sizes_[table][j]);
+            is_valid_row = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
+          default: {
+            throw IOError("querying column '" + qr.fields[j] + "' in table '" + \
+                          table + "' failed due to unsupported data type.");
+            break;
+          }
         }
         if (!is_valid_row)
           break;
@@ -285,8 +298,7 @@ void Hdf5Back::CreateTable(Datum* d) {
       field_types[i] = H5T_NATIVE_CHAR;
       dst_sizes[i] = sizeof(char);
       dst_size += sizeof(char);
-    }
-    else if (valtype == typeid(int)) {
+    } else if (valtype == typeid(int)) {
       dbtypes[i] = INT;
       field_types[i] = H5T_NATIVE_INT;
       dst_sizes[i] = sizeof(int);
@@ -327,6 +339,23 @@ void Hdf5Back::CreateTable(Datum* d) {
       field_types[i] = uuid_type_;
       dst_sizes[i] = CYCLUS_UUID_SIZE;
       dst_size += CYCLUS_UUID_SIZE;
+    } else if (valtype == typeid(std::vector<int>)) {
+      shape = shapes[i];
+      if (shape == NULL || (*shape)[0] < 1) {
+        dbtypes[i] = VL_VECTOR_INT;
+        field_types[i] = sha1_type_;
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+        dst_size += CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = VECTOR_INT;
+        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = sizeof(int) * (*shape)[0];
+        dst_size += dst_sizes[i];
+      }
+    } else {
+      throw IOError("the type for column '" + std::string(field_names[i]) + \
+                    "is not yet supported in HDF5.");
     } 
   }
 
@@ -388,6 +417,8 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
 
   size_t offset = 0;
   const void* val;
+  size_t fieldlen;
+  size_t valuelen;
   DatumList::iterator it;
   for (it = group.begin(); it != group.end(); ++it) {
     for (int col = 0; col < ncols; ++col) {
@@ -404,10 +435,10 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         }
         case STRING: {
           const std::string s = a->cast<std::string>();
-          size_t fieldlen = sizes[col];
-          size_t slen = std::min(s.size(), fieldlen);
-          memcpy(buf + offset, s.c_str(), slen);
-          memset(buf + offset + slen, 0, fieldlen - slen);
+          fieldlen = sizes[col];
+          valuelen = std::min(s.size(), fieldlen);
+          memcpy(buf + offset, s.c_str(), valuelen);
+          memset(buf + offset + valuelen, 0, fieldlen - valuelen);
           break;
         }
         case VL_STRING: {
@@ -423,6 +454,14 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         case UUID: {
           boost::uuids::uuid uuid = a->cast<boost::uuids::uuid>();
           memcpy(buf + offset, &uuid, CYCLUS_UUID_SIZE);
+          break;
+        }
+        case VECTOR_INT: {
+          std::vector<int> val = a->cast<std::vector<int> >();
+          fieldlen = sizes[col];
+          valuelen = std::min(val.size() * sizeof(int), fieldlen);
+          memcpy(buf + offset, &val[0], valuelen);
+          memset(buf + offset + valuelen, 0, fieldlen - valuelen);
           break;
         }
       }

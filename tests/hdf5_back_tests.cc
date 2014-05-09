@@ -195,3 +195,15 @@ TEST(Hdf5BackTest, ReadWriteUuid) {
   Hdf5ReadWriteTestBasic<uuid>("uuid.h5", x, y);
 }
 
+TEST(Hdf5BackTest, ReadWriteVectorInt) {
+  using std::vector;
+  vector<int> shape(1);
+  shape[0] = 3;
+  int x_[] = {6, 28, 496};
+  vector<int> x = vector<int>(x_, x_+3);
+  int y_[] = {42, 43, 44};
+  vector<int> y = vector<int>(y_, y_+3);
+  Hdf5ReadWriteTestBasic<vector<int> >("vector_int.h5", x, y, &shape);
+}
+
+
