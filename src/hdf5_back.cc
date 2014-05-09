@@ -551,9 +551,10 @@ void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, Digest key) {
   hsize_t offset[1] = {origlen};
   hsize_t extent[1] = {1};
   hid_t mspace = H5Screate_simple(1, extent, NULL);
-  herr_t status = H5Dset_extent(dset, newlen);
+  herr_t status = H5Dextend(dset, newlen);
   if (status < 0)
     throw IOError("could not resize key array.");
+  dspace = H5Dget_space(dset);
   status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, offset, NULL, extent, NULL);
   if (status < 0)
     throw IOError("could not select hyperslab of key array.");
