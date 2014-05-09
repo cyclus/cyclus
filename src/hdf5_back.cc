@@ -8,6 +8,8 @@
 
 namespace cyclus {
 
+const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   hasher_ = Sha1();
   if (boost::filesystem::exists(path_))
@@ -77,6 +79,61 @@ void Hdf5Back::Notify(DatumList data) {
   for (it = groups.begin(); it != groups.end(); ++it) {
     WriteGroup(it->second);
   }
+}
+
+template <>
+std::string Hdf5Back::VLRead<std::string, VL_STRING>(const char* rawkey) { 
+  using std::string;
+  // key is used as offset
+  Digest key;
+  memcpy(key.val, rawkey, CYCLUS_SHA1_SIZE);
+  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  hid_t dset = VLDataset(VL_STRING, false);
+  hid_t dspace = H5Dget_space(dset);
+  hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, vlchunk_, NULL);
+  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
+                                      NULL, vlchunk_, NULL);
+  if (status < 0)
+    throw IOError("could not select hyperslab of string value array for reading.");
+  char** buf = new char* [sizeof(char *)];
+  status = H5Dread(dset, vldts_[VL_STRING], mspace, dspace, H5P_DEFAULT, buf);
+  if (status < 0)
+    throw IOError("failed to read in variable length string data.");
+  string val = string(buf[0]);
+  status = H5Dvlen_reclaim(vldts_[VL_STRING], mspace, H5P_DEFAULT, buf);
+  if (status < 0)
+    throw IOError("failed to reclaim variable length string data space.");
+  delete[] buf;
+  H5Sclose(mspace);
+  H5Sclose(dspace);
+  return val;
+}
+
+template <>
+Blob Hdf5Back::VLRead<Blob, BLOB>(const char* rawkey) { 
+  // key is used as offset
+  Digest key;
+  memcpy(key.val, rawkey, CYCLUS_SHA1_SIZE);
+  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  hid_t dset = VLDataset(BLOB, false);
+  hid_t dspace = H5Dget_space(dset);
+  hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, vlchunk_, NULL);
+  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
+                                      NULL, vlchunk_, NULL);
+  if (status < 0)
+    throw IOError("could not select hyperslab of value array for reading.");
+  char** buf = new char* [sizeof(char *)];
+  status = H5Dread(dset, vldts_[BLOB], mspace, dspace, H5P_DEFAULT, buf);
+  if (status < 0)
+    throw IOError("failed to read in variable length data.");
+  Blob val = Blob(buf[0]);
+  status = H5Dvlen_reclaim(vldts_[BLOB], mspace, H5P_DEFAULT, buf);
+  if (status < 0)
+    throw IOError("failed to reclaim variable lenght data space.");
+  delete[] buf;
+  H5Sclose(mspace);
+  H5Sclose(dspace);
+  return val;
 }
 
 QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
@@ -191,6 +248,13 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           case VECTOR_INT: {
             std::vector<int> x = std::vector<int>(tbl_sizes_[table][j] / sizeof(int));
             memcpy(&x[0], buf + offset, tbl_sizes_[table][j]);
+            is_valid_row = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
+          case VL_VECTOR_INT: {
+            std::vector<int> x = VLRead<std::vector<int>, VL_VECTOR_INT>(buf + offset);
             is_valid_row = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
@@ -344,6 +408,10 @@ void Hdf5Back::CreateTable(Datum* d) {
       if (shape == NULL || (*shape)[0] < 1) {
         dbtypes[i] = VL_VECTOR_INT;
         field_types[i] = sha1_type_;
+        if (vldts_.count(VL_VECTOR_INT) == 0) {
+          vldts_[VL_VECTOR_INT] = H5Tvlen_create(H5T_NATIVE_INT);
+          opened_types_.insert(vldts_[VL_VECTOR_INT]);
+        }
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
         dst_size += CYCLUS_SHA1_SIZE;
       } else {
@@ -464,6 +532,11 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           memset(buf + offset + valuelen, 0, fieldlen - valuelen);
           break;
         }
+        case VL_VECTOR_INT: {
+          Digest key = VLWrite<std::vector<int>, VL_VECTOR_INT>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
       }
       offset += sizes[col];
     }
@@ -478,21 +551,19 @@ T Hdf5Back::VLRead(const char* rawkey) {
   const std::vector<hsize_t> idx = key.cast<hsize_t>();
   hid_t dset = VLDataset(U, false);
   hid_t dspace = H5Dget_space(dset);
-  hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
-  hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
+  hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, vlchunk_, NULL);
   herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
-                                      NULL, extent, NULL);
+                                      NULL, vlchunk_, NULL);
   if (status < 0)
     throw IOError("could not select hyperslab of value array for reading.");
-  char** buf = new char* [sizeof(char *)];
-  status = H5Dread(dset, vldts_[U], mspace, dspace, H5P_DEFAULT, buf);
+  hvl_t buf;
+  status = H5Dread(dset, vldts_[U], mspace, dspace, H5P_DEFAULT, &buf);
   if (status < 0)
     throw IOError("failed to read in variable length data.");
-  T val = T(buf[0]);
-  status = H5Dvlen_reclaim(vldts_[U], mspace, H5P_DEFAULT, buf);
+  T val = VLBufToVal(buf);
+  status = H5Dvlen_reclaim(vldts_[U], mspace, H5P_DEFAULT, &buf);
   if (status < 0)
     throw IOError("failed to reclaim variable lenght data space.");
-  delete[] buf;
   H5Sclose(mspace);
   H5Sclose(dspace);
   return val;
@@ -507,8 +578,9 @@ Digest Hdf5Back::VLWrite(const T& x) {
   hid_t valsds = VLDataset(U, false);
   if (vlkeys_[U].count(key) == 1)
     return key;
+  hvl_t buf = VLValToBuf(x);
   AppendVLKey(keysds, U, key);
-  InsertVLVal(valsds, U, key, x);
+  InsertVLVal(valsds, U, key, buf);
   return key;
 }
 
@@ -650,6 +722,41 @@ void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
     throw IOError("could not write string to value array.");
   H5Sclose(mspace);
   H5Sclose(dspace);
+};
+
+void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key, 
+                           hvl_t buf) {
+  hid_t dspace = H5Dget_space(dset);
+  hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+  hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
+  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
+                                      NULL, extent, NULL);
+  if (status < 0)
+    throw IOError("could not select hyperslab of value array.");
+  status = H5Dwrite(dset, vldts_[dbtype], mspace, dspace, H5P_DEFAULT, &buf);
+  if (status < 0)
+    throw IOError("could not write variable length data to value array.");
+  status = H5Dvlen_reclaim(vldts_[dbtype], mspace, H5P_DEFAULT, &buf);
+  if (status < 0)
+    throw IOError("could not free variable length buffer.");
+  H5Sclose(mspace);
+  H5Sclose(dspace);
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::vector<int>& x) {
+  hvl_t buf;
+  buf.len = x.size();
+  size_t nbytes = buf.len * sizeof(int);
+  buf.p = new char[nbytes];
+  memcpy(buf.p, &x[0], nbytes);
+  return buf;
+};
+
+std::vector<int> Hdf5Back::VLBufToVal(const hvl_t& buf) {
+  std::vector<int> x = std::vector<int>(buf.len);
+  memcpy(&x[0], buf.p, buf.len * sizeof(int));
+  return x;
 };
 
 } // namespace cyclus

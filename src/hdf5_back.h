@@ -95,7 +95,23 @@ class Hdf5Back : public FullBackend {
   /// @param key the SHA1 digest to append
   void AppendVLKey(hid_t dset, DbTypes dbtype, const Digest& key);
 
-  void InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key, const std::string& val);
+
+  /// Inserts a variable length data into it value dataset
+  ///
+  /// @param dset an open HDF5 dataset
+  /// @param dbtype the variable length data type
+  /// @param key the SHA1 digest to append
+  /// @param buf the value or buffer to insert
+  /// \{
+  void InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key, 
+                   const std::string& val);
+  void InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key, 
+                   hvl_t buf);
+  /// \}
+
+  hvl_t VLValToBuf(const std::vector<int>& x);
+
+  std::vector<int> VLBufToVal(const hvl_t& buf);
 
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;
@@ -110,6 +126,9 @@ class Hdf5Back : public FullBackend {
   hid_t vlstr_type_;
   /// The HDF5 Blob type, variable length string.
   hid_t blob_type_;
+
+  /// Variable length value chunk size and extent
+  static const hsize_t vlchunk_[CYCLUS_SHA1_NINT];
 
   /// Listing of types opened here so that we may close them.
   std::set<hid_t> opened_types_;

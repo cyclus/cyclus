@@ -206,4 +206,14 @@ TEST(Hdf5BackTest, ReadWriteVectorInt) {
   Hdf5ReadWriteTestBasic<vector<int> >("vector_int.h5", x, y, &shape);
 }
 
+TEST(Hdf5BackTest, ReadWriteVLVectorInt) {
+  using std::vector;
+  int x_[] = {6, 28, 496, 8128};
+  vector<int> x = vector<int>(x_, x_+4);
+  vector<int> y = vector<int>(42);
+  for (int i = 0; i < 42; ++i)
+    y[i] = 42;
+  Hdf5ReadWriteTestBasic<vector<int> >("vector_int.h5", x, y);
+}
+
 

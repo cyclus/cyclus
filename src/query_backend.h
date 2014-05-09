@@ -407,11 +407,18 @@ class Sha1 {
   /// Clears the current hash value to its default state.
   inline void Clear() {hash_.reset();};
 
-  /// Updates the hash value with a string.
+  /// Updates the hash value in-place.
+  /// \{
   inline void Update(const std::string& s) {
     hash_.process_bytes(s.c_str(), s.size());
   };
+
   inline void Update(const Blob& b) { Update(b.str()); };
+
+  inline void Update(const std::vector<int>& x) { 
+    hash_.process_bytes(&x[0], x.size() * sizeof(int));
+  };
+  /// \}
 
   Digest digest() {
     Digest d;
