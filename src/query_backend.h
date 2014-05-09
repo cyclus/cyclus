@@ -343,6 +343,7 @@ class Digest {
  public:
   unsigned int val[CYCLUS_SHA1_NINT];
 
+  /// Casts the value of this digest to a vector of the templated type.
   template <typename T>
   inline std::vector<T> cast() {
     std::vector<T> rtn = std::vector<T>(CYCLUS_SHA1_NINT);

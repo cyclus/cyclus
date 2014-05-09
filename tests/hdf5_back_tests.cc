@@ -121,7 +121,7 @@ TEST(Hdf5BackTest, ReadWriteVLString) {
   ->Record();
   m.Close();
 
-  //cyclus::QueryResult qr = back.Query("data", NULL);
-  //std::string obs = qr.GetVal<std::string>("x", 0);
-  //EXPECT_STREQ(x.c_str(), obs.c_str());
+  cyclus::QueryResult qr = back.Query("data", NULL);
+  std::string obs = qr.GetVal<std::string>("x", 0);
+  EXPECT_STREQ(x.c_str(), obs.c_str());
 }

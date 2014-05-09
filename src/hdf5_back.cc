@@ -434,13 +434,16 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
 
 template <typename T, DbTypes U>
 T Hdf5Back::VLRead(const char* rawkey) { 
-  hsize_t key[CYCLUS_SHA1_NINT];  // key is used as offset
-  memcpy(key, rawkey, CYCLUS_SHA1_SIZE);
+  // key is used as offset
+  Digest key;
+  memcpy(key.val, rawkey, CYCLUS_SHA1_SIZE);
+  const std::vector<hsize_t> idx = key.cast<hsize_t>();
   hid_t dset = VLDataset(U, false);
   hid_t dspace = H5Dget_space(dset);
   hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
   hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
-  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, key, NULL, extent, NULL);
+  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
+                                      NULL, extent, NULL);
   if (status < 0)
     throw IOError("could not select hyperslab of value array for reading.");
   char** buf = new char* [sizeof(char *)];
@@ -448,7 +451,7 @@ T Hdf5Back::VLRead(const char* rawkey) {
   if (status < 0)
     throw IOError("failed to read in variable length data.");
   T val = T(buf[0]);
-  status = H5Dvlen_reclaim(vldts_[U], dspace, H5P_DEFAULT, buf);
+  status = H5Dvlen_reclaim(vldts_[U], mspace, H5P_DEFAULT, buf);
   if (status < 0)
     throw IOError("failed to reclaim variable lenght data space.");
   delete[] buf;
