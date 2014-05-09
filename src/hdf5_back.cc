@@ -467,7 +467,7 @@ Digest Hdf5Back::VLWrite(T x) {
   if (vlkeys_[U].count(key) == 1)
     return key;
   AppendVLKey(keysds, U, key);
-  //InsertVLVal(valsds, U, key, x);
+  InsertVLVal(valsds, U, key, x);
   return key;
 }
 
@@ -529,11 +529,10 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
     if (status < 0) 
       throw IOError("could not create HDF5 array " + name);
   } else {
-    hsize_t dims[CYCLUS_SHA1_NINT] = {0, 0, 0, 0, 0};
-    hsize_t maxdims[CYCLUS_SHA1_NINT] = {UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX};
+    hsize_t dims[CYCLUS_SHA1_NINT] = {UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX};
     hsize_t chunkdims[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};  // this is a single element
     dt = vldts_[dbtype];
-    dspace = H5Screate_simple(CYCLUS_SHA1_NINT, dims, maxdims);
+    dspace = H5Screate_simple(CYCLUS_SHA1_NINT, dims, dims);
     prop = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_chunk(prop, CYCLUS_SHA1_NINT, chunkdims);
     if (status < 0) 
@@ -570,11 +569,13 @@ void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, Digest key, std::string v
   hid_t dspace = H5Dget_space(dset);
   hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
   hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
-  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) key.val, 
+  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
                                       NULL, extent, NULL);
   if (status < 0)
     throw IOError("could not select hyperslab of value array.");
-  status = H5Dwrite(dset, vldts_[dbtype], mspace, dspace, H5P_DEFAULT, val.c_str());
+  const char* buf[1] = {val.c_str()};
+  status = H5Dwrite(dset, vldts_[dbtype], mspace, dspace, H5P_DEFAULT, buf);
   if (status < 0)
     throw IOError("could not write string to value array.");
   H5Sclose(mspace);

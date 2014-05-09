@@ -343,6 +343,14 @@ class Digest {
  public:
   unsigned int val[CYCLUS_SHA1_NINT];
 
+  template <typename T>
+  inline std::vector<T> cast() {
+    std::vector<T> rtn = std::vector<T>(CYCLUS_SHA1_NINT);
+    for (unsigned int i = 0; i < CYCLUS_SHA1_NINT; ++i)
+      rtn[i] = (T) val[i];
+    return rtn;
+  };
+
   // operators
   inline friend std::ostream& operator<<(std::ostream& out, const cyclus::Digest& d) {
     return out << "[" << d.val[0] << ", " << d.val[1] << ", " <<  d.val[2] << \
