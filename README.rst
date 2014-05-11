@@ -26,7 +26,7 @@ Package                Minimum Version
 `libxml++`             2.6
 `python`               2.6
 `sqlite3`              3.7.10            
-`HDF5`                 1.8.0
+`HDF5`                 1.8.4
 `Coin-Cbc`             2.5
 ====================   ==================
 
