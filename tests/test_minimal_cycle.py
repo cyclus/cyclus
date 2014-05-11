@@ -11,15 +11,6 @@ from tools import check_cmd
 from helper import table_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, sha1array
 
-def hasher(x):
-    return int(sha1(x).hexdigest(), 16)
-
-def idx(h):
-    ind = [None] * 5
-    for i in range(4, -1, -1):
-        h, ind[i] = divmod(h, 2**32)
-    return tuple(ind)
-
 def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
     """Changes k_factor_in and k_factor_out for one facility.
 
