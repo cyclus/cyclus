@@ -16,11 +16,7 @@ def clean_outs():
 def table_exist(db, tables):
     """Checks if hdf5 database contains the specified tables.
     """
-    for t in tables:
-        if not db.__contains__(t):
-            return False
-
-    return True
+    return all([t in db.root for t in tables])
 
 def find_ids(data, data_table, id_table):
     """Finds ids of the specified data located in the specified data_table,

@@ -449,7 +449,7 @@ void Hdf5Back::CreateTable(Datum* d) {
 
   herr_t status;
   const char* title = d->title().c_str();
-  int compress = 1;
+  int compress = 0;
   int chunk_size = 1000;
   void* fill_data = NULL;
   void* data = NULL;
@@ -461,12 +461,11 @@ void Hdf5Back::CreateTable(Datum* d) {
 
   // add dbtypes attribute
   hid_t tb_set = H5Dopen2(file_, title, H5P_DEFAULT);
-  hid_t attr_space = H5Screate(H5S_SCALAR);
-  hid_t dbtypes_type = H5Tarray_create2(H5T_NATIVE_INT, 1, &nvals);
-  hid_t dbtypes_attr = H5Acreate2(tb_set, "cyclus_dbtypes", dbtypes_type, attr_space, H5P_DEFAULT, H5P_DEFAULT);
-  H5Awrite(dbtypes_attr, dbtypes_type, dbtypes);
+  hid_t attr_space = H5Screate_simple(1, &nvals, &nvals);
+  hid_t dbtypes_attr = H5Acreate2(tb_set, "cyclus_dbtypes", H5T_NATIVE_INT, 
+                                  attr_space, H5P_DEFAULT, H5P_DEFAULT);
+  H5Awrite(dbtypes_attr, H5T_NATIVE_INT, dbtypes);
   H5Aclose(dbtypes_attr);
-  H5Tclose(dbtypes_type);
   H5Sclose(attr_space);
   H5Dclose(tb_set);
 
