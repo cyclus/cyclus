@@ -489,7 +489,8 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
                               offsets, sizes, buf);
   if (status < 0) {
-    throw IOError("Failed to write some data to hdf5 output db");
+    throw IOError("Failed to write some data to the '" + title + "' table in "
+                  "the hdf5 database.");
   }
   delete[] buf;
 }
