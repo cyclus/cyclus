@@ -9,7 +9,16 @@ import tables
 import numpy as np
 from tools import check_cmd
 from helper import table_exist, find_ids, exit_times, create_sim_input, \
-    h5out, sqliteout, clean_outs
+    h5out, sqliteout, clean_outs, sha1array
+
+def hasher(x):
+    return int(sha1(x).hexdigest(), 16)
+
+def idx(h):
+    ind = [None] * 5
+    for i in range(4, -1, -1):
+        h, ind[i] = divmod(h, 2**32)
+    return tuple(ind)
 
 def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
     """Changes k_factor_in and k_factor_out for one facility.
@@ -104,7 +113,6 @@ def test_minimal_cycle():
             clean_outs()
             sim_input = change_minimal_input(ref_input, k_factor_a, k_factor_b)
 
-            print("x1")
             holdsrtn = [1]  # needed because nose does not send() to test generator
             cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
             yield check_cmd, cmd, '.', holdsrtn
@@ -112,61 +120,45 @@ def test_minimal_cycle():
             if rtn != 0:
                 return  # don't execute further commands
 
-            print("x2")
             output = tables.open_file(h5out, mode = "r")
-            print("x2.1")
             # tables of interest
             paths = ["/AgentEntry", "/Resources", "/Transactions",
                     "/Info"]
-            print("x2.2")
             # Check if these tables exist
             yield assert_true, table_exist(output, paths)
-            print("x2.3")
             if not table_exist(output, paths):
                 output.close()
                 clean_outs()
                 return  # don't execute further commands
-            print("x3")
 
             # Get specific tables and columns
             #agent_entry = output.get_node("/AgentEntry")[:]
             print(output.root.AgentEntry)
-            #agent_entry = output.root.AgentEntry[:]
-            print("x3.1")
+            agent_entry = output.root.AgentEntry[:]
             info = output.get_node("/Info")[:]
-            print("x3.2")
             resources = output.get_node("/Resources")[:]
-            print("x3.3")
             transactions = output.get_node("/Transactions")[:]
-            print("x4")
 
             # Find agent ids
             agent_ids = agent_entry["AgentId"]
             agent_impl = agent_entry["Implementation"]
             agent_protos = agent_entry["Prototype"]
             duration = info["Duration"][0]
-            print("x5")
 
             facility_id = find_ids("KFacility", agent_impl, agent_ids)
             # Test for two KFacility
             yield assert_equal, len(facility_id), 2
-            print("x6")
 
             # Test for one Facility A and Facility B
             facility_a = find_ids("FacilityA", agent_protos, agent_ids)
             facility_b = find_ids("FacilityB", agent_protos, agent_ids)
             yield assert_equal, len(facility_a), 1
-            print("x7")
             yield assert_equal, len(facility_b), 1
-            print("x8")
 
             # Test if both facilities are KFracilities
             # Assume FacilityA is deployed first according to the schema
-            print("x9")
             yield assert_equal, facility_a[0], facility_id[0]
-            print("x10")
             yield assert_equal, facility_b[0], facility_id[1]
-            print("x11")
 
             # Test if the transactions are strictly between Facility A and
             # Facility B. There are no Facility A to Facility A or vice versa.
@@ -176,30 +168,24 @@ def test_minimal_cycle():
             pattern_two = np.arange(1, sender_ids.size, 2)
             pattern_a = pattern_one  # expected pattern for Facility A as a sender
             pattern_b = pattern_two  # expected pattern for Facility B as a sender
-            print("x12")
 
             # Re-assign in case the expected patterns are incorrect
             if sender_ids[0] == facility_b[0]:
                 pattern_a = pattern_two
                 pattern_b = pattern_one
 
-            print("x13")
             yield assert_array_equal, np.where(sender_ids == facility_a[0])[0], \
                 pattern_a
-            print("x14")
             yield assert_array_equal, np.where(receiver_ids == facility_a[0])[0], \
                 pattern_b  # reverse pattern when acted as a receiver
 
-            print("x15")
             yield assert_array_equal, np.where(sender_ids == facility_b[0])[0], \
                 pattern_b
-            print("x16")
             yield assert_array_equal, np.where(receiver_ids == facility_b[0])[0], \
                 pattern_a  # reverse pattern when acted as a receiver
 
             # Transaction ids must be equal range from 1 to the number of rows
             expected_trans_ids = np.arange(sender_ids.size)
-            print("x17")
             yield assert_array_equal, transactions["TransactionId"], expected_trans_ids
 
             # When k_factors are very low and the simulation time is big
@@ -207,7 +193,6 @@ def test_minimal_cycle():
             # limit cyclus::eps() for transaction amounts.
             # Expect not to have shortened transactions, so for two facilities,
             # there must be (2 * duration) number of transactions.
-            print("x18")
             yield assert_equal, sender_ids.size, 2 * duration
 
             # Track transacted resources
@@ -218,14 +203,12 @@ def test_minimal_cycle():
             init_capacity_b = quantities[1]
             j = 0
             for p in pattern_a:
-                print("x19." + p)
                 yield assert_almost_equal, quantities[p], \
                     init_capacity_a * k_factor_a ** j
                 j += 1
 
             j = 0
             for p in pattern_b:
-                print("x20." + p)
                 yield assert_almost_equal, quantities[p], \
                     init_capacity_b * k_factor_b ** j
                 j += 1
