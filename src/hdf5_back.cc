@@ -69,8 +69,12 @@ void Hdf5Back::Notify(DatumList data) {
   for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
     std::string name = (*it)->title();
     if (tbl_size_.count(name) == 0) {
-      Datum* d = *it;
-      CreateTable(d);
+      if (H5Lexists(file_, name.c_str(), H5P_DEFAULT)) {
+        LoadTableTypes(name, (*it)->vals().size());
+      } else {
+        Datum* d = *it;
+        CreateTable(d);
+      }
     }
     groups[name].push_back(*it);
   }
@@ -296,7 +300,7 @@ QueryResult Hdf5Back::GetTableInfo(std::string title, hid_t dset, hid_t dt) {
   hsize_t ncols = H5Tget_nmembers(dt);
   std::string fieldname;
   std::string fieldtype;
-  LoadTableTypes(title, dset, ncols);
+  //LoadTableTypes(title, dset, ncols);
   DbTypes* dbtypes = tbl_types_[title];
 
   QueryResult qr;
@@ -322,6 +326,22 @@ void Hdf5Back::LoadTableTypes(std::string title, hid_t dset, hsize_t ncols) {
   if (tbl_types_.count(title) > 0)
     return;
 
+  int i;
+  hid_t subt;
+  hid_t t = H5Dget_type(dset);
+  tbl_size_[title] = H5Tget_size(t);
+  size_t* offsets = new size_t[ncols];
+  size_t* sizes = new size_t[ncols];
+  for (i = 0; i < ncols; ++i) {
+    offsets[i] = H5Tget_member_offset(t, i);
+    subt = H5Tget_member_type(t, i);
+    sizes[i] = H5Tget_size(subt);
+    H5Tclose(subt);
+  }
+  H5Tclose(t);
+  tbl_offset_[title] = offsets;
+  tbl_sizes_[title] = sizes;
+
   // get types from db
   int dbt[ncols];
   hid_t dbtypes_attr = H5Aopen(dset, "cyclus_dbtypes", H5P_DEFAULT);
@@ -330,9 +350,9 @@ void Hdf5Back::LoadTableTypes(std::string title, hid_t dset, hsize_t ncols) {
   H5Tclose(dbtypes_type);
   H5Aclose(dbtypes_attr);
 
-  // store types on class
+  // store types
   DbTypes* dbtypes = new DbTypes[ncols];
-  for (int i = 0; i < ncols; ++i)
+  for (i = 0; i < ncols; ++i)
     dbtypes[i] = static_cast<DbTypes>(dbt[i]);
   tbl_types_[title] = dbtypes;
 }
@@ -480,7 +500,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
   Datum::Vals vals;
   Datum::Vals header = group.front()->vals();
   int ncols = header.size();
-  LoadTableTypes(title, ncols);
+  //LoadTableTypes(title, ncols);
   DbTypes* dbtypes = tbl_types_[title];
 
   size_t offset = 0;
