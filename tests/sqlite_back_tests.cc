@@ -33,6 +33,7 @@ TEST(SqliteBackTest, Regression) {
       ->AddVal("animal", std::string("monkey"))
       ->AddVal("weight", 10)
       ->AddVal("height", 5.5)
+      ->AddVal("alive", true)
       ->AddVal("data", cyclus::Blob("banana"))
       ->Record();
 
@@ -40,14 +41,8 @@ TEST(SqliteBackTest, Regression) {
       ->AddVal("animal", std::string("elephant"))
       ->AddVal("weight", 1000)
       ->AddVal("height", 4.2)
+      ->AddVal("alive", false)
       ->AddVal("data", cyclus::Blob("a very large mammal"))
-      ->Record();
-
-  m.NewDatum("DumbTitle")
-      ->AddVal("animal", std::string("sea cucumber"))
-      ->AddVal("weight", 200)
-      ->AddVal("height", 1.2)
-      ->AddVal("data", cyclus::Blob("a very small vegetable"))
       ->Record();
 
   m.Close();
@@ -57,27 +52,22 @@ TEST(SqliteBackTest, Regression) {
   std::string animal = qr.GetVal<std::string>("animal", 0);
   int weight = qr.GetVal<int>("weight", 0);
   double height = qr.GetVal<double>("height", 0);
+  bool alive = qr.GetVal<bool>("alive", 0);
   cyclus::Blob data = qr.GetVal<cyclus::Blob>("data", 0);
   EXPECT_EQ("monkey", animal);
   EXPECT_EQ(10, weight);
   EXPECT_EQ(5.5, height);
+  EXPECT_EQ(true, alive);
   EXPECT_EQ("banana", data.str());
 
   animal = qr.GetVal<std::string>("animal", 1);
   weight = qr.GetVal<int>("weight", 1);
   height = qr.GetVal<double>("height", 1);
+  alive = qr.GetVal<bool>("alive", 1);
   data = qr.GetVal<cyclus::Blob>("data", 1);
   EXPECT_EQ("elephant", animal);
   EXPECT_EQ(1000, weight);
   EXPECT_DOUBLE_EQ(4.2, height);
+  EXPECT_EQ(false, alive);
   EXPECT_EQ("a very large mammal", data.str());
-
-  animal = qr.GetVal<std::string>("animal", 2);
-  weight = qr.GetVal<int>("weight", 2);
-  height = qr.GetVal<double>("height", 2);
-  data = qr.GetVal<cyclus::Blob>("data", 2);
-  EXPECT_EQ("sea cucumber", animal);
-  EXPECT_EQ(200, weight);
-  EXPECT_DOUBLE_EQ(1.2, height);
-  EXPECT_EQ("a very small vegetable", data.str());
 }
