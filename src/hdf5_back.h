@@ -100,6 +100,9 @@ class Hdf5Back : public FullBackend {
   void LoadTableTypes(std::string title, hid_t dset, hsize_t ncols);
   /// \}
 
+  /// Creates a fixed length HDF5 string type of length-n
+  hid_t CreateFLStrType(int n);
+
   /// Creates and initializes an hdf5 table with schema defined by d.
   void CreateTable(Datum* d);
 

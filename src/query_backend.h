@@ -447,6 +447,11 @@ class Sha1 {
     hash_.process_bytes(&x[0], x.size() * sizeof(int));
   };
 
+  inline void Update(const std::vector<std::string>& x) {
+    for (unsigned int i = 0; i < x.size(); ++i)
+      hash_.process_bytes(x[i].c_str(), x[i].size());
+  };
+
   inline void Update(const std::set<int>& x) { 
     std::set<int>::iterator it = x.begin();
     for(; it != x.end(); ++it)

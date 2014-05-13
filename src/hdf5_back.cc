@@ -141,6 +141,7 @@ Blob Hdf5Back::VLRead<Blob, BLOB>(const char* rawkey) {
 }
 
 QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
+  using std::string;
   using std::vector;
   using std::set;
   using std::list;
@@ -181,6 +182,8 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
     if (field_conds.count(qr.fields[i]) == 0)
       field_conds[qr.fields[i]] = std::vector<Cond*>();
   for (n; n < nchunks; ++n) {
+    // This loop is meant to be OpenMP-izable
+    hid_t field_type;
     hsize_t start = n * tb_chunksize;
     hsize_t count = (tb_length-start)<tb_chunksize ? tb_length - start : tb_chunksize;
     char* buf = new char [tb_typesize * count];
@@ -268,6 +271,25 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             is_valid_row = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
+            break;
+          }
+          case VECTOR_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int strlen = tbl_sizes_[table][j] / fieldlen;
+            vector<string> x = vector<string>(fieldlen);
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              x[k] = string(buf + offset + strlen*k, strlen);
+              nullpos = x[k].find('\0');
+              if (nullpos != std::string::npos)
+                x[k].resize(nullpos);
+            }
+            is_valid_row = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            H5Tclose(field_type);
             break;
           }
           case SET_INT: {
@@ -422,6 +444,14 @@ void Hdf5Back::LoadTableTypes(std::string title, hid_t dset, hsize_t ncols) {
   tbl_types_[title] = dbtypes;
 }
 
+hid_t Hdf5Back::CreateFLStrType(int n) {
+  hid_t str_type = H5Tcopy(H5T_C_S1);
+  H5Tset_size(str_type, n);
+  H5Tset_strpad(str_type, H5T_STR_NULLPAD);
+  opened_types_.insert(str_type);
+  return str_type;
+}
+
 std::string Hdf5Back::Name() {
   return path_;
 }
@@ -495,6 +525,37 @@ void Hdf5Back::CreateTable(Datum* d) {
         field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * (*shape)[0];
+      }
+    } else if (valtype == typeid(std::vector<std::string>)) {
+      shape = shapes[i];
+      if (shape == NULL || ((*shape)[0] < 1 && (*shape)[1] < 1)) {
+        dbtypes[i] = VL_VECTOR_VL_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_VECTOR_VL_STRING) == 0) {
+          vldts_[VL_VECTOR_VL_STRING] = H5Tvlen_create(H5T_NATIVE_INT);
+          opened_types_.insert(vldts_[VL_VECTOR_VL_STRING]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if ((*shape)[0] < 1 && (*shape)[1] >= 1) {
+        dbtypes[i] = VL_VECTOR_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_VECTOR_STRING) == 0) {
+          vldts_[VL_VECTOR_VL_STRING] = H5Tvlen_create(H5T_NATIVE_INT);
+          opened_types_.insert(vldts_[VL_VECTOR_STRING]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if ((*shape)[0] >= 1 && (*shape)[1] < 1) {
+        dbtypes[i] = VECTOR_VL_STRING;
+        field_types[i] = H5Tarray_create2(sha1_type_, 1, (hsize_t *) &(*shape)[0]);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = (*shape)[0] * CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = VECTOR_STRING;
+        hid_t str_type = CreateFLStrType((*shape)[1]);
+        hsize_t shape0 = (*shape)[0];
+        field_types[i] = H5Tarray_create2(str_type, 1, &shape0);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = (*shape)[0] * (*shape)[1];
       }
     } else if (valtype == typeid(std::set<int>)) {
       shape = shapes[i];
@@ -616,12 +677,15 @@ void Hdf5Back::WriteGroup(DatumList& group) {
 void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group, 
                        size_t* sizes, size_t rowsize) {
   using std::min;
+  using std::string;
   using std::vector;
   using std::set;
   using std::list;
   using std::pair;
   using std::map;
   Datum::Vals vals;
+  Datum::Shape shape;
+  Datum::Shapes shapes;
   Datum::Vals header = group.front()->vals();
   int ncols = header.size();
   //LoadTableTypes(title, ncols);
@@ -633,8 +697,9 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
   size_t valuelen;
   DatumList::iterator it;
   for (it = group.begin(); it != group.end(); ++it) {
+    vals = (*it)->vals();
+    shapes = (*it)->shapes();
     for (int col = 0; col < ncols; ++col) {
-      vals = (*it)->vals();
       const boost::spirit::hold_any* a = &(vals[col].second);
       switch (dbtypes[col]) {
         case BOOL:
@@ -679,6 +744,19 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         case VL_VECTOR_INT: {
           Digest key = VLWrite<std::vector<int>, VL_VECTOR_INT>(a);
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case VECTOR_STRING: {
+          vector<string> val = a->cast<vector<string> >();
+          shape = shapes[col];
+          fieldlen = (*shape)[1];
+          unsigned int cnt = 0;
+          for (; cnt < val.size(); ++cnt) {
+            valuelen = std::min(val[cnt].size(), fieldlen);
+            memcpy(buf + offset + fieldlen*cnt, val[cnt].c_str(), valuelen);
+            memset(buf + offset + fieldlen*cnt + valuelen, 0, fieldlen - valuelen);
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * ((*shape)[0] - cnt));
           break;
         }
         case SET_INT: {
