@@ -236,3 +236,25 @@ TEST(Hdf5BackTest, ReadWriteVLSetInt) {
     y.insert(42 + i);
   Hdf5ReadWriteTestBasic<set<int> >("vl_set_int.h5", x, y);
 }
+
+TEST(Hdf5BackTest, ReadWriteListInt) {
+  using std::list;
+  std::vector<int> shape(1);
+  shape[0] = 3;
+  int x_[] = {6, 28, 496};
+  list<int> x = list<int>(x_, x_+3);
+  int y_[] = {42, 43, 44};
+  list<int> y = list<int>(y_, y_+3);
+  Hdf5ReadWriteTestBasic<list<int> >("list_int.h5", x, y, &shape);
+}
+
+TEST(Hdf5BackTest, ReadWriteVLListInt) {
+  using std::list;
+  int x_[] = {6, 28, 496, 8128};
+  list<int> x = list<int>(x_, x_+4);
+  list<int> y = list<int>();
+  for (int i = 0; i < 42; ++i)
+    y.push_back(42);
+  Hdf5ReadWriteTestBasic<list<int> >("vl_list_int.h5", x, y);
+}
+

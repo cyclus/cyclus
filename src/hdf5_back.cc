@@ -281,6 +281,22 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case LIST_INT: {
+            jlen = tbl_sizes_[table][j] / sizeof(int);
+            int* xraw = reinterpret_cast<int*>(buf + offset);
+            std::list<int> x = std::list<int>(xraw, xraw+jlen);
+            is_valid_row = CmpConds<std::list<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
+          case VL_LIST_INT: {
+            std::list<int> x = VLRead<std::list<int>, VL_LIST_INT>(buf + offset);
+            is_valid_row = CmpConds<std::list<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
           default: {
             throw IOError("querying column '" + qr.fields[j] + "' in table '" + \
                           table + "' failed due to unsupported data type.");
@@ -476,6 +492,24 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = sizeof(int) * (*shape)[0];
         dst_size += dst_sizes[i];
       }
+    } else if (valtype == typeid(std::list<int>)) {
+      shape = shapes[i];
+      if (shape == NULL || (*shape)[0] < 1) {
+        dbtypes[i] = VL_LIST_INT;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_LIST_INT) == 0) {
+          vldts_[VL_LIST_INT] = H5Tvlen_create(H5T_NATIVE_INT);
+          opened_types_.insert(vldts_[VL_LIST_INT]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+        dst_size += CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = LIST_INT;
+        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = sizeof(int) * (*shape)[0];
+        dst_size += dst_sizes[i];
+      }
     } else {
       throw IOError("the type for column '" + std::string(field_names[i]) + \
                     "is not yet supported in HDF5.");
@@ -609,6 +643,24 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
+        case LIST_INT: {
+          std::list<int> val = a->cast<std::list<int> >();
+          fieldlen = sizes[col];
+          valuelen = std::min(val.size() * sizeof(int), fieldlen);
+          unsigned int cnt = 0;
+          std::list<int>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            memcpy(buf + offset + cnt*sizeof(int), &(*valit), sizeof(int));
+            ++cnt;
+          }
+          memset(buf + offset + valuelen, 0, fieldlen - valuelen);
+          break;
+        }
+        case VL_LIST_INT: {
+          Digest key = VLWrite<std::list<int>, VL_LIST_INT>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
       }
       offset += sizes[col];
     }
@@ -693,6 +745,22 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
     }
     case BLOB: {
       name = "Blob";
+      break;
+    }
+    case VL_VECTOR_INT: {
+      name = "VectorInt";
+      break;
+    }
+    case VL_SET_INT: {
+      name = "SetInt";
+      break;
+    }
+    case VL_LIST_INT: {
+      name = "ListInt";
+      break;
+    }
+    default: {
+      throw IOError("could not determine variable length dataset name.");
       break;
     }
   }
@@ -850,6 +918,27 @@ template <>
 std::set<int> Hdf5Back::VLBufToVal<std::set<int> >(const hvl_t& buf) {
   int* xraw = reinterpret_cast<int*>(buf.p);
   std::set<int> x = std::set<int>(xraw, xraw+buf.len);
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::list<int>& x) {
+  hvl_t buf;
+  buf.len = x.size();
+  size_t nbytes = buf.len * sizeof(int);
+  buf.p = new char[nbytes];
+  unsigned int cnt = 0;
+  std::list<int>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    memcpy((char *) buf.p + cnt*sizeof(int), &(*it), sizeof(int));
+    ++cnt;
+  }
+  return buf;
+};
+
+template <>
+std::list<int> Hdf5Back::VLBufToVal<std::list<int> >(const hvl_t& buf) {
+  int* xraw = reinterpret_cast<int*>(buf.p);
+  std::list<int> x = std::list<int>(xraw, xraw+buf.len);
   return x;
 };
 
