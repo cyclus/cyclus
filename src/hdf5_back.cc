@@ -422,29 +422,24 @@ void Hdf5Back::CreateTable(Datum* d) {
       dbtypes[i] = BOOL;
       field_types[i] = H5T_NATIVE_CHAR;
       dst_sizes[i] = sizeof(char);
-      dst_size += sizeof(char);
     } else if (valtype == typeid(int)) {
       dbtypes[i] = INT;
       field_types[i] = H5T_NATIVE_INT;
       dst_sizes[i] = sizeof(int);
-      dst_size += sizeof(int);
     } else if (valtype == typeid(float)) {
       dbtypes[i] = FLOAT;
       field_types[i] = H5T_NATIVE_FLOAT;
       dst_sizes[i] = sizeof(float);
-      dst_size += sizeof(float);
     } else if (valtype == typeid(double)) {
       dbtypes[i] = DOUBLE;
       field_types[i] = H5T_NATIVE_DOUBLE;
       dst_sizes[i] = sizeof(double);
-      dst_size += sizeof(double);
     } else if (valtype == typeid(std::string)) {
       shape = shapes[i];
       if (shape == NULL || (*shape)[0] < 1) {
         dbtypes[i] = VL_STRING;
         field_types[i] = sha1_type_;
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
-        dst_size += CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = STRING;
         field_types[i] = H5Tcopy(H5T_C_S1);
@@ -452,18 +447,15 @@ void Hdf5Back::CreateTable(Datum* d) {
         H5Tset_strpad(field_types[i], H5T_STR_NULLPAD);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(char) * (*shape)[0];
-        dst_size += sizeof(char) * (*shape)[0];
       }
     } else if (valtype == typeid(Blob)) {
       dbtypes[i] = BLOB;
       field_types[i] = sha1_type_;
       dst_sizes[i] = CYCLUS_SHA1_SIZE;
-      dst_size += CYCLUS_SHA1_SIZE;
     } else if (valtype == typeid(boost::uuids::uuid)) {
       dbtypes[i] = UUID;
       field_types[i] = uuid_type_;
       dst_sizes[i] = CYCLUS_UUID_SIZE;
-      dst_size += CYCLUS_UUID_SIZE;
     } else if (valtype == typeid(std::vector<int>)) {
       shape = shapes[i];
       if (shape == NULL || (*shape)[0] < 1) {
@@ -474,13 +466,11 @@ void Hdf5Back::CreateTable(Datum* d) {
           opened_types_.insert(vldts_[VL_VECTOR_INT]);
         }
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
-        dst_size += CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = VECTOR_INT;
         field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * (*shape)[0];
-        dst_size += dst_sizes[i];
       }
     } else if (valtype == typeid(std::set<int>)) {
       shape = shapes[i];
@@ -492,13 +482,11 @@ void Hdf5Back::CreateTable(Datum* d) {
           opened_types_.insert(vldts_[VL_SET_INT]);
         }
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
-        dst_size += CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = SET_INT;
         field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * (*shape)[0];
-        dst_size += dst_sizes[i];
       }
     } else if (valtype == typeid(std::list<int>)) {
       shape = shapes[i];
@@ -510,13 +498,11 @@ void Hdf5Back::CreateTable(Datum* d) {
           opened_types_.insert(vldts_[VL_LIST_INT]);
         }
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
-        dst_size += CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = LIST_INT;
         field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * (*shape)[0];
-        dst_size += dst_sizes[i];
       }
     } else if (valtype == typeid(std::pair<int, int>)) {
       dbtypes[i] = PAIR_INT_INT;
@@ -525,11 +511,11 @@ void Hdf5Back::CreateTable(Datum* d) {
       H5Tinsert(field_types[i], "first", 0, H5T_NATIVE_INT);
       H5Tinsert(field_types[i], "second", sizeof(int), H5T_NATIVE_INT);
       opened_types_.insert(field_types[i]);
-      dst_size += dst_sizes[i];
     } else {
       throw IOError("the type for column '" + std::string(field_names[i]) + \
                     "is not yet supported in HDF5.");
     } 
+    dst_size += dst_sizes[i];
   }
 
   herr_t status;
