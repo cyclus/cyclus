@@ -83,6 +83,31 @@ enum DbTypes {
   VL_LIST_BLOB,
   LIST_UUID,
   VL_LIST_UUID,
+  // pairs - not variable length
+  PAIR_INT_BOOL,
+  PAIR_INT_INT,
+  PAIR_INT_FLOAT,
+  PAIR_INT_DOUBLE,
+  PAIR_INT_STRING,
+  PAIR_INT_VL_STRING,
+  PAIR_INT_BLOB,
+  PAIR_INT_UUID,
+  PAIR_STRING_BOOL,
+  PAIR_STRING_INT,
+  PAIR_STRING_FLOAT,
+  PAIR_STRING_DOUBLE,
+  PAIR_STRING_STRING,
+  PAIR_STRING_VL_STRING,
+  PAIR_STRING_BLOB,
+  PAIR_STRING_UUID,
+  PAIR_VL_STRING_BOOL,
+  PAIR_VL_STRING_INT,
+  PAIR_VL_STRING_FLOAT,
+  PAIR_VL_STRING_DOUBLE,
+  PAIR_VL_STRING_STRING,
+  PAIR_VL_STRING_VL_STRING,
+  PAIR_VL_STRING_BLOB,
+  PAIR_VL_STRING_UUID,
   // maps with int keys
   MAP_INT_BOOL,
   VL_MAP_INT_BOOL,
@@ -431,6 +456,11 @@ class Sha1 {
     std::list<int>::const_iterator it = x.begin();
     for(; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
+  };
+
+  inline void Update(const std::pair<int, int>& x) { 
+    hash_.process_bytes(&(x.first), sizeof(int));
+    hash_.process_bytes(&(x.second), sizeof(int));
   };
   /// \}
 

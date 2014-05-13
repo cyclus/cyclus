@@ -297,6 +297,14 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case PAIR_INT_INT: {
+            std::pair<int, int> x = std::make_pair(*reinterpret_cast<int*>(buf + offset), 
+                                                   *reinterpret_cast<int*>(buf + offset + sizeof(int)));
+            is_valid_row = CmpConds<std::pair<int, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
           default: {
             throw IOError("querying column '" + qr.fields[j] + "' in table '" + \
                           table + "' failed due to unsupported data type.");
@@ -510,6 +518,14 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = sizeof(int) * (*shape)[0];
         dst_size += dst_sizes[i];
       }
+    } else if (valtype == typeid(std::pair<int, int>)) {
+      dbtypes[i] = PAIR_INT_INT;
+      dst_sizes[i] = sizeof(int) * 2;
+      field_types[i] = H5Tcreate(H5T_COMPOUND, dst_sizes[i]);
+      H5Tinsert(field_types[i], "first", 0, H5T_NATIVE_INT);
+      H5Tinsert(field_types[i], "second", sizeof(int), H5T_NATIVE_INT);
+      opened_types_.insert(field_types[i]);
+      dst_size += dst_sizes[i];
     } else {
       throw IOError("the type for column '" + std::string(field_names[i]) + \
                     "is not yet supported in HDF5.");
@@ -659,6 +675,12 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         case VL_LIST_INT: {
           Digest key = VLWrite<std::list<int>, VL_LIST_INT>(a);
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case PAIR_INT_INT: {
+          std::pair<int, int> val = a->cast<std::pair<int, int> >();
+          memcpy(buf + offset, &(val.first), sizeof(int));
+          memcpy(buf + offset + sizeof(int), &(val.second), sizeof(int));
           break;
         }
       }

@@ -258,3 +258,9 @@ TEST(Hdf5BackTest, ReadWriteVLListInt) {
   Hdf5ReadWriteTestBasic<list<int> >("vl_list_int.h5", x, y);
 }
 
+TEST(Hdf5BackTest, ReadWritePairIntInt) {
+  using std::pair;
+  pair<int, int> x = pair<int, int>(6, 28);
+  pair<int, int> y = pair<int, int>(42, 43);
+  Hdf5ReadWriteTestBasic<pair<int, int> >("pair_int_int.h5", x, y);
+}
