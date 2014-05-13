@@ -264,3 +264,31 @@ TEST(Hdf5BackTest, ReadWritePairIntInt) {
   pair<int, int> y = pair<int, int>(42, 43);
   Hdf5ReadWriteTestBasic<pair<int, int> >("pair_int_int.h5", x, y);
 }
+
+TEST(Hdf5BackTest, ReadWriteMapIntInt) {
+  using std::map;
+  std::vector<int> shape(1);
+  shape[0] = 3;
+  map<int, int> x = map<int, int>();
+  x[6] = 42;
+  x[28] = 43;
+  x[496] = 44;
+  map<int, int> y = map<int, int>();
+  y[42] = 6;
+  y[43] = 28;
+  y[44] = 496;
+  Hdf5ReadWriteTestBasic<map<int, int> >("map_int_int.h5", x, y, &shape);
+}
+
+TEST(Hdf5BackTest, ReadWriteVLMapIntInt) {
+  using std::map;
+  map<int, int> x = map<int, int>();
+  x[6] = 42;
+  x[28] = 43;
+  x[496] = 44;
+  x[8128] = 45;
+  map<int, int> y = map<int, int>();
+  for (int i = 0; i < 42; ++i)
+    y[42 + i] = i;
+  Hdf5ReadWriteTestBasic<map<int, int> >("vl_map_int_int.h5", x, y);
+}

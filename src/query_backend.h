@@ -3,6 +3,7 @@
 
 #include <climits>
 #include <list>
+#include <map>
 #include <set>
 
 #include <boost/uuid/sha1.hpp>
@@ -461,6 +462,14 @@ class Sha1 {
   inline void Update(const std::pair<int, int>& x) { 
     hash_.process_bytes(&(x.first), sizeof(int));
     hash_.process_bytes(&(x.second), sizeof(int));
+  };
+
+  inline void Update(const std::map<int, int>& x) {
+    std::map<int, int>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first), sizeof(int));
+      hash_.process_bytes(&(it->second), sizeof(int));
+    }
   };
   /// \}
 

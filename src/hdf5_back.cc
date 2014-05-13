@@ -141,6 +141,11 @@ Blob Hdf5Back::VLRead<Blob, BLOB>(const char* rawkey) {
 }
 
 QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
+  using std::vector;
+  using std::set;
+  using std::list;
+  using std::pair;
+  using std::map;
   int i;
   int j;
   int jlen;
@@ -298,9 +303,28 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case PAIR_INT_INT: {
-            std::pair<int, int> x = std::make_pair(*reinterpret_cast<int*>(buf + offset), 
-                                                   *reinterpret_cast<int*>(buf + offset + sizeof(int)));
-            is_valid_row = CmpConds<std::pair<int, int> >(&x, &(field_conds[qr.fields[j]]));
+            pair<int, int> x = std::make_pair(*reinterpret_cast<int*>(buf + offset), 
+                                              *reinterpret_cast<int*>(buf + offset + sizeof(int)));
+            is_valid_row = CmpConds<pair<int, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
+          case MAP_INT_INT: {
+            map<int, int> x = map<int, int>();
+            jlen = tbl_sizes_[table][j] / (2*sizeof(int));
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x[*reinterpret_cast<int*>(buf + offset + 2*sizeof(int)*k)] = \
+                *reinterpret_cast<int*>(buf + offset + 2*sizeof(int)*k + sizeof(int));
+            }
+            is_valid_row = CmpConds<map<int, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
+          case VL_MAP_INT_INT: {
+            map<int, int> x = VLRead<map<int, int>, VL_MAP_INT_INT>(buf + offset);
+            is_valid_row = CmpConds<map<int, int> >(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
             break;
@@ -511,6 +535,29 @@ void Hdf5Back::CreateTable(Datum* d) {
       H5Tinsert(field_types[i], "first", 0, H5T_NATIVE_INT);
       H5Tinsert(field_types[i], "second", sizeof(int), H5T_NATIVE_INT);
       opened_types_.insert(field_types[i]);
+    } else if (valtype == typeid(std::map<int, int>)) {
+      shape = shapes[i];
+      hid_t item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) * 2);
+      H5Tinsert(item_type, "key", 0, H5T_NATIVE_INT);
+      H5Tinsert(item_type, "val", sizeof(int), H5T_NATIVE_INT);
+      if (shape == NULL || (*shape)[0] < 1) {
+        dbtypes[i] = VL_MAP_INT_INT;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_INT_INT) == 0) {
+          vldts_[VL_MAP_INT_INT] = H5Tvlen_create(item_type);
+          opened_types_.insert(item_type);
+          opened_types_.insert(vldts_[VL_MAP_INT_INT]);
+        } else {
+          H5Tclose(item_type);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = MAP_INT_INT;
+        field_types[i] = H5Tarray_create2(item_type, 1, (hsize_t *) &(*shape)[0]);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = sizeof(int) * 2 * (*shape)[0];
+      }
     } else {
       throw IOError("the type for column '" + std::string(field_names[i]) + \
                     "is not yet supported in HDF5.");
@@ -568,6 +615,12 @@ void Hdf5Back::WriteGroup(DatumList& group) {
 
 void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group, 
                        size_t* sizes, size_t rowsize) {
+  using std::min;
+  using std::vector;
+  using std::set;
+  using std::list;
+  using std::pair;
+  using std::map;
   Datum::Vals vals;
   Datum::Vals header = group.front()->vals();
   int ncols = header.size();
@@ -669,6 +722,24 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           memcpy(buf + offset + sizeof(int), &(val.second), sizeof(int));
           break;
         }
+        case MAP_INT_INT: {
+          map<int, int> val = a->cast<map<int, int> >();
+          fieldlen = sizes[col];
+          valuelen = min(2 * sizeof(int) * val.size(), fieldlen);
+          unsigned int cnt = 0;
+          for (map<int, int>::iterator valit = val.begin(); valit != val.end(); ++valit) {
+            memcpy(buf + offset + 2*sizeof(int)*cnt, &(valit->first), sizeof(int));
+            memcpy(buf + offset + 2*sizeof(int)*cnt + sizeof(int), &(valit->second), sizeof(int));
+            ++cnt;
+          }
+          memset(buf + offset + valuelen, 0, fieldlen - valuelen);
+          break;
+        }
+        case VL_MAP_INT_INT: {
+          Digest key = VLWrite<map<int, int>, VL_MAP_INT_INT>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
       }
       offset += sizes[col];
     }
@@ -765,6 +836,10 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
     }
     case VL_LIST_INT: {
       name = "ListInt";
+      break;
+    }
+    case VL_MAP_INT_INT: {
+      name = "MapIntInt";
       break;
     }
     default: {
@@ -947,6 +1022,30 @@ template <>
 std::list<int> Hdf5Back::VLBufToVal<std::list<int> >(const hvl_t& buf) {
   int* xraw = reinterpret_cast<int*>(buf.p);
   std::list<int> x = std::list<int>(xraw, xraw+buf.len);
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::map<int, int>& x) {
+  hvl_t buf;
+  buf.len = x.size();
+  size_t nbytes = 2 * sizeof(int) * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int cnt = 0;
+  std::map<int, int>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    memcpy((char *) buf.p + 2*sizeof(int)*cnt, &(it->first), sizeof(int));
+    memcpy((char *) buf.p + 2*sizeof(int)*cnt + sizeof(int), &(it->second), sizeof(int));
+    ++cnt;
+  }
+  return buf;
+};
+
+template <>
+std::map<int, int> Hdf5Back::VLBufToVal<std::map<int, int> >(const hvl_t& buf) {
+  int* xraw = reinterpret_cast<int*>(buf.p);
+  std::map<int, int> x = std::map<int, int>();
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x[xraw[2*i]] = xraw[2*i + 1];
   return x;
 };
 
