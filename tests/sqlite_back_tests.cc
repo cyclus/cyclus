@@ -57,7 +57,7 @@ TEST(SqliteBackTest, Regression) {
   EXPECT_EQ("monkey", animal);
   EXPECT_EQ(10, weight);
   EXPECT_EQ(5.5, height);
-  EXPECT_EQ(true, alive);
+  EXPECT_TRUE(alive);
   EXPECT_EQ("banana", data.str());
 
   animal = qr.GetVal<std::string>("animal", 1);
@@ -68,6 +68,6 @@ TEST(SqliteBackTest, Regression) {
   EXPECT_EQ("elephant", animal);
   EXPECT_EQ(1000, weight);
   EXPECT_DOUBLE_EQ(4.2, height);
-  EXPECT_EQ(false, alive);
+  EXPECT_FALSE(alive);
   EXPECT_EQ("a very large mammal", data.str());
 }
