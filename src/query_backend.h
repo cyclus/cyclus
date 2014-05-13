@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_QUERY_BACKEND_H_
 
 #include <climits>
+#include <set>
 
 #include <boost/uuid/sha1.hpp>
 
@@ -417,6 +418,12 @@ class Sha1 {
 
   inline void Update(const std::vector<int>& x) { 
     hash_.process_bytes(&x[0], x.size() * sizeof(int));
+  };
+
+  inline void Update(const std::set<int>& x) { 
+    std::set<int>::iterator it = x.begin();
+    for(; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), sizeof(int));
   };
   /// \}
 

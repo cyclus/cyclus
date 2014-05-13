@@ -38,7 +38,10 @@ def find_ids(data, data_table, id_table):
     """
     ids = []
     for i, d in enumerate(data_table):
-        if isinstance(d, np.ndarray): 
+        if isinstance(d, np.ndarray) and isinstance(data, np.ndarray): 
+            if (d == data).all():
+                ids.append(id_table[i])
+        elif isinstance(d, np.ndarray) and not isinstance(data, np.ndarray): 
             if (d == sha1array(data)).all():
                 ids.append(id_table[i])
         elif d == data:

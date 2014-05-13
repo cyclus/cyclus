@@ -143,6 +143,7 @@ Blob Hdf5Back::VLRead<Blob, BLOB>(const char* rawkey) {
 QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   int i;
   int j;
+  int jlen;
   herr_t status = 0;
   hid_t tb_set = H5Dopen2(file_, table.c_str(), H5P_DEFAULT);
   hid_t tb_space = H5Dget_space(tb_set);
@@ -260,6 +261,22 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           case VL_VECTOR_INT: {
             std::vector<int> x = VLRead<std::vector<int>, VL_VECTOR_INT>(buf + offset);
             is_valid_row = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
+          case SET_INT: {
+            jlen = tbl_sizes_[table][j] / sizeof(int);
+            int* xraw = reinterpret_cast<int*>(buf + offset);
+            std::set<int> x = std::set<int>(xraw, xraw+jlen);
+            is_valid_row = CmpConds<std::set<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
+          case VL_SET_INT: {
+            std::set<int> x = VLRead<std::set<int>, VL_SET_INT>(buf + offset);
+            is_valid_row = CmpConds<std::set<int> >(&x, &(field_conds[qr.fields[j]]));
             if (is_valid_row)
               row[j] = x;
             break;
@@ -441,6 +458,24 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = sizeof(int) * (*shape)[0];
         dst_size += dst_sizes[i];
       }
+    } else if (valtype == typeid(std::set<int>)) {
+      shape = shapes[i];
+      if (shape == NULL || (*shape)[0] < 1) {
+        dbtypes[i] = VL_SET_INT;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_SET_INT) == 0) {
+          vldts_[VL_SET_INT] = H5Tvlen_create(H5T_NATIVE_INT);
+          opened_types_.insert(vldts_[VL_SET_INT]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+        dst_size += CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = SET_INT;
+        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = sizeof(int) * (*shape)[0];
+        dst_size += dst_sizes[i];
+      }
     } else {
       throw IOError("the type for column '" + std::string(field_names[i]) + \
                     "is not yet supported in HDF5.");
@@ -557,6 +592,23 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
+        case SET_INT: {
+          std::set<int> val = a->cast<std::set<int> >();
+          fieldlen = sizes[col];
+          valuelen = std::min(val.size() * sizeof(int), fieldlen);
+          unsigned int cnt = 0;
+          for (std::set<int>::iterator sit = val.begin(); sit != val.end(); ++sit) {
+            memcpy(buf + offset + cnt*sizeof(int), &(*sit), sizeof(int));
+            ++cnt;
+          }
+          memset(buf + offset + valuelen, 0, fieldlen - valuelen);
+          break;
+        }
+        case VL_SET_INT: {
+          Digest key = VLWrite<std::set<int>, VL_SET_INT>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
       }
       offset += sizes[col];
     }
@@ -580,7 +632,7 @@ T Hdf5Back::VLRead(const char* rawkey) {
   status = H5Dread(dset, vldts_[U], mspace, dspace, H5P_DEFAULT, &buf);
   if (status < 0)
     throw IOError("failed to read in variable length data.");
-  T val = VLBufToVal(buf);
+  T val = VLBufToVal<T>(buf);
   status = H5Dvlen_reclaim(vldts_[U], mspace, H5P_DEFAULT, &buf);
   if (status < 0)
     throw IOError("failed to reclaim variable lenght data space.");
@@ -773,9 +825,31 @@ hvl_t Hdf5Back::VLValToBuf(const std::vector<int>& x) {
   return buf;
 };
 
-std::vector<int> Hdf5Back::VLBufToVal(const hvl_t& buf) {
+template <>
+std::vector<int> Hdf5Back::VLBufToVal<std::vector<int> >(const hvl_t& buf) {
   std::vector<int> x = std::vector<int>(buf.len);
   memcpy(&x[0], buf.p, buf.len * sizeof(int));
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::set<int>& x) {
+  hvl_t buf;
+  buf.len = x.size();
+  size_t nbytes = buf.len * sizeof(int);
+  buf.p = new char[nbytes];
+  unsigned int cnt = 0;
+  std::set<int>::iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    memcpy((char *) buf.p + cnt*sizeof(int), &(*it), sizeof(int));
+    ++cnt;
+  }
+  return buf;
+};
+
+template <>
+std::set<int> Hdf5Back::VLBufToVal<std::set<int> >(const hvl_t& buf) {
+  int* xraw = reinterpret_cast<int*>(buf.p);
+  std::set<int> x = std::set<int>(xraw, xraw+buf.len);
   return x;
 };
 
