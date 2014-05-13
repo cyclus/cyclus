@@ -8,15 +8,70 @@
 
 #include "boost/filesystem.hpp"
 
-#include "query_backend.h"
 #include "hdf5.h"
 #include "hdf5_hl.h"
 
+#include "query_backend.h"
+
 namespace cyclus {
+
 /// An Recorder backend that writes data to an hdf5 file.  Identically named
-/// Datum objects have their data placed as rows in a single table.  Handles the following
-/// datum value types: int, float, double, std::string, cyclus::Blob,
-/// boost::uuids::uuid.
+/// Datum objects have their data placed as rows in a single table.  
+///
+/// The HDF5 backend ensures that every column in its tables is represented 
+/// in the schema with a fixed size.  This in turn ensures that the schema itself
+/// is of a fixed size. This fixed size constraint applies even to variable length 
+/// (VL) data types (string, blob, vector, etc).  
+///
+/// Variable length data is handled in a special way to ensure a fixed length 
+/// column.  The naive approach would be to set a maximum size based on the data
+/// available. However, this is not truly a fixed length data type. Instead, the
+/// HDF5 backend serves as an on-disk bidriectional hash map for each VL data type.
+///
+/// A regular hash table applies a hash function to keys and stores the values based
+/// on this hash. Keys are unique and values may be repeated for many keys. In a
+/// bidirectional hash map the keys and values are both one-to-one and onto. This 
+/// makes storing a seperate hash redunant and since the key and hash are the same.
+///
+/// The HDF5 backend uses the well-known SHA1 hash function as its keys for VL data.
+/// This is because SHA1 is 5x the size (20 bytes) of standard 32-bit unsigned ints.
+/// This provides a gigantic address space in which to store variable length data.
+/// HDF5 provides two critical features that make an address space of this size 
+/// possible: multidiemnsional arrays and chunking.
+///
+/// HDF5 easily supports 5D arrays. This allows us to use the SHA1 hash not only as 
+/// a key, but also a we can cast it to an index (len-5 array of unsigned ints) for 
+/// a 5D array.  Furthermore, for such an array we can set the chunksize to a single 
+/// element ([1, 1, 1, 1, 1]). This allows us to have the full space available 
+/// ([UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX]) while only storing the 
+/// data that actually exists!
+///
+/// In the table columns for VL data, the HDF5 backend stores the SHA1 as a length-5
+/// array of unsigned ints. Looking up the associated value is simply a matter of using
+/// this array as an index into a special data type array as above.
+/// This has the added advantage of de-duplicating storage for identical entries.
+///
+/// On disk the keys and values for a data type are stored as arrays named with 
+/// base data type and the string "Keys" and "Vals" appended respectively.  For 
+/// instance, BLOB is stored in the arrays BlobKeys and BlobVals while VL_VECTOR_INT
+/// is stored in the arrays VectorIntKeys and VectorIntVals.
+///
+/// In memory, all active keys are stored in vlkeys_ private member of this class.
+/// This maps the DbType to a set of the SHA1 digests. This is used to prevent 
+/// excessive writing of values to disk that already exist.
+///
+/// The cost of the bidirectional hash map strategy is that the values need to be 
+/// looked up in a separate read() from that of the table itself.  However, by 
+/// using VL data types users should expect a performance hit and this is one of 
+/// the more effiecient strategies.
+///
+/// Another implicit problem with all hash mappings is the possibility of collision.
+/// However, this is in practice impossible here.  For SHA1, there is a 3.4e-13 chance
+/// of having a single collission with 1e18 (a billion billion) entries.  
+///
+/// Still, if the address space of SHA1 ever becomes insufficient for some reason, 
+/// please  move to a larger SHA value such as SHA224 or SHA256 or higher. Such a 
+/// migration is not anticipated but would be straighforward.
 class Hdf5Back : public FullBackend {
  public:
   /// Creates a new backend writing data to the specified file.
