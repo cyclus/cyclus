@@ -70,6 +70,17 @@ class SqliteBack: public FullBackend {
 
   std::map<std::string, SqlStatement::Ptr> stmts_;
   std::map<std::string, std::vector<DbTypes> > schemas_;
+
+  SqlStatement::Ptr vect_int_ins_;
+  SqlStatement::Ptr vect_int_get_;
+  std::set<Digest> vect_int_keys_;
+
+  SqlStatement::Ptr vect_str_ins_;
+  SqlStatement::Ptr vect_str_get_;
+  std::set<Digest> vect_str_keys_;
+
+  /// A class to help with hashing variable length datatypes
+  Sha1 hasher_;
 };
 } // namespace cyclus
 #endif
