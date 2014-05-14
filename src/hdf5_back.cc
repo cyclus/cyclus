@@ -1,4 +1,4 @@
-// hdf5_back.cc
+// hdf5_y16back.cc
 #include "hdf5_back.h"
 
 #include <cmath>
@@ -147,6 +147,8 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   using std::list;
   using std::pair;
   using std::map;
+  if (!H5Lexists(file_, table.c_str(), H5P_DEFAULT))
+    throw IOError("table '" + table + "' does not exist in hdf5.");
   int i;
   int j;
   int jlen;
@@ -164,7 +166,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
 
   // set up field-conditions map
   std::map<std::string, std::vector<Cond*> > field_conds = std::map<std::string, 
-                                                             std::vector<Cond*> >();
+                                                           std::vector<Cond*> >();
   if (conds != NULL) {
     Cond* cond;
     for (i = 0; i < conds->size(); ++i) {
@@ -192,10 +194,10 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
     status = H5Dread(tb_set, tb_type, memspace, tb_space, H5P_DEFAULT, buf);
     int offset = 0;
     bool is_valid_row;
-    QueryRow row = QueryRow(nfields);
     for (i = 0; i < count; ++i) {
       offset = i * tb_typesize;
       is_valid_row = true;
+      QueryRow row = QueryRow(nfields);
       for (j = 0; j < nfields; ++j) {
         switch (qr.types[j]) {
           case BOOL: {
@@ -388,10 +390,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
       }
       if (is_valid_row) {
         qr.rows.push_back(row);
-        QueryRow row = QueryRow(nfields);
-      } else {
-        row.clear();
-        row.reserve(nfields);
       }
     }
     delete[] buf;
@@ -654,7 +652,7 @@ void Hdf5Back::CreateTable(Datum* d) {
 
   herr_t status;
   const char* title = d->title().c_str();
-  int compress = 0;
+  int compress = 1;
   int chunk_size = 1000;
   void* fill_data = NULL;
   void* data = NULL;
@@ -1009,7 +1007,7 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
         throw IOError("failed to read in keys for " + name);
       for (int n = 0; n < nkeys; ++n) {
         Digest d = Digest();
-        memcpy(buf + (n * CYCLUS_SHA1_SIZE), &d.val, CYCLUS_SHA1_SIZE);
+        memcpy(d.val, buf + (n * CYCLUS_SHA1_SIZE), CYCLUS_SHA1_SIZE);
         vlkeys_[dbtype].insert(d);
       }
       H5Sclose(dspace);

@@ -115,11 +115,8 @@ int main(int argc, char* argv[]) {
   std::string ext = fs::path(ai.output_path).extension().generic_string();
   std::string stem = fs::path(ai.output_path).stem().generic_string();
   if (ext == ".h5") {  // not queryable
-    fback = new SqliteBack(stem + ".sqlite");
-    rback = new Hdf5Back(ai.output_path.c_str());
-    rec.RegisterBackend(rback);
+    fback = new Hdf5Back(ai.output_path.c_str());
     rec.RegisterBackend(fback);
-    bdel.Add(rback);
     bdel.Add(fback);
   } else if (ext == ".csv") {  // not queryable
     fback = new SqliteBack(stem + ".sqlite");
