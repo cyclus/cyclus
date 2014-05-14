@@ -303,6 +303,20 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case VL_VECTOR_STRING: {
+            vector<string> x = VLRead<vector<string>, VL_VECTOR_STRING>(buf + offset);
+            is_valid_row = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
+          case VL_VECTOR_VL_STRING: {
+            vector<string> x = VLRead<vector<string>, VL_VECTOR_VL_STRING>(buf + offset);
+            is_valid_row = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
           case SET_INT: {
             jlen = tbl_sizes_[table][j] / sizeof(int);
             int* xraw = reinterpret_cast<int*>(buf + offset);
@@ -543,7 +557,7 @@ void Hdf5Back::CreateTable(Datum* d) {
         dbtypes[i] = VL_VECTOR_VL_STRING;
         field_types[i] = sha1_type_;
         if (vldts_.count(VL_VECTOR_VL_STRING) == 0) {
-          vldts_[VL_VECTOR_VL_STRING] = H5Tvlen_create(H5T_NATIVE_INT);
+          vldts_[VL_VECTOR_VL_STRING] = H5Tvlen_create(sha1_type_);
           opened_types_.insert(vldts_[VL_VECTOR_VL_STRING]);
         }
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
@@ -551,7 +565,7 @@ void Hdf5Back::CreateTable(Datum* d) {
         dbtypes[i] = VL_VECTOR_STRING;
         field_types[i] = sha1_type_;
         if (vldts_.count(VL_VECTOR_STRING) == 0) {
-          vldts_[VL_VECTOR_VL_STRING] = H5Tvlen_create(H5T_NATIVE_INT);
+          vldts_[VL_VECTOR_STRING] = H5Tvlen_create(sha1_type_);
           opened_types_.insert(vldts_[VL_VECTOR_STRING]);
         }
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
@@ -820,10 +834,28 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           unsigned int cnt = 0;
           string s;
           for (; cnt < val.size(); ++cnt) {
-            key = VLWrite<std::string, VL_STRING>(val[cnt]);
+            key = VLWrite<string, VL_STRING>(val[cnt]);
             memcpy(buf + offset + CYCLUS_SHA1_SIZE*cnt, key.val, CYCLUS_SHA1_SIZE);
           }
           memset(buf + offset + CYCLUS_SHA1_SIZE*cnt, 0, CYCLUS_SHA1_SIZE * (val.size() - cnt));
+          break;
+        }
+        case VL_VECTOR_STRING: {
+          shape = shapes[col];
+          size_t strlen =(*shape)[1];
+          vector<string> givenval = a->cast<vector<string> >();
+          vector<string> val = vector<string>(givenval.size());
+          unsigned int cnt = 0;
+          // ensure string is of specified length
+          for (; cnt < givenval.size(); ++cnt)
+            val[cnt] = string(givenval[cnt], 0, strlen);
+          Digest key = VLWrite<vector<string>, VL_VECTOR_STRING>(val);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case VL_VECTOR_VL_STRING: {
+          Digest key = VLWrite<vector<string>, VL_VECTOR_VL_STRING>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
         case SET_INT: {
@@ -931,6 +963,11 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
     }
     case VL_VECTOR_INT: {
       name = "VectorInt";
+      break;
+    }
+    case VL_VECTOR_STRING:
+    case VL_VECTOR_VL_STRING: {
+      name = "VectorString";
       break;
     }
     case VL_SET_INT: {
@@ -1083,6 +1120,29 @@ template <>
 std::vector<int> Hdf5Back::VLBufToVal<std::vector<int> >(const hvl_t& buf) {
   std::vector<int> x = std::vector<int>(buf.len);
   memcpy(&x[0], buf.p, buf.len * sizeof(int));
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::vector<std::string>& x) {
+  // VL_VECTOR_STRING implmented as VL_VECTOR_VL_STRING
+  hvl_t buf;
+  Digest key;
+  buf.len = x.size();
+  size_t nbytes = CYCLUS_SHA1_SIZE * buf.len;
+  buf.p = new char[nbytes];
+  for (unsigned int i = 0; i < buf.len; ++i) {
+    key = VLWrite<std::string, VL_STRING>(x[i]);
+    memcpy((char *) buf.p + CYCLUS_SHA1_SIZE*i, key.val, CYCLUS_SHA1_SIZE);
+  }
+  return buf;
+};
+
+template <>
+std::vector<std::string> Hdf5Back::VLBufToVal<std::vector<std::string> >(const hvl_t& buf) {
+  using std::string;
+  std::vector<string> x = std::vector<string>(buf.len);
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x[i] = VLRead<string, VL_STRING>((char *) buf.p + CYCLUS_SHA1_SIZE*i);
   return x;
 };
 

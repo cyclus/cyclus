@@ -122,7 +122,7 @@ class Hdf5Back : public FullBackend {
   T VLRead(const char* rawkey);
 
   /// Writes a variable length data to its on-disk bidirectional hash map.
-  /// @param x the data to write.
+  /// @param x the dat a to write.
   /// @param dbtype the data type of x.
   /// @return the key of x, which is a SHA1 hash as len-5 an array of ints.
   /// \{
@@ -170,6 +170,7 @@ class Hdf5Back : public FullBackend {
   /// Converts a value to a variable length buffer for HDF5.
   /// \{
   hvl_t VLValToBuf(const std::vector<int>& x);
+  hvl_t VLValToBuf(const std::vector<std::string>& x);
   hvl_t VLValToBuf(const std::set<int>& x);
   hvl_t VLValToBuf(const std::list<int>& x);
   hvl_t VLValToBuf(const std::map<int, int>& x);
