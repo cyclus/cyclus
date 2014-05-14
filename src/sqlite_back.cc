@@ -37,6 +37,7 @@ SqliteBack::~SqliteBack() {
 SqliteBack::SqliteBack(std::string path) : db_(path) {
   path_ = path;
   db_.open();
+  hasher_ = Sha1();
 
   // cache pre-existing table names
   SqlStatement::Ptr stmt;
@@ -50,6 +51,33 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
     std::string cmd = "CREATE TABLE IF NOT EXISTS FieldTypes";
     cmd += "(TableName TEXT,Field TEXT,Type INTEGER);";
     db_.Execute(cmd);
+  }
+
+  // initialize template type table statements
+  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS VectorInt (Sum BLOB,Val INTEGER);");
+  stmt->Exec();
+  vect_int_ins_ = db_.Prepare("INSERT INTO VectorInt VALUES (?,?);");
+  vect_int_get_ = db_.Prepare("SELECT Val FROM VectorInt WHERE Sum = ?;");
+  stmt = db_.Prepare("SELECT Sum FROM VectorInt;");
+  while(stmt->Step()) {
+    Digest d;
+    int n;
+    char* data = stmt->GetText(0, &n);
+    memcpy(d.val, data, n);
+    vect_int_keys_.insert(d);
+  }
+
+  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS VectorStr (Sum BLOB,Val TEXT);");
+  stmt->Exec();
+  vect_str_ins_ = db_.Prepare("INSERT INTO VectorStr VALUES (?,?);");
+  vect_str_get_ = db_.Prepare("SELECT Val FROM VectorStr WHERE Sum = ?;");
+  stmt = db_.Prepare("SELECT Sum FROM VectorStr;");
+  while(stmt->Step()) {
+    Digest d;
+    int n;
+    char* data = stmt->GetText(0, &n);
+    memcpy(d.val, data, n);
+    vect_str_keys_.insert(d);
   }
 }
 
@@ -223,7 +251,46 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
     stmt->BindBlob(index, ui.data, 16);
     break;
   }
-  default: {}// templated type
+  case VECTOR_INT: {
+    std::vector<int> vect = v.cast<std::vector<int> >();
+    hasher_.Clear();
+    hasher_.Update(vect);
+    Digest d = hasher_.digest();
+    int nbytes = CYCLUS_SHA1_NINT*4;
+    stmt->BindBlob(index, d.val, nbytes);
+
+    if (vect_int_keys_.count(d) == 0) {
+      for (int i = 0; i < vect.size(); ++i) {
+        vect_int_ins_->BindBlob(1, d.val, nbytes);
+        vect_int_ins_->BindInt(2, vect[i]);
+        vect_int_ins_->Exec();
+      }
+      vect_int_keys_.insert(d);
+    }
+    break;
+  }
+  case VECTOR_VL_STRING: {
+    std::vector<std::string> vect = v.cast<std::vector<std::string> >();
+    hasher_.Clear();
+    hasher_.Update(vect);
+    Digest d = hasher_.digest();
+    int nbytes = CYCLUS_SHA1_NINT*4;
+    stmt->BindBlob(index, d.val, nbytes);
+
+    if (vect_str_keys_.count(d) == 0) {
+      for (int i = 0; i < vect.size(); ++i) {
+        vect_str_ins_->BindBlob(1, d.val, nbytes);
+        vect_str_ins_->BindText(2, vect[i].c_str());
+        vect_str_ins_->Exec();
+      }
+      vect_str_keys_.insert(d);
+    }
+    break;
+  }
+  default: {
+    throw ValueError("Attempted to retrieve unsupported backend type");
+  }
+
   }
 }
 
@@ -236,13 +303,13 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
     v = stmt->GetInt(col);
     break;
   } case BOOL: {
-    v = (bool)stmt->GetInt(col);
+    v = static_cast<bool>(stmt->GetInt(col));
     break;
   } case DOUBLE: {
     v = stmt->GetDouble(col);
     break;
   } case FLOAT: {
-    v = (float)stmt->GetDouble(col);
+    v = static_cast<float>(stmt->GetDouble(col));
     break;
   } case VL_STRING: {
     v = std::string(stmt->GetText(col, NULL));
@@ -256,6 +323,30 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
     boost::uuids::uuid u;
     memcpy(&u, stmt->GetText(col, NULL), 16);
     v = u;
+    break;
+  } case VECTOR_INT: {
+    int n;
+    char* data = stmt->GetText(col, &n);
+
+    std::vector<int> vect;
+    vect_int_get_->BindBlob(1, data, n);
+    while(vect_int_get_->Step()) {
+      vect.push_back(vect_int_get_->GetInt(0));
+    }
+    vect_int_get_->Reset();
+    v = vect;
+    break;
+  } case VECTOR_VL_STRING: {
+    int n;
+    char* data = stmt->GetText(col, &n);
+
+    std::vector<std::string> vect;
+    vect_str_get_->BindBlob(1, data, n);
+    while(vect_str_get_->Step()) {
+      vect.push_back(vect_str_get_->GetText(0, NULL));
+    }
+    vect_str_get_->Reset();
+    v = vect;
     break;
   } default: {
     throw ValueError("Attempted to retrieve unsupported backend type");
@@ -272,7 +363,7 @@ std::string SqliteBack::SqlType(boost::spirit::hold_any v) {
   case FLOAT:
     return "REAL";
   case STRING: // fallthrough
-  case VL_STRING: // fallthrough
+  case VL_STRING:
     return "TEXT";
   case BLOB: // fallthrough
   case UUID: // fallthrough
@@ -306,12 +397,12 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
     //type_map[&typeid(std::set<boost::uuids::uuid>)] = SET_UUID;
     //type_map[&typeid(std::set<std::string>)] = SET_VL_STRING;
 
-    //type_map[&typeid(std::vector<int>)] = VECTOR_INT;
+    type_map[&typeid(std::vector<int>)] = VECTOR_INT;
     //type_map[&typeid(std::vector<double>)] = VECTOR_DOUBLE;
     //type_map[&typeid(std::vector<float>)] = VECTOR_FLOAT;
     //type_map[&typeid(std::vector<Blob>)] = VECTOR_BLOB;
     //type_map[&typeid(std::vector<boost::uuids::uuid>)] = VECTOR_UUID;
-    //type_map[&typeid(std::vector<std::string>)] = VECTOR_VL_STRING;
+    type_map[&typeid(std::vector<std::string>)] = VECTOR_VL_STRING;
 
     //type_map[&typeid(std::list<int>)] = LIST_INT;
     //type_map[&typeid(std::list<double>)] = LIST_DOUBLE;

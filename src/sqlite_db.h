@@ -30,6 +30,11 @@ class SqlStatement {
   /// Executes the prepared statement.
   void Exec() {
     Must(sqlite3_step(stmt_));
+    Reset();
+  }
+
+  /// Executes the prepared statement.
+  void Reset() {
     Must(sqlite3_reset(stmt_));
     Must(sqlite3_clear_bindings(stmt_));
   }
