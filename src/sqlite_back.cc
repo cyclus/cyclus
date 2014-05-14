@@ -303,13 +303,13 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
     v = stmt->GetInt(col);
     break;
   } case BOOL: {
-    v = (bool)stmt->GetInt(col);
+    v = static_cast<bool>(stmt->GetInt(col));
     break;
   } case DOUBLE: {
     v = stmt->GetDouble(col);
     break;
   } case FLOAT: {
-    v = (float)stmt->GetDouble(col);
+    v = static_cast<float>(stmt->GetDouble(col));
     break;
   } case VL_STRING: {
     v = std::string(stmt->GetText(col, NULL));
