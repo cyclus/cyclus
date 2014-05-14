@@ -229,6 +229,19 @@ TEST(Hdf5BackTest, ReadWriteVectorString) {
   Hdf5ReadWriteTestBasic<vector<string> >("vector_string.h5", x, y, &shape);
 }
 
+TEST(Hdf5BackTest, ReadWriteVectorVLString) {
+  using std::string;
+  using std::vector;
+  vector<int> shape(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  vector<string> x = vector<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It Just Might Be a One‐Shot Deal"};
+  vector<string> y = vector<string>(y_, y_+3);
+  Hdf5ReadWriteTestBasic<vector<string> >("vector_vl_string.h5", x, y, &shape);
+}
+
 TEST(Hdf5BackTest, ReadWriteSetInt) {
   using std::set;
   std::vector<int> shape(1);

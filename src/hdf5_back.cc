@@ -292,6 +292,17 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             H5Tclose(field_type);
             break;
           }
+          case VECTOR_VL_STRING: {
+            jlen = tbl_sizes_[table][j] / CYCLUS_SHA1_SIZE;
+            vector<string> x = vector<string>(jlen);
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x[k] = VLRead<std::string, VL_STRING>(buf + offset + CYCLUS_SHA1_SIZE*k);
+            }
+            is_valid_row = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_valid_row)
+              row[j] = x;
+            break;
+          }
           case SET_INT: {
             jlen = tbl_sizes_[table][j] / sizeof(int);
             int* xraw = reinterpret_cast<int*>(buf + offset);
@@ -546,7 +557,8 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
       } else if ((*shape)[0] >= 1 && (*shape)[1] < 1) {
         dbtypes[i] = VECTOR_VL_STRING;
-        field_types[i] = H5Tarray_create2(sha1_type_, 1, (hsize_t *) &(*shape)[0]);
+        hsize_t shape0 = (*shape)[0];
+        field_types[i] = H5Tarray_create2(sha1_type_, 1, &shape0);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = (*shape)[0] * CYCLUS_SHA1_SIZE;
       } else {
@@ -674,6 +686,49 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   delete[] buf;
 }
 
+template <typename T, DbTypes U>
+Digest Hdf5Back::VLWrite(const T& x) {
+  hasher_.Clear();
+  hasher_.Update(x);
+  Digest key = hasher_.digest();
+  hid_t keysds = VLDataset(U, true);
+  hid_t valsds = VLDataset(U, false);
+  if (vlkeys_[U].count(key) == 1)
+    return key;
+  hvl_t buf = VLValToBuf(x);
+  AppendVLKey(keysds, U, key);
+  InsertVLVal(valsds, U, key, buf);
+  return key;
+}
+
+template <>
+Digest Hdf5Back::VLWrite<std::string, VL_STRING>(const std::string& x) {
+  hasher_.Clear();
+  hasher_.Update(x);
+  Digest key = hasher_.digest();
+  hid_t keysds = VLDataset(VL_STRING, true);
+  hid_t valsds = VLDataset(VL_STRING, false);
+  if (vlkeys_[VL_STRING].count(key) == 1)
+    return key;
+  AppendVLKey(keysds, VL_STRING, key);
+  InsertVLVal(valsds, VL_STRING, key, x);
+  return key;
+}
+
+template <>
+Digest Hdf5Back::VLWrite<Blob, BLOB>(const Blob& x) {
+  hasher_.Clear();
+  hasher_.Update(x);
+  Digest key = hasher_.digest();
+  hid_t keysds = VLDataset(BLOB, true);
+  hid_t valsds = VLDataset(BLOB, false);
+  if (vlkeys_[BLOB].count(key) == 1)
+    return key;
+  AppendVLKey(keysds, BLOB, key);
+  InsertVLVal(valsds, BLOB, key, x.str());
+  return key;
+}
+
 void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group, 
                        size_t* sizes, size_t rowsize) {
   using std::min;
@@ -757,6 +812,18 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
             memset(buf + offset + fieldlen*cnt + valuelen, 0, fieldlen - valuelen);
           }
           memset(buf + offset + fieldlen*cnt, 0, fieldlen * ((*shape)[0] - cnt));
+          break;
+        }
+        case VECTOR_VL_STRING: {
+          vector<string> val = a->cast<vector<string> >();
+          Digest key;
+          unsigned int cnt = 0;
+          string s;
+          for (; cnt < val.size(); ++cnt) {
+            key = VLWrite<std::string, VL_STRING>(val[cnt]);
+            memcpy(buf + offset + CYCLUS_SHA1_SIZE*cnt, key.val, CYCLUS_SHA1_SIZE);
+          }
+          memset(buf + offset + CYCLUS_SHA1_SIZE*cnt, 0, CYCLUS_SHA1_SIZE * (val.size() - cnt));
           break;
         }
         case SET_INT: {
@@ -850,48 +917,6 @@ T Hdf5Back::VLRead(const char* rawkey) {
   return val;
 }
 
-template <typename T, DbTypes U>
-Digest Hdf5Back::VLWrite(const T& x) {
-  hasher_.Clear();
-  hasher_.Update(x);
-  Digest key = hasher_.digest();
-  hid_t keysds = VLDataset(U, true);
-  hid_t valsds = VLDataset(U, false);
-  if (vlkeys_[U].count(key) == 1)
-    return key;
-  hvl_t buf = VLValToBuf(x);
-  AppendVLKey(keysds, U, key);
-  InsertVLVal(valsds, U, key, buf);
-  return key;
-}
-
-template <>
-Digest Hdf5Back::VLWrite<std::string, VL_STRING>(const std::string& x) {
-  hasher_.Clear();
-  hasher_.Update(x);
-  Digest key = hasher_.digest();
-  hid_t keysds = VLDataset(VL_STRING, true);
-  hid_t valsds = VLDataset(VL_STRING, false);
-  if (vlkeys_[VL_STRING].count(key) == 1)
-    return key;
-  AppendVLKey(keysds, VL_STRING, key);
-  InsertVLVal(valsds, VL_STRING, key, x);
-  return key;
-}
-
-template <>
-Digest Hdf5Back::VLWrite<Blob, BLOB>(const Blob& x) {
-  hasher_.Clear();
-  hasher_.Update(x);
-  Digest key = hasher_.digest();
-  hid_t keysds = VLDataset(BLOB, true);
-  hid_t valsds = VLDataset(BLOB, false);
-  if (vlkeys_[BLOB].count(key) == 1)
-    return key;
-  AppendVLKey(keysds, BLOB, key);
-  InsertVLVal(valsds, BLOB, key, x.str());
-  return key;
-}
 
 hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
   std::string name;
