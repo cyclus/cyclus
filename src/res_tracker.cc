@@ -25,7 +25,7 @@ void ResTracker::Create(Agent* creator) {
   parent2_ = 0;
   Record();
   ctx_->NewDatum("ResCreators")
-    ->AddVal("ResourceId", res_->id())
+    ->AddVal("ResourceId", res_->graphid())
     ->AddVal("AgentId", creator->id())
     ->Record();
 }
@@ -35,7 +35,7 @@ void ResTracker::Modify() {
     return;
   }
 
-  parent1_ = res_->id();
+  parent1_ = res_->graphid();
   parent2_ = 0;
   Record();
 }
@@ -45,9 +45,9 @@ void ResTracker::Extract(ResTracker* removed) {
     return;
   }
 
-  parent1_ = res_->id();
+  parent1_ = res_->graphid();
   parent2_ = 0;
-  removed->parent1_ = res_->id();
+  removed->parent1_ = res_->graphid();
   removed->parent2_ = 0;
   removed->tracked_ = tracked_;
 
@@ -60,15 +60,16 @@ void ResTracker::Absorb(ResTracker* absorbed) {
     return;
   }
 
-  parent1_ = res_->id();
-  parent2_ = absorbed->res_->id();
+  parent1_ = res_->graphid();
+  parent2_ = absorbed->res_->graphid();
   Record();
 }
 
 void ResTracker::Record() {
   res_->BumpId();
   ctx_->NewDatum("Resources")
-  ->AddVal("ResourceId", res_->id())
+  ->AddVal("ResourceId", res_->graphid())
+  ->AddVal("TrackId", res_->trackid())
   ->AddVal("Type", res_->type())
   ->AddVal("TimeCreated", ctx_->time())
   ->AddVal("Quantity", res_->quantity())

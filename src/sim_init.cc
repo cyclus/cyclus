@@ -101,6 +101,11 @@ void SimInit::Snapshot(Context* ctx) {
   ->Record();
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
+  ->AddVal("Object", std::string("ResourceTrack"))
+  ->AddVal("NextId", Resource::nexttrackid_)
+  ->Record();
+  ctx->NewDatum("NextIds")
+  ->AddVal("Time", ctx->time())
   ->AddVal("Object", std::string("Product"))
   ->AddVal("NextId", Product::next_state_)
   ->Record();
@@ -124,7 +129,7 @@ void SimInit::SnapAgent(Agent* m) {
       ->AddVal("AgentId", m->id())
       ->AddVal("SimTime", ctx->time())
       ->AddVal("InventoryName", name)
-      ->AddVal("ResourceId", inv[i]->id())
+      ->AddVal("ResourceId", inv[i]->graphid())
       ->Record();
     }
   }
@@ -346,6 +351,8 @@ void SimInit::LoadNextIds() {
       Composition::next_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Resource") {
       Resource::nextid_ = qr.GetVal<int>("NextId", i);
+    } else if (obj == "ResourceTrack") {
+      Resource::nexttrackid_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Product") {
       Product::next_state_ = qr.GetVal<int>("NextId", i);
     } else {
@@ -359,13 +366,20 @@ Resource::Ptr SimInit::LoadResource(int resid) {
   conds.push_back(Cond("ResourceId", "==", resid));
   QueryResult qr = b_->Query("Resources", &conds);
   ResourceType type = qr.GetVal<ResourceType>("Type");
+  int trackid = qr.GetVal<int>("TrackId");
 
+  Resource::Ptr r;
   if (type == Material::kType) {
-    return LoadMaterial(resid);
+    r = LoadMaterial(resid);
   } else if (type == Product::kType) {
-    return LoadProduct(resid);
+    r = LoadProduct(resid);
+  } else {
+    throw IOError("Invalid resource type in output database: " + type);
   }
-  throw IOError("Invalid resource type in output database: " + type);
+
+  r->id_ = resid;
+  r->trackid_ = trackid;
+  return r;
 }
 
 Resource::Ptr SimInit::LoadMaterial(int resid) {
@@ -387,7 +401,6 @@ Resource::Ptr SimInit::LoadMaterial(int resid) {
   Composition::Ptr comp = LoadComposition(stateid);
   Agent* dummy = new Dummy(ctx_);
   Material::Ptr mat = Material::Create(dummy, qty, comp);
-  mat->id_ = resid;
   mat->prev_decay_time_ = prev_decay;
 
   return mat;

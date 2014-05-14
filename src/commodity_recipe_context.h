@@ -63,7 +63,7 @@ class CommodityRecipeContext : public StateWrangler {
   /// @return commodity of a material
   /// @warning returns a blank string if material isn't found
   inline std::string commod(Resource::Ptr rsrc) {
-    return rsrc_commod_map_[rsrc->id()];
+    return rsrc_commod_map_[rsrc->trackid()];
   }
 
   inline bool operator==(const CommodityRecipeContext& other) const {

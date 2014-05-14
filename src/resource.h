@@ -17,22 +17,29 @@ typedef std::string ResourceType;
 /// represent the lifeblood of a simulation.
 class Resource {
   friend class SimInit;
+  friend class ResTracker;
 
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 
-  Resource() : id_(nextid_++) {};
+  Resource() : id_(nextid_++), trackid_(nexttrackid_++) {};
 
   virtual ~Resource() {};
 
+  /// Returns the unique id corresponding to this resource object. Can be used
+  /// to track and/or associate other information with this resource object.
+  /// You should NOT track resources by pointer.
+  const int trackid() const { return trackid_;};
+
   /// Returns the unique id corresponding to this resource and its current
   /// state.  All resource id's are unique - even across different resource
-  /// types/implementations.
-  const int id() const {
+  /// types/implementations. Runtime tracking of resources should generally
+  /// use the trackid rather than this.
+  const int graphid() const {
     return id_;
   };
 
-  /// Assigns a new, unique id to this resource and its state. This should be
+  /// Assigns a new, unique internal id to this resource and its state. This should be
   /// called by resource implementations whenever their state changes.  A call to
   /// BumpId is not necessarily accompanied by a change to the state id.
   /// This should NEVER be called by agents.
@@ -71,8 +78,11 @@ class Resource {
   virtual Ptr ExtractRes(double quantity) = 0;
 
  private:
+
   static int nextid_;
+  static int nexttrackid_;
   int id_;
+  int trackid_;
 };
 
 } // namespace cyclus
