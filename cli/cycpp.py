@@ -282,27 +282,8 @@ class ClassFilter(Filter):
         machine = self.machine
         if len(machine.classes) == 0 or machine.depth != machine.classes[-1][0]:
             return
-        #if isinstance(machine, StateAccumulator):
-        #    rtn = None
-        #elif isinstance(self.machine, CodeGenerator):
-        #    rtn = ";\n"  # need to add extra semicolon just in case
-        #    found_shape = False
-        #    cls = machine.classes[-1][1]
-        #    ctx = machine.context.get(machine.classname(), {})
-        #    for vname, annotations in ctx.items():
-        #        shape = annotations.get('shape', None)
-        #        if shape is None:
-        #            continue
-        #        found_shape = True
-        #        rtn += ('const int {3}::__{0}_rawshape__[{1}] = {{{2}}};\n'
-        #                'const std::vector<int> {3}::__{0}_shape__ = '
-        #                'std::vector<int>(__{0}_rawshape__, __{0}_rawshape__+{1});\n'
-        #                ).format(vname, len(shape), ', '.join(map(str, shape)), cls)
-        #    if not found_shape:
-        #        rtn = None
         del machine.access[tuple(machine.classes)]
         del machine.classes[-1]
-        #return rtn
 
 class ClassAndSuperclassFilter(ClassFilter):
     """This accumulates superclass information as well as class information."""
