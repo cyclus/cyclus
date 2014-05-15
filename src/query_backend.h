@@ -396,18 +396,18 @@ class Digest {
   };
 
   // operators
-  inline friend std::ostream& operator<<(std::ostream& out, const cyclus::Digest& d) {
-    return out << "[" << d.val[0] << ", " << d.val[1] << ", " <<  d.val[2] << \
-                  ", " << d.val[3] << ", " << d.val[4] << "]";
+  inline std::ostream& operator<<(std::ostream& out) const {
+    return out << "[" << val[0] << ", " << val[1] << ", " <<  val[2] << \
+                  ", " << val[3] << ", " << val[4] << "]";
   };
 
-  inline friend bool operator< (const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+  inline bool operator< (const cyclus::Digest& rhs) const {
     bool rtn = false;
     for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-      if (lhs.val[i] < rhs.val[i]) {
+      if (val[i] < rhs.val[i]) {
         rtn = true;
         break;
-      } else if (lhs.val[i] > rhs.val[i]) {
+      } else if (val[i] > rhs.val[i]) {
         rtn = false;
         break;
       } // else they are equal and we need to check the next index
@@ -415,22 +415,22 @@ class Digest {
     return rtn;
   };
 
-  inline friend bool operator> (const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-    return rhs < lhs;
+  inline bool operator> (const cyclus::Digest& rhs) const {
+    return !operator<(rhs) && !operator==(rhs);
   };
 
-  inline friend bool operator<=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-    return !(lhs > rhs);
+  inline bool operator<=(const cyclus::Digest& rhs) const {
+    return !operator>(rhs);
   };
 
-  inline friend bool operator>=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-    return !(lhs < rhs);
+  inline bool operator>=(const cyclus::Digest& rhs) const {
+    return !operator<(rhs);
   };
 
-  inline friend bool operator==(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
+  inline bool operator==(const cyclus::Digest& rhs) const {
     bool rtn = true;
     for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-      if (lhs.val[i] != rhs.val[i]) {
+      if (val[i] != rhs.val[i]) {
         rtn = false;
         break;
       } // else they are equal and we need to check the next index.
@@ -438,8 +438,8 @@ class Digest {
     return rtn;
   };
 
-  inline friend bool operator!=(const cyclus::Digest& lhs, const cyclus::Digest& rhs) {
-    return !(lhs == rhs);
+  inline bool operator!=(const cyclus::Digest& rhs) const {
+    return !operator==(rhs);
   };
 };
 

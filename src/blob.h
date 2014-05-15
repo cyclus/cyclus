@@ -15,37 +15,37 @@ class Blob {
     return str_;
   }
 
+  inline std::ostream& operator<<(std::ostream& out) const {
+     return out << str();
+  }
+
+  inline bool operator< (const cyclus::Blob& rhs) const {
+    return str() < rhs.str();
+  }
+
+  inline bool operator> (const cyclus::Blob& rhs) const {
+    return !operator<(rhs) && !operator==(rhs);
+  }
+
+  inline bool operator<=(const cyclus::Blob& rhs) const {
+    return !operator>(rhs);
+  }
+
+  inline bool operator>=(const cyclus::Blob& rhs) const {
+    return !operator<(rhs);
+  }
+
+  inline bool operator==(const cyclus::Blob& rhs) const {
+    return str() == rhs.str();
+  }
+
+  inline bool operator!=(const cyclus::Blob& rhs) const {
+    return !operator==(rhs);
+  }
+
  private:
   std::string str_;
 };
 }  // namespace cyclus
-
-inline std::ostream& operator<<(std::ostream& out, const cyclus::Blob& b) {
-   return out << b.str();
-}
-
-inline bool operator< (const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
-  return lhs.str() < rhs.str();
-}
-
-inline bool operator> (const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
-  return rhs < lhs;
-}
-
-inline bool operator<=(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
-  return !(lhs > rhs);
-}
-
-inline bool operator>=(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
-  return !(lhs < rhs);
-}
-
-inline bool operator==(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
-  return lhs.str() == rhs.str();
-}
-
-inline bool operator!=(const cyclus::Blob& lhs, const cyclus::Blob& rhs) {
-  return !(lhs == rhs);
-}
 
 #endif  // CYCLUS_SRC_BLOB_H_
