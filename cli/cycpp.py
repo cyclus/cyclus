@@ -279,12 +279,30 @@ class ClassFilter(Filter):
 
     def revert(self, statement, sep):
         super(ClassFilter, self).revert(statement, sep)
-        state = self.machine
-        if len(state.classes) == 0:
+        machine = self.machine
+        if len(machine.classes) == 0 or machine.depth != machine.classes[-1][0]:
             return
-        if state.depth == state.classes[-1][0]:
-            del state.access[tuple(state.classes)]
-            del state.classes[-1]
+        #if isinstance(machine, StateAccumulator):
+        #    rtn = None
+        #elif isinstance(self.machine, CodeGenerator):
+        #    rtn = ";\n"  # need to add extra semicolon just in case
+        #    found_shape = False
+        #    cls = machine.classes[-1][1]
+        #    ctx = machine.context.get(machine.classname(), {})
+        #    for vname, annotations in ctx.items():
+        #        shape = annotations.get('shape', None)
+        #        if shape is None:
+        #            continue
+        #        found_shape = True
+        #        rtn += ('const int {3}::__{0}_rawshape__[{1}] = {{{2}}};\n'
+        #                'const std::vector<int> {3}::__{0}_shape__ = '
+        #                'std::vector<int>(__{0}_rawshape__, __{0}_rawshape__+{1});\n'
+        #                ).format(vname, len(shape), ', '.join(map(str, shape)), cls)
+        #    if not found_shape:
+        #        rtn = None
+        del machine.access[tuple(machine.classes)]
+        del machine.classes[-1]
+        #return rtn
 
 class ClassAndSuperclassFilter(ClassFilter):
     """This accumulates superclass information as well as class information."""
@@ -325,10 +343,13 @@ class VarDecorationFilter(Filter):
     This evals the contents of dict and puts them in state.var_annotations, to be
     consumed by the next match with VarDeclarationFilter.
     """
-    regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
+    regex = re.compile("\s*#\s*pragma\s+cyclus\s+var\s+(.*)")
 
     def transform(self, statement, sep):
         state = self.machine
+        if isinstance(state, CodeGenerator):
+            state.var_annotations = True
+            return
         context = state.context
         classname = state.classname()
         classpaths = classname.split('::')
@@ -370,7 +391,7 @@ class VarDeclarationFilter(Filter):
     """
     regex = re.compile("(.*\w+.*?)\s+(\w+)")
 
-    def transform(self, statement, sep):
+    def transform_pass2(self, statement, sep):
         state = self.machine
         annotations = state.var_annotations
         if annotations is None:
@@ -383,6 +404,29 @@ class VarDeclarationFilter(Filter):
         annotations['type'] = state.canonize_type(vtype, vname)
         state.context[classname][vname] = annotations
         state.var_annotations = None
+
+    def transform_pass3(self, statement, sep):
+        cg = self.machine
+        if cg.var_annotations is None:
+            return
+        classname = cg.classname()
+        vtype, vname = self.match.groups()
+        cg.var_annotations = None
+        shape = cg.context.get(classname, {}).get(vname, {}).get('shape', None)
+        if shape is None:
+            return
+        s = statement + sep + '\n'
+        s += '  std::vector<int> __{0}_shape__;\n'.format(vname)
+        return s
+
+    def transform(self, statement, sep):
+        if isinstance(self.machine, StateAccumulator):
+            rtn = self.transform_pass2(statement, sep)
+        elif isinstance(self.machine, CodeGenerator):
+            rtn = self.transform_pass3(statement, sep)
+        else:
+            rtn = None
+        return rtn
 
 class ExecFilter(Filter):
     """Filter for executing arbitrary python code in the exec pragma and
@@ -470,11 +514,11 @@ class StateAccumulator(object):
     supported_types = PRIMITIVES
     supported_types |= BUFFERS
     known_templates = {
-        'std::set': ('T',),
-        'std::map': ('Key', 'T'),
-        'std::pair': ('T1', 'T2'),
-        'std::list': ('T',),
         'std::vector': ('T',),
+        'std::set': ('T',),
+        'std::list': ('T',),
+        'std::pair': ('T1', 'T2'),
+        'std::map': ('Key', 'T'),
         }
     scopz = '::'  # intern the scoping operator
 
@@ -668,6 +712,18 @@ class CodeGeneratorFilter(Filter):
         self.local_classname = None
         self.given_classname = None
 
+    def shapes_impl(self, ctx, ind="  "):
+        s = ""
+        for vname, annotations in ctx.items():
+            shape = annotations.get('shape', None)
+            if shape is None:
+                continue
+            shapename = "__{0}_shape__".format(vname)
+            s += ('{3}int raw{0}[{1}] = {{{2}}};\n'
+                  '{3}{0} = std::vector<int>(raw{0}, raw{0} + {1});\n'
+                  ).format(shapename, len(shape), ", ".join(map(str, shape)), ind)
+        return s
+
 class CloneFilter(CodeGeneratorFilter):
     """Filter for handling Clone() code generation:
         #pragma cyclus [def|decl|impl] clone [classname]
@@ -707,8 +763,8 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
 
+        impl += self.shapes_impl(ctx, ind)
         cap_buffs = []
-
         for member, info in ctx.items():
             if info['type'] not in BUFFERS:
                 impl += ind + "{0} = m->{0};\n".format(member)
@@ -745,8 +801,8 @@ class InitFromDbFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
 
+        impl += self.shapes_impl(ctx, ind)
         cap_buffs = []
-
         for member, info in ctx.items():
             t = info['type']
             if t in BUFFERS:
@@ -820,6 +876,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
 
         impl += ind + "tree = tree->SubTree(\"agent/\" + agent_impl());\n"
+        impl += self.shapes_impl(ctx, ind)
         for member, info in ctx.items():
             t = info['type']
             if t in BUFFERS:
@@ -1125,35 +1182,6 @@ class DefaultPragmaFilter(Filter):
         for f in self.machine.codegen_filters:
             f.revert(statement, sep)
 
-class Indenter(object):
-    def __init__(self, n=2, level=0):
-        str.__init__(self)
-        self._n = int(n)
-        self._level = int(level)
-
-    def __add__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __radd__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __concat__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __str__(self):
-        return ' '*self._n*self._level
-
-    def __repr__(self):
-        return ' '*self._n*self._level
-
-    def up(self):
-        self._level += 1
-        return Indenter(n=self._n, level=self._level-1)
-
-    def down(self):
-        self._level -= 1
-        return Indenter(n=self._n, level=self._level)
-
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
 
@@ -1175,7 +1203,8 @@ class CodeGenerator(object):
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.linemarkers = []
-        # all basic code generating filters
+        self.var_annotations = None
+        # all basic code generating filters for core methods
         self.codegen_filters = [InitFromCopyFilter(self),
                                 InitFromDbFilter(self), InfileToDbFilter(self),
                                 CloneFilter(self), SchemaFilter(self),
@@ -1189,8 +1218,11 @@ class CodeGenerator(object):
                                                AccessFilter(self),
                                                NamespaceAliasFilter(self),
                                                NamespaceFilter(self),
+                                               VarDecorationFilter(self),
+                                               VarDeclarationFilter(self),
+                                               LinemarkerFilter(self),
                                                DefaultPragmaFilter(self),
-                                               LinemarkerFilter(self)]
+                                               ]
 
     def classname(self):
         """Returns the current, fully-expanded class name."""
@@ -1244,7 +1276,9 @@ class CodeGenerator(object):
             self.depth += statement.count('{') - statement.count('}')
         # revert what is needed
         for filter in self.filters:
-            filter.revert(statement, sep)
+            reverted = filter.revert(statement, sep)
+            if reverted is not None:
+                self.statements.append(reverted)
 
 def generate_code(orig, context, superclasses):
     """Takes a canonical C++ source file and separates it out into statements
@@ -1309,6 +1343,34 @@ class Proxy(MutableMapping):
     def __contains__(self, key):
         return key in self.__dict__['_d']
 
+class Indenter(object):
+    def __init__(self, n=2, level=0):
+        str.__init__(self)
+        self._n = int(n)
+        self._level = int(level)
+
+    def __add__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __radd__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __concat__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __str__(self):
+        return ' '*self._n*self._level
+
+    def __repr__(self):
+        return ' '*self._n*self._level
+
+    def up(self):
+        self._level += 1
+        return Indenter(n=self._n, level=self._level-1)
+
+    def down(self):
+        self._level -= 1
+        return Indenter(n=self._n, level=self._level)
 
 def outter_split(s, open_brace='(', close_brace=')', separator=','):
     """Takes a string and only split the outter most level."""

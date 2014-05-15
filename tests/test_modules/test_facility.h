@@ -22,6 +22,9 @@ class TestFacility: public cyclus::Facility {
 
   void Tick(int time) {};
   void Tock(int time) {};
+
+  #pragma cyclus var dict(shape=[10])
+  std::vector<double> sized_test;
 };
 
 #endif  // CYCLUS_TESTS_TEST_MODULES_TEST_FACILITY_H_

@@ -8,7 +8,7 @@
 
 namespace cyclus {
 
-const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+//const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   hasher_ = Sha1();
