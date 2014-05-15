@@ -53,13 +53,13 @@ Hdf5Back::~Hdf5Back() {
   // cleanup memory
   std::map<std::string, size_t*>::iterator it;
   std::map<std::string, DbTypes*>::iterator dbtit;
-  for (it = tbl_offset_.begin(); it != tbl_offset_.end(); ++it) {
+  for (it = col_offsets_.begin(); it != col_offsets_.end(); ++it) {
     delete[](it->second);
   }
-  for (it = tbl_sizes_.begin(); it != tbl_sizes_.end(); ++it) {
+  for (it = col_sizes_.begin(); it != col_sizes_.end(); ++it) {
     delete[](it->second);
   }
-  for (dbtit = tbl_types_.begin(); dbtit != tbl_types_.end(); ++dbtit) {
+  for (dbtit = schemas_.begin(); dbtit != schemas_.end(); ++dbtit) {
     delete[](dbtit->second);
   }
 };
@@ -68,7 +68,7 @@ void Hdf5Back::Notify(DatumList data) {
   std::map<std::string, DatumList> groups;
   for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
     std::string name = (*it)->title();
-    if (tbl_size_.count(name) == 0) {
+    if (schema_sizes_.count(name) == 0) {
       if (H5Lexists(file_, name.c_str(), H5P_DEFAULT)) {
         LoadTableTypes(name, (*it)->vals().size());
       } else {
@@ -229,7 +229,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case STRING: {
-            std::string x = std::string(buf + offset, tbl_sizes_[table][j]);
+            std::string x = std::string(buf + offset, col_sizes_[table][j]);
             size_t nullpos = x.find('\0');
             if (nullpos != std::string::npos)
               x.resize(nullpos);
@@ -261,8 +261,8 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case VECTOR_INT: {
-            std::vector<int> x = std::vector<int>(tbl_sizes_[table][j] / sizeof(int));
-            memcpy(&x[0], buf + offset, tbl_sizes_[table][j]);
+            std::vector<int> x = std::vector<int>(col_sizes_[table][j] / sizeof(int));
+            memcpy(&x[0], buf + offset, col_sizes_[table][j]);
             is_row_selected = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
             if (is_row_selected)
               row[j] = x;
@@ -280,7 +280,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             size_t nullpos;
             hsize_t fieldlen;
             H5Tget_array_dims2(field_type, &fieldlen);
-            unsigned int strlen = tbl_sizes_[table][j] / fieldlen;
+            unsigned int strlen = col_sizes_[table][j] / fieldlen;
             vector<string> x = vector<string>(fieldlen);
             for (unsigned int k = 0; k < fieldlen; ++k) {
               x[k] = string(buf + offset + strlen*k, strlen);
@@ -295,7 +295,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case VECTOR_VL_STRING: {
-            jlen = tbl_sizes_[table][j] / CYCLUS_SHA1_SIZE;
+            jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
             vector<string> x = vector<string>(jlen);
             for (unsigned int k = 0; k < jlen; ++k) {
               x[k] = VLRead<std::string, VL_STRING>(buf + offset + CYCLUS_SHA1_SIZE*k);
@@ -320,7 +320,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case SET_INT: {
-            jlen = tbl_sizes_[table][j] / sizeof(int);
+            jlen = col_sizes_[table][j] / sizeof(int);
             int* xraw = reinterpret_cast<int*>(buf + offset);
             std::set<int> x = std::set<int>(xraw, xraw+jlen);
             is_row_selected = CmpConds<std::set<int> >(&x, &(field_conds[qr.fields[j]]));
@@ -336,7 +336,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case LIST_INT: {
-            jlen = tbl_sizes_[table][j] / sizeof(int);
+            jlen = col_sizes_[table][j] / sizeof(int);
             int* xraw = reinterpret_cast<int*>(buf + offset);
             std::list<int> x = std::list<int>(xraw, xraw+jlen);
             is_row_selected = CmpConds<std::list<int> >(&x, &(field_conds[qr.fields[j]]));
@@ -361,7 +361,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           }
           case MAP_INT_INT: {
             map<int, int> x = map<int, int>();
-            jlen = tbl_sizes_[table][j] / (2*sizeof(int));
+            jlen = col_sizes_[table][j] / (2*sizeof(int));
             for (unsigned int k = 0; k < jlen; ++k) {
               x[*reinterpret_cast<int*>(buf + offset + 2*sizeof(int)*k)] = \
                 *reinterpret_cast<int*>(buf + offset + 2*sizeof(int)*k + sizeof(int));
@@ -386,7 +386,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
         }
         if (!is_row_selected)
           break;
-        offset += tbl_sizes_[table][j];
+        offset += col_sizes_[table][j];
       }
       if (is_row_selected) {
         qr.rows.push_back(row);
@@ -411,7 +411,7 @@ QueryResult Hdf5Back::GetTableInfo(std::string title, hid_t dset, hid_t dt) {
   std::string fieldname;
   std::string fieldtype;
   //LoadTableTypes(title, dset, ncols);
-  DbTypes* dbtypes = tbl_types_[title];
+  DbTypes* dbtypes = schemas_[title];
 
   QueryResult qr;
   for (i = 0; i < ncols; ++i) {
@@ -425,7 +425,7 @@ QueryResult Hdf5Back::GetTableInfo(std::string title, hid_t dset, hid_t dt) {
 }
 
 void Hdf5Back::LoadTableTypes(std::string title, hsize_t ncols) {
-  if (tbl_types_.count(title) > 0)
+  if (schemas_.count(title) > 0)
     return;
   hid_t dset = H5Dopen2(file_, title.c_str(), H5P_DEFAULT);
   LoadTableTypes(title, dset, ncols);
@@ -433,13 +433,13 @@ void Hdf5Back::LoadTableTypes(std::string title, hsize_t ncols) {
 }
 
 void Hdf5Back::LoadTableTypes(std::string title, hid_t dset, hsize_t ncols) {
-  if (tbl_types_.count(title) > 0)
+  if (schemas_.count(title) > 0)
     return;
 
   int i;
   hid_t subt;
   hid_t t = H5Dget_type(dset);
-  tbl_size_[title] = H5Tget_size(t);
+  schema_sizes_[title] = H5Tget_size(t);
   size_t* offsets = new size_t[ncols];
   size_t* sizes = new size_t[ncols];
   for (i = 0; i < ncols; ++i) {
@@ -449,8 +449,8 @@ void Hdf5Back::LoadTableTypes(std::string title, hid_t dset, hsize_t ncols) {
     H5Tclose(subt);
   }
   H5Tclose(t);
-  tbl_offset_[title] = offsets;
-  tbl_sizes_[title] = sizes;
+  col_offsets_[title] = offsets;
+  col_sizes_[title] = sizes;
 
   // get types from db
   int dbt[ncols];
@@ -464,7 +464,7 @@ void Hdf5Back::LoadTableTypes(std::string title, hid_t dset, hsize_t ncols) {
   DbTypes* dbtypes = new DbTypes[ncols];
   for (i = 0; i < ncols; ++i)
     dbtypes[i] = static_cast<DbTypes>(dbt[i]);
-  tbl_types_[title] = dbtypes;
+  schemas_[title] = dbtypes;
 }
 
 hid_t Hdf5Back::CreateFLStrType(int n) {
@@ -673,18 +673,18 @@ void Hdf5Back::CreateTable(Datum* d) {
   H5Dclose(tb_set);
 
   // record everything for later
-  tbl_offset_[d->title()] = dst_offset;
-  tbl_size_[d->title()] = dst_size;
-  tbl_sizes_[d->title()] = dst_sizes;
-  tbl_types_[d->title()] = dbtypes;
+  col_offsets_[d->title()] = dst_offset;
+  schema_sizes_[d->title()] = dst_size;
+  col_sizes_[d->title()] = dst_sizes;
+  schemas_[d->title()] = dbtypes;
 }
 
 void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
 
-  size_t* offsets = tbl_offset_[title];
-  size_t* sizes = tbl_sizes_[title];
-  size_t rowsize = tbl_size_[title];
+  size_t* offsets = col_offsets_[title];
+  size_t* sizes = col_sizes_[title];
+  size_t rowsize = schema_sizes_[title];
 
   char* buf = new char[group.size() * rowsize];
   FillBuf(title, buf, group, sizes, rowsize);
@@ -756,7 +756,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
   Datum::Vals header = group.front()->vals();
   int ncols = header.size();
   //LoadTableTypes(title, ncols);
-  DbTypes* dbtypes = tbl_types_[title];
+  DbTypes* dbtypes = schemas_[title];
 
   size_t offset = 0;
   const void* val;

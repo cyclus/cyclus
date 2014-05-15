@@ -94,7 +94,7 @@ class Hdf5Back : public FullBackend {
   /// Creates a QueryResult from a table description.
   QueryResult GetTableInfo(std::string title, hid_t dset, hid_t dt);
 
-  /// Reads a table's column types into tbl_types_ if they aren't already there
+  /// Reads a table's column types into schemas_ if they aren't already there
   /// \{
   void LoadTableTypes(std::string title, hsize_t ncols);
   void LoadTableTypes(std::string title, hid_t dset, hsize_t ncols);
@@ -205,19 +205,19 @@ class Hdf5Back : public FullBackend {
 
   /// Offsets in bytes of each column in the tables, note that Hdf5Back itself
   /// owns the value pointers and deallocates them in the desturctor.
-  std::map<std::string, size_t*> tbl_offset_;
+  std::map<std::string, size_t*> col_offsets_;
 
   /// Size in bytes of each column in the tables, note that Hdf5Back itself
   /// owns the value pointers and deallocates them in the desturctor.
-  std::map<std::string, size_t*> tbl_sizes_;
+  std::map<std::string, size_t*> col_sizes_;
 
   /// Total size in bytes of the whole schema in the tables.
-  std::map<std::string, size_t> tbl_size_;
+  std::map<std::string, size_t> schema_sizes_;
 
   /// Backend database specific datatypes for each column in the tables. 
   /// Note that Hdf5Back itself owns the value pointers and deallocates them 
   /// in the desturctor.
-  std::map<std::string, DbTypes*> tbl_types_;
+  std::map<std::string, DbTypes*> schemas_;
 
   /// Map of array name (eg StringVals, BlobVals) to the HDF5 id for the 
   /// cooresponding dataet for variable length data.
