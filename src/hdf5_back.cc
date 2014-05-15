@@ -545,7 +545,7 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = VECTOR_INT;
-        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
+        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &((*shape)[0]));
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * (*shape)[0];
       }
@@ -661,6 +661,19 @@ void Hdf5Back::CreateTable(Datum* d) {
   status = H5TBmake_table(title, file_, title, nvals, 0, dst_size,
                           field_names, dst_offset, field_types, chunk_size, 
                           fill_data, compress, data);
+  if (status < 0) {
+    std::stringstream ss; 
+    ss << "Failed to create HDF5 table:\n" \
+       << "  file      " << path_ << "\n" \
+       << "  table     " << title << "\n" \
+       << "  chunksize " << chunk_size << "\n" \
+       << "  rowsize   " << dst_size << "\n";
+    for (int i = 0; i < nvals; ++i) {
+      ss << "    col #" << i << " " << field_names[i] << " size: " << dst_sizes[i] \
+         << " offset: " << dst_offset[i] << "\n";
+    }
+    throw IOError(ss.str());
+  }
 
   // add dbtypes attribute
   hid_t tb_set = H5Dopen2(file_, title, H5P_DEFAULT);
