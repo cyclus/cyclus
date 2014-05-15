@@ -44,8 +44,13 @@ class SimInit {
               boost::uuids::uuid new_sim_id);
 
   /// Records a snapshot of the current state of the simulation being managed by
-  /// ctx into the simulations output database.
+  /// ctx into the simulation's output database.
   static void Snapshot(Context* ctx);
+
+  /// Records a snapshot of the agent's current internal state into the
+  /// simulation's output database.  Note that this should generally not be
+  /// called directly.
+  static void SnapAgent(Agent* m);
 
   /// Returns the initialized context. Note that either Init, Restart, or Branch
   /// must be called first.
@@ -76,8 +81,6 @@ class SimInit {
   Resource::Ptr LoadMaterial(int resid);
   Resource::Ptr LoadProduct(int resid);
   Composition::Ptr LoadComposition(int stateid);
-
-  static void SnapAgent(Agent* m);
 
   // std::map<AgentId, Agent*>
   std::map<int, Agent*> agents_;

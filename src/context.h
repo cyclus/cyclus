@@ -18,6 +18,8 @@
 #include "greedy_solver.h"
 #include "recorder.h"
 
+class SimInitTest;
+
 namespace cyclus {
 
 class Datum;
@@ -78,6 +80,7 @@ class SimInfo {
 /// destruction.
 class Context {
  public:
+  friend class ::SimInitTest;
   friend class SimInit;
   friend class Agent;
 

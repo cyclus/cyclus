@@ -68,7 +68,7 @@ std::map<std::string, DynamicModule*> DynamicModule::modules_;
 std::map<std::string, Agent*> DynamicModule::man_agents_;
 
 Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
-  if (man_agents_.count(spec.str()) > 0) {
+  if (man_agents_.count(spec.str()) > 0) { // for testing
     return man_agents_[spec.str()]->Clone();
   } else if (modules_.count(spec.str()) == 0) {
     DynamicModule* dyn = new DynamicModule(spec);
@@ -79,10 +79,6 @@ Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
   Agent* a = dyn->ConstructInstance(ctx);
   a->spec(spec.str());
   return a;
-}
-
-void DynamicModule::AddAgent(std::string spec, Agent* ref) {
-  man_agents_[spec] = ref;
 }
 
 void DynamicModule::CloseAll() {
