@@ -645,7 +645,7 @@ void Hdf5Back::CreateTable(Datum* d) {
       }
     } else {
       throw IOError("the type for column '" + std::string(field_names[i]) + \
-                    "is not yet supported in HDF5.");
+                    "' is not yet supported in HDF5.");
     } 
     dst_size += dst_sizes[i];
   }
