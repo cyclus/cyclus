@@ -689,6 +689,9 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   char* buf = new char[group.size() * rowsize];
   FillBuf(title, buf, group, sizes, rowsize);
 
+  std::cout << "path " << path_ << "\n";
+  std::cout << "table " << title << "\n";
+  std::cout << "groupsize " << group.size() << "\n";
   std::cout << "rowsize " << rowsize << "\n";
   for (int i = 0; i < group[0]->vals().size(); ++i) {
     std::cout << "col " << i << " " << sizes[i] << " "<< offsets[i] <<"\n";

@@ -116,6 +116,7 @@ cyclus::QueryResult Hdf5ReadWriteResultBasic(const char* fpath, T x, T y,
   ->AddVal("vals", y, shape)
   ->Record();
   m.Close();
+  H5garbage_collect();
   return back.Query("data", NULL);
 }
 
