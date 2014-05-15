@@ -8,7 +8,7 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times, create_sim_input, \
+from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, sha1array
 
 def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
@@ -116,8 +116,8 @@ def test_minimal_cycle():
             paths = ["/AgentEntry", "/Resources", "/Transactions",
                     "/Info"]
             # Check if these tables exist
-            yield assert_true, table_exist(output, paths)
-            if not table_exist(output, paths):
+            yield assert_true, tables_exist(output, paths)
+            if not tables_exist(output, paths):
                 output.close()
                 clean_outs()
                 return  # don't execute further commands

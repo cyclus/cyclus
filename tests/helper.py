@@ -27,7 +27,7 @@ def clean_outs():
         os.remove(sqliteout)
         
 
-def table_exist(db, tables):
+def tables_exist(db, tables):
     """Checks if hdf5 database contains the specified tables.
     """
     return all([t in db.root for t in tables])

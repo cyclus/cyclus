@@ -5,7 +5,7 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times, \
+from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs
 
 """Tests"""
@@ -30,8 +30,8 @@ def test_null_sink():
     legal_paths = ["/AgentEntry", "/Info"]
     illegal_paths = ["/Transactions"]  # this must contain tables to test
     # Check if these tables exist
-    yield assert_true, table_exist(output, legal_paths)
-    if not table_exist(output, legal_paths):
+    yield assert_true, tables_exist(output, legal_paths)
+    if not tables_exist(output, legal_paths):
         output.close()
         clean_outs()
         return  # don't execute further commands
@@ -49,7 +49,7 @@ def test_null_sink():
     yield assert_equal, len(sink_id), 1
 
     # No resource exchange is expected
-    yield assert_false, table_exist(output, illegal_paths)
+    yield assert_false, tables_exist(output, illegal_paths)
 
     output.close()
     clean_outs()
