@@ -54,8 +54,7 @@ def agent_time_series(f, names):
     all_exits = {x['AgentId']: x['ExitTime'] for x in tbl.iterrows() \
                      if x['AgentId'] in all_ids}
     for k, v in all_exits.items():
-        if v != nsteps - 1:
-            exits[ids[k]][v] += 1
+        exits[ids[k]][v] += 1
 
     # cumulative exits
     for k, v in exits.items():
