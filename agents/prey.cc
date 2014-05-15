@@ -19,8 +19,8 @@ std::string Prey::str() {
   return ss.str();
 }
 
-void Prey::DoRegistration() {
-  cyclus::Facility::DoRegistration();
+void Prey::EnterNotify() {
+  cyclus::Facility::EnterNotify();
   context()->RegisterTrader(this);
 }
 

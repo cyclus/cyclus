@@ -24,7 +24,7 @@ class Predator : public cyclus::Facility  {
   #pragma cyclus
 
   virtual std::string str();
-  virtual void DoRegistration();
+  virtual void EnterNotify();
   virtual void Build(cyclus::Agent* parent = NULL);
   virtual void Decommission();
   virtual void Tick(int time);

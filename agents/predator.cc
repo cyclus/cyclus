@@ -11,8 +11,8 @@ std::string Predator::str() {
   return Facility::str();
 }
 
-void Predator::DoRegistration() {
-  cyclus::Facility::DoRegistration();
+void Predator::EnterNotify() {
+  cyclus::Facility::EnterNotify();
   context()->RegisterTrader(this);
 }
 
