@@ -1007,10 +1007,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
             if t in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
-            reader = self.readers.get(t, self.readers.get(t[0], None))
-            impl += reader(member, t, d, ind)
             if 'derived_init' in info:
                 impl += ind + info['derived_init'] + '\n'
+            else:
+                reader = self.readers.get(t, self.readers.get(t[0], None))
+                impl += reader(member, t, d, ind)
 
         # write obj to database
         impl += ind + 'di.NewDatum("Info")\n'
