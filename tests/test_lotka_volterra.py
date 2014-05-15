@@ -6,51 +6,77 @@ import os
 import tables
 import numpy as np
 from tools import check_cmd
-from helper import table_exist, find_ids, exit_times, h5out, clean_outs
+from helper import tables_exist, find_ids, exit_times, h5out, clean_outs
 
-def test_prey_only():
-    """Tests simulations with Preys only.
+prey = "Prey"
+pred = "Predator"
 
-    The population is expected to grow exponentially.
+def agent_time_series(f, names):
+    """Return a list of timeseries corresponding to the number of agents in a
+    Cyclus simulation
+    
+    Parameters
+    ----------
+    f : PyTables file
+        the output file
+    names : list
+        the list of agent names
     """
-    clean_outs()
+    names = [prey, pred]
 
-    # A reference simulation input for Lotka-Volterra simulation
-    sim_input = "./input/prey.xml"
+    tbl = f.root.Info
+    nsteps = [x['Duration'] for x in tbl.iterrows()][0]
+    entries = {name: [0 for n in range(nsteps)] for name in names}
+    exits = {name: [0 for n in range(nsteps)] for name in names}
 
-    holdsrtn = [1]  # needed because nose does not send() to test generator
-    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
-    rtn = holdsrtn[0]
-    if rtn != 0:
-        return  # don't execute further commands
+    # entries per timestep
+    tbl = f.root.AgentEntry    
+    for x in tbl.iterrows():
+        for name in names:
+            if x['Prototype'] == name:
+                entries[name][x['EnterTime']] += 1
+    
+    # cumulative entries
+    for k, v in entries.items():
+        for i in range(len(v) - 1):
+            v[i+1] += v[i]
 
-    output = tables.open_file(h5out, mode = "r")
-    # tables of interest
-    paths = ["/AgentEntry"]
-    # Check if these tables exist
-    yield assert_true, table_exist(output, paths)
-    if not table_exist(output, paths):
-        output.close()
-        clean_outs()
-        return  # don't execute further commands
+    if not hasattr(f.root, 'AgentExit'):
+        return entries
 
-    # Get specific tables and columns
-    agent_entry = output.get_node("/AgentEntry")[:]
+    # agent id -> prototype name mapping
+    cond = """Prototype == '{0}'"""
+    ids = {row["AgentId"]: name for row in tbl.where(cond.format(name)) for name in names}
+    all_ids = [k for k, v in ids.items()]
+    
+    # exits per timestep
+    tbl = f.root.AgentExit
+    all_exits = {x['AgentId']: x['ExitTime'] for x in tbl.iterrows() \
+                     if x['AgentId'] in all_ids}
+    for k, v in all_exits.items():
+        if v != nsteps - 1:
+            exits[ids[k]][v] += 1
 
-    # Find agent ids
-    agent_ids = agent_entry["AgentId"]
-    agent_impl = agent_entry["Implementation"]
-    agent_protos = agent_entry["Prototype"]
+    # cumulative exits
+    for k, v in exits.items():
+        for i in range(len(v) - 1):
+            v[i+1] += v[i]
 
-    output.close()
-    clean_outs()
-
+    # return difference
+    ret = {}
+    for name in names:
+        i = entries[name]
+        # shift by one to account for agents that enter/exit in the same
+        # timestep
+        o = [0] + exits[name][:-1] 
+        ret[name] = [i - o for i, o in zip(i, o)]
+            
+    return ret
 
 def test_predator_only():
     """Tests simulations with Predators only.
 
-    The population is expected to decrease exponentially.
+    The population is expected to die off after a timestep.
     """
     clean_outs()
 
@@ -61,30 +87,49 @@ def test_predator_only():
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
-    if rtn != 0:
-        return  # don't execute further commands
+    
+    print("Confirming valid Cyclus execution.")
+    assert_equal(rtn, 0)
 
     output = tables.open_file(h5out, mode = "r")
-    # tables of interest
-    paths = ["/AgentEntry"]
-    # Check if these tables exist
-    yield assert_true, table_exist(output, paths)
-    if not table_exist(output, paths):
-        output.close()
-        clean_outs()
-        return  # don't execute further commands
+    series = agent_time_series(output, [prey, pred])
+    
+    prey_exp = [0 for n in range(10)]
+    pred_exp = [1, 1] + [0 for n in range(8)]
 
-    # Get specific tables and columns
-    agent_entry = output.get_node("/AgentEntry")[:]
-
-    # Find agent ids
-    agent_ids = agent_entry["AgentId"]
-    agent_impl = agent_entry["Implementation"]
-    agent_protos = agent_entry["Prototype"]
+    assert_equal(series[prey], prey_exp)
+    assert_equal(series[pred], pred_exp)
 
     output.close()
     clean_outs()
 
+def test_prey_only():
+    """Tests simulations with Preys only.
+
+    The population is expected to grow exponentially.
+    """
+    clean_outs()
+    sim_input = "./input/prey.xml"
+    holdsrtn = [1]  # needed because nose does not send() to test generator
+    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
+    yield check_cmd, cmd, '.', holdsrtn
+    rtn = holdsrtn[0]
+    
+    print("Confirming valid Cyclus execution.")
+    assert_equal(rtn, 0)
+
+    output = tables.open_file(h5out, mode = "r")
+    series = agent_time_series(output, [prey, pred])
+    print(series)
+    
+    prey_exp = [2**n for n in range(10)]
+    pred_exp = [0 for n in range(10)]
+    
+    assert_equal(series[prey], prey_exp)
+    assert_equal(series[pred], pred_exp)
+
+    output.close()
+    clean_outs()
 
 def test_lotka_volterra():
     """Tests simulations with Preys and Predators
@@ -97,46 +142,26 @@ def test_lotka_volterra():
     After certain time steps, predators and preys reproduce and deploy new
     predators and preys respectively.
 
-    Oscillating behavior is expected when both species are in the simulation.
-    If only one specie is in the environment, its population should show
-    exponential growth or decay.
+    A single oscillation is expected and the peak of the predator population is
+    expected to occur after the peak of the prey population.
     """
     clean_outs()
-
-    # A reference simulation input for Lotka-Volterra simulation
     sim_input = "./input/lotka_volterra_determ.xml"
-
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
-    if rtn != 0:
-        return  # don't execute further commands
+    
+    print("Confirming valid Cyclus execution.")
+    assert_equal(rtn, 0)
 
     output = tables.open_file(h5out, mode = "r")
-    # tables of interest
-    paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
-    # Check if these tables exist
-    yield assert_true, table_exist(output, paths)
-    if not table_exist(output, paths):
-        output.close()
-        clean_outs()
-        return  # don't execute further commands
-
-    # Get specific tables and columns
-    agent_entry = output.get_node("/AgentEntry")[:]
-    info = output.get_node("/Info")[:]
-    resources = output.get_node("/Resources")[:]
-    transactions = output.get_node("/Transactions")[:]
-
-    # Find agent ids
-    agent_ids = agent_entry["AgentId"]
-    agent_impl = agent_entry["Implementation"]
-    agent_protos = agent_entry["Prototype"]
-    duration = info["Duration"][0]
-
-    # Track transacted resources
-    quantities = resources["Quantity"]
+    series = agent_time_series(output, [prey, pred])
+    
+    prey_max = series[prey].index(max(series[prey]))
+    pred_max = series[pred].index(max(series[pred]))
+    
+    assert_true(prey_max > pred_max)
 
     output.close()
     clean_outs()
