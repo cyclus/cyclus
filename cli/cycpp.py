@@ -79,9 +79,10 @@ CYCNS = 'cyclus'
 PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob', 
               'boost::uuids::uuid'}
 
-BUFFERS = {
-    '{0}::ResourceBuff'.format(CYCNS),
-}
+BUFFERS = {'{0}::ResourceBuff'.format(CYCNS)}
+
+TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
+             'std::map',}
 
 WRANGLERS = {
     '{0}::Agent'.format(CYCNS),
@@ -775,62 +776,28 @@ class InitFromDbFilter(CodeGeneratorFilter):
         context = cg.context
         ctx = context[self.given_classname]
         impl = ''
-        pods = []
-
         # add inheritance init froms
         rents = parent_intersection(self.given_classname, WRANGLERS,
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
-
-        impl += self.shapes_impl(ctx, ind)
+        # create body
         cap_buffs = []
+        impl += self.shapes_impl(ctx, ind)
+        impl += ind + '{0}::QueryResult qr = b->Query("Info", NULL);\n'.format(CYCNS)
         for member, info in ctx.items():
             t = info['type']
             if t in BUFFERS:
                 if 'capacity' in info:
                     cap_buffs.append((member, info['capacity']))
                 continue
-            if t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
-                if t[0] == 'std::map':
-                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
-                else:
-                    table = 'ListOf' + t[1].replace('std::', '').title()
-                impl += ind + '{\n'
-                impl += ind + '  std::vector<{0}::Cond> conds;\n'.format(CYCNS)
-                impl += ind + '  conds.push_back({0}::Cond("Member", "==", "{1}"));\n'.format(CYCNS, member)
-                impl += ind + '  {0}::QueryResult qr = b->Query("{1}", &conds);\n'.format(CYCNS, table)
-                impl += ind + '  for (int i = 0; i < qr.rows.size(); ++i) {\n'
-                ind += '    '
-                if t[0] == 'std::map':
-                    impl += ind + '{0} {1}_k = qr.GetVal<{0}>("Key", i);\n'.format(t[1], member)
-                    impl += ind + '{0} {1}_v = qr.GetVal<{0}>("Value", i);\n'.format(t[2], member)
-                    impl += ind + '{0}[{0}_k] = {0}_v;\n'.format(member)
-                elif t[0] == 'std::set':
-                    impl += ind + '{0}.insert(qr.GetVal<{1}>("Value", i));\n'.format(member, t[1])
-                else:
-                    impl += ind + '{0}.push_back(qr.GetVal<{1}>("Value", i));\n'.format(member, t[1])
-                ind = ind[:-4]
-                impl += ind + '  }\n'
-                impl += ind + '}\n'
-            elif t in PRIMITIVES:
-                pods.append((member, t))
-            elif t[0] == 'std::pair':
-                pods.append((member, t))
-            else:
-                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
-
-        # add pod
-        impl += ind + "{0}::QueryResult qr = b->Query(\"Info\", NULL);\n".format(CYCNS)
-        for (member, t) in pods:
-            if t[0] == 'std::pair':
-                impl += ind + "{0}.first = qr.GetVal<{1}>(\"{0}A\");\n".format(member, t[1])
-                impl += ind + "{0}.second = qr.GetVal<{1}>(\"{0}B\");\n".format(member, t[2])
-            else:
-                impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(member, t)
-
+            tstr = type_to_str(t)
+            if tstr.endswith('>'):
+                tstr += ' '
+            impl += ind + '{0} = qr.GetVal<{1}>("{0}");\n'.format(member, tstr)
         for b in cap_buffs:
-            impl += ind + "{0}.set_capacity(qr.GetVal<double>(\"{1}\"));\n".format(b[0], b[1])
+            impl += ind + ('{0}.set_capacity(qr.GetVal<double>'
+                           '("{1}"));\n').format(b[0], b[1])
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
@@ -841,8 +808,41 @@ class InfileToDbFilter(CodeGeneratorFilter):
     pragmaname = "infiletodb"
     methodrtn = "void"
 
+    def __init__(self *args, **kwargs):
+        super(InfileToDbFilter, self).__init__(*args, **kwargs)
+        self.readers = {
+            'std::map': self.read_map,
+            }
+
     def methodargs(self):
         return "{0}::InfileTree* tree, {0}::DbInit di".format(CYCNS)
+
+    def read_map(self, member, t, d, ind="  "):
+        s = ""
+        keystr = type_to_str(t[1])
+        if keystr.endswith('>'):
+            keystr += " "
+        valstr = type_to_str(t[2])
+        if valstr.endswith('>'):
+            valstr += " "
+        if d is not None:
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            ind += '  '
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'n = sub->NMatches("val");\n'
+        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + ('  {1}[{0}::Query<{2}>(sub, "key", i)] = '
+                    '{0}::Query<{3}>(sub, "val", i);\n'
+                    ).format(CYCNS, member, keystr, valstr)
+        s += ind + '}\n'
+        if d is not None:
+            ind = ind[:-2]
+            s += ind + '} else {\n'
+            ind += '  '
+            
+            ind = ind[:-2]
+            s += ind + '}\n'
+        return s
 
     def impl(self, ind="  "):
         cg = self.machine
@@ -857,7 +857,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
 
-        impl += ind + "tree = tree->SubTree(\"agent/\" + agent_impl());\n"
+        impl += ind + 'tree = tree->SubTree("agent/" + agent_impl());\n'
+        impl += ind + '{0}::InfileTree* sub;\n'.format(CYCNS)
+        impl += ind + 'int i;\n'
+        impl += ind + 'int n;\n'
         impl += self.shapes_impl(ctx, ind)
         for member, info in ctx.items():
             t = info['type']
@@ -866,16 +869,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             d = info['default'] if 'default' in info else None
             code = info['derived_init'] if 'derived_init' in info else None
             if t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
-                if t[0] == 'std::map':
-                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
-                else:
-                    table = 'ListOf' + t[1].split('::')[-1].title()
 
-                if d is not None:
-                    impl += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
-                else:
-                    impl += ind + '{\n'
-                ind += '  '
 
                 impl += ind + '{0}::InfileTree* sub = tree->SubTree("{1}");\n'.format(CYCNS, member)
                 impl += ind + 'int n = sub->NMatches("val");\n'
