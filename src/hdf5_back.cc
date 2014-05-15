@@ -812,6 +812,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           std::vector<int> val = a->cast<std::vector<int> >();
           fieldlen = sizes[col];
           valuelen = std::min(val.size() * sizeof(int), fieldlen);
+          std::cout << "vector<int> " << val.size() << " " << fieldlen << " " << valuelen << "\n";
           memcpy(buf + offset, &val[0], valuelen);
           memset(buf + offset + valuelen, 0, fieldlen - valuelen);
           break;
@@ -868,6 +869,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           std::set<int> val = a->cast<std::set<int> >();
           fieldlen = sizes[col];
           valuelen = std::min(val.size() * sizeof(int), fieldlen);
+          std::cout << "set<int> " << val.size() << " " << fieldlen << " " << valuelen << "\n";
           unsigned int cnt = 0;
           for (std::set<int>::iterator sit = val.begin(); sit != val.end(); ++sit) {
             memcpy(buf + offset + cnt*sizeof(int), &(*sit), sizeof(int));
@@ -885,6 +887,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           std::list<int> val = a->cast<std::list<int> >();
           fieldlen = sizes[col];
           valuelen = std::min(val.size() * sizeof(int), fieldlen);
+          std::cout << "list<int> " << val.size() << " " << fieldlen << " " << valuelen << "\n";
           unsigned int cnt = 0;
           std::list<int>::iterator valit = val.begin();
           for (; valit != val.end(); ++valit) {
@@ -909,6 +912,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           map<int, int> val = a->cast<map<int, int> >();
           fieldlen = sizes[col];
           valuelen = min(2 * sizeof(int) * val.size(), fieldlen);
+          std::cout << "map<int, int> " << val.size() << " " << fieldlen << " " << valuelen << "\n";
           unsigned int cnt = 0;
           for (map<int, int>::iterator valit = val.begin(); valit != val.end(); ++valit) {
             memcpy(buf + offset + 2*sizeof(int)*cnt, &(valit->first), sizeof(int));

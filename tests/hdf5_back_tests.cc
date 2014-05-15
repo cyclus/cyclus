@@ -157,7 +157,7 @@ void Hdf5ReadWriteTestBasic<cyclus::Blob>(const char* fpath, cyclus::Blob x,
 //
 
 TEST(Hdf5BackTest, ReadWriteBool) {
-  Hdf5ReadWriteTestBasic<bool>("int.h5", true, false);
+  Hdf5ReadWriteTestBasic<bool>("bool.h5", true, false);
 }
 
 TEST(Hdf5BackTest, ReadWriteInt) {
