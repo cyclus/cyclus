@@ -122,7 +122,7 @@ class Hdf5Back : public FullBackend {
   T VLRead(const char* rawkey);
 
   /// Writes a variable length data to its on-disk bidirectional hash map.
-  /// @param x the dat a to write.
+  /// @param x the data to write.
   /// @param dbtype the data type of x.
   /// @return the key of x, which is a SHA1 hash as len-5 an array of ints.
   /// \{
@@ -139,14 +139,12 @@ class Hdf5Back : public FullBackend {
   /// If the dataset does not exist in the database, it will create it.
   ///
   /// @param dbtype the datatype to retrive
-  ///
   /// @param forkeys specifies whether to retrieve the keys (true) or 
   /// values (false) dataset, optional
-  ///
   /// @return the dataset identifier
-  hid_t VLDataset(DbTypes dbtype, bool forkeys=true);
+  hid_t VLDataset(DbTypes dbtype, bool forkeys);
 
-  /// Appends a key to a variable lengeth key dataset
+  /// Appends a key to a variable length key dataset
   ///
   /// @param dset an open HDF5 dataset
   /// @param dbtype the variable length data type
@@ -205,12 +203,30 @@ class Hdf5Back : public FullBackend {
   /// Stores the database's path+name, declared during construction.
   std::string path_;
 
+  /// Offsets in bytes of each column in the tables, note that Hdf5Back itself
+  /// owns the value pointers and deallocates them in the desturctor.
   std::map<std::string, size_t*> tbl_offset_;
+
+  /// Size in bytes of each column in the tables, note that Hdf5Back itself
+  /// owns the value pointers and deallocates them in the desturctor.
   std::map<std::string, size_t*> tbl_sizes_;
+
+  /// Total size in bytes of the whole schema in the tables.
   std::map<std::string, size_t> tbl_size_;
+
+  /// Backend database specific datatypes for each column in the tables. 
+  /// Note that Hdf5Back itself owns the value pointers and deallocates them 
+  /// in the desturctor.
   std::map<std::string, DbTypes*> tbl_types_;
+
+  /// Map of array name (eg StringVals, BlobVals) to the HDF5 id for the 
+  /// cooresponding dataet for variable length data.
   std::map<std::string, hid_t> vldatasets_;
+
+  /// Map of database type to the cooresponding HDF5 datatype.
   std::map<DbTypes, hid_t> vldts_;
+
+  /// Map of database type to the set of current keys present in the database.
   std::map<DbTypes, std::set<Digest> > vlkeys_;
 };
 

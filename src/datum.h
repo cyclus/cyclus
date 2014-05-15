@@ -37,7 +37,7 @@ class Datum {
   /// such as string and blob. If a shape is provided, this field and value 
   /// is interpreted as having a fixed length (of the value given). If the 
   /// pointer is NULL or the entry is less than one (<1), the field is interpreted
-  /// as inherently variable length, which may affect persistance. This is 
+  /// as inherently variable length, which may affect persistance. This is a
   /// vector of ints (a shape) rather than an int (a length) to accomodate 
   /// nested data types, such as a vector of vectors of doubles or a map of 
   /// strings to ints.  Use NULL as the shape for fixed length data types such

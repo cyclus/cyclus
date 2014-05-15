@@ -11,15 +11,15 @@ namespace cyclus {
 //const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
-  hasher_ = Sha1();
+  hasher_.Clear();
   if (boost::filesystem::exists(path_))
     file_ = H5Fopen(path_.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
   else  
     file_ = H5Fcreate(path_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  opened_types_ = std::set<hid_t>();
-  vldatasets_ = std::map<std::string, hid_t>();
-  vldts_ = std::map<DbTypes, hid_t>();
-  vlkeys_ = std::map<DbTypes, std::set<Digest> >();
+  opened_types_.clear();
+  vldatasets_.clear();
+  vldts_.clear();
+  vlkeys_.clear();
 
   uuid_type_ = H5Tcopy(H5T_C_S1);
   H5Tset_size(uuid_type_, CYCLUS_UUID_SIZE);
@@ -193,38 +193,38 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
     status = H5Sselect_hyperslab(tb_space, H5S_SELECT_SET, &start, NULL, &count, NULL);
     status = H5Dread(tb_set, tb_type, memspace, tb_space, H5P_DEFAULT, buf);
     int offset = 0;
-    bool is_valid_row;
+    bool is_row_selected;
     for (i = 0; i < count; ++i) {
       offset = i * tb_typesize;
-      is_valid_row = true;
+      is_row_selected = true;
       QueryRow row = QueryRow(nfields);
       for (j = 0; j < nfields; ++j) {
         switch (qr.types[j]) {
           case BOOL: {
             bool x = *reinterpret_cast<bool*>(buf + offset);
-            is_valid_row = CmpConds<bool>(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<bool>(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case INT: {
             int x = *reinterpret_cast<int*>(buf + offset);
-            is_valid_row = CmpConds<int>(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<int>(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case FLOAT: {
             float x = *reinterpret_cast<float*>(buf + offset);
-            is_valid_row = CmpConds<float>(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<float>(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case DOUBLE: {
             double x = *reinterpret_cast<double*>(buf + offset);
-            is_valid_row = CmpConds<double>(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<double>(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
@@ -233,45 +233,45 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             size_t nullpos = x.find('\0');
             if (nullpos != std::string::npos)
               x.resize(nullpos);
-            is_valid_row = CmpConds<std::string>(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<std::string>(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case VL_STRING: {
             std::string x = VLRead<std::string, VL_STRING>(buf + offset);
-            is_valid_row = CmpConds<std::string>(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<std::string>(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case BLOB: {
             Blob x = VLRead<Blob, BLOB>(buf + offset);
-            is_valid_row = CmpConds<Blob>(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<Blob>(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case UUID: {
             boost::uuids::uuid x;
             memcpy(&x, buf + offset, 16);
-            is_valid_row = CmpConds<boost::uuids::uuid>(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<boost::uuids::uuid>(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case VECTOR_INT: {
             std::vector<int> x = std::vector<int>(tbl_sizes_[table][j] / sizeof(int));
             memcpy(&x[0], buf + offset, tbl_sizes_[table][j]);
-            is_valid_row = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case VL_VECTOR_INT: {
             std::vector<int> x = VLRead<std::vector<int>, VL_VECTOR_INT>(buf + offset);
-            is_valid_row = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<std::vector<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
@@ -288,8 +288,8 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               if (nullpos != std::string::npos)
                 x[k].resize(nullpos);
             }
-            is_valid_row = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             H5Tclose(field_type);
             break;
@@ -300,22 +300,22 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             for (unsigned int k = 0; k < jlen; ++k) {
               x[k] = VLRead<std::string, VL_STRING>(buf + offset + CYCLUS_SHA1_SIZE*k);
             }
-            is_valid_row = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case VL_VECTOR_STRING: {
             vector<string> x = VLRead<vector<string>, VL_VECTOR_STRING>(buf + offset);
-            is_valid_row = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case VL_VECTOR_VL_STRING: {
             vector<string> x = VLRead<vector<string>, VL_VECTOR_VL_STRING>(buf + offset);
-            is_valid_row = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<vector<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
@@ -323,15 +323,15 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             jlen = tbl_sizes_[table][j] / sizeof(int);
             int* xraw = reinterpret_cast<int*>(buf + offset);
             std::set<int> x = std::set<int>(xraw, xraw+jlen);
-            is_valid_row = CmpConds<std::set<int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<std::set<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case VL_SET_INT: {
             std::set<int> x = VLRead<std::set<int>, VL_SET_INT>(buf + offset);
-            is_valid_row = CmpConds<std::set<int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<std::set<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
@@ -339,23 +339,23 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             jlen = tbl_sizes_[table][j] / sizeof(int);
             int* xraw = reinterpret_cast<int*>(buf + offset);
             std::list<int> x = std::list<int>(xraw, xraw+jlen);
-            is_valid_row = CmpConds<std::list<int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<std::list<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case VL_LIST_INT: {
             std::list<int> x = VLRead<std::list<int>, VL_LIST_INT>(buf + offset);
-            is_valid_row = CmpConds<std::list<int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<std::list<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case PAIR_INT_INT: {
             pair<int, int> x = std::make_pair(*reinterpret_cast<int*>(buf + offset), 
                                               *reinterpret_cast<int*>(buf + offset + sizeof(int)));
-            is_valid_row = CmpConds<pair<int, int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<pair<int, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
@@ -366,15 +366,15 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               x[*reinterpret_cast<int*>(buf + offset + 2*sizeof(int)*k)] = \
                 *reinterpret_cast<int*>(buf + offset + 2*sizeof(int)*k + sizeof(int));
             }
-            is_valid_row = CmpConds<map<int, int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<map<int, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
           case VL_MAP_INT_INT: {
             map<int, int> x = VLRead<map<int, int>, VL_MAP_INT_INT>(buf + offset);
-            is_valid_row = CmpConds<map<int, int> >(&x, &(field_conds[qr.fields[j]]));
-            if (is_valid_row)
+            is_row_selected = CmpConds<map<int, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
               row[j] = x;
             break;
           }
@@ -384,11 +384,11 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
         }
-        if (!is_valid_row)
+        if (!is_row_selected)
           break;
         offset += tbl_sizes_[table][j];
       }
-      if (is_valid_row) {
+      if (is_row_selected) {
         qr.rows.push_back(row);
       }
     }
