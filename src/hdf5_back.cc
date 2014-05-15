@@ -689,6 +689,11 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   char* buf = new char[group.size() * rowsize];
   FillBuf(title, buf, group, sizes, rowsize);
 
+  std::cout << "rowsize " << rowsize << "\n";
+  for (int i = 0; i < group[0]->vals().size(); ++i) {
+    std::cout << "col " << i << " " << sizes[i] << " "<< offsets[i] <<"\n";
+  }
+
   herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
                               offsets, sizes, buf);
   if (status < 0) {
