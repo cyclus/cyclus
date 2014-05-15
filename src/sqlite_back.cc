@@ -295,8 +295,8 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
 }
 
 boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
-                                                int col,
-                                                DbTypes type) {
+                                             int col,
+                                             DbTypes type) {
   boost::spirit::hold_any v;
   switch (type) {
   case INT: {

@@ -110,10 +110,10 @@ cyclus::QueryResult Hdf5ReadWriteResultBasic(const char* fpath, T x, T y,
   cyclus::Hdf5Back back(fpath);
   m.RegisterBackend(&back);
   m.NewDatum("data")
-  ->AddVal("x", x, shape)
+  ->AddVal("vals", x, shape)
   ->Record();
   m.NewDatum("data")
-  ->AddVal("x", y, shape)
+  ->AddVal("vals", y, shape)
   ->Record();
   m.Close();
   return back.Query("data", NULL);
@@ -123,9 +123,9 @@ template <typename T>
 void Hdf5ReadWriteTestBasic(const char* fpath, T x, T y, 
                             cyclus::Datum::Shape shape = NULL) {
   cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<T>(fpath, x, y, shape);
-  T obsx = qr.GetVal<T>("x", 0);
+  T obsx = qr.GetVal<T>("vals", 0);
   EXPECT_EQ(x, obsx);
-  T obsy = qr.GetVal<T>("x", 1);
+  T obsy = qr.GetVal<T>("vals", 1);
   EXPECT_EQ(y, obsy);
 }
 
@@ -133,9 +133,9 @@ template <>
 void Hdf5ReadWriteTestBasic<std::string>(const char* fpath, std::string x, std::string y, 
                                          cyclus::Datum::Shape shape) {
   cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<std::string>(fpath, x, y, shape);
-  std::string obsx = qr.GetVal<std::string>("x", 0);
+  std::string obsx = qr.GetVal<std::string>("vals", 0);
   EXPECT_STREQ(x.c_str(), obsx.c_str());
-  std::string obsy = qr.GetVal<std::string>("x", 1);
+  std::string obsy = qr.GetVal<std::string>("vals", 1);
   EXPECT_STREQ(y.c_str(), obsy.c_str());
 }
 
@@ -145,9 +145,9 @@ void Hdf5ReadWriteTestBasic<cyclus::Blob>(const char* fpath, cyclus::Blob x,
                                           cyclus::Datum::Shape shape) {
   using cyclus::Blob;
   cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<Blob>(fpath, x, y, shape);
-  Blob obsx = qr.GetVal<Blob>("x", 0);
+  Blob obsx = qr.GetVal<Blob>("vals", 0);
   EXPECT_STREQ(x.str().c_str(), obsx.str().c_str());
-  Blob obsy = qr.GetVal<Blob>("x", 1);
+  Blob obsy = qr.GetVal<Blob>("vals", 1);
   EXPECT_STREQ(y.str().c_str(), obsy.str().c_str());
 }
 

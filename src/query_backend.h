@@ -19,12 +19,12 @@
 namespace cyclus {
 
 /// This is the master list of all supported database types.  All types must 
-/// have a constant length unless they begin with the prefix VL_, which stand
+/// have a constant length unless they begin with the prefix VL_, which stands
 /// for "variable length" or are implicitly variable length, such as blob.
 /// Changing the order here may invalidate previously created databases.
-/// Thus only append to thies enum if it is post-1.0.
+/// Thus only append to this enum if it is post-1.0.
 enum DbTypes {
-  // promitive types
+  // primitive types
   BOOL = 0,
   INT,
   FLOAT,
@@ -366,7 +366,22 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
   return true;
 };
 
-/// The digest type for SHA1s
+/// The digest type for SHA1s.
+///
+/// This class is a hack around a language deficiency in C++. You cannot pass
+/// around an array (unsinged int[5]) between function calls. You can only 
+/// pass pointers, which would involve lost of new/free and heap shenanigans
+/// that are not needed for a dumb container. Therefore Sha1::Digest() cannot
+/// return what would be most natural. The second most natural thing would be
+/// a std::array<unsigned int, 5>. However, std::array is a C++11 feature and
+/// we are not yet ready to go down that road.
+///
+/// To pass an array into and out of a function it has to be inside of struct
+/// or a class. I chose a class here since there are many member functions.
+/// 
+/// The reason why this is public is that it needs to be directly writable 
+/// from buffers coming from HDF5. In the future, this really should just be 
+/// a std::array.
 class Digest {
  public:
   unsigned int val[CYCLUS_SHA1_NINT];
@@ -376,7 +391,7 @@ class Digest {
   inline std::vector<T> cast() const {
     std::vector<T> rtn = std::vector<T>(CYCLUS_SHA1_NINT);
     for (unsigned int i = 0; i < CYCLUS_SHA1_NINT; ++i)
-      rtn[i] = (T) val[i];
+      rtn[i] = static_cast<T>(val[i]);
     return rtn;
   };
 

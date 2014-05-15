@@ -64,7 +64,7 @@ class SqlStatement {
   /// Returns a byte array value for the specified column of the current query
   /// row. This can be used for retrieving TEXT and BLOB column data.
   char* GetText(int col, int* n) {
-    char* v = (char*)sqlite3_column_text(stmt_, col);
+    char* v = const_cast<char*>(reinterpret_cast<const char *>(sqlite3_column_text(stmt_, col)));
     if (n != NULL) {
       *n = sqlite3_column_bytes(stmt_, col);
     }
