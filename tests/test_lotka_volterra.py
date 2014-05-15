@@ -104,7 +104,7 @@ def test_lotka_volterra():
     clean_outs()
 
     # A reference simulation input for Lotka-Volterra simulation
-    sim_input = "./input/lotka_volterra.xml"
+    sim_input = "./input/lotka_volterra_determ.xml"
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
