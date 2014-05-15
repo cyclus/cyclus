@@ -76,7 +76,8 @@ RE_STATEMENT = re.compile(
 
 CYCNS = 'cyclus'
 
-PRIMITIVES = {'std::string', 'float', 'double', 'int'}
+PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob', 
+              'boost::uuids::uuid'}
 
 BUFFERS = {
     '{0}::ResourceBuff'.format(CYCNS),
