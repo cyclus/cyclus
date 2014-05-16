@@ -41,14 +41,11 @@ std::string KFacility::str() {
 void KFacility::Tick(int time) {
   using std::string;
   using std::vector;
-  LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is ticking {";
+  LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is ticking";
   LOG(cyclus::LEV_INFO4, "KFac") << "will offer " << out_capacity_
                                    << " kg of "
                                    << out_commod_ << ".";
-  LOG(cyclus::LEV_INFO3, "KFac") << "}";
   current_capacity_ = out_capacity_;  // reset capacity
-
-  LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is ticking {";
 
   double requestAmt = RequestAmt();
   // inform the simulation about what the sink facility will be requesting
@@ -56,17 +53,15 @@ void KFacility::Tick(int time) {
     LOG(cyclus::LEV_INFO4, "KFac") << " will request " << requestAmt
         << " kg of " << in_commod_ << ".";
   }
-  LOG(cyclus::LEV_INFO3, "KFac") << "}";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void KFacility::Tock(int time) {
-  LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is tocking {";
+  LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is tocking";
   LOG(cyclus::LEV_INFO4, "KFac") << "KFacility " << this->id()
                                    << " is holding " << inventory_.quantity()
                                    << " units of material at the close of month "
                                    << time << ".";
-  LOG(cyclus::LEV_INFO3, "KFac") << "}";
   // Update capacity for the next step
   in_capacity_ = in_capacity_ * k_factor_in_;
   out_capacity_ = out_capacity_ * k_factor_out_;
