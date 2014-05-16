@@ -34,15 +34,19 @@ class SimInit;
 /// the simulation and affect its behavior.
 class SimInfo {
  public:
+  SimInfo()
+    : duration(0), y0(0), m0(0), decay_period(0),
+      branch_time(-1), parent_type("init") {};
+
   SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1, std::string handle = "")
     : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
-      branch_time(-1), handle(handle), parent_sim(boost::uuids::nil_uuid()) {};
+      branch_time(-1), handle(handle), parent_type("init"), parent_sim(boost::uuids::nil_uuid()) {};
 
   SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
-          int branch_time,
+          int branch_time, std::string parent_type,
           std::string handle = "")
     : duration(dur), y0(-1), m0(-1), decay_period(decay_period),
-      parent_sim(parent_sim),
+      parent_sim(parent_sim), parent_type(parent_type),
       branch_time(branch_time), handle(handle) {};
 
   /// user-defined label associated with a particular simulation
@@ -62,6 +66,10 @@ class SimInfo {
 
   /// id for the parent simulation if any
   boost::uuids::uuid parent_sim;
+
+  /// One of "init", "branch", "restart" indicating the relationship of this
+  /// simulation to its parent simulation.
+  std::string parent_type;
 
   /// timestep at which simulation branching occurs if any
   int branch_time;

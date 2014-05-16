@@ -89,6 +89,7 @@ class SimInit {
   Recorder* rec_;
   Timer ti_;
   boost::uuids::uuid simid_;
+  SimInfo si_;
   QueryableBackend* b_;
   int t_;
 };

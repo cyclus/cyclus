@@ -33,6 +33,10 @@ void SimInit::Init(Recorder* r, QueryableBackend* b) {
 void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
   rec_ = new Recorder();
   InitBase(b, sim_id, t);
+  si_.parent_sim = sim_id;
+  si_.parent_type = "restart";
+  si_.branch_time = t;
+  ctx_->InitSim(si_);
 }
 
 void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
@@ -141,7 +145,10 @@ void SimInit::LoadInfo() {
   int dec = qr.GetVal<int>("DecayInterval");
   int y0 = qr.GetVal<int>("InitialYear");
   int m0 = qr.GetVal<int>("InitialMonth");
-  ctx_->InitSim(SimInfo(dur, y0, m0, dec));
+  std::string h = qr.GetVal<std::string>("Handle");
+  si_ = SimInfo(dur, y0, m0, dec, h);
+  si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
+  ctx_->InitSim(si_);
 }
 
 void SimInit::LoadRecipes() {
