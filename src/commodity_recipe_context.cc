@@ -99,10 +99,10 @@ std::string CommodityRecipeContext::schema() {
   return
       "  <oneOrMore>                                 \n"
       "  <element name=\"fuel\">                     \n"
-      "   <ref name=\"incommodity\"/>                \n"
-      "   <ref name=\"inrecipe\"/>                   \n"
-      "   <ref name=\"outcommodity\"/>               \n"
-      "   <ref name=\"outrecipe\"/>                  \n"
+      "    <element name=\"incommodity\"><text/></element>\n"
+      "    <element name=\"inrecipe\"><text/></element>\n"
+      "    <element name=\"outcommodity\"><text/></element>\n"
+      "    <element name=\"outrecipe\"><text/></element>\n"
       "  </element>                                  \n"
       "  </oneOrMore>                                \n";
 }

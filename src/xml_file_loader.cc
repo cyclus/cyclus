@@ -36,7 +36,36 @@ void LoadStringstreamFromFile(std::stringstream& stream,
   file_stream.close();
 }
 
-std::string BuildMasterSchema(std::string schema_path) {
+std::vector<AgentSpec> ParseModules(std::string infile) {
+  std::stringstream input;
+  LoadStringstreamFromFile(input, infile);
+  XMLParser parser_;
+  parser_.Init(input);
+  InfileTree xqe(parser_);
+
+  std::vector<std::string> xpaths;
+  xpaths.push_back("/simulation/facility/module");
+  xpaths.push_back("/simulation/region/module");
+  xpaths.push_back("/simulation/region/institution/module");
+  xpaths.push_back("/simulation/prototype/module");
+
+  std::vector<AgentSpec> modules;
+  std::set<std::string> unique;
+  for (int x = 0; x < xpaths.size(); ++x) {
+    std::string p = xpaths[x];
+    int n = xqe.NMatches(p);
+    for (int i = 0; i < n; ++i) {
+      AgentSpec spec(xqe.SubTree(p, i));
+      if (unique.count(spec.str()) == 0) {
+        modules.push_back(spec);
+        unique.insert(spec.str());
+      };
+    }
+  }
+  return modules;
+}
+
+std::string BuildMasterSchema(std::string schema_path, std::string infile) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -45,11 +74,15 @@ std::string BuildMasterSchema(std::string schema_path) {
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
-  std::vector<std::string> names = Env::ListModules();
+  std::vector<AgentSpec> modules = ParseModules(infile);
+  if (modules.size() == 0) {
+    throw ValidationError("no agent modules found in input xml");
+  }
+
   std::map<std::string, std::string> subschemas;
-  for (int i = 0; i < names.size(); ++i) {
-    Agent* m = DynamicModule::Make(&ctx, names[i]);
-    subschemas[m->kind()] += "<element name=\"" + names[i] + "\">\n";
+  for (int i = 0; i < modules.size(); ++i) {
+    Agent* m = DynamicModule::Make(&ctx, modules[i]);
+    subschemas[m->kind()] += "<element name=\"" + modules[i].alias() + "\">\n";
     subschemas[m->kind()] += m->schema() + "\n";
     subschemas[m->kind()] += "</element>\n";
     ctx.DelAgent(m);
@@ -127,7 +160,7 @@ XMLFileLoader::~XMLFileLoader() {
 }
 
 std::string XMLFileLoader::master_schema() {
-  return BuildMasterSchema(schema_path_);
+  return BuildMasterSchema(schema_path_, file_);
 }
 
 void XMLFileLoader::LoadSim() {
@@ -222,12 +255,10 @@ void XMLFileLoader::LoadInitialAgents() {
     int num_agents = xqe.NMatches(schema_paths[*it]);
     for (int i = 0; i < num_agents; i++) {
       InfileTree* qe = xqe.SubTree(schema_paths[*it], i);
-      InfileTree* module_data = qe->SubTree("agent");
-      std::string module_name = module_data->GetElementName();
       prototype = qe->GetString("name");
+      AgentSpec spec(qe->SubTree("module"));
 
-      Agent* agent = DynamicModule::Make(ctx_, module_name);
-      agent->agent_impl(module_name);
+      Agent* agent = DynamicModule::Make(ctx_, spec);
 
       // call manually without agent impl injected to keep all Agent state in a
       // single, consolidated db table
@@ -246,7 +277,7 @@ void XMLFileLoader::LoadInitialAgents() {
       // call manually without agent impl injected
       agent->Agent::InitFrom(&pi);
 
-      pi = PrefixInjector(&ci, "AgentState" + module_name);
+      pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
       agent->InitFrom(&pi);
       ctx_->AddPrototype(prototype, agent);
     }

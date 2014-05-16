@@ -51,7 +51,6 @@ int main(int argc, char* argv[]) {
 
   // tell ENV the path between the cwd and the cyclus executable
   std::string path = Env::PathBase(argv[0]);
-  Env::SetCyclusRelPath(path);
 
   // tell pyne about the path to nuc data
   Env::SetNucDataPath();
@@ -150,6 +149,8 @@ int main(int argc, char* argv[]) {
   si.Init(&rec, fback);
   si.timer()->RunSim();
 
+  rec.Flush();
+
   std::cout << std::endl;
   std::cout << "Status: Cyclus run successful!" << std::endl;
   std::cout << "Output location: " << ai.output_path << std::endl;
@@ -227,16 +228,9 @@ int EarlyExitArgs(const ArgInfo& ai) {
     std::cout << Env::GetInstallPath() << "/include/cyclus/\n";
     return 0;
   } else if (ai.vm.count("schema")) {
-    try {
-      if (ai.flat_schema) {
-        std::cout << "\n" << BuildFlatMasterSchema(ai.schema_path) << "\n";
-      } else {
-        std::cout << "\n" << BuildMasterSchema(ai.schema_path) << "\n";
-      }
-    } catch (cyclus::IOError err) {
-      std::cout << err.what() << "\n";
-      return 1;
-    }
+    std::stringstream f;
+    LoadStringstreamFromFile(f, ai.schema_path);
+    std::cout << f.str() << "\n";
     return 0;
   } else if (ai.vm.count("module-schema")) {
     std::string name(ai.vm["module-schema"].as<std::string>());
@@ -245,9 +239,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
       Timer ti;
       Context* ctx = new Context(&ti, &rec);
       Agent* m = DynamicModule::Make(ctx, name);
-      std::cout << "<element name=\"" << name << "\">\n";
       std::cout << m->schema();
-      std::cout << "</element>\n";
       ctx->DelAgent(m);
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
@@ -259,12 +251,8 @@ int EarlyExitArgs(const ArgInfo& ai) {
 
 void GetSimInfo(ArgInfo* ai) {
   // schema info
-  ai->flat_schema = ai->vm.count("flat-schema") ? true : false;
-  std::string inschema = ai->vm.count("flat-schema") ?
-                         "cyclus-flat.rng.in" : "cyclus.rng.in";
-  ai->schema_path = ai->vm.count("schema-path") ?
-                    ai->vm["schema-path"].as<std::string>() :
-                    Env::GetRNGFile(inschema);
+  ai->flat_schema = ai->vm.count("flat-schema") > 0;
+  ai->schema_path = Env::rng_schema(ai->flat_schema);
 
   // logging params
   if (ai->vm.count("no-agent")) {

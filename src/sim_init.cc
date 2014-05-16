@@ -188,9 +188,9 @@ void SimInit::LoadPrototypes() {
     std::string proto = qr.GetVal<std::string>("Prototype", i);
     int agentid = qr.GetVal<int>("AgentId", i);
     std::string impl = qr.GetVal<std::string>("Implementation", i);
+    AgentSpec spec(impl);
 
-    Agent* m = DynamicModule::Make(ctx_, impl);
-    m->agent_impl(impl);
+    Agent* m = DynamicModule::Make(ctx_, spec);
 
     std::vector<Cond> conds;
     conds.push_back(Cond("SimTime", "==", t_));
@@ -201,7 +201,7 @@ void SimInit::LoadPrototypes() {
     // call manually without agent impl injected
     m->Agent::InitFrom(&pi);
 
-    pi = PrefixInjector(&ci, "AgentState" + impl);
+    pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
     m->InitFrom(&pi);
     ctx_->AddPrototype(proto, m);
   }
@@ -220,7 +220,6 @@ void SimInit::LoadInitialAgents() {
   std::map<int, int> parentmap; // map<agentid, parentid>
   std::map<int, Agent*> unbuilt; // map<agentid, agent_ptr>
   for (int i = 0; i < qentry.rows.size(); ++i) {
-
     int id = qentry.GetVal<int>("AgentId", i);
     std::vector<Cond> conds;
     conds.push_back(Cond("AgentId", "==", id));
@@ -232,12 +231,12 @@ void SimInit::LoadInitialAgents() {
     if (qexit.rows.size() == 0) {
       std::string proto = qentry.GetVal<std::string>("Prototype", i);
       std::string impl = qentry.GetVal<std::string>("Implementation", i);
-      Agent* m = DynamicModule::Make(ctx_, impl);
+      AgentSpec spec(impl);
+      Agent* m = DynamicModule::Make(ctx_, spec);
 
       // agent-kernel init
       m->prototype_ = proto;
       m->id_ = id;
-      m->agent_impl(qentry.GetVal<std::string>("Implementation", i));
       m->enter_time_ = qentry.GetVal<int>("EnterTime", i);
       unbuilt[id] = m;
       parentmap[id] = qentry.GetVal<int>("ParentId", i);
@@ -247,7 +246,7 @@ void SimInit::LoadInitialAgents() {
       CondInjector ci(b_, conds);
       PrefixInjector pi(&ci, "AgentState");
       m->Agent::InitFrom(&pi);
-      pi = PrefixInjector(&ci, "AgentState" + m->agent_impl());
+      pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
       m->InitFrom(&pi);
     }
   }

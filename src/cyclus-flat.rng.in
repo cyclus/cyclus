@@ -29,31 +29,29 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     <element name="prototype">
     <interleave>
       <element name="name"><text/></element>
+      <element name="module"> 
+        <optional><element name="path"><text/></element></optional>
+        <optional><element name="lib"><text/></element></optional>
+        <element name="agent"><text/></element>
+        <optional><element name="alias"><text/></element></optional>
+      </element>
+      <optional>
+        <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+      </optional>
 
       <!-- For compatibility with nested schema format -->
       <!-- Facility/Inst/Region specific data -->
       <optional>
-
-        <optional>
-          <element name="lifetime">
-            <data type="nonNegativeInteger"/>
-          </element>
-        </optional>
-
         <choice>
           <oneOrMore>
             <element name="allowedfacility"><text/></element>
           </oneOrMore>
 
-          <group>
-            <optional>
-              <oneOrMore>
-                <element name="availableprototype">
-                  <text/>
-                </element>
-              </oneOrMore>
-            </optional>
-          </group>
+          <optional>
+            <oneOrMore>
+              <element name="availableprototype"> <text/> </element>
+            </oneOrMore>
+          </optional>
 
         </choice>
       </optional>
@@ -64,12 +62,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
           @MODEL_SCHEMAS@
         </choice>
       </element>
-      <zeroOrMore>
-        <element name="incommodity"><text/></element>
-      </zeroOrMore>
-      <zeroOrMore>
-        <element name="outcommodity"><text/></element>
-      </zeroOrMore>
+
     </interleave>
     </element>
   </oneOrMore>
@@ -100,104 +93,5 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 </interleave>
 </element><!-- end of simulation -->
 </start>
-
-<!-- for compatibility with nested schema format -->
-  <define name="capacity">
-      <element name="capacity">
-        <data type="double"/>
-      </element>
-  </define>
-
-  <define name="commodprice">
-      <element name="commodprice">
-        <data type="double"/>
-      </element>
-  </define>
-
-  <define name="componenttype">
-      <element name="componenttype">
-        <data type="string"/>
-      </element>
-  </define>
-
-  <define name="incommodity">
-      <element name="incommodity">
-          <text/>
-      </element>
-  </define>
-
-  <define name="input_capacity">
-      <element name="input_capacity">
-         <data type="double"/>
-      </element>
-  </define>
-
-  <define name="innerradius">
-      <element name="innerradius">
-        <data type="double"/>
-      </element>
-  </define>
-
-  <define name="inrecipe">
-      <element name="inrecipe">
-          <text/>
-      </element>
-  </define>
-
-  <define name="inventorysize">
-      <element name="inventorysize">
-        <data type="double"/>
-      </element>
-  </define>
-
-  <define name="name">
-      <element name="name">
-        <data type="string"/>
-      </element>
-  </define>
-
-  <define name="outcommodity">
-      <element name="outcommodity">
-         <text/>
-      </element>
-  </define>
-
-  <define name="output_capacity">
-      <element name="output_capacity">
-         <data type="double"/>
-      </element>
-  </define>
-
-  <define name="outerradius">
-      <element name="outerradius">
-        <data type="double"/>
-      </element>
-  </define>
-
-  <define name="outrecipe">
-      <element name="outrecipe">
-          <text/>
-      </element>
-  </define>
-
-  <define name="startOperMonth">
-      <element name="startOperMonth">
-        <data type="nonNegativeInteger"/>
-      </element>
-  </define>
-
-  <define name="startOperYear">
-      <element name="startOperYear">
-        <data type="nonNegativeInteger"/>
-      </element>
-  </define>
-
-  <define name="tailsassay">
-      <element name="tailsassay">
-        <data type="double"/>
-      </element>
-  </define>
-<!-- end compatibility section -->
-
 </grammar>
 

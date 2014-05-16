@@ -5,12 +5,43 @@
 #include <string>
 #include <map>
 
+#include "error.h"
+
 namespace cyclus {
 
 class Agent;
 class Context;
 
 typedef Agent* AgentCtor(Context*);
+
+class InfileTree;
+
+class AgentSpec {
+ public:
+  AgentSpec() {};
+  AgentSpec(InfileTree* t);
+  AgentSpec(std::string path, std::string lib, std::string agent, std::string alias);
+  AgentSpec(std::string str_spec);
+
+  std::string Sanitize();
+  std::string LibPath();
+  std::string str();
+
+  std::string path() {return path_;};
+  std::string lib() {return lib_;};
+  std::string agent() {return agent_;};
+  std::string alias() {return alias_;};
+
+ private:
+  std::string path_;
+  std::string lib_;
+  std::string agent_;
+  std::string alias_;
+};
+
+std::string SanitizeSpec(std::string module_spec);
+
+std::string ModuleConstructor(std::string module_spec);
 
 class DynamicModule {
  public:
@@ -23,31 +54,24 @@ class DynamicModule {
     };
   };
 
-  /// Returns a newly constructed agent for the given module name.
-  static Agent* Make(Context* ctx, std::string name);
+  /// Returns a newly constructed agent for the given module spec.
+  static Agent* Make(Context* ctx, AgentSpec spec);
+
+  /// Manually registers an agent to be used/cloned when Make is called.
+  static void AddAgent(std::string spec, Agent* ref);
 
   /// Closes all statically loaded dynamic modules. This should always be called
   /// before process termination.  This must be called AFTER all agents have
   /// been destructed.
   static void CloseAll();
 
-  /// @return the global library suffix
-  static const std::string Suffix();
-
-  /// @return the module name
-  std::string name();
-
-  /// If this path for this module has not been discovered yet, path searches
-  /// for it.
-  ///
-  /// @exception IOError the library path was not found
-  /// @return the filepath of the dynamic library.
+  /// The path to the module's shared object library.
   std::string path();
 
  private:
   /// Creates a new dynamically loadable module.
   /// @param name the name of the module
-  DynamicModule(std::string name);
+  DynamicModule(AgentSpec spec);
 
   /// construct an instance of this module
   /// @return a fresh instance
@@ -60,20 +84,19 @@ class DynamicModule {
   /// added to this map when loaded.
   static std::map<std::string, DynamicModule*> modules_;
 
-  /// the path to the library
-  std::string abs_path_;
+  static std::map<std::string, Agent*> man_agents_;
 
   /// the name of the module
-  std::string module_name_;
+  std::string path_;
 
-  /// the name of all module constructor functions
-  std::string constructor_name_;
+  /// the name of the module
+  std::string ctor_name_;
 
   /// the library to open and close
   void* module_library_;
 
   /// a functor for the constructor
-  AgentCtor* constructor_;
+  AgentCtor* ctor_;
 
   /// uses dlopen to open the module shared lib
   void OpenLibrary();

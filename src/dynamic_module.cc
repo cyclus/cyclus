@@ -2,7 +2,7 @@
 
 #include "dynamic_module.h"
 
-#include "boost/filesystem.hpp"
+#include <boost/filesystem.hpp>
 
 #include "context.h"
 #include "env.h"
@@ -15,16 +15,73 @@ namespace fs = boost::filesystem;
 
 namespace cyclus {
 
-std::map<std::string, DynamicModule*> DynamicModule::modules_;
+AgentSpec::AgentSpec(std::string path, std::string lib, std::string agent,
+                     std::string alias)
+  : path_(path), lib_(lib), agent_(agent), alias_(alias) {
 
-Agent* DynamicModule::Make(Context* ctx, std::string name) {
-  if (modules_.count(name) == 0) {
-    DynamicModule* dyn = new DynamicModule(name);
-    modules_[name] = dyn;
+  if (lib_ == "") {
+    lib_ = agent_;
+  }
+  if (alias_ == "") {
+    alias = agent_;
+  }
+}
+
+AgentSpec::AgentSpec(InfileTree* t) {
+  agent_ = t->GetString("agent");
+  lib_ = OptionalQuery<std::string>(t, "lib", agent_);
+  path_ = OptionalQuery<std::string>(t, "path", "");
+  alias_ = OptionalQuery<std::string>(t, "alias", agent_);
+}
+
+AgentSpec::AgentSpec(std::string str_spec) {
+  std::vector<std::string> strs;
+  boost::split(strs, str_spec, boost::is_any_of(":"));
+  if (strs.size() != 3) {
+    throw ValueError("invalid agent spec string '" + str_spec + "'");
+  }
+  path_ = strs[0];
+  lib_ = strs[1];
+  agent_ = strs[2];
+  alias_ = agent_;
+};
+
+std::string AgentSpec::Sanitize() {
+  std::string s = str();
+  boost::replace_all(s, "/", "_");
+  boost::replace_all(s, "-", "_");
+  boost::replace_all(s, ":", "_");
+  boost::replace_all(s, ".", "_");
+  return s;
+}
+
+std::string AgentSpec::LibPath() {
+  return (fs::path(path_) / fs::path("lib" + lib_ + SUFFIX)).string();
+}
+
+std::string AgentSpec::str() {
+  return path_ + ":" + lib_ + ":" + agent_;
+}
+
+std::map<std::string, DynamicModule*> DynamicModule::modules_;
+std::map<std::string, Agent*> DynamicModule::man_agents_;
+
+Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
+  if (man_agents_.count(spec.str()) > 0) {
+    return man_agents_[spec.str()]->Clone();
+  } else if (modules_.count(spec.str()) == 0) {
+    DynamicModule* dyn = new DynamicModule(spec);
+    modules_[spec.str()] = dyn;
   }
 
-  DynamicModule* dyn = modules_[name];
-  return dyn->ConstructInstance(ctx);
+  DynamicModule* dyn = modules_[spec.str()];
+  Agent* a = dyn->ConstructInstance(ctx);
+  a->agent_impl(spec.str());
+  return a;
+}
+
+void DynamicModule::AddAgent(std::string spec, Agent* ref) {
+  man_agents_[spec] = ref;
 }
 
 void DynamicModule::CloseAll() {
@@ -34,38 +91,25 @@ void DynamicModule::CloseAll() {
     delete it->second;
   }
   modules_.clear();
+  man_agents_.clear();
 }
 
-const std::string DynamicModule::Suffix() {
-  return SUFFIX;
-}
-
-DynamicModule::DynamicModule(std::string name)
-    : module_name_(name),
-      constructor_name_("Construct" + name),
-      module_library_(0),
-      constructor_(0) {
-  std::string lib_name = "lib" + module_name_ + Suffix();
-  fs::path p;
-  if (!Env::FindModuleLib(lib_name, p)) {
-    throw IOError("Could not find library: " + lib_name);
-  }
-  abs_path_ = p.string();
-
+DynamicModule::DynamicModule(AgentSpec spec)
+  : module_library_(0),
+    ctor_(NULL) {
+  path_ = Env::FindModule(spec.LibPath());
+  ctor_name_ = "Construct" + spec.agent();
   OpenLibrary();
   SetConstructor();
 }
 
 Agent* DynamicModule::ConstructInstance(Context* ctx) {
-  return constructor_(ctx);
-}
-
-std::string DynamicModule::name() {
-  return module_name_;
+  return ctor_(ctx);
 }
 
 std::string DynamicModule::path() {
-  return abs_path_;
+  return path_;
 }
 
 }  // namespace cyclus
+
