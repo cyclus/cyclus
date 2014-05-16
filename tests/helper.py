@@ -1,6 +1,20 @@
 """A set of tools for use in integration tests."""
-import tables
 import os
+from hashlib import sha1
+
+import numpy as np
+import tables
+
+def hasher(x):
+    return int(sha1(x).hexdigest(), 16)
+
+def idx(h):
+    ind = [None] * 5
+    for i in range(4, -1, -1):
+        h, ind[i] = divmod(h, 2**32)
+    return tuple(ind)
+
+sha1array = lambda x: np.array(idx(hasher(x)), np.uint32)
 
 h5out = "output_temp.h5"
 sqliteout = "output_temp.sqlite"
@@ -16,23 +30,22 @@ def clean_outs():
 def table_exist(db, tables):
     """Checks if hdf5 database contains the specified tables.
     """
-    for t in tables:
-        if not db.__contains__(t):
-            return False
-
-    return True
+    return all([t in db.root for t in tables])
 
 def find_ids(data, data_table, id_table):
     """Finds ids of the specified data located in the specified data_table,
     and extracts the corresponding id from the specified id_table.
     """
     ids = []
-    i = 0
-    for d in data_table:
-        if d == data:
+    for i, d in enumerate(data_table):
+        if isinstance(d, np.ndarray) and isinstance(data, np.ndarray): 
+            if (d == data).all():
+                ids.append(id_table[i])
+        elif isinstance(d, np.ndarray) and not isinstance(data, np.ndarray): 
+            if (d == sha1array(data)).all():
+                ids.append(id_table[i])
+        elif d == data:
             ids.append(id_table[i])
-        i += 1
-
     return ids
 
 def exit_times(agent_id, exit_table):

@@ -76,11 +76,13 @@ RE_STATEMENT = re.compile(
 
 CYCNS = 'cyclus'
 
-PRIMITIVES = {'std::string', 'float', 'double', 'int'}
+PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob', 
+              'boost::uuids::uuid'}
 
-BUFFERS = {
-    '{0}::ResourceBuff'.format(CYCNS),
-}
+BUFFERS = {'{0}::ResourceBuff'.format(CYCNS)}
+
+TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
+             'std::map',}
 
 WRANGLERS = {
     '{0}::Agent'.format(CYCNS),
@@ -279,12 +281,11 @@ class ClassFilter(Filter):
 
     def revert(self, statement, sep):
         super(ClassFilter, self).revert(statement, sep)
-        state = self.machine
-        if len(state.classes) == 0:
+        machine = self.machine
+        if len(machine.classes) == 0 or machine.depth != machine.classes[-1][0]:
             return
-        if state.depth == state.classes[-1][0]:
-            del state.access[tuple(state.classes)]
-            del state.classes[-1]
+        del machine.access[tuple(machine.classes)]
+        del machine.classes[-1]
 
 class ClassAndSuperclassFilter(ClassFilter):
     """This accumulates superclass information as well as class information."""
@@ -325,10 +326,13 @@ class VarDecorationFilter(Filter):
     This evals the contents of dict and puts them in state.var_annotations, to be
     consumed by the next match with VarDeclarationFilter.
     """
-    regex = re.compile("#\s*pragma\s+cyclus\s+var\s+(.*)")
+    regex = re.compile("\s*#\s*pragma\s+cyclus\s+var\s+(.*)")
 
     def transform(self, statement, sep):
         state = self.machine
+        if isinstance(state, CodeGenerator):
+            state.var_annotations = True
+            return
         context = state.context
         classname = state.classname()
         classpaths = classname.split('::')
@@ -370,7 +374,7 @@ class VarDeclarationFilter(Filter):
     """
     regex = re.compile("(.*\w+.*?)\s+(\w+)")
 
-    def transform(self, statement, sep):
+    def transform_pass2(self, statement, sep):
         state = self.machine
         annotations = state.var_annotations
         if annotations is None:
@@ -383,6 +387,29 @@ class VarDeclarationFilter(Filter):
         annotations['type'] = state.canonize_type(vtype, vname)
         state.context[classname][vname] = annotations
         state.var_annotations = None
+
+    def transform_pass3(self, statement, sep):
+        cg = self.machine
+        if cg.var_annotations is None:
+            return
+        classname = cg.classname()
+        vtype, vname = self.match.groups()
+        cg.var_annotations = None
+        shape = cg.context.get(classname, {}).get(vname, {}).get('shape', None)
+        if shape is None:
+            return
+        s = statement + sep + '\n'
+        s += '  std::vector<int> cycpp_shape_{0};\n'.format(vname)
+        return s
+
+    def transform(self, statement, sep):
+        if isinstance(self.machine, StateAccumulator):
+            rtn = self.transform_pass2(statement, sep)
+        elif isinstance(self.machine, CodeGenerator):
+            rtn = self.transform_pass3(statement, sep)
+        else:
+            rtn = None
+        return rtn
 
 class ExecFilter(Filter):
     """Filter for executing arbitrary python code in the exec pragma and
@@ -470,11 +497,11 @@ class StateAccumulator(object):
     supported_types = PRIMITIVES
     supported_types |= BUFFERS
     known_templates = {
-        'std::set': ('T',),
-        'std::map': ('Key', 'T'),
-        'std::pair': ('T1', 'T2'),
-        'std::list': ('T',),
         'std::vector': ('T',),
+        'std::set': ('T',),
+        'std::list': ('T',),
+        'std::pair': ('T1', 'T2'),
+        'std::map': ('Key', 'T'),
         }
     scopz = '::'  # intern the scoping operator
 
@@ -668,6 +695,18 @@ class CodeGeneratorFilter(Filter):
         self.local_classname = None
         self.given_classname = None
 
+    def shapes_impl(self, ctx, ind="  "):
+        s = ""
+        for vname, annotations in ctx.items():
+            shape = annotations.get('shape', None)
+            if shape is None:
+                continue
+            shapename = "cycpp_shape_{0}".format(vname)
+            s += ('{3}int raw{0}[{1}] = {{{2}}};\n'
+                  '{3}{0} = std::vector<int>(raw{0}, raw{0} + {1});\n'
+                  ).format(shapename, len(shape), ", ".join(map(str, shape)), ind)
+        return s
+
 class CloneFilter(CodeGeneratorFilter):
     """Filter for handling Clone() code generation:
         #pragma cyclus [def|decl|impl] clone [classname]
@@ -707,8 +746,8 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
 
+        impl += self.shapes_impl(ctx, ind)
         cap_buffs = []
-
         for member, info in ctx.items():
             if info['type'] not in BUFFERS:
                 impl += ind + "{0} = m->{0};\n".format(member)
@@ -737,62 +776,28 @@ class InitFromDbFilter(CodeGeneratorFilter):
         context = cg.context
         ctx = context[self.given_classname]
         impl = ''
-        pods = []
-
         # add inheritance init froms
         rents = parent_intersection(self.given_classname, WRANGLERS,
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
-
+        # create body
         cap_buffs = []
-
+        impl += self.shapes_impl(ctx, ind)
+        impl += ind + '{0}::QueryResult qr = b->Query("Info", NULL);\n'.format(CYCNS)
         for member, info in ctx.items():
             t = info['type']
             if t in BUFFERS:
                 if 'capacity' in info:
                     cap_buffs.append((member, info['capacity']))
                 continue
-            if t[0] in ['std::map', 'std::set', 'std::list', 'std::vector']:
-                if t[0] == 'std::map':
-                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
-                else:
-                    table = 'ListOf' + t[1].replace('std::', '').title()
-                impl += ind + '{\n'
-                impl += ind + '  std::vector<{0}::Cond> conds;\n'.format(CYCNS)
-                impl += ind + '  conds.push_back({0}::Cond("Member", "==", "{1}"));\n'.format(CYCNS, member)
-                impl += ind + '  {0}::QueryResult qr = b->Query("{1}", &conds);\n'.format(CYCNS, table)
-                impl += ind + '  for (int i = 0; i < qr.rows.size(); ++i) {\n'
-                ind += '    '
-                if t[0] == 'std::map':
-                    impl += ind + '{0} {1}_k = qr.GetVal<{0}>("Key", i);\n'.format(t[1], member)
-                    impl += ind + '{0} {1}_v = qr.GetVal<{0}>("Value", i);\n'.format(t[2], member)
-                    impl += ind + '{0}[{0}_k] = {0}_v;\n'.format(member)
-                elif t[0] == 'std::set':
-                    impl += ind + '{0}.insert(qr.GetVal<{1}>("Value", i));\n'.format(member, t[1])
-                else:
-                    impl += ind + '{0}.push_back(qr.GetVal<{1}>("Value", i));\n'.format(member, t[1])
-                ind = ind[:-4]
-                impl += ind + '  }\n'
-                impl += ind + '}\n'
-            elif t in PRIMITIVES:
-                pods.append((member, t))
-            elif t[0] == 'std::pair':
-                pods.append((member, t))
-            else:
-                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
-
-        # add pod
-        impl += ind + "{0}::QueryResult qr = b->Query(\"Info\", NULL);\n".format(CYCNS)
-        for (member, t) in pods:
-            if t[0] == 'std::pair':
-                impl += ind + "{0}.first = qr.GetVal<{1}>(\"{0}A\");\n".format(member, t[1])
-                impl += ind + "{0}.second = qr.GetVal<{1}>(\"{0}B\");\n".format(member, t[2])
-            else:
-                impl += ind + "{0} = qr.GetVal<{1}>(\"{0}\");\n".format(member, t)
-
+            tstr = type_to_str(t)
+            if tstr.endswith('>'):
+                tstr += ' '
+            impl += ind + '{0} = qr.GetVal<{1}>("{0}");\n'.format(member, tstr)
         for b in cap_buffs:
-            impl += ind + "{0}.set_capacity(qr.GetVal<double>(\"{1}\"));\n".format(b[0], b[1])
+            impl += ind + ('{0}.set_capacity(qr.GetVal<double>'
+                           '("{1}"));\n').format(b[0], b[1])
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
@@ -803,8 +808,180 @@ class InfileToDbFilter(CodeGeneratorFilter):
     pragmaname = "infiletodb"
     methodrtn = "void"
 
+    def __init__(self, *args, **kwargs):
+        super(InfileToDbFilter, self).__init__(*args, **kwargs)
+        self.readers = {
+            'bool': self.read_primitive,
+            'int': self.read_primitive,
+            'float': self.read_primitive,
+            'double': self.read_primitive,
+            'std::string': self.read_primitive,
+            'cyclus::Blob': self.read_primitive,
+            'boost::uuids::uuid': self.read_primitive,
+            'std::vector': self.read_vector,
+            'std::set': self.read_set,
+            'std::list': self.read_list,
+            'std::pair': self.read_pair,
+            'std::map': self.read_map,
+            }
+
     def methodargs(self):
         return "{0}::InfileTree* tree, {0}::DbInit di".format(CYCNS)
+
+    def _fmt(self, t):
+        """returns a format string for a type t"""
+        return '"{0}"' if t == 'std::string' else '{0}'
+    
+    def read_primitive(self, member, t, d, ind="  "):
+        s = ""
+        tstr = type_to_str(t)
+        tfmt = self._fmt(t)
+        if d is None:
+            query = "Query"
+            dstr = ""
+        else:
+            query = "OptionalQuery"
+            dstr = ", " + tfmt.format(d)
+        s += ind + '{0} = {1}::{2}<{3}>(tree, "{0}"{4});\n'\
+                   .format(member, CYCNS, query, tstr, dstr)
+        return s
+
+    def read_vector(self, member, t, d, ind="  "):
+        s = ""
+        valstr = type_to_str(t[1])
+        if valstr.endswith('>'):
+            valstr += " "
+        valfmt = self._fmt(t[1])
+        if d is not None:
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            ind += '  '
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'n = sub->NMatches("val");\n'
+        s += ind + '{0}.resize(n);\n'.format(member)
+        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + ('  {1}[i] = {0}::Query<{2}>(sub, "val", i);'
+                    '\n').format(CYCNS, member, valstr)
+        s += ind + '}\n'
+        if d is not None:
+            ind = ind[:-2]
+            s += ind + '} else {\n'
+            ind += '  '
+            s += ind + '{0}.resize({1});\n'.format(member, len(d))
+            for i, v in enumerate(d):
+                vstr = vfmt.format(v)
+                s += ind + '{0}[{1}] = {2};\n'.format(member, i, vstr)
+            ind = ind[:-2]
+            s += ind + '}\n'
+        return s
+
+    def read_set(self, member, t, d, ind="  "):
+        s = ""
+        valstr = type_to_str(t[1])
+        if valstr.endswith('>'):
+            valstr += " "
+        valfmt = self._fmt(t[1])
+        s += ind + '{0}.clear();\n'.format(member)
+        if d is not None:
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            ind += '  '
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'n = sub->NMatches("val");\n'
+        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + ('  {1}.insert({0}::Query<{2}>(sub, "val", i));'
+                    '\n').format(CYCNS, member, valstr)
+        s += ind + '}\n'
+        if d is not None:
+            ind = ind[:-2]
+            s += ind + '} else {\n'
+            ind += '  '
+            for i, v in enumerate(d):
+                vstr = vfmt.format(v)
+                s += ind + '{0}.insert({1});\n'.format(member, vstr)
+            ind = ind[:-2]
+            s += ind + '}\n'
+        return s
+
+    def read_list(self, member, t, d, ind="  "):
+        s = ""
+        valstr = type_to_str(t[1])
+        if valstr.endswith('>'):
+            valstr += " "
+        valfmt = self._fmt(t[1])
+        s += ind + '{0}.clear();\n'.format(member)
+        if d is not None:
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            ind += '  '
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'n = sub->NMatches("val");\n'
+        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + ('  {1}.push_back({0}::Query<{2}>(sub, "val", i));'
+                    '\n').format(CYCNS, member, valstr)
+        s += ind + '}\n'
+        if d is not None:
+            ind = ind[:-2]
+            s += ind + '} else {\n'
+            ind += '  '
+            for i, v in enumerate(d):
+                vstr = vfmt.format(v)
+                s += ind + '{0}.push_back({1});\n'.format(member, vstr)
+            ind = ind[:-2]
+            s += ind + '}\n'
+        return s
+
+    def read_pair(self, member, t, d, ind="  "):
+        s = ""
+        firststr = type_to_str(t[1])
+        if firststr.endswith('>'):
+            firststr += " "
+        firstfmt = self._fmt(t[1])
+        secondstr = type_to_str(t[2])
+        if secondstr.endswith('>'):
+            secondstr += " "
+        secondfmt = self._fmt(t[2])
+        if d is None:
+            query = "Query"
+            dfirst = dsecond = ""
+        else:
+            query = "OptionalQuery"
+            dfirst = ", " + firstfmt.format(d[0])
+            dsecond = ", " + secondfmt.format(d[1])
+        s += ind + '{0}.first = {1}::{2}<{3}>(tree, "{0}/first"{4});\n'\
+                   .format(member, CYCNS, query, firststr, dfirst)
+        s += ind + '{0}.second = {1}::{2}<{3}>(tree, "{0}/second"{4});\n'\
+                   .format(member, CYCNS, query, secondstr, dsecond)
+        return s
+
+    def read_map(self, member, t, d, ind="  "):
+        s = ""
+        keystr = type_to_str(t[1])
+        if keystr.endswith('>'):
+            keystr += " "
+        keyfmt = self._fmt(t[1])
+        valstr = type_to_str(t[2])
+        if valstr.endswith('>'):
+            valstr += " "
+        valfmt = self._fmt(t[2])
+        if d is not None:
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            ind += '  '
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'n = sub->NMatches("val");\n'
+        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + ('  {1}[{0}::Query<{2}>(sub, "key", i)] = '
+                    '{0}::Query<{3}>(sub, "val", i);\n'
+                    ).format(CYCNS, member, keystr, valstr)
+        s += ind + '}\n'
+        if d is not None:
+            ind = ind[:-2]
+            s += ind + '} else {\n'
+            ind += '  '
+            for k, v in d.items():
+                kstr = keyfmt.format(k)
+                vstr = valfmt.format(v)
+                s += ind + '{0}[{1}] = {2};\n'.format(member, kstr, vstr)
+            ind = ind[:-2]
+            s += ind + '}\n'
+        return s
 
     def impl(self, ind="  "):
         cg = self.machine
@@ -818,102 +995,32 @@ class InfileToDbFilter(CodeGeneratorFilter):
                                     self.machine.superclasses)
         for rent in rents:
             impl += ind + "{0}::InfileToDb(tree, di);\n".format(rent)
+        impl += self.shapes_impl(ctx, ind)
 
-        impl += ind + "tree = tree->SubTree(\"agent/\" + agent_impl());\n"
+        # read data from infile onto class
+        impl += ind + 'tree = tree->SubTree("agent/" + agent_impl());\n'
+        impl += ind + '{0}::InfileTree* sub;\n'.format(CYCNS)
+        impl += ind + 'int i;\n'
+        impl += ind + 'int n;\n'
         for member, info in ctx.items():
             t = info['type']
             if t in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
-            code = info['derived_init'] if 'derived_init' in info else None
-            if t[0] in ['std::set', 'std::vector', 'std::map', 'std::list']:
-                if t[0] == 'std::map':
-                    table = 'MapOf' + t[1].replace('std::', '').title() + 'To' + t[2].replace('std::', '').title()
-                else:
-                    table = 'ListOf' + t[1].split('::')[-1].title()
-
-                if d is not None:
-                    impl += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
-                else:
-                    impl += ind + '{\n'
-                ind += '  '
-
-                impl += ind + '{0}::InfileTree* sub = tree->SubTree("{1}");\n'.format(CYCNS, member)
-                impl += ind + 'int n = sub->NMatches("val");\n'
-                impl += ind + 'for (int i = 0; i < n; ++i) {\n'
-                impl += ind + '  di.NewDatum("{0}")\n'.format(table)
-                impl += ind + '  ->AddVal("Member", "{0}")\n'.format(member)
-                if t[0] == 'std::map':
-                    impl += ind + '  ->AddVal("Key", {0}::Query<{1}>(sub, "key", i))\n'.format(CYCNS, t[1])
-                    impl += ind + '  ->AddVal("Value", {0}::Query<{1}>(sub, "val", i))\n'.format(CYCNS, t[2])
-                else:
-                    impl += ind + '  ->AddVal("Value", {0}::Query<{1}>(sub, "val", i))\n'.format(CYCNS, t[1])
-                impl += ind + '  ->Record();\n'
-                impl += ind + '}\n'
-
-                if d is not None:
-                    ind = ind[:-2]
-                    impl += ind + '} else {\n'
-                    ind += '  '
-                    if t[0] == 'std::map':
-                        for k, v in d.items():
-                            ktext = '"{0}"'.format(k) if t[1] == 'std::string' else '{0}'.format(k)
-                            vtext = '"{0}"'.format(v) if t[2] == 'std::string' else '{0}'.format(v)
-                            impl += ind + 'di.NewDatum("{0}")\n'.format(table)
-                            impl += ind + '->AddVal("Member", "{0}")\n'.format(member)
-                            impl += ind + '->AddVal("Key", {0})\n'.format(ktext)
-                            impl += ind + '->AddVal("Value", {0})\n'.format(vtext)
-                            impl += ind + '->Record();\n'
-                    else:
-                        for v in d:
-                            vtext = '"{0}"'.format(v) if t[1] == 'std::string' else '{0}'.format(v)
-                            impl += ind + 'di.NewDatum("{0}")\n'.format(table)
-                            impl += ind + '->AddVal("Member", "{0}")\n'.format(member)
-                            impl += ind + '->AddVal("Value", {0})\n'.format(vtext)
-                            impl += ind + '->Record();\n'
-
-                ind = ind[:-2]
-                impl += ind + '}\n'
-            elif t in PRIMITIVES:
-                pods.append((member, t, d, code))
-            elif t[0] == 'std::pair':
-                pods.append((member, t, d, code))
+            if 'derived_init' in info:
+                impl += ind + info['derived_init'] + '\n'
             else:
-                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
+                reader = self.readers.get(t, self.readers.get(t[0], None))
+                impl += reader(member, t, d, ind)
 
-        head = ""  # from input to var
-        body = ""  # derive vars
-        tail = ""  # from far to db
-
-        # handle pod in a single datum/table
-        tail += ind + 'di.NewDatum("Info")\n'
-        for (member, t, d, code) in pods:
-            methname = "Query" if d is None else "OptionalQuery"
-            opt = ''
-            if t[0] == 'std::pair':
-                opt2 = ''
-                if d is not None:
-                    opt = ', ' + d[0]
-                    opt2 = ', ' + d[1]
-                if code is None:
-                    head += ind + ("{0}A = {1}::{2}<{3}>(tree, \"{0}/first\"{4});\n").format(member, CYCNS, methname, t[1], opt)
-                    head += ind + ("{0}B = {1}::{2}<{3}>(tree, \"{0}/second\"{4});\n").format(member, CYCNS, methname, t[2], opt)
-                    tail += ind + ("->AddVal(\"{0}A\", {0}A)\n\"").format(member)
-                    tail += ind + ("->AddVal(\"{0}B\", {0}B)\n\"").format(member)
-                else:
-                    tail += ind + ("->AddVal(\"{0}A\", {0}.first)\n\"").format(member)
-                    tail += ind + ("->AddVal(\"{0}B\", {0}.second)\n\"").format(member)
-            else:
-                if d is not None:
-                    opt = ', "' + str(d) + '"' if t == "std::string" else ', ' + str(d)
-                if code is None:
-                    head += ind + ("{0} = {1}::{2}<{3}>(tree, \"{0}\"{4});\n").format(member, CYCNS, methname, t, opt)
-                tail += ind + ("->AddVal(\"{0}\", {0})\n").format(member)
-            if code is not None:
-                body += ind + code + '\n'
-
-        tail += ind + '->Record();\n'
-        impl += head + body + tail
+        # write obj to database
+        impl += ind + 'di.NewDatum("Info")\n'
+        for member, info in ctx.items():
+            if info['type'] in BUFFERS:
+                continue
+            shape = ', &cycpp_shape_{0}'.format(member) if 'shape' in info else ''
+            impl += ind + '->AddVal("{0}", {0}{1})\n'.format(member, shape)
+        impl += ind + '->Record();\n'
         return impl
 
 class SchemaFilter(CodeGeneratorFilter):
@@ -1005,50 +1112,13 @@ class SnapshotFilter(CodeGeneratorFilter):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]
-        impl = ""
-        # TODO This should all be in one loop
-        pod = OrderedDict()
-        for member, params in ctx.items():
-            t = params["type"]
+        impl = ind + 'di.NewDatum("Info")\n'
+        for member, info in ctx.items():
+            t = info["type"]
             if t in BUFFERS:
                 continue
-            if t[0] in ["std::vector", "std::list", "std::set"]:
-                suffix = t[1].replace("std::", "").title()
-                impl += ind + "{\n"
-                impl += ind + "  {0}::iterator it;\n".format(type_to_str(t))
-                impl += ind + "  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n".format(member)
-                impl += ind + "    di.NewDatum(\"ListOf{0}\")\n".format(suffix)
-                impl += ind + "    ->AddVal(\"Member\", \"{0}\")\n".format(member)
-                impl += ind + "    ->AddVal(\"Value\", *it)\n"
-                impl += ind + "    ->Record();\n"
-                impl += ind + "  }\n"
-                impl += ind + "}\n"
-            elif t[0] == "std::map":
-                suffix = t[1].replace("std::", "").title() + "To" + t[2].replace("std::", "").title()
-                impl += ind + "{\n"
-                impl += ind + "  {0}::iterator it;\n".format(type_to_str(t))
-                impl += ind + "  for (it = {0}.begin(); it != {0}.end(); ++it) {{\n".format(member)
-                impl += ind + "    di.NewDatum(\"MapOf{0}\")\n".format(suffix)
-                impl += ind + "    ->AddVal(\"Member\", \"{0}\")\n".format(member)
-                impl += ind + "    ->AddVal(\"Key\", it->first)\n"
-                impl += ind + "    ->AddVal(\"Value\", it->second)\n"
-                impl += ind + "    ->Record();\n"
-                impl += ind + "  }\n"
-                impl += ind + "}\n"
-            elif t[0] == "std::pair":
-                pod[member] = t
-            elif t in PRIMITIVES:
-                pod[member] = t
-            else:
-                raise RuntimeError("{0}Unsupported type {1}".format(self.machine.includeloc(), t))
-
-        impl += ind + "di.NewDatum(\"Info\")\n"
-        for member, t in pod.items():
-            if t[0] == "std::pair":
-                impl += ind + "->AddVal(\"{0}A\", {0}.first)\n".format(member)
-                impl += ind + "->AddVal(\"{0}B\", {0}.second)\n".format(member)
-            else:
-                impl += ind + "->AddVal(\"{0}\", {0})\n".format(member)
+            shape = ', &cycpp_shape_{0}'.format(member) if 'shape' in info else ''
+            impl += ind + '->AddVal("{0}", {0}{1})\n'.format(member, shape)
         impl += ind + "->Record();\n"
 
         return impl
@@ -1125,35 +1195,6 @@ class DefaultPragmaFilter(Filter):
         for f in self.machine.codegen_filters:
             f.revert(statement, sep)
 
-class Indenter(object):
-    def __init__(self, n=2, level=0):
-        str.__init__(self)
-        self._n = int(n)
-        self._level = int(level)
-
-    def __add__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __radd__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __concat__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __str__(self):
-        return ' '*self._n*self._level
-
-    def __repr__(self):
-        return ' '*self._n*self._level
-
-    def up(self):
-        self._level += 1
-        return Indenter(n=self._n, level=self._level-1)
-
-    def down(self):
-        self._level -= 1
-        return Indenter(n=self._n, level=self._level)
-
 class CodeGenerator(object):
     """The CodeGenerator class is the pass 3 state machine.
 
@@ -1175,7 +1216,8 @@ class CodeGenerator(object):
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.linemarkers = []
-        # all basic code generating filters
+        self.var_annotations = None
+        # all basic code generating filters for core methods
         self.codegen_filters = [InitFromCopyFilter(self),
                                 InitFromDbFilter(self), InfileToDbFilter(self),
                                 CloneFilter(self), SchemaFilter(self),
@@ -1189,8 +1231,11 @@ class CodeGenerator(object):
                                                AccessFilter(self),
                                                NamespaceAliasFilter(self),
                                                NamespaceFilter(self),
+                                               VarDecorationFilter(self),
+                                               VarDeclarationFilter(self),
+                                               LinemarkerFilter(self),
                                                DefaultPragmaFilter(self),
-                                               LinemarkerFilter(self)]
+                                               ]
 
     def classname(self):
         """Returns the current, fully-expanded class name."""
@@ -1244,7 +1289,9 @@ class CodeGenerator(object):
             self.depth += statement.count('{') - statement.count('}')
         # revert what is needed
         for filter in self.filters:
-            filter.revert(statement, sep)
+            reverted = filter.revert(statement, sep)
+            if reverted is not None:
+                self.statements.append(reverted)
 
 def generate_code(orig, context, superclasses):
     """Takes a canonical C++ source file and separates it out into statements
@@ -1309,6 +1356,34 @@ class Proxy(MutableMapping):
     def __contains__(self, key):
         return key in self.__dict__['_d']
 
+class Indenter(object):
+    def __init__(self, n=2, level=0):
+        str.__init__(self)
+        self._n = int(n)
+        self._level = int(level)
+
+    def __add__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __radd__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __concat__(self, other):
+        return '{0}{1}'.format(self, other)
+
+    def __str__(self):
+        return ' '*self._n*self._level
+
+    def __repr__(self):
+        return ' '*self._n*self._level
+
+    def up(self):
+        self._level += 1
+        return Indenter(n=self._n, level=self._level-1)
+
+    def down(self):
+        self._level -= 1
+        return Indenter(n=self._n, level=self._level)
 
 def outter_split(s, open_brace='(', close_brace=')', separator=','):
     """Takes a string and only split the outter most level."""

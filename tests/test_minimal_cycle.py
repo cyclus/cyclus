@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+import nose
+
 from nose.tools import assert_equal, assert_almost_equal, assert_true
 from numpy.testing import assert_array_equal
 import os
@@ -7,7 +9,7 @@ import tables
 import numpy as np
 from tools import check_cmd
 from helper import table_exist, find_ids, exit_times, create_sim_input, \
-    h5out, sqliteout, clean_outs
+    h5out, sqliteout, clean_outs, sha1array
 
 def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
     """Changes k_factor_in and k_factor_out for one facility.
@@ -78,7 +80,6 @@ def change_minimal_input(ref_input, k_factor_a, k_factor_b):
 
     return fw_path
 
-"""Tests"""
 def test_minimal_cycle():
     """Tests simulations with two facilities with several conversion factors.
 
@@ -122,7 +123,9 @@ def test_minimal_cycle():
                 return  # don't execute further commands
 
             # Get specific tables and columns
-            agent_entry = output.get_node("/AgentEntry")[:]
+            #agent_entry = output.get_node("/AgentEntry")[:]
+            print(output.root.AgentEntry)
+            agent_entry = output.root.AgentEntry[:]
             info = output.get_node("/Info")[:]
             resources = output.get_node("/Resources")[:]
             transactions = output.get_node("/Transactions")[:]
@@ -204,3 +207,6 @@ def test_minimal_cycle():
             output.close()
             clean_outs()
             os.remove(sim_input)
+
+if __name__ == "__main__":
+    nose.runmodule()

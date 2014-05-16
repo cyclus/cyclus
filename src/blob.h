@@ -15,6 +15,34 @@ class Blob {
     return str_;
   }
 
+  inline std::ostream& operator<<(std::ostream& out) const {
+     return out << str();
+  }
+
+  inline bool operator< (const cyclus::Blob& rhs) const {
+    return str() < rhs.str();
+  }
+
+  inline bool operator> (const cyclus::Blob& rhs) const {
+    return !operator<(rhs) && !operator==(rhs);
+  }
+
+  inline bool operator<=(const cyclus::Blob& rhs) const {
+    return !operator>(rhs);
+  }
+
+  inline bool operator>=(const cyclus::Blob& rhs) const {
+    return !operator<(rhs);
+  }
+
+  inline bool operator==(const cyclus::Blob& rhs) const {
+    return str() == rhs.str();
+  }
+
+  inline bool operator!=(const cyclus::Blob& rhs) const {
+    return !operator==(rhs);
+  }
+
  private:
   std::string str_;
 };

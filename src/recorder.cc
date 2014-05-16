@@ -55,6 +55,7 @@ Datum* Recorder::NewDatum(std::string title) {
   Datum* d = data_[index_];
   d->title_ = title;
   d->vals_.resize(1);
+  d->shapes_.resize(1);
 
   index_++;
   return d;

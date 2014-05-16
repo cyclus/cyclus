@@ -37,7 +37,7 @@ class SqliteBack: public FullBackend {
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
  private:
-  void Bind(boost::spirit::hold_any v, SqlStatement::Ptr stmt, int index);
+  void Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt, int index);
 
   QueryResult GetTableInfo(std::string table);
 
@@ -45,11 +45,11 @@ class SqliteBack: public FullBackend {
   std::string SqlType(boost::spirit::hold_any v);
 
   /// returns a canonical string name for the type in v
-  std::string Type(boost::spirit::hold_any v);
+  DbTypes Type(boost::spirit::hold_any v);
 
   /// converts the string value in s to a c++ value corresponding the the
   /// supported sqlite datatype type in a hold_any object.
-  boost::spirit::hold_any StringAsVal(std::string s, std::string type);
+  boost::spirit::hold_any ColAsVal(SqlStatement::Ptr stmt, int col, DbTypes type);
 
   /// Queue up a table-create command for d.
   void CreateTable(Datum* d);
@@ -69,7 +69,18 @@ class SqliteBack: public FullBackend {
   std::set<std::string> tbl_names_;
 
   std::map<std::string, SqlStatement::Ptr> stmts_;
-  std::map<std::string, std::map<const char*, int> > field_order_;
+  std::map<std::string, std::vector<DbTypes> > schemas_;
+
+  SqlStatement::Ptr vect_int_ins_;
+  SqlStatement::Ptr vect_int_get_;
+  std::set<Digest> vect_int_keys_;
+
+  SqlStatement::Ptr vect_str_ins_;
+  SqlStatement::Ptr vect_str_get_;
+  std::set<Digest> vect_str_keys_;
+
+  /// A class to help with hashing variable length datatypes
+  Sha1 hasher_;
 };
 } // namespace cyclus
 #endif

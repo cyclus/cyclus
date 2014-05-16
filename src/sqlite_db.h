@@ -30,31 +30,45 @@ class SqlStatement {
   /// Executes the prepared statement.
   void Exec() {
     Must(sqlite3_step(stmt_));
+    Reset();
+  }
+
+  /// Executes the prepared statement.
+  void Reset() {
     Must(sqlite3_reset(stmt_));
     Must(sqlite3_clear_bindings(stmt_));
   }
 
-  /// Returns the result of executing the prepared statement
-  std::vector<StrList> Query() {
-    std::vector<StrList> results;
-    int cols = sqlite3_column_count(stmt_);
-    while (true) {
-      if(sqlite3_step(stmt_) != SQLITE_ROW) {
-        break;
-      }
-
-      StrList values;
-      for (int col = 0; col < cols; col++) {
-        char* val = (char*)sqlite3_column_text(stmt_, col);
-        if (val == NULL) {
-          values.push_back("");
-        } else {
-          values.push_back(val);
-        }
-      }
-      results.push_back(values);
+  /// Step to next row of previously executed query. Returns false when there
+  /// are no more rows. Previously retrieved text or blob column data memory
+  /// is deallocated.
+  bool Step() {
+    int status = sqlite3_step(stmt_);
+    if (status == SQLITE_ROW) {
+      return true;
     }
-    return results;
+    Must(status);
+    return false;
+  }
+
+  /// Returns an int value for the specified column of the current query row.
+  int GetInt(int col) {
+    return sqlite3_column_int(stmt_, col);
+  }
+
+  /// Returns a double value for the specified column of the current query row.
+  double GetDouble(int col) {
+    return sqlite3_column_double(stmt_, col);
+  }
+
+  /// Returns a byte array value for the specified column of the current query
+  /// row. This can be used for retrieving TEXT and BLOB column data.
+  char* GetText(int col, int* n) {
+    char* v = const_cast<char*>(reinterpret_cast<const char *>(sqlite3_column_text(stmt_, col)));
+    if (n != NULL) {
+      *n = sqlite3_column_bytes(stmt_, col);
+    }
+    return v;
   }
 
   /// Binds the templated sql parameter at index i to val.
@@ -79,7 +93,8 @@ class SqlStatement {
   }
 
  private:
-  SqlStatement(sqlite3* db, std::string zSql) : db_(db), zSql_(zSql) {
+  SqlStatement(sqlite3* db, std::string zSql)
+      : db_(db), zSql_(zSql), stmt_(NULL) {
     Must(sqlite3_prepare_v2(db_, zSql.c_str(), -1, &stmt_, NULL));
   }
 

@@ -157,7 +157,7 @@ class KFacility : public cyclus::Facility {
   /**
      Name of the recipe this facility uses.
    */
-  #pragma cyclus var {}
+  #pragma cyclus var {'shape': [50]}
   std::string recipe_name_;
 
   /**
