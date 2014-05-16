@@ -46,7 +46,6 @@ void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
 }
 
 void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
-  rec_->set_dump_count(10000); // this recorder is "real" and gets bigger buf
   ctx_ = new Context(&ti_, rec_);
 
   std::vector<Cond> conds;
@@ -210,8 +209,10 @@ void SimInit::LoadPrototypes() {
 
     Agent* m = DynamicModule::Make(ctx_, spec);
 
+    // note that we don't filter by SimTime here because prototypes remain
+    // static over the life of the simulation and we only snapshot them once
+    // when the simulation is initialized.
     std::vector<Cond> conds;
-    conds.push_back(Cond("SimTime", "==", t_));
     conds.push_back(Cond("AgentId", "==", agentid));
     CondInjector ci(b_, conds);
     PrefixInjector pi(&ci, "AgentState");
