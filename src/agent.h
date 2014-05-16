@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include "dynamic_module.h"
 #include "resource.h"
@@ -81,7 +80,7 @@ class Agent : public StateWrangler {
   ///
   /// Agent parameters in the InfileTree are scoped in the
   /// "agent/[agent-class-name]" path. The agent's class-name can be retrieved
-  /// from the agent_impl method. The superclass InitFrom expects the InfileTree
+  /// from the spec method. The superclass InitFrom expects the InfileTree
   /// passed to it to be scoped identically - do NOT pass a changed-scope
   /// InfileTree to the superclass.
   ///
@@ -94,7 +93,7 @@ class Agent : public StateWrangler {
   ///   void InfileToDb(InfileTree* qe, DbInit di) {
   ///     cyclus::Facility::InitFrom(qe); // 
   ///     // now do MyAgentClass' initialitions, e.g.:
-  ///     qe = qe->Query("agent/" + agent_impl()); // rescope the InfileTree
+  ///     qe = qe->Query("agent/" + spec()); // rescope the InfileTree
   ///
   ///     // retrieve all agent params
   ///     std::string recipe = qe->GetString("recipe");
@@ -214,10 +213,10 @@ class Agent : public StateWrangler {
   inline const int id() const { return id_; }
 
   /// get agent implementation
-  inline std::string agent_impl() {return agent_impl_;}
+  inline std::string spec() {return spec_;}
 
   /// set agent implementation
-  inline void agent_impl(std::string new_impl) {agent_impl_ = new_impl;}
+  inline void spec(std::string new_impl) {spec_ = new_impl;}
 
   /// returns a string that describes the agent subclass (e.g. Region, etc.)
   inline const std::string kind() const {return kind_;};
@@ -314,7 +313,7 @@ class Agent : public StateWrangler {
   std::string prototype_;
 
   /// concrete type of a agent (e.g. "MyReactorAgent")
-  std::string agent_impl_;
+  std::string spec_;
 
   /// an instance-unique ID for the agent
   int id_;

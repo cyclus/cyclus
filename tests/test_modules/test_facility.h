@@ -8,11 +8,11 @@
 class TestFacility: public cyclus::Facility {
  public:
   static std::string proto_name() { return "test_fac_prototype"; }
-  static std::string agent_impl() { return "test_fac_impl"; }
+  static std::string spec() { return "test_fac_impl"; }
                                   
   TestFacility(cyclus::Context* ctx) : cyclus::Facility(ctx) {
     cyclus::Agent::prototype(proto_name());
-    cyclus::Agent::agent_impl(agent_impl());
+    cyclus::Agent::spec(spec());
   }
   virtual ~TestFacility() {};
   
