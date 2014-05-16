@@ -6,18 +6,9 @@ namespace cyclus {
 
 Predator::Predator(cyclus::Context* ctx) : cyclus::Facility(ctx) {}
 
-std::string Predator::str() {
-  // no info for now. Change later
-  return Facility::str();
-}
-
 void Predator::EnterNotify() {
   cyclus::Facility::EnterNotify();
   context()->RegisterTrader(this);
-}
-
-void Predator::Build(cyclus::Agent* parent) {
-  cyclus::Facility::Build();
 }
 
 void Predator::Decommission() {
