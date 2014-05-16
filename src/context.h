@@ -34,20 +34,14 @@ class SimInit;
 /// the simulation and affect its behavior.
 class SimInfo {
  public:
-  SimInfo()
-    : duration(0), y0(0), m0(0), decay_period(0),
-      branch_time(-1), parent_type("init") {};
+  SimInfo();
 
-  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1, std::string handle = "")
-    : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
-      branch_time(-1), handle(handle), parent_type("init"), parent_sim(boost::uuids::nil_uuid()) {};
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1,
+          std::string handle = "");
 
   SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
           int branch_time, std::string parent_type,
-          std::string handle = "")
-    : duration(dur), y0(-1), m0(-1), decay_period(decay_period),
-      parent_sim(parent_sim), parent_type(parent_type),
-      branch_time(branch_time), handle(handle) {};
+          std::string handle = "");
 
   /// user-defined label associated with a particular simulation
   std::string handle;
@@ -184,7 +178,9 @@ class Context {
   int time();
 
   /// Return static simulation info.
-  inline SimInfo sim_info() const {return si_;};
+  inline SimInfo sim_info() const {
+    return si_;
+  };
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
@@ -225,9 +221,9 @@ class Context {
   inline int n_specs(std::string impl) {
     return n_specs_[impl];
   }
-  
+
  private:
-  /// Registers an agent as a participant in the simulation. 
+  /// Registers an agent as a participant in the simulation.
   inline void RegisterAgent(Agent* a) {
     n_prototypes_[a->prototype()]++;
     n_specs_[a->spec()]++;
@@ -256,6 +252,4 @@ class Context {
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_CONTEXT_H_
-
-
 
