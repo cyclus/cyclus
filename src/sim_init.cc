@@ -145,7 +145,12 @@ void SimInit::LoadInfo() {
 }
 
 void SimInit::LoadRecipes() {
-  QueryResult qr = b_->Query("Recipes", NULL);
+  QueryResult qr;
+  try {
+    qr = b_->Query("Recipes", NULL);
+  } catch (std::exception err) {
+    return;
+  } // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string recipe = qr.GetVal<std::string>("Recipe", i);
@@ -166,24 +171,25 @@ void SimInit::LoadRecipes() {
 }
 
 void SimInit::LoadSolverInfo() {
-  QueryResult qr = b_->Query("CommodPriority", NULL);
+  GreedyPreconditioner* conditioner = NULL;
 
-  std::map<std::string, double> commod_order;
-  for (int i = 0; i < qr.rows.size(); ++i) {
-    std::string commod = qr.GetVal<std::string>("Commodity", i);
-    double order = qr.GetVal<double>("SolutionOrder", i);
-    commod_order[commod] = order;
-  }
+  try {
+    QueryResult qr = b_->Query("CommodPriority", NULL);
+    std::map<std::string, double> commod_order;
+    for (int i = 0; i < qr.rows.size(); ++i) {
+      std::string commod = qr.GetVal<std::string>("Commodity", i);
+      double order = qr.GetVal<double>("SolutionOrder", i);
+      commod_order[commod] = order;
+    }
 
-  // solver will delete conditioner
-  GreedyPreconditioner* conditioner = new GreedyPreconditioner(
-    commod_order,
-    GreedyPreconditioner::REVERSE);
+    // solver will delete conditioner
+    conditioner = new GreedyPreconditioner( commod_order,
+        GreedyPreconditioner::REVERSE);
+  } catch (std::exception err) { } // table doesn't exist (okay)
 
   // context will delete solver
   bool exclusive_orders = false;
   GreedySolver* solver = new GreedySolver(exclusive_orders, conditioner);
-
   ctx_->solver(solver);
 }
 
@@ -228,32 +234,36 @@ void SimInit::LoadInitialAgents() {
     int id = qentry.GetVal<int>("AgentId", i);
     std::vector<Cond> conds;
     conds.push_back(Cond("AgentId", "==", id));
-    QueryResult qexit;
+    conds.push_back(Cond("ExitTime", "<", t_));
     try {
-      qexit = b_->Query("AgentExit", &conds);
+      QueryResult qexit = b_->Query("AgentExit", &conds);
+      if (qexit.rows.size() != 0) {
+        continue; // agent was decomissioned before t_ - skip
+      }
     } catch (std::exception err) { } // table doesn't exist (okay)
+
     // if the agent wasn't decommissioned before t_ create and init it
-    if (qexit.rows.size() == 0) {
-      std::string proto = qentry.GetVal<std::string>("Prototype", i);
-      std::string impl = qentry.GetVal<std::string>("Implementation", i);
-      AgentSpec spec(impl);
-      Agent* m = DynamicModule::Make(ctx_, spec);
 
-      // agent-kernel init
-      m->prototype_ = proto;
-      m->id_ = id;
-      m->enter_time_ = qentry.GetVal<int>("EnterTime", i);
-      unbuilt[id] = m;
-      parentmap[id] = qentry.GetVal<int>("ParentId", i);
+    std::string proto = qentry.GetVal<std::string>("Prototype", i);
+    std::string impl = qentry.GetVal<std::string>("Implementation", i);
+    AgentSpec spec(impl);
+    Agent* m = DynamicModule::Make(ctx_, spec);
 
-      // agent-custom init
-      conds.push_back(Cond("SimTime", "==", t_));
-      CondInjector ci(b_, conds);
-      PrefixInjector pi(&ci, "AgentState");
-      m->Agent::InitFrom(&pi);
-      pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
-      m->InitFrom(&pi);
-    }
+    // agent-kernel init
+    m->prototype_ = proto;
+    m->id_ = id;
+    m->enter_time_ = qentry.GetVal<int>("EnterTime", i);
+    unbuilt[id] = m;
+    parentmap[id] = qentry.GetVal<int>("ParentId", i);
+
+    // agent-custom init
+    conds.pop_back();
+    conds.push_back(Cond("SimTime", "==", t_));
+    CondInjector ci(b_, conds);
+    PrefixInjector pi(&ci, "AgentState");
+    m->Agent::InitFrom(&pi);
+    pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
+    m->InitFrom(&pi);
   }
 
   // construct agent hierarchy starting at roots (no parent) down
