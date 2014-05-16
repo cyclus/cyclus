@@ -10,77 +10,10 @@ import numpy as np
 import hashlib
 
 from tools import check_cmd
-from helper import tables_exist, find_ids, exit_times, h5out, clean_outs
+from helper import tables_exist, h5out, clean_outs, agent_time_series
 
 prey = "Prey"
 pred = "Predator"
-
-def agent_time_series(f, names):
-    """Return a list of timeseries corresponding to the number of agents in a
-    Cyclus simulation
-    
-    Parameters
-    ----------
-    f : PyTables file
-        the output file
-    names : list
-        the list of agent names
-    """
-    names = [prey, pred]
-    digests = [hashlib.sha1(name).digest() for name in names]
-    print("digests:", digests)
-
-    tbl = f.root.Info
-    nsteps = tbl.cols.Duration[:][0]
-    entries = {name: [0] * nsteps for name in names}
-    exits = {name: [0] * nsteps for name in names}
-
-    # Get specific tables and columns
-    agent_entry = f.get_node("/AgentEntry")[:]
-    agent_exit = f.get_node("/AgentExit")[:] if hasattr(f.root, 'AgentExit') \
-        else None
-
-    # Find agent ids
-    agent_ids = agent_entry["AgentId"]
-    agent_type = agent_entry["Prototype"]
-    agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
-
-    # entries per timestep
-    for name, ids in agent_ids.items():
-        for id in ids:
-            idx = np.where(agent_entry['AgentId'] == id)[0][0]
-            entries[name][agent_entry[idx]['EnterTime']] += 1
-    
-    # cumulative entries
-    for k, v in entries.items():
-        for i in range(len(v) - 1):
-            v[i+1] += v[i]
-
-    if agent_exit is None:
-        return entries
-
-    # entries per timestep
-    for name, ids in agent_ids.items():
-        for id in ids:
-            idxs = np.where(agent_exit['AgentId'] == id)[0]
-            if len(idxs) > 0:
-                exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
-
-    # cumulative exits
-    for k, v in exits.items():
-        for i in range(len(v) - 1):
-            v[i+1] += v[i]
-
-    # return difference
-    ret = {}
-    for name in names:
-        i = entries[name]
-        # shift by one to account for agents that enter/exit in the same
-        # timestep
-        o = [0] + exits[name][:-1] 
-        ret[name] = [i - o for i, o in zip(i, o)]
-            
-    return ret
 
 def test_predator_only():
     """Tests simulations with Predators only.
