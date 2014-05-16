@@ -45,10 +45,10 @@ def test_source_to_sink():
 
         # Find agent ids of source and sink facilities
         agent_ids = agent_entry["AgentId"]
-        agent_impl = agent_entry["Implementation"]
+        spec = agent_entry["Implementation"]
 
-        source_id = find_ids("Source:Source:Source", agent_impl, agent_ids)
-        sink_id = find_ids("Sink:Sink:Sink", agent_impl, agent_ids)
+        source_id = find_ids("Source:Source:Source", spec, agent_ids)
+        sink_id = find_ids("Sink:Sink:Sink", spec, agent_ids)
 
         # Test for only one source and one sink are deployed in the simulation
         yield assert_equal, len(source_id), 1

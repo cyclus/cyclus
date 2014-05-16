@@ -35,7 +35,7 @@ New features
 - added more detail about context agent ownership and stack agents are bad. (7682c6c)
 - changed clone methods to use context-arg constructor (eaede68)
 - changed xml Init[Core/Module]Member fan methods to be InitFrom chain. 
-  Gave agent class a default val for agent_impl_ to facilitate testing of xml init 
+  Gave agent class a default val for spec_ to facilitate testing of xml init 
   methods. (3efb2b6)
 - renamed InitCoreMembers to InitFrom (f6e0add)
 - fixed deploy self as parent bug in xmlfileloader. Agent class removes 'this' from 
