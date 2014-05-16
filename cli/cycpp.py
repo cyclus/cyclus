@@ -399,7 +399,7 @@ class VarDeclarationFilter(Filter):
         if shape is None:
             return
         s = statement + sep + '\n'
-        s += '  std::vector<int> __{0}_shape__;\n'.format(vname)
+        s += '  std::vector<int> cycpp_shape_{0};\n'.format(vname)
         return s
 
     def transform(self, statement, sep):
@@ -701,7 +701,7 @@ class CodeGeneratorFilter(Filter):
             shape = annotations.get('shape', None)
             if shape is None:
                 continue
-            shapename = "__{0}_shape__".format(vname)
+            shapename = "cycpp_shape_{0}".format(vname)
             s += ('{3}int raw{0}[{1}] = {{{2}}};\n'
                   '{3}{0} = std::vector<int>(raw{0}, raw{0} + {1});\n'
                   ).format(shapename, len(shape), ", ".join(map(str, shape)), ind)
@@ -1018,7 +1018,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         for member, info in ctx.items():
             if info['type'] in BUFFERS:
                 continue
-            shape = ', &__{0}_shape__'.format(member) if 'shape' in info else ''
+            shape = ', &cycpp_shape_{0}'.format(member) if 'shape' in info else ''
             impl += ind + '->AddVal("{0}", {0}{1})\n'.format(member, shape)
         impl += ind + '->Record();\n'
         return impl
@@ -1117,7 +1117,7 @@ class SnapshotFilter(CodeGeneratorFilter):
             t = info["type"]
             if t in BUFFERS:
                 continue
-            shape = ', &__{0}_shape__'.format(member) if 'shape' in info else ''
+            shape = ', &cycpp_shape_{0}'.format(member) if 'shape' in info else ''
             impl += ind + '->AddVal("{0}", {0}{1})\n'.format(member, shape)
         impl += ind + "->Record();\n"
 
