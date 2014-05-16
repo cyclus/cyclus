@@ -78,10 +78,9 @@ class Inver : public cy::Facility {
 class SimInitTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    rec = new cy::Recorder();
     b = new cy::SqliteBack(dbpath);
-    rec->RegisterBackend(b);
-    ctx = new cy::Context(&ti, rec);
+    rec.RegisterBackend(b);
+    ctx = new cy::Context(&ti, &rec);
     ctx->InitSim(cy::SimInfo(5));
 
     cy::CompMap v;
@@ -93,10 +92,10 @@ class SimInitTest : public ::testing::Test {
 
     Inver* a1 = new Inver(ctx);
     cy::DynamicModule::man_agents_["::Inver"] = a1->Clone();
-    a1->agent_impl("::Inver");
+    a1->spec("::Inver");
     a1->val1 = 23;
     Inver* a2 = new Inver(ctx);
-    a2->agent_impl("::Inver");
+    a2->spec("::Inver");
     a2->val1 = 26;
 
     cy::SimInit::SnapAgent(a1);
@@ -110,27 +109,28 @@ class SimInitTest : public ::testing::Test {
     a2->Clone()->Build(NULL);
 
     cy::SimInit::Snapshot(ctx);
-    rec->Flush();
+    rec.Flush();
   }
 
   virtual void TearDown() {
+    rec.Close();
     delete ctx;
-    delete rec;
     delete b;
     remove(dbpath);
   }
 
   int transid(cy::Context* ctx) { return ctx->trans_id_; };
+  cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; };
 
   cy::Context* ctx;
   cy::Timer ti;
-  cy::Recorder* rec;
+  cy::Recorder rec;
   cy::SqliteBack* b;
 };
 
 TEST_F(SimInitTest, InitNextIds) {
   cy::SimInit si;
-  si.Init(rec, b);
+  si.Init(&rec, b);
   cy::Context* init_ctx = si.context();
 
   EXPECT_EQ(transid(ctx), transid(init_ctx));
@@ -138,7 +138,7 @@ TEST_F(SimInitTest, InitNextIds) {
 
 TEST_F(SimInitTest, InitRecipes) {
   cy::SimInit si;
-  si.Init(rec, b);
+  si.Init(&rec, b);
   cy::Context* init_ctx = si.context();
 
   cy::CompMap orig1 = ctx->GetRecipe("recipe1")->mass();
@@ -150,4 +150,23 @@ TEST_F(SimInitTest, InitRecipes) {
   cy::CompMap init2 = init_ctx->GetRecipe("recipe1")->mass();
   EXPECT_FLOAT_EQ(orig2[922350000], init2[922350000]);
   EXPECT_FLOAT_EQ(orig2[922380000], init2[922380000]);
+}
+
+TEST_F(SimInitTest, InitSimInfo) {
+  cy::SimInit si;
+  si.Init(&rec, b);
+  cy::Context* init_ctx = si.context();
+
+  cy::SimInfo si_orig = ctx->sim_info();
+  cy::SimInfo si_init = init_ctx->sim_info();
+
+  EXPECT_EQ(ctx->time(), init_ctx->time());
+  EXPECT_EQ(si_orig.duration, si_init.duration);
+  EXPECT_EQ(si_orig.y0, si_init.y0);
+  EXPECT_EQ(si_orig.m0, si_init.m0);
+  EXPECT_EQ(si_orig.decay_period, si_init.decay_period);
+  EXPECT_EQ(si_orig.handle, si_init.handle);
+  EXPECT_EQ(si_orig.parent_sim, si_init.parent_sim);
+  EXPECT_EQ(si_orig.parent_type, si_init.parent_type);
+  EXPECT_EQ(si_orig.branch_time, si_init.branch_time);
 }
