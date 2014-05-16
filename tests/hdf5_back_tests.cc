@@ -18,8 +18,301 @@ class FileDeleter {
   const char* path_;
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(Hdf5BackTest, ReadWrite) {
+class Hdf5GlobalEnv : public ::testing::Environment {
+ public:
+  virtual void SetUp() {
+    path = "db.h5";
+    db = new cyclus::Hdf5Back(path.c_str());
+  }
+
+  virtual void TearDown() {
+    delete db;
+    remove(path.c_str());
+  }
+
+  std::string path;
+  cyclus::Hdf5Back* db;
+};
+
+Hdf5GlobalEnv* const hdf5_glb_env = new Hdf5GlobalEnv;
+::testing::Environment* const hdf5_env = \
+  ::testing::AddGlobalTestEnvironment(hdf5_glb_env);
+
+class Hdf5BackTests : public ::testing::Test {
+ public:
+  virtual void SetUp() {
+    path = hdf5_glb_env->path;
+    db = hdf5_glb_env->db;
+    rec.RegisterBackend(db);
+  }
+
+  virtual void TearDown() {
+    rec.Close();
+  }
+
+  //
+  // Test helpers
+  //
+  template <typename T>
+  inline void ResultBasic(std::string title, const T& x, const T& y) {
+    std::vector<int>* shape_ptr;
+    if (shape.empty())
+      shape_ptr = NULL;
+    else
+      shape_ptr = &shape;
+    rec.NewDatum(title)
+    ->AddVal("vals", x, shape_ptr)
+    ->Record();
+    rec.NewDatum(title)
+    ->AddVal("vals", y, shape_ptr)
+    ->Record();
+    rec.Flush();
+    qr = db->Query(title, NULL);
+  }
+
+  template <typename T>
+  inline void TestBasic(std::string title, const T& x, const T& y) {
+    ResultBasic<T>(title, x, y);
+    T obsx = qr.GetVal<T>("vals", 0);
+    EXPECT_EQ(x, obsx);
+    T obsy = qr.GetVal<T>("vals", 1);
+    EXPECT_EQ(y, obsy);
+  }
+
+  void TestBasicString(std::string title, std::string x, std::string y) {
+    ResultBasic<std::string>(title, x, y);
+    std::string obsx = qr.GetVal<std::string>("vals", 0);
+    EXPECT_STREQ(x.c_str(), obsx.c_str());
+    std::string obsy = qr.GetVal<std::string>("vals", 1);
+    EXPECT_STREQ(y.c_str(), obsy.c_str());
+  }
+
+  void TestBasicBlob(std::string title, cyclus::Blob x, cyclus::Blob y) {
+    using cyclus::Blob;
+    ResultBasic<Blob>(title, x, y);
+    Blob obsx = qr.GetVal<Blob>("vals", 0);
+    EXPECT_STREQ(x.str().c_str(), obsx.str().c_str());
+    Blob obsy = qr.GetVal<Blob>("vals", 1);
+    EXPECT_STREQ(y.str().c_str(), obsy.str().c_str());
+  }
+
+
+  std::string path;
+  cyclus::Hdf5Back* db;
+  std::vector<int> shape;
+  cyclus::QueryResult qr;
+  cyclus::RecBackend::Deleter bdel;
+  cyclus::Recorder rec;
+};
+
+//
+// Actual unit tests
+//
+
+TEST_F(Hdf5BackTests, ReadWriteBool) {
+  shape.clear();
+  TestBasic<bool>("bool", true, false);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteInt) {
+  shape.clear();
+  TestBasic<int>("int", 42, 43);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteFloat) {
+  shape.clear();
+  TestBasic<float>("float", 42.0, 43.0);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteDouble) {
+  shape.clear();
+  TestBasic<double>("double", 42.0, 43.0);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteString) {
+  shape.resize(1);
+  shape[0] = 6;
+  TestBasicString("string", "wakka", "jawaka");
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLString) {
+  shape.clear();
+  TestBasicString("vl_string", "wakka", "jawaka");
+}
+
+TEST_F(Hdf5BackTests, ReadWriteBlob) {
+  using cyclus::Blob;
+  shape.clear();
+  TestBasicBlob("blob", Blob("wakka"), Blob("jawaka"));
+}
+
+TEST_F(Hdf5BackTests, ReadWriteUuid) {
+  using boost::uuids::uuid;
+  shape.clear();
+  uuid x = {0x12 ,0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56,
+            0x78, 0x90, 0xab, 0xcd, 0xef};
+  uuid y = {0x42 ,0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
+            0x42, 0x42, 0x42, 0x42, 0x42};
+  TestBasic<uuid>("uuid", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVectorInt) {
+  using std::vector;
+  shape.resize(1);
+  shape[0] = 3;
+  int x_[] = {6, 28, 496};
+  vector<int> x = vector<int>(x_, x_+3);
+  int y_[] = {42, 43, 44};
+  vector<int> y = vector<int>(y_, y_+3);
+  TestBasic<vector<int> >("vector_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLVectorInt) {
+  using std::vector;
+  int x_[] = {6, 28, 496, 8128};
+  vector<int> x = vector<int>(x_, x_+4);
+  vector<int> y = vector<int>(42);
+  for (int i = 0; i < 42; ++i)
+    y[i] = 42;
+  TestBasic<vector<int> >("vl_vector_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVectorString) {
+  using std::string;
+  using std::vector;
+  shape.resize(2);
+  shape[0] = 2;
+  shape[1] = 6;
+  string x_[] = {"wakka", "jawaka"};
+  vector<string> x = vector<string>(x_, x_+2);
+  string y_[] = {"Frank", "Zappa"};
+  vector<string> y = vector<string>(y_, y_+2);
+  TestBasic<vector<string> >("vector_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVectorVLString) {
+  using std::string;
+  using std::vector;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  vector<string> x = vector<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It Just Might Be a One‐Shot Deal"};
+  vector<string> y = vector<string>(y_, y_+3);
+  TestBasic<vector<string> >("vector_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLVectorString) {
+  using std::string;
+  using std::vector;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 10;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  vector<string> x = vector<string>(x_, x_+3);
+  string y_[] = {"One‐Shot"};
+  vector<string> y = vector<string>(y_, y_+1);
+  TestBasic<vector<string> >("vl_vector_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLVectorVLString) {
+  using std::string;
+  using std::vector;
+  shape.clear();
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  vector<string> x = vector<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
+  vector<string> y = vector<string>(y_, y_+9);
+  TestBasic<vector<string> >("vl_vector_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteSetInt) {
+  using std::set;
+  shape.resize(1);
+  shape[0] = 3;
+  int x_[] = {6, 28, 496};
+  set<int> x = set<int>(x_, x_+3);
+  int y_[] = {42, 43, 44};
+  set<int> y = set<int>(y_, y_+3);
+  TestBasic<set<int> >("set_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLSetInt) {
+  using std::set;
+  shape.clear();
+  int x_[] = {6, 28, 496, 8128};
+  set<int> x = set<int>(x_, x_+4);
+  set<int> y = set<int>();
+  for (int i = 0; i < 42; ++i)
+    y.insert(42 + i);
+  TestBasic<set<int> >("vl_set_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteListInt) {
+  using std::list;
+  shape.resize(1);
+  shape[0] = 3;
+  int x_[] = {6, 28, 496};
+  list<int> x = list<int>(x_, x_+3);
+  int y_[] = {42, 43, 44};
+  list<int> y = list<int>(y_, y_+3);
+  TestBasic<list<int> >("list_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLListInt) {
+  using std::list;
+  shape.clear();
+  int x_[] = {6, 28, 496, 8128};
+  list<int> x = list<int>(x_, x_+4);
+  list<int> y = list<int>();
+  for (int i = 0; i < 42; ++i)
+    y.push_back(42);
+  TestBasic<list<int> >("vl_list_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWritePairIntInt) {
+  using std::pair;
+  shape.clear();
+  pair<int, int> x = pair<int, int>(6, 28);
+  pair<int, int> y = pair<int, int>(42, 43);
+  TestBasic<pair<int, int> >("pair_int_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapIntInt) {
+  using std::map;
+  shape.resize(1);
+  shape[0] = 3;
+  map<int, int> x = map<int, int>();
+  x[6] = 42;
+  x[28] = 43;
+  x[496] = 44;
+  map<int, int> y = map<int, int>();
+  y[42] = 6;
+  y[43] = 28;
+  y[44] = 496;
+  TestBasic<map<int, int> >("map_int_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapIntInt) {
+  using std::map;
+  shape.clear();
+  map<int, int> x = map<int, int>();
+  x[6] = 42;
+  x[28] = 43;
+  x[496] = 44;
+  x[8128] = 45;
+  map<int, int> y = map<int, int>();
+  for (int i = 0; i < 42; ++i)
+    y[42 + i] = i;
+  TestBasic<map<int, int> >("vl_map_int_int", x, y);
+}
+
+//
+// Multi-faceted unit tests
+//
+
+TEST(Hdf5BackTest, ReadWriteAll) {
   using std::vector;
   using std::string;
   using cyclus::Recorder;
@@ -96,249 +389,4 @@ TEST(Hdf5BackTest, ReadWrite) {
   conds[1] = Cond("string", "==", str);
   qr = back.Query("DumbTitle", &conds);
   EXPECT_EQ(qr.rows.size(), 1);
-}
-
-//
-// Test helpers
-//
-
-template <typename T>
-cyclus::QueryResult Hdf5ReadWriteResultBasic(const char* fpath, T x, T y, 
-                                             cyclus::Datum::Shape shape = NULL) {
-  FileDeleter fd(fpath);
-  cyclus::Recorder m;
-  cyclus::Hdf5Back back(fpath);
-  m.RegisterBackend(&back);
-  m.NewDatum("data")
-  ->AddVal("vals", x, shape)
-  ->Record();
-  m.NewDatum("data")
-  ->AddVal("vals", y, shape)
-  ->Record();
-  m.Close();
-  H5garbage_collect();
-  return back.Query("data", NULL);
-}
-
-template <typename T>
-void Hdf5ReadWriteTestBasic(const char* fpath, T x, T y, 
-                            cyclus::Datum::Shape shape = NULL) {
-  cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<T>(fpath, x, y, shape);
-  T obsx = qr.GetVal<T>("vals", 0);
-  EXPECT_EQ(x, obsx);
-  T obsy = qr.GetVal<T>("vals", 1);
-  EXPECT_EQ(y, obsy);
-}
-
-template <>
-void Hdf5ReadWriteTestBasic<std::string>(const char* fpath, std::string x, std::string y, 
-                                         cyclus::Datum::Shape shape) {
-  cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<std::string>(fpath, x, y, shape);
-  std::string obsx = qr.GetVal<std::string>("vals", 0);
-  EXPECT_STREQ(x.c_str(), obsx.c_str());
-  std::string obsy = qr.GetVal<std::string>("vals", 1);
-  EXPECT_STREQ(y.c_str(), obsy.c_str());
-}
-
-template <>
-void Hdf5ReadWriteTestBasic<cyclus::Blob>(const char* fpath, cyclus::Blob x, 
-                                          cyclus::Blob y, 
-                                          cyclus::Datum::Shape shape) {
-  using cyclus::Blob;
-  cyclus::QueryResult qr = Hdf5ReadWriteResultBasic<Blob>(fpath, x, y, shape);
-  Blob obsx = qr.GetVal<Blob>("vals", 0);
-  EXPECT_STREQ(x.str().c_str(), obsx.str().c_str());
-  Blob obsy = qr.GetVal<Blob>("vals", 1);
-  EXPECT_STREQ(y.str().c_str(), obsy.str().c_str());
-}
-
-//
-// Actual unit tests
-//
-
-TEST(Hdf5BackTest, ReadWriteBool) {
-  Hdf5ReadWriteTestBasic<bool>("bool.h5", true, false);
-}
-
-TEST(Hdf5BackTest, ReadWriteInt) {
-  Hdf5ReadWriteTestBasic<int>("int.h5", 42, 43);
-}
-
-TEST(Hdf5BackTest, ReadWriteFloat) {
-  Hdf5ReadWriteTestBasic<float>("float.h5", 42.0, 43.0);
-}
-
-TEST(Hdf5BackTest, ReadWriteDouble) {
-  Hdf5ReadWriteTestBasic<double>("double.h5", 42.0, 43.0);
-}
-
-TEST(Hdf5BackTest, ReadWriteString) {
-  std::vector<int> shape(1);
-  shape[0] = 6;
-  Hdf5ReadWriteTestBasic<std::string>("string.h5", "wakka", "jawaka", &shape);
-}
-
-TEST(Hdf5BackTest, ReadWriteVLString) {
-  Hdf5ReadWriteTestBasic<std::string>("vlstring.h5", "wakka", "jawaka", NULL);
-}
-
-TEST(Hdf5BackTest, ReadWriteBlob) {
-  using cyclus::Blob;
-  Hdf5ReadWriteTestBasic<Blob>("blob.h5", Blob("wakka"), Blob("jawaka"), NULL);
-}
-
-TEST(Hdf5BackTest, ReadWriteUuid) {
-  using boost::uuids::uuid;
-  uuid x = {0x12 ,0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56,
-            0x78, 0x90, 0xab, 0xcd, 0xef};
-  uuid y = {0x42 ,0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
-            0x42, 0x42, 0x42, 0x42, 0x42};
-  Hdf5ReadWriteTestBasic<uuid>("uuid.h5", x, y);
-}
-
-TEST(Hdf5BackTest, ReadWriteVectorInt) {
-  using std::vector;
-  vector<int> shape(1);
-  shape[0] = 3;
-  int x_[] = {6, 28, 496};
-  vector<int> x = vector<int>(x_, x_+3);
-  int y_[] = {42, 43, 44};
-  vector<int> y = vector<int>(y_, y_+3);
-  Hdf5ReadWriteTestBasic<vector<int> >("vector_int.h5", x, y, &shape);
-}
-
-TEST(Hdf5BackTest, ReadWriteVLVectorInt) {
-  using std::vector;
-  int x_[] = {6, 28, 496, 8128};
-  vector<int> x = vector<int>(x_, x_+4);
-  vector<int> y = vector<int>(42);
-  for (int i = 0; i < 42; ++i)
-    y[i] = 42;
-  Hdf5ReadWriteTestBasic<vector<int> >("vl_vector_int.h5", x, y);
-}
-
-TEST(Hdf5BackTest, ReadWriteVectorString) {
-  using std::string;
-  using std::vector;
-  vector<int> shape(2);
-  shape[0] = 2;
-  shape[1] = 6;
-  string x_[] = {"wakka", "jawaka"};
-  vector<string> x = vector<string>(x_, x_+2);
-  string y_[] = {"Frank", "Zappa"};
-  vector<string> y = vector<string>(y_, y_+2);
-  Hdf5ReadWriteTestBasic<vector<string> >("vector_string.h5", x, y, &shape);
-}
-
-TEST(Hdf5BackTest, ReadWriteVectorVLString) {
-  using std::string;
-  using std::vector;
-  vector<int> shape(2);
-  shape[0] = 3;
-  shape[1] = -1;
-  string x_[] = {"wakka", "jawaka", "Hot Rats"};
-  vector<string> x = vector<string>(x_, x_+3);
-  string y_[] = {"Frank", "Zappa", "It Just Might Be a One‐Shot Deal"};
-  vector<string> y = vector<string>(y_, y_+3);
-  Hdf5ReadWriteTestBasic<vector<string> >("vector_vl_string.h5", x, y, &shape);
-}
-
-TEST(Hdf5BackTest, ReadWriteVLVectorString) {
-  using std::string;
-  using std::vector;
-  vector<int> shape(2);
-  shape[0] = -1;
-  shape[1] = 10;
-  string x_[] = {"wakka", "jawaka", "Hot Rats"};
-  vector<string> x = vector<string>(x_, x_+3);
-  string y_[] = {"One‐Shot"};
-  vector<string> y = vector<string>(y_, y_+1);
-  Hdf5ReadWriteTestBasic<vector<string> >("vl_vector_string.h5", x, y, &shape);
-}
-
-TEST(Hdf5BackTest, ReadWriteVLVectorVLString) {
-  using std::string;
-  using std::vector;
-  string x_[] = {"wakka", "jawaka", "Hot Rats"};
-  vector<string> x = vector<string>(x_, x_+3);
-  string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
-  vector<string> y = vector<string>(y_, y_+9);
-  Hdf5ReadWriteTestBasic<vector<string> >("vl_vector_vl_string.h5", x, y);
-}
-
-TEST(Hdf5BackTest, ReadWriteSetInt) {
-  using std::set;
-  std::vector<int> shape(1);
-  shape[0] = 3;
-  int x_[] = {6, 28, 496};
-  set<int> x = set<int>(x_, x_+3);
-  int y_[] = {42, 43, 44};
-  set<int> y = set<int>(y_, y_+3);
-  Hdf5ReadWriteTestBasic<set<int> >("set_int.h5", x, y, &shape);
-}
-
-TEST(Hdf5BackTest, ReadWriteVLSetInt) {
-  using std::set;
-  int x_[] = {6, 28, 496, 8128};
-  set<int> x = set<int>(x_, x_+4);
-  set<int> y = set<int>();
-  for (int i = 0; i < 42; ++i)
-    y.insert(42 + i);
-  Hdf5ReadWriteTestBasic<set<int> >("vl_set_int.h5", x, y);
-}
-
-TEST(Hdf5BackTest, ReadWriteListInt) {
-  using std::list;
-  std::vector<int> shape(1);
-  shape[0] = 3;
-  int x_[] = {6, 28, 496};
-  list<int> x = list<int>(x_, x_+3);
-  int y_[] = {42, 43, 44};
-  list<int> y = list<int>(y_, y_+3);
-  Hdf5ReadWriteTestBasic<list<int> >("list_int.h5", x, y, &shape);
-}
-
-TEST(Hdf5BackTest, ReadWriteVLListInt) {
-  using std::list;
-  int x_[] = {6, 28, 496, 8128};
-  list<int> x = list<int>(x_, x_+4);
-  list<int> y = list<int>();
-  for (int i = 0; i < 42; ++i)
-    y.push_back(42);
-  Hdf5ReadWriteTestBasic<list<int> >("vl_list_int.h5", x, y);
-}
-
-TEST(Hdf5BackTest, ReadWritePairIntInt) {
-  using std::pair;
-  pair<int, int> x = pair<int, int>(6, 28);
-  pair<int, int> y = pair<int, int>(42, 43);
-  Hdf5ReadWriteTestBasic<pair<int, int> >("pair_int_int.h5", x, y);
-}
-
-TEST(Hdf5BackTest, ReadWriteMapIntInt) {
-  using std::map;
-  std::vector<int> shape(1);
-  shape[0] = 3;
-  map<int, int> x = map<int, int>();
-  x[6] = 42;
-  x[28] = 43;
-  x[496] = 44;
-  map<int, int> y = map<int, int>();
-  y[42] = 6;
-  y[43] = 28;
-  y[44] = 496;
-  Hdf5ReadWriteTestBasic<map<int, int> >("map_int_int.h5", x, y, &shape);
-}
-
-TEST(Hdf5BackTest, ReadWriteVLMapIntInt) {
-  using std::map;
-  map<int, int> x = map<int, int>();
-  x[6] = 42;
-  x[28] = 43;
-  x[496] = 44;
-  x[8128] = 45;
-  map<int, int> y = map<int, int>();
-  for (int i = 0; i < 42; ++i)
-    y[42 + i] = i;
-  Hdf5ReadWriteTestBasic<map<int, int> >("vl_map_int_int.h5", x, y);
 }

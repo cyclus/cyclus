@@ -11,6 +11,7 @@ namespace cyclus {
 //const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
+  H5open();
   hasher_.Clear();
   if (boost::filesystem::exists(path_))
     file_ = H5Fopen(path_.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
@@ -41,7 +42,7 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
 
 Hdf5Back::~Hdf5Back() {
   // cleanup HDF5
-  Hdf5Back::Flush();
+  Flush();
   H5Fclose(file_);
   std::set<hid_t>::iterator t;
   for (t = opened_types_.begin(); t != opened_types_.end(); ++t) 
@@ -72,8 +73,9 @@ void Hdf5Back::Notify(DatumList data) {
       if (H5Lexists(file_, name.c_str(), H5P_DEFAULT)) {
         LoadTableTypes(name, (*it)->vals().size());
       } else {
-        Datum* d = *it;
-        CreateTable(d);
+        //Datum* d = *it;
+        //CreateTable(d);
+        CreateTable(*it);
       }
     }
     groups[name].push_back(*it);
@@ -669,8 +671,11 @@ void Hdf5Back::CreateTable(Datum* d) {
        << "  chunksize " << chunk_size << "\n" \
        << "  rowsize   " << dst_size << "\n";
     for (int i = 0; i < nvals; ++i) {
-      ss << "    col #" << i << " " << field_names[i] << " size: " << dst_sizes[i] \
-         << " offset: " << dst_offset[i] << "\n";
+      ss << "    #" << i << " " << field_names[i] << "\n" \
+         << "      dbtype: " << dbtypes[i] << "\n" \
+         << "      h5type: " << field_types[i] << "\n" \
+         << "      size:   " << dst_sizes[i] << "\n" \
+         << "      offset: " << dst_offset[i] << "\n";
     }
     throw IOError(ss.str());
   }
@@ -701,14 +706,6 @@ void Hdf5Back::WriteGroup(DatumList& group) {
 
   char* buf = new char[group.size() * rowsize];
   FillBuf(title, buf, group, sizes, rowsize);
-
-  std::cout << "path " << path_ << "\n";
-  std::cout << "table " << title << "\n";
-  std::cout << "groupsize " << group.size() << "\n";
-  std::cout << "rowsize " << rowsize << "\n";
-  for (int i = 0; i < group[0]->vals().size(); ++i) {
-    std::cout << "col " << i << " " << sizes[i] << " "<< offsets[i] <<"\n";
-  }
 
   herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
                               offsets, sizes, buf);
@@ -776,7 +773,6 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
   Datum::Shapes shapes;
   Datum::Vals header = group.front()->vals();
   int ncols = header.size();
-  //LoadTableTypes(title, ncols);
   DbTypes* dbtypes = schemas_[title];
 
   size_t offset = 0;
@@ -825,7 +821,6 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           std::vector<int> val = a->cast<std::vector<int> >();
           fieldlen = sizes[col];
           valuelen = std::min(val.size() * sizeof(int), fieldlen);
-          std::cout << "vector<int> " << val.size() << " " << fieldlen << " " << valuelen << "\n";
           memcpy(buf + offset, &val[0], valuelen);
           memset(buf + offset + valuelen, 0, fieldlen - valuelen);
           break;
@@ -882,7 +877,6 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           std::set<int> val = a->cast<std::set<int> >();
           fieldlen = sizes[col];
           valuelen = std::min(val.size() * sizeof(int), fieldlen);
-          std::cout << "set<int> " << val.size() << " " << fieldlen << " " << valuelen << "\n";
           unsigned int cnt = 0;
           for (std::set<int>::iterator sit = val.begin(); sit != val.end(); ++sit) {
             memcpy(buf + offset + cnt*sizeof(int), &(*sit), sizeof(int));
@@ -900,7 +894,6 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           std::list<int> val = a->cast<std::list<int> >();
           fieldlen = sizes[col];
           valuelen = std::min(val.size() * sizeof(int), fieldlen);
-          std::cout << "list<int> " << val.size() << " " << fieldlen << " " << valuelen << "\n";
           unsigned int cnt = 0;
           std::list<int>::iterator valit = val.begin();
           for (; valit != val.end(); ++valit) {
@@ -925,7 +918,6 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           map<int, int> val = a->cast<map<int, int> >();
           fieldlen = sizes[col];
           valuelen = min(2 * sizeof(int) * val.size(), fieldlen);
-          std::cout << "map<int, int> " << val.size() << " " << fieldlen << " " << valuelen << "\n";
           unsigned int cnt = 0;
           for (map<int, int>::iterator valit = val.begin(); valit != val.end(); ++valit) {
             memcpy(buf + offset + 2*sizeof(int)*cnt, &(valit->first), sizeof(int));
