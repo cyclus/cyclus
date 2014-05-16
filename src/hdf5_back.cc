@@ -547,7 +547,8 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = VECTOR_INT;
-        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &((*shape)[0]));
+        hsize_t shape0 = (*shape)[0];
+        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, &shape0);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * (*shape)[0];
       }
@@ -595,7 +596,8 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = SET_INT;
-        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
+        hsize_t shape0 = (*shape)[0];
+        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, &shape0);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * (*shape)[0];
       }
@@ -611,7 +613,8 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = LIST_INT;
-        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, (hsize_t *) &(*shape)[0]);
+        hsize_t shape0 = (*shape)[0];
+        field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, &shape0);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * (*shape)[0];
       }
@@ -640,7 +643,8 @@ void Hdf5Back::CreateTable(Datum* d) {
         dst_sizes[i] = CYCLUS_SHA1_SIZE;
       } else {
         dbtypes[i] = MAP_INT_INT;
-        field_types[i] = H5Tarray_create2(item_type, 1, (hsize_t *) &(*shape)[0]);
+        hsize_t shape0 = (*shape)[0];
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
         opened_types_.insert(item_type);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * 2 * (*shape)[0];

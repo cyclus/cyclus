@@ -21,7 +21,6 @@ class FileDeleter {
 class Hdf5GlobalEnv : public ::testing::Environment {
  public:
   virtual void SetUp() {
-    H5set_free_list_limits(-1, -1, -1, -1, -1, -1);
     path = "db.h5";
     db = new cyclus::Hdf5Back(path.c_str());
   }
