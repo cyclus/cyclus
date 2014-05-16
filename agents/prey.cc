@@ -12,20 +12,9 @@ Prey::Prey(cyclus::Context* ctx)
       birth_freq_(1),
       age_(0) {}
 
-std::string Prey::str() {
-  std::stringstream ss;
-  ss << cyclus::Facility::str()
-     << " supplies commodity '"<< commod_;
-  return ss.str();
-}
-
 void Prey::EnterNotify() {
   cyclus::Facility::EnterNotify();
   context()->RegisterTrader(this);
-}
-
-void Prey::Build(cyclus::Agent* parent) {
-  cyclus::Facility::Build();
 }
 
 void Prey::Decommission() {
