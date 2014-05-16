@@ -131,11 +131,12 @@ void Agent::Connect(Agent* parent) {
     parent_ = parent;
     parent_id_ = parent->id();
     parent->children_.push_back(this);
-  }
+  } 
 }
 
 void Agent::Decommission() {
-  CLOG(LEV_INFO3) << prototype() << " is being decommissioned";
+  CLOG(LEV_INFO3) << prototype() << "(" << this << ")" << " is being decommissioned";
+  
   ctx_->NewDatum("AgentExit")
   ->AddVal("AgentId", id())
   ->AddVal("ExitTime", ctx_->time())

@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!-- Lotka-Volterra simulation with Predators only. -->
+
+<simulation>
+  <control>
+    <duration>10</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+    <decay>0</decay>
+  </control>
+
+  <commodity>
+    <name>commodity</name>
+  </commodity>
+
+  <facility>
+    <name>Predator</name>
+    <module>
+      <path>Predator</path>
+      <agent>Predator</agent>
+    </module>
+    <agent>
+      <Predator>
+        <commod_>commodity</commod_>
+        <prey_>none</prey_>
+      </Predator>
+    </agent>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <allowedfacility>Prey</allowedfacility>
+    <allowedfacility>Predator</allowedfacility>    
+    <module>
+      <path>NullRegion</path>
+      <agent>NullRegion</agent>
+    </module>
+    <agent>
+      <NullRegion/>
+    </agent>
+    <institution>
+      <name>SingleInstitution</name>
+      <module>
+        <path>NullInst</path>
+        <agent>NullInst</agent>
+      </module>
+      <availableprototype>Predator</availableprototype>
+      <initialfacilitylist>
+        <entry>
+          <prototype>Predator</prototype>
+          <number>1</number>
+        </entry>
+      </initialfacilitylist>
+      <agent>
+        <NullInst/>
+      </agent>
+    </institution>
+  </region>
+
+  <recipe>
+    <name>commod_recipe</name>
+    <basis>mass</basis>
+    <nuclide>
+      <id>010010000</id>
+      <comp>1</comp>
+    </nuclide>
+  </recipe>
+
+</simulation>

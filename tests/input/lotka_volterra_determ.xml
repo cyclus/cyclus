@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!-- Lotka-Volterra simulation with Preys and Predators -->
+
+<simulation>
+  <control>
+    <duration>20</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+    <decay>0</decay>
+  </control>
+
+  <commodity>
+    <name>wabbit</name>
+  </commodity>
+
+  <facility>
+    <name>Prey</name>
+    <module>
+      <path>Prey</path>
+      <agent>Prey</agent>
+    </module>
+    <agent>
+      <Prey>
+        <birth_freq_>1</birth_freq_>
+        <nchildren_>1</nchildren_>
+        <birth_and_death_>0</birth_and_death_>
+        <commod_>wabbit</commod_>
+      </Prey>
+    </agent>
+  </facility>
+
+  <facility>
+    <name>Predator</name>
+    <module>
+      <path>Predator</path>
+      <agent>Predator</agent>
+    </module>
+    <agent>
+      <Predator>
+        <hunt_cap_>2</hunt_cap_>
+        <hunt_freq_>3</hunt_freq_>
+        <full_>2</full_>
+        <lifespan_>6</lifespan_>
+        <commod_>wabbit</commod_>
+        <success_>0.575</success_>
+        <birth_and_death_>0</birth_and_death_>
+        <prey_>Prey</prey_>
+      </Predator>
+    </agent>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <allowedfacility>Prey</allowedfacility>
+    <allowedfacility>Predator</allowedfacility>    
+    <module>
+      <path>NullRegion</path>
+      <agent>NullRegion</agent>
+    </module>
+    <agent>
+      <NullRegion/>
+    </agent>
+    <institution>
+      <name>SingleInstitution</name>
+      <module>
+        <path>NullInst</path>
+        <agent>NullInst</agent>
+      </module>
+      <availableprototype>Prey</availableprototype>
+      <availableprototype>Predator</availableprototype>
+      <initialfacilitylist>
+        <entry>
+          <prototype>Prey</prototype>
+          <number>95</number>
+        </entry>
+        <entry>
+          <prototype>Predator</prototype>
+          <number>20</number>
+        </entry>
+      </initialfacilitylist>
+      <agent>
+        <NullInst/>
+      </agent>
+    </institution>
+  </region>
+
+  <!-- cyclus requires a recipe to not core dump...-->
+  <recipe>
+    <name>commod_recipe</name>
+    <basis>mass</basis>
+    <nuclide>
+      <id>010010000</id>
+      <comp>1</comp>
+    </nuclide>
+  </recipe>
+</simulation>

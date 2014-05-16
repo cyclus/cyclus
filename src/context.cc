@@ -48,9 +48,10 @@ void Context::SchedBuild(Agent* parent, std::string proto_name, int t) {
   if (t == -1) {
     t = time() + 1;
   }
+  int pid = (parent != NULL) ? parent->id() : -1;
   ti_->SchedBuild(parent, proto_name, t);
   NewDatum("BuildSchedule")
-    ->AddVal("ParentId", parent->id())
+    ->AddVal("ParentId", pid)
     ->AddVal("Prototype", proto_name)
     ->AddVal("SchedTime", time())
     ->AddVal("BuildTime", t)

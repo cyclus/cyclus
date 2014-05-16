@@ -170,7 +170,7 @@ KFacility::GetMatlRequests() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
-KFacility::GetGenRsrcRequests() {
+KFacility::GetProductRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::Product;
   using cyclus::RequestPortfolio;
@@ -206,7 +206,7 @@ void KFacility::AcceptMatlTrades(
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void KFacility::AcceptGenRsrcTrades(
+void KFacility::AcceptProductTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
     cyclus::Product::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Product>,

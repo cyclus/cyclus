@@ -34,7 +34,7 @@ class Sink : public cyclus::Facility  {
   /// commodity. Note that it is assumed the Sink operates on a single
   /// resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
-      GetGenRsrcRequests();
+      GetProductRequests();
 
   /// @brief Sink place accepted trade Materials in their Inventory
   virtual void AcceptMatlTrades(
@@ -42,7 +42,7 @@ class Sink : public cyclus::Facility  {
       cyclus::Material::Ptr> >& responses);
 
   /// @brief Sink place accepted trade Materials in their Inventory
-  virtual void AcceptGenRsrcTrades(
+  virtual void AcceptProductTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
       cyclus::Product::Ptr> >& responses);
 
