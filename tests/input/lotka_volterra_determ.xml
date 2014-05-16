@@ -15,6 +15,10 @@
 
   <facility>
     <name>Prey</name>
+    <module>
+      <path>Prey</path>
+      <agent>Prey</agent>
+    </module>
     <agent>
       <Prey>
         <birth_freq_>1</birth_freq_>
@@ -27,6 +31,10 @@
 
   <facility>
     <name>Predator</name>
+    <module>
+      <path>Predator</path>
+      <agent>Predator</agent>
+    </module>
     <agent>
       <Predator>
         <hunt_cap_>2</hunt_cap_>
@@ -44,12 +52,20 @@
   <region>
     <name>SingleRegion</name>
     <allowedfacility>Prey</allowedfacility>
-    <allowedfacility>Predator</allowedfacility>
+    <allowedfacility>Predator</allowedfacility>    
+    <module>
+      <path>NullRegion</path>
+      <agent>NullRegion</agent>
+    </module>
     <agent>
       <NullRegion/>
     </agent>
     <institution>
       <name>SingleInstitution</name>
+      <module>
+        <path>NullInst</path>
+        <agent>NullInst</agent>
+      </module>
       <availableprototype>Prey</availableprototype>
       <availableprototype>Predator</availableprototype>
       <initialfacilitylist>

@@ -15,6 +15,10 @@
 
   <facility>
     <name>Predator</name>
+    <module>
+      <path>Predator</path>
+      <agent>Predator</agent>
+    </module>
     <agent>
       <Predator>
         <commod_>commodity</commod_>
@@ -25,12 +29,21 @@
 
   <region>
     <name>SingleRegion</name>
-    <allowedfacility>Predator</allowedfacility>
+    <allowedfacility>Prey</allowedfacility>
+    <allowedfacility>Predator</allowedfacility>    
+    <module>
+      <path>NullRegion</path>
+      <agent>NullRegion</agent>
+    </module>
     <agent>
       <NullRegion/>
     </agent>
     <institution>
       <name>SingleInstitution</name>
+      <module>
+        <path>NullInst</path>
+        <agent>NullInst</agent>
+      </module>
       <availableprototype>Predator</availableprototype>
       <initialfacilitylist>
         <entry>

@@ -15,6 +15,10 @@
 
   <facility>
     <name>Prey</name>
+    <module>
+      <path>Prey</path>
+      <agent>Prey</agent>
+    </module>
     <agent>
       <Prey>
         <commod_>commodity</commod_>
@@ -25,11 +29,19 @@
   <region>
     <name>SingleRegion</name>
     <allowedfacility>Prey</allowedfacility>
+    <module>
+      <path>NullRegion</path>
+      <agent>NullRegion</agent>
+    </module>
     <agent>
       <NullRegion/>
     </agent>
     <institution>
       <name>SingleInstitution</name>
+      <module>
+        <path>NullInst</path>
+        <agent>NullInst</agent>
+      </module>
       <availableprototype>Prey</availableprototype>
       <initialfacilitylist>
         <entry>
