@@ -37,43 +37,34 @@ def agent_time_series(f, names):
 
     # Get specific tables and columns
     agent_entry = f.get_node("/AgentEntry")[:]
+    agent_exit = f.get_node("/AgentExit")[:] if hasattr(f.root, 'AgentExit') \
+        else None
 
     # Find agent ids
     agent_ids = agent_entry["AgentId"]
     agent_type = agent_entry["Prototype"]
-    prey_ids = find_ids(prey, agent_type, agent_ids)
-    pred_ids = find_ids(pred, agent_type, agent_ids)
+    agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
 
     # entries per timestep
-    for x in agent_entry:
-        name = None
-        id = x['AgentId']
-        if id in prey_ids:
-            name = prey
-        elif id in pred_ids:
-            name = pred
-        if name is not None:
-            entries[name][x['EnterTime']] += 1
+    for name, ids in agent_ids.items():
+        for id in ids:
+            idx = np.where(agent_entry['AgentId'] == id)[0][0]
+            entries[name][agent_entry[idx]['EnterTime']] += 1
     
     # cumulative entries
     for k, v in entries.items():
         for i in range(len(v) - 1):
             v[i+1] += v[i]
 
-    if not hasattr(f.root, 'AgentExit'):
+    if agent_exit is None:
         return entries
-    
-    # exits per timestep
-    agent_exit = f.get_node("/AgentExit")[:]
-    for x in agent_exit:
-        name = None
-        id = x['AgentId']
-        if id in prey_ids:
-            name = prey
-        elif id in pred_ids:
-            name = pred
-        if name is not None:
-            exits[name][x['ExitTime']] += 1
+
+    # entries per timestep
+    for name, ids in agent_ids.items():
+        for id in ids:
+            idxs = np.where(agent_exit['AgentId'] == id)[0]
+            if len(idxs) > 0:
+                exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
 
     # cumulative exits
     for k, v in exits.items():
