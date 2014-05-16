@@ -44,15 +44,11 @@ class Inver : public cy::Facility {
   virtual void Build(cy::Agent* parent) {
     cy::Facility::Build(parent);
 
-    cy::CompMap v;
-    v[922350000] = 1;
-    v[922380000] = 2;
-    cy::Composition::Ptr c = cy::Composition::CreateFromMass(v);
+    cy::Composition::Ptr c = context()->GetRecipe("recipe1");
     cy::Material::Ptr m1 = cy::Material::Create(this, 1, c);
     cy::Material::Ptr m2 = cy::Material::Create(this, 2, c);
 
-    v[922380000] = 3;
-    c = cy::Composition::CreateFromMass(v);
+    c = context()->GetRecipe("recipe2");
     cy::Material::Ptr m3 = cy::Material::Create(this, 3, c);
 
     buf1.Push(m1);
@@ -88,6 +84,13 @@ class SimInitTest : public ::testing::Test {
     ctx = new cy::Context(&ti, rec);
     ctx->InitSim(cy::SimInfo(5));
 
+    cy::CompMap v;
+    v[922350000] = 1;
+    v[922380000] = 2;
+    ctx->AddRecipe("recipe1", cy::Composition::CreateFromMass(v));
+    v[922380000] = 3;
+    ctx->AddRecipe("recipe2", cy::Composition::CreateFromMass(v));
+
     Inver* a1 = new Inver(ctx);
     cy::DynamicModule::man_agents_["::Inver"] = a1->Clone();
     a1->agent_impl("::Inver");
@@ -117,9 +120,7 @@ class SimInitTest : public ::testing::Test {
     remove(dbpath);
   }
 
-  int transid(cy::Context* ctx) {
-    return ctx->trans_id_;
-  };
+  int transid(cy::Context* ctx) { return ctx->trans_id_; };
 
   cy::Context* ctx;
   cy::Timer ti;
@@ -133,4 +134,20 @@ TEST_F(SimInitTest, InitNextIds) {
   cy::Context* init_ctx = si.context();
 
   EXPECT_EQ(transid(ctx), transid(init_ctx));
+}
+
+TEST_F(SimInitTest, InitRecipes) {
+  cy::SimInit si;
+  si.Init(rec, b);
+  cy::Context* init_ctx = si.context();
+
+  cy::CompMap orig1 = ctx->GetRecipe("recipe1")->mass();
+  cy::CompMap init1 = init_ctx->GetRecipe("recipe1")->mass();
+  EXPECT_FLOAT_EQ(orig1[922350000], init1[922350000]);
+  EXPECT_FLOAT_EQ(orig1[922380000], init1[922380000]);
+
+  cy::CompMap orig2 = ctx->GetRecipe("recipe1")->mass();
+  cy::CompMap init2 = init_ctx->GetRecipe("recipe1")->mass();
+  EXPECT_FLOAT_EQ(orig2[922350000], init2[922350000]);
+  EXPECT_FLOAT_EQ(orig2[922380000], init2[922380000]);
 }
