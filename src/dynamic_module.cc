@@ -3,6 +3,7 @@
 #include "dynamic_module.h"
 
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "context.h"
 #include "env.h"
@@ -76,7 +77,7 @@ Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
 
   DynamicModule* dyn = modules_[spec.str()];
   Agent* a = dyn->ConstructInstance(ctx);
-  a->agent_impl(spec.str());
+  a->spec(spec.str());
   return a;
 }
 

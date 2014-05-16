@@ -21,14 +21,14 @@ void Agent::InitFrom(Agent* m) {
   id_ = next_id_++;
   prototype_ = m->prototype_;
   kind_ = m->kind_;
-  agent_impl_ = m->agent_impl_;
+  spec_ = m->spec_;
   lifetime_ = m->lifetime_;
   ctx_ = m->ctx_;
 }
 
 std::string Agent::InformErrorMsg(std::string msg) {
   std::stringstream ret;
-  ret << "A(n) " << agent_impl_ << " named " << prototype_
+  ret << "A(n) " << spec_ << " named " << prototype_
       << " at time " << context()->time()
       << " received the following error:\n"
       << msg;
@@ -65,7 +65,7 @@ Agent::Agent(Context* ctx)
     enter_time_(-1),
     lifetime_(-1),
     parent_(NULL),
-    agent_impl_("UNSPECIFIED") {
+    spec_("UNSPECIFIED") {
   ctx_->agent_list_.insert(this); 
   MLOG(LEV_DEBUG3) << "Agent ID=" << id_ << ", ptr=" << this << " created.";
 }
@@ -98,7 +98,7 @@ std::string Agent::str() {
   ss << kind_ << "_" << prototype_
      << " ( "
      << "ID=" << id_
-     << ", implementation=" << agent_impl_
+     << ", implementation=" << spec_
      << ",  name=" << prototype_
      << ",  parentID=" << parent_id_
      << " ) " ;
@@ -109,7 +109,7 @@ void Agent::Build(Agent* parent) {
   CLOG(LEV_DEBUG1) << "Agent '" << prototype()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
-  CLOG(LEV_DEBUG3) << " * Implementation: " << agent_impl_;
+  CLOG(LEV_DEBUG3) << " * Implementation: " << spec_;
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
   Connect(parent);
@@ -176,7 +176,7 @@ void Agent::AddToTable() {
   ctx_->NewDatum("AgentEntry")
   ->AddVal("AgentId", id_)
   ->AddVal("Kind", kind_)
-  ->AddVal("Implementation", agent_impl_)
+  ->AddVal("Implementation", spec_)
   ->AddVal("Prototype", prototype_)
   ->AddVal("ParentId", parent_id_)
   ->AddVal("Lifetime", lifetime_)

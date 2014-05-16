@@ -204,21 +204,21 @@ class Context {
 
   /// @return the number of agents of a given implementation currently in the
   /// simulation
-  inline int n_agent_impls(std::string impl) {
-    return n_agent_impls_[impl];
+  inline int n_specs(std::string impl) {
+    return n_specs_[impl];
   }
   
  private:
   /// Registers an agent as a participant in the simulation. 
   inline void RegisterAgent(Agent* a) {
     n_prototypes_[a->prototype()]++;
-    n_agent_impls_[a->agent_impl()]++;
+    n_specs_[a->spec()]++;
   }
 
   /// Unregisters an agent as a participant in the simulation.
   inline void UnregisterAgent(Agent* a) {
     n_prototypes_[a->prototype()]--;
-    n_agent_impls_[a->agent_impl()]--;
+    n_specs_[a->spec()]--;
   }
 
   std::map<std::string, Agent*> protos_;
@@ -226,7 +226,7 @@ class Context {
   std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
   std::map<std::string, int> n_prototypes_;
-  std::map<std::string, int> n_agent_impls_;
+  std::map<std::string, int> n_specs_;
   
   SimInfo si_;
   Timer* ti_;

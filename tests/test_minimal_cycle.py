@@ -132,11 +132,11 @@ def test_minimal_cycle():
 
             # Find agent ids
             agent_ids = agent_entry["AgentId"]
-            agent_impl = agent_entry["Implementation"]
+            spec = agent_entry["Implementation"]
             agent_protos = agent_entry["Prototype"]
             duration = info["Duration"][0]
 
-            facility_id = find_ids("KFacility:KFacility:KFacility", agent_impl, agent_ids)
+            facility_id = find_ids("KFacility:KFacility:KFacility", spec, agent_ids)
             # Test for two KFacility
             yield assert_equal, len(facility_id), 2
 

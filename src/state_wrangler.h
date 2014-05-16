@@ -30,10 +30,9 @@ class StateWrangler {
   /// data transfered through di.
   ///
   /// Agent parameters in the InfileTree are scoped in the
-  /// "agent/[agent-class-name]" path. The agent's class-name can be retrieved
-  /// from the agent_impl method. The superclass InitFrom expects the InfileTree
-  /// passed to it to be scoped identically - do NOT pass a changed-scope
-  /// InfileTree to the superclass.
+  /// "agent/*" path. The superclass InitFrom expects the InfileTree
+  /// passed to it to be scoped identically to the tree passed to the agent's
+  /// InitFrom. - do NOT pass a changed-scope tree to the superclass.
   ///
   /// @warning this method MUST NOT modify the object's state.
   virtual void InfileToDb(InfileTree* qe, DbInit di) = 0;
