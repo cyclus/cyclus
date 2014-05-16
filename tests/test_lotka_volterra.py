@@ -25,9 +25,9 @@ def agent_time_series(f, names):
     names = [prey, pred]
 
     tbl = f.root.Info
-    nsteps = [x['Duration'] for x in tbl.iterrows()][0]
-    entries = {name: [0 for n in range(nsteps)] for name in names}
-    exits = {name: [0 for n in range(nsteps)] for name in names}
+    nsteps = tbl.cols.Duration[:][0]
+    entries = {name: [0] * nsteps for name in names}
+    exits = {name: [0] * nsteps for name in names}
 
     # entries per timestep
     tbl = f.root.AgentEntry    
@@ -46,7 +46,8 @@ def agent_time_series(f, names):
 
     # agent id -> prototype name mapping
     cond = """Prototype == '{0}'"""
-    ids = {row["AgentId"]: name for row in tbl.where(cond.format(name)) for name in names}
+    ids = {row["AgentId"]: name for row in tbl.where(cond.format(name)) \
+               for name in names}
     all_ids = [k for k, v in ids.items()]
     
     # exits per timestep
