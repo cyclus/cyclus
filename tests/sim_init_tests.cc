@@ -67,7 +67,7 @@ class Inver : public cy::Facility {
     invs["buf2"] = buf2.PopN(buf2.count());
     return invs;
   }
-  virtual void Tick(int t) { };
+  virtual void Tick(int t) {context()->Snapshot();};
   virtual void Tock(int t) { };
 
   cy::ResourceBuff buf1;
@@ -78,6 +78,7 @@ class Inver : public cy::Facility {
 class SimInitTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
+    remove(dbpath);
     b = new cy::SqliteBack(dbpath);
     rec.RegisterBackend(b);
     ctx = new cy::Context(&ti, &rec);
@@ -90,6 +91,7 @@ class SimInitTest : public ::testing::Test {
     v[922380000] = 3;
     ctx->AddRecipe("recipe2", cy::Composition::CreateFromMass(v));
 
+    // create initial prototypes
     Inver* a1 = new Inver(ctx);
     cy::DynamicModule::man_agents_["::Inver"] = a1->Clone();
     a1->spec("::Inver");
@@ -98,11 +100,13 @@ class SimInitTest : public ::testing::Test {
     a2->spec("::Inver");
     a2->val1 = 26;
 
+    // manually snap and add prototypes
     cy::SimInit::SnapAgent(a1);
     cy::SimInit::SnapAgent(a2);
-
     ctx->AddPrototype("proto1", a1);
     ctx->AddPrototype("proto2", a2);
+
+    // sched 2 agents, build 2 agents
     ctx->SchedBuild(NULL, "proto1", 2);
     ctx->SchedBuild(NULL, "proto2", 3);
     a1->Clone()->Build(NULL);
@@ -169,4 +173,26 @@ TEST_F(SimInitTest, InitSimInfo) {
   EXPECT_EQ(si_orig.parent_sim, si_init.parent_sim);
   EXPECT_EQ(si_orig.parent_type, si_init.parent_type);
   EXPECT_EQ(si_orig.branch_time, si_init.branch_time);
+}
+
+TEST_F(SimInitTest, RestartSimInfo) {
+  ti.RunSim();
+  rec.Flush();
+  cy::SimInit si;
+  si.Restart(b, rec.sim_id(), 2);
+  cy::Context* restart_ctx = si.context();
+
+  cy::SimInfo si_orig = ctx->sim_info();
+  cy::SimInfo si_restart = restart_ctx->sim_info();
+
+  EXPECT_NE(rec.sim_id(), si.recorder()->sim_id());
+  EXPECT_EQ(2, restart_ctx->time());
+  EXPECT_EQ(si_orig.duration, si_restart.duration);
+  EXPECT_EQ(si_orig.y0, si_restart.y0);
+  EXPECT_EQ(si_orig.m0, si_restart.m0);
+  EXPECT_EQ(si_orig.decay_period, si_restart.decay_period);
+  EXPECT_EQ(si_orig.handle, si_restart.handle);
+  EXPECT_EQ(rec.sim_id(), si_restart.parent_sim);
+  EXPECT_EQ("restart", si_restart.parent_type);
+  EXPECT_EQ(2, si_restart.branch_time);
 }

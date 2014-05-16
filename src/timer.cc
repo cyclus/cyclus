@@ -147,6 +147,10 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   ctx_ = ctx;
   time_ = 0;
   si_ = si;
+
+  if (si.branch_time > -1) {
+    time_ = si.branch_time;
+  }
 }
 
 int Timer::dur() {
