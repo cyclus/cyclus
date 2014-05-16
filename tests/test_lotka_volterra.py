@@ -1,10 +1,14 @@
 #! /usr/bin/env python
+from __future__ import print_function
 
+import nose
 from nose.tools import assert_equal, assert_almost_equal, assert_true
 from numpy.testing import assert_array_equal
 import os
 import tables
 import numpy as np
+import hashlib
+
 from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, h5out, clean_outs
 
@@ -23,18 +27,33 @@ def agent_time_series(f, names):
         the list of agent names
     """
     names = [prey, pred]
+    digests = [hashlib.sha1(name).digest() for name in names]
+    print("digests:", digests)
 
     tbl = f.root.Info
     nsteps = tbl.cols.Duration[:][0]
     entries = {name: [0] * nsteps for name in names}
     exits = {name: [0] * nsteps for name in names}
 
+    # Get specific tables and columns
+    agent_entry = f.get_node("/AgentEntry")[:]
+
+    # Find agent ids
+    agent_ids = agent_entry["AgentId"]
+    agent_type = agent_entry["Prototype"]
+    prey_ids = find_ids(prey, agent_type, agent_ids)
+    pred_ids = find_ids(pred, agent_type, agent_ids)
+
     # entries per timestep
-    tbl = f.root.AgentEntry    
-    for x in tbl.iterrows():
-        for name in names:
-            if x['Prototype'] == name:
-                entries[name][x['EnterTime']] += 1
+    for x in agent_entry:
+        name = None
+        id = x['AgentId']
+        if id in prey_ids:
+            name = prey
+        elif id in pred_ids:
+            name = pred
+        if name is not None:
+            entries[name][x['EnterTime']] += 1
     
     # cumulative entries
     for k, v in entries.items():
@@ -43,19 +62,18 @@ def agent_time_series(f, names):
 
     if not hasattr(f.root, 'AgentExit'):
         return entries
-
-    # agent id -> prototype name mapping
-    cond = """Prototype == '{0}'"""
-    ids = {row["AgentId"]: name for row in tbl.where(cond.format(name)) \
-               for name in names}
-    all_ids = [k for k, v in ids.items()]
     
     # exits per timestep
-    tbl = f.root.AgentExit
-    all_exits = {x['AgentId']: x['ExitTime'] for x in tbl.iterrows() \
-                     if x['AgentId'] in all_ids}
-    for k, v in all_exits.items():
-        exits[ids[k]][v] += 1
+    agent_exit = f.get_node("/AgentExit")[:]
+    for x in agent_exit:
+        name = None
+        id = x['AgentId']
+        if id in prey_ids:
+            name = prey
+        elif id in pred_ids:
+            name = pred
+        if name is not None:
+            exits[name][x['ExitTime']] += 1
 
     # cumulative exits
     for k, v in exits.items():
@@ -93,6 +111,7 @@ def test_predator_only():
 
     output = tables.open_file(h5out, mode = "r")
     series = agent_time_series(output, [prey, pred])
+    print("Prey:", series[prey], "Predators:", series[pred])
     
     prey_exp = [0 for n in range(10)]
     pred_exp = [1, 1] + [0 for n in range(8)]
@@ -120,7 +139,7 @@ def test_prey_only():
 
     output = tables.open_file(h5out, mode = "r")
     series = agent_time_series(output, [prey, pred])
-    print(series)
+    print("Prey:", series[prey], "Predators:", series[pred])
     
     prey_exp = [2**n for n in range(10)]
     pred_exp = [0 for n in range(10)]
@@ -157,11 +176,16 @@ def test_lotka_volterra():
 
     output = tables.open_file(h5out, mode = "r")
     series = agent_time_series(output, [prey, pred])
+    print("Prey:", series[prey], "Predators:", series[pred])
     
     prey_max = series[prey].index(max(series[prey]))
     pred_max = series[pred].index(max(series[pred]))
+    print("t_prey_max:", prey_max, "t_pred_max:", pred_max)
     
-    assert_true(prey_max > pred_max)
+    assert_true(prey_max < pred_max)
 
     output.close()
     clean_outs()
+
+if __name__ == "__main__":
+    nose.runmodule()
