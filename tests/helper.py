@@ -92,9 +92,8 @@ def agent_time_series(f, names):
             entries[name][agent_entry[idx]['EnterTime']] += 1
     
     # cumulative entries
-    for k, v in entries.items():
-        for i in range(len(v) - 1):
-            v[i+1] += v[i]
+    entries = {k: [v[0]] + [sum(v[:i]) for i in range(2, len(v) + 1)] \
+                   for k, v in entries.items()}
 
     if agent_exit is None:
         return entries
@@ -107,9 +106,8 @@ def agent_time_series(f, names):
                 exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
 
     # cumulative exits
-    for k, v in exits.items():
-        for i in range(len(v) - 1):
-            v[i+1] += v[i]
+    exits = {k: [v[0]] + [sum(v[:i]) for i in range(2, len(v) + 1)] \
+                   for k, v in exits.items()}
 
     # return difference
     ret = {}
