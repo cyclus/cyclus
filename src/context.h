@@ -5,7 +5,13 @@
 #include <map>
 #include <set>
 #include <string>
+
+#ifndef CYCPP
+// The cyclus preprocessor cannot handle this file since there are two 
+// unmatch open braces '{' inside of strings that don't have cooresponding
+// closed braces '}'
 #include <boost/uuid/uuid_generators.hpp>
+#endif
 
 #include "composition.h"
 #include "agent.h"
