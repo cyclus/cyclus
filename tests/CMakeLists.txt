@@ -74,6 +74,7 @@ SET(
 # added to ctest.
 set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   # --
+  "${CMAKE_CURRENT_SOURCE_DIR}/agent_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/bid_portfolio_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/bid_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc"
@@ -110,7 +111,6 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/agent_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/query_backend_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/region_class_tests.cc"
