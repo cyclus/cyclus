@@ -70,7 +70,6 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   "${CMAKE_CURRENT_SOURCE_DIR}/comp_math.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/composition.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/context.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/csv_back.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/datum.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/db_init.cc"
@@ -139,7 +138,6 @@ INSTALL(FILES
   comp_math.h
   composition.h
   context.h
-  csv_back.h
   cyc_arithmetic.h
   cyc_limits.h
   cyc_std.h

@@ -90,7 +90,6 @@ set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
   "${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/context_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/csv_back_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc"

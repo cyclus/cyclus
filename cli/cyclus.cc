@@ -7,7 +7,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-#include "csv_back.h"
 #include "cyclus.h"
 #include "hdf5_back.h"
 #include "query_backend.h"
@@ -113,16 +112,9 @@ int main(int argc, char* argv[]) {
 
   std::string ext = fs::path(ai.output_path).extension().generic_string();
   std::string stem = fs::path(ai.output_path).stem().generic_string();
-  if (ext == ".h5") {  // not queryable
+  if (ext == ".h5") {
     fback = new Hdf5Back(ai.output_path.c_str());
     rec.RegisterBackend(fback);
-    bdel.Add(fback);
-  } else if (ext == ".csv") {  // not queryable
-    fback = new SqliteBack(stem + ".sqlite");
-    rback = new CsvBack(ai.output_path.c_str());
-    rec.RegisterBackend(rback);
-    rec.RegisterBackend(fback);
-    bdel.Add(rback);
     bdel.Add(fback);
   } else {
     fback = new SqliteBack(ai.output_path);
