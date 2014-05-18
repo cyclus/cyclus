@@ -9,12 +9,13 @@ SET( CYCLUS_SOURCE ${CYCLUS_SOURCE}
   cyclus.cc
   )
 
-ADD_EXECUTABLE( cyclus ${CYCLUS_SOURCE} )
+ADD_EXECUTABLE( cyclus_cli ${CYCLUS_SOURCE} )
+set_target_properties(cyclus_cli PROPERTIES OUTPUT_NAME cyclus)
 
-TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} cycluscore )
+TARGET_LINK_LIBRARIES( cyclus_cli dl ${LIBS} cyclus )
 
 INSTALL(
-  TARGETS cyclus
+  TARGETS cyclus_cli
   RUNTIME DESTINATION bin
   COMPONENT cyclus
   )
