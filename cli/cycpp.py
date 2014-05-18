@@ -101,7 +101,8 @@ WRANGLERS = {
 #
 # pass 1
 #
-def preprocess_file(filename, includes = [], cpp_path='cpp', cpp_args=('-xc++', '-pipe', '-E')):
+def preprocess_file(filename, includes=(), cpp_path='cpp', 
+                    cpp_args=('-xc++', '-pipe', '-E', '-DCYCPP')):
     """Preprocess a file using cpp.
 
     Parameters
