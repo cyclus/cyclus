@@ -73,12 +73,12 @@ Agent::Agent(Context* ctx)
 Agent::~Agent() {
   MLOG(LEV_DEBUG3) << "Deleting agent '" << prototype() << "' ID=" << id_;
   context()->agent_list_.erase(this);
-  
+
+  std::set<Agent*>::iterator it;  
   if (parent_ != NULL) {
     CLOG(LEV_DEBUG2) << "Agent '" << parent_->prototype() << "' ID=" << parent_->id()
                      << " has removed child '" << prototype() << "' ID="
                      << id() << " from its list of children.";
-    std::vector<Agent*>::iterator it;
     it = find(parent_->children_.begin(), parent_->children_.end(), this);
     if (it != parent_->children_.end()) {
       parent_->children_.erase(it);
@@ -86,8 +86,8 @@ Agent::~Agent() {
   }
 
   // set children's parents to NULL
-  for (int i = 0; i < children_.size(); ++i) {
-    Agent* child = children_[i];
+  for (it = children_.begin(); it != children_.end(); ++it) {
+    Agent* child = *it;
     child->parent_ = NULL;
     child->parent_id_ = -1;
   }
@@ -130,7 +130,7 @@ void Agent::Connect(Agent* parent) {
   if (parent != NULL) {
     parent_ = parent;
     parent_id_ = parent->id();
-    parent->children_.push_back(this);
+    parent->children_.insert(this);
   } 
 }
 
@@ -148,8 +148,11 @@ void Agent::Decommission() {
 std::string Agent::PrintChildren() {
   std::stringstream ss("");
   ss << "Children of " << prototype() << ":" << std::endl;
-  for (int i = 0; i < children_.size(); i++) {
-    std::vector<std::string> print_outs = GetTreePrintOuts(children_.at(i));
+  
+  std::set<Agent*>::iterator it;  
+  for (it = children_.begin(); it != children_.end(); ++it) {
+    Agent* child = *it;
+    std::vector<std::string> print_outs = GetTreePrintOuts(child);
     for (int j = 0; j < print_outs.size(); j++) {
       ss << "\t" << print_outs.at(j);
     }
@@ -162,8 +165,10 @@ std::vector<std::string> Agent::GetTreePrintOuts(Agent* m) {
   std::stringstream ss("");
   ss << m->prototype() << std::endl;
   ret.push_back(ss.str());
-  for (int i = 0; i < m->children().size(); i++) {
-    std::vector<std::string> outs = GetTreePrintOuts(m->children().at(i));
+  std::set<Agent*>::iterator it;  
+  for (it = children_.begin(); it != children_.end(); ++it) {
+    Agent* child = *it;
+    std::vector<std::string> outs = GetTreePrintOuts(child);
     for (int j = 0; j < outs.size(); j++) {
       ss.str("");
       ss << "\t" << outs.at(j) << std::endl;

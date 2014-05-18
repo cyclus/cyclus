@@ -40,7 +40,7 @@ std::string Region::str() {
   std::string s = Agent::str();
 
   s += " has insts: ";
-  for (std::vector<Agent*>::const_iterator inst = children().begin();
+  for (std::set<Agent*>::const_iterator inst = children().begin();
        inst != children().end();
        inst++) {
     s += (*inst)->prototype() + ", ";
