@@ -755,7 +755,9 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         impl += self.shapes_impl(ctx, ind)
         cap_buffs = []
         for member, info in ctx.items():
-            if info['type'] not in BUFFERS:
+            if self.pragmaname in info:
+                impl += info[self.pragmaname]
+            elif info['type'] not in BUFFERS:
                 impl += ind + "{0} = m->{0};\n".format(member)
             elif 'capacity' in info:
                 cap_buffs.append((member,))
@@ -792,6 +794,9 @@ class InitFromDbFilter(CodeGeneratorFilter):
         impl += self.shapes_impl(ctx, ind)
         impl += ind + '{0}::QueryResult qr = b->Query("Info", NULL);\n'.format(CYCNS)
         for member, info in ctx.items():
+            if self.pragmaname in info:
+                impl += info[self.pragmaname]
+                continue
             t = info['type']
             if t in BUFFERS:
                 if 'capacity' in info:
@@ -1009,6 +1014,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
         impl += ind + 'int i;\n'
         impl += ind + 'int n;\n'
         for member, info in ctx.items():
+            if self.pragmaname in info and 'read' in info[self.pragmaname]:
+                impl += info[self.pragmaname]['read']
+                continue
             t = info['type']
             if t in BUFFERS:
                 continue
@@ -1022,6 +1030,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # write obj to database
         impl += ind + 'di.NewDatum("Info")\n'
         for member, info in ctx.items():
+            if self.pragmaname in info and 'write' in info[self.pragmaname]:
+                impl += info[self.pragmaname]['write']
+                continue
             if info['type'] in BUFFERS:
                 continue
             shape = ', &cycpp_shape_{0}'.format(member) if 'shape' in info else ''
@@ -1050,6 +1061,9 @@ class SchemaFilter(CodeGeneratorFilter):
         impl = i.up() + 'return ""\n'
         impl += i +  '"<interleave>\\n"\n'
         for member, info in ctx.items():
+            if self.pragmaname in info:
+                impl += info[self.pragmaname]
+                continue
             t = info['type']
             if t in BUFFERS: # buffer state, skip
                 continue
@@ -1059,7 +1073,6 @@ class SchemaFilter(CodeGeneratorFilter):
             if opt:
                 impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
 
-            t = info['type']
             if t[0] in ['std::list', 'std::map', 'std::set', 'std::vector']:
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
                 impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
@@ -1150,6 +1163,9 @@ class SnapshotFilter(CodeGeneratorFilter):
         ctx = context[self.given_classname]
         impl = ind + 'di.NewDatum("Info")\n'
         for member, info in ctx.items():
+            if self.pragmaname in info:
+                impl += info[self.pragmaname]
+                continue
             t = info["type"]
             if t in BUFFERS:
                 continue
@@ -1181,6 +1197,9 @@ class SnapshotInvFilter(CodeGeneratorFilter):
         impl = ind + "{0}::Inventories invs;\n".format(CYCNS)
 
         for buff in buffs:
+            if self.pragmaname in info:
+                impl += info[self.pragmaname]
+                continue
             impl += ind + ("invs[\"{0}\"] = "
                            "{0}.PopN({0}.count());\n").format(buff)
         impl += ind + "return invs;\n"
@@ -1208,8 +1227,10 @@ class InitInvFilter(CodeGeneratorFilter):
             if t in BUFFERS:
                 buffs.append(member)
 
-        impl = ""
         for buff in buffs:
+            if self.pragmaname in info:
+                impl += info[self.pragmaname]
+                continue
             impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(buff)
         return impl
 
