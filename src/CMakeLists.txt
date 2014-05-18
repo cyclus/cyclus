@@ -214,20 +214,20 @@ INSTALL(FILES
   COMPONENT core
   )
 
-ADD_LIBRARY( cycluscore ${CYCLUS_CORE_SRC} )
+ADD_LIBRARY( cyclus ${CYCLUS_CORE_SRC} )
 
-SET_TARGET_PROPERTIES( cycluscore 
+SET_TARGET_PROPERTIES( cyclus
   PROPERTIES 
   INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
   )
 
-TARGET_LINK_LIBRARIES( cycluscore dl ${LIBS} )
+TARGET_LINK_LIBRARIES( cyclus dl ${LIBS} )
 
 INSTALL(
-  TARGETS cycluscore
+  TARGETS cyclus
   LIBRARY DESTINATION lib
-  COMPONENT cycluscore
+  COMPONENT cyclus
   )
 
 #################################################################
