@@ -188,11 +188,6 @@ class Agent : public StateWrangler {
   /// their Decommission method.
   virtual void Decommission();
 
-  /// returns the ith child
-  Agent* children(int i) {
-    return children_[i];
-  }
-
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};
   
@@ -251,7 +246,7 @@ class Agent : public StateWrangler {
   inline const int lifetime() const { return lifetime_; }
 
   /// returns a list of children this agent has
-  inline const std::vector<Agent*>& children() const { return children_; }
+  inline const std::set<Agent*>& children() const { return children_; }
   
  protected:
   /// Initializes a agent by copying parameters from the passed agent m. This
@@ -303,7 +298,7 @@ class Agent : public StateWrangler {
   static int next_id_;
 
   /// children of this agent
-  std::vector<Agent*> children_;
+  std::set<Agent*> children_;
 
   /// parent of this agent
   Agent* parent_;
