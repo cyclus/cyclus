@@ -1,5 +1,6 @@
 import os
 import sys
+from collections import OrderedDict
 
 import nose
 from nose.tools import assert_equal, assert_true, assert_false
@@ -18,7 +19,7 @@ from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter
 # pass 3 Filters
 from cycpp import CloneFilter, InitFromCopyFilter, \
         InitFromDbFilter, InfileToDbFilter, SchemaFilter, SnapshotFilter, \
-        SnapshotInvFilter, InitInvFilter, DefaultPragmaFilter
+        SnapshotInvFilter, InitInvFilter, DefaultPragmaFilter, AnnotationsFilter
 
 
 
@@ -198,10 +199,21 @@ class MockCodeGenMachine(object):
     def __init__(self):
         self.depth = 0
         self.execns = {}
-        self.context = {"MyFactory": "Cyclus::Facility" }
+        self.context = {"MyFactory": OrderedDict([
+            ('x', {'type': 'int'}), 
+            ('y', {'type': 'std::string',
+                   'shape': [42],
+                   'initfromcopy': 'y=m -> y;\n',
+                   'initfromdb': 'WAKKA JAWAKA',
+                   'infiletodb': {'read': 'THINGFISH\n',
+                                  'write': 'ABSOLUTELY FREE\n'},
+                   'schema': "FREAK OUT\n",
+                   'snapshot': "JUST ANOTHER BAND FROM LA\n"
+                   }),
+            ])}
         self.statements = []
         self.classes = []
-        self.superclasses = {}
+        self.superclasses = {'MyFactory': ()}
         self.access = {}
         self.namespaces = []
         self.using_namespaces = set()
@@ -217,57 +229,158 @@ def test_clonefilter():
     """Test CloneFilter"""
     m = MockCodeGenMachine()
     f = CloneFilter(m)
+    f.given_classname = 'MyFactory'
     impl = f.impl()
     exp_impl = "  MyFactory* m = new MyFactory(context());\n" + \
                "  m->InitFrom(this);\n  return m;\n"
-    # yield assert_equal, exp_impl, impl
+    assert_equal(exp_impl, impl)
 
 def test_ifcfilter():
     """Test InitFromCopyFilter"""
     m = MockCodeGenMachine()
     f = InitFromCopyFilter(m)
+    f.given_classname = 'MyFactory'
+
     args = f.methodargs()
-    exp_args = "None* m"
+    exp_args = "MyFactory* m"
     yield assert_equal, exp_args, args
 
-    # impl = f.impl()
-    exp_impl = ""
-    # yield assert_equal, exp_impl, impl
+    impl = f.impl()
+    exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
+                '  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, '
+                                                   'rawcycpp_shape_y + 1);\n'
+                "  x = m->x;\n"
+                "y=m -> y;\n")
+    yield assert_equal, exp_impl, impl
 
 def test_ifdbfilter():
     """Test InitFromDbFilter"""
     m = MockCodeGenMachine()
     f = InitFromDbFilter(m)
+    f.given_classname = 'MyFactory'
+
+    args = f.methodargs()
+    exp_args = "cyclus::QueryableBackend* b"
+    yield assert_equal, exp_args, args
+
+    impl = f.impl()
+    exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
+                '  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, '
+                                                   'rawcycpp_shape_y + 1);\n'
+                '  cyclus::QueryResult qr = b->Query("Info", NULL);\n'
+                '  x = qr.GetVal<int>("x");\n'
+                "WAKKA JAWAKA")
+    yield assert_equal, exp_impl, impl
 
 def test_itdbfilter():
     """Test InfileToDbFilter"""
     m = MockCodeGenMachine()
     f = InfileToDbFilter(m)
+    f.given_classname = 'MyFactory'
+
+    args = f.methodargs()
+    exp_args = "cyclus::InfileTree* tree, cyclus::DbInit di"
+    yield assert_equal, exp_args, args
+
+    impl = f.impl()
+    exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
+                '  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, '
+                                                   'rawcycpp_shape_y + 1);\n'
+                '  tree = tree->SubTree("agent/*");\n'
+                '  cyclus::InfileTree* sub;\n'
+                '  int i;\n'
+                '  int n;\n'
+                '  x = cyclus::Query<int>(tree, "x");\n'
+                'THINGFISH\n'
+                '  di.NewDatum("Info")\n'
+                '  ->AddVal("x", x)\n'
+                'ABSOLUTELY FREE\n'
+                '  ->Record();\n')
+    yield assert_equal, exp_impl, impl
 
 def test_schemafilter():
     """Test SchemaFilter"""
     m = MockCodeGenMachine()
     f = SchemaFilter(m)
+    f.given_classname = 'MyFactory'
+
+    args = f.methodargs()
+    exp_args = ""
+    yield assert_equal, exp_args, args
+
+    impl = f.impl()
+    exp_impl = ('  return ""\n'
+                '    "<interleave>\\n"\n'
+                '    "<element name=\\"x\\">\\n"\n'
+                '    "    <data type=\\"int\\" />\\n"\n'
+                '    "</element>\\n"\n'
+                "FREAK OUT\n"
+                '    "</interleave>\\n"\n    ;\n')
+    yield assert_equal, exp_impl, impl
+
+def test_annotationsfilter():
+    """Test SchemaFilter"""
+    m = MockCodeGenMachine()
+    f = AnnotationsFilter(m)
+    f.given_classname = 'MyFactory'
+
+    args = f.methodargs()
+    exp_args = ""
+    yield assert_equal, exp_args, args
+
+    impl = f.impl()
+    yield assert_true, isinstance(impl, str)
 
 def test_snapshotfilter():
     """Test SnapshotFilter"""
     m = MockCodeGenMachine()
     f = SnapshotFilter(m)
+    f.given_classname = 'MyFactory'
+
+    args = f.methodargs()
+    exp_args = 'cyclus::DbInit di'
+    yield assert_equal, exp_args, args
+
+    impl = f.impl()
+    exp_impl = ('  di.NewDatum("Info")\n'
+                '  ->AddVal("x", x)\n'
+                'JUST ANOTHER BAND FROM LA\n'
+                '  ->Record();\n')
+    yield assert_equal, exp_impl, impl
 
 def test_sshinvfilter():
     """Test SnapshotInvFilter"""
     m = MockCodeGenMachine()
     f = SnapshotInvFilter(m)
+    f.given_classname = 'MyFactory'
+
+    args = f.methodargs()
+    exp_args = ''
+    yield assert_equal, exp_args, args
+
+    impl = f.impl()
+    exp_impl = ("  cyclus::Inventories invs;\n"
+                "  return invs;\n")
+    yield assert_equal, exp_impl, impl
 
 def test_intinvfilter():
     """Test InitInvFilter"""
     m = MockCodeGenMachine()
     f = InitInvFilter(m)
+    f.given_classname = 'MyFactory'
+
+    args = f.methodargs()
+    exp_args = "cyclus::Inventories& inv"
+    yield assert_equal, exp_args, args
+
+    impl = f.impl()
+    exp_impl = ''
+    yield assert_equal, exp_impl, impl
 
 def test_defpragmafilter():
     """Test DefaultPragmaFilter"""
     m = MockCodeGenMachine()
-    #f = DefaultPragmaFilter(m)
+    f = DefaultPragmaFilter(m)
 
 
 if __name__ == "__main__":
