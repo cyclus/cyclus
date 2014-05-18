@@ -34,6 +34,11 @@ TEST_P(AgentTests, Schema) {
   EXPECT_NO_THROW(p.Init(schema));
 }
 
+TEST_P(AgentTests, Annotations) {
+  Json::Value anno = agent_->annotations();
+  EXPECT_TRUE(anno.isObject());
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(AgentTests, GetAgentType) {
   EXPECT_NE(std::string("Agent"), agent_->kind());

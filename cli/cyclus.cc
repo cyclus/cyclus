@@ -9,6 +9,7 @@
 
 #include "cyclus.h"
 #include "hdf5_back.h"
+#include "pyne.h"
 #include "query_backend.h"
 #include "sim_init.h"
 #include "sqlite_back.h"
@@ -168,11 +169,13 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("version", "print cyclus core and dependency versions and quit")
       ("schema",
        "dump the cyclus master schema including all installed module schemas")
-      ("module-schema", po::value<std::string>(),
-       "dump the schema for the named module")
+      ("agent-schema", po::value<std::string>(),
+       "dump the schema for the named agent")
       ("schema-path", po::value<std::string>(),
        "manually specify the path to the cyclus master schema")
       ("flat-schema", "use the flat master simulation schema")
+      ("agent-annotations", po::value<std::string>(),
+       "dump the annotations for the named agent")
       ("no-agent", "only print log entries from cyclus core code")
       ("no-mem", "exclude memory log statement from logger output")
       ("verb,v", po::value<std::string>(), vmessage.c_str())
@@ -224,14 +227,28 @@ int EarlyExitArgs(const ArgInfo& ai) {
     LoadStringstreamFromFile(f, ai.schema_path);
     std::cout << f.str() << "\n";
     return 0;
-  } else if (ai.vm.count("module-schema")) {
-    std::string name(ai.vm["module-schema"].as<std::string>());
+  } else if (ai.vm.count("agent-schema")) {
+    std::string name(ai.vm["agent-schema"].as<std::string>());
     try {
       Recorder rec;
       Timer ti;
       Context* ctx = new Context(&ti, &rec);
       Agent* m = DynamicModule::Make(ctx, name);
       std::cout << m->schema();
+      ctx->DelAgent(m);
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("agent-annotations")) {
+    std::string name(ai.vm["agent-annotations"].as<std::string>());
+    try {
+      Recorder rec;
+      Timer ti;
+      Context* ctx = new Context(&ti, &rec);
+      Agent* m = DynamicModule::Make(ctx, name);
+      Json::StyledWriter writer;
+      std::cout << writer.write(m->annotations());
       ctx->DelAgent(m);
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";

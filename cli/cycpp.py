@@ -50,6 +50,12 @@ from itertools import takewhile
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint, pformat
+import textwrap
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 if sys.version_info[0] == 2:
     STRING_TYPES = (str, unicode, basestring)
@@ -1024,7 +1030,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         return impl
 
 class SchemaFilter(CodeGeneratorFilter):
-    """Filter for handling Schema() code generation:
+    """Filter for handling schema() code generation:
         #pragma cyclus [def|decl|impl] schema [classname]
     """
     methodname = "schema"
@@ -1096,6 +1102,36 @@ class SchemaFilter(CodeGeneratorFilter):
         impl += i +  '"</interleave>\\n"\n'
         impl += i + ";\n"
         return impl
+
+class AnnotationsFilter(CodeGeneratorFilter):
+    """Filter for handling annotations() code generation:
+        #pragma cyclus [def|decl|impl] annotations [classname]
+    """
+    methodname = "annotations"
+    pragmaname = "annotations"
+    methodrtn = "Json::Value"
+
+    def impl(self, ind="  "):
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.given_classname]
+        s = ind + 'Json::Value root;\n'
+        s += ind + 'Json::Reader reader;\n'
+        s += ind + 'bool parsed_ok = reader.parse({1}, root);\n'
+        s += ind + 'if (!parsed_ok) {{\n'
+        s += ind + ('  throw cyclus::ValueError("failed to parse annotations '
+                    'for {0}.");\n')
+        s += ind + '}}\n'
+        s += ind + 'return root;\n'
+        jstr = json.dumps(ctx, encoding='ascii', separators=(',', ':'))
+        if len(jstr) > 50:
+            jstr = [j.replace('"', '\\"') for j in  textwrap.wrap(jstr, 50)]
+            jstr = ('"\n  ' + ind + '"').join(jstr)
+            jstr = '\n  ' + ind + '"' + jstr + '"'
+        else:
+            jstr = '"' + jstr.replace('"', '\\"') + '"'
+        s = s.format(self.given_classname, jstr)
+        return s
 
 class SnapshotFilter(CodeGeneratorFilter):
     """Filter for handling copy-constructor-like InitFrom() code generation:
@@ -1221,7 +1257,7 @@ class CodeGenerator(object):
         self.codegen_filters = [InitFromCopyFilter(self),
                                 InitFromDbFilter(self), InfileToDbFilter(self),
                                 CloneFilter(self), SchemaFilter(self),
-                                InitInvFilter(self),
+                                AnnotationsFilter(self), InitInvFilter(self),
                                 # SnapshotInv has to come before Snapshot for some
                                 # regex reason I don't understand
                                 SnapshotInvFilter(self),

@@ -1,19 +1,21 @@
 // agent.h
-#ifndef MODEL_H_
-#define MODEL_H_
+#ifndef CYCLUS_SRC_AGENT_H_
+#define CYCLUS_SRC_AGENT_H_
 
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+
 #include <boost/shared_ptr.hpp>
 
+#include "db_init.h"
 #include "dynamic_module.h"
-#include "resource.h"
 #include "infile_tree.h"
 #include "exchange_context.h"
+#include "pyne.h"
 #include "query_backend.h"
-#include "db_init.h"
+#include "resource.h"
 #include "state_wrangler.h"
 
 #define SHOW(X) \
@@ -197,10 +199,17 @@ class Agent : public StateWrangler {
   /// default implementation for material preferences.
   virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {};
 
-  /// Returns a module's xml rng schema for initializing from input files. All
+  /// Returns an agent's xml rng schema for initializing from input files. All
   /// concrete agents should override this method.
   virtual std::string schema() {
     return "<text />\n";
+  };
+
+  /// Returns an agent's json annotations for all state variables and any other
+  /// information the developer wishes to provide. All concrete agents should
+  /// override this method.
+  virtual Json::Value annotations() {
+    return Json::Value(Json::objectValue);
   };
 
   /// get agent instance name
