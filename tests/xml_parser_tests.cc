@@ -92,7 +92,7 @@ TEST_F(XMLParserTests, XInclude) {
   using std::ofstream;
   using std::stringstream;
   // setup file on disk and in-memory snippet
-  FileDeleter fd("includ_me.xml");
+  FileDeleter fd("include_me.xml");
   stringstream fss("");
   FillSnippet(fss);
   ofstream f;

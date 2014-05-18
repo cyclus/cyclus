@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!-- 1 Sink -->
+
+<simulation xmlns:xi="http://www.w3.org/2001/XInclude">
+  <control>
+    <duration>100</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+    <decay>0</decay>
+  </control>
+
+  <commodity>
+    <name>commodity</name>
+  </commodity>
+
+  <facility>
+    <name>Sink</name>
+    <module>
+      <path>Sink</path>
+      <agent>Sink</agent>
+    </module>
+    <agent>
+      <Sink>
+        <in_commods_>
+          <val>commodity</val>
+        </in_commods_>
+        <capacity_>1.00</capacity_>
+      </Sink>
+    </agent>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <module>
+      <path>NullRegion</path>
+      <agent>NullRegion</agent>
+    </module>
+    <allowedfacility>Sink</allowedfacility>
+    <agent>
+      <NullRegion/>
+    </agent>
+    <institution>
+      <name>SingleInstitution</name>
+      <module>
+        <path>NullInst</path>
+        <agent>NullInst</agent>
+      </module>
+      <availableprototype>Sink</availableprototype>
+      <initialfacilitylist>
+        <entry>
+          <prototype>Sink</prototype>
+          <number>1</number>
+        </entry>
+      </initialfacilitylist>
+      <agent>
+        <NullInst/>
+      </agent>
+    </institution>
+  </region>
+
+  <xi:include href="input/recipe.xml" />
+
+</simulation>
