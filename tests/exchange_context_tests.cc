@@ -29,7 +29,6 @@ using cyclus::Resource;
 using cyclus::TestContext;
 using cyclus::Trader;
 using test_helpers::get_mat;
-using test_helpers::get_req;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ExchangeContextTests: public ::testing::Test {
@@ -57,6 +56,8 @@ class ExchangeContextTests: public ::testing::Test {
   }
 
   virtual void TearDown() {
+    delete fac1;
+    delete fac2;
   }
 };
 

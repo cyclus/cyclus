@@ -23,7 +23,6 @@ using cyclus::Material;
 using cyclus::TestContext;
 using std::string;
 using test_helpers::get_mat;
-using test_helpers::get_req;
 using test_helpers::TestConverter;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,11 +42,14 @@ class BidPortfolioTests: public ::testing::Test {
     fac2 = new TestFacility(tc.get());
     commod1 = "commod1";
     commod2 = "commod2";
-    req1 = get_req(commod1);
-    req2 = get_req(commod2);
+    req1 = tc.NewReq(NULL, commod1);
+    req2 = tc.NewReq(NULL, commod2);
   }
 
-  virtual void TearDown() {}
+  virtual void TearDown() {
+    delete fac1;
+    delete fac2;
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
