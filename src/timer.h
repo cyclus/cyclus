@@ -12,12 +12,15 @@
 #include "infile_tree.h"
 #include "time_listener.h"
 
+class SimInitTest;
+
 namespace cyclus {
 
 class Agent;
 
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
+  friend class ::SimInitTest;
  public:
   Timer();
 

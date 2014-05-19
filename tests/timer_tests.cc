@@ -70,8 +70,8 @@ TEST(TimerTests, EarlyTermination) {
   rec.Close();
 
   cyclus::QueryResult qr = b.Query("Finish", NULL);
-  bool early = qr.GetVal<int>("EarlyTerm");
-  bool end = qr.GetVal<int>("EndTime");
+  bool early = qr.GetVal<bool>("EarlyTerm");
+  int end = qr.GetVal<int>("EndTime");
 
   EXPECT_TRUE(early);
   EXPECT_EQ(0, end);

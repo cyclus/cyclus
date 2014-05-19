@@ -116,10 +116,14 @@ class SimInitTest : public ::testing::Test {
     ctx->AddPrototype("proto2", a2);
 
     // sched 2 agents, build 2 agents
+    Agent* b1 = a1->Clone();
+    Agent* b2 = a2->Clone();
+    b1->Build(NULL);
+    b2->Build(NULL);
+    ctx->SchedDecom(b1, 1);
+    ctx->SchedDecom(b2, 2);
     ctx->SchedBuild(NULL, "proto1", 2);
     ctx->SchedBuild(NULL, "proto2", 3);
-    a1->Clone()->Build(NULL);
-    a2->Clone()->Build(NULL);
 
     cy::SimInit::Snapshot(ctx);
     rec.Flush();
@@ -148,6 +152,9 @@ class SimInitTest : public ::testing::Test {
 
   cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; };
   std::set<Agent*> agent_list(cy::Context* ctx) { return ctx->agent_list_; };
+  std::set<cy::TimeListener*> tickers(cy::Timer* ti) { return ti->tickers_; };
+  std::map<int, std::vector<std::pair<std::string, Agent*> > > build_queue(cy::Timer* ti) { return ti->build_queue_; };
+  std::map<int, std::vector<Agent*> > decom_queue(cy::Timer* ti) { return ti->decom_queue_; };
 
   cy::Context* ctx;
   cy::Timer ti;
@@ -215,6 +222,54 @@ TEST_F(SimInitTest, InitRecipes) {
   cy::CompMap init2 = init_ctx->GetRecipe("recipe1")->mass();
   EXPECT_FLOAT_EQ(orig2[922350000], init2[922350000]);
   EXPECT_FLOAT_EQ(orig2[922380000], init2[922380000]);
+}
+
+TEST_F(SimInitTest, InitTimeListeners) {
+  cy::SimInit si;
+  si.Init(&rec, b);
+  std::set<cy::TimeListener*> init_tickers = tickers(si.timer());
+
+  ASSERT_EQ(2, init_tickers.size());
+}
+
+TEST_F(SimInitTest, InitBuildSched) {
+  cy::SimInit si;
+  si.Init(&rec, b);
+  std::map<int, std::vector<std::pair<std::string, Agent*> > > queue = build_queue(si.timer());
+
+  EXPECT_EQ(2, queue.size());
+
+  int n_sched_t2 = queue[2].size();
+  EXPECT_EQ(1, n_sched_t2);
+  if (n_sched_t2 == 1) {
+    EXPECT_EQ("proto1", queue[2][0].first);
+  }
+
+  int n_sched_t3 = queue[3].size();
+  EXPECT_EQ(1, n_sched_t3);
+  if (n_sched_t3 == 1) {
+    EXPECT_EQ("proto2", queue[3][0].first);
+  }
+}
+
+TEST_F(SimInitTest, InitDecomSched) {
+  cy::SimInit si;
+  si.Init(&rec, b);
+  std::map<int, std::vector<Agent*> > queue = decom_queue(si.timer());
+
+  EXPECT_EQ(2, queue.size());
+
+  int n_sched_t1 = queue[1].size();
+  EXPECT_EQ(1, n_sched_t1);
+  if (n_sched_t1 == 1) {
+    EXPECT_EQ(2, queue[1][0]->id());
+  }
+
+  int n_sched_t2 = queue[2].size();
+  EXPECT_EQ(1, n_sched_t2);
+  if (n_sched_t2 == 1) {
+    EXPECT_EQ(3, queue[2][0]->id());
+  }
 }
 
 TEST_F(SimInitTest, InitProtos) {
@@ -292,19 +347,16 @@ TEST_F(SimInitTest, RestartSimInfo) {
   rec.Flush();
   cy::SimInit si;
   si.Restart(b, rec.sim_id(), 2);
-  cy::Context* restart_ctx = si.context();
-
-  cy::SimInfo si_orig = ctx->sim_info();
-  cy::SimInfo si_restart = restart_ctx->sim_info();
+  cy::SimInfo info = si.context()->sim_info();
 
   EXPECT_NE(rec.sim_id(), si.recorder()->sim_id());
-  EXPECT_EQ(2, restart_ctx->time());
-  EXPECT_EQ(si_orig.duration, si_restart.duration);
-  EXPECT_EQ(si_orig.y0, si_restart.y0);
-  EXPECT_EQ(si_orig.m0, si_restart.m0);
-  EXPECT_EQ(si_orig.decay_period, si_restart.decay_period);
-  EXPECT_EQ(si_orig.handle, si_restart.handle);
-  EXPECT_EQ(rec.sim_id(), si_restart.parent_sim);
-  EXPECT_EQ("restart", si_restart.parent_type);
-  EXPECT_EQ(2, si_restart.branch_time);
+  EXPECT_EQ(2, si.context()->time());
+  EXPECT_EQ(5, info.duration);
+  EXPECT_EQ(2010, info.y0);
+  EXPECT_EQ(1, info.m0);
+  EXPECT_EQ(-1, info.decay_period);
+  EXPECT_EQ("", info.handle);
+  EXPECT_EQ(rec.sim_id(), info.parent_sim);
+  EXPECT_EQ("restart", info.parent_type);
+  EXPECT_EQ(2, info.branch_time);
 }

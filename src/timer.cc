@@ -22,17 +22,17 @@ void Timer::RunSim() {
   while (time_ < si_.duration) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
 
+    if (want_snapshot_) {
+      want_snapshot_ = false;
+      SimInit::Snapshot(ctx_);
+    }
+
     // run through phases
     DoBuild();
     DoTick();
     DoResEx(&matl_manager, &genrsrc_manager);
     DoTock();
     DoDecom();
-
-    if (want_snapshot_) {
-      want_snapshot_ = false;
-      SimInit::Snapshot(ctx_);
-    }
 
     if (want_kill_) {
       break;
@@ -41,9 +41,8 @@ void Timer::RunSim() {
     time_++;
   }
 
-  // FIXME: make the want_kill_ be stored as bool when backends support it
   ctx_->NewDatum("Finish")
-      ->AddVal("EarlyTerm", (int)want_kill_)
+      ->AddVal("EarlyTerm", want_kill_)
       ->AddVal("EndTime", time_)
       ->Record();
 }

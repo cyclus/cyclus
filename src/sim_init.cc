@@ -240,6 +240,10 @@ void SimInit::LoadInitialAgents() {
   std::map<int, int> parentmap; // map<agentid, parentid>
   std::map<int, Agent*> unbuilt; // map<agentid, agent_ptr>
   for (int i = 0; i < qentry.rows.size(); ++i) {
+    if (t_ > 0 && qentry.GetVal<int>("EnterTime", i) == t_) {
+      // agent is scheduled to be built already
+      continue;
+    }
     int id = qentry.GetVal<int>("AgentId", i);
     std::vector<Cond> conds;
     conds.push_back(Cond("AgentId", "==", id));
@@ -343,7 +347,7 @@ void SimInit::LoadBuildSched() {
 
 void SimInit::LoadDecomSched() {
   std::vector<Cond> conds;
-  conds.push_back(Cond("DecomTime", ">", t_));
+  conds.push_back(Cond("DecomTime", ">=", t_));
   QueryResult qr;
   try {
     qr = b_->Query("DecomSchedule", &conds);
