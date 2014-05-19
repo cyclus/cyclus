@@ -3,12 +3,12 @@
 
 namespace cyclus {
 
-int Resource::nextid_ = 1;
-int Resource::nexttrackid_ = 1;
+int Resource::nextstate_id_ = 1;
+int Resource::nextobj_id_ = 1;
 
-void Resource::BumpId() {
-  id_ = nextid_;
-  nextid_++;
+void Resource::BumpStateId() {
+  state_id_ = nextstate_id_;
+  nextstate_id_++;
 }
 
 } // namespace cyclus

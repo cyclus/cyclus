@@ -96,13 +96,13 @@ void SimInit::Snapshot(Context* ctx) {
   ->Record();
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("Resource"))
-  ->AddVal("NextId", Resource::nextid_)
+  ->AddVal("Object", std::string("ResourceState"))
+  ->AddVal("NextId", Resource::nextstate_id_)
   ->Record();
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("ResourceTrack"))
-  ->AddVal("NextId", Resource::nexttrackid_)
+  ->AddVal("Object", std::string("ResourceObj"))
+  ->AddVal("NextId", Resource::nextobj_id_)
   ->Record();
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
@@ -129,7 +129,7 @@ void SimInit::SnapAgent(Agent* m) {
       ->AddVal("AgentId", m->id())
       ->AddVal("SimTime", ctx->time())
       ->AddVal("InventoryName", name)
-      ->AddVal("ResourceId", inv[i]->graphid())
+      ->AddVal("ResourceId", inv[i]->state_id())
       ->Record();
     }
   }
@@ -149,10 +149,10 @@ void SimInit::LoadRecipes() {
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string recipe = qr.GetVal<std::string>("Recipe", i);
-    int stateid = qr.GetVal<int>("StateId", i);
+    int stateid = qr.GetVal<int>("QualId", i);
 
     std::vector<Cond> conds;
-    conds.push_back(Cond("StateId", "==", stateid));
+    conds.push_back(Cond("QualId", "==", stateid));
     QueryResult qr = b_->Query("Compositions", &conds);
     CompMap m;
     for (int j = 0; j < qr.rows.size(); ++j) {
@@ -299,8 +299,8 @@ void SimInit::LoadInventories() {
     Inventories invs;
     for (int i = 0; i < qr.rows.size(); ++i) {
       std::string inv_name = qr.GetVal<std::string>("InventoryName", i);
-      int resid = qr.GetVal<int>("ResourceId", i);
-      invs[inv_name].push_back(LoadResource(resid));
+      int state_id = qr.GetVal<int>("ResourceId", i);
+      invs[inv_name].push_back(LoadResource(state_id));
     }
     m->InitInv(invs);
   }
@@ -349,10 +349,10 @@ void SimInit::LoadNextIds() {
       ctx_->trans_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Composition") {
       Composition::next_id_ = qr.GetVal<int>("NextId", i);
-    } else if (obj == "Resource") {
-      Resource::nextid_ = qr.GetVal<int>("NextId", i);
-    } else if (obj == "ResourceTrack") {
-      Resource::nexttrackid_ = qr.GetVal<int>("NextId", i);
+    } else if (obj == "ResourceState") {
+      Resource::nextstate_id_ = qr.GetVal<int>("NextId", i);
+    } else if (obj == "ResourceObj") {
+      Resource::nextobj_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Product") {
       Product::next_state_ = qr.GetVal<int>("NextId", i);
     } else {
@@ -361,41 +361,41 @@ void SimInit::LoadNextIds() {
   }
 }
 
-Resource::Ptr SimInit::LoadResource(int resid) {
+Resource::Ptr SimInit::LoadResource(int state_id) {
   std::vector<Cond> conds;
-  conds.push_back(Cond("ResourceId", "==", resid));
+  conds.push_back(Cond("ResourceId", "==", state_id));
   QueryResult qr = b_->Query("Resources", &conds);
   ResourceType type = qr.GetVal<ResourceType>("Type");
-  int trackid = qr.GetVal<int>("TrackId");
+  int obj_id = qr.GetVal<int>("ObjId");
 
   Resource::Ptr r;
   if (type == Material::kType) {
-    r = LoadMaterial(resid);
+    r = LoadMaterial(state_id);
   } else if (type == Product::kType) {
-    r = LoadProduct(resid);
+    r = LoadProduct(state_id);
   } else {
     throw IOError("Invalid resource type in output database: " + type);
   }
 
-  r->id_ = resid;
-  r->trackid_ = trackid;
+  r->state_id_ = state_id;
+  r->obj_id_ = obj_id;
   return r;
 }
 
-Resource::Ptr SimInit::LoadMaterial(int resid) {
+Resource::Ptr SimInit::LoadMaterial(int state_id) {
   // get special material object state
   std::vector<Cond> conds;
-  conds.push_back(Cond("ResourceId", "==", resid));
+  conds.push_back(Cond("ResourceId", "==", state_id));
   conds.push_back(Cond("Time", "==", t_));
   QueryResult qr = b_->Query("MaterialInfo", &conds);
   int prev_decay = qr.GetVal<int>("PrevDecayTime");
 
   // get general resource object info
   conds.clear();
-  conds.push_back(Cond("ResourceId", "==", resid));
+  conds.push_back(Cond("ResourceId", "==", state_id));
   qr = b_->Query("Resources", &conds);
   double qty = qr.GetVal<double>("Quantity");
-  int stateid = qr.GetVal<int>("StateId");
+  int stateid = qr.GetVal<int>("QualId");
 
   // create the composition and material
   Composition::Ptr comp = LoadComposition(stateid);
@@ -408,7 +408,7 @@ Resource::Ptr SimInit::LoadMaterial(int resid) {
 
 Composition::Ptr SimInit::LoadComposition(int stateid) {
   std::vector<Cond> conds;
-  conds.push_back(Cond("StateId", "==", stateid));
+  conds.push_back(Cond("QualId", "==", stateid));
   QueryResult qr = b_->Query("Compositions", &conds);
   CompMap cm;
   for (int i = 0; i < qr.rows.size(); ++i) {
@@ -419,17 +419,17 @@ Composition::Ptr SimInit::LoadComposition(int stateid) {
   return Composition::CreateFromMass(cm);
 }
 
-Resource::Ptr SimInit::LoadProduct(int resid) {
+Resource::Ptr SimInit::LoadProduct(int state_id) {
   // get general resource object info
   std::vector<Cond> conds;
-  conds.push_back(Cond("ResourceId", "==", resid));
+  conds.push_back(Cond("ResourceId", "==", state_id));
   QueryResult qr = b_->Query("Resources", &conds);
   double qty = qr.GetVal<double>("Quantity");
-  int stateid = qr.GetVal<int>("StateId");
+  int stateid = qr.GetVal<int>("QualId");
 
   // get special Product internal state
   conds.clear();
-  conds.push_back(Cond("StateId", "==", stateid));
+  conds.push_back(Cond("QualId", "==", stateid));
   qr = b_->Query("Products", &conds);
   std::string quality = qr.GetVal<std::string>("Quality");
 

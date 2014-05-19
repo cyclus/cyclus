@@ -23,7 +23,7 @@ Product::Ptr Product::Create(Agent* creator,
   if (stateids_.count(quality) == 0) {
     stateids_[quality] = next_state_++;
     creator->context()->NewDatum("Products")
-    ->AddVal("StateId", stateids_[quality])
+    ->AddVal("QualId", stateids_[quality])
     ->AddVal("Quality", quality)
     ->Record();
   }

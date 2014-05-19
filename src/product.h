@@ -34,7 +34,7 @@ class Product : public Resource {
   static Ptr CreateUntracked(double quantity, std::string quality);
 
   /// Returns 0 (for now).
-  virtual int state_id() const {
+  virtual int qual_id() const {
     return 0;
   };
 

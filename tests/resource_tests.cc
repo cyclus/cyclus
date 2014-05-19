@@ -47,56 +47,56 @@ class ResourceTest : public ::testing::Test {
 };
 
 TEST_F(ResourceTest, MaterialAbsorbTrackid) {
-  int trackid = m1->trackid();
+  int obj_id = m1->obj_id();
   m1->Absorb(m2);
-  EXPECT_EQ(trackid, m1->trackid());
+  EXPECT_EQ(obj_id, m1->obj_id());
 }
 
 TEST_F(ResourceTest, MaterialAbsorbGraphid) {
-  int graphid = m1->graphid();
+  int state_id = m1->state_id();
   m1->Absorb(m2);
-  EXPECT_LT(graphid, m1->graphid());
+  EXPECT_LT(state_id, m1->state_id());
 }
 
 TEST_F(ResourceTest, MaterialExtractTrackid) {
-  int trackid = m1->trackid();
+  int obj_id = m1->obj_id();
   Material::Ptr m3 = m1->ExtractQty(2);
-  EXPECT_EQ(trackid, m1->trackid());
-  EXPECT_LT(trackid, m3->trackid());
+  EXPECT_EQ(obj_id, m1->obj_id());
+  EXPECT_LT(obj_id, m3->obj_id());
 }
 
 TEST_F(ResourceTest, MaterialExtractGraphid) {
-  int graphid = m1->graphid();
+  int state_id = m1->state_id();
   Material::Ptr m3 = m1->ExtractQty(2);
-  EXPECT_LT(graphid, m1->graphid());
-  EXPECT_LT(graphid, m3->graphid());
-  EXPECT_NE(m1->graphid(), m3->graphid());
+  EXPECT_LT(state_id, m1->state_id());
+  EXPECT_LT(state_id, m3->state_id());
+  EXPECT_NE(m1->state_id(), m3->state_id());
 }
 
 TEST_F(ResourceTest, ProductAbsorbTrackid) {
-  int trackid = p1->trackid();
+  int obj_id = p1->obj_id();
   p1->Absorb(p2);
-  EXPECT_EQ(trackid, p1->trackid());
+  EXPECT_EQ(obj_id, p1->obj_id());
 }
 
 TEST_F(ResourceTest, ProductAbsorbGraphid) {
-  int graphid = p1->graphid();
+  int state_id = p1->state_id();
   p1->Absorb(p2);
-  EXPECT_LT(graphid, p1->graphid());
+  EXPECT_LT(state_id, p1->state_id());
 }
 
 TEST_F(ResourceTest, ProductExtractTrackid) {
-  int trackid = p1->trackid();
+  int obj_id = p1->obj_id();
   Product::Ptr p3 = p1->Extract(2);
-  EXPECT_EQ(trackid, p1->trackid());
-  EXPECT_LT(trackid, p3->trackid());
+  EXPECT_EQ(obj_id, p1->obj_id());
+  EXPECT_LT(obj_id, p3->obj_id());
 }
 
 TEST_F(ResourceTest, ProductExtractGraphid) {
-  int graphid = p1->graphid();
+  int state_id = p1->state_id();
   Product::Ptr p3 = p1->Extract(2);
-  EXPECT_LT(graphid, p1->graphid());
-  EXPECT_LT(graphid, p3->graphid());
-  EXPECT_NE(p1->graphid(), p3->graphid());
+  EXPECT_LT(state_id, p1->state_id());
+  EXPECT_LT(state_id, p3->state_id());
+  EXPECT_NE(p1->state_id(), p3->state_id());
 }
 

@@ -88,7 +88,7 @@ class Material: public Resource {
   static Ptr CreateUntracked(double quantity, Composition::Ptr c);
 
   /// Returns the id of the material's internal nuclide composition.
-  virtual int state_id() const;
+  virtual int qual_id() const;
 
   /// Returns Material::kType.
   virtual const ResourceType type() const;
