@@ -23,7 +23,7 @@ Package                Minimum Version
 `CMake`                2.8            
 `boost`                1.46.1
 `libxml2`              2
-`libxml++`             2.6
+`libxml++`             2.36
 `python`               2.7 or 3.3+
 `sqlite3`              3.7.10            
 `HDF5`                 1.8.4
