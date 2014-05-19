@@ -69,7 +69,7 @@ class TestTrader : public TestFacility {
   }
 
   virtual std::set<BidPortfolio<Material>::Ptr>
-      GetMatlBids(const CommodMap<Material>::type& commod_requests) {
+      GetMatlBids(CommodMap<Material>::type& commod_requests) {
     bids++;
     if (obj_fac == NULL || is_requester) {
       return std::set<BidPortfolio<Material>::Ptr>();
@@ -111,8 +111,8 @@ class TestTrader : public TestFacility {
   }
 
   TestObjFactory* obj_fac;
-  Request<Material>::Ptr req;  // obs or exp
-  Bid<Material>::Ptr bid;  // obs or exp
+  Request<Material>* req;  // obs or exp
+  Bid<Material>* bid;  // obs or exp
   Trade<Material> obs_trade;  // obs trade
   Material::Ptr mat;  // obs mat
   bool is_requester;

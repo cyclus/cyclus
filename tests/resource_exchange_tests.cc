@@ -65,11 +65,11 @@ class Requester: public TestFacility {
 
   // increments counter and squares all preferences
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
-    std::map<Request<Material>::Ptr,
-             std::map<Bid<Material>::Ptr, double> >::iterator p_it;
+    std::map<Request<Material>*,
+             std::map<Bid<Material>*, double> >::iterator p_it;
     for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
-      std::map<Bid<Material>::Ptr, double>& map = p_it->second;
-      std::map<Bid<Material>::Ptr, double>::iterator m_it;
+      std::map<Bid<Material>*, double>& map = p_it->second;
+      std::map<Bid<Material>*, double>::iterator m_it;
       for (m_it = map.begin(); m_it != map.end(); ++m_it) {
         m_it->second = std::pow(m_it->second, 2);
       }
@@ -99,7 +99,7 @@ class Bidder: public TestFacility {
   }
 
   set<BidPortfolio<Material>::Ptr> GetMatlBids(
-      const CommodMap<Material>::type& commod_requests) {
+      CommodMap<Material>::type& commod_requests) {
     set<BidPortfolio<Material>::Ptr> bps;
     bps.insert(port_);
     bid_ctr_++;
@@ -121,8 +121,8 @@ class ResourceExchangeTests: public ::testing::Test {
   string commod;
   double pref;
   Material::Ptr mat;
-  Request<Material>::Ptr req;
-  Bid<Material>::Ptr bid;
+  Request<Material>* req;
+  Bid<Material>* bid;
 
   virtual void SetUp() {
     commod = "name";
@@ -162,9 +162,9 @@ TEST_F(ResourceExchangeTests, Requests) {
   EXPECT_EQ(1, obsvp.size());
   EXPECT_TRUE(RPEq(*rp.get(), *obsvp[0].get()));
 
-  const std::vector<Request<Material>::Ptr>& obsvr = ctx.commod_requests[commod];
+  const std::vector<Request<Material>*>& obsvr = ctx.commod_requests[commod];
   EXPECT_EQ(1, obsvr.size());
-  std::vector<Request<Material>::Ptr> vr;
+  std::vector<Request<Material>*> vr;
   vr.push_back(req);
   EXPECT_EQ(vr, obsvr);
 
@@ -177,18 +177,18 @@ TEST_F(ResourceExchangeTests, Bids) {
 
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   req = rp->AddRequest(mat, reqr, commod, pref);
-  Request<Material>::Ptr req1 = rp->AddRequest(mat, reqr, commod, pref);
+  Request<Material>* req1 = rp->AddRequest(mat, reqr, commod, pref);
   ctx.AddRequestPortfolio(rp);
-  const std::vector<Request<Material>::Ptr>& reqs = ctx.commod_requests[commod];
+  const std::vector<Request<Material>*>& reqs = ctx.commod_requests[commod];
   EXPECT_EQ(2, reqs.size());
 
   Bidder* bidr = new Bidder(tc.get(), commod);
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   bid = bp->AddBid(req, mat, bidr);
-  Bid<Material>::Ptr bid1 = bp->AddBid(req1, mat, bidr);
+  Bid<Material>* bid1 = bp->AddBid(req1, mat, bidr);
 
-  std::vector<Bid<Material>::Ptr> bids;
+  std::vector<Bid<Material>*> bids;
   bids.push_back(bid);
   bids.push_back(bid1);
 
@@ -210,13 +210,13 @@ TEST_F(ResourceExchangeTests, Bids) {
   const cyclus::BidPortfolio<Material>& rhs = *obsvp[0];
   EXPECT_TRUE(BPEq(*bp, *obsvp[0]));
 
-  const std::vector<Bid<Material>::Ptr>& obsvb = ctx.bids_by_request[req];
+  const std::vector<Bid<Material>*>& obsvb = ctx.bids_by_request[req];
   EXPECT_EQ(1, obsvb.size());
-  std::vector<Bid<Material>::Ptr> vb;
+  std::vector<Bid<Material>*> vb;
   vb.push_back(bid);
   EXPECT_EQ(vb, obsvb);
 
-  const std::vector<Bid<Material>::Ptr>& obsvb1 = ctx.bids_by_request[req1];
+  const std::vector<Bid<Material>*>& obsvb1 = ctx.bids_by_request[req1];
   EXPECT_EQ(1, obsvb1.size());
   vb.clear();
   vb.push_back(bid1);
@@ -244,10 +244,10 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
 
   // doin a little magic to simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
-  Request<Material>::Ptr preq = rp1->AddRequest(mat, pcast, commod, pref);
+  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, pref);
   pcast->port_ = rp1;
   RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
-  Request<Material>::Ptr creq = rp2->AddRequest(mat, ccast, commod, pref);
+  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, pref);
   ccast->port_ = rp2;
 
   EXPECT_EQ(0, pcast->req_ctr_);
@@ -282,19 +282,19 @@ TEST_F(ResourceExchangeTests, PrefValues) {
 
   // doin a little magic to simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
-  Request<Material>::Ptr preq = rp1->AddRequest(mat, pcast, commod, pref);
+  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, pref);
   pcast->port_ = rp1;
   RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
-  Request<Material>::Ptr creq = rp2->AddRequest(mat, ccast, commod, pref);
+  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, pref);
   ccast->port_ = rp2;
 
   Bidder* bidr = new Bidder(tc.get(), commod);
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  Bid<Material>::Ptr pbid = bp->AddBid(preq, mat, bidr);
-  Bid<Material>::Ptr cbid = bp->AddBid(creq, mat, bidr);
+  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr);
+  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr);
 
-  std::vector<Bid<Material>::Ptr> bids;
+  std::vector<Bid<Material>*> bids;
   bids.push_back(pbid);
   bids.push_back(cbid);
   bidr->port_ = bp;

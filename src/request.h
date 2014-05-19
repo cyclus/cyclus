@@ -20,8 +20,6 @@ template <class T> class RequestPortfolio;
 template <class T>
 class Request {
  public:
-  typedef boost::shared_ptr< Request<T> > Ptr;
-
   /// @brief a factory method for a request
   /// @param target the target resource associated with this request
   /// @param requester the requester
@@ -31,27 +29,26 @@ class Request {
   /// others in the portfolio)
   /// @param exclusive a flag denoting that this request must be met exclusively,
   /// i.e., in its entirety by a single offer
-  inline static typename Request<T>::Ptr Create(
+  inline static Request<T>* Create(
       boost::shared_ptr<T> target,
       Trader* requester,
       typename RequestPortfolio<T>::Ptr portfolio,
       std::string commodity = "",
       double preference = 0,
       bool exclusive = false) {
-    return Ptr(
-        new Request<T>(target, requester, portfolio, commodity, preference,
-                       exclusive));
+    return new Request<T>(target, requester, portfolio,
+                          commodity, preference, exclusive);
   }
 
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
-  inline static typename Request<T>::Ptr Create(boost::shared_ptr<T> target,
-                                                Trader* requester,
-                                                std::string commodity = "",
-                                                double preference = 0,
-                                                bool exclusive = false) {
-    return Ptr(new Request<T>(target, requester, commodity, preference,
-                              exclusive));
+  inline static Request<T>* Create(boost::shared_ptr<T> target,
+                                   Trader* requester,
+                                   std::string commodity = "",
+                                   double preference = 0,
+                                   bool exclusive = false) {
+    return new Request<T>(target, requester, commodity, preference,
+                          exclusive);
   }
 
   /// @return this request's target

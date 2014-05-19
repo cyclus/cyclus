@@ -35,17 +35,25 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
       : bidder_(NULL),
         commodity_("NO_COMMODITY_SET") {}
 
+  /// deletes all bids associated with it
+  ~BidPortfolio() {
+    typename std::set<Bid<T>*>::iterator it;
+    for (it = bids_.begin(); it != bids_.end(); ++it) {
+      delete *it;
+    }
+  };
+
   /// @brief add a bid to the portfolio
   /// @param request the request being responded to by this bid
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original or if the bid commodity is different than the original
-  typename Bid<T>::Ptr AddBid(typename Request<T>::Ptr request,
-                              boost::shared_ptr<T> offer,
-                              Trader* bidder,
-                              bool exclusive = false) {
-    typename Bid<T>::Ptr b =
+  Bid<T>* AddBid(Request<T>* request,
+                 boost::shared_ptr<T> offer,
+                 Trader* bidder,
+                 bool exclusive = false) {
+    Bid<T>* b =
         Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
                        exclusive);
     VerifyResponder_(b);
@@ -73,7 +81,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   }
 
   /// @return const access to the bids
-  inline const std::set<typename Bid<T>::Ptr>& bids() const {
+  inline const std::set<Bid<T>*>& bids() const {
     return bids_;
   }
 
@@ -90,7 +98,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
     bids_ = rhs.bids_;
     commodity_ = rhs.commodity_;
     constraints_ = rhs.constraints_;
-    typename std::set<typename Bid<T>::Ptr>::iterator it;
+    typename std::set<Bid<T>*>::iterator it;
     for (it = bids_.begin(); it != bids_.end(); ++it) {
       it->get()->set_portfolio(this->shared_from_this());
     }
@@ -101,7 +109,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// portfolio's bidder
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original
-  void VerifyResponder_(typename Bid<T>::Ptr b) {
+  void VerifyResponder_(Bid<T>* b) {
     if (bidder_ == NULL) {
       bidder_ = b->bidder();
     } else if (bidder_ != b->bidder()) {
@@ -115,7 +123,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// portfolio's commodity
   /// @throws KeyError if a commodity is added that is a different commodity
   /// from the original
-  void VerifyCommodity_(const typename Bid<T>::Ptr r) {
+  void VerifyCommodity_(const Bid<T>* r) {
     std::string other = r->request()->commodity();
     if (commodity_ == "NO_COMMODITY_SET") {
       commodity_ = other;
@@ -127,7 +135,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
 
   // bid_ is a set because there is a one-to-one correspondence between a
   // bid and a request, i.e., bids are unique
-  std::set< typename Bid<T>::Ptr > bids_;
+  std::set<Bid<T>*> bids_;
 
   // constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;

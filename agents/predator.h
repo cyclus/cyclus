@@ -13,8 +13,8 @@ namespace cyclus {
 class Predator : public cyclus::Facility  {
  public:
   /// smallest first! 
-  static inline bool SortById(cyclus::Bid<cyclus::Product>::Ptr l,
-                              cyclus::Bid<cyclus::Product>::Ptr r) {
+  static inline bool SortById(cyclus::Bid<cyclus::Product>* l,
+                              cyclus::Bid<cyclus::Product>* r) {
     return l->bidder()->manager()->id() < r->bidder()->manager()->id();
   }
 

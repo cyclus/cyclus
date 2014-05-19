@@ -40,13 +40,12 @@ static Material::Ptr get_mat() {
 static TestContext helper_tc;
 static TestFacility* trader = new TestFacility(helper_tc.get());
 
-static Request<Material>::Ptr get_req(std::string commod = "") {
+static Request<Material>* get_req(std::string commod = "") {
   return Request<Material>::Create(get_mat(), trader, commod);
 }
 
-static Bid<Material>::Ptr get_bid() {
-  return Bid<Material>::Ptr(
-      Bid<Material>::Create(get_req(), get_mat(), trader));
+static Bid<Material>* get_bid() {
+  return Bid<Material>::Create(get_req(), get_mat(), trader);
 }
 
 struct TestConverter : public Converter<Material> {

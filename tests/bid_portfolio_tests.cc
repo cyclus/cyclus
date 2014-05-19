@@ -35,8 +35,8 @@ class BidPortfolioTests: public ::testing::Test {
   string commod1;
   string commod2;
 
-  Request<Material>::Ptr req1;
-  Request<Material>::Ptr req2;
+  Request<Material>* req1;
+  Request<Material>* req2;
 
   virtual void SetUp() {
     fac1 = new TestFacility(tc.get());
@@ -54,7 +54,7 @@ class BidPortfolioTests: public ::testing::Test {
 TEST_F(BidPortfolioTests, RespAdd) {
   BidPortfolio<Material>::Ptr rp(new BidPortfolio<Material>());
   EXPECT_EQ(rp->bids().size(), 0);
-  Bid<Material>::Ptr r1 = rp->AddBid(req1, get_mat(), fac1);
+  Bid<Material>* r1 = rp->AddBid(req1, get_mat(), fac1);
   EXPECT_EQ(rp->bidder(), fac1);
   EXPECT_EQ(rp->bids().size(), 1);
   EXPECT_EQ(*rp->bids().begin(), r1);

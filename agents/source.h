@@ -36,7 +36,7 @@ class Source : public cyclus::Facility {
   /// If a given request is more than this facility's capacity, it will offer
   /// its capacity.
   virtual std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
-      GetMatlBids(const cyclus::CommodMap<cyclus::Material>::type&
+      GetMatlBids(cyclus::CommodMap<cyclus::Material>::type&
                   commod_requests);
 
   /// @brief respond to each trade with a material made from this facility's
