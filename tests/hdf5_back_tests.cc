@@ -3,15 +3,21 @@
 #include <gtest/gtest.h>
 
 #include "blob.h"
+#include "error.h"
 #include "hdf5.h"
 #include "hdf5_back.h"
 #include "hdf5_hl.h"
+
+#include "boost/filesystem.hpp"
 
 static const char* path = "testdb.h5";
 
 class FileDeleter {
  public:
-  FileDeleter(const char* path) : path_(path) {}
+  FileDeleter(const char* path) : path_(path) {
+    if (!boost::filesystem::exists(path_))
+      throw cyclus::IOError(std::string(path_) + " not found");
+  }
   ~FileDeleter() {
     remove(path_);
   }
@@ -318,6 +324,7 @@ TEST(Hdf5BackTest, ReadWriteAll) {
   using cyclus::Recorder;
   using cyclus::Hdf5Back;
   using cyclus::Cond;
+  std::cout << path << std::endl;
   FileDeleter fd(path);
 
   int i = 42;
