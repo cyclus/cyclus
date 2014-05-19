@@ -22,7 +22,7 @@ using std::string;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RequestTests, MaterialGetSet) {
   TestContext tc;
-  TestFacility* fac = new TestFacility(tc.get());
+  TestFacility* fac = tc.trader();
   Trader* excast = dynamic_cast<Trader*>(fac);
 
   string commod = "name";
@@ -39,12 +39,14 @@ TEST(RequestTests, MaterialGetSet) {
   EXPECT_EQ(excast, r->requester());
   EXPECT_EQ(mat, r->target());
   EXPECT_EQ(pref, r->preference());
+
+  delete r;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RequestTests, ProductGetSet) {
   TestContext tc;
-  TestFacility* fac = new TestFacility(tc.get());
+  TestFacility* fac = tc.trader();
   string commod = "name";
   double pref = 2.4;
   double qty = 1.0;
@@ -60,4 +62,6 @@ TEST(RequestTests, ProductGetSet) {
   EXPECT_EQ(fac, r->requester());
   EXPECT_EQ(rsrc, r->target());
   EXPECT_EQ(pref, r->preference());
+
+  delete r;
 }
