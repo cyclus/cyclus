@@ -9,21 +9,20 @@
 #include "env.h"
 #include "error.h"
 
-using cyclus::Nuc;
-using cyclus::CompMap;
-using cyclus::Composition;
-using cyclus::Material;
+namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, Constructors) {
   EXPECT_EQ(default_mat_->units(), "kg");
   EXPECT_EQ(default_mat_->type(), cyclus::Material::kType);
   EXPECT_GE(default_mat_->obj_id(), 0);
+  EXPECT_EQ(default_mat_->type(), Material::kType);
+  EXPECT_GE(default_mat_->id(), 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, Clone) {
-  cyclus::Resource::Ptr clone_mat;
+  Resource::Ptr clone_mat;
   ASSERT_NO_THROW(clone_mat = test_mat_->Clone());
 
   EXPECT_EQ(test_mat_->type(), clone_mat->type());
@@ -35,7 +34,7 @@ TEST_F(MaterialTest, Clone) {
 TEST_F(MaterialTest, ExtractRes) {
   EXPECT_DOUBLE_EQ(test_size_, test_mat_->quantity());
   double other_size = test_size_ / 3;
-  cyclus::Resource::Ptr other;
+  Resource::Ptr other;
   ASSERT_NO_THROW(other = test_mat_->ExtractRes(other_size));
   EXPECT_DOUBLE_EQ(test_size_ - other_size, test_mat_->quantity());
   EXPECT_DOUBLE_EQ(other_size, other->quantity());
@@ -44,8 +43,8 @@ TEST_F(MaterialTest, ExtractRes) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, SimpleAbsorb) {
   double val = 1.5 * units::kg;
-  cyclus::Material::Ptr m1 = cyclus::Material::CreateUntracked(val, test_comp_);
-  cyclus::Material::Ptr m2 = cyclus::Material::CreateUntracked(val, test_comp_);
+  Material::Ptr m1 = Material::CreateUntracked(val, test_comp_);
+  Material::Ptr m2 = Material::CreateUntracked(val, test_comp_);
   ASSERT_EQ(m1->comp(), m2->comp());
   ASSERT_EQ(m1->quantity(), m2->quantity());
 
@@ -58,12 +57,12 @@ TEST_F(MaterialTest, SimpleAbsorb) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbLikeMaterial) {
-  cyclus::Material::Ptr mat1;
-  cyclus::Material::Ptr mat2;
-  cyclus::Material::Ptr mat10;
-  mat1 = cyclus::Material::CreateUntracked(1 * test_size_, test_comp_);
-  mat2 = cyclus::Material::CreateUntracked(2 * test_size_, test_comp_);
-  mat10 = cyclus::Material::CreateUntracked(10 * test_size_, test_comp_);
+  Material::Ptr mat1;
+  Material::Ptr mat2;
+  Material::Ptr mat10;
+  mat1 = Material::CreateUntracked(1 * test_size_, test_comp_);
+  mat2 = Material::CreateUntracked(2 * test_size_, test_comp_);
+  mat10 = Material::CreateUntracked(10 * test_size_, test_comp_);
 
   // see that two materials with the same composition do the right thing
   double orig = test_mat_->quantity();
@@ -85,17 +84,18 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
+  Env::SetNucDataPath();
   // make a number of materials masses 1, 2, and 10
-  cyclus::Material::Ptr same_as_orig_test_mat = cyclus::Material::CreateUntracked(0,
+  Material::Ptr same_as_orig_test_mat = Material::CreateUntracked(0,
                                                 test_comp_);
 
   CompMap v;
   v[pb208_] = 1.0 * units::g;
   v[am241_] = 1.0 * units::g;
   v[th228_] = 1.0 * units::g;
-  cyclus::Composition::Ptr diff_test_comp = cyclus::Composition::CreateFromMass(
+  Composition::Ptr diff_test_comp = Composition::CreateFromMass(
                                               v);
-  cyclus::Material::Ptr diff_test_mat = cyclus::Material::CreateUntracked(
+  Material::Ptr diff_test_mat = Material::CreateUntracked(
                                         test_size_ / 2,
                                         diff_test_comp);
 
@@ -108,10 +108,10 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   EXPECT_NE(test_mat_->comp(), same_as_orig_test_mat->comp());
   EXPECT_DOUBLE_EQ(orig + origdiff, test_mat_->quantity());
   EXPECT_TRUE(std::abs(same_as_orig_test_mat->quantity() -
-                       test_mat_->quantity()) > cyclus::eps_rsrc());
+                       test_mat_->quantity()) > eps_rsrc());
 
   // see that an empty material appropriately absorbs a not empty material.
-  ASSERT_NO_THROW(default_mat_->Absorb(test_mat_));
+  ASSERT_NO_THROW(default_mat_->Absorb(test_mat_);
   EXPECT_DOUBLE_EQ(orig + origdiff, default_mat_->quantity());
 }
 
@@ -133,19 +133,19 @@ TEST_F(MaterialTest, AbsorbIntoZeroMaterial) {
 TEST_F(MaterialTest, ExtractMass) {
   double amt = test_size_ / 3;
   double diff = test_size_ - amt;
-  cyclus::Material::Ptr extracted;
+  Material::Ptr extracted;
   EXPECT_DOUBLE_EQ(test_mat_->quantity(), test_size_);  // we expect this amt
   EXPECT_NO_THROW(extracted = test_mat_->ExtractQty(amt));  // extract an amt
   EXPECT_DOUBLE_EQ(extracted->quantity(), amt);  // check correctness
   EXPECT_DOUBLE_EQ(test_mat_->quantity(), diff);  // check correctness
   EXPECT_EQ(test_mat_->comp(), extracted->comp());
   EXPECT_THROW(two_test_mat_->ExtractQty(2 * two_test_mat_->quantity()),
-               cyclus::Error);
+               Error);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractComplete) {
-  cyclus::Material::Ptr m1;
+  Material::Ptr m1;
   EXPECT_NO_THROW(m1 = test_mat_->ExtractComp(test_size_, test_comp_));
   EXPECT_EQ(m1->comp(), test_comp_);
   EXPECT_DOUBLE_EQ(0, test_mat_->quantity());
@@ -155,9 +155,9 @@ TEST_F(MaterialTest, ExtractComplete) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractOverQty) {
   EXPECT_THROW(diff_mat_->ExtractComp(2 * test_size_, test_comp_),
-               cyclus::ValueError);
+               ValueError);
   EXPECT_THROW(test_mat_->ExtractComp(2 * test_size_, test_comp_),
-               cyclus::ValueError);
+               ValueError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -169,18 +169,18 @@ TEST_F(MaterialTest, ExtractOverComp) {
   Composition::Ptr inexact_comp = Composition::CreateFromMass(inexact);
 
   EXPECT_THROW(diff_mat_->ExtractComp(test_size_, inexact_comp),
-               cyclus::ValueError);
+               ValueError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractHalf) {
-  cyclus::Material::Ptr m1 = two_test_mat_->ExtractComp(test_size_, test_comp_);
+  Material::Ptr m1 = two_test_mat_->ExtractComp(test_size_, test_comp_);
   EXPECT_DOUBLE_EQ(test_size_, m1->quantity());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbThenExtract) {
-  cyclus::Composition::Ptr comp_to_rem = cyclus::Composition::Ptr(test_comp_);
+  Composition::Ptr comp_to_rem = Composition::Ptr(test_comp_);
   double kg_to_rem = 0.25 * test_size_;
 
   // if you start with an empty material
@@ -196,7 +196,7 @@ TEST_F(MaterialTest, AbsorbThenExtract) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractInGrams) {
-  cyclus::Composition::Ptr comp_to_rem = cyclus::Composition::Ptr(test_comp_);
+  Composition::Ptr comp_to_rem = Composition::Ptr(test_comp_);
   double kg_to_rem = 0.25 * test_size_;
   double g_to_rem = 1000 * kg_to_rem;
 
@@ -213,12 +213,11 @@ TEST_F(MaterialTest, ExtractInGrams) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, DecayShortcut) {
-  using cyclus::Composition;
-  cyclus::Env::SetNucDataPath();
-  cyclus::CompMap mp;
+  Env::SetNucDataPath();
+  CompMap mp;
   mp[922350000] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(mp);
-  cyclus::Material::Ptr m = Material::CreateUntracked(1.0, c);
+  Material::Ptr m = Material::CreateUntracked(1.0, c);
 
   double u235_decay_const = 8.087e-11;  // per month
   double eps = 1e-3;
@@ -226,3 +225,5 @@ TEST_F(MaterialTest, DecayShortcut) {
   m->Decay(threshold * 0.9);
   EXPECT_EQ(c, m->comp());
 }
+
+} // namespace cyclus
