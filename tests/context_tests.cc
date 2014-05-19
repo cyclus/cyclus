@@ -25,6 +25,7 @@ class ContextTests: public ::testing::Test {
   }
 
   virtual void TearDown() {
+    delete fac;
     delete ctx;
   }
 };
