@@ -123,6 +123,18 @@ class SimInitTest : public ::testing::Test {
     remove(dbpath);
   }
 
+  void resetnextids() {
+    cy::Agent::next_id_ = 0;
+    cy::Resource::nextstate_id_ = 0;
+    cy::Resource::nextobj_id_ = 0;
+    cy::Composition::next_id_ = 0;
+    cy::Product::next_state_ = 0;
+  };
+  int agentid() { return cy::Agent::next_id_; };
+  int stateid() { return cy::Resource::nextstate_id_; };
+  int objid() { return cy::Resource::nextobj_id_; };
+  int compid() { return cy::Composition::next_id_; };
+  int prodid() { return cy::Product::next_state_; };
   int transid(cy::Context* ctx) { return ctx->trans_id_; };
   cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; };
 
@@ -133,11 +145,30 @@ class SimInitTest : public ::testing::Test {
 };
 
 TEST_F(SimInitTest, InitNextIds) {
+  // retrieve next ids from global static vars before overwriting them
+  int agent_id = agentid();
+  int rsrc_state_id = stateid();
+  int rsrc_obj_id = objid();
+  int comp_qual_id = compid();
+  int prod_qual_id = prodid();
+
+  resetnextids();
+  ASSERT_EQ(0, agentid());
+  ASSERT_EQ(0, stateid());
+  ASSERT_EQ(0, objid());
+  ASSERT_EQ(0, compid());
+  ASSERT_EQ(0, prodid());
+
   cy::SimInit si;
   si.Init(&rec, b);
   cy::Context* init_ctx = si.context();
 
   EXPECT_EQ(transid(ctx), transid(init_ctx));
+  EXPECT_EQ(agent_id, agentid());
+  EXPECT_EQ(rsrc_state_id, stateid());
+  EXPECT_EQ(rsrc_obj_id, objid());
+  EXPECT_EQ(comp_qual_id, compid());
+  EXPECT_EQ(prod_qual_id, prodid());
 }
 
 TEST_F(SimInitTest, InitRecipes) {

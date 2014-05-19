@@ -4,6 +4,8 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
+class SimInitTest;
+
 namespace cyclus {
 
 class Context;
@@ -34,6 +36,7 @@ typedef std::map<Nuc, double> CompMap;
 ///
 class Composition {
   friend class SimInit;
+  friend class ::SimInitTest;
 
  public:
   typedef boost::shared_ptr<Composition> Ptr;

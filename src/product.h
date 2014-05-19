@@ -8,6 +8,8 @@
 #include "resource.h"
 #include "res_tracker.h"
 
+class SimInitTest;
+
 namespace cyclus {
 
 /// A Product is a general type of resource in the Cyclus simulation,
@@ -16,6 +18,7 @@ namespace cyclus {
 /// man-hours, water, buying power, etc.
 class Product : public Resource {
   friend class SimInit;
+  friend class ::SimInitTest;
 
  public:
   typedef
