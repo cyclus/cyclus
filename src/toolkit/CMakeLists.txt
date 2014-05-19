@@ -9,13 +9,11 @@ SET(
   )
 
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
-FILE(GLOB cpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files} ${cpp_files} PARENT_SCOPE)
+SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files} PARENT_SCOPE)
 
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-FILE(GLOB hpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 INSTALL(
-  FILES ${h_files} ${hpp_files}
+  FILES ${h_files}
   DESTINATION include/cyclus/toolkit
   COMPONENT core
   )

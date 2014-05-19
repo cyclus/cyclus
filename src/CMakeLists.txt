@@ -59,15 +59,20 @@ SET(
   )
 
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
-SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
-SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
+SET(
+  cc_files ${cc_files} 
   "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
   )
+SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
 
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-FILE(GLOB hpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+SET(
+  h_files ${h_files}
+  any.hpp
+  OsiCbcSolverInterface.hpp
+  )
 INSTALL(
-  FILES ${h_files} ${hpp_files}
+  FILES ${h_files}
   DESTINATION include/cyclus
   COMPONENT core
   )
