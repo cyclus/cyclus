@@ -324,7 +324,6 @@ TEST(Hdf5BackTest, ReadWriteAll) {
   using cyclus::Recorder;
   using cyclus::Hdf5Back;
   using cyclus::Cond;
-  std::cout << path << std::endl;
   FileDeleter fd(path);
 
   int i = 42;
