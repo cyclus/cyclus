@@ -186,7 +186,7 @@ class Context {
   Datum* NewDatum(std::string title);
 
   /// Schedules a snapshot of simulation state to output database to occur at
-  /// the end of the current timestep.
+  /// the beginning of the next timestep.
   void Snapshot();
 
   /// Schedules the simulation to be terminated at the end of this timestep.

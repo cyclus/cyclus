@@ -53,7 +53,7 @@ class Timer {
   void SchedDecom(Agent* m, int time);
 
   /// Schedules a snapshot of simulation state to output database to occur at
-  /// the end of this timestep.
+  /// the beginning of the next timestep.
   void Snapshot() { want_snapshot_ = true; };
 
   /// Schedules the simulation to be terminated at the end of this timestep.
