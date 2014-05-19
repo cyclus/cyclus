@@ -86,6 +86,20 @@ class Trader {
 
  private:
   Agent* manager_;
+
+  /// @warning this function is hidden to prevent an invalid signature that can
+  /// raise difficult to find bugs
+  virtual std::set<BidPortfolio<Material>::Ptr>
+      GetMatlBids(const CommodMap<Material>::type& commod_requests) {
+    return std::set<BidPortfolio<Material>::Ptr>();
+  }
+
+  /// @warning this function is hidden to prevent an invalid signature that can
+  /// raise difficult to find bugs
+  virtual std::set<BidPortfolio<Product>::Ptr>
+      GetProductBids(const CommodMap<Product>::type& commod_requests) {
+    return std::set<BidPortfolio<Product>::Ptr>();
+  }
 };
 
 }  // namespace cyclus

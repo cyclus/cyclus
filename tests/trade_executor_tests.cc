@@ -72,7 +72,17 @@ class TradeExecutorTests : public ::testing::Test {
     trades.push_back(t3);
   }
 
-  virtual void TearDown() {}
+  virtual void TearDown() {
+    delete bid3;
+    delete bid2;
+    delete bid1;
+    delete req2;
+    delete req1;
+    delete r2;
+    delete r1;
+    delete s2;
+    delete s1;
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
