@@ -37,7 +37,8 @@ class ExchangeContextTests: public ::testing::Test {
   TestContext tc;
   TestFacility* fac1;
   TestFacility* fac2;
-  Request<Resource>::Ptr req1, req2;
+  Request<Resource>* req1;
+  Request<Resource>* req2;
   RequestPortfolio<Resource>::Ptr rp1, rp2;
   string commod1, commod2;
   double pref;
@@ -79,7 +80,7 @@ TEST_F(ExchangeContextTests, AddRequest1) {
   EXPECT_EQ(vp, context.requests);
 
   EXPECT_EQ(1, context.commod_requests[commod1].size());
-  std::vector<Request<Resource>::Ptr> vr;
+  std::vector<Request<Resource>*> vr;
   vr.push_back(req1);
   EXPECT_EQ(vr, context.commod_requests[commod1]);
 
@@ -103,7 +104,7 @@ TEST_F(ExchangeContextTests, AddRequest2) {
   EXPECT_EQ(vp, context.requests);
 
   EXPECT_EQ(2, context.commod_requests[commod1].size());
-  std::vector<Request<Resource>::Ptr> vr;
+  std::vector<Request<Resource>*> vr;
   vr.push_back(req1);
   vr.push_back(req2);
   EXPECT_EQ(vr, context.commod_requests[commod1]);
@@ -112,7 +113,7 @@ TEST_F(ExchangeContextTests, AddRequest2) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ExchangeContextTests, AddRequest3) {
   // 2 requests for 2 commod
-  Request<Resource>::Ptr req = rp1->AddRequest(get_mat(), fac1, commod2);
+  Request<Resource>* req = rp1->AddRequest(get_mat(), fac1, commod2);
 
   ExchangeContext<Resource> context;
 
@@ -121,7 +122,7 @@ TEST_F(ExchangeContextTests, AddRequest3) {
   EXPECT_EQ(1, context.commod_requests[commod1].size());
   EXPECT_EQ(1, context.commod_requests[commod2].size());
 
-  std::vector<Request<Resource>::Ptr> vr;
+  std::vector<Request<Resource>*> vr;
   vr.push_back(req1);
   EXPECT_EQ(vr, context.commod_requests[commod1]);
 

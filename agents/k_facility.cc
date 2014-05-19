@@ -79,7 +79,7 @@ cyclus::Material::Ptr KFacility::GetOffer(
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
 KFacility::GetMatlBids(
-    const cyclus::CommodMap<cyclus::Material>::type& commod_requests) {
+    cyclus::CommodMap<cyclus::Material>::type& commod_requests) {
   using cyclus::Bid;
   using cyclus::BidPortfolio;
   using cyclus::CapacityConstraint;
@@ -91,12 +91,12 @@ KFacility::GetMatlBids(
   if (commod_requests.count(out_commod_) > 0) {
     BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
 
-    const std::vector<Request<Material>::Ptr>& requests = commod_requests.at(
+    std::vector<Request<Material>*>& requests = commod_requests.at(
         out_commod_);
 
-    std::vector<Request<Material>::Ptr>::const_iterator it;
+    std::vector<Request<Material>*>::iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
-      const Request<Material>::Ptr req = *it;
+      Request<Material>* req = *it;
       Material::Ptr offer = GetOffer(req->target());
       port->AddBid(req, offer, this);
     }

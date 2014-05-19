@@ -43,14 +43,13 @@ class Trader {
 
   /// @brief default implementation for material requests
   virtual std::set<BidPortfolio<Material>::Ptr>
-      GetMatlBids(const CommodMap<Material>::type& commod_requests) {
+      GetMatlBids(CommodMap<Material>::type& commod_requests) {
     return std::set<BidPortfolio<Material>::Ptr>();
   }
 
   /// @brief default implementation for product requests
   virtual std::set<BidPortfolio<Product>::Ptr>
-      GetProductBids(const CommodMap<Product>::type&
-                     commod_requests) {
+      GetProductBids(CommodMap<Product>::type& commod_requests) {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
 

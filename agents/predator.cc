@@ -40,7 +40,7 @@ void Predator::AdjustProductPrefs(
     cyclus::PrefMap<cyclus::Product>::type& prefs) {
   if (prefs.size() == 0)
     return;
-  Request<Product>::Ptr req = prefs.begin()->first;
+  Request<Product>* req = prefs.begin()->first;
   std::map<Bid<Product>::Ptr, double>::iterator it;
   std::vector<Bid<Product>::Ptr> bids;
   for (it = prefs[req].begin(); it != prefs[req].end(); ++it) {

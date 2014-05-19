@@ -114,10 +114,10 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
   Request<T>* AddRequest(boost::shared_ptr<T> target,
-                                      Trader* requester,
-                                      std::string commodity = "",
-                                      double preference = 0,
-                                      bool exclusive = false) {
+                         Trader* requester,
+                         std::string commodity = "",
+                         double preference = 0,
+                         bool exclusive = false) {
     Request<T>* r =
         Request<T>::Create(target, requester, this->shared_from_this(),
                            commodity, preference, exclusive);

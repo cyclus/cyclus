@@ -69,9 +69,9 @@ Prey::GetProductBids(
 
   if (commod_requests.count(commod_) > 0) {
     BidPortfolio<Product>::Ptr port(new BidPortfolio<Product>());
-    const std::vector<Request<Product>::Ptr>& requests =
+    const std::vector<Request<Product>*>& requests =
         commod_requests.at(commod_);
-    std::vector<Request<Product>::Ptr>::const_iterator it;
+    std::vector<Request<Product>*>::const_iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
       // offer one wabbit
       port->AddBid(*it, Product::CreateUntracked(1, ""), this);

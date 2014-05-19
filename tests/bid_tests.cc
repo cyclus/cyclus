@@ -33,7 +33,7 @@ TEST(BidTests, MaterialGetSet) {
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   double qty = 1.0;
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
-  Request<Material>::Ptr req = get_req();
+  Request<Material>* req = get_req();
 
   Bid<Material>::Ptr r = Bid<Material>::Create(req, mat, fac);
 
@@ -51,7 +51,7 @@ TEST(BidTests, ProductGetSet) {
 
   Product::Ptr rsrc = Product::CreateUntracked(qty, quality);
 
-  Request<Product>::Ptr req = Request<Product>::Create(rsrc, trader);
+  Request<Product>* req = Request<Product>::Create(rsrc, trader);
 
   Bid<Product>::Ptr r = Bid<Product>::Create(req, rsrc, fac);
 

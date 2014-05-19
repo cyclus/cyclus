@@ -36,10 +36,11 @@ class Bid {
 
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
-  inline static typename Bid<T>::Ptr Create(Request<T>* request,
-                                            boost::shared_ptr<T> offer,
-                                            Trader* bidder,
-                                            bool exclusive = false) {
+  inline static typename Bid<T>::Ptr Create(
+      Request<T>* request,
+      boost::shared_ptr<T> offer,
+      Trader* bidder,
+      bool exclusive = false) {
     return Ptr(new Bid<T>(request, offer, bidder, exclusive));
   }
 

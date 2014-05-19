@@ -35,8 +35,8 @@ class BidPortfolioTests: public ::testing::Test {
   string commod1;
   string commod2;
 
-  Request<Material>::Ptr req1;
-  Request<Material>::Ptr req2;
+  Request<Material>* req1;
+  Request<Material>* req2;
 
   virtual void SetUp() {
     fac1 = new TestFacility(tc.get());

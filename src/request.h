@@ -36,17 +36,17 @@ class Request {
       std::string commodity = "",
       double preference = 0,
       bool exclusive = false) {
-    return new Request<T>(target, requester, portfolio, commodity, preference,
-                          exclusive);
+    return new Request<T>(target, requester, portfolio,
+                          commodity, preference, exclusive);
   }
 
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
   inline static Request<T>* Create(boost::shared_ptr<T> target,
-                                                Trader* requester,
-                                                std::string commodity = "",
-                                                double preference = 0,
-                                                bool exclusive = false) {
+                                   Trader* requester,
+                                   std::string commodity = "",
+                                   double preference = 0,
+                                   bool exclusive = false) {
     return new Request<T>(target, requester, commodity, preference,
                           exclusive);
   }
