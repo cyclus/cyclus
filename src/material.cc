@@ -11,16 +11,12 @@
 namespace cyclus {
 
 const ResourceType Material::kType = "Material";
-std::map<Material*, bool> Material::all_mats_;
 
-Material::~Material() {
-  all_mats_.erase(this);
-}
+Material::~Material() {}
 
 Material::Ptr Material::Create(Agent* creator, double quantity,
                                Composition::Ptr c) {
   Material::Ptr m(new Material(creator->context(), quantity, c));
-  all_mats_[m.get()] = true;
   m->tracker_.Create(creator);
   return m;
 }

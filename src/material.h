@@ -139,8 +139,6 @@ class Material: public Resource {
   Material(Context* ctx, double quantity, Composition::Ptr c);
 
  private:
-  static std::map<Material*, bool> all_mats_;
-
   Context* ctx_;
   double qty_;
   Composition::Ptr comp_;
