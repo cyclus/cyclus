@@ -1137,7 +1137,7 @@ class AnnotationsFilter(CodeGeneratorFilter):
                     'for {0}.");\n')
         s += ind + '}}\n'
         s += ind + 'return root;\n'
-        jstr = json.dumps(ctx, encoding='ascii', separators=(',', ':'))
+        jstr = json.dumps(ctx, separators=(',', ':'))
         if len(jstr) > 50:
             jstr = [j.replace('"', '\\"') for j in  textwrap.wrap(jstr, 50)]
             jstr = ('"\n  ' + ind + '"').join(jstr)
