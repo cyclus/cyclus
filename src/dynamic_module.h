@@ -87,7 +87,7 @@ class DynamicModule {
   /// for testing - see sim_init_tests
   friend class ::SimInitTest;
   /// for testing - see sim_init_tests
-  static std::map<std::string, Agent*> man_agents_;
+  static std::map<std::string, AgentCtor*> man_ctors_;
 
   /// the name of the module
   std::string path_;

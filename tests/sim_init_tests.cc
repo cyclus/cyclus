@@ -12,13 +12,14 @@
 static const char* dbpath = "testsiminit.sqlite";
 
 namespace cy = cyclus;
+using cy::Agent;
 
 class Inver : public cy::Facility {
  public:
   Inver(cy::Context* ctx) : cy::Facility(ctx), val1(0) {}
   virtual ~Inver() {}
 
-  virtual cy::Agent* Clone() {
+  virtual Agent* Clone() {
     Inver* i = new Inver(context());
     i->InitFrom(this);
     return i;
@@ -41,7 +42,7 @@ class Inver : public cy::Facility {
       ->Record();
   };
 
-  virtual void Build(cy::Agent* parent) {
+  virtual void Build(Agent* parent) {
     cy::Facility::Build(parent);
 
     cy::Composition::Ptr c = context()->GetRecipe("recipe1");
@@ -75,10 +76,17 @@ class Inver : public cy::Facility {
   int val1;
 };
 
+Agent* ConstructInver(cy::Context* ctx) {
+  return new Inver(ctx);
+}
+
 class SimInitTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     remove(dbpath);
+    resetnextids();
+    cy::DynamicModule::man_ctors_[":Inver:Inver"] = ConstructInver;
+
     b = new cy::SqliteBack(dbpath);
     rec.RegisterBackend(b);
     ctx = new cy::Context(&ti, &rec);
@@ -93,12 +101,13 @@ class SimInitTest : public ::testing::Test {
 
     // create initial prototypes
     Inver* a1 = new Inver(ctx);
-    cy::DynamicModule::man_agents_["::Inver"] = a1->Clone();
-    a1->spec("::Inver");
+    a1->spec(":Inver:Inver");
     a1->val1 = 23;
+    a1->prototype_ = "proto1";
     Inver* a2 = new Inver(ctx);
-    a2->spec("::Inver");
+    a2->spec(":Inver:Inver");
     a2->val1 = 26;
+    a2->prototype_ = "proto2";
 
     // manually snap and add prototypes
     cy::SimInit::SnapAgent(a1);
@@ -124,19 +133,21 @@ class SimInitTest : public ::testing::Test {
   }
 
   void resetnextids() {
-    cy::Agent::next_id_ = 0;
-    cy::Resource::nextstate_id_ = 0;
-    cy::Resource::nextobj_id_ = 0;
-    cy::Composition::next_id_ = 0;
-    cy::Product::next_state_ = 0;
+    Agent::next_id_ = 0;
+    cy::Resource::nextstate_id_ = 1;
+    cy::Resource::nextobj_id_ = 1;
+    cy::Composition::next_id_ = 1;
+    cy::Product::next_state_ = 1;
   };
-  int agentid() { return cy::Agent::next_id_; };
+  int agentid() { return Agent::next_id_; };
   int stateid() { return cy::Resource::nextstate_id_; };
   int objid() { return cy::Resource::nextobj_id_; };
   int compid() { return cy::Composition::next_id_; };
   int prodid() { return cy::Product::next_state_; };
   int transid(cy::Context* ctx) { return ctx->trans_id_; };
+
   cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; };
+  std::set<Agent*> agent_list(cy::Context* ctx) { return ctx->agent_list_; };
 
   cy::Context* ctx;
   cy::Timer ti;
@@ -154,10 +165,10 @@ TEST_F(SimInitTest, InitNextIds) {
 
   resetnextids();
   ASSERT_EQ(0, agentid());
-  ASSERT_EQ(0, stateid());
-  ASSERT_EQ(0, objid());
-  ASSERT_EQ(0, compid());
-  ASSERT_EQ(0, prodid());
+  ASSERT_EQ(1, stateid());
+  ASSERT_EQ(1, objid());
+  ASSERT_EQ(1, compid());
+  ASSERT_EQ(1, prodid());
 
   cy::SimInit si;
   si.Init(&rec, b);
@@ -169,22 +180,6 @@ TEST_F(SimInitTest, InitNextIds) {
   EXPECT_EQ(rsrc_obj_id, objid());
   EXPECT_EQ(comp_qual_id, compid());
   EXPECT_EQ(prod_qual_id, prodid());
-}
-
-TEST_F(SimInitTest, InitRecipes) {
-  cy::SimInit si;
-  si.Init(&rec, b);
-  cy::Context* init_ctx = si.context();
-
-  cy::CompMap orig1 = ctx->GetRecipe("recipe1")->mass();
-  cy::CompMap init1 = init_ctx->GetRecipe("recipe1")->mass();
-  EXPECT_FLOAT_EQ(orig1[922350000], init1[922350000]);
-  EXPECT_FLOAT_EQ(orig1[922380000], init1[922380000]);
-
-  cy::CompMap orig2 = ctx->GetRecipe("recipe1")->mass();
-  cy::CompMap init2 = init_ctx->GetRecipe("recipe1")->mass();
-  EXPECT_FLOAT_EQ(orig2[922350000], init2[922350000]);
-  EXPECT_FLOAT_EQ(orig2[922380000], init2[922380000]);
 }
 
 TEST_F(SimInitTest, InitSimInfo) {
@@ -204,6 +199,92 @@ TEST_F(SimInitTest, InitSimInfo) {
   EXPECT_EQ(si_orig.parent_sim, si_init.parent_sim);
   EXPECT_EQ(si_orig.parent_type, si_init.parent_type);
   EXPECT_EQ(si_orig.branch_time, si_init.branch_time);
+}
+
+TEST_F(SimInitTest, InitRecipes) {
+  cy::SimInit si;
+  si.Init(&rec, b);
+  cy::Context* init_ctx = si.context();
+
+  cy::CompMap orig1 = ctx->GetRecipe("recipe1")->mass();
+  cy::CompMap init1 = init_ctx->GetRecipe("recipe1")->mass();
+  EXPECT_FLOAT_EQ(orig1[922350000], init1[922350000]);
+  EXPECT_FLOAT_EQ(orig1[922380000], init1[922380000]);
+
+  cy::CompMap orig2 = ctx->GetRecipe("recipe1")->mass();
+  cy::CompMap init2 = init_ctx->GetRecipe("recipe1")->mass();
+  EXPECT_FLOAT_EQ(orig2[922350000], init2[922350000]);
+  EXPECT_FLOAT_EQ(orig2[922380000], init2[922380000]);
+}
+
+TEST_F(SimInitTest, InitProtos) {
+  cy::SimInit si;
+  si.Init(&rec, b);
+  cy::Context* init_ctx = si.context();
+
+  Inver* p1;
+  ASSERT_NO_THROW(p1 = init_ctx->CreateAgent<Inver>("proto1"));
+  EXPECT_EQ(23, p1->val1);
+  EXPECT_EQ(0, p1->buf1.count());
+  EXPECT_EQ(0, p1->buf2.count());
+  EXPECT_EQ("proto1", p1->prototype());
+  EXPECT_EQ(-1, p1->enter_time());
+  EXPECT_EQ(":Inver:Inver", p1->spec());
+
+  Inver* p2;
+  ASSERT_NO_THROW(p2 = init_ctx->CreateAgent<Inver>("proto2"));
+  EXPECT_EQ(26, p2->val1);
+  EXPECT_EQ(0, p2->buf1.count());
+  EXPECT_EQ(0, p2->buf2.count());
+  EXPECT_EQ("proto2", p2->prototype());
+}
+
+TEST_F(SimInitTest, InitAgentState) {
+  cy::SimInit si;
+  si.Init(&rec, b);
+  std::set<Agent*> agents = agent_list(ctx);
+  std::set<Agent*> init_agents = agent_list(si.context());
+
+  std::map<int, Agent*> byid;
+  std::map<int, Agent*> init_byid;
+  std::set<Agent*>::iterator it;
+  for (it = agents.begin(); it != agents.end(); ++it) {
+    byid[(*it)->id()] = *it;
+  }
+  for (it = init_agents.begin(); it != init_agents.end(); ++it) {
+    init_byid[(*it)->id()] = *it;
+  }
+
+  ASSERT_EQ(4, byid.size()); // 2 deployed, 2 protos
+  ASSERT_EQ(4, init_byid.size()); // 2 deployed, 2 protos
+
+  std::map<int, Agent*>::iterator i;
+  for (i = byid.begin(); i != byid.end(); ++i) {
+    int id = i->first;
+    Agent* agent = i->second;
+    if (i == byid.begin()) {
+      // skip the extra agent registered to DynamicModule for testing
+      continue;
+    } else if (agent->enter_time() == -1) {
+      // skip prototypes
+      continue;
+    }
+
+
+    bool was_loaded = init_byid.count(id) > 0;
+    EXPECT_TRUE(was_loaded) << "agent id " << id << " not found in loaded agents list";
+    if (!was_loaded) {
+      continue;
+    }
+
+    Agent* init_agent = init_byid[id];
+    EXPECT_EQ(agent->parent(), init_agent->parent());
+    EXPECT_EQ(agent->lifetime(), init_agent->lifetime());
+    EXPECT_EQ(agent->enter_time(), init_agent->enter_time());
+    EXPECT_EQ(agent->kind(), init_agent->kind());
+    EXPECT_EQ(agent->prototype(), init_agent->prototype());
+    EXPECT_EQ(agent->spec(), init_agent->spec());
+  }
 }
 
 TEST_F(SimInitTest, RestartSimInfo) {

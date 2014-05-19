@@ -208,6 +208,7 @@ void SimInit::LoadPrototypes() {
     AgentSpec spec(impl);
 
     Agent* m = DynamicModule::Make(ctx_, spec);
+    m->id_ = agentid;
 
     // note that we don't filter by SimTime here because prototypes remain
     // static over the life of the simulation and we only snapshot them once
@@ -420,6 +421,7 @@ Resource::Ptr SimInit::LoadMaterial(int state_id) {
   Agent* dummy = new Dummy(ctx_);
   Material::Ptr mat = Material::Create(dummy, qty, comp);
   mat->prev_decay_time_ = prev_decay;
+  ctx_->DelAgent(dummy);
 
   return mat;
 }
@@ -455,7 +457,9 @@ Resource::Ptr SimInit::LoadProduct(int state_id) {
   Product::stateids_[quality] = stateid;
 
   Agent* dummy = new Dummy(ctx_);
-  return Product::Create(dummy, qty, quality);
+  Resource::Ptr r = Product::Create(dummy, qty, quality);
+  ctx_->DelAgent(dummy);
+  return r;
 }
 
 } // namespace cyclus
