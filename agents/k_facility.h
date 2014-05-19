@@ -182,7 +182,7 @@ class KFacility : public cyclus::Facility {
   double max_inv_size_;
 
   #pragma cyclus var {'capacity': 'max_inv_size_'}
-  cyclus::ResourceBuff inventory_;
+  cyclus::toolkit::ResourceBuff inventory_;
 
   /**
      Conversion factors for input and output amounts.

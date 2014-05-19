@@ -85,7 +85,7 @@ CYCNS = 'cyclus'
 PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob', 
               'boost::uuids::uuid'}
 
-BUFFERS = {'{0}::ResourceBuff'.format(CYCNS)}
+BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS)}
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
              'std::map',}

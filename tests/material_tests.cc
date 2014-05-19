@@ -8,7 +8,6 @@
 #include "cyc_limits.h"
 #include "env.h"
 #include "error.h"
-#include "mat_query.h"
 
 using cyclus::Nuc;
 using cyclus::CompMap;
@@ -174,49 +173,9 @@ TEST_F(MaterialTest, ExtractOverComp) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(MaterialTest, ExtractCompleteInexactComp) {
-  // Complete extraction
-  // this should succeed even if inexact, within eps.
-  Material::Ptr m1;
-  // make an inexact composition
-
-  CompMap inexact = diff_comp_->mass();
-  inexact[am241_] *= (1 - cyclus::eps_rsrc() / test_size_);
-  Composition::Ptr inexact_comp = Composition::CreateFromMass(inexact);
-
-  m1 = diff_mat_->ExtractComp(test_size_, inexact_comp);
-  EXPECT_EQ(m1->comp(), inexact_comp);
-  EXPECT_NEAR(test_size_, m1->quantity(), cyclus::eps_rsrc());
-
-  cyclus::MatQuery mq(diff_mat_);
-  EXPECT_NEAR(0, mq.mass(am241_), cyclus::eps_rsrc());
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, ExtractHalf) {
   cyclus::Material::Ptr m1 = two_test_mat_->ExtractComp(test_size_, test_comp_);
   EXPECT_DOUBLE_EQ(test_size_, m1->quantity());
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(MaterialTest, ExtractDiffComp) {
-  // differing comp minus one element equals old comp minus new
-  cyclus::Material::Ptr m1;
-  double orig = diff_mat_->quantity();
-  CompMap v = diff_mat_->comp()->atom();
-
-  cyclus::MatQuery mq(diff_mat_);
-  const double orig_u235 = mq.mass(u235_);
-  const double orig_am241 = mq.mass(am241_);
-  const double orig_pb208 = mq.mass(pb208_);
-
-  EXPECT_NO_THROW(m1 = diff_mat_->ExtractComp(mq.mass(u235_), test_comp_));
-  EXPECT_DOUBLE_EQ(orig - m1->quantity(), diff_mat_->quantity());
-  EXPECT_EQ(m1->comp(), test_comp_);
-  EXPECT_NE(diff_mat_->comp(), test_comp_);
-  EXPECT_DOUBLE_EQ(orig_am241, mq.mass(am241_));
-  EXPECT_DOUBLE_EQ(orig_pb208, mq.mass(pb208_));
-  EXPECT_NE(orig_u235, mq.mass(u235_));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
