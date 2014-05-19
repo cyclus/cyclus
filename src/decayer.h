@@ -6,6 +6,7 @@
 #include <set>
 
 #include "composition.h"
+#include "error.h"
 #include "pyne.h"
 #include "use_matrix_lib.h"
 
