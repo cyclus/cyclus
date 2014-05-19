@@ -33,7 +33,7 @@ TEST(RequestTests, MaterialGetSet) {
   double qty = 1.0;
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
 
-  Request<Material>::Ptr r = Request<Material>::Create(mat, fac, commod, pref);
+  Request<Material>* r = Request<Material>::Create(mat, fac, commod, pref);
 
   EXPECT_EQ(commod, r->commodity());
   EXPECT_EQ(excast, r->requester());
@@ -53,7 +53,7 @@ TEST(RequestTests, ProductGetSet) {
   Product::Ptr rsrc =
       Product::CreateUntracked(qty, quality);
 
-  Request<Product>::Ptr r =
+  Request<Product>* r =
       Request<Product>::Create(rsrc, fac, commod, pref);
 
   EXPECT_EQ(commod, r->commodity());

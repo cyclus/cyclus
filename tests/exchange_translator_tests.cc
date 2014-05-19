@@ -83,10 +83,10 @@ struct MatConverter2 : public Converter<Material> {
 TEST(ExXlateTests, NegPref) {
   double pref = -1;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req =
+  Request<Material>* req =
       rp->AddRequest(get_mat(u235, qty), trader, "", pref);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid = bp->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
   ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());  
 
   ExchangeContext<Material> ctx;
@@ -151,9 +151,9 @@ TEST(ExXlateTests, XlateReq) {
 
   std::string commod = "commod";
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req =
+  Request<Material>* req =
       rp->AddRequest(get_mat(u235, qty), trader, commod);
-  Request<Material>::Ptr ereq =
+  Request<Material>* ereq =
       rp->AddRequest(get_mat(u235, qty), trader, commod, 0, true);
   rp->AddConstraint(cc1);
   rp->AddConstraint(cc2);
@@ -181,7 +181,7 @@ TEST(ExXlateTests, XlateReq) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateBid) {
   std::string commod = "commod";
-  Request<Material>::Ptr req =
+  Request<Material>* req =
       Request<Material>::Create(get_mat(u235, qty), trader, commod);
 
   Converter<Material>::Ptr c1(new MatConverter1());
@@ -196,9 +196,9 @@ TEST(ExXlateTests, XlateBid) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
   BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid = port->AddBid(req, get_mat(u235, qty), trader);
-  Bid<Material>::Ptr ebid = port->AddBid(req, get_mat(u235, qty), trader, true);
-  Bid<Material>::Ptr ebid2 = port->AddBid(req, get_mat(u235, qty), trader,
+  Bid<Material>* bid = port->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>* ebid = port->AddBid(req, get_mat(u235, qty), trader, true);
+  Bid<Material>* ebid2 = port->AddBid(req, get_mat(u235, qty), trader,
                                           true);
   port->AddConstraint(cc1);
   port->AddConstraint(cc2);
@@ -246,11 +246,11 @@ TEST(ExXlateTests, XlateArc) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), trader);
+  Request<Material>* req = rport->AddRequest(get_mat(u235, qty), trader);
   rport->AddConstraint(cc1);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid = bport->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>* bid = bport->AddBid(req, get_mat(u235, qty), trader);
   bport->AddConstraint(cc1);
   bport->AddConstraint(cc2);
 
@@ -283,27 +283,27 @@ TEST(ExXlateTests, XlateArcExclusive) {
   bool exclusive = true;
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req = rport->AddRequest(get_mat(u235, qty), trader,
+  Request<Material>* req = rport->AddRequest(get_mat(u235, qty), trader,
                                                  "", 0, exclusive);
-  Request<Material>::Ptr req2 = rport->AddRequest(get_mat(u235, qty), trader,
+  Request<Material>* req2 = rport->AddRequest(get_mat(u235, qty), trader,
                                                   "", 0, !exclusive);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  Bid<Material>::Ptr bid1 = bport->AddBid(req, get_mat(u235, qty  + 1), trader,
+  Bid<Material>* bid1 = bport->AddBid(req, get_mat(u235, qty  + 1), trader,
                                           !exclusive);
-  Bid<Material>::Ptr bid2 = bport->AddBid(req, get_mat(u235, qty), trader,
+  Bid<Material>* bid2 = bport->AddBid(req, get_mat(u235, qty), trader,
                                           !exclusive);
-  Bid<Material>::Ptr bid3 = bport->AddBid(req, get_mat(u235, qty - 1), trader,
+  Bid<Material>* bid3 = bport->AddBid(req, get_mat(u235, qty - 1), trader,
                                           !exclusive);
-  Bid<Material>::Ptr bid4 = bport->AddBid(req, get_mat(u235, qty + 1), trader,
+  Bid<Material>* bid4 = bport->AddBid(req, get_mat(u235, qty + 1), trader,
                                           exclusive);
-  Bid<Material>::Ptr bid5 = bport->AddBid(req, get_mat(u235, qty), trader,
+  Bid<Material>* bid5 = bport->AddBid(req, get_mat(u235, qty), trader,
                                           exclusive);
-  Bid<Material>::Ptr bid6 = bport->AddBid(req2, get_mat(u235, qty - 1), trader,
+  Bid<Material>* bid6 = bport->AddBid(req2, get_mat(u235, qty - 1), trader,
                                           exclusive);
-  Bid<Material>::Ptr bid7 = bport->AddBid(req2, get_mat(u235, qty), trader,
+  Bid<Material>* bid7 = bport->AddBid(req2, get_mat(u235, qty), trader,
                                           exclusive);
-  Bid<Material>::Ptr bid8 = bport->AddBid(req2, get_mat(u235, qty + 1), trader,
+  Bid<Material>* bid8 = bport->AddBid(req2, get_mat(u235, qty + 1), trader,
                                           exclusive);
 
   ExchangeContext<Material> ctx;
@@ -360,7 +360,7 @@ TEST(ExXlateTests, SimpleXlate) {
   std::string commod = "c";
   double pref = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>::Ptr req =
+  Request<Material>* req =
       rport->AddRequest(get_mat(u235, qty), trader, commod, pref);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
@@ -388,10 +388,10 @@ TEST(ExXlateTests, BackXlate) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  Request<Material>::Ptr ur(get_req());
-  Request<Material>::Ptr xr(get_req());
-  Bid<Material>::Ptr vb(get_bid());
-  Bid<Material>::Ptr yb(get_bid());
+  Request<Material>* ur(get_req());
+  Request<Material>* xr(get_req());
+  Bid<Material>* vb(get_bid());
+  Bid<Material>* yb(get_bid());
 
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());

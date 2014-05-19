@@ -30,20 +30,20 @@ inline std::set<RequestPortfolio<Product>::Ptr>
 
 template<class T>
 inline static std::set<typename BidPortfolio<T>::Ptr>
-    QueryBids(Trader* t, const typename CommodMap<T>::type& map) {
+    QueryBids(Trader* t, typename CommodMap<T>::type& map) {
   throw StateError("Non-specialized version of QueryBids not supported");
 }
 
 template<>
 inline std::set<BidPortfolio<Material>::Ptr>
-    QueryBids<Material>(Trader* t, const CommodMap<Material>::type& map) {
+    QueryBids<Material>(Trader* t, CommodMap<Material>::type& map) {
   return t->GetMatlBids(map);
 }
 
 template<>
 inline std::set<BidPortfolio<Product>::Ptr>
     QueryBids<Product>(Trader* t,
-                               const CommodMap<Product>::type& map) {
+                       CommodMap<Product>::type& map) {
   return t->GetProductBids(map);
 }
 

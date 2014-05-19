@@ -49,7 +49,7 @@ class RequestPortfolioTests: public ::testing::Test {
 TEST_F(RequestPortfolioTests, ReqAdd) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   EXPECT_EQ(rp->requests().size(), 0);
-  Request<Material>::Ptr r1 = rp->AddRequest(get_mat(), fac1);
+  Request<Material>* r1 = rp->AddRequest(get_mat(), fac1);
   EXPECT_EQ(rp->requester(), fac1);
   EXPECT_EQ(rp->requests().size(), 1);
   EXPECT_EQ(rp->qty(), get_mat()->quantity());
@@ -108,16 +108,16 @@ TEST_F(RequestPortfolioTests, DefaultConstraint) {
   double avg = (m1qty + m2qty) / 2;
   double totalqty = rqty + avg;
 
-  Request<Material>::Ptr r = rp->AddRequest(get_mat(92235, rqty), fac1);
-  Request<Material>::Ptr m1 = rp->AddRequest(get_mat(92235, m1qty), fac1);
-  Request<Material>::Ptr m2 = rp->AddRequest(get_mat(92235, m2qty), fac1);
+  Request<Material>* r = rp->AddRequest(get_mat(92235, rqty), fac1);
+  Request<Material>* m1 = rp->AddRequest(get_mat(92235, m1qty), fac1);
+  Request<Material>* m2 = rp->AddRequest(get_mat(92235, m2qty), fac1);
 
-  std::vector<Request<Material>::Ptr> mutuals;
+  std::vector<Request<Material>*> mutuals;
   mutuals.push_back(m1);
   mutuals.push_back(m2);
   rp->AddMutualReqs(mutuals);
 
-  std::map<Request<Material>::Ptr, double> coeffs;
+  std::map<Request<Material>*, double> coeffs;
   coeffs[r] = 1;
   coeffs[m1] = m1qty / avg;
   coeffs[m2] = m2qty / avg;

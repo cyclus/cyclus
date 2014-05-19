@@ -14,14 +14,14 @@ namespace cyclus {
 /// quantity. Finally, Trades have a price member which is not currently used.
 template <class T>
 struct Trade {
-  typename Request<T>::Ptr request;
-  typename Bid<T>::Ptr bid;
+  Request<T>* request;
+  Bid<T>* bid;
   double amt;
   double price;
 
   Trade() : amt(0), price(0) {}
 
-  Trade(typename Request<T>::Ptr request, typename Bid<T>::Ptr bid, double amt)
+  Trade(Request<T>* request, Bid<T>* bid, double amt)
       : request(request),
         bid(bid),
         amt(amt),

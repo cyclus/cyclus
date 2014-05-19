@@ -40,7 +40,7 @@ cyclus::Material::Ptr Source::GetOffer(
 
 std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
 Source::GetMatlBids(
-    const cyclus::CommodMap<cyclus::Material>::type& commod_requests) {
+    cyclus::CommodMap<cyclus::Material>::type& commod_requests) {
   using cyclus::Bid;
   using cyclus::BidPortfolio;
   using cyclus::CapacityConstraint;
@@ -52,12 +52,11 @@ Source::GetMatlBids(
   if (commod_requests.count(commod_) > 0) {
     BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
 
-    const std::vector<Request<Material>::Ptr>& requests = commod_requests.at(
-        commod_);
+    std::vector<Request<Material>*>& requests = commod_requests[commod_];
 
-    std::vector<Request<Material>::Ptr>::const_iterator it;
+    std::vector<Request<Material>*>::iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
-      const Request<Material>::Ptr req = *it;
+      Request<Material>* req = *it;
       Material::Ptr offer = GetOffer(req->target());
       port->AddBid(req, offer, this);
     }
