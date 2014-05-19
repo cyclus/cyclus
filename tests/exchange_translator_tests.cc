@@ -233,6 +233,8 @@ TEST(ExXlateTests, XlateBid) {
   t = (test == xlator.translation_ctx().bid_to_node[ebid2] ||
        test == xlator.translation_ctx().bid_to_node[ebid]);
   EXPECT_TRUE(t);
+
+  delete req;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
