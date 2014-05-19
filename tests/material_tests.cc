@@ -111,7 +111,7 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
                        test_mat_->quantity()) > eps_rsrc());
 
   // see that an empty material appropriately absorbs a not empty material.
-  ASSERT_NO_THROW(default_mat_->Absorb(test_mat_);
+  ASSERT_NO_THROW(default_mat_->Absorb(test_mat_));
   EXPECT_DOUBLE_EQ(orig + origdiff, default_mat_->quantity());
 }
 
