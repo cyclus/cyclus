@@ -59,35 +59,35 @@ class Source : public cyclus::Facility {
      @brief sets the output commodity name
      @param name the commodity name
    */
-  inline void commodity(std::string name) { commod_ = name; }
+  inline void commodity(std::string name) { commod = name; }
 
   /// @return the output commodity
-  inline std::string commodity() const { return commod_; }
+  inline std::string commodity() const { return commod; }
 
   /**
      @brief sets the capacity of a material generated at any given time step
-     @param capacity the production capacity
+     @param cap the production capacity
    */
-  inline void capacity(double capacity) { capacity_ = capacity; }
+  inline void Capacity(double cap) { capacity = cap; }
 
   /// @return the production capacity at any given time step
-  inline double capacity() const { return capacity_; }
+  inline double Capacity() const { return capacity; }
 
   /**
      @brief sets the name of the recipe to be produced
      @param name the recipe name
    */
-  inline void recipe(std::string name) { recipe_name_ = name; }
+  inline void recipe(std::string name) { recipe_name = name; }
 
   /// @return the name of the output recipe
-  inline std::string recipe() const { return recipe_name_; }
+  inline std::string recipe() const { return recipe_name; }
 
  private:
   #pragma cyclus var {}
-  std::string commod_;
+  std::string commod;
 
   #pragma cyclus var {}
-  std::string recipe_name_;
+  std::string recipe_name;
 
   /**
      The capacity is defined in terms of the number of units of the
@@ -95,7 +95,7 @@ class Source : public cyclus::Facility {
      can be provided to represent infinte capacity.
    */
   #pragma cyclus var {}
-  double capacity_;
+  double capacity;
 };
 
 }  // namespace cyclus

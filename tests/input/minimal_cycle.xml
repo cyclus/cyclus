@@ -25,13 +25,13 @@
     </module>
     <agent>
       <KFacility>
-        <in_commod_>commodityB</in_commod_>
-        <in_capacity_>1</in_capacity_>
-        <k_factor_in_>1</k_factor_in_>
-        <out_commod_>commodityA</out_commod_>
-        <recipe_name_>commod_recipe</recipe_name_>
-        <out_capacity_>1</out_capacity_>
-        <k_factor_out_>1</k_factor_out_>
+        <in_commod>commodityB</in_commod>
+        <in_capacity>1</in_capacity>
+        <k_factor_in>1</k_factor_in>
+        <out_commod>commodityA</out_commod>
+        <recipe_name>commod_recipe</recipe_name>
+        <out_capacity>1</out_capacity>
+        <k_factor_out>1</k_factor_out>
       </KFacility>
     </agent>
   </facility>
@@ -44,13 +44,13 @@
     </module>
     <agent>
       <KFacility>
-        <in_commod_>commodityA</in_commod_>
-        <in_capacity_>1</in_capacity_>
-        <k_factor_in_>1</k_factor_in_>
-        <out_commod_>commodityB</out_commod_>
-        <recipe_name_>commod_recipe</recipe_name_>
-        <out_capacity_>1</out_capacity_>
-        <k_factor_out_>1</k_factor_out_>
+        <in_commod>commodityA</in_commod>
+        <in_capacity>1</in_capacity>
+        <k_factor_in>1</k_factor_in>
+        <out_commod>commodityB</out_commod>
+        <recipe_name>commod_recipe</recipe_name>
+        <out_capacity>1</out_capacity>
+        <k_factor_out>1</k_factor_out>
       </KFacility>
     </agent>
   </facility>

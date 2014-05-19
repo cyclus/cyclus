@@ -21,7 +21,7 @@
     </module>
     <agent>
       <Prey>
-        <commod_>commodity</commod_>
+        <commod>commodity</commod>
       </Prey>
     </agent>
   </facility>

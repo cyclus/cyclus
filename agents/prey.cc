@@ -6,11 +6,11 @@ namespace cyclus {
 
 Prey::Prey(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      commod_(""),
-      dead_(0),
-      nchildren_(1),
-      birth_freq_(1),
-      age_(0) {}
+      commod(""),
+      dead(0),
+      nchildren(1),
+      birth_freq(1),
+      age(0) {}
 
 void Prey::EnterNotify() {
   cyclus::Facility::EnterNotify();
@@ -26,15 +26,15 @@ void Prey::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "Prey") << name() << " is ticking {";
   LOG(cyclus::LEV_INFO4, "Prey") << "will offer " << 1
                                    << " units of "
-                                   << commod_ << ".";
+                                   << commod << ".";
   LOG(cyclus::LEV_INFO3, "Prey") << "}";
 }
 
 void Prey::GiveBirth() {
-  bool policy = dead_ ? birth_and_death_ : true;
-  if (age_ % birth_freq_ == 0 && policy) {
+  bool policy = dead ? birth_and_death : true;
+  if (age % birth_freq == 0 && policy) {
     LOG(cyclus::LEV_INFO3, "Prey") << name() << " is having children";
-    for (int i = 0; i < nchildren_; ++i) {
+    for (int i = 0; i < nchildren; ++i) {
       context()->SchedBuild(NULL, prototype());
     }
   }
@@ -43,7 +43,7 @@ void Prey::GiveBirth() {
 void Prey::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "Prey") << name() << " is tocking {";
     
-  if (dead_) {
+  if (dead) {
     LOG(cyclus::LEV_INFO3, "Prey") << name() << " got eaten";
     context()->SchedDecom(this);
     LOG(cyclus::LEV_INFO3, "Prey") << "}";
@@ -51,7 +51,7 @@ void Prey::Tock(int time) {
   
   GiveBirth();
   
-  age_++;  // getting older
+  age++;  // getting older
 
   LOG(cyclus::LEV_INFO3, "Prey") << "}";
 }
@@ -67,10 +67,10 @@ Prey::GetProductBids(
 
   std::set<BidPortfolio<Product>::Ptr> ports;
 
-  if (commod_requests.count(commod_) > 0) {
+  if (commod_requests.count(commod) > 0) {
     BidPortfolio<Product>::Ptr port(new BidPortfolio<Product>());
     std::vector<Request<Product>*>& requests =
-        commod_requests.at(commod_);
+        commod_requests.at(commod);
     std::vector<Request<Product>*>::iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
       // offer one wabbit
@@ -101,7 +101,7 @@ void Prey::GetProductTrades(
     responses.push_back(std::make_pair(*it, response));
     LOG(cyclus::LEV_INFO5, "Prey") << name() << " just received an order"
                                      << " for " << qty
-                                     << " of " << commod_;
+                                     << " of " << commod;
   }
   if (cyclus::IsNegative(current_capacity)) {
     std::stringstream ss;
@@ -110,7 +110,7 @@ void Prey::GetProductTrades(
     throw cyclus::ValueError(Agent::InformErrorMsg(ss.str()));
   }
 
-  if (provided > 0) dead_ = 1; // They came from... behind! 
+  if (provided > 0) dead = 1; // They came from... behind! 
 }
 
 extern "C" cyclus::Agent* ConstructPrey(cyclus::Context* ctx) {

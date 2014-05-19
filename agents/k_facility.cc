@@ -8,13 +8,13 @@ namespace cyclus {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KFacility::KFacility(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      in_commod_(""),
-      out_commod_(""),
-      recipe_name_(""),
-      k_factor_in_(1),
-      k_factor_out_(1),
-      in_capacity_(100),
-      out_capacity_(100) {}
+      in_commod(""),
+      out_commod(""),
+      recipe_name(""),
+      k_factor_in(1),
+      k_factor_out(1),
+      in_capacity(100),
+      out_capacity(100) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 KFacility::~KFacility() {}
@@ -24,16 +24,16 @@ std::string KFacility::str() {
   std::stringstream ss;
   ss << cyclus::Facility::str()
      << " supplies commodity '"
-     << out_commod_ << "' with recipe '"
-     << recipe_name_ << "' at a capacity of "
-     << out_capacity_ << " kg per time step "
+     << out_commod << "' with recipe '"
+     << recipe_name << "' at a capacity of "
+     << out_capacity << " kg per time step "
      << ", changing per step by a factor "
-     << k_factor_out_ << "\n"
+     << k_factor_out << "\n"
      << "This facility also requests '"
-     << in_commod_ << "' at a capacity of "
-     << in_capacity_ << " kg per time step "
+     << in_commod << "' at a capacity of "
+     << in_capacity << " kg per time step "
      << ", changing per step by a factor "
-     << k_factor_in_;
+     << k_factor_in;
   return ss.str();
 }
 
@@ -42,16 +42,16 @@ void KFacility::Tick(int time) {
   using std::string;
   using std::vector;
   LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is ticking";
-  LOG(cyclus::LEV_INFO4, "KFac") << "will offer " << out_capacity_
+  LOG(cyclus::LEV_INFO4, "KFac") << "will offer " << out_capacity
                                    << " kg of "
-                                   << out_commod_ << ".";
-  current_capacity_ = out_capacity_;  // reset capacity
+                                   << out_commod << ".";
+  current_capacity = out_capacity;  // reset capacity
 
-  double requestAmt = RequestAmt();
+  double request_amt = RequestAmt();
   // inform the simulation about what the sink facility will be requesting
-  if (requestAmt > cyclus::eps()) {
-    LOG(cyclus::LEV_INFO4, "KFac") << " will request " << requestAmt
-        << " kg of " << in_commod_ << ".";
+  if (request_amt > cyclus::eps()) {
+    LOG(cyclus::LEV_INFO4, "KFac") << " will request " << request_amt
+        << " kg of " << in_commod << ".";
   }
 }
 
@@ -59,21 +59,21 @@ void KFacility::Tick(int time) {
 void KFacility::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is tocking";
   LOG(cyclus::LEV_INFO4, "KFac") << "KFacility " << this->id()
-                                   << " is holding " << inventory_.quantity()
+                                   << " is holding " << inventory.quantity()
                                    << " units of material at the close of month "
                                    << time << ".";
   // Update capacity for the next step
-  in_capacity_ = in_capacity_ * k_factor_in_;
-  out_capacity_ = out_capacity_ * k_factor_out_;
-  current_capacity_ = out_capacity_;
+  in_capacity = in_capacity * k_factor_in;
+  out_capacity = out_capacity * k_factor_out;
+  current_capacity = out_capacity;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Material::Ptr KFacility::GetOffer(
     const cyclus::Material::Ptr target) const {
   using cyclus::Material;
-  double qty = std::min(target->quantity(), out_capacity_);
-  return Material::CreateUntracked(qty, context()->GetRecipe(recipe_name_));
+  double qty = std::min(target->quantity(), out_capacity);
+  return Material::CreateUntracked(qty, context()->GetRecipe(recipe_name));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -88,11 +88,11 @@ KFacility::GetMatlBids(
 
   std::set<BidPortfolio<Material>::Ptr> ports;
 
-  if (commod_requests.count(out_commod_) > 0) {
+  if (commod_requests.count(out_commod) > 0) {
     BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
 
     std::vector<Request<Material>*>& requests = commod_requests.at(
-        out_commod_);
+        out_commod);
 
     std::vector<Request<Material>*>::iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
@@ -101,7 +101,7 @@ KFacility::GetMatlBids(
       port->AddBid(req, offer, this);
     }
 
-    CapacityConstraint<Material> cc(out_capacity_);
+    CapacityConstraint<Material> cc(out_capacity);
     port->AddConstraint(cc);
     ports.insert(port);
   }
@@ -120,20 +120,20 @@ void KFacility::GetMatlTrades(
   std::vector< cyclus::Trade<cyclus::Material> >::const_iterator it;
   for (it = trades.begin(); it != trades.end(); ++it) {
     double qty = it->amt;
-    current_capacity_ -= qty;
+    current_capacity -= qty;
     provided += qty;
     // @TODO we need a policy on negatives..
     Material::Ptr response = Material::Create(this, qty,
-                                              context()->GetRecipe(recipe_name_));
+                                              context()->GetRecipe(recipe_name));
     responses.push_back(std::make_pair(*it, response));
     LOG(cyclus::LEV_INFO5, "KFac") << prototype() << " just received an order"
                                      << " for " << qty
-                                     << " of " << out_commod_;
+                                     << " of " << out_commod;
   }
-  if (cyclus::IsNegative(current_capacity_)) {
+  if (cyclus::IsNegative(current_capacity)) {
     std::stringstream ss;
     ss << "is being asked to provide " << provided
-       << " but its capacity is " <<out_capacity_ << ".";
+       << " but its capacity is " <<out_capacity << ".";
     throw cyclus::ValueError(Agent::InformErrorMsg(ss.str()));
   }
 }
@@ -155,7 +155,7 @@ KFacility::GetMatlRequests() {
     CapacityConstraint<Material> cc(amt);
     port->AddConstraint(cc);
 
-    port->AddRequest(mat, this, in_commod_);
+    port->AddRequest(mat, this, in_commod);
 
     ports.insert(port);
   }  // if amt > eps
@@ -181,7 +181,7 @@ KFacility::GetProductRequests() {
 
     std::string quality = "";  // not clear what this should be..
     Product::Ptr rsrc = Product::CreateUntracked(amt, quality);
-    port->AddRequest(rsrc, this, in_commod_);
+    port->AddRequest(rsrc, this, in_commod);
 
     ports.insert(port);
   }  // if amt > eps
@@ -196,7 +196,7 @@ void KFacility::AcceptMatlTrades(
   std::vector< std::pair<cyclus::Trade<cyclus::Material>,
   cyclus::Material::Ptr> >::const_iterator it;
   for (it = responses.begin(); it != responses.end(); ++it) {
-    inventory_.Push(it->second);
+    inventory.Push(it->second);
   }
 }
 
@@ -207,7 +207,7 @@ void KFacility::AcceptProductTrades(
   std::vector< std::pair<cyclus::Trade<cyclus::Product>,
   cyclus::Product::Ptr> >::const_iterator it;
   for (it = responses.begin(); it != responses.end(); ++it) {
-    inventory_.Push(it->second);
+    inventory.Push(it->second);
   }
 }
 

@@ -25,10 +25,10 @@ class Context;
 
    @section params Parameters
    The parameters relevant to simulation tests:
-      #. k_factor_in_ : a conversion factor for input commodity or request.
-      #. k_factor_out_ : a conversion factor for output commodity or bid.
-      #. in_capacity_ : an initial capacity for input commodity.
-      #. out_capacity_ : an initial capacity for output commodity.
+      #. k_factor_in : a conversion factor for input commodity or request.
+      #. k_factor_out : a conversion factor for output commodity or bid.
+      #. in_capacity : an initial capacity for input commodity.
+      #. out_capacity : an initial capacity for output commodity.
  */
 class KFacility : public cyclus::Facility {
  public:
@@ -96,69 +96,69 @@ class KFacility : public cyclus::Facility {
      @brief sets the output commodity name
      @param name the commodity name
    */
-  inline void commodity(std::string name) { out_commod_ = name; }
+  inline void commodity(std::string name) { out_commod = name; }
 
   /// @return the output commodity
-  inline std::string commodity() const { return out_commod_; }
+  inline std::string commodity() const { return out_commod; }
 
   /**
      @brief sets the capacity of a material generated at any given time step
      @param capacity the production capacity
    */
   inline void capacity(double capacity) {
-    out_capacity_ = capacity;
-    current_capacity_ = out_capacity_;
+    out_capacity = capacity;
+    current_capacity = out_capacity;
   }
 
   /// @return the production capacity at any given time step
-  inline double capacity() const { return out_capacity_; }
+  inline double capacity() const { return out_capacity; }
 
   /**
      @brief sets the name of the recipe to be produced
      @param name the recipe name
    */
-  inline void recipe(std::string name) { recipe_name_ = name; }
+  inline void recipe(std::string name) { recipe_name = name; }
 
   /// @return the name of the output recipe
-  inline std::string recipe() const { return recipe_name_; }
+  inline std::string recipe() const { return recipe_name; }
 
   /// @return the current timestep's capacity
-  inline double current_capacity() const { return current_capacity_; }
+  inline double CurrentCapacity() const { return current_capacity; }
 
   /**
      @brief determines the amount to request
    */
-  inline double RequestAmt() const { return in_capacity_; }
+  inline double RequestAmt() const { return in_capacity; }
 
   /// @ return the conversion factor input
-  inline double k_factor_in() const { return k_factor_in_; }
+  inline double KFactorIn() const { return k_factor_in; }
 
   /// @brief sets the conversion factor input
   /// @param new conversion factor
-  inline void k_factor_in(double k_factor) { k_factor_in_ = k_factor; }
+  inline void KFactorIn(double k_factor) { k_factor_in = k_factor; }
 
   /// @ return the conversion factor for output
-  inline double k_factor_out() const { return k_factor_out_; }
+  inline double KFactorOut() const { return k_factor_out; }
 
   /// @brief sets the conversion factor for output
   /// @param new conversion factor
-  inline void k_factor_out(double k_factor) { k_factor_out_ = k_factor; }
+  inline void KFactorOut(double k_factor) { k_factor_out = k_factor; }
 
  private:
   /**
      This facility has one output commodity and one input commodity
    */
   #pragma cyclus var {}
-  std::string in_commod_;
+  std::string in_commod;
 
   #pragma cyclus var {}
-  std::string out_commod_;
+  std::string out_commod;
 
   /**
      Name of the recipe this facility uses.
    */
   #pragma cyclus var {'shape': [50]}
-  std::string recipe_name_;
+  std::string recipe_name;
 
   /**
      The capacity is defined in terms of the number of units of the
@@ -167,31 +167,31 @@ class KFacility : public cyclus::Facility {
      In and out commodity capacities are defined.
    */
   #pragma cyclus var {}
-  double in_capacity_;
+  double in_capacity;
 
   #pragma cyclus var {}
-  double out_capacity_;
+  double out_capacity;
 
   /**
      The output capacity at the current time step.
    */
   #pragma cyclus var {"default": 0}
-  double current_capacity_;
+  double current_capacity;
 
   #pragma cyclus var {"default": 1e299}
-  double max_inv_size_;
+  double max_inv_size;
 
-  #pragma cyclus var {'capacity': 'max_inv_size_'}
-  cyclus::ResourceBuff inventory_;
+  #pragma cyclus var {'capacity': 'max_inv_size'}
+  cyclus::ResourceBuff inventory;
 
   /**
      Conversion factors for input and output amounts.
    */
   #pragma cyclus var {}
-  double k_factor_in_;
+  double k_factor_in;
 
   #pragma cyclus var {}
-  double k_factor_out_;
+  double k_factor_out;
 };
 
 }  // namespace cyclus

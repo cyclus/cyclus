@@ -34,16 +34,16 @@ def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
     i = 0  # to tract a number of sets
 
     for f in fs_read:
-        if f.count("k_factor_in_"):
+        if f.count("k_factor_in"):
             assert(not k_in_changed)
-            f = f.split("<")[0] + "<k_factor_in_>" + str(k_factor_in) + \
-                "</k_factor_in_>\n"
+            f = f.split("<")[0] + "<k_factor_in>" + str(k_factor_in) + \
+                "</k_factor_in>\n"
             k_in_changed = True
 
-        elif f.count("k_factor_out_"):
+        elif f.count("k_factor_out"):
             assert(k_in_changed)
-            f = f.split("<")[0] + "<k_factor_out_>" + str(k_factor_out) + \
-                "</k_factor_out_>\n"
+            f = f.split("<")[0] + "<k_factor_out>" + str(k_factor_out) + \
+                "</k_factor_out>\n"
             k_in_changed = False
             i += 1
 

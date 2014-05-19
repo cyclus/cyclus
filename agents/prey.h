@@ -47,26 +47,26 @@ class Prey : public cyclus::Facility {
   
  private:
   #pragma cyclus var {}
-  std::string commod_;
+  std::string commod;
 
   /// number of timsteps between having children
   #pragma cyclus var {'default': 1}
-  int birth_freq_;
+  int birth_freq;
 
   // number of children
   #pragma cyclus var {'default': 1}
-  int nchildren_;
+  int nchildren;
   
   /// age of a prey
   #pragma cyclus var {'default': 0}
-  int age_;
+  int age;
 
   #pragma cyclus var {'default': 0}
-  int dead_;
+  int dead;
 
   /// whether or not an agent can give birth and die in the same timestep
   #pragma cyclus var {'default': 1} // true
-  int birth_and_death_;
+  int birth_and_death;
 };
 
 }  // namespace cyclus
