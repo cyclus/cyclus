@@ -31,7 +31,7 @@ Material::Ptr Material::CreateUntracked(double quantity,
   return m;
 }
 
-int Material::state_id() const {
+int Material::qual_id() const {
   return comp_->id();
 }
 
@@ -48,7 +48,7 @@ Resource::Ptr Material::Clone() const {
 
 void Material::Record(Context* ctx) const {
   ctx_->NewDatum("MaterialInfo")
-  ->AddVal("ResourceId", id())
+  ->AddVal("ResourceId", state_id())
   ->AddVal("Time", ctx_->time())
   ->AddVal("PrevDecayTime", prev_decay_time_)
   ->Record();
