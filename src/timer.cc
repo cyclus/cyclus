@@ -21,9 +21,6 @@ void Timer::RunSim() {
   ExchangeManager<Product> genrsrc_manager(ctx_);
   while (time_ < si_.duration) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
-    if (si_.decay_period > 0 && time_ > 0 && time_ % si_.decay_period == 0) {
-      Material::DecayAll(time_);
-    }
 
     // run through phases
     DoBuild();

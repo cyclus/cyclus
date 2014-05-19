@@ -132,9 +132,6 @@ class Material: public Resource {
   /// Decay was invoked.
   void Decay(int curr_time);
 
-  /// Calls Decay for all materials currently existing in the simulation.
-  static void DecayAll(int curr_time);
-
   /// Returns the nuclide composition of this material.
   Composition::Ptr comp() const;
 

@@ -145,13 +145,6 @@ void Material::Decay(int curr_time) {
   }
 }
 
-void Material::DecayAll(int curr_time) {
-  std::map<Material*, bool>::iterator it;
-  for (it = all_mats_.begin(); it != all_mats_.end(); ++it) {
-    it->first->Decay(curr_time);
-  }
-}
-
 Composition::Ptr Material::comp() const {
   return comp_;
 }
