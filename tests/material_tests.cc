@@ -16,8 +16,6 @@ TEST_F(MaterialTest, Constructors) {
   EXPECT_EQ(default_mat_->units(), "kg");
   EXPECT_EQ(default_mat_->type(), cyclus::Material::kType);
   EXPECT_GE(default_mat_->obj_id(), 0);
-  EXPECT_EQ(default_mat_->type(), Material::kType);
-  EXPECT_GE(default_mat_->id(), 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

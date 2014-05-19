@@ -60,10 +60,10 @@ SET(
 
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 SET(
-  cc_files ${cc_files} 
+  CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
+  ${cc_files}
   "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
   )
-SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
 
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 SET(
