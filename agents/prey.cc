@@ -58,7 +58,7 @@ void Prey::Tock(int time) {
 
 std::set<cyclus::BidPortfolio<cyclus::Product>::Ptr>
 Prey::GetProductBids(
-    const cyclus::CommodMap<cyclus::Product>::type& commod_requests) {
+    cyclus::CommodMap<cyclus::Product>::type& commod_requests) {
   using cyclus::Bid;
   using cyclus::BidPortfolio;
   using cyclus::CapacityConstraint;
@@ -69,9 +69,9 @@ Prey::GetProductBids(
 
   if (commod_requests.count(commod_) > 0) {
     BidPortfolio<Product>::Ptr port(new BidPortfolio<Product>());
-    const std::vector<Request<Product>*>& requests =
+    std::vector<Request<Product>*>& requests =
         commod_requests.at(commod_);
-    std::vector<Request<Product>*>::const_iterator it;
+    std::vector<Request<Product>*>::iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
       // offer one wabbit
       port->AddBid(*it, Product::CreateUntracked(1, ""), this);

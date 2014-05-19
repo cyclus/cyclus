@@ -29,8 +29,8 @@ class Prey : public cyclus::Facility {
   virtual void Tock(int time);
 
   virtual std::set<cyclus::BidPortfolio<cyclus::Product>::Ptr>
-      GetProductBids(const cyclus::CommodMap<cyclus::Product>::type&
-                  commod_requests);
+      GetProductBids(
+          cyclus::CommodMap<cyclus::Product>::type& commod_requests);
 
   virtual void GetProductTrades(
       const std::vector< cyclus::Trade<cyclus::Product> >& trades,
