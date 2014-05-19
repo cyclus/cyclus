@@ -149,6 +149,8 @@ void Decayer::BuildDecayMatrix() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::Decay(double secs) {
+  Warn<VALIDATION_WARNING>("the cyclus decayer has not yet been benchmarked and "
+                           "should be considered experimental.");
   // solves the decay equation for the final composition
   post_vect_ = UniformTaylor::MatrixExpSolver(decay_matrix_, pre_vect_, secs);
 }
