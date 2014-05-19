@@ -24,7 +24,7 @@ Package                Minimum Version
 `boost`                1.46.1
 `libxml2`              2
 `libxml++`             2.6
-`python`               2.6
+`python`               2.7 or 3.3+
 `sqlite3`              3.7.10            
 `HDF5`                 1.8.4
 `Coin-Cbc`             2.5
