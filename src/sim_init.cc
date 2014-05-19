@@ -440,7 +440,9 @@ Composition::Ptr SimInit::LoadComposition(int stateid) {
     double mass_frac = qr.GetVal<double>("MassFrac", i);
     cm[nucid] = mass_frac;
   }
-  return Composition::CreateFromMass(cm);
+  Composition::Ptr c = Composition::CreateFromMass(cm);
+  c->id_ = stateid;
+  return c;
 }
 
 Resource::Ptr SimInit::LoadProduct(int state_id) {

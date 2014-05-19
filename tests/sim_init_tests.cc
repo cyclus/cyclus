@@ -8,6 +8,8 @@
 #include "sim_init.h"
 #include "facility.h"
 #include "resource_buff.h"
+#include "material.h"
+#include "composition.h"
 
 static const char* dbpath = "testsiminit.sqlite";
 
@@ -215,11 +217,13 @@ TEST_F(SimInitTest, InitRecipes) {
 
   cy::CompMap orig1 = ctx->GetRecipe("recipe1")->mass();
   cy::CompMap init1 = init_ctx->GetRecipe("recipe1")->mass();
+  EXPECT_EQ(ctx->GetRecipe("recipe1")->id(), init_ctx->GetRecipe("recipe1")->id());
   EXPECT_FLOAT_EQ(orig1[922350000], init1[922350000]);
   EXPECT_FLOAT_EQ(orig1[922380000], init1[922380000]);
 
   cy::CompMap orig2 = ctx->GetRecipe("recipe1")->mass();
   cy::CompMap init2 = init_ctx->GetRecipe("recipe1")->mass();
+  EXPECT_EQ(ctx->GetRecipe("recipe2")->id(), init_ctx->GetRecipe("recipe2")->id());
   EXPECT_FLOAT_EQ(orig2[922350000], init2[922350000]);
   EXPECT_FLOAT_EQ(orig2[922380000], init2[922380000]);
 }
@@ -317,10 +321,7 @@ TEST_F(SimInitTest, InitAgentState) {
   for (i = byid.begin(); i != byid.end(); ++i) {
     int id = i->first;
     Agent* agent = i->second;
-    if (i == byid.begin()) {
-      // skip the extra agent registered to DynamicModule for testing
-      continue;
-    } else if (agent->enter_time() == -1) {
+    if (agent->enter_time() == -1) {
       // skip prototypes
       continue;
     }
@@ -339,6 +340,70 @@ TEST_F(SimInitTest, InitAgentState) {
     EXPECT_EQ(agent->kind(), init_agent->kind());
     EXPECT_EQ(agent->prototype(), init_agent->prototype());
     EXPECT_EQ(agent->spec(), init_agent->spec());
+  }
+}
+
+TEST_F(SimInitTest, InitAgentInventories) {
+  cy::SimInit si;
+  si.Init(&rec, b);
+  std::set<Agent*> init_agents = agent_list(si.context());
+  std::set<Agent*> agents = agent_list(ctx);
+
+  std::map<int, Agent*> byid;
+  std::map<int, Agent*> init_byid;
+  std::set<Agent*>::iterator it;
+  for (it = agents.begin(); it != agents.end(); ++it) {
+    byid[(*it)->id()] = *it;
+  }
+  for (it = init_agents.begin(); it != init_agents.end(); ++it) {
+    init_byid[(*it)->id()] = *it;
+  }
+
+  ASSERT_EQ(4, init_byid.size()); // 2 deployed, 2 protos
+  ASSERT_EQ(4, byid.size()); // 2 deployed, 2 protos
+
+  cy::Composition::Ptr recipe1 = ctx->GetRecipe("recipe1");
+  cy::Composition::Ptr recipe2 = ctx->GetRecipe("recipe2");
+
+  std::map<int, Agent*>::iterator i;
+  for (i = byid.begin(); i != byid.end(); ++i) {
+    int id = i->first;
+    Inver* agent = dynamic_cast<Inver*>(i->second);
+    Inver* init_agent = dynamic_cast<Inver*>(init_byid[id]);
+    if (agent->enter_time() == -1) {
+      // skip prototypes
+      continue;
+    }
+
+    EXPECT_EQ(1, agent->buf1.count());
+    EXPECT_EQ(1, init_agent->buf1.count());
+    EXPECT_EQ(2, agent->buf2.count());
+    EXPECT_EQ(2, init_agent->buf2.count());
+
+    // check agents' buf1 inventory
+    cy::Material::Ptr mat1 = agent->buf1.Pop<cy::Material>();
+    cy::Material::Ptr init_mat1 = init_agent->buf1.Pop<cy::Material>();
+
+    EXPECT_EQ(mat1->qual_id(), init_mat1->qual_id());
+    EXPECT_EQ(mat1->obj_id(), init_mat1->obj_id());
+    EXPECT_EQ(mat1->state_id(), init_mat1->state_id());
+    EXPECT_EQ(mat1->quantity(), init_mat1->quantity());
+
+    // check agents' buf2 inventories
+    mat1 = agent->buf2.Pop<cy::Material>();
+    init_mat1 = init_agent->buf2.Pop<cy::Material>();
+    cy::Material::Ptr mat2 = agent->buf2.Pop<cy::Material>();
+    cy::Material::Ptr init_mat2 = init_agent->buf2.Pop<cy::Material>();
+
+    EXPECT_EQ(mat1->qual_id(), init_mat1->qual_id());
+    EXPECT_EQ(mat1->obj_id(), init_mat1->obj_id());
+    EXPECT_EQ(mat1->state_id(), init_mat1->state_id());
+    EXPECT_EQ(mat1->quantity(), init_mat1->quantity());
+
+    EXPECT_EQ(mat2->qual_id(), init_mat2->qual_id());
+    EXPECT_EQ(mat2->obj_id(), init_mat2->obj_id());
+    EXPECT_EQ(mat2->state_id(), init_mat2->state_id());
+    EXPECT_EQ(mat2->quantity(), init_mat2->quantity());
   }
 }
 
