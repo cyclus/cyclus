@@ -112,7 +112,7 @@ class TestTrader : public TestFacility {
 
   TestObjFactory* obj_fac;
   Request<Material>* req;  // obs or exp
-  Bid<Material>::Ptr bid;  // obs or exp
+  Bid<Material>* bid;  // obs or exp
   Trade<Material> obs_trade;  // obs trade
   Material::Ptr mat;  // obs mat
   bool is_requester;

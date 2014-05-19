@@ -140,7 +140,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
   EXPECT_TRUE(context.bids_by_request[req1].empty());
 
   BidPortfolio<Resource>::Ptr bp1(new BidPortfolio<Resource>());
-  Bid<Resource>::Ptr bid = bp1->AddBid(req1, get_mat(), fac1);
+  Bid<Resource>* bid = bp1->AddBid(req1, get_mat(), fac1);
 
   context.AddBidPortfolio(bp1);
 
@@ -150,7 +150,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
 
   EXPECT_EQ(1, context.bids_by_request[req1].size());
 
-  std::vector<Bid<Resource>::Ptr> vr;
+  std::vector<Bid<Resource>*> vr;
   vr.push_back(bid);
   EXPECT_EQ(vr, context.bids_by_request[req1]);
 
@@ -179,17 +179,17 @@ TEST_F(ExchangeContextTests, AddBid2) {
 
   // bid1 and bid2 are from one bidder (fac1)
   BidPortfolio<Resource>::Ptr bp1(new BidPortfolio<Resource>());
-  Bid<Resource>::Ptr bid1 = bp1->AddBid(req1, get_mat(), fac1);
-  Bid<Resource>::Ptr bid2 = bp1->AddBid(req2, get_mat(), fac1);
+  Bid<Resource>* bid1 = bp1->AddBid(req1, get_mat(), fac1);
+  Bid<Resource>* bid2 = bp1->AddBid(req2, get_mat(), fac1);
 
   // bid3 and bid4 are from one bidder (fac2)
   BidPortfolio<Resource>::Ptr bp2(new BidPortfolio<Resource>());
-  Bid<Resource>::Ptr bid3 = bp2->AddBid(req1, get_mat(), fac2);
-  Bid<Resource>::Ptr bid4 = bp2->AddBid(req2, get_mat(), fac2);
+  Bid<Resource>* bid3 = bp2->AddBid(req1, get_mat(), fac2);
+  Bid<Resource>* bid4 = bp2->AddBid(req2, get_mat(), fac2);
 
   std::vector<BidPortfolio<Resource>::Ptr> vp;
-  std::vector<Bid<Resource>::Ptr> vreq1;
-  std::vector<Bid<Resource>::Ptr> vreq2;
+  std::vector<Bid<Resource>*> vreq1;
+  std::vector<Bid<Resource>*> vreq2;
 
   // add bids from first bidder
   context.AddBidPortfolio(bp1);

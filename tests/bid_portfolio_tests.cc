@@ -54,7 +54,7 @@ class BidPortfolioTests: public ::testing::Test {
 TEST_F(BidPortfolioTests, RespAdd) {
   BidPortfolio<Material>::Ptr rp(new BidPortfolio<Material>());
   EXPECT_EQ(rp->bids().size(), 0);
-  Bid<Material>::Ptr r1 = rp->AddBid(req1, get_mat(), fac1);
+  Bid<Material>* r1 = rp->AddBid(req1, get_mat(), fac1);
   EXPECT_EQ(rp->bidder(), fac1);
   EXPECT_EQ(rp->bids().size(), 1);
   EXPECT_EQ(*rp->bids().begin(), r1);

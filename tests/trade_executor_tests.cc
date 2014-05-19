@@ -43,7 +43,9 @@ class TradeExecutorTests : public ::testing::Test {
   double amt;
   Request<Material>* req1;
   Request<Material>* req2;
-  Bid<Material>::Ptr bid1, bid2, bid3;
+  Bid<Material>* bid1;
+  Bid<Material>* bid2;
+  Bid<Material>* bid3;
   Trade<Material> t1, t2, t3;
   std::vector< Trade<Material> > trades;
 
@@ -151,7 +153,7 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
 //   Request<Material>* req = Request<Material>::Create(mat, r);
 
 //   Sender* s = new Sender(tc.get(), true);
-//   Bid<Material>::Ptr bid = Bid<Material>::Create(req, mat, s);
+//   Bid<Material>* bid = Bid<Material>::Create(req, mat, s);
 
 //   Trade<Material> trade(req, bid, mat->quantity());
 //   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);

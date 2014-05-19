@@ -35,7 +35,7 @@ TEST(BidTests, MaterialGetSet) {
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
   Request<Material>* req = get_req();
 
-  Bid<Material>::Ptr r = Bid<Material>::Create(req, mat, fac);
+  Bid<Material>* r = Bid<Material>::Create(req, mat, fac);
 
   EXPECT_EQ(fac, r->bidder());
   EXPECT_EQ(req, r->request());
@@ -53,7 +53,7 @@ TEST(BidTests, ProductGetSet) {
 
   Request<Product>* req = Request<Product>::Create(rsrc, trader);
 
-  Bid<Product>::Ptr r = Bid<Product>::Create(req, rsrc, fac);
+  Bid<Product>* r = Bid<Product>::Create(req, rsrc, fac);
 
   EXPECT_EQ(fac, r->bidder());
   EXPECT_EQ(req, r->request());

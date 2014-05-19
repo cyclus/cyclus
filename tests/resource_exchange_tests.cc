@@ -66,10 +66,10 @@ class Requester: public TestFacility {
   // increments counter and squares all preferences
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
     std::map<Request<Material>*,
-             std::map<Bid<Material>::Ptr, double> >::iterator p_it;
+             std::map<Bid<Material>*, double> >::iterator p_it;
     for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
-      std::map<Bid<Material>::Ptr, double>& map = p_it->second;
-      std::map<Bid<Material>::Ptr, double>::iterator m_it;
+      std::map<Bid<Material>*, double>& map = p_it->second;
+      std::map<Bid<Material>*, double>::iterator m_it;
       for (m_it = map.begin(); m_it != map.end(); ++m_it) {
         m_it->second = std::pow(m_it->second, 2);
       }
@@ -122,7 +122,7 @@ class ResourceExchangeTests: public ::testing::Test {
   double pref;
   Material::Ptr mat;
   Request<Material>* req;
-  Bid<Material>::Ptr bid;
+  Bid<Material>* bid;
 
   virtual void SetUp() {
     commod = "name";
@@ -186,9 +186,9 @@ TEST_F(ResourceExchangeTests, Bids) {
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   bid = bp->AddBid(req, mat, bidr);
-  Bid<Material>::Ptr bid1 = bp->AddBid(req1, mat, bidr);
+  Bid<Material>* bid1 = bp->AddBid(req1, mat, bidr);
 
-  std::vector<Bid<Material>::Ptr> bids;
+  std::vector<Bid<Material>*> bids;
   bids.push_back(bid);
   bids.push_back(bid1);
 
@@ -210,13 +210,13 @@ TEST_F(ResourceExchangeTests, Bids) {
   const cyclus::BidPortfolio<Material>& rhs = *obsvp[0];
   EXPECT_TRUE(BPEq(*bp, *obsvp[0]));
 
-  const std::vector<Bid<Material>::Ptr>& obsvb = ctx.bids_by_request[req];
+  const std::vector<Bid<Material>*>& obsvb = ctx.bids_by_request[req];
   EXPECT_EQ(1, obsvb.size());
-  std::vector<Bid<Material>::Ptr> vb;
+  std::vector<Bid<Material>*> vb;
   vb.push_back(bid);
   EXPECT_EQ(vb, obsvb);
 
-  const std::vector<Bid<Material>::Ptr>& obsvb1 = ctx.bids_by_request[req1];
+  const std::vector<Bid<Material>*>& obsvb1 = ctx.bids_by_request[req1];
   EXPECT_EQ(1, obsvb1.size());
   vb.clear();
   vb.push_back(bid1);
@@ -291,10 +291,10 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   Bidder* bidr = new Bidder(tc.get(), commod);
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  Bid<Material>::Ptr pbid = bp->AddBid(preq, mat, bidr);
-  Bid<Material>::Ptr cbid = bp->AddBid(creq, mat, bidr);
+  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr);
+  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr);
 
-  std::vector<Bid<Material>::Ptr> bids;
+  std::vector<Bid<Material>*> bids;
   bids.push_back(pbid);
   bids.push_back(cbid);
   bidr->port_ = bp;

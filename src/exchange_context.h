@@ -16,13 +16,12 @@ namespace cyclus {
 
 template <class T>
 struct PrefMap {
-  typedef std::map< Request<T>*,
-          std::map< typename Bid<T>::Ptr, double > > type;
+  typedef std::map<Request<T>*, std::map<Bid<T>*, double> > type;
 };
 
 template <class T>
 struct CommodMap {
-  typedef std::map< std::string, std::vector<Request<T>*> > type;
+  typedef std::map<std::string, std::vector<Request<T>*> > type;
 };
 
 
@@ -63,11 +62,11 @@ struct ExchangeContext {
   /// @brief adds a bid to the context
   void AddBidPortfolio(const typename BidPortfolio<T>::Ptr port) {
     bids.push_back(port);
-    const std::set<typename Bid<T>::Ptr>& vr = port->bids();
-    typename std::set<typename Bid<T>::Ptr>::const_iterator it;
+    const std::set<Bid<T>*>& vr = port->bids();
+    typename std::set<Bid<T>*>::const_iterator it;
 
     for (it = vr.begin(); it != vr.end(); ++it) {
-      typename Bid<T>::Ptr pb = *it;
+      Bid<T>* pb = *it;
       AddBid(pb);
     }
   }
@@ -75,7 +74,7 @@ struct ExchangeContext {
   /// @brief adds a bid to the appropriate containers, default trade preference
   /// between request and bid is set
   /// @param pb the bid
-  void AddBid(typename Bid<T>::Ptr pb) {
+  void AddBid(Bid<T>* pb) {
     assert(pb->bidder() != NULL);
     bidders.insert(pb->bidder());
 
@@ -101,7 +100,7 @@ struct ExchangeContext {
   typename CommodMap<T>::type commod_requests;
 
   /// @brief maps request to all bids for request
-  std::map< Request<T>*, std::vector<typename Bid<T>::Ptr> >
+  std::map< Request<T>*, std::vector<Bid<T>*> >
       bids_by_request;
 
   /// @brief maps commodity name to requests for that commodity

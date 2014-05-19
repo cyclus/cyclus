@@ -58,10 +58,10 @@ class ExchangeTranslator {
       graph->AddSupplyGroup(ns);
 
       // add each request-bid arc
-      const std::set<typename Bid<T>::Ptr>& bids = (*bp_it)->bids();
-      typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
+      const std::set<Bid<T>*>& bids = (*bp_it)->bids();
+      typename std::set<Bid<T>*>::const_iterator b_it;
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
-        typename Bid<T>::Ptr bid = *b_it;
+        Bid<T>* bid = *b_it;
         Request<T>* req = bid->request();
         AddArc(req, bid, graph);
       }
@@ -72,8 +72,7 @@ class ExchangeTranslator {
 
   /// @brief adds a bid-request arc to a graph, if the preference for the arc is
   /// non-negative
-  void AddArc(Request<T>* req, typename Bid<T>::Ptr bid, 
-              ExchangeGraph::Ptr graph) {
+  void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
     double pref =
         ex_ctx_->trader_prefs.at(req->requester())[req][bid];
     if (pref < 0) {
@@ -127,7 +126,7 @@ template <class T>
 /// @brief Adds a bid-node mapping
 template <class T>
     inline void AddBid(ExchangeTranslationContext<T>& translation_ctx,
-                       typename Bid<T>::Ptr b, ExchangeNode::Ptr n) {
+                       Bid<T>* b, ExchangeNode::Ptr n) {
   translation_ctx.bid_to_node[b] = n;
   translation_ctx.node_to_bid[n] = b;
 }
@@ -177,11 +176,11 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 
   std::map<typename T::Ptr, std::vector<ExchangeNode::Ptr> > excl_bid_grps;
   
-  typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
+  typename std::set<Bid<T>*>::const_iterator b_it;
   for (b_it = bp->bids().begin();
        b_it != bp->bids().end();
        ++b_it) {
-    typename Bid<T>::Ptr b = *b_it;
+    Bid<T>* b = *b_it;
     ExchangeNode::Ptr n(new ExchangeNode(b->offer()->quantity(),
                                          b->exclusive(),
                                          b->request()->commodity()));
@@ -217,7 +216,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
-                 typename Bid<T>::Ptr bid) {
+                 Bid<T>* bid) {
   Request<T>* req = bid->request();
     
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);

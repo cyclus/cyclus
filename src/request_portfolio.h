@@ -99,7 +99,6 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     typename std::vector<Request<T>*>::iterator it;
     for (it = requests_.begin(); it != requests_.end(); ++it) {
       delete *it;
-      *it = NULL;
     }
   };
 

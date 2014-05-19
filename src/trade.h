@@ -15,13 +15,13 @@ namespace cyclus {
 template <class T>
 struct Trade {
   Request<T>* request;
-  typename Bid<T>::Ptr bid;
+  Bid<T>* bid;
   double amt;
   double price;
 
   Trade() : amt(0), price(0) {}
 
-  Trade(Request<T>* request, typename Bid<T>::Ptr bid, double amt)
+  Trade(Request<T>* request, Bid<T>* bid, double amt)
       : request(request),
         bid(bid),
         amt(amt),

@@ -19,8 +19,8 @@ struct ExchangeTranslationContext {
  public:
   std::map<Request<T>*, ExchangeNode::Ptr> request_to_node;
   std::map<ExchangeNode::Ptr, Request<T>*> node_to_request;
-  std::map<typename Bid<T>::Ptr, ExchangeNode::Ptr> bid_to_node;
-  std::map<ExchangeNode::Ptr, typename Bid<T>::Ptr> node_to_bid;
+  std::map<Bid<T>*, ExchangeNode::Ptr> bid_to_node;
+  std::map<ExchangeNode::Ptr, Bid<T>*> node_to_bid;
 };
 
 } // namespace cyclus

@@ -41,8 +41,8 @@ void Predator::AdjustProductPrefs(
   if (prefs.size() == 0)
     return;
   Request<Product>* req = prefs.begin()->first;
-  std::map<Bid<Product>::Ptr, double>::iterator it;
-  std::vector<Bid<Product>::Ptr> bids;
+  std::map<Bid<Product>*, double>::iterator it;
+  std::vector<Bid<Product>*> bids;
   for (it = prefs[req].begin(); it != prefs[req].end(); ++it) {
     bids.push_back(it->first);
   }

@@ -18,30 +18,28 @@ template<class T> class BidPortfolio;
 template <class T>
 class Bid {
  public:
-  typedef boost::shared_ptr< Bid<T> > Ptr;
-
   /// @brief a factory method for a bid
   /// @param request the request being responded to by this bid
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
   /// @param portfolio the porftolio of which this bid is a part
-  inline static typename Bid<T>::Ptr Create(
+  inline static Bid<T>* Create(
       Request<T>* request,
       boost::shared_ptr<T> offer,
       Trader* bidder,
       typename BidPortfolio<T>::Ptr portfolio,
       bool exclusive = false) {
-    return Ptr(new Bid<T>(request, offer, bidder, portfolio, exclusive));
+    return new Bid<T>(request, offer, bidder, portfolio, exclusive);
   }
 
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
-  inline static typename Bid<T>::Ptr Create(
+  inline static Bid<T>* Create(
       Request<T>* request,
       boost::shared_ptr<T> offer,
       Trader* bidder,
       bool exclusive = false) {
-    return Ptr(new Bid<T>(request, offer, bidder, exclusive));
+    return new Bid<T>(request, offer, bidder, exclusive);
   }
 
   /// @return the request being responded to
