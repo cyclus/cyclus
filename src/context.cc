@@ -87,7 +87,7 @@ void Context::AddRecipe(std::string name, Composition::Ptr c) {
   recipes_[name] = c;
   NewDatum("Recipes")
     ->AddVal("Recipe", name)
-    ->AddVal("StateId", c->id())
+    ->AddVal("QualId", c->id())
     ->Record();
 }
 

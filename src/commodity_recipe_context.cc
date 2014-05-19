@@ -18,17 +18,17 @@ void CommodityRecipeContext::AddInCommod(std::string in_commod,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::AddRsrc(std::string commod, Resource::Ptr rsrc) {
-  rsrc_commod_map_[rsrc->id()] = commod;
+  rsrc_commod_map_[rsrc->obj_id()] = commod;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::RemoveRsrc(Resource::Ptr rsrc) {
-  rsrc_commod_map_.erase(rsrc->id());
+  rsrc_commod_map_.erase(rsrc->obj_id());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::UpdateRsrc(std::string commod, Resource::Ptr rsrc) {
-  rsrc_commod_map_[rsrc->id()] = commod;
+  rsrc_commod_map_[rsrc->obj_id()] = commod;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
