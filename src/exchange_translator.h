@@ -62,7 +62,7 @@ class ExchangeTranslator {
       typename std::set<typename Bid<T>::Ptr>::const_iterator b_it;
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
         typename Bid<T>::Ptr bid = *b_it;
-        typename Request<T>::Ptr req = bid->request();
+        Request<T>* req = bid->request();
         AddArc(req, bid, graph);
       }
     }
@@ -72,7 +72,7 @@ class ExchangeTranslator {
 
   /// @brief adds a bid-request arc to a graph, if the preference for the arc is
   /// non-negative
-  void AddArc(typename Request<T>::Ptr req, typename Bid<T>::Ptr bid, 
+  void AddArc(Request<T>* req, typename Bid<T>::Ptr bid, 
               ExchangeGraph::Ptr graph) {
     double pref =
         ex_ctx_->trader_prefs.at(req->requester())[req][bid];
@@ -119,7 +119,7 @@ class ExchangeTranslator {
 /// @brief Adds a request-node mapping
 template <class T>
     inline void AddRequest(ExchangeTranslationContext<T>& translation_ctx,
-                           typename Request<T>::Ptr r, ExchangeNode::Ptr n) {
+                           Request<T>* r, ExchangeNode::Ptr n) {
   translation_ctx.request_to_node[r] = n;
   translation_ctx.node_to_request[n] = r;
 }
@@ -142,11 +142,11 @@ RequestGroup::Ptr TranslateRequestPortfolio(
   RequestGroup::Ptr rs(new RequestGroup(rp->qty()));
   CLOG(LEV_DEBUG2) << "Translating request portfolio of size " << rp->qty();
 
-  typename std::vector<typename Request<T>::Ptr>::const_iterator r_it;
+  typename std::vector<Request<T>*>::const_iterator r_it;
   for (r_it = rp->requests().begin();
        r_it != rp->requests().end();
        ++r_it) {
-    typename Request<T>::Ptr r = *r_it;
+    Request<T>* r = *r_it;
     ExchangeNode::Ptr n(new ExchangeNode(r->target()->quantity(),
                                          r->exclusive(),
                                          r->commodity()));
@@ -218,7 +218,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
                  typename Bid<T>::Ptr bid) {
-  typename Request<T>::Ptr req = bid->request();
+  Request<T>* req = bid->request();
     
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);

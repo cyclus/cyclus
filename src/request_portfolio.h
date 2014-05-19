@@ -20,7 +20,7 @@ class Trader;
 
 /// @brief accumulator sum for request quantities
 template<class T>
-    inline double SumQty(double total, typename Request<T>::Ptr r) {
+    inline double SumQty(double total, Request<T>* r) {
   return total += r->target()->quantity();
 };
 
@@ -32,7 +32,7 @@ template<class T>
 template<class T>
 struct DefaultCoeffConverter: public Converter<T> {
   DefaultCoeffConverter(
-      const std::map<typename Request<T>::Ptr, double>& coeffs)
+      const std::map<Request<T>*, double>& coeffs)
        : coeffs(coeffs) { };
 
   inline virtual double convert(
@@ -48,7 +48,7 @@ struct DefaultCoeffConverter: public Converter<T> {
     return cast != NULL && coeffs == cast->coeffs;
   }
   
-  std::map<typename Request<T>::Ptr, double> coeffs;
+  std::map<Request<T>*, double> coeffs;
 };
 
 /// @class RequestPortfolio
@@ -92,8 +92,16 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
  public:
   typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
 
-  /// @brief default constructor
   RequestPortfolio() : requester_(NULL), qty_(0) {};
+
+  /// deletes all requests associated with it
+  ~RequestPortfolio() {
+    typename std::vector<Request<T>*>::iterator it;
+    for (it = requests_.begin(); it != requests_.end(); ++it) {
+      delete *it;
+      *it = NULL;
+    }
+  };
 
   /// @brief add a request to the portfolio
   /// @param target the target resource associated with this request
@@ -105,12 +113,12 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// i.e., in its entirety by a single offer
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
-  typename Request<T>::Ptr AddRequest(boost::shared_ptr<T> target,
+  Request<T>* AddRequest(boost::shared_ptr<T> target,
                                       Trader* requester,
                                       std::string commodity = "",
                                       double preference = 0,
                                       bool exclusive = false) {
-    typename Request<T>::Ptr r =
+    Request<T>* r =
         Request<T>::Create(target, requester, this->shared_from_this(),
                            commodity, preference, exclusive);
     VerifyRequester_(r);
@@ -124,11 +132,11 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// this portfolio) as multicommodity requests
   /// @param rs the collection of requests to add
   inline void AddMutualReqs(
-      const std::vector<typename Request<T>::Ptr>& rs) {
+      const std::vector<Request<T>*>& rs) {
     double avg_qty =
         std::accumulate(rs.begin(), rs.end(), 0.0, SumQty<T>) / rs.size();
     double qty;
-    typename Request<T>::Ptr r;
+    Request<T>* r;
     for (int i = 0; i < rs.size(); i++) {
       r = rs[i];
       qty = r->target()->quantity();
@@ -165,7 +173,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline double qty() const { return qty_; }
 
   /// @return const access to the unconstrained requests
-  inline const std::vector<typename Request<T>::Ptr>& requests() const {
+  inline const std::vector<Request<T>*>& requests() const {
     return requests_;
   };
   
@@ -182,7 +190,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     requests_ = rhs.requests_;
     constraints_ = rhs.constraints_;
     qty_ = rhs.qty_;
-    typename std::vector<typename Request<T>::Ptr>::iterator it;
+    typename std::vector<Request<T>*>::iterator it;
     for (it = requests_.begin(); it != requests_.end(); ++it) {
       it->get()->set_portfolio(this->shared_from_this());
     }
@@ -193,7 +201,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// requester
   /// @throws KeyError if a request is added from a different requester than the
   /// original
-  void VerifyRequester_(const typename Request<T>::Ptr r) {
+  void VerifyRequester_(const Request<T>* r) {
     if (requester_ == NULL) {
       requester_ = r->requester();
     } else if (requester_ != r->requester()) {
@@ -204,10 +212,10 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
 
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
-  std::vector<typename Request<T>::Ptr> requests_;
+  std::vector<Request<T>*> requests_;
 
   /// coefficients for the default mass constraint for known resources
-  std::map<typename Request<T>::Ptr, double> mass_coeffs_;
+  std::map<Request<T>*, double> mass_coeffs_;
 
   /// constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;

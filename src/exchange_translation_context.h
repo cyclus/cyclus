@@ -17,8 +17,8 @@ namespace cyclus {
 template <class T>
 struct ExchangeTranslationContext {
  public:
-  std::map<typename Request<T>::Ptr, ExchangeNode::Ptr> request_to_node;
-  std::map<ExchangeNode::Ptr, typename Request<T>::Ptr> node_to_request;
+  std::map<Request<T>*, ExchangeNode::Ptr> request_to_node;
+  std::map<ExchangeNode::Ptr, Request<T>*> node_to_request;
   std::map<typename Bid<T>::Ptr, ExchangeNode::Ptr> bid_to_node;
   std::map<ExchangeNode::Ptr, typename Bid<T>::Ptr> node_to_bid;
 };

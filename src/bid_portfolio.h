@@ -41,7 +41,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @param bidder the bidder
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original or if the bid commodity is different than the original
-  typename Bid<T>::Ptr AddBid(typename Request<T>::Ptr request,
+  typename Bid<T>::Ptr AddBid(Request<T>* request,
                               boost::shared_ptr<T> offer,
                               Trader* bidder,
                               bool exclusive = false) {
