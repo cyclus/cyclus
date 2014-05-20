@@ -1,12 +1,10 @@
 #include "building_manager.h"
 
-#include <boost/any.hpp>
+#include "CoinPackedVector.hpp"
+#include "OsiSolverInterface.hpp"
 
-#include "cbc_solver.h"
 #include "error.h"
 #include "logger.h"
-#include "solver.h"
-#include "solver_interface.h"
 
 namespace cyclus {
 namespace toolkit {
