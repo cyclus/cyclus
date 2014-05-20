@@ -1,11 +1,21 @@
 #include "xml_parser_tests.h"
 
 #include <iostream>
+#include <fstream>
 #include <gtest/gtest.h>
 
 #include "error.h"
 
 using namespace std;
+
+class FileDeleter {
+ public:
+  FileDeleter(const char* path) : path_(path) {}
+  ~FileDeleter() {
+    remove(path_);
+  }
+  const char* path_;
+};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLParserTests::FillSnippet(std::stringstream &ss) {
@@ -73,4 +83,38 @@ TEST_F(XMLParserTests, WithError) {
   cyclus::XMLParser parser;
   EXPECT_NO_THROW(parser.Init(snippet));
   EXPECT_THROW(parser.Validate(schema), cyclus::ValidationError);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(XMLParserTests, XInclude) {
+  using std::ostream;
+  using std::iostream;
+  using std::ofstream;
+  using std::stringstream;
+  // setup file on disk and in-memory snippet
+  FileDeleter fd("include_me.xml");
+  stringstream fss("");
+  FillSnippet(fss);
+  ofstream f;
+  f.open("include_me.xml");
+  f << fss.str();
+  f.close();
+  stringstream snippet(
+    "<document xmlns:xi=\"http://www.w3.org/2003/XInclude\">\n"
+    "  <xi:include href=\"include_me.xml\" />\n"
+    "</document>\n");
+
+  // load the document
+  cyclus::XMLParser parser;
+  EXPECT_NO_THROW(parser.Init(snippet));
+  xmlpp::Document* doc = parser.Document();
+
+  // test that the subsititution happened
+  Glib::ustring obs = doc->write_to_string();
+  stringstream exp("");
+  exp << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+      << "<document xmlns:xi=\"http://www.w3.org/2003/XInclude\">\n"
+      << "  " << fss.str() << "\n"
+      << "</document>\n";
+  EXPECT_STREQ(exp.str().c_str(), obs.c_str());
 }
