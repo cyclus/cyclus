@@ -7,12 +7,13 @@
 #include "timer.h"
 #include "sim_init.h"
 #include "facility.h"
-#include "resource_buff.h"
+#include "toolkit/resource_buff.h"
 #include "material.h"
 #include "composition.h"
 
 static const char* dbpath = "testsiminit.sqlite";
 
+namespace cy = cyclus;
 namespace cy = cyclus;
 using cy::Agent;
 
@@ -68,13 +69,15 @@ class Inver : public cy::Facility {
     cy::Inventories invs;
     invs["buf1"] = buf1.PopN(buf1.count());
     invs["buf2"] = buf2.PopN(buf2.count());
+    buf1.PushAll(invs["buf1"]);
+    buf2.PushAll(invs["buf2"]);
     return invs;
   }
   virtual void Tick(int t) {context()->Snapshot();};
   virtual void Tock(int t) { };
 
-  cy::ResourceBuff buf1;
-  cy::ResourceBuff buf2;
+  cy::toolkit::ResourceBuff buf1;
+  cy::toolkit::ResourceBuff buf2;
   int val1;
 };
 
@@ -83,6 +86,9 @@ Agent* ConstructInver(cy::Context* ctx) {
 }
 
 class SimInitTest : public ::testing::Test {
+ public:
+  SimInitTest() : rec(300) { }
+
  protected:
   virtual void SetUp() {
     remove(dbpath);

@@ -161,18 +161,8 @@ void SimInit::LoadRecipes() {
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string recipe = qr.GetVal<std::string>("Recipe", i);
     int stateid = qr.GetVal<int>("QualId", i);
-
-    std::vector<Cond> conds;
-    conds.push_back(Cond("QualId", "==", stateid));
-    QueryResult qr = b_->Query("Compositions", &conds);
-    CompMap m;
-    for (int j = 0; j < qr.rows.size(); ++j) {
-      int nuc = qr.GetVal<int>("NucId", j);
-      double frac = qr.GetVal<double>("MassFrac", j);
-      m[nuc] = frac;
-    }
-    Composition::Ptr comp = Composition::CreateFromMass(m);
-    ctx_->AddRecipe(recipe, comp);
+    Composition::Ptr c = LoadComposition(stateid);
+    ctx_->AddRecipe(recipe, c);
   }
 }
 
@@ -409,7 +399,6 @@ Resource::Ptr SimInit::LoadMaterial(int state_id) {
   // get special material object state
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", state_id));
-  conds.push_back(Cond("Time", "==", t_));
   QueryResult qr = b_->Query("MaterialInfo", &conds);
   int prev_decay = qr.GetVal<int>("PrevDecayTime");
 
