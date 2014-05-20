@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 
+#include "cyc_limits.h"
 #include "commodity.h"
 
 namespace cyclus {
@@ -11,81 +12,87 @@ namespace toolkit {
 
 /// a container to hold information about a commodity
 struct CommodInfo {
-  CommodInfo();
-  CommodInfo(double a_capacity, double a_cost);
-  double cost;
+  CommodInfo(double default_capacity = 0,
+             double default_cost = kModifierLimit);
   double capacity;
+  double cost;
 };
 
 /// a mixin to provide information about produced commodities
 class CommodityProducer {
  public:
-  /// constructor
-  CommodityProducer();
-
-  /// virtual destructor for inheritance
+  CommodityProducer(double default_capacity = 0,
+                    double default_cost = kModifierLimit);
   virtual ~CommodityProducer();
-
-  /// @return the set of commodities produced by this producers
-  std::set<Commodity, CommodityCompare> ProducedCommodities();
 
   /// @param commodity the commodity in question
   /// @return true if the commodity is produced by this entity
-  bool ProducesCommodity(const Commodity& commodity);
+  inline bool Produces(const Commodity& commodity) const {
+    return commodities_.find(commodity) != commodities_.end();
+  }
 
   /// @param commodity the commodity in question
   /// @return the production capacity for a commodity
-  double ProductionCapacity(const Commodity& commodity);
+  inline double Capacity(const Commodity& commodity) {
+    return commodities_[commodity].capacity; 
+  }
 
   /// @return the cost to produce a commodity at a given capacity
   /// @param commodity the commodity in question
-  double ProductionCost(const Commodity& commodity);
-
-  // protected: @MJGFlag - should be protected. Revise when tests can
-  // be found by classes in the Utility folder
-  /// register a commodity as being produced by this object
-  /// @param commodity the commodity being produced
-  void AddCommodity(const Commodity& commodity);
+  inline double Cost(const Commodity& commodity) {
+    return commodities_[commodity].cost;
+  }
 
   /// set the production capacity for a given commodity
   /// @param commodity the commodity being produced
   /// @param capacity the production capacity
-  void SetCapacity(const Commodity& commodity, double capacity);
+  inline void SetCapacity(const Commodity& commodity, double capacity) {
+    commodities_[commodity].capacity = capacity;
+  }
 
   /// set the production cost for a given commodity
   /// @param commodity the commodity being produced
   /// @param cost the production cost
-  void SetCost(const Commodity& commodity, double cost);
+  inline void SetCost(const Commodity& commodity, double cost) {
+    commodities_[commodity].cost = cost;
+  }
+
+  /// register a commodity as being produced by this object
+  /// @param commodity the commodity being produced
+  inline void Add(const Commodity& commodity) {
+    Add(commodity, CommodInfo(default_capacity_, default_cost_));
+  }
 
   /// register a commodity as being produced by this object and set
   /// its relevant info
   /// @param commodity the commodity being produced
   /// @param info the information describing the commodity
-  void AddCommodityWithInformation(const Commodity& commodity,
-                                   const CommodInfo& info);
+  inline void Add(const Commodity& commodity, const CommodInfo& info) {
+    commodities_.insert(std::make_pair(commodity, info));
+  }
+
+  /// unregister a commodity as being produced by this object
+  /// @param commodity the commodity being produced
+  inline void Rm(const Commodity& commodity) {
+    commodities_.erase(commodity);
+  }
+
+  /// @return the set of commodities produced by this producers
+  std::set<Commodity, CommodityCompare> ProducedCommodities();
 
   /// add all commodities produced by a source
   /// @param source the original commodity producer
-  void CopyProducedCommoditiesFrom(CommodityProducer* source);
+  void Copy(CommodityProducer* source);
 
-  /// checks if ProducesCommodity() is true. If it is false, an
-  /// error is thrown.
-  /// @param commodity the commodity in question
-  void ThrowErrorIfCommodityNotProduced(const Commodity& commodity);
+ private:
+  /// a collection of commodities and their production capacities
+  std::map<Commodity, CommodInfo, CommodityCompare> commodities_;
 
   /// a default production capacity
   double default_capacity_;
 
   /// a default production cost
   double default_cost_;
-
- private:
-  /// a collection of commodities and their production capacities
-  std::map<Commodity, CommodInfo, CommodityCompare> produced_commodities_;
-
-  // #include "commodity_producer_tests.h"
-  // friend class CommodityProducerTests;
-  // @MJGFlag - removed for the same reason as above
 };
 
 } // namespace toolkit

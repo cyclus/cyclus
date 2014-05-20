@@ -22,15 +22,15 @@ CommodityTestHelper::~CommodityTestHelper() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityTestHelper::SetUpProducerManager() {
   SetUpProducers();
-  manager.RegisterProducer(producer1);
-  manager.RegisterProducer(producer2);
+  manager.Register(producer1);
+  manager.Register(producer2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityTestHelper::SetUpProducers() {
-  producer1->AddCommodity(commodity);
+  producer1->Add(commodity);
   producer1->SetCapacity(commodity, capacity);
-  producer2->AddCommodity(commodity);
+  producer2->Add(commodity);
   producer2->SetCapacity(commodity, capacity);
 }
 

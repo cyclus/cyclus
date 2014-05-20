@@ -22,11 +22,6 @@ class CommodityProducerTests : public ::testing::Test {
  public:
   virtual void SetUp();
   virtual void TearDown();
-  double DefaultCapacity();
-  double DefaultCost();
-  void AddCommodity();
-  void SetCapacity();
-  void SetCost();
 };
 
 } // namespace toolkit

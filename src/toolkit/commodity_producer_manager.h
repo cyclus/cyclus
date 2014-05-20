@@ -20,24 +20,25 @@ class CommodityProducerManager {
 
   /// @return the total production capacity for a commodity amongst producers
   /// @param commodity the commodity in question
-  double TotalProductionCapacity(Commodity& commodity);
+  double TotalCapacity(Commodity& commodity);
 
-  // protected: @MJGFlag - should be protected. Revise when tests can
-  // be found by classes in the Utility folder
   /// register a commodity producer with the manager
   /// @param producer the producer
-  void RegisterProducer(CommodityProducer* producer);
+  inline void Register(CommodityProducer* producer) {
+    producers_.insert(producer);
+  }
 
   /// unregister a commodity producer with the manager
   /// @param producer the producer
-  void UnRegisterProducer(CommodityProducer* producer);
+  inline void Unregister(CommodityProducer* producer) {
+    producers_.erase(producer);
+  }
 
+  const std::set<CommodityProducer*>& producers() const {return producers_;}
+  
+ private:
   /// the set of managed producers
   std::set<CommodityProducer*> producers_;
-
-  // #include "commodity_producer_manager_tests.h"
-  // friend class CommodityProducerManagerTests;
-  // @MJGFlag - removed for the same reason as above
 };
 
 } // namespace toolkit

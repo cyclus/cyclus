@@ -37,7 +37,6 @@
 #include "version.h"
 
 #include "toolkit/enrichment.h"
-#include "toolkit/function.h"
 #include "toolkit/builder.h"
 #include "toolkit/building_manager.h"
 #include "toolkit/commodity.h"
@@ -48,7 +47,6 @@
 #include "toolkit/supply_demand_manager.h"
 #include "toolkit/symbolic_function_factories.h"
 #include "toolkit/symbolic_functions.h"
-#include "toolkit/variable.h"
 #include "toolkit/mat_query.h"
 #include "toolkit/resource_buff.h"
 

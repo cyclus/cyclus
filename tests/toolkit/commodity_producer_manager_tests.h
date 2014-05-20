@@ -14,17 +14,11 @@ namespace toolkit {
 class CommodityProducerManagerTests : public ::testing::Test {
  public:
   CommodityProducerManager manager;
-  CommodityTestHelper* helper;
+  CommodityTestHelper helper;
 
  public:
   virtual void SetUp();
   virtual void TearDown();
-
-  void AddCommodity(CommodityProducer* producer);
-  void SetCapacity(CommodityProducer* producer);
-  void SetUpProducers();
-  void RegisterProducer(CommodityProducer* producer);
-  void UnRegisterProducer(CommodityProducer* producer);
 };
 
 } // namespace toolkit

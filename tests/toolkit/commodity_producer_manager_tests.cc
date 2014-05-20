@@ -7,64 +7,45 @@ namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityProducerManagerTests::SetUp() {
-  helper = new CommodityTestHelper();
-  helper->SetUpProducers();
+  helper.SetUpProducers();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityProducerManagerTests::TearDown() {
-  delete helper;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityProducerManagerTests::RegisterProducer(
-  CommodityProducer* producer) {
-  manager.RegisterProducer(producer);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityProducerManagerTests::UnRegisterProducer(
-  CommodityProducer* producer) {
-  manager.UnRegisterProducer(producer);
-}
+void CommodityProducerManagerTests::TearDown() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerManagerTests, initialization) {
-  EXPECT_EQ(manager.TotalProductionCapacity(helper->commodity), 0.0);
+  EXPECT_EQ(manager.TotalCapacity(helper.commodity), 0.0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerManagerTests, registerunregister) {
   // 1 producer
-  EXPECT_NO_THROW(RegisterProducer(helper->producer1));
-  EXPECT_EQ(manager.TotalProductionCapacity(helper->commodity),
-            helper->capacity);
-  EXPECT_THROW(RegisterProducer(helper->producer1), KeyError);
+  EXPECT_NO_THROW(manager.Register(helper.producer1));
+  EXPECT_EQ(manager.TotalCapacity(helper.commodity),
+            helper.capacity);
 
   // 2 producers
-  EXPECT_NO_THROW(RegisterProducer(helper->producer2));
-  EXPECT_EQ(manager.TotalProductionCapacity(helper->commodity),
-            helper->nproducers*helper->capacity);
-  EXPECT_THROW(RegisterProducer(helper->producer2), KeyError);
+  EXPECT_NO_THROW(manager.Register(helper.producer2));
+  EXPECT_EQ(manager.TotalCapacity(helper.commodity),
+            helper.nproducers*helper.capacity);
 
   // 1 producer
-  EXPECT_NO_THROW(UnRegisterProducer(helper->producer1));
-  EXPECT_EQ(manager.TotalProductionCapacity(helper->commodity),
-            helper->capacity);
-  EXPECT_THROW(UnRegisterProducer(helper->producer1), KeyError);
+  EXPECT_NO_THROW(manager.Unregister(helper.producer1));
+  EXPECT_EQ(manager.TotalCapacity(helper.commodity),
+            helper.capacity);
 
   // 0 producers
-  EXPECT_NO_THROW(UnRegisterProducer(helper->producer2));
-  EXPECT_EQ(manager.TotalProductionCapacity(helper->commodity), 0.0);
-  EXPECT_THROW(UnRegisterProducer(helper->producer2), KeyError);
+  EXPECT_NO_THROW(manager.Unregister(helper.producer2));
+  EXPECT_EQ(manager.TotalCapacity(helper.commodity), 0.0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(CommodityProducerManagerTests, differentcommodity) {
-  EXPECT_NO_THROW(RegisterProducer(helper->producer1));
+  EXPECT_NO_THROW(manager.Register(helper.producer1));
 
   Commodity differentcommodity("differentcommodity");
-  EXPECT_EQ(manager.TotalProductionCapacity(differentcommodity), 0.0);
+  EXPECT_EQ(manager.TotalCapacity(differentcommodity), 0.0);
 }
 
 } // namespace toolkit

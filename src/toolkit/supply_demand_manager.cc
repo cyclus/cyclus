@@ -41,7 +41,7 @@ double SupplyDemandManager::Supply(Commodity& commodity) {
   double value = 0.0;
   std::set<CommodityProducerManager*>::iterator it;
   for (it = managers_.begin(); it != managers_.end(); it++) {
-    value += (*it)->TotalProductionCapacity(commodity);
+    value += (*it)->TotalCapacity(commodity);
   }
   return value;
 }

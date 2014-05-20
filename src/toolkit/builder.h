@@ -3,6 +3,7 @@
 
 #include <set>
 
+#include "agent.h"
 #include "commodity_producer.h"
 
 namespace cyclus {
@@ -12,38 +13,28 @@ namespace toolkit {
 /// be built
 class Builder {
  public:
-  /// constructor
-  Builder();
+  Builder(Agent* manager=NULL) : manager_(manager) {};
+  virtual ~Builder() {};
 
-  /// virtual destructor for inheritance
-  virtual ~Builder();
-
-  // protected: @MJGFlag - should be protected. Revise when tests can
-  // be found by classes in the Utility folder
   /// register a commodity producer with the manager
   /// @param producer the producer
-  void RegisterProducer(CommodityProducer* producer);
+  inline void Register(CommodityProducer* producer) {
+    producers_.insert(producer);
+  }
 
   /// unregister a commodity producer with the manager
   /// @param producer the producer
-  void UnRegisterProducer(CommodityProducer* producer);
+  inline void Unregister(CommodityProducer* producer) {
+    producers_.erase(producer);
+  }
 
-  /// @return the number of buildings managed by this builder
-  double NBuildingPrototypes();
+  const std::set<CommodityProducer*>& producers() const {return producers_;}
 
-  /// @return the beginning iterator of the set of producers
-  std::set<CommodityProducer*>::iterator BeginningProducer();
-
-  /// @return the beginning iterator of the set of producers
-  std::set<CommodityProducer*>::iterator EndingProducer();
-
+  Agent* manager() const {return manager_;}
+  
  protected:
-  /// the set of managed producers
-  std::set<CommodityProducer*> commod_producers_;
-
-  // #include "commodity_producer_manager_tests.h"
-  // friend class CommodityProducerManagerTests;
-  // @MJGFlag - removed for the same reason as above
+  Agent* manager_;
+  std::set<CommodityProducer*> producers_;
 };
 
 } // namespace toolkit
