@@ -6,16 +6,9 @@
 
 #include "error.h"
 
-using namespace std;
+#include "tools.h"
 
-class FileDeleter {
- public:
-  FileDeleter(const char* path) : path_(path) {}
-  ~FileDeleter() {
-    remove(path_);
-  }
-  const char* path_;
-};
+using namespace std;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLParserTests::FillSnippet(std::stringstream &ss) {
