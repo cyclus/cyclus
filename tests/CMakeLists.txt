@@ -74,7 +74,22 @@ FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 SET(CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_SRC} ${cc_files})
 
 ADD_SUBDIRECTORY(toolkit)
-ADD_SUBDIRECTORY(cli)
+
+ADD_EXECUTABLE( cyclus_unit_tests
+  cyclus_unit_test_driver.cc 
+  ${CYCLUS_CORE_TEST_SOURCE}
+  )
+
+TARGET_LINK_LIBRARIES( cyclus_unit_tests dl 
+  ${LIBS} 
+  cyclus
+  gtest
+  )
+
+INSTALL(TARGETS cyclus_unit_tests
+  RUNTIME DESTINATION bin
+  COMPONENT testing
+  )
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB test_agents "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/*.h")
