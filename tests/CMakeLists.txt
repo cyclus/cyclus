@@ -70,86 +70,11 @@ SET(
   PARENT_SCOPE
   )
 
-# To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
-# added to ctest.
-set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
-  # --
-  "${CMAKE_CURRENT_SOURCE_DIR}/agent_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/bid_portfolio_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/bid_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/capacity_constraint_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/commodity_recipe_context_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/context_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/recorder_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/exchange_context_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/exchange_manager_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/exchange_solver_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/exchange_test_cases.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/facility_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/full_sim_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/greedy_solver_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/query_backend_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/region_class_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/resource_exchange_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/solver_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/trade_executor_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/variable_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/infile_tree_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_region.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_inst.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/test_facility.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/timer_tests.cc"
-  )
+FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
+SET(CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_SRC} ${cc_files})
 
-ADD_EXECUTABLE( cyclus_unit_tests
-  cyclus_unit_test_driver.cc 
-  ${CYCLUS_CORE_TEST_SOURCE}
-  )
-
-TARGET_LINK_LIBRARIES( cyclus_unit_tests dl 
-  ${LIBS} 
-  cyclus
-  gtest
-  )
-
-INSTALL(TARGETS cyclus_unit_tests
-  RUNTIME DESTINATION bin
-  COMPONENT testing
-  )
+ADD_SUBDIRECTORY(toolkit)
+ADD_SUBDIRECTORY(cli)
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB test_agents "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/*.h")

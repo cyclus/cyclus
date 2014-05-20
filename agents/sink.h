@@ -60,7 +60,7 @@ class Sink : public cyclus::Facility  {
   double max_inv_size;
 
   #pragma cyclus var {'capacity': 'max_inv_size'}
-  cyclus::ResourceBuff inventory;
+  cyclus::toolkit::ResourceBuff inventory;
 };
 
 }  // namespace cyclus

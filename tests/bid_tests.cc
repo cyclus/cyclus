@@ -19,43 +19,43 @@ using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
 using std::string;
-using test_helpers::get_bid;
-using test_helpers::get_mat;
-using test_helpers::get_req;
-using test_helpers::trader;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, MaterialGetSet) {
   TestContext tc;
-  TestFacility* fac = new TestFacility(tc.get());
+  TestFacility* fac = tc.trader();
   cyclus::CompMap cm;
   cm[92235] = 1.0;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   double qty = 1.0;
-  Material::Ptr mat = Material::CreateUntracked(qty, comp);
-  Request<Material>* req = get_req();
+  Material::Ptr mat = tc.mat();
+  Request<Material>* req = tc.NewReq(); 
+  Bid<Material>* bid = Bid<Material>::Create(req, mat, fac);
 
-  Bid<Material>* r = Bid<Material>::Create(req, mat, fac);
+  EXPECT_EQ(fac, bid->bidder());
+  EXPECT_EQ(req, bid->request());
+  EXPECT_EQ(mat, bid->offer());
 
-  EXPECT_EQ(fac, r->bidder());
-  EXPECT_EQ(req, r->request());
-  EXPECT_EQ(mat, r->offer());
+  delete bid;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, ProductGetSet) {
   TestContext tc;
-  TestFacility* fac = new TestFacility(tc.get());
+  TestFacility* fac = tc.trader();
   double qty = 1.0;
   string quality = "qual";
 
   Product::Ptr rsrc = Product::CreateUntracked(qty, quality);
 
-  Request<Product>* req = Request<Product>::Create(rsrc, trader);
+  Request<Product>* req = Request<Product>::Create(rsrc, fac);
 
-  Bid<Product>* r = Bid<Product>::Create(req, rsrc, fac);
+  Bid<Product>* bid = Bid<Product>::Create(req, rsrc, fac);
 
-  EXPECT_EQ(fac, r->bidder());
-  EXPECT_EQ(req, r->request());
-  EXPECT_EQ(rsrc, r->offer());
+  EXPECT_EQ(fac, bid->bidder());
+  EXPECT_EQ(req, bid->request());
+  EXPECT_EQ(rsrc, bid->offer());
+
+  delete bid;
+  delete req;
 }

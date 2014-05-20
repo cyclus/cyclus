@@ -88,7 +88,7 @@ class Material: public Resource {
   static Ptr CreateUntracked(double quantity, Composition::Ptr c);
 
   /// Returns the id of the material's internal nuclide composition.
-  virtual int state_id() const;
+  virtual int qual_id() const;
 
   /// Returns Material::kType.
   virtual const ResourceType type() const;
@@ -132,9 +132,6 @@ class Material: public Resource {
   /// Decay was invoked.
   void Decay(int curr_time);
 
-  /// Calls Decay for all materials currently existing in the simulation.
-  static void DecayAll(int curr_time);
-
   /// Returns the nuclide composition of this material.
   Composition::Ptr comp() const;
 
@@ -142,8 +139,6 @@ class Material: public Resource {
   Material(Context* ctx, double quantity, Composition::Ptr c);
 
  private:
-  static std::map<Material*, bool> all_mats_;
-
   Context* ctx_;
   double qty_;
   Composition::Ptr comp_;

@@ -11,16 +11,12 @@
 namespace cyclus {
 
 const ResourceType Material::kType = "Material";
-std::map<Material*, bool> Material::all_mats_;
 
-Material::~Material() {
-  all_mats_.erase(this);
-}
+Material::~Material() {}
 
 Material::Ptr Material::Create(Agent* creator, double quantity,
                                Composition::Ptr c) {
   Material::Ptr m(new Material(creator->context(), quantity, c));
-  all_mats_[m.get()] = true;
   m->tracker_.Create(creator);
   return m;
 }
@@ -31,7 +27,7 @@ Material::Ptr Material::CreateUntracked(double quantity,
   return m;
 }
 
-int Material::state_id() const {
+int Material::qual_id() const {
   return comp_->id();
 }
 
@@ -48,7 +44,7 @@ Resource::Ptr Material::Clone() const {
 
 void Material::Record(Context* ctx) const {
   ctx_->NewDatum("MaterialInfo")
-  ->AddVal("ResourceId", id())
+  ->AddVal("ResourceId", state_id())
   ->AddVal("Time", ctx_->time())
   ->AddVal("PrevDecayTime", prev_decay_time_)
   ->Record();
@@ -106,7 +102,6 @@ void Material::Absorb(Material::Ptr mat) {
   }
   qty_ += mat->qty_;
   mat->qty_ = 0;
-
   tracker_.Absorb(&mat->tracker_);
 }
 
@@ -142,13 +137,6 @@ void Material::Decay(int curr_time) {
     if (dt > 0) {
       Transmute(comp_->Decay(dt));
     }
-  }
-}
-
-void Material::DecayAll(int curr_time) {
-  std::map<Material*, bool>::iterator it;
-  for (it = all_mats_.begin(); it != all_mats_.end(); ++it) {
-    it->first->Decay(curr_time);
   }
 }
 

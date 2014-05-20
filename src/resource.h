@@ -17,31 +17,39 @@ typedef std::string ResourceType;
 /// represent the lifeblood of a simulation.
 class Resource {
   friend class SimInit;
+  friend class ResTracker;
 
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 
-  Resource() : id_(nextid_++) {};
+  Resource() : state_id_(nextstate_id_++), obj_id_(nextobj_id_++) {};
 
   virtual ~Resource() {};
 
+  /// Returns the unique id corresponding to this resource object. Can be used
+  /// to track and/or associate other information with this resource object.
+  /// You should NOT track resources by pointer.
+  const int obj_id() const { return obj_id_;};
+
   /// Returns the unique id corresponding to this resource and its current
   /// state.  All resource id's are unique - even across different resource
-  /// types/implementations.
-  const int id() const {
-    return id_;
+  /// types/implementations. Runtime tracking of resources should generally
+  /// use the obj_id rather than this.
+  const int state_id() const {
+    return state_id_;
   };
 
-  /// Assigns a new, unique id to this resource and its state. This should be
+  /// Assigns a new, unique internal id to this resource and its state. This should be
   /// called by resource implementations whenever their state changes.  A call to
-  /// BumpId is not necessarily accompanied by a change to the state id.
+  /// BumpStateId is not necessarily accompanied by a change to the state id.
   /// This should NEVER be called by agents.
-  void BumpId();
+  void BumpStateId();
 
   /// Returns an id representing the specific resource implementation's internal
   /// state that is not accessible via the Resource class public interface.  Any
-  /// change to the state_id should always be accompanied by a call to BumpId.
-  virtual int state_id() const = 0;
+  /// change to the qual_id should always be accompanied by a call to
+  /// BumpStateId.
+  virtual int qual_id() const = 0;
 
   /// A unique type/name for the concrete resource implementation.
   virtual const ResourceType type() const = 0;
@@ -52,7 +60,7 @@ class Resource {
 
   /// Records the resource's state to the output database.  This method
   /// should generally NOT record data accessible via the Resource class
-  /// public methods (e.g.  state_id, units, type, quantity).
+  /// public methods (e.g.  qual_id, units, type, quantity).
   /// @param ctx the simulation context used to record the data.
   virtual void Record(Context* ctx) const = 0;
 
@@ -71,8 +79,11 @@ class Resource {
   virtual Ptr ExtractRes(double quantity) = 0;
 
  private:
-  static int nextid_;
-  int id_;
+
+  static int nextstate_id_;
+  static int nextobj_id_;
+  int state_id_;
+  int obj_id_;
 };
 
 } // namespace cyclus

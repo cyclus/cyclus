@@ -85,7 +85,7 @@ CYCNS = 'cyclus'
 PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob', 
               'boost::uuids::uuid'}
 
-BUFFERS = {'{0}::ResourceBuff'.format(CYCNS)}
+BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS)}
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
              'std::map',}
@@ -1137,7 +1137,7 @@ class AnnotationsFilter(CodeGeneratorFilter):
                     'for {0}.");\n')
         s += ind + '}}\n'
         s += ind + 'return root;\n'
-        jstr = json.dumps(ctx, encoding='ascii', separators=(',', ':'))
+        jstr = json.dumps(ctx, separators=(',', ':'))
         if len(jstr) > 50:
             jstr = [j.replace('"', '\\"') for j in  textwrap.wrap(jstr, 50)]
             jstr = ('"\n  ' + ind + '"').join(jstr)

@@ -40,10 +40,7 @@ using cyclus::Resource;
 using cyclus::TestContext;
 using cyclus::Trade;
 using cyclus::TranslateCapacities;
-using test_helpers::get_bid;
 using test_helpers::get_mat;
-using test_helpers::get_req;
-using test_helpers::trader;
 
 double fraction = 0.7;
 int u235 = 92235;
@@ -81,6 +78,8 @@ struct MatConverter2 : public Converter<Material> {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, NegPref) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
   double pref = -1;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
@@ -138,6 +137,9 @@ TEST(ExXlateTests, XlateCapacities) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateReq) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
   CapacityConstraint<Material> cc1(qty1, c1);
@@ -180,6 +182,9 @@ TEST(ExXlateTests, XlateReq) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateBid) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  
   std::string commod = "commod";
   Request<Material>* req =
       Request<Material>::Create(get_mat(u235, qty), trader, commod);
@@ -228,10 +233,15 @@ TEST(ExXlateTests, XlateBid) {
   t = (test == xlator.translation_ctx().bid_to_node[ebid2] ||
        test == xlator.translation_ctx().bid_to_node[ebid]);
   EXPECT_TRUE(t);
+
+  delete req;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateArc) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  
   Material::Ptr mat = get_mat(u235, qty);
 
   Converter<Material>::Ptr c1(new MatConverter1());
@@ -280,6 +290,9 @@ TEST(ExXlateTests, XlateArc) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateArcExclusive) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  
   bool exclusive = true;
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
@@ -357,6 +370,9 @@ TEST(ExXlateTests, XlateArcExclusive) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, SimpleXlate) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  
   std::string commod = "c";
   double pref = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
@@ -385,13 +401,15 @@ TEST(ExXlateTests, SimpleXlate) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, BackXlate) {
+  TestContext tc;
+  
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  Request<Material>* ur(get_req());
-  Request<Material>* xr(get_req());
-  Bid<Material>* vb(get_bid());
-  Bid<Material>* yb(get_bid());
+  Request<Material>* ur = tc.NewReq();
+  Request<Material>* xr = tc.NewReq();
+  Bid<Material>* vb = tc.NewBid(ur);
+  Bid<Material>* yb = tc.NewBid(xr);
 
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());

@@ -7,18 +7,18 @@
 #include "composition.h"
 #include "material.h"
 
-namespace units = cyclus::units;
-
+namespace cyclus {
+  
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MaterialTest : public ::testing::Test {
  protected:
-  cyclus::Nuc u235_, am241_, th228_, pb208_, pu239_;
+  Nuc u235_, am241_, th228_, pb208_, pu239_;
   int one_g_;  // grams
-  cyclus::Composition::Ptr test_comp_, diff_comp_;
+  Composition::Ptr test_comp_, diff_comp_;
   double test_size_, fraction;
-  cyclus::Material::Ptr test_mat_, two_test_mat_, ten_test_mat_;
-  cyclus::Material::Ptr diff_mat_;
-  cyclus::Material::Ptr default_mat_;
+  Material::Ptr test_mat_, two_test_mat_, ten_test_mat_;
+  Material::Ptr diff_mat_;
+  Material::Ptr default_mat_;
   long int u235_halflife_;
   int th228_halflife_;
   double u235_g_per_mol_;
@@ -33,20 +33,20 @@ class MaterialTest : public ::testing::Test {
     fraction = 2.0 / 3.0;
 
     // composition creation
-    cyclus::CompMap v;
+    CompMap v;
     v[u235_] = 1;
-    test_comp_ = cyclus::Composition::CreateFromMass(v);
+    test_comp_ = Composition::CreateFromMass(v);
 
     v[u235_] = 1;
     v[pb208_] = 1;
     v[am241_] = 1;
-    diff_comp_ = cyclus::Composition::CreateFromMass(v);
+    diff_comp_ = Composition::CreateFromMass(v);
 
-    default_mat_ = cyclus::Material::CreateUntracked(0 * units::g, test_comp_);
-    test_mat_ = cyclus::Material::CreateUntracked(test_size_, test_comp_);
-    two_test_mat_ = cyclus::Material::CreateUntracked(2 * test_size_, test_comp_);
-    ten_test_mat_ = cyclus::Material::CreateUntracked(10 * test_size_, test_comp_);
-    diff_mat_ = cyclus::Material::CreateUntracked(test_size_, diff_comp_);
+    default_mat_ = Material::CreateUntracked(0 * units::g, test_comp_);
+    test_mat_ = Material::CreateUntracked(test_size_, test_comp_);
+    two_test_mat_ = Material::CreateUntracked(2 * test_size_, test_comp_);
+    ten_test_mat_ = Material::CreateUntracked(10 * test_size_, test_comp_);
+    diff_mat_ = Material::CreateUntracked(test_size_, diff_comp_);
 
     // test info
     u235_g_per_mol_ = 235.044;
@@ -57,4 +57,6 @@ class MaterialTest : public ::testing::Test {
   virtual void TearDown() {}
 };
 
+} // namespace cyclus
+  
 #endif  // CYCLUS_TESTS_MATERIAL_TESTS_H_

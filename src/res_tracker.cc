@@ -25,7 +25,7 @@ void ResTracker::Create(Agent* creator) {
   parent2_ = 0;
   Record();
   ctx_->NewDatum("ResCreators")
-    ->AddVal("ResourceId", res_->id())
+    ->AddVal("ResourceId", res_->state_id())
     ->AddVal("AgentId", creator->id())
     ->Record();
 }
@@ -35,7 +35,7 @@ void ResTracker::Modify() {
     return;
   }
 
-  parent1_ = res_->id();
+  parent1_ = res_->state_id();
   parent2_ = 0;
   Record();
 }
@@ -45,9 +45,9 @@ void ResTracker::Extract(ResTracker* removed) {
     return;
   }
 
-  parent1_ = res_->id();
+  parent1_ = res_->state_id();
   parent2_ = 0;
-  removed->parent1_ = res_->id();
+  removed->parent1_ = res_->state_id();
   removed->parent2_ = 0;
   removed->tracked_ = tracked_;
 
@@ -60,20 +60,21 @@ void ResTracker::Absorb(ResTracker* absorbed) {
     return;
   }
 
-  parent1_ = res_->id();
-  parent2_ = absorbed->res_->id();
+  parent1_ = res_->state_id();
+  parent2_ = absorbed->res_->state_id();
   Record();
 }
 
 void ResTracker::Record() {
-  res_->BumpId();
+  res_->BumpStateId();
   ctx_->NewDatum("Resources")
-  ->AddVal("ResourceId", res_->id())
+  ->AddVal("ResourceId", res_->state_id())
+  ->AddVal("ObjId", res_->obj_id())
   ->AddVal("Type", res_->type())
   ->AddVal("TimeCreated", ctx_->time())
   ->AddVal("Quantity", res_->quantity())
   ->AddVal("Units", res_->units())
-  ->AddVal("StateId", res_->state_id())
+  ->AddVal("QualId", res_->qual_id())
   ->AddVal("Parent1", parent1_)
   ->AddVal("Parent2", parent2_)
   ->Record();

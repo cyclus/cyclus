@@ -181,6 +181,9 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("verb,v", po::value<std::string>(), vmessage.c_str())
       ("output-path,o", po::value<std::string>(), "output path")
       ("input-file", po::value<std::string>(), "input file")
+      ("warn-limit", po::value<unsigned int>(), 
+       "number of warnings to issue per kind, defaults to 1")
+      ("warn-as-error", "throw errors when warnings are issued")
       ;
 
   po::variables_map vm;
@@ -278,6 +281,12 @@ void GetSimInfo(ArgInfo* ai) {
       Logger::ReportLevel() = Logger::ToLogLevel(v_level);
     }
   }
+
+  // warning params
+  if (ai->vm.count("warn-limit")) 
+    cyclus::warn_limit = ai->vm["warn-limit"].as<unsigned int>();
+  if (ai->vm.count("warn-as-error")) 
+    cyclus::warn_as_error = true;
 
   // output path
   ai->output_path = "cyclus.sqlite";
