@@ -107,7 +107,6 @@ int main(int argc, char* argv[]) {
 
   // create db backends and recorder
   FullBackend* fback = NULL;
-  RecBackend* rback = NULL;
   RecBackend::Deleter bdel;
   Recorder rec;  // must be after backend deleter because ~Rec does flushing
 
