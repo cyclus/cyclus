@@ -36,7 +36,7 @@ void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
   si_.parent_sim = sim_id;
   si_.parent_type = "restart";
   si_.branch_time = t;
-  ctx_->InitSim(si_);
+  ctx_->InitSim(si_); // explicitly force this to show up in the new simulations output db
 }
 
 void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,

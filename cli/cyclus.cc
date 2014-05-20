@@ -2,10 +2,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/string_generator.hpp>
 
 #include "cyclus.h"
 #include "hdf5_back.h"
@@ -27,6 +29,7 @@ struct ArgInfo {
   bool flat_schema;
   std::string schema_path;
   std::string output_path;
+  std::string restart;
 };
 
 // Describes and parses cli arguments. Returns the error code that main should
@@ -68,13 +71,15 @@ int main(int argc, char* argv[]) {
   }
 
   // process positional args
-  if (!ai.vm.count("input-file")) {
+  std::string infile;
+  if (ai.vm.count("input-file") == 0 && ai.restart == "") {
     std::cout << "No input file specified.\n"
               << usage << "\n\n"
               << ai.desc << "\n";
     return 1;
+  } else if (ai.vm.count("input-file") > 0) {
+    infile = ai.vm["input-file"].as<std::string>();
   }
-  std::string infile = ai.vm["input-file"].as<std::string>();
 
   // announce yourself
   std::cout << "              :                                                               " << std::endl;
@@ -110,35 +115,61 @@ int main(int argc, char* argv[]) {
   RecBackend::Deleter bdel;
   Recorder rec;  // must be after backend deleter because ~Rec does flushing
 
-  std::string ext = fs::path(ai.output_path).extension().generic_string();
-  std::string stem = fs::path(ai.output_path).stem().generic_string();
+  std::string ext = fs::path(ai.output_path).extension().string();
+  std::string stem = fs::path(ai.output_path).stem().string();
   if (ext == ".h5") {
     fback = new Hdf5Back(ai.output_path.c_str());
-    rec.RegisterBackend(fback);
-    bdel.Add(fback);
   } else {
     fback = new SqliteBack(ai.output_path);
-    rec.RegisterBackend(fback);
-    bdel.Add(fback);
   }
+  rec.RegisterBackend(fback);
+  bdel.Add(fback);
 
-  // read input file and initialize db from input file
-  try {
-    if (ai.flat_schema) {
-      XMLFlatLoader l(&rec, fback, ai.schema_path, infile);
-      l.LoadSim();
-    } else {
-      XMLFileLoader l(&rec, fback, ai.schema_path, infile);
-      l.LoadSim();
-    }
-  } catch (cyclus::Error e) {
-    CLOG(LEV_ERROR) << e.what();
-    return 1;
-  }
-
-  // initialize sim from output db and run it
   SimInit si;
-  si.Init(&rec, fback);
+  if (ai.restart == "") {
+    // read input file and initialize db and simulation from input file
+    try {
+      if (ai.flat_schema) {
+        XMLFlatLoader l(&rec, fback, ai.schema_path, infile);
+        l.LoadSim();
+      } else {
+        XMLFileLoader l(&rec, fback, ai.schema_path, infile);
+        l.LoadSim();
+      }
+    } catch (cyclus::Error e) {
+      CLOG(LEV_ERROR) << e.what();
+      return 1;
+    }
+
+    si.Init(&rec, fback);
+  } else {
+    // read output db and restart simulation from specified simid and timestep
+    std::vector<std::string> parts;
+    boost::split(parts, ai.restart, boost::is_any_of(":"));
+    if (parts.size() != 3) {
+      std::cerr << "invalid restart spec\n";
+      return 1;
+    }
+
+    fs::path dbfile = parts[0];
+    boost::uuids::string_generator gen;
+    boost::uuids::uuid simid = gen(parts[1]);
+    int t = boost::lexical_cast<int>(parts[2]);
+    FullBackend* rback = NULL;
+    RecBackend::Deleter bdel;
+
+    std::string ext = dbfile.extension().string();
+    if (ext == ".h5") {
+      rback = new Hdf5Back(dbfile.c_str());
+    } else {
+      rback = new SqliteBack(dbfile.c_str());
+    }
+    bdel.Add(rback);
+
+    si.Restart(rback, simid, t);
+    si.recorder()->RegisterBackend(fback);
+  }
+
   si.timer()->RunSim();
 
   rec.Flush();
@@ -165,7 +196,9 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
   ai->desc.add_options()
       ("help,h", "produce help message")
       ("include", "print the cyclus include directory")
-      ("version", "print cyclus core and dependency versions and quit")
+      ("version,V", "print cyclus core and dependency versions and quit")
+      ("restart", po::value<std::string>(),
+       "restart from the specified simulation snapshot [db-file]:[sim-id]:[timestep]")
       ("schema",
        "dump the cyclus master schema including all installed module schemas")
       ("agent-schema", po::value<std::string>(),
@@ -264,6 +297,11 @@ void GetSimInfo(ArgInfo* ai) {
   // schema info
   ai->flat_schema = ai->vm.count("flat-schema") > 0;
   ai->schema_path = Env::rng_schema(ai->flat_schema);
+
+
+  if (ai->vm.count("restart") > 0) {
+    ai->restart = ai->vm["restart"].as<std::string>();
+  }
 
   // logging params
   if (ai->vm.count("no-agent")) {

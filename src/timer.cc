@@ -25,6 +25,9 @@ void Timer::RunSim() {
     if (want_snapshot_) {
       want_snapshot_ = false;
       SimInit::Snapshot(ctx_);
+      ctx_->NewDatum("Snapshots")
+          ->AddVal("Time", time_)
+          ->Record();
     }
 
     // run through phases
@@ -41,10 +44,15 @@ void Timer::RunSim() {
     time_++;
   }
 
+
   ctx_->NewDatum("Finish")
       ->AddVal("EarlyTerm", want_kill_)
       ->AddVal("EndTime", time_)
       ->Record();
+
+  time_++; // move time forward because snapshots are always "beginning of timestep"
+  SimInit::Snapshot(ctx_); // always do a snapshot at the end of every simulation
+  time_--;
 }
 
 void Timer::DoBuild() {
