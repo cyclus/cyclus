@@ -16,7 +16,7 @@ using namespace std;
 using cyclus::XMLFileLoader;
 
 void XMLFileLoaderTests::SetUp() {
-  schema_path = cyclus::Env::GetInstallPath() + "/share/cyclus.rng.in";
+  schema_path = cyclus::Env::GetInstallPath() + "/share/cyclus/cyclus.rng.in";
   b_ = new cyclus::SqliteBack("xmlfileloadtestdb.sqlite");
   rec_.RegisterBackend(b_);
 

@@ -20,7 +20,7 @@ endif()
 
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5"
-  "${CYCLUS_BINARY_DIR}/share/cyclus_nuc_data.h5"
+  "${CYCLUS_BINARY_DIR}/share/cyclus/cyclus_nuc_data.h5"
   COPYONLY
   )
 
@@ -36,7 +36,7 @@ INSTALL(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus-flat.rng.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5"
-  DESTINATION share
+  DESTINATION share/cyclus
   COMPONENT core
   )
 
