@@ -2,27 +2,17 @@
 
 #include <gtest/gtest.h>
 
-#include "blob.h"
-#include "error.h"
+#include "boost/filesystem.hpp"
 #include "hdf5.h"
-#include "hdf5_back.h"
 #include "hdf5_hl.h"
 
-#include "boost/filesystem.hpp"
+#include "blob.h"
+#include "error.h"
+#include "hdf5_back.h"
+
+#include "tools.h"
 
 static const char* path = "testdb.h5";
-
-class FileDeleter {
- public:
-  FileDeleter(const char* path) : path_(path) {
-    // if (!boost::filesystem::exists(path_))
-    //   throw cyclus::IOError(std::string(path_) + " not found");
-  }
-  ~FileDeleter() {
-    remove(path_);
-  }
-  const char* path_;
-};
 
 class Hdf5GlobalEnv : public ::testing::Environment {
  public:
