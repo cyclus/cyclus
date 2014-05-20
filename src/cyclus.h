@@ -43,7 +43,6 @@
 #include "toolkit/commodity_producer.h"
 #include "toolkit/commodity_producer_manager.h"
 #include "toolkit/commodity_recipe_context.h"
-#include "toolkit/supply_demand.h"
 #include "toolkit/supply_demand_manager.h"
 #include "toolkit/symbolic_function_factories.h"
 #include "toolkit/symbolic_functions.h"
