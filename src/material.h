@@ -132,9 +132,6 @@ class Material: public Resource {
   /// Decay was invoked.
   void Decay(int curr_time);
 
-  /// Calls Decay for all materials currently existing in the simulation.
-  static void DecayAll(int curr_time);
-
   /// Returns the nuclide composition of this material.
   Composition::Ptr comp() const;
 
@@ -142,8 +139,6 @@ class Material: public Resource {
   Material(Context* ctx, double quantity, Composition::Ptr c);
 
  private:
-  static std::map<Material*, bool> all_mats_;
-
   Context* ctx_;
   double qty_;
   Composition::Ptr comp_;
