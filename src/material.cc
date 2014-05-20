@@ -102,7 +102,6 @@ void Material::Absorb(Material::Ptr mat) {
   }
   qty_ += mat->qty_;
   mat->qty_ = 0;
-
   tracker_.Absorb(&mat->tracker_);
 }
 

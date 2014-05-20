@@ -2,21 +2,17 @@
 
 #include <gtest/gtest.h>
 
-#include "blob.h"
+#include "boost/filesystem.hpp"
 #include "hdf5.h"
-#include "hdf5_back.h"
 #include "hdf5_hl.h"
 
-static const char* path = "testdb.h5";
+#include "blob.h"
+#include "error.h"
+#include "hdf5_back.h"
 
-class FileDeleter {
- public:
-  FileDeleter(const char* path) : path_(path) {}
-  ~FileDeleter() {
-    remove(path_);
-  }
-  const char* path_;
-};
+#include "tools.h"
+
+static const char* path = "testdb.h5";
 
 class Hdf5GlobalEnv : public ::testing::Environment {
  public:
