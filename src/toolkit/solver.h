@@ -1,0 +1,43 @@
+#ifndef CYCLUS_CYCLOPTS_SOLVER_H_
+#define CYCLUS_CYCLOPTS_SOLVER_H_
+
+#include <vector>
+#include <map>
+
+#include <boost/shared_ptr.hpp>
+
+#include "function.h"
+#include "variable.h"
+
+namespace cyclus {
+namespace toolkit {
+
+/// abstract base class for different types of constraint program solvers
+class Solver {
+ public:
+  typedef boost::shared_ptr<Solver> Ptr;
+
+  /// constructor
+  Solver();
+
+  /// virtual destructor
+  virtual ~Solver() {};
+
+  /// solve method to be overloaded by derived classes
+  virtual void Solve(
+      std::vector<Variable::Ptr>& variables, 
+      ObjectiveFunction::Ptr obj, 
+      std::vector<Constraint::Ptr>& constraints) = 0;
+
+ protected:
+  /// the indices used for each variable
+  std::map<Variable::Ptr, int> index_;
+
+  /// match variable pointers to indices, populating indicies_
+  void PopulateIndices(std::vector<Variable::Ptr>& variables);
+};
+
+} // namespace toolkit
+} // namespace cyclus
+
+#endif
