@@ -28,6 +28,7 @@ std::map<Warnings, std::string> warn_prefixes() {
   wp[VALIDATION_WARNING] = "Validation Warning";
   wp[DEPRECATION_WARNING] = "Deprecation Warning";
   wp[PENDING_DEPRECATION_WARNING] = "Pending Deprecation Warning";
+  wp[EXPERIMENTAL_WARNING] = "Experimental Warning";
   return wp;
 }
 std::map<Warnings, std::string> warn_prefix = warn_prefixes();
