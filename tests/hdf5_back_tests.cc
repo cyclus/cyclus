@@ -15,8 +15,8 @@ static const char* path = "testdb.h5";
 class FileDeleter {
  public:
   FileDeleter(const char* path) : path_(path) {
-    if (!boost::filesystem::exists(path_))
-      throw cyclus::IOError(std::string(path_) + " not found");
+    // if (!boost::filesystem::exists(path_))
+    //   throw cyclus::IOError(std::string(path_) + " not found");
   }
   ~FileDeleter() {
     remove(path_);
