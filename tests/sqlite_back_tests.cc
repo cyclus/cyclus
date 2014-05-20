@@ -5,21 +5,9 @@
 #include "blob.h"
 #include "sqlite_back.h"
 
+#include "tools.h"
+
 static std::string const path = "testdb.sqlite";
-
-class FileDeleter {
- public:
-  FileDeleter(std::string path) {
-    path_ = path;
-  }
-
-  ~FileDeleter() {
-    remove(path_.c_str());
-  }
-
- private:
-  std::string path_;
-};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(SqliteBackTest, Regression) {
