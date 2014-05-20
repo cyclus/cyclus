@@ -21,10 +21,10 @@
     </module>
     <agent>
       <Prey>
-        <birth_freq_>1</birth_freq_>
-        <nchildren_>1</nchildren_>
-        <birth_and_death_>0</birth_and_death_>
-        <commod_>wabbit</commod_>
+        <birth_freq>1</birth_freq>
+        <nchildren>1</nchildren>
+        <birth_and_death>0</birth_and_death>
+        <commod>wabbit</commod>
       </Prey>
     </agent>
   </facility>
@@ -37,14 +37,14 @@
     </module>
     <agent>
       <Predator>
-        <hunt_cap_>2</hunt_cap_>
-        <hunt_freq_>3</hunt_freq_>
-        <full_>2</full_>
-        <lifespan_>6</lifespan_>
-        <commod_>wabbit</commod_>
-        <success_>0.575</success_>
-        <birth_and_death_>0</birth_and_death_>
-        <prey_>Prey</prey_>
+        <hunt_cap>2</hunt_cap>
+        <hunt_freq>3</hunt_freq>
+        <full>2</full>
+        <lifespan>6</lifespan>
+        <commod>wabbit</commod>
+        <success>0.575</success>
+        <birth_and_death>0</birth_and_death>
+        <prey>Prey</prey>
       </Predator>
     </agent>
   </facility>

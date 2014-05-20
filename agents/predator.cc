@@ -27,8 +27,8 @@ Predator::GetProductRequests() {
   RequestPortfolio<Product>::Ptr
       port(new RequestPortfolio<Product>());
 
-  if (age_ % hunt_freq_  == 0) {
-    port->AddRequest(Product::CreateUntracked(hunt_cap_, ""), this, commod_);
+  if (age % hunt_freq  == 0) {
+    port->AddRequest(Product::CreateUntracked(hunt_cap, ""), this, commod);
     port->AddDefaultConstraint();
     ports.insert(port);
   }
@@ -48,10 +48,10 @@ void Predator::AdjustProductPrefs(
   }
   
   std::sort(bids.begin(), bids.end(), Predator::SortById);
-  int nprey = context()->n_prototypes(prey_);
+  int nprey = context()->n_prototypes(prey);
   int npred = context()->n_prototypes(prototype());
-  double factor = (hunt_factor_ && nprey < npred) ? double(nprey) / npred : 1;
-  int n_drop = std::floor(prefs[req].size() * (1 - success_ * factor));
+  double factor = (hunt_factor && nprey < npred) ? double(nprey) / npred : 1;
+  int n_drop = std::floor(prefs[req].size() * (1 - success * factor));
   LOG(cyclus::LEV_INFO3, "Predator") << name()
                                      << " removing " << n_drop << " bids "
                                      << " out of " << prefs[req].size();
@@ -68,49 +68,49 @@ void Predator::AcceptProductTrades(
   
   for (it = responses.begin(); it != responses.end(); ++it) {
     LOG(cyclus::LEV_INFO3, "Predator") << name() << " ate";
-    consumed_ += it->second->quantity();
+    consumed += it->second->quantity();
   }
   LOG(cyclus::LEV_INFO3, "Predator") << name() << " consumed "
-                                     << consumed_;
+                                     << consumed;
 }
 
 void Predator::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "Predator") << name() << " is ticking {";
 
   // inform the simulation about what the Predator facility will be requesting
-  if (age_ % hunt_freq_ == 0) {
+  if (age % hunt_freq == 0) {
     LOG(cyclus::LEV_INFO4, "Predator")
-        << " will request " << hunt_cap_
-        << " units of " << commod_ << ".";
+        << " will request " << hunt_cap
+        << " units of " << commod << ".";
   }
   LOG(cyclus::LEV_INFO3, "Predator") << "}";
 }
 
 void Predator::GiveBirth() {
-  bool policy = dead_ ? birth_and_death_ : true;
-  if (consumed_ >= full_ && policy) {
-    int nchildren = nchildren_;
+  bool policy = dead ? birth_and_death : true;
+  if (consumed >= full && policy) {
+    int nkids = nchildren;
     LOG(cyclus::LEV_INFO3, "Predator") << name() << " is having "
-                                       << nchildren << " children";
-    for (int i = 0; i < nchildren; ++i) {
+                                       << nkids << " children";
+    for (int i = 0; i < nkids; ++i) {
       context()->SchedBuild(NULL, prototype());
     }
-    consumed_ = 0;
+    consumed = 0;
   }
 }
 
 void Predator::Tock(int time) {
   LOG(cyclus::LEV_INFO3, "Predator") << name() << " is tocking {";
 
-  if (age_ >= lifespan_) {
+  if (age >= lifespan) {
     LOG(cyclus::LEV_INFO3, "Predator") << name() << " is dying of old age";
-    dead_ = 1;
+    dead = 1;
     context()->SchedDecom(this);
   }
   
   GiveBirth();
   
-  age_++;  // getting older
+  age++;  // getting older
 
   LOG(cyclus::LEV_INFO3, "Predator") << "}";
 }

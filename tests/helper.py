@@ -122,7 +122,7 @@ def agent_time_series(f, names):
 def create_sim_input(ref_input, k_factor_in, k_factor_out):
     """Creates xml input file from a reference xml input file.
 
-    Changes k_factor_in_ and k_factor_out_ in a simulation input
+    Changes k_factor_in and k_factor_out in a simulation input
     files for KFacility.
 
     Args:
@@ -140,12 +140,12 @@ def create_sim_input(ref_input, k_factor_in, k_factor_out):
     fw = open(fw_path, "w")
     fr = open(ref_input, "r")
     for f in fr:
-        if f.count("k_factor_in_"):
-            f = f.split("<")[0] + "<k_factor_in_>" + str(k_factor_in) + \
-                "</k_factor_in_>\n"
-        elif f.count("k_factor_out_"):
-            f = f.split("<")[0] + "<k_factor_out_>" + str(k_factor_out) + \
-                "</k_factor_out_>\n"
+        if f.count("k_factor_in"):
+            f = f.split("<")[0] + "<k_factor_in>" + str(k_factor_in) + \
+                "</k_factor_in>\n"
+        elif f.count("k_factor_out"):
+            f = f.split("<")[0] + "<k_factor_out>" + str(k_factor_out) + \
+                "</k_factor_out>\n"
 
         fw.write(f)
 

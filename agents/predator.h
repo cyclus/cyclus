@@ -51,51 +51,51 @@ class Predator : public cyclus::Facility  {
   
  private:
   #pragma cyclus var {}
-  std::string commod_;
+  std::string commod;
 
   #pragma cyclus var {}
-  std::string prey_;
+  std::string prey;
 
   /// how many prey until we're full
   #pragma cyclus var {'default': 1}
-  double full_;
+  double full;
   
   /// how many prey we can catch on the hunt
   #pragma cyclus var {'default': 1}
-  double hunt_cap_;
+  double hunt_cap;
   
   /// how often we hunt
   #pragma cyclus var {'default': 1}
-  int hunt_freq_;
+  int hunt_freq;
 
   /// hunting success on a scale from 1 to 0
   #pragma cyclus var {'default': 1}
-  double success_;
+  double success;
 
   #pragma cyclus var {'default': 1}
-  double nchildren_;
+  double nchildren;
 
   /// age of a prey
   #pragma cyclus var {'default': 0}
-  int age_;
+  int age;
 
   #pragma cyclus var {'default': 1}
-  int lifespan_;
+  int lifespan;
 
   #pragma cyclus var {'default': 0}
-  int dead_;
+  int dead;
 
   /// whether or not to base hunt succes on relative prey/predator populations
   #pragma cyclus var {'default': 0} // false
-  int hunt_factor_;
+  int hunt_factor;
 
   /// whether or not an agent can give birth and die in the same timestep  
   #pragma cyclus var {'default': 0} // false
-  int birth_and_death_;
+  int birth_and_death;
 
   /// consumption this time step
   #pragma cyclus var {'default': 0}
-  double consumed_;
+  double consumed;
 };
 
 }  // namespace cyclus

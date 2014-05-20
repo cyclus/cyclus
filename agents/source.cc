@@ -6,25 +6,25 @@ namespace cyclus {
 
 Source::Source(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      commod_(""),
-      recipe_name_(""),
-      capacity_(100) {}
+      commod(""),
+      recipe_name(""),
+      capacity(100) {}
 
 std::string Source::str() {
   std::stringstream ss;
   ss << cyclus::Facility::str()
      << " supplies commodity '"
-     << commod_ << "' with recipe '"
-     << recipe_name_ << "' at a capacity of "
-     << capacity_ << " kg per time step ";
+     << commod << "' with recipe '"
+     << recipe_name << "' at a capacity of "
+     << capacity << " kg per time step ";
   return ss.str();
 }
 
 void Source::Tick(int time) {
   LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is ticking";
-  LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity_
+  LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity
                                    << " kg of "
-                                   << commod_ << ".";
+                                   << commod << ".";
 }
 
 void Source::Tock(int time) {
@@ -34,8 +34,8 @@ void Source::Tock(int time) {
 cyclus::Material::Ptr Source::GetOffer(
     const cyclus::Material::Ptr target) const {
   using cyclus::Material;
-  double qty = std::min(target->quantity(), capacity_);
-  return Material::CreateUntracked(qty, context()->GetRecipe(recipe_name_));
+  double qty = std::min(target->quantity(), capacity);
+  return Material::CreateUntracked(qty, context()->GetRecipe(recipe_name));
 }
 
 std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
@@ -49,10 +49,10 @@ Source::GetMatlBids(
 
   std::set<BidPortfolio<Material>::Ptr> ports;
 
-  if (commod_requests.count(commod_) > 0) {
+  if (commod_requests.count(commod) > 0) {
     BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
 
-    std::vector<Request<Material>*>& requests = commod_requests[commod_];
+    std::vector<Request<Material>*>& requests = commod_requests[commod];
 
     std::vector<Request<Material>*>::iterator it;
     for (it = requests.begin(); it != requests.end(); ++it) {
@@ -61,7 +61,7 @@ Source::GetMatlBids(
       port->AddBid(req, offer, this);
     }
 
-    CapacityConstraint<Material> cc(capacity_);
+    CapacityConstraint<Material> cc(capacity);
     port->AddConstraint(cc);
     ports.insert(port);
   }
@@ -76,7 +76,7 @@ void Source::GetMatlTrades(
   using cyclus::Trade;
 
   double provided = 0;
-  double current_capacity = capacity_;
+  double current_capacity = capacity;
   std::vector< cyclus::Trade<cyclus::Material> >::const_iterator it;
   for (it = trades.begin(); it != trades.end(); ++it) {
     double qty = it->amt;
@@ -84,16 +84,16 @@ void Source::GetMatlTrades(
     provided += qty;
     // @TODO we need a policy on negatives..
     Material::Ptr response = Material::Create(this, qty,
-                                              context()->GetRecipe(recipe_name_));
+                                              context()->GetRecipe(recipe_name));
     responses.push_back(std::make_pair(*it, response));
     LOG(cyclus::LEV_INFO5, "SrcFac") << prototype() << " just received an order"
                                      << " for " << qty
-                                     << " of " << commod_;
+                                     << " of " << commod;
   }
   if (cyclus::IsNegative(current_capacity)) {
     std::stringstream ss;
     ss << "is being asked to provide " << provided
-       << " but its capacity is " << capacity_ << ".";
+       << " but its capacity is " << capacity << ".";
     throw cyclus::ValueError(Agent::InformErrorMsg(ss.str()));
   }
 }

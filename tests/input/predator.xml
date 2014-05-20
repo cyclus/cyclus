@@ -21,8 +21,8 @@
     </module>
     <agent>
       <Predator>
-        <commod_>commodity</commod_>
-        <prey_>none</prey_>
+        <commod>commodity</commod>
+        <prey>none</prey>
       </Predator>
     </agent>
   </facility>

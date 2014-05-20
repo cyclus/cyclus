@@ -47,20 +47,20 @@ class Sink : public cyclus::Facility  {
       cyclus::Product::Ptr> >& responses);
 
   /// @brief determines the amount to request
-  inline double capacity() const { return capacity_; }
+  inline double Capacity() const { return capacity; }
 
  private:
   #pragma cyclus var {}
-  std::vector<std::string> in_commods_;
+  std::vector<std::string> in_commods;
 
   #pragma cyclus var {}
-  double capacity_;
+  double capacity;
 
   #pragma cyclus var {"default": 1e299}
-  double max_inv_size_;
+  double max_inv_size;
 
-  #pragma cyclus var {'capacity': 'max_inv_size_'}
-  cyclus::toolkit::ResourceBuff inventory_;
+  #pragma cyclus var {'capacity': 'max_inv_size'}
+  cyclus::toolkit::ResourceBuff inventory;
 };
 
 }  // namespace cyclus

@@ -21,10 +21,10 @@
     </module>
     <agent>
       <Sink>
-        <in_commods_>
+        <in_commods>
           <val>commodity</val>
-        </in_commods_>
-        <capacity_>1.00</capacity_>
+        </in_commods>
+        <capacity>1.00</capacity>
       </Sink>
     </agent>
   </facility>
