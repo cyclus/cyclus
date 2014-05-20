@@ -4,12 +4,6 @@ namespace cyclus {
 namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CommodityProducerManager::CommodityProducerManager() {}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-CommodityProducerManager::~CommodityProducerManager() {}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double CommodityProducerManager::TotalCapacity(Commodity& commodity) {
   double total = 0.0;
   std::set<CommodityProducer*>::iterator it;

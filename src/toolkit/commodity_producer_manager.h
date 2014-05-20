@@ -3,6 +3,7 @@
 
 #include <set>
 
+#include "agent.h"
 #include "commodity.h"
 #include "commodity_producer.h"
 
@@ -11,12 +12,9 @@ namespace toolkit {
 
 /// a mixin to provide information about commodity producers
 class CommodityProducerManager {
- public:
-  /// constructor
-  CommodityProducerManager();
-
-  /// virtual destructor for inheritance
-  virtual ~CommodityProducerManager();
+ public: 
+  CommodityProducerManager(Agent* agent=NULL) : agent_(agent) {};
+  virtual ~CommodityProducerManager() {};
 
   /// @return the total production capacity for a commodity amongst producers
   /// @param commodity the commodity in question
@@ -34,9 +32,14 @@ class CommodityProducerManager {
     producers_.erase(producer);
   }
 
-  const std::set<CommodityProducer*>& producers() const {return producers_;}
-  
+  inline const std::set<CommodityProducer*>& producers() const {return producers_;}
+
+  inline Agent* agent() const {return agent_;}
+
  private:
+  /// the agent managing this instance
+  Agent* agent_;
+
   /// the set of managed producers
   std::set<CommodityProducer*> producers_;
 };

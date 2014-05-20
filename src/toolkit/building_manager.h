@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+#include "agent.h"
 #include "builder.h"
 #include "commodity_producer.h"
 #include "OsiCbcSolverInterface.hpp"
@@ -21,31 +22,28 @@ struct BuildOrder {
   CommodityProducer* producer;
 };
 
-/**
-  The BuildingManager class is a managing entity that makes decisions
-  about which objects to build given certain conditions.
-
-  Specifically, the BuildingManager queries the SupplyDemandManager
-  to determine if there exists unmet demand for a Commodity, and then
-  decides which object(s) amongst that Commodity's producers should be
-  built to meet that demand. This decision takes the form of an
-  integer program:
-
-  \f[
-  \min \sum_{i=1}^{N}c_i*y_i \\
-  s.t. \sum_{i=1}^{N}\phi_i*y_i \ge \Phi \\
-  n_i \in [0,\infty) \forall i \in I, y_i integer
-  \f]
-
-  Where y_i is the number of objects of type i to build, c_i is the
-  cost to build the object of type i, \f$\phi_i\f$ is the nameplate
-  capacity of the object, and \f$\Phi\f$ is the capacity demand. Here
-  the set I corresponds to all producers of a given commodity.
-  */
+/// The BuildingManager class is a managing entity that makes decisions
+/// about which objects to build given certain conditions.
+///
+/// Specifically, the BuildingManager queries the SupplyDemandManager
+/// to determine if there exists unmet demand for a Commodity, and then
+/// decides which object(s) amongst that Commodity's producers should be
+/// built to meet that demand. This decision takes the form of an
+/// integer program:
+///
+/// \f[
+/// \min \sum_{i=1}^{N}c_i*y_i \\
+/// s.t. \sum_{i=1}^{N}\phi_i*y_i \ge \Phi \\
+/// n_i \in [0,\infty) \forall i \in I, y_i integer
+/// \f]
+///
+/// Where y_i is the number of objects of type i to build, c_i is the
+/// cost to build the object of type i, \f$\phi_i\f$ is the nameplate
+/// capacity of the object, and \f$\Phi\f$ is the capacity demand. Here
+/// the set I corresponds to all producers of a given commodity.
 class BuildingManager {
  public:
-  BuildingManager() {};
-  virtual ~BuildingManager() {};
+  BuildingManager(Agent* agent=NULL) : agent_(agent) {};
 
   /// register a builder with the manager
   /// @param builder the builder
@@ -65,11 +63,15 @@ class BuildingManager {
   std::vector<BuildOrder> MakeBuildDecision(Commodity& commodity,
                                             double demand);
 
-  const std::set<Builder*>& builders() const {
+  inline const std::set<Builder*>& builders() const {
     return builders_;
   }
 
+  inline Agent* agent() const {return agent_;}
+
  private:
+  /// the agent managing this instance
+  Agent* agent_;
   std::set<Builder*> builders_;
 
   void SetUp_(OsiCbcSolverInterface& iface,

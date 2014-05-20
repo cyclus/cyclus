@@ -13,27 +13,28 @@ namespace toolkit {
 /// be built
 class Builder {
  public:
-  Builder(Agent* manager=NULL) : manager_(manager) {};
+  Builder(Agent* agent=NULL) : agent_(agent) {};
   virtual ~Builder() {};
 
-  /// register a commodity producer with the manager
+  /// register a commodity producer with the agent
   /// @param producer the producer
   inline void Register(CommodityProducer* producer) {
     producers_.insert(producer);
   }
 
-  /// unregister a commodity producer with the manager
+  /// unregister a commodity producer with the agent
   /// @param producer the producer
   inline void Unregister(CommodityProducer* producer) {
     producers_.erase(producer);
   }
 
-  const std::set<CommodityProducer*>& producers() const {return producers_;}
+  inline const std::set<CommodityProducer*>& producers() const {return producers_;}
 
-  Agent* manager() const {return manager_;}
+  inline Agent* agent() const {return agent_;}
   
- protected:
-  Agent* manager_;
+ private:
+  /// the agent managing this instance
+  Agent* agent_;
   std::set<CommodityProducer*> producers_;
 };
 

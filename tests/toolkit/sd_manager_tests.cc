@@ -22,7 +22,6 @@ void SDManagerTests::TearDown() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SDManagerTests, initialization) {
   EXPECT_FALSE(manager.ManagesCommodity(helper->commodity));
-  EXPECT_THROW(manager.Supply(helper->commodity), KeyError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
