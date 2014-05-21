@@ -8,6 +8,7 @@
 #include "logger.h"
 #include "sim_init.h"
 #include "timer.h"
+#include "version.h"
 
 namespace cyclus {
 
@@ -140,6 +141,13 @@ void Context::InitSim(SimInfo si) {
   ->AddVal("ParentSimId", si.parent_sim)
   ->AddVal("ParentType", si.parent_type)
   ->AddVal("BranchTime", si.branch_time)
+  ->AddVal("CyclusVersion", version::core())
+  ->AddVal("CyclusVersionDescribe", version::describe())
+  ->AddVal("SqliteVersion", version::sqlite3())
+  ->AddVal("Hdf5Version", version::hdf5())
+  ->AddVal("BoostVersion", version::boost())
+  ->AddVal("LibXML2Version", version::xml2())
+  ->AddVal("CoinCBCVersion", version::coincbc())
   ->Record();
   si_ = si;
   ti_->Initialize(this, si);
