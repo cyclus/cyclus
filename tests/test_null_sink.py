@@ -44,7 +44,7 @@ def test_null_sink():
     agent_ids = agent_entry["AgentId"]
     spec = agent_entry["Implementation"]
 
-    sink_id = find_ids("Sink:Sink:Sink", spec, agent_ids)
+    sink_id = find_ids(":agents:Sink", spec, agent_ids)
     # Test if one SimpleSink is deployed
     yield assert_equal, len(sink_id), 1
 

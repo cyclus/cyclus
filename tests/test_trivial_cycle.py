@@ -60,7 +60,7 @@ def test_source_to_sink():
         agent_ids = agent_entry["AgentId"]
         spec = agent_entry["Implementation"]
 
-        facility_id = find_ids("KFacility:KFacility:KFacility", spec, agent_ids)
+        facility_id = find_ids(":agents:KFacility", spec, agent_ids)
         # Test for only one KFacility
         yield assert_equal, len(facility_id), 1
 
