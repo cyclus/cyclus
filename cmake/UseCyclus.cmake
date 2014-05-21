@@ -48,7 +48,7 @@
 #                       exists
 #
 MACRO(USE_CYCLUS lib_root src_root)
-  MESSAGE(STATUS "Starting construction of build files for agent: ${lib_root}")
+  MESSAGE(STATUS "Starting construction of build files for agent: ${src_root}")
 
   # output directory
   SET(AGENT_PATH "cyclus/${lib_root}")
@@ -232,40 +232,45 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
   ADD_DEPENDENCIES(${lib_root} "${${lib_root}_H}" "${${lib_root}_CC}")
 
   # install library
-  install(TARGETS ${lib_root} LIBRARY DESTINATION lib/cyclus/${lib_dir} 
-          COMPONENT ${lib_root})
+  INSTALL(
+    TARGETS ${lib_root} 
+    LIBRARY DESTINATION lib/cyclus/${lib_dir} 
+    COMPONENT ${lib_root}
+    )
   SET("${lib_root}_LIB" "${lib_root}" CACHE INTERNAL "Agent library alias." FORCE)
   
   # install headers
-  SET(HOUT "${lib_root}.h")
-  IF(EXISTS "${HOUT}")
-    INSTALL(FILES ${HOUT} DESTINATION include/cyclus COMPONENT ${lib_root})
-  ENDIF(EXISTS "${HOUT}")
+  IF(NOT "${${lib_root}_H}" STREQUAL "")
+    INSTALL(FILES ${${lib_root}_H} DESTINATION include/cyclus COMPONENT ${lib_root})
+  ENDIF(NOT "${${lib_root}_H}" STREQUAL "")
 
   # install test header
-  SET(HTOUT "${lib_root}_tests.h")
-  IF(EXISTS "${HTOUT}")
-    INSTALL(FILES ${HTOUT} DESTINATION include/cyclus/${lib_dir} COMPONENT ${lib_root})
-  ENDIF(EXISTS "${HTOUT}")
+  IF(NOT "${${lib_root}_TEST_H}" STREQUAL "")
+    INSTALL(
+      FILES ${${lib_root}_TEST_H} 
+      DESTINATION include/cyclus/${lib_dir} 
+      COMPONENT ${lib_root}
+      )
+  ENDIF(NOT "${${lib_root}_TEST_H}" STREQUAL "")
 
   # build & install test impl
-  SET(HTOUT "${lib_root}_tests.cc")
-  IF(EXISTS "${CCTOUT}")
-    ADD_LIBRARY("${lib_root}_tests" ${${lib_root}_TEST_CC})
-    TARGET_LINK_LIBRARIES("${lib_root}_tests" dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
-    SET_TARGET_PROPERTIES("${lib_root}_tests" PROPERTIES LINKER_LANGUAGE CXX)
-    SET("${lib_root}_TEST_LIB" "${lib_root}_tests"
-        CACHE INTERNAL "Agent test library alias." FORCE)
-    INSTALL(TARGETS ${lib_root}_tests LIBRARY DESTINATION lib/cyclus/${lib_dir}
-            COMPONENT ${lib_root})
-  ENDIF(EXISTS "${CCTOUT}")
-
-  # clear variables before returning
-  SET("${lib_root}_H" "" CACHE INTERNAL "Agent header" FORCE)
-  SET("${lib_root}_CC" "" CACHE INTERNAL "Agent source" FORCE)
-  SET("${lib_root}_TEST_H" "" CACHE INTERNAL "Agent test headers" FORCE)
-  SET("${lib_root}_TEST_CC" "" CACHE INTERNAL "Agent test source" FORCE)
-  SET("${lib_root}_TEST_LIB" "" CACHE INTERNAL "Agent test library alias." FORCE)
+  IF(NOT "${${lib_root}_TEST_CC}" STREQUAL "")
+    SET(TGT ${lib_root}tests)
+    MESSAGE(STATUS "Building agent test library: ${TGT}")
+    ADD_LIBRARY(${TGT} ${${lib_root}_TEST_CC})
+    TARGET_LINK_LIBRARIES(${TGT} dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
+    SET_TARGET_PROPERTIES(${TGT} PROPERTIES LINKER_LANGUAGE CXX)
+    SET(
+      ${lib_root}_TEST_LIB "${TGT}" 
+      CACHE INTERNAL "Agent test library alias." 
+      FORCE
+      )
+    INSTALL(
+      TARGETS ${TGT} 
+      LIBRARY DESTINATION lib/cyclus/${lib_dir}
+      COMPONENT ${lib_root}
+      )
+  ENDIF(NOT "${${lib_root}_TEST_CC}" STREQUAL "")
 ENDMACRO()
 
 macro(add_all_subdirs)
