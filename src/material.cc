@@ -43,9 +43,10 @@ Resource::Ptr Material::Clone() const {
 }
 
 void Material::Record(Context* ctx) const {
+  // Note that no time field is needed because the resource ID changes
+  // every time the resource changes - state_id by itself is already unique.
   ctx_->NewDatum("MaterialInfo")
   ->AddVal("ResourceId", state_id())
-  ->AddVal("Time", ctx_->time())
   ->AddVal("PrevDecayTime", prev_decay_time_)
   ->Record();
 

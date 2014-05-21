@@ -31,18 +31,23 @@ void SimInit::Init(Recorder* r, QueryableBackend* b) {
 }
 
 void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
+  Warn<EXPERIMENTAL_WARNING>("restart capability is not finalized and fully"
+                             " tested. Its behavior may change in future"
+                             " releases.");
   rec_ = new Recorder();
   InitBase(b, sim_id, t);
+  si_.parent_sim = sim_id;
+  si_.parent_type = "restart";
+  si_.branch_time = t;
+  ctx_->InitSim(si_); // explicitly force this to show up in the new simulations output db
 }
 
 void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
-                           int t,
-                           boost::uuids::uuid new_sim_id) {
+                     int t, boost::uuids::uuid new_sim_id) {
   throw Error("simulation branching feature not implemented");
 }
 
 void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
-  rec_->set_dump_count(10000); // this recorder is "real" and gets bigger buf
   ctx_ = new Context(&ti_, rec_);
 
   std::vector<Cond> conds;
@@ -141,49 +146,48 @@ void SimInit::LoadInfo() {
   int dec = qr.GetVal<int>("DecayInterval");
   int y0 = qr.GetVal<int>("InitialYear");
   int m0 = qr.GetVal<int>("InitialMonth");
-  ctx_->InitSim(SimInfo(dur, y0, m0, dec));
+  std::string h = qr.GetVal<std::string>("Handle");
+  si_ = SimInfo(dur, y0, m0, dec, h);
+  si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
+  ctx_->InitSim(si_);
 }
 
 void SimInit::LoadRecipes() {
-  QueryResult qr = b_->Query("Recipes", NULL);
+  QueryResult qr;
+  try {
+    qr = b_->Query("Recipes", NULL);
+  } catch (std::exception err) {
+    return;
+  } // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string recipe = qr.GetVal<std::string>("Recipe", i);
     int stateid = qr.GetVal<int>("QualId", i);
-
-    std::vector<Cond> conds;
-    conds.push_back(Cond("QualId", "==", stateid));
-    QueryResult qr = b_->Query("Compositions", &conds);
-    CompMap m;
-    for (int j = 0; j < qr.rows.size(); ++j) {
-      int nuc = qr.GetVal<int>("NucId", j);
-      double frac = qr.GetVal<double>("MassFrac", j);
-      m[nuc] = frac;
-    }
-    Composition::Ptr comp = Composition::CreateFromMass(m);
-    ctx_->AddRecipe(recipe, comp);
+    Composition::Ptr c = LoadComposition(stateid);
+    ctx_->AddRecipe(recipe, c);
   }
 }
 
 void SimInit::LoadSolverInfo() {
-  QueryResult qr = b_->Query("CommodPriority", NULL);
+  GreedyPreconditioner* conditioner = NULL;
 
-  std::map<std::string, double> commod_order;
-  for (int i = 0; i < qr.rows.size(); ++i) {
-    std::string commod = qr.GetVal<std::string>("Commodity", i);
-    double order = qr.GetVal<double>("SolutionOrder", i);
-    commod_order[commod] = order;
-  }
+  try {
+    QueryResult qr = b_->Query("CommodPriority", NULL);
+    std::map<std::string, double> commod_order;
+    for (int i = 0; i < qr.rows.size(); ++i) {
+      std::string commod = qr.GetVal<std::string>("Commodity", i);
+      double order = qr.GetVal<double>("SolutionOrder", i);
+      commod_order[commod] = order;
+    }
 
-  // solver will delete conditioner
-  GreedyPreconditioner* conditioner = new GreedyPreconditioner(
-    commod_order,
-    GreedyPreconditioner::REVERSE);
+    // solver will delete conditioner
+    conditioner = new GreedyPreconditioner(commod_order,
+                                           GreedyPreconditioner::REVERSE);
+  } catch (std::exception err) { } // table doesn't exist (okay)
 
   // context will delete solver
   bool exclusive_orders = false;
   GreedySolver* solver = new GreedySolver(exclusive_orders, conditioner);
-
   ctx_->solver(solver);
 }
 
@@ -196,9 +200,12 @@ void SimInit::LoadPrototypes() {
     AgentSpec spec(impl);
 
     Agent* m = DynamicModule::Make(ctx_, spec);
+    m->id_ = agentid;
 
+    // note that we don't filter by SimTime here because prototypes remain
+    // static over the life of the simulation and we only snapshot them once
+    // when the simulation is initialized.
     std::vector<Cond> conds;
-    conds.push_back(Cond("SimTime", "==", t_));
     conds.push_back(Cond("AgentId", "==", agentid));
     CondInjector ci(b_, conds);
     PrefixInjector pi(&ci, "AgentState");
@@ -225,35 +232,43 @@ void SimInit::LoadInitialAgents() {
   std::map<int, int> parentmap; // map<agentid, parentid>
   std::map<int, Agent*> unbuilt; // map<agentid, agent_ptr>
   for (int i = 0; i < qentry.rows.size(); ++i) {
+    if (t_ > 0 && qentry.GetVal<int>("EnterTime", i) == t_) {
+      // agent is scheduled to be built already
+      continue;
+    }
     int id = qentry.GetVal<int>("AgentId", i);
     std::vector<Cond> conds;
     conds.push_back(Cond("AgentId", "==", id));
-    QueryResult qexit;
+    conds.push_back(Cond("ExitTime", "<", t_));
     try {
-      qexit = b_->Query("AgentExit", &conds);
+      QueryResult qexit = b_->Query("AgentExit", &conds);
+      if (qexit.rows.size() != 0) {
+        continue; // agent was decomissioned before t_ - skip
+      }
     } catch (std::exception err) { } // table doesn't exist (okay)
+
     // if the agent wasn't decommissioned before t_ create and init it
-    if (qexit.rows.size() == 0) {
-      std::string proto = qentry.GetVal<std::string>("Prototype", i);
-      std::string impl = qentry.GetVal<std::string>("Implementation", i);
-      AgentSpec spec(impl);
-      Agent* m = DynamicModule::Make(ctx_, spec);
 
-      // agent-kernel init
-      m->prototype_ = proto;
-      m->id_ = id;
-      m->enter_time_ = qentry.GetVal<int>("EnterTime", i);
-      unbuilt[id] = m;
-      parentmap[id] = qentry.GetVal<int>("ParentId", i);
+    std::string proto = qentry.GetVal<std::string>("Prototype", i);
+    std::string impl = qentry.GetVal<std::string>("Implementation", i);
+    AgentSpec spec(impl);
+    Agent* m = DynamicModule::Make(ctx_, spec);
 
-      // agent-custom init
-      conds.push_back(Cond("SimTime", "==", t_));
-      CondInjector ci(b_, conds);
-      PrefixInjector pi(&ci, "AgentState");
-      m->Agent::InitFrom(&pi);
-      pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
-      m->InitFrom(&pi);
-    }
+    // agent-kernel init
+    m->prototype_ = proto;
+    m->id_ = id;
+    m->enter_time_ = qentry.GetVal<int>("EnterTime", i);
+    unbuilt[id] = m;
+    parentmap[id] = qentry.GetVal<int>("ParentId", i);
+
+    // agent-custom init
+    conds.pop_back();
+    conds.push_back(Cond("SimTime", "==", t_));
+    CondInjector ci(b_, conds);
+    PrefixInjector pi(&ci, "AgentState");
+    m->Agent::InitFrom(&pi);
+    pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
+    m->InitFrom(&pi);
   }
 
   // construct agent hierarchy starting at roots (no parent) down
@@ -324,7 +339,7 @@ void SimInit::LoadBuildSched() {
 
 void SimInit::LoadDecomSched() {
   std::vector<Cond> conds;
-  conds.push_back(Cond("DecomTime", ">", t_));
+  conds.push_back(Cond("DecomTime", ">=", t_));
   QueryResult qr;
   try {
     qr = b_->Query("DecomSchedule", &conds);
@@ -386,7 +401,6 @@ Resource::Ptr SimInit::LoadMaterial(int state_id) {
   // get special material object state
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", state_id));
-  conds.push_back(Cond("Time", "==", t_));
   QueryResult qr = b_->Query("MaterialInfo", &conds);
   int prev_decay = qr.GetVal<int>("PrevDecayTime");
 
@@ -402,6 +416,7 @@ Resource::Ptr SimInit::LoadMaterial(int state_id) {
   Agent* dummy = new Dummy(ctx_);
   Material::Ptr mat = Material::Create(dummy, qty, comp);
   mat->prev_decay_time_ = prev_decay;
+  ctx_->DelAgent(dummy);
 
   return mat;
 }
@@ -416,7 +431,9 @@ Composition::Ptr SimInit::LoadComposition(int stateid) {
     double mass_frac = qr.GetVal<double>("MassFrac", i);
     cm[nucid] = mass_frac;
   }
-  return Composition::CreateFromMass(cm);
+  Composition::Ptr c = Composition::CreateFromMass(cm);
+  c->id_ = stateid;
+  return c;
 }
 
 Resource::Ptr SimInit::LoadProduct(int state_id) {
@@ -437,7 +454,9 @@ Resource::Ptr SimInit::LoadProduct(int state_id) {
   Product::stateids_[quality] = stateid;
 
   Agent* dummy = new Dummy(ctx_);
-  return Product::Create(dummy, qty, quality);
+  Resource::Ptr r = Product::Create(dummy, qty, quality);
+  ctx_->DelAgent(dummy);
+  return r;
 }
 
 } // namespace cyclus

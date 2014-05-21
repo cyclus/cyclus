@@ -7,6 +7,9 @@
 
 #include "error.h"
 
+// for testing
+class SimInitTest;
+
 namespace cyclus {
 
 class Agent;
@@ -57,9 +60,6 @@ class DynamicModule {
   /// Returns a newly constructed agent for the given module spec.
   static Agent* Make(Context* ctx, AgentSpec spec);
 
-  /// Manually registers an agent to be used/cloned when Make is called.
-  static void AddAgent(std::string spec, Agent* ref);
-
   /// Closes all statically loaded dynamic modules. This should always be called
   /// before process termination.  This must be called AFTER all agents have
   /// been destructed.
@@ -84,7 +84,10 @@ class DynamicModule {
   /// added to this map when loaded.
   static std::map<std::string, DynamicModule*> modules_;
 
-  static std::map<std::string, Agent*> man_agents_;
+  /// for testing - see sim_init_tests
+  friend class ::SimInitTest;
+  /// for testing - see sim_init_tests
+  static std::map<std::string, AgentCtor*> man_ctors_;
 
   /// the name of the module
   std::string path_;

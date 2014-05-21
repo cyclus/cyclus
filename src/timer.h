@@ -12,12 +12,15 @@
 #include "infile_tree.h"
 #include "time_listener.h"
 
+class SimInitTest;
+
 namespace cyclus {
 
 class Agent;
 
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
+  friend class ::SimInitTest;
  public:
   Timer();
 
@@ -50,7 +53,7 @@ class Timer {
   void SchedDecom(Agent* m, int time);
 
   /// Schedules a snapshot of simulation state to output database to occur at
-  /// the end of this timestep.
+  /// the beginning of the next timestep.
   void Snapshot() { want_snapshot_ = true; };
 
   /// Schedules the simulation to be terminated at the end of this timestep.

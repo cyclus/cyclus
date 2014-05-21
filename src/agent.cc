@@ -18,7 +18,6 @@ namespace cyclus {
 int Agent::next_id_ = 0;
 
 void Agent::InitFrom(Agent* m) {
-  id_ = next_id_++;
   prototype_ = m->prototype_;
   kind_ = m->kind_;
   spec_ = m->spec_;
@@ -47,6 +46,7 @@ void Agent::InfileToDb(InfileTree* qe, DbInit di) {
 void Agent::InitFrom(QueryableBackend* b) {
   QueryResult qr = b->Query("Agent", NULL);
   prototype_ = qr.GetVal<std::string>("Prototype");
+  id_ = qr.GetVal<int>("AgentId");
   lifetime_ = qr.GetVal<int>("Lifetime");
 }
 

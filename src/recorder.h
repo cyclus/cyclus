@@ -51,6 +51,10 @@ class Recorder {
   /// simulation id.
   Recorder();
 
+  /// create a new recorder with the given dump count and random
+  /// simulation id.
+  Recorder(unsigned int dump_count);
+
   /// create a new recorder with default dump frequency and the specified
   /// simulation id.
   Recorder(boost::uuids::uuid simid);
