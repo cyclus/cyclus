@@ -66,10 +66,9 @@ SET(
   )
 
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+FILE(GLOB hpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 SET(
-  h_files ${h_files}
-  any.hpp
-  OsiCbcSolverInterface.hpp
+  h_files ${h_files} ${hpp_files}
   )
 INSTALL(
   FILES ${h_files}
