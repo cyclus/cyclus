@@ -134,7 +134,7 @@ MACRO(USE_CYCLUS lib_root src_root)
         COMMENT "Copying ${HTIN} to ${HTOUT}."
         COMMENT "Copying ${CCTIN} to ${CCTOUT}."
         )
-      SET("${lib_root}_Test_H" "${${lib_root}_Test_H}" "${HTOUT}" 
+      SET("${lib_root}_TEST_H" "${${lib_root}_TEST_H}" "${HTOUT}" 
           CACHE INTERNAL "Agent test headers" FORCE)
     ENDIF(EXISTS "${HTIN}")
 
@@ -159,7 +159,7 @@ MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
   SET("${lib_root}_H" "" CACHE INTERNAL "Agent header" FORCE)
   SET("${lib_root}_CC" "" CACHE INTERNAL "Agent source" FORCE)
   SET("${lib_root}_LIB" "" CACHE INTERNAL "Agent library alias." FORCE)
-  SET("${lib_root}_Test_H" "" CACHE INTERNAL "Agent test headers" FORCE)
+  SET("${lib_root}_TEST_H" "" CACHE INTERNAL "Agent test headers" FORCE)
   SET("${lib_root}_TEST_CC" "" CACHE INTERNAL "Agent test source" FORCE)
   SET("${lib_root}_TEST_LIB" "" CACHE INTERNAL "Agent test library alias." FORCE)
 
@@ -263,7 +263,7 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
   # clear variables before returning
   SET("${lib_root}_H" "" CACHE INTERNAL "Agent header" FORCE)
   SET("${lib_root}_CC" "" CACHE INTERNAL "Agent source" FORCE)
-  SET("${lib_root}_Test_H" "" CACHE INTERNAL "Agent test headers" FORCE)
+  SET("${lib_root}_TEST_H" "" CACHE INTERNAL "Agent test headers" FORCE)
   SET("${lib_root}_TEST_CC" "" CACHE INTERNAL "Agent test source" FORCE)
   SET("${lib_root}_TEST_LIB" "" CACHE INTERNAL "Agent test library alias." FORCE)
 ENDMACRO()
