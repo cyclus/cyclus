@@ -14,7 +14,6 @@
 static const char* dbpath = "testsiminit.sqlite";
 
 namespace cy = cyclus;
-namespace cy = cyclus;
 using cy::Agent;
 
 class Inver : public cy::Facility {
@@ -161,8 +160,14 @@ class SimInitTest : public ::testing::Test {
   cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; };
   std::set<Agent*> agent_list(cy::Context* ctx) { return ctx->agent_list_; };
   std::set<cy::TimeListener*> tickers(cy::Timer* ti) { return ti->tickers_; };
-  std::map<int, std::vector<std::pair<std::string, Agent*> > > build_queue(cy::Timer* ti) { return ti->build_queue_; };
-  std::map<int, std::vector<Agent*> > decom_queue(cy::Timer* ti) { return ti->decom_queue_; };
+
+  std::map<int, std::vector<std::pair<std::string, Agent*> > >
+  build_queue(cy::Timer* ti) {
+    return ti->build_queue_;
+  };
+  std::map<int, std::vector<Agent*> > decom_queue(cy::Timer* ti) {
+    return ti->decom_queue_;
+  };
 
   cy::Context* ctx;
   cy::Timer ti;

@@ -31,7 +31,9 @@ void SimInit::Init(Recorder* r, QueryableBackend* b) {
 }
 
 void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
-  Warn<EXPERIMENTAL_WARNING>("restart capability is not finalized and fully tested. Its behavior may change in future releases.");
+  Warn<EXPERIMENTAL_WARNING>("restart capability is not finalized and fully"
+                             " tested. Its behavior may change in future"
+                             " releases.");
   rec_ = new Recorder();
   InitBase(b, sim_id, t);
   si_.parent_sim = sim_id;
@@ -41,8 +43,7 @@ void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
 }
 
 void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
-                           int t,
-                           boost::uuids::uuid new_sim_id) {
+                     int t, boost::uuids::uuid new_sim_id) {
   throw Error("simulation branching feature not implemented");
 }
 
@@ -180,8 +181,8 @@ void SimInit::LoadSolverInfo() {
     }
 
     // solver will delete conditioner
-    conditioner = new GreedyPreconditioner( commod_order,
-        GreedyPreconditioner::REVERSE);
+    conditioner = new GreedyPreconditioner(commod_order,
+                                           GreedyPreconditioner::REVERSE);
   } catch (std::exception err) { } // table doesn't exist (okay)
 
   // context will delete solver
