@@ -147,14 +147,21 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> parts;
     boost::split(parts, ai.restart, boost::is_any_of(":"));
     if (parts.size() != 3) {
-      std::cerr << "invalid restart spec\n";
+      std::cerr << "invalid restart spec: need 3 parts [db-file]:[sim-id]:[timestep]\n";
       return 1;
     }
 
     fs::path dbfile = parts[0];
     boost::uuids::string_generator gen;
-    boost::uuids::uuid simid = gen(parts[1]);
-    int t = boost::lexical_cast<int>(parts[2]);
+    boost::uuids::uuid simid;
+    int t;
+    try {
+      simid = gen(parts[1]);
+      t = boost::lexical_cast<int>(parts[2]);
+    } catch (std::exception err) {
+      std::cerr << "invalid restart spec: simid or time is invalid\n";
+      return 1;
+    }
     FullBackend* rback = NULL;
     RecBackend::Deleter bdel;
 

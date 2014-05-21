@@ -31,6 +31,7 @@ void SimInit::Init(Recorder* r, QueryableBackend* b) {
 }
 
 void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
+  Warn<EXPERIMENTAL_WARNING>("restart capability is not finalized and fully tested. Its behavior may change in future releases.");
   rec_ = new Recorder();
   InitBase(b, sim_id, t);
   si_.parent_sim = sim_id;
