@@ -1,6 +1,6 @@
 // enrichment.h
-#ifndef CYCLUS_SRC_ENRICHMENT_H_
-#define CYCLUS_SRC_ENRICHMENT_H_
+#ifndef CYCLUS_SRC_TOOLKIT_ENRICHMENT_H_
+#define CYCLUS_SRC_TOOLKIT_ENRICHMENT_H_
 
 #include <set>
 
@@ -70,4 +70,4 @@ double ValueFunc(double frac);
 
 } // namespace toolkit
 } // namespace cyclus
-#endif  // CYCLUS_SRC_ENRICHMENT_H_
+#endif  // CYCLUS_SRC_TOOLKIT_ENRICHMENT_H_

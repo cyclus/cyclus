@@ -1,10 +1,10 @@
-#ifndef CYCLUS_SRC_COMMODITY_PRODUCER_H_
-#define CYCLUS_SRC_COMMODITY_PRODUCER_H_
+#ifndef CYCLUS_SRC_TOOLKIT_COMMODITY_PRODUCER_H_
+#define CYCLUS_SRC_TOOLKIT_COMMODITY_PRODUCER_H_
 
 #include <map>
 #include <set>
 
-#include "agent.h"
+#include "agent_managed.h"
 #include "cyc_limits.h"
 #include "commodity.h"
 
@@ -20,7 +20,7 @@ struct CommodInfo {
 };
 
 /// a mixin to provide information about produced commodities
-class CommodityProducer {
+class CommodityProducer: public AgentManaged {
  public:
   CommodityProducer(double default_capacity=0,
                     double default_cost=kModifierLimit,
@@ -86,12 +86,7 @@ class CommodityProducer {
   /// @param source the original commodity producer
   void Copy(CommodityProducer* source);
 
-  inline Agent* agent() const {return agent_;}
-
  private:
-  /// the agent managing this instance
-  Agent* agent_;
-
   /// a collection of commodities and their production capacities
   std::map<Commodity, CommodInfo, CommodityCompare> commodities_;
 
@@ -104,4 +99,5 @@ class CommodityProducer {
 
 } // namespace toolkit
 } // namespace cyclus
-#endif  // CYCLUS_SRC_COMMODITY_PRODUCER_H_
+
+#endif  // CYCLUS_SRC_TOOLKIT_COMMODITY_PRODUCER_H_

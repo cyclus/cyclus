@@ -1,10 +1,10 @@
-#ifndef CYCLUS_SRC_BUILDING_MANAGER_H_
-#define CYCLUS_SRC_BUILDING_MANAGER_H_
+#ifndef CYCLUS_SRC_TOOLKIT_BUILDING_MANAGER_H_
+#define CYCLUS_SRC_TOOLKIT_BUILDING_MANAGER_H_
 
 #include <map>
 #include <vector>
 
-#include "agent.h"
+#include "agent_managed.h"
 #include "builder.h"
 #include "commodity_producer.h"
 #include "OsiCbcSolverInterface.hpp"
@@ -41,9 +41,9 @@ struct BuildOrder {
 /// cost to build the object of type i, \f$\phi_i\f$ is the nameplate
 /// capacity of the object, and \f$\Phi\f$ is the capacity demand. Here
 /// the set I corresponds to all producers of a given commodity.
-class BuildingManager {
+class BuildingManager: public AgentManaged {
  public:
-  BuildingManager(Agent* agent=NULL) : agent_(agent) {};
+  BuildingManager(Agent* agent=NULL) : AgentManaged(agent) {};
 
   /// register a builder with the manager
   /// @param builder the builder
@@ -67,11 +67,7 @@ class BuildingManager {
     return builders_;
   }
 
-  inline Agent* agent() const {return agent_;}
-
  private:
-  /// the agent managing this instance
-  Agent* agent_;
   std::set<Builder*> builders_;
 
   void SetUp_(OsiCbcSolverInterface& iface,
@@ -89,4 +85,4 @@ class BuildingManager {
 };
 } // namespace toolkit
 } // namespace cyclus
-#endif  // CYCLUS_SRC_BUILDING_MANAGER_H_
+#endif  // CYCLUS_SRC_TOOLKIT_BUILDING_MANAGER_H_
