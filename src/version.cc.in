@@ -14,6 +14,9 @@
 #define CBC_VERSION CBCVERSION
 #endif
 
+#define INNER(x) #x
+#define SVER(x,y,z) INNER(x.y.z)
+
 namespace cyclus {
 namespace version {
 const char* describe() {
@@ -21,7 +24,7 @@ const char* describe() {
 }
 
 const char* core() {
-  return "0.4.4";
+  return SVER(CYCLUS_VERSION_MAJOR, CYCLUS_VERSION_MINOR, CYCLUS_VERSION_MICRO);
 }
 
 const char* boost() {
