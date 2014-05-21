@@ -94,7 +94,7 @@ INSTALL(FILES
   "${CMAKE_CURRENT_SOURCE_DIR}/facility_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/institution_tests.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/region_tests.cc"
-  DESTINATION share
+  DESTINATION share/cyclus
   COMPONENT testing
   )
 
