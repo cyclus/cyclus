@@ -11,9 +11,9 @@ CommodInfo::CommodInfo(double default_capacity,
 CommodityProducer::CommodityProducer(double default_capacity,
                                      double default_cost,
                                      Agent* agent)
-    : default_capacity_(default_capacity),
-      default_cost_(default_cost),
-      agent_(agent) {}
+    : AgentManaged(agent),
+      default_capacity_(default_capacity),
+      default_cost_(default_cost) {}
 
 CommodityProducer::~CommodityProducer() {}
 

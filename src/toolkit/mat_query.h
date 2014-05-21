@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SRC_MAT_QUERY_H_
-#define CYCLUS_SRC_MAT_QUERY_H_
+#ifndef CYCLUS_SRC_TOOLKIT_MAT_QUERY_H_
+#define CYCLUS_SRC_TOOLKIT_MAT_QUERY_H_
 
 #include "comp_math.h"
 #include "cyc_limits.h"
@@ -45,4 +45,4 @@ class MatQuery {
 } // namespace toolkit
 } // namespace cyclus
 
-#endif  // CYCLUS_SRC_MAT_QUERY_H_
+#endif  // CYCLUS_SRC_TOOLKIT_MAT_QUERY_H_

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SRC_COMMODITY_H_
-#define CYCLUS_SRC_COMMODITY_H_
+#ifndef CYCLUS_SRC_TOOLKIT_COMMODITY_H_
+#define CYCLUS_SRC_TOOLKIT_COMMODITY_H_
 
 #include <string>
 
@@ -49,4 +49,4 @@ struct CommodityCompare {
 };
 } // namespace toolkit
 } // namespace cyclus
-#endif  // CYCLUS_SRC_COMMODITY_H_
+#endif  // CYCLUS_SRC_TOOLKIT_COMMODITY_H_
