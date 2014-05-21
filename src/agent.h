@@ -18,9 +18,6 @@
 #include "resource.h"
 #include "state_wrangler.h"
 
-#define SHOW(X) \
-  std::cout << __FILE__ << ":" << __LINE__ << ": "#X" = " << X << "\n"
-
 class SimInitTest;
 
 namespace cyclus {
