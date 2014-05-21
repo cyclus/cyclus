@@ -75,6 +75,7 @@ SET(CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_SRC} ${cc_files})
 
 ADD_SUBDIRECTORY(toolkit)
 ADD_SUBDIRECTORY(cli)
+ADD_SUBDIRECTORY(agent_tests)
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB test_agents "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/*.h")
@@ -85,16 +86,6 @@ INSTALL(FILES ${header_files}
 
 INSTALL(FILES ${test_agents}
   DESTINATION include/cyclus/test_modules
-  COMPONENT testing
-  )
-
-FILE(GLOB agent_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*agent_tests.cc")
-INSTALL(FILES 
-  "${CMAKE_CURRENT_SOURCE_DIR}/agent_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/facility_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/institution_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/region_tests.cc"
-  DESTINATION share/cyclus
   COMPONENT testing
   )
 
