@@ -69,7 +69,7 @@ MACRO(USE_CYCLUS lib_root src_root)
     ENDIF(NOT EXISTS ${HOUT})
     SET(
       "${lib_root}_H" 
-      "${HOUT}"
+      "${lib_root}_H" "${HOUT}"
       CACHE INTERNAL "Agent header" FORCE
       )
   ENDIF(EXISTS "${HIN}")
@@ -84,7 +84,7 @@ MACRO(USE_CYCLUS lib_root src_root)
   ENDIF(NOT EXISTS ${CCOUT})
   SET(
     "${lib_root}_CC" 
-    "${CCOUT}"
+    "${lib_root}_CC" "${CCOUT}"
     CACHE INTERNAL "Agent source" FORCE
     )
 ENDMACRO()
