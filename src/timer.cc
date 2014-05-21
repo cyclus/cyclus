@@ -22,17 +22,20 @@ void Timer::RunSim() {
   while (time_ < si_.duration) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
 
+    if (want_snapshot_) {
+      want_snapshot_ = false;
+      SimInit::Snapshot(ctx_);
+      ctx_->NewDatum("Snapshots")
+          ->AddVal("Time", time_)
+          ->Record();
+    }
+
     // run through phases
     DoBuild();
     DoTick();
     DoResEx(&matl_manager, &genrsrc_manager);
     DoTock();
     DoDecom();
-
-    if (want_snapshot_) {
-      want_snapshot_ = false;
-      SimInit::Snapshot(ctx_);
-    }
 
     if (want_kill_) {
       break;
@@ -41,11 +44,15 @@ void Timer::RunSim() {
     time_++;
   }
 
-  // FIXME: make the want_kill_ be stored as bool when backends support it
+
   ctx_->NewDatum("Finish")
-      ->AddVal("EarlyTerm", (int)want_kill_)
+      ->AddVal("EarlyTerm", want_kill_)
       ->AddVal("EndTime", time_)
       ->Record();
+
+  time_++; // move time forward because snapshots are always "beginning of timestep"
+  SimInit::Snapshot(ctx_); // always do a snapshot at the end of every simulation
+  time_--;
 }
 
 void Timer::DoBuild() {
@@ -147,6 +154,10 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   ctx_ = ctx;
   time_ = 0;
   si_ = si;
+
+  if (si.branch_time > -1) {
+    time_ = si.branch_time;
+  }
 }
 
 int Timer::dur() {

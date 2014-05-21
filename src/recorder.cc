@@ -17,6 +17,11 @@ Recorder::Recorder() : index_(0) {
   set_dump_count(kDefaultDumpCount);
 }
 
+Recorder::Recorder(unsigned int dump_count) : index_(0) {
+  uuid_ = boost::uuids::random_generator()();
+  set_dump_count(dump_count);
+}
+
 Recorder::Recorder(boost::uuids::uuid simid)
     : index_(0), uuid_(simid) {
   set_dump_count(kDefaultDumpCount);

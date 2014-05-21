@@ -5,6 +5,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+class SimInitTest;
 
 namespace cyclus {
 
@@ -17,7 +18,7 @@ typedef std::string ResourceType;
 /// represent the lifeblood of a simulation.
 class Resource {
   friend class SimInit;
-  friend class ResTracker;
+  friend class ::SimInitTest;
 
  public:
   typedef boost::shared_ptr<Resource> Ptr;

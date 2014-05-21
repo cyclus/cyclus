@@ -18,6 +18,8 @@
 #include "greedy_solver.h"
 #include "recorder.h"
 
+class SimInitTest;
+
 namespace cyclus {
 
 class Datum;
@@ -32,16 +34,14 @@ class SimInit;
 /// the simulation and affect its behavior.
 class SimInfo {
  public:
-  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1, std::string handle = "")
-    : duration(dur), y0(y0), m0(m0), decay_period(decay_period),
-      branch_time(-1), handle(handle), parent_sim(boost::uuids::nil_uuid()) {};
+  SimInfo();
+
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1,
+          std::string handle = "");
 
   SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
-          int branch_time,
-          std::string handle = "")
-    : duration(dur), y0(-1), m0(-1), decay_period(decay_period),
-      parent_sim(parent_sim),
-      branch_time(branch_time), handle(handle) {};
+          int branch_time, std::string parent_type,
+          std::string handle = "");
 
   /// user-defined label associated with a particular simulation
   std::string handle;
@@ -61,6 +61,10 @@ class SimInfo {
   /// id for the parent simulation if any
   boost::uuids::uuid parent_sim;
 
+  /// One of "init", "branch", "restart" indicating the relationship of this
+  /// simulation to its parent simulation.
+  std::string parent_type;
+
   /// timestep at which simulation branching occurs if any
   int branch_time;
 };
@@ -78,6 +82,7 @@ class SimInfo {
 /// destruction.
 class Context {
  public:
+  friend class ::SimInitTest;
   friend class SimInit;
   friend class Agent;
 
@@ -173,13 +178,15 @@ class Context {
   int time();
 
   /// Return static simulation info.
-  inline SimInfo sim_info() const {return si_;};
+  inline SimInfo sim_info() const {
+    return si_;
+  };
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
 
   /// Schedules a snapshot of simulation state to output database to occur at
-  /// the end of the current timestep.
+  /// the beginning of the next timestep.
   void Snapshot();
 
   /// Schedules the simulation to be terminated at the end of this timestep.
@@ -214,9 +221,9 @@ class Context {
   inline int n_specs(std::string impl) {
     return n_specs_[impl];
   }
-  
+
  private:
-  /// Registers an agent as a participant in the simulation. 
+  /// Registers an agent as a participant in the simulation.
   inline void RegisterAgent(Agent* a) {
     n_prototypes_[a->prototype()]++;
     n_specs_[a->spec()]++;
@@ -245,6 +252,4 @@ class Context {
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_CONTEXT_H_
-
-
 

@@ -8,7 +8,7 @@
 
 namespace cyclus {
 
-int Composition::next_id_ = 0;
+int Composition::next_id_ = 1;
 
 Composition::Ptr Composition::CreateFromAtom(CompMap v) {
   if (!compmath::ValidNucs(v))

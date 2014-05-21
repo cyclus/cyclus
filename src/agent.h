@@ -18,8 +18,7 @@
 #include "resource.h"
 #include "state_wrangler.h"
 
-#define SHOW(X) \
-  std::cout << __FILE__ << ":" << __LINE__ << ": "#X" = " << X << "\n"
+class SimInitTest;
 
 namespace cyclus {
 
@@ -40,6 +39,7 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 /// table schemas).
 class Agent : public StateWrangler {
   friend class SimInit;
+  friend class ::SimInitTest;
 
  public:
   /// Constructor for the Agent Class

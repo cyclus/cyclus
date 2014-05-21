@@ -27,23 +27,31 @@ class SimInit {
 
   ~SimInit();
 
-  /// Initialize a simulation with data from b for simulation id in r.
+  /// Initialize a simulation with data from b for simulation id in r. SimInit
+  /// does not take ownership of the recorder or backend. the configured
+  /// context's recorder is set to r.
   void Init(Recorder* r, QueryableBackend* b);
 
-  /// Restarts a simulation from time t with data from b identified by simid.
-  /// The newly configured simulation will run with a new simulation id.
+  /// EXPERIMENTAL (might not work properly). Restarts a simulation from time t
+  /// with data from b identified by simid.  The newly configured simulation
+  /// will run with a new simulation id.
   void Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t);
 
   /// NOT IMPLEMENTED. Initializes a simulation branched from prev_sim_id at
   /// time t with diverging state described in new_sim_id.
   ///
-  /// TODO: implement
+  /// TODO(rwcarlsen): implement
   void Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id, int t,
               boost::uuids::uuid new_sim_id);
 
   /// Records a snapshot of the current state of the simulation being managed by
-  /// ctx into the simulations output database.
+  /// ctx into the simulation's output database.
   static void Snapshot(Context* ctx);
+
+  /// Records a snapshot of the agent's current internal state into the
+  /// simulation's output database.  Note that this should generally not be
+  /// called directly.
+  static void SnapAgent(Agent* m);
 
   /// Returns the initialized context. Note that either Init, Restart, or Branch
   /// must be called first.
@@ -75,8 +83,6 @@ class SimInit {
   Resource::Ptr LoadProduct(int resid);
   Composition::Ptr LoadComposition(int stateid);
 
-  static void SnapAgent(Agent* m);
-
   // std::map<AgentId, Agent*>
   std::map<int, Agent*> agents_;
 
@@ -84,6 +90,7 @@ class SimInit {
   Recorder* rec_;
   Timer ti_;
   boost::uuids::uuid simid_;
+  SimInfo si_;
   QueryableBackend* b_;
   int t_;
 };
