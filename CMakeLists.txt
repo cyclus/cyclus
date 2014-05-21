@@ -169,12 +169,12 @@ set(LIBS ${LIBS} ${COIN_LIBRARIES})
 # include all the directories we just found
 INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
                     "${LibXML++_INCLUDE_DIR}"
-                    ${Glibmm_INCLUDE_DIRS}
+                    "${Glibmm_INCLUDE_DIRS}"
                     "${LibXML++Config_INCLUDE_DIR}"
                     "${SQLITE3_INCLUDE_DIR}"
-                    ${HDF5_INCLUDE_DIRS}
+                    "${HDF5_INCLUDE_DIRS}"
                     "${Boost_INCLUDE_DIR}"
-                    ${COIN_INCLUDE_DIRS})
+                    "${COIN_INCLUDE_DIRS}")
 
 ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
