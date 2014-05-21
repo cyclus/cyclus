@@ -83,14 +83,14 @@ MACRO(USE_CYCLUS lib_root src_root)
     EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
   ENDIF(NOT EXISTS ${CCOUT})
 
-  IF("${${lib_root}_CC}" STREQUAL "")
-    SET("${lib_root}_CC" "${CCOUT}" CACHE INTERNAL "Agent source" FORCE)
-  ELSE("${${lib_root}_CC}" STREQUAL "")
-    SET("${lib_root}_CC" "${${lib_root}_CC}" "${CCOUT}" CACHE INTERNAL "Agent source" FORCE)
-  ENDIF("${${lib_root}_CC}" STREQUAL "")
+  #IF("${${lib_root}_CC}" STREQUAL "")
+  #  SET("${lib_root}_CC" "${CCOUT}" CACHE INTERNAL "Agent source" FORCE)
+  #ELSE("${${lib_root}_CC}" STREQUAL "")
+  SET("${lib_root}_CC" "${${lib_root}_CC}" "${CCOUT}" CACHE INTERNAL "Agent source" FORCE)
+  #ENDIF("${${lib_root}_CC}" STREQUAL "")
 ENDMACRO()
 
-MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root)
+MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
   # clear variables before starting
   SET("${lib_root}_H" "" CACHE INTERNAL "Agent header" FORCE)
   SET("${lib_root}_CC" "" CACHE INTERNAL "Agent source" FORCE)
@@ -133,7 +133,7 @@ MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root)
   # install library
   install(
     TARGETS ${lib_root}
-    LIBRARY DESTINATION lib/cyclus/${lib_root}
+    LIBRARY DESTINATION lib/cyclus/${lib_dir}
     COMPONENT ${lib_root}
     )
   SET(
@@ -212,7 +212,7 @@ MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root)
   MESSAGE(STATUS "Finished construction of build files for agent: ${lib_root}")
 ENDMACRO()
 
-MACRO(INSTALL_CYCLUS_MODULE lib_root)
+MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
   # add library
   ADD_LIBRARY("${lib_root}" ${${lib_root}_CC})
   TARGET_LINK_LIBRARIES(${lib_root} dl ${LIBS})
@@ -220,7 +220,7 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root)
   ADD_DEPENDENCIES(${lib_root} "${${lib_root}_H}" "${${lib_root}_CC}")
 
   # install library
-  install(TARGETS ${lib_root} LIBRARY DESTINATION lib/cyclus/${lib_root} COMPONENT ${lib_root})
+  install(TARGETS ${lib_root} LIBRARY DESTINATION lib/cyclus/${lib_dir} COMPONENT ${lib_root})
   SET("${lib_root}_LIB" "${lib_root}" CACHE INTERNAL "Agent library alias." FORCE)
   
   # install headers
