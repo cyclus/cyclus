@@ -16,7 +16,7 @@
   <facility>
     <name>KFacility</name>
     <module>
-      <path>KFacility</path>
+      <lib>agents</lib>
       <agent>KFacility</agent>
     </module>
     <agent>
@@ -35,7 +35,7 @@
   <region>
     <name>SingleRegion</name>
     <module>
-      <path>NullRegion</path>
+      <lib>agents</lib>
       <agent>NullRegion</agent>
     </module>
     <allowedfacility>KFacility</allowedfacility>
@@ -45,7 +45,7 @@
     <institution>
       <name>SingleInstitution</name>
       <module>
-        <path>NullInst</path>
+        <lib>agents</lib>
         <agent>NullInst</agent>
       </module>
       <availableprototype>KFacility</availableprototype>

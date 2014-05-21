@@ -1,3 +1,3 @@
-use_cyclus("TestFacility" "test_facility")
-use_cyclus("TestInst" "test_inst")
-use_cyclus("TestRegion" "test_region")
+install_cyclus_standalone("TestFacility" "test_facility" "tests")
+install_cyclus_standalone("TestInst" "test_inst" "tests")
+install_cyclus_standalone("TestRegion" "test_region" "tests")

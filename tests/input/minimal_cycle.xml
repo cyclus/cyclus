@@ -20,7 +20,7 @@
   <facility>
     <name>FacilityA</name>
     <module>
-      <path>KFacility</path>
+      <lib>agents</lib>
       <agent>KFacility</agent>
     </module>
     <agent>
@@ -39,7 +39,7 @@
   <facility>
     <name>FacilityB</name>
     <module>
-      <path>KFacility</path>
+      <lib>agents</lib>
       <agent>KFacility</agent>
     </module>
     <agent>
@@ -58,7 +58,7 @@
   <region>
     <name>SingleRegion</name>
     <module>
-      <path>NullRegion</path>
+      <lib>agents</lib>
       <agent>NullRegion</agent>
     </module>
     <allowedfacility>FacilityA</allowedfacility>
@@ -69,7 +69,7 @@
     <institution>
       <name>SingleInstitution</name>
       <module>
-        <path>NullInst</path>
+        <lib>agents</lib>
         <agent>NullInst</agent>
       </module>
       <availableprototype>FacilityA</availableprototype>
