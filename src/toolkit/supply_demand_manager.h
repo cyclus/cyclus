@@ -4,7 +4,7 @@
 #include "commodity.h"
 #include "commodity_producer_manager.h"
 #include "symbolic_functions.h"
-#include "agent.h"
+#include "agent_managed.h"
 
 #include <map>
 #include <set>
@@ -20,9 +20,9 @@ namespace toolkit {
 /// provides the demand and supply of a commodity at a given time.
 /// What to do with this information is left to the user of the
 /// SupplyDemandManager.
-class SupplyDemandManager {
+class SupplyDemandManager: public AgentManaged {
  public:
-  SupplyDemandManager(Agent* agent=NULL) : agent_(agent) {};
+  SupplyDemandManager(Agent* agent=NULL) : AgentManaged(agent) {};
   virtual ~SupplyDemandManager() {};
   
   /// register a new commodity with the manager, along with all the
@@ -64,17 +64,12 @@ class SupplyDemandManager {
     return demand_functions_[commodity];
   }
 
-  inline Agent* agent() const {return agent_;}
-
   /// returns the current supply of a commodity
   /// @param commodity the commodity
   /// @return the current supply of the commodity
   double Supply(Commodity& commodity);
   
  private:
-  /// the agent managing this instance
-  Agent* agent_;
-
   /// a container of all demand functions known to the manager
   std::map<Commodity, SymFunction::Ptr, CommodityCompare> demand_functions_;
 

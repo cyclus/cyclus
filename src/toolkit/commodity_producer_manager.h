@@ -1,9 +1,9 @@
-#ifndef CYCLUS_SRC_COMMODITY_PRODUCER_MANAGER_H_
-#define CYCLUS_SRC_COMMODITY_PRODUCER_MANAGER_H_
+#ifndef CYCLUS_SRC_TOOLKIT_COMMODITY_PRODUCER_MANAGER_H_
+#define CYCLUS_SRC_TOOLKIT_COMMODITY_PRODUCER_MANAGER_H_
 
 #include <set>
 
-#include "agent.h"
+#include "agent_managed.h"
 #include "commodity.h"
 #include "commodity_producer.h"
 
@@ -11,9 +11,9 @@ namespace cyclus {
 namespace toolkit {
 
 /// a mixin to provide information about commodity producers
-class CommodityProducerManager {
+class CommodityProducerManager: public AgentManaged {
  public: 
-  CommodityProducerManager(Agent* agent=NULL) : agent_(agent) {};
+  CommodityProducerManager(Agent* agent=NULL) : AgentManaged(agent) {};
   virtual ~CommodityProducerManager() {};
 
   /// @return the total production capacity for a commodity amongst producers
@@ -34,16 +34,11 @@ class CommodityProducerManager {
 
   inline const std::set<CommodityProducer*>& producers() const {return producers_;}
 
-  inline Agent* agent() const {return agent_;}
-
  private:
-  /// the agent managing this instance
-  Agent* agent_;
-
   /// the set of managed producers
   std::set<CommodityProducer*> producers_;
 };
 
 } // namespace toolkit
 } // namespace cyclus
-#endif  // CYCLUS_SRC_COMMODITY_PRODUCER_MANAGER_H_
+#endif  // CYCLUS_SRC_TOOLKIT_COMMODITY_PRODUCER_MANAGER_H_

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SRC_COMMODITY_RECIPE_CONTEXT_H_
-#define CYCLUS_SRC_COMMODITY_RECIPE_CONTEXT_H_
+#ifndef CYCLUS_SRC_TOOLKIT_COMMODITY_RECIPE_CONTEXT_H_
+#define CYCLUS_SRC_TOOLKIT_COMMODITY_RECIPE_CONTEXT_H_
 
 #include <map>
 #include <string>
@@ -98,4 +98,4 @@ class CommodityRecipeContext : public StateWrangler {
 } // namespace toolkit
 } // namespace cyclus
 
-#endif  // CYCLUS_SRC_COMMODITY_RECIPE_CONTEXT_H_
+#endif  // CYCLUS_SRC_TOOLKIT_COMMODITY_RECIPE_CONTEXT_H_

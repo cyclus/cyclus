@@ -1,9 +1,9 @@
-#ifndef CYCLUS_SRC_BUILDER_H_
-#define CYCLUS_SRC_BUILDER_H_
+#ifndef CYCLUS_SRC_TOOLKIT_BUILDER_H_
+#define CYCLUS_SRC_TOOLKIT_BUILDER_H_
 
 #include <set>
 
-#include "agent.h"
+#include "agent_managed.h"
 #include "commodity_producer.h"
 
 namespace cyclus {
@@ -11,9 +11,9 @@ namespace toolkit {
 
 /// a mixin to provide information about commodity producers that can
 /// be built
-class Builder {
+class Builder: public AgentManaged {
  public:
-  Builder(Agent* agent=NULL) : agent_(agent) {};
+  Builder(Agent* agent=NULL) : AgentManaged(agent) {};
   virtual ~Builder() {};
 
   /// register a commodity producer with the agent
@@ -29,15 +29,11 @@ class Builder {
   }
 
   inline const std::set<CommodityProducer*>& producers() const {return producers_;}
-
-  inline Agent* agent() const {return agent_;}
   
  private:
-  /// the agent managing this instance
-  Agent* agent_;
   std::set<CommodityProducer*> producers_;
 };
 
 } // namespace toolkit
 } // namespace cyclus
-#endif  // CYCLUS_SRC_BUILDER_H_
+#endif  // CYCLUS_SRC_TOOLKIT_BUILDER_H_
