@@ -52,11 +52,13 @@ MACRO(USE_CYCLUS lib_root src_root)
 
   # output directory
   SET(AGENT_PATH "cyclus/${lib_root}")
-  SET(
-    CMAKE_LIBRARY_OUTPUT_DIRECTORY
-    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${AGENT_PATH}
-    )
-  
+  IF(NOT "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" MATCHES
+         ".*${AGENT_PATH}$")
+    SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY 
+      ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${AGENT_PATH})
+  ENDIF(NOT "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" MATCHES
+         ".*${AGENT_PATH}$")
+
   # get preprocessor script
   IF(NOT DEFINED CYCPP)
     SET(CYCPP "${CYCLUS_CORE_INCLUDE_DIRS}/../../bin/cycpp.py")
@@ -106,7 +108,50 @@ MACRO(USE_CYCLUS lib_root src_root)
     EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
   ENDIF(NOT EXISTS ${CCOUT})
 
-  SET("${lib_root}_CC" "${${lib_root}_CC}" "${CCOUT}" CACHE INTERNAL "Agent source" FORCE)
+  SET("${lib_root}_CC" "${${lib_root}_CC}" "${CCOUT}" 
+      CACHE INTERNAL "Agent source" FORCE)
+
+  # add tests
+  SET(CCTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.cc")
+  SET(CCTOUT "${BUILD_DIR}/${src_root}_tests.cc")
+  SET(HTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.h")
+  SET(HTOUT "${BUILD_DIR}/${src_root}_tests.h")
+  SET(CMD "cp")
+  IF(EXISTS "${CCTIN}")
+    IF(EXISTS "${HTIN}")
+      # install test headers
+      MESSAGE(STATUS "Copying ${HTIN} to ${HTOUT}.")
+      EXECUTE_PROCESS(COMMAND ${CMD} ${HTIN} ${HTOUT})
+      ADD_CUSTOM_COMMAND(
+        OUTPUT ${HTOUT}
+        OUTPUT ${CCTOUT}
+        COMMAND ${CMD} ${HTIN} ${HTOUT}
+        COMMAND ${CMD} ${CCTIN} ${CCTOUT}
+        DEPENDS ${HIN}
+        DEPENDS ${CCIN}
+        DEPENDS ${HTIN}
+        DEPENDS ${CCTIN}
+        COMMENT "Copying ${HTIN} to ${HTOUT}."
+        COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+        )
+      SET("${lib_root}_Test_H" "${${lib_root}_Test_H}" "${HTOUT}" 
+          CACHE INTERNAL "Agent test headers" FORCE)
+    ENDIF(EXISTS "${HTIN}")
+
+    # install test impl
+    MESSAGE(STATUS "Copying ${CCTIN} to ${CCTOUT}.")
+    EXECUTE_PROCESS(COMMAND ${CMD} ${CCTIN} ${CCTOUT})
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CCTOUT}
+      COMMAND ${CMD} ${CCTIN} ${CCTOUT}
+      DEPENDS ${CCTIN} 
+      DEPENDS ${CCIN}
+      COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+      )
+    SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCOUT}" "${CCTOUT}"
+        CACHE INTERNAL "Agent test source" FORCE)
+  ENDIF(EXISTS "${CCTIN}")
+
 ENDMACRO()
 
 MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
@@ -150,83 +195,31 @@ MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
   ENDIF(EXISTS "${HIN}")
 
   # install library
-  install(
-    TARGETS ${lib_root}
-    LIBRARY DESTINATION lib/cyclus/${lib_dir}
-    COMPONENT ${lib_root}
-    )
-  SET(
-    "${lib_root}_LIB" 
-    "${lib_root}" 
-    CACHE INTERNAL "Agent library alias." FORCE
-    )
+  install(TARGETS ${lib_root} LIBRARY DESTINATION lib/cyclus/${lib_dir}
+          COMPONENT ${lib_root})
+  SET("${lib_root}_LIB" "${lib_root}" 
+      CACHE INTERNAL "Agent library alias." FORCE)
   
   # install headers
   IF(EXISTS "${HOUT}")
-    INSTALL(
-      FILES ${HOUT}
-      DESTINATION include/cyclus
-      COMPONENT ${lib_root}
-      )
+    INSTALL(FILES ${HOUT} DESTINATION include/cyclus COMPONENT ${lib_root})
   ENDIF(EXISTS "${HOUT}")
 
-  # add tests
-  SET(CCTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.cc")
-  SET(CCTOUT "${BUILD_DIR}/${src_root}_tests.cc")
-  SET(HTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.h")
-  SET(HTOUT "${BUILD_DIR}/${src_root}_tests.h")
-  SET(CMD "cp")
-  IF(EXISTS "${CCTIN}")
-    IF(EXISTS "${HTIN}")
-      # install test headers
-      MESSAGE(STATUS "Copying ${HTIN} to ${HTOUT}.")
-      EXECUTE_PROCESS(COMMAND ${CMD} ${HTIN} ${HTOUT})
-      ADD_CUSTOM_COMMAND(
-      	OUTPUT ${HTOUT}
-      	OUTPUT ${CCTOUT}
-	COMMAND ${CMD} ${HTIN} ${HTOUT}
-	COMMAND ${CMD} ${CCTIN} ${CCTOUT}
-	DEPENDS ${HIN}
-	DEPENDS ${CCIN}
-	DEPENDS ${HTIN}
-	DEPENDS ${CCTIN}
-	COMMENT "Copying ${HTIN} to ${HTOUT}."
-	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
-	)
-      SET(
-    "${lib_root}_Test_H" 
-    "${HTOUT}"
-    CACHE INTERNAL "Agent test headers" FORCE
-    )
-    ENDIF(EXISTS "${HTIN}")
+  # install test header
+  IF(EXISTS "${HTOUT}")
+    INSTALL(FILES ${HTOUT} DESTINATION include/cyclus/${lib_dir} COMPONENT ${lib_root})
+  ENDIF(EXISTS "${HTOUT}")
 
-    # install test impl
-    MESSAGE(STATUS "Copying ${CCTIN} to ${CCTOUT}.")
-    EXECUTE_PROCESS(COMMAND ${CMD} ${CCTIN} ${CCTOUT})
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${CCTOUT}
-      COMMAND ${CMD} ${CCTIN} ${CCTOUT}
-      DEPENDS ${CCTIN} 
-      DEPENDS ${CCIN}
-      COMMENT "Copying ${CCTIN} to ${CCTOUT}."
-      )
-    SET(
-      "${lib_root}_TEST_CC" 
-      "${CCOUT}"
-      "${CCTOUT}"
-      CACHE INTERNAL "Agent test source" FORCE
-      )
-
-    ADD_LIBRARY(${lib_root}Tests ${${lib_root}_TEST_CC})
-    TARGET_LINK_LIBRARIES(${lib_root}Tests dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
-    SET_TARGET_PROPERTIES(${lib_root}Tests PROPERTIES LINKER_LANGUAGE CXX)
-    SET(
-      "${lib_root}_TEST_LIB"
-      "${lib_root}Tests"
-      CACHE INTERNAL "Agent test library alias." FORCE
-      )
-
-  ENDIF(EXISTS "${CCTIN}")
+  # build & install test impl
+  IF(EXISTS "${CCTOUT}")
+    ADD_LIBRARY("${lib_root}_tests" ${${lib_root}_TEST_CC})
+    TARGET_LINK_LIBRARIES("${lib_root}_tests" dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
+    SET_TARGET_PROPERTIES("${lib_root}_tests" PROPERTIES LINKER_LANGUAGE CXX)
+    SET("${lib_root}_TEST_LIB" "${lib_root}_tests"
+        CACHE INTERNAL "Agent test library alias." FORCE)
+    INSTALL(TARGETS ${lib_root}_tests LIBRARY DESTINATION lib/cyclus/${lib_dir}
+            COMPONENT ${lib_root})
+  ENDIF(EXISTS "${CCTOUT}")
 
   MESSAGE(STATUS "Finished construction of build files for agent: ${lib_root}")
 ENDMACRO()
@@ -239,7 +232,8 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
   ADD_DEPENDENCIES(${lib_root} "${${lib_root}_H}" "${${lib_root}_CC}")
 
   # install library
-  install(TARGETS ${lib_root} LIBRARY DESTINATION lib/cyclus/${lib_dir} COMPONENT ${lib_root})
+  install(TARGETS ${lib_root} LIBRARY DESTINATION lib/cyclus/${lib_dir} 
+          COMPONENT ${lib_root})
   SET("${lib_root}_LIB" "${lib_root}" CACHE INTERNAL "Agent library alias." FORCE)
   
   # install headers
@@ -247,6 +241,24 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
   IF(EXISTS "${HOUT}")
     INSTALL(FILES ${HOUT} DESTINATION include/cyclus COMPONENT ${lib_root})
   ENDIF(EXISTS "${HOUT}")
+
+  # install test header
+  SET(HTOUT "${lib_root}_tests.h")
+  IF(EXISTS "${HTOUT}")
+    INSTALL(FILES ${HTOUT} DESTINATION include/cyclus/${lib_dir} COMPONENT ${lib_root})
+  ENDIF(EXISTS "${HTOUT}")
+
+  # build & install test impl
+  SET(HTOUT "${lib_root}_tests.cc")
+  IF(EXISTS "${CCTOUT}")
+    ADD_LIBRARY("${lib_root}_tests" ${${lib_root}_TEST_CC})
+    TARGET_LINK_LIBRARIES("${lib_root}_tests" dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
+    SET_TARGET_PROPERTIES("${lib_root}_tests" PROPERTIES LINKER_LANGUAGE CXX)
+    SET("${lib_root}_TEST_LIB" "${lib_root}_tests"
+        CACHE INTERNAL "Agent test library alias." FORCE)
+    INSTALL(TARGETS ${lib_root}_tests LIBRARY DESTINATION lib/cyclus/${lib_dir}
+            COMPONENT ${lib_root})
+  ENDIF(EXISTS "${CCTOUT}")
 
   # clear variables before returning
   SET("${lib_root}_H" "" CACHE INTERNAL "Agent header" FORCE)
