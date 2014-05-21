@@ -87,6 +87,19 @@ MACRO(USE_CYCLUS lib_root src_root)
     "${CCOUT}"
     CACHE INTERNAL "Agent source" FORCE
     )
+ENDMACRO()
+
+MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root)
+  # clear variables before starting
+  SET("${lib_root}_H" "" CACHE INTERNAL "Agent header" FORCE)
+  SET("${lib_root}_CC" "" CACHE INTERNAL "Agent source" FORCE)
+  SET("${lib_root}_LIB" "" CACHE INTERNAL "Agent library alias." FORCE)
+  SET("${lib_root}_Test_H" "" CACHE INTERNAL "Agent test headers" FORCE)
+  SET("${lib_root}_TEST_CC" "" CACHE INTERNAL "Agent test source" FORCE)
+  SET("${lib_root}_TEST_LIB" "" CACHE INTERNAL "Agent test library alias." FORCE)
+
+  # setup
+  USE_CYCLUS("${lib_root}" "${src_root}")
 
   # add library
   ADD_LIBRARY(${lib_root} ${CCOUT})
@@ -161,10 +174,10 @@ MACRO(USE_CYCLUS lib_root src_root)
 	COMMENT "Copying ${CCTIN} to ${CCTOUT}."
 	)
       SET(
-	"${lib_root}_Test_H" 
-	"${HTOUT}"
-	CACHE INTERNAL "Agent test headers" FORCE
-	)
+    "${lib_root}_Test_H" 
+    "${HTOUT}"
+    CACHE INTERNAL "Agent test headers" FORCE
+    )
     ENDIF(EXISTS "${HTIN}")
 
     # install test impl
