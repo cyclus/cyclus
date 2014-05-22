@@ -66,7 +66,7 @@ struct DefaultCoeffConverter: public Converter<T> {
 /// An option exists to add a default mass based constraint that incorporates
 /// multicommodity requests, but it must be called manually once all requests
 /// have been added, e.g.,
-/// @begincode
+/// @code
 /// 
 /// RequestPortfolio<SomeResource>::Ptr rp(new RequestPortfolio<SomeResource>());
 /// // add some requests
