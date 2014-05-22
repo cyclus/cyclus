@@ -66,7 +66,7 @@ TEST_F(ContextTests, EnterLeave) {
   Agent* clone = fac->Clone();
   EXPECT_EQ(ctx->n_prototypes(TestFacility::proto_name()), 0);
   EXPECT_EQ(ctx->n_specs(TestFacility::spec()), 0);
-  clone->Build();
+  clone->Build(NULL);
   Trader* exr = dynamic_cast<Trader*>(clone);
   EXPECT_EQ(ctx->traders().size(), 1);
   EXPECT_EQ(*ctx->traders().begin(), exr);
