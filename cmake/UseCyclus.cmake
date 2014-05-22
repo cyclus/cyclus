@@ -195,14 +195,13 @@ MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
 
   # check if a test driver was provided, otherwise use the default
   IF(${ARGC} GREATER 3)
-    MESSAGE("ARGC: ${ARGC}")
-    SET(DRIVER ${ARG4})
+    SET(DRIVER "${ARGV4}")
   ELSE(${ARGC} GREATER 3)
     SET(DRIVER "${CYCLUS_DEFAULT_TEST_DRIVER}")
   ENDIF(${ARGC} GREATER 3)
 
   USE_CYCLUS("${lib_root}" "${src_root}")
-  INSTALL_CYCLUS_MODULE("${lib_root}" "${lib_dir}" "${DRIVER}")
+  INSTALL_CYCLUS_MODULE("${lib_root}" "${lib_dir}" ${DRIVER})
 ENDMACRO()
 
 MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
@@ -214,12 +213,11 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
   SET(INST_DIR "${lib_dir}")
 
   # check if a test driver was provided, otherwise use the default
-  IF(${ARGC} GREATER 3)
-    MESSAGE("ARGC: ${ARGC}")
-    SET(DRIVER ${ARG4})
-  ELSE(${ARGC} GREATER 3)
+  IF(${ARGC} GREATER 2)
+    SET(DRIVER "${ARGV2}")
+  ELSE(${ARGC} GREATER 2)
     SET(DRIVER "${CYCLUS_DEFAULT_TEST_DRIVER}")
-  ENDIF(${ARGC} GREATER 3)
+  ENDIF(${ARGC} GREATER 2)
 
   INSTALL_AGENT_LIB_("${LIB_NAME}" "${LIB_SRC}" "${LIB_H}" "${INST_DIR}")
   INSTALL_AGENT_TESTS_("${LIB_NAME}" "${TEST_SRC}" "${TEST_H}" "${DRIVER}" "${INST_DIR}")
@@ -257,9 +255,11 @@ MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
   ENDIF(NOT "${test_h}" STREQUAL "")
 
   # build & install test impl
-  IF(NOT "${driver}" STREQUAL "NONE" OR NOT "${test_src}" STREQUAL "")
+  IF(NOT "${test_src}" STREQUAL "" AND NOT "${driver}" STREQUAL "NONE")
     SET(TGT ${lib_name}_unit_tests)
     MESSAGE(STATUS "Building agent unit test binary: ${TGT}")
+    MESSAGE(STATUS "Using source: ${test_src}")
+    MESSAGE(STATUS "And test driver: ${driver}")
     ADD_EXECUTABLE( 
       ${TGT}
       ${driver}
@@ -275,7 +275,7 @@ MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
       RUNTIME DESTINATION bin
       COMPONENT ${lib_name}_testing
       )
-  ENDIF(NOT "${driver}" STREQUAL "NONE" OR NOT "${test_src}" STREQUAL "")
+  ENDIF(NOT "${test_src}" STREQUAL "" AND NOT "${driver}" STREQUAL "NONE")
 ENDMACRO()
 
 
