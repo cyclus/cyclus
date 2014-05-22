@@ -161,11 +161,11 @@ class Agent : public StateWrangler {
   /// Called when the agent enters the smiulation as an active participant and
   /// is only ever called once.  Agents should NOT register for services (such
   /// as ticks/tocks and resource exchange) in this method. If agents implement
-  /// this method, they must call their superclass's Build method at the
+  /// this method, they must call their superclass' Build method at the
   /// BEGINING of their Build method.
   ///
   /// @param parent this agent's parent. NULL if this agent has no parent.
-  virtual void Build(Agent* parent = NULL);
+  virtual void Build(Agent* parent);
 
   /// Called to give the agent an opportunity to register for services (e.g.
   /// ticks/tocks and resource exchange).  Note that this may be called more
