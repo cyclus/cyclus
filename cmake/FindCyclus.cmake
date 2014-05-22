@@ -45,6 +45,7 @@ SET(CYCLUS_ROOT_DIR "${CYCLUS_CORE_INCLUDE_DIR}/../..")
 # Look for the header files
 FIND_PATH(CYCLUS_CORE_SHARE_DIR cyclus.rng.in
   HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus" 
+        "${CYCLUS_ROOT_DIR}/share" "${CYCLUS_ROOT_DIR}/share/cyclus"
   /usr/local/cyclus /opt/local/cyclus
   PATH_SUFFIXES cyclus/share share)
 
