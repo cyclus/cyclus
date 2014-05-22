@@ -51,6 +51,9 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
   COMPONENT testing
   )
 
+SET(CYCLUS_GTEST_LIBRARIES gtest PARENT_SCOPE) # for stubs/agents
+SET(CYCLUS_GTEST_LIBRARIES gtest) # for test modules
+
 ###############################################################################
 ##################################### end google test #########################
 ###############################################################################

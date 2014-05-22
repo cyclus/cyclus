@@ -22,7 +22,8 @@
 # If test files (named *_tests.[h|cc]) are present, a unit test executable will
 # be automatically generated. A custom test driver (i.e., a source file that
 # contains a main() function for gtest to run) can optionally be provided to the
-# INSTALL_CYCLUS_STANDALONE or INSTALL_CYCLUS_MODULE macros.
+# INSTALL_CYCLUS_STANDALONE or INSTALL_CYCLUS_MODULE macros. If the driver
+# supplied is NONE, then a test executable will *NOT* be created.
 #
 # Signtaures:
 #   use_cyclus(lib_root src_root)
@@ -34,7 +35,8 @@
 #   src_root : the root name of source files, e.g., my_agent for my_agent.h 
 #              and my_agent.cc
 #   lib_dir : the directory to install the module or agent into.
-#   test_driver : (optional) the custom test driver to use with unit tests
+#   test_driver : (optional) the custom test driver to use with unit tests, 
+#                 or NONE
 #
 # The following vars are updated.
 #
@@ -97,12 +99,22 @@ MACRO(USE_CYCLUS lib_root src_root)
   SET(CCOUT "${BUILD_DIR}/${src_root}.cc")
   SET(CCFLAG "-o=${CCOUT}")
 
+  # not sure if needed..
+  IF(NOT EXISTS ${CCOUT})
+    MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
+    EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
+  ENDIF(NOT EXISTS ${CCOUT})
+  SET(
+    "${lib_root}_CC" 
+    "${${lib_root}_CC}" "${CCOUT}"
+    CACHE INTERNAL "Agent impl" FORCE
+    )
   IF(EXISTS "${HIN}")
-    ## not sure if we still need this...
-    # IF(NOT EXISTS ${HOUT})
-    #   MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
-    #   EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
-    # ENDIF(NOT EXISTS ${HOUT})
+    # not sure if we still need this...
+    IF(NOT EXISTS ${HOUT})
+      MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
+      EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
+    ENDIF(NOT EXISTS ${HOUT})
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CCOUT} 
       OUTPUT ${HOUT}
@@ -128,14 +140,6 @@ MACRO(USE_CYCLUS lib_root src_root)
       COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
       )
   ENDIF(EXISTS "${HIN}")
-  ## not sure if needed..
-  # IF(NOT EXISTS ${CCOUT})
-  #   MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
-  #   EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
-  # ENDIF(NOT EXISTS ${CCOUT})
-
-  SET("${lib_root}_CC" "${${lib_root}_CC}" "${CCOUT}" 
-      CACHE INTERNAL "Agent source" FORCE)
 
   # add tests
   SET(CCTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.cc")
@@ -177,6 +181,7 @@ MACRO(USE_CYCLUS lib_root src_root)
     SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCOUT}" "${CCTOUT}"
         CACHE INTERNAL "Agent test source" FORCE)
   ENDIF(EXISTS "${CCTIN}")
+  MESSAGE(STATUS "Finished construction of build files for agent: ${src_root}")
 ENDMACRO()
 
 MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
@@ -189,11 +194,12 @@ MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
   SET("${lib_root}_TEST_LIB" "" CACHE INTERNAL "Agent test library alias." FORCE)
 
   # check if a test driver was provided, otherwise use the default
-  IF(${ARGC} GREATER 0)
-    SET(DRIVER "${ARG0}")
-  ELSE(${ARGC} GREATER 0)
+  IF(${ARGC} GREATER 3)
+    MESSAGE("ARGC: ${ARGC}")
+    SET(DRIVER ${ARG4})
+  ELSE(${ARGC} GREATER 3)
     SET(DRIVER "${CYCLUS_DEFAULT_TEST_DRIVER}")
-  ENDIF(${ARGC} GREATER 0)
+  ENDIF(${ARGC} GREATER 3)
 
   USE_CYCLUS("${lib_root}" "${src_root}")
   INSTALL_CYCLUS_MODULE("${lib_root}" "${lib_dir}" "${DRIVER}")
@@ -208,35 +214,35 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
   SET(INST_DIR "${lib_dir}")
 
   # check if a test driver was provided, otherwise use the default
-  IF(${ARGC} GREATER 0)
-    SET(DRIVER "${ARG0}")
-  ELSE(${ARGC} GREATER 0)
+  IF(${ARGC} GREATER 3)
+    MESSAGE("ARGC: ${ARGC}")
+    SET(DRIVER ${ARG4})
+  ELSE(${ARGC} GREATER 3)
     SET(DRIVER "${CYCLUS_DEFAULT_TEST_DRIVER}")
-  ENDIF(${ARGC} GREATER 0)
+  ENDIF(${ARGC} GREATER 3)
 
   INSTALL_AGENT_LIB_("${LIB_NAME}" "${LIB_SRC}" "${LIB_H}" "${INST_DIR}")
   INSTALL_AGENT_TESTS_("${LIB_NAME}" "${TEST_SRC}" "${TEST_H}" "${DRIVER}" "${INST_DIR}")
-  MESSAGE(STATUS "Finished construction of build files for module: ${LIB_NAME}")
 ENDMACRO()
 
 MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
   # add lib
-  ADD_LIBRARY("${lib_name}" "${lib_src}")
-  TARGET_LINK_LIBRARIES("${lib_name}" dl "${LIBS}")
-  SET(CYCLUS_LIBRARIES "${CYCLUS_LIBRARIES}" "${lib_root}")
-  ADD_DEPENDENCIES("${lib_name}" "${lib_src}" "${lib_h}")
+  ADD_LIBRARY(${lib_name} ${lib_src})
+  TARGET_LINK_LIBRARIES(${lib_name} dl ${LIBS})
+  SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${lib_root})
+  ADD_DEPENDENCIES(${lib_name} ${lib_src} ${lib_h})
 
   # install library
   INSTALL(
-    TARGETS "${lib_name}"
-    LIBRARY DESTINATION "lib/cyclus/${inst_dir}"
-    COMPONENT "${lib_name}"
+    TARGETS ${lib_name}
+    LIBRARY DESTINATION lib/cyclus/${inst_dir}
+    COMPONENT ${lib_name}
     )
-  SET("${lib_name}_LIB" "${lib_name}" CACHE INTERNAL "Agent library alias." FORCE)
+  SET(${lib_name}_LIB ${lib_name} CACHE INTERNAL "Agent library alias." FORCE)
   
   # install headers
   IF(NOT "${lib_h}" STREQUAL "")
-    INSTALL(FILES "${lib_h}" DESTINATION include/cyclus COMPONENT "${lib_name}")
+    INSTALL(FILES ${lib_h} DESTINATION include/cyclus COMPONENT "${lib_name}")
   ENDIF(NOT "${lib_h}" STREQUAL "")
 ENDMACRO()
 
@@ -244,32 +250,32 @@ MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
   # install test header
   IF(NOT "${test_h}" STREQUAL "")
     INSTALL(
-      FILES "${test_h}" 
-      DESTINATION "include/cyclus/${inst_dir}" 
-      COMPONENT "${lib_name}"
+      FILES ${test_h}
+      DESTINATION include/cyclus/${inst_dir} 
+      COMPONENT ${lib_name}
       )
   ENDIF(NOT "${test_h}" STREQUAL "")
 
   # build & install test impl
-  IF(NOT "${test_src}" STREQUAL "")
-    SET(TGT "${lib_name}_unit_tests")
-    MESSAGE(STATUS "Building agent test library: ${TGT}")
+  IF(NOT "${driver}" STREQUAL "NONE" OR NOT "${test_src}" STREQUAL "")
+    SET(TGT ${lib_name}_unit_tests)
+    MESSAGE(STATUS "Building agent unit test binary: ${TGT}")
     ADD_EXECUTABLE( 
-      "${TGT}"
-      "${driver}"
-      "${test_src}"
+      ${TGT}
+      ${driver}
+      ${test_src}
       )
     TARGET_LINK_LIBRARIES( 
-      "${TGT}" dl
-      "${LIBS}" 
-      "${CYCLUS_GTEST_LIBRARIES}"
+      ${TGT} dl
+      ${LIBS}
+      ${CYCLUS_GTEST_LIBRARIES}
       )
     INSTALL(
-      TARGETS "${TGT}"
+      TARGETS ${TGT}
       RUNTIME DESTINATION bin
-      COMPONENT "${lib_name}_testing"
+      COMPONENT ${lib_name}_testing
       )
-  ENDIF(NOT "${test_src}" STREQUAL "")
+  ENDIF(NOT "${driver}" STREQUAL "NONE" OR NOT "${test_src}" STREQUAL "")
 ENDMACRO()
 
 
