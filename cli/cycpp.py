@@ -392,6 +392,7 @@ class VarDeclarationFilter(Filter):
         if classname not in state.context:
             state.context[classname] = OrderedDict()
         annotations['type'] = state.canonize_type(vtype, vname)
+        annotations['index'] = len(state.context[classname])
         state.context[classname][vname] = annotations
         state.var_annotations = None
 
