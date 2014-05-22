@@ -98,7 +98,7 @@ class Facility : public TimeListener, public Agent, public Trader {
 
      @param parent the parent of this facility
    */
-  virtual void Build(Agent* parent = NULL);
+  virtual void Build(Agent* parent);
 
   virtual void EnterNotify();
 

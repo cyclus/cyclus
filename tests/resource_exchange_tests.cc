@@ -147,7 +147,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   reqr->port_ = rp;
 
   Facility* clone = dynamic_cast<Facility*>(reqr->Clone());
-  clone->Build();
+  clone->Build(NULL);
   Requester* rcast = dynamic_cast<Requester*>(clone);
   EXPECT_EQ(0, rcast->req_ctr_);
   exchng->AddAllRequests();
@@ -193,7 +193,7 @@ TEST_F(ResourceExchangeTests, Bids) {
   bidr->port_ = bp;
 
   Facility* clone = dynamic_cast<Facility*>(bidr->Clone());
-  clone->Build();
+  clone->Build(NULL);
   Bidder* bcast = dynamic_cast<Bidder*>(clone);
 
   EXPECT_EQ(0, bcast->bid_ctr_);
@@ -227,7 +227,7 @@ TEST_F(ResourceExchangeTests, Bids) {
 TEST_F(ResourceExchangeTests, PrefCalls) {
   Facility* parent = dynamic_cast<Facility*>(reqr->Clone());
   Facility* child = dynamic_cast<Facility*>(reqr->Clone());
-  parent->Build();
+  parent->Build(NULL);
   child->Build(parent);
 
   Requester* pcast = dynamic_cast<Requester*>(parent);
@@ -272,7 +272,7 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
 TEST_F(ResourceExchangeTests, PrefValues) {
   Facility* parent = dynamic_cast<Facility*>(reqr->Clone());
   Facility* child = dynamic_cast<Facility*>(reqr->Clone());
-  parent->Build();
+  parent->Build(NULL);
   child->Build(parent);
 
   Requester* pcast = dynamic_cast<Requester*>(parent);
@@ -298,7 +298,7 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   bidr->port_ = bp;
 
   Facility* bclone = dynamic_cast<Facility*>(bidr->Clone());
-  bclone->Build();
+  bclone->Build(NULL);
 
   EXPECT_NO_THROW(exchng->AddAllRequests());
   EXPECT_NO_THROW(exchng->AddAllBids());
