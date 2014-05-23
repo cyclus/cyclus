@@ -11,6 +11,7 @@
 #include "error.h"
 #include "material.h"
 #include "timer.h"
+#include "env.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -76,12 +77,14 @@ TEST_F(EnrichmentTests, valuefunction) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, material) {
+  Env::SetNucDataPath();
   EXPECT_DOUBLE_EQ(assay_u_, UraniumAssay(mat_));
   EXPECT_DOUBLE_EQ(mass_u_, UraniumQty(mat_));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, enrichmentcalcs) {
+  Env::SetNucDataPath();
   Assays assays(feed_, UraniumAssay(mat_),
                                     tails_);
   double product_qty = UraniumQty(mat_);

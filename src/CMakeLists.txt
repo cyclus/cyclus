@@ -8,36 +8,12 @@ CONFIGURE_FILE(suffix.h.in "${CMAKE_CURRENT_SOURCE_DIR}/suffix.h" @ONLY)
 EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
 CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5")
-    message("-- Found '${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5'")
-else()
-    message("-- Downloading http://regtests.fuelcycle.org/cyclus_nuc_data.h5 to "
-            "'${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5'...")
-    file(DOWNLOAD "http://regtests.fuelcycle.org/cyclus_nuc_data.h5" 
-         "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5")
-    message("-- ...download complete!")
-endif()
-
-CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5"
-  "${CYCLUS_BINARY_DIR}/share/cyclus/cyclus_nuc_data.h5"
-  COPYONLY
-  )
-
 SET(cyclus_install_dir "${CMAKE_INSTALL_PREFIX}")
 SET(cyclus_build_dir "${CYCLUS_BINARY_DIR}")
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in"
   "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
   @ONLY
-  )
-
-INSTALL(FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cyclus-flat.rng.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5"
-  DESTINATION share/cyclus
-  COMPONENT core
   )
 
 ############################################################
@@ -94,6 +70,7 @@ INSTALL(
   COMPONENT cyclus
   )
 
+SET(LIBS ${LIBS} cyclus PARENT_SCOPE)
 #################################################################
 ######### end build libcyclus ###################################
 #################################################################

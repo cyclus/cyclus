@@ -8,9 +8,9 @@
 #   install_cyclus_standalone("TestFacility" "test_facility" "tests")
 #
 # INSTALL_CYCLUS_MODULE meanwhile is meant to be able to build many agents into
-# the same module.  To do this the environment must first be prepared with 
-# USE_CYCLUS on all of the agents that will go into this module.  Then this macro
-# need only be called once.  For example,
+# the same module.  To do this the environment must first be prepared with
+# USE_CYCLUS on all of the agents that will go into this module.  Then this
+# macro need only be called once.  For example,
 #
 #   use_cyclus("agents" "sink")
 #   use_cyclus("agents" "source")
@@ -19,16 +19,24 @@
 #   use_cyclus("agents" "predator")
 #   install_cyclus_module("agents" "")
 #
+# If test files (named *_tests.[h|cc]) are present, a unit test executable will
+# be automatically generated. A custom test driver (i.e., a source file that
+# contains a main() function for gtest to run) can optionally be provided to the
+# INSTALL_CYCLUS_STANDALONE or INSTALL_CYCLUS_MODULE macros. If the driver
+# supplied is NONE, then a test executable will *NOT* be created.
+#
 # Signtaures:
 #   use_cyclus(lib_root src_root)
-#   install_cyclus_standalone(lib_root src_root lib_dir)
-#   install_cyclus_module(lib_root lib_dir)
+#   install_cyclus_standalone(lib_root src_root lib_dir [test_driver])
+#   install_cyclus_module(lib_root lib_dir [test_driver])
 #
 # Arguments:
 #   lib_root : the root library name, e.g., MyAgent
 #   src_root : the root name of source files, e.g., my_agent for my_agent.h 
 #              and my_agent.cc
 #   lib_dir : the directory to install the module or agent into.
+#   test_driver : (optional) the custom test driver to use with unit tests, 
+#                 or NONE
 #
 # The following vars are updated.
 #
@@ -43,12 +51,12 @@
 #
 # Target names that are valid:
 #
-# <lib_root>_LIB      : the name of the library target
-# <lib_root>_TEST_LIB : the name of the test library target, if test source 
-#                       exists
+# <lib_root>_LIB        : the name of the library target
+# <lib_root>_unit_tests : the name of the unit test executable, if test source 
+#                         exists
 #
 MACRO(USE_CYCLUS lib_root src_root)
-  MESSAGE(STATUS "Starting construction of build files for agent: ${lib_root}")
+  MESSAGE(STATUS "Starting construction of build files for agent: ${src_root}")
 
   # output directory
   SET(AGENT_PATH "cyclus/${lib_root}")
@@ -87,29 +95,51 @@ MACRO(USE_CYCLUS lib_root src_root)
   SET(HIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}.h")
   SET(HOUT "${BUILD_DIR}/${src_root}.h")
   SET(HFLAG "-o=${HOUT}")
+  SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}.cc")
+  SET(CCOUT "${BUILD_DIR}/${src_root}.cc")
+  SET(CCFLAG "-o=${CCOUT}")
+
+  # not sure if needed..
+  IF(NOT EXISTS ${CCOUT})
+    MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
+    EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
+  ENDIF(NOT EXISTS ${CCOUT})
+  SET(
+    "${lib_root}_CC" 
+    "${${lib_root}_CC}" "${CCOUT}"
+    CACHE INTERNAL "Agent impl" FORCE
+    )
   IF(EXISTS "${HIN}")
+    # not sure if we still need this...
     IF(NOT EXISTS ${HOUT})
       MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
       EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
     ENDIF(NOT EXISTS ${HOUT})
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CCOUT} 
+      OUTPUT ${HOUT}
+      COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
+      COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
+      DEPENDS ${HIN}
+      DEPENDS ${CCIN}
+      DEPENDS ${CYCPP}
+      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
+      COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
+      )
     SET(
       "${lib_root}_H" 
       "${${lib_root}_H}" "${HOUT}"
       CACHE INTERNAL "Agent header" FORCE
       )
+  ELSE(EXISTS "${HIN}")
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CCOUT}
+      COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
+      DEPENDS ${CCIN}
+      DEPENDS ${CYCPP}
+      COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
+      )
   ENDIF(EXISTS "${HIN}")
-
-  # process impl
-  SET(CCIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}.cc")
-  SET(CCOUT "${BUILD_DIR}/${src_root}.cc")
-  SET(CCFLAG "-o=${CCOUT}")
-  IF(NOT EXISTS ${CCOUT})
-    MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
-    EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
-  ENDIF(NOT EXISTS ${CCOUT})
-
-  SET("${lib_root}_CC" "${${lib_root}_CC}" "${CCOUT}" 
-      CACHE INTERNAL "Agent source" FORCE)
 
   # add tests
   SET(CCTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.cc")
@@ -151,7 +181,7 @@ MACRO(USE_CYCLUS lib_root src_root)
     SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCOUT}" "${CCTOUT}"
         CACHE INTERNAL "Agent test source" FORCE)
   ENDIF(EXISTS "${CCTIN}")
-
+  MESSAGE(STATUS "Finished construction of build files for agent: ${src_root}")
 ENDMACRO()
 
 MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
@@ -163,110 +193,92 @@ MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
   SET("${lib_root}_TEST_CC" "" CACHE INTERNAL "Agent test source" FORCE)
   SET("${lib_root}_TEST_LIB" "" CACHE INTERNAL "Agent test library alias." FORCE)
 
-  # setup
+  # check if a test driver was provided, otherwise use the default
+  IF(${ARGC} GREATER 3)
+    SET(DRIVER "${ARGV4}")
+  ELSE(${ARGC} GREATER 3)
+    SET(DRIVER "${CYCLUS_DEFAULT_TEST_DRIVER}")
+  ENDIF(${ARGC} GREATER 3)
+
   USE_CYCLUS("${lib_root}" "${src_root}")
-
-  # add library
-  ADD_LIBRARY(${lib_root} ${CCOUT})
-  TARGET_LINK_LIBRARIES(${lib_root} dl ${LIBS})
-  SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${lib_root})
-  ADD_DEPENDENCIES(${lib_root} ${HIN} ${HOUT} ${CCIN} ${CCOUT})
-
-  IF(EXISTS "${HIN}")
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${CCOUT} 
-      OUTPUT ${HOUT}
-      COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
-      COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
-      DEPENDS ${HIN}
-      DEPENDS ${CCIN}
-      DEPENDS ${CYCPP}
-      COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
-      COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
-      )
-  ELSE(EXISTS "${HIN}")
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${CCOUT}
-      COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
-      DEPENDS ${CCIN}
-      DEPENDS ${CYCPP}
-      COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
-      )
-  ENDIF(EXISTS "${HIN}")
-
-  # install library
-  install(TARGETS ${lib_root} LIBRARY DESTINATION lib/cyclus/${lib_dir}
-          COMPONENT ${lib_root})
-  SET("${lib_root}_LIB" "${lib_root}" 
-      CACHE INTERNAL "Agent library alias." FORCE)
-  
-  # install headers
-  IF(EXISTS "${HOUT}")
-    INSTALL(FILES ${HOUT} DESTINATION include/cyclus COMPONENT ${lib_root})
-  ENDIF(EXISTS "${HOUT}")
-
-  # install test header
-  IF(EXISTS "${HTOUT}")
-    INSTALL(FILES ${HTOUT} DESTINATION include/cyclus/${lib_dir} COMPONENT ${lib_root})
-  ENDIF(EXISTS "${HTOUT}")
-
-  # build & install test impl
-  IF(EXISTS "${CCTOUT}")
-    ADD_LIBRARY("${lib_root}_tests" ${${lib_root}_TEST_CC})
-    TARGET_LINK_LIBRARIES("${lib_root}_tests" dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
-    SET_TARGET_PROPERTIES("${lib_root}_tests" PROPERTIES LINKER_LANGUAGE CXX)
-    SET("${lib_root}_TEST_LIB" "${lib_root}_tests"
-        CACHE INTERNAL "Agent test library alias." FORCE)
-    INSTALL(TARGETS ${lib_root}_tests LIBRARY DESTINATION lib/cyclus/${lib_dir}
-            COMPONENT ${lib_root})
-  ENDIF(EXISTS "${CCTOUT}")
-
-  MESSAGE(STATUS "Finished construction of build files for agent: ${lib_root}")
+  INSTALL_CYCLUS_MODULE("${lib_root}" "${lib_dir}" ${DRIVER})
 ENDMACRO()
 
 MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
-  # add library
-  ADD_LIBRARY("${lib_root}" ${${lib_root}_CC})
-  TARGET_LINK_LIBRARIES(${lib_root} dl ${LIBS})
+  SET(LIB_NAME "${lib_root}")
+  SET(LIB_SRC "${${lib_root}_CC}")
+  SET(LIB_H "${${lib_root}_H}")
+  SET(TEST_SRC "${${lib_root}_TEST_CC}")
+  SET(TEST_H "${${lib_root}_TEST_H}")
+  SET(INST_DIR "${lib_dir}")
+
+  # check if a test driver was provided, otherwise use the default
+  IF(${ARGC} GREATER 2)
+    SET(DRIVER "${ARGV2}")
+  ELSE(${ARGC} GREATER 2)
+    SET(DRIVER "${CYCLUS_DEFAULT_TEST_DRIVER}")
+  ENDIF(${ARGC} GREATER 2)
+
+  INSTALL_AGENT_LIB_("${LIB_NAME}" "${LIB_SRC}" "${LIB_H}" "${INST_DIR}")
+  INSTALL_AGENT_TESTS_("${LIB_NAME}" "${TEST_SRC}" "${TEST_H}" "${DRIVER}" "${INST_DIR}")
+ENDMACRO()
+
+MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
+  # add lib
+  ADD_LIBRARY(${lib_name} ${lib_src})
+  TARGET_LINK_LIBRARIES(${lib_name} dl ${LIBS})
   SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${lib_root})
-  ADD_DEPENDENCIES(${lib_root} "${${lib_root}_H}" "${${lib_root}_CC}")
+  ADD_DEPENDENCIES(${lib_name} ${lib_src} ${lib_h})
 
   # install library
-  install(TARGETS ${lib_root} LIBRARY DESTINATION lib/cyclus/${lib_dir} 
-          COMPONENT ${lib_root})
-  SET("${lib_root}_LIB" "${lib_root}" CACHE INTERNAL "Agent library alias." FORCE)
+  INSTALL(
+    TARGETS ${lib_name}
+    LIBRARY DESTINATION lib/cyclus/${inst_dir}
+    COMPONENT ${lib_name}
+    )
+  SET(${lib_name}_LIB ${lib_name} CACHE INTERNAL "Agent library alias." FORCE)
   
   # install headers
-  SET(HOUT "${lib_root}.h")
-  IF(EXISTS "${HOUT}")
-    INSTALL(FILES ${HOUT} DESTINATION include/cyclus COMPONENT ${lib_root})
-  ENDIF(EXISTS "${HOUT}")
+  IF(NOT "${lib_h}" STREQUAL "")
+    INSTALL(FILES ${lib_h} DESTINATION include/cyclus COMPONENT "${lib_name}")
+  ENDIF(NOT "${lib_h}" STREQUAL "")
+ENDMACRO()
 
+MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
   # install test header
-  SET(HTOUT "${lib_root}_tests.h")
-  IF(EXISTS "${HTOUT}")
-    INSTALL(FILES ${HTOUT} DESTINATION include/cyclus/${lib_dir} COMPONENT ${lib_root})
-  ENDIF(EXISTS "${HTOUT}")
+  IF(NOT "${test_h}" STREQUAL "")
+    INSTALL(
+      FILES ${test_h}
+      DESTINATION include/cyclus/${inst_dir} 
+      COMPONENT ${lib_name}
+      )
+  ENDIF(NOT "${test_h}" STREQUAL "")
 
   # build & install test impl
-  SET(HTOUT "${lib_root}_tests.cc")
-  IF(EXISTS "${CCTOUT}")
-    ADD_LIBRARY("${lib_root}_tests" ${${lib_root}_TEST_CC})
-    TARGET_LINK_LIBRARIES("${lib_root}_tests" dl ${LIBS} ${CYCLUS_GTEST_LIBRARIES})
-    SET_TARGET_PROPERTIES("${lib_root}_tests" PROPERTIES LINKER_LANGUAGE CXX)
-    SET("${lib_root}_TEST_LIB" "${lib_root}_tests"
-        CACHE INTERNAL "Agent test library alias." FORCE)
-    INSTALL(TARGETS ${lib_root}_tests LIBRARY DESTINATION lib/cyclus/${lib_dir}
-            COMPONENT ${lib_root})
-  ENDIF(EXISTS "${CCTOUT}")
-
-  # clear variables before returning
-  SET("${lib_root}_H" "" CACHE INTERNAL "Agent header" FORCE)
-  SET("${lib_root}_CC" "" CACHE INTERNAL "Agent source" FORCE)
-  SET("${lib_root}_TEST_H" "" CACHE INTERNAL "Agent test headers" FORCE)
-  SET("${lib_root}_TEST_CC" "" CACHE INTERNAL "Agent test source" FORCE)
-  SET("${lib_root}_TEST_LIB" "" CACHE INTERNAL "Agent test library alias." FORCE)
+  IF(NOT "${test_src}" STREQUAL "" AND NOT "${driver}" STREQUAL "NONE")
+    SET(TGT ${lib_name}_unit_tests)
+    MESSAGE(STATUS "Building agent unit test binary: ${TGT}")
+    MESSAGE(STATUS "Using source: ${test_src}")
+    MESSAGE(STATUS "And test driver: ${driver}")
+    ADD_EXECUTABLE( 
+      ${TGT}
+      ${driver}
+      ${test_src}
+      )
+    TARGET_LINK_LIBRARIES( 
+      ${TGT} dl
+      ${LIBS}
+      ${CYCLUS_GTEST_LIBRARIES}
+      )
+    INSTALL(
+      TARGETS ${TGT}
+      RUNTIME DESTINATION bin
+      COMPONENT ${lib_name}_testing
+      )
+  ENDIF(NOT "${test_src}" STREQUAL "" AND NOT "${driver}" STREQUAL "NONE")
 ENDMACRO()
+
+
 
 macro(add_all_subdirs)
   file(GLOB all_valid_subdirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/CMakeLists.txt")

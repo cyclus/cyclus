@@ -32,6 +32,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
 # set project directories
 SET(PROJECT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+SET(CYCLUS_SHARE_DIR "${PROJECT_SOURCE_DIR}/share")
 SET(CYCLUS_CLI_DIR "${PROJECT_SOURCE_DIR}/cli")
 SET(CYCLUS_DOC_DIR "${PROJECT_SOURCE_DIR}/doc")
 SET(CYCLUS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
@@ -79,7 +80,7 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Tell CMake where the modules are
 LIST(APPEND CMAKE_MODULE_PATH
-     "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/CMake")
+     "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/cmake")
 
 # Include macros
 INCLUDE(UseCyclus)
@@ -167,20 +168,23 @@ set(LIBS ${LIBS} ${COIN_LIBRARIES})
 ##############################################################################################
 
 # include all the directories we just found
+# NOTE: for some reason, adding quotes around 
+# ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
 INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
                     "${LibXML++_INCLUDE_DIR}"
                     ${Glibmm_INCLUDE_DIRS}
                     "${LibXML++Config_INCLUDE_DIR}"
                     "${SQLITE3_INCLUDE_DIR}"
-                    ${HDF5_INCLUDE_DIRS}
+                    "${HDF5_INCLUDE_DIRS}"
                     "${Boost_INCLUDE_DIR}"
-                    ${COIN_INCLUDE_DIRS})
+                    "${COIN_INCLUDE_DIRS}")
 
+ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
-ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
 ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
+ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
 
 ##############################################################################################
 ####################################### end includes #########################################
@@ -191,7 +195,7 @@ ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
 ##############################################################################################
 
 configure_file(
-    "${PROJECT_SOURCE_DIR}/CMake/cmake_uninstall.cmake.in"
+    "${PROJECT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY
     )
@@ -225,9 +229,9 @@ SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
 #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev  (>= 1.46.0-1), libxml++2.6-dev (>= 2.6.0), libsqlite3-dev (>= 3.7.9), libhdf5-serial-dev (>= 1.8.0)")
 set (CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/CMake/CyclusCPackOptions.cmake.in"
-  "${CYCLUS_BINARY_DIR}/CMake/CyclusCPackOptions.cmake" @ONLY)
-SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/CMake/CyclusCPackOptions.cmake")
+CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/cmake/CyclusCPackOptions.cmake.in"
+  "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake" @ONLY)
+SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake")
 SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
 
 INCLUDE(CPack)

@@ -51,6 +51,10 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
   COMPONENT testing
   )
 
+SET(CYCLUS_GTEST_LIBRARIES gtest PARENT_SCOPE) # for stubs/agents
+SET(CYCLUS_GTEST_LIBRARIES gtest) # for test modules
+SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" "${CYCLUS_GTEST_LIBRARIES}" PARENT_SCOPE)
+
 ###############################################################################
 ##################################### end google test #########################
 ###############################################################################
@@ -63,18 +67,8 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
 ADD_SUBDIRECTORY(test_modules)
 
-SET(
-  CYCLUS_CORE_TEST_INCLUDE_DIRS ${CYCLUS_CORE_TEST_INCLUDE_DIRS}
-  "${CMAKE_CURRENT_SOURCE_DIR}"
-  "${GTEST_INCLUDE_DIRS}"
-  PARENT_SCOPE
-  )
-
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
-SET(CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_SRC} ${cc_files})
-
-ADD_SUBDIRECTORY(toolkit)
-ADD_SUBDIRECTORY(cli)
+SET(CYCLUS_CORE_TEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB test_agents "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/*.h")
@@ -88,15 +82,20 @@ INSTALL(FILES ${test_agents}
   COMPONENT testing
   )
 
-FILE(GLOB agent_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*agent_tests.cc")
-INSTALL(FILES 
-  "${CMAKE_CURRENT_SOURCE_DIR}/agent_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/facility_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/institution_tests.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/region_tests.cc"
-  DESTINATION share/cyclus
-  COMPONENT testing
+ADD_SUBDIRECTORY(toolkit)
+ADD_SUBDIRECTORY(agent_tests)
+SET(
+  CYCLUS_CORE_TEST_SOURCE "${CYCLUS_CORE_TEST_SOURCE}" 
+  "${CYCLUS_CORE_SRC}" 
+  "${cc_files}" 
+  PARENT_SCOPE
   )
+SET(
+  CYCLUS_CORE_INCLUDE_DIRS "${CYCLUS_CORE_INCLUDE_DIRS}" 
+  "${CYCLUS_CORE_TEST_INCLUDE_DIRS}" 
+  "${GTEST_INCLUDE_DIRS}"
+  PARENT_SCOPE
+)
 
 # read tests after building the driver, and add them to ctest
 set( tgt "cyclus_unit_tests" )
@@ -110,6 +109,7 @@ add_custom_command(TARGET ${tgt}
   VERBATIM
   )
 
+SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" PARENT_SCOPE)
 ###############################################################################
 #################################### end cyclus testing #######################
 ###############################################################################
