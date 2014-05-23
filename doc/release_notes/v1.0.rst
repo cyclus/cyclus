@@ -20,20 +20,26 @@ Major features
 - Cyclus Enhancement Proposal (CEP) system for large changes
 
 - Testing suite 
-  - unit tests
-  - integration tests (continuous through BaTLab and Polyphemus)
-  - regression tests
+  * unit tests
+  * integration tests (continuous through BaTLab and Polyphemus)
+  * regression tests
 
-- Resource tracking and interfaces (CEP 17)
+- Resource tracking functionality and resource interface simplicity (CEP 17)
 
-- Dynamic resource exchange (CEP 18)
+- Complicated fuel cycles enabled via dynamic resource exchange (CEP 18)
 
-- Advanced time step execution (CEP 20)
+- Advanced time step execution for consistent agent behavior (CEP 20)
 
 - Basic modules in Cyclus core, advanced modules in Cycamore
-  - relatedly, agent identification (CEP 21)
+  * relatedly, agent identification (CEP 21)
 
-- Simulation restart
+- Pre-processing
+
+- Post-processing 
+
+- Input/XML deets?
+
+- Simulation initialization and restart
 
 - Depends on PyNE for nuclear data (pyne.io)
 
