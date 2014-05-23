@@ -20,9 +20,10 @@ Major features
 - Cyclus Enhancement Proposal (CEP) system for large changes
 
 - Testing suite 
-  * unit tests
-  * integration tests (continuous through BaTLab and Polyphemus)
-  * regression tests
+
+   * unit tests
+   * integration tests (continuous through BaTLab and Polyphemus)
+   * regression tests
 
 - Resource tracking functionality and resource interface simplicity (CEP 17)
 
@@ -31,6 +32,7 @@ Major features
 - Advanced time step execution for consistent agent behavior (CEP 20)
 
 - Basic modules in Cyclus core, advanced modules in Cycamore
+
   * relatedly, agent identification (CEP 21)
 
 - Pre-processing
