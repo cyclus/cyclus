@@ -22,7 +22,7 @@ TEST(DynamicLoadingTests, ConstructTestFacility) {
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context* ctx = new cyclus::Context(&ti, &rec);
-  EXPECT_NO_THROW(DynamicModule::Make(ctx, AgentSpec("TestFacility:TestFacility:TestFacility")));
+  EXPECT_NO_THROW(DynamicModule::Make(ctx, AgentSpec("tests:TestFacility:TestFacility")));
   EXPECT_NO_THROW(DynamicModule::CloseAll());
 }
 
@@ -37,7 +37,7 @@ TEST(DynamicLoadingTests, CloneTestFacility) {
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context* ctx = new cyclus::Context(&ti, &rec);
-  EXPECT_NO_THROW(Agent* fac = DynamicModule::Make(ctx, AgentSpec("TestFacility:TestFacility:TestFacility"));
+  EXPECT_NO_THROW(Agent* fac = DynamicModule::Make(ctx, AgentSpec("tests:TestFacility:TestFacility"));
                   Agent* clone = fac->Clone(););
   DynamicModule::CloseAll();
 }
