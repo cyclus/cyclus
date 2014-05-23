@@ -273,6 +273,7 @@ void SimInit::LoadInitialAgents() {
 
   // construct agent hierarchy starting at roots (no parent) down
   std::map<int, Agent*>::iterator it = unbuilt.begin();
+  std::vector<Agent*> enter_list;
   while (unbuilt.size() > 0) {
     int id = it->first;
     Agent* m = it->second;
@@ -283,19 +284,25 @@ void SimInit::LoadInitialAgents() {
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
-      m->EnterNotify();
+      enter_list.push_back(m);
     } else if (agents_.count(parentid) > 0) { // parent is built
       m->Connect(agents_[parentid]);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
-      m->EnterNotify();
+      enter_list.push_back(m);
     } else { // parent not built yet
       ++it;
     }
     if (it == unbuilt.end()) {
       it = unbuilt.begin();
     }
+  }
+
+  // notify all agents that they are active in a simulation AFTER the
+  // parent-child hierarchy has been reconstructed.
+  for (int i = 0; i < enter_list.size(); ++i) {
+    enter_list[i]->EnterNotify();
   }
 }
 
