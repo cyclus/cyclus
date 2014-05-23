@@ -168,9 +168,11 @@ set(LIBS ${LIBS} ${COIN_LIBRARIES})
 ##############################################################################################
 
 # include all the directories we just found
+# NOTE: for some reason, adding quotes around 
+# ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
 INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
                     "${LibXML++_INCLUDE_DIR}"
-                    "${Glibmm_INCLUDE_DIRS}"
+                    ${Glibmm_INCLUDE_DIRS}
                     "${LibXML++Config_INCLUDE_DIR}"
                     "${SQLITE3_INCLUDE_DIR}"
                     "${HDF5_INCLUDE_DIRS}"
