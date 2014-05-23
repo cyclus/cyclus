@@ -10,7 +10,6 @@
 namespace cyclus {
 
 class Context;
-
 /**
    @class KFacility
 
@@ -192,6 +191,7 @@ class KFacility : public cyclus::Facility {
 
   #pragma cyclus var {}
   double k_factor_out;
+
 };
 
 }  // namespace cyclus

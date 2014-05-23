@@ -9,14 +9,15 @@
 #include "infile_tree.h"
 #include "xml_parser.h"
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(AgentTests, DISABLED_CreateFromXML) {}
+/// this function should be called by all most derived agents in order to get
+/// access to the functionality of the agent unit test library
+extern int ConnectAgentTests() {return 0;}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(AgentTests, DISABLED_LoadConstructor) {}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(AgentTests, DISABLED_InitFromXML) {}
+TEST_P(AgentTests, Clone) {
+  cyclus::Agent* clone = agent_->Clone();
+  delete clone;
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(AgentTests, Print) {
