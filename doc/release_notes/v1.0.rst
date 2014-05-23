@@ -1,0 +1,54 @@
+========================
+Cyclus 1.0 Release Notes
+========================
+
+:Author: Cyclus Developers
+:Website: http://fuelcycle.org/
+:Contact: https://groups.google.com/forum/#!forum/cyclus-dev
+
+The Cyclus core team is excited to announce the latest stable version 
+of the cyclus ecosystem!  This includes over xxxx commits by 
+x developers.  Major features include: 
+
+- predator-prey simulation behavior
+
+- simulation restart
+
+- PyNE is now a dependency for nuclear data (pyne.io)
+
+- build system changes
+
+- toolkit
+
+- backend database refactoring
+
+Since v0.4, xxx files have changed encompassing a net xxxx line insertions(+) and 
+xxxx deletions(-).
+
+Changes from 0.4 to 1.0
+=======================
+
+New features
+------------
+
+- so many, so many
+
+Known bugs
+----------
+N/A
+
+Contributors
+============
+
+The following people contributed to this release of Cyclus.  A "*" by their
+name indicates a first time contributor.  Names follow alphabetically, 
+
+* Robert Carlsen
+* Royal Elmore
+* Matthew Gidden
+* Katy Huff
+* Olzhas Rakhimov
+* Anthony Scopatz
+* Zach Welch
+* Paul Wilson
+
