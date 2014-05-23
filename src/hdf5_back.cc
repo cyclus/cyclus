@@ -100,15 +100,18 @@ std::string Hdf5Back::VLRead<std::string, VL_STRING>(const char* rawkey) {
   herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
                                       NULL, vlchunk_, NULL);
   if (status < 0)
-    throw IOError("could not select hyperslab of string value array for reading.");
+    throw IOError("could not select hyperslab of string value array for reading "
+                  "in the database '" + path_ + "'.");
   char** buf = new char* [sizeof(char *)];
   status = H5Dread(dset, vldts_[VL_STRING], mspace, dspace, H5P_DEFAULT, buf);
   if (status < 0)
-    throw IOError("failed to read in variable length string data.");
+    throw IOError("failed to read in variable length string data "
+                  "in database '" + path_ + "'.");
   string val = string(buf[0]);
   status = H5Dvlen_reclaim(vldts_[VL_STRING], mspace, H5P_DEFAULT, buf);
   if (status < 0)
-    throw IOError("failed to reclaim variable length string data space.");
+    throw IOError("failed to reclaim variable length string data space in "
+                  "database '" + path_ + "'.");
   delete[] buf;
   H5Sclose(mspace);
   H5Sclose(dspace);
@@ -127,15 +130,17 @@ Blob Hdf5Back::VLRead<Blob, BLOB>(const char* rawkey) {
   herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
                                       NULL, vlchunk_, NULL);
   if (status < 0)
-    throw IOError("could not select hyperslab of value array for reading.");
+    throw IOError("could not select hyperslab of Blob value array for reading "
+                  "in the database '" + path_ + "'.");
   char** buf = new char* [sizeof(char *)];
   status = H5Dread(dset, vldts_[BLOB], mspace, dspace, H5P_DEFAULT, buf);
   if (status < 0)
-    throw IOError("failed to read in variable length data.");
+    throw IOError("failed to read in Blob data in database '" + path_ + "'.");
   Blob val = Blob(buf[0]);
   status = H5Dvlen_reclaim(vldts_[BLOB], mspace, H5P_DEFAULT, buf);
   if (status < 0)
-    throw IOError("failed to reclaim variable lenght data space.");
+    throw IOError("failed to reclaim Blob data space in database "
+                  "'" + path_ + "'.");
   delete[] buf;
   H5Sclose(mspace);
   H5Sclose(dspace);
@@ -150,7 +155,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   using std::pair;
   using std::map;
   if (!H5Lexists(file_, table.c_str(), H5P_DEFAULT))
-    throw IOError("table '" + table + "' does not exist in hdf5.");
+    throw IOError("table '" + table + "' does not exist in '" + path_ + "'.");
   int i;
   int j;
   int jlen;
@@ -954,15 +959,18 @@ T Hdf5Back::VLRead(const char* rawkey) {
   herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
                                       NULL, vlchunk_, NULL);
   if (status < 0)
-    throw IOError("could not select hyperslab of value array for reading.");
+    throw IOError("could not select hyperslab of value array for reading "
+                  "in the database '" + path_ + "'.");
   hvl_t buf;
   status = H5Dread(dset, vldts_[U], mspace, dspace, H5P_DEFAULT, &buf);
   if (status < 0)
-    throw IOError("failed to read in variable length data.");
+    throw IOError("failed to read in variable length data "
+                  "in the database '" + path_ + "'.");
   T val = VLBufToVal<T>(buf);
   status = H5Dvlen_reclaim(vldts_[U], mspace, H5P_DEFAULT, &buf);
   if (status < 0)
-    throw IOError("failed to reclaim variable lenght data space.");
+    throw IOError("failed to reclaim variable length data space "
+                  "in the database '" + path_ + "'.");
   H5Sclose(mspace);
   H5Sclose(dspace);
   return val;
@@ -1075,14 +1083,16 @@ void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, const Digest& key) {
   hid_t mspace = H5Screate_simple(1, extent, NULL);
   herr_t status = H5Dextend(dset, newlen);
   if (status < 0)
-    throw IOError("could not resize key array.");
+    throw IOError("could not resize key array in the database '" + path_ + "'.");
   dspace = H5Dget_space(dset);
   status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, offset, NULL, extent, NULL);
   if (status < 0)
-    throw IOError("could not select hyperslab of key array.");
+    throw IOError("could not select hyperslab of key array "
+                  "in the database '" + path_ + "'.");
   status = H5Dwrite(dset, sha1_type_, mspace, dspace, H5P_DEFAULT, key.val);
   if (status < 0)
-    throw IOError("could not write digest to key array.");
+    throw IOError("could not write digest to key array "
+                  "in the database '" + path_ + "'.");
   H5Sclose(mspace);
   H5Sclose(dspace);
   vlkeys_[dbtype].insert(key);
@@ -1097,11 +1107,13 @@ void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
   herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
                                       NULL, extent, NULL);
   if (status < 0)
-    throw IOError("could not select hyperslab of value array.");
+    throw IOError("could not select hyperslab of value array "
+                  "in the database '" + path_ + "'.");
   const char* buf[1] = {val.c_str()};
   status = H5Dwrite(dset, vldts_[dbtype], mspace, dspace, H5P_DEFAULT, buf);
   if (status < 0)
-    throw IOError("could not write string to value array.");
+    throw IOError("could not write string to value array "
+                  "in the database '" + path_ + "'.");
   H5Sclose(mspace);
   H5Sclose(dspace);
 };
@@ -1115,13 +1127,16 @@ void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
   herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0], 
                                       NULL, extent, NULL);
   if (status < 0)
-    throw IOError("could not select hyperslab of value array.");
+    throw IOError("could not select hyperslab of value array "
+                  "in the database '" + path_ + "'.");
   status = H5Dwrite(dset, vldts_[dbtype], mspace, dspace, H5P_DEFAULT, &buf);
   if (status < 0)
-    throw IOError("could not write variable length data to value array.");
+    throw IOError("could not write variable length data to value array "
+                  "in the database '" + path_ + "'.");
   status = H5Dvlen_reclaim(vldts_[dbtype], mspace, H5P_DEFAULT, &buf);
   if (status < 0)
-    throw IOError("could not free variable length buffer.");
+    throw IOError("could not free variable length buffer "
+                  "in the database '" + path_ + "'.");
   H5Sclose(mspace);
   H5Sclose(dspace);
 };
