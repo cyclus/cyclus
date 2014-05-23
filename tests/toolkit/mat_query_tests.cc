@@ -171,6 +171,7 @@ TEST_F(MaterialMatQueryTest, ExtractCompleteInexactComp) {
 TEST_F(MaterialMatQueryTest, ExtractDiffComp) {
   // differing comp minus one element equals old comp minus new
   Material::Ptr m1;
+  Env::SetNucDataPath();
   double orig = diff_mat_->quantity();
   CompMap v = diff_mat_->comp()->atom();
 
