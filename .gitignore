@@ -25,3 +25,4 @@ src/Core/Utility/Env.cpp
 src/cyclus_nuc_data.h5
 src/env.cc
 src/version.cc
+share/cyclus_nuc_data.h5
