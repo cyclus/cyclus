@@ -37,6 +37,8 @@ following handy table!
        is great for. Any variables defined here are kept in a separate
        namespace from the classes.  Since this gives you direct access to the
        Python interpreter, try to be a little careful.
+:note: Merges the argument (which like with var must evalutae to a dict) with the 
+       current class level annotations. Enrties here overwrite previous entries.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
 library. It requires Python 2.7+ or Python 3.3+ to run.
@@ -45,7 +47,7 @@ from __future__ import print_function
 import os
 import re
 import sys
-from collections import Sequence, MutableMapping, OrderedDict
+from collections import Sequence, Mapping, MutableMapping, OrderedDict
 from itertools import takewhile
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
@@ -325,31 +327,9 @@ class AccessFilter(Filter):
 #
 # pass 2
 #
-class VarDecorationFilter(Filter):
-    """Filter for handling state variable decoration of the form:
-
-        #pragma cyclus var <dict>
-
-    This evals the contents of dict and puts them in state.var_annotations, to be
-    consumed by the next match with VarDeclarationFilter.
+class DecorationFilter(Filter):
+    """Abstract class for annotation accumulation.
     """
-    regex = re.compile("\s*#\s*pragma\s+cyclus\s+var\s+(.*)")
-
-    def transform(self, statement, sep):
-        state = self.machine
-        if isinstance(state, CodeGenerator):
-            state.var_annotations = True
-            return
-        context = state.context
-        classname = state.classname()
-        classpaths = classname.split('::')
-        raw = self.match.group(1)
-        glb = dict(state.execns)
-        for cls, val in context.items():
-            clspaths = cls.split('::')
-            self._add_gbl_proxies(glb, clspaths, val)
-            self._add_lcl_proxies(glb, clspaths, classpaths)
-        state.var_annotations = eval(raw, glb, context.get(classname, OrderedDict()))
 
     def _add_gbl_proxies(self, glb, path, val):
         """Proxies for global C++ scope."""
@@ -375,6 +355,38 @@ class VarDecorationFilter(Filter):
         for k in prx:
             glb[k] = prx[k]
 
+    def _eval(self):
+        state = self.machine
+        context = state.context
+        classname = state.classname()
+        classpaths = classname.split('::')
+        raw = self.match.group(1)
+        glb = dict(state.execns)
+        for cls, val in context.items():
+            clspaths = cls.split('::')
+            self._add_gbl_proxies(glb, clspaths, val['vars'])
+            self._add_lcl_proxies(glb, clspaths, classpaths)
+        lcl = context.get(classname, OrderedDict()).get('vars', OrderedDict())
+        annotations = eval(raw, glb, lcl)
+        return annotations
+
+class VarDecorationFilter(DecorationFilter):
+    """Filter for handling state variable decoration of the form:
+
+        #pragma cyclus var <dict>
+
+    This evals the contents of dict and puts them in state.var_annotations, to be
+    consumed by the next match with VarDeclarationFilter.
+    """
+    regex = re.compile("\s*#\s*pragma\s+cyclus\s+var\s+(.*)")
+
+    def transform(self, statement, sep):
+        state = self.machine
+        if isinstance(state, CodeGenerator):
+            state.var_annotations = True
+            return
+        state.var_annotations = self._eval()
+
 class VarDeclarationFilter(Filter):
     """State varible declaration.  Only oeprates if state.var_annotations is
     not None. Access for member variable must be public.
@@ -391,9 +403,11 @@ class VarDeclarationFilter(Filter):
         access = state.access[tuple(state.classes)]
         if classname not in state.context:
             state.context[classname] = OrderedDict()
+        if 'vars' not in state.context[classname]:
+            state.context[classname]['vars'] = OrderedDict()
         annotations['type'] = state.canonize_type(vtype, vname)
         annotations['index'] = len(state.context[classname])
-        state.context[classname][vname] = annotations
+        state.context[classname]['vars'][vname] = annotations
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -403,7 +417,8 @@ class VarDeclarationFilter(Filter):
         classname = cg.classname()
         vtype, vname = self.match.groups()
         cg.var_annotations = None
-        shape = cg.context.get(classname, {}).get(vname, {}).get('shape', None)
+        shape = cg.context.get(classname, {}).get('vars', {})\
+                          .get(vname, {}).get('shape', None)
         if shape is None:
             return
         s = statement + sep + '\n'
@@ -437,6 +452,37 @@ class ExecFilter(Filter):
         exec(raw, context, execns)
         del context['__builtins__']
 
+class NoteDecorationFilter(DecorationFilter):
+    """Filter for handling annotation decoration of the form:
+
+        #pragma cyclus note <dict>
+
+    This evals the contents of dict and merges them in as the class-level
+    annotations dict.
+    """
+    regex = re.compile("\s*#\s*pragma\s+cyclus\s+note\s+(.*)")
+
+    def transform(self, statement, sep):
+        state = self.machine
+        context = state.context
+        classname = state.classname()
+        annotations = self._eval()
+        if classname not in state.context:
+            state.context[classname] = OrderedDict()
+        if 'vars' not in state.context[classname]:
+            state.context[classname]['vars'] = OrderedDict()
+        self.update(context[classname], annotations)
+
+    def update(self, old, new):
+        """Updates the new annotations dictionary into the old one in-place recursively."""
+        for key, val in new.items():
+            if key not in old:
+                old[key] = val
+            elif isinstance(val, Mapping) and isinstance(old[key], Mapping):
+                self.update(old[key], val)
+            else:
+                old[key] = val
+
 class StateAccumulator(object):
     """The StateAccumulator class is the pass 2 state machine.
 
@@ -466,7 +512,8 @@ class StateAccumulator(object):
                         ExecFilter(self), UsingNamespaceFilter(self),
                         NamespaceAliasFilter(self), NamespaceFilter(self),
                         TypedefFilter(self), UsingFilter(self), LinemarkerFilter(self),
-                        VarDecorationFilter(self), VarDeclarationFilter(self)]
+                        VarDecorationFilter(self), VarDeclarationFilter(self), 
+                        NoteDecorationFilter(self)]
 
     def classname(self):
         """Returns the current, fully-expanded class name."""
@@ -663,9 +710,11 @@ class CodeGeneratorFilter(Filter):
         self.local_classname = cg.classname()
 
         # compute def line
-        ctx = context[classname] = context.get(classname, OrderedDict())
+        if classname not in context:
+            context[classname] = OrderedDict()
+        if 'vars' not in context[classname]:
+            context[classname]['vars'] = OrderedDict()
         in_class_decl = self.in_class_decl()
-        #ns = "" if in_class_decl else classname.split('::')[-1] + "::"
         ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
         virt = "virtual " if in_class_decl else ""
         end = ";" if mode == "decl" else " {"
@@ -745,7 +794,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
-        ctx = context[self.given_classname]
+        ctx = context[self.given_classname]['vars']
         impl = ""
 
         # add inheritance init froms
@@ -784,7 +833,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
-        ctx = context[self.given_classname]
+        ctx = context[self.given_classname]['vars']
         impl = ''
         # add inheritance init froms
         rents = parent_intersection(self.given_classname, WRANGLERS,
@@ -999,7 +1048,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
-        ctx = context[self.given_classname]
+        ctx = context[self.given_classname]['vars']
         pods = []
         impl = ""
 
@@ -1053,7 +1102,7 @@ class SchemaFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
-        ctx = context[self.given_classname]
+        ctx = context[self.given_classname]['vars']
         i = Indenter(level=len(ind) / 2)
         xi = Indenter(n=4)
 
@@ -1162,7 +1211,7 @@ class SnapshotFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
-        ctx = context[self.given_classname]
+        ctx = context[self.given_classname]['vars']
         impl = ind + 'di.NewDatum("Info")\n'
         for member, info in ctx.items():
             if self.pragmaname in info:
@@ -1188,7 +1237,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
-        ctx = context[self.given_classname]
+        ctx = context[self.given_classname]['vars']
         impl = ""
         buffs = []
         for member, info in ctx.items():
@@ -1222,7 +1271,7 @@ class InitInvFilter(CodeGeneratorFilter):
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
-        ctx = context[self.given_classname]
+        ctx = context[self.given_classname]['vars']
         impl = ""
         buffs = []
         for member, info in ctx.items():
