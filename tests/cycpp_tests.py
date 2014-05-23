@@ -14,7 +14,8 @@ from cycpp import NamespaceFilter, TypedefFilter, UsingFilter,\
         AccessFilter
 
 # pass 2 Filters
-from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter
+from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter, \
+    NoteDecorationFilter
 
 # pass 3 Filters
 from cycpp import CloneFilter, InitFromCopyFilter, \
@@ -191,6 +192,17 @@ def test_execfilter():
     # What are the other possible tests
     yield assert_equal, m.execns["x"], 42
 
+def test_notefilter():
+    """Test NoteDecorationFilter"""
+    m = MockMachine()
+    f = NoteDecorationFilter(m)
+    yield assert_false, f.isvalid("#pragma cyclus")
+
+    statement, sep = "#pragma cyclus note {'doc': 'string'} ", "\n"
+    yield assert_true, f.isvalid(statement)
+    f.transform(statement, sep)
+    yield assert_equal, m.context['']['doc'], 'string'
+
 #
 # pass 3 Filters
 #
@@ -199,7 +211,7 @@ class MockCodeGenMachine(object):
     def __init__(self):
         self.depth = 0
         self.execns = {}
-        self.context = {"MyFactory": OrderedDict([
+        self.context = {"MyFactory": OrderedDict([('vars', OrderedDict([ 
             ('x', {'type': 'int'}), 
             ('y', {'type': 'std::string',
                    'shape': [42],
@@ -210,6 +222,7 @@ class MockCodeGenMachine(object):
                    'schema': "FREAK OUT\n",
                    'snapshot': "JUST ANOTHER BAND FROM LA\n"
                    }),
+            ]))
             ])}
         self.statements = []
         self.classes = []
