@@ -268,7 +268,7 @@ MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
     TARGET_LINK_LIBRARIES( 
       ${TGT} dl
       ${LIBS}
-      ${CYCLUS_GTEST_LIBRARIES}
+      ${CYCLUS_TEST_LIBRARIES}
       )
     INSTALL(
       TARGETS ${TGT}

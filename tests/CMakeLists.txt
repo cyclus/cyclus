@@ -51,10 +51,6 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
   COMPONENT testing
   )
 
-SET(CYCLUS_GTEST_LIBRARIES gtest PARENT_SCOPE) # for stubs/agents
-SET(CYCLUS_GTEST_LIBRARIES gtest) # for test modules
-SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" "${CYCLUS_GTEST_LIBRARIES}" PARENT_SCOPE)
-
 ###############################################################################
 ##################################### end google test #########################
 ###############################################################################
@@ -96,6 +92,8 @@ SET(
   "${GTEST_INCLUDE_DIRS}"
   PARENT_SCOPE
 )
+
+SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" gtest PARENT_SCOPE) # for stubs/agents
 
 # read tests after building the driver, and add them to ctest
 set( tgt "cyclus_unit_tests" )
