@@ -7,31 +7,44 @@ Cyclus 1.0 Release Notes
 :Contact: https://groups.google.com/forum/#!forum/cyclus-dev
 
 The Cyclus core team is excited to announce the latest stable version 
-of the cyclus ecosystem!  This includes over xxxx commits by 
-x developers.  Major features include: 
+of the cyclus ecosystem!  This includes nearly 4000 commits by 
+8 developers.  
 
-- predator-prey simulation behavior
+Major features
+==============
 
-- simulation restart
+- Fast simulation performance
 
-- PyNE is now a dependency for nuclear data (pyne.io)
+- Memory management: model instantiation/deallocation
 
-- build system changes
+- Cyclus Enhancement Proposal (CEP) system for large changes
 
-- toolkit
+- Testing suite 
+  - unit tests
+  - integration tests (continuous through BaTLab and Polyphemus)
+  - regression tests
 
-- backend database refactoring
+- Resource tracking and interfaces (CEP 17)
+
+- Dynamic resource exchange (CEP 18)
+
+- Advanced time step execution (CEP 20)
+
+- Basic modules in Cyclus core, advanced modules in Cycamore
+  - relatedly, agent identification (CEP 21)
+
+- Simulation restart
+
+- Depends on PyNE for nuclear data (pyne.io)
+
+- Build system deets?
+
+- Toolkit
+
+- Backend database deets?
 
 Since v0.4, xxx files have changed encompassing a net xxxx line insertions(+) and 
 xxxx deletions(-).
-
-Changes from 0.4 to 1.0
-=======================
-
-New features
-------------
-
-- so many, so many
 
 Known bugs
 ----------
