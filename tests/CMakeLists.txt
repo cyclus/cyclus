@@ -108,6 +108,8 @@ add_custom_command(TARGET ${tgt}
   )
 
 SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" PARENT_SCOPE)
+SET(CYCLUS_AGENT_TEST_LIBRARIES "${CYCLUS_AGENT_TEST_LIBRARIES}" PARENT_SCOPE)
+
 ###############################################################################
 #################################### end cyclus testing #######################
 ###############################################################################
