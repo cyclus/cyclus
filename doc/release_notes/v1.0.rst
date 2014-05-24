@@ -68,6 +68,7 @@ name indicates a first time contributor.  Names follow alphabetically,
 * Royal Elmore
 * Matthew Gidden
 * Katy Huff
+* Arrielle Opotowsky
 * Olzhas Rakhimov
 * Anthony Scopatz
 * Zach Welch
