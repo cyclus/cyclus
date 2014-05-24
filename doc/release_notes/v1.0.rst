@@ -1,0 +1,75 @@
+========================
+Cyclus 1.0 Release Notes
+========================
+
+:Author: Cyclus Developers
+:Website: http://fuelcycle.org/
+:Contact: https://groups.google.com/forum/#!forum/cyclus-dev
+
+The Cyclus core team is excited to announce the latest stable version 
+of the cyclus ecosystem!  This includes nearly 4000 commits by 
+8 developers.  
+
+Major features
+==============
+
+- Fast simulation performance
+
+- Memory management: model instantiation/deallocation
+
+- Cyclus Enhancement Proposal (CEP) system for large changes
+
+- Testing suite 
+
+   * unit tests
+   * integration tests (continuous through BaTLab and Polyphemus)
+   * regression tests
+
+- Resource tracking functionality and resource interface simplicity (CEP 17)
+
+- Complicated fuel cycles enabled via dynamic resource exchange (CEP 18)
+
+- Advanced time step execution for consistent agent behavior (CEP 20)
+
+- Basic modules in Cyclus core, advanced modules in Cycamore
+
+  * relatedly, agent identification (CEP 21)
+
+- Pre-processing
+
+- Post-processing 
+
+- Input/XML deets?
+
+- Simulation initialization and restart
+
+- Depends on PyNE for nuclear data (pyne.io)
+
+- Build system deets?
+
+- Toolkit
+
+- Backend database deets?
+
+Since v0.4, xxx files have changed encompassing a net xxxx line insertions(+) and 
+xxxx deletions(-).
+
+Known bugs
+----------
+N/A
+
+Contributors
+============
+
+The following people contributed to this release of Cyclus.  A "*" by their
+name indicates a first time contributor.  Names follow alphabetically, 
+
+* Robert Carlsen
+* Royal Elmore
+* Matthew Gidden
+* Katy Huff
+* Olzhas Rakhimov
+* Anthony Scopatz
+* Zach Welch
+* Paul Wilson
+
