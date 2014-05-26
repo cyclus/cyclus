@@ -36,10 +36,10 @@ class SimInfo {
  public:
   SimInfo();
 
-  SimInfo(int dur, int y0 = 2010, int m0 = 1, int decay_period = -1,
+  SimInfo(int dur, int y0 = 2010, int m0 = 1,
           std::string handle = "");
 
-  SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
+  SimInfo(int dur, boost::uuids::uuid parent_sim,
           int branch_time, std::string parent_type,
           std::string handle = "");
 
@@ -54,9 +54,6 @@ class SimInfo {
 
   /// start month for the simulation: Jan = 1, ..., Dec = 12
   int m0;
-
-  /// interval between decay calculations in timesteps (months)
-  int decay_period;
 
   /// id for the parent simulation if any
   boost::uuids::uuid parent_sim;
