@@ -28,9 +28,12 @@ void DynamicModule::SetConstructor() {
                  GetProcAddress(module_library_, ctor_name_.c_str());
 
   if (!ctor_) {
-    string err_msg = "Unable to load agent constructor: ";
-    err_msg += GetLastError();
-    throw IOError(err_msg);
+    std::stringstream ss;
+    std::string agent = ctor_name_;
+    agent.erase(0, 9); // len(Construct) == 9
+    ss << "Could not find agent " << agent << " in module library "
+       << path_.c_str() << " (" << GetLastError() << ").";
+    throw IOError(ss.str());
   }
 }
 
