@@ -42,7 +42,9 @@ class StubRegion : public cyclus::Region {
   /// The Prime Directive
   /// Generates code that handles all input file reading and restart operations
   /// (e.g., reading from the database, instantiating a new object, etc.).
-
+  /// @warning The Prime Directive must have a space before it! (A fix will be
+  /// in 2.0 ^TM)
+  
   #pragma cyclus
 
   /// A verbose printer for the StubRegion
