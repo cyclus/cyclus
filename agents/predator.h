@@ -23,6 +23,10 @@ class Predator : public cyclus::Facility  {
 
   #pragma cyclus
 
+  #pragma cyclus note {"doc": "A facility that represents predators " \
+                              "in the Lotka-Volterra integration " \
+                              "tests"}
+
   virtual void EnterNotify();
   virtual void Decommission();
   virtual void Tick(int time);

@@ -19,6 +19,11 @@ class Sink : public cyclus::Facility  {
 
   #pragma cyclus
 
+  #pragma cyclus note {"doc": "A minimum implementation sink " \
+                              "facility that accepts specified " \
+                              "amounts of commodities from " \
+                              "other agents"}
+
   virtual std::string str();
 
   virtual void Tick(int time);
@@ -50,13 +55,20 @@ class Sink : public cyclus::Facility  {
   inline double Capacity() const { return capacity; }
 
  private:
-  #pragma cyclus var {}
+  #pragma cyclus var {"doc": "commodities that the sink facility " \
+                             "accepts", \
+                      "tooltip": "input commodities"}
   std::vector<std::string> in_commods;
 
-  #pragma cyclus var {}
+  #pragma cyclus var {"doc": "capacity the sink facility can " \
+                             "accept at each time step", \
+                      "tooltip": "sink capacity"}
   double capacity;
 
-  #pragma cyclus var {"default": 1e299}
+  #pragma cyclus var {"default": 1e299, \
+                      "doc": "total maximum inventory size of " \
+                             "sink facility", \
+                      "tooltip": "sink maximum inventory size"}
   double max_inv_size;
 
   #pragma cyclus var {'capacity': 'max_inv_size'}

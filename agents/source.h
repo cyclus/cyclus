@@ -26,6 +26,10 @@ class Source : public cyclus::Facility {
 
   #pragma cyclus
 
+  #pragma cyclus note {"doc": "A minimum implementation source " \
+                              "facility that provides a commodity " \
+                              "with a given capacity"}
+  
   virtual std::string str();
 
   virtual void Tick(int time);
@@ -83,10 +87,14 @@ class Source : public cyclus::Facility {
   inline std::string recipe() const { return recipe_name; }
 
  private:
-  #pragma cyclus var {}
+  #pragma cyclus var {"doc": "commodity that the source facility " \
+                             "supplies", \
+                      "tooltip": "source commodity"}
   std::string commod;
 
-  #pragma cyclus var {}
+  #pragma cyclus var {"doc": "recipe name for source facility's " \
+                             "commodity", \
+                      "tooltip": "commodity recipe name"}
   std::string recipe_name;
 
   /**
@@ -94,7 +102,9 @@ class Source : public cyclus::Facility {
      recipe that can be provided each time step.  A very large number
      can be provided to represent infinte capacity.
    */
-  #pragma cyclus var {}
+  #pragma cyclus var {"doc": "amount of commodity that can be " \
+                             "supplied at each time step", \
+                      "tooltip": "source capacity"}
   double capacity;
 };
 
