@@ -142,10 +142,6 @@ void Timer::Reset() {
 void Timer::Initialize(Context* ctx, SimInfo si) {
   if (si.m0 < 1 || si.m0 > 12) {
     throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
-  } else if (si.y0 < 1942) {
-    Warn<VALUE_WARNING>("The first man-made nuclear reactor was built in 1942!");
-  } else if (si.y0 > 2063) {
-    Warn<VALUE_WARNING>("Why start a simulation after we've got warp drive?: http://en.wikipedia.org/wiki/Warp_drive#Development_of_the_backstory");
   } else if (si.decay_period > si.duration) {
     throw ValueError("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
   }
