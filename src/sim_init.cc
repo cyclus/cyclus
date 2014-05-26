@@ -143,11 +143,10 @@ void SimInit::SnapAgent(Agent* m) {
 void SimInit::LoadInfo() {
   QueryResult qr = b_->Query("Info", NULL);
   int dur = qr.GetVal<int>("Duration");
-  int dec = qr.GetVal<int>("DecayInterval");
   int y0 = qr.GetVal<int>("InitialYear");
   int m0 = qr.GetVal<int>("InitialMonth");
   std::string h = qr.GetVal<std::string>("Handle");
-  si_ = SimInfo(dur, y0, m0, dec, h);
+  si_ = SimInfo(dur, y0, m0, h);
   si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
   ctx_->InitSim(si_);
 }

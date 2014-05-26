@@ -214,7 +214,6 @@ TEST_F(SimInitTest, InitSimInfo) {
   EXPECT_EQ(si_orig.duration, si_init.duration);
   EXPECT_EQ(si_orig.y0, si_init.y0);
   EXPECT_EQ(si_orig.m0, si_init.m0);
-  EXPECT_EQ(si_orig.decay_period, si_init.decay_period);
   EXPECT_EQ(si_orig.handle, si_init.handle);
   EXPECT_EQ(si_orig.parent_sim, si_init.parent_sim);
   EXPECT_EQ(si_orig.parent_type, si_init.parent_type);
@@ -430,7 +429,6 @@ TEST_F(SimInitTest, RestartSimInfo) {
   EXPECT_EQ(5, info.duration);
   EXPECT_EQ(2010, info.y0);
   EXPECT_EQ(1, info.m0);
-  EXPECT_EQ(-1, info.decay_period);
   EXPECT_EQ("", info.handle);
   EXPECT_EQ(rec.sim_id(), info.parent_sim);
   EXPECT_EQ("restart", info.parent_type);

@@ -16,28 +16,25 @@ SimInfo::SimInfo()
   : duration(0),
     y0(0),
     m0(0),
-    decay_period(0),
     branch_time(-1),
     parent_sim(boost::uuids::nil_uuid()),
     parent_type("init") {};
 
-SimInfo::SimInfo(int dur, int y0, int m0, int decay_period, std::string handle)
+SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
   : duration(dur),
     y0(y0),
     m0(m0),
-    decay_period(decay_period),
     branch_time(-1),
     handle(handle),
     parent_sim(boost::uuids::nil_uuid()),
     parent_type("init") {};
 
-SimInfo::SimInfo(int dur, int decay_period, boost::uuids::uuid parent_sim,
+SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
                  int branch_time, std::string parent_type,
                  std::string handle)
   : duration(dur),
     y0(-1),
     m0(-1),
-    decay_period(decay_period),
     parent_sim(parent_sim),
     parent_type(parent_type),
     branch_time(branch_time),
@@ -137,7 +134,6 @@ void Context::InitSim(SimInfo si) {
   ->AddVal("InitialYear", si.y0)
   ->AddVal("InitialMonth", si.m0)
   ->AddVal("Duration", si.duration)
-  ->AddVal("DecayInterval", si.decay_period)
   ->AddVal("ParentSimId", si.parent_sim)
   ->AddVal("ParentType", si.parent_type)
   ->AddVal("BranchTime", si.branch_time)
