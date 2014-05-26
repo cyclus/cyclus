@@ -7,77 +7,50 @@
 
 namespace stubs {
 
-/**
-  @class StubRegion
-
-  This Region is intended
-  as a skeleton to guide the implementation of new Region agents.
-
-  The StubRegion class inherits from the Region class and is
-  dynamically loaded by the Agent class when requested.
-
-  @section intro Introduction
-  Place an introduction to the agent here.
-
-  @section agentparams Agent Parameters
-  Place a description of the required input parameters which define the
-  agent implementation.
-
-  @section optionalparams Optional Parameters
-  Place a description of the optional input parameters to define the
-  agent implementation.
-
-  @section detailed Detailed Behavior
-  Place a description of the detailed behavior of the agent. Consider
-  describing the behavior at the tick and tock as well as the behavior
-  upon sending and receiving materials and messages.
-  */
+/// @class StubRegion
+///
+/// This Region is intended
+/// as a skeleton to guide the implementation of new Region agents.
+///
+/// The StubRegion class inherits from the Region class and is
+/// dynamically loaded by the Agent class when requested.
+///
+/// @section intro Introduction
+/// Place an introduction to the agent here.
+///
+/// @section agentparams Agent Parameters
+/// Place a description of the required input parameters which define the
+/// agent implementation.
+///
+/// @section optionalparams Optional Parameters
+/// Place a description of the optional input parameters to define the
+/// agent implementation.
+///
+/// @section detailed Detailed Behavior
+/// Place a description of the detailed behavior of the agent. Consider
+/// describing the behavior at the tick and tock as well as the behavior
+/// upon sending and receiving materials and messages.
 class StubRegion : public cyclus::Region {
-  /* --------------------
-   * all REGIONMODEL classes have these members
-   * --------------------
-   */
  public:
-  /**
-    Constructor for StubRegion Class
-    @param ctx the cyclus context for access to simulation-wide parameters
-    */
+  /// Constructor for StubRegion Class
+  /// @param ctx the cyclus context for access to simulation-wide parameters
   explicit StubRegion(cyclus::Context* ctx);
 
-  /**
-    every agent should be destructable
-    */
+  /// every agent should be destructable
   virtual ~StubRegion();
 
-  /**
-    Initialize db with input file info related to derived module class
-    */
-  virtual void InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di);
+  /// The Prime Directive
+  /// Generates code that handles all input file reading and restart operations
+  /// (e.g., reading from the database, instantiating a new object, etc.).
+  /// @warning The Prime Directive must have a space before it! (A fix will be
+  /// in 2.0 ^TM)
+  
+  #pragma cyclus
 
-  /**
-    Initialize members for a cloned module.
-    */
-  virtual void InitFrom(StubRegion* m);
-
-  /**
-    A verbose printer for the StubRegion
-    */
+  /// A verbose printer for the StubRegion
   virtual std::string str();
 
-  /**
-    Initializes a StubRegion object by copying the members of another.
-    */
-  virtual cyclus::Agent* Clone();
-
-  /* -------------------- */
-
-
-  /* --------------------
-   * all REGIONMODEL classes have these members
-   * --------------------
-   */
-
-  /* ------------------- */
+  // and away we go!
 };
 
 }  // namespace stubs

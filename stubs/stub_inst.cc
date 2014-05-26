@@ -10,33 +10,6 @@ StubInst::StubInst(cyclus::Context* ctx)
 StubInst::~StubInst() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::InfileToDb(cyclus::InfileTree* qe, cyclus::DbInit di) {
-  Agent::InfileToDb(qe, di);
-  qe = qe->SubTree(spec());
-  // retrieve input data members here. For example:
-  //
-  //   int cycle_len = lexical_cast<int>(input->getElementContent("cycle_length"));
-  //   ...
-  //   di.NewDatum("StubFacilityParams")
-  //     ->AddVal("cycle_length", cycle_len)
-  //     ...
-  //     ->Record();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* StubInst::Clone() {
-  StubInst* m = new StubInst(context());
-  m->InitFrom(this);
-  return m;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubInst::InitFrom(StubInst* m) {
-  cyclus::Institution::InitFrom(m);
-  // Initialize stubinst members for a cloned module here
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubInst::str() {
   return Institution::str();
 }
