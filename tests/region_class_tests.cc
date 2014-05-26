@@ -5,7 +5,7 @@
 #include "institution.h"
 #include "recorder.h"
 #include "region.h"
-#include "test_modules/test_region.h"
+#include "test_agents/test_region.h"
 #include "timer.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

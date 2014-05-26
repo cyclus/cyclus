@@ -7,9 +7,9 @@
 #include "institution.h"
 #include "suffix.h"
 #include "test_context.h"
-#include "test_modules/test_facility.h"
-#include "test_modules/test_inst.h"
-#include "test_modules/test_region.h"
+#include "test_agents/test_facility.h"
+#include "test_agents/test_inst.h"
+#include "test_agents/test_region.h"
 
 #if GTEST_HAS_PARAM_TEST
 

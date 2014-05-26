@@ -8,7 +8,7 @@
 #include "product.h"
 #include "request.h"
 #include "test_context.h"
-#include "test_modules/test_facility.h"
+#include "test_agents/test_facility.h"
 #include "trader.h"
 
 using cyclus::Composition;

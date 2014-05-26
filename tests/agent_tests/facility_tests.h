@@ -7,7 +7,7 @@
 #include "facility.h"
 #include "suffix.h"
 #include "test_context.h"
-#include "test_modules/test_inst.h"
+#include "test_agents/test_inst.h"
 
 #if GTEST_HAS_PARAM_TEST
 

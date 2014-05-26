@@ -61,20 +61,13 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
 
 INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
-ADD_SUBDIRECTORY(test_modules)
-
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 SET(CYCLUS_CORE_TEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-FILE(GLOB test_agents "${CMAKE_CURRENT_SOURCE_DIR}/test_modules/*.h")
+FILE(GLOB test_agents "${CMAKE_CURRENT_SOURCE_DIR}/test_agents/*.h")
 INSTALL(FILES ${header_files}
   DESTINATION include/cyclus
-  COMPONENT testing
-  )
-
-INSTALL(FILES ${test_agents}
-  DESTINATION include/cyclus/test_modules
   COMPONENT testing
   )
 
@@ -94,6 +87,12 @@ SET(
 )
 
 SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" gtest PARENT_SCOPE) # for stubs/agents
+
+ADD_SUBDIRECTORY(test_agents)
+INSTALL(FILES ${test_agents}
+  DESTINATION include/cyclus/test_agents
+  COMPONENT testing
+  )
 
 # read tests after building the driver, and add them to ctest
 set( tgt "cyclus_unit_tests" )

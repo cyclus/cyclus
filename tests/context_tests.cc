@@ -2,7 +2,7 @@
 
 #include "context.h"
 #include "recorder.h"
-#include "test_modules/test_facility.h"
+#include "test_agents/test_facility.h"
 #include "timer.h"
 
 using cyclus::Context;

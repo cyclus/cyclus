@@ -17,7 +17,7 @@
 #include "resource_exchange.h"
 #include "resource_helpers.h"
 #include "test_context.h"
-#include "test_modules/test_facility.h"
+#include "test_agents/test_facility.h"
 
 using cyclus::Bid;
 using cyclus::BidPortfolio;
