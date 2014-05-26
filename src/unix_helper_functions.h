@@ -29,9 +29,12 @@ void DynamicModule::SetConstructor() {
                  dlsym(module_library_, ctor_name_.c_str());
 
   if (!ctor_) {
-    std::string err_msg = "Unable to load module constructor: ";
-    err_msg  += dlerror();
-    throw IOError(err_msg);
+    std::stringstream ss;
+    std::string agent = ctor_name_;
+    agent.erase(0, 9); // len(Construct) == 9
+    ss << "Could not find agent " << agent << " in module library "
+       << path_.c_str() << " (" << dlerror() << ").";
+    throw IOError(ss.str());
   }
 
   dlerror();  // reset errors
