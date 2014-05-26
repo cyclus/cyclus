@@ -512,8 +512,9 @@ class StateAccumulator(object):
                         ExecFilter(self), UsingNamespaceFilter(self),
                         NamespaceAliasFilter(self), NamespaceFilter(self),
                         TypedefFilter(self), UsingFilter(self), LinemarkerFilter(self),
+                        NoteDecorationFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self), 
-                        NoteDecorationFilter(self)]
+                        ]
 
     def classname(self):
         """Returns the current, fully-expanded class name."""
@@ -1189,7 +1190,8 @@ class AnnotationsFilter(CodeGeneratorFilter):
         s += ind + 'return root;\n'
         jstr = json.dumps(ctx, separators=(',', ':'))
         if len(jstr) > 50:
-            jstr = [j.replace('"', '\\"') for j in  textwrap.wrap(jstr, 50)]
+            tw = textwrap.wrap(jstr, 50, drop_whitespace=False)
+            jstr = [j.replace('"', '\\"') for j in tw]
             jstr = ('"\n  ' + ind + '"').join(jstr)
             jstr = '\n  ' + ind + '"' + jstr + '"'
         else:
