@@ -52,7 +52,6 @@ std::string XMLFileLoaderTests::ControlSequence() {
           "  <startmonth>1</startmonth>"
           "  <startyear>2000</startyear>"
           "  <simstart>0</simstart>"
-          "  <decay>-1</decay>"
           " </control>"
           "</simulation>";
 }
@@ -133,9 +132,6 @@ std::string XMLFileLoaderTests::ControlSchema() {
     "</element>"
     "<element name=\"simstart\">"
     "  <data type=\"nonNegativeInteger\"/>"
-    "</element>"
-    "<element name=\"decay\">"
-    "  <data type=\"integer\"/>"
     "</element>"
     "</element>"
     "</element>"
