@@ -45,7 +45,7 @@ def test_source_to_sink():
 
         # Find agent ids of source and sink facilities
         agent_ids = agent_entry["AgentId"]
-        spec = agent_entry["Implementation"]
+        spec = agent_entry["Spec"]
 
         source_id = find_ids(":agents:Source", spec, agent_ids)
         sink_id = find_ids(":agents:Sink", spec, agent_ids)
