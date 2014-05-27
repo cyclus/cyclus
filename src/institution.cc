@@ -44,14 +44,14 @@ void Institution::Decommission() {
   Agent::Decommission();
 }
 
-void Institution::Tock(int time) {
+void Institution::Tock() {
   std::vector<Agent*> to_decomm;
   std::set<Agent*>::iterator it;  
   // set children's parents to NULL
   for (it = children().begin(); it != children().end(); ++it) {
     Facility* child = dynamic_cast<Facility*>(*it);
     int lifetime = child->lifetime();
-    if (lifetime != -1 && time >= child->enter_time() + lifetime) {
+    if (lifetime != -1 && context()->time() >= child->enter_time() + lifetime) {
       CLOG(LEV_INFO3) << child->prototype()
                       << " has reached the end of its lifetime";
       if (child->CheckDecommissionCondition()) {

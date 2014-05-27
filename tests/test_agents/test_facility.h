@@ -20,8 +20,8 @@ class TestFacility: public cyclus::Facility {
   virtual void InitInv(cyclus::Inventories& inv) {};
   virtual cyclus::Inventories SnapshotInv() {return cyclus::Inventories();};
 
-  void Tick(int time) {};
-  void Tock(int time) {};
+  void Tick() {};
+  void Tock() {};
 
   #pragma cyclus var dict(shape=[10])
   std::vector<double> sized_test;

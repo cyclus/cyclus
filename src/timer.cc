@@ -76,7 +76,7 @@ void Timer::DoTick() {
   for (std::set<TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
-    (*agent)->Tick(time_);
+    (*agent)->Tick();
   }
 }
 
@@ -90,7 +90,7 @@ void Timer::DoTock() {
   for (std::set<TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
-    (*agent)->Tock(time_);
+    (*agent)->Tock();
   }
 }
 

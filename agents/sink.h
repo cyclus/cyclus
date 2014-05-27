@@ -26,9 +26,9 @@ class Sink : public cyclus::Facility  {
 
   virtual std::string str();
 
-  virtual void Tick(int time);
+  virtual void Tick();
 
-  virtual void Tock(int time);
+  virtual void Tock();
 
   /// @brief Sink request Materials of their given commodity. Note
   /// that it is assumed the Sink operates on a single resource type!

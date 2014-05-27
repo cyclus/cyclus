@@ -74,7 +74,7 @@ void Predator::AcceptProductTrades(
                                      << consumed;
 }
 
-void Predator::Tick(int time) {
+void Predator::Tick() {
   LOG(cyclus::LEV_INFO3, "Predator") << name() << " is ticking {";
 
   // inform the simulation about what the Predator facility will be requesting
@@ -99,7 +99,7 @@ void Predator::GiveBirth() {
   }
 }
 
-void Predator::Tock(int time) {
+void Predator::Tock() {
   LOG(cyclus::LEV_INFO3, "Predator") << name() << " is tocking {";
 
   if (age >= lifespan) {

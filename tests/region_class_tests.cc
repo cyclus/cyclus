@@ -26,13 +26,13 @@ class DieInst : public cyclus::Institution {
     return new DieInst(context());
   }
 
-  virtual void Tick(int time) {
+  virtual void Tick() {
     if (tickDie_) {
       context()->DelAgent(this);
     }
   }
 
-  virtual void Tock(int time) {
+  virtual void Tock() {
     if (tockDie_) {
       context()->DelAgent(this);
     }
@@ -79,19 +79,19 @@ TEST_F(RegionClassTests, TickIter) {
   ASSERT_EQ(5, reg_->children().size());
 
   child2_->tickDie_ = true;
-  ASSERT_NO_THROW(child1_->Tick(0));
-  ASSERT_NO_THROW(child2_->Tick(0));
-  ASSERT_NO_THROW(child3_->Tick(0));
-  ASSERT_NO_THROW(child4_->Tick(0));
-  ASSERT_NO_THROW(child5_->Tick(0));
+  ASSERT_NO_THROW(child1_->Tick());
+  ASSERT_NO_THROW(child2_->Tick());
+  ASSERT_NO_THROW(child3_->Tick());
+  ASSERT_NO_THROW(child4_->Tick());
+  ASSERT_NO_THROW(child5_->Tick());
   EXPECT_EQ(4, reg_->children().size());
 
   child1_->tickDie_ = true;
   child3_->tickDie_ = true;
-  ASSERT_NO_THROW(child1_->Tick(0));
-  ASSERT_NO_THROW(child3_->Tick(0));
-  ASSERT_NO_THROW(child4_->Tick(0));
-  ASSERT_NO_THROW(child5_->Tick(0));
+  ASSERT_NO_THROW(child1_->Tick());
+  ASSERT_NO_THROW(child3_->Tick());
+  ASSERT_NO_THROW(child4_->Tick());
+  ASSERT_NO_THROW(child5_->Tick());
   EXPECT_EQ(2, reg_->children().size());
 }
 
@@ -100,18 +100,18 @@ TEST_F(RegionClassTests, TockIter) {
   ASSERT_EQ(5, reg_->children().size());
 
   child2_->tockDie_ = true;
-  ASSERT_NO_THROW(child1_->Tock(0));
-  ASSERT_NO_THROW(child2_->Tock(0));
-  ASSERT_NO_THROW(child3_->Tock(0));
-  ASSERT_NO_THROW(child4_->Tock(0));
-  ASSERT_NO_THROW(child5_->Tock(0));
+  ASSERT_NO_THROW(child1_->Tock());
+  ASSERT_NO_THROW(child2_->Tock());
+  ASSERT_NO_THROW(child3_->Tock());
+  ASSERT_NO_THROW(child4_->Tock());
+  ASSERT_NO_THROW(child5_->Tock());
   EXPECT_EQ(4, reg_->children().size());
 
   child1_->tockDie_ = true;
   child3_->tockDie_ = true;
-  ASSERT_NO_THROW(child1_->Tock(0));
-  ASSERT_NO_THROW(child3_->Tock(0));
-  ASSERT_NO_THROW(child4_->Tock(0));
-  ASSERT_NO_THROW(child5_->Tock(0));
+  ASSERT_NO_THROW(child1_->Tock());
+  ASSERT_NO_THROW(child3_->Tock());
+  ASSERT_NO_THROW(child4_->Tock());
+  ASSERT_NO_THROW(child5_->Tock());
   EXPECT_EQ(2, reg_->children().size());
 }

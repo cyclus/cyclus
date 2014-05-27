@@ -46,14 +46,14 @@ TEST_F(SinkTest, ReceiveMessage) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SinkTest, Tick) {
   int time = 1;
-  ASSERT_NO_THROW(src_facility_->Tick(time));
+  ASSERT_NO_THROW(src_facility_->Tick());
   // Test Sink specific behaviors of the Tick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SinkTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_facility_->Tock(time));
+  EXPECT_NO_THROW(src_facility_->Tock());
   // Test Sink specific behaviors of the Tock function here
 }
 

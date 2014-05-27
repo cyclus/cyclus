@@ -38,7 +38,7 @@ std::string KFacility::str() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void KFacility::Tick(int time) {
+void KFacility::Tick() {
   using std::string;
   using std::vector;
   LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is ticking";
@@ -56,7 +56,7 @@ void KFacility::Tick(int time) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void KFacility::Tock(int time) {
+void KFacility::Tock() {
   LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is tocking";
   LOG(cyclus::LEV_INFO4, "KFac") << "KFacility " << this->id()
                                    << " is holding " << inventory.quantity()

@@ -27,13 +27,13 @@ class TimeListener {
   /// method.
   ///
   /// @param time is the current simulation timestep
-  virtual void Tick(int time) = 0;
+  virtual void Tick() = 0;
 
   /// Simulation agents do their end-of-timestep activities in the Tock
   /// method.
   ///
   /// @param time is the current simulation timestep
-  virtual void Tock(int time) = 0;
+  virtual void Tock() = 0;
 };
 } // namespace cyclus
 #endif // ifndef CYCLUS_TIME_LISTENER_H_

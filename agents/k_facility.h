@@ -44,9 +44,9 @@ class KFacility : public cyclus::Facility {
 
   virtual std::string str();
 
-  virtual void Tick(int time);
+  virtual void Tick();
 
-  virtual void Tock(int time);
+  virtual void Tock();
 
   /// @brief Responds to each request for this source facility's commodity.
   /// If a given request is more than this facility's capacity, it will offer

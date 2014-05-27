@@ -22,7 +22,7 @@ void Prey::Decommission() {
   cyclus::Facility::Decommission();
 }
 
-void Prey::Tick(int time) {
+void Prey::Tick() {
   LOG(cyclus::LEV_INFO3, "Prey") << name() << " is ticking {";
   LOG(cyclus::LEV_INFO4, "Prey") << "will offer " << 1
                                    << " units of "
@@ -40,7 +40,7 @@ void Prey::GiveBirth() {
   }
 }
 
-void Prey::Tock(int time) {
+void Prey::Tock() {
   LOG(cyclus::LEV_INFO3, "Prey") << name() << " is tocking {";
     
   if (dead) {

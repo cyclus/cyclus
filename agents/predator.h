@@ -28,8 +28,8 @@ class Predator : public cyclus::Facility  {
 
   virtual void EnterNotify();
   virtual void Decommission();
-  virtual void Tick(int time);
-  virtual void Tock(int time);
+  virtual void Tick();
+  virtual void Tock();
 
   /// @brief Predator request Product of their given
   /// commodity. Note that it is assumed the Predator operates on a single

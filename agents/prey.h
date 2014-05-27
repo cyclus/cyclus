@@ -29,8 +29,8 @@ class Prey : public cyclus::Facility {
 
   virtual void EnterNotify();
   virtual void Decommission();
-  virtual void Tick(int time);
-  virtual void Tock(int time);
+  virtual void Tick();
+  virtual void Tock();
 
   virtual std::set<cyclus::BidPortfolio<cyclus::Product>::Ptr>
       GetProductBids(

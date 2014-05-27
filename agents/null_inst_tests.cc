@@ -41,14 +41,14 @@ TEST_F(NullInstTest, Print) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(NullInstTest, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(src_inst_->Tick(time));
+  EXPECT_NO_THROW(src_inst_->Tick());
   // Test NullInst specific behaviors of the handleTick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(NullInstTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_inst_->Tick(time));
+  EXPECT_NO_THROW(src_inst_->Tick());
   // Test NullInst specific behaviors of the handleTock function here
 }
 

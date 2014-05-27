@@ -42,14 +42,14 @@ TEST_F(StubInstTest, Print) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubInstTest, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(src_inst_->Tick(time));
+  EXPECT_NO_THROW(src_inst_->Tick());
   // Test StubInst specific behaviors of the handleTick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubInstTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_inst_->Tick(time));
+  EXPECT_NO_THROW(src_inst_->Tick());
   // Test StubInst specific behaviors of the handleTock function here
 }
 

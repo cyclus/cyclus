@@ -72,9 +72,9 @@ class Institution : public Agent, public TimeListener {
 
   virtual void Decommission();
 
-  virtual void Tick(int time) {};
+  virtual void Tick() {};
 
-  virtual void Tock(int time);
+  virtual void Tock();
 
  protected:
   void InitFrom(Institution* m);

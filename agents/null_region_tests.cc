@@ -45,14 +45,14 @@ TEST_F(NullRegionTest, ReceiveMessage) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(NullRegionTest, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(src_region_->Tick(time));
+  EXPECT_NO_THROW(src_region_->Tick());
   // Test NullRegion specific behaviors of the handleTick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(NullRegionTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_region_->Tick(time));
+  EXPECT_NO_THROW(src_region_->Tick());
   // Test NullRegion specific behaviors of the handleTock function here
 }
 

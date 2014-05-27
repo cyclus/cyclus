@@ -103,9 +103,9 @@ class Region : public Agent, public TimeListener {
    */
   virtual std::string str();
 
-  virtual void Tick(int time) {};
+  virtual void Tick() {};
 
-  virtual void Tock(int time) {};
+  virtual void Tock() {};
 
  protected:
   void InitFrom(Region* m);

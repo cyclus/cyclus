@@ -21,10 +21,10 @@ class Dier : public cyclus::Facility {
   virtual void InitInv(cyclus::Inventories& inv) {}
   virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
 
-  void Tick(int time) {
+  void Tick() {
     context()->SchedDecom(this);
   }
-  void Tock(int time) {};
+  void Tock() {};
 };
 
 class Termer : public cyclus::Facility {
@@ -36,10 +36,10 @@ class Termer : public cyclus::Facility {
   virtual void InitInv(cyclus::Inventories& inv) {}
   virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
 
-  void Tick(int time) {
+  void Tick() {
     context()->KillSim();
   };
-  void Tock(int time) {};
+  void Tock() {};
 };
 
 TEST(TimerTests, BareSim) {

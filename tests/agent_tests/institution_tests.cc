@@ -6,11 +6,11 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(InstitutionTests, Tick) {
   int time = 1;
-  EXPECT_NO_THROW(institution_->Tick(time));
+  EXPECT_NO_THROW(institution_->Tick());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(InstitutionTests, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(institution_->Tock(time));
+  EXPECT_NO_THROW(institution_->Tock());
 }

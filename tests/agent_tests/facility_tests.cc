@@ -8,11 +8,11 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(FacilityTests, Tick) {
   int time = 1;
-  facility_->Tick(time);
+  facility_->Tick();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(FacilityTests, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(facility_->Tock(time));
+  EXPECT_NO_THROW(facility_->Tock());
 }

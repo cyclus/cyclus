@@ -20,14 +20,14 @@ std::string Source::str() {
   return ss.str();
 }
 
-void Source::Tick(int time) {
+void Source::Tick() {
   LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is ticking";
   LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity
                                    << " kg of "
                                    << commod << ".";
 }
 
-void Source::Tock(int time) {
+void Source::Tock() {
   LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is tocking";
 }
 

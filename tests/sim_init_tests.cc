@@ -72,8 +72,8 @@ class Inver : public cy::Facility {
     buf2.PushAll(invs["buf2"]);
     return invs;
   }
-  virtual void Tick(int t) {context()->Snapshot();};
-  virtual void Tock(int t) { };
+  virtual void Tick() {context()->Snapshot();};
+  virtual void Tock() { };
 
   cy::toolkit::ResourceBuff buf1;
   cy::toolkit::ResourceBuff buf2;
