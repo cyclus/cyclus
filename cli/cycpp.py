@@ -1145,6 +1145,10 @@ class SchemaFilter(CodeGeneratorFilter):
 
                 impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down(), member)
+            elif t == 'bool':
+                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
+                impl += i + '"{0}<data type=\\"boolean\\" />\\n"\n'.format(xi, t)
+                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t in PRIMITIVES:
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
                 impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t.replace('std::', ''))
@@ -1614,6 +1618,7 @@ def main():
         with open(ns.path) as f:
             orig = f.read()
         orig = ensure_startswith_newlinehash(orig)
+        orig = orig.replace('\\\n', '') # line continuation
     # pass 3
     newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)
     if ns.output is None:
