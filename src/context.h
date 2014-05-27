@@ -179,9 +179,6 @@ class Context {
     return si_;
   };
 
-  /// return the prototype registered under a given name
-  inline Agent* prototype(std::string name) {return protos_[name];}
-
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
 

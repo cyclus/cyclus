@@ -91,10 +91,6 @@ TEST_F(ContextTests, CreateAgent) {
   ctx->AddPrototype("krispy kreme", m2);
   Agent* m3 = new DonutShop(ctx, "raspberry filled");
   ctx->AddPrototype("greenbush bakery", m3);
-
-  EXPECT_EQ(m1, ctx->prototype("dunkin donuts"));
-  EXPECT_EQ(m2, ctx->prototype("krispy kreme"));
-  EXPECT_EQ(m3, ctx->prototype("greenbush bakery"));
   
   DonutShop* d;
   ASSERT_NO_THROW(d = ctx->CreateAgent<DonutShop>("dunkin donuts"));
