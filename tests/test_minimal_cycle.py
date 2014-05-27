@@ -132,7 +132,7 @@ def test_minimal_cycle():
 
             # Find agent ids
             agent_ids = agent_entry["AgentId"]
-            spec = agent_entry["Implementation"]
+            spec = agent_entry["Spec"]
             agent_protos = agent_entry["Prototype"]
             duration = info["Duration"][0]
 

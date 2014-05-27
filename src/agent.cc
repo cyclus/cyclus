@@ -109,7 +109,7 @@ void Agent::Build(Agent* parent) {
   CLOG(LEV_DEBUG1) << "Agent '" << prototype()
                    << "' is entering the simulation.";
   CLOG(LEV_DEBUG3) << "It has:";
-  CLOG(LEV_DEBUG3) << " * Implementation: " << spec_;
+  CLOG(LEV_DEBUG3) << " * Spec: " << spec_;
   CLOG(LEV_DEBUG3) << " * ID: " << id();
 
   Connect(parent);
@@ -182,7 +182,7 @@ void Agent::AddToTable() {
   ctx_->NewDatum("AgentEntry")
   ->AddVal("AgentId", id_)
   ->AddVal("Kind", kind_)
-  ->AddVal("Implementation", spec_)
+  ->AddVal("Spec", spec_)
   ->AddVal("Prototype", prototype_)
   ->AddVal("ParentId", parent_id_)
   ->AddVal("Lifetime", lifetime_)

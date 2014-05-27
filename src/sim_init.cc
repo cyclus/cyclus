@@ -195,7 +195,7 @@ void SimInit::LoadPrototypes() {
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string proto = qr.GetVal<std::string>("Prototype", i);
     int agentid = qr.GetVal<int>("AgentId", i);
-    std::string impl = qr.GetVal<std::string>("Implementation", i);
+    std::string impl = qr.GetVal<std::string>("Spec", i);
     AgentSpec spec(impl);
 
     Agent* m = DynamicModule::Make(ctx_, spec);
@@ -249,7 +249,7 @@ void SimInit::LoadInitialAgents() {
     // if the agent wasn't decommissioned before t_ create and init it
 
     std::string proto = qentry.GetVal<std::string>("Prototype", i);
-    std::string impl = qentry.GetVal<std::string>("Implementation", i);
+    std::string impl = qentry.GetVal<std::string>("Spec", i);
     AgentSpec spec(impl);
     Agent* m = DynamicModule::Make(ctx_, spec);
 
