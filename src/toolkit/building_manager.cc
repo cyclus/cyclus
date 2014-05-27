@@ -40,9 +40,6 @@ void BuildingManager::SetUp_(OsiCbcSolverInterface& iface,
     for (pit = b->producers().begin(); pit != b->producers().end(); ++pit) {
       p = *pit;
       if (p->Produces(commodity)) {
-        std::cout << "adding "
-                  << "cost :" << p->Cost(commodity)
-                  << "capacity :" << p->Capacity(commodity);
         ctx.obj_coeffs.push_back(p->Cost(commodity));
         caps.insert(idx, p->Capacity(commodity));
         ctx.col_lbs.push_back(0);
