@@ -19,7 +19,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     <element name="commodity">
       <element name="name"> <text/> </element>
       <optional>
-        <element name="solution_order"> <data type="double"/> </element>
+        <element name="solution_priority"> <data type="double"/> </element>
       </optional>
     </element>
   </oneOrMore>
