@@ -20,22 +20,6 @@ static double const kBuffInfinity = std::numeric_limits<double>::max();
 
 typedef std::vector<Resource::Ptr> Manifest;
 
-/// Casts a vector of Resources into a vector of a specific resource type T.
-template <class T>
-std::vector<typename T::Ptr> ResCast(Manifest rs) {
-  std::vector<typename T::Ptr> casted;
-  for (int i = 0; i < rs.size(); ++i) {
-    casted.push_back(boost::dynamic_pointer_cast<T>(rs[i]));
-  }
-  return casted;
-};
-
-/// Casts a Resource::Ptr into a pointer of a specific resource type T.
-template <class T>
-typename T::Ptr ResCast(Resource::Ptr r) {
-  return boost::dynamic_pointer_cast<T>(r);
-};
-
 /// ResourceBuff is a helper function that provides semi-automated management of
 /// resource buffers (e.g. agent stocks and inventories).
 /// 
