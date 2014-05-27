@@ -178,45 +178,45 @@ void XMLFileLoader::LoadSolver() {
   InfileTree xqe(*parser_);
   std::string query = "/*/commodity";
 
-  std::map<std::string, double> commod_order;
+  std::map<std::string, double> commod_priority;
   std::string name;
-  double order;
+  double priority;
   int num_commods = xqe.NMatches(query);
   for (int i = 0; i < num_commods; i++) {
     InfileTree* qe = xqe.SubTree(query, i);
     name = qe->GetString("name");
-    order = OptionalQuery<double>(qe, "solution_order", -1);
-    commod_order[name] = order;
+    priority = OptionalQuery<double>(qe, "solution_priority", -1);
+    commod_priority[name] = priority;
   }
 
-  ProcessCommodities(&commod_order);
+  ProcessCommodities(&commod_priority);
   std::map<std::string, double>::iterator it;
-  for (it = commod_order.begin(); it != commod_order.end(); ++it) {
+  for (it = commod_priority.begin(); it != commod_priority.end(); ++it) {
     ctx_->NewDatum("CommodPriority")
       ->AddVal("Commodity", it->first)
-      ->AddVal("SolutionOrder", it->second)
+      ->AddVal("SolutionPriority", it->second)
       ->Record();
   }
 }
 
 void XMLFileLoader::ProcessCommodities(
-  std::map<std::string, double>* commodity_order) {
+  std::map<std::string, double>* commod_priority) {
   double max = std::max_element(
-                 commodity_order->begin(),
-                 commodity_order->end(),
+                 commod_priority->begin(),
+                 commod_priority->end(),
                  SecondLT< std::pair<std::string, double> >())->second;
   if (max < 1) {
-    max = 0;  // in case no orders are specified
+    max = 0;  // in case no priorities are specified
   }
 
   std::map<std::string, double>::iterator it;
-  for (it = commodity_order->begin();
-       it != commodity_order->end();
+  for (it = commod_priority->begin();
+       it != commod_priority->end();
        ++it) {
     if (it->second < 1) {
       it->second = max + 1;
     }
-    CLOG(LEV_INFO1) << "Commodity ordering for " << it->first
+    CLOG(LEV_INFO1) << "Commodity priority for " << it->first
                     << " is " << it->second;
   }
 }
