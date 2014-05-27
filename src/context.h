@@ -172,7 +172,7 @@ class Context {
   void InitSim(SimInfo si);
 
   /// Returns the current simulation timestep.
-  int time();
+  virtual int time();
 
   /// Return static simulation info.
   inline SimInfo sim_info() const {

@@ -16,10 +16,23 @@ using cyclus::Request;
 using test_helpers::get_mat;
 
 namespace cyclus {
+
+class FakeContext: public Context {
+ public:
+  FakeContext(cyclus::Timer* ti, cyclus::Recorder* rec)
+    : cyclus::Context(ti, rec), t_(0) {};
+
+  virtual int time() { return t_; };
+  virtual void time(int t) { t_ = t; };
+
+ private:
+  int t_;
+};
+
 class TestContext {
  public:
   TestContext() {
-    ctx_ = new Context(&ti_, &rec_);
+    ctx_ = new FakeContext(&ti_, &rec_);
     trader_ = new TestFacility(ctx_);
     mat_ = get_mat();
   }
@@ -54,7 +67,7 @@ class TestContext {
     return bid;
   }
 
-  Context* get() {return ctx_;}
+  FakeContext* get() {return ctx_;}
   Timer* timer() {return &ti_;}
   Recorder* recorder() {return &rec_;}
   TestFacility* trader() {return trader_;}
@@ -63,7 +76,7 @@ class TestContext {
  private:
   Timer ti_;
   Recorder rec_;
-  Context* ctx_;
+  FakeContext* ctx_;
   TestFacility* trader_;
   Material::Ptr mat_;
   std::vector<Request<Material>*> reqs_;
