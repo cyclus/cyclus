@@ -18,10 +18,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <oneOrMore>
     <element name="commodity">
       <element name="name"> <text/> </element>
+      <optional>
+        <element name="solution_order"> <data type="double"/> </element>
+      </optional>
     </element>
-    <optional>
-      <element name="solution_order"> <data type="double"/> </element>
-    </optional>
   </oneOrMore>
     
   <oneOrMore>

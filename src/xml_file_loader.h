@@ -73,10 +73,10 @@ class XMLFileLoader {
 
   virtual std::string master_schema();
 
-  /// Processes commodity orders, such that any without a defined order (i.e.,
-  /// are nonpositive), are given an order value greater the last known
+  /// Processes commodity priorities, such that any without a defined priority 
+  /// (i.e., are nonpositive), are given priority lower than the last known
   /// commodity
-  void ProcessCommodities(std::map<std::string, double>* commodity_order);
+  void ProcessCommodities(std::map<std::string, double>* commodity_priority);
 
   /// Creates and builds an agent, notifying its parent. The agent init info is
   /// translated and stored in the output db.
