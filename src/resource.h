@@ -89,7 +89,7 @@ class Resource {
 
 /// Casts a vector of Resources into a vector of a specific resource type T.
 template <class T>
-std::vector<typename T::Ptr> ResCast(std::vector<Resource::Ptr> rs) {
+std::vector<typename T::Ptr> ResCast(std::vector<Resource::Ptr>& rs) {
   std::vector<typename T::Ptr> casted;
   for (int i = 0; i < rs.size(); ++i) {
     casted.push_back(boost::dynamic_pointer_cast<T>(rs[i]));
