@@ -10,35 +10,37 @@
 namespace cyclus {
 
 class Context;
-/**
-   @class KFacility
 
-   @section intro Introduction
-   The KFacility is a source and consumer of commodities.
-   The facility changes its request and offer amount according to a power law.
+/// @class KFacility
+///
+/// @section intro Introduction
+/// The KFacility is a source and consumer of commodities.
+/// The facility changes its request and offer amount according to a power law.
+///
+/// Amount = Capacity(T=0) * ConversionFactor ^ Time
+///
+/// This facility is intended to be used for Cyclus trivial and
+/// minimal cycle integration tests.
 
-   Amount = Capacity(T=0) * ConversionFactor ^ Time
-
-   This facility is intended to be used for Cyclus trivial and
-   minimal cycle integration tests.
-
-   @section params Parameters
-   The parameters relevant to simulation tests:
-      #. k_factor_in : a conversion factor for input commodity or request.
-      #. k_factor_out : a conversion factor for output commodity or bid.
-      #. in_capacity : an initial capacity for input commodity.
-      #. out_capacity : an initial capacity for output commodity.
- */
+/// @section params Parameters
+/// The parameters relevant to simulation tests:
+///   #. k_factor_in : a conversion factor for input commodity or request.
+///   #. k_factor_out : a conversion factor for output commodity or bid.
+///   #. in_capacity : an initial capacity for input commodity.
+///   #. out_capacity : an initial capacity for output commodity.
 class KFacility : public cyclus::Facility {
  public:
-  /**
-     @brief Constructor for KFacility Class
-     @param ctx the cyclus context for access to simulation-wide parameters
-   */
+  /// @brief Constructor for KFacility Class
+  /// @param ctx the cyclus context for access to simulation-wide parameters
   KFacility(cyclus::Context* ctx);
   virtual ~KFacility();
 
   #pragma cyclus
+
+  #pragma cyclus note {"doc": "A facility designed for integration tests " \
+                              "that both provides and consumes commodities" \
+                              ". It changes its request and offer amounts " \
+                              "based on a power law with respect to time."}
 
   virtual std::string str();
 
@@ -84,26 +86,20 @@ class KFacility : public cyclus::Facility {
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
       cyclus::Product::Ptr> >& responses);
 
-  /* --- KFacility Members --- */
-  /**
-     @brief creates a material object to offer to a requester
-     @param target the material target a request desires
-   */
+  // --- KFacility Members ---
+  /// @brief creates a material object to offer to a requester
+  /// @param target the material target a request desires
   cyclus::Material::Ptr GetOffer(const cyclus::Material::Ptr target) const;
 
-  /**
-     @brief sets the output commodity name
-     @param name the commodity name
-   */
+  /// @brief sets the output commodity name
+  /// @param name the commodity name
   inline void commodity(std::string name) { out_commod = name; }
 
   /// @return the output commodity
   inline std::string commodity() const { return out_commod; }
 
-  /**
-     @brief sets the capacity of a material generated at any given time step
-     @param capacity the production capacity
-   */
+  /// @brief sets the capacity of a material generated at any given time step
+  /// @param capacity the production capacity
   inline void capacity(double capacity) {
     out_capacity = capacity;
     current_capacity = out_capacity;
@@ -112,10 +108,8 @@ class KFacility : public cyclus::Facility {
   /// @return the production capacity at any given time step
   inline double capacity() const { return out_capacity; }
 
-  /**
-     @brief sets the name of the recipe to be produced
-     @param name the recipe name
-   */
+  /// @brief sets the name of the recipe to be produced
+  /// @param name the recipe name
   inline void recipe(std::string name) { recipe_name = name; }
 
   /// @return the name of the output recipe
@@ -124,9 +118,7 @@ class KFacility : public cyclus::Facility {
   /// @return the current timestep's capacity
   inline double CurrentCapacity() const { return current_capacity; }
 
-  /**
-     @brief determines the amount to request
-   */
+  /// @brief determines the amount to request
   inline double RequestAmt() const { return in_capacity; }
 
   /// @ return the conversion factor input
@@ -144,52 +136,62 @@ class KFacility : public cyclus::Facility {
   inline void KFactorOut(double k_factor) { k_factor_out = k_factor; }
 
  private:
-  /**
-     This facility has one output commodity and one input commodity
-   */
-  #pragma cyclus var {}
+  /// This facility has one output commodity and one input commodity
+  #pragma cyclus var {"tooltip": "input commodity", \
+                      "doc": "commodity that the k-facility consumes"}
   std::string in_commod;
 
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "output commodity", \
+                      "doc": "commodity that the k-facility supplies"}
   std::string out_commod;
 
-  /**
-     Name of the recipe this facility uses.
-   */
-  #pragma cyclus var {'shape': [50]}
+  /// Name of the recipe this facility uses.
+  #pragma cyclus var {"shape": [50], "tooltip": "in-commodity recipe name", \
+                      "doc": "recipe name for the k-facility's in-commodity"}
   std::string recipe_name;
 
-  /**
-     The capacity is defined in terms of the number of units of the
-     recipe that can be provided each time step.  A very large number
-     can be provided to represent infinte capacity.
-     In and out commodity capacities are defined.
-   */
-  #pragma cyclus var {}
+  /// The capacity is defined in terms of the number of units of the
+  /// recipe that can be provided each time step.  A very large number
+  /// can be provided to represent infinte capacity.
+  /// In and out commodity capacities are defined.
+  #pragma cyclus var {"tooltip": "input commodity capacity", \
+                      "doc": "number of commodity units that can be taken " \
+                             "at each time step (infinite capacity can be " \
+                             "represented by a very large number"}
   double in_capacity;
 
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "output commodity capacity", \
+                      "doc": "number of commodity units that can be " \
+                             "supplied at each time step (infinite " \
+                             "capacity can be represented by a very large " \
+                             "number"}
   double out_capacity;
 
-  /**
-     The output capacity at the current time step.
-   */
-  #pragma cyclus var {"default": 0}
+  /// The output capacity at the current time step.
+  #pragma cyclus var {"default": 0, "tooltip": "current output capacity", \
+                      "doc": "number of output commodity units that can be " \
+                             "supplied at the current time step (infinite " \
+                             "capacity can be represented by a very large " \
+                             "number"}
   double current_capacity;
 
-  #pragma cyclus var {"default": 1e299}
+  #pragma cyclus var {"default": 1e299, "tooltip": "k-facility maximum " \
+                                                   "inventory size", \
+                      "doc": "total maximum inventory size of the k-facility"}
   double max_inv_size;
 
   #pragma cyclus var {'capacity': 'max_inv_size'}
   cyclus::toolkit::ResourceBuff inventory;
 
-  /**
-     Conversion factors for input and output amounts.
-   */
-  #pragma cyclus var {}
+  /// Conversion factors for input and output amounts.
+  #pragma cyclus var {"tooltip": "input k-factor", \
+                      "doc": "conversion factor that governs the behavior " \
+                             "of the k-facility's input commodity capacity"}
   double k_factor_in;
 
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "output k-factor", \
+                      "doc": "conversion factor that governs the behavior " \
+                             "of the k-facility's output commodity capacity"}
   double k_factor_out;
 
 };

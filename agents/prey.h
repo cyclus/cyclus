@@ -23,6 +23,10 @@ class Prey : public cyclus::Facility {
 
   #pragma cyclus
 
+  #pragma cyclus note {"doc": "A facility that represents prey " \
+                              "in the Lotka-Volterra integration " \
+                              "tests"}
+
   virtual void EnterNotify();
   virtual void Decommission();
   virtual void Tick(int time);
@@ -50,23 +54,34 @@ class Prey : public cyclus::Facility {
   std::string commod;
 
   /// number of timsteps between having children
-  #pragma cyclus var {'default': 1}
+  #pragma cyclus var {'default': 1, "tooltip": "birth frequency", \
+                      "doc": "number of time steps between birth " \
+                             "of children"}
   int birth_freq;
 
   // number of children
-  #pragma cyclus var {'default': 1}
+  #pragma cyclus var {'default': 1, "tooltip": "number of children", \
+                      "doc": "number of children born at each " \
+                             "birthing instance"}
   int nchildren;
   
   /// age of a prey
-  #pragma cyclus var {'default': 0}
+  #pragma cyclus var {'default': 0, "tooltip": "prey age", \
+                      "doc": "age of prey at start of simulation"}
   int age;
 
-  #pragma cyclus var {'default': 0}
-  int dead;
+  #pragma cyclus var {'default': 0, "tooltip": "dead?", \
+                      "doc": "flag for whether prey is currently dead"}
+  bool dead;
 
   /// whether or not an agent can give birth and die in the same timestep
-  #pragma cyclus var {'default': 1} // true
-  int birth_and_death;
+  #pragma cyclus var {'default': 1, "tooltip": "simultaneous birth " \
+                                    "and death?", \
+                      "doc": "whether or not simultaneous birth and " \
+                             "and death are allowed (i.e., can a " \
+                             "facility give birth and die in the " \
+                             "same time step?)"} // true
+  bool birth_and_death;
 };
 
 }  // namespace cyclus

@@ -47,6 +47,10 @@ class StubInst : public cyclus::Institution {
   
   #pragma cyclus
 
+  #pragma cyclus note {"doc": "A stub institution is provided as a " \
+                              "skeleton for the design of new " \
+                              "institution agents."}
+
   /// every agent should be able to print a verbose description
   virtual std::string str();
 
