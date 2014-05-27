@@ -40,6 +40,11 @@ class KFacility : public cyclus::Facility {
 
   #pragma cyclus
 
+  #pragma cyclus note {"doc": "A facility designed for integration tests " \
+                              "that both provides and consumes commodities" \
+                              ". It changes its request and offer amounts " \
+                              "based on a power law with respect to time."}
+
   virtual std::string str();
 
   virtual void Tick(int time);
@@ -147,16 +152,20 @@ class KFacility : public cyclus::Facility {
   /**
      This facility has one output commodity and one input commodity
    */
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "input commodity", \
+                      "doc": "commodity that the k-facility consumes"}
   std::string in_commod;
 
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "output commodity", \
+                      "doc": "commodity that the k-facility supplies"}
   std::string out_commod;
 
   /**
      Name of the recipe this facility uses.
    */
-  #pragma cyclus var {'shape': [50]}
+
+  #pragma cyclus var {'shape': [50], "tooltip": "in-commodity recipe name", \
+                      "doc": "recipe name for the k-facility's in-commodity"}
   std::string recipe_name;
 
   /**
@@ -165,19 +174,32 @@ class KFacility : public cyclus::Facility {
      can be provided to represent infinte capacity.
      In and out commodity capacities are defined.
    */
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "input commodity capacity", \
+                      "doc": "number of commodity units that can be taken " \
+                             "at each time step (infinite capacity can be " \
+                             "represented by a very large number"}
   double in_capacity;
 
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "output commodity capacity", \
+                      "doc": "number of commodity units that can be " \
+                             "supplied at each time step (infinite " \
+                             "capacity can be represented by a very large " \
+                             "number"}
   double out_capacity;
 
   /**
      The output capacity at the current time step.
    */
-  #pragma cyclus var {"default": 0}
+  #pragma cyclus var {"default": 0, "tooltip": "current output capacity", \
+                      "doc": "number of output commodity units that can be " \
+                             "supplied at the current time step (infinite " \
+                             "capacity can be represented by a very large " \
+                             "number"}
   double current_capacity;
 
-  #pragma cyclus var {"default": 1e299}
+  #pragma cyclus var {"default": 1e299, "tooltip": "k-facility maximum " \
+                                                   "inventory size", \
+                      "doc": "total maximum inventory size of the k-facility"}
   double max_inv_size;
 
   #pragma cyclus var {'capacity': 'max_inv_size'}
@@ -186,10 +208,14 @@ class KFacility : public cyclus::Facility {
   /**
      Conversion factors for input and output amounts.
    */
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "input k-factor", \
+                      "doc": "conversion factor that governs the behavior " \
+                             "of the k-facility's input commodity capacity"}
   double k_factor_in;
 
-  #pragma cyclus var {}
+  #pragma cyclus var {"tooltip": "output k-factor", \
+                      "doc": "conversion factor that governs the behavior " \
+                             "of the k-facility's output commodity capacity"}
   double k_factor_out;
 
 };

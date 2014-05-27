@@ -13,6 +13,11 @@ class NullRegion : public cyclus::Region {
   virtual ~NullRegion();
 
   #pragma cyclus
+
+  #pragma cyclus note {"doc": "A region that owns the simulation's " \
+                              "institutions but exhibits null behavior. " \
+                              "No parameters are given when using the " \
+                              "null region."}
 };
 
 }  // namespace cyclus
