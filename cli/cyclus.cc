@@ -2,6 +2,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+
+#ifdef __clang__
+#ifdef __gnu_linux__
+  #include "gtest/gtest.h"
+#endif
+#endif
+
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 #include <boost/shared_ptr.hpp>
@@ -49,6 +56,12 @@ static std::string usage = "Usage:   cyclus [opts] [input-file]";
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
+  #ifdef __clang__
+  #ifdef __gnu_linux__
+    int fake_argc = 0;
+    testing::InitGoogleTest(&fake_argc, (char**) NULL);
+  #endif
+  #endif
   // close all dlopen'd modules AFTER everything else destructs
   DynamicModule::Closer cl;
 

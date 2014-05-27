@@ -12,7 +12,16 @@ SET( CYCLUS_SOURCE ${CYCLUS_SOURCE}
 ADD_EXECUTABLE( cyclus_cli ${CYCLUS_SOURCE} )
 set_target_properties(cyclus_cli PROPERTIES OUTPUT_NAME cyclus)
 
-TARGET_LINK_LIBRARIES( cyclus_cli dl ${LIBS} cyclus )
+message("  !!  CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
+message("  !!  CMAKE_CXX_COMPILER = ${CMAKE_CXX_COMPILER}")
+IF(${CMAKE_SYSTEM_NAME} MATCHES "^Linux.*" AND
+   ${CMAKE_CXX_COMPILER} MATCHES ".*clang\\+\\+$")
+    TARGET_LINK_LIBRARIES( cyclus_cli dl ${LIBS} cyclus gtest ${CYCLUS_TEST_LIBRARIES})
+ELSE(${CMAKE_SYSTEM_NAME} MATCHES "^Linux.*" AND
+   ${CMAKE_CXX_COMPILER} MATCHES ".*clang\\+\\+$")
+    TARGET_LINK_LIBRARIES( cyclus_cli dl ${LIBS} cyclus )
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "^Linux.*" AND
+   ${CMAKE_CXX_COMPILER} MATCHES ".*clang\\+\\+$")
 
 INSTALL(
   TARGETS cyclus_cli
