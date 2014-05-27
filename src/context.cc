@@ -109,7 +109,7 @@ void Context::AddPrototype(std::string name, Agent* p) {
   NewDatum("Prototypes")
   ->AddVal("Prototype", name)
   ->AddVal("AgentId", p->id())
-  ->AddVal("Implementation", p->spec())
+  ->AddVal("Spec", p->spec())
   ->Record();
 }
 

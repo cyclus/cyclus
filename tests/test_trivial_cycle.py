@@ -58,7 +58,7 @@ def test_source_to_sink():
 
         # Find agent ids
         agent_ids = agent_entry["AgentId"]
-        spec = agent_entry["Implementation"]
+        spec = agent_entry["Spec"]
 
         facility_id = find_ids(":agents:KFacility", spec, agent_ids)
         # Test for only one KFacility

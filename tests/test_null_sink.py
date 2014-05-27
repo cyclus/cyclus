@@ -42,7 +42,7 @@ def test_null_sink():
 
     # Sink's deployment
     agent_ids = agent_entry["AgentId"]
-    spec = agent_entry["Implementation"]
+    spec = agent_entry["Spec"]
 
     sink_id = find_ids(":agents:Sink", spec, agent_ids)
     # Test if one SimpleSink is deployed
