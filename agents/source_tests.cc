@@ -55,12 +55,22 @@ TEST_F(SourceTest, Tock) {
   int time = 1;
   EXPECT_NO_THROW(src_facility_->Tock(time));
   // Test Source specific behaviors of the Tock function here
+  int a = 0;
 }
+
+};  // namespace cyclus
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Agent* SourceConstructor(cyclus::Context* ctx) {
-  return new Source(ctx);
+  return new cyclus::Source(ctx);
 }
+
+// required to get functionality in cyclus agent unit tests library
+#ifndef CYCLUS_AGENT_TESTS_CONNECTED
+int ConnectAgentTests();
+static int cyclus_agent_tests_connected = ConnectAgentTests();
+#define CYCLUS_AGENT_TESTS_CONNECTED cyclus_agent_tests_connected
+#endif // CYCLUS_AGENT_TESTS_CONNECTED
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 INSTANTIATE_TEST_CASE_P(SourceFac, FacilityTests,
@@ -68,5 +78,3 @@ INSTANTIATE_TEST_CASE_P(SourceFac, FacilityTests,
 
 INSTANTIATE_TEST_CASE_P(SourceFac, AgentTests,
                         ::testing::Values(&SourceConstructor));
-
-};  // namespace cyclus

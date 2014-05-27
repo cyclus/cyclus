@@ -1576,7 +1576,8 @@ def parent_intersection(classname, queryset, superclasses):
 ensure_startswith_newlinehash = lambda x: '\n' + x if x.startswith('#') else x
 
 def main():
-    parser = ArgumentParser(prog="cycpp", description=__doc__,
+    doc = __doc__ + "\nfilename: " + os.path.abspath(__file__)
+    parser = ArgumentParser(prog="cycpp", description=doc,
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('path', help="path to source file")
     parser.add_argument('--pass3-use-pp', action="store_true", default=True,
