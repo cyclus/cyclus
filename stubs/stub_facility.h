@@ -45,6 +45,9 @@ class StubFacility : public cyclus::Facility  {
   
   #pragma cyclus
 
+  #pragma cyclus note {"doc": "A stub facility is provided as a skeleton " \
+                              "for the design of new facility agents."}
+
   /// A verbose printer for the StubFacility
   virtual std::string str();
   

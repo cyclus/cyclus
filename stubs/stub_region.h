@@ -47,6 +47,9 @@ class StubRegion : public cyclus::Region {
   
   #pragma cyclus
 
+  #pragma cyclus note {"doc": "A stub region is provided as a skeleton " \
+                              "for the design of new region agents."}
+
   /// A verbose printer for the StubRegion
   virtual std::string str();
 
