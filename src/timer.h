@@ -105,7 +105,7 @@ class Timer {
   // std::map<time,std::vector<std::pair<prototype, parent> > >
   std::map<int, std::vector<std::pair<std::string, Agent*> > > build_queue_;
 
-  // std::map<time,std::vector<agent> >
+  // std::map<time,std::vector<config> >
   std::map<int, std::vector<Agent*> > decom_queue_;
 };
 

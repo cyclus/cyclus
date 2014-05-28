@@ -15,7 +15,7 @@
 
   <facility>
     <name>KFacility</name>
-    <agent>
+    <config>
       <KFacility>
         <in_commod>commodity</in_commod>
         <in_capacity>1</in_capacity>
@@ -25,12 +25,12 @@
         <out_capacity>1</out_capacity>
         <k_factor_out>1</k_factor_out>
       </KFacility>
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>SingleRegion</name>
-    <agent> <NullRegion/> </agent>
+    <config> <NullRegion/> </config>
     <institution>
       <name>SingleInstitution</name>
       <initialfacilitylist>
@@ -39,7 +39,7 @@
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent> <NullInst/> </agent>
+      <config> <NullInst/> </config>
     </institution>
   </region>
 

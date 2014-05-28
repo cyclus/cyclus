@@ -13,16 +13,16 @@
 
   <facility>
     <name>OneFacility</name>
-    <agent>
+    <config>
       <StubFacility />
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>OneRegion</name>
-    <agent>
+    <config>
       <StubRegion />
-    </agent>
+    </config>
     <institution>
       <name>OneInst</name>
       <initialfacilitylist>
@@ -31,9 +31,9 @@
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent>
+      <config>
         <StubInst />
-      </agent>
+      </config>
     </institution>
   </region>
 

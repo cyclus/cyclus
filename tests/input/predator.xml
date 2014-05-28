@@ -15,17 +15,17 @@
 
   <facility>
     <name>Predator</name>
-    <agent>
+    <config>
       <Predator>
         <commod>commodity</commod>
         <prey>none</prey>
       </Predator>
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>SingleRegion</name>
-    <agent> <NullRegion/> </agent>
+    <config> <NullRegion/> </config>
     <institution>
       <name>SingleInstitution</name>
       <initialfacilitylist>
@@ -34,7 +34,7 @@
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent> <NullInst/> </agent>
+      <config> <NullInst/> </config>
     </institution>
   </region>
 </simulation>

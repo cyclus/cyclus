@@ -16,19 +16,19 @@
 
   <facility>
     <name>Prey</name>
-    <agent>
+    <config>
       <Prey>
         <birth_freq>1</birth_freq>
         <nchildren>1</nchildren>
         <birth_and_death>0</birth_and_death>
         <commod>wabbit</commod>
       </Prey>
-    </agent>
+    </config>
   </facility>
 
   <facility>
     <name>Predator</name>
-    <agent>
+    <config>
       <Predator>
         <hunt_cap>2</hunt_cap>
         <hunt_freq>3</hunt_freq>
@@ -39,12 +39,12 @@
         <birth_and_death>0</birth_and_death>
         <prey>Prey</prey>
       </Predator>
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>SingleRegion</name>
-    <agent> <NullRegion/> </agent>
+    <config> <NullRegion/> </config>
     <institution>
       <name>SingleInstitution</name>
       <initialfacilitylist>
@@ -57,7 +57,7 @@
           <number>20</number>
         </entry>
       </initialfacilitylist>
-      <agent> <NullInst/> </agent>
+      <config> <NullInst/> </config>
     </institution>
   </region>
 </simulation>
