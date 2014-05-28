@@ -15,46 +15,32 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </interleave>
   </element>
 
-  <oneOrMore>
+  <zeroOrMore>
     <element name="commodity">
       <element name="name"><text/></element>
-      <optional>
-        <element name="solution_priority"><data type="double"/></element>
-      </optional>
+      <element name="solution_priority"><data type="double"/></element>
     </element>
-  </oneOrMore>
+  </zeroOrMore>
+
+  <element name="archetypes"> 
+    <oneOrMore>
+      <element name="spec"> 
+        <optional><element name="path"><text/></element></optional>
+        <optional><element name="lib"><text/></element></optional>
+        <element name="archetype"><text/></element>
+        <optional><element name="alias"><text/></element></optional>
+      </element>
+    </oneOrMore>
+  </element>
 
   <oneOrMore>
     <element name="prototype">
     <interleave>
       <element name="name"><text/></element>
-      <element name="module"> 
-        <optional><element name="path"><text/></element></optional>
-        <optional><element name="lib"><text/></element></optional>
-        <element name="agent"><text/></element>
-        <optional><element name="alias"><text/></element></optional>
-      </element>
+      <element name="archetype"><text/></element>
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
-
-      <!-- For compatibility with nested schema format -->
-      <!-- Facility/Inst/Region specific data -->
-      <optional>
-        <choice>
-          <oneOrMore>
-            <element name="allowedfacility"><text/></element>
-          </oneOrMore>
-
-          <optional>
-            <oneOrMore>
-              <element name="availableprototype"> <text/> </element>
-            </oneOrMore>
-          </optional>
-
-        </choice>
-      </optional>
-      <!-- end compatibility section -->
 
       <element name="agent">
         <choice>

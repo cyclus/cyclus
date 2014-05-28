@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <!-- 1 Sink -->
 
 <simulation xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -8,21 +7,15 @@
     <startyear>2000</startyear>
   </control>
 
-  <commodity>
-    <name>commodity</name>
-    <solution_priority>2</solution_priority>
-  </commodity>
-  <commodity>
-    <name>other_commodity</name>
-    <solution_priority>1</solution_priority>
-  </commodity>
+  <archetypes>
+    <spec><lib>agents</lib><archetype>Sink</archetype></spec>
+    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
+    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+  </archetypes>
 
   <facility>
     <name>Sink</name>
-    <module>
-      <lib>agents</lib>
-      <agent>Sink</agent>
-    </module>
+    <archetype>Sink</archetype>
     <agent>
       <Sink>
         <in_commods>
@@ -35,30 +28,18 @@
 
   <region>
     <name>SingleRegion</name>
-    <module>
-      <lib>agents</lib>
-      <agent>NullRegion</agent>
-    </module>
-    <allowedfacility>Sink</allowedfacility>
-    <agent>
-      <NullRegion/>
-    </agent>
+    <archetype>NullRegion</archetype>
+    <agent> <NullRegion/> </agent>
     <institution>
       <name>SingleInstitution</name>
-      <module>
-        <lib>agents</lib>
-        <agent>NullInst</agent>
-      </module>
-      <availableprototype>Sink</availableprototype>
+      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Sink</prototype>
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent>
-        <NullInst/>
-      </agent>
+      <agent> <NullInst/> </agent>
     </institution>
   </region>
 
