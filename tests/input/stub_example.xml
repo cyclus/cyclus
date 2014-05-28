@@ -1,0 +1,54 @@
+<simulation>
+  <control>
+    <duration>10</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+  </control>
+
+  <commodity>
+    <name>commodity</name>
+  </commodity>
+
+  <facility>
+    <name>OneFacility</name>
+    <module>
+      <path>stubs</path>
+      <lib>StubFacility</lib>
+      <agent>StubFacility</agent>
+    </module>
+    <agent>
+      <StubFacility />
+    </agent>
+  </facility>
+
+  <region>
+    <name>OneRegion</name>
+    <module>
+      <path>stubs</path>
+      <lib>StubRegion</lib>
+      <agent>StubRegion</agent>
+    </module>
+    <allowedfacility>OneFacility</allowedfacility>
+    <agent>
+      <StubRegion />
+    </agent>
+    <institution>
+      <name>OneInst</name>
+      <module>
+        <path>stubs</path>
+        <lib>StubInst</lib>
+        <agent>StubInst</agent>
+      </module>
+      <initialfacilitylist>
+        <entry>
+          <prototype>OneFacility</prototype>
+          <number>1</number>
+        </entry>
+      </initialfacilitylist>
+      <agent>
+        <StubInst />
+      </agent>
+    </institution>
+  </region>
+
+</simulation>
