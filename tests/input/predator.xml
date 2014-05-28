@@ -8,16 +8,15 @@
     <startyear>2000</startyear>
   </control>
 
-  <commodity>
-    <name>commodity</name>
-  </commodity>
+  <archetypes>
+    <spec><lib>agents</lib><archetype>Predator</archetype></spec>
+    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
+    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+  </archetypes>
 
   <facility>
     <name>Predator</name>
-    <spec>
-      <lib>agents</lib>
-      <agent>Predator</agent>
-    </spec>
+    <archetype>Predator</archetype>
     <agent>
       <Predator>
         <commod>commodity</commod>
@@ -28,28 +27,18 @@
 
   <region>
     <name>SingleRegion</name>
-    <spec>
-      <lib>agents</lib>
-      <agent>NullRegion</agent>
-    </spec>
-    <agent>
-      <NullRegion/>
-    </agent>
+    <archetype>NullRegion</archetype>
+    <agent> <NullRegion/> </agent>
     <institution>
       <name>SingleInstitution</name>
-      <spec>
-        <lib>agents</lib>
-        <agent>NullInst</agent>
-      </spec>
+      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Predator</prototype>
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent>
-        <NullInst/>
-      </agent>
+      <agent> <NullInst/> </agent>
     </institution>
   </region>
 

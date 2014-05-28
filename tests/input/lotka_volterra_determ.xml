@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <!-- Lotka-Volterra simulation with Preys and Predators -->
 
 <simulation>
@@ -8,16 +7,16 @@
     <startyear>2000</startyear>
   </control>
 
-  <commodity>
-    <name>wabbit</name>
-  </commodity>
+  <archetypes>
+    <spec><lib>agents</lib><archetype>Prey</archetype></spec>
+    <spec><lib>agents</lib><archetype>Predator</archetype></spec>
+    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
+    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+  </archetypes>
 
   <facility>
     <name>Prey</name>
-    <spec>
-      <lib>agents</lib>
-      <agent>Prey</agent>
-    </spec>
+    <archetype>Prey</archetype>
     <agent>
       <Prey>
         <birth_freq>1</birth_freq>
@@ -30,10 +29,7 @@
 
   <facility>
     <name>Predator</name>
-    <spec>
-      <lib>agents</lib>
-      <agent>Predator</agent>
-    </spec>
+    <archetype>Predator</archetype>
     <agent>
       <Predator>
         <hunt_cap>2</hunt_cap>
@@ -50,19 +46,11 @@
 
   <region>
     <name>SingleRegion</name>
-    <spec>
-      <lib>agents</lib>
-      <agent>NullRegion</agent>
-    </spec>
-    <agent>
-      <NullRegion/>
-    </agent>
+    <archetype>NullRegion</archetype>
+    <agent> <NullRegion/> </agent>
     <institution>
       <name>SingleInstitution</name>
-      <spec>
-        <lib>agents</lib>
-        <agent>NullInst</agent>
-      </spec>
+      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
@@ -73,9 +61,7 @@
           <number>20</number>
         </entry>
       </initialfacilitylist>
-      <agent>
-        <NullInst/>
-      </agent>
+      <agent> <NullInst/> </agent>
     </institution>
   </region>
 

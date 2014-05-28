@@ -110,8 +110,5 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
 </start>
 
-<define name="spec">
-</define>
-
 </grammar>
 
