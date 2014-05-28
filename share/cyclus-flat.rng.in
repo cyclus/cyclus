@@ -41,7 +41,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
 
-      <element name="agent">
+      <element name="config">
         <choice>
           @MODEL_SCHEMAS@
         </choice>

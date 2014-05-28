@@ -40,7 +40,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
 
-      <element name="agent">
+      <element name="config">
         <choice>
         @Facility_REFS@
         </choice>
@@ -55,7 +55,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
 
-      <element name="agent">
+      <element name="config">
         <choice>
         @Region_REFS@
         </choice>
@@ -79,7 +79,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
             </element>
           </optional>
 
-          <element name="agent">
+          <element name="config">
             <choice>
             @Inst_REFS@
             </choice>

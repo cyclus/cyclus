@@ -1061,7 +1061,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         impl += self.shapes_impl(ctx, ind)
 
         # read data from infile onto class
-        impl += ind + 'tree = tree->SubTree("agent/*");\n'
+        impl += ind + 'tree = tree->SubTree("config/*");\n'
         impl += ind + '{0}::InfileTree* sub;\n'.format(CYCNS)
         impl += ind + 'int i;\n'
         impl += ind + 'int n;\n'
