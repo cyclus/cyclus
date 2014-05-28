@@ -13,7 +13,6 @@
 
   <facility>
     <name>OneFacility</name>
-    <archetype>StubFacility</archetype>
     <agent>
       <StubFacility />
     </agent>
@@ -21,13 +20,11 @@
 
   <region>
     <name>OneRegion</name>
-    <archetype>StubRegion</archetype>
     <agent>
       <StubRegion />
     </agent>
     <institution>
       <name>OneInst</name>
-      <archetype>StubInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>OneFacility</prototype>

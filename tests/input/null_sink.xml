@@ -15,7 +15,6 @@
 
   <facility>
     <name>Sink</name>
-    <archetype>Sink</archetype>
     <agent>
       <Sink>
         <in_commods>
@@ -28,11 +27,9 @@
 
   <region>
     <name>SingleRegion</name>
-    <archetype>NullRegion</archetype>
     <agent> <NullRegion/> </agent>
     <institution>
       <name>SingleInstitution</name>
-      <archetype>NullRegion</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Sink</prototype>

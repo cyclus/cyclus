@@ -15,7 +15,6 @@
 
   <facility>
     <name>Prey</name>
-    <archetype>Prey</archetype>
     <agent>
       <Prey>
         <commod>commodity</commod>
@@ -25,11 +24,9 @@
 
   <region>
     <name>SingleRegion</name>
-    <archetype>NullRegion</archetype>
     <agent> <NullRegion/> </agent>
     <institution>
       <name>SingleInstitution</name>
-      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
