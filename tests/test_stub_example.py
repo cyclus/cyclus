@@ -8,16 +8,12 @@ from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs
 
-def test_null_sink():
-    """Testing for null sink case without a source facility.
-
-    No transactions are expected in this test; therefore, a table with
-    transaction records must not exist in order to pass this test.
-    """
+def test_stub_example():
+    """Testing for the stubs example."""
     clean_outs()
 
     # Cyclus simulation input for null sink testing
-    sim_input = "./input/null_sink.xml"
+    sim_input = "./input/stub_example.xml"
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
@@ -43,7 +39,7 @@ def test_null_sink():
     agent_ids = agent_entry["AgentId"]
     spec = agent_entry["Spec"]
 
-    sink_id = find_ids(":agents:Sink", spec, agent_ids)
+    sink_id = find_ids("stubs:StubFacility:StubFacility", spec, agent_ids)
     # Test if one SimpleSink is deployed
     yield assert_equal, len(sink_id), 1
 
