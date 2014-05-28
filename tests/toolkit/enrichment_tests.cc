@@ -18,6 +18,8 @@ namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void EnrichmentTests::SetUp() {
+  Env::SetNucDataPath();
+
   feed_ = 0.0072;
   product_ = 0.05;
   tails_ = 0.002;
@@ -77,14 +79,13 @@ TEST_F(EnrichmentTests, valuefunction) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, material) {
-  Env::SetNucDataPath();
   EXPECT_DOUBLE_EQ(assay_u_, UraniumAssay(mat_));
   EXPECT_DOUBLE_EQ(mass_u_, UraniumQty(mat_));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, enrichmentcalcs) {
-  Env::SetNucDataPath();
+  
   Assays assays(feed_, UraniumAssay(mat_),
                                     tails_);
   double product_qty = UraniumQty(mat_);
