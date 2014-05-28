@@ -44,10 +44,10 @@ std::vector<AgentSpec> ParseModules(std::string infile) {
   InfileTree xqe(parser_);
 
   std::vector<std::string> xpaths;
-  xpaths.push_back("/simulation/facility/module");
-  xpaths.push_back("/simulation/region/module");
-  xpaths.push_back("/simulation/region/institution/module");
-  xpaths.push_back("/simulation/prototype/module");
+  xpaths.push_back("/simulation/facility/spec");
+  xpaths.push_back("/simulation/region/spec");
+  xpaths.push_back("/simulation/region/institution/spec");
+  xpaths.push_back("/simulation/prototype/spec");
 
   std::vector<AgentSpec> modules;
   std::set<std::string> unique;
@@ -256,7 +256,7 @@ void XMLFileLoader::LoadInitialAgents() {
     for (int i = 0; i < num_agents; i++) {
       InfileTree* qe = xqe.SubTree(schema_paths[*it], i);
       prototype = qe->GetString("name");
-      AgentSpec spec(qe->SubTree("module"));
+      AgentSpec spec(qe->SubTree("spec"));
 
       Agent* agent = DynamicModule::Make(ctx_, spec);
 
