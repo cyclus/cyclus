@@ -48,10 +48,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
 
-      <oneOrMore>
-      <element name="allowedfacility"> <text/> </element>
-      </oneOrMore>
-
       <element name="agent">
         <choice>
         @Region_REFS@
@@ -64,14 +60,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
           <ref name="module"/> 
           <optional>
             <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
-          </optional>
-
-          <optional>
-            <oneOrMore>
-              <element name="availableprototype">
-                <text/>
-              </element>
-            </oneOrMore>
           </optional>
 
           <optional>

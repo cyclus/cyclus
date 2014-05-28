@@ -38,24 +38,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
 
-      <!-- For compatibility with nested schema format -->
-      <!-- Facility/Inst/Region specific data -->
-      <optional>
-        <choice>
-          <oneOrMore>
-            <element name="allowedfacility"><text/></element>
-          </oneOrMore>
-
-          <optional>
-            <oneOrMore>
-              <element name="availableprototype"> <text/> </element>
-            </oneOrMore>
-          </optional>
-
-        </choice>
-      </optional>
-      <!-- end compatibility section -->
-
       <element name="agent">
         <choice>
           @MODEL_SCHEMAS@
