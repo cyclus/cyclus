@@ -27,7 +27,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <oneOrMore>
     <element name="facility">
       <element name="name"> <text/> </element>
-      <ref name="module"/> 
+      <ref name="spec"/> 
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
@@ -43,7 +43,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <oneOrMore>
     <element name="region"> <interleave>
       <element name="name"> <text/> </element>
-      <ref name="module"/> 
+      <ref name="spec"/> 
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
@@ -57,7 +57,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <oneOrMore>
         <element name="institution"> <interleave>
           <element name="name"> <text/> </element>
-          <ref name="module"/> 
+          <ref name="spec"/> 
           <optional>
             <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
           </optional>
@@ -101,8 +101,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
 </start>
 
-<define name="module">
-  <element name="module"> 
+<define name="spec">
+  <element name="spec"> 
     <optional><element name="path"><text/></element></optional>
     <optional><element name="lib"><text/></element></optional>
     <element name="agent"><text/></element>
