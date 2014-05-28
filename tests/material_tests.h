@@ -6,6 +6,7 @@
 
 #include "composition.h"
 #include "material.h"
+#include "env.h"
 
 namespace cyclus {
   
@@ -24,6 +25,8 @@ class MaterialTest : public ::testing::Test {
   double u235_g_per_mol_;
 
   virtual void SetUp() {
+    Env::SetNucDataPath();
+  
     // composition set up
     u235_ = 922350000;
     am241_ = 952410000;
