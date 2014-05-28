@@ -82,7 +82,7 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
-  Env::SetNucDataPath();
+  
   // make a number of materials masses 1, 2, and 10
   Material::Ptr same_as_orig_test_mat = Material::CreateUntracked(0,
                                                 test_comp_);
@@ -211,7 +211,7 @@ TEST_F(MaterialTest, ExtractInGrams) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, DecayShortcut) {
-  Env::SetNucDataPath();
+  
   CompMap mp;
   mp[922350000] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(mp);
