@@ -250,7 +250,8 @@ void XMLFileLoader::LoadInitialAgents() {
     for (int i = 0; i < num_agents; i++) {
       InfileTree* qe = xqe.SubTree(it->second, i);
       prototype = qe->GetString("name");
-      AgentSpec spec = specs_[qe->GetString("archetype")];
+      std::string alias = qe->SubTree("agent")->GetElementName(0);
+      AgentSpec spec = specs_[alias];
 
       Agent* agent = DynamicModule::Make(ctx_, spec);
 

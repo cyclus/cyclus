@@ -37,7 +37,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     <element name="prototype">
     <interleave>
       <element name="name"><text/></element>
-      <element name="archetype"><text/></element>
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>

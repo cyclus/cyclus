@@ -16,7 +16,6 @@
 
   <facility>
     <name>Source</name>
-    <archetype>Source</archetype>
     <agent>
       <Source>
         <commod>commodity</commod>
@@ -28,7 +27,6 @@
 
   <facility>
     <name>Sink</name>
-    <archetype>Sink</archetype>
     <agent>
       <Sink>
         <in_commods>
@@ -41,11 +39,9 @@
 
   <region>
     <name>SingleRegion</name>
-    <archetype>NullRegion</archetype>
     <agent> <NullRegion/> </agent>
     <institution>
       <name>SingleInstitution</name>
-      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Source</prototype>

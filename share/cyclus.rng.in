@@ -36,7 +36,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <oneOrMore>
     <element name="facility">
       <element name="name"> <text/> </element>
-      <element name="archetype"><text/></element>
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
@@ -52,7 +51,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <oneOrMore>
     <element name="region"> <interleave>
       <element name="name"> <text/> </element>
-      <element name="archetype"><text/></element>
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
@@ -66,7 +64,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <oneOrMore>
         <element name="institution"> <interleave>
           <element name="name"> <text/> </element>
-          <element name="archetype"><text/></element>
           <optional>
             <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
           </optional>
