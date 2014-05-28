@@ -29,7 +29,7 @@ AgentSpec::AgentSpec(std::string path, std::string lib, std::string agent,
 }
 
 AgentSpec::AgentSpec(InfileTree* t) {
-  agent_ = t->GetString("agent");
+  agent_ = t->GetString("archetype");
   lib_ = OptionalQuery<std::string>(t, "lib", agent_);
   path_ = OptionalQuery<std::string>(t, "path", "");
   alias_ = OptionalQuery<std::string>(t, "alias", agent_);

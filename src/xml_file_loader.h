@@ -23,7 +23,7 @@ void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
 
 /// Returns a list of the full module+agent spec for all agents in the given
 /// input file.
-std::vector<AgentSpec> ParseModules(std::string infile);
+std::vector<AgentSpec> ParseSpecs(std::string infile);
 
 /// Builds and returns a master cyclus input xml schema that includes the
 /// sub-schemas defined by all installed cyclus modules (e.g. facility agents).
@@ -55,6 +55,9 @@ class XMLFileLoader {
   virtual void LoadSim();
 
  protected:
+  /// Load agent specs from the input file to a map by alias
+  void LoadSpecs();
+
   /// Method to load the simulation exchange solver.
   void LoadSolver();
 
@@ -89,6 +92,9 @@ class XMLFileLoader {
 
   /// filepath to the schema
   std::string schema_path_;
+
+  // map<specalias, spec>
+  std::map<std::string, AgentSpec> specs_;
 
   /// the parser
   boost::shared_ptr<XMLParser> parser_;

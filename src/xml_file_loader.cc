@@ -36,33 +36,26 @@ void LoadStringstreamFromFile(std::stringstream& stream,
   file_stream.close();
 }
 
-std::vector<AgentSpec> ParseModules(std::string infile) {
+std::vector<AgentSpec> ParseSpecs(std::string infile) {
   std::stringstream input;
   LoadStringstreamFromFile(input, infile);
   XMLParser parser_;
   parser_.Init(input);
   InfileTree xqe(parser_);
 
-  std::vector<std::string> xpaths;
-  xpaths.push_back("/simulation/facility/spec");
-  xpaths.push_back("/simulation/region/spec");
-  xpaths.push_back("/simulation/region/institution/spec");
-  xpaths.push_back("/simulation/prototype/spec");
-
-  std::vector<AgentSpec> modules;
+  std::vector<AgentSpec> specs;
   std::set<std::string> unique;
-  for (int x = 0; x < xpaths.size(); ++x) {
-    std::string p = xpaths[x];
-    int n = xqe.NMatches(p);
-    for (int i = 0; i < n; ++i) {
-      AgentSpec spec(xqe.SubTree(p, i));
-      if (unique.count(spec.str()) == 0) {
-        modules.push_back(spec);
-        unique.insert(spec.str());
-      };
+
+  std::string p = "/simulation/archetypes/spec";
+  int n = xqe.NMatches(p);
+  for (int i = 0; i < n; ++i) {
+    AgentSpec spec(xqe.SubTree(p, i));
+    if (unique.count(spec.str()) == 0) {
+      specs.push_back(spec);
+      unique.insert(spec.str());
     }
   }
-  return modules;
+  return specs;
 }
 
 std::string BuildMasterSchema(std::string schema_path, std::string infile) {
@@ -74,15 +67,12 @@ std::string BuildMasterSchema(std::string schema_path, std::string infile) {
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
-  std::vector<AgentSpec> modules = ParseModules(infile);
-  if (modules.size() == 0) {
-    throw ValidationError("no agent modules found in input xml");
-  }
+  std::vector<AgentSpec> specs = ParseSpecs(infile);
 
   std::map<std::string, std::string> subschemas;
-  for (int i = 0; i < modules.size(); ++i) {
-    Agent* m = DynamicModule::Make(&ctx, modules[i]);
-    subschemas[m->kind()] += "<element name=\"" + modules[i].alias() + "\">\n";
+  for (int i = 0; i < specs.size(); ++i) {
+    Agent* m = DynamicModule::Make(&ctx, specs[i]);
+    subschemas[m->kind()] += "<element name=\"" + specs[i].alias() + "\">\n";
     subschemas[m->kind()] += m->schema() + "\n";
     subschemas[m->kind()] += "</element>\n";
     ctx.DelAgent(m);
@@ -169,6 +159,7 @@ void XMLFileLoader::LoadSim() {
   LoadControlParams(); // must be first
   LoadSolver();
   LoadRecipes();
+  LoadSpecs();
   LoadInitialAgents(); // must be last
   SimInit::Snapshot(ctx_);
   rec_->Flush();
@@ -236,27 +227,30 @@ void XMLFileLoader::LoadRecipes() {
   }
 }
 
+void XMLFileLoader::LoadSpecs() {
+  std::vector<AgentSpec> specs = ParseSpecs(file_);
+  for (int i = 0; i < specs.size(); ++i) {
+    specs_[specs[i].alias()] = specs[i];
+  }
+}
+
 void XMLFileLoader::LoadInitialAgents() {
   std::map<std::string, std::string> schema_paths;
   schema_paths["Region"] = "/*/region";
   schema_paths["Inst"] = "/*/region/institution";
   schema_paths["Facility"] = "/*/facility";
 
-  std::set<std::string> module_types;
-  module_types.insert("Region");
-  module_types.insert("Inst");
-  module_types.insert("Facility");
-  std::set<std::string>::iterator it;
   InfileTree xqe(*parser_);
 
   // create prototypes
   std::string prototype; // defined here for force-create AgentExit tbl
-  for (it = module_types.begin(); it != module_types.end(); it++) {
-    int num_agents = xqe.NMatches(schema_paths[*it]);
+  std::map<std::string, std::string>::iterator it;
+  for (it = schema_paths.begin(); it != schema_paths.end(); it++) {
+    int num_agents = xqe.NMatches(it->second);
     for (int i = 0; i < num_agents; i++) {
-      InfileTree* qe = xqe.SubTree(schema_paths[*it], i);
+      InfileTree* qe = xqe.SubTree(it->second, i);
       prototype = qe->GetString("name");
-      AgentSpec spec(qe->SubTree("spec"));
+      AgentSpec spec = specs_[qe->GetString("archetype")];
 
       Agent* agent = DynamicModule::Make(ctx_, spec);
 
