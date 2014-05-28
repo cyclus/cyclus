@@ -28,8 +28,6 @@
 
   <region>
     <name>SingleRegion</name>
-    <allowedfacility>Prey</allowedfacility>
-    <allowedfacility>Predator</allowedfacility>    
     <module>
       <lib>agents</lib>
       <agent>NullRegion</agent>
@@ -43,7 +41,6 @@
         <lib>agents</lib>
         <agent>NullInst</agent>
       </module>
-      <availableprototype>Predator</availableprototype>
       <initialfacilitylist>
         <entry>
           <prototype>Predator</prototype>

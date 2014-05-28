@@ -60,8 +60,6 @@
       <lib>agents</lib>
       <agent>NullRegion</agent>
     </module>
-    <allowedfacility>FacilityA</allowedfacility>
-    <allowedfacility>FacilityB</allowedfacility>
     <agent>
       <NullRegion/>
     </agent>
@@ -71,8 +69,6 @@
         <lib>agents</lib>
         <agent>NullInst</agent>
       </module>
-      <availableprototype>FacilityA</availableprototype>
-      <availableprototype>FacilityB</availableprototype>
       <initialfacilitylist>
         <entry>
           <prototype>FacilityA</prototype>

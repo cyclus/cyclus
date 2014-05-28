@@ -39,7 +39,6 @@
       <lib>agents</lib>
       <agent>NullRegion</agent>
     </module>
-    <allowedfacility>Sink</allowedfacility>
     <agent>
       <NullRegion/>
     </agent>
@@ -49,7 +48,6 @@
         <lib>agents</lib>
         <agent>NullInst</agent>
       </module>
-      <availableprototype>Sink</availableprototype>
       <initialfacilitylist>
         <entry>
           <prototype>Sink</prototype>
