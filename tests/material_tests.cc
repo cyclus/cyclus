@@ -6,7 +6,6 @@
 #include <gtest/gtest.h>
 
 #include "cyc_limits.h"
-#include "env.h"
 #include "error.h"
 
 namespace cyclus {

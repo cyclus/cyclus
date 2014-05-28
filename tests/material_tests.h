@@ -6,6 +6,7 @@
 
 #include "composition.h"
 #include "material.h"
+#include "env.h"
 
 namespace cyclus {
   
