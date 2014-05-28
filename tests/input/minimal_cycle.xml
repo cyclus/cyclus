@@ -8,9 +8,9 @@
   </control>
 
   <archetypes>
-    <spec><lib>agents</lib><archetype>KFacility</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+    <spec><lib>agents</lib><name>KFacility</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
   </archetypes>
 
   <facility>

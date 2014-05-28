@@ -27,7 +27,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="spec"> 
         <optional><element name="path"><text/></element></optional>
         <optional><element name="lib"><text/></element></optional>
-        <element name="archetype"><text/></element>
+        <element name="name"><text/></element>
         <optional><element name="alias"><text/></element></optional>
       </element>
     </oneOrMore>

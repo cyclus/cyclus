@@ -8,10 +8,10 @@
   </control>
 
   <archetypes>
-    <spec><lib>agents</lib><archetype>Prey</archetype></spec>
-    <spec><lib>agents</lib><archetype>Predator</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+    <spec><lib>agents</lib><name>Prey</name></spec>
+    <spec><lib>agents</lib><name>Predator</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
   </archetypes>
 
   <facility>

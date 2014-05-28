@@ -6,9 +6,9 @@
   </control>
 
   <archetypes>
-    <spec><path>stubs</path><lib>StubFacility</lib><archetype>StubFacility</archetype></spec>
-    <spec><path>stubs</path><lib>StubRegion</lib><archetype>StubRegion</archetype></spec>
-    <spec><path>stubs</path><lib>StubInst</lib><archetype>StubInst</archetype></spec>
+    <spec><path>stubs</path><lib>StubFacility</lib><name>StubFacility</name></spec>
+    <spec><path>stubs</path><lib>StubRegion</lib><name>StubRegion</name></spec>
+    <spec><path>stubs</path><lib>StubInst</lib><name>StubInst</name></spec>
   </archetypes>
 
   <facility>
