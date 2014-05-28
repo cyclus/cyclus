@@ -15,19 +15,28 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </interleave>
   </element>
 
-  <oneOrMore>
+  <zeroOrMore>
     <element name="commodity">
       <element name="name"> <text/> </element>
-      <optional>
-        <element name="solution_priority"> <data type="double"/> </element>
-      </optional>
+      <element name="solution_priority"> <data type="double"/> </element>
     </element>
-  </oneOrMore>
+  </zeroOrMore>
     
+  <element name="archetypes"> 
+    <oneOrMore>
+      <element name="spec"> 
+        <optional><element name="path"><text/></element></optional>
+        <optional><element name="lib"><text/></element></optional>
+        <element name="archetype"><text/></element>
+        <optional><element name="alias"><text/></element></optional>
+      </element>
+    </oneOrMore>
+  </element>
+
   <oneOrMore>
     <element name="facility">
       <element name="name"> <text/> </element>
-      <ref name="spec"/> 
+      <element name="archetype"><text/></element>
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
@@ -43,7 +52,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <oneOrMore>
     <element name="region"> <interleave>
       <element name="name"> <text/> </element>
-      <ref name="spec"/> 
+      <element name="archetype"><text/></element>
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
@@ -57,7 +66,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <oneOrMore>
         <element name="institution"> <interleave>
           <element name="name"> <text/> </element>
-          <ref name="spec"/> 
+          <element name="archetype"><text/></element>
           <optional>
             <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
           </optional>
@@ -102,12 +111,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 </start>
 
 <define name="spec">
-  <element name="spec"> 
-    <optional><element name="path"><text/></element></optional>
-    <optional><element name="lib"><text/></element></optional>
-    <element name="agent"><text/></element>
-    <optional><element name="alias"><text/></element></optional>
-  </element>
 </define>
 
 </grammar>
