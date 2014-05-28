@@ -19,10 +19,10 @@
 
   <facility>
     <name>Sink</name>
-    <module>
+    <spec>
       <lib>agents</lib>
       <agent>Sink</agent>
-    </module>
+    </spec>
     <agent>
       <Sink>
         <in_commods>
@@ -35,21 +35,19 @@
 
   <region>
     <name>SingleRegion</name>
-    <module>
+    <spec>
       <lib>agents</lib>
       <agent>NullRegion</agent>
-    </module>
-    <allowedfacility>Sink</allowedfacility>
+    </spec>
     <agent>
       <NullRegion/>
     </agent>
     <institution>
       <name>SingleInstitution</name>
-      <module>
+      <spec>
         <lib>agents</lib>
         <agent>NullInst</agent>
-      </module>
-      <availableprototype>Sink</availableprototype>
+      </spec>
       <initialfacilitylist>
         <entry>
           <prototype>Sink</prototype>

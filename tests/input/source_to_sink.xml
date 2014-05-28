@@ -14,10 +14,10 @@
 
   <facility>
     <name>Source</name>
-    <module>
+    <spec>
       <lib>agents</lib>
       <agent>Source</agent>
-    </module>
+    </spec>
     <agent>
       <Source>
         <commod>commodity</commod>
@@ -29,10 +29,10 @@
 
   <facility>
     <name>Sink</name>
-    <module>
+    <spec>
       <lib>agents</lib>
       <agent>Sink</agent>
-    </module>
+    </spec>
     <agent>
       <Sink>
         <in_commods>
@@ -45,23 +45,19 @@
 
   <region>
     <name>SingleRegion</name>
-    <module>
+    <spec>
       <lib>agents</lib>
       <agent>NullRegion</agent>
-    </module>
-    <allowedfacility>Source</allowedfacility>
-    <allowedfacility>Sink</allowedfacility>
+    </spec>
     <agent>
       <NullRegion/>
     </agent>
     <institution>
       <name>SingleInstitution</name>
-      <module>
+      <spec>
         <lib>agents</lib>
         <agent>NullInst</agent>
-      </module>
-      <availableprototype>Source</availableprototype>
-      <availableprototype>Sink</availableprototype>
+      </spec>
       <initialfacilitylist>
         <entry>
           <prototype>Source</prototype>

@@ -22,11 +22,11 @@ std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
-  std::vector<AgentSpec> modules = ParseModules(infile);
+  std::vector<AgentSpec> specs = ParseSpecs(infile);
   std::string subschemas;
-  for (int i = 0; i < modules.size(); ++i) {
-    Agent* m = DynamicModule::Make(&ctx, modules[i]);
-    subschemas += "<element name=\"" + modules[i].alias() + "\">\n";
+  for (int i = 0; i < specs.size(); ++i) {
+    Agent* m = DynamicModule::Make(&ctx, specs[i]);
+    subschemas += "<element name=\"" + specs[i].alias() + "\">\n";
     subschemas += m->schema() + "\n";
     subschemas += "</element>\n";
     ctx.DelAgent(m);
@@ -54,7 +54,7 @@ void XMLFlatLoader::LoadInitialAgents() {
   for (int i = 0; i < num_protos; i++) {
     InfileTree* qe = xqe.SubTree("/*/prototype", i);
     std::string prototype = qe->GetString("name");
-    AgentSpec spec(qe->SubTree("module"));
+    AgentSpec spec = specs_[qe->GetString("archetype")];
 
     Agent* agent = DynamicModule::Make(ctx_, spec);
 
