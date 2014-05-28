@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<!-- 1 SimpleSource Source, 1 SimpleSink Sink -->
+<!-- 2 SimpleSource Source, 1 SimpleSink Sink -->
 
 <simulation>
   <control>
@@ -8,16 +7,15 @@
     <startyear>2000</startyear>
   </control>
 
-  <commodity>
-    <name>commodity</name>
-  </commodity>
+  <archetypes>
+    <spec><lib>agents</lib><archetype>KFacility</archetype></spec>
+    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
+    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+  </archetypes>
 
   <facility>
     <name>KFacility</name>
-    <spec>
-      <lib>agents</lib>
-      <agent>KFacility</agent>
-    </spec>
+    <archetype>KFacility</archetype>
     <agent>
       <KFacility>
         <in_commod>commodity</in_commod>
@@ -33,28 +31,18 @@
 
   <region>
     <name>SingleRegion</name>
-    <spec>
-      <lib>agents</lib>
-      <agent>NullRegion</agent>
-    </spec>
-    <agent>
-      <NullRegion/>
-    </agent>
+    <archetype>NullRegion</archetype>
+    <agent> <NullRegion/> </agent>
     <institution>
       <name>SingleInstitution</name>
-      <spec>
-        <lib>agents</lib>
-        <agent>NullInst</agent>
-      </spec>
+      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>KFacility</prototype>
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent>
-        <NullInst/>
-      </agent>
+      <agent> <NullInst/> </agent>
     </institution>
   </region>
 
