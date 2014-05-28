@@ -54,7 +54,8 @@ void XMLFlatLoader::LoadInitialAgents() {
   for (int i = 0; i < num_protos; i++) {
     InfileTree* qe = xqe.SubTree("/*/prototype", i);
     std::string prototype = qe->GetString("name");
-    AgentSpec spec = specs_[qe->GetString("archetype")];
+    std::string alias = qe->SubTree("config")->GetElementName(0);
+    AgentSpec spec = specs_[alias];
 
     Agent* agent = DynamicModule::Make(ctx_, spec);
 

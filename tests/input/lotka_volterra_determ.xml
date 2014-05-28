@@ -8,29 +8,27 @@
   </control>
 
   <archetypes>
-    <spec><lib>agents</lib><archetype>Prey</archetype></spec>
-    <spec><lib>agents</lib><archetype>Predator</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+    <spec><lib>agents</lib><name>Prey</name></spec>
+    <spec><lib>agents</lib><name>Predator</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
   </archetypes>
 
   <facility>
     <name>Prey</name>
-    <archetype>Prey</archetype>
-    <agent>
+    <config>
       <Prey>
         <birth_freq>1</birth_freq>
         <nchildren>1</nchildren>
         <birth_and_death>0</birth_and_death>
         <commod>wabbit</commod>
       </Prey>
-    </agent>
+    </config>
   </facility>
 
   <facility>
     <name>Predator</name>
-    <archetype>Predator</archetype>
-    <agent>
+    <config>
       <Predator>
         <hunt_cap>2</hunt_cap>
         <hunt_freq>3</hunt_freq>
@@ -41,16 +39,14 @@
         <birth_and_death>0</birth_and_death>
         <prey>Prey</prey>
       </Predator>
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>SingleRegion</name>
-    <archetype>NullRegion</archetype>
-    <agent> <NullRegion/> </agent>
+    <config> <NullRegion/> </config>
     <institution>
       <name>SingleInstitution</name>
-      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
@@ -61,7 +57,7 @@
           <number>20</number>
         </entry>
       </initialfacilitylist>
-      <agent> <NullInst/> </agent>
+      <config> <NullInst/> </config>
     </institution>
   </region>
 </simulation>

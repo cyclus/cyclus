@@ -27,7 +27,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="spec"> 
         <optional><element name="path"><text/></element></optional>
         <optional><element name="lib"><text/></element></optional>
-        <element name="archetype"><text/></element>
+        <element name="name"><text/></element>
         <optional><element name="alias"><text/></element></optional>
       </element>
     </oneOrMore>
@@ -36,12 +36,11 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <oneOrMore>
     <element name="facility">
       <element name="name"> <text/> </element>
-      <element name="archetype"><text/></element>
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
 
-      <element name="agent">
+      <element name="config">
         <choice>
         @Facility_REFS@
         </choice>
@@ -52,12 +51,11 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <oneOrMore>
     <element name="region"> <interleave>
       <element name="name"> <text/> </element>
-      <element name="archetype"><text/></element>
       <optional>
         <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
       </optional>
 
-      <element name="agent">
+      <element name="config">
         <choice>
         @Region_REFS@
         </choice>
@@ -66,7 +64,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <oneOrMore>
         <element name="institution"> <interleave>
           <element name="name"> <text/> </element>
-          <element name="archetype"><text/></element>
           <optional>
             <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
           </optional>
@@ -82,7 +79,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
             </element>
           </optional>
 
-          <element name="agent">
+          <element name="config">
             <choice>
             @Inst_REFS@
             </choice>

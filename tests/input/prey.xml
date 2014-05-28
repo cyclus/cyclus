@@ -8,35 +8,32 @@
   </control>
 
   <archetypes>
-    <spec><lib>agents</lib><archetype>Prey</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+    <spec><lib>agents</lib><name>Prey</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
   </archetypes>
 
   <facility>
     <name>Prey</name>
-    <archetype>Prey</archetype>
-    <agent>
+    <config>
       <Prey>
         <commod>commodity</commod>
       </Prey>
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>SingleRegion</name>
-    <archetype>NullRegion</archetype>
-    <agent> <NullRegion/> </agent>
+    <config> <NullRegion/> </config>
     <institution>
       <name>SingleInstitution</name>
-      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Prey</prototype>
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent> <NullInst/> </agent>
+      <config> <NullInst/> </config>
     </institution>
   </region>
 </simulation>

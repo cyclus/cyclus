@@ -30,7 +30,7 @@ class StateWrangler {
   /// data transfered through di.
   ///
   /// Agent parameters in the InfileTree are scoped in the
-  /// "agent/*" path. The superclass InitFrom expects the InfileTree
+  /// "config/*" path. The superclass InitFrom expects the InfileTree
   /// passed to it to be scoped identically to the tree passed to the agent's
   /// InitFrom. - do NOT pass a changed-scope tree to the superclass.
   ///

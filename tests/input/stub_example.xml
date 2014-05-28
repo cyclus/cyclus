@@ -6,37 +6,34 @@
   </control>
 
   <archetypes>
-    <spec><path>stubs</path><lib>StubFacility</lib><archetype>StubFacility</archetype></spec>
-    <spec><path>stubs</path><lib>StubRegion</lib><archetype>StubRegion</archetype></spec>
-    <spec><path>stubs</path><lib>StubInst</lib><archetype>StubInst</archetype></spec>
+    <spec><path>stubs</path><lib>StubFacility</lib><name>StubFacility</name></spec>
+    <spec><path>stubs</path><lib>StubRegion</lib><name>StubRegion</name></spec>
+    <spec><path>stubs</path><lib>StubInst</lib><name>StubInst</name></spec>
   </archetypes>
 
   <facility>
     <name>OneFacility</name>
-    <archetype>StubFacility</archetype>
-    <agent>
+    <config>
       <StubFacility />
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>OneRegion</name>
-    <archetype>StubRegion</archetype>
-    <agent>
+    <config>
       <StubRegion />
-    </agent>
+    </config>
     <institution>
       <name>OneInst</name>
-      <archetype>StubInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>OneFacility</prototype>
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent>
+      <config>
         <StubInst />
-      </agent>
+      </config>
     </institution>
   </region>
 

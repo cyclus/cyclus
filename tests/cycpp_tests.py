@@ -299,7 +299,7 @@ def test_itdbfilter():
     exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
                 '  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, '
                                                    'rawcycpp_shape_y + 1);\n'
-                '  tree = tree->SubTree("agent/*");\n'
+                '  tree = tree->SubTree("config/*");\n'
                 '  cyclus::InfileTree* sub;\n'
                 '  int i;\n'
                 '  int n;\n'

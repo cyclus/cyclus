@@ -8,44 +8,40 @@
   </control>
 
   <archetypes>
-    <spec><lib>agents</lib><archetype>Source</archetype></spec>
-    <spec><lib>agents</lib><archetype>Sink</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+    <spec><lib>agents</lib><name>Source</name></spec>
+    <spec><lib>agents</lib><name>Sink</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
   </archetypes>
 
   <facility>
     <name>Source</name>
-    <archetype>Source</archetype>
-    <agent>
+    <config>
       <Source>
         <commod>commodity</commod>
         <recipe_name>commod_recipe</recipe_name>
         <capacity>1.00</capacity>
       </Source>
-    </agent>
+    </config>
   </facility>
 
   <facility>
     <name>Sink</name>
-    <archetype>Sink</archetype>
-    <agent>
+    <config>
       <Sink>
         <in_commods>
           <val>commodity</val>
         </in_commods>
         <capacity>1.00</capacity>
       </Sink>
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>SingleRegion</name>
-    <archetype>NullRegion</archetype>
-    <agent> <NullRegion/> </agent>
+    <config> <NullRegion/> </config>
     <institution>
       <name>SingleInstitution</name>
-      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>Source</prototype>
@@ -56,7 +52,7 @@
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent> <NullInst/> </agent>
+      <config> <NullInst/> </config>
     </institution>
   </region>
 

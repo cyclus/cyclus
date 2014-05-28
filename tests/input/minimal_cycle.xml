@@ -8,15 +8,14 @@
   </control>
 
   <archetypes>
-    <spec><lib>agents</lib><archetype>KFacility</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullRegion</archetype></spec>
-    <spec><lib>agents</lib><archetype>NullInst</archetype></spec>
+    <spec><lib>agents</lib><name>KFacility</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
   </archetypes>
 
   <facility>
     <name>FacilityA</name>
-    <archetype>KFacility</archetype>
-    <agent>
+    <config>
       <KFacility>
         <in_commod>commodityB</in_commod>
         <in_capacity>1</in_capacity>
@@ -26,13 +25,12 @@
         <out_capacity>1</out_capacity>
         <k_factor_out>1</k_factor_out>
       </KFacility>
-    </agent>
+    </config>
   </facility>
 
   <facility>
     <name>FacilityB</name>
-    <archetype>KFacility</archetype>
-    <agent>
+    <config>
       <KFacility>
         <in_commod>commodityA</in_commod>
         <in_capacity>1</in_capacity>
@@ -42,16 +40,14 @@
         <out_capacity>1</out_capacity>
         <k_factor_out>1</k_factor_out>
       </KFacility>
-    </agent>
+    </config>
   </facility>
 
   <region>
     <name>SingleRegion</name>
-    <archetype>NullRegion</archetype>
-    <agent> <NullRegion/> </agent>
+    <config> <NullRegion/> </config>
     <institution>
       <name>SingleInstitution</name>
-      <archetype>NullInst</archetype>
       <initialfacilitylist>
         <entry>
           <prototype>FacilityA</prototype>
@@ -62,7 +58,7 @@
           <number>1</number>
         </entry>
       </initialfacilitylist>
-      <agent> <NullInst/> </agent>
+      <config> <NullInst/> </config>
     </institution>
   </region>
 
