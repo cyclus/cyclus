@@ -10,6 +10,11 @@
 
   <commodity>
     <name>commodity</name>
+    <solution_priority>2</solution_priority>
+  </commodity>
+  <commodity>
+    <name>other_commodity</name>
+    <solution_priority>1</solution_priority>
   </commodity>
 
   <facility>
