@@ -38,20 +38,13 @@ TEST_F(StubRegionTest, Print) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubRegionTest, ReceiveMessage) {
-  // Test StubRegion specific behaviors of the receiveMessage function here
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubRegionTest, Tick) {
-  int time = 1;
   EXPECT_NO_THROW(src_region_->Tick());
   // Test StubRegion specific behaviors of the handleTick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubRegionTest, Tock) {
-  int time = 1;
   EXPECT_NO_THROW(src_region_->Tock());
   // Test StubRegion specific behaviors of the handleTock function here
 }
