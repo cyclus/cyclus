@@ -38,21 +38,14 @@ TEST_F(StubFacilityTest, Print) {
   // Test StubFacility specific aspects of the print method here
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubFacilityTest, ReceiveMessage) {
-  // Test StubFacility specific behaviors of the ReceiveMessage function here
-}
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, Tick) {
-  int time = 1;
   ASSERT_NO_THROW(src_facility_->Tick());
   // Test StubFacility specific behaviors of the Tick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubFacilityTest, Tock) {
-  int time = 1;
   EXPECT_NO_THROW(src_facility_->Tock());
   // Test StubFacility specific behaviors of the Tock function here
 }
