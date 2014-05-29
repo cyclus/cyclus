@@ -203,7 +203,6 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
   // parse command line options
   ai->desc.add_options()
       ("help,h", "produce help message")
-      ("include", "print the cyclus include directory")
       ("version,V", "print cyclus core and dependency versions and quit")
       ("restart", po::value<std::string>(),
        "restart from the specified simulation snapshot [db-file]:[sim-id]:[timestep]")
@@ -224,6 +223,12 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("warn-limit", po::value<unsigned int>(), 
        "number of warnings to issue per kind, defaults to 1")
       ("warn-as-error", "throw errors when warnings are issued")
+      ("path,p", "print the CYCLUS_PATH")
+      ("include", "print the cyclus include directory")
+      ("install-path", "print the cyclus install directory")
+      ("build-path", "print the cyclus build directory")
+      ("rng-schema", "print the path to cyclus.rng.in")
+      ("nuc-data", "print the path to cyclus_nuc_data.h5")
       ;
 
   po::variables_map vm;
@@ -262,8 +267,27 @@ int EarlyExitArgs(const ArgInfo& ai) {
     std::cout << "   Sqlite3  " << version::sqlite3() << "\n";
     std::cout << "   xml2     " << version::xml2() << "\n";
     return 0;
+  } else if (ai.vm.count("path")) {
+    std::vector<std::string> p = Env::cyclus_path();
+    std::cout << p[0];
+    for (int i = 1; i < p.size(); ++i)
+      std::cout << ":" << p[i];
+    std::cout << "\n";
+    return 0;
   } else if (ai.vm.count("include")) {
     std::cout << Env::GetInstallPath() << "/include/cyclus/\n";
+    return 0;
+  } else if (ai.vm.count("install-path")) {
+    std::cout << Env::GetInstallPath() << "\n";
+    return 0;
+  } else if (ai.vm.count("build-path")) {
+    std::cout << Env::GetBuildPath() << "\n";
+    return 0;
+  } else if (ai.vm.count("rng-schema")) {
+    std::cout << Env::rng_schema(ai.vm.count("flat-schema") > 0) << "\n";
+    return 0;
+  } else if (ai.vm.count("nuc-data")) {
+    std::cout << Env::nuc_data() << "\n";
     return 0;
   } else if (ai.vm.count("schema")) {
     std::stringstream f;
