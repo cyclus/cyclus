@@ -48,11 +48,13 @@ class Env {
   /// @return path with the last item removed
   static std::string PathBase(std::string path);
 
-  /// the relative path to the root install directory (containing bin, lib, etc.)
-  /// @return the absolute path to the build directory
+  /// The relative path to the root install directory (containing bin, lib, etc.)
+  /// This first checks the path of the cyclus executable itself and then tries
+  /// the install directory given at run time. 
+  /// @return the absolute path to the install directory
   static const std::string GetInstallPath();
 
-  /// the relative path to the root build directory (containing bin, lib, etc.)
+  /// The relative path to the root build directory (containing bin, lib, etc.)
   /// @return the absolute path to the build directory
   static const std::string GetBuildPath();
 
@@ -103,6 +105,9 @@ class Env {
 
   /// the cwd path
   static boost::filesystem::path cwd_;
+
+  ///the install path, cache of results from GetInstallPath()
+  static std::string instdir_;
 };
 
 }  // namespace cyclus
