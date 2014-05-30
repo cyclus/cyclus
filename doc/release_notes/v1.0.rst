@@ -7,7 +7,7 @@ Cyclus 1.0 Release Notes
 :Contact: https://groups.google.com/forum/#!forum/cyclus-dev
 
 The Cyclus core team is excited to announce the latest stable version 
-of the cyclus ecosystem!  This includes nearly 4000 commits by 
+of the cyclus ecosystem!  This includes over 5000 commits by 
 8 developers.  
 
 Major features
@@ -37,26 +37,53 @@ Major features
 
 - Pre-processing
 
-- Post-processing 
-
-- Input/XML deets?
+  * auto-generate input/output archetype code for supported datatypes
 
 - Simulation initialization and restart
 
-- Depends on PyNE for nuclear data (pyne.io)
+- Now using PyNE for nuclear data (http://pyne.io)
 
-- Build system deets?
+- Basic Lodtka-Volterra predator/prey-like simulation behavior demonstrated
+
+- Updated build system
+
+  * kernel in ``$PREFIX/lib/`` as ``cyclus`` (i.e., ``libcyclus.so`` or
+    ``libcyclus.dylib``)
+
+  * cyclus agents in ``$PREFIX/lib/cyclus`` as ``agents``
+
+  * cyclus generic agent archetype unit tests in ``$PREFIX/lib/cyclus`` as
+    ``baseagentunittests``
+
+  * cycamore agents in ``$PREFIX/lib/cyclus`` as ``cycamore``
+
+  * cyclus unit tests in ``$PREFIX/bin`` as ``cyclus_unit_tests``
+
+  * cycamore unit tests in ``$PREFIX/bin`` as ``cycamore_unit_tests``
+
+  * support for easy build/install of modules with single agent archetype and
+    associated tests
+
+  * support for easy build/install of modules of group of agent archetypes and
+    associated tests
 
 - Toolkit
 
-- Backend database deets?
+  * separation of additional "helper" classes and interfaces out of kernel
+    source directory and namespace
 
-Since v0.4, xxx files have changed encompassing a net xxxx line insertions(+) and 
-xxxx deletions(-).
+- Significantly updated database schema, utilized for both canonical input and
+  output
 
-Known bugs
-----------
-N/A
+  * supports variable length datatypes for both sqlite and hdf5
+
+Since v0.4
+
+* Cyclus: 1,120 commits resulted in 262 changed files encompassing a net 33,820
+line insertions(+) and 9,673 deletions(-).
+
+* Cycamore: 270 commits resulted in 133 changed files encompassing a net 2,243
+line insertions(+) and 95,294 deletions(-).
 
 Contributors
 ============
@@ -65,7 +92,6 @@ The following people contributed to this release of Cyclus.  A "*" by their
 name indicates a first time contributor.  Names follow alphabetically, 
 
 * Robert Carlsen
-* Royal Elmore
 * Matthew Gidden
 * Katy Huff
 * Arrielle Opotowsky
