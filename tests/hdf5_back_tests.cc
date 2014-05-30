@@ -105,6 +105,27 @@ class Hdf5BackTests : public ::testing::Test {
 // Actual unit tests
 //
 
+TEST_F(Hdf5BackTests, ShapeSegfault) {
+  // this test should not segfault
+  cyclus::Recorder r;
+  FileDeleter fd("segfault.h5");
+  cyclus::Hdf5Back b("segfault.h5");
+  r.RegisterBackend(&b);
+  std::vector<int>* shape = new std::vector<int>();
+  shape->push_back(1);
+  std::vector<int> foo;
+  foo.push_back(42);
+
+  r.NewDatum("bar")
+  ->AddVal("foo", foo, shape)
+  ->Record();
+
+  delete shape;
+  memset(shape, 42, sizeof(std::vector<int>));
+
+  r.Close();
+}
+
 TEST_F(Hdf5BackTests, ReadWriteBool) {
   shape.clear();
   TestBasic<bool>("bool", true, false);
