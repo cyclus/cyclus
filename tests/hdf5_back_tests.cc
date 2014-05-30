@@ -120,8 +120,7 @@ TEST_F(Hdf5BackTests, ShapeSegfault) {
   ->AddVal("foo", foo, shape)
   ->Record();
 
-  delete shape;
-  memset(shape, 42, sizeof(std::vector<int>));
+  memset(shape, '-', 1);
 
   r.Close();
 }

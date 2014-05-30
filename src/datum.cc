@@ -13,7 +13,11 @@ typedef boost::singleton_pool<Datum, sizeof(Datum)> DatumPool;
 Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val,
                      std::vector<int>* shape) {
   vals_.push_back(std::pair<const char*, boost::spirit::hold_any>(field, val));
-  shapes_.push_back(shape);
+  std::vector<int> s;
+  if (shape == NULL)
+    shapes_.push_back(s);
+  else
+    shapes_.push_back(*shape);
   return this;
 }
 

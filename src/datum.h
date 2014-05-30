@@ -19,7 +19,7 @@ class Datum {
  public:
   typedef std::pair<const char*, boost::spirit::hold_any> Entry;
   typedef std::vector<Entry> Vals;
-  typedef std::vector<int>* Shape;
+  typedef std::vector<int> Shape;
   typedef std::vector<Shape> Shapes;
 
   virtual ~Datum();
@@ -46,7 +46,7 @@ class Datum {
   /// @warning for the val argument - what variable types are supported
   /// depends on what the backend(s) in use are designed to handle.
   Datum* AddVal(const char* field, boost::spirit::hold_any val, 
-                Shape shape = NULL);
+                std::vector<int>* shape = NULL);
 
   /*!
   Record this datum to its Recorder. Recorded Datum objects of the same
