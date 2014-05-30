@@ -1,0 +1,32 @@
+
+.memproto, dl.reflist dt {
+    border-top: 0px solid #A8B8D9;
+    border-left: 0px solid #A8B8D9;
+    border-right: 0px solid #A8B8D9;
+    padding: 0px 0px 0px 0px;
+    background-image: none;
+
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+}
+
+.memdoc, dl.reflist dd {
+    border-bottom: 0px solid #A8B8D9;      
+    border-left: 0px solid #A8B8D9;      
+    border-right: 0px solid #A8B8D9; 
+    padding: 0px 10px 2px 20px;
+    background-image: none;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+}
+
+.memname tr {
+	float: left;
+}
+
+dl.warning, dl.attention
+{
+    background: #FFE5E5;
+}
