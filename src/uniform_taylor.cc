@@ -2,22 +2,24 @@
 // Implements the UniformTaylor class
 #include "uniform_taylor.h"
 
-#include "error.h"
-
 #include <cmath>
 #include <string>
 
+#include "error.h"
+
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Vector UniformTaylor::MatrixExpSolver(const Matrix& A,
-                                      const Vector& x_o, const double t) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Vector UniformTaylor::MatrixExpSolver(const Matrix& A, const Vector& x_o,
+                                      const double t) {
   int n = A.NumRows();
 
   // checks if the dimensions of A and x_o are compatible for matrix-vector
   // computations
   if (x_o.NumRows() != n) {
-    std::string error = "Error: Matrix-Vector dimensions are not compatible.";
+    std::string error = "Error: Matrix-Vector dimensions are not compatible: " + \
+                        boost::lexical_cast<std::string>( x_o.NumRows()) + \
+                        " rows vs " + boost::lexical_cast<std::string>(n) + " nuclides.";
     throw ValueError(error);
   }
 
@@ -38,7 +40,7 @@ Vector UniformTaylor::MatrixExpSolver(const Matrix& A,
   return x_t;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double UniformTaylor::MaxAbsDiag(const Matrix& A) {
   int n = A.NumRows();       // stores the order of the matrix A
   double a_ii = A(1, 1);     // begins with the first diagonal element
@@ -61,16 +63,16 @@ double UniformTaylor::MaxAbsDiag(const Matrix& A) {
   return max_a_ii;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Vector UniformTaylor::GetSolutionVector(const Matrix& B,
-                                        const Vector& x_o, double alpha, double t, double tol) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Vector UniformTaylor::GetSolutionVector(const Matrix& B, const Vector& x_o,
+                                        double alpha, double t, double tol) {
   // step 3 of algorithm: calculates exp( -alpha * t)
   long double alpha_t = alpha * t;
   long double expat = exp(-alpha_t);
 
   if (expat == 0) {
     std::string error =
-      "Error: exp(-alpha * t) exceeds the range of a long double.";
+        "Error: exp(-alpha * t) exceeds the range of a long double.";
     error += "\nThe Uniform Taylor method cannot solve the matrix exponential.";
     throw ValueError(error);
   }
@@ -106,7 +108,7 @@ Vector UniformTaylor::GetSolutionVector(const Matrix& B,
   return Ck_sum;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int UniformTaylor::MaxNumTerms(long double alpha_t, double epsilon) {
   long double nextTerm;           // stores the next term in the series
 
@@ -150,5 +152,4 @@ int UniformTaylor::MaxNumTerms(long double alpha_t, double epsilon) {
 
   return p;
 }
-
-} // namespace cyclus
+}  // namespace cyclus

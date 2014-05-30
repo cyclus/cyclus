@@ -3,11 +3,14 @@
 
 #include "composition.h"
 #include "material.h"
-#include "generic_resource.h"
-#include "test_context.h"
-#include "mock_facility.h"
-#include "request.h"
-#include "bid.h"
+#include "product.h"
+
+using cyclus::Arc;
+using cyclus::CompMap;
+using cyclus::Composition;
+using cyclus::Converter;
+using cyclus::Material;
+using cyclus::ExchangeTranslationContext;
 
 namespace test_helpers {
 
@@ -15,44 +18,35 @@ namespace test_helpers {
 /// exchanges
 static int u235 = 92235;
 static double helper_qty = 4.5;
-    
-static cyclus::Material::Ptr get_mat(int iso, double qty) {
-  cyclus::CompMap cm;
-  cm[iso] = qty;
-  cyclus::Composition::Ptr comp = cyclus::Composition::CreateFromMass(cm);
-  return cyclus::Material::CreateUntracked(qty, comp);
+
+static Material::Ptr get_mat(int nuc, double qty) {
+  CompMap cm;
+  cm[nuc] = qty;
+  Composition::Ptr comp = Composition::CreateFromMass(cm);
+  return Material::CreateUntracked(qty, comp);
 }
 
-static cyclus::Material::Ptr get_mat() {
+static Material::Ptr get_mat() {
   return get_mat(u235, helper_qty);
 }
 
-static cyclus::TestContext helper_tc;
-static MockFacility* trader = new MockFacility(helper_tc.get());
-
-static cyclus::Request<cyclus::Material>::Ptr get_req(std::string commod = "") {
-  return cyclus::Request<cyclus::Material>::Create(get_mat(), trader, commod);
-}
-
-static cyclus::Bid<cyclus::Material>::Ptr get_bid() {
-  return cyclus::Bid<cyclus::Material>::Ptr(
-      cyclus::Bid<cyclus::Material>::Create(get_req(), get_mat(), trader));
-}
-
-struct TestConverter : public cyclus::Converter<cyclus::Material> {
+struct TestConverter : public Converter<Material> {
   TestConverter() {}
   virtual ~TestConverter() {}
-  
-  virtual double convert(cyclus::Material::Ptr r) {
+
+  virtual double convert(
+      Material::Ptr r,
+      Arc const * a = NULL,
+      ExchangeTranslationContext<Material> const * ctx = NULL) const {
     return r->quantity() * helper_qty;
   }
 
   /// @returns true if a dynamic cast succeeds
-  virtual bool operator==(Converter<cyclus::Material>& other) const {
+  virtual bool operator==(Converter<Material>& other) const {
     return dynamic_cast<TestConverter*>(&other) != NULL;
   }
 };
 
-} // namespace test_helpers
+}  // namespace test_helpers
 
-#endif // ifndef CYCLUS_TESTS_RESOURCE_HELPERS_H_
+#endif  // CYCLUS_TESTS_RESOURCE_HELPERS_H_

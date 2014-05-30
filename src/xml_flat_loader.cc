@@ -6,15 +6,14 @@
 #include "env.h"
 #include "error.h"
 #include "logger.h"
-#include "model.h"
+#include "agent.h"
 #include "recorder.h"
 #include "timer.h"
-#include "xml_query_engine.h"
+#include "infile_tree.h"
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string BuildFlatMasterSchema(std::string schema_path) {
+std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -23,16 +22,14 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
-  std::vector<std::string> names = Env::ListModules();
+  std::vector<AgentSpec> specs = ParseSpecs(infile);
   std::string subschemas;
-  for (int i = 0; i < names.size(); ++i) {
-    DynamicModule dyn(names[i]);
-    Model* m = dyn.ConstructInstance(&ctx);
-    subschemas += "<element name=\"" + names[i] + "\">\n";
+  for (int i = 0; i < specs.size(); ++i) {
+    Agent* m = DynamicModule::Make(&ctx, specs[i]);
+    subschemas += "<element name=\"" + specs[i].alias() + "\">\n";
     subschemas += m->schema() + "\n";
     subschemas += "</element>\n";
-    ctx.DelModel(m);
-    dyn.CloseLibrary();
+    ctx.DelAgent(m);
   }
 
   // replace refs in master rng template file
@@ -45,58 +42,84 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
   return master;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string XMLFlatLoader::master_schema() {
-  return BuildFlatMasterSchema(schema_path_);
+  return BuildFlatMasterSchema(schema_path_, file_);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLFlatLoader::LoadInitialAgents() {
-  XMLQueryEngine xqe(*parser_);
+  InfileTree xqe(*parser_);
 
-  int num_protos = xqe.NElementsMatchingQuery("/*/prototype");
+  // create prototypes
+  int num_protos = xqe.NMatches("/*/prototype");
   for (int i = 0; i < num_protos; i++) {
-    QueryEngine* qe = xqe.QueryElement("/*/prototype", i);
-    QueryEngine* module_data = qe->QueryElement("model");
-    std::string module_name = module_data->GetElementName();
+    InfileTree* qe = xqe.SubTree("/*/prototype", i);
+    std::string prototype = qe->GetString("name");
+    std::string alias = qe->SubTree("config")->GetElementName(0);
+    AgentSpec spec = specs_[alias];
 
-    Model* model = modules_[module_name]->ConstructInstance(ctx_);
-    model->SetModelImpl(module_name);
-    model->InitFrom(qe);
+    Agent* agent = DynamicModule::Make(ctx_, spec);
 
-    CLOG(LEV_DEBUG3) << "Module '" << model->name()
-                     << "' has had its module members initialized:";
-    CLOG(LEV_DEBUG3) << " * Type: " << model->model_type();
-    CLOG(LEV_DEBUG3) << " * Implementation: " << model->ModelImpl() ;
-    CLOG(LEV_DEBUG3) << " * ID: " << model->id();
+    // call manually without agent impl injected to keep all Agent state in a
+    // single, consolidated db table
+    agent->Agent::InfileToDb(qe, DbInit(agent, true));
 
-    // register module
-    ctx_->AddPrototype(model->name(), model);
+    agent->InfileToDb(qe, DbInit(agent));
+    rec_->Flush();
+
+    std::vector<Cond> conds;
+    conds.push_back(Cond("SimId", "==", rec_->sim_id()));
+    conds.push_back(Cond("AgentId", "==", agent->id()));
+    conds.push_back(Cond("SimTime", "==", static_cast<int>(0)));
+    CondInjector ci(b_, conds);
+    PrefixInjector pi(&ci, "AgentState");
+
+    // call manually without agent impl injected
+    agent->Agent::InitFrom(&pi);
+
+    pi = PrefixInjector(&ci, "AgentState" + spec.Sanitize());
+    agent->InitFrom(&pi);
+    ctx_->AddPrototype(prototype, agent);
   }
 
-  int num_agents = xqe.NElementsMatchingQuery("/*/agent");
-  std::map<std::string, Model*> agents; // map<name, agent>
-  std::map<std::string, std::string> parents; // map<agent, parent>
+  // retrieve agent hierarchy and initial inventories
+  int num_agents = xqe.NMatches("/*/agent");
+  std::map<std::string, std::string> protos;  // map<name, prototype>
+  std::map<std::string, std::string> parents;  // map<agent, parent>
+  std::set<std::string> agents; // set<agent_name>
+  std::map<std::string, InfileTree*> invs; // map<agent, qe>;
   for (int i = 0; i < num_agents; i++) {
-    QueryEngine* qe = xqe.QueryElement("/*/agent", i);
-    std::string name = qe->GetElementContent("name");
-    std::string proto = qe->GetElementContent("prototype");
-    std::string parent = GetOptionalQuery<std::string>(qe, "parent", "");
-    agents[name] = ctx_->CreateModel<Model>(proto);
+    InfileTree* qe = xqe.SubTree("/*/agent", i);
+    std::string name = qe->GetString("name");
+    std::string proto = qe->GetString("prototype");
+    std::string parent = OptionalQuery<std::string>(qe, "parent", "");
+    protos[name] = proto;
     parents[name] = parent;
+    invs[name] = qe;
+    agents.insert(name);
   }
 
-  std::map<std::string, Model*>::iterator it;
-  for (it = agents.begin(); it != agents.end(); ++it) {
-    std::string name = it->first;
-    Model* agent = it->second;
-    if (parents[name] == "") {
-      agent->Deploy();
+  // build agents starting at roots (no parent) down.
+  std::map<std::string, Agent*> built; // map<agent_name, agent_ptr>
+  std::set<std::string>::iterator it = agents.begin();
+  while (agents.size() > 0) {
+    std::string name = *it;
+    std::string proto = protos[name];
+    std::string parent = parents[name];
+    if (parent == "") {
+      built[name] = BuildAgent(proto, NULL);
+      ++it;
+      agents.erase(name);
+    } else if (built.count(parent) > 0) {
+      built[name] = BuildAgent(proto, built[parent]);
+      ++it;
+      agents.erase(name);
     } else {
-      agent->Deploy(agents[parents[name]]);
+      ++it;
+    }
+    if (it == agents.end()) {
+      it = agents.begin();
     }
   }
 }
 
-} // namespace cyclus
-
+}  // namespace cyclus

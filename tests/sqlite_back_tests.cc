@@ -1,80 +1,92 @@
-
-
-#include "sqlite_back.h"
-#include "blob.h"
-
-#include <gtest/gtest.h>
 #include "boost/lexical_cast.hpp"
 #include <boost/uuid/uuid_io.hpp>
+#include <gtest/gtest.h>
+
+#include "blob.h"
+#include "sqlite_back.h"
+
+#include "tools.h"
 
 static std::string const path = "testdb.sqlite";
 
-class FlushCatcher: public cyclus::SqliteBack {
-public:
-  FlushCatcher(std::string path) : SqliteBack(path) {};
-  cyclus::StrList cmds;
-
-protected:
-  virtual void Flush() {
-    cmds.insert(cmds.end(), cmds_.begin(), cmds_.end());
-    cyclus::SqliteBack::Flush();
-  };
-};
-
-class FileDeleter {
-public:
-  FileDeleter(std::string path) {
-    path_ = path;
-  };
-
-  ~FileDeleter() {
-    remove(path_.c_str());
-  };
-
-private:
-  std::string path_;
-};
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(SqliteBackTest, Regression) {
   using cyclus::Recorder;
   FileDeleter fd(path);
   Recorder m;
-  FlushCatcher back(path);
+  cyclus::SqliteBack back(path);
   m.RegisterBackend(&back);
 
-  m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("monkey"))
-  ->AddVal("weight", 10)
-  ->AddVal("height", 5.5)
-  ->AddVal("data", cyclus::Blob("banana"))
-  ->Record();
+  std::vector<int> vect;
+  vect.push_back(4);
+  vect.push_back(2);
+  std::vector<std::string> svect;
+  svect.push_back("one");
+  svect.push_back("two");
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("elephant"))
-  ->AddVal("weight", 1000)
-  ->Record();
+      ->AddVal("animal", std::string("monkey"))
+      ->AddVal("weight", 10)
+      ->AddVal("height", 5.5)
+      ->AddVal("alive", true)
+      ->AddVal("answer", vect)
+      ->AddVal("count", svect)
+      ->AddVal("data", cyclus::Blob("banana"))
+      ->Record();
+
+  vect[1] = 3;
+  svect[1] = "three";
 
   m.NewDatum("DumbTitle")
-  ->AddVal("animal", std::string("sea cucumber"))
-  ->AddVal("height", 1.2)
-  ->Record();
+      ->AddVal("animal", std::string("elephant"))
+      ->AddVal("weight", 1000)
+      ->AddVal("height", 4.2)
+      ->AddVal("alive", false)
+      ->AddVal("answer", vect)
+      ->AddVal("count", svect)
+      ->AddVal("data", cyclus::Blob("a very large mammal"))
+      ->Record();
 
-  m.close();
+  m.Close();
 
-  std::string sid = boost::lexical_cast<std::string>(m.sim_id());
+  cyclus::QueryResult qr = back.Query("DumbTitle", NULL);
 
-  ASSERT_EQ(back.cmds.size(), 4);
-  EXPECT_EQ(back.cmds.at(0),
-            "CREATE TABLE DumbTitle (SimID TEXT, animal TEXT, weight INTEGER, height REAL, data BLOB);");
-  EXPECT_EQ(back.cmds.at(1),
-            "INSERT INTO DumbTitle (SimID, animal, weight, height, data) VALUES ('" + sid +
-            "', 'monkey', 10, 5.5, X'62616e616e61');");
-  EXPECT_EQ(back.cmds.at(2),
-            "INSERT INTO DumbTitle (SimID, animal, weight) VALUES ('" + sid +
-            "', 'elephant', 1000);");
-  EXPECT_EQ(back.cmds.at(3),
-            "INSERT INTO DumbTitle (SimID, animal, height) VALUES ('" + sid +
-            "', 'sea cucumber', 1.2);");
+  std::string animal = qr.GetVal<std::string>("animal", 0);
+  int weight = qr.GetVal<int>("weight", 0);
+  double height = qr.GetVal<double>("height", 0);
+  bool alive = qr.GetVal<bool>("alive", 0);
+  cyclus::Blob data = qr.GetVal<cyclus::Blob>("data", 0);
+  std::vector<int> vget = qr.GetVal<std::vector<int> >("answer", 0);
+  std::vector<std::string> svget = qr.GetVal<std::vector<std::string> >("count", 0);
+
+  EXPECT_EQ("monkey", animal);
+  EXPECT_EQ(10, weight);
+  EXPECT_EQ(5.5, height);
+  EXPECT_TRUE(alive);
+  EXPECT_EQ("banana", data.str());
+  ASSERT_EQ(2, vget.size());
+  EXPECT_EQ(4, vget[0]);
+  EXPECT_EQ(2, vget[1]);
+  ASSERT_EQ(2, svget.size());
+  EXPECT_EQ("one", svget[0]);
+  EXPECT_EQ("two", svget[1]);
+
+  animal = qr.GetVal<std::string>("animal", 1);
+  weight = qr.GetVal<int>("weight", 1);
+  height = qr.GetVal<double>("height", 1);
+  alive = qr.GetVal<bool>("alive", 1);
+  data = qr.GetVal<cyclus::Blob>("data", 1);
+  vget = qr.GetVal<std::vector<int> >("answer", 1);
+  svget = qr.GetVal<std::vector<std::string> >("count", 1);
+  EXPECT_EQ("elephant", animal);
+  EXPECT_EQ(1000, weight);
+  EXPECT_DOUBLE_EQ(4.2, height);
+  EXPECT_FALSE(alive);
+  EXPECT_EQ("a very large mammal", data.str());
+  ASSERT_EQ(2, vget.size());
+  EXPECT_EQ(4, vget[0]);
+  EXPECT_EQ(3, vget[1]);
+  ASSERT_EQ(2, svget.size());
+  EXPECT_EQ("one", svget[0]);
+  EXPECT_EQ("three", svget[1]);
 }
-

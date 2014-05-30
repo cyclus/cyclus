@@ -1,17 +1,19 @@
-#ifndef COMPOSITION_H
-#define COMPOSITION_H
+#ifndef CYCLUS_SRC_COMPOSITION_H_
+#define CYCLUS_SRC_COMPOSITION_H_
 
 #include <map>
 #include <boost/shared_ptr.hpp>
+
+class SimInitTest;
 
 namespace cyclus {
 
 class Context;
 
-typedef int Iso;
+typedef int Nuc;
 
-/// a raw definition of isotopes and corresponding (dimensionless quantities).
-typedef std::map<Iso, double> CompMap;
+/// a raw definition of nuclides and corresponding (dimensionless quantities).
+typedef std::map<Nuc, double> CompMap;
 
 /// An immutable object responsible for holding a nuclide composition. It tracks
 /// decay lineages to prevent duplicate calculations and output recording and is
@@ -27,12 +29,15 @@ typedef std::map<Iso, double> CompMap;
 ///
 /// @code
 /// CompMap v;
-/// v[92235] = 2.4;
-/// v[8016] = 4.8;
+/// v[922350000] = 2.4;
+/// v[80160000] = 4.8;
 /// Composition c = Composition::CreateFromAtom(v);
 /// @endcode
 ///
 class Composition {
+  friend class SimInit;
+  friend class ::SimInitTest;
+
  public:
   typedef boost::shared_ptr<Composition> Ptr;
 
@@ -62,12 +67,11 @@ class Composition {
   /// delta timesteps). This composition remains unchanged.
   Ptr Decay(int delta);
 
-  /// Records the isotopic composition in output database Compositions table (if
+  /// Records the composition in output database Compositions table (if
   /// not done previously).
   void Record(Context* ctx);
 
  protected:
-
   /// a chain containing compositions that are a result of decay from a common
   /// ancestor composition. The key is the total amount of time a composition
   /// has been decayed from its root parent.
@@ -97,6 +101,6 @@ class Composition {
   int prev_decay_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_COMPOSITION_H_

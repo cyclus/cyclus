@@ -53,6 +53,8 @@ def install_cyclus(args):
             cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
             cmake_cmd += ['-DBOOST_ROOT=' + absexpanduser(args.boost_root)]
+        if args.build_type:
+            cmake_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
@@ -64,15 +66,13 @@ def install_cyclus(args):
                                 shell=(os.name == 'nt'))
 
     if args.test:
-        make_cmd = ['make', 'test']
-        rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
-                                    shell=(os.name == 'nt'))
-
-    if not args.build_only:
-        make_cmd = ['make', 'install']
-        rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
-                                    shell=(os.name == 'nt'))
-
+        make_cmd += ['test']
+    elif not args.build_only:
+        make_cmd += ['install']
+    
+    rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
+                                shell=(os.name == 'nt'))
+        
 def uninstall_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
     if not os.path.exists(args.build_dir) or not os.path.exists(makefile):
@@ -118,6 +118,9 @@ def main():
     cmake_prefix_path = "the cmake prefix path for use with FIND_PACKAGE, " + \
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
     parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
+
+    build_type = "the CMAKE_BUILD_TYPE" 
+    parser.add_argument('--build_type', help=build_type)
 
     args = parser.parse_args()
     if args.uninstall:

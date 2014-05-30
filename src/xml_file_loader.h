@@ -9,8 +9,10 @@
 
 #include "composition.h"
 #include "dynamic_module.h"
-#include "query_engine.h"
+#include "infile_tree.h"
 #include "xml_parser.h"
+#include "timer.h"
+#include "recorder.h"
 
 namespace cyclus {
 
@@ -19,35 +21,42 @@ class Context;
 /// Reads the given file path into the passed stream.
 void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
 
+/// Returns a list of the full module+agent spec for all agents in the given
+/// input file.
+std::vector<AgentSpec> ParseSpecs(std::string infile);
+
 /// Builds and returns a master cyclus input xml schema that includes the
-/// sub-schemas defined by all installed cyclus modules (e.g. facility models).
+/// sub-schemas defined by all installed cyclus modules (e.g. facility agents).
 /// This is used to validate simulation input files.
-std::string BuildMasterSchema(std::string schema_path);
+std::string BuildMasterSchema(std::string schema_path, std::string infile);
 
 /// Creates a composition from the recipe in the query engine.
-Composition::Ptr ReadRecipe(QueryEngine* qe);
+Composition::Ptr ReadRecipe(InfileTree* qe);
 
-/// a class that encapsulates the methods needed to load input to
-/// a cyclus simulation from xml
+/// Handles initialization of a database with information from
+/// a cyclus xml input file. 
+///
+/// @warning the LoadSim method is NOT idempotent. Only one / simulation should
+/// ever be initialized per XMLFileLoader object.
 class XMLFileLoader {
  public:
-  /// Constructor to create a new XML for loading. Defaults to using the main schema.
-  /// @param ctx all input file configuration will be loaded into here
-  /// @param load_filename The filename for the file to be loaded; defaults to
-  /// an empty string
-  XMLFileLoader(Context* ctx, std::string schema_path,
-                const std::string load_filename = "");
+  /// Create a new loader reading from the xml simulation input file and writing
+  /// to and initializing the backends in r. r must already have b registered.
+  /// schema_file identifies the master xml rng schema used to validate the
+  /// input file.
+  XMLFileLoader(Recorder* r, QueryableBackend* b, std::string schema_file,
+                const std::string input_file = "");
 
   virtual ~XMLFileLoader();
-
-  /// applies a schema agaisnt the parser used by the file loader
-  /// @param schema the schema representation
-  void ApplySchema(const std::stringstream& schema);
 
   /// Load an entire simulation from the inputfile.
   ///
   /// @param use_flat_schema whether or not to use the flat schema
   virtual void LoadSim();
+
+ protected:
+  /// Load agent specs from the input file to a map by alias
+  void LoadSpecs();
 
   /// Method to load the simulation exchange solver.
   void LoadSolver();
@@ -59,40 +68,40 @@ class XMLFileLoader {
   /// or a recipeBook catalog.
   void LoadRecipes();
 
-  /// Processes commodity orders, such that any without a defined order (i.e.,
-  /// are nonpositive), are given an order value greater the last known
-  /// commodity
-  void ProcessCommodities(std::map<std::string, double>* commodity_order);
-
- protected:
-  virtual std::string master_schema();
+  /// loads a specific recipe
+  void LoadRecipe(InfileTree* qe);
 
   /// Creates all initial agent instances from the input file.
   virtual void LoadInitialAgents();
 
+  virtual std::string master_schema();
+
+  /// Processes commodity priorities, such that any without a defined priority 
+  /// (i.e., are nonpositive), are given priority lower than the last known
+  /// commodity
+  void ProcessCommodities(std::map<std::string, double>* commodity_priority);
+
+  /// Creates and builds an agent, notifying its parent. The agent init info is
+  /// translated and stored in the output db.
+  Agent* BuildAgent(std::string proto, Agent* parent);
+
+  Recorder* rec_;
+  Timer ti_;
   Context* ctx_;
+  QueryableBackend* b_;
 
   /// filepath to the schema
   std::string schema_path_;
 
-  /// a map of module types to their paths in xml
-  std::map<std::string, std::string> schema_paths_;
+  // map<specalias, spec>
+  std::map<std::string, AgentSpec> specs_;
 
   /// the parser
   boost::shared_ptr<XMLParser> parser_;
 
-  /// a map of loaded modules. all dynamically loaded modules are
-  /// registered with this map when loaded.
-  std::map< std::string, DynamicModule*> modules_;
-
-  /// Method to load all dyamic modules
-  void LoadDynamicModules();
-
-  /// loads a specific recipe
-  void LoadRecipe(QueryEngine* qe);
-
   /// the input file name
   std::string file_;
+
 };
 } // namespace cyclus
 

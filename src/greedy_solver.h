@@ -11,7 +11,13 @@ namespace cyclus {
 /// requester's (unode's) preference, in decensing order (i.e., most preferred
 /// Arc first)
 inline bool ReqPrefComp(const Arc& l, const Arc& r) {
-  return l.first->prefs[l] > r.first->prefs[r];
+  return l.unode()->prefs[l] > r.unode()->prefs[r];
+}
+
+/// @brief A comparison function for sorting a container of Nodes by the nodes
+/// preference in decensing order (i.e., most preferred Node first)
+inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
+  return AvgPref(l) > AvgPref(r);
 }
   
 class ExchangeGraph;
@@ -32,29 +38,40 @@ class GreedyPreconditioner;
 /// @warning the GreedySolver is responsible for deleting is conditioner!
 class GreedySolver: public ExchangeSolver {
  public:
-  GreedySolver(bool exclusive_orders = false,
-               GreedyPreconditioner* c = NULL)
-    : exclusive_orders_(exclusive_orders),
-      conditioner_(c) {};
-  
-  GreedySolver(ExchangeGraph* g,
-               bool exclusive_orders = false,
-               GreedyPreconditioner* c = NULL)
-    : conditioner_(c),
-      exclusive_orders_(exclusive_orders),
-      ExchangeSolver(g) {};
+  GreedySolver(bool exclusive_orders = false, 
+               GreedyPreconditioner* c = NULL);
   
   virtual ~GreedySolver();
 
+  /// Uses the provided (or a default) GreedyPreconditioner to condition the
+  /// solver's ExchangeGraph so that RequestGroups are ordered by average
+  /// preference and commodity weight.
+  ///
+  /// @warning this function is called during the Solve step and should most
+  /// likely not be called independently thereof (except for testing)
+  void Condition();
+  
+ protected:
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
   /// RequestGroup and matching requests with the minimum bids possible, starting
   /// from the beginning of the the respective request and bid containers.
-  virtual void Solve();
+  virtual void SolveGraph();
 
  private:
+  /// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
+  /// capacities of its ExchangeNodeGroup)
+  ///
+  /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
+  /// @throws ValueError if the update results in a negative ExchangeNodeGroup
+  /// capacity or a negative ExchangeNode max_qty
+  /// @param n the ExchangeNode
+  /// @param qty the quantity for the node to update
+  void Init_(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet_(RequestGroup::Ptr prs);
+  void UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty);
+  
   GreedyPreconditioner* conditioner_;
-  bool exclusive_orders_;
+  std::map<ExchangeNode::Ptr, double> n_qty_;
 };
 
 } // namespace cyclus

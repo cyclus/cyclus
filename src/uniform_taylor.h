@@ -1,6 +1,8 @@
 // uniform_taylor.h
-#ifndef UNIFORMTAYLOR_H
-#define UNIFORMTAYLOR_H
+#ifndef CYCLUS_SRC_UNIFORM_TAYLOR_H_
+#define CYCLUS_SRC_UNIFORM_TAYLOR_H_
+
+#include <boost/lexical_cast.hpp>
 
 #include "use_matrix_lib.h"
 
@@ -13,7 +15,6 @@ namespace cyclus {
    problem using the Taylor Series with Uniformization method.
  */
 class UniformTaylor {
-
  public:
   /**
      Solves the matrix exponential problem:
@@ -22,7 +23,7 @@ class UniformTaylor {
      -----  =  A * x(t)
      dt
 
-     where A is an nxn Matrix and x(t) is an nx1 Vector.  The solution
+     where A is an nxn Matrix and x(t) is a nx1 Vector. The solution
      to this equation can be determined by calculating:
 
      x(t) = e^(tA) * x(t=0)
@@ -52,17 +53,14 @@ class UniformTaylor {
 
      @param B the Matrix B = A + alpha * I
      @param x_o the initial condition Vector
-     @param alpha the diagonal element of A with the largest absolute
-     value @param t the value for which the solution is being
-     evaluated @param tol the accuracy desired
+     @param alpha the diagonal element of A with the largest absolute value
+     @param t the value for which the solution is being evaluated
+     @param tol the accuracy desired
      @return the solution Vector x_t for the given value of t
-     @throw <string> if exp(-alpha * t) or exp(alpha * t) exceeds
+     @throw <string> if exp(-alpha * t) or exp(alpha * t) exceeds range
    */
-  static Vector GetSolutionVector(const Matrix& B,
-                                  const Vector& x_o,
-                                  double alpha,
-                                  double t,
-                                  double tol);
+  static Vector GetSolutionVector(const Matrix& B, const Vector& x_o,
+                                  double alpha, double t, double tol);
 
   /**
      Computes the maximum number of terms needed to obtain an accuracy
@@ -75,5 +73,5 @@ class UniformTaylor {
    */
   static int MaxNumTerms(long double alpha_t, double epsilon);
 };
-} // namespace cyclus
-#endif
+}  // namespace cyclus
+#endif  // CYCLUS_SRC_UNIFORM_TAYLOR_H_

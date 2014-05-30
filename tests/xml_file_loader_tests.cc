@@ -6,18 +6,20 @@
 #include <sstream>
 #include <string>
 
-#include "model.h"
+#include "agent.h"
+#include "dynamic_module.h"
 #include "env.h"
 #include "error.h"
-#include "dynamic_module.h"
+#include "sqlite_back.h"
 
 using namespace std;
 using cyclus::XMLFileLoader;
 
 void XMLFileLoaderTests::SetUp() {
-  schema_path = cyclus::Env::GetInstallPath() + "/share/cyclus.rng.in";
+  schema_path = cyclus::Env::GetInstallPath() + "/share/cyclus/cyclus.rng.in";
+  b_ = new cyclus::SqliteBack("xmlfileloadtestdb.sqlite");
+  rec_.RegisterBackend(b_);
 
-  ctx_ = new cyclus::Context(&ti_, &rec_);
   falseFile = "false.xml";
   CreateTestInputFile(falseFile, FalseSequence());
 
@@ -32,6 +34,7 @@ void XMLFileLoaderTests::SetUp() {
 }
 
 void XMLFileLoaderTests::TearDown() {
+  remove("xmlfileloadtestdb.sqlite");
   unlink(falseFile.c_str());
   unlink(controlFile.c_str());
   unlink(recipeFile.c_str());
@@ -49,7 +52,6 @@ std::string XMLFileLoaderTests::ControlSequence() {
           "  <startmonth>1</startmonth>"
           "  <startyear>2000</startyear>"
           "  <simstart>0</simstart>"
-          "  <decay>-1</decay>"
           " </control>"
           "</simulation>";
 }
@@ -62,22 +64,22 @@ std::string XMLFileLoaderTests::RecipeSequence() {
           "    <basis>mass</basis>"
           "    <unit>assembly</unit>"
           "    <total>1000</total>"
-          "    <isotope>"
-          "      <id>92234</id>"
+          "    <nuclide>"
+          "      <id>922340000</id>"
           "      <comp>0.01</comp>"
-          "    </isotope>"
-          "    <isotope>"
-          "      <id>92235</id>"
+          "    </nuclide>"
+          "    <nuclide>"
+          "      <id>922350000</id>"
           "      <comp>0.02</comp>"
-          "    </isotope>"
-          "    <isotope>"
-          "      <id>92238</id>"
+          "    </nuclide>"
+          "    <nuclide>"
+          "      <id>922380000</id>"
           "      <comp>0.97</comp>"
-          "    </isotope>"
-          "    <isotope>"
-          "      <id>08016</id>"
+          "    </nuclide>"
+          "    <nuclide>"
+          "      <id>080160000</id>"
           "      <comp>0.13</comp>"
-          "    </isotope>"
+          "    </nuclide>"
           "  </recipe>"
           " </control>"
           "</simulation>";
@@ -88,24 +90,22 @@ std::string XMLFileLoaderTests::ModuleSequence() {
           "  <!-- facility prototypes -->"
           "  <facility>"
           "    <name>fac</name>"
-          "    <model>"
+          "    <config>"
           "      <TestFacility/>"
-          "    </model>"
+          "    </config>"
           "  </facility>"
           "  <!-- region definitions -->"
           "  <region>"
           "    <name>reg</name>"
-          "    <allowedfacility>fac</allowedfacility>"
-          "    <model>"
+          "    <config>"
           "      <TestRegion/>"
-          "    </model>"
+          "    </config>"
           "    <!-- institution definitions -->"
           "    <institution>"
           "      <name>inst</name>"
-          "	 <availableprototype>fac</availableprototype>"
-          "      <model>"
+          "      <config>"
           "        <TestInst/>"
-          "      </model>"
+          "      </config>"
           "    </institution>"
           "    <!-- end institution definitions -->"
           "  </region>"
@@ -131,9 +131,6 @@ std::string XMLFileLoaderTests::ControlSchema() {
     "<element name=\"simstart\">"
     "  <data type=\"nonNegativeInteger\"/>"
     "</element>"
-    "<element name=\"decay\">"
-    "  <data type=\"integer\"/>"
-    "</element>"
     "</element>"
     "</element>"
     "</start>"
@@ -141,25 +138,9 @@ std::string XMLFileLoaderTests::ControlSchema() {
 }
 
 TEST_F(XMLFileLoaderTests, openfile) {
-  EXPECT_NO_THROW(XMLFileLoader file(ctx_, schema_path, controlFile));
+  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, controlFile));
 }
 
 TEST_F(XMLFileLoaderTests, throws) {
-  EXPECT_THROW(XMLFileLoader file(ctx_, schema_path, "blah"), cyclus::IOError);
-}
-
-TEST_F(XMLFileLoaderTests, control) {
-  XMLFileLoader file(ctx_, schema_path, controlFile);
-  EXPECT_NO_THROW(file.LoadControlParams());
-}
-
-TEST_F(XMLFileLoaderTests, recipes) {
-  XMLFileLoader file(ctx_, schema_path, recipeFile);
-  EXPECT_NO_THROW(file.LoadRecipes());
-}
-
-TEST_F(XMLFileLoaderTests, schema) {
-  XMLFileLoader file(ctx_, schema_path, controlFile);
-  std::stringstream schema(ControlSchema());
-  EXPECT_NO_THROW(file.ApplySchema(schema););
+  EXPECT_THROW(XMLFileLoader file(&rec_, b_, schema_path, "blah"), cyclus::IOError);
 }

@@ -1,66 +1,61 @@
+#include <string>
 
 #include <gtest/gtest.h>
 
-#include <string>
-
+#include "bid.h"
 #include "composition.h"
-#include "facility_model.h"
-#include "generic_resource.h"
+#include "facility.h"
 #include "material.h"
-#include "mock_facility.h"
+#include "product.h"
 #include "request.h"
 #include "resource_helpers.h"
 #include "test_context.h"
-
-#include "bid.h"
+#include "test_agents/test_facility.h"
 
 using cyclus::Bid;
 using cyclus::Composition;
-using cyclus::GenericResource;
+using cyclus::Product;
 using cyclus::Material;
 using cyclus::Request;
 using cyclus::TestContext;
 using std::string;
-using test_helpers::get_bid;
-using test_helpers::get_mat;
-using test_helpers::get_req;
-using test_helpers::trader;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(BidTests, MaterialGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = tc.trader();
   cyclus::CompMap cm;
   cm[92235] = 1.0;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   double qty = 1.0;
-  Material::Ptr mat = Material::CreateUntracked(qty, comp);
-  Request<Material>::Ptr req = get_req();
-  
-  Bid<Material>::Ptr r = Bid<Material>::Create(req, mat, fac);
+  Material::Ptr mat = tc.mat();
+  Request<Material>* req = tc.NewReq(); 
+  Bid<Material>* bid = Bid<Material>::Create(req, mat, fac);
 
-  EXPECT_EQ(fac, r->bidder());
-  EXPECT_EQ(req, r->request());
-  EXPECT_EQ(mat, r->offer());
+  EXPECT_EQ(fac, bid->bidder());
+  EXPECT_EQ(req, bid->request());
+  EXPECT_EQ(mat, bid->offer());
+
+  delete bid;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(BidTests, GenRsrcGetSet) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(BidTests, ProductGetSet) {
   TestContext tc;
-  MockFacility* fac = new MockFacility(tc.get());
+  TestFacility* fac = tc.trader();
   double qty = 1.0;
   string quality = "qual";
-  string units = "units";
 
-  GenericResource::Ptr rsrc =
-      GenericResource::CreateUntracked(qty, quality, units);
-  
-  Request<GenericResource>::Ptr req =
-      Request<GenericResource>::Create(rsrc, trader);
-  
-  Bid<GenericResource>::Ptr r = Bid<GenericResource>::Create(req, rsrc, fac);
+  Product::Ptr rsrc = Product::CreateUntracked(qty, quality);
 
-  EXPECT_EQ(fac, r->bidder());
-  EXPECT_EQ(req, r->request());
-  EXPECT_EQ(rsrc, r->offer());
+  Request<Product>* req = Request<Product>::Create(rsrc, fac);
+
+  Bid<Product>* bid = Bid<Product>::Create(req, rsrc, fac);
+
+  EXPECT_EQ(fac, bid->bidder());
+  EXPECT_EQ(req, bid->request());
+  EXPECT_EQ(rsrc, bid->offer());
+
+  delete bid;
+  delete req;
 }

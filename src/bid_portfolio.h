@@ -1,5 +1,5 @@
-#ifndef CYCLUS_BID_PORTFOLIO_H_
-#define CYCLUS_BID_PORTFOLIO_H_
+#ifndef CYCLUS_SRC_BID_PORTFOLIO_H_
+#define CYCLUS_SRC_BID_PORTFOLIO_H_
 
 #include <set>
 #include <string>
@@ -26,15 +26,22 @@ class Trader;
 /// and the commodity that it produces. Constraints are assumed to act over the
 /// entire set of possible bids.
 template <class T>
-class BidPortfolio :
-public boost::enable_shared_from_this< BidPortfolio<T> > {
+class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
  public:
   typedef boost::shared_ptr< BidPortfolio<T> > Ptr;
 
   /// @brief default constructor
   BidPortfolio()
-    : bidder_(NULL),
-      commodity_("NO_COMMODITY_SET") {};
+      : bidder_(NULL),
+        commodity_("NO_COMMODITY_SET") {}
+
+  /// deletes all bids associated with it
+  ~BidPortfolio() {
+    typename std::set<Bid<T>*>::iterator it;
+    for (it = bids_.begin(); it != bids_.end(); ++it) {
+      delete *it;
+    }
+  };
 
   /// @brief add a bid to the portfolio
   /// @param request the request being responded to by this bid
@@ -42,41 +49,47 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @param bidder the bidder
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original or if the bid commodity is different than the original
-  typename Bid<T>::Ptr AddBid(typename Request<T>::Ptr request, 
-                              boost::shared_ptr<T> offer,
-                              Trader* bidder,
-                              bool exclusive = false) {
-    typename Bid<T>::Ptr b =
+  Bid<T>* AddBid(Request<T>* request,
+                 boost::shared_ptr<T> offer,
+                 Trader* bidder,
+                 bool exclusive = false) {
+    Bid<T>* b =
         Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
                        exclusive);
     VerifyResponder_(b);
     VerifyCommodity_(b);
     bids_.insert(b);
     return b;
-  };
+  }
 
   /// @brief add a capacity constraint associated with the portfolio
   /// @param c the constraint to add
   inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
-  };
-  
-  /// @return the model associated with the portfolio. if no bids have
+  }
+
+  /// @return the agent associated with the portfolio. If no bids have
   /// been added, the bidder is NULL.
-  inline Trader* bidder() const { return bidder_; }
-    
-  /// @return the commodity associated with the portfolio. if no bids have
+  inline Trader* bidder() const {
+    return bidder_;
+  }
+
+  /// @return the commodity associated with the portfolio. If no bids have
   /// been added, the commodity is 'NO_COMMODITY_SET'.
-  inline std::string commodity() const { return commodity_; }
+  inline std::string commodity() const {
+    return commodity_;
+  }
 
   /// @return const access to the bids
-  inline const std::set<typename Bid<T>::Ptr>& bids() const { return bids_; }
-  
+  inline const std::set<Bid<T>*>& bids() const {
+    return bids_;
+  }
+
   /// @return the set of constraints over the bids
   inline const std::set< CapacityConstraint<T> >& constraints() const {
     return constraints_;
-  };
-  
+  }
+
  private:
   /// @brief copy constructor is private to prevent copying and preserve
   /// explicit single-ownership of bids
@@ -85,32 +98,32 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
     bids_ = rhs.bids_;
     commodity_ = rhs.commodity_;
     constraints_ = rhs.constraints_;
-    typename std::set<typename Bid<T>::Ptr>::iterator it;
+    typename std::set<Bid<T>*>::iterator it;
     for (it = bids_.begin(); it != bids_.end(); ++it) {
       it->get()->set_portfolio(this->shared_from_this());
     }
-  };
+  }
 
-  /// @brief if the bidder has not been determined yet, it is set. otherwise
-  /// VerifyResponder() verifies the the bid is associated with the
+  /// @brief if the bidder has not been determined yet, it is set. Otherwise
+  /// VerifyResponder() verifies the bid is associated with the
   /// portfolio's bidder
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original
-  void VerifyResponder_(typename Bid<T>::Ptr b) {
+  void VerifyResponder_(Bid<T>* b) {
     if (bidder_ == NULL) {
       bidder_ = b->bidder();
     } else if (bidder_ != b->bidder()) {
       std::string msg = "Insertion error: bidders do not match.";
       throw KeyError(msg);
     }
-  };
+  }
 
-  /// @brief if the commodity has not been determined yet, it is set. otherwise
-  /// VerifyCommodity() verifies the the commodity is associated with the
+  /// @brief if the commodity has not been determined yet, it is set. Otherwise
+  /// VerifyCommodity() verifies the commodity is associated with the
   /// portfolio's commodity
   /// @throws KeyError if a commodity is added that is a different commodity
   /// from the original
-  void VerifyCommodity_(const typename Bid<T>::Ptr r) {
+  void VerifyCommodity_(const Bid<T>* r) {
     std::string other = r->request()->commodity();
     if (commodity_ == "NO_COMMODITY_SET") {
       commodity_ = other;
@@ -118,19 +131,19 @@ public boost::enable_shared_from_this< BidPortfolio<T> > {
       std::string msg = "Insertion error: commodities do not match.";
       throw KeyError(msg);
     }
-  };
+  }
 
-  // bid_ is a set because there is a one-to-one correspondance between a
+  // bid_ is a set because there is a one-to-one correspondence between a
   // bid and a request, i.e., bids are unique
-  std::set< typename Bid<T>::Ptr > bids_;
+  std::set<Bid<T>*> bids_;
 
   // constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;
-  
+
   std::string commodity_;
   Trader* bidder_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_BID_PORTFOLIO_H_

@@ -23,10 +23,10 @@ Package                Minimum Version
 `CMake`                2.8            
 `boost`                1.46.1
 `libxml2`              2
-`libxml++`             2.6
-`python`               2.6
+`libxml++`             2.36
+`python`               2.7 or 3.3+
 `sqlite3`              3.7.10            
-`HDF5`                 1.8.0
+`HDF5`                 1.8.4
 `Coin-Cbc`             2.5
 ====================   ==================
 
@@ -58,6 +58,7 @@ The command to install a dependency takes the form of:
 where "package" is replaced by the correct package name. The minimal list of
 required library package names is:
 
+#. make
 #. cmake
 #. libboost-all-dev (see note below)
 #. libxml2-dev
@@ -66,6 +67,10 @@ required library package names is:
 #. libhdf5-serial-dev
 #. libbz2-dev
 #. coinor-libcbc-dev
+#. coinor-libcoinutils-dev
+#. coinor-libosi-dev
+#. coinor-libclp-dev
+#. coinor-libcgl-dev
 
 and (optionally):
 
@@ -76,6 +81,13 @@ For example, in order to install libxml++ (and libxml2) on your system, type:
 .. code-block:: bash
 
   sudo apt-get install libxml++2.6-dev
+
+If you'd prefer to copy/paste, the following line will install all *Cyclus*
+dependencies:
+
+.. code-block:: bash
+  
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
 
 Boost Note
 ----------
@@ -179,10 +191,8 @@ file `input.xml`, you can run Cyclus via:
 
 For a more detailed explanation, checkout the user guide.
 
-.. _`Cyclus Homepage`: http://cyclus.github.com
-.. _`CMake`: http://www.cmake.org
+.. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
-.. _`Cyclus User Guide`: http://cyclus.github.io/usrdoc/main.html
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
 **********************
@@ -336,5 +346,5 @@ See also
 --------
 
 A good description of a git workflow with good graphics is available at
-http://nvie.com/posts/a-successful-git-branching-model/
+http://nvie.com/posts/a-successful-git-branching-agent/
 

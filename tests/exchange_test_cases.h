@@ -4,10 +4,9 @@
 #include <string>
 
 namespace cyclus {
-  
+
 class ExchangeGraph;
 
-  
 /// ExchangeCase, a class that provides a virtual interface for constructing
 /// and testing a variety of ExchangeGraph/ExchangeSolver test instances.
 ///
@@ -58,9 +57,9 @@ class Case1b: public ExchangeCase {
 class Case2: public ExchangeCase {
  public:
   virtual ~Case2() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
-  
+
  protected:
   double qty, unit_cap_req, capacity, unit_cap_sup, flow;
 };
@@ -71,43 +70,43 @@ class Case2: public ExchangeCase {
 class Case2a: public Case2 {
  public:
   virtual ~Case2a() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case2b:
-///q = c, u_s = 1
-///f = c
+/// q = c, u_s = 1
+/// f = c
 class Case2b: public Case2 {
  public:
   virtual ~Case2b() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case2c:
-///q > c, u_s = 1, u_r = 1
-///f = c
+/// q > c, u_s = 1, u_r = 1
+/// f = c
 class Case2c: public Case2 {
  public:
   virtual ~Case2c() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case2d:
-///q > c, u_s < 1, c/u_s > q, u_r = 1
-///f = q
+/// q > c, u_s < 1, c/u_s > q, u_r = 1
+/// f = q
 class Case2d: public Case2 {
  public:
   virtual ~Case2d() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case2e:
-///q = c, u_s < 1 ( => c/u_s > q ), u_r = 1
-///f = q
+/// q = c, u_s < 1 ( => c/u_s > q ), u_r = 1
+/// f = q
 class Case2e: public Case2 {
  public:
   virtual ~Case2e() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case2f:
@@ -116,7 +115,7 @@ class Case2e: public Case2 {
 class Case2f: public Case2 {
  public:
   virtual ~Case2f() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case2g:
@@ -125,7 +124,7 @@ class Case2f: public Case2 {
 class Case2g: public Case2 {
  public:
   virtual ~Case2g() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case2h:
@@ -134,7 +133,7 @@ class Case2g: public Case2 {
 class Case2h: public Case2 {
  public:
   virtual ~Case2h() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case 3:
@@ -147,9 +146,9 @@ class Case2h: public Case2 {
 class Case3: public ExchangeCase {
  public:
   virtual ~Case3() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
-  
+
  protected:
   double q, c1, c2;
   double p1, p2;
@@ -162,7 +161,7 @@ class Case3: public ExchangeCase {
 class Case3a: public Case3 {
  public:
   virtual ~Case3a() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case3b:
@@ -171,7 +170,7 @@ class Case3a: public Case3 {
 class Case3b: public Case3 {
  public:
   virtual ~Case3b() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case3c:
@@ -180,7 +179,7 @@ class Case3b: public Case3 {
 class Case3c: public Case3 {
  public:
   virtual ~Case3c() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case3d:
@@ -189,7 +188,7 @@ class Case3c: public Case3 {
 class Case3d: public Case3 {
  public:
   virtual ~Case3d() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case3e:
@@ -199,7 +198,10 @@ class Case3d: public Case3 {
 class Case3e: public Case3 {
  public:
   virtual ~Case3e() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
+
+  /// overrides case3 Test
+  virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
 /// Case3f:
@@ -212,7 +214,7 @@ class Case3f: public Case3 {
   virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 
   /// overrides case3 Test
-  virtual void Test(std::string solver_type, ExchangeGraph* g); 
+  virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
 /// Case 4:
@@ -223,7 +225,7 @@ class Case3f: public Case3 {
 class Case4: public ExchangeCase {
  public:
   virtual ~Case4() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
 
  protected:
@@ -237,7 +239,7 @@ class Case4: public ExchangeCase {
 class Case4a: public Case4 {
  public:
   virtual ~Case4a() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
@@ -247,7 +249,7 @@ class Case4a: public Case4 {
 class Case4b: public Case4 {
  public:
   virtual ~Case4b() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case 4c
@@ -256,7 +258,7 @@ class Case4b: public Case4 {
 class Case4c: public Case4 {
  public:
   virtual ~Case4c() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
@@ -266,7 +268,7 @@ class Case4c: public Case4 {
 class Case4d: public Case4 {
  public:
   virtual ~Case4d() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case 4e
@@ -275,7 +277,7 @@ class Case4d: public Case4 {
 class Case4e: public Case4 {
  public:
   virtual ~Case4e() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case 5:
@@ -286,7 +288,7 @@ class Case4e: public Case4 {
 class Case5: public ExchangeCase {
  public:
   virtual ~Case5() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
 
  protected:
@@ -300,7 +302,7 @@ class Case5: public ExchangeCase {
 class Case5a: public Case5 {
  public:
   virtual ~Case5a() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case5b:
@@ -309,7 +311,7 @@ class Case5a: public Case5 {
 class Case5b: public Case5 {
  public:
   virtual ~Case5b() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case5c:
@@ -318,7 +320,7 @@ class Case5b: public Case5 {
 class Case5c: public Case5 {
  public:
   virtual ~Case5c() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case5d:
@@ -327,7 +329,7 @@ class Case5c: public Case5 {
 class Case5d: public Case5 {
  public:
   virtual ~Case5d() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case5e:
@@ -336,7 +338,7 @@ class Case5d: public Case5 {
 class Case5e: public Case5 {
  public:
   virtual ~Case5e() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
 };
 
 /// Case 6:
@@ -349,7 +351,7 @@ class Case5e: public Case5 {
 class Case6: public ExchangeCase {
  public:
   virtual ~Case6() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g) = 0;
 
  protected:
@@ -363,7 +365,7 @@ class Case6: public ExchangeCase {
 class Case6a: public Case6 {
  public:
   virtual ~Case6a() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
@@ -373,7 +375,7 @@ class Case6a: public Case6 {
 class Case6b: public Case6 {
  public:
   virtual ~Case6b() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
 };
 
@@ -384,7 +386,7 @@ class Case6b: public Case6 {
 class Case7: public ExchangeCase {
  public:
   virtual ~Case7() {}
-  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false); 
+  virtual void Construct(ExchangeGraph* g, bool exclusive_orders = false);
   virtual void Test(std::string solver_type, ExchangeGraph* g);
 
  protected:
@@ -392,7 +394,6 @@ class Case7: public ExchangeCase {
   int N;
 };
 
+}  // namespace cyclus
 
-} // namespace cyclus
-
-#endif // ifndef CYCLUS_TESTS_EXCHANGE_TEST_CASES_H_
+#endif  // CYCLUS_TESTS_EXCHANGE_TEST_CASES_H_

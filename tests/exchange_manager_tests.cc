@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 
+#include "exchange_manager.h"
 #include "greedy_solver.h"
 #include "material.h"
 #include "test_context.h"
-
-#include "exchange_manager.h"
 
 using cyclus::ExchangeManager;
 using cyclus::GreedySolver;

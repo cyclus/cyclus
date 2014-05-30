@@ -3,103 +3,65 @@
 
 #include <string>
 
-#include "context.h"
-#include "facility_model.h"
-#include "query_engine.h"
+#include "cyclus.h"
 
 namespace stubs {
 
-/**
-   @class StubFacility 
-    
-   This FacilityModel is intended 
-   as a skeleton to guide the implementation of new FacilityModel 
-   models.  
-   The StubFacility class inherits from the FacilityModel class and is 
-   dynamically loaded by the Model class when requested. 
-    
-   @section intro Introduction 
-   Place an introduction to the model here. 
-    
-   @section modelparams Model Parameters 
-   Place a description of the required input parameters which define the 
-   model implementation. 
-    
-   @section optionalparams Optional Parameters 
-   Place a description of the optional input parameters to define the 
-   model implementation. 
-    
-   @section detailed Detailed Behavior 
-   Place a description of the detailed behavior of the model. Consider 
-   describing the behavior at the tick and tock as well as the behavior 
-   upon sending and receiving materials and messages. 
- */
-class StubFacility : public cyclus::FacilityModel  {
-/* --------------------
- * all FACILITYMODEL classes have these members
- * --------------------
- */
- public:
-  /**
-     Constructor for StubFacility Class 
-     @param ctx the cyclus context for access to simulation-wide parameters
-   */
-  StubFacility(cyclus::Context* ctx);
 
-  /**
-     every model should be destructable 
-   */
-  virtual ~StubFacility();
-    
-  /**
-     Initialize members related to derived module class
+/// @class StubFacility
+///
+/// This Facility is intended
+/// as a skeleton to guide the implementation of new Facility
+/// agents.
+/// The StubFacility class inherits from the Facility class and is
+/// dynamically loaded by the Agent class when requested.
+///
+/// @section intro Introduction
+/// Place an introduction to the agent here.
+///
+/// @section agentparams Agent Parameters
+/// Place a description of the required input parameters which define the
+/// agent implementation.
+///
+/// @section optionalparams Optional Parameters
+/// Place a description of the optional input parameters to define the
+/// agent implementation.
+///
+/// @section detailed Detailed Behavior
+/// Place a description of the detailed behavior of the agent. Consider
+/// describing the behavior at the tick and tock as well as the behavior
+/// upon sending and receiving materials and messages.
+class StubFacility : public cyclus::Facility  {
+ public:  
+  /// Constructor for StubFacility Class
+  /// @param ctx the cyclus context for access to simulation-wide parameters
+  explicit StubFacility(cyclus::Context* ctx);
 
-     @param qe a pointer to a QueryEngine object containing initialization data
-   */
-  virtual void InitFrom(cyclus::QueryEngine* qe);
-
-  /**
-     Initialize members for a cloned module.
-   */
-  virtual void InitFrom(StubFacility* m);
+  /// The Prime Directive
+  /// Generates code that handles all input file reading and restart operations
+  /// (e.g., reading from the database, instantiating a new object, etc.).
+  /// @warning The Prime Directive must have a space before it! (A fix will be
+  /// in 2.0 ^TM)
   
-  /**
-     A verbose printer for the StubFacility
-   */
-   virtual std::string str();
+  #pragma cyclus
 
-  /**
-     Initializes a StubFacility object by copying the members of another.
-   */
-   virtual cyclus::Model* Clone();
+  #pragma cyclus note {"doc": "A stub facility is provided as a skeleton " \
+                              "for the design of new facility agents."}
 
-  /**
-     The handleTick function specific to the StubFacility. 
-      
-     @param time the time of the tick 
-   */
-  virtual void Tick(int time);
+  /// A verbose printer for the StubFacility
+  virtual std::string str();
+  
+  /// The handleTick function specific to the StubFacility.
+  /// @param time the time of the tick  
+  virtual void Tick();
 
-  /**
-     The handleTick function specific to the StubFacility. 
-      
-     @param time the time of the tock 
-   */
-  virtual void Tock(int time);
+  /// The handleTick function specific to the StubFacility.
+  /// @param time the time of the tock
+  virtual void Tock();
 
-/* ------------------- */ 
-
-
-/* --------------------
- * _THIS_ FACILITYMODEL class has these members
- * --------------------
- */
-
-/* ------------------- */ 
-
+  // and away we go!
 };
 
-} // namespace stub
-  
-#endif // STUB_FACILITY_H_
+}  // namespace stubs
 
+#endif  // CYCLUS_STUBS_STUB_FACILITY_H_

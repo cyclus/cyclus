@@ -29,7 +29,7 @@ New features
 ------------
 
 - Added data type specification capability to rng system.
-- Made various ResourceBuffer, Material Class, and model memory management 
+- Made various ResourceBuffer, Material Class, and agent memory management 
   improvements and tests.
 - Made the relaxng schema system modular.
 - Made significant build system and installation changes to allow separating 
@@ -69,9 +69,9 @@ New features
   supply/demand inquiry and supplier/demander registration with a manager.
 - Added a commodity production toolkit, providing an interface to query agents 
   ability to produce commodities.
-- Added a toolkit for modeling general symbolic functions and factory methods 
+- Added a toolkit for agenting general symbolic functions and factory methods 
   to produce them.
-- Added derived classes to model linear, exponential, and piecewise functions.
+- Added derived classes to agent linear, exponential, and piecewise functions.
 - Added a robust dynamic loading interface for dynamic libraries for easy opening, 
   access, and closing.
 - Separated unix and windows-specific helper functions for dynamic loading.

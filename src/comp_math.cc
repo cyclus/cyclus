@@ -1,4 +1,3 @@
-
 #include "comp_math.h"
 
 #include <cmath>
@@ -6,28 +5,27 @@
 
 #include "cyc_arithmetic.h"
 #include "error.h"
+#include "pyne.h"
 
 namespace cyclus {
 namespace compmath {
 
-CompMap Add(const CompMap& v1,
-                      const CompMap& v2) {
+CompMap Add(const CompMap& v1, const CompMap& v2) {
   CompMap out(v1);
   CompMap vv2(v2);
   for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
-    int iso = it->first;
-    out[iso] += vv2[iso];
+    int nuc = it->first;
+    out[nuc] += vv2[nuc];
   }
   return out;
 }
 
-CompMap Sub(const CompMap& v1,
-                      const CompMap& v2) {
+CompMap Sub(const CompMap& v1, const CompMap& v2) {
   CompMap out(v1);
   CompMap vv2(v2);
   for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
-    int iso = it->first;
-    out[iso] -= vv2[iso];
+    int nuc = it->first;
+    out[nuc] -= vv2[nuc];
   }
   return out;
 }
@@ -40,10 +38,12 @@ void ApplyThreshold(CompMap* v, double threshold) {
     throw ValueError(ss.str());
   }
 
-  CompMap::iterator it;
-  for (it = v->begin(); it != v->end(); ++it) {
+  CompMap::iterator it = v->begin();
+  while (it != v->end()) {
     if (std::abs(it->second) <= threshold) {
-      v->erase(it);
+      v->erase(it++);
+    } else {
+      it++;
     }
   }
 }
@@ -62,14 +62,10 @@ void Normalize(CompMap* v, double val) {
   }
 }
 
-bool ValidIsos(const CompMap& v) {
-  int min = 1001;
-  int max = 1182949;
-
+bool ValidNucs(const CompMap& v) {
   CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
-    Iso iso = it->first;
-    if (iso < min || iso > max) {
+    if (!pyne::nucname::isnuclide(it->first)) {
       return false;
     }
   }
@@ -86,9 +82,7 @@ bool AllPositive(const CompMap& v) {
   return true;
 }
 
-bool AlmostEq(const CompMap& v1,
-              const CompMap& v2,
-              double threshold) {
+bool AlmostEq(const CompMap& v1, const CompMap& v2, double threshold) {
   // I learned at
   // http://www.ualberta.ca/~kbeach/comp_phys/fp_err.html#testing-for-equality
   // that the following is less naive than the intuitive way of doing this...
@@ -112,12 +106,12 @@ bool AlmostEq(const CompMap& v1,
 
   CompMap::iterator it;
   for (it = n1.begin(); it != n1.end(); ++it) {
-    Iso iso = it->first;
-    if (n2.count(iso) == 0) {
+    Nuc nuc = it->first;
+    if (n2.count(nuc) == 0) {
       return false;
     }
-    double minuend = n2[iso];
-    double subtrahend = n1[iso];
+    double minuend = n2[nuc];
+    double subtrahend = n1[nuc];
     double diff = minuend - subtrahend;
     if (std::abs(minuend) == 0 || std::abs(subtrahend) == 0) {
       if (std::abs(diff) > std::abs(diff)*threshold) {
@@ -131,6 +125,5 @@ bool AlmostEq(const CompMap& v1,
   return true;
 }
 
-} // namespace compmath
-} // namespace cyclus
-
+}  // namespace compmath
+}  // namespace cyclus

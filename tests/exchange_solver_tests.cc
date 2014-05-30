@@ -4,17 +4,17 @@
 
 using cyclus::ExchangeSolver;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MockSolver: public ExchangeSolver {
  public:
   explicit MockSolver() : i(0) {}
   
-  virtual void Solve() { ++i; }
+  virtual void SolveGraph() { ++i; }
 
   int i;
 };
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExSolverTests, Interface) {
   MockSolver s;
   EXPECT_EQ(0, s.i);

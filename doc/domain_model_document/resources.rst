@@ -63,7 +63,7 @@ Resource amount is mutable over time.
 Quality
 ---------
 
-In addition to the generic resource-quantity_ characteristics that all Resources must have, 
+In addition to the product-quantity_ characteristics that all Resources must have, 
 specific Resource types can be defined by the developer to have arbitrarily many 
 defining characteristics. These specific characteristics are necessary for 
 comparing and trading Resources during the simulation and for analyzing fuel 

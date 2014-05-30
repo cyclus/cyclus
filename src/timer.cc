@@ -7,157 +7,159 @@
 
 #include "error.h"
 #include "logger.h"
-#include "material.h"
-#include "generic_resource.h"
-#include "exchange_manager.h"
+#include "agent.h"
+#include "sim_init.h"
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::RunSim(Context* ctx) {
+void Timer::RunSim() {
   CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << start_time_ << " to end=" << start_time_ + dur_;
+                  << 0 << " to end=" << si_.duration;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
-  time_ = start_time_;
-  ExchangeManager<Material> matl_manager(ctx);
-  ExchangeManager<GenericResource> genrsrc_manager(ctx);
-  while (time_ < start_time_ + dur_) {
+  ExchangeManager<Material> matl_manager(ctx_);
+  ExchangeManager<Product> genrsrc_manager(ctx_);
+  while (time_ < si_.duration) {
     CLOG(LEV_INFO2) << " Current time: " << time_;
-    CLOG(LEV_DEBUG3) << "The list of current tick listeners is: " <<
-                     ReportListeners();
-    if (decay_interval_ > 0 && time_ > 0 && time_ % decay_interval_ == 0) {
-      Material::DecayAll(time_);
-    }
-      
-    // provides robustness when listeners are added during ticks/tocks
-    for (int i = 0; i < new_tickers_.size(); ++i) {
-      tick_listeners_.push_back(new_tickers_[i]);
-    }
-    new_tickers_.clear();
 
-    SendTick();
-    matl_manager.Execute();
-    genrsrc_manager.Execute();
-    SendTock();
-    
+    if (want_snapshot_) {
+      want_snapshot_ = false;
+      SimInit::Snapshot(ctx_);
+      ctx_->NewDatum("Snapshots")
+          ->AddVal("Time", time_)
+          ->Record();
+    }
+
+    // run through phases
+    DoBuild();
+    DoTick();
+    DoResEx(&matl_manager, &genrsrc_manager);
+    DoTock();
+    DoDecom();
+
+    if (want_kill_) {
+      break;
+    }
+
     time_++;
   }
+
+
+  ctx_->NewDatum("Finish")
+      ->AddVal("EarlyTerm", want_kill_)
+      ->AddVal("EndTime", time_)
+      ->Record();
+
+  time_++; // move time forward because snapshots are always "beginning of timestep"
+  SimInit::Snapshot(ctx_); // always do a snapshot at the end of every simulation
+  time_--;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string Timer::ReportListeners() {
-  std::string report = "";
-  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
-       agent != tick_listeners_.end();
-       agent++) {
-    report += (*agent)->name() + " ";
-  }
-  return report;
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::SendTick() {
-  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
-       agent != tick_listeners_.end();
-       agent++) {
-    CLOG(LEV_INFO3) << "Sending tick to Model ID=" << (*agent)->id()
-                    << ", name=" << (*agent)->name() << " {";
-    (*agent)->Tick(time_);
-    CLOG(LEV_INFO3) << "}";
-  }
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::SendTock() {
-  for (std::vector<TimeListener*>::iterator agent = tick_listeners_.begin();
-       agent != tick_listeners_.end();
-       agent++) {
-    CLOG(LEV_INFO3) << "Sending tock to Model ID=" << (*agent)->id()
-                    << ", name=" << (*agent)->name() << " {";
-    (*agent)->Tock(time_);
-    CLOG(LEV_INFO3) << "}";
+void Timer::DoBuild() {
+  // build queued agents
+  std::vector<std::pair<std::string, Agent*> > build_list = build_queue_[time_];
+  for (int i = 0; i < build_list.size(); ++i) {
+    Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
+    Agent* parent = build_list[i].second;
+    CLOG(LEV_INFO3) << "Building a " << build_list[i].first
+                    << " from parent " << build_list[i].second;
+    m->Build(parent);
+    if (parent != NULL) {
+      parent->BuildNotify(m);
+    } else {
+      CLOG(LEV_DEBUG1) << "Hey! Listen! Built an Agent without a Parent.";
+    }
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::RegisterTickListener(TimeListener* agent) {
-  CLOG(LEV_INFO2) << "Model ID=" << agent->id() << ", name=" << agent->name()
-                  << " has registered to receive 'ticks' and 'tocks'.";
-  new_tickers_.push_back(agent);
+void Timer::DoTick() {
+  for (std::set<TimeListener*>::iterator agent = tickers_.begin();
+       agent != tickers_.end();
+       agent++) {
+    (*agent)->Tick();
+  }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Timer::DoResEx(ExchangeManager<Material>* matmgr,
+                    ExchangeManager<Product>* genmgr) {
+  matmgr->Execute();
+  genmgr->Execute();
+}
+
+void Timer::DoTock() {
+  for (std::set<TimeListener*>::iterator agent = tickers_.begin();
+       agent != tickers_.end();
+       agent++) {
+    (*agent)->Tock();
+  }
+}
+
+void Timer::DoDecom() {
+  // decommission queued agents
+  std::vector<Agent*> decom_list = decom_queue_[time_];
+  for (int i = 0; i < decom_list.size(); ++i) {
+    Agent* m = decom_list[i];
+    if (m->parent() != NULL) {
+      m->parent()->DecomNotify(m);
+    }
+    m->Decommission();
+  }
+}
+
+void Timer::RegisterTimeListener(TimeListener* agent) {
+  tickers_.insert(agent);
+}
+
+void Timer::UnregisterTimeListener(TimeListener* tl) {
+  tickers_.erase(tl);
+}
+
+void Timer::SchedBuild(Agent* parent, std::string proto_name, int t) {
+  if (t <= time_) {
+    throw ValueError("Cannot schedule build for t < [current-time]");
+  }
+  build_queue_[t].push_back(std::make_pair(proto_name, parent));
+}
+
+void Timer::SchedDecom(Agent* m, int t) {
+  if (t < time_) {
+    throw ValueError("Cannot schedule decommission for t < [current-time]");
+  }
+  decom_queue_[t].push_back(m);
+}
+
 int Timer::time() {
   return time_;
 }
 
 void Timer::Reset() {
-  tick_listeners_.clear();
-
-  decay_interval_ = 0;
-  month0_ = 0;
-  year0_ = 0;
-  start_time_ = 0;
-  time_ = 0;
-  dur_ = 0;
+  tickers_.clear();
+  build_queue_.clear();
+  decom_queue_.clear();
+  si_ = SimInfo(0);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::Initialize(Context* ctx, int dur, int m0, int y0, int start,
-                       int decay, std::string handle) {
-  if (m0 < 1 || m0 > 12) {
+void Timer::Initialize(Context* ctx, SimInfo si) {
+  if (si.m0 < 1 || si.m0 > 12) {
     throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
   }
 
-  if (y0 < 1942) {
-    throw ValueError("Invalid year0; the first man-made nuclear reactor was build in 1942");
+  want_kill_ = false;
+  ctx_ = ctx;
+  time_ = 0;
+  si_ = si;
+
+  if (si.branch_time > -1) {
+    time_ = si.branch_time;
   }
-
-  if (y0 > 2063) {
-    throw ValueError("Invalid year0; why start a simulation after we've got warp drive?: http://en.wikipedia.org/wiki/Warp_drive#Development_of_the_backstory");
-  }
-
-  if (decay > dur) {
-    throw ValueError("Invalid decay interval; no decay occurs if the interval is greater than the simulation duriation. For no decay, use -1 .");
-  }
-
-  decay_interval_ = decay;
-
-  month0_ = m0;
-  year0_ = y0;
-
-  start_time_ = start;
-  time_ = start;
-  dur_ = dur;
-
-  LogTimeData(ctx, handle);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int Timer::dur() {
-  return dur_;
+  return si_.duration;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Timer::Timer() :
-  time_(0),
-  start_time_(0),
-  dur_(0),
-  decay_interval_(0),
-  month0_(0),
-  year0_(0) {}
+Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Timer::LogTimeData(Context* ctx, std::string handle) {
-  ctx->NewDatum("SimulationTimeInfo")
-  ->AddVal("SimHandle", handle)
-  ->AddVal("InitialYear", year0_)
-  ->AddVal("InitialMonth", month0_)
-  ->AddVal("SimulationStart", start_time_)
-  ->AddVal("Duration", dur_)
-  ->AddVal("DecayInterval", decay_interval_)
-  ->Record();
-}
 } // namespace cyclus
+
 

@@ -172,7 +172,7 @@ their boundaries. For example, a region may place a restriction on any
 outgoing enriched uranium that it must be low enriched (i.e. <= 20 w/o
 U-235). Similarly, regions may affect the preference of a given
 transaction by increasing its cost. This is one way in which tax
-structures can be modeled in the simulation.
+structures can be agented in the simulation.
 
 .. _exchange_match_phase:
 

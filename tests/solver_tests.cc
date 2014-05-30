@@ -1,11 +1,11 @@
+#include "solver_tests.h"
+
 #include <gtest/gtest.h>
 
 #include "exchange_graph.h"
-#include "greedy_solver.h"
-
 #include "exchange_test_cases.h"
-
-#include "solver_tests.h"
+#include "greedy_solver.h"
+#include "prog_solver.h"
 
 namespace cyclus {
 
@@ -120,9 +120,10 @@ TYPED_TEST(ExchangeSolverTest, GreedySolver) {
   std::string type = "greedy";
   ExchangeGraph g;
   this->case_->Construct(&g);
-  GreedySolver solver(&g);
-  solver.Solve();
+  ExchangeSolver* solver = new GreedySolver();
+  solver->Solve(&g);
   this->case_->Test(type, &g);
+  delete solver;
 }
 
 TYPED_TEST(ExchangeSolverTest, ExclusiveGreedySolver) {
@@ -130,13 +131,14 @@ TYPED_TEST(ExchangeSolverTest, ExclusiveGreedySolver) {
   ExchangeGraph g;
   bool exclusive_orders = true;
   this->case_->Construct(&g, exclusive_orders);
-  GreedySolver solver(&g, exclusive_orders);
-  solver.Solve();
+  ExchangeSolver* solver = new GreedySolver(exclusive_orders);
+  solver->Solve(&g);
   this->case_->Test(type, &g);
+  delete solver;
 }
 
 // add any more solvers to test here
 
 #endif  // GTEST_HAS_TYPED_TEST
 
-} // namespace cyclus
+}  // namespace cyclus

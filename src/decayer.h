@@ -1,47 +1,66 @@
 // decayer.h
-#ifndef DECAYER_H_
-#define DECAYER_H_
+#ifndef CYCLUS_SRC_DECAYER_H_
+#define CYCLUS_SRC_DECAYER_H_
 
 #include <map>
+#include <set>
 
-#include "use_matrix_lib.h"
 #include "composition.h"
+#include "error.h"
+#include "pyne.h"
+#include "use_matrix_lib.h"
 
 namespace cyclus {
 
-/**
-   A map type to represent all of the parent isotopes tracked.  The key
-   for this map type is the parent's Iso number, and the value is a pair
-   that contains the corresponding decay matrix column and decay
-   constant associated with that parent.
- */
+/// A map type to represent all of the parent nuclides tracked. The key
+/// for this map type is the parent's Nuc number, and the value is a pair
+/// that contains the corresponding decay matrix column and decay
+/// constant associated with that parent.
 typedef std::map< int, std::pair<int, double> > ParentMap;
 
-/**
-   A map type to represent all of the daughter isotopes tracked.  The
-   key for this map type is the decay matrix column associated with the
-   parent, and the value is a vector of pairs of all the daughters for
-   that parent. Each of the daughters are represented by a pair that
-   contains the daughter's Iso number and its branching ratio.
- */
+/// A map type to represent all of the daughter nuclides tracked. The
+/// key for this map type is the decay matrix column associated with the
+/// parent, and the value is a vector of pairs of all the daughters for
+/// that parent. Each of the daughters are represented by a pair that
+/// contains the daughter's Nuc number and its branching ratio.
 typedef std::map<int, std::vector<std::pair<int, double> > > DaughtersMap;
 
-typedef std::vector<int> IsoList;
+typedef std::vector<int> NucList;
 
 class Decayer {
+ public:
+  Decayer(const CompMap& comp);
+
+  /**
+     set the composition from a CompMap
+   */
+  void GetResult(CompMap& comp);
+
+  /// decay the material
+  /// @param secs the number of seconds to decay
+  void Decay(double secs);
+
+  /**
+     the number of tracked nuclides
+   */
+  int n_tracked_nuclides() {
+    return nuclides_tracked_.size();
+  }
+
+  /**
+     the tracked nuclide at position i
+   */
+  int TrackedNuclide(int i) {
+    return nuclides_tracked_.at(i);
+  }
+
  private:
   /**
      Builds the decay matrix needed for the decay calculations from
-     the parent and daughters map variables.  The resulting matrix is
+     the parent and daughters map variables. The resulting matrix is
      stored in the static variable decayMatrix.
    */
   static void BuildDecayMatrix();
-
-  /**
-     Reads the decay information found in the 'decayInfo.dat' file
-     into the parent and daughters maps.Uses these maps to create the
-   */
-  static void LoadDecayInfo();
 
   /**
      The CompMap's parent
@@ -65,56 +84,20 @@ class Decayer {
   Vector post_vect_;
 
   /**
-     whether the decay information is loaded
+     the list of tracked nuclides
    */
-  static bool decay_info_loaded_;
+  static NucList nuclides_tracked_;
 
-  /**
-     the list of tracked isotopes
-   */
-  static IsoList isotopes_tracked_;
+  /// Add the nuclide to the parent/daughter maps IFF it is not in the tracked list.
+  static void AddNucToMaps(int nuc);
 
-  /**
-     Add the Isotope to our list of tracked isotopes IFF it is not
-   */
-  static void AddIsoToList(int iso);
+  /// Add the nuclide to our list of tracked nuclides IFF it is not in the list.
+  static void AddNucToList(int nuc);
 
- public:
-  /// Returns the decay constant for specified isotope in inverse years.
-  static double DecayConstant(int iso);
-
-  /**
-     default constructor
-   */
-  Decayer(const CompMap& comp);
-
-  /**
-     set the composition from a CompMap
-   */
-  void GetResult(CompMap& comp);
-
-  /**
-     decay the material
-     @param years the number of years to decay
-   */
-  void Decay(double years);
-
-  /**
-     the number of tracked isotopes
-   */
-  int n_tracked_isotopes() {
-    return isotopes_tracked_.size();
-  }
-
-  /**
-     the tracked isotope at position i
-   */
-  int TrackedIsotope(int i) {
-    return isotopes_tracked_.at(i);
-  }
+  /// Checks if the nuclide is tracked
+  static bool IsNucTracked(int nuc);
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
-
+#endif  // CYCLUS_SRC_DECAYER_H_

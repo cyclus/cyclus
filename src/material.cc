@@ -11,16 +11,12 @@
 namespace cyclus {
 
 const ResourceType Material::kType = "Material";
-std::map<Material*, bool> Material::all_mats_;
 
-Material::~Material() {
-  all_mats_.erase(this);
-}
+Material::~Material() {}
 
-Material::Ptr Material::Create(Model* creator, double quantity,
+Material::Ptr Material::Create(Agent* creator, double quantity,
                                Composition::Ptr c) {
   Material::Ptr m(new Material(creator->context(), quantity, c));
-  all_mats_[m.get()] = true;
   m->tracker_.Create(creator);
   return m;
 }
@@ -31,13 +27,7 @@ Material::Ptr Material::CreateUntracked(double quantity,
   return m;
 }
 
-Material::Ptr Material::CreateBlank(double quantity) {
-  CompMap cm;
-  Composition::Ptr comp = Composition::CreateFromMass(cm);  
-  return CreateUntracked(quantity, comp);
-}
-
-int Material::state_id() const {
+int Material::qual_id() const {
   return comp_->id();
 }
 
@@ -53,6 +43,13 @@ Resource::Ptr Material::Clone() const {
 }
 
 void Material::Record(Context* ctx) const {
+  // Note that no time field is needed because the resource ID changes
+  // every time the resource changes - state_id by itself is already unique.
+  ctx_->NewDatum("MaterialInfo")
+  ->AddVal("ResourceId", state_id())
+  ->AddVal("PrevDecayTime", prev_decay_time_)
+  ->Record();
+
   comp_->Record(ctx);
 }
 
@@ -77,7 +74,6 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   if (qty_ < qty) {
     throw ValueError("mass extraction causes negative quantity");
   }
-
   if (comp_ != c) {
     CompMap v(comp_->mass());
     compmath::Normalize(&v, qty_);
@@ -107,7 +103,6 @@ void Material::Absorb(Material::Ptr mat) {
   }
   qty_ += mat->qty_;
   mat->qty_ = 0;
-
   tracker_.Absorb(&mat->tracker_);
 }
 
@@ -127,8 +122,9 @@ void Material::Decay(int curr_time) {
   } else {
     CompMap::const_iterator it;
     for (it = c.end(); it != c.begin(); --it) {
-      int iso = it->first;
-      double lambda_months = Decayer::DecayConstant(iso) / 12;
+      int nuc = it->first;
+      // 2419200 == secs / month
+      double lambda_months = pyne::decay_const(nuc) * 2419200;
 
       if (eps <= 1 - std::exp(-lambda_months * dt)) {
         decay = true;
@@ -145,13 +141,6 @@ void Material::Decay(int curr_time) {
   }
 }
 
-void Material::DecayAll(int curr_time) {
-  std::map<Material*, bool>::iterator it;
-  for (it = all_mats_.begin(); it != all_mats_.end(); ++it) {
-    it->first->Decay(curr_time);
-  }
-}
-
 Composition::Ptr Material::comp() const {
   return comp_;
 }
@@ -164,6 +153,11 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c)
   } else {
     tracker_.DontTrack();
   }
+}
+
+Material::Ptr NewBlankMaterial(double quantity) {
+  Composition::Ptr comp = Composition::CreateFromMass(CompMap());  
+  return Material::CreateUntracked(quantity, comp);
 }
 
 } // namespace cyclus

@@ -1,41 +1,43 @@
 // unix_helper_functions.h
 // This is the dynamic loading implementation for UNIX machines
-#ifndef UNIXHELPERFUNCTIONS_H
-#define UNIXHELPERFUNCTIONS_H
+#ifndef CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_
+#define CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_
 
 #include <dlfcn.h>
 
-#include "suffix.h"
 #include "error.h"
+#include "suffix.h"
 
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::OpenLibrary() {
-  module_library_ = dlopen(abs_path_.c_str(), RTLD_LAZY);
+  module_library_ = dlopen(path_.c_str(), RTLD_LAZY);
 
   if (!module_library_) {
-    std::string err_msg = "Unable to load model shared object file: ";
+    std::string err_msg = "Unable to load agent shared object file: ";
     err_msg  += dlerror();
     throw IOError(err_msg);
   }
 
-  dlerror(); // reset errors
+  dlerror();  // reset errors
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
+  ctor_ = (AgentCtor*)
+                 dlsym(module_library_, ctor_name_.c_str());
 
-  constructor_ = (ModelCtor*)
-                 dlsym(module_library_, constructor_name_.c_str());
-
-  if (!constructor_) {
-    std::string err_msg = "Unable to load module constructor: ";
-    err_msg  += dlerror();
-    throw IOError(err_msg);
+  if (!ctor_) {
+    std::stringstream ss;
+    std::string agent = ctor_name_;
+    agent.erase(0, 9); // len(Construct) == 9
+    ss << "Could not find agent " << agent << " in module library "
+       << path_.c_str() << " (" << dlerror() << ").";
+    throw IOError(ss.str());
   }
 
-  dlerror(); // reset errors
+  dlerror();  // reset errors
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,9 +49,9 @@ void DynamicModule::CloseLibrary() {
       err_msg  += dlerror();
       throw IOError(err_msg);
     }
-    dlerror(); // reset errors
+    dlerror();  // reset errors
   }
 }
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_

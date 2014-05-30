@@ -5,29 +5,35 @@
 #include <string>
 
 #include "context.h"
-#include "model.h"
+#include "agent.h"
 
 namespace cyclus {
 
-/// The TimeListener class is an inheritable class for any Agent
-/// that requires knowlege of ticks and tocks.
-class TimeListener : virtual public Model {
+/// The TimeListener class is an inheritable class for any Agent that
+/// requires knowlege of ticks and tocks. The agent should register as a
+/// TimeListener with its context from its Deploy method. For Example:
+///
+/// @begincode
+///
+/// MyFacility::Build(cyclus::Agent* parent) {
+///   cyclus::Facility::Build(parent);
+///   context()->RegisterTimeListener(this);
+/// }
+/// 
+/// @endcode
+class TimeListener {
  public:
-  TimeListener(Context* ctx) : Model(ctx) {};
-
-  virtual ~TimeListener() {};
-
-  /// Each simulation agent is prompted to do its beginning-of-time-step
-  /// stuff at the tick of the timer.
+  /// Simulation agents do their beginning-of-timestep activities in the Tick
+  /// method.
   ///
-  /// @param time is the time to perform the tick
-  virtual void Tick(int time) = 0;
+  /// @param time is the current simulation timestep
+  virtual void Tick() = 0;
 
-  /// Each simulation agent is prompted to its end-of-time-step
-  /// stuff on the tock of the timer.
+  /// Simulation agents do their end-of-timestep activities in the Tock
+  /// method.
   ///
-  /// @param time is the time to perform the tock
-  virtual void Tock(int time) = 0;
+  /// @param time is the current simulation timestep
+  virtual void Tock() = 0;
 };
 } // namespace cyclus
 #endif // ifndef CYCLUS_TIME_LISTENER_H_

@@ -1,0 +1,55 @@
+<!-- 2 SimpleSource Source, 1 SimpleSink Sink -->
+
+<simulation>
+  <control>
+    <duration>100</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+  </control>
+
+  <archetypes>
+    <spec><lib>agents</lib><name>KFacility</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
+  </archetypes>
+
+  <facility>
+    <name>KFacility</name>
+    <config>
+      <KFacility>
+        <in_commod>commodity</in_commod>
+        <in_capacity>1</in_capacity>
+        <k_factor_in>1</k_factor_in>
+        <out_commod>commodity</out_commod>
+        <recipe_name>commod_recipe</recipe_name>
+        <out_capacity>1</out_capacity>
+        <k_factor_out>1</k_factor_out>
+      </KFacility>
+    </config>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <config> <NullRegion/> </config>
+    <institution>
+      <name>SingleInstitution</name>
+      <initialfacilitylist>
+        <entry>
+          <prototype>KFacility</prototype>
+          <number>1</number>
+        </entry>
+      </initialfacilitylist>
+      <config> <NullInst/> </config>
+    </institution>
+  </region>
+
+  <recipe>
+    <name>commod_recipe</name>
+    <basis>mass</basis>
+    <nuclide>
+      <id>010010000</id>
+      <comp>1</comp>
+    </nuclide>
+  </recipe>
+
+</simulation>

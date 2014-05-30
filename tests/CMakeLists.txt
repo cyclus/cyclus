@@ -25,10 +25,10 @@ ENDIF()
 
 # Build libgtest
 SET( GTest
-  ${CMAKE_CURRENT_SOURCE_DIR}/GoogleTest/gtest/gtest-all.cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/GoogleTest/gtest/gtest-all.cc"
   )
 
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 
 ADD_LIBRARY(gtest ${GTest})
 
@@ -61,110 +61,53 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
 
 INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
-ADD_SUBDIRECTORY(test_modules)
-
-# To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
-# added to ctest.
-set ( CYCLUS_CORE_TEST_SOURCE ${CYCLUS_CORE_TEST_SOURCE}
-  # --
-  ${CMAKE_CURRENT_SOURCE_DIR}/bid_portfolio_tests.cc  
-  ${CMAKE_CURRENT_SOURCE_DIR}/bid_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/building_manager_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/building_test_helper.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/capacity_constraint_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/cbc_solver_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_manager_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_producer_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_recipe_context_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/commodity_test_helper.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/comp_math_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/composition_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/context_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/csv_back_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/cyc_arithmetic_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_loading_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/enrichment_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/environment_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/recorder_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_context_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_manager_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_solver_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_translator_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_graph_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/exchange_test_cases.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/facility_model_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/full_sim_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/function_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/greedy_preconditioner_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/header_impl.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/inst_model_class_tests.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/mass_table_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/mat_query_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/material_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/model_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/region_model_class_tests.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/request_portfolio_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/request_tests.cc 
-  ${CMAKE_CURRENT_SOURCE_DIR}/resource_buff_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/resource_exchange_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/sd_manager_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/solver_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_back_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/sqlite_db_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/symbolic_function_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/trade_executor_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/variable_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_file_loader_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_parser_tests.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/xml_query_engine_tests.cc
-  ${CYCLUS_STUB_TEST_SOURCE} # needed to test stubs 
-  )
-
-ADD_EXECUTABLE( cyclus_unit_tests
-  cyclus_unit_test_driver.cc 
-  ${CYCLUS_CORE_TEST_SOURCE}
-  )
-
-TARGET_LINK_LIBRARIES( cyclus_unit_tests dl 
-  ${LIBS} 
-  cycluscore 
-  gtest
-  cyclusstubs # needed to test stubs 
-  )
-
-INSTALL(TARGETS cyclus_unit_tests
-  RUNTIME DESTINATION bin
-  COMPONENT testing
-  )
+FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
+SET(CYCLUS_CORE_TEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+FILE(GLOB test_agents "${CMAKE_CURRENT_SOURCE_DIR}/test_agents/*.h")
 INSTALL(FILES ${header_files}
   DESTINATION include/cyclus
   COMPONENT testing
   )
 
-FILE(GLOB model_test_files "${CMAKE_CURRENT_SOURCE_DIR}/*model_tests.cc")
-INSTALL(FILES ${model_test_files}
-  DESTINATION share
+ADD_SUBDIRECTORY(toolkit)
+ADD_SUBDIRECTORY(agent_tests)
+SET(
+  CYCLUS_CORE_TEST_SOURCE "${CYCLUS_CORE_TEST_SOURCE}" 
+  "${CYCLUS_CORE_SRC}" 
+  "${cc_files}" 
+  PARENT_SCOPE
+  )
+SET(
+  CYCLUS_CORE_INCLUDE_DIRS "${CYCLUS_CORE_INCLUDE_DIRS}" 
+  "${CYCLUS_CORE_TEST_INCLUDE_DIRS}" 
+  "${GTEST_INCLUDE_DIRS}"
+  PARENT_SCOPE
+)
+
+SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" gtest PARENT_SCOPE) # for stubs/agents
+
+ADD_SUBDIRECTORY(test_agents)
+INSTALL(FILES ${test_agents}
+  DESTINATION include/cyclus/test_agents
   COMPONENT testing
   )
 
 # read tests after building the driver, and add them to ctest
 set( tgt "cyclus_unit_tests" )
-set( script "${CMAKE_CURRENT_SOURCE_DIR}/generate_test_macros.py" )
-set( exec "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}" )
-set( out "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake" )
 add_custom_command(TARGET ${tgt}
   POST_BUILD
-  COMMAND python ${script} ${exec} ${out}
+  COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/generate_gtest_macros.py"
+          "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}"
+          "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake"
   COMMENT "adding tests from ${tgt}"
   DEPENDS
   VERBATIM
   )
+
+SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" PARENT_SCOPE)
+SET(CYCLUS_AGENT_TEST_LIBRARIES "${CYCLUS_AGENT_TEST_LIBRARIES}" PARENT_SCOPE)
 
 ###############################################################################
 #################################### end cyclus testing #######################

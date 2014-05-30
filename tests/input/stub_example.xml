@@ -1,0 +1,40 @@
+<simulation>
+  <control>
+    <duration>10</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+  </control>
+
+  <archetypes>
+    <spec><path>stubs</path><lib>StubFacility</lib><name>StubFacility</name></spec>
+    <spec><path>stubs</path><lib>StubRegion</lib><name>StubRegion</name></spec>
+    <spec><path>stubs</path><lib>StubInst</lib><name>StubInst</name></spec>
+  </archetypes>
+
+  <facility>
+    <name>OneFacility</name>
+    <config>
+      <StubFacility />
+    </config>
+  </facility>
+
+  <region>
+    <name>OneRegion</name>
+    <config>
+      <StubRegion />
+    </config>
+    <institution>
+      <name>OneInst</name>
+      <initialfacilitylist>
+        <entry>
+          <prototype>OneFacility</prototype>
+          <number>1</number>
+        </entry>
+      </initialfacilitylist>
+      <config>
+        <StubInst />
+      </config>
+    </institution>
+  </region>
+
+</simulation>

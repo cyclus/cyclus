@@ -1,0 +1,111 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<start>
+
+<element name="simulation"> <interleave>
+  
+  <element name ="control">
+    <interleave>
+      <optional>
+        <element name="simhandle"> <data type="string"/> </element>
+      </optional>
+      <element name="duration"> <data type="nonNegativeInteger"/> </element>
+      <element name="startmonth"> <data type="nonNegativeInteger"/> </element>
+      <element name="startyear"> <data type="nonNegativeInteger"/> </element>
+    </interleave>
+  </element>
+
+  <zeroOrMore>
+    <element name="commodity">
+      <element name="name"> <text/> </element>
+      <element name="solution_priority"> <data type="double"/> </element>
+    </element>
+  </zeroOrMore>
+    
+  <element name="archetypes"> 
+    <oneOrMore>
+      <element name="spec"> 
+        <optional><element name="path"><text/></element></optional>
+        <optional><element name="lib"><text/></element></optional>
+        <element name="name"><text/></element>
+        <optional><element name="alias"><text/></element></optional>
+      </element>
+    </oneOrMore>
+  </element>
+
+  <oneOrMore>
+    <element name="facility">
+      <element name="name"> <text/> </element>
+      <optional>
+        <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+      </optional>
+
+      <element name="config">
+        <choice>
+        @Facility_REFS@
+        </choice>
+      </element>
+    </element>
+  </oneOrMore>
+
+  <oneOrMore>
+    <element name="region"> <interleave>
+      <element name="name"> <text/> </element>
+      <optional>
+        <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+      </optional>
+
+      <element name="config">
+        <choice>
+        @Region_REFS@
+        </choice>
+      </element>
+
+      <oneOrMore>
+        <element name="institution"> <interleave>
+          <element name="name"> <text/> </element>
+          <optional>
+            <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+          </optional>
+
+          <optional>
+            <element name="initialfacilitylist">
+              <oneOrMore>
+                <element name="entry">
+                  <element name="prototype"> <text/> </element>
+                  <element name="number"> <data type="nonNegativeInteger"/> </element>
+                </element>
+              </oneOrMore>
+            </element>
+          </optional>
+
+          <element name="config">
+            <choice>
+            @Inst_REFS@
+            </choice>
+          </element>
+        </interleave> </element>
+      </oneOrMore>
+
+    </interleave> </element>
+  </oneOrMore>
+
+  <zeroOrMore>
+    <element name="recipe">
+      <element name="name"><text/></element>
+      <element name="basis"><text/></element>
+      <oneOrMore>
+        <element name="nuclide">
+          <element name="id"><data type="nonNegativeInteger"/></element>
+          <element name="comp"><data type="double"/></element>
+        </element>
+      </oneOrMore>
+    </element>
+  </zeroOrMore>
+
+</interleave> </element>
+
+</start>
+
+</grammar>
+
