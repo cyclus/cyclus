@@ -191,10 +191,8 @@ file `input.xml`, you can run Cyclus via:
 
 For a more detailed explanation, checkout the user guide.
 
-.. _`Cyclus Homepage`: http://cyclus.github.com
-.. _`CMake`: http://www.cmake.org
+.. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
-.. _`Cyclus User Guide`: http://cyclus.github.io/usrdoc/main.html
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
 **********************
