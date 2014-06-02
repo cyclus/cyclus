@@ -83,15 +83,20 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
 
 void SqliteBack::Notify(DatumList data) {
   db_.Execute("BEGIN TRANSACTION;");
-  for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
-    std::string tbl = (*it)->title();
-    if (tbl_names_.count(tbl) == 0) {
-      CreateTable(*it);
+  try {
+    for (DatumList::iterator it = data.begin(); it != data.end(); ++it) {
+      std::string tbl = (*it)->title();
+      if (tbl_names_.count(tbl) == 0) {
+        CreateTable(*it);
+      }
+      if (stmts_.count(tbl) == 0) {
+        BuildStmt(*it);
+      }
+      WriteDatum(*it);
     }
-    if (stmts_.count(tbl) == 0) {
-      BuildStmt(*it);
-    }
-    WriteDatum(*it);
+  } catch (ValueError err) {
+    db_.Execute("END TRANSACTION;");
+    throw ValueError(err.what());
   }
   db_.Execute("END TRANSACTION;");
   Flush();

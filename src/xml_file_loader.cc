@@ -55,6 +55,11 @@ std::vector<AgentSpec> ParseSpecs(std::string infile) {
       unique.insert(spec.str());
     }
   }
+
+  if (specs.size() == 0) {
+    throw ValidationError("failed to parse archetype specs from input file");
+  }
+
   return specs;
 }
 
@@ -70,6 +75,12 @@ std::string BuildMasterSchema(std::string schema_path, std::string infile) {
   std::vector<AgentSpec> specs = ParseSpecs(infile);
 
   std::map<std::string, std::string> subschemas;
+
+  // force element types to exist so we always replace the config string
+  subschemas["region"] = "";
+  subschemas["inst"] = "";
+  subschemas["facility"] = "";
+
   for (int i = 0; i < specs.size(); ++i) {
     Agent* m = DynamicModule::Make(&ctx, specs[i]);
     subschemas[m->kind()] += "<element name=\"" + specs[i].alias() + "\">\n";
@@ -141,11 +152,6 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
 }
 
 XMLFileLoader::~XMLFileLoader() {
-  try {
-    rec_->Flush();
-  } catch (Error e) {
-    CLOG(LEV_ERROR) << "Error in XMLFileLoader destructor: " << e.what();
-  }
   delete ctx_;
 }
 

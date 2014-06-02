@@ -28,7 +28,12 @@ Recorder::Recorder(boost::uuids::uuid simid)
 }
 
 Recorder::~Recorder() {
-  Flush();
+  try {
+    Flush();
+  } catch (Error err) {
+    CLOG(LEV_ERROR) << "Error in Recorder destructor: " << err.what();
+  }
+
   for (int i = 0; i < data_.size(); ++i) {
     delete data_[i];
   }
