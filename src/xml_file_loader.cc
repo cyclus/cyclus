@@ -120,7 +120,7 @@ Composition::Ptr ReadRecipe(InfileTree* qe) {
   CompMap v;
   for (int i = 0; i < nnucs; i++) {
     InfileTree* nuclide = qe->SubTree(query, i);
-    key = strtol(nuclide->GetString("id").c_str(), NULL, 10);
+    key = pyne::nucname::id(nuclide->GetString("id"));
     value = strtod(nuclide->GetString("comp").c_str(), NULL);
     v[key] = value;
     CLOG(LEV_DEBUG3) << "  Nuclide: " << key << " Value: " << v[key];

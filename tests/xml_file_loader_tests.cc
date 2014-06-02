@@ -69,7 +69,7 @@ std::string XMLFileLoaderTests::RecipeSequence() {
           "      <comp>0.01</comp>"
           "    </nuclide>"
           "    <nuclide>"
-          "      <id>922350000</id>"
+          "      <id>U-235</id>"
           "      <comp>0.02</comp>"
           "    </nuclide>"
           "    <nuclide>"
