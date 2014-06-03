@@ -473,10 +473,22 @@ class Sha1 {
       hash_.process_bytes(&(*it), sizeof(int));
   };
 
+  inline void Update(const std::set<std::string>& x) { 
+    std::set<std::string>::iterator it = x.begin();
+    for(; it != x.end(); ++it)
+      hash_.process_bytes(it->c_str(), it->size());
+  };
+
   inline void Update(const std::list<int>& x) { 
     std::list<int>::const_iterator it = x.begin();
     for(; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
+  };
+
+  inline void Update(const std::list<std::string>& x) { 
+    std::list<std::string>::const_iterator it = x.begin();
+    for(; it != x.end(); ++it)
+      hash_.process_bytes(it->c_str(), it->size());
   };
 
   inline void Update(const std::pair<int, int>& x) { 
@@ -489,6 +501,46 @@ class Sha1 {
     for (; it != x.end(); ++it) {
       hash_.process_bytes(&(it->first), sizeof(int));
       hash_.process_bytes(&(it->second), sizeof(int));
+    }
+  };
+
+  inline void Update(const std::map<int, double>& x) {
+    std::map<int, double>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first), sizeof(int));
+      hash_.process_bytes(&(it->second), sizeof(double));
+    }
+  };
+
+  inline void Update(const std::map<int, std::string>& x) {
+    std::map<int, std::string>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first), sizeof(int));
+      hash_.process_bytes(it->second.c_str(), it->second.size());
+    }
+  };
+
+  inline void Update(const std::map<std::string, int>& x) {
+    std::map<std::string, int>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      hash_.process_bytes(&(it->second), sizeof(int));
+    }
+  };
+
+  inline void Update(const std::map<std::string, double>& x) {
+    std::map<std::string, double>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      hash_.process_bytes(&(it->second), sizeof(double));
+    }
+  };
+
+  inline void Update(const std::map<std::string, std::string>& x) {
+    std::map<std::string, std::string>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      hash_.process_bytes(it->second.c_str(), it->second.size());
     }
   };
   /// \}

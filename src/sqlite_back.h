@@ -79,6 +79,30 @@ class SqliteBack: public FullBackend {
   SqlStatement::Ptr vect_str_get_;
   std::set<Digest> vect_str_keys_;
 
+  SqlStatement::Ptr map_int_double_ins_;
+  SqlStatement::Ptr map_int_double_get_;
+  std::set<Digest> map_int_double_keys_;
+
+  SqlStatement::Ptr map_int_int_ins_;
+  SqlStatement::Ptr map_int_int_get_;
+  std::set<Digest> map_int_int_keys_;
+
+  SqlStatement::Ptr map_int_str_ins_;
+  SqlStatement::Ptr map_int_str_get_;
+  std::set<Digest> map_int_str_keys_;
+
+  SqlStatement::Ptr map_str_int_ins_;
+  SqlStatement::Ptr map_str_int_get_;
+  std::set<Digest> map_str_int_keys_;
+
+  SqlStatement::Ptr map_str_double_ins_;
+  SqlStatement::Ptr map_str_double_get_;
+  std::set<Digest> map_str_double_keys_;
+
+  SqlStatement::Ptr map_str_str_ins_;
+  SqlStatement::Ptr map_str_str_get_;
+  std::set<Digest> map_str_str_keys_;
+
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;
 };
