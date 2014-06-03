@@ -1,4 +1,5 @@
 #include "solver_factory.h"
+#include "error.h"
 
 #include "OsiClpSolverInterface.hpp"
 #include "OsiCbcSolverInterface.hpp" 
@@ -14,6 +15,8 @@ OsiSolverInterface* SolverFactory::get() {
     return new OsiClpSolverInterface();
   } else if (t_ == "cbc") {
     return new OsiCbcSolverInterface();
+  } else {
+    throw ValueError("invalid SolverFactory type '" + t_ + "'");
   }
 }
 

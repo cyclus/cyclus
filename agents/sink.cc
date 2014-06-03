@@ -114,7 +114,7 @@ void Sink::Tock() {
   LOG(cyclus::LEV_INFO4, "SnkFac") << "Sink " << this->id()
                                    << " is holding " << inventory.quantity()
                                    << " units of material at the close of month "
-                                   << time << ".";
+                                   << context()->time() << ".";
 }
 
 extern "C" cyclus::Agent* ConstructSink(cyclus::Context* ctx) {

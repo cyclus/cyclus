@@ -7,8 +7,11 @@
 #include "agent_managed.h"
 #include "builder.h"
 #include "commodity_producer.h"
-#include "OsiCbcSolverInterface.hpp"
 #include "prog_translator.h"
+
+// headers in this file below this pragma have all warnings shushed
+#pragma GCC system_header
+#include "OsiCbcSolverInterface.hpp"
 
 namespace cyclus {
 namespace toolkit {
