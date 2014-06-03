@@ -61,7 +61,7 @@ void KFacility::Tock() {
   LOG(cyclus::LEV_INFO4, "KFac") << "KFacility " << this->id()
                                    << " is holding " << inventory.quantity()
                                    << " units of material at the close of month "
-                                   << time << ".";
+                                   << context()->time() << ".";
   // Update capacity for the next step
   in_capacity = in_capacity * k_factor_in;
   out_capacity = out_capacity * k_factor_out;

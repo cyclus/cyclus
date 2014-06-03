@@ -293,7 +293,7 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
     break;
   }
   default: {
-    throw ValueError("Attempted to retrieve unsupported backend type");
+    throw ValueError("attempted to retrieve unsupported sqlite backend type");
   }
 
   }
@@ -433,7 +433,7 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
 
   const std::type_info* ti = &v.type();
   if (type_map.count(ti) == 0) {
-    throw ValueError(std::string("Unsupported backend type ") + ti->name());
+    throw ValueError(std::string("unsupported backend type ") + ti->name());
   }
   return type_map[ti];
 };

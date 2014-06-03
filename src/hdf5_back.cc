@@ -169,7 +169,6 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   hsize_t tb_chunksize;
   H5Pget_chunk(tb_plist, 1, &tb_chunksize);
   unsigned int nchunks = (tb_length/tb_chunksize) + (tb_length%tb_chunksize == 0?0:1);
-  unsigned int n = 0;
 
   // set up field-conditions map
   std::map<std::string, std::vector<Cond*> > field_conds = std::map<std::string, 
@@ -187,10 +186,12 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
   // read in data
   QueryResult qr = GetTableInfo(table, tb_set, tb_type);
   int nfields = qr.fields.size();
-  for (i = 0; i < nfields; ++i)
-    if (field_conds.count(qr.fields[i]) == 0)
+  for (i = 0; i < nfields; ++i) {
+    if (field_conds.count(qr.fields[i]) == 0) {
       field_conds[qr.fields[i]] = std::vector<Cond*>();
-  for (n; n < nchunks; ++n) {
+    }
+  }
+  for (unsigned int n = 0; n < nchunks; ++n) {
     // This loop is meant to be OpenMP-izable
     hid_t field_type;
     hsize_t start = n * tb_chunksize;
@@ -940,6 +941,9 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           Digest key = VLWrite<map<int, int>, VL_MAP_INT_INT>(a);
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
+        }
+        default: {
+          throw ValueError("attempted to retrieve unsupported sqlite backend type");
         }
       }
       offset += sizes[col];
