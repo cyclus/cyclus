@@ -265,6 +265,60 @@ TEST_F(Hdf5BackTests, ReadWriteVLSetInt) {
   TestBasic<set<int> >("vl_set_int", x, y);
 }
 
+TEST_F(Hdf5BackTests, ReadWriteSetString) {
+  using std::string;
+  using std::vector;
+  using std::set;
+  shape.resize(2);
+  shape[0] = 2;
+  shape[1] = 6;
+  string x_[] = {"wakka", "jawaka"};
+  set<string> x = set<string>(x_, x_+2);
+  string y_[] = {"Frank", "Zappa"};
+  set<string> y = set<string>(y_, y_+2);
+  TestBasic<set<string> >("set_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteSetVLString) {
+  using std::string;
+  using std::vector;
+  using std::set;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  set<string> x = set<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It Just Might Be a One‐Shot Deal"};
+  set<string> y = set<string>(y_, y_+3);
+  TestBasic<set<string> >("set_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLSetString) {
+  using std::string;
+  using std::vector;
+  using std::set;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 10;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  set<string> x = set<string>(x_, x_+3);
+  string y_[] = {"One‐Shot"};
+  set<string> y = set<string>(y_, y_+1);
+  TestBasic<set<string> >("vl_set_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLSetVLString) {
+  using std::string;
+  using std::vector;
+  using std::set;
+  shape.clear();
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  set<string> x = set<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
+  set<string> y = set<string>(y_, y_+9);
+  TestBasic<set<string> >("vl_set_vl_string", x, y);
+}
+
 TEST_F(Hdf5BackTests, ReadWriteListInt) {
   using std::list;
   shape.resize(1);
