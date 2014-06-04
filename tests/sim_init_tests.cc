@@ -148,13 +148,13 @@ class SimInitTest : public ::testing::Test {
     cy::Resource::nextstate_id_ = 1;
     cy::Resource::nextobj_id_ = 1;
     cy::Composition::next_id_ = 1;
-    cy::Product::next_state_ = 1;
+    cy::Product::next_qualid_ = 1;
   };
   int agentid() { return Agent::next_id_; };
   int stateid() { return cy::Resource::nextstate_id_; };
   int objid() { return cy::Resource::nextobj_id_; };
   int compid() { return cy::Composition::next_id_; };
-  int prodid() { return cy::Product::next_state_; };
+  int prodid() { return cy::Product::next_qualid_; };
   int transid(cy::Context* ctx) { return ctx->trans_id_; };
 
   cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; };

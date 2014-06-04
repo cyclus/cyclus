@@ -38,7 +38,7 @@ class Product : public Resource {
 
   /// Returns 0 (for now).
   virtual int qual_id() const {
-    return 0;
+    return qualids_[quality_];
   };
 
   /// Returns Product::kType.
@@ -80,8 +80,8 @@ class Product : public Resource {
   Product(Context* ctx, double quantity, std::string quality);
 
   // map<quality, quality_id>
-  static std::map<std::string, int> stateids_;
-  static int next_state_;
+  static std::map<std::string, int> qualids_;
+  static int next_qualid_;
 
   Context* ctx_;
   std::string quality_;

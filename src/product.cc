@@ -9,24 +9,23 @@ namespace cyclus {
 
 const ResourceType Product::kType = "Product";
 
-std::map<std::string, int> Product::stateids_;
-int Product::next_state_ = 1;
+std::map<std::string, int> Product::qualids_;
+int Product::next_qualid_ = 1;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Product::Ptr Product::Create(Agent* creator,
-                                             double quantity,
-                                             std::string quality) {
-  Product::Ptr r(new Product(creator->context(), quantity,
-                                             quality));
-  r->tracker_.Create(creator);
-
-  if (stateids_.count(quality) == 0) {
-    stateids_[quality] = next_state_++;
+Product::Ptr Product::Create(Agent* creator, double quantity,
+                             std::string quality) {
+  if (qualids_.count(quality) == 0) {
+    qualids_[quality] = next_qualid_++;
     creator->context()->NewDatum("Products")
-    ->AddVal("QualId", stateids_[quality])
+    ->AddVal("QualId", qualids_[quality])
     ->AddVal("Quality", quality)
     ->Record();
   }
+
+  // the next lines must come after qual id setting
+  Product::Ptr r(new Product(creator->context(), quantity, quality));
+  r->tracker_.Create(creator);
   return r;
 }
 

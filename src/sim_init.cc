@@ -112,7 +112,7 @@ void SimInit::Snapshot(Context* ctx) {
   ctx->NewDatum("NextIds")
   ->AddVal("Time", ctx->time())
   ->AddVal("Object", std::string("Product"))
-  ->AddVal("NextId", Product::next_state_)
+  ->AddVal("NextId", Product::next_qualid_)
   ->Record();
 };
 
@@ -375,7 +375,7 @@ void SimInit::LoadNextIds() {
     } else if (obj == "ResourceObj") {
       Resource::nextobj_id_ = qr.GetVal<int>("NextId", i);
     } else if (obj == "Product") {
-      Product::next_state_ = qr.GetVal<int>("NextId", i);
+      Product::next_qualid_ = qr.GetVal<int>("NextId", i);
     } else {
       throw IOError("Unexpected value in NextIds table: " + obj);
     }
@@ -457,7 +457,7 @@ Resource::Ptr SimInit::LoadProduct(int state_id) {
   std::string quality = qr.GetVal<std::string>("Quality");
 
   // set static quality-stateid map to have same vals as db
-  Product::stateids_[quality] = stateid;
+  Product::qualids_[quality] = stateid;
 
   Agent* dummy = new Dummy(ctx_);
   Resource::Ptr r = Product::Create(dummy, qty, quality);
