@@ -341,6 +341,60 @@ TEST_F(Hdf5BackTests, ReadWriteVLListInt) {
   TestBasic<list<int> >("vl_list_int", x, y);
 }
 
+TEST_F(Hdf5BackTests, ReadWriteListString) {
+  using std::string;
+  using std::vector;
+  using std::list;
+  shape.resize(2);
+  shape[0] = 2;
+  shape[1] = 6;
+  string x_[] = {"wakka", "jawaka"};
+  list<string> x = list<string>(x_, x_+2);
+  string y_[] = {"Frank", "Zappa"};
+  list<string> y = list<string>(y_, y_+2);
+  TestBasic<list<string> >("list_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteListVLString) {
+  using std::string;
+  using std::vector;
+  using std::list;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  list<string> x = list<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It Just Might Be a One‐Shot Deal"};
+  list<string> y = list<string>(y_, y_+3);
+  TestBasic<list<string> >("list_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLListString) {
+  using std::string;
+  using std::vector;
+  using std::list;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 10;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  list<string> x = list<string>(x_, x_+3);
+  string y_[] = {"One‐Shot"};
+  list<string> y = list<string>(y_, y_+1);
+  TestBasic<list<string> >("vl_list_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLListVLString) {
+  using std::string;
+  using std::vector;
+  using std::list;
+  shape.clear();
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  list<string> x = list<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
+  list<string> y = list<string>(y_, y_+9);
+  TestBasic<list<string> >("vl_list_vl_string", x, y);
+}
+
 TEST_F(Hdf5BackTests, ReadWritePairIntInt) {
   using std::pair;
   shape.clear();

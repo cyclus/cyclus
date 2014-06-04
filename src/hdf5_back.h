@@ -173,6 +173,7 @@ class Hdf5Back : public FullBackend {
   hvl_t VLValToBuf(const std::set<int>& x);
   hvl_t VLValToBuf(const std::set<std::string>& x);
   hvl_t VLValToBuf(const std::list<int>& x);
+  hvl_t VLValToBuf(const std::list<std::string>& x);
   hvl_t VLValToBuf(const std::map<int, int>& x);
   /// \}
 
