@@ -461,6 +461,71 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapIntDouble) {
   TestBasic<map<int, double> >("vl_map_int_double", x, y);
 }
 
+TEST_F(Hdf5BackTests, ReadWriteMapIntString) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = 4;
+  map<int, string> x;
+  x[6] = "jazz";
+  x[28] = "from";
+  x[496] = "hell";
+  map<int, string> y;
+  y[42] = "help";
+  y[43] = "imma";
+  y[44] = "rock";
+  TestBasic<map<int, string> >("map_int_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapIntString) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 4;
+  map<int, string> x;
+  x[6] = "abso";
+  x[28] = "lute";
+  x[496] = "ly  ";
+  x[8128] = "free";
+  map<int, string> y = map<int, string>();
+  for (int i = 0; i < 42; ++i)
+    y[42 + i] = "Arf!";
+  TestBasic<map<int, string> >("vl_map_int_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapIntVLString) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  map<int, string> x;
+  x[6] = "you";
+  x[28] = "are";
+  x[496] = "probably";
+  map<int, string> y;
+  y[42] = "wondering";
+  y[43] = "why";
+  y[44] = "I'm here!";
+  TestBasic<map<int, string> >("map_int_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapIntVLString) {
+  using std::map;
+  using std::string;
+  shape.clear();
+  map<int, string> x;
+  x[6] = "I am lonesome";
+  x[28] = "Cowboy Burt";
+  map<int, string> y = map<int, string>();
+  for (int i = 0; i < 42; ++i)
+    y[42 + i] = "Come smell my friend's shirt";
+  TestBasic<map<int, string> >("vl_map_int_vl_string", x, y);
+}
+
+
 //
 // Multi-faceted unit tests
 //
