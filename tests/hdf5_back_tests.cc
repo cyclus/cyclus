@@ -432,6 +432,35 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapIntInt) {
   TestBasic<map<int, int> >("vl_map_int_int", x, y);
 }
 
+TEST_F(Hdf5BackTests, ReadWriteMapIntDouble) {
+  using std::map;
+  shape.resize(1);
+  shape[0] = 3;
+  map<int, double> x;
+  x[6] = 42.0;
+  x[28] = 43.0;
+  x[496] = 44.0;
+  map<int, double> y;
+  y[42] = 6.0;
+  y[43] = 28.0;
+  y[44] = 496.0;
+  TestBasic<map<int, double> >("map_int_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapIntDouble) {
+  using std::map;
+  shape.clear();
+  map<int, double> x = map<int, double>();
+  x[6] = 42.0;
+  x[28] = 43.0;
+  x[496] = 44.0;
+  x[8128] = 45.0;
+  map<int, double> y = map<int, double>();
+  for (int i = 0; i < 42; ++i)
+    y[42 + i] = 1.0*i;
+  TestBasic<map<int, double> >("vl_map_int_double", x, y);
+}
+
 //
 // Multi-faceted unit tests
 //

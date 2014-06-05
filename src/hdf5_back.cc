@@ -1,4 +1,3 @@
-// hdf5_y16back.cc
 #include "hdf5_back.h"
 
 #include <cmath>
@@ -7,8 +6,6 @@
 #include "blob.h"
 
 namespace cyclus {
-
-//const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   H5open();
@@ -478,6 +475,26 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case MAP_INT_DOUBLE: {
+            map<int, double> x = map<int, double>();
+            size_t itemsize = sizeof(int) + sizeof(double);
+            jlen = col_sizes_[table][j] / itemsize;
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x[*reinterpret_cast<int*>(buf + offset + itemsize*k)] = \
+                *reinterpret_cast<double*>(buf + offset + itemsize*k + sizeof(int));
+            }
+            is_row_selected = CmpConds<map<int, double> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_MAP_INT_DOUBLE: {
+            map<int, double> x = VLRead<map<int, double>, VL_MAP_INT_DOUBLE>(buf + offset);
+            is_row_selected = CmpConds<map<int, double> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
           default: {
             throw IOError("querying column '" + qr.fields[j] + "' in table '" + \
                           table + "' failed due to unsupported data type.");
@@ -591,6 +608,7 @@ void Hdf5Back::CreateTable(Datum* d) {
   Datum::Shape shape;
   Datum::Shapes shapes = d->shapes();
 
+  herr_t status;
   size_t dst_size = 0;
   size_t* dst_offset = new size_t[nvals];
   size_t* dst_sizes = new size_t[nvals];
@@ -817,6 +835,33 @@ void Hdf5Back::CreateTable(Datum* d) {
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * 2 * shape[0];
       }
+    } else if (valtype == typeid(std::map<int, double>)) {
+      shape = shapes[i];
+      hid_t item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) + sizeof(double));
+      H5Tinsert(item_type, "key", 0, H5T_NATIVE_INT);
+      H5Tinsert(item_type, "val", sizeof(int), H5T_NATIVE_DOUBLE);
+      hid_t dt0 = H5Tget_member_type(item_type, 0); 
+      if (shape.empty() || shape[0] < 1) {
+        dbtypes[i] = VL_MAP_INT_DOUBLE;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_INT_DOUBLE) == 0) {
+          vldts_[VL_MAP_INT_DOUBLE] = H5Tvlen_create(item_type);
+          opened_types_.insert(item_type);
+          opened_types_.insert(vldts_[VL_MAP_INT_DOUBLE]);
+        } else {
+          H5Tclose(item_type);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = MAP_INT_DOUBLE;
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = (sizeof(int) + sizeof(double)) * shape[0];
+        H5Tpack(field_types[i]);
+        H5Tpack(item_type);
+      }
     } else {
       throw IOError("the type for column '" + std::string(field_names[i]) + \
                     "' is not yet supported in HDF5.");
@@ -824,10 +869,9 @@ void Hdf5Back::CreateTable(Datum* d) {
     dst_size += dst_sizes[i];
   }
 
-  herr_t status;
   const char* title = d->title().c_str();
   int compress = 1;
-  int chunk_size = 1000;
+  int chunk_size = 1024;
   void* fill_data = NULL;
   void* data = NULL;
 
@@ -871,6 +915,7 @@ void Hdf5Back::CreateTable(Datum* d) {
 
 void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
+  const char * c_title = title.c_str();
 
   size_t* offsets = col_offsets_[title];
   size_t* sizes = col_sizes_[title];
@@ -879,12 +924,54 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   char* buf = new char[group.size() * rowsize];
   FillBuf(title, buf, group, sizes, rowsize);
 
-  herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
-                              offsets, sizes, buf);
+  // We cannot do the simple thing (append_records) here because of a bug in 
+  // H5TB where it stupidly tries to reconstruct the datatype in memory from 
+  // what it read in on disk. This works in most cases but failed where the table
+  // had a column which is an array of a compound datatype of non-homogenous
+  // fields (eg MAP_INT_DOUBLE). The fix here just uses the datatype present on 
+  // disk - which is what we wanted anyway!
+  //herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
+  //                            offsets, sizes, buf);
+  herr_t status;
+  hid_t dset = H5Dopen2(file_, title.c_str(), H5P_DEFAULT);
+  hid_t dtype = H5Dget_type(dset);
+  hsize_t nrecords_add = group.size();
+  hsize_t nrecords_orig;
+  hsize_t nfields;
+  hsize_t dims[1];
+  hsize_t offset[1];
+  hsize_t count[1];
+  H5TBget_table_info(file_, c_title, &nfields, &nrecords_orig);
+  dims[0] = nrecords_add + nrecords_orig;
+  offset[0] = nrecords_orig;
+  count[0] = nrecords_add;
+
+  status = H5Dset_extent(dset, dims);
+  hid_t dspace = H5Dget_space(dset);
+  hid_t memspace = H5Screate_simple(1, count, NULL);
+  status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+  status = H5Dwrite(dset, dtype, memspace, dspace, H5P_DEFAULT, buf);
+
   if (status < 0) {
-    throw IOError("Failed to write some data to the '" + title + "' table in "
-                  "the hdf5 database.");
+    std::stringstream ss; 
+    ss << "Failed to write to the HDF5 table:\n" \
+       << "  file      " << path_ << "\n" \
+       << "  table     " << title << "\n" \
+       << "  num. rows " << group.size() << "\n"
+       << "  rowsize   " << rowsize << "\n";
+    for (int i = 0; i < group.front()->vals().size(); ++i) {
+      ss << "    # Column " << i << "\n" \
+         << "      dbtype: " << schemas_[title][i] << "\n" \
+         << "      size:   " << sizes[i] << "\n" \
+         << "      offset: " << offsets[i] << "\n";
+    }
+    throw IOError(ss.str());
   }
+
+  H5Sclose(memspace);
+  H5Sclose(dspace);
+  H5Tclose(dtype);
+  H5Dclose(dset);
   delete[] buf;
 }
 
@@ -1193,6 +1280,26 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
+        case MAP_INT_DOUBLE: {
+          map<int, double> val = a->cast<map<int, double> >();
+          size_t itemsize = sizeof(int) + sizeof(double);
+          fieldlen = sizes[col];
+          valuelen = min(itemsize * val.size(), fieldlen);
+          unsigned int cnt = 0;
+          for (map<int, double>::iterator valit = val.begin(); valit != val.end(); ++valit) {
+            memcpy(buf + offset + itemsize*cnt, &(valit->first), sizeof(int));
+            memcpy(buf + offset + itemsize*cnt + sizeof(int), &(valit->second), 
+                                                              sizeof(double));
+            ++cnt;
+          }
+          memset(buf + offset + valuelen, 0, fieldlen - valuelen);
+          break;
+        }
+        case VL_MAP_INT_DOUBLE: {
+          Digest key = VLWrite<map<int, double>, VL_MAP_INT_DOUBLE>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
         default: {
           throw ValueError("attempted to retrieve unsupported sqlite backend type");
         }
@@ -1272,6 +1379,10 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
     }
     case VL_MAP_INT_INT: {
       name = "MapIntInt";
+      break;
+    }
+    case VL_MAP_INT_DOUBLE: {
+      name = "MapIntDouble";
       break;
     }
     default: {
@@ -1560,6 +1671,33 @@ std::map<int, int> Hdf5Back::VLBufToVal<std::map<int, int> >(const hvl_t& buf) {
   std::map<int, int> x = std::map<int, int>();
   for (unsigned int i = 0; i < buf.len; ++i)
     x[xraw[2*i]] = xraw[2*i + 1];
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::map<int, double>& x) {
+  hvl_t buf;
+  buf.len = x.size();
+  size_t itemsize = sizeof(int) + sizeof(double);
+  size_t nbytes = itemsize * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int cnt = 0;
+  std::map<int, double>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    memcpy((char *) buf.p + itemsize*cnt, &(it->first), sizeof(int));
+    memcpy((char *) buf.p + itemsize*cnt + sizeof(int), &(it->second), sizeof(double));
+    ++cnt;
+  }
+  return buf;
+};
+
+template <>
+std::map<int, double> Hdf5Back::VLBufToVal<std::map<int, double> >(const hvl_t& buf) {
+  std::map<int, double> x;
+  char * p = reinterpret_cast<char*>(buf.p);
+  size_t itemsize = sizeof(int) + sizeof(double);
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x[*reinterpret_cast<int*>(p + itemsize*i)] = \
+      *reinterpret_cast<double*>(p + itemsize*i + sizeof(int));
   return x;
 };
 
