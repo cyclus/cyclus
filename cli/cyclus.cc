@@ -126,6 +126,23 @@ int main(int argc, char* argv[]) {
   rec.RegisterBackend(fback);
   bdel.Add(fback);
 
+  // try to detect schema type
+  std::stringstream input;
+  LoadStringstreamFromFile(input, infile);
+  boost::shared_ptr<XMLParser> parser =
+      boost::shared_ptr<XMLParser>(new XMLParser());
+  parser->Init(input);
+  InfileTree tree(*parser);
+  std::string schema_type =
+      OptionalQuery<std::string>(&tree, "/simulation/schematype", "");
+  if (schema_type == "flat" && !ai.flat_schema) {
+    std::cout << "flat schema tag detected - switching to flat input schema\n";
+    ai.flat_schema = true;
+    if (ai.schema_path != Env::rng_schema(ai.flat_schema)) {
+      ai.schema_path = Env::rng_schema(ai.flat_schema);
+    }
+  }
+
   SimInit si;
   if (ai.restart == "") {
     // read input file and initialize db and simulation from input file
@@ -192,15 +209,6 @@ int main(int argc, char* argv[]) {
 }
 
 int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
-  // verbosity help msg
-  std::string vmessage = "output log verbosity. Can be text:\n\n";
-  vmessage +=
-      "   LEV_ERROR (least verbose, default), LEV_WARN, \n"
-      "   LEV_INFO1 (through 5), and LEV_DEBUG1 (through 5).\n\n";
-  vmessage +=
-      "Or an integer:\n\n   0 (LEV_ERROR equiv) through 11 (LEV_DEBUG5 equiv)\n";
-
-  // parse command line options
   ai->desc.add_options()
       ("help,h", "produce help message")
       ("version,V", "print cyclus core and dependency versions and quit")
@@ -217,7 +225,8 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
        "dump the annotations for the named agent")
       ("no-agent", "only print log entries from cyclus core code")
       ("no-mem", "exclude memory log statement from logger output")
-      ("verb,v", po::value<std::string>(), vmessage.c_str())
+      ("verb,v", po::value<std::string>(),
+       "log verbosity. integer from 0 (quiet) to 11 (verbose).")
       ("output-path,o", po::value<std::string>(), "output path")
       ("input-file", po::value<std::string>(), "input file")
       ("warn-limit", po::value<unsigned int>(), 
@@ -329,7 +338,9 @@ void GetSimInfo(ArgInfo* ai) {
   // schema info
   ai->flat_schema = ai->vm.count("flat-schema") > 0;
   ai->schema_path = Env::rng_schema(ai->flat_schema);
-
+  if (ai->vm.count("schema-path")) {
+    ai->schema_path = ai->vm["schema-path"].as<std::string>();
+  }
 
   if (ai->vm.count("restart") > 0) {
     ai->restart = ai->vm["restart"].as<std::string>();

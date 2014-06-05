@@ -2,6 +2,7 @@
 datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 <start>
 <element name="simulation">
+  <optional><element name="schematype"><text/></element></optional>
 <interleave>
 
   <element name ="control">
