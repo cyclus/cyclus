@@ -30,6 +30,16 @@ Package                Minimum Version
 `Coin-Cbc`             2.5
 ====================   ==================
 
+On some platforms, such as Ubuntu 14.04, the following are also necessary:
+
+====================   ==================
+Package                Minimum Version   
+====================   ==================
+`libblas-dev`          1.2
+`liblapack-dev`        3.5.0
+====================   ==================
+
+
 An optional dependency (to build documentation) is:
 
 ====================   ==================
