@@ -265,6 +265,60 @@ TEST_F(Hdf5BackTests, ReadWriteVLSetInt) {
   TestBasic<set<int> >("vl_set_int", x, y);
 }
 
+TEST_F(Hdf5BackTests, ReadWriteSetString) {
+  using std::string;
+  using std::vector;
+  using std::set;
+  shape.resize(2);
+  shape[0] = 2;
+  shape[1] = 6;
+  string x_[] = {"wakka", "jawaka"};
+  set<string> x = set<string>(x_, x_+2);
+  string y_[] = {"Frank", "Zappa"};
+  set<string> y = set<string>(y_, y_+2);
+  TestBasic<set<string> >("set_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteSetVLString) {
+  using std::string;
+  using std::vector;
+  using std::set;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  set<string> x = set<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It Just Might Be a One‐Shot Deal"};
+  set<string> y = set<string>(y_, y_+3);
+  TestBasic<set<string> >("set_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLSetString) {
+  using std::string;
+  using std::vector;
+  using std::set;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 10;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  set<string> x = set<string>(x_, x_+3);
+  string y_[] = {"One‐Shot"};
+  set<string> y = set<string>(y_, y_+1);
+  TestBasic<set<string> >("vl_set_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLSetVLString) {
+  using std::string;
+  using std::vector;
+  using std::set;
+  shape.clear();
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  set<string> x = set<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
+  set<string> y = set<string>(y_, y_+9);
+  TestBasic<set<string> >("vl_set_vl_string", x, y);
+}
+
 TEST_F(Hdf5BackTests, ReadWriteListInt) {
   using std::list;
   shape.resize(1);
@@ -285,6 +339,60 @@ TEST_F(Hdf5BackTests, ReadWriteVLListInt) {
   for (int i = 0; i < 42; ++i)
     y.push_back(42);
   TestBasic<list<int> >("vl_list_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteListString) {
+  using std::string;
+  using std::vector;
+  using std::list;
+  shape.resize(2);
+  shape[0] = 2;
+  shape[1] = 6;
+  string x_[] = {"wakka", "jawaka"};
+  list<string> x = list<string>(x_, x_+2);
+  string y_[] = {"Frank", "Zappa"};
+  list<string> y = list<string>(y_, y_+2);
+  TestBasic<list<string> >("list_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteListVLString) {
+  using std::string;
+  using std::vector;
+  using std::list;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  list<string> x = list<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It Just Might Be a One‐Shot Deal"};
+  list<string> y = list<string>(y_, y_+3);
+  TestBasic<list<string> >("list_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLListString) {
+  using std::string;
+  using std::vector;
+  using std::list;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 10;
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  list<string> x = list<string>(x_, x_+3);
+  string y_[] = {"One‐Shot"};
+  list<string> y = list<string>(y_, y_+1);
+  TestBasic<list<string> >("vl_list_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLListVLString) {
+  using std::string;
+  using std::vector;
+  using std::list;
+  shape.clear();
+  string x_[] = {"wakka", "jawaka", "Hot Rats"};
+  list<string> x = list<string>(x_, x_+3);
+  string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
+  list<string> y = list<string>(y_, y_+9);
+  TestBasic<list<string> >("vl_list_vl_string", x, y);
 }
 
 TEST_F(Hdf5BackTests, ReadWritePairIntInt) {
@@ -323,6 +431,363 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapIntInt) {
     y[42 + i] = i;
   TestBasic<map<int, int> >("vl_map_int_int", x, y);
 }
+
+TEST_F(Hdf5BackTests, ReadWriteMapIntDouble) {
+  using std::map;
+  shape.resize(1);
+  shape[0] = 3;
+  map<int, double> x;
+  x[6] = 42.0;
+  x[28] = 43.0;
+  x[496] = 44.0;
+  map<int, double> y;
+  y[42] = 6.0;
+  y[43] = 28.0;
+  y[44] = 496.0;
+  TestBasic<map<int, double> >("map_int_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapIntDouble) {
+  using std::map;
+  shape.clear();
+  map<int, double> x = map<int, double>();
+  x[6] = 42.0;
+  x[28] = 43.0;
+  x[496] = 44.0;
+  x[8128] = 45.0;
+  map<int, double> y = map<int, double>();
+  for (int i = 0; i < 42; ++i)
+    y[42 + i] = 1.0*i;
+  TestBasic<map<int, double> >("vl_map_int_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapIntString) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = 4;
+  map<int, string> x;
+  x[6] = "jazz";
+  x[28] = "from";
+  x[496] = "hell";
+  map<int, string> y;
+  y[42] = "help";
+  y[43] = "imma";
+  y[44] = "rock";
+  TestBasic<map<int, string> >("map_int_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapIntString) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 4;
+  map<int, string> x;
+  x[6] = "abso";
+  x[28] = "lute";
+  x[496] = "ly  ";
+  x[8128] = "free";
+  map<int, string> y = map<int, string>();
+  for (int i = 0; i < 42; ++i)
+    y[42 + i] = "Arf!";
+  TestBasic<map<int, string> >("vl_map_int_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapIntVLString) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  map<int, string> x;
+  x[6] = "you";
+  x[28] = "are";
+  x[496] = "probably";
+  map<int, string> y;
+  y[42] = "wondering";
+  y[43] = "why";
+  y[44] = "I'm here!";
+  TestBasic<map<int, string> >("map_int_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapIntVLString) {
+  using std::map;
+  using std::string;
+  shape.clear();
+  map<int, string> x;
+  x[6] = "I am lonesome";
+  x[28] = "Cowboy Burt";
+  map<int, string> y = map<int, string>();
+  for (int i = 0; i < 42; ++i)
+    y[42 + i] = "Come smell my friend's shirt";
+  TestBasic<map<int, string> >("vl_map_int_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapStringInt) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = 4;
+  map<string, int> x;
+  x["jazz"] = 6;
+  x["from"] = 28;
+  x["hell"] = 496;
+  map<string, int> y;
+  y["help"] = 42;
+  y["imma"] = 43;
+  y["rock"] = 44;
+  TestBasic<map<string, int> >("map_string_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapStringInt) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 4;
+  map<string, int> x;
+  x["abso"] = 6;
+  x["lute"] = 28;
+  x["ly  "] = 496;
+  x["free"] = 8128;
+  map<string, int> y;
+  y["Arf!"] = 42;
+  y["Arf?"] = 43;
+  TestBasic<map<string, int> >("vl_map_string_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapVLStringInt) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  map<string, int> x;
+  x["you"] = 6;
+  x["are"] = 28;
+  x["probably"] = 496;
+  map<string, int> y;
+  y["wondering"] = 42;
+  y["why"] = 43;
+  y["I'm here!"] = 44;
+  TestBasic<map<string, int> >("map_vl_string_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringInt) {
+  using std::map;
+  using std::string;
+  shape.clear();
+  map<string, int> x;
+  x["I am lonesome"] = 6;
+  x["Cowboy Burt"] = 28;
+  map<string, int> y;
+  y["Come smell my friend's shirt"] = 42;
+  TestBasic<map<string, int> >("vl_map_vl_string_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapStringDouble) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = 4;
+  map<string, double> x;
+  x["jazz"] = 6.0;
+  x["from"] = 28.0;
+  x["hell"] = 496.0;
+  map<string, double> y;
+  y["help"] = 42.0;
+  y["imma"] = 43.0;
+  y["rock"] = 44.0;
+  TestBasic<map<string, double> >("map_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapStringDouble) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 4;
+  map<string, double> x;
+  x["abso"] = 6.0;
+  x["lute"] = 28.0;
+  x["ly  "] = 496.0;
+  x["free"] = 8128.0;
+  map<string, double> y;
+  y["Arf!"] = 42.0;
+  y["Arf?"] = 43.0;
+  TestBasic<map<string, double> >("vl_map_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapVLStringDouble) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  map<string, double> x;
+  x["you"] = 6.0;
+  x["are"] = 28.0;
+  x["probably"] = 496.0;
+  map<string, double> y;
+  y["wondering"] = 42.0;
+  y["why"] = 43.0;
+  y["I'm here!"] = 44.0;
+  TestBasic<map<string, double> >("map_vl_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringDouble) {
+  using std::map;
+  using std::string;
+  shape.clear();
+  map<string, double> x;
+  x["I am lonesome"] = 6.0;
+  x["Cowboy Burt"] = 28.0;
+  map<string, double> y;
+  y["Come smell my friend's shirt"] = 42.0;
+  TestBasic<map<string, double> >("vl_map_vl_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapStringString) {
+  using std::map;
+  using std::string;
+  shape.resize(3);
+  shape[0] = 3;
+  shape[1] = 4;
+  shape[2] = 2;
+  map<string, string> x;
+  x["jazz"] = "ja";
+  x["from"] = "wa";
+  x["hell"] = "ka";
+  map<string, string> y;
+  y["help"] = "wa";
+  y["imma"] = "kk";
+  y["rock"] = "a!";
+  TestBasic<map<string, string> >("map_string_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapStringString) {
+  using std::map;
+  using std::string;
+  shape.resize(3);
+  shape[0] = -1;
+  shape[1] = 4;
+  shape[2] = 2;
+  map<string, string> x;
+  x["abso"] = "jo";
+  x["lute"] = "e&";
+  x["ly  "] = "ma";
+  x["free"] = "ry";
+  map<string, string> y;
+  y["Arf!"] = "sa";
+  y["Arf?"] = "id";
+  TestBasic<map<string, string> >("vl_map_string_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapStringVLString) {
+  using std::map;
+  using std::string;
+  shape.resize(3);
+  shape[0] = 3;
+  shape[1] = 4;
+  shape[2] = -1;
+  map<string, string> x;
+  x["jazz"] = "you";
+  x["from"] = "are";
+  x["hell"] = "probably";
+  map<string, string> y;
+  y["help"] = "wondering";
+  y["imma"] = "why";
+  y["rock"] = "I'm here!";
+  TestBasic<map<string, string> >("map_string_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapStringVLString) {
+  using std::map;
+  using std::string;
+  shape.resize(3);
+  shape[0] = -1;
+  shape[1] = 4;
+  shape[2] = -1;
+  map<string, string> x;
+  x["Arf!"] = "I am lonesome";
+  x["Arf?"] = "Cowboy Burt";
+  map<string, string> y;
+  y["Arf~"] = "Come smell my friend's shirt";
+  TestBasic<map<string, string> >("vl_map_string_vl_string", x, y);
+}
+
+
+TEST_F(Hdf5BackTests, ReadWriteMapVLStringString) {
+  using std::map;
+  using std::string;
+  shape.resize(3);
+  shape[0] = 3;
+  shape[1] = -1;
+  shape[2] = 2;
+  map<string, string> x;
+  x["jazzy"] = "ja";
+  x["frommmmmmm"] = "wa";
+  x["helllll"] = "ka";
+  map<string, string> y;
+  y["help"] = "wa";
+  y["I'm a "] = "kk";
+  y["rock!"] = "a!";
+  TestBasic<map<string, string> >("map_vl_string_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringString) {
+  using std::map;
+  using std::string;
+  shape.resize(3);
+  shape[0] = -1;
+  shape[1] = -1;
+  shape[2] = 2;
+  map<string, string> x;
+  x["absoluetly"] = "jo";
+  x["free"] = "e&";
+  x["Freak"] = "ma";
+  x["out"] = "ry";
+  map<string, string> y;
+  y["Joe's"] = "sa";
+  y["Garage"] = "id";
+  TestBasic<map<string, string> >("vl_map_vl_string_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapVLStringVLString) {
+  using std::map;
+  using std::string;
+  shape.resize(3);
+  shape[0] = 3;
+  shape[1] = -1;
+  shape[2] = -1;
+  map<string, string> x;
+  x["jazzy"] = "you";
+  x["frommmmmmmm"] = "are";
+  x["helllll"] = "probably";
+  map<string, string> y;
+  y["help"] = "wondering";
+  y["I'm a "] = "why";
+  y["rock!"] = "I'm here!";
+  TestBasic<map<string, string> >("map_vl_string_vl_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringVLString) {
+  using std::map;
+  using std::string;
+  shape.clear();
+  map<string, string> x;
+  x["Arf!"] = "I am lonesome";
+  x["She said"] = "Cowboy Burt";
+  map<string, string> y;
+  y["panchromatic"] = "Come smell my friend's shirt";
+  TestBasic<map<string, string> >("vl_map_vl_string_vl_string", x, y);
+}
+
+
 
 //
 // Multi-faceted unit tests

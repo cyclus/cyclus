@@ -171,8 +171,15 @@ class Hdf5Back : public FullBackend {
   hvl_t VLValToBuf(const std::vector<int>& x);
   hvl_t VLValToBuf(const std::vector<std::string>& x);
   hvl_t VLValToBuf(const std::set<int>& x);
+  hvl_t VLValToBuf(const std::set<std::string>& x);
   hvl_t VLValToBuf(const std::list<int>& x);
+  hvl_t VLValToBuf(const std::list<std::string>& x);
   hvl_t VLValToBuf(const std::map<int, int>& x);
+  hvl_t VLValToBuf(const std::map<int, double>& x);
+  hvl_t VLValToBuf(const std::map<int, std::string>& x);
+  hvl_t VLValToBuf(const std::map<std::string, int>& x);
+  hvl_t VLValToBuf(const std::map<std::string, double>& x);
+  hvl_t VLValToBuf(const std::map<std::string, std::string>& x);
   /// \}
 
   /// Converts a variable length buffer to a value for HDF5.

@@ -1,4 +1,3 @@
-// hdf5_y16back.cc
 #include "hdf5_back.h"
 
 #include <cmath>
@@ -7,8 +6,6 @@
 #include "blob.h"
 
 namespace cyclus {
-
-//const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
 
 Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   H5open();
@@ -107,7 +104,9 @@ std::string Hdf5Back::VLRead<std::string, VL_STRING>(const char* rawkey) {
   if (status < 0)
     throw IOError("failed to read in variable length string data "
                   "in database '" + path_ + "'.");
-  string val = string(buf[0]);
+  string val;
+  if (buf[0] != NULL)
+    val = string(buf[0]);
   status = H5Dvlen_reclaim(vldts_[VL_STRING], mspace, H5P_DEFAULT, buf);
   if (status < 0)
     throw IOError("failed to reclaim variable length string data space in "
@@ -343,6 +342,51 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case SET_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int strlen = col_sizes_[table][j] / fieldlen;
+            set<string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string s = string(buf + offset + strlen*k, strlen);
+              nullpos = s.find('\0');
+              if (nullpos != std::string::npos)
+                s.resize(nullpos);
+              x.insert(s);
+            }
+            is_row_selected = CmpConds<set<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case SET_VL_STRING: {
+            jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
+            set<string> x;
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x.insert(VLRead<string, VL_STRING>(buf + offset + CYCLUS_SHA1_SIZE*k));
+            }
+            is_row_selected = CmpConds<set<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_SET_STRING: {
+            set<string> x = VLRead<set<string>, VL_SET_STRING>(buf + offset);
+            is_row_selected = CmpConds<set<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_SET_VL_STRING: {
+            set<string> x = VLRead<set<string>, VL_SET_VL_STRING>(buf + offset);
+            is_row_selected = CmpConds<set<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
           case LIST_INT: {
             jlen = col_sizes_[table][j] / sizeof(int);
             int* xraw = reinterpret_cast<int*>(buf + offset);
@@ -355,6 +399,51 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           case VL_LIST_INT: {
             std::list<int> x = VLRead<std::list<int>, VL_LIST_INT>(buf + offset);
             is_row_selected = CmpConds<std::list<int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case LIST_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int strlen = col_sizes_[table][j] / fieldlen;
+            list<string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string s = string(buf + offset + strlen*k, strlen);
+              nullpos = s.find('\0');
+              if (nullpos != std::string::npos)
+                s.resize(nullpos);
+              x.push_back(s);
+            }
+            is_row_selected = CmpConds<list<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case LIST_VL_STRING: {
+            jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
+            list<string> x;
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x.push_back(VLRead<string, VL_STRING>(buf + offset + CYCLUS_SHA1_SIZE*k));
+            }
+            is_row_selected = CmpConds<list<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_LIST_STRING: {
+            list<string> x = VLRead<list<string>, VL_LIST_STRING>(buf + offset);
+            is_row_selected = CmpConds<list<string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_LIST_VL_STRING: {
+            list<string> x = VLRead<list<string>, VL_LIST_VL_STRING>(buf + offset);
+            is_row_selected = CmpConds<list<string> >(&x, &(field_conds[qr.fields[j]]));
             if (is_row_selected)
               row[j] = x;
             break;
@@ -382,6 +471,305 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
           case VL_MAP_INT_INT: {
             map<int, int> x = VLRead<map<int, int>, VL_MAP_INT_INT>(buf + offset);
             is_row_selected = CmpConds<map<int, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_INT_DOUBLE: {
+            map<int, double> x = map<int, double>();
+            size_t itemsize = sizeof(int) + sizeof(double);
+            jlen = col_sizes_[table][j] / itemsize;
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x[*reinterpret_cast<int*>(buf + offset + itemsize*k)] = \
+                *reinterpret_cast<double*>(buf + offset + itemsize*k + sizeof(int));
+            }
+            is_row_selected = CmpConds<map<int, double> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_MAP_INT_DOUBLE: {
+            map<int, double> x = VLRead<map<int, double>, VL_MAP_INT_DOUBLE>(buf + offset);
+            is_row_selected = CmpConds<map<int, double> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_INT_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = col_sizes_[table][j] / fieldlen;
+            unsigned int strlen = itemsize - sizeof(int);
+            map<int, string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string s = string(buf + offset + itemsize*k + sizeof(int), strlen);
+              nullpos = s.find('\0');
+              if (nullpos != std::string::npos)
+                s.resize(nullpos);
+              x[*reinterpret_cast<int*>(buf + offset + itemsize*k)] = s;
+            }
+            is_row_selected = CmpConds<map<int, string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case MAP_INT_VL_STRING: {
+            unsigned int itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
+            jlen = col_sizes_[table][j] / itemsize;
+            map<int, string> x;
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x[*reinterpret_cast<int*>(buf + offset + itemsize*k)] = \
+                VLRead<string, VL_STRING>(buf + offset + itemsize*k + sizeof(int));
+            }
+            is_row_selected = CmpConds<map<int, string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_MAP_INT_STRING: {
+            map<int, string> x = VLRead<map<int, string>, VL_MAP_INT_STRING>(buf + offset);
+            is_row_selected = CmpConds<map<int, string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_MAP_INT_VL_STRING: {
+            map<int, string> x = VLRead<map<int, string>, VL_MAP_INT_VL_STRING>(buf + offset);
+            is_row_selected = CmpConds<map<int, string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_STRING_INT: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = col_sizes_[table][j] / fieldlen;
+            unsigned int strlen = itemsize - sizeof(int);
+            map<string, int> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string s = string(buf + offset + itemsize*k, strlen);
+              nullpos = s.find('\0');
+              if (nullpos != std::string::npos)
+                s.resize(nullpos);
+              x[s] = *reinterpret_cast<int*>(buf + offset + itemsize*k + strlen);
+            }
+            is_row_selected = CmpConds<map<string, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case VL_MAP_STRING_INT: {
+            map<string, int> x = VLRead<map<string, int>, VL_MAP_STRING_INT>(buf + offset);
+            is_row_selected = CmpConds<map<string, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_VL_STRING_INT: {
+            unsigned int itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
+            jlen = col_sizes_[table][j] / itemsize;
+            map<string, int> x;
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x[VLRead<string, VL_STRING>(buf + offset + itemsize*k)] = \
+                *reinterpret_cast<int*>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
+            }
+            is_row_selected = CmpConds<map<string, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_MAP_VL_STRING_INT: {
+            map<string, int> x = VLRead<map<string, int>, VL_MAP_VL_STRING_INT>(buf + offset);
+            is_row_selected = CmpConds<map<string, int> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_STRING_DOUBLE: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = col_sizes_[table][j] / fieldlen;
+            unsigned int strlen = itemsize - sizeof(double);
+            map<string, double> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string s = string(buf + offset + itemsize*k, strlen);
+              nullpos = s.find('\0');
+              if (nullpos != std::string::npos)
+                s.resize(nullpos);
+              x[s] = *reinterpret_cast<double*>(buf + offset + itemsize*k + strlen);
+            }
+            is_row_selected = CmpConds<map<string, double> >(&x, 
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case VL_MAP_STRING_DOUBLE: {
+            map<string, double> x = \
+              VLRead<map<string, double>, VL_MAP_STRING_DOUBLE>(buf + offset);
+            is_row_selected = CmpConds<map<string, double> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_STRING_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            hid_t item_type = H5Tget_super(field_type);
+            hid_t key_type = H5Tget_member_type(item_type, 0);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = col_sizes_[table][j] / fieldlen;
+            unsigned int keylen = H5Tget_size(key_type);
+            unsigned int vallen = itemsize - keylen;
+            map<string, string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string key = string(buf + offset + itemsize*k, keylen);
+              nullpos = key.find('\0');
+              if (nullpos != std::string::npos)
+                key.resize(nullpos);
+              string val = string(buf + offset + itemsize*k + keylen, vallen);
+              nullpos = val.find('\0');
+              if (nullpos != std::string::npos)
+                val.resize(nullpos);
+              x[key] = val;
+            }
+            is_row_selected = CmpConds<map<string, string> >(&x, 
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(key_type);
+            H5Tclose(item_type);
+            H5Tclose(field_type);
+            break;
+          }
+          case VL_MAP_STRING_STRING: {
+            map<string, string> x = \
+              VLRead<map<string, string>, VL_MAP_STRING_STRING>(buf + offset);
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_STRING_VL_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = col_sizes_[table][j] / fieldlen;
+            unsigned int keylen = itemsize - CYCLUS_SHA1_SIZE;
+            map<string, string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string key = string(buf + offset + itemsize*k, keylen);
+              nullpos = key.find('\0');
+              if (nullpos != std::string::npos)
+                key.resize(nullpos);
+              x[key] = VLRead<string, VL_STRING>(buf + offset + itemsize*k + keylen);
+            }
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case VL_MAP_STRING_VL_STRING: {
+            map<string, string> x = \
+              VLRead<map<string, string>, VL_MAP_STRING_VL_STRING>(buf + offset);
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_VL_STRING_DOUBLE: {
+            unsigned int itemsize = sizeof(double) + CYCLUS_SHA1_SIZE;
+            jlen = col_sizes_[table][j] / itemsize;
+            map<string, double> x;
+            for (unsigned int k = 0; k < jlen; ++k) {
+              x[VLRead<string, VL_STRING>(buf + offset + itemsize*k)] = \
+                *reinterpret_cast<double*>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
+            }
+            is_row_selected = CmpConds<map<string, double> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_MAP_VL_STRING_DOUBLE: {
+            map<string, double> x = \
+              VLRead<map<string, double>, VL_MAP_VL_STRING_DOUBLE>(buf + offset);
+            is_row_selected = CmpConds<map<string, double> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_VL_STRING_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = col_sizes_[table][j] / fieldlen;
+            unsigned int vallen = itemsize - CYCLUS_SHA1_SIZE;
+            map<string, string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string val = string(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE, vallen);
+              nullpos = val.find('\0');
+              if (nullpos != std::string::npos)
+                val.resize(nullpos);
+              x[VLRead<string, VL_STRING>(buf + offset + itemsize*k)] = val;
+            }
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case VL_MAP_VL_STRING_STRING: {
+            map<string, string> x = \
+              VLRead<map<string, string>, VL_MAP_VL_STRING_STRING>(buf + offset);
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_VL_STRING_VL_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = 2*CYCLUS_SHA1_SIZE;
+            map<string, string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              x[VLRead<string, VL_STRING>(buf + offset + itemsize*k)] = \
+                VLRead<string, VL_STRING>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
+            }
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case VL_MAP_VL_STRING_VL_STRING: {
+            map<string, string> x = \
+              VLRead<map<string, string>, VL_MAP_VL_STRING_VL_STRING>(buf + offset);
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
             if (is_row_selected)
               row[j] = x;
             break;
@@ -488,11 +876,19 @@ std::string Hdf5Back::Name() {
 }
 
 void Hdf5Back::CreateTable(Datum* d) {
+  using std::set;
+  using std::string;
+  using std::vector;
+  using std::list;
+  using std::pair;
+  using std::list;
+  using std::map;
   Datum::Vals vals = d->vals();
   hsize_t nvals = vals.size();
   Datum::Shape shape;
   Datum::Shapes shapes = d->shapes();
 
+  herr_t status;
   size_t dst_size = 0;
   size_t* dst_offset = new size_t[nvals];
   size_t* dst_sizes = new size_t[nvals];
@@ -607,6 +1003,38 @@ void Hdf5Back::CreateTable(Datum* d) {
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * shape[0];
       }
+    } else if (valtype == typeid(set<string>)) {
+      shape = shapes[i];
+      if (shape.empty() || (shape[0] < 1 && shape[1] < 1)) {
+        dbtypes[i] = VL_SET_VL_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_SET_VL_STRING) == 0) {
+          vldts_[VL_SET_VL_STRING] = H5Tvlen_create(sha1_type_);
+          opened_types_.insert(vldts_[VL_SET_VL_STRING]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] < 1 && shape[1] >= 1) {
+        dbtypes[i] = VL_SET_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_SET_STRING) == 0) {
+          vldts_[VL_SET_STRING] = H5Tvlen_create(sha1_type_);
+          opened_types_.insert(vldts_[VL_SET_STRING]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] >= 1 && shape[1] < 1) {
+        dbtypes[i] = SET_VL_STRING;
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(sha1_type_, 1, &shape0);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = SET_STRING;
+        hid_t str_type = CreateFLStrType(shape[1]);
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(str_type, 1, &shape0);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * shape[1];
+      }
     } else if (valtype == typeid(std::list<int>)) {
       shape = shapes[i];
       if (shape.empty() || shape[0] < 1) {
@@ -623,6 +1051,38 @@ void Hdf5Back::CreateTable(Datum* d) {
         field_types[i] = H5Tarray_create2(H5T_NATIVE_INT, 1, &shape0);
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * shape[0];
+      }
+    } else if (valtype == typeid(list<string>)) {
+      shape = shapes[i];
+      if (shape.empty() || (shape[0] < 1 && shape[1] < 1)) {
+        dbtypes[i] = VL_LIST_VL_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_LIST_VL_STRING) == 0) {
+          vldts_[VL_LIST_VL_STRING] = H5Tvlen_create(sha1_type_);
+          opened_types_.insert(vldts_[VL_LIST_VL_STRING]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] < 1 && shape[1] >= 1) {
+        dbtypes[i] = VL_LIST_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_LIST_STRING) == 0) {
+          vldts_[VL_LIST_STRING] = H5Tvlen_create(sha1_type_);
+          opened_types_.insert(vldts_[VL_LIST_STRING]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] >= 1 && shape[1] < 1) {
+        dbtypes[i] = LIST_VL_STRING;
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(sha1_type_, 1, &shape0);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = LIST_STRING;
+        hid_t str_type = CreateFLStrType(shape[1]);
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(str_type, 1, &shape0);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * shape[1];
       }
     } else if (valtype == typeid(std::pair<int, int>)) {
       dbtypes[i] = PAIR_INT_INT;
@@ -655,6 +1115,249 @@ void Hdf5Back::CreateTable(Datum* d) {
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * 2 * shape[0];
       }
+    } else if (valtype == typeid(std::map<int, double>)) {
+      shape = shapes[i];
+      hid_t item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) + sizeof(double));
+      H5Tinsert(item_type, "key", 0, H5T_NATIVE_INT);
+      H5Tinsert(item_type, "val", sizeof(int), H5T_NATIVE_DOUBLE);
+      if (shape.empty() || shape[0] < 1) {
+        dbtypes[i] = VL_MAP_INT_DOUBLE;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_INT_DOUBLE) == 0) {
+          vldts_[VL_MAP_INT_DOUBLE] = H5Tvlen_create(item_type);
+          opened_types_.insert(item_type);
+          opened_types_.insert(vldts_[VL_MAP_INT_DOUBLE]);
+        } else {
+          H5Tclose(item_type);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = MAP_INT_DOUBLE;
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = (sizeof(int) + sizeof(double)) * shape[0];
+        H5Tpack(field_types[i]);
+        H5Tpack(item_type);
+      }
+    } else if (valtype == typeid(map<int, string>)) {
+      shape = shapes[i];
+      hid_t item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) + CYCLUS_SHA1_SIZE);
+      H5Tinsert(item_type, "key", 0, H5T_NATIVE_INT);
+      H5Tinsert(item_type, "val", sizeof(int), sha1_type_);
+      if (shape.empty() || (shape[0] < 1 && shape[1] < 1)) {
+        dbtypes[i] = VL_MAP_INT_VL_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_INT_VL_STRING) == 0) {
+          vldts_[VL_MAP_INT_VL_STRING] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_INT_VL_STRING]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] < 1 && shape[1] >= 1) {
+        dbtypes[i] = VL_MAP_INT_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_INT_STRING) == 0) {
+          vldts_[VL_MAP_INT_STRING] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_INT_STRING]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] >= 1 && shape[1] < 1) {
+        dbtypes[i] = MAP_INT_VL_STRING;
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (sizeof(int) + CYCLUS_SHA1_SIZE);
+      } else {
+        dbtypes[i] = MAP_INT_STRING;
+        hid_t str_type = CreateFLStrType(shape[1]);
+        hsize_t shape0 = shape[0];
+        H5Tclose(item_type);
+        item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) + shape[1]);
+        H5Tinsert(item_type, "key", 0, H5T_NATIVE_INT);
+        H5Tinsert(item_type, "val", sizeof(int), str_type);
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (sizeof(int) + shape[1]);
+      }
+    } else if (valtype == typeid(map<string, int>)) {
+      shape = shapes[i];
+      hid_t item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) + CYCLUS_SHA1_SIZE);
+      H5Tinsert(item_type, "key", 0, sha1_type_);
+      H5Tinsert(item_type, "val", CYCLUS_SHA1_SIZE, H5T_NATIVE_INT);
+      if (shape.empty() || (shape[0] < 1 && shape[1] < 1)) {
+        dbtypes[i] = VL_MAP_VL_STRING_INT;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_VL_STRING_INT) == 0) {
+          vldts_[VL_MAP_VL_STRING_INT] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_VL_STRING_INT]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] < 1 && shape[1] >= 1) {
+        dbtypes[i] = VL_MAP_STRING_INT;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_STRING_INT) == 0) {
+          vldts_[VL_MAP_STRING_INT] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_STRING_INT]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] >= 1 && shape[1] < 1) {
+        dbtypes[i] = MAP_VL_STRING_INT;
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (sizeof(int) + CYCLUS_SHA1_SIZE);
+      } else {
+        dbtypes[i] = MAP_STRING_INT;
+        hid_t str_type = CreateFLStrType(shape[1]);
+        hsize_t shape0 = shape[0];
+        H5Tclose(item_type);
+        item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) + shape[1]);
+        H5Tinsert(item_type, "key", 0, str_type);
+        H5Tinsert(item_type, "val", shape[1], H5T_NATIVE_INT);
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (sizeof(int) + shape[1]);
+      }
+    } else if (valtype == typeid(map<string, double>)) {
+      shape = shapes[i];
+      hid_t item_type = H5Tcreate(H5T_COMPOUND, sizeof(double) + CYCLUS_SHA1_SIZE);
+      H5Tinsert(item_type, "key", 0, sha1_type_);
+      H5Tinsert(item_type, "val", CYCLUS_SHA1_SIZE, H5T_NATIVE_DOUBLE);
+      if (shape.empty() || (shape[0] < 1 && shape[1] < 1)) {
+        dbtypes[i] = VL_MAP_VL_STRING_DOUBLE;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_VL_STRING_DOUBLE) == 0) {
+          vldts_[VL_MAP_VL_STRING_DOUBLE] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_VL_STRING_DOUBLE]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] < 1 && shape[1] >= 1) {
+        dbtypes[i] = VL_MAP_STRING_DOUBLE;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_STRING_DOUBLE) == 0) {
+          vldts_[VL_MAP_STRING_DOUBLE] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_STRING_DOUBLE]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] >= 1 && shape[1] < 1) {
+        dbtypes[i] = MAP_VL_STRING_DOUBLE;
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (sizeof(double) + CYCLUS_SHA1_SIZE);
+      } else {
+        dbtypes[i] = MAP_STRING_DOUBLE;
+        hid_t str_type = CreateFLStrType(shape[1]);
+        hsize_t shape0 = shape[0];
+        H5Tclose(item_type);
+        item_type = H5Tcreate(H5T_COMPOUND, sizeof(double) + shape[1]);
+        H5Tinsert(item_type, "key", 0, str_type);
+        H5Tinsert(item_type, "val", shape[1], H5T_NATIVE_DOUBLE);
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (sizeof(double) + shape[1]);
+      }
+    } else if (valtype == typeid(map<string, string>)) {
+      shape = shapes[i];
+      hid_t item_type;
+      if (shape.empty() || shape[0] < 1) {
+        // dtype for VL_MAP_...
+        item_type = H5Tcreate(H5T_COMPOUND, 2*CYCLUS_SHA1_SIZE);
+        H5Tinsert(item_type, "key", 0, sha1_type_);
+        H5Tinsert(item_type, "val", CYCLUS_SHA1_SIZE, sha1_type_);
+      }
+      if (shape.empty() || (shape[0] < 1 && shape[1] < 1 && shape[2] < 1)) {
+        dbtypes[i] = VL_MAP_VL_STRING_VL_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_VL_STRING_VL_STRING) == 0) {
+          vldts_[VL_MAP_VL_STRING_VL_STRING] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_VL_STRING_VL_STRING]);
+        } else {
+          H5Tclose(item_type);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] < 1 && shape[1] >= 1 && shape[2] < 1) {
+        dbtypes[i] = VL_MAP_STRING_VL_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_STRING_VL_STRING) == 0) {
+          vldts_[VL_MAP_STRING_VL_STRING] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_STRING_VL_STRING]);
+        } else {
+          H5Tclose(item_type);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] < 1 && shape[1] < 1 && shape[2] >= 1) {
+        dbtypes[i] = VL_MAP_VL_STRING_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_VL_STRING_STRING) == 0) {
+          vldts_[VL_MAP_VL_STRING_STRING] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_VL_STRING_STRING]);
+        } else {
+          H5Tclose(item_type);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] < 1 && shape[1] >= 1 && shape[2] >= 1) {
+        dbtypes[i] = VL_MAP_STRING_STRING;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_MAP_STRING_STRING) == 0) {
+          vldts_[VL_MAP_STRING_STRING] = H5Tvlen_create(item_type);
+          opened_types_.insert(vldts_[VL_MAP_STRING_STRING]);
+        } else {
+          H5Tclose(item_type);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else if (shape[0] >= 1 && shape[1] < 1 && shape[2] < 1) {
+        hsize_t shape0 = shape[0];
+        dbtypes[i] = MAP_VL_STRING_VL_STRING;
+        item_type = H5Tcreate(H5T_COMPOUND, 2*CYCLUS_SHA1_SIZE);
+        H5Tinsert(item_type, "key", 0, sha1_type_);
+        H5Tinsert(item_type, "val", CYCLUS_SHA1_SIZE, sha1_type_);
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * 2 * CYCLUS_SHA1_SIZE;
+      } else if (shape[0] >= 1 && shape[1] < 1 && shape[2] >= 1) {
+        hsize_t shape0 = shape[0];
+        dbtypes[i] = MAP_VL_STRING_STRING;
+        hid_t val_type = CreateFLStrType(shape[2]);
+        item_type = H5Tcreate(H5T_COMPOUND, CYCLUS_SHA1_SIZE + shape[2]);
+        H5Tinsert(item_type, "key", 0, sha1_type_);
+        H5Tinsert(item_type, "val", CYCLUS_SHA1_SIZE, val_type);
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (CYCLUS_SHA1_SIZE + shape[2]);
+      } else if (shape[0] >= 1 && shape[1] >= 1 && shape[2] < 1) {
+        hsize_t shape0 = shape[0];
+        dbtypes[i] = MAP_STRING_VL_STRING;
+        hid_t key_type = CreateFLStrType(shape[1]);
+        item_type = H5Tcreate(H5T_COMPOUND, CYCLUS_SHA1_SIZE + shape[1]);
+        H5Tinsert(item_type, "key", 0, key_type);
+        H5Tinsert(item_type, "val", shape[1], sha1_type_);
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (CYCLUS_SHA1_SIZE + shape[1]);
+      } else {
+        dbtypes[i] = MAP_STRING_STRING;
+        hsize_t shape0 = shape[0];
+        hid_t key_type = CreateFLStrType(shape[1]);
+        hid_t val_type = CreateFLStrType(shape[2]);
+        item_type = H5Tcreate(H5T_COMPOUND, shape[1] + shape[2]);
+        H5Tinsert(item_type, "key", 0, key_type);
+        H5Tinsert(item_type, "val", shape[1], val_type);
+        field_types[i] = H5Tarray_create2(item_type, 1, &shape0);
+        opened_types_.insert(item_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = shape[0] * (shape[1] + shape[2]);
+      }
     } else {
       throw IOError("the type for column '" + std::string(field_names[i]) + \
                     "' is not yet supported in HDF5.");
@@ -662,10 +1365,9 @@ void Hdf5Back::CreateTable(Datum* d) {
     dst_size += dst_sizes[i];
   }
 
-  herr_t status;
   const char* title = d->title().c_str();
   int compress = 1;
-  int chunk_size = 1000;
+  int chunk_size = 1024;
   void* fill_data = NULL;
   void* data = NULL;
 
@@ -709,6 +1411,7 @@ void Hdf5Back::CreateTable(Datum* d) {
 
 void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
+  const char * c_title = title.c_str();
 
   size_t* offsets = col_offsets_[title];
   size_t* sizes = col_sizes_[title];
@@ -717,12 +1420,54 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   char* buf = new char[group.size() * rowsize];
   FillBuf(title, buf, group, sizes, rowsize);
 
-  herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
-                              offsets, sizes, buf);
+  // We cannot do the simple thing (append_records) here because of a bug in 
+  // H5TB where it stupidly tries to reconstruct the datatype in memory from 
+  // what it read in on disk. This works in most cases but failed where the table
+  // had a column which is an array of a compound datatype of non-homogenous
+  // fields (eg MAP_INT_DOUBLE). The fix here just uses the datatype present on 
+  // disk - which is what we wanted anyway!
+  //herr_t status = H5TBappend_records(file_, title.c_str(), group.size(), rowsize,
+  //                            offsets, sizes, buf);
+  herr_t status;
+  hid_t dset = H5Dopen2(file_, title.c_str(), H5P_DEFAULT);
+  hid_t dtype = H5Dget_type(dset);
+  hsize_t nrecords_add = group.size();
+  hsize_t nrecords_orig;
+  hsize_t nfields;
+  hsize_t dims[1];
+  hsize_t offset[1];
+  hsize_t count[1];
+  H5TBget_table_info(file_, c_title, &nfields, &nrecords_orig);
+  dims[0] = nrecords_add + nrecords_orig;
+  offset[0] = nrecords_orig;
+  count[0] = nrecords_add;
+
+  status = H5Dset_extent(dset, dims);
+  hid_t dspace = H5Dget_space(dset);
+  hid_t memspace = H5Screate_simple(1, count, NULL);
+  status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+  status = H5Dwrite(dset, dtype, memspace, dspace, H5P_DEFAULT, buf);
+
   if (status < 0) {
-    throw IOError("Failed to write some data to the '" + title + "' table in "
-                  "the hdf5 database.");
+    std::stringstream ss; 
+    ss << "Failed to write to the HDF5 table:\n" \
+       << "  file      " << path_ << "\n" \
+       << "  table     " << title << "\n" \
+       << "  num. rows " << group.size() << "\n"
+       << "  rowsize   " << rowsize << "\n";
+    for (int i = 0; i < group.front()->vals().size(); ++i) {
+      ss << "    # Column " << i << "\n" \
+         << "      dbtype: " << schemas_[title][i] << "\n" \
+         << "      size:   " << sizes[i] << "\n" \
+         << "      offset: " << offsets[i] << "\n";
+    }
+    throw IOError(ss.str());
   }
+
+  H5Sclose(memspace);
+  H5Sclose(dspace);
+  H5Tclose(dtype);
+  H5Dclose(dset);
   delete[] buf;
 }
 
@@ -900,6 +1645,49 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
+        case SET_STRING: {
+          set<string> val = a->cast<set<string> >();
+          shape = shapes[col];
+          fieldlen = shape[1];
+          unsigned int cnt = 0;
+          for (set<string>::iterator sit = val.begin(); sit != val.end(); ++sit) {
+            valuelen = std::min(sit->size(), fieldlen);
+            memcpy(buf + offset + fieldlen*cnt, sit->c_str(), valuelen);
+            memset(buf + offset + fieldlen*cnt + valuelen, 0, fieldlen - valuelen);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (shape[0] - cnt));
+          break;
+        }
+        case SET_VL_STRING: {
+          set<string> val = a->cast<set<string> >();
+          Digest key;
+          unsigned int cnt = 0;
+          for (set<string>::iterator sit = val.begin(); sit != val.end(); ++sit) {
+            key = VLWrite<string, VL_STRING>(*sit);
+            memcpy(buf + offset + CYCLUS_SHA1_SIZE*cnt, key.val, CYCLUS_SHA1_SIZE);
+            ++cnt;
+          }
+          memset(buf+offset+CYCLUS_SHA1_SIZE*cnt, 0, CYCLUS_SHA1_SIZE*(val.size()-cnt));
+          break;
+        }
+        case VL_SET_STRING: {
+          shape = shapes[col];
+          size_t strlen = shape[1];
+          set<string> givenval = a->cast<set<string> >();
+          set<string> val;
+          // ensure string is of specified length
+          for (set<string>::iterator sit = givenval.begin(); sit != givenval.end(); ++sit)
+            val.insert(string((*sit), 0, strlen));
+          Digest key = VLWrite<set<string>, VL_SET_STRING>(val);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case VL_SET_VL_STRING: {
+          Digest key = VLWrite<set<string>, VL_SET_VL_STRING>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
         case LIST_INT: {
           std::list<int> val = a->cast<std::list<int> >();
           fieldlen = sizes[col];
@@ -915,6 +1703,52 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         }
         case VL_LIST_INT: {
           Digest key = VLWrite<std::list<int>, VL_LIST_INT>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case LIST_STRING: {
+          list<string> val = a->cast<list<string> >();
+          shape = shapes[col];
+          fieldlen = shape[1];
+          unsigned int cnt = 0;
+          list<string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            valuelen = std::min(valit->size(), fieldlen);
+            memcpy(buf + offset + fieldlen*cnt, valit->c_str(), valuelen);
+            memset(buf + offset + fieldlen*cnt + valuelen, 0, fieldlen - valuelen);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (shape[0] - cnt));
+          break;
+        }
+        case LIST_VL_STRING: {
+          list<string> val = a->cast<list<string> >();
+          Digest key;
+          unsigned int cnt = 0;
+          list<string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            key = VLWrite<string, VL_STRING>(*valit);
+            memcpy(buf + offset + CYCLUS_SHA1_SIZE*cnt, key.val, CYCLUS_SHA1_SIZE);
+            ++cnt;
+          }
+          memset(buf+offset+CYCLUS_SHA1_SIZE*cnt, 0, CYCLUS_SHA1_SIZE*(val.size()-cnt));
+          break;
+        }
+        case VL_LIST_STRING: {
+          shape = shapes[col];
+          size_t strlen = shape[1];
+          list<string> givenval = a->cast<list<string> >();
+          list<string> val;
+          // ensure string is of specified length
+          list<string>::iterator valit = givenval.begin();
+          for (; valit != givenval.end(); ++valit)
+            val.push_back(string((*valit), 0, strlen));
+          Digest key = VLWrite<list<string>, VL_LIST_STRING>(val);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case VL_LIST_VL_STRING: {
+          Digest key = VLWrite<list<string>, VL_LIST_VL_STRING>(a);
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
@@ -942,8 +1776,299 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
+        case MAP_INT_DOUBLE: {
+          map<int, double> val = a->cast<map<int, double> >();
+          size_t itemsize = sizeof(int) + sizeof(double);
+          fieldlen = sizes[col];
+          valuelen = min(itemsize * val.size(), fieldlen);
+          unsigned int cnt = 0;
+          for (map<int, double>::iterator valit = val.begin(); valit != val.end(); ++valit) {
+            memcpy(buf + offset + itemsize*cnt, &(valit->first), sizeof(int));
+            memcpy(buf + offset + itemsize*cnt + sizeof(int), &(valit->second), 
+                                                              sizeof(double));
+            ++cnt;
+          }
+          memset(buf + offset + valuelen, 0, fieldlen - valuelen);
+          break;
+        }
+        case VL_MAP_INT_DOUBLE: {
+          Digest key = VLWrite<map<int, double>, VL_MAP_INT_DOUBLE>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_INT_STRING: {
+          map<int, string> val = a->cast<map<int, string> >();
+          shape = shapes[col];
+          int strlen = shape[1];
+          fieldlen = sizeof(int) + strlen;
+          unsigned int cnt = 0;
+          map<int, string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            memcpy(buf + offset + fieldlen*cnt, &(valit->first), sizeof(int));
+            valuelen = std::min(static_cast<int>(valit->second.size()), strlen);
+            memcpy(buf + offset + fieldlen*cnt + sizeof(int), 
+                   valit->second.c_str(), valuelen);
+            memset(buf + offset + fieldlen*cnt + sizeof(int) + valuelen, 0, 
+                   strlen - valuelen);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (shape[0] - cnt));
+          break;
+        }
+        case MAP_INT_VL_STRING: {
+          map<int, string> val = a->cast<map<int, string> >();
+          Digest valhash;
+          fieldlen = sizeof(int) + CYCLUS_SHA1_SIZE;
+          unsigned int cnt = 0;
+          map<int, string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            memcpy(buf + offset + fieldlen*cnt, &(valit->first), sizeof(int));
+            valhash = VLWrite<string, VL_STRING>(valit->second);
+            memcpy(buf + offset + fieldlen*cnt + sizeof(int), valhash.val, 
+                   CYCLUS_SHA1_SIZE);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (val.size() - cnt));
+          break;
+        }
+        case VL_MAP_INT_STRING: {
+          shape = shapes[col];
+          size_t strlen = shape[1];
+          map<int, string> givenval = a->cast<map<int, string> >();
+          map<int, string> val;
+          // ensure string is of specified length
+          map<int, string>::iterator valit = givenval.begin();
+          for (; valit != givenval.end(); ++valit)
+            val[valit->first] = string(valit->second, 0, strlen);
+          Digest key = VLWrite<map<int, string>, VL_MAP_INT_STRING>(val);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case VL_MAP_INT_VL_STRING: {
+          Digest key = VLWrite<map<int, string>, VL_MAP_INT_VL_STRING>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_STRING_INT: {
+          map<string, int> val = a->cast<map<string, int> >();
+          shape = shapes[col];
+          int strlen = shape[1];
+          fieldlen = sizeof(int) + strlen;
+          unsigned int cnt = 0;
+          map<string, int>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            valuelen = std::min(static_cast<int>(valit->first.size()), strlen);
+            memcpy(buf + offset + fieldlen*cnt, valit->first.c_str(), valuelen);
+            memset(buf + offset + fieldlen*cnt + valuelen, 0, strlen - valuelen);
+            memcpy(buf + offset + fieldlen*cnt + strlen, &(valit->second), sizeof(int));
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (shape[0] - cnt));
+          break;
+        }
+        case MAP_VL_STRING_INT: {
+          map<string, int> val = a->cast<map<string, int> >();
+          Digest keyhash;
+          fieldlen = sizeof(int) + CYCLUS_SHA1_SIZE;
+          unsigned int cnt = 0;
+          map<string, int>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            keyhash = VLWrite<string, VL_STRING>(valit->first);
+            memcpy(buf + offset + fieldlen*cnt, keyhash.val, CYCLUS_SHA1_SIZE);
+            memcpy(buf + offset + fieldlen*cnt + CYCLUS_SHA1_SIZE, &(valit->second), 
+                   sizeof(int));
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (val.size() - cnt));
+          break;
+        }
+        case VL_MAP_STRING_INT: {
+          shape = shapes[col];
+          size_t strlen = shape[1];
+          map<string, int> givenval = a->cast<map<string, int> >();
+          map<string, int> val;
+          // ensure string is of specified length
+          map<string, int>::iterator valit = givenval.begin();
+          for (; valit != givenval.end(); ++valit)
+            val[string(valit->first, 0, strlen)] = valit->second;
+          Digest key = VLWrite<map<string, int>, VL_MAP_STRING_INT>(val);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case VL_MAP_VL_STRING_INT: {
+          Digest key = VLWrite<map<string, int>, VL_MAP_VL_STRING_INT>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_STRING_DOUBLE: {
+          map<string, double> val = a->cast<map<string, double> >();
+          shape = shapes[col];
+          int strlen = shape[1];
+          fieldlen = sizeof(double) + strlen;
+          unsigned int cnt = 0;
+          map<string, double>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            valuelen = std::min(static_cast<int>(valit->first.size()), strlen);
+            memcpy(buf + offset + fieldlen*cnt, valit->first.c_str(), valuelen);
+            memset(buf + offset + fieldlen*cnt + valuelen, 0, strlen - valuelen);
+            memcpy(buf + offset + fieldlen*cnt + strlen, &(valit->second), 
+                   sizeof(double));
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (shape[0] - cnt));
+          break;
+        }
+        case VL_MAP_STRING_DOUBLE: {
+          shape = shapes[col];
+          size_t strlen = shape[1];
+          map<string, double> givenval = a->cast<map<string, double> >();
+          map<string, double> val;
+          // ensure string is of specified length
+          map<string, double>::iterator valit = givenval.begin();
+          for (; valit != givenval.end(); ++valit)
+            val[string(valit->first, 0, strlen)] = valit->second;
+          Digest key = VLWrite<map<string, double>, VL_MAP_STRING_DOUBLE>(val);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+
+
+        case MAP_STRING_STRING: {
+          map<string, string> val = a->cast<map<string, string> >();
+          shape = shapes[col];
+          int keylen = shape[1];
+          int vallen = shape[2];
+          fieldlen = keylen + vallen;
+          unsigned int cnt = 0;
+          int truekeylen;
+          int truevallen;
+          map<string, string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            truekeylen = std::min(static_cast<int>(valit->first.size()), keylen);
+            memcpy(buf + offset + fieldlen*cnt, valit->first.c_str(), truekeylen);
+            memset(buf + offset + fieldlen*cnt + truekeylen, 0, keylen - truekeylen);
+            truevallen = std::min(static_cast<int>(valit->second.size()), vallen);
+            memcpy(buf + offset + fieldlen*cnt + keylen, valit->second.c_str(),
+                   truevallen);
+            memset(buf + offset + fieldlen*cnt + keylen + truekeylen, 0, 
+                   vallen - truevallen);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (shape[0] - cnt));
+          break;
+        }
+        case VL_MAP_STRING_STRING: {
+          shape = shapes[col];
+          size_t keylen = shape[1];
+          size_t vallen = shape[2];
+          map<string, string> givenval = a->cast<map<string, string> >();
+          map<string, string> val;
+          // ensure strings of specified length
+          map<string, string>::iterator valit = givenval.begin();
+          for (; valit != givenval.end(); ++valit)
+            val[string(valit->first, 0, keylen)] = string(valit->second, 0, vallen);
+          Digest key = VLWrite<map<string, string>, VL_MAP_STRING_STRING>(val);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_STRING_VL_STRING: {
+          map<string, string> val = a->cast<map<string, string> >();
+          Digest valhash;
+          shape = shapes[col];
+          size_t keylen = shape[1];
+          fieldlen = CYCLUS_SHA1_SIZE + keylen;
+          int truekeylen;
+          unsigned int cnt = 0;
+          map<string, string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            truekeylen = std::min(valit->first.size(), keylen);
+            memcpy(buf + offset + fieldlen*cnt, valit->first.c_str(), truekeylen);
+            memset(buf + offset + fieldlen*cnt + truekeylen, 0, keylen - truekeylen);
+            valhash = VLWrite<string, VL_STRING>(valit->second);
+            memcpy(buf + offset + fieldlen*cnt + keylen, valhash.val, CYCLUS_SHA1_SIZE);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (val.size() - cnt));
+          break;
+        }
+        case VL_MAP_STRING_VL_STRING: {
+          Digest key = VLWrite<map<string, string>, VL_MAP_STRING_VL_STRING>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_VL_STRING_DOUBLE: {
+          map<string, double> val = a->cast<map<string, double> >();
+          Digest keyhash;
+          fieldlen = sizeof(double) + CYCLUS_SHA1_SIZE;
+          unsigned int cnt = 0;
+          map<string, double>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            keyhash = VLWrite<string, VL_STRING>(valit->first);
+            memcpy(buf + offset + fieldlen*cnt, keyhash.val, CYCLUS_SHA1_SIZE);
+            memcpy(buf + offset + fieldlen*cnt + CYCLUS_SHA1_SIZE, &(valit->second), 
+                   sizeof(double));
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (val.size() - cnt));
+          break;
+        }
+        case VL_MAP_VL_STRING_DOUBLE: {
+          Digest key = VLWrite<map<string, double>, VL_MAP_VL_STRING_DOUBLE>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_VL_STRING_STRING: {
+          map<string, string> val = a->cast<map<string, string> >();
+          Digest keyhash;
+          shape = shapes[col];
+          size_t vallen = shape[2];
+          fieldlen = CYCLUS_SHA1_SIZE + vallen;
+          int truevallen;
+          unsigned int cnt = 0;
+          map<string, string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            keyhash = VLWrite<string, VL_STRING>(valit->first);
+            memcpy(buf + offset + fieldlen*cnt, keyhash.val, CYCLUS_SHA1_SIZE);
+            truevallen = std::min(valit->second.size(), vallen);
+            memcpy(buf + offset + fieldlen*cnt + CYCLUS_SHA1_SIZE, valit->second.c_str(), truevallen);
+            memset(buf + offset + fieldlen*cnt + CYCLUS_SHA1_SIZE + truevallen, 0, 
+                   vallen - truevallen);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (val.size() - cnt));
+          break;
+        }
+        case VL_MAP_VL_STRING_STRING: {
+          Digest key = VLWrite<map<string, string>, VL_MAP_VL_STRING_STRING>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_VL_STRING_VL_STRING: {
+          map<string, string> val = a->cast<map<string, string> >();
+          Digest keyhash;
+          Digest valhash;
+          shape = shapes[col];
+          fieldlen = 2 * CYCLUS_SHA1_SIZE;
+          unsigned int cnt = 0;
+          map<string, string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            keyhash = VLWrite<string, VL_STRING>(valit->first);
+            memcpy(buf + offset + fieldlen*cnt, keyhash.val, CYCLUS_SHA1_SIZE);
+            valhash = VLWrite<string, VL_STRING>(valit->second);
+            memcpy(buf + offset + fieldlen*cnt + CYCLUS_SHA1_SIZE, valhash.val, 
+                   CYCLUS_SHA1_SIZE);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (val.size() - cnt));
+          break;
+        }
+        case VL_MAP_VL_STRING_VL_STRING: {
+          Digest key = VLWrite<map<string, string>, VL_MAP_VL_STRING_VL_STRING>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
         default: {
-          throw ValueError("attempted to retrieve unsupported sqlite backend type");
+          throw ValueError("attempted to retrieve unsupported HDF5 backend type");
         }
       }
       offset += sizes[col];
@@ -1005,12 +2130,48 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
       name = "SetInt";
       break;
     }
+    case VL_SET_STRING:
+    case VL_SET_VL_STRING: {
+      name = "SetString";
+      break;
+    }
     case VL_LIST_INT: {
       name = "ListInt";
       break;
     }
+    case VL_LIST_STRING:
+    case VL_LIST_VL_STRING: {
+      name = "ListString";
+      break;
+    }
     case VL_MAP_INT_INT: {
       name = "MapIntInt";
+      break;
+    }
+    case VL_MAP_INT_DOUBLE: {
+      name = "MapIntDouble";
+      break;
+    }
+    case VL_MAP_INT_STRING:
+    case VL_MAP_INT_VL_STRING: {
+      name = "MapIntString";
+      break;
+    }
+    case VL_MAP_STRING_INT:
+    case VL_MAP_VL_STRING_INT: {
+      name = "MapStringInt";
+      break;
+    }
+    case VL_MAP_STRING_DOUBLE:
+    case VL_MAP_VL_STRING_DOUBLE: {
+      name = "MapStringDouble";
+      break;
+    }
+    case VL_MAP_STRING_STRING:
+    case VL_MAP_STRING_VL_STRING:
+    case VL_MAP_VL_STRING_STRING:
+    case VL_MAP_VL_STRING_VL_STRING: {
+      name = "MapStringString";
       break;
     }
     default: {
@@ -1162,7 +2323,7 @@ std::vector<int> Hdf5Back::VLBufToVal<std::vector<int> >(const hvl_t& buf) {
 };
 
 hvl_t Hdf5Back::VLValToBuf(const std::vector<std::string>& x) {
-  // VL_VECTOR_STRING implmented as VL_VECTOR_VL_STRING
+  // VL_VECTOR_STRING implemented as VL_VECTOR_VL_STRING
   hvl_t buf;
   Digest key;
   buf.len = x.size();
@@ -1205,6 +2366,32 @@ std::set<int> Hdf5Back::VLBufToVal<std::set<int> >(const hvl_t& buf) {
   return x;
 };
 
+hvl_t Hdf5Back::VLValToBuf(const std::set<std::string>& x) {
+  // VL_SET_STRING implemented as VL_SET_VL_STRING
+  hvl_t buf;
+  Digest key;
+  buf.len = x.size();
+  size_t nbytes = CYCLUS_SHA1_SIZE * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int i = 0;
+  std::set<std::string>::iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    key = VLWrite<std::string, VL_STRING>(*it);
+    memcpy((char *) buf.p + CYCLUS_SHA1_SIZE*i, key.val, CYCLUS_SHA1_SIZE);
+    ++i;
+  }
+  return buf;
+};
+
+template <>
+std::set<std::string> Hdf5Back::VLBufToVal<std::set<std::string> >(const hvl_t& buf) {
+  using std::string;
+  std::set<string> x;
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x.insert(VLRead<string, VL_STRING>((char *) buf.p + CYCLUS_SHA1_SIZE*i));
+  return x;
+};
+
 hvl_t Hdf5Back::VLValToBuf(const std::list<int>& x) {
   hvl_t buf;
   buf.len = x.size();
@@ -1223,6 +2410,32 @@ template <>
 std::list<int> Hdf5Back::VLBufToVal<std::list<int> >(const hvl_t& buf) {
   int* xraw = reinterpret_cast<int*>(buf.p);
   std::list<int> x = std::list<int>(xraw, xraw+buf.len);
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::list<std::string>& x) {
+  // VL_LIST_STRING implemented as VL_LIST_VL_STRING
+  hvl_t buf;
+  Digest key;
+  buf.len = x.size();
+  size_t nbytes = CYCLUS_SHA1_SIZE * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int i = 0;
+  std::list<std::string>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    key = VLWrite<std::string, VL_STRING>(*it);
+    memcpy((char *) buf.p + CYCLUS_SHA1_SIZE*i, key.val, CYCLUS_SHA1_SIZE);
+    ++i;
+  }
+  return buf;
+};
+
+template <>
+std::list<std::string> Hdf5Back::VLBufToVal<std::list<std::string> >(const hvl_t& buf) {
+  using std::string;
+  std::list<string> x;
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x.push_back(VLRead<string, VL_STRING>((char *) buf.p + CYCLUS_SHA1_SIZE*i));
   return x;
 };
 
@@ -1247,6 +2460,162 @@ std::map<int, int> Hdf5Back::VLBufToVal<std::map<int, int> >(const hvl_t& buf) {
   std::map<int, int> x = std::map<int, int>();
   for (unsigned int i = 0; i < buf.len; ++i)
     x[xraw[2*i]] = xraw[2*i + 1];
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::map<int, double>& x) {
+  hvl_t buf;
+  buf.len = x.size();
+  size_t itemsize = sizeof(int) + sizeof(double);
+  size_t nbytes = itemsize * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int cnt = 0;
+  std::map<int, double>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    memcpy((char *) buf.p + itemsize*cnt, &(it->first), sizeof(int));
+    memcpy((char *) buf.p + itemsize*cnt + sizeof(int), &(it->second), sizeof(double));
+    ++cnt;
+  }
+  return buf;
+};
+
+template <>
+std::map<int, double> Hdf5Back::VLBufToVal<std::map<int, double> >(const hvl_t& buf) {
+  std::map<int, double> x;
+  char * p = reinterpret_cast<char*>(buf.p);
+  size_t itemsize = sizeof(int) + sizeof(double);
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x[*reinterpret_cast<int*>(p + itemsize*i)] = \
+      *reinterpret_cast<double*>(p + itemsize*i + sizeof(int));
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::map<int, std::string>& x) {
+  // VL_MAP_INT_STRING implemented as VL_MAP_INT_VL_STRING
+  hvl_t buf;
+  Digest valhash;
+  buf.len = x.size();
+  size_t itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
+  size_t nbytes = itemsize * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int i = 0;
+  std::map<int, std::string>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    memcpy((char *) buf.p + itemsize*i, &(it->first), sizeof(int));
+    valhash = VLWrite<std::string, VL_STRING>(it->second);
+    memcpy((char *) buf.p + itemsize*i + sizeof(int), valhash.val, CYCLUS_SHA1_SIZE);
+    ++i;
+  }
+  return buf;
+};
+
+template <> std::map<int, std::string> 
+Hdf5Back::VLBufToVal<std::map<int, std::string> >(const hvl_t& buf) {
+  using std::string;
+  std::map<int, string> x;
+  char * p = reinterpret_cast<char*>(buf.p);
+  size_t itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x[*reinterpret_cast<int*>(p + itemsize*i)] = \
+      VLRead<string, VL_STRING>(p + itemsize*i + sizeof(int));
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::map<std::string, int>& x) {
+  // VL_MAP_STRING_INT implemented as VL_MAP_VL_STRING_INT
+  hvl_t buf;
+  Digest keyhash;
+  buf.len = x.size();
+  size_t itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
+  size_t nbytes = itemsize * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int i = 0;
+  std::map<std::string, int>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    keyhash = VLWrite<std::string, VL_STRING>(it->first);
+    memcpy((char *) buf.p + itemsize*i, keyhash.val, CYCLUS_SHA1_SIZE);
+    memcpy((char *) buf.p + itemsize*i + CYCLUS_SHA1_SIZE, &(it->second), sizeof(int));
+    ++i;
+  }
+  return buf;
+};
+
+template <> std::map<std::string, int> 
+Hdf5Back::VLBufToVal<std::map<std::string, int> >(const hvl_t& buf) {
+  using std::string;
+  std::map<string, int> x;
+  char * p = reinterpret_cast<char*>(buf.p);
+  size_t itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x[VLRead<string, VL_STRING>(p + itemsize*i)] = \
+      *reinterpret_cast<int*>(p + itemsize*i + CYCLUS_SHA1_SIZE);
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::map<std::string, double>& x) {
+  // VL_MAP_STRING_DOUBLE implemented as VL_MAP_VL_STRING_DOUBLE
+  hvl_t buf;
+  Digest keyhash;
+  buf.len = x.size();
+  size_t itemsize = sizeof(double) + CYCLUS_SHA1_SIZE;
+  size_t nbytes = itemsize * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int i = 0;
+  std::map<std::string, double>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    keyhash = VLWrite<std::string, VL_STRING>(it->first);
+    memcpy((char *) buf.p + itemsize*i, keyhash.val, CYCLUS_SHA1_SIZE);
+    memcpy((char *) buf.p + itemsize*i + CYCLUS_SHA1_SIZE, &(it->second),
+           sizeof(double));
+    ++i;
+  }
+  return buf;
+};
+
+template <> std::map<std::string, double> 
+Hdf5Back::VLBufToVal<std::map<std::string, double> >(const hvl_t& buf) {
+  using std::string;
+  std::map<string, double> x;
+  char * p = reinterpret_cast<char*>(buf.p);
+  size_t itemsize = sizeof(double) + CYCLUS_SHA1_SIZE;
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x[VLRead<string, VL_STRING>(p + itemsize*i)] = \
+      *reinterpret_cast<double*>(p + itemsize*i + CYCLUS_SHA1_SIZE);
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::map<std::string, std::string>& x) {
+  // VL_MAP_STRING_STRING, VL_MAP_STRING_VL_STRING, and VL_MAP_VL_STRING_STRING
+  // implemented as VL_MAP_VL_STRING_VL_STRING
+  hvl_t buf;
+  Digest keyhash;
+  Digest valhash;
+  buf.len = x.size();
+  size_t itemsize = 2*CYCLUS_SHA1_SIZE;
+  size_t nbytes = itemsize * buf.len;
+  buf.p = new char[nbytes];
+  unsigned int i = 0;
+  std::map<std::string, std::string>::const_iterator it = x.begin();
+  for (; it != x.end(); ++it) {
+    keyhash = VLWrite<std::string, VL_STRING>(it->first);
+    memcpy((char *) buf.p + itemsize*i, keyhash.val, CYCLUS_SHA1_SIZE);
+    valhash = VLWrite<std::string, VL_STRING>(it->second);
+    memcpy((char *) buf.p + itemsize*i + CYCLUS_SHA1_SIZE, valhash.val,
+           CYCLUS_SHA1_SIZE);
+    ++i;
+  }
+  return buf;
+};
+
+template <> std::map<std::string, std::string> 
+Hdf5Back::VLBufToVal<std::map<std::string, std::string> >(const hvl_t& buf) {
+  using std::string;
+  std::map<string, string> x;
+  char * p = reinterpret_cast<char*>(buf.p);
+  size_t itemsize = 2 * CYCLUS_SHA1_SIZE;
+  for (unsigned int i = 0; i < buf.len; ++i)
+    x[VLRead<string, VL_STRING>(p + itemsize*i)] = \
+      VLRead<string, VL_STRING>(p + itemsize*i + CYCLUS_SHA1_SIZE);
   return x;
 };
 
