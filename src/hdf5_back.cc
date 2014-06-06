@@ -2068,7 +2068,6 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           break;
         }
         default: {
-          std::cout << "dbtypes[col] " << dbtypes[col] << "\n";
           throw ValueError("attempted to retrieve unsupported HDF5 backend type");
         }
       }
