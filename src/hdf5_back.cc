@@ -716,6 +716,64 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case MAP_VL_STRING_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = col_sizes_[table][j] / fieldlen;
+            unsigned int vallen = itemsize - CYCLUS_SHA1_SIZE;
+            map<string, string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              string val = string(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE, vallen);
+              nullpos = val.find('\0');
+              if (nullpos != std::string::npos)
+                val.resize(nullpos);
+              x[VLRead<string, VL_STRING>(buf + offset + itemsize*k)] = val;
+            }
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case VL_MAP_VL_STRING_STRING: {
+            map<string, string> x = \
+              VLRead<map<string, string>, VL_MAP_VL_STRING_STRING>(buf + offset);
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case MAP_VL_STRING_VL_STRING: {
+            hid_t field_type = H5Tget_member_type(tb_type, j);
+            size_t nullpos;
+            hsize_t fieldlen;
+            H5Tget_array_dims2(field_type, &fieldlen);
+            unsigned int itemsize = 2*CYCLUS_SHA1_SIZE;
+            map<string, string> x;
+            for (unsigned int k = 0; k < fieldlen; ++k) {
+              x[VLRead<string, VL_STRING>(buf + offset + itemsize*k)] = \
+                VLRead<string, VL_STRING>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
+            }
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            H5Tclose(field_type);
+            break;
+          }
+          case VL_MAP_VL_STRING_VL_STRING: {
+            map<string, string> x = \
+              VLRead<map<string, string>, VL_MAP_VL_STRING_VL_STRING>(buf + offset);
+            is_row_selected = CmpConds<map<string, string> >(&x,
+                                                      &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
           default: {
             throw IOError("querying column '" + qr.fields[j] + "' in table '" + \
                           table + "' failed due to unsupported data type.");
@@ -1956,6 +2014,56 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         }
         case VL_MAP_VL_STRING_DOUBLE: {
           Digest key = VLWrite<map<string, double>, VL_MAP_VL_STRING_DOUBLE>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_VL_STRING_STRING: {
+          map<string, string> val = a->cast<map<string, string> >();
+          Digest keyhash;
+          shape = shapes[col];
+          size_t vallen = shape[2];
+          fieldlen = CYCLUS_SHA1_SIZE + vallen;
+          int truevallen;
+          unsigned int cnt = 0;
+          map<string, string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            keyhash = VLWrite<string, VL_STRING>(valit->first);
+            memcpy(buf + offset + fieldlen*cnt, keyhash.val, CYCLUS_SHA1_SIZE);
+            truevallen = std::min(valit->second.size(), vallen);
+            memcpy(buf + offset + fieldlen*cnt + CYCLUS_SHA1_SIZE, valit->second.c_str(), truevallen);
+            memset(buf + offset + fieldlen*cnt + CYCLUS_SHA1_SIZE + truevallen, 0, 
+                   vallen - truevallen);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (val.size() - cnt));
+          break;
+        }
+        case VL_MAP_VL_STRING_STRING: {
+          Digest key = VLWrite<map<string, string>, VL_MAP_VL_STRING_STRING>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
+        case MAP_VL_STRING_VL_STRING: {
+          map<string, string> val = a->cast<map<string, string> >();
+          Digest keyhash;
+          Digest valhash;
+          shape = shapes[col];
+          fieldlen = 2 * CYCLUS_SHA1_SIZE;
+          unsigned int cnt = 0;
+          map<string, string>::iterator valit = val.begin();
+          for (; valit != val.end(); ++valit) {
+            keyhash = VLWrite<string, VL_STRING>(valit->first);
+            memcpy(buf + offset + fieldlen*cnt, keyhash.val, CYCLUS_SHA1_SIZE);
+            valhash = VLWrite<string, VL_STRING>(valit->second);
+            memcpy(buf + offset + fieldlen*cnt + CYCLUS_SHA1_SIZE, valhash.val, 
+                   CYCLUS_SHA1_SIZE);
+            ++cnt;
+          }
+          memset(buf + offset + fieldlen*cnt, 0, fieldlen * (val.size() - cnt));
+          break;
+        }
+        case VL_MAP_VL_STRING_VL_STRING: {
+          Digest key = VLWrite<map<string, string>, VL_MAP_VL_STRING_VL_STRING>(a);
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
