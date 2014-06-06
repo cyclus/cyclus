@@ -588,6 +588,68 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringInt) {
   TestBasic<map<string, int> >("vl_map_vl_string_int", x, y);
 }
 
+TEST_F(Hdf5BackTests, ReadWriteMapStringDouble) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = 4;
+  map<string, double> x;
+  x["jazz"] = 6.0;
+  x["from"] = 28.0;
+  x["hell"] = 496.0;
+  map<string, double> y;
+  y["help"] = 42.0;
+  y["imma"] = 43.0;
+  y["rock"] = 44.0;
+  TestBasic<map<string, double> >("map_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapStringDouble) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 4;
+  map<string, double> x;
+  x["abso"] = 6.0;
+  x["lute"] = 28.0;
+  x["ly  "] = 496.0;
+  x["free"] = 8128.0;
+  map<string, double> y;
+  y["Arf!"] = 42.0;
+  y["Arf?"] = 43.0;
+  TestBasic<map<string, double> >("vl_map_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapVLStringDouble) {
+  using std::map;
+  using std::string;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  map<string, double> x;
+  x["you"] = 6.0;
+  x["are"] = 28.0;
+  x["probably"] = 496.0;
+  map<string, double> y;
+  y["wondering"] = 42.0;
+  y["why"] = 43.0;
+  y["I'm here!"] = 44.0;
+  TestBasic<map<string, double> >("map_vl_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringDouble) {
+  using std::map;
+  using std::string;
+  shape.clear();
+  map<string, double> x;
+  x["I am lonesome"] = 6.0;
+  x["Cowboy Burt"] = 28.0;
+  map<string, double> y;
+  y["Come smell my friend's shirt"] = 42.0;
+  TestBasic<map<string, double> >("vl_map_vl_string_double", x, y);
+}
 
 //
 // Multi-faceted unit tests
