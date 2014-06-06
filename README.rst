@@ -85,6 +85,8 @@ required library package names is:
 and (optionally):
 
 #. doxygen
+#. libblas-dev
+#. liblapack-dev
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -97,7 +99,7 @@ dependencies:
 
 .. code-block:: bash
   
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev
 
 Boost Note
 ----------
