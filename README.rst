@@ -35,6 +35,7 @@ On some platforms, such as Ubuntu 14.04, the following are also necessary:
 ====================   ==================
 Package                Minimum Version   
 ====================   ==================
+`g++`                  4.8.2
 `libblas-dev`          1.2
 `liblapack-dev`        3.5.0
 ====================   ==================
@@ -85,6 +86,7 @@ required library package names is:
 and (optionally):
 
 #. doxygen
+#. g++
 #. libblas-dev
 #. liblapack-dev
 
@@ -99,7 +101,7 @@ dependencies:
 
 .. code-block:: bash
   
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++
 
 Boost Note
 ----------
