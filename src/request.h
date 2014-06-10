@@ -5,6 +5,7 @@
 #include <string>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 namespace cyclus {
 
@@ -65,7 +66,7 @@ class Request {
 
   /// @return the portfolio of which this request is a part
   inline typename RequestPortfolio<T>::Ptr portfolio() const { 
-    return portfolio_;
+    return portfolio_.lock();
   }
 
   /// @return whether or not this an exclusive request
@@ -97,7 +98,7 @@ class Request {
   Trader* requester_;
   double preference_;
   std::string commodity_;
-  typename RequestPortfolio<T>::Ptr portfolio_;
+  boost::weak_ptr<RequestPortfolio<T> > portfolio_;
   bool exclusive_;
 };
 
