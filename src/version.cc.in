@@ -24,7 +24,7 @@ namespace version {
 static char h5version[15];
 
 const char* describe() {
-  return "1.0.0-rc4-36-g5076e44";
+  return "@core_version@";
 }
 
 const char* core() {
