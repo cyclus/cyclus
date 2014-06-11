@@ -99,7 +99,7 @@ void Material::Absorb(Material::Ptr mat) {
     compmath::Normalize(&v, qty_);
     CompMap otherv(mat->comp()->mass());
     compmath::Normalize(&otherv, mat->quantity());
-    comp_ = Composition::CreateFromAtom(compmath::Add(v, otherv));
+    comp_ = Composition::CreateFromMass(compmath::Add(v, otherv));
   }
   qty_ += mat->qty_;
   mat->qty_ = 0;

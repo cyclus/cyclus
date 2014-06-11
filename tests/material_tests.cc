@@ -6,6 +6,8 @@
 #include <gtest/gtest.h>
 
 #include "cyc_limits.h"
+#include "cyc_limits.h"
+#include "toolkit/mat_query.h"
 #include "error.h"
 
 namespace cyclus {
@@ -92,20 +94,34 @@ TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
   v[th228_] = 1.0 * units::g;
   Composition::Ptr diff_test_comp = Composition::CreateFromMass(
                                               v);
+  double diff_mat_qty = test_size_ / 2;
   Material::Ptr diff_test_mat = Material::CreateUntracked(
-                                        test_size_ / 2,
+                                        diff_mat_qty,
                                         diff_test_comp);
 
+  cyclus::toolkit::MatQuery mqdiff(diff_test_mat);
+  double pb208_qty = mqdiff.mass(pb208_);
+  double am241_qty = mqdiff.mass(am241_);
+  double th228_qty = mqdiff.mass(th228_);
+  double u235_qty = test_size_;
   double orig = test_mat_->quantity();
   double origdiff = diff_test_mat->quantity();
 
-  // see that materials with different compositions do the right thing
   ASSERT_NO_THROW(test_mat_->Absorb(diff_test_mat));
-  EXPECT_NE(test_mat_->comp(), diff_test_mat->comp());
-  EXPECT_NE(test_mat_->comp(), same_as_orig_test_mat->comp());
+
+  // check mass totals for absorption
   EXPECT_DOUBLE_EQ(orig + origdiff, test_mat_->quantity());
   EXPECT_TRUE(std::abs(same_as_orig_test_mat->quantity() -
                        test_mat_->quantity()) > eps_rsrc());
+
+  // test the new absorbed composition nuclide quantities
+  cyclus::toolkit::MatQuery mq(test_mat_);
+  EXPECT_NE(test_mat_->comp(), diff_test_mat->comp());
+  EXPECT_NE(test_mat_->comp(), same_as_orig_test_mat->comp());
+  EXPECT_DOUBLE_EQ(u235_qty, mq.mass(u235_));
+  EXPECT_DOUBLE_EQ(am241_qty, mq.mass(am241_));
+  EXPECT_DOUBLE_EQ(pb208_qty, mq.mass(pb208_));
+  EXPECT_DOUBLE_EQ(th228_qty, mq.mass(th228_));
 
   // see that an empty material appropriately absorbs a not empty material.
   ASSERT_NO_THROW(default_mat_->Absorb(test_mat_));
