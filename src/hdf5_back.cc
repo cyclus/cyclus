@@ -293,7 +293,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
             break;
           }
           case VL_VECTOR_DOUBLE: {
-            std::vector<double> x = VLRead<std::vector<double>, VL_VECTOR_INT>(buf + offset);
+            std::vector<double> x = VLRead<std::vector<double>, VL_VECTOR_DOUBLE>(buf + offset);
             is_row_selected = CmpConds<std::vector<double> >(&x, &(field_conds[qr.fields[j]]));
             if (is_row_selected)
               row[j] = x;
@@ -2370,6 +2370,22 @@ template <>
 std::vector<int> Hdf5Back::VLBufToVal<std::vector<int> >(const hvl_t& buf) {
   std::vector<int> x = std::vector<int>(buf.len);
   memcpy(&x[0], buf.p, buf.len * sizeof(int));
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::vector<double>& x) {
+  hvl_t buf;
+  buf.len = x.size();
+  size_t nbytes = buf.len * sizeof(double);
+  buf.p = new char[nbytes];
+  memcpy(buf.p, &x[0], nbytes);
+  return buf;
+};
+
+template <>
+std::vector<double> Hdf5Back::VLBufToVal<std::vector<double> >(const hvl_t& buf) {
+  std::vector<double> x = std::vector<double>(buf.len);
+  memcpy(&x[0], buf.p, buf.len * sizeof(double));
   return x;
 };
 
