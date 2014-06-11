@@ -63,6 +63,7 @@ class TestTrader : public TestFacility {
       std::set<RequestPortfolio<Material>::Ptr> ports;
       RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
       req = port->AddRequest(obj_fac->mat, this, obj_fac->commod);  // exp request
+      reqport = port;
       ports.insert(port);
       return ports;
     }
@@ -79,6 +80,7 @@ class TestTrader : public TestFacility {
       std::set<BidPortfolio<Material>::Ptr> ports;
       BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
       bid = port->AddBid(req, obj_fac->mat, this);  // exp bid
+      bidport = port;
       ports.insert(port);
       return ports;
     }
@@ -113,6 +115,8 @@ class TestTrader : public TestFacility {
   TestObjFactory* obj_fac;
   Request<Material>* req;  // obs or exp
   Bid<Material>* bid;  // obs or exp
+  BidPortfolio<Material>::Ptr bidport;
+  RequestPortfolio<Material>::Ptr reqport;
   Trade<Material> obs_trade;  // obs trade
   Material::Ptr mat;  // obs mat
   bool is_requester;

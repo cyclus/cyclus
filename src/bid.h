@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_BID_H_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include "request.h"
 
@@ -59,7 +60,7 @@ class Bid {
 
   /// @return the portfolio of which this bid is a part
   inline typename BidPortfolio<T>::Ptr portfolio() {
-    return portfolio_;
+    return portfolio_.lock();
   }
 
   /// @return whether or not this an exclusive bid
@@ -92,7 +93,7 @@ class Bid {
   Request<T>* request_;
   boost::shared_ptr<T> offer_;
   Trader* bidder_;
-  typename BidPortfolio<T>::Ptr portfolio_;
+  boost::weak_ptr<BidPortfolio<T> > portfolio_;
   bool exclusive_;
 };
 

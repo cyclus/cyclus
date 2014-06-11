@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 namespace cyclus {
 
@@ -79,22 +80,24 @@ class Arc {
   };
 
   inline bool operator <(const Arc& rhs) const {
-    return unode_ < rhs.unode() ||
-        (!(rhs.unode() < unode_) && vnode_ < rhs.vnode());
+    ExchangeNode::Ptr u = unode();
+    ExchangeNode::Ptr v = vnode();
+    return u < rhs.unode() ||
+        (!(rhs.unode() < u) && v < rhs.vnode());
   }
 
   inline bool operator==(const Arc& rhs) const {
-    return unode_ == rhs.unode() && vnode_ == rhs.vnode();
+    return unode() == rhs.unode() && vnode() == rhs.vnode();
   };
     
-  inline boost::shared_ptr<ExchangeNode> unode() const { return unode_; }
-  inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_; }  
+  inline boost::shared_ptr<ExchangeNode> unode() const { return unode_.lock(); }
+  inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }  
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
 
  private:
-  boost::shared_ptr<ExchangeNode> unode_;
-  boost::shared_ptr<ExchangeNode> vnode_;
+  boost::weak_ptr<ExchangeNode> unode_;
+  boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
   double excl_val_;
 };

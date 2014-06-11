@@ -1,5 +1,6 @@
 
 #include <sstream>
+#include <cstring>
 
 #include "version.h"
 
@@ -19,6 +20,9 @@
 
 namespace cyclus {
 namespace version {
+
+static char h5version[15];
+
 const char* describe() {
   return "@core_version@";
 }
@@ -36,12 +40,16 @@ const char* sqlite3() {
 }
 
 const char* hdf5() {
-  std::stringstream ss;
-  ss << H5_VERS_MAJOR << ".";
-  ss << H5_VERS_MINOR << ".";
-  ss << H5_VERS_RELEASE << "-";
-  ss << H5_VERS_SUBRELEASE;
-  return ss.str().c_str();
+  if (std::string("") == h5version) {
+    std::stringstream ss;
+    ss << H5_VERS_MAJOR << ".";
+    ss << H5_VERS_MINOR << ".";
+    ss << H5_VERS_RELEASE << "-";
+    ss << H5_VERS_SUBRELEASE;
+    memset(h5version, 0, 15);
+    memcpy(h5version, ss.str().c_str(), ss.str().size());
+  }
+  return h5version;
 }
 
 const char* xml2() {
