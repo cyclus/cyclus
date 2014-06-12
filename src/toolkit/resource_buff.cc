@@ -1,13 +1,18 @@
 // resource_buff.cc
 #include "resource_buff.h"
 
+#include <iomanip>
+
 namespace cyclus {
 namespace toolkit {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::set_capacity(double cap) {
   if (quantity() - cap > eps_rsrc()) {
-    throw ValueError("New capacity lower than existing quantity");
+    std::stringstream ss;
+    ss << std::setprecision(17) <<"new capacity " << cap
+       << " lower than existing quantity " << quantity();
+    throw ValueError(ss.str());
   }
   capacity_ = cap;
 }
@@ -15,7 +20,10 @@ void ResourceBuff::set_capacity(double cap) {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Manifest ResourceBuff::PopQty(double qty) {
   if (qty > quantity()) {
-    throw ValueError("Removal quantity larger than store tot quantity.");
+    std::stringstream ss;
+    ss << std::setprecision(17) <<"removal quantity " << qty
+       << " larger than buff quantity " << quantity();
+    throw ValueError(ss.str());
   }
 
   Manifest manifest;
@@ -41,13 +49,33 @@ Manifest ResourceBuff::PopQty(double qty) {
     left -= quan;
   }
 
+  if (count() == 0) {
+    qty_ = 0;
+  }
+
   return manifest;
 };
 
+Manifest ResourceBuff::PopQty(double qty, double eps) {
+  if (qty > quantity() + eps) {
+    std::stringstream ss;
+    ss << std::setprecision(17) <<"removal quantity " << qty
+       << " larger than buff quantity " << quantity();
+    throw ValueError(ss.str());
+  }
+
+  if (qty >= quantity()) {
+    return PopN(count());
+  }
+  return PopQty(qty);
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Manifest ResourceBuff::PopN(int num) {
-  if (mats_.size() < num) {
-    throw ValueError("Remove count larger than store count.");
+  if (count() < num || num < 0) {
+    std::stringstream ss;
+    ss << "remove count " << num << " larger than buff count " << count();
+    throw ValueError(ss.str());
   }
 
   Manifest manifest;
@@ -59,13 +87,17 @@ Manifest ResourceBuff::PopN(int num) {
     qty_ -= r->quantity();
   }
 
+  if (count() == 0) {
+    qty_ = 0;
+  }
+
   return manifest;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Resource::Ptr ResourceBuff::Pop(AccessDir dir) {
   if (mats_.size() < 1) {
-    throw ValueError("Cannot pop material from an empty store.");
+    throw ValueError("cannot pop material from an empty buff");
   }
   
   Resource::Ptr r;
@@ -79,15 +111,20 @@ Resource::Ptr ResourceBuff::Pop(AccessDir dir) {
   
   qty_ -= r->quantity();
   mats_present_.erase(r);
+
+  if (count() == 0) {
+    qty_ = 0;
+  }
+
   return r;
 };
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::Push(Resource::Ptr r) {
   if (r->quantity() - space() > eps_rsrc()) {
-    throw ValueError("Resource pushing breaks capacity limit.");
+    throw ValueError("resource pushing breaks capacity limit");
   } else if (mats_present_.count(r) == 1) {
-    throw KeyError("Duplicate resource pushing attempted");
+    throw KeyError("duplicate resource push attempted");
   }
 
   qty_ += r->quantity();
