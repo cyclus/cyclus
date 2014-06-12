@@ -7,6 +7,7 @@
 #include <set>
 
 #include <libxml++/libxml++.h>
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "xml_parser.h"
@@ -81,9 +82,31 @@ template <typename T>
     inline T Query(InfileTree* tree, std::string query, int index = 0) {
   return boost::lexical_cast<T>(tree->GetString(query, index).c_str());
 }
+
 template <>
     inline std::string Query(InfileTree* tree, std::string query, int index) {
   return tree->GetString(query, index);
+}
+
+template <>
+    inline int Query(InfileTree* tree, std::string query, int index) {
+  std::string s = tree->GetString(query, index);
+  boost::trim(s);
+  return boost::lexical_cast<int>(s.c_str());
+}
+
+template <>
+    inline float Query(InfileTree* tree, std::string query, int index) {
+  std::string s = tree->GetString(query, index);
+  boost::trim(s);
+  return boost::lexical_cast<float>(s.c_str());
+}
+
+template <>
+    inline double Query(InfileTree* tree, std::string query, int index) {
+  std::string s = tree->GetString(query, index);
+  boost::trim(s);
+  return boost::lexical_cast<double>(s.c_str());
 }
 
 /// @brief a query method for optional parameters
@@ -96,11 +119,44 @@ template <typename T>
     inline T OptionalQuery(InfileTree* tree, std::string query, T default_val) {
   T val;
   tree->NMatches(query) == 1 ?
-      val = boost::lexical_cast<T>(tree->GetString(query).c_str()) :
-      val = default_val;
+    val = boost::lexical_cast<T>(tree->GetString(query).c_str()) :
+    val = default_val;
   return val;
 }
   
+template <>
+    inline int OptionalQuery(InfileTree* tree, std::string query, int default_val) {
+  int val = default_val;
+  if (tree->NMatches(query) == 1) {
+    std::string s = tree->GetString(query);
+    boost::trim(s);
+    val = boost::lexical_cast<int>(s.c_str());
+  }
+  return val;
+}
+  
+template <>
+    inline float OptionalQuery(InfileTree* tree, std::string query, float default_val) {
+  float val = default_val;
+  if (tree->NMatches(query) == 1) {
+    std::string s = tree->GetString(query);
+    boost::trim(s);
+    val = boost::lexical_cast<float>(s.c_str());
+  }
+  return val;
+}
+
+template <>
+    inline double OptionalQuery(InfileTree* tree, std::string query, double default_val) {
+  double val = default_val;
+  if (tree->NMatches(query) == 1) {
+    std::string s = tree->GetString(query);
+    boost::trim(s);
+    val = boost::lexical_cast<double>(s.c_str());
+  }
+  return val;
+}
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_INFILE_TREE_H_

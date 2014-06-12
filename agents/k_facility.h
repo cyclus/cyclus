@@ -138,16 +138,19 @@ class KFacility : public cyclus::Facility {
  private:
   /// This facility has one output commodity and one input commodity
   #pragma cyclus var {"tooltip": "input commodity", \
-                      "doc": "commodity that the k-facility consumes"}
+                      "doc": "commodity that the k-facility consumes", \
+                      "schematype": "token"}
   std::string in_commod;
 
   #pragma cyclus var {"tooltip": "output commodity", \
-                      "doc": "commodity that the k-facility supplies"}
+                      "doc": "commodity that the k-facility supplies", \
+                      "schematype": "token"}
   std::string out_commod;
 
   /// Name of the recipe this facility uses.
   #pragma cyclus var {"shape": [50], "tooltip": "in-commodity recipe name", \
-                      "doc": "recipe name for the k-facility's in-commodity"}
+                      "doc": "recipe name for the k-facility's in-commodity", \
+                      "schematype": "token"}
   std::string recipe_name;
 
   /// The capacity is defined in terms of the number of units of the

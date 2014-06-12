@@ -54,11 +54,13 @@ class Predator : public cyclus::Facility  {
   
  private:
   #pragma cyclus var {"tooltip": "predator commodity", \
-                      "doc": "commodity that the predator supplies"}
+                      "doc": "commodity that the predator supplies", \
+                      "schematype": "token"}
   std::string commod;
 
   #pragma cyclus var {"tooltip": "predator's prey", \
-                      "doc": "prey that the predator hunts"}
+                      "doc": "prey that the predator hunts", \
+                      "schematype": "token"}
   std::string prey;
 
   /// how many prey until we're full

@@ -1100,6 +1100,37 @@ class SchemaFilter(CodeGeneratorFilter):
     pragmaname = "schema"
     methodrtn = "std::string"
 
+    alltypes = frozenset(['anyType', 'anySimpleType', 'string', 'boolean', 'decimal', 
+                          'float', 'double', 'duration', 'dateTime', 'time', 'date', 
+                          'gYearMonth', 'gYear', 'gMonthDay', 'gDay', 'gMonth', 
+                          'hexBinary', 'base64Binary', 'anyURI', 'QName', 'NOTATION', 
+                          'normalizedString', 'token', 'language', 'NMTOKEN', 
+                          'NMTOKENS', 'Name', 'NCName', 'ID', 'IDREF', 'IDREFS', 
+                          'ENTITY', 'ENTITIES', 'integer', 'nonPositiveInteger',
+                          'negativeInteger', 'long', 'int', 'short', 'byte',
+                          'nonNegativeInteger', 'unsignedLong', 'unsignedInt',
+                          'unsignedShort', 'unsignedByte', 'positiveInteger'])
+
+    # C++ type -> XML Schema type
+    default_types = {
+        'bool': 'boolean',
+        'std::string': 'string',
+        'int': 'int',
+        'float': 'float',
+        'double': 'double', 
+        'cyclus::Blob': 'string', 
+        'boost::uuids::uuid': 'token',
+        }
+
+    def _type(self, cpp, given=None):
+        """Finds a schema type for a C++ type with a possible type given."""
+        if given is not None:
+            if given in self.alltypes:
+                return given
+            raise TypeError("{0!r} is not a valid XML schema data type, see "
+                            "http://www.w3.org/TR/xmlschema-2/ for more information.")
+        return self.default_types[cpp]
+
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
@@ -1117,6 +1148,7 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]
                 continue
             t = info['type']
+            schematype = info.get('schematype', None)
             if t in BUFFERS: # buffer state, skip
                 continue
             if 'derived_init' in info: # derived state, skip
@@ -1129,13 +1161,13 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
                 impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
                 if t[0] in ['std::set', 'std::vector', 'std::list']:
-                    el_type = t[1].replace('std::', '')
+                    el_type = self._type(t[1], schematype)
                     impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
                     impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, el_type)
                     impl += i + '"{0}</element>\\n"\n'.format(xi.down())
                 else: # map
-                    k_type = t[1].replace('std::', '')
-                    v_type = t[2].replace('std::', '')
+                    k_type = self._type(t[1], schematype[0])
+                    v_type = self._type(t[2], schematype[1])
                     impl += i + '"{0}<element name=\\"key\\">\\n"\n'.format(xi.up())
                     impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, k_type)
                     impl += i + '"{0}</element>\\n"\n'.format(xi.down())
@@ -1145,25 +1177,25 @@ class SchemaFilter(CodeGeneratorFilter):
 
                 impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down(), member)
-            elif t == 'bool':
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
-                impl += i + '"{0}<data type=\\"boolean\\" />\\n"\n'.format(xi, t)
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t in PRIMITIVES:
+                d_type = self._type(t, schematype)
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t.replace('std::', ''))
+                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, d_type)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t[0] == 'std::pair':
+                f_type = self._type(t[1], schematype[0])
+                s_type = self._type(t[2], schematype[1])
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
                 impl += i + '"{0}<element name=\\"first\\">\\n"\n'.format(xi.up())
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t[1].replace('std::', ''))
+                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, f_type)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
                 impl += i + '"{0}<element name=\\"second\\">\\n"\n'.format(xi.up())
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, t[2].replace('std::', ''))
+                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, s_type)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             else:
-                raise RuntimeError('{0}Unsupported type {1}'.format(self.machine.includeloc(), t))
+                msg = '{0}Unsupported type {1}'.format(self.machine.includeloc(), t)
+                raise RuntimeError(msg)
 
             if opt:
                 impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
