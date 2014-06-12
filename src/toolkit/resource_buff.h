@@ -79,15 +79,19 @@ class ResourceBuff {
   };
 
   /// PopQty pops the specified quantity of resources from the
-  /// store.
+  /// buffer.
   ///
   /// Resources are split if necessary in order to pop the exact quantity
   /// specified (within eps_rsrc()).  Resources are retrieved in the order they were
   /// pushed (i.e. oldest first).
   ///
-  /// @throws ValueError the specified pop quantity is larger (by
-  /// eps_rsrc()) than the store's current quantity.
+  /// @throws ValueError the specified pop quantity is larger than the
+  /// buffer's current quantity.
   Manifest PopQty(double qty);
+  
+  /// Same behavior as PopQty(double) except a non-zero eps may be specified
+  /// for cases where qty might be larger than the buffer's current quantity.
+  Manifest PopQty(double qty, double eps);
 
   /// PopN pops the specified number or count of resource objects from the
   /// store.
