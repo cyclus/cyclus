@@ -13,7 +13,7 @@ namespace cyclus {
 /// requires knowlege of ticks and tocks. The agent should register as a
 /// TimeListener with its context from its Deploy method. For Example:
 ///
-/// @begincode
+/// @code
 ///
 /// MyFacility::Build(cyclus::Agent* parent) {
 ///   cyclus::Facility::Build(parent);
