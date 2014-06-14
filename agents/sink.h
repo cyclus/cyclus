@@ -57,7 +57,8 @@ class Sink : public cyclus::Facility  {
  private:
   #pragma cyclus var {"doc": "commodities that the sink facility " \
                              "accepts", \
-                      "tooltip": "input commodities"}
+                      "tooltip": "input commodities", \
+                      "schematype": "token"}
   std::vector<std::string> in_commods;
 
   #pragma cyclus var {"doc": "capacity the sink facility can " \

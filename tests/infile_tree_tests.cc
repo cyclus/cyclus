@@ -135,7 +135,7 @@ TEST_F(InfileTreeTest, optional_queries) {
   string str_other = "some_str";
   string str_str = "string";
   ss << "<root>"
-     << "<" << dbl_str << ">" << dbl_val << "</" << dbl_str << ">"
+     << "<" << dbl_str << "> " << dbl_val << " </" << dbl_str << ">"
      << "<" << int_str << ">" << int_val << "</" << int_str << ">"
      << "<" << str_str << ">" << str_val << "</" << str_str << ">"
      << "</root>";

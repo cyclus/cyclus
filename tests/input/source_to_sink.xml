@@ -32,7 +32,7 @@
         <in_commods>
           <val>commodity</val>
         </in_commods>
-        <capacity>1.00</capacity>
+        <capacity>   1.00 </capacity>
       </Sink>
     </config>
   </facility>

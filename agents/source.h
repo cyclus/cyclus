@@ -89,12 +89,14 @@ class Source : public cyclus::Facility {
  private:
   #pragma cyclus var {"doc": "commodity that the source facility " \
                              "supplies", \
-                      "tooltip": "source commodity"}
+                      "tooltip": "source commodity", \
+                      "schematype": "token"}
   std::string commod;
 
   #pragma cyclus var {"doc": "recipe name for source facility's " \
                              "commodity", \
-                      "tooltip": "commodity recipe name"}
+                      "tooltip": "commodity recipe name", \
+                      "schematype": "token"}
   std::string recipe_name;
 
   /**
