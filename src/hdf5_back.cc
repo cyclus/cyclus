@@ -282,6 +282,23 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case VECTOR_FLOAT: {
+            std::vector<float> x = std::vector<float>(
+                                        col_sizes_[table][j] / sizeof(float));
+            memcpy(&x[0], buf + offset, col_sizes_[table][j]);
+            is_row_selected = CmpConds<std::vector<float> >(&x, 
+                                                 &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case VL_VECTOR_FLOAT: {
+            std::vector<float> x = VLRead<std::vector<float>, VL_VECTOR_FLOAT>(buf + offset);
+            is_row_selected = CmpConds<std::vector<float> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
           case VECTOR_DOUBLE: {
             std::vector<double> x = std::vector<double>(
                                         col_sizes_[table][j] / sizeof(double));
@@ -971,6 +988,23 @@ void Hdf5Back::CreateTable(Datum* d) {
         opened_types_.insert(field_types[i]);
         dst_sizes[i] = sizeof(int) * shape[0];
       }
+    } else if (valtype == typeid(std::vector<float>)) {
+      shape = shapes[i];
+      if (shape.empty() || shape[0] < 1) {
+        dbtypes[i] = VL_VECTOR_FLOAT;
+        field_types[i] = sha1_type_;
+        if (vldts_.count(VL_VECTOR_FLOAT) == 0) {
+          vldts_[VL_VECTOR_FLOAT] = H5Tvlen_create(H5T_NATIVE_FLOAT);
+          opened_types_.insert(vldts_[VL_VECTOR_FLOAT]);
+        }
+        dst_sizes[i] = CYCLUS_SHA1_SIZE;
+      } else {
+        dbtypes[i] = VECTOR_FLOAT;
+        hsize_t shape0 = shape[0];
+        field_types[i] = H5Tarray_create2(H5T_NATIVE_FLOAT, 1, &shape0);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = sizeof(float) * shape[0];
+      }
     } else if (valtype == typeid(std::vector<double>)) {
       shape = shapes[i];
       if (shape.empty() || shape[0] < 1) {
@@ -1619,6 +1653,19 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
           break;
         }
+        case VECTOR_FLOAT: {
+          std::vector<float> val = a->cast<std::vector<float> >();
+          fieldlen = sizes[col];
+          valuelen = std::min(val.size() * sizeof(float), fieldlen);
+          memcpy(buf + offset, &val[0], valuelen);
+          memset(buf + offset + valuelen, 0, fieldlen - valuelen);
+          break;
+        }
+        case VL_VECTOR_FLOAT: {
+          Digest key = VLWrite<std::vector<float>, VL_VECTOR_FLOAT>(a);
+          memcpy(buf + offset, key.val, CYCLUS_SHA1_SIZE);
+          break;
+        }
         case VECTOR_DOUBLE: {
           std::vector<double> val = a->cast<std::vector<double> >();
           fieldlen = sizes[col];
@@ -2168,6 +2215,10 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
       name = "VectorInt";
       break;
     }
+    case VL_VECTOR_FLOAT: {
+      name = "VectorFloat";
+      break;
+    }
     case VL_VECTOR_DOUBLE: {
       name = "VectorDouble";
       break;
@@ -2370,6 +2421,22 @@ template <>
 std::vector<int> Hdf5Back::VLBufToVal<std::vector<int> >(const hvl_t& buf) {
   std::vector<int> x = std::vector<int>(buf.len);
   memcpy(&x[0], buf.p, buf.len * sizeof(int));
+  return x;
+};
+
+hvl_t Hdf5Back::VLValToBuf(const std::vector<float>& x) {
+  hvl_t buf;
+  buf.len = x.size();
+  size_t nbytes = buf.len * sizeof(float);
+  buf.p = new char[nbytes];
+  memcpy(buf.p, &x[0], nbytes);
+  return buf;
+};
+
+template <>
+std::vector<float> Hdf5Back::VLBufToVal<std::vector<float> >(const hvl_t& buf) {
+  std::vector<float> x = std::vector<float>(buf.len);
+  memcpy(&x[0], buf.p, buf.len * sizeof(float));
   return x;
 };
 

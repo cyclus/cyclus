@@ -462,6 +462,10 @@ class Sha1 {
     hash_.process_bytes(&x[0], x.size() * sizeof(int));
   };
 
+  inline void Update(const std::vector<float>& x) { 
+    hash_.process_bytes(&x[0], x.size() * sizeof(float));
+  };
+
   inline void Update(const std::vector<double>& x) { 
     hash_.process_bytes(&x[0], x.size() * sizeof(double));
   };
