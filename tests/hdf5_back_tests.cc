@@ -193,6 +193,28 @@ TEST_F(Hdf5BackTests, ReadWriteVLVectorInt) {
   TestBasic<vector<int> >("vl_vector_int", x, y);
 }
 
+TEST_F(Hdf5BackTests, ReadWriteVectorFloat) {
+  using std::vector;
+  shape.resize(1);
+  shape[0] = 3;
+  float x_[] = {6.0, 28.0, 496.0};
+  vector<float> x = vector<float>(x_, x_+3);
+  float y_[] = {42.0, 43.0, 44.0};
+  vector<float> y = vector<float>(y_, y_+3);
+  TestBasic<vector<float> >("vector_float", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLVectorFloat) {
+  using std::vector;
+  shape.clear();
+  float x_[] = {6.0, 28.0, 496.0, 8128.0};
+  vector<float> x = vector<float>(x_, x_+4);
+  vector<float> y = vector<float>(42);
+  for (int i = 0; i < 42; ++i)
+    y[i] = 42.0 + i;
+  TestBasic<vector<float> >("vl_vector_float", x, y);
+}
+
 TEST_F(Hdf5BackTests, ReadWriteVectorDouble) {
   using std::vector;
   shape.resize(1);
