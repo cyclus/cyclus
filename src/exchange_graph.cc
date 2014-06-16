@@ -78,8 +78,9 @@ void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
-  double ucap = Capacity(a.unode(), a, u_curr_qty);
-  double vcap = Capacity(a.vnode(), a, v_curr_qty);
+  bool min = true;
+  double ucap = Capacity(a.unode(), a, !min, u_curr_qty);
+  double vcap = Capacity(a.vnode(), a, min, v_curr_qty);
 
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
@@ -90,7 +91,8 @@ double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
+double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+                double curr_qty) {
   if (n->group == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
@@ -121,8 +123,12 @@ double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
     }
   }
 
-  return std::min(*std::min_element(caps.begin(), caps.end()),
-                  n->qty - curr_qty);
+  if (min_cap) { // the smallest value is constraining (for bids)
+    cap = *std::min_element(caps.begin(), caps.end());
+  } else { // the largest value must be met (for requests)
+    cap = *std::max_element(caps.begin(), caps.end());
+  }
+  return std::min(cap, n->qty - curr_qty);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

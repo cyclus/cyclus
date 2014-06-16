@@ -59,10 +59,11 @@ TEST(ExGraphTests, DefaultCap) {
   ExchangeNodeGroup s;
   s.AddExchangeNode(u);
   s.AddExchangeNode(v);
-  
-  EXPECT_DOUBLE_EQ(min, Capacity(u, a));
-  EXPECT_DOUBLE_EQ(min + 1, Capacity(v, a));
-  EXPECT_DOUBLE_EQ(min, Capacity(v, a, 1));
+
+  bool max = true;
+  EXPECT_DOUBLE_EQ(min, Capacity(u, a, max));
+  EXPECT_DOUBLE_EQ(min + 1, Capacity(v, a, !max));
+  EXPECT_DOUBLE_EQ(min, Capacity(v, a, !max, 1));
 }
 
 TEST(ExGraphTests, ExchangeNodeCaps1) {
@@ -83,13 +84,15 @@ TEST(ExGraphTests, ExchangeNodeCaps1) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExGraphTests, ExchangeNodeCaps2) {
   double qty = 1.5;
-  double ucap = 1.7;
-  double cap = 5;
+  double minucap = 1.7;
+  double mincap = 5;
+  double maxucap = .01;
+  double maxcap = 1;
 
-  double acap[] = {10, cap, 3, 1};
+  double acap[] = {10, mincap, 3, maxcap};
   vector<double> caps (acap, acap + sizeof(acap) / sizeof(acap[0]) );
 
-  double aucap[] = {2.1, ucap, .07, .01};
+  double aucap[] = {2.1, minucap, .07, maxucap};
   vector<double> ucaps (aucap, aucap + sizeof(aucap) / sizeof(aucap[0]) );
 
   vector<double> exp;
@@ -107,8 +110,9 @@ TEST(ExGraphTests, ExchangeNodeCaps2) {
     s.AddCapacity(caps[i]);
   }
   s.AddExchangeNode(n);
-  double min_exp = cap / ucap;
-  EXPECT_EQ(min_exp, Capacity(n, a));
+  bool min = true;
+  EXPECT_EQ(mincap / minucap, Capacity(n, a, min));
+  EXPECT_EQ(maxcap / maxucap, Capacity(n, a, !min));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

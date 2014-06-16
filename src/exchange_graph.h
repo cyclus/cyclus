@@ -194,10 +194,15 @@ double Capacity(const Arc& a, double u_curr_qty = 0, double v_curr_qty = 0);
 ///
 /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
 /// @param n the node
+/// @param min_cap whether to use the minimum or maximum capacity value. In general,
+/// nodes that represent bids use the minimum (i.e., the capacities represents a
+/// less-than constraint) and nodes that represent requests use the maximum
+/// value (i.e., the capacities represents a greater-than constraint).
 /// @param curr_qty the currently allocated node quantity (if solving piecemeal)
 /// @return The minimum of the node's nodegroup capacities / the node's unit
 /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller. 
-double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty = 0.0);
+double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap = true,
+                double curr_qty = 0.0);
 
 typedef std::pair<Arc, double> Match;
 
