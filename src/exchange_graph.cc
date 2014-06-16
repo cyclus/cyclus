@@ -77,61 +77,6 @@ void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
-  bool min = true;
-  double ucap = Capacity(a.unode(), a, !min, u_curr_qty);
-  double vcap = Capacity(a.vnode(), a, min, v_curr_qty);
-
-  CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
-  CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
-  CLOG(cyclus::LEV_DEBUG1) << "Capacity for arc         : "
-                           << std::min(ucap, vcap);
-  
-  return std::min(ucap, vcap);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
-                double curr_qty) {
-  if (n->group == NULL) {
-    throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
-  }
-
-  if (n->unit_capacities[a].size() == 0) {
-    return n->qty - curr_qty;
-  }
-
-  std::vector<double>& unit_caps = n->unit_capacities[a];
-  const std::vector<double>& group_caps = n->group->capacities();
-  std::vector<double> caps;
-  double grp_cap, u_cap, cap;
-
-  for (int i = 0; i < unit_caps.size(); i++) {
-    grp_cap = group_caps[i];
-    u_cap = unit_caps[i];
-    cap = grp_cap / u_cap;
-    CLOG(cyclus::LEV_DEBUG1) << "Capacity for node: ";
-    CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << grp_cap;
-    CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << u_cap;
-    CLOG(cyclus::LEV_DEBUG1) << "         capacity: " << cap;
-    
-    // special case for unlimited capacities
-    if (grp_cap == std::numeric_limits<double>::max()) {
-      caps.push_back(std::numeric_limits<double>::max());
-    } else {
-      caps.push_back(cap);
-    }
-  }
-
-  if (min_cap) { // the smallest value is constraining (for bids)
-    cap = *std::min_element(caps.begin(), caps.end());
-  } else { // the largest value must be met (for requests)
-    cap = *std::max_element(caps.begin(), caps.end());
-  }
-  return std::min(cap, n->qty - curr_qty);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ExchangeGraph::ExchangeGraph() : next_arc_id_(0) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
