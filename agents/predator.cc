@@ -29,7 +29,6 @@ Predator::GetProductRequests() {
 
   if (age % hunt_freq  == 0) {
     port->AddRequest(Product::CreateUntracked(hunt_cap, ""), this, commod);
-    port->AddDefaultConstraint();
     ports.insert(port);
   }
 
