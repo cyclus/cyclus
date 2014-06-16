@@ -33,6 +33,7 @@ TEST(ExGraphTests, ReqGroups) {
 TEST(ExGraphTests, ExchangeNodeCapThrow) {
   ExchangeNode::Ptr m(new ExchangeNode());
   ExchangeNode::Ptr n(new ExchangeNode());
+  
   Arc a(m, n);
   EXPECT_THROW(Capacity(m, a), cyclus::StateError);
 }
@@ -50,6 +51,20 @@ TEST(ExGraphTests, ExchangeNodeNoCap) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ExGraphTests, DefaultCap) {
+  double min = 2;
+  ExchangeNode::Ptr u(new ExchangeNode(min));
+  ExchangeNode::Ptr v(new ExchangeNode(min + 1));
+  Arc a(u, v);
+  ExchangeNodeGroup s;
+  s.AddExchangeNode(u);
+  s.AddExchangeNode(v);
+  
+  EXPECT_DOUBLE_EQ(min, Capacity(u, a));
+  EXPECT_DOUBLE_EQ(min + 1, Capacity(v, a));
+  EXPECT_DOUBLE_EQ(min, Capacity(v, a, 1));
+}
+
 TEST(ExGraphTests, ExchangeNodeCaps1) {
   double ncap = 1.0;
   ExchangeNode::Ptr m(new ExchangeNode());

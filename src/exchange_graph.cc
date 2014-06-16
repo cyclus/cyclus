@@ -96,7 +96,7 @@ double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
   }
 
   if (n->unit_capacities[a].size() == 0) {
-    return std::numeric_limits<double>::max();
+    return n->qty - curr_qty;
   }
 
   std::vector<double>& unit_caps = n->unit_capacities[a];
