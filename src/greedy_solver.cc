@@ -148,7 +148,12 @@ void GreedySolver::UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty
   }
 
   if (IsNegative(n->qty - qty)) {
-    throw ValueError("ExchangeNode quantities can not be reduced below 0.");
+    std::stringstream ss;
+    ss << "A bid for " << n->commod << " was set at " << n->qty
+       << " but has been matched to a higher value " << qty
+       << ". This could be due to a problem with your "
+       << "bid portfolio constraints.";
+    throw ValueError(ss.str());
   }
 }
 
