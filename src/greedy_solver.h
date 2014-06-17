@@ -32,7 +32,10 @@ class GreedyPreconditioner;
 /// @param v_curr_qty the current quantity assigned to the vnode (if solving
 /// piecemeal)
 /// @return The minimum of the unode and vnode's capacities
-double Capacity(const Arc& a, double u_curr_qty = 0, double v_curr_qty = 0);
+//@{
+double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty);
+double Capacity(const Arc& a) {return Capacity(a, 0, 0);}
+//@}
 
 /// @brief the capacity of a node
 ///
@@ -45,8 +48,19 @@ double Capacity(const Arc& a, double u_curr_qty = 0, double v_curr_qty = 0);
 /// @param curr_qty the currently allocated node quantity (if solving piecemeal)
 /// @return The minimum of the node's nodegroup capacities / the node's unit
 /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller. 
+//@{
 double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap = true,
                 double curr_qty = 0.0);
+double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap) {
+  return Capacity(n, a, min_cap, 0.0);
+}
+double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
+  return Capacity(n, a, true, curr_qty);
+}
+double Capacity(ExchangeNode::Ptr n, const Arc& a) {
+  return Capacity(n, a, true, 0.0);
+}
+//@}
   
 /// @brief The GreedySolver provides the implementation for a "greedy" solution
 /// to a resource exchange graph.
