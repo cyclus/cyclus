@@ -19,7 +19,7 @@ inline bool ReqPrefComp(const Arc& l, const Arc& r) {
 inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
   return AvgPref(l) > AvgPref(r);
 }
-  
+
 class ExchangeGraph;
 class GreedyPreconditioner;
 
@@ -34,7 +34,7 @@ class GreedyPreconditioner;
 /// @return The minimum of the unode and vnode's capacities
 //@{
 double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty);
-double Capacity(const Arc& a) {return Capacity(a, 0, 0);}
+inline double Capacity(const Arc& a) {return Capacity(a, 0, 0);}
 //@}
 
 /// @brief the capacity of a node
@@ -49,15 +49,15 @@ double Capacity(const Arc& a) {return Capacity(a, 0, 0);}
 /// @return The minimum of the node's nodegroup capacities / the node's unit
 /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller. 
 //@{
-double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap = true,
-                double curr_qty = 0.0);
-double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap) {
+double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+                double curr_qty);
+inline double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap) {
   return Capacity(n, a, min_cap, 0.0);
 }
-double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
+inline double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
   return Capacity(n, a, true, curr_qty);
 }
-double Capacity(ExchangeNode::Ptr n, const Arc& a) {
+inline double Capacity(ExchangeNode::Ptr n, const Arc& a) {
   return Capacity(n, a, true, 0.0);
 }
 //@}
