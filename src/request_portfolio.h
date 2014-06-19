@@ -30,8 +30,8 @@ template<class T>
 /// converter. The arc and exchange context are used in order to reference the
 /// original request so that the request's coefficient can be applied.
 template<class T>
-struct DefaultCoeffConverter: public Converter<T> {
-  DefaultCoeffConverter(
+struct QtyCoeffConverter: public Converter<T> {
+  QtyCoeffConverter(
       const std::map<Request<T>*, double>& coeffs)
        : coeffs(coeffs) { };
 
@@ -43,8 +43,8 @@ struct DefaultCoeffConverter: public Converter<T> {
   }
 
   virtual bool operator==(Converter<T>& other) const {
-    DefaultCoeffConverter<T>* cast =
-        dynamic_cast<DefaultCoeffConverter<T>*>(&other);
+    QtyCoeffConverter<T>* cast =
+        dynamic_cast<QtyCoeffConverter<T>*>(&other);
     return cast != NULL && coeffs == cast->coeffs;
   }
   
@@ -63,9 +63,8 @@ struct DefaultCoeffConverter: public Converter<T> {
 /// the facility's needs, then requests for both would be added to the portfolio
 /// along with a capacity constraint.
 ///
-/// An option exists to add a default mass based constraint that incorporates
-/// multicommodity requests, but it must be called manually once all requests
-/// have been added, e.g.,
+/// The ExchangeTranslator will automatically add a mass-based constraint, that
+/// accounts for mutual requests, if the portfolio has them. , e.g.,
 /// @code
 /// 
 /// RequestPortfolio<SomeResource>::Ptr rp(new RequestPortfolio<SomeResource>());
@@ -74,8 +73,6 @@ struct DefaultCoeffConverter: public Converter<T> {
 /// // declare some of them as multicommodity requsts (i.e., any one will
 /// // satisfy this demand).
 /// rp->AddMutualReqs(/* args */);
-/// // add the default constraint
-/// rp->AddDefaultConstraint();
 /// 
 /// @endcode
 ///
@@ -151,15 +148,6 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
   };
-
-  /// @brief adds a default mass constraint based on the current requests and
-  /// multicommodity requests
-  inline void AddDefaultConstraint() { 
-    typename Converter<T>::Ptr conv(
-        new DefaultCoeffConverter<T>(mass_coeffs_));
-    CapacityConstraint<T> c(qty_, conv);
-    constraints_.insert(c);
-  };
       
   /// @return the agent associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
@@ -181,6 +169,11 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     return constraints_;
   };
 
+  /// returns a capacity converter for this portfolios request quantities
+  inline typename Converter<T>::Ptr qty_converter() {
+    return typename Converter<T>::Ptr(new QtyCoeffConverter<T>(mass_coeffs_));
+  }
+  
  private:
   /// @brief copy constructor is private to prevent copying and preserve
   /// explicit single-ownership of requests
