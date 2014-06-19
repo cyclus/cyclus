@@ -1165,7 +1165,8 @@ class SchemaFilter(CodeGeneratorFilter):
                     impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
                     impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, el_type)
                     impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                else: # map
+                else:  # map
+                    schematype = [None, None] if schematype is None else schematype
                     k_type = self._type(t[1], schematype[0])
                     v_type = self._type(t[2], schematype[1])
                     impl += i + '"{0}<element name=\\"key\\">\\n"\n'.format(xi.up())
@@ -1183,6 +1184,7 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, d_type)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t[0] == 'std::pair':
+                schematype = [None, None] if schematype is None else schematype
                 f_type = self._type(t[1], schematype[0])
                 s_type = self._type(t[2], schematype[1])
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)

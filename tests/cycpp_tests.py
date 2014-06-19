@@ -212,7 +212,7 @@ class MockCodeGenMachine(object):
         self.depth = 0
         self.execns = {}
         self.context = {"MyFactory": OrderedDict([('vars', OrderedDict([ 
-            ('x', {'type': 'int'}), 
+            ('x', {'type': 'int', 'schematype': 'positiveInteger'}), 
             ('y', {'type': 'std::string',
                    'shape': [42],
                    'initfromcopy': 'y=m -> y;\n',
@@ -325,9 +325,34 @@ def test_schemafilter():
     exp_impl = ('  return ""\n'
                 '    "<interleave>\\n"\n'
                 '    "<element name=\\"x\\">\\n"\n'
-                '    "    <data type=\\"int\\" />\\n"\n'
+                '    "    <data type=\\"positiveInteger\\" />\\n"\n'
                 '    "</element>\\n"\n'
                 "FREAK OUT\n"
+                '    "</interleave>\\n"\n    ;\n')
+    yield assert_equal, exp_impl, impl
+
+    # schema type tests
+    yield assert_equal, 'string', f._type('std::string')
+    yield assert_equal, 'boolean', f._type('bool')
+    yield assert_equal, 'token', f._type('std::string', 'token')
+
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([ 
+            ('x', {'type': ('std::map', 'int', 'double')}), 
+            ]))
+            ])}
+    impl = f.impl()
+    exp_impl = ('  return ""\n'
+                '    "<interleave>\\n"\n'
+                '    "<element name=\\"x\\">\\n"\n'
+                '    "    <oneOrMore>\\n"\n'
+                '    "        <element name=\\"key\\">\\n"\n'
+                '    "            <data type=\\"int\\" />\\n"\n'
+                '    "        </element>\\n"\n'
+                '    "        <element name=\\"val\\">\\n"\n'
+                '    "            <data type=\\"double\\" />\\n"\n'
+                '    "        </element>\\n"\n'
+                '    "    </oneOrMore>\\n"\n'
+                '    "</element>\\n"\n'
                 '    "</interleave>\\n"\n    ;\n')
     yield assert_equal, exp_impl, impl
 
