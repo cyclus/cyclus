@@ -77,55 +77,6 @@ void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
-  double ucap = Capacity(a.unode(), a, u_curr_qty);
-  double vcap = Capacity(a.vnode(), a, v_curr_qty);
-
-  CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
-  CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
-  CLOG(cyclus::LEV_DEBUG1) << "Capacity for arc         : "
-                           << std::min(ucap, vcap);
-  
-  return std::min(ucap, vcap);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
-  if (n->group == NULL) {
-    throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
-  }
-
-  if (n->unit_capacities[a].size() == 0) {
-    return std::numeric_limits<double>::max();
-  }
-
-  std::vector<double>& unit_caps = n->unit_capacities[a];
-  const std::vector<double>& group_caps = n->group->capacities();
-  std::vector<double> caps;
-  double grp_cap, u_cap, cap;
-
-  for (int i = 0; i < unit_caps.size(); i++) {
-    grp_cap = group_caps[i];
-    u_cap = unit_caps[i];
-    cap = grp_cap / u_cap;
-    CLOG(cyclus::LEV_DEBUG1) << "Capacity for node: ";
-    CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << grp_cap;
-    CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << u_cap;
-    CLOG(cyclus::LEV_DEBUG1) << "         capacity: " << cap;
-    
-    // special case for unlimited capacities
-    if (grp_cap == std::numeric_limits<double>::max()) {
-      caps.push_back(std::numeric_limits<double>::max());
-    } else {
-      caps.push_back(cap);
-    }
-  }
-
-  return std::min(*std::min_element(caps.begin(), caps.end()),
-                  n->qty - curr_qty);
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ExchangeGraph::ExchangeGraph() : next_arc_id_(0) { }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

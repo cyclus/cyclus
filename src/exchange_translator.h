@@ -46,6 +46,9 @@ class ExchangeTranslator {
     typename std::vector<typename RequestPortfolio<T>::Ptr>::const_iterator
         rp_it;
     for (rp_it = requests.begin(); rp_it != requests.end(); ++rp_it) {
+      CapacityConstraint<T> c((*rp_it)->qty(), (*rp_it)->qty_converter());
+      (*rp_it)->AddConstraint(c);
+
       RequestGroup::Ptr rs = TranslateRequestPortfolio(xlation_ctx_, *rp_it);
       graph->AddRequestGroup(rs);
     }
