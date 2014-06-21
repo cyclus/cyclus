@@ -438,6 +438,7 @@ Composition::Ptr SimInit::LoadComposition(int stateid) {
     cm[nucid] = mass_frac;
   }
   Composition::Ptr c = Composition::CreateFromMass(cm);
+  c->recorded_ = true;
   c->id_ = stateid;
   return c;
 }
