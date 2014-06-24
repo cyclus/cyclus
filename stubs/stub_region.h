@@ -36,7 +36,7 @@ class StubRegion : public cyclus::Region {
   /// @param ctx the cyclus context for access to simulation-wide parameters
   explicit StubRegion(cyclus::Context* ctx);
 
-  /// every agent should be destructable
+  /// Every agent should be destructable
   virtual ~StubRegion();
 
   /// The Prime Directive
@@ -44,7 +44,7 @@ class StubRegion : public cyclus::Region {
   /// (e.g., reading from the database, instantiating a new object, etc.).
   /// @warning The Prime Directive must have a space before it! (A fix will be
   /// in 2.0 ^TM)
-  
+
   #pragma cyclus
 
   #pragma cyclus note {"doc": "A stub region is provided as a skeleton " \
@@ -53,7 +53,7 @@ class StubRegion : public cyclus::Region {
   /// A verbose printer for the StubRegion
   virtual std::string str();
 
-  // and away we go!
+  // And away we go!
 };
 
 }  // namespace stubs
