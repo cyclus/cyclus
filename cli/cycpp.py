@@ -37,7 +37,7 @@ following handy table!
        is great for. Any variables defined here are kept in a separate
        namespace from the classes.  Since this gives you direct access to the
        Python interpreter, try to be a little careful.
-:note: Merges the argument (which like with var must evalutae to a dict) with the 
+:note: Merges the argument (which like with var must evalutae to a dict) with the
        current class level annotations. Enrties here overwrite previous entries.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
@@ -84,7 +84,7 @@ RE_STATEMENT = re.compile(
 
 CYCNS = 'cyclus'
 
-PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob', 
+PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob',
               'boost::uuids::uuid'}
 
 BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS)}
@@ -103,7 +103,7 @@ WRANGLERS = {
 #
 # pass 1
 #
-def preprocess_file(filename, includes=(), cpp_path='cpp', 
+def preprocess_file(filename, includes=(), cpp_path='cpp',
                     cpp_args=('-xc++', '-pipe', '-E', '-DCYCPP')):
     """Preprocess a file using cpp.
 
@@ -513,7 +513,7 @@ class StateAccumulator(object):
                         NamespaceAliasFilter(self), NamespaceFilter(self),
                         TypedefFilter(self), UsingFilter(self), LinemarkerFilter(self),
                         NoteDecorationFilter(self),
-                        VarDecorationFilter(self), VarDeclarationFilter(self), 
+                        VarDecorationFilter(self), VarDeclarationFilter(self),
                         ]
 
     def classname(self):
@@ -894,7 +894,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
     def _fmt(self, t):
         """returns a format string for a type t"""
         return '"{0}"' if t == 'std::string' else '{0}'
-    
+
     def read_primitive(self, member, t, d, ind="  "):
         s = ""
         tstr = type_to_str(t)
@@ -1100,12 +1100,12 @@ class SchemaFilter(CodeGeneratorFilter):
     pragmaname = "schema"
     methodrtn = "std::string"
 
-    alltypes = frozenset(['anyType', 'anySimpleType', 'string', 'boolean', 'decimal', 
-                          'float', 'double', 'duration', 'dateTime', 'time', 'date', 
-                          'gYearMonth', 'gYear', 'gMonthDay', 'gDay', 'gMonth', 
-                          'hexBinary', 'base64Binary', 'anyURI', 'QName', 'NOTATION', 
-                          'normalizedString', 'token', 'language', 'NMTOKEN', 
-                          'NMTOKENS', 'Name', 'NCName', 'ID', 'IDREF', 'IDREFS', 
+    alltypes = frozenset(['anyType', 'anySimpleType', 'string', 'boolean', 'decimal',
+                          'float', 'double', 'duration', 'dateTime', 'time', 'date',
+                          'gYearMonth', 'gYear', 'gMonthDay', 'gDay', 'gMonth',
+                          'hexBinary', 'base64Binary', 'anyURI', 'QName', 'NOTATION',
+                          'normalizedString', 'token', 'language', 'NMTOKEN',
+                          'NMTOKENS', 'Name', 'NCName', 'ID', 'IDREF', 'IDREFS',
                           'ENTITY', 'ENTITIES', 'integer', 'nonPositiveInteger',
                           'negativeInteger', 'long', 'int', 'short', 'byte',
                           'nonNegativeInteger', 'unsignedLong', 'unsignedInt',
@@ -1117,8 +1117,8 @@ class SchemaFilter(CodeGeneratorFilter):
         'std::string': 'string',
         'int': 'int',
         'float': 'float',
-        'double': 'double', 
-        'cyclus::Blob': 'string', 
+        'double': 'double',
+        'cyclus::Blob': 'string',
         'boost::uuids::uuid': 'token',
         }
 
