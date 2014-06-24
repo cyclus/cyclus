@@ -137,13 +137,13 @@ void Context::InitSim(SimInfo si) {
   ->AddVal("ParentSimId", si.parent_sim)
   ->AddVal("ParentType", si.parent_type)
   ->AddVal("BranchTime", si.branch_time)
-  ->AddVal("CyclusVersion", version::core())
-  ->AddVal("CyclusVersionDescribe", version::describe())
-  ->AddVal("SqliteVersion", version::sqlite3())
-  ->AddVal("Hdf5Version", version::hdf5())
-  ->AddVal("BoostVersion", version::boost())
-  ->AddVal("LibXML2Version", version::xml2())
-  ->AddVal("CoinCBCVersion", version::coincbc())
+  ->AddVal("CyclusVersion", std::string(version::core()))
+  ->AddVal("CyclusVersionDescribe", std::string(version::describe()))
+  ->AddVal("SqliteVersion", std::string(version::sqlite3()))
+  ->AddVal("Hdf5Version", std::string(version::hdf5()))
+  ->AddVal("BoostVersion", std::string(version::boost()))
+  ->AddVal("LibXML2Version", std::string(version::xml2()))
+  ->AddVal("CoinCBCVersion", std::string(version::coincbc()))
   ->Record();
   si_ = si;
   ti_->Initialize(this, si);
