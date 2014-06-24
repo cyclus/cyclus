@@ -23,5 +23,6 @@ bool Commodity::operator==(const Commodity& other) const {
 bool Commodity::operator!=(const Commodity& other) const {
   return !(*this == other);
 }
-} // namespace toolkit
-} // namespace cyclus
+
+}  // namespace toolkit
+}  // namespace cyclus

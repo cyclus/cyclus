@@ -6,7 +6,9 @@ namespace cyclus {
 namespace toolkit {
 
 BuildOrder::BuildOrder(int n, Builder* b, CommodityProducer* cp)
-    : number(n), builder(b), producer(cp) {}
+    : number(n),
+      builder(b),
+      producer(cp) {}
 
 std::vector<BuildOrder> BuildingManager::MakeBuildDecision(Commodity& commodity,
                                                            double demand) {
@@ -53,7 +55,7 @@ void BuildingManager::SetUp_(OsiCbcSolverInterface& iface,
   ctx.row_ubs.push_back(inf);
   ctx.row_lbs.push_back(demand);
   ctx.m.setDimensions(0, ctx.col_ubs.size());
-  ctx.m.appendRow(caps);    
+  ctx.m.appendRow(caps);
 }
 
 void BuildingManager::Solve_(OsiCbcSolverInterface& iface,
@@ -62,7 +64,7 @@ void BuildingManager::Solve_(OsiCbcSolverInterface& iface,
                              std::map<int, CommodityProducer*>& idx_to_p,
                              std::vector<BuildOrder>& orders) {
   int nvar = ctx.col_ubs.size();
-  iface.setObjSense(1.0); // minimize
+  iface.setObjSense(1.0);  // minimize
   iface.loadProblem(ctx.m, &ctx.col_lbs[0], &ctx.col_ubs[0],
                     &ctx.obj_coeffs[0], &ctx.row_lbs[0], &ctx.row_ubs[0]);
   for (int i = 0; i != nvar; i++) {
@@ -70,7 +72,7 @@ void BuildingManager::Solve_(OsiCbcSolverInterface& iface,
   }
   iface.initialSolve();
   iface.branchAndBound();
-  
+
   const double* sol = iface.getColSolution();
   int n;
   CommodityProducer* p;
@@ -82,8 +84,8 @@ void BuildingManager::Solve_(OsiCbcSolverInterface& iface,
       b = p_to_b[p];
       orders.push_back(BuildOrder(n, b, p));
     }
-  }        
+  }
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

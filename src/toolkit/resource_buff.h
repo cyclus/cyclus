@@ -1,6 +1,5 @@
-// resource_buff.h
-#ifndef RESOURCEBUFF_H_
-#define RESOURCEBUFF_H_
+#ifndef CYCLUS_SRC_TOOLKIT_RESOURCE_BUFF_H_
+#define CYCLUS_SRC_TOOLKIT_RESOURCE_BUFF_H_
 
 #include <limits>
 #include <list>
@@ -22,7 +21,7 @@ typedef std::vector<Resource::Ptr> Manifest;
 
 /// ResourceBuff is a helper function that provides semi-automated management of
 /// resource buffers (e.g. agent stocks and inventories).
-/// 
+///
 /// Methods that begin with a "set", "make", "push", or "pop" prefix change the
 /// state/behavior of the store; other methods do not.  Default constructed
 /// resource store has infinite capacity. Resource popping occurs in the order
@@ -34,52 +33,51 @@ class ResourceBuff {
     FRONT,
     BACK
   };
-  
-  ResourceBuff() : capacity_(kBuffInfinity), qty_(0) {};
 
-  virtual ~ResourceBuff() {};
+  ResourceBuff() : capacity_(kBuffInfinity), qty_(0) {}
 
-  /// capacity returns the maximum resource quantity this store can hold (units
+  virtual ~ResourceBuff() {}
+
+  /// Capacity returns the maximum resource quantity this store can hold (units
   /// based on constituent resource objects' units).
   /// Never throws.
   inline double capacity() const {
     return capacity_;
-  };
+  }
 
-  /// set_capacity sets the maximum quantity this store can hold (units based
+  /// Set_capacity sets the maximum quantity this store can hold (units based
   /// on constituent resource objects' units).
   ///
   /// @throws ValueError the new capacity is lower (by eps_rsrc()) than the
   /// quantity of resources that already exist in the store.
   void set_capacity(double cap);
 
-  /// count returns the total number of constituent resource objects
+  /// Count returns the total number of constituent resource objects
   /// in the store. Never throws.
   inline int count() const {
     return mats_.size();
-  };
+  }
 
-  /// quantity returns the total resource quantity of constituent resource objects
-  /// in the store. Never throws.
+  /// Quantity returns the total resource quantity of constituent resource
+  /// objects in the store. Never throws.
   inline double quantity() const {
     return qty_;
-  };
+  }
 
-  /// space returns the quantity of space remaining in this store.
+  /// Space returns the quantity of space remaining in this store.
   ///
   /// It is effectively the difference between the capacity and the quantity.
   /// Never throws.
   inline double space() const {
     return capacity_ - qty_;
-  };
+  }
 
-  /// returns true if there are no mats in mats_
+  /// Returns true if there are no mats in mats_
   inline bool empty() const {
     return mats_.empty();
-  };
+  }
 
-  /// PopQty pops the specified quantity of resources from the
-  /// buffer.
+  /// PopQty pops the specified quantity of resources from the buffer.
   ///
   /// Resources are split if necessary in order to pop the exact quantity
   /// specified (within eps_rsrc()).  Resources are retrieved in the order they were
@@ -88,7 +86,7 @@ class ResourceBuff {
   /// @throws ValueError the specified pop quantity is larger than the
   /// buffer's current quantity.
   Manifest PopQty(double qty);
-  
+
   /// Same behavior as PopQty(double) except a non-zero eps may be specified
   /// for cases where qty might be larger than the buffer's current quantity.
   Manifest PopQty(double qty, double eps);
@@ -118,7 +116,7 @@ class ResourceBuff {
   template <class T>
   typename T::Ptr Pop() {
     return boost::dynamic_pointer_cast<T>(Pop());
-  };
+  }
 
   /// Push pushs a single resource object to the store.
   ///
@@ -166,18 +164,20 @@ class ResourceBuff {
       mats_present_.insert(rs[i]);
     }
     qty_ += tot_qty;
-  };
+  }
 
  private:
   double qty_;
 
-  /// maximum quantity of resources this store can hold
+  /// Maximum quantity of resources this store can hold
   double capacity_;
 
-  /// list of constituent resource objects forming the store's inventory
+  /// List of constituent resource objects forming the store's inventory
   std::list<Resource::Ptr> mats_;
   std::set<Resource::Ptr> mats_present_;
 };
-} // namespace toolkit
-} // namespace cyclus
-#endif
+
+}  // namespace toolkit
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_TOOLKIT_RESOURCE_BUFF_H_

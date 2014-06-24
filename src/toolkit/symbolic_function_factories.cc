@@ -3,47 +3,45 @@
 
 #include "symbolic_function_factories.h"
 
-//using namespace boost;
-
 namespace cyclus {
 namespace toolkit {
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SymFunction::Ptr LinFunctionFactory::GetFunctionPtr(std::string params) {
   std::stringstream ss(params);
   double slope, intercept;
   ss >> slope >> intercept;
 
   LOG(LEV_DEBUG2, "Funct") <<
-                           "Linear function created in the form y = m*x + b, with";
+      "Linear function created in the form y = m*x + b, with";
   LOG(LEV_DEBUG2, "Funct") << "  * m: " << slope;
   LOG(LEV_DEBUG2, "Funct") << "  * b: " << intercept;
 
   return SymFunction::Ptr(new LinearFunction(slope, intercept));
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SymFunction::Ptr ExpFunctionFactory::GetFunctionPtr(std::string params) {
   std::stringstream ss(params);
   double constant, exponent, intercept;
   ss >> constant >> exponent >> intercept;
 
   LOG(LEV_DEBUG2, "Funct") <<
-                           "Exponential function created in the form y = a*exp(b*x) + c, with";
+      "Exponential function created in the form y = a*exp(b*x) + c, with";
   LOG(LEV_DEBUG2, "Funct") << "  * a: " << constant;
   LOG(LEV_DEBUG2, "Funct") << "  * b: " << exponent;
   LOG(LEV_DEBUG2, "Funct") << "  * c: " << intercept;
 
   return SymFunction::Ptr(new ExponentialFunction(constant, exponent,
-                                             intercept));
+                                                  intercept));
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 PiecewiseFunctionFactory::PiecewiseFunctionFactory() {
   function_ = boost::shared_ptr<PiecewiseFunction>(new PiecewiseFunction());
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SymFunction::Ptr PiecewiseFunctionFactory::GetFunctionPtr(std::string params) {
   if (!params.empty()) {
     throw Error("Piecewise Functions cannot be created with a list of parameters");
@@ -51,16 +49,16 @@ SymFunction::Ptr PiecewiseFunctionFactory::GetFunctionPtr(std::string params) {
 
   LOG(LEV_DEBUG2, "Funct") << "A piecewise function has been created: "
                            << function_->Print();
-
   return function_;
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void PiecewiseFunctionFactory::AddFunction(SymFunction::Ptr function,
-                                           double starting_coord, bool continuous) {
+                                           double starting_coord,
+                                           bool continuous) {
   if (!function_->functions_.empty()) {
     const PiecewiseFunction::PiecewiseFunctionInfo& last =
-      function_->functions_.back();
+        function_->functions_.back();
     if (starting_coord <= last.xoffset) {
       throw Error("Cannot append a function before the last registered function");
     }
@@ -72,15 +70,15 @@ void PiecewiseFunctionFactory::AddFunction(SymFunction::Ptr function,
   }
 
   function_->functions_.push_back(PiecewiseFunction::PiecewiseFunctionInfo(
-                                    function, starting_coord, yoffset));
+                                      function, starting_coord, yoffset));
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::map<std::string, BasicFunctionFactory::FunctionType>
 BasicFunctionFactory::enum_names_ =
-  std::map<std::string, BasicFunctionFactory::FunctionType>();
+    std::map<std::string, BasicFunctionFactory::FunctionType>();
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BasicFunctionFactory::BasicFunctionFactory() {
   if (enum_names_.empty()) {
     enum_names_["lin"] = LIN;
@@ -88,9 +86,9 @@ BasicFunctionFactory::BasicFunctionFactory() {
   }
 }
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SymFunction::Ptr BasicFunctionFactory::GetFunctionPtr(std::string type,
-                                                    std::string params) {
+                                                      std::string params) {
   switch (enum_names_[type]) {
     case LIN: {
       LinFunctionFactory lff;
@@ -110,5 +108,6 @@ SymFunction::Ptr BasicFunctionFactory::GetFunctionPtr(std::string type,
       break;
   }
 }
-} // namespace toolkit
-} // namespace cyclus
+
+}  // namespace toolkit
+}  // namespace cyclus

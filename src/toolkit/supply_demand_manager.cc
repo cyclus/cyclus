@@ -5,7 +5,7 @@
 namespace cyclus {
 namespace toolkit {
 
-// -------------------------------------------------------------------
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double SupplyDemandManager::Supply(Commodity& commodity) {
   double value = 0.0;
   std::set<CommodityProducerManager*>::iterator it;
@@ -14,6 +14,6 @@ double SupplyDemandManager::Supply(Commodity& commodity) {
   }
   return value;
 }
- 
-} // namespace toolkit
-} // namespace cyclus
+
+}  // namespace toolkit
+}  // namespace cyclus
