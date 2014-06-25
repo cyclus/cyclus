@@ -1,15 +1,13 @@
-// xml_flat_loader.cc
-
 #include "xml_flat_loader.h"
 
+#include "agent.h"
 #include "context.h"
 #include "env.h"
 #include "error.h"
+#include "infile_tree.h"
 #include "logger.h"
-#include "agent.h"
 #include "recorder.h"
 #include "timer.h"
-#include "infile_tree.h"
 
 namespace cyclus {
 
@@ -85,8 +83,8 @@ void XMLFlatLoader::LoadInitialAgents() {
   int num_agents = xqe.NMatches("/*/agent");
   std::map<std::string, std::string> protos;  // map<name, prototype>
   std::map<std::string, std::string> parents;  // map<agent, parent>
-  std::set<std::string> agents; // set<agent_name>
-  std::map<std::string, InfileTree*> invs; // map<agent, qe>;
+  std::set<std::string> agents;  // set<agent_name>
+  std::map<std::string, InfileTree*> invs;  // map<agent, qe>;
   for (int i = 0; i < num_agents; i++) {
     InfileTree* qe = xqe.SubTree("/*/agent", i);
     std::string name = qe->GetString("name");
@@ -99,7 +97,7 @@ void XMLFlatLoader::LoadInitialAgents() {
   }
 
   // build agents starting at roots (no parent) down.
-  std::map<std::string, Agent*> built; // map<agent_name, agent_ptr>
+  std::map<std::string, Agent*> built;  // map<agent_name, agent_ptr>
   std::set<std::string>::iterator it = agents.begin();
   while (agents.size() > 0) {
     std::string name = *it;

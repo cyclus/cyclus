@@ -1,4 +1,3 @@
-
 #include "resource.h"
 
 namespace cyclus {
@@ -11,4 +10,4 @@ void Resource::BumpStateId() {
   nextstate_id_++;
 }
 
-} // namespace cyclus
+}  // namespace cyclus

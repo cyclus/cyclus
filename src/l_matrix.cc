@@ -290,4 +290,5 @@ LMatrix identity(int n) {
 
   return I;  // returns the nxn identity matrix
 }
-} // namespace cyclus
+
+}  // namespace cyclus

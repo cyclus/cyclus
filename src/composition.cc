@@ -14,7 +14,7 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
   if (!compmath::ValidNucs(v))
     throw ValueError("invalid nuclide in CompMap");
 
-  if (!compmath::AllPositive(v)) 
+  if (!compmath::AllPositive(v))
     throw ValueError("negative quantity in CompMap");
 
   Composition::Ptr c(new Composition());
@@ -26,7 +26,7 @@ Composition::Ptr Composition::CreateFromMass(CompMap v) {
   if (!compmath::ValidNucs(v))
     throw ValueError("invalid nuclide in CompMap");
 
-  if (!compmath::AllPositive(v)) 
+  if (!compmath::AllPositive(v))
     throw ValueError("negative quantity in CompMap");
 
   Composition::Ptr c(new Composition());

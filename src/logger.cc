@@ -1,10 +1,10 @@
-// logger.cc
 #include "logger.h"
+
 #include <cstdio>
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::vector<std::string> Logger::level_to_string;
 std::map<std::string, LogLevel> Logger::string_to_level;
 LogLevel Logger::report_level = (Logger::Initialize(), LEV_ERROR);
@@ -14,7 +14,7 @@ bool Logger::no_mem = false;
 int Logger::spc_per_lev_ = 2;
 int Logger::field_width_ = 6;
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::ostringstream& Logger::Get(LogLevel level, std::string prefix) {
   int ind_level = level - LEV_INFO1;
   if (ind_level < 0) {
@@ -31,7 +31,7 @@ std::ostringstream& Logger::Get(LogLevel level, std::string prefix) {
   return os;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Logger::~Logger() {
   os << std::endl;
   // fprintf used to maintain thread safety
@@ -39,7 +39,7 @@ Logger::~Logger() {
   fflush(stdout);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logger::Initialize() {
   Logger::AddLevel(LEV_ERROR, "LEV_ERROR");
   Logger::AddLevel(LEV_WARN, "LEV_WARN");
@@ -55,7 +55,7 @@ void Logger::Initialize() {
   Logger::AddLevel(LEV_DEBUG5, "LEV_DEBUG5");
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 LogLevel Logger::ToLogLevel(std::string text) {
   if (string_to_level.count(text) > 0) {
     return string_to_level[text];
@@ -64,7 +64,7 @@ LogLevel Logger::ToLogLevel(std::string text) {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string Logger::ToString(LogLevel level) {
   std::string text;
   try {
@@ -75,7 +75,7 @@ std::string Logger::ToString(LogLevel level) {
   return text;
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Logger::AddLevel(LogLevel level, std::string text) {
   // order of the following statements matters
   Logger::string_to_level[text] = level;
@@ -84,4 +84,4 @@ void Logger::AddLevel(LogLevel level, std::string text) {
   Logger::level_to_string.push_back(text);
 }
 
-} // namespace cyclus
+}  // namespace cyclus

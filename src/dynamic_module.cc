@@ -1,5 +1,3 @@
-// dynamic_module.cc
-
 #include "dynamic_module.h"
 
 #include <boost/filesystem.hpp>
@@ -18,7 +16,10 @@ namespace cyclus {
 
 AgentSpec::AgentSpec(std::string path, std::string lib, std::string agent,
                      std::string alias)
-  : path_(path), lib_(lib), agent_(agent), alias_(alias) {
+    : path_(path),
+      lib_(lib),
+      agent_(agent),
+      alias_(alias) {
 
   if (lib_ == "") {
     lib_ = agent_;
@@ -45,7 +46,7 @@ AgentSpec::AgentSpec(std::string str_spec) {
   lib_ = strs[1];
   agent_ = strs[2];
   alias_ = agent_;
-};
+}
 
 std::string AgentSpec::Sanitize() {
   std::string s = str();
@@ -68,7 +69,7 @@ std::map<std::string, DynamicModule*> DynamicModule::modules_;
 std::map<std::string, AgentCtor*> DynamicModule::man_ctors_;
 
 Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
-  if (man_ctors_.count(spec.str()) > 0) { // for testing
+  if (man_ctors_.count(spec.str()) > 0) {  // for testing
     Agent* a = man_ctors_[spec.str()](ctx);
     a->spec(spec.str());
     return a;
@@ -94,8 +95,8 @@ void DynamicModule::CloseAll() {
 }
 
 DynamicModule::DynamicModule(AgentSpec spec)
-  : module_library_(0),
-    ctor_(NULL) {
+    : module_library_(0),
+      ctor_(NULL) {
   path_ = Env::FindModule(spec.LibPath());
   ctor_name_ = "Construct" + spec.agent();
   OpenLibrary();
@@ -111,4 +112,3 @@ std::string DynamicModule::path() {
 }
 
 }  // namespace cyclus
-

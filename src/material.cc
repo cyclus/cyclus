@@ -1,7 +1,7 @@
-
 #include "material.h"
 
 #include <math.h>
+
 #include "comp_math.h"
 #include "context.h"
 #include "decayer.h"
@@ -156,8 +156,8 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c)
 }
 
 Material::Ptr NewBlankMaterial(double quantity) {
-  Composition::Ptr comp = Composition::CreateFromMass(CompMap());  
+  Composition::Ptr comp = Composition::CreateFromMass(CompMap());
   return Material::CreateUntracked(quantity, comp);
 }
 
-} // namespace cyclus
+}  // namespace cyclus
