@@ -29,7 +29,7 @@ TEST(BidTests, MaterialGetSet) {
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   double qty = 1.0;
   Material::Ptr mat = tc.mat();
-  Request<Material>* req = tc.NewReq(); 
+  Request<Material>* req = tc.NewReq();
   Bid<Material>* bid = Bid<Material>::Create(req, mat, fac);
 
   EXPECT_EQ(fac, bid->bidder());

@@ -24,7 +24,7 @@ class Dier : public cyclus::Facility {
   void Tick() {
     context()->SchedDecom(this);
   }
-  void Tock() {};
+  void Tock() {}
 };
 
 class Termer : public cyclus::Facility {
@@ -38,8 +38,8 @@ class Termer : public cyclus::Facility {
 
   void Tick() {
     context()->KillSim();
-  };
-  void Tock() {};
+  }
+  void Tock() {}
 };
 
 TEST(TimerTests, BareSim) {

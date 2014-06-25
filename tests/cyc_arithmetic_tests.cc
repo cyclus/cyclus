@@ -1,4 +1,3 @@
-// cyc_arithmetic_tests.cc
 #include <map>
 #include <gtest/gtest.h>
 

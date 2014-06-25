@@ -1,4 +1,3 @@
-
 #include <gtest/gtest.h>
 
 #include "context.h"
@@ -14,8 +13,8 @@ using cyclus::Product;
 
 class Dummy : public cyclus::Region {
  public:
-  Dummy(cyclus::Context* ctx) : cyclus::Region(ctx) {};
-  Dummy* Clone() { return NULL; };
+  Dummy(cyclus::Context* ctx) : cyclus::Region(ctx) {}
+  Dummy* Clone() { return NULL; }
 };
 
 class ResourceTest : public ::testing::Test {

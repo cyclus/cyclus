@@ -1,4 +1,3 @@
-// xml_file_loader_tests.cc
 #include "xml_file_loader_tests.h"
 
 #include <iostream>

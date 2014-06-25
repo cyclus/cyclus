@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SRC_TESTS_TOOLS_H_
-#define CYCLUS_SRC_TESTS_TOOLS_H_
+#ifndef CYCLUS_TESTS_TOOLS_H_
+#define CYCLUS_TESTS_TOOLS_H_
 
 #include "boost/filesystem.hpp"
 
@@ -20,4 +20,4 @@ class FileDeleter {
   std::string path_;
 };
 
-#endif  // CYCLUS_SRC_TESTS_TOOLS_H_
+#endif  // CYCLUS_TESTS_TOOLS_H_

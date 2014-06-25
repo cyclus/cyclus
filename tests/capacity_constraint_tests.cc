@@ -89,7 +89,7 @@ TEST(CapacityConstraintTests, RsrcGetSet) {
 TEST(CapacityConstraintTests, Trivial) {
   CapacityConstraint<Resource> cc(val);
   double val = 42;
-  EXPECT_EQ(val, cc.convert(NewBlankMaterial(val))); // some magic number
+  EXPECT_EQ(val, cc.convert(NewBlankMaterial(val)));  // some magic number
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

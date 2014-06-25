@@ -1,4 +1,3 @@
-// infile_tree_tests.cc
 #include "infile_tree_tests.h"
 
 #include <iostream>

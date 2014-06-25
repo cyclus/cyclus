@@ -1,11 +1,11 @@
-#include "dynamic_module.h"
-#include "env.h"
-
 #include <fstream>
 #include <string>
 
 #include "boost/filesystem.hpp"
 #include <gtest/gtest.h>
+
+#include "dynamic_module.h"
+#include "env.h"
 
 namespace fs = boost::filesystem;
 

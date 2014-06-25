@@ -29,14 +29,14 @@ def test_predator_only():
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
-    
+
     print("Confirming valid Cyclus execution.")
     assert_equal(rtn, 0)
 
     output = tables.open_file(h5out, mode = "r")
     series = agent_time_series(output, [prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
-    
+
     prey_exp = [0 for n in range(10)]
     pred_exp = [1, 1] + [0 for n in range(8)]
 
@@ -57,17 +57,17 @@ def test_prey_only():
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
-    
+
     print("Confirming valid Cyclus execution.")
     assert_equal(rtn, 0)
 
     output = tables.open_file(h5out, mode = "r")
     series = agent_time_series(output, [prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
-    
+
     prey_exp = [2**n for n in range(10)]
     pred_exp = [0 for n in range(10)]
-    
+
     assert_equal(series[prey], prey_exp)
     assert_equal(series[pred], pred_exp)
 
@@ -94,18 +94,18 @@ def test_lotka_volterra():
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
-    
+
     print("Confirming valid Cyclus execution.")
     assert_equal(rtn, 0)
 
     output = tables.open_file(h5out, mode = "r")
     series = agent_time_series(output, [prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
-    
+
     prey_max = series[prey].index(max(series[prey]))
     pred_max = series[pred].index(max(series[pred]))
     print("t_prey_max:", prey_max, "t_pred_max:", pred_max)
-    
+
     assert_true(prey_max < pred_max)
 
     output.close()
