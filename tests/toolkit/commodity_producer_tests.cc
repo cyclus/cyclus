@@ -48,5 +48,5 @@ TEST_F(CommodityProducerTests, copy) {
   EXPECT_EQ(copy.Cost(commodity_), cost_);
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

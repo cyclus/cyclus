@@ -47,5 +47,5 @@ TEST_F(SDManagerTests, demand) {
   }
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

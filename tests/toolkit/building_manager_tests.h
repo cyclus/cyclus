@@ -1,6 +1,5 @@
-// building_manager_tests.h
-#ifndef CYCLUS_TESTS_BUILDING_MANAGER_TESTS_H_
-#define CYCLUS_TESTS_BUILDING_MANAGER_TESTS_H_
+#ifndef CYCLUS_TESTS_TOOLKIT_BUILDING_MANAGER_TESTS_H_
+#define CYCLUS_TESTS_TOOLKIT_BUILDING_MANAGER_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -12,6 +11,11 @@ namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BuildingManagerTests : public ::testing::Test {
+ public:
+  virtual void SetUp();
+  virtual void TearDown();
+  void SetUpProblem();
+
  protected:
   CommodityTestHelper helper;
   Builder builder1;
@@ -19,14 +23,9 @@ class BuildingManagerTests : public ::testing::Test {
   BuildingManager manager;
   double demand, capacity1, capacity2, cost1, cost2;
   int build1, build2;
-
- public:
-  virtual void SetUp();
-  virtual void TearDown();
-  void SetUpProblem();
 };
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
 
-#endif  // CYCLUS_TESTS_BUILDING_MANAGER_TESTS_H_
+#endif  // CYCLUS_TESTS_TOOLKIT_BUILDING_MANAGER_TESTS_H_

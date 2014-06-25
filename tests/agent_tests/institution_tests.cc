@@ -1,4 +1,3 @@
-// institution_tests.cc
 #include "institution_tests.h"
 
 #include <gtest/gtest.h>

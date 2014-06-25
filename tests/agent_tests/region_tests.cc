@@ -1,4 +1,3 @@
-// Regionagent_tests.cc
 #include "region_tests.h"
 
 #include <string>

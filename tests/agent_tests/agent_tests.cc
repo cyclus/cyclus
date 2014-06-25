@@ -1,4 +1,3 @@
-// agent_tests.cc
 #include "agent_tests.h"
 
 #include <sstream>
@@ -11,7 +10,7 @@
 
 /// this function should be called by all most derived agents in order to get
 /// access to the functionality of the agent unit test library
-extern int ConnectAgentTests() {return 0;}
+extern int ConnectAgentTests() { return 0; }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(AgentTests, Clone) {
