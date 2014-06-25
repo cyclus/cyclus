@@ -1,6 +1,5 @@
-// timer.h
-#ifndef CYCLUS_TIMER_H_
-#define CYCLUS_TIMER_H_
+#ifndef CYCLUS_SRC_TIMER_H_
+#define CYCLUS_SRC_TIMER_H_
 
 #include <utility>
 #include <vector>
@@ -54,10 +53,10 @@ class Timer {
 
   /// Schedules a snapshot of simulation state to output database to occur at
   /// the beginning of the next timestep.
-  void Snapshot() { want_snapshot_ = true; };
+  void Snapshot() { want_snapshot_ = true; }
 
   /// Schedules the simulation to be terminated at the end of this timestep.
-  void KillSim() { want_kill_ = true; };
+  void KillSim() { want_kill_ = true; }
 
   /// Returns the current time, in months since the simulation started.
   ///
@@ -109,8 +108,6 @@ class Timer {
   std::map<int, std::vector<Agent*> > decom_queue_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_TIMER_H_
-
-
+#endif  // CYCLUS_SRC_TIMER_H_

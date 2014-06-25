@@ -1,11 +1,9 @@
-
-// InstrusiveBase.h
-
-#ifndef INTRUSIVE_BASE_H
-#define INTRUSIVE_BASE_H
+#ifndef CYCLUS_SRC_INTRUSIVE_BASE_H_
+#define CYCLUS_SRC_INTRUSIVE_BASE_H_
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/assert.hpp>
+
 #include "logger.h"
 
 namespace cyclus {
@@ -63,7 +61,7 @@ template <class Derived> class IntrusiveBase {
     }
   }
 
-protected:
+ protected:
   /// protected because we don't want direct instantiations of
   IntrusiveBase(): counter_(0) {}
 
@@ -76,10 +74,11 @@ protected:
     return *this;
   }
 
-private:
+ private:
   /// tracks an object's reference count
   mutable unsigned long counter_;
 };
-} // namespace cyclus
-#endif
 
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_INTRUSIVE_BASE_H_

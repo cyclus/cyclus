@@ -6,8 +6,8 @@
    at http://cyclus.github.com/devdoc/main.html
  */
 
-#ifndef CYCLUS_LOGGER_H_
-#define CYCLUS_LOGGER_H_
+#ifndef CYCLUS_SRC_LOGGER_H_
+#define CYCLUS_SRC_LOGGER_H_
 
 
 #include <iostream>
@@ -52,18 +52,18 @@ namespace cyclus {
    categorical (verbosity) levels for log statements.
  */
 enum LogLevel {
-  LEV_ERROR, //!< Use for errors that require agent code or input file modification (use extremely sparingly)
-  LEV_WARN, //!< Use to report questionable simulation state (use extremely sparingly)
-  LEV_INFO1, //!< Information helpful for simulation users and developers alike - least verbose.
-  LEV_INFO2, //!< Information helpful for simulation users and developers alike.
-  LEV_INFO3, //!< Information helpful for simulation users and developers alike.
-  LEV_INFO4, //!< Information helpful for simulation users and developers alike.
-  LEV_INFO5, //!< Information helpful for simulation users and developers alike - most verbose.
-  LEV_DEBUG1, //!< debugging information - least verbose
-  LEV_DEBUG2, //!< debugging information
-  LEV_DEBUG3, //!< debugging information
-  LEV_DEBUG4, //!< debugging information
-  LEV_DEBUG5 //!< debugging information - most verbose
+  LEV_ERROR,  //!< Use for errors that require agent code or input file modification (use extremely sparingly)
+  LEV_WARN,  //!< Use to report questionable simulation state (use extremely sparingly)
+  LEV_INFO1,  //!< Information helpful for simulation users and developers alike - least verbose.
+  LEV_INFO2,  //!< Information helpful for simulation users and developers alike.
+  LEV_INFO3,  //!< Information helpful for simulation users and developers alike.
+  LEV_INFO4,  //!< Information helpful for simulation users and developers alike.
+  LEV_INFO5,  //!< Information helpful for simulation users and developers alike - most verbose.
+  LEV_DEBUG1,  //!< debugging information - least verbose
+  LEV_DEBUG2,  //!< debugging information
+  LEV_DEBUG3,  //!< debugging information
+  LEV_DEBUG4,  //!< debugging information
+  LEV_DEBUG5  //!< debugging information - most verbose
 };
 
 /**
@@ -74,9 +74,8 @@ enum LogLevel {
    macro as they may not run if the report level excludes the specified level.
  */
 class Logger {
-
  public:
-  Logger() {};
+  Logger() {}
   virtual ~Logger();
 
   /*!
@@ -92,17 +91,17 @@ class Logger {
   */
   static LogLevel& ReportLevel() {
     return report_level;
-  };
+  }
 
   /// Set whether or not agent/agent log entries should be printed
   static bool& NoAgent() {
     return no_agent;
-  };
+  }
 
   /// Set whether or not agent/agent log entries should be printed
   static bool& NoMem() {
     return no_mem;
-  };
+  }
 
   /*!
   Converts a string into a corresponding LogLevel value.
@@ -174,6 +173,7 @@ class Logger {
   */
   static int field_width_;
 };
-} // namespace cyclus
-#endif // ifndef CYCLUS_LOGGER_H_
 
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_LOGGER_H_

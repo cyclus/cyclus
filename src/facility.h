@@ -1,6 +1,5 @@
-// facility.h
-#ifndef CYCLUS_FACILITY_H_
-#define CYCLUS_FACILITY_H_
+#ifndef CYCLUS_SRC_FACILITY_H_
+#define CYCLUS_SRC_FACILITY_H_
 
 #include <string>
 #include <vector>
@@ -75,7 +74,7 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual ~Facility();
 
   // DO NOT call Agent class implementation of this method
-  virtual void InfileToDb(InfileTree* qe, DbInit di) {};
+  virtual void InfileToDb(InfileTree* qe, DbInit di) {}
 
   // DO NOT call Agent class implementation of this method
   virtual void InitFrom(QueryableBackend* b) {}
@@ -88,7 +87,7 @@ class Facility : public TimeListener, public Agent, public Trader {
 
      Any facility subclassing facility agent should invoke their own InitFrom
      method, calling Facility's first!
-     
+
      @param m the agent to copy from
    */
   void InitFrom(Facility* m);
@@ -120,6 +119,6 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual std::string str();
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_FACILITY_H_
+#endif  // CYCLUS_SRC_FACILITY_H_

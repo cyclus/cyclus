@@ -1,5 +1,3 @@
-//relax_ng_validator.h
-
 /* relaxngvalidator.h
  * this class is agented off of the schemavalidator in libxml++
  * here is their license statement:
@@ -10,8 +8,8 @@
  * included with libxml++ as the file COPYING.
  */
 
-#ifndef _RELAXNGVALIDATOR_H
-#define _RELAXNGVALIDATOR_H
+#ifndef CYCLUS_SRC_RELAX_NG_VALIDATOR_H_
+#define CYCLUS_SRC_RELAX_NG_VALIDATOR_H_
 
 #include <libxml/relaxng.h>
 #include <libxml++/document.h>
@@ -61,6 +59,7 @@ class RelaxNGValidator {
   /// the validated context
   xmlRelaxNGValidCtxtPtr valid_context_;
 };
-} // namespace cyclus
 
-#endif
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_RELAX_NG_VALIDATOR_H_

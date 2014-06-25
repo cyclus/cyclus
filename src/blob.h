@@ -1,4 +1,3 @@
-// blob.h
 #ifndef CYCLUS_SRC_BLOB_H_
 #define CYCLUS_SRC_BLOB_H_
 
@@ -46,6 +45,7 @@ class Blob {
  private:
   std::string str_;
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_BLOB_H_

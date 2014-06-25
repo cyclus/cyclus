@@ -1,5 +1,5 @@
-#ifndef RESOURCE_H_
-#define RESOURCE_H_
+#ifndef CYCLUS_SRC_RESOURCE_H_
+#define CYCLUS_SRC_RESOURCE_H_
 
 #include <string>
 #include <vector>
@@ -23,14 +23,14 @@ class Resource {
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 
-  Resource() : state_id_(nextstate_id_++), obj_id_(nextobj_id_++) {};
+  Resource() : state_id_(nextstate_id_++), obj_id_(nextobj_id_++) {}
 
-  virtual ~Resource() {};
+  virtual ~Resource() {}
 
   /// Returns the unique id corresponding to this resource object. Can be used
   /// to track and/or associate other information with this resource object.
   /// You should NOT track resources by pointer.
-  const int obj_id() const { return obj_id_;};
+  const int obj_id() const { return obj_id_; }
 
   /// Returns the unique id corresponding to this resource and its current
   /// state.  All resource id's are unique - even across different resource
@@ -38,7 +38,7 @@ class Resource {
   /// use the obj_id rather than this.
   const int state_id() const {
     return state_id_;
-  };
+  }
 
   /// Assigns a new, unique internal id to this resource and its state. This should be
   /// called by resource implementations whenever their state changes.  A call to
@@ -80,7 +80,6 @@ class Resource {
   virtual Ptr ExtractRes(double quantity) = 0;
 
  private:
-
   static int nextstate_id_;
   static int nextobj_id_;
   int state_id_;
@@ -95,13 +94,14 @@ std::vector<typename T::Ptr> ResCast(std::vector<Resource::Ptr> rs) {
     casted.push_back(boost::dynamic_pointer_cast<T>(rs[i]));
   }
   return casted;
-};
+}
 
 /// Casts a Resource::Ptr into a pointer of a specific resource type T.
 template <class T>
 typename T::Ptr ResCast(Resource::Ptr r) {
   return boost::dynamic_pointer_cast<T>(r);
-};
+}
 
-} // namespace cyclus
-#endif
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_RESOURCE_H_

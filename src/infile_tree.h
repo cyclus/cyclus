@@ -1,4 +1,3 @@
-//infile_tree.h
 #ifndef CYCLUS_SRC_INFILE_TREE_H_
 #define CYCLUS_SRC_INFILE_TREE_H_
 
@@ -71,7 +70,7 @@ class InfileTree {
   std::set<InfileTree*> spawned_children_;
   xmlpp::Node* current_node_;
 };
-  
+
 /// @brief a query method for required parameters
 /// @param tree the infile tree to use
 /// @param query the query to be made
@@ -123,9 +122,10 @@ template <typename T>
     val = default_val;
   return val;
 }
-  
+
 template <>
-    inline int OptionalQuery(InfileTree* tree, std::string query, int default_val) {
+    inline int OptionalQuery(InfileTree* tree, std::string query,
+                             int default_val) {
   int val = default_val;
   if (tree->NMatches(query) == 1) {
     std::string s = tree->GetString(query);
@@ -134,9 +134,10 @@ template <>
   }
   return val;
 }
-  
+
 template <>
-    inline float OptionalQuery(InfileTree* tree, std::string query, float default_val) {
+    inline float OptionalQuery(InfileTree* tree, std::string query,
+                               float default_val) {
   float val = default_val;
   if (tree->NMatches(query) == 1) {
     std::string s = tree->GetString(query);
@@ -147,7 +148,8 @@ template <>
 }
 
 template <>
-    inline double OptionalQuery(InfileTree* tree, std::string query, double default_val) {
+    inline double OptionalQuery(InfileTree* tree, std::string query,
+                                double default_val) {
   double val = default_val;
   if (tree->NMatches(query) == 1) {
     std::string s = tree->GetString(query);

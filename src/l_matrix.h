@@ -4,8 +4,8 @@
 // except its elements are long doubles.
 //-----------------------------------------------------------------------------
 
-#ifndef LMATRIX_H
-#define LMATRIX_H
+#ifndef CYCLUS_SRC_L_MATRIX_H_
+#define CYCLUS_SRC_L_MATRIX_H_
 
 #include <vector>
 
@@ -44,10 +44,9 @@ class LMatrix {
 
  private:
   std::vector< std::vector<long double> >
-  M_;  // 2D vector containing matrix elements
+      M_;  // 2D vector containing matrix elements
   int rows_;                    // number of rows
   int cols_;                    // number of columns
-
 };
 
 // arithmetic operators for matrix objects A and B
@@ -58,6 +57,6 @@ LMatrix operator*(const LMatrix& lhs, const LMatrix& rhs);    // A * B
 // non-member functions
 LMatrix identity(int n);  // creates an nxn identity matrix
 
-} // namespace cyclus
-#endif
+}  // namespace cyclus
 
+#endif  // CYCLUS_SRC_L_MATRIX_H_

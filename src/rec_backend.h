@@ -1,4 +1,3 @@
-// rec_backend.h
 #ifndef CYCLUS_SRC_REC_BACKEND_H_
 #define CYCLUS_SRC_REC_BACKEND_H_
 
@@ -35,7 +34,7 @@ class RecBackend {
     std::vector<RecBackend*> backs_;
   };
 
-  virtual ~RecBackend() {};
+  virtual ~RecBackend() {}
 
   /// Used to pass a list of new/collected Datum objects
   virtual void Notify(DatumList data) = 0;
@@ -47,5 +46,7 @@ class RecBackend {
   /// Flushes all buffered data in the backend to its final format/location.
   virtual void Flush() = 0;
 };
-} // namespace cyclus
-#endif
+
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_REC_BACKEND_H_

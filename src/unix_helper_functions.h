@@ -1,4 +1,3 @@
-// unix_helper_functions.h
 // This is the dynamic loading implementation for UNIX machines
 #ifndef CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_
 #define CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_
@@ -31,7 +30,7 @@ void DynamicModule::SetConstructor() {
   if (!ctor_) {
     std::stringstream ss;
     std::string agent = ctor_name_;
-    agent.erase(0, 9); // len(Construct) == 9
+    agent.erase(0, 9);  // len(Construct) == 9
     ss << "Could not find agent " << agent << " in module library "
        << path_.c_str() << " (" << dlerror() << ").";
     throw IOError(ss.str());
@@ -52,6 +51,7 @@ void DynamicModule::CloseLibrary() {
     dlerror();  // reset errors
   }
 }
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_UNIX_HELPER_FUNCTIONS_H_

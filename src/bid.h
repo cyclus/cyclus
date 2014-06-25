@@ -24,22 +24,18 @@ class Bid {
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
   /// @param portfolio the porftolio of which this bid is a part
-  inline static Bid<T>* Create(
-      Request<T>* request,
-      boost::shared_ptr<T> offer,
-      Trader* bidder,
-      typename BidPortfolio<T>::Ptr portfolio,
-      bool exclusive = false) {
+  inline static Bid<T>* Create(Request<T>* request,
+                               boost::shared_ptr<T> offer,
+                               Trader* bidder,
+                               typename BidPortfolio<T>::Ptr portfolio,
+                               bool exclusive = false) {
     return new Bid<T>(request, offer, bidder, portfolio, exclusive);
   }
 
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
-  inline static Bid<T>* Create(
-      Request<T>* request,
-      boost::shared_ptr<T> offer,
-      Trader* bidder,
-      bool exclusive = false) {
+  inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
+                               Trader* bidder, bool exclusive = false) {
     return new Bid<T>(request, offer, bidder, exclusive);
   }
 
@@ -70,20 +66,15 @@ class Bid {
 
  private:
   /// @brief constructors are private to require use of factory methods
-  Bid(Request<T>* request,
-      boost::shared_ptr<T> offer,
-      Trader* bidder,
+  Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
       bool exclusive = false)
       : request_(request),
         offer_(offer),
         bidder_(bidder),
         exclusive_(exclusive) {}
 
-  Bid(Request<T>* request,
-      boost::shared_ptr<T> offer,
-      Trader* bidder,
-      typename BidPortfolio<T>::Ptr portfolio,
-      bool exclusive = false)
+  Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
+      typename BidPortfolio<T>::Ptr portfolio, bool exclusive = false)
       : request_(request),
         offer_(offer),
         bidder_(bidder),

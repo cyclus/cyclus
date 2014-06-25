@@ -1,6 +1,5 @@
-// sqlite_back.h
-#ifndef CYCLUS_CORE_UTILITY_SQLITE_BACK_H_
-#define CYCLUS_CORE_UTILITY_SQLITE_BACK_H_
+#ifndef CYCLUS_SRC_SQLITE_BACK_H_
+#define CYCLUS_SRC_SQLITE_BACK_H_
 
 #include <string>
 #include <map>
@@ -106,5 +105,7 @@ class SqliteBack: public FullBackend {
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;
 };
-} // namespace cyclus
-#endif
+
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_SQLITE_BACK_H_

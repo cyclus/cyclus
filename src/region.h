@@ -1,6 +1,5 @@
-// region.h
-#ifndef CYCLUS_REGION_H_
-#define CYCLUS_REGION_H_
+#ifndef CYCLUS_SRC_REGION_H_
+#define CYCLUS_SRC_REGION_H_
 
 #include <set>
 
@@ -39,7 +38,7 @@ namespace cyclus {
    -# Deferring to an Institution to make this determination.
    -# Manage the deployment of facilities by interacting with the
    Institutions to select a specific facility type and facility
-   parameters 
+   parameters
 
    Different regional types will be required to fully define the first
    two functions while the third is a built-in capability for all region
@@ -74,20 +73,20 @@ class Region : public Agent, public TimeListener {
   /**
      Regions should not be indestructible.
    */
-  virtual ~Region() {};
+  virtual ~Region() {}
 
   // DO NOT call Agent class implementation of this method
   virtual void InfileToDb(InfileTree* qe, DbInit di) {}
 
   // DO NOT call Agent class implementation of this method
-  virtual void InitFrom(QueryableBackend* b) {};
+  virtual void InitFrom(QueryableBackend* b) {}
 
   // DO NOT call Agent class implementation of this method
-  virtual void Snapshot(DbInit di) {};
+  virtual void Snapshot(DbInit di) {}
 
-  virtual void InitInv(Inventories& inv) {};
+  virtual void InitInv(Inventories& inv) {}
 
-  virtual Inventories SnapshotInv() { return Inventories(); };
+  virtual Inventories SnapshotInv() { return Inventories(); }
 
   /**
      perform actions required when entering the simulation
@@ -103,15 +102,14 @@ class Region : public Agent, public TimeListener {
    */
   virtual std::string str();
 
-  virtual void Tick() {};
+  virtual void Tick() {}
 
-  virtual void Tock() {};
+  virtual void Tock() {}
 
  protected:
   void InitFrom(Region* m);
-
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_REGION_H_
+#endif  // CYCLUS_SRC_REGION_H_

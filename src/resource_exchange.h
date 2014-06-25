@@ -1,10 +1,10 @@
-#ifndef CYCLUS_RESOURCE_EXCHANGE_H_
-#define CYCLUS_RESOURCE_EXCHANGE_H_
+#ifndef CYCLUS_SRC_RESOURCE_EXCHANGE_H_
+#define CYCLUS_SRC_RESOURCE_EXCHANGE_H_
 
 #include <algorithm>
 #include <functional>
 #include <set>
-                   
+
 #include "bid_portfolio.h"
 #include "context.h"
 #include "exchange_context.h"
@@ -68,13 +68,13 @@ class ResourceExchange {
   ///
   /// @param ctx the simulation context
   ResourceExchange(Context* ctx) {
-    ctx_ = ctx;    
-  };
+    ctx_ = ctx;
+  }
 
   inline ExchangeContext<T>& ex_ctx() {
     return ex_ctx_;
-  } 
-  
+  }
+
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
     std::set<Trader*> traders = ctx_->traders();
@@ -84,7 +84,7 @@ class ResourceExchange {
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
                      this));
   }
-  
+
   /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
     std::set<Trader*> traders = ctx_->traders();
@@ -107,16 +107,16 @@ class ResourceExchange {
   }
 
  private:
-  /// @brief queries a given facility agent for 
+  /// @brief queries a given facility agent for
   void AddRequests_(Trader* t) {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
     typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;
     for (it = rp.begin(); it != rp.end(); ++it) {
       ex_ctx_.AddRequestPortfolio(*it);
     }
-  };
+  }
 
-  /// @brief queries a given facility agent for 
+  /// @brief queries a given facility agent for
   void AddBids_(Trader* t) {
     std::set<typename BidPortfolio<T>::Ptr> bp =
         QueryBids<T>(t, ex_ctx_.commod_requests);
@@ -124,8 +124,8 @@ class ResourceExchange {
     for (it = bp.begin(); it != bp.end(); ++it) {
       ex_ctx_.AddBidPortfolio(*it);
     }
-  };
-  
+  }
+
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
   void AdjustPrefs_(Trader* t) {
@@ -135,13 +135,13 @@ class ResourceExchange {
     while (m != NULL) {
       AdjustPrefs(m, prefs);
       m = m->parent();
-    }    
-  };
-  
+    }
+  }
+
   Context* ctx_;
   ExchangeContext<T> ex_ctx_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_RESOURCE_EXCHANGE_H_

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SIM_INIT_H_
-#define CYCLUS_SIM_INIT_H_
+#ifndef CYCLUS_SRC_SIM_INIT_H_
+#define CYCLUS_SRC_SIM_INIT_H_
 
 #include <boost/uuid/uuid_io.hpp>
 
@@ -55,15 +55,15 @@ class SimInit {
 
   /// Returns the initialized context. Note that either Init, Restart, or Branch
   /// must be called first.
-  Context* context() { return ctx_; };
+  Context* context() { return ctx_; }
 
   /// Returns the initialized recorder with registered backends. Note that
   /// either Init, Restart, or Branch must be called first.
-  Recorder* recorder() { return rec_; };
+  Recorder* recorder() { return rec_; }
 
   /// Returns the initialized timer. Note that either Init, Restart, or Branch
   /// must be called first.
-  Timer* timer() { return &ti_; };
+  Timer* timer() { return &ti_; }
 
  private:
   void InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t);
@@ -95,9 +95,6 @@ class SimInit {
   int t_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
-
-
-
+#endif  // CYCLUS_SRC_SIM_INIT_H_

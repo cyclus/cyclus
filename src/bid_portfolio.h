@@ -31,9 +31,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   typedef boost::shared_ptr< BidPortfolio<T> > Ptr;
 
   /// @brief default constructor
-  BidPortfolio()
-      : bidder_(NULL),
-        commodity_("NO_COMMODITY_SET") {}
+  BidPortfolio() : bidder_(NULL), commodity_("NO_COMMODITY_SET") {}
 
   /// deletes all bids associated with it
   ~BidPortfolio() {
@@ -41,7 +39,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
     for (it = bids_.begin(); it != bids_.end(); ++it) {
       delete *it;
     }
-  };
+  }
 
   /// @brief add a bid to the portfolio
   /// @param request the request being responded to by this bid
@@ -49,10 +47,8 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @param bidder the bidder
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original or if the bid commodity is different than the original
-  Bid<T>* AddBid(Request<T>* request,
-                 boost::shared_ptr<T> offer,
-                 Trader* bidder,
-                 bool exclusive = false) {
+  Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
+                 Trader* bidder, bool exclusive = false) {
     Bid<T>* b =
         Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
                        exclusive);

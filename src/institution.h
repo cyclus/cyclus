@@ -1,14 +1,13 @@
-// institution.h
-#ifndef CYCLUS_INSTITUTION_H_
-#define CYCLUS_INSTITUTION_H_
+#ifndef CYCLUS_SRC_INSTITUTION_H_
+#define CYCLUS_SRC_INSTITUTION_H_
 
-#include "time_listener.h"
-#include "agent.h"
-#include "region.h"
-
+#include <list>
 #include <map>
 #include <set>
-#include <list>
+
+#include "agent.h"
+#include "region.h"
+#include "time_listener.h"
 
 namespace cyclus {
 
@@ -43,20 +42,20 @@ class Institution : public Agent, public TimeListener {
   /**
      every agent should be destructable
    */
-  virtual ~Institution() {};
+  virtual ~Institution() {}
 
   // DO NOT call Agent class implementation of this method
-  virtual void InfileToDb(InfileTree* qe, DbInit di) {};
+  virtual void InfileToDb(InfileTree* qe, DbInit di) {}
 
   // DO NOT call Agent class implementation of this method
-  virtual void InitFrom(QueryableBackend* b) {};
+  virtual void InitFrom(QueryableBackend* b) {}
 
   // DO NOT call Agent class implementation of this method
-  virtual void Snapshot(DbInit di) {};
+  virtual void Snapshot(DbInit di) {}
 
-  virtual void InitInv(Inventories& inv) {};
+  virtual void InitInv(Inventories& inv) {}
 
-  virtual Inventories SnapshotInv() { return Inventories(); };
+  virtual Inventories SnapshotInv() { return Inventories(); }
 
   /**
      every agent should be able to print a verbose description
@@ -72,16 +71,14 @@ class Institution : public Agent, public TimeListener {
 
   virtual void Decommission();
 
-  virtual void Tick() {};
+  virtual void Tick() {}
 
   virtual void Tock();
 
  protected:
   void InitFrom(Institution* m);
-
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_INSTITUTION_H_
-
+#endif  // CYCLUS_SRC_INSTITUTION_H_

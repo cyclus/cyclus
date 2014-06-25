@@ -1,5 +1,5 @@
-#ifndef MATERIAL_H_
-#define MATERIAL_H_
+#ifndef CYCLUS_SRC_MATERIAL_H_
+#define CYCLUS_SRC_MATERIAL_H_
 
 #include <list>
 #include <boost/shared_ptr.hpp>
@@ -18,7 +18,7 @@ const double kg = 1.0;
 const double g =  kg* .001;
 const double mg = kg* .000001;
 const double ug = kg* .000000001;
-} // namespace units
+}  // namespace units
 
 /// The material class is primarily responsible for enabling basic material
 /// manipulation while helping enforce mass conservation.  It also provides the
@@ -116,7 +116,8 @@ class Material: public Resource {
   /// @param threshold an absolute mass cutoff below which constituent nuclide
   /// quantities of the remaining unextracted material are set to zero.
   /// @return a new material with quantity qty and composition c
-  Ptr ExtractComp(double qty, Composition::Ptr c, double threshold = eps_rsrc());
+  Ptr ExtractComp(double qty, Composition::Ptr c,
+                  double threshold = eps_rsrc());
 
   /// Combines material mat with this one.  mat's quantity becomes zero.
   void Absorb(Ptr mat);
@@ -144,7 +145,6 @@ class Material: public Resource {
   Composition::Ptr comp_;
   int prev_decay_time_;
   ResTracker tracker_;
-
 };
 
 /// Creates and returns a new material with the specified quantity and a
@@ -152,6 +152,6 @@ class Material: public Resource {
 /// purposes.
 Material::Ptr NewBlankMaterial(double qty);
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_MATERIAL_H_

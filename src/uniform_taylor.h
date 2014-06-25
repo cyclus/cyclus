@@ -1,4 +1,3 @@
-// uniform_taylor.h
 #ifndef CYCLUS_SRC_UNIFORM_TAYLOR_H_
 #define CYCLUS_SRC_UNIFORM_TAYLOR_H_
 
@@ -73,5 +72,7 @@ class UniformTaylor {
    */
   static int MaxNumTerms(long double alpha_t, double epsilon);
 };
+
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_UNIFORM_TAYLOR_H_

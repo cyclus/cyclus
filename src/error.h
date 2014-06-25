@@ -1,4 +1,3 @@
-// error.h
 #ifndef CYCLUS_SRC_ERROR_H_
 #define CYCLUS_SRC_ERROR_H_
 
@@ -103,7 +102,7 @@ std::map<Warnings, std::string> warn_prefixes();
 /// The number of warnings issues for each kind.
 extern std::map<Warnings, std::string> warn_prefix;
 
-/// Issue a warning with the approriate message, accoring to the current 
+/// Issue a warning with the approriate message, accoring to the current
 /// warning settings.
 template <Warnings T>
 void Warn(const std::string& msg) {
@@ -129,7 +128,7 @@ void Warn(const std::string& msg) {
   if (cnt >= warn_limit)
     return;
   std::cerr << warn_prefix[T] << ": " << msg << "\n";
-};
+}
 
 }  // namespace cyclus
 

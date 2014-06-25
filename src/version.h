@@ -7,6 +7,7 @@
 
 namespace cyclus {
 namespace version {
+
 const char* describe();
 
 const char* core();
@@ -20,6 +21,7 @@ const char* hdf5();
 const char* xml2();
 
 const char* coincbc();
+
 }  // namespace version
 }  // namespace cyclus
 

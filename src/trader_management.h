@@ -83,7 +83,7 @@ inline static void AcceptTrades(
 template<>
 inline void AcceptTrades(
     Trader* trader,
-    const std::vector< std::pair<Trade<Material>, 
+    const std::vector< std::pair<Trade<Material>,
         Material::Ptr> >& responses) {
   trader->AcceptMatlTrades(responses);
 }
