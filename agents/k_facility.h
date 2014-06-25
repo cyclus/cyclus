@@ -196,7 +196,6 @@ class KFacility : public cyclus::Facility {
                       "doc": "conversion factor that governs the behavior " \
                              "of the k-facility's output commodity capacity"}
   double k_factor_out;
-
 };
 
 }  // namespace cyclus

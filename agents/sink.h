@@ -44,12 +44,12 @@ class Sink : public cyclus::Facility  {
   /// @brief Sink place accepted trade Materials in their Inventory
   virtual void AcceptMatlTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
-      cyclus::Material::Ptr> >& responses);
+                                   cyclus::Material::Ptr> >& responses);
 
   /// @brief Sink place accepted trade Materials in their Inventory
   virtual void AcceptProductTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
-      cyclus::Product::Ptr> >& responses);
+                                   cyclus::Product::Ptr> >& responses);
 
   /// @brief determines the amount to request
   inline double Capacity() const { return capacity; }

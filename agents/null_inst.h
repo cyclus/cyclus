@@ -13,7 +13,7 @@ class NullInst : public cyclus::Institution {
   virtual ~NullInst();
 
   #pragma cyclus
-  
+
   #pragma cyclus note {"doc": "An instition that owns facilities in the " \
                               "simulation but exhibits null behavior. " \
                               "No parameters are given when using the " \

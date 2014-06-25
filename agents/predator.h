@@ -12,7 +12,7 @@ namespace cyclus {
 /// This Predator facility simulates hunters on preys.
 class Predator : public cyclus::Facility  {
  public:
-  /// smallest first! 
+  /// Smallest first!
   static inline bool SortById(cyclus::Bid<cyclus::Product>* l,
                               cyclus::Bid<cyclus::Product>* r) {
     return l->bidder()->manager()->id() < r->bidder()->manager()->id();
@@ -42,16 +42,16 @@ class Predator : public cyclus::Facility  {
   /// @brief Predator place accepted trade Materials in their Inventory
   virtual void AcceptProductTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
-      cyclus::Product::Ptr> >& responses);
+                                   cyclus::Product::Ptr> >& responses);
 
   inline std::string name() {
     std::stringstream ss;
     ss << prototype() << "_" << id();
     return ss.str();
-  };
+  }
 
   void GiveBirth();
-  
+
  private:
   #pragma cyclus var {"tooltip": "predator commodity", \
                       "doc": "commodity that the predator supplies", \
@@ -63,24 +63,24 @@ class Predator : public cyclus::Facility  {
                       "schematype": "token"}
   std::string prey;
 
-  /// how many prey until we're full
+  /// How many prey until we're full
   #pragma cyclus var {'default': 1, "tooltip": "feast size", \
                       "doc": "how many units of prey a predator " \
                              "consumes until it is satisfied"}
   double full;
-  
-  /// how many prey we can catch on the hunt
+
+  /// How many prey we can catch on the hunt
   #pragma cyclus var {'default': 1, "tooltip": "hunting yield", \
                       "doc": "how many units of prey a predator " \
                              "can catch during a hunt"}
   double hunt_cap;
-  
-  /// how often we hunt
+
+  /// How often we hunt
   #pragma cyclus var {'default': 1, "tooltip": "hunting frequency", \
                       "doc": "how often a predator needs to hunt"}
   int hunt_freq;
 
-  /// hunting success on a scale from 1 to 0
+  /// Hunting success on a scale from 0 to 1
   #pragma cyclus var {'default': 1, "tooltip": "hunting success fraction", \
                       "doc": "fraction of hunting success on a scale " \
                              "from 0 to 1"}
@@ -91,7 +91,7 @@ class Predator : public cyclus::Facility  {
                              "each birthing instance"}
   double nchildren;
 
-  /// age of a predator
+  /// Age of a predator
   #pragma cyclus var {'default': 0, "tooltip": "predator age", \
                       "doc": "age of predator at beginning of simulation"}
   int age;
@@ -104,22 +104,22 @@ class Predator : public cyclus::Facility  {
                       "doc": "flag for whether predator is currently dead"}
   bool dead;
 
-  /// whether or not to base hunt succes on relative prey/predator populations
+  /// Whether or not to base hunt succes on relative prey/predator populations
   #pragma cyclus var {'default': 0, "tooltip": "hunting success factor", \
                       "doc": "whether or not to base hunting success on " \
-                             "relative predator/prey populations"} // false
+                             "relative predator/prey populations"}  // false
   bool hunt_factor;
 
-  /// whether or not an agent can give birth and die in the same timestep  
+  /// Whether or not an agent can give birth and die in the same timestep
   #pragma cyclus var {'default': 0, "tooltip": "simultaneous birth " \
                                                "and death?", \
                       "doc": "whether or not simultaneous birth and " \
                              "and death are allowed (i.e., can a " \
                              "facility give birth and die in the " \
-                             "same time step?)"} // false
+                             "same time step?)"}  // false
   bool birth_and_death;
 
-  /// consumption this time step
+  /// Consumption this time step
   #pragma cyclus var {'default': 0, "tooltip": "prey consumed", \
                       "doc": "how many units of prey consumed per time step"}
   double consumed;

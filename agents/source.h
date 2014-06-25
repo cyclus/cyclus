@@ -29,7 +29,7 @@ class Source : public cyclus::Facility {
   #pragma cyclus note {"doc": "A minimum implementation source " \
                               "facility that provides a commodity " \
                               "with a given capacity"}
-  
+
   virtual std::string str();
 
   virtual void Tick();
@@ -51,7 +51,7 @@ class Source : public cyclus::Facility {
   virtual void GetMatlTrades(
       const std::vector< cyclus::Trade<cyclus::Material> >& trades,
       std::vector<std::pair<cyclus::Trade<cyclus::Material>,
-      cyclus::Material::Ptr> >& responses);
+                            cyclus::Material::Ptr> >& responses);
 
   /**
      @brief creates a material object to offer to a requester
