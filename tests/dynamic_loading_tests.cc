@@ -33,6 +33,11 @@ TEST(DynamicLoadingTests, LoadLibError) {
   EXPECT_THROW(DynamicModule::Make(ctx, AgentSpec("foo:foo:not_a_fac")), cyclus::IOError);
 }
 
+TEST(DynamicLoadingTests, Exists) {
+  EXPECT_TRUE(DynamicModule::Exists(AgentSpec("tests:TestFacility:TestFacility")));
+  EXPECT_FALSE(DynamicModule::Exists(AgentSpec("foo:foo:not_a_fac")));
+}
+
 TEST(DynamicLoadingTests, CloneTestFacility) {
   cyclus::Recorder rec;
   cyclus::Timer ti;

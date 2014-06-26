@@ -8,15 +8,20 @@ std::set<std::string> DiscoverArchetypes(const std::string s) {
   std::set<string> archs;
   size_t offset = 0;
   size_t end_offset = 0;
-  const string words = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
-  while ((offset = s.find("Construct", offset)) != string::npos) {
-    end_offset = s.find_first_not_of(words, offset+9);
-    if (words.find(s[offset-1]) != string::npos || offset+9 == end_offset) {
+  const string words = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+                                 "abcdefghijklmnopqrstuvwxyz";
+  string construct = "Construct";
+  if (SUFFIX == ".dylib")
+    construct = "_Construct";
+  size_t lenconstruct = construct.length();
+  while ((offset = s.find(construct, offset)) != string::npos) {
+    end_offset = s.find_first_not_of(words, offset+lenconstruct);
+    if (words.find(s[offset-1]) != string::npos || offset+lenconstruct == end_offset) {
       // make sure construct starts the word
-      offset += 9;
+      offset += lenconstruct;
       continue;
     }
-    archs.insert(string(s, offset+9, end_offset - offset - 9));
+    archs.insert(string(s, offset+lenconstruct, end_offset - offset - lenconstruct));
     offset = end_offset;
   }
   return archs;
