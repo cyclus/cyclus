@@ -34,15 +34,15 @@ INSTALL(
 ################################## begin cyclus unit tests ###################################
 ##############################################################################################
 
-ADD_EXECUTABLE( 
+ADD_EXECUTABLE(
   cyclus_unit_tests
   ${CYCLUS_CORE_TEST_SOURCE}
-  cyclus_unit_test_driver.cc 
+  cyclus_unit_test_driver.cc
   )
 
-TARGET_LINK_LIBRARIES( 
-  cyclus_unit_tests dl 
-  ${LIBS} 
+TARGET_LINK_LIBRARIES(
+  cyclus_unit_tests dl
+  ${LIBS}
   ${CYCLUS_TEST_LIBRARIES}
   )
 

@@ -3,8 +3,7 @@
 using stubs::StubInst;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubInst::StubInst(cyclus::Context* ctx)
-    : cyclus::Institution(ctx) {};
+StubInst::StubInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubInst::~StubInst() {}

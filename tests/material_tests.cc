@@ -1,11 +1,9 @@
-// material_tests.cpp
 #include "material_tests.h"
 
 #include <cmath>
 
 #include <gtest/gtest.h>
 
-#include "cyc_limits.h"
 #include "cyc_limits.h"
 #include "toolkit/mat_query.h"
 #include "error.h"
@@ -83,7 +81,6 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
-  
   // make a number of materials masses 1, 2, and 10
   Material::Ptr same_as_orig_test_mat = Material::CreateUntracked(0,
                                                 test_comp_);
@@ -226,7 +223,6 @@ TEST_F(MaterialTest, ExtractInGrams) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, DecayShortcut) {
-  
   CompMap mp;
   mp[922350000] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(mp);
@@ -239,4 +235,4 @@ TEST_F(MaterialTest, DecayShortcut) {
   EXPECT_EQ(c, m->comp());
 }
 
-} // namespace cyclus
+}  // namespace cyclus

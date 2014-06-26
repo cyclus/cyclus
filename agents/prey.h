@@ -39,33 +39,33 @@ class Prey : public cyclus::Facility {
   virtual void GetProductTrades(
       const std::vector< cyclus::Trade<cyclus::Product> >& trades,
       std::vector<std::pair<cyclus::Trade<cyclus::Product>,
-      cyclus::Product::Ptr> >& responses);
+                            cyclus::Product::Ptr> >& responses);
 
   inline std::string name() {
     std::stringstream ss;
     ss << prototype() << "_" << id();
     return ss.str();
-  };
+  }
 
   void GiveBirth();
-  
+
  private:
   #pragma cyclus var {"schematype": "token"}
   std::string commod;
 
-  /// number of timsteps between having children
+  /// Number of timsteps between having children
   #pragma cyclus var {'default': 1, "tooltip": "birth frequency", \
                       "doc": "number of time steps between birth " \
                              "of children"}
   int birth_freq;
 
-  // number of children
+  // Number of children
   #pragma cyclus var {'default': 1, "tooltip": "number of children", \
                       "doc": "number of children born at each " \
                              "birthing instance"}
   int nchildren;
-  
-  /// age of a prey
+
+  /// Age of a prey
   #pragma cyclus var {'default': 0, "tooltip": "prey age", \
                       "doc": "age of prey at start of simulation"}
   int age;
@@ -74,13 +74,13 @@ class Prey : public cyclus::Facility {
                       "doc": "flag for whether prey is currently dead"}
   bool dead;
 
-  /// whether or not an agent can give birth and die in the same timestep
+  /// Whether or not an agent can give birth and die in the same timestep
   #pragma cyclus var {'default': 1, "tooltip": "simultaneous birth " \
                                     "and death?", \
                       "doc": "whether or not simultaneous birth and " \
                              "and death are allowed (i.e., can a " \
                              "facility give birth and die in the " \
-                             "same time step?)"} // true
+                             "same time step?)"}  // true
   bool birth_and_death;
 };
 

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_EXCHANGE_MANAGER_H
-#define CYCLUS_EXCHANGE_MANAGER_H
+#ifndef CYCLUS_SRC_EXCHANGE_MANAGER_H_
+#define CYCLUS_SRC_EXCHANGE_MANAGER_H_
 
 #include <algorithm>
 
@@ -26,7 +26,7 @@ namespace cyclus {
 template <class T>
 class ExchangeManager {
  public:
-  ExchangeManager(Context* ctx) : ctx_(ctx) {};
+  ExchangeManager(Context* ctx) : ctx_(ctx) {}
 
   /// @brief execute the full resource sequence
   void Execute() {
@@ -36,13 +36,13 @@ class ExchangeManager {
     exchng.AddAllBids();
     exchng.AdjustAll();
     CLOG(LEV_DEBUG1) << "done with info gathering";
-    
+
     // translate graph
     ExchangeTranslator<T> xlator(&exchng.ex_ctx());
     CLOG(LEV_DEBUG1) << "translating graph...";
     ExchangeGraph::Ptr graph = xlator.Translate();
     CLOG(LEV_DEBUG1) << "graph translated!";
-    
+
     // solve graph
     CLOG(LEV_DEBUG1) << "solving graph...";
     ctx_->solver()->Solve(graph.get());
@@ -63,6 +63,6 @@ class ExchangeManager {
   Context* ctx_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_EXCHANGE_MANAGER_H
+#endif  // CYCLUS_SRC_EXCHANGE_MANAGER_H_

@@ -3,8 +3,7 @@
 namespace stubs {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubFacility::StubFacility(cyclus::Context* ctx)
-    : cyclus::Facility(ctx) {};
+StubFacility::StubFacility(cyclus::Context* ctx) : cyclus::Facility(ctx) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StubFacility::str() {
@@ -22,4 +21,4 @@ extern "C" cyclus::Agent* ConstructStubFacility(cyclus::Context* ctx) {
   return new StubFacility(ctx);
 }
 
-}
+}  // namespace stubs

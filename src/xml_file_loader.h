@@ -1,6 +1,5 @@
-// xml_file_loader.h
-#ifndef CYCLUS_XML_FILE_LOADER_H_
-#define CYCLUS_XML_FILE_LOADER_H_
+#ifndef CYCLUS_SRC_XML_FILE_LOADER_H_
+#define CYCLUS_SRC_XML_FILE_LOADER_H_
 
 #include <map>
 #include <string>
@@ -34,7 +33,7 @@ std::string BuildMasterSchema(std::string schema_path, std::string infile);
 Composition::Ptr ReadRecipe(InfileTree* qe);
 
 /// Handles initialization of a database with information from
-/// a cyclus xml input file. 
+/// a cyclus xml input file.
 ///
 /// @warning the LoadSim method is NOT idempotent. Only one / simulation should
 /// ever be initialized per XMLFileLoader object.
@@ -76,7 +75,7 @@ class XMLFileLoader {
 
   virtual std::string master_schema();
 
-  /// Processes commodity priorities, such that any without a defined priority 
+  /// Processes commodity priorities, such that any without a defined priority
   /// (i.e., are nonpositive), are given priority lower than the last known
   /// commodity
   void ProcessCommodities(std::map<std::string, double>* commodity_priority);
@@ -101,9 +100,8 @@ class XMLFileLoader {
 
   /// the input file name
   std::string file_;
-
 };
-} // namespace cyclus
 
-#endif // ifndef CYCLUS_XML_FILE_LOADER_H_
+}  // namespace cyclus
 
+#endif  // CYCLUS_SRC_XML_FILE_LOADER_H_

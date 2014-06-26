@@ -4,10 +4,10 @@ namespace cyclus {
 
 Sink::Sink(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
-      capacity(100){}
+      capacity(100) {}
 
 std::string Sink::str() {
-  // no info for now. Change later
+  // No info for now. Change later
   return Facility::str();
 }
 
@@ -69,7 +69,7 @@ Sink::GetProductRequests() {
 
 void Sink::AcceptMatlTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
-    cyclus::Material::Ptr> >& responses) {
+                                 cyclus::Material::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Material>,
   cyclus::Material::Ptr> >::const_iterator it;
   for (it = responses.begin(); it != responses.end(); ++it) {
@@ -79,7 +79,7 @@ void Sink::AcceptMatlTrades(
 
 void Sink::AcceptProductTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
-    cyclus::Product::Ptr> >& responses) {
+                                 cyclus::Product::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Product>,
   cyclus::Product::Ptr> >::const_iterator it;
   for (it = responses.begin(); it != responses.end(); ++it) {
@@ -94,7 +94,7 @@ void Sink::Tick() {
   LOG(cyclus::LEV_INFO3, "SnkFac") << prototype() << " is ticking";
 
   double request_amt = Capacity();
-  // inform the simulation about what the sink facility will be requesting
+  // Inform the simulation about what the sink facility will be requesting
   if (request_amt > cyclus::eps()) {
     for (vector<string>::iterator commod = in_commods.begin();
          commod != in_commods.end();

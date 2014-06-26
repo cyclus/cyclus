@@ -1,4 +1,3 @@
-// windows_helper_functions.h
 // This is the dynamic loading implementation for WINDOWS machines
 #ifndef CYCLUS_SRC_WINDOWS_HELPER_FUNCTIONS_H_
 #define CYCLUS_SRC_WINDOWS_HELPER_FUNCTIONS_H_
@@ -30,7 +29,7 @@ void DynamicModule::SetConstructor() {
   if (!ctor_) {
     std::stringstream ss;
     std::string agent = ctor_name_;
-    agent.erase(0, 9); // len(Construct) == 9
+    agent.erase(0, 9);  // len(Construct) == 9
     ss << "Could not find agent " << agent << " in module library "
        << path_.c_str() << " (" << GetLastError() << ").";
     throw IOError(ss.str());
@@ -43,6 +42,7 @@ void DynamicModule::CloseLibrary() {
     FreeLibrary(module_library_);
   }
 }
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_WINDOWS_HELPER_FUNCTIONS_H_

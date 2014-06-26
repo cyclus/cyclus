@@ -3,13 +3,12 @@
 #include <gtest/gtest.h>
 
 #include "boost/filesystem.hpp"
-#include "hdf5.h"
-#include "hdf5_hl.h"
 
 #include "blob.h"
 #include "error.h"
+#include "hdf5.h"
 #include "hdf5_back.h"
-
+#include "hdf5_hl.h"
 #include "tools.h"
 
 static const char* path = "testdb.h5";
@@ -165,9 +164,9 @@ TEST_F(Hdf5BackTests, ReadWriteBlob) {
 TEST_F(Hdf5BackTests, ReadWriteUuid) {
   using boost::uuids::uuid;
   shape.clear();
-  uuid x = {0x12 ,0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56,
+  uuid x = {0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56,
             0x78, 0x90, 0xab, 0xcd, 0xef};
-  uuid y = {0x42 ,0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
+  uuid y = {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
             0x42, 0x42, 0x42, 0x42, 0x42};
   TestBasic<uuid>("uuid", x, y);
 }
@@ -895,7 +894,7 @@ TEST(Hdf5BackTest, ReadWriteAll) {
 
   // query read
   string expfields[] = {"SimId", "string", "int", "float", "double"};
-  cyclus::DbTypes exptypes[] = {cyclus::UUID, cyclus::STRING, cyclus::INT, 
+  cyclus::DbTypes exptypes[] = {cyclus::UUID, cyclus::STRING, cyclus::INT,
                                 cyclus::FLOAT, cyclus::DOUBLE};
   cyclus::QueryResult qr = back.Query("DumbTitle", NULL);
   for (int i = 0; i < qr.fields.size(); i++) {

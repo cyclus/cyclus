@@ -2,30 +2,30 @@
 Cyclus Core
 ###########
 
-The core of the Cyclus nuclear fuel cycle simulator from the 
-University of Wisconsin - Madison is intended to be a simulation 
-framework upon which to develop innovative fuel cycle simulations. 
+The core of the Cyclus nuclear fuel cycle simulator from the
+University of Wisconsin - Madison is intended to be a simulation
+framework upon which to develop innovative fuel cycle simulations.
 
-To see user and developer documentation for this code, please visit 
+To see user and developer documentation for this code, please visit
 the `Cyclus Homepage`_.
 
 ******************************
 Building and Installing Cyclus
 ******************************
 
-In order to facilitate future compatibility with multiple platforms, 
-Cyclus is built using `CMake`_. A full list of the Cyclus package 
+In order to facilitate future compatibility with multiple platforms,
+Cyclus is built using `CMake`_. A full list of the Cyclus package
 dependencies is shown below:
 
 ====================   ==================
-Package                Minimum Version   
+Package                Minimum Version
 ====================   ==================
-`CMake`                2.8            
+`CMake`                2.8
 `boost`                1.46.1
 `libxml2`              2
 `libxml++`             2.36
 `python`               2.7 or 3.3+
-`sqlite3`              3.7.10            
+`sqlite3`              3.7.10
 `HDF5`                 1.8.4
 `Coin-Cbc`             2.5
 ====================   ==================
@@ -33,7 +33,7 @@ Package                Minimum Version
 On some platforms, such as Ubuntu 14.04, the following are also necessary:
 
 ====================   ==================
-Package                Minimum Version   
+Package                Minimum Version
 ====================   ==================
 `g++`                  4.8.2
 `libblas-dev`          1.2
@@ -44,7 +44,7 @@ Package                Minimum Version
 An optional dependency (to build documentation) is:
 
 ====================   ==================
-Package                Minimum Version   
+Package                Minimum Version
 ====================   ==================
 doxygen                1.7.6.1
 ====================   ==================
@@ -57,8 +57,8 @@ This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
 of Ubuntu 12.10 using apt-get as the package manager; if on a Mac system, a good
-manager to use is macports. In that case, replace all of the following instances 
-of "apt-get" with "port". 
+manager to use is macports. In that case, replace all of the following instances
+of "apt-get" with "port".
 
 The command to install a dependency takes the form of:
 
@@ -100,7 +100,7 @@ If you'd prefer to copy/paste, the following line will install all *Cyclus*
 dependencies:
 
 .. code-block:: bash
-  
+
    sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++
 
 Boost Note
@@ -123,7 +123,7 @@ Installing Cyclus (Linux and Unix)
 ==================================
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
-fairly straightforward. 
+fairly straightforward.
 
 We make the following assumptions in this guide:
 
@@ -134,7 +134,7 @@ We make the following assumptions in this guide:
 #. you have acquired the Cyclus source code from the `Cyclus repo`_
 #. you have placed the Cyclus repository in .../cyclus/cyclus
 
-Under these assumptions **and** if you used a package manager to 
+Under these assumptions **and** if you used a package manager to
 install coin-Cbc (i.e. it's installed in a standard location), the
 Cyclus building and installation process will look like:
 
@@ -142,9 +142,9 @@ Cyclus building and installation process will look like:
 
     .../cyclus/cyclus$ python install.py --prefix=../install
 
-If you have installed coin-Cbc from source or otherwise have it 
-installed in a non-standard location, you should make use of the 
-coinRoot installation flag. The otherwise identical process would look 
+If you have installed coin-Cbc from source or otherwise have it
+installed in a non-standard location, you should make use of the
+coinRoot installation flag. The otherwise identical process would look
 like:
 
 .. code-block:: bash
@@ -167,18 +167,18 @@ There are additional options which can be inspected via `install.py`'s help:
 Windows
 =======
 
-A native Windows installation is not currently explicitly supported. However, a 
-Virtual Machine image can be downloaded which includes a pre-installation of all 
-of these dependencies as well as a pre-installation of Cyclus. If you do not 
+A native Windows installation is not currently explicitly supported. However, a
+Virtual Machine image can be downloaded which includes a pre-installation of all
+of these dependencies as well as a pre-installation of Cyclus. If you do not
 have access to a Linux or Unix (MacOS) machine, please follow these three steps:
 
 #. Install `VirtualBox <https://www.virtualbox.org/>`_
-#. Download `cyclus_user_environment.ova 
-   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus_user_environment.ova>`_ 
+#. Download `cyclus_user_environment.ova
+   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus_user_environment.ova>`_
 #. Open the .ova file using VirtualBox (File->Import Appliance).
 
-The user name is "cyclus-user" and the password is "cyclus". You now have the 
-same user environment as someone who installed cyclus on an Ubuntu Linux 
+The user name is "cyclus-user" and the password is "cyclus". You now have the
+same user environment as someone who installed cyclus on an Ubuntu Linux
 machine. Congratulations. You may skip to `Running Tests`_ .
 
 
@@ -244,17 +244,17 @@ Issuing a Pull Request
 Reviewing a Pull Request
 ========================
 
-* Look over the code. 
+* Look over the code.
 
   * Check that it meets `our style guidelines
     <http://cyclus.github.com/devdoc/style_guide.html>`_.
 
-  * Make inline review comments concerning improvements. 
+  * Make inline review comments concerning improvements.
 
 * Wait for the Continuous Integration service to show full test passage
 
 * Click the green "Merge Pull Request" button
-  
+
   * Note: if the button is not available, the requester needs to merge or rebase
     from the current HEAD of the blessed's "develop" (or "master") branch
 
@@ -280,8 +280,8 @@ for brand new programmers, an example is provided.
 
 For the sake of simplicity, let us assume that we want a single "sandbox" branch
 in which we would like to work, i.e. where we can store all of our work that may not
-yet pass tests or even compile, but where we also want to save our progress. Let us 
-call this branch "Work". So, when all is said and done, in our fork there will be 
+yet pass tests or even compile, but where we also want to save our progress. Let us
+call this branch "Work". So, when all is said and done, in our fork there will be
 three branches: "Master", "Develop", and "Work".
 
 Acquiring Cyclus and Workflow
@@ -293,7 +293,7 @@ the repo, we will have two branches in our fork: "Master" and "Develop".
 Acquiring a Fork of the Cyclus Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A fork is *your* copy of Cyclus. Github offers an excellent 
+A fork is *your* copy of Cyclus. Github offers an excellent
 `tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
 example assumes you have set up the "upstream" repository as cyclus/core. Note that git
 refers to your fork as "origin".
@@ -305,8 +305,8 @@ First, let's make our "work" branch:
 
 We now have the following situation: there exists the "blessed" copy of the Master and
 Develop branches, there exists your fork's copy of the Master, Develop, and Work branches,
-*AND* there exists your *local* copy of the Master, Develop, and Work branches. It is 
-important now to note that you may wish to work from home or the office. If you keep your 
+*AND* there exists your *local* copy of the Master, Develop, and Work branches. It is
+important now to note that you may wish to work from home or the office. If you keep your
 fork's branches up to date (i.e., "push" your changes before you leave), only your *local*
 copies of your branches may be different when you next sit down at the other location.
 
@@ -329,9 +329,9 @@ let's update our *home's local branches*.  ::
     .../cyclus_dir/$ git rebase develop
     .../cyclus_dir/$ git push origin work
 
-Perhaps a little explanation is required. We first want to make sure that this new local copy of 
+Perhaps a little explanation is required. We first want to make sure that this new local copy of
 the develop branch is up-to-date with respect to the remote origin's branch and remote upstream's
-branch. If there was a change from the remote upstream's branch, we want to push that to origin. 
+branch. If there was a change from the remote upstream's branch, we want to push that to origin.
 We then follow the same process to update the work branch, except:
 
 #. we don't need to worry about the *upstream* repo because it doesn't have a work branch, and
@@ -341,24 +341,23 @@ Workflow: The End
 ^^^^^^^^^^^^^^^^^
 
 As time passes, you make some changes to files, and you commit those changes (to your *local work
-branch*). Eventually (hopefully) you come to a stopping point where you have finished your project 
+branch*). Eventually (hopefully) you come to a stopping point where you have finished your project
 on your work branch *AND* it compiles *AND* it runs input files correctly *AND* it passes all tests!
 Perhaps you have found Nirvana. In any case, you've performed the final commit to your work branch,
-so it's time to make a pull request online and wait for our developer friends to 
+so it's time to make a pull request online and wait for our developer friends to
 review and accept it.
 
-Sometimes, your pull request will be closed by the reviewer until further 
-changes are made to appease the reviewer's concerns. This may be frustrating, 
-but please act rationally, discuss the issues on the GitHub space made for your 
-pull request, consult the `style guide <http://cyclus.github.com/devdoc/style_guide.html>`_, 
-email the developer listhost for further advice, and make changes to your topic branch 
-accordingly. The pull request will be updated with those changes when you push them 
-to your fork.  When you think your request is ready for another review, you can 
-reopen the review yourself with the button made available to you. 
+Sometimes, your pull request will be closed by the reviewer until further
+changes are made to appease the reviewer's concerns. This may be frustrating,
+but please act rationally, discuss the issues on the GitHub space made for your
+pull request, consult the `style guide <http://cyclus.github.com/devdoc/style_guide.html>`_,
+email the developer listhost for further advice, and make changes to your topic branch
+accordingly. The pull request will be updated with those changes when you push them
+to your fork.  When you think your request is ready for another review, you can
+reopen the review yourself with the button made available to you.
 
 See also
 --------
 
 A good description of a git workflow with good graphics is available at
 http://nvie.com/posts/a-successful-git-branching-agent/
-

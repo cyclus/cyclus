@@ -1,17 +1,15 @@
-/// institution.cc
 // Implements the Institution class
+#include "institution.h"
 
 #include <iostream>
 #include <sstream>
 #include <string>
 
-#include "institution.h"
-
-#include "logger.h"
-#include "timer.h"
 #include "error.h"
 #include "facility.h"
 #include "infile_tree.h"
+#include "logger.h"
+#include "timer.h"
 
 namespace cyclus {
 
@@ -46,7 +44,7 @@ void Institution::Decommission() {
 
 void Institution::Tock() {
   std::vector<Agent*> to_decomm;
-  std::set<Agent*>::iterator it;  
+  std::set<Agent*>::iterator it;
   // set children's parents to NULL
   for (it = children().begin(); it != children().end(); ++it) {
     Facility* child = dynamic_cast<Facility*>(*it);
@@ -67,4 +65,4 @@ void Institution::Tock() {
   }
 }
 
-} // namespace cyclus
+}  // namespace cyclus

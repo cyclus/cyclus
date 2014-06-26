@@ -1,5 +1,5 @@
-#ifndef CYCLUS_EXCHANGE_GRAPH_H_
-#define CYCLUS_EXCHANGE_GRAPH_H_
+#ifndef CYCLUS_SRC_EXCHANGE_GRAPH_H_
+#define CYCLUS_SRC_EXCHANGE_GRAPH_H_
 
 #include <limits>
 #include <map>
@@ -27,7 +27,7 @@ class Arc;
 struct ExchangeNode {
  public:
   typedef boost::shared_ptr<ExchangeNode> Ptr;
-  
+
   ExchangeNode(double qty = std::numeric_limits<double>::max(),
                bool exclusive = false,
                std::string commod = "");
@@ -42,13 +42,13 @@ struct ExchangeNode {
 
   /// @brief preference values for arcs
   std::map<Arc, double> prefs;
-  
+
   /// @brief whether this node represents an exclusive request or offer
   bool exclusive;
 
   /// @brief the commodity associated with this exchange node
   std::string commod;
-  
+
   /// @brief the maximum amount of a resource that can be associated with this
   /// node
   double qty;
@@ -64,7 +64,7 @@ class Arc {
   /// default required for usage in maps
   /// @warning, in general do not use this constructor; it exists for arcs to be
   /// map values
-  Arc() {};
+  Arc() {}
 
   Arc(boost::shared_ptr<ExchangeNode> unode,
       boost::shared_ptr<ExchangeNode> vnode);
@@ -77,7 +77,7 @@ class Arc {
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
     return *this;
-  };
+  }
 
   inline bool operator <(const Arc& rhs) const {
     ExchangeNode::Ptr u = unode();
@@ -88,10 +88,10 @@ class Arc {
 
   inline bool operator==(const Arc& rhs) const {
     return unode() == rhs.unode() && vnode() == rhs.vnode();
-  };
-    
+  }
+
   inline boost::shared_ptr<ExchangeNode> unode() const { return unode_.lock(); }
-  inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }  
+  inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
 
@@ -114,7 +114,7 @@ inline bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs);
 class ExchangeNodeGroup {
  public:
   typedef boost::shared_ptr<ExchangeNodeGroup> Ptr;
-  
+
   const std::vector<ExchangeNode::Ptr>& nodes() const { return nodes_; }
   std::vector<ExchangeNode::Ptr>& nodes() { return nodes_; }
 
@@ -127,7 +127,7 @@ class ExchangeNodeGroup {
   std::vector< std::vector<ExchangeNode::Ptr> >& excl_node_groups() {
     return excl_node_groups_;
   }
-  
+
   /// @brief the flow capacities assocaited with this group
   const std::vector<double>& capacities() const { return capacities_; }
   std::vector<double>& capacities() { return capacities_; }
@@ -165,16 +165,16 @@ class ExchangeNodeGroup {
 class RequestGroup : public ExchangeNodeGroup {
  public:
   typedef boost::shared_ptr<RequestGroup> Ptr;
-  
+
   explicit RequestGroup(double qty = 0.0);
-  
+
   double qty() { return qty_; }
 
   /// @brief Add the node to the ExchangeNodeGroup and informs the node it is a
   /// member of this ExchangeNodeGroup, if the node is exclusive, also add it to
   /// the group of exclusive nodes
   virtual void AddExchangeNode(ExchangeNode::Ptr node);
-  
+
  private:
   double qty_;
 };
@@ -190,17 +190,17 @@ typedef std::pair<Arc, double> Match;
 /// other. An ExchangeSolver can solve a given instance of an ExchangeGraph, and
 /// the solution is stored on the Graph in the form of Matches.
 class ExchangeGraph {
- public: 
+ public:
   typedef boost::shared_ptr<ExchangeGraph> Ptr;
 
   ExchangeGraph();
-  
+
   /// @brief adds a request group to the graph
   void AddRequestGroup(RequestGroup::Ptr prs);
-  
+
   /// @brief adds a supply group to the graph
   void AddSupplyGroup(ExchangeNodeGroup::Ptr prs);
-  
+
   /// @brief adds an arc to the graph
   void AddArc(const Arc& a);
 
@@ -209,21 +209,21 @@ class ExchangeGraph {
   /// @param pa the arc corresponding to a match
   /// @param qty the amount of flow corresponding to a match
   void AddMatch(const Arc& a, double qty);
-  
+
   inline const std::vector<RequestGroup::Ptr>& request_groups() const {
     return request_groups_;
   }
   inline std::vector<RequestGroup::Ptr>& request_groups() {
     return request_groups_;
   }
-  
+
   inline const std::vector<ExchangeNodeGroup::Ptr>& supply_groups() const {
     return supply_groups_;
   }
   inline std::vector<ExchangeNodeGroup::Ptr>& supply_groups() {
     return supply_groups_;
   }
-  
+
   inline const std::map<ExchangeNode::Ptr, std::vector<Arc> >&
       node_arc_map() const {
     return node_arc_map_;
@@ -231,19 +231,19 @@ class ExchangeGraph {
   inline std::map<ExchangeNode::Ptr, std::vector<Arc> >& node_arc_map() {
     return node_arc_map_;
   }
-  
+
   inline const std::vector<Match>& matches() { return matches_; }
-  
+
   inline const std::vector<Arc>& arcs() const { return arcs_; }
   inline std::vector<Arc>& arcs() { return arcs_; }
-  
+
   inline const std::map<Arc, int>& arc_ids() const { return arc_ids_; }
   inline std::map<Arc, int>& arc_ids() { return arc_ids_; }
-  
+
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
-  
- private: 
+
+ private:
   std::vector<RequestGroup::Ptr> request_groups_;
   std::vector<ExchangeNodeGroup::Ptr> supply_groups_;
   std::map<ExchangeNode::Ptr, std::vector<Arc> > node_arc_map_;
@@ -253,7 +253,7 @@ class ExchangeGraph {
   std::map<int, Arc> arc_by_id_;
   int next_arc_id_;
 };
-  
-} // namespace cyclus
 
-#endif // ifndef CYCLUS_EXCHANGE_GRAPH_H_
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_EXCHANGE_GRAPH_H_

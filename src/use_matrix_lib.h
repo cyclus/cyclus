@@ -22,4 +22,5 @@ typedef LMatrix Matrix;
 typedef LMatrix Vector;
 
 }  // namespace cyclus
+
 #endif  // CYCLUS_SRC_USE_MATRIX_LIB_H_

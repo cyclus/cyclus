@@ -1,6 +1,5 @@
-// recorder.h
-#ifndef CYCLUS_RECORDER_H_
-#define CYCLUS_RECORDER_H_
+#ifndef CYCLUS_SRC_RECORDER_H_
+#define CYCLUS_SRC_RECORDER_H_
 
 #include <list>
 #include <string>
@@ -108,11 +107,12 @@ class Recorder {
   unsigned int dump_count_;
   boost::uuids::uuid uuid_;
 };
-} // namespace cyclus
+
+}  // namespace cyclus
 
 // this allows files to use Datum objects without having to explicitly include
 // both recorder.h and datum.h, while avoiding a circular include
 // dependency.
 #include "datum.h"
 
-#endif
+#endif  // CYCLUS_SRC_RECORDER_H_

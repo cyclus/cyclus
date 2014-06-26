@@ -1,5 +1,5 @@
-#ifndef CYCLUS_PROG_TRANSLATOR_H_
-#define CYCLUS_PROG_TRANSLATOR_H_
+#ifndef CYCLUS_SRC_PROG_TRANSLATOR_H_
+#define CYCLUS_SRC_PROG_TRANSLATOR_H_
 
 #include <vector>
 
@@ -32,9 +32,9 @@ class ProgTranslator {
     std::vector<double> row_lbs;
     std::vector<double> col_ubs;
     std::vector<double> col_lbs;
-    CoinPackedMatrix m;    
+    CoinPackedMatrix m;
   };
-  
+
   /// constructor
   ///
   /// @param g the exchange graph
@@ -49,22 +49,22 @@ class ProgTranslator {
   /// @brief populates the solver interface with values from the translators
   /// Context
   void Populate();
-  
+
   /// @brief translates graph into mathematic program via iface. This method is
   /// equivalent to calling Translate(), then Populate().
   void ToProg();
-  
+
   /// @brief translates solution from iface back into graph matches
   void FromProg();
 
   const ProgTranslator::Context& ctx() const { return ctx_; }
-  
+
  private:
   /// perform all translation for a node group
   /// @param grp a pointer to the node group
   /// @param req a boolean flag, true if grp is a request group
   void XlateGrp_(ExchangeNodeGroup* grp, bool req);
-  
+
   ExchangeGraph* g_;
   OsiSolverInterface* iface_;
   bool excl_;
@@ -75,7 +75,6 @@ class ProgTranslator {
   int cost_add_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_PROG_TRANSLATOR_H_
-
+#endif  // CYCLUS_SRC_PROG_TRANSLATOR_H_

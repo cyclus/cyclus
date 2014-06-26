@@ -21,8 +21,8 @@ namespace cyclus {
     May modify both agents by cleaning up
 */
 int differentAgent(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
-                   bool ignoreNames=true);
-  
-} // namespace cyclus
+                   bool ignoreNames = true);
 
-#endif // CYCLUS_SRC_COIN_HELPERS_H_
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_COIN_HELPERS_H_

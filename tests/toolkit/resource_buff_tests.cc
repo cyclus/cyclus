@@ -126,7 +126,7 @@ TEST_F(ResourceBuffTest, RemoveQty_SingleNoSplit) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveQty_SingleWithSplit) {
   // pop one no splitting leaving one mat in the store
-  
+
   Manifest manifest;
 
   double orig_qty = filled_store_.quantity();
@@ -140,20 +140,20 @@ TEST_F(ResourceBuffTest, RemoveQty_SingleWithSplit) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveQty_DoubleWithSplit) {
   // pop one no splitting leaving one mat in the store
-  
+
   Manifest manifest;
 
   double orig_qty = filled_store_.quantity();
   ASSERT_NO_THROW(manifest = filled_store_.PopQty(exact_qty_over));
   ASSERT_EQ(manifest.size(), 2);
-  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity() + manifest.at(1)->quantity(), exact_qty_over);
+  EXPECT_DOUBLE_EQ(manifest.at(0)->quantity() + \
+                   manifest.at(1)->quantity(), exact_qty_over);
   EXPECT_TRUE(filled_store_.count() == 1);
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), orig_qty - exact_qty_over);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveNum_ExceptionsFilled) {
-  
   Manifest manifest;
   ASSERT_THROW(manifest = filled_store_.PopN(3), ValueError);
   ASSERT_THROW(manifest = filled_store_.PopN(-1), ValueError);
@@ -161,7 +161,6 @@ TEST_F(ResourceBuffTest, RemoveNum_ExceptionsFilled) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveNum_ZeroFilled) {
-  
   Manifest manifest;
   double tot_qty = filled_store_.quantity();
 
@@ -173,7 +172,6 @@ TEST_F(ResourceBuffTest, RemoveNum_ZeroFilled) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveNum_OneFilled) {
-  
   Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.PopN(1));
@@ -186,7 +184,6 @@ TEST_F(ResourceBuffTest, RemoveNum_OneFilled) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, RemoveNum_TwoFilled) {
-  
   Manifest manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.PopN(2));
@@ -296,7 +293,6 @@ TEST_F(ResourceBuffTest, PushAll_Empty) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, PushAll_NoneEmpty) {
-  
   Manifest manifest;
   ASSERT_NO_THROW(store_.set_capacity(cap));
   ASSERT_NO_THROW(store_.PushAll(manifest));
@@ -318,7 +314,6 @@ TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceBuffTest, PushAll_OverCapacityEmpty) {
-  
   ASSERT_NO_THROW(store_.set_capacity(cap));
   ASSERT_NO_THROW(store_.PushAll(mats));
 
@@ -355,5 +350,5 @@ TEST_F(ResourceBuffTest, PushAll_DuplicateEmpty) {
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

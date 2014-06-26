@@ -46,11 +46,11 @@ def check_cmd(args, cwd, holdsrtn):
     holdsrtn[0] = rtn
     assert_equal(rtn, 0)
 
-@contextmanager 
+@contextmanager
 def clean_import(name, paths=None):
     """Imports and returns a module context manager and then removes
     all modules which didn't originally exist when exiting the block.
-    Be sure to delete any references to the returned module prior to 
+    Be sure to delete any references to the returned module prior to
     exiting the context.
     """
     sys.path = paths + sys.path
@@ -71,12 +71,12 @@ def modtests(mod):
     for name in dir(mod):
         if TESTNAME_RE.match(name) is None:
             continue
-        test = getattr(mod, name) 
+        test = getattr(mod, name)
         if test is unittest.TestCase:
             continue
         tests.append(test)
     return tests
-            
+
 def dirtests(d):
     """Finds all of the test files in a directory."""
     files = os.listdir(d)
@@ -100,12 +100,10 @@ def skip_then_continue(msg=""):
 # Here there be Hackons!
 #
 
-# hack to make sure that we are actually in the tests dir when we start running 
-# tests.  This works because this file is imported by many of the other test 
+# hack to make sure that we are actually in the tests dir when we start running
+# tests.  This works because this file is imported by many of the other test
 # files.
 _fdir = os.path.dirname(__file__)
 if os.getcwd() != _fdir:
     os.chdir(_fdir)
 del _fdir
-    
-

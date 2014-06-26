@@ -1,5 +1,5 @@
-#ifndef CYCLUS_GREEDY_PRECONDITIONER_H_
-#define CYCLUS_GREEDY_PRECONDITIONER_H_
+#ifndef CYCLUS_SRC_GREEDY_PRECONDITIONER_H_
+#define CYCLUS_SRC_GREEDY_PRECONDITIONER_H_
 
 #include <map>
 #include <string>
@@ -20,7 +20,7 @@ double GroupWeight(RequestGroup::Ptr g,
 
 /// @returns the average preference across arcs for a node
 double AvgPref(ExchangeNode::Ptr n);
-  
+
 /// @class GreedyPreconditioner
 ///
 /// @brief A GreedyPreconditioner conditions an ExchangeGraph for a GreedySolver
@@ -61,9 +61,9 @@ class GreedyPreconditioner {
  public:
   /// @brief the order of commodity weights
   enum WgtOrder {
-    REVERSE, ///< a flag for commodity weights given in the reverse order, i.e.,
-             ///lightest first
-    END ///< default flag, indicating heaviest-first ordering
+    REVERSE,  /// a flag for commodity weights given in the reverse order,
+             /// i.e, lightest first
+    END  /// default flag, indicating heaviest-first ordering
   };
 
   /// @brief constructor if weights are given in heaviest-first order
@@ -73,7 +73,7 @@ class GreedyPreconditioner {
     if (commod_weights_.size() != 0)
       ProcessWeights_(END);
   }
-  
+
   /// @brief constructor if weights may not be given in heaviest-first order
   /// @warning weights are assumed to be positive
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights,
@@ -81,7 +81,7 @@ class GreedyPreconditioner {
     : commod_weights_(commod_weights) {
     if (commod_weights_.size() != 0)
       ProcessWeights_(order);
-  };
+  }
 
   /// @brief conditions the graph as described above
   /// @throws KeyError if a commodity is in the graph but not in the weight
@@ -108,14 +108,13 @@ class GreedyPreconditioner {
   /// @brief normalizes all weights to 1 and puts them in the heaviest-first
   /// direction
   void ProcessWeights_(WgtOrder order);
-  
+
   bool apply_commod_weights_;
   std::map<ExchangeNode::Ptr, double> avg_prefs_;
   std::map<std::string, double> commod_weights_;
   std::map<RequestGroup::Ptr, double> group_weights_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_GREEDY_PRECONDITIONER_H_
-
+#endif  // CYCLUS_SRC_GREEDY_PRECONDITIONER_H_

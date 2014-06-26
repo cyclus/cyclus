@@ -1,6 +1,5 @@
-// sqlite_db.h
-#ifndef CYCLUS_SQLITEDB_H_
-#define CYCLUS_SQLITEDB_H_
+#ifndef CYCLUS_SRC_SQLITE_DB_H_
+#define CYCLUS_SRC_SQLITE_DB_H_
 
 #include <vector>
 #include <string>
@@ -64,7 +63,8 @@ class SqlStatement {
   /// Returns a byte array value for the specified column of the current query
   /// row. This can be used for retrieving TEXT and BLOB column data.
   char* GetText(int col, int* n) {
-    char* v = const_cast<char*>(reinterpret_cast<const char *>(sqlite3_column_text(stmt_, col)));
+    char* v = const_cast<char*>(reinterpret_cast<const char *>(
+                                    sqlite3_column_text(stmt_, col)));
     if (n != NULL) {
       *n = sqlite3_column_bytes(stmt_, col);
     }
@@ -116,7 +116,6 @@ class SqlStatement {
 /// creation and data insertion.
 class SqliteDb {
  public:
-
   /// Creates a new Sqlite database to be stored at the specified path.
   ///
   /// @param path the path+name for the sqlite database file
@@ -170,6 +169,7 @@ class SqliteDb {
   /// indicates true if the db is readonly false otherwise
   bool readonly_;
 };
-} // namespace cyclus
-#endif // ifndef CYCLUS_SQLITEDB_H_
 
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_SQLITE_DB_H_

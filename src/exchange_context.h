@@ -24,7 +24,6 @@ struct CommodMap {
   typedef std::map<std::string, std::vector<Request<T>*> > type;
 };
 
-
 /// @class ExchangeContext
 ///
 /// @brief The ExchangeContext is designed to provide an ease-of-use interface

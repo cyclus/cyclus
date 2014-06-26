@@ -1,4 +1,3 @@
-// context.h
 #ifndef CYCLUS_SRC_CONTEXT_H_
 #define CYCLUS_SRC_CONTEXT_H_
 
@@ -7,7 +6,7 @@
 #include <string>
 
 #ifndef CYCPP
-// The cyclus preprocessor cannot handle this file since there are two 
+// The cyclus preprocessor cannot handle this file since there are two
 // unmatch open braces '{' inside of strings that don't have cooresponding
 // closed braces '}'
 #include <boost/uuid/uuid_generators.hpp>
@@ -177,7 +176,7 @@ class Context {
   /// Return static simulation info.
   inline SimInfo sim_info() const {
     return si_;
-  };
+  }
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
@@ -238,7 +237,7 @@ class Context {
   std::set<Trader*> traders_;
   std::map<std::string, int> n_prototypes_;
   std::map<std::string, int> n_specs_;
-  
+
   SimInfo si_;
   Timer* ti_;
   ExchangeSolver* solver_;
@@ -249,4 +248,3 @@ class Context {
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_CONTEXT_H_
-

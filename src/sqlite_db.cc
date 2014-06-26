@@ -1,22 +1,20 @@
-// sqlite_db.cc
-
 #include "sqlite_db.h"
 
+#include <fstream>
+
+#include "datum.h"
 #include "error.h"
 #include "logger.h"
-#include "datum.h"
-
-#include <fstream>
 
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteDb::SqliteDb(std::string path, bool readonly)
-  : db_(NULL),
-    isOpen_(false),
-    path_(path),
-    readonly_(readonly),
-    overwrite_(false) {}
+    : db_(NULL),
+      isOpen_(false),
+      path_(path),
+      readonly_(readonly),
+      overwrite_(false) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteDb::~SqliteDb() {}
@@ -131,4 +129,4 @@ std::vector<StrList> SqliteDb::Query(std::string sql) {
   return results;
 }
 
-} // namespace cyclus
+}  // namespace cyclus

@@ -1,14 +1,12 @@
-// recorder.cc
-
 #include "recorder.h"
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "rec_backend.h"
 #include "datum.h"
 #include "logger.h"
+#include "rec_backend.h"
 
 namespace cyclus {
 
@@ -104,5 +102,5 @@ void Recorder::Close() {
   Flush();
   backs_.clear();
 }
-} // namespace cyclus
 
+}  // namespace cyclus

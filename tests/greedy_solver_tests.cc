@@ -17,7 +17,7 @@ using cyclus::GreedySolver;
 TEST(GreedySolverTests, ExchangeNodeCapThrow) {
   ExchangeNode::Ptr m(new ExchangeNode());
   ExchangeNode::Ptr n(new ExchangeNode());
-  
+
   Arc a(m, n);
   EXPECT_THROW(Capacity(m, a), cyclus::StateError);
 }

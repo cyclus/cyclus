@@ -1,4 +1,3 @@
-// Instagent_tests.h
 #include <gtest/gtest.h>
 
 #include "context.h"

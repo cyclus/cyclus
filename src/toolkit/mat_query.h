@@ -42,7 +42,7 @@ class MatQuery {
   Material::Ptr m_;
 };
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
 
 #endif  // CYCLUS_SRC_TOOLKIT_MAT_QUERY_H_

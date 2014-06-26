@@ -64,7 +64,7 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/cyclus")
 
@@ -134,7 +134,7 @@ ADD_DEFINITIONS(${HDF5_DEFINITIONS})
 set(LIBS ${LIBS} ${HDF5_LIBRARIES} )
 
 # Include the boost header files and the program_options library
-# Please be sure to use Boost rather than BOOST. 
+# Please be sure to use Boost rather than BOOST.
 # Capitalization matters on some platforms
 SET(Boost_USE_STATIC_LIBS       OFF)
 SET(Boost_USE_STATIC_RUNTIME    OFF)
@@ -168,7 +168,7 @@ set(LIBS ${LIBS} ${COIN_LIBRARIES})
 ##############################################################################################
 
 # include all the directories we just found
-# NOTE: for some reason, adding quotes around 
+# NOTE: for some reason, adding quotes around
 # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
 INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
                     "${LibXML++_INCLUDE_DIR}"
@@ -240,7 +240,7 @@ INCLUDE(CPack)
 ######################################## end cpack ###########################################
 ##############################################################################################
 
-ENDIF(NOT CYCLUS_DOC_ONLY)  
+ENDIF(NOT CYCLUS_DOC_ONLY)
 
 ##############################################################################################
 ###################################### begin doxygen #########################################
@@ -250,8 +250,8 @@ ENDIF(NOT CYCLUS_DOC_ONLY)
 SET(DOC_SOURCE_DIR "${CYCLUS_SOURCE_DIR}")
 SET(DOC_INPUT_DIR "${CYCLUS_DOC_DIR}")
 SET(DOC_OUTPUT_DIR "${CMAKE_BINARY_DIR}/doc")
-  
-# If doxygen exists, use the doc/CMakeLists.txt file for further instructions. 
+
+# If doxygen exists, use the doc/CMakeLists.txt file for further instructions.
 FIND_PACKAGE(Doxygen)
 IF (DOXYGEN_FOUND)
   ADD_SUBDIRECTORY("${CYCLUS_DOC_DIR}")

@@ -1,9 +1,8 @@
-// datum.cc
-
 #include "datum.h"
-#include "timer.h"
 
 #include <boost/pool/singleton_pool.hpp>
+
+#include "timer.h"
 
 namespace cyclus {
 
@@ -80,4 +79,5 @@ void Datum::operator delete(void* rawMemory) throw() {
   }
   DatumPool::free(rawMemory);
 }
+
 }  // namespace cyclus

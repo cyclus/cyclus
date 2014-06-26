@@ -1,4 +1,3 @@
-// uniform_taylor.cc
 // Implements the UniformTaylor class
 #include "uniform_taylor.h"
 
@@ -18,7 +17,7 @@ Vector UniformTaylor::MatrixExpSolver(const Matrix& A, const Vector& x_o,
   // computations
   if (x_o.NumRows() != n) {
     std::string error = "Error: Matrix-Vector dimensions are not compatible: " + \
-                        boost::lexical_cast<std::string>( x_o.NumRows()) + \
+                        boost::lexical_cast<std::string>(x_o.NumRows()) + \
                         " rows vs " + boost::lexical_cast<std::string>(n) + " nuclides.";
     throw ValueError(error);
   }
@@ -121,7 +120,8 @@ int UniformTaylor::MaxNumTerms(long double alpha_t, double epsilon) {
 
   // checks to see if exp(alpha * t) is infinite
   if (lowerBound == HUGE_VAL) {
-    std::string error = "Error: exp(alpha * t) exceeds the range of a long double";
+    std::string error =
+        "Error: exp(alpha * t) exceeds the range of a long double";
     error += "\nThe Uniform Taylor method cannot solve the matrix exponential.";
     throw ValueError(error);
   }
@@ -152,4 +152,5 @@ int UniformTaylor::MaxNumTerms(long double alpha_t, double epsilon) {
 
   return p;
 }
+
 }  // namespace cyclus

@@ -29,6 +29,6 @@ class DbInit {
   Agent* m_;
 };
 
-} // namespace cyclus
-#endif
+}  // namespace cyclus
 
+#endif  // CYCLUS_SRC_DB_INIT_H_

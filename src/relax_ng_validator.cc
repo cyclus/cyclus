@@ -9,36 +9,38 @@
  */
 
 #include "relax_ng_validator.h"
-#include "error.h"
+
 #include <libxml/xmlerror.h>
+
+#include "error.h"
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RelaxNGValidator::RelaxNGValidator() : schema_(0), valid_context_(0) {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 RelaxNGValidator::~RelaxNGValidator() {
   release_underlying();
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RelaxNGValidator::parse_context(xmlRelaxNGParserCtxtPtr context) {
-  release_underlying(); // Free any existing info
+  release_underlying();  // Free any existing info
   schema_ = xmlRelaxNGParse(context);
   if (!schema_) {
     throw ValidationError("Schema could not be parsed");
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RelaxNGValidator::parse_memory(const Glib::ustring& contents) {
   xmlRelaxNGParserCtxtPtr context =
     xmlRelaxNGNewMemParserCtxt(contents.c_str(), contents.bytes());
   parse_context(context);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RelaxNGValidator::release_underlying() {
   if (valid_context_) {
     xmlRelaxNGFreeValidCtxt(valid_context_);
@@ -51,7 +53,7 @@ void RelaxNGValidator::release_underlying() {
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool RelaxNGValidator::Validate(const xmlpp::Document* doc) {
   if (!doc) {
     throw ValidationError("Document pointer cannot be 0");
@@ -83,5 +85,5 @@ bool RelaxNGValidator::Validate(const xmlpp::Document* doc) {
 
   return res;
 }
-} // namespace cyclus
 
+}  // namespace cyclus

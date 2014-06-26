@@ -1,13 +1,12 @@
-// timer.cc
 // Implements the Timer class
-
 #include "timer.h"
-#include <string>
-#include <iostream>
 
+#include <iostream>
+#include <string>
+
+#include "agent.h"
 #include "error.h"
 #include "logger.h"
-#include "agent.h"
 #include "sim_init.h"
 
 namespace cyclus {
@@ -50,8 +49,8 @@ void Timer::RunSim() {
       ->AddVal("EndTime", time_)
       ->Record();
 
-  time_++; // move time forward because snapshots are always "beginning of timestep"
-  SimInit::Snapshot(ctx_); // always do a snapshot at the end of every simulation
+  time_++;  // move time forward because snapshots are always "beginning of timestep"
+  SimInit::Snapshot(ctx_);  // always do a snapshot at the end of every simulation
   time_--;
 }
 
@@ -160,6 +159,4 @@ int Timer::dur() {
 
 Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
-} // namespace cyclus
-
-
+}  // namespace cyclus

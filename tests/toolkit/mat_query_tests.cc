@@ -1,4 +1,3 @@
-// mat_query_tests.cc
 #include <gtest/gtest.h>
 
 #include "composition.h"
@@ -189,5 +188,5 @@ TEST_F(MaterialMatQueryTest, ExtractDiffComp) {
   EXPECT_NE(orig_u235, mq.mass(u235_));
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

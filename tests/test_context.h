@@ -1,4 +1,3 @@
-// test_context.h
 #ifndef CYCLUS_TESTS_TEST_CONTEXT_H_
 #define CYCLUS_TESTS_TEST_CONTEXT_H_
 
@@ -20,10 +19,11 @@ namespace cyclus {
 class FakeContext: public Context {
  public:
   FakeContext(cyclus::Timer* ti, cyclus::Recorder* rec)
-    : cyclus::Context(ti, rec), t_(0) {};
+      : cyclus::Context(ti, rec),
+        t_(0) {}
 
-  virtual int time() { return t_; };
-  virtual void time(int t) { t_ = t; };
+  virtual int time() { return t_; }
+  virtual void time(int t) { t_ = t; }
 
  private:
   int t_;

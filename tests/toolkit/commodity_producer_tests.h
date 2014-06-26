@@ -1,6 +1,5 @@
-// commodity_producer_tests.h
-#ifndef CYCLUS_TESTS_COMMODITY_PRODUCER_TESTS_H_
-#define CYCLUS_TESTS_COMMODITY_PRODUCER_TESTS_H_
+#ifndef CYCLUS_TESTS_TOOLKIT_COMMODITY_PRODUCER_TESTS_H_
+#define CYCLUS_TESTS_TOOLKIT_COMMODITY_PRODUCER_TESTS_H_
 
 #include <string>
 
@@ -13,18 +12,18 @@ namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class CommodityProducerTests : public ::testing::Test {
+ public:
+  virtual void SetUp();
+  virtual void TearDown();
+
  protected:
   std::string commodity_name_;
   Commodity commodity_;
   CommodityProducer producer_;
   double capacity_, cost_;
-
- public:
-  virtual void SetUp();
-  virtual void TearDown();
 };
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
 
-#endif  // CYCLUS_TESTS_COMMODITY_PRODUCER_TESTS_H_
+#endif  // CYCLUS_TESTS_TOOLKIT_COMMODITY_PRODUCER_TESTS_H_

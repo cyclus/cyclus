@@ -1,4 +1,3 @@
-// decayer.h
 #ifndef CYCLUS_SRC_DECAYER_H_
 #define CYCLUS_SRC_DECAYER_H_
 

@@ -1,6 +1,5 @@
-// product.h
-#ifndef GENERICRESOURCE_H_
-#define GENERICRESOURCE_H_
+#ifndef CYCLUS_SRC_PRODUCT_H_
+#define CYCLUS_SRC_PRODUCT_H_
 
 #include <boost/shared_ptr.hpp>
 
@@ -30,7 +29,6 @@ class Product : public Resource {
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
   static Ptr Create(Agent* creator, double quantity, std::string quality);
-                    
 
   /// Creates a new product that does not actually exist as part of
   /// the simulation and is untracked.
@@ -39,27 +37,27 @@ class Product : public Resource {
   /// Returns 0 (for now).
   virtual int qual_id() const {
     return qualids_[quality_];
-  };
+  }
 
   /// Returns Product::kType.
   virtual const ResourceType type() const {
     return kType;
-  };
+  }
 
   virtual Resource::Ptr Clone() const;
 
-  virtual void Record(Context* ctx) const {};
+  virtual void Record(Context* ctx) const {}
 
-  virtual std::string units() const {return "NONE";};
+  virtual std::string units() const { return "NONE"; }
 
   virtual double quantity() const {
     return quantity_;
-  };
+  }
 
   /// Returns the quality of this resource (e.g. bananas, human labor, water, etc.).
   virtual const std::string& quality() const {
     return quality_;
-  };
+  }
 
   virtual Resource::Ptr ExtractRes(double quantity);
 
@@ -89,6 +87,6 @@ class Product : public Resource {
   ResTracker tracker_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_PRODUCT_H_

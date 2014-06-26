@@ -56,6 +56,7 @@ class StateWrangler {
   /// Returns an object's xml rng schema for initializing from input files.
   virtual std::string schema() = 0;
 };
-} // namespace cyclus
 
-#endif
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_STATE_WRANGLER_H_

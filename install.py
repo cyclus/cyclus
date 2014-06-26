@@ -69,10 +69,10 @@ def install_cyclus(args):
         make_cmd += ['test']
     elif not args.build_only:
         make_cmd += ['install']
-    
+
     rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
                                 shell=(os.name == 'nt'))
-        
+
 def uninstall_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
     if not os.path.exists(args.build_dir) or not os.path.exists(makefile):
@@ -119,7 +119,7 @@ def main():
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
     parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
 
-    build_type = "the CMAKE_BUILD_TYPE" 
+    build_type = "the CMAKE_BUILD_TYPE"
     parser.add_argument('--build_type', help=build_type)
 
     args = parser.parse_args()

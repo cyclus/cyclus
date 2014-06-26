@@ -18,7 +18,7 @@
 
 namespace cyclus {
 
-/// This is the master list of all supported database types.  All types must 
+/// This is the master list of all supported database types.  All types must
 /// have a constant length unless they begin with the prefix VL_, which stands
 /// for "variable length" or are implicitly variable length, such as blob.
 /// Changing the order here may invalidate previously created databases.
@@ -175,10 +175,12 @@ enum CmpOpCode {
 /// Represents a condition used to filter rows returned by a query.
 class Cond {
  public:
-  Cond() {};
+  Cond() {}
 
   Cond(std::string field, std::string op, boost::spirit::hold_any val)
-    : field(field), op(op), val(val) {
+      : field(field),
+        op(op),
+        val(val) {
     if (op == "<")
       opcode = LT;
     else if (op == ">")
@@ -194,7 +196,7 @@ class Cond {
     else
       throw ValueError("operation '" + op + "' not valid for field '" + \
                        field + "'.");
-  };
+  }
 
   /// table column name
   std::string field;
@@ -227,7 +229,7 @@ class QueryResult {
     fields.clear();
     types.clear();
     rows.clear();
-  };
+  }
 
   /// Convenience method for retrieving a value from a specific row and named
   /// field (column). The caller is responsible for specifying a valid templated
@@ -262,13 +264,13 @@ class QueryResult {
     }
 
     return rows[row][field_idx].cast<T>();
-  };
+  }
 };
 
 /// Interface implemented by backends that support rudimentary querying.
 class QueryableBackend {
  public:
-  virtual ~QueryableBackend() {};
+  virtual ~QueryableBackend() {}
 
   /// Return a set of rows from the specificed table that match all given
   /// conditions.  Conditions are AND'd together.  conds may be NULL.
@@ -278,7 +280,7 @@ class QueryableBackend {
 /// Interface implemented by backends that support recording and querying.
 class FullBackend: public QueryableBackend, public RecBackend {
  public:
-  virtual ~FullBackend() {};
+  virtual ~FullBackend() {}
 };
 
 /// Wrapper class for QueryableBackends that injects a set of Cond's into every
@@ -286,7 +288,8 @@ class FullBackend: public QueryableBackend, public RecBackend {
 class CondInjector: public QueryableBackend {
  public:
   CondInjector(QueryableBackend* b, std::vector<Cond> to_inject)
-    : b_(b), to_inject_(to_inject) {};
+      : b_(b),
+        to_inject_(to_inject) {}
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
     if (conds == NULL) {
@@ -298,7 +301,7 @@ class CondInjector: public QueryableBackend {
       c.push_back(to_inject_[i]);
     }
     return b_->Query(table, &c);
-  };
+  }
 
  private:
   QueryableBackend* b_;
@@ -312,18 +315,19 @@ class CondInjector: public QueryableBackend {
 class PrefixInjector: public QueryableBackend {
  public:
   PrefixInjector(QueryableBackend* b, std::string prefix)
-    : b_(b), prefix_(prefix) {};
+      : b_(b),
+        prefix_(prefix) {}
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
     return b_->Query(prefix_ + table, conds);
-  };
+  }
 
  private:
   QueryableBackend* b_;
   std::string prefix_;
 };
 
-/// Compares a condiontion for a single value 
+/// Compares a condiontion for a single value
 template <typename T>
 inline bool CmpCond(T* x, Cond* cond) {
   bool rtn;
@@ -354,9 +358,9 @@ inline bool CmpCond(T* x, Cond* cond) {
     }
   }
   return rtn;
-};
+}
 
-/// Compares all condiontions for a value 
+/// Compares all condiontions for a value
 template <typename T>
 inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
   int i;
@@ -364,12 +368,12 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
     if (!CmpCond<T>(&(*x), (*conds)[i]))
       return false;
   return true;
-};
+}
 
 /// The digest type for SHA1s.
 ///
 /// This class is a hack around a language deficiency in C++. You cannot pass
-/// around an array (unsinged int[5]) between function calls. You can only 
+/// around an array (unsinged int[5]) between function calls. You can only
 /// pass pointers, which would involve lost of new/free and heap shenanigans
 /// that are not needed for a dumb container. Therefore Sha1::Digest() cannot
 /// return what would be most natural. The second most natural thing would be
@@ -378,9 +382,9 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
 ///
 /// To pass an array into and out of a function it has to be inside of struct
 /// or a class. I chose a class here since there are many member functions.
-/// 
-/// The reason why this is public is that it needs to be directly writable 
-/// from buffers coming from HDF5. In the future, this really should just be 
+///
+/// The reason why this is public is that it needs to be directly writable
+/// from buffers coming from HDF5. In the future, this really should just be
 /// a std::array.
 class Digest {
  public:
@@ -393,13 +397,13 @@ class Digest {
     for (unsigned int i = 0; i < CYCLUS_SHA1_NINT; ++i)
       rtn[i] = static_cast<T>(val[i]);
     return rtn;
-  };
+  }
 
   // operators
   inline std::ostream& operator<<(std::ostream& out) const {
     return out << "[" << val[0] << ", " << val[1] << ", " <<  val[2] << \
                   ", " << val[3] << ", " << val[4] << "]";
-  };
+  }
 
   inline bool operator< (const cyclus::Digest& rhs) const {
     bool rtn = false;
@@ -410,22 +414,22 @@ class Digest {
       } else if (val[i] > rhs.val[i]) {
         rtn = false;
         break;
-      } // else they are equal and we need to check the next index
+      }  // else they are equal and we need to check the next index
     }
     return rtn;
-  };
+  }
 
   inline bool operator> (const cyclus::Digest& rhs) const {
     return !operator<(rhs) && !operator==(rhs);
-  };
+  }
 
   inline bool operator<=(const cyclus::Digest& rhs) const {
     return !operator>(rhs);
-  };
+  }
 
   inline bool operator>=(const cyclus::Digest& rhs) const {
     return !operator<(rhs);
-  };
+  }
 
   inline bool operator==(const cyclus::Digest& rhs) const {
     bool rtn = true;
@@ -433,76 +437,76 @@ class Digest {
       if (val[i] != rhs.val[i]) {
         rtn = false;
         break;
-      } // else they are equal and we need to check the next index.
+      }  // else they are equal and we need to check the next index.
     }
     return rtn;
-  };
+  }
 
   inline bool operator!=(const cyclus::Digest& rhs) const {
     return !operator==(rhs);
-  };
+  }
 };
 
 class Sha1 {
  public:
-  Sha1() {hash_ = boost::uuids::detail::sha1();};
+  Sha1() { hash_ = boost::uuids::detail::sha1(); }
 
   /// Clears the current hash value to its default state.
-  inline void Clear() {hash_.reset();};
+  inline void Clear() { hash_.reset(); }
 
   /// Updates the hash value in-place.
   /// \{
   inline void Update(const std::string& s) {
     hash_.process_bytes(s.c_str(), s.size());
-  };
+  }
 
-  inline void Update(const Blob& b) { Update(b.str()); };
+  inline void Update(const Blob& b) { Update(b.str()); }
 
-  inline void Update(const std::vector<int>& x) { 
+  inline void Update(const std::vector<int>& x) {
     hash_.process_bytes(&x[0], x.size() * sizeof(int));
-  };
+  }
 
-  inline void Update(const std::vector<float>& x) { 
+  inline void Update(const std::vector<float>& x) {
     hash_.process_bytes(&x[0], x.size() * sizeof(float));
-  };
+  }
 
-  inline void Update(const std::vector<double>& x) { 
+  inline void Update(const std::vector<double>& x) {
     hash_.process_bytes(&x[0], x.size() * sizeof(double));
-  };
+  }
 
   inline void Update(const std::vector<std::string>& x) {
     for (unsigned int i = 0; i < x.size(); ++i)
       hash_.process_bytes(x[i].c_str(), x[i].size());
-  };
+  }
 
-  inline void Update(const std::set<int>& x) { 
+  inline void Update(const std::set<int>& x) {
     std::set<int>::iterator it = x.begin();
-    for(; it != x.end(); ++it)
+    for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
-  };
+  }
 
-  inline void Update(const std::set<std::string>& x) { 
+  inline void Update(const std::set<std::string>& x) {
     std::set<std::string>::iterator it = x.begin();
-    for(; it != x.end(); ++it)
+    for (; it != x.end(); ++it)
       hash_.process_bytes(it->c_str(), it->size());
-  };
+  }
 
-  inline void Update(const std::list<int>& x) { 
+  inline void Update(const std::list<int>& x) {
     std::list<int>::const_iterator it = x.begin();
-    for(; it != x.end(); ++it)
+    for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
-  };
+  }
 
-  inline void Update(const std::list<std::string>& x) { 
+  inline void Update(const std::list<std::string>& x) {
     std::list<std::string>::const_iterator it = x.begin();
-    for(; it != x.end(); ++it)
+    for (; it != x.end(); ++it)
       hash_.process_bytes(it->c_str(), it->size());
-  };
+  }
 
-  inline void Update(const std::pair<int, int>& x) { 
+  inline void Update(const std::pair<int, int>& x) {
     hash_.process_bytes(&(x.first), sizeof(int));
     hash_.process_bytes(&(x.second), sizeof(int));
-  };
+  }
 
   inline void Update(const std::map<int, int>& x) {
     std::map<int, int>::const_iterator it = x.begin();
@@ -510,7 +514,7 @@ class Sha1 {
       hash_.process_bytes(&(it->first), sizeof(int));
       hash_.process_bytes(&(it->second), sizeof(int));
     }
-  };
+  }
 
   inline void Update(const std::map<int, double>& x) {
     std::map<int, double>::const_iterator it = x.begin();
@@ -518,7 +522,7 @@ class Sha1 {
       hash_.process_bytes(&(it->first), sizeof(int));
       hash_.process_bytes(&(it->second), sizeof(double));
     }
-  };
+  }
 
   inline void Update(const std::map<int, std::string>& x) {
     std::map<int, std::string>::const_iterator it = x.begin();
@@ -526,7 +530,7 @@ class Sha1 {
       hash_.process_bytes(&(it->first), sizeof(int));
       hash_.process_bytes(it->second.c_str(), it->second.size());
     }
-  };
+  }
 
   inline void Update(const std::map<std::string, int>& x) {
     std::map<std::string, int>::const_iterator it = x.begin();
@@ -534,7 +538,7 @@ class Sha1 {
       hash_.process_bytes(it->first.c_str(), it->first.size());
       hash_.process_bytes(&(it->second), sizeof(int));
     }
-  };
+  }
 
   inline void Update(const std::map<std::string, double>& x) {
     std::map<std::string, double>::const_iterator it = x.begin();
@@ -542,7 +546,7 @@ class Sha1 {
       hash_.process_bytes(it->first.c_str(), it->first.size());
       hash_.process_bytes(&(it->second), sizeof(double));
     }
-  };
+  }
 
   inline void Update(const std::map<std::string, std::string>& x) {
     std::map<std::string, std::string>::const_iterator it = x.begin();
@@ -550,18 +554,19 @@ class Sha1 {
       hash_.process_bytes(it->first.c_str(), it->first.size());
       hash_.process_bytes(it->second.c_str(), it->second.size());
     }
-  };
+  }
   /// \}
 
   Digest digest() {
     Digest d;
     hash_.get_digest(d.val);
     return d;
-  };
+  }
 
  private:
   boost::uuids::detail::sha1 hash_;
 };
 
-}; // namespace cyclus
-#endif
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_QUERY_BACKEND_H_

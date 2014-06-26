@@ -1,4 +1,3 @@
-// material_tests.h
 #ifndef CYCLUS_TESTS_MATERIAL_TESTS_H_
 #define CYCLUS_TESTS_MATERIAL_TESTS_H_
 
@@ -9,7 +8,7 @@
 #include "env.h"
 
 namespace cyclus {
-  
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MaterialTest : public ::testing::Test {
  protected:
@@ -26,7 +25,7 @@ class MaterialTest : public ::testing::Test {
 
   virtual void SetUp() {
     Env::SetNucDataPath();
-  
+
     // composition set up
     u235_ = 922350000;
     am241_ = 952410000;
@@ -60,6 +59,6 @@ class MaterialTest : public ::testing::Test {
   virtual void TearDown() {}
 };
 
-} // namespace cyclus
-  
+}  // namespace cyclus
+
 #endif  // CYCLUS_TESTS_MATERIAL_TESTS_H_

@@ -1,4 +1,3 @@
-// decayer.cc
 #include "decayer.h"
 
 #include <fstream>
@@ -51,13 +50,13 @@ void Decayer::AddNucToMaps(int nuc) {
   int col;
   int daughter;
   std::set<int> daughters;
-  std::set<int>::iterator d; 
+  std::set<int>::iterator d;
 
   if (IsNucTracked(nuc))
     return;
 
   col = parent_.size() + 1;
-  parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));  
+  parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));
   AddNucToList(nuc);
 
   i = 0;
@@ -66,7 +65,8 @@ void Decayer::AddNucToMaps(int nuc) {
   for (d = daughters.begin(); d != daughters.end(); ++d) {
     daughter = *d;
     AddNucToMaps(daughter);
-    dvec[i] = std::make_pair<int, double>(daughter, pyne::branch_ratio(nuc, daughter));
+    dvec[i] = std::make_pair<int, double>(daughter,
+                                          pyne::branch_ratio(nuc, daughter));
     i++;
   }
   daughters_[col] = dvec;

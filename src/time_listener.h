@@ -1,6 +1,5 @@
-// time_listener.h
-#ifndef CYCLUS_TIME_LISTENER_H_
-#define CYCLUS_TIME_LISTENER_H_
+#ifndef CYCLUS_SRC_TIME_LISTENER_H_
+#define CYCLUS_SRC_TIME_LISTENER_H_
 
 #include <string>
 
@@ -19,7 +18,7 @@ namespace cyclus {
 ///   cyclus::Facility::Build(parent);
 ///   context()->RegisterTimeListener(this);
 /// }
-/// 
+///
 /// @endcode
 class TimeListener {
  public:
@@ -35,6 +34,7 @@ class TimeListener {
   /// @param time is the current simulation timestep
   virtual void Tock() = 0;
 };
-} // namespace cyclus
-#endif // ifndef CYCLUS_TIME_LISTENER_H_
 
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_TIME_LISTENER_H_
