@@ -64,9 +64,18 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
   namespace fs = boost::filesystem;
   set<string> specs;
   set<string> libspecs;
-  fs::recursive_directory_iterator it(d);
+  fs::path pth;
+  boost::system::error_code errc;
+  boost::system::error_code no_err;
+  fs::recursive_directory_iterator it(d, errc);
   fs::recursive_directory_iterator last;
-  BOOST_FOREACH(fs::path const & pth, std::make_pair(it, last)) {
+  for (; it != last; it.increment(errc)) {
+    if (errc != no_err) {
+      if (it.level() > 0)
+        it.pop();
+      continue;
+    }
+    pth = it->path();
     string pthstr = pth.string();
     if (!boost::algorithm::ends_with(pthstr, SUFFIX)) {
       continue;
@@ -80,7 +89,9 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     else 
       p = "";
     lib = lib.substr(3, lib.rfind(".") - 3);  // remove 'lib' prefix and suffix
-    libspecs = DiscoverSpecs(p, lib); 
+    try {
+      libspecs = DiscoverSpecs(p, lib); 
+    } catch (cyclus::IOError& e) {};
     for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls)
       specs.insert(*ls);
   }
