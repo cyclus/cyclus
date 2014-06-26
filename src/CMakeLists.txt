@@ -19,7 +19,7 @@ CONFIGURE_FILE(
 ############################################################
 ############# end special configuration ####################
 ############################################################
-  
+
 #################################################################
 ######### build libcyclus #######################################
 #################################################################
@@ -36,7 +36,7 @@ SET(
 
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 SET(
-  CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} 
+  CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
   ${cc_files}
   "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
   )
@@ -57,7 +57,7 @@ ADD_SUBDIRECTORY(toolkit)
 ADD_LIBRARY( cyclus ${CYCLUS_CORE_SRC} )
 
 SET_TARGET_PROPERTIES( cyclus
-  PROPERTIES 
+  PROPERTIES
   INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
   )
@@ -74,4 +74,3 @@ SET(LIBS ${LIBS} cyclus PARENT_SCOPE)
 #################################################################
 ######### end build libcyclus ###################################
 #################################################################
-

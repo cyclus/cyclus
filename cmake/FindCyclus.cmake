@@ -22,7 +22,7 @@ ELSE(DEFINED ENV{CYCLUS_ROOT_DIR})
                     OUTPUT_VARIABLE CYCLUS_ROOT_DIR
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
   ELSE(CYCLUS_BIN)
-    SET(CYCLUS_ROOT_DIR "$ENV{HOME}/.local") 
+    SET(CYCLUS_ROOT_DIR "$ENV{HOME}/.local")
   ENDIF(CYCLUS_BIN)
 ENDIF(DEFINED ENV{CYCLUS_ROOT_DIR})
 
@@ -33,18 +33,18 @@ MESSAGE(STATUS "Using ${CYCLUS_ROOT_DIR} as CYCLUS_ROOT_DIR.")
 # defined dirs
 FIND_PATH(CYCLUS_CORE_INCLUDE_DIR cyclus.h
   HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
-  "${CYCLUS_ROOT_DIR}/include" 
-  "${CYCLUS_ROOT_DIR}/include/cyclus" 
-  /usr/local/cyclus /opt/local/cyclus  
+  "${CYCLUS_ROOT_DIR}/include"
+  "${CYCLUS_ROOT_DIR}/include/cyclus"
+  /usr/local/cyclus /opt/local/cyclus
   PATH_SUFFIXES cyclus/include include include/cyclus)
 
 # Set the include dir, this will be the future basis for other
 # defined dirs
 FIND_PATH(CYCLUS_CORE_TEST_INCLUDE_DIR agent_tests.h
   HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus/tests"
-  "${CYCLUS_ROOT_DIR}/include" 
-  "${CYCLUS_ROOT_DIR}/include/cyclus/tests" 
-  /usr/local/cyclus /opt/local/cyclus  
+  "${CYCLUS_ROOT_DIR}/include"
+  "${CYCLUS_ROOT_DIR}/include/cyclus/tests"
+  /usr/local/cyclus /opt/local/cyclus
   PATH_SUFFIXES cyclus/include include include/cyclus include/cyclus/tests cyclus/include/tests)
 
 # Add the root dir to the hints
@@ -52,35 +52,35 @@ SET(CYCLUS_ROOT_DIR "${CYCLUS_CORE_INCLUDE_DIR}/../..")
 
 # Look for the header files
 FIND_PATH(CYCLUS_CORE_SHARE_DIR cyclus.rng.in
-  HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus" 
-        "${CYCLUS_ROOT_DIR}/share" "${CYCLUS_ROOT_DIR}/share/cyclus"
+  HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
+  "${CYCLUS_ROOT_DIR}/share" "${CYCLUS_ROOT_DIR}/share/cyclus"
   /usr/local/cyclus /opt/local/cyclus
   PATH_SUFFIXES cyclus/share share)
 
 # Look for the library
 FIND_LIBRARY(CYCLUS_CORE_LIBRARY NAMES cyclus
-  HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus" 
-  /usr/local/cyclus/lib /usr/local/cyclus 
+  HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
+  /usr/local/cyclus/lib /usr/local/cyclus
   /opt/local /opt/local/cyclus
   PATH_SUFFIXES cyclus/lib lib)
 
 # Look for the library
 FIND_LIBRARY(CYCLUS_AGENT_TEST_LIBRARY NAMES baseagentunittests
-  HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus" 
+  HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
   /usr/local/cyclus/lib /usr/local/cyclus
   /opt/local /opt/local/cyclus
   PATH_SUFFIXES cyclus/lib lib lib/cyclus)
 
 # Look for the library
 FIND_LIBRARY(CYCLUS_GTEST_LIBRARY NAMES gtest
-  HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus" 
+  HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
   "${CYCLUS_ROOT_DIR}/lib"  "${CYCLUS_CORE_SHARE_DIR}/../lib"
-  /usr/local/cyclus/lib /usr/local/cyclus 
-  /opt/local/lib /opt/local/cyclus/lib 
+  /usr/local/cyclus/lib /usr/local/cyclus
+  /opt/local/lib /opt/local/cyclus/lib
   PATH_SUFFIXES cyclus/lib lib)
 
 # Copy the results to the output variables.
-IF (CYCLUS_CORE_INCLUDE_DIR AND CYCLUS_CORE_TEST_INCLUDE_DIR 
+IF (CYCLUS_CORE_INCLUDE_DIR AND CYCLUS_CORE_TEST_INCLUDE_DIR
     AND CYCLUS_CORE_LIBRARY AND CYCLUS_GTEST_LIBRARY AND CYCLUS_CORE_SHARE_DIR
     AND CYCLUS_AGENT_TEST_LIBRARY)
   SET(CYCLUS_CORE_FOUND 1)
@@ -104,21 +104,21 @@ ENDIF ()
 
 # Report the results.
 IF (CYCLUS_CORE_FOUND)
-  SET(CYCLUS_CORE_DIR_MESSAGE "Found Cyclus Core Headers : " 
+  SET(CYCLUS_CORE_DIR_MESSAGE "Found Cyclus Core Headers : "
     ${CYCLUS_CORE_INCLUDE_DIRS} )
-  SET(CYCLUS_CORE_TEST_DIR_MESSAGE "Found Cyclus Core Test Headers : " 
+  SET(CYCLUS_CORE_TEST_DIR_MESSAGE "Found Cyclus Core Test Headers : "
     ${CYCLUS_CORE_TEST_INCLUDE_DIRS} )
-  SET(CYCLUS_CORE_SHARE_MESSAGE "Found Cyclus Core Shared Data : " 
+  SET(CYCLUS_CORE_SHARE_MESSAGE "Found Cyclus Core Shared Data : "
     ${CYCLUS_CORE_SHARE_DIRS} )
-  SET(CYCLUS_CORE_LIB_MESSAGE "Found Cyclus Core Library : " 
+  SET(CYCLUS_CORE_LIB_MESSAGE "Found Cyclus Core Library : "
     ${CYCLUS_CORE_LIBRARIES} )
-  SET(CYCLUS_TEST_LIB_MESSAGE "Found Cyclus Test Libraries : " 
+  SET(CYCLUS_TEST_LIB_MESSAGE "Found Cyclus Test Libraries : "
     ${CYCLUS_TEST_LIBRARIES} )
-  MESSAGE(STATUS ${CYCLUS_CORE_DIR_MESSAGE}) 
-  MESSAGE(STATUS ${CYCLUS_CORE_TEST_DIR_MESSAGE}) 
-  MESSAGE(STATUS ${CYCLUS_CORE_SHARE_MESSAGE}) 
-  MESSAGE(STATUS ${CYCLUS_CORE_LIB_MESSAGE})  
-  MESSAGE(STATUS ${CYCLUS_TEST_LIB_MESSAGE}) 
+  MESSAGE(STATUS ${CYCLUS_CORE_DIR_MESSAGE})
+  MESSAGE(STATUS ${CYCLUS_CORE_TEST_DIR_MESSAGE})
+  MESSAGE(STATUS ${CYCLUS_CORE_SHARE_MESSAGE})
+  MESSAGE(STATUS ${CYCLUS_CORE_LIB_MESSAGE})
+  MESSAGE(STATUS ${CYCLUS_TEST_LIB_MESSAGE})
 ELSE (CYCLUS_CORE_FOUND)
   SET(CYCLUS_CORE_DIR_MESSAGE
     "Cyclus was not found. Make sure CYCLUS_CORE_LIBRARY and CYCLUS_CORE_INCLUDE_DIR are set.")
@@ -134,6 +134,6 @@ ELSE (CYCLUS_CORE_FOUND)
 ENDIF (CYCLUS_CORE_FOUND)
 
 MARK_AS_ADVANCED(
-	CYCLUS_CORE_INCLUDE_DIR
-	CYCLUS_CORE_LIBRARY
-)
+  CYCLUS_CORE_INCLUDE_DIR
+  CYCLUS_CORE_LIBRARY
+  )

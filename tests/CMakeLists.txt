@@ -39,7 +39,7 @@ ENDIF()
 SET_TARGET_PROPERTIES(gtest
   PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
-)
+  )
 
 INSTALL(TARGETS gtest
   LIBRARY DESTINATION lib
@@ -84,7 +84,7 @@ SET(
   "${CYCLUS_CORE_TEST_INCLUDE_DIRS}"
   "${GTEST_INCLUDE_DIRS}"
   PARENT_SCOPE
-)
+  )
 
 SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_TEST_LIBRARIES}" gtest PARENT_SCOPE) # for stubs/agents
 
@@ -99,8 +99,8 @@ set( tgt "cyclus_unit_tests" )
 add_custom_command(TARGET ${tgt}
   POST_BUILD
   COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/generate_gtest_macros.py"
-          "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}"
-          "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake"
+  "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}"
+  "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake"
   COMMENT "adding tests from ${tgt}"
   DEPENDS
   VERBATIM
