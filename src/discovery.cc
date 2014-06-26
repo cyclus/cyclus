@@ -2,10 +2,10 @@
 
 namespace cyclus {
 
-std::vector<std::string> DiscoverArchetypes(const std::string s) {
+std::set<std::string> DiscoverArchetypes(const std::string s) {
   // Note that 9 is the length of the word "Construct"
   using std::string;
-  std::vector<string> archs;
+  std::set<string> archs;
   size_t offset = 0;
   size_t end_offset = 0;
   const string words = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
@@ -16,7 +16,7 @@ std::vector<std::string> DiscoverArchetypes(const std::string s) {
       offset += 9;
       continue;
     }
-    archs.push_back(string(s, offset+9, end_offset - offset - 9));
+    archs.insert(string(s, offset+9, end_offset - offset - 9));
     offset = end_offset;
   }
   return archs;
@@ -24,7 +24,7 @@ std::vector<std::string> DiscoverArchetypes(const std::string s) {
 
 std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
   using std::string;
-  using std::vector;
+  using std::set;
   namespace fs = boost::filesystem;
   // find file
   string libpath = (fs::path(p) / fs::path("lib" + lib + SUFFIX)).string();
@@ -40,10 +40,17 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
             std::istreambuf_iterator<char>());
 
   // find specs
-  vector<string> archs = DiscoverArchetypes(s);
-  std::set<string> specs;
-  for (unsigned int i = 0; i < archs.size(); ++i)
-    specs.insert(p + ":" + lib + ":" + archs[i]);
+  set<string> archs = DiscoverArchetypes(s);
+  set<string> specs;
+  string spec;
+  AgentSpec agentspec;
+  //DynamicModule dynmod;
+  for (set<string>::iterator it = archs.begin(); it != archs.end(); ++it) {
+    spec = p + ":" + lib + ":" + (*it);
+    agentspec = AgentSpec(spec);
+    if (DynamicModule::Exists(agentspec))
+      specs.insert(spec);
+  }
   return specs;
 };
 

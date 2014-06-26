@@ -83,6 +83,16 @@ Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
   return a;
 }
 
+bool DynamicModule::Exists(AgentSpec spec) {
+  bool rtn = true;
+  try { 
+    DynamicModule dyn (spec);
+  } catch (cyclus::Error& e) {
+    rtn = false;
+  }
+  return rtn;
+}
+
 void DynamicModule::CloseAll() {
   std::map<std::string, DynamicModule*>::iterator it;
   for (it = modules_.begin(); it != modules_.end(); it++) {

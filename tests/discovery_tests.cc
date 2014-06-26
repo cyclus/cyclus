@@ -7,7 +7,7 @@
 
 TEST(DiscoveryTests, DiscoverArchetypes) {
   using std::string;
-  using std::vector;
+  using std::set;
   string s = "RS4_^@_Construct<std::pair<std::basic_string<char>, std::basic_"
              "string<char> >, std::pair<std::basic_string<char>, std::basic_s"
              "tring<char> > >^@_ZNSt6vectorIS_IN5boost6spirit14basic_hold_any"
@@ -25,24 +25,24 @@ TEST(DiscoveryTests, DiscoverArchetypes) {
              "t10shared_ptrIN6cyclus12BidPortfolioINS2_8MaterialEEEEES6_St9_I"
              "dentityIS6_ESt4lessIS6_ESaIS6_EE7_M_rootEv^@_ZNK5boost6spirit14"
              "basic_hold_anyIcE4castISsEERKT_v^@_ZNSt6vectorIN6cyclus7DbTypes";
-  std::vector<string> v = cyclus::DiscoverArchetypes(s);
-  std::vector<string> obs;
-  obs.push_back("Yourself");
-  obs.push_back("_ME_42");
-  EXPECT_EQ(obs, v);
+  set<string> obs = cyclus::DiscoverArchetypes(s);
+  set<string> exp;
+  exp.insert("Yourself");
+  exp.insert("_ME_42");
+  EXPECT_EQ(exp, obs);
 }
 
 TEST(DiscoveryTests, DiscoverSpec) {
   using std::string;
-  using std::vector;
-  std::set<string> exp = cyclus::DiscoverSpecs("", "agents");
-  std::set<string> obs;
-  obs.insert(":agents:NullInst");
-  obs.insert(":agents:NullRegion");
-  obs.insert(":agents:Sink");
-  obs.insert(":agents:Source");
-  obs.insert(":agents:KFacility");
-  obs.insert(":agents:Prey");
-  obs.insert(":agents:Predator");
-  EXPECT_EQ(obs, exp);
+  using std::set;
+  set<string> obs = cyclus::DiscoverSpecs("", "agents");
+  set<string> exp;
+  exp.insert(":agents:NullInst");
+  exp.insert(":agents:NullRegion");
+  exp.insert(":agents:Sink");
+  exp.insert(":agents:Source");
+  exp.insert(":agents:KFacility");
+  exp.insert(":agents:Prey");
+  exp.insert(":agents:Predator");
+  EXPECT_EQ(exp, obs);
 }
