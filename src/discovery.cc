@@ -75,8 +75,11 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     }
     string p = pth.parent_path().string();
     string lib = pth.filename().string();
-    p = p.substr(d.length(), string::npos);
-    lib = lib.substr(3, lib.rfind("."));  // remove 'lib' prefix and suffix
+    if (d.length() < p.length()) 
+      p = p.substr(d.length()+1, string::npos); 
+    else 
+      p = "";
+    lib = lib.substr(3, lib.rfind(".") - 3);  // remove 'lib' prefix and suffix
     libspecs = DiscoverSpecs(p, lib); 
     for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls)
       specs.insert(*ls);
@@ -92,7 +95,7 @@ std::set<std::string> DiscoverSpecsInCyclusPath() {
   set<string> dirspecs;
   vector<string> cycpath = Env::cyclus_path();
   for (vector<string>::iterator it = cycpath.begin(); it != cycpath.end(); ++it) {
-    dirspecs = DiscoverSpecsInDir(*it);
+    dirspecs = DiscoverSpecsInDir((*it).length() == 0 ? "." : (*it));
     for (set<string>::iterator ds = dirspecs.begin(); ds != dirspecs.end(); ++ds)
       specs.insert(*ds);
   }
