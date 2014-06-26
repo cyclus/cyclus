@@ -56,6 +56,6 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
       specs.insert(spec);
   }
   return specs;
-};
+}
 
 }  // namespace cyclus

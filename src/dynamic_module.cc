@@ -86,7 +86,7 @@ Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
 bool DynamicModule::Exists(AgentSpec spec) {
   bool rtn = true;
   try { 
-    DynamicModule dyn (spec);
+    DynamicModule dyn(spec);
   } catch (cyclus::Error& e) {
     rtn = false;
   }
