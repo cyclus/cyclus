@@ -58,4 +58,45 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
   return specs;
 }
 
+std::set<std::string> DiscoverSpecsInDir(std::string d) {
+  using std::string;
+  using std::set;
+  namespace fs = boost::filesystem;
+  set<string> specs;
+  set<string> libspecs;
+  fs::recursive_directory_iterator it(d);
+  fs::recursive_directory_iterator last;
+  BOOST_FOREACH(fs::path const & pth, std::make_pair(it, last)) {
+    string pthstr = pth.string();
+    if (!boost::algorithm::ends_with(pthstr, SUFFIX)) {
+      continue;
+    } else if (is_directory(pth)) {
+      continue;
+    }
+    string p = pth.parent_path().string();
+    string lib = pth.filename().string();
+    p = p.substr(d.length(), string::npos);
+    lib = lib.substr(3, lib.rfind("."));  // remove 'lib' prefix and suffix
+    libspecs = DiscoverSpecs(p, lib); 
+    for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls)
+      specs.insert(*ls);
+  }
+  return specs;
+}
+
+std::set<std::string> DiscoverSpecsInCyclusPath() {
+  using std::string;
+  using std::set;
+  using std::vector;
+  set<string> specs;
+  set<string> dirspecs;
+  vector<string> cycpath = Env::cyclus_path();
+  for (vector<string>::iterator it = cycpath.begin(); it != cycpath.end(); ++it) {
+    dirspecs = DiscoverSpecsInDir(*it);
+    for (set<string>::iterator ds = dirspecs.begin(); ds != dirspecs.end(); ++ds)
+      specs.insert(*ds);
+  }
+  return specs;
+}
+
 }  // namespace cyclus

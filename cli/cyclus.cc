@@ -230,6 +230,8 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
        "dump the annotations for the named agent")
       ("agent-listing,l", po::value<std::string>(),
        "dump the agents in a library.")
+      ("all-agent-listing,a", po::value<std::string>(),
+       "dump all the agents cyclus knows about.")
       ("no-agent", "only print log entries from cyclus core code")
       ("no-mem", "exclude memory log statement from logger output")
       ("verb,v", po::value<std::string>(),
