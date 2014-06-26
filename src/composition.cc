@@ -87,10 +87,10 @@ void Composition::Record(Context* ctx) {
   compmath::Normalize(&mass_, 1);
   for (it = mass().begin(); it != mass().end(); ++it) {
     ctx->NewDatum("Compositions")
-       ->AddVal("QualId", id())
-       ->AddVal("NucId", it->first)
-       ->AddVal("MassFrac", it->second)
-       ->Record();
+        ->AddVal("QualId", id())
+        ->AddVal("NucId", it->first)
+        ->AddVal("MassFrac", it->second)
+        ->Record();
   }
 }
 
