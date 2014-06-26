@@ -12,6 +12,7 @@
 #include "cyc_std.h"
 #include "datum.h"
 #include "db_init.h"
+#include "discovery.h"
 #include "exchange_graph.h"
 #include "exchange_translation_context.h"
 #include "env.h"

@@ -60,6 +60,9 @@ class DynamicModule {
   /// Returns a newly constructed agent for the given module spec.
   static Agent* Make(Context* ctx, AgentSpec spec);
 
+  /// Tests that an agent spec really exists.
+  static bool Exists(AgentSpec spec);
+
   /// Closes all statically loaded dynamic modules. This should always be called
   /// before process termination.  This must be called AFTER all agents have
   /// been destructed.
