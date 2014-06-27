@@ -77,22 +77,22 @@ class Request {
   Request(boost::shared_ptr<T> target, Trader* requester,
           std::string commodity = "", double preference = 0,
           bool exclusive = false)
-    : target_(target),
-      requester_(requester),
-      commodity_(commodity),
-      preference_(preference),
-      exclusive_(exclusive) {}
+      : target_(target),
+        requester_(requester),
+        commodity_(commodity),
+        preference_(preference),
+        exclusive_(exclusive) {}
 
   Request(boost::shared_ptr<T> target, Trader* requester,
           typename RequestPortfolio<T>::Ptr portfolio,
           std::string commodity = "", double preference = 0,
           bool exclusive = false)
-    : target_(target),
-      requester_(requester),
-      commodity_(commodity),
-      preference_(preference),
-      portfolio_(portfolio),
-      exclusive_(exclusive) {}
+      : target_(target),
+        requester_(requester),
+        commodity_(commodity),
+        preference_(preference),
+        portfolio_(portfolio),
+        exclusive_(exclusive) {}
 
   boost::shared_ptr<T> target_;
   Trader* requester_;

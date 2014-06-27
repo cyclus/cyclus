@@ -13,7 +13,9 @@ namespace cyclus {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                                bool exclusive)
-    :  g_(g), iface_(iface), excl_(exclusive) {
+    : g_(g),
+      iface_(iface),
+      excl_(exclusive) {
   arc_offset_ = g_->arcs().size();
   int n_cols = arc_offset_ + g_->request_groups().size();
   ctx_.obj_coeffs.resize(n_cols);

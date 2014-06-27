@@ -32,7 +32,7 @@ inline double SumQty(double total, Request<T>* r) {
 template<class T>
 struct QtyCoeffConverter: public Converter<T> {
   QtyCoeffConverter(const std::map<Request<T>*, double>& coeffs)
-       : coeffs(coeffs) {}
+      : coeffs(coeffs) {}
 
   inline virtual double convert(
       boost::shared_ptr<T> offer,
