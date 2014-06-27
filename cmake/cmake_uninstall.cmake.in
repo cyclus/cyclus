@@ -12,7 +12,7 @@ foreach (file ${files})
             COMMAND @CMAKE_COMMAND@ -E remove "$ENV{DESTDIR}${file}"
             OUTPUT_VARIABLE rm_out
             RESULT_VARIABLE rm_retval
-        )
+            )
         if(NOT ${rm_retval} EQUAL 0)
             message(FATAL_ERROR "Problem when removing \"$ENV{DESTDIR}${file}\"")
         endif (NOT ${rm_retval} EQUAL 0)

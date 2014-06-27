@@ -130,11 +130,11 @@ void SimInit::SnapAgent(Agent* m) {
     std::vector<Resource::Ptr> inv = it->second;
     for (int i = 0; i < inv.size(); ++i) {
       ctx->NewDatum("AgentStateInventories")
-      ->AddVal("AgentId", m->id())
-      ->AddVal("SimTime", ctx->time())
-      ->AddVal("InventoryName", name)
-      ->AddVal("ResourceId", inv[i]->state_id())
-      ->Record();
+          ->AddVal("AgentId", m->id())
+          ->AddVal("SimTime", ctx->time())
+          ->AddVal("InventoryName", name)
+          ->AddVal("ResourceId", inv[i]->state_id())
+          ->Record();
     }
   }
 }

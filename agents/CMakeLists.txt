@@ -10,7 +10,7 @@ use_cyclus("agents" "predator")
 install_cyclus_module("agents" "" "NONE")
 
 SET(
-  CYCLUS_CORE_TEST_SOURCE "${CYCLUS_CORE_TEST_SOURCE}"
-  "${agents_TEST_CC}"
-  PARENT_SCOPE
-  )
+    CYCLUS_CORE_TEST_SOURCE "${CYCLUS_CORE_TEST_SOURCE}"
+    "${agents_TEST_CC}"
+    PARENT_SCOPE
+    )
