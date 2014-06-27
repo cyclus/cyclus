@@ -38,7 +38,7 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
   // read in file, pre-allocates space
   std::ifstream f (libpath.c_str());
   std::string s;
-  f.seekg(0, std::ios::end);   
+  f.seekg(0, std::ios::end);
   s.reserve(f.tellg());
   f.seekg(0, std::ios::beg);
   s.assign((std::istreambuf_iterator<char>(f)),
@@ -84,13 +84,13 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     }
     string p = pth.parent_path().string();
     string lib = pth.filename().string();
-    if (d.length() < p.length()) 
-      p = p.substr(d.length()+1, string::npos); 
-    else 
+    if (d.length() < p.length())
+      p = p.substr(d.length()+1, string::npos);
+    else
       p = "";
     lib = lib.substr(3, lib.rfind(".") - 3);  // remove 'lib' prefix and suffix
     try {
-      libspecs = DiscoverSpecs(p, lib); 
+      libspecs = DiscoverSpecs(p, lib);
     } catch (cyclus::IOError& e) {}
     for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls)
       specs.insert(*ls);

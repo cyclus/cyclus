@@ -17,12 +17,10 @@
 
 namespace cyclus {
 
-/**
-    RelaxNGValidator
-
-    This class provides a simple interface to validate xml documents
-    agaisnt a given RelaxNG schema.
- */
+/// RelaxNGValidator
+///
+/// This class provides a simple interface to validate xml documents
+/// agaisnt a given RelaxNG schema.
 class RelaxNGValidator {
  public:
   /// constructor
@@ -31,26 +29,20 @@ class RelaxNGValidator {
   /// destructor
   ~RelaxNGValidator();
 
-  /**
-     parse a relaxng schema xml file
-     @param contents the contents of the xml file
-   */
+  /// parse a relaxng schema xml file
+  /// @param contents the contents of the xml file
   void parse_memory(const Glib::ustring& contents);
 
-  /**
-     validate an xml file agaisnt the given schema
-     @param doc the xml file document
-   */
+  /// validate an xml file agaisnt the given schema
+  /// @param doc the xml file document
   bool Validate(const xmlpp::Document* doc);
 
  protected:
   /// free xml-related memory
   void release_underlying();
 
-  /**
-     parse a relaxng schema context
-     @param context the context
-   */
+  /// parse a relaxng schema context
+  /// @param context the context
   void parse_context(xmlRelaxNGParserCtxtPtr context);
 
   /// the schema

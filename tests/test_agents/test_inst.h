@@ -5,9 +5,7 @@
 
 #include <sstream>
 
-/**
-   This is the simplest possible Institution, for testing
- */
+/// This is the simplest possible Institution, for testing
 class TestInst: public cyclus::Institution {
  public:
   TestInst(cyclus::Context* ctx) : cyclus::Institution(ctx) {}

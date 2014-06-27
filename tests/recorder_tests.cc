@@ -133,7 +133,7 @@ TEST(RecorderTest, Datum_record) {
 
   Datum* d = m.NewDatum("DumbTitle");
   d->AddVal("animal", std::string("monkey"))
-  ->Record();
+      ->Record();
 
   EXPECT_EQ(back.flush_count, 1);
 }

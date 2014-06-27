@@ -146,8 +146,11 @@ Composition::Ptr Material::comp() const {
 }
 
 Material::Material(Context* ctx, double quantity, Composition::Ptr c)
-  : qty_(quantity), comp_(c), tracker_(ctx, this), ctx_(ctx),
-    prev_decay_time_(0) {
+    : qty_(quantity),
+      comp_(c),
+      tracker_(ctx, this),
+      ctx_(ctx),
+      prev_decay_time_(0) {
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
   } else {

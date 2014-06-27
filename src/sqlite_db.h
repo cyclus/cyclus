@@ -94,7 +94,9 @@ class SqlStatement {
 
  private:
   SqlStatement(sqlite3* db, std::string zSql)
-      : db_(db), zSql_(zSql), stmt_(NULL) {
+      : db_(db),
+        zSql_(zSql),
+        stmt_(NULL) {
     Must(sqlite3_prepare_v2(db_, zSql.c_str(), -1, &stmt_, NULL));
   }
 

@@ -39,8 +39,8 @@ class Inver : public cy::Facility {
 
   virtual void Snapshot(cy::DbInit di) {
     di.NewDatum("Info")
-      ->AddVal("val1", val1)
-      ->Record();
+        ->AddVal("val1", val1)
+        ->Record();
   }
 
   virtual void Build(Agent* parent) {

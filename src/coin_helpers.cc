@@ -13,10 +13,10 @@
 
 namespace cyclus {
 
-/* Check two agents against each other.  Return nonzero if different.
-   Ignore names if that set.
-   May modify both agents by cleaning up
-*/
+// Check two agents against each other.  Return nonzero if different.
+// Ignore names if that set.
+// May modify both agents by cleaning up
+
 int
 differentAgent(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
                bool /*ignoreNames*/) {

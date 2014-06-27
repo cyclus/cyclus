@@ -20,20 +20,16 @@ namespace cyclus {
 /// Agent inheritance hierarchy
 template<class T>
 inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
-inline static void AdjustPrefs(Agent* m,
-                               PrefMap<Material>::type& prefs) {
+inline static void AdjustPrefs(Agent* m, PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
 }
-inline static void AdjustPrefs(Agent* m,
-                               PrefMap<Product>::type& prefs) {
+inline static void AdjustPrefs(Agent* m, PrefMap<Product>::type& prefs) {
   m->AdjustProductPrefs(prefs);
 }
-inline static void AdjustPrefs(Trader* t,
-                               PrefMap<Material>::type& prefs) {
+inline static void AdjustPrefs(Trader* t, PrefMap<Material>::type& prefs) {
   t->AdjustMatlPrefs(prefs);
 }
-inline static void AdjustPrefs(Trader* t,
-                               PrefMap<Product>::type& prefs) {
+inline static void AdjustPrefs(Trader* t, PrefMap<Product>::type& prefs) {
   t->AdjustProductPrefs(prefs);
 }
 

@@ -47,11 +47,9 @@ class Datum {
   Datum* AddVal(const char* field, boost::spirit::hold_any val,
                 std::vector<int>* shape = NULL);
 
-  /*!
-  Record this datum to its Recorder. Recorded Datum objects of the same
-  title (e.g. same table) must not contain any fields that were not
-  present in the first datum recorded of that title.
-  */
+  /// Record this datum to its Recorder. Recorded Datum objects of the same
+  /// title (e.g. same table) must not contain any fields that were not
+  /// present in the first datum recorded of that title.
   void Record();
 
   /// Returns the datum's title as specified during the datum's creation.

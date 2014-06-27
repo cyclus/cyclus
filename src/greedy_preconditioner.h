@@ -69,7 +69,7 @@ class GreedyPreconditioner {
   /// @brief constructor if weights are given in heaviest-first order
   /// @warning weights are assumed to be positive
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights)
-    : commod_weights_(commod_weights) {
+      : commod_weights_(commod_weights) {
     if (commod_weights_.size() != 0)
       ProcessWeights_(END);
   }
@@ -78,7 +78,7 @@ class GreedyPreconditioner {
   /// @warning weights are assumed to be positive
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights,
                        WgtOrder order)
-    : commod_weights_(commod_weights) {
+      : commod_weights_(commod_weights) {
     if (commod_weights_.size() != 0)
       ProcessWeights_(order);
   }

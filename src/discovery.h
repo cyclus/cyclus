@@ -20,7 +20,7 @@
 
 namespace cyclus {
 
-/// This function returns a vector of archetype names in a given 
+/// This function returns a vector of archetype names in a given
 /// string that is the binary represnetation of a module/shared-object/library.
 std::set<std::string> DiscoverArchetypes(const std::string s);
 

@@ -30,8 +30,8 @@ class Hdf5GlobalEnv : public ::testing::Environment {
 };
 
 Hdf5GlobalEnv* const hdf5_glb_env = new Hdf5GlobalEnv;
-::testing::Environment* const hdf5_env = \
-  ::testing::AddGlobalTestEnvironment(hdf5_glb_env);
+::testing::Environment* const hdf5_env =
+    ::testing::AddGlobalTestEnvironment(hdf5_glb_env);
 
 class Hdf5BackTests : public ::testing::Test {
  public:
@@ -56,11 +56,11 @@ class Hdf5BackTests : public ::testing::Test {
     else
       shape_ptr = &shape;
     rec.NewDatum(title)
-    ->AddVal("vals", x, shape_ptr)
-    ->Record();
+        ->AddVal("vals", x, shape_ptr)
+        ->Record();
     rec.NewDatum(title)
-    ->AddVal("vals", y, shape_ptr)
-    ->Record();
+        ->AddVal("vals", y, shape_ptr)
+        ->Record();
     rec.Flush();
     qr = db->Query(title, NULL);
   }
@@ -91,7 +91,6 @@ class Hdf5BackTests : public ::testing::Test {
     EXPECT_STREQ(y.str().c_str(), obsy.str().c_str());
   }
 
-
   std::string path;
   cyclus::Hdf5Back* db;
   std::vector<int> shape;
@@ -116,8 +115,8 @@ TEST_F(Hdf5BackTests, ShapeSegfault) {
   foo.push_back(42);
 
   r.NewDatum("bar")
-  ->AddVal("foo", foo, shape)
-  ->Record();
+      ->AddVal("foo", foo, shape)
+      ->Record();
 
   memset(shape, '-', 1);
 
@@ -864,11 +863,11 @@ TEST(Hdf5BackTest, ReadWriteAll) {
   string_shape[0] = 16;
   m.RegisterBackend(&back);
   m.NewDatum("DumbTitle")
-  ->AddVal("string", str, &string_shape)
-  ->AddVal("int", i)
-  ->AddVal("float", f)
-  ->AddVal("double", d)
-  ->Record();
+      ->AddVal("string", str, &string_shape)
+      ->AddVal("int", i)
+      ->AddVal("float", f)
+      ->AddVal("double", d)
+      ->Record();
   m.Close();
 
   // raw read
