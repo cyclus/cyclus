@@ -30,7 +30,7 @@ inline double SumQty(double total, Request<T>* r) {
 /// converter. The arc and exchange context are used in order to reference the
 /// original request so that the request's coefficient can be applied.
 template<class T>
-struct QtyCoeffConverter: public Converter<T> {
+struct QtyCoeffConverter : public Converter<T> {
   QtyCoeffConverter(const std::map<Request<T>*, double>& coeffs)
       : coeffs(coeffs) {}
 

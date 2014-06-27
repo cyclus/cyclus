@@ -17,31 +17,24 @@ class InfileTree;
 typedef std::set<std::string> PrototypeSet;
 typedef std::set<std::string>::iterator PrototypeIterator;
 
-/**
-   The Institution class is the abstract class/interface
-   used by all institution agents
-
-   @section introduction Introduction The Institution type assists in defining the
-   region-institution-facility hierarchy in Cyclus. A Institution institution is
-   an actor associated with a set of facilities for which it is responsible. An
-   Institution may be used to adjust preferences in the ResourceExchange to make
-   material routing decisions based on interfacility relationships. Deployment
-   is a primary differentiator between different Institution implementations.
- */
+/// The Institution class is the abstract class/interface
+/// used by all institution agents
+///
+/// @section introduction Introduction The Institution type assists in defining the
+/// region-institution-facility hierarchy in Cyclus. A Institution institution is
+/// an actor associated with a set of facilities for which it is responsible. An
+/// Institution may be used to adjust preferences in the ResourceExchange to make
+/// material routing decisions based on interfacility relationships. Deployment
+/// is a primary differentiator between different Institution implementations.
 class Institution : public Agent, public TimeListener {
-  /* --------------------
-   * all MODEL classes have these members
-   * --------------------
-   */
+  // --------------------
+  // all MODEL classes have these members
+  // --------------------
  public:
-  /**
-     Default constructor for Institution Class
-   */
+  /// Default constructor for Institution Class
   Institution(Context* ctx);
 
-  /**
-     every agent should be destructable
-   */
+  /// every agent should be destructable
   virtual ~Institution() {}
 
   // DO NOT call Agent class implementation of this method
@@ -57,14 +50,10 @@ class Institution : public Agent, public TimeListener {
 
   virtual Inventories SnapshotInv() { return Inventories(); }
 
-  /**
-     every agent should be able to print a verbose description
-   */
+  /// every agent should be able to print a verbose description
   virtual std::string str();
 
-  /**
-     perform all tasks required when an inst enters the simulation
-   */
+  /// perform all tasks required when an inst enters the simulation
   virtual void Build(Agent* parent);
 
   virtual void EnterNotify();
