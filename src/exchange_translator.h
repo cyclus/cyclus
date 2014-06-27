@@ -120,15 +120,15 @@ class ExchangeTranslator {
 
 /// @brief Adds a request-node mapping
 template <class T>
-    inline void AddRequest(ExchangeTranslationContext<T>& translation_ctx,
-                           Request<T>* r, ExchangeNode::Ptr n) {
+inline void AddRequest(ExchangeTranslationContext<T>& translation_ctx,
+                       Request<T>* r, ExchangeNode::Ptr n) {
   translation_ctx.request_to_node[r] = n;
   translation_ctx.node_to_request[n] = r;
 }
 
 /// @brief Adds a bid-node mapping
 template <class T>
-    inline void AddBid(ExchangeTranslationContext<T>& translation_ctx,
+inline void AddBid(ExchangeTranslationContext<T>& translation_ctx,
                        Bid<T>* b, ExchangeNode::Ptr n) {
   translation_ctx.bid_to_node[b] = n;
   translation_ctx.node_to_bid[n] = b;

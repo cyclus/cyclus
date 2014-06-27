@@ -7,8 +7,7 @@
 #include "request_portfolio.h"
 
 template<class T>
-inline void TestVecEq(const std::vector<T>& lhs,
-                      const std::vector<T>& rhs) {
+inline void TestVecEq(const std::vector<T>& lhs, const std::vector<T>& rhs) {
   ASSERT_EQ(lhs.size(), rhs.size()) << "Vectors not the same size";
   for (int i = 0; i < lhs.size(); i++) {
     EXPECT_EQ(lhs[i], rhs[i]) << "Vectors differ at index " << i;

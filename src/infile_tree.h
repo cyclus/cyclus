@@ -78,31 +78,31 @@ class InfileTree {
 /// @return either return the optional value if it exists or return the default
 /// value
 template <typename T>
-    inline T Query(InfileTree* tree, std::string query, int index = 0) {
+inline T Query(InfileTree* tree, std::string query, int index = 0) {
   return boost::lexical_cast<T>(tree->GetString(query, index).c_str());
 }
 
 template <>
-    inline std::string Query(InfileTree* tree, std::string query, int index) {
+inline std::string Query(InfileTree* tree, std::string query, int index) {
   return tree->GetString(query, index);
 }
 
 template <>
-    inline int Query(InfileTree* tree, std::string query, int index) {
+inline int Query(InfileTree* tree, std::string query, int index) {
   std::string s = tree->GetString(query, index);
   boost::trim(s);
   return boost::lexical_cast<int>(s.c_str());
 }
 
 template <>
-    inline float Query(InfileTree* tree, std::string query, int index) {
+inline float Query(InfileTree* tree, std::string query, int index) {
   std::string s = tree->GetString(query, index);
   boost::trim(s);
   return boost::lexical_cast<float>(s.c_str());
 }
 
 template <>
-    inline double Query(InfileTree* tree, std::string query, int index) {
+inline double Query(InfileTree* tree, std::string query, int index) {
   std::string s = tree->GetString(query, index);
   boost::trim(s);
   return boost::lexical_cast<double>(s.c_str());
@@ -115,7 +115,7 @@ template <>
 /// @return either return the optional value if it exists or return the default
 /// value
 template <typename T>
-    inline T OptionalQuery(InfileTree* tree, std::string query, T default_val) {
+inline T OptionalQuery(InfileTree* tree, std::string query, T default_val) {
   T val;
   tree->NMatches(query) == 1 ?
     val = boost::lexical_cast<T>(tree->GetString(query).c_str()) :
@@ -124,8 +124,8 @@ template <typename T>
 }
 
 template <>
-    inline int OptionalQuery(InfileTree* tree, std::string query,
-                             int default_val) {
+inline int OptionalQuery(InfileTree* tree, std::string query,
+                         int default_val) {
   int val = default_val;
   if (tree->NMatches(query) == 1) {
     std::string s = tree->GetString(query);
@@ -136,8 +136,8 @@ template <>
 }
 
 template <>
-    inline float OptionalQuery(InfileTree* tree, std::string query,
-                               float default_val) {
+inline float OptionalQuery(InfileTree* tree, std::string query,
+                           float default_val) {
   float val = default_val;
   if (tree->NMatches(query) == 1) {
     std::string s = tree->GetString(query);
@@ -148,8 +148,8 @@ template <>
 }
 
 template <>
-    inline double OptionalQuery(InfileTree* tree, std::string query,
-                                double default_val) {
+inline double OptionalQuery(InfileTree* tree, std::string query,
+                            double default_val) {
   double val = default_val;
   if (tree->NMatches(query) == 1) {
     std::string s = tree->GetString(query);
