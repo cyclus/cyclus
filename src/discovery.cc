@@ -91,7 +91,7 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     lib = lib.substr(3, lib.rfind(".") - 3);  // remove 'lib' prefix and suffix
     try {
       libspecs = DiscoverSpecs(p, lib); 
-    } catch (cyclus::IOError& e) {};
+    } catch (cyclus::IOError& e) {}
     for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls)
       specs.insert(*ls);
   }

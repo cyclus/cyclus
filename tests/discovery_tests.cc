@@ -69,4 +69,3 @@ TEST(DiscoveryTests, DiscoverSpecsInInstallPath) {
   for (set<string>::iterator it = exp.begin(); it != exp.end(); ++it)
     EXPECT_EQ(1, obs.count(*it));
 }
-
