@@ -230,6 +230,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
        "dump the annotations for the named agent")
       ("agent-listing,l", po::value<std::string>(),
        "dump the agents in a library.")
+      ("all-agent-listing,a", "dump all the agents cyclus knows about.")
       ("no-agent", "only print log entries from cyclus core code")
       ("no-mem", "exclude memory log statement from logger output")
       ("verb,v", po::value<std::string>(),
@@ -344,6 +345,15 @@ int EarlyExitArgs(const ArgInfo& ai) {
       std::string p = name.substr(0, colpos);
       std::string lib = name.substr(colpos+1, std::string::npos);
       std::set<std::string> specs = cyclus::DiscoverSpecs(p, lib);
+      for (std::set<std::string>::iterator it = specs.begin(); it != specs.end(); ++it)
+        std::cout << *it << "\n";
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("all-agent-listing")) {
+    try {
+      std::set<std::string> specs = cyclus::DiscoverSpecsInCyclusPath();
       for (std::set<std::string>::iterator it = specs.begin(); it != specs.end(); ++it)
         std::cout << *it << "\n";
     } catch (cyclus::IOError err) {

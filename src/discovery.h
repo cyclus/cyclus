@@ -10,7 +10,9 @@
 #include <vector>
 
 #include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "dynamic_module.h"
 #include "env.h"
@@ -24,6 +26,12 @@ std::set<std::string> DiscoverArchetypes(const std::string s);
 
 /// Discover archetype specifications for a path and library.
 std::set<std::string> DiscoverSpecs(std::string p, std::string lib);
+
+/// Discover archetype specifications that live recursively in modules in a dir.
+std::set<std::string> DiscoverSpecsInDir(std::string d);
+
+/// Discover archetype specifications that live recursively in CYCLUS_PATH directories.
+std::set<std::string> DiscoverSpecsInCyclusPath();
 
 }  // namespace cyclus
 

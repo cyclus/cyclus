@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "discovery.h"
+#include "env.h"
 
 TEST(DiscoveryTests, DiscoverArchetypes) {
   using std::string;
@@ -47,4 +48,24 @@ TEST(DiscoveryTests, DiscoverSpec) {
   exp.insert(":agents:Prey");
   exp.insert(":agents:Predator");
   EXPECT_EQ(exp, obs);
+}
+
+TEST(DiscoveryTests, DiscoverSpecsInInstallPath) {
+  using std::string;
+  using std::set;
+  set<string> obs = cyclus::DiscoverSpecsInDir(cyclus::Env::GetInstallPath() + \
+                                               "/lib/cyclus");
+  set<string> exp;
+  exp.insert(":agents:NullInst");
+  exp.insert(":agents:NullRegion");
+  exp.insert(":agents:Sink");
+  exp.insert(":agents:Source");
+  exp.insert(":agents:KFacility");
+  exp.insert(":agents:Prey");
+  exp.insert(":agents:Predator");
+  exp.insert("stubs:StubFacility:StubFacility");
+  exp.insert("stubs:StubInst:StubInst");
+  exp.insert("stubs:StubRegion:StubRegion");
+  for (set<string>::iterator it = exp.begin(); it != exp.end(); ++it)
+    EXPECT_EQ(1, obs.count(*it));
 }
