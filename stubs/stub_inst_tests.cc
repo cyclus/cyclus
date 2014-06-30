@@ -24,8 +24,7 @@ class StubInstTest : public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubInstTest, clone) {
-  StubInst* cloned_fac =
-      dynamic_cast<StubInst*> (src_inst_->Clone());
+  StubInst* cloned_fac = dynamic_cast<StubInst*> (src_inst_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
