@@ -116,7 +116,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
     FIND_PACKAGE( LibXml2 REQUIRED )
-    ADD_DEFINITIONS (${LIBXML2_DEFINITIONS})
+    ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
     SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
     # Find LibXML++ and dependencies
@@ -228,7 +228,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
     SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}")
     #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev  (>= 1.46.0-1), libxml++2.6-dev (>= 2.6.0), libsqlite3-dev (>= 3.7.9), libhdf5-serial-dev (>= 1.8.0)")
-    set (CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/cmake/CyclusCPackOptions.cmake.in"
         "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake" @ONLY)
     SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake")
@@ -253,11 +253,11 @@ SET(DOC_OUTPUT_DIR "${CMAKE_BINARY_DIR}/doc")
 
 # If doxygen exists, use the doc/CMakeLists.txt file for further instructions.
 FIND_PACKAGE(Doxygen)
-IF (DOXYGEN_FOUND)
+IF(DOXYGEN_FOUND)
     ADD_SUBDIRECTORY("${CYCLUS_DOC_DIR}")
-ELSE (DOXYGEN_FOUND)
+ELSE(DOXYGEN_FOUND)
     MESSAGE(STATUS "WARNING: Doxygen not found - doc won't be created")
-ENDIF (DOXYGEN_FOUND)
+ENDIF(DOXYGEN_FOUND)
 
 ##############################################################################################
 ####################################### end doxygen ##########################################
