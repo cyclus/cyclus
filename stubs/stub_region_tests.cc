@@ -22,8 +22,7 @@ class StubRegionTest : public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubRegionTest, clone) {
-  StubRegion* cloned_fac =
-      dynamic_cast<StubRegion*> (src_region_->Clone());
+  StubRegion* cloned_fac = dynamic_cast<StubRegion*> (src_region_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
