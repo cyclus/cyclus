@@ -14,8 +14,12 @@ namespace cyclus {
 /// interface
 class SolverFactory {
  public:
+  /// currently supported solver types are 'clp' and 'cbc'
   /// @param t the solver type
-  explicit SolverFactory(std::string t = "");
+  /// @param tmax the maximum solution time
+  SolverFactory();
+  explicit SolverFactory(std::string t);
+  SolverFactory(std::string t, double tmax);
 
   /// get/set the solver type
   inline void solver_t(std::string t) { t_ = t; }
@@ -27,6 +31,7 @@ class SolverFactory {
 
  private:
   std::string t_;
+  double tmax_;
 };
 
 void SolveProg(OsiSolverInterface* si);

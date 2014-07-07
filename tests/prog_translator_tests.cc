@@ -19,8 +19,7 @@ namespace cyclus {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ProgTranslatorTests, translation) {
   // Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
-  SolverFactory sf;
-  sf.solver_t("cbc");
+  SolverFactory sf("cbc");
   OsiSolverInterface* iface = sf.get();
   CoinMessageHandler h;
   h.setLogLevel(0);

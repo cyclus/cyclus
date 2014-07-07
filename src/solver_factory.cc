@@ -7,21 +7,27 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-SolverFactory::SolverFactory(std::string t) : t_(t) { }
+// 10800 s = 3 hrs * 60 min/hr * 60 s/min
+SolverFactory::SolverFactory() : t_("cbc"), tmax_(10800) { }
+SolverFactory::SolverFactory(std::string t) : t_(t), tmax_(10800) { }
+SolverFactory::SolverFactory(std::string t, double tmax)
+    : t_(t),
+      tmax_(tmax) { }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 OsiSolverInterface* SolverFactory::get() {
   if (t_ == "clp") {
-    return new OsiClpSolverInterface();
+    OsiClpSolverInterface* s = new OsiClpSolverInterface();
+    s->getModelPtr()->setMaximumSeconds(tmax_);
+    return s;
   } else if (t_ == "cbc") {
-    return new OsiCbcSolverInterface();
+    OsiCbcSolverInterface* s = new OsiCbcSolverInterface();
+    s->setMaximumSeconds(tmax_);
+    return s;
   } else {
     throw ValueError("invalid SolverFactory type '" + t_ + "'");
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void SolveProg(OsiSolverInterface* si) {
   si->initialSolve();
   if (HasInt(si)) {
@@ -29,7 +35,6 @@ void SolveProg(OsiSolverInterface* si) {
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool HasInt(OsiSolverInterface* si) {
   int i = 0;
   for (i = 0; i != si->getNumCols(); i++) {
