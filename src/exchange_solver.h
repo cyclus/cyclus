@@ -10,9 +10,13 @@ class ExchangeGraph;
 /// @brief a very simple interface for solving translated resource exchanges
 class ExchangeSolver {
  public:
-  explicit ExchangeSolver(bool exclusive_orders = false) {}
+  explicit ExchangeSolver(bool exclusive_orders = false)
+    : exclusive_orders_(exclusive_orders),
+      verbose_(false) {}
   virtual ~ExchangeSolver() {}
 
+  /// tell the solver to be verbose
+  inline void verbose() { verbose_ = true; }
   inline void graph(ExchangeGraph* graph) { graph_ = graph; }
   inline ExchangeGraph* graph() { return graph_; }
 
@@ -30,6 +34,7 @@ class ExchangeSolver {
   virtual void SolveGraph() = 0;
   ExchangeGraph* graph_;
   bool exclusive_orders_;
+  bool verbose_;
 };
 
 }  // namespace cyclus
