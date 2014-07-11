@@ -20,7 +20,7 @@ class ProgSolver: public ExchangeSolver {
  protected:
   /// @brief the ProgSolver solves an ExchangeGraph...
   virtual void SolveGraph();
-
+  
  private:
   std::string solver_t_;
 };

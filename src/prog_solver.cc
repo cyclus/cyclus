@@ -7,21 +7,30 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Report(OsiSolverInterface* iface) {
+  std::cout << iface->getNumCols() << " total variables, "
+            << iface->getNumIntegers() << " integer.\n";
+  std::cout << iface->getNumRows() << " constraints\n";
+}
+
 ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
     : solver_t_(solver_t),
       ExchangeSolver(exclusive_orders) {}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ProgSolver::~ProgSolver() {}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ProgSolver::SolveGraph() {
   SolverFactory sf(solver_t_);
   OsiSolverInterface* iface = sf.get();
   try {
     ProgTranslator xlator(graph_, iface, exclusive_orders_);
     xlator.ToProg();
+    CoinMessageHandler h;
+    h.setLogLevel(0);
+    if (verbose_)
+      Report(iface);
+      h.setLogLevel(4);
+    iface->passInMessageHandler(&h);
     SolveProg(iface);
     xlator.FromProg();
   } catch(...) {
