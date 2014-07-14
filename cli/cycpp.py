@@ -186,7 +186,8 @@ class LinemarkerFilter(Filter):
         lms = self.machine.linemarkers
         if not self.last_was_linemarker:
             del lms[:]
-        lms.append(fname + ":" + lineno)
+        lms.append((fname, int(lineno)))
+        self.machine.nlines_since_linemarker = -1
 
     def revert(self, statement, sep):
         self.last_was_linemarker = self.match is not None
@@ -508,6 +509,7 @@ class StateAccumulator(object):
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.var_annotations = None
         self.linemarkers = []
+        self.nlines_since_linemarker = -1
         self.filters = [ClassAndSuperclassFilter(self), AccessFilter(self),
                         ExecFilter(self), UsingNamespaceFilter(self),
                         NamespaceAliasFilter(self), NamespaceFilter(self),
@@ -526,6 +528,7 @@ class StateAccumulator(object):
         """Modify the existing state by incoprorating the statement, which is
         partitioned from the next statement by sep.
         """
+        self.nlines_since_linemarker += statement.count('\n') + sep.count('\n')
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
@@ -544,7 +547,8 @@ class StateAccumulator(object):
         """Current location of the file from includes as a string."""
         if len(self.linemarkers) == 0:
             return ""
-        s = "\n Included from:\n  " + "\n  ".join(self.linemarkers)
+        s = "\n Included from:\n  " + "\n  ".join([lm[0] + ":" + str(lm[1]) for lm in self.linemarkers])
+        s += "\n In file: " + self.linemarkers[-1][0] + ":" + str(self.linemarkers[-1][1] + self.nlines_since_linemarker)
         return s + "\n"
 
     #
@@ -1365,6 +1369,7 @@ class CodeGenerator(object):
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.linemarkers = []
+        self.nlines_since_linemarker = -1
         self.var_annotations = None
         # all basic code generating filters for core methods
         self.codegen_filters = [InitFromCopyFilter(self),
@@ -1417,6 +1422,7 @@ class CodeGenerator(object):
         ignoring this statement, which is partitioned from the next statement by
         sep.
         """
+        self.nlines_since_linemarker += statement.count('\n') + sep.count('\n')
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
