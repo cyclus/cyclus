@@ -242,7 +242,7 @@ void Case3a::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 5;
   c2 = 10;
-  p1 = 0;
+  p1 = 1;
   p2 = 0;
   f1 = c1;
   f2 = 0;
@@ -255,7 +255,7 @@ void Case3b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 3;
   c2 = q - c1 + 0.1;
-  p1 = 0;
+  p1 = 1;
   p2 = 0;
   f1 = c1;
   f2 = q - c1;
@@ -270,7 +270,7 @@ void Case3c::Construct(ExchangeGraph* g, bool exclusive_orders) {
   c2 = q - c1;
   f1 = c1;
   f2 = c2;
-  p1 = 0;
+  p1 = 1;
   p2 = 0;
 
   Case3::Construct(g, exclusive_orders);
@@ -283,7 +283,7 @@ void Case3d::Construct(ExchangeGraph* g, bool exclusive_orders) {
   c2 = q - c1 - 0.1;
   f1 = c1;
   f2 = c2;
-  p1 = 0;
+  p1 = 1;
   p2 = 0;
 
   Case3::Construct(g, exclusive_orders);
@@ -732,9 +732,10 @@ void Case7::Test(std::string solver_type, ExchangeGraph* g) {
   if (solver_type == "greedy") {
     ASSERT_EQ(g->arcs().size(), N);
     ASSERT_EQ(g->matches().size(), N);
+    std::set<Arc> arcs(g->arcs().begin(), g->arcs().end());
     for (int i = 0; i < N; i++) {
-      Match exp = Match(g->arcs().at(i), flow);
-      EXPECT_EQ(exp, g->matches().at(i));
+      EXPECT_TRUE(arcs.find(g->matches().at(i).first) != arcs.end());
+      EXPECT_EQ(flow, g->matches().at(i).second);
     }
   } else if (solver_type == "greedy-excl") {
     EXPECT_EQ(g->matches().size(), 0);

@@ -9,9 +9,16 @@ namespace cyclus {
 
 /// @brief A comparison function for sorting a container of Arcs by the
 /// requester's (unode's) preference, in decensing order (i.e., most preferred
-/// Arc first)
+/// Arc first). In the case of a tie, a lexicalgraphic ordering of nodes is
+/// used.
 inline bool ReqPrefComp(const Arc& l, const Arc& r) {
-  return l.unode()->prefs[l] > r.unode()->prefs[r];
+  ExchangeNode* lu = l.unode().get();
+  ExchangeNode* lv = l.vnode().get();
+  ExchangeNode* ru = r.unode().get();
+  ExchangeNode* rv = r.vnode().get();
+  double lpref = lu->prefs[l];
+  double rpref = ru->prefs[r];
+  return (lpref != rpref) ? (lpref > rpref) : (lu > ru || (lu == ru && lv > rv));
 }
 
 /// @brief A comparison function for sorting a container of Nodes by the nodes
