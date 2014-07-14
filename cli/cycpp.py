@@ -406,7 +406,8 @@ class VarDeclarationFilter(Filter):
             state.context[classname] = OrderedDict()
         if 'vars' not in state.context[classname]:
             state.context[classname]['vars'] = OrderedDict()
-        annotations['type'] = state.canonize_type(vtype, vname)
+        annotations['type'] = state.canonize_type(vtype, vname, 
+                                                  statement=statement)
         annotations['index'] = len(state.context[classname]['vars'])
         state.context[classname]['vars'][vname] = annotations
         state.var_annotations = None
@@ -543,12 +544,14 @@ class StateAccumulator(object):
         for filter in self.filters:
             filter.revert(statement, sep)
 
-    def includeloc(self):
+    def includeloc(self, statement=None):
         """Current location of the file from includes as a string."""
         if len(self.linemarkers) == 0:
             return ""
-        s = "\n Included from:\n  " + "\n  ".join([lm[0] + ":" + str(lm[1]) for lm in self.linemarkers])
-        s += "\n In file: " + self.linemarkers[-1][0] + ":" + str(self.linemarkers[-1][1] + self.nlines_since_linemarker)
+        s = "\n Included from:\n  " + "\n  ".join([lm[0] + ":" + str(lm[1]) \
+                                                  for lm in self.linemarkers])
+        if statement is not None:
+            s += "\n Snippet from " + self.linemarkers[-1][0] + ":\n  " + statement
         return s + "\n"
 
     #
@@ -565,7 +568,7 @@ class StateAccumulator(object):
         }
     scopz = '::'  # intern the scoping operator
 
-    def canonize_type(self, t, name="<member variable>"):
+    def canonize_type(self, t, name="<member variable>", statement=None):
         """Returns the canonical form for a type given the current state.
         This should not be called for types other than state variables.
         The name argument here is provided for debugging & reporting purposes.
@@ -587,19 +590,20 @@ class StateAccumulator(object):
                     # the alias - which is impossible.
                     continue
                 try:
-                    return self.canonize_type([nsa + scopz + tname] + targs, name)
+                    return self.canonize_type([nsa + scopz + tname] + targs, name, 
+                                              statement=statement)
                 except TypeError:
                     pass  # This is the TypeError from below
             else:
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
-                       "template type: {p}.").format(i=self.includeloc(), t=t,
-                       n=name, c=self.classname(),
+                       "template type: {p}.").format(i=self.includeloc(statement=statement), 
+                       t=t, n=name, c=self.classname(),
                        p=", ".join(sorted(self.known_templates)))
                 raise TypeError(msg)
         elif '<' in t:
             # string version of template type
             t = " ".join(t.strip().strip(scopz).split())
-            t = self.canonize_type(parse_template(t))
+            t = self.canonize_type(parse_template(t), name=name, statement=statement)
         else:
             # primitive type
             t = " ".join(t.strip().strip(scopz).split())
@@ -738,11 +742,16 @@ class CodeGeneratorFilter(Filter):
             impl += '\n'
         end = "" if mode == "decl" else " " * ind + "};\n"
 
+        # line directive
+        linedir = ''
+        if cg.filename is not None:
+            linedir = '\n#line {0} "{1}"\n'.format(cg.lineno + 1, cg.filename)
+
         # compute return
         if mode == 'impl':
-            return impl
+            return linedir + impl + linedir
         else:
-            return definition + impl + end
+            return linedir + definition + impl + end + linedir
 
     def methodargs(self):
         # overwriteable
@@ -1359,8 +1368,10 @@ class CodeGenerator(object):
     state.
     """
 
-    def __init__(self, context, superclasses):
+    def __init__(self, context, superclasses, filename=None):
         self.depth = 0
+        self.filename = filename
+        self.lineno = 1
         self.context = context  # the results of pass 2
         self.superclasses = superclasses  # the results of pass 2
         self.statements = []    # the results of pass 3, waiting to be joined
@@ -1410,11 +1421,14 @@ class CodeGenerator(object):
             same_prefix.append(s)
         return "::".join(clspath[len(same_prefix):] + [clsname])
 
-    def includeloc(self):
+    def includeloc(self, statement=None):
         """Current location of the file from includes as a string."""
         if len(self.linemarkers) == 0:
             return ""
-        s = "\n Included from:\n  " + "\n  ".join(self.linemarkers)
+        s = "\n Included from:\n  " + "\n  ".join([lm[0] + ":" + str(lm[1]) \
+                                                  for lm in self.linemarkers])
+        if statement is not None:
+            s += "\n Snippet from " + self.linemarkers[-1][0] + ":\n  " + statement
         return s + "\n"
 
     def generate(self, statement, sep):
@@ -1422,7 +1436,8 @@ class CodeGenerator(object):
         ignoring this statement, which is partitioned from the next statement by
         sep.
         """
-        self.nlines_since_linemarker += statement.count('\n') + sep.count('\n')
+        nnewlines = statement.count('\n') + sep.count('\n')
+        self.nlines_since_linemarker += nnewlines
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
@@ -1447,12 +1462,13 @@ class CodeGenerator(object):
             reverted = filter.revert(statement, sep)
             if reverted is not None:
                 self.statements.append(reverted)
+        self.lineno += nnewlines
 
-def generate_code(orig, context, superclasses):
+def generate_code(orig, context, superclasses, filename=None):
     """Takes a canonical C++ source file and separates it out into statements
     which are fed into a code generator. The new file is returned.
     """
-    cg = CodeGenerator(context, superclasses)
+    cg = CodeGenerator(context, superclasses, filename=filename)
     for m in RE_STATEMENT.finditer(orig):
         if m is None:
             continue
@@ -1660,7 +1676,8 @@ def main():
         orig = ensure_startswith_newlinehash(orig)
         orig = orig.replace('\\\n', '') # line continuation
     # pass 3
-    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)
+    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses,
+                            None if ns.pass3_use_pp else ns.path)
     if ns.output is None:
         print(newfile)
     else:
