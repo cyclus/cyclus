@@ -66,6 +66,19 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
     vect_int_keys_.insert(d);
   }
 
+  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS VectorDbl (Sum BLOB,Val REAL);");
+  stmt->Exec();
+  vect_dbl_ins_ = db_.Prepare("INSERT INTO VectorDbl VALUES (?,?);");
+  vect_dbl_get_ = db_.Prepare("SELECT Val FROM VectorDbl WHERE Sum = ?;");
+  stmt = db_.Prepare("SELECT Sum FROM VectorDbl;");
+  while (stmt->Step()) {
+    Digest d;
+    int n;
+    char* data = stmt->GetText(0, &n);
+    memcpy(d.val, data, n);
+    vect_dbl_keys_.insert(d);
+  }
+
   stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS VectorStr (Sum BLOB,Val TEXT);");
   stmt->Exec();
   vect_str_ins_ = db_.Prepare("INSERT INTO VectorStr VALUES (?,?);");
@@ -427,6 +440,24 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
     }
     break;
   }
+  case VECTOR_DOUBLE: {
+    std::vector<double> vect = v.cast<std::vector<double> >();
+    hasher_.Clear();
+    hasher_.Update(vect);
+    Digest d = hasher_.digest();
+    int nbytes = CYCLUS_SHA1_NINT*4;
+    stmt->BindBlob(index, d.val, nbytes);
+
+    if (vect_dbl_keys_.count(d) == 0) {
+      for (int i = 0; i < vect.size(); ++i) {
+        vect_dbl_ins_->BindBlob(1, d.val, nbytes);
+        vect_dbl_ins_->BindDouble(2, vect[i]);
+        vect_dbl_ins_->Exec();
+      }
+      vect_dbl_keys_.insert(d);
+    }
+    break;
+  }
   case VECTOR_STRING: {
     std::vector<std::string> vect = v.cast<std::vector<std::string> >();
     hasher_.Clear();
@@ -662,6 +693,18 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
     vect_int_get_->Reset();
     v = vect;
     break;
+  } case VECTOR_DOUBLE: {
+    int n;
+    char* data = stmt->GetText(col, &n);
+
+    std::vector<double> vect;
+    vect_dbl_get_->BindBlob(1, data, n);
+    while (vect_dbl_get_->Step()) {
+      vect.push_back(vect_dbl_get_->GetDouble(0));
+    }
+    vect_dbl_get_->Reset();
+    v = vect;
+    break;
   } case VECTOR_STRING: {
     int n;
     char* data = stmt->GetText(col, &n);
@@ -807,7 +850,7 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
     type_map[&typeid(std::set<std::string>)] = SET_STRING;
 
     type_map[&typeid(std::vector<int>)] = VECTOR_INT;
-    // type_map[&typeid(std::vector<double>)] = VECTOR_DOUBLE;
+    type_map[&typeid(std::vector<double>)] = VECTOR_DOUBLE;
     // type_map[&typeid(std::vector<float>)] = VECTOR_FLOAT;
     // type_map[&typeid(std::vector<Blob>)] = VECTOR_BLOB;
     // type_map[&typeid(std::vector<boost::uuids::uuid>)] = VECTOR_UUID;

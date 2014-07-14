@@ -74,6 +74,10 @@ class SqliteBack: public FullBackend {
   SqlStatement::Ptr vect_int_get_;
   std::set<Digest> vect_int_keys_;
 
+  SqlStatement::Ptr vect_dbl_ins_;
+  SqlStatement::Ptr vect_dbl_get_;
+  std::set<Digest> vect_dbl_keys_;
+
   SqlStatement::Ptr vect_str_ins_;
   SqlStatement::Ptr vect_str_get_;
   std::set<Digest> vect_str_keys_;
