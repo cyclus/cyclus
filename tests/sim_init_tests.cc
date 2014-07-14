@@ -158,7 +158,7 @@ class SimInitTest : public ::testing::Test {
 
   cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; }
   std::set<Agent*> agent_list(cy::Context* ctx) { return ctx->agent_list_; }
-  std::set<cy::TimeListener*> tickers(cy::Timer* ti) { return ti->tickers_; }
+  std::map<int, cy::TimeListener*> tickers(cy::Timer* ti) { return ti->tickers_; }
 
   std::map<int, std::vector<std::pair<std::string, Agent*> > >
   build_queue(cy::Timer* ti) {
@@ -240,7 +240,7 @@ TEST_F(SimInitTest, InitRecipes) {
 TEST_F(SimInitTest, InitTimeListeners) {
   cy::SimInit si;
   si.Init(&rec, b);
-  std::set<cy::TimeListener*> init_tickers = tickers(si.timer());
+  std::map<int, cy::TimeListener*> init_tickers = tickers(si.timer());
 
   ASSERT_EQ(2, init_tickers.size());
 }

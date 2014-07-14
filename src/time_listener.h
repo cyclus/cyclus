@@ -20,7 +20,7 @@ namespace cyclus {
 /// }
 ///
 /// @endcode
-class TimeListener {
+class TimeListener: virtual public Ider {
  public:
   /// Simulation agents do their beginning-of-timestep activities in the Tick
   /// method.
