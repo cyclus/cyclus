@@ -9,7 +9,7 @@ namespace cyclus {
 
 /// @brief A comparison function for sorting a container of Arcs by the
 /// requester's (unode's) preference, in decensing order (i.e., most preferred
-/// Arc first). In the case of a tie, a lexicalgraphic ordering of nodes is
+/// Arc first). In the case of a tie, a lexicalgraphic ordering of node ids is
 /// used.
 inline bool ReqPrefComp(const Arc& l, const Arc& r) {
   int lu = l.unode()->agent_id;
@@ -22,9 +22,16 @@ inline bool ReqPrefComp(const Arc& l, const Arc& r) {
 }
 
 /// @brief A comparison function for sorting a container of Nodes by the nodes
-/// preference in decensing order (i.e., most preferred Node first)
+/// preference in decensing order (i.e., most preferred Node first). In the case
+/// of a tie, a lexicalgraphic ordering of node ids is used.
 inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
-  return AvgPref(l) > AvgPref(r);
+  int lu = l->agent_id;
+  int lv = l->agent_id;
+  int ru = r->agent_id;
+  int rv = r->agent_id;
+  double lpref =  AvgPref(l);
+  double rpref = AvgPref(r);
+  return (lpref != rpref) ? (lpref > rpref) : (lu > ru || (lu == ru && lv > rv));
 }
 
 class ExchangeGraph;
