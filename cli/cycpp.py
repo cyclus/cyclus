@@ -53,6 +53,7 @@ from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint, pformat
 import textwrap
+import difflib
 
 try:
     import simplejson as json
@@ -742,16 +743,11 @@ class CodeGeneratorFilter(Filter):
             impl += '\n'
         end = "" if mode == "decl" else " " * ind + "};\n"
 
-        # line directive
-        linedir = ''
-        if cg.filename is not None:
-            linedir = '\n#line {0} "{1}"\n'.format(cg.lineno + 1, cg.filename)
-
         # compute return
         if mode == 'impl':
-            return linedir + impl + linedir
+            return impl
         else:
-            return linedir + definition + impl + end + linedir
+            return definition + impl + end
 
     def methodargs(self):
         # overwriteable
@@ -1370,8 +1366,6 @@ class CodeGenerator(object):
 
     def __init__(self, context, superclasses, filename=None):
         self.depth = 0
-        self.filename = filename
-        self.lineno = 1
         self.context = context  # the results of pass 2
         self.superclasses = superclasses  # the results of pass 2
         self.statements = []    # the results of pass 3, waiting to be joined
@@ -1462,13 +1456,12 @@ class CodeGenerator(object):
             reverted = filter.revert(statement, sep)
             if reverted is not None:
                 self.statements.append(reverted)
-        self.lineno += nnewlines
 
-def generate_code(orig, context, superclasses, filename=None):
+def generate_code(orig, context, superclasses):
     """Takes a canonical C++ source file and separates it out into statements
     which are fed into a code generator. The new file is returned.
     """
-    cg = CodeGenerator(context, superclasses, filename=filename)
+    cg = CodeGenerator(context, superclasses)
     for m in RE_STATEMENT.finditer(orig):
         if m is None:
             continue
@@ -1635,6 +1628,18 @@ def parent_intersection(classname, queryset, superclasses):
 
 ensure_startswith_newlinehash = lambda x: '\n' + x if x.startswith('#') else x
 
+def insert_line_directives(newfile, filename):
+    """Inserts line directives based on diff of original file."""
+    with open(filename) as f:
+        orig = f.read()
+    origlines = orig.splitlines()
+    newlines = newfile.splitlines()
+    sm = difflib.SequenceMatcher(a=origlines, b=newlines, autojunk=False)
+    blocks = sm.get_matching_blocks()
+    for i, j, n in blocks[-2::-1]:
+        newlines.insert(j, '#line {0} "{1}"'.format(i+1, filename))
+    return "\n".join(newlines)
+
 def main():
     doc = __doc__ + "\nfilename: " + os.path.abspath(__file__)
     parser = ArgumentParser(prog="cycpp", description=doc,
@@ -1676,8 +1681,8 @@ def main():
         orig = ensure_startswith_newlinehash(orig)
         orig = orig.replace('\\\n', '') # line continuation
     # pass 3
-    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses,
-                            None if ns.pass3_use_pp else ns.path)
+    newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)
+    newfile = insert_line_directives(newfile, ns.path)
     if ns.output is None:
         print(newfile)
     else:
