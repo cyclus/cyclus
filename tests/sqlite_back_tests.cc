@@ -229,6 +229,24 @@ TEST_F(SqliteBackTests, VectorInt) {
   EXPECT_EQ(2, vect[1]);
 }
 
+TEST_F(SqliteBackTests, VectorDouble) {
+  std::vector<double> vect;
+  vect.push_back(4.4);
+  vect.push_back(2.2);
+
+  r.NewDatum("foo")
+      ->AddVal("bar", vect)
+      ->Record();
+
+  r.Close();
+  cyclus::QueryResult qr = b->Query("foo", NULL);
+  vect = qr.GetVal<std::vector<double> >("bar", 0);
+
+  ASSERT_EQ(2, vect.size());
+  EXPECT_DOUBLE_EQ(4.4, vect[0]);
+  EXPECT_DOUBLE_EQ(2.2, vect[1]);
+}
+
 TEST_F(SqliteBackTests, VectorString) {
   std::vector<std::string> vect;
   vect.push_back("four");
