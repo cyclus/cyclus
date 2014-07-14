@@ -25,13 +25,11 @@ inline bool ReqPrefComp(const Arc& l, const Arc& r) {
 /// preference in decensing order (i.e., most preferred Node first). In the case
 /// of a tie, a lexicalgraphic ordering of node ids is used.
 inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
-  int lu = l->agent_id;
-  int lv = l->agent_id;
-  int ru = r->agent_id;
-  int rv = r->agent_id;
+  int lid = l->agent_id;
+  int rid = r->agent_id;
   double lpref =  AvgPref(l);
   double rpref = AvgPref(r);
-  return (lpref != rpref) ? (lpref > rpref) : (lu > ru || (lu == ru && lv > rv));
+  return (lpref != rpref) ? (lpref > rpref) : (lid > rid);
 }
 
 class ExchangeGraph;
