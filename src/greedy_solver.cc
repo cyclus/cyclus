@@ -117,7 +117,7 @@ void GreedySolver::Init_(ExchangeNodeGroup::Ptr g) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
-  std::sort(nodes.begin(), nodes.end(), AvgPrefComp);
+  std::stable_sort(nodes.begin(), nodes.end(), AvgPrefComp);
 
   std::vector<ExchangeNode::Ptr>::iterator req_it = nodes.begin();
   double target = prs->qty();
@@ -138,7 +138,7 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
     if (graph_->node_arc_map().count(*req_it) > 0) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
       sorted = std::vector<Arc>(arcs);  // make a copy for now
-      std::sort(sorted.begin(), sorted.end(), ReqPrefComp);
+      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp);
       arc_it = sorted.begin();
 
       while ((match <= target) && (arc_it != sorted.end())) {

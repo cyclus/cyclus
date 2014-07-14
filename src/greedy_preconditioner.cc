@@ -43,9 +43,9 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
     }
 
     // sort nodes by weight
-    std::sort(nodes.begin(),
-              nodes.end(),
-              l::bind(&GreedyPreconditioner::NodeComp, this, l::_1, l::_2));
+    std::stable_sort(
+        nodes.begin(), nodes.end(),
+        l::bind(&GreedyPreconditioner::NodeComp, this, l::_1, l::_2));
 
     // get avg group weights
     group_weights_[*it] = GroupWeight(*it, &commod_weights_, &avg_prefs_);
@@ -54,9 +54,9 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
   }
 
   // sort groups by avg weight
-  std::sort(groups.begin(),
-            groups.end(),
-            l::bind(&GreedyPreconditioner::GroupComp, this, l::_1, l::_2));
+  std::stable_sort(
+      groups.begin(), groups.end(),
+      l::bind(&GreedyPreconditioner::GroupComp, this, l::_1, l::_2));
 
   // clear graph-specific state
   group_weights_.clear();

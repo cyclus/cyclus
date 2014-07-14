@@ -149,9 +149,11 @@ RequestGroup::Ptr TranslateRequestPortfolio(
        r_it != rp->requests().end();
        ++r_it) {
     Request<T>* r = *r_it;
-    ExchangeNode::Ptr n(new ExchangeNode(r->target()->quantity(),
-                                         r->exclusive(),
-                                         r->commodity()));
+    ExchangeNode::Ptr n(
+        new ExchangeNode(r->target()->quantity(),
+                         r->exclusive(),
+                         r->commodity(),
+                         r->requester()->manager()->id()));
     rs->AddExchangeNode(n);
 
     AddRequest(translation_ctx, *r_it, n);
@@ -184,9 +186,11 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
        b_it != bp->bids().end();
        ++b_it) {
     Bid<T>* b = *b_it;
-    ExchangeNode::Ptr n(new ExchangeNode(b->offer()->quantity(),
-                                         b->exclusive(),
-                                         b->request()->commodity()));
+    ExchangeNode::Ptr n(
+        new ExchangeNode(b->offer()->quantity(),
+                         b->exclusive(),
+                         b->request()->commodity(),
+                         b->bidder()->manager()->id()));
     bs->AddExchangeNode(n);
     AddBid(translation_ctx, *b_it, n);
     if (b->exclusive()) {

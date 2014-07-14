@@ -21,6 +21,11 @@ class SimInitTest;
 
 namespace cyclus {
 
+class Ider {
+ public:
+  virtual const int id() const = 0;
+};
+
 class Material;
 class Product;
 
@@ -38,7 +43,7 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 /// functions all do inter-related things.  Notably, the #InfileToDb, #InitFrom,
 /// and #Snapshot functions must all write/read to/from the same database tables
 /// (and table schemas).
-class Agent : public StateWrangler {
+class Agent : public StateWrangler, virtual public Ider {
   friend class SimInit;
   friend class ::SimInitTest;
 
@@ -324,7 +329,7 @@ class Agent : public StateWrangler {
   inline void prototype(std::string p) { prototype_ = p; }
 
   /// The agent instance's unique ID within a simulation.
-  inline const int id() const { return id_; }
+  virtual const int id() const { return id_; }
 
   /// The string representation of the agent spec that uniquely identifies the
   /// concrete agent class/module.  See CEP21 for details..

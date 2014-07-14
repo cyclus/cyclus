@@ -99,7 +99,7 @@ class Timer {
   bool want_kill_;
 
   /// Concrete agents that desire to receive tick and tock notifications
-  std::set<TimeListener*> tickers_;
+  std::map<int, TimeListener*> tickers_;
 
   // std::map<time,std::vector<std::pair<prototype, parent> > >
   std::map<int, std::vector<std::pair<std::string, Agent*> > > build_queue_;

@@ -72,10 +72,10 @@ void Timer::DoBuild() {
 }
 
 void Timer::DoTick() {
-  for (std::set<TimeListener*>::iterator agent = tickers_.begin();
+  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
-    (*agent)->Tick();
+    agent->second->Tick();
   }
 }
 
@@ -86,10 +86,10 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-  for (std::set<TimeListener*>::iterator agent = tickers_.begin();
+  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
-    (*agent)->Tock();
+    agent->second->Tock();
   }
 }
 
@@ -106,11 +106,11 @@ void Timer::DoDecom() {
 }
 
 void Timer::RegisterTimeListener(TimeListener* agent) {
-  tickers_.insert(agent);
+  tickers_[agent->id()] = agent;
 }
 
 void Timer::UnregisterTimeListener(TimeListener* tl) {
-  tickers_.erase(tl);
+  tickers_.erase(tl->id());
 }
 
 void Timer::SchedBuild(Agent* parent, std::string proto_name, int t) {
