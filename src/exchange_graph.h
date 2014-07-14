@@ -28,9 +28,10 @@ struct ExchangeNode {
  public:
   typedef boost::shared_ptr<ExchangeNode> Ptr;
 
-  ExchangeNode(double qty = std::numeric_limits<double>::max(),
-               bool exclusive = false,
-               std::string commod = "");
+  ExchangeNode();
+  explicit ExchangeNode(double qty);
+  ExchangeNode(double qty, bool exclusive);
+  ExchangeNode(double qty, bool exclusive, std::string commod, int agent_id);
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
@@ -48,6 +49,9 @@ struct ExchangeNode {
 
   /// @brief the commodity associated with this exchange node
   std::string commod;
+
+  /// @brief the id of the agent associated with this node
+  int agent_id;
 
   /// @brief the maximum amount of a resource that can be associated with this
   /// node

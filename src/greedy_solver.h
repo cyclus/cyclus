@@ -12,12 +12,12 @@ namespace cyclus {
 /// Arc first). In the case of a tie, a lexicalgraphic ordering of nodes is
 /// used.
 inline bool ReqPrefComp(const Arc& l, const Arc& r) {
-  ExchangeNode* lu = l.unode().get();
-  ExchangeNode* lv = l.vnode().get();
-  ExchangeNode* ru = r.unode().get();
-  ExchangeNode* rv = r.vnode().get();
-  double lpref = lu->prefs[l];
-  double rpref = ru->prefs[r];
+  int lu = l.unode()->agent_id;
+  int lv = l.vnode()->agent_id;
+  int ru = r.unode()->agent_id;
+  int rv = r.vnode()->agent_id;
+  double lpref = l.unode()->prefs[l];
+  double rpref = r.unode()->prefs[r];
   return (lpref != rpref) ? (lpref > rpref) : (lu > ru || (lu == ru && lv > rv));
 }
 

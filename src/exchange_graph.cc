@@ -8,11 +8,33 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ExchangeNode::ExchangeNode(double qty, bool exclusive, std::string commod)
+ExchangeNode::ExchangeNode(double qty, bool exclusive, std::string commod,
+                           int agent_id)
     : qty(qty),
       exclusive(exclusive),
       commod(commod),
+      agent_id(agent_id),
+      group(NULL) {}
+
+ExchangeNode::ExchangeNode(double qty, bool exclusive)
+    : qty(qty),
+      exclusive(exclusive),
+      commod(""),
+      agent_id(-1),
+      group(NULL) {}
+
+ExchangeNode::ExchangeNode(double qty)
+    : qty(qty),
+      exclusive(false),
+      commod(""),
+      agent_id(-1),
+      group(NULL) {}
+
+ExchangeNode::ExchangeNode()
+    : qty(std::numeric_limits<double>::max()),
+      exclusive(false),
+      commod(""),
+      agent_id(-1),
       group(NULL) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
