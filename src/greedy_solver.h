@@ -106,7 +106,7 @@ class GreedySolver: public ExchangeSolver {
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
   /// RequestGroup and matching requests with the minimum bids possible, starting
   /// from the beginning of the the respective request and bid containers.
-  virtual void SolveGraph();
+  virtual double SolveGraph();
 
  private:
   /// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
@@ -120,9 +120,11 @@ class GreedySolver: public ExchangeSolver {
   void Init_(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet_(RequestGroup::Ptr prs);
   void UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty);
-
+  void UpdateObj_(double qty, double pref);
+  
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
+  double obj_;
 };
 
 }  // namespace cyclus
