@@ -19,7 +19,7 @@ ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
 
 ProgSolver::~ProgSolver() {}
 
-void ProgSolver::SolveGraph() {
+double ProgSolver::SolveGraph() {
   SolverFactory sf(solver_t_);
   OsiSolverInterface* iface = sf.get();
   try {
@@ -37,7 +37,9 @@ void ProgSolver::SolveGraph() {
     delete iface;
     throw;
   }
+  double ret = iface->getObjValue(); 
   delete iface;
+  return ret;
 }
 
 }  // namespace cyclus

@@ -22,16 +22,16 @@ class ExchangeSolver {
 
   /// @brief interface for solving a given exchange graph
   /// @param a pointer to the graph to be solved
-  void Solve(ExchangeGraph* graph = NULL) {
+  double Solve(ExchangeGraph* graph = NULL) {
     if (graph != NULL)
       graph_ = graph;
-    this->SolveGraph();
+    return this->SolveGraph();
   }
 
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by
   /// any solver.
-  virtual void SolveGraph() = 0;
+  virtual double SolveGraph() = 0;
   ExchangeGraph* graph_;
   bool exclusive_orders_;
   bool verbose_;

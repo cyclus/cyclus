@@ -9,7 +9,7 @@ class MockSolver: public ExchangeSolver {
  public:
   explicit MockSolver() : i(0) {}
 
-  virtual void SolveGraph() { ++i; }
+  virtual double SolveGraph() { ++i; return 0; }
 
   int i;
 };

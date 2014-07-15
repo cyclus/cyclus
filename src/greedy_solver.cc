@@ -83,9 +83,9 @@ void GreedySolver::Condition() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GreedySolver::SolveGraph() {
+double GreedySolver::SolveGraph() {
   Condition();
-
+  obj_ = 0;
   n_qty_.clear();
 
   std::for_each(graph_->request_groups().begin(),
@@ -105,6 +105,8 @@ void GreedySolver::SolveGraph() {
                 std::bind1st(
                     std::mem_fun(&GreedySolver::GreedilySatisfySet_),
                     this));
+
+  return obj_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -166,6 +168,7 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
           graph_->AddMatch(a, tomatch);
 
           match += tomatch;
+          UpdateObj_(tomatch, u->prefs[a]);
         }
         ++arc_it;
       }  // while( (match =< target) && (arc_it != arcs.end()) )
@@ -173,6 +176,12 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
 
     ++req_it;
   }  // while( (match =< target) && (req_it != nodes.end()) )
+}
+
+void GreedySolver::UpdateObj_(double qty, double pref) {
+  // updates minimizing object (i.e., 1/pref is a cost and the objective is cost
+  // * flow)
+  obj_ += qty / pref;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
