@@ -32,6 +32,11 @@ void SolveProg(OsiSolverInterface* si) {
   si->initialSolve();
   if (HasInt(si)) {
     si->branchAndBound();
+  } else {
+    OsiClpSolverInterface* cast = dynamic_cast<OsiClpSolverInterface*>(si);
+    if (cast) {
+      cast->getModelPtr()->primal(); // solve problem with primal alg
+    }
   }
 }
 
