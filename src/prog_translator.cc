@@ -64,6 +64,7 @@ void ProgTranslator::Populate() {
   iface_->loadProblem(ctx_.m, &ctx_.col_lbs[0], &ctx_.col_ubs[0],
                       &ctx_.obj_coeffs[0], &ctx_.row_lbs[0], &ctx_.row_ubs[0]);
 
+  
   if (excl_) {
     std::vector<Arc>& arcs = g_->arcs();
     for (int i = 0; i != arcs.size(); i++) {
@@ -73,6 +74,7 @@ void ProgTranslator::Populate() {
       }
     }
   }
+
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -122,7 +124,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
         double col_ub = std::min(nodes[i]->qty, inf);
-        double obj_coeff = (excl_ && a.exclusive()) ? a.excl_val() / pref : 1 / pref;
+        double obj_coeff = (excl_ && a.exclusive()) ? a.excl_val() / pref : 1.0 / pref;
         if (max_obj_coeff_ < obj_coeff) {
           max_obj_coeff_ = obj_coeff;
         }
@@ -143,34 +145,36 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
     if (request) {
       cap_rows[i].insert(faux_id, 1.0);  // faux arc
     }
-
+    
     ctx_.row_lbs.push_back(request ? caps[i] : 0);
     ctx_.row_ubs.push_back(request ? inf : caps[i]);
     ctx_.m.appendRow(cap_rows[i]);
   }
 
-  // add exclusive arcs
-  std::vector< std::vector<ExchangeNode::Ptr> >& exngs =
-      grp->excl_node_groups();
-  for (int i = 0; i != exngs.size(); i++) {
-    CoinPackedVector excl_row;
-    std::vector<ExchangeNode::Ptr>& nodes = exngs[i];
-    for (int j = 0; j != nodes.size(); j++) {
-      std::vector<Arc>& arcs = g_->node_arc_map()[nodes[j]];
-      for (int k = 0; k != arcs.size(); k++) {
-        excl_row.insert(g_->arc_ids()[arcs[k]], 1.0);
+  if (excl_) {
+    // add exclusive arcs
+    std::vector< std::vector<ExchangeNode::Ptr> >& exngs =
+        grp->excl_node_groups();
+    for (int i = 0; i != exngs.size(); i++) {
+      CoinPackedVector excl_row;
+      std::vector<ExchangeNode::Ptr>& nodes = exngs[i];
+      for (int j = 0; j != nodes.size(); j++) {
+        std::vector<Arc>& arcs = g_->node_arc_map()[nodes[j]];
+        for (int k = 0; k != arcs.size(); k++) {
+          excl_row.insert(g_->arc_ids()[arcs[k]], 1.0);
+        }
+      }
+      if (excl_row.getNumElements() > 0) {
+        excl_rows.push_back(excl_row);
       }
     }
-    if (excl_row.getNumElements() > 0) {
-      excl_rows.push_back(excl_row);
-    }
-  }
 
-  // add all exclusive rows
-  for (int i = 0; i != excl_rows.size(); i++) {
-    ctx_.row_lbs.push_back(0.0);
-    ctx_.row_ubs.push_back(1.0);
-    ctx_.m.appendRow(excl_rows[i]);
+    // add all exclusive rows
+    for (int i = 0; i != excl_rows.size(); i++) {
+      ctx_.row_lbs.push_back(0.0);
+      ctx_.row_ubs.push_back(1.0);
+      ctx_.m.appendRow(excl_rows[i]);
+    }
   }
 }
 
