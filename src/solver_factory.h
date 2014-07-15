@@ -34,7 +34,7 @@ class SolverFactory {
   double tmax_;
 };
 
-void SolveProg(OsiSolverInterface* si);
+void SolveProg(OsiSolverInterface* si, bool verbose=false);
 bool HasInt(OsiSolverInterface* si);
 
 }  // namespace cyclus

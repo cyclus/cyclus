@@ -31,7 +31,7 @@ double ProgSolver::SolveGraph() {
       Report(iface);
       h.setLogLevel(4);
     iface->passInMessageHandler(&h);
-    SolveProg(iface);
+    SolveProg(iface, verbose_);
     xlator.FromProg();
   } catch(...) {
     delete iface;
