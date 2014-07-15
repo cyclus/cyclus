@@ -122,13 +122,13 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
         double col_ub = std::min(nodes[i]->qty, inf);
-        double obj_coeff = a.exclusive() ? a.excl_val() / pref  : 1 / pref;
+        double obj_coeff = (excl_ && a.exclusive()) ? a.excl_val() / pref  : 1 / pref;
         if (max_obj_coeff_ < obj_coeff) {
           max_obj_coeff_ = obj_coeff;
         }
         ctx_.obj_coeffs[arc_id] = obj_coeff;
         ctx_.col_lbs[arc_id] = 0;
-        ctx_.col_ubs[arc_id] = a.exclusive() ? 1 : col_ub;
+        ctx_.col_ubs[arc_id] = (excl_ && a.exclusive()) ? 1 : col_ub;
       }
     }
   }
@@ -182,7 +182,7 @@ void ProgTranslator::FromProg() {
   for (int i = 0; i < arcs.size(); i++) {
     Arc& a = g_->arc_by_id().at(i);
     flow = sol[i];
-    flow = (a.exclusive()) ? flow * a.excl_val() : flow;
+    flow = (excl_ && a.exclusive()) ? flow * a.excl_val() : flow;
     if (flow > cyclus::eps()) {
       g_->AddMatch(a, flow);
     }
