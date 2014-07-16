@@ -32,7 +32,7 @@ CompMap Sub(const CompMap& v1, const CompMap& v2) {
 
 double Sum(const CompMap& v) {
   std::vector<double> vec;
-  for (CompMap::iterator it = v->begin(); it != v->end(); ++it) {
+  for (CompMap::const_iterator it = v.begin(); it != v.end(); ++it) {
     vec.push_back(it->second);
   }
 
@@ -59,7 +59,7 @@ void ApplyThreshold(CompMap* v, double threshold) {
 }
 
 void Normalize(CompMap* v, double val) {
-  double sum = Sum(v);
+  double sum = Sum(*v);
   if (sum != val && sum != 0) {
     for (CompMap::iterator it = v->begin(); it != v->end(); ++it) {
       (*v)[it->first] = it->second / sum * val;
