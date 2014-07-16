@@ -1,5 +1,5 @@
-#ifndef CYCLUS_CORE_RESOURCES_RESTRACKER_H_
-#define CYCLUS_CORE_RESOURCES_RESTRACKER_H_
+#ifndef CYCLUS_SRC_RES_TRACKER_H_
+#define CYCLUS_SRC_RES_TRACKER_H_
 
 #include <string>
 #include <vector>
@@ -53,6 +53,6 @@ class ResTracker {
   Context* ctx_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_RES_TRACKER_H_

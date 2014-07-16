@@ -1,5 +1,5 @@
-#ifndef CYCLUS_EXCHANGE_TRANSLATOR_H_
-#define CYCLUS_EXCHANGE_TRANSLATOR_H_
+#ifndef CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
+#define CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 
 #include "bid.h"
 #include "bid_portfolio.h"
@@ -33,8 +33,8 @@ class ExchangeTranslator {
   ///
   /// @param ex_ctx the exchance context
   ExchangeTranslator(ExchangeContext<T>* ex_ctx) {
-    ex_ctx_ = ex_ctx;    
-  };
+    ex_ctx_ = ex_ctx;
+  }
 
   /// @brief translate the ExchangeContext into an ExchangeGraph
   ExchangeGraph::Ptr Translate() {
@@ -69,9 +69,9 @@ class ExchangeTranslator {
         AddArc(req, bid, graph);
       }
     }
-    
+
     return graph;
-  };
+  }
 
   /// @brief adds a bid-request arc to a graph, if the preference for the arc is
   /// non-negative
@@ -83,19 +83,19 @@ class ExchangeTranslator {
     } else {
       // get translated arc
       Arc a = TranslateArc(xlation_ctx_, bid);
-          
-      a.unode()->prefs[a] = pref; // request node is a.unode()
+
+      a.unode()->prefs[a] = pref;  // request node is a.unode()
       int n_prefs = a.unode()->prefs.size();
-          
+
       CLOG(LEV_DEBUG5) << "Updating preference for one of "
                        << req->requester()->manager()->prototype()
                        << "'s trade nodes:";
       CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-          
+
       graph->AddArc(a);
     }
   }
-  
+
   /// @brief Provide a vector of Trades given a vector of Matches
   void BackTranslateSolution(const std::vector<Match>& matches,
                              std::vector< Trade<T> >& ret) {
@@ -105,30 +105,30 @@ class ExchangeTranslator {
     for (m_it = matches.begin(); m_it != matches.end(); ++m_it) {
       ret.push_back(BackTranslateMatch(xlation_ctx_, *m_it));
     }
-  };
+  }
 
   const ExchangeTranslationContext<T>& translation_ctx() const {
     return xlation_ctx_;
   }
-  
+
   ExchangeTranslationContext<T>& translation_ctx() { return xlation_ctx_; }
-  
- private: 
+
+ private:
   ExchangeContext<T>* ex_ctx_;
   ExchangeTranslationContext<T> xlation_ctx_;
 };
 
 /// @brief Adds a request-node mapping
 template <class T>
-    inline void AddRequest(ExchangeTranslationContext<T>& translation_ctx,
-                           Request<T>* r, ExchangeNode::Ptr n) {
+inline void AddRequest(ExchangeTranslationContext<T>& translation_ctx,
+                       Request<T>* r, ExchangeNode::Ptr n) {
   translation_ctx.request_to_node[r] = n;
   translation_ctx.node_to_request[n] = r;
 }
 
 /// @brief Adds a bid-node mapping
 template <class T>
-    inline void AddBid(ExchangeTranslationContext<T>& translation_ctx,
+inline void AddBid(ExchangeTranslationContext<T>& translation_ctx,
                        Bid<T>* b, ExchangeNode::Ptr n) {
   translation_ctx.bid_to_node[b] = n;
   translation_ctx.node_to_bid[n] = b;
@@ -149,26 +149,28 @@ RequestGroup::Ptr TranslateRequestPortfolio(
        r_it != rp->requests().end();
        ++r_it) {
     Request<T>* r = *r_it;
-    ExchangeNode::Ptr n(new ExchangeNode(r->target()->quantity(),
-                                         r->exclusive(),
-                                         r->commodity()));
+    ExchangeNode::Ptr n(
+        new ExchangeNode(r->target()->quantity(),
+                         r->exclusive(),
+                         r->commodity(),
+                         r->requester()->manager()->id()));
     rs->AddExchangeNode(n);
 
     AddRequest(translation_ctx, *r_it, n);
   }
 
   CLOG(LEV_DEBUG4) << "adding " << rp->constraints().size()
-                   << " request capacities";    
+                   << " request capacities";
   typename std::set< CapacityConstraint<T> >::const_iterator c_it;
   for (c_it = rp->constraints().begin();
        c_it != rp->constraints().end();
        ++c_it) {
     rs->AddCapacity(c_it->capacity());
   }
-    
+
   return rs;
 }
-  
+
 /// @brief translates a bid portfolio by adding bid nodes and accounting
 /// for capacities. Bid unit capcities must be added when arcs are known
 template <class T>
@@ -178,15 +180,17 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   ExchangeNodeGroup::Ptr bs(new ExchangeNodeGroup());
 
   std::map<typename T::Ptr, std::vector<ExchangeNode::Ptr> > excl_bid_grps;
-  
+
   typename std::set<Bid<T>*>::const_iterator b_it;
   for (b_it = bp->bids().begin();
        b_it != bp->bids().end();
        ++b_it) {
     Bid<T>* b = *b_it;
-    ExchangeNode::Ptr n(new ExchangeNode(b->offer()->quantity(),
-                                         b->exclusive(),
-                                         b->request()->commodity()));
+    ExchangeNode::Ptr n(
+        new ExchangeNode(b->offer()->quantity(),
+                         b->exclusive(),
+                         b->request()->commodity(),
+                         b->bidder()->manager()->id()));
     bs->AddExchangeNode(n);
     AddBid(translation_ctx, *b_it, n);
     if (b->exclusive()) {
@@ -201,9 +205,9 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
        ++m_it) {
     bs->AddExclGroup(m_it->second);
   }
-  
+
   CLOG(LEV_DEBUG4) << "adding " << bp->constraints().size()
-                   << " bid capacities";    
+                   << " bid capacities";
 
   typename std::set< CapacityConstraint<T> >::const_iterator c_it;
   for (c_it = bp->constraints().begin();
@@ -211,7 +215,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
        ++c_it) {
     bs->AddCapacity(c_it->capacity());
   }
-    
+
   return bs;
 }
 
@@ -221,7 +225,7 @@ template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
                  Bid<T>* bid) {
   Request<T>* req = bid->request();
-    
+
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
@@ -234,23 +238,24 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   TranslateCapacities(offer, bp->constraints(), vnode, arc, translation_ctx);
   // req is u
   TranslateCapacities(offer, rp->constraints(), unode, arc, translation_ctx);
-    
+
   return arc;
 }
-  
+
 /// @brief simple translation from a Match to a Trade, given internal state
 template <class T>
-Trade<T> BackTranslateMatch(const ExchangeTranslationContext<T>& translation_ctx,
+Trade<T> BackTranslateMatch(const ExchangeTranslationContext<T>&
+                                translation_ctx,
                             const Match& match) {
   ExchangeNode::Ptr req_node = match.first.unode();
   ExchangeNode::Ptr bid_node = match.first.vnode();
-    
+
   Trade<T> t;
   t.request = translation_ctx.node_to_request.at(req_node);
   t.bid = translation_ctx.node_to_bid.at(bid_node);
   t.amt = match.second;
   return t;
-};
+}
 
 /// @brief updates a node's unit capacities given, a target resource and
 /// constraints
@@ -265,11 +270,11 @@ void TranslateCapacities(
   for (it = constr.begin(); it != constr.end(); ++it) {
     CLOG(cyclus::LEV_DEBUG1) << "Additing unit capacity: "
                              << it->convert(offer, &a, &ctx) / offer->quantity();
-    n->unit_capacities[a].push_back(it->convert(offer, &a, &ctx) / 
+    n->unit_capacities[a].push_back(it->convert(offer, &a, &ctx) /
                                     offer->quantity());
   }
 }
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_EXCHANGE_TRANSLATOR_H_
+#endif  // CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_

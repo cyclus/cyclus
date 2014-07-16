@@ -1,4 +1,3 @@
-// agent.cc
 // Implements the Agent Class
 #include "agent.h"
 
@@ -38,9 +37,9 @@ void Agent::InfileToDb(InfileTree* qe, DbInit di) {
   std::string proto = qe->GetString("name");
   int lifetime = OptionalQuery<int>(qe, "lifetime", -1);
   di.NewDatum("Agent")
-    ->AddVal("Prototype", proto)
-    ->AddVal("Lifetime", lifetime)
-    ->Record();
+      ->AddVal("Prototype", proto)
+      ->AddVal("Lifetime", lifetime)
+      ->Record();
 }
 
 void Agent::InitFrom(QueryableBackend* b) {
@@ -52,21 +51,21 @@ void Agent::InitFrom(QueryableBackend* b) {
 
 void Agent::Snapshot(DbInit di) {
   di.NewDatum("Agent")
-    ->AddVal("Prototype", prototype_)
-    ->AddVal("Lifetime", lifetime_)
-    ->Record();
+      ->AddVal("Prototype", prototype_)
+      ->AddVal("Lifetime", lifetime_)
+      ->Record();
 }
 
 Agent::Agent(Context* ctx)
-  : ctx_(ctx),
-    id_(next_id_++),
-    kind_("Agent"),
-    parent_id_(-1),
-    enter_time_(-1),
-    lifetime_(-1),
-    parent_(NULL),
-    spec_("UNSPECIFIED") {
-  ctx_->agent_list_.insert(this); 
+    : ctx_(ctx),
+      id_(next_id_++),
+      kind_("Agent"),
+      parent_id_(-1),
+      enter_time_(-1),
+      lifetime_(-1),
+      parent_(NULL),
+      spec_("UNSPECIFIED") {
+  ctx_->agent_list_.insert(this);
   MLOG(LEV_DEBUG3) << "Agent ID=" << id_ << ", ptr=" << this << " created.";
 }
 
@@ -74,9 +73,10 @@ Agent::~Agent() {
   MLOG(LEV_DEBUG3) << "Deleting agent '" << prototype() << "' ID=" << id_;
   context()->agent_list_.erase(this);
 
-  std::set<Agent*>::iterator it;  
+  std::set<Agent*>::iterator it;
   if (parent_ != NULL) {
-    CLOG(LEV_DEBUG2) << "Agent '" << parent_->prototype() << "' ID=" << parent_->id()
+    CLOG(LEV_DEBUG2) << "Agent '" << parent_->prototype() << "' ID="
+                     << parent_->id()
                      << " has removed child '" << prototype() << "' ID="
                      << id() << " from its list of children.";
     it = find(parent_->children_.begin(), parent_->children_.end(), this);
@@ -101,7 +101,7 @@ std::string Agent::str() {
      << ", implementation=" << spec_
      << ",  name=" << prototype_
      << ",  parentID=" << parent_id_
-     << " ) " ;
+     << " ) ";
   return ss.str();
 }
 
@@ -131,16 +131,17 @@ void Agent::Connect(Agent* parent) {
     parent_ = parent;
     parent_id_ = parent->id();
     parent->children_.insert(this);
-  } 
+  }
 }
 
 void Agent::Decommission() {
-  CLOG(LEV_INFO3) << prototype() << "(" << this << ")" << " is being decommissioned";
-  
+  CLOG(LEV_INFO3) << prototype() << "(" << this << ")"
+                  << " is being decommissioned";
+
   ctx_->NewDatum("AgentExit")
-  ->AddVal("AgentId", id())
-  ->AddVal("ExitTime", ctx_->time())
-  ->Record();
+      ->AddVal("AgentId", id())
+      ->AddVal("ExitTime", ctx_->time())
+      ->Record();
   ctx_->UnregisterAgent(this);
   ctx_->DelAgent(this);
 }
@@ -148,8 +149,8 @@ void Agent::Decommission() {
 std::string Agent::PrintChildren() {
   std::stringstream ss("");
   ss << "Children of " << prototype() << ":" << std::endl;
-  
-  std::set<Agent*>::iterator it;  
+
+  std::set<Agent*>::iterator it;
   for (it = children_.begin(); it != children_.end(); ++it) {
     Agent* child = *it;
     std::vector<std::string> print_outs = GetTreePrintOuts(child);
@@ -165,7 +166,7 @@ std::vector<std::string> Agent::GetTreePrintOuts(Agent* m) {
   std::stringstream ss("");
   ss << m->prototype() << std::endl;
   ret.push_back(ss.str());
-  std::set<Agent*>::iterator it;  
+  std::set<Agent*>::iterator it;
   for (it = children_.begin(); it != children_.end(); ++it) {
     Agent* child = *it;
     std::vector<std::string> outs = GetTreePrintOuts(child);
@@ -180,13 +181,14 @@ std::vector<std::string> Agent::GetTreePrintOuts(Agent* m) {
 
 void Agent::AddToTable() {
   ctx_->NewDatum("AgentEntry")
-  ->AddVal("AgentId", id_)
-  ->AddVal("Kind", kind_)
-  ->AddVal("Spec", spec_)
-  ->AddVal("Prototype", prototype_)
-  ->AddVal("ParentId", parent_id_)
-  ->AddVal("Lifetime", lifetime_)
-  ->AddVal("EnterTime", enter_time_)
-  ->Record();
+      ->AddVal("AgentId", id_)
+      ->AddVal("Kind", kind_)
+      ->AddVal("Spec", spec_)
+      ->AddVal("Prototype", prototype_)
+      ->AddVal("ParentId", parent_id_)
+      ->AddVal("Lifetime", lifetime_)
+      ->AddVal("EnterTime", enter_time_)
+      ->Record();
 }
-} // namespace cyclus
+
+}  // namespace cyclus

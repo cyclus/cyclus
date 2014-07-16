@@ -1,4 +1,3 @@
-// dynamic_module.h
 #ifndef CYCLUS_SRC_DYNAMIC_MODULE_H_
 #define CYCLUS_SRC_DYNAMIC_MODULE_H_
 
@@ -21,19 +20,20 @@ class InfileTree;
 
 class AgentSpec {
  public:
-  AgentSpec() {};
+  AgentSpec() {}
   AgentSpec(InfileTree* t);
-  AgentSpec(std::string path, std::string lib, std::string agent, std::string alias);
+  AgentSpec(std::string path, std::string lib, std::string agent,
+            std::string alias);
   AgentSpec(std::string str_spec);
 
   std::string Sanitize();
   std::string LibPath();
   std::string str();
 
-  std::string path() {return path_;};
-  std::string lib() {return lib_;};
-  std::string agent() {return agent_;};
-  std::string alias() {return alias_;};
+  std::string path() { return path_; }
+  std::string lib() { return lib_; }
+  std::string agent() { return agent_; }
+  std::string alias() { return alias_; }
 
  private:
   std::string path_;
@@ -54,11 +54,14 @@ class DynamicModule {
    public:
     ~Closer() {
       CloseAll();
-    };
+    }
   };
 
   /// Returns a newly constructed agent for the given module spec.
   static Agent* Make(Context* ctx, AgentSpec spec);
+
+  /// Tests that an agent spec really exists.
+  static bool Exists(AgentSpec spec);
 
   /// Closes all statically loaded dynamic modules. This should always be called
   /// before process termination.  This must be called AFTER all agents have
@@ -107,6 +110,7 @@ class DynamicModule {
   /// sets the constructor member
   void SetConstructor();
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_DYNAMIC_MODULE_H_

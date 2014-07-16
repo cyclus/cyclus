@@ -1,5 +1,5 @@
-#ifndef CYCLUS_REQUEST_H_
-#define CYCLUS_REQUEST_H_
+#ifndef CYCLUS_SRC_REQUEST_H_
+#define CYCLUS_SRC_REQUEST_H_
 
 #include <ostream>
 #include <string>
@@ -57,7 +57,7 @@ class Request {
 
   /// @return the requester associated with this request
   inline Trader* requester() const { return requester_; }
-  
+
   /// @return the commodity associated with this request
   inline std::string commodity() const { return commodity_; }
 
@@ -65,34 +65,34 @@ class Request {
   inline double preference() const { return preference_; }
 
   /// @return the portfolio of which this request is a part
-  inline typename RequestPortfolio<T>::Ptr portfolio() const { 
+  inline typename RequestPortfolio<T>::Ptr portfolio() const {
     return portfolio_.lock();
   }
 
   /// @return whether or not this an exclusive request
   inline bool exclusive() const { return exclusive_; }
-  
+
  private:
   /// @brief constructors are private to require use of factory methods
   Request(boost::shared_ptr<T> target, Trader* requester,
           std::string commodity = "", double preference = 0,
           bool exclusive = false)
-    : target_(target),
-      requester_(requester),
-      commodity_(commodity),
-      preference_(preference),
-      exclusive_(exclusive) {};
+      : target_(target),
+        requester_(requester),
+        commodity_(commodity),
+        preference_(preference),
+        exclusive_(exclusive) {}
 
   Request(boost::shared_ptr<T> target, Trader* requester,
           typename RequestPortfolio<T>::Ptr portfolio,
           std::string commodity = "", double preference = 0,
           bool exclusive = false)
-    : target_(target),
-      requester_(requester),
-      commodity_(commodity),
-      preference_(preference),
-      portfolio_(portfolio),
-      exclusive_(exclusive) {};
+      : target_(target),
+        requester_(requester),
+        commodity_(commodity),
+        preference_(preference),
+        portfolio_(portfolio),
+        exclusive_(exclusive) {}
 
   boost::shared_ptr<T> target_;
   Trader* requester_;
@@ -102,6 +102,6 @@ class Request {
   bool exclusive_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_REQUEST_H_

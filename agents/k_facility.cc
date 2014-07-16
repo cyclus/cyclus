@@ -45,10 +45,10 @@ void KFacility::Tick() {
   LOG(cyclus::LEV_INFO4, "KFac") << "will offer " << out_capacity
                                    << " kg of "
                                    << out_commod << ".";
-  current_capacity = out_capacity;  // reset capacity
+  current_capacity = out_capacity;  // Reset capacity
 
   double request_amt = RequestAmt();
-  // inform the simulation about what the sink facility will be requesting
+  // Inform the simulation about what the sink facility will be requesting
   if (request_amt > cyclus::eps()) {
     LOG(cyclus::LEV_INFO4, "KFac") << " will request " << request_amt
         << " kg of " << in_commod << ".";
@@ -59,9 +59,9 @@ void KFacility::Tick() {
 void KFacility::Tock() {
   LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is tocking";
   LOG(cyclus::LEV_INFO4, "KFac") << "KFacility " << this->id()
-                                   << " is holding " << inventory.quantity()
-                                   << " units of material at the close of month "
-                                   << context()->time() << ".";
+                                 << " is holding " << inventory.quantity()
+                                 << " units of material at the close of month "
+                                 << context()->time() << ".";
   // Update capacity for the next step
   in_capacity = in_capacity * k_factor_in;
   out_capacity = out_capacity * k_factor_out;
@@ -215,5 +215,5 @@ void KFacility::AcceptProductTrades(
 extern "C" cyclus::Agent* ConstructKFacility(cyclus::Context* ctx) {
   return new KFacility(ctx);
 }
- 
+
 }  // namespace cyclus

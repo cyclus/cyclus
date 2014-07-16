@@ -1,4 +1,3 @@
-// env.h
 #ifndef CYCLUS_SRC_ENV_H_
 #define CYCLUS_SRC_ENV_H_
 
@@ -50,7 +49,7 @@ class Env {
 
   /// The relative path to the root install directory (containing bin, lib, etc.)
   /// This first checks the path of the cyclus executable itself and then tries
-  /// the install directory given at run time. 
+  /// the install directory given at run time.
   /// @return the absolute path to the install directory
   static const std::string GetInstallPath();
 
@@ -102,11 +101,10 @@ class Env {
   static std::string FindModule(std::string path);
 
  private:
-
   /// the cwd path
   static boost::filesystem::path cwd_;
 
-  ///the install path, cache of results from GetInstallPath()
+  /// the install path, cache of results from GetInstallPath()
   static std::string instdir_;
 };
 

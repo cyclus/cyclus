@@ -1,5 +1,5 @@
-#ifndef CYCLUS_PROG_SOLVER_H_
-#define CYCLUS_PROG_SOLVER_H_
+#ifndef CYCLUS_SRC_PROG_SOLVER_H_
+#define CYCLUS_SRC_PROG_SOLVER_H_
 
 #include <string>
 
@@ -9,12 +9,12 @@
 namespace cyclus {
 
 class ExchangeGraph;
-  
+
 /// @brief The ProgSolver provides the implementation for a mathematical
 /// programming solution to a resource exchange graph.
 class ProgSolver: public ExchangeSolver {
  public:
-  ProgSolver(std::string solver_t, bool exclusive_orders = false); 
+  ProgSolver(std::string solver_t, bool exclusive_orders = false);
   virtual ~ProgSolver();
 
  protected:
@@ -25,6 +25,6 @@ class ProgSolver: public ExchangeSolver {
   std::string solver_t_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_PROG_SOLVER_H_
+#endif  // CYCLUS_SRC_PROG_SOLVER_H_

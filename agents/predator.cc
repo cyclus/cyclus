@@ -45,7 +45,7 @@ void Predator::AdjustProductPrefs(
   for (it = prefs[req].begin(); it != prefs[req].end(); ++it) {
     bids.push_back(it->first);
   }
-  
+
   std::sort(bids.begin(), bids.end(), Predator::SortById);
   int nprey = context()->n_prototypes(prey);
   int npred = context()->n_prototypes(prototype());
@@ -61,10 +61,10 @@ void Predator::AdjustProductPrefs(
 
 void Predator::AcceptProductTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
-    cyclus::Product::Ptr> >& responses) {
+                                 cyclus::Product::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Product>,
   cyclus::Product::Ptr> >::const_iterator it;
-  
+
   for (it = responses.begin(); it != responses.end(); ++it) {
     LOG(cyclus::LEV_INFO3, "Predator") << name() << " ate";
     consumed += it->second->quantity();
@@ -76,7 +76,7 @@ void Predator::AcceptProductTrades(
 void Predator::Tick() {
   LOG(cyclus::LEV_INFO3, "Predator") << name() << " is ticking {";
 
-  // inform the simulation about what the Predator facility will be requesting
+  // Inform the simulation about what the Predator facility will be requesting
   if (age % hunt_freq == 0) {
     LOG(cyclus::LEV_INFO4, "Predator")
         << " will request " << hunt_cap
@@ -106,9 +106,9 @@ void Predator::Tock() {
     dead = 1;
     context()->SchedDecom(this);
   }
-  
+
   GiveBirth();
-  
+
   age++;  // getting older
 
   LOG(cyclus::LEV_INFO3, "Predator") << "}";

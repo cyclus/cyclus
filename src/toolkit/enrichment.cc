@@ -60,18 +60,18 @@ double UraniumQty(Material::Ptr rsrc) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double FeedQty(double product_qty, const Assays& assays) {
   double factor =
-    (assays.Product() - assays.Tails())
-    /
-    (assays.Feed() - assays.Tails());
+      (assays.Product() - assays.Tails())
+      /
+      (assays.Feed() - assays.Tails());
   return product_qty * factor;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double TailsQty(double product_qty, const Assays& assays) {
   double factor =
-    (assays.Product() - assays.Feed())
-    /
-    (assays.Feed() - assays.Tails());
+      (assays.Product() - assays.Feed())
+      /
+      (assays.Feed() - assays.Tails());
   return product_qty * factor;
 }
 
@@ -99,11 +99,11 @@ double SwuRequired(double product_qty, const Assays& assays) {
   double feed = FeedQty(product_qty, assays);
   double tails = TailsQty(product_qty, assays);
   double swu =
-    product_qty * ValueFunc(assays.Product()) +
-    tails * ValueFunc(assays.Tails()) -
-    feed * ValueFunc(assays.Feed());
+      product_qty * ValueFunc(assays.Product()) +
+      tails * ValueFunc(assays.Tails()) -
+      feed * ValueFunc(assays.Feed());
   return swu;
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

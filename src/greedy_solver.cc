@@ -1,7 +1,7 @@
 #include "greedy_solver.h"
 
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <functional>
 #include <vector>
 
@@ -20,7 +20,7 @@ double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for arc         : "
                            << std::min(ucap, vcap);
-  
+
   return std::min(ucap, vcap);
 }
 
@@ -47,7 +47,7 @@ double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
     CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << grp_cap;
     CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << u_cap;
     CLOG(cyclus::LEV_DEBUG1) << "         capacity: " << cap;
-    
+
     // special case for unlimited capacities
     if (grp_cap == std::numeric_limits<double>::max()) {
       caps.push_back(std::numeric_limits<double>::max());
@@ -56,20 +56,20 @@ double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
     }
   }
 
-  if (min_cap) { // the smallest value is constraining (for bids)
+  if (min_cap) {  // the smallest value is constraining (for bids)
     cap = *std::min_element(caps.begin(), caps.end());
-  } else { // the largest value must be met (for requests)
+  } else {  // the largest value must be met (for requests)
     cap = *std::max_element(caps.begin(), caps.end());
   }
   return std::min(cap, n->qty - curr_qty);
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c) 
-  : conditioner_(c),
-    ExchangeSolver(exclusive_orders) { };
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
+    : conditioner_(c),
+      ExchangeSolver(exclusive_orders) {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GreedySolver::~GreedySolver() {
   if (conditioner_ != NULL)
     delete conditioner_;
@@ -78,79 +78,75 @@ GreedySolver::~GreedySolver() {
 void GreedySolver::Condition() {
   if (conditioner_ == NULL)
     conditioner_ = new GreedyPreconditioner(std::map<std::string, double>());
-  
-  conditioner_->Condition(graph_);
 
+  conditioner_->Condition(graph_);
 }
 
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::SolveGraph() {
   Condition();
-  
+
   n_qty_.clear();
-  
+
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind1st(
                     std::mem_fun(&GreedySolver::Init_),
                     this));
-  
+
   std::for_each(graph_->supply_groups().begin(),
                 graph_->supply_groups().end(),
                 std::bind1st(
                     std::mem_fun(&GreedySolver::Init_),
                     this));
-    
+
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind1st(
                     std::mem_fun(&GreedySolver::GreedilySatisfySet_),
                     this));
-
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::Init_(ExchangeNodeGroup::Ptr g) {
   for (int i = 0; i != g->nodes().size(); i++) {
     n_qty_[g->nodes()[i]] = 0;
   }
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) { 
-
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
-  std::sort(nodes.begin(), nodes.end(), AvgPrefComp);
-  
+  std::stable_sort(nodes.begin(), nodes.end(), AvgPrefComp);
+
   std::vector<ExchangeNode::Ptr>::iterator req_it = nodes.begin();
   double target = prs->qty();
   double match = 0;
-  
+
   ExchangeNode::Ptr u, v;
   std::vector<Arc>::const_iterator arc_it;
   std::vector<Arc> sorted;
   double remain, tomatch, excl_val;
-  
+
   CLOG(LEV_DEBUG1) << "Greedy Solving for " << target
                    << " amount of a resource.";
 
-  while( (match <= target) && (req_it != nodes.end()) ) {
+  while ((match <= target) && (req_it != nodes.end())) {
     // this if statement is needed because map.at() will throw if the key does
     // not exist, which is a corner case for when there is a request with no bid
     // arcs associated with it
     if (graph_->node_arc_map().count(*req_it) > 0) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
-      sorted = std::vector<Arc>(arcs); // make a copy for now
-      std::sort(sorted.begin(), sorted.end(), ReqPrefComp);
+      sorted = std::vector<Arc>(arcs);  // make a copy for now
+      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp);
       arc_it = sorted.begin();
-    
-      while( (match <= target) && (arc_it != sorted.end()) ) {
+
+      while ((match <= target) && (arc_it != sorted.end())) {
         remain = target - match;
         const Arc& a = *arc_it;
         u = a.unode();
         v = a.vnode();
-        
+
         // capacity adjustment
         tomatch = std::min(remain, Capacity(a, n_qty_[u], n_qty_[v]));
 
@@ -159,7 +155,7 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
           excl_val = a.excl_val();
           tomatch = (tomatch < excl_val) ? 0 : excl_val;
         }
-          
+
         if (tomatch > eps()) {
           CLOG(LEV_DEBUG1) << "Greedy Solver is matching " << tomatch
                            << " amount of a resource.";
@@ -168,20 +164,20 @@ void GreedySolver::GreedilySatisfySet_(RequestGroup::Ptr prs) {
           n_qty_[u] += tomatch;
           n_qty_[v] += tomatch;
           graph_->AddMatch(a, tomatch);
-          
+
           match += tomatch;
         }
         ++arc_it;
-      } // while( (match =< target) && (arc_it != arcs.end()) )
-    } // if(graph_->node_arc_map().count(*req_it) > 0)
-    
-    ++req_it;
-  } // while( (match =< target) && (req_it != nodes.end()) )
+      }  // while( (match =< target) && (arc_it != arcs.end()) )
+    }  // if(graph_->node_arc_map().count(*req_it) > 0)
 
+    ++req_it;
+  }  // while( (match =< target) && (req_it != nodes.end()) )
 }
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void GreedySolver::UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void GreedySolver::UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a,
+                                   double qty) {
   using cyclus::IsNegative;
   using cyclus::ValueError;
 
@@ -210,4 +206,4 @@ void GreedySolver::UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty
   }
 }
 
-} // namespace cyclus
+}  // namespace cyclus

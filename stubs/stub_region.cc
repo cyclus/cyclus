@@ -3,8 +3,7 @@
 using stubs::StubRegion;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubRegion::StubRegion(cyclus::Context* ctx)
-    : cyclus::Region(ctx) {};
+StubRegion::StubRegion(cyclus::Context* ctx) : cyclus::Region(ctx) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubRegion::~StubRegion() {}

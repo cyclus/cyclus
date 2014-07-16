@@ -1,4 +1,3 @@
-
 #include "res_tracker.h"
 
 #include "recorder.h"
@@ -6,11 +5,11 @@
 namespace cyclus {
 
 ResTracker::ResTracker(Context* ctx, Resource* r)
-  : tracked_(true),
-    res_(r),
-    ctx_(ctx),
-    parent1_(0),
-    parent2_(0) {}
+    : tracked_(true),
+      res_(r),
+      ctx_(ctx),
+      parent1_(0),
+      parent2_(0) {}
 
 void ResTracker::DontTrack() {
   tracked_ = false;
@@ -25,9 +24,9 @@ void ResTracker::Create(Agent* creator) {
   parent2_ = 0;
   Record();
   ctx_->NewDatum("ResCreators")
-    ->AddVal("ResourceId", res_->state_id())
-    ->AddVal("AgentId", creator->id())
-    ->Record();
+      ->AddVal("ResourceId", res_->state_id())
+      ->AddVal("AgentId", creator->id())
+      ->Record();
 }
 
 void ResTracker::Modify() {
@@ -68,18 +67,18 @@ void ResTracker::Absorb(ResTracker* absorbed) {
 void ResTracker::Record() {
   res_->BumpStateId();
   ctx_->NewDatum("Resources")
-  ->AddVal("ResourceId", res_->state_id())
-  ->AddVal("ObjId", res_->obj_id())
-  ->AddVal("Type", res_->type())
-  ->AddVal("TimeCreated", ctx_->time())
-  ->AddVal("Quantity", res_->quantity())
-  ->AddVal("Units", res_->units())
-  ->AddVal("QualId", res_->qual_id())
-  ->AddVal("Parent1", parent1_)
-  ->AddVal("Parent2", parent2_)
-  ->Record();
+      ->AddVal("ResourceId", res_->state_id())
+      ->AddVal("ObjId", res_->obj_id())
+      ->AddVal("Type", res_->type())
+      ->AddVal("TimeCreated", ctx_->time())
+      ->AddVal("Quantity", res_->quantity())
+      ->AddVal("Units", res_->units())
+      ->AddVal("QualId", res_->qual_id())
+      ->AddVal("Parent1", parent1_)
+      ->AddVal("Parent2", parent2_)
+      ->Record();
 
   res_->Record(ctx_);
 }
 
-} // namespace cyclus
+}  // namespace cyclus

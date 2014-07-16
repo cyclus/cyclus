@@ -95,7 +95,7 @@ class CommodityRecipeContext : public StateWrangler {
   std::map<int, std::string> rsrc_commod_map_;
 };
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
 
 #endif  // CYCLUS_SRC_TOOLKIT_COMMODITY_RECIPE_CONTEXT_H_

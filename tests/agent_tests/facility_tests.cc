@@ -1,9 +1,8 @@
-// facility_tests.cc
 #include "facility_tests.h"
 
 #include <gtest/gtest.h>
 
-//extern int ConnectFacTests() {return 0;}
+// extern int ConnectFacTests() {return 0;}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(FacilityTests, Tick) {

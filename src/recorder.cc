@@ -1,14 +1,12 @@
-// recorder.cc
-
 #include "recorder.h"
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "rec_backend.h"
 #include "datum.h"
 #include "logger.h"
+#include "rec_backend.h"
 
 namespace cyclus {
 
@@ -22,8 +20,7 @@ Recorder::Recorder(unsigned int dump_count) : index_(0) {
   set_dump_count(dump_count);
 }
 
-Recorder::Recorder(boost::uuids::uuid simid)
-    : index_(0), uuid_(simid) {
+Recorder::Recorder(boost::uuids::uuid simid) : index_(0), uuid_(simid) {
   set_dump_count(kDefaultDumpCount);
 }
 
@@ -104,5 +101,5 @@ void Recorder::Close() {
   Flush();
   backs_.clear();
 }
-} // namespace cyclus
 
+}  // namespace cyclus

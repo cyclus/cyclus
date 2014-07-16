@@ -1,17 +1,15 @@
-// region.cc
 // Implements the Region class
-
-#include <string>
-#include <iostream>
-
 #include "region.h"
 
+#include <iostream>
+#include <string>
+
 #include "agent.h"
-#include "institution.h"
 #include "error.h"
-#include "timer.h"
-#include "logger.h"
 #include "infile_tree.h"
+#include "institution.h"
+#include "logger.h"
+#include "timer.h"
 
 namespace cyclus {
 
@@ -48,4 +46,4 @@ std::string Region::str() {
   return s;
 }
 
-} // namespace cyclus
+}  // namespace cyclus

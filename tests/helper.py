@@ -37,10 +37,10 @@ def find_ids(data, data_table, id_table):
     """
     ids = []
     for i, d in enumerate(data_table):
-        if isinstance(d, np.ndarray) and isinstance(data, np.ndarray): 
+        if isinstance(d, np.ndarray) and isinstance(data, np.ndarray):
             if (d == data).all():
                 ids.append(id_table[i])
-        elif isinstance(d, np.ndarray) and not isinstance(data, np.ndarray): 
+        elif isinstance(d, np.ndarray) and not isinstance(data, np.ndarray):
             if (d == sha1array(data)).all():
                 ids.append(id_table[i])
         elif d == data:
@@ -62,7 +62,7 @@ def exit_times(agent_id, exit_table):
 def agent_time_series(f, names):
     """Return a list of timeseries corresponding to the number of agents in a
     Cyclus simulation
-    
+
     Parameters
     ----------
     f : PyTables file
@@ -89,7 +89,7 @@ def agent_time_series(f, names):
         for id in ids:
             idx = np.where(agent_entry['AgentId'] == id)[0][0]
             entries[name][agent_entry[idx]['EnterTime']] += 1
-    
+
     # cumulative entries
     entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
                    for k, v in entries.items()}
@@ -114,9 +114,9 @@ def agent_time_series(f, names):
         i = entries[name]
         # shift by one to account for agents that enter/exit in the same
         # timestep
-        o = [0] + exits[name][:-1] 
+        o = [0] + exits[name][:-1]
         ret[name] = [i - o for i, o in zip(i, o)]
-            
+
     return ret
 
 def create_sim_input(ref_input, k_factor_in, k_factor_out):
@@ -154,4 +154,3 @@ def create_sim_input(ref_input, k_factor_in, k_factor_out):
     fw.close()
 
     return fw_path
-

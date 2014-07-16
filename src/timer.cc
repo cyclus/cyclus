@@ -1,13 +1,12 @@
-// timer.cc
 // Implements the Timer class
-
 #include "timer.h"
-#include <string>
-#include <iostream>
 
+#include <iostream>
+#include <string>
+
+#include "agent.h"
 #include "error.h"
 #include "logger.h"
-#include "agent.h"
 #include "sim_init.h"
 
 namespace cyclus {
@@ -50,8 +49,8 @@ void Timer::RunSim() {
       ->AddVal("EndTime", time_)
       ->Record();
 
-  time_++; // move time forward because snapshots are always "beginning of timestep"
-  SimInit::Snapshot(ctx_); // always do a snapshot at the end of every simulation
+  time_++;  // move time forward because snapshots are always "beginning of timestep"
+  SimInit::Snapshot(ctx_);  // always do a snapshot at the end of every simulation
   time_--;
 }
 
@@ -73,10 +72,10 @@ void Timer::DoBuild() {
 }
 
 void Timer::DoTick() {
-  for (std::set<TimeListener*>::iterator agent = tickers_.begin();
+  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
-    (*agent)->Tick();
+    agent->second->Tick();
   }
 }
 
@@ -87,10 +86,10 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-  for (std::set<TimeListener*>::iterator agent = tickers_.begin();
+  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
-    (*agent)->Tock();
+    agent->second->Tock();
   }
 }
 
@@ -107,11 +106,11 @@ void Timer::DoDecom() {
 }
 
 void Timer::RegisterTimeListener(TimeListener* agent) {
-  tickers_.insert(agent);
+  tickers_[agent->id()] = agent;
 }
 
 void Timer::UnregisterTimeListener(TimeListener* tl) {
-  tickers_.erase(tl);
+  tickers_.erase(tl->id());
 }
 
 void Timer::SchedBuild(Agent* parent, std::string proto_name, int t) {
@@ -160,6 +159,4 @@ int Timer::dur() {
 
 Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
-} // namespace cyclus
-
-
+}  // namespace cyclus

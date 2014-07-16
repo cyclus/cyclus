@@ -1,7 +1,7 @@
-
 #include "material.h"
 
 #include <math.h>
+
 #include "comp_math.h"
 #include "context.h"
 #include "decayer.h"
@@ -46,9 +46,9 @@ void Material::Record(Context* ctx) const {
   // Note that no time field is needed because the resource ID changes
   // every time the resource changes - state_id by itself is already unique.
   ctx_->NewDatum("MaterialInfo")
-  ->AddVal("ResourceId", state_id())
-  ->AddVal("PrevDecayTime", prev_decay_time_)
-  ->Record();
+      ->AddVal("ResourceId", state_id())
+      ->AddVal("PrevDecayTime", prev_decay_time_)
+      ->Record();
 
   comp_->Record(ctx);
 }
@@ -146,8 +146,11 @@ Composition::Ptr Material::comp() const {
 }
 
 Material::Material(Context* ctx, double quantity, Composition::Ptr c)
-  : qty_(quantity), comp_(c), tracker_(ctx, this), ctx_(ctx),
-    prev_decay_time_(0) {
+    : qty_(quantity),
+      comp_(c),
+      tracker_(ctx, this),
+      ctx_(ctx),
+      prev_decay_time_(0) {
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
   } else {
@@ -156,8 +159,8 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c)
 }
 
 Material::Ptr NewBlankMaterial(double quantity) {
-  Composition::Ptr comp = Composition::CreateFromMass(CompMap());  
+  Composition::Ptr comp = Composition::CreateFromMass(CompMap());
   return Material::CreateUntracked(quantity, comp);
 }
 
-} // namespace cyclus
+}  // namespace cyclus

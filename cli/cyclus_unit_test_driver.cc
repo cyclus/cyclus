@@ -8,13 +8,13 @@
 #include "logger.h"
 
 int main(int argc, char* argv[]) {
-  // tell ENV the path between the cwd and the cyclus executable
+  // Tell ENV the path between the cwd and the cyclus executable
   using cyclus::Env;
   using cyclus::Logger;
   std::string path = Env::PathBase(argv[0]);
   Logger::ReportLevel() = cyclus::LEV_ERROR;
 
-  // add the build path to the environment for testing
+  // Add the build path to the environment for testing
   std::string test_env = "CYCLUS_PATH=" + Env::GetBuildPath();
   std::string curr_var = Env::GetEnv("CYCLUS_PATH");
   if (curr_var != "") {

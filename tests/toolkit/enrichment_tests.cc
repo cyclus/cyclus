@@ -7,11 +7,11 @@
 #include "composition.h"
 #include "context.h"
 #include "cyc_limits.h"
-#include "recorder.h"
+#include "env.h"
 #include "error.h"
 #include "material.h"
+#include "recorder.h"
 #include "timer.h"
-#include "env.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -85,7 +85,6 @@ TEST_F(EnrichmentTests, material) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, enrichmentcalcs) {
-  
   Assays assays(feed_, UraniumAssay(mat_),
                                     tails_);
   double product_qty = UraniumQty(mat_);
@@ -94,5 +93,5 @@ TEST_F(EnrichmentTests, enrichmentcalcs) {
   EXPECT_NEAR(swu_, SwuRequired(product_qty, assays), 1e-8);
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

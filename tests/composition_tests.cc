@@ -1,4 +1,3 @@
-// CompositionTests.cpp
 #include <map>
 
 #include <gtest/gtest.h>

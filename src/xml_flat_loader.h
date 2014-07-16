@@ -1,4 +1,3 @@
-// xml_flat_loader.h
 #ifndef CYCLUS_SRC_XML_FLAT_LOADER_H_
 #define CYCLUS_SRC_XML_FLAT_LOADER_H_
 
@@ -25,8 +24,8 @@ class XMLFlatLoader : public XMLFileLoader {
 
  protected:
   virtual std::string master_schema();
-
 };
+
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_XML_FLAT_LOADER_H_

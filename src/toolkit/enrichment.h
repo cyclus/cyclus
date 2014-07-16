@@ -1,4 +1,3 @@
-// enrichment.h
 #ifndef CYCLUS_SRC_TOOLKIT_ENRICHMENT_H_
 #define CYCLUS_SRC_TOOLKIT_ENRICHMENT_H_
 
@@ -9,10 +8,10 @@
 namespace cyclus {
 namespace toolkit {
 
-/// a simple container class for enrichment assays
+/// A simple container class for enrichment assays
 class Assays {
  public:
-  /// constructor
+  /// Constructor
   Assays(double feed, double product, double tails);
 
   /// @return the feed assay as an atomic fraction, i.e. for
@@ -68,6 +67,7 @@ double SwuRequired(double product_qty, const Assays& assays);
 /// @return the value function for a given fraction in [0,1)
 double ValueFunc(double frac);
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
+
 #endif  // CYCLUS_SRC_TOOLKIT_ENRICHMENT_H_

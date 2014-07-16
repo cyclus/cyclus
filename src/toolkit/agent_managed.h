@@ -10,15 +10,15 @@ namespace toolkit {
 /// agent that manages it.
 class AgentManaged {
  public:
-  explicit AgentManaged(Agent* agent=NULL) : agent_(agent) {};
-  inline Agent* agent() const {return agent_;}
+  explicit AgentManaged(Agent* agent = NULL) : agent_(agent) {}
+  inline Agent* agent() const { return agent_; }
 
  private:
-  /// the agent managing this instance
+  /// The agent managing this instance
   Agent* agent_;
 };
-  
-} // namespace toolkit
-} // namespace cyclus
 
-#endif // CYCLUS_SRC_TOOLKIT_AGENT_MANAGED_H_
+}  // namespace toolkit
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_TOOLKIT_AGENT_MANAGED_H_

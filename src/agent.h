@@ -1,4 +1,3 @@
-// agent.h
 #ifndef CYCLUS_SRC_AGENT_H_
 #define CYCLUS_SRC_AGENT_H_
 
@@ -22,9 +21,14 @@ class SimInitTest;
 
 namespace cyclus {
 
+class Ider {
+ public:
+  virtual const int id() const = 0;
+};
+
 class Material;
 class Product;
-  
+
 /// map<inventory_name, vector<resources_in_inventory> >.  Used by agents in
 /// their #SnapshotInv and #InitInv functions for saving+loading their internal
 /// resource inventories.
@@ -39,7 +43,7 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 /// functions all do inter-related things.  Notably, the #InfileToDb, #InitFrom,
 /// and #Snapshot functions must all write/read to/from the same database tables
 /// (and table schemas).
-class Agent : public StateWrangler {
+class Agent : public StateWrangler, virtual public Ider {
   friend class SimInit;
   friend class ::SimInitTest;
 
@@ -85,7 +89,7 @@ class Agent : public StateWrangler {
   /// Agent parameters in the InfileTree are scoped in the "agent/*/" path.
   /// The superclass InitFrom expects the scope InfileTree passed to it to be
   /// unchanged from the agent's InfileTree arg.
-  /// 
+  ///
   ///
   /// Example:
   ///
@@ -286,10 +290,10 @@ class Agent : public StateWrangler {
   /// Called when a new child of this agent has just been built. It is possible
   /// for this function to be called before the simulation has started when
   /// initially existing agents are being setup.
-  virtual void BuildNotify(Agent* m) {};
+  virtual void BuildNotify(Agent* m) {}
 
   /// Called when a new child of this agent is about to be decommissioned.
-  virtual void DecomNotify(Agent* m) {};
+  virtual void DecomNotify(Agent* m) {}
 
   /// Decommissions the agent, removing it from the simulation. Results in
   /// destruction of the agent object. If agents write their own Decommission
@@ -298,24 +302,24 @@ class Agent : public StateWrangler {
   virtual void Decommission();
 
   /// default implementation for material preferences.
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {};
-  
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
+
   /// default implementation for material preferences.
-  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {};
+  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
 
   /// Returns an agent's xml rng schema for initializing from input files. All
   /// concrete agents should override this function. This must validate the same
   /// xml input that the InfileToDb function receives.
   virtual std::string schema() {
     return "<text />\n";
-  };
+  }
 
   /// Returns an agent's json annotations for all state variables and any other
   /// information the developer wishes to provide. All concrete agents should
   /// override this function.
   virtual Json::Value annotations() {
     return Json::Value(Json::objectValue);
-  };
+  }
 
   /// Returns the agent's prototype.
   inline const std::string prototype() const { return prototype_; }
@@ -325,19 +329,19 @@ class Agent : public StateWrangler {
   inline void prototype(std::string p) { prototype_ = p; }
 
   /// The agent instance's unique ID within a simulation.
-  inline const int id() const { return id_; }
+  virtual const int id() const { return id_; }
 
   /// The string representation of the agent spec that uniquely identifies the
   /// concrete agent class/module.  See CEP21 for details..
-  inline std::string spec() {return spec_;}
+  inline std::string spec() { return spec_; }
 
   /// Sets this agent's agent spec.  This should generally NEVER be called
   /// explicitly by code outside the cyclus kernel.
-  inline void spec(std::string new_impl) {spec_ = new_impl;}
+  inline void spec(std::string new_impl) { spec_ = new_impl; }
 
   /// Returns a string that describes the agent subclass (e.g. Region,
   /// Facility, etc.)
-  inline const std::string kind() const {return kind_;};
+  inline const std::string kind() const { return kind_; }
 
   /// Returns this agent's simulation context.
   inline Context* context() const { return ctx_; }
@@ -362,7 +366,7 @@ class Agent : public StateWrangler {
 
   /// Returns a list of children this agent has
   inline const std::set<Agent*>& children() const { return children_; }
-  
+
  protected:
   /// Initializes a agent by copying parameters from the passed agent m. This
   /// function must be implemented by all agents.  This function must call the
@@ -372,7 +376,7 @@ class Agent : public StateWrangler {
   ///
   /// @param m the agent containing state that should be used to initialize this
   /// agent.
-  /// 
+  ///
   /// Example:
   ///
   /// @code
@@ -393,7 +397,7 @@ class Agent : public StateWrangler {
 
   /// adds agent-specific information prefix to an error message
   virtual std::string InformErrorMsg(std::string msg);
-  
+
   /// describes the agent subclass (e.g. Region, Inst, etc.). The in-kernel
   /// subclasses must set this variable in their constructor(s).
   std::string kind_;
@@ -401,7 +405,7 @@ class Agent : public StateWrangler {
  private:
   /// Prevents creation/use of copy constructors (including in subclasses).
   /// Cloning and InitFrom should be used instead.
-  Agent(const Agent& m) {};
+  Agent(const Agent& m) {}
 
   /// adds an agent to the transactiont table
   void AddToTable();
@@ -440,7 +444,6 @@ class Agent : public StateWrangler {
   Context* ctx_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
-
+#endif  // CYCLUS_SRC_AGENT_H_

@@ -1,4 +1,3 @@
-
 #include "db_init.h"
 
 #include "context.h"
@@ -21,4 +20,4 @@ Datum* DbInit::NewDatum(std::string title) {
   return d;
 }
 
-} // namespace cyclus
+}  // namespace cyclus

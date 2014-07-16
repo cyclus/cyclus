@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SOLVER_FACTORY_H_
-#define CYCLUS_SOLVER_FACTORY_H_
+#ifndef CYCLUS_SRC_SOLVER_FACTORY_H_
+#define CYCLUS_SRC_SOLVER_FACTORY_H_
 
 #include <string>
 
@@ -16,7 +16,7 @@ class SolverFactory {
  public:
   /// @param t the solver type
   explicit SolverFactory(std::string t = "");
-  
+
   /// get/set the solver type
   inline void solver_t(std::string t) { t_ = t; }
   inline const std::string solver_t() const { return t_; }
@@ -32,6 +32,6 @@ class SolverFactory {
 void SolveProg(OsiSolverInterface* si);
 bool HasInt(OsiSolverInterface* si);
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // ifndef CYCLUS_SOLVER_FACTORY_H_
+#endif  // CYCLUS_SRC_SOLVER_FACTORY_H_

@@ -1,4 +1,3 @@
-// infile_tree_tests.h
 #ifndef CYCLUS_TESTS_INFILE_TREE_TESTS_H_
 #define CYCLUS_TESTS_INFILE_TREE_TESTS_H_
 

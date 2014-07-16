@@ -117,7 +117,8 @@ void GroupTradesBySupplier(TradeExecutionContext<T>& trade_ctx,
 template<class T>
 static void GetTradeResponses(TradeExecutionContext<T>& trade_ctx) {
   std::set<Trader*>::iterator it;
-  for (it = trade_ctx.suppliers.begin(); it != trade_ctx.suppliers.end(); ++it) {
+  for (it = trade_ctx.suppliers.begin(); it != trade_ctx.suppliers.end();
+       ++it) {
     // get responses
     Trader* supplier = *it;
     std::vector< std::pair<Trade<T>, typename T::Ptr> > responses;

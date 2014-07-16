@@ -1,6 +1,5 @@
-// symbolic_function_tests.h
-#ifndef CYCLUS_TESTS_SYMBOLIC_FUNCTION_TESTS_H_
-#define CYCLUS_TESTS_SYMBOLIC_FUNCTION_TESTS_H_
+#ifndef CYCLUS_TESTS_TOOLKIT_SYMBOLIC_FUNCTION_TESTS_H_
+#define CYCLUS_TESTS_TOOLKIT_SYMBOLIC_FUNCTION_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -36,7 +35,7 @@ class SymbolicFunctionTests : public ::testing::Test {
   double piecewise_value(double value, int index);
 };
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
 
-#endif  // CYCLUS_TESTS_SYMBOLIC_FUNCTION_TESTS_H_
+#endif  // CYCLUS_TESTS_TOOLKIT_SYMBOLIC_FUNCTION_TESTS_H_

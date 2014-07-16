@@ -1,8 +1,9 @@
 #include "solver_factory.h"
-#include "error.h"
 
 #include "OsiClpSolverInterface.hpp"
-#include "OsiCbcSolverInterface.hpp" 
+#include "OsiCbcSolverInterface.hpp"
+
+#include "error.h"
 
 namespace cyclus {
 
@@ -32,11 +33,11 @@ void SolveProg(OsiSolverInterface* si) {
 bool HasInt(OsiSolverInterface* si) {
   int i = 0;
   for (i = 0; i != si->getNumCols(); i++) {
-    if(si->isInteger(i)) {
+    if (si->isInteger(i)) {
       return true;
     }
   }
   return false;
 }
 
-} // namespace cyclus
+}  // namespace cyclus

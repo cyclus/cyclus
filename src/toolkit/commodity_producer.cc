@@ -3,8 +3,7 @@
 namespace cyclus {
 namespace toolkit {
 
-CommodInfo::CommodInfo(double default_capacity,
-                       double default_cost)
+CommodInfo::CommodInfo(double default_capacity, double default_cost)
     : capacity(default_capacity),
       cost(default_cost) {}
 
@@ -37,5 +36,5 @@ void CommodityProducer::Copy(CommodityProducer* source) {
   }
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

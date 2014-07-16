@@ -62,5 +62,5 @@ TEST_F(BuildingManagerTests, emptyorder) {
   EXPECT_TRUE(orders.empty());
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

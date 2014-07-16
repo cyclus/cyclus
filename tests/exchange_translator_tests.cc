@@ -86,13 +86,13 @@ TEST(ExXlateTests, NegPref) {
       rp->AddRequest(get_mat(u235, qty), trader, "", pref);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
-  ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());  
+  ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
   ExchangeTranslator<Material> xlator(&ctx);
-    
+
   xlator.AddArc(req, bid, graph);
   EXPECT_EQ(graph->arcs().size(), 0);
 }
@@ -139,7 +139,7 @@ TEST(ExXlateTests, XlateCapacities) {
 TEST(ExXlateTests, XlateReq) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  
+
   Converter<Material>::Ptr c1(new MatConverter1());
   double qty1 = 2.5 * qty;
   CapacityConstraint<Material> cc1(qty1, c1);
@@ -184,7 +184,7 @@ TEST(ExXlateTests, XlateReq) {
 TEST(ExXlateTests, XlateBid) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  
+
   std::string commod = "commod";
   Request<Material>* req =
       Request<Material>::Create(get_mat(u235, qty), trader, commod);
@@ -241,7 +241,7 @@ TEST(ExXlateTests, XlateBid) {
 TEST(ExXlateTests, XlateArc) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  
+
   Material::Ptr mat = get_mat(u235, qty);
 
   Converter<Material>::Ptr c1(new MatConverter1());
@@ -292,7 +292,7 @@ TEST(ExXlateTests, XlateArc) {
 TEST(ExXlateTests, XlateArcExclusive) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  
+
   bool exclusive = true;
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
@@ -372,7 +372,7 @@ TEST(ExXlateTests, XlateArcExclusive) {
 TEST(ExXlateTests, SimpleXlate) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  
+
   std::string commod = "c";
   double pref = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
@@ -402,7 +402,7 @@ TEST(ExXlateTests, SimpleXlate) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, BackXlate) {
   TestContext tc;
-  
+
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 

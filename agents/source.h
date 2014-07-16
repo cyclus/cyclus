@@ -29,7 +29,7 @@ class Source : public cyclus::Facility {
   #pragma cyclus note {"doc": "A minimum implementation source " \
                               "facility that provides a commodity " \
                               "with a given capacity"}
-  
+
   virtual std::string str();
 
   virtual void Tick();
@@ -51,36 +51,28 @@ class Source : public cyclus::Facility {
   virtual void GetMatlTrades(
       const std::vector< cyclus::Trade<cyclus::Material> >& trades,
       std::vector<std::pair<cyclus::Trade<cyclus::Material>,
-      cyclus::Material::Ptr> >& responses);
+                            cyclus::Material::Ptr> >& responses);
 
-  /**
-     @brief creates a material object to offer to a requester
-     @param target the material target a request desires
-   */
+  /// @brief creates a material object to offer to a requester
+  /// @param target the material target a request desires
   cyclus::Material::Ptr GetOffer(const cyclus::Material::Ptr target) const;
 
-  /**
-     @brief sets the output commodity name
-     @param name the commodity name
-   */
+  /// @brief sets the output commodity name
+  /// @param name the commodity name
   inline void commodity(std::string name) { commod = name; }
 
   /// @return the output commodity
   inline std::string commodity() const { return commod; }
 
-  /**
-     @brief sets the capacity of a material generated at any given time step
-     @param cap the production capacity
-   */
+  /// @brief sets the capacity of a material generated at any given time step
+  /// @param cap the production capacity
   inline void Capacity(double cap) { capacity = cap; }
 
   /// @return the production capacity at any given time step
   inline double Capacity() const { return capacity; }
 
-  /**
-     @brief sets the name of the recipe to be produced
-     @param name the recipe name
-   */
+  /// @brief sets the name of the recipe to be produced
+  /// @param name the recipe name
   inline void recipe(std::string name) { recipe_name = name; }
 
   /// @return the name of the output recipe
@@ -99,11 +91,9 @@ class Source : public cyclus::Facility {
                       "schematype": "token"}
   std::string recipe_name;
 
-  /**
-     The capacity is defined in terms of the number of units of the
-     recipe that can be provided each time step.  A very large number
-     can be provided to represent infinte capacity.
-   */
+  /// The capacity is defined in terms of the number of units of the
+  /// recipe that can be provided each time step.  A very large number
+  /// can be provided to represent infinte capacity.
   #pragma cyclus var {"doc": "amount of commodity that can be " \
                              "supplied at each time step", \
                       "tooltip": "source capacity"}

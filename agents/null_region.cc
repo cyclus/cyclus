@@ -10,4 +10,4 @@ extern "C" cyclus::Agent* ConstructNullRegion(cyclus::Context* ctx) {
   return new NullRegion(ctx);
 }
 
-}  // namespce cyclus
+}  // namespace cyclus

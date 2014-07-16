@@ -9,17 +9,16 @@
 #include "commodity_producer.h"
 #include "prog_translator.h"
 
-// headers in this file below this pragma have all warnings shushed
+// Headers in this file below this pragma have all warnings shushed.
 #pragma GCC system_header
 #include "OsiCbcSolverInterface.hpp"
 
 namespace cyclus {
 namespace toolkit {
 
-/// a struct for a build order: the number of producers to build
+/// A struct for a build order: the number of producers to build.
 struct BuildOrder {
-  BuildOrder(int n, Builder* b,
-             CommodityProducer* cp);
+  BuildOrder(int n, Builder* b, CommodityProducer* cp);
   int number;
   Builder* builder;
   CommodityProducer* producer;
@@ -44,19 +43,19 @@ struct BuildOrder {
 /// cost to build the object of type i, \f$\phi_i\f$ is the nameplate
 /// capacity of the object, and \f$\Phi\f$ is the capacity demand. Here
 /// the set I corresponds to all producers of a given commodity.
-class BuildingManager: public AgentManaged {
+class BuildingManager : public AgentManaged {
  public:
-  BuildingManager(Agent* agent=NULL) : AgentManaged(agent) {};
+  BuildingManager(Agent* agent = NULL) : AgentManaged(agent) {}
 
-  /// register a builder with the manager
+  /// Register a builder with the manager
   /// @param builder the builder
-  inline void Register(Builder* builder) {builders_.insert(builder);}
+  inline void Register(Builder* builder) { builders_.insert(builder); }
 
-  /// unregister a builder with the manager
+  /// Unregister a builder with the manager
   /// @param builder the builder
-  inline void Unregister(Builder* builder) {builders_.erase(builder);}
+  inline void Unregister(Builder* builder) { builders_.erase(builder); }
 
-  /// given a certain commodity and demand, a decision is made as to
+  /// Given a certain commodity and demand, a decision is made as to
   /// how many producers of each available type to build this
   /// function constructs an integer program through the
   /// SolverInterface
@@ -86,6 +85,8 @@ class BuildingManager: public AgentManaged {
               std::map<int, CommodityProducer*>& idx_to_p,
               std::vector<BuildOrder>& orders);
 };
-} // namespace toolkit
-} // namespace cyclus
+
+}  // namespace toolkit
+}  // namespace cyclus
+
 #endif  // CYCLUS_SRC_TOOLKIT_BUILDING_MANAGER_H_

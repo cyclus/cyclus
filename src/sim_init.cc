@@ -1,4 +1,3 @@
-
 #include "sim_init.h"
 
 #include "greedy_preconditioner.h"
@@ -9,8 +8,8 @@ namespace cyclus {
 
 class Dummy : public Region {
  public:
-  Dummy(Context* ctx) : Region(ctx) {};
-  Dummy* Clone() { return NULL; };
+  Dummy(Context* ctx) : Region(ctx) {}
+  Dummy* Clone() { return NULL; }
 };
 
 SimInit::SimInit() : rec_(NULL), ctx_(NULL) {}
@@ -25,9 +24,9 @@ SimInit::~SimInit() {
 }
 
 void SimInit::Init(Recorder* r, QueryableBackend* b) {
-  rec_ = new Recorder(); // use dummy recorder to avoid re-recording
+  rec_ = new Recorder();  // use dummy recorder to avoid re-recording
   InitBase(b, r->sim_id(), 0);
-  ctx_->rec_ = r; // switch back before running sim
+  ctx_->rec_ = r;  // switch back before running sim
 }
 
 void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
@@ -39,7 +38,7 @@ void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
   si_.parent_sim = sim_id;
   si_.parent_type = "restart";
   si_.branch_time = t;
-  ctx_->InitSim(si_); // explicitly force this to show up in the new simulations output db
+  ctx_->InitSim(si_);  // explicitly force this to show up in the new simulations output db
 }
 
 void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
@@ -85,36 +84,36 @@ void SimInit::Snapshot(Context* ctx) {
 
   // snapshot all next ids
   ctx->NewDatum("NextIds")
-  ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("Agent"))
-  ->AddVal("NextId", Agent::next_id_)
-  ->Record();
+      ->AddVal("Time", ctx->time())
+      ->AddVal("Object", std::string("Agent"))
+      ->AddVal("NextId", Agent::next_id_)
+      ->Record();
   ctx->NewDatum("NextIds")
-  ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("Transaction"))
-  ->AddVal("NextId", ctx->trans_id_)
-  ->Record();
+      ->AddVal("Time", ctx->time())
+      ->AddVal("Object", std::string("Transaction"))
+      ->AddVal("NextId", ctx->trans_id_)
+      ->Record();
   ctx->NewDatum("NextIds")
-  ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("Composition"))
-  ->AddVal("NextId", Composition::next_id_)
-  ->Record();
+      ->AddVal("Time", ctx->time())
+      ->AddVal("Object", std::string("Composition"))
+      ->AddVal("NextId", Composition::next_id_)
+      ->Record();
   ctx->NewDatum("NextIds")
-  ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("ResourceState"))
-  ->AddVal("NextId", Resource::nextstate_id_)
-  ->Record();
+      ->AddVal("Time", ctx->time())
+      ->AddVal("Object", std::string("ResourceState"))
+      ->AddVal("NextId", Resource::nextstate_id_)
+      ->Record();
   ctx->NewDatum("NextIds")
-  ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("ResourceObj"))
-  ->AddVal("NextId", Resource::nextobj_id_)
-  ->Record();
+      ->AddVal("Time", ctx->time())
+      ->AddVal("Object", std::string("ResourceObj"))
+      ->AddVal("NextId", Resource::nextobj_id_)
+      ->Record();
   ctx->NewDatum("NextIds")
-  ->AddVal("Time", ctx->time())
-  ->AddVal("Object", std::string("Product"))
-  ->AddVal("NextId", Product::next_qualid_)
-  ->Record();
-};
+      ->AddVal("Time", ctx->time())
+      ->AddVal("Object", std::string("Product"))
+      ->AddVal("NextId", Product::next_qualid_)
+      ->Record();
+}
 
 void SimInit::SnapAgent(Agent* m) {
   // call manually without agent impl injected to keep all Agent state in a
@@ -131,11 +130,11 @@ void SimInit::SnapAgent(Agent* m) {
     std::vector<Resource::Ptr> inv = it->second;
     for (int i = 0; i < inv.size(); ++i) {
       ctx->NewDatum("AgentStateInventories")
-      ->AddVal("AgentId", m->id())
-      ->AddVal("SimTime", ctx->time())
-      ->AddVal("InventoryName", name)
-      ->AddVal("ResourceId", inv[i]->state_id())
-      ->Record();
+          ->AddVal("AgentId", m->id())
+          ->AddVal("SimTime", ctx->time())
+          ->AddVal("InventoryName", name)
+          ->AddVal("ResourceId", inv[i]->state_id())
+          ->Record();
     }
   }
 }
@@ -157,7 +156,7 @@ void SimInit::LoadRecipes() {
     qr = b_->Query("Recipes", NULL);
   } catch (std::exception err) {
     return;
-  } // table doesn't exist (okay)
+  }  // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string recipe = qr.GetVal<std::string>("Recipe", i);
@@ -182,7 +181,7 @@ void SimInit::LoadSolverInfo() {
     // solver will delete conditioner
     conditioner = new GreedyPreconditioner(commod_order,
                                            GreedyPreconditioner::REVERSE);
-  } catch (std::exception err) { } // table doesn't exist (okay)
+  } catch (std::exception err) {}  // table doesn't exist (okay)
 
   // context will delete solver
   bool exclusive_orders = false;
@@ -228,8 +227,8 @@ void SimInit::LoadInitialAgents() {
   std::vector<Cond> conds;
   conds.push_back(Cond("EnterTime", "<=", t_));
   QueryResult qentry = b_->Query("AgentEntry", &conds);
-  std::map<int, int> parentmap; // map<agentid, parentid>
-  std::map<int, Agent*> unbuilt; // map<agentid, agent_ptr>
+  std::map<int, int> parentmap;  // map<agentid, parentid>
+  std::map<int, Agent*> unbuilt;  // map<agentid, agent_ptr>
   for (int i = 0; i < qentry.rows.size(); ++i) {
     if (t_ > 0 && qentry.GetVal<int>("EnterTime", i) == t_) {
       // agent is scheduled to be built already
@@ -242,9 +241,9 @@ void SimInit::LoadInitialAgents() {
     try {
       QueryResult qexit = b_->Query("AgentExit", &conds);
       if (qexit.rows.size() != 0) {
-        continue; // agent was decomissioned before t_ - skip
+        continue;  // agent was decomissioned before t_ - skip
       }
-    } catch (std::exception err) { } // table doesn't exist (okay)
+    } catch (std::exception err) {}  // table doesn't exist (okay)
 
     // if the agent wasn't decommissioned before t_ create and init it
 
@@ -278,19 +277,19 @@ void SimInit::LoadInitialAgents() {
     Agent* m = it->second;
     int parentid = parentmap[id];
 
-    if (parentid == -1) { // root agent
+    if (parentid == -1) {  // root agent
       m->Connect(NULL);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
       enter_list.push_back(m);
-    } else if (agents_.count(parentid) > 0) { // parent is built
+    } else if (agents_.count(parentid) > 0) {  // parent is built
       m->Connect(agents_[parentid]);
       agents_[id] = m;
       ++it;
       unbuilt.erase(id);
       enter_list.push_back(m);
-    } else { // parent not built yet
+    } else {  // parent not built yet
       ++it;
     }
     if (it == unbuilt.end()) {
@@ -315,7 +314,7 @@ void SimInit::LoadInventories() {
     QueryResult qr;
     try {
       qr = b_->Query("AgentStateInventories", &conds);
-    } catch (std::exception err) {return;} // table doesn't exist (okay)
+    } catch (std::exception err) {return;}  // table doesn't exist (okay)
 
     Inventories invs;
     for (int i = 0; i < qr.rows.size(); ++i) {
@@ -333,7 +332,7 @@ void SimInit::LoadBuildSched() {
   QueryResult qr;
   try {
     qr = b_->Query("BuildSchedule", &conds);
-  } catch (std::exception err) {return;} // table doesn't exist (okay)
+  } catch (std::exception err) {return;}  // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>("BuildTime", i);
@@ -349,7 +348,7 @@ void SimInit::LoadDecomSched() {
   QueryResult qr;
   try {
     qr = b_->Query("DecomSchedule", &conds);
-  } catch (std::exception err) {return;} // table doesn't exist (okay)
+  } catch (std::exception err) {return;}  // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>("DecomTime", i);
@@ -466,7 +465,4 @@ Resource::Ptr SimInit::LoadProduct(int state_id) {
   return r;
 }
 
-} // namespace cyclus
-
-
-
+}  // namespace cyclus

@@ -33,8 +33,8 @@ TEST_F(SqliteBackTests, MapStrDouble) {
   m["three"] = 5.5;
 
   r.NewDatum("monty")
-  ->AddVal("count", m)
-  ->Record();
+      ->AddVal("count", m)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("monty", NULL);
@@ -52,8 +52,8 @@ TEST_F(SqliteBackTests, MapStrInt) {
   m["three"] = 5;
 
   r.NewDatum("monty")
-  ->AddVal("count", m)
-  ->Record();
+      ->AddVal("count", m)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("monty", NULL);
@@ -71,8 +71,8 @@ TEST_F(SqliteBackTests, MapStrStr) {
   m["three"] = "5";
 
   r.NewDatum("monty")
-  ->AddVal("count", m)
-  ->Record();
+      ->AddVal("count", m)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("monty", NULL);
@@ -90,8 +90,8 @@ TEST_F(SqliteBackTests, MapIntDouble) {
   m[3] = 5.5;
 
   r.NewDatum("monty")
-  ->AddVal("count", m)
-  ->Record();
+      ->AddVal("count", m)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("monty", NULL);
@@ -109,8 +109,8 @@ TEST_F(SqliteBackTests, MapIntInt) {
   m[3] = 5;
 
   r.NewDatum("monty")
-  ->AddVal("count", m)
-  ->Record();
+      ->AddVal("count", m)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("monty", NULL);
@@ -128,8 +128,8 @@ TEST_F(SqliteBackTests, MapIntStr) {
   m[3] = "five";
 
   r.NewDatum("monty")
-  ->AddVal("count", m)
-  ->Record();
+      ->AddVal("count", m)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("monty", NULL);
@@ -146,8 +146,8 @@ TEST_F(SqliteBackTests, SetInt) {
   s.insert(2);
 
   r.NewDatum("foo")
-  ->AddVal("bar", s)
-  ->Record();
+      ->AddVal("bar", s)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("foo", NULL);
@@ -163,8 +163,8 @@ TEST_F(SqliteBackTests, SetString) {
   s.insert("two");
 
   r.NewDatum("foo")
-  ->AddVal("bar", s)
-  ->Record();
+      ->AddVal("bar", s)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("foo", NULL);
@@ -180,8 +180,8 @@ TEST_F(SqliteBackTests, ListInt) {
   l.push_back(2);
 
   r.NewDatum("foo")
-  ->AddVal("bar", l)
-  ->Record();
+      ->AddVal("bar", l)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("foo", NULL);
@@ -199,8 +199,8 @@ TEST_F(SqliteBackTests, ListString) {
 
 
   r.NewDatum("foo")
-  ->AddVal("bar", l)
-  ->Record();
+      ->AddVal("bar", l)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("foo", NULL);
@@ -217,8 +217,8 @@ TEST_F(SqliteBackTests, VectorInt) {
   vect.push_back(2);
 
   r.NewDatum("foo")
-  ->AddVal("bar", vect)
-  ->Record();
+      ->AddVal("bar", vect)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("foo", NULL);
@@ -229,6 +229,24 @@ TEST_F(SqliteBackTests, VectorInt) {
   EXPECT_EQ(2, vect[1]);
 }
 
+TEST_F(SqliteBackTests, VectorDouble) {
+  std::vector<double> vect;
+  vect.push_back(4.4);
+  vect.push_back(2.2);
+
+  r.NewDatum("foo")
+      ->AddVal("bar", vect)
+      ->Record();
+
+  r.Close();
+  cyclus::QueryResult qr = b->Query("foo", NULL);
+  vect = qr.GetVal<std::vector<double> >("bar", 0);
+
+  ASSERT_EQ(2, vect.size());
+  EXPECT_DOUBLE_EQ(4.4, vect[0]);
+  EXPECT_DOUBLE_EQ(2.2, vect[1]);
+}
+
 TEST_F(SqliteBackTests, VectorString) {
   std::vector<std::string> vect;
   vect.push_back("four");
@@ -236,8 +254,8 @@ TEST_F(SqliteBackTests, VectorString) {
 
 
   r.NewDatum("foo")
-  ->AddVal("bar", vect)
-  ->Record();
+      ->AddVal("bar", vect)
+      ->Record();
 
   r.Close();
   cyclus::QueryResult qr = b->Query("foo", NULL);

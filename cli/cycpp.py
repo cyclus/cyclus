@@ -37,7 +37,7 @@ following handy table!
        is great for. Any variables defined here are kept in a separate
        namespace from the classes.  Since this gives you direct access to the
        Python interpreter, try to be a little careful.
-:note: Merges the argument (which like with var must evalutae to a dict) with the 
+:note: Merges the argument (which like with var must evalutae to a dict) with the
        current class level annotations. Enrties here overwrite previous entries.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
@@ -53,6 +53,7 @@ from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint, pformat
 import textwrap
+import difflib
 
 try:
     import simplejson as json
@@ -84,7 +85,7 @@ RE_STATEMENT = re.compile(
 
 CYCNS = 'cyclus'
 
-PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob', 
+PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob',
               'boost::uuids::uuid'}
 
 BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS)}
@@ -103,7 +104,7 @@ WRANGLERS = {
 #
 # pass 1
 #
-def preprocess_file(filename, includes=(), cpp_path='cpp', 
+def preprocess_file(filename, includes=(), cpp_path='cpp',
                     cpp_args=('-xc++', '-pipe', '-E', '-DCYCPP')):
     """Preprocess a file using cpp.
 
@@ -186,7 +187,8 @@ class LinemarkerFilter(Filter):
         lms = self.machine.linemarkers
         if not self.last_was_linemarker:
             del lms[:]
-        lms.append(fname + ":" + lineno)
+        lms.append((fname, int(lineno)))
+        self.machine.nlines_since_linemarker = -1
 
     def revert(self, statement, sep):
         self.last_was_linemarker = self.match is not None
@@ -405,7 +407,8 @@ class VarDeclarationFilter(Filter):
             state.context[classname] = OrderedDict()
         if 'vars' not in state.context[classname]:
             state.context[classname]['vars'] = OrderedDict()
-        annotations['type'] = state.canonize_type(vtype, vname)
+        annotations['type'] = state.canonize_type(vtype, vname, 
+                                                  statement=statement)
         annotations['index'] = len(state.context[classname]['vars'])
         state.context[classname]['vars'][vname] = annotations
         state.var_annotations = None
@@ -508,12 +511,13 @@ class StateAccumulator(object):
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.var_annotations = None
         self.linemarkers = []
+        self.nlines_since_linemarker = -1
         self.filters = [ClassAndSuperclassFilter(self), AccessFilter(self),
                         ExecFilter(self), UsingNamespaceFilter(self),
                         NamespaceAliasFilter(self), NamespaceFilter(self),
                         TypedefFilter(self), UsingFilter(self), LinemarkerFilter(self),
                         NoteDecorationFilter(self),
-                        VarDecorationFilter(self), VarDeclarationFilter(self), 
+                        VarDecorationFilter(self), VarDeclarationFilter(self),
                         ]
 
     def classname(self):
@@ -526,6 +530,7 @@ class StateAccumulator(object):
         """Modify the existing state by incoprorating the statement, which is
         partitioned from the next statement by sep.
         """
+        self.nlines_since_linemarker += statement.count('\n') + sep.count('\n')
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
@@ -540,11 +545,14 @@ class StateAccumulator(object):
         for filter in self.filters:
             filter.revert(statement, sep)
 
-    def includeloc(self):
+    def includeloc(self, statement=None):
         """Current location of the file from includes as a string."""
         if len(self.linemarkers) == 0:
             return ""
-        s = "\n Included from:\n  " + "\n  ".join(self.linemarkers)
+        s = "\n Included from:\n  " + "\n  ".join([lm[0] + ":" + str(lm[1]) \
+                                                  for lm in self.linemarkers])
+        if statement is not None:
+            s += "\n Snippet from " + self.linemarkers[-1][0] + ":\n  " + statement
         return s + "\n"
 
     #
@@ -561,7 +569,7 @@ class StateAccumulator(object):
         }
     scopz = '::'  # intern the scoping operator
 
-    def canonize_type(self, t, name="<member variable>"):
+    def canonize_type(self, t, name="<member variable>", statement=None):
         """Returns the canonical form for a type given the current state.
         This should not be called for types other than state variables.
         The name argument here is provided for debugging & reporting purposes.
@@ -583,19 +591,20 @@ class StateAccumulator(object):
                     # the alias - which is impossible.
                     continue
                 try:
-                    return self.canonize_type([nsa + scopz + tname] + targs, name)
+                    return self.canonize_type([nsa + scopz + tname] + targs, name, 
+                                              statement=statement)
                 except TypeError:
                     pass  # This is the TypeError from below
             else:
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
-                       "template type: {p}.").format(i=self.includeloc(), t=t,
-                       n=name, c=self.classname(),
+                       "template type: {p}.").format(i=self.includeloc(statement=statement), 
+                       t=t, n=name, c=self.classname(),
                        p=", ".join(sorted(self.known_templates)))
                 raise TypeError(msg)
         elif '<' in t:
             # string version of template type
             t = " ".join(t.strip().strip(scopz).split())
-            t = self.canonize_type(parse_template(t))
+            t = self.canonize_type(parse_template(t), name=name, statement=statement)
         else:
             # primitive type
             t = " ".join(t.strip().strip(scopz).split())
@@ -894,7 +903,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
     def _fmt(self, t):
         """returns a format string for a type t"""
         return '"{0}"' if t == 'std::string' else '{0}'
-    
+
     def read_primitive(self, member, t, d, ind="  "):
         s = ""
         tstr = type_to_str(t)
@@ -1100,12 +1109,12 @@ class SchemaFilter(CodeGeneratorFilter):
     pragmaname = "schema"
     methodrtn = "std::string"
 
-    alltypes = frozenset(['anyType', 'anySimpleType', 'string', 'boolean', 'decimal', 
-                          'float', 'double', 'duration', 'dateTime', 'time', 'date', 
-                          'gYearMonth', 'gYear', 'gMonthDay', 'gDay', 'gMonth', 
-                          'hexBinary', 'base64Binary', 'anyURI', 'QName', 'NOTATION', 
-                          'normalizedString', 'token', 'language', 'NMTOKEN', 
-                          'NMTOKENS', 'Name', 'NCName', 'ID', 'IDREF', 'IDREFS', 
+    alltypes = frozenset(['anyType', 'anySimpleType', 'string', 'boolean', 'decimal',
+                          'float', 'double', 'duration', 'dateTime', 'time', 'date',
+                          'gYearMonth', 'gYear', 'gMonthDay', 'gDay', 'gMonth',
+                          'hexBinary', 'base64Binary', 'anyURI', 'QName', 'NOTATION',
+                          'normalizedString', 'token', 'language', 'NMTOKEN',
+                          'NMTOKENS', 'Name', 'NCName', 'ID', 'IDREF', 'IDREFS',
                           'ENTITY', 'ENTITIES', 'integer', 'nonPositiveInteger',
                           'negativeInteger', 'long', 'int', 'short', 'byte',
                           'nonNegativeInteger', 'unsignedLong', 'unsignedInt',
@@ -1117,8 +1126,8 @@ class SchemaFilter(CodeGeneratorFilter):
         'std::string': 'string',
         'int': 'int',
         'float': 'float',
-        'double': 'double', 
-        'cyclus::Blob': 'string', 
+        'double': 'double',
+        'cyclus::Blob': 'string',
         'boost::uuids::uuid': 'token',
         }
 
@@ -1355,7 +1364,7 @@ class CodeGenerator(object):
     state.
     """
 
-    def __init__(self, context, superclasses):
+    def __init__(self, context, superclasses, filename=None):
         self.depth = 0
         self.context = context  # the results of pass 2
         self.superclasses = superclasses  # the results of pass 2
@@ -1365,6 +1374,7 @@ class CodeGenerator(object):
         self.namespaces = []  # stack of (depth, ns name) tuples
         self.aliases = set()  # set of (depth, name, alias) tuples
         self.linemarkers = []
+        self.nlines_since_linemarker = -1
         self.var_annotations = None
         # all basic code generating filters for core methods
         self.codegen_filters = [InitFromCopyFilter(self),
@@ -1405,11 +1415,14 @@ class CodeGenerator(object):
             same_prefix.append(s)
         return "::".join(clspath[len(same_prefix):] + [clsname])
 
-    def includeloc(self):
+    def includeloc(self, statement=None):
         """Current location of the file from includes as a string."""
         if len(self.linemarkers) == 0:
             return ""
-        s = "\n Included from:\n  " + "\n  ".join(self.linemarkers)
+        s = "\n Included from:\n  " + "\n  ".join([lm[0] + ":" + str(lm[1]) \
+                                                  for lm in self.linemarkers])
+        if statement is not None:
+            s += "\n Snippet from " + self.linemarkers[-1][0] + ":\n  " + statement
         return s + "\n"
 
     def generate(self, statement, sep):
@@ -1417,6 +1430,8 @@ class CodeGenerator(object):
         ignoring this statement, which is partitioned from the next statement by
         sep.
         """
+        nnewlines = statement.count('\n') + sep.count('\n')
+        self.nlines_since_linemarker += nnewlines
         # filters have to come before sep
         for filter in (() if len(statement) == 0 else self.filters):
             if filter.isvalid(statement):
@@ -1613,6 +1628,18 @@ def parent_intersection(classname, queryset, superclasses):
 
 ensure_startswith_newlinehash = lambda x: '\n' + x if x.startswith('#') else x
 
+def insert_line_directives(newfile, filename):
+    """Inserts line directives based on diff of original file."""
+    with open(filename) as f:
+        orig = f.read()
+    origlines = orig.splitlines()
+    newlines = newfile.splitlines()
+    sm = difflib.SequenceMatcher(a=origlines, b=newlines, autojunk=False)
+    blocks = sm.get_matching_blocks()
+    for i, j, n in blocks[-2::-1]:
+        newlines.insert(j, '#line {0} "{1}"'.format(i+1, filename))
+    return "\n".join(newlines)
+
 def main():
     doc = __doc__ + "\nfilename: " + os.path.abspath(__file__)
     parser = ArgumentParser(prog="cycpp", description=doc,
@@ -1655,6 +1682,7 @@ def main():
         orig = orig.replace('\\\n', '') # line continuation
     # pass 3
     newfile = generate_code(canon if ns.pass3_use_pp else orig, context, superclasses)
+    newfile = insert_line_directives(newfile, ns.path)
     if ns.output is None:
         print(newfile)
     else:

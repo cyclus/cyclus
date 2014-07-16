@@ -1,5 +1,5 @@
-#ifndef CYCLUS_TESTS_SD_MANAGER_TESTS_H_
-#define CYCLUS_TESTS_SD_MANAGER_TESTS_H_
+#ifndef CYCLUS_TESTS_TOOLKIT_SD_MANAGER_TESTS_H_
+#define CYCLUS_TESTS_TOOLKIT_SD_MANAGER_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -21,7 +21,7 @@ class SDManagerTests : public ::testing::Test {
   virtual void TearDown();
 };
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
 
-#endif  // CYCLUS_TESTS_SD_MANAGER_TESTS_H_
+#endif  // CYCLUS_TESTS_TOOLKIT_SD_MANAGER_TESTS_H_

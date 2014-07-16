@@ -1,112 +1,107 @@
-#ifndef SYMBOLICFUNCTIONS_H
-#define SYMBOLICFUNCTIONS_H
+#ifndef CYCLUS_SRC_TOOLKIT_SYMBOLIC_FUNCTIONS_H_
+#define CYCLUS_SRC_TOOLKIT_SYMBOLIC_FUNCTIONS_H_
 
-#include <string>
 #include <list>
+#include <string>
+
 #include <boost/shared_ptr.hpp>
 
 namespace cyclus {
 namespace toolkit {
 
-// forward declarations
+// Forward declarations
 class LinearFunction;
 class ExponentialFunction;
 class PiecewiseFunction;
 
-/// abstract base class for symbolic functions
+/// Abstract base class for symbolic functions
 class SymFunction {
  public:
   typedef boost::shared_ptr<SymFunction> Ptr;
-  
-  /// virtual destructor for an abstract base class
-  virtual ~SymFunction() {};
 
-  /// base class must define how to calculate demand (dbl argument)
+  /// Virtual destructor for an abstract base class
+  virtual ~SymFunction() {}
+
+  /// Base class must define how to calculate demand (dbl argument)
   virtual double value(double x) = 0;
 
-  /// every function must print itself
+  /// Every function must print itself
   virtual std::string Print() = 0;
 };
 
-/**
-   linear functions
-   f(x) = slope_ * x + intercept_
- */
+/// Linear functions
+/// f(x) = slope_ * x + intercept_
 class LinearFunction : public SymFunction {
  public:
-  /**
-     constructor for a linear function
-     @param s the slope
-     @param i the intercept, with the default being 0
-   */
-  LinearFunction(double s, double i = 0.0) :
-    slope_(s), intercept_(i) {};
+  /// Constructor for a linear function
+  /// @param s the slope
+  /// @param i the intercept, with the default being 0
+  LinearFunction(double s, double i = 0.0) : slope_(s), intercept_(i) {}
 
-  /// evaluation for an double argument
+  /// Evaluation for an double argument
   virtual double value(double x);
 
-  /// print a string of the function
+  /// Print a string of the function
   virtual std::string Print();
 
  private:
-  /// the slope
+  /// The slope
   double slope_;
 
-  /// the intercept
+  /// The intercept
   double intercept_;
 };
 
-/**
-   exponential functions
-   f(x) = constant_ * exp ( exponent_ * x ) + intercept_
- */
+/// Exponential functions
+/// f(x) = constant_ * exp ( exponent_ * x ) + intercept_
 class ExponentialFunction : public SymFunction {
  public:
-  /**
-     constructor for an exponential function
-     @param c the leading constant
-     @param e the exponent multiplier
-     @param i the intercept, with the default being 0
-   */
-  ExponentialFunction(double c, double e, double i = 0.0) :
-    constant_(c), exponent_(e), intercept_(i) {};
+  /// Constructor for an exponential function
+  /// @param c the leading constant
+  /// @param e the exponent multiplier
+  /// @param i the intercept, with the default being 0
+  ExponentialFunction(double c, double e, double i = 0.0)
+      : constant_(c),
+        exponent_(e),
+        intercept_(i) {}
 
-  /// evaluation for a double argument
+  /// Evaluation for a double argument
   virtual double value(double x);
 
-  /// print a string of the function
+  /// Print a string of the function
   virtual std::string Print();
 
  private:
-  /// the constant factor
+  /// The constant factor
   double constant_;
 
-  /// the exponent multiplier
+  /// The exponent multiplier
   double exponent_;
 
-  /// the intercept
+  /// The intercept
   double intercept_;
 };
 
-/**
-   piecewise function
-   f(x) for all x in [lhs,rhs]
-   0 otherwise
- */
+/// Piecewise function
+/// f(x) for all x in [lhs,rhs]
+/// 0 otherwise
 class PiecewiseFunction : public SymFunction {
   struct PiecewiseFunctionInfo {
     PiecewiseFunctionInfo(SymFunction::Ptr function_, double xoff_ = 0,
-                          double yoff_ = 0) :
-      function(function_), xoffset(xoff_), yoffset(yoff_) {};
+                          double yoff_ = 0)
+        : function(function_),
+          xoffset(xoff_),
+          yoffset(yoff_) {}
+
     SymFunction::Ptr function;
     double xoffset, yoffset;
   };
 
  public:
-  /// evaluation for an double argument
+  /// Evaluation for an double argument
   virtual double value(double x);
 
-  /// print a string of the function
+  /// Print a string of the function
   virtual std::string Print();
 
  private:
@@ -114,6 +109,8 @@ class PiecewiseFunction : public SymFunction {
 
   friend class PiecewiseFunctionFactory;
 };
-} // namespace toolkit
-} // namespace cyclus
-#endif
+
+}  // namespace toolkit
+}  // namespace cyclus
+
+#endif  // CYCLUS_SRC_TOOLKIT_SYMBOLIC_FUNCTIONS_H_

@@ -1,4 +1,3 @@
-// decayer.h
 #ifndef CYCLUS_SRC_DECAYER_H_
 #define CYCLUS_SRC_DECAYER_H_
 
@@ -31,61 +30,43 @@ class Decayer {
  public:
   Decayer(const CompMap& comp);
 
-  /**
-     set the composition from a CompMap
-   */
+  /// set the composition from a CompMap
   void GetResult(CompMap& comp);
 
   /// decay the material
   /// @param secs the number of seconds to decay
   void Decay(double secs);
 
-  /**
-     the number of tracked nuclides
-   */
+  /// the number of tracked nuclides
   int n_tracked_nuclides() {
     return nuclides_tracked_.size();
   }
 
-  /**
-     the tracked nuclide at position i
-   */
+  /// the tracked nuclide at position i
   int TrackedNuclide(int i) {
     return nuclides_tracked_.at(i);
   }
 
  private:
-  /**
-     Builds the decay matrix needed for the decay calculations from
-     the parent and daughters map variables. The resulting matrix is
-     stored in the static variable decayMatrix.
-   */
+  /// Builds the decay matrix needed for the decay calculations from
+  /// the parent and daughters map variables. The resulting matrix is
+  /// stored in the static variable decayMatrix.
   static void BuildDecayMatrix();
 
-  /**
-     The CompMap's parent
-   */
+  /// The CompMap's parent
   static ParentMap parent_;
 
-  /**
-     The CompMap's daughters
-   */
+  /// The CompMap's daughters
   static DaughtersMap daughters_;
 
-  /**
-     The decay matrix
-   */
+  /// The decay matrix
   static Matrix decay_matrix_;
 
-  /**
-     The atomic composition map
-   */
+  /// The atomic composition map
   Vector pre_vect_;
   Vector post_vect_;
 
-  /**
-     the list of tracked nuclides
-   */
+  /// the list of tracked nuclides
   static NucList nuclides_tracked_;
 
   /// Add the nuclide to the parent/daughter maps IFF it is not in the tracked list.

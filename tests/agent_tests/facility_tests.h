@@ -1,5 +1,5 @@
-#ifndef CYCLUS_TESTS_FACILITY_TESTS_H_
-#define CYCLUS_TESTS_FACILITY_TESTS_H_
+#ifndef CYCLUS_TESTS_AGENT_TESTS_FACILITY_TESTS_H_
+#define CYCLUS_TESTS_AGENT_TESTS_FACILITY_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -47,4 +47,4 @@ TEST(DummyTest, ValueParameterizedTestsAreNotSupportedOnThisPlatform) {}
 
 #endif  // GTEST_HAS_PARAM_TEST
 
-#endif  // CYCLUS_TESTS_FACILITY_TESTS_H_
+#endif  // CYCLUS_TESTS_AGENT_TESTS_FACILITY_TESTS_H_

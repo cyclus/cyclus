@@ -36,25 +36,25 @@ class StubInst : public cyclus::Institution {
   /// @param ctx the cyclus context for access to simulation-wide parameters
   explicit  StubInst(cyclus::Context* ctx);
 
-  /// every agent should be destructable
+  /// Every agent should be destructable
   virtual ~StubInst();
-  
+
   /// The Prime Directive
   /// Generates code that handles all input file reading and restart operations
   /// (e.g., reading from the database, instantiating a new object, etc.).
   /// @warning The Prime Directive must have a space before it! (A fix will be
   /// in 2.0 ^TM)
-  
+
   #pragma cyclus
 
   #pragma cyclus note {"doc": "A stub institution is provided as a " \
                               "skeleton for the design of new " \
                               "institution agents."}
 
-  /// every agent should be able to print a verbose description
+  /// Every agent should be able to print a verbose description
   virtual std::string str();
 
-  // and away we go!
+  // And away we go!
 };
 
 }  // namespace stubs

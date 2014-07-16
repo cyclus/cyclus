@@ -55,5 +55,5 @@ TEST(CommodRecCtx, DuplicateOutcommod) {
   EXPECT_EQ(1, ctx.out_commods().size());
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

@@ -34,5 +34,5 @@ void CommodityTestHelper::SetUpProducers() {
   producer2->SetCapacity(commodity, capacity);
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

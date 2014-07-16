@@ -7,14 +7,15 @@
 
 namespace cyclus {
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
-  : solver_t_(solver_t), ExchangeSolver(exclusive_orders) { }
+    : solver_t_(solver_t),
+      ExchangeSolver(exclusive_orders) {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ProgSolver::~ProgSolver() { }
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ProgSolver::~ProgSolver() {}
 
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ProgSolver::SolveGraph() {
   SolverFactory sf(solver_t_);
   OsiSolverInterface* iface = sf.get();
@@ -30,4 +31,4 @@ void ProgSolver::SolveGraph() {
   delete iface;
 }
 
-} // namespace cyclus
+}  // namespace cyclus

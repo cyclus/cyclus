@@ -42,8 +42,7 @@ inline std::set<BidPortfolio<Material>::Ptr>
 
 template<>
 inline std::set<BidPortfolio<Product>::Ptr>
-    QueryBids<Product>(Trader* t,
-                       CommodMap<Product>::type& map) {
+    QueryBids<Product>(Trader* t, CommodMap<Product>::type& map) {
   return t->GetProductBids(map);
 }
 
@@ -68,8 +67,7 @@ template<>
 inline void PopulateTradeResponses<Product>(
     Trader* trader,
     const std::vector< Trade<Product> >& trades,
-    std::vector<std::pair<Trade<Product>,
-        Product::Ptr> >& responses) {
+    std::vector<std::pair<Trade<Product>, Product::Ptr> >& responses) {
   trader->GetProductTrades(trades, responses);
 }
 
@@ -83,16 +81,14 @@ inline static void AcceptTrades(
 template<>
 inline void AcceptTrades(
     Trader* trader,
-    const std::vector< std::pair<Trade<Material>, 
-        Material::Ptr> >& responses) {
+    const std::vector< std::pair<Trade<Material>, Material::Ptr> >& responses) {
   trader->AcceptMatlTrades(responses);
 }
 
 template<>
 inline void AcceptTrades(
     Trader* trader,
-    const std::vector< std::pair<Trade<Product>,
-        Product::Ptr> >& responses) {
+    const std::vector< std::pair<Trade<Product>, Product::Ptr> >& responses) {
   trader->AcceptProductTrades(responses);
 }
 

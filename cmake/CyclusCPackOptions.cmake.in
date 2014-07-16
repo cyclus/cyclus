@@ -1,30 +1,30 @@
 # This file is configured at cmake time, and loaded at cpack time.
 # To pass variables to cpack from cmake, they must be configured
-# in this file.  
+# in this file.
 
 if(CPACK_GENERATOR MATCHES "NSIS")
-  SET(CPACK_NSIS_INSTALL_ROOT "@CPACK_NSIS_INSTALL_ROOT@")
+    SET(CPACK_NSIS_INSTALL_ROOT "@CPACK_NSIS_INSTALL_ROOT@")
 
-  # set the install/unistall icon used for the installer itself
-  # There is a bug in NSI that does not handle full unix paths properly.
-  SET(CPACK_NSIS_MUI_ICON "@CYCLUS_SOURCE_DIR@/Config\\cyclus_logo.png")
-  SET(CPACK_NSIS_MUI_UNIICON "@CYCLIS_SOURCE_DIR@/Config\\cyclus_logo.png")
-  # set the package header icon for MUI
-  SET(CPACK_PACKAGE_ICON "@CYCLUS_SOURCE_DIR@/Config\\cyclus_logo.png")
-  # tell cpack to create links to the doc files
-  SET(CPACK_NSIS_MENU_LINKS
-    "http://www.cyclus.github.com" "Cyclus Web Site"
-    "http://cnerg.engr.wisc.edu/cyclus/docs/" "Cyclus Documentation"
-    )
-  # Use the icon for add-remove programs
-  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\cyclus.exe")
+    # set the install/unistall icon used for the installer itself
+    # There is a bug in NSI that does not handle full unix paths properly.
+    SET(CPACK_NSIS_MUI_ICON "@CYCLUS_SOURCE_DIR@/Config\\cyclus_logo.png")
+    SET(CPACK_NSIS_MUI_UNIICON "@CYCLIS_SOURCE_DIR@/Config\\cyclus_logo.png")
+    # set the package header icon for MUI
+    SET(CPACK_PACKAGE_ICON "@CYCLUS_SOURCE_DIR@/Config\\cyclus_logo.png")
+    # tell cpack to create links to the doc files
+    SET(CPACK_NSIS_MENU_LINKS
+        "http://www.cyclus.github.com" "Cyclus Web Site"
+        "http://cnerg.engr.wisc.edu/cyclus/docs/" "Cyclus Documentation"
+        )
+    # Use the icon for add-remove programs
+    SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\cyclus.exe")
 
-  SET(CPACK_NSIS_PACKAGE_NAME "@CPACK_NSIS_PACKAGE_NAME@")
-  SET(CPACK_NSIS_DISPLAY_NAME "@CPACK_NSIS_PACKAGE_NAME@, a cross-platform, open-source build system")
-  SET(CPACK_NSIS_HELP_LINK "http://www.cyclus.github.com")
-  SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.cyclus.github.com")
-  SET(CPACK_NSIS_CONTACT "cyclus-dev@googlegroups.com")
-  SET(CPACK_NSIS_MODIFY_PATH ON)
+    SET(CPACK_NSIS_PACKAGE_NAME "@CPACK_NSIS_PACKAGE_NAME@")
+    SET(CPACK_NSIS_DISPLAY_NAME "@CPACK_NSIS_PACKAGE_NAME@, a cross-platform, open-source build system")
+    SET(CPACK_NSIS_HELP_LINK "http://www.cyclus.github.com")
+    SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.cyclus.github.com")
+    SET(CPACK_NSIS_CONTACT "cyclus-dev@googlegroups.com")
+    SET(CPACK_NSIS_MODIFY_PATH ON)
 endif(CPACK_GENERATOR MATCHES "NSIS")
 
 # include the cpack options for qt dialog if they exisit
@@ -32,15 +32,15 @@ endif(CPACK_GENERATOR MATCHES "NSIS")
 INCLUDE("@QT_DIALOG_CPACK_OPTIONS_FILE@" OPTIONAL)
 
 if(CPACK_GENERATOR MATCHES "CygwinSource")
-  # when packaging source make sure the .build directory is not included
+    # when packaging source make sure the .build directory is not included
     SET(CPACK_SOURCE_IGNORE_FILES
-      "/CVS/" "/\\.build/" "/\\.svn/" "\\.swp$" "\\.#" "/#" "~$")
+        "/CVS/" "/\\.build/" "/\\.svn/" "\\.swp$" "\\.#" "/#" "~$")
 endif(CPACK_GENERATOR MATCHES "CygwinSource")
 
 if("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
-  if(CMAKE_PACKAGE_QTGUI)                       
-    set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
-  else(CMAKE_PACKAGE_QTGUI)                     
-    set(CPACK_PACKAGE_DEFAULT_LOCATION "/usr")
-  endif(CMAKE_PACKAGE_QTGUI)                    
+    if(CMAKE_PACKAGE_QTGUI)
+        set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
+    else(CMAKE_PACKAGE_QTGUI)
+        set(CPACK_PACKAGE_DEFAULT_LOCATION "/usr")
+    endif(CMAKE_PACKAGE_QTGUI)
 endif("${CPACK_GENERATOR}" STREQUAL "PackageMaker")

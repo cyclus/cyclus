@@ -1,15 +1,14 @@
-
 #include <gtest/gtest.h>
 
-#include "sqlite_back.h"
-#include "recorder.h"
-#include "context.h"
-#include "timer.h"
-#include "sim_init.h"
-#include "facility.h"
-#include "toolkit/resource_buff.h"
-#include "material.h"
 #include "composition.h"
+#include "context.h"
+#include "facility.h"
+#include "material.h"
+#include "recorder.h"
+#include "sim_init.h"
+#include "sqlite_back.h"
+#include "timer.h"
+#include "toolkit/resource_buff.h"
 
 static const char* dbpath = "testsiminit.sqlite";
 
@@ -30,19 +29,19 @@ class Inver : public cy::Facility {
   virtual void InitFrom(Inver* a) {
     cy::Facility::InitFrom(a);
     val1 = a->val1;
-  };
+  }
 
   virtual void InitFrom(cy::QueryableBackend* b) {
     cy::Facility::InitFrom(b);
     cy::QueryResult qr = b->Query("Info", NULL);
     val1 = qr.GetVal<int>("val1");
-  };
+  }
 
   virtual void Snapshot(cy::DbInit di) {
     di.NewDatum("Info")
-      ->AddVal("val1", val1)
-      ->Record();
-  };
+        ->AddVal("val1", val1)
+        ->Record();
+  }
 
   virtual void Build(Agent* parent) {
     cy::Facility::Build(parent);
@@ -57,12 +56,12 @@ class Inver : public cy::Facility {
     buf1.Push(m1);
     buf2.Push(m2);
     buf2.Push(m3);
-  };
+  }
 
   virtual void InitInv(cy::Inventories& inv) {
     buf1.PushAll(inv["buf1"]);
     buf2.PushAll(inv["buf2"]);
-  };
+  }
 
   virtual cy::Inventories SnapshotInv() {
     cy::Inventories invs;
@@ -72,8 +71,8 @@ class Inver : public cy::Facility {
     buf2.PushAll(invs["buf2"]);
     return invs;
   }
-  virtual void Tick() {context()->Snapshot();};
-  virtual void Tock() { };
+  virtual void Tick() { context()->Snapshot(); }
+  virtual void Tock() {};
 
   cy::toolkit::ResourceBuff buf1;
   cy::toolkit::ResourceBuff buf2;
@@ -86,7 +85,7 @@ Agent* ConstructInver(cy::Context* ctx) {
 
 class SimInitTest : public ::testing::Test {
  public:
-  SimInitTest() : rec(300) { }
+  SimInitTest() : rec(300) {}
 
  protected:
   virtual void SetUp() {
@@ -149,25 +148,25 @@ class SimInitTest : public ::testing::Test {
     cy::Resource::nextobj_id_ = 1;
     cy::Composition::next_id_ = 1;
     cy::Product::next_qualid_ = 1;
-  };
-  int agentid() { return Agent::next_id_; };
-  int stateid() { return cy::Resource::nextstate_id_; };
-  int objid() { return cy::Resource::nextobj_id_; };
-  int compid() { return cy::Composition::next_id_; };
-  int prodid() { return cy::Product::next_qualid_; };
-  int transid(cy::Context* ctx) { return ctx->trans_id_; };
+  }
+  int agentid() { return Agent::next_id_; }
+  int stateid() { return cy::Resource::nextstate_id_; }
+  int objid() { return cy::Resource::nextobj_id_; }
+  int compid() { return cy::Composition::next_id_; }
+  int prodid() { return cy::Product::next_qualid_; }
+  int transid(cy::Context* ctx) { return ctx->trans_id_; }
 
-  cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; };
-  std::set<Agent*> agent_list(cy::Context* ctx) { return ctx->agent_list_; };
-  std::set<cy::TimeListener*> tickers(cy::Timer* ti) { return ti->tickers_; };
+  cy::SimInfo siminfo(cy::Context* ctx) { return ctx->si_; }
+  std::set<Agent*> agent_list(cy::Context* ctx) { return ctx->agent_list_; }
+  std::map<int, cy::TimeListener*> tickers(cy::Timer* ti) { return ti->tickers_; }
 
   std::map<int, std::vector<std::pair<std::string, Agent*> > >
   build_queue(cy::Timer* ti) {
     return ti->build_queue_;
-  };
+  }
   std::map<int, std::vector<Agent*> > decom_queue(cy::Timer* ti) {
     return ti->decom_queue_;
-  };
+  }
 
   cy::Context* ctx;
   cy::Timer ti;
@@ -241,7 +240,7 @@ TEST_F(SimInitTest, InitRecipes) {
 TEST_F(SimInitTest, InitTimeListeners) {
   cy::SimInit si;
   si.Init(&rec, b);
-  std::set<cy::TimeListener*> init_tickers = tickers(si.timer());
+  std::map<int, cy::TimeListener*> init_tickers = tickers(si.timer());
 
   ASSERT_EQ(2, init_tickers.size());
 }
@@ -324,8 +323,8 @@ TEST_F(SimInitTest, InitAgentState) {
     init_byid[(*it)->id()] = *it;
   }
 
-  ASSERT_EQ(4, byid.size()); // 2 deployed, 2 protos
-  ASSERT_EQ(4, init_byid.size()); // 2 deployed, 2 protos
+  ASSERT_EQ(4, byid.size());  // 2 deployed, 2 protos
+  ASSERT_EQ(4, init_byid.size());  // 2 deployed, 2 protos
 
   std::map<int, Agent*>::iterator i;
   for (i = byid.begin(); i != byid.end(); ++i) {
@@ -369,8 +368,8 @@ TEST_F(SimInitTest, InitAgentInventories) {
     init_byid[(*it)->id()] = *it;
   }
 
-  ASSERT_EQ(4, init_byid.size()); // 2 deployed, 2 protos
-  ASSERT_EQ(4, byid.size()); // 2 deployed, 2 protos
+  ASSERT_EQ(4, init_byid.size());  // 2 deployed, 2 protos
+  ASSERT_EQ(4, byid.size());  // 2 deployed, 2 protos
 
   cy::Composition::Ptr recipe1 = ctx->GetRecipe("recipe1");
   cy::Composition::Ptr recipe2 = ctx->GetRecipe("recipe2");

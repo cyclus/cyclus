@@ -164,5 +164,5 @@ TEST_F(SymbolicFunctionTests, piecewisefunc) {
   // output.close();
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

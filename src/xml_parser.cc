@@ -1,4 +1,3 @@
-// xml_parser.cc
 #include "xml_parser.h"
 
 #include <stdlib.h>
@@ -29,8 +28,7 @@ void XMLParser::Init(const std::stringstream& xml_input_snippet) {
       throw ValidationError("Could not parse xml file.");
     }
   } catch (const std::exception& ex) {
-    throw ValidationError("Error loading xml file: " +
-                          std::string(ex.what()));
+    throw ValidationError("Error loading xml file: " + std::string(ex.what()));
   }
 }
 
@@ -57,5 +55,5 @@ xmlpp::Document* XMLParser::Document() {
   }
   return doc;
 }
-}  // namespace cyclus
 
+}  // namespace cyclus

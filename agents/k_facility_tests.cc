@@ -2,9 +2,9 @@
 
 #include "k_facility.h"
 
+#include "agent_tests.h"
 #include "context.h"
 #include "facility_tests.h"
-#include "agent_tests.h"
 
 using cyclus::KFacility;
 
@@ -31,12 +31,12 @@ cyclus::Agent* KFacilityConstructor(cyclus::Context* ctx) {
   return dynamic_cast<cyclus::Agent*>(new KFacility(ctx));
 }
 
-// required to get functionality in cyclus agent unit tests library
+// Required to get functionality in cyclus agent unit tests library
 #ifndef CYCLUS_AGENT_TESTS_CONNECTED
 int ConnectAgentTests();
 static int cyclus_agent_tests_connected = ConnectAgentTests();
 #define CYCLUS_AGENT_TESTS_CONNECTED cyclus_agent_tests_connected
-#endif // CYCLUS_AGENT_TESTS_CONNECTED
+#endif  // CYCLUS_AGENT_TESTS_CONNECTED
 
 INSTANTIATE_TEST_CASE_P(KFac, FacilityTests,
                         ::testing::Values(&KFacilityConstructor));

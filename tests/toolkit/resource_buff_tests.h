@@ -1,5 +1,5 @@
-#ifndef CYCLUS_TESTS_RESOURCE_BUFF_TESTS_H_
-#define CYCLUS_TESTS_RESOURCE_BUFF_TESTS_H_
+#ifndef CYCLUS_TESTS_TOOLKIT_RESOURCE_BUFF_TESTS_H_
+#define CYCLUS_TESTS_TOOLKIT_RESOURCE_BUFF_TESTS_H_
 
 #include <gtest/gtest.h>
 
@@ -63,7 +63,7 @@ class ResourceBuffTest : public ::testing::Test {
   }
 };
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
 
-#endif  // CYCLUS_TESTS_RESOURCE_BUFF_TESTS_H_
+#endif  // CYCLUS_TESTS_TOOLKIT_RESOURCE_BUFF_TESTS_H_

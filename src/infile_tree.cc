@@ -1,11 +1,11 @@
-// infile_tree.cc
 // Implements class for querying XML snippets
 #include <iostream>
 #include <sstream>
 
+#include <boost/lexical_cast.hpp>
+
 #include "error.h"
 #include "infile_tree.h"
-#include <boost/lexical_cast.hpp>
 
 namespace cyclus {
 
@@ -134,4 +134,5 @@ InfileTree* InfileTree::SubTree(std::string query, int index) {
   spawned_children_.insert(qe_child);
   return qe_child;
 }
+
 }  // namespace cyclus

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_EXCHANGE_TRANSLATION_CONTEXT_H_
-#define CYCLUS_EXCHANGE_TRANSLATION_CONTEXT_H_
+#ifndef CYCLUS_SRC_EXCHANGE_TRANSLATION_CONTEXT_H_
+#define CYCLUS_SRC_EXCHANGE_TRANSLATION_CONTEXT_H_
 
 #include <map>
 
@@ -23,6 +23,6 @@ struct ExchangeTranslationContext {
   std::map<ExchangeNode::Ptr, Bid<T>*> node_to_bid;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif // CYCLUS_EXCHANGE_TRANSLATION_CONTEXT_H_
+#endif  // CYCLUS_SRC_EXCHANGE_TRANSLATION_CONTEXT_H_

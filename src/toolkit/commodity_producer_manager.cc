@@ -16,6 +16,5 @@ double CommodityProducerManager::TotalCapacity(Commodity& commodity) {
   return total;
 }
 
-} // namespace toolkit
-} // namespace cyclus
-
+}  // namespace toolkit
+}  // namespace cyclus

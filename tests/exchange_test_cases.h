@@ -13,7 +13,7 @@ class ExchangeGraph;
 /// To add test case support of a new solver type, add to the solver_type
 /// if-then statement for the test case of your choosing.
 class ExchangeCase {
-public:
+ public:
   virtual ~ExchangeCase() {}
 
   /// constructs an instance of an exchange graph for the test case

@@ -48,5 +48,5 @@ TEST_F(CommodityProducerManagerTests, differentcommodity) {
   EXPECT_EQ(manager.TotalCapacity(differentcommodity), 0.0);
 }
 
-} // namespace toolkit
-} // namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus

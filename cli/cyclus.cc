@@ -25,8 +25,8 @@ namespace fs = boost::filesystem;
 using namespace cyclus;
 
 struct ArgInfo {
-  po::variables_map vm;  // holds parsed/specified cli opts and values
-  po::options_description desc;  // holds cli opts description;
+  po::variables_map vm;  // Holds parsed/specified cli opts and values
+  po::options_description desc;  // Holds cli opts description
   bool flat_schema;
   std::string schema_path;
   std::string output_path;
@@ -50,16 +50,16 @@ static std::string usage = "Usage:   cyclus [opts] [input-file]";
 // Main entry point for the test application...
 //-----------------------------------------------------------------------
 int main(int argc, char* argv[]) {
-  // close all dlopen'd modules AFTER everything else destructs
+  // Close all dlopen'd modules AFTER everything else destructs
   DynamicModule::Closer cl;
 
-  // tell ENV the path between the cwd and the cyclus executable
+  // Tell ENV the path between the cwd and the cyclus executable
   std::string path = Env::PathBase(argv[0]);
 
-  // tell pyne about the path to nuc data
+  // Tell pyne about the path to nuc data
   Env::SetNucDataPath();
 
-  // handle cli option flags
+  // Handle cli option flags
   ArgInfo ai;
   int ret = ParseCliArgs(&ai, argc, argv);
   if (ret > -1) {
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     return ret;
   }
 
-  // process positional args
+  // Process positional args
   std::string infile;
   if (ai.vm.count("input-file") == 0 && ai.restart == "") {
     std::cout << "No input file specified.\n"
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     infile = ai.vm["input-file"].as<std::string>();
   }
 
-  // announce yourself
+  // Announce yourself
   std::cout << "              :                                                               " << std::endl;
   std::cout << "          .CL:CC CC             _Q     _Q  _Q_Q    _Q    _Q              _Q   " << std::endl;
   std::cout << "        CC;CCCCCCCC:C;         /_\\)   /_\\)/_/\\\\)  /_\\)  /_\\)            /_\\)  " << std::endl;
@@ -111,10 +111,10 @@ int main(int argc, char* argv[]) {
   std::cout << "           .  C. ,                                                            " << std::endl;
   std::cout << "              :                                                               " << std::endl;
 
-  // create db backends and recorder
+  // Create db backends and recorder
   FullBackend* fback = NULL;
   RecBackend::Deleter bdel;
-  Recorder rec;  // must be after backend deleter because ~Rec does flushing
+  Recorder rec;  // Must be after backend deleter because ~Rec does flushing
 
   std::string ext = fs::path(ai.output_path).extension().string();
   std::string stem = fs::path(ai.output_path).stem().string();
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
   rec.RegisterBackend(fback);
   bdel.Add(fback);
 
-  // try to detect schema type
+  // Try to detect schema type
   std::stringstream input;
   LoadStringstreamFromFile(input, infile);
   boost::shared_ptr<XMLParser> parser =
@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
 
   SimInit si;
   if (ai.restart == "") {
-    // read input file and initialize db and simulation from input file
+    // Read input file and initialize db and simulation from input file
     try {
       if (ai.flat_schema) {
         XMLFlatLoader l(&rec, fback, ai.schema_path, infile);
@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
 
     si.Init(&rec, fback);
   } else {
-    // read output db and restart simulation from specified simid and timestep
+    // Read output db and restart simulation from specified simid and timestep
     std::vector<std::string> parts;
     boost::split(parts, ai.restart, boost::is_any_of(":"));
     if (parts.size() != 3) {
@@ -228,13 +228,16 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("flat-schema", "use the flat master simulation schema")
       ("agent-annotations", po::value<std::string>(),
        "dump the annotations for the named agent")
+      ("agent-listing,l", po::value<std::string>(),
+       "dump the agents in a library.")
+      ("all-agent-listing,a", "dump all the agents cyclus knows about.")
       ("no-agent", "only print log entries from cyclus core code")
       ("no-mem", "exclude memory log statement from logger output")
       ("verb,v", po::value<std::string>(),
        "log verbosity. integer from 0 (quiet) to 11 (verbose).")
       ("output-path,o", po::value<std::string>(), "output path")
       ("input-file", po::value<std::string>(), "input file")
-      ("warn-limit", po::value<unsigned int>(), 
+      ("warn-limit", po::value<unsigned int>(),
        "number of warnings to issue per kind, defaults to 1")
       ("warn-as-error", "throw errors when warnings are issued")
       ("path,p", "print the CYCLUS_PATH")
@@ -260,13 +263,13 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
   p.add("input-file", 1);
 
   po::store(po::command_line_parser(argc, argv).
-            options(ai->desc).positional(p).run(), ai->vm);
+                options(ai->desc).positional(p).run(), ai->vm);
   po::notify(ai->vm);
   return -1;
 }
 
 int EarlyExitArgs(const ArgInfo& ai) {
-  // respond to command line args that don't run a simulation
+  // Respond to command line args that don't run a simulation
   if (ai.vm.count("help")) {
     std::cout << usage << "\n\n"
               << ai.desc << "\n";
@@ -335,12 +338,34 @@ int EarlyExitArgs(const ArgInfo& ai) {
       std::cout << err.what() << "\n";
     }
     return 0;
+  } else if (ai.vm.count("agent-listing")) {
+    std::string name(ai.vm["agent-listing"].as<std::string>());
+    try {
+      size_t colpos = name.find(":");
+      std::string p = name.substr(0, colpos);
+      std::string lib = name.substr(colpos+1, std::string::npos);
+      std::set<std::string> specs = cyclus::DiscoverSpecs(p, lib);
+      for (std::set<std::string>::iterator it = specs.begin(); it != specs.end(); ++it)
+        std::cout << *it << "\n";
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("all-agent-listing")) {
+    try {
+      std::set<std::string> specs = cyclus::DiscoverSpecsInCyclusPath();
+      for (std::set<std::string>::iterator it = specs.begin(); it != specs.end(); ++it)
+        std::cout << *it << "\n";
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
   }
-  return -1;  // main should not return early
+  return -1;  // Main should not return early
 }
 
 void GetSimInfo(ArgInfo* ai) {
-  // schema info
+  // Schema info
   ai->flat_schema = ai->vm.count("flat-schema") > 0;
   ai->schema_path = Env::rng_schema(ai->flat_schema);
   if (ai->vm.count("schema-path")) {
@@ -351,7 +376,7 @@ void GetSimInfo(ArgInfo* ai) {
     ai->restart = ai->vm["restart"].as<std::string>();
   }
 
-  // logging params
+  // Logging params
   if (ai->vm.count("no-agent")) {
     Logger::NoAgent() = true;
   }
@@ -367,13 +392,13 @@ void GetSimInfo(ArgInfo* ai) {
     }
   }
 
-  // warning params
-  if (ai->vm.count("warn-limit")) 
+  // Warning params
+  if (ai->vm.count("warn-limit"))
     cyclus::warn_limit = ai->vm["warn-limit"].as<unsigned int>();
-  if (ai->vm.count("warn-as-error")) 
+  if (ai->vm.count("warn-as-error"))
     cyclus::warn_as_error = true;
 
-  // output path
+  // Output path
   ai->output_path = "cyclus.sqlite";
   if (ai->vm.count("output-path")) {
     ai->output_path = ai->vm["output-path"].as<std::string>();

@@ -22,7 +22,7 @@ struct Converter {
   /// @param a the associated arc for the potential offer
   /// @param ctx the exchange context in which the offer is being made
   ///
-  /// @warning it is up to the user to inherit default parameters 
+  /// @warning it is up to the user to inherit default parameters
   virtual double convert(
       boost::shared_ptr<T> offer,
       Arc const * a = NULL,

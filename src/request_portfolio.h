@@ -1,5 +1,5 @@
-#ifndef CYCLUS_REQUEST_PORTFOLIO_H_
-#define CYCLUS_REQUEST_PORTFOLIO_H_
+#ifndef CYCLUS_SRC_REQUEST_PORTFOLIO_H_
+#define CYCLUS_SRC_REQUEST_PORTFOLIO_H_
 
 #include <numeric>
 #include <set>
@@ -20,9 +20,9 @@ class Trader;
 
 /// @brief accumulator sum for request quantities
 template<class T>
-    inline double SumQty(double total, Request<T>* r) {
+inline double SumQty(double total, Request<T>* r) {
   return total += r->target()->quantity();
-};
+}
 
 /// @brief provide coefficients for default mass constraints
 ///
@@ -30,13 +30,12 @@ template<class T>
 /// converter. The arc and exchange context are used in order to reference the
 /// original request so that the request's coefficient can be applied.
 template<class T>
-struct QtyCoeffConverter: public Converter<T> {
-  QtyCoeffConverter(
-      const std::map<Request<T>*, double>& coeffs)
-       : coeffs(coeffs) { };
+struct QtyCoeffConverter : public Converter<T> {
+  QtyCoeffConverter(const std::map<Request<T>*, double>& coeffs)
+      : coeffs(coeffs) {}
 
   inline virtual double convert(
-      boost::shared_ptr<T> offer, 
+      boost::shared_ptr<T> offer,
       Arc const * a,
       ExchangeTranslationContext<T> const * ctx) const {
     return offer->quantity() * coeffs.at(ctx->node_to_request.at(a->unode()));
@@ -47,12 +46,12 @@ struct QtyCoeffConverter: public Converter<T> {
         dynamic_cast<QtyCoeffConverter<T>*>(&other);
     return cast != NULL && coeffs == cast->coeffs;
   }
-  
+
   std::map<Request<T>*, double> coeffs;
 };
 
 /// @class RequestPortfolio
-/// 
+///
 /// @brief A RequestPortfolio is a group of (possibly constrainted) requests for
 /// resources
 ///
@@ -66,14 +65,14 @@ struct QtyCoeffConverter: public Converter<T> {
 /// The ExchangeTranslator will automatically add a mass-based constraint, that
 /// accounts for mutual requests, if the portfolio has them. , e.g.,
 /// @code
-/// 
+///
 /// RequestPortfolio<SomeResource>::Ptr rp(new RequestPortfolio<SomeResource>());
 /// // add some requests
 /// rp->AddRequest(/* args */);
 /// // declare some of them as multicommodity requsts (i.e., any one will
 /// // satisfy this demand).
 /// rp->AddMutualReqs(/* args */);
-/// 
+///
 /// @endcode
 ///
 /// A default constraint will add unity for normal requests in the portfolio,
@@ -89,7 +88,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
  public:
   typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
 
-  RequestPortfolio() : requester_(NULL), qty_(0) {};
+  RequestPortfolio() : requester_(NULL), qty_(0) {}
 
   /// deletes all requests associated with it
   ~RequestPortfolio() {
@@ -97,7 +96,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     for (it = requests_.begin(); it != requests_.end(); ++it) {
       delete *it;
     }
-  };
+  }
 
   /// @brief add a request to the portfolio
   /// @param target the target resource associated with this request
@@ -109,10 +108,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// i.e., in its entirety by a single offer
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
-  Request<T>* AddRequest(boost::shared_ptr<T> target,
-                         Trader* requester,
-                         std::string commodity = "",
-                         double preference = 0,
+  Request<T>* AddRequest(boost::shared_ptr<T> target, Trader* requester,
+                         std::string commodity = "", double preference = 0,
                          bool exclusive = false) {
     Request<T>* r =
         Request<T>::Create(target, requester, this->shared_from_this(),
@@ -122,13 +119,12 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     mass_coeffs_[r] = 1;
     qty_ += target->quantity();
     return r;
-  };
+  }
 
   /// @brief adds a collection of requests (already having been registered with
   /// this portfolio) as multicommodity requests
   /// @param rs the collection of requests to add
-  inline void AddMutualReqs(
-      const std::vector<Request<T>*>& rs) {
+  inline void AddMutualReqs(const std::vector<Request<T>*>& rs) {
     double avg_qty =
         std::accumulate(rs.begin(), rs.end(), 0.0, SumQty<T>) / rs.size();
     double qty;
@@ -141,14 +137,14 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     }
     qty_ += avg_qty;
   }
-  
+
   /// @brief add a capacity constraint associated with the portfolio, if it
   /// doesn't already exist
   /// @param c the constraint to add
   inline void AddConstraint(const CapacityConstraint<T>& c) {
     constraints_.insert(c);
-  };
-      
+  }
+
   /// @return the agent associated with the portfolio. if no reqeusts have
   /// been added, the requester is NULL.
   inline Trader* requester() const { return requester_; }
@@ -162,18 +158,18 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @return const access to the unconstrained requests
   inline const std::vector<Request<T>*>& requests() const {
     return requests_;
-  };
-  
+  }
+
   /// @return const access to the request constraints
   inline const std::set< CapacityConstraint<T> >& constraints() const {
     return constraints_;
-  };
+  }
 
   /// returns a capacity converter for this portfolios request quantities
   inline typename Converter<T>::Ptr qty_converter() {
     return typename Converter<T>::Ptr(new QtyCoeffConverter<T>(mass_coeffs_));
   }
-  
+
  private:
   /// @brief copy constructor is private to prevent copying and preserve
   /// explicit single-ownership of requests
@@ -186,7 +182,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     for (it = requests_.begin(); it != requests_.end(); ++it) {
       it->get()->set_portfolio(this->shared_from_this());
     }
-  };
+  }
 
   /// @brief if the requester has not been determined yet, it is set. otherwise
   /// VerifyRequester() verifies the the request is associated with the portfolio's
@@ -200,7 +196,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
       std::string msg = "Insertion error: requesters do not match.";
       throw KeyError(msg);
     }
-  };
+  }
 
   /// requests_ is a vector because many requests may be identical, i.e., a set
   /// is not appropriate
@@ -217,6 +213,6 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   Trader* requester_;
 };
 
-} // namespace cyclus
+}  // namespace cyclus
 
-#endif
+#endif  // CYCLUS_SRC_REQUEST_PORTFOLIO_H_

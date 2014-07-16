@@ -1,27 +1,23 @@
-// facility.cc
 // Implements the Facility class
-
 #include "facility.h"
 
-#include "timer.h"
+#include <limits>
+#include <sstream>
+#include <stdlib.h>
+
+#include "error.h"
 #include "infile_tree.h"
 #include "institution.h"
-#include "error.h"
-
-#include <stdlib.h>
-#include <sstream>
 #include "logger.h"
-#include <limits>
+#include "timer.h"
 
 namespace cyclus {
 
-Facility::Facility(Context* ctx)
-    : Trader(this),
-      Agent(ctx) {
+Facility::Facility(Context* ctx) : Trader(this), Agent(ctx) {
   kind_ = "Facility";
-};
+}
 
-Facility::~Facility() {};
+Facility::~Facility() {}
 
 
 void Facility::InitFrom(Facility* m) {
@@ -44,7 +40,7 @@ std::string Facility::str() {
      << " lifetime: " << lifetime()
      << " build date: " << enter_time();
   return ss.str();
-};
+}
 
 void Facility::Decommission() {
   if (!CheckDecommissionCondition()) {
@@ -60,4 +56,4 @@ bool Facility::CheckDecommissionCondition() {
   return true;
 }
 
-} // namespace cyclus
+}  // namespace cyclus

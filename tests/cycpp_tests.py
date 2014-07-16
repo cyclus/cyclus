@@ -211,8 +211,8 @@ class MockCodeGenMachine(object):
     def __init__(self):
         self.depth = 0
         self.execns = {}
-        self.context = {"MyFactory": OrderedDict([('vars', OrderedDict([ 
-            ('x', {'type': 'int', 'schematype': 'positiveInteger'}), 
+        self.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'schematype': 'positiveInteger'}),
             ('y', {'type': 'std::string',
                    'shape': [42],
                    'initfromcopy': 'y=m -> y;\n',
@@ -336,8 +336,8 @@ def test_schemafilter():
     yield assert_equal, 'boolean', f._type('bool')
     yield assert_equal, 'token', f._type('std::string', 'token')
 
-    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([ 
-            ('x', {'type': ('std::map', 'int', 'double')}), 
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': ('std::map', 'int', 'double')}),
             ]))
             ])}
     impl = f.impl()
