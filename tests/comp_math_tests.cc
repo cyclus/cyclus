@@ -68,6 +68,18 @@ TEST(CompMathTests, SubCloseComp) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CompMathTests, Sum) {
+  CompMap v;
+  v[1] = 1.0;
+  v[2] = 2.0;
+  v[3] = 3.0;
+
+  EXPECT_FLOAT_EQ(6.0, cm::Sum(&v));
+
+}
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, ApplyThresholdZero) {
   // if the threshold is 0, applying the threshold should do nothing
   CompMap v;
