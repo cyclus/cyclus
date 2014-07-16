@@ -74,7 +74,7 @@ TEST(CompMathTests, Sum) {
   v[2] = 2.0;
   v[3] = 3.0;
 
-  EXPECT_FLOAT_EQ(6.0, cm::Sum(&v));
+  EXPECT_FLOAT_EQ(6.0, cm::Sum(v));
 
 }
 
