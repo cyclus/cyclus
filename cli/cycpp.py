@@ -1635,7 +1635,7 @@ def insert_line_directives(newfile, filename):
     origlines = orig.splitlines()
     newlines = newfile.splitlines()
     sm = difflib.SequenceMatcher(a=origlines, b=newlines, autojunk=False)
-    blocks = sm.get_matching_blocks()
+    blocks = list(sm.get_matching_blocks())
     for i, j, n in blocks[-2::-1]:
         newlines.insert(j, '#line {0} "{1}"'.format(i+1, filename))
     return "\n".join(newlines)
