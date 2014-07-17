@@ -30,6 +30,16 @@ CompMap Sub(const CompMap& v1, const CompMap& v2) {
   return out;
 }
 
+double Sum(const CompMap& v) {
+  std::vector<double> vec;
+  for (CompMap::const_iterator it = v.begin(); it != v.end(); ++it) {
+    vec.push_back(it->second);
+  }
+
+  double sum = CycArithmetic::KahanSum(vec);
+  return sum;
+}
+
 void ApplyThreshold(CompMap* v, double threshold) {
   if (threshold < 0) {
     std::stringstream ss;
@@ -49,12 +59,7 @@ void ApplyThreshold(CompMap* v, double threshold) {
 }
 
 void Normalize(CompMap* v, double val) {
-  std::vector<double> vec;
-  for (CompMap::iterator it = v->begin(); it != v->end(); ++it) {
-    vec.push_back(it->second);
-  }
-
-  double sum = CycArithmetic::KahanSum(vec);
+  double sum = Sum(*v);
   if (sum != val && sum != 0) {
     for (CompMap::iterator it = v->begin(); it != v->end(); ++it) {
       (*v)[it->first] = it->second / sum * val;

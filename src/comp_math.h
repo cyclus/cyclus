@@ -28,6 +28,9 @@ CompMap Add(const CompMap& v1, const CompMap& v2);
 /// returns the result.  No normalization is done.
 CompMap Sub(const CompMap& v1, const CompMap& v2);
 
+/// Sums the quantities of all nuclides without normalization
+double Sum(const CompMap& v1);
+
 /// All nuclides with quantities below threshold will have their quantity set to
 /// zero.
 void ApplyThreshold(CompMap* v, double threshold);
