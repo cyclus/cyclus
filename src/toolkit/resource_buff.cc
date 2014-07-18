@@ -1,11 +1,11 @@
 #include "resource_buff.h"
+#include "cyc_arithmetic.h"
 
 #include <iomanip>
 
 namespace cyclus {
 namespace toolkit {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::set_capacity(double cap) {
   if (quantity() - cap > eps_rsrc()) {
     std::stringstream ss;
@@ -16,7 +16,6 @@ void ResourceBuff::set_capacity(double cap) {
   capacity_ = cap;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Manifest ResourceBuff::PopQty(double qty) {
   if (qty > quantity()) {
     std::stringstream ss;
@@ -38,19 +37,15 @@ Manifest ResourceBuff::PopQty(double qty) {
       tmp = r->ExtractRes(left);
       mats_.push_front(r);
       r = tmp;
-      qty_ -= left;
     } else {
       mats_present_.erase(r);
-      qty_ -= quan;
     }
 
     manifest.push_back(r);
     left -= quan;
   }
 
-  if (count() == 0) {
-    qty_ = 0;
-  }
+  UpdateQty();
 
   return manifest;
 }
@@ -69,7 +64,15 @@ Manifest ResourceBuff::PopQty(double qty, double eps) {
   return PopQty(qty);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void ResourceBuff::UpdateQty() {
+  std::list<Resource::Ptr>::iterator it;
+  std::vector<double> qtys;
+  for (it = mats_.begin(); it != mats_.end(); ++it) {
+    qtys.push_back((*it)->quantity());
+  }
+  qty_ = CycArithmetic::KahanSum(qtys);
+}
+
 Manifest ResourceBuff::PopN(int num) {
   if (count() < num || num < 0) {
     std::stringstream ss;
@@ -83,17 +86,12 @@ Manifest ResourceBuff::PopN(int num) {
     mats_.pop_front();
     manifest.push_back(r);
     mats_present_.erase(r);
-    qty_ -= r->quantity();
   }
 
-  if (count() == 0) {
-    qty_ = 0;
-  }
-
+  UpdateQty();
   return manifest;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Resource::Ptr ResourceBuff::Pop(AccessDir dir) {
   if (mats_.size() < 1) {
     throw ValueError("cannot pop material from an empty buff");
@@ -108,17 +106,11 @@ Resource::Ptr ResourceBuff::Pop(AccessDir dir) {
     mats_.pop_back();
   }
 
-  qty_ -= r->quantity();
   mats_present_.erase(r);
-
-  if (count() == 0) {
-    qty_ = 0;
-  }
-
+  UpdateQty();
   return r;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ResourceBuff::Push(Resource::Ptr r) {
   if (r->quantity() - space() > eps_rsrc()) {
     throw ValueError("resource pushing breaks capacity limit");
@@ -126,9 +118,9 @@ void ResourceBuff::Push(Resource::Ptr r) {
     throw KeyError("duplicate resource push attempted");
   }
 
-  qty_ += r->quantity();
   mats_.push_back(r);
   mats_present_.insert(r);
+  UpdateQty();
 }
 
 }  // namespace toolkit

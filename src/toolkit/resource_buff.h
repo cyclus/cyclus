@@ -167,6 +167,8 @@ class ResourceBuff {
   }
 
  private:
+  void UpdateQty();
+
   double qty_;
 
   /// Maximum quantity of resources this store can hold
