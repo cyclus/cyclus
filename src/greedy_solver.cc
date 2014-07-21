@@ -239,9 +239,11 @@ double GreedySolver::PseudoCost_() {
       std::map<Arc, std::vector<double> >& caps = (*n_it)->unit_capacities;
       for (c_it = caps.begin(); c_it != caps.end(); ++c_it) {
         std::vector<double>& ucaps = c_it->second; 
-        min_cap = *std::min_element(ucaps.begin(), ucaps.end());
-        if (min_cap < min_unit_cap)
-          min_unit_cap = min_cap;
+        if (!ucaps.empty()) {
+          min_cap = *std::min_element(ucaps.begin(), ucaps.end());
+          if (min_cap < min_unit_cap)
+            min_unit_cap = min_cap;
+        }
       }
     }
   }
@@ -256,11 +258,13 @@ double GreedySolver::PseudoCost_() {
       std::map<Arc, std::vector<double> >& caps = (*n_it)->unit_capacities;
       for (c_it = caps.begin(); c_it != caps.end(); ++c_it) {
         std::vector<double>& ucaps = c_it->second; 
-        min_cap = *std::min_element(ucaps.begin(), ucaps.end());
-        if (min_cap < min_unit_cap)
-          min_unit_cap = min_cap;
+        if (!ucaps.empty()) {
+          min_cap = *std::min_element(ucaps.begin(), ucaps.end());
+          if (min_cap < min_unit_cap)
+            min_unit_cap = min_cap;
+        }
       }
-      
+o      
       // update max_pref_
       std::map<Arc, double>& prefs = (*n_it)->prefs;
       for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
