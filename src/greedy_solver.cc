@@ -264,7 +264,7 @@ double GreedySolver::PseudoCost_() {
             min_unit_cap = min_cap;
         }
       }
-o      
+      
       // update max_pref_
       std::map<Arc, double>& prefs = (*n_it)->prefs;
       for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
