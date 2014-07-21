@@ -49,6 +49,7 @@ void ProgTranslator::Translate() {
   // add each false arc
   double inf = iface_->getInfinity();
   double max_cost = max_obj_coeff_ / min_row_coeff_ + cost_add_;
+
   for (int i = g_->arcs().size(); i != arc_offset_; i++) {
     ctx_.obj_coeffs[i] = max_cost;
     ctx_.col_lbs[i] = 0;

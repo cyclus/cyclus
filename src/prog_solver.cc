@@ -27,11 +27,17 @@ double ProgSolver::SolveGraph() {
     xlator.ToProg();
     CoinMessageHandler h;
     h.setLogLevel(0);
-    if (verbose_)
+    if (verbose_) {
       Report(iface);
       h.setLogLevel(4);
+    }
     iface->passInMessageHandler(&h);
-    SolveProg(iface, verbose_);
+    if (verbose_) {
+      std::cout << "Solving problem, message handler has log level of "
+                << iface->messageHandler()->logLevel() << "\n";
+    }
+    bool verbose = false; // turn this off, solveprog prints a lot
+    SolveProg(iface, verbose);
     xlator.FromProg();
   } catch(...) {
     delete iface;

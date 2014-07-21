@@ -246,7 +246,7 @@ class ExchangeGraph {
 
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
-
+  
  private:
   std::vector<RequestGroup::Ptr> request_groups_;
   std::vector<ExchangeNodeGroup::Ptr> supply_groups_;

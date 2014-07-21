@@ -121,10 +121,15 @@ class GreedySolver: public ExchangeSolver {
   void GreedilySatisfySet_(RequestGroup::Ptr prs);
   void UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty);
   void UpdateObj_(double qty, double pref);
+
+  /// this is an expensive function O(total number of arcs) that is used
+  /// to evaluate the maximum node preference and min unit capacity
+  double PseudoCost_();
   
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
   double obj_;
+  double unmatched_;
 };
 
 }  // namespace cyclus
