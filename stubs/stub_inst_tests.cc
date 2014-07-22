@@ -48,7 +48,7 @@ TEST_F(StubInstTest, Tick) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubInstTest, Tock) {
   int time = 1;
-  EXPECT_NO_THROW(src_inst_->Tick());
+  EXPECT_NO_THROW(src_inst_->Tock());
   // Test StubInst specific behaviors of the handleTock function here
 }
 
