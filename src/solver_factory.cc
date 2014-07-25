@@ -64,7 +64,11 @@ void SolveProg(OsiSolverInterface* si, bool verbose) {
 
   si->initialSolve();
   if (HasInt(si)) {
-    si->branchAndBound();
+    OsiCbcSolverInterface* cast = dynamic_cast<OsiCbcSolverInterface*>(si);
+    if (cast)
+      cast->getModelPtr()->branchAndBound(); // get rid of warning
+    else
+      si->branchAndBound();
   } else {
     OsiClpSolverInterface* cast = dynamic_cast<OsiClpSolverInterface*>(si);
     if (cast) {
