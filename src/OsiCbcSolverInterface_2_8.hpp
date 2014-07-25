@@ -3,8 +3,8 @@
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
-#ifndef OsiCbcSolverInterface_2_8_HPP
-#define OsiCbcSolverInterface_2_8_HPP
+#ifndef OsiCbcSolverInterface_H
+#define OsiCbcSolverInterface_H
 
 #include <string>
 #include <cfloat>
@@ -23,7 +23,7 @@ static const double OsiCbcInfinity = COIN_DBL_MAX;
 
 /** Cbc Solver Interface
     
-Instantiation of OsiCbcSolverInterface for the Agent Algorithm.
+Instantiation of OsiCbcSolverInterface for the Model Algorithm.
 
 */
 
@@ -269,8 +269,7 @@ public:
       vector using delete[].
   */
   virtual std::vector<double*> getDualRays(int maxNumRays,
-        				   bool fullRay = false) const;
-  
+					   bool fullRay = false) const;
   /** Get as many primal rays as the solver can provide. (In case of proven
       dual infeasibility there should be at least one.)
       
@@ -649,7 +648,7 @@ public:
   
   /**@name Message handling (extra for Cbc messages).
      Normally I presume you would want the same language.
-     If not then you could use underlying agent pointer */
+     If not then you could use underlying model pointer */
   //@{
   /// Set language
   void newLanguage(CoinMessages::Language language);
@@ -660,48 +659,48 @@ public:
   
   /**@name Cbc specific public interfaces */
   //@{
-  /// Get pointer to Cbc agent
-  inline CbcModel * getAgentPtr() const 
-  { return agentPtr_;}
+  /// Get pointer to Cbc model
+  inline CbcModel * getModelPtr() const 
+  { return modelPtr_;}
   /// Get pointer to underlying solver
   inline OsiSolverInterface * getRealSolverPtr() const 
-  { return agentPtr_->solver();}
+  { return modelPtr_->solver();}
   /// Set cutoff bound on the objective function.
   inline void setCutoff(double value) 
-  { agentPtr_->setCutoff(value);}
+  { modelPtr_->setCutoff(value);}
   /// Get the cutoff bound on the objective function - always as minimize
   inline double getCutoff() const
-  { return agentPtr_->getCutoff();}
+  { return modelPtr_->getCutoff();}
   /// Set the CbcModel::CbcMaxNumNode maximum node limit 
   inline void setMaximumNodes( int value)
-  { agentPtr_->setMaximumNodes(value);}
+  { modelPtr_->setMaximumNodes(value);}
   /// Get the CbcModel::CbcMaxNumNode maximum node limit
   inline int getMaximumNodes() const
-  { return agentPtr_->getMaximumNodes();}
+  { return modelPtr_->getMaximumNodes();}
   /// Set the CbcModel::CbcMaxNumSol maximum number of solutions
   inline void setMaximumSolutions( int value) 
-  { agentPtr_->setMaximumSolutions(value);}
+  { modelPtr_->setMaximumSolutions(value);}
   /// Get the CbcModel::CbcMaxNumSol maximum number of solutions 
   inline int getMaximumSolutions() const 
-  { return agentPtr_->getMaximumSolutions();}
+  { return modelPtr_->getMaximumSolutions();}
   /// Set the CbcModel::CbcMaximumSeconds maximum number of seconds 
   inline void setMaximumSeconds( double value) 
-  { agentPtr_->setMaximumSeconds(value);}
+  { modelPtr_->setMaximumSeconds(value);}
   /// Get the CbcModel::CbcMaximumSeconds maximum number of seconds 
   inline double getMaximumSeconds() const 
-  { return agentPtr_->getMaximumSeconds();}
+  { return modelPtr_->getMaximumSeconds();}
   /// Node limit reached?
   inline bool isNodeLimitReached() const
-  { return agentPtr_->isNodeLimitReached();}
+  { return modelPtr_->isNodeLimitReached();}
   /// Solution limit reached?
   inline bool isSolutionLimitReached() const
-  { return agentPtr_->isSolutionLimitReached();}
+  { return modelPtr_->isSolutionLimitReached();}
   /// Get how many Nodes it took to solve the problem.
   inline int getNodeCount() const
-  { return agentPtr_->getNodeCount();}
+  { return modelPtr_->getNodeCount();}
     /// Final status of problem - 0 finished, 1 stopped, 2 difficulties
     inline int status() const
-  { return agentPtr_->status();}
+  { return modelPtr_->status();}
   /** Pass in a message handler
   
     It is the client's responsibility to destroy a message handler installed
@@ -751,8 +750,8 @@ protected:
   //@}
   /**@name Protected member data */
   //@{
-  /// Cbc agent represented by this class instance
-  mutable CbcModel * agentPtr_;
+  /// Cbc model represented by this class instance
+  mutable CbcModel * modelPtr_;
   //@}
 };
 // So unit test can find out if NDEBUG set
