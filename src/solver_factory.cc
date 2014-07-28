@@ -19,13 +19,9 @@ SolverFactory::SolverFactory(std::string t, double tmax)
       tmax_(tmax) { }
 
 OsiSolverInterface* SolverFactory::get() {
-  if (t_ == "clp") {
+  if (t_ == "clp" || t_ == "cbc") {
     OsiClpSolverInterface* s = new OsiClpSolverInterface();
     s->getModelPtr()->setMaximumSeconds(tmax_);
-    return s;
-  } else if (t_ == "cbc") {
-    OsiCbcSolverInterface* s = new OsiCbcSolverInterface();
-    s->setMaximumSeconds(tmax_);
     return s;
   } else {
     throw ValueError("invalid SolverFactory type '" + t_ + "'");
@@ -90,17 +86,16 @@ void SolveProg(OsiSolverInterface* si, bool verbose) {
   if (verbose)
     ReportProg(si);
 
-  OsiCbcSolverInterface* cbccast = dynamic_cast<OsiCbcSolverInterface*>(si);
-  if (cbccast) {
-    const char *argv[] = {"driver4","-solve","-quit", "-slog 0"};
-    int argc = 4;
-    CbcMain0(*cbccast->getModelPtr());
-    CbcMain1(argc, argv, *cbccast->getModelPtr(), callBack);
-  }
-  OsiClpSolverInterface* clpcast = dynamic_cast<OsiClpSolverInterface*>(si);
-  if (clpcast) {
+  if (HasInt(si)) {
+    const char *argv[] = {"exchng","-solve","-quit"};
+    int argc = 3;
+    CbcModel model(*si);
+    CbcMain0(model);
+    CbcMain1(argc, argv, model, callBack);
+    si->setColSolution(model.getColSolution());
+  } else {
+    // no ints, just solve 'initial lp relaxation' 
     si->initialSolve();
-    clpcast->getModelPtr()->primal(); // solve problem with primal alg
   }
   
   if (verbose) {
