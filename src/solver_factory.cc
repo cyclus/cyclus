@@ -5,6 +5,8 @@
 #include "OsiClpSolverInterface.hpp"
 #include "OsiCbcSolverInterface.hpp"
 
+#include "CbcSolver.hpp"
+
 #include "error.h"
 
 namespace cyclus {
@@ -58,24 +60,49 @@ void ReportProg(OsiSolverInterface* si) {
   m->dumpMatrix();
 }
 
+static int callBack(CbcModel * model, int whereFrom)
+{
+  int returnCode=0;
+  switch (whereFrom) {
+  case 1:
+  case 2:
+    if (!model->status()&&model->secondaryStatus())
+      returnCode=1;
+    break;
+  case 3:
+    {
+      //CbcCompareUser compare;
+      //model->setNodeComparison(compare);
+    }
+    break;
+  case 4:
+    // If not good enough could skip postprocessing
+    break;
+  case 5:
+    break;
+  default:
+    abort();
+  }
+  return returnCode;
+}
+
 void SolveProg(OsiSolverInterface* si, bool verbose) {
   if (verbose)
     ReportProg(si);
 
-  si->initialSolve();
-  if (HasInt(si)) {
-    OsiCbcSolverInterface* cast = dynamic_cast<OsiCbcSolverInterface*>(si);
-    if (cast)
-      cast->getModelPtr()->branchAndBound(); // get rid of warning
-    else
-      si->branchAndBound();
-  } else {
-    OsiClpSolverInterface* cast = dynamic_cast<OsiClpSolverInterface*>(si);
-    if (cast) {
-      cast->getModelPtr()->primal(); // solve problem with primal alg
-    }
+  OsiCbcSolverInterface* cbccast = dynamic_cast<OsiCbcSolverInterface*>(si);
+  if (cbccast) {
+    const char *argv[] = {"driver4","-solve","-quit", "-slog 0"};
+    int argc = 4;
+    CbcMain0(*cbccast->getModelPtr());
+    CbcMain1(argc, argv, *cbccast->getModelPtr(), callBack);
   }
-
+  OsiClpSolverInterface* clpcast = dynamic_cast<OsiClpSolverInterface*>(si);
+  if (clpcast) {
+    si->initialSolve();
+    clpcast->getModelPtr()->primal(); // solve problem with primal alg
+  }
+  
   if (verbose) {
     const double* soln = si->getColSolution();
     for (int i = 0; i != si->getNumCols(); i ++) {
