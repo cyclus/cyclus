@@ -280,6 +280,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
               << "\n\nDependencies:\n";
     std::cout << "   Boost    " << version::boost() << "\n";
     std::cout << "   Coin-Cbc " << version::coincbc() << "\n";
+    std::cout << "   Coin-Clp " << version::coinclp() << "\n";
     std::cout << "   Hdf5     " << version::hdf5() << "\n";
     std::cout << "   Sqlite3  " << version::sqlite3() << "\n";
     std::cout << "   xml2     " << version::xml2() << "\n";

@@ -22,6 +22,8 @@ const char* xml2();
 
 const char* coincbc();
 
+const char* coinclp();
+
 }  // namespace version
 }  // namespace cyclus
 
