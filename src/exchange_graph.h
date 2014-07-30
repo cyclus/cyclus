@@ -214,6 +214,9 @@ class ExchangeGraph {
   /// @param qty the amount of flow corresponding to a match
   void AddMatch(const Arc& a, double qty);
 
+  /// clears all matches
+  inline void ClearMatches() {matches_.clear();}
+
   inline const std::vector<RequestGroup::Ptr>& request_groups() const {
     return request_groups_;
   }
