@@ -6,10 +6,54 @@
 #include "OsiCbcSolverInterface.hpp"
 
 #include "CbcSolver.hpp"
+#include "CbcEventHandler.hpp"
+#include "CoinTime.hpp"
 
 #include "error.h"
 
 namespace cyclus {
+
+/// An event handler that records the time that a better solution is found  
+class ObjValueHandler: public CbcEventHandler {
+ public:
+  ObjValueHandler(double obj, double time, bool found)
+    : obj_(obj),
+      time_(time),
+      found_(found) {};
+
+  explicit ObjValueHandler(double obj)
+    : obj_(obj),
+      time_(0),
+      found_(false) {};
+
+  virtual CbcEventHandler* clone() {
+    return new ObjValueHandler(obj_, time_, found_);
+  }
+
+  virtual CbcAction event(CbcEventHandler::CbcEvent e) {
+    std::cout << "Greedy event handler\n";
+    if (!found_ && e == CbcEventHandler::solution) {
+      std::cout << "Greedy event found\n";
+      const CbcModel* m = getModel();
+      double cbcobj = m->getObjValue();
+      if (cbcobj < obj_) {
+        time_ = CoinCpuTime() -
+                m->getDblParam(CbcModel::CbcStartSeconds);
+        found_ = true;
+      }
+    }
+    return CbcEventHandler::noAction;
+  }
+
+  inline double time() const {return time_;}
+  inline double obj() const {return obj_;}
+  inline bool found() const {return found_;}
+    
+ private:
+  double obj_, time_;
+  bool found_;
+};
+
 
 // 10800 s = 3 hrs * 60 min/hr * 60 s/min
 SolverFactory::SolverFactory() : t_("cbc"), tmax_(10800) { }
@@ -82,7 +126,7 @@ static int callBack(CbcModel * model, int whereFrom)
   return returnCode;
 }
 
-void SolveProg(OsiSolverInterface* si, bool verbose) {
+void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
   if (verbose)
     ReportProg(si);
 
@@ -90,9 +134,15 @@ void SolveProg(OsiSolverInterface* si, bool verbose) {
     const char *argv[] = {"exchng","-solve","-quit"};
     int argc = 3;
     CbcModel model(*si);
+    ObjValueHandler handler(greedy_obj);
+    model.passInEventHandler(&handler);
     CbcMain0(model);
     CbcMain1(argc, argv, model, callBack);
+    si->writeMps("exchng");
     si->setColSolution(model.getColSolution());
+    // std::cout << "Greedy equivalent time: " << handler.time()
+    //           << " and obj " << handler.obj()
+    //           << " and found " << handler.found() << "\n";
   } else {
     // no ints, just solve 'initial lp relaxation' 
     si->initialSolve();
@@ -101,9 +151,22 @@ void SolveProg(OsiSolverInterface* si, bool verbose) {
   if (verbose) {
     const double* soln = si->getColSolution();
     for (int i = 0; i != si->getNumCols(); i ++) {
-      std::cout << "soln " << i << ": " << soln[i] << '\n';
+      std::cout << "soln " << i << ": " << soln[i]
+                << " integer: " << std::boolalpha << si->isInteger(i) << "\n";
     }
   }
+}
+
+void SolveProg(OsiSolverInterface* si) {
+  SolveProg(si, si->getInfinity(), false);
+}
+
+void SolveProg(OsiSolverInterface* si, bool verbose) {
+  SolveProg(si, si->getInfinity(), verbose);
+}
+
+void SolveProg(OsiSolverInterface* si, double greedy_obj) {
+  SolveProg(si, greedy_obj, false);
 }
 
 bool HasInt(OsiSolverInterface* si) {
