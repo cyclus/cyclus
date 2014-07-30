@@ -125,11 +125,6 @@ TEST_F(SolverFactoryTests, ClpRedundant) {
   delete si;
 }
 
-// This test is disabled due to what appears to be a bug in the CLI for this
-// small problem In general, solutions for larger problems appear fine
-// (e.g. cyclopts DRE instances).
-// The relevant listserv discussion is here:
-// http://list.coin-or.org/pipermail/cbc/2014-July/001436.html
 TEST_F(SolverFactoryTests, Cbc) {
   sf_.solver_t("cbc");
   OsiSolverInterface* si = sf_.get();
