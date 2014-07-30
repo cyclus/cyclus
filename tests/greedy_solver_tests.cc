@@ -12,6 +12,7 @@ using cyclus::ExchangeNode;
 using cyclus::ExchangeNodeGroup;
 using cyclus::RequestGroup;
 using cyclus::GreedySolver;
+using cyclus::GreedyPreconditioner;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(GreedySolverTests, ExchangeNodeCapThrow) {
@@ -196,7 +197,10 @@ TEST(GreedySolverTests, Condition) {
   EXPECT_EQ(g.request_groups()[0], gu1);
   EXPECT_EQ(g.request_groups()[1], gu2);
 
-  GreedySolver s;
+  std::map<std::string, double> null_weights;
+  // the solver cleans up
+  GreedyPreconditioner* p = new GreedyPreconditioner(null_weights);
+  GreedySolver s(false, p);
   s.graph(&g);
   s.Condition();
 
