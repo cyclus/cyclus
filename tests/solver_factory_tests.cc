@@ -129,7 +129,7 @@ TEST_F(SolverFactoryTests, ClpRedundant) {
 // small problem In general, solutions for larger problems appear fine
 // (e.g. cyclopts DRE instances).
 // The relevant listserv discussion is here:
-// 
+// http://list.coin-or.org/pipermail/cbc/2014-July/001436.html
 TEST_F(SolverFactoryTests, DISABLED_Cbc) {
   sf_.solver_t("cbc");
   OsiSolverInterface* si = sf_.get();
