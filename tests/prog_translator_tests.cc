@@ -231,7 +231,7 @@ TEST(ProgTranslatorTests, translation) {
   EXPECT_NO_THROW(SolveProg(iface));
   const double* soln = iface->getColSolution();
   const double* check = checkface.getColSolution();
-  array_double_eq(soln, check, narcs + nfaux);
+  array_double_eq(soln, check, narcs + nfaux, "soln");
 
   // validate solution
   double x1_flow = excl_flow[1];
