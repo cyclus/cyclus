@@ -5,6 +5,8 @@
 #include "OsiClpSolverInterface.hpp"
 #include "OsiCbcSolverInterface.hpp"
 
+#include "CbcSolver.hpp"
+
 #include "error.h"
 
 namespace cyclus {
@@ -17,13 +19,9 @@ SolverFactory::SolverFactory(std::string t, double tmax)
       tmax_(tmax) { }
 
 OsiSolverInterface* SolverFactory::get() {
-  if (t_ == "clp") {
+  if (t_ == "clp" || t_ == "cbc") {
     OsiClpSolverInterface* s = new OsiClpSolverInterface();
     s->getModelPtr()->setMaximumSeconds(tmax_);
-    return s;
-  } else if (t_ == "cbc") {
-    OsiCbcSolverInterface* s = new OsiCbcSolverInterface();
-    s->setMaximumSeconds(tmax_);
     return s;
   } else {
     throw ValueError("invalid SolverFactory type '" + t_ + "'");
@@ -58,20 +56,48 @@ void ReportProg(OsiSolverInterface* si) {
   m->dumpMatrix();
 }
 
+static int callBack(CbcModel * model, int whereFrom)
+{
+  int returnCode=0;
+  switch (whereFrom) {
+  case 1:
+  case 2:
+    if (!model->status()&&model->secondaryStatus())
+      returnCode=1;
+    break;
+  case 3:
+    {
+      //CbcCompareUser compare;
+      //model->setNodeComparison(compare);
+    }
+    break;
+  case 4:
+    // If not good enough could skip postprocessing
+    break;
+  case 5:
+    break;
+  default:
+    abort();
+  }
+  return returnCode;
+}
+
 void SolveProg(OsiSolverInterface* si, bool verbose) {
   if (verbose)
     ReportProg(si);
 
-  si->initialSolve();
   if (HasInt(si)) {
-    si->branchAndBound();
+    const char *argv[] = {"exchng","-solve","-quit"};
+    int argc = 3;
+    CbcModel model(*si);
+    CbcMain0(model);
+    CbcMain1(argc, argv, model, callBack);
+    si->setColSolution(model.getColSolution());
   } else {
-    OsiClpSolverInterface* cast = dynamic_cast<OsiClpSolverInterface*>(si);
-    if (cast) {
-      cast->getModelPtr()->primal(); // solve problem with primal alg
-    }
+    // no ints, just solve 'initial lp relaxation' 
+    si->initialSolve();
   }
-
+  
   if (verbose) {
     const double* soln = si->getColSolution();
     for (int i = 0; i != si->getNumCols(); i ++) {
