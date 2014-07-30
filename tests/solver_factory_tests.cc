@@ -36,9 +36,9 @@ void SolverFactoryTests::SetUp() {
   n_vars_ = 3;
   n_int_vars_ = 2;
   n_rows_ = 2;
-  lp_obj_ = 5.47;
+  lp_obj_ = 7.45;
   lp_exp_ = new double[n_vars_];
-  lp_exp_[0] = 1.7; lp_exp_[1] = 2.7; lp_exp_[2] = 0.4;
+  lp_exp_[0] = 2.3; lp_exp_[1] = 2.1; lp_exp_[2] = 1.0;
   mip_obj_ = 7.6;
   mip_exp_ = new double[n_vars_];
   mip_exp_[0] = 2.4; mip_exp_[1] = 2; mip_exp_[2] = 1;
@@ -59,7 +59,7 @@ void SolverFactoryTests::Init(OsiSolverInterface* si) {
   //                y, z integer (if integer solver)
   double inf = si->getInfinity();
   double obj[] = {2.0, 0.5, 1.8};
-  double col_lb[] = {1.3, 2.0, 0.4};
+  double col_lb[] = {1.3, 2.0, 1.0};
   double col_ub[] = {5, 5, 5};
   double row_lb[] = {4.4, -1.0*inf};
   double row_ub[] = {inf, 3.1};
@@ -130,7 +130,7 @@ TEST_F(SolverFactoryTests, ClpRedundant) {
 // (e.g. cyclopts DRE instances).
 // The relevant listserv discussion is here:
 // http://list.coin-or.org/pipermail/cbc/2014-July/001436.html
-TEST_F(SolverFactoryTests, DISABLED_Cbc) {
+TEST_F(SolverFactoryTests, Cbc) {
   sf_.solver_t("cbc");
   OsiSolverInterface* si = sf_.get();
   CoinMessageHandler h;
