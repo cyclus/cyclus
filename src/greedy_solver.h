@@ -35,45 +35,6 @@ inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
 class ExchangeGraph;
 class GreedyPreconditioner;
 
-/// @brief the capacity of the arc
-///
-/// @throws StateError if either ExchangeNode does not have a ExchangeNodeGroup
-/// @param a the arc
-/// @param u_curr_qty the current quantity assigned to the unode (if solving
-/// piecemeal)
-/// @param v_curr_qty the current quantity assigned to the vnode (if solving
-/// piecemeal)
-/// @return The minimum of the unode and vnode's capacities
-// @{
-double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty);
-inline double Capacity(const Arc& a) { return Capacity(a, 0, 0); }
-// @}
-
-/// @brief the capacity of a node
-///
-/// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
-/// @param n the node
-/// @param min_cap whether to use the minimum or maximum capacity value. In general,
-/// nodes that represent bids use the minimum (i.e., the capacities represents a
-/// less-than constraint) and nodes that represent requests use the maximum
-/// value (i.e., the capacities represents a greater-than constraint).
-/// @param curr_qty the currently allocated node quantity (if solving piecemeal)
-/// @return The minimum of the node's nodegroup capacities / the node's unit
-/// capacities, or the ExchangeNode's remaining qty -- whichever is smaller.
-// @{
-double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
-                double curr_qty);
-inline double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap) {
-  return Capacity(n, a, min_cap, 0.0);
-}
-inline double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
-  return Capacity(n, a, true, curr_qty);
-}
-inline double Capacity(ExchangeNode::Ptr n, const Arc& a) {
-  return Capacity(n, a, true, 0.0);
-}
-// @}
-
 /// @brief The GreedySolver provides the implementation for a "greedy" solution
 /// to a resource exchange graph.
 ///
@@ -102,6 +63,48 @@ class GreedySolver: public ExchangeSolver {
   /// likely not be called independently thereof (except for testing)
   void Condition();
 
+  /// Initialize member values based on the given graph.
+  void Init();
+
+  /// @brief the capacity of the arc
+  ///
+  /// @throws StateError if either ExchangeNode does not have a ExchangeNodeGroup
+  /// @param a the arc
+  /// @param u_curr_qty the current quantity assigned to the unode (if solving
+  /// piecemeal)
+  /// @param v_curr_qty the current quantity assigned to the vnode (if solving
+  /// piecemeal)
+  /// @return The minimum of the unode and vnode's capacities
+  // @{
+  double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty);
+  inline double Capacity(const Arc& a) { return Capacity(a, 0, 0); }
+  // @}
+
+  /// @brief the capacity of a node
+  ///
+  /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
+  /// @param n the node
+  /// @param min_cap whether to use the minimum or maximum capacity value. In general,
+  /// nodes that represent bids use the minimum (i.e., the capacities represents a
+  /// less-than constraint) and nodes that represent requests use the maximum
+  /// value (i.e., the capacities represents a greater-than constraint).
+  /// @param curr_qty the currently allocated node quantity (if solving piecemeal)
+  /// @return The minimum of the node's nodegroup capacities / the node's unit
+  /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller.
+  // @{
+  double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+                  double curr_qty);
+  inline double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap) {
+    return Capacity(n, a, min_cap, 0.0);
+  }
+  inline double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
+    return Capacity(n, a, true, curr_qty);
+  }
+  inline double Capacity(ExchangeNode::Ptr n, const Arc& a) {
+    return Capacity(n, a, true, 0.0);
+  }
+  // @}
+
  protected:
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
   /// RequestGroup and matching requests with the minimum bids possible, starting
@@ -128,6 +131,7 @@ class GreedySolver: public ExchangeSolver {
   
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
+  std::map<ExchangeNodeGroup*, std::vector<double> > grp_caps_;
   double obj_;
   double unmatched_;
 };

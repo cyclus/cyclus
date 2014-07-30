@@ -11,7 +11,57 @@
 
 namespace cyclus {
 
-double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
+    : conditioner_(c),
+      ExchangeSolver(exclusive_orders) {}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+GreedySolver::~GreedySolver() {
+  if (conditioner_ != NULL)
+    delete conditioner_;
+}
+
+void GreedySolver::Condition() {
+  if (conditioner_ != NULL)
+    conditioner_->Condition(graph_);
+}
+
+void GreedySolver::Init() {
+ std::for_each(graph_->request_groups().begin(),
+                graph_->request_groups().end(),
+                std::bind1st(
+                    std::mem_fun(&GreedySolver::Init_),
+                    this));
+
+  std::for_each(graph_->supply_groups().begin(),
+                graph_->supply_groups().end(),
+                std::bind1st(
+                    std::mem_fun(&GreedySolver::Init_),
+                    this));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double GreedySolver::SolveGraph() {
+  Condition();
+  obj_ = 0;
+  unmatched_ = 0;
+  n_qty_.clear();
+
+  Init();
+ 
+  std::for_each(graph_->request_groups().begin(),
+                graph_->request_groups().end(),
+                std::bind1st(
+                    std::mem_fun(&GreedySolver::GreedilySatisfySet_),
+                    this));
+
+  obj_ += unmatched_ * PseudoCost_();
+  return obj_;
+}
+
+double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
+                               double v_curr_qty) {
   bool min = true;
   double ucap = Capacity(a.unode(), a, !min, u_curr_qty);
   double vcap = Capacity(a.vnode(), a, min, v_curr_qty);
@@ -24,8 +74,8 @@ double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
   return std::min(ucap, vcap);
 }
 
-double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
-                double curr_qty) {
+double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+                               double curr_qty) {
   if (n->group == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
@@ -35,7 +85,7 @@ double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
   }
 
   std::vector<double>& unit_caps = n->unit_capacities[a];
-  const std::vector<double>& group_caps = n->group->capacities();
+  const std::vector<double>& group_caps = grp_caps_[n->group];
   std::vector<double> caps;
   double grp_cap, u_cap, cap;
 
@@ -65,57 +115,11 @@ double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
-    : conditioner_(c),
-      ExchangeSolver(exclusive_orders) {}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-GreedySolver::~GreedySolver() {
-  if (conditioner_ != NULL)
-    delete conditioner_;
-}
-
-void GreedySolver::Condition() {
-  if (conditioner_ == NULL)
-    conditioner_ = new GreedyPreconditioner(std::map<std::string, double>());
-
-  conditioner_->Condition(graph_);
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double GreedySolver::SolveGraph() {
-  Condition();
-  obj_ = 0;
-  unmatched_ = 0;
-  n_qty_.clear();
-  
-  std::for_each(graph_->request_groups().begin(),
-                graph_->request_groups().end(),
-                std::bind1st(
-                    std::mem_fun(&GreedySolver::Init_),
-                    this));
-
-  std::for_each(graph_->supply_groups().begin(),
-                graph_->supply_groups().end(),
-                std::bind1st(
-                    std::mem_fun(&GreedySolver::Init_),
-                    this));
-
-  std::for_each(graph_->request_groups().begin(),
-                graph_->request_groups().end(),
-                std::bind1st(
-                    std::mem_fun(&GreedySolver::GreedilySatisfySet_),
-                    this));
-
-  obj_ += unmatched_ * PseudoCost_();
-  return obj_;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::Init_(ExchangeNodeGroup::Ptr g) {
   for (int i = 0; i != g->nodes().size(); i++) {
     n_qty_[g->nodes()[i]] = 0;
   }
+  grp_caps_[g.get()] = g->capacities();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -194,7 +198,7 @@ void GreedySolver::UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a,
   using cyclus::ValueError;
 
   std::vector<double>& unit_caps = n->unit_capacities[a];
-  std::vector<double>& caps = n->group->capacities();
+  std::vector<double>& caps = grp_caps_[n->group];
   assert(unit_caps.size() == caps.size());
   for (int i = 0; i < caps.size(); i++) {
     double prev = caps[i];

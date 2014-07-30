@@ -124,7 +124,7 @@ TYPED_TEST(ExchangeSolverTest, GreedySolver) {
   // the solver cleans up
   GreedyPreconditioner* p = new GreedyPreconditioner(null_weights);
   ExchangeSolver* solver = new GreedySolver(false, p);
-  solver->Solve(&g);
+  double obj = solver->Solve(&g);
   this->case_->Test(type, &g);
   delete solver;
 }
@@ -134,11 +134,12 @@ TYPED_TEST(ExchangeSolverTest, ExclusiveGreedySolver) {
   ExchangeGraph g;
   bool exclusive_orders = true;
   this->case_->Construct(&g, exclusive_orders);
-  std::map<std::string, double> null_weights;
-  // the solver cleans up
-  GreedyPreconditioner* p = new GreedyPreconditioner(null_weights);
-  ExchangeSolver* solver = new GreedySolver(exclusive_orders, p);
-  solver->Solve(&g);
+  // std::map<std::string, double> null_weights;
+  // // the solver cleans up
+  // GreedyPreconditioner* p = new GreedyPreconditioner(null_weights);
+  // ExchangeSolver* solver = new GreedySolver(exclusive_orders, p);
+  ExchangeSolver* solver = new GreedySolver(exclusive_orders);
+  double obj = solver->Solve(&g);
   this->case_->Test(type, &g);
   delete solver;
 }
