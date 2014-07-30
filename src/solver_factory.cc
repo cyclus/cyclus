@@ -138,11 +138,12 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
     model.passInEventHandler(&handler);
     CbcMain0(model);
     CbcMain1(argc, argv, model, callBack);
-    si->writeMps("exchng");
     si->setColSolution(model.getColSolution());
-    // std::cout << "Greedy equivalent time: " << handler.time()
-    //           << " and obj " << handler.obj()
-    //           << " and found " << handler.found() << "\n";
+    if (verbose) {
+      std::cout << "Greedy equivalent time: " << handler.time()
+                << " and obj " << handler.obj()
+                << " and found " << handler.found() << "\n";
+    }
   } else {
     // no ints, just solve 'initial lp relaxation' 
     si->initialSolve();

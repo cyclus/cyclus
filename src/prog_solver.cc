@@ -3,6 +3,7 @@
 #include "OsiSolverInterface.hpp"
 
 #include "prog_translator.h"
+#include "greedy_solver.h"
 #include "solver_factory.h"
 
 namespace cyclus {
@@ -23,8 +24,16 @@ double ProgSolver::SolveGraph() {
   SolverFactory sf(solver_t_);
   OsiSolverInterface* iface = sf.get();
   try {
+    // get greedy solution
+    GreedySolver greedy(exclusive_orders_);
+    double greedy_obj = greedy.Solve(graph_);
+    graph_->ClearMatches();
+    
+    // translate graph to iface instance
     ProgTranslator xlator(graph_, iface, exclusive_orders_);
     xlator.ToProg();
+
+    // set noise level
     CoinMessageHandler h;
     h.setLogLevel(0);
     if (verbose_) {
@@ -37,7 +46,9 @@ double ProgSolver::SolveGraph() {
                 << iface->messageHandler()->logLevel() << "\n";
     }
     bool verbose = false; // turn this off, solveprog prints a lot
-    SolveProg(iface, verbose);
+
+    // solve and back translate
+    SolveProg(iface, greedy_obj, verbose);
     xlator.FromProg();
   } catch(...) {
     delete iface;
