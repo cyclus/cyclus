@@ -26,14 +26,32 @@ class ObjValueHandler: public CbcEventHandler {
       time_(0),
       found_(false) {};
 
+  virtual ~ObjValueHandler() {}
+
+  ObjValueHandler(const ObjValueHandler& other): CbcEventHandler(other) {
+    obj_ = other.obj();
+    time_ = other.time();
+    found_ = other.found();
+  }
+  
+  ObjValueHandler& operator=(const ObjValueHandler& other) {
+    if (this != &other) {
+      obj_ = other.obj();
+      time_ = other.time();
+      found_ = other.found();
+      CbcEventHandler::operator=(other);
+    }
+    return *this;
+  }
+  
   virtual CbcEventHandler* clone() {
-    return new ObjValueHandler(obj_, time_, found_);
+    return new ObjValueHandler(*this);
   }
 
-  virtual CbcAction event(CbcEventHandler::CbcEvent e) {
-    std::cout << "Greedy event handler\n";
-    if (!found_ && e == CbcEventHandler::solution) {
-      std::cout << "Greedy event found\n";
+  virtual CbcAction event(CbcEvent e) {
+    //std::cout << "Greedy event handler\n";
+    if (!found_ && (e == solution || e == heuristicSolution)) {
+      //std::cout << "Greedy event found\n";
       const CbcModel* m = getModel();
       double cbcobj = m->getObjValue();
       if (cbcobj < obj_) {
@@ -42,7 +60,7 @@ class ObjValueHandler: public CbcEventHandler {
         found_ = true;
       }
     }
-    return CbcEventHandler::noAction;
+    return noAction;
   }
 
   inline double time() const {return time_;}
@@ -100,6 +118,7 @@ void ReportProg(OsiSolverInterface* si) {
   m->dumpMatrix();
 }
 
+/// this is taken exactly from driver4.cpp in the Cbc examples
 static int callBack(CbcModel * model, int whereFrom)
 {
   int returnCode=0;
@@ -135,14 +154,14 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
     int argc = 3;
     CbcModel model(*si);
     ObjValueHandler handler(greedy_obj);
-    model.passInEventHandler(&handler);
     CbcMain0(model);
+    model.passInEventHandler(&handler);
     CbcMain1(argc, argv, model, callBack);
     si->setColSolution(model.getColSolution());
     if (verbose) {
       std::cout << "Greedy equivalent time: " << handler.time()
                 << " and obj " << handler.obj()
-                << " and found " << handler.found() << "\n";
+                << " and found " << std::boolalpha << handler.found() << "\n";
     }
   } else {
     // no ints, just solve 'initial lp relaxation' 
