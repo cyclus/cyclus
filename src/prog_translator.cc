@@ -10,13 +10,21 @@
 
 namespace cyclus {
 
+ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface)
+    : g_(g),
+      iface_(iface),
+      excl_(false),
+      pseudo_cost_(std::numeric_limits<double>::max()) {
+  Init();
+}
+
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
-                               bool exclusive, double pseudo_cost)
+                               bool exclusive)
     : g_(g),
       iface_(iface),
       excl_(exclusive),
-      pseudo_cost_(pseudo_cost) {
-  Init_();
+      pseudo_cost_(std::numeric_limits<double>::max()) {
+  Init();
 }
 
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
@@ -25,11 +33,20 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
       iface_(iface),
       excl_(false),
       pseudo_cost_(pseudo_cost) {
-  Init_();
+  Init();
+}
+
+ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
+                               bool exclusive, double pseudo_cost)
+    : g_(g),
+      iface_(iface),
+      excl_(exclusive),
+      pseudo_cost_(pseudo_cost) {
+  Init();
 }
 
 
-void ProgTranslator::Init_() {
+void ProgTranslator::Init() {
   arc_offset_ = g_->arcs().size();
   int n_cols = arc_offset_ + g_->request_groups().size();
   ctx_.obj_coeffs.resize(n_cols);

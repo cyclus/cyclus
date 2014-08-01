@@ -41,6 +41,8 @@ class ProgTranslator {
   /// @param iface the solver interface
   /// @param exclusive whether or not to include binary-valued arcs
   /// @param pseudo_cost the cost to use for faux arcs
+  ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface);
+  ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive);
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                  double pseudo_cost);
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
@@ -63,7 +65,7 @@ class ProgTranslator {
   const ProgTranslator::Context& ctx() const { return ctx_; }
 
  private:
-  void Init_();
+  void Init();
  
   /// perform all translation for a node group
   /// @param grp a pointer to the node group
