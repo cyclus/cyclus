@@ -120,10 +120,10 @@ class GreedySolver: public ExchangeSolver {
   /// capacity or a negative ExchangeNode max_qty
   /// @param n the ExchangeNode
   /// @param qty the quantity for the node to update
-  void Init_(ExchangeNodeGroup::Ptr prs);
-  void GreedilySatisfySet_(RequestGroup::Ptr prs);
-  void UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty);
-  void UpdateObj_(double qty, double pref);
+  void GetCaps(ExchangeNodeGroup::Ptr prs);
+  void GreedilySatisfySet(RequestGroup::Ptr prs);
+  void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
+  void UpdateObj(double qty, double pref);
   
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
