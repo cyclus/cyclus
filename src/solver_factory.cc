@@ -11,29 +11,20 @@
 
 namespace cyclus {
 
-int callBack(CbcModel * model, int whereFrom) {
-  int returnCode=0;
-  switch (whereFrom) {
+int CbcCallBack(CbcModel * model, int from) {
+  int ret = 0;
+  switch (from) {
   case 1:
   case 2:
-    if (!model->status()&&model->secondaryStatus())
-      returnCode=1;
+    if (!model->status() && model->secondaryStatus())
+      ret=1;
     break;
   case 3:
-    {
-      //CbcCompareUser compare;
-      //model->setNodeComparison(compare);
-    }
-    break;
   case 4:
-    // If not good enough could skip postprocessing
-    break;
   case 5:
     break;
-  default:
-    abort();
   }
-  return returnCode;
+  return ret;
 }
 
 ObjValueHandler::ObjValueHandler(double obj, double time, bool found)
@@ -139,7 +130,7 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
     ObjValueHandler handler(greedy_obj);
     CbcMain0(model);
     model.passInEventHandler(&handler);
-    CbcMain1(argc, argv, model, callBack);
+    CbcMain1(argc, argv, model, CbcCallBack);
     si->setColSolution(model.getColSolution());
     if (verbose) {
       std::cout << "Greedy equivalent time: " << handler.time()
