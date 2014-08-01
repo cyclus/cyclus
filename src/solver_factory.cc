@@ -49,9 +49,7 @@ class ObjValueHandler: public CbcEventHandler {
   }
 
   virtual CbcAction event(CbcEvent e) {
-    //std::cout << "Greedy event handler\n";
     if (!found_ && (e == solution || e == heuristicSolution)) {
-      //std::cout << "Greedy event found\n";
       const CbcModel* m = getModel();
       double cbcobj = m->getObjValue();
       if (cbcobj < obj_) {
