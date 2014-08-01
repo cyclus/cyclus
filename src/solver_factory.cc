@@ -4,75 +4,61 @@
 
 #include "OsiClpSolverInterface.hpp"
 #include "OsiCbcSolverInterface.hpp"
-
 #include "CbcSolver.hpp"
-#include "CbcEventHandler.hpp"
 #include "CoinTime.hpp"
 
 #include "error.h"
 
 namespace cyclus {
 
-/// An event handler that records the time that a better solution is found  
-class ObjValueHandler: public CbcEventHandler {
- public:
-  ObjValueHandler(double obj, double time, bool found)
-    : obj_(obj),
-      time_(time),
-      found_(found) {};
+ObjValueHandler::ObjValueHandler(double obj, double time, bool found)
+  : obj_(obj),
+    time_(time),
+    found_(found) { };
 
-  explicit ObjValueHandler(double obj)
-    : obj_(obj),
-      time_(0),
-      found_(false) {};
+ObjValueHandler::ObjValueHandler(double obj)
+  : obj_(obj),
+    time_(0),
+    found_(false) { };
+    
+ObjValueHandler::~ObjValueHandler() { };
 
-  virtual ~ObjValueHandler() {}
-
-  ObjValueHandler(const ObjValueHandler& other): CbcEventHandler(other) {
+ObjValueHandler::ObjValueHandler(const ObjValueHandler& other): CbcEventHandler(other) {
+  obj_ = other.obj();
+  time_ = other.time();
+  found_ = other.found();
+}
+  
+ObjValueHandler& ObjValueHandler::operator=(const ObjValueHandler& other) {
+  if (this != &other) {
     obj_ = other.obj();
     time_ = other.time();
     found_ = other.found();
+    CbcEventHandler::operator=(other);
   }
+  return *this;
+}
   
-  ObjValueHandler& operator=(const ObjValueHandler& other) {
-    if (this != &other) {
-      obj_ = other.obj();
-      time_ = other.time();
-      found_ = other.found();
-      CbcEventHandler::operator=(other);
+CbcEventHandler* ObjValueHandler::clone() {
+  return new ObjValueHandler(*this);
+}
+
+CbcEventHandler::CbcAction ObjValueHandler::event(CbcEvent e) {
+  if (!found_ && (e == solution || e == heuristicSolution)) {
+    const CbcModel* m = getModel();
+    double cbcobj = m->getObjValue();
+    if (cbcobj < obj_) {
+      time_ = CoinCpuTime() -
+              m->getDblParam(CbcModel::CbcStartSeconds);
+      found_ = true;
     }
-    return *this;
   }
-  
-  virtual CbcEventHandler* clone() {
-    return new ObjValueHandler(*this);
-  }
-
-  virtual CbcAction event(CbcEvent e) {
-    if (!found_ && (e == solution || e == heuristicSolution)) {
-      const CbcModel* m = getModel();
-      double cbcobj = m->getObjValue();
-      if (cbcobj < obj_) {
-        time_ = CoinCpuTime() -
-                m->getDblParam(CbcModel::CbcStartSeconds);
-        found_ = true;
-      }
-    }
-    return noAction;
-  }
-
-  inline double time() const {return time_;}
-  inline double obj() const {return obj_;}
-  inline bool found() const {return found_;}
-    
- private:
-  double obj_, time_;
-  bool found_;
-};
-
+  return noAction;
+}
 
 // 10800 s = 3 hrs * 60 min/hr * 60 s/min
 #define CYCLUS_SOLVER_TIMEOUT 10800
+
 SolverFactory::SolverFactory() : t_("cbc"), tmax_(CYCLUS_SOLVER_TIMEOUT) { }
 SolverFactory::SolverFactory(std::string t) : t_(t), tmax_(CYCLUS_SOLVER_TIMEOUT) { }
 SolverFactory::SolverFactory(std::string t, double tmax)

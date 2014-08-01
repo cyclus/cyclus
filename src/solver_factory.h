@@ -3,9 +3,29 @@
 
 #include <string>
 
+#include "CbcEventHandler.hpp"
+
 class OsiSolverInterface;
 
 namespace cyclus {
+/// An event handler that records the time that a better solution is found  
+class ObjValueHandler: public CbcEventHandler {
+ public:
+  ObjValueHandler(double obj, double time, bool found);
+  explicit ObjValueHandler(double obj);
+  virtual ~ObjValueHandler();
+  ObjValueHandler(const ObjValueHandler& other);
+  ObjValueHandler& operator=(const ObjValueHandler& other);
+  virtual CbcEventHandler* clone();
+  virtual CbcEventHandler::CbcAction event(CbcEvent e);
+  inline double time() const { return time_; }
+  inline double obj() const { return obj_; }
+  inline bool found() const { return found_; }
+    
+ private:
+  double obj_, time_;
+  bool found_;
+};
 
 /// A factory class that, given a configuration, returns a
 /// Coin::OsiSolverInterface for a solver.
