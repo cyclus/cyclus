@@ -8,6 +8,10 @@
 class OsiSolverInterface;
 
 namespace cyclus {
+ 
+/// this is taken exactly from driver4.cpp in the Cbc examples
+static int callBack(CbcModel * model, int whereFrom);
+  
 /// An event handler that records the time that a better solution is found  
 class ObjValueHandler: public CbcEventHandler {
  public:

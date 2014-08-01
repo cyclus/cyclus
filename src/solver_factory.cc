@@ -11,6 +11,31 @@
 
 namespace cyclus {
 
+int callBack(CbcModel * model, int whereFrom) {
+  int returnCode=0;
+  switch (whereFrom) {
+  case 1:
+  case 2:
+    if (!model->status()&&model->secondaryStatus())
+      returnCode=1;
+    break;
+  case 3:
+    {
+      //CbcCompareUser compare;
+      //model->setNodeComparison(compare);
+    }
+    break;
+  case 4:
+    // If not good enough could skip postprocessing
+    break;
+  case 5:
+    break;
+  default:
+    abort();
+  }
+  return returnCode;
+}
+
 ObjValueHandler::ObjValueHandler(double obj, double time, bool found)
   : obj_(obj),
     time_(time),
@@ -101,33 +126,6 @@ void ReportProg(OsiSolverInterface* si) {
   }
   std::cout << "matrix:\n";
   m->dumpMatrix();
-}
-
-/// this is taken exactly from driver4.cpp in the Cbc examples
-static int callBack(CbcModel * model, int whereFrom)
-{
-  int returnCode=0;
-  switch (whereFrom) {
-  case 1:
-  case 2:
-    if (!model->status()&&model->secondaryStatus())
-      returnCode=1;
-    break;
-  case 3:
-    {
-      //CbcCompareUser compare;
-      //model->setNodeComparison(compare);
-    }
-    break;
-  case 4:
-    // If not good enough could skip postprocessing
-    break;
-  case 5:
-    break;
-  default:
-    abort();
-  }
-  return returnCode;
 }
 
 void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
