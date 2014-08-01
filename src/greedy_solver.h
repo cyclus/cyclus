@@ -91,7 +91,7 @@ class GreedySolver: public ExchangeSolver {
   /// @param curr_qty the currently allocated node quantity (if solving piecemeal)
   /// @return The minimum of the node's nodegroup capacities / the node's unit
   /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller.
-  // @{
+  /// @{
   double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
                   double curr_qty);
   inline double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap) {
@@ -103,7 +103,7 @@ class GreedySolver: public ExchangeSolver {
   inline double Capacity(ExchangeNode::Ptr n, const Arc& a) {
     return Capacity(n, a, true, 0.0);
   }
-  // @}
+  /// @}
 
  protected:
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
@@ -124,10 +124,6 @@ class GreedySolver: public ExchangeSolver {
   void GreedilySatisfySet_(RequestGroup::Ptr prs);
   void UpdateCapacity_(ExchangeNode::Ptr n, const Arc& a, double qty);
   void UpdateObj_(double qty, double pref);
-
-  /// this is an expensive function O(total number of arcs) that is used
-  /// to evaluate the maximum node preference and min unit capacity
-  double PseudoCost_();
   
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;

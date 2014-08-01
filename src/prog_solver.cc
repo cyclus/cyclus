@@ -30,7 +30,8 @@ double ProgSolver::SolveGraph() {
     graph_->ClearMatches();
     
     // translate graph to iface instance
-    ProgTranslator xlator(graph_, iface, exclusive_orders_);
+    double pseudo_cost = PseudoCost(); // from ExchangeSolver API
+    ProgTranslator xlator(graph_, iface, exclusive_orders_, pseudo_cost);
     xlator.ToProg();
 
     // set noise level

@@ -40,8 +40,11 @@ class ProgTranslator {
   /// @param g the exchange graph
   /// @param iface the solver interface
   /// @param exclusive whether or not to include binary-valued arcs
+  /// @param pseudo_cost the cost to use for faux arcs
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
-                 bool exclusive = false);
+                 double pseudo_cost);
+  ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
+                 bool exclusive, double pseudo_cost);
 
   /// @brief translates the graph, filling the translators Context
   void Translate();
@@ -60,6 +63,8 @@ class ProgTranslator {
   const ProgTranslator::Context& ctx() const { return ctx_; }
 
  private:
+  void Init_();
+ 
   /// perform all translation for a node group
   /// @param grp a pointer to the node group
   /// @param req a boolean flag, true if grp is a request group
@@ -70,9 +75,7 @@ class ProgTranslator {
   bool excl_;
   int arc_offset_;
   ProgTranslator::Context ctx_;
-  double max_obj_coeff_;
-  double min_row_coeff_;
-  int cost_add_;
+  double pseudo_cost_;
 };
 
 }  // namespace cyclus

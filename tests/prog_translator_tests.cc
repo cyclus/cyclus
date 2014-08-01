@@ -59,6 +59,7 @@ TEST(ProgTranslatorTests, translation) {
                          excl_flow[i] / prefs[i] : 1 / prefs[i]);
   }
 
+  
   double cost_add = 1;
   double max_obj_coeff = 1 / 0.2;  // 1 / prefs[0]
   double min_row_coeff = 0.3;  // ucaps_a_3
@@ -142,7 +143,7 @@ TEST(ProgTranslatorTests, translation) {
   g.AddArc(x4);
 
   bool excl = true;
-  ProgTranslator pt(&g, iface, excl);
+  ProgTranslator pt(&g, iface, excl, max_cost);
   ASSERT_NO_THROW(pt.Translate());
 
   // test non-coin xlate members

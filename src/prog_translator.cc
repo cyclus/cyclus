@@ -10,24 +10,34 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
-                               bool exclusive)
+                               bool exclusive, double pseudo_cost)
     : g_(g),
       iface_(iface),
-      excl_(exclusive) {
+      excl_(exclusive),
+      pseudo_cost_(pseudo_cost) {
+  Init_();
+}
+
+ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
+                               double pseudo_cost)
+    : g_(g),
+      iface_(iface),
+      excl_(false),
+      pseudo_cost_(pseudo_cost) {
+  Init_();
+}
+
+
+void ProgTranslator::Init_() {
   arc_offset_ = g_->arcs().size();
   int n_cols = arc_offset_ + g_->request_groups().size();
   ctx_.obj_coeffs.resize(n_cols);
   ctx_.col_ubs.resize(n_cols);
   ctx_.col_lbs.resize(n_cols);
   ctx_.m = CoinPackedMatrix(false, 0, 0);
-  min_row_coeff_ = std::numeric_limits<double>::max();
-  max_obj_coeff_ = 0;
-  cost_add_ = 1;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ProgTranslator::Translate() {
   // number of variables = number of arcs + 1 faux arc per request group
   int n_cols = g_->arcs().size() + g_->request_groups().size();
@@ -48,16 +58,13 @@ void ProgTranslator::Translate() {
 
   // add each false arc
   double inf = iface_->getInfinity();
-  double max_cost = max_obj_coeff_ / min_row_coeff_ + cost_add_;
-
   for (int i = g_->arcs().size(); i != arc_offset_; i++) {
-    ctx_.obj_coeffs[i] = max_cost;
+    ctx_.obj_coeffs[i] = pseudo_cost_;
     ctx_.col_lbs[i] = 0;
     ctx_.col_ubs[i] = inf;
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ProgTranslator::Populate() {
   iface_->setObjSense(1.0);  // minimize
 
@@ -78,13 +85,11 @@ void ProgTranslator::Populate() {
 
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ProgTranslator::ToProg() {
   Translate();
   Populate();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
   double inf = iface_->getInfinity();
   std::vector<double>& caps = grp->capacities();
@@ -114,11 +119,6 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
         }
 
         cap_rows[j].insert(arc_id, coeff);
-
-        double compare = coeff;  // caps[j];
-        if (min_row_coeff_ > compare) {
-          min_row_coeff_ = compare;
-        }
       }
 
       if (request) {
@@ -126,9 +126,6 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
         double pref = nodes[i]->prefs[a];
         double col_ub = std::min(nodes[i]->qty, inf);
         double obj_coeff = (excl_ && a.exclusive()) ? a.excl_val() / pref : 1.0 / pref;
-        if (max_obj_coeff_ < obj_coeff) {
-          max_obj_coeff_ = obj_coeff;
-        }
         ctx_.obj_coeffs[arc_id] = obj_coeff;
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] = (excl_ && a.exclusive()) ? 1 : col_ub;
@@ -179,7 +176,6 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
   }
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ProgTranslator::FromProg() {
   const double* sol = iface_->getColSolution();
   std::vector<Arc>& arcs = g_->arcs();
