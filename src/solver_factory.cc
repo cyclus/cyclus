@@ -72,8 +72,9 @@ class ObjValueHandler: public CbcEventHandler {
 
 
 // 10800 s = 3 hrs * 60 min/hr * 60 s/min
-SolverFactory::SolverFactory() : t_("cbc"), tmax_(10800) { }
-SolverFactory::SolverFactory(std::string t) : t_(t), tmax_(10800) { }
+#define CYCLUS_SOLVER_TIMEOUT 10800
+SolverFactory::SolverFactory() : t_("cbc"), tmax_(CYCLUS_SOLVER_TIMEOUT) { }
+SolverFactory::SolverFactory(std::string t) : t_(t), tmax_(CYCLUS_SOLVER_TIMEOUT) { }
 SolverFactory::SolverFactory(std::string t, double tmax)
     : t_(t),
       tmax_(tmax) { }
