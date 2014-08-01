@@ -215,7 +215,7 @@ class ExchangeGraph {
   void AddMatch(const Arc& a, double qty);
 
   /// clears all matches
-  inline void ClearMatches() {matches_.clear();}
+  inline void ClearMatches() { matches_.clear(); }
 
   inline const std::vector<RequestGroup::Ptr>& request_groups() const {
     return request_groups_;
