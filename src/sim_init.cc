@@ -167,8 +167,10 @@ void SimInit::LoadRecipes() {
 }
 
 void SimInit::LoadSolverInfo() {
-  GreedyPreconditioner* conditioner = NULL;
-
+  // context will delete solver
+  GreedySolver* solver;
+  bool exclusive_orders = false;
+  
   try {
     QueryResult qr = b_->Query("CommodPriority", NULL);
     std::map<std::string, double> commod_order;
@@ -179,15 +181,13 @@ void SimInit::LoadSolverInfo() {
     }
 
     // solver will delete conditioner
-    conditioner = new GreedyPreconditioner(commod_order,
-                                           GreedyPreconditioner::REVERSE);
-  } catch (std::exception err) {}  // table doesn't exist (okay)
+    GreedyPreconditioner* conditioner = new GreedyPreconditioner(
+        commod_order, GreedyPreconditioner::REVERSE);
+    solver = new GreedySolver(exclusive_orders, conditioner);
+  } catch (std::exception err) {
+    solver = new GreedySolver(exclusive_orders);
+  }  // table doesn't exist (okay)
 
-  // context will delete solver
-  bool exclusive_orders = false;
-  GreedySolver* solver = conditioner == NULL ?
-                         new GreedySolver(exclusive_orders) :
-                         new GreedySolver(exclusive_orders, conditioner);
   ctx_->solver(solver);
 }
 
