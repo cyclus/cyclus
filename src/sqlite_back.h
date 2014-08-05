@@ -25,7 +25,7 @@ class SqliteBack: public FullBackend {
 
   /// Writes Datum objects immediately to the database as a single transaction.
   /// @param data group of Datum objects to write to the database together.
-  void Notify(DatumList data);
+  virtual void Notify(DatumList data);
 
   /// Returns a unique name for this backend.
   std::string Name();
