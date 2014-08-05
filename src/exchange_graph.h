@@ -84,10 +84,8 @@ class Arc {
   }
 
   inline bool operator <(const Arc& rhs) const {
-    ExchangeNode::Ptr u = unode();
-    ExchangeNode::Ptr v = vnode();
-    return u < rhs.unode() ||
-        (!(rhs.unode() < u) && v < rhs.vnode());
+    return unode_ < rhs.unode_ ||
+        (!(rhs.unode_ < unode_) && vnode_ < rhs.vnode_);
   }
 
   inline bool operator==(const Arc& rhs) const {
