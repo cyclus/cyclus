@@ -11,12 +11,23 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
     : conditioner_(c),
       ExchangeSolver(exclusive_orders) {}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+GreedySolver::GreedySolver(bool exclusive_orders)
+    : ExchangeSolver(exclusive_orders) {
+  conditioner_ = new cyclus::GreedyPreconditioner();  
+}
+
+GreedySolver::GreedySolver(GreedyPreconditioner* c)
+    : conditioner_(c),
+      ExchangeSolver(true) {}
+
+GreedySolver::GreedySolver() : ExchangeSolver(true) {
+  conditioner_ = new cyclus::GreedyPreconditioner();  
+}
+
 GreedySolver::~GreedySolver() {
   if (conditioner_ != NULL)
     delete conditioner_;
@@ -41,7 +52,6 @@ void GreedySolver::Init() {
                     this));
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double GreedySolver::SolveGraph() {
   double pseudo_cost = PseudoCost(); // from ExchangeSolver API
   Condition();
@@ -115,7 +125,6 @@ double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
   return std::min(cap, n->qty - curr_qty);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
   for (int i = 0; i != g->nodes().size(); i++) {
     n_qty_[g->nodes()[i]] = 0;
@@ -123,7 +132,6 @@ void GreedySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
   grp_caps_[g.get()] = g->capacities();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
   std::stable_sort(nodes.begin(), nodes.end(), AvgPrefComp);
@@ -155,7 +163,6 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
         const Arc& a = *arc_it;
         u = a.unode();
         v = a.vnode();
-
         // capacity adjustment
         tomatch = std::min(remain, Capacity(a, n_qty_[u], n_qty_[v]));
 
@@ -192,7 +199,6 @@ void GreedySolver::UpdateObj(double qty, double pref) {
   obj_ += qty / pref;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,
                                   double qty) {
   using cyclus::IsNegative;

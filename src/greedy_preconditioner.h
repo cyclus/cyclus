@@ -68,12 +68,15 @@ class GreedyPreconditioner {
 
   /// @brief constructor if weights are given in heaviest-first order
   /// @warning weights are assumed to be positive
+  /// @{
+  GreedyPreconditioner() {}
+
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights)
       : commod_weights_(commod_weights) {
     if (commod_weights_.size() != 0)
       ProcessWeights_(END);
   }
-
+  
   /// @brief constructor if weights may not be given in heaviest-first order
   /// @warning weights are assumed to be positive
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights,
@@ -82,7 +85,8 @@ class GreedyPreconditioner {
     if (commod_weights_.size() != 0)
       ProcessWeights_(order);
   }
-
+  /// @}
+  
   /// @brief conditions the graph as described above
   /// @throws KeyError if a commodity is in the graph but not in the weight
   /// mapping

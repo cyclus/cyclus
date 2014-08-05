@@ -71,10 +71,8 @@ TEST(GreedySolverTests, General) {
   EXPECT_EQ(g.request_groups()[0], gu1);
   EXPECT_EQ(g.request_groups()[1], gu2);
 
-  std::map<std::string, double> null_weights;
-  // the solver cleans up
-  GreedyPreconditioner* p = new GreedyPreconditioner(null_weights);
-  GreedySolver s(false, p);
+  bool excl = false;
+  GreedySolver s(excl);
 
   s.graph(&g);
   s.Init();

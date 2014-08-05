@@ -50,9 +50,18 @@ class GreedyPreconditioner;
 /// @warning the GreedySolver is responsible for deleting is conditioner!
 class GreedySolver: public ExchangeSolver {
  public:
-  GreedySolver(bool exclusive_orders = false,
-               GreedyPreconditioner* c = NULL);
-
+  /// GreedySolver constructor
+  /// @param exclusive_orders a flag for enforcing integral, quantized orders
+  /// @param c a conditioner to use before solving a graph instance
+  /// @warning if a NULL pointer is passed as a conditioner argument,
+  /// conditioning will *NOT* occur
+  /// @{
+  GreedySolver();
+  explicit GreedySolver(bool exclusive_orders);
+  explicit GreedySolver(GreedyPreconditioner* c);
+  GreedySolver(bool exclusive_orders, GreedyPreconditioner* c);
+  /// @}
+  
   virtual ~GreedySolver();
 
   /// Uses the provided (or a default) GreedyPreconditioner to condition the
