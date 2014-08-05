@@ -50,8 +50,10 @@ class GreedyPreconditioner;
 /// @warning the GreedySolver is responsible for deleting is conditioner!
 class GreedySolver: public ExchangeSolver {
  public:
-  GreedySolver(bool exclusive_orders = false,
-               GreedyPreconditioner* c = NULL);
+  GreedySolver();
+  explicit GreedySolver(bool exclusive_orders);
+  explicit GreedySolver(GreedyPreconditioner* c);
+  GreedySolver(bool exclusive_orders, GreedyPreconditioner* c);
 
   virtual ~GreedySolver();
 

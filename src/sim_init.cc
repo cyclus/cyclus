@@ -185,7 +185,9 @@ void SimInit::LoadSolverInfo() {
 
   // context will delete solver
   bool exclusive_orders = false;
-  GreedySolver* solver = new GreedySolver(exclusive_orders, conditioner);
+  GreedySolver* solver = conditioner == NULL ?
+                         new GreedySolver(exclusive_orders) :
+                         new GreedySolver(exclusive_orders, conditioner);
   ctx_->solver(solver);
 }
 
