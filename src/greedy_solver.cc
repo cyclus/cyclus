@@ -163,7 +163,6 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
         const Arc& a = *arc_it;
         u = a.unode();
         v = a.vnode();
-        std::cout << u->prefs[a] << std::endl;
         // capacity adjustment
         tomatch = std::min(remain, Capacity(a, n_qty_[u], n_qty_[v]));
 
