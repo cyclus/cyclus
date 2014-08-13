@@ -84,32 +84,32 @@ TEST(ProgTranslatorTests, translation) {
   Arc x3(a1, d0);
   Arc x4(b1, d1);
 
-  a0->unit_capacities[x0] = std::vector<double>(
+  a0->unit_capacities[&x0] = std::vector<double>(
       ucaps_a_0, ucaps_a_0 + sizeof(ucaps_a_0) / sizeof(ucaps_a_0[0]) );
-  a1->unit_capacities[x3] = std::vector<double>(
+  a1->unit_capacities[&x3] = std::vector<double>(
       ucaps_a_3, ucaps_a_3 + sizeof(ucaps_a_3) / sizeof(ucaps_a_3[0]) );
-  b0->unit_capacities[x1] = std::vector<double>(
+  b0->unit_capacities[&x1] = std::vector<double>(
       ucaps_b_1, ucaps_b_1 + sizeof(ucaps_b_1) / sizeof(ucaps_b_1[0]) );
-  b1->unit_capacities[x2] = std::vector<double>(
+  b1->unit_capacities[&x2] = std::vector<double>(
       ucaps_b_2, ucaps_b_2 + sizeof(ucaps_b_2) / sizeof(ucaps_b_2[0]) );
-  b1->unit_capacities[x4] = std::vector<double>(
+  b1->unit_capacities[&x4] = std::vector<double>(
       ucaps_b_4, ucaps_b_4 + sizeof(ucaps_b_4) / sizeof(ucaps_b_4[0]) );
-  c0->unit_capacities[x0] = std::vector<double>(
+  c0->unit_capacities[&x0] = std::vector<double>(
       ucaps_c_0, ucaps_c_0 + sizeof(ucaps_c_0) / sizeof(ucaps_c_0[0]) );
-  c1->unit_capacities[x1] = std::vector<double>(
+  c1->unit_capacities[&x1] = std::vector<double>(
       ucaps_c_1, ucaps_c_1 + sizeof(ucaps_c_1) / sizeof(ucaps_c_1[0]) );
-  c2->unit_capacities[x2] = std::vector<double>(
+  c2->unit_capacities[&x2] = std::vector<double>(
       ucaps_c_2, ucaps_c_2 + sizeof(ucaps_c_2) / sizeof(ucaps_c_2[0]) );
-  d0->unit_capacities[x3] = std::vector<double>(
+  d0->unit_capacities[&x3] = std::vector<double>(
       ucaps_d_3, ucaps_d_3 + sizeof(ucaps_d_3) / sizeof(ucaps_d_3[0]) );
-  d1->unit_capacities[x4] = std::vector<double>(
+  d1->unit_capacities[&x4] = std::vector<double>(
       ucaps_d_4, ucaps_d_4 + sizeof(ucaps_d_4) / sizeof(ucaps_d_4[0]) );
 
-  a0->prefs[x0] = prefs[0];
-  b0->prefs[x1] = prefs[1];
-  b1->prefs[x2] = prefs[2];
-  a1->prefs[x3] = prefs[3];
-  b1->prefs[x4] = prefs[4];
+  a0->prefs[&x0] = prefs[0];
+  b0->prefs[&x1] = prefs[1];
+  b1->prefs[&x2] = prefs[2];
+  a1->prefs[&x3] = prefs[3];
+  b1->prefs[&x4] = prefs[4];
 
   RequestGroup::Ptr a(new RequestGroup());  // new RequestGroup(dem_a[0])?
   a->AddExchangeNode(a0);
@@ -136,11 +136,11 @@ TEST(ProgTranslatorTests, translation) {
   g.AddRequestGroup(b);
   g.AddSupplyGroup(c);
   g.AddSupplyGroup(d);
-  g.AddArc(x0);
-  g.AddArc(x1);
-  g.AddArc(x2);
-  g.AddArc(x3);
-  g.AddArc(x4);
+  g.AddArc(&x0);
+  g.AddArc(&x1);
+  g.AddArc(&x2);
+  g.AddArc(&x3);
+  g.AddArc(&x4);
 
   bool excl = true;
   ProgTranslator pt(&g, iface, excl, max_cost);
@@ -260,10 +260,10 @@ TEST(ProgTranslatorTests, translation) {
   ASSERT_NO_THROW(pt.FromProg());
   const std::vector<Match>& matches = g.matches();
   ASSERT_EQ(4, matches.size());
-  pair_double_eq(matches[0], std::pair<Arc, double>(x0, x0_flow));
-  pair_double_eq(matches[1], std::pair<Arc, double>(x1, x1_flow));
-  pair_double_eq(matches[2], std::pair<Arc, double>(x2, x2_flow));
-  pair_double_eq(matches[3], std::pair<Arc, double>(x3, x3_flow));
+  pair_double_eq(matches[0], std::pair<const Arc*, double>(&x0, x0_flow));
+  pair_double_eq(matches[1], std::pair<const Arc*, double>(&x1, x1_flow));
+  pair_double_eq(matches[2], std::pair<const Arc*, double>(&x2, x2_flow));
+  pair_double_eq(matches[3], std::pair<const Arc*, double>(&x3, x3_flow));
 
   delete iface;
 }

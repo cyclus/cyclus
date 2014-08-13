@@ -54,10 +54,10 @@ TEST(ExGraphTests, AddArc1) {
 
   Arc a(u, v);
 
-  Arc arr[] = {a};
-  vector<Arc> exp (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+  Arc* arr[] = {&a};
+  vector<const Arc*> exp (arr, arr + sizeof(arr) / sizeof(arr[0]) );
 
-  g.AddArc(a);
+  g.AddArc(&a);
   EXPECT_EQ(exp, g.node_arc_map().at(u));
   EXPECT_EQ(exp, g.node_arc_map().at(v));
 }
@@ -75,21 +75,21 @@ TEST(ExGraphTests, AddArc2) {
   Arc a2(u, w);
   Arc a3(x, w);
 
-  Arc arru[] = {a1, a2};
-  vector<Arc> expu (arru, arru + sizeof(arru) / sizeof(arru[0]) );
+  Arc* arru[] = {&a1, &a2};
+  vector<const Arc*> expu (arru, arru + sizeof(arru) / sizeof(arru[0]) );
 
-  Arc arrv[] = {a1};
-  vector<Arc> expv (arrv, arrv + sizeof(arrv) / sizeof(arrv[0]) );
+  Arc* arrv[] = {&a1};
+  vector<const Arc*> expv (arrv, arrv + sizeof(arrv) / sizeof(arrv[0]) );
 
-  Arc arrw[] = {a2, a3};
-  vector<Arc> expw (arrw, arrw + sizeof(arrw) / sizeof(arrw[0]) );
+  Arc* arrw[] = {&a2, &a3};
+  vector<const Arc*> expw (arrw, arrw + sizeof(arrw) / sizeof(arrw[0]) );
 
-  Arc arrx[] = {a3};
-  vector<Arc> expx (arrx, arrx + sizeof(arrx) / sizeof(arrx[0]) );
+  Arc* arrx[] = {&a3};
+  vector<const Arc*> expx (arrx, arrx + sizeof(arrx) / sizeof(arrx[0]) );
 
-  g.AddArc(a1);
-  g.AddArc(a2);
-  g.AddArc(a3);
+  g.AddArc(&a1);
+  g.AddArc(&a2);
+  g.AddArc(&a3);
 
   EXPECT_EQ(expu, g.node_arc_map().at(u));
   EXPECT_EQ(expv, g.node_arc_map().at(v));
@@ -107,8 +107,8 @@ TEST(ExGraphTests, AddMatch) {
   ExchangeNode::Ptr v(new ExchangeNode());
   Arc a(u, v);
 
-  u->unit_capacities[a].push_back(uval);
-  v->unit_capacities[a].push_back(vval);
+  u->unit_capacities[&a].push_back(uval);
+  v->unit_capacities[&a].push_back(vval);
 
   double large = 500;
 
@@ -124,9 +124,9 @@ TEST(ExGraphTests, AddMatch) {
 
   double qty = large * 0.1;
 
-  Match match(std::make_pair(a, qty));
+  Match match(std::make_pair(&a, qty));
 
-  g.AddMatch(a, qty);
+  g.AddMatch(&a, qty);
   ASSERT_EQ(1, g.matches().size());
   EXPECT_EQ(match, g.matches().at(0));
 }
