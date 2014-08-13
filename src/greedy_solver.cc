@@ -71,11 +71,11 @@ double GreedySolver::SolveGraph() {
   return obj_;
 }
 
-double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
+double GreedySolver::Capacity(const Arc* a, double u_curr_qty,
                                double v_curr_qty) {
   bool min = true;
-  double ucap = Capacity(a.unode(), a, !min, u_curr_qty);
-  double vcap = Capacity(a.vnode(), a, min, v_curr_qty);
+  double ucap = Capacity(a->unode(), a, !min, u_curr_qty);
+  double vcap = Capacity(a->vnode(), a, min, v_curr_qty);
 
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
@@ -85,7 +85,7 @@ double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
   return std::min(ucap, vcap);
 }
 
-double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc* a, bool min_cap,
                                double curr_qty) {
   if (n->group == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
@@ -141,8 +141,8 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
   double match = 0;
 
   ExchangeNode::Ptr u, v;
-  std::vector<Arc>::const_iterator arc_it;
-  std::vector<Arc> sorted;
+  std::vector<const Arc*>::const_iterator arc_it;
+  std::vector<const Arc*> sorted;
   double remain, tomatch, excl_val;
 
   CLOG(LEV_DEBUG1) << "Greedy Solving for " << target
@@ -153,22 +153,23 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
     // not exist, which is a corner case for when there is a request with no bid
     // arcs associated with it
     if (graph_->node_arc_map().count(*req_it) > 0) {
-      const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
-      sorted = std::vector<Arc>(arcs);  // make a copy for now
+      const std::vector<const Arc*>& arcs = graph_->node_arc_map().at(*req_it);
+      sorted = std::vector<const Arc*>(arcs);  // make a copy for now
       std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp);
       arc_it = sorted.begin();
 
       while ((match <= target) && (arc_it != sorted.end())) {
         remain = target - match;
-        const Arc& a = *arc_it;
-        u = a.unode();
-        v = a.vnode();
+        const Arc* a = *arc_it;
+        u = a->unode();
+        v = a->vnode();
+
         // capacity adjustment
         tomatch = std::min(remain, Capacity(a, n_qty_[u], n_qty_[v]));
 
         // exclusivity adjustment
-        if (arc_it->exclusive()) {
-          excl_val = a.excl_val();
+        if ((*arc_it)->exclusive()) {
+          excl_val = a->excl_val();
           tomatch = (tomatch < excl_val) ? 0 : excl_val;
         }
 
@@ -199,7 +200,7 @@ void GreedySolver::UpdateObj(double qty, double pref) {
   obj_ += qty / pref;
 }
 
-void GreedySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,
+void GreedySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc* a,
                                   double qty) {
   using cyclus::IsNegative;
   using cyclus::ValueError;

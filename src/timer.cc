@@ -82,7 +82,9 @@ void Timer::DoTick() {
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
   matmgr->Execute();
+  Arc::ReleaseCache();
   genmgr->Execute();
+  Arc::ReleaseCache();
 }
 
 void Timer::DoTock() {

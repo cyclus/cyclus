@@ -82,15 +82,15 @@ class ExchangeTranslator {
       CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
     } else {
       // get translated arc
-      Arc a = TranslateArc(xlation_ctx_, bid);
+      Arc* a = TranslateArc(xlation_ctx_, bid);
 
-      a.unode()->prefs[a] = pref;  // request node is a.unode()
-      int n_prefs = a.unode()->prefs.size();
+      a->unode()->prefs[a] = pref;  // request node is a->unode()
+      int n_prefs = a->unode()->prefs.size();
 
       CLOG(LEV_DEBUG5) << "Updating preference for one of "
                        << req->requester()->manager()->prototype()
                        << "'s trade nodes:";
-      CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
+      CLOG(LEV_DEBUG5) << "   preference: " << a->unode()->prefs[a];
 
       graph->AddArc(a);
     }
@@ -222,13 +222,13 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 /// @brief translates an arc given a bid and subsequent data, and also
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
-Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
+Arc* TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
                  Bid<T>* bid) {
   Request<T>* req = bid->request();
 
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
-  Arc arc(unode, vnode);
+  Arc* arc = Arc::Make(unode, vnode);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
@@ -247,8 +247,8 @@ template <class T>
 Trade<T> BackTranslateMatch(const ExchangeTranslationContext<T>&
                                 translation_ctx,
                             const Match& match) {
-  ExchangeNode::Ptr req_node = match.first.unode();
-  ExchangeNode::Ptr bid_node = match.first.vnode();
+  ExchangeNode::Ptr req_node = match.first->unode();
+  ExchangeNode::Ptr bid_node = match.first->vnode();
 
   Trade<T> t;
   t.request = translation_ctx.node_to_request.at(req_node);
@@ -264,13 +264,13 @@ void TranslateCapacities(
     typename T::Ptr offer,
     const typename std::set< CapacityConstraint<T> >& constr,
     ExchangeNode::Ptr n,
-    const Arc& a,
+    const Arc* a,
     const ExchangeTranslationContext<T>& ctx) {
   typename std::set< CapacityConstraint<T> >::const_iterator it;
   for (it = constr.begin(); it != constr.end(); ++it) {
     CLOG(cyclus::LEV_DEBUG1) << "Additing unit capacity: "
-                             << it->convert(offer, &a, &ctx) / offer->quantity();
-    n->unit_capacities[a].push_back(it->convert(offer, &a, &ctx) /
+                             << it->convert(offer, a, &ctx) / offer->quantity();
+    n->unit_capacities[a].push_back(it->convert(offer, a, &ctx) /
                                     offer->quantity());
   }
 }

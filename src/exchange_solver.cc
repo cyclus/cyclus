@@ -9,8 +9,8 @@ namespace cyclus {
 
 double ExchangeSolver::PseudoCost(double cost_add) {
   std::vector<ExchangeNode::Ptr>::iterator n_it;
-  std::map<Arc, std::vector<double> >::iterator c_it;
-  std::map<Arc, double>::iterator p_it;
+  std::map<const Arc*, std::vector<double> >::iterator c_it;
+  std::map<const Arc*, double>::iterator p_it;
   std::vector<RequestGroup::Ptr>::iterator rg_it;
   std::vector<ExchangeNodeGroup::Ptr>::iterator sg_it;
   double min_cap, pref, coeff;
@@ -24,8 +24,8 @@ double ExchangeSolver::PseudoCost(double cost_add) {
     std::vector<ExchangeNode::Ptr>& nodes = (*sg_it)->nodes();
     for (n_it = nodes.begin(); n_it != nodes.end(); ++n_it) {
       // update min_unit_cap
-      std::map<Arc, std::vector<double> >::iterator c_it;
-      std::map<Arc, std::vector<double> >& caps = (*n_it)->unit_capacities;
+      std::map<const Arc*, std::vector<double> >::iterator c_it;
+      std::map<const Arc*, std::vector<double> >& caps = (*n_it)->unit_capacities;
       for (c_it = caps.begin(); c_it != caps.end(); ++c_it) {
         std::vector<double>& ucaps = c_it->second; 
         if (!ucaps.empty()) {
@@ -43,8 +43,8 @@ double ExchangeSolver::PseudoCost(double cost_add) {
     std::vector<ExchangeNode::Ptr>& nodes = (*rg_it)->nodes();
     for (n_it = nodes.begin(); n_it != nodes.end(); ++n_it) {
       // update min_unit_cap
-      std::map<Arc, std::vector<double> >::iterator c_it;
-      std::map<Arc, std::vector<double> >& caps = (*n_it)->unit_capacities;
+      std::map<const Arc*, std::vector<double> >::iterator c_it;
+      std::map<const Arc*, std::vector<double> >& caps = (*n_it)->unit_capacities;
       for (c_it = caps.begin(); c_it != caps.end(); ++c_it) {
         std::vector<double>& ucaps = c_it->second; 
         if (!ucaps.empty()) {
@@ -55,12 +55,12 @@ double ExchangeSolver::PseudoCost(double cost_add) {
       }
       
       // update max_pref_
-      std::map<Arc, double>& prefs = (*n_it)->prefs;
+      std::map<const Arc*, double>& prefs = (*n_it)->prefs;
       for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
         pref = p_it->second;
-        const Arc& a = p_it->first;
-        coeff = (exclusive_orders_ && a.exclusive()) ?
-                a.excl_val() / pref : 1.0 / pref;
+        const Arc* a = p_it->first;
+        coeff = (exclusive_orders_ && a->exclusive()) ?
+                a->excl_val() / pref : 1.0 / pref;
         if (coeff > max_coeff)
           max_coeff = coeff;
       }
