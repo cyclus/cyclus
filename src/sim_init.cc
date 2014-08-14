@@ -144,8 +144,9 @@ void SimInit::LoadInfo() {
   int dur = qr.GetVal<int>("Duration");
   int y0 = qr.GetVal<int>("InitialYear");
   int m0 = qr.GetVal<int>("InitialMonth");
+  bool d = qr.GetVal<bool>("DecayOn");
   std::string h = qr.GetVal<std::string>("Handle");
-  si_ = SimInfo(dur, y0, m0, h);
+  si_ = SimInfo(dur, y0, m0, d, h);
   si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
   ctx_->InitSim(si_);
 }

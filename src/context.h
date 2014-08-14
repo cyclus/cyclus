@@ -35,7 +35,7 @@ class SimInfo {
  public:
   SimInfo();
 
-  SimInfo(int dur, int y0 = 2010, int m0 = 1,
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, bool d = true,
           std::string handle = "");
 
   SimInfo(int dur, boost::uuids::uuid parent_sim,
