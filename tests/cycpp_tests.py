@@ -3,7 +3,7 @@ import sys
 from collections import OrderedDict
 
 import nose
-from nose.tools import assert_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
 cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'cli'))
@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(cycdir, 'cli'))
 # pass 1 Filters
 from cycpp import NamespaceFilter, TypedefFilter, UsingFilter,\
         UsingNamespaceFilter, NamespaceAliasFilter, ClassFilter, \
-        AccessFilter
+        AccessFilter, PragmaCyclusErrorFilter
 
 # pass 2 Filters
 from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter, \
@@ -38,6 +38,9 @@ class MockMachine(object):
         self.aliases = set()
         self.var_annotations = None
         self.filters = []
+
+    def includeloc(self, statement=None):
+        return ""
 
     def classname(self):
         """Implemented just for testing"""
@@ -151,6 +154,18 @@ def test_afilter():
     yield assert_true, f.isvalid(statement)
     f.transform(statement, sep)
     yield assert_equal, m.access[tuple(m.classes)], "private"
+
+def test_synerror():
+    """Test PragmaCyclusErrorFilter"""
+    m = MockMachine()
+    f = PragmaCyclusErrorFilter(m)
+    yield assert_false, f.isvalid("#pragma cyclus var {}")
+    yield assert_false, f.isvalid("#pragma cyclus")
+
+    yield assert_true, f.isvalid('#pragma cyclus nooooo')
+    statement, sep = "#pragma cyclus var{}", "\n"
+    yield assert_true, f.isvalid(statement)
+    yield assert_raises, SyntaxError, f.transform, statement, sep
 
 #
 # pass 2 Filters
