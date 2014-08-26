@@ -41,13 +41,17 @@ Package                Minimum Version
 ====================   ==================
 
 
-An optional dependency (to build documentation) is:
+And a few optional dependencies:
 
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
-doxygen                1.7.6.1
+doxygen (for docs)     1.7.6.1
+tcmalloc (for speed)   any?
 ====================   ==================
+
+*Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
+by our build system.  Instead use `libgoogle-perftools-dev`.*
 
 
 Installing Dependencies (Linux and Unix)
@@ -89,6 +93,7 @@ and (optionally):
 #. g++
 #. libblas-dev
 #. liblapack-dev
+#. libgoogle-perftools-dev
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -101,7 +106,7 @@ dependencies:
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev
 
 Boost Note
 ----------
