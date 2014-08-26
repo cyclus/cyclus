@@ -44,7 +44,7 @@ void Case1b::Test(std::string solver_type, ExchangeGraph* g) {
 void Case2::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNode::Ptr u(new ExchangeNode(qty, exclusive_orders));
   ExchangeNode::Ptr v(new ExchangeNode());
-  Arc a(u, v);
+  const Arc* a = Arc::Make(u, v);
 
   u->unit_capacities[a].push_back(unit_cap_req);
   v->unit_capacities[a].push_back(unit_cap_sup);
@@ -181,8 +181,8 @@ void Case3::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNode::Ptr u(new ExchangeNode(q, exclusive_orders));
   ExchangeNode::Ptr v(new ExchangeNode());
   ExchangeNode::Ptr w(new ExchangeNode());
-  Arc a1(u, v);
-  Arc a2(u, w);
+  const Arc* a1 = Arc::Make(u, v);
+  const Arc* a2 = Arc::Make(u, w);
 
   u->unit_capacities[a1].push_back(1);
   v->unit_capacities[a1].push_back(1);
@@ -348,8 +348,8 @@ void Case4::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNode::Ptr v1(new ExchangeNode());
   ExchangeNode::Ptr w(new ExchangeNode(q2, exclusive_orders));
   ExchangeNode::Ptr v2(new ExchangeNode());
-  Arc a1(u, v1);
-  Arc a2(w, v2);
+  const Arc* a1 = Arc::Make(u, v1);
+  const Arc* a2 = Arc::Make(w, v2);
 
   u->unit_capacities[a1].push_back(1);
   v1->unit_capacities[a1].push_back(1);
@@ -470,8 +470,8 @@ void Case5::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNode::Ptr u2(new ExchangeNode(q, exclusive_orders));
   ExchangeNode::Ptr v(new ExchangeNode());
   ExchangeNode::Ptr w(new ExchangeNode());
-  Arc a1(u1, v);
-  Arc a2(u2, w);
+  const Arc* a1 = Arc::Make(u1, v);
+  const Arc* a2 = Arc::Make(u2, w);
 
   u1->unit_capacities[a1].push_back(1);
   v->unit_capacities[a1].push_back(1);
@@ -586,10 +586,10 @@ void Case6::Construct(ExchangeGraph* g, bool exclusive_orders) {
   ExchangeNode::Ptr v1_2(new ExchangeNode());
   ExchangeNode::Ptr v2_1(new ExchangeNode());
   ExchangeNode::Ptr v2_2(new ExchangeNode());
-  Arc a1(u1_1, v1_1);
-  Arc a2(u1_2, v2_1);
-  Arc a3(u2_1, v1_2);
-  Arc a4(u2_2, v2_2);
+  const Arc* a1 = Arc::Make(u1_1, v1_1);
+  const Arc* a2 = Arc::Make(u1_2, v2_1);
+  const Arc* a3 = Arc::Make(u2_1, v1_2);
+  const Arc* a4 = Arc::Make(u2_2, v2_2);
 
   u1_1->unit_capacities[a1].push_back(1);
   u1_2->unit_capacities[a2].push_back(1);
@@ -719,7 +719,7 @@ void Case7::Construct(ExchangeGraph* g, bool exclusive_orders) {
   for (int i = 0; i < N; i++) {
     ExchangeNode::Ptr v(new ExchangeNode(qty / N));
     sup->AddExchangeNode(v);
-    Arc a(u, v);
+    const Arc* a = Arc::Make(u, v);
     u->unit_capacities[a].push_back(1);
     v->unit_capacities[a].push_back(1);
     g->AddArc(a);
@@ -732,7 +732,7 @@ void Case7::Test(std::string solver_type, ExchangeGraph* g) {
   if (solver_type == "greedy") {
     ASSERT_EQ(g->arcs().size(), N);
     ASSERT_EQ(g->matches().size(), N);
-    std::set<Arc> arcs(g->arcs().begin(), g->arcs().end());
+    std::set<const Arc*> arcs(g->arcs().begin(), g->arcs().end());
     for (int i = 0; i < N; i++) {
       EXPECT_TRUE(arcs.find(g->matches().at(i).first) != arcs.end());
       EXPECT_EQ(flow, g->matches().at(i).second);

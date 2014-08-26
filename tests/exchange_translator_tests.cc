@@ -128,11 +128,11 @@ TEST(ExXlateTests, XlateCapacities) {
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
 
   ExchangeTranslationContext<Material> ctx;
-  TranslateCapacities<Material>(mat, rconstrs, rnode, arc, ctx);
-  TestVecEq(rexp, rnode->unit_capacities[arc]);
+  TranslateCapacities<Material>(mat, rconstrs, rnode, &arc, ctx);
+  TestVecEq(rexp, rnode->unit_capacities[&arc]);
 
-  TranslateCapacities<Material>(mat, bconstrs, bnode, arc, ctx);
-  TestVecEq(bexp, bnode->unit_capacities[arc]);
+  TranslateCapacities<Material>(mat, bconstrs, bnode, &arc, ctx);
+  TestVecEq(bexp, bnode->unit_capacities[&arc]);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -273,19 +273,19 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeNodeGroup::Ptr bset =
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  Arc a = TranslateArc(xlator.translation_ctx(), bid);
+  const Arc* a = TranslateArc(xlator.translation_ctx(), bid);
 
-  EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
-  EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.unode());
-  EXPECT_FALSE(a.exclusive());
+  EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a->vnode());
+  EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a->unode());
+  EXPECT_FALSE(a->exclusive());
 
   double barr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
   std::vector<double> bexp(barr, barr +sizeof(barr) / sizeof(barr[0]));
-  TestVecEq(bexp, a.vnode()->unit_capacities[a]);
+  TestVecEq(bexp, a->vnode()->unit_capacities[a]);
 
   double rarr[] = {(c1->convert(mat) / qty)};
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
-  TestVecEq(rexp, a.unode()->unit_capacities[a]);
+  TestVecEq(rexp, a->unode()->unit_capacities[a]);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -326,46 +326,46 @@ TEST(ExXlateTests, XlateArcExclusive) {
 
   // bid > request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
-  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1);
-  EXPECT_TRUE(a1.exclusive());
-  EXPECT_DOUBLE_EQ(a1.excl_val(), qty);
+  const Arc* a1 = TranslateArc(xlator.translation_ctx(), bid1);
+  EXPECT_TRUE(a1->exclusive());
+  EXPECT_DOUBLE_EQ(a1->excl_val(), qty);
   // bid == request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
-  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2);
-  EXPECT_TRUE(a2.exclusive());
-  EXPECT_DOUBLE_EQ(a2.excl_val(), qty);
+  const Arc* a2 = TranslateArc(xlator.translation_ctx(), bid2);
+  EXPECT_TRUE(a2->exclusive());
+  EXPECT_DOUBLE_EQ(a2->excl_val(), qty);
   // request < bid && req exclusive && bid !exclusive,
   // so arc excl_val is set to 0
-  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3);
-  EXPECT_TRUE(a3.exclusive());
-  EXPECT_DOUBLE_EQ(a3.excl_val(), 0.0);
+  const Arc* a3 = TranslateArc(xlator.translation_ctx(), bid3);
+  EXPECT_TRUE(a3->exclusive());
+  EXPECT_DOUBLE_EQ(a3->excl_val(), 0.0);
 
   // bid != request && req exclusive && bid exclusive,
   // so excl_val set to 0
-  Arc a4 = TranslateArc(xlator.translation_ctx(), bid4);
-  EXPECT_TRUE(a4.exclusive());
-  EXPECT_DOUBLE_EQ(a4.excl_val(), 0);
+  const Arc* a4 = TranslateArc(xlator.translation_ctx(), bid4);
+  EXPECT_TRUE(a4->exclusive());
+  EXPECT_DOUBLE_EQ(a4->excl_val(), 0);
   // bid == request && req exclusive && bid exclusive,
   // so excl_val set to request qty
-  Arc a5 = TranslateArc(xlator.translation_ctx(), bid5);
-  EXPECT_TRUE(a5.exclusive());
-  EXPECT_DOUBLE_EQ(a5.excl_val(), qty);
+  const Arc* a5 = TranslateArc(xlator.translation_ctx(), bid5);
+  EXPECT_TRUE(a5->exclusive());
+  EXPECT_DOUBLE_EQ(a5->excl_val(), qty);
 
   // bid < request && bid exclusive && req !exclusive,
   // so excl_val set to bid qty
-  Arc a6 = TranslateArc(xlator.translation_ctx(), bid6);
-  EXPECT_TRUE(a6.exclusive());
-  EXPECT_DOUBLE_EQ(a6.excl_val(), qty - 1);
+  const Arc* a6 = TranslateArc(xlator.translation_ctx(), bid6);
+  EXPECT_TRUE(a6->exclusive());
+  EXPECT_DOUBLE_EQ(a6->excl_val(), qty - 1);
   // bid == request && bid exclusive && req !exclusive,
   // so excl_val set to bid qty
-  Arc a7 = TranslateArc(xlator.translation_ctx(), bid7);
-  EXPECT_TRUE(a7.exclusive());
-  EXPECT_DOUBLE_EQ(a7.excl_val(), qty);
+  const Arc* a7 = TranslateArc(xlator.translation_ctx(), bid7);
+  EXPECT_TRUE(a7->exclusive());
+  EXPECT_DOUBLE_EQ(a7->excl_val(), qty);
   // bid > request && bid exclusive && req !exclusive,
   // so excl_val set to 0
-  Arc a8 = TranslateArc(xlator.translation_ctx(), bid8);
-  EXPECT_TRUE(a8.exclusive());
-  EXPECT_DOUBLE_EQ(a8.excl_val(), 0);
+  const Arc* a8 = TranslateArc(xlator.translation_ctx(), bid8);
+  EXPECT_TRUE(a8->exclusive());
+  EXPECT_DOUBLE_EQ(a8->excl_val(), 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -395,8 +395,8 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(2, graph->node_arc_map().size());
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
-  const Arc& a = *graph->arcs().begin();
-  EXPECT_EQ(pref, a.unode()->prefs[a]);
+  const Arc* a = *graph->arcs().begin();
+  EXPECT_EQ(pref, a->unode()->prefs[a]);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -434,8 +434,8 @@ TEST(ExXlateTests, BackXlate) {
   Trade<Material> tarr[] = {aexp, bexp};
   std::vector< Trade<Material> > exp(tarr, tarr + sizeof(tarr) / sizeof(tarr[0]));
 
-  Match amatch(std::make_pair(a, aqty));
-  Match bmatch(std::make_pair(b, bqty));
+  Match amatch(std::make_pair(&a, aqty));
+  Match bmatch(std::make_pair(&b, bqty));
 
   Match marr[] = {amatch, bmatch};
   std::vector<Match> matches(marr, marr + sizeof(marr) / sizeof(marr[0]));

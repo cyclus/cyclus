@@ -113,6 +113,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     ################################### begin find libraries #####################################
     ##############################################################################################
 
+    FIND_PACKAGE( Tcmalloc )
+    SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
+
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
     FIND_PACKAGE( LibXml2 REQUIRED )

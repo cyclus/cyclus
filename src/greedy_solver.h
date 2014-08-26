@@ -11,13 +11,13 @@ namespace cyclus {
 /// requester's (unode's) preference, in decensing order (i.e., most preferred
 /// Arc first). In the case of a tie, a lexicalgraphic ordering of node ids is
 /// used.
-inline bool ReqPrefComp(const Arc& l, const Arc& r) {
-  int lu = l.unode()->agent_id;
-  int lv = l.vnode()->agent_id;
-  int ru = r.unode()->agent_id;
-  int rv = r.vnode()->agent_id;
-  double lpref = l.unode()->prefs[l];
-  double rpref = r.unode()->prefs[r];
+inline bool ReqPrefComp(const Arc* l, const Arc* r) {
+  int lu = l->unode()->agent_id;
+  int lv = l->vnode()->agent_id;
+  int ru = r->unode()->agent_id;
+  int rv = r->vnode()->agent_id;
+  double lpref = l->unode()->prefs[l];
+  double rpref = r->unode()->prefs[r];
   return (lpref != rpref) ? (lpref > rpref) : (lu > ru || (lu == ru && lv > rv));
 }
 
@@ -85,8 +85,8 @@ class GreedySolver: public ExchangeSolver {
   /// piecemeal)
   /// @return The minimum of the unode and vnode's capacities
   // @{
-  double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty);
-  inline double Capacity(const Arc& a) { return Capacity(a, 0, 0); }
+  double Capacity(const Arc* a, double u_curr_qty, double v_curr_qty);
+  inline double Capacity(const Arc* a) { return Capacity(a, 0, 0); }
   // @}
 
   /// @brief the capacity of a node
@@ -101,15 +101,15 @@ class GreedySolver: public ExchangeSolver {
   /// @return The minimum of the node's nodegroup capacities / the node's unit
   /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller.
   /// @{
-  double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+  double Capacity(ExchangeNode::Ptr n, const Arc* a, bool min_cap,
                   double curr_qty);
-  inline double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap) {
+  inline double Capacity(ExchangeNode::Ptr n, const Arc* a, bool min_cap) {
     return Capacity(n, a, min_cap, 0.0);
   }
-  inline double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
+  inline double Capacity(ExchangeNode::Ptr n, const Arc* a, double curr_qty) {
     return Capacity(n, a, true, curr_qty);
   }
-  inline double Capacity(ExchangeNode::Ptr n, const Arc& a) {
+  inline double Capacity(ExchangeNode::Ptr n, const Arc* a) {
     return Capacity(n, a, true, 0.0);
   }
   /// @}
@@ -131,7 +131,7 @@ class GreedySolver: public ExchangeSolver {
   /// @param qty the quantity for the node to update
   void GetCaps(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet(RequestGroup::Ptr prs);
-  void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
+  void UpdateCapacity(ExchangeNode::Ptr n, const Arc* a, double qty);
   void UpdateObj(double qty, double pref);
   
   GreedyPreconditioner* conditioner_;

@@ -23,8 +23,8 @@ TEST(GreedySolverTests, AvgPref) {
   Arc a1(u1, v);
   Arc a2(u2, v);
 
-  u1->prefs[a1] = 1;
-  u2->prefs[a2] = 2;
+  u1->prefs[&a1] = 1;
+  u2->prefs[&a2] = 2;
 
   std::vector<ExchangeNode::Ptr> nodes;
   nodes.push_back(u1);
@@ -46,12 +46,12 @@ TEST(GreedySolverTests, General) {
   Arc a1(u1, v);
   Arc a2(u2, v);
 
-  u1->prefs[a1] = 1;
-  u1->unit_capacities[a1].push_back(1);
-  u2->prefs[a2] = 2;
-  u2->unit_capacities[a2].push_back(1);
-  v->unit_capacities[a1].push_back(1);
-  v->unit_capacities[a2].push_back(1);
+  u1->prefs[&a1] = 1;
+  u1->unit_capacities[&a1].push_back(1);
+  u2->prefs[&a2] = 2;
+  u2->unit_capacities[&a2].push_back(1);
+  v->unit_capacities[&a1].push_back(1);
+  v->unit_capacities[&a2].push_back(1);
   
   RequestGroup::Ptr gu1(new RequestGroup());
   gu1->AddExchangeNode(u1);
@@ -76,8 +76,8 @@ TEST(GreedySolverTests, General) {
 
   s.graph(&g);
   s.Init();
-  EXPECT_EQ(s.Capacity(a1), 1);
-  EXPECT_EQ(s.Capacity(a2), 1.5);
+  EXPECT_EQ(s.Capacity(&a1), 1);
+  EXPECT_EQ(s.Capacity(&a2), 1.5);
   
   s.Condition();  
   EXPECT_EQ(g.request_groups()[1], gu1);

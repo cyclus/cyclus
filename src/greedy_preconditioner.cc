@@ -14,12 +14,12 @@ namespace l = boost::lambda;
 
 namespace cyclus {
 
-inline double SumPref(double total, std::pair<Arc, double> pref) {
+inline double SumPref(double total, std::pair<const Arc*, double> pref) {
   return total += pref.second;
 }
 
 double AvgPref(ExchangeNode::Ptr n) {
-  std::map<Arc, double>& prefs = n->prefs;
+  std::map<const Arc*, double>& prefs = n->prefs;
   return prefs.size() > 0 ?
       std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) / prefs.size() :
       0;

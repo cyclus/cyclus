@@ -39,10 +39,10 @@ struct ExchangeNode {
   /// @brief unit values associated with this ExchangeNode corresponding to
   /// capacties of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
-  std::map<Arc, std::vector<double> > unit_capacities;
+  std::map<const Arc*, std::vector<double> > unit_capacities;
 
   /// @brief preference values for arcs
-  std::map<Arc, double> prefs;
+  std::map<const Arc*, double> prefs;
 
   /// @brief whether this node represents an exclusive request or offer
   bool exclusive;
@@ -97,7 +97,18 @@ class Arc {
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
 
+  static Arc* Make(boost::shared_ptr<ExchangeNode> unode,
+                   boost::shared_ptr<ExchangeNode> vnode);
+
+  static void ReleaseCache() { index_ = 0;};
+
  private:
+  static std::vector<Arc*> cache_;
+  static int index_;
+
+  Arc* init(boost::shared_ptr<ExchangeNode> unode,
+            boost::shared_ptr<ExchangeNode> vnode);
+
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
@@ -181,7 +192,7 @@ class RequestGroup : public ExchangeNodeGroup {
   double qty_;
 };
 
-typedef std::pair<Arc, double> Match;
+typedef std::pair<const Arc*, double> Match;
 
 /// @class ExchangeGraph
 ///
@@ -204,13 +215,13 @@ class ExchangeGraph {
   void AddSupplyGroup(ExchangeNodeGroup::Ptr prs);
 
   /// @brief adds an arc to the graph
-  void AddArc(const Arc& a);
+  void AddArc(const Arc* a);
 
   /// @brief adds a match for a quanity of flow along an arc
   ///
   /// @param pa the arc corresponding to a match
   /// @param qty the amount of flow corresponding to a match
-  void AddMatch(const Arc& a, double qty);
+  void AddMatch(const Arc* a, double qty);
 
   /// clears all matches
   inline void ClearMatches() { matches_.clear(); }
@@ -229,33 +240,33 @@ class ExchangeGraph {
     return supply_groups_;
   }
 
-  inline const std::map<ExchangeNode::Ptr, std::vector<Arc> >&
+  inline const std::map<ExchangeNode::Ptr, std::vector<const Arc*> >&
       node_arc_map() const {
     return node_arc_map_;
   }
-  inline std::map<ExchangeNode::Ptr, std::vector<Arc> >& node_arc_map() {
+  inline std::map<ExchangeNode::Ptr, std::vector<const Arc*> >& node_arc_map() {
     return node_arc_map_;
   }
 
   inline const std::vector<Match>& matches() { return matches_; }
 
-  inline const std::vector<Arc>& arcs() const { return arcs_; }
-  inline std::vector<Arc>& arcs() { return arcs_; }
+  inline const std::vector<const Arc*>& arcs() const { return arcs_; }
+  inline std::vector<const Arc*>& arcs() { return arcs_; }
 
-  inline const std::map<Arc, int>& arc_ids() const { return arc_ids_; }
-  inline std::map<Arc, int>& arc_ids() { return arc_ids_; }
+  inline const std::map<const Arc*, int>& arc_ids() const { return arc_ids_; }
+  inline std::map<const Arc*, int>& arc_ids() { return arc_ids_; }
 
-  inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
-  inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
+  inline const std::map<int, const Arc*>& arc_by_id() const { return arc_by_id_; }
+  inline std::map<int, const Arc*>& arc_by_id() { return arc_by_id_; }
   
  private:
   std::vector<RequestGroup::Ptr> request_groups_;
   std::vector<ExchangeNodeGroup::Ptr> supply_groups_;
-  std::map<ExchangeNode::Ptr, std::vector<Arc> > node_arc_map_;
+  std::map<ExchangeNode::Ptr, std::vector<const Arc*> > node_arc_map_;
   std::vector<Match> matches_;
-  std::vector<Arc> arcs_;
-  std::map<Arc, int> arc_ids_;
-  std::map<int, Arc> arc_by_id_;
+  std::vector<const Arc*> arcs_;
+  std::map<const Arc*, int> arc_ids_;
+  std::map<int, const Arc*> arc_by_id_;
   int next_arc_id_;
 };
 
