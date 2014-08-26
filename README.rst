@@ -41,12 +41,13 @@ Package                Minimum Version
 ====================   ==================
 
 
-An optional dependency (to build documentation) is:
+And a few optional dependencies:
 
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
-doxygen                1.7.6.1
+doxygen (for docs)     1.7.6.1
+tcmalloc (for speed)   any?
 ====================   ==================
 
 
