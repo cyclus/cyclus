@@ -238,7 +238,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("output-path,o", po::value<std::string>(), "output path")
       ("input-file", po::value<std::string>(), "input file")
       ("warn-limit", po::value<unsigned int>(),
-       "number of warnings to issue per kind, defaults to 1")
+       "number of warnings to issue per kind, defaults to 42")
       ("warn-as-error", "throw errors when warnings are issued")
       ("path,p", "print the CYCLUS_PATH")
       ("include", "print the cyclus include directory")

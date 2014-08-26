@@ -10,7 +10,7 @@ const char* Error::what() const throw() {
   return msg_.c_str();
 }
 
-unsigned int warn_limit = 1;
+unsigned int warn_limit = 42;
 
 bool warn_as_error = false;
 
