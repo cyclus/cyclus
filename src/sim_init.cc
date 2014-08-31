@@ -72,6 +72,10 @@ void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
 }
 
 void SimInit::Snapshot(Context* ctx) {
+  ctx->NewDatum("Snapshots")
+     ->AddVal("Time", ctx->time())
+     ->Record();
+
   // snapshot all agent internal state
   std::set<Agent*> mlist = ctx->agent_list_;
   std::set<Agent*>::iterator it;

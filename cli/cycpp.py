@@ -326,6 +326,31 @@ class AccessFilter(Filter):
         access = self.match.group(1)
         self.machine.access[tuple(self.machine.classes)] = access
 
+class PragmaCyclusErrorFilter(Filter):
+    """Filter for handling invalid #pragma cyclus. This should be the last filter."""
+    regex = re.compile('\s*#\s*pragma\s+cyclus(.*)')
+
+    directives = frozenset(['var', 'note', 'exec', 'decl', 'def', 'impl'])
+
+    def isvalid(self, statement):
+        """Checks if a statement is valid for this fliter."""
+        self.match = m = self.regex.match(statement)
+        if m is None:
+            return False
+        g1 = m.group(1).strip()
+        if len(g1) == 0:
+            return False
+        s0 = g1.split(None, 1)[0]
+        return s0 not in self.directives
+
+    def transform(self, statement, sep):
+        m = self.machine
+        msg = '{0}This appears to be a cyclus pragma but has an incorrect form!'
+        inc = m.includeloc(statement=statement)
+        if len(inc) == 0:
+            inc = "For the statement:\n" + statement + "\n"
+        raise SyntaxError(msg.format(inc))
+
 #
 # pass 2
 #
@@ -518,6 +543,7 @@ class StateAccumulator(object):
                         TypedefFilter(self), UsingFilter(self), LinemarkerFilter(self),
                         NoteDecorationFilter(self),
                         VarDecorationFilter(self), VarDeclarationFilter(self),
+                        PragmaCyclusErrorFilter(self),
                         ]
 
     def classname(self):
@@ -1394,6 +1420,7 @@ class CodeGenerator(object):
                                                VarDeclarationFilter(self),
                                                LinemarkerFilter(self),
                                                DefaultPragmaFilter(self),
+                                               PragmaCyclusErrorFilter(self),
                                                ]
 
     def classname(self):
