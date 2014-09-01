@@ -13,6 +13,9 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <element name="duration"><data type="nonNegativeInteger"/></element>
       <element name="startmonth"><data type="nonNegativeInteger"/></element>
       <element name="startyear"><data type="nonNegativeInteger"/></element>
+      <optional
+        <element name="decayallowed"><data type="boolean"/></element>
+      </optional>
     </interleave>
   </element>
 

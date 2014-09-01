@@ -21,11 +21,11 @@ SimInfo::SimInfo()
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
-SimInfo::SimInfo(int dur, int y0, int m0, bool d, std::string handle)
+SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
     : duration(dur),
       y0(y0),
       m0(m0),
-      decay(d),
+      decay(true),
       branch_time(-1),
       handle(handle),
       parent_sim(boost::uuids::nil_uuid()),
@@ -146,7 +146,7 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("Handle", si.handle)
       ->AddVal("InitialYear", si.y0)
       ->AddVal("InitialMonth", si.m0)
-      ->AddVal("DecayOn", si.decay)
+      ->AddVal("DecayAllowed", si.decay)
       ->AddVal("Duration", si.duration)
       ->AddVal("ParentSimId", si.parent_sim)
       ->AddVal("ParentType", si.parent_type)

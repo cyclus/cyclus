@@ -338,8 +338,8 @@ void XMLFileLoader::LoadControlParams() {
   std::string y0_str = qe->GetString("startyear");
   int y0 = strtol(y0_str.c_str(), NULL, 10);
   // get decay off
-  std::string do_str = qe->GetString("decayon");
-  bool d = bool(OptionalQuery<int>(qe, "decayon", int(true)));
+  std::string do_str = qe->GetString("decayallowed");
+  bool d = bool(OptionalQuery<int>(qe, "decayallowed", int(true)));
 
   ctx_->InitSim(SimInfo(dur, y0, m0, d, handle));
 }
