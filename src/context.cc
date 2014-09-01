@@ -21,16 +21,6 @@ SimInfo::SimInfo()
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
-SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
-    : duration(dur),
-      y0(y0),
-      m0(m0),
-      decay(true),
-      branch_time(-1),
-      handle(handle),
-      parent_sim(boost::uuids::nil_uuid()),
-      parent_type("init") {}
-
 SimInfo::SimInfo(int dur, int y0, int m0, bool d, std::string handle)
     : duration(dur),
       y0(y0),
@@ -43,11 +33,11 @@ SimInfo::SimInfo(int dur, int y0, int m0, bool d, std::string handle)
 
 SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
                  int branch_time, std::string parent_type,
-                 std::string handle)
+                 bool d, std::string handle)
     : duration(dur),
       y0(-1),
       m0(-1),
-      decay(true),
+      decay(d),
       parent_sim(parent_sim),
       parent_type(parent_type),
       branch_time(branch_time),

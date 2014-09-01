@@ -40,11 +40,7 @@ class SimInfo {
 
   SimInfo(int dur, boost::uuids::uuid parent_sim,
           int branch_time, std::string parent_type,
-          std::string handle = "");
-
-  SimInfo(int dur, boost::uuids::uuid parent_sim,
-          int branch_time, std::string parent_type,
-          bool d, std::string handle = "");
+          bool d = true, std::string handle = "");
 
   /// user-defined label associated with a particular simulation
   std::string handle;
