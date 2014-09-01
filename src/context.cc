@@ -16,7 +16,7 @@ SimInfo::SimInfo()
     : duration(0),
       y0(0),
       m0(0),
-      d(true),
+      decay(true),
       branch_time(-1),
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
