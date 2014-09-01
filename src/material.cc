@@ -112,31 +112,33 @@ void Material::Transmute(Composition::Ptr c) {
 }
 
 void Material::Decay(int curr_time) {
-  int dt = curr_time - prev_decay_time_;
-  double eps = 1e-3;
-  bool decay = false;
-
-  const CompMap c = comp_->atom();
-  if (c.size() > 100) {
-    decay = true;
-  } else {
-    CompMap::const_iterator it;
-    for (it = c.end(); it != c.begin(); --it) {
-      int nuc = it->first;
-      // 2419200 == secs / month
-      double lambda_months = pyne::decay_const(nuc) * 2419200;
-
-      if (eps <= 1 - std::exp(-lambda_months * dt)) {
-        decay = true;
-        break;
+  if (context()->decay() == true) {
+    int dt = curr_time - prev_decay_time_;
+    double eps = 1e-3;
+    bool decay = false;
+  
+    const CompMap c = comp_->atom();
+    if (c.size() > 100) {
+      decay = true;
+    } else {
+      CompMap::const_iterator it;
+      for (it = c.end(); it != c.begin(); --it) {
+        int nuc = it->first;
+        // 2419200 == secs / month
+        double lambda_months = pyne::decay_const(nuc) * 2419200;
+  
+        if (eps <= 1 - std::exp(-lambda_months * dt)) {
+          decay = true;
+          break;
+        }
       }
     }
-  }
-
-  if (decay) {
-    prev_decay_time_ = curr_time;
-    if (dt > 0) {
-      Transmute(comp_->Decay(dt));
+  
+    if (decay) {
+      prev_decay_time_ = curr_time;
+      if (dt > 0) {
+        Transmute(comp_->Decay(dt));
+      }
     }
   }
 }
