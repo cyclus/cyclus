@@ -49,6 +49,9 @@ class SimInfo {
   /// user-defined label associated with a particular simulation
   std::string handle;
 
+  /// true if use of the decay function is allowed, false otherwise
+  bool decay;
+
   /// length of the simulation in timesteps (months)
   int duration;
 

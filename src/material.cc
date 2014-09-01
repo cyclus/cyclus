@@ -112,7 +112,7 @@ void Material::Transmute(Composition::Ptr c) {
 }
 
 void Material::Decay(int curr_time) {
-  if (context()->decay() == true) {
+  if (ctx_->sim_info().decay == true) {
     int dt = curr_time - prev_decay_time_;
     double eps = 1e-3;
     bool decay = false;
