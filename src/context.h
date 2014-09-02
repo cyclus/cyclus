@@ -36,15 +36,14 @@ class SimInfo {
   SimInfo();
 
   SimInfo(int dur, int y0 = 2010, int m0 = 1, 
-          std::string handle = "", std::string d = "manual");
+          std::string handle = "");
+
+  SimInfo(int dur, int y0, int m0, 
+          std::string handle, std::string d);
 
   SimInfo(int dur, boost::uuids::uuid parent_sim,
           int branch_time, std::string parent_type,
           std::string handle = "");
-
-  SimInfo(int dur, boost::uuids::uuid parent_sim,
-          int branch_time, std::string parent_type,
-          std::string d, std::string handle = "");
 
   /// user-defined label associated with a particular simulation
   std::string handle;
