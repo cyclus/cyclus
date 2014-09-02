@@ -33,14 +33,36 @@ class SimInit;
 /// the simulation and affect its behavior.
 class SimInfo {
  public:
+  /// @brief constructs a SimInfo instance with default variables
+  /// @return a SimInfo instance
   SimInfo();
 
+  /// @brief constructs a SimInfo instance using some default variables
+  /// @param dur simulation duration in number of timesteps
+  /// @param y0 start year for the simulation
+  /// @param m0 start month for the simulation
+  /// @param handle is this simulation's unique simulation handle
+  /// @return a SimInfo instance
   SimInfo(int dur, int y0 = 2010, int m0 = 1, 
           std::string handle = "");
 
+  /// @brief constructs a SimInfo instance using no default variables
+  /// @param dur simulation duration in number of timesteps
+  /// @param y0 start year for the simulation
+  /// @param m0 start month for the simulation
+  /// @param handle is this simulation's unique simulation handle
+  /// @param d the decay data member, "never" for no decay. "manual" otherwise
+  /// @return a SimInfo instance
   SimInfo(int dur, int y0, int m0, 
           std::string handle, std::string d);
 
+  /// @brief constructs a SimInfo instance
+  /// @param dur simulation duration in number of timesteps
+  /// @param parent_sim the uuid of the parent simulation
+  /// @param branch_time
+  /// @param parent_type a string indicating the type of the parent simulation
+  /// @param handle is this simulation's unique simulation handle
+  /// @return a SimInfo instance
   SimInfo(int dur, boost::uuids::uuid parent_sim,
           int branch_time, std::string parent_type,
           std::string handle = "");
