@@ -35,8 +35,8 @@ class SimInfo {
  public:
   SimInfo();
 
-  SimInfo(int dur, int y0 = 2010, int m0 = 1, bool d = true,
-          std::string handle = "");
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, 
+          std::string handle = "", std::string d = "manual");
 
   SimInfo(int dur, boost::uuids::uuid parent_sim,
           int branch_time, std::string parent_type,
@@ -44,13 +44,13 @@ class SimInfo {
 
   SimInfo(int dur, boost::uuids::uuid parent_sim,
           int branch_time, std::string parent_type,
-          bool d, std::string handle = "");
+          std::string d, std::string handle = "");
 
   /// user-defined label associated with a particular simulation
   std::string handle;
 
-  /// true if use of the decay function is allowed, false otherwise
-  bool decay;
+  /// "manual" if use of the decay function is allowed, "never" otherwise
+  std::string decay;
 
   /// length of the simulation in timesteps (months)
   int duration;
