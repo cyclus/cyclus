@@ -146,7 +146,6 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("Handle", si.handle)
       ->AddVal("InitialYear", si.y0)
       ->AddVal("InitialMonth", si.m0)
-      ->AddVal("Decay", si.decay)
       ->AddVal("Duration", si.duration)
       ->AddVal("ParentSimId", si.parent_sim)
       ->AddVal("ParentType", si.parent_type)
@@ -159,6 +158,11 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("LibXML2Version", std::string(version::xml2()))
       ->AddVal("CoinCBCVersion", std::string(version::coincbc()))
       ->Record();
+
+  NewDatum("DecayMode")
+      ->AddVal("Decay", si.decay)
+      ->Record();
+
   si_ = si;
   ti_->Initialize(this, si);
 }
