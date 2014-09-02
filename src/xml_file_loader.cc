@@ -340,7 +340,7 @@ void XMLFileLoader::LoadControlParams() {
   // get decay mode
   std::string d = OptionalQuery<std::string>(qe, "decay", "manual");
 
-  ctx_->InitSim(SimInfo(dur, y0, m0, d, handle));
+  ctx_->InitSim(SimInfo(dur, y0, m0, handle, d));
 }
 
 }  // namespace cyclus
