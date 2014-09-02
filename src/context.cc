@@ -45,7 +45,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
 
 SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
                  int branch_time, std::string parent_type,
-                 std::string handle, bool d)
+                 bool d, std::string handle)
     : duration(dur),
       y0(-1),
       m0(-1),
