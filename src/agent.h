@@ -271,6 +271,11 @@ class Agent : public StateWrangler, virtual public Ider {
   /// @param m the agent node to base as the root of this print tree
   std::vector<std::string> GetTreePrintOuts(Agent* m);
 
+  /// returns true if this agent is in the parent-child chain (self, parent,
+  /// grandparent, etc.) of an other agent
+  /// @param other the other agent
+  bool InChain(Agent* other);
+  
   /// Called when the agent enters the smiulation as an active participant and
   /// is only ever called once.  Agents should NOT register for services (such
   /// as ticks/tocks and resource exchange) in this function. If agents implement

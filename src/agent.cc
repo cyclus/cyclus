@@ -105,6 +105,20 @@ std::string Agent::str() {
   return ss.str();
 }
 
+bool Agent::InChain(Agent* other) {
+  if (this == other)
+    return true;
+  
+  other = other->parent();
+  while (other != NULL) {
+    if (this == other)
+      return true;
+    other = other->parent();
+  }
+  
+  return false;               
+}
+
 void Agent::Build(Agent* parent) {
   CLOG(LEV_DEBUG1) << "Agent '" << prototype()
                    << "' is entering the simulation.";
