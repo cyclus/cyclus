@@ -222,7 +222,7 @@ TEST_F(MaterialTest, ExtractInGrams) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(MaterialTest, DecayManual) {
+TEST_F(MaterialTest, DISABLED_DecayManual) {
   // prequeries
   cyclus::toolkit::MatQuery orig(tracked_mat_);
   double u235_qty = orig.mass(u235_);
