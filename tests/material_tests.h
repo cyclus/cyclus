@@ -25,6 +25,7 @@ class MaterialTest : public ::testing::Test {
   Material::Ptr diff_mat_;
   Material::Ptr default_mat_;
   Material::Ptr tracked_mat_;
+  Material::Ptr tracked_mat_no_decay_;
   long int u235_halflife_;
   int th228_halflife_;
   double u235_g_per_mol_;
@@ -33,10 +34,19 @@ class MaterialTest : public ::testing::Test {
   cyclus::Recorder rec;
   cyclus::Context* ctx;
   TestFacility* fac;
+  cyclus::Context* ctx_no_decay;
+  TestFacility* fac_no_decay;
+  // dur 100, y0 = 2015, m0=1, handle="", d="never"
+  SimInfo si;
 
   virtual void SetUp() {
     ctx = new cyclus::Context(&ti, &rec);
     fac = new TestFacility(ctx);
+
+    si = SimInfo(100, 2015, 1, "", "never");
+    ctx_no_decay = new cyclus::Context(&ti, &rec);
+    ctx_no_decay->InitSim(si);
+    fac_no_decay = new TestFacility(ctx_no_decay);
     Env::SetNucDataPath();
 
     // composition set up
@@ -65,6 +75,7 @@ class MaterialTest : public ::testing::Test {
 
     // tracked material
     tracked_mat_ = Material::Create(fac, 1000, diff_comp_);
+    tracked_mat_no_decay_ = Material::Create(fac_no_decay, 1000, diff_comp_);
 
     // test info
     u235_g_per_mol_ = 235.044;
@@ -74,6 +85,7 @@ class MaterialTest : public ::testing::Test {
 
   virtual void TearDown() {
     delete ctx;
+    delete ctx_no_decay;
   }
 };
 

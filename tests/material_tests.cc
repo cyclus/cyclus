@@ -249,25 +249,24 @@ TEST_F(MaterialTest, DecayManual) {
 TEST_F(MaterialTest, DecayNever) {
 
   // prequeries
-  cyclus::toolkit::MatQuery orig(tracked_mat_);
+  cyclus::toolkit::MatQuery orig(tracked_mat_no_decay_);
   double u235_qty = orig.mass(u235_);
   double pb208_qty = orig.mass(pb208_);
   double am241_qty = orig.mass(am241_);
-  double orig_mass = tracked_mat_->quantity();
+  double orig_mass = tracked_mat_no_decay_->quantity();
 
   // decay should succeed
-  fac->context()->sim_info().decay = "never";
-  EXPECT_EQ(fac->context()->sim_info().decay, "never");
-  tracked_mat_->Decay(100);
+  EXPECT_EQ(fac_no_decay->context()->sim_info().decay, "never");
+  tracked_mat_no_decay_->Decay(100);
 
   // postquery
-  cyclus::toolkit::MatQuery mq(tracked_mat_);
+  cyclus::toolkit::MatQuery mq(tracked_mat_no_decay_);
 
   // postchecks
   EXPECT_DOUBLE_EQ(u235_qty, mq.mass(u235_));
   EXPECT_DOUBLE_EQ(pb208_qty, mq.mass(pb208_));
   EXPECT_DOUBLE_EQ(am241_qty, mq.mass(am241_));
-  EXPECT_DOUBLE_EQ(orig_mass, tracked_mat_->quantity());
+  EXPECT_DOUBLE_EQ(orig_mass, tracked_mat_no_decay_->quantity());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
