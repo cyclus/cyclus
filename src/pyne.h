@@ -1,14 +1,18 @@
 // This file is composed of the following original files:
 
 //   license.txt
-//   cpp/pyne.h
-//   cpp/extra_types.h
-//   cpp/h5wrap.h
-//   cpp/nucname.h
-//   cpp/rxname.h
-//   cpp/data.h
-//   cpp/json/json-forwards.h
-//   cpp/json/json.h
+//   src/utils.h
+//   src/extra_types.h
+//   src/h5wrap.h
+//   src/nucname.h
+//   src/rxname.h
+//   src/data.h
+//   src/json-forwards.h
+//   src/json.h
+//   src/material.h
+//   src/enrichment_cascade.h
+//   src/enrichment.h
+//   src/enrichment_symbolic.h
 
 // PyNE amalgated header http://pyne.io/
 #ifndef PYNE_52BMSKGZ3FHG3NQI566D4I2ZLY
@@ -44,17 +48,23 @@
 // The views and conclusions contained in the software and documentation are those of the
 // authors and should not be interpreted as representing official policies, either expressed
 // or implied, of the stakeholders of the PyNE project or the employers of PyNE developers.
+// 
+// -------------------------------------------------------------------------------
+// The files cpp/measure.cpp and cpp/measure.hpp are covered by:
+// 
+// Copyright 2004 Sandia Corporation.  Under the terms of Contract
+// DE-AC04-94AL85000 with Sandia Coroporation, the U.S. Government
+// retains certain rights in this software.
+// 
+// http://trac.mcs.anl.gov/projects/ITAPS/wiki/MOAB
 // //
 // end of license.txt
 //
 
 
 //
-// start of cpp/pyne.h
+// start of src/utils.h
 //
-/// \file pyne.h
-/// \author Anthony Scopatz (scopatz\@gmail.com)
-///
 /// \brief This is the base PyNE library.
 ///
 /// It contains a lot of utility functions and constants that are globaly useful
@@ -81,10 +91,6 @@
 #include <vector>
 #include <algorithm>
 
-/*** Macros ***/
-/// Determines the length of an array using sizeof().
-#define length_array(a) ( sizeof ( a ) / sizeof ( *a ) )
-
 #if defined __APPLE__ || defined __WIN_GNUC__
 #if (__GNUC__ >= 4)
   #include <cmath>
@@ -97,6 +103,10 @@
 
 #ifdef __WIN_MSVC__
     #define isnan(x) ((x) != (x))
+#endif
+
+#ifndef JSON_IS_AMALGAMATION
+  #define JSON_IS_AMALGAMATION
 #endif
 
 /// The 'pyne' namespace all PyNE functionality is included in.
@@ -129,7 +139,13 @@ namespace pyne {
 
   double to_dbl(std::string s);  ///< Converts a valid string to a float using atof().
 
-  double endftod(char * s); ///< Converts a string from ENDF format to a float.
+  /// Converts a string from ENDF format to a float. Only handles E-less format
+  /// but is roughly 5 times faster than endftod.
+  double endftod_cpp(char * s);
+  double endftod_f(char * s); ///< Converts a string from ENDF format to a float.
+  extern  double (*endftod)(char * s); ///< endftod function pointer. defaults to fortran
+
+  void use_fast_endftod();/// switches endftod to fast cpp version
 
   /// Returns an all upper case copy of the string.
   std::string to_upper(std::string s);
@@ -169,14 +185,14 @@ namespace pyne {
   /// Returns true if \a substr is in \a s.
   bool contains_substring(std::string s, std::string substr);
 
-  /// Calculates a version of the string \a name that is also a valid variable name. 
+  /// Calculates a version of the string \a name that is also a valid variable name.
   /// That is to say that the return value uses only word characters.
   std::string natural_naming(std::string name);
 
   /// Finds the slope of a line from the points (\a x1, \a y1) and (\a x2, \a y2).
   double slope (double x2, double y2, double x1, double y1);
 
-  /// Solves the equation for the line y = mx + b, given \a x and the points that 
+  /// Solves the equation for the line y = mx + b, given \a x and the points that
   /// form the line: (\a x1, \a y1) and (\a x2, \a y2).
   double solve_line (double x, double x2, double y2, double x1, double y1);
 
@@ -226,12 +242,12 @@ namespace pyne {
 
 #endif  // PYNE_KMMHYNANYFF5BFMEYIP7TUNLHA
 //
-// end of cpp/pyne.h
+// end of src/utils.h
 //
 
 
 //
-// start of cpp/extra_types.h
+// start of src/extra_types.h
 //
 /// \file extra_types.h
 /// \author Anthony Scopatz (scopatz\@gmail.com)
@@ -296,12 +312,12 @@ typedef struct {
 #endif
 
 //
-// end of cpp/extra_types.h
+// end of src/extra_types.h
 //
 
 
 //
-// start of cpp/h5wrap.h
+// start of src/h5wrap.h
 //
 /// \file h5wrap.h
 /// \author Anthony Scopatz (scopatz\@gmail.com)
@@ -448,7 +464,7 @@ namespace h5wrap
   T get_array_index(hid_t dset, int n, hid_t dtype=H5T_NATIVE_DOUBLE)
   {
     hsize_t count  [1] = {1};
-    hsize_t offset [1] = {n};
+    hsize_t offset [1] = {static_cast<hsize_t>(n)};
 
     hid_t dspace = H5Dget_space(dset);
     hsize_t npoints = H5Sget_simple_extent_npoints(dspace);
@@ -753,16 +769,13 @@ namespace h5wrap
 #endif
 
 //
-// end of cpp/h5wrap.h
+// end of src/h5wrap.h
 //
 
 
 //
-// start of cpp/nucname.h
+// start of src/nucname.h
 //
-/// \file nucname.h
-/// \author Anthony Scopatz (scopatz\@gmail.com)
-///
 /// \brief Converts between naming conventions for nuclides.
 
 #ifndef PYNE_D35WIXV5DZAA5LLOWBY2BL2DPA
@@ -776,7 +789,7 @@ namespace h5wrap
 #include <stdio.h>
 
 #ifndef PYNE_IS_AMALGAMATED
-#include "pyne.h"
+#include "utils.h"
 #endif
 
 namespace pyne
@@ -796,6 +809,10 @@ namespace nucname
   zzname_t get_zz_name();   ///< Creates standard Z number to name mapping.
   extern zzname_t zz_name;  ///< Z num to name map
 
+  name_zz_t get_fluka_zz();  ///< Creates standard fluka-name to nucid mapping.
+  extern name_zz_t fluka_zz; ///< fluka-name to nucid map
+  zzname_t get_zz_fluka();   ///< Creates standard nucid to fluka-name mapping.
+  extern zzname_t zz_fluka;  ///< nucid to fluka-name map
   /******************************************/
   /*** Define useful elemental group sets ***/
   /******************************************/
@@ -1149,6 +1166,28 @@ namespace nucname
   int mcnp_to_id(std::string nuc);
   /// \}
 
+  /// \name FLUKA Form Functions
+  /// \{
+  /// This is the naming convention used by the FLUKA suite of codes.
+  /// The FLUKA format for entering nuclides requires some knowledge of FLUKA
+  /// The nuclide in must cases should be the atomic # times 10000000.  
+  /// The exceptions are for FLUKA's named isotopes
+  /// See the FLUKA Manual for more information.
+  /// \param nuc a nuclide
+  /// \return the received FLUKA name
+  std::string fluka(int nuc);
+  /// \}
+
+  /// \name FLUKA Form to Identifier Form Functions
+  /// \{
+  /// This converts from the FLUKA name to the
+  /// id canonical form  for nuclides in PyNE. 
+  /// \param name a fluka name
+  /// \return an integer id nuclide identifier.
+  int fluka_to_id(std::string name);
+  int fluka_to_id(char * name);
+  /// \}
+
   /// \name Serpent Form Functions
   /// \{
   /// This is the string-based naming convention used by the Serpent suite of codes.
@@ -1278,9 +1317,9 @@ namespace nucname
   /// form as ID, but the four last digits are all zeros.
   /// \param nuc a nuclide
   /// \return a integer groundstate id
-  int groundstate(int nuc);
-  int groundstate(char * nuc);
-  int groundstate(std::string nuc);
+  inline int groundstate(int nuc) {return (id(nuc) / 10000 ) * 10000;};
+  inline int groundstate(std::string nuc) {return groundstate(id(nuc));};
+  inline int groundstate(char * nuc) {return groundstate(std::string(nuc));};
   /// \}
   
   /// \name State Map functions
@@ -1298,16 +1337,13 @@ namespace nucname
 
 #endif  // PYNE_D35WIXV5DZAA5LLOWBY2BL2DPA
 //
-// end of cpp/nucname.h
+// end of src/nucname.h
 //
 
 
 //
-// start of cpp/rxname.h
+// start of src/rxname.h
 //
-/// \file rxname.h
-/// \author Anthony Scopatz (scopatz\@gmail.com)
-///
 /// \brief Converts between naming conventions for reaction channels.
 
 #ifndef PYNE_7DOEB2PKSBEFFIA3Q2NARI3KFY
@@ -1322,7 +1358,7 @@ namespace nucname
 #include <stdio.h>
 
 #ifndef PYNE_IS_AMALGAMATED
-#include "pyne.h"
+#include "utils.h"
 #include "nucname.h"
 #endif
 
@@ -1665,12 +1701,12 @@ namespace rxname
 
 #endif  // PYNE_7DOEB2PKSBEFFIA3Q2NARI3KFY
 //
-// end of cpp/rxname.h
+// end of src/rxname.h
 //
 
 
 //
-// start of cpp/data.h
+// start of src/data.h
 //
 /// \file data.h
 /// \author Anthony Scopatz (scopatz\@gmail.com)
@@ -1697,7 +1733,7 @@ namespace rxname
 #ifndef PYNE_IS_AMALGAMATED
 #include "h5wrap.h"
 #include "extra_types.h"
-#include "pyne.h"
+#include "utils.h"
 #include "nucname.h"
 #include "rxname.h"
 #endif
@@ -1711,13 +1747,14 @@ namespace pyne
   extern const double barns_per_cm2;  ///< barns per cm^2
   extern const double cm2_per_barn;   ///< cm^2 per barn
   extern const double sec_per_day;    ///< seconds per day
+  extern const double MeV_per_K;    ///< MeV per Kelvin
   /// \}
 
   extern std::string NUC_DATA_PATH; ///< Path to the nuc_data.h5 file.
 
   /// Mapping from nodes in nuc_data.h5 to hashes of nodes
-  extern std::map<std::string, std::string> data_checksums; 
-  
+  extern std::map<std::string, std::string> data_checksums;
+
   /// \name Atomic Mass Data
   /// \{
 
@@ -1725,31 +1762,31 @@ namespace pyne
   extern std::map<int, double> atomic_mass_map;
 
   /// a struct matching the atomic_mass table in nuc_data.h5.
-  typedef struct atomic_mass_struct {
+  typedef struct atomic_mass_data {
     int nuc;      ///< nuclide in id form
     double mass;  ///< nuclide atomic mass [amu]
     double error; ///< error in atomic mass [amu]
     double abund; ///< natural abundance of nuclide [atom fraction]
-  } atomic_mass_struct; 
+  } atomic_mass_data;
 
   // Loads preset dataset hashes into memory.
   std::map<std::string, std::string> get_data_checksums();
-  
+
   /// Loads the atomic mass and natural abundance data from the nuc_data.h5 file
   /// into memory.
-  void _load_atomic_mass_map(); 
+  void _load_atomic_mass_map();
 
-  /// \brief Returns the atomic mass of a nuclide \a nuc.  
-  /// 
+  /// \brief Returns the atomic mass of a nuclide \a nuc.
+  ///
   /// This function will first try to find the atomic mass data in the atomic_mass_map.
   /// If this map is empty, it will load the data from disk.  If the nuclide is in an
   /// excited state and not found in the map, it will give the value for the ground
   /// state nuclide.  If the nuclide simply cannot be found, the A number is returned.
   double atomic_mass(int nuc);
   /// Returns the atomic mass of a nuclide \a nuc.
-  double atomic_mass(char * nuc); 
+  double atomic_mass(char * nuc);
   /// Returns the atomic mass of a nuclide \a nuc.
-  double atomic_mass(std::string nuc); 
+  double atomic_mass(std::string nuc);
   /// \}
 
 
@@ -1759,16 +1796,16 @@ namespace pyne
   /// Mapping from nuclides in id form to their natural abundances.
   extern std::map<int, double> natural_abund_map;
 
-  /// \brief Returns the natural abundance of a nuclide \a nuc.  
-  /// 
+  /// \brief Returns the natural abundance of a nuclide \a nuc.
+  ///
   /// This follows the same the basic rules for finding or computing the natural
   /// abundances as the atomic_mass() functions do.  However, if the nuclide cannot
   /// be found, the default value returned is 0.0.
   double natural_abund(int nuc);
-  /// Returns the natural abundance of a nuclide \a nuc. 
-  double natural_abund(char * nuc); 
-  /// Returns the natural abundance of a nuclide \a nuc. 
-  double natural_abund(std::string nuc); 
+  /// Returns the natural abundance of a nuclide \a nuc.
+  double natural_abund(char * nuc);
+  /// Returns the natural abundance of a nuclide \a nuc.
+  double natural_abund(std::string nuc);
   /// \}
 
 
@@ -1776,49 +1813,85 @@ namespace pyne
   /// \name Q_value Data
   /// \{
 
-  /// Mapping from nuclides in id form to their q_values.
+  /// Mapping from nuclides in id form to their q_values and
+  /// the fraction of Q that comes from gammas.
   extern std::map<int, double> q_val_map;
+  extern std::map<int, double> gamma_frac_map;
 
   /// a struct matching the q_value table in nuc_data.h5.
-  typedef struct q_val_struct {
+  typedef struct q_val_data {
     int nuc;          ///< nuclide in id form
     double q_val;      ///< nuclide q_value [MeV/fission]
     double gamma_frac; ///< fraction of q that comes from gammas
-  } q_val_struct; 
+  } q_val_data;
 
   /// Loads the q_value data from the nuc_data.h5 file into memory.
-  void _load_q_val_map(); 
+  void _load_q_val_map();
 
-  /// \brief Returns the q_value of a nuclide \a nuc.  
-  /// 
+  /// \brief Returns the q_value of a nuclide \a nuc.
+  ///
   /// This function will first try to find the q_value data in the q_val_map.
-  /// If this map is empty, it will load the data from disk. If the nuclide simply 
+  /// If this map is empty, it will load the data from disk. If the nuclide simply
   /// cannot be found, the default value returned is 0.0.
   double q_val(int nuc);
-  /// Returns the q_value of a nuclide \a nuc.
-  double q_val(char * nuc); 
-  /// Returns the q_value of a nuclide \a nuc.
-  double q_val(std::string nuc); 
+  double q_val(const char * nuc);
+  double q_val(std::string nuc);
+  double gamma_frac(int nuc);
+  double gamma_frac(const char * nuc);
+  double gamma_frac(std::string nuc);
   /// \}
 
 
-
-  /// \name Gamma Fraction of Q Values Data
+  /// \name Dose Factor Data
   /// \{
 
-  /// Mapping from nuclides in id form to the fraction of Q that comes from gammas.
-  extern std::map<int, double> gamma_frac_map;
+  /// A struct matching the dose factor table in nuc_data.h5.
+  typedef struct dose {
+    int nuc;              ///< nuclide in id form
+    double ext_air_dose;  ///< nuclide ext_air dose factor [mrem/h per Ci/m^3]
+    double ratio;         ///< ratio of external air dose factor to dose factor due to inhalation
+    double ext_soil_dose; ///< nuclide ext_soil dose factor [mrem/h per Ci/m^2]
+    double ingest_dose;   ///< nuclide dose factor due to ingestion [mrem/pCi]
+    double fluid_frac;    ///< fraction of activity abosorbed in body fluids
+    double inhale_dose;   ///< nuclide dose factor due to inhalation [mrem/pCi]
+    char lung_mod;        ///< model of lung used (time of biological half life-- D, W, or Y)
+  } dose;
 
-  /// \brief Returns the natural abundance of a nuclide \a nuc.  
-  /// 
-  /// This follows the same the basic rules for finding or computing the fraction
-  /// of Q that comes from gammas as the q_val() functions do.
-  /// If the nuclide cannot be found, the default value returned is 0.0.
-  double gamma_frac(int nuc);
-  /// Returns the gamma_frac of a nuclide \a nuc. 
-  double gamma_frac(char * nuc); 
-  /// Returns the gamma_frac of a nuclide \a nuc. 
-  double gamma_frac(std::string nuc); 
+  /// Mapping from int to dose for 3 sources
+  extern std::map<int, dose> epa_dose_map;
+  extern std::map<int, dose> doe_dose_map;
+  extern std::map<int, dose> genii_dose_map;
+
+  /// Loads the dose factor data from the nuc_data.h5 file into memory
+  /// according to the user-input source.
+  void _load_dose_map(std::map<int, dose>& dm, std::string source_path);
+
+  /// \brief Returns the dose factors of a nuclide.
+  ///
+  /// These functions will first try to find the dose factor data in the dose_maps.
+  /// If the maps are empty, it will load the data from disk. If the nuclide simply
+  /// cannot be found, the default value returned is -1.
+  double ext_air_dose(int nuc, int source);
+  double ext_air_dose(const char * nuc, int source);
+  double ext_air_dose(std::string nuc, int source);
+  double ext_soil_dose(int nuc, int source);
+  double ext_soil_dose(const char * nuc, int source);
+  double ext_soil_dose(std::string nuc, int source);
+  double ingest_dose(int nuc, int source);
+  double ingest_dose(const char * nuc, int source);
+  double ingest_dose(std::string nuc, int source);
+  double inhale_dose(int nuc, int source);
+  double inhale_dose(const char * nuc, int source);
+  double inhale_dose(std::string nuc, int source);
+  double dose_ratio(int nuc, int source);
+  double dose_ratio(const char * nuc, int source);
+  double dose_ratio(std::string nuc, int source);
+  double dose_fluid_frac(int nuc, int source);
+  double dose_fluid_frac(const char * nuc, int source);
+  double dose_fluid_frac(std::string nuc, int source);
+  std::string dose_lung_model(int nuc, int source);
+  std::string dose_lung_model(const char * nuc, int source);
+  std::string dose_lung_model(std::string nuc, int source);
   /// \}
 
 
@@ -1834,14 +1907,14 @@ namespace pyne
   extern std::map<int, double> b_map;
 
   /// a struct matching the '/neutron/scattering_lengths' table in nuc_data.h5.
-  typedef struct scattering_lengths_struct {
+  typedef struct scattering_lengths {
     int nuc;  ///< nuclide in id form
     xd_complex_t b_coherent;  ///< coherent scattering length [cm]
     xd_complex_t b_incoherent;  ///< incoherent scattering length [cm]
     double xs_coherent;   ///< coherent scattering cross section
     double xs_incoherent; ///< incoherent scattering cross section
     double xs;            ///< scattering cross section
-  } scattering_lengths_struct; 
+  } scattering_lengths;
 
   /// Loads the scattering length data from the nuc_data.h5 file into memory.
   void _load_scattering_lengths();
@@ -1884,17 +1957,17 @@ namespace pyne
   extern std::map<std::pair<int, int>, double> wimsdfpy_data;
 
   /// a struct matching the '/neutron/wimsd_fission_product' table in nuc_data.h5.
-  typedef struct wimsdfpy_struct {
+  typedef struct wimsdfpy {
     int from_nuc;  ///< from nuclide in id form
     int to_nuc;  ///< from nuclide in id form
     double yields; ///< fission product yield, fraction [unitless]
-  } wimsdfpy_struct; 
+  } wimsdfpy;
 
   /// Loads the WIMSD fission product yield data from the nuc_data.h5 file into memory.
   void _load_wimsdfpy();
 
   /// a struct matching the '/neutron/nds_fission_product' table in nuc_data.h5
-  typedef struct ndsfpy_struct {
+  typedef struct ndsfpy {
     int from_nuc; ///< id of fissioning nuclide
     int to_nuc; ///< id of fission product
     double yield_thermal; ///< thermal yield [fraction]
@@ -1903,20 +1976,20 @@ namespace pyne
     double yield_fast_err; ///< fast yield error [fraction]
     double yield_14MeV; ///< 14 MeV yield [fraction]
     double yield_14MeV_err; ///< 14 MeV yield error [fraction]
-  } ndsfpy_struct;
+  } ndsfpy;
 
   /// a struct for the nds data for fpyield
-  typedef struct ndsfpysub_struct {
+  typedef struct ndsfpysub {
     double yield_thermal; ///< thermal yield [fraction]
     double yield_thermal_err; ///< thermal yield error [fraction]
     double yield_fast; ///< fast yield [fraction]
     double yield_fast_err; ///< fast yield error [fraction]
     double yield_14MeV; ///< 14 MeV yield [fraction]
     double yield_14MeV_err; ///< 14 MeV yield error [fraction]
-  } ndsfpysub_struct;
+  } ndsfpysub;
 
 
-  extern std::map<std::pair<int, int>, ndsfpysub_struct> ndsfpy_data;
+  extern std::map<std::pair<int, int>, ndsfpysub> ndsfpy_data;
 
   /// Loads the NDS fission product yield data from the nuc_data.h5 file into memory.
   void _load_ndsfpy();
@@ -1942,9 +2015,9 @@ namespace pyne
 
   /// \name Decay Data
   /// \{
-  
+
   /// Data access functions
-  
+
   /// simple class to swap the order in which a pair is compared
   class swapmapcompare{
     public:
@@ -1952,38 +2025,38 @@ namespace pyne
         bool operator()(const std::pair<int, double>& lhs,
                         const std::pair<int, double>& rhs) const;
   };
-  
-  /// Access data in a std::map<std::pair<int, double> for a range of 
-  /// values of the second member of the pair. Returns a vector of all 
+
+  /// Access data in a std::map<std::pair<int, double> for a range of
+  /// values of the second member of the pair. Returns a vector of all
   /// values at valoffset of class U of type T f
   template<typename T, typename U> std::vector<T> data_access(double emin,
     double emax, size_t valoffset, std::map<std::pair<int, double>, U>  &data);
-  /// Access data in a std::map<std::pair<int, double> for a given 
-  /// value of the first member of the pair. Returns a vector of all 
+  /// Access data in a std::map<std::pair<int, double> for a given
+  /// value of the first member of the pair. Returns a vector of all
   /// values at valoffset of class U of type T
   template<typename T, typename U> std::vector<T> data_access(int parent,
-    double min, double max, size_t valoffset, 
+    double min, double max, size_t valoffset,
     std::map<std::pair<int, double>, U>  &data);
-  /// Access data in a std::map<std::pair<int, int> for a given 
+  /// Access data in a std::map<std::pair<int, int> for a given
   /// matching pair. Returns the value at valoffset of
   /// class U of type T
-  template<typename T, typename U> T data_access(std::pair<int, int> from_to, 
+  template<typename T, typename U> T data_access(std::pair<int, int> from_to,
     size_t valoffset, std::map<std::pair<int, int>, U> &data);
-  /// Access data in a std::map<std::pair<int, int> for a given 
+  /// Access data in a std::map<std::pair<int, int> for a given
   /// value of the first member of the pair. Returns an array of the values
-  /// at valoffset of class U of type T 
-  template<typename T, typename U> std::vector<T> data_access(int parent, 
-    size_t valoffset, std::map<std::pair<int, int>, U> &data);    
-  template<typename T, typename U> std::vector<T> data_access(int parent, 
-    size_t valoffset, std::map<std::pair<int, unsigned int>, U> &data); 
+  /// at valoffset of class U of type T
+  template<typename T, typename U> std::vector<T> data_access(int parent,
+    size_t valoffset, std::map<std::pair<int, int>, U> &data);
+  template<typename T, typename U> std::vector<T> data_access(int parent,
+    size_t valoffset, std::map<std::pair<int, unsigned int>, U> &data);
 
   /// Access data in a std::map<int, data> format for a given first member
   /// of the pair. Returns the value at valoffset of the matching datapoint.
-  template<typename U> double data_access(int parent, 
-  size_t valoffset, std::map<int, U> &data); 
-  
+  template<typename U> double data_access(int parent,
+  size_t valoffset, std::map<int, U> &data);
+
   /// Structure for atomic data
-  typedef struct atomic_struct{
+  typedef struct atomic{
     int z; ///< number of protons [int]
     double k_shell_fluor; ///< K-shell fluorescence [fraction]
     double k_shell_fluor_error; ///< K-shell fluorescence error [fraction]
@@ -2010,21 +2083,21 @@ namespace pyne
     double ka2_x_ray_en_err; ///< Ka2 X-ray energy error [keV]
     double kb_x_ray_en; ///< Kb X-ray energy [keV]
     double l_x_ray_en; ///< L X-ray energy [keV]
-  } atomic_struct;
-  
+  } atomic;
+
   // map of Z to atomic data
-  extern std::map<int, atomic_struct> atomic_data_map;
-  
+  extern std::map<int, atomic> atomic_data_map;
+
   template<typename T> void _load_data();
-  template<> void _load_data<atomic_struct>();
-  
+  template<> void _load_data<atomic>();
+
   // compute X-ray data
   std::vector<std::pair<double, double> >
   calculate_xray_data(int z, double k_conv, double l_conv);
-  
-  
+
+
   /// a struct matching the '/decay/level_list' table in nuc_data.h5.
-  typedef struct level_struct{
+  typedef struct level_data{
     int nuc_id; ///< state id of nuclide
     unsigned int rx_id; ///< rx id of reaction, 0 for basic level data
     double half_life; ///< half life [seconds]
@@ -2032,15 +2105,15 @@ namespace pyne
     double branch_ratio; ///< branch ratio [fraction]
     int metastable; ///< metastable level [int]
     char special; ///< special high-spin state [character]
-  } level_struct;
+  } level_data;
 
   /// Mapping from nuclides in id form to a struct containing data associated
   /// with that level.
-  extern std::map<std::pair<int,double>, level_struct> level_data_lvl_map;
-  extern std::map<std::pair<int,unsigned int>, level_struct> level_data_rx_map;
-  
-  template<> void _load_data<level_struct>();
-  
+  extern std::map<std::pair<int,double>, level_data> level_data_lvl_map;
+  extern std::map<std::pair<int,unsigned int>, level_data> level_data_rx_map;
+
+  template<> void _load_data<level_data>();
+
   /// \brief Returns the nuc_id of an energy level
   ///
   /// This function looks for the level that best matches the input level
@@ -2054,7 +2127,7 @@ namespace pyne
   int metastable_id(int nuc, int m);
   /// Assumes the first metastable state is the desired one
   int metastable_id(int nuc);
-  
+
   /// \brief Returns the half life for a nuclide \a nuc.
   ///
   /// This function works by first checking the half_life_map.  If this is empty it
@@ -2080,7 +2153,7 @@ namespace pyne
   /// \brief Returns the branch ratio for a parent/child nuclide pair.
   ///
   /// This function works by first checking the branch_ratio_map.  If this is empty it
-  /// loads the data from disk.  If the parent/child nuclide pair is still not found, 
+  /// loads the data from disk.  If the parent/child nuclide pair is still not found,
   /// then the decay is assumed to be impossible and 0.0 is returned.
   double branch_ratio(std::pair<int, int> from_to);
   /// Returns the branch ratio for a parent/child nuclide pair.
@@ -2113,7 +2186,7 @@ namespace pyne
   std::set<int> decay_children(std::string nuc);
 
   /// a struct matching the '/decay/decays' table in nuc_data.h5.
-  typedef struct decay_struct{
+  typedef struct decay{
     int parent; ///< state id of decay parent
     int child; ///< state id of decay child
     unsigned int decay; ///< rx id of decay
@@ -2128,16 +2201,17 @@ namespace pyne
     double beta_branch_ratio;
     /// beta branching ratio error of this decay [fraction]
     double beta_branch_ratio_error;
-  } decay_struct;
+  } decay;
 
   /// Loads the decay data from the nuc_data.h5 file into memory.
-  template<> void _load_data<decay_struct>();
+  template<> void _load_data<decay>();
   /// Mapping from a pair of nuclides in id form to a struct containing data
   /// associated with the decay from the first to the second
-  extern std::map<std::pair<int, int>, decay_struct> decay_data;
+  extern std::map<std::pair<int, int>, decay> decay_data;
 
   //
-  //void decay_data(std::pair<int, int> from_to, decay_struct *data);
+  //
+  std::vector<int> decay_data_children(int parent);
   std::pair<double, double> decay_half_life(std::pair<int,int>);
   std::vector<std::pair<double, double> > decay_half_lifes(int);
   double decay_branch_ratio(std::pair<int,int>);
@@ -2149,7 +2223,7 @@ namespace pyne
 
 
   /// a struct matching the '/decay/gammas' table in nuc_data.h5.
-  typedef struct gamma_struct{
+  typedef struct gamma{
     int from_nuc; ///< state id of starting level
     int to_nuc; ///< state id of final level
     int parent_nuc; ///< state id of the primary decaying nucleus
@@ -2164,12 +2238,12 @@ namespace pyne
     double k_conv_e; ///< k conversion electron fraction
     double l_conv_e; ///< l conversion electron fraction
     double m_conv_e; ///< m conversion electron fraction
-  } gamma_struct;
+  } gamma;
 
   /// Loads the gamma ray data from the nuc_data.h5 file into memory.
-  template<> void _load_data<gamma_struct>();
+  template<> void _load_data<gamma>();
 
-  extern std::map<std::pair<int, double>, gamma_struct> gamma_data;
+  extern std::map<std::pair<int, double>, gamma> gamma_data;
 
   //returns a list of gamma decay energies from input parent nuclide
   std::vector<std::pair<double, double> > gamma_energy(int parent);
@@ -2182,29 +2256,35 @@ namespace pyne
   //returns a list of gamma total intensities from input parent nuclide
   std::vector<std::pair<double, double> > gamma_total_intensity(int parent);
   //returns a list of pairs of excited state transitions from an input parent nuclide
-  std::vector<std::pair<int, int> > gamma_from_to(int parxent);
+  std::vector<std::pair<int, int> > gamma_from_to(int parent);
   //returns a list of pairs of excited state transitions from an decay energy
   std::vector<std::pair<int, int> > gamma_from_to(double energy, double error);
   //returns a list of parent nuclides associated with an input decay energy
   std::vector<int> gamma_parent(double energy, double error);
-  //returns an array of arrays of X-ray energies and intesities for a 
+  //returns an array of arrays of X-ray energies and intesities for a
   //given parent
-  std::vector<std::vector<std::pair<double, double> > > gamma_xrays(int parent);
+  std::vector<std::pair<double, double> > gamma_xrays(int parent);
+
+  /// Returns a list of energies and intensities normalized to branching ratios
+  std::vector<std::pair<double, double> > gammas(int parent_state_id);
+  std::vector<std::pair<double, double> > alphas(int parent_state_id);
+  std::vector<std::pair<double, double> > betas(int parent_state_id);
+  std::vector<std::pair<double, double> > xrays(int parent);
 
   /// a struct matching the '/decay/alphas' table in nuc_data.h5.
-  typedef struct alpha_struct{
+  typedef struct alpha{
     int from_nuc; ///< state id of parent nuclide
     int to_nuc; ///< state id of child nuclide
     double energy; ///< energy of alpha
     double intensity; ///< intensity of alpha decay
-  } alpha_struct;
+  } alpha;
 
   /// Loads the alpha decay data from the nuc_data.h5 file into memory.
-  template<> void _load_data<alpha_struct>();
+  template<> void _load_data<alpha>();
 
   /// A vector of structs containing alpha data for access in memory
-  extern std::map<std::pair<int, double>, alpha_struct> alpha_data;
-  
+  extern std::map<std::pair<int, double>, alpha> alpha_data;
+
   //returns a list of alpha decay energies from input parent nuclide
   std::vector<double > alpha_energy(int parent);
   //returns a list of alpha decay intensities from input parent nuclide
@@ -2217,19 +2297,19 @@ namespace pyne
   std::vector<int> alpha_child(int parent);
 
   /// a struct matching the '/decay/betas' table in nuc_data.h5.
-  typedef struct beta_struct{
+  typedef struct beta{
     int from_nuc; ///< state id of parent nuclide
     int to_nuc; ///< state id of child nuclide
     double endpoint_energy; ///< beta decay endpoint energy
     double avg_energy; ///< beta decay average energy
     double intensity; ///< beta intensity
-  } beta_struct;
+  } beta;
 
   /// Loads the beta decay data from the nuc_data.h5 file into memory.
-  template<> void _load_data<beta_struct>();
+  template<> void _load_data<beta>();
 
   /// A vector of structs containing beta data for access in memory
-  extern std::map<std::pair<int, double>, beta_struct> beta_data;
+  extern std::map<std::pair<int, double>, beta> beta_data;
   //returns a list of beta decay endpoint energies from input parent nuclide
   std::vector<double > beta_endpoint_energy(int parent);
   //returns a list of beta decay average energies from input parent nuclide
@@ -2244,7 +2324,7 @@ namespace pyne
   std::vector<int> beta_child(int parent);
 
   /// A struct matching the '/decay/ecbp' table in nuc_data.h5.
-  typedef struct ecbp_struct{
+  typedef struct ecbp{
     int from_nuc;  ///< state id of parent nuclide
     int to_nuc; ///< state id of child nuclide
     double endpoint_energy; ///< beta decay endpoint energy
@@ -2254,41 +2334,41 @@ namespace pyne
     double k_conv_e; ///< k conversion electron fraction
     double l_conv_e; ///< l conversion electron fraction
     double m_conv_e; ///< m conversion electron fraction
-  } ecbp_struct;
+  } ecbp;
 
   /// A vector of structs containing ecbp data for access in memory
-  extern std::map<std::pair<int, double>, ecbp_struct> ecbp_data;
+  extern std::map<std::pair<int, double>, ecbp> ecbp_data;
 
   /// Loads the electron capture and beta plus decay data from the
   /// nuc_data.h5 file into memory.
-  template<> void _load_data<ecbp_struct>();
+  template<> void _load_data<ecbp>();
   ///returns a list of electron capture/ beta plus decay endpoint energies from
   ///input parent nuclide
   std::vector<double > ecbp_endpoint_energy(int parent);
-  //returns a list of electron capture/ beta plus decay average energies from 
+  //returns a list of electron capture/ beta plus decay average energies from
   //input parent nuclide
   std::vector<double > ecbp_average_energy(int parent);
-  //returns a list of electron capture decay intensities from input parent 
+  //returns a list of electron capture decay intensities from input parent
   //nuclide
   std::vector<double> ec_intensity(int parent);
   //returns a list of beta plus decay intensities from input parent nuclide
   std::vector<double> bp_intensity(int parent);
-  //returns a list of electron capture /beta plus decay parents from input 
+  //returns a list of electron capture /beta plus decay parents from input
   //decay energy range
   std::vector<int> ecbp_parent(double energy, double error);
   //returns a list of electron capture /beta plus decay children from input
   //decay energy range
   std::vector<int> ecbp_child(double energy, double error);
-  //returns a list of electron capture /beta plus decay children from input 
+  //returns a list of electron capture /beta plus decay children from input
   //parent nuclide
   std::vector<int> ecbp_child(int parent);
-  //returns an array of arrays of X-ray energies and intesities for a 
+  //returns an array of arrays of X-ray energies and intesities for a
   //given parent
-  std::vector<std::vector<std::pair<double, double> > > ecbp_xrays(int parent);
+  std::vector<std::pair<double, double> > ecbp_xrays(int parent);
   /// \}
 
   /// map<energy, map<nuclide, map<rx, xs> > >
-  extern std::map<std::string, std::map<int, std::map<int, double> > > 
+  extern std::map<std::string, std::map<int, std::map<int, double> > >
       simple_xs_map;
 
   /// returns the microscopic cross section in barns for the specified
@@ -2332,12 +2412,12 @@ namespace pyne
 
 #endif
 //
-// end of cpp/data.h
+// end of src/data.h
 //
 
 
 //
-// start of cpp/json/json-forwards.h
+// start of src/json-forwards.h
 //
 /// Json-cpp amalgated forward header (http://jsoncpp.sourceforge.net/).
 /// It is intented to be used with #include <json/json-forwards.h>
@@ -2593,15 +2673,15 @@ namespace Json {
 
 #endif //ifndef JSON_FORWARD_AMALGATED_H_INCLUDED
 //
-// end of cpp/json/json-forwards.h
+// end of src/json-forwards.h
 //
 
 
 //
-// start of cpp/json/json.h
+// start of src/json.h
 //
 /// Json-cpp amalgated header (http://jsoncpp.sourceforge.net/).
-/// It is intented to be used with #include <json/json.h>
+/// It is intented to be used with #include <json.h>
 
 // //////////////////////////////////////////////////////////////////////
 // Beginning of content of file: LICENSE
@@ -4460,7 +4540,652 @@ namespace Json {
 
 #endif //ifndef JSON_AMALGATED_H_INCLUDED
 //
-// end of cpp/json/json.h
+// end of src/json.h
+//
+
+
+//
+// start of src/material.h
+//
+/// \brief The ever-important material class and related helpers.
+///
+/// The material class is effectively a normalized nuclide linked list with
+/// associated mass, density, atoms per mol, and metadata.  However, this
+/// implementation also contains other functions for mixing materials and generating
+/// related materials.
+
+#ifndef PYNE_MR34UE5INRGMZK2QYRDWICFHVM
+#define PYNE_MR34UE5INRGMZK2QYRDWICFHVM
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <map>
+#include <set>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sstream>	// std::ostringstream
+
+#if !defined(JSON_IS_AMALGAMATION)
+  #define JSON_IS_AMALGAMATION
+#endif
+
+#ifndef PYNE_IS_AMALGAMATED
+#include "json-forwards.h"
+#include "json.h"
+#include "h5wrap.h"
+#include "utils.h"
+#include "nucname.h"
+#include "data.h"
+#endif
+
+namespace pyne
+{
+  // Set Type Definitions
+  typedef std::map<int, double> comp_map; ///< Nuclide-mass composition map type
+  typedef comp_map::iterator comp_iter;   ///< Nuclide-mass composition iter type
+
+  // These 37 strings are predefined FLUKA materials. 
+  // Materials not on this list requires a MATERIAL card. 
+  static std::string fluka_mat_strings[] = {
+   "BLCKHOLE", "VACUUM",   "HYDROGEN", "HELIUM",   "BERYLLIU", "CARBON", 
+   "NITROGEN", "OXYGEN",   "MAGNESIU", "ALUMINUM", "IRON",     "COPPER", 
+   "SILVER",   "SILICON",  "GOLD",     "MERCURY",  "LEAD",     "TANTALUM", 
+   "SODIUM",   "ARGON",    "CALCIUM",  "TIN",      "TUNGSTEN", "TITANIUM", 
+   "NICKEL",   "WATER",    "POLYSTYR", "PLASCINT", "PMMA",     "BONECOMP", 
+   "BONECORT", "MUSCLESK", "MUSCLEST", "ADTISSUE", "KAPTON", "POLYETHY", "AIR"
+  };
+  static int FLUKA_MAT_NUM = 37;
+
+  /// Material composed of nuclides.
+  class Material
+  {
+  protected:
+
+    /// Computes the total mass stored in the composition.
+    double get_comp_sum ();
+
+  public:
+
+    // Material Constructors
+    Material ();  ///< empty constructor
+    /// Constructor from composition map
+    /// \param cm composition map
+    /// \param m mass value, the mass is set to the sum of the values in the
+    ///          composition if \a m is negative.
+    /// \param d density value
+    /// \param apm atoms per mole
+    /// \param attributes initial metadata
+    Material(comp_map cm, double m=-1.0, double d=-1.0, double apm=-1.0,
+             Json::Value attributes=Json::Value(Json::objectValue));
+    /// Constructor from file
+    /// \param filename path to file on disk, this file may be either in plaintext
+    ///                 or HDF5 format.
+    /// \param m mass value, the mass is set to the sum of the values in the
+    ///          composition if \a m is negative,
+    ///          may be overridden by the value from disk.
+    /// \param d density value,
+    ///          may be overridden by the value from disk.
+    /// \param apm atoms per mole,
+    ///          may be overridden by the value from disk.
+    /// \param attributes initial metadata,
+    ///          may be overridden by the value from disk.
+    Material(char * filename, double m=-1.0, double d=-1.0, double apm=-1.0,
+             Json::Value attributes=Json::Value(Json::objectValue));
+    /// Constructor from file
+    /// \param filename path to file on disk, this file may be either in plaintext
+    ///                 or HDF5 format.
+    /// \param m mass value, the mass is set to the sum of the values in the
+    ///          composition if \a m is negative,
+    ///          may be overridden by the value from disk.
+    /// \param d density value,
+    ///          may be overridden by the value from disk.
+    /// \param apm atoms per mole,
+    ///          may be overridden by the value from disk.
+    /// \param attributes initial metadata,
+    ///          may be overridden by the value from disk.
+    Material(std::string filename, double m=-1.0, double d=-1.0, double apm=-1.0,
+             Json::Value attributes=Json::Value(Json::objectValue));
+    ~Material (); ///< default destructor
+
+    /// Normalizes the mass values in the composition.
+    void norm_comp ();
+
+    // Persistence functions.
+
+    /// Loads the matrial composition from an HDF5 file according to the layout
+    /// defined by protocol 0.  This protocol is depratacted.
+    /// \param db HDF5 id for the open HDF5 file.
+    /// \param datapath Path to the base node for the material in \a db.
+    /// \param row The index to read out, may be negative.
+    void _load_comp_protocol0(hid_t db, std::string datapath, int row);
+
+    /// Loads the matrial composition from an HDF5 file according to the layout
+    /// defined by protocol 1.  This protocol should be used in favor of protocol 0.
+    /// \param db HDF5 id for the open HDF5 file.
+    /// \param datapath Path to the base node for the material in \a db.
+    /// \param row The index to read out, may be negative.
+    void _load_comp_protocol1(hid_t db, std::string datapath, int row);
+
+    /// Loads a material from an HDF5 file into this object.
+    /// \param filename Path on disk to the HDF5 file.
+    /// \param datapath Path to the the material in the file.
+    /// \param row The index to read out, may be negative.
+    /// \param protocol Flag for layout of material on disk.
+    void from_hdf5(char * filename, char * datapath, int row=-1, int protocol=1);
+
+    /// Loads a material from an HDF5 file into this object.
+    /// \param filename Path on disk to the HDF5 file.
+    /// \param datapath Path to the the material in the file.
+    /// \param row The index to read out, may be negative.
+    /// \param protocol Flag for layout of material on disk.
+    void from_hdf5(std::string filename, std::string datapath="/material",
+                                                          int row=-1, int protocol=1);
+
+    /// Writes this material out to an HDF5 file.
+    /// This happens according to protocol 1.
+    /// \param filename Path on disk to the HDF5 file.
+    /// \param datapath Path to the the material in the file.
+    /// \param nucpath Path to the nuclides set in the file.
+    /// \param row The index to read out, may be negative. Also note that this is a
+    ///            float.  A value of -0.0 indicates that the material should be
+    ///            appended to the end of the dataset.
+    /// \param chunksize The chunksize for all material data on disk.
+    void write_hdf5(char * filename, char * datapath, char * nucpath, float row=-0.0,
+                                                                    int chunksize=100);
+    /// Writes this material out to an HDF5 file.
+    /// This happens according to protocol 1.
+    /// \param filename Path on disk to the HDF5 file.
+    /// \param datapath Path to the the material in the file.
+    /// \param nucpath Path to the nuclides set in the file.
+    /// \param row The index to read out, may be negative. Also note that this is a
+    ///            float.  A value of -0.0 indicates that the material should be
+    ///            appended to the end of the dataset.
+    /// \param chunksize The chunksize for all material data on disk.
+    void write_hdf5(std::string filename, std::string datapath="/material",
+                    std::string nucpath="/nucid", float row=-0.0, int chunksize=100);
+
+    /// Return an mcnp input deck record as a string
+    std::string mcnp(std::string frac_type = "mass");
+    /// 
+    /// Return a fluka input deck MATERIAL card as a string
+    std::string fluka(int id, std::string frac_type = "mass");
+    /// Convenience function to tell whether a given name needs a material card
+    bool not_fluka_builtin(std::string fluka_name);
+    /// High level call to get details and call material_component(..)
+    std::string fluka_material_str(int id);
+    /// Intermediate level call to prepare final info and call material_line(..)
+    std::string fluka_material_component(int fid, int nucid, 
+                                         std::string fluka_name);
+    /// Format information into a FLUKA material card
+    std::string fluka_material_line(int znum, double atomic_mass, 
+                              int fid, std::string fluka_name);
+    /// Convenience function to format a single fluka field
+    std::string fluka_format_field(float field);
+    /// Return FLUKA compound card and the material card for the named compound
+    /// but not the material cards of the components
+    std::string fluka_compound_str(int id, std::string frac_type = "mass");
+
+    /// Reads data from a plaintext file at \a filename into this Material instance.
+    void from_text(char * filename);
+    /// Reads data from a plaintext file at \a filename into this Material instance.
+    void from_text(std::string filename);
+
+    /// Writes the Material out to a simple plaintext file readable by from_text().
+    void write_text(char * filename);
+    /// Writes the Material out to a simple plaintext file readable by from_text().
+    void write_text(std::string filename);
+
+    /// Loads a JSON instance tree into this Material.
+    void load_json(Json::Value);
+    /// Dumps the Material out to a JSON instance tree.
+    Json::Value dump_json();
+    /// Reads data from a JSON file at \a filename into this Material instance.
+    void from_json(char * filename);
+    /// Reads data from a JSON file at \a filename into this Material instance.
+    void from_json(std::string filname);
+    /// Writes the Material out to a JSON file
+    void write_json(char * filename);
+    /// Writes the Material out to a JSON file
+    void write_json(std::string filename);
+
+    // Fundemental mass stream data
+    /// composition, maps nuclides in id form to normalized mass weights.
+    comp_map comp;
+    double mass;  ///< mass (in arbitrary units) of the Material.
+    double density; ///< density (in arbitrary units) of the Material.
+    double atoms_per_molecule; ///< The number of atoms per molecule.
+    /// container for arbitrary metadata, following the JSON rules.
+    Json::Value metadata;
+
+    // Material function definitions
+    void normalize ();  ///< Normalizes the mass.
+    /// Returns a composition map that has been unnormalized by multiplying each
+    /// mass weight by the actual mass of the material.
+    comp_map mult_by_mass();
+    /// Calculates the atomic weight of this material based on the composition
+    /// and the number of atoms per mol.  If \a apm is non-negative then it is
+    /// used (and stored on the instance) as the atoms_per_molecule for this calculation.
+    /// If \a apm and atoms_per_molecule on this instance are both negative, then the best
+    /// guess value calculated from the normailized composition is used here.
+    double molecular_mass(double apm=-1.0);
+    /// Returns a copy of the current material where all natural elements in the
+    /// composition are expanded to their natural isotopic abundances.
+    Material expand_elements();
+    // Returns a copy of the current material where all the isotopes of the elements
+    // are added up, atomic-fraction-wise, unless they are in the exception set
+    Material collapse_elements(std::set<int> exception_znum);
+    // Wrapped version to facilitate calling from python
+    Material collapse_elements(int **int_ptr_arry);
+    // void print_material( pyne::Material test_mat);
+    /// Computes, sets, and returns the mass density when \a num_dens is greater
+    /// than or equal zero.  If \a num_dens is negative, this simply returns the
+    /// current value of the density member variable.  You may also use / set the
+    /// atoms per molecule (atoms_per_molecule) in this function using \a apm.
+    double mass_density(double num_dens=-1.0, double apm=-1.0);
+    /// Computes and returns the number density of the material using the
+    /// mass density if \a mass_dens is greater than or equal to zero.  If
+    /// \a mass_dens is negative, the denisty member variable is used instead.
+    /// You may also use / set the atoms per molecule (atoms_per_molecule) in this
+    /// function using \a apm.
+    double number_density(double mass_dens=-1.0, double apm=-1.0);
+
+    // Sub-Stream Computation
+    /// Creates a sub-Material with only the nuclides present in \a nucset.
+    /// Elements of this set may be either in id form or simple Z numbers.
+    Material sub_mat(std::set<int> nucset);
+    /// Creates a sub-Material with only the nuclides present in \a nucset.
+    /// Elements of this set may be in any form.
+    Material sub_mat(std::set<std::string> nucset);
+
+    /// Creates a new Material with the mass weights for all nuclides in \a nucset
+    /// set to \a value.
+    /// Elements of \a nucset may be either in id form or simple Z numbers.
+    Material set_mat(std::set<int> nucset, double value);
+    /// Creates a new Material with the mass weights for all nuclides in \a nucset
+    /// set to \a value.  Elements of \a nucset may be in any form.
+    Material set_mat(std::set<std::string> nucset, double value);
+
+    /// Creates a new Material with the all nuclides in \a nucset removed.
+    /// Elements of \a nucset may be either in id form or simple Z numbers.
+    Material del_mat(std::set<int> nucset);
+    /// Creates a new Material with the all nuclides in \a nucset removed.
+    /// Elements of \a nucset may be in any form.
+    Material del_mat(std::set<std::string> nucset);
+
+    /// Creates a sub-Material based on a range of id-form integers.
+    Material sub_range(int lower=0, int upper=10000000);
+    /// Creates a new Material with the mass weights for all nuclides in the id
+    /// range set to \a value.
+    Material set_range(int lower=0, int upper=10000000, double value=0.0);
+    /// Creates a new Material with the all nuclides in the id range removed.
+    Material del_range(int lower=0, int upper=10000000);
+
+    /// Creates a sub-Material of only the given element. Assumes element is
+    /// id form.
+    Material sub_elem(int element);
+    /// Creates a sub-Material of only lanthanides.
+    Material sub_lan();
+    /// Creates a sub-Material of only actinides.
+    Material sub_act();
+    /// Creates a sub-Material of only transuranics.
+    Material sub_tru();
+    /// Creates a sub-Material of only minor actinides.
+    Material sub_ma();
+    /// Creates a sub-Material of only fission products.
+    Material sub_fp();
+
+    // Atom fraction functions
+    /// Returns a mapping of the nuclides in this material to their atom fractions.
+    /// This calculation is based off of the materials molecular weight.
+    std::map<int, double> to_atom_frac();
+    /// Sets the composition, mass, and atoms_per_molecule of this material to those
+    /// calculated from \a atom_fracs, a mapping of nuclides to atom fractions values.
+    void from_atom_frac(std::map<int, double> atom_fracs);
+
+    // Radioactive Material functions
+    /// Returns a list of gamma-rays energies in keV and intensities in
+    /// decays/s/atom material unnormalized
+    std::vector<std::pair<double, double> > gammas();
+    /// Returns a list of x-rays average energies in keV and intensities in
+    /// decays/s material unnormalized
+    std::vector<std::pair<double, double> > xrays();
+    /// Returns a list of photon energies in keV and intensities in
+    /// decays/s/atom material unnormalized
+    std::vector<std::pair<double, double> > photons(bool norm);
+    /// Takes a list of photon energies and intensities and normalizes them
+    /// so the sum of the intensities is one
+    std::vector<std::pair<double, double> > normalize_radioactivity(
+      std::vector<std::pair<double, double> > unnormed);
+
+
+    // Overloaded Operators
+    /// Adds mass to a material instance.
+    Material operator+ (double);
+    /// Adds two materials together.
+    Material operator+ (Material);
+    /// Multiplies a material's mass.
+    Material operator* (double);
+    /// Divides a material's mass.
+    Material operator/ (double);
+  };
+
+  /// Converts a Material to a string stream representation for canonical writing.
+  /// This operator is also defined on inheritors of std::ostream
+  std::ostream& operator<< (std::ostream& os, Material mat);
+
+  /// A stuct for reprensenting fundemental data in a material.
+  /// Useful for HDF5 representations.
+  typedef struct material_data {
+    double mass;  ///< material mass
+    double density; ///< material density
+    double atoms_per_mol; ///< material atoms per mole
+    double comp []; ///< array of material composition mass weights.
+  } material_data;
+
+  /// Custom exception for invalid HDF5 protocol numbers
+  class MaterialProtocolError: public std::exception
+  {
+    /// marginally helpful error message.
+    virtual const char* what() const throw()
+    {
+      return "Invalid loading protocol number; please use 0 or 1.";
+    };
+  };
+
+// End pyne namespace
+};
+
+#endif  // PYNE_MR34UE5INRGMZK2QYRDWICFHVM
+//
+// end of src/material.h
+//
+
+
+//
+// start of src/enrichment_cascade.h
+//
+/// \brief A container representing enrichment cascades.
+
+#ifndef PYNE_3QGDWZMLZBHDHI424JL52SQHN4
+#define PYNE_3QGDWZMLZBHDHI424JL52SQHN4
+
+#ifndef PYNE_IS_AMALGAMATED
+#include "utils.h"
+#include "nucname.h"
+#include "data.h"
+#include "material.h"
+#endif
+
+/************************************************/
+/*** Enrichment Component Class and Functions ***/
+/************************************************/
+
+namespace pyne {
+namespace enrichment {
+
+  /// A set of physical parameters used to specify an enrichment cascade.
+  class Cascade 
+  {
+
+  public:
+
+    ///  default constructors
+    Cascade();
+
+    /// default destructor
+    ~Cascade();
+
+    // Attributes
+    double alpha; ///< stage separation factor
+    double Mstar; ///< mass separation factor
+
+    int j; ///< Component to enrich (U-235), id form
+    int k; ///< Component to de-enrich, or strip (U-238), id form
+
+    double N; ///< number of enriching stages
+    double M; ///< number of stripping stages
+
+    double x_feed_j; ///< enrichment of the #j-th isotope in the feed stream
+    double x_prod_j; ///< enrichment of the #j-th isotope in the product stream
+    double x_tail_j; ///< enrichment of the #j-th isotope in the tails stream
+
+    pyne::Material mat_feed; ///< feed material
+    pyne::Material mat_prod; ///< product material
+    pyne::Material mat_tail; ///< tails material
+
+    double l_t_per_feed; ///< Total flow rate per feed rate.
+    double swu_per_feed; ///< This is the SWU for 1 kg of Feed material.
+    double swu_per_prod; ///< This is the SWU for 1 kg of Product material.
+
+    // member functions
+    void _reset_xjs();  ///< Sets #x_feed_j to #j-th value of #mat_feed.
+  };
+
+// end enrichment
+};
+// end pyne
+};
+
+#endif
+
+
+//
+// end of src/enrichment_cascade.h
+//
+
+
+//
+// start of src/enrichment.h
+//
+/// \file enrichment.h
+/// \author Anthony Scopatz (scopatz\@gmail.com)
+///
+/// \brief Top-level enrichment functionality.
+
+#ifndef PYNE_B3ANNCKDQ5HEJLI33RPZPDNX6A
+#define PYNE_B3ANNCKDQ5HEJLI33RPZPDNX6A
+
+#ifndef PYNE_IS_AMALGAMATED
+#include "enrichment_symbolic.h"
+#endif
+
+/************************************************/
+/*** Enrichment Component Class and Functions ***/
+/************************************************/
+
+namespace pyne {
+namespace enrichment {
+
+  /// Greates a cascade instance with default values for a uranium enrichment.
+  Cascade _fill_default_uranium_cascade();
+  /// a cascade instance with default values for a uranium enrichment.
+  extern Cascade default_uranium_cascade;
+
+  /// Computes the feed per product mass ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double feed_per_prod(double x_feed, double x_prod, double x_tail);
+  /// Computes the feed per tails mass ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double feed_per_tail(double x_feed, double x_prod, double x_tail);
+  /// Computes the product per feed mass ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double prod_per_feed(double x_feed, double x_prod, double x_tail);
+  /// Computes the product per tails mass ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double prod_per_tail(double x_feed, double x_prod, double x_tail);
+  /// Computes the tails per feed mass ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double tail_per_feed(double x_feed, double x_prod, double x_tail);
+  /// Computes the tails per product mass ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double tail_per_prod(double x_feed, double x_prod, double x_tail);
+  /// Computes the value or separation potential of an assay \a x.
+  double value_func(double x);
+  /// Computes the swu per feed ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double swu_per_feed(double x_feed, double x_prod, double x_tail);
+  /// Computes the swu per product ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double swu_per_prod(double x_feed, double x_prod, double x_tail);
+  /// Computes the swu per tails ratio for feed, product, and tails
+  /// enrichments \a x_feed, \a x_prod, and \a x_tails.
+  double swu_per_tail(double x_feed, double x_prod, double x_tail);
+
+  /// Computes the nuclide-specific stage separation factor from the 
+  /// overall stage separation factor \a alpha, the key mass \a Mstar, 
+  /// and the nulide's atomic mass \a M_i.
+  double alphastar_i(double alpha, double Mstar, double M_i);
+
+  /// \{ Numeric Solver Functions
+  /// \{
+  /// These functions enable the numeric cascade solver.
+
+  /// Finds the total flow rate (L) over the feed flow rate (F), the number of 
+  /// enriching stages (N), and the number of stripping stages (M).
+  /// \param orig_casc Original input cascade.
+  /// \param tolerance Maximum numerical error allowed in L/F, N, and M.
+  /// \param max_iter Maximum number of iterations for to perform.
+  /// \return A cascade whose N & M coorespond to the L/F value.
+  Cascade solve_numeric(Cascade & orig_casc, double tolerance=1.0E-7, 
+                                             int max_iter=100);
+  /// So,ves for valid stage numbers N &nd M of a casc.
+  /// \param casc Cascade instance, modified in-place.
+  /// \param tolerance Maximum numerical error allowed in N and M.  
+  void _recompute_nm(Cascade & casc, double tolerance=1.0E-7);
+  /// This function takes a given initial guess number of enriching and stripping 
+  /// stages for a given composition of fuel with a given jth key component, knowing 
+  /// the values that are desired in both Product and Tails streams.  Having this it 
+  /// solves for what the actual N and M stage numbers are and also what the product 
+  /// and waste streams compositions are.
+  /// \param casc Cascade instance, modified in-place.
+  void _recompute_prod_tail_mats(Cascade & casc);
+  /// This function solves the whole system of equations.  It uses
+  /// _recompute_prod_tail_mats() to find the roots for the enriching and stripping 
+  /// stage numbers.  It then checks to see if the product and waste streams meet 
+  /// their target enrichments for the jth component like they should.  If they don't 
+  /// then it trys other values of N and M varied by the Secant method.  
+  /// \param casc Input cascade.
+  /// \param tolerance Maximum numerical error allowed in L/F, N, and M.
+  /// \param max_iter Maximum number of iterations for to perform.
+  /// \return A cascade whose N & M coorespond to the L/F value.
+  Cascade _norm_comp_secant(Cascade & casc, double tolerance=1.0E-7, int max_iter=100);
+  /// Solves for a stage separative power relevant to the ith component
+  /// per unit of flow G.  This is taken from Equation 31 divided by G 
+  /// from the paper "Wood, Houston G., Borisevich, V. D. and Sulaberidze, G. A.,
+  /// 'On a Criterion Efficiency for Multi-Isotope Mixtures Separation', 
+  /// Separation Science and Technology, 34:3, 343 - 357"
+  /// To link to this article: DOI: 10.1081/SS-100100654
+  /// URL: http://dx.doi.org/10.1081/SS-100100654
+  /// \param casc Input cascade.  
+  /// \param i nuclide in id form.
+  double _deltaU_i_OverG(Cascade & casc, int i);
+  /// \}
+
+  /// \name Multicomponent Functions
+  /// \{
+  /// Finds a value of Mstar by minimzing the seperative power.  
+  /// Note that Mstar on \a orig_casc represents an intial guess at what Mstar might 
+  /// be. This is the final function that actually solves for an optimized M* that 
+  /// makes the cascade!
+  /// \param orig_casc Original input cascade.
+  /// \param solver flag for solver to use, may be 'symbolic' or 'numeric'.
+  /// \param tolerance Maximum numerical error allowed in L/F, N, and M.
+  /// \param max_iter Maximum number of iterations for to perform.
+  /// \return A cascade whose N & M coorespond to the L/F value.
+  Cascade multicomponent(Cascade & orig_casc, char * solver, 
+                         double tolerance=1.0E-7, int max_iter=100);
+  Cascade multicomponent(Cascade & orig_casc, std::string solver="symbolic", 
+                         double tolerance=1.0E-7, int max_iter=100);
+  /// \}
+
+  /// Custom exception for when an enrichment solver has entered an infinite loop.
+  class EnrichmentInfiniteLoopError: public std::exception
+  {
+    /// Returns a moderately helpful error message.
+    virtual const char* what() const throw()
+    {
+      return "Inifinite loop found while calculating enrichment cascade.";
+    };
+  };
+
+  /// Custom exception for when an enrichment solver has reached its maximum
+  /// number of iterations.
+  class EnrichmentIterationLimit: public std::exception
+  {
+    /// Returns a moderately helpful error message.
+    virtual const char* what() const throw()
+    {
+      return "Iteration limit hit durring enrichment calculation.";
+    };
+  };
+
+  /// Custom exception for when an enrichment solver iteration has produced a NaN.
+  class EnrichmentIterationNaN: public std::exception
+  {
+    /// Returns a moderately helpful error message.
+    virtual const char* what() const throw()
+    {
+      return "Iteration has hit a point where some values are not-a-number.";
+    };
+  };
+
+// end enrichment
+};
+// end pyne
+};
+
+#endif
+
+
+//
+// end of src/enrichment.h
+//
+
+
+//
+// start of src/enrichment_symbolic.h
+//
+ 
+/// \file enrichment_symbolic.h
+/// \author Anthony Scopatz (scopatz\@gmail.com)
+///
+/// \brief A multicomponent enrichment cascade solver using
+///     a symbolic solution to the mass flow rate equations.
+
+/*********************************************************/
+/***            Symbolic Enrichment Functions          ***/
+/*** WARNING: This file is auto-generated.             ***/
+/***                  DO NOT MODIFY!!!                 ***/
+/*********************************************************/
+
+#ifndef PYNE_OU4PO4TJDBDM5PY4VKAVL7JCSM
+#define PYNE_OU4PO4TJDBDM5PY4VKAVL7JCSM
+
+#include <math.h>
+
+#ifndef PYNE_IS_AMALGAMATED
+#include "enrichment_cascade.h"
+#endif
+
+namespace pyne {
+namespace enrichment {
+
+  /// A multicomponent enrichment cascade solver using     
+  /// a symbolic solution to the mass flow rate equations.
+  /// \param orig_casc The original state of the cascade.
+  /// \return A cascade solved for new N, M, and total flow
+  ///         rates.
+  Cascade solve_symbolic(Cascade & orig_casc);
+
+// end enrichment
+};
+// end pyne
+};
+
+#endif
+//
+// end of src/enrichment_symbolic.h
 //
 
 
