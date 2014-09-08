@@ -105,6 +105,30 @@ std::string Agent::str() {
   return ss.str();
 }
 
+bool Agent::AncestorOf(Agent* other) {
+  other = other->parent();
+  while (other != NULL) {
+    if (this == other)
+      return true;
+    other = other->parent();
+  }
+  return false;               
+}
+
+bool Agent::DecendentOf(Agent* other) {
+  const std::set<Agent*>& children = other->children();
+  std::set<Agent*>::const_iterator it = children.begin();
+  for (; it != children.end(); ++it) {
+    if (this == *(it) || this->DecendentOf(*(it)))
+      return true;
+  }  
+  return false;               
+}
+
+bool Agent::InFamilyTree(Agent* other) {
+  return (this == other) || AncestorOf(other) || DecendentOf(other);
+}
+
 void Agent::Build(Agent* parent) {
   CLOG(LEV_DEBUG1) << "Agent '" << prototype()
                    << "' is entering the simulation.";
