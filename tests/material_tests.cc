@@ -242,7 +242,6 @@ TEST_F(MaterialTest, DecayManual) {
   EXPECT_NE(u235_qty, mq.mass(u235_));
   EXPECT_NE(pb208_qty, mq.mass(pb208_));
   EXPECT_NE(am241_qty, mq.mass(am241_));
-  EXPECT_NE(orig_mass, tracked_mat_->quantity());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
