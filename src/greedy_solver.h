@@ -7,11 +7,17 @@
 
 namespace cyclus {
 
-/// 
-inline double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
-    return 0;
-}
+/// @warning Deprecated! Use the Capacity member functions defined in the
+/// GreedySolver class.
+// @{
+void Capacity(cyclus::Arc const&, double, double);
+void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
+              double);
+// @}
 
+/// double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
+///     return 0;
+/// }
       
 /// @brief A comparison function for sorting a container of Arcs by the
 /// requester's (unode's) preference, in decensing order (i.e., most preferred

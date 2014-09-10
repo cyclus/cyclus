@@ -11,6 +11,10 @@
 
 namespace cyclus {
 
+void Capacity(cyclus::Arc const&, double, double) {};
+void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
+              double) {};
+
 GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
     : conditioner_(c),
       ExchangeSolver(exclusive_orders) {}
