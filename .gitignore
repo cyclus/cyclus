@@ -1,7 +1,6 @@
 *.sw*
 *.orig
 build
-release
 debug
 doxygen.conf
 suffix.h
