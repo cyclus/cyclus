@@ -25,7 +25,23 @@ double AvgPref(ExchangeNode::Ptr n) {
       0;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+GreedyPreconditioner::GreedyPreconditioner() {};
+
+GreedyPreconditioner::GreedyPreconditioner(
+    const std::map<std::string, double>& commod_weights)
+    : commod_weights_(commod_weights) {
+  if (commod_weights_.size() != 0)
+    ProcessWeights_(END);
+};
+
+GreedyPreconditioner::GreedyPreconditioner(
+    const std::map<std::string, double>& commod_weights,
+    WgtOrder order)
+    : commod_weights_(commod_weights) {
+  if (commod_weights_.size() != 0)
+    ProcessWeights_(order);
+};
+
 void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
   avg_prefs_.clear();
 
