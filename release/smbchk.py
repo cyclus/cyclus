@@ -17,6 +17,7 @@ The following tasks may be useful:
 from __future__ import print_function
 import os
 import io
+import re
 import sys
 import argparse
 import difflib
@@ -26,6 +27,8 @@ try:
     import simplejson as json
 except ImportError:
     import json
+
+NAME_RE = re.compile('([A-Za-z~_:]+)')
 
 def load(ns):
     """Loads a database of symbols or returns an empty list."""
@@ -55,7 +58,6 @@ def nm(ns):
     # because everything else should be external to the cares of cyclus stability
     lib = os.path.abspath(os.path.join(ns.prefix, 'lib', 'libcyclus.so'))
     stdout = subprocess.check_output(['nm', '-g', '-p', '-C', '-fbsd', lib])
-    types = set()
     names = set()
     ok_types = {'B', 'b', 'D', 'd', 'R', 'r', 'S', 's', 'T', 't', 'W', 'w', 'u'}
     for line in stdout.splitlines():
@@ -63,16 +65,20 @@ def nm(ns):
         if len(line) == 0 or not line[0].isdigit():
             continue
         val, typ, name = line.split(None, 2)
-        types.add(typ)
         if not name.startswith('cyclus::'):
+            continue
+        if typ not in ok_types:
             continue
         if ' ' in name:
             # handle funny private pointer cases
             pre, post = name.split(' ', 1)
             if pre.endswith('*') or post.startswith('std::__'):
                 continue
-        if typ in ok_types:
-            names.add(name)
+        # use trailing underscore naming convention to skip private variables
+        m = NAME_RE.match(name)
+        if m is None or m.group(1).endswith('_'):
+            continue
+        names.add(name)
     return sorted(names)
 
 def git_log():
