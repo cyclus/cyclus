@@ -12,14 +12,21 @@ reldir = os.path.join(cycdir, 'release')
 blddir = os.path.join(cycdir, 'build')
 sys.path.insert(0, reldir)
 
-import smbchk
+try: 
+    import smbchk
+except ImportError:
+    smbchk = False    
 
 def test_load():
+    if not smbchk:
+        return
     ns = Namespace(filename=os.path.join(reldir, 'symbols.json'))
     db = smbchk.load(ns)
     assert_true(isinstance(db, list))
 
 def test_nm():
+    if not smbchk:
+        return
     if os.name != 'posix' or not os.path.isdir(blddir):
         return
     ns = Namespace(prefix=blddir)
@@ -27,6 +34,8 @@ def test_nm():
     assert_in("cyclus::Agent::Agent(cyclus::Context*)", syms)
 
 def test_diff():
+    if not smbchk:
+        return
     db = [{'symbols': ["cyclus::Agent::Agent(cyclus::Context*)"], 
            'version': 'X', 'date': 'x.x.x'}, 
           {'symbols': ["cyclus::Agent::Agent(cyclus::Context*)", 
@@ -36,6 +45,8 @@ def test_diff():
     assert_true(len(obs) > 0)
 
 def test_check():
+    if not smbchk:
+        return
     # adds to API
     db = [{'symbols': ["cyclus::Agent::Agent(cyclus::Context*)"], 
            'version': 'X', 'date': 'x.x.x'}, 
