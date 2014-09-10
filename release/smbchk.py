@@ -28,7 +28,7 @@ try:
 except ImportError:
     import json
 
-NAME_RE = re.compile('([A-Za-z~_:]+)')
+NAME_RE = re.compile('([A-Za-z0-9~_:]+)')
 
 def load(ns):
     """Loads a database of symbols or returns an empty list."""
