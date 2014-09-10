@@ -41,6 +41,10 @@ SET(
     "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
     )
 
+# write the include directories to a file for later use
+get_property(incdirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+file(WRITE "${CMAKE_BINARY_DIR}/includes.txt" "${incdirs}")
+
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB hpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 SET(
