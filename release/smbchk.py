@@ -26,7 +26,7 @@ def load(ns):
 def save(db, ns):
     """Saves a database of symbols."""
     with io.open(ns.filename, 'wb') as f:
-        json.dump(trans, f, indent=1, separators=(',', ': '))
+        json.dump(db, f, indent=1, separators=(',', ': '))
 
 def nm(ns):
     """Obtains the latest symbols as a sorted list by running and parsing the 
@@ -134,7 +134,7 @@ def main():
     if ns.update:
         update(db, ns)
         if ns.save:
-            save(db)
+            save(db, ns)
     if ns.dump:
         pprint.pprint(db)
     if ns.check:
