@@ -7,6 +7,7 @@ import os
 import io
 import sys
 import argparse
+import difflib
 import subprocess
 import pprint
 try:
@@ -81,6 +82,29 @@ def update(db, ns):
              'tag': ns.tag, 'version': core_version(),}
     db.append(entry)
 
+def diff(db, i, j):
+    """Diffs two database indices, returns string unified diff."""
+    x = db[i]
+    y = db[j]
+    lines = list(difflib.unified_diff(x['symbols'], y['symbols'], 
+                                      fromfile=x['version'], tofile=y['version'], 
+                                      fromfiledate=x['date'], tofiledate=y['date']))
+    return '\n'.join(lines)
+
+def check(db):
+    """Checks if an API is stable, returns bool, prints debug info."""
+    if len(db) < 2:
+        sys.exit('too few entries in database to check for stability')
+    stable = True
+    for i, (x, y) in enumerate(zip(db[:-1], db[1:])):
+        if not (frozenset(x['symbols']) <= frozenset(y['symbols'])):
+            stable = False
+            d = diff(db, i, i+1)
+            print(d)
+    if stable:
+        print('API stability has been achieved!')
+    return stable
+
 def main():
     if os.name != 'posix':
         sys.exit("must be run on a posix system, "
@@ -100,6 +124,10 @@ def main():
                    help='does not save the database')
     p.add_argument('-t', '--tag', dest='tag', default=None, 
                    help='version tag used when updating, eg 1.0.0-rc5')
+    p.add_argument('-c', '--check', action='store_true', dest='check', default=False, 
+                   help='checks that the API is stable')
+    p.add_argument('-d', '--diff', nargs=2, dest='diff', type=int, default=(), 
+                   help='takes the difference between two database indices')
     ns = p.parse_args()
 
     db = load(ns)
@@ -109,6 +137,11 @@ def main():
             save(db)
     if ns.dump:
         pprint.pprint(db)
+    if ns.check:
+        check(db)
+    if len(ns.diff) == 2:
+        d = diff(db, ns.diff[0], ns.diff[1])
+        print(d)
 
 if __name__ == '__main__':
     main()
