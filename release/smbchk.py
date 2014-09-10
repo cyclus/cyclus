@@ -1,6 +1,18 @@
 #! /usr/bin/env python
 """Collects & diffs public symobls in libcyclus.so. Used to ensure stability 
 between versions. Now with 100% fewer vowels!
+
+The following tasks may be useful:
+
+    # update the database to the most recent release tag
+    $ ./smbchk.py --update -t 1.X.Y
+
+    # check that the existing database is stable
+    $ ./smbchk.py --check
+
+    # check if HEAD is stable, a diff will be printed if it is not
+    $ ./smbchk.py --update -t HEAD --no-save --check
+
 """
 from __future__ import print_function
 import os
@@ -20,7 +32,7 @@ def load(ns):
     if not os.path.isfile(ns.filename):
         return []
     with io.open(ns.filename, 'rt') as f:
-        db = json.loads(f)
+        db = json.load(f)
     return db
 
 def save(db, ns):
@@ -86,10 +98,10 @@ def diff(db, i, j):
     """Diffs two database indices, returns string unified diff."""
     x = db[i]
     y = db[j]
-    lines = list(difflib.unified_diff(x['symbols'], y['symbols'], 
-                                      fromfile=x['version'], tofile=y['version'], 
-                                      fromfiledate=x['date'], tofiledate=y['date']))
-    return '\n'.join(lines)
+    lines = difflib.unified_diff(x['symbols'], y['symbols'], 
+                                 fromfile=x['version'], tofile=y['version'], 
+                                 fromfiledate=x['date'], tofiledate=y['date'])
+    return '\n'.join(map(lambda x: x[:-1] if x.endswith('\n') else x, lines))
 
 def check(db):
     """Checks if an API is stable, returns bool, prints debug info."""
@@ -109,7 +121,8 @@ def main():
     if os.name != 'posix':
         sys.exit("must be run on a posix system, "
                  "'nm' utility not compatible elsewhere.")
-    p = argparse.ArgumentParser('smbchk', description=__doc__)
+    p = argparse.ArgumentParser('smbchk', description=__doc__, 
+                                formatter_class=argparse.RawDescriptionHelpFormatter,)
     p.add_argument('--prefix', dest='prefix', default='../build', 
                    help="location of lib dir with libcyclus, default '../build'")
     p.add_argument('-f', '--filename', dest='filename', default='symbols.json', 
