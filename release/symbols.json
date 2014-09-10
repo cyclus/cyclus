@@ -308,7 +308,6 @@
    "cyclus::Hdf5Back::VLValToBuf(std::vector<int, std::allocator<int> > const&)",
    "cyclus::Hdf5Back::VLValToBuf(std::vector<std::string, std::allocator<std::string> > const&)",
    "cyclus::Hdf5Back::WriteGroup(std::vector<cyclus::Datum*, std::allocator<cyclus::Datum*> >&)",
-   "cyclus::Hdf5Back::vlchunk_",
    "cyclus::Hdf5Back::~Hdf5Back()",
    "cyclus::IOError::IOError(std::string)",
    "cyclus::IOError::~IOError()",
