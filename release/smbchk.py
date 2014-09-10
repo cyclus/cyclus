@@ -62,12 +62,24 @@ def nm(ns):
             names.add(name)
     return sorted(names)
 
+def git_log():
+    """Returns git SHA, date, and timestamp from log."""
+    stdout = subprocess.check_output(['git', 'log', '--pretty=format:%H/%ci/%ct', '-n1'])
+    return stdout.strip().split('/')
+
+def core_version():
+    stdout = subprocess.check_output(['cyclus', '--version'])
+    return stdout.splitlines()[0].strip()
+
 def update(db, ns):
     """Updates a symbol database with the latest values."""
+    if ns.tag is None:
+        sys.exit("a tag for the version must be given when updating, eg '--tag 1.1'")
     symbols = nm(ns)
-    entry = {'symbols': symbols}
+    sha, d, t = git_log()
+    entry = {'symbols': symbols, 'sha': sha, 'date': d, 'timestamp': t, 
+             'tag': ns.tag, 'version': core_version(),}
     db.append(entry)
-    
 
 def main():
     if os.name != 'posix':
@@ -82,11 +94,19 @@ def main():
                    help='dumps existing symbols')
     p.add_argument('--update', dest='update', action='store_true', default=False, 
                    help='updates the symbols with the current version')
+    p.add_argument('--save', action='store_true', default=True, dest='save', 
+                   help='saves the database')
+    p.add_argument('--no-save', action='store_false', default=True, dest='save', 
+                   help='does not save the database')
+    p.add_argument('-t', '--tag', dest='tag', default=None, 
+                   help='version tag used when updating, eg 1.0.0-rc5')
     ns = p.parse_args()
 
     db = load(ns)
     if ns.update:
         update(db, ns)
+        if ns.save:
+            save(db)
     if ns.dump:
         pprint.pprint(db)
 
