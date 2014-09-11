@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include "CoinPackedVector.hpp"
 #include "OsiSolverInterface.hpp"
 
 #include "cyc_limits.h"
@@ -53,6 +52,7 @@ void ProgTranslator::Init() {
   ctx_.col_ubs.resize(n_cols);
   ctx_.col_lbs.resize(n_cols);
   ctx_.m = CoinPackedMatrix(false, 0, 0);
+  ctx_.inf = iface_->getInfinity();
 }
 
 void ProgTranslator::Translate() {
@@ -74,11 +74,10 @@ void ProgTranslator::Translate() {
   }
 
   // add each false arc
-  double inf = iface_->getInfinity();
   for (int i = g_->arcs().size(); i != arc_offset_; i++) {
     ctx_.obj_coeffs[i] = pseudo_cost_;
     ctx_.col_lbs[i] = 0;
-    ctx_.col_ubs[i] = inf;
+    ctx_.col_ubs[i] = ctx_.inf;
   }
 }
 
@@ -107,9 +106,31 @@ void ProgTranslator::ToProg() {
   Populate();
 }
 
-void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
-  double inf = iface_->getInfinity();
+void ProgTranslator::XlateCaps(ExchangeNodeGroup* grp,
+                               bool request,
+                               int faux_id,
+                               std::vector<CoinPackedVector>& cap_rows,
+                               ProgTranslator::Context& ctx) {
   std::vector<double>& caps = grp->capacities();
+  std::vector<cap_t>& cap_types = grp->cap_types();
+  bool gteq;
+  int i;
+
+  for (i = 0; i != cap_rows.size(); i++) {
+    if (request) {
+      cap_rows[i].insert(faux_id, 1.0);  // faux arc
+    }
+
+    gteq = cap_types[i] == GTEQ;
+    ctx.row_lbs.push_back(gteq ? caps[i] : 0);
+    ctx.row_ubs.push_back(gteq ? ctx.inf : caps[i]);
+    ctx.m.appendRow(cap_rows[i]);
+  }
+}
+
+void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
+  std::vector<double>& caps = grp->capacities();
+  std::vector<cap_t>& cap_types = grp->cap_types();
 
   std::vector<CoinPackedVector> cap_rows;
   std::vector<CoinPackedVector> excl_rows;
@@ -141,7 +162,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       if (request) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
-        double col_ub = std::min(nodes[i]->qty, inf);
+        double col_ub = std::min(nodes[i]->qty, ctx_.inf);
         double obj_coeff = (excl_ && a.exclusive()) ? a.excl_val() / pref : 1.0 / pref;
         ctx_.obj_coeffs[arc_id] = obj_coeff;
         ctx_.col_lbs[arc_id] = 0;
@@ -156,15 +177,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
   }
 
   // add all capacity rows
-  for (int i = 0; i != cap_rows.size(); i++) {
-    if (request) {
-      cap_rows[i].insert(faux_id, 1.0);  // faux arc
-    }
-    
-    ctx_.row_lbs.push_back(request ? caps[i] : 0);
-    ctx_.row_ubs.push_back(request ? inf : caps[i]);
-    ctx_.m.appendRow(cap_rows[i]);
-  }
+  XlateCaps(grp, request, faux_id, cap_rows, ctx_);
 
   if (excl_) {
     // add exclusive arcs

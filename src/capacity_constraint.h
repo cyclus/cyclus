@@ -6,6 +6,7 @@
 #include "error.h"
 #include "exchange_graph.h"
 #include "exchange_translation_context.h"
+#include "capacity_types.h"
 
 namespace cyclus {
 

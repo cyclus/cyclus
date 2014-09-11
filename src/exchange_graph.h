@@ -10,6 +10,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
+#include "capacity_types.h"
+
 namespace cyclus {
 
 class ExchangeNodeGroup;
@@ -135,6 +137,10 @@ class ExchangeNodeGroup {
   const std::vector<double>& capacities() const { return capacities_; }
   std::vector<double>& capacities() { return capacities_; }
 
+  /// @brief the kind of capacities (i.e., LTEQ, GTEQ, EQ) 
+  const std::vector<cap_t>& cap_types() const { return cap_types_; }
+  std::vector<cap_t>& cap_types() { return cap_types_; }
+
   /// @brief Add the node to the ExchangeNodeGroup and informs the node it is a
   /// member of this ExchangeNodeGroup
   virtual void AddExchangeNode(ExchangeNode::Ptr node);
@@ -153,12 +159,26 @@ class ExchangeNodeGroup {
   void AddExclNode(ExchangeNode::Ptr n);
 
   /// @brief Add a flow capacity to the group
-  inline void AddCapacity(double c) { capacities_.push_back(c); }
+  /// @param c the rhs for the capacity
+  /// @param t the capacity type, the default for exchange groups is LTEQ
+  // @{
+  inline virtual void AddCapacity(double c) {
+    capacities_.push_back(c);
+    cap_types_.push_back(LTEQ);
+  }
+  inline void AddCapacity(double c, cap_t t) {
+    capacities_.push_back(c);
+    cap_types_.push_back(t);
+  }
+  // @}
 
+ protected:
+  std::vector<double> capacities_;
+  std::vector<cap_t> cap_types_;
+  
  private:
   std::vector<ExchangeNode::Ptr> nodes_;
   std::vector< std::vector<ExchangeNode::Ptr> > excl_node_groups_;
-  std::vector<double> capacities_;
 };
 
 /// @class RequestGroup
@@ -178,6 +198,16 @@ class RequestGroup : public ExchangeNodeGroup {
   /// the group of exclusive nodes
   virtual void AddExchangeNode(ExchangeNode::Ptr node);
 
+  /// @brief Add a flow capacity to the group
+  /// @param c the rhs for the capacity
+  /// @param t the capacity type, the default for request groups is GTEQ
+  // @{
+  inline virtual void AddCapacity(double c) {
+    capacities_.push_back(c);
+    cap_types_.push_back(GTEQ);
+  }
+  // @}
+  
  private:
   double qty_;
 };

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "CoinPackedMatrix.hpp"
+#include "CoinPackedVector.hpp"
 
 class OsiSolverInterface;
 
@@ -33,8 +34,22 @@ class ProgTranslator {
     std::vector<double> col_ubs;
     std::vector<double> col_lbs;
     CoinPackedMatrix m;
+    double inf;
   };
 
+  /// a helper function to translate capacities
+  ///
+  /// @param grp the exchange group
+  /// @param request whether this is a request or not
+  /// @param faux_id a false arc id for surplus supply
+  /// @param cap_rows the capacity rows which will be appended to
+  /// @param ctx the translation context
+  static void XlateCaps(ExchangeNodeGroup* grp,
+                        bool request,
+                        int faux_id,
+                        std::vector<CoinPackedVector>& cap_rows,
+                        ProgTranslator::Context& ctx);
+  
   /// constructor
   ///
   /// @param g the exchange graph
