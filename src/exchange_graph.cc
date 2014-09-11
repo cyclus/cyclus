@@ -23,6 +23,13 @@ ExchangeNode::ExchangeNode(double qty, bool exclusive)
       agent_id(-1),
       group(NULL) {}
 
+ExchangeNode::ExchangeNode(double qty, bool exclusive, std::string commod)
+    : qty(qty),
+      exclusive(exclusive),
+      commod(commod),
+      agent_id(-1),
+      group(NULL) {}
+
 ExchangeNode::ExchangeNode(double qty)
     : qty(qty),
       exclusive(false),

@@ -31,6 +31,7 @@ struct ExchangeNode {
   ExchangeNode();
   explicit ExchangeNode(double qty);
   ExchangeNode(double qty, bool exclusive);
+  ExchangeNode(double qty, bool exclusive, std::string commod);
   ExchangeNode(double qty, bool exclusive, std::string commod, int agent_id);
 
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
