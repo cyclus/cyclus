@@ -8,6 +8,7 @@ namespace cyclus {
 enum CapType {
   LTEQ = 0,
   GTEQ,
+  NONE, // default
 } typedef cap_t;
 
 }  // namespace cyclus

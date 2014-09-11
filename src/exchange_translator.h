@@ -165,7 +165,17 @@ RequestGroup::Ptr TranslateRequestPortfolio(
   for (c_it = rp->constraints().begin();
        c_it != rp->constraints().end();
        ++c_it) {
-    rs->AddCapacity(c_it->capacity());
+    switch(c_it->cap_type()) {
+      case GTEQ:
+        rs->ExchangeNodeGroup::AddCapacity(c_it->capacity(), GTEQ);
+        break;
+      case LTEQ:
+        rs->ExchangeNodeGroup::AddCapacity(c_it->capacity(), GTEQ);
+        break;
+      case NONE:
+        rs->AddCapacity(c_it->capacity());
+        break;
+    }
   }
 
   return rs;
@@ -213,7 +223,17 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   for (c_it = bp->constraints().begin();
        c_it != bp->constraints().end();
        ++c_it) {
-    bs->AddCapacity(c_it->capacity());
+    switch(c_it->cap_type()) {
+      case GTEQ:
+        bs->AddCapacity(c_it->capacity(), GTEQ);
+        break;
+      case LTEQ:
+        bs->AddCapacity(c_it->capacity(), GTEQ);
+        break;
+      case NONE:
+        bs->AddCapacity(c_it->capacity());
+        break;
+    }
   }
 
   return bs;
