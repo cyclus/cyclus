@@ -1,0 +1,58 @@
+========================
+Cyclus 1.1 Release Notes
+========================
+:Author: Cyclus Developers
+:Website: http://fuelcycle.org/
+:Contact: https://groups.google.com/forum/#!forum/cyclus-dev
+
+The Cyclus core team is excited to announce the latest stable version 
+of the cyclus ecosystem! This includes nearly 300 commits by 
+8 developers.  
+
+Major features
+==============
+- Ability to force decay calculations off everywhere in the simulation.
+- A menagerie of new datatypes:
+
+    * ``std::vector<float>``
+    * ``std::vector<double>``
+    * ``std::set<std::string>``
+    * ``std::list<std::string>``
+    * ``std::pair<int, int>``
+    * ``std::map<int, double>``
+    * ``std::map<int, std::string>``
+    * ``std::map<std::string, int>``
+    * ``std::map<std::string, double>``
+    * ``std::map<std::string, std::string>``
+
+- Human-readable nuclide names may now be uses in input files.
+- Memory leak bug fix.
+- New 'schematype' state variable annotation allows archetype developers to
+  explicitly set the XML datatype in the schema for a given state variable, 
+  rather than relying on deafults.
+- Quantity-based constratints added to DRE.
+- Automatic archetype discovery with '-l' and '-a' command line arguments.
+- Better error handling in cycpp.
+- Optional allocation optimization using tcmalloc.
+
+Since v1.0,
+
+* Cyclus: 243 commits resulted in 274 changed files encompassing a net 24,441
+line insertions(+) and 5,222 deletions(-).
+
+* Cycamore: 38 commits resulted in 69 changed files encompassing a net 1,948
+line insertions(+) and 1,855 deletions(-).
+
+Contributors
+============
+The following people contributed to this release of Cyclus.  A "*" by their
+name indicates a first time contributor.  Names follow alphabetically, 
+
+* Robert Carlsen
+* Matthew Gidden
+* Katy Huff
+* Arrielle Opotowsky
+* Olzhas Rakhimov
+* Anthony Scopatz
+* Zach Welch
+* Paul Wilson
