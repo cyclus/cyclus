@@ -222,6 +222,53 @@ TEST_F(MaterialTest, ExtractInGrams) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(MaterialTest, DecayManual) {
+  // prequeries
+  cyclus::toolkit::MatQuery orig(tracked_mat_);
+  double u235_qty = orig.mass(u235_);
+  double pb208_qty = orig.mass(pb208_);
+  double am241_qty = orig.mass(am241_);
+  double orig_mass = tracked_mat_->quantity();
+
+  // decay should succeed
+  // default decay value is "manual"
+  EXPECT_EQ(fac->context()->sim_info().decay, "manual");
+  tracked_mat_->Decay(100);
+
+  // postquery
+  cyclus::toolkit::MatQuery mq(tracked_mat_);
+
+  // postchecks
+  EXPECT_NE(u235_qty, mq.mass(u235_));
+  EXPECT_NE(pb208_qty, mq.mass(pb208_));
+  EXPECT_NE(am241_qty, mq.mass(am241_));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(MaterialTest, DecayNever) {
+
+  // prequeries
+  cyclus::toolkit::MatQuery orig(tracked_mat_no_decay_);
+  double u235_qty = orig.mass(u235_);
+  double pb208_qty = orig.mass(pb208_);
+  double am241_qty = orig.mass(am241_);
+  double orig_mass = tracked_mat_no_decay_->quantity();
+
+  // decay should succeed
+  EXPECT_EQ(fac_no_decay->context()->sim_info().decay, "never");
+  tracked_mat_no_decay_->Decay(100);
+
+  // postquery
+  cyclus::toolkit::MatQuery mq(tracked_mat_no_decay_);
+
+  // postchecks
+  EXPECT_DOUBLE_EQ(u235_qty, mq.mass(u235_));
+  EXPECT_DOUBLE_EQ(pb208_qty, mq.mass(pb208_));
+  EXPECT_DOUBLE_EQ(am241_qty, mq.mass(am241_));
+  EXPECT_DOUBLE_EQ(orig_mass, tracked_mat_no_decay_->quantity());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(MaterialTest, DecayShortcut) {
   CompMap mp;
   mp[922350000] = 1;

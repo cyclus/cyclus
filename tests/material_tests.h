@@ -6,6 +6,11 @@
 #include "composition.h"
 #include "material.h"
 #include "env.h"
+#include "context.h"
+#include "test_agents/test_facility.h"
+#include "recorder.h"
+#include "timer.h"
+
 
 namespace cyclus {
 
@@ -19,11 +24,29 @@ class MaterialTest : public ::testing::Test {
   Material::Ptr test_mat_, two_test_mat_, ten_test_mat_;
   Material::Ptr diff_mat_;
   Material::Ptr default_mat_;
+  Material::Ptr tracked_mat_;
+  Material::Ptr tracked_mat_no_decay_;
   long int u235_halflife_;
   int th228_halflife_;
   double u235_g_per_mol_;
 
+  cyclus::Timer ti;
+  cyclus::Recorder rec;
+  cyclus::Context* ctx;
+  TestFacility* fac;
+  cyclus::Context* ctx_no_decay;
+  TestFacility* fac_no_decay;
+  // dur 100, y0 = 2015, m0=1, handle="", d="never"
+  SimInfo si;
+
   virtual void SetUp() {
+    ctx = new cyclus::Context(&ti, &rec);
+    fac = new TestFacility(ctx);
+
+    si = SimInfo(100, 2015, 1, "", "never");
+    ctx_no_decay = new cyclus::Context(&ti, &rec);
+    ctx_no_decay->InitSim(si);
+    fac_no_decay = new TestFacility(ctx_no_decay);
     Env::SetNucDataPath();
 
     // composition set up
@@ -50,13 +73,20 @@ class MaterialTest : public ::testing::Test {
     ten_test_mat_ = Material::CreateUntracked(10 * test_size_, test_comp_);
     diff_mat_ = Material::CreateUntracked(test_size_, diff_comp_);
 
+    // tracked material
+    tracked_mat_ = Material::Create(fac, 1000, diff_comp_);
+    tracked_mat_no_decay_ = Material::Create(fac_no_decay, 1000, diff_comp_);
+
     // test info
     u235_g_per_mol_ = 235.044;
     u235_halflife_ = 8445600000;  // approximate, in months
     th228_halflife_ = 2 * 11;  // approximate, in months
   }
 
-  virtual void TearDown() {}
+  virtual void TearDown() {
+    delete ctx;
+    delete ctx_no_decay;
+  }
 };
 
 }  // namespace cyclus

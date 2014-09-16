@@ -337,8 +337,10 @@ void XMLFileLoader::LoadControlParams() {
   // get start year
   std::string y0_str = qe->GetString("startyear");
   int y0 = strtol(y0_str.c_str(), NULL, 10);
+  // get decay mode
+  std::string d = OptionalQuery<std::string>(qe, "decay", "manual");
 
-  ctx_->InitSim(SimInfo(dur, y0, m0, handle));
+  ctx_->InitSim(SimInfo(dur, y0, m0, handle, d));
 }
 
 }  // namespace cyclus

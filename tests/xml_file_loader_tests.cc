@@ -25,6 +25,9 @@ void XMLFileLoaderTests::SetUp() {
   controlFile = "control.xml";
   CreateTestInputFile(controlFile, ControlSequence());
 
+  decayControlFile = "decaycontrol.xml";
+  CreateTestInputFile(decayControlFile, ControlSequenceWithDecay());
+
   recipeFile = "recipes.xml";
   CreateTestInputFile(recipeFile, RecipeSequence());
 
@@ -36,6 +39,7 @@ void XMLFileLoaderTests::TearDown() {
   remove("xmlfileloadtestdb.sqlite");
   unlink(falseFile.c_str());
   unlink(controlFile.c_str());
+  unlink(decayControlFile.c_str());
   unlink(recipeFile.c_str());
   unlink(moduleFile.c_str());
 }
@@ -51,6 +55,18 @@ std::string XMLFileLoaderTests::ControlSequence() {
           "  <startmonth>1</startmonth>"
           "  <startyear>2000</startyear>"
           "  <simstart>0</simstart>"
+          " </control>"
+          "</simulation>";
+}
+
+std::string XMLFileLoaderTests::ControlSequenceWithDecay() {
+  return  "<simulation>"
+          " <control>"
+          "  <duration>1200</duration>"
+          "  <startmonth>1</startmonth>"
+          "  <startyear>2000</startyear>"
+          "  <simstart>0</simstart>"
+          "  <decay>never</decay>"
           " </control>"
           "</simulation>";
 }
@@ -138,6 +154,10 @@ std::string XMLFileLoaderTests::ControlSchema() {
 
 TEST_F(XMLFileLoaderTests, openfile) {
   EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, controlFile));
+}
+
+TEST_F(XMLFileLoaderTests, decayfile) {
+  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, decayControlFile));
 }
 
 TEST_F(XMLFileLoaderTests, throws) {
