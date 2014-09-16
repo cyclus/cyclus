@@ -29,8 +29,8 @@ Major features
 - Memory leak bug fix.
 - New 'schematype' state variable annotation allows archetype developers to
   explicitly set the XML datatype in the schema for a given state variable, 
-  rather than relying on deafults.
-- Quantity-based constratints added to DRE.
+  rather than relying on defaults.
+- Quantity-based constraints added to DRE.
 - Automatic archetype discovery with '-l' and '-a' command line arguments.
 - Better error handling in cycpp.
 - Optional allocation optimization using tcmalloc.
