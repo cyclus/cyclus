@@ -14,3 +14,12 @@ TEST(ErrorTests, WarnAsError) {
                cyclus::ValueError);
   cyclus::warn_as_error = false;
 }
+
+TEST(ErrorTests, WarnLimit) {
+  using cyclus::warn_limit;
+  unsigned int prev = warn_limit;
+  warn_limit = 0;
+  cyclus::Warn<cyclus::KEY_WARNING>("my spoon is toooooo big!");
+  warn_limit = prev;
+}
+
