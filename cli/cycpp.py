@@ -1457,14 +1457,16 @@ class CodeGenerator(object):
         """Ensures that the context for the class at heand is well-formed."""
         if classname not in self.context:
             self.context[classname] = OrderedDict()
-            supers = self.superclasses[classname]
-            for sup, entity in ENTITIES:
-                if sup in supers:
+            parents = self.superclasses[classname]
+            all_parents = parent_classes(classname, self.superclasses)
+            for parent, entity in ENTITIES:
+                if parent in all_parents:
                     break
             else:
                 entity = 'unkown'
             self.context[classname]['entity'] = entity
-            self.context[classname]['superclasses'] = sorted(supers)
+            self.context[classname]['parents'] = sorted(parents)
+            self.context[classname]['all_parents'] = sorted(all_parents)
         if 'vars' not in self.context[classname]:
             self.context[classname]['vars'] = OrderedDict()
 
