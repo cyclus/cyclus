@@ -559,7 +559,7 @@ class StateAccumulator(object):
                 if parent in all_parents:
                     break
             else:
-                entity = 'unkown'
+                entity = 'unknown'
             self.context[classname]['entity'] = entity
             self.context[classname]['parents'] = sorted(parents)
             self.context[classname]['all_parents'] = sorted(all_parents)
@@ -1463,7 +1463,7 @@ class CodeGenerator(object):
                 if parent in all_parents:
                     break
             else:
-                entity = 'unkown'
+                entity = 'unknown'
             self.context[classname]['entity'] = entity
             self.context[classname]['parents'] = sorted(parents)
             self.context[classname]['all_parents'] = sorted(all_parents)
