@@ -25,7 +25,8 @@ using ::testing::Values;
 class InstitutionTests : public TestWithParam<AgentConstructor*> {
  public:
   virtual void SetUp() {
-    institution_ = new TestInst(tc_.get());
+    //institution_ = new TestInst(tc_.get());
+    institution_ = dynamic_cast<cyclus::Institution*>((*GetParam())(tc_.get()));
     test_facility_ = new TestFacility(tc_.get());
     test_region_ = new TestRegion(tc_.get());
     institution_->Build(test_region_);
@@ -37,7 +38,7 @@ class InstitutionTests : public TestWithParam<AgentConstructor*> {
   }
 
  protected:
-  TestInst* institution_;
+  cyclus::Institution* institution_;
   TestFacility* test_facility_;
   TestRegion* test_region_;
   cyclus::TestContext tc_;
