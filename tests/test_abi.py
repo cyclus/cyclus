@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 
 import nose
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises
@@ -11,9 +12,14 @@ sys.path.insert(0, reldir)
 
 import tools
 
-import smbchk
+try:
+    import smbchk
+except ImportError:
+    smbchk = None
 
 def test_abi_stability():
+    if smbchk is None:
+        raise SkipTest('Could not import smbchk!')
     if os.name != 'posix':
         raise SkipTest('can only check for ABI stability on posix systems.')
     libcyc = os.path.join(cycdir, 'build', 'lib', 'libcyclus.so')
