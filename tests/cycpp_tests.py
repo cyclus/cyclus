@@ -46,6 +46,10 @@ class MockMachine(object):
         """Implemented just for testing"""
         return ""
 
+    def ensure_class_context(self, classname):
+        if classname not in self.context:
+            self.context[classname] = OrderedDict()
+
 
 #
 # pass 1 Filters

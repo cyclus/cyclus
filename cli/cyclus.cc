@@ -314,6 +314,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
     return 0;
   } else if (ai.vm.count("agent-schema")) {
     std::string name(ai.vm["agent-schema"].as<std::string>());
+    cyclus::warn_limit = 0;
     try {
       Recorder rec;
       Timer ti;
@@ -327,6 +328,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
     return 0;
   } else if (ai.vm.count("agent-annotations")) {
     std::string name(ai.vm["agent-annotations"].as<std::string>());
+    cyclus::warn_limit = 0;
     try {
       Recorder rec;
       Timer ti;

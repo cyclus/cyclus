@@ -101,6 +101,9 @@ WRANGLERS = {
     'mi6::Spy',  # for testing!!
     }
 
+ENTITIES = [('cyclus::Region', 'region'), ('cyclus::Institution', 'institution'), 
+            ('cyclus::Facility', 'facility'), ('cyclus::Agent', 'archetype')]
+
 #
 # pass 1
 #
@@ -428,10 +431,7 @@ class VarDeclarationFilter(Filter):
         classname = state.classname()
         vtype, vname = self.match.groups()
         access = state.access[tuple(state.classes)]
-        if classname not in state.context:
-            state.context[classname] = OrderedDict()
-        if 'vars' not in state.context[classname]:
-            state.context[classname]['vars'] = OrderedDict()
+        state.ensure_class_context(classname)
         annotations['type'] = state.canonize_type(vtype, vname, 
                                                   statement=statement)
         annotations['index'] = len(state.context[classname]['vars'])
@@ -495,10 +495,7 @@ class NoteDecorationFilter(DecorationFilter):
         context = state.context
         classname = state.classname()
         annotations = self._eval()
-        if classname not in state.context:
-            state.context[classname] = OrderedDict()
-        if 'vars' not in state.context[classname]:
-            state.context[classname]['vars'] = OrderedDict()
+        state.ensure_class_context(classname)
         self.update(context[classname], annotations)
 
     def update(self, old, new):
@@ -551,6 +548,23 @@ class StateAccumulator(object):
         names = [n for d, n in self.namespaces]
         names += [n for d, n in self.classes]
         return "::".join(names)
+
+    def ensure_class_context(self, classname):
+        """Ensures that the context for the class at heand is well-formed."""
+        if classname not in self.context:
+            self.context[classname] = OrderedDict()
+            parents = self.superclasses[classname]
+            all_parents = parent_classes(classname, self.superclasses)
+            for parent, entity in ENTITIES:
+                if parent in all_parents:
+                    break
+            else:
+                entity = 'unknown'
+            self.context[classname]['entity'] = entity
+            self.context[classname]['parents'] = sorted(parents)
+            self.context[classname]['all_parents'] = sorted(all_parents)
+        if 'vars' not in self.context[classname]:
+            self.context[classname]['vars'] = OrderedDict()
 
     def accumulate(self, statement, sep):
         """Modify the existing state by incoprorating the statement, which is
@@ -746,10 +760,7 @@ class CodeGeneratorFilter(Filter):
         self.local_classname = cg.classname()
 
         # compute def line
-        if classname not in context:
-            context[classname] = OrderedDict()
-        if 'vars' not in context[classname]:
-            context[classname]['vars'] = OrderedDict()
+        cg.ensure_class_context(classname)
         in_class_decl = self.in_class_decl()
         ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
         virt = "virtual " if in_class_decl else ""
@@ -1441,6 +1452,23 @@ class CodeGenerator(object):
                 break
             same_prefix.append(s)
         return "::".join(clspath[len(same_prefix):] + [clsname])
+
+    def ensure_class_context(self, classname):
+        """Ensures that the context for the class at heand is well-formed."""
+        if classname not in self.context:
+            self.context[classname] = OrderedDict()
+            parents = self.superclasses[classname]
+            all_parents = parent_classes(classname, self.superclasses)
+            for parent, entity in ENTITIES:
+                if parent in all_parents:
+                    break
+            else:
+                entity = 'unknown'
+            self.context[classname]['entity'] = entity
+            self.context[classname]['parents'] = sorted(parents)
+            self.context[classname]['all_parents'] = sorted(all_parents)
+        if 'vars' not in self.context[classname]:
+            self.context[classname]['vars'] = OrderedDict()
 
     def includeloc(self, statement=None):
         """Current location of the file from includes as a string."""

@@ -43,3 +43,20 @@ TEST_P(AgentTests, Annotations) {
 TEST_P(AgentTests, GetAgentType) {
   EXPECT_NE(std::string("Agent"), agent_->kind());
 }
+
+TEST_P(AgentTests, Parents) {
+  Json::Value a = agent_->annotations();
+  EXPECT_FALSE(a["parents"].empty());
+}
+
+TEST_P(AgentTests, AllParents) {
+  Json::Value all_parents = agent_->annotations()["all_parents"];
+  EXPECT_FALSE(all_parents.empty());
+
+  Json::Value agent = Json::Value("cyclus::Agent");
+  bool isagent = false;
+  for (int i = 0; i < all_parents.size(); ++i)
+    if (agent == all_parents[i])
+      isagent = true;
+  EXPECT_TRUE(isagent);
+}

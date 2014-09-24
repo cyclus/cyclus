@@ -14,3 +14,8 @@ TEST_P(RegionTests, Print) {
 TEST_P(RegionTests, IsRegion) {
   EXPECT_EQ("Region", region_->kind());
 }
+
+TEST_P(RegionTests, Entity) {
+  Json::Value a = region_->annotations();
+  EXPECT_STREQ("region", a["entity"].asCString());
+}

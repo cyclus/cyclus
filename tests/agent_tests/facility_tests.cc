@@ -15,3 +15,8 @@ TEST_P(FacilityTests, Tock) {
   int time = 1;
   EXPECT_NO_THROW(facility_->Tock());
 }
+
+TEST_P(FacilityTests, Entity) {
+  Json::Value a = facility_->annotations();
+  EXPECT_STREQ("facility", a["entity"].asCString());
+}

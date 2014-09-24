@@ -127,6 +127,7 @@ void Warn(const std::string& msg) {
   unsigned int cnt = warn_count[T]++;
   if (cnt < warn_limit) {
     std::cerr << warn_prefix[T] << ": " << msg << "\n";
+  } else if (cnt == 0) {
   } else if (cnt == warn_limit) {
     std::cerr << "Further " << warn_prefix[T] << "s will be suppressed.\n";
   }
