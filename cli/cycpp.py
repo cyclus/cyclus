@@ -560,6 +560,7 @@ class StateAccumulator(object):
                     break
             else:
                 entity = 'unknown'
+            self.context[classname]['name'] = classname
             self.context[classname]['entity'] = entity
             self.context[classname]['parents'] = sorted(parents)
             self.context[classname]['all_parents'] = sorted(all_parents)
@@ -1464,6 +1465,7 @@ class CodeGenerator(object):
                     break
             else:
                 entity = 'unknown'
+            self.context[classname]['name'] = classname
             self.context[classname]['entity'] = entity
             self.context[classname]['parents'] = sorted(parents)
             self.context[classname]['all_parents'] = sorted(all_parents)
