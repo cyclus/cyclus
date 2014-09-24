@@ -120,10 +120,10 @@ def check(db):
             d = diff(db, i, i+1)
             print(d)
     if stable:
-        print('API stability has been achieved!')
+        print('ABI stability has been achieved!')
     return stable
 
-def main():
+def main(args=None):
     if os.name != 'posix':
         sys.exit("must be run on a posix system, "
                  "'nm' utility not compatible elsewhere.")
@@ -147,7 +147,7 @@ def main():
                    help='checks that the API is stable')
     p.add_argument('-d', '--diff', nargs=2, dest='diff', type=int, default=(), 
                    help='takes the difference between two database indices')
-    ns = p.parse_args()
+    ns = p.parse_args(args=args)
 
     db = load(ns)
     if ns.update:
@@ -157,10 +157,11 @@ def main():
     if ns.dump:
         pprint.pprint(db)
     if ns.check:
-        check(db)
+        is_stable = check(db)
     if len(ns.diff) == 2:
         d = diff(db, ns.diff[0], ns.diff[1])
         print(d)
+    return is_stable
 
 if __name__ == '__main__':
     main()
