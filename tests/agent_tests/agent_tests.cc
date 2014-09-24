@@ -44,6 +44,11 @@ TEST_P(AgentTests, GetAgentType) {
   EXPECT_NE(std::string("Agent"), agent_->kind());
 }
 
+TEST_P(AgentTests, Name) {
+  Json::Value a = agent_->annotations();
+  EXPECT_TRUE(a["name"].isString());
+}
+
 TEST_P(AgentTests, Parents) {
   Json::Value a = agent_->annotations();
   EXPECT_FALSE(a["parents"].empty());
