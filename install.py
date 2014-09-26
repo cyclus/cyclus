@@ -34,7 +34,8 @@ def update_describe():
         lines = f.readlines()
     idx = lines.index(next(x for x in lines if 'describe()' in x)) + 1
     cmd = 'git describe --tag'
-    p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, shell=(os.name == 'nt'))
+    p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, 
+                         shell=(os.name == 'nt'), cwd=root_dir)
     out, err = p.communicate()
     rtn = p.returncode
     ary = lines[idx].split('"')
