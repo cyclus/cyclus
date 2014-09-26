@@ -96,6 +96,14 @@ def skip_then_continue(msg=""):
     """
     raise SkipTest(msg)
 
+@contextmanager
+def indir(d):
+    """Context manager for switching directorties and then switching back."""
+    cwd = os.getcwd()
+    os.chdir(d)
+    yield
+    os.chdir(cwd)
+
 #
 # Here there be Hackons!
 #
