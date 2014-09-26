@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 import shutil
+import io
 
 try:
     import argparse as ap
@@ -26,6 +27,21 @@ def check_windows_cmake(cmake_cmd):
             cmake_cmd += ['-G "MinGW Makefiles"']
         cmake_cmd = ' '.join(cmake_cmd)
 
+def update_describe():
+    root_dir = os.path.split(__file__)[0]
+    fname = os.path.join(root_dir, 'src', 'version.cc')
+    with io.open(fname, 'r') as f:
+        lines = f.readlines()
+    idx = lines.index(next(x for x in lines if 'describe()' in x)) + 1
+    cmd = 'git describe --tag'
+    p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, shell=(os.name == 'nt'))
+    out, err = p.communicate()
+    rtn = p.returncode
+    ary = lines[idx].split('"')
+    ary[1] = out.strip()
+    lines[idx] = '"'.join(ary)
+    with io.open(fname, 'w') as f:
+        f.writelines(lines)
 
 def install_cyclus(args):
     if not os.path.exists(args.build_dir):
@@ -58,6 +74,8 @@ def install_cyclus(args):
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
+
+    update_describe()
 
     make_cmd = ['make']
     if args.threads:
