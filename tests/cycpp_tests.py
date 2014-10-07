@@ -22,8 +22,6 @@ from cycpp import CloneFilter, InitFromCopyFilter, \
         InitFromDbFilter, InfileToDbFilter, SchemaFilter, SnapshotFilter, \
         SnapshotInvFilter, InitInvFilter, DefaultPragmaFilter, AnnotationsFilter
 
-
-
 class MockMachine(object):
     def __init__(self):
         self.depth = 0

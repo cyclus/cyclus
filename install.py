@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 import shutil
+import io
 
 try:
     import argparse as ap
@@ -26,6 +27,11 @@ def check_windows_cmake(cmake_cmd):
             cmake_cmd += ['-G "MinGW Makefiles"']
         cmake_cmd = ' '.join(cmake_cmd)
 
+def update_describe():
+    root_dir = os.path.split(__file__)[0]
+    fname = os.path.join(root_dir, 'src', 'version.cc.in')
+    cmd = 'touch {0}'.format(fname)
+    subprocess.check_call(cmd.split(), shell=(os.name == 'nt'))
 
 def install_cyclus(args):
     if not os.path.exists(args.build_dir):
@@ -58,6 +64,9 @@ def install_cyclus(args):
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
+
+    if args.update:
+        update_describe()
 
     make_cmd = ['make']
     if args.threads:
@@ -93,6 +102,10 @@ def main():
 
     uninst = 'uninstall'
     parser.add_argument('--uninstall', action='store_true', help=uninst, default=False)
+
+    noupdate = 'do not update the hash in version.cc'
+    parser.add_argument('--no-update', dest='update', action='store_false', 
+                        help=noupdate, default=True)
 
     clean = 'attempt to remove the build directory before building'
     parser.add_argument('--clean-build', action='store_true', help=clean)
