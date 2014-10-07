@@ -32,19 +32,6 @@ def update_describe():
     fname = os.path.join(root_dir, 'src', 'version.cc.in')
     cmd = 'touch {0}'.format(fname)
     subprocess.check_call(cmd.split(), shell=(os.name == 'nt'))
-    # with io.open(fname, 'r') as f:
-    #     lines = f.readlines()
-    # idx = lines.index(next(x for x in lines if 'describe()' in x)) + 1
-    # cmd = 'git describe --tag'
-    # p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, 
-    #                      shell=(os.name == 'nt'), cwd=root_dir)
-    # out, err = p.communicate()
-    # rtn = p.returncode
-    # ary = lines[idx].split('"')
-    # ary[1] = out.strip()
-    # lines[idx] = '"'.join(ary)
-    # with io.open(fname, 'w') as f:
-    #     f.writelines(lines)
 
 def install_cyclus(args):
     if not os.path.exists(args.build_dir):
@@ -78,7 +65,8 @@ def install_cyclus(args):
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
 
-    update_describe()
+    if args.update:
+        update_describe()
 
     make_cmd = ['make']
     if args.threads:
@@ -114,6 +102,10 @@ def main():
 
     uninst = 'uninstall'
     parser.add_argument('--uninstall', action='store_true', help=uninst, default=False)
+
+    noupdate = 'do not update the hash in version.cc'
+    parser.add_argument('--no-update', dest='update', action='store_false', 
+                        help=noupdate, default=True)
 
     clean = 'attempt to remove the build directory before building'
     parser.add_argument('--clean-build', action='store_true', help=clean)
