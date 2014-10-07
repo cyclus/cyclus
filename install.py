@@ -29,7 +29,7 @@ def check_windows_cmake(cmake_cmd):
 
 def update_describe():
     root_dir = os.path.split(__file__)[0]
-    fname = os.path.join(root_dir, 'src', 'version.cc')
+    fname = os.path.join(root_dir, 'src', 'version.cc.in')
     cmd = 'touch {0}'.format(fname)
     subprocess.check_call(cmd.split(), shell=(os.name == 'nt'))
     # with io.open(fname, 'r') as f:
