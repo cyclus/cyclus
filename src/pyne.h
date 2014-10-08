@@ -9,6 +9,7 @@
 //   src/data.h
 //   src/json-forwards.h
 //   src/json.h
+//   src/jsoncustomwriter.h
 //   src/material.h
 //   src/enrichment_cascade.h
 //   src/enrichment.h
@@ -1007,6 +1008,28 @@ namespace nucname
   /// nuclides in PyNE. This is termed a ZAS, or ZZZAAASSSS, representation because 
   /// It stores 3 Z-number digits, 3 A-number digits, followed by 4 S-number digits
   /// which the nucleus excitation state. 
+  ///
+  /// The id() function will always return an nuclide in id form, if successful. 
+  /// If the input nuclide is in id form already, then this is function does no
+  /// work. For all other formats, the id() function provides a best-guess based
+  /// on a heirarchy of other formats that is used to resolve ambiguities between
+  /// naming conventions. For integer input the form resolution order is:
+  ///   - id
+  ///   - zz (elemental z-num only given)
+  ///   - zzaaam
+  ///   - cinder (aaazzzm)
+  ///   - mcnp
+  ///   - zzaaa
+  /// For string (or char *) input the form resolution order is as follows:
+  ///   - ZZ-LL-AAAM
+  ///   - Integer form in a string representation, uses interger resolution
+  ///   - NIST
+  ///   - name form
+  ///   - Serpent
+  ///   - LL (element symbol)
+  /// For well-defined situations where you know ahead of time what format the
+  /// nuclide is in, you should use the various form_to_id() functions, rather 
+  /// than the id() function which is meant to resolve possibly ambiquous cases.
   /// \param nuc a nuclide
   /// \return nucid 32-bit integer identifier
   int id(int nuc);
@@ -1020,8 +1043,11 @@ namespace nucname
   /// notation. The chemical symbol (one or two characters long) is first, followed 
   /// by the nucleon number. Lastly if the nuclide is metastable, the letter M is 
   /// concatenated to the end. For example, ‘H-1’ and ‘Am242M’ are both valid. 
-  /// Note that nucname will always return name form with the dash removed and all 
-  /// letters uppercase.
+  /// Note that nucname will always return name form with dashes removed, the 
+  /// chemical symbol used for letter casing (ie 'Pu'), and a trailing upercase 'M' 
+  /// for a metastable flag. The name() function first converts functions to id form
+  /// using the id() function. Thus the form order resolution for id() also applies 
+  /// here.
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
   std::string name(int nuc);
@@ -4541,6 +4567,91 @@ namespace Json {
 #endif //ifndef JSON_AMALGATED_H_INCLUDED
 //
 // end of src/json.h
+//
+
+
+//
+// start of src/jsoncustomwriter.h
+//
+/**********************************************************************
+Copyright (c) 2013 by Matt Swain <m.swain@me.com>
+
+The MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+***********************************************************************/
+
+#ifndef PYNE_46Z7LQYFI5HZNASIPCWHVX3X5E
+#define PYNE_46Z7LQYFI5HZNASIPCWHVX3X5E
+
+#include <string>
+
+namespace Json {
+
+   /** \brief Writes a Value in <a HREF="http://www.json.org">JSON</a> format with custom formatting.
+    *
+    * The JSON document is written according to the rules specified in the constructor. Objects and
+    * arrays are printed on a single line if they are below a certain length, otherwise they are 
+    * indented. It is possible to output invalid json if the customizable parameters are specified
+    * incorrectly. Set maxWidth to 0 to print output on a single line. 
+    *
+    * \sa Reader, Value
+    */
+   class JSON_API CustomWriter : public Writer
+   {
+   public:
+      CustomWriter( std::string opencurly = "{",
+                    std::string closecurly = "}",
+                    std::string opensquare = "[",
+                    std::string closesquare = "]",
+                    std::string colon = ":",
+                    std::string comma = ",",
+                    std::string indent = "  ",
+                    int maxWidth = 74);
+      virtual ~CustomWriter(){}
+
+   public: // overridden from Writer
+      virtual std::string write( const Value &root );
+
+   private:
+      void writeValue( const Value &value, std::string &doc, bool forceSingleLine );
+      bool isMultiline( const Value &value );
+      void indent();
+      void unindent();
+
+      std::string document_;
+      std::string indentString_;
+      std::string opencurly_;
+      std::string closecurly_;
+      std::string opensquare_;
+      std::string closesquare_;
+      std::string colon_;
+      std::string comma_;
+      std::string indent_;
+      int maxWidth_;
+   };
+   
+}
+
+#endif//
+// end of src/jsoncustomwriter.h
 //
 
 

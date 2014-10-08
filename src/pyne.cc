@@ -7,6 +7,7 @@
 //   src/rxname.cpp
 //   src/data.cpp
 //   src/jsoncpp.cpp
+//   src/jsoncustomwriter.cpp
 //   src/material.cpp
 //   src/enrichment_cascade.cpp
 //   src/enrichment.cpp
@@ -2722,12 +2723,6 @@ int pyne::nucname::id(int nuc) {
   } else if (aaa == 0 && 0 < zz_name.count(zzz)) {
     // MCNP form natural nuclide
     return zzz * 10000000;
-  } else if (zzz > 1000) {
-    // SZA form with a metastable state (sss != 0)
-    int sss = zzz / 1000;
-    int newzzz = zzz % 1000;
-    
-    return newzzz * 10000000 + aaa * 10000 + sss;
   }
 
   // Not a normal nuclide, might be a 
@@ -2744,27 +2739,28 @@ int pyne::nucname::id(char * nuc) {
 };
 
 int pyne::nucname::id(std::string nuc) {
+  size_t npos = std::string::npos;
   if (nuc.empty())
     throw NotANuclide(nuc, "<empty>");
   int newnuc;
   std::string elem_name;
+  int dash1 = nuc.find("-"); 
+  int dash2;
+  if (dash1 == npos)
+    dash2 = npos;
+  else
+    dash2 = nuc.find("-", dash1+1);
   
-  if(nuc.length()>=5) { //nuc must be at least 4 characters or greater if it is in ZZLLAAAM form.
-    if((pyne::contains_substring(nuc.substr(1, 3), "-")) && (pyne::contains_substring(nuc.substr(4, 5), "-")) ){
-       // Nuclide most likely in ZZLLAAAM Form, only form that contains two "-"'s.
-       int dashIndex = nuc.find("-"); 
-       std::string zz = nuc.substr(0, dashIndex);
-       std::string ll_aaa_m = nuc.substr(dashIndex+1);
-       int dash2Index = ll_aaa_m.find("-");
-       std::string ll = ll_aaa_m.substr(0, dash2Index);
-       int zz_int;
-       std::stringstream s_str(zz);
-       s_str >> zz_int;
-       if(znum(ll)==zz_int ) {    // Verifying that the LL and ZZ point to the same element as secondary
-	  			  // verification that nuc is in ZZLLAAAM form.
-         return zzllaaam_to_id(nuc);
-       }
-    }
+  // nuc must be at least 4 characters or greater if it is in ZZLLAAAM form.
+  if (nuc.length() >= 5 && dash1 != npos && dash2 != npos) {
+    // Nuclide most likely in ZZLLAAAM Form, only form that contains two "-"'s.
+    std::string zz = nuc.substr(0, dash1);
+    std::string ll = nuc.substr(dash1+1, dash2);
+    int zz_int = to_int(zz);
+    // Verifying that the LL and ZZ point to the same element as secondary
+    if(znum(ll) != zz_int)
+      throw NotANuclide(nuc, "mismatched znum and chemical symbol");
+    return zzllaaam_to_id(nuc);
   }
 
   // Get the string into a regular form
@@ -3129,7 +3125,9 @@ int pyne::nucname::mcnp(std::string nuc) {
 int pyne::nucname::mcnp_to_id(int nuc) {
   int zzz = nuc / 1000;
   int aaa = nuc % 1000; 
-  if (zzz <= aaa) {
+  if (zzz == 0)
+    throw NotANuclide(nuc, "not in the MCNP format");
+  else if (zzz <= aaa) {
     if (aaa - 400 < 0) {
       if (nuc == 95242)
         return nuc * 10000 + 1;  // special case MCNP Am-242m
@@ -12943,6 +12941,208 @@ std::ostream& operator<<( std::ostream &sout, const Value &root ) {
 
 
 //
+// start of src/jsoncustomwriter.cpp
+//
+/**********************************************************************
+Copyright (c) 2013 by Matt Swain <m.swain@me.com>
+
+The MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+***********************************************************************/
+
+#ifndef PYNE_IS_AMALGAMATED
+  #include "json.h"
+  #include "jsoncustomwriter.h"
+#endif
+
+namespace Json {
+
+CustomWriter::CustomWriter( std::string opencurly,
+                            std::string closecurly,
+                            std::string opensquare,
+                            std::string closesquare,
+                            std::string colon,
+                            std::string comma,
+                            std::string indent,
+                            int maxWidth)
+   : opencurly_( opencurly )
+   , closecurly_( closecurly )
+   , opensquare_( opensquare )
+   , closesquare_( closesquare )
+   , colon_( colon )
+   , comma_( comma )
+   , indent_( indent )
+   , maxWidth_( maxWidth )
+{
+}
+
+
+std::string 
+CustomWriter::write( const Value &root )
+{
+   document_ = "";
+   indentString_ = "";
+   writeValue( root, document_, false );
+   document_ += "\n";
+   return document_;
+}
+
+
+void 
+CustomWriter::writeValue( const Value &value, std::string &doc, bool forceSingleLine )
+{
+   switch ( value.type() )
+   {
+   case nullValue:
+      doc += "null";
+      break;
+   case intValue:
+      doc += valueToString( value.asLargestInt() );
+      break;
+   case uintValue:
+      doc += valueToString( value.asLargestUInt() );
+      break;
+   case realValue:
+      doc += valueToString( value.asDouble() );
+      break;
+   case stringValue:
+      doc += valueToQuotedString( value.asCString() );
+      break;
+   case booleanValue:
+      doc += valueToString( value.asBool() );
+      break;
+   case arrayValue:
+      {
+         bool isMulti = false;
+         if (!forceSingleLine)
+         {
+            std::string valLine = "";
+            writeValue( value, valLine, true);
+            if (valLine.length() > maxWidth_)
+            {
+               isMulti = true;
+            }
+            else
+            {
+               doc += valLine;
+               break;
+            }
+         }
+         doc += opensquare_;
+         if (isMulti)
+            indent();
+         for ( int index =0; index < value.size(); ++index )
+         {
+            if (isMulti)
+            {
+               doc += "\n";
+               doc += indentString_;
+            }
+            writeValue( value[index], doc, false );
+            if ( index < value.size()-1 )
+               doc += comma_;
+         }
+         if (isMulti)
+         {
+            unindent();
+            doc += "\n";
+            doc += indentString_;
+         }
+         doc += closesquare_;
+      }
+      break;
+   case objectValue:
+      {
+         bool isMulti = false;
+         if (!forceSingleLine)
+         {
+            std::string valLine = "";
+            writeValue( value, valLine, true);
+            if (valLine.length() > maxWidth_)
+            {
+               isMulti = true;
+            }
+            else
+            {
+               doc += valLine;
+               break;
+            }
+         }
+         Value::Members members( value.getMemberNames() );
+         doc += opencurly_;
+         if (isMulti)
+            indent();
+         for ( Value::Members::iterator it = members.begin(); 
+               it != members.end(); 
+               ++it )
+         {
+            if (isMulti)
+            {
+               doc += "\n";
+               doc += indentString_;
+               
+            }
+            const std::string &name = *it;
+            doc += valueToQuotedString( name.c_str() );
+            doc += colon_;
+            writeValue( value[name], doc, forceSingleLine );
+            if ( !(it + 1 == members.end()) )
+               doc += comma_;
+         }
+         if (isMulti)
+         {
+            unindent();
+            doc += "\n";
+            doc += indentString_;
+         }
+         doc += closecurly_;
+      }
+      break;
+   }
+}
+
+
+void 
+CustomWriter::indent()
+{
+   indentString_ += indent_;
+}
+
+
+void 
+CustomWriter::unindent()
+{
+   int idSize = int(indent_.size());
+   int idsSize = int(indentString_.size());
+   if (idsSize >= idSize)
+      indentString_.resize (idsSize - idSize);
+}
+
+}
+//
+// end of src/jsoncustomwriter.cpp
+//
+
+
+//
 // start of src/material.cpp
 //
 // Material.cpp
@@ -13497,26 +13697,28 @@ std::string pyne::Material::mcnp(std::string frac_type) {
   std::string nucmcnp;
   std::string table_item;
   for(pyne::comp_iter i = fracs.begin(); i != fracs.end(); ++i) {
-    // Clear first
-    ss.str(std::string() );
-    ss.str("");
-    ss << pyne::nucname::mcnp(i->first );
-    nucmcnp = ss.str();
-
-    int mcnp_id;
-    mcnp_id = pyne::nucname::mcnp(i->first );
-    // Spaces are important for tests
-    table_item = metadata["table_ids"][nucmcnp].asString();
-    if ( !table_item.empty() ) {
-      oss << "     " << mcnp_id << "." << table_item << " ";
-    } else {
-      oss << "     " << mcnp_id << " ";
+    if (i->second > 0.0) {
+      // Clear first
+      ss.str(std::string());
+      ss.str("");
+      ss << pyne::nucname::mcnp(i->first);
+      nucmcnp = ss.str();
+      
+      int mcnp_id;
+      mcnp_id = pyne::nucname::mcnp(i->first);
+      // Spaces are important for tests
+      table_item = metadata["table_ids"][nucmcnp].asString();
+      if (!table_item.empty()) {
+	oss << "     " << mcnp_id << "." << table_item << " ";
+      } else {
+	oss << "     " << mcnp_id << " ";
+      }
+      // The int needs a little formatting
+      std::stringstream fs;
+      fs << std::setprecision(4) << std::scientific << frac_sign << i->second \
+	 << std::endl;
+      oss << fs.str();
     }
-    // The int needs a little formatting
-    std::stringstream fs;
-    fs << std::setprecision(4) << std::scientific << frac_sign << i->second \
-       << std::endl;
-    oss << fs.str();
   }
 
   return oss.str();
@@ -13607,7 +13809,7 @@ std::string pyne::Material::fluka_material_component(int fid, int nucid,
     // for compounds (i.e., unrecognized nucids), this will be 0
     atomic_mass = pyne::atomic_mass(nucid);
   } else {
-    atomic_mass = -1; 
+    atomic_mass = 1.0; 
   }  
 
   return fluka_material_line(znum, atomic_mass, fid, fluka_name);
@@ -13632,7 +13834,7 @@ std::string pyne::Material::fluka_material_line(int znum, double atomic_mass,
 
   ls << fluka_format_field(atomic_mass);
   // Note this is the current object density, and may or may not be meaningful
-  ls << fluka_format_field(density);
+  ls << fluka_format_field(std::sqrt(density*density));
 
   ls << std::setprecision(0) << std::fixed << std::showpoint <<
         std::setw(10) << std::right << (float)fid;
@@ -13682,8 +13884,8 @@ std::string pyne::Material::fluka_compound_str(int id, std::string frac_type) {
   std::vector<std::string> material_names;
 
   // The nucid doesn't make sense for a compound
-  int znum = 999;
-  double atomic_mass = 999.;
+  int znum = 1;
+  double atomic_mass = 1.;
   // This better be true
   std::string compound_name;
   if (metadata.isMember("fluka_name")) {
@@ -13756,9 +13958,9 @@ std::string pyne::Material::fluka_compound_str(int id, std::string frac_type) {
     ss << std::setw(10) << std::right << ""; 
     ss << std::setw(10) << std::right << ""; 
     ss << std::setw(10) << std::left << compound_name;
+    ss << std::endl;
     }
 
-  ss<< std::endl;
   return ss.str();
 }
 
