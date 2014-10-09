@@ -10,6 +10,15 @@ To see user and developer documentation for this code, please visit
 the `Cyclus Homepage`_.
 
 ******************************
+Installing Cyclus the Easy Way
+******************************
+Cyclus provides easy-to-install binary packages via the 
+`conda package manager <http://conda.pydata.org/docs/>`_. These are 
+grate for users but may not be suitable for developers. For detailed
+instructions on installing conda and Cyclus, please 
+`see the install documentation <http://fuelcycle.org/user/install.html>`_.
+
+******************************
 Building and Installing Cyclus
 ******************************
 
