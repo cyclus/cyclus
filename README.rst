@@ -14,7 +14,7 @@ Installing Cyclus the Easy Way
 ******************************
 Cyclus provides easy-to-install binary packages via the 
 `conda package manager <http://conda.pydata.org/docs/>`_. These are 
-grate for users but may not be suitable for developers. For detailed
+great for users but may not be suitable for developers. For detailed
 instructions on installing conda and Cyclus, please 
 `see the install documentation <http://fuelcycle.org/user/install.html>`_.
 
