@@ -89,7 +89,8 @@ class Source : public cyclus::Facility {
   #pragma cyclus var {"doc": "recipe name for source facility's " \
                              "commodity", \
                       "tooltip": "commodity recipe name", \
-                      "schematype": "token"}
+                      "schematype": "token", \
+		      "uitype": "recipe"}
   std::string recipe_name;
 
   /// The capacity is defined in terms of the number of units of the
