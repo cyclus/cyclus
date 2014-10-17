@@ -90,7 +90,7 @@ class Source : public cyclus::Facility {
                              "commodity", \
                       "tooltip": "commodity recipe name", \
                       "schematype": "token", \
-		      "uitype": "recipe"}
+                      "uitype": "recipe"}
   std::string recipe_name;
 
   /// The capacity is defined in terms of the number of units of the
