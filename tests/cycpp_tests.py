@@ -220,6 +220,36 @@ def test_notefilter():
     f.transform(statement, sep)
     yield assert_equal, m.context['']['doc'], 'string'
 
+class MockAliasCodeGenMachine(object):
+    """Mock machine for testing aliasing on pass 3 filters"""
+    def __init__(self):
+        self.depth = 0
+        self.execns = {}
+        self.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('bar_var', {
+                'type': 'std::string',
+                'alias': 'foo_alias',
+            }),('foo_alias', 'bar_var'),
+            ('bar_map_var', {
+                'type': ('std::map', 'std::string', 'int'),
+                'alias': 'foo_map_alias',
+            }),('foo_map_alias', 'bar_map_var'),
+            ]))
+            ])}
+        self.statements = []
+        self.classes = []
+        self.superclasses = {'MyFactory': ()}
+        self.access = {}
+        self.namespaces = []
+        self.using_namespaces = set()
+        self.aliases = set()
+        self.var_annotations = None
+        self.filters = []
+        self.local_classname = "MyFactory"
+
+    def classname(self):
+        return self.local_classname
+
 #
 # pass 3 Filters
 #
@@ -301,6 +331,36 @@ def test_ifdbfilter():
                 '  x = qr.GetVal<int>("x");\n'
                 "WAKKA JAWAKA")
     yield assert_equal, exp_impl, impl
+
+def test_aliasing_schemafilter():
+    impl = setup_alias(SchemaFilter)
+
+    assert_true('foo_alias' in impl)
+    assert_false('bar_var' in impl)
+    assert_true('foo_map_alias' in impl)
+    assert_false('bar_map_var' in impl)
+
+def test_aliasing_snapshotfilter():
+    impl = setup_alias(SnapshotFilter)
+
+    assert_false('foo_alias' in impl)
+    assert_true('bar_var' in impl)
+    assert_false('foo_map_alias' in impl)
+    assert_true('bar_map_var' in impl)
+
+def test_aliasing_infiletodbfilter():
+    impl = setup_alias(InfileToDbFilter)
+
+    assert_true('foo_alias' in impl)
+    assert_true('bar_var' in impl)
+    assert_true('foo_map_alias' in impl)
+    assert_true('bar_map_var' in impl)
+
+def setup_alias(filt):
+    m = MockAliasCodeGenMachine()
+    f = filt(m)
+    f.given_classname = 'MyFactory'
+    return f.impl()
 
 def test_itdbfilter():
     """Test InfileToDbFilter"""
