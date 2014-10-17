@@ -50,7 +50,8 @@ class Prey : public cyclus::Facility {
   void GiveBirth();
 
  private:
-  #pragma cyclus var {"schematype": "token"}
+  #pragma cyclus var {"schematype": "token", \
+                      "uitype": "outcommodity"}
   std::string commod;
 
   /// Number of timsteps between having children
