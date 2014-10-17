@@ -30,7 +30,7 @@ following handy table!
 
 :var:  Add the following C++ statement as an Agent's state variable. There is
        one argument which must be a Python expression that evaluates to
-       a dictionary or other mapping.
+       a dictionary or other Mapping.
 :exec: Executes arbitrary python code that is passed in as the arguments and
        loads this into the context. This is useful for importing handy modules,
        declaring variables for later use, or any of the other things that Python
@@ -436,6 +436,8 @@ class VarDeclarationFilter(Filter):
                                                   statement=statement)
         annotations['index'] = len(state.context[classname]['vars'])
         state.context[classname]['vars'][vname] = annotations
+        if 'alias' in annotations:
+            state.context[classname]['vars'][annotations['alias']] = vname
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -803,6 +805,10 @@ class CodeGeneratorFilter(Filter):
     def shapes_impl(self, ctx, ind="  "):
         s = ""
         for vname, annotations in ctx.items():
+            if not isinstance(annotations, Mapping):
+                # this member is a variable alias pointer
+                continue
+
             shape = annotations.get('shape', None)
             if shape is None:
                 continue
@@ -854,6 +860,10 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         impl += self.shapes_impl(ctx, ind)
         cap_buffs = []
         for member, info in ctx.items():
+            if not isinstance(info, Mapping):
+                # this member is a variable alias pointer
+                continue
+
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
             elif info['type'] not in BUFFERS:
@@ -893,6 +903,10 @@ class InitFromDbFilter(CodeGeneratorFilter):
         impl += self.shapes_impl(ctx, ind)
         impl += ind + '{0}::QueryResult qr = b->Query("Info", NULL);\n'.format(CYCNS)
         for member, info in ctx.items():
+            if not isinstance(info, Mapping):
+                # this member is a variable alias pointer
+                continue
+
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
@@ -942,7 +956,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         """returns a format string for a type t"""
         return '"{0}"' if t == 'std::string' else '{0}'
 
-    def read_primitive(self, member, t, d, ind="  "):
+    def read_primitive(self, member, alias, t, d, ind="  "):
         s = ""
         tstr = type_to_str(t)
         tfmt = self._fmt(t)
@@ -952,20 +966,20 @@ class InfileToDbFilter(CodeGeneratorFilter):
         else:
             query = "OptionalQuery"
             dstr = ", " + tfmt.format(d)
-        s += ind + '{0} = {1}::{2}<{3}>(tree, "{0}"{4});\n'\
-                   .format(member, CYCNS, query, tstr, dstr)
+        s += ind + '{0} = {1}::{2}<{3}>(tree, "{5}"{4});\n'\
+                   .format(member, CYCNS, query, tstr, dstr, alias)
         return s
 
-    def read_vector(self, member, t, d, ind="  "):
+    def read_vector(self, member, alias, t, d, ind="  "):
         s = ""
         valstr = type_to_str(t[1])
         if valstr.endswith('>'):
             valstr += " "
         valfmt = self._fmt(t[1])
         if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
             ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
         s += ind + 'n = sub->NMatches("val");\n'
         s += ind + '{0}.resize(n);\n'.format(member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
@@ -984,7 +998,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_set(self, member, t, d, ind="  "):
+    def read_set(self, member, alias, t, d, ind="  "):
         s = ""
         valstr = type_to_str(t[1])
         if valstr.endswith('>'):
@@ -992,9 +1006,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
         valfmt = self._fmt(t[1])
         s += ind + '{0}.clear();\n'.format(member)
         if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
             ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
         s += ind + 'n = sub->NMatches("val");\n'
         s += ind + 'for (i = 0; i < n; ++i) {\n'
         s += ind + ('  {1}.insert({0}::Query<{2}>(sub, "val", i));'
@@ -1011,7 +1025,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_list(self, member, t, d, ind="  "):
+    def read_list(self, member, alias, t, d, ind="  "):
         s = ""
         valstr = type_to_str(t[1])
         if valstr.endswith('>'):
@@ -1019,9 +1033,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
         valfmt = self._fmt(t[1])
         s += ind + '{0}.clear();\n'.format(member)
         if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
             ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
         s += ind + 'n = sub->NMatches("val");\n'
         s += ind + 'for (i = 0; i < n; ++i) {\n'
         s += ind + ('  {1}.push_back({0}::Query<{2}>(sub, "val", i));'
@@ -1038,7 +1052,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_pair(self, member, t, d, ind="  "):
+    def read_pair(self, member, alias, t, d, ind="  "):
         s = ""
         firststr = type_to_str(t[1])
         if firststr.endswith('>'):
@@ -1055,13 +1069,13 @@ class InfileToDbFilter(CodeGeneratorFilter):
             query = "OptionalQuery"
             dfirst = ", " + firstfmt.format(d[0])
             dsecond = ", " + secondfmt.format(d[1])
-        s += ind + '{0}.first = {1}::{2}<{3}>(tree, "{0}/first"{4});\n'\
-                   .format(member, CYCNS, query, firststr, dfirst)
-        s += ind + '{0}.second = {1}::{2}<{3}>(tree, "{0}/second"{4});\n'\
-                   .format(member, CYCNS, query, secondstr, dsecond)
+        s += ind + '{0}.first = {1}::{2}<{3}>(tree, "{5}/first"{4});\n'\
+                   .format(member, CYCNS, query, firststr, dfirst, alias)
+        s += ind + '{0}.second = {1}::{2}<{3}>(tree, "{5}/second"{4});\n'\
+                   .format(member, CYCNS, query, secondstr, dsecond, alias)
         return s
 
-    def read_map(self, member, t, d, ind="  "):
+    def read_map(self, member, alias, t, d, ind="  "):
         s = ""
         keystr = type_to_str(t[1])
         if keystr.endswith('>'):
@@ -1072,9 +1086,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
             valstr += " "
         valfmt = self._fmt(t[2])
         if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(member)
+            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
             ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(member)
+        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
         s += ind + 'n = sub->NMatches("val");\n'
         s += ind + 'for (i = 0; i < n; ++i) {\n'
         s += ind + ('  {1}[{0}::Query<{2}>(sub, "key", i)] = '
@@ -1113,6 +1127,14 @@ class InfileToDbFilter(CodeGeneratorFilter):
         impl += ind + 'int i;\n'
         impl += ind + 'int n;\n'
         for member, info in ctx.items():
+            if not isinstance(info, Mapping):
+                # this member is a variable alias pointer
+                continue
+
+            alias = member
+            if 'alias' in info:
+                alias = info['alias']
+
             if self.pragmaname in info and 'read' in info[self.pragmaname]:
                 impl += info[self.pragmaname]['read']
                 continue
@@ -1124,11 +1146,15 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 impl += ind + info['derived_init'] + '\n'
             else:
                 reader = self.readers.get(t, self.readers.get(t[0], None))
-                impl += reader(member, t, d, ind)
+                impl += reader(member, alias, t, d, ind)
 
         # write obj to database
         impl += ind + 'di.NewDatum("Info")\n'
         for member, info in ctx.items():
+            if not isinstance(info, Mapping):
+                # this member is a variable alias pointer
+                continue
+
             if self.pragmaname in info and 'write' in info[self.pragmaname]:
                 impl += info[self.pragmaname]['write']
                 continue
@@ -1191,6 +1217,14 @@ class SchemaFilter(CodeGeneratorFilter):
         impl = i.up() + 'return ""\n'
         impl += i +  '"<interleave>\\n"\n'
         for member, info in ctx.items():
+            if not isinstance(info, Mapping):
+                # this member is a variable alias pointer
+                continue
+
+            alias = member
+            if 'alias' in info:
+                alias = info['alias']
+
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
@@ -1205,7 +1239,7 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
 
             if t[0] in ['std::list', 'std::map', 'std::set', 'std::vector']:
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
+                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
                 impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
                 if t[0] in ['std::set', 'std::vector', 'std::list']:
                     el_type = self._type(t[1], schematype)
@@ -1224,17 +1258,17 @@ class SchemaFilter(CodeGeneratorFilter):
                     impl += i + '"{0}</element>\\n"\n'.format(xi.down())
 
                 impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down(), member)
+                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t in PRIMITIVES:
                 d_type = self._type(t, schematype)
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
+                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
                 impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, d_type)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t[0] == 'std::pair':
                 schematype = [None, None] if schematype is None else schematype
                 f_type = self._type(t[1], schematype[0])
                 s_type = self._type(t[2], schematype[1])
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), member)
+                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
                 impl += i + '"{0}<element name=\\"first\\">\\n"\n'.format(xi.up())
                 impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, f_type)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
@@ -1301,6 +1335,10 @@ class SnapshotFilter(CodeGeneratorFilter):
         ctx = context[self.given_classname]['vars']
         impl = ind + 'di.NewDatum("Info")\n'
         for member, info in ctx.items():
+            if not isinstance(info, Mapping):
+                # this member is a variable alias pointer
+                continue
+
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
@@ -1328,6 +1366,10 @@ class SnapshotInvFilter(CodeGeneratorFilter):
         impl = ""
         buffs = []
         for member, info in ctx.items():
+            if not isinstance(info, Mapping):
+                # this member is a variable alias pointer
+                continue
+
             t = info['type']
             if t in BUFFERS:
                 buffs.append(member)
@@ -1362,6 +1404,10 @@ class InitInvFilter(CodeGeneratorFilter):
         impl = ""
         buffs = []
         for member, info in ctx.items():
+            if not isinstance(info, Mapping):
+                # this member is a variable alias pointer
+                continue
+
             t = info['type']
             if t in BUFFERS:
                 buffs.append(member)
@@ -1557,7 +1603,7 @@ class Proxy(MutableMapping):
             del self.__dict__[key]
 
     #
-    # mapping interface
+    # Mapping interface
     #
     def __getitem__(self, key):
         return self.__dict__['_d'][key]
