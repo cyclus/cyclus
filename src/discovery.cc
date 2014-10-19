@@ -33,7 +33,10 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
   namespace fs = boost::filesystem;
   // find file
   string libpath = (fs::path(p) / fs::path("lib" + lib + SUFFIX)).string();
+  std::cout << "BEFORE: " << libpath << "\n";
   libpath = Env::FindModule(libpath);
+  std::cout << "AFTER: " << libpath << "\n";
+  std::cout << "\n";
 
   // read in file, pre-allocates space
   std::ifstream f (libpath.c_str());
