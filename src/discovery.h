@@ -22,20 +22,6 @@ std::set<std::string> DiscoverSpecsInDir(std::string d);
 /// Discover archetype specifications that live recursively in CYCLUS_PATH directories.
 std::set<std::string> DiscoverSpecsInCyclusPath();
 
-/// Discover the annotations dictionary for a spec
-std::string DiscoverAnnotations(std::string spec);
-
-/// Discover the annotations dictionary for all specs in the cyclus path.
-/// @return mapping from spec to annotations dictionary
-std::map<std::string, std::string> DiscoverAnnotationsInCyclusPath();
-
-/// Discover the schema dictionary for a spec
-std::string DiscoverSchema(std::string spec);
-
-/// Discover the schema dictionary for all specs in the cyclus path.
-/// @return mapping from spec to schema dictionary
-std::map<std::string, std::string> DiscoverSchemaInCyclusPath();
-
 /// Discover archetype metadata in cyclus path
 /// @return a Json::Value having the structure
 ///  {
@@ -44,7 +30,6 @@ std::map<std::string, std::string> DiscoverSchemaInCyclusPath();
 ///   "schema": {"<spec1>": "<schema1>"}
 ///  }
 Json::Value DiscoverMetadataInCyclusPath();
-
 
 }  // namespace cyclus
 
