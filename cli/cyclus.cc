@@ -231,6 +231,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("agent-listing,l", po::value<std::string>(),
        "dump the agents in a library.")
       ("all-agent-listing,a", "dump all the agents cyclus knows about.")
+      ("metadata,m", "dump metadata for all the agents cyclus knows about.")
       ("no-agent", "only print log entries from cyclus core code")
       ("no-mem", "exclude memory log statement from logger output")
       ("verb,v", po::value<std::string>(),
@@ -336,6 +337,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
       Agent* m = DynamicModule::Make(ctx, name);
       Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
                                                      ", ", " ", 80);
+      std::cout << "str: " << m->annotations() << std::endl << std::endl;
       std::cout << writer.write(m->annotations());
       ctx->DelAgent(m);
     } catch (cyclus::IOError err) {
@@ -360,6 +362,16 @@ int EarlyExitArgs(const ArgInfo& ai) {
       std::set<std::string> specs = cyclus::DiscoverSpecsInCyclusPath();
       for (std::set<std::string>::iterator it = specs.begin(); it != specs.end(); ++it)
         std::cout << *it << "\n";
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("metadata")) {
+    try {
+      Json::Value root = DiscoverMetadataInCyclusPath();
+      Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
+                                                     ", ", " ", 80);
+      std::cout << writer.write(root);
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
     }

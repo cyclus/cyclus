@@ -1,5 +1,23 @@
 #include "discovery.h"
 
+#include <fstream>
+#include <iostream>
+#include <streambuf>
+#include <vector>
+
+#include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
+#include "agent.h"
+#include "context.h"
+#include "dynamic_module.h"
+#include "env.h"
+#include "recorder.h"
+#include "suffix.h"
+#include "timer.h"
+
 namespace cyclus {
 
 std::set<std::string> DiscoverArchetypes(const std::string s) {
@@ -111,6 +129,89 @@ std::set<std::string> DiscoverSpecsInCyclusPath() {
       specs.insert(*ds);
   }
   return specs;
+}
+
+std::string DiscoverAnnotations(std::string spec) {  
+  Recorder rec;
+  Timer ti;
+  Context* ctx = new Context(&ti, &rec);
+  Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
+                                                 ", ", " ", 80);
+  Agent* m = DynamicModule::Make(ctx, spec);
+  std::string ret = writer.write(m->annotations());
+  ctx->DelAgent(m);
+  delete ctx;
+  return ret;
+}
+
+std::map<std::string, std::string> DiscoverAnnotationsInCyclusPath() {
+  using std::string;
+  using std::set;
+  using std::map;
+  set<string> specs = DiscoverSpecsInCyclusPath();
+  map<string, string> spec_map;
+  for (set<string>::iterator it = specs.begin(); it != specs.end(); ++it)
+    spec_map[*it] = DiscoverAnnotations(*it);
+  return spec_map;
+}
+ 
+std::string DiscoverSchema(std::string spec) {  
+  Recorder rec;
+  Timer ti;
+  Context* ctx = new Context(&ti, &rec);
+  Agent* m = DynamicModule::Make(ctx, spec);
+  std::string ret = m->schema();
+  ctx->DelAgent(m);
+  delete ctx;
+  return ret;
+}
+
+std::map<std::string, std::string> DiscoverSchemaInCyclusPath() {
+  using std::string;
+  using std::set;
+  using std::map;
+  set<string> specs = DiscoverSpecsInCyclusPath();
+  map<string, string> spec_map;
+  for (set<string>::iterator it = specs.begin(); it != specs.end(); ++it)
+    spec_map[*it] = DiscoverSchema(*it);
+  return spec_map;
+}
+
+Json::Value DiscoverMetadataInCyclusPath() {
+  // get archetype data
+  std::set<std::string> specs = cyclus::DiscoverSpecsInCyclusPath();
+  std::map<std::string, std::string> annotations =
+      cyclus::DiscoverAnnotationsInCyclusPath();
+  std::map<std::string, std::string> schemas =
+      cyclus::DiscoverSchemaInCyclusPath();
+    
+  // populate streams
+  std::stringstream specss, annoss, schmss;
+  specss << "\"specs\": [";
+  annoss << "\"annotations\": {";
+  schmss << "\"schema\": {";
+  for (std::set<std::string>::iterator it = specs.begin();
+       it != specs.end(); ++it) {
+    specss << "\"" << *it << "\", ";
+    annoss << "\"" << *it << "\": " << annotations[*it] << ", ";
+    schmss << "\"" << *it << "\": \"" << schemas[*it] << "\", ";
+  }
+  specss << "]";
+  annoss << "}";
+  schmss << "}";
+    
+  // validate
+  Json::Value root;
+  Json::Reader reader;
+  bool parsed_ok = reader.parse("{" +\
+                                specss.str() + ", " + \
+                                annoss.str() + ", " + \
+                                schmss.str() + ", " + \
+                                "}", root);
+  if (!parsed_ok) {
+    throw cyclus::ValueError("Failed to parse metadata in Cyclus path.");
+  }
+  return root;
 }
 
 }  // namespace cyclus
