@@ -337,7 +337,6 @@ int EarlyExitArgs(const ArgInfo& ai) {
       Agent* m = DynamicModule::Make(ctx, name);
       Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
                                                      ", ", " ", 80);
-      std::cout << "str: " << m->annotations() << std::endl << std::endl;
       std::cout << writer.write(m->annotations());
       ctx->DelAgent(m);
     } catch (cyclus::IOError err) {
