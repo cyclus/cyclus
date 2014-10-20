@@ -186,31 +186,21 @@ Json::Value DiscoverMetadataInCyclusPath() {
       cyclus::DiscoverSchemaInCyclusPath();
     
   // populate streams
-  std::stringstream specss, annoss, schmss;
-  specss << "\"specs\": [";
-  annoss << "\"annotations\": {";
-  schmss << "\"schema\": {";
+  Json::Value root(Json::objectValue);
+  Json::Value spec(Json::arrayValue);
+  Json::Value anno(Json::objectValue);
+  Json::Value schm(Json::objectValue);
+
   for (std::set<std::string>::iterator it = specs.begin();
        it != specs.end(); ++it) {
-    specss << "\"" << *it << "\", ";
-    annoss << "\"" << *it << "\": " << annotations[*it] << ", ";
-    schmss << "\"" << *it << "\": \"" << schemas[*it] << "\", ";
+    spec.append(*it);
+    anno[*it] = annotations[*it];
+    schm[*it] = schemas[*it];
   }
-  specss << "]";
-  annoss << "}";
-  schmss << "}";
-    
-  // validate
-  Json::Value root;
-  Json::Reader reader;
-  bool parsed_ok = reader.parse("{" +\
-                                specss.str() + ", " + \
-                                annoss.str() + ", " + \
-                                schmss.str() + ", " + \
-                                "}", root);
-  if (!parsed_ok) {
-    throw cyclus::ValueError("Failed to parse metadata in Cyclus path.");
-  }
+  root["specs"] = spec;
+  root["annotations"] = anno;
+  root["schema"] = schm;
+  
   return root;
 }
 
