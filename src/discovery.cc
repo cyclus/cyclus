@@ -131,72 +131,28 @@ std::set<std::string> DiscoverSpecsInCyclusPath() {
   return specs;
 }
 
-std::string DiscoverAnnotations(std::string spec) {  
-  Recorder rec;
-  Timer ti;
-  Context* ctx = new Context(&ti, &rec);
-  Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
-                                                 ", ", " ", 80);
-  Agent* m = DynamicModule::Make(ctx, spec);
-  std::string ret = writer.write(m->annotations());
-  ctx->DelAgent(m);
-  delete ctx;
-  return ret;
-}
-
-std::map<std::string, std::string> DiscoverAnnotationsInCyclusPath() {
-  using std::string;
-  using std::set;
-  using std::map;
-  set<string> specs = DiscoverSpecsInCyclusPath();
-  map<string, string> spec_map;
-  for (set<string>::iterator it = specs.begin(); it != specs.end(); ++it)
-    spec_map[*it] = DiscoverAnnotations(*it);
-  return spec_map;
-}
- 
-std::string DiscoverSchema(std::string spec) {  
-  Recorder rec;
-  Timer ti;
-  Context* ctx = new Context(&ti, &rec);
-  Agent* m = DynamicModule::Make(ctx, spec);
-  std::string ret = m->schema();
-  ctx->DelAgent(m);
-  delete ctx;
-  return ret;
-}
-
-std::map<std::string, std::string> DiscoverSchemaInCyclusPath() {
-  using std::string;
-  using std::set;
-  using std::map;
-  set<string> specs = DiscoverSpecsInCyclusPath();
-  map<string, string> spec_map;
-  for (set<string>::iterator it = specs.begin(); it != specs.end(); ++it)
-    spec_map[*it] = DiscoverSchema(*it);
-  return spec_map;
-}
-
 Json::Value DiscoverMetadataInCyclusPath() {
-  // get archetype data
   std::set<std::string> specs = cyclus::DiscoverSpecsInCyclusPath();
-  std::map<std::string, std::string> annotations =
-      cyclus::DiscoverAnnotationsInCyclusPath();
-  std::map<std::string, std::string> schemas =
-      cyclus::DiscoverSchemaInCyclusPath();
-    
-  // populate streams
   Json::Value root(Json::objectValue);
   Json::Value spec(Json::arrayValue);
   Json::Value anno(Json::objectValue);
   Json::Value schm(Json::objectValue);
+  Recorder rec;
+  Timer ti;
+  Context* ctx = new Context(&ti, &rec);
+  std::string s;
+  std::set<std::string>::iterator it;
 
-  for (std::set<std::string>::iterator it = specs.begin();
-       it != specs.end(); ++it) {
-    spec.append(*it);
-    anno[*it] = annotations[*it];
-    schm[*it] = schemas[*it];
+  for (it = specs.begin(); it != specs.end(); ++it) {
+    s = *it;
+    Agent* m = DynamicModule::Make(ctx, s);
+    spec.append(s);
+    anno[*it] = m->annotations();
+    schm[*it] = m->schema();
+    ctx->DelAgent(m);
   }
+  delete ctx;
+
   root["specs"] = spec;
   root["annotations"] = anno;
   root["schema"] = schm;
