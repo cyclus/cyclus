@@ -147,8 +147,8 @@ Json::Value DiscoverMetadataInCyclusPath() {
     s = *it;
     Agent* m = DynamicModule::Make(ctx, s);
     spec.append(s);
-    anno[*it] = m->annotations();
-    schm[*it] = m->schema();
+    anno[s] = m->annotations();
+    schm[s] = m->schema();
     ctx->DelAgent(m);
   }
   delete ctx;
