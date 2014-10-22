@@ -380,5 +380,5 @@ Releases
 ========
 
 If you are going through a release of Cyclus and Cycamore, check out the release
-procedure notes :doc:`here <doc/release_procedure.rst>` and on the `website
+procedure notes :ref:`here <doc/release_procedure.rst>` and on the `website
 <http://fuelcycle.org/cep/cep3.html>`_.
