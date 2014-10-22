@@ -7,7 +7,7 @@ Cyclus/Cycamore Basic Release Procedure
 
 #. `git push upstream develop`
 
-# `git push upstream <version>`
+#. `git push upstream <version>`
 
 #. Update cycamore/src/version.h
 
@@ -15,7 +15,7 @@ Cyclus/Cycamore Basic Release Procedure
 
 #. `git push upstream develop`
 
-# `git push upstream <version>`
+#. `git push upstream <version>`
 
 #. Follow instructions in cycamore/tests/README.rst
 
