@@ -375,3 +375,11 @@ See also
 
 A good description of a git workflow with good graphics is available at
 http://nvie.com/posts/a-successful-git-branching-agent/
+
+Releases
+========
+
+If you are going through a release of Cyclus and Cycamore, check out the release
+procedure notes `here
+<https://github.com/cyclus/cyclus/blob/develop/doc/release_procedure.rst>`_ and
+on the `website <http://fuelcycle.org/cep/cep3.html>`_.
