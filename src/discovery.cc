@@ -1,5 +1,23 @@
 #include "discovery.h"
 
+#include <fstream>
+#include <iostream>
+#include <streambuf>
+#include <vector>
+
+#include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
+#include "agent.h"
+#include "context.h"
+#include "dynamic_module.h"
+#include "env.h"
+#include "recorder.h"
+#include "suffix.h"
+#include "timer.h"
+
 namespace cyclus {
 
 std::set<std::string> DiscoverArchetypes(const std::string s) {
@@ -111,6 +129,35 @@ std::set<std::string> DiscoverSpecsInCyclusPath() {
       specs.insert(*ds);
   }
   return specs;
+}
+
+Json::Value DiscoverMetadataInCyclusPath() {
+  std::set<std::string> specs = cyclus::DiscoverSpecsInCyclusPath();
+  Json::Value root(Json::objectValue);
+  Json::Value spec(Json::arrayValue);
+  Json::Value anno(Json::objectValue);
+  Json::Value schm(Json::objectValue);
+  Recorder rec;
+  Timer ti;
+  Context* ctx = new Context(&ti, &rec);
+  std::string s;
+  std::set<std::string>::iterator it;
+
+  for (it = specs.begin(); it != specs.end(); ++it) {
+    s = *it;
+    Agent* m = DynamicModule::Make(ctx, s);
+    spec.append(s);
+    anno[s] = m->annotations();
+    schm[s] = m->schema();
+    ctx->DelAgent(m);
+  }
+  delete ctx;
+
+  root["specs"] = spec;
+  root["annotations"] = anno;
+  root["schema"] = schm;
+  
+  return root;
 }
 
 }  // namespace cyclus

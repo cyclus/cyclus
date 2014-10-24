@@ -5,6 +5,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <optional><element name="schematype"><text/></element></optional>
 <interleave>
 
+  <optional><element name="ui"><text/></element></optional>
+
   <element name ="control">
     <interleave>
       <optional>

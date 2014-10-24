@@ -11,7 +11,8 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::OpenLibrary() {
-  module_library_ = dlopen(path_.c_str(), RTLD_LAZY);
+  // Do not change this to RTLD_LAZY, because it randomly breaks modules discovery!
+  module_library_ = dlopen(path_.c_str(), RTLD_NOW);
 
   if (!module_library_) {
     std::string err_msg = "Unable to load agent shared object file: ";
