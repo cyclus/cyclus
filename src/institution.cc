@@ -17,6 +17,9 @@ Institution::Institution(Context* ctx) : Agent(ctx) {
   kind_ = "Inst";
 }
 
+Institution::~Institution() {
+}
+
 void Institution::InitFrom(Institution* m) {
   Agent::InitFrom(m);
 }

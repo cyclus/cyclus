@@ -72,7 +72,7 @@ def nm(ns):
         if ' ' in name:
             # handle funny private pointer cases
             pre, post = name.split(' ', 1)
-            if pre.endswith('*') or post.startswith('std::__'):
+            if pre.endswith('*') or post.startswith('std::__') or post.startswith('const* std::__'):
                 continue
         # use trailing underscore naming convention to skip private variables
         m = NAME_RE.match(name)

@@ -35,7 +35,7 @@ class Institution : public Agent, public TimeListener {
   Institution(Context* ctx);
 
   /// every agent should be destructable
-  virtual ~Institution() {}
+  virtual ~Institution();
 
   // DO NOT call Agent class implementation of this method
   virtual void InfileToDb(InfileTree* qe, DbInit di) {}
