@@ -61,7 +61,7 @@ def nm(ns):
     names = set()
     ok_types = {'B', 'b', 'D', 'd', 'R', 'r', 'S', 's', 'T', 't', 'W', 'w', 'u'}
     for line in stdout.splitlines():
-        line = line.strip()
+        line = line.strip().decode()
         if len(line) == 0 or not line[0].isdigit():
             continue
         val, typ, name = line.split(None, 2)
@@ -72,7 +72,7 @@ def nm(ns):
         if ' ' in name:
             # handle funny private pointer cases
             pre, post = name.split(' ', 1)
-            if pre.endswith('*') or post.startswith('std::__'):
+            if pre.endswith('*') or post.startswith('std::__') or post.startswith('const* std::__'):
                 continue
         # use trailing underscore naming convention to skip private variables
         m = NAME_RE.match(name)
@@ -84,7 +84,7 @@ def nm(ns):
 def git_log():
     """Returns git SHA, date, and timestamp from log."""
     stdout = subprocess.check_output(['git', 'log', '--pretty=format:%H/%ci/%ct', '-n1'])
-    return stdout.strip().split('/')
+    return stdout.decode().strip().split('/')
 
 def core_version():
     stdout = subprocess.check_output(['cyclus', '--version'])

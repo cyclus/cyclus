@@ -6,7 +6,7 @@ import numpy as np
 import tables
 
 def hasher(x):
-    return int(sha1(x).hexdigest(), 16)
+    return int(sha1(x.encode()).hexdigest(), 16)
 
 def idx(h):
     ind = [None] * 5

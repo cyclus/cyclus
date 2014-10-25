@@ -16,7 +16,7 @@ def test_stub_example():
     sim_input = "./input/stub_example.xml"
     holdsrtn = [1]  # needed because nose does not send() to test generator
     cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    yield check_cmd, cmd, os.getcwd(), holdsrtn
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands
