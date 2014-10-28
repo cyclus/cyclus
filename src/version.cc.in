@@ -8,6 +8,7 @@
 #include "boost/version.hpp"
 #include "hdf5.h"
 #include "libxml/xmlversion.h"
+#include "libxml++config.h"
 #include "sqlite3.h"
 
 // required for coin-cbc v < 2.5
@@ -54,6 +55,15 @@ const char* hdf5() {
 
 const char* xml2() {
   return LIBXML_DOTTED_VERSION;
+}
+
+const char* xmlpp() {
+  #ifdef LIBXMLXX_MAJOR_VERSION
+    return SVER(LIBXMLXX_MAJOR_VERSION, LIBXMLXX_MINOR_VERSION, \
+                LIBXMLXX_MICRO_VERSION);
+  #else
+    return "<2.37";
+  #endif
 }
 
 const char* coincbc() {

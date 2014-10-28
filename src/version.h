@@ -20,6 +20,8 @@ const char* hdf5();
 
 const char* xml2();
 
+const char* xmlpp();
+
 const char* coincbc();
 
 const char* coinclp();
