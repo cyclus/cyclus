@@ -285,6 +285,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
     std::cout << "   Hdf5     " << version::hdf5() << "\n";
     std::cout << "   Sqlite3  " << version::sqlite3() << "\n";
     std::cout << "   xml2     " << version::xml2() << "\n";
+    std::cout << "   xml++    " << version::xmlpp() << "\n";
     return 0;
   } else if (ai.vm.count("path")) {
     std::vector<std::string> p = Env::cyclus_path();

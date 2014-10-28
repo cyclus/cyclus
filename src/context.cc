@@ -163,6 +163,10 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("Decay", si.decay)
       ->Record();
 
+  NewDatum("XMLPPInfo")
+      ->AddVal("LibXMLPlusPlusVersion", std::string(version::xmlpp()))
+      ->Record();
+
   si_ = si;
   ti_->Initialize(this, si);
 }
