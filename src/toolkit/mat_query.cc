@@ -1,4 +1,5 @@
 #include "mat_query.h"
+#include "pyne.h"
 
 #include <cmath>
 
@@ -29,6 +30,22 @@ double MatQuery::atom_frac(Nuc nuc) {
   CompMap v = m_->comp()->atom();
   compmath::Normalize(&v);
   return v[nuc];
+}
+
+double MatQuery::mass(std::string nuc) {
+  return mass(pyne::nucname::id(nuc));
+}
+
+double MatQuery::moles(std::string nuc) {
+  return moles(pyne::nucname::id(nuc));
+}
+
+double MatQuery::mass_frac(std::string nuc) {
+  return mass_frac(pyne::nucname::id(nuc));
+}
+
+double MatQuery::atom_frac(std::string nuc) {
+  return atom_frac(pyne::nucname::id(nuc));
 }
 
 bool MatQuery::AlmostEq(Material::Ptr other, double threshold) {
