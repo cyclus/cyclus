@@ -93,6 +93,7 @@ class Material: public Resource {
   /// Returns Material::kType.
   virtual const ResourceType type() const;
 
+  /// Creates an untracked copy of this material object.
   virtual Resource::Ptr Clone() const;
 
   /// Records the internal nuclide composition of this resource.

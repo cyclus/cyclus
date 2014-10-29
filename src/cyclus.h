@@ -49,5 +49,6 @@
 #include "toolkit/symbolic_functions.h"
 #include "toolkit/mat_query.h"
 #include "toolkit/resource_buff.h"
+#include "toolkit/res_manip.h"
 
 #endif  // CYCLUS_SRC_CYCLUS_H_
