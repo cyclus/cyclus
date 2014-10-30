@@ -57,8 +57,8 @@ class CommodityRecipeContext : public StateWrangler {
   }
 
   /// @return output recipe of an input recipe
-  inline std::string out_recipe(std::string in_recipe) {
-    return out_recipes_[in_recipe];
+  inline std::string out_recipe(std::string in_commod) {
+    return out_recipes_[in_commod];
   }
 
   /// @return commodity of a material

@@ -20,12 +20,11 @@ TEST(CommodRecCtx, All) {
   ctx.AddInCommod(in_c, in_r, out_c, out_r);
   EXPECT_EQ(ctx.out_commod(in_c), out_c);
   EXPECT_EQ(ctx.in_recipe(in_c), in_r);
-  EXPECT_EQ(ctx.out_recipe(in_r), out_r);
+  EXPECT_EQ(ctx.out_recipe(in_c), out_r);
 
   ctx.UpdateInRec(in_c, in_r2);
   EXPECT_EQ(ctx.in_recipe(in_c), in_r2);
-  EXPECT_EQ(ctx.out_recipe(in_r), out_r);
-  EXPECT_EQ(ctx.out_recipe(in_r2), out_r);
+  EXPECT_EQ(ctx.out_recipe(in_c), out_r);
 
   ctx.AddRsrc(in_c, mat);
   EXPECT_EQ(ctx.commod(mat), in_c);

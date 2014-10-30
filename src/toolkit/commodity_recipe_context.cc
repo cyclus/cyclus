@@ -14,7 +14,7 @@ void CommodityRecipeContext::AddInCommod(std::string in_commod,
   out_commods_.insert(out_commod);
   out_commod_map_[in_commod] = out_commod;
   in_recipes_[in_commod] = in_recipe;
-  out_recipes_[in_recipe]  = out_recipe;
+  out_recipes_[in_commod]  = out_recipe;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -35,7 +35,6 @@ void CommodityRecipeContext::UpdateRsrc(std::string commod, Resource::Ptr rsrc) 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void CommodityRecipeContext::UpdateInRec(std::string incommod,
                                          std::string recipe) {
-  out_recipes_[recipe] = out_recipes_[in_recipes_[incommod]];
   in_recipes_[incommod] = recipe;
 }
 
@@ -81,11 +80,11 @@ void CommodityRecipeContext::Snapshot(DbInit di) {
   for (it2 = in_commods_.begin(); it2 != in_commods_.end(); ++it2) {
     std::string c = *it2;
     di.NewDatum("CommodityRecipeContext_inoutmap")
-        ->AddVal("in_commod", c)
-        ->AddVal("in_recipe", in_recipes_[c])
-        ->AddVal("out_commod", out_commod_map_[c])
-        ->AddVal("out_recipe", out_recipes_[in_recipes_[c]])
-        ->Record();
+      ->AddVal("in_commod", c)
+      ->AddVal("in_recipe", in_recipes_[c])
+      ->AddVal("out_commod", out_commod_map_[c])
+      ->AddVal("out_recipe", out_recipes_[c])
+      ->Record();
   }
 
   std::map<int, std::string>::iterator it = rsrc_commod_map_.begin();
