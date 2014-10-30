@@ -91,18 +91,17 @@ TEST(ResManipTests, Squash) {
   EXPECT_DOUBLE_EQ(testprod()->quantity()*n, tot);
 }
 
-TEST(ResManipTests, Separate) {
+TEST(ResManipTests, Separate_ByNuc) {
   Material::Ptr m = testmat();
 
-  cyclus::toolkit::NucEffs effs;
-  effs[922350000] = 1;
-  effs[942390000] = 0.7;
+  cyclus::toolkit::NucMap effs;
+  effs.Add(922350000, 1)
+      .Add(942390000, 0.7);
 
   Material::Ptr stream = Separate(m, effs);
   cyclus::toolkit::MatQuery mq(m);
   cyclus::toolkit::MatQuery mqstream(stream);
   cyclus::toolkit::MatQuery mqref(testmat());
-
 
   // remains after separations are correct
   EXPECT_DOUBLE_EQ(0, mq.mass("U235")); // extracted all
@@ -114,5 +113,28 @@ TEST(ResManipTests, Separate) {
   EXPECT_DOUBLE_EQ(mqref.mass("U238"), mqstream.mass("U238") + mq.mass("U238"));
   EXPECT_DOUBLE_EQ(mqref.mass("Pu239"), mqstream.mass("Pu239") + mq.mass("Pu239"));
 
+}
+
+TEST(ResManipTests, Separate_ByElt) {
+  Material::Ptr m = testmat();
+
+  cyclus::toolkit::EltMap effs;
+  effs.Add(92, 1)
+      .Add(94, 0.7);
+
+  Material::Ptr stream = Separate(m, effs);
+  cyclus::toolkit::MatQuery mq(m);
+  cyclus::toolkit::MatQuery mqstream(stream);
+  cyclus::toolkit::MatQuery mqref(testmat());
+
+  // remains after separations are correct
+  EXPECT_DOUBLE_EQ(0, mq.mass("U235")); // extracted all
+  EXPECT_DOUBLE_EQ(0, mq.mass("U238")); // extracted all
+  EXPECT_DOUBLE_EQ(0.3*mqref.mass("Pu239"), mq.mass("Pu239")); // extracted part
+
+  // nuclide mass conservation
+  EXPECT_DOUBLE_EQ(mqref.mass("U235"), mqstream.mass("U235") + mq.mass("U235"));
+  EXPECT_DOUBLE_EQ(mqref.mass("U238"), mqstream.mass("U238") + mq.mass("U238"));
+  EXPECT_DOUBLE_EQ(mqref.mass("Pu239"), mqstream.mass("Pu239") + mq.mass("Pu239"));
 }
 
