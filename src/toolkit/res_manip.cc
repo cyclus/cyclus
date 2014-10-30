@@ -4,6 +4,12 @@
 namespace cyclus {
 namespace toolkit {
 
+NucMap::NucMap() { }
+
+NucMap::NucMap(CompMap m) {
+  nucs_ = m;
+}
+
 NucMap& NucMap::Add(std::string nuc, double val) {
   nucs_[pyne::nucname::id(nuc)] = val;
   return *this;
@@ -26,6 +32,12 @@ Composition::Ptr NucMap::Mass() {
 }
 CompMap NucMap::Map() {
   return nucs_;
+}
+
+EltMap::EltMap() { }
+
+EltMap::EltMap(std::map<int, double> elts) {
+  elts_ = elts;
 }
 
 EltMap& EltMap::Add(std::string elt, double val) {

@@ -18,6 +18,11 @@ class NucVals {
 /// creating compositions and separations.
 class NucMap : public NucVals {
   public:
+    NucMap();
+
+    /// Create a NucMap with an initial mapping of nuclides to values.
+    NucMap(CompMap m);
+
     /// Adds the named nuclide to the map, overwriting any previous value it
     /// may have had.  Use fractions from 0 to 1 for separations.
     NucMap& Add(std::string nuc, double val);
@@ -34,7 +39,7 @@ class NucMap : public NucVals {
     /// values as mass-based relative quantities.
     Composition::Ptr Mass();
 
-    /// Returns the underlying CompMap.
+    /// Returns the underlying nuclide-value map.
     CompMap Map();
 
     /// Implements NucVals interface for use in things like the Separate
@@ -49,12 +54,18 @@ class NucMap : public NucVals {
 /// separations.
 class EltMap : public NucVals {
   public:
+    EltMap();
+
+    /// Create an EltMap with an initial mapping of element Z number to
+    /// values.
+    EltMap(std::map<int, double> elts);
+
     /// Adds the named element to the map, overwriting any previous value it
     /// may have had.
     EltMap& Add(std::string elt, double val);
 
     /// Adds the named element to the map, overwriting any previous value it
-    /// may have had.
+    /// may have had.  elt_z must be the Z number for an element.
     EltMap& Add(int elt_z, double val);
 
     /// Implements NucVals interface for use in things like the Separate
@@ -62,6 +73,9 @@ class EltMap : public NucVals {
     /// return.  If "U" was added with a value of 0.5, for every nuclide of
     /// uranium, this function would return 0.5.
     virtual double Val(Nuc n);
+
+    /// Returns the underlying element-value map.
+    std::map<int, double> Map();
 
   private:
     std::map<int, double> elts_;
