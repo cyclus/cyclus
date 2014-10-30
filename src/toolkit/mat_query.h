@@ -4,7 +4,6 @@
 #include "comp_math.h"
 #include "cyc_limits.h"
 #include "material.h"
-#include "pyne.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -21,14 +20,26 @@ class MatQuery {
   /// Returns the mass in kg of nuclide nuc in the material.
   double mass(Nuc nuc);
 
+  /// Returns the mass in kg of nuclide nuc in the material.  
+  double mass(std::string nuc);
+
   /// Returns the number of moles of nuclide nuc in the material.
   double moles(Nuc nuc);
+
+  /// Returns the number of moles of nuclide nuc in the material.
+  double moles(std::string nuc);
 
   /// Returns the mass fraction of nuclide nuc in the material.
   double mass_frac(Nuc nuc);
 
+  /// Returns the mass fraction of nuclide nuc in the material.
+  double mass_frac(std::string nuc);
+
   /// returns the atom/mole fraction of nuclide nuc in the material.
   double atom_frac(Nuc nuc);
+
+  /// returns the atom/mole fraction of nuclide nuc in the material.
+  double atom_frac(std::string nuc);
 
   /// Returns true if all nuclide fractions of the material and other
   /// are the same within threshold.

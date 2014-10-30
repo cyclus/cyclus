@@ -1,30 +1,31 @@
 #include "res_manip.h"
+#include "comp_math.h"
 
 namespace cyclus {
 namespace toolkit {
 
-Product::Ptr SquashProd(std::vector<Product::Ptr> rs) {
-  if (rs.size() == 0) {
+Product::Ptr SquashProd(std::vector<Product::Ptr> ps) {
+  if (ps.size() == 0) {
     throw Error("cannot squash zero resources together");
   }
 
-  Product::Ptr r = rs[0];
-  for (int i = 1; i < rs.size(); ++i) {
-    r->Absorb(rs[i]);
+  Product::Ptr p = ps[0];
+  for (int i = 1; i < ps.size(); ++i) {
+    p->Absorb(ps[i]);
   }
-  return r;
+  return p;
 }
 
-Material::Ptr SquashMat(std::vector<Material::Ptr> rs) {
-  if (rs.size() == 0) {
+Material::Ptr SquashMat(std::vector<Material::Ptr> ms) {
+  if (ms.size() == 0) {
     throw Error("cannot squash zero resources together");
   }
 
-  Material::Ptr r = rs[0];
-  for (int i = 1; i < rs.size(); ++i) {
-    r->Absorb(rs[i]);
+  Material::Ptr m = ms[0];
+  for (int i = 1; i < ms.size(); ++i) {
+    m->Absorb(ms[i]);
   }
-  return r;
+  return m;
 }
 
 Resource::Ptr Squash(std::vector<Resource::Ptr> rs) {
@@ -44,6 +45,25 @@ Resource::Ptr Squash(std::vector<Resource::Ptr> rs) {
   throw Error("cannot squash resource type " + rs[0]->type());
 }
   
+Material::Ptr Separate(Material::Ptr m, std::map<Nuc, double> fracs) {
+  CompMap cm = m->comp()->mass();
+  compmath::Normalize(&cm, m->quantity());
+  CompMap::iterator it;
+  double qty = 0;
+  for (it = cm.begin(); it != cm.end(); ++it) {
+    Nuc n = it->first;
+    if (fracs.count(n) == 0) {
+      cm[n] = 0;
+    } else {
+      cm[n] *= fracs[n];
+      qty += cm[n];
+    }
+  }
+
+  Composition::Ptr c = Composition::CreateFromMass(cm);
+  return m->ExtractComp(std::min(qty, m->quantity()), c);
+}
+
 }  // namespace toolkit
 }  // namespace cyclus
 

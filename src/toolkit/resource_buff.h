@@ -101,8 +101,13 @@ class ResourceBuff {
   /// store's current inventoryNum or the specified number is negative.
   Manifest PopN(int num);
 
+  /// Peek returns the next resource that will be popped from the buffer
+  /// without actually removing it from the buffer.
   template <class T>
   typename T::Ptr Peek() {
+    if (mats_.size() < 1) {
+      throw ValueError("cannot peek at resource from an empty buff");
+    }
     return boost::dynamic_pointer_cast<T>(mats_.front());
   }
 
