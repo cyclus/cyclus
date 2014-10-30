@@ -116,18 +116,35 @@ TEST_F(TradeExecutorTests, SupplierResponses) {
 
   std::map<Trader*,
            std::vector< std::pair<Trade<Material>, Material::Ptr> > >
-      trades_by_requester;
-  trades_by_requester[r1].push_back(std::make_pair(t1, fac.mat));
-  trades_by_requester[r1].push_back(std::make_pair(t2, fac.mat));
-  trades_by_requester[r2].push_back(std::make_pair(t3, fac.mat));
-  EXPECT_EQ(exec.trade_ctx().trades_by_requester, trades_by_requester);
+      by_req_obs = exec.trade_ctx().trades_by_requester;
+  EXPECT_NE(std::find(by_req_obs[r1].begin(),
+                      by_req_obs[r1].end(),
+                      std::make_pair(t1, fac.mat)),
+            by_req_obs[r1].end());
+  EXPECT_NE(std::find(by_req_obs[r1].begin(),
+                      by_req_obs[r1].end(),
+                      std::make_pair(t2, fac.mat)),
+            by_req_obs[r1].end());
+  EXPECT_NE(std::find(by_req_obs[r2].begin(),
+                      by_req_obs[r2].end(),
+                      std::make_pair(t3, fac.mat)),
+            by_req_obs[r2].end());
 
   std::map<std::pair<Trader*, Trader*>,
-           std::vector< std::pair<Trade<Material>, Material::Ptr> > > all_trades;
-  all_trades[std::make_pair(s1, r1)].push_back(std::make_pair(t1, fac.mat));
-  all_trades[std::make_pair(s2, r1)].push_back(std::make_pair(t2, fac.mat));
-  all_trades[std::make_pair(s2, r2)].push_back(std::make_pair(t3, fac.mat));
-  EXPECT_EQ(exec.trade_ctx().all_trades, all_trades);
+           std::vector< std::pair<Trade<Material>, Material::Ptr> > >
+      all_t_obs = exec.trade_ctx().all_trades;
+  EXPECT_NE(std::find(all_t_obs[std::make_pair(s1, r1)].begin(),
+                      all_t_obs[std::make_pair(s1, r1)].end(),
+                      std::make_pair(t1, fac.mat)),
+            all_t_obs[std::make_pair(s1, r1)].end());
+  EXPECT_NE(std::find(all_t_obs[std::make_pair(s2, r1)].begin(),
+                      all_t_obs[std::make_pair(s2, r1)].end(),
+                      std::make_pair(t2, fac.mat)),
+            all_t_obs[std::make_pair(s2, r1)].end());
+  EXPECT_NE(std::find(all_t_obs[std::make_pair(s2, r2)].begin(),
+                      all_t_obs[std::make_pair(s2, r2)].end(),
+                      std::make_pair(t3, fac.mat)),
+            all_t_obs[std::make_pair(s2, r2)].end());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
