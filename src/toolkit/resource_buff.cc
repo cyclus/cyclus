@@ -113,7 +113,10 @@ Resource::Ptr ResourceBuff::Pop(AccessDir dir) {
 
 void ResourceBuff::Push(Resource::Ptr r) {
   if (r->quantity() - space() > eps_rsrc()) {
-    throw ValueError("resource pushing breaks capacity limit");
+    std::stringstream ss;
+    ss << "resource pushing breaks capacity limit: space=" << space()
+       << ", rsrc->quantity()=" << r->quantity();
+    throw ValueError(ss.str());
   } else if (mats_present_.count(r) == 1) {
     throw KeyError("duplicate resource push attempted");
   }
