@@ -212,14 +212,14 @@ class Agent : public StateWrangler, virtual public Ider {
   ///   // ...
   ///
   ///   void InitInv(cyclus::Inventories& inv) {
-  ///     buf1.PushAll(inv["buf1"]);
-  ///     buf2.PushAll(inv["buf2"]);
+  ///     buf1.Push(inv["buf1"]);
+  ///     buf2.Push(inv["buf2"]);
   ///
   ///     // ...
   ///   };
   ///
-  ///   cyclus::toolkit::ResourceBuff buf1;
-  ///   cyclus::toolkit::ResourceBuff buf2;
+  ///   cyclus::toolkit::ResBuf<Material> buf1;
+  ///   cyclus::toolkit::ResBuf<Material> buf2;
   ///
   ///   // ...
   /// };
@@ -240,11 +240,11 @@ class Agent : public StateWrangler, virtual public Ider {
   ///
   ///   cyclus::Inventories SnapshotInv() {
   ///     cyclus::Inventories invs;
-  ///     std::vector<cyclus::Resource::Ptr> rs = buf1.PopN(buf1.count());
-  ///     buf1.PushAll(rs); // Snapshot must not change agent's state
+  ///     cyclus::toolkit::ResVec rs = buf1.PopNRes(buf1.count());
+  ///     buf1.Push(rs); // Snapshot must not change agent's state
   ///     invs["buf1"] = rs;
-  ///     rs = buf1.PopN(buf2.count());
-  ///     buf1.PushAll(rs); // Snapshot must not change agent's state
+  ///     rs = buf2.PopNRes(buf2.count());
+  ///     buf2.Push(rs); // Snapshot must not change agent's state
   ///     invs["buf2"] = rs;
   ///
   ///     // ...
@@ -252,8 +252,8 @@ class Agent : public StateWrangler, virtual public Ider {
   ///     return invs;
   ///   };
   ///
-  ///   cyclus::toolkit::ResourceBuff buf1;
-  ///   cyclus::toolkit::ResourceBuff buf2;
+  ///   cyclus::toolkit::ResBuf<Material> buf1;
+  ///   cyclus::toolkit::ResBuf<Material> buf2;
   ///
   ///   // ...
   /// };

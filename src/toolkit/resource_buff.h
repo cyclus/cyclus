@@ -27,6 +27,9 @@ typedef std::vector<Resource::Ptr> Manifest;
 /// resource store has infinite capacity. Resource popping occurs in the order
 /// the resources were pushed (i.e. oldest resources are popped first), unless
 /// explicitly specified otherwise.
+///
+/// @warn In the near future this class will become deprecated in favor of
+/// ResBuf.
 class ResourceBuff {
  public:
   enum AccessDir {
