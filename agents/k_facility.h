@@ -187,7 +187,7 @@ class KFacility : public cyclus::Facility {
   double max_inv_size;
 
   #pragma cyclus var {'capacity': 'max_inv_size'}
-  cyclus::toolkit::ResourceBuff inventory;
+  cyclus::toolkit::ResBuf<cyclus::Resource> inventory;
 
   /// Conversion factors for input and output amounts.
   #pragma cyclus var {"tooltip": "input k-factor", \

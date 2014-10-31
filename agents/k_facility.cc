@@ -59,7 +59,7 @@ void KFacility::Tick() {
 void KFacility::Tock() {
   LOG(cyclus::LEV_INFO3, "KFac") << prototype() << " is tocking";
   LOG(cyclus::LEV_INFO4, "KFac") << "KFacility " << this->id()
-                                 << " is holding " << inventory.quantity()
+                                 << " is holding " << inventory.qty()
                                  << " units of material at the close of month "
                                  << context()->time() << ".";
   // Update capacity for the next step
