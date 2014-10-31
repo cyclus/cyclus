@@ -66,10 +66,10 @@ class ResourceBuff {
 
   /// Space returns the quantity of space remaining in this store.
   ///
-  /// It is effectively the difference between the capacity and the quantity.
-  /// Never throws.
+  /// It is effectively the difference between the capacity and the quantity
+  /// and is never negative. Never throws.
   inline double space() const {
-    return capacity_ - qty_;
+    return std::max(0.0, capacity_ - qty_);
   }
 
   /// Returns true if there are no mats in mats_
@@ -100,6 +100,16 @@ class ResourceBuff {
   /// @throws ValueError the specified pop number is larger than the
   /// store's current inventoryNum or the specified number is negative.
   Manifest PopN(int num);
+
+  /// Peek returns the next resource that will be popped from the buffer
+  /// without actually removing it from the buffer.
+  template <class T>
+  typename T::Ptr Peek() {
+    if (mats_.size() < 1) {
+      throw ValueError("cannot peek at resource from an empty buff");
+    }
+    return boost::dynamic_pointer_cast<T>(mats_.front());
+  }
 
   /// Pop pops one resource object from the store.
   ///

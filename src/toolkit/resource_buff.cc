@@ -94,7 +94,7 @@ Manifest ResourceBuff::PopN(int num) {
 
 Resource::Ptr ResourceBuff::Pop(AccessDir dir) {
   if (mats_.size() < 1) {
-    throw ValueError("cannot pop material from an empty buff");
+    throw ValueError("cannot pop resource from an empty buff");
   }
 
   Resource::Ptr r;
