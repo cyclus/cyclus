@@ -7,8 +7,6 @@ using cyclus::Material;
 using cyclus::Product;
 using cyclus::Resource;
 using cyclus::toolkit::Squash;
-using cyclus::toolkit::SquashProd;
-using cyclus::toolkit::SquashMat;
 using cyclus::toolkit::Separate;
 
 
@@ -32,7 +30,7 @@ TEST(ResManipTests, SquashMat) {
     mats.push_back(testmat());
   }
 
-  Material::Ptr big = SquashMat(mats);
+  Material::Ptr big = Squash(mats);
   EXPECT_DOUBLE_EQ(testmat()->quantity()*n, big->quantity());
 
   double tot = 0;
@@ -49,7 +47,7 @@ TEST(ResManipTests, SquashProd) {
     prods.push_back(testprod());
   }
 
-  Product::Ptr big = SquashProd(prods);
+  Product::Ptr big = Squash(prods);
   EXPECT_DOUBLE_EQ(testprod()->quantity()*n, big->quantity());
 
   double tot = 0;

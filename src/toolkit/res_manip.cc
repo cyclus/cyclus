@@ -56,7 +56,7 @@ double EltMap::Val(Nuc n) {
   return elts_[z];
 }
 
-Product::Ptr SquashProd(std::vector<Product::Ptr> ps) {
+Product::Ptr Squash(std::vector<Product::Ptr> ps) {
   if (ps.size() == 0) {
     throw Error("cannot squash zero resources together");
   }
@@ -68,7 +68,7 @@ Product::Ptr SquashProd(std::vector<Product::Ptr> ps) {
   return p;
 }
 
-Material::Ptr SquashMat(std::vector<Material::Ptr> ms) {
+Material::Ptr Squash(std::vector<Material::Ptr> ms) {
   if (ms.size() == 0) {
     throw Error("cannot squash zero resources together");
   }
@@ -87,11 +87,11 @@ Resource::Ptr Squash(std::vector<Resource::Ptr> rs) {
 
   std::vector<Material::Ptr> mats = ResCast<Material>(rs);
   if (mats[0] != NULL) {
-    return SquashMat(mats);
+    return Squash(mats);
   }
   std::vector<Product::Ptr> prods = ResCast<Product>(rs);
   if (prods[0] != NULL) {
-    return SquashProd(prods);
+    return Squash(prods);
   }
 
   throw Error("cannot squash resource type " + rs[0]->type());

@@ -81,15 +81,15 @@ class EltMap : public NucVals {
     std::map<int, double> elts_;
 };
 
-/// SquashProd combines all products in ps and returns the resulting single
+/// Squash combines all products in ps and returns the resulting single
 /// product.
-Product::Ptr SquashProd(std::vector<Product::Ptr> ps);
+Product::Ptr Squash(std::vector<Product::Ptr> ps);
 
-/// SquashProd combines all materials in ms and returns the resulting single
+/// Squash combines all materials in ms and returns the resulting single
 /// material.
-Material::Ptr SquashMat(std::vector<Material::Ptr> ms);
+Material::Ptr Squash(std::vector<Material::Ptr> ms);
 
-/// SquashProd combines all resources in rs and returns the resulting single
+/// Squash combines all resources in rs and returns the resulting single
 /// resource.
 Resource::Ptr Squash(std::vector<Resource::Ptr> rs);
 
