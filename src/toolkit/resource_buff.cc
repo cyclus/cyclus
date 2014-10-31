@@ -6,6 +6,10 @@
 namespace cyclus {
 namespace toolkit {
 
+ResourceBuff::ResourceBuff() : capacity_(kBuffInfinity), qty_(0) {
+  Warn<DEPRECATION_WARNING>("ResourceBuff is deprecated.  Please use ResBuf.");
+}
+
 void ResourceBuff::set_capacity(double cap) {
   if (quantity() - cap > eps_rsrc()) {
     std::stringstream ss;

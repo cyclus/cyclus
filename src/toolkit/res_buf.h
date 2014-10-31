@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_TOOLKIT_RES_BUF_H_
 #define CYCLUS_SRC_TOOLKIT_RES_BUF_H_
 
+#include <iomanip>
 #include <limits>
 #include <list>
 #include <set>
@@ -16,7 +17,7 @@
 namespace cyclus {
 namespace toolkit {
 
-static double const kBufInfinity = std::numeric_limits<double>::max();
+static double const kInfinity = std::numeric_limits<double>::max();
 
 typedef std::vector<Resource::Ptr> ResVect;
 typedef std::vector<Material::Ptr> MatVect;
@@ -33,7 +34,7 @@ typedef std::vector<Product::Ptr> ProdVect;
 template<class T>
 class ResBuf {
  public:
-  ResBuf() : cap_(kBufInfinity), qty_(0) {}
+  ResBuf() : cap_(kInfinity), qty_(0) {}
 
   virtual ~ResBuf() {}
 

@@ -86,12 +86,16 @@ RE_STATEMENT = re.compile(
 CYCNS = 'cyclus'
 
 PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob',
-              'boost::uuids::uuid'}
+        'boost::uuids::uuid', }
 
-BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS)}
+BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
+           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS+'::Resource'),
+           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS+'::Product'),
+           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS+'::Material'),
+           }
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
-             'std::map',}
+             'std::map','{0}::toolkit::ResBuf'.format(CYCNS),}
 
 WRANGLERS = {
     '{0}::Agent'.format(CYCNS),
@@ -603,7 +607,13 @@ class StateAccumulator(object):
     #
     supported_types = PRIMITIVES
     supported_types |= BUFFERS
+    supported_types |= {
+                       CYCNS+'::Resource',
+                       CYCNS+'::Material',
+                       CYCNS+'::Product',
+                       }
     known_templates = {
+        '{0}::toolkit::ResBuf'.format(CYCNS): ('T',),
         'std::vector': ('T',),
         'std::set': ('T',),
         'std::list': ('T',),
@@ -858,7 +868,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
             impl += ind + "{0}::InitFrom(m);\n".format(rent)
 
         impl += self.shapes_impl(ctx, ind)
-        cap_buffs = []
+        cap_buffs = {}
         for member, info in ctx.items():
             if not isinstance(info, Mapping):
                 # this member is a variable alias pointer
@@ -869,10 +879,13 @@ class InitFromCopyFilter(CodeGeneratorFilter):
             elif info['type'] not in BUFFERS:
                 impl += ind + "{0} = m->{0};\n".format(member)
             elif 'capacity' in info:
-                cap_buffs.append((member,))
+                cap_buffs[member] = info
 
-        for b in cap_buffs:
-            impl += ind + "{0}.set_capacity(m->{0}.capacity());\n".format(b[0])
+        for b, info in cap_buffs.items():
+            if isinstance(info['type'], STRING_TYPES): # ResourceBuff
+                impl += ind + "{0}.set_capacity(m->{0}.capacity());\n".format(b)
+            else: # ResBuf
+                impl += ind + "{0}.cap(m->{0}.cap());\n".format(b)
 
         return impl
 
@@ -899,7 +912,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
         for rent in rents:
             impl += ind + "{0}::InitFrom(b);\n".format(rent)
         # create body
-        cap_buffs = []
+        cap_buffs = {}
         impl += self.shapes_impl(ctx, ind)
         impl += ind + '{0}::QueryResult qr = b->Query("Info", NULL);\n'.format(CYCNS)
         for member, info in ctx.items():
@@ -913,15 +926,19 @@ class InitFromDbFilter(CodeGeneratorFilter):
             t = info['type']
             if t in BUFFERS:
                 if 'capacity' in info:
-                    cap_buffs.append((member, info['capacity']))
+                    cap_buffs[member] = info
                 continue
             tstr = type_to_str(t)
             if tstr.endswith('>'):
                 tstr += ' '
             impl += ind + '{0} = qr.GetVal<{1}>("{0}");\n'.format(member, tstr)
-        for b in cap_buffs:
-            impl += ind + ('{0}.set_capacity(qr.GetVal<double>'
-                           '("{1}"));\n').format(b[0], b[1])
+        for b, info in cap_buffs.items():
+            if isinstance(info['type'], STRING_TYPES): # ResourceBuff
+                impl += ind + ('{0}.set_capacity(qr.GetVal<double>'
+                               '("{1}"));\n').format(b, info['capacity'])
+            else: # ResBuf
+                impl += ind + ('{0}.cap(qr.GetVal<double>'
+                               '("{1}"));\n').format(b, info['capacity'])
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
@@ -1364,7 +1381,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
         context = cg.context
         ctx = context[self.given_classname]['vars']
         impl = ""
-        buffs = []
+        buffs = {}
         for member, info in ctx.items():
             if not isinstance(info, Mapping):
                 # this member is a variable alias pointer
@@ -1372,16 +1389,22 @@ class SnapshotInvFilter(CodeGeneratorFilter):
 
             t = info['type']
             if t in BUFFERS:
-                buffs.append(member)
+                buffs[member] = info
 
         impl = ind + "{0}::Inventories invs;\n".format(CYCNS)
 
-        for buff in buffs:
+        for buff, info in buffs.items():
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
-            impl += ind + ("invs[\"{0}\"] = "
-                           "{0}.PopN({0}.count());\n").format(buff)
+
+            if isinstance(info['type'], STRING_TYPES): # ResourceBuff
+                impl += ind + ("invs[\"{0}\"] = "
+                               "{0}.PopN({0}.count());\n").format(buff)
+            else: # ResBuf
+                impl += ind + ("invs[\"{0}\"] = "
+                               "{0}.PopN({0}.n());\n").format(buff)
+
             impl += ind + '{0}.PushAll(invs["{0}"]);\n'.format(buff)
         impl += ind + "return invs;\n"
         return impl

@@ -37,7 +37,7 @@ TEST_F(ResBufTest, GetCapacity_ExceptionsEmpty) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResBufTest, GetCapacity_InitialEmpty) {
-  EXPECT_DOUBLE_EQ(store_.cap(), kBufInfinity);
+  EXPECT_DOUBLE_EQ(store_.cap(), kInfinity);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,7 +52,7 @@ TEST_F(ResBufTest, Getset_capacityEmpty) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResBufTest, GetSpace_Empty) {
   ASSERT_NO_THROW(store_.space());
-  EXPECT_DOUBLE_EQ(store_.space(), kBufInfinity);
+  EXPECT_DOUBLE_EQ(store_.space(), kInfinity);
 
   store_.cap(zero_cap);
   ASSERT_NO_THROW(store_.space());
