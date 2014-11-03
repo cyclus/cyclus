@@ -73,7 +73,7 @@ class Resource {
   virtual double quantity() const = 0;
 
   /// Splits the resource and returns the extracted portion as a new resource
-  /// object.  Allows for things like ResourceBuff and Traders to split
+  /// object.  Allows for things like ResBuf and Traders to split
   /// offers/requests of arbitrary resource implementation type.
   ///
   /// @return a new resource object with same state id and quantity == quantity
