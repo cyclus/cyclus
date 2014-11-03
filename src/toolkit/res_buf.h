@@ -58,7 +58,7 @@ class ResBuf {
 
   /// Returns the total number of constituent resource objects
   /// in the buffer. Never throws.
-  inline int n() const {
+  inline int count() const {
     return rs_.size();
   }
 
@@ -102,7 +102,7 @@ class ResBuf {
     typename T::Ptr tmp;
     double left = qty;
     double quan;
-    while (left > 0 && n() > 0) {
+    while (left > 0 && count() > 0) {
       r = rs_.front();
       rs_.pop_front();
       quan = r->quantity();
@@ -126,7 +126,8 @@ class ResBuf {
 
 
   /// Same behavior as PopQty(double) except a non-zero eps may be specified
-  /// for cases where qty might be larger than the buffer's current quantity.
+  /// for cases where qty might be slightly larger than the buffer's current
+  /// quantity.
   std::vector<typename T::Ptr> PopQty(double qty, double eps) {
     if (qty > this->qty() + eps) {
       std::stringstream ss;
@@ -136,7 +137,7 @@ class ResBuf {
     }
 
     if (qty >= this->qty()) {
-      return PopN(n());
+      return PopN(count());
     }
     return PopQty(qty);
   }
@@ -149,9 +150,9 @@ class ResBuf {
   /// @throws ValueError the specified pop number is larger than the
   /// buffer's current inventoryNum or the specified number is negative.
   std::vector<typename T::Ptr> PopN(int num) {
-    if (n() < num || num < 0) {
+    if (count() < num || num < 0) {
       std::stringstream ss;
-      ss << "remove count " << num << " larger than buff count " << n();
+      ss << "remove count " << num << " larger than buff count " << count();
       throw ValueError(ss.str());
     }
 
@@ -168,17 +169,17 @@ class ResBuf {
   }
 
   /// Same as PopQty(double) except returns the Resource-typed objects.
-  std::vector<Resource::Ptr> PopQtyRes(double qty) {
+  ResVect PopQtyRes(double qty) {
     return ResCast<Resource>(PopQty(qty));
   }
 
   /// Same as PopQty(doble, double) except returns the Resource-typed objects.
-  std::vector<Resource::Ptr> PopQtyRes(double qty, double eps) {
+  ResVect PopQtyRes(double qty, double eps) {
     return ResCast<Resource>(PopQty(qty, eps));
   }
 
   /// Same as PopN except returns the Resource-typed objects.
-  std::vector<Resource::Ptr> PopNRes(int num) {
+  ResVect PopNRes(int num) {
     return ResCast<Resource>(PopN(num));
   }
 

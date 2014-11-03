@@ -240,10 +240,10 @@ class Agent : public StateWrangler, virtual public Ider {
   ///
   ///   cyclus::Inventories SnapshotInv() {
   ///     cyclus::Inventories invs;
-  ///     cyclus::toolkit::ResVect rs = buf1.PopNRes(buf1.n());
+  ///     cyclus::toolkit::ResVect rs = buf1.PopNRes(buf1.count());
   ///     buf1.Push(rs); // Snapshot must not change agent's state
   ///     invs["buf1"] = rs;
-  ///     rs = buf2.PopNRes(buf2.n());
+  ///     rs = buf2.PopNRes(buf2.count());
   ///     buf2.Push(rs); // Snapshot must not change agent's state
   ///     invs["buf2"] = rs;
   ///

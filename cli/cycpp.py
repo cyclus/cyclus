@@ -1402,7 +1402,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
                 impl += ind + '{0}.PushAll(invs["{0}"]);\n'.format(buff)
             else:  # ResBuf
                 impl += ind + ("invs[\"{0}\"] = "
-                               "{0}.PopNRes({0}.n());\n").format(buff)
+                               "{0}.PopNRes({0}.count());\n").format(buff)
                 impl += ind + '{0}.Push(invs["{0}"]);\n'.format(buff)
 
         impl += ind + "return invs;\n"

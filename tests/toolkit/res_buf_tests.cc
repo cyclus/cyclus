@@ -83,14 +83,14 @@ TEST_F(ResBufTest, GetQuantity_Filled) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResBufTest, GetCount_Empty) {
-  ASSERT_NO_THROW(store_.n());
-  EXPECT_EQ(store_.n(), 0);
+  ASSERT_NO_THROW(store_.count());
+  EXPECT_EQ(store_.count(), 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResBufTest, GetCount_Filled) {
-  ASSERT_NO_THROW(filled_store_.n());
-  EXPECT_DOUBLE_EQ(filled_store_.n(), 2);
+  ASSERT_NO_THROW(filled_store_.count());
+  EXPECT_DOUBLE_EQ(filled_store_.count(), 2);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -117,7 +117,7 @@ TEST_F(ResBufTest, RemoveQty_SingleNoSplit) {
   ASSERT_NO_THROW(manifest = filled_store_.PopQty(exact_qty));
   ASSERT_EQ(manifest.size(), 1);
   EXPECT_EQ(manifest.at(0), mat1_);
-  EXPECT_EQ(filled_store_.n(), 1);
+  EXPECT_EQ(filled_store_.count(), 1);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), mat2_->quantity());
 }
 
@@ -131,7 +131,7 @@ TEST_F(ResBufTest, RemoveQty_SingleWithSplit) {
   ASSERT_NO_THROW(manifest = filled_store_.PopQty(exact_qty_under));
   ASSERT_EQ(manifest.size(), 1);
   EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), exact_qty_under);
-  EXPECT_EQ(filled_store_.n(), 2);
+  EXPECT_EQ(filled_store_.count(), 2);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), orig_qty - exact_qty_under);
 }
 
@@ -146,7 +146,7 @@ TEST_F(ResBufTest, RemoveQty_DoubleWithSplit) {
   ASSERT_EQ(manifest.size(), 2);
   EXPECT_DOUBLE_EQ(manifest.at(0)->quantity() + \
                    manifest.at(1)->quantity(), exact_qty_over);
-  EXPECT_TRUE(filled_store_.n() == 1);
+  EXPECT_TRUE(filled_store_.count() == 1);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), orig_qty - exact_qty_over);
 }
 
@@ -164,7 +164,7 @@ TEST_F(ResBufTest, RemoveNum_ZeroFilled) {
 
   ASSERT_NO_THROW(manifest = filled_store_.PopN(0));
   ASSERT_EQ(manifest.size(), 0);
-  ASSERT_EQ(filled_store_.n(), 2);
+  ASSERT_EQ(filled_store_.count(), 2);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), tot_qty);
 }
 
@@ -174,7 +174,7 @@ TEST_F(ResBufTest, RemoveNum_OneFilled) {
 
   ASSERT_NO_THROW(manifest = filled_store_.PopN(1));
   ASSERT_EQ(manifest.size(), 1);
-  ASSERT_EQ(filled_store_.n(), 1);
+  ASSERT_EQ(filled_store_.count(), 1);
   EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), mat2_->quantity());
@@ -186,7 +186,7 @@ TEST_F(ResBufTest, RemoveNum_TwoFilled) {
 
   ASSERT_NO_THROW(manifest = filled_store_.PopN(2));
   ASSERT_EQ(manifest.size(), 2);
-  ASSERT_EQ(filled_store_.n(), 0);
+  ASSERT_EQ(filled_store_.count(), 0);
   EXPECT_DOUBLE_EQ(manifest.at(0)->quantity(), mat1_->quantity());
   EXPECT_EQ(manifest.at(0), mat1_);
   EXPECT_DOUBLE_EQ(manifest.at(1)->quantity(), mat2_->quantity());
@@ -201,13 +201,13 @@ TEST_F(ResBufTest, RemoveOne_Filled) {
   ASSERT_NO_THROW(mat = filled_store_.Pop());
   EXPECT_DOUBLE_EQ(mat->quantity(), mat1_->quantity());
   EXPECT_EQ(mat, mat1_);
-  EXPECT_EQ(filled_store_.n(), 1);
+  EXPECT_EQ(filled_store_.count(), 1);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), mat2_->quantity());
 
   ASSERT_NO_THROW(mat = filled_store_.Pop());
   EXPECT_DOUBLE_EQ(mat->quantity(), mat2_->quantity());
   EXPECT_EQ(mat, mat2_);
-  EXPECT_EQ(filled_store_.n(), 0);
+  EXPECT_EQ(filled_store_.count(), 0);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), 0.0);
 
   ASSERT_THROW(mat = filled_store_.Pop(), ValueError);
@@ -220,13 +220,13 @@ TEST_F(ResBufTest, PopBack) {
   ASSERT_NO_THROW(mat = filled_store_.PopBack());
   EXPECT_DOUBLE_EQ(mat->quantity(), mat2_->quantity());
   EXPECT_EQ(mat, mat2_);
-  EXPECT_EQ(filled_store_.n(), 1);
+  EXPECT_EQ(filled_store_.count(), 1);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), mat1_->quantity());
 
   ASSERT_NO_THROW(mat = filled_store_.PopBack());
   EXPECT_DOUBLE_EQ(mat->quantity(), mat1_->quantity());
   EXPECT_EQ(mat, mat1_);
-  EXPECT_EQ(filled_store_.n(), 0);
+  EXPECT_EQ(filled_store_.count(), 0);
   EXPECT_DOUBLE_EQ(filled_store_.qty(), 0.0);
 
   ASSERT_THROW(mat = filled_store_.PopBack(), ValueError);
@@ -239,11 +239,11 @@ TEST_F(ResBufTest, Push_Empty) {
   ASSERT_NO_THROW(store_.cap(cap));
 
   ASSERT_NO_THROW(store_.Push(mat1_));
-  ASSERT_EQ(store_.n(), 1);
+  ASSERT_EQ(store_.count(), 1);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity());
 
   ASSERT_NO_THROW(store_.Push(mat2_));
-  ASSERT_EQ(store_.n(), 2);
+  ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 }
 
@@ -258,12 +258,12 @@ TEST_F(ResBufTest, Push_OverCapacityEmpty) {
   Product::Ptr overmat = Product::CreateUntracked(topush + overeps, "food");
 
   ASSERT_THROW(store_.Push(overmat), ValueError);
-  ASSERT_EQ(store_.n(), 2);
+  ASSERT_EQ(store_.count(), 2);
   ASSERT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 
   overmat = Product::CreateUntracked(topush + undereps, "food");
   ASSERT_NO_THROW(store_.Push(overmat));
-  ASSERT_EQ(store_.n(), 3);
+  ASSERT_EQ(store_.count(), 3);
 
   double expected = mat1_->quantity() + mat2_->quantity() + overmat->quantity();
   ASSERT_DOUBLE_EQ(store_.qty(), expected);
@@ -276,7 +276,7 @@ TEST_F(ResBufTest, Push_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.Push(mat1_));
   ASSERT_THROW(store_.Push(mat1_), KeyError);
 
-  ASSERT_EQ(store_.n(), 1);
+  ASSERT_EQ(store_.count(), 1);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity());
 }
 
@@ -284,7 +284,7 @@ TEST_F(ResBufTest, Push_DuplicateEmpty) {
 TEST_F(ResBufTest, PushAll_Empty) {
   ASSERT_NO_THROW(store_.cap(cap));
   ASSERT_NO_THROW(store_.Push(mats));
-  ASSERT_EQ(store_.n(), 2);
+  ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 }
 
@@ -296,7 +296,7 @@ TEST_F(ResBufTest, PushAll_ResCast) {
   }
   ASSERT_NO_THROW(store_.cap(cap));
   ASSERT_NO_THROW(store_.Push(rs));
-  ASSERT_EQ(store_.n(), 2);
+  ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 }
 
@@ -305,7 +305,7 @@ TEST_F(ResBufTest, PushAll_NoneEmpty) {
   ProdVect manifest;
   ASSERT_NO_THROW(store_.cap(cap));
   ASSERT_NO_THROW(store_.Push(manifest));
-  ASSERT_EQ(store_.n(), 0);
+  ASSERT_EQ(store_.count(), 0);
   EXPECT_DOUBLE_EQ(store_.qty(), 0);
 }
 
@@ -332,7 +332,7 @@ TEST_F(ResBufTest, PushAll_OverCapacityEmpty) {
   overmats.push_back(overmat);
 
   ASSERT_THROW(store_.Push(overmats), ValueError);
-  ASSERT_EQ(store_.n(), 2);
+  ASSERT_EQ(store_.count(), 2);
   ASSERT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 
   overmats.clear();
@@ -340,7 +340,7 @@ TEST_F(ResBufTest, PushAll_OverCapacityEmpty) {
   overmats.push_back(overmat);
 
   ASSERT_NO_THROW(store_.Push(overmats));
-  ASSERT_EQ(store_.n(), 3);
+  ASSERT_EQ(store_.count(), 3);
 
   double expected = mat1_->quantity() + mat2_->quantity() + overmat->quantity();
   ASSERT_DOUBLE_EQ(store_.qty(), expected);
@@ -355,7 +355,7 @@ TEST_F(ResBufTest, PushAll_DuplicateEmpty) {
   ASSERT_THROW(store_.Push(mat2_), KeyError);
   ASSERT_THROW(store_.Push(mats), KeyError);
 
-  ASSERT_EQ(store_.n(), 2);
+  ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 }
 
