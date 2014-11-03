@@ -1401,11 +1401,12 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             if isinstance(info['type'], STRING_TYPES): # ResourceBuff
                 impl += ind + ("invs[\"{0}\"] = "
                                "{0}.PopN({0}.count());\n").format(buff)
+                impl += ind + '{0}.PushAll(invs["{0}"]);\n'.format(buff)
             else: # ResBuf
                 impl += ind + ("invs[\"{0}\"] = "
                                "{0}.PopNRes({0}.n());\n").format(buff)
+                impl += ind + '{0}.Push(invs["{0}"]);\n'.format(buff)
 
-            impl += ind + '{0}.PushAll(invs["{0}"]);\n'.format(buff)
         impl += ind + "return invs;\n"
         return impl
 
@@ -1425,7 +1426,7 @@ class InitInvFilter(CodeGeneratorFilter):
         context = cg.context
         ctx = context[self.given_classname]['vars']
         impl = ""
-        buffs = []
+        buffs = {}
         for member, info in ctx.items():
             if not isinstance(info, Mapping):
                 # this member is a variable alias pointer
@@ -1433,13 +1434,18 @@ class InitInvFilter(CodeGeneratorFilter):
 
             t = info['type']
             if t in BUFFERS:
-                buffs.append(member)
+                buffs[member] = info
 
-        for buff in buffs:
+        for buff, info in buffs.items():
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
-            impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(buff)
+
+            if isinstance(info['type'], STRING_TYPES): # ResourceBuff
+                impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(buff)
+            else: # ResBuf
+                impl += ind + "{0}.Push(inv[\"{0}\"]);\n".format(buff)
+
         return impl
 
 class DefaultPragmaFilter(Filter):

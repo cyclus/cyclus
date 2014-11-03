@@ -212,8 +212,8 @@ class Agent : public StateWrangler, virtual public Ider {
   ///   // ...
   ///
   ///   void InitInv(cyclus::Inventories& inv) {
-  ///     buf1.PushAll(inv["buf1"]);
-  ///     buf2.PushAll(inv["buf2"]);
+  ///     buf1.Push(inv["buf1"]);
+  ///     buf2.Push(inv["buf2"]);
   ///
   ///     // ...
   ///   };
@@ -241,10 +241,10 @@ class Agent : public StateWrangler, virtual public Ider {
   ///   cyclus::Inventories SnapshotInv() {
   ///     cyclus::Inventories invs;
   ///     cyclus::toolkit::ResVect rs = buf1.PopNRes(buf1.n());
-  ///     buf1.PushAll(rs); // Snapshot must not change agent's state
+  ///     buf1.Push(rs); // Snapshot must not change agent's state
   ///     invs["buf1"] = rs;
   ///     rs = buf2.PopNRes(buf2.n());
-  ///     buf2.PushAll(rs); // Snapshot must not change agent's state
+  ///     buf2.Push(rs); // Snapshot must not change agent's state
   ///     invs["buf2"] = rs;
   ///
   ///     // ...

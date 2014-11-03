@@ -252,7 +252,7 @@ class ResBuf {
     UpdateQty();
   }
 
-  /// PushAll pushes one or more resource objects (as a std::vector) to the
+  /// Push pushes one or more resource objects (as a std::vector) to the
   /// buffer.
   ///
   /// Resource objects are never combined in the buffer; they are stored as
@@ -266,7 +266,7 @@ class ResBuf {
   /// @throws KeyError one or more of the resource objects to be added
   /// are already present in the buffer.
   template <class B>
-  void PushAll(std::vector<B> rs) {
+  void Push(std::vector<B> rs) {
     std::vector<typename T::Ptr> rss;
     typename T::Ptr r;
     for (int i = 0; i < rs.size(); i++) {

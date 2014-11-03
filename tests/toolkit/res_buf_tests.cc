@@ -283,7 +283,7 @@ TEST_F(ResBufTest, Push_DuplicateEmpty) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResBufTest, PushAll_Empty) {
   ASSERT_NO_THROW(store_.cap(cap));
-  ASSERT_NO_THROW(store_.PushAll(mats));
+  ASSERT_NO_THROW(store_.Push(mats));
   ASSERT_EQ(store_.n(), 2);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 }
@@ -295,7 +295,7 @@ TEST_F(ResBufTest, PushAll_ResCast) {
     rs.push_back(mats[i]);
   }
   ASSERT_NO_THROW(store_.cap(cap));
-  ASSERT_NO_THROW(store_.PushAll(rs));
+  ASSERT_NO_THROW(store_.Push(rs));
   ASSERT_EQ(store_.n(), 2);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 }
@@ -304,7 +304,7 @@ TEST_F(ResBufTest, PushAll_ResCast) {
 TEST_F(ResBufTest, PushAll_NoneEmpty) {
   ProdVect manifest;
   ASSERT_NO_THROW(store_.cap(cap));
-  ASSERT_NO_THROW(store_.PushAll(manifest));
+  ASSERT_NO_THROW(store_.Push(manifest));
   ASSERT_EQ(store_.n(), 0);
   EXPECT_DOUBLE_EQ(store_.qty(), 0);
 }
@@ -314,7 +314,7 @@ TEST_F(ResBufTest, PushAll_RetrieveOrderEmpty) {
   Product::Ptr mat;
 
   ASSERT_NO_THROW(store_.cap(cap));
-  ASSERT_NO_THROW(store_.PushAll(mats));
+  ASSERT_NO_THROW(store_.Push(mats));
   ASSERT_NO_THROW(mat = store_.Pop());
   ASSERT_EQ(mat, mat1_);
   ASSERT_NO_THROW(mat = store_.Pop());
@@ -324,14 +324,14 @@ TEST_F(ResBufTest, PushAll_RetrieveOrderEmpty) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResBufTest, PushAll_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.cap(cap));
-  ASSERT_NO_THROW(store_.PushAll(mats));
+  ASSERT_NO_THROW(store_.Push(mats));
 
   double topush = cap - store_.qty();
   Product::Ptr overmat = Product::CreateUntracked(topush + overeps, "food");
   ProdVect overmats;
   overmats.push_back(overmat);
 
-  ASSERT_THROW(store_.PushAll(overmats), ValueError);
+  ASSERT_THROW(store_.Push(overmats), ValueError);
   ASSERT_EQ(store_.n(), 2);
   ASSERT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
 
@@ -339,7 +339,7 @@ TEST_F(ResBufTest, PushAll_OverCapacityEmpty) {
   overmat = Product::CreateUntracked(topush + undereps, "food");
   overmats.push_back(overmat);
 
-  ASSERT_NO_THROW(store_.PushAll(overmats));
+  ASSERT_NO_THROW(store_.Push(overmats));
   ASSERT_EQ(store_.n(), 3);
 
   double expected = mat1_->quantity() + mat2_->quantity() + overmat->quantity();
@@ -350,10 +350,10 @@ TEST_F(ResBufTest, PushAll_OverCapacityEmpty) {
 TEST_F(ResBufTest, PushAll_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.cap(2 * cap));
 
-  ASSERT_NO_THROW(store_.PushAll(mats));
+  ASSERT_NO_THROW(store_.Push(mats));
   ASSERT_THROW(store_.Push(mat1_), KeyError);
   ASSERT_THROW(store_.Push(mat2_), KeyError);
-  ASSERT_THROW(store_.PushAll(mats), KeyError);
+  ASSERT_THROW(store_.Push(mats), KeyError);
 
   ASSERT_EQ(store_.n(), 2);
   EXPECT_DOUBLE_EQ(store_.qty(), mat1_->quantity() + mat2_->quantity());
