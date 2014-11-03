@@ -86,16 +86,16 @@ RE_STATEMENT = re.compile(
 CYCNS = 'cyclus'
 
 PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob',
-        'boost::uuids::uuid', }
+              'boost::uuids::uuid', }
 
 BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
-           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS+'::Resource'),
-           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS+'::Product'),
-           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS+'::Material'),
+           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Resource'),
+           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Product'),
+           ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Material'),
            }
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
-             'std::map','{0}::toolkit::ResBuf'.format(CYCNS),}
+             'std::map', '{0}::toolkit::ResBuf'.format(CYCNS),}
 
 WRANGLERS = {
     '{0}::Agent'.format(CYCNS),
@@ -607,11 +607,9 @@ class StateAccumulator(object):
     #
     supported_types = PRIMITIVES
     supported_types |= BUFFERS
-    supported_types |= {
-                       CYCNS+'::Resource',
-                       CYCNS+'::Material',
-                       CYCNS+'::Product',
-                       }
+    supported_types |= {CYCNS+'::Resource',
+                        CYCNS+'::Material',
+                        CYCNS+'::Product',}
     known_templates = {
         '{0}::toolkit::ResBuf'.format(CYCNS): ('T',),
         'std::vector': ('T',),
@@ -882,9 +880,9 @@ class InitFromCopyFilter(CodeGeneratorFilter):
                 cap_buffs[member] = info
 
         for b, info in cap_buffs.items():
-            if isinstance(info['type'], STRING_TYPES): # ResourceBuff
+            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
                 impl += ind + "{0}.set_capacity(m->{0}.capacity());\n".format(b)
-            else: # ResBuf
+            else:  # ResBuf
                 impl += ind + "{0}.cap(m->{0}.cap());\n".format(b)
 
         return impl
@@ -933,10 +931,10 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 tstr += ' '
             impl += ind + '{0} = qr.GetVal<{1}>("{0}");\n'.format(member, tstr)
         for b, info in cap_buffs.items():
-            if isinstance(info['type'], STRING_TYPES): # ResourceBuff
+            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
                 impl += ind + ('{0}.set_capacity(qr.GetVal<double>'
                                '("{1}"));\n').format(b, info['capacity'])
-            else: # ResBuf
+            else:  # ResBuf
                 impl += ind + ('{0}.cap(qr.GetVal<double>'
                                '("{1}"));\n').format(b, info['capacity'])
         return impl
@@ -1398,11 +1396,11 @@ class SnapshotInvFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]
                 continue
 
-            if isinstance(info['type'], STRING_TYPES): # ResourceBuff
+            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
                 impl += ind + ("invs[\"{0}\"] = "
                                "{0}.PopN({0}.count());\n").format(buff)
                 impl += ind + '{0}.PushAll(invs["{0}"]);\n'.format(buff)
-            else: # ResBuf
+            else:  # ResBuf
                 impl += ind + ("invs[\"{0}\"] = "
                                "{0}.PopNRes({0}.n());\n").format(buff)
                 impl += ind + '{0}.Push(invs["{0}"]);\n'.format(buff)
@@ -1441,9 +1439,9 @@ class InitInvFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]
                 continue
 
-            if isinstance(info['type'], STRING_TYPES): # ResourceBuff
+            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
                 impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(buff)
-            else: # ResBuf
+            else:  # ResBuf
                 impl += ind + "{0}.Push(inv[\"{0}\"]);\n".format(buff)
 
         return impl

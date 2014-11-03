@@ -19,14 +19,17 @@ static double const kBuffInfinity = std::numeric_limits<double>::max();
 
 typedef std::vector<Resource::Ptr> Manifest;
 
-/// ResourceBuff is a helper function that provides semi-automated management of
-/// resource buffers (e.g. agent stocks and inventories).
+/// ResourceBuff is a DEPRECATED (use ResBuf) helper function that provides
+/// semi-automated management of resource buffers (e.g. agent stocks and
+/// inventories).
 ///
 /// Methods that begin with a "set", "make", "push", or "pop" prefix change the
 /// state/behavior of the store; other methods do not.  Default constructed
 /// resource store has infinite capacity. Resource popping occurs in the order
 /// the resources were pushed (i.e. oldest resources are popped first), unless
 /// explicitly specified otherwise.
+///
+/// @warn This class has been DERECATED in favor of ResBuf.
 class ResourceBuff {
  public:
   enum AccessDir {
