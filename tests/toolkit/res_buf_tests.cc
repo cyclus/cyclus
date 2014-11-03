@@ -5,8 +5,6 @@
 namespace cyclus {
 namespace toolkit {
 
-// Test order MATTERS.  Beware of reordering.
-
 // The "Empty" suffix indicates the test uses the store_ instance of
 // ResBuf. The "Filled" suffix indicates the test uses the
 // filled_store_ instance of ResBuf.
