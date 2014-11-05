@@ -956,26 +956,39 @@ class InfileToDbFilter(CodeGeneratorFilter):
         """returns a format string for a type t"""
         return '"{0}"' if t == 'std::string' else '{0}'
 
-    def read_primitive(self, member, alias, t, d, ind="  "):
-        s = ""
+    def _query(self, tree, alias, t, d, uitype=None, idx=None):
         tstr = type_to_str(t)
+        if tstr.endswith('>'):
+            tstr += " "
         tfmt = self._fmt(t)
+        # Get keys
+        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree}
         if d is None:
-            query = "Query"
-            dstr = ""
+            kw['query'] = "Query"
+            kw['default'] = ""
         else:
-            query = "OptionalQuery"
-            dstr = ", " + tfmt.format(d)
-        s += ind + '{0} = {1}::{2}<{3}>(tree, "{5}"{4});\n'\
-                   .format(member, CYCNS, query, tstr, dstr, alias)
+            kw['query'] = "OptionalQuery"
+            kw['default'] = ", " + tfmt.format(d)
+        kw['index'] = '' if idx is None else ', {0}'.format(idx)
+        # get template
+        if uitype == 'nuclide':
+            template = ('pyne::nucname::id({cycns}::{query}<std::string>({tree}, '
+                        '"{alias}"{default}{index}))')
+            if d is not None:
+                kw['default'] = ', "{0}"'.format(d)
+        else:
+            template = '{cycns}::{query}<{type}>({tree}, "{alias}"{default}{index})'
+        # fill in template and return 
+        return template.format(**kw)
+
+    def read_primitive(self, member, alias, t, d, uitype=None, ind="  "):
+        query = self._query('tree', alias, t, d, uitype)
+        s = '{ind}{member} = {query};\n'.format(ind=ind, member=member, query=query)
         return s
 
-    def read_vector(self, member, alias, t, d, ind="  "):
+    def read_vector(self, member, alias, t, d, uitype=None, ind="  "):
+        uitype = uitype or [None, None]
         s = ""
-        valstr = type_to_str(t[1])
-        if valstr.endswith('>'):
-            valstr += " "
-        valfmt = self._fmt(t[1])
         if d is not None:
             s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
             ind += '  '
@@ -983,8 +996,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + 'n = sub->NMatches("val");\n'
         s += ind + '{0}.resize(n);\n'.format(member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        s += ind + ('  {1}[i] = {0}::Query<{2}>(sub, "val", i);'
-                    '\n').format(CYCNS, member, valstr)
+        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
+        s += ind + '  {member}[i] = {query};\n'.format(member=member, query=query)
         s += ind + '}\n'
         if d is not None:
             ind = ind[:-2]
@@ -998,12 +1011,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_set(self, member, alias, t, d, ind="  "):
+    def read_set(self, member, alias, t, d, uitype=None, ind="  "):
+        uitype = uitype or [None, None]
         s = ""
-        valstr = type_to_str(t[1])
-        if valstr.endswith('>'):
-            valstr += " "
-        valfmt = self._fmt(t[1])
         s += ind + '{0}.clear();\n'.format(member)
         if d is not None:
             s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
@@ -1011,8 +1021,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
         s += ind + 'n = sub->NMatches("val");\n'
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        s += ind + ('  {1}.insert({0}::Query<{2}>(sub, "val", i));'
-                    '\n').format(CYCNS, member, valstr)
+        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
+        s += ind + '  {member}.insert({query});\n'.format(member=member, query=query)
         s += ind + '}\n'
         if d is not None:
             ind = ind[:-2]
@@ -1025,12 +1035,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_list(self, member, alias, t, d, ind="  "):
+    def read_list(self, member, alias, t, d, uitype=None, ind="  "):
+        uitype = uitype or [None, None]
         s = ""
-        valstr = type_to_str(t[1])
-        if valstr.endswith('>'):
-            valstr += " "
-        valfmt = self._fmt(t[1])
         s += ind + '{0}.clear();\n'.format(member)
         if d is not None:
             s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
@@ -1038,8 +1045,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
         s += ind + 'n = sub->NMatches("val");\n'
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        s += ind + ('  {1}.push_back({0}::Query<{2}>(sub, "val", i));'
-                    '\n').format(CYCNS, member, valstr)
+        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
+        s += ind + '  {1}.push_back({query});\n'.format(member=member, query=query)
         s += ind + '}\n'
         if d is not None:
             ind = ind[:-2]
@@ -1052,48 +1059,29 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_pair(self, member, alias, t, d, ind="  "):
+    def read_pair(self, member, alias, t, d, uitype=None, ind="  "):
+        uitype = uitype or [None, None, None]
         s = ""
-        firststr = type_to_str(t[1])
-        if firststr.endswith('>'):
-            firststr += " "
-        firstfmt = self._fmt(t[1])
-        secondstr = type_to_str(t[2])
-        if secondstr.endswith('>'):
-            secondstr += " "
-        secondfmt = self._fmt(t[2])
-        if d is None:
-            query = "Query"
-            dfirst = dsecond = ""
-        else:
-            query = "OptionalQuery"
-            dfirst = ", " + firstfmt.format(d[0])
-            dsecond = ", " + secondfmt.format(d[1])
-        s += ind + '{0}.first = {1}::{2}<{3}>(tree, "{5}/first"{4});\n'\
-                   .format(member, CYCNS, query, firststr, dfirst, alias)
-        s += ind + '{0}.second = {1}::{2}<{3}>(tree, "{5}/second"{4});\n'\
-                   .format(member, CYCNS, query, secondstr, dsecond, alias)
+        query = self._query('tree', alias + '/first', t[1], d[0], uitype[1])
+        s += ind + '{member}.first = {query};\n'.format(member=member, query=query)
+        query = self._query('tree', alias + '/second', t[1], d[0], uitype[1])
+        s += ind + '{member}.second = {query};\n'.format(member=member, query=query)
         return s
 
-    def read_map(self, member, alias, t, d, ind="  "):
+    def read_map(self, member, alias, t, d, uitype=None, ind="  "):
+        uitype = uitype or [None, None, None]
         s = ""
-        keystr = type_to_str(t[1])
-        if keystr.endswith('>'):
-            keystr += " "
-        keyfmt = self._fmt(t[1])
-        valstr = type_to_str(t[2])
-        if valstr.endswith('>'):
-            valstr += " "
-        valfmt = self._fmt(t[2])
         if d is not None:
             s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
             ind += '  '
         s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
         s += ind + 'n = sub->NMatches("val");\n'
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        s += ind + ('  {1}[{0}::Query<{2}>(sub, "key", i)] = '
-                    '{0}::Query<{3}>(sub, "val", i);\n'
-                    ).format(CYCNS, member, keystr, valstr)
+        kquery = self._query('sub', 'key', t[1], None, uitype[1], 'i')
+        vquery = self._query('sub', 'val', t[2], None, uitype[2], 'i')
+        s += ind + '  {member}[{kquery}] = {vquery};\n'.format(member=member, 
+                                                               kquery=kquery, 
+                                                               vquery=vquery)
         s += ind + '}\n'
         if d is not None:
             ind = ind[:-2]
@@ -1139,6 +1127,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]['read']
                 continue
             t = info['type']
+            uitype = info.get('uitype', None)
             if t in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
@@ -1146,7 +1135,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 impl += ind + info['derived_init'] + '\n'
             else:
                 reader = self.readers.get(t, self.readers.get(t[0], None))
-                impl += reader(member, alias, t, d, ind)
+                impl += reader(member, alias, t, d, uitype, ind)
 
         # write obj to database
         impl += ind + 'di.NewDatum("Info")\n'
@@ -1186,6 +1175,7 @@ class SchemaFilter(CodeGeneratorFilter):
 
     # C++ type -> XML Schema type
     default_types = {
+        # Primitive types
         'bool': 'boolean',
         'std::string': 'string',
         'int': 'int',
@@ -1193,6 +1183,17 @@ class SchemaFilter(CodeGeneratorFilter):
         'double': 'double',
         'cyclus::Blob': 'string',
         'boost::uuids::uuid': 'token',
+        # UI types
+        'nuclide': 'string',
+        'incommodity': None, 
+        'outcommodity': None, 
+        'range': None, 
+        'combobox': None, 
+        'facility': None, 
+        'recipe': None,
+        'none': None,
+        None: None,
+        '': None,
         }
 
     def _type(self, cpp, given=None):
@@ -1200,6 +1201,8 @@ class SchemaFilter(CodeGeneratorFilter):
         if given is not None:
             if given in self.alltypes:
                 return given
+            elif given in self.default_types:
+                return self.default_types[given] or self.default_types[cpp]
             raise TypeError("{0!r} is not a valid XML schema data type, see "
                             "http://www.w3.org/TR/xmlschema-2/ for more information.")
         return self.default_types[cpp]
@@ -1229,6 +1232,7 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]
                 continue
             t = info['type']
+            uitype = info.get('uitype', None)
             schematype = info.get('schematype', None)
             if t in BUFFERS: # buffer state, skip
                 continue
@@ -1242,32 +1246,34 @@ class SchemaFilter(CodeGeneratorFilter):
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
                 impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
                 if t[0] in ['std::set', 'std::vector', 'std::list']:
-                    el_type = self._type(t[1], schematype)
+                    uitype = [None, None] if uitype is None else uitype
+                    el_type = self._type(t[1], schematype or uitype[1])
                     impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
                     impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, el_type)
                     impl += i + '"{0}</element>\\n"\n'.format(xi.down())
                 else:  # map
+                    uitype = [None, None, None] if uitype is None else uitype
                     schematype = [None, None] if schematype is None else schematype
-                    k_type = self._type(t[1], schematype[0])
-                    v_type = self._type(t[2], schematype[1])
+                    k_type = self._type(t[1], schematype[0] or uitype[1])
+                    v_type = self._type(t[2], schematype[1] or uitype[2])
                     impl += i + '"{0}<element name=\\"key\\">\\n"\n'.format(xi.up())
                     impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, k_type)
                     impl += i + '"{0}</element>\\n"\n'.format(xi.down())
                     impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
                     impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, v_type)
                     impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-
                 impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t in PRIMITIVES:
-                d_type = self._type(t, schematype)
+                d_type = self._type(t, schematype or uitype)
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
                 impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, d_type)
                 impl += i + '"{0}</element>\\n"\n'.format(xi.down())
             elif t[0] == 'std::pair':
+                uitype = [None, None, None] if uitype is None else uitype
                 schematype = [None, None] if schematype is None else schematype
-                f_type = self._type(t[1], schematype[0])
-                s_type = self._type(t[2], schematype[1])
+                f_type = self._type(t[1], schematype[0] or uitype[1])
+                s_type = self._type(t[2], schematype[1] or uitype[2])
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
                 impl += i + '"{0}<element name=\\"first\\">\\n"\n'.format(xi.up())
                 impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, f_type)
