@@ -83,10 +83,11 @@ class Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>,
       Product::Ptr> >& responses) {}
-
- private:
+ 
+ protected:
   Agent* manager_;
 
+ private:
   /// @warning this function is hidden to prevent an invalid signature that can
   /// raise difficult to find bugs
   virtual std::set<BidPortfolio<Material>::Ptr>
