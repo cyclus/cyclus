@@ -497,6 +497,39 @@ def test_defpragmafilter():
     m = MockCodeGenMachine()
     f = DefaultPragmaFilter(m)
 
+def test_nuclide_uitype():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+
+    # test schema is set to string
+    f = SchemaFilter(m)
+    f.given_classname = 'MyFactory'
+    impl = f.impl()
+    exp_impl = ('  return ""\n'
+                '    "<interleave>\\n"\n'
+                '    "<element name=\\"x\\">\\n"\n'
+                '    "    <data type=\\"string\\" />\\n"\n'
+                '    "</element>\\n"\n'
+                '    "</interleave>\\n"\n    ;\n')
+    yield assert_equal, exp_impl, impl
+
+    # test infiletodb updates
+    f = InfileToDbFilter(m)
+    f.given_classname = 'MyFactory'
+    impl = f.impl()
+    exp_impl = ('  tree = tree->SubTree("config/*");\n'
+                '  cyclus::InfileTree* sub;\n'
+                '  int i;\n'
+                '  int n;\n'
+                '  x = pyne::nucname::id(cyclus::Query<std::string>(tree, "x"));\n'
+                '  di.NewDatum("Info")\n'
+                '  ->AddVal("x", x)\n'
+                '  ->Record();\n')
+    yield assert_equal, exp_impl, impl
+
 
 if __name__ == "__main__":
     nose.runmodule()
