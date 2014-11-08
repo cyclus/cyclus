@@ -170,6 +170,23 @@ class Filter(object):
         """Reverts state transformation."""
         self.match = None
 
+    def ctxstr(self, classname=None, varname=None):
+        mc = self.machine
+        if classname is None and varname is None:
+            s = "The {0} machine has the current context:\n{1}"
+            s = s.format(mc.__class__.__name__, pformat(mc.context))
+        elif varname is None:
+            s = ("The {0!r} class in the {1} machine has the following "
+                 "annotations:\n{2}")
+            s = s.format(classname, mc.__class__.__name__, 
+                         pformat(mc.context[classname]))
+        else:
+            s = ("The {0!r} state variable on the {1!r} class in the {2} machine "
+                 "has the following annotations:\n\n{3}\n")
+            s = s.format(varname, classname, mc.__class__.__name__, 
+                         pformat(mc.context[classname]['vars'][varname]))
+        return s
+
 class LinemarkerFilter(Filter):
     """Filter for computing the current source code line
     from preprocessor line marker directives.
@@ -1185,11 +1202,13 @@ class SchemaFilter(CodeGeneratorFilter):
         'boost::uuids::uuid': 'token',
         # UI types
         'nuclide': 'string',
+        'commodity': None, 
         'incommodity': None, 
         'outcommodity': None, 
         'range': None, 
         'combobox': None, 
         'facility': None, 
+        'prototype': None, 
         'recipe': None,
         'none': None,
         None: None,
@@ -1203,8 +1222,10 @@ class SchemaFilter(CodeGeneratorFilter):
                 return given
             elif given in self.default_types:
                 return self.default_types[given] or self.default_types[cpp]
-            raise TypeError("{0!r} is not a valid XML schema data type, see "
-                            "http://www.w3.org/TR/xmlschema-2/ for more information.")
+            msg = ("{0}\nNote that {1!r} is not a valid XML schema data type, see "
+                   "http://www.w3.org/TR/xmlschema-2/ for more information.")
+            cs = self.ctxstr(self.given_classname, self._member)
+            raise TypeError(msg.format(cs, given))
         return self.default_types[cpp]
 
     def impl(self, ind="  "):
@@ -1220,6 +1241,7 @@ class SchemaFilter(CodeGeneratorFilter):
         impl = i.up() + 'return ""\n'
         impl += i +  '"<interleave>\\n"\n'
         for member, info in ctx.items():
+            self._member = member
             if not isinstance(info, Mapping):
                 # this member is a variable alias pointer
                 continue
@@ -1241,7 +1263,6 @@ class SchemaFilter(CodeGeneratorFilter):
             opt = True if 'default' in info else False
             if opt:
                 impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
-
             if t[0] in ['std::list', 'std::map', 'std::set', 'std::vector']:
                 impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
                 impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
@@ -1288,7 +1309,7 @@ class SchemaFilter(CodeGeneratorFilter):
 
             if opt:
                 impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
-
+        del self._member
         impl += i +  '"</interleave>\\n"\n'
         impl += i + ";\n"
         return impl
