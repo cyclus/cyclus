@@ -530,6 +530,15 @@ def test_nuclide_uitype():
                 '  ->Record();\n')
     yield assert_equal, exp_impl, impl
 
+    # test bad uitypes values fail
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'WRONG'}),
+            ]))
+            ])}
+    f = SchemaFilter(m)
+    f.given_classname = 'MyFactory'
+    yield assert_raises, TypeError, f.impl
+
 
 if __name__ == "__main__":
     nose.runmodule()
