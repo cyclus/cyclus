@@ -10,7 +10,8 @@
 
 #include "tools.h"
 
-static std::string const path = "testdb.sqlite";
+// special name to tell sqlite to use in-mem db
+static std::string const path = ":memory:";
 
 class Dier : public cyclus::Facility {
  public:
@@ -63,8 +64,6 @@ TEST(TimerTests, BareSim) {
 }
 
 TEST(TimerTests, EarlyTermination) {
-  FileDeleter fd(path);
-
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -88,8 +87,6 @@ TEST(TimerTests, EarlyTermination) {
 }
 
 TEST(TimerTests, DefaultSnapshot) {
-  FileDeleter fd(path);
-
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -110,8 +107,6 @@ TEST(TimerTests, DefaultSnapshot) {
 }
 
 TEST(TimerTests, CustomSnapshot) {
-  FileDeleter fd(path);
-
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);

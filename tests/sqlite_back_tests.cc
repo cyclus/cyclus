@@ -7,12 +7,12 @@
 
 #include "tools.h"
 
-static std::string const path = "testdb.sqlite";
+// special name to tell sqlite to use in-mem db
+static std::string const path = ":memory:";
 
 class SqliteBackTests : public ::testing::Test {
  public:
   virtual void SetUp() {
-    remove(path.c_str());
     b = new cyclus::SqliteBack(path);
     r.RegisterBackend(b);
   }
@@ -20,7 +20,6 @@ class SqliteBackTests : public ::testing::Test {
   virtual void TearDown() {
     r.Close();
     delete b;
-    remove(path.c_str());
   }
   cyclus::SqliteBack* b;
   cyclus::Recorder r;

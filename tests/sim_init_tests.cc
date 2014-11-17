@@ -10,7 +10,8 @@
 #include "timer.h"
 #include "toolkit/resource_buff.h"
 
-static const char* dbpath = "testsiminit.sqlite";
+// special name to tell sqlite to use in-mem db
+static const char* dbpath = ":memory:";
 
 namespace cy = cyclus;
 using cy::Agent;
@@ -89,7 +90,6 @@ class SimInitTest : public ::testing::Test {
 
  protected:
   virtual void SetUp() {
-    remove(dbpath);
     resetnextids();
     cy::DynamicModule::man_ctors_[":Inver:Inver"] = ConstructInver;
 
@@ -139,7 +139,6 @@ class SimInitTest : public ::testing::Test {
     rec.Close();
     delete ctx;
     delete b;
-    remove(dbpath);
   }
 
   void resetnextids() {
