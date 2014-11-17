@@ -9,7 +9,7 @@
 class SqliteDbTests : public ::testing::Test {
  public:
   virtual void SetUp() {
-    path = "testdb.sqlite";
+    path = ":memory:"; // special name to tell sqlite to use in-mem db
     v1 = "stuff";
     v2 = "thing";
     db = new cyclus::SqliteDb(path);
@@ -22,7 +22,6 @@ class SqliteDbTests : public ::testing::Test {
   virtual void TearDown() {
     db->close();
     delete db;
-    remove(path.c_str());
   }
 
   cyclus::SqliteDb* db;
