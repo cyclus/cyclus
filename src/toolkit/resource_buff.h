@@ -66,10 +66,10 @@ class ResourceBuff {
 
   /// Space returns the quantity of space remaining in this store.
   ///
-  /// It is effectively the difference between the capacity and the quantity.
-  /// Never throws.
+  /// It is effectively the difference between the capacity and the quantity
+  /// and is never negative. Never throws.
   inline double space() const {
-    return capacity_ - qty_;
+    return std::max(0.0, capacity_ - qty_);
   }
 
   /// Returns true if there are no mats in mats_
