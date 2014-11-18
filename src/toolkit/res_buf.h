@@ -27,6 +27,37 @@ typedef std::vector<Product::Ptr> ProdVec;
 /// Constructed buffers have infinite capacity unless explicitly changed.
 /// Resource popping occurs in the order the resources were pushed (i.e. oldest
 /// resources are popped first), unless explicitly specified otherwise.
+///
+/// Typically, a ResBuf will be a member variable on an agent/archetype class.
+/// Resources can be added and retrieved from it as needed, and the buffer can
+/// be queried in various ways as done in the example below:
+///
+/// @code
+/// class MyAgent : public cyclus::Facility {
+///  public:
+///   Tick() {
+///     double batch_size = 2703;
+///     if (outventory_.space() < batch_size) {
+///       return;
+///     } else if (inventory_.quantity() < batch_size) {
+///       return;
+///     }
+///
+///     outventory_.Push(inventory_.Pop(batch_size));
+///   }
+///
+///   ... // resource exchange to fill up inventory_ buffer
+///
+///  private:
+///   ...
+///   cyclus::toolkit::ResBuf<cyclus::Material> inventory_;
+///   cyclus::toolkit::ResBuf<cyclus::Material> outventory_;
+/// };
+/// @endcode
+///
+/// In this example, if there is sufficient material in inventory_, 2703 kg is
+/// removed as a single object that is then placed in another buffer
+/// (outventory_) each time step.
 template <class T>
 class ResBuf {
  public:
