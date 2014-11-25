@@ -6,9 +6,11 @@ order):
 
 * Robert Carlsen
 * Royal Elmore
+* Robert Flanagan
 * Matthew Gidden
 * Katy Huff
 * Olzhas Rakhimov
 * Anthony Scopatz
 * Zach Welch
 * Paul P.H. Wilson
+* John Xia
