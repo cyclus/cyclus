@@ -398,6 +398,26 @@ bool pyne::file_exists(std::string strfilename) {
 
   return(blnReturn);
 };
+
+// Message Helpers
+ 
+bool pyne::USE_WARNINGS = true;
+
+bool pyne::toggle_warnings(){
+  USE_WARNINGS = !USE_WARNINGS;
+  return USE_WARNINGS;
+}
+
+void pyne::warning(std::string s){
+  // Prints a warning message
+  if (USE_WARNINGS){
+    std::cout << "\033[1;33m WARNING: \033[0m" << s << "\n"; 
+  }  
+}
+
+
+
+
 //
 // end of src/utils.cpp
 //
@@ -2667,9 +2687,14 @@ int pyne::nucname::id(int nuc) {
   int zzz = nuc / 10000000;     // ZZZ ?
   int aaassss = nuc % 10000000; // AAA-SSSS ?
   int aaa = aaassss / 10000;    // AAA ?
+  int ssss = aaassss % 10000;   // SSSS ?
   // Nuclide must already be in id form
   if (0 < zzz && zzz <= aaa && aaa <= zzz * 7) {
     // Normal nuclide
+    if (5 < ssss){
+    // Unphysical metastable state warning 
+     warning("You have indicated a metastable state of " + pyne::to_str(ssss) + ". Metastable state above 5, possibly unphysical. ");
+    }
     return nuc;
   } else if (aaassss == 0 && 0 < zz_name.count(zzz)) {
     // Natural elemental nuclide:  ie for Uranium = 920000000
@@ -2682,11 +2707,20 @@ int pyne::nucname::id(int nuc) {
   zzz = nuc / 10000;     // ZZZ ?
   aaassss = nuc % 10000; // AAA-SSSS ?
   aaa = aaassss / 10;    // AAA ?
+  ssss = nuc % 10;       // SSSS ?          
   if (zzz <= aaa && aaa <= zzz * 7) {
     // ZZZAAAM nuclide
+    if (5 < ssss){
+    // Unphysical metastable state warning
+      warning("You have indicated a metastable state of " + pyne::to_str(ssss) + ". Metastable state above 5, possibly unphysical. ");
+    }
     return (zzz*10000000) + (aaa*10000) + (nuc%10);
   } else if (aaa <= zzz && zzz <= aaa * 7 && 0 < zz_name.count(aaa)) {
     // Cinder-form (aaazzzm), ie 2350920
+    if (5 < ssss){
+    // Unphysical metastable state warning
+      warning("You have indicated a metastable state of " + pyne::to_str(ssss) + ". Metastable state above 5, possibly unphysical. ");
+    }
     return (aaa*10000000) + (zzz*10000) + (nuc%10);
   }
   //else if (aaassss == 0 && 0 == zz_name.count(nuc/1000) && 0 < zz_name.count(zzz))
@@ -2829,6 +2863,42 @@ int pyne::nucname::id(std::string nuc) {
 };
 
 
+/***************************/
+/*** iselement functions ***/
+/***************************/
+
+bool pyne::nucname::iselement(std::string nuc) {
+  int n;
+  try {
+    n = id(nuc);
+  }
+  catch(NotANuclide) {
+    return false;
+  }
+  return iselement(n);
+};
+
+bool pyne::nucname::iselement(char * nuc) {
+  return iselement(std::string(nuc));
+};
+
+bool pyne::nucname::iselement(int nuc) {
+  int n;
+  try {
+    n = id(nuc);
+  }
+  catch(NotANuclide) {
+    return false;
+  }
+ 
+  if (n <= 10000000)
+    return false;
+  int zzz = znum(n);
+  int aaa = anum(n);
+  if (zzz > 0 && aaa == 0)
+    return true;  // is element
+  return false;
+};
 
 /**********************/
 /*** name functions ***/
@@ -3551,6 +3621,10 @@ int pyne::nucname::sza(std::string nuc) {
 int pyne::nucname::sza_to_id(int nuc) {
   int sss = nuc / 1000000;
   int zzzaaa = nuc % 1000000;
+  if (5 < sss){
+  // Unphysical metastable state warning 
+   warning("You have indicated a metastable state of " + pyne::to_str(sss) + ". Metastable state above 5, possibly unphysical. ");
+  }
   return zzzaaa * 10000 + sss;
 }
 
@@ -4197,7 +4271,7 @@ std::string pyne::rxname::_names[NUM_RX_NAMES] = {
   "bplus_3p",
   "sf",
   "decay_2bplus",
-  "decay_2ec",
+  "decay_2ec"
   };
 std::set<std::string> pyne::rxname::names(pyne::rxname::_names, 
                                           pyne::rxname::_names+NUM_RX_NAMES);
@@ -4789,7 +4863,7 @@ void * pyne::rxname::_fill_maps() {
     0,
     0,
     0,
-    0,
+    0
   };
   std::string _labels[NUM_RX_NAMES] = {
     "(z,total)",
@@ -5363,7 +5437,7 @@ void * pyne::rxname::_fill_maps() {
     "(z,b+3p)",
     "(z,sf)",
     "(z,2b+)",
-    "(z,2ec)",
+    "(z,2ec)"
   };
   std::string _docs[NUM_RX_NAMES] = {
     "(n,total) Neutron total",
@@ -5937,7 +6011,7 @@ void * pyne::rxname::_fill_maps() {
     "(z,b+3p)",
     "(z,sf)",
     "(z,2b+)",
-    "(z,2ec)",
+    "(z,2ec)"
   };
 
   // fill the maps
@@ -8143,7 +8217,7 @@ double pyne::branch_ratio(std::pair<int, int> from_to) {
     } else if (part1[i] == 36565) {
       // spontaneous fission, rx == 'sf'
       result += part2[i] * 0.01 * wimsdfpy_data[from_to];
-    } else if ((part1[i] != 0) && (groundstate(rxname::child(from_to.first, 
+    } else if ((part1[i] != 0) && (groundstate(rxname::child(from_to.first,
                                    part1[i], "decay")) == from_to.second)) {
       result += part2[i] * 0.01;
     }
@@ -8330,6 +8404,8 @@ template<> void pyne::_load_data<pyne::gamma>() {
                      H5T_NATIVE_INT);
   status = H5Tinsert(desc, "parent_nuc", HOFFSET(gamma, parent_nuc),
                      H5T_NATIVE_INT);
+  status = H5Tinsert(desc, "child_nuc", HOFFSET(gamma, child_nuc),
+                     H5T_NATIVE_INT);
   status = H5Tinsert(desc, "energy", HOFFSET(gamma, energy),
                      H5T_NATIVE_DOUBLE);
   status = H5Tinsert(desc, "energy_err", HOFFSET(gamma, energy_err),
@@ -8379,12 +8455,25 @@ template<> void pyne::_load_data<pyne::gamma>() {
   delete[] gamma_array;
 }
 
-std::vector<std::pair<double, double> > pyne::gamma_energy(int parent){
+std::vector<std::pair<double, double> > pyne::gamma_energy(int parent) {
   std::vector<std::pair<double, double> > result;
   std::vector<double> part1 = data_access<double, gamma>(parent, 0.0,
     DBL_MAX, offsetof(gamma, energy), gamma_data);
   std::vector<double> part2 = data_access<double, gamma>(parent, 0.0,
     DBL_MAX, offsetof(gamma, energy_err), gamma_data);
+  for(int i = 0; i < part1.size(); ++i){
+    result.push_back(std::make_pair(part1[i],part2[i]));
+  }
+  return result;
+};
+
+std::vector<std::pair<double, double> > pyne::gamma_energy(double energy,
+double error) {
+  std::vector<std::pair<double, double> > result;
+  std::vector<double> part1 = data_access<double, gamma>(energy+error,
+    energy-error, offsetof(gamma, energy), gamma_data);
+  std::vector<double> part2 = data_access<double, gamma>(energy+error,
+    energy-error, offsetof(gamma, energy_err), gamma_data);
   for(int i = 0; i < part1.size(); ++i){
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
@@ -8462,6 +8551,20 @@ double error) {
     energy-error, offsetof(gamma, from_nuc), gamma_data);
   std::vector<int> part2 = data_access<int, gamma>(energy+error,
     energy-error, offsetof(gamma, to_nuc), gamma_data);
+  for(int i = 0; i < part1.size(); ++i){
+    result.push_back(std::make_pair(part1[i],part2[i]));
+  }
+  return result;
+};
+
+
+std::vector<std::pair<int, int> > pyne::gamma_parent_child(double energy,
+double error) {
+  std::vector<std::pair<int, int> > result;
+  std::vector<int> part1 = data_access<int, gamma>(energy+error,
+    energy-error, offsetof(gamma, parent_nuc), gamma_data);
+  std::vector<int> part2 = data_access<int, gamma>(energy+error,
+    energy-error, offsetof(gamma, child_nuc), gamma_data);
   for(int i = 0; i < part1.size(); ++i){
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
@@ -13904,6 +14007,9 @@ std::string pyne::Material::fluka_compound_str(int id, std::string frac_type) {
   }
 
   std::stringstream temp_s;
+  temp_s << std::scientific;
+  temp_s << std::setprecision(3);
+
   int counter = comp.size();
   pyne::comp_iter nuc = comp.begin();
   // This will pick up multiples of 3 components
@@ -13911,6 +14017,7 @@ std::string pyne::Material::fluka_compound_str(int id, std::string frac_type) {
     ss << std::setw(10) << std::left  << "COMPOUND";
 
     temp_s << frac_sign << nuc->second;
+
     ss << std::setw(10) << std::right << temp_s.str();
     ss << std::setw(10) << std::right << nucname::fluka(nuc->first);
     nuc++;
@@ -13936,7 +14043,6 @@ std::string pyne::Material::fluka_compound_str(int id, std::string frac_type) {
 
   // Get the last (or only, as the case may be) one or two fractions
   if (nuc != comp.end()) {
-    std::stringstream temp_s;
     ss << std::setw(10) << std::left  << "COMPOUND";
     temp_s << frac_sign << nuc->second;
     ss << std::setw(10) << std::right << temp_s.str();

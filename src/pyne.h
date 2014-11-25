@@ -205,6 +205,14 @@ namespace pyne {
   /// Returns true if the file can be found.
   bool file_exists(std::string strfilename);
 
+  // Message Helpers
+  extern bool USE_WARNINGS;
+  /// Toggles warnings on and off
+  bool toggle_warnings();
+
+  /// Prints a warning message.
+  void warning(std::string s);
+
   /// Custom exception to be thrown in the event that a required file is not able to
   /// be found.
   class FileNotFound : public std::exception
@@ -344,7 +352,7 @@ typedef struct {
 #include "extra_types.h"
 #endif
 
-
+//! Wrapper for standard HDF5 operations
 namespace h5wrap
 {
   /// Custom exception for HDF5 indexing errors.
@@ -459,7 +467,7 @@ namespace h5wrap
 
   // Read-in Functions
 
-  /// Retrieves the \a nth index out of the dataset \a dset (which has an HDF5 
+  /// Retrieves the \a nth index out of the dataset \a dset (which has an HDF5
   /// datatype \a dtype).  The value is returned as the C/C++ type given by \a T.
   template <typename T>
   T get_array_index(hid_t dset, int n, hid_t dtype=H5T_NATIVE_DOUBLE)
@@ -487,7 +495,7 @@ namespace h5wrap
     hsize_t count_out  [1] = {1};
     hsize_t offset_out [1] = {0};
 
-    H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_out, NULL, 
+    H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_out, NULL,
                                  count_out, NULL);
 
     T data_out [1];
@@ -499,7 +507,7 @@ namespace h5wrap
 
   // Conversion functions
 
-  /// Reads in data from an HDF5 file as a C++ set.  \a T should roughly match 
+  /// Reads in data from an HDF5 file as a C++ set.  \a T should roughly match
   /// \a dtype.
   /// \param h5file HDF5 file id for an open file.
   /// \param data_path path to the data in the open file.
@@ -530,14 +538,14 @@ namespace h5wrap
   };
 
 
-  /// Reads in data from an HDF5 file as a 1 dimiensional vector.  \a T should roughly 
+  /// Reads in data from an HDF5 file as a 1 dimiensional vector.  \a T should roughly
   /// match \a dtype.
   /// \param h5file HDF5 file id for an open file.
   /// \param data_path path to the data in the open file.
   /// \param dtype HDF5 data type for the data set at \a data_path.
   /// \return an in memory 1D vector of type \a T.
   template <typename T>
-  std::vector<T> h5_array_to_cpp_vector_1d(hid_t h5file, std::string data_path, 
+  std::vector<T> h5_array_to_cpp_vector_1d(hid_t h5file, std::string data_path,
                                            hid_t dtype=H5T_NATIVE_DOUBLE)
   {
     std::vector<T> cpp_vec;
@@ -560,14 +568,14 @@ namespace h5wrap
   };
 
 
-  /// Reads in data from an HDF5 file as a 2 dimiensional vector.  \a T should roughly 
+  /// Reads in data from an HDF5 file as a 2 dimiensional vector.  \a T should roughly
   /// match \a dtype.
   /// \param h5file HDF5 file id for an open file.
   /// \param data_path path to the data in the open file.
   /// \param dtype HDF5 data type for the data set at \a data_path.
   /// \return an in memory 2D vector of type \a T.
   template <typename T>
-  std::vector< std::vector<T> > h5_array_to_cpp_vector_2d(hid_t h5file, std::string data_path, 
+  std::vector< std::vector<T> > h5_array_to_cpp_vector_2d(hid_t h5file, std::string data_path,
                                                           hid_t dtype=H5T_NATIVE_DOUBLE)
   {
     hsize_t arr_dims [2];
@@ -595,15 +603,15 @@ namespace h5wrap
   };
 
 
-  /// Reads in data from an HDF5 file as a 3 dimiensional vector.  \a T should roughly 
+  /// Reads in data from an HDF5 file as a 3 dimiensional vector.  \a T should roughly
   /// match \a dtype.
   /// \param h5file HDF5 file id for an open file.
   /// \param data_path path to the data in the open file.
   /// \param dtype HDF5 data type for the data set at \a data_path.
   /// \return an in memory 3D vector of type \a T.
   template <typename T>
-  std::vector< std::vector< std::vector<T> > > h5_array_to_cpp_vector_3d(hid_t h5file, 
-                                                  std::string data_path, 
+  std::vector< std::vector< std::vector<T> > > h5_array_to_cpp_vector_3d(hid_t h5file,
+                                                  std::string data_path,
                                                   hid_t dtype=H5T_NATIVE_DOUBLE)
   {
     hsize_t arr_dims [3];
@@ -649,7 +657,7 @@ namespace h5wrap
     /// default destructor
     ~HomogenousTypeTable(){};
 
-    /// Constructor to load in data upon initialization.  \a T should roughly 
+    /// Constructor to load in data upon initialization.  \a T should roughly
     /// match \a dtype.
     /// \param h5file HDF5 file id for an open file.
     /// \param data_path path to the data in the open file.
@@ -693,17 +701,17 @@ namespace h5wrap
       delete[] col_buf;
     };
 
-    // Metadata attributes 
+    // Metadata attributes
     std::string path; ///< path in file to the data
     int shape [2];    ///< table shape, rows x columns.
     std::vector<std::string> cols;  ///< column names
     /// mapping from column names to column data
-    std::map<std::string, std::vector<T> > data;  
+    std::map<std::string, std::vector<T> > data;
 
     //
     // operator overloads
     //
-    /// index into the table by column name (string) 
+    /// index into the table by column name (string)
     std::vector<T> operator[] (std::string col_name)
     {
       return data[col_name];
@@ -749,7 +757,7 @@ namespace h5wrap
       rtn = true;
       H5Dclose(ds);
     }
-    else 
+    else
     {
       hid_t grp = H5Gopen2(h5file, path.c_str(), H5P_DEFAULT);
       if (0 <= grp)
@@ -768,7 +776,6 @@ namespace h5wrap
 
 
 #endif
-
 //
 // end of src/h5wrap.h
 //
@@ -795,7 +802,8 @@ namespace h5wrap
 
 namespace pyne
 {
-namespace nucname 
+//! Nuclide naming conventions
+namespace nucname
 {
   typedef std::string name_t; ///< name type
   typedef int zz_t;           ///< Z number type
@@ -819,7 +827,7 @@ namespace nucname
   /******************************************/
 
   /// name grouping type (for testing containment)
-  typedef std::set<name_t> name_group;  
+  typedef std::set<name_t> name_group;
   typedef name_group::iterator name_group_iter; ///< name grouping iter type
 
   /// Z number grouping type (for testing containment)
@@ -856,13 +864,13 @@ namespace nucname
   /*** Exceptions ***/
   /******************/
 
-  /// Custom expection for declaring that a value does not follow a recognizable 
+  /// Custom expection for declaring that a value does not follow a recognizable
   /// nuclide naming convention.
   class NotANuclide : public std::exception
   {
   public:
     /// default constructor
-    NotANuclide () {}; 
+    NotANuclide () {};
 
     /// default destructor
     ~NotANuclide () throw () {};
@@ -913,7 +921,7 @@ namespace nucname
 
       if (!nucnow.empty())
       {
-        NaNEstr += " --> "; 
+        NaNEstr += " --> ";
         NaNEstr += nucnow;
       }
       return (const char *) NaNEstr.c_str();
@@ -921,10 +929,10 @@ namespace nucname
 
   private:
     std::string nucwas; ///< previous nuclide state
-    std::string nucnow; ///< current nuclide state  
+    std::string nucnow; ///< current nuclide state
   };
 
-  /// Custom expection for declaring that a value represents one or more nuclides 
+  /// Custom expection for declaring that a value represents one or more nuclides
   /// in one or more namig conventions
   class IndeterminateNuclideForm : public std::exception
   {
@@ -981,7 +989,7 @@ namespace nucname
 
       if (!nucnow.empty())
       {
-        INFEstr += " --> "; 
+        INFEstr += " --> ";
         INFEstr += nucnow;
       }
       return (const char *) INFEstr.c_str();
@@ -1002,14 +1010,24 @@ namespace nucname
   bool isnuclide(int nuc);
   /// \}
 
+  /// \name iselement functions
+  /// \{
+  /// These functions test if an input \a nuc is a valid element.
+  /// \param nuc a possible element
+  /// \return a bool
+  bool iselement(std::string nuc);
+  bool iselement(char * nuc);
+  bool iselement(int nuc);
+
+  /// \}
   /// \name Identifier Form Functions
   /// \{
   /// The 'id' nuclide naming convention is the canonical form for representing
-  /// nuclides in PyNE. This is termed a ZAS, or ZZZAAASSSS, representation because 
+  /// nuclides in PyNE. This is termed a ZAS, or ZZZAAASSSS, representation because
   /// It stores 3 Z-number digits, 3 A-number digits, followed by 4 S-number digits
-  /// which the nucleus excitation state. 
+  /// which the nucleus excitation state.
   ///
-  /// The id() function will always return an nuclide in id form, if successful. 
+  /// The id() function will always return an nuclide in id form, if successful.
   /// If the input nuclide is in id form already, then this is function does no
   /// work. For all other formats, the id() function provides a best-guess based
   /// on a heirarchy of other formats that is used to resolve ambiguities between
@@ -1028,7 +1046,7 @@ namespace nucname
   ///   - Serpent
   ///   - LL (element symbol)
   /// For well-defined situations where you know ahead of time what format the
-  /// nuclide is in, you should use the various form_to_id() functions, rather 
+  /// nuclide is in, you should use the various form_to_id() functions, rather
   /// than the id() function which is meant to resolve possibly ambiquous cases.
   /// \param nuc a nuclide
   /// \return nucid 32-bit integer identifier
@@ -1039,14 +1057,14 @@ namespace nucname
 
   /// \name Name Form Functions
   /// \{
-  /// The 'name' nuclide naming convention is the more common, human readable 
-  /// notation. The chemical symbol (one or two characters long) is first, followed 
-  /// by the nucleon number. Lastly if the nuclide is metastable, the letter M is 
-  /// concatenated to the end. For example, ‘H-1’ and ‘Am242M’ are both valid. 
-  /// Note that nucname will always return name form with dashes removed, the 
-  /// chemical symbol used for letter casing (ie 'Pu'), and a trailing upercase 'M' 
+  /// The 'name' nuclide naming convention is the more common, human readable
+  /// notation. The chemical symbol (one or two characters long) is first, followed
+  /// by the nucleon number. Lastly if the nuclide is metastable, the letter M is
+  /// concatenated to the end. For example, ‘H-1’ and ‘Am242M’ are both valid.
+  /// Note that nucname will always return name form with dashes removed, the
+  /// chemical symbol used for letter casing (ie 'Pu'), and a trailing upercase 'M'
   /// for a metastable flag. The name() function first converts functions to id form
-  /// using the id() function. Thus the form order resolution for id() also applies 
+  /// using the id() function. Thus the form order resolution for id() also applies
   /// here.
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
@@ -1068,7 +1086,7 @@ namespace nucname
 
   /// \name A-Number Functions
   /// \{
-  /// The A-number, or nucleon number, represents the number of protons and 
+  /// The A-number, or nucleon number, represents the number of protons and
   /// neutrons in a nuclide.  This function returns that number.
   /// \param nuc a nuclide
   /// \return an integer A-number.
@@ -1080,7 +1098,7 @@ namespace nucname
   /// \name S-Number Functions
   /// \{
   /// The S-number, or excitation state number, represents the excitation
-  /// level of a nuclide.  Normally, this is zero.  This function returns 
+  /// level of a nuclide.  Normally, this is zero.  This function returns
   /// that number.
   /// \param nuc a nuclide
   /// \return an integer A-number.
@@ -1091,10 +1109,10 @@ namespace nucname
 
   /// \name ZZAAAM Form Functions
   /// \{
-  /// The ZZAAAM nuclide naming convention is the former canonical form for 
-  /// nuclides in PyNE. This places the charge of the nucleus out front, then has 
-  /// three digits for the atomic mass number, and ends with a metastable flag 
-  /// (0 = ground, 1 = first excited state, 2 = second excited state, etc). 
+  /// The ZZAAAM nuclide naming convention is the former canonical form for
+  /// nuclides in PyNE. This places the charge of the nucleus out front, then has
+  /// three digits for the atomic mass number, and ends with a metastable flag
+  /// (0 = ground, 1 = first excited state, 2 = second excited state, etc).
   /// Uranium-235 here would be expressed as ‘922350’.
   /// \param nuc a nuclide
   /// \return an integer nuclide identifier.
@@ -1105,8 +1123,8 @@ namespace nucname
 
   /// \name ZZAAAM Form to Identifier Form Functions
   /// \{
-  /// This converts from the ZZAAAM nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the ZZAAAM nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in ZZAAAM form.
   /// \return an integer id nuclide identifier.
   int zzaaam_to_id(int nuc);
@@ -1117,8 +1135,8 @@ namespace nucname
 
   /// \name ZZZAAA Form Functions
   /// \{
-  /// The ZZZAAA nuclide naming convention is a form in which the nuclides three 
-  ///digit ZZZ number is followed by the 3 digit AAA number.  If the ZZZ number 
+  /// The ZZZAAA nuclide naming convention is a form in which the nuclides three
+  ///digit ZZZ number is followed by the 3 digit AAA number.  If the ZZZ number
   ///is 2 digits, the preceding zeros are not included.
   /// Uranium-235 here would be expressed as ‘92235’.
   /// \param nuc a nuclide
@@ -1131,8 +1149,8 @@ namespace nucname
 
   /// \name ZZZAAA Form to Identifier Form Functions
   /// \{
-  /// This converts from the ZZZAAA nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the ZZZAAA nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in ZZZAAA form.
   /// \return an integer id nuclide identifier.
   int zzzaaa_to_id(int nuc);
@@ -1143,8 +1161,8 @@ namespace nucname
 
   /// \name ZZLLAAAM Form Functions
   /// \{
-  /// The ZZLLAAAM nuclide naming convention is a form in which the nuclides 
-  /// AA number is followed by the redundant two LL characters, followed by 
+  /// The ZZLLAAAM nuclide naming convention is a form in which the nuclides
+  /// AA number is followed by the redundant two LL characters, followed by
   /// the nuclides ZZZ number.  Can also be followed with a metastable flag.
   /// Uranium-235 here would be expressed as ‘92-U-235’.
   /// \param nuc a nuclide
@@ -1157,8 +1175,8 @@ namespace nucname
 
   /// \name ZZLLAAAM Form to Identifier Form Functions
   /// \{
-  /// This converts from the ZZLLAAAM nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the ZZLLAAAM nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in ZZLLAAAM form.
   /// \return an integer id nuclide identifier.
   //int zzllaaam_to_id(int nuc);
@@ -1170,9 +1188,9 @@ namespace nucname
   /// \name MCNP Form Functions
   /// \{
   /// This is the naming convention used by the MCNP suite of codes.
-  /// The MCNP format for entering nuclides is unfortunately non-standard. 
-  /// In most ways it is similar to zzaaam form, except that it lacks the metastable 
-  /// flag. For information on how metastable isotopes are named, please consult the 
+  /// The MCNP format for entering nuclides is unfortunately non-standard.
+  /// In most ways it is similar to zzaaam form, except that it lacks the metastable
+  /// flag. For information on how metastable isotopes are named, please consult the
   /// MCNP documentation for more information.
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
@@ -1183,8 +1201,8 @@ namespace nucname
 
   /// \name MCNP Form to Identifier Form Functions
   /// \{
-  /// This converts from the MCNP nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the MCNP nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in MCNP form.
   /// \return an integer id nuclide identifier.
   int mcnp_to_id(int nuc);
@@ -1196,7 +1214,7 @@ namespace nucname
   /// \{
   /// This is the naming convention used by the FLUKA suite of codes.
   /// The FLUKA format for entering nuclides requires some knowledge of FLUKA
-  /// The nuclide in must cases should be the atomic # times 10000000.  
+  /// The nuclide in must cases should be the atomic # times 10000000.
   /// The exceptions are for FLUKA's named isotopes
   /// See the FLUKA Manual for more information.
   /// \param nuc a nuclide
@@ -1207,7 +1225,7 @@ namespace nucname
   /// \name FLUKA Form to Identifier Form Functions
   /// \{
   /// This converts from the FLUKA name to the
-  /// id canonical form  for nuclides in PyNE. 
+  /// id canonical form  for nuclides in PyNE.
   /// \param name a fluka name
   /// \return an integer id nuclide identifier.
   int fluka_to_id(std::string name);
@@ -1217,9 +1235,9 @@ namespace nucname
   /// \name Serpent Form Functions
   /// \{
   /// This is the string-based naming convention used by the Serpent suite of codes.
-  /// The serpent naming convention is similar to name form. However, only the first 
-  /// letter in the chemical symbol is uppercase, the dash is always present, and the 
-  /// the meta-stable flag is lowercase. For instance, ‘Am-242m’ is the valid serpent 
+  /// The serpent naming convention is similar to name form. However, only the first
+  /// letter in the chemical symbol is uppercase, the dash is always present, and the
+  /// the meta-stable flag is lowercase. For instance, ‘Am-242m’ is the valid serpent
   /// notation for this nuclide.
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
@@ -1230,8 +1248,8 @@ namespace nucname
 
   /// \name Serpent Form to Identifier Form Functions
   /// \{
-  /// This converts from the Serpent nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the Serpent nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in Serpent form.
   /// \return an integer id nuclide identifier.
   //int serpent_to_id(int nuc);  Should be ZAID
@@ -1242,8 +1260,8 @@ namespace nucname
   /// \name NIST Form Functions
   /// \{
   /// This is the string-based naming convention used by NIST.
-  /// The NIST naming convention is also similar to the Serpent form. However, this 
-  /// convention contains no metastable information. Moreover, the A-number comes 
+  /// The NIST naming convention is also similar to the Serpent form. However, this
+  /// convention contains no metastable information. Moreover, the A-number comes
   /// before the element symbol. For example, ‘242Am’ is the valid NIST notation.
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
@@ -1254,8 +1272,8 @@ namespace nucname
 
   /// \name NIST Form to Identifier Form Functions
   /// \{
-  /// This converts from the NIST nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the NIST nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in NIST form.
   /// \return an integer id nuclide identifier.
   //int serpent_to_id(int nuc);  NON-EXISTANT
@@ -1266,8 +1284,8 @@ namespace nucname
   /// \name CINDER Form Functions
   /// \{
   /// This is the naming convention used by the CINDER burnup library.
-  /// The CINDER format is similar to zzaaam form except that the placement of the 
-  /// Z- and A-numbers are swapped. Therefore, this format is effectively aaazzzm. 
+  /// The CINDER format is similar to zzaaam form except that the placement of the
+  /// Z- and A-numbers are swapped. Therefore, this format is effectively aaazzzm.
   /// For example, ‘2420951’ is the valid cinder notation for ‘AM242M’.
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
@@ -1278,8 +1296,8 @@ namespace nucname
 
   /// \name Cinder Form to Identifier Form Functions
   /// \{
-  /// This converts from the Cinder nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the Cinder nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in Cinder form.
   /// \return an integer id nuclide identifier.
   int cinder_to_id(int nuc);
@@ -1301,8 +1319,8 @@ namespace nucname
 
   /// \name ALARA Form to Identifier Form Functions
   /// \{
-  /// This converts from the ALARA nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the ALARA nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in ALARA form.
   /// \return an integer id nuclide identifier.
   //int alara_to_id(int nuc); NOT POSSIBLE
@@ -1327,8 +1345,8 @@ namespace nucname
 
   /// \name SZA Form to Identifier Form Functions
   /// \{
-  /// This converts from the SZA nuclide naming convention 
-  /// to the id canonical form  for nuclides in PyNE. 
+  /// This converts from the SZA nuclide naming convention
+  /// to the id canonical form  for nuclides in PyNE.
   /// \param nuc a nuclide in SZA form.
   /// \return an integer id nuclide identifier.
   int sza_to_id(int nuc);
@@ -1347,7 +1365,7 @@ namespace nucname
   inline int groundstate(std::string nuc) {return groundstate(id(nuc));};
   inline int groundstate(char * nuc) {return groundstate(std::string(nuc));};
   /// \}
-  
+
   /// \name State Map functions
   /// \{
   /// These convert from/to decay state ids (used in decay data)
@@ -1393,14 +1411,15 @@ namespace nucname
 
 namespace pyne
 {
-namespace rxname 
+//! Converts between naming conventions for reaction channels.
+namespace rxname
 {
   extern std::string _names[NUM_RX_NAMES];  ///< Raw array of reaction names
   /// Set of reaction names, must be valid variable names.
-  extern std::set<std::string> names;       
-  /// Mapping from reaction ids to reaction names. 
+  extern std::set<std::string> names;
+  /// Mapping from reaction ids to reaction names.
   extern std::map<unsigned int, std::string> id_name;
-  /// Mapping from reaction names to reaction ids. 
+  /// Mapping from reaction names to reaction ids.
   extern std::map<std::string, unsigned int> name_id;
   /// Mapping between alternative names for reactions and the reaction id.
   extern std::map<std::string, unsigned int> altnames;
@@ -1412,7 +1431,7 @@ namespace rxname
   extern std::map<unsigned int, std::string> labels;
   /// Mapping from reaction ids to documentation strings (long descriptions).
   extern std::map<unsigned int, std::string> docs;
-  /// Mapping from particle type and offset pairs to reaction ids.  
+  /// Mapping from particle type and offset pairs to reaction ids.
   /// Particle flags are 'n', 'p', 'd', 't', 'He3', 'a', 'gamma', and 'decay'.
   extern std::map<std::pair<std::string, int>, unsigned int> offset_id;
   /// Mapping from particle type and reaction ids to offsets.
@@ -1420,7 +1439,7 @@ namespace rxname
   extern std::map<std::pair<std::string, unsigned int>, int> id_offset;
 
   /// A helper function to set the contents of the variables in this library.
-  void * _fill_maps();  
+  void * _fill_maps();
   extern void * _;  ///< A dummy variable used when calling #_fill_maps().
 
   /// A helper function to compute nuclide id offsets from z-, a-, and s- deltas
@@ -1458,7 +1477,7 @@ namespace rxname
 
   /// \name ID Functions
   /// \{
-  /// Returns the recation id of a reaction channel.  This id has been precomputed  
+  /// Returns the recation id of a reaction channel.  This id has been precomputed
   /// from the hash of the name.
   /// \param x Input reaction specification, may be a reaction name, alternate name,
   ///          an id, or an MT number.
@@ -1571,7 +1590,7 @@ namespace rxname
   int child(std::string nuc, std::string rx, std::string z="n");
   /// \}
 
-  /// Custom exception for declaring a value not to be a valid reaction.  
+  /// Custom exception for declaring a value not to be a valid reaction.
   class NotAReaction : public std::exception
   {
   public:
@@ -1647,7 +1666,7 @@ namespace rxname
 
       if (!rxnow.empty())
       {
-        narxstr += " --> "; 
+        narxstr += " --> ";
         narxstr += rxnow;
       }
       return (const char *) narxstr.c_str();
@@ -1712,7 +1731,7 @@ namespace rxname
 
       if (!rxnow.empty())
       {
-        INFEstr += " --> "; 
+        INFEstr += " --> ";
         INFEstr += rxnow;
       }
       return (const char *) INFEstr.c_str();
@@ -2253,6 +2272,7 @@ namespace pyne
     int from_nuc; ///< state id of starting level
     int to_nuc; ///< state id of final level
     int parent_nuc; ///< state id of the primary decaying nucleus
+    int child_nuc; ///< stateless id of the child nucleus
     double energy; ///< energy of the photon [keV]
     double energy_err; ///< energy error of the photon [keV]
     double photon_intensity; ///< photon intensity
@@ -2273,6 +2293,8 @@ namespace pyne
 
   //returns a list of gamma decay energies from input parent nuclide
   std::vector<std::pair<double, double> > gamma_energy(int parent);
+  std::vector<std::pair<double, double> > gamma_energy(double energy,
+   double error);
   //returns a list of gamma photon intensities from input parent nuclide
   std::vector<std::pair<double, double> > gamma_photon_intensity(int parent);
   std::vector<std::pair<double, double> > gamma_photon_intensity(double energy,
@@ -2285,6 +2307,8 @@ namespace pyne
   std::vector<std::pair<int, int> > gamma_from_to(int parent);
   //returns a list of pairs of excited state transitions from an decay energy
   std::vector<std::pair<int, int> > gamma_from_to(double energy, double error);
+  //returns a list of parent/child pairs associated with an input decay energy
+  std::vector<std::pair<int, int> > gamma_parent_child(double energy, double error);
   //returns a list of parent nuclides associated with an input decay energy
   std::vector<int> gamma_parent(double energy, double error);
   //returns an array of arrays of X-ray energies and intesities for a
@@ -5106,6 +5130,7 @@ namespace enrichment {
 /************************************************/
 
 namespace pyne {
+//! Enrichment Component Class and Functions
 namespace enrichment {
 
   /// Greates a cascade instance with default values for a uranium enrichment.
@@ -5143,8 +5168,8 @@ namespace enrichment {
   /// enrichments \a x_feed, \a x_prod, and \a x_tails.
   double swu_per_tail(double x_feed, double x_prod, double x_tail);
 
-  /// Computes the nuclide-specific stage separation factor from the 
-  /// overall stage separation factor \a alpha, the key mass \a Mstar, 
+  /// Computes the nuclide-specific stage separation factor from the
+  /// overall stage separation factor \a alpha, the key mass \a Mstar,
   /// and the nulide's atomic mass \a M_i.
   double alphastar_i(double alpha, double Mstar, double M_i);
 
@@ -5152,61 +5177,61 @@ namespace enrichment {
   /// \{
   /// These functions enable the numeric cascade solver.
 
-  /// Finds the total flow rate (L) over the feed flow rate (F), the number of 
+  /// Finds the total flow rate (L) over the feed flow rate (F), the number of
   /// enriching stages (N), and the number of stripping stages (M).
   /// \param orig_casc Original input cascade.
   /// \param tolerance Maximum numerical error allowed in L/F, N, and M.
   /// \param max_iter Maximum number of iterations for to perform.
   /// \return A cascade whose N & M coorespond to the L/F value.
-  Cascade solve_numeric(Cascade & orig_casc, double tolerance=1.0E-7, 
+  Cascade solve_numeric(Cascade & orig_casc, double tolerance=1.0E-7,
                                              int max_iter=100);
   /// So,ves for valid stage numbers N &nd M of a casc.
   /// \param casc Cascade instance, modified in-place.
-  /// \param tolerance Maximum numerical error allowed in N and M.  
+  /// \param tolerance Maximum numerical error allowed in N and M.
   void _recompute_nm(Cascade & casc, double tolerance=1.0E-7);
-  /// This function takes a given initial guess number of enriching and stripping 
-  /// stages for a given composition of fuel with a given jth key component, knowing 
-  /// the values that are desired in both Product and Tails streams.  Having this it 
-  /// solves for what the actual N and M stage numbers are and also what the product 
+  /// This function takes a given initial guess number of enriching and stripping
+  /// stages for a given composition of fuel with a given jth key component, knowing
+  /// the values that are desired in both Product and Tails streams.  Having this it
+  /// solves for what the actual N and M stage numbers are and also what the product
   /// and waste streams compositions are.
   /// \param casc Cascade instance, modified in-place.
   void _recompute_prod_tail_mats(Cascade & casc);
   /// This function solves the whole system of equations.  It uses
-  /// _recompute_prod_tail_mats() to find the roots for the enriching and stripping 
-  /// stage numbers.  It then checks to see if the product and waste streams meet 
-  /// their target enrichments for the jth component like they should.  If they don't 
-  /// then it trys other values of N and M varied by the Secant method.  
+  /// _recompute_prod_tail_mats() to find the roots for the enriching and stripping
+  /// stage numbers.  It then checks to see if the product and waste streams meet
+  /// their target enrichments for the jth component like they should.  If they don't
+  /// then it trys other values of N and M varied by the Secant method.
   /// \param casc Input cascade.
   /// \param tolerance Maximum numerical error allowed in L/F, N, and M.
   /// \param max_iter Maximum number of iterations for to perform.
   /// \return A cascade whose N & M coorespond to the L/F value.
   Cascade _norm_comp_secant(Cascade & casc, double tolerance=1.0E-7, int max_iter=100);
   /// Solves for a stage separative power relevant to the ith component
-  /// per unit of flow G.  This is taken from Equation 31 divided by G 
+  /// per unit of flow G.  This is taken from Equation 31 divided by G
   /// from the paper "Wood, Houston G., Borisevich, V. D. and Sulaberidze, G. A.,
-  /// 'On a Criterion Efficiency for Multi-Isotope Mixtures Separation', 
+  /// 'On a Criterion Efficiency for Multi-Isotope Mixtures Separation',
   /// Separation Science and Technology, 34:3, 343 - 357"
   /// To link to this article: DOI: 10.1081/SS-100100654
   /// URL: http://dx.doi.org/10.1081/SS-100100654
-  /// \param casc Input cascade.  
+  /// \param casc Input cascade.
   /// \param i nuclide in id form.
   double _deltaU_i_OverG(Cascade & casc, int i);
   /// \}
 
   /// \name Multicomponent Functions
   /// \{
-  /// Finds a value of Mstar by minimzing the seperative power.  
-  /// Note that Mstar on \a orig_casc represents an intial guess at what Mstar might 
-  /// be. This is the final function that actually solves for an optimized M* that 
+  /// Finds a value of Mstar by minimzing the seperative power.
+  /// Note that Mstar on \a orig_casc represents an intial guess at what Mstar might
+  /// be. This is the final function that actually solves for an optimized M* that
   /// makes the cascade!
   /// \param orig_casc Original input cascade.
   /// \param solver flag for solver to use, may be 'symbolic' or 'numeric'.
   /// \param tolerance Maximum numerical error allowed in L/F, N, and M.
   /// \param max_iter Maximum number of iterations for to perform.
   /// \return A cascade whose N & M coorespond to the L/F value.
-  Cascade multicomponent(Cascade & orig_casc, char * solver, 
+  Cascade multicomponent(Cascade & orig_casc, char * solver,
                          double tolerance=1.0E-7, int max_iter=100);
-  Cascade multicomponent(Cascade & orig_casc, std::string solver="symbolic", 
+  Cascade multicomponent(Cascade & orig_casc, std::string solver="symbolic",
                          double tolerance=1.0E-7, int max_iter=100);
   /// \}
 
@@ -5247,8 +5272,6 @@ namespace enrichment {
 };
 
 #endif
-
-
 //
 // end of src/enrichment.h
 //
