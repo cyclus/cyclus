@@ -9,6 +9,7 @@
 #include "resource_exchange.h"
 #include "trade_executor.h"
 #include "trader_management.h"
+#include "env.h"
 
 namespace cyclus {
 
@@ -26,7 +27,9 @@ namespace cyclus {
 template <class T>
 class ExchangeManager {
  public:
-  ExchangeManager(Context* ctx) : ctx_(ctx) {}
+  ExchangeManager(Context* ctx) : ctx_(ctx), debug_(false) {
+    debug_ = Env::GetEnv("CYCLUS_DEBUG_DRE").size() > 0;
+  }
 
   /// @brief execute the full resource sequence
   void Execute() {
@@ -36,6 +39,10 @@ class ExchangeManager {
     exchng.AddAllBids();
     exchng.AdjustAll();
     CLOG(LEV_DEBUG1) << "done with info gathering";
+
+    if (debug_) {
+      RecordDebugInfo(exchng.ex_ctx());
+    }
 
     // translate graph
     ExchangeTranslator<T> xlator(&exchng.ex_ctx());
@@ -60,6 +67,48 @@ class ExchangeManager {
   }
 
  private:
+  void RecordDebugInfo(ExchangeContext<T>& exctx) {
+    typename std::vector<typename RequestPortfolio<T>::Ptr>::iterator it;
+    for (it = exctx.requests.begin(); it != exctx.requests.end(); ++it) {
+      std::vector<Request<T>*> reqs = (*it)->requests();
+      typename std::vector<Request<T>*>::iterator it2;
+      for (it2 = reqs.begin(); it2 != reqs.end(); ++it2) {
+        Request<T>* r = *it2;
+        std::stringstream ss;
+        ss << ctx_->time() << "_" << r;
+        ctx_->NewDatum("DebugRequests")
+          ->AddVal("Time", ctx_->time())
+          ->AddVal("ReqId", ss.str())
+          ->AddVal("RequesterID", r->requester()->manager()->id())
+          ->AddVal("Commodity", r->commodity())
+          ->AddVal("Preference", r->preference())
+          ->AddVal("Exclusive", r->exclusive())
+          ->AddVal("ResType", r->target()->type())
+          ->AddVal("Quantity", r->target()->quantity())
+          ->AddVal("ResUnits", r->target()->units())
+          ->Record();
+      }
+    }
+
+    typename std::vector<typename BidPortfolio<T>::Ptr>::iterator it3;
+    for (it3 = exctx.bids.begin(); it3 != exctx.bids.end(); ++it3) {
+      std::set<Bid<T>*> bids = (*it3)->bids();
+      typename std::set<Bid<T>*>::iterator it4;
+      for (it4 = bids.begin(); it4 != bids.end(); ++it4) {
+        Bid<T>* b = *it4;
+        std::stringstream ss;
+        ss << ctx_->time() << "_" << b->request();
+        ctx_->NewDatum("DebugBids")
+          ->AddVal("ReqId", ss.str())
+          ->AddVal("BidderId", b->bidder()->manager()->id())
+          ->AddVal("BidQuantity", b->offer()->quantity())
+          ->AddVal("Exclusive", b->exclusive())
+          ->Record();
+      }
+    }
+  }
+
+  bool debug_;
   Context* ctx_;
 };
 
