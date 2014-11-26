@@ -144,7 +144,7 @@ class Material: public Resource {
   int prev_decay_time() { return prev_decay_time_; }
 
   /// Returns the nuclide composition of this material.
-  Composition::Ptr comp() const;
+  Composition::Ptr comp();
 
  protected:
   Material(Context* ctx, double quantity, Composition::Ptr c);
