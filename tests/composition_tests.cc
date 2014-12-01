@@ -14,7 +14,6 @@ class TestComp : public cyclus::Composition {
   }
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, create_atom) {
   using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
@@ -31,7 +30,6 @@ TEST(CompositionTests, create_atom) {
                    2 * pyne::atomic_mass(922350000) / pyne::atomic_mass(922330000));
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, create_mass) {
   using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
@@ -48,7 +46,6 @@ TEST(CompositionTests, create_mass) {
                    2 / pyne::atomic_mass(922350000) * pyne::atomic_mass(922330000));
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompositionTests, lineage) {
   using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
