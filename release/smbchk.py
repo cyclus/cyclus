@@ -150,6 +150,7 @@ def main(args=None):
     ns = p.parse_args(args=args)
 
     db = load(ns)
+    is_stable = None
     if ns.update:
         update(db, ns)
         if ns.save:
