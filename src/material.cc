@@ -88,6 +88,10 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
   Material::Ptr other(new Material(ctx_, qty, c));
 
+  // Decay called on the extracted material should have the same dt as for
+  // this material regardless of composition.
+  other->prev_decay_time_ = prev_decay_time_;
+
   tracker_.Extract(&other->tracker_);
 
   return other;
@@ -101,6 +105,15 @@ void Material::Absorb(Material::Ptr mat) {
     compmath::Normalize(&otherv, mat->quantity());
     comp_ = Composition::CreateFromMass(compmath::Add(v, otherv));
   }
+
+  // Set the decay time to the value of the material that had the larger
+  // quantity.  This helps avoid inheriting erroneous prev decay times if, for
+  // example, you absorb a material into a zero-quantity material that had a
+  // prev decay time prior to the current simulation time step.
+  if (qty_ < mat->qty_) {
+    prev_decay_time_ = mat->prev_decay_time_;
+  }
+
   qty_ += mat->qty_;
   mat->qty_ = 0;
   tracker_.Absorb(&mat->tracker_);
