@@ -50,12 +50,10 @@ DECAY_URL = 'http://data.pyne.io/decay.tar.gz'
 def ensure_decay_include():
     with io.open(DECAY_CPP, 'r') as f:
         cc = f.read()
-    if cc.startswith('#ifdef PYNE_IS_AMALGAMATED'):
+    if cc.startswith('#include "pyne.h"'):
         return
-    incs = ('#ifdef PYNE_IS_AMALGAMATED\n'
-            '#include "pyne.h"\n'
-            '#include "pyne_decay.h"\n'
-            '#endif\n')
+    incs = ('#include "pyne.h"\n'
+            '#include "pyne_decay.h"\n')
     with io.open(DECAY_CPP, 'w') as f:
         f.write(incs)
         f.write(cc)
