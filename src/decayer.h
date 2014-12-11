@@ -26,9 +26,12 @@ typedef std::map<int, std::vector<std::pair<int, double> > > DaughtersMap;
 
 typedef std::vector<int> NucList;
 
+/// Decayer is DEPRECATED.  Use pyne::decayers::decay.
 class Decayer {
  public:
   Decayer(const CompMap& comp);
+
+  ~Decayer();
 
   /// set the composition from a CompMap
   void GetResult(CompMap& comp);

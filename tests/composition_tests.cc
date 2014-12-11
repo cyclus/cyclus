@@ -3,22 +3,26 @@
 #include <gtest/gtest.h>
 
 #include "composition.h"
+#include "comp_math.h"
 #include "env.h"
 #include "pyne.h"
 
-class TestComp : public cyclus::Composition {
+using cyclus::Composition;
+using cyclus::CompMap;
+using pyne::nucname::id;
+
+class TestComp : public Composition {
  public:
   TestComp() {}
-  cyclus::Composition::Chain DecayLine() {
+  Composition::Chain DecayLine() {
     return *decay_line_.get();
   }
 };
 
 TEST(CompositionTests, create_atom) {
-  using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
 
-  cyclus::CompMap v;
+  CompMap v;
   v[922350000] = 2;
   v[922330000] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(v);
@@ -31,10 +35,9 @@ TEST(CompositionTests, create_atom) {
 }
 
 TEST(CompositionTests, create_mass) {
-  using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
 
-  cyclus::CompMap v;
+  CompMap v;
   v[922350000] = 2;
   v[922330000] = 1;
   Composition::Ptr c = Composition::CreateFromMass(v);
@@ -47,7 +50,6 @@ TEST(CompositionTests, create_mass) {
 }
 
 TEST(CompositionTests, lineage) {
-  using cyclus::Composition;
   cyclus::Env::SetNucDataPath();
 
   TestComp c;
@@ -68,3 +70,25 @@ TEST(CompositionTests, lineage) {
   EXPECT_EQ(chain[3 * dt], dec4);
   EXPECT_EQ(dec4, dec5);
 }
+
+TEST(CompositionTests, decay) {
+  cyclus::Env::SetNucDataPath();
+
+  CompMap v;
+  v[id("Cs137")] = 1;
+  v[id("U238")] = 10;
+  cyclus::compmath::Normalize(&v);
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+
+  double secs_per_timestep = 2419200.0;
+  Composition::Ptr newc = c->Decay(int(pyne::half_life("Cs137") / secs_per_timestep));
+
+  CompMap newv = newc->atom();
+  cyclus::compmath::Normalize(&newv);
+
+  ASSERT_TRUE(newv.size() > 0) << "decayed composition has zero nuclides - what?";
+  ASSERT_TRUE(newv.size() > v.size()) << "decayed composition should have more nuclides than original";
+  EXPECT_NEAR(v[id("Cs137")] / 2, newv[id("Cs137")], 1e-4);
+  EXPECT_NEAR(v[id("U238")], newv[id("U238")], 1e-4);
+}
+
