@@ -26,6 +26,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow")
 
 IF(NOT CYCLUS_DOC_ONLY)
 
+    # download pre-generated decay source code files from pyne
+    EXECUTE_PROCESS(COMMAND python ${PROJECT_SOURCE_DIR}/getdecay.py --root ${PROJECT_SOURCE_DIR})
+
     ##############################################################################################
     ################################# begin cmake configuration ##################################
     ##############################################################################################
