@@ -1,9 +1,15 @@
 #! /usr/bin/env python
+from __future__ import print_function, unicode_literals
 import os
 import sys
+import tarfile
 import subprocess
 import shutil
 import io
+if sys.version_info[0] < 3:
+    from urllib import urlopen
+else:
+    from urllib.request import urlopen
 
 try:
     import argparse as ap

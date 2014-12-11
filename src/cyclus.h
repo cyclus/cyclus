@@ -24,6 +24,7 @@
 #include "material.h"
 #include "agent.h"
 #include "pyne.h"
+#include "pyne_decay.h"
 #include "query_backend.h"
 #include "infile_tree.h"
 #include "recorder.h"
