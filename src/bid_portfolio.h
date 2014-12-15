@@ -19,19 +19,18 @@ class Trader;
 /// @brief A BidPortfolio is a collection of bids as responses to requests for
 /// resources and associated constraints on those bids.
 ///
-/// A BidPortfolio contains all the information corresponding to a
-/// bidder's response to resource requests. It is a light wrapper around the set
-/// of bids and constraints for a given bidder, guaranteeing a single
-/// bidder and commodity per portfolio. Responses are grouped by both the bidder
-/// and the commodity that it produces. Constraints are assumed to act over the
-/// entire set of possible bids.
+/// A BidPortfolio contains all the information corresponding to a bidder's
+/// response to resource requests. It is a light wrapper around the set of bids
+/// and constraints for a given bidder, guaranteeing a single bidder per
+/// portfolio. Responses are grouped by the bidder. Constraints are assumed to
+/// act over the entire set of possible bids.
 template <class T>
 class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
  public:
   typedef boost::shared_ptr< BidPortfolio<T> > Ptr;
 
   /// @brief default constructor
-  BidPortfolio() : bidder_(NULL), commodity_("NO_COMMODITY_SET") {}
+  BidPortfolio() : bidder_(NULL) {}
 
   /// deletes all bids associated with it
   ~BidPortfolio() {
@@ -46,14 +45,13 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
   /// @throws KeyError if a bid is added from a different bidder than the
-  /// original or if the bid commodity is different than the original
+  /// original
   Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
                  Trader* bidder, bool exclusive = false) {
     Bid<T>* b =
         Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
                        exclusive);
     VerifyResponder_(b);
-    VerifyCommodity_(b);
     bids_.insert(b);
     return b;
   }
@@ -70,10 +68,9 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
     return bidder_;
   }
 
-  /// @return the commodity associated with the portfolio. If no bids have
-  /// been added, the commodity is 'NO_COMMODITY_SET'.
-  inline std::string commodity() const {
-    return commodity_;
+  /// @return *deprecated* the commodity associated with the portfolio.
+  inline std::string commodity() const { 
+    return "";
   }
 
   /// @return const access to the bids
@@ -92,7 +89,6 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   BidPortfolio(const BidPortfolio& rhs) {
     bidder_ = rhs.bidder_;
     bids_ = rhs.bids_;
-    commodity_ = rhs.commodity_;
     constraints_ = rhs.constraints_;
     typename std::set<Bid<T>*>::iterator it;
     for (it = bids_.begin(); it != bids_.end(); ++it) {
@@ -114,21 +110,9 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
     }
   }
 
-  /// @brief if the commodity has not been determined yet, it is set. Otherwise
-  /// VerifyCommodity() verifies the commodity is associated with the
-  /// portfolio's commodity
-  /// @throws KeyError if a commodity is added that is a different commodity
-  /// from the original
-  void VerifyCommodity_(const Bid<T>* r) {
-    std::string other = r->request()->commodity();
-    if (commodity_ == "NO_COMMODITY_SET") {
-      commodity_ = other;
-    } else if (commodity_ != other) {
-      std::string msg = "Insertion error: commodities do not match.";
-      throw KeyError(msg);
-    }
-  }
-
+  /// @brief *deprecated*
+  void VerifyCommodity_(const Bid<T>* r) { }
+  
   // bid_ is a set because there is a one-to-one correspondence between a
   // bid and a request, i.e., bids are unique
   std::set<Bid<T>*> bids_;
@@ -136,7 +120,6 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   // constraints_ is a set because constraints are assumed to be unique
   std::set< CapacityConstraint<T> > constraints_;
 
-  std::string commodity_;
   Trader* bidder_;
 };
 
