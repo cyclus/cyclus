@@ -5,6 +5,7 @@
 #include "decayer.h"
 #include "error.h"
 #include "recorder.h"
+#include "pyne_decay.h"
 
 namespace cyclus {
 
@@ -116,13 +117,10 @@ Composition::Ptr Composition::NewDecay(int delta) {
   if (atom_.size() == 0)
     return Composition::Ptr(new Composition(tot_decay, decay_line_));
 
-  Decayer handler(atom_);
-  handler.Decay(2419200.0 * delta);  // 2419200 == secs / month
-
   // the new composition is a part of this decay chain and so is created with a
   // pointer to the exact same decay_line_.
   Composition::Ptr decayed(new Composition(tot_decay, decay_line_));
-  handler.GetResult(decayed->atom_);
+  decayed->atom_ = pyne::decayers::decay(atom_, 2419200.0 * delta);
   return decayed;
 }
 
