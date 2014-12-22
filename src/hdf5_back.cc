@@ -904,7 +904,7 @@ QueryResult Hdf5Back::GetTableInfo(std::string title, hid_t dset, hid_t dt) {
   hsize_t ncols = H5Tget_nmembers(dt);
   std::string fieldname;
   std::string fieldtype;
-  //LoadTableTypes(title, dset, ncols);
+  LoadTableTypes(title, dset, ncols);
   DbTypes* dbtypes = schemas_[title];
 
   QueryResult qr;
