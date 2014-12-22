@@ -15,6 +15,12 @@ inline bool NotCmpConds(T* x, std::vector<cyclus::Cond*>* cond) {
   return !cyclus::CmpConds<T>(x, cond);
 }
 
+TEST(QueryBackendTest, EmptyBlob) {
+  using cyclus::Blob;
+  Blob x = Blob();
+  EXPECT_EQ(0, x.str().size());
+}
+
 TEST(QueryBackendTest, CmpCondOps) {
   using cyclus::Cond;
   using cyclus::CmpCond;
