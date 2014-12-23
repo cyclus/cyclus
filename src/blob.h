@@ -8,6 +8,8 @@ namespace cyclus {
 /// output database.
 class Blob {
  public:
+  Blob() : str_("") {}
+
   explicit Blob(std::string s) : str_(s) {}
 
   const std::string& str() const {
