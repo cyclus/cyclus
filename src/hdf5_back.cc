@@ -1541,6 +1541,33 @@ void Hdf5Back::CreateTable(Datum* d) {
   schemas_[d->title()] = dbtypes;
 }
 
+std::map<std::string, DbTypes> Hdf5Back::ColumnTypes(std::string table) {
+  using std::string;
+  int i;
+  char* colname;
+  hid_t dset = H5Dopen2(file_, table.c_str(), H5P_DEFAULT);
+  hid_t dt = H5Dget_type(dset);
+  hsize_t ncols = H5Tget_nmembers(dt);
+  string fieldname;
+  string fieldtype;
+  LoadTableTypes(table, dset, ncols);
+  DbTypes* dbtypes = schemas_[table];
+
+  // create return value
+  std::map<string, DbTypes> rtn;
+  for (i = 0; i < ncols; ++i) {
+    colname = H5Tget_member_name(dt, i);
+    fieldname = string(colname);
+    free(colname);
+    rtn[fieldname] = dbtypes[i];
+  }
+
+  // close and return
+  H5Tclose(dt);
+  H5Dclose(dset);
+  return rtn;
+}
+
 void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
   const char * c_title = title.c_str();

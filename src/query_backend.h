@@ -275,6 +275,10 @@ class QueryableBackend {
   /// Return a set of rows from the specificed table that match all given
   /// conditions.  Conditions are AND'd together.  conds may be NULL.
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) = 0;
+
+  /// Return a map of column names of the specified table to the associated 
+  /// database type.
+  virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) = 0;
 };
 
 /// Interface implemented by backends that support recording and querying.
@@ -303,6 +307,10 @@ class CondInjector: public QueryableBackend {
     return b_->Query(table, &c);
   }
 
+  virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
+    return b_->ColumnTypes(table);
+  }
+
  private:
   QueryableBackend* b_;
   std::vector<Cond> to_inject_;
@@ -320,6 +328,10 @@ class PrefixInjector: public QueryableBackend {
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
     return b_->Query(prefix_ + table, conds);
+  }
+
+  virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
+    return b_->ColumnTypes(table);
   }
 
  private:

@@ -339,3 +339,22 @@ TEST_F(SqliteBackTests, AllTogether) {
   EXPECT_EQ("one", svget[0]);
   EXPECT_EQ("three", svget[1]);
 }
+
+TEST_F(SqliteBackTests, ColumnTypes) {
+  using std::map;
+  using std::string;
+  FileDeleter fd(path);
+
+  int i = 42;
+
+  // creation
+  r.NewDatum("IntTable")
+      ->AddVal("intcol", i)
+      ->Record();
+  r.Close();
+
+  map<string, cyclus::DbTypes> coltypes = b->ColumnTypes("IntTable");
+  EXPECT_EQ(2, coltypes.size());  // injects simid
+  EXPECT_EQ(cyclus::INT, coltypes["intcol"]);
+}
+

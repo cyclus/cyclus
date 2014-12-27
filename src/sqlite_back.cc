@@ -230,6 +230,14 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
   return q;
 }
 
+std::map<std::string, DbTypes> SqliteBack::ColumnTypes(std::string table) {
+  QueryResult qr = GetTableInfo(table);
+  std::map<std::string, DbTypes> rtn;
+  for (int i = 0; i < qr.fields.size(); ++i)
+    rtn[qr.fields[i]] = qr.types[i];
+  return rtn;
+}
+
 QueryResult SqliteBack::GetTableInfo(std::string table) {
   std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" +
                     table + "';";

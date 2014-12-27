@@ -913,3 +913,27 @@ TEST(Hdf5BackTest, ReadWriteAll) {
   qr = back.Query("DumbTitle", &conds);
   EXPECT_EQ(qr.rows.size(), 1);
 }
+
+
+TEST(Hdf5BackTest, ColumnTypes) {
+  using std::map;
+  using std::string;
+  using cyclus::Recorder;
+  using cyclus::Hdf5Back;
+  FileDeleter fd(path);
+
+  int i = 42;
+
+  // creation
+  Recorder m;
+  Hdf5Back back(path);
+  m.RegisterBackend(&back);
+  m.NewDatum("IntTable")
+      ->AddVal("intcol", i)
+      ->Record();
+  m.Close();
+
+  map<string, cyclus::DbTypes> coltypes = back.ColumnTypes("IntTable");
+  EXPECT_EQ(2, coltypes.size());  // injects simid
+  EXPECT_EQ(cyclus::INT, coltypes["intcol"]);
+}
