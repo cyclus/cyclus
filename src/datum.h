@@ -14,6 +14,7 @@ namespace cyclus {
 /// Recorder for recording.
 class Datum {
   friend class Recorder;
+  friend class RawRecorder;
 
  public:
   typedef std::pair<const char*, boost::spirit::hold_any> Entry;

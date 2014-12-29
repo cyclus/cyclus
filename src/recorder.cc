@@ -102,4 +102,37 @@ void Recorder::Close() {
   backs_.clear();
 }
 
+//
+// Raw Recorder
+//
+
+RawRecorder::RawRecorder() {
+  index_ = 0;
+  uuid_ = boost::uuids::nil_uuid();
+  set_dump_count(kDefaultDumpCount);
+}
+
+void RawRecorder::set_dump_count(unsigned int count) {
+  for (int i = 0; i < data_.size(); ++i) {
+    delete data_[i];
+  }
+  data_.clear();
+  data_.reserve(count);
+  for (int i = 0; i < count; ++i) {
+    Datum* d = new Datum(this, "");
+    data_.push_back(d);
+  }
+  dump_count_ = count;
+}
+
+Datum* RawRecorder::NewDatum(std::string title) {
+  Datum* d = data_[index_];
+  d->title_ = title;
+  d->vals_.resize(0);
+  d->shapes_.resize(0);
+
+  index_++;
+  return d;
+}
+
 }  // namespace cyclus
