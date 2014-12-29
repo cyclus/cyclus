@@ -75,6 +75,8 @@ void Recorder::AddDatum(Datum* d) {
 }
 
 void Recorder::Flush() {
+  if (index_ == 0)
+    return;
   DatumList tmp = data_;
   tmp.resize(index_);
   index_ = 0;

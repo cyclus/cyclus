@@ -67,11 +67,23 @@ TEST(RecorderTest, Manager_Closing) {
 
   ASSERT_FALSE(back1.flushed);
   ASSERT_FALSE(back2.flushed);
-
   m.Close();
+  ASSERT_FALSE(back1.flushed);
+  ASSERT_FALSE(back2.flushed);
 
-  EXPECT_TRUE(back1.flushed);
-  EXPECT_TRUE(back2.flushed);
+  Recorder n;
+  TestBack back3;
+  TestBack back4;
+  n.RegisterBackend(&back3);
+  n.RegisterBackend(&back4);
+  ASSERT_FALSE(back3.flushed);
+  ASSERT_FALSE(back4.flushed);
+  n.NewDatum("DumbTitle")
+      ->AddVal("animal", std::string("monkey"))
+      ->Record();
+  n.Close();
+  EXPECT_TRUE(back3.flushed);
+  EXPECT_TRUE(back4.flushed);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -215,11 +227,23 @@ TEST(RawRecorderTest, Manager_Closing) {
 
   ASSERT_FALSE(back1.flushed);
   ASSERT_FALSE(back2.flushed);
-
   m.Close();
+  ASSERT_FALSE(back1.flushed);
+  ASSERT_FALSE(back2.flushed);
 
-  EXPECT_TRUE(back1.flushed);
-  EXPECT_TRUE(back2.flushed);
+  RawRecorder n;
+  TestBack back3;
+  TestBack back4;
+  n.RegisterBackend(&back3);
+  n.RegisterBackend(&back4);
+  ASSERT_FALSE(back3.flushed);
+  ASSERT_FALSE(back4.flushed);
+  n.NewDatum("DumbTitle")
+      ->AddVal("animal", std::string("monkey"))
+      ->Record();
+  n.Close();
+  EXPECT_TRUE(back3.flushed);
+  EXPECT_TRUE(back4.flushed);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
