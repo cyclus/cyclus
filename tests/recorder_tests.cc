@@ -172,3 +172,148 @@ TEST(RecorderTest, Datum_addVal) {
   cyclus::Datum::Vals vals = back.data.back()->vals();
   EXPECT_EQ(d, back.data.back());
 }
+
+
+//
+// Raw Recorder Test
+//
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RawRecorderTest, Manager_NewDatum) {
+  cyclus::RawRecorder m;
+  cyclus::Datum* d = m.NewDatum("DumbTitle");
+  EXPECT_EQ(d->title(), "DumbTitle");
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RawRecorderTest, Manager_CreateDefault) {
+  using cyclus::RawRecorder;
+  RawRecorder m;
+  EXPECT_EQ(m.dump_count(), cyclus::kDefaultDumpCount);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RawRecorderTest, Manager_GetSetDumpFreq) {
+  using cyclus::RawRecorder;
+  RawRecorder m;
+  m.set_dump_count(1);
+  EXPECT_EQ(m.dump_count(), 1);
+
+  m.set_dump_count(cyclus::kDefaultDumpCount);
+  EXPECT_EQ(m.dump_count(), cyclus::kDefaultDumpCount);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RawRecorderTest, Manager_Closing) {
+  using cyclus::RawRecorder;
+  RawRecorder m;
+  TestBack back1;
+  TestBack back2;
+  m.RegisterBackend(&back1);
+  m.RegisterBackend(&back2);
+
+  ASSERT_FALSE(back1.flushed);
+  ASSERT_FALSE(back2.flushed);
+
+  m.Close();
+
+  EXPECT_TRUE(back1.flushed);
+  EXPECT_TRUE(back2.flushed);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RawRecorderTest, Manager_Buffering) {
+  using cyclus::RawRecorder;
+  TestBack back1;
+
+  RawRecorder m;
+  m.set_dump_count(2);
+  m.RegisterBackend(&back1);
+
+  m.NewDatum("DumbTitle")
+      ->AddVal("animal", std::string("monkey"))
+      ->Record();
+
+  EXPECT_EQ(back1.flush_count, 0);
+  EXPECT_EQ(back1.notify_count, 0);
+
+  m.NewDatum("DumbTitle")
+      ->AddVal("animal", std::string("elephant"))
+      ->Record();
+
+  EXPECT_EQ(back1.flush_count, 2);
+  EXPECT_EQ(back1.notify_count, 1);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RawRecorderTest, Manager_CloseFlushing) {
+  using cyclus::RawRecorder;
+  TestBack back1;
+
+  RawRecorder m;
+  m.set_dump_count(2);
+  m.RegisterBackend(&back1);
+
+  m.NewDatum("DumbTitle")
+      ->AddVal("animal", std::string("monkey"))
+      ->Record();
+
+  EXPECT_EQ(back1.flush_count, 0);
+  EXPECT_EQ(back1.notify_count, 0);
+
+  m.Close();
+
+  EXPECT_EQ(back1.flush_count, 1);
+  EXPECT_EQ(back1.notify_count, 1);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RawRecorderTest, Datum_record) {
+  using cyclus::Datum;
+  using cyclus::RawRecorder;
+  TestBack back;
+  RawRecorder m;
+  m.set_dump_count(1);
+  m.RegisterBackend(&back);
+
+  EXPECT_EQ(back.flush_count, 0);
+
+  Datum* d = m.NewDatum("DumbTitle");
+  d->AddVal("animal", std::string("monkey"))
+      ->Record();
+
+  EXPECT_EQ(back.flush_count, 1);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(RawRecorderTest, Datum_addVal) {
+  using cyclus::Datum;
+  using cyclus::RawRecorder;
+  TestBack back;
+  RawRecorder m;
+  m.RegisterBackend(&back);
+
+  cyclus::Datum* d = m.NewDatum("DumbTitle");
+  d->AddVal("animal", std::string("monkey"));
+  d->AddVal("weight", 10);
+  d->AddVal("height", 5.5);
+  d->Record();
+
+  ASSERT_EQ(d->vals().size(), 3);
+
+  cyclus::Datum::Vals::const_iterator it = d->vals().begin();
+  EXPECT_STREQ(it->first, "animal");
+  EXPECT_EQ(it->second.cast<std::string>(), "monkey");
+  ++it;
+  EXPECT_STREQ(it->first, "weight");
+  EXPECT_EQ(it->second.cast<int>(), 10);
+  ++it;
+  EXPECT_STREQ(it->first, "height");
+  EXPECT_DOUBLE_EQ(it->second.cast<double>(), 5.5);
+
+  m.Close();
+
+  cyclus::Datum::Vals vals = back.data.back()->vals();
+  EXPECT_EQ(d, back.data.back());
+}

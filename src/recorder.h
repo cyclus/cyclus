@@ -111,7 +111,7 @@ class Recorder {
 /// Collects and manages output data bases. This is like the Recorded class
 /// except that the simulation id is not automatically injected into the Datum.
 /// The simulation id is always nil.
-class RawRecorder : Recorder {
+class RawRecorder : public Recorder {
   friend class Datum;
 
  public:
