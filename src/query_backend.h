@@ -279,6 +279,9 @@ class QueryableBackend {
   /// Return a map of column names of the specified table to the associated 
   /// database type.
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) = 0;
+
+  /// Return a set of all table names currently in the database.
+  virtual std::set<std::string> Tables() = 0;
 };
 
 /// Interface implemented by backends that support recording and querying.
@@ -311,6 +314,8 @@ class CondInjector: public QueryableBackend {
     return b_->ColumnTypes(table);
   }
 
+  virtual std::set<std::string> Tables() { return b_->Tables(); }
+
  private:
   QueryableBackend* b_;
   std::vector<Cond> to_inject_;
@@ -333,6 +338,8 @@ class PrefixInjector: public QueryableBackend {
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
     return b_->ColumnTypes(table);
   }
+
+  virtual std::set<std::string> Tables() { return b_->Tables(); }
 
  private:
   QueryableBackend* b_;

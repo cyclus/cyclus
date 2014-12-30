@@ -37,6 +37,8 @@ class SqliteBack: public FullBackend {
 
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table);
 
+  virtual std::set<std::string> Tables();
+
  private:
   void Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt, int index);
 

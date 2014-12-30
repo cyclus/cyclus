@@ -1568,6 +1568,28 @@ std::map<std::string, DbTypes> Hdf5Back::ColumnTypes(std::string table) {
   return rtn;
 }
 
+std::set<std::string> Hdf5Back::Tables() {
+  using std::set;
+  using std::string;
+  set<string> rtn;
+  hsize_t i;
+  hsize_t n;
+  ssize_t namelen;
+  char name[500];
+  H5G_info_t root_info;
+  hid_t root = H5Gopen(file_, "/", H5P_DEFAULT);
+  herr_t err = H5Gget_info(root, &root_info);
+  for (i = 0; i < root_info.nlinks; ++i) {
+    namelen = H5Lget_name_by_idx(root, ".", H5_INDEX_NAME, H5_ITER_NATIVE, i,
+                                 NULL, 0, H5P_DEFAULT);
+    H5Lget_name_by_idx(root, ".", H5_INDEX_NAME, H5_ITER_NATIVE, i,
+                       name, namelen+1, H5P_DEFAULT);
+    rtn.insert(string(name, namelen+1));
+  }
+  H5Gclose(root);
+  return rtn;
+}
+
 void Hdf5Back::WriteGroup(DatumList& group) {
   std::string title = group.front()->title();
   const char * c_title = title.c_str();
