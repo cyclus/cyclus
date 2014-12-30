@@ -914,7 +914,6 @@ TEST(Hdf5BackTest, ReadWriteAll) {
   EXPECT_EQ(qr.rows.size(), 1);
 }
 
-
 TEST(Hdf5BackTest, ColumnTypes) {
   using std::map;
   using std::string;
@@ -936,4 +935,27 @@ TEST(Hdf5BackTest, ColumnTypes) {
   map<string, cyclus::DbTypes> coltypes = back.ColumnTypes("IntTable");
   EXPECT_EQ(2, coltypes.size());  // injects simid
   EXPECT_EQ(cyclus::INT, coltypes["intcol"]);
+}
+
+TEST(Hdf5BackTest, Tables) {
+  using std::set;
+  using std::string;
+  using cyclus::Recorder;
+  using cyclus::Hdf5Back;
+  FileDeleter fd(path);
+
+  int i = 42;
+
+  // creation
+  Recorder m;
+  Hdf5Back back(path);
+  m.RegisterBackend(&back);
+  m.NewDatum("IntTable")
+      ->AddVal("intcol", i)
+      ->Record();
+  m.Close();
+
+  set<string> tabs = back.Tables();
+  EXPECT_LE(1, tabs.size());
+  EXPECT_EQ(1, tabs.count("IntTable"));
 }

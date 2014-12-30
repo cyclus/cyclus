@@ -358,3 +358,20 @@ TEST_F(SqliteBackTests, ColumnTypes) {
   EXPECT_EQ(cyclus::INT, coltypes["intcol"]);
 }
 
+TEST_F(SqliteBackTests, Tables) {
+  using std::set;
+  using std::string;
+  FileDeleter fd(path);
+
+  int i = 42;
+
+  // creation
+  r.NewDatum("IntTable")
+      ->AddVal("intcol", i)
+      ->Record();
+  r.Close();
+
+  set<string> tabs = b->Tables();
+  EXPECT_LE(1, tabs.size());
+  EXPECT_EQ(1, tabs.count("IntTable"));
+}

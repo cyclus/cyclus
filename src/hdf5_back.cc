@@ -1584,7 +1584,7 @@ std::set<std::string> Hdf5Back::Tables() {
                                  NULL, 0, H5P_DEFAULT);
     H5Lget_name_by_idx(root, ".", H5_INDEX_NAME, H5_ITER_NATIVE, i,
                        name, namelen+1, H5P_DEFAULT);
-    rtn.insert(string(name, namelen+1));
+    rtn.insert(string(name, namelen));
   }
   H5Gclose(root);
   return rtn;
