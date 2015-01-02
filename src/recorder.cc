@@ -10,17 +10,23 @@
 
 namespace cyclus {
 
-Recorder::Recorder() : index_(0) {
+Recorder::Recorder() : index_(0), inject_sim_id_(true) {
   uuid_ = boost::uuids::random_generator()();
   set_dump_count(kDefaultDumpCount);
 }
 
-Recorder::Recorder(unsigned int dump_count) : index_(0) {
+Recorder::Recorder(bool inject_sim_id) : index_(0), inject_sim_id_(inject_sim_id) {
+  uuid_ = boost::uuids::random_generator()();
+  set_dump_count(kDefaultDumpCount);
+}
+
+Recorder::Recorder(unsigned int dump_count) : index_(0), inject_sim_id_(true) {
   uuid_ = boost::uuids::random_generator()();
   set_dump_count(dump_count);
 }
 
-Recorder::Recorder(boost::uuids::uuid simid) : index_(0), uuid_(simid) {
+Recorder::Recorder(boost::uuids::uuid simid) : index_(0), uuid_(simid), \
+                                               inject_sim_id_(true) {
   set_dump_count(kDefaultDumpCount);
 }
 
@@ -52,7 +58,9 @@ void Recorder::set_dump_count(unsigned int count) {
   data_.reserve(count);
   for (int i = 0; i < count; ++i) {
     Datum* d = new Datum(this, "");
-    d->AddVal("SimId", uuid_);
+    if (inject_sim_id_) {
+      d->AddVal("SimId", uuid_);
+    }
     data_.push_back(d);
   }
   dump_count_ = count;
@@ -61,8 +69,13 @@ void Recorder::set_dump_count(unsigned int count) {
 Datum* Recorder::NewDatum(std::string title) {
   Datum* d = data_[index_];
   d->title_ = title;
-  d->vals_.resize(1);
-  d->shapes_.resize(1);
+  if (inject_sim_id_) {
+    d->vals_.resize(1);
+    d->shapes_.resize(1);
+  } else {
+    d->vals_.resize(0);
+    d->shapes_.resize(0);
+  }
 
   index_++;
   return d;
@@ -102,39 +115,6 @@ void Recorder::RegisterBackend(RecBackend* b) {
 void Recorder::Close() {
   Flush();
   backs_.clear();
-}
-
-//
-// Raw Recorder
-//
-
-RawRecorder::RawRecorder() {
-  index_ = 0;
-  uuid_ = boost::uuids::nil_uuid();
-  set_dump_count(kDefaultDumpCount);
-}
-
-void RawRecorder::set_dump_count(unsigned int count) {
-  for (int i = 0; i < data_.size(); ++i) {
-    delete data_[i];
-  }
-  data_.clear();
-  data_.reserve(count);
-  for (int i = 0; i < count; ++i) {
-    Datum* d = new Datum(this, "");
-    data_.push_back(d);
-  }
-  dump_count_ = count;
-}
-
-Datum* RawRecorder::NewDatum(std::string title) {
-  Datum* d = data_[index_];
-  d->title_ = title;
-  d->vals_.resize(0);
-  d->shapes_.resize(0);
-
-  index_++;
-  return d;
 }
 
 }  // namespace cyclus

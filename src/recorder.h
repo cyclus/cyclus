@@ -46,16 +46,20 @@ class Recorder {
   friend class Datum;
 
  public:
-  /// create a new recorder with default dump frequency and random
-  /// simulation id.
+  /// create a new recorder with default dump frequency, random
+  /// simulation id, and simulation id injection.
   Recorder();
+
+  /// create a new recorder with the given dump count, random
+  /// simulation id, and given flag for injecting the simulation id.
+  Recorder(bool inject_sim_id);
 
   /// create a new recorder with the given dump count and random
   /// simulation id.
   Recorder(unsigned int dump_count);
 
-  /// create a new recorder with default dump frequency and the specified
-  /// simulation id.
+  /// create a new recorder with default dump frequency. the specified
+  /// simulation id, and simulation id injection.
   Recorder(boost::uuids::uuid simid);
 
   ~Recorder();
@@ -70,10 +74,16 @@ class Recorder {
   ///
   /// @param count # Datum objects to buffer before flushing to backends.
   /// @warning this deletes all buffered data from the recorder.
-  virtual void set_dump_count(unsigned int count);
+  void set_dump_count(unsigned int count);
 
   /// returns the unique id associated with this cyclus simulation.
   boost::uuids::uuid sim_id();
+
+  /// returns whether or not the unique simulation id will be injected.
+  bool inject_sim_id() { return inject_sim_id_; };
+
+  /// sets whether or not the unique simulation id will be injected.
+  void set_inject_sim_id(bool x) { inject_sim_id_ = x; };
 
   /// Creates a new datum namespaced under the specified title.
   ///
@@ -81,7 +91,7 @@ class Recorder {
   /// agents. Also note that a static title (e.g. an unchanging string) will
   /// result in multiple instances of this agent storing datum data together
   /// (e.g. the same table).
-  virtual Datum* NewDatum(std::string title);
+  Datum* NewDatum(std::string title);
 
   /// Registers b to receive Datum notifications for all Datum objects collected
   /// by the Recorder and to receive a flush notification when there
@@ -106,34 +116,7 @@ class Recorder {
   std::list<RecBackend*> backs_;
   unsigned int dump_count_;
   boost::uuids::uuid uuid_;
-};
-
-/// Collects and manages output data bases. This is like the Recorded class
-/// except that the simulation id is not automatically injected into the Datum.
-/// The simulation id is always nil.
-class RawRecorder : public Recorder {
-  friend class Datum;
-
- public:
-  /// create a new raw recorder with default dump frequency and random
-  /// simulation id.
-  RawRecorder();
-
-  /// Set the Recorder to flush its collected Datum objects to registered
-  /// backends every [count] Datum objects. If count == 0 then Datum objects
-  /// will be flushed immediately as they come.
-  ///
-  /// @param count # Datum objects to buffer before flushing to backends.
-  /// @warning this deletes all buffered data from the recorder.
-  virtual void set_dump_count(unsigned int count);
-
-  /// Creates a new datum with the specified title.
-  ///
-  /// @warning choose title carefully to not conflict with Datum objects from other
-  /// agents. Also note that a static title (e.g. an unchanging string) will
-  /// result in multiple instances of this agent storing datum data together
-  /// (e.g. the same table).
-  virtual Datum* NewDatum(std::string title);
+  bool inject_sim_id_;
 };
 
 }  // namespace cyclus

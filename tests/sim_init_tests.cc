@@ -86,7 +86,7 @@ Agent* ConstructInver(cy::Context* ctx) {
 
 class SimInitTest : public ::testing::Test {
  public:
-  SimInitTest() : rec(300) {}
+  SimInitTest() : rec((unsigned int) 300) {}
 
  protected:
   virtual void SetUp() {

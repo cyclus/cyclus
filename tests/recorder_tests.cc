@@ -56,6 +56,15 @@ TEST(RecorderTest, Manager_GetSetDumpFreq) {
   EXPECT_EQ(m.dump_count(), cyclus::kDefaultDumpCount);
 }
 
+TEST(RecorderTest, InjectSimId) {
+  using cyclus::Recorder;
+  Recorder m;
+  EXPECT_TRUE(m.inject_sim_id());
+
+  m.set_inject_sim_id(false);
+  EXPECT_FALSE(m.inject_sim_id());
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RecorderTest, Manager_Closing) {
   using cyclus::Recorder;
@@ -193,22 +202,23 @@ TEST(RecorderTest, Datum_addVal) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RawRecorderTest, Manager_NewDatum) {
-  cyclus::RawRecorder m;
+  using cyclus::Recorder;
+  Recorder m (false);
   cyclus::Datum* d = m.NewDatum("DumbTitle");
   EXPECT_EQ(d->title(), "DumbTitle");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RawRecorderTest, Manager_CreateDefault) {
-  using cyclus::RawRecorder;
-  RawRecorder m;
+  using cyclus::Recorder;
+  Recorder m (false);
   EXPECT_EQ(m.dump_count(), cyclus::kDefaultDumpCount);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RawRecorderTest, Manager_GetSetDumpFreq) {
-  using cyclus::RawRecorder;
-  RawRecorder m;
+  using cyclus::Recorder;
+  Recorder m (false);
   m.set_dump_count(1);
   EXPECT_EQ(m.dump_count(), 1);
 
@@ -216,10 +226,19 @@ TEST(RawRecorderTest, Manager_GetSetDumpFreq) {
   EXPECT_EQ(m.dump_count(), cyclus::kDefaultDumpCount);
 }
 
+TEST(RawRecorderTest, InjectSimId) {
+  using cyclus::Recorder;
+  Recorder m (false);
+  EXPECT_FALSE(m.inject_sim_id());
+
+  m.set_inject_sim_id(true);
+  EXPECT_TRUE(m.inject_sim_id());
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RawRecorderTest, Manager_Closing) {
-  using cyclus::RawRecorder;
-  RawRecorder m;
+  using cyclus::Recorder;
+  Recorder m (false);
   TestBack back1;
   TestBack back2;
   m.RegisterBackend(&back1);
@@ -231,7 +250,7 @@ TEST(RawRecorderTest, Manager_Closing) {
   ASSERT_FALSE(back1.flushed);
   ASSERT_FALSE(back2.flushed);
 
-  RawRecorder n;
+  Recorder n (false);
   TestBack back3;
   TestBack back4;
   n.RegisterBackend(&back3);
@@ -248,10 +267,10 @@ TEST(RawRecorderTest, Manager_Closing) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RawRecorderTest, Manager_Buffering) {
-  using cyclus::RawRecorder;
+  using cyclus::Recorder;
   TestBack back1;
 
-  RawRecorder m;
+  Recorder m (false);
   m.set_dump_count(2);
   m.RegisterBackend(&back1);
 
@@ -272,10 +291,10 @@ TEST(RawRecorderTest, Manager_Buffering) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RawRecorderTest, Manager_CloseFlushing) {
-  using cyclus::RawRecorder;
+  using cyclus::Recorder;
   TestBack back1;
 
-  RawRecorder m;
+  Recorder m (false);
   m.set_dump_count(2);
   m.RegisterBackend(&back1);
 
@@ -295,9 +314,9 @@ TEST(RawRecorderTest, Manager_CloseFlushing) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RawRecorderTest, Datum_record) {
   using cyclus::Datum;
-  using cyclus::RawRecorder;
+  using cyclus::Recorder;
   TestBack back;
-  RawRecorder m;
+  Recorder m (false);
   m.set_dump_count(1);
   m.RegisterBackend(&back);
 
@@ -313,9 +332,9 @@ TEST(RawRecorderTest, Datum_record) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RawRecorderTest, Datum_addVal) {
   using cyclus::Datum;
-  using cyclus::RawRecorder;
+  using cyclus::Recorder;
   TestBack back;
-  RawRecorder m;
+  Recorder m (false);
   m.RegisterBackend(&back);
 
   cyclus::Datum* d = m.NewDatum("DumbTitle");
