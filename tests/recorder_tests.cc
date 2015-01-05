@@ -57,12 +57,32 @@ TEST(RecorderTest, Manager_GetSetDumpFreq) {
 }
 
 TEST(RecorderTest, InjectSimId) {
+  using cyclus::Datum;
   using cyclus::Recorder;
   Recorder m;
+  // with injection
   EXPECT_TRUE(m.inject_sim_id());
+  Datum* d = m.NewDatum("DumbTitle");
+  d->AddVal("animal", std::string("monkey"))
+   ->Record();
+  ASSERT_EQ(d->vals().size(), 2);
+  cyclus::Datum::Vals::const_iterator it = d->vals().begin();
+  EXPECT_STREQ(it->first, "SimId");
+  EXPECT_EQ(it->second.cast<boost::uuids::uuid>(), m.sim_id());
+  ++it;
+  EXPECT_STREQ(it->first, "animal");
+  EXPECT_EQ(it->second.cast<std::string>(), "monkey");
 
+  // without injection
   m.inject_sim_id(false);
   EXPECT_FALSE(m.inject_sim_id());
+  d = m.NewDatum("OtherTitle");
+  d->AddVal("music", std::string("funkey"))
+   ->Record();
+  ASSERT_EQ(d->vals().size(), 1);
+  it = d->vals().begin();
+  EXPECT_STREQ(it->first, "music");
+  EXPECT_EQ(it->second.cast<std::string>(), "funkey");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -227,12 +247,32 @@ TEST(RawRecorderTest, Manager_GetSetDumpFreq) {
 }
 
 TEST(RawRecorderTest, InjectSimId) {
+  using cyclus::Datum;
   using cyclus::Recorder;
   Recorder m (false);
+  // Without injection
   EXPECT_FALSE(m.inject_sim_id());
+  Datum* d = m.NewDatum("DumbTitle");
+  d->AddVal("music", std::string("funkey"))
+   ->Record();
+  ASSERT_EQ(d->vals().size(), 1);
+  cyclus::Datum::Vals::const_iterator it = d->vals().begin();
+  EXPECT_STREQ(it->first, "music");
+  EXPECT_EQ(it->second.cast<std::string>(), "funkey");
 
+  // with injections
   m.inject_sim_id(true);
   EXPECT_TRUE(m.inject_sim_id());
+  d = m.NewDatum("OtherTitle");
+  d->AddVal("animal", std::string("monkey"))
+   ->Record();
+  ASSERT_EQ(d->vals().size(), 2);
+  it = d->vals().begin();
+  EXPECT_STREQ(it->first, "SimId");
+  EXPECT_EQ(it->second.cast<boost::uuids::uuid>(), m.sim_id());
+  ++it;
+  EXPECT_STREQ(it->first, "animal");
+  EXPECT_EQ(it->second.cast<std::string>(), "monkey");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
