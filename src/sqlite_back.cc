@@ -245,8 +245,7 @@ std::set<std::string> SqliteBack::Tables() {
   std::string sql = "SELECT name FROM sqlite_master WHERE type='table';";
   SqlStatement::Ptr stmt;
   stmt = db_.Prepare(sql);
-  int i;
-  for (i = 0; stmt->Step(); ++i) {
+  while (stmt->Step()) {
     rtn.insert(stmt->GetText(0, NULL));
   }
   return rtn;
