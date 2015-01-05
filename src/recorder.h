@@ -107,7 +107,7 @@ class Recorder {
   /// Unregisters all backends and resets.
   void Close();
 
- protected:
+ private:
   void NotifyBackends();
   void AddDatum(Datum* d);
 
