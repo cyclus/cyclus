@@ -61,7 +61,7 @@ TEST(RecorderTest, InjectSimId) {
   Recorder m;
   EXPECT_TRUE(m.inject_sim_id());
 
-  m.set_inject_sim_id(false);
+  m.inject_sim_id(false);
   EXPECT_FALSE(m.inject_sim_id());
 }
 
@@ -231,7 +231,7 @@ TEST(RawRecorderTest, InjectSimId) {
   Recorder m (false);
   EXPECT_FALSE(m.inject_sim_id());
 
-  m.set_inject_sim_id(true);
+  m.inject_sim_id(true);
   EXPECT_TRUE(m.inject_sim_id());
 }
 

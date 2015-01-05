@@ -83,8 +83,8 @@ class Recorder {
   bool inject_sim_id() { return inject_sim_id_; };
 
   /// sets whether or not the unique simulation id will be injected.
-  void set_inject_sim_id(bool x) { inject_sim_id_ = x; };
-
+  void inject_sim_id(bool x) { inject_sim_id_ = x; };
+ 
   /// Creates a new datum namespaced under the specified title.
   ///
   /// @warning choose title carefully to not conflict with Datum objects from other
