@@ -238,6 +238,19 @@ std::map<std::string, DbTypes> SqliteBack::ColumnTypes(std::string table) {
   return rtn;
 }
 
+std::set<std::string> SqliteBack::Tables() {
+  using std::set;
+  using std::string;
+  set<string> rtn;
+  std::string sql = "SELECT name FROM sqlite_master WHERE type='table';";
+  SqlStatement::Ptr stmt;
+  stmt = db_.Prepare(sql);
+  while (stmt->Step()) {
+    rtn.insert(stmt->GetText(0, NULL));
+  }
+  return rtn;
+}
+
 QueryResult SqliteBack::GetTableInfo(std::string table) {
   std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" +
                     table + "';";

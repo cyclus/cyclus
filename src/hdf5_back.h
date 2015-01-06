@@ -91,6 +91,8 @@ class Hdf5Back : public FullBackend {
 
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table);
 
+  virtual std::set<std::string> Tables();
+
  private:
   /// Creates a QueryResult from a table description.
   QueryResult GetTableInfo(std::string title, hid_t dset, hid_t dt);
