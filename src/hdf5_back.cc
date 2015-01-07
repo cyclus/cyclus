@@ -532,6 +532,33 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
               row[j] = x;
             break;
           }
+          case PAIR_INT_STRING: {
+            size_t nullpos;
+            unsigned int strlen = col_sizes_[table][j] - sizeof(int);
+            int xfirst = *reinterpret_cast<int*>(buf + offset);
+            string s = string(buf + offset + sizeof(int), strlen);
+            nullpos = s.find('\0');
+            if (nullpos != std::string::npos)
+              s.resize(nullpos);
+            pair<int, string> x = std::make_pair(xfirst, s);
+            is_row_selected =
+                CmpConds<pair<int, string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
+          case PAIR_INT_VL_STRING: {
+            unsigned int itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
+            jlen = col_sizes_[table][j] / itemsize;
+            pair<int, string> x = std::make_pair(
+              *reinterpret_cast<int*>(buf + offset),
+              VLRead<string, VL_STRING>(buf + offset + sizeof(int)));
+            is_row_selected =
+                CmpConds<pair<int, string> >(&x, &(field_conds[qr.fields[j]]));
+            if (is_row_selected)
+              row[j] = x;
+            break;
+          }
           case MAP_INT_INT: {
             map<int, int> x = map<int, int>();
             jlen = col_sizes_[table][j] / (2*sizeof(int));
@@ -1223,6 +1250,24 @@ void Hdf5Back::CreateTable(Datum* d) {
       H5Tinsert(field_types[i], "first", 0, H5T_NATIVE_INT);
       H5Tinsert(field_types[i], "second", sizeof(int), H5T_NATIVE_INT);
       opened_types_.insert(field_types[i]);
+    } else if (valtype == typeid(pair<int, string>)) {
+      shape = shapes[i];
+      if (shape.empty() || shape[0] < 1) {
+        dbtypes[i] = PAIR_INT_VL_STRING;
+        field_types[i] = H5Tcreate(H5T_COMPOUND, sizeof(int) + CYCLUS_SHA1_SIZE);
+        H5Tinsert(field_types[i], "first", 0, H5T_NATIVE_INT);
+        H5Tinsert(field_types[i], "second", sizeof(int), sha1_type_);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = (sizeof(int) + CYCLUS_SHA1_SIZE);
+      } else {
+        dbtypes[i] = PAIR_INT_STRING;
+        hid_t str_type = CreateFLStrType(shape[0]);
+        field_types[i] = H5Tcreate(H5T_COMPOUND, sizeof(int) + shape[0]);
+        H5Tinsert(field_types[i], "first", 0, H5T_NATIVE_INT);
+        H5Tinsert(field_types[i], "second", sizeof(int), str_type);
+        opened_types_.insert(field_types[i]);
+        dst_sizes[i] = (sizeof(int) + shape[0]);
+      }
     } else if (valtype == typeid(std::map<int, int>)) {
       shape = shapes[i];
       hid_t item_type = H5Tcreate(H5T_COMPOUND, sizeof(int) * 2);
@@ -1963,6 +2008,26 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           std::pair<int, int> val = a->cast<std::pair<int, int> >();
           memcpy(buf + offset, &(val.first), sizeof(int));
           memcpy(buf + offset + sizeof(int), &(val.second), sizeof(int));
+          break;
+        }
+        case PAIR_INT_STRING: {
+          pair<int, string> val = a->cast<pair<int, string> >();
+          shape = shapes[col];
+          int strlen = shape[0];
+          fieldlen = sizeof(int) + strlen;
+          memcpy(buf + offset, &(val.first), sizeof(int));
+          valuelen = std::min(static_cast<int>(val.second.size()), strlen);
+          memcpy(buf + offset + sizeof(int), val.second.c_str(), valuelen);
+          memset(buf + offset + sizeof(int) + valuelen, 0, strlen - valuelen);
+          break;
+        }
+        case PAIR_INT_VL_STRING: {
+          pair<int, string> val = a->cast<pair<int, string> >();
+          Digest valhash;
+          fieldlen = sizeof(int) + CYCLUS_SHA1_SIZE;
+          memcpy(buf + offset, &(val.first), sizeof(int));
+          valhash = VLWrite<string, VL_STRING>(val.second);
+          memcpy(buf + offset + sizeof(int), valhash.val, CYCLUS_SHA1_SIZE);
           break;
         }
         case MAP_INT_INT: {

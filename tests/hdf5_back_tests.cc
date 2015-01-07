@@ -439,10 +439,29 @@ TEST_F(Hdf5BackTests, ReadWriteVLListVLString) {
 
 TEST_F(Hdf5BackTests, ReadWritePairIntInt) {
   using std::pair;
-  shape.clear();
+  shape.resize(1);
+  shape[0] = 3;
   pair<int, int> x = pair<int, int>(6, 28);
   pair<int, int> y = pair<int, int>(42, 43);
   TestBasic<pair<int, int> >("pair_int_int", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWritePairIntString) {
+  using std::string;
+  using std::pair;
+  shape.clear();
+  pair<int, string> x = pair<int, string>(6, "yo");
+  pair<int, string> y = pair<int, string>(42, "mom");
+  TestBasic<pair<int, string> >("pair_int_string", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWritePairIntVLString) {
+  using std::string;
+  using std::pair;
+  shape.clear();
+  pair<int, string> x = pair<int, string>(6, "wakka");
+  pair<int, string> y = pair<int, string>(42, "It just might be a one-shot deal");
+  TestBasic<pair<int, string> >("pair_int_vl_string", x, y);
 }
 
 TEST_F(Hdf5BackTests, ReadWriteMapIntInt) {

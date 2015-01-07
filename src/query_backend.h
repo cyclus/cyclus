@@ -160,6 +160,11 @@ enum DbTypes {
   VL_MAP_VL_STRING_BLOB,
   MAP_VL_STRING_UUID,
   VL_MAP_VL_STRING_UUID,
+  // maps with pair<int, string> keys
+  MAP_PAIR_INT_STRING_DOUBLE,
+  MAP_PAIR_INT_VL_STRING_DOUBLE,
+  VL_MAP_PAIR_INT_STRING_DOUBLE,
+  VL_MAP_PAIR_INT_VL_STRING_DOUBLE,
 };
 
 /// Represents operation codes for condition checking.
@@ -527,6 +532,11 @@ class Sha1 {
     hash_.process_bytes(&(x.second), sizeof(int));
   }
 
+  inline void Update(const std::pair<int, std::string>& x) {
+    hash_.process_bytes(&(x.first), sizeof(int));
+    hash_.process_bytes(x.second.c_str(), x.second.size());
+  }
+
   inline void Update(const std::map<int, int>& x) {
     std::map<int, int>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -572,6 +582,15 @@ class Sha1 {
     for (; it != x.end(); ++it) {
       hash_.process_bytes(it->first.c_str(), it->first.size());
       hash_.process_bytes(it->second.c_str(), it->second.size());
+    }
+  }
+
+  inline void Update(const std::map<std::pair<int, std::string>, double>& x) {
+    std::map<std::pair<int, std::string>, double>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first.first), sizeof(int));
+      hash_.process_bytes(it->first.second.c_str(), it->first.second.size());
+      hash_.process_bytes(&(it->second), sizeof(double));
     }
   }
   /// \}
