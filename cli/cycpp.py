@@ -949,11 +949,11 @@ class InitFromDbFilter(CodeGeneratorFilter):
             impl += ind + '{0} = qr.GetVal<{1}>("{0}");\n'.format(member, tstr)
         for b, info in cap_buffs.items():
             if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + ('{0}.set_capacity(qr.GetVal<double>'
-                               '("{1}"));\n').format(b, info['capacity'])
+                impl += ind + ('{0}.set_capacity({1});\n'
+                               .format(b, info['capacity']))
             else:  # ResBuf
-                impl += ind + ('{0}.capacity(qr.GetVal<double>'
-                               '("{1}"));\n').format(b, info['capacity'])
+                impl += ind + ('{0}.capacity({1});\n'
+                               .format(b, info['capacity']))
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):

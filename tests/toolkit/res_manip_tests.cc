@@ -7,6 +7,7 @@ using cyclus::Material;
 using cyclus::Product;
 using cyclus::Resource;
 using cyclus::toolkit::Squash;
+using cyclus::toolkit::ResCast;
 
 
 Material::Ptr testmat() {
@@ -86,5 +87,21 @@ TEST(ResManipTests, Squash_Res) {
     tot += rs[i]->quantity();
   }
   EXPECT_DOUBLE_EQ(testprod()->quantity()*n, tot);
+}
+
+TEST(ResManipTests, ResCast_Material) {
+  std::vector<Material::Ptr> rs;
+  for (int i = 0; i < 2; i++) {
+    rs.push_back(testmat());
+  }
+  ASSERT_NO_THROW(std::vector<Resource::Ptr> foo = ResCast(rs));
+}
+
+TEST(ResManipTests, ResCast_Product) {
+  std::vector<Product::Ptr> rs;
+  for (int i = 0; i < 2; i++) {
+    rs.push_back(testprod());
+  }
+  ASSERT_NO_THROW(std::vector<Resource::Ptr> foo = ResCast(rs));
 }
 
