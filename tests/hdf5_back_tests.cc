@@ -848,6 +848,79 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringVLString) {
   TestBasic<map<string, string> >("vl_map_vl_string_vl_string", x, y);
 }
 
+TEST_F(Hdf5BackTests, ReadWriteMapPairIntStringDouble) {
+  using std::map;
+  using std::string;
+  using std::pair;
+  using std::make_pair;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = 4;
+  map<pair<int, string>, double> x;
+  x[make_pair(1, "jazz")] = 6.0;
+  x[make_pair(2, "from")] = 28.0;
+  x[make_pair(6, "hell")] = 496.0;
+  map<pair<int, string>, double> y;
+  y[make_pair(44, "help")] = 42.0;
+  y[make_pair(43, "imma")] = 43.0;
+  y[make_pair(42, "rock")] = 44.0;
+  TestBasic<map<pair<int, string>, double> >("map_pair_int_string_double", x, y);
+}
+
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapPairIntStringDouble) {
+  using std::map;
+  using std::string;
+  using std::pair;
+  using std::make_pair;
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = 4;
+  map<pair<int, string>, double> x;
+  x[make_pair(11, "abso")] = 6.0;
+  x[make_pair(17, "lute")] = 28.0;
+  x[make_pair(67, "ly  ")] = 496.0;
+  x[make_pair(99, "free")] = 8128.0;
+  map<pair<int, string>, double> y;
+  y[make_pair(43, "Arf!")] = 42.0;
+  y[make_pair(42, "Arf?")] = 43.0;
+  TestBasic<map<pair<int, string>, double> >("vl_map_pair_int_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteMapPairIntVLStringDouble) {
+  using std::map;
+  using std::string;
+  using std::pair;
+  using std::make_pair;
+  shape.resize(2);
+  shape[0] = 3;
+  shape[1] = -1;
+  map<pair<int, string>, double> x;
+  x[make_pair(1, "you")] = 6.0;
+  x[make_pair(2, "are")] = 28.0;
+  x[make_pair(3, "probably")] = 496.0;
+  map<pair<int, string>, double> y;
+  y[make_pair(44, "wondering")] = 42.0;
+  y[make_pair(43, "why")] = 43.0;
+  y[make_pair(42, "I'm here!")] = 44.0;
+  TestBasic<map<pair<int, string>, double> >("map_pair_int_vl_string_double", x, y);
+}
+
+TEST_F(Hdf5BackTests, ReadWriteVLMapPairIntVLStringDouble) {
+  using std::map;
+  using std::string;
+  using std::pair;
+  using std::make_pair;
+  shape.clear();
+  map<pair<int, string>, double> x;
+  x[make_pair(24, "I am lonesome")] = 6.0;
+  x[make_pair(12, "Cowboy Burt")] = 28.0;
+  map<pair<int, string>, double> y;
+  y[make_pair(6, "Come smell my friend's shirt")] = 42.0;
+  TestBasic<map<pair<int, string>, double> >("vl_map_pair_int_vl_string_double", x, y);
+}
+
+
 
 
 //

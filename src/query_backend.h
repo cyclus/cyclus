@@ -160,10 +160,10 @@ enum DbTypes {
   VL_MAP_VL_STRING_BLOB,
   MAP_VL_STRING_UUID,
   VL_MAP_VL_STRING_UUID,
-  // maps with pair<int, string> keys
+  // maps with pair<int, string> keys and double values
   MAP_PAIR_INT_STRING_DOUBLE,
-  MAP_PAIR_INT_VL_STRING_DOUBLE,
   VL_MAP_PAIR_INT_STRING_DOUBLE,
+  MAP_PAIR_INT_VL_STRING_DOUBLE,
   VL_MAP_PAIR_INT_VL_STRING_DOUBLE,
 };
 
