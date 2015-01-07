@@ -191,7 +191,7 @@ class ResBuf {
   }
 
   /// Same as PopN except returns the Resource-typed objects.
-  ResVec PopNRes(int n) { return ResCast<Resource>(PopN(n)); }
+  ResVec PopNRes(int n) { return ResCast(PopN(n)); }
 
   /// Returns the next resource in line to be popped from the buffer
   /// without actually removing it from the buffer.

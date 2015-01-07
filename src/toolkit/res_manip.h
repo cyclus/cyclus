@@ -20,6 +20,12 @@ Material::Ptr Squash(std::vector<Material::Ptr> ms);
 /// resource.
 Resource::Ptr Squash(std::vector<Resource::Ptr> rs);
 
+/// Casts a vector of Materials into a vector of Resources.
+std::vector<Resource::Ptr> ResCast(std::vector<Material::Ptr> rs);
+
+/// Casts a vector of Products into a vector of Resources.
+std::vector<Resource::Ptr> ResCast(std::vector<Product::Ptr> rs);
+
 }  // namespace toolkit
 }  // namespace cyclus
 

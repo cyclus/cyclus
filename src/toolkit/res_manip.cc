@@ -33,11 +33,11 @@ Resource::Ptr Squash(std::vector<Resource::Ptr> rs) {
     throw Error("cannot squash zero resources together");
   }
 
-  std::vector<Material::Ptr> mats = ResCast<Material>(rs);
+  std::vector<Material::Ptr> mats = ::cyclus::ResCast<Material>(rs);
   if (mats[0] != NULL) {
     return Squash(mats);
   }
-  std::vector<Product::Ptr> prods = ResCast<Product>(rs);
+  std::vector<Product::Ptr> prods = ::cyclus::ResCast<Product>(rs);
   if (prods[0] != NULL) {
     return Squash(prods);
   }
@@ -45,6 +45,22 @@ Resource::Ptr Squash(std::vector<Resource::Ptr> rs) {
   throw Error("cannot squash resource type " + rs[0]->type());
 }
   
+std::vector<Resource::Ptr> ResCast(std::vector<Material::Ptr> rs) {
+  std::vector<Resource::Ptr> casted;
+  for (int i = 0; i < rs.size(); ++i) {
+    casted.push_back(boost::dynamic_pointer_cast<Resource>(rs[i]));
+  }
+  return casted;
+}
+
+std::vector<Resource::Ptr> ResCast(std::vector<Product::Ptr> rs) {
+  std::vector<Resource::Ptr> casted;
+  for (int i = 0; i < rs.size(); ++i) {
+    casted.push_back(boost::dynamic_pointer_cast<Resource>(rs[i]));
+  }
+  return casted;
+}
+
 }  // namespace toolkit
 }  // namespace cyclus
 
