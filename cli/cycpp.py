@@ -673,6 +673,8 @@ class StateAccumulator(object):
             # string version of template type
             t = " ".join(t.strip().strip(scopz).split())
             t = self.canonize_type(parse_template(t), name=name, statement=statement)
+        elif t in self.known_templates:
+            pass
         else:
             # primitive type
             t = " ".join(t.strip().strip(scopz).split())
