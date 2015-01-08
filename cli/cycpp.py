@@ -673,8 +673,6 @@ class StateAccumulator(object):
             # string version of template type
             t = " ".join(t.strip().strip(scopz).split())
             t = self.canonize_type(parse_template(t), name=name, statement=statement)
-        elif t in self.known_templates:
-            pass
         else:
             # primitive type
             t = " ".join(t.strip().strip(scopz).split())
@@ -1736,6 +1734,8 @@ def split_template_args(s, open_brace='<', close_brace='>', separator=','):
     for n in ns:
         count += int(open_brace in n)
         count -= int(close_brace in n)
+        if len(targ_name) > 0:
+            targ_name += separator
         targ_name += n
         if count == 0:
             targs.append(targ_name.strip())
