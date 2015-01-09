@@ -128,6 +128,17 @@ void Material::Absorb(Material::Ptr mat) {
 void Material::Transmute(Composition::Ptr c) {
   comp_ = c;
   tracker_.Modify();
+
+  // Presumably the user has chosen the new composition to be accurate for
+  // the current simulation time.  The next call to decay should not include
+  // accumulated decay delta t from a composition that no longer exists in
+  // this material.  This ---------+ condition allows testing to work.
+  //                               |
+  //                               |
+  //                               V
+  if (ctx_ != NULL && ctx_->time() > prev_decay_time_) {
+    prev_decay_time_ = ctx_->time();
+  }
 }
 
 void Material::Decay(int curr_time) {
@@ -142,7 +153,9 @@ void Material::Decay(int curr_time) {
   }
 
   int dt = curr_time - prev_decay_time_;
-  assert(dt >= 0);
+  if (dt == 0) {
+    return;
+  }
 
   double eps = 1e-3;
   const CompMap c = comp_->atom();
@@ -171,11 +184,9 @@ void Material::Decay(int curr_time) {
     }
   }
 
-  prev_decay_time_ = curr_time;
-  if (dt > 0) {
-    Composition::Ptr decayed = comp_->Decay(dt);
-    Transmute(decayed);
-  }
+  prev_decay_time_ = curr_time; // this must go before Transmute call
+  Composition::Ptr decayed = comp_->Decay(dt);
+  Transmute(decayed);
 }
 
 Composition::Ptr Material::comp() {
