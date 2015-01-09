@@ -15,7 +15,7 @@ from cycpp import NamespaceFilter, TypedefFilter, UsingFilter,\
 
 # pass 2 Filters
 from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter, \
-    NoteDecorationFilter
+    NoteDecorationFilter, StateAccumulator
 
 # pass 3 Filters
 from cycpp import CloneFilter, InitFromCopyFilter, \
@@ -249,6 +249,22 @@ class MockAliasCodeGenMachine(object):
 
     def classname(self):
         return self.local_classname
+
+
+def test_canon_type():
+    sa = StateAccumulator()
+    cases = [
+        ('double', 'double'),
+        ('std::string', 'std::string'),
+        ('std::vector<int>', ('std::vector', 'int')),
+        ('std::map<int, cyclus::Blob>', ('std::map', 'int', 'cyclus::Blob')),
+        ('std::pair<int,std::string>', ('std::pair', 'int', 'std::string')),
+        ('std::map<std::pair<int, std::string>, double>', 
+            ('std::map', ('std::pair', 'int', 'std::string'), 'double')),
+        ]
+    for t, exp in cases:
+        obs = sa.canonize_type(t)
+        yield assert_equal, exp, obs
 
 #
 # pass 3 Filters

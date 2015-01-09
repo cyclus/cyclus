@@ -1734,6 +1734,8 @@ def split_template_args(s, open_brace='<', close_brace='>', separator=','):
     for n in ns:
         count += int(open_brace in n)
         count -= int(close_brace in n)
+        if len(targ_name) > 0:
+            targ_name += separator
         targ_name += n
         if count == 0:
             targs.append(targ_name.strip())
