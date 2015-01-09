@@ -17,42 +17,28 @@
 namespace cyclus {
 namespace toolkit {
 
-/// ResMap     is a helper class that provides semi-automated management of
-/// a collection of resources (e.g. agent stocks and inventories).
-/// Constructed buffers have infinite capacity unless explicitly changed.
-/// Resource popping occurs in the order the resources were pushed (i.e. oldest
-/// resources are popped first), unless explicitly specified otherwise.
+/// ResMap container for the management of resources. It allows you to associate
+/// keys with individual resources. The keys are often strings or ints and the
+/// ResMap enables you to add whatever semantic meaning that you want to these keys.
+/// Like the ResBuf class, ResMap is able to keep track of its total quantity of
+/// resources and has a maximum capacity limit. Overfilled ResMaps will throw a
+/// ValueError when their quantity() is next computed.
 ///
-/// Typically, a ResMap     will be a member variable on an agent/archetype class.
-/// Resources can be added and retrieved from it as needed, and the buffer can
-/// be queried in various ways as done in the example below:
+/// Typically, a ResMap will be a member variable of an archetype class.
+/// Resources can be added, removed, and retrieved from it as needed.
 ///
 /// @code
-/// class MyAgent : public cyclus::Facility {
+/// class HasResMapAgent : public cyclus::Facility {
 ///  public:
 ///   Tick() {
-///     double batch_size = 2703;
-///     if (outventory_.space() < batch_size) {
-///       return;
-///     } else if (inventory_.quantity() < batch_size) {
-///       return;
-///     }
-///
-///     outventory_.Push(inventory_.Pop(batch_size));
+///     cyclus::Material::Ptr best = inventory_["best"];
+///     double invsize = inventory_.quantity();
 ///   }
 ///
-///   ... // resource exchange to fill up inventory_ buffer
-///
 ///  private:
-///   ...
-///   cyclus::toolkit::ResMap    <cyclus::Material> inventory_;
-///   cyclus::toolkit::ResMap    <cyclus::Material> outventory_;
+///   cyclus::toolkit::ResMap<std::string, cyclus::Material> inventory_;
 /// };
 /// @endcode
-///
-/// In this example, if there is sufficient material in inventory_, 2703 kg is
-/// removed as a single object that is then placed in another buffer
-/// (outventory_) each time step.
 template <class K, class R>
 class ResMap {
  public:
@@ -67,12 +53,11 @@ class ResMap {
   typedef typename std::map<K, typename R::Ptr>::iterator iterator;
   typedef typename std::map<K, typename R::Ptr>::const_iterator const_iterator;
 
-  /// Returns the maximum resource quantity this buffer can hold (units
+  /// Returns the maximum resource quantity this mapping can hold (units
   /// based on constituent resource objects' units).
-  /// Never throws.
   inline double capacity() const { return capacity_; }
 
-  /// Sets the maximum quantity this buffer can hold (units based
+  /// Sets the maximum quantity this mapping can hold (units based
   /// on constituent resource objects' units).
   ///
   /// @throws ValueError the new capacity is lower (by eps_rsrc()) than the
@@ -90,8 +75,7 @@ class ResMap {
   /// Returns the total number of resources in the map.
   inline int size() const { return resources_.size(); }
 
-  /// Returns the total resource quantity of constituent resource
-  /// objects in the map.
+  /// Returns the total quantity of resources in the map.
   inline double quantity() {
     if (dirty_quantity_)
       UpdateQuantity();
@@ -104,53 +88,71 @@ class ResMap {
     return quantity_;
   };
 
-  /// Returns the quantity of space remaining in this buffer.
+  /// Returns the quantity of space remaining in the mapping.
   /// This is effectively the difference between the capacity and the quantity
-  /// and is never negative. Never throws.
+  /// and is non-negative.
   inline double space() { return std::max(0.0, capacity_ - quantity()); }
 
-  /// Returns true if there are no resources in the buffer.
+  /// Returns true if there are no resources in the map.
   inline bool empty() const { return resources_.empty(); }
 
+  /// Returns a reference to a resource pointer given a key.
   typename R::Ptr& operator[](const K& k) {
     dirty_quantity_ = true;
     return resources_[k];
   };
 
+  /// Returns a reference to a resource pointer given a key.
   const typename R::Ptr& operator[](const K& k) const {
     dirty_quantity_ = true;
     return const_cast<map_type&>(resources_)[k];
   };
 
+  /// Returns an iterator to the begining of the map.
   iterator begin() {
     dirty_quantity_ = true;
     return resources_.begin();
   }
+
+  /// Returns a const iterator to the begining of the map.
   const_iterator begin() const { return resources_.begin(); }
+
+  /// Returns a const iterator to the begining of the map.
   const_iterator cbegin() const { return resources_.begin(); }
 
+  /// Returns an iterator to the end of the map.
   iterator end() {
     dirty_quantity_ = true;
     return resources_.end();
   }
+
+  /// Returns a const iterator to the end of the map.
   const_iterator end() const { return resources_.end(); }
+
+  /// Returns a const iterator to the end of the map.
   const_iterator cend() const { return resources_.end(); }
 
+  /// Removes an element at a given position in the map.
   void erase(iterator position) {
     resources_.erase(position);
     UpdateQuantity();
   };
+
+  /// Removes an element from the map, given its key.
   typename map_type::size_type erase(const K& k) {
     typename map_type::size_type s = resources_.erase(k);
     UpdateQuantity();
     return s;
   };
+
+  /// Removes elements along a range from the first to last position in the map.
   void erase(iterator first, iterator last) {
     resources_.erase(first, last);
     UpdateQuantity();
   };
 
  private:
+  /// Recomputes the internal quantity variable.
   void UpdateQuantity() {
     using std::vector;
     iterator it = resources_.begin();
