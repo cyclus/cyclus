@@ -899,12 +899,22 @@ class InitFromCopyFilter(CodeGeneratorFilter):
                 cap_buffs[member] = info
 
         for b, info in cap_buffs.items():
-            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + "{0}.set_capacity(m->{0}.capacity());\n".format(b)
-            else:  # ResBuf and ResMap
-                impl += ind + "{0}.capacity(m->{0}.capacity());\n".format(b)
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                msg = 'type {0!r} could not be found for InitFromCopy() code gen.'
+                raise TypeError(msg.format(t_info))
+            impl += ind + t_impl.format(var=b)
 
         return impl
+
+    res_impl = {
+        CYCNS + '::toolkit::ResourceBuff': ("{var}.set_capacity("
+                                            "m->{var}.capacity());\n"),
+        CYCNS + '::toolkit::ResBuf': "{var}.capacity(m->{var}.capacity());\n",
+        CYCNS + '::toolkit::ResMap': "{var}.capacity(m->{var}.capacity());\n",
+        }
 
 class InitFromDbFilter(CodeGeneratorFilter):
     """Filter for handling db-constructor-like InitFrom() code
@@ -950,12 +960,22 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 tstr += ' '
             impl += ind + '{0} = qr.GetVal<{1}>("{0}");\n'.format(member, tstr)
         for b, info in cap_buffs.items():
-            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + ('{0}.set_capacity({1});\n'
-                               .format(b, info['capacity']))
-            else:  # ResBuf and ResMap
-                impl += ind + '{0}.capacity({1});\n'.format(b, info['capacity'])
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                msg = 'type {0!r} could not be found for InitFromDb() code gen.'
+                raise TypeError(msg.format(t_info))
+            impl += ind + t_impl.format(var=b, capacity=info['capacity'])
+
         return impl
+
+    res_impl = {
+        CYCNS + '::toolkit::ResourceBuff': '{var}.set_capacity({capacity});\n',
+        CYCNS + '::toolkit::ResBuf': '{var}.capacity({capacity});\n',
+        CYCNS + '::toolkit::ResMap': '{var}.capacity({capacity});\n',
+        }
+
 
 class InfileToDbFilter(CodeGeneratorFilter):
     """Filter for handling InfileToDb() code generation:
@@ -1423,24 +1443,28 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
-
-            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + ("invs[\"{0}\"] = "
-                               "{0}.PopN({0}.count());\n").format(buff)
-                impl += ind + '{0}.PushAll(invs["{0}"]);\n'.format(buff)
-            elif info['type'][0] == CYCNS + '::toolkit::ResBuf':
-                impl += ind + ("invs[\"{0}\"] = "
-                               "{0}.PopNRes({0}.count());\n").format(buff)
-                impl += ind + '{0}.Push(invs["{0}"]);\n'.format(buff)
-            elif info['type'][0] == CYCNS + '::toolkit::ResMap':
-                impl += ind + "invs[\"{0}\"] = {0}.ResValues();\n".format(buff)
-                # FIXME ResMap mat need to write anther table here
-            else:
-                msg = 'could not snapshot inventory for type {0!r}'
-                raise TypeError(msg.format(info['type']))
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                msg = 'type {0!r} could not be found for SnapshotInv() code gen.'
+                raise TypeError(msg.format(t_info))
+            s = t_impl.format(var=buff)
+            impl += ind + s.replace('\n', '\n' + ind)
 
         impl += ind + "return invs;\n"
         return impl
+
+    res_impl = {
+        CYCNS + '::toolkit::ResourceBuff': (
+            'invs[\"{var}\"] = {var}.PopN({var}.count());\n'
+            '{var}.PushAll(invs["{var}"]);\n'),
+        CYCNS + '::toolkit::ResBuf': (
+            'invs[\"{var}\"] = {var}.PopNRes({var}.count());\n'
+            '{var}.Push(invs["{var}"]);\n'),
+        CYCNS + '::toolkit::ResMap': "invs[\"{var}\"] = {var}.ResValues();\n",
+        }
+
 
 class InitInvFilter(CodeGeneratorFilter):
     """Filter for handling InitInv() code generation:
@@ -1472,13 +1496,23 @@ class InitInvFilter(CodeGeneratorFilter):
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
-
-            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(buff)
-            else:  # ResBuf
-                impl += ind + "{0}.Push(inv[\"{0}\"]);\n".format(buff)
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                msg = 'type {0!r} could not be found for InitInv() code gen.'
+                raise TypeError(msg.format(t_info))
+            s = t_impl.format(var=buff)
+            impl += ind + s.replace('\n', '\n' + ind)
 
         return impl
+
+    res_impl = {
+        CYCNS + '::toolkit::ResourceBuff': "{var}.PushAll(inv[\"{var}\"]);\n",
+        CYCNS + '::toolkit::ResBuf': "{var}.Push(inv[\"{var}\"]);\n",
+        CYCNS + '::toolkit::ResMap': "{var}.Push(inv[\"{var}\"]);\n",
+        }
+
 
 class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
