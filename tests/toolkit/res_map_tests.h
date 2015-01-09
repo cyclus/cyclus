@@ -17,7 +17,7 @@ class ResMapTest : public ::testing::Test {
  protected:
   Product::Ptr mat1_, mat2_;
   double mass1, mass2;
-  ProdVec mats;
+  ResMap<std::string, Product>::map_type mats;
 
   ResMap<std::string, Product> store_;  // default constructed mat store
   ResMap<std::string, Product> filled_store_;
@@ -36,8 +36,8 @@ class ResMapTest : public ::testing::Test {
       mat1_ = Product::CreateUntracked(mass1, "bananas");
       mass2 = 222;
       mat2_ = Product::CreateUntracked(mass2, "bananas");
-      mats.push_back(mat1_);
-      mats.push_back(mat2_);
+      mats["mat1"] = mat1_;
+      mats["mat2"] = mat2_;
 
       neg_cap = -1;
       zero_cap = 0;

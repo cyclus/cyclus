@@ -92,26 +92,32 @@ class ResMap {
 
   /// Returns the total resource quantity of constituent resource
   /// objects in the map.
-  inline double quantity() const {
+  inline double quantity() {
     if (dirty_quantity_)
       UpdateQuantity();
+    if (quantity_ > capacity_ + eps_rsrc()) {
+      std::stringstream ss;
+      ss << std::setprecision(17) << "quantity " << quantity_
+         << " greater than than allowed capacity " << capacity_;
+      throw ValueError(ss.str());
+    }
     return quantity_;
   };
 
   /// Returns the quantity of space remaining in this buffer.
   /// This is effectively the difference between the capacity and the quantity
   /// and is never negative. Never throws.
-  inline double space() const { return std::max(0.0, capacity_ - quantity()); }
+  inline double space() { return std::max(0.0, capacity_ - quantity()); }
 
   /// Returns true if there are no resources in the buffer.
   inline bool empty() const { return resources_.empty(); }
 
-  typename R::Ptr operator[](const K& k) {
+  typename R::Ptr& operator[](const K& k) {
     dirty_quantity_ = true;
     return resources_[k];
   };
 
-  const typename R::Ptr operator[](const K& k) const {
+  const typename R::Ptr& operator[](const K& k) const {
     dirty_quantity_ = true;
     return const_cast<map_type&>(resources_)[k];
   };
@@ -148,15 +154,19 @@ class ResMap {
   void UpdateQuantity() {
     using std::vector;
     iterator it = resources_.begin();
+    int i = 0;
     int n = resources_.size();
-    int i;
-    vector<double> qtys (n, 0.0);
-    while (it != resources_.end()) {
-      qtys[i] = (*it)->quantity();
-      ++i;
-      ++it;
+    if (n == 0) {
+      quantity_ = 0.0;
+    } else {
+      vector<double> qtys (n, 0.0);
+      while (it != resources_.end()) {
+        qtys[i] = (*(it->second)).quantity();
+        ++i;
+        ++it;
+      }
+      quantity_ = CycArithmetic::KahanSum(qtys);
     }
-    quantity_ = CycArithmetic::KahanSum(qtys);
     dirty_quantity_ = false;
   }
 
@@ -171,7 +181,6 @@ class ResMap {
 
   /// Underlying container
   map_type resources_;
-  std::set<typename R::Ptr> resources_present_;
 };
 
 }  // namespace toolkit
