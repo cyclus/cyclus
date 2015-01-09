@@ -3,9 +3,8 @@
 
 #include <iomanip>
 #include <limits>
-#include <list>
+#include <map>
 #include <set>
-#include <vector>
 
 #include "cyc_arithmetic.h"
 #include "cyc_limits.h"
@@ -64,8 +63,9 @@ class ResMap {
 
   virtual ~ResMap() {}
 
-  typedef std::map<typename K, typename R::Ptr>::iterator iterator;
-  typedef std::map<typename K, typename R::Ptr>::const_iterator const_iterator;
+  typedef typename std::map<K, typename R::Ptr> map_type;
+  typedef typename std::map<K, typename R::Ptr>::iterator iterator;
+  typedef typename std::map<K, typename R::Ptr>::const_iterator const_iterator;
 
   /// Returns the maximum resource quantity this buffer can hold (units
   /// based on constituent resource objects' units).
@@ -106,14 +106,14 @@ class ResMap {
   /// Returns true if there are no resources in the buffer.
   inline bool empty() const { return resources_.empty(); }
 
-  typename R:Ptr operator[](const typename K& k) {
+  typename R::Ptr operator[](const K& k) {
     dirty_quantity_ = true;
     return resources_[k];
   };
 
-  const typename R:Ptr operator[](const typename K& k) {
+  const typename R::Ptr operator[](const K& k) const {
     dirty_quantity_ = true;
-    return const_cast<std::map<typename K, typename R::Ptr>&>(resources_)[k];
+    return const_cast<map_type&>(resources_)[k];
   };
 
   iterator begin() {
@@ -134,8 +134,8 @@ class ResMap {
     resources_.erase(position);
     UpdateQuantity();
   };
-  size_type erase(const typename K& k) {
-    size_type s = resources_.erase(k);
+  typename map_type::size_type erase(const K& k) {
+    typename map_type::size_type s = resources_.erase(k);
     UpdateQuantity();
     return s;
   };
@@ -147,11 +147,10 @@ class ResMap {
  private:
   void UpdateQuantity() {
     using std::vector;
-    typename std::list<typename K, typename R::Ptr>::iterator it;
+    iterator it = resources_.begin();
     int n = resources_.size();
     int i;
     vector<double> qtys (n, 0.0);
-    it = resources_.begin();
     while (it != resources_.end()) {
       qtys[i] = (*it)->quantity();
       ++i;
@@ -171,7 +170,7 @@ class ResMap {
   double quantity_;
 
   /// Underlying container
-  std::map<typename K, typename R::Ptr> resources_;
+  map_type resources_;
   std::set<typename R::Ptr> resources_present_;
 };
 
