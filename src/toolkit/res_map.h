@@ -5,6 +5,7 @@
 #include <limits>
 #include <map>
 #include <set>
+#include <vector>
 
 #include "cyc_arithmetic.h"
 #include "cyc_limits.h"
@@ -96,6 +97,10 @@ class ResMap {
   /// Returns true if there are no resources in the map.
   inline bool empty() const { return resources_.empty(); }
 
+  //
+  // std::map interface
+  //
+
   /// Returns a reference to a resource pointer given a key.
   typename R::Ptr& operator[](const K& k) {
     dirty_quantity_ = true;
@@ -150,6 +155,27 @@ class ResMap {
     resources_.erase(first, last);
     UpdateQuantity();
   };
+
+  //
+  // Non-std::map interface 
+  //
+
+  /// Returns a vector of the values in the map
+  std::vector<typename R::Ptr> Values() {
+    int i = 0;
+    int n = resources_.size();
+    std::vector<typename R::Ptr> vals (n);
+    iterator it = resources_.begin();
+    while (it != resources_.end()) {
+      vals[i] = it->second;
+      ++i;
+      ++it;
+    }
+    return vals;
+  }
+
+  /// Returns a vector resource pointers for the values in the map
+  std::vector<Resource::Ptr> ResValues() { return ResCast(Values()); }
 
  private:
   /// Recomputes the internal quantity variable.

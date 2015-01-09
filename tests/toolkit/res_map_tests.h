@@ -7,6 +7,7 @@
 #include "error.h"
 #include "logger.h"
 #include "product.h"
+#include "resource.h"
 #include "toolkit/res_map.h"
 
 namespace cyclus {

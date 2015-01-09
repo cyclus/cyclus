@@ -144,5 +144,21 @@ TEST_F(ResMapTest, Push_DuplicateEmpty) {
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity());
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ResMapTest, Values) {
+  std::vector<Product::Ptr> vals = filled_store_.Values();
+  ASSERT_EQ(vals.size(), 2);
+  EXPECT_EQ(vals[0], mat1_);
+  EXPECT_EQ(vals[1], mat2_);
+}
+
+TEST_F(ResMapTest, ResValues) {
+  std::vector<Resource::Ptr> vals = filled_store_.ResValues();
+  std::vector<Resource::Ptr> resvals = ResCast(filled_store_.Values());
+  ASSERT_EQ(vals.size(), 2);
+  EXPECT_EQ(vals[0], resvals[0]);
+  EXPECT_EQ(vals[1], resvals[1]);
+}
+
 }  // namespace toolkit
 }  // namespace cyclus

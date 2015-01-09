@@ -95,7 +95,8 @@ BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
            }
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
-             'std::map', '{0}::toolkit::ResBuf'.format(CYCNS),}
+             'std::map', '{0}::toolkit::ResBuf'.format(CYCNS),
+             CYCNS + '::toolkit::ResMap',}
 
 WRANGLERS = {
     '{0}::Agent'.format(CYCNS),
@@ -628,12 +629,13 @@ class StateAccumulator(object):
                         CYCNS+'::Material',
                         CYCNS+'::Product',}
     known_templates = {
-        '{0}::toolkit::ResBuf'.format(CYCNS): ('T',),
         'std::vector': ('T',),
         'std::set': ('T',),
         'std::list': ('T',),
         'std::pair': ('T1', 'T2'),
         'std::map': ('Key', 'T'),
+        '{0}::toolkit::ResBuf'.format(CYCNS): ('T',),
+        '{0}::toolkit::ResMap'.format(CYCNS): ('K', 'R'),
         }
     scopz = '::'  # intern the scoping operator
 
@@ -899,7 +901,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         for b, info in cap_buffs.items():
             if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
                 impl += ind + "{0}.set_capacity(m->{0}.capacity());\n".format(b)
-            else:  # ResBuf
+            else:  # ResBuf and ResMap
                 impl += ind + "{0}.capacity(m->{0}.capacity());\n".format(b)
 
         return impl
@@ -951,9 +953,8 @@ class InitFromDbFilter(CodeGeneratorFilter):
             if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
                 impl += ind + ('{0}.set_capacity({1});\n'
                                .format(b, info['capacity']))
-            else:  # ResBuf
-                impl += ind + ('{0}.capacity({1});\n'
-                               .format(b, info['capacity']))
+            else:  # ResBuf and ResMap
+                impl += ind + '{0}.capacity({1});\n'.format(b, info['capacity'])
         return impl
 
 class InfileToDbFilter(CodeGeneratorFilter):
@@ -1427,10 +1428,16 @@ class SnapshotInvFilter(CodeGeneratorFilter):
                 impl += ind + ("invs[\"{0}\"] = "
                                "{0}.PopN({0}.count());\n").format(buff)
                 impl += ind + '{0}.PushAll(invs["{0}"]);\n'.format(buff)
-            else:  # ResBuf
+            elif info['type'][0] == CYCNS + '::toolkit::ResBuf':
                 impl += ind + ("invs[\"{0}\"] = "
                                "{0}.PopNRes({0}.count());\n").format(buff)
                 impl += ind + '{0}.Push(invs["{0}"]);\n'.format(buff)
+            elif info['type'][0] == CYCNS + '::toolkit::ResMap':
+                impl += ind + "invs[\"{0}\"] = {0}.ResValues();\n".format(buff)
+                # FIXME ResMap mat need to write anther table here
+            else:
+                msg = 'could not snapshot inventory for type {0!r}'
+                raise TypeError(msg.format(info['type']))
 
         impl += ind + "return invs;\n"
         return impl
