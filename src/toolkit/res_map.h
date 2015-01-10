@@ -210,7 +210,7 @@ class ResMap {
   /// member must be set.  This is primarily for restart capabilities and is
   /// not recomended for day-to-day use.
   void Values(std::vector<typename R::Ptr> vals) {
-    std::map<int, typename K> lookup;
+    std::map<int, K> lookup;
     obj_iterator oit = obj_ids_.begin();
     for (; oit != obj_ids_.end(); ++oit) {
       lookup[oit->second] = oit->first;
@@ -226,7 +226,9 @@ class ResMap {
   /// Sets the resource values of map based on their object ids. Thus the objs_ids
   /// member must be set.  This is primarily for restart capabilities and is
   /// not recomended for day-to-day use.
-  void ResValues(std::vector<Resource::Ptr> vals) { Values(ResCast(vals)); }
+  void ResValues(std::vector<Resource::Ptr> vals) {
+    Values(cyclus::template ResCast<R>(vals));
+  }
 
  private:
   /// Recomputes the internal quantity variable.
