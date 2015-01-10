@@ -89,9 +89,11 @@ PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob',
               'boost::uuids::uuid', }
 
 BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
+           '{0}::toolkit::ResBuf'.format(CYCNS),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Resource'),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Product'),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Material'),
+           '{0}::toolkit::ResMap'.format(CYCNS),
            }
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
@@ -905,7 +907,8 @@ class InitFromCopyFilter(CodeGeneratorFilter):
             if t_impl is None:
                 msg = 'type {0!r} could not be found for InitFromCopy() code gen.'
                 raise TypeError(msg.format(t_info))
-            impl += ind + t_impl.format(var=b)
+            t_impl = t_impl.format(var=b)
+            impl += ind + t_impl.replace('\n', '\n' + ind).strip(' ')
 
         return impl
 
@@ -913,7 +916,9 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResourceBuff': ("{var}.set_capacity("
                                             "m->{var}.capacity());\n"),
         CYCNS + '::toolkit::ResBuf': "{var}.capacity(m->{var}.capacity());\n",
-        CYCNS + '::toolkit::ResMap': "{var}.capacity(m->{var}.capacity());\n",
+        CYCNS + '::toolkit::ResMap': (
+            "{var}.capacity(m->{var}.capacity());\n"
+            '{var}.obj_ids(m->obj_ids());\n'),
         }
 
 class InitFromDbFilter(CodeGeneratorFilter):
@@ -951,14 +956,18 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]
                 continue
             t = info['type']
-            if t in BUFFERS:
-                if 'capacity' in info:
-                    cap_buffs[member] = info
+            key = t if isinstance(t, STRING_TYPES) else t[0]
+            if key in BUFFERS:
+                if 'capacity' not in info:
+                    info = dict(info)
+                    info['capacity'] = 1e300
+                cap_buffs[member] = info
                 continue
             tstr = type_to_str(t)
             if tstr.endswith('>'):
                 tstr += ' '
             impl += ind + '{0} = qr.GetVal<{1}>("{0}");\n'.format(member, tstr)
+
         for b, info in cap_buffs.items():
             t_info = info['type']
             key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
@@ -966,14 +975,17 @@ class InitFromDbFilter(CodeGeneratorFilter):
             if t_impl is None:
                 msg = 'type {0!r} could not be found for InitFromDb() code gen.'
                 raise TypeError(msg.format(t_info))
-            impl += ind + t_impl.format(var=b, capacity=info['capacity'])
+            t_impl = t_impl.format(var=b, tstr=type_to_str(t_info), **info)
+            impl += ind + t_impl.replace('\n', '\n' + ind).strip(' ')
 
         return impl
 
     res_impl = {
         CYCNS + '::toolkit::ResourceBuff': '{var}.set_capacity({capacity});\n',
         CYCNS + '::toolkit::ResBuf': '{var}.capacity({capacity});\n',
-        CYCNS + '::toolkit::ResMap': '{var}.capacity({capacity});\n',
+        CYCNS + '::toolkit::ResMap': (
+            '{var}.capacity({capacity});\n'
+            '{var}.obj_ids(qr.GetVal<{tstr}>("{var}"))\n;'),
         }
 
 
@@ -1401,18 +1413,45 @@ class SnapshotFilter(CodeGeneratorFilter):
             if not isinstance(info, Mapping):
                 # this member is a variable alias pointer
                 continue
-
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
+
+            # get expression
             t = info["type"]
+            key = t if isinstance(t, STRING_TYPES) else t[0]
             if t in BUFFERS:
-                continue
+                expr = self.res_exprs.get(key, None)
+                if expr is None:
+                    continue
+                expr = expr.format(var=member)
+            else:
+                expr = member
+
             shape = ', &cycpp_shape_{0}'.format(member) if 'shape' in info else ''
-            impl += ind + '->AddVal("{0}", {0}{1})\n'.format(member, shape)
+            impl += ind + '->AddVal("{0}", {1}{2})\n'.format(member, expr, shape)
         impl += ind + "->Record();\n"
 
+        for buff, info in buffs.items():
+            if self.pragmaname in info:
+                impl += info[self.pragmaname]
+                continue
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                continue
+            s = t_impl.format(var=buff, t_str=type_to_str(t_info), **info)
+            impl += ind + s.replace('\n', '\n' + ind).strip(' ')
+
         return impl
+
+    res_exprs = {
+        CYCNS + '::toolkit::ResourceBuff': None,
+        CYCNS + '::toolkit::ResBuf': None,
+        CYCNS + '::toolkit::ResMap': '{var}.obj_ids()',
+        }
+
 
 class SnapshotInvFilter(CodeGeneratorFilter):
     """Filter for handling SnapshotInv() code generation:
@@ -1432,9 +1471,8 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             if not isinstance(info, Mapping):
                 # this member is a variable alias pointer
                 continue
-
             t = info['type']
-            if t in BUFFERS:
+            if t in BUFFERS or t[0] in BUFFERS:
                 buffs[member] = info
 
         impl = ind + "{0}::Inventories invs;\n".format(CYCNS)
@@ -1449,8 +1487,8 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             if t_impl is None:
                 msg = 'type {0!r} could not be found for SnapshotInv() code gen.'
                 raise TypeError(msg.format(t_info))
-            s = t_impl.format(var=buff)
-            impl += ind + s.replace('\n', '\n' + ind)
+            s = t_impl.format(var=buff, t_str=type_to_str(t_info), **info)
+            impl += ind + s.replace('\n', '\n' + ind).strip(' ')
 
         impl += ind + "return invs;\n"
         return impl
@@ -1510,7 +1548,7 @@ class InitInvFilter(CodeGeneratorFilter):
     res_impl = {
         CYCNS + '::toolkit::ResourceBuff': "{var}.PushAll(inv[\"{var}\"]);\n",
         CYCNS + '::toolkit::ResBuf': "{var}.Push(inv[\"{var}\"]);\n",
-        CYCNS + '::toolkit::ResMap': "{var}.Push(inv[\"{var}\"]);\n",
+        CYCNS + '::toolkit::ResMap': "{var}.ResValues(inv[\"{var}\"]);\n",
         }
 
 

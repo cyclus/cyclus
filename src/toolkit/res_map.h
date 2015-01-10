@@ -54,6 +54,14 @@ class ResMap {
   typedef typename std::map<K, typename R::Ptr>::iterator iterator;
   typedef typename std::map<K, typename R::Ptr>::const_iterator const_iterator;
 
+  typedef typename std::map<K, int> obj_type;
+  typedef typename std::map<K, int>::iterator obj_iterator;
+  typedef typename std::map<K, int>::const_iterator const_obj_iterator;
+
+  //
+  // properties
+  //
+
   /// Returns the maximum resource quantity this mapping can hold (units
   /// based on constituent resource objects' units).
   inline double capacity() const { return capacity_; }
@@ -88,6 +96,20 @@ class ResMap {
     }
     return quantity_;
   };
+
+  obj_type& obj_ids() {
+    obj_ids_.clear();
+    iterator it = resources_.begin();
+    for (; it != resources_.end(); ++it) {
+      obj_ids_[it->first] = it->second->obj_id();
+    }
+    return obj_ids_;
+  }
+
+  void obj_ids(obj_type oi) {
+    obj_ids_ = oi;
+    dirty_quantity_ = true;
+  }
 
   /// Returns the quantity of space remaining in the mapping.
   /// This is effectively the difference between the capacity and the quantity
@@ -156,6 +178,13 @@ class ResMap {
     UpdateQuantity();
   };
 
+  /// Removes all elements from the map.
+  void clear() {
+    resources_.clear();
+    obj_ids_.clear();
+    dirty_quantity_ = true;
+  };
+
   //
   // Non-std::map interface 
   //
@@ -176,6 +205,28 @@ class ResMap {
 
   /// Returns a vector resource pointers for the values in the map
   std::vector<Resource::Ptr> ResValues() { return ResCast(Values()); }
+
+  /// Sets the values of map based on their object ids. Thus the objs_ids
+  /// member must be set.  This is primarily for restart capabilities and is
+  /// not recomended for day-to-day use.
+  void Values(std::vector<typename R::Ptr> vals) {
+    std::map<int, typename K> lookup;
+    obj_iterator oit = obj_ids_.begin();
+    for (; oit != obj_ids_.end(); ++oit) {
+      lookup[oit->second] = oit->first;
+    }
+    int i = 0;
+    int n = vals.size();
+    for (; i < n; ++i) {
+      resources_[lookup[vals[i].obj_id()]] = vals[i];
+    }
+    dirty_quantity_ = true;
+  }
+
+  /// Sets the resource values of map based on their object ids. Thus the objs_ids
+  /// member must be set.  This is primarily for restart capabilities and is
+  /// not recomended for day-to-day use.
+  void ResValues(std::vector<Resource::Ptr> vals) { Values(ResCast(vals)); }
 
  private:
   /// Recomputes the internal quantity variable.
@@ -209,6 +260,9 @@ class ResMap {
 
   /// Underlying container
   map_type resources_;
+
+  /// Object ID mapping, primarily used for restart, 
+  obj_type obj_ids_;
 };
 
 }  // namespace toolkit
