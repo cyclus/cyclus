@@ -1192,8 +1192,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]['read']
                 continue
             t = info['type']
+            key = t if isinstance(t, STRING_TYPES) else t[0]
             uitype = info.get('uitype', None)
-            if t in BUFFERS:
+            if key in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
             if 'derived_init' in info:
@@ -1297,16 +1298,16 @@ class SchemaFilter(CodeGeneratorFilter):
             alias = member
             if 'alias' in info:
                 alias = info['alias']
-
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
             t = info['type']
+            key = t if isinstance(t, STRING_TYPES) else t[0]
             uitype = info.get('uitype', None)
             schematype = info.get('schematype', None)
-            if t in BUFFERS: # buffer state, skip
+            if key in BUFFERS:  # buffer state, skip
                 continue
-            if 'derived_init' in info: # derived state, skip
+            if 'derived_init' in info:  # derived state, skip
                 continue
             opt = True if 'default' in info else False
             if opt:
