@@ -218,7 +218,7 @@ class ResMap {
     int i = 0;
     int n = vals.size();
     for (; i < n; ++i) {
-      resources_[lookup[vals[i].obj_id()]] = vals[i];
+      resources_[lookup[vals[i]->obj_id()]] = vals[i];
     }
     dirty_quantity_ = true;
   }

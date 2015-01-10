@@ -94,6 +94,14 @@ TEST_F(ResMapTest, GetSizeFilled) {
 }
 
 
+TEST_F(ResMapTest, ObjIds) {
+  std::map<std::string, int> oids;
+  ASSERT_NO_THROW(oids = filled_store_.obj_ids());
+  ASSERT_NO_THROW(store_.obj_ids(oids));
+}
+
+
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - Pushing into buffer - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -145,19 +153,35 @@ TEST_F(ResMapTest, Push_DuplicateEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResMapTest, Values) {
+TEST_F(ResMapTest, GetValues) {
   std::vector<Product::Ptr> vals = filled_store_.Values();
   ASSERT_EQ(vals.size(), 2);
   EXPECT_EQ(vals[0], mat1_);
   EXPECT_EQ(vals[1], mat2_);
 }
 
-TEST_F(ResMapTest, ResValues) {
+TEST_F(ResMapTest, GetResValues) {
   std::vector<Resource::Ptr> vals = filled_store_.ResValues();
   std::vector<Resource::Ptr> resvals = ResCast(filled_store_.Values());
   ASSERT_EQ(vals.size(), 2);
   EXPECT_EQ(vals[0], resvals[0]);
   EXPECT_EQ(vals[1], resvals[1]);
+}
+
+TEST_F(ResMapTest, SetValues) {
+  store_.obj_ids(filled_store_.obj_ids());
+  store_.Values(filled_store_.Values());
+  std::vector<Product::Ptr> vals = store_.Values();
+  ASSERT_EQ(vals.size(), filled_store_.size());
+  EXPECT_EQ(vals, filled_store_.Values());
+}
+
+TEST_F(ResMapTest, SetResValues) {
+  store_.obj_ids(filled_store_.obj_ids());
+  store_.ResValues(filled_store_.ResValues());
+  std::vector<Resource::Ptr> vals = store_.ResValues();
+  ASSERT_EQ(vals.size(), filled_store_.size());
+  EXPECT_EQ(vals, filled_store_.ResValues());
 }
 
 }  // namespace toolkit
