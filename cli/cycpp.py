@@ -1432,18 +1432,6 @@ class SnapshotFilter(CodeGeneratorFilter):
             impl += ind + '->AddVal("{0}", {1}{2})\n'.format(member, expr, shape)
         impl += ind + "->Record();\n"
 
-        for buff, info in buffs.items():
-            if self.pragmaname in info:
-                impl += info[self.pragmaname]
-                continue
-            t_info = info['type']
-            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
-            t_impl = self.res_impl.get(key, None)
-            if t_impl is None:
-                continue
-            s = t_impl.format(var=buff, t_str=type_to_str(t_info), **info)
-            impl += ind + s.replace('\n', '\n' + ind).strip(' ')
-
         return impl
 
     res_exprs = {
