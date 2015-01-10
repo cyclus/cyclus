@@ -230,6 +230,20 @@ class ResMap {
     Values(cyclus::template ResCast<R>(vals));
   }
 
+  /// Retrieves and removes the value associated with the provided key.
+  typename R::Ptr Pop(const K key) {
+    iterator it = resources_.find(key);
+    if (it == resources_.end()) {
+      std::stringstream ss;
+      ss << "key " << key << " could not be found";
+      throw KeyError(ss.str());
+    }
+    typename R::Ptr val = it->second;
+    resources_.erase(it);
+    dirty_quantity_ = true;
+    return val;
+  }
+  
  private:
   /// Recomputes the internal quantity variable.
   void UpdateQuantity() {

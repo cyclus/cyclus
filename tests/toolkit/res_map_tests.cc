@@ -184,5 +184,12 @@ TEST_F(ResMapTest, SetResValues) {
   EXPECT_EQ(vals, filled_store_.ResValues());
 }
 
+
+TEST_F(ResMapTest, Pop) {
+  Product::Ptr mat1 = filled_store_.Pop("mat1");
+  ASSERT_EQ(filled_store_.size(), 1);
+}
+
+
 }  // namespace toolkit
 }  // namespace cyclus
