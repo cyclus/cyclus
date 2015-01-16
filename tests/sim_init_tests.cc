@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "comp_math.h"
 #include "composition.h"
 #include "context.h"
 #include "facility.h"
@@ -224,12 +225,14 @@ TEST_F(SimInitTest, InitRecipes) {
   cy::Context* init_ctx = si.context();
 
   cy::CompMap orig1 = ctx->GetRecipe("recipe1")->mass();
+  cy::compmath::Normalize(&orig1);
   cy::CompMap init1 = init_ctx->GetRecipe("recipe1")->mass();
   EXPECT_EQ(ctx->GetRecipe("recipe1")->id(), init_ctx->GetRecipe("recipe1")->id());
   EXPECT_FLOAT_EQ(orig1[922350000], init1[922350000]);
   EXPECT_FLOAT_EQ(orig1[922380000], init1[922380000]);
 
   cy::CompMap orig2 = ctx->GetRecipe("recipe1")->mass();
+  cy::compmath::Normalize(&orig2);
   cy::CompMap init2 = init_ctx->GetRecipe("recipe1")->mass();
   EXPECT_EQ(ctx->GetRecipe("recipe2")->id(), init_ctx->GetRecipe("recipe2")->id());
   EXPECT_FLOAT_EQ(orig2[922350000], init2[922350000]);

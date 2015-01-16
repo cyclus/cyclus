@@ -74,7 +74,7 @@ TEST_F(MaterialTest, AbsorbLikeMaterial) {
   EXPECT_DOUBLE_EQ(test_mat_->quantity(), factor * orig);
 }
 
-TEST_F(MaterialTest, AbsorbUnLikeMaterial) {
+TEST_F(MaterialTest, AbsorbUnlikeMaterial) {
   // make a number of materials masses 1, 2, and 10
   Material::Ptr same_as_orig_test_mat = Material::CreateUntracked(0,
                                                 test_comp_);
@@ -214,9 +214,6 @@ TEST_F(MaterialTest, DecayManual) {
   double am241_qty = orig.mass(am241_);
   double orig_mass = tracked_mat_->quantity();
 
-  // decay should succeed
-  // default decay value is "manual"
-  EXPECT_EQ(fac->context()->sim_info().decay, "manual");
   tracked_mat_->Decay(100);
 
   // postquery
@@ -228,22 +225,72 @@ TEST_F(MaterialTest, DecayManual) {
   EXPECT_NE(am241_qty, mq.mass(am241_));
 }
 
+TEST_F(MaterialTest, DecayLazy) {
+  SimInfo si(100, 2015, 1, "", "lazy");
+  cyclus::Context ctx(&ti, &rec);
+  ctx.InitSim(si);
+  Agent* a = new TestFacility(&ctx);
+  Material::Ptr m = Material::Create(a, 1000, diff_comp_);
+
+  cyclus::toolkit::MatQuery orig(m);
+  double u235_qty = orig.mass(u235_);
+  double pb208_qty = orig.mass(pb208_);
+  double am241_qty = orig.mass(am241_);
+  double orig_mass = m->quantity();
+
+  // run the simulation clock forward so decay dt > 0
+  ti.RunSim();
+  ASSERT_EQ(si.duration, ctx.time());
+
+  // decay shouldn't have happened yet - comp was never "observed"
+  ASSERT_EQ(m->prev_decay_time(), 0);
+
+  // force lazy decay calculation to change composition
+  m->comp();
+
+  // composition should have changed from decay
+  cyclus::toolkit::MatQuery mq(m);
+  ASSERT_EQ(m->prev_decay_time(), ctx.time());
+  EXPECT_NE(u235_qty, mq.mass(u235_));
+  EXPECT_NE(pb208_qty, mq.mass(pb208_));
+  EXPECT_NE(am241_qty, mq.mass(am241_));
+}
+
+TEST_F(MaterialTest, DecayDefault) {
+  cyclus::toolkit::MatQuery orig(tracked_mat_);
+  double u235_qty = orig.mass(u235_);
+  double pb208_qty = orig.mass(pb208_);
+  double am241_qty = orig.mass(am241_);
+  double orig_mass = tracked_mat_->quantity();
+
+  // Passing -1 as the decay delta t tells the material to decay up to the
+  // current time step.  If the material has no context (and whence there is
+  // no current time step), the decay call throws an exception.
+  ASSERT_NO_THROW(tracked_mat_->Decay(-1));
+  ASSERT_THROW(test_mat_->Decay(-1), ValueError); // test_mat has no context
+
+  cyclus::toolkit::MatQuery mq(tracked_mat_);
+
+  // Since the current time step is zero, composition should be identical to
+  // original.
+  EXPECT_DOUBLE_EQ(u235_qty, mq.mass(u235_));
+  EXPECT_DOUBLE_EQ(pb208_qty, mq.mass(pb208_));
+  EXPECT_DOUBLE_EQ(am241_qty, mq.mass(am241_));
+}
+
 TEST_F(MaterialTest, DecayNever) {
-  // prequeries
   cyclus::toolkit::MatQuery orig(tracked_mat_no_decay_);
   double u235_qty = orig.mass(u235_);
   double pb208_qty = orig.mass(pb208_);
   double am241_qty = orig.mass(am241_);
   double orig_mass = tracked_mat_no_decay_->quantity();
 
-  // decay should succeed
   EXPECT_EQ(fac_no_decay->context()->sim_info().decay, "never");
   tracked_mat_no_decay_->Decay(100);
 
-  // postquery
   cyclus::toolkit::MatQuery mq(tracked_mat_no_decay_);
 
-  // postchecks
+  // With decay set to never, composition should be identical to original.
   EXPECT_DOUBLE_EQ(u235_qty, mq.mass(u235_));
   EXPECT_DOUBLE_EQ(pb208_qty, mq.mass(pb208_));
   EXPECT_DOUBLE_EQ(am241_qty, mq.mass(am241_));
@@ -259,6 +306,9 @@ TEST_F(MaterialTest, DecayShortcut) {
   double u235_decay_const = 8.087e-11;  // per month
   double eps = 1e-3;
   double threshold = -1 * std::log(1-eps) / u235_decay_const;
+
+  // If delta t is small w.r.t. composition's decay constants, no decay is
+  // performed and the composition should remain the same.
   m->Decay(threshold * 0.9);
   EXPECT_EQ(c, m->comp());
 }

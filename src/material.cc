@@ -74,6 +74,8 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   if (qty_ < qty) {
     throw ValueError("mass extraction causes negative quantity");
   }
+
+  // TODO: decide if ExtractComp should force lazy-decay by calling comp()
   if (comp_ != c) {
     CompMap v(comp_->mass());
     compmath::Normalize(&v, qty_);
@@ -98,11 +100,15 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 }
 
 void Material::Absorb(Material::Ptr mat) {
-  if (comp_ != mat->comp()) {
-    CompMap v(comp_->mass());
+  // these calls force lazy evaluation if in lazy decay mode
+  Composition::Ptr c0 = comp();
+  Composition::Ptr c1 = mat->comp();
+
+  if (c0 != c1) {
+    CompMap v(c0->mass());
     compmath::Normalize(&v, qty_);
-    CompMap otherv(mat->comp()->mass());
-    compmath::Normalize(&otherv, mat->quantity());
+    CompMap otherv(c1->mass());
+    compmath::Normalize(&otherv, mat->qty_);
     comp_ = Composition::CreateFromMass(compmath::Add(v, otherv));
   }
 
@@ -125,38 +131,57 @@ void Material::Transmute(Composition::Ptr c) {
 }
 
 void Material::Decay(int curr_time) {
-  if (ctx_ != NULL && ctx_->sim_info().decay != "never") {
-    int dt = curr_time - prev_decay_time_;
-    double eps = 1e-3;
-    bool decay = false;
-  
-    const CompMap c = comp_->atom();
-    if (c.size() > 100) {
-      decay = true;
-    } else {
-      CompMap::const_iterator it;
-      for (it = c.end(); it != c.begin(); --it) {
-        int nuc = it->first;
-        // 2419200 == secs / month
-        double lambda_months = pyne::decay_const(nuc) * 2419200;
-  
-        if (eps <= 1 - std::exp(-lambda_months * dt)) {
-          decay = true;
-          break;
-        }
+  if (ctx_ != NULL && ctx_->sim_info().decay == "never") {
+    return;
+  } else if (curr_time < 0 && ctx_ == NULL) {
+    throw ValueError("decay cannot use default time with NULL context");
+  }
+
+  if (curr_time < 0) {
+    curr_time = ctx_->time();
+  }
+
+  int dt = curr_time - prev_decay_time_;
+  assert(dt >= 0);
+
+  double eps = 1e-3;
+  const CompMap c = comp_->atom();
+
+  // If composition has too many nuclides (i.e. > 100), it is cheaper to
+  // just do the decay rather than check all the decay constants.
+  bool decay = c.size() > 100;
+
+  if (!decay) {
+    // Only do the decay calc if one of the nuclides would change in number
+    // density more than fraction eps.
+    // i.e. decay if   (1 - eps) > exp(-lambda*dt)
+    CompMap::const_iterator it;
+    for (it = c.end(); it != c.begin(); --it) {
+      int nuc = it->first;
+      // 2419200 == secs / month
+      double lambda_months = pyne::decay_const(nuc) * 2419200.0;
+      double change = 1.0 - std::exp(-lambda_months * static_cast<double>(dt));
+      if (change >= eps) {
+        decay = true;
+        break;
       }
     }
-  
-    if (decay) {
-      prev_decay_time_ = curr_time;
-      if (dt > 0) {
-        Transmute(comp_->Decay(dt));
-      }
+    if (!decay) {
+      return;
     }
+  }
+
+  prev_decay_time_ = curr_time;
+  if (dt > 0) {
+    Composition::Ptr decayed = comp_->Decay(dt);
+    Transmute(decayed);
   }
 }
 
-Composition::Ptr Material::comp() const {
+Composition::Ptr Material::comp() {
+  if (ctx_ != NULL && ctx_->sim_info().decay == "lazy") {
+    Decay(-1);
+  }
   return comp_;
 }
 
