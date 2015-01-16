@@ -20,6 +20,8 @@ great for users but may not be suitable for developers. For detailed
 instructions on installing conda and Cyclus, please 
 `see the install documentation <http://fuelcycle.org/user/install.html>`_.
 
+
+
 ******************************
 Building and Installing Cyclus
 ******************************
