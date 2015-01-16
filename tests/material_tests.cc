@@ -321,16 +321,33 @@ TEST_F(MaterialTest, ExtractPrevDecay) {
   EXPECT_EQ(tracked_mat_->prev_decay_time(), x->prev_decay_time());
 }
 
-TEST_F(MaterialTest, AbsorbPrevDecay) {
-  // The behavior this test checks for is subject to change and is not part of
-  // the Cyclus API.  It is testing "undefined" implementation detail behavior
-  // as coded.  We may decide to change the behavior in the future breaking
-  // this test; the test will need to be modified accordingly.
-  //
-  // This test checks to see that, when materials are absorbed together, the
-  // previous decay time for the larger quantity material is used as the value
-  // for the new, combined material.
+// Transmute should reset a material's prev_decay_time to the current
+// simulation time.
+TEST_F(MaterialTest, TransmutePrevDecay) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  cyclus::Context ctx(&ti, &rec);
+  ctx.InitSim(si);
+  Agent* a = new TestFacility(&ctx);
+  Material::Ptr m = Material::Create(a, 1000, diff_comp_);
 
+  // run the simulation clock forward
+  ti.RunSim();
+  ASSERT_EQ(si.duration, ctx.time());
+
+  EXPECT_EQ(0, m->prev_decay_time());
+  m->Transmute(test_comp_);
+  EXPECT_EQ(ctx.time(), m->prev_decay_time());
+}
+
+// The behavior this test checks for is subject to change and is not part of
+// the Cyclus API.  It is testing "undefined" implementation detail behavior
+// as coded.  We may decide to change the behavior in the future breaking
+// this test; the test will need to be modified accordingly.
+//
+// This test checks to see that, when materials are absorbed together, the
+// previous decay time for the larger quantity material is used as the value
+// for the new, combined material.
+TEST_F(MaterialTest, AbsorbPrevDecay) {
   Material::Ptr m1 = Material::Create(fac, 1, diff_comp_);
   Material::Ptr m2 = Material::Create(fac, 1, diff_comp_);
   Material::Ptr m3 = Material::Create(fac, 1000, diff_comp_);
