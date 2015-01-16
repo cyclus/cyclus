@@ -23,7 +23,6 @@ class ResMapTest : public ::testing::Test {
   ResMap<std::string, Product> store_;  // default constructed mat store
   ResMap<std::string, Product> filled_store_;
 
-  double neg_cap, zero_cap, cap, low_cap;
   double exact_qty;  // mass in filled_store_
   double exact_qty_under;  // mass in filled_store - 0.9*eps_rsrc()
   double exact_qty_over;  // mass in filled_store + 0.9*eps_rsrc()
@@ -40,13 +39,6 @@ class ResMapTest : public ::testing::Test {
       mats["mat1"] = mat1_;
       mats["mat2"] = mat2_;
 
-      neg_cap = -1;
-      zero_cap = 0;
-      cap = mat1_->quantity() + mat2_->quantity() +
-            1;  // should be higher than mat1+mat2 masses
-      low_cap = mat1_->quantity() + mat2_->quantity() -
-                1;  // should be lower than mat1_mat2 masses
-
       undereps = 0.9 * eps_rsrc();
       overeps = 1.1 * eps_rsrc();
       exact_qty = mat1_->quantity();
@@ -55,7 +47,6 @@ class ResMapTest : public ::testing::Test {
       under_qty = exact_qty - overeps;
       over_qty = exact_qty + overeps;
 
-      filled_store_.capacity(cap);
       filled_store_["mat1"] = mat1_;
       filled_store_["mat2"] = mat2_;
     } catch (std::exception err) {

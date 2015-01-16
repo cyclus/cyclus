@@ -21,9 +21,6 @@ namespace toolkit {
 /// ResMap container for the management of resources. It allows you to associate
 /// keys with individual resources. The keys are often strings or ints and the
 /// ResMap enables you to add whatever semantic meaning that you want to these keys.
-/// Like the ResBuf class, ResMap is able to keep track of its total quantity of
-/// resources and has a maximum capacity limit. Overfilled ResMaps will throw a
-/// ValueError when their quantity() is next computed.
 ///
 /// Typically, a ResMap will be a member variable of an archetype class.
 /// Resources can be added, removed, and retrieved from it as needed.
@@ -43,7 +40,7 @@ namespace toolkit {
 template <class K, class R>
 class ResMap {
  public:
-  ResMap() : capacity_(INFINITY), dirty_quantity_(true), quantity_(0) {
+  ResMap() : dirty_quantity_(true), quantity_(0) {
     Warn<EXPERIMENTAL_WARNING>("ResMap is experimental and its API may be "
                                "subject to change");
   }
@@ -62,25 +59,6 @@ class ResMap {
   // properties
   //
 
-  /// Returns the maximum resource quantity this mapping can hold (units
-  /// based on constituent resource objects' units).
-  inline double capacity() const { return capacity_; }
-
-  /// Sets the maximum quantity this mapping can hold (units based
-  /// on constituent resource objects' units).
-  ///
-  /// @throws ValueError the new capacity is lower (by eps_rsrc()) than the
-  /// quantity of resources that exist in the buffer.
-  void capacity(double cap) {
-    if (quantity() - cap > eps_rsrc()) {
-      std::stringstream ss;
-      ss << std::setprecision(17) << "new capacity " << cap
-         << " lower than existing quantity " << quantity();
-      throw ValueError(ss.str());
-    }
-    capacity_ = cap;
-  }
-
   /// Returns the total number of resources in the map.
   inline int size() const { return resources_.size(); }
 
@@ -88,12 +66,6 @@ class ResMap {
   inline double quantity() {
     if (dirty_quantity_)
       UpdateQuantity();
-    if (quantity_ > capacity_ + eps_rsrc()) {
-      std::stringstream ss;
-      ss << std::setprecision(17) << "quantity " << quantity_
-         << " greater than than allowed capacity " << capacity_;
-      throw ValueError(ss.str());
-    }
     return quantity_;
   };
 
@@ -110,11 +82,6 @@ class ResMap {
     obj_ids_ = oi;
     dirty_quantity_ = true;
   }
-
-  /// Returns the quantity of space remaining in the mapping.
-  /// This is effectively the difference between the capacity and the quantity
-  /// and is non-negative.
-  inline double space() { return std::max(0.0, capacity_ - quantity()); }
 
   /// Returns true if there are no resources in the map.
   inline bool empty() const { return resources_.empty(); }
@@ -264,9 +231,6 @@ class ResMap {
     }
     dirty_quantity_ = false;
   }
-
-  /// Maximum quantity of resources this mapping can hold.
-  double capacity_;
 
   /// Whether quantity_ should be recomputed or not.
   bool dirty_quantity_;

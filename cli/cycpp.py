@@ -897,7 +897,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]
             elif info['type'] not in BUFFERS:
                 impl += ind + "{0} = m->{0};\n".format(member)
-            elif 'capacity' in info:
+            else:
                 cap_buffs[member] = info
 
         for b, info in cap_buffs.items():
@@ -916,9 +916,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResourceBuff': ("{var}.set_capacity("
                                             "m->{var}.capacity());\n"),
         CYCNS + '::toolkit::ResBuf': "{var}.capacity(m->{var}.capacity());\n",
-        CYCNS + '::toolkit::ResMap': (
-            "{var}.capacity(m->{var}.capacity());\n"
-            '{var}.obj_ids(m->obj_ids());\n'),
+        CYCNS + '::toolkit::ResMap': '{var}.obj_ids(m->obj_ids());\n',
         }
 
 class InitFromDbFilter(CodeGeneratorFilter):
@@ -984,7 +982,6 @@ class InitFromDbFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResourceBuff': '{var}.set_capacity({capacity});\n',
         CYCNS + '::toolkit::ResBuf': '{var}.capacity({capacity});\n',
         CYCNS + '::toolkit::ResMap': (
-            '{var}.capacity({capacity});\n'
             '{var}.obj_ids(qr.GetVal<{tstr}>("{var}"))\n;'),
         }
 
