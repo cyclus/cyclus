@@ -6,8 +6,19 @@ The core of the Cyclus nuclear fuel cycle simulator from the
 University of Wisconsin - Madison is intended to be a simulation
 framework upon which to develop innovative fuel cycle simulations.
 
+
 To see user and developer documentation for this code, please visit
 the `Cyclus Homepage`_.
+
+
+
+
+
+
+
+
+
+
 
 ******************************
 Installing Cyclus the Easy Way
@@ -17,6 +28,8 @@ Cyclus provides easy-to-install binary packages via the
 great for users but may not be suitable for developers. For detailed
 instructions on installing conda and Cyclus, please 
 `see the install documentation <http://fuelcycle.org/user/install.html>`_.
+
+
 
 ******************************
 Building and Installing Cyclus
