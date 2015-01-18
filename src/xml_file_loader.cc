@@ -170,6 +170,7 @@ void XMLFileLoader::LoadSim() {
 }
 
 void XMLFileLoader::LoadSolver() {
+  using std::string;
   InfileTree xqe(*parser_);
   std::string query = "/*/commodity";
 
@@ -192,6 +193,20 @@ void XMLFileLoader::LoadSolver() {
         ->AddVal("SolutionPriority", it->second)
         ->Record();
   }
+
+  // now load the actual solver
+  string greedy = "greedy";
+  query = string("/control/solver");
+  string solver_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
+  query = string("/control/preconditioner");
+  string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
+  query = string("/control/exclusive_orders_only");
+  bool exclusive = cyclus::OptionalQuery<bool>(&xqe, query, false);
+  ctx_->NewDatum("SolverInfo")
+      ->AddVal("Solver", solver_name)
+      ->AddVal("Preconditioner", precon_name)
+      ->AddVal("ExclusiveOrders", exclusive)
+      ->Record();
 }
 
 void XMLFileLoader::ProcessCommodities(
