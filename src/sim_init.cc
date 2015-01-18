@@ -173,28 +173,68 @@ void SimInit::LoadRecipes() {
   }
 }
 
-void SimInit::LoadSolverInfo() {
-  // context will delete solver
-  GreedySolver* solver;
-  bool exclusive_orders = false;
-  
+void* SimInit::LoadPreconditioner(std::string name) {
+  using std::map;
+  using std::string;
+  void* precon = NULL;
+  map<string, double> commod_order;
   try {
     QueryResult qr = b_->Query("CommodPriority", NULL);
-    std::map<std::string, double> commod_order;
     for (int i = 0; i < qr.rows.size(); ++i) {
-      std::string commod = qr.GetVal<std::string>("Commodity", i);
+      std::string commod = qr.GetVal<string>("Commodity", i);
       double order = qr.GetVal<double>("SolutionOrder", i);
       commod_order[commod] = order;
     }
-
-    // solver will delete conditioner
-    GreedyPreconditioner* conditioner = new GreedyPreconditioner(
-        commod_order, GreedyPreconditioner::REVERSE);
-    solver = new GreedySolver(exclusive_orders, conditioner);
   } catch (std::exception err) {
-    solver = new GreedySolver(exclusive_orders);
+    return NULL;
   }  // table doesn't exist (okay)
 
+  // actually create and return the preconditioner
+  if (name == "greedy") {
+    precon = new GreedyPreconditioner(commod_order, 
+                                      GreedyPreconditioner::REVERSE);
+  } else {
+    throw ValueError("The name of the preconditioner was not recognized, "
+                     "got '" + name + "'.");
+  }
+  return precon;
+}
+
+void SimInit::LoadSolverInfo() {
+  using std::set;
+  using std::string;
+  // context will delete solver
+  ExchangeSolver* solver;
+  void* precon = NULL;
+  string solver_name = string("greedy");
+  string precon_name = string("greedy");
+  bool exclusive_orders = false;
+
+  // load in possible Solver info, needs to be optional to 
+  // maintain backwards compatibility, defaults above.
+  set<string> tables = b_->Tables();
+  string solver_info = string("SolverInfo");
+  if (0 < tables.count(solver_info)) {
+    QueryResult qr = b_->Query(solver_info, NULL);
+    solver_name = qr.GetVal<string>("Solver");
+    precon_name = qr.GetVal<string>("Preconditioner");
+    exclusive_orders = qr.GetVal<bool>("ExclusiveOrders");
+  }
+
+  precon = LoadPreconditioner(precon_name);
+
+  if (solver_name == "greedy") {
+    if (precon == NULL) {
+      solver = new GreedySolver(exclusive_orders);
+    } else {
+      solver = new GreedySolver(exclusive_orders, 
+                                (GreedyPreconditioner*) precon);
+    }
+  } else {
+    throw ValueError("The name of the solver was not recognized, "
+                     "got '" + solver_name + "'.");
+  }
+  
   ctx_->solver(solver);
 }
 

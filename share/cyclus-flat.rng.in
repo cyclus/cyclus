@@ -18,6 +18,14 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional> 
         <element name="decay"><text/></element> 
       </optional>
+        <element name="solver"> <text/> </element>
+      </optional>
+      <optional>
+        <element name="preconditioner"> <text/> </element>
+      </optional>
+      <optional>
+        <element name="exclusive_orders_only"><data type="boolean" /></element>
+      </optional>
     </interleave>
   </element>
 
