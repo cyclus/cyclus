@@ -228,7 +228,7 @@ void SimInit::LoadSolverInfo() {
       solver = new GreedySolver(exclusive_orders);
     } else {
       solver = new GreedySolver(exclusive_orders, 
-                                (GreedyPreconditioner*) precon);
+        reinterpret_cast<GreedyPreconditioner*>(precon));
     }
   } else {
     throw ValueError("The name of the solver was not recognized, "
