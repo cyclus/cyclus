@@ -216,9 +216,11 @@ void SimInit::LoadSolverInfo() {
   string solver_info = string("SolverInfo");
   if (0 < tables.count(solver_info)) {
     QueryResult qr = b_->Query(solver_info, NULL);
-    solver_name = qr.GetVal<string>("Solver");
-    precon_name = qr.GetVal<string>("Preconditioner");
-    exclusive_orders = qr.GetVal<bool>("ExclusiveOrders");
+    if (qr.rows.size() > 0) {
+      solver_name = qr.GetVal<string>("Solver");
+      precon_name = qr.GetVal<string>("Preconditioner");
+      exclusive_orders = qr.GetVal<bool>("ExclusiveOrders");
+    }
   }
 
   precon = LoadPreconditioner(precon_name);
