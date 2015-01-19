@@ -182,6 +182,28 @@ class RequestGroup : public ExchangeNodeGroup {
   double qty_;
 };
 
+/// \class SupplyGroup
+///
+/// \brief A Supplyroup is a specific ExchangeNodeGroup with a notion of an
+/// total suppliable quantity.
+class SupplyGroup : public ExchangeNodeGroup {
+ public:
+  typedef boost::shared_ptr<SupplyGroup> Ptr;
+
+  explicit SupplyGroup();
+  explicit SupplyGroup(double qty);
+
+  double qty() { return qty_; }
+
+  /// \brief Add the node to the ExchangeNodeGroup and informs the node it is a
+  /// member of this ExchangeNodeGroup, if the node is exclusive, also add it to
+  /// the group of exclusive nodes
+  virtual void AddExchangeNode(ExchangeNode::Ptr node);
+
+ private:
+  double qty_;
+};
+
 typedef std::pair<Arc, double> Match;
 
 /// @class ExchangeGraph

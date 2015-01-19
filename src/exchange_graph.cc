@@ -106,6 +106,18 @@ void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+SupplyGroup::SupplyGroup() : qty_(0.0) {}
+
+SupplyGroup::SupplyGroup(double qty) : qty_(qty) {}
+
+void SupplyGroup::AddExchangeNode(ExchangeNode::Ptr node) {
+  ExchangeNodeGroup::AddExchangeNode(node);
+  if (node->exclusive) {
+    ExchangeNodeGroup::AddExclNode(node);
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ExchangeGraph::ExchangeGraph() : next_arc_id_(0) { }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
