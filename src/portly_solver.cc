@@ -70,7 +70,7 @@ double PortlySolver::SolveGraph() {
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind1st(
-                    std::mem_fun(&PortlySolver::LustilySatisfySet),
+                    std::mem_fun(&PortlySolver::SatisfySet),
                     this));
 
   obj_ += unmatched_ * pseudo_cost;
