@@ -146,6 +146,9 @@ class Material: public Resource {
   /// Returns the nuclide composition of this material.
   Composition::Ptr comp();
 
+  /// DEPRECATED - use non-const comp() function.
+  Composition::Ptr comp() const;
+
  protected:
   Material(Context* ctx, double quantity, Composition::Ptr c);
 

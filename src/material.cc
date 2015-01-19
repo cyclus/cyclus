@@ -189,6 +189,11 @@ void Material::Decay(int curr_time) {
   Transmute(decayed);
 }
 
+Composition::Ptr Material::comp() const {
+  throw Error("comp() const is deprecated - use non-const comp() function."
+              " Recompilation should fix the problem.");
+}
+
 Composition::Ptr Material::comp() {
   if (ctx_ != NULL && ctx_->sim_info().decay == "lazy") {
     Decay(-1);
