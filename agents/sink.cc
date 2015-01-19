@@ -21,7 +21,12 @@ Sink::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
   double amt = Capacity();
+
   Material::Ptr mat = cyclus::NewBlankMaterial(amt);
+  if (recipe_name != "") {
+    Composition::Ptr c = context()->GetRecipe(recipe_name);
+    mat = Material::CreateUntracked(amt, c);
+  }
 
   if (amt > cyclus::eps()) {
     CapacityConstraint<Material> cc(amt);

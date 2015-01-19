@@ -22,6 +22,7 @@
 #include "institution.h"
 #include "logger.h"
 #include "material.h"
+#include "mock_sim.h"
 #include "agent.h"
 #include "pyne.h"
 #include "pyne_decay.h"
