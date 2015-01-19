@@ -28,6 +28,9 @@ void XMLFileLoaderTests::SetUp() {
   decayControlFile = "decaycontrol.xml";
   CreateTestInputFile(decayControlFile, ControlSequenceWithDecay());
 
+  solver_control_file = "solvercontrol.xml";
+  CreateTestInputFile(solver_control_file, ControlSequenceWithSolver());
+
   recipeFile = "recipes.xml";
   CreateTestInputFile(recipeFile, RecipeSequence());
 
@@ -40,6 +43,7 @@ void XMLFileLoaderTests::TearDown() {
   unlink(falseFile.c_str());
   unlink(controlFile.c_str());
   unlink(decayControlFile.c_str());
+  unlink(solver_control_file.c_str());
   unlink(recipeFile.c_str());
   unlink(moduleFile.c_str());
 }
@@ -67,6 +71,20 @@ std::string XMLFileLoaderTests::ControlSequenceWithDecay() {
           "  <startyear>2000</startyear>"
           "  <simstart>0</simstart>"
           "  <decay>never</decay>"
+          " </control>"
+          "</simulation>";
+}
+
+std::string XMLFileLoaderTests::ControlSequenceWithSolver() {
+  return  "<simulation>"
+          " <control>"
+          "  <duration>1200</duration>"
+          "  <startmonth>1</startmonth>"
+          "  <startyear>2000</startyear>"
+          "  <simstart>0</simstart>"
+          "  <solver>greedy</solver>"
+          "  <preconditioner>greedy</preconditioner>"
+          "  <exclusive_orders_only>true</exclusive_orders_only>"
           " </control>"
           "</simulation>";
 }
@@ -158,6 +176,10 @@ TEST_F(XMLFileLoaderTests, openfile) {
 
 TEST_F(XMLFileLoaderTests, decayfile) {
   EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, decayControlFile));
+}
+
+TEST_F(XMLFileLoaderTests, solverfile) {
+  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, solver_control_file));
 }
 
 TEST_F(XMLFileLoaderTests, throws) {
