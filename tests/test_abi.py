@@ -24,7 +24,8 @@ def find_libcyc():
 
     cmd = "find / -type f -name libcyclus.so -executable 2>/dev/null"
     try:
-        output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+        output = subprocess.check_output(cmd, shell=True, 
+                                         stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
         output = e.output
 
@@ -41,7 +42,8 @@ def test_abi_stability():
         raise SkipTest('libcyclus could not be found, '
                        'cannot check for ABI stability')
     prefix = os.path.join(os.path.dirname(libcyc), '..')
-    args = '--update -t HEAD --no-save --check --prefix {}'.format(prefix).split()
+    args = '--update -t HEAD --no-save --check --prefix {}'
+    args = args.format(prefix).split()
     with tools.indir(reldir):
         obs = smbchk.main(args=args)
     print('obs ' + obs)
