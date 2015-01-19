@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SRC_LUSTY_SOLVER_H_
-#define CYCLUS_SRC_LUSTY_SOLVER_H_
+#ifndef CYCLUS_SRC_PORTLY_SOLVER_H_
+#define CYCLUS_SRC_PORTLY_SOLVER_H_
 
 #include "exchange_graph.h"
 #include "exchange_solver.h"
@@ -34,30 +34,30 @@ inline bool QuantityCompare(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
 class ExchangeGraph;
 class GreedyPreconditioner;
 
-/// \brief The LustySolver provides the implementation for a "lusty" solution
+/// \brief The PortlySolver provides the implementation for a "portly" solution
 /// to a resource exchange graph.
 ///
-/// Given an ExchangeGraph, the lusty solver will traverse the SupplyGroup,
+/// Given an ExchangeGraph, the portly solver will traverse the SupplyGroup,
 /// matching request nodes with supply nodes that have the largest
 /// quantity of supply first. This solver terminates in the same way as the
 /// greedy solver.
 ///
-/// \warning the LustySolver is responsible for deleting is conditioner!
-class LustySolver: public ExchangeSolver {
+/// \warning the PortlySolver is responsible for deleting is conditioner!
+class PortlySolver: public ExchangeSolver {
  public:
-  /// LustySolver constructor
+  /// PortlySolver constructor
   /// \param exclusive_orders a flag for enforcing integral, quantized orders
   /// \param c a conditioner to use before solving a graph instance
   /// \warning if a NULL pointer is passed as a conditioner argument,
   /// conditioning will *NOT* occur
   /// \{
-  LustySolver();
-  explicit LustySolver(bool exclusive_orders);
-  explicit LustySolver(void* c);
-  LustySolver(bool exclusive_orders, void* c);
+  PortlySolver();
+  explicit PortlySolver(bool exclusive_orders);
+  explicit PortlySolver(void* c);
+  PortlySolver(bool exclusive_orders, void* c);
   /// \}
 
-  virtual ~LustySolver();
+  virtual ~PortlySolver();
 
   /// Uses the provided preconditioner to condition the solver's ExchangeGraph
   /// so that SupplyGroups are ordered by their quantity.
@@ -112,7 +112,7 @@ class LustySolver: public ExchangeSolver {
   /// \}
 
  protected:
-  /// \brief the LustySolver solves an ExchangeGraph by iterating over each
+  /// \brief the PortlySolver solves an ExchangeGraph by iterating over each
   /// SupplyGroup and matching requests with the minimum bids possible,
   /// starting from the beginning of the the respective request and bid
   /// containers.
@@ -128,7 +128,7 @@ class LustySolver: public ExchangeSolver {
   /// \param n the ExchangeNode
   /// \param qty the quantity for the node to update
   void GetCaps(ExchangeNodeGroup::Ptr prs);
-  void LustilySatisfySet(RequestGroup::Ptr prs);
+  void SatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
   void UpdateObj(double qty, double pref);
 
@@ -141,4 +141,4 @@ class LustySolver: public ExchangeSolver {
 
 }  // namespace cyclus
 
-#endif  // CYCLUS_SRC_LUSTY_SOLVER_H_
+#endif  // CYCLUS_SRC_PORTLY_SOLVER_H_

@@ -2,7 +2,7 @@
 
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
-#include "lusty_solver.h"
+#include "portly_solver.h"
 #include "region.h"
 
 namespace cyclus {
@@ -233,8 +233,8 @@ void SimInit::LoadSolverInfo() {
       solver = new GreedySolver(exclusive_orders, 
         reinterpret_cast<GreedyPreconditioner*>(precon));
     }
-  } else if (solver_name == "lusty") {
-      solver = new LustySolver(exclusive_orders, precon);
+  } else if (solver_name == "portly") {
+      solver = new PortlySolver(exclusive_orders, precon);
   } else {
     throw ValueError("The name of the solver was not recognized, "
                      "got '" + solver_name + "'.");

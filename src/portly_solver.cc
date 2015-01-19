@@ -1,4 +1,4 @@
-#include "lusty_solver.h"
+#include "portly_solver.h"
 
 #include <algorithm>
 #include <cassert>
@@ -11,54 +11,54 @@
 
 namespace cyclus {
 
-LustySolver::LustySolver(bool exclusive_orders, void* c)
+PortlySolver::PortlySolver(bool exclusive_orders, void* c)
     : conditioner_(c),
       ExchangeSolver(exclusive_orders) {}
 
-LustySolver::LustySolver(bool exclusive_orders)
+PortlySolver::PortlySolver(bool exclusive_orders)
     : ExchangeSolver(exclusive_orders) {
   // FIXME
   //conditioner_ = new cyclus::GreedyPreconditioner();
   conditioner_ = NULL;
 }
 
-LustySolver::LustySolver(void* c)
+PortlySolver::PortlySolver(void* c)
     : conditioner_(c),
       ExchangeSolver(true) {}
 
-LustySolver::LustySolver() : ExchangeSolver(true) {
+PortlySolver::PortlySolver() : ExchangeSolver(true) {
   // FIXME
   //conditioner_ = new cyclus::GreedyPreconditioner();
   conditioner_ = NULL;
 }
 
-LustySolver::~LustySolver() {
+PortlySolver::~PortlySolver() {
 // FIXME
 //  if (conditioner_ != NULL)
 //    delete conditioner_;
 }
 
-void LustySolver::Condition() {
+void PortlySolver::Condition() {
 // FIXME
 //  if (conditioner_ != NULL)
 //    conditioner_->Condition(graph_);
 }
 
-void LustySolver::Init() {
+void PortlySolver::Init() {
  std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind1st(
-                    std::mem_fun(&LustySolver::GetCaps),
+                    std::mem_fun(&PortlySolver::GetCaps),
                     this));
 
   std::for_each(graph_->supply_groups().begin(),
                 graph_->supply_groups().end(),
                 std::bind1st(
-                    std::mem_fun(&LustySolver::GetCaps),
+                    std::mem_fun(&PortlySolver::GetCaps),
                     this));
 }
 
-double LustySolver::SolveGraph() {
+double PortlySolver::SolveGraph() {
   double pseudo_cost = PseudoCost();  // from ExchangeSolver API
   Condition();
   obj_ = 0;
@@ -70,14 +70,14 @@ double LustySolver::SolveGraph() {
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind1st(
-                    std::mem_fun(&LustySolver::LustilySatisfySet),
+                    std::mem_fun(&PortlySolver::LustilySatisfySet),
                     this));
 
   obj_ += unmatched_ * pseudo_cost;
   return obj_;
 }
 
-double LustySolver::Capacity(const Arc& a, double u_curr_qty,
+double PortlySolver::Capacity(const Arc& a, double u_curr_qty,
                              double v_curr_qty) {
   bool min = true;
   double ucap = Capacity(a.unode(), a, !min, u_curr_qty);
@@ -91,7 +91,7 @@ double LustySolver::Capacity(const Arc& a, double u_curr_qty,
   return cap;
 }
 
-double LustySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+double PortlySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
                              double curr_qty) {
   if (n->group == NULL) {
     throw cyclus::StateError("Notion of node capacity requires a nodegroup.");
@@ -131,14 +131,14 @@ double LustySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
   return std::min(cap, n->qty - curr_qty);
 }
 
-void LustySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
+void PortlySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
   for (int i = 0; i != g->nodes().size(); i++) {
     n_qty_[g->nodes()[i]] = 0;
   }
   grp_caps_[g.get()] = g->capacities();
 }
 
-void LustySolver::LustilySatisfySet(RequestGroup::Ptr prs) {
+void PortlySolver::SatisfySet(RequestGroup::Ptr prs) {
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
   std::stable_sort(nodes.begin(), nodes.end(), QuantityCompare);
 
@@ -151,7 +151,7 @@ void LustySolver::LustilySatisfySet(RequestGroup::Ptr prs) {
   std::vector<Arc> sorted;
   double remain, tomatch, excl_val;
 
-  CLOG(LEV_DEBUG1) << "Lusty Solving for " << target
+  CLOG(LEV_DEBUG1) << "Portly Solving for " << target
                    << " amount of a resource.";
 
   while ((match <= target) && (sup_it != nodes.end())) {
@@ -179,7 +179,7 @@ void LustySolver::LustilySatisfySet(RequestGroup::Ptr prs) {
         }
 
         if (tomatch > eps()) {
-          CLOG(LEV_DEBUG1) << "Lusty Solver is matching " << tomatch
+          CLOG(LEV_DEBUG1) << "Portly Solver is matching " << tomatch
                            << " amount of a resource.";
           UpdateCapacity(u, a, tomatch);
           UpdateCapacity(v, a, tomatch);
@@ -199,13 +199,13 @@ void LustySolver::LustilySatisfySet(RequestGroup::Ptr prs) {
   unmatched_ += target - match;
 }
 
-void LustySolver::UpdateObj(double qty, double pref) {
+void PortlySolver::UpdateObj(double qty, double pref) {
   // updates minimizing object (i.e., 1/pref is a cost and the objective is
   // cost * flow)
   obj_ += qty / pref;
 }
 
-void LustySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,
+void PortlySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,
                                  double qty) {
   using cyclus::IsNegative;
   using cyclus::ValueError;
