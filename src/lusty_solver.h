@@ -128,7 +128,7 @@ class LustySolver: public ExchangeSolver {
   /// \param n the ExchangeNode
   /// \param qty the quantity for the node to update
   void GetCaps(ExchangeNodeGroup::Ptr prs);
-  void LustilySatisfySet(SupplyGroup::Ptr prs);
+  void LustilySatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
   void UpdateObj(double qty, double pref);
 

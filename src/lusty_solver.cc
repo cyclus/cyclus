@@ -29,13 +29,15 @@ LustySolver::LustySolver() : ExchangeSolver(true) {
 }
 
 LustySolver::~LustySolver() {
-  if (conditioner_ != NULL)
-    delete conditioner_;
+// FIXME
+//  if (conditioner_ != NULL)
+//    delete conditioner_;
 }
 
 void LustySolver::Condition() {
-  if (conditioner_ != NULL)
-    conditioner_->Condition(graph_);
+// FIXME
+//  if (conditioner_ != NULL)
+//    conditioner_->Condition(graph_);
 }
 
 void LustySolver::Init() {
@@ -61,8 +63,8 @@ double LustySolver::SolveGraph() {
 
   Init();
 
-  std::for_each(graph_->supply_groups().begin(),
-                graph_->supply_groups().end(),
+  std::for_each(graph_->request_groups().begin(),
+                graph_->request_groups().end(),
                 std::bind1st(
                     std::mem_fun(&LustySolver::LustilySatisfySet),
                     this));
@@ -132,7 +134,7 @@ void LustySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
   grp_caps_[g.get()] = g->capacities();
 }
 
-void LustySolver::LustilySatisfySet(SupplyGroup::Ptr prs) {
+void LustySolver::LustilySatisfySet(RequestGroup::Ptr prs) {
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
   std::stable_sort(nodes.begin(), nodes.end(), QuantityCompare);
 
@@ -145,7 +147,7 @@ void LustySolver::LustilySatisfySet(SupplyGroup::Ptr prs) {
   std::vector<Arc> sorted;
   double remain, tomatch, excl_val;
 
-  CLOG(LEV_DEBUG1) << "Greedy Solving for " << target
+  CLOG(LEV_DEBUG1) << "Lusty Solving for " << target
                    << " amount of a resource.";
 
   while ((match <= target) && (sup_it != nodes.end())) {
