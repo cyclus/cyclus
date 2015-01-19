@@ -17,7 +17,9 @@ LustySolver::LustySolver(bool exclusive_orders, void* c)
 
 LustySolver::LustySolver(bool exclusive_orders)
     : ExchangeSolver(exclusive_orders) {
-  conditioner_ = new cyclus::GreedyPreconditioner();
+  // FIXME
+  //conditioner_ = new cyclus::GreedyPreconditioner();
+  conditioner_ = NULL;
 }
 
 LustySolver::LustySolver(void* c)
@@ -25,7 +27,9 @@ LustySolver::LustySolver(void* c)
       ExchangeSolver(true) {}
 
 LustySolver::LustySolver() : ExchangeSolver(true) {
-  conditioner_ = new cyclus::GreedyPreconditioner();
+  // FIXME
+  //conditioner_ = new cyclus::GreedyPreconditioner();
+  conditioner_ = NULL;
 }
 
 LustySolver::~LustySolver() {
