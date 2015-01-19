@@ -29,7 +29,6 @@ def find_libcyc():
     except subprocess.CalledProcessError as e:
         output = e.output
 
-    print('output:', output)
     return output.split('\n')[0]
 
 def test_abi_stability():
@@ -46,7 +45,6 @@ def test_abi_stability():
     args = args.format(prefix).split()
     with tools.indir(reldir):
         obs = smbchk.main(args=args)
-    print('obs ' + obs)
     assert_true(obs)
 
 if __name__ == "__main__":
