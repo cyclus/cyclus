@@ -57,7 +57,7 @@ void GreedySolver::Init() {
 }
 
 double GreedySolver::SolveGraph() {
-  double pseudo_cost = PseudoCost(); // from ExchangeSolver API
+  double pseudo_cost = PseudoCost();  // from ExchangeSolver API
   Condition();
   obj_ = 0;
   unmatched_ = 0;
@@ -92,7 +92,7 @@ double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
 double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
                                double curr_qty) {
   if (n->group == NULL) {
-    throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
+    throw cyclus::StateError("A notion of node capacity requires a nodegroup.");
   }
 
   if (n->unit_capacities[a].size() == 0) {
