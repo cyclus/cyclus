@@ -20,6 +20,7 @@ except ImportError:
 def find_libcyc():
     libcyc = os.path.join(cycdir, 'build', 'lib', 'libcyclus.so')
     if os.path.exists(libcyc):
+        print('lib cyc exists in build: ', libcyc)
         return libcyc
 
     cmd = "find / -type f -name libcyclus.so -executable 2>/dev/null"
@@ -29,6 +30,7 @@ def find_libcyc():
     except subprocess.CalledProcessError as e:
         output = e.output
 
+    print('lib cyc found with find: ', output)
     return output.split('\n')[0]
 
 def test_abi_stability():
