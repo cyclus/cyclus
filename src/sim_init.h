@@ -78,6 +78,7 @@ class SimInit {
   void LoadDecomSched();
   void LoadNextIds();
 
+  void* LoadPreconditioner(std::string name);
   Resource::Ptr LoadResource(int resid);
   Resource::Ptr LoadMaterial(int resid);
   Resource::Ptr LoadProduct(int resid);
