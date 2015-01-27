@@ -52,5 +52,6 @@
 #include "toolkit/resource_buff.h"
 #include "toolkit/res_buf.h"
 #include "toolkit/res_manip.h"
+#include "toolkit/res_map.h"
 
 #endif  // CYCLUS_SRC_CYCLUS_H_
