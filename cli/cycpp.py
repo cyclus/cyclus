@@ -1131,7 +1131,6 @@ class InfileToDbFilter(CodeGeneratorFilter):
         tstr = type_to_str(t)
         if tstr.endswith('>'):
             tstr += " "
-        tfmt = self._fmt(t)
         # Get keys
         kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree}
         if d is None:
@@ -1139,7 +1138,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
             kw['default'] = ""
         else:
             kw['query'] = "OptionalQuery"
-            kw['default'] = ", " + tfmt.format(d)
+            default = self._val(d)
+            if ';' in default:
+                raise ValueError('can only query based on values that '
+                                 'are C++ expressions, got:\n\n' + default)
+            kw['default'] = ", " + default
         kw['index'] = '' if idx is None else ', {0}'.format(idx)
         # get template
         if uitype == 'nuclide':
@@ -1174,10 +1177,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             ind = ind[:-2]
             s += ind + '} else {\n'
             ind += '  '
-            s += ind + '{0}.resize({1});\n'.format(member, len(d))
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}[{1}] = {2};\n'.format(member, i, vstr)
+            val = self._val(t, val=d, name=member, uitype=uitype)
+            s += ind + val.replace('\n', '\n' + ind)
             ind = ind[:-2]
             s += ind + '}\n'
         return s
@@ -1199,9 +1200,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             ind = ind[:-2]
             s += ind + '} else {\n'
             ind += '  '
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}.insert({1});\n'.format(member, vstr)
+            val = self._val(t, val=d, name=member, uitype=uitype)
+            s += ind + val.replace('\n', '\n' + ind)
             ind = ind[:-2]
             s += ind + '}\n'
         return s
@@ -1223,9 +1223,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             ind = ind[:-2]
             s += ind + '} else {\n'
             ind += '  '
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}.push_back({1});\n'.format(member, vstr)
+            val = self._val(t, val=d, name=member, uitype=uitype)
+            s += ind + val.replace('\n', '\n' + ind)
             ind = ind[:-2]
             s += ind + '}\n'
         return s
@@ -1258,10 +1257,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             ind = ind[:-2]
             s += ind + '} else {\n'
             ind += '  '
-            for k, v in d.items():
-                kstr = keyfmt.format(k)
-                vstr = valfmt.format(v)
-                s += ind + '{0}[{1}] = {2};\n'.format(member, kstr, vstr)
+            val = self._val(t, val=d, name=member, uitype=uitype)
+            s += ind + val.replace('\n', '\n' + ind)
             ind = ind[:-2]
             s += ind + '}\n'
         return s
