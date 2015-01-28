@@ -1041,16 +1041,16 @@ class InfileToDbFilter(CodeGeneratorFilter):
         """
         key = t if isinstance(t, STRING_TYPES) else t[0]
         if val is None:
-            return self._vals[key](t, name=name, uitype=None)
+            return self._vals[key](t, name=name, uitype=uitype)
         else:
-            return self._vals[key](t, val=val, name=name, uitype=None)
+            return self._vals[key](t, val=val, name=name, uitype=uitype)
 
     def _val_bool(self, t, val=False, name=None, uitype=None):
         return 'true' if val else 'false'
 
     def _val_int(self, t, val=0, name=None, uitype=None):
         if uitype == 'nuclide':
-            fmt = '"{0}"' if isinstnace(val, STRING_TYPES) else '{0}'
+            fmt = '"{0}"' if isinstance(val, STRING_TYPES) else '{0}'
             v = fmt.format(val)
             v = 'pyne::nucname::id({0})'.format(v)
         else:
@@ -1117,6 +1117,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
     def _val_map(self, t, val=None, name=None, uitype=None):
         val = val or {}
+        if not isinstance(val, Mapping):
+            val = dict(val)
         ktype, vtype = t[1], t[2]
         kuitype = None if uitype is None else uitype[1]
         vuitype = None if uitype is None else uitype[2]

@@ -1,5 +1,6 @@
 import os
 import sys
+import uuid
 from collections import OrderedDict
 
 import nose
@@ -403,6 +404,60 @@ def test_itdbfilter():
                 'ABSOLUTELY FREE\n'
                 '  ->Record();\n')
     yield assert_equal, exp_impl, impl
+
+
+def check_itdbfilter_val(exp, f, t, v, name, uitype):
+    obs = f._val(t, val=v, name=name, uitype=uitype)
+    assert_equal(exp, obs)
+
+def test_itdbfilter_val():
+    """Test InfileToDbFilter._val()"""
+    m = MockCodeGenMachine()
+    f = InfileToDbFilter(m)
+
+    cases = [
+        ('bool', True, None, None, 'true'), 
+        ('bool', False, None, None, 'false'), 
+        ('int', 42, None, None, '42'), 
+        ('int', 92235, None, 'nuclide', 'pyne::nucname::id(92235)'), 
+        ('int', 'U-235', None, 'nuclide', 'pyne::nucname::id("U-235")'), 
+        ('float', 42.0, None, None, '42.0'), 
+        ('double', 42.0, None, None, '42.0'), 
+        ('std::string', 'wakka', None, None, 'std::string("wakka")'),
+        ('cyclus::Blob', 'wakka', None, None, 'cyclus::Blob("wakka")'),
+        ('boost::uuids::uuid', 
+            '/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb', None, None, 
+            '"/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb"'),
+        ('boost::uuids::uuid', 
+            uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), None, None, 
+            '{0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, '
+            '0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92}'),
+        (('std::vector', 'int'), [42], 'x', None, 
+            'x.resize(1);\n'
+            'x[0] = 42;\n'
+            ),
+        (('std::vector', 'int'), [92235], 'x', [None, 'nuclide'], 
+            'x.resize(1);\n'
+            'x[0] = pyne::nucname::id(92235);\n'
+            ),
+        (('std::set', 'int'), [42, 65], 'x', None, 
+            'x.insert(42);\n'
+            'x.insert(65);\n'
+            ),
+        (('std::list', 'int'), [42, 65], 'x', None, 
+            'x.push_back(42);\n'
+            'x.push_back(65);\n'
+            ),
+        (('std::pair', 'int', 'double'), [42, 65.0], None, None, 
+            'std::pair<int, double >(42, 65.0)'
+            ),
+        (('std::map', 'int', 'double'), {42: 65.0}, 'x', None, 
+            'x[42] = 65.0;\n'
+            ),
+        ]
+    for t, v, name, uitype, exp in cases:
+        yield check_itdbfilter_val, exp, f, t, v, name, uitype
+
 
 def test_schemafilter():
     """Test SchemaFilter"""
