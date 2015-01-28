@@ -1140,7 +1140,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             kw['default'] = ""
         else:
             kw['query'] = "OptionalQuery"
-            default = self._val(d)
+            default = self._val(t, val=d, uitype=uitype)
             if ';' in default:
                 raise ValueError('can only query based on values that '
                                  'are C++ expressions, got:\n\n' + default)
