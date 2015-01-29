@@ -200,14 +200,38 @@ void* SimInit::LoadPreconditioner(std::string name) {
   return precon;
 }
 
+ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive, 
+                                          std::set<std::string> tables) {
+  using std::set;
+  using std::string;
+  ExchangeSolver* solver;
+  void* precon = NULL;
+  string precon_name = string("greedy");
+
+  string solver_info = string("GreedySolverInfo");
+  if (0 < tables.count(solver_info)) {
+    QueryResult qr = b_->Query(solver_info, NULL);
+    if (qr.rows.size() > 0) {
+      precon_name = qr.GetVal<string>("Preconditioner");
+    }
+  }
+
+  precon = LoadPreconditioner(precon_name);
+  if (precon == NULL) {
+    solver = new GreedySolver(exclusive);
+  } else {
+    solver = new GreedySolver(exclusive,
+      reinterpret_cast<GreedyPreconditioner*>(precon));
+  }
+  return solver;
+}
+
 void SimInit::LoadSolverInfo() {
   using std::set;
   using std::string;
   // context will delete solver
   ExchangeSolver* solver;
-  void* precon = NULL;
   string solver_name = string("greedy");
-  string precon_name = string("greedy");
   bool exclusive_orders = false;
 
   // load in possible Solver info, needs to be optional to
@@ -218,20 +242,12 @@ void SimInit::LoadSolverInfo() {
     QueryResult qr = b_->Query(solver_info, NULL);
     if (qr.rows.size() > 0) {
       solver_name = qr.GetVal<string>("Solver");
-      precon_name = qr.GetVal<string>("Preconditioner");
       exclusive_orders = qr.GetVal<bool>("ExclusiveOrders");
     }
   }
 
-  precon = LoadPreconditioner(precon_name);
-
   if (solver_name == "greedy") {
-    if (precon == NULL) {
-      solver = new GreedySolver(exclusive_orders);
-    } else {
-      solver = new GreedySolver(exclusive_orders,
-        reinterpret_cast<GreedyPreconditioner*>(precon));
-    }
+    solver = LoadGreedySolver(exclusive_orders, tables);
   } else {
     throw ValueError("The name of the solver was not recognized, "
                      "got '" + solver_name + "'.");

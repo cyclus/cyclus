@@ -79,6 +79,7 @@ class SimInit {
   void LoadNextIds();
 
   void* LoadPreconditioner(std::string name);
+  ExchangeSolver* LoadGreedySolver(bool exclusive, std::set<std::string> tables);
   Resource::Ptr LoadResource(int resid);
   Resource::Ptr LoadMaterial(int resid);
   Resource::Ptr LoadProduct(int resid);

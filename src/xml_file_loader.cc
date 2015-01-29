@@ -194,19 +194,27 @@ void XMLFileLoader::LoadSolver() {
         ->Record();
   }
 
-  // now load the actual solver
+  // now load the solver info
   string greedy = "greedy";
-  query = string("/control/solver");
+  query = string("/control/solver/name");
   string solver_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
-  query = string("/control/preconditioner");
-  string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
-  query = string("/control/exclusive_orders_only");
+  query = string("/control/solver/exclusive_orders_only");
   bool exclusive = cyclus::OptionalQuery<bool>(&xqe, query, false);
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
-      ->AddVal("Preconditioner", precon_name)
       ->AddVal("ExclusiveOrders", exclusive)
       ->Record();
+
+  // now load the actual solver
+  if (solver_name == "greedy") {
+    query = string("/control/solver/greedy/preconditioner");
+    string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
+    ctx_->NewDatum("GreedySolverInfo")
+      ->AddVal("Preconditioner", precon_name)
+      ->Record();
+  } else {
+    throw ValueError("unknown solver name: " + solver_name);
+  }
 }
 
 void XMLFileLoader::ProcessCommodities(
