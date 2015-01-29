@@ -22,18 +22,17 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="solver"> 
           <interleave>
             <optional>
-              <element name="name"> <text/> </element>
-            </optional>
-            <optional>
-              <choice>
-                <element name="greedy">
-                  <interleave>
-                    <optional>
-                      <element name="preconditioner"> <text/> </element>
-                    </optional>
-                  </interleave>
-                </element>
-              </choice>
+              <element name="config">
+                <choice>
+                  <element name="greedy">
+                    <interleave>
+                      <optional>
+                        <element name="preconditioner"> <text/> </element>
+                      </optional>
+                    </interleave>
+                  </element>
+                </choice>
+              </element>
             </optional>
             <optional>
               <element name="exclusive_orders_only">

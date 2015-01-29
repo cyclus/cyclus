@@ -172,6 +172,7 @@ void XMLFileLoader::LoadSim() {
 void XMLFileLoader::LoadSolver() {
   using std::string;
   InfileTree xqe(*parser_);
+  InfileTree* qe;
   std::string query = "/*/commodity";
 
   std::map<std::string, double> commod_priority;
@@ -179,7 +180,7 @@ void XMLFileLoader::LoadSolver() {
   double priority;
   int num_commods = xqe.NMatches(query);
   for (int i = 0; i < num_commods; i++) {
-    InfileTree* qe = xqe.SubTree(query, i);
+    qe = xqe.SubTree(query, i);
     name = qe->GetString("name");
     priority = OptionalQuery<double>(qe, "solution_priority", -1);
     commod_priority[name] = priority;
@@ -195,11 +196,18 @@ void XMLFileLoader::LoadSolver() {
   }
 
   // now load the solver info
+  string config = "config";
   string greedy = "greedy";
-  query = string("/control/solver/name");
-  string solver_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
-  query = string("/control/solver/exclusive_orders_only");
-  bool exclusive = cyclus::OptionalQuery<bool>(&xqe, query, false);
+  string solver_name = greedy;
+  bool exclusive = false;
+  if (xqe.NMatches("/control/solver") == 1) {
+    qe = xqe.SubTree("/control/solver");
+    if (qe->NMatches(config) == 1) {
+      solver_name = qe->SubTree(config)->GetElementName(0);
+    }
+    exclusive = cyclus::OptionalQuery<bool>(qe, "exclusive_orders_only", 
+                                            exclusive);
+  } 
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
       ->AddVal("ExclusiveOrders", exclusive)
@@ -207,7 +215,7 @@ void XMLFileLoader::LoadSolver() {
 
   // now load the actual solver
   if (solver_name == "greedy") {
-    query = string("/control/solver/greedy/preconditioner");
+    query = string("/control/solver/config/greedy/preconditioner");
     string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
     ctx_->NewDatum("GreedySolverInfo")
       ->AddVal("Preconditioner", precon_name)
