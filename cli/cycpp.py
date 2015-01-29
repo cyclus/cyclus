@@ -47,6 +47,7 @@ from __future__ import print_function
 import os
 import re
 import sys
+import uuid
 from collections import Sequence, Mapping, MutableMapping, OrderedDict
 from itertools import takewhile
 from subprocess import Popen, PIPE
@@ -1010,6 +1011,20 @@ class InfileToDbFilter(CodeGeneratorFilter):
             'std::pair': self.read_pair,
             'std::map': self.read_map,
             }
+        self._vals = {
+            'bool': self._val_bool,
+            'int': self._val_int,
+            'float': self._val_floating,
+            'double': self._val_floating,
+            'std::string': self._val_string,
+            'cyclus::Blob': self._val_blob,
+            'boost::uuids::uuid': self._val_uuid,
+            'std::vector': self._val_vector,
+            'std::set': self._val_set,
+            'std::list': self._val_list,
+            'std::pair': self._val_pair,
+            'std::map': self._val_map,
+            }
 
     def methodargs(self):
         return "{0}::InfileTree* tree, {0}::DbInit di".format(CYCNS)
@@ -1018,11 +1033,106 @@ class InfileToDbFilter(CodeGeneratorFilter):
         """returns a format string for a type t"""
         return '"{0}"' if t == 'std::string' else '{0}'
 
+    def _val(self, t, val=None, name=None, uitype=None):
+        """Returns a string that represents a Python value (val) of a given 
+        type (t) in C++. For types that do not have an expression 
+        representation, the variable (name) may also be used. If a value
+        is not provided, the default for the type will be provided.
+        """
+        key = t if isinstance(t, STRING_TYPES) else t[0]
+        if val is None:
+            return self._vals[key](t, name=name, uitype=uitype)
+        else:
+            return self._vals[key](t, val=val, name=name, uitype=uitype)
+
+    def _val_bool(self, t, val=False, name=None, uitype=None):
+        return 'true' if val else 'false'
+
+    def _val_int(self, t, val=0, name=None, uitype=None):
+        if uitype == 'nuclide':
+            fmt = '"{0}"' if isinstance(val, STRING_TYPES) else '{0}'
+            v = fmt.format(val)
+            v = 'pyne::nucname::id({0})'.format(v)
+        else:
+            v = '{0}'.format(val)
+        return v
+
+    def _val_floating(self, t, val=0.0, name=None, uitype=None):
+        return '{0}'.format(val)
+
+    def _val_string(self, t, val='', name=None, uitype=None):
+        return 'std::string("{0}")'.format(val)
+
+    def _val_blob(self, t, val='', name=None, uitype=None):
+        return 'cyclus::Blob("{0}")'.format(val)
+
+    def _val_uuid(self, t, val='', name=None, uitype=None):
+        if isinstance(val, STRING_TYPES):
+            v = '"{0}"'.format(val)
+        elif isinstance(val, uuid.UUID):
+            v = [x+y for x,y in zip(val.hex[::1], val.hex[1::2])]
+            v = '{0x' + ', 0x'.join(v) + '}'
+        else:
+            msg = "could not interpret UUID type of {0}"
+            raise TypeError(msg.format(val))
+        return v
+
+    def _val_vector(self, t, val=(), name=None, uitype=None):
+        vtype = t[1]
+        vuitype = None if uitype is None else uitype[1]
+        v = '{0}.resize({1});\n'.format(name, len(val))
+        for i, x in enumerate(val):
+            x = self._val(vtype, val=x, uitype=vuitype)
+            v += '{0}[{1}] = {2};\n'.format(name, i, x)
+        return v
+
+    def _val_set(self, t, val=frozenset(), name=None, uitype=None):
+        vtype = t[1]
+        vuitype = None if uitype is None else uitype[1]
+        v = ''
+        for i, x in enumerate(val):
+            x = self._val(vtype, val=x, uitype=vuitype)
+            v += '{0}.insert({1});\n'.format(name, x)
+        return v
+
+    def _val_list(self, t, val=(), name=None, uitype=None):
+        vtype = t[1]
+        vuitype = None if uitype is None else uitype[1]
+        v = ''
+        for i, x in enumerate(val):
+            x = self._val(vtype, val=x, uitype=vuitype)
+            v += '{0}.push_back({1});\n'.format(name, x)
+        return v
+
+    def _val_pair(self, t, val=(None, None), name=None, 
+                  uitype=(None, None, None)):
+        ftype, stype = t[1], t[2]
+        fuitype = None if uitype is None else uitype[1]
+        suitype = None if uitype is None else uitype[2]
+        first = self._val(ftype, val=val[0], uitype=fuitype)
+        second = self._val(stype, val=val[1], uitype=suitype)
+        v = 'std::pair<{0}, {1} >({2}, {3})'
+        v = v.format(type_to_str(ftype), type_to_str(stype), first, second)
+        return v
+
+    def _val_map(self, t, val=None, name=None, uitype=None):
+        val = val or {}
+        if not isinstance(val, Mapping):
+            val = dict(val)
+        ktype, vtype = t[1], t[2]
+        kuitype = None if uitype is None else uitype[1]
+        vuitype = None if uitype is None else uitype[2]
+        v = ''
+        for k, x in val.items():
+            k = self._val(ktype, val=k, uitype=kuitype)
+            x = self._val(vtype, val=x, uitype=vuitype)
+            v += '{0}[{1}] = {2};\n'.format(name, k, x)
+        return v
+
     def _query(self, tree, alias, t, d, uitype=None, idx=None):
         tstr = type_to_str(t)
         if tstr.endswith('>'):
             tstr += " "
-        tfmt = self._fmt(t)
         # Get keys
         kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree}
         if d is None:
@@ -1030,7 +1140,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
             kw['default'] = ""
         else:
             kw['query'] = "OptionalQuery"
-            kw['default'] = ", " + tfmt.format(d)
+            default = self._val(t, val=d, uitype=uitype)
+            if ';' in default:
+                raise ValueError('can only query based on values that '
+                                 'are C++ expressions, got:\n\n' + default)
+            kw['default'] = ", " + default
         kw['index'] = '' if idx is None else ', {0}'.format(idx)
         # get template
         if uitype == 'nuclide':
@@ -1065,10 +1179,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             ind = ind[:-2]
             s += ind + '} else {\n'
             ind += '  '
-            s += ind + '{0}.resize({1});\n'.format(member, len(d))
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}[{1}] = {2};\n'.format(member, i, vstr)
+            val = self._val(t, val=d, name=member, uitype=uitype)
+            s += ind + val.replace('\n', '\n' + ind)
             ind = ind[:-2]
             s += ind + '}\n'
         return s
@@ -1090,9 +1202,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             ind = ind[:-2]
             s += ind + '} else {\n'
             ind += '  '
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}.insert({1});\n'.format(member, vstr)
+            val = self._val(t, val=d, name=member, uitype=uitype)
+            s += ind + val.replace('\n', '\n' + ind)
             ind = ind[:-2]
             s += ind + '}\n'
         return s
@@ -1114,9 +1225,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             ind = ind[:-2]
             s += ind + '} else {\n'
             ind += '  '
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}.push_back({1});\n'.format(member, vstr)
+            val = self._val(t, val=d, name=member, uitype=uitype)
+            s += ind + val.replace('\n', '\n' + ind)
             ind = ind[:-2]
             s += ind + '}\n'
         return s
@@ -1149,10 +1259,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             ind = ind[:-2]
             s += ind + '} else {\n'
             ind += '  '
-            for k, v in d.items():
-                kstr = keyfmt.format(k)
-                vstr = valfmt.format(v)
-                s += ind + '{0}[{1}] = {2};\n'.format(member, kstr, vstr)
+            val = self._val(t, val=d, name=member, uitype=uitype)
+            s += ind + val.replace('\n', '\n' + ind)
             ind = ind[:-2]
             s += ind + '}\n'
         return s
