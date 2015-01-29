@@ -82,9 +82,13 @@ std::string XMLFileLoaderTests::ControlSequenceWithSolver() {
           "  <startmonth>1</startmonth>"
           "  <startyear>2000</startyear>"
           "  <simstart>0</simstart>"
-          "  <solver>greedy</solver>"
-          "  <preconditioner>greedy</preconditioner>"
-          "  <exclusive_orders_only>true</exclusive_orders_only>"
+          "  <solver>"
+          "    <name>greedy</name>"
+          "    <greedy>"
+          "      <preconditioner>greedy</preconditioner>"
+          "    </greedy>"
+          "    <exclusive_orders_only>true</exclusive_orders_only>"
+          "  </solver>"
           " </control>"
           "</simulation>";
 }
