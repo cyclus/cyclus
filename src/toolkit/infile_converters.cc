@@ -15,25 +15,41 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
   using std::string;
   using Json::Value;
   if (node.isObject()) {
+    bool indent_child;
     string name;
     string newindent = indent + "  ";
     Value::Members members = node.getMemberNames();
     for (int n = 0; n < members.size(); ++n) {
       name = members[n];
+      indent_child = node[name].isObject();
+      if (!indent_child && node[name].isArray())
+        indent_child = node[name][0].isObject() || node[name][0].isArray();
       ss << indent << "<" << name << ">";
+      if (indent_child)
+        ss << "\n";
       AddJsonToXml(node[name], ss, name, newindent);
+      if (indent_child)
+        ss << indent;
       ss << "</" << name << ">\n";
     }
   } else if (node.isArray()){
+    bool indent_child;
     std::string newindent = indent;
     indent = indent.substr(0, indent.size() - 2);
     int nchildren = node.size();
     for (int n = 0; n < nchildren; ++n) {
-      if (n > 0)
+      indent_child = node[n].isObject() || node[n].isArray();
+      if (n > 0) {
         ss << indent << "<" << parent_name << ">";
+        if (indent_child)
+          ss << "\n";
+      }
       AddJsonToXml(node[n], ss, parent_name, newindent);
-      if (n < nchildren - 1)
+      if (n < nchildren - 1) {
+        if (indent_child)
+          ss << indent;
         ss << "</" << parent_name << ">\n";
+      }
     }
   } else {
     // plain old data
@@ -95,8 +111,8 @@ void AddXmlToJson(InfileTree* xnode, Json::Value& jnode,
     for (int i = 0; i < n; ++i) {
       string name = xnode->GetElementName(i);
       Value val (Json::objectValue);
-      JsonInsertOrAppend(jnode, name, val);
       AddXmlToJson(xnode->SubTree("*", i), val, name);
+      JsonInsertOrAppend(jnode, name, val);
     }
   }
 }
