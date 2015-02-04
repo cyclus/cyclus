@@ -247,6 +247,8 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("build-path", "print the cyclus build directory")
       ("rng-schema", "print the path to cyclus.rng.in")
       ("nuc-data", "print the path to cyclus_nuc_data.h5")
+      ("json-to-xml", po::value<std::string>(), "*.json input file")
+      ("xml-to-json", po::value<std::string>(), "*.xml input file")
       ;
 
   po::variables_map vm;
@@ -362,6 +364,26 @@ int EarlyExitArgs(const ArgInfo& ai) {
       std::set<std::string> specs = cyclus::DiscoverSpecsInCyclusPath();
       for (std::set<std::string>::iterator it = specs.begin(); it != specs.end(); ++it)
         std::cout << *it << "\n";
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("json-to-xml")) {
+    std::string infile(ai.vm["json-to-xml"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::JsonToXml(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("xml-to-json")) {
+    std::string infile(ai.vm["xml-to-json"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::XmlToJson(input.str());
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
     }
