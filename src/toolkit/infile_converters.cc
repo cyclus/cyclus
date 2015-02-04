@@ -110,8 +110,14 @@ void AddXmlToJson(InfileTree* xnode, Json::Value& jnode,
   } else {
     for (int i = 0; i < n; ++i) {
       string name = xnode->GetElementName(i);
-      Value val (Json::objectValue);
-      AddXmlToJson(xnode->SubTree("*", i), val, name);
+      InfileTree* subxnode = xnode->SubTree("*", i);
+      Value val;
+      if (subxnode->NElements() == 0) {
+        val = Value(subxnode->GetString("."));
+      } else {
+        val = Value(Json::objectValue);
+        AddXmlToJson(subxnode, val, name);
+      }
       JsonInsertOrAppend(jnode, name, val);
     }
   }
@@ -128,7 +134,7 @@ std::string XmlToJson(std::string s) {
   parser->Init(ss);
   InfileTree xroot(*parser);
   Value jroot(Json::objectValue);
-  AddXmlToJson(&xroot, jroot, "");
+  AddXmlToJson(&xroot, jroot, xroot.GetElementName());
   Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
                                                  ", ", " ", 80);
   return writer.write(jroot);
