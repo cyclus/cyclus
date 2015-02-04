@@ -1,5 +1,7 @@
 #include <sstream>
 
+#include <boost/shared_ptr.hpp>
+
 #include "infile_converters.h"
 #include "pyne.h"
 
@@ -61,12 +63,58 @@ std::string JsonToXml(std::string s) {
   return x.str();
 }
 
+// inserts a value, or appends to an array
+void JsonInsertOrAppend(Json::Value& node, std::string key, Json::Value& val) {
+  using std::string;
+  using Json::Value;
+  if (node.isMember(key)) {
+    Value keynode = node[key];
+    if (keynode.isArray()) {
+      keynode.append(val);
+    } else {
+      keynode = Value(Json::arrayValue);
+      keynode.append(node[key]);
+      keynode.append(val);
+      node[key] = keynode;
+    }
+  } else {
+    node[key] = val;
+  }
+}
+
+void AddXmlToJson(InfileTree& xnode, Json::Value& jnode,
+                  std::string parent_name) {
+  using std::string;
+  using Json::Value;
+  int n = xnode.NElements();
+  if (n == 0) {
+    Value val(xnode.GetString("."));
+    JsonInsertOrAppend(jnode, parent_name, val);
+  } else {
+    for (int i = 0; i < n; ++i) {
+      string name = xnode.GetElementName(i);
+      Value val (Json::objectValue);
+      JsonInsertOrAppend(jnode, name, val);
+      AddXmlToJson(xnode.SubTree("*", i), val, name);
+    }
+  }
+}
+
 // Converts an XML string into an equivalent JSON string
 std::string XmlToJson(std::string s) {
   using std::string;
   using std::stringstream;
-  stringstream js;
-  return js.str();
+  using Json::Value;
+  stringstream ss (s);
+  boost::shared_ptr<XMLParser> parser = boost::shared_ptr<XMLParser>(
+                                                            new XMLParser());
+  parser->Init(ss);
+  InfileTree xroot(*parser);
+  Value jroot(Json::objectValue);
+  AddXmlToJson(xroot, jroot, "");
+  Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
+                                                 ", ", " ", 80);
+  return writer.write(jroot);
 }
 
 }  // namespace toolkit
