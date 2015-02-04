@@ -2,7 +2,9 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "error.h"
 #include "infile_converters.h"
+#include "infile_tree.h"
 #include "pyne.h"
 
 namespace cyclus {
@@ -27,7 +29,6 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
     indent = indent.substr(0, indent.size() - 2);
     int nchildren = node.size();
     for (int n = 0; n < nchildren; ++n) {
-      name = members[n];
       if (n > 0)
         ss << indent << "<" << parent_name << ">";
       AddJsonToXml(node[n], ss, parent_name, newindent);
@@ -46,7 +47,7 @@ std::string JsonToXml(std::string s) {
   using std::stringstream;
   using Json::Value;
 
-  stringstring x;
+  stringstream x;
 
   // parse the JSON string
   Value root;
@@ -82,20 +83,20 @@ void JsonInsertOrAppend(Json::Value& node, std::string key, Json::Value& val) {
   }
 }
 
-void AddXmlToJson(InfileTree& xnode, Json::Value& jnode,
+void AddXmlToJson(InfileTree* xnode, Json::Value& jnode,
                   std::string parent_name) {
   using std::string;
   using Json::Value;
-  int n = xnode.NElements();
+  int n = xnode->NElements();
   if (n == 0) {
-    Value val(xnode.GetString("."));
+    Value val(xnode->GetString("."));
     JsonInsertOrAppend(jnode, parent_name, val);
   } else {
     for (int i = 0; i < n; ++i) {
-      string name = xnode.GetElementName(i);
+      string name = xnode->GetElementName(i);
       Value val (Json::objectValue);
       JsonInsertOrAppend(jnode, name, val);
-      AddXmlToJson(xnode.SubTree("*", i), val, name);
+      AddXmlToJson(xnode->SubTree("*", i), val, name);
     }
   }
 }
@@ -111,7 +112,7 @@ std::string XmlToJson(std::string s) {
   parser->Init(ss);
   InfileTree xroot(*parser);
   Value jroot(Json::objectValue);
-  AddXmlToJson(xroot, jroot, "");
+  AddXmlToJson(&xroot, jroot, "");
   Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
                                                  ", ", " ", 80);
   return writer.write(jroot);
