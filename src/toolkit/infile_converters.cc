@@ -85,10 +85,10 @@ void JsonInsertOrAppend(Json::Value& node, std::string key, Json::Value& val) {
   using std::string;
   using Json::Value;
   if (node.isMember(key)) {
-    Value keynode = node[key];
-    if (keynode.isArray()) {
-      keynode.append(val);
+    if (node[key].isArray()) {
+      node[key].append(val);
     } else {
+      Value keynode = node[key];
       keynode = Value(Json::arrayValue);
       keynode.append(node[key]);
       keynode.append(val);
