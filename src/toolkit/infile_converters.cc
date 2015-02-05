@@ -36,7 +36,7 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
         ss << indent;
       ss << "</" << name << ">\n";
     }
-  } else if (node.isArray()){
+  } else if (node.isArray()) {
     bool indent_child;
     std::string newindent = indent;
     indent = indent.substr(0, indent.size() - 2);
@@ -59,6 +59,16 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
         ss << "</" << parent_name << ">\n";
       }
     }
+  } else if (node.isString()) {
+    ss << node.asString();
+  } else if (node.isInt()) {
+    ss << node.asInt64();
+  } else if (node.isUInt()) {
+    ss << node.asUInt64();
+  } else if (node.isDouble()) {
+    ss << node.asDouble();
+  } else if (node.isBool()) {
+    ss << node.asBool();
   } else {
     // plain old data
     ss << node.asString();
