@@ -43,7 +43,7 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
     int nchildren = node.size();
     for (int n = 0; n < nchildren; ++n) {
       if (node[n].isNull()) {
-        ss << indent << "<" << name << "/>\n";
+        ss << indent << "<" << parent_name << "/>\n";
         continue;
       }
       indent_child = node[n].isObject() || node[n].isArray();
