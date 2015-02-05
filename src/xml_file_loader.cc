@@ -19,12 +19,13 @@
 #include "infile_tree.h"
 #include "logger.h"
 #include "sim_init.h"
+#include "toolkit/infile_converters.h"
 
 namespace cyclus {
 
 namespace fs = boost::filesystem;
 
-void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
+void LoadRawStringstreamFromFile(std::stringstream& stream, std::string file) {
   std::ifstream file_stream(file.c_str());
   if (!file_stream) {
     throw IOError("The file '" + file + "' could not be loaded.");
@@ -32,6 +33,15 @@ void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
 
   stream << file_stream.rdbuf();
   file_stream.close();
+}
+
+void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
+  LoadRawStringstreamFromFile(stream, file);
+  std::string inext = fs::path(file).extension().string();
+  if (inext == ".json") {
+    std::string inxml = cyclus::toolkit::JsonToXml(stream.str());
+    stream.str(inxml);
+  }
 }
 
 std::vector<AgentSpec> ParseSpecs(std::string infile) {
@@ -144,8 +154,10 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->Init(input);
 
+  std::stringstream orig_input;
+  LoadRawStringstreamFromFile(orig_input, file_);
   ctx_->NewDatum("InputFiles")
-      ->AddVal("Data", Blob(input.str()))
+      ->AddVal("Data", Blob(orig_input.str()))
       ->Record();
 }
 

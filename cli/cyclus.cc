@@ -129,11 +129,6 @@ int main(int argc, char* argv[]) {
   // Try to detect schema type
   std::stringstream input;
   LoadStringstreamFromFile(input, infile);
-  std::string inext = fs::path(infile).extension().string();
-  if (inext == ".json") {
-    std::string inxml = cyclus::toolkit::JsonToXml(input.str());
-    input.str(inxml);
-  }
   boost::shared_ptr<XMLParser> parser =
       boost::shared_ptr<XMLParser>(new XMLParser());
   parser->Init(input);
@@ -377,7 +372,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
     std::string infile(ai.vm["json-to-xml"].as<std::string>());
     try {
       std::stringstream input;
-      LoadStringstreamFromFile(input, infile);
+      LoadRawStringstreamFromFile(input, infile);
       std::cout << cyclus::toolkit::JsonToXml(input.str());
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
@@ -387,7 +382,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
     std::string infile(ai.vm["xml-to-json"].as<std::string>());
     try {
       std::stringstream input;
-      LoadStringstreamFromFile(input, infile);
+      LoadRawStringstreamFromFile(input, infile);
       std::cout << cyclus::toolkit::XmlToJson(input.str());
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
