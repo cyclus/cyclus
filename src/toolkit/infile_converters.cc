@@ -21,6 +21,10 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
     Value::Members members = node.getMemberNames();
     for (int n = 0; n < members.size(); ++n) {
       name = members[n];
+      if (node[name].isNull()) {
+        ss << indent << "<" << name << "/>\n";
+        continue;
+      }
       indent_child = node[name].isObject();
       if (!indent_child && node[name].isArray())
         indent_child = node[name][0].isObject() || node[name][0].isArray();
@@ -38,6 +42,10 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
     indent = indent.substr(0, indent.size() - 2);
     int nchildren = node.size();
     for (int n = 0; n < nchildren; ++n) {
+      if (node[n].isNull()) {
+        ss << indent << "<" << name << "/>\n";
+        continue;
+      }
       indent_child = node[n].isObject() || node[n].isArray();
       if (n > 0) {
         ss << indent << "<" << parent_name << ">";
@@ -109,7 +117,11 @@ void AddXmlToJson(InfileTree* xnode, Json::Value& jnode,
     InfileTree* subxnode = xnode->SubTree("*", i);
     Value val;
     if (subxnode->NElements() == 0) {
-      val = Value(subxnode->GetString("."));
+      try {
+        val = Value(subxnode->GetString("."));
+      } catch (cyclus::ValueError& e) {
+        val = Value(Json::nullValue);
+      }
     } else {
       val = Value(Json::objectValue);
       AddXmlToJson(subxnode, val, name);

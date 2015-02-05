@@ -129,6 +129,11 @@ int main(int argc, char* argv[]) {
   // Try to detect schema type
   std::stringstream input;
   LoadStringstreamFromFile(input, infile);
+  std::string inext = fs::path(infile).extension().string();
+  if (inext == ".json") {
+    std::string inxml = cyclus::toolkit::JsonToXml(input.str());
+    input.str(inxml);
+  }
   boost::shared_ptr<XMLParser> parser =
       boost::shared_ptr<XMLParser>(new XMLParser());
   parser->Init(input);
