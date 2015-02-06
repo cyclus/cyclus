@@ -49,34 +49,40 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <zeroOrMore>
     <element name="commodity">
-      <element name="name"> <text/> </element>
-      <element name="solution_priority"> <data type="double"/> </element>
+      <interleave>
+        <element name="name"> <text/> </element>
+        <element name="solution_priority"> <data type="double"/> </element>
+      </interleave>
     </element>
   </zeroOrMore>
     
   <element name="archetypes"> 
     <oneOrMore>
-      <element name="spec"> 
-        <optional><element name="path"><text/></element></optional>
-        <optional><element name="lib"><text/></element></optional>
-        <element name="name"><text/></element>
-        <optional><element name="alias"><text/></element></optional>
+      <element name="spec">
+        <interleave>
+          <optional><element name="path"><text/></element></optional>
+          <optional><element name="lib"><text/></element></optional>
+          <element name="name"><text/></element>
+          <optional><element name="alias"><text/></element></optional>
+        </interleave>
       </element>
     </oneOrMore>
   </element>
 
   <oneOrMore>
     <element name="facility">
-      <element name="name"> <text/> </element>
-      <optional>
-        <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
-      </optional>
+      <interleave>
+        <element name="name"> <text/> </element>
+        <optional>
+          <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+        </optional>
 
-      <element name="config">
-        <choice>
-        @Facility_REFS@
-        </choice>
-      </element>
+        <element name="config">
+          <choice>
+          @Facility_REFS@
+          </choice>
+        </element>
+      </interleave>
     </element>
   </oneOrMore>
 
@@ -104,8 +110,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
             <element name="initialfacilitylist">
               <oneOrMore>
                 <element name="entry">
-                  <element name="prototype"> <text/> </element>
-                  <element name="number"> <data type="nonNegativeInteger"/> </element>
+                  <interleave>
+                    <element name="prototype"> <text/> </element>
+                    <element name="number"> <data type="nonNegativeInteger"/> </element>
+                  </interleave>
                 </element>
               </oneOrMore>
             </element>
@@ -124,14 +132,18 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
   <zeroOrMore>
     <element name="recipe">
-      <element name="name"><text/></element>
-      <element name="basis"><text/></element>
-      <oneOrMore>
-        <element name="nuclide">
-          <element name="id"><data type="string"/></element>
-          <element name="comp"><data type="double"/></element>
-        </element>
-      </oneOrMore>
+      <interleave>
+        <element name="name"><text/></element>
+        <element name="basis"><text/></element>
+        <oneOrMore>
+          <element name="nuclide">
+            <interleave>
+              <element name="id"><data type="string"/></element>
+              <element name="comp"><data type="double"/></element>
+            </interleave>
+          </element>
+        </oneOrMore>
+      </interleave>
     </element>
   </zeroOrMore>
 

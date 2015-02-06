@@ -17,7 +17,10 @@ namespace cyclus {
 
 class Context;
 
-/// Reads the given file path into the passed stream.
+/// Reads the given file path into the passed stream without modification.
+void LoadRawStringstreamFromFile(std::stringstream& stream, std::string file);
+
+/// Reads the given file path as XML into the passed stream.
 void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
 
 /// Returns a list of the full module+agent spec for all agents in the given
