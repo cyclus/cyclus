@@ -2536,9 +2536,13 @@ T Hdf5Back::VLRead(const char* rawkey) {
                   "in the database '" + path_ + "'.");
   hvl_t buf;
   status = H5Dread(dset, vldts_[U], mspace, dspace, H5P_DEFAULT, &buf);
-  if (status < 0)
+  if (status < 0) {
+    std::stringstream ss;
+    ss << U;
     throw IOError("failed to read in variable length data "
-                  "in the database '" + path_ + "'.");
+                  "in the database '" + path_ + "' (type id " + ss.str() +
+                  ").");
+  }
   T val = VLBufToVal<T>(buf);
   status = H5Dvlen_reclaim(vldts_[U], mspace, H5P_DEFAULT, &buf);
   if (status < 0)
@@ -2643,6 +2647,7 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
     return vldatasets_[name];
 
   // already in db
+  hid_t dt;
   hid_t dset;
   hid_t dspace;
   herr_t status;
@@ -2663,13 +2668,19 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
       }
       H5Sclose(dspace);
       delete[] buf;
+    } else {
+      if (vldts_.count(dbtype) == 0) {
+        dt = H5Dget_type(dset);
+        if (dt < 0)
+          throw IOError("failed to read in HDF5 datatype for " + name);
+        vldts_[dbtype] = dt;
+      }
     }
     vldatasets_[name] = dset;
     return dset;
   }
 
   // doesn't exist at all
-  hid_t dt;
   hid_t prop;
   if (forkeys) {
     hsize_t dims[1] = {0};
