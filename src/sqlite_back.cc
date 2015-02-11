@@ -251,6 +251,10 @@ std::set<std::string> SqliteBack::Tables() {
   return rtn;
 }
 
+SqliteDb& SqliteBack::db() {
+  return db_;
+}
+
 QueryResult SqliteBack::GetTableInfo(std::string table) {
   std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" +
                     table + "';";
