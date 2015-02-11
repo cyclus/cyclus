@@ -78,6 +78,13 @@ class Source : public cyclus::Facility {
   /// @return the name of the output recipe
   inline std::string recipe() const { return recipe_name; }
 
+  virtual void Build(cyclus::Agent* parent) {
+    Facility::Build(parent);
+    if (lifetime() >= 0) {
+      context()->SchedDecom(this, enter_time() + lifetime());
+    }
+  }
+
  private:
   #pragma cyclus var {"doc": "commodity that the source facility " \
                              "supplies", \
@@ -86,11 +93,14 @@ class Source : public cyclus::Facility {
                       "uitype": "outcommodity"}
   std::string commod;
 
-  #pragma cyclus var {"doc": "recipe name for source facility's " \
-                             "commodity", \
-                      "tooltip": "commodity recipe name", \
-                      "schematype": "token", \
-                      "uitype": "recipe"}
+  #pragma cyclus var { \
+    "doc": "Recipe name for source facility's commodity." \
+           "If empty, source supplies material with requested compositions.", \
+    "tooltip": "commodity recipe name", \
+    "schematype": "token", \
+    "default": "", \
+    "uitype": "recipe", \
+  }
   std::string recipe_name;
 
   /// The capacity is defined in terms of the number of units of the

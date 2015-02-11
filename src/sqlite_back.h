@@ -39,6 +39,10 @@ class SqliteBack: public FullBackend {
 
   virtual std::set<std::string> Tables();
 
+  /// Returns the underlying sqlite database. Only use this if you really know
+  /// what you are doing.
+  SqliteDb& db();
+
  private:
   void Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt, int index);
 
