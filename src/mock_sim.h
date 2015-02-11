@@ -51,8 +51,8 @@ class MockAgent {
 
   /// Finalize MUST be called after configuration is complete to actually
   /// create the source/sink agent (or schedule it to be built). The
-  /// auto-generated name of the created prototype is returned to support
-  /// querying based on specific sources/sinks.
+  /// auto-generated prototype name of the created prototype is returned to
+  /// support querying based on specific sources/sinks.
   std::string Finalize();
 
  private:
@@ -171,8 +171,9 @@ class MockSim {
 
   /// Run the simulation.  This can only be called once.  After the simulation
   /// has been run, this MockSim object CANNOT be reused to run other
-  /// simulations.
-  void Run();
+  /// simulations.  Run returns the agent ID for the agent being tested for
+  /// use in queries.
+  int Run();
 
   /// Returns the underlying in-memory database containing results for
   /// the simulation.  Run must be called before the database will contain

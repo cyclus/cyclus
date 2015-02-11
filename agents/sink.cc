@@ -23,7 +23,7 @@ Sink::GetMatlRequests() {
   double amt = Capacity();
 
   Material::Ptr mat = cyclus::NewBlankMaterial(amt);
-  if (recipe_name != "") {
+  if (!recipe_name.empty()) {
     Composition::Ptr c = context()->GetRecipe(recipe_name);
     mat = Material::CreateUntracked(amt, c);
   }

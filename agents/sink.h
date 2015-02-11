@@ -72,11 +72,14 @@ class Sink : public cyclus::Facility  {
   }
 
  private:
-  #pragma cyclus var {"doc": "name of recipe to request for all in commodities", \
-                      "tooltip": "input/request recipe name", \
-                      "schematype": "token", \
-                      "default": "", \
-                      "uitype": "recipe"}
+  #pragma cyclus var { \
+    "tooltip": "input/request recipe name", \
+    "doc": "Name of recipe to request." \
+           "If empty, sink requests material no particular composition.", \
+    "schematype": "token", \
+    "default": "", \
+    "uitype": "recipe", \
+  }
   std::string recipe_name;
 
   #pragma cyclus var {"doc": "commodities that the sink facility " \

@@ -145,9 +145,13 @@ void MockSim::AddRecipe(std::string name, Composition::Ptr c) {
   ctx_.AddRecipe(name, c);
 }
 
-void MockSim::Run() {
+int MockSim::Run() {
   ti_.RunSim();
   rec_.Flush();
+  std::vector<Cond> conds;
+  conds.push_back(Cond("Prototype", "==", "agent_being_tested"));
+  QueryResult qr = back_->Query("AgentEntry", &conds);
+  return qr.GetVal<int>("AgentId");
 }
 
 SqliteBack& MockSim::db() { return *back_; }

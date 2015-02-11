@@ -35,7 +35,7 @@ cyclus::Material::Ptr Source::GetOffer(
     const cyclus::Material::Ptr target) const {
   using cyclus::Material;
   double qty = std::min(target->quantity(), capacity);
-  if (recipe_name == "") {
+  if (recipe_name.empty()) {
     return target;
   } else {
     return Material::CreateUntracked(qty, context()->GetRecipe(recipe_name));
@@ -88,7 +88,7 @@ void Source::GetMatlTrades(
     provided += qty;
     // @TODO we need a policy on negatives..
     Material::Ptr response;
-    if (recipe_name == "") {
+    if (recipe_name.empty()) {
       response = Material::Create(this, qty, it->request->target()->comp());
     } else {
       response = Material::Create(this, qty, context()->GetRecipe(recipe_name));

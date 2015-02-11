@@ -93,12 +93,14 @@ class Source : public cyclus::Facility {
                       "uitype": "outcommodity"}
   std::string commod;
 
-  #pragma cyclus var {"doc": "recipe name for source facility's " \
-                             "commodity", \
-                      "tooltip": "commodity recipe name", \
-                      "schematype": "token", \
-                      "default": "", \
-                      "uitype": "recipe"}
+  #pragma cyclus var { \
+    "doc": "Recipe name for source facility's commodity." \
+           "If empty, source supplies material with requested compositions.", \
+    "tooltip": "commodity recipe name", \
+    "schematype": "token", \
+    "default": "", \
+    "uitype": "recipe", \
+  }
   std::string recipe_name;
 
   /// The capacity is defined in terms of the number of units of the
