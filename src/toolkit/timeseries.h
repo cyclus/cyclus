@@ -14,13 +14,19 @@ enum TimeSeriesTypes {
 };
 
 /// Records a per-time step quantity for a given type
-void RecordTimeSeries(TimeSeriesTypes tstype, cyclus::Agent* agent,
-                      double value);
+template <TimeSeriesTypes T>
+void RecordTimeSeries(cyclus::Agent* agent, double value);
 
 /// Records a per-time step quantity for a string
-void RecordTimeSeries(std::string tstype, cyclus::Agent* agent,
-                      double value);
-
+template <typename T>
+void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
+  std::string tblname = "TimeSeries" + tsname;
+  agent->context()->NewDatum(tblname)
+       ->AddValue("AgentId", agent->id())
+       ->AddValue("Time", agent->context()->time())
+       ->AddValue("Value", value)
+       ->Record();
+};
 
 }  // namespace toolkit
 }  // namespace cyclus
