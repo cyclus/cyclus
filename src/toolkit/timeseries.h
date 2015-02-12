@@ -3,6 +3,9 @@
 
 #include <string>
 
+#include "agent.h"
+#include "context.h"
+
 namespace cyclus {
 namespace toolkit {
 
@@ -22,11 +25,11 @@ template <typename T>
 void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
   std::string tblname = "TimeSeries" + tsname;
   agent->context()->NewDatum(tblname)
-       ->AddValue("AgentId", agent->id())
-       ->AddValue("Time", agent->context()->time())
-       ->AddValue("Value", value)
+       ->AddVal("AgentId", agent->id())
+       ->AddVal("Time", agent->context()->time())
+       ->AddVal("Value", value)
        ->Record();
-};
+}
 
 }  // namespace toolkit
 }  // namespace cyclus
