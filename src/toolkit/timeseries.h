@@ -9,7 +9,7 @@
 namespace cyclus {
 namespace toolkit {
 
-/// Time series types to be used in the RecordTimeSeries() fucntions.
+/// Time series types to be used in the RecordTimeSeries() functions.
 /// These types have the following unit which *must* be adhered to strictly:
 /// - POWER [MWe]
 enum TimeSeriesTypes {
