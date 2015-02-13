@@ -169,11 +169,19 @@ class MockSim {
   /// with this function.
   void AddRecipe(std::string name, Composition::Ptr c);
 
-  /// Run the simulation.  This can only be called once.  After the simulation
+  /// Runs the simulation.  This can only be called once.  After the simulation
   /// has been run, this MockSim object CANNOT be reused to run other
   /// simulations.  Run returns the agent ID for the agent being tested for
   /// use in queries.
   int Run();
+
+  /// Reconstructs a material object from the simulation results database with
+  /// the given resource state id.
+  Material::Ptr GetMaterial(int resid);
+
+  /// Reconstructs a product object from the simulation results database with
+  /// the given resource state id.
+  Product::Ptr GetProduct(int resid);
 
   /// Returns the underlying in-memory database containing results for
   /// the simulation.  Run must be called before the database will contain

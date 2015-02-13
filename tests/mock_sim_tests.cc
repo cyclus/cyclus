@@ -73,4 +73,35 @@ TEST(MockTests, Sink) {
   }
 }
 
+TEST(MockTests, ReconstructMaterial) {
+  cyclus::CompMap m;
+  m[id("U235")] = .05;
+  m[id("U238")] = .95;
+  compmath::Normalize(&m);
+  Composition::Ptr fresh = Composition::CreateFromMass(m);
+
+  std::string config =
+      "<in_commods><val>enriched_u</val></in_commods>"
+      "<recipe_name>fresh_fuel</recipe_name>"
+      "<capacity>10</capacity>";
+
+  int dur = 10;
+  cyclus::MockSim sim(cyclus::AgentSpec(":agents:Sink"), config, dur);
+  sim.AddSource("enriched_u").Finalize();
+  sim.AddRecipe("fresh_fuel", fresh);
+
+  sim.Run();
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  Material::Ptr mat = sim.GetMaterial(qr.GetVal<int>("ResourceId"));
+  toolkit::MatQuery mq(mat);
+
+  double cap = 10;
+  cyclus::CompMap::iterator it;
+  for (it = m.begin(); it != m.end(); ++it) {
+    cyclus::Nuc nuc = it->first;
+    EXPECT_DOUBLE_EQ(m[nuc]*cap, mq.mass(nuc));
+  }
+}
+
 }  // namespace cyclus

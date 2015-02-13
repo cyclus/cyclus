@@ -18,13 +18,11 @@ SimInit::~SimInit() {
   if (ctx_ != NULL) {
     delete ctx_;
   }
-  if (rec_ != NULL) {
-    delete rec_;
-  }
 }
 
 void SimInit::Init(Recorder* r, QueryableBackend* b) {
-  rec_ = new Recorder();  // use dummy recorder to avoid re-recording
+  Recorder tmprec;
+  rec_ = &tmprec;  // use dummy recorder to avoid re-recording
   InitBase(b, r->sim_id(), 0);
   ctx_->rec_ = r;  // switch back before running sim
 }
@@ -168,7 +166,7 @@ void SimInit::LoadRecipes() {
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string recipe = qr.GetVal<std::string>("Recipe", i);
     int stateid = qr.GetVal<int>("QualId", i);
-    Composition::Ptr c = LoadComposition(stateid);
+    Composition::Ptr c = LoadComposition(b_, stateid);
     ctx_->AddRecipe(recipe, c);
   }
 }
@@ -387,7 +385,7 @@ void SimInit::LoadInventories() {
     for (int i = 0; i < qr.rows.size(); ++i) {
       std::string inv_name = qr.GetVal<std::string>("InventoryName", i);
       int state_id = qr.GetVal<int>("ResourceId", i);
-      invs[inv_name].push_back(LoadResource(state_id));
+      invs[inv_name].push_back(LoadResource(b_, state_id));
     }
     m->InitInv(invs);
   }
@@ -448,18 +446,18 @@ void SimInit::LoadNextIds() {
   }
 }
 
-Resource::Ptr SimInit::LoadResource(int state_id) {
+Resource::Ptr SimInit::LoadResource(QueryableBackend* b, int state_id) {
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", state_id));
-  QueryResult qr = b_->Query("Resources", &conds);
+  QueryResult qr = b->Query("Resources", &conds);
   ResourceType type = qr.GetVal<ResourceType>("Type");
   int obj_id = qr.GetVal<int>("ObjId");
 
   Resource::Ptr r;
   if (type == Material::kType) {
-    r = LoadMaterial(state_id);
+    r = LoadMaterial(b, state_id);
   } else if (type == Product::kType) {
-    r = LoadProduct(state_id);
+    r = LoadProduct(b, state_id);
   } else {
     throw IOError("Invalid resource type in output database: " + type);
   }
@@ -469,22 +467,38 @@ Resource::Ptr SimInit::LoadResource(int state_id) {
   return r;
 }
 
-Resource::Ptr SimInit::LoadMaterial(int state_id) {
+Material::Ptr SimInit::BuildMaterial(QueryableBackend* b, int resid) {
+  SimInit si;
+  Timer ti;
+  Recorder rec;
+  si.ctx_ = new Context(&ti, &rec);
+  return ResCast<Material>(si.LoadResource(b, resid));
+}
+
+Product::Ptr SimInit::BuildProduct(QueryableBackend* b, int resid) {
+  SimInit si;
+  Timer ti;
+  Recorder rec;
+  si.ctx_ = new Context(&ti, &rec);
+  return ResCast<Product>(si.LoadResource(b, resid));
+}
+
+Material::Ptr SimInit::LoadMaterial(QueryableBackend* b, int state_id) {
   // get special material object state
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", state_id));
-  QueryResult qr = b_->Query("MaterialInfo", &conds);
+  QueryResult qr = b->Query("MaterialInfo", &conds);
   int prev_decay = qr.GetVal<int>("PrevDecayTime");
 
   // get general resource object info
   conds.clear();
   conds.push_back(Cond("ResourceId", "==", state_id));
-  qr = b_->Query("Resources", &conds);
+  qr = b->Query("Resources", &conds);
   double qty = qr.GetVal<double>("Quantity");
   int stateid = qr.GetVal<int>("QualId");
 
   // create the composition and material
-  Composition::Ptr comp = LoadComposition(stateid);
+  Composition::Ptr comp = LoadComposition(b, stateid);
   Agent* dummy = new Dummy(ctx_);
   Material::Ptr mat = Material::Create(dummy, qty, comp);
   mat->prev_decay_time_ = prev_decay;
@@ -493,10 +507,10 @@ Resource::Ptr SimInit::LoadMaterial(int state_id) {
   return mat;
 }
 
-Composition::Ptr SimInit::LoadComposition(int stateid) {
+Composition::Ptr SimInit::LoadComposition(QueryableBackend* b, int stateid) {
   std::vector<Cond> conds;
   conds.push_back(Cond("QualId", "==", stateid));
-  QueryResult qr = b_->Query("Compositions", &conds);
+  QueryResult qr = b->Query("Compositions", &conds);
   CompMap cm;
   for (int i = 0; i < qr.rows.size(); ++i) {
     int nucid = qr.GetVal<int>("NucId", i);
@@ -509,25 +523,25 @@ Composition::Ptr SimInit::LoadComposition(int stateid) {
   return c;
 }
 
-Resource::Ptr SimInit::LoadProduct(int state_id) {
+Product::Ptr SimInit::LoadProduct(QueryableBackend* b, int state_id) {
   // get general resource object info
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", state_id));
-  QueryResult qr = b_->Query("Resources", &conds);
+  QueryResult qr = b->Query("Resources", &conds);
   double qty = qr.GetVal<double>("Quantity");
   int stateid = qr.GetVal<int>("QualId");
 
   // get special Product internal state
   conds.clear();
   conds.push_back(Cond("QualId", "==", stateid));
-  qr = b_->Query("Products", &conds);
+  qr = b->Query("Products", &conds);
   std::string quality = qr.GetVal<std::string>("Quality");
 
   // set static quality-stateid map to have same vals as db
   Product::qualids_[quality] = stateid;
 
   Agent* dummy = new Dummy(ctx_);
-  Resource::Ptr r = Product::Create(dummy, qty, quality);
+  Product::Ptr r = Product::Create(dummy, qty, quality);
   ctx_->DelAgent(dummy);
   return r;
 }

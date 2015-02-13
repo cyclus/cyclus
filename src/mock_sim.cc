@@ -1,6 +1,7 @@
 #include "mock_sim.h"
 
 #include "cyclus.h"
+#include "sim_init.h"
 #include <sstream>
 
 namespace cyclus {
@@ -152,6 +153,14 @@ int MockSim::Run() {
   conds.push_back(Cond("Prototype", "==", std::string("agent_being_tested")));
   QueryResult qr = back_->Query("AgentEntry", &conds);
   return qr.GetVal<int>("AgentId");
+}
+
+Material::Ptr MockSim::GetMaterial(int resid) {
+  return SimInit::BuildMaterial(back_, resid);
+}
+
+Product::Ptr MockSim::GetProduct(int resid) {
+  return SimInit::BuildProduct(back_, resid);
 }
 
 SqliteBack& MockSim::db() { return *back_; }
