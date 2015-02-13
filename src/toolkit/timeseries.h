@@ -12,12 +12,12 @@ namespace toolkit {
 /// Time series types to be used in the RecordTimeSeries() functions.
 /// These types have the following unit which *must* be adhered to strictly:
 /// - POWER [MWe]
-enum TimeSeriesTypes {
+enum TimeSeriesType {
   POWER,
 };
 
 /// Records a per-time step quantity for a given type
-template <TimeSeriesTypes T>
+template <TimeSeriesType T>
 void RecordTimeSeries(cyclus::Agent* agent, double value);
 
 /// Records a per-time step quantity for a string
