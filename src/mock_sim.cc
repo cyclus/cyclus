@@ -114,6 +114,7 @@ std::string MockAgent::Finalize() {
 
 MockSim::MockSim(AgentSpec spec, std::string config, int duration)
     : ctx_(&ti_, &rec_), back_(NULL) {
+  Env::SetNucDataPath();
   back_ = new SqliteBack(":memory:");
   rec_.RegisterBackend(back_);
   ti_.Initialize(&ctx_, SimInfo(duration));

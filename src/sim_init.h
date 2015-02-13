@@ -65,14 +65,14 @@ class SimInit {
   /// must be called first.
   Timer* timer() { return &ti_; }
 
-  /// Convenience function for reconstructing a material object with the given
-  /// resource state id from a database backend b.  Particularly useful for
-  /// running mock simulations/tests.
+  /// Convenience function for reconstructing an untracked material object with
+  /// the given resource state id from a database backend b.  Particularly
+  /// useful for running mock simulations/tests.
   static Material::Ptr BuildMaterial(QueryableBackend* b, int resid);
 
-  /// Convenience function for reconstructing a product object with the given
-  /// resource state id from a database backend b.  Particularly useful for
-  /// running mock simulations/tests.
+  /// Convenience function for reconstructing an untracked product object with
+  /// the given resource state id from a database backend b.  Particularly
+  /// useful for running mock simulations/tests.
   static Product::Ptr BuildProduct(QueryableBackend* b, int resid);
 
  private:

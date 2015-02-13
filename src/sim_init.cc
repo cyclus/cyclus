@@ -472,7 +472,14 @@ Material::Ptr SimInit::BuildMaterial(QueryableBackend* b, int resid) {
   Timer ti;
   Recorder rec;
   si.ctx_ = new Context(&ti, &rec);
-  return ResCast<Material>(si.LoadResource(b, resid));
+  Material::Ptr m = ResCast<Material>(si.LoadResource(b, resid));
+
+  // manually make this "untracked" to prevent segfaulting and other such
+  // terrors because the created context is destructed by SimInit at the end
+  // of this function.
+  m->ctx_ = NULL;
+  m->tracker_.DontTrack();
+  return m;
 }
 
 Product::Ptr SimInit::BuildProduct(QueryableBackend* b, int resid) {
@@ -480,7 +487,14 @@ Product::Ptr SimInit::BuildProduct(QueryableBackend* b, int resid) {
   Timer ti;
   Recorder rec;
   si.ctx_ = new Context(&ti, &rec);
-  return ResCast<Product>(si.LoadResource(b, resid));
+  Product::Ptr p = ResCast<Product>(si.LoadResource(b, resid));
+
+  // manually make this "untracked" to prevent segfaulting and other such
+  // terrors because the created context is destructed by SimInit at the end
+  // of this function.
+  p->ctx_ = NULL;
+  p->tracker_.DontTrack();
+  return p;
 }
 
 Material::Ptr SimInit::LoadMaterial(QueryableBackend* b, int state_id) {
