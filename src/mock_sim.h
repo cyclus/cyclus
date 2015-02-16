@@ -126,6 +126,8 @@ class MockSim {
   /// steps.
   MockSim(AgentSpec spec, std::string config, int duration);
 
+  ~MockSim();
+
   /// AddSource adds a source facility that can offer/provide material to the
   /// archetype being tested.  commod specifies the commodity the source will
   /// offer on. AddSource can be called multiple times to generate many sources
