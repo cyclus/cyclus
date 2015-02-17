@@ -81,7 +81,7 @@ class Source : public cyclus::Facility {
   virtual void Build(cyclus::Agent* parent) {
     Facility::Build(parent);
     if (lifetime() >= 0) {
-      context()->SchedDecom(this, enter_time() + lifetime());
+      context()->SchedDecom(this, exit_time());
     }
   }
 
