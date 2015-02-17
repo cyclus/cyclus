@@ -52,7 +52,7 @@ void Institution::Tock() {
   for (it = children().begin(); it != children().end(); ++it) {
     Facility* child = dynamic_cast<Facility*>(*it);
     int lifetime = child->lifetime();
-    if (lifetime != -1 && context()->time() >= child->enter_time() + lifetime) {
+    if (lifetime != -1 && context()->time() >= child->exit_time()) {
       CLOG(LEV_INFO3) << child->prototype()
                       << " has reached the end of its lifetime";
       if (child->CheckDecommissionCondition()) {

@@ -379,6 +379,20 @@ class Agent : public StateWrangler, virtual public Ider {
   /// decommissioning (-1 if the agent has an infinite lifetime).
   inline const int lifetime() const { return lifetime_; }
 
+  /// Returns the default time step at which this agent will exit the
+  /// simulation (-1 if the agent has an infinite lifetime).
+  ///
+  /// Deomissioning happens at the end of a time step. With a lifetime of 1, we
+  /// expect an agent to go through only 1 entire time step. In this case, the
+  /// agent should be decommissioned on the same time step it was
+  /// created. Therefore, for agents with non-infinite lifetimes, the exit_time
+  /// will be the enter time plus its lifetime less 1.
+  inline const int exit_time() const {
+    if (lifetime() == -1)
+      return -1;
+    return enter_time_ + lifetime_ - 1;
+  }
+
   /// Returns a list of children this agent has
   inline const std::set<Agent*>& children() const { return children_; }
 
