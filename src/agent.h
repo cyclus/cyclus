@@ -381,12 +381,12 @@ class Agent : public StateWrangler, virtual public Ider {
 
   /// Returns the default time step at which this agent will exit the
   /// simulation (-1 if the agent has an infinite lifetime).
-  //
-  // The "- 1" is because deomissioning happens at the end of a time step.
-  // For a lifetime of 1, we expect an agent to go through only 1 entire
-  // time step.  In this case, the agent should be decommissioned on the
-  // same time step it was created.  So we need "- 1" for lifetime to have
-  // this correct meaning.
+  ///
+  /// Deomissioning happens at the end of a time step. With a lifetime of 1, we
+  /// expect an agent to go through only 1 entire time step. In this case, the
+  /// agent should be decommissioned on the same time step it was
+  /// created. Therefore, for agents with non-infinite lifetimes, the exit_time
+  /// will be the enter time plus its lifetime less 1.
   inline const int exit_time() const {
     if (lifetime() == -1)
       return -1;
