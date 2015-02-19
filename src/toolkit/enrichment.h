@@ -31,7 +31,7 @@ class Assays {
 };
 
 /// @param mat the material inquired about
-/// @return the atom percent of U-235 w.r.t Uranium in a material
+/// @return the atom percent of U-235 w.r.t U-235+U-238 in a material
 double UraniumAssay(Material::Ptr mat);
 
 /// inline double UraniumAssay(Material::Ptr mat) {
@@ -45,7 +45,8 @@ double UraniumQty(Material::Ptr mat);
 
 /// inline double UraniumQty(Material::Ptr mat) { return UraniumQty(mat.get()); }
 
-/// @param product_qty the amount of product Uranium
+/// @param product_qty the amount of product Uranium,
+/// assuming feed is comprised of only fissile material (U-235,U-238)
 /// @param assays the assay of product, feed, and tails
 /// @return the quantity of feedstock required to make the product
 /// whose units match those of the given product
@@ -56,6 +57,14 @@ double FeedQty(double product_qty, const Assays& assays);
 /// @return the quantity of tails resulting from enriching the product
 /// whose units match those of the given product
 double TailsQty(double product_qty, const Assays& assays);
+
+/// @param feed_matl pointer to material
+/// @return ratio of (total mass)/(fissile mass)
+/// Can be used to convert amnt of necessary fissile material
+/// (from FeedQty) into necessary amount of raw material when
+/// non-fissile components are present.  Returns 1 when material
+/// is entirely comprised of U-235 + U-238
+double NonFissileMultiplier(cyclus::Material::Ptr matl);
 
 /// @param product_qty the amount of product Uranium
 /// @param assays the assay of product, feed, and tails

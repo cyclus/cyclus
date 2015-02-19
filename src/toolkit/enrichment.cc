@@ -75,6 +75,12 @@ double TailsQty(double product_qty, const Assays& assays) {
   return product_qty * factor;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double NonFissileMultiplier(cyclus::Material::Ptr matl) {
+  cyclus::toolkit::MatQuery mq(matl);
+  return mq.qty()/(mq.mass(922350000) + mq.mass(922380000));
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double ValueFunc(double frac) {
   if (frac < 0) {
