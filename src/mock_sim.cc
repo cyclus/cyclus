@@ -132,7 +132,11 @@ MockSim::MockSim(AgentSpec spec, std::string config, int duration)
   a->Build(NULL);
 }
 
-MockSim::~MockSim() { warn_limit = 42; }
+MockSim::~MockSim() {
+  warn_limit = 42;
+  rec_.Close();
+  delete back_;
+}
 
 MockAgent MockSim::AddSource(std::string commod) {
   MockAgent ms(&ctx_, &rec_, back_, true);
