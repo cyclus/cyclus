@@ -171,8 +171,8 @@ void Material::Decay(int curr_time) {
     CompMap::const_iterator it;
     for (it = c.end(); it != c.begin(); --it) {
       int nuc = it->first;
-      // 2419200 == secs / month
-      double lambda_months = pyne::decay_const(nuc) * 2419200.0;
+      // 2629152 == secs / month
+      double lambda_months = pyne::decay_const(nuc) * 2629152.0;
       double change = 1.0 - std::exp(-lambda_months * static_cast<double>(dt));
       if (change >= eps) {
         decay = true;
