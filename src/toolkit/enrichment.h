@@ -58,14 +58,6 @@ double FeedQty(double product_qty, const Assays& assays);
 /// whose units match those of the given product
 double TailsQty(double product_qty, const Assays& assays);
 
-/// @param feed_matl pointer to material
-/// @return ratio of (total mass)/(fissile mass)
-/// Can be used to convert amnt of necessary fissile material
-/// (from FeedQty) into necessary amount of raw material when
-/// non-fissile components are present.  Returns 1 when material
-/// is entirely comprised of U-235 + U-238
-double NonFissileMultiplier(cyclus::Material::Ptr matl);
-
 /// @param product_qty the amount of product Uranium
 /// @param assays the assay of product, feed, and tails
 /// @return the amount of swu required to enrich the product
