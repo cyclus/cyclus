@@ -96,7 +96,7 @@ class MockAgent {
 /// cyclus::MockSim sim(cyclus::AgentSpec(":agents:Source"), config, dur);
 /// sim.AddSink("enriched_u").Finalize();
 /// sim.AddRecipe("fresh_fuel", fresh);
-/// sim.Run();
+/// int src_id = sim.Run(); // capture the agent ID of the facility being tested
 ///
 /// @endcode
 ///
@@ -111,9 +111,22 @@ class MockAgent {
 ///
 /// @code
 ///
-///  cyclus::QueryResult qr = sim.db().Query("Transactions", NULL);
-///  int n_trans = qr.rows.size();
-///  EXPECT_EQ(10, n_trans) << "expected 10 transactions, got " << n_trans;
+/// // return all transactions where our source facility is the sender
+/// std::vector<cyclus::Cond> conds;
+/// conds.push_back("SenderId", "==", src_id);
+/// cyclus::QueryResult qr = sim.db().Query("Transactions", &conds);
+/// int n_trans = qr.rows.size();
+/// EXPECT_EQ(10, n_trans) << "expected 10 transactions, got " << n_trans;
+///
+/// // reconstruct the material object for the first transaction
+/// int res_id = qr.GetVal<int>("ResourceId", 0);
+/// cyclus::Material::Ptr m = sim.GetMaterial(res_id);
+/// EXPECT_DOUBLE_EQ(10, m->quantity());
+///
+/// // confirm composition is as expected
+/// cyclus::toolkit::MatQuery mq(m);
+/// EXPECT_DOUBLE_EQ(0.5, mq.mass(922350000));
+/// EXPECT_DOUBLE_EQ(9.5, mq.mass(922380000));
 ///
 /// @endcode
 class MockSim {
