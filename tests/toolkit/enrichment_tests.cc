@@ -26,7 +26,7 @@ void EnrichmentTests::SetUp() {
 
   assay_u_ = product_;
   mass_u_ = 10;
-  
+
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -92,6 +92,6 @@ TEST_F(EnrichmentTests, enrichmentcalcs) {
   EXPECT_DOUBLE_EQ(tails_qty_, TailsQty(product_qty, assays));
   EXPECT_NEAR(swu_, SwuRequired(product_qty, assays), 1e-8);
 }
- 
+
 }  // namespace toolkit
 }  // namespace cyclus
