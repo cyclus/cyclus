@@ -1491,7 +1491,7 @@ class AnnotationsFilter(CodeGeneratorFilter):
         jstr = json.dumps(ctx, separators=(',', ':'))
         if len(jstr) > 50:
             tw = textwrap.wrap(jstr, 50, drop_whitespace=False)
-            jstr = [j.replace('"', '\\"') for j in tw]
+            jstr = [j.replace('\\', '\\\\').replace('"', '\\"') for j in tw]
             jstr = ('"\n  ' + ind + '"').join(jstr)
             jstr = '\n  ' + ind + '"' + jstr + '"'
         else:
