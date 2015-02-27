@@ -33,6 +33,13 @@ TEST(MatQueryTests, MassAndMoles) {
   double nmoles = mq.moles(922350000) + mq.moles(10070000);
   EXPECT_DOUBLE_EQ(mq.atom_frac(922350000), 1500 / pyne::atomic_mass(922350000) / nmoles);
   EXPECT_DOUBLE_EQ(mq.atom_frac(10070000), 2500 / pyne::atomic_mass(10070000) / nmoles);
+
+  std::set<cyclus::Nuc> nucs ;
+  nucs.insert(922350000);
+  double out_frac=mq.multi_mass_frac(nucs);
+  EXPECT_DOUBLE_EQ(mq.multi_mass_frac(nucs), 1.5/(1.5+2.5));  
+  nucs.insert(10070000);
+  EXPECT_DOUBLE_EQ(mq.multi_mass_frac(nucs), 1.0);  
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

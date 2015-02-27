@@ -92,30 +92,6 @@ TEST_F(EnrichmentTests, enrichmentcalcs) {
   EXPECT_DOUBLE_EQ(tails_qty_, TailsQty(product_qty, assays));
   EXPECT_NEAR(swu_, SwuRequired(product_qty, assays), 1e-8);
 }
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(EnrichmentTests, nonfissilematl) {
-  // for testing material containing non-fissile components
-  double extra_ = 0.05;
-  double fissile_frac = (1-extra_);
-
-  CompMap v_extra;
-  v_extra[922350000] = assay_u_;
-  v_extra[922390000] = extra_ ;
-  v_extra[922380000] = 1 - assay_u_ - extra_;
-  Composition::Ptr comp_extra = Composition::CreateFromAtom(v_extra);
-  cyclus::Material::Ptr mat_extra_ =
-    Material::CreateUntracked(mass_u_, comp_extra);
-
-  Assays assays(feed_, UraniumAssay(mat_),
-		tails_);
-  double product_qty = UraniumQty(mat_);
-  
-  EXPECT_DOUBLE_EQ(feed_qty_ ,NonFissileMultiplier(mat_)
-	      * FeedQty(product_qty, assays));
-  EXPECT_NEAR(feed_qty_ / fissile_frac,
-		   NonFissileMultiplier(mat_extra_)
-	      * FeedQty(product_qty, assays), 0.05); 
-} 
  
 }  // namespace toolkit
 }  // namespace cyclus
