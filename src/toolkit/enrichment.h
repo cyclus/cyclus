@@ -46,7 +46,7 @@ double UraniumQty(Material::Ptr mat);
 /// inline double UraniumQty(Material::Ptr mat) { return UraniumQty(mat.get()); }
 
 /// @param product_qty the amount of product Uranium,
-/// assuming feed is comprised of only fissile material (U-235,U-238)
+/// assuming feed is comprised of only U-235 and U-238
 /// @param assays the assay of product, feed, and tails
 /// @return the quantity of feedstock required to make the product
 /// whose units match those of the given product

@@ -303,9 +303,12 @@ TEST_F(MaterialTest, DecayShortcut) {
   Composition::Ptr c = Composition::CreateFromAtom(mp);
   Material::Ptr m = Material::CreateUntracked(1.0, c);
 
-  double u235_decay_const = 8.087e-11;  // per month
+  ASSERT_NEAR(3.11996e-17, pyne::decay_const("u235"), 1e-20);
+
+  double sec_per_month = 2629152;
+  double u235_lambda = pyne::decay_const("u235") * sec_per_month;  // per month
   double eps = 1e-3;
-  double threshold = -1 * std::log(1-eps) / u235_decay_const;
+  double threshold = -1 * std::log(1-eps) / u235_lambda;
 
   // If delta t is small w.r.t. composition's decay constants, no decay is
   // performed and the composition should remain the same.

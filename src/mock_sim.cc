@@ -149,7 +149,7 @@ int MockSim::Run() {
   ti_.RunSim();
   rec_.Flush();
   std::vector<Cond> conds;
-  conds.push_back(Cond("Prototype", "==", "agent_being_tested"));
+  conds.push_back(Cond("Prototype", "==", std::string("agent_being_tested")));
   QueryResult qr = back_->Query("AgentEntry", &conds);
   return qr.GetVal<int>("AgentId");
 }
