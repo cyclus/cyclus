@@ -203,6 +203,8 @@ class MockSim {
   /// anything.
   SqliteBack& db();
 
+  Agent* agent;
+
  private:
   Context ctx_;
   Timer ti_;
