@@ -568,6 +568,30 @@ def test_defpragmafilter():
     m = MockCodeGenMachine()
     f = DefaultPragmaFilter(m)
 
+def test_schemafilter_buildschema():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = SchemaFilter(m)
+
+    schematype = None
+    uitype = None
+    names = None
+
+    cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
+    names = ['streams']
+    want = '"<element name=\\"streams\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"key\\">\\n"\n"<data type=\\"string\\" />\\n"\n"</element>\\n"\n"<element name=\\"val\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"val\\">\\n"\n"<data type=\\"double\\" />\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n'
+    got = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, want, got
+
+    cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
+    names = ['streams', 'name', ['efficiencies', 'val']]
+    want = '"<element name=\\"streams\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"name\\">\\n"\n"<data type=\\"string\\" />\\n"\n"</element>\\n"\n"<element name=\\"efficiencies\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"val\\">\\n"\n"<data type=\\"double\\" />\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n'
+    got = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, want, got
+
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
     m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([

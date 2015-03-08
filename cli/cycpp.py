@@ -1382,6 +1382,93 @@ class SchemaFilter(CodeGeneratorFilter):
             raise TypeError(msg.format(cs, given))
         return self.default_types[cpp]
 
+    def _buildschema(self, cpptype, schematype=None, uitype=None, names=None):
+        if not isinstance(cpptype, STRING_TYPES):
+            if names is None:
+                names = []
+                for v in cpptype:
+                    names.append(None)
+            elif len(names) < len(cpptype):
+                for i in range(len(cpptype)-len(names)):
+                    names.append(None)
+
+            if schematype is None:
+                schematype = []
+                for v in cpptype:
+                    schematype.append(None)
+            elif len(schematype) < len(cpptype):
+                for i in range(len(cpptype)-len(schematype)):
+                    schematype.append(None)
+
+            if uitype is None:
+                uitype = []
+                for v in cpptype:
+                    uitype.append(None)
+            elif len(uitype) < len(cpptype):
+                for i in range(len(cpptype)-len(uitype)):
+                    uitype.append(None)
+
+        impl = ''
+        t = cpptype if isinstance(cpptype, STRING_TYPES) else cpptype[0]
+        if t in PRIMITIVES:
+            name = 'val'
+            if names is not None:
+                name = names
+            d_type = self._type(t, schematype or uitype)
+            impl += '"<element name=\\"{0}\\">\\n"\n'.format(name)
+            impl += '"<data type=\\"{0}\\" />\\n"\n'.format(d_type)
+            impl += '"</element>\\n"\n'
+        elif t in ['std::list', 'std::set', 'std::vector']:
+            name = 'list' if isinstance(cpptype, STRING_TYPES) else ['list']
+            if names[0] is not None:
+                name = names[0]
+            impl += '"<element name=\\"{0}\\">\\n"\n'.format(name)
+            impl += '"<oneOrMore>\\n"\n'
+            impl += self._buildschema(cpptype[1], schematype[1], uitype[1], names[1])
+            impl += '"</oneOrMore>\\n"\n'
+            impl += '"</element>\\n"\n'
+        elif t == 'std::map':
+            name = 'map'
+            if names[0] is not None:
+                name = names[0]
+
+            keynames = 'key' if isinstance(cpptype[1], STRING_TYPES) else ['key']
+            if names[1] is not None:
+                keynames = names[1]
+
+            valnames = 'val' if isinstance(cpptype[2], STRING_TYPES) else ['val']
+            if names[1] is not None:
+                valnames = names[2]
+
+            impl += '"<element name=\\"{0}\\">\\n"\n'.format(name)
+            impl += '"<oneOrMore>\\n"\n'
+            impl += self._buildschema(cpptype[1], schematype[1], uitype[1], keynames)
+            impl += self._buildschema(cpptype[2], schematype[2], uitype[2], valnames)
+            impl += '"</oneOrMore>\\n"\n'
+            impl += '"</element>\\n"\n'
+        elif t == 'std::pair':
+            name = 'pair'
+            if names[0] is not None:
+                name = names[0]
+
+            firstname = 'first' if isinstance(cpptype[1], STRING_TYPES) else ['first']
+            if names[1] is not None:
+                firstname = names[1]
+
+            secondname = 'second' if isinstance(cpptype[2], STRING_TYPES) else ['second']
+            if names[2] is not None:
+                secondname = names[2]
+
+            impl += '"<element name=\\"{0}\\">\\n"\n'.format(name)
+            impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
+            impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
+            impl += '"</element>\\n"\n'
+        else:
+            msg = '{0}Unsupported type {1}'.format(self.machine.includeloc(), t)
+            raise RuntimeError(msg)
+
+        return impl
+
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
@@ -1410,56 +1497,20 @@ class SchemaFilter(CodeGeneratorFilter):
             key = t if isinstance(t, STRING_TYPES) else t[0]
             uitype = info.get('uitype', None)
             schematype = info.get('schematype', None)
+            labels = info.get('schemalabels', None)
+            if labels is None:
+                labels = alias if isinstance(t, STRING_TYPES) else [alias]
+
             if key in BUFFERS:  # buffer state, skip
                 continue
             if 'derived_init' in info:  # derived state, skip
                 continue
+
             opt = True if 'default' in info else False
             if opt:
                 impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
-            if t[0] in ['std::list', 'std::map', 'std::set', 'std::vector']:
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
-                impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
-                if t[0] in ['std::set', 'std::vector', 'std::list']:
-                    uitype = [None, None] if uitype is None else uitype
-                    el_type = self._type(t[1], schematype or uitype[1])
-                    impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
-                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, el_type)
-                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                else:  # map
-                    uitype = [None, None, None] if uitype is None else uitype
-                    schematype = [None, None] if schematype is None else schematype
-                    k_type = self._type(t[1], schematype[0] or uitype[1])
-                    v_type = self._type(t[2], schematype[1] or uitype[2])
-                    impl += i + '"{0}<element name=\\"key\\">\\n"\n'.format(xi.up())
-                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, k_type)
-                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                    impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
-                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, v_type)
-                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-            elif t in PRIMITIVES:
-                d_type = self._type(t, schematype or uitype)
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, d_type)
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-            elif t[0] == 'std::pair':
-                uitype = [None, None, None] if uitype is None else uitype
-                schematype = [None, None] if schematype is None else schematype
-                f_type = self._type(t[1], schematype[0] or uitype[1])
-                s_type = self._type(t[2], schematype[1] or uitype[2])
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
-                impl += i + '"{0}<element name=\\"first\\">\\n"\n'.format(xi.up())
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, f_type)
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                impl += i + '"{0}<element name=\\"second\\">\\n"\n'.format(xi.up())
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, s_type)
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-            else:
-                msg = '{0}Unsupported type {1}'.format(self.machine.includeloc(), t)
-                raise RuntimeError(msg)
+
+            impl += self._buildschema(t, schematype, uitype, labels)
 
             if opt:
                 impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
