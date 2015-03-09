@@ -44,6 +44,34 @@ TEST_F(SqliteBackTests, MapStrDouble) {
   EXPECT_EQ(5.5, m["three"]);
 }
 
+TEST_F(SqliteBackTests, MapStrVectorDouble) {
+  std::map<std::string, std::vector<double> > m;
+  std::vector<double> av;
+  av.push_back(1.1);
+  av.push_back(3.3);
+  std::vector<double> bv;
+  bv.push_back(2.2);
+  bv.push_back(4.4);
+  bv.push_back(6.6);
+  m["one"] = av;
+  m["two"] = bv;
+
+  r.NewDatum("monty")
+      ->AddVal("count", m)
+      ->Record();
+
+  r.Close();
+  cyclus::QueryResult qr = b->Query("monty", NULL);
+  std::map<std::string, std::vector<double> > mnew;
+  mnew = qr.GetVal<std::map<std::string, std::vector<double> > >("count", 0);
+
+  EXPECT_EQ(1.1, mnew["one"][0]);
+  EXPECT_EQ(3.3, mnew["one"][1]);
+  EXPECT_EQ(2.2, mnew["two"][0]);
+  EXPECT_EQ(4.4, mnew["two"][1]);
+  EXPECT_EQ(6.6, mnew["two"][2]);
+}
+
 TEST_F(SqliteBackTests, MapStrInt) {
   std::map<std::string, int> m;
   m["one"] = 1;
