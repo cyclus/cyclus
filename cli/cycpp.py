@@ -112,6 +112,24 @@ WRANGLERS = {
 ENTITIES = [('cyclus::Region', 'region'), ('cyclus::Institution', 'institution'), 
             ('cyclus::Facility', 'facility'), ('cyclus::Agent', 'archetype')]
 
+def prepare_type(cpptype, othertype):
+    """Updates othertype to conform to the length of cpptype using None's.
+    """
+    if not isinstance(cpptype, STRING_TYPES):
+        if isinstance(othertype, STRING_TYPES):
+            othertype = [othertype]
+
+        if othertype is None:
+            othertype = []
+            for v in cpptype:
+                othertype.append(None)
+        elif len(othertype) < len(cpptype):
+            for i in range(len(cpptype)-len(othertype)):
+                othertype.append(None)
+        return othertype
+    else:
+        return othertype
+
 #
 # pass 1
 #
@@ -1045,224 +1063,212 @@ class InfileToDbFilter(CodeGeneratorFilter):
         else:
             return self._vals[key](t, val=val, name=name, uitype=uitype)
 
-    def _val_bool(self, t, val=False, name=None, uitype=None):
-        return 'true' if val else 'false'
+    def _val_bool(self, t, val=False, name='boolvar', uitype=None):
+        return 'bool {0} = {1};'.format(name, 'true' if val else 'false')
 
-    def _val_int(self, t, val=0, name=None, uitype=None):
+    def _val_int(self, t, val=0, name='intvar', uitype=None):
         if uitype == 'nuclide':
             fmt = '"{0}"' if isinstance(val, STRING_TYPES) else '{0}'
             v = fmt.format(val)
-            v = 'pyne::nucname::id({0})'.format(v)
+            v = 'int {0} = pyne::nucname::id({1});'.format(name, v)
         else:
-            v = '{0}'.format(val)
+            v = 'int {0} = {1};'.format(name, val)
         return v
 
-    def _val_floating(self, t, val=0.0, name=None, uitype=None):
-        return '{0}'.format(val)
+    def _val_floating(self, t, val=0.0, name='floatvar', uitype=None):
+        return 'double {0} = {1};'.format(name, val)
 
-    def _val_string(self, t, val='', name=None, uitype=None):
-        return 'std::string("{0}")'.format(val)
+    def _val_string(self, t, val='', name='stringvar', uitype=None):
+        return 'std::string {0}("{1}");'.format(name, val)
 
-    def _val_blob(self, t, val='', name=None, uitype=None):
-        return 'cyclus::Blob("{0}")'.format(val)
+    def _val_blob(self, t, val='', name='blobvar', uitype=None):
+        return 'cyclus::Blob {0}("{1}");'.format(name, val)
 
-    def _val_uuid(self, t, val='', name=None, uitype=None):
+    def _val_uuid(self, t, val='', name='uuidvar', uitype=None):
+        v = 'boost::uuids::uuid {0} = '.format(name)
         if isinstance(val, STRING_TYPES):
-            v = '"{0}"'.format(val)
+            v += '"{0}"'.format(val)
         elif isinstance(val, uuid.UUID):
-            v = [x+y for x,y in zip(val.hex[::1], val.hex[1::2])]
-            v = '{0x' + ', 0x'.join(v) + '}'
+            l = [x+y for x,y in zip(val.hex[::1], val.hex[1::2])]
+            v += '{0x' + ', 0x'.join(l) + '}'
         else:
             msg = "could not interpret UUID type of {0}"
             raise TypeError(msg.format(val))
+        return v + ';'
+
+    def _val_vector(self, t, val=(), name='vecvar', uitype=None):
+        uitype = prepare_type(t, uitype)
+        elemname = 'elem'
+
+        v = '{0} {1};'.format(type_to_str(t), name)
+        v += '{0}.resize({1});\n'.format(name, len(val))
+        v += '{'
+        for i, x in enumerate(val):
+            x = self._val(t[1], val=x, uitype=uitype[1], name=elemname)
+            v += '{{ {0} {1}[{2}] = {3};}}'.format(x, name, i, elemname)
+        v += '}'
+
         return v
 
-    def _val_vector(self, t, val=(), name=None, uitype=None):
-        vtype = t[1]
-        vuitype = None if uitype is None else uitype[1]
-        v = '{0}.resize({1});\n'.format(name, len(val))
+    def _val_set(self, t, val=frozenset(), name='setvar', uitype=None):
+        uitype = prepare_type(t, uitype)
+        elemname = 'elem'
+
+        v = '{0} {1};'.format(type_to_str(t), name)
+        v += '{'
         for i, x in enumerate(val):
-            x = self._val(vtype, val=x, uitype=vuitype)
-            v += '{0}[{1}] = {2};\n'.format(name, i, x)
+            x = self._val(t[1], val=x, uitype=uitype[1], name=elemname)
+            v += '{{ {0} {1}.insert({2});}}'.format(x, name, elemname)
+        v += '}'
+
         return v
 
-    def _val_set(self, t, val=frozenset(), name=None, uitype=None):
-        vtype = t[1]
-        vuitype = None if uitype is None else uitype[1]
-        v = ''
-        for i, x in enumerate(val):
-            x = self._val(vtype, val=x, uitype=vuitype)
-            v += '{0}.insert({1});\n'.format(name, x)
-        return v
+    def _val_list(self, t, val=(), name='listvar', uitype=None):
+        uitype = prepare_type(t, uitype)
+        elemname = 'elem'
 
-    def _val_list(self, t, val=(), name=None, uitype=None):
-        vtype = t[1]
-        vuitype = None if uitype is None else uitype[1]
-        v = ''
+        v = '{0} {1};'.format(type_to_str(t), name)
+        v += '{'
         for i, x in enumerate(val):
-            x = self._val(vtype, val=x, uitype=vuitype)
-            v += '{0}.push_back({1});\n'.format(name, x)
+            x = self._val(t[1], val=x, uitype=uitype[1], name=elemname)
+            v += '{{ {0} {1}.push_back({2});}}'.format(x, name, elemname)
+        v += '}'
+
         return v
 
     def _val_pair(self, t, val=(None, None), name=None, 
                   uitype=(None, None, None)):
         ftype, stype = t[1], t[2]
-        fuitype = None if uitype is None else uitype[1]
-        suitype = None if uitype is None else uitype[2]
-        first = self._val(ftype, val=val[0], uitype=fuitype)
-        second = self._val(stype, val=val[1], uitype=suitype)
-        v = 'std::pair<{0}, {1} >({2}, {3})'
-        v = v.format(type_to_str(ftype), type_to_str(stype), first, second)
+        uitype = prepare_type(t, uitype)
+
+        fname, sname = 'first', 'second'
+        first = self._val(ftype, val=val[0], uitype=uitype[1], name=fname)
+        second = self._val(stype, val=val[1], uitype=uitype[2], name=sname)
+        v = '{0} {1} {2} {3}({4}, {5});'.format(
+                first, second, type_to_str(t), name, fname, sname)
         return v
 
     def _val_map(self, t, val=None, name=None, uitype=None):
-        val = val or {}
-        if not isinstance(val, Mapping):
-            val = dict(val)
-        ktype, vtype = t[1], t[2]
-        kuitype = None if uitype is None else uitype[1]
-        vuitype = None if uitype is None else uitype[2]
-        v = ''
+        uitype = prepare_type(t, uitype)
+        keyname = 'key'
+        valname = 'val'
+
+        v = '{0} {1};'.format(type_to_str(t), name)
+        v += '{'
         for k, x in val.items():
-            k = self._val(ktype, val=k, uitype=kuitype)
-            x = self._val(vtype, val=x, uitype=vuitype)
-            v += '{0}[{1}] = {2};\n'.format(name, k, x)
+            kval = self._val(t[1], val=k, uitype=uitype[1], name=keyname)
+            xval = self._val(t[2], val=x, uitype=uitype[2], name=valname)
+            v += '{{ {0} {1} {2}[{3}] = {4};}}'.format(kval, xval, name, keyname, valname)
+        v += '}'
+
         return v
 
-    def _query(self, tree, alias, t, d, uitype=None, idx=None):
+    def _query(self, tree, alias, t, uitype=None, idx=None):
         tstr = type_to_str(t)
         if tstr.endswith('>'):
             tstr += " "
         # Get keys
         kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree}
-        if d is None:
-            kw['query'] = "Query"
-            kw['default'] = ""
-        else:
-            kw['query'] = "OptionalQuery"
-            default = self._val(t, val=d, uitype=uitype)
-            if ';' in default:
-                raise ValueError('can only query based on values that '
-                                 'are C++ expressions, got:\n\n' + default)
-            kw['default'] = ", " + default
         kw['index'] = '' if idx is None else ', {0}'.format(idx)
         # get template
         if uitype == 'nuclide':
-            template = ('pyne::nucname::id({cycns}::{query}<std::string>({tree}, '
-                        '"{alias}"{default}{index}))')
-            if d is not None:
-                kw['default'] = ', "{0}"'.format(d)
+            template = ('pyne::nucname::id({cycns}::Query<std::string>({tree}, '
+                        '"{alias}"{index}))')
         else:
-            template = '{cycns}::{query}<{type}>({tree}, "{alias}"{default}{index})'
+            template = '{cycns}::Query<{type}>({tree}, "{alias}"{index})'
         # fill in template and return 
         return template.format(**kw)
 
-    def read_primitive(self, member, alias, t, d, uitype=None, ind="  "):
-        query = self._query('tree', alias, t, d, uitype)
-        s = '{ind}{member} = {query};\n'.format(ind=ind, member=member, query=query)
+    def read_member(self, member, alias, t, uitype=None, ind="  ", idx=None):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+
+        s = '{0} {1};'.format(type_to_str(t), member)
+        mname = member + '_in'
+        tt = t if isinstance(t, STRING_TYPES) else t[0]
+        reader = self.readers.get(tt, None)
+        s += '{'
+        s += reader(mname, alias, t, uitype, ind + '  ', idx=idx)
+        s += '{0} = {1};'.format(member, mname)
+        s += '}'
         return s
 
-    def read_vector(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None]
-        s = ""
-        if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
-            ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
-        s += ind + 'n = sub->NMatches("val");\n'
+    def read_primitive(self, member, alias, t, uitype=None, ind="  ", idx=None):
+        query = self._query('sub', alias, t, uitype, idx=idx)
+        s = '{ind}{t} {member} = {query};\n'.format(t=t, ind=ind, member=member, query=query)
+        return s
+
+    def read_vector(self, member, alias, t, uitype=None, ind="  ", idx=None):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] == None:
+            alias[1] = 'val'
+        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
+        s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + '{0}.resize(n);\n'.format(member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
-        s += ind + '  {member}[i] = {query};\n'.format(member=member, query=query)
+        s += ind + self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += ind + '  {0}[i] = elem;\n'.format(member)
         s += ind + '}\n'
-        if d is not None:
-            ind = ind[:-2]
-            s += ind + '} else {\n'
-            ind += '  '
-            val = self._val(t, val=d, name=member, uitype=uitype)
-            s += ind + val.replace('\n', '\n' + ind)
-            ind = ind[:-2]
-            s += ind + '}\n'
         return s
 
-    def read_set(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None]
-        s = ""
-        s += ind + '{0}.clear();\n'.format(member)
-        if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
-            ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
-        s += ind + 'n = sub->NMatches("val");\n'
+    def read_set(self, member, alias, t, uitype=None, ind="  ", idx=None):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] == None:
+            alias[1] = 'val'
+        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
+        s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
-        s += ind + '  {member}.insert({query});\n'.format(member=member, query=query)
+        s += ind + self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += ind + '  {0}.insert(elem);\n'.format(member)
         s += ind + '}\n'
-        if d is not None:
-            ind = ind[:-2]
-            s += ind + '} else {\n'
-            ind += '  '
-            val = self._val(t, val=d, name=member, uitype=uitype)
-            s += ind + val.replace('\n', '\n' + ind)
-            ind = ind[:-2]
-            s += ind + '}\n'
         return s
 
-    def read_list(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None]
-        s = ""
-        s += ind + '{0}.clear();\n'.format(member)
-        if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
-            ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
-        s += ind + 'n = sub->NMatches("val");\n'
+    def read_list(self, member, alias, t, uitype=None, ind="  ", idx=None):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] == None:
+            alias[1] = 'val'
+        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
+        s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
-        s += ind + '  {1}.push_back({query});\n'.format(member=member, query=query)
+        s += ind + self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += ind + '  {0}.push_back(elem);\n'.format(member)
         s += ind + '}\n'
-        if d is not None:
-            ind = ind[:-2]
-            s += ind + '} else {\n'
-            ind += '  '
-            val = self._val(t, val=d, name=member, uitype=uitype)
-            s += ind + val.replace('\n', '\n' + ind)
-            ind = ind[:-2]
-            s += ind + '}\n'
         return s
 
-    def read_pair(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None, None]
-        s = ""
-        query = self._query('tree', alias + '/first', t[1], d[0], uitype[1])
-        s += ind + '{member}.first = {query};\n'.format(member=member, query=query)
-        query = self._query('tree', alias + '/second', t[1], d[0], uitype[1])
-        s += ind + '{member}.second = {query};\n'.format(member=member, query=query)
+    def read_pair(self, member, alias, t, uitype=None, ind="  ", idx=None):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] == None:
+            alias[1] = 'first'
+        if alias[2] == None:
+            alias[2] = 'second'
+        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += ind + self.read_member('first', alias[1], t[1], uitype[1], ind+'  ')
+        s += ind + self.read_member('second', alias[2], t[2], uitype[2], ind+'  ')
+        s += ind + '{0} {1}(first, second);\n'.format(type_to_str(t), member)
         return s
 
-    def read_map(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None, None]
-        s = ""
-        if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
-            ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
-        s += ind + 'n = sub->NMatches("val");\n'
+    def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] == None:
+            alias[1] = 'key'
+        if alias[2] == None:
+            alias[2] = 'val'
+        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
+        s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        kquery = self._query('sub', 'key', t[1], None, uitype[1], 'i')
-        vquery = self._query('sub', 'val', t[2], None, uitype[2], 'i')
-        s += ind + '  {member}[{kquery}] = {vquery};\n'.format(member=member, 
-                                                               kquery=kquery, 
-                                                               vquery=vquery)
+        s += ind + self.read_member('key', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += ind + self.read_member('val', alias[2], t[2], uitype[2], ind+'  ', idx='i')
+        s += ind + '  {0}[key] = val;\n'.format(member)
         s += ind + '}\n'
-        if d is not None:
-            ind = ind[:-2]
-            s += ind + '} else {\n'
-            ind += '  '
-            val = self._val(t, val=d, name=member, uitype=uitype)
-            s += ind + val.replace('\n', '\n' + ind)
-            ind = ind[:-2]
-            s += ind + '}\n'
         return s
 
     def impl(self, ind="  "):
@@ -1281,7 +1287,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
         # read data from infile onto class
         impl += ind + 'tree = tree->SubTree("config/*");\n'
-        impl += ind + '{0}::InfileTree* sub;\n'.format(CYCNS)
+        impl += ind + '{0}::InfileTree* sub = tree;\n'.format(CYCNS)
         impl += ind + 'int i;\n'
         impl += ind + 'int n;\n'
         for member, info in ctx.items():
@@ -1305,8 +1311,34 @@ class InfileToDbFilter(CodeGeneratorFilter):
             if 'derived_init' in info:
                 impl += ind + info['derived_init'] + '\n'
             else:
+                labels = info.get('alias', None)
+                if labels is None:
+                    labels = member if isinstance(t, STRING_TYPES) else [member]
                 reader = self.readers.get(t, self.readers.get(t[0], None))
-                impl += reader(member, alias, t, d, uitype, ind)
+
+                # generate condition to choose default vs given val if default exists
+                if d is not None:
+                    name = labels if isinstance(t, STRING_TYPES) else labels[0]
+                    impl += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(name)
+                    ind += '  '
+
+                mname = member + '_val'
+                impl += '{'
+                impl += reader(mname, labels, t, uitype, ind)
+                impl += '{0} = {1};'.format(member, mname)
+                impl += '}'
+
+                # generate code to assign default val if no other is specified
+                if d is not None:
+                    ind = ind[:-2]
+                    impl += ind + '} else {\n'
+                    ind += '  '
+                    mname = member + '_tmp'
+                    val = self._val(t, val=d, name=mname, uitype=uitype)
+                    val += '{0} = {1};'.format(member, mname)
+                    impl += ind + val.replace('\n', '\n' + ind)
+                    ind = ind[:-2]
+                    impl += ind + '}\n'
 
         # write obj to database
         impl += ind + 'di.NewDatum("Info")\n'
@@ -1383,30 +1415,9 @@ class SchemaFilter(CodeGeneratorFilter):
         return self.default_types[cpp]
 
     def _buildschema(self, cpptype, schematype=None, uitype=None, names=None):
-        if not isinstance(cpptype, STRING_TYPES):
-            if names is None:
-                names = []
-                for v in cpptype:
-                    names.append(None)
-            elif len(names) < len(cpptype):
-                for i in range(len(cpptype)-len(names)):
-                    names.append(None)
-
-            if schematype is None:
-                schematype = []
-                for v in cpptype:
-                    schematype.append(None)
-            elif len(schematype) < len(cpptype):
-                for i in range(len(cpptype)-len(schematype)):
-                    schematype.append(None)
-
-            if uitype is None:
-                uitype = []
-                for v in cpptype:
-                    uitype.append(None)
-            elif len(uitype) < len(cpptype):
-                for i in range(len(cpptype)-len(uitype)):
-                    uitype.append(None)
+        schematype = prepare_type(cpptype, schematype)
+        uitype = prepare_type(cpptype, uitype)
+        names = prepare_type(cpptype, names)
 
         impl = ''
         t = cpptype if isinstance(cpptype, STRING_TYPES) else cpptype[0]
@@ -1497,7 +1508,7 @@ class SchemaFilter(CodeGeneratorFilter):
             key = t if isinstance(t, STRING_TYPES) else t[0]
             uitype = info.get('uitype', None)
             schematype = info.get('schematype', None)
-            labels = info.get('schemalabels', None)
+            labels = info.get('alias', None)
             if labels is None:
                 labels = alias if isinstance(t, STRING_TYPES) else [alias]
 

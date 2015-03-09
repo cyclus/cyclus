@@ -1,6 +1,7 @@
 import os
 import sys
 import uuid
+import pprint
 from collections import OrderedDict
 
 import nose
@@ -591,6 +592,37 @@ def test_schemafilter_buildschema():
     want = '"<element name=\\"streams\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"name\\">\\n"\n"<data type=\\"string\\" />\\n"\n"</element>\\n"\n"<element name=\\"efficiencies\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"val\\">\\n"\n"<data type=\\"double\\" />\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n'
     got = f._buildschema(cpptype, schematype, uitype, names)
     yield assert_equal, want, got
+
+def test_infiletodb_read_member():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+
+    print('gen:')
+    cpptype = ('std::map', 'std::string', ('std::vector', ('std::vector', ('std::pair', 'double', ('std::pair', 'int', ('std::list', 'bool'))))))
+    alias = ['streams', 'name', ['efficiencies', 'val']]
+    gen = f.read_member('mymap', alias, cpptype, uitype=None)
+    print('foobarbaz')
+    pprint.pprint(gen)
+    assert_equal(False, True)
+
+def test_infiletodb_val():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+
+    cpptype = ('std::map', 'std::string', ('std::vector', 'double'))
+    val = {'one': [1, 1, 1], 'two': [2, 2, 2], 'three':[]}
+    gen = f._val(cpptype, val=val, name='mymap', uitype=None)
+    print('gen:')
+    pprint.pprint(gen)
+    assert_equal(False, True)
 
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
