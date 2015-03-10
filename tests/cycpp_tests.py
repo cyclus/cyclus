@@ -404,8 +404,6 @@ def test_itdbfilter():
                 '  ->AddVal("x", x)\n'
                 'ABSOLUTELY FREE\n'
                 '  ->Record();\n')
-    print('gotted:')
-    print(impl.replace('\n', '\\n'))
     yield assert_equal, exp_impl, impl
 
 def check_itdbfilter_val(exp, f, t, v, name, uitype):
@@ -446,7 +444,7 @@ def test_itdbfilter_val():
             'std::list< int > foo;{{ int elem = 42; foo.push_back(elem);}{ int elem = 65; foo.push_back(elem);}}',
             ),
         (('std::pair', 'int', 'double'), [42, 65.0], 'foo', None, 
-            'int first = 42; double second = 65.0; std::pair< int, double > foo(first, second);',
+            'std::pair< int, double > foo;{int first = 42; double second = 65.0; foo.first = first; foo.second = second;}',
             ),
         (('std::map', 'int', 'double'), {42: 65.0}, 'foo', None, 
             'std::map< int, double > foo;{{ int key = 42; double val = 65.0; foo[key] = val;}}',
@@ -469,11 +467,11 @@ def test_schemafilter():
     impl = f.impl()
     exp_impl = ('  return ""\n'
                 '    "<interleave>\\n"\n'
-                '    "<element name=\\"x\\">\\n"\n'
-                '    "    <data type=\\"positiveInteger\\" />\\n"\n'
-                '    "</element>\\n"\n'
-                "FREAK OUT\n"
-                '    "</interleave>\\n"\n    ;\n')
+                '    "    <element name=\\"x\\">\\n"\n'
+                '    "        <data type=\\"positiveInteger\\"/>\\n"\n'
+                '    "    </element>\\n"\n'
+                '    "    FREAK OUT\\n"\n'
+                '    "</interleave>\\n";\n')
     yield assert_equal, exp_impl, impl
 
     # schema type tests
@@ -486,19 +484,21 @@ def test_schemafilter():
             ]))
             ])}
     impl = f.impl()
-    exp_impl = ('  return ""\n'
-                '    "<interleave>\\n"\n'
-                '    "<element name=\\"x\\">\\n"\n'
-                '    "    <oneOrMore>\\n"\n'
-                '    "        <element name=\\"key\\">\\n"\n'
-                '    "            <data type=\\"int\\" />\\n"\n'
-                '    "        </element>\\n"\n'
-                '    "        <element name=\\"val\\">\\n"\n'
-                '    "            <data type=\\"double\\" />\\n"\n'
-                '    "        </element>\\n"\n'
-                '    "    </oneOrMore>\\n"\n'
-                '    "</element>\\n"\n'
-                '    "</interleave>\\n"\n    ;\n')
+    exp_impl = (
+        '  return ""\n'
+        '    "<interleave>\\n"\n'
+        '    "    <element name=\\"x\\">\\n"\n'
+        '    "        <oneOrMore>\\n"\n'
+        '    "            <element name=\\"key\\">\\n"\n'
+        '    "                <data type=\\"int\\"/>\\n"\n'
+        '    "            </element>\\n"\n'
+        '    "            <element name=\\"val\\">\\n"\n'
+        '    "                <data type=\\"double\\"/>\\n"\n'
+        '    "            </element>\\n"\n'
+        '    "        </oneOrMore>\\n"\n'
+        '    "    </element>\\n"\n'
+        '    "</interleave>\\n";\n')
+
     yield assert_equal, exp_impl, impl
 
 def test_annotationsfilter():
@@ -597,31 +597,15 @@ def test_escape_xml():
     got = cycpp.escape_xml(xml)
 
     s = '    "<element name=\\"mymap\\">\\n"\n' \
-        '    "	<element name=\\"key\\">\\n"\n' \
-        '    "		<text1/>\\n"\n' \
-        '    "	</element>\\n"\n' \
-        '    "	<element name=\\"val\\">\\n"\n' \
-        '    "		<text2/>\\n"\n' \
-        '    "	</element>\\n"\n' \
+        '    "    <element name=\\"key\\">\\n"\n' \
+        '    "        <text1/>\\n"\n' \
+        '    "    </element>\\n"\n' \
+        '    "    <element name=\\"val\\">\\n"\n' \
+        '    "        <text2/>\\n"\n' \
+        '    "    </element>\\n"\n' \
         '    "</element>\\n"'
 
     yield assert_equal, s, got
-
-def test_infiletodb_read_member():
-    m = MockCodeGenMachine()
-    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
-            ('x', {'type': 'int', 'uitype': 'nuclide'}),
-            ]))
-            ])}
-    f = InfileToDbFilter(m)
-
-    print('gen:')
-    cpptype = ('std::map', 'std::string', ('std::vector', ('std::vector', ('std::pair', 'double', ('std::pair', 'int', ('std::list', 'bool'))))))
-    alias = ['streams', 'name', ['efficiencies', 'val']]
-    gen = f.read_member('mymap', alias, cpptype, uitype=None)
-    print('foobarbaz')
-    pprint.pprint(gen)
-    assert_equal(False, True)
 
 def test_infiletodb_val():
     m = MockCodeGenMachine()
@@ -631,12 +615,89 @@ def test_infiletodb_val():
             ])}
     f = InfileToDbFilter(m)
 
-    cpptype = ('std::map', 'std::string', ('std::vector', 'double'))
-    val = {'one': [1, 1, 1], 'two': [2, 2, 2], 'three':[]}
-    gen = f._val(cpptype, val=val, name='mymap', uitype=None)
-    print('gen:')
-    pprint.pprint(gen)
-    assert_equal(False, True)
+    cases = (
+        ('bool', True, 'bool mymap = true;'),
+        ('int', 42, 'int mymap = 42;'),
+        ('double', 4.2, 'double mymap = 4.2;'),
+        ('cyclus::Blob', 'hello', 'cyclus::Blob mymap("hello");'),
+        ('boost::uuids::uuid', uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), 'boost::uuids::uuid mymap = {0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, 0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92};'),
+        (('std::set', 'int'), [1, 2, 3], 'std::set< int > mymap;{{ int elem = 1; mymap.insert(elem);}{ int elem = 2; mymap.insert(elem);}{ int elem = 3; mymap.insert(elem);}}'),
+        (('std::list', 'int'), [1, 2, 3], 'std::list< int > mymap;{{ int elem = 1; mymap.push_back(elem);}{ int elem = 2; mymap.push_back(elem);}{ int elem = 3; mymap.push_back(elem);}}'),
+        (('std::vector', 'int'), [1, 2, 3], 'std::vector< int > mymap;mymap.resize(3);\n{{ int elem = 1; mymap[0] = elem;}{ int elem = 2; mymap[1] = elem;}{ int elem = 3; mymap[2] = elem;}}'),
+
+        (('std::map', 'int', 'double'), {1: 1.1, 2:2.2, 3:3.3}, 'std::map< int, double > mymap;{{ int key = 1; double val = 1.1; mymap[key] = val;}{ int key = 2; double val = 2.2; mymap[key] = val;}{ int key = 3; double val = 3.3; mymap[key] = val;}}'),
+        (('std::pair', 'int', 'double'), [1, 2], 'std::pair< int, double > mymap;{int first = 1; double second = 2; mymap.first = first; mymap.second = second;}'),
+        (('std::map', 'std::string', ('std::pair', 'bool', ('std::vector', 'double'))),
+            OrderedDict([('hello', [True, [1.1, 2.2, 3.3]]), ('goodbye', [False, [3.3, 2.2, 1.1]])]), 'std::map< std::string, std::pair< bool, std::vector< double > > > mymap;{{ std::string key("hello"); std::pair< bool, std::vector< double > > val;{bool first = true; std::vector< double > second;second.resize(3);\n{{ double elem = 1.1; second[0] = elem;}{ double elem = 2.2; second[1] = elem;}{ double elem = 3.3; second[2] = elem;}} val.first = first; val.second = second;} mymap[key] = val;}{ std::string key("goodbye"); std::pair< bool, std::vector< double > > val;{bool first = false; std::vector< double > second;second.resize(3);\n{{ double elem = 3.3; second[0] = elem;}{ double elem = 2.2; second[1] = elem;}{ double elem = 1.1; second[2] = elem;}} val.first = first; val.second = second;} mymap[key] = val;}}')
+        )
+
+    for cpptype, val, want in cases:
+        gen = f._val(cpptype, val=val, name='mymap', uitype=None)
+        yield assert_equal, want, gen
+
+def test_infiletodb_read_member():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+
+    cpptype = ('std::map', 'std::string', ('std::vector', ('std::vector', ('std::pair', 'double', ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
+    alias = ['streams', 'name', ['efficiencies', 'val']]
+    gen = f.read_member('mymap', alias, cpptype, uitype=None)
+
+    exp_gen = (
+        'std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap;{cyclus::InfileTree* bub = sub->SubTree("streams");\n'
+        'cyclus::InfileTree* sub = bub;\n'
+        'int n = sub->NMatches("name");\n'
+        '    std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap_in;\n'
+        '    for (i = 0; i < n; ++i) {\n'
+        '    std::string key;{        std::string key_in = cyclus::Query<std::string>(sub, "name", i);\n'
+        'key = key_in;}    std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val;{cyclus::InfileTree* bub = sub->SubTree("efficiencies");\n'
+        'cyclus::InfileTree* sub = bub;\n'
+        'int n = sub->NMatches("val");\n'
+        '        std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val_in;\n'
+        '        val_in.resize(n);\n'
+        '        for (i = 0; i < n; ++i) {\n'
+        '        std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > elem;{cyclus::InfileTree* bub = sub->SubTree("val");\n'
+        'cyclus::InfileTree* sub = bub;\n'
+        'int n = sub->NMatches("val");\n'
+        '            std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > elem_in;\n'
+        '            elem_in.resize(n);\n'
+        '            for (i = 0; i < n; ++i) {\n'
+        '            std::pair< double, std::pair< int, std::list< std::set< bool > > > > elem;{cyclus::InfileTree* bub = sub->SubTree("val");\n'
+        'cyclus::InfileTree* sub = bub;\n'
+        '                double first;{                    double first_in = cyclus::Query<double>(sub, "first");\n'
+        'first = first_in;}                std::pair< int, std::list< std::set< bool > > > second;{cyclus::InfileTree* bub = sub->SubTree("second");\n'
+        'cyclus::InfileTree* sub = bub;\n'
+        '                    int first;{                        int first_in = cyclus::Query<int>(sub, "first");\n'
+        'first = first_in;}                    std::list< std::set< bool > > second;{cyclus::InfileTree* bub = sub->SubTree("second");\n'
+        'cyclus::InfileTree* sub = bub;\n'
+        'int n = sub->NMatches("val");\n'
+        '                        std::list< std::set< bool > > second_in;\n'
+        '                        for (i = 0; i < n; ++i) {\n'
+        '                        std::set< bool > elem;{cyclus::InfileTree* bub = sub->SubTree("val");\n'
+        'cyclus::InfileTree* sub = bub;\n'
+        'int n = sub->NMatches("val");\n'
+        '                            std::set< bool > elem_in;\n'
+        '                            for (i = 0; i < n; ++i) {\n'
+        '                            bool elem;{                                bool elem_in = cyclus::Query<bool>(sub, "val", i);\n'
+        'elem = elem_in;}                              elem_in.insert(elem);\n'
+        '                            }\n'
+        'elem = elem_in;}                          second_in.push_back(elem);\n'
+        '                        }\n'
+        'second = second_in;}                    std::pair< int, std::list< std::set< bool > > > second_in(first, second);\n'
+        'second = second_in;}                std::pair< double, std::pair< int, std::list< std::set< bool > > > > elem_in(first, second);\n'
+        'elem = elem_in;}              elem_in[i] = elem;\n'
+        '            }\n'
+        'elem = elem_in;}          val_in[i] = elem;\n'
+        '        }\n'
+        'val = val_in;}      mymap_in[key] = val;\n'
+        '    }\n'
+        'mymap = mymap_in;}'
+        )
+    yield assert_equal, exp_gen, gen
 
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
@@ -651,24 +712,25 @@ def test_nuclide_uitype():
     impl = f.impl()
     exp_impl = ('  return ""\n'
                 '    "<interleave>\\n"\n'
-                '    "<element name=\\"x\\">\\n"\n'
-                '    "    <data type=\\"string\\" />\\n"\n'
-                '    "</element>\\n"\n'
-                '    "</interleave>\\n"\n    ;\n')
+                '    "    <element name=\\"x\\">\\n"\n'
+                '    "        <data type=\\"string\\"/>\\n"\n'
+                '    "    </element>\\n"\n'
+                '    "</interleave>\\n";\n')
     yield assert_equal, exp_impl, impl
 
     # test infiletodb updates
     f = InfileToDbFilter(m)
     f.given_classname = 'MyFactory'
     impl = f.impl()
-    exp_impl = ('  tree = tree->SubTree("config/*");\n'
-                '  cyclus::InfileTree* sub;\n'
-                '  int i;\n'
-                '  int n;\n'
-                '  x = pyne::nucname::id(cyclus::Query<std::string>(tree, "x"));\n'
-                '  di.NewDatum("Info")\n'
-                '  ->AddVal("x", x)\n'
-                '  ->Record();\n')
+    exp_impl = (
+        '  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+        '  int i;\n'
+        '  int n;\n'
+        '{  int x_val = pyne::nucname::id(cyclus::Query<std::string>(sub, "x"));\n'
+        'x = x_val;}  di.NewDatum("Info")\n'
+        '  ->AddVal("x", x)\n'
+        '  ->Record();\n')
+
     yield assert_equal, exp_impl, impl
 
     # test bad uitypes values fail

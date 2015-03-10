@@ -117,7 +117,7 @@ def escape_xml(s, ind='    '):
     """Escapes xml string s, prettifies it and puts in c++ string lit form."""
 
     s = xml.dom.minidom.parseString(s)
-    s = s.toprettyxml()
+    s = s.toprettyxml(indent='    ')
     s = s.replace('"', '\\"')
 
     lines = s.splitlines()
@@ -129,8 +129,6 @@ def escape_xml(s, ind='    '):
             clean.append(line)
 
     for i, line in enumerate(clean):
-        if line.strip() == '':
-            continue
         clean[i] = '{0}"{1}\\n"'.format(ind, line.rstrip())
 
     return '\n'.join(clean)
@@ -1167,8 +1165,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         fname, sname = 'first', 'second'
         first = self._val(ftype, val=val[0], uitype=uitype[1], name=fname)
         second = self._val(stype, val=val[1], uitype=uitype[2], name=sname)
-        v = '{0} {1} {2} {3}({4}, {5});'.format(
-                first, second, type_to_str(t), name, fname, sname)
+        v = '{0} {1};'.format(type_to_str(t), name)
+        v += '{'
+        v += '{0} {1} {2}.first = {3}; {2}.second = {4};'.format(
+                first, second, name, fname, sname)
+        v += '}'
         return v
 
     def _val_map(self, t, val=None, name=None, uitype=None):
