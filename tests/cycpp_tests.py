@@ -24,6 +24,8 @@ from cycpp import CloneFilter, InitFromCopyFilter, \
         InitFromDbFilter, InfileToDbFilter, SchemaFilter, SnapshotFilter, \
         SnapshotInvFilter, InitInvFilter, DefaultPragmaFilter, AnnotationsFilter
 
+import cycpp
+
 class MockMachine(object):
     def __init__(self):
         self.depth = 0
@@ -592,6 +594,24 @@ def test_schemafilter_buildschema():
     want = '"<element name=\\"streams\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"name\\">\\n"\n"<data type=\\"string\\" />\\n"\n"</element>\\n"\n"<element name=\\"efficiencies\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"val\\">\\n"\n"<data type=\\"double\\" />\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n'
     got = f._buildschema(cpptype, schematype, uitype, names)
     yield assert_equal, want, got
+
+def test_escape_xml():
+    """Test escape_xml"""
+    xml = '<element name="mymap">' \
+          '<element name="key"><text1/></element><element name="val"><text2/></element>' \
+          '</element>'
+    got = cycpp.escape_xml(xml)
+
+    s = '    "<element name=\\"mymap\\">\\n"\n' \
+        '    "	<element name=\\"key\\">\\n"\n' \
+        '    "		<text1/>\\n"\n' \
+        '    "	</element>\\n"\n' \
+        '    "	<element name=\\"val\\">\\n"\n' \
+        '    "		<text2/>\\n"\n' \
+        '    "	</element>\\n"\n' \
+        '    "</element>\\n"'
+
+    yield assert_equal, s, got
 
 def test_infiletodb_read_member():
     m = MockCodeGenMachine()

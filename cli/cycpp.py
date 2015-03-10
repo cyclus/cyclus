@@ -55,6 +55,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint, pformat
 import textwrap
 import difflib
+import xml.dom.minidom
 
 try:
     import simplejson as json
@@ -111,6 +112,28 @@ WRANGLERS = {
 
 ENTITIES = [('cyclus::Region', 'region'), ('cyclus::Institution', 'institution'), 
             ('cyclus::Facility', 'facility'), ('cyclus::Agent', 'archetype')]
+
+def escape_xml(s, ind='    '):
+    """Escapes xml string s, prettifies it and puts in c++ string lit form."""
+
+    s = xml.dom.minidom.parseString(s)
+    s = s.toprettyxml()
+    s = s.replace('"', '\\"')
+
+    lines = s.splitlines()
+    lines = lines[1:] # remove initial xml version tag
+
+    clean = []
+    for line in lines:
+        if line.strip() != '':
+            clean.append(line)
+
+    for i, line in enumerate(clean):
+        if line.strip() == '':
+            continue
+        clean[i] = '{0}"{1}\\n"'.format(ind, line.rstrip())
+
+    return '\n'.join(clean)
 
 def prepare_type(cpptype, othertype):
     """Updates othertype to conform to the length of cpptype using None's.
@@ -1203,7 +1226,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         alias = prepare_type(t, alias)
         if alias[1] == None:
             alias[1] = 'val'
-        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + '{0}.resize(n);\n'.format(member)
@@ -1218,7 +1246,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         alias = prepare_type(t, alias)
         if alias[1] == None:
             alias[1] = 'val'
-        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
@@ -1232,7 +1264,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         alias = prepare_type(t, alias)
         if alias[1] == None:
             alias[1] = 'val'
-        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
@@ -1248,7 +1284,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
             alias[1] = 'first'
         if alias[2] == None:
             alias[2] = 'second'
-        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + self.read_member('first', alias[1], t[1], uitype[1], ind+'  ')
         s += ind + self.read_member('second', alias[2], t[2], uitype[2], ind+'  ')
         s += ind + '{0} {1}(first, second);\n'.format(type_to_str(t), member)
@@ -1261,7 +1301,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
             alias[1] = 'key'
         if alias[2] == None:
             alias[2] = 'val'
-        s = '{0}::InfileTree* sub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
@@ -1286,8 +1330,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         impl += self.shapes_impl(ctx, ind)
 
         # read data from infile onto class
-        impl += ind + 'tree = tree->SubTree("config/*");\n'
-        impl += ind + '{0}::InfileTree* sub = tree;\n'.format(CYCNS)
+        impl += ind + '{0}::InfileTree* sub = tree->SubTree("config/*");\n'.format(CYCNS)
         impl += ind + 'int i;\n'
         impl += ind + 'int n;\n'
         for member, info in ctx.items():
@@ -1319,7 +1362,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 # generate condition to choose default vs given val if default exists
                 if d is not None:
                     name = labels if isinstance(t, STRING_TYPES) else labels[0]
-                    impl += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(name)
+                    impl += ind + 'if (sub->NMatches("{0}") > 0) {{\n'.format(name)
                     ind += '  '
 
                 mname = member + '_val'
@@ -1426,18 +1469,18 @@ class SchemaFilter(CodeGeneratorFilter):
             if names is not None:
                 name = names
             d_type = self._type(t, schematype or uitype)
-            impl += '"<element name=\\"{0}\\">\\n"\n'.format(name)
-            impl += '"<data type=\\"{0}\\" />\\n"\n'.format(d_type)
-            impl += '"</element>\\n"\n'
+            impl += '<element name="{0}">'.format(name)
+            impl += '<data type="{0}" />'.format(d_type)
+            impl += '</element>'
         elif t in ['std::list', 'std::set', 'std::vector']:
             name = 'list' if isinstance(cpptype, STRING_TYPES) else ['list']
             if names[0] is not None:
                 name = names[0]
-            impl += '"<element name=\\"{0}\\">\\n"\n'.format(name)
-            impl += '"<oneOrMore>\\n"\n'
+            impl += '<element name="{0}">'.format(name)
+            impl += '<oneOrMore>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], names[1])
-            impl += '"</oneOrMore>\\n"\n'
-            impl += '"</element>\\n"\n'
+            impl += '</oneOrMore>'
+            impl += '</element>'
         elif t == 'std::map':
             name = 'map'
             if names[0] is not None:
@@ -1451,12 +1494,12 @@ class SchemaFilter(CodeGeneratorFilter):
             if names[1] is not None:
                 valnames = names[2]
 
-            impl += '"<element name=\\"{0}\\">\\n"\n'.format(name)
-            impl += '"<oneOrMore>\\n"\n'
+            impl += '<element name="{0}">'.format(name)
+            impl += '<oneOrMore>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], keynames)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], valnames)
-            impl += '"</oneOrMore>\\n"\n'
-            impl += '"</element>\\n"\n'
+            impl += '</oneOrMore>'
+            impl += '</element>'
         elif t == 'std::pair':
             name = 'pair'
             if names[0] is not None:
@@ -1470,10 +1513,10 @@ class SchemaFilter(CodeGeneratorFilter):
             if names[2] is not None:
                 secondname = names[2]
 
-            impl += '"<element name=\\"{0}\\">\\n"\n'.format(name)
+            impl += '<element name="{0}">'.format(name)
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
-            impl += '"</element>\\n"\n'
+            impl += '</element>'
         else:
             msg = '{0}Unsupported type {1}'.format(self.machine.includeloc(), t)
             raise RuntimeError(msg)
@@ -1484,14 +1527,11 @@ class SchemaFilter(CodeGeneratorFilter):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]['vars']
-        i = Indenter(level=len(ind) / 2)
-        xi = Indenter(n=4)
 
         if len(ctx.keys()) == 0:
-            return i + 'return "<text/>";\n'
+            return ind + 'return "<text/>";\n'
 
-        impl = i.up() + 'return ""\n'
-        impl += i +  '"<interleave>\\n"\n'
+        xml = '<interleave>'
         for member, info in ctx.items():
             self._member = member
             if not isinstance(info, Mapping):
@@ -1502,7 +1542,7 @@ class SchemaFilter(CodeGeneratorFilter):
             if 'alias' in info:
                 alias = info['alias']
             if self.pragmaname in info:
-                impl += info[self.pragmaname]
+                xml += info[self.pragmaname]
                 continue
             t = info['type']
             key = t if isinstance(t, STRING_TYPES) else t[0]
@@ -1519,16 +1559,18 @@ class SchemaFilter(CodeGeneratorFilter):
 
             opt = True if 'default' in info else False
             if opt:
-                impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
+                xml += '<optional>'
 
-            impl += self._buildschema(t, schematype, uitype, labels)
+            xml += self._buildschema(t, schematype, uitype, labels)
 
             if opt:
-                impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
+                xml += '</optional>'
+        xml += '</interleave>'
+
         del self._member
-        impl += i +  '"</interleave>\\n"\n'
-        impl += i + ";\n"
-        return impl
+        print(xml)
+        return ind + 'return ""\n' + escape_xml(xml, ind=ind+'  ') + ';\n'
+
 
 class AnnotationsFilter(CodeGeneratorFilter):
     """Filter for handling annotations() code generation:
