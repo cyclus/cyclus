@@ -165,6 +165,8 @@ enum DbTypes {
   VL_MAP_PAIR_INT_STRING_DOUBLE,
   MAP_PAIR_INT_VL_STRING_DOUBLE,
   VL_MAP_PAIR_INT_VL_STRING_DOUBLE,
+  // append new types only:
+  VL_MAP_VL_STRING_VL_VECTOR_DOUBLE,
 };
 
 /// Represents operation codes for condition checking.
