@@ -1568,7 +1568,6 @@ class SchemaFilter(CodeGeneratorFilter):
         xml += '</interleave>'
 
         del self._member
-        print(xml)
         return ind + 'return ""\n' + escape_xml(xml, ind=ind+'  ') + ';\n'
 
 

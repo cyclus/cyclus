@@ -394,20 +394,19 @@ def test_itdbfilter():
 
     impl = f.impl()
     exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
-                '  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, '
-                                                   'rawcycpp_shape_y + 1);\n'
-                '  tree = tree->SubTree("config/*");\n'
-                '  cyclus::InfileTree* sub;\n'
+                '  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, rawcycpp_shape_y + 1);\n'
+                '  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
                 '  int i;\n'
                 '  int n;\n'
-                '  x = cyclus::Query<int>(tree, "x");\n'
-                'THINGFISH\n'
+                '{  int x_val = cyclus::Query<int>(sub, "x");\n'
+                'x = x_val;}THINGFISH\n'
                 '  di.NewDatum("Info")\n'
                 '  ->AddVal("x", x)\n'
                 'ABSOLUTELY FREE\n'
                 '  ->Record();\n')
+    print('gotted:')
+    print(impl.replace('\n', '\\n'))
     yield assert_equal, exp_impl, impl
-
 
 def check_itdbfilter_val(exp, f, t, v, name, uitype):
     obs = f._val(t, val=v, name=name, uitype=uitype)
@@ -419,43 +418,38 @@ def test_itdbfilter_val():
     f = InfileToDbFilter(m)
 
     cases = [
-        ('bool', True, None, None, 'true'), 
-        ('bool', False, None, None, 'false'), 
-        ('int', 42, None, None, '42'), 
-        ('int', 92235, None, 'nuclide', 'pyne::nucname::id(92235)'), 
-        ('int', 'U-235', None, 'nuclide', 'pyne::nucname::id("U-235")'), 
-        ('float', 42.0, None, None, '42.0'), 
-        ('double', 42.0, None, None, '42.0'), 
-        ('std::string', 'wakka', None, None, 'std::string("wakka")'),
-        ('cyclus::Blob', 'wakka', None, None, 'cyclus::Blob("wakka")'),
+        ('bool', True, 'foo', None, 'bool foo = true;'), 
+        ('bool', False, 'foo', None, 'bool foo = false;'), 
+        ('int', 42, 'foo', None, 'int foo = 42;'), 
+        ('int', 92235, 'foo', 'nuclide', 'int foo = pyne::nucname::id(92235);'), 
+        ('int', 'U-235', 'foo', 'nuclide', 'int foo = pyne::nucname::id("U-235");'), 
+        ('float', 42.0, 'foo', None, 'double foo = 42.0;'), 
+        ('double', 42.0, 'foo', None, 'double foo = 42.0;'), 
+        ('std::string', 'wakka', 'foo', None, 'std::string foo("wakka");'),
+        ('cyclus::Blob', 'wakka', 'foo', None, 'cyclus::Blob foo("wakka");'),
         ('boost::uuids::uuid', 
-            '/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb', None, None, 
-            '"/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb"'),
+            '/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb', 'foo', None, 
+            'boost::uuids::uuid foo = "/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb";'),
         ('boost::uuids::uuid', 
-            uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), None, None, 
-            '{0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, '
-            '0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92}'),
-        (('std::vector', 'int'), [42], 'x', None, 
-            'x.resize(1);\n'
-            'x[0] = 42;\n'
+            uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), 'foo', None, 
+            'boost::uuids::uuid foo = {0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, 0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92};'),
+        (('std::vector', 'int'), [42], 'foo', None, 
+            'std::vector< int > foo;foo.resize(1);\n{{ int elem = 42; foo[0] = elem;}}',
             ),
-        (('std::vector', 'int'), [92235], 'x', [None, 'nuclide'], 
-            'x.resize(1);\n'
-            'x[0] = pyne::nucname::id(92235);\n'
+        (('std::vector', 'int'), [92235], 'foo', [None, 'nuclide'], 
+            'std::vector< int > foo;foo.resize(1);\n{{ int elem = pyne::nucname::id(92235); foo[0] = elem;}}',
             ),
-        (('std::set', 'int'), [42, 65], 'x', None, 
-            'x.insert(42);\n'
-            'x.insert(65);\n'
+        (('std::set', 'int'), [42, 65], 'foo', None, 
+            'std::set< int > foo;{{ int elem = 42; foo.insert(elem);}{ int elem = 65; foo.insert(elem);}}',
             ),
-        (('std::list', 'int'), [42, 65], 'x', None, 
-            'x.push_back(42);\n'
-            'x.push_back(65);\n'
+        (('std::list', 'int'), [42, 65], 'foo', None, 
+            'std::list< int > foo;{{ int elem = 42; foo.push_back(elem);}{ int elem = 65; foo.push_back(elem);}}',
             ),
-        (('std::pair', 'int', 'double'), [42, 65.0], None, None, 
-            'std::pair<int, double >(42, 65.0)'
+        (('std::pair', 'int', 'double'), [42, 65.0], 'foo', None, 
+            'int first = 42; double second = 65.0; std::pair< int, double > foo(first, second);',
             ),
-        (('std::map', 'int', 'double'), {42: 65.0}, 'x', None, 
-            'x[42] = 65.0;\n'
+        (('std::map', 'int', 'double'), {42: 65.0}, 'foo', None, 
+            'std::map< int, double > foo;{{ int key = 42; double val = 65.0; foo[key] = val;}}',
             ),
         ]
     for t, v, name, uitype, exp in cases:
@@ -585,13 +579,13 @@ def test_schemafilter_buildschema():
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams']
-    want = '"<element name=\\"streams\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"key\\">\\n"\n"<data type=\\"string\\" />\\n"\n"</element>\\n"\n"<element name=\\"val\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"val\\">\\n"\n"<data type=\\"double\\" />\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n'
+    want = '<element name="streams"><oneOrMore><element name="key"><data type="string" /></element><element name="val"><oneOrMore><element name="val"><data type="double" /></element></oneOrMore></element></oneOrMore></element>'
     got = f._buildschema(cpptype, schematype, uitype, names)
     yield assert_equal, want, got
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams', 'name', ['efficiencies', 'val']]
-    want = '"<element name=\\"streams\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"name\\">\\n"\n"<data type=\\"string\\" />\\n"\n"</element>\\n"\n"<element name=\\"efficiencies\\">\\n"\n"<oneOrMore>\\n"\n"<element name=\\"val\\">\\n"\n"<data type=\\"double\\" />\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n"</oneOrMore>\\n"\n"</element>\\n"\n'
+    want = '<element name="streams"><oneOrMore><element name="name"><data type="string" /></element><element name="efficiencies"><oneOrMore><element name="val"><data type="double" /></element></oneOrMore></element></oneOrMore></element>'
     got = f._buildschema(cpptype, schematype, uitype, names)
     yield assert_equal, want, got
 
