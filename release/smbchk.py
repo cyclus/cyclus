@@ -28,6 +28,8 @@ try:
 except ImportError:
     import json
 
+from abi_whitelist import whitelist
+
 NAME_RE = re.compile('([A-Za-z0-9~_:]+)')
 
 def load(ns):
@@ -115,7 +117,9 @@ def check(db):
         sys.exit('too few entries in database to check for stability')
     stable = True
     for i, (x, y) in enumerate(zip(db[:-1], db[1:])):
-        if not (frozenset(x['symbols']) <= frozenset(y['symbols'])):
+        x = set(_ for _ in x['symbols'] if _.split('(')[0] not in whitelist)
+        y = set(_ for _ in y['symbols'] if _.split('(')[0] not in whitelist)
+        if not (frozenset(x) <= frozenset(y)):
             stable = False
             d = diff(db, i, i+1)
             print(d)
