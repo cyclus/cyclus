@@ -114,7 +114,9 @@ def diff(db, i, j):
     """Diffs two database indices, returns string unified diff."""
     x = db[i]
     y = db[j]
-    lines = difflib.unified_diff(x['symbols'], y['symbols'], 
+    xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in api_whitelist]
+    ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in api_whitelist]
+    lines = difflib.unified_diff(xsym, ysym, 
                                  fromfile=x['version'], tofile=y['version'], 
                                  fromfiledate=x['date'], tofiledate=y['date'])
     return '\n'.join(map(lambda x: x[:-1] if x.endswith('\n') else x, lines))
