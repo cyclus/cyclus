@@ -26,9 +26,9 @@ def find_libcyc():
 
     try:
         base = subprocess.check_output('which cyclus'.split()).strip()
-        tried.append(libcyc)
         libcyc = os.path.join(os.path.dirname(base), 
                               '..', 'lib', 'libcyclus.so')
+        tried.append(libcyc)
         if os.path.exists(libcyc):
             print('lib cyclus exists: ', libcyc)
             return libcyc, tried
@@ -36,13 +36,11 @@ def find_libcyc():
         pass
 
     base = os.path.expanduser('~/anaconda/envs/_build')
-    print('base', base)
     libcyc = os.path.join(os.path.dirname(base), 'lib', 'libcyclus.so')
     tried.append(libcyc)
     if os.path.exists(libcyc):
         print('lib cyclus exists: ', libcyc)
         return libcyc, tried
-    tried.append(libcyc)
     
     cmd = "find / -type f -name libcyclus.so -executable 2>/dev/null"
     try:
