@@ -36,7 +36,7 @@ class MatQuery {
   double mass_frac(std::string nuc);
 
   /// Returns the mass fraction of nuclide nuc in the material.
-  double multi_mass_frac(std::set<Nuc> nucs);
+  double mass_frac(std::set<Nuc> nucs);
 
   /// returns the atom/mole fraction of nuclide nuc in the material.
   double atom_frac(Nuc nuc);

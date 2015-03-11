@@ -36,10 +36,10 @@ TEST(MatQueryTests, MassAndMoles) {
 
   std::set<cyclus::Nuc> nucs ;
   nucs.insert(922350000);
-  double out_frac=mq.multi_mass_frac(nucs);
-  EXPECT_DOUBLE_EQ(mq.multi_mass_frac(nucs), 1.5/(1.5+2.5));  
+  double out_frac=mq.mass_frac(nucs);
+  EXPECT_DOUBLE_EQ(mq.mass_frac(nucs), 1.5/(1.5+2.5));  
   nucs.insert(10070000);
-  EXPECT_DOUBLE_EQ(mq.multi_mass_frac(nucs), 1.0);  
+  EXPECT_DOUBLE_EQ(mq.mass_frac(nucs), 1.0);  
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

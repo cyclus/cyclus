@@ -26,7 +26,7 @@ double MatQuery::mass_frac(Nuc nuc) {
   return v[nuc];
 }
 
-double MatQuery::multi_mass_frac(std::set<Nuc> nucs) {
+double MatQuery::mass_frac(std::set<Nuc> nucs) {
   double m_tot = 0;
   std::set<Nuc>::iterator it ;
   for (it = nucs.begin(); it != nucs.end(); ++it) {
