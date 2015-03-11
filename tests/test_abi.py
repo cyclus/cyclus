@@ -33,6 +33,13 @@ def find_libcyc():
     except subprocess.CalledProcessError:
         pass
 
+    base = os.path.expanduser('~/anaconda/envs/_build')
+    print('base', base)
+    libcyc = os.path.join(os.path.dirname(base), 'lib', 'libcyclus.so')
+    if os.path.exists(libcyc):
+        print('lib cyclus exists: ', libcyc)
+        return libcyc
+    
     cmd = "find / -type f -name libcyclus.so -executable 2>/dev/null"
     try:
         output = subprocess.check_output(cmd, shell=True, 
