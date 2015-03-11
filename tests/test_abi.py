@@ -20,8 +20,18 @@ except ImportError:
 def find_libcyc():
     libcyc = os.path.join(cycdir, 'build', 'lib', 'libcyclus.so')
     if os.path.exists(libcyc):
-        print('lib cyc exists in build: ', libcyc)
+        print('lib cyclus exists: ', libcyc)
         return libcyc
+
+    try:
+        base = subprocess.check_output('which cyclus'.split()).strip()
+        libcyc = os.path.join(os.path.dirname(base), 
+                              '..', 'lib', 'libcyclus.so')
+        if os.path.exists(libcyc):
+            print('lib cyclus exists: ', libcyc)
+            return libcyc
+    except subprocess.CalledProcessError:
+        pass
 
     cmd = "find / -type f -name libcyclus.so -executable 2>/dev/null"
     try:
