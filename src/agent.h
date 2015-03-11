@@ -431,6 +431,9 @@ class Agent : public StateWrangler, virtual public Ider {
   /// subclasses must set this variable in their constructor(s).
   std::string kind_;
 
+  /// length of time this agent is intended to operate
+  int lifetime_;
+
  private:
   /// Prevents creation/use of copy constructors (including in subclasses).
   /// Cloning and InitFrom should be used instead.
@@ -458,9 +461,6 @@ class Agent : public StateWrangler, virtual public Ider {
 
   /// born on date of this agent
   int enter_time_;
-
-  /// length of time this agent is intended to operate
-  int lifetime_;
 
   std::string prototype_;
 
