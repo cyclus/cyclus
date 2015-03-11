@@ -18,15 +18,15 @@ except ImportError:
     smbchk = None
 
 def find_libcyc():
-    tried = []
     libcyc = os.path.join(cycdir, 'build', 'lib', 'libcyclus.so')
+    tried = [libcyc]
     if os.path.exists(libcyc):
         print('lib cyclus exists: ', libcyc)
         return libcyc, tried
-    tried.append(libcyc)
 
     try:
         base = subprocess.check_output('which cyclus'.split()).strip()
+        tried.append(libcyc)
         libcyc = os.path.join(os.path.dirname(base), 
                               '..', 'lib', 'libcyclus.so')
         if os.path.exists(libcyc):
@@ -34,11 +34,11 @@ def find_libcyc():
             return libcyc, tried
     except subprocess.CalledProcessError:
         pass
-    tried.append(libcyc)
 
     base = os.path.expanduser('~/anaconda/envs/_build')
     print('base', base)
     libcyc = os.path.join(os.path.dirname(base), 'lib', 'libcyclus.so')
+    tried.append(libcyc)
     if os.path.exists(libcyc):
         print('lib cyclus exists: ', libcyc)
         return libcyc, tried
