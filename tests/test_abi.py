@@ -61,8 +61,8 @@ def test_abi_stability():
         raise SkipTest('can only check for ABI stability on posix systems.')
     libcyc, tried = find_libcyc()
     if not os.path.exists(libcyc):
-        msg = 'libcyclus could not be found, cannot check for ABI stability\n'
-        msg += 'Final libcyc: {}\nTried: {}\nHOME: {}'.format(
+        msg = 'libcyclus could not be found, cannot check for ABI stability '
+        msg += 'Final libcyc: {} Tried: {} HOME: {}'.format(
             libcyc, tried, os.environ['HOME']) 
         raise SkipTest(msg)
     prefix = os.path.join(os.path.dirname(libcyc), '..')
