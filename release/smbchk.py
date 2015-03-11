@@ -30,10 +30,10 @@ except ImportError:
 
 NAME_RE = re.compile('([A-Za-z0-9~_:]+)')
 
-"""A greylist for private API that gets caught by `nm`. Add additional
+"""A blacklist for private API that gets caught by `nm`. Add additional
 functions as needed.
 """
-api_greylist = {
+api_blacklist = {
     'cyclus::SimInit::LoadResource',
     'cyclus::SimInit::LoadMaterial',
     'cyclus::SimInit::LoadProduct',
@@ -114,8 +114,8 @@ def diff(db, i, j):
     """Diffs two database indices, returns string unified diff."""
     x = db[i]
     y = db[j]
-    xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in api_greylist]
-    ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in api_greylist]
+    xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in api_blacklist]
+    ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in api_blacklist]
     lines = difflib.unified_diff(xsym, ysym, 
                                  fromfile=x['version'], tofile=y['version'], 
                                  fromfiledate=x['date'], tofiledate=y['date'])
@@ -127,8 +127,8 @@ def check(db):
         sys.exit('too few entries in database to check for stability')
     stable = True
     for i, (x, y) in enumerate(zip(db[:-1], db[1:])):
-        x = set(_ for _ in x['symbols'] if _.split('(')[0] not in api_greylist)
-        y = set(_ for _ in y['symbols'] if _.split('(')[0] not in api_greylist)
+        x = set(_ for _ in x['symbols'] if _.split('(')[0] not in api_blacklist)
+        y = set(_ for _ in y['symbols'] if _.split('(')[0] not in api_blacklist)
         if not (frozenset(x) <= frozenset(y)):
             stable = False
             d = diff(db, i, i+1)
