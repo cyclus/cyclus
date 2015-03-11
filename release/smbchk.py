@@ -28,9 +28,17 @@ try:
 except ImportError:
     import json
 
-from abi_whitelist import whitelist
-
 NAME_RE = re.compile('([A-Za-z0-9~_:]+)')
+
+"""A whitelist for private API that gets caught by `nm`. Add additional
+functions as needed.
+"""
+api_whitelist = {
+    'cyclus::SimInit::LoadResource',
+    'cyclus::SimInit::LoadMaterial',
+    'cyclus::SimInit::LoadProduct',
+    'cyclus::SimInit::LoadComposition',
+}
 
 def load(ns):
     """Loads a database of symbols or returns an empty list."""
@@ -117,8 +125,8 @@ def check(db):
         sys.exit('too few entries in database to check for stability')
     stable = True
     for i, (x, y) in enumerate(zip(db[:-1], db[1:])):
-        x = set(_ for _ in x['symbols'] if _.split('(')[0] not in whitelist)
-        y = set(_ for _ in y['symbols'] if _.split('(')[0] not in whitelist)
+        x = set(_ for _ in x['symbols'] if _.split('(')[0] not in api_whitelist)
+        y = set(_ for _ in y['symbols'] if _.split('(')[0] not in api_whitelist)
         if not (frozenset(x) <= frozenset(y)):
             stable = False
             d = diff(db, i, i+1)
