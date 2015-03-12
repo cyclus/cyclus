@@ -414,7 +414,7 @@ def check_itdbfilter_val(exp, f, t, v, name, uitype):
     assert_equal(exp, obs)
 
 def test_itdbfilter_val():
-    """Test InfileToDbFilter._val()"""
+    """Test InfileToDbFilter._val() Defaults"""
     m = MockCodeGenMachine()
     f = InfileToDbFilter(m)
 
@@ -495,6 +495,65 @@ def test_itdbfilter_val():
              '  {\n'
              '    int key = 42;\n'
              '    double val = 65.0;\n'
+             '    foo[key] = val;\n'
+             '  }\n'
+             '}\n'),
+            ),
+        (('std::map', 'std::string', ('std::pair', 'bool', ('std::vector', 'double'))),
+            OrderedDict([('hello', [True, [1.1, 2.2, 3.3]]), ('goodbye', [False, [3.3, 2.2, 1.1]])]),
+            'foo', None,
+            ('std::map< std::string, std::pair< bool, std::vector< double > > > foo;\n'
+             '{\n'
+             '  {\n'
+             '    std::string key("hello");\n'
+             '    std::pair< bool, std::vector< double > > val;\n'
+             '    {\n'
+             '      bool first = true;\n'
+             '      std::vector< double > second;\n'
+             '      second.resize(3);\n'
+             '      {\n'
+             '        {\n'
+             '          double elem = 1.1;\n'
+             '          second[0] = elem;\n'
+             '        }\n'
+             '        {\n'
+             '          double elem = 2.2;\n'
+             '          second[1] = elem;\n'
+             '        }\n'
+             '        {\n'
+             '          double elem = 3.3;\n'
+             '          second[2] = elem;\n'
+             '        }\n'
+             '      }\n'
+             '      val.first = first;\n'
+             '      val.second = second;\n'
+             '    }\n'
+             '    foo[key] = val;\n'
+             '  }\n'
+             '  {\n'
+             '    std::string key("goodbye");\n'
+             '    std::pair< bool, std::vector< double > > val;\n'
+             '    {\n'
+             '      bool first = false;\n'
+             '      std::vector< double > second;\n'
+             '      second.resize(3);\n'
+             '      {\n'
+             '        {\n'
+             '          double elem = 3.3;\n'
+             '          second[0] = elem;\n'
+             '        }\n'
+             '        {\n'
+             '          double elem = 2.2;\n'
+             '          second[1] = elem;\n'
+             '        }\n'
+             '        {\n'
+             '          double elem = 1.1;\n'
+             '          second[2] = elem;\n'
+             '        }\n'
+             '      }\n'
+             '      val.first = first;\n'
+             '      val.second = second;\n'
+             '    }\n'
              '    foo[key] = val;\n'
              '  }\n'
              '}\n'),
@@ -657,34 +716,6 @@ def test_escape_xml():
 
     yield assert_equal, s, got
 
-def test_infiletodb_val():
-    m = MockCodeGenMachine()
-    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
-            ('x', {'type': 'int', 'uitype': 'nuclide'}),
-            ]))
-            ])}
-    f = InfileToDbFilter(m)
-
-    cases = (
-        ('bool', True, 'bool mymap = true;'),
-        ('int', 42, 'int mymap = 42;'),
-        ('double', 4.2, 'double mymap = 4.2;'),
-        ('cyclus::Blob', 'hello', 'cyclus::Blob mymap("hello");'),
-        ('boost::uuids::uuid', uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), 'boost::uuids::uuid mymap = {0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, 0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92};'),
-        (('std::set', 'int'), [1, 2, 3], 'std::set< int > mymap;{{ int elem = 1; mymap.insert(elem);}{ int elem = 2; mymap.insert(elem);}{ int elem = 3; mymap.insert(elem);}}'),
-        (('std::list', 'int'), [1, 2, 3], 'std::list< int > mymap;{{ int elem = 1; mymap.push_back(elem);}{ int elem = 2; mymap.push_back(elem);}{ int elem = 3; mymap.push_back(elem);}}'),
-        (('std::vector', 'int'), [1, 2, 3], 'std::vector< int > mymap;mymap.resize(3);\n{{ int elem = 1; mymap[0] = elem;}{ int elem = 2; mymap[1] = elem;}{ int elem = 3; mymap[2] = elem;}}'),
-
-        (('std::map', 'int', 'double'), {1: 1.1, 2:2.2, 3:3.3}, 'std::map< int, double > mymap;{{ int key = 1; double val = 1.1; mymap[key] = val;}{ int key = 2; double val = 2.2; mymap[key] = val;}{ int key = 3; double val = 3.3; mymap[key] = val;}}'),
-        (('std::pair', 'int', 'double'), [1, 2], 'std::pair< int, double > mymap;{int first = 1; double second = 2; mymap.first = first; mymap.second = second;}'),
-        (('std::map', 'std::string', ('std::pair', 'bool', ('std::vector', 'double'))),
-            OrderedDict([('hello', [True, [1.1, 2.2, 3.3]]), ('goodbye', [False, [3.3, 2.2, 1.1]])]), 'std::map< std::string, std::pair< bool, std::vector< double > > > mymap;{{ std::string key("hello"); std::pair< bool, std::vector< double > > val;{bool first = true; std::vector< double > second;second.resize(3);\n{{ double elem = 1.1; second[0] = elem;}{ double elem = 2.2; second[1] = elem;}{ double elem = 3.3; second[2] = elem;}} val.first = first; val.second = second;} mymap[key] = val;}{ std::string key("goodbye"); std::pair< bool, std::vector< double > > val;{bool first = false; std::vector< double > second;second.resize(3);\n{{ double elem = 3.3; second[0] = elem;}{ double elem = 2.2; second[1] = elem;}{ double elem = 1.1; second[2] = elem;}} val.first = first; val.second = second;} mymap[key] = val;}}')
-        )
-
-    for cpptype, val, want in cases:
-        gen = f._val(cpptype, val=val, name='mymap', uitype=None)
-        yield assert_equal, want, gen
-
 def test_infiletodb_read_member():
     m = MockCodeGenMachine()
     m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
@@ -747,6 +778,10 @@ def test_infiletodb_read_member():
         '    }\n'
         'mymap = mymap_in;}'
         )
+
+    print('gotted:')
+    pprint.pprint(gen)
+    print('')
     yield assert_equal, exp_gen, gen
 
 def test_nuclide_uitype():

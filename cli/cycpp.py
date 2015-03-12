@@ -1229,26 +1229,28 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # fill in template and return 
         return template.format(**kw)
 
-    def read_member(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_member(self, member, alias, t, uitype=None, ind='  ', idx=None):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
 
-        s = '{0} {1};'.format(type_to_str(t), member)
+        s = ind + '{0} {1};\n'.format(type_to_str(t), member)
         mname = member + '_in'
         tt = t if isinstance(t, STRING_TYPES) else t[0]
         reader = self.readers.get(tt, None)
-        s += '{'
-        s += reader(mname, alias, t, uitype, ind + '  ', idx=idx)
-        s += '{0} = {1};'.format(member, mname)
-        s += '}'
+        s += ind + '{\n'
+        ind += '  '
+        s += reader(mname, alias, t, uitype, ind=ind, idx=idx)
+        s += ind + '{0} = {1};\n'.format(member, mname)
+        ind = ind[:-2]
+        s += ind + '}\n'
         return s
 
-    def read_primitive(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_primitive(self, member, alias, t, uitype=None, ind='  ', idx=None):
         query = self._query('sub', alias, t, uitype, idx=idx)
-        s = '{ind}{t} {member} = {query};\n'.format(t=t, ind=ind, member=member, query=query)
+        s = ind + '{t} {member} = {query};\n'.format(t=t, member=member, query=query)
         return s
 
-    def read_vector(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_vector(self, member, alias, t, uitype=None, ind='  ', idx=None):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] == None:
@@ -1257,13 +1259,13 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
-        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
-        s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + '{0}.resize(n);\n'.format(member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        s += ind + self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
         s += ind + '  {0}[i] = elem;\n'.format(member)
         s += ind + '}\n'
         return s
@@ -1276,12 +1278,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
-        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
-        s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        s += ind + self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
         s += ind + '  {0}.insert(elem);\n'.format(member)
         s += ind + '}\n'
         return s
@@ -1294,12 +1296,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
-        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
-        s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        s += ind + self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
         s += ind + '  {0}.push_back(elem);\n'.format(member)
         s += ind + '}\n'
         return s
@@ -1314,10 +1316,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
-        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
-        s += ind + self.read_member('first', alias[1], t[1], uitype[1], ind+'  ')
-        s += ind + self.read_member('second', alias[2], t[2], uitype[2], ind+'  ')
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        s += self.read_member('first', alias[1], t[1], uitype[1], ind+'  ')
+        s += self.read_member('second', alias[2], t[2], uitype[2], ind+'  ')
         s += ind + '{0} {1}(first, second);\n'.format(type_to_str(t), member)
         return s
 
@@ -1331,13 +1333,13 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        s = '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
-        s += '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
-        s += 'int n = sub->NMatches("{0}");\n'.format(alias[1])
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (i = 0; i < n; ++i) {\n'
-        s += ind + self.read_member('key', alias[1], t[1], uitype[1], ind+'  ', idx='i')
-        s += ind + self.read_member('val', alias[2], t[2], uitype[2], ind+'  ', idx='i')
+        s += self.read_member('key', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += self.read_member('val', alias[2], t[2], uitype[2], ind+'  ', idx='i')
         s += ind + '  {0}[key] = val;\n'.format(member)
         s += ind + '}\n'
         return s
