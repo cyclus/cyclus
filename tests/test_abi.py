@@ -17,6 +17,9 @@ try:
 except ImportError:
     smbchk = None
 
+def test_failure():
+    assert_true(False)
+
 def test_abi_stability():
     if smbchk is None:
         raise SkipTest('Could not import smbchk!')
