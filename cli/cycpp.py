@@ -141,12 +141,9 @@ def prepare_type(cpptype, othertype):
             othertype = [othertype]
 
         if othertype is None:
-            othertype = []
-            for v in cpptype:
-                othertype.append(None)
+            othertype = [None] * len(cpptype)
         elif len(othertype) < len(cpptype):
-            for i in range(len(cpptype)-len(othertype)):
-                othertype.append(None)
+            othertype.extend([None] * (len(cpptype) - len(othertype)))
         return othertype
     else:
         return othertype
@@ -1110,7 +1107,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         if isinstance(val, STRING_TYPES):
             v += '"{0}"'.format(val)
         elif isinstance(val, uuid.UUID):
-            l = [x+y for x,y in zip(val.hex[::1], val.hex[1::2])]
+            l = [x+y for x, y in zip(val.hex[::1], val.hex[1::2])]
             v += '{0x' + ', 0x'.join(l) + '}'
         else:
             msg = "could not interpret UUID type of {0}"
@@ -1486,15 +1483,12 @@ class SchemaFilter(CodeGeneratorFilter):
             name = 'map'
             if names[0] is not None:
                 name = names[0]
-
             keynames = 'key' if isinstance(cpptype[1], STRING_TYPES) else ['key']
             if names[1] is not None:
                 keynames = names[1]
-
             valnames = 'val' if isinstance(cpptype[2], STRING_TYPES) else ['val']
             if names[1] is not None:
                 valnames = names[2]
-
             impl += '<element name="{0}">'.format(name)
             impl += '<oneOrMore>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], keynames)
@@ -1505,15 +1499,12 @@ class SchemaFilter(CodeGeneratorFilter):
             name = 'pair'
             if names[0] is not None:
                 name = names[0]
-
             firstname = 'first' if isinstance(cpptype[1], STRING_TYPES) else ['first']
             if names[1] is not None:
                 firstname = names[1]
-
             secondname = 'second' if isinstance(cpptype[2], STRING_TYPES) else ['second']
             if names[2] is not None:
                 secondname = names[2]
-
             impl += '<element name="{0}">'.format(name)
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
