@@ -54,6 +54,9 @@ def find_libcyc():
     print('lib cyc found with find: ', output)
     return libcyc, tried
 
+def test_failure():
+    assert_true(False)
+
 def test_abi_stability():
     if smbchk is None:
         raise SkipTest('Could not import smbchk!')
