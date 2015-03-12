@@ -96,7 +96,7 @@ class MockAgent {
 /// cyclus::MockSim sim(cyclus::AgentSpec(":agents:Source"), config, dur);
 /// sim.AddSink("enriched_u").Finalize();
 /// sim.AddRecipe("fresh_fuel", fresh);
-/// sim.Run();
+/// int src_id = sim.Run(); // capture the agent ID of the facility being tested
 ///
 /// @endcode
 ///
@@ -111,9 +111,22 @@ class MockAgent {
 ///
 /// @code
 ///
-///  cyclus::QueryResult qr = sim.db().Query("Transactions", NULL);
-///  int n_trans = qr.rows.size();
-///  EXPECT_EQ(10, n_trans) << "expected 10 transactions, got " << n_trans;
+/// // return all transactions where our source facility is the sender
+/// std::vector<cyclus::Cond> conds;
+/// conds.push_back("SenderId", "==", src_id);
+/// cyclus::QueryResult qr = sim.db().Query("Transactions", &conds);
+/// int n_trans = qr.rows.size();
+/// EXPECT_EQ(10, n_trans) << "expected 10 transactions, got " << n_trans;
+///
+/// // reconstruct the material object for the first transaction
+/// int res_id = qr.GetVal<int>("ResourceId", 0);
+/// cyclus::Material::Ptr m = sim.GetMaterial(res_id);
+/// EXPECT_DOUBLE_EQ(10, m->quantity());
+///
+/// // confirm composition is as expected
+/// cyclus::toolkit::MatQuery mq(m);
+/// EXPECT_DOUBLE_EQ(0.5, mq.mass(922350000));
+/// EXPECT_DOUBLE_EQ(9.5, mq.mass(922380000));
 ///
 /// @endcode
 class MockSim {
@@ -125,6 +138,8 @@ class MockSim {
   /// "<[AgentName]>" tags.  duration is the length of the simulation in time
   /// steps.
   MockSim(AgentSpec spec, std::string config, int duration);
+
+  ~MockSim();
 
   /// AddSource adds a source facility that can offer/provide material to the
   /// archetype being tested.  commod specifies the commodity the source will
@@ -169,16 +184,26 @@ class MockSim {
   /// with this function.
   void AddRecipe(std::string name, Composition::Ptr c);
 
-  /// Run the simulation.  This can only be called once.  After the simulation
+  /// Runs the simulation.  This can only be called once.  After the simulation
   /// has been run, this MockSim object CANNOT be reused to run other
   /// simulations.  Run returns the agent ID for the agent being tested for
   /// use in queries.
   int Run();
 
+  /// Reconstructs a material object from the simulation results database with
+  /// the given resource state id.
+  Material::Ptr GetMaterial(int resid);
+
+  /// Reconstructs a product object from the simulation results database with
+  /// the given resource state id.
+  Product::Ptr GetProduct(int resid);
+
   /// Returns the underlying in-memory database containing results for
   /// the simulation.  Run must be called before the database will contain
   /// anything.
   SqliteBack& db();
+
+  Agent* agent;
 
  private:
   Context ctx_;

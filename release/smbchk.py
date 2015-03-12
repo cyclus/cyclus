@@ -30,6 +30,16 @@ except ImportError:
 
 NAME_RE = re.compile('([A-Za-z0-9~_:]+)')
 
+"""A blacklist for private API that gets caught by `nm`. Add additional
+functions as needed.
+"""
+api_blacklist = {
+    'cyclus::SimInit::LoadResource',
+    'cyclus::SimInit::LoadMaterial',
+    'cyclus::SimInit::LoadProduct',
+    'cyclus::SimInit::LoadComposition',
+}
+
 def load(ns):
     """Loads a database of symbols or returns an empty list."""
     if not os.path.isfile(ns.filename):
@@ -104,7 +114,9 @@ def diff(db, i, j):
     """Diffs two database indices, returns string unified diff."""
     x = db[i]
     y = db[j]
-    lines = difflib.unified_diff(x['symbols'], y['symbols'], 
+    xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in api_blacklist]
+    ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in api_blacklist]
+    lines = difflib.unified_diff(xsym, ysym, 
                                  fromfile=x['version'], tofile=y['version'], 
                                  fromfiledate=x['date'], tofiledate=y['date'])
     return '\n'.join(map(lambda x: x[:-1] if x.endswith('\n') else x, lines))
@@ -115,7 +127,9 @@ def check(db):
         sys.exit('too few entries in database to check for stability')
     stable = True
     for i, (x, y) in enumerate(zip(db[:-1], db[1:])):
-        if not (frozenset(x['symbols']) <= frozenset(y['symbols'])):
+        x = set(_ for _ in x['symbols'] if _.split('(')[0] not in api_blacklist)
+        y = set(_ for _ in y['symbols'] if _.split('(')[0] not in api_blacklist)
+        if not (frozenset(x) <= frozenset(y)):
             stable = False
             d = diff(db, i, i+1)
             print(d)

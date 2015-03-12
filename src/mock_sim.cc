@@ -1,6 +1,7 @@
 #include "mock_sim.h"
 
 #include "cyclus.h"
+#include "sim_init.h"
 #include <sstream>
 
 namespace cyclus {
@@ -112,7 +113,9 @@ std::string MockAgent::Finalize() {
 ///////// MockSim ////////////
 
 MockSim::MockSim(AgentSpec spec, std::string config, int duration)
-    : ctx_(&ti_, &rec_), back_(NULL) {
+    : ctx_(&ti_, &rec_), back_(NULL), agent(NULL) {
+  Env::SetNucDataPath();
+  warn_limit = 0;
   back_ = new SqliteBack(":memory:");
   rec_.RegisterBackend(back_);
   ti_.Initialize(&ctx_, SimInfo(duration));
@@ -125,8 +128,13 @@ MockSim::MockSim(AgentSpec spec, std::string config, int duration)
   InitAgent(a, xml, &rec_, back_);
 
   ctx_.AddPrototype(a->prototype(), a);
-  a = ctx_.CreateAgent<Agent>(a->prototype());
-  a->Build(NULL);
+  agent = ctx_.CreateAgent<Agent>(a->prototype());
+}
+
+MockSim::~MockSim() {
+  warn_limit = 42;
+  rec_.Close();
+  delete back_;
 }
 
 MockAgent MockSim::AddSource(std::string commod) {
@@ -146,12 +154,18 @@ void MockSim::AddRecipe(std::string name, Composition::Ptr c) {
 }
 
 int MockSim::Run() {
+  agent->Build(NULL);
   ti_.RunSim();
   rec_.Flush();
-  std::vector<Cond> conds;
-  conds.push_back(Cond("Prototype", "==", std::string("agent_being_tested")));
-  QueryResult qr = back_->Query("AgentEntry", &conds);
-  return qr.GetVal<int>("AgentId");
+  return agent->id();
+}
+
+Material::Ptr MockSim::GetMaterial(int resid) {
+  return SimInit::BuildMaterial(back_, resid);
+}
+
+Product::Ptr MockSim::GetProduct(int resid) {
+  return SimInit::BuildProduct(back_, resid);
 }
 
 SqliteBack& MockSim::db() { return *back_; }
