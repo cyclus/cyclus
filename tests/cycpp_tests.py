@@ -408,6 +408,9 @@ def test_itdbfilter():
 
 def check_itdbfilter_val(exp, f, t, v, name, uitype):
     obs = f._val(t, val=v, name=name, uitype=uitype)
+    print('gotted:')
+    pprint.pprint(obs)
+    print('')
     assert_equal(exp, obs)
 
 def test_itdbfilter_val():
@@ -416,38 +419,85 @@ def test_itdbfilter_val():
     f = InfileToDbFilter(m)
 
     cases = [
-        ('bool', True, 'foo', None, 'bool foo = true;'), 
-        ('bool', False, 'foo', None, 'bool foo = false;'), 
-        ('int', 42, 'foo', None, 'int foo = 42;'), 
-        ('int', 92235, 'foo', 'nuclide', 'int foo = pyne::nucname::id(92235);'), 
-        ('int', 'U-235', 'foo', 'nuclide', 'int foo = pyne::nucname::id("U-235");'), 
-        ('float', 42.0, 'foo', None, 'double foo = 42.0;'), 
-        ('double', 42.0, 'foo', None, 'double foo = 42.0;'), 
-        ('std::string', 'wakka', 'foo', None, 'std::string foo("wakka");'),
-        ('cyclus::Blob', 'wakka', 'foo', None, 'cyclus::Blob foo("wakka");'),
+        ('bool', True, 'foo', None, 'bool foo = true;\n'), 
+        ('bool', False, 'foo', None, 'bool foo = false;\n'), 
+        ('int', 42, 'foo', None, 'int foo = 42;\n'), 
+        ('int', 92235, 'foo', 'nuclide', 'int foo = pyne::nucname::id(92235);\n'), 
+        ('int', 'U-235', 'foo', 'nuclide', 'int foo = pyne::nucname::id("U-235");\n'), 
+        ('float', 42.0, 'foo', None, 'double foo = 42.0;\n'), 
+        ('double', 42.0, 'foo', None, 'double foo = 42.0;\n'), 
+        ('std::string', 'wakka', 'foo', None, 'std::string foo("wakka");\n'),
+        ('cyclus::Blob', 'wakka', 'foo', None, 'cyclus::Blob foo("wakka");\n'),
         ('boost::uuids::uuid', 
             '/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb', 'foo', None, 
-            'boost::uuids::uuid foo = "/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb";'),
+            'boost::uuids::uuid foo = "/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb";\n'),
         ('boost::uuids::uuid', 
             uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), 'foo', None, 
-            'boost::uuids::uuid foo = {0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, 0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92};'),
+            'boost::uuids::uuid foo = {0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, 0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92};\n'),
         (('std::vector', 'int'), [42], 'foo', None, 
-            'std::vector< int > foo;foo.resize(1);\n{{ int elem = 42; foo[0] = elem;}}',
+            ('std::vector< int > foo;\n'
+             'foo.resize(1);\n'
+             '{\n'
+             '  {\n'
+             '    int elem = 42;\n'
+             '    foo[0] = elem;\n'
+             '  }\n'
+             '}\n'),
             ),
         (('std::vector', 'int'), [92235], 'foo', [None, 'nuclide'], 
-            'std::vector< int > foo;foo.resize(1);\n{{ int elem = pyne::nucname::id(92235); foo[0] = elem;}}',
+            ('std::vector< int > foo;\n'
+             'foo.resize(1);\n'
+             '{\n'
+             '  {\n'
+             '    int elem = pyne::nucname::id(92235);\n'
+             '    foo[0] = elem;\n'
+             '  }\n'
+             '}\n'),
             ),
         (('std::set', 'int'), [42, 65], 'foo', None, 
-            'std::set< int > foo;{{ int elem = 42; foo.insert(elem);}{ int elem = 65; foo.insert(elem);}}',
+            ('std::set< int > foo;\n'
+             '{\n'
+             '  {\n'
+             '    int elem = 42;\n'
+             '    foo.insert(elem);\n'
+             '  }\n'
+             '  {\n'
+             '    int elem = 65;\n'
+             '    foo.insert(elem);\n'
+             '  }\n'
+             '}\n'),
             ),
         (('std::list', 'int'), [42, 65], 'foo', None, 
-            'std::list< int > foo;{{ int elem = 42; foo.push_back(elem);}{ int elem = 65; foo.push_back(elem);}}',
+            ('std::list< int > foo;\n'
+             '{\n'
+             '  {\n'
+             '    int elem = 42;\n'
+             '    foo.push_back(elem);\n'
+             '  }\n'
+             '  {\n'
+             '    int elem = 65;\n'
+             '    foo.push_back(elem);\n'
+             '  }\n'
+             '}\n'),
             ),
         (('std::pair', 'int', 'double'), [42, 65.0], 'foo', None, 
-            'std::pair< int, double > foo;{int first = 42; double second = 65.0; foo.first = first; foo.second = second;}',
+            ('std::pair< int, double > foo;\n'
+             '{\n'
+             '  int first = 42;\n'
+             '  double second = 65.0;\n'
+             '  foo.first = first;\n'
+             '  foo.second = second;\n'
+             '}\n'),
             ),
         (('std::map', 'int', 'double'), {42: 65.0}, 'foo', None, 
-            'std::map< int, double > foo;{{ int key = 42; double val = 65.0; foo[key] = val;}}',
+            ('std::map< int, double > foo;\n'
+             '{\n'
+             '  {\n'
+             '    int key = 42;\n'
+             '    double val = 65.0;\n'
+             '    foo[key] = val;\n'
+             '  }\n'
+             '}\n'),
             ),
         ]
     for t, v, name, uitype, exp in cases:

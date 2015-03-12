@@ -1069,7 +1069,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         """returns a format string for a type t"""
         return '"{0}"' if t == 'std::string' else '{0}'
 
-    def _val(self, t, val=None, name=None, uitype=None):
+    def _val(self, t, val=None, name=None, uitype=None, ind=''):
         """Returns a string that represents a Python value (val) of a given 
         type (t) in C++. For types that do not have an expression 
         representation, the variable (name) may also be used. If a value
@@ -1077,33 +1077,33 @@ class InfileToDbFilter(CodeGeneratorFilter):
         """
         key = t if isinstance(t, STRING_TYPES) else t[0]
         if val is None:
-            return self._vals[key](t, name=name, uitype=uitype)
+            return self._vals[key](t, name=name, uitype=uitype, ind=ind)
         else:
-            return self._vals[key](t, val=val, name=name, uitype=uitype)
+            return self._vals[key](t, val=val, name=name, uitype=uitype, ind=ind)
 
-    def _val_bool(self, t, val=False, name='boolvar', uitype=None):
-        return 'bool {0} = {1};'.format(name, 'true' if val else 'false')
+    def _val_bool(self, t, val=False, name='boolvar', uitype=None, ind=''):
+        return ind + 'bool {0} = {1};\n'.format(name, 'true' if val else 'false')
 
-    def _val_int(self, t, val=0, name='intvar', uitype=None):
+    def _val_int(self, t, val=0, name='intvar', uitype=None, ind=''):
         if uitype == 'nuclide':
             fmt = '"{0}"' if isinstance(val, STRING_TYPES) else '{0}'
             v = fmt.format(val)
-            v = 'int {0} = pyne::nucname::id({1});'.format(name, v)
+            v = ind + 'int {0} = pyne::nucname::id({1});\n'.format(name, v)
         else:
-            v = 'int {0} = {1};'.format(name, val)
+            v = ind + 'int {0} = {1};\n'.format(name, val)
         return v
 
-    def _val_floating(self, t, val=0.0, name='floatvar', uitype=None):
-        return 'double {0} = {1};'.format(name, val)
+    def _val_floating(self, t, val=0.0, name='floatvar', uitype=None, ind=''):
+        return ind + 'double {0} = {1};\n'.format(name, val)
 
-    def _val_string(self, t, val='', name='stringvar', uitype=None):
-        return 'std::string {0}("{1}");'.format(name, val)
+    def _val_string(self, t, val='', name='stringvar', uitype=None, ind=''):
+        return ind + 'std::string {0}("{1}");\n'.format(name, val)
 
-    def _val_blob(self, t, val='', name='blobvar', uitype=None):
-        return 'cyclus::Blob {0}("{1}");'.format(name, val)
+    def _val_blob(self, t, val='', name='blobvar', uitype=None, ind=''):
+        return ind + 'cyclus::Blob {0}("{1}");\n'.format(name, val)
 
-    def _val_uuid(self, t, val='', name='uuidvar', uitype=None):
-        v = 'boost::uuids::uuid {0} = '.format(name)
+    def _val_uuid(self, t, val='', name='uuidvar', uitype=None, ind=''):
+        v = ind + 'boost::uuids::uuid {0} = '.format(name)
         if isinstance(val, STRING_TYPES):
             v += '"{0}"'.format(val)
         elif isinstance(val, uuid.UUID):
@@ -1112,75 +1112,104 @@ class InfileToDbFilter(CodeGeneratorFilter):
         else:
             msg = "could not interpret UUID type of {0}"
             raise TypeError(msg.format(val))
-        return v + ';'
+        return v + ';\n'
 
-    def _val_vector(self, t, val=(), name='vecvar', uitype=None):
+    def _val_vector(self, t, val=(), name='vecvar', uitype=None, ind=''):
         uitype = prepare_type(t, uitype)
         elemname = 'elem'
 
-        v = '{0} {1};'.format(type_to_str(t), name)
-        v += '{0}.resize({1});\n'.format(name, len(val))
-        v += '{'
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{0}.resize({1});\n'.format(name, len(val))
+        v += ind + '{\n'
+        ind += '  '
         for i, x in enumerate(val):
-            x = self._val(t[1], val=x, uitype=uitype[1], name=elemname)
-            v += '{{ {0} {1}[{2}] = {3};}}'.format(x, name, i, elemname)
-        v += '}'
+            v += ind + '{\n'
+            ind += '  '
+            v += self._val(t[1], val=x, uitype=uitype[1],
+                           name=elemname, ind=ind)
+            v += ind + '{0}[{1}] = {2};\n'.format(name, i, elemname)
+            ind = ind[:-2]
+            v += ind + '}\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
 
         return v
 
-    def _val_set(self, t, val=frozenset(), name='setvar', uitype=None):
+    def _val_set(self, t, val=frozenset(), name='setvar', uitype=None, ind=''):
         uitype = prepare_type(t, uitype)
         elemname = 'elem'
 
-        v = '{0} {1};'.format(type_to_str(t), name)
-        v += '{'
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
         for i, x in enumerate(val):
-            x = self._val(t[1], val=x, uitype=uitype[1], name=elemname)
-            v += '{{ {0} {1}.insert({2});}}'.format(x, name, elemname)
-        v += '}'
+            v += ind + '{\n'
+            ind += '  '
+            v += self._val(t[1], val=x, uitype=uitype[1],
+                           name=elemname, ind=ind)
+            v += ind + '{0}.insert({1});\n'.format(name, elemname)
+            ind = ind[:-2]
+            v += ind + '}\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
 
         return v
 
-    def _val_list(self, t, val=(), name='listvar', uitype=None):
+    def _val_list(self, t, val=(), name='listvar', uitype=None, ind=''):
         uitype = prepare_type(t, uitype)
         elemname = 'elem'
 
-        v = '{0} {1};'.format(type_to_str(t), name)
-        v += '{'
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
         for i, x in enumerate(val):
-            x = self._val(t[1], val=x, uitype=uitype[1], name=elemname)
-            v += '{{ {0} {1}.push_back({2});}}'.format(x, name, elemname)
-        v += '}'
+            v += ind + '{\n'
+            ind += '  '
+            v += self._val(t[1], val=x, uitype=uitype[1],
+                           name=elemname, ind=ind)
+            v += ind + '{0}.push_back({1});\n'.format(name, elemname)
+            ind = ind[:-2]
+            v += ind + '}\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
 
         return v
 
     def _val_pair(self, t, val=(None, None), name=None, 
-                  uitype=(None, None, None)):
+                  uitype=(None, None, None), ind=''):
         ftype, stype = t[1], t[2]
         uitype = prepare_type(t, uitype)
 
         fname, sname = 'first', 'second'
-        first = self._val(ftype, val=val[0], uitype=uitype[1], name=fname)
-        second = self._val(stype, val=val[1], uitype=uitype[2], name=sname)
-        v = '{0} {1};'.format(type_to_str(t), name)
-        v += '{'
-        v += '{0} {1} {2}.first = {3}; {2}.second = {4};'.format(
-                first, second, name, fname, sname)
-        v += '}'
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
+        v += self._val(ftype, val=val[0], uitype=uitype[1], name=fname, ind=ind)
+        v += self._val(stype, val=val[1], uitype=uitype[2], name=sname, ind=ind)
+        v += ind + '{0}.first = {1};\n'.format(name, fname)
+        v += ind + '{0}.second = {1};\n'.format(name, sname)
+        ind = ind[:-2]
+        v += ind + '}\n'
         return v
 
-    def _val_map(self, t, val=None, name=None, uitype=None):
+    def _val_map(self, t, val=None, name=None, uitype=None, ind=''):
         uitype = prepare_type(t, uitype)
         keyname = 'key'
         valname = 'val'
 
-        v = '{0} {1};'.format(type_to_str(t), name)
-        v += '{'
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
         for k, x in val.items():
-            kval = self._val(t[1], val=k, uitype=uitype[1], name=keyname)
-            xval = self._val(t[2], val=x, uitype=uitype[2], name=valname)
-            v += '{{ {0} {1} {2}[{3}] = {4};}}'.format(kval, xval, name, keyname, valname)
-        v += '}'
+            v += ind + '{\n'
+            ind += '  '
+            v += self._val(t[1], val=k, uitype=uitype[1], name=keyname, ind=ind)
+            v += self._val(t[2], val=x, uitype=uitype[2], name=valname, ind=ind)
+            v += ind + '{0}[{1}] = {2};\n'.format(name, keyname, valname)
+            ind = ind[:-2]
+            v += ind + '}\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
 
         return v
 
