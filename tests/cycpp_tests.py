@@ -406,13 +406,6 @@ def test_itdbfilter():
                 '  ->Record();\n')
     yield assert_equal, exp_impl, impl
 
-def check_itdbfilter_val(exp, f, t, v, name, uitype):
-    obs = f._val(t, val=v, name=name, uitype=uitype)
-    print('gotted:')
-    pprint.pprint(obs)
-    print('')
-    assert_equal(exp, obs)
-
 def test_itdbfilter_val():
     """Test InfileToDbFilter._val() Defaults"""
     m = MockCodeGenMachine()
@@ -559,9 +552,10 @@ def test_itdbfilter_val():
              '}\n'),
             ),
         ]
-    for t, v, name, uitype, exp in cases:
-        yield check_itdbfilter_val, exp, f, t, v, name, uitype
 
+    for t, v, name, uitype, exp in cases:
+        obs = f._val(t, val=v, name=name, uitype=uitype)
+        yield assert_equal, exp, obs
 
 def test_schemafilter():
     """Test SchemaFilter"""
@@ -729,59 +723,111 @@ def test_infiletodb_read_member():
     gen = f.read_member('mymap', alias, cpptype, uitype=None)
 
     exp_gen = (
-        'std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap;{cyclus::InfileTree* bub = sub->SubTree("streams");\n'
-        'cyclus::InfileTree* sub = bub;\n'
-        'int n = sub->NMatches("name");\n'
-        '    std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap_in;\n'
+        '  std::map< std::string, std::vector< std::vector< std::pair< double, '
+        'std::pair< int, std::list< std::set< bool > > > > > > > mymap;\n'
+        '  {\n'
+        '    cyclus::InfileTree* bub = sub->SubTree("streams");\n'
+        '    cyclus::InfileTree* sub = bub;\n'
+        '    int n = sub->NMatches("name");\n'
+        '    std::map< std::string, std::vector< std::vector< std::pair< double, '
+        'std::pair< int, std::list< std::set< bool > > > > > > > mymap_in;\n'
         '    for (i = 0; i < n; ++i) {\n'
-        '    std::string key;{        std::string key_in = cyclus::Query<std::string>(sub, "name", i);\n'
-        'key = key_in;}    std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val;{cyclus::InfileTree* bub = sub->SubTree("efficiencies");\n'
-        'cyclus::InfileTree* sub = bub;\n'
-        'int n = sub->NMatches("val");\n'
-        '        std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val_in;\n'
+        '      std::string key;\n'
+        '      {\n'
+        '        std::string key_in = cyclus::Query<std::string>(sub, "name", i);\n'
+        '        key = key_in;\n'
+        '      }\n'
+        '      std::vector< std::vector< std::pair< double, std::pair< int, '
+        'std::list< std::set< bool > > > > > > val;\n'
+        '      {\n'
+        '        cyclus::InfileTree* bub = sub->SubTree("efficiencies");\n'
+        '        cyclus::InfileTree* sub = bub;\n'
+        '        int n = sub->NMatches("val");\n'
+        '        std::vector< std::vector< std::pair< double, std::pair< int, '
+        'std::list< std::set< bool > > > > > > val_in;\n'
         '        val_in.resize(n);\n'
         '        for (i = 0; i < n; ++i) {\n'
-        '        std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > elem;{cyclus::InfileTree* bub = sub->SubTree("val");\n'
-        'cyclus::InfileTree* sub = bub;\n'
-        'int n = sub->NMatches("val");\n'
-        '            std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > elem_in;\n'
+        '          std::vector< std::pair< double, std::pair< int, std::list< '
+        'std::set< bool > > > > > elem;\n'
+        '          {\n'
+        '            cyclus::InfileTree* bub = sub->SubTree("val");\n'
+        '            cyclus::InfileTree* sub = bub;\n'
+        '            int n = sub->NMatches("val");\n'
+        '            std::vector< std::pair< double, std::pair< int, std::list< '
+        'std::set< bool > > > > > elem_in;\n'
         '            elem_in.resize(n);\n'
         '            for (i = 0; i < n; ++i) {\n'
-        '            std::pair< double, std::pair< int, std::list< std::set< bool > > > > elem;{cyclus::InfileTree* bub = sub->SubTree("val");\n'
-        'cyclus::InfileTree* sub = bub;\n'
-        '                double first;{                    double first_in = cyclus::Query<double>(sub, "first");\n'
-        'first = first_in;}                std::pair< int, std::list< std::set< bool > > > second;{cyclus::InfileTree* bub = sub->SubTree("second");\n'
-        'cyclus::InfileTree* sub = bub;\n'
-        '                    int first;{                        int first_in = cyclus::Query<int>(sub, "first");\n'
-        'first = first_in;}                    std::list< std::set< bool > > second;{cyclus::InfileTree* bub = sub->SubTree("second");\n'
-        'cyclus::InfileTree* sub = bub;\n'
-        'int n = sub->NMatches("val");\n'
+        '              std::pair< double, std::pair< int, std::list< std::set< bool '
+        '> > > > elem;\n'
+        '              {\n'
+        '                cyclus::InfileTree* bub = sub->SubTree("val");\n'
+        '                cyclus::InfileTree* sub = bub;\n'
+        '                  double first;\n'
+        '                  {\n'
+        '                    double first_in = cyclus::Query<double>(sub, '
+        '"first");\n'
+        '                    first = first_in;\n'
+        '                  }\n'
+        '                  std::pair< int, std::list< std::set< bool > > > second;\n'
+        '                  {\n'
+        '                    cyclus::InfileTree* bub = sub->SubTree("second");\n'
+        '                    cyclus::InfileTree* sub = bub;\n'
+        '                      int first;\n'
+        '                      {\n'
+        '                        int first_in = cyclus::Query<int>(sub, "first");\n'
+        '                        first = first_in;\n'
+        '                      }\n'
+        '                      std::list< std::set< bool > > second;\n'
+        '                      {\n'
+        '                        cyclus::InfileTree* bub = sub->SubTree("second");\n'
+        '                        cyclus::InfileTree* sub = bub;\n'
+        '                        int n = sub->NMatches("val");\n'
         '                        std::list< std::set< bool > > second_in;\n'
         '                        for (i = 0; i < n; ++i) {\n'
-        '                        std::set< bool > elem;{cyclus::InfileTree* bub = sub->SubTree("val");\n'
-        'cyclus::InfileTree* sub = bub;\n'
-        'int n = sub->NMatches("val");\n'
+        '                          std::set< bool > elem;\n'
+        '                          {\n'
+        '                            cyclus::InfileTree* bub = '
+        'sub->SubTree("val");\n'
+        '                            cyclus::InfileTree* sub = bub;\n'
+        '                            int n = sub->NMatches("val");\n'
         '                            std::set< bool > elem_in;\n'
         '                            for (i = 0; i < n; ++i) {\n'
-        '                            bool elem;{                                bool elem_in = cyclus::Query<bool>(sub, "val", i);\n'
-        'elem = elem_in;}                              elem_in.insert(elem);\n'
+        '                              bool elem;\n'
+        '                              {\n'
+        '                                bool elem_in = cyclus::Query<bool>(sub, '
+        '"val", i);\n'
+        '                                elem = elem_in;\n'
+        '                              }\n'
+        '                              elem_in.insert(elem);\n'
         '                            }\n'
-        'elem = elem_in;}                          second_in.push_back(elem);\n'
+        '                            elem = elem_in;\n'
+        '                          }\n'
+        '                          second_in.push_back(elem);\n'
         '                        }\n'
-        'second = second_in;}                    std::pair< int, std::list< std::set< bool > > > second_in(first, second);\n'
-        'second = second_in;}                std::pair< double, std::pair< int, std::list< std::set< bool > > > > elem_in(first, second);\n'
-        'elem = elem_in;}              elem_in[i] = elem;\n'
+        '                        second = second_in;\n'
+        '                      }\n'
+        '                    std::pair< int, std::list< std::set< bool > > > '
+        'second_in(first, second);\n'
+        '                    second = second_in;\n'
+        '                  }\n'
+        '                std::pair< double, std::pair< int, std::list< std::set< '
+        'bool > > > > elem_in(first, second);\n'
+        '                elem = elem_in;\n'
+        '              }\n'
+        '              elem_in[i] = elem;\n'
         '            }\n'
-        'elem = elem_in;}          val_in[i] = elem;\n'
+        '            elem = elem_in;\n'
+        '          }\n'
+        '          val_in[i] = elem;\n'
         '        }\n'
-        'val = val_in;}      mymap_in[key] = val;\n'
+        '        val = val_in;\n'
+        '      }\n'
+        '      mymap_in[key] = val;\n'
         '    }\n'
-        'mymap = mymap_in;}'
-        )
+        '    mymap = mymap_in;\n'
+        '  }\n')
 
-    print('gotted:')
-    pprint.pprint(gen)
-    print('')
+    print(gen)
     yield assert_equal, exp_gen, gen
 
 def test_nuclide_uitype():
