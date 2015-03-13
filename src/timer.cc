@@ -131,7 +131,7 @@ void Timer::SchedDecom(Agent* m, int t) {
     std::vector<Agent*> ags = it->second;
     for (int i = 0; i < ags.size(); i++) {
       if (ags[i] == m) {
-        CLOG(LEV_ERROR) << "scheduled over previous decommissioning of " << m->id();
+        CLOG(LEV_WARN) << "scheduled over previous decommissioning of " << m->id();
         decom_queue_[t].erase(decom_queue_[t].begin()+i);
         done = true;
         break;

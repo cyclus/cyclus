@@ -131,6 +131,20 @@ MockSim::MockSim(AgentSpec spec, std::string config, int duration)
   agent = ctx_.CreateAgent<Agent>(a->prototype());
 }
 
+void MockSim::DummyProto(std::string name) {
+  Agent* a = DynamicModule::Make(&ctx_, AgentSpec(":agents:Source"));
+
+  std::stringstream xml;
+  xml << "<facility><name>" << name << "</name>"
+      << "<config><foo>"
+      << "<commod>alongunusedcommodityname</commod>"
+      << "<capacity>0</capacity>"
+      << "</foo></config></facility>";
+
+  InitAgent(a, xml, &rec_, back_);
+  ctx_.AddPrototype(name, a);
+};
+
 MockSim::~MockSim() {
   warn_limit = 42;
   rec_.Close();
