@@ -1976,35 +1976,6 @@ class Proxy(MutableMapping):
     def __contains__(self, key):
         return key in self.__dict__['_d']
 
-class Indenter(object):
-    def __init__(self, n=2, level=0):
-        str.__init__(self)
-        self._n = int(n)
-        self._level = int(level)
-
-    def __add__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __radd__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __concat__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __str__(self):
-        return ' '*self._n*self._level
-
-    def __repr__(self):
-        return ' '*self._n*self._level
-
-    def up(self):
-        self._level += 1
-        return Indenter(n=self._n, level=self._level-1)
-
-    def down(self):
-        self._level -= 1
-        return Indenter(n=self._n, level=self._level)
-
 def outter_split(s, open_brace='(', close_brace=')', separator=','):
     """Takes a string and only split the outter most level."""
     outter = []
