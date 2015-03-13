@@ -375,6 +375,12 @@ class Agent : public StateWrangler, virtual public Ider {
   /// the agent has never been built).
   inline const int enter_time() const { return enter_time_; }
 
+  /// Sets the number of time steps this agent operates between building and
+  /// decommissioning (-1 if the agent has an infinite lifetime).  This should
+  /// generally only be called BEFORE an agent is added to a context as a
+  /// prototype.  Throws ValueError if the agent has already been deployed.
+  void lifetime(int n_timesteps);
+
   /// Returns the number of time steps this agent operates between building and
   /// decommissioning (-1 if the agent has an infinite lifetime).
   inline const int lifetime() const { return lifetime_; }
@@ -431,10 +437,10 @@ class Agent : public StateWrangler, virtual public Ider {
   /// subclasses must set this variable in their constructor(s).
   std::string kind_;
 
+ private:
   /// length of time this agent is intended to operate
   int lifetime_;
 
- private:
   /// Prevents creation/use of copy constructors (including in subclasses).
   /// Cloning and InitFrom should be used instead.
   Agent(const Agent& m) {}

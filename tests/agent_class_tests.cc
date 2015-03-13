@@ -7,6 +7,18 @@
 
 namespace cyclus {
 
+TEST(AgentClassTests, lifetime) {
+  TestContext tc;
+  Agent* a = new TestAgent(tc.get());
+
+  EXPECT_EQ(-1, a->lifetime());
+  EXPECT_NO_THROW(a->lifetime(42));
+  EXPECT_EQ(42, a->lifetime());
+  a->Build(NULL);
+  EXPECT_THROW(a->lifetime(13), ValueError);
+  EXPECT_EQ(42, a->lifetime());
+}
+
 TEST(AgentClassTests, FamilyTree) {
   TestContext tc;
 
