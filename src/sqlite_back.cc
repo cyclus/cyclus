@@ -233,16 +233,19 @@ void SqliteBack::WriteDatum(Datum* d) {
 void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt,
                       int index) {
 
-// serializes the value v of type T and binds it to stmt
-#define COMMA ,
-#define BINDVAL(T) \
+// serializes the value v of type T and DBType D and binds it to stmt (inside
+// a case statement
+#define CYCLUS_COMMA ,
+#define CYCLUS_BINDVAL(D, T) \
+    case D: { \
     T vect = v.cast<T>(); \
     std::stringstream ss; \
     boost::archive::xml_oarchive ar(ss); \
     ar & BOOST_SERIALIZATION_NVP(vect); \
     std::string s = ss.str(); \
     stmt->BindBlob(index, s.c_str(), s.size()); \
-    break
+    break; \
+    }
 
   switch (type) {
   case INT: {
@@ -275,52 +278,27 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
     stmt->BindBlob(index, ui.data, 16);
     break;
   }
-  case SET_INT: {
-    BINDVAL(std::set<int>);
-  }
-  case SET_STRING: {
-    BINDVAL(std::set<std::string>);
-  }
-  case LIST_INT: {
-    BINDVAL(std::list<int>);
-  }
-  case LIST_STRING: {
-    BINDVAL(std::list<std::string>);
-  }
-  case VECTOR_INT: {
-    BINDVAL(std::vector<int>);
-  }
-  case VECTOR_DOUBLE: {
-    BINDVAL(std::vector<double>);
-  }
-  case VECTOR_STRING: {
-    BINDVAL(std::vector<std::string>);
-  }
-  case MAP_INT_DOUBLE: {
-    BINDVAL(std::map<int COMMA double>);
-  }
-  case MAP_INT_INT: {
-    BINDVAL(std::map<int COMMA int>);
-  }
-  case MAP_INT_STRING: {
-    BINDVAL(std::map<int COMMA std::string>);
-  }
-  case MAP_STRING_INT: {
-    BINDVAL(std::map<std::string COMMA int>);
-  }
-  case MAP_STRING_DOUBLE: {
-    BINDVAL(std::map<std::string COMMA double>);
-  }
-  case MAP_STRING_STRING: {
-    BINDVAL(std::map<std::string COMMA std::string>);
-  }
-  case VL_MAP_VL_STRING_VL_VECTOR_DOUBLE: {
-    BINDVAL(std::map<std::string COMMA std::vector<double> >);
-  }
+  CYCLUS_BINDVAL(SET_INT, std::set<int>);
+  CYCLUS_BINDVAL(SET_STRING, std::set<std::string>);
+  CYCLUS_BINDVAL(LIST_INT, std::list<int>);
+  CYCLUS_BINDVAL(LIST_STRING, std::list<std::string>);
+  CYCLUS_BINDVAL(VECTOR_INT, std::vector<int>);
+  CYCLUS_BINDVAL(VECTOR_DOUBLE, std::vector<double>);
+  CYCLUS_BINDVAL(VECTOR_STRING, std::vector<std::string>);
+  CYCLUS_BINDVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
+  CYCLUS_BINDVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
+  CYCLUS_BINDVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
+  CYCLUS_BINDVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
+  CYCLUS_BINDVAL(MAP_STRING_DOUBLE, std::map<std::string CYCLUS_COMMA double>);
+  CYCLUS_BINDVAL(MAP_STRING_STRING, std::map<std::string CYCLUS_COMMA std::string>);
+  CYCLUS_BINDVAL(MAP_STRING_VECTOR_DOUBLE, std::map<std::string CYCLUS_COMMA std::vector<double> >);
+  CYCLUS_BINDVAL(MAP_STRING_MAP_INT_DOUBLE, std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
   default: {
     throw ValueError("attempted to retrieve unsupported sqlite backend type");
   }
   }
+#undef CYCLUS_BINDVAL
+#undef CYCLUS_COMMA
 }
 
 boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
@@ -329,10 +307,11 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
 
   boost::spirit::hold_any v;
 
-// reconstructs from a serialization in stmt of type T and
+// reconstructs from a serialization in stmt of type T and DbType D and
 // store it in v.
-#define COMMA ,
-#define LOADVAL(T) \
+#define CYCLUS_COMMA ,
+#define CYCLUS_LOADVAL(D, T) \
+      case D: { \
       char* data =  stmt->GetText(col, NULL); \
       std::stringstream ss; \
       ss << data; \
@@ -340,7 +319,8 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
       T vect; \
       ar & BOOST_SERIALIZATION_NVP(vect); \
       v = vect; \
-      break
+      break; \
+      }
 
   switch (type) {
   case INT: {
@@ -368,37 +348,29 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
     memcpy(&u, stmt->GetText(col, NULL), 16);
     v = u;
     break;
-  } case SET_INT: {
-    LOADVAL(std::set<int>);
-  } case SET_STRING: {
-    LOADVAL(std::set<std::string>);
-  } case LIST_INT: {
-    LOADVAL(std::list<int>);
-  } case LIST_STRING: {
-    LOADVAL(std::list<std::string>);
-  } case VECTOR_INT: {
-    LOADVAL(std::vector<int>);
-  } case VECTOR_DOUBLE: {
-    LOADVAL(std::vector<double>);
-  } case VECTOR_STRING: {
-    LOADVAL(std::vector<std::string>);
-  } case MAP_INT_DOUBLE: {
-    LOADVAL(std::map<int COMMA double>);
-  } case MAP_INT_INT: {
-    LOADVAL(std::map<int COMMA int>);
-  } case MAP_INT_STRING: {
-    LOADVAL(std::map<int COMMA std::string>);
-  } case MAP_STRING_DOUBLE: {
-    LOADVAL(std::map<std::string COMMA double>);
-  } case MAP_STRING_INT: {
-    LOADVAL(std::map<std::string COMMA int>);
-  } case MAP_STRING_STRING: {
-    LOADVAL(std::map<std::string COMMA std::string>);
-  } case VL_MAP_VL_STRING_VL_VECTOR_DOUBLE: {
-    LOADVAL(std::map<std::string COMMA std::vector<double> >);
-  } default: {
+  }
+  CYCLUS_LOADVAL(SET_INT, std::set<int>);
+  CYCLUS_LOADVAL(SET_STRING, std::set<std::string>);
+  CYCLUS_LOADVAL(LIST_INT, std::list<int>);
+  CYCLUS_LOADVAL(LIST_STRING, std::list<std::string>);
+  CYCLUS_LOADVAL(VECTOR_INT, std::vector<int>);
+  CYCLUS_LOADVAL(VECTOR_DOUBLE, std::vector<double>);
+  CYCLUS_LOADVAL(VECTOR_STRING, std::vector<std::string>);
+  CYCLUS_LOADVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
+  CYCLUS_LOADVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
+  CYCLUS_LOADVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
+  CYCLUS_LOADVAL(MAP_STRING_DOUBLE, std::map<std::string CYCLUS_COMMA double>);
+  CYCLUS_LOADVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
+  CYCLUS_LOADVAL(MAP_STRING_STRING, std::map<std::string CYCLUS_COMMA std::string>);
+  CYCLUS_LOADVAL(MAP_STRING_VECTOR_DOUBLE, std::map<std::string CYCLUS_COMMA std::vector<double> >);
+  CYCLUS_LOADVAL(MAP_STRING_MAP_INT_DOUBLE, std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
+  default: {
     throw ValueError("Attempted to retrieve unsupported backend type");
   }}
+
+#undef CYCLUS_LOADVAL
+#undef CYCLUS_COMMA
+
   return v;
 }
 
@@ -471,7 +443,8 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
     // type_map[&typeid(std::map<std::string, Blob>)] = MAP_STRING_BLOB;
     // type_map[&typeid(std::map<std::string, boost::uuids::uuid>)] = MAP_STRING_UUID;
     type_map[&typeid(std::map<std::string, std::string>)] = MAP_STRING_STRING;
-    type_map[&typeid(std::map<std::string, std::vector<double> >)] = VL_MAP_VL_STRING_VL_VECTOR_DOUBLE;
+    type_map[&typeid(std::map<std::string, std::vector<double> >)] = MAP_STRING_VECTOR_DOUBLE;
+    type_map[&typeid(std::map<std::string, std::map<int, double> >)] = MAP_STRING_MAP_INT_DOUBLE;
   }
 
   const std::type_info* ti = &v.type();
