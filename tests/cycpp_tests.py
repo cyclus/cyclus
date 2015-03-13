@@ -393,17 +393,10 @@ def test_itdbfilter():
     yield assert_equal, exp_args, args
 
     impl = f.impl()
-    exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
-                '  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, rawcycpp_shape_y + 1);\n'
-                '  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
-                '  int i;\n'
-                '  int n;\n'
-                '{  int x_val = cyclus::Query<int>(sub, "x");\n'
-                'x = x_val;}THINGFISH\n'
-                '  di.NewDatum("Info")\n'
-                '  ->AddVal("x", x)\n'
-                'ABSOLUTELY FREE\n'
-                '  ->Record();\n')
+    exp_impl = (
+        '  int rawcycpp_shape_y[1] = {42};\n  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, rawcycpp_shape_y + 1);\n  cyclus::InfileTree* sub = tree->SubTree("config/*");\n  int i;\n  int n;\n  {\n    int x_val = cyclus::Query<int>(sub, "x");\n    x = x_val;\n  }\nTHINGFISH\n  di.NewDatum("Info")\n  ->AddVal("x", x)\nABSOLUTELY FREE\n  ->Record();\n'
+        )
+
     yield assert_equal, exp_impl, impl
 
 def test_itdbfilter_val():
@@ -827,7 +820,6 @@ def test_infiletodb_read_member():
         '    mymap = mymap_in;\n'
         '  }\n')
 
-    print(gen)
     yield assert_equal, exp_gen, gen
 
 def test_nuclide_uitype():
@@ -853,14 +845,7 @@ def test_nuclide_uitype():
     f = InfileToDbFilter(m)
     f.given_classname = 'MyFactory'
     impl = f.impl()
-    exp_impl = (
-        '  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
-        '  int i;\n'
-        '  int n;\n'
-        '{  int x_val = pyne::nucname::id(cyclus::Query<std::string>(sub, "x"));\n'
-        'x = x_val;}  di.NewDatum("Info")\n'
-        '  ->AddVal("x", x)\n'
-        '  ->Record();\n')
+    exp_impl = '  cyclus::InfileTree* sub = tree->SubTree("config/*");\n  int i;\n  int n;\n  {\n    int x_val = pyne::nucname::id(cyclus::Query<std::string>(sub, "x"));\n    x = x_val;\n  }\n  di.NewDatum("Info")\n  ->AddVal("x", x)\n  ->Record();\n'
 
     yield assert_equal, exp_impl, impl
 

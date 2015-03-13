@@ -1395,10 +1395,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
                     ind += '  '
 
                 mname = member + '_val'
-                impl += '{'
-                impl += reader(mname, labels, t, uitype, ind)
-                impl += '{0} = {1};'.format(member, mname)
-                impl += '}'
+                impl += ind + '{\n'
+                impl += reader(mname, labels, t, uitype, ind+'  ')
+                impl += ind + '  {0} = {1};\n'.format(member, mname)
+                impl += ind + '}\n'
 
                 # generate code to assign default val if no other is specified
                 if d is not None:
@@ -1406,9 +1406,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
                     impl += ind + '} else {\n'
                     ind += '  '
                     mname = member + '_tmp'
-                    val = self._val(t, val=d, name=mname, uitype=uitype)
-                    val += '{0} = {1};'.format(member, mname)
-                    impl += ind + val.replace('\n', '\n' + ind)
+                    impl += self._val(t, val=d, name=mname, uitype=uitype, ind=ind)
+                    impl += ind + '{0} = {1};\n'.format(member, mname)
                     ind = ind[:-2]
                     impl += ind + '}\n'
 
