@@ -54,15 +54,14 @@ def find_libcyc():
     print('lib cyc found with find: ', output)
     return libcyc, tried
 
-def test_failure():
-    assert_true(False)
-
 def test_abi_stability():
     if smbchk is None:
         raise SkipTest('Could not import smbchk!')
     if os.name != 'posix':
         raise SkipTest('can only check for ABI stability on posix systems.')
     libcyc, tried = find_libcyc()
+    print('libcyc', libcyc)
+    print('tried', tried)
     if not os.path.exists(libcyc):
         msg = 'libcyclus could not be found, cannot check for ABI stability '
         msg += 'Final libcyc: {} Tried: {} HOME: {}'.format(
