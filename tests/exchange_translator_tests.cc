@@ -137,6 +137,7 @@ TEST(ExXlateTests, XlateCapacities) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateReq) {
+  using cyclus::cap_t;
   TestContext tc;
   TestFacility* trader = tc.trader();
 
@@ -146,10 +147,13 @@ TEST(ExXlateTests, XlateReq) {
 
   Converter<Material>::Ptr c2(new MatConverter2());
   double qty2 = 0.8 * qty;
-  CapacityConstraint<Material> cc2(qty2, c2);
+  CapacityConstraint<Material> cc2(qty2, cyclus::LTEQ, c2);
 
   double carr[] = {qty2, qty1};
-  std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
+  std::vector<double> capexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
+
+  cap_t tarr[] = {cyclus::LTEQ, cyclus::GTEQ};
+  std::vector<cap_t> typexp(tarr, tarr + sizeof(tarr) / sizeof(tarr[0]));
 
   std::string commod = "commod";
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
@@ -163,20 +167,21 @@ TEST(ExXlateTests, XlateReq) {
   ExchangeContext<Material> ctx;
   ExchangeTranslator<Material> xlator(&ctx);
 
-  RequestGroup::Ptr set = TranslateRequestPortfolio(xlator.translation_ctx(), rp);
+  RequestGroup::Ptr grp = TranslateRequestPortfolio(xlator.translation_ctx(), rp);
 
-  EXPECT_DOUBLE_EQ(qty * 2, set->qty());
-  TestVecEq(cexp, set->capacities());
+  EXPECT_DOUBLE_EQ(qty * 2, grp->qty());
+  TestVecEq(capexp, grp->capacities());
+  TestVecEq(typexp, grp->cap_types());
   EXPECT_TRUE(xlator.translation_ctx().request_to_node.find(req)
               != xlator.translation_ctx().request_to_node.end());
   EXPECT_EQ(
       xlator.translation_ctx().request_to_node.find(req)->second->commod,
       commod);
 
-  ASSERT_EQ(set->nodes().size(), 2);
-  ASSERT_EQ(set->excl_node_groups().size(), 1);
-  ASSERT_EQ(set->excl_node_groups()[0].size(), 1);
-  EXPECT_EQ(set->excl_node_groups()[0][0],
+  ASSERT_EQ(grp->nodes().size(), 2);
+  ASSERT_EQ(grp->excl_node_groups().size(), 1);
+  ASSERT_EQ(grp->excl_node_groups()[0].size(), 1);
+  EXPECT_EQ(grp->excl_node_groups()[0][0],
             xlator.translation_ctx().request_to_node[ereq]);
 }
 
