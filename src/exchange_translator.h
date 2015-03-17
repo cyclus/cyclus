@@ -134,6 +134,23 @@ inline void AddBid(ExchangeTranslationContext<T>& translation_ctx,
   translation_ctx.node_to_bid[n] = b;
 }
 
+/// @brief translate a set of constraints to an exchange node group
+template <class T>
+void TranslateConstraints(ExchangeNodeGroup::Ptr g,
+                          const std::set< CapacityConstraint<T> >& s) {
+  typename std::set< CapacityConstraint<T> >::const_iterator c_it;
+  for (c_it = s.begin(); c_it != s.end(); ++c_it) {
+    switch(c_it->cap_type()) {
+      case NONE:
+        g->AddCapacity(c_it->capacity());
+        break;
+      default:
+        g->AddCapacity(c_it->capacity(), c_it->cap_type());
+        break;
+    }
+  }
+}
+
 /// @brief translates a request portfolio by adding request nodes and
 /// accounting for capacities. Request unit capcities must be added when arcs
 /// are known
@@ -206,22 +223,6 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   TranslateConstraints(bs, bp->constraints());
   
   return bs;
-}
-
-template <class T>
-void TranslateConstraints(ExchangeNodeGroup::Ptr g,
-                          const std::set< CapacityConstraint<T> >& s) {
-  typename std::set< CapacityConstraint<T> >::const_iterator c_it;
-  for (c_it = s.begin(); c_it != s.end(); ++c_it) {
-    switch(c_it->cap_type()) {
-      case NONE:
-        g->AddCapacity(c_it->capacity());
-        break;
-      default:
-        g->AddCapacity(c_it->capacity(), c_it->cap_type());
-        break;
-    }
-  }
 }
 
 /// @brief translates an arc given a bid and subsequent data, and also
