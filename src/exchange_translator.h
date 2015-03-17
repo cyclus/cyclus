@@ -161,23 +161,8 @@ RequestGroup::Ptr TranslateRequestPortfolio(
 
   CLOG(LEV_DEBUG4) << "adding " << rp->constraints().size()
                    << " request capacities";
-  typename std::set< CapacityConstraint<T> >::const_iterator c_it;
-  for (c_it = rp->constraints().begin();
-       c_it != rp->constraints().end();
-       ++c_it) {
-    switch(c_it->cap_type()) {
-      case GTEQ:
-        rs->ExchangeNodeGroup::AddCapacity(c_it->capacity(), GTEQ);
-        break;
-      case LTEQ:
-        rs->ExchangeNodeGroup::AddCapacity(c_it->capacity(), GTEQ);
-        break;
-      case NONE:
-        rs->AddCapacity(c_it->capacity());
-        break;
-    }
-  }
-
+  TranslateConstraints(rs, rp->constraints());
+  
   return rs;
 }
 
@@ -218,25 +203,25 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 
   CLOG(LEV_DEBUG4) << "adding " << bp->constraints().size()
                    << " bid capacities";
+  TranslateConstraints(bs, bp->constraints());
+  
+  return bs;
+}
 
+template <class T>
+void TranslateConstraints(ExchangeNodeGroup::Ptr g,
+                          const std::set< CapacityConstraint<T> >& s) {
   typename std::set< CapacityConstraint<T> >::const_iterator c_it;
-  for (c_it = bp->constraints().begin();
-       c_it != bp->constraints().end();
-       ++c_it) {
+  for (c_it = s.begin(); c_it != s.end(); ++c_it) {
     switch(c_it->cap_type()) {
-      case GTEQ:
-        bs->AddCapacity(c_it->capacity(), GTEQ);
-        break;
-      case LTEQ:
-        bs->AddCapacity(c_it->capacity(), GTEQ);
-        break;
       case NONE:
-        bs->AddCapacity(c_it->capacity());
+        g->AddCapacity(c_it->capacity());
+        break;
+      default:
+        g->AddCapacity(c_it->capacity(), c_it->cap_type());
         break;
     }
   }
-
-  return bs;
 }
 
 /// @brief translates an arc given a bid and subsequent data, and also
