@@ -4,7 +4,6 @@
 
 using cyclus::ExchangeSolver;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MockSolver: public ExchangeSolver {
  public:
   explicit MockSolver() : i(0) {}
@@ -14,7 +13,6 @@ class MockSolver: public ExchangeSolver {
   int i;
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExSolverTests, Interface) {
   MockSolver s;
   EXPECT_EQ(0, s.i);
@@ -23,3 +21,4 @@ TEST(ExSolverTests, Interface) {
   s.Solve();
   EXPECT_EQ(2, s.i);
 }
+
