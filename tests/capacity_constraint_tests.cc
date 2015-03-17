@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "capacity_constraint.h"
+#include "capacity_types.h"
 #include "composition.h"
 #include "cyc_limits.h"
 #include "material.h"
@@ -94,9 +95,11 @@ TEST(CapacityConstraintTests, Trivial) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CapacityConstraintTests, Equality) {
-  CapacityConstraint<Resource> cc1(val);
-  CapacityConstraint<Resource> cc2(val);
+  CapacityConstraint<Resource> cc1(val, cyclus::GTEQ);
+  CapacityConstraint<Resource> cc2(val, cyclus::GTEQ);
   EXPECT_EQ(cc1, cc2);
+  CapacityConstraint<Resource> cc3(val, cyclus::LTEQ);
+  EXPECT_NE(cc1, cc3);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

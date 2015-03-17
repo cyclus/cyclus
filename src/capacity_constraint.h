@@ -64,7 +64,11 @@ struct TrivialConverter : public Converter<T> {
 template <class T>
 class CapacityConstraint {
  public:
-  /// @brief constructor for a constraint with a non-trivial converter
+  /// constructor
+  /// @param capacity a capacitating value
+  /// @param type the type, e.g., LTEQ or GTEQ
+  /// @param converter a conversion function pointer
+  // @{
   CapacityConstraint(double capacity, typename Converter<T>::Ptr converter)
       : capacity_(capacity),
         converter_(converter),
@@ -74,8 +78,6 @@ class CapacityConstraint {
       throw ValueError("Capacity is not positive, no trades will be executed");
   }
 
-  /// @brief constructor for a constraint with a trivial converter (i.e., one
-  /// that simply returns 1)
   explicit CapacityConstraint(double capacity)
       : capacity_(capacity),
         cap_type_(NONE),
@@ -85,6 +87,25 @@ class CapacityConstraint {
     converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
   }
 
+  CapacityConstraint(double capacity, cap_t type)
+      : capacity_(capacity),
+        cap_type_(type),
+        id_(next_id_++) {
+    if (capacity_ <= 0)
+      throw ValueError("Capacity is not positive, no trades will be executed");
+    converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
+  }
+
+  CapacityConstraint(double capacity, cap_t type, typename Converter<T>::Ptr converter)
+      : capacity_(capacity),
+        converter_(converter),
+        cap_type_(type),
+        id_(next_id_++) {
+    if (capacity_ <= 0)
+      throw ValueError("Capacity is not positive, no trades will be executed");
+  }
+  // @}
+  
   /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(const CapacityConstraint& other)
       : capacity_(other.capacity_),
@@ -140,6 +161,13 @@ inline bool operator==(const CapacityConstraint<T>& lhs,
   return  ((lhs.capacity() == rhs.capacity()) &&
            (*lhs.converter() == *rhs.converter()) &&
            (lhs.cap_type() == rhs.cap_type()));
+}
+
+/// @brief CapacityConstraint-CapacityConstraint equality operator
+template<class T>
+inline bool operator!=(const CapacityConstraint<T>& lhs,
+                       const CapacityConstraint<T>& rhs) {
+  return  !(lhs == rhs);
 }
 
 /// @brief CapacityConstraint-CapacityConstraint comparison operator, allows
