@@ -25,7 +25,7 @@ TEST(ExSolverTests, Interface) {
   EXPECT_EQ(2, s.i);
 }
 
-ExchangeGraph* gen() {
+ExchangeGraph* gen(double cap=1) {
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
   Arc a(u, v);
@@ -38,7 +38,7 @@ ExchangeGraph* gen() {
   RequestGroup::Ptr gu(new RequestGroup(1));
   gu->AddExchangeNode(u);
   gu->AddCapacity(1);
-  gu->AddCapacity(1, LTEQ);
+  gu->AddCapacity(cap, LTEQ);
   ExchangeNodeGroup::Ptr gv(new ExchangeNodeGroup());
   gv->AddExchangeNode(v);
   gv->AddCapacity(2); // 2 > 1
@@ -50,10 +50,9 @@ ExchangeGraph* gen() {
   return g;
 }
 
-TEST(ExSolverTests, Constraints) {
+TEST(ExSolverTests, ConstraintsProg) {
   ExchangeGraph* g = gen();
   ProgSolver s("clp");
-  // GreedySolver s(false);
 
   // test unit flow to consumer
   s.graph(g);
@@ -61,16 +60,49 @@ TEST(ExSolverTests, Constraints) {
   Match exp = Match(g->arcs().at(0), 1);
   ASSERT_TRUE(g->matches().size() > 0);
   EXPECT_EQ(exp, g->matches().at(0));
-  g->ClearMatches();
+  
+  delete g;
+}
 
-  // test less-than unit flow to consumer
-  RequestGroup::Ptr rg = g->request_groups()[0];
-  rg->capacities()[1] = 0.5;
-  EXPECT_EQ(0.5, g->request_groups().at(0)->capacities.at(1));
+TEST(ExSolverTests, ConstraintsProgLT) {
+  ExchangeGraph* g = gen(0.5);
+  ProgSolver s("clp");
+  // GreedySolver s(false);
+
+  // test unit flow to consumer
+  s.graph(g);
   s.Solve();
-  Match exp2 = Match(g->arcs().at(0), 0.5);
+  Match exp = Match(g->arcs().at(0), 0.5);
   ASSERT_TRUE(g->matches().size() > 0);
-  EXPECT_EQ(exp2, g->matches().at(0));
+  EXPECT_EQ(exp, g->matches().at(0));
+  
+  delete g;
+}
+
+TEST(ExSolverTests, ConstraintsGreedy) {
+  ExchangeGraph* g = gen();
+  GreedySolver s(false);
+
+  // test unit flow to consumer
+  s.graph(g);
+  s.Solve();
+  Match exp = Match(g->arcs().at(0), 1);
+  ASSERT_TRUE(g->matches().size() > 0);
+  EXPECT_EQ(exp, g->matches().at(0));
+  
+  delete g;
+}
+
+TEST(ExSolverTests, ConstraintsGreedyLT) {
+  ExchangeGraph* g = gen(0.5);
+  GreedySolver s(false);
+
+  // test unit flow to consumer
+  s.graph(g);
+  s.Solve();
+  Match exp = Match(g->arcs().at(0), 0.5);
+  ASSERT_TRUE(g->matches().size() > 0);
+  EXPECT_EQ(exp, g->matches().at(0));
   
   delete g;
 }
