@@ -140,12 +140,14 @@ void TranslateConstraints(ExchangeNodeGroup::Ptr g,
                           const std::set< CapacityConstraint<T> >& s) {
   typename std::set< CapacityConstraint<T> >::const_iterator c_it;
   for (c_it = s.begin(); c_it != s.end(); ++c_it) {
-    switch(c_it->cap_type()) {
+    cap_t type = c_it->cap_type(); 
+    switch(type) {
       case NONE:
-        g->AddCapacity(c_it->capacity());
+        // use default value for backwards compatability
+        g->AddCapacity(c_it->capacity()); 
         break;
       default:
-        g->AddCapacity(c_it->capacity(), c_it->cap_type());
+        g->AddCapacity(c_it->capacity(), type);
         break;
     }
   }
