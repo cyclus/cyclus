@@ -206,6 +206,10 @@ class RequestGroup : public ExchangeNodeGroup {
     capacities_.push_back(c);
     cap_types_.push_back(GTEQ);
   }
+  inline void AddCapacity(double c, cap_t t) {
+    capacities_.push_back(c);
+    cap_types_.push_back(t);
+  }
   // @}
   
  private:
