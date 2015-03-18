@@ -109,7 +109,7 @@ double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a,
 
   double stdmax = std::numeric_limits<double>::max();
   double gtcap = stdmax;
-  double ltcap = -stdmax;
+  double ltcap = stdmax;
   for (int i = 0; i < unit_caps.size(); i++) {
     grp_cap = group_caps[i];
     u_cap = unit_caps[i];
@@ -125,7 +125,7 @@ double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a,
         gtcap = std::min(gtcap, cap);
         break;
       case LTEQ:
-        ltcap = std::max(ltcap, cap);
+        ltcap = std::min(ltcap, cap);
         break;
       default:
           std::stringstream ss;
@@ -134,7 +134,7 @@ double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a,
     }
   }
 
-  if (ltcap == -stdmax) {
+  if (ltcap == stdmax) {
     cap = gtcap; // never saw a LTEQ
   } else if (gtcap == stdmax) {
     cap = ltcap; // never saw a GTEQ
