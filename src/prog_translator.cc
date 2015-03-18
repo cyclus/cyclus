@@ -117,11 +117,12 @@ void ProgTranslator::XlateCaps(ExchangeNodeGroup* grp,
   int i;
 
   for (i = 0; i != cap_rows.size(); i++) {
-    if (request) {
+    gteq = cap_types[i] == GTEQ;
+
+    if (request && gteq) {
       cap_rows[i].insert(faux_id, 1.0);  // faux arc
     }
 
-    gteq = cap_types[i] == GTEQ;
     ctx.row_lbs.push_back(gteq ? caps[i] : 0);
     ctx.row_ubs.push_back(gteq ? ctx.inf : caps[i]);
     ctx.m.appendRow(cap_rows[i]);
