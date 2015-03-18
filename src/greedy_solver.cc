@@ -11,9 +11,12 @@
 
 namespace cyclus {
 
+// deprecated
 void Capacity(cyclus::Arc const&, double, double) {};
 void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
               double) {};
+double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+                              double curr_qty) {};
 
 GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
     : conditioner_(c),
@@ -77,9 +80,8 @@ double GreedySolver::SolveGraph() {
 
 double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
                                double v_curr_qty) {
-  bool min = true;
-  double ucap = Capacity(a.unode(), a, !min, u_curr_qty);
-  double vcap = Capacity(a.vnode(), a, min, v_curr_qty);
+  double ucap = Capacity(a.unode(), a, u_curr_qty);
+  double vcap = Capacity(a.vnode(), a, v_curr_qty);
 
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
@@ -89,8 +91,8 @@ double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
   return std::min(ucap, vcap);
 }
 
-double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
-                               double curr_qty) {
+double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a,
+                              double curr_qty) {
   if (n->group == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
@@ -106,8 +108,8 @@ double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
   double grp_cap, u_cap, cap;
 
   double stdmax = std::numeric_limits<double>::max();
-  double ltcap = stdmax;
-  double gtcap = std::numeric_limits<double>::min();
+  double gtcap = stdmax;
+  double ltcap = -stdmax;
   for (int i = 0; i < unit_caps.size(); i++) {
     grp_cap = group_caps[i];
     u_cap = unit_caps[i];
@@ -132,7 +134,13 @@ double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
     }
   }
 
-  cap = std::min(ltcap, gtcap);
+  if (ltcap == -stdmax) {
+    cap = gtcap; // never saw a LTEQ
+  } else if (gtcap == stdmax) {
+    cap = ltcap; // never saw a GTEQ
+  } else {
+    cap = std::min(ltcap, gtcap); // saw both, take minimum
+  }
   return std::min(cap, n->qty - curr_qty);
 }
 

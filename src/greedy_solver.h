@@ -105,27 +105,25 @@ class GreedySolver: public ExchangeSolver {
   ///
   /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
   /// @param n the node
-  /// @param min_cap whether to use the minimum or maximum capacity value. In general,
-  /// nodes that represent bids use the minimum (i.e., the capacities represents a
-  /// less-than constraint) and nodes that represent requests use the maximum
-  /// value (i.e., the capacities represents a greater-than constraint).
   /// @param curr_qty the currently allocated node quantity (if solving piecemeal)
   /// @return The minimum of the node's nodegroup capacities / the node's unit
   /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller.
+  /// @{
+  double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty);
+  inline double Capacity(ExchangeNode::Ptr n, const Arc& a) {
+    return Capacity(n, a, 0.0);
+  }
+  /// @}
+
+  /// @warning deprecated!
   /// @{
   double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
                   double curr_qty);
   inline double Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap) {
     return Capacity(n, a, min_cap, 0.0);
   }
-  inline double Capacity(ExchangeNode::Ptr n, const Arc& a, double curr_qty) {
-    return Capacity(n, a, true, curr_qty);
-  }
-  inline double Capacity(ExchangeNode::Ptr n, const Arc& a) {
-    return Capacity(n, a, true, 0.0);
-  }
-  /// @}
-
+  /// }@
+  
  protected:
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
   /// RequestGroup and matching requests with the minimum bids possible, starting
