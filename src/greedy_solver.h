@@ -149,6 +149,7 @@ class GreedySolver: public ExchangeSolver {
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
   std::map<ExchangeNodeGroup*, std::vector<double> > grp_caps_;
+  std::map<ExchangeNodeGroup*, std::vector<cap_t> > cap_types_;
   double obj_;
   double unmatched_;
 };

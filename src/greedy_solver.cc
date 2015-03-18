@@ -101,31 +101,38 @@ double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
 
   std::vector<double>& unit_caps = n->unit_capacities[a];
   const std::vector<double>& group_caps = grp_caps_[n->group];
+  const std::vector<cap_t>& cap_types = cap_types_[n->group];
   std::vector<double> caps;
   double grp_cap, u_cap, cap;
 
+  double stdmax = std::numeric_limits<double>::max();
+  double ltcap = stdmax;
+  double gtcap = std::numeric_limits<double>::min();
   for (int i = 0; i < unit_caps.size(); i++) {
     grp_cap = group_caps[i];
     u_cap = unit_caps[i];
-    cap = grp_cap / u_cap;
+    // special case for unlimited capacities
+    cap = grp_cap == stdmax ? stdmax : grp_cap / u_cap;
     CLOG(cyclus::LEV_DEBUG1) << "Capacity for node: ";
     CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << grp_cap;
     CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << u_cap;
     CLOG(cyclus::LEV_DEBUG1) << "         capacity: " << cap;
 
-    // special case for unlimited capacities
-    if (grp_cap == std::numeric_limits<double>::max()) {
-      caps.push_back(std::numeric_limits<double>::max());
-    } else {
-      caps.push_back(cap);
+    switch(cap_types[i]) {
+      case GTEQ:
+        gtcap = std::min(gtcap, cap);
+        break;
+      case LTEQ:
+        ltcap = std::max(ltcap, cap);
+        break;
+      default:
+          std::stringstream ss;
+          ss << "A capacity has a type of NONE.";
+          throw ValueError(ss.str());
     }
   }
 
-  if (min_cap) {  // the smallest value is constraining (for bids)
-    cap = *std::min_element(caps.begin(), caps.end());
-  } else {  // the largest value must be met (for requests)
-    cap = *std::max_element(caps.begin(), caps.end());
-  }
+  cap = std::min(ltcap, gtcap);
   return std::min(cap, n->qty - curr_qty);
 }
 
@@ -134,6 +141,7 @@ void GreedySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
     n_qty_[g->nodes()[i]] = 0;
   }
   grp_caps_[g.get()] = g->capacities();
+  cap_types_[g.get()] = g->cap_types();
 }
 
 void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
