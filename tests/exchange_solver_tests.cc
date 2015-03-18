@@ -54,8 +54,7 @@ ExchangeGraph* gen(bool consumer_lteq) {
   return g;
 }
 
-TEST(ExSolverTests, CustomConstraints) {
-  ProgSolver clp("clp");
+TEST(ExSolverTests, CustomConstraintsGreedy) {
   GreedySolver greedy(false);
   bool consumer_lteq;
   
@@ -67,12 +66,6 @@ TEST(ExSolverTests, CustomConstraints) {
   greedy.Solve();
   ASSERT_TRUE(g->matches().size() > 0);
   EXPECT_EQ(exp_g, g->matches().at(0));
-  g->ClearMatches();
-  clp.graph(g);
-  clp.Solve();
-  ASSERT_TRUE(g->matches().size() > 0);
-  EXPECT_EQ(exp_g, g->matches().at(0));
-  g->ClearMatches();
   delete g;
 
   // test consumer with LTEQ constraints
@@ -83,9 +76,30 @@ TEST(ExSolverTests, CustomConstraints) {
   greedy.Solve();
   ASSERT_TRUE(h->matches().size() > 0);
   EXPECT_EQ(exp_h, h->matches().at(0));
-  h->ClearMatches();
-  clp.graph(h);
-  clp.Solve();
+  delete h;  
+}
+
+TEST(ExSolverTests, CustomConstraintsProg) {
+  ProgSolver cbc("cbc");
+  bool consumer_lteq;
+  
+  // test supplier and consumer constraints
+  consumer_lteq = false;
+  ExchangeGraph* g = gen(consumer_lteq);
+  Match exp_g = Match(g->arcs().at(0), 0.5);
+  cbc.graph(g);
+  cbc.Solve();
+  ASSERT_TRUE(g->matches().size() > 0);
+  EXPECT_EQ(exp_g, g->matches().at(0));
+  g->ClearMatches();
+  delete g;
+
+  // test consumer with LTEQ constraints
+  consumer_lteq = true;
+  ExchangeGraph* h = gen(consumer_lteq);
+  Match exp_h = Match(h->arcs().at(0), 0.5);
+  cbc.graph(h);
+  cbc.Solve();
   ASSERT_TRUE(h->matches().size() > 0);
   EXPECT_EQ(exp_h, h->matches().at(0));
   h->ClearMatches();
