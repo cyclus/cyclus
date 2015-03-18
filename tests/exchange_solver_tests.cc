@@ -25,24 +25,28 @@ TEST(ExSolverTests, Interface) {
   EXPECT_EQ(2, s.i);
 }
 
-ExchangeGraph* gen(double cap=1) {
+ExchangeGraph* gen(bool consumer_lteq) {
   ExchangeNode::Ptr u(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
   Arc a(u, v);
 
   u->unit_capacities[a].push_back(1);
-  u->unit_capacities[a].push_back(1);
-  v->unit_capacities[a].push_back(1);
   u->prefs[a] = 1;
 
   RequestGroup::Ptr gu(new RequestGroup(1));
   gu->AddExchangeNode(u);
   gu->AddCapacity(1);
-  gu->AddCapacity(cap, LTEQ);
   ExchangeNodeGroup::Ptr gv(new ExchangeNodeGroup());
   gv->AddExchangeNode(v);
-  gv->AddCapacity(2); // 2 > 1
 
+  if (consumer_lteq) {
+    u->unit_capacities[a].push_back(1);
+    gu->AddCapacity(0.5, LTEQ);
+  } else {
+    v->unit_capacities[a].push_back(1);
+    gv->AddCapacity(0.5);
+  }
+  
   ExchangeGraph* g = new ExchangeGraph();
   g->AddRequestGroup(gu);
   g->AddSupplyGroup(gv);
@@ -50,61 +54,42 @@ ExchangeGraph* gen(double cap=1) {
   return g;
 }
 
-TEST(ExSolverTests, ConstraintsProg) {
-  ExchangeGraph* g = gen();
-  ProgSolver s("clp");
-
-  // test unit flow to consumer
-  s.graph(g);
-  s.Solve();
-  Match exp = Match(g->arcs().at(0), 1);
-  ASSERT_TRUE(g->matches().size() > 0);
-  EXPECT_EQ(exp, g->matches().at(0));
+TEST(ExSolverTests, CustomConstraints) {
+  ProgSolver clp("clp");
+  GreedySolver greedy(false);
+  bool consumer_lteq;
   
-  delete g;
-}
-
-TEST(ExSolverTests, ConstraintsProgLT) {
-  ExchangeGraph* g = gen(0.5);
-  ProgSolver s("clp");
-  // GreedySolver s(false);
-
-  // test unit flow to consumer
-  s.graph(g);
-  s.Solve();
-  Match exp = Match(g->arcs().at(0), 0.5);
+  // test supplier and consumer constraints
+  consumer_lteq = false;
+  ExchangeGraph* g = gen(consumer_lteq);
+  Match exp_g = Match(g->arcs().at(0), 0.5);
+  greedy.graph(g);
+  greedy.Solve();
   ASSERT_TRUE(g->matches().size() > 0);
-  EXPECT_EQ(exp, g->matches().at(0));
-  
-  delete g;
-}
-
-TEST(ExSolverTests, ConstraintsGreedy) {
-  ExchangeGraph* g = gen();
-  GreedySolver s(false);
-
-  // test unit flow to consumer
-  s.graph(g);
-  s.Solve();
-  Match exp = Match(g->arcs().at(0), 1);
+  EXPECT_EQ(exp_g, g->matches().at(0));
+  g->ClearMatches();
+  clp.graph(g);
+  clp.Solve();
   ASSERT_TRUE(g->matches().size() > 0);
-  EXPECT_EQ(exp, g->matches().at(0));
-  
+  EXPECT_EQ(exp_g, g->matches().at(0));
+  g->ClearMatches();
   delete g;
-}
 
-TEST(ExSolverTests, ConstraintsGreedyLT) {
-  ExchangeGraph* g = gen(0.5);
-  GreedySolver s(false);
-
-  // test unit flow to consumer
-  s.graph(g);
-  s.Solve();
-  Match exp = Match(g->arcs().at(0), 0.5);
-  ASSERT_TRUE(g->matches().size() > 0);
-  EXPECT_EQ(exp, g->matches().at(0));
-  
-  delete g;
+  // test consumer with LTEQ constraints
+  consumer_lteq = true;
+  ExchangeGraph* h = gen(consumer_lteq);
+  Match exp_h = Match(h->arcs().at(0), 0.5);
+  greedy.graph(h);
+  greedy.Solve();
+  ASSERT_TRUE(h->matches().size() > 0);
+  EXPECT_EQ(exp_h, h->matches().at(0));
+  h->ClearMatches();
+  clp.graph(h);
+  clp.Solve();
+  ASSERT_TRUE(h->matches().size() > 0);
+  EXPECT_EQ(exp_h, h->matches().at(0));
+  h->ClearMatches();
+  delete h;  
 }
 
 }
