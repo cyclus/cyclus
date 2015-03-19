@@ -13,26 +13,15 @@
 #include "test_context.h"
 #include "test_agents/test_facility.h"
 
-using cyclus::Bid;
-using cyclus::BidPortfolio;
-using cyclus::CapacityConstraint;
-using cyclus::Converter;
-using cyclus::KeyError;
-using cyclus::Request;
-using cyclus::Material;
-using cyclus::TestContext;
-using std::string;
-using test_helpers::get_mat;
-using test_helpers::TestConverter;
+namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class BidPortfolioTests: public ::testing::Test {
  protected:
   TestContext tc;
   TestFacility* fac1;
   TestFacility* fac2;
-  string commod1;
-  string commod2;
+  std::string commod1;
+  std::string commod2;
 
   Request<Material>* req1;
   Request<Material>* req2;
@@ -52,26 +41,24 @@ class BidPortfolioTests: public ::testing::Test {
   }
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BidPortfolioTests, RespAdd) {
   BidPortfolio<Material>::Ptr rp(new BidPortfolio<Material>());
   EXPECT_EQ(rp->bids().size(), 0);
-  Bid<Material>* r1 = rp->AddBid(req1, get_mat(), fac1);
+  Bid<Material>* r1 = rp->AddBid(req1, test_helpers::get_mat(), fac1);
   EXPECT_EQ(rp->bidder(), fac1);
   EXPECT_EQ(rp->bids().size(), 1);
   EXPECT_EQ(*rp->bids().begin(), r1);
 
-  EXPECT_THROW(rp->AddBid(req2, get_mat(), fac2), KeyError);
+  EXPECT_THROW(rp->AddBid(req2, test_helpers::get_mat(), fac2), KeyError);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BidPortfolioTests, Sets) {
   BidPortfolio<Material>::Ptr rp1(new BidPortfolio<Material>());
   BidPortfolio<Material>::Ptr rp2(new BidPortfolio<Material>());
   BidPortfolio<Material>::Ptr rp3(new BidPortfolio<Material>());
 
-  rp3->AddBid(req1, get_mat(), fac1);
-  rp3->AddBid(req1, get_mat(), fac1);
+  rp3->AddBid(req1, test_helpers::get_mat(), fac1);
+  rp3->AddBid(req1, test_helpers::get_mat(), fac1);
 
   std::set< BidPortfolio<Material>::Ptr > bids;
   EXPECT_EQ(bids.size(), 0);
@@ -98,12 +85,16 @@ TEST_F(BidPortfolioTests, Sets) {
   EXPECT_EQ(bids.count(rp3), 1);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(BidPortfolioTests, CapAdd) {
-  Converter<Material>::Ptr test_converter(new TestConverter());
+  Converter<Material>::Ptr test_converter(new test_helpers::TestConverter());
   CapacityConstraint<Material> c(5, test_converter);
 
   BidPortfolio<Material>::Ptr rp(new BidPortfolio<Material>());
   EXPECT_NO_THROW(rp->AddConstraint(c));
   EXPECT_EQ(*rp->constraints().begin(), c);
+
+  CapacityConstraint<Material> bad(5, GTEQ, test_converter);
+  EXPECT_THROW(rp->AddConstraint(bad), ValueError);
+}
+
 }

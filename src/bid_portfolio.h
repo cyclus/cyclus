@@ -58,7 +58,10 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
 
   /// @brief add a capacity constraint associated with the portfolio
   /// @param c the constraint to add
+  /// @throws ValueError if a GTEQ constraint is added
   inline void AddConstraint(const CapacityConstraint<T>& c) {
+    if (c.cap_type() == GTEQ)
+      throw ValueError("Bids can not have a GTEQ constraint.");
     constraints_.insert(c);
   }
 
