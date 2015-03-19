@@ -187,6 +187,7 @@ class ExchangeNodeGroup {
 /// requested quantity.
 class RequestGroup : public ExchangeNodeGroup {
  public:
+  using ExchangeNodeGroup::AddCapacity;
   typedef boost::shared_ptr<RequestGroup> Ptr;
 
   explicit RequestGroup(double qty = 0.0);
@@ -205,10 +206,6 @@ class RequestGroup : public ExchangeNodeGroup {
   inline virtual void AddCapacity(double c) {
     capacities_.push_back(c);
     cap_types_.push_back(GTEQ);
-  }
-  inline void AddCapacity(double c, cap_t t) {
-    capacities_.push_back(c);
-    cap_types_.push_back(t);
   }
   // @}
   
