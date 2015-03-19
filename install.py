@@ -67,6 +67,8 @@ def install_cyclus(args):
             cmake_cmd += ['-DBOOST_ROOT=' + absexpanduser(args.boost_root)]
         if args.build_type:
             cmake_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
+        if args.D is not None:
+            cmake_cmd += ['-D' + x for x in args.D]
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
@@ -140,6 +142,9 @@ def main():
 
     build_type = "the CMAKE_BUILD_TYPE"
     parser.add_argument('--build_type', help=build_type)
+
+    parser.add_argument('-D', metavar='VAR', action='append',
+                        help='Set enviornment variable(s).')
 
     args = parser.parse_args()
     if args.uninstall:
