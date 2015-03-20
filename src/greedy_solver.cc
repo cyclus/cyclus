@@ -187,7 +187,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
         tomatch = std::min(remain, Capacity(a, n_qty_[u], n_qty_[v]));
 
         // exclusivity adjustment
-        if (arc_it->exclusive()) {
+        if (exclusive_orders_ && arc_it->exclusive()) {
           excl_val = a.excl_val();
           tomatch = (tomatch < excl_val) ? 0 : excl_val;
         }
