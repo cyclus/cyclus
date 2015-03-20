@@ -68,7 +68,7 @@ class CapacityConstraint {
   /// @param capacity a capacitating value
   /// @param type the type, e.g., LTEQ or GTEQ
   /// @param converter a conversion function pointer
-  // @{
+  /// @{
   CapacityConstraint(double capacity, typename Converter<T>::Ptr converter)
       : capacity_(capacity),
         converter_(converter),
@@ -104,7 +104,7 @@ class CapacityConstraint {
     if (capacity_ <= 0)
       throw ValueError("Capacity is not positive, no trades will be executed");
   }
-  // @}
+  /// @}
   
   /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(const CapacityConstraint& other)
@@ -116,16 +116,16 @@ class CapacityConstraint {
   }
 
   /// capacity getters/setters
-  // @{
+  /// @{
   inline double capacity() const { return capacity_; }
   inline void capacity(double c) { capacity_ = c; }
-  // @}
+  /// @}
   
   /// type getters/setters
-  // @{
+  /// @{
   inline cap_t cap_type() const { return cap_type_; }
   inline void cap_type(cap_t t) const { cap_type_ = t; }
-  // @}
+  /// @}
   
   /// @return the converter
   inline typename Converter<T>::Ptr converter() const {

@@ -161,7 +161,7 @@ class ExchangeNodeGroup {
   /// @brief Add a flow capacity to the group
   /// @param c the rhs for the capacity
   /// @param t the capacity type, the default for exchange groups is LTEQ
-  // @{
+  /// @{
   inline virtual void AddCapacity(double c) {
     capacities_.push_back(c);
     cap_types_.push_back(LTEQ);
@@ -170,7 +170,7 @@ class ExchangeNodeGroup {
     capacities_.push_back(c);
     cap_types_.push_back(t);
   }
-  // @}
+  /// @}
 
  protected:
   std::vector<double> capacities_;
@@ -202,12 +202,12 @@ class RequestGroup : public ExchangeNodeGroup {
   /// @brief Add a flow capacity to the group
   /// @param c the rhs for the capacity
   /// @param t the capacity type, the default for request groups is GTEQ
-  // @{
+  /// @{
   inline virtual void AddCapacity(double c) {
     capacities_.push_back(c);
     cap_types_.push_back(GTEQ);
   }
-  // @}
+  /// @}
   
  private:
   double qty_;

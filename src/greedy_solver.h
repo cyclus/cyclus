@@ -96,10 +96,10 @@ class GreedySolver: public ExchangeSolver {
   /// @param v_curr_qty the current quantity assigned to the vnode (if solving
   /// piecemeal)
   /// @return The minimum of the unode and vnode's capacities
-  // @{
+  /// @{
   double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty);
   inline double Capacity(const Arc& a) { return Capacity(a, 0, 0); }
-  // @}
+  /// @}
 
   /// @brief the capacity of a node
   ///
