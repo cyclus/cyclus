@@ -123,15 +123,9 @@ def escape_xml(s, ind='    '):
     lines = s.splitlines()
     lines = lines[1:] # remove initial xml version tag
 
-    clean = []
-    for line in lines:
-        if line.strip() != '':
-            clean.append(line)
-
-    for i, line in enumerate(clean):
-        clean[i] = '{0}"{1}\\n"'.format(ind, line.rstrip())
-
-    return '\n'.join(clean)
+    clean = [line for line in lines if len(line.strip()) != 0]
+    cleaner = ['{0}"{1}\\n"'.format(ind, line.rstrip()) for line in clean]
+    return '\n'.join(cleaner)
 
 def prepare_type(cpptype, othertype):
     """Updates othertype to conform to the length of cpptype using None's.
