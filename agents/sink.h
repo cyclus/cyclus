@@ -76,7 +76,6 @@ class Sink : public cyclus::Facility  {
     "tooltip": "input/request recipe name", \
     "doc": "Name of recipe to request." \
            "If empty, sink requests material no particular composition.", \
-    "schematype": "token", \
     "default": "", \
     "uitype": "recipe", \
   }
@@ -85,8 +84,7 @@ class Sink : public cyclus::Facility  {
   #pragma cyclus var {"doc": "commodities that the sink facility " \
                              "accepts", \
                       "tooltip": "input commodities for the sink", \
-                      "schematype": "token", \
-                      "uitype": "incommodity"}
+                      "uitype": ["oneormore", "incommodity"]}
   std::vector<std::string> in_commods;
 
   #pragma cyclus var {"doc": "capacity the sink facility can " \
