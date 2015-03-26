@@ -492,7 +492,9 @@ class VarDeclarationFilter(Filter):
         annotations['index'] = len(state.context[classname]['vars'])
         state.context[classname]['vars'][vname] = annotations
         if 'alias' in annotations:
-            state.context[classname]['vars'][annotations['alias']] = vname
+            alias = annotations['alias']
+            alias = alias if isinstance(alias, STRING_TYPES) else alias[0]
+            state.context[classname]['vars'][alias] = vname
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -732,7 +734,7 @@ class StateAccumulator(object):
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
                        "primitive type: {p}.").format(
                     i=self.includeloc(), t=t, n=name, c=self.classname(),
-                    p=", ".join(sorted(self.supported_types)))
+                    p=pformat(self.supported_types))
                 raise TypeError(msg)
         return t
 
@@ -1361,10 +1363,6 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 # this member is a variable alias pointer
                 continue
 
-            alias = member
-            if 'alias' in info:
-                alias = info['alias']
-
             if self.pragmaname in info and 'read' in info[self.pragmaname]:
                 impl += info[self.pragmaname]['read']
                 continue
@@ -1986,38 +1984,44 @@ def outter_split(s, open_brace='(', close_brace=')', separator=','):
             val += separator
     return outter
 
-def split_template_args(s, open_brace='<', close_brace='>', separator=','):
-    """Takes a string with template specialization and returns a list
-    of the argument values as strings. Mostly cribbed from xdress.
-    """
-    targs = []
-    ns = s.split(open_brace, 1)[-1].rsplit(close_brace, 1)[0].split(separator)
-    count = 0
-    targ_name = ''
-    for n in ns:
-        count += int(open_brace in n)
-        count -= int(close_brace in n)
-        if len(targ_name) > 0:
-            targ_name += separator
-        targ_name += n
-        if count == 0:
-            targs.append(targ_name.strip())
-            targ_name = ''
-    return targs
-
 def parse_template(s, open_brace='<', close_brace='>', separator=','):
     """Takes a string -- which may represent a template specialization --
-    and returns the corresponding type. Mostly cribbed from xdress.
+    and returns the corresponding type.
     """
-    if open_brace not in s and close_brace not in s:
+    s = s.replace(' ', '')
+    if open_brace not in s and separator not in s:
         return s
-    t = [s.split(open_brace, 1)[0]]
-    targs = split_template_args(s, open_brace=open_brace,
-                                close_brace=close_brace, separator=separator)
-    for targ in targs:
-        t.append(parse_template(targ, open_brace=open_brace,
-                                close_brace=close_brace, separator=separator))
+
+    i = s.find(open_brace)
+    j = s.rfind(close_brace)
+    t = [s[:i]]
+    inner = s[i+1:j]
+    t.extend(parse_arg(inner, open_brace, close_brace, separator))
     return t
+
+def parse_arg(s, open_brace, close_brace, separator):
+    """Takes a string containing one or more c++ template args and returns
+    a list of the argument values as strings.
+    """
+    nest = 0
+    ts = []
+    start = 0
+    for i in range(len(s)):
+        ch = s[i]
+        if ch == open_brace:
+            nest += 1
+        elif ch == close_brace:
+            nest -= 1
+        
+        if ch == separator and nest == 0:
+            t = parse_template(s[start:i], open_brace, close_brace, separator)
+            ts.append(t)
+            start = i+1
+
+    if start < len(s):
+        t = parse_template(s[start:], open_brace, close_brace, separator)
+        ts.append(t)
+    return ts
 
 def type_to_str(t):
     if t in PRIMITIVES:
