@@ -184,6 +184,10 @@ class MockSim {
   /// with this function.
   void AddRecipe(std::string name, Composition::Ptr c);
 
+  /// Adds a dummy prototype to the simulation that can be used by
+  /// institutions and other agents for deployment/decommission testing.
+  void DummyProto(std::string name);
+
   /// Runs the simulation.  This can only be called once.  After the simulation
   /// has been run, this MockSim object CANNOT be reused to run other
   /// simulations.  Run returns the agent ID for the agent being tested for
