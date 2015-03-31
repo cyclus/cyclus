@@ -290,9 +290,16 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
   CYCLUS_BINDVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
   CYCLUS_BINDVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
   CYCLUS_BINDVAL(MAP_STRING_DOUBLE, std::map<std::string CYCLUS_COMMA double>);
-  CYCLUS_BINDVAL(MAP_STRING_STRING, std::map<std::string CYCLUS_COMMA std::string>);
-  CYCLUS_BINDVAL(MAP_STRING_VECTOR_DOUBLE, std::map<std::string CYCLUS_COMMA std::vector<double> >);
-  CYCLUS_BINDVAL(MAP_STRING_MAP_INT_DOUBLE, std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
+  CYCLUS_BINDVAL(MAP_STRING_STRING,
+                 std::map<std::string CYCLUS_COMMA std::string>);
+  CYCLUS_BINDVAL(MAP_STRING_VECTOR_DOUBLE,
+                 std::map<std::string CYCLUS_COMMA std::vector<double> >);
+  CYCLUS_BINDVAL(
+      MAP_STRING_MAP_INT_DOUBLE,
+      std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
+  CYCLUS_BINDVAL(MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+                 std::map<std::string CYCLUS_COMMA std::pair<
+                     double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
   default: {
     throw ValueError("attempted to retrieve unsupported sqlite backend type");
   }
@@ -361,9 +368,16 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
   CYCLUS_LOADVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
   CYCLUS_LOADVAL(MAP_STRING_DOUBLE, std::map<std::string CYCLUS_COMMA double>);
   CYCLUS_LOADVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
-  CYCLUS_LOADVAL(MAP_STRING_STRING, std::map<std::string CYCLUS_COMMA std::string>);
-  CYCLUS_LOADVAL(MAP_STRING_VECTOR_DOUBLE, std::map<std::string CYCLUS_COMMA std::vector<double> >);
-  CYCLUS_LOADVAL(MAP_STRING_MAP_INT_DOUBLE, std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
+  CYCLUS_LOADVAL(MAP_STRING_STRING,
+                 std::map<std::string CYCLUS_COMMA std::string>);
+  CYCLUS_LOADVAL(MAP_STRING_VECTOR_DOUBLE,
+                 std::map<std::string CYCLUS_COMMA std::vector<double> >);
+  CYCLUS_LOADVAL(
+      MAP_STRING_MAP_INT_DOUBLE,
+      std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
+  CYCLUS_LOADVAL(MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+                 std::map<std::string CYCLUS_COMMA std::pair<
+                     double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
   default: {
     throw ValueError("Attempted to retrieve unsupported backend type");
   }}
@@ -408,43 +422,26 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
     type_map[&typeid(Blob)] = BLOB;
     type_map[&typeid(boost::uuids::uuid)] = UUID;
     type_map[&typeid(std::string)] = STRING;
-
     type_map[&typeid(std::set<int>)] = SET_INT;
-    // type_map[&typeid(std::set<double>)] = SET_DOUBLE;
-    // type_map[&typeid(std::set<float>)] = SET_FLOAT;
-    // type_map[&typeid(std::set<Blob>)] = SET_BLOB;
-    // type_map[&typeid(std::set<boost::uuids::uuid>)] = SET_UUID;
     type_map[&typeid(std::set<std::string>)] = SET_STRING;
-
     type_map[&typeid(std::vector<int>)] = VECTOR_INT;
     type_map[&typeid(std::vector<double>)] = VECTOR_DOUBLE;
-    // type_map[&typeid(std::vector<float>)] = VECTOR_FLOAT;
-    // type_map[&typeid(std::vector<Blob>)] = VECTOR_BLOB;
-    // type_map[&typeid(std::vector<boost::uuids::uuid>)] = VECTOR_UUID;
     type_map[&typeid(std::vector<std::string>)] = VECTOR_STRING;
-
     type_map[&typeid(std::list<int>)] = LIST_INT;
-    // type_map[&typeid(std::list<double>)] = LIST_DOUBLE;
-    // type_map[&typeid(std::list<float>)] = LIST_FLOAT;
-    // type_map[&typeid(std::list<Blob>)] = LIST_BLOB;
-    // type_map[&typeid(std::list<boost::uuids::uuid>)] = LIST_UUID;
     type_map[&typeid(std::list<std::string>)] = LIST_STRING;
-
     type_map[&typeid(std::map<int, int>)] = MAP_INT_INT;
     type_map[&typeid(std::map<int, double>)] = MAP_INT_DOUBLE;
-    // type_map[&typeid(std::map<int, float>)] = MAP_INT_FLOAT;
-    // type_map[&typeid(std::map<int, Blob>)] = MAP_INT_BLOB;
-    // type_map[&typeid(std::map<int, boost::uuids::uuid>)] = MAP_INT_UUID;
     type_map[&typeid(std::map<int, std::string>)] = MAP_INT_STRING;
-
     type_map[&typeid(std::map<std::string, int>)] = MAP_STRING_INT;
     type_map[&typeid(std::map<std::string, double>)] = MAP_STRING_DOUBLE;
-    // type_map[&typeid(std::map<std::string, float>)] = MAP_STRING_FLOAT;
-    // type_map[&typeid(std::map<std::string, Blob>)] = MAP_STRING_BLOB;
-    // type_map[&typeid(std::map<std::string, boost::uuids::uuid>)] = MAP_STRING_UUID;
     type_map[&typeid(std::map<std::string, std::string>)] = MAP_STRING_STRING;
-    type_map[&typeid(std::map<std::string, std::vector<double> >)] = MAP_STRING_VECTOR_DOUBLE;
-    type_map[&typeid(std::map<std::string, std::map<int, double> >)] = MAP_STRING_MAP_INT_DOUBLE;
+    type_map[&typeid(std::map<std::string, std::vector<double> >)] =
+        MAP_STRING_VECTOR_DOUBLE;
+    type_map[&typeid(std::map<std::string, std::map<int, double> >)] =
+        MAP_STRING_MAP_INT_DOUBLE;
+    type_map[&typeid(std::map<std::string,
+                              std::pair<double, std::map<int, double> > >)] =
+        MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE;
   }
 
   const std::type_info* ti = &v.type();
