@@ -1985,9 +1985,18 @@ def outter_split(s, open_brace='(', close_brace=')', separator=','):
     return outter
 
 def parse_template(s, open_brace='<', close_brace='>', separator=','):
-    """Takes a string -- which may represent a template specialization --
-    and returns the corresponding type.
+    """Takes a string -- which may represent a template specialization -- and
+    returns the corresponding type.
+    
+    It calls parse_arg to return the type(s) for any template arguments the
+    type may have. For example:
+
+    >>> parse_template('std::map<int, double>')
+    ['std::map', 'int', 'double']
+    >>> parse_template('std::map<int, std::map<int, std::map<int, int> > >')
+    ['std::map', 'int', ['std::map', 'int', ['std::map', 'int', 'int']]]
     """
+
     s = s.replace(' ', '')
     if open_brace not in s and separator not in s:
         return s
@@ -1999,10 +2008,21 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
     t.extend(parse_arg(inner, open_brace, close_brace, separator))
     return t
 
-def parse_arg(s, open_brace, close_brace, separator):
-    """Takes a string containing one or more c++ template args and returns
-    a list of the argument values as strings.
+def parse_arg(s, open_brace='<', close_brace='>', separator=','):
+    """Takes a string containing one or more c++ template args and returns a
+    list of the argument types as strings.
+    
+    This is called by parse_template to handle the inner portion of the
+    template braces.  For example:
+
+    >>> parse_arg('int, double')
+    ['int', 'double']
+    >>> parse_arg('std::map<int, double>')
+    [['std::map', 'int', 'double']]
+    >>> parse_arg('int, std::map<int, double>')
+    ['int', ['std::map', 'int', 'double']]
     """
+
     nest = 0
     ts = []
     start = 0
