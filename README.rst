@@ -69,7 +69,8 @@ Installing Dependencies (Linux and Unix)
 This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Ubuntu 12.10 using apt-get as the package manager.
+of Ubuntu 12.10 using apt-get as the package manager (scroll down further for
+Mac OSX instructions).
 
 The command to install a dependency takes the form of:
 
@@ -165,16 +166,16 @@ required library package names is:
 #. doxygen
 #. glibmm
 
-Download coin-CBC:
+Download Coin-Cbc:
 
 .. code-block:: bash
 
-  svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 coin-Cbc
+  svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc
 
 Download `hdf5 <http://www.hdfgroup.org/HDF5/release/obtainsrc.html#src>`_
 (make sure to get v1.8.13, and do not use the macports version):
 
-After downloading each source file to its own dir/, installation takes the form of:
+After downloading hdf5 and Coin-Cbc each to their own dir/, installation takes the form of:
 
 .. code-block:: bash
 
