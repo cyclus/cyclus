@@ -135,9 +135,10 @@ Installing Dependencies (Mac OSX)
 ========================================
 
 Cyclus archetype development is not fully supported on Mac.  Nonetheless, because
-there are some use cases in which users have needed to install from source,
-we have compiled a list of instructions that should be successful, with the exception
-of the HDF5 interface, which is not working on Yosemite as of 1-Apr-2015. Use a
+there are some use cases which require installation from source,
+we have compiled a list of instructions that should be successful. (Note that the
+HDF5 interface is not working on Yosemite as of 1-Apr-2015. Ignore related warnings
+when building cyclus). Use a
 Mac platform at your own risk, we strongly recommend sticking to Linux for development.
 
 This guide assumes that the user has root access (to issue sudo commands) and
@@ -164,12 +165,15 @@ required library package names is:
 #. doxygen
 #. glibmm
 
-You will also need to install the following from source:
+Download coin-CBC:
 
-#. `coin-CBC <https://projects.coin-or.org/svn/Cbc/stable/2.8>`_
-#. `hdf5 <http://www.hdfgroup.org/HDF5/release/obtainsrc.html#src>`_ (make sure to get
-  v1.8.13, and do not use the macports version)
-    
+.. code-block:: bash
+
+  svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 coin-Cbc
+
+Download `hdf5 <http://www.hdfgroup.org/HDF5/release/obtainsrc.html#src>`_
+(make sure to get v1.8.13, and do not use the macports version):
+
 After downloading each source file to its own dir/, installation takes the form of:
 
 .. code-block:: bash
@@ -182,7 +186,7 @@ After downloading each source file to its own dir/, installation takes the form 
   sudo make install
 
 Finally, update your path and the following environment variables in your
-~/.profile or ~/.bashrc file:
+~/.profile (or ~/.bashrc ) file:
 
 .. code-block:: bash
 
