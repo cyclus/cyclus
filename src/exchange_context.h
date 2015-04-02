@@ -14,6 +14,14 @@
 
 namespace cyclus {
 
+/// @brief A notion of the point of view from which an trade-related action is
+/// being requested
+enum TradeSense {
+  REQUEST = 0, ///< The action is from the request-perspective 
+  BID, ///< The action is from the bid-perspective
+  END
+};    
+
 template <class T>
 struct PrefMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double> > type;

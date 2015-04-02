@@ -318,12 +318,25 @@ class Agent : public StateWrangler, virtual public Ider {
   /// their Decommission function.
   virtual void Decommission();
 
-  /// default implementation for material preferences.
+  /// @warning Deprecated!
+  /// @{
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
+  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
+  /// @}
+  
 
   /// default implementation for material preferences.
-  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
-
+  virtual double AdjustMatlPref(Request<Material>* req, Bid<Material>* bid,
+                                double pref, TradeSense sense) {
+    return pref;
+  }
+  /// default implementation for product preferences.
+  virtual double AdjustProductPref(Request<Product>* req, Bid<Product>* bid,
+                                   double pref, TradeSense sense) {
+    return pref;
+  }
+  
+  
   /// Returns an agent's xml rng schema for initializing from input files. All
   /// concrete agents should override this function. This must validate the same
   /// xml input that the InfileToDb function receives.

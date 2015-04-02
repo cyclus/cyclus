@@ -18,25 +18,11 @@
 #include "resource_helpers.h"
 #include "test_context.h"
 #include "test_agents/test_facility.h"
-
-using cyclus::Bid;
-using cyclus::BidPortfolio;
-using cyclus::CommodMap;
-using cyclus::Composition;
-using cyclus::Context;
-using cyclus::ExchangeContext;
-using cyclus::Facility;
-using cyclus::Material;
-using cyclus::Agent;
-using cyclus::PrefMap;
-using cyclus::Request;
-using cyclus::RequestPortfolio;
-using cyclus::ResourceExchange;
-using cyclus::TestContext;
 using std::set;
 using std::string;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+namespace cyclus {
+
 class Requester: public TestFacility {
  public:
   Requester(Context* ctx, int i = 1)
@@ -75,19 +61,25 @@ class Requester: public TestFacility {
     pref_ctr_++;
   }
 
+  virtual double AdjustMatlPref(Request<Material>* req, Bid<Material>* bid,
+                                double pref, TradeSense sense) {
+    pref_ctr_++;
+    return std::pow(pref, 2);
+  }
+  
   RequestPortfolio<Material>::Ptr port_;
   int i_;
   int pref_ctr_;
   int req_ctr_;
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Bidder: public TestFacility {
  public:
   Bidder(Context* ctx, std::string commod)
       : TestFacility(ctx),
         commod_(commod),
-        bid_ctr_(0) {}
+        bid_ctr_(0),
+        pref_ctr_(0) {}
 
   virtual cyclus::Agent* Clone() {
     Bidder* m = new Bidder(context(), commod_);
@@ -104,12 +96,18 @@ class Bidder: public TestFacility {
     return bps;
   }
 
+  virtual double AdjustMatlPref(Request<Material>* req, Bid<Material>* bid,
+                                double pref, TradeSense sense) {
+    pref_ctr_++;
+    return pref;
+  }
+
   BidPortfolio<Material>::Ptr port_;
   std::string commod_;
   int bid_ctr_;
+  int pref_ctr_;
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ResourceExchangeTests: public ::testing::Test {
  protected:
   TestContext tc;
@@ -140,7 +138,6 @@ class ResourceExchangeTests: public ::testing::Test {
   }
 };
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, Requests) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   req = rp->AddRequest(mat, reqr, commod, pref);
@@ -169,7 +166,6 @@ TEST_F(ResourceExchangeTests, Requests) {
   clone->Decommission();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, Bids) {
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
 
@@ -223,84 +219,43 @@ TEST_F(ResourceExchangeTests, Bids) {
   clone->Decommission();
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, PrefCalls) {
-  Facility* parent = dynamic_cast<Facility*>(reqr->Clone());
-  Facility* child = dynamic_cast<Facility*>(reqr->Clone());
-  parent->Build(NULL);
-  child->Build(parent);
-
-  Requester* pcast = dynamic_cast<Requester*>(parent);
-  Requester* ccast = dynamic_cast<Requester*>(child);
-
-  ASSERT_TRUE(pcast != NULL);
-  ASSERT_TRUE(ccast != NULL);
-  ASSERT_TRUE(pcast->parent() == NULL);
-  ASSERT_TRUE(ccast->parent() == dynamic_cast<Agent*>(pcast));
-  ASSERT_TRUE(pcast->manager() == dynamic_cast<Agent*>(pcast));
-  ASSERT_TRUE(ccast->manager() == dynamic_cast<Agent*>(ccast));
-
-  // doin a little magic to simulate each requester making their own request
-  RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
-  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, pref);
-  pcast->port_ = rp1;
-  RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
-  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, pref);
-  ccast->port_ = rp2;
-
-  EXPECT_EQ(0, pcast->req_ctr_);
-  EXPECT_EQ(0, ccast->req_ctr_);
-  exchng->AddAllRequests();
-  EXPECT_EQ(2, exchng->ex_ctx().requesters.size());
-  EXPECT_EQ(1, pcast->req_ctr_);
-  EXPECT_EQ(1, ccast->req_ctr_);
-
-  EXPECT_EQ(0, pcast->pref_ctr_);
-  EXPECT_EQ(0, ccast->pref_ctr_);
-  EXPECT_NO_THROW(exchng->AdjustAll());
-
-  // child gets to adjust once - its own request
-  // parent gets called twice - its request and adjusting its child's request
-  EXPECT_EQ(2, pcast->pref_ctr_);
-  EXPECT_EQ(1, ccast->pref_ctr_);
-
-  child->Decommission();
-  parent->Decommission();
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, PrefValues) {
-  Facility* parent = dynamic_cast<Facility*>(reqr->Clone());
-  Facility* child = dynamic_cast<Facility*>(reqr->Clone());
-  parent->Build(NULL);
-  child->Build(parent);
-
-  Requester* pcast = dynamic_cast<Requester*>(parent);
-  Requester* ccast = dynamic_cast<Requester*>(child);
-
-  // doin a little magic to simulate each requester making their own request
-  RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
-  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, pref);
-  pcast->port_ = rp1;
-  RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
-  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, pref);
-  ccast->port_ = rp2;
+TEST_F(ResourceExchangeTests, PrefAdjustment) {
+  Facility* rparent = dynamic_cast<Facility*>(reqr->Clone());
+  Facility* rchild = dynamic_cast<Facility*>(reqr->Clone());
+  rparent->Build(NULL);
+  rchild->Build(rparent);
+  Requester* rpcast = dynamic_cast<Requester*>(rparent);
+  Requester* rccast = dynamic_cast<Requester*>(rchild);
 
   Bidder* bidr = new Bidder(tc.get(), commod);
+  Facility* bparent = dynamic_cast<Facility*>(bidr->Clone());
+  Facility* bchild = dynamic_cast<Facility*>(bidr->Clone());
+  bparent->Build(NULL);
+  bchild->Build(bparent);
+  Bidder* bpcast = dynamic_cast<Bidder*>(bparent);
+  Bidder* bccast = dynamic_cast<Bidder*>(bchild);
+  
+  // doin a little magic to simulate each requester making their own request
+  RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
+  Request<Material>* preq = rp1->AddRequest(mat, rpcast, commod, pref);
+  rpcast->port_ = rp1;
+  RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
+  Request<Material>* creq = rp2->AddRequest(mat, rccast, commod, pref);
+  rccast->port_ = rp2;
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr);
-  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr);
-
-  std::vector<Bid<Material>*> bids;
-  bids.push_back(pbid);
-  bids.push_back(cbid);
-  bidr->port_ = bp;
-
-  Facility* bclone = dynamic_cast<Facility*>(bidr->Clone());
-  bclone->Build(NULL);
-
+  Bid<Material>* pbid = bp->AddBid(preq, mat, bccast);
+  Bid<Material>* cbid = bp->AddBid(creq, mat, bccast);
+  bccast->port_ = bp;
+  BidPortfolio<Material>::Ptr foo(new BidPortfolio<Material>());
+  bpcast->port_ = foo;
+  
+  EXPECT_EQ(0, rpcast->req_ctr_);
+  EXPECT_EQ(0, rccast->req_ctr_);
   EXPECT_NO_THROW(exchng->AddAllRequests());
+  EXPECT_EQ(2, exchng->ex_ctx().requesters.size());
+  EXPECT_EQ(1, rpcast->req_ctr_);
+  EXPECT_EQ(1, rccast->req_ctr_);
   EXPECT_NO_THROW(exchng->AddAllBids());
 
   PrefMap<Material>::type pobs;
@@ -309,16 +264,31 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   cobs[creq].insert(std::make_pair(cbid, creq->preference()));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();
-  EXPECT_EQ(context.trader_prefs[parent], pobs);
-  EXPECT_EQ(context.trader_prefs[child], cobs);
+  EXPECT_EQ(context.trader_prefs[rparent], pobs);
+  EXPECT_EQ(context.trader_prefs[rchild], cobs);
 
+  EXPECT_EQ(0, rpcast->pref_ctr_);
+  EXPECT_EQ(0, rccast->pref_ctr_);
+  EXPECT_EQ(0, bccast->pref_ctr_);
+  EXPECT_EQ(0, bpcast->pref_ctr_);
   EXPECT_NO_THROW(exchng->AdjustAll());
-
+  // rchild gets to adjust once - its own request
+  // rparent gets to adjust once for each possible trade
+  EXPECT_EQ(2, rpcast->pref_ctr_);
+  EXPECT_EQ(1, rccast->pref_ctr_);
+  // bchild gets no adjustment
+  // bparent gets to adjust once for each possible trade
+  EXPECT_EQ(2, bpcast->pref_ctr_);
+  EXPECT_EQ(0, bccast->pref_ctr_);
   pobs[preq].begin()->second = std::pow(preq->preference(), 2);
   cobs[creq].begin()->second = std::pow(std::pow(creq->preference(), 2), 2);
-  EXPECT_EQ(context.trader_prefs[parent], pobs);
-  EXPECT_EQ(context.trader_prefs[child], cobs);
+  EXPECT_EQ(context.trader_prefs[rparent], pobs);
+  EXPECT_EQ(context.trader_prefs[rchild], cobs);
 
-  child->Decommission();
-  parent->Decommission();
+  rchild->Decommission();
+  rparent->Decommission();
+  bchild->Decommission();
+  bparent->Decommission();
+}
+
 }
