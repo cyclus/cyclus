@@ -19,20 +19,8 @@
 #include "test_context.h"
 #include "test_agents/test_facility.h"
 
-using cyclus::Bid;
-using cyclus::BidPortfolio;
-using cyclus::CommodMap;
-using cyclus::Composition;
-using cyclus::Context;
-using cyclus::ExchangeContext;
-using cyclus::Facility;
-using cyclus::Material;
-using cyclus::Agent;
-using cyclus::PrefMap;
-using cyclus::Request;
-using cyclus::RequestPortfolio;
-using cyclus::ResourceExchange;
-using cyclus::TestContext;
+namespace cyclus {
+
 using std::set;
 using std::string;
 
@@ -142,20 +130,33 @@ class ResourceExchangeTests: public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, Requests) {
-  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  req = rp->AddRequest(mat, reqr, commod, pref);
-  reqr->port_ = rp;
-
   Facility* clone = dynamic_cast<Facility*>(reqr->Clone());
   clone->Build(NULL);
   Requester* rcast = dynamic_cast<Requester*>(clone);
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  req = rp->AddRequest(mat, clone, commod, pref);
+  rcast->port_ = rp;
+
+  // add a port with a bad constraint
+  Facility* clone2 = dynamic_cast<Facility*>(reqr->Clone());
+  clone2->Build(NULL);
+  Requester* rcast2 = dynamic_cast<Requester*>(clone2);
+  RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
+  rp2->AddRequest(mat, clone2, commod, pref);
+  CapacityConstraint<Material> cap(-1);
+  rp2->AddConstraint(cap);
+  rcast2->port_ = rp2;
+
+  // everyone should have their requests seen
   EXPECT_EQ(0, rcast->req_ctr_);
+  EXPECT_EQ(0, rcast2->req_ctr_);
   exchng->AddAllRequests();
   EXPECT_EQ(1, rcast->req_ctr_);
+  EXPECT_EQ(1, rcast2->req_ctr_);
   EXPECT_EQ(1, exchng->ex_ctx().requesters.size());
 
+  // but only 1 port should get through
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
-
   const std::vector<RequestPortfolio<Material>::Ptr>& obsvp = ctx.requests;
   EXPECT_EQ(1, obsvp.size());
   EXPECT_TRUE(RPEq(*rp.get(), *obsvp[0].get()));
@@ -167,6 +168,7 @@ TEST_F(ResourceExchangeTests, Requests) {
   EXPECT_EQ(vr, obsvr);
 
   clone->Decommission();
+  clone2->Decommission();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -321,4 +323,6 @@ TEST_F(ResourceExchangeTests, PrefValues) {
 
   child->Decommission();
   parent->Decommission();
+}
+
 }
