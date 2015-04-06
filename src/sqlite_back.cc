@@ -238,7 +238,6 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
 #define CYCLUS_COMMA ,
 #define CYCLUS_BINDVAL(D, T) \
     case D: { \
-    CLOG(LEV_DEBUG5) << "case D: " << D; \
     T vect = v.cast<T>(); \
     std::stringstream ss; \
     boost::archive::xml_oarchive ar(ss); \
@@ -302,7 +301,8 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
                  std::map<std::string CYCLUS_COMMA std::pair<
                      double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
   CYCLUS_BINDVAL(MAP_INT_MAP_STRING_DOUBLE,
-                 std::map<int CYCLUS_COMMA std::map<std::string CYCLUS_COMMA double> >);
+                 std::map<int CYCLUS_COMMA
+                          std::map<std::string CYCLUS_COMMA double> >);
   default: {
     throw ValueError("attempted to retrieve unsupported sqlite backend type");
   }
@@ -381,6 +381,9 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
   CYCLUS_LOADVAL(MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
                  std::map<std::string CYCLUS_COMMA std::pair<
                      double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
+  CYCLUS_LOADVAL(MAP_INT_MAP_STRING_DOUBLE,
+                 std::map<int CYCLUS_COMMA
+                          std::map<std::string CYCLUS_COMMA double> >);
   default: {
     throw ValueError("Attempted to retrieve unsupported backend type");
   }}
@@ -445,6 +448,8 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
     type_map[&typeid(std::map<std::string,
                               std::pair<double, std::map<int, double> > >)] =
         MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE;
+    type_map[&typeid(std::map<int, std::map<std::string, double> >)] =
+        MAP_INT_MAP_STRING_DOUBLE;
   }
 
   const std::type_info* ti = &v.type();
