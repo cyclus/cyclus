@@ -1260,7 +1260,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + '{0}.resize(n);\n'.format(member)
-        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + 'for (int i = 0; i < n; ++i) {\n'
         s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
         s += ind + '  {0}[i] = elem;\n'.format(member)
         s += ind + '}\n'
@@ -1278,7 +1278,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
-        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + 'for (int i = 0; i < n; ++i) {\n'
         s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
         s += ind + '  {0}.insert(elem);\n'.format(member)
         s += ind + '}\n'
@@ -1296,7 +1296,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
-        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + 'for (int i = 0; i < n; ++i) {\n'
         s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
         s += ind + '  {0}.push_back(elem);\n'.format(member)
         s += ind + '}\n'
@@ -1333,7 +1333,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
-        s += ind + 'for (i = 0; i < n; ++i) {\n'
+        s += ind + 'for (int i = 0; i < n; ++i) {\n'
         s += self.read_member('key', alias[1], t[1], uitype[1], ind+'  ', idx='i')
         s += self.read_member('val', alias[2], t[2], uitype[2], ind+'  ', idx='i')
         s += ind + '  {0}[key] = val;\n'.format(member)
