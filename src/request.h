@@ -35,7 +35,7 @@ class Request {
       Trader* requester,
       typename RequestPortfolio<T>::Ptr portfolio,
       std::string commodity = "",
-      double preference = 0,
+      double preference = 1,
       bool exclusive = false) {
     return new Request<T>(target, requester, portfolio,
                           commodity, preference, exclusive);
@@ -46,7 +46,7 @@ class Request {
   inline static Request<T>* Create(boost::shared_ptr<T> target,
                                    Trader* requester,
                                    std::string commodity = "",
-                                   double preference = 0,
+                                   double preference = 1,
                                    bool exclusive = false) {
     return new Request<T>(target, requester, commodity, preference,
                           exclusive);
@@ -75,7 +75,7 @@ class Request {
  private:
   /// @brief constructors are private to require use of factory methods
   Request(boost::shared_ptr<T> target, Trader* requester,
-          std::string commodity = "", double preference = 0,
+          std::string commodity = "", double preference = 1,
           bool exclusive = false)
       : target_(target),
         requester_(requester),
@@ -85,7 +85,7 @@ class Request {
 
   Request(boost::shared_ptr<T> target, Trader* requester,
           typename RequestPortfolio<T>::Ptr portfolio,
-          std::string commodity = "", double preference = 0,
+          std::string commodity = "", double preference = 1,
           bool exclusive = false)
       : target_(target),
         requester_(requester),
