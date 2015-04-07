@@ -1255,14 +1255,15 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
+        idx = 'i{}'.format(len(ind) / 2)
         s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + '{0}.resize(n);\n'.format(member)
-        s += ind + 'for (int i = 0; i < n; ++i) {\n'
-        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
-        s += ind + '  {0}[i] = elem;\n'.format(member)
+        s += ind + 'for (int {idx} = 0; {idx} < n; ++{idx})'.format(idx=idx) + ' {\n'
+        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx=idx)
+        s += ind + '  {0}[{1}] = elem;\n'.format(member, idx)
         s += ind + '}\n'
         return s
 
@@ -1274,12 +1275,13 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
+        idx = 'i{}'.format(len(ind) / 2)
         s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
-        s += ind + 'for (int i = 0; i < n; ++i) {\n'
-        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += ind + 'for (int {idx} = 0; {idx} < n; ++{idx})'.format(idx=idx) + ' {\n'
+        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx=idx)
         s += ind + '  {0}.insert(elem);\n'.format(member)
         s += ind + '}\n'
         return s
@@ -1292,12 +1294,13 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
+        idx = 'i{}'.format(len(ind) / 2)
         s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
-        s += ind + 'for (int i = 0; i < n; ++i) {\n'
-        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx='i')
+        s += ind + 'for (int {idx} = 0; {idx} < n; ++{idx})'.format(idx=idx) + ' {\n'
+        s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx=idx)
         s += ind + '  {0}.push_back(elem);\n'.format(member)
         s += ind + '}\n'
         return s
@@ -1329,13 +1332,14 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
+        idx = 'i{}'.format(len(ind) / 2)
         s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
-        s += ind + 'for (int i = 0; i < n; ++i) {\n'
-        s += self.read_member('key', alias[1], t[1], uitype[1], ind+'  ', idx='i')
-        s += self.read_member('val', alias[2], t[2], uitype[2], ind+'  ', idx='i')
+        s += ind + 'for (int {idx} = 0; {idx} < n; ++{idx})'.format(idx=idx) + ' {\n'
+        s += self.read_member('key', alias[1], t[1], uitype[1], ind+'  ', idx=idx)
+        s += self.read_member('val', alias[2], t[2], uitype[2], ind+'  ', idx=idx)
         s += ind + '  {0}[key] = val;\n'.format(member)
         s += ind + '}\n'
         return s
