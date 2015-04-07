@@ -1057,6 +1057,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             'std::pair': self._val_pair,
             'std::map': self._val_map,
             }
+        self._idx_lev = 0
 
     def methodargs(self):
         return "{0}::InfileTree* tree, {0}::DbInit di".format(CYCNS)
@@ -1255,17 +1256,20 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        lev = len(ind) // 2
+        lev = self._idx_lev
         idx = 'i{}'.format(lev)
         # subtree must be specified if in recursive level
-        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
+        tree_idx = '0' if lev == 0 else 'i{}'.format(lev - 1)
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
+            CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + '{0}.resize(n);\n'.format(member)
         s += ind + 'for (int {idx} = 0; {idx} < n; ++{idx})'.format(idx=idx) + ' {\n'
+        self._idx_lev += 1
         s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx=idx)
+        self._idx_lev -= 1
         s += ind + '  {0}[{1}] = elem;\n'.format(member, idx)
         s += ind + '}\n'
         return s
@@ -1278,16 +1282,19 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        lev = len(ind) // 2
+        lev = self._idx_lev
         idx = 'i{}'.format(lev)
         # subtree must be specified if in recursive level
-        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
+        tree_idx = '0' if lev == 0 else 'i{}'.format(lev - 1)
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
+            CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (int {idx} = 0; {idx} < n; ++{idx})'.format(idx=idx) + ' {\n'
+        self._idx_lev += 1
         s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx=idx)
+        self._idx_lev -= 1
         s += ind + '  {0}.insert(elem);\n'.format(member)
         s += ind + '}\n'
         return s
@@ -1300,16 +1307,19 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        lev = len(ind) // 2
+        lev = self._idx_lev
         idx = 'i{}'.format(lev)
         # subtree must be specified if in recursive level
-        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
+        tree_idx = '0' if lev == 0 else 'i{}'.format(lev - 1)
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
+            CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (int {idx} = 0; {idx} < n; ++{idx})'.format(idx=idx) + ' {\n'
+        self._idx_lev += 1
         s += self.read_member('elem', alias[1], t[1], uitype[1], ind+'  ', idx=idx)
+        self._idx_lev -= 1
         s += ind + '  {0}.push_back(elem);\n'.format(member)
         s += ind + '}\n'
         return s
@@ -1324,13 +1334,17 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        lev = len(ind) // 2
+        lev = self._idx_lev
+        idx = 'i{}'.format(lev)
         # subtree must be specified if in recursive level
-        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
+        tree_idx = '0' if lev == 0 else 'i{}'.format(lev - 1)
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
+            CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        self._idx_lev += 1
         s += self.read_member('first', alias[1], t[1], uitype[1], ind+'  ')
         s += self.read_member('second', alias[2], t[2], uitype[2], ind+'  ')
+        self._idx_lev -= 1
         s += ind + '{0} {1}(first, second);\n'.format(type_to_str(t), member)
         return s
 
@@ -1344,17 +1358,20 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        lev = len(ind) // 2
+        lev = self._idx_lev
         idx = 'i{}'.format(lev)
         # subtree must be specified if in recursive level
-        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
+        tree_idx = '0' if lev == 0 else 'i{}'.format(lev - 1)
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
+            CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
         s += ind + 'for (int {idx} = 0; {idx} < n; ++{idx})'.format(idx=idx) + ' {\n'
+        self._idx_lev += 1
         s += self.read_member('key', alias[1], t[1], uitype[1], ind+'  ', idx=idx)
         s += self.read_member('val', alias[2], t[2], uitype[2], ind+'  ', idx=idx)
+        self._idx_lev -= 1
         s += ind + '  {0}[key] = val;\n'.format(member)
         s += ind + '}\n'
         return s
