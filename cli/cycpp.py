@@ -1255,7 +1255,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        idx = 'i{}'.format(len(ind) / 2)
+        idx = 'i{}'.format(len(ind) // 2)
         s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
@@ -1275,7 +1275,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        idx = 'i{}'.format(len(ind) / 2)
+        idx = 'i{}'.format(len(ind) // 2)
         s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
@@ -1294,7 +1294,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        idx = 'i{}'.format(len(ind) / 2)
+        idx = 'i{}'.format(len(ind) // 2)
         s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
@@ -1332,7 +1332,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        idx = 'i{}'.format(len(ind) / 2)
+        idx = 'i{}'.format(len(ind) // 2)
         s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
