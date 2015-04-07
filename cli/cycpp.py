@@ -1255,8 +1255,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        idx = 'i{}'.format(len(ind) // 2)
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        lev = len(ind) // 2
+        idx = 'i{}'.format(lev)
+        # subtree must be specified if in recursive level
+        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
@@ -1275,8 +1278,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        idx = 'i{}'.format(len(ind) // 2)
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        lev = len(ind) // 2
+        idx = 'i{}'.format(lev)
+        # subtree must be specified if in recursive level
+        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
@@ -1294,8 +1300,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        idx = 'i{}'.format(len(ind) // 2)
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        lev = len(ind) // 2
+        idx = 'i{}'.format(lev)
+        # subtree must be specified if in recursive level
+        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
@@ -1315,7 +1324,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        lev = len(ind) // 2
+        # subtree must be specified if in recursive level
+        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += self.read_member('first', alias[1], t[1], uitype[1], ind+'  ')
         s += self.read_member('second', alias[2], t[2], uitype[2], ind+'  ')
@@ -1332,8 +1344,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
-        idx = 'i{}'.format(len(ind) // 2)
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}");\n'.format(CYCNS, alias[0])
+        lev = len(ind) // 2
+        idx = 'i{}'.format(lev)
+        # subtree must be specified if in recursive level
+        txt = ', i{}'.format(lev - 2) if lev > 3 else ''
+        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}"{2});\n'.format(CYCNS, alias[0], txt)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += ind + 'int n = sub->NMatches("{0}");\n'.format(alias[1])
         s += ind + '{0} {1};\n'.format(type_to_str(t), member)
