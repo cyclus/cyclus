@@ -169,7 +169,7 @@ required library package names is:
 Then install Coin-Cbc and HDF5 from source. They can be downloaded to any
 directory on your computer:
    
-#. Download and build Coin-Cbc from source by using the svn command in the terminal:
+**Coin-Cbc**: Download and build using the svn command in the terminal:
    
 .. code-block:: bash
 
@@ -181,7 +181,7 @@ directory on your computer:
   make
   sudo make install
 
-#. Download and build HDF5 from source using the gzip Linux/Unix distribution of `HDF5. <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/hdf5-1.8.13.tar.gz>`_  (The 1.8.13 version appears to work better than 1.8.14.  Do not use the macports distribution, it is definitely broken.)
+**HDF5** Download and build using the gzip Linux/Unix distribution of `HDF5. <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/hdf5-1.8.13.tar.gz>`_  (The 1.8.13 version appears to work better than 1.8.14.  Do not use the macports distribution, it is definitely broken.)
 
 .. code-block:: bash
 
