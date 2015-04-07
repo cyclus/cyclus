@@ -138,9 +138,9 @@ Installing Dependencies (Mac OSX)
 Cyclus archetype development is not fully supported on Mac.  Nonetheless, because
 there are some use cases which require installation from source,
 we have compiled a list of instructions that should be successful. (Note that the
-HDF5 interface is not working on Yosemite as of 1-Apr-2015. Ignore related warnings
-when building cyclus). Use a
-Mac platform at your own risk, we strongly recommend sticking to Linux for development.
+HDF5 interface is not working on Yosemite as of 1-Apr-2015. Ignore related
+warningswhen building cyclus). Use a Mac platform at your own risk, we strongly
+recommend sticking to Linux for development.
 
 This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
@@ -166,7 +166,8 @@ required library package names is:
 #. doxygen
 #. glibmm
 
-Then install Coin-Cbc and HDF5 from source. They can be downloaded to any directory on your computer:
+Then install Coin-Cbc and HDF5 from source. They can be downloaded to any
+directory on your computer:
    
 #. Download and build Coin-Cbc from source by using the svn command in the terminal:
    
@@ -187,7 +188,7 @@ Then install Coin-Cbc and HDF5 from source. They can be downloaded to any direct
 
   mkdir hdf5/
   mv hdf5-1.8.13.tar.gz hdf5/
-=======
+
 Download Coin-Cbc:
 
 .. code-block:: bash
