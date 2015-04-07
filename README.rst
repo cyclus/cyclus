@@ -166,20 +166,27 @@ required library package names is:
 #. doxygen
 #. glibmm
 
-Download Coin-Cbc:
-
+Then install Coin-Cbc and HDF5 from source. They can be downloaded to any directory on your computer:
+   
+#. Download and build Coin-Cbc from source by using the svn command in the terminal:
+   
 .. code-block:: bash
 
   svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc
+  cd Coin-Cbc/
+  mkdir build
+  cd build/
+  ../configure --prefix=/opt/local
+  make
+  sudo make install
 
-Download `hdf5 <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/>`_
-(make sure to get v1.8.13, and do not use the macports version):
-
-After downloading hdf5 and Coin-Cbc each to their own dir/, installation takes the form of:
+#. Download and build HDF5 from source using the gzip Linux/Unix distribution of `HDF5 <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/hdf5-1.8.13.tar.gz>`_
+(The 1.8.13 version appears to work better than 1.8.14.  Do not use the macports distribution, it is definitely broken)
 
 .. code-block:: bash
 
-  cd dir/
+  mkdir hdf5/
+  mv hdf5-1.8.13.tar.gz hdf5/
   mkdir build
   cd build/
   ../configure --prefix=/opt/local
