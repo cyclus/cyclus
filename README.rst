@@ -181,28 +181,15 @@ directory on your computer:
   make
   sudo make install
 
-#. Download and build HDF5 from source using the gzip Linux/Unix distribution of `HDF5 <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/hdf5-1.8.13.tar.gz>`_
-(The 1.8.13 version appears to work better than 1.8.14.  Do not use the macports distribution, it is definitely broken)
+#. Download and build HDF5 from source using the gzip Linux/Unix distribution of `HDF5. <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/hdf5-1.8.13.tar.gz>`_
+
+(The 1.8.13 version appears to work better than 1.8.14.  Do not use the macports distribution, it is definitely broken.)
 
 .. code-block:: bash
 
   mkdir hdf5/
   mv hdf5-1.8.13.tar.gz hdf5/
-
-Download Coin-Cbc:
-
-.. code-block:: bash
-
-  svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc
-
-Download `hdf5 <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/>`_
-(make sure to get v1.8.13, and do not use the macports version):
-
-After downloading hdf5 and Coin-Cbc each to their own dir/, installation takes the form of:
-
-.. code-block:: bash
-
-  cd dir/
+  cd hdf5/
   mkdir build
   cd build/
   ../configure --prefix=/opt/local
