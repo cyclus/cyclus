@@ -1268,17 +1268,18 @@ class InfileToDbFilter(CodeGeneratorFilter):
             CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
+            lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=self._idx_lev)
+                alias[1], lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
-            s += ind + '{0}.resize(n{lev});\n'.format(member, lev=self._idx_lev)
+            s += ind + '{0}.resize(n{lev});\n'.format(member, lev=lev)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
-                lev=self._idx_lev) + ' {\n'
+                lev=lev) + ' {\n'
             s += self.read_member(
                 'elem', alias[1], t[1], uitype[1], 
-                ind+'  ', idx='i{lev}'.format(lev=self._idx_lev))
+                ind+'  ', idx='i{lev}'.format(lev=lev))
             s += ind + '  {0}[{idx}] = elem;\n'.format(
-                member, idx='i{lev}'.format(lev=self._idx_lev))
+                member, idx='i{lev}'.format(lev=lev))
             s += ind + '}\n'
         return s
 
@@ -1295,6 +1296,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
+            lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
                 alias[1], lev=self._idx_lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
@@ -1320,14 +1322,15 @@ class InfileToDbFilter(CodeGeneratorFilter):
             CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
+            lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=self._idx_lev)
+                alias[1], lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
-                lev=self._idx_lev) + ' {\n'
+                lev=lev) + ' {\n'
             s += self.read_member(
                 'elem', alias[1], t[1], uitype[1], 
-                ind+'  ', idx='i{lev}'.format(lev=self._idx_lev))
+                ind+'  ', idx='i{lev}'.format(lev=lev))
             s += ind + '  {0}.push_back(elem);\n'.format(member)
             s += ind + '}\n'
         return s
@@ -1367,15 +1370,16 @@ class InfileToDbFilter(CodeGeneratorFilter):
             CYCNS, alias[0], tree_idx)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
+            lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=self._idx_lev)
+                alias[1], lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
-                lev=self._idx_lev) + ' {\n'
+                lev=lev) + ' {\n'
             s += self.read_member('key', alias[1], t[1], uitype[1], 
-                                  ind+'  ', idx='i{lev}'.format(lev=self._idx_lev))
+                                  ind+'  ', idx='i{lev}'.format(lev=lev))
             s += self.read_member('val', alias[2], t[2], uitype[2], 
-                                  ind+'  ', idx='i{lev}'.format(lev=self._idx_lev))
+                                  ind+'  ', idx='i{lev}'.format(lev=lev))
             s += ind + '  {0}[key] = val;\n'.format(member)
             s += ind + '}\n'
         return s
