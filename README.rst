@@ -185,7 +185,7 @@ directory on your computer:
 the macports distribution, it is definitely broken.
 Download and build using the gzip Linux/Unix distribution of
 `HDF5. <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/hdf5-1.8.13.tar.gz>`_   (For Safari users - the file will be automatically unzipped so change
-your command in the the following codeblock to *mv h=hdf5-1.8.13.tar hdf5/* ).
+the *mv* command in the the following codeblock to *mv hdf5-1.8.13.tar hdf5/* ).
 
 .. code-block:: bash
 
