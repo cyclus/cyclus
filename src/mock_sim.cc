@@ -131,6 +131,28 @@ MockSim::MockSim(AgentSpec spec, std::string config, int duration)
   agent = ctx_.CreateAgent<Agent>(a->prototype());
 }
 
+MockSim::MockSim(AgentSpec spec, std::string config, int duration, int lifetime)
+    : ctx_(&ti_, &rec_), back_(NULL), agent(NULL) {
+  Env::SetNucDataPath();
+  warn_limit = 0;
+  back_ = new SqliteBack(":memory:");
+  rec_.RegisterBackend(back_);
+  ti_.Initialize(&ctx_, SimInfo(duration));
+
+  Agent* a = DynamicModule::Make(&ctx_, spec);
+
+  std::stringstream xml;
+  xml << "<facility>"
+      << "<lifetime>" << lifetime << "</lifetime>"
+      << "<name>agent_being_tested</name>"
+      << "<config><foo>" << config << "</foo></config>"
+      << "</facility>";
+  InitAgent(a, xml, &rec_, back_);
+
+  ctx_.AddPrototype(a->prototype(), a);
+  agent = ctx_.CreateAgent<Agent>(a->prototype());
+}
+
 void MockSim::DummyProto(std::string name) {
   Agent* a = DynamicModule::Make(&ctx_, AgentSpec(":agents:Source"));
 
