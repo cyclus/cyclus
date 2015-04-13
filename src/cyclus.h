@@ -41,7 +41,7 @@
 
 #include "toolkit/builder.h"
 #include "toolkit/building_manager.h"
-#include "toolkit/buy_policy.h"
+#include "toolkit/matl_buy_policy.h"
 #include "toolkit/sell_policy.h"
 #include "toolkit/commodity.h"
 #include "toolkit/commodity_producer.h"
