@@ -25,8 +25,12 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
                                    double fill_to, double req_when_under) {
   manager_ = manager;
   buf_ = buf;
+  if (fill_to > 1)
+    fill_to /= buf_->capacity();
   assert(fill_to > 0 && fill_to <= 1.);
   fill_to_ = fill_to;
+  if (req_when_under > 1)
+    req_when_under /= buf_->capacity();
   assert(req_when_under > 0 && req_when_under <= 1.);
   req_when_under_ = req_when_under;
   assert(quantize != 0);
@@ -55,7 +59,7 @@ std::map<Material::Ptr, std::string> MatlBuyPolicy::Commods() {
 std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   rsrc_commod_.clear();
   std::set<RequestPortfolio<Material>::Ptr> ports;
-  bool make_req = req_when_under_ * buf_->capacity() < buf_->quantity();
+  bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt = TotalQty();
   if (!make_req || amt < eps()) {
     return ports;
@@ -63,11 +67,11 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
 
   bool excl = quantize_ > 0;
   double req_amt = ReqQty();
-  double n_req = NReq();
+  int n_req = NReq();
   LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)";
 
   // one portfolio for each request
-  for (int i = 0; i < n_req; i++) {
+  for (int i = 0; i != n_req; i++) {
     RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
     std::map<int, std::vector<Request<Material>*> > grps;
     // one request for each commodity
@@ -77,7 +81,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
       CommodDetail d = it->second;
       LG(INFO4) << "  - one " << amt << " kg request of " << commod;
       Material::Ptr m = Material::CreateUntracked(req_amt, d.comp);
-      grps[i].push_back(port->AddRequest(m, this, commod, excl));
+      grps[i].push_back(port->AddRequest(m, this, commod, d.pref, excl));
     }
 
     // if there's more than one commodity, then make them mutal
@@ -102,22 +106,6 @@ void MatlBuyPolicy::AcceptMatlTrades(
     LGH(INFO3) << "got " << it->second->quantity() << " kg of "
                << it->first.request->commodity();
     buf_->Push(it->second);
-  }
-}
-
-void MatlBuyPolicy::AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
-  PrefMap<Material>::type::iterator it;
-  for (it = prefs.begin(); it != prefs.end(); ++it) {
-    Request<Material>* r = it->first;
-    double pref = commods_[r->commodity()].pref;
-    LGH(INFO5) << "setting prefs for " << r->target()->quantity()
-               << " kg bid for " << r->commodity() << " to " << pref;
-    std::map<Bid<Material>*, double>::iterator it2;
-    std::map<Bid<Material>*, double> bids = it->second;
-    for (it2 = bids.begin(); it2 != bids.end(); ++it2) {
-      Bid<Material>* b = it2->first;
-      prefs[r][b] = pref;
-    }
   }
 }
 

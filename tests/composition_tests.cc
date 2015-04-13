@@ -16,7 +16,7 @@ class TestComp : public Composition {
   TestComp() {}
   Composition::Chain DecayLine() {
     return *decay_line_.get();
-  }
+  }  
 };
 
 TEST(CompositionTests, create_atom) {

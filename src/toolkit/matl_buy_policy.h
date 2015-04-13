@@ -106,8 +106,9 @@ class MatlBuyPolicy : public Trader {
   
   /// the amount requested per each request
   inline double ReqQty() {
-    double amt_ = TotalQty();
-    return quantize_ > 0 ? amt_ / quantize_ : amt_;
+    if (quantize_ > 0)
+      return quantize_;
+    return TotalQty();
   }
   
   /// the number of requests made per each commodity
@@ -124,8 +125,6 @@ class MatlBuyPolicy : public Trader {
 
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>, Material::Ptr> >& resps);
-
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs);
 
  private:
   struct CommodDetail {
