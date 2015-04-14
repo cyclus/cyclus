@@ -14,10 +14,11 @@ namespace toolkit {
 /// MatlSellPolicy performs semi-automatic inventory management of a material
 /// buffer by making offers and trading away materials in an attempt to empty
 /// the buffer's inventory every time step.
+///
 /// For simple behavior, policies virtually eliminate the need to write any code
-/// for resource exchange. Just assign a few policies to work with a few
-/// buffers and focus on writing the physics and other behvavior of your agent.
-/// Typical usage goes something like this:
+/// for resource exchange. Just assign a few policies to work with a few buffers
+/// and focus on writing the physics and other behvavior of your agent.  Typical
+/// usage goes something like this:
 ///
 /// @code
 /// class YourAgent : public Facility {
@@ -41,8 +42,8 @@ namespace toolkit {
 /// The policy needs to be initialized with its owning agent and the material
 /// buffer that is is managing. It also needs to be activated by calling the
 /// Start function for it to begin participation in resource exchange.  And
-/// don't forget to add some commodities to offer on by calling Set.  All
-/// policy configuration should usually occur in the agent's EnterNotify member
+/// don't forget to add some commodities to offer on by calling Set.  All policy
+/// configuration should usually occur in the agent's EnterNotify member
 /// function.
 ///
 /// @warn When a policy's managing agent is deallocated, you MUST either
@@ -61,7 +62,7 @@ class MatlSellPolicy : public Trader {
   /// single offer will be sent each time step to empty the buffer's entire
   /// inventory.
   MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
-                   double quantize = -1);
+                       double quantize = -1);
 
   /// Instructs the policy to empty its buffer with offers on the given
   /// commodity.  This must be called at least once or the policy will do

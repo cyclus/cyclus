@@ -69,11 +69,11 @@ class MatlBuyPolicy : public Trader {
   /// @param quantize If quantize is greater than zero, the policy will make
   /// exclusive, integral quantize kg requests.  Otherwise, single requests will
   /// be sent to fill the buffer's empty space.
-  /// @param fill_to_frac the fraction of inventory to order when placing an
-  /// order. This is equivalent to the S in an (s, S) inventory policy.
-  /// @param req_when_frac place an request when the buf's quantity is less than
-  /// its capacity * order_when_frac. This is equivalent to the s in an (s, S)
-  /// inventory policy.
+  /// @param fill_to the amount or fraction of inventory to order when placing
+  /// an order. This is equivalent to the S in an (s, S) inventory policy.
+  /// @param req_when_under place an request when the buf's quantity is less
+  /// than its capacity * fill_to (as a fraction). This is equivalent to the s
+  /// in an (s, S) inventory policy.
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
                       double quantize = -1,
                       double fill_to = 1., double req_when_under = 1.);
