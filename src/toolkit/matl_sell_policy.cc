@@ -1,4 +1,4 @@
-#include "sell_policy.h"
+#include "matl_sell_policy.h"
 
 #include "error.h"
 
@@ -9,14 +9,14 @@
 namespace cyclus {
 namespace toolkit {
 
-SellPolicy::SellPolicy() : Trader(NULL) {
+MatlSellPolicy::MatlSellPolicy() : Trader(NULL) {
   Warn<EXPERIMENTAL_WARNING>(
-      "SellPolicy is experimental and its API may be subject to change");
+      "MatlSellPolicy is experimental and its API may be subject to change");
 }
 
-SellPolicy::~SellPolicy() { manager()->context()->UnregisterTrader(this); }
+MatlSellPolicy::~MatlSellPolicy() { manager()->context()->UnregisterTrader(this); }
 
-SellPolicy& SellPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
                              std::string name, double quantize) {
   manager_ = manager;
   quantize_ = quantize;
@@ -25,16 +25,16 @@ SellPolicy& SellPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-SellPolicy& SellPolicy::Set(std::string commod) {
+MatlSellPolicy& MatlSellPolicy::Set(std::string commod) {
   commods_.insert(commod);
   return *this;
 }
 
-void SellPolicy::Start() { manager()->context()->RegisterTrader(this); }
+void MatlSellPolicy::Start() { manager()->context()->RegisterTrader(this); }
 
-void SellPolicy::Stop() { manager()->context()->UnregisterTrader(this); }
+void MatlSellPolicy::Stop() { manager()->context()->UnregisterTrader(this); }
 
-std::set<BidPortfolio<Material>::Ptr> SellPolicy::GetMatlBids(
+std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     CommodMap<Material>::type& commod_requests) {
   std::set<BidPortfolio<Material>::Ptr> ports;
   if (buf_->empty()) {
@@ -93,7 +93,7 @@ std::set<BidPortfolio<Material>::Ptr> SellPolicy::GetMatlBids(
   return ports;
 }
 
-void SellPolicy::GetMatlTrades(
+void MatlSellPolicy::GetMatlTrades(
     const std::vector<Trade<Material> >& trades,
     std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
   std::vector<Trade<Material> >::const_iterator it;
