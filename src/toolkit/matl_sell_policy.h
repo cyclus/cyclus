@@ -62,7 +62,9 @@ class MatlSellPolicy : public Trader {
   /// single offer will be sent each time step to empty the buffer's entire
   /// inventory.
   MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
-                       double quantize = -1);
+                       double quantize = -1,
+                       double throughput = std::numeric_limits<double>::max(),
+                       bool ignore_comp = false);
 
   /// Instructs the policy to empty its buffer with offers on the given
   /// commodity.  This must be called at least once or the policy will do
@@ -95,7 +97,9 @@ class MatlSellPolicy : public Trader {
   ResourceBuff* buf_;
   std::set<std::string> commods_;
   double quantize_;
+  double throughput_;
   std::string name_;
+  bool ignore_comp_;
 };
 
 }  // namespace toolkit
