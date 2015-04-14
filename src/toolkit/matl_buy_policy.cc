@@ -5,7 +5,7 @@
 #define LG(X) LOG(LEV_##X, "buypol")
 #define LGH(X)                                               \
   LOG(LEV_##X, "buypol") << "policy " << name_ << " (agent " \
-                         << manager_->id() << "): "
+                         << manager()->id() << "): "
 
 namespace cyclus {
 namespace toolkit {
@@ -16,8 +16,8 @@ MatlBuyPolicy::MatlBuyPolicy() : Trader(NULL) {
 }
 
 MatlBuyPolicy::~MatlBuyPolicy() {
-  if (manager_)
-    manager_->context()->UnregisterTrader(this);
+  if (manager())
+    manager()->context()->UnregisterTrader(this);
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
@@ -48,9 +48,9 @@ MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,
   return *this;
 }
 
-void MatlBuyPolicy::Start() { manager_->context()->RegisterTrader(this); }
+void MatlBuyPolicy::Start() { manager()->context()->RegisterTrader(this); }
 
-void MatlBuyPolicy::Stop() { manager_->context()->UnregisterTrader(this); }
+void MatlBuyPolicy::Stop() { manager()->context()->UnregisterTrader(this); }
 
 std::map<Material::Ptr, std::string> MatlBuyPolicy::Commods() {
   return rsrc_commod_;
