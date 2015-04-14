@@ -1,5 +1,7 @@
 #include "matl_buy_policy.h"
 
+#include <sstream>
+
 #include "error.h"
 
 #define LG(X) LOG(LEV_##X, "buypol")
@@ -16,14 +18,14 @@ MatlBuyPolicy::MatlBuyPolicy() : Trader(NULL) {
 }
 
 MatlBuyPolicy::~MatlBuyPolicy() {
-  if (manager())
+  if (manager() != NULL) 
     manager()->context()->UnregisterTrader(this);
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
                                    std::string name, double quantize,
                                    double fill_to, double req_when_under) {
-  manager_ = manager;
+  Trader::manager_ = manager;
   buf_ = buf;
   if (fill_to > 1)
     fill_to /= buf_->capacity();
@@ -48,9 +50,23 @@ MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,
   return *this;
 }
 
-void MatlBuyPolicy::Start() { manager()->context()->RegisterTrader(this); }
+void MatlBuyPolicy::Start() {
+  if (manager() == NULL) {
+    std::stringstream ss;
+    ss << "No manager set on Buy Policy " << name_;
+    throw ValueError(ss.str());
+  }
+  manager()->context()->RegisterTrader(this);
+}
 
-void MatlBuyPolicy::Stop() { manager()->context()->UnregisterTrader(this); }
+void MatlBuyPolicy::Stop() {
+  if (manager() == NULL) {
+    std::stringstream ss;
+    ss << "No manager set on Buy Policy " << name_;
+    throw ValueError(ss.str());
+  }
+  manager()->context()->UnregisterTrader(this);
+}
 
 std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   rsrc_commods_.clear();

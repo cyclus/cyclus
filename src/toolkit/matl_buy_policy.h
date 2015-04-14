@@ -137,7 +137,6 @@ class MatlBuyPolicy : public Trader {
     Composition::Ptr comp;
     double pref;
   };
-  Agent* manager_;
   ResourceBuff* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_;
