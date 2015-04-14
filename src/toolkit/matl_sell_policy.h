@@ -76,17 +76,21 @@ class MatlSellPolicy : public Trader {
   /// idempotent.
   void Start();
 
-  /// Unregisters this policy as a trader in the current simulation. Stop is
-  /// idempotent.
+  /// Unregisters this policy as a trader in the current simulation. This
+  /// function need only be called if a policy is to be stopped *during* a
+  /// simulation (it is not required to be called explicitly at the end). Stop
+  /// is idempotent.
   void Stop();
-
+  
+  /// Trader Methods
+  /// @{
   virtual std::set<BidPortfolio<Material>::Ptr> GetMatlBids(
       CommodMap<Material>::type& commod_requests);
-
   virtual void GetMatlTrades(
       const std::vector<Trade<Material> >& trades,
       std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses);
-
+  /// }@
+  
  private:
   ResourceBuff* buf_;
   std::set<std::string> commods_;
