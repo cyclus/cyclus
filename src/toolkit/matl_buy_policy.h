@@ -95,8 +95,10 @@ class MatlBuyPolicy : public Trader {
   /// idempotent.
   void Start();
 
-  /// Unregisters this policy as a trader in the current simulation. Stop is
-  /// idempotent.
+  /// Unregisters this policy as a trader in the current simulation. This
+  /// function need only be called if a policy is to be stopped *during* a
+  /// simulation (it is not required to be called explicitly at the end). Stop
+  /// is idempotent.
   void Stop();
 
   /// the total amount requested
@@ -122,7 +124,6 @@ class MatlBuyPolicy : public Trader {
   inline const std::map<Material::Ptr, std::string>& rsrc_commods() {
       return rsrc_commods_;
   };
-
 
   /// Trader Methods
   /// @{
