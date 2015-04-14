@@ -44,7 +44,7 @@ MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,
   CommodDetail d;
   d.comp = c;
   d.pref = pref;
-  commods_[commod] = d;
+  commod_details_[commod] = d;
   return *this;
 }
 
@@ -52,12 +52,8 @@ void MatlBuyPolicy::Start() { manager()->context()->RegisterTrader(this); }
 
 void MatlBuyPolicy::Stop() { manager()->context()->UnregisterTrader(this); }
 
-std::map<Material::Ptr, std::string> MatlBuyPolicy::Commods() {
-  return rsrc_commod_;
-};
-
 std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
-  rsrc_commod_.clear();
+  rsrc_commods_.clear();
   std::set<RequestPortfolio<Material>::Ptr> ports;
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt = TotalQty();
@@ -76,7 +72,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     std::map<int, std::vector<Request<Material>*> > grps;
     // one request for each commodity
     std::map<std::string, CommodDetail>::iterator it;
-    for (it = commods_.begin(); it != commods_.end(); ++it) {
+    for (it = commod_details_.begin(); it != commod_details_.end(); ++it) {
       std::string commod = it->first;
       CommodDetail d = it->second;
       LG(INFO4) << "  - one " << amt << " kg request of " << commod;
@@ -100,9 +96,9 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
 void MatlBuyPolicy::AcceptMatlTrades(
     const std::vector<std::pair<Trade<Material>, Material::Ptr> >& resps) {
   std::vector<std::pair<Trade<Material>, Material::Ptr> >::const_iterator it;
-  rsrc_commod_.clear();
+  rsrc_commods_.clear();
   for (it = resps.begin(); it != resps.end(); ++it) {
-    rsrc_commod_[it->second] = it->first.request->commodity();
+    rsrc_commods_[it->second] = it->first.request->commodity();
     LGH(INFO3) << "got " << it->second->quantity() << " kg of "
                << it->first.request->commodity();
     buf_->Push(it->second);

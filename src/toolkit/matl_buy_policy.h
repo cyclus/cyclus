@@ -100,32 +100,37 @@ class MatlBuyPolicy : public Trader {
   void Stop();
 
   /// the total amount requested
-  inline double TotalQty() {
+  inline double TotalQty() const {
     return fill_to_ * buf_->capacity() - buf_->quantity();
   }
   
   /// the amount requested per each request
-  inline double ReqQty() {
+  inline double ReqQty() const {
     if (quantize_ > 0)
       return quantize_;
     return TotalQty();
   }
   
   /// the number of requests made per each commodity
-  inline int NReq() {
+  inline int NReq() const {
     return quantize_ > 0 ? static_cast<int>(TotalQty() / quantize_) : 1;
   }
   
   /// Returns corresponding commodities from which each material object
   /// was received for the current time step. The data returned by this function
   /// are ONLY valid during the Tock phase of a time step.
-  std::map<Material::Ptr, std::string> Commods();
+  inline const std::map<Material::Ptr, std::string>& rsrc_commods() {
+      return rsrc_commods_;
+  };
 
+
+  /// Trader Methods
+  /// @{
   virtual std::set<RequestPortfolio<Material>::Ptr> GetMatlRequests();
-
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>, Material::Ptr> >& resps);
-
+  /// }@
+  
  private:
   struct CommodDetail {
     Composition::Ptr comp;
@@ -135,8 +140,8 @@ class MatlBuyPolicy : public Trader {
   ResourceBuff* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_;
-  std::map<Material::Ptr, std::string> rsrc_commod_;
-  std::map<std::string, CommodDetail> commods_;
+  std::map<Material::Ptr, std::string> rsrc_commods_;
+  std::map<std::string, CommodDetail> commod_details_;
 };
 
 }  // namespace toolkit
