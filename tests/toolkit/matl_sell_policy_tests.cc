@@ -52,10 +52,12 @@ TEST_F(MatlSellPolicyTests, Init) {
   ASSERT_FALSE(p.Excl());
   ASSERT_FLOAT_EQ(p.Limit(), qty);
 
-  // limit
+  // limit & excl
   p.Init(fac1, &buff, "", 1.5, false, 1);
   ASSERT_TRUE(p.Excl());
   ASSERT_FLOAT_EQ(p.Limit(), 1.5);
+  p.Init(fac1, &buff, "", qty - 1.5, false, qty - 2);
+  ASSERT_FLOAT_EQ(p.Limit(), qty - 2);
   
   // test bad state
   ASSERT_DEATH(p.Init(fac1, &buff, "", 0, false),
@@ -63,6 +65,7 @@ TEST_F(MatlSellPolicyTests, Init) {
   ASSERT_DEATH(p.Init(fac1, &buff, "", 1, false, 0),
                "Assertion `x != 0' failed");
 }
+
 
 
 }
