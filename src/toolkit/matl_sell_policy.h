@@ -61,6 +61,18 @@ class MatlSellPolicy : public Trader {
   /// policy will make exclusive, integral quantize kg offers.  Otherwise, a
   /// single offer will be sent each time step to empty the buffer's entire
   /// inventory.
+  /// @param manager the agent
+  /// @param buf the resource buffer
+  /// @param name a unique name identifying this policy
+  /// @param throughput a maximum throughput per time step for material leaving
+  /// buf
+  /// @ignore_comp ignore the composition of material in buf. When making bids,
+  /// requested material compsositions will be used. When making trades,
+  /// material in the buffer will have its composition transmuted to match the
+  /// requested material.
+  /// @param quantize If quantize is greater than zero, the policy will make
+  /// exclusive, integral quantize kg bids. Otherwise, single bids will
+  /// be sent matching the requested quantity.
   /// @{
   MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name);
   MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
