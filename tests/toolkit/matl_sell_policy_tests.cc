@@ -28,7 +28,9 @@ class MatlSellPolicyTests: public ::testing::Test {
   TestFacility* fac1;
   double cap, qty;
   ResourceBuff buff;
-
+  Composition::Ptr comp, comp1;
+  Material::Ptr mat, mat1;
+  
   virtual void SetUp() {
     fac1 = new TestFacility(tc.get());
     cap = 5;
@@ -36,7 +38,11 @@ class MatlSellPolicyTests: public ::testing::Test {
     buff.set_capacity(cap);
     CompMap v;
     v[pyne::nucname::id("H1")] = 1;
-    buff.Push(Material::CreateUntracked(qty, Composition::CreateFromAtom(v)));
+    comp = Composition::CreateFromAtom(v);
+    mat = Material::CreateUntracked(qty, comp);
+    buff.Push(mat);
+    comp1 = Composition::CreateFromAtom(v);
+    mat1 = Material::CreateUntracked(qty, comp1);
   }
 
   virtual void TearDown() {
@@ -76,6 +82,35 @@ TEST_F(MatlSellPolicyTests, StartStop) {
   ASSERT_THROW(p.Stop(), ValueError);
 }
 
+TEST_F(MatlSellPolicyTests, Bids) {
+  MatlSellPolicy p;
+  std::string commod("commod");  
+  CommodMap<Material>::type reqs;
+  reqs[commod] = std::vector<Request<Material>*>();
+  Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
+  reqs[commod].push_back(req);
+  std::set<BidPortfolio<Material>::Ptr> obs;
+
+  // basic
+  p.Init(NULL, &buff, "").Set(commod);
+  obs = p.GetMatlBids(reqs);
+  ASSERT_EQ(obs.size(), 1);
+  ASSERT_EQ((*obs.begin())->bids().size(), 1);
+  ASSERT_FLOAT_EQ((*(*obs.begin())->bids().begin())->offer()->quantity(),
+                  mat->quantity());
+  ASSERT_EQ((*(*obs.begin())->bids().begin())->offer()->comp(), comp);
+
+  // excl and ignore_comp
+  p.Init(NULL, &buff, "", qty, true, qty / 2).Set(commod);
+  obs = p.GetMatlBids(reqs);
+  ASSERT_EQ(obs.size(), 1);
+  ASSERT_EQ((*obs.begin())->bids().size(), 2);
+  ASSERT_FLOAT_EQ((*(*obs.begin())->bids().begin())->offer()->quantity(),
+                  mat->quantity() / 2);
+  ASSERT_EQ((*(*obs.begin())->bids().begin())->offer()->comp(), comp1);
+  
+  delete req;
+}
 
 }
 }
