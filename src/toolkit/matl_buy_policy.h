@@ -120,9 +120,7 @@ class MatlBuyPolicy : public Trader {
   
   /// the amount requested per each request
   inline double ReqQty() const {
-    if (Excl())
-      return quantize_;
-    return TotalQty();
+    return Excl() ? quantize_ : TotalQty();
   }
   
   /// the number of requests made per each commodity
