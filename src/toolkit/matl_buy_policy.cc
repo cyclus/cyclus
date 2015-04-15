@@ -118,9 +118,8 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt = TotalQty();
-  if (!make_req || amt < eps()) {
+  if (!make_req || amt < eps())
     return ports;
-  }
 
   bool excl = Excl();
   double req_amt = ReqQty();

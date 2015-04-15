@@ -142,9 +142,8 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   std::vector<Request<Material>*>::const_iterator rit;
   for (sit = commods_.begin(); sit != commods_.end(); ++sit) {
     commod = *sit;
-    if (commod_requests.count(commod) < 1) {
+    if (commod_requests.count(commod) < 1)
       continue;
-    }
 
     const std::vector<Request<Material>*>& requests =
         commod_requests.at(commod);
