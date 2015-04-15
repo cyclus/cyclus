@@ -105,17 +105,20 @@ class MatlBuyPolicy : public Trader {
   inline double TotalQty() const {
     return fill_to_ * buf_->capacity() - buf_->quantity();
   }
+
+  /// whether trades will be denoted as exclusive or not
+  inline bool Excl() const { return quantize_ > 0; }
   
   /// the amount requested per each request
   inline double ReqQty() const {
-    if (quantize_ > 0)
+    if (Excl())
       return quantize_;
     return TotalQty();
   }
   
   /// the number of requests made per each commodity
   inline int NReq() const {
-    return quantize_ > 0 ? static_cast<int>(TotalQty() / quantize_) : 1;
+    return Excl() ? static_cast<int>(TotalQty() / quantize_) : 1;
   }
   
   /// Returns corresponding commodities from which each material object

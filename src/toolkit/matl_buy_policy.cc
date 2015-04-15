@@ -7,7 +7,7 @@
 #define LG(X) LOG(LEV_##X, "buypol")
 #define LGH(X)                                               \
   LOG(LEV_##X, "buypol") << "policy " << name_ << " (agent " \
-                         << manager()->id() << "): "
+                         << Trader::manager()->id() << "): "
 
 namespace cyclus {
 namespace toolkit {
@@ -38,6 +38,12 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   assert(quantize != 0);
   quantize_ = quantize;
   name_ = name;
+
+  LGH(DEBUG1) << " configured with "
+              << " quantize: " << quantize_
+              << " fill_to: " << fill_to_
+              << " req_when_under: " << req_when_under_;
+
   return *this;
 }
 
@@ -77,7 +83,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     return ports;
   }
 
-  bool excl = quantize_ > 0;
+  bool excl = Excl();
   double req_amt = ReqQty();
   int n_req = NReq();
   LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)";
