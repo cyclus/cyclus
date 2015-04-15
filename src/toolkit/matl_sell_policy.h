@@ -62,6 +62,7 @@ class MatlSellPolicy : public Trader {
   /// single offer will be sent each time step to empty the buffer's entire
   /// inventory.
   /// @{
+  MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name);
   MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
                        double throughput);
   MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,

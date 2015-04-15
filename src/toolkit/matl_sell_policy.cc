@@ -39,6 +39,14 @@ void MatlSellPolicy::set_ignore_comp(bool x) {
 }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+                                     std::string name) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  return *this;
+}
+
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
                                      std::string name, double throughput) {
   Trader::manager_ = manager;
   buf_ = buf;
