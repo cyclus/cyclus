@@ -30,10 +30,10 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
   throughput_ = throughput;
   ignore_comp_ = ignore_comp;
 
-  LGH(INFO3) << " configured with "
-             << " quantize: " << quantize_
-             << " throughput: " << throughput_
-             << " ignore_comp: " << std::boolalpha << ignore_comp_;
+  LGH(DEBUG1) << " configured with "
+              << " quantize: " << quantize_
+              << " throughput: " << throughput_
+              << " ignore_comp: " << std::boolalpha << ignore_comp_;
   
   return *this;
 }
@@ -61,24 +61,29 @@ void MatlSellPolicy::Stop() {
   manager()->context()->UnregisterTrader(this);
 }
 
+
+double MatlSellPolicy::Limit() const {
+ double bcap = buf_->quantity();
+ double limit = Excl() ?                                               \
+                bcap * static_cast<int>(std::floor(bcap / quantize_)) : bcap;
+ return std::min(throughput_, limit);
+}
+
 std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     CommodMap<Material>::type& commod_requests) {
   std::set<BidPortfolio<Material>::Ptr> ports;
   if (buf_->empty() || buf_->quantity() < eps())
     return ports;
-  
-  double bcap = buf_->quantity();
-  bool excl = quantize_ > 0;
-  double limit = excl ?                                                 \
-                 bcap * static_cast<int>(std::floor(bcap / quantize_)) : bcap;
-  limit = std::min(throughput_, limit);
-  LGH(INFO3) << "bidding out " << limit << " kg";
-  
+
   BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
+
+  double limit = Limit();
   CapacityConstraint<Material> cc(limit);
   port->AddConstraint(cc);
   ports.insert(port);
+  LGH(INFO3) << "bidding out " << limit << " kg";
   
+  bool excl = Excl();
   std::string commod;
   Request<Material>* req;
   Material::Ptr m, offer;
@@ -96,7 +101,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
         commod_requests.at(commod);
     for (rit = requests.begin(); rit != requests.end(); ++rit) {
       req = *rit;
-      qty = std::min(req->target()->quantity(), buf_->quantity());
+      qty = std::min(req->target()->quantity(), limit);
       nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : 1;
       qty = excl ? quantize_ : qty;
       for (int i = 0; i < nbids; i++) {

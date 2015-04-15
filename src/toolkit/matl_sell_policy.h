@@ -83,6 +83,13 @@ class MatlSellPolicy : public Trader {
   /// simulation (it is not required to be called explicitly at the end). Stop
   /// is idempotent.
   void Stop();
+
+  /// the current (total) limit on transactions, i.e., the quantity of resources
+  /// that can be transacted in a time step
+  double Limit() const;
+
+  /// whether trades will be denoted as exclusive or not
+  inline bool Excl() const { return quantize_ > 0; }
   
   /// Trader Methods
   /// @{
