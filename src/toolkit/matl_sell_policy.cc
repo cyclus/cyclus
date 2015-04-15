@@ -156,7 +156,9 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       for (int i = 0; i < nbids; i++) {
         m = buf_->Pop<Material>();
         buf_->Push(m);
-        offer = Material::CreateUntracked(qty, m->comp());
+        offer = ignore_comp_ ? \
+                Material::CreateUntracked(qty, req->target()->comp()) : \
+                Material::CreateUntracked(qty, m->comp());
         port->AddBid(req, offer, this, excl);
         LG(INFO4) << "  - bid " << qty << " kg on a request for " << commod;
       }
