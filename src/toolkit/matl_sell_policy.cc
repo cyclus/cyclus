@@ -114,7 +114,7 @@ void MatlSellPolicy::Stop() {
 double MatlSellPolicy::Limit() const {
  double bcap = buf_->quantity();
  double limit = Excl() ?                                               \
-                bcap * static_cast<int>(std::floor(bcap / quantize_)) : bcap;
+                quantize_ * static_cast<int>(std::floor(bcap / quantize_)) : bcap;
  return std::min(throughput_, limit);
 }
 

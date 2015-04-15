@@ -5,6 +5,7 @@
 
 #include "composition.h"
 #include "material.h"
+#include "bid.h"
 #include "request.h"
 #include "error.h"
 #include "pyne.h"
@@ -56,8 +57,10 @@ TEST_F(MatlSellPolicyTests, Init) {
   p.Init(fac1, &buff, "", 1.5, false, 1);
   ASSERT_TRUE(p.Excl());
   ASSERT_FLOAT_EQ(p.Limit(), 1.5);
-  p.Init(fac1, &buff, "", qty - 1.5, false, qty - 2);
-  ASSERT_FLOAT_EQ(p.Limit(), qty - 2);
+
+  // throughput = 2.5, quantize = 2, limit = 2
+  p.Init(fac1, &buff, "", qty - 0.5, false, qty - 1);
+  ASSERT_FLOAT_EQ(p.Limit(), qty - 1);
   
   // test bad state
   ASSERT_DEATH(p.Init(fac1, &buff, "", 0, false),
@@ -66,6 +69,12 @@ TEST_F(MatlSellPolicyTests, Init) {
                "Assertion `x != 0' failed");
 }
 
+TEST_F(MatlSellPolicyTests, StartStop) {
+  MatlSellPolicy p;
+  p.Init(NULL, &buff, "");
+  ASSERT_THROW(p.Start(), ValueError);
+  ASSERT_THROW(p.Stop(), ValueError);
+}
 
 
 }
