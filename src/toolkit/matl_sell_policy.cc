@@ -9,7 +9,12 @@
 namespace cyclus {
 namespace toolkit {
 
-MatlSellPolicy::MatlSellPolicy() : Trader(NULL) {
+MatlSellPolicy::MatlSellPolicy() :
+    Trader(NULL),
+    name_(""),
+    quantize_(-1),
+    throughput_(std::numeric_limits<double>::max()),
+    ignore_comp_(false) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlSellPolicy is experimental and its API may be subject to change");
 }
@@ -19,22 +24,58 @@ MatlSellPolicy::~MatlSellPolicy() {
     manager()->context()->UnregisterTrader(this);
 }
 
+void MatlSellPolicy::set_quantize(double x) {
+  assert(x != 0);
+  quantize_ = x;
+}
+
+void MatlSellPolicy::set_throughput(double x) {
+  assert(x > 0);
+  throughput_ = x;
+}
+
+void MatlSellPolicy::set_ignore_comp(bool x) {
+  ignore_comp_ = x;
+}
+
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
-                                     std::string name, double quantize,
-                                     double throughput, bool ignore_comp) {
+                                     std::string name, double throughput) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
-  assert(quantize != 0);
-  quantize_ = quantize;
-  throughput_ = throughput;
-  ignore_comp_ = ignore_comp;
+  set_throughput(throughput);
+  return *this;
+}
 
-  LGH(DEBUG1) << " configured with "
-              << " quantize: " << quantize_
-              << " throughput: " << throughput_
-              << " ignore_comp: " << std::boolalpha << ignore_comp_;
-  
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+                                     std::string name, bool ignore_comp) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  set_ignore_comp(ignore_comp);
+  return *this;
+}
+
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+                                     std::string name, double throughput,
+                                     bool ignore_comp) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  set_throughput(throughput);
+  set_ignore_comp(ignore_comp);
+  return *this;
+}
+
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+                                     std::string name, double throughput,
+                                     bool ignore_comp, double quantize) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  set_quantize(quantize);
+  set_throughput(throughput);
+  set_ignore_comp(ignore_comp);
   return *this;
 }
 
