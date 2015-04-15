@@ -12,7 +12,12 @@
 namespace cyclus {
 namespace toolkit {
 
-MatlBuyPolicy::MatlBuyPolicy() : Trader(NULL) {
+MatlBuyPolicy::MatlBuyPolicy() :
+    Trader(NULL),
+    name_(""),
+    quantize_(-1),
+    fill_to_(1),
+    req_when_under_(1) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -22,28 +27,62 @@ MatlBuyPolicy::~MatlBuyPolicy() {
     manager()->context()->UnregisterTrader(this);
 }
 
+void MatlBuyPolicy::set_fill_to(double x) {
+  if (x > 1)
+    x /= buf_->capacity();
+  assert(x > 0 && x <= 1.);
+  fill_to_ = x;
+}
+
+void MatlBuyPolicy::set_req_when_under(double x) {
+  if (x > 1)
+    x /= buf_->capacity();
+  assert(x > 0 && x <= 1.);
+  req_when_under_ = x;
+}
+
+void MatlBuyPolicy::set_quantize(double x) {
+  assert(x != 0);
+  quantize_ = x;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+                                   std::string name) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  return *this;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+                                   std::string name, double quantize) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  set_quantize(quantize);
+  return *this;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+                                   std::string name,
+                                   double fill_to, double req_when_under) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  set_fill_to(fill_to);
+  set_req_when_under(req_when_under);
+  return *this;
+}
+
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
                                    std::string name, double quantize,
                                    double fill_to, double req_when_under) {
   Trader::manager_ = manager;
   buf_ = buf;
-  if (fill_to > 1)
-    fill_to /= buf_->capacity();
-  assert(fill_to > 0 && fill_to <= 1.);
-  fill_to_ = fill_to;
-  if (req_when_under > 1)
-    req_when_under /= buf_->capacity();
-  assert(req_when_under > 0 && req_when_under <= 1.);
-  req_when_under_ = req_when_under;
-  assert(quantize != 0);
-  quantize_ = quantize;
   name_ = name;
-
-  LGH(DEBUG1) << " configured with "
-              << " quantize: " << quantize_
-              << " fill_to: " << fill_to_
-              << " req_when_under: " << req_when_under_;
-
+  set_fill_to(fill_to);
+  set_req_when_under(req_when_under);
+  set_quantize(quantize);
   return *this;
 }
 

@@ -74,10 +74,19 @@ class MatlBuyPolicy : public Trader {
   /// @param req_when_under place an request when the buf's quantity is less
   /// than its capacity * fill_to (as a fraction). This is equivalent to the s
   /// in an (s, S) inventory policy.
+  /// @warning, (s, S) policy values are ambiguous for buffers with a capacity
+  /// in (0, 1]. However that is a rare case.
+  /// @{
+  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
-                      double quantize = -1,
-                      double fill_to = 1., double req_when_under = 1.);
-                      
+                      double quantize);
+  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+                      double fill_to, double req_when_under);
+  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+                      double quantize,
+                      double fill_to, double req_when_under);
+  /// @}
+    
   /// Instructs the policy to fill its buffer with requests on the given
   /// commodity of composition c and the given preference.  This must be called
   /// at least once or the policy will do nothing.  The policy can request on an
@@ -134,12 +143,19 @@ class MatlBuyPolicy : public Trader {
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>, Material::Ptr> >& resps);
   /// }@
-  
+
  private:
   struct CommodDetail {
     Composition::Ptr comp;
     double pref;
   };
+
+  /// requires buf_ already set
+  void set_fill_to(double x); 
+  /// requires buf_ already set
+  void set_req_when_under(double x); 
+  void set_quantize(double x); 
+  
   ResourceBuff* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_;
