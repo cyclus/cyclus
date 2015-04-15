@@ -112,5 +112,33 @@ TEST_F(MatlSellPolicyTests, Bids) {
   delete req;
 }
 
+TEST_F(MatlSellPolicyTests, Trades) {
+  MatlSellPolicy p;
+  std::string commod("commod");  
+  std::vector<Trade<Material> > trades;
+  std::vector<std::pair<Trade<Material>, Material::Ptr> > obs;
+  
+  Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
+  Bid<Material>* bid = Bid<Material>::Create(req, mat, fac1);
+  Trade<Material> trade(req, bid, 1);
+  trades.push_back(trade);
+  
+  // basic
+  p.Init(NULL, &buff, "").Set(commod);
+  p.GetMatlTrades(trades, obs);
+  ASSERT_EQ(obs.size(), 1);
+  ASSERT_EQ(obs.begin()->second->comp(), comp);
+  
+  // ignore comp
+  obs.clear();
+  p.Init(NULL, &buff, "", qty, true).Set(commod);
+  p.GetMatlTrades(trades, obs);
+  ASSERT_EQ(obs.size(), 1);
+  ASSERT_EQ(obs.begin()->second->comp(), comp1);
+
+  delete bid;
+  delete req;
+}
+
 }
 }
