@@ -286,7 +286,8 @@ class QueryResult {
   template <class T>
   T GetVal(std::string field, int row = 0) {
     if (row >= rows.size()) {
-      throw KeyError("index larger than number of query rows");
+      throw KeyError("index larger than number of query rows for field "
+                     + field);
     }
 
     int field_idx = -1;
