@@ -117,8 +117,6 @@ class SimInitTest : public ::testing::Test {
     a2->prototype_ = "proto2";
 
     // manually snap and add prototypes
-    cy::SimInit::SnapAgent(a1);
-    cy::SimInit::SnapAgent(a2);
     ctx->AddPrototype("proto1", a1);
     ctx->AddPrototype("proto2", a2);
 
