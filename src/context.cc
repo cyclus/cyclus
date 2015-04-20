@@ -119,6 +119,8 @@ boost::uuids::uuid Context::sim_id() {
 
 void Context::AddPrototype(std::string name, Agent* p) {
   protos_[name] = p;
+  // explicit call to support in situ prototype generation
+  SimInit::SnapAgent(p); 
   NewDatum("Prototypes")
       ->AddVal("Prototype", name)
       ->AddVal("AgentId", p->id())
