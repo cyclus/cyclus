@@ -67,12 +67,6 @@ TEST_F(MatlSellPolicyTests, Init) {
   // throughput = 2.5, quantize = 2, limit = 2
   p.Init(fac1, &buff, "", qty - 0.5, false, qty - 1);
   ASSERT_FLOAT_EQ(p.Limit(), qty - 1);
-  
-  // test bad state
-  ASSERT_DEATH(p.Init(fac1, &buff, "", 0, false),
-               "Assertion `x > 0' failed");
-  ASSERT_DEATH(p.Init(fac1, &buff, "", 1, false, 0),
-               "Assertion `x != 0' failed");
 }
 
 TEST_F(MatlSellPolicyTests, StartStop) {

@@ -65,14 +65,6 @@ TEST_F(MatlBuyPolicyTests, Init) {
   ASSERT_FLOAT_EQ(p.TotalQty(), S - s);
   ASSERT_FLOAT_EQ(p.ReqQty(), S - s);
   ASSERT_EQ(p.NReq(), 1);
-
-  // test bad state
-  ASSERT_DEATH(p.Init(fac1, &buff, "", 0),
-               "Assertion `x != 0' failed");
-  ASSERT_DEATH(p.Init(fac1, &buff, "", -1, 5),
-               "Assertion `x > 0 && x <= 1.' failed.");
-  ASSERT_DEATH(p.Init(fac1, &buff, "", 5, -1),
-               "Assertion `x > 0 && x <= 1.' failed.");
 }
 
 TEST_F(MatlBuyPolicyTests, StartStop) {
