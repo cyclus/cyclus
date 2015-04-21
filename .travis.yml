@@ -22,7 +22,7 @@ install:
   - conda config --add channels pyne
   - conda config --add channels cyclus
   - conda update -q conda
-  - conda install conda-build setuptools binstar patchelf nose tables
+  - conda install conda-build setuptools binstar patchelf nose
   # Useful for debugging any issues with conda
   - conda info -a
   
@@ -37,6 +37,8 @@ install:
   - conda install cyclus --use-local
 
 script:
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - conda install tables
   - cyclus_unit_tests
   - nosetests -w tests
   #- cd tests
