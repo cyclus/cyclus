@@ -112,10 +112,10 @@ void MatlSellPolicy::Stop() {
 
 
 double MatlSellPolicy::Limit() const {
- double bcap = buf_->quantity();
- double limit = Excl() ?                                               \
-                quantize_ * static_cast<int>(std::floor(bcap / quantize_)) : bcap;
- return std::min(throughput_, limit);
+  double bcap = buf_->quantity();
+  double limit = Excl() ?                                               \
+                 quantize_ * static_cast<int>(std::floor(bcap / quantize_)) : bcap;
+  return std::min(throughput_, limit);
 }
 
 std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(

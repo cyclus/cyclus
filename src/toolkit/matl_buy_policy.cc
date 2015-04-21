@@ -140,7 +140,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
       grps[i].push_back(port->AddRequest(m, this, commod, d.pref, excl));
     }
 
-    // if there's more than one commodity, then make them mutal
+    // if there's more than one commodity, then make them mutual
     if (grps.size() > 1) {
       std::map<int, std::vector<Request<Material>*> >::iterator grpit;
       for (grpit = grps.begin(); grpit != grps.end(); ++grpit) {

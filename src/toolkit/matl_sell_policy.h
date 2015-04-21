@@ -67,7 +67,7 @@ class MatlSellPolicy : public Trader {
   /// @param throughput a maximum throughput per time step for material leaving
   /// buf
   /// @ignore_comp ignore the composition of material in buf. When making bids,
-  /// requested material compsositions will be used. When making trades,
+  /// requested material compositions will be used. When making trades,
   /// material in the buffer will have its composition transmuted to match the
   /// requested material.
   /// @param quantize If quantize is greater than zero, the policy will make
