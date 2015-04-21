@@ -295,8 +295,12 @@ class QueryResult {
   /// @endcode
   template <class T>
   T GetVal(std::string field, int row = 0) {
+    if (rows.empty())
+      throw StateError("No rows found during query for field " + field);
+
     if (row >= rows.size()) {
-      throw KeyError("index larger than number of query rows");
+      throw KeyError("index larger than number of query rows for field "
+                     + field);
     }
 
     int field_idx = -1;
