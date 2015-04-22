@@ -47,8 +47,11 @@ script:
   #- export CPLUS_INCLUDE_PATH="$HOME/miniconda/include:$CPLUS_INCLUDE_PATH"
   - ls -l $HOME/miniconda/include
   - ldd $(which cyclus_unit_tests_base)
-  - ln -s $HOME/miniconda/lib/libhdf5.so.9 $HOME/miniconda/lib/libhdf5.so.8;
-  - ln -s $HOME/miniconda/lib/libhdf5_hl.so.9 $HOME/miniconda/lib/libhdf5_hl.so.8;
+  - if [[ ! -f $HOME/miniconda/lib/libhdf5.so.8 ]]; then
+      echo "No libhdf5.so.8 found in $HOME/miniconda/lib/, sym linking" 
+      ln -s $HOME/miniconda/lib/libhdf5.so.9 $HOME/miniconda/lib/libhdf5.so.8;
+      ln -s $HOME/miniconda/lib/libhdf5_hl.so.9 $HOME/miniconda/lib/libhdf5_hl.so.8;
+    fi
   - ls -l $HOME/miniconda/lib
   - ldd $(which cyclus_unit_tests_base)
   - conda install numpy pytables
