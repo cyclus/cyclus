@@ -39,8 +39,8 @@ install:
 script:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - export LD_LIBRARY_PATH="$HOME/miniconda/lib:$HOME/miniconda/envs/_build/lib:$LD_LIBRARY_PATH"
-  - ll $HOME/miniconda/lib
-  - ll $HOME/miniconda/envs/_build/lib
+  - ls -l $HOME/miniconda/lib
+  - ls -l $HOME/miniconda/envs/_build/lib
   - ln -s $HOME/miniconda/lib/libhdf5.so.9 $HOME/miniconda/lib/libhdf5.so.8
   - conda install numpy pytables
   - cyclus_unit_tests
