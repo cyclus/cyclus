@@ -42,6 +42,7 @@ script:
   - ls -l $HOME/miniconda/lib
   - ls -l $HOME/miniconda/envs/_build/lib
   - ln -s $HOME/miniconda/lib/libhdf5.so.9 $HOME/miniconda/lib/libhdf5.so.8
+  - ln -s $HOME/miniconda/lib/libhdf5_hl.so.9 $HOME/miniconda/lib/libhdf5_hl.so.8
   - conda install numpy pytables
   - cyclus_unit_tests
   - nosetests -w tests
