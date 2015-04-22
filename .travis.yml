@@ -34,6 +34,7 @@ install:
   #- conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION dep1 dep2 ...
   #- source activate test-environment
   - conda build --no-test conda-recipe
+  - ls -l /usr/lib
   - conda install cyclus --use-local
 
 script:
