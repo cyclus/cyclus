@@ -27,7 +27,7 @@ install:
   - conda info -a
   
   # download CI repo
-  - wget https://github.com/cyclus/ciclus/archive/master.zip -O ciclus.zip
+  - wget https://github.com/gidden/ciclus/archive/travis.zip -O ciclus.zip
   - unzip -j ciclus.zip "*/cyclus/*" -d conda-recipe
   
   # Replace dep1 dep2 ... with your dependencies
