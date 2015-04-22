@@ -39,7 +39,7 @@ TEST_F(MaterialTest, SimpleAbsorb) {
   Material::Ptr m1 = Material::CreateUntracked(val, test_comp_);
   Material::Ptr m2 = Material::CreateUntracked(val, test_comp_);
   ASSERT_EQ(m1->comp(), m2->comp());
-  ASSERT_EQ(m1->quantity(), m2->quantity());
+  ASSERT_EQ(m1->quantity() - 1, m2->quantity());
 
   m2->Absorb(m1);
 
