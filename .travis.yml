@@ -54,8 +54,8 @@ script:
     fi
   - ls -l $HOME/miniconda/lib
   - ldd $(which cyclus_unit_tests_base)
-  #- conda install numpy pytables
   - cyclus_unit_tests
+  - conda install numpy pytables
   - nosetests -w tests
   #- cd tests
   #- nosetests
