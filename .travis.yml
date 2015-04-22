@@ -40,9 +40,13 @@ install:
 script:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - export LD_LIBRARY_PATH="$HOME/miniconda/lib:$LD_LIBRARY_PATH"
-  - ldd $(which cyclus_unit_tests_base)
   - ls -l $HOME/miniconda/lib
   - ls -l $HOME/miniconda/envs/_build/lib
+  - export INCLUDE_PATH="$HOME/miniconda/include:$INCLUDE_PATH"
+  - export C_INCLUDE_PATH="$HOME/miniconda/include:$C_INCLUDE_PATH"
+  - export CPLUS_INCLUDE_PATH="$HOME/miniconda/include:$CPLUS_INCLUDE_PATH"
+  - ls -l $HOME/miniconda/include
+  - ldd $(which cyclus_unit_tests_base)
   - if [[ ! -f $HOME/miniconda/lib/libhdf5.so.8 ]]; then
       ln -s $HOME/miniconda/envs/_build/lib/libhdf5.so.9 $HOME/miniconda/lib/libhdf5.so.8;
       ln -s $HOME/miniconda/envs/_build/lib/libhdf5_hl.so.9 $HOME/miniconda/lib/libhdf5_hl.so.8;
