@@ -54,9 +54,11 @@ def find_ids(data, data_table, id_table):
             ids.append(id_table[i])
     return ids
 
+# agent_table,'AgentID'
 def to_ary(a, k):
     return np.array([x[k] for x in a])
-    
+#    array([x[AgentID] for x in agent_table
+
 def exit_times(agent_id, exit_table):
     """Finds exit times of the specified agent from the exit table.
     """
@@ -79,6 +81,7 @@ def agent_time_series(outfile, names):
     names : list
         the list of agent names
     """
+    print("second outfile is",outfile)
     if outfile == h5out :
         f = tables.open_file(h5out, mode = "r")
         nsteps = f.root.Info.cols.Duration[:][0]
@@ -99,7 +102,7 @@ def agent_time_series(outfile, names):
         cur = conn.cursor()
         exc = cur.execute
 
-        nsteps = exc('SELECT MIN(Duration) FROM Info').fetchall()
+        nsteps = exc('SELECT MIN(Duration) FROM Info').fetchall()[0][0]
         entries = {name: [0] * nsteps for name in names}
         exits = {name: [0] * nsteps for name in names}
 
@@ -111,7 +114,11 @@ def agent_time_series(outfile, names):
                  "type='table' AND name='AgentExit'")).fetchall()) > 0 \
                  else None
 
+        #    array([x[AgentID] for x in agent_table
+
         # Find agent id
+        print("agent entry", agent_entry)
+#        print("test",agent_entry["AgentId"])
         agent_ids = to_ary(agent_entry, "AgentId")
         agent_ids = to_ary(agent_entry, "Prototype")
 
