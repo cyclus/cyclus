@@ -25,16 +25,9 @@ install:
   - conda install conda-build jinja2 setuptools binstar patchelf nose
   # Useful for debugging any issues with conda
   - conda info -a
-  
-  # download CI repo
-  - wget https://github.com/gidden/ciclus/archive/travis.zip -O ciclus.zip
-  - unzip -j ciclus.zip "*/cyclus/*" -d conda-recipe
-  
-  # Replace dep1 dep2 ... with your dependencies
-  #- conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION dep1 dep2 ...
-  #- source activate test-environment
-  - conda build --no-test conda-recipe
-  - conda install --use-local cyclus=0.0
+
+  # install cyclus
+  - ./.travis-install.sh
 
 script:
   - export PATH="$HOME/miniconda/bin:$PATH"
