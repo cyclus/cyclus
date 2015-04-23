@@ -45,7 +45,6 @@ def test_predator_only():
     assert_equal(series[prey], prey_exp)
     assert_equal(series[pred], pred_exp)
 
-    output.close()
     clean_outs()
 
 def test_prey_only():
@@ -56,15 +55,16 @@ def test_prey_only():
     clean_outs()
     sim_input = "./input/prey.xml"
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
+    outfile = which_outfile()
+
+    cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
 
     print("Confirming valid Cyclus execution.")
     assert_equal(rtn, 0)
 
-    output = tables.open_file(h5out, mode = "r")
-    series = agent_time_series(output, [prey, pred])
+    series = agent_time_series(outfile, [prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
 
     prey_exp = [2**n for n in range(10)]
@@ -73,7 +73,6 @@ def test_prey_only():
     assert_equal(series[prey], prey_exp)
     assert_equal(series[pred], pred_exp)
 
-    output.close()
     clean_outs()
 
 def test_lotka_volterra():
@@ -93,15 +92,16 @@ def test_lotka_volterra():
     clean_outs()
     sim_input = "./input/lotka_volterra_determ.xml"
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
+    outfile = which_outfile()
+
+    cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
 
     print("Confirming valid Cyclus execution.")
     assert_equal(rtn, 0)
 
-    output = tables.open_file(h5out, mode = "r")
-    series = agent_time_series(output, [prey, pred])
+    series = agent_time_series(outfile, [prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
 
     prey_max = series[prey].index(max(series[prey]))
@@ -110,7 +110,6 @@ def test_lotka_volterra():
 
     assert_true(prey_max < pred_max)
 
-    output.close()
     clean_outs()
 
 if __name__ == "__main__":
