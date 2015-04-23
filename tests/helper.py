@@ -58,6 +58,8 @@ def find_ids(data, data_table, id_table):
 def to_ary(a, k):
     return np.array([x[k] for x in a])
 #    array([x[AgentID] for x in agent_table
+#def to_ary(a):
+#    return np.array([x[0] for x in a])
 
 def exit_times(agent_id, exit_table):
     """Finds exit times of the specified agent from the exit table.
@@ -93,12 +95,39 @@ def agent_time_series(outfile, names):
         agent_exit = f.get_node("/AgentExit")[:] if \
                      hasattr(f.root, 'AgentExit') else None
 
+        output.close()
+ 
         # Find agent id
         agent_ids = agent_entry["AgentId"]
         agent_type = agent_entry["Prototype"]
+        agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
+        # entries per timestep
+        for name, ids in agent_ids.items():
+            for id in ids:
+                idx = np.where(agent_entry['AgentId'] == id)[0][0]
+                entries[name][agent_entry[idx]['EnterTime']] += 1
+
+        # cumulative entries
+        entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
+                   for k, v in entries.items()}
+
+        if agent_exit is None:
+            return entries
+
+        # exits per timestep
+        for name, ids in agent_ids.items():
+            for id in ids:
+                idxs = np.where(agent_exit['AgentId'] == id)[0]
+                if len(idxs) > 0:
+                    exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
+
+        # cumulative exits
+        exits = {k: [sum(v[:i+1]) for i in range(len(v))] \
+                     for k, v in exits.items()}
+  
     else :
         conn = sqlite3.connect(sqliteout)
-        row_factory = sqlite3.Row
+        conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         exc = cur.execute
 
@@ -114,39 +143,33 @@ def agent_time_series(outfile, names):
                  "type='table' AND name='AgentExit'")).fetchall()) > 0 \
                  else None
 
-        #    array([x[AgentID] for x in agent_table
-
         # Find agent id
-        print("agent entry", agent_entry)
-#        print("test",agent_entry["AgentId"])
         agent_ids = to_ary(agent_entry, "AgentId")
-        agent_ids = to_ary(agent_entry, "Prototype")
+        agent_type = to_ary(agent_entry, "Prototype")
+        agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
+        # entries per timestep
+        for name, ids in agent_ids.items():
+            for id in ids:
+                idx = np.where(to_ary(agent_entry,'AgentId') == id)[0][0]
+                entries[name][agent_entry[idx]['EnterTime']] += 1
 
-    agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
+        # cumulative entries
+        entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
+                   for k, v in entries.items()}
 
-    # entries per timestep
-    for name, ids in agent_ids.items():
-        for id in ids:
-            idx = np.where(agent_entry['AgentId'] == id)[0][0]
-            entries[name][agent_entry[idx]['EnterTime']] += 1
+        if agent_exit is None:
+            return entries
 
-    # cumulative entries
-    entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
-               for k, v in entries.items()}
+        # exits per timestep
+        for name, ids in agent_ids.items():
+            for id in ids:
+                idxs = np.where(to_ary(agent_exit,'AgentId') == id)[0]
+                if len(idxs) > 0:
+                    exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
 
-    if agent_exit is None:
-        return entries
-
-    # exits per timestep
-    for name, ids in agent_ids.items():
-        for id in ids:
-            idxs = np.where(agent_exit['AgentId'] == id)[0]
-            if len(idxs) > 0:
-                exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
-
-    # cumulative exits
-    exits = {k: [sum(v[:i+1]) for i in range(len(v))] \
-                 for k, v in exits.items()}
+        # cumulative exits
+        exits = {k: [sum(v[:i+1]) for i in range(len(v))] \
+                     for k, v in exits.items()}
 
     # return difference
     ret = {}
