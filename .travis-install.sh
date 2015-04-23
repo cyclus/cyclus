@@ -3,7 +3,7 @@
 set -x
 set -e
 
-wget https://github.com/gidden/ciclus/archive/travis.zip -O ciclus.zip
+wget https://github.com/cyclus/ciclus/archive/master.zip -O ciclus.zip
 unzip -j ciclus.zip "*/cyclus/*" -d conda-recipe
 
 # build
