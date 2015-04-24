@@ -32,9 +32,6 @@ install:
 script:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - export LD_LIBRARY_PATH="$HOME/miniconda/lib:$LD_LIBRARY_PATH"
-  #- ls -l $HOME/miniconda/lib
-  #- ls -l $HOME/miniconda/envs/_build/lib
-  #- ls -l $HOME/miniconda/include
   - cyclus_unit_tests
   - conda install numpy pytables
   - nosetests -w tests
