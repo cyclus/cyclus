@@ -5,11 +5,12 @@ import nose
 from nose.tools import assert_equal, assert_almost_equal, assert_true
 from numpy.testing import assert_array_equal
 import os
+import sqlite3
 import tables
 import numpy as np
 from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
-    h5out, sqliteout, clean_outs, sha1array
+    h5out, sqliteout, clean_outs, sha1array, to_ary, which_outfile
 
 def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
     """Changes k_factor_in and k_factor_out for one facility.
@@ -104,37 +105,50 @@ def test_minimal_cycle():
             clean_outs()
             sim_input = change_minimal_input(ref_input, k_factor_a, k_factor_b)
 
-            holdsrtn = [1]  # needed because nose does not send() to test generator
-            cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
+            holdsrtn = [1]  # needed b/c nose does not send() to test generator
+            outfile = which_outfile()
+            cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
             yield check_cmd, cmd, '.', holdsrtn
             rtn = holdsrtn[0]
             if rtn != 0:
                 return  # don't execute further commands
 
-            output = tables.open_file(h5out, mode = "r")
-            # tables of interest
+             # tables of interest
             paths = ["/AgentEntry", "/Resources", "/Transactions",
                     "/Info"]
             # Check if these tables exist
-            yield assert_true, tables_exist(output, paths)
-            if not tables_exist(output, paths):
-                output.close()
+            yield assert_true, tables_exist(outfile, paths)
+            if not tables_exist(outfile, paths):
+                outfile.close()
                 clean_outs()
                 return  # don't execute further commands
 
             # Get specific tables and columns
-            #agent_entry = output.get_node("/AgentEntry")[:]
-            print(output.root.AgentEntry)
-            agent_entry = output.root.AgentEntry[:]
-            info = output.get_node("/Info")[:]
-            resources = output.get_node("/Resources")[:]
-            transactions = output.get_node("/Transactions")[:]
+            if outfile == h5out:
+                output = tables.open_file(h5out, mode = "r")
+                agent_entry = output.root.AgentEntry[:]
+                info = output.get_node("/Info")[:]
+                resources = output.get_node("/Resources")[:]
+                transactions = output.get_node("/Transactions")[:]
+                output.close()
+ 
+            else:
+                conn = sqlite3.connect(sqliteout)
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+                exc = cur.execute
 
+                agent_entry = exc('SELECT * FROM AgentEntry').fetchall()
+                info = exc('SELECT * FROM Info').fetchall()
+                resources = exc('SELECT * FROM Resources').fetchall()
+                transactions = exc('SELECT * FROM Transactions').fetchall()
+                conn.close()
+                
             # Find agent ids
-            agent_ids = agent_entry["AgentId"]
-            spec = agent_entry["Spec"]
-            agent_protos = agent_entry["Prototype"]
-            duration = info["Duration"][0]
+            agent_ids = to_ary(outfile, agent_entry, "AgentId")
+            spec = to_ary(outfile, agent_entry, "Spec")
+            agent_protos = to_ary(outfile, agent_entry, "Prototype")
+            duration = to_ary(outfile, info, "Duration")[0]
 
             facility_id = find_ids(":agents:KFacility", spec, agent_ids)
             # Test for two KFacility
@@ -153,31 +167,37 @@ def test_minimal_cycle():
 
             # Test if the transactions are strictly between Facility A and
             # Facility B. There are no Facility A to Facility A or vice versa.
-            sender_ids = transactions["SenderId"]
-            receiver_ids = transactions["ReceiverId"]
+            sender_ids = to_ary(outfile, transactions, "SenderId")
+            receiver_ids = to_ary(outfile, transactions, "ReceiverId")
             pattern_one = np.arange(0, sender_ids.size, 2)
             pattern_two = np.arange(1, sender_ids.size, 2)
-            pattern_a = pattern_one  # expected pattern for Facility A as a sender
-            pattern_b = pattern_two  # expected pattern for Facility B as a sender
+            pattern_a = pattern_one  # expected pattern for Facility A as sender
+            pattern_b = pattern_two  # expected pattern for Facility B as sender
 
             # Re-assign in case the expected patterns are incorrect
             if sender_ids[0] == facility_b[0]:
                 pattern_a = pattern_two
                 pattern_b = pattern_one
 
-            yield assert_array_equal, np.where(sender_ids == facility_a[0])[0], \
+            yield assert_array_equal, \
+                np.where(sender_ids == facility_a[0])[0], \
                 pattern_a
-            yield assert_array_equal, np.where(receiver_ids == facility_a[0])[0], \
+            yield assert_array_equal, \
+                np.where(receiver_ids == facility_a[0])[0], \
                 pattern_b  # reverse pattern when acted as a receiver
 
-            yield assert_array_equal, np.where(sender_ids == facility_b[0])[0], \
+            yield assert_array_equal, \
+                np.where(sender_ids == facility_b[0])[0], \
                 pattern_b
-            yield assert_array_equal, np.where(receiver_ids == facility_b[0])[0], \
+            yield assert_array_equal, \
+                np.where(receiver_ids == facility_b[0])[0], \
                 pattern_a  # reverse pattern when acted as a receiver
 
             # Transaction ids must be equal range from 1 to the number of rows
             expected_trans_ids = np.arange(sender_ids.size)
-            yield assert_array_equal, transactions["TransactionId"], expected_trans_ids
+            yield assert_array_equal, \
+                to_ary(outfile, transactions, "TransactionId"), \
+                expected_trans_ids
 
             # When k_factors are very low and the simulation time is big
             # the number of transactions maybe shortened due to the lower
@@ -187,7 +207,7 @@ def test_minimal_cycle():
             yield assert_equal, sender_ids.size, 2 * duration
 
             # Track transacted resources
-            quantities = resources["Quantity"]
+            quantities = to_ary(outfile, resources, "Quantity")
 
             # Almost equal cases due to floating point k_factors
             init_capacity_a = quantities[0]
@@ -204,7 +224,6 @@ def test_minimal_cycle():
                     init_capacity_b * k_factor_b ** j
                 j += 1
 
-            output.close()
             clean_outs()
             os.remove(sim_input)
 
