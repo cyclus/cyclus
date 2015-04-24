@@ -37,6 +37,7 @@ def test_stub_example():
         output = tables.open_file(h5out, mode = "r")
         agent_entry = output.get_node("/AgentEntry")[:]
         info = output.get_node("/Info")[:]
+        output.close()
     else:
         conn = sqlite3.connect(sqliteout)
         conn.row_factory = sqlite3.Row
@@ -44,7 +45,7 @@ def test_stub_example():
         exc = cur.execute
         agent_entry = exc('SELECT * FROM AgentEntry').fetchall()
         info = exc('SELECT * FROM Info').fetchall()
-        
+        conn.close()
         
     # Sink's deployment
     agent_ids = to_ary(agent_entry, "AgentId")

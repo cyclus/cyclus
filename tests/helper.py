@@ -107,7 +107,7 @@ def agent_time_series(names):
         agent_exit = f.get_node("/AgentExit")[:] if \
                      hasattr(f.root, 'AgentExit') else None
 
-        outfile.close()
+        f.close()
  
     else :
         conn = sqlite3.connect(sqliteout)
