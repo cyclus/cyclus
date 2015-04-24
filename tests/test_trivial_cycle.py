@@ -71,15 +71,15 @@ def test_source_to_sink():
             conn.close()
                 
         # Find agent ids
-        agent_ids = to_ary(outfile, agent_entry, "AgentId")
-        spec = to_ary(outfile, agent_entry, "Spec")
+        agent_ids = to_ary(agent_entry, "AgentId")
+        spec = to_ary(agent_entry, "Spec")
 
         facility_id = find_ids(":agents:KFacility", spec, agent_ids)
         # Test for only one KFacility
         yield assert_equal, len(facility_id), 1
 
-        sender_ids = to_ary(outfile, transactions, "SenderId")
-        receiver_ids = to_ary(outfile, transactions, "ReceiverId")
+        sender_ids = to_ary(transactions, "SenderId")
+        receiver_ids = to_ary(transactions, "ReceiverId")
         expected_sender_array = np.empty(sender_ids.size)
         expected_sender_array.fill(facility_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
@@ -90,12 +90,12 @@ def test_source_to_sink():
         # Transaction ids must be equal range from 1 to the number of rows
         expected_trans_ids = np.arange(0, sender_ids.size, 1)
         yield assert_array_equal, \
-            to_ary(outfile, transactions, "TransactionId"), \
+            to_ary(transactions, "TransactionId"), \
                    expected_trans_ids
 
         # Track transacted resources
-        resource_ids = to_ary(outfile, resources, "ResourceId")
-        quantities = to_ary(outfile, resources, "Quantity")
+        resource_ids = to_ary(resources, "ResourceId")
+        quantities = to_ary(resources, "Quantity")
 
         # Almost equal cases due to floating point k_factors
         i = 0

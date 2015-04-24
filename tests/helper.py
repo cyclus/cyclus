@@ -37,16 +37,18 @@ def tables_exist(outfile, tables):
     """Checks if output database contains the specified tables.
     """
     if outfile == h5out:
-        db = tables.open_file(outfile, mode = "r")
-        return all([t in db.root for t in tables])
+        with tables.open_file(outfile, mode = "r") as f:
+            return all([t in f.root for t in tables])
     else:
-        tables = [t.replace('/','') for t in tables]
+        tables = [t.replace('/', '') for t in tables]
         conn = sqlite3.connect(outfile)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         exc = cur.execute
-        return all([bool(exc('SELECT * From sqlite_master WHERE name = ? ', \
+        res = all([bool(exc('SELECT * From sqlite_master WHERE name = ? ', \
                              (t, )).fetchone()) for t in tables])
+        conn.close()
+        return res
     
 def find_ids(data, data_table, id_table):
     """Finds ids of the specified data located in the specified data_table,
@@ -65,8 +67,8 @@ def find_ids(data, data_table, id_table):
     return ids
 
 
-def to_ary(outfile, a, k):
-    if outfile == sqliteout:
+def to_ary(a, k):
+    if which_outfile() == sqliteout:
         return np.array([x[k] for x in a])
     else:
         return a[k]
@@ -84,7 +86,7 @@ def exit_times(agent_id, exit_table):
 
     return exit_times
 
-def agent_time_series(outfile, names):
+def agent_time_series(names):
     """Return a list of timeseries corresponding to the number of agents in a
     Cyclus simulation
 
@@ -94,8 +96,7 @@ def agent_time_series(outfile, names):
     names : list
         the list of agent names
     """
-    print("second outfile is",outfile)
-    if outfile == h5out :
+    if which_outfile() == h5out :
         f = tables.open_file(h5out, mode = "r")
         nsteps = f.root.Info.cols.Duration[:][0]
         entries = {name: [0] * nsteps for name in names}
@@ -129,18 +130,18 @@ def agent_time_series(outfile, names):
         conn.close()
 
     # Find agent id
-    agent_ids = to_ary(outfile, agent_entry, "AgentId")
-    agent_type = to_ary(outfile, agent_entry, "Prototype")
+    agent_ids = to_ary(agent_entry, "AgentId")
+    agent_type = to_ary(agent_entry, "Prototype")
     agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
     # entries per timestep
     for name, ids in agent_ids.items():
         for id in ids:
-            idx = np.where(to_ary(outfile, agent_entry,'AgentId') == id)[0]
+            idx = np.where(to_ary(agent_entry,'AgentId') == id)[0]
             entries[name][agent_entry[idx]['EnterTime']] += 1
-
+            
     # cumulative entries
     entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
-               for k, v in entries.items()}
+                   for k, v in entries.items()}
 
     if agent_exit is None:
         return entries
@@ -148,7 +149,7 @@ def agent_time_series(outfile, names):
     # exits per timestep
     for name, ids in agent_ids.items():
         for id in ids:
-            idxs = np.where(to_ary(outfile, agent_exit,'AgentId') == id)[0]
+            idxs = np.where(to_ary(agent_exit,'AgentId') == id)[0]
             if len(idxs) > 0:
                 exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
 

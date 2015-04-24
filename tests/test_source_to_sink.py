@@ -60,8 +60,8 @@ def test_source_to_sink():
             conn.close()
         
         # Find agent ids of source and sink facilities
-        agent_ids = to_ary(outfile, agent_entry, "AgentId")
-        spec = to_ary(outfile, agent_entry, "Spec")
+        agent_ids = to_ary(agent_entry, "AgentId")
+        spec = to_ary(agent_entry, "Spec")
 
         source_id = find_ids(":agents:Source", spec, agent_ids)
         sink_id = find_ids(":agents:Sink", spec, agent_ids)
@@ -71,8 +71,8 @@ def test_source_to_sink():
         yield assert_equal, len(sink_id), 1
 
         # Check if transactions are only between source and sink
-        sender_ids = to_ary(outfile, transactions, "SenderId")
-        receiver_ids = to_ary(outfile, transactions, "ReceiverId")
+        sender_ids = to_ary(transactions, "SenderId")
+        receiver_ids = to_ary(transactions, "ReceiverId")
         expected_sender_array = np.empty(sender_ids.size)
         expected_sender_array.fill(source_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
@@ -83,12 +83,12 @@ def test_source_to_sink():
         # Transaction ids must be equal range from 1 to the number of rows
         expected_trans_ids = np.arange(0, sender_ids.size, 1)
         yield assert_array_equal, \
-            to_ary(outfile, transactions, "TransactionId"),\
+            to_ary(transactions, "TransactionId"),\
             expected_trans_ids
 
         # Track transacted resources
-        resource_ids = to_ary(outfile,resources, "ResourceId")
-        quantities = to_ary(outfile, resources, "Quantity")
+        resource_ids = to_ary(resources, "ResourceId")
+        quantities = to_ary(resources, "Quantity")
         expected_quantities = np.empty(resource_ids.size)
         # Expect that every transaction quantity is the same amount
         expected_quantities.fill(quantities[0])

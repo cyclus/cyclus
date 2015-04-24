@@ -36,7 +36,7 @@ def test_predator_only():
     print("Confirming valid Cyclus execution.")
     assert_equal(rtn, 0)
 
-    series = agent_time_series(outfile, [prey, pred])
+    series = agent_time_series([prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
 
     prey_exp = [0 for n in range(10)]
@@ -64,7 +64,7 @@ def test_prey_only():
     print("Confirming valid Cyclus execution.")
     assert_equal(rtn, 0)
 
-    series = agent_time_series(outfile, [prey, pred])
+    series = agent_time_series([prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
 
     prey_exp = [2**n for n in range(10)]
@@ -101,7 +101,7 @@ def test_lotka_volterra():
     print("Confirming valid Cyclus execution.")
     assert_equal(rtn, 0)
 
-    series = agent_time_series(outfile, [prey, pred])
+    series = agent_time_series([prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
 
     prey_max = series[prey].index(max(series[prey]))

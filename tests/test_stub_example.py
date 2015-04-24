@@ -47,8 +47,8 @@ def test_stub_example():
         
         
     # Sink's deployment
-    agent_ids = to_ary(outfile, agent_entry, "AgentId")
-    spec = to_ary(outfile, agent_entry, "Spec")
+    agent_ids = to_ary(agent_entry, "AgentId")
+    spec = to_ary(agent_entry, "Spec")
 
     sink_id = find_ids("stubs:StubFacility:StubFacility", spec, agent_ids)
     # Test if one SimpleSink is deployed

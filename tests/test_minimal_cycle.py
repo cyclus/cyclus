@@ -145,10 +145,10 @@ def test_minimal_cycle():
                 conn.close()
                 
             # Find agent ids
-            agent_ids = to_ary(outfile, agent_entry, "AgentId")
-            spec = to_ary(outfile, agent_entry, "Spec")
-            agent_protos = to_ary(outfile, agent_entry, "Prototype")
-            duration = to_ary(outfile, info, "Duration")[0]
+            agent_ids = to_ary(agent_entry, "AgentId")
+            spec = to_ary(agent_entry, "Spec")
+            agent_protos = to_ary(agent_entry, "Prototype")
+            duration = to_ary(info, "Duration")[0]
 
             facility_id = find_ids(":agents:KFacility", spec, agent_ids)
             # Test for two KFacility
@@ -167,8 +167,8 @@ def test_minimal_cycle():
 
             # Test if the transactions are strictly between Facility A and
             # Facility B. There are no Facility A to Facility A or vice versa.
-            sender_ids = to_ary(outfile, transactions, "SenderId")
-            receiver_ids = to_ary(outfile, transactions, "ReceiverId")
+            sender_ids = to_ary(transactions, "SenderId")
+            receiver_ids = to_ary(transactions, "ReceiverId")
             pattern_one = np.arange(0, sender_ids.size, 2)
             pattern_two = np.arange(1, sender_ids.size, 2)
             pattern_a = pattern_one  # expected pattern for Facility A as sender
@@ -196,7 +196,7 @@ def test_minimal_cycle():
             # Transaction ids must be equal range from 1 to the number of rows
             expected_trans_ids = np.arange(sender_ids.size)
             yield assert_array_equal, \
-                to_ary(outfile, transactions, "TransactionId"), \
+                to_ary(transactions, "TransactionId"), \
                 expected_trans_ids
 
             # When k_factors are very low and the simulation time is big
@@ -207,7 +207,7 @@ def test_minimal_cycle():
             yield assert_equal, sender_ids.size, 2 * duration
 
             # Track transacted resources
-            quantities = to_ary(outfile, resources, "Quantity")
+            quantities = to_ary(resources, "Quantity")
 
             # Almost equal cases due to floating point k_factors
             init_capacity_a = quantities[0]
