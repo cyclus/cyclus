@@ -1,11 +1,14 @@
 from __future__ import print_function
 import os
+import platform
 import sys
 from argparse import Namespace
 
 import nose
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises, \
     assert_in
+
+from tools import skip_then_continue
 
 cycdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 reldir = os.path.join(cycdir, 'release')
@@ -25,6 +28,8 @@ def test_load():
     assert_true(isinstance(db, list))
 
 def test_nm():
+    if platform.system() == 'Darwin':
+        skip_then_continue("Skipping for Mac")
     if not smbchk:
         return
     if os.name != 'posix' or not os.path.isdir(blddir):

@@ -1,5 +1,7 @@
 """A set of tools for use in integration tests."""
 import os
+import platform
+import sqlite3
 from hashlib import sha1
 
 import numpy as np
@@ -26,11 +28,30 @@ def clean_outs():
     if os.path.exists(sqliteout):
         os.remove(sqliteout)
 
-def tables_exist(db, tables):
-    """Checks if hdf5 database contains the specified tables.
+def which_outfile():
+    """Uses sqlite if platform is Mac, otherwise uses hdf5
     """
-    return all([t in db.root for t in tables])
+    return h5out if platform.system() == 'Linux' else sqliteout
 
+def tables_exist(outfile, table_names):
+    """Checks if output database contains the specified tables.
+    """
+    if outfile == h5out:
+        f = tables.open_file(outfile, mode = "r")
+        res = all([t in f.root for t in table_names])
+        f.close()
+        return res
+    else:
+        table_names = [t.replace('/', '') for t in table_names]
+        conn = sqlite3.connect(outfile)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        exc = cur.execute
+        res = all([bool(exc('SELECT * From sqlite_master WHERE name = ? ', \
+                             (t, )).fetchone()) for t in table_names])
+        conn.close()
+        return res
+    
 def find_ids(data, data_table, id_table):
     """Finds ids of the specified data located in the specified data_table,
     and extracts the corresponding id from the specified id_table.
@@ -47,6 +68,14 @@ def find_ids(data, data_table, id_table):
             ids.append(id_table[i])
     return ids
 
+
+def to_ary(a, k):
+    if which_outfile() == sqliteout:
+        return np.array([x[k] for x in a])
+    else:
+        return a[k]
+
+
 def exit_times(agent_id, exit_table):
     """Finds exit times of the specified agent from the exit table.
     """
@@ -59,37 +88,59 @@ def exit_times(agent_id, exit_table):
 
     return exit_times
 
-def agent_time_series(f, names):
+def agent_time_series(names):
     """Return a list of timeseries corresponding to the number of agents in a
     Cyclus simulation
 
     Parameters
     ----------
-    f : PyTables file
-        the output file
+    outfile : the output file (hdf5 or sqlite format)
     names : list
         the list of agent names
     """
-    nsteps = f.root.Info.cols.Duration[:][0]
-    entries = {name: [0] * nsteps for name in names}
-    exits = {name: [0] * nsteps for name in names}
+    if which_outfile() == h5out :
+        f = tables.open_file(h5out, mode = "r")
+        nsteps = f.root.Info.cols.Duration[:][0]
+        entries = {name: [0] * nsteps for name in names}
+        exits = {name: [0] * nsteps for name in names}
 
-    # Get specific tables and columns
-    agent_entry = f.get_node("/AgentEntry")[:]
-    agent_exit = f.get_node("/AgentExit")[:] if hasattr(f.root, 'AgentExit') \
-        else None
+        # Get specific tables and columns
+        agent_entry = f.get_node("/AgentEntry")[:]
+        agent_exit = f.get_node("/AgentExit")[:] if \
+                     hasattr(f.root, 'AgentExit') else None
 
-    # Find agent ids
-    agent_ids = agent_entry["AgentId"]
-    agent_type = agent_entry["Prototype"]
+        f.close()
+ 
+    else :
+        conn = sqlite3.connect(sqliteout)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        exc = cur.execute
+
+        nsteps = exc('SELECT MIN(Duration) FROM Info').fetchall()[0][0]
+        entries = {name: [0] * nsteps for name in names}
+        exits = {name: [0] * nsteps for name in names}
+
+        # Get specific tables and columns
+        agent_entry = exc('SELECT * FROM AgentEntry').fetchall()
+        agent_exit = exc('SELECT * FROM AgentExit').fetchall() \
+            if len(exc(
+                ("SELECT * FROM sqlite_master WHERE "
+                 "type='table' AND name='AgentExit'")).fetchall()) > 0 \
+                 else None
+
+        conn.close()
+
+    # Find agent id
+    agent_ids = to_ary(agent_entry, "AgentId")
+    agent_type = to_ary(agent_entry, "Prototype")
     agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
-
     # entries per timestep
     for name, ids in agent_ids.items():
         for id in ids:
-            idx = np.where(agent_entry['AgentId'] == id)[0][0]
+            idx = np.where(to_ary(agent_entry,'AgentId') == id)[0]
             entries[name][agent_entry[idx]['EnterTime']] += 1
-
+            
     # cumulative entries
     entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
                    for k, v in entries.items()}
@@ -97,10 +148,10 @@ def agent_time_series(f, names):
     if agent_exit is None:
         return entries
 
-    # entries per timestep
+    # exits per timestep
     for name, ids in agent_ids.items():
         for id in ids:
-            idxs = np.where(agent_exit['AgentId'] == id)[0]
+            idxs = np.where(to_ary(agent_exit,'AgentId') == id)[0]
             if len(idxs) > 0:
                 exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
 

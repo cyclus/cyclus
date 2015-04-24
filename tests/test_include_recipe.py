@@ -6,7 +6,7 @@ import tables
 import numpy as np
 from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, \
-    h5out, sqliteout, clean_outs
+    h5out, sqliteout, clean_outs, which_outfile
 
 """Tests"""
 def test_include_recipe():
@@ -16,7 +16,8 @@ def test_include_recipe():
     # Cyclus simulation input for recipe including
     sim_input = "./input/include_recipe.xml"
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
+    outfile = which_outfile()
+    cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
     if rtn != 0:
