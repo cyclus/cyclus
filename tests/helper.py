@@ -33,22 +33,22 @@ def which_outfile():
     """
     return h5out if platform.system() == 'Linux' else sqliteout
 
-def tables_exist(outfile, tables):
+def tables_exist(outfile, table_names):
     """Checks if output database contains the specified tables.
     """
     if outfile == h5out:
         f = tables.open_file(outfile, mode = "r")
-        res = all([t in f.root for t in tables])
+        res = all([t in f.root for t in table_names])
         f.close()
         return res
     else:
-        tables = [t.replace('/', '') for t in tables]
+        table_names = [t.replace('/', '') for t in table_names]
         conn = sqlite3.connect(outfile)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         exc = cur.execute
         res = all([bool(exc('SELECT * From sqlite_master WHERE name = ? ', \
-                             (t, )).fetchone()) for t in tables])
+                             (t, )).fetchone()) for t in table_names])
         conn.close()
         return res
     
