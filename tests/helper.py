@@ -37,8 +37,10 @@ def tables_exist(outfile, tables):
     """Checks if output database contains the specified tables.
     """
     if outfile == h5out:
-        with tables.open_file(outfile, mode = "r") as f:
-            return all([t in f.root for t in tables])
+        f = tables.open_file(outfile, mode = "r")
+        res = all([t in f.root for t in tables])
+        f.close()
+        return res
     else:
         tables = [t.replace('/', '') for t in tables]
         conn = sqlite3.connect(outfile)
