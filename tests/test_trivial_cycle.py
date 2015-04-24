@@ -3,11 +3,12 @@
 from nose.tools import assert_equal, assert_almost_equal, assert_true
 from numpy.testing import assert_array_equal
 import os
+import sqlite3
 import tables
 import numpy as np
 from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
-    h5out, sqliteout, clean_outs
+    h5out, sqliteout, clean_outs, to_ary, which_outfile
 
 """Tests"""
 def test_source_to_sink():
@@ -33,39 +34,52 @@ def test_source_to_sink():
         sim_input = create_sim_input(ref_input, k_factor, k_factor)
 
         holdsrtn = [1]  # needed because nose does not send() to test generator
-        cmd = ["cyclus", "-o", h5out, "--input-file", sim_input]
+        outfile = which_outfile()
+        cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
         yield check_cmd, cmd, '.', holdsrtn
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
 
-        output = tables.open_file(h5out, mode = "r")
         # tables of interest
         paths = ["/AgentEntry", "/Resources", "/Transactions",
                 "/Info"]
         # Check if these tables exist
-        yield assert_true, tables_exist(output, paths)
-        if not tables_exist(output, paths):
-            output.close()
+        yield assert_true, tables_exist(outfile, paths)
+        if not tables_exist(outfile, paths):
+            outfile.close()
             clean_outs()
             return  # don't execute further commands
 
         # Get specific tables and columns
-        agent_entry = output.get_node("/AgentEntry")[:]
-        info = output.get_node("/Info")[:]
-        resources = output.get_node("/Resources")[:]
-        transactions = output.get_node("/Transactions")[:]
-
+        if outfile == h5out:
+            output = tables.open_file(h5out, mode = "r")
+            agent_entry = output.get_node("/AgentEntry")[:]
+            info = output.get_node("/Info")[:]
+            resources = output.get_node("/Resources")[:]
+            transactions = output.get_node("/Transactions")[:]
+            output.close()
+        else:
+            conn = sqlite3.connect(sqliteout)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            exc = cur.execute
+            agent_entry = exc('SELECT * FROM AgentEntry').fetchall()
+            info = exc('SELECT * FROM Info').fetchall()
+            resources = exc('SELECT * FROM Resources').fetchall()
+            transactions = exc('SELECT * FROM Transactions').fetchall()
+            conn.close()
+                
         # Find agent ids
-        agent_ids = agent_entry["AgentId"]
-        spec = agent_entry["Spec"]
+        agent_ids = to_ary(outfile, agent_entry, "AgentId")
+        spec = to_ary(outfile, agent_entry, "Spec")
 
         facility_id = find_ids(":agents:KFacility", spec, agent_ids)
         # Test for only one KFacility
         yield assert_equal, len(facility_id), 1
 
-        sender_ids = transactions["SenderId"]
-        receiver_ids = transactions["ReceiverId"]
+        sender_ids = to_ary(outfile, transactions, "SenderId")
+        receiver_ids = to_ary(outfile, transactions, "ReceiverId")
         expected_sender_array = np.empty(sender_ids.size)
         expected_sender_array.fill(facility_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
@@ -75,11 +89,13 @@ def test_source_to_sink():
 
         # Transaction ids must be equal range from 1 to the number of rows
         expected_trans_ids = np.arange(0, sender_ids.size, 1)
-        yield assert_array_equal, transactions["TransactionId"], expected_trans_ids
+        yield assert_array_equal, \
+            to_ary(outfile, transactions, "TransactionId"), \
+                   expected_trans_ids
 
         # Track transacted resources
-        resource_ids = resources["ResourceId"]
-        quantities = resources["Quantity"]
+        resource_ids = to_ary(outfile, resources, "ResourceId")
+        quantities = to_ary(outfile, resources, "Quantity")
 
         # Almost equal cases due to floating point k_factors
         i = 0
@@ -88,6 +104,5 @@ def test_source_to_sink():
             yield assert_almost_equal, q, initial_capacity * k_factor ** i
             i += 1
 
-        output.close()
         clean_outs()
         os.remove(sim_input)

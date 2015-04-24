@@ -33,11 +33,21 @@ def which_outfile():
     """
     return h5out if platform.system() == 'Linux' else sqliteout
 
-def tables_exist(db, tables):
-    """Checks if hdf5 database contains the specified tables.
+def tables_exist(outfile, tables):
+    """Checks if output database contains the specified tables.
     """
-    return all([t in db.root for t in tables])
-
+    if outfile == h5out:
+        db = tables.open_file(outfile, mode = "r")
+        return all([t in db.root for t in tables])
+    else:
+        tables = [t.replace('/','') for t in tables]
+        conn = sqlite3.connect(outfile)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        exc = cur.execute
+        return all([bool(exc('SELECT * From sqlite_master WHERE name = ? ', \
+                             (t, )).fetchone()) for t in tables])
+    
 def find_ids(data, data_table, id_table):
     """Finds ids of the specified data located in the specified data_table,
     and extracts the corresponding id from the specified id_table.
@@ -54,12 +64,13 @@ def find_ids(data, data_table, id_table):
             ids.append(id_table[i])
     return ids
 
-# agent_table,'AgentID'
-def to_ary(a, k):
-    return np.array([x[k] for x in a])
-#    array([x[AgentID] for x in agent_table
-#def to_ary(a):
-#    return np.array([x[0] for x in a])
+
+def to_ary(outfile, a, k):
+    if outfile == sqliteout:
+        return np.array([x[k] for x in a])
+    else:
+        return a[k]
+
 
 def exit_times(agent_id, exit_table):
     """Finds exit times of the specified agent from the exit table.
@@ -97,34 +108,6 @@ def agent_time_series(outfile, names):
 
         output.close()
  
-        # Find agent id
-        agent_ids = agent_entry["AgentId"]
-        agent_type = agent_entry["Prototype"]
-        agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
-        # entries per timestep
-        for name, ids in agent_ids.items():
-            for id in ids:
-                idx = np.where(agent_entry['AgentId'] == id)[0][0]
-                entries[name][agent_entry[idx]['EnterTime']] += 1
-
-        # cumulative entries
-        entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
-                   for k, v in entries.items()}
-
-        if agent_exit is None:
-            return entries
-
-        # exits per timestep
-        for name, ids in agent_ids.items():
-            for id in ids:
-                idxs = np.where(agent_exit['AgentId'] == id)[0]
-                if len(idxs) > 0:
-                    exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
-
-        # cumulative exits
-        exits = {k: [sum(v[:i+1]) for i in range(len(v))] \
-                     for k, v in exits.items()}
-  
     else :
         conn = sqlite3.connect(sqliteout)
         conn.row_factory = sqlite3.Row
@@ -143,33 +126,35 @@ def agent_time_series(outfile, names):
                  "type='table' AND name='AgentExit'")).fetchall()) > 0 \
                  else None
 
-        # Find agent id
-        agent_ids = to_ary(agent_entry, "AgentId")
-        agent_type = to_ary(agent_entry, "Prototype")
-        agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
-        # entries per timestep
-        for name, ids in agent_ids.items():
-            for id in ids:
-                idx = np.where(to_ary(agent_entry,'AgentId') == id)[0][0]
-                entries[name][agent_entry[idx]['EnterTime']] += 1
+        conn.close()
 
-        # cumulative entries
-        entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
-                   for k, v in entries.items()}
+    # Find agent id
+    agent_ids = to_ary(outfile, agent_entry, "AgentId")
+    agent_type = to_ary(outfile, agent_entry, "Prototype")
+    agent_ids = {name: find_ids(name, agent_type, agent_ids) for name in names}
+    # entries per timestep
+    for name, ids in agent_ids.items():
+        for id in ids:
+            idx = np.where(to_ary(outfile, agent_entry,'AgentId') == id)[0]
+            entries[name][agent_entry[idx]['EnterTime']] += 1
 
-        if agent_exit is None:
-            return entries
+    # cumulative entries
+    entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
+               for k, v in entries.items()}
 
-        # exits per timestep
-        for name, ids in agent_ids.items():
-            for id in ids:
-                idxs = np.where(to_ary(agent_exit,'AgentId') == id)[0]
-                if len(idxs) > 0:
-                    exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
+    if agent_exit is None:
+        return entries
 
-        # cumulative exits
-        exits = {k: [sum(v[:i+1]) for i in range(len(v))] \
-                     for k, v in exits.items()}
+    # exits per timestep
+    for name, ids in agent_ids.items():
+        for id in ids:
+            idxs = np.where(to_ary(outfile, agent_exit,'AgentId') == id)[0]
+            if len(idxs) > 0:
+                exits[name][agent_exit[idxs[0]]['ExitTime']] += 1
+
+    # cumulative exits
+    exits = {k: [sum(v[:i+1]) for i in range(len(v))] \
+                 for k, v in exits.items()}
 
     # return difference
     ret = {}
