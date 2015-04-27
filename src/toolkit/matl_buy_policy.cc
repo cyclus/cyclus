@@ -15,6 +15,7 @@ namespace toolkit {
 MatlBuyPolicy::MatlBuyPolicy() :
     Trader(NULL),
     name_(""),
+    throughput_(std::numeric_limits<double>::max()),
     quantize_(-1),
     fill_to_(1),
     req_when_under_(1) {
@@ -44,6 +45,11 @@ void MatlBuyPolicy::set_req_when_under(double x) {
 void MatlBuyPolicy::set_quantize(double x) {
   assert(x != 0);
   quantize_ = x;
+}
+
+void MatlBuyPolicy::set_throughput(double x) {
+  assert(x > 0);
+  throughput_ = x;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
@@ -83,6 +89,20 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
   set_quantize(quantize);
+  return *this;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+                                   std::string name, double quantize,
+                                   double fill_to, double req_when_under,
+                                   double throughput) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  set_fill_to(fill_to);
+  set_req_when_under(req_when_under);
+  set_quantize(quantize);
+  set_throughput(throughput);
   return *this;
 }
 

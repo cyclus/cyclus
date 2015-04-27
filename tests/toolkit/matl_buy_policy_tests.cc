@@ -46,16 +46,23 @@ TEST_F(MatlBuyPolicyTests, Init) {
   ASSERT_FLOAT_EQ(p.ReqQty(), cap);
   ASSERT_EQ(p.NReq(), 1);
 
+  // throughput
+  double throughput = cap - 1;
+  p.Init(fac1, &buff, "", -1, 1, 1, throughput);
+  ASSERT_FLOAT_EQ(p.TotalQty(), throughput);
+  ASSERT_FLOAT_EQ(p.ReqQty(), throughput);
+  ASSERT_EQ(p.NReq(), 1);
+
   // exclusive orders
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", quantize);
+  p.Init(fac1, &buff, "", quantize, 1, 1, std::numeric_limits<double>::max());
   ASSERT_FLOAT_EQ(p.TotalQty(), cap);
   ASSERT_FLOAT_EQ(p.ReqQty(), quantize);
   ASSERT_EQ(p.NReq(), static_cast<int>(cap / quantize));
 
   // S,s with nothing in buffer 
   double S = 4, s = 2;
-  p.Init(fac1, &buff, "", -1, S, s);
+  p.Init(fac1, &buff, "", -1, S, s, std::numeric_limits<double>::max());
   ASSERT_FLOAT_EQ(p.TotalQty(), S);
   ASSERT_FLOAT_EQ(p.ReqQty(), S);
   ASSERT_EQ(p.NReq(), 1);
