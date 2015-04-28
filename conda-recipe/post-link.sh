@@ -20,7 +20,7 @@ mv $PREFIX/bin/cyclus_unit_tests $PREFIX/bin/cyclus_unit_tests_base
 echo "
 #!/bin/bash
 export LD_LIBRARY_PATH=$PREFIX/lib:$PREFIX/lib/cyclus
- export DYLD_FALLBACK_LIBRARY_PATH=$PREFIX/lib/cyclus
+export DYLD_FALLBACK_LIBRARY_PATH=$PREFIX/lib/cyclus
 export DYLD_LIBRARY_PATH=
 export CYCLUS_NUC_DATA=$PREFIX/share/cyclus/cyclus_nuc_data.h5
 export CYCLUS_PATH=$PREFIX/lib/cyclus
