@@ -8,7 +8,7 @@ msg=`git log --pretty=oneline -1`
 echo "Building commit: $msg" 
 
 # build
-conda build --no-test conda
+conda build --no-test conda-recipe
 
 # install
 conda install --use-local cyclus=0.0
