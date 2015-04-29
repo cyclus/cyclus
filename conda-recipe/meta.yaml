@@ -38,9 +38,6 @@ requirements:
     - gettext # [osx]
     - pkg-config-lite # [osx]
 
-build:
-  string: nightly
-
 test:
   requires:
     - nose
