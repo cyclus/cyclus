@@ -23,6 +23,21 @@ TEST(CompMathTests, SubSame) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(CompMathTests, Normalize) {
+  CompMap v;
+  v[922350000] = .1;
+  v[922380000] = .2;
+
+  CompMap v2(v);
+  cm::Normalize(&v2, 1);
+
+  CompMap::iterator it;
+  for (it = v.begin(); it != v.end(); ++it) {
+    EXPECT_DOUBLE_EQ(it->second/.3, v2[it->first]);
+  }
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, SubCloseSize) {
   CompMap v;
   double qty = 0.1;
@@ -36,6 +51,8 @@ TEST(CompMathTests, SubCloseSize) {
   remainder = cm::Sub(v, v2);
   CompMap::iterator it;
   for (it = remainder.begin(); it != remainder.end(); ++it) {
+    std::cout << "v1: " << it->first << "=" << v[it->first] << "\n";
+    std::cout << "v2: " << it->first << "=" << v2[it->first] << "\n";
     double expected = cyclus::eps_rsrc();
     EXPECT_FLOAT_EQ(expected, it->second);
   }
