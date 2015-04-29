@@ -11,4 +11,4 @@ echo "Building commit: $msg"
 conda build --no-test conda-recipe
 
 # install
-conda install --use-local cyclus=0.0
+conda install --use-local cyclus=0.0-0
