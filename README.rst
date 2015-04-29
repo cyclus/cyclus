@@ -464,4 +464,4 @@ Releases
 If you are going through a release of Cyclus and Cycamore, check out the release
 procedure notes `here
 <https://github.com/cyclus/cyclus/blob/develop/doc/release_procedure.rst>`_ and
-on the `website <http://fuelcycle.org/cep/cep3.html>`_.
+on the `website <http://fuelcycle.org/cep/cep3.html>`_.foo
