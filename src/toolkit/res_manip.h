@@ -26,6 +26,10 @@ std::vector<Resource::Ptr> ResCast(std::vector<Material::Ptr> rs);
 /// Casts a vector of Products into a vector of Resources.
 std::vector<Resource::Ptr> ResCast(std::vector<Product::Ptr> rs);
 
+/// Casts a vector of Resources into a vector of Resources.  This is actually
+/// basically a no-op that enables ResBuf to work for plain Resource types.
+std::vector<Resource::Ptr> ResCast(std::vector<Resource::Ptr> rs);
+
 }  // namespace toolkit
 }  // namespace cyclus
 
