@@ -1,6 +1,6 @@
 package:
   name: cyclus
-  version: 0.0
+  version: 9999
 
 # Only use fn and url for polyphemus compatability
 source:
@@ -37,9 +37,6 @@ requirements:
     - libffi # [osx]
     - gettext # [osx]
     - pkg-config-lite # [osx]
-
-build:
-  string: nightly
 
 test:
   requires:
