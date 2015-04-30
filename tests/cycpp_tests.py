@@ -642,6 +642,13 @@ def test_sshinvfilter():
                 "  return invs;\n")
     yield assert_equal, exp_impl, impl
 
+    f = SnapshotInvFilter(m)
+    f.given_classname = 'MyFactory'
+    f.mode = 'impl'
+    impl = f.impl()
+    exp_impl = ("  cyclus::Inventories invs;\n")
+    yield assert_equal, exp_impl, impl
+
 def test_intinvfilter():
     """Test InitInvFilter"""
     m = MockCodeGenMachine()

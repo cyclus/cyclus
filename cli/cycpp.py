@@ -806,14 +806,15 @@ class CodeGeneratorFilter(Filter):
         # class names that are in the current namespace (Spy) or use classnames
         # that are fully qualified (mi6::Spy).
         self.given_classname = None
+        self.mode = 'def'
 
     def transform(self, statement, sep):
         # basic setup
         cg = self.machine
         groups = self.match.groups()
-        mode = (groups[0] or '').strip()
-        if len(mode) == 0:
-            mode = "def"
+        self.mode = (groups[0] or 'def').strip()
+        if len(self.mode) == 0:
+            self.mode = "def"
         classname = groups[1] if len(groups) > 1 else None
         if classname is None:
             if len(cg.classes) == 0:
@@ -830,7 +831,7 @@ class CodeGeneratorFilter(Filter):
         in_class_decl = self.in_class_decl()
         ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
         virt = "virtual " if in_class_decl else ""
-        end = ";" if mode == "decl" else " {"
+        end = ";" if self.mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
         definition = self.def_template.format(ind=" "*ind, virt=virt,
                         rtn=self.methodrtn, ns=ns, methodname=self.methodname,
@@ -839,15 +840,15 @@ class CodeGeneratorFilter(Filter):
         # compute implementation
         impl = ""
         ind += 2
-        if mode != "decl":
+        if self.mode != "decl":
             impl = self.impl(ind=ind * " ")
         ind -= 2
         if not impl.endswith("\n") and 0 != len(impl):
             impl += '\n'
-        end = "" if mode == "decl" else " " * ind + "};\n"
+        end = "" if self.mode == "decl" else " " * ind + "};\n"
 
         # compute return
-        if mode == 'impl':
+        if self.mode == 'impl':
             return impl
         else:
             return definition + impl + end
@@ -1745,7 +1746,10 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             s = t_impl.format(var=buff, t_str=type_to_str(t_info), **info)
             impl += ind + s.replace('\n', '\n' + ind).strip(' ')
 
-        impl += ind + "return invs;\n"
+        # if in impl mode, archetype dev is responsible for adding the return
+        # statement
+        if self.mode != 'impl':
+            impl += ind + "return invs;\n"
         return impl
 
     res_impl = {
