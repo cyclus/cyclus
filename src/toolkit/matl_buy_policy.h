@@ -66,6 +66,7 @@ class MatlBuyPolicy : public Trader {
   /// @param manager the agent
   /// @param buf the resource buffer
   /// @param name a unique name identifying this policy
+  /// @param throughput a maximum on total transaction quantities
   /// @param quantize If quantize is greater than zero, the policy will make
   /// exclusive, integral quantize kg requests.  Otherwise, single requests will
   /// be sent to fill the buffer's empty space.
@@ -85,6 +86,9 @@ class MatlBuyPolicy : public Trader {
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
                       double quantize,
                       double fill_to, double req_when_under);
+  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+                      double quantize, double fill_to,
+                      double req_when_under, double throughput);
   /// @}
     
   /// Instructs the policy to fill its buffer with requests on the given
@@ -112,7 +116,8 @@ class MatlBuyPolicy : public Trader {
 
   /// the total amount requested
   inline double TotalQty() const {
-    return fill_to_ * buf_->capacity() - buf_->quantity();
+    return std::min(throughput_,
+                    fill_to_ * buf_->capacity() - buf_->quantity());
   }
 
   /// whether trades will be denoted as exclusive or not
@@ -153,10 +158,11 @@ class MatlBuyPolicy : public Trader {
   /// requires buf_ already set
   void set_req_when_under(double x); 
   void set_quantize(double x); 
+  void set_throughput(double x); 
   
   ResourceBuff* buf_;
   std::string name_;
-  double fill_to_, req_when_under_, quantize_;
+  double fill_to_, req_when_under_, quantize_, throughput_;
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
 };
