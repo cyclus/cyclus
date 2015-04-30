@@ -1217,23 +1217,25 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
         return v
 
-    def _query(self, tree, alias, t, uitype=None, idx=None):
+    def _query(self, tree, alias, t, uitype=None, idx=None, path=''):
         tstr = type_to_str(t)
         if tstr.endswith('>'):
             tstr += " "
         # Get keys
-        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree}
+        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree, 
+              'path': path}
         kw['index'] = '' if idx is None else ', {0}'.format(idx)
         # get template
         if uitype == 'nuclide':
             template = ('pyne::nucname::id({cycns}::Query<std::string>({tree}, '
-                        '"{alias}"{index}))')
+                        '"{path}{alias}"{index}))')
         else:
-            template = '{cycns}::Query<{type}>({tree}, "{alias}"{index})'
+            template = '{cycns}::Query<{type}>({tree}, "{path}{alias}"{index})'
         # fill in template and return 
         return template.format(**kw)
 
-    def read_member(self, member, alias, t, uitype=None, ind='  ', idx=None):
+    def read_member(self, member, alias, t, uitype=None, ind='  ', idx=None, 
+                    path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
 
@@ -1243,18 +1245,20 @@ class InfileToDbFilter(CodeGeneratorFilter):
         reader = self.readers.get(tt, None)
         s += ind + '{\n'
         ind += '  '
-        s += reader(mname, alias, t, uitype, ind=ind, idx=idx)
+        s += reader(mname, alias, t, uitype, ind=ind, idx=idx, path=path)
         s += ind + '{0} = {1};\n'.format(member, mname)
         ind = ind[:-2]
         s += ind + '}\n'
         return s
 
-    def read_primitive(self, member, alias, t, uitype=None, ind='  ', idx=None):
-        query = self._query('sub', alias, t, uitype, idx=idx)
+    def read_primitive(self, member, alias, t, uitype=None, ind='  ', idx=None,
+                       path=''):
+        query = self._query('sub', alias, t, uitype, idx=idx, path=path)
         s = ind + '{t} {member} = {query};\n'.format(t=t, member=member, query=query)
         return s
 
-    def read_vector(self, member, alias, t, uitype=None, ind='  ', idx=None):
+    def read_vector(self, member, alias, t, uitype=None, ind='  ', idx=None,
+                    path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] == None:
@@ -1264,8 +1268,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
             lev = self._idx_lev
@@ -1283,7 +1287,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_set(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_set(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                 path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] == None:
@@ -1292,8 +1297,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
             lev = self._idx_lev
@@ -1309,7 +1314,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_list(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_list(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                  path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] == None:
@@ -1318,8 +1324,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
             lev = self._idx_lev
@@ -1335,7 +1341,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_pair(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_pair(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                  path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] == None:
@@ -1346,15 +1353,16 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += self.read_member('first', alias[1], t[1], uitype[1], ind+'  ', idx='0')
         s += self.read_member('second', alias[2], t[2], uitype[2], ind+'  ', idx='0')
         s += ind + '{0} {1}(first, second);\n'.format(type_to_str(t), member)
         return s
 
-    def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                 path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] == None:
@@ -1366,20 +1374,22 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # in scope causing segfaults
         # subtree must be specified if in recursive level
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
             lev = self._idx_lev
-            s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=lev)
+            s += ind + 'int n{lev} = sub->NMatches("item");\n'.format(
+                        lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
             s += self.read_member('key', alias[1], t[1], uitype[1], 
-                                  ind+'  ', idx='i{lev}'.format(lev=lev))
+                                  ind+'  ', idx='i{lev}'.format(lev=lev),
+                                  path='item/')
             s += self.read_member('val', alias[2], t[2], uitype[2], 
-                                  ind+'  ', idx='i{lev}'.format(lev=lev))
+                                  ind+'  ', idx='i{lev}'.format(lev=lev),
+                                  path='item/')
             s += ind + '  {0}[key] = val;\n'.format(member)
             s += ind + '}\n'
         return s

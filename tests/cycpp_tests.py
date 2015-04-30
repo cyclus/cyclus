@@ -26,6 +26,8 @@ from cycpp import CloneFilter, InitFromCopyFilter, \
 
 import cycpp
 
+assert_equal.__self__.maxDiff = None
+
 class MockMachine(object):
     def __init__(self):
         self.depth = 0
@@ -731,17 +733,17 @@ def test_infiletodb_read_member():
         '  {\n'
         '    cyclus::InfileTree* bub = sub->SubTree("streams", 0);\n'
         '    cyclus::InfileTree* sub = bub;\n'
-        '    int n1 = sub->NMatches("name");\n'
+        '    int n1 = sub->NMatches("item");\n'
         '    std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap_in;\n'
         '    for (int i1 = 0; i1 < n1; ++i1) {\n'
         '      std::string key;\n'
         '      {\n'
-        '        std::string key_in = cyclus::Query<std::string>(sub, "name", i1);\n'
+        '        std::string key_in = cyclus::Query<std::string>(sub, "item/name", i1);\n'
         '        key = key_in;\n'
         '      }\n'
         '      std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val;\n'
         '      {\n'
-        '        cyclus::InfileTree* bub = sub->SubTree("efficiencies", i1);\n'
+        '        cyclus::InfileTree* bub = sub->SubTree("item/efficiencies", i1);\n'
         '        cyclus::InfileTree* sub = bub;\n'
         '        int n2 = sub->NMatches("val");\n'
         '        std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val_in;\n'
