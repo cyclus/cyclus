@@ -1557,8 +1557,12 @@ class SchemaFilter(CodeGeneratorFilter):
                 valnames = names[2]
             impl += '<element name="{0}">'.format(name)
             impl += '<oneOrMore>'
+            impl += '<element name="item">'
+            impl += '<interleave>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], keynames)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], valnames)
+            impl += '</interleave>'
+            impl += '</element>'
             impl += '</oneOrMore>'
             impl += '</element>'
         elif t == 'std::pair':
@@ -1572,8 +1576,10 @@ class SchemaFilter(CodeGeneratorFilter):
             if names[2] is not None:
                 secondname = names[2]
             impl += '<element name="{0}">'.format(name)
+            impl += '<interleave>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
+            impl += '</interleave>'
             impl += '</element>'
         else:
             msg = '{0}Unsupported type {1}'.format(self.machine.includeloc(), t)

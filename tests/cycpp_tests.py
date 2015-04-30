@@ -585,16 +585,19 @@ def test_schemafilter():
         '    "<interleave>\\n"\n'
         '    "    <element name=\\"x\\">\\n"\n'
         '    "        <oneOrMore>\\n"\n'
-        '    "            <element name=\\"key\\">\\n"\n'
-        '    "                <data type=\\"int\\"/>\\n"\n'
-        '    "            </element>\\n"\n'
-        '    "            <element name=\\"val\\">\\n"\n'
-        '    "                <data type=\\"double\\"/>\\n"\n'
+        '    "            <element name=\\"item\\">\\n"\n'
+        '    "                <interleave>\\n"\n'
+        '    "                    <element name=\\"key\\">\\n"\n'
+        '    "                        <data type=\\"int\\"/>\\n"\n'
+        '    "                    </element>\\n"\n'
+        '    "                    <element name=\\"val\\">\\n"\n'
+        '    "                        <data type=\\"double\\"/>\\n"\n'
+        '    "                    </element>\\n"\n'
+        '    "                </interleave>\\n"\n'
         '    "            </element>\\n"\n'
         '    "        </oneOrMore>\\n"\n'
         '    "    </element>\\n"\n'
         '    "</interleave>\\n";\n')
-
     yield assert_equal, exp_impl, impl
 
 def test_annotationsfilter():
@@ -675,15 +678,23 @@ def test_schemafilter_buildschema():
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams']
-    want = '<element name="streams"><oneOrMore><element name="key"><data type="string" /></element><element name="val"><oneOrMore><element name="val"><data type="double" /></element></oneOrMore></element></oneOrMore></element>'
-    got = f._buildschema(cpptype, schematype, uitype, names)
-    yield assert_equal, want, got
+    exp = ('<element name="streams"><oneOrMore><element name="item">'
+           '<interleave><element name="key"><data type="string" /></element>'
+           '<element name="val"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams', 'name', ['efficiencies', 'val']]
-    want = '<element name="streams"><oneOrMore><element name="name"><data type="string" /></element><element name="efficiencies"><oneOrMore><element name="val"><data type="double" /></element></oneOrMore></element></oneOrMore></element>'
-    got = f._buildschema(cpptype, schematype, uitype, names)
-    yield assert_equal, want, got
+    exp = ('<element name="streams"><oneOrMore><element name="item">'
+           '<interleave><element name="name"><data type="string" /></element>'
+           '<element name="efficiencies"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
 
 def test_escape_xml():
     """Test escape_xml"""
@@ -714,8 +725,6 @@ def test_infiletodb_read_member():
     cpptype = ('std::map', 'std::string', ('std::vector', ('std::vector', ('std::pair', 'double', ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
     alias = ['streams', 'name', ['efficiencies', 'val']]
     gen = f.read_member('mymap', alias, cpptype, uitype=None)
-
-    pprint.pprint(gen)
 
     exp_gen = (
         '  std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap;\n'
