@@ -48,21 +48,24 @@ TEST_F(MatlBuyPolicyTests, Init) {
 
   // throughput
   double throughput = cap - 1;
-  p.Init(fac1, &buff, "", -1, 1, 1, throughput);
+  p.Init(fac1, &buff, "", throughput, 1, 1, -1);
   ASSERT_FLOAT_EQ(p.TotalQty(), throughput);
   ASSERT_FLOAT_EQ(p.ReqQty(), throughput);
   ASSERT_EQ(p.NReq(), 1);
 
   // exclusive orders
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", quantize, 1, 1, std::numeric_limits<double>::max());
+  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, quantize);
   ASSERT_FLOAT_EQ(p.TotalQty(), cap);
   ASSERT_FLOAT_EQ(p.ReqQty(), quantize);
   ASSERT_EQ(p.NReq(), static_cast<int>(cap / quantize));
 
   // S,s with nothing in buffer 
   double S = 4, s = 2;
-  p.Init(fac1, &buff, "", -1, S, s, std::numeric_limits<double>::max());
+  // reset
+  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, -1); 
+  // use Ss constructor
+  p.Init(fac1, &buff, "", S, s);
   ASSERT_FLOAT_EQ(p.TotalQty(), S);
   ASSERT_FLOAT_EQ(p.ReqQty(), S);
   ASSERT_EQ(p.NReq(), 1);
@@ -112,7 +115,7 @@ TEST_F(MatlBuyPolicyTests, Reqs) {
   
   // two portfolios with quantize
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", quantize);
+  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, quantize);
   obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 2);
   ASSERT_EQ((*obs.begin())->requests().size(), 2);

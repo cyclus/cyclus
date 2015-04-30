@@ -61,11 +61,11 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
-                                   std::string name, double quantize) {
+                                   std::string name, double throughput) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
-  set_quantize(quantize);
+  set_throughput(throughput);
   return *this;
 }
 
@@ -81,21 +81,9 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
-                                   std::string name, double quantize,
-                                   double fill_to, double req_when_under) {
-  Trader::manager_ = manager;
-  buf_ = buf;
-  name_ = name;
-  set_fill_to(fill_to);
-  set_req_when_under(req_when_under);
-  set_quantize(quantize);
-  return *this;
-}
-
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
-                                   std::string name, double quantize,
+                                   std::string name, double throughput,
                                    double fill_to, double req_when_under,
-                                   double throughput) {
+                                   double quantize) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;

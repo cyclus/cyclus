@@ -80,15 +80,12 @@ class MatlBuyPolicy : public Trader {
   /// @{
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
-                      double quantize);
+                      double throughput);
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
                       double fill_to, double req_when_under);
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
-                      double quantize,
-                      double fill_to, double req_when_under);
-  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
-                      double quantize, double fill_to,
-                      double req_when_under, double throughput);
+                      double throughput, double fill_to,
+                      double req_when_under, double quantize);
   /// @}
     
   /// Instructs the policy to fill its buffer with requests on the given
