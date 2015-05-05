@@ -61,6 +61,10 @@ std::vector<Resource::Ptr> ResCast(std::vector<Product::Ptr> rs) {
   return casted;
 }
 
+std::vector<Resource::Ptr> ResCast(std::vector<Resource::Ptr> rs) {
+  return rs;
+}
+
 }  // namespace toolkit
 }  // namespace cyclus
 

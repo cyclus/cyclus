@@ -186,7 +186,7 @@ TEST_F(MaterialMatQueryTest, ExtractDiffComp) {
   const double orig_am241 = mq.mass(am241_);
   const double orig_pb208 = mq.mass(pb208_);
 
-  EXPECT_NO_THROW(m1 = diff_mat_->ExtractComp(mq.mass(u235_), test_comp_));
+  ASSERT_NO_THROW(m1 = diff_mat_->ExtractComp(mq.mass(u235_), test_comp_));
   EXPECT_DOUBLE_EQ(orig - m1->quantity(), diff_mat_->quantity());
   EXPECT_EQ(m1->comp(), test_comp_);
   EXPECT_NE(diff_mat_->comp(), test_comp_);
