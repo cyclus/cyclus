@@ -51,12 +51,12 @@ class TradeExecutor {
 
   /// @brief execute all trades, collecting responders from bidders and sending
   /// responses to requesters
-  /// @deprecated Use ExecuteTrades(Context*) instead.
+  ///
+  /// @deprecated Use ExecuteTrades(Context*) instead.  This function just
+  /// calls ExecuteTrades(NULL).
   void ExecuteTrades() {
     Warn<IO_WARNING>("this function does not record trades to the database");
-    GroupTradesBySupplier(trade_ctx_, trades_);
-    GetTradeResponses(trade_ctx_);
-    SendTradeResources(trade_ctx_);
+    ExecuteTrades(NULL);
   }
 
   /// @brief execute all trades, collecting responders from bidders and sending
