@@ -48,6 +48,10 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
   path_ = path;
   db_.open();
 
+  db_.Execute("PRAGMA synchronous=OFF;");
+  db_.Execute("PRAGMA journal_mode=MEMORY;");
+  db_.Execute("PRAGMA temp_store=MEMORY;");
+
   // cache pre-existing table names
   SqlStatement::Ptr stmt;
   stmt = db_.Prepare("SELECT name FROM sqlite_master WHERE type='table';");

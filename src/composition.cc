@@ -44,7 +44,7 @@ const CompMap& Composition::atom() {
     CompMap::iterator it;
     for (it = mass_.begin(); it != mass_.end(); ++it) {
       Nuc nuc = it->first;
-      atom_[nuc] = mass_[nuc] / pyne::atomic_mass(nuc);
+      atom_[nuc] = it->second / pyne::atomic_mass(nuc);
     }
   }
   return atom_;
@@ -55,7 +55,7 @@ const CompMap& Composition::mass() {
     CompMap::iterator it;
     for (it = atom_.begin(); it != atom_.end(); ++it) {
       Nuc nuc = it->first;
-      mass_[nuc] = atom_[nuc] * pyne::atomic_mass(nuc);
+      mass_[nuc] = it->second * pyne::atomic_mass(nuc);
     }
   }
   return mass_;
