@@ -62,8 +62,7 @@ class ExchangeManager {
 
     // execute trades!
     TradeExecutor<T> exec(trades);
-    exec.ExecuteTrades();
-    exec.RecordTrades(ctx_);
+    exec.ExecuteTrades(ctx_);
   }
 
  private:
