@@ -1563,7 +1563,7 @@ class SchemaFilter(CodeGeneratorFilter):
             impl += '</element>'
         elif t == 'std::map':
             name = 'map'
-            if isinstance(names[0], STRING_TYPES):
+            if names[0] is None or isinstance(names[0], STRING_TYPES):
                 names[0] = [names[0], None]
             if names[0][0] is not None:
                 name = names[0][0]
