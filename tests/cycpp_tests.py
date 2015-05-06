@@ -698,6 +698,17 @@ def test_schemafilter_buildschema():
     obs = f._buildschema(cpptype, schematype, uitype, names)
     yield assert_equal, exp, obs
 
+    # test item aliasing
+    cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
+    names = [['streams', 'entry'], 'name', ['efficiencies', 'val']]
+    exp = ('<element name="streams"><oneOrMore><element name="entry">'
+           '<interleave><element name="name"><data type="string" /></element>'
+           '<element name="efficiencies"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
+
 def test_escape_xml():
     """Test escape_xml"""
     xml = '<element name="mymap">' \
@@ -724,7 +735,9 @@ def test_infiletodb_read_member():
             ])}
     f = InfileToDbFilter(m)
 
-    cpptype = ('std::map', 'std::string', ('std::vector', ('std::vector', ('std::pair', 'double', ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
+    cpptype = ('std::map', 'std::string', ('std::vector', 
+                ('std::vector', ('std::pair', 'double', 
+                  ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
     alias = ['streams', 'name', ['efficiencies', 'val']]
     gen = f.read_member('mymap', alias, cpptype, uitype=None)
 
@@ -822,6 +835,45 @@ def test_infiletodb_read_member():
         '  }\n')
 
     yield assert_equal, exp_gen, gen
+
+
+def test_infiletodb_read_map():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+
+    cpptype = ('std::map', 'int', 'double') 
+    alias = [['streams', 'entry'], 'id', 'mass']
+    obs = f.read_member('mymap', alias, cpptype, uitype=None)
+
+    exp = (
+        '  std::map< int, double > mymap;\n'
+        '  {\n'
+        '    cyclus::InfileTree* bub = sub->SubTree("streams", 0);\n'
+        '    cyclus::InfileTree* sub = bub;\n'
+        '    int n1 = sub->NMatches("entry");\n'
+        '    std::map< int, double > mymap_in;\n'
+        '    for (int i1 = 0; i1 < n1; ++i1) {\n'
+        '      int key;\n'
+        '      {\n'
+        '        int key_in = cyclus::Query<int>(sub, "entry/id", i1);\n'
+        '        key = key_in;\n'
+        '      }\n'
+        '      double val;\n'
+        '      {\n'
+        '        double val_in = cyclus::Query<double>(sub, "entry/mass", i1);\n'
+        '        val = val_in;\n'
+        '      }\n'
+        '      mymap_in[key] = val;\n'
+        '    }\n'
+        '    mymap = mymap_in;\n'
+        '  }\n')
+
+    yield assert_equal, exp, obs
+
 
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
