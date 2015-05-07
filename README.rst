@@ -139,7 +139,7 @@ Cyclus archetype development is not fully supported on Mac.  Nonetheless,
 because there are some use cases which require installation from source,
 we have compiled a list of instructions that should be successful. (Note that
 the HDF5 interface is not working on Yosemite as of 1-Apr-2015. Ignore related
-warningswhen building cyclus). Use a Mac platform at your own risk, we strongly
+warnings when building cyclus). Use a Mac platform at your own risk, we strongly
 recommend sticking to Linux for development.
 
 This guide assumes that the user has root access (to issue sudo commands) and
