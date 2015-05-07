@@ -66,25 +66,27 @@ class MatlBuyPolicy : public Trader {
   /// @param manager the agent
   /// @param buf the resource buffer
   /// @param name a unique name identifying this policy
-  /// @param quantize If quantize is greater than zero, the policy will make
-  /// exclusive, integral quantize kg requests.  Otherwise, single requests will
-  /// be sent to fill the buffer's empty space.
+  /// @param throughput a constraining value for total transaction quantities in
+  /// a single time step
   /// @param fill_to the amount or fraction of inventory to order when placing
   /// an order. This is equivalent to the S in an (s, S) inventory policy.
   /// @param req_when_under place an request when the buf's quantity is less
   /// than its capacity * fill_to (as a fraction). This is equivalent to the s
   /// in an (s, S) inventory policy.
+  /// @param quantize If quantize is greater than zero, the policy will make
+  /// exclusive, integral quantize kg requests.  Otherwise, single requests will
+  /// be sent to fill the buffer's empty space.
   /// @warning, (s, S) policy values are ambiguous for buffers with a capacity
   /// in (0, 1]. However that is a rare case.
   /// @{
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
-                      double quantize);
+                      double throughput);
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
                       double fill_to, double req_when_under);
   MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
-                      double quantize,
-                      double fill_to, double req_when_under);
+                      double throughput, double fill_to,
+                      double req_when_under, double quantize);
   /// @}
     
   /// Instructs the policy to fill its buffer with requests on the given
@@ -112,7 +114,8 @@ class MatlBuyPolicy : public Trader {
 
   /// the total amount requested
   inline double TotalQty() const {
-    return fill_to_ * buf_->capacity() - buf_->quantity();
+    return std::min(throughput_,
+                    fill_to_ * buf_->capacity() - buf_->quantity());
   }
 
   /// whether trades will be denoted as exclusive or not
@@ -153,10 +156,11 @@ class MatlBuyPolicy : public Trader {
   /// requires buf_ already set
   void set_req_when_under(double x); 
   void set_quantize(double x); 
+  void set_throughput(double x); 
   
   ResourceBuff* buf_;
   std::string name_;
-  double fill_to_, req_when_under_, quantize_;
+  double fill_to_, req_when_under_, quantize_, throughput_;
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
 };

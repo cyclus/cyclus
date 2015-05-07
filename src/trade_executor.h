@@ -51,9 +51,22 @@ class TradeExecutor {
 
   /// @brief execute all trades, collecting responders from bidders and sending
   /// responses to requesters
+  ///
+  /// @deprecated Use ExecuteTrades(Context*) instead.  This function just
+  /// calls ExecuteTrades(NULL).
   void ExecuteTrades() {
+    Warn<IO_WARNING>("this function does not record trades to the database");
+    ExecuteTrades(NULL);
+  }
+
+  /// @brief execute all trades, collecting responders from bidders and sending
+  /// responses to requesters
+  void ExecuteTrades(Context* ctx) {
     GroupTradesBySupplier(trade_ctx_, trades_);
     GetTradeResponses(trade_ctx_);
+    if (ctx != NULL) {
+      RecordTrades(ctx);
+    }
     SendTradeResources(trade_ctx_);
   }
 
