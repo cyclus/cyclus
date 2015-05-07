@@ -494,7 +494,8 @@ class VarDeclarationFilter(Filter):
         state.context[classname]['vars'][vname] = annotations
         if 'alias' in annotations:
             alias = annotations['alias']
-            alias = alias if isinstance(alias, STRING_TYPES) else alias[0]
+            while not isinstance(alias, STRING_TYPES):
+                alias = alias[0] 
             state.context[classname]['vars'][alias] = vname
         state.var_annotations = None
 
