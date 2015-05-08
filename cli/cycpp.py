@@ -532,8 +532,6 @@ class VarDeclarationFilter(Filter):
         'std::list': (None, 'val'),
         'std::pair': (None, 'first', 'second'),
         'std::map': ((None, 'item'), 'key', 'val'),
-        #'{0}::toolkit::ResBuf'.format(CYCNS): (None, 'val'),
-        #'{0}::toolkit::ResMap'.format(CYCNS): ((None, 'item'), 'key', 'val'),
         }
 
     def canonize_alias(self, t, name, alias=None):
