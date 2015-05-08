@@ -26,6 +26,8 @@ from cycpp import CloneFilter, InitFromCopyFilter, \
 
 import cycpp
 
+assert_equal.__self__.maxDiff = None
+
 class MockMachine(object):
     def __init__(self):
         self.depth = 0
@@ -585,16 +587,19 @@ def test_schemafilter():
         '    "<interleave>\\n"\n'
         '    "    <element name=\\"x\\">\\n"\n'
         '    "        <oneOrMore>\\n"\n'
-        '    "            <element name=\\"key\\">\\n"\n'
-        '    "                <data type=\\"int\\"/>\\n"\n'
-        '    "            </element>\\n"\n'
-        '    "            <element name=\\"val\\">\\n"\n'
-        '    "                <data type=\\"double\\"/>\\n"\n'
+        '    "            <element name=\\"item\\">\\n"\n'
+        '    "                <interleave>\\n"\n'
+        '    "                    <element name=\\"key\\">\\n"\n'
+        '    "                        <data type=\\"int\\"/>\\n"\n'
+        '    "                    </element>\\n"\n'
+        '    "                    <element name=\\"val\\">\\n"\n'
+        '    "                        <data type=\\"double\\"/>\\n"\n'
+        '    "                    </element>\\n"\n'
+        '    "                </interleave>\\n"\n'
         '    "            </element>\\n"\n'
         '    "        </oneOrMore>\\n"\n'
         '    "    </element>\\n"\n'
         '    "</interleave>\\n";\n')
-
     yield assert_equal, exp_impl, impl
 
 def test_annotationsfilter():
@@ -675,15 +680,34 @@ def test_schemafilter_buildschema():
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams']
-    want = '<element name="streams"><oneOrMore><element name="key"><data type="string" /></element><element name="val"><oneOrMore><element name="val"><data type="double" /></element></oneOrMore></element></oneOrMore></element>'
-    got = f._buildschema(cpptype, schematype, uitype, names)
-    yield assert_equal, want, got
+    exp = ('<element name="streams"><oneOrMore><element name="item">'
+           '<interleave><element name="key"><data type="string" /></element>'
+           '<element name="val"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams', 'name', ['efficiencies', 'val']]
-    want = '<element name="streams"><oneOrMore><element name="name"><data type="string" /></element><element name="efficiencies"><oneOrMore><element name="val"><data type="double" /></element></oneOrMore></element></oneOrMore></element>'
-    got = f._buildschema(cpptype, schematype, uitype, names)
-    yield assert_equal, want, got
+    exp = ('<element name="streams"><oneOrMore><element name="item">'
+           '<interleave><element name="name"><data type="string" /></element>'
+           '<element name="efficiencies"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
+
+    # test item aliasing
+    cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
+    names = [['streams', 'entry'], 'name', ['efficiencies', 'val']]
+    exp = ('<element name="streams"><oneOrMore><element name="entry">'
+           '<interleave><element name="name"><data type="string" /></element>'
+           '<element name="efficiencies"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
 
 def test_escape_xml():
     """Test escape_xml"""
@@ -711,28 +735,28 @@ def test_infiletodb_read_member():
             ])}
     f = InfileToDbFilter(m)
 
-    cpptype = ('std::map', 'std::string', ('std::vector', ('std::vector', ('std::pair', 'double', ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
+    cpptype = ('std::map', 'std::string', ('std::vector', 
+                ('std::vector', ('std::pair', 'double', 
+                  ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
     alias = ['streams', 'name', ['efficiencies', 'val']]
     gen = f.read_member('mymap', alias, cpptype, uitype=None)
-
-    pprint.pprint(gen)
 
     exp_gen = (
         '  std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap;\n'
         '  {\n'
         '    cyclus::InfileTree* bub = sub->SubTree("streams", 0);\n'
         '    cyclus::InfileTree* sub = bub;\n'
-        '    int n1 = sub->NMatches("name");\n'
+        '    int n1 = sub->NMatches("item");\n'
         '    std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap_in;\n'
         '    for (int i1 = 0; i1 < n1; ++i1) {\n'
         '      std::string key;\n'
         '      {\n'
-        '        std::string key_in = cyclus::Query<std::string>(sub, "name", i1);\n'
+        '        std::string key_in = cyclus::Query<std::string>(sub, "item/name", i1);\n'
         '        key = key_in;\n'
         '      }\n'
         '      std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val;\n'
         '      {\n'
-        '        cyclus::InfileTree* bub = sub->SubTree("efficiencies", i1);\n'
+        '        cyclus::InfileTree* bub = sub->SubTree("item/efficiencies", i1);\n'
         '        cyclus::InfileTree* sub = bub;\n'
         '        int n2 = sub->NMatches("val");\n'
         '        std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val_in;\n'
@@ -811,6 +835,45 @@ def test_infiletodb_read_member():
         '  }\n')
 
     yield assert_equal, exp_gen, gen
+
+
+def test_infiletodb_read_map():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+
+    cpptype = ('std::map', 'int', 'double') 
+    alias = [['streams', 'entry'], 'id', 'mass']
+    obs = f.read_member('mymap', alias, cpptype, uitype=None)
+
+    exp = (
+        '  std::map< int, double > mymap;\n'
+        '  {\n'
+        '    cyclus::InfileTree* bub = sub->SubTree("streams", 0);\n'
+        '    cyclus::InfileTree* sub = bub;\n'
+        '    int n1 = sub->NMatches("entry");\n'
+        '    std::map< int, double > mymap_in;\n'
+        '    for (int i1 = 0; i1 < n1; ++i1) {\n'
+        '      int key;\n'
+        '      {\n'
+        '        int key_in = cyclus::Query<int>(sub, "entry/id", i1);\n'
+        '        key = key_in;\n'
+        '      }\n'
+        '      double val;\n'
+        '      {\n'
+        '        double val_in = cyclus::Query<double>(sub, "entry/mass", i1);\n'
+        '        val = val_in;\n'
+        '      }\n'
+        '      mymap_in[key] = val;\n'
+        '    }\n'
+        '    mymap = mymap_in;\n'
+        '  }\n')
+
+    yield assert_equal, exp, obs
+
 
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
