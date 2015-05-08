@@ -139,15 +139,17 @@ Cyclus archetype development is not fully supported on Mac.  Nonetheless,
 because there are some use cases which require installation from source,
 we have compiled a list of instructions that should be successful. (Note that
 the HDF5 interface is not working on Yosemite as of 1-Apr-2015. Ignore related
-warningswhen building cyclus). Use a Mac platform at your own risk, we strongly
+warnings when building cyclus). Use a Mac platform at your own risk, we strongly
 recommend sticking to Linux for development.
 
 This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
 of Yosemite 10.10.2 using macports as the package manager.  Macports installs
-packages in /opt/local.  If installing to a different location (ie. using brew),
-change paths in the following instructions accordingly.
+packages in /opt/local.  If installing to a different location,
+(i.e. /usr/local) change paths in the following instructions accordingly. If
+you use homebrew, try the following instructions with brew commands in place of
+the port commands.
 
 The command to install a dependency takes the form of:
 
