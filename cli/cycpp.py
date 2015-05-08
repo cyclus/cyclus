@@ -497,8 +497,9 @@ class VarDeclarationFilter(Filter):
             while not isinstance(alias, STRING_TYPES):
                 alias = alias[0] 
             state.context[classname]['vars'][alias] = vname
-        annotations['alias'] = self.canonize_alias(annotations['type'], 
-                                    vname, alias=annotations.get('alias'))
+        if annotations['type'][0] not in BUFFERS:
+            annotations['alias'] = self.canonize_alias(annotations['type'], 
+                                        vname, alias=annotations.get('alias'))
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -531,6 +532,8 @@ class VarDeclarationFilter(Filter):
         'std::list': (None, 'val'),
         'std::pair': (None, 'first', 'second'),
         'std::map': ((None, 'item'), 'key', 'val'),
+        #'{0}::toolkit::ResBuf'.format(CYCNS): (None, 'val'),
+        #'{0}::toolkit::ResMap'.format(CYCNS): ((None, 'item'), 'key', 'val'),
         }
 
     def canonize_alias(self, t, name, alias=None):
@@ -1485,7 +1488,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
                 # generate condition to choose default vs given val if default exists
                 if d is not None:
-                    name = labels if isinstance(t, STRING_TYPES) else labels[0]
+                    name = labels
+                    while not isinstance(name, STRING_TYPES):
+                        name = name[0]
                     impl += ind + 'if (sub->NMatches("{0}") > 0) {{\n'.format(name)
                     ind += '  '
 
