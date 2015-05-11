@@ -203,6 +203,35 @@ def test_vdeclarfilter():
     f.transform(statement, sep)
     yield assert_equal, m.var_annotations, None
 
+def test_vdeclarfilter_canonize_alias():
+    m = MockMachine()
+    f = VarDeclarationFilter(m)
+    cases = [
+        # exp   type  name  alias
+        ('x', 'float', 'x', None),
+        (['x', 'val'], ['std::set', 'float'], 'x', None),
+        (['x', 'first', 'second'], ['std::pair', 'int', 'int'], 'x', None),
+        ([['x', 'item'], 'key', 'val'], ['std::map', 'int', 'int'], 'x', None),
+        ([['x', 'item'], ['key', 'first', 'second'], ['val', 'val']], 
+            ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+            'x', None),
+        ('y', 'float', 'x', 'y'),
+        (['x', 'y'], ['std::set', 'float'], 'x', [None, 'y']),
+        (['y', 'first', 'second'], ['std::pair', 'int', 'int'], 
+            'x', ['y']),
+        ([['x', 'item'], 'y', 'val'], ['std::map', 'int', 'int'], 'x', 
+            [None, 'y']),
+        ([['x', 'ytem'], 'y', 'val'], ['std::map', 'int', 'int'], 'x', 
+            [['x', 'ytem'], 'y']),
+        ([['x', 'ytem'], ['key', 'f', 's'], ['data', 'val']], 
+            ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+            'x', [[None, 'ytem'], [None, 'f', 's'], 'data']),
+        ]
+    for exp, t, name, alias in cases:
+        obs = f.canonize_alias(t, name, alias=alias)
+        yield assert_equal, exp, obs
+
+
 def test_execfilter():
     """Test ExecFilter"""
     m = MockMachine()
