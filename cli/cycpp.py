@@ -291,7 +291,7 @@ class UsingFilter(AliasFilter):
 
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
-    # handles anonymous namespaces as group(1) == None
+    # handles anonymous namespaces as group(1) is None
     regex = re.compile("\s*namespace(\s+\w*)?\s*[^=]*", re.DOTALL)
 
     def transform(self, statement, sep):
@@ -494,8 +494,12 @@ class VarDeclarationFilter(Filter):
         state.context[classname]['vars'][vname] = annotations
         if 'alias' in annotations:
             alias = annotations['alias']
-            alias = alias if isinstance(alias, STRING_TYPES) else alias[0]
+            while not isinstance(alias, STRING_TYPES):
+                alias = alias[0] 
             state.context[classname]['vars'][alias] = vname
+        if annotations['type'][0] not in BUFFERS:
+            annotations['alias'] = self.canonize_alias(annotations['type'], 
+                                        vname, alias=annotations.get('alias'))
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -521,6 +525,46 @@ class VarDeclarationFilter(Filter):
         else:
             rtn = None
         return rtn
+
+    _default_aliases = {
+        'std::vector': (None, 'val'),
+        'std::set': (None, 'val'),
+        'std::list': (None, 'val'),
+        'std::pair': (None, 'first', 'second'),
+        'std::map': ((None, 'item'), 'key', 'val'),
+        }
+
+    def canonize_alias(self, t, name, alias=None):
+        """Computes the default alias structure for a C++ type for with the 
+        given state variable name.
+        """
+        if isinstance(t, STRING_TYPES):
+            return alias or name 
+        template = self._default_aliases[t[0]]
+        # expand alias if needed
+        if alias is None:
+            alias = [None] * len(t)
+        elif isinstance(alias, STRING_TYPES):
+            alias = [alias] + [None]*(len(t) - 1)
+        elif len(alias) < len(t):
+            alias = alias + [None]*(len(t) - len(alias))
+        # find template name
+        if template[0] is None: 
+            t0 = alias[0] or name
+        else:
+            # expand t0 alias if needed
+            if alias[0] is None:
+                alias[0] = [None] * len(template[0])
+            elif isinstance(alias[0], STRING_TYPES):
+                alias[0] = [alias[0]] + [None]*(len(template[0]) - 1)
+            elif len(alias[0]) < len(template[0]):
+                alias[0] = alias[0] + [None]*(len(template[0]) - len(alias[0]))
+            t0 = [alias[0][0] or name] + \
+                 [ai or ti for ai, ti in zip(alias[0][1:], template[0][1:])]
+        a = [t0]
+        for t_i, template_i, alias_i in zip(t[1:], template[1:], alias[1:]):
+            a.append(self.canonize_alias(t_i, template_i, alias=alias_i))
+        return a
 
 class ExecFilter(Filter):
     """Filter for executing arbitrary python code in the exec pragma and
@@ -806,14 +850,15 @@ class CodeGeneratorFilter(Filter):
         # class names that are in the current namespace (Spy) or use classnames
         # that are fully qualified (mi6::Spy).
         self.given_classname = None
+        self.mode = 'def'
 
     def transform(self, statement, sep):
         # basic setup
         cg = self.machine
         groups = self.match.groups()
-        mode = (groups[0] or '').strip()
-        if len(mode) == 0:
-            mode = "def"
+        self.mode = (groups[0] or 'def').strip()
+        if len(self.mode) == 0:
+            self.mode = "def"
         classname = groups[1] if len(groups) > 1 else None
         if classname is None:
             if len(cg.classes) == 0:
@@ -830,7 +875,7 @@ class CodeGeneratorFilter(Filter):
         in_class_decl = self.in_class_decl()
         ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
         virt = "virtual " if in_class_decl else ""
-        end = ";" if mode == "decl" else " {"
+        end = ";" if self.mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
         definition = self.def_template.format(ind=" "*ind, virt=virt,
                         rtn=self.methodrtn, ns=ns, methodname=self.methodname,
@@ -839,15 +884,15 @@ class CodeGeneratorFilter(Filter):
         # compute implementation
         impl = ""
         ind += 2
-        if mode != "decl":
+        if self.mode != "decl":
             impl = self.impl(ind=ind * " ")
         ind -= 2
         if not impl.endswith("\n") and 0 != len(impl):
             impl += '\n'
-        end = "" if mode == "decl" else " " * ind + "};\n"
+        end = "" if self.mode == "decl" else " " * ind + "};\n"
 
         # compute return
-        if mode == 'impl':
+        if self.mode == 'impl':
             return impl
         else:
             return definition + impl + end
@@ -1217,23 +1262,25 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
         return v
 
-    def _query(self, tree, alias, t, uitype=None, idx=None):
+    def _query(self, tree, alias, t, uitype=None, idx=None, path=''):
         tstr = type_to_str(t)
         if tstr.endswith('>'):
             tstr += " "
         # Get keys
-        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree}
+        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree, 
+              'path': path}
         kw['index'] = '' if idx is None else ', {0}'.format(idx)
         # get template
         if uitype == 'nuclide':
             template = ('pyne::nucname::id({cycns}::Query<std::string>({tree}, '
-                        '"{alias}"{index}))')
+                        '"{path}{alias}"{index}))')
         else:
-            template = '{cycns}::Query<{type}>({tree}, "{alias}"{index})'
+            template = '{cycns}::Query<{type}>({tree}, "{path}{alias}"{index})'
         # fill in template and return 
         return template.format(**kw)
 
-    def read_member(self, member, alias, t, uitype=None, ind='  ', idx=None):
+    def read_member(self, member, alias, t, uitype=None, ind='  ', idx=None, 
+                    path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
 
@@ -1243,29 +1290,31 @@ class InfileToDbFilter(CodeGeneratorFilter):
         reader = self.readers.get(tt, None)
         s += ind + '{\n'
         ind += '  '
-        s += reader(mname, alias, t, uitype, ind=ind, idx=idx)
+        s += reader(mname, alias, t, uitype, ind=ind, idx=idx, path=path)
         s += ind + '{0} = {1};\n'.format(member, mname)
         ind = ind[:-2]
         s += ind + '}\n'
         return s
 
-    def read_primitive(self, member, alias, t, uitype=None, ind='  ', idx=None):
-        query = self._query('sub', alias, t, uitype, idx=idx)
+    def read_primitive(self, member, alias, t, uitype=None, ind='  ', idx=None,
+                       path=''):
+        query = self._query('sub', alias, t, uitype, idx=idx, path=path)
         s = ind + '{t} {member} = {query};\n'.format(t=t, member=member, query=query)
         return s
 
-    def read_vector(self, member, alias, t, uitype=None, ind='  ', idx=None):
+    def read_vector(self, member, alias, t, uitype=None, ind='  ', idx=None,
+                    path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
-        if alias[1] == None:
+        if alias[1] is None:
             alias[1] = 'val'
 
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
             lev = self._idx_lev
@@ -1283,17 +1332,18 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_set(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_set(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                 path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
-        if alias[1] == None:
+        if alias[1] is None:
             alias[1] = 'val'
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
             lev = self._idx_lev
@@ -1309,17 +1359,18 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_list(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_list(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                  path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
-        if alias[1] == None:
+        if alias[1] is None:
             alias[1] = 'val'
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
             lev = self._idx_lev
@@ -1335,51 +1386,61 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '}\n'
         return s
 
-    def read_pair(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_pair(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                  path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
-        if alias[1] == None:
+        if alias[1] is None:
             alias[1] = 'first'
-        if alias[2] == None:
+        if alias[2] is None:
             alias[2] = 'second'
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         s += self.read_member('first', alias[1], t[1], uitype[1], ind+'  ', idx='0')
         s += self.read_member('second', alias[2], t[2], uitype[2], ind+'  ', idx='0')
         s += ind + '{0} {1}(first, second);\n'.format(type_to_str(t), member)
         return s
 
-    def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None):
+    def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                 path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
-        if alias[1] == None:
+        #import pdb; pdb.set_trace()
+        if isinstance(alias[0], STRING_TYPES):
+            alias[0] = [alias[0], None]
+        if alias[0][1] is None:
+            alias[0][1] = 'item'
+        if alias[1] is None:
             alias[1] = 'key'
-        if alias[2] == None:
+        if alias[2] is None:
             alias[2] = 'val'
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         # subtree must be specified if in recursive level
+        itempath = alias[0][1] + '/'
         tree_idx = idx or '0'
-        s = ind + '{0}::InfileTree* bub = sub->SubTree("{1}", {2});\n'.format(
-            CYCNS, alias[0], tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0][0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         with self._nest_idx():
             lev = self._idx_lev
-            s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=lev)
+            s += ind + 'int n{lev} = sub->NMatches("{item}");\n'.format(
+                        lev=lev, item=alias[0][1])
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
             s += self.read_member('key', alias[1], t[1], uitype[1], 
-                                  ind+'  ', idx='i{lev}'.format(lev=lev))
+                                  ind+'  ', idx='i{lev}'.format(lev=lev),
+                                  path=itempath)
             s += self.read_member('val', alias[2], t[2], uitype[2], 
-                                  ind+'  ', idx='i{lev}'.format(lev=lev))
+                                  ind+'  ', idx='i{lev}'.format(lev=lev),
+                                  path=itempath)
             s += ind + '  {0}[key] = val;\n'.format(member)
             s += ind + '}\n'
         return s
@@ -1426,7 +1487,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
                 # generate condition to choose default vs given val if default exists
                 if d is not None:
-                    name = labels if isinstance(t, STRING_TYPES) else labels[0]
+                    name = labels
+                    while not isinstance(name, STRING_TYPES):
+                        name = name[0]
                     impl += ind + 'if (sub->NMatches("{0}") > 0) {{\n'.format(name)
                     ind += '  '
 
@@ -1547,8 +1610,11 @@ class SchemaFilter(CodeGeneratorFilter):
             impl += '</element>'
         elif t == 'std::map':
             name = 'map'
-            if names[0] is not None:
-                name = names[0]
+            if names[0] is None or isinstance(names[0], STRING_TYPES):
+                names[0] = [names[0], None]
+            if names[0][0] is not None:
+                name = names[0][0]
+            itemname ='item' if names[0][1] is None else names[0][1]
             keynames = 'key' if isinstance(cpptype[1], STRING_TYPES) else ['key']
             if names[1] is not None:
                 keynames = names[1]
@@ -1557,8 +1623,12 @@ class SchemaFilter(CodeGeneratorFilter):
                 valnames = names[2]
             impl += '<element name="{0}">'.format(name)
             impl += '<oneOrMore>'
+            impl += '<element name="{0}">'.format(itemname)
+            impl += '<interleave>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], keynames)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], valnames)
+            impl += '</interleave>'
+            impl += '</element>'
             impl += '</oneOrMore>'
             impl += '</element>'
         elif t == 'std::pair':
@@ -1572,8 +1642,10 @@ class SchemaFilter(CodeGeneratorFilter):
             if names[2] is not None:
                 secondname = names[2]
             impl += '<element name="{0}">'.format(name)
+            impl += '<interleave>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
+            impl += '</interleave>'
             impl += '</element>'
         else:
             msg = '{0}Unsupported type {1}'.format(self.machine.includeloc(), t)
@@ -1745,7 +1817,10 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             s = t_impl.format(var=buff, t_str=type_to_str(t_info), **info)
             impl += ind + s.replace('\n', '\n' + ind).strip(' ')
 
-        impl += ind + "return invs;\n"
+        # if in impl mode, archetype dev is responsible for adding the return
+        # statement
+        if self.mode != 'impl':
+            impl += ind + "return invs;\n"
         return impl
 
     res_impl = {
