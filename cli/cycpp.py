@@ -497,6 +497,9 @@ class VarDeclarationFilter(Filter):
             while not isinstance(alias, STRING_TYPES):
                 alias = alias[0] 
             state.context[classname]['vars'][alias] = vname
+        if annotations['type'][0] not in BUFFERS:
+            annotations['alias'] = self.canonize_alias(annotations['type'], 
+                                        vname, alias=annotations.get('alias'))
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -522,6 +525,46 @@ class VarDeclarationFilter(Filter):
         else:
             rtn = None
         return rtn
+
+    _default_aliases = {
+        'std::vector': (None, 'val'),
+        'std::set': (None, 'val'),
+        'std::list': (None, 'val'),
+        'std::pair': (None, 'first', 'second'),
+        'std::map': ((None, 'item'), 'key', 'val'),
+        }
+
+    def canonize_alias(self, t, name, alias=None):
+        """Computes the default alias structure for a C++ type for with the 
+        given state variable name.
+        """
+        if isinstance(t, STRING_TYPES):
+            return alias or name 
+        template = self._default_aliases[t[0]]
+        # expand alias if needed
+        if alias is None:
+            alias = [None] * len(t)
+        elif isinstance(alias, STRING_TYPES):
+            alias = [alias] + [None]*(len(t) - 1)
+        elif len(alias) < len(t):
+            alias = alias + [None]*(len(t) - len(alias))
+        # find template name
+        if template[0] is None: 
+            t0 = alias[0] or name
+        else:
+            # expand t0 alias if needed
+            if alias[0] is None:
+                alias[0] = [None] * len(template[0])
+            elif isinstance(alias[0], STRING_TYPES):
+                alias[0] = [alias[0]] + [None]*(len(template[0]) - 1)
+            elif len(alias[0]) < len(template[0]):
+                alias[0] = alias[0] + [None]*(len(template[0]) - len(alias[0]))
+            t0 = [alias[0][0] or name] + \
+                 [ai or ti for ai, ti in zip(alias[0][1:], template[0][1:])]
+        a = [t0]
+        for t_i, template_i, alias_i in zip(t[1:], template[1:], alias[1:]):
+            a.append(self.canonize_alias(t_i, template_i, alias=alias_i))
+        return a
 
 class ExecFilter(Filter):
     """Filter for executing arbitrary python code in the exec pragma and
@@ -1443,7 +1486,9 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
                 # generate condition to choose default vs given val if default exists
                 if d is not None:
-                    name = labels if isinstance(t, STRING_TYPES) else labels[0]
+                    name = labels
+                    while not isinstance(name, STRING_TYPES):
+                        name = name[0]
                     impl += ind + 'if (sub->NMatches("{0}") > 0) {{\n'.format(name)
                     ind += '  '
 
