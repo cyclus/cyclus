@@ -12,8 +12,12 @@ namespace toolkit {
 /// Time series types to be used in the RecordTimeSeries() functions.
 /// These types have the following unit which *must* be adhered to strictly:
 /// - POWER [MWe]
+/// - ENRICH_SWU [kg SWU]
+/// - ENRICH_FEED [kg]
 enum TimeSeriesType {
   POWER,
+  ENRICH_SWU,
+  ENRICH_FEED,
 };
 
 /// Records a per-time step quantity for a given type
