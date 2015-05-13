@@ -27,7 +27,7 @@ class MatlSellPolicyTests: public ::testing::Test {
   TestContext tc;
   TestFacility* fac1;
   double cap, qty;
-  ResourceBuff buff;
+  ResBuf<Material> buff;
   Composition::Ptr comp, comp1;
   Material::Ptr mat, mat1;
   
@@ -35,7 +35,7 @@ class MatlSellPolicyTests: public ::testing::Test {
     fac1 = new TestFacility(tc.get());
     cap = 5;
     qty = 3;
-    buff.set_capacity(cap);
+    buff.capacity(cap);
     CompMap v;
     v[pyne::nucname::id("H1")] = 1;
     comp = Composition::CreateFromAtom(v);

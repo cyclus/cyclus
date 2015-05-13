@@ -52,7 +52,7 @@ void MatlBuyPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name) {
   Trader::manager_ = manager;
   buf_ = buf;
@@ -60,7 +60,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, double throughput) {
   Trader::manager_ = manager;
   buf_ = buf;
@@ -69,7 +69,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name,
                                    double fill_to, double req_when_under) {
   Trader::manager_ = manager;
@@ -80,7 +80,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, double throughput,
                                    double fill_to, double req_when_under,
                                    double quantize) {

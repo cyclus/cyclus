@@ -36,8 +36,8 @@ class MatlBuyPolicyTests: public ::testing::Test {
 
 TEST_F(MatlBuyPolicyTests, Init) {
   double cap = 5;
-  ResourceBuff buff;
-  buff.set_capacity(cap);
+  ResBuf<Material> buff;
+  buff.capacity(cap);
   MatlBuyPolicy p;
 
   // defaults
@@ -71,7 +71,8 @@ TEST_F(MatlBuyPolicyTests, Init) {
   ASSERT_EQ(p.NReq(), 1);
 
   // S,s with something in buffer
-  buff.Push(Product::CreateUntracked(s, "bananas"));
+  Composition::Ptr c;
+  buff.Push(Material::CreateUntracked(s, c));
   ASSERT_FLOAT_EQ(p.TotalQty(), S - s);
   ASSERT_FLOAT_EQ(p.ReqQty(), S - s);
   ASSERT_EQ(p.NReq(), 1);
@@ -79,8 +80,8 @@ TEST_F(MatlBuyPolicyTests, Init) {
 
 TEST_F(MatlBuyPolicyTests, StartStop) {
   double cap = 5;
-  ResourceBuff buff;
-  buff.set_capacity(cap);
+  ResBuf<Material> buff;
+  buff.capacity(cap);
   MatlBuyPolicy p;
   p.Init(NULL, &buff, "");
   ASSERT_THROW(p.Start(), ValueError);
@@ -89,8 +90,8 @@ TEST_F(MatlBuyPolicyTests, StartStop) {
 
 TEST_F(MatlBuyPolicyTests, Reqs) {
   double cap = 5;
-  ResourceBuff buff;
-  buff.set_capacity(cap);
+  ResBuf<Material> buff;
+  buff.capacity(cap);
   std::string commod1("foo"), commod2("bar");
   double p2 = 2.5;
   cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
