@@ -98,7 +98,11 @@ class MatlBuyPolicy : public Trader {
   /// @param commod the commodity name
   /// @param c the composition to request for the given commodity
   /// @param pref the preference value for the commodity
-  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double pref=1.0);
+  /// @{
+  MatlBuyPolicy& Set(std::string commod);
+  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c);
+  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double pref);
+  /// @}
 
   /// Registers this policy as a trader in the current simulation.  This
   /// function must be called for the policy to begin participating in resource
