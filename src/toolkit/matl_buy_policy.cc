@@ -94,6 +94,15 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
+MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod) {
+  Composition::Ptr c;
+  return Set(commod, c, 1.0);
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c) {
+  return Set(commod, c, 1.0);
+}
+
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,
                                   double pref) {
   CommodDetail d;
