@@ -30,7 +30,7 @@ void MatlSellPolicy::set_quantize(double x) {
 }
 
 void MatlSellPolicy::set_throughput(double x) {
-  assert(x > 0);
+  assert(x >= 0);
   throughput_ = x;
 }
 
