@@ -38,7 +38,7 @@ void MatlSellPolicy::set_ignore_comp(bool x) {
   ignore_comp_ = x;
 }
 
-MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name) {
   Trader::manager_ = manager;
   buf_ = buf;
@@ -46,7 +46,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, double throughput) {
   Trader::manager_ = manager;
   buf_ = buf;
@@ -55,7 +55,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, bool ignore_comp) {
   Trader::manager_ = manager;
   buf_ = buf;
@@ -64,7 +64,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, double throughput,
                                      bool ignore_comp) {
   Trader::manager_ = manager;
@@ -75,7 +75,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, double throughput,
                                      bool ignore_comp, double quantize) {
   Trader::manager_ = manager;
@@ -153,7 +153,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : 1;
       qty = excl ? quantize_ : qty;
       for (int i = 0; i < nbids; i++) {
-        m = buf_->Pop<Material>();
+        m = buf_->Pop();
         buf_->Push(m);
         offer = ignore_comp_ ? \
                 Material::CreateUntracked(qty, req->target()->comp()) : \
@@ -174,19 +174,10 @@ void MatlSellPolicy::GetMatlTrades(
   for (it = trades.begin(); it != trades.end(); ++it) {
     double qty = it->amt;
     LGH(INFO4) << " sending " << qty << " kg of " << it->request->commodity();
-    std::vector<Material::Ptr> man =
-        ResCast<Material>(buf_->PopQty(qty, buf_->quantity() * 1e-12));
-    if (ignore_comp_) {
-      c = it->request->target()->comp();
-      man[0]->Transmute(c);
-      for (int i = 1; i < man.size(); ++i) {
-        man[i]->Transmute(c);
-      }
-    }
-    for (int i = 1; i < man.size(); ++i) {
-      man[0]->Absorb(man[i]);
-    }
-    responses.push_back(std::make_pair(*it, man[0]));
+    Material::Ptr mat = buf_->Pop(qty, buf_->quantity() * 1e-12);
+    if (ignore_comp_)
+      mat->Transmute(it->request->target()->comp());
+    responses.push_back(std::make_pair(*it, mat));
   }
 }
 

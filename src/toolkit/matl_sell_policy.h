@@ -5,7 +5,7 @@
 
 #include "composition.h"
 #include "material.h"
-#include "resource_buff.h"
+#include "res_buf.h"
 #include "trader.h"
 
 namespace cyclus {
@@ -34,7 +34,7 @@ namespace toolkit {
 ///
 ///  private:
 ///   MatlSellPolicy policy_;
-///   ResourceBuff outbuf_;
+///   ResBuf<Material> outbuf_;
 ///    ...
 /// }
 /// @endcode
@@ -74,14 +74,14 @@ class MatlSellPolicy : public Trader {
   /// exclusive, integral quantize kg bids. Otherwise, single bids will
   /// be sent matching the requested quantity.
   /// @{
-  MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name);
-  MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+  MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
+  MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        double throughput);
-  MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+  MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        bool ignore_comp);
-  MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+  MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        double throughput, bool ignore_comp);
-  MatlSellPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+  MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        double throughput, bool ignore_comp, 
                        double quantize);
   /// @}
@@ -125,7 +125,7 @@ class MatlSellPolicy : public Trader {
   void set_throughput(double x);
   void set_ignore_comp(bool x);
   
-  ResourceBuff* buf_;
+  ResBuf<Material>* buf_;
   std::set<std::string> commods_;
   double quantize_;
   double throughput_;
