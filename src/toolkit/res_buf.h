@@ -102,8 +102,11 @@ class ResBuf {
   inline double space() const { return std::max(0.0, cap_ - qty_); }
 
   /// Returns true if there are no resources in the buffer.
+  /// @{
   inline bool empty() const { return rs_.empty(); }
-
+  inline bool Empty() const { return empty(); }
+  /// @}
+  
   /// Pops and returns the specified quantity from the buffer as a single
   /// resource object.
   /// Resources are split if necessary in order to pop the exact quantity
