@@ -80,6 +80,11 @@ class ResourceBuff {
     return mats_.empty();
   }
 
+  /// Returns true if there are no mats in mats_
+  inline bool Empty() const {
+    return empty();
+  }
+
   /// PopQty pops the specified quantity of resources from the buffer.
   ///
   /// Resources are split if necessary in order to pop the exact quantity
