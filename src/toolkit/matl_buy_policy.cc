@@ -48,7 +48,7 @@ void MatlBuyPolicy::set_quantize(double x) {
 }
 
 void MatlBuyPolicy::set_throughput(double x) {
-  assert(x > 0);
+  assert(x >= 0);
   throughput_ = x;
 }
 
