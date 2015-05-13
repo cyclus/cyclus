@@ -310,6 +310,8 @@ TEST_F(ResourceBuffTest, PushAll_RetrieveOrderEmpty) {
   ASSERT_EQ(mat, mat1_);
   ASSERT_NO_THROW(mat = store_.Pop());
   ASSERT_EQ(mat, mat2_);
+  ASSERT_TRUE(store_.empty());
+  ASSERT_TRUE(store_.Empty());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
