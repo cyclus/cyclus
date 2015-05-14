@@ -21,15 +21,13 @@ std::string Source::str() {
 }
 
 void Source::Tick() {
-  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is ticking";
-  LOG(cyclus::LEV_INFO4, "SrcFac") << "will offer " << capacity
+  LOG(cyclus::LEV_INFO3, "Source") << prototype()
+                                   << " will offer " << capacity
                                    << " kg of "
                                    << commod << ".";
 }
 
-void Source::Tock() {
-  LOG(cyclus::LEV_INFO3, "SrcFac") << prototype() << " is tocking";
-}
+void Source::Tock() {}
 
 cyclus::Material::Ptr Source::GetOffer(
     const cyclus::Material::Ptr target) const {
@@ -94,7 +92,7 @@ void Source::GetMatlTrades(
       response = Material::Create(this, qty, context()->GetRecipe(recipe_name));
     }
     responses.push_back(std::make_pair(*it, response));
-    LOG(cyclus::LEV_INFO5, "SrcFac") << prototype() << " just received an order"
+    LOG(cyclus::LEV_INFO4, "Source") << prototype() << " just received an order"
                                      << " for " << qty
                                      << " of " << commod;
   }
