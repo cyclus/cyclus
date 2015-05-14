@@ -5,8 +5,9 @@
 #include "error.h"
 
 #define LG(X) LOG(LEV_##X, "buypol")
-#define LGH(X)                                               \
-  LOG(LEV_##X, "buypol") << "policy " << name_ << " (agent " \
+#define LGH(X)                                                    \
+  LOG(LEV_##X, "buypol") << "policy " << name_ << " (agent "      \
+                         << Trader::manager()->prototype() << "-" \
                          << Trader::manager()->id() << "): "
 
 namespace cyclus {
@@ -152,7 +153,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     for (it = commod_details_.begin(); it != commod_details_.end(); ++it) {
       std::string commod = it->first;
       CommodDetail d = it->second;
-      LG(INFO4) << "  - one " << amt << " kg request of " << commod;
+      LG(INFO3) << "  - one " << amt << " kg request of " << commod;
       Material::Ptr m = Material::CreateUntracked(req_amt, d.comp);
       grps[i].push_back(port->AddRequest(m, this, commod, d.pref, excl));
     }

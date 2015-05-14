@@ -3,9 +3,11 @@
 #include "error.h"
 
 #define LG(X) LOG(LEV_##X, "selpol")
-#define LGH(X)                                               \
-  LOG(LEV_##X, "selpol") << "policy " << name_ << " (agent " \
+#define LGH(X)                                                    \
+  LOG(LEV_##X, "selpol") << "policy " << name_ << " (agent "      \
+                         << Trader::manager()->prototype() << "-" \
                          << Trader::manager()->id() << "): "
+
 namespace cyclus {
 namespace toolkit {
 
@@ -159,7 +161,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
                 Material::CreateUntracked(qty, req->target()->comp()) : \
                 Material::CreateUntracked(qty, m->comp());
         port->AddBid(req, offer, this, excl);
-        LG(INFO4) << "  - bid " << qty << " kg on a request for " << commod;
+        LG(INFO3) << "  - bid " << qty << " kg on a request for " << commod;
       }
     }
   }
@@ -173,7 +175,7 @@ void MatlSellPolicy::GetMatlTrades(
   std::vector<Trade<Material> >::const_iterator it;
   for (it = trades.begin(); it != trades.end(); ++it) {
     double qty = it->amt;
-    LGH(INFO4) << " sending " << qty << " kg of " << it->request->commodity();
+    LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
     Material::Ptr mat = buf_->Pop(qty, buf_->quantity() * 1e-12);
     if (ignore_comp_)
       mat->Transmute(it->request->target()->comp());
