@@ -17,7 +17,9 @@ class StubRegionTest : public ::testing::Test {
     region = new StubRegion(tc.get());
   }
 
-  virtual void TearDown() {}
+  virtual void TearDown() {
+    delete region;
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

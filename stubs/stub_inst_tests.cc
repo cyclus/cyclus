@@ -19,7 +19,9 @@ class StubInstTest : public ::testing::Test {
     inst = new StubInst(tc.get());
   }
 
-  virtual void TearDown() {}
+  virtual void TearDown() {
+    delete inst;
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

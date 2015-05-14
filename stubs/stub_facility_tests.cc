@@ -18,7 +18,9 @@ class StubFacilityTest : public ::testing::Test {
     facility = new StubFacility(tc.get());
   }
 
-  virtual void TearDown() {}
+  virtual void TearDown() {
+    delete facility;
+  }
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
