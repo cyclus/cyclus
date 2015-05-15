@@ -1328,7 +1328,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
             s += self.read_member(
-                'elem', alias[1], t[1], uitype[1], 
+                'elem', val, t[1], uitype[1], 
                 ind+'  ', idx='i{lev}'.format(lev=lev))
             s += ind + '  {0}[{idx}] = elem;\n'.format(
                 member, idx='i{lev}'.format(lev=lev))
@@ -1340,7 +1340,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
@@ -1351,12 +1355,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=self._idx_lev)
+                val, lev=self._idx_lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=self._idx_lev) + ' {\n'
             s += self.read_member(
-                'elem', alias[1], t[1], uitype[1], 
+                'elem', val, t[1], uitype[1], 
                 ind+'  ', idx='i{lev}'.format(lev=self._idx_lev))
             s += ind + '  {0}.insert(elem);\n'.format(member)
             s += ind + '}\n'
@@ -1367,7 +1371,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
@@ -1378,12 +1386,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=lev)
+                val, lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
             s += self.read_member(
-                'elem', alias[1], t[1], uitype[1], 
+                'elem', val, t[1], uitype[1], 
                 ind+'  ', idx='i{lev}'.format(lev=lev))
             s += ind + '  {0}.push_back(elem);\n'.format(member)
             s += ind + '}\n'

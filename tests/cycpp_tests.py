@@ -769,7 +769,6 @@ def test_infiletodb_read_member():
                   ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
     alias = ['streams', 'name', ['efficiencies', 'val']]
     gen = f.read_member('mymap', alias, cpptype, uitype=None)
-
     exp_gen = (
         '  std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap;\n'
         '  {\n'
@@ -862,6 +861,10 @@ def test_infiletodb_read_member():
         '    }\n'
         '    mymap = mymap_in;\n'
         '  }\n')
+    
+    ## useful for debugging test failures
+    #print(gen)
+    #print(exp_gen)
 
     yield assert_equal, exp_gen, gen
 
