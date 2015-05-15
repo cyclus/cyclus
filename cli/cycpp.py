@@ -500,8 +500,8 @@ class VarDeclarationFilter(Filter):
         if annotations['type'][0] not in BUFFERS:
             annotations['alias'] = self.canonize_alias(
                 annotations['type'], vname, alias=annotations.get('alias'))
-            annotations['doc'] = self.canonize_doc(
-                annotations['type'], vname, doc=annotations.get('doc'))
+            annotations['tooltip'] = self.canonize_tooltip(
+                annotations['type'], vname, tooltip=annotations.get('tooltip'))
             annotations['uilabel'] = self.canonize_uilabel(
                 annotations['type'], vname, uilabel=annotations.get('uilabel'))
         state.var_annotations = None
@@ -584,11 +584,11 @@ class VarDeclarationFilter(Filter):
         'std::map': ((None, ''), '', ''),
         }
 
-    def canonize_doc(self, t, name, doc=None):
-        """Computes the default doc structure for a C++ type for with the given state
+    def canonize_tooltip(self, t, name, tooltip=None):
+        """Computes the default tooltip structure for a C++ type for with the given state
         variable name.
         """
-        return self._canonize_ann(self._default_ui, t, name, doc)
+        return self._canonize_ann(self._default_ui, t, name, tooltip)
 
     def canonize_uilabel(self, t, name, uilabel=None):
         """Computes the default uilabel structure for a C++ type for with the given state

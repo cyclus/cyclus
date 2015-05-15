@@ -235,7 +235,7 @@ def test_vdeclarfilter_canonize_ui():
     m = MockMachine()
     f = VarDeclarationFilter(m)
     cases = [
-        # exp   type  name  uilabel/doc
+        # exp   type  name  uilabel/tooltip
         ('foo', 'float', 'x', 'foo'),
         (['foo', ''], ['std::set', 'float'], 'x', 'foo'),
         (['foo', 'bar'], ['std::set', 'float'], 'x', ['foo', 'bar']),
@@ -255,7 +255,7 @@ def test_vdeclarfilter_canonize_ui():
     for exp, t, name, x in cases:
         obs = f.canonize_uilabel(t, name, uilabel=x)
         yield assert_equal, exp, obs
-        obs = f.canonize_doc(t, name, doc=x)
+        obs = f.canonize_tooltip(t, name, doc=x)
         yield assert_equal, exp, obs
 
 
