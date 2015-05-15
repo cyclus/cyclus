@@ -1306,7 +1306,11 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
 
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
@@ -1318,7 +1322,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=lev)
+                val, lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + '{0}.resize(n{lev});\n'.format(member, lev=lev)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
