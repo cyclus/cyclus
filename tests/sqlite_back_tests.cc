@@ -44,27 +44,6 @@ TEST_F(SqliteBackTests, MapStrDouble) {
   EXPECT_EQ(5.5, m["three"]);
 }
 
-TEST_F(SqliteBackTests, MapIntMapStringDouble) {
-  std::map<int, std::map<std::string, double> > exp;
-  std::map<std::string, double> expa;
-  expa["foo"] = 4.2;
-  expa["bar"] = 5.2;
-  exp[42] = expa;
-  std::map<std::string, double> expb;
-  expb["foo"] = 4.9;
-  expb["baz"] = 5.1;
-  exp[65] = expb;
-  
-  r.NewDatum("monty")->AddVal("count", exp)->Record();
-  r.Close();
-
-  cyclus::QueryResult qr = b->Query("monty", NULL);
-  std::map<int, std::map<std::string, double> > obs;
-  obs = qr.GetVal<
-    std::map<int, std::map<std::string, double> > >("count", 0);
-  EXPECT_EQ(obs, exp);
-}
-
 TEST_F(SqliteBackTests, MapStrPairDoubleMapIntDouble) {
   std::map<std::string, std::pair<double, std::map<int, double> > > m;
   std::map<int, double> ma;
@@ -91,6 +70,33 @@ TEST_F(SqliteBackTests, MapStrPairDoubleMapIntDouble) {
   EXPECT_EQ(.42, mnew["two"].first);
   EXPECT_EQ(1.2, mnew["two"].second[1]);
   EXPECT_EQ(3.3, mnew["two"].second[3]);
+}
+
+TEST_F(SqliteBackTests, MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING) {
+  std::map<std::string,
+      std::vector<std::pair<int, std::pair<std::string, std::string> > > > exp;
+  
+  std::vector<std::pair<int, std::pair<std::string, std::string> > > va;
+  va.push_back(std::make_pair(42, std::make_pair("foo", "bar")));
+  va.push_back(std::make_pair(43, std::make_pair("foo", "baz")));
+  exp["hi"] = va;
+  std::vector<std::pair<int, std::pair<std::string, std::string> > > vb;
+  vb.push_back(std::make_pair(-3, std::make_pair("baz", "bar")));
+  vb.push_back(std::make_pair(-4, std::make_pair("baz", "foo")));
+  exp["mom"] = vb;
+  
+  r.NewDatum("monty")->AddVal("count", exp)->Record();
+  r.Close();
+
+  cyclus::QueryResult qr = b->Query("monty", NULL);
+  std::map<std::string,
+      std::vector<
+        std::pair<int, std::pair<std::string, std::string> > > > obs;
+  obs = qr.GetVal<
+    std::map<std::string,
+      std::vector<
+        std::pair<int, std::pair<std::string, std::string> > > > >("count", 0);
+  EXPECT_EQ(obs, exp);
 }
 
 TEST_F(SqliteBackTests, MapStrVectorDouble) {
