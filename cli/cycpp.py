@@ -500,6 +500,10 @@ class VarDeclarationFilter(Filter):
         if annotations['type'][0] not in BUFFERS:
             annotations['alias'] = self.canonize_alias(
                 annotations['type'], vname, alias=annotations.get('alias'))
+            annotations['doc'] = self.canonize_doc(
+                annotations['type'], vname, doc=annotations.get('doc'))
+            annotations['uilabel'] = self.canonize_uilabel(
+                annotations['type'], vname, uilabel=annotations.get('uilabel'))
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -571,6 +575,26 @@ class VarDeclarationFilter(Filter):
         variable name.
         """
         return self._canonize_ann(self._default_aliases, t, name, alias)
+
+    _default_ui = {
+        'std::vector': (None, ''),
+        'std::set': (None, ''),
+        'std::list': (None, ''),
+        'std::pair': (None, '', ''),
+        'std::map': ((None, ''), '', ''),
+        }
+
+    def canonize_doc(self, t, name, doc=None):
+        """Computes the default doc structure for a C++ type for with the given state
+        variable name.
+        """
+        return self._canonize_ann(self._default_ui, t, name, doc)
+
+    def canonize_uilabel(self, t, name, uilabel=None):
+        """Computes the default uilabel structure for a C++ type for with the given state
+        variable name.
+        """
+        return self._canonize_ann(self._default_ui, t, name, uilabel)
 
 class ExecFilter(Filter):
     """Filter for executing arbitrary python code in the exec pragma and
