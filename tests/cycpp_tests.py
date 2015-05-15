@@ -255,7 +255,7 @@ def test_vdeclarfilter_canonize_ui():
     for exp, t, name, x in cases:
         obs = f.canonize_uilabel(t, name, uilabel=x)
         yield assert_equal, exp, obs
-        obs = f.canonize_tooltip(t, name, doc=x)
+        obs = f.canonize_tooltip(t, name, tooltip=x)
         yield assert_equal, exp, obs
 
 
