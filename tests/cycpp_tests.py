@@ -231,6 +231,33 @@ def test_vdeclarfilter_canonize_alias():
         obs = f.canonize_alias(t, name, alias=alias)
         yield assert_equal, exp, obs
 
+def test_vdeclarfilter_canonize_ui():
+    m = MockMachine()
+    f = VarDeclarationFilter(m)
+    cases = [
+        # exp   type  name  uilabel/doc
+        ('foo', 'float', 'x', 'foo'),
+        (['foo', ''], ['std::set', 'float'], 'x', 'foo'),
+        (['foo', 'bar'], ['std::set', 'float'], 'x', ['foo', 'bar']),
+        ([['foo', ''], ['', '', ''], ['', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         'foo'),
+        ([['foo', ''], ['bar', '', ''], ['', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         ['foo', 'bar']),
+        ([['foo', ''], ['bar', '', ''], ['baz', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         ['foo', 'bar', 'baz']),
+    ]
+    for exp, t, name, x in cases:
+        obs = f.canonize_uilabel(t, name, uilabel=x)
+        yield assert_equal, exp, obs
+        obs = f.canonize_doc(t, name, doc=x)
+        yield assert_equal, exp, obs
+
 
 def test_execfilter():
     """Test ExecFilter"""
