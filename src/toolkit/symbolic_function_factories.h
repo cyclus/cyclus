@@ -27,9 +27,18 @@ class SymbFunctionFactory {
 class LinFunctionFactory : public SymbFunctionFactory {
  public:
   /// Return a function pointer to a linear function
-  /// @param params the parameters for the linear function in order:
-  /// slope, intercept
+  ///
+  /// @param params a string of space-separated values for m and x in the equation
+  /// \f[
+  ///   y = mx + b
+  /// \f]
+  ///
   /// @return the linear function
+  ///
+  /// \b Example
+  /// @code
+  ///   SymFunction::Ptr func = fac.GetFunctionPtr("2.5 5"); // y = 2.5x + 5
+  /// @endcode
   virtual SymFunction::Ptr GetFunctionPtr(std::string params);
 };
 
@@ -37,9 +46,19 @@ class LinFunctionFactory : public SymbFunctionFactory {
 class ExpFunctionFactory : public SymbFunctionFactory {
  public:
   /// Return a function pointer to a exponential function
-  /// @param params the parameters for the exponential function in
-  /// order: constant, exponent, intercept
+  ///
+  /// @param params a string of space-separated values for c, a, and b in the
+  /// equation
+  /// \f[
+  ///   y = ce^{ax} + b
+  /// \f]
+  ///
   /// @return the exponential function
+  ///
+  /// \b Example
+  /// @code
+  ///   SymFunction::Ptr func = fac.GetFunctionPtr("2.5 0.1 5"); // y = 2.5exp(0.1x) + 5
+  /// @endcode
   virtual SymFunction::Ptr GetFunctionPtr(std::string params);
 };
 
