@@ -474,7 +474,7 @@ class VarDecorationFilter(DecorationFilter):
         state.var_annotations = self._eval()
 
 class VarDeclarationFilter(Filter):
-    """State varible declaration.  Only oeprates if state.var_annotations is
+    """State varible declaration.  Only operates if state.var_annotations is
     not None. Access for member variable must be public.
     """
     regex = re.compile("(.*\w+.*?)\s+(\w+)")
@@ -498,8 +498,8 @@ class VarDeclarationFilter(Filter):
                 alias = alias[0] 
             state.context[classname]['vars'][alias] = vname
         if annotations['type'][0] not in BUFFERS:
-            annotations['alias'] = self.canonize_alias(annotations['type'], 
-                                        vname, alias=annotations.get('alias'))
+            annotations['alias'] = self.canonize_alias(
+                annotations['type'], vname, alias=annotations.get('alias'))
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -526,6 +526,38 @@ class VarDeclarationFilter(Filter):
             rtn = None
         return rtn
 
+    def _canonize_ann(self, defaults, t, name, ann=None):
+        """Computes the nested default annotation structure for a C++ type for with the
+        given state variable name and defaults for non-nested containers.
+        """
+        if isinstance(t, STRING_TYPES):
+            return ann or name 
+        template = defaults[t[0]]
+        # expand ann if needed
+        if ann is None:
+            ann = [None] * len(t)
+        elif isinstance(ann, STRING_TYPES):
+            ann = [ann] + [None]*(len(t) - 1)
+        elif len(ann) < len(t):
+            ann = ann + [None]*(len(t) - len(ann))
+        # find template name
+        if template[0] is None: 
+            t0 = ann[0] or name
+        else:
+            # expand t0 ann if needed
+            if ann[0] is None:
+                ann[0] = [None] * len(template[0])
+            elif isinstance(ann[0], STRING_TYPES):
+                ann[0] = [ann[0]] + [None]*(len(template[0]) - 1)
+            elif len(ann[0]) < len(template[0]):
+                ann[0] = ann[0] + [None]*(len(template[0]) - len(ann[0]))
+            t0 = [ann[0][0] or name] + \
+                 [ai or ti for ai, ti in zip(ann[0][1:], template[0][1:])]
+        a = [t0]
+        for t_i, template_i, ann_i in zip(t[1:], template[1:], ann[1:]):
+            a.append(self._canonize_ann(defaults, t_i, template_i, ann=ann_i))
+        return a
+
     _default_aliases = {
         'std::vector': (None, 'val'),
         'std::set': (None, 'val'),
@@ -535,36 +567,10 @@ class VarDeclarationFilter(Filter):
         }
 
     def canonize_alias(self, t, name, alias=None):
-        """Computes the default alias structure for a C++ type for with the 
-        given state variable name.
+        """Computes the default alias structure for a C++ type for with the given state
+        variable name.
         """
-        if isinstance(t, STRING_TYPES):
-            return alias or name 
-        template = self._default_aliases[t[0]]
-        # expand alias if needed
-        if alias is None:
-            alias = [None] * len(t)
-        elif isinstance(alias, STRING_TYPES):
-            alias = [alias] + [None]*(len(t) - 1)
-        elif len(alias) < len(t):
-            alias = alias + [None]*(len(t) - len(alias))
-        # find template name
-        if template[0] is None: 
-            t0 = alias[0] or name
-        else:
-            # expand t0 alias if needed
-            if alias[0] is None:
-                alias[0] = [None] * len(template[0])
-            elif isinstance(alias[0], STRING_TYPES):
-                alias[0] = [alias[0]] + [None]*(len(template[0]) - 1)
-            elif len(alias[0]) < len(template[0]):
-                alias[0] = alias[0] + [None]*(len(template[0]) - len(alias[0]))
-            t0 = [alias[0][0] or name] + \
-                 [ai or ti for ai, ti in zip(alias[0][1:], template[0][1:])]
-        a = [t0]
-        for t_i, template_i, alias_i in zip(t[1:], template[1:], alias[1:]):
-            a.append(self.canonize_alias(t_i, template_i, alias=alias_i))
-        return a
+        return self._canonize_ann(self._default_aliases, t, name, alias)
 
 class ExecFilter(Filter):
     """Filter for executing arbitrary python code in the exec pragma and
