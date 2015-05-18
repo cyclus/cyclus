@@ -28,7 +28,7 @@ class LinFunctionFactory : public SymbFunctionFactory {
  public:
   /// Return a function pointer to a linear function
   ///
-  /// @param params a string of space-separated values for m and x in the equation
+  /// @param params a string of space-separated values for m and b in the equation
   /// \f[
   ///   y = mx + b
   /// \f]
