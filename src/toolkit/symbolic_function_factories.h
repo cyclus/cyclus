@@ -92,7 +92,14 @@ class PiecewiseFunctionFactory : public SymbFunctionFactory {
 class BasicFunctionFactory {
  public:
   /// The type of functions this factory can provide
-  enum FunctionType { LIN, EXP };
+  enum FunctionType {
+    /// See cyclus::toolkit::LinFunctionFactory for a description of function
+    /// parameters
+    LIN,
+    /// See cyclus::toolkit::ExpFunctionFactory for a description of function
+    /// parameters
+    EXP  
+  };
 
   /// Constructor sets up the enum names map
   BasicFunctionFactory();

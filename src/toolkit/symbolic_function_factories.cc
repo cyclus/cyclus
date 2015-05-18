@@ -82,7 +82,9 @@ BasicFunctionFactory::enum_names_ =
 BasicFunctionFactory::BasicFunctionFactory() {
   if (enum_names_.empty()) {
     enum_names_["lin"] = LIN;
+    enum_names_["linear"] = LIN;
     enum_names_["exp"] = EXP;
+    enum_names_["exponential"] = EXP;
   }
 }
 
