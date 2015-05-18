@@ -91,7 +91,14 @@ BasicFunctionFactory::BasicFunctionFactory() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SymFunction::Ptr BasicFunctionFactory::GetFunctionPtr(std::string type,
                                                       std::string params) {
-  switch (enum_names_[type]) {
+  if (enum_names_.count(type) == 0) {
+    std::stringstream err("");
+    err << type << " is not a registered function type"
+        << " of the basic function factory.";
+    throw Error(err.str());
+  }
+  
+  switch (enum_names_.at(type)) {
     case LIN: {
       LinFunctionFactory lff;
       return lff.GetFunctionPtr(params);
@@ -103,10 +110,7 @@ SymFunction::Ptr BasicFunctionFactory::GetFunctionPtr(std::string type,
     }
     break;
     default:
-      std::stringstream err("");
-      err << type << " is not a registered function type"
-          << " of the basic function factory.";
-      throw Error(err.str());
+      throw Error("Function type " + type + " not yet supported.");
       break;
   }
 }

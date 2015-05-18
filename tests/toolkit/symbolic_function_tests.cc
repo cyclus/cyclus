@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include "error.h"
 #include "toolkit/symbolic_function_factories.h"
 
 using namespace std;
@@ -162,6 +163,15 @@ TEST_F(SymbolicFunctionTests, piecewisefunc) {
     }
   }
   // output.close();
+}
+
+TEST(BasicFunctionFactory, constructors) {
+  BasicFunctionFactory bff;
+  ASSERT_NO_THROW(bff.GetFunctionPtr("lin", "0 5"));
+  ASSERT_NO_THROW(bff.GetFunctionPtr("linear", "0 5"));
+  ASSERT_NO_THROW(bff.GetFunctionPtr("exp", "0 5 2"));
+  ASSERT_NO_THROW(bff.GetFunctionPtr("exponential", "0 5 2"));
+  ASSERT_THROW(bff.GetFunctionPtr("foo", "0 5 2"), cyclus::Error);
 }
 
 }  // namespace toolkit
