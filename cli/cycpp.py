@@ -1307,7 +1307,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
 
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
@@ -1319,7 +1324,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=lev)
+                val, lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + '{0}.resize(n{lev});\n'.format(member, lev=lev)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
@@ -1337,7 +1342,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
@@ -1348,7 +1358,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=self._idx_lev)
+                val, lev=self._idx_lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=self._idx_lev) + ' {\n'
@@ -1364,7 +1374,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
@@ -1375,7 +1390,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=lev)
+                val, lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
@@ -1398,12 +1413,14 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
+        first = 'first{}'.format(tree_idx)
+        second = 'second{}'.format(tree_idx)
         s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
         s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
-        s += self.read_member('first', alias[1], t[1], uitype[1], ind+'  ', idx='0')
-        s += self.read_member('second', alias[2], t[2], uitype[2], ind+'  ', idx='0')
-        s += ind + '{0} {1}(first, second);\n'.format(type_to_str(t), member)
+        s += self.read_member(first, alias[1], t[1], uitype[1], ind+'  ', idx='0')
+        s += self.read_member(second, alias[2], t[2], uitype[2], ind+'  ', idx='0')
+        s += ind + '{0} {1}({2}, {3});\n'.format(type_to_str(t), member, first, second)
         return s
 
     def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None,
