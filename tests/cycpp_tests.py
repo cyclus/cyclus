@@ -876,7 +876,7 @@ def test_infiletodb_read_member2():
             ])}
     f = InfileToDbFilter(m)
 
-    alias = ['map', 'int', ['vector', ['pair2', 'str1', 'str2']]]
+    alias = ['map', 'int', ['vector', ['pair', 'str1', 'str2']]]
     cpptype = ('std::map', 'int', ('std::vector', ('std::pair', 'std::string', 'std::string')))
     gen = f.read_member('mymap', alias, cpptype, uitype=None)
     exp_gen = (
@@ -896,13 +896,13 @@ def test_infiletodb_read_member2():
         '      {\n'
         '        cyclus::InfileTree* bub = sub->SubTree("item/vector", i1);\n'
         '        cyclus::InfileTree* sub = bub;\n'
-        '        int n2 = sub->NMatches("pair2");\n'
+        '        int n2 = sub->NMatches("pair");\n'
         '        std::vector< std::pair< std::string, std::string > > val_in;\n'
         '        val_in.resize(n2);\n'
         '        for (int i2 = 0; i2 < n2; ++i2) {\n'
         '          std::pair< std::string, std::string > elem;\n'
         '          {\n'
-        '            cyclus::InfileTree* bub = sub->SubTree("pair2", i2);\n'
+        '            cyclus::InfileTree* bub = sub->SubTree("pair", i2);\n'
         '            cyclus::InfileTree* sub = bub;\n'
         '              std::string first;\n'
         '              {\n'
