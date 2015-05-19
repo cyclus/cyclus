@@ -231,6 +231,33 @@ def test_vdeclarfilter_canonize_alias():
         obs = f.canonize_alias(t, name, alias=alias)
         yield assert_equal, exp, obs
 
+def test_vdeclarfilter_canonize_ui():
+    m = MockMachine()
+    f = VarDeclarationFilter(m)
+    cases = [
+        # exp   type  name  uilabel/tooltip
+        ('foo', 'float', 'x', 'foo'),
+        (['foo', ''], ['std::set', 'float'], 'x', 'foo'),
+        (['foo', 'bar'], ['std::set', 'float'], 'x', ['foo', 'bar']),
+        ([['foo', ''], ['', '', ''], ['', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         'foo'),
+        ([['foo', ''], ['bar', '', ''], ['', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         ['foo', 'bar']),
+        ([['foo', ''], ['bar', '', ''], ['baz', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         ['foo', 'bar', 'baz']),
+    ]
+    for exp, t, name, x in cases:
+        obs = f.canonize_uilabel(t, name, uilabel=x)
+        yield assert_equal, exp, obs
+        obs = f.canonize_tooltip(t, name, tooltip=x)
+        yield assert_equal, exp, obs
+
 
 def test_execfilter():
     """Test ExecFilter"""
@@ -911,17 +938,17 @@ def test_infiletodb_read_member2():
         '          {\n'
         '            cyclus::InfileTree* bub = sub->SubTree("pair", i2);\n'
         '            cyclus::InfileTree* sub = bub;\n'
-        '              std::string first;\n'
+        '              std::string firsti2;\n'
         '              {\n'
-        '                std::string first_in = cyclus::Query<std::string>(sub, "str1", 0);\n'
-        '                first = first_in;\n'
+        '                std::string firsti2_in = cyclus::Query<std::string>(sub, "str1", 0);\n'
+        '                firsti2 = firsti2_in;\n'
         '              }\n'
-        '              std::string second;\n'
+        '              std::string secondi2;\n'
         '              {\n'
-        '                std::string second_in = cyclus::Query<std::string>(sub, "str2", 0);\n'
-        '                second = second_in;\n'
+        '                std::string secondi2_in = cyclus::Query<std::string>(sub, "str2", 0);\n'
+        '                secondi2 = secondi2_in;\n'
         '              }\n'
-        '            std::pair< std::string, std::string > elem_in(first, second);\n'
+        '            std::pair< std::string, std::string > elem_in(firsti2, secondi2);\n'
         '            elem = elem_in;\n'
         '          }\n'
         '          val_in[i2] = elem;\n'
