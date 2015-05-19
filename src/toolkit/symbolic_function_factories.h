@@ -92,13 +92,23 @@ class PiecewiseFunctionFactory : public SymbFunctionFactory {
 class BasicFunctionFactory {
  public:
   /// The type of functions this factory can provide
-  enum FunctionType { LIN, EXP };
+  enum FunctionType {
+    /// See cyclus::toolkit::LinFunctionFactory for a description of function
+    /// parameters
+    LIN,
+    /// See cyclus::toolkit::ExpFunctionFactory for a description of function
+    /// parameters
+    EXP  
+  };
 
   /// Constructor sets up the enum names map
   BasicFunctionFactory();
 
   /// Return a function pointer to a registered function type
-  /// @param type the function type
+  /// @param type the function type, see BasicFunctionFactory::FunctionType for
+  /// supported function types. For each supported function type, either the
+  /// full name or the first three letters are acceptable. For example, for a
+  /// "linear" function, either "linear" or "lin" are acceptable.
   /// @param params the function parameters
   /// @return the function
   SymFunction::Ptr GetFunctionPtr(std::string type, std::string params);
