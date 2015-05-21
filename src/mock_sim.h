@@ -139,6 +139,13 @@ class MockSim {
   /// steps.
   MockSim(AgentSpec spec, std::string config, int duration);
 
+  /// Creates and initializes a new mock simulation environment to test the
+  /// archetype identified by spec.  config should contain the
+  /// archetype-specific xml snippet excluding the wrapping "<config>" and
+  /// "<[AgentName]>" tags.  duration is the length of the simulation in time
+  /// steps.  'lifetime' is the lifetime of the agent being tested.
+  MockSim(AgentSpec spec, std::string config, int duration, int lifetime);
+
   ~MockSim();
 
   /// AddSource adds a source facility that can offer/provide material to the
