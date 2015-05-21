@@ -365,7 +365,7 @@ Cautions
 * **DO NOT** rebase any commits that have been pulled/pushed anywhere else other
   than your own fork (especially if those commits have been integrated into the
   blessed repository.  You should NEVER rebase commits that are a part of the
-  'master' branch. *If you do, you will be flogged publicly*.
+  'master' branch. *If you do, we will never, ever accept your pull request*.
 
 An Example
 ==========

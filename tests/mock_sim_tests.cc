@@ -131,4 +131,30 @@ TEST(MockTests, BuildAfterConstruct) {
   EXPECT_EQ(0, sim.agent->enter_time());
 }
 
+// mock sim should decommission an agent being tested if a lifetime is given.
+TEST(MockTests, FiniteLifeDecommission) {
+  cyclus::CompMap m;
+  m[id("U235")] = .05;
+  m[id("U238")] = .95;
+  Composition::Ptr fresh = Composition::CreateFromMass(m);
+
+  std::string config =
+      "<in_commods><val>enriched_u</val></in_commods>"
+      "<recipe_name>fresh_fuel</recipe_name>"
+      "<capacity>10</capacity>";
+
+  int life = 5;
+  int dur = 2 * life;
+  cyclus::MockSim sim(cyclus::AgentSpec(":agents:Sink"), config, dur, life);
+  sim.AddRecipe("fresh_fuel", fresh);
+  int agentid = sim.Run();
+  cyclus::SqlStatement::Ptr stmt = sim.db().db().Prepare(
+      "SELECT exittime FROM agentexit WHERE agentid=?;"
+      );
+
+  stmt->BindInt(1, agentid);
+  stmt->Step();
+  EXPECT_EQ(life - 1, stmt->GetInt(0));
+}
+
 }  // namespace cyclus
