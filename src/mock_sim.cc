@@ -191,9 +191,10 @@ void MockSim::AddRecipe(std::string name, Composition::Ptr c) {
 
 int MockSim::Run() {
   agent->Build(NULL);
+  int id = agent->id();
   ti_.RunSim();
   rec_.Flush();
-  return agent->id();
+  return id;
 }
 
 Material::Ptr MockSim::GetMaterial(int resid) {
