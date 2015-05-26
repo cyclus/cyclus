@@ -72,6 +72,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
 Context::Context(Timer* ti, Recorder* rec)
     : ti_(ti),
       rec_(rec),
+      db_(NULL),
       solver_(NULL),
       trans_id_(0),
       si_(0) {}

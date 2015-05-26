@@ -37,6 +37,8 @@ class SimInit {
   /// will run with a new simulation id.
   void Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t);
 
+  void Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t, int dur);
+
   /// NOT IMPLEMENTED. Initializes a simulation branched from prev_sim_id at
   /// time t with diverging state described in new_sim_id.
   ///

@@ -282,6 +282,10 @@ class Context {
     return n_specs_[impl];
   }
 
+  inline QueryableBackend* db() {
+    return db_;
+  }
+
  private:
   /// Registers an agent as a participant in the simulation.
   inline void RegisterAgent(Agent* a) {
@@ -310,6 +314,7 @@ class Context {
   Timer* ti_;
   ExchangeSolver* solver_;
   Recorder* rec_;
+  QueryableBackend* db_;
   int trans_id_;
 };
 

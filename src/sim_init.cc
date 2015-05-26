@@ -40,6 +40,19 @@ void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
   ctx_->InitSim(si_);  // explicitly force this to show up in the new simulations output db
 }
 
+void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t, int dur) {
+  Warn<EXPERIMENTAL_WARNING>("restart capability is not finalized and fully"
+                             " tested. Its behavior may change in future"
+                             " releases.");
+  rec_ = new Recorder();
+  InitBase(b, sim_id, t);
+  si_.parent_sim = sim_id;
+  si_.parent_type = "restart";
+  si_.branch_time = t;
+  si_.duration = dur;
+  ctx_->InitSim(si_);  // explicitly force this to show up in the new simulations output db
+}
+
 void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
                      int t, boost::uuids::uuid new_sim_id) {
   throw Error("simulation branching feature not implemented");
@@ -47,6 +60,7 @@ void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
 
 void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   ctx_ = new Context(&ti_, rec_);
+  ctx_->db_ = b;
 
   std::vector<Cond> conds;
   conds.push_back(Cond("SimId", "==", simid));
