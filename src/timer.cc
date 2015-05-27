@@ -19,7 +19,7 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
   while (time_ < si_.duration) {
-    CLOG(LEV_INFO2) << " Current time: " << time_;
+    CLOG(LEV_INFO1) << "Current time: " << time_;
 
     if (want_snapshot_) {
       want_snapshot_ = false;
@@ -28,8 +28,11 @@ void Timer::RunSim() {
 
     // run through phases
     DoBuild();
+    CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
     DoTick();
+    CLOG(LEV_INFO2) << "Beginning DRE for time: " << time_;
     DoResEx(&matl_manager, &genrsrc_manager);
+    CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
     DoTock();
     DoDecom();
 
@@ -118,6 +121,30 @@ void Timer::SchedDecom(Agent* m, int t) {
   if (t < time_) {
     throw ValueError("Cannot schedule decommission for t < [current-time]");
   }
+
+  // It is possible that a single agent may be scheduled for decommissioning
+  // multiple times. If this happens, we cannot just add it to the queue again
+  // - the duplicate entries will result in a double delete attempt and
+  // segfaults and otherwise bad things.  Remove previous decommissionings
+  // before scheduling this new one.
+  std::map<int, std::vector<Agent*> >::iterator it;
+  bool done = false;
+  for (it = decom_queue_.begin(); it != decom_queue_.end(); ++it) {
+    int t = it->first;
+    std::vector<Agent*> ags = it->second;
+    for (int i = 0; i < ags.size(); i++) {
+      if (ags[i] == m) {
+        CLOG(LEV_WARN) << "scheduled over previous decommissioning of " << m->id();
+        decom_queue_[t].erase(decom_queue_[t].begin()+i);
+        done = true;
+        break;
+      }
+    }
+    if (done) {
+      break;
+    }
+  }
+
   decom_queue_[t].push_back(m);
 }
 

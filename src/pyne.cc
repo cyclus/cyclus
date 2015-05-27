@@ -12,6 +12,7 @@
 //   src/enrichment_cascade.cpp
 //   src/enrichment.cpp
 //   src/enrichment_symbolic20.cpp
+//   src/_decay.cpp
 
 // PyNE amalgated source http://pyne.io/
 #include "pyne.h"
@@ -19,7 +20,7 @@
 //
 // start of license.txt
 //
-// Copyright 2011-2014, the PyNE Development Team. All rights reserved.
+// Copyright 2011-2015, the PyNE Development Team. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
@@ -432,7 +433,7 @@ void pyne::warning(std::string s){
 #define PYNE_4HFU6PUEQJB3ZJ4UIFLVU4SPCM
 namespace pyne {
 namespace nucname {
-#define TOTAL_STATE_MAPS 906
+#define TOTAL_STATE_MAPS 922
 std::map<int, int> state_id_map;
 int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 130240001,
@@ -454,7 +455,6 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 250520001,
 260520041,
 260530022,
-210540001,
 270540001,
 210560001,
 210560004,
@@ -467,6 +467,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 270600001,
 250620001,
 270620001,
+230640001,
 250640002,
 260650003,
 260670002,
@@ -511,6 +512,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 340790001,
 350790001,
 360790001,
+310800001,
 350800002,
 390800001,
 390800003,
@@ -733,16 +735,26 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 501280003,
 511280001,
 571280001,
+471290001,
+481290001,
 491290001,
+491290010,
+491290012,
+491290013,
 501290001,
+501290017,
+501290018,
+501290025,
 511290011,
 511290012,
+511290023,
 521290001,
 541290002,
+551290010,
 561290001,
 571290002,
-581290001,
-591290001,
+601290001,
+601290003,
 491300001,
 491300002,
 491300003,
@@ -798,6 +810,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 601350001,
 611350000,
 611350003,
+501360003,
 531360006,
 551360001,
 561360005,
@@ -807,6 +820,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 561370002,
 581370002,
 601370004,
+501380003,
 551380003,
 581380005,
 591380005,
@@ -827,6 +841,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 651410001,
 591420001,
 591420024,
+601420004,
 611420012,
 631420031,
 641420019,
@@ -858,7 +873,6 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 691470001,
 591480000,
 591480001,
-611480000,
 611480003,
 651480001,
 671480001,
@@ -901,6 +915,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 691530001,
 601540003,
 611540000,
+611540001,
 631540013,
 651540001,
 651540002,
@@ -1111,6 +1126,8 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 851930001,
 851930002,
 751940001,
+751940002,
+751940003,
 771940007,
 771940012,
 791940003,
@@ -1120,10 +1137,12 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 831940002,
 851940000,
 851940001,
-761950003,
+761950002,
+761950004,
 771950002,
 781950007,
 791950004,
+791950055,
 801950003,
 811950002,
 821950002,
@@ -1240,6 +1259,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 862150013,
 902150003,
 872160001,
+832170005,
 892170010,
 902170001,
 912170001,
@@ -1277,10 +1297,6 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 962420005,
 972420002,
 972420003,
-942430074,
-952430029,
-962430030,
-972430004,
 942440032,
 952440001,
 952440112,
@@ -1340,6 +1356,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1082670002,
 1102700001,
 1102710001,
+1082770001,
 };int map_metastable [TOTAL_STATE_MAPS] = {1,
 1,
 1,
@@ -1362,7 +1379,6 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 1,
-1,
 2,
 1,
 1,
@@ -1378,13 +1394,8 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 1,
-2,
-1,
-1,
 1,
 2,
-1,
-1,
 1,
 1,
 1,
@@ -1394,8 +1405,15 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 1,
+2,
+1,
+1,
+1,
+1,
+1,
 1,
 2,
+1,
 1,
 1,
 1,
@@ -1643,12 +1661,22 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 2,
+3,
+4,
+1,
+2,
+3,
+4,
+1,
+2,
+3,
 1,
 1,
 1,
 1,
 1,
 1,
+2,
 1,
 2,
 3,
@@ -1708,36 +1736,6 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 1,
-2,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-2,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-2,
-1,
-1,
-1,
-2,
-1,
 1,
 2,
 1,
@@ -1754,6 +1752,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 1,
+2,
 1,
 1,
 1,
@@ -1765,6 +1764,37 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 2,
 1,
+1,
+1,
+1,
+2,
+1,
+1,
+2,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+2,
 2,
 1,
 1,
@@ -1802,6 +1832,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 2,
+1,
 1,
 1,
 1,
@@ -2017,6 +2048,8 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 2,
 1,
+2,
+3,
 1,
 2,
 1,
@@ -2027,59 +2060,11 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 2,
 1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-2,
-1,
-1,
-2,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
 2,
 1,
 1,
 1,
 2,
-1,
-2,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
-2,
-1,
-2,
-1,
 1,
 1,
 1,
@@ -2101,6 +2086,56 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 1,
+1,
+1,
+1,
+1,
+1,
+1,
+2,
+1,
+1,
+1,
+2,
+1,
+2,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+2,
+1,
+2,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
+2,
+1,
+1,
+2,
+1,
+1,
+1,
+1,
+1,
+1,
+1,
 2,
 1,
 1,
@@ -2160,23 +2195,20 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 1,
 1,
-2,
-1,
-1,
-1,
-1,
-1,
-1,
-1,
 1,
 2,
 1,
-2,
+1,
+1,
+1,
+1,
+1,
 1,
 1,
 2,
 1,
 2,
+1,
 1,
 2,
 1,
@@ -2184,9 +2216,9 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 2,
 1,
+2,
 1,
-1,
-1,
+2,
 1,
 1,
 2,
@@ -2234,6 +2266,7 @@ int map_nuc_ids [TOTAL_STATE_MAPS] = {110240001,
 1,
 2,
 3,
+1,
 1,
 1,
 1,
@@ -2648,7 +2681,7 @@ bool pyne::nucname::isnuclide(std::string nuc) {
   return isnuclide(n);
 };
 
-bool pyne::nucname::isnuclide(char * nuc) {
+bool pyne::nucname::isnuclide(const char * nuc) {
   return isnuclide(std::string(nuc));
 };
 
@@ -2767,7 +2800,7 @@ int pyne::nucname::id(int nuc) {
   throw IndeterminateNuclideForm(nuc, "");
 };
 
-int pyne::nucname::id(char * nuc) {
+int pyne::nucname::id(const char * nuc) {
   std::string newnuc (nuc);
   return id(newnuc);
 };
@@ -2878,7 +2911,7 @@ bool pyne::nucname::iselement(std::string nuc) {
   return iselement(n);
 };
 
-bool pyne::nucname::iselement(char * nuc) {
+bool pyne::nucname::iselement(const char * nuc) {
   return iselement(std::string(nuc));
 };
 
@@ -2932,7 +2965,7 @@ std::string pyne::nucname::name(int nuc) {
 
 
 
-std::string pyne::nucname::name(char * nuc) {
+std::string pyne::nucname::name(const char * nuc) {
   std::string newnuc (nuc);
   return name(newnuc);
 }
@@ -2950,7 +2983,7 @@ int pyne::nucname::znum(int nuc) {
   return id(nuc) / 10000000;
 };
 
-int pyne::nucname::znum(char * nuc) {
+int pyne::nucname::znum(const char * nuc) {
   return id(nuc) / 10000000;
 };
 
@@ -2965,7 +2998,7 @@ int pyne::nucname::anum(int nuc) {
   return (id(nuc) / 10000) % 1000;
 };
 
-int pyne::nucname::anum(char * nuc) {
+int pyne::nucname::anum(const char * nuc) {
   return (id(nuc) / 10000) % 1000;
 };
 
@@ -2980,7 +3013,7 @@ int pyne::nucname::snum(int nuc) {
   return id(nuc) % 10000;
 };
 
-int pyne::nucname::snum(char * nuc) {
+int pyne::nucname::snum(const char * nuc) {
   return id(nuc) % 10000;
 };
 
@@ -3001,7 +3034,7 @@ int pyne::nucname::zzaaam(int nuc) {
 };
 
 
-int pyne::nucname::zzaaam(char * nuc) {
+int pyne::nucname::zzaaam(const char * nuc) {
   std::string newnuc (nuc);
   return zzaaam(newnuc);
 };
@@ -3017,7 +3050,7 @@ int pyne::nucname::zzaaam_to_id(int nuc) {
 };
 
 
-int pyne::nucname::zzaaam_to_id(char * nuc) {
+int pyne::nucname::zzaaam_to_id(const char * nuc) {
   return zzaaam_to_id(std::string(nuc));
 };
 
@@ -3037,7 +3070,7 @@ int pyne::nucname::zzzaaa(int nuc) {
 };
 
 
-int pyne::nucname::zzzaaa(char * nuc) {
+int pyne::nucname::zzzaaa(const char * nuc) {
   std::string newnuc (nuc);
   return zzzaaa(newnuc);
 };
@@ -3053,7 +3086,7 @@ int pyne::nucname::zzzaaa_to_id(int nuc) {
 };
 
 
-int pyne::nucname::zzzaaa_to_id(char * nuc) {
+int pyne::nucname::zzzaaa_to_id(const char * nuc) {
   return zzzaaa_to_id(std::string(nuc));
 };
 
@@ -3094,7 +3127,7 @@ std::string pyne::nucname::zzllaaam(int nuc) {
 };
 
 
-std::string pyne::nucname::zzllaaam(char * nuc) {
+std::string pyne::nucname::zzllaaam(const char * nuc) {
   std::string newnuc (nuc);
   return zzllaaam(newnuc);
 };
@@ -3105,7 +3138,7 @@ std::string pyne::nucname::zzllaaam(std::string nuc) {
 };
 
 
-int pyne::nucname::zzllaaam_to_id(char * nuc) {
+int pyne::nucname::zzllaaam_to_id(const char * nuc) {
   return zzllaaam_to_id(std::string(nuc));
 };
 
@@ -3178,7 +3211,7 @@ int pyne::nucname::mcnp(int nuc) {
 
 
 
-int pyne::nucname::mcnp(char * nuc) {
+int pyne::nucname::mcnp(const char * nuc) {
   std::string newnuc (nuc);
   return mcnp(newnuc);
 };
@@ -3219,7 +3252,7 @@ int pyne::nucname::mcnp_to_id(int nuc) {
 };
 
 
-int pyne::nucname::mcnp_to_id(char * nuc) {
+int pyne::nucname::mcnp_to_id(const char * nuc) {
   return mcnp_to_id(std::string(nuc));
 };
 
@@ -3296,7 +3329,7 @@ std::string pyne::nucname::serpent(int nuc) {
 };
 
 
-std::string pyne::nucname::serpent(char * nuc) {
+std::string pyne::nucname::serpent(const char * nuc) {
   std::string newnuc (nuc);
   return serpent(newnuc);
 };
@@ -3315,7 +3348,7 @@ std::string pyne::nucname::serpent(std::string nuc) {
 //};
 
 
-int pyne::nucname::serpent_to_id(char * nuc) {
+int pyne::nucname::serpent_to_id(const char * nuc) {
   return serpent_to_id(std::string(nuc));
 };
 
@@ -3399,7 +3432,7 @@ std::string pyne::nucname::nist(int nuc) {
 };
 
 
-std::string pyne::nucname::nist(char * nuc) {
+std::string pyne::nucname::nist(const char * nuc) {
   std::string newnuc (nuc);
   return nist(newnuc);
 };
@@ -3418,7 +3451,7 @@ std::string pyne::nucname::nist(std::string nuc) {
 // NON-EXISTANT
 //};
 
-int pyne::nucname::nist_to_id(char * nuc) {
+int pyne::nucname::nist_to_id(const char * nuc) {
   return nist_to_id(std::string(nuc));
 };
 
@@ -3469,7 +3502,7 @@ int pyne::nucname::cinder(int nuc) {
 
 
 
-int pyne::nucname::cinder(char * nuc) {
+int pyne::nucname::cinder(const char * nuc) {
   std::string newnuc (nuc);
   return cinder(newnuc);
 };
@@ -3492,7 +3525,7 @@ int pyne::nucname::cinder_to_id(int nuc) {
 };
 
 
-int pyne::nucname::cinder_to_id(char * nuc) {
+int pyne::nucname::cinder_to_id(const char * nuc) {
   return cinder_to_id(std::string(nuc));
 };
 
@@ -3539,7 +3572,7 @@ std::string pyne::nucname::alara(int nuc) {
 };
 
 
-std::string pyne::nucname::alara(char * nuc) {
+std::string pyne::nucname::alara(const char * nuc) {
   std::string newnuc (nuc);
   return alara(newnuc);
 }
@@ -3559,7 +3592,7 @@ std::string pyne::nucname::alara(std::string nuc) {
 //};
 
 
-int pyne::nucname::alara_to_id(char * nuc) {
+int pyne::nucname::alara_to_id(const char * nuc) {
   return alara_to_id(std::string(nuc));
 };
 
@@ -3607,7 +3640,7 @@ int pyne::nucname::sza(int nuc) {
 }
 
 
-int pyne::nucname::sza(char * nuc) {
+int pyne::nucname::sza(const char * nuc) {
   std::string newnuc (nuc);
   return sza(newnuc);
 }
@@ -3629,7 +3662,7 @@ int pyne::nucname::sza_to_id(int nuc) {
 }
 
 
-int pyne::nucname::sza_to_id(char * nuc) {
+int pyne::nucname::sza_to_id(const char * nuc) {
   std::string newnuc (nuc);
   return sza_to_id(newnuc);
 }
@@ -3648,7 +3681,8 @@ void pyne::nucname::_load_state_map(){
 
 int pyne::nucname::state_id_to_id(int state) {
     int zzzaaa = (state / 10000) * 10000;
-    
+    int state_number = state % 10000;
+    if (state_number == 0) return state;
     std::map<int, int>::iterator nuc_iter, nuc_end;
 
     nuc_iter = state_id_map.find(state);
@@ -3669,7 +3703,7 @@ int pyne::nucname::state_id_to_id(int state) {
 int pyne::nucname::id_to_state_id(int nuc_id) {
     int zzzaaa = (nuc_id / 10000) * 10000;
     int state = nuc_id % 10000;
-    
+    if (state == 0) return nuc_id;
     std::map<int, int>::iterator nuc_iter, nuc_end, it;
     
     nuc_iter = state_id_map.lower_bound(nuc_id);
@@ -3687,6 +3721,35 @@ int pyne::nucname::id_to_state_id(int nuc_id) {
     }
     throw IndeterminateNuclideForm(state, "no matching state id");
 }
+
+
+/************************/
+/*** ENSDF functions ***/
+/************************/
+//
+// ENSDF  -> Id
+//
+
+int pyne::nucname::ensdf_to_id(const char * nuc) {
+  return ensdf_to_id(std::string(nuc));
+};
+
+int pyne::nucname::ensdf_to_id(std::string nuc) {
+  if (nuc.size() < 4) {
+    return nucname::id(nuc);
+  } else if (std::isdigit(nuc[3])) {
+    int aaa = to_int(nuc.substr(0, 3));
+    int zzz;
+    std::string xx_str = nuc.substr(3,2); 
+    zzz = to_int(xx_str) + 100;
+    int nid = 10000 * aaa + 10000000 * zzz;
+    return nid;
+  } else {
+    return nucname::id(nuc);
+  }
+  
+};
+
 //
 // end of src/nucname.cpp
 //
@@ -6601,6 +6664,10 @@ const double pyne::barns_per_cm2 = 1e24;
 const double pyne::cm2_per_barn = 1e-24;
 const double pyne::sec_per_day = 24.0 * 3600.0;
 const double pyne::MeV_per_K = 8.617343e-11;
+const double pyne::MeV_per_MJ = 1.60217657e-19;
+const double pyne::Bq_per_Ci = 3.7e10;
+const double pyne::Ci_per_Bq = 2.7027027e-11;
+
 
 /********************************/
 /*** data_checksums Functions ***/
@@ -6614,7 +6681,8 @@ std::map<std::string, std::string> pyne::get_data_checksums() {
     temp_map["/neutron/eaf_xs"]="29622c636c4a3a46802207b934f9516c";
     temp_map["/neutron/scattering_lengths"]="a24d391cc9dc0fc146392740bb97ead4";
     temp_map["/neutron/simple_xs"]="3d6e086977783dcdf07e5c6b0c2416be";
-
+    temp_map["/decay"]="4f41f3e46f4306cc44449f08a20922e0";
+    temp_map["/dose_factors"]="dafa32c24b2303850a0bebdf3e6b122e";
     return temp_map;
 };
 
@@ -6660,10 +6728,12 @@ void pyne::_load_atomic_mass_map() {
   H5Dclose(atomic_mass_set);
   H5Fclose(nuc_data_h5);
 
-  // Ok now that we have the array of stucts, put it in the map
+  // Ok now that we have the array of structs, put it in the map
   for(int n = 0; n < atomic_mass_length; n++) {
-    atomic_mass_map[atomic_mass_array[n].nuc] = atomic_mass_array[n].mass;
-    natural_abund_map[atomic_mass_array[n].nuc] = atomic_mass_array[n].abund;
+    atomic_mass_map.insert(std::pair<int, double>(atomic_mass_array[n].nuc, \
+                                                  atomic_mass_array[n].mass));
+    natural_abund_map.insert(std::pair<int, double>(atomic_mass_array[n].nuc, \
+                                                    atomic_mass_array[n].abund));
   }
 
   delete[] atomic_mass_array;
@@ -6678,8 +6748,9 @@ double pyne::atomic_mass(int nuc) {
   nuc_end = atomic_mass_map.end();
 
   // First check if we already have the nuc mass in the map
-  if (nuc_iter != nuc_end)
+  if (nuc_iter != nuc_end) {
     return (*nuc_iter).second;
+  }
 
   // Next, fill up the map with values from the
   // nuc_data.h5, if the map is empty.
@@ -6696,7 +6767,9 @@ double pyne::atomic_mass(int nuc) {
   // state mass...not strictly true, but good guess.
   if (0 < nucid%10000) {
     aw = atomic_mass((nucid/10000)*10000);
-    atomic_mass_map[nuc] = aw;
+    if (atomic_mass_map.count(nuc) != 1) {
+      atomic_mass_map.insert(std::pair<int, double>(nuc, aw));
+    }
     return aw;
   };
 
@@ -6704,7 +6777,9 @@ double pyne::atomic_mass(int nuc) {
   // take a best guess based on the
   // aaa number.
   aw = (double) ((nucid/10000)%1000);
-  atomic_mass_map[nuc] = aw;
+  if (atomic_mass_map.count(nuc) != 1) {
+    atomic_mass_map.insert(std::pair<int, double>(nuc, aw));
+  }
   return aw;
 };
 
@@ -6753,7 +6828,7 @@ double pyne::natural_abund(int nuc) {
   // state abundance...not strictly true, but good guess.
   if (0 < nucid%10000) {
     na = natural_abund((nucid/10000)*10000);
-    atomic_mass_map[nuc] = na;
+    natural_abund_map[nuc] = na;
     return na;
   };
 
@@ -8015,22 +8090,23 @@ int pyne::id_from_level(int nuc, double level, std::string special) {
   nuc_lower = level_data_lvl_map.lower_bound(std::make_pair(nostate, 0.0));
   nuc_upper = level_data_lvl_map.upper_bound(std::make_pair(nostate+9999,
                                              DBL_MAX));
-  double min = DBL_MAX;
+  double minv = DBL_MAX;
   //by default return input nuc_id with level stripped
   int ret_id = nuc;
   for (std::map<std::pair<int, double>, level_data>::iterator it=nuc_lower;
-  it!=nuc_upper;
-       ++it) {
-    if ((abs(level - it->second.level) < min) &&
+       it!=nuc_upper; ++it) {
+    if ((abs(level - it->second.level) < minv) &&
     ((char)it->second.special == special.c_str()[0]) &&
     !isnan(it->second.level)) {
-      min = abs(level - it->second.level);
+      minv = abs(level - it->second.level);
       ret_id = it->second.nuc_id;
     }
   }
-  if (min > 1.0)
-    ret_id = nuc;
-  return ret_id;
+  // This value was chosen so important transitions in U-235 are not missed
+  if (minv > 3.0)
+    return -nuc;
+  else 
+    return ret_id;
 }
 
 int pyne::id_from_level(int nuc, double level){
@@ -8270,6 +8346,8 @@ template<> void pyne::_load_data<pyne::decay>() {
                      half_life_error), H5T_NATIVE_DOUBLE);
   status = H5Tinsert(desc, "branch_ratio", HOFFSET(decay, branch_ratio),
                      H5T_NATIVE_DOUBLE);
+  status = H5Tinsert(desc, "branch_ratio_error", HOFFSET(decay, branch_ratio_error),
+                     H5T_NATIVE_DOUBLE);
   status = H5Tinsert(desc, "photon_branch_ratio", HOFFSET(decay,
                      photon_branch_ratio), H5T_NATIVE_DOUBLE);
   status = H5Tinsert(desc, "photon_branch_ratio_err", HOFFSET(decay,
@@ -8329,9 +8407,10 @@ std::vector<std::pair<double, double> >pyne::decay_half_lifes(int parent) {
   return result;
 }
 
-double pyne::decay_branch_ratio(std::pair<int, int> from_to) {
-  return data_access<double, decay>(from_to, offsetof(decay,
-    branch_ratio), decay_data);
+std::pair<double, double> pyne::decay_branch_ratio(std::pair<int, int> from_to) {
+  return std::make_pair(data_access<double, decay>(from_to, offsetof(decay,
+    branch_ratio), decay_data),data_access<double, decay>(from_to, offsetof(decay,
+    branch_ratio_error), decay_data));
 };
 
 std::vector<double> pyne::decay_branch_ratios(int parent) {
@@ -8449,8 +8528,9 @@ template<> void pyne::_load_data<pyne::gamma>() {
   status = H5Fclose(nuc_data_h5);
 
   for (int i = 0; i < gamma_length; ++i) {
-    gamma_data[std::make_pair(gamma_array[i].parent_nuc,
-      gamma_array[i].energy)] = gamma_array[i];
+    if ((gamma_array[i].parent_nuc != 0) && !isnan(gamma_array[i].energy))
+      gamma_data[std::make_pair(gamma_array[i].parent_nuc,
+        gamma_array[i].energy)] = gamma_array[i];
   }
   delete[] gamma_array;
 }
@@ -8576,6 +8656,15 @@ std::vector<int> pyne::gamma_parent(double energy, double error) {
     offsetof(gamma, parent_nuc), gamma_data);
 };
 
+std::vector<int> pyne::gamma_child(double energy, double error) {
+  return data_access<int, gamma>(energy+error, energy-error,
+  offsetof(gamma, child_nuc), gamma_data);
+};
+
+std::vector<int> pyne::gamma_child(int parent) {
+  return data_access<int, gamma>(parent, 0.0, DBL_MAX,
+  offsetof(gamma, child_nuc), gamma_data);
+};
 
 std::vector<std::pair<double, double> > pyne::gamma_xrays(int parent) {
   std::vector<std::pair<double, double> > result;
@@ -8662,8 +8751,9 @@ template<> void pyne::_load_data<pyne::alpha>() {
   status = H5Fclose(nuc_data_h5);
 
   for (int i = 0; i < alpha_length; ++i) {
-    alpha_data[std::make_pair(alpha_array[i].from_nuc, alpha_array[i].energy)]
-    = alpha_array[i];
+    if ((alpha_array[i].from_nuc != 0) && !isnan(alpha_array[i].energy))
+      alpha_data[std::make_pair(alpha_array[i].from_nuc, alpha_array[i].energy)]
+        = alpha_array[i];
   }
   delete[] alpha_array;
 }
@@ -8739,8 +8829,9 @@ template<> void pyne::_load_data<pyne::beta>() {
   status = H5Fclose(nuc_data_h5);
 
   for (int i = 0; i < beta_length; ++i) {
-    beta_data[std::make_pair(beta_array[i].from_nuc, beta_array[i].avg_energy)]
-    = beta_array[i];
+    if ((beta_array[i].from_nuc != 0) && !isnan(beta_array[i].avg_energy))
+      beta_data[std::make_pair(beta_array[i].from_nuc, beta_array[i].avg_energy)]
+        = beta_array[i];
   }
   delete[] beta_array;
 }
@@ -8830,8 +8921,9 @@ template<> void pyne::_load_data<pyne::ecbp>() {
   status = H5Fclose(nuc_data_h5);
 
   for (int i = 0; i < ecbp_length; ++i) {
-    ecbp_data[std::make_pair(ecbp_array[i].from_nuc, ecbp_array[i].avg_energy)]
-    = ecbp_array[i];
+    if ((ecbp_array[i].from_nuc != 0) && !isnan(ecbp_array[i].avg_energy))
+      ecbp_data[std::make_pair(ecbp_array[i].from_nuc, ecbp_array[i].avg_energy)]
+        = ecbp_array[i];
   }
   delete[] ecbp_array;
 }
@@ -13256,10 +13348,10 @@ CustomWriter::unindent()
 #include <vector>
 #include <iomanip>  // std::setprecision
 #include <math.h>   // modf
+#include <stdexcept>
 
 #ifndef PYNE_IS_AMALGAMATED
 #include "material.h"
-#include "nucname.h"
 #endif
 
 // h5wrap template
@@ -13620,14 +13712,6 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
     H5Pset_chunk(data_set_params, 1, chunk_dims);
     H5Pset_deflate(data_set_params, 1);
 
-    material_data * data_fill_value  = new material_data[material_data_size];
-    (*data_fill_value).mass = -1.0;
-    (*data_fill_value).density= -1.0;
-    (*data_fill_value).atoms_per_mol = -1.0;
-    for (int n = 0; n != nuc_size; n++)
-      (*data_fill_value).comp[n] = 0.0;
-    H5Pset_fill_value(data_set_params, desc, &data_fill_value);
-
     // Create the data set
     data_set = H5Dcreate2(db, datapath.c_str(), desc, data_space, H5P_DEFAULT,
                             data_set_params, H5P_DEFAULT);
@@ -13641,9 +13725,6 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
                                 H5P_DEFAULT, H5P_DEFAULT);
     H5Awrite(nuc_attr, nuc_attr_type, nucpath.c_str());
     H5Fflush(db, H5F_SCOPE_GLOBAL);
-
-    // Remember to de-allocate
-    delete[] data_fill_value;
   };
 
   // Get the data hyperslab
@@ -14341,6 +14422,63 @@ pyne::comp_map pyne::Material::mult_by_mass() {
 
 
 
+pyne::comp_map pyne::Material::activity() {
+  pyne::comp_map act;
+  double masspermole = mass * pyne::N_A;
+  for (pyne::comp_iter i = comp.begin(); i != comp.end(); ++i) {
+    act[i->first] = masspermole * (i->second) * decay_const(i->first) / \
+                    atomic_mass(i->first);
+  }
+  return act;
+}	
+
+
+pyne::comp_map pyne::Material::decay_heat() {
+  pyne::comp_map dh;
+  double masspermole = mass * pyne::N_A;
+  for (pyne::comp_iter i = comp.begin(); i != comp.end(); ++i) {
+    dh[i->first] = pyne::MeV_per_MJ * masspermole * (i->second) * \
+                   decay_const(i->first) * q_val(i->first) / \
+                   atomic_mass(i->first);
+  }
+  return dh;
+}
+
+
+pyne::comp_map pyne::Material::dose_per_g(std::string dose_type, int source) {
+  pyne::comp_map dose; 
+  const double pCi_per_Bq = 27.027027;
+  if (dose_type == "ext_air") {
+    for (pyne::comp_iter i = comp.begin(); i != comp.end(); ++i) {
+      dose[i->first] = Ci_per_Bq * pyne::N_A * (i->second) * \
+                       decay_const(i->first) * ext_air_dose(i->first, source) / \
+                       atomic_mass(i->first);
+    }
+  } else if (dose_type == "ext_soil") {
+    for (pyne::comp_iter i = comp.begin(); i != comp.end(); ++i) {
+      dose[i->first] = Ci_per_Bq * pyne::N_A * (i->second) * \
+                       decay_const(i->first) * ext_soil_dose(i->first, source) / \
+                       atomic_mass(i->first);
+    }
+  } else if (dose_type == "ingest") {
+    for (pyne::comp_iter i = comp.begin(); i != comp.end(); ++i) {
+      dose[i->first] = pCi_per_Bq * pyne::N_A * (i->second) * \
+                       decay_const(i->first) * ingest_dose(i->first, source) / \
+                       atomic_mass(i->first);
+    }
+  } else if (dose_type == "inhale") {
+    for (pyne::comp_iter i = comp.begin(); i != comp.end(); ++i) {
+      dose[i->first] = pCi_per_Bq * pyne::N_A * (i->second) * \
+                       decay_const(i->first) * inhale_dose(i->first, source) / \
+                       atomic_mass(i->first);
+    }
+  } else {
+    throw std::invalid_argument("Dose type must be one of: ext_air, ext_soil, ingest, inhale.");
+  }
+  return dose;
+}	
+
+
 double pyne::Material::molecular_mass(double apm) {
   // Calculate the atomic weight of the Material
   double inverseA = 0.0;
@@ -14390,7 +14528,7 @@ pyne::Material pyne::Material::expand_elements() {
         nabund = (*abund_itr).first;
         if (zabund == znuc && 0 != nucname::anum(nabund) && 0.0 != (*abund_itr).second)
           newcomp[nabund] = (*abund_itr).second * (*nuc).second * \
-                            atomic_mass_map[nabund] / atomic_mass_map[n];
+                            atomic_mass(nabund) / atomic_mass(n);
         else if (n == nabund && 0.0 == (*abund_itr).second)
           newcomp.insert(*nuc);
         abund_itr++;
@@ -14722,6 +14860,18 @@ void pyne::Material::from_atom_frac(std::map<int, double> atom_fracs) {
 };
 
 
+std::map<int, double> pyne::Material::to_atom_dens() {
+  // Returns an atom density map from this material's composition
+  // the material's density
+
+  std::map<int, double> atom_dens = std::map<int, double>();
+
+  for (comp_iter ci = comp.begin(); ci != comp.end(); ci++)
+    atom_dens[ci->first] = (ci->second) * density * pyne::N_A / pyne::atomic_mass(ci->first);
+
+  return atom_dens;
+};
+
 
 std::vector<std::pair<double, double> > pyne::Material::gammas() {
   std::vector<std::pair<double, double> > result;
@@ -14787,6 +14937,15 @@ std::vector<std::pair<double, double> > unnormed) {
   }
   return normed;
 }
+
+
+pyne::Material pyne::Material::decay(double t) {
+  Material rtn;
+  comp_map out = pyne::decayers::decay(to_atom_frac(), t);
+  rtn.from_atom_frac(out);
+  rtn.mass = mass * rtn.molecular_mass() / molecular_mass();
+  return rtn;
+};
 
 
 pyne::Material pyne::Material::operator+ (double y) {
@@ -25841,6 +26000,103 @@ pyne::enrichment::Cascade pyne::enrichment::solve_symbolic(pyne::enrichment::Cas
 };
 //
 // end of src/enrichment_symbolic20.cpp
+//
+
+
+//
+// start of src/_decay.cpp
+//
+#ifdef PYNE_DECAY_IS_DUMMY
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//              WARNING
+// This file has been auto generated
+// Do not modify directly. You have
+// been warned. This is that warning
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+#ifndef PYNE_IS_AMALGAMATED
+#include "decay.h"
+#endif
+
+namespace pyne {
+namespace decayers {
+
+void decay_h(double t, std::map<int, double>::const_iterator &it, std::map<int, double> &outcomp, double (&out)[4]) {
+  //using std::exp2;
+  switch (it->first) {
+    case 10010000: {
+      out[0] += it->second;
+      break;
+    } case 10020000: {
+      out[1] += it->second;
+      break;
+    } case 10030000: {
+      double b0 = exp2(-2.572085e-09*t);
+      out[2] += (it->second) * (b0);
+      out[3] += (it->second) * (-1.000000e+00*b0 + 1.0);
+      break;
+    } default: {
+      outcomp.insert(*it);
+      break;
+    }
+  }
+}
+
+void decay_he(double t, std::map<int, double>::const_iterator &it, std::map<int, double> &outcomp, double (&out)[4]) {
+  //using std::exp2;
+  switch (it->first) {
+    case 20030000: {
+      out[3] += it->second;
+      break;
+    } default: {
+      outcomp.insert(*it);
+      break;
+    }
+  }
+}
+
+std::map<int, double> decay(std::map<int, double> comp, double t) {
+  // setup
+  using std::map;
+  int nuc;
+  int i = 0;
+  double out [4] = {};  // init to zero
+  map<int, double> outcomp;
+  
+  // body
+  map<int, double>::const_iterator it = comp.begin();
+  for (; it != comp.end(); ++it) {
+    switch (nucname::znum(it->first)) {
+      case 1:
+        decay_h(t, it, outcomp, out);
+        break;
+      case 2:
+        decay_he(t, it, outcomp, out);
+        break;
+      default:
+        outcomp.insert(*it);
+        break;
+    }
+  }
+  
+  // cleanup
+  for (i = 0; i < 4; ++i)
+    if (out[i] > 0.0)
+      outcomp[all_nucs[i]] = out[i];
+  return outcomp;
+}
+
+const int all_nucs [4] = {
+  10010000, 10020000, 10030000, 20030000
+};
+
+}  // namespace decayers
+}  // namespace pyne
+
+#endif  // PYNE_DECAY_IS_DUMMY//
+// end of src/_decay.cpp
 //
 
 

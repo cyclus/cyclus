@@ -35,6 +35,14 @@ class SqliteBack: public FullBackend {
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
+  virtual std::map<std::string, DbTypes> ColumnTypes(std::string table);
+
+  virtual std::set<std::string> Tables();
+
+  /// Returns the underlying sqlite database. Only use this if you really know
+  /// what you are doing.
+  SqliteDb& db();
+
  private:
   void Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt, int index);
 
@@ -69,45 +77,6 @@ class SqliteBack: public FullBackend {
 
   std::map<std::string, SqlStatement::Ptr> stmts_;
   std::map<std::string, std::vector<DbTypes> > schemas_;
-
-  SqlStatement::Ptr vect_int_ins_;
-  SqlStatement::Ptr vect_int_get_;
-  std::set<Digest> vect_int_keys_;
-
-  SqlStatement::Ptr vect_dbl_ins_;
-  SqlStatement::Ptr vect_dbl_get_;
-  std::set<Digest> vect_dbl_keys_;
-
-  SqlStatement::Ptr vect_str_ins_;
-  SqlStatement::Ptr vect_str_get_;
-  std::set<Digest> vect_str_keys_;
-
-  SqlStatement::Ptr map_int_double_ins_;
-  SqlStatement::Ptr map_int_double_get_;
-  std::set<Digest> map_int_double_keys_;
-
-  SqlStatement::Ptr map_int_int_ins_;
-  SqlStatement::Ptr map_int_int_get_;
-  std::set<Digest> map_int_int_keys_;
-
-  SqlStatement::Ptr map_int_str_ins_;
-  SqlStatement::Ptr map_int_str_get_;
-  std::set<Digest> map_int_str_keys_;
-
-  SqlStatement::Ptr map_str_int_ins_;
-  SqlStatement::Ptr map_str_int_get_;
-  std::set<Digest> map_str_int_keys_;
-
-  SqlStatement::Ptr map_str_double_ins_;
-  SqlStatement::Ptr map_str_double_get_;
-  std::set<Digest> map_str_double_keys_;
-
-  SqlStatement::Ptr map_str_str_ins_;
-  SqlStatement::Ptr map_str_str_get_;
-  std::set<Digest> map_str_str_keys_;
-
-  /// A class to help with hashing variable length datatypes
-  Sha1 hasher_;
 };
 
 }  // namespace cyclus

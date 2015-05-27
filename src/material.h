@@ -128,13 +128,25 @@ class Material: public Resource {
   /// a reactor.
   void Transmute(Composition::Ptr c);
 
-  /// A special case of Transmute where the new composition is calculated by
-  /// performing a decay calculation on the material's composition.  The time
-  /// delta is calculated as the difference between curr_time and the last time
-  /// Decay was invoked.
+  /// Updates the material's composition by performing a decay calculation.
+  /// This is a special case of Transmute where the new composition is
+  /// calculated automatically.  The time delta is calculated as the difference
+  /// between curr_time and the last time the material's composition was
+  /// updated with a decay calculation (i.e. prev_decay_time).  This may or may
+  /// not result in an updated material composition.  Does nothing if the
+  /// simulation decay mode is set to "never" or none of the nuclides' decay
+  /// constants are significant with respect to the time delta.
   void Decay(int curr_time);
 
+  /// Returns the last time step on which a decay calculation was performed
+  /// for the material.  This is not necessarily synonymous with the last time
+  /// step the material's Decay function was called.
+  int prev_decay_time() { return prev_decay_time_; }
+
   /// Returns the nuclide composition of this material.
+  Composition::Ptr comp();
+
+  /// DEPRECATED - use non-const comp() function.
   Composition::Ptr comp() const;
 
  protected:

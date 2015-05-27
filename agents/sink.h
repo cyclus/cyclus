@@ -54,12 +54,37 @@ class Sink : public cyclus::Facility  {
   /// @brief determines the amount to request
   inline double Capacity() const { return capacity; }
 
+  inline void Capacity(double cap) { capacity = cap; }
+
+  void AddIncommod(std::string commod) {in_commods.push_back(commod);};
+
+  /// sets the name of the recipe to be requested
+  inline void recipe(std::string name) { recipe_name = name; }
+
+  /// the name of the input recipe to request
+  inline std::string recipe() const { return recipe_name; }
+
+  virtual void Build(cyclus::Agent* parent) {
+    Facility::Build(parent);
+    if (lifetime() >= 0) {
+      context()->SchedDecom(this, exit_time());
+    }
+  }
+
  private:
+  #pragma cyclus var { \
+    "tooltip": "input/request recipe name", \
+    "doc": "Name of recipe to request." \
+           "If empty, sink requests material no particular composition.", \
+    "default": "", \
+    "uitype": "recipe", \
+  }
+  std::string recipe_name;
+
   #pragma cyclus var {"doc": "commodities that the sink facility " \
                              "accepts", \
                       "tooltip": "input commodities for the sink", \
-                      "schematype": "token", \
-                      "uitype": "incommodity"}
+                      "uitype": ["oneormore", "incommodity"]}
   std::vector<std::string> in_commods;
 
   #pragma cyclus var {"doc": "capacity the sink facility can " \

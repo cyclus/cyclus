@@ -19,12 +19,13 @@
 #include "infile_tree.h"
 #include "logger.h"
 #include "sim_init.h"
+#include "toolkit/infile_converters.h"
 
 namespace cyclus {
 
 namespace fs = boost::filesystem;
 
-void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
+void LoadRawStringstreamFromFile(std::stringstream& stream, std::string file) {
   std::ifstream file_stream(file.c_str());
   if (!file_stream) {
     throw IOError("The file '" + file + "' could not be loaded.");
@@ -32,6 +33,15 @@ void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
 
   stream << file_stream.rdbuf();
   file_stream.close();
+}
+
+void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
+  LoadRawStringstreamFromFile(stream, file);
+  std::string inext = fs::path(file).extension().string();
+  if (inext == ".json") {
+    std::string inxml = cyclus::toolkit::JsonToXml(stream.str());
+    stream.str(inxml);
+  }
 }
 
 std::vector<AgentSpec> ParseSpecs(std::string infile) {
@@ -144,8 +154,10 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->Init(input);
 
+  std::stringstream orig_input;
+  LoadRawStringstreamFromFile(orig_input, file_);
   ctx_->NewDatum("InputFiles")
-      ->AddVal("Data", Blob(input.str()))
+      ->AddVal("Data", Blob(orig_input.str()))
       ->Record();
 }
 
@@ -170,7 +182,9 @@ void XMLFileLoader::LoadSim() {
 }
 
 void XMLFileLoader::LoadSolver() {
+  using std::string;
   InfileTree xqe(*parser_);
+  InfileTree* qe;
   std::string query = "/*/commodity";
 
   std::map<std::string, double> commod_priority;
@@ -178,7 +192,7 @@ void XMLFileLoader::LoadSolver() {
   double priority;
   int num_commods = xqe.NMatches(query);
   for (int i = 0; i < num_commods; i++) {
-    InfileTree* qe = xqe.SubTree(query, i);
+    qe = xqe.SubTree(query, i);
     name = qe->GetString("name");
     priority = OptionalQuery<double>(qe, "solution_priority", -1);
     commod_priority[name] = priority;
@@ -191,6 +205,35 @@ void XMLFileLoader::LoadSolver() {
         ->AddVal("Commodity", it->first)
         ->AddVal("SolutionPriority", it->second)
         ->Record();
+  }
+
+  // now load the solver info
+  string config = "config";
+  string greedy = "greedy";
+  string solver_name = greedy;
+  bool exclusive = false;
+  if (xqe.NMatches("/control/solver") == 1) {
+    qe = xqe.SubTree("/control/solver");
+    if (qe->NMatches(config) == 1) {
+      solver_name = qe->SubTree(config)->GetElementName(0);
+    }
+    exclusive = cyclus::OptionalQuery<bool>(qe, "exclusive_orders_only", 
+                                            exclusive);
+  } 
+  ctx_->NewDatum("SolverInfo")
+      ->AddVal("Solver", solver_name)
+      ->AddVal("ExclusiveOrders", exclusive)
+      ->Record();
+
+  // now load the actual solver
+  if (solver_name == "greedy") {
+    query = string("/control/solver/config/greedy/preconditioner");
+    string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
+    ctx_->NewDatum("GreedySolverInfo")
+      ->AddVal("Preconditioner", precon_name)
+      ->Record();
+  } else {
+    throw ValueError("unknown solver name: " + solver_name);
   }
 }
 

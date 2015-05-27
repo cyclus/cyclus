@@ -21,10 +21,20 @@ class Dier : public cyclus::Facility {
   virtual cyclus::Agent* Clone() { return new Dier(context()); }
   virtual void InitInv(cyclus::Inventories& inv) {}
   virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
+  virtual void Decommission() {
+    decom_count++;
+  }
 
-  void Tick() { context()->SchedDecom(this); }
+  void Tick() {
+    if (context()->time() == 0) {
+      context()->SchedDecom(this);
+    }
+  }
   void Tock() {}
+  static int decom_count;
 };
+
+int Dier::decom_count = 0;
 
 class Termer : public cyclus::Facility {
  public:
@@ -130,7 +140,7 @@ TEST(TimerTests, CustomSnapshot) {
   EXPECT_EQ(10, qr.GetVal<int>("Time", 3));
 }
 
-TEST(TimerTests, NullParentDecomSegfault) {
+TEST(TimerTests, NullParentDecomNoSegfault) {
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -142,4 +152,20 @@ TEST(TimerTests, NullParentDecomSegfault) {
 
   // EXPECT_NO_SEGFAULT
   ti.RunSim();
+}
+
+TEST(TimerTests, DoubleDecom) {
+  cyclus::Recorder rec;
+  cyclus::Timer ti;
+  cyclus::Context ctx(&ti, &rec);
+
+  ti.Initialize(&ctx, cyclus::SimInfo(4));
+
+  Dier* d = new Dier(&ctx);
+  d->Build(NULL);
+  ctx.SchedDecom(d, 0);
+
+  Dier::decom_count = 0;
+  ti.RunSim();
+  EXPECT_EQ(1, Dier::decom_count);
 }

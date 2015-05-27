@@ -139,6 +139,7 @@ class ResBuf {
         rs_present_.erase(r);
       }
 
+      qty_ -= r->quantity();
       rs.push_back(r);
       left -= quan;
     }
@@ -181,6 +182,7 @@ class ResBuf {
     std::vector<typename T::Ptr> rs;
     for (int i = 0; i < n; i++) {
       typename T::Ptr r = rs_.front();
+      qty_ -= r->quantity();
       rs_.pop_front();
       rs.push_back(r);
       rs_present_.erase(r);
@@ -191,7 +193,7 @@ class ResBuf {
   }
 
   /// Same as PopN except returns the Resource-typed objects.
-  ResVec PopNRes(int n) { return ResCast<Resource>(PopN(n)); }
+  ResVec PopNRes(int n) { return ResCast(PopN(n)); }
 
   /// Returns the next resource in line to be popped from the buffer
   /// without actually removing it from the buffer.
@@ -215,6 +217,7 @@ class ResBuf {
     typename T::Ptr r = rs_.front();
     rs_.pop_front();
     rs_present_.erase(r);
+    qty_ -= r->quantity();
     UpdateQty();
     return r;
   }
@@ -228,6 +231,7 @@ class ResBuf {
     typename T::Ptr r = rs_.back();
     rs_.pop_back();
     rs_present_.erase(r);
+    qty_ -= r->quantity();
     UpdateQty();
     return r;
   }
@@ -257,6 +261,7 @@ class ResBuf {
 
     rs_.push_back(m);
     rs_present_.insert(m);
+    qty_ += r->quantity();
     UpdateQty();
   }
 
@@ -306,12 +311,12 @@ class ResBuf {
 
  private:
   void UpdateQty() {
-    typename std::list<typename T::Ptr>::iterator it;
-    std::vector<double> qtys;
-    for (it = rs_.begin(); it != rs_.end(); ++it) {
-      qtys.push_back((*it)->quantity());
+    int n = rs_.size();
+    if (n == 0) {
+      qty_ = 0;
+    } else if (n == 1) {
+      qty_ = rs_.front()->quantity();
     }
-    qty_ = CycArithmetic::KahanSum(qtys);
   }
 
   double qty_;

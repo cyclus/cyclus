@@ -47,13 +47,16 @@ from __future__ import print_function
 import os
 import re
 import sys
+import uuid
 from collections import Sequence, Mapping, MutableMapping, OrderedDict
+from contextlib import contextmanager
 from itertools import takewhile
 from subprocess import Popen, PIPE
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint, pformat
 import textwrap
 import difflib
+import xml.dom.minidom
 
 try:
     import simplejson as json
@@ -89,13 +92,16 @@ PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob',
               'boost::uuids::uuid', }
 
 BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
+           '{0}::toolkit::ResBuf'.format(CYCNS),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Resource'),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Product'),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Material'),
+           '{0}::toolkit::ResMap'.format(CYCNS),
            }
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
-             'std::map', '{0}::toolkit::ResBuf'.format(CYCNS),}
+             'std::map', '{0}::toolkit::ResBuf'.format(CYCNS),
+             CYCNS + '::toolkit::ResMap',}
 
 WRANGLERS = {
     '{0}::Agent'.format(CYCNS),
@@ -107,6 +113,35 @@ WRANGLERS = {
 
 ENTITIES = [('cyclus::Region', 'region'), ('cyclus::Institution', 'institution'), 
             ('cyclus::Facility', 'facility'), ('cyclus::Agent', 'archetype')]
+
+def escape_xml(s, ind='    '):
+    """Escapes xml string s, prettifies it and puts in c++ string lit form."""
+
+    s = xml.dom.minidom.parseString(s)
+    s = s.toprettyxml(indent='    ')
+    s = s.replace('"', '\\"')
+
+    lines = s.splitlines()
+    lines = lines[1:] # remove initial xml version tag
+
+    clean = [line for line in lines if len(line.strip()) != 0]
+    cleaner = ['{0}"{1}\\n"'.format(ind, line.rstrip()) for line in clean]
+    return '\n'.join(cleaner)
+
+def prepare_type(cpptype, othertype):
+    """Updates othertype to conform to the length of cpptype using None's.
+    """
+    if not isinstance(cpptype, STRING_TYPES):
+        if isinstance(othertype, STRING_TYPES):
+            othertype = [othertype]
+
+        if othertype is None:
+            othertype = [None] * len(cpptype)
+        elif len(othertype) < len(cpptype):
+            othertype.extend([None] * (len(cpptype) - len(othertype)))
+        return othertype
+    else:
+        return othertype
 
 #
 # pass 1
@@ -256,7 +291,7 @@ class UsingFilter(AliasFilter):
 
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
-    # handles anonymous namespaces as group(1) == None
+    # handles anonymous namespaces as group(1) is None
     regex = re.compile("\s*namespace(\s+\w*)?\s*[^=]*", re.DOTALL)
 
     def transform(self, statement, sep):
@@ -439,7 +474,7 @@ class VarDecorationFilter(DecorationFilter):
         state.var_annotations = self._eval()
 
 class VarDeclarationFilter(Filter):
-    """State varible declaration.  Only oeprates if state.var_annotations is
+    """State varible declaration.  Only operates if state.var_annotations is
     not None. Access for member variable must be public.
     """
     regex = re.compile("(.*\w+.*?)\s+(\w+)")
@@ -458,7 +493,17 @@ class VarDeclarationFilter(Filter):
         annotations['index'] = len(state.context[classname]['vars'])
         state.context[classname]['vars'][vname] = annotations
         if 'alias' in annotations:
-            state.context[classname]['vars'][annotations['alias']] = vname
+            alias = annotations['alias']
+            while not isinstance(alias, STRING_TYPES):
+                alias = alias[0] 
+            state.context[classname]['vars'][alias] = vname
+        if annotations['type'][0] not in BUFFERS:
+            annotations['alias'] = self.canonize_alias(
+                annotations['type'], vname, alias=annotations.get('alias'))
+            annotations['tooltip'] = self.canonize_tooltip(
+                annotations['type'], vname, tooltip=annotations.get('tooltip'))
+            annotations['uilabel'] = self.canonize_uilabel(
+                annotations['type'], vname, uilabel=annotations.get('uilabel'))
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -484,6 +529,72 @@ class VarDeclarationFilter(Filter):
         else:
             rtn = None
         return rtn
+
+    def _canonize_ann(self, defaults, t, name, ann=None):
+        """Computes the nested default annotation structure for a C++ type for with the
+        given state variable name and defaults for non-nested containers.
+        """
+        if isinstance(t, STRING_TYPES):
+            return ann or name 
+        template = defaults[t[0]]
+        # expand ann if needed
+        if ann is None:
+            ann = [None] * len(t)
+        elif isinstance(ann, STRING_TYPES):
+            ann = [ann] + [None]*(len(t) - 1)
+        elif len(ann) < len(t):
+            ann = ann + [None]*(len(t) - len(ann))
+        # find template name
+        if template[0] is None: 
+            t0 = ann[0] or name
+        else:
+            # expand t0 ann if needed
+            if ann[0] is None:
+                ann[0] = [None] * len(template[0])
+            elif isinstance(ann[0], STRING_TYPES):
+                ann[0] = [ann[0]] + [None]*(len(template[0]) - 1)
+            elif len(ann[0]) < len(template[0]):
+                ann[0] = ann[0] + [None]*(len(template[0]) - len(ann[0]))
+            t0 = [ann[0][0] or name] + \
+                 [ai or ti for ai, ti in zip(ann[0][1:], template[0][1:])]
+        a = [t0]
+        for t_i, template_i, ann_i in zip(t[1:], template[1:], ann[1:]):
+            a.append(self._canonize_ann(defaults, t_i, template_i, ann=ann_i))
+        return a
+
+    _default_aliases = {
+        'std::vector': (None, 'val'),
+        'std::set': (None, 'val'),
+        'std::list': (None, 'val'),
+        'std::pair': (None, 'first', 'second'),
+        'std::map': ((None, 'item'), 'key', 'val'),
+        }
+
+    def canonize_alias(self, t, name, alias=None):
+        """Computes the default alias structure for a C++ type for with the given state
+        variable name.
+        """
+        return self._canonize_ann(self._default_aliases, t, name, alias)
+
+    _default_ui = {
+        'std::vector': (None, ''),
+        'std::set': (None, ''),
+        'std::list': (None, ''),
+        'std::pair': (None, '', ''),
+        'std::map': ((None, ''), '', ''),
+        }
+
+    def canonize_tooltip(self, t, name, tooltip=None):
+        """Computes the default tooltip structure for a C++ type for with the given state
+        variable name.
+        """
+        return self._canonize_ann(self._default_ui, t, name, tooltip)
+
+    def canonize_uilabel(self, t, name, uilabel=None):
+        """Computes the default uilabel structure for a C++ type for with the given state
+        variable name.
+        """
+        return self._canonize_ann(self._default_ui, t, name, uilabel)
 
 class ExecFilter(Filter):
     """Filter for executing arbitrary python code in the exec pragma and
@@ -628,12 +739,13 @@ class StateAccumulator(object):
                         CYCNS+'::Material',
                         CYCNS+'::Product',}
     known_templates = {
-        '{0}::toolkit::ResBuf'.format(CYCNS): ('T',),
         'std::vector': ('T',),
         'std::set': ('T',),
         'std::list': ('T',),
         'std::pair': ('T1', 'T2'),
         'std::map': ('Key', 'T'),
+        '{0}::toolkit::ResBuf'.format(CYCNS): ('T',),
+        '{0}::toolkit::ResMap'.format(CYCNS): ('K', 'R'),
         }
     scopz = '::'  # intern the scoping operator
 
@@ -697,7 +809,7 @@ class StateAccumulator(object):
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
                        "primitive type: {p}.").format(
                     i=self.includeloc(), t=t, n=name, c=self.classname(),
-                    p=", ".join(sorted(self.supported_types)))
+                    p=pformat(self.supported_types))
                 raise TypeError(msg)
         return t
 
@@ -768,14 +880,15 @@ class CodeGeneratorFilter(Filter):
         # class names that are in the current namespace (Spy) or use classnames
         # that are fully qualified (mi6::Spy).
         self.given_classname = None
+        self.mode = 'def'
 
     def transform(self, statement, sep):
         # basic setup
         cg = self.machine
         groups = self.match.groups()
-        mode = (groups[0] or '').strip()
-        if len(mode) == 0:
-            mode = "def"
+        self.mode = (groups[0] or 'def').strip()
+        if len(self.mode) == 0:
+            self.mode = "def"
         classname = groups[1] if len(groups) > 1 else None
         if classname is None:
             if len(cg.classes) == 0:
@@ -792,7 +905,7 @@ class CodeGeneratorFilter(Filter):
         in_class_decl = self.in_class_decl()
         ns = "" if in_class_decl else cg.scoped_classname(classname) + "::"
         virt = "virtual " if in_class_decl else ""
-        end = ";" if mode == "decl" else " {"
+        end = ";" if self.mode == "decl" else " {"
         ind = 2 * (cg.depth - len(cg.namespaces))
         definition = self.def_template.format(ind=" "*ind, virt=virt,
                         rtn=self.methodrtn, ns=ns, methodname=self.methodname,
@@ -801,15 +914,15 @@ class CodeGeneratorFilter(Filter):
         # compute implementation
         impl = ""
         ind += 2
-        if mode != "decl":
+        if self.mode != "decl":
             impl = self.impl(ind=ind * " ")
         ind -= 2
         if not impl.endswith("\n") and 0 != len(impl):
             impl += '\n'
-        end = "" if mode == "decl" else " " * ind + "};\n"
+        end = "" if self.mode == "decl" else " " * ind + "};\n"
 
         # compute return
-        if mode == 'impl':
+        if self.mode == 'impl':
             return impl
         else:
             return definition + impl + end
@@ -893,16 +1006,27 @@ class InitFromCopyFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]
             elif info['type'] not in BUFFERS:
                 impl += ind + "{0} = m->{0};\n".format(member)
-            elif 'capacity' in info:
+            else:
                 cap_buffs[member] = info
 
         for b, info in cap_buffs.items():
-            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + "{0}.set_capacity(m->{0}.capacity());\n".format(b)
-            else:  # ResBuf
-                impl += ind + "{0}.capacity(m->{0}.capacity());\n".format(b)
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                msg = 'type {0!r} could not be found for InitFromCopy() code gen.'
+                raise TypeError(msg.format(t_info))
+            t_impl = t_impl.format(var=b)
+            impl += ind + t_impl.replace('\n', '\n' + ind).strip(' ')
 
         return impl
+
+    res_impl = {
+        CYCNS + '::toolkit::ResourceBuff': ("{var}.set_capacity("
+                                            "m->{var}.capacity());\n"),
+        CYCNS + '::toolkit::ResBuf': "{var}.capacity(m->{var}.capacity());\n",
+        CYCNS + '::toolkit::ResMap': '{var}.obj_ids(m->obj_ids());\n',
+        }
 
 class InitFromDbFilter(CodeGeneratorFilter):
     """Filter for handling db-constructor-like InitFrom() code
@@ -939,22 +1063,37 @@ class InitFromDbFilter(CodeGeneratorFilter):
                 impl += info[self.pragmaname]
                 continue
             t = info['type']
-            if t in BUFFERS:
-                if 'capacity' in info:
-                    cap_buffs[member] = info
+            key = t if isinstance(t, STRING_TYPES) else t[0]
+            if key in BUFFERS:
+                if 'capacity' not in info:
+                    info = dict(info)
+                    info['capacity'] = 1e300
+                cap_buffs[member] = info
                 continue
             tstr = type_to_str(t)
             if tstr.endswith('>'):
                 tstr += ' '
             impl += ind + '{0} = qr.GetVal<{1}>("{0}");\n'.format(member, tstr)
+
         for b, info in cap_buffs.items():
-            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + ('{0}.set_capacity(qr.GetVal<double>'
-                               '("{1}"));\n').format(b, info['capacity'])
-            else:  # ResBuf
-                impl += ind + ('{0}.capacity(qr.GetVal<double>'
-                               '("{1}"));\n').format(b, info['capacity'])
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                msg = 'type {0!r} could not be found for InitFromDb() code gen.'
+                raise TypeError(msg.format(t_info))
+            t_impl = t_impl.format(var=b, tstr=type_to_str(t_info), **info)
+            impl += ind + t_impl.replace('\n', '\n' + ind).strip(' ')
+
         return impl
+
+    res_impl = {
+        CYCNS + '::toolkit::ResourceBuff': '{var}.set_capacity({capacity});\n',
+        CYCNS + '::toolkit::ResBuf': '{var}.capacity({capacity});\n',
+        CYCNS + '::toolkit::ResMap': (
+            '{var}.obj_ids(qr.GetVal<{tstr}>("{var}"))\n;'),
+        }
+
 
 class InfileToDbFilter(CodeGeneratorFilter):
     """Filter for handling InfileToDb() code generation:
@@ -980,6 +1119,27 @@ class InfileToDbFilter(CodeGeneratorFilter):
             'std::pair': self.read_pair,
             'std::map': self.read_map,
             }
+        self._vals = {
+            'bool': self._val_bool,
+            'int': self._val_int,
+            'float': self._val_floating,
+            'double': self._val_floating,
+            'std::string': self._val_string,
+            'cyclus::Blob': self._val_blob,
+            'boost::uuids::uuid': self._val_uuid,
+            'std::vector': self._val_vector,
+            'std::set': self._val_set,
+            'std::list': self._val_list,
+            'std::pair': self._val_pair,
+            'std::map': self._val_map,
+            }
+        self._idx_lev = 0
+
+    @contextmanager
+    def _nest_idx(self):
+        self._idx_lev += 1
+        yield
+        self._idx_lev -= 1
 
     def methodargs(self):
         return "{0}::InfileTree* tree, {0}::DbInit di".format(CYCNS)
@@ -988,142 +1148,347 @@ class InfileToDbFilter(CodeGeneratorFilter):
         """returns a format string for a type t"""
         return '"{0}"' if t == 'std::string' else '{0}'
 
-    def _query(self, tree, alias, t, d, uitype=None, idx=None):
+    def _val(self, t, val=None, name=None, uitype=None, ind=''):
+        """Returns a string that represents a Python value (val) of a given 
+        type (t) in C++. For types that do not have an expression 
+        representation, the variable (name) may also be used. If a value
+        is not provided, the default for the type will be provided.
+        """
+        key = t if isinstance(t, STRING_TYPES) else t[0]
+        if val is None:
+            return self._vals[key](t, name=name, uitype=uitype, ind=ind)
+        else:
+            return self._vals[key](t, val=val, name=name, uitype=uitype, ind=ind)
+
+    def _val_bool(self, t, val=False, name='boolvar', uitype=None, ind=''):
+        return ind + 'bool {0} = {1};\n'.format(name, 'true' if val else 'false')
+
+    def _val_int(self, t, val=0, name='intvar', uitype=None, ind=''):
+        if uitype == 'nuclide':
+            fmt = '"{0}"' if isinstance(val, STRING_TYPES) else '{0}'
+            v = fmt.format(val)
+            v = ind + 'int {0} = pyne::nucname::id({1});\n'.format(name, v)
+        else:
+            v = ind + 'int {0} = {1};\n'.format(name, val)
+        return v
+
+    def _val_floating(self, t, val=0.0, name='floatvar', uitype=None, ind=''):
+        return ind + 'double {0} = {1};\n'.format(name, val)
+
+    def _val_string(self, t, val='', name='stringvar', uitype=None, ind=''):
+        return ind + 'std::string {0}("{1}");\n'.format(name, val)
+
+    def _val_blob(self, t, val='', name='blobvar', uitype=None, ind=''):
+        return ind + 'cyclus::Blob {0}("{1}");\n'.format(name, val)
+
+    def _val_uuid(self, t, val='', name='uuidvar', uitype=None, ind=''):
+        v = ind + 'boost::uuids::uuid {0} = '.format(name)
+        if isinstance(val, STRING_TYPES):
+            v += '"{0}"'.format(val)
+        elif isinstance(val, uuid.UUID):
+            l = [x+y for x, y in zip(val.hex[::1], val.hex[1::2])]
+            v += '{0x' + ', 0x'.join(l) + '}'
+        else:
+            msg = "could not interpret UUID type of {0}"
+            raise TypeError(msg.format(val))
+        return v + ';\n'
+
+    def _val_vector(self, t, val=(), name='vecvar', uitype=None, ind=''):
+        uitype = prepare_type(t, uitype)
+        elemname = 'elem'
+
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{0}.resize({1});\n'.format(name, len(val))
+        v += ind + '{\n'
+        ind += '  '
+        for i, x in enumerate(val):
+            v += ind + '{\n'
+            ind += '  '
+            v += self._val(t[1], val=x, uitype=uitype[1],
+                           name=elemname, ind=ind)
+            v += ind + '{0}[{1}] = {2};\n'.format(name, i, elemname)
+            ind = ind[:-2]
+            v += ind + '}\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
+
+        return v
+
+    def _val_set(self, t, val=frozenset(), name='setvar', uitype=None, ind=''):
+        uitype = prepare_type(t, uitype)
+        elemname = 'elem'
+
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
+        for i, x in enumerate(val):
+            v += ind + '{\n'
+            ind += '  '
+            v += self._val(t[1], val=x, uitype=uitype[1],
+                           name=elemname, ind=ind)
+            v += ind + '{0}.insert({1});\n'.format(name, elemname)
+            ind = ind[:-2]
+            v += ind + '}\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
+
+        return v
+
+    def _val_list(self, t, val=(), name='listvar', uitype=None, ind=''):
+        uitype = prepare_type(t, uitype)
+        elemname = 'elem'
+
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
+        for i, x in enumerate(val):
+            v += ind + '{\n'
+            ind += '  '
+            v += self._val(t[1], val=x, uitype=uitype[1],
+                           name=elemname, ind=ind)
+            v += ind + '{0}.push_back({1});\n'.format(name, elemname)
+            ind = ind[:-2]
+            v += ind + '}\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
+
+        return v
+
+    def _val_pair(self, t, val=(None, None), name=None, 
+                  uitype=(None, None, None), ind=''):
+        ftype, stype = t[1], t[2]
+        uitype = prepare_type(t, uitype)
+
+        fname, sname = 'first', 'second'
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
+        v += self._val(ftype, val=val[0], uitype=uitype[1], name=fname, ind=ind)
+        v += self._val(stype, val=val[1], uitype=uitype[2], name=sname, ind=ind)
+        v += ind + '{0}.first = {1};\n'.format(name, fname)
+        v += ind + '{0}.second = {1};\n'.format(name, sname)
+        ind = ind[:-2]
+        v += ind + '}\n'
+        return v
+
+    def _val_map(self, t, val=None, name=None, uitype=None, ind=''):
+        uitype = prepare_type(t, uitype)
+        keyname = 'key'
+        valname = 'val'
+
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
+        for k, x in val.items():
+            v += ind + '{\n'
+            ind += '  '
+            v += self._val(t[1], val=k, uitype=uitype[1], name=keyname, ind=ind)
+            v += self._val(t[2], val=x, uitype=uitype[2], name=valname, ind=ind)
+            v += ind + '{0}[{1}] = {2};\n'.format(name, keyname, valname)
+            ind = ind[:-2]
+            v += ind + '}\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
+
+        return v
+
+    def _query(self, tree, alias, t, uitype=None, idx=None, path=''):
         tstr = type_to_str(t)
         if tstr.endswith('>'):
             tstr += " "
-        tfmt = self._fmt(t)
         # Get keys
-        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree}
-        if d is None:
-            kw['query'] = "Query"
-            kw['default'] = ""
-        else:
-            kw['query'] = "OptionalQuery"
-            kw['default'] = ", " + tfmt.format(d)
+        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree, 
+              'path': path}
         kw['index'] = '' if idx is None else ', {0}'.format(idx)
         # get template
         if uitype == 'nuclide':
-            template = ('pyne::nucname::id({cycns}::{query}<std::string>({tree}, '
-                        '"{alias}"{default}{index}))')
-            if d is not None:
-                kw['default'] = ', "{0}"'.format(d)
+            template = ('pyne::nucname::id({cycns}::Query<std::string>({tree}, '
+                        '"{path}{alias}"{index}))')
         else:
-            template = '{cycns}::{query}<{type}>({tree}, "{alias}"{default}{index})'
+            template = '{cycns}::Query<{type}>({tree}, "{path}{alias}"{index})'
         # fill in template and return 
         return template.format(**kw)
 
-    def read_primitive(self, member, alias, t, d, uitype=None, ind="  "):
-        query = self._query('tree', alias, t, d, uitype)
-        s = '{ind}{member} = {query};\n'.format(ind=ind, member=member, query=query)
+    def read_member(self, member, alias, t, uitype=None, ind='  ', idx=None, 
+                    path=''):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+
+        s = ind + '{0} {1};\n'.format(type_to_str(t), member)
+        mname = member + '_in'
+        tt = t if isinstance(t, STRING_TYPES) else t[0]
+        reader = self.readers.get(tt, None)
+        s += ind + '{\n'
+        ind += '  '
+        s += reader(mname, alias, t, uitype, ind=ind, idx=idx, path=path)
+        s += ind + '{0} = {1};\n'.format(member, mname)
+        ind = ind[:-2]
+        s += ind + '}\n'
         return s
 
-    def read_vector(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None]
-        s = ""
-        if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
-            ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
-        s += ind + 'n = sub->NMatches("val");\n'
-        s += ind + '{0}.resize(n);\n'.format(member)
-        s += ind + 'for (i = 0; i < n; ++i) {\n'
-        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
-        s += ind + '  {member}[i] = {query};\n'.format(member=member, query=query)
-        s += ind + '}\n'
-        if d is not None:
-            ind = ind[:-2]
-            s += ind + '} else {\n'
-            ind += '  '
-            s += ind + '{0}.resize({1});\n'.format(member, len(d))
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}[{1}] = {2};\n'.format(member, i, vstr)
-            ind = ind[:-2]
+    def read_primitive(self, member, alias, t, uitype=None, ind='  ', idx=None,
+                       path=''):
+        query = self._query('sub', alias, t, uitype, idx=idx, path=path)
+        s = ind + '{t} {member} = {query};\n'.format(t=t, member=member, query=query)
+        return s
+
+    def read_vector(self, member, alias, t, uitype=None, ind='  ', idx=None,
+                    path=''):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] is None:
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
+
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        tree_idx = idx or '0'
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        with self._nest_idx():
+            lev = self._idx_lev
+            s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
+                val, lev=lev)
+            s += ind + '{0} {1};\n'.format(type_to_str(t), member)
+            s += ind + '{0}.resize(n{lev});\n'.format(member, lev=lev)
+            s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
+                lev=lev) + ' {\n'
+            s += self.read_member(
+                'elem', alias[1], t[1], uitype[1], 
+                ind+'  ', idx='i{lev}'.format(lev=lev))
+            s += ind + '  {0}[{idx}] = elem;\n'.format(
+                member, idx='i{lev}'.format(lev=lev))
             s += ind + '}\n'
         return s
 
-    def read_set(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None]
-        s = ""
-        s += ind + '{0}.clear();\n'.format(member)
-        if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
-            ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
-        s += ind + 'n = sub->NMatches("val");\n'
-        s += ind + 'for (i = 0; i < n; ++i) {\n'
-        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
-        s += ind + '  {member}.insert({query});\n'.format(member=member, query=query)
-        s += ind + '}\n'
-        if d is not None:
-            ind = ind[:-2]
-            s += ind + '} else {\n'
-            ind += '  '
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}.insert({1});\n'.format(member, vstr)
-            ind = ind[:-2]
+    def read_set(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                 path=''):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] is None:
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        tree_idx = idx or '0'
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        with self._nest_idx():
+            lev = self._idx_lev
+            s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
+                val, lev=self._idx_lev)
+            s += ind + '{0} {1};\n'.format(type_to_str(t), member)
+            s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
+                lev=self._idx_lev) + ' {\n'
+            s += self.read_member(
+                'elem', alias[1], t[1], uitype[1], 
+                ind+'  ', idx='i{lev}'.format(lev=self._idx_lev))
+            s += ind + '  {0}.insert(elem);\n'.format(member)
             s += ind + '}\n'
         return s
 
-    def read_list(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None]
-        s = ""
-        s += ind + '{0}.clear();\n'.format(member)
-        if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
-            ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
-        s += ind + 'n = sub->NMatches("val");\n'
-        s += ind + 'for (i = 0; i < n; ++i) {\n'
-        query = self._query('sub', 'val', t[1], None, uitype[1], 'i')
-        s += ind + '  {1}.push_back({query});\n'.format(member=member, query=query)
-        s += ind + '}\n'
-        if d is not None:
-            ind = ind[:-2]
-            s += ind + '} else {\n'
-            ind += '  '
-            for i, v in enumerate(d):
-                vstr = vfmt.format(v)
-                s += ind + '{0}.push_back({1});\n'.format(member, vstr)
-            ind = ind[:-2]
+    def read_list(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                  path=''):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] is None:
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        tree_idx = idx or '0'
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        with self._nest_idx():
+            lev = self._idx_lev
+            s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
+                val, lev=lev)
+            s += ind + '{0} {1};\n'.format(type_to_str(t), member)
+            s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
+                lev=lev) + ' {\n'
+            s += self.read_member(
+                'elem', alias[1], t[1], uitype[1], 
+                ind+'  ', idx='i{lev}'.format(lev=lev))
+            s += ind + '  {0}.push_back(elem);\n'.format(member)
             s += ind + '}\n'
         return s
 
-    def read_pair(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None, None]
-        s = ""
-        query = self._query('tree', alias + '/first', t[1], d[0], uitype[1])
-        s += ind + '{member}.first = {query};\n'.format(member=member, query=query)
-        query = self._query('tree', alias + '/second', t[1], d[0], uitype[1])
-        s += ind + '{member}.second = {query};\n'.format(member=member, query=query)
+    def read_pair(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                  path=''):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        if alias[1] is None:
+            alias[1] = 'first'
+        if alias[2] is None:
+            alias[2] = 'second'
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        tree_idx = idx or '0'
+        first = 'first{}'.format(tree_idx)
+        second = 'second{}'.format(tree_idx)
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        s += self.read_member(first, alias[1], t[1], uitype[1], ind+'  ', idx='0')
+        s += self.read_member(second, alias[2], t[2], uitype[2], ind+'  ', idx='0')
+        s += ind + '{0} {1}({2}, {3});\n'.format(type_to_str(t), member, first, second)
         return s
 
-    def read_map(self, member, alias, t, d, uitype=None, ind="  "):
-        uitype = uitype or [None, None, None]
-        s = ""
-        if d is not None:
-            s += ind + 'if (tree->NMatches("{0}") > 0) {{\n'.format(alias)
-            ind += '  '
-        s += ind + 'sub = tree->SubTree("{0}");\n'.format(alias)
-        s += ind + 'n = sub->NMatches("val");\n'
-        s += ind + 'for (i = 0; i < n; ++i) {\n'
-        kquery = self._query('sub', 'key', t[1], None, uitype[1], 'i')
-        vquery = self._query('sub', 'val', t[2], None, uitype[2], 'i')
-        s += ind + '  {member}[{kquery}] = {vquery};\n'.format(member=member, 
-                                                               kquery=kquery, 
-                                                               vquery=vquery)
-        s += ind + '}\n'
-        if d is not None:
-            ind = ind[:-2]
-            s += ind + '} else {\n'
-            ind += '  '
-            for k, v in d.items():
-                kstr = keyfmt.format(k)
-                vstr = valfmt.format(v)
-                s += ind + '{0}[{1}] = {2};\n'.format(member, kstr, vstr)
-            ind = ind[:-2]
+    def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                 path=''):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        #import pdb; pdb.set_trace()
+        if isinstance(alias[0], STRING_TYPES):
+            alias[0] = [alias[0], None]
+        if alias[0][1] is None:
+            alias[0][1] = 'item'
+        if alias[1] is None:
+            alias[1] = 'key'
+        if alias[2] is None:
+            alias[2] = 'val'
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        # subtree must be specified if in recursive level
+        itempath = alias[0][1] + '/'
+        tree_idx = idx or '0'
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0][0], tree_idx, path=path, ind=ind)
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        with self._nest_idx():
+            lev = self._idx_lev
+            s += ind + 'int n{lev} = sub->NMatches("{item}");\n'.format(
+                        lev=lev, item=alias[0][1])
+            s += ind + '{0} {1};\n'.format(type_to_str(t), member)
+            s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
+                lev=lev) + ' {\n'
+            s += self.read_member('key', alias[1], t[1], uitype[1], 
+                                  ind+'  ', idx='i{lev}'.format(lev=lev),
+                                  path=itempath)
+            s += self.read_member('val', alias[2], t[2], uitype[2], 
+                                  ind+'  ', idx='i{lev}'.format(lev=lev),
+                                  path=itempath)
+            s += ind + '  {0}[key] = val;\n'.format(member)
             s += ind + '}\n'
         return s
 
@@ -1142,8 +1507,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         impl += self.shapes_impl(ctx, ind)
 
         # read data from infile onto class
-        impl += ind + 'tree = tree->SubTree("config/*");\n'
-        impl += ind + '{0}::InfileTree* sub;\n'.format(CYCNS)
+        impl += ind + '{0}::InfileTree* sub = tree->SubTree("config/*");\n'.format(CYCNS)
         impl += ind + 'int i;\n'
         impl += ind + 'int n;\n'
         for member, info in ctx.items():
@@ -1151,23 +1515,47 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 # this member is a variable alias pointer
                 continue
 
-            alias = member
-            if 'alias' in info:
-                alias = info['alias']
-
             if self.pragmaname in info and 'read' in info[self.pragmaname]:
                 impl += info[self.pragmaname]['read']
                 continue
             t = info['type']
+            key = t if isinstance(t, STRING_TYPES) else t[0]
             uitype = info.get('uitype', None)
-            if t in BUFFERS:
+            if key in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
             if 'derived_init' in info:
                 impl += ind + info['derived_init'] + '\n'
             else:
+                labels = info.get('alias', None)
+                if labels is None:
+                    labels = member if isinstance(t, STRING_TYPES) else [member]
                 reader = self.readers.get(t, self.readers.get(t[0], None))
-                impl += reader(member, alias, t, d, uitype, ind)
+
+                # generate condition to choose default vs given val if default exists
+                if d is not None:
+                    name = labels
+                    while not isinstance(name, STRING_TYPES):
+                        name = name[0]
+                    impl += ind + 'if (sub->NMatches("{0}") > 0) {{\n'.format(name)
+                    ind += '  '
+
+                mname = member + '_val'
+                impl += ind + '{\n'
+                impl += reader(mname, labels, t, uitype, ind+'  ')
+                impl += ind + '  {0} = {1};\n'.format(member, mname)
+                impl += ind + '}\n'
+
+                # generate code to assign default val if no other is specified
+                if d is not None:
+                    ind = ind[:-2]
+                    impl += ind + '} else {\n'
+                    ind += '  '
+                    mname = member + '_tmp'
+                    impl += self._val(t, val=d, name=mname, uitype=uitype, ind=ind)
+                    impl += ind + '{0} = {1};\n'.format(member, mname)
+                    ind = ind[:-2]
+                    impl += ind + '}\n'
 
         # write obj to database
         impl += ind + 'di.NewDatum("Info")\n'
@@ -1243,18 +1631,84 @@ class SchemaFilter(CodeGeneratorFilter):
             raise TypeError(msg.format(cs, given))
         return self.default_types[cpp]
 
+    def _buildschema(self, cpptype, schematype=None, uitype=None, names=None):
+        schematype = prepare_type(cpptype, schematype)
+        uitype = prepare_type(cpptype, uitype)
+        names = prepare_type(cpptype, names)
+
+        impl = ''
+        t = cpptype if isinstance(cpptype, STRING_TYPES) else cpptype[0]
+        if t in PRIMITIVES:
+            name = 'val'
+            if names is not None:
+                name = names
+            d_type = self._type(t, schematype or uitype)
+            impl += '<element name="{0}">'.format(name)
+            impl += '<data type="{0}" />'.format(d_type)
+            impl += '</element>'
+        elif t in ['std::list', 'std::set', 'std::vector']:
+            name = 'list' if isinstance(cpptype, STRING_TYPES) else ['list']
+            if names[0] is not None:
+                name = names[0]
+            impl += '<element name="{0}">'.format(name)
+            impl += '<oneOrMore>'
+            impl += self._buildschema(cpptype[1], schematype[1], uitype[1], names[1])
+            impl += '</oneOrMore>'
+            impl += '</element>'
+        elif t == 'std::map':
+            name = 'map'
+            if names[0] is None or isinstance(names[0], STRING_TYPES):
+                names[0] = [names[0], None]
+            if names[0][0] is not None:
+                name = names[0][0]
+            itemname ='item' if names[0][1] is None else names[0][1]
+            keynames = 'key' if isinstance(cpptype[1], STRING_TYPES) else ['key']
+            if names[1] is not None:
+                keynames = names[1]
+            valnames = 'val' if isinstance(cpptype[2], STRING_TYPES) else ['val']
+            if names[1] is not None:
+                valnames = names[2]
+            impl += '<element name="{0}">'.format(name)
+            impl += '<oneOrMore>'
+            impl += '<element name="{0}">'.format(itemname)
+            impl += '<interleave>'
+            impl += self._buildschema(cpptype[1], schematype[1], uitype[1], keynames)
+            impl += self._buildschema(cpptype[2], schematype[2], uitype[2], valnames)
+            impl += '</interleave>'
+            impl += '</element>'
+            impl += '</oneOrMore>'
+            impl += '</element>'
+        elif t == 'std::pair':
+            name = 'pair'
+            if names[0] is not None:
+                name = names[0]
+            firstname = 'first' if isinstance(cpptype[1], STRING_TYPES) else ['first']
+            if names[1] is not None:
+                firstname = names[1]
+            secondname = 'second' if isinstance(cpptype[2], STRING_TYPES) else ['second']
+            if names[2] is not None:
+                secondname = names[2]
+            impl += '<element name="{0}">'.format(name)
+            impl += '<interleave>'
+            impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
+            impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
+            impl += '</interleave>'
+            impl += '</element>'
+        else:
+            msg = '{0}Unsupported type {1}'.format(self.machine.includeloc(), t)
+            raise RuntimeError(msg)
+
+        return impl
+
     def impl(self, ind="  "):
         cg = self.machine
         context = cg.context
         ctx = context[self.given_classname]['vars']
-        i = Indenter(level=len(ind) / 2)
-        xi = Indenter(n=4)
 
         if len(ctx.keys()) == 0:
-            return i + 'return "<text/>";\n'
+            return ind + 'return "<text/>";\n'
 
-        impl = i.up() + 'return ""\n'
-        impl += i +  '"<interleave>\\n"\n'
+        xml = '<interleave>'
         for member, info in ctx.items():
             self._member = member
             if not isinstance(info, Mapping):
@@ -1264,70 +1718,35 @@ class SchemaFilter(CodeGeneratorFilter):
             alias = member
             if 'alias' in info:
                 alias = info['alias']
-
             if self.pragmaname in info:
-                impl += info[self.pragmaname]
+                xml += info[self.pragmaname]
                 continue
             t = info['type']
+            key = t if isinstance(t, STRING_TYPES) else t[0]
             uitype = info.get('uitype', None)
             schematype = info.get('schematype', None)
-            if t in BUFFERS: # buffer state, skip
+            labels = info.get('alias', None)
+            if labels is None:
+                labels = alias if isinstance(t, STRING_TYPES) else [alias]
+
+            if key in BUFFERS:  # buffer state, skip
                 continue
-            if 'derived_init' in info: # derived state, skip
+            if 'derived_init' in info:  # derived state, skip
                 continue
+
             opt = True if 'default' in info else False
             if opt:
-                impl += i + '"{0}<optional>\\n"\n'.format(xi.up())
-            if t[0] in ['std::list', 'std::map', 'std::set', 'std::vector']:
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
-                impl += i + '"{0}<oneOrMore>\\n"\n'.format(xi.up())
-                if t[0] in ['std::set', 'std::vector', 'std::list']:
-                    uitype = [None, None] if uitype is None else uitype
-                    el_type = self._type(t[1], schematype or uitype[1])
-                    impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
-                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, el_type)
-                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                else:  # map
-                    uitype = [None, None, None] if uitype is None else uitype
-                    schematype = [None, None] if schematype is None else schematype
-                    k_type = self._type(t[1], schematype[0] or uitype[1])
-                    v_type = self._type(t[2], schematype[1] or uitype[2])
-                    impl += i + '"{0}<element name=\\"key\\">\\n"\n'.format(xi.up())
-                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, k_type)
-                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                    impl += i + '"{0}<element name=\\"val\\">\\n"\n'.format(xi.up())
-                    impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, v_type)
-                    impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                impl += i + '"{0}</oneOrMore>\\n"\n'.format(xi.down())
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-            elif t in PRIMITIVES:
-                d_type = self._type(t, schematype or uitype)
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, d_type)
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-            elif t[0] == 'std::pair':
-                uitype = [None, None, None] if uitype is None else uitype
-                schematype = [None, None] if schematype is None else schematype
-                f_type = self._type(t[1], schematype[0] or uitype[1])
-                s_type = self._type(t[2], schematype[1] or uitype[2])
-                impl += i + '"{0}<element name=\\"{1}\\">\\n"\n'.format(xi.up(), alias)
-                impl += i + '"{0}<element name=\\"first\\">\\n"\n'.format(xi.up())
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, f_type)
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                impl += i + '"{0}<element name=\\"second\\">\\n"\n'.format(xi.up())
-                impl += i + '"{0}<data type=\\"{1}\\" />\\n"\n'.format(xi, s_type)
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-                impl += i + '"{0}</element>\\n"\n'.format(xi.down())
-            else:
-                msg = '{0}Unsupported type {1}'.format(self.machine.includeloc(), t)
-                raise RuntimeError(msg)
+                xml += '<optional>'
+
+            xml += self._buildschema(t, schematype, uitype, labels)
 
             if opt:
-                impl += i + '"{0}</optional>\\n"\n'.format(xi.down())
+                xml += '</optional>'
+        xml += '</interleave>'
+
         del self._member
-        impl += i +  '"</interleave>\\n"\n'
-        impl += i + ";\n"
-        return impl
+        return ind + 'return ""\n' + escape_xml(xml, ind=ind+'  ') + ';\n'
+
 
 class AnnotationsFilter(CodeGeneratorFilter):
     """Filter for handling annotations() code generation:
@@ -1352,7 +1771,7 @@ class AnnotationsFilter(CodeGeneratorFilter):
         jstr = json.dumps(ctx, separators=(',', ':'))
         if len(jstr) > 50:
             tw = textwrap.wrap(jstr, 50, drop_whitespace=False)
-            jstr = [j.replace('"', '\\"') for j in tw]
+            jstr = [j.replace('\\', '\\\\').replace('"', '\\"') for j in tw]
             jstr = ('"\n  ' + ind + '"').join(jstr)
             jstr = '\n  ' + ind + '"' + jstr + '"'
         else:
@@ -1380,18 +1799,33 @@ class SnapshotFilter(CodeGeneratorFilter):
             if not isinstance(info, Mapping):
                 # this member is a variable alias pointer
                 continue
-
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
+
+            # get expression
             t = info["type"]
+            key = t if isinstance(t, STRING_TYPES) else t[0]
             if t in BUFFERS:
-                continue
+                expr = self.res_exprs.get(key, None)
+                if expr is None:
+                    continue
+                expr = expr.format(var=member)
+            else:
+                expr = member
+
             shape = ', &cycpp_shape_{0}'.format(member) if 'shape' in info else ''
-            impl += ind + '->AddVal("{0}", {0}{1})\n'.format(member, shape)
+            impl += ind + '->AddVal("{0}", {1}{2})\n'.format(member, expr, shape)
         impl += ind + "->Record();\n"
 
         return impl
+
+    res_exprs = {
+        CYCNS + '::toolkit::ResourceBuff': None,
+        CYCNS + '::toolkit::ResBuf': None,
+        CYCNS + '::toolkit::ResMap': '{var}.obj_ids()',
+        }
+
 
 class SnapshotInvFilter(CodeGeneratorFilter):
     """Filter for handling SnapshotInv() code generation:
@@ -1411,9 +1845,8 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             if not isinstance(info, Mapping):
                 # this member is a variable alias pointer
                 continue
-
             t = info['type']
-            if t in BUFFERS:
+            if t in BUFFERS or t[0] in BUFFERS:
                 buffs[member] = info
 
         impl = ind + "{0}::Inventories invs;\n".format(CYCNS)
@@ -1422,18 +1855,31 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                msg = 'type {0!r} could not be found for SnapshotInv() code gen.'
+                raise TypeError(msg.format(t_info))
+            s = t_impl.format(var=buff, t_str=type_to_str(t_info), **info)
+            impl += ind + s.replace('\n', '\n' + ind).strip(' ')
 
-            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + ("invs[\"{0}\"] = "
-                               "{0}.PopN({0}.count());\n").format(buff)
-                impl += ind + '{0}.PushAll(invs["{0}"]);\n'.format(buff)
-            else:  # ResBuf
-                impl += ind + ("invs[\"{0}\"] = "
-                               "{0}.PopNRes({0}.count());\n").format(buff)
-                impl += ind + '{0}.Push(invs["{0}"]);\n'.format(buff)
-
-        impl += ind + "return invs;\n"
+        # if in impl mode, archetype dev is responsible for adding the return
+        # statement
+        if self.mode != 'impl':
+            impl += ind + "return invs;\n"
         return impl
+
+    res_impl = {
+        CYCNS + '::toolkit::ResourceBuff': (
+            'invs[\"{var}\"] = {var}.PopN({var}.count());\n'
+            '{var}.PushAll(invs["{var}"]);\n'),
+        CYCNS + '::toolkit::ResBuf': (
+            'invs[\"{var}\"] = {var}.PopNRes({var}.count());\n'
+            '{var}.Push(invs["{var}"]);\n'),
+        CYCNS + '::toolkit::ResMap': "invs[\"{var}\"] = {var}.ResValues();\n",
+        }
+
 
 class InitInvFilter(CodeGeneratorFilter):
     """Filter for handling InitInv() code generation:
@@ -1465,13 +1911,23 @@ class InitInvFilter(CodeGeneratorFilter):
             if self.pragmaname in info:
                 impl += info[self.pragmaname]
                 continue
-
-            if isinstance(info['type'], STRING_TYPES):  # ResourceBuff
-                impl += ind + "{0}.PushAll(inv[\"{0}\"]);\n".format(buff)
-            else:  # ResBuf
-                impl += ind + "{0}.Push(inv[\"{0}\"]);\n".format(buff)
+            t_info = info['type']
+            key = t_info if isinstance(t_info, STRING_TYPES) else t_info[0]
+            t_impl = self.res_impl.get(key, None)
+            if t_impl is None:
+                msg = 'type {0!r} could not be found for InitInv() code gen.'
+                raise TypeError(msg.format(t_info))
+            s = t_impl.format(var=buff)
+            impl += ind + s.replace('\n', '\n' + ind)
 
         return impl
+
+    res_impl = {
+        CYCNS + '::toolkit::ResourceBuff': "{var}.PushAll(inv[\"{var}\"]);\n",
+        CYCNS + '::toolkit::ResBuf': "{var}.Push(inv[\"{var}\"]);\n",
+        CYCNS + '::toolkit::ResMap': "{var}.ResValues(inv[\"{var}\"]);\n",
+        }
+
 
 class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
@@ -1677,35 +2133,6 @@ class Proxy(MutableMapping):
     def __contains__(self, key):
         return key in self.__dict__['_d']
 
-class Indenter(object):
-    def __init__(self, n=2, level=0):
-        str.__init__(self)
-        self._n = int(n)
-        self._level = int(level)
-
-    def __add__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __radd__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __concat__(self, other):
-        return '{0}{1}'.format(self, other)
-
-    def __str__(self):
-        return ' '*self._n*self._level
-
-    def __repr__(self):
-        return ' '*self._n*self._level
-
-    def up(self):
-        self._level += 1
-        return Indenter(n=self._n, level=self._level-1)
-
-    def down(self):
-        self._level -= 1
-        return Indenter(n=self._n, level=self._level)
-
 def outter_split(s, open_brace='(', close_brace=')', separator=','):
     """Takes a string and only split the outter most level."""
     outter = []
@@ -1723,36 +2150,64 @@ def outter_split(s, open_brace='(', close_brace=')', separator=','):
             val += separator
     return outter
 
-def split_template_args(s, open_brace='<', close_brace='>', separator=','):
-    """Takes a string with template specialization and returns a list
-    of the argument values as strings. Mostly cribbed from xdress.
-    """
-    targs = []
-    ns = s.split(open_brace, 1)[-1].rsplit(close_brace, 1)[0].split(separator)
-    count = 0
-    targ_name = ''
-    for n in ns:
-        count += int(open_brace in n)
-        count -= int(close_brace in n)
-        targ_name += n
-        if count == 0:
-            targs.append(targ_name.strip())
-            targ_name = ''
-    return targs
-
 def parse_template(s, open_brace='<', close_brace='>', separator=','):
-    """Takes a string -- which may represent a template specialization --
-    and returns the corresponding type. Mostly cribbed from xdress.
+    """Takes a string -- which may represent a template specialization -- and
+    returns the corresponding type.
+    
+    It calls parse_arg to return the type(s) for any template arguments the
+    type may have. For example:
+
+    >>> parse_template('std::map<int, double>')
+    ['std::map', 'int', 'double']
+    >>> parse_template('std::map<int, std::map<int, std::map<int, int> > >')
+    ['std::map', 'int', ['std::map', 'int', ['std::map', 'int', 'int']]]
     """
-    if open_brace not in s and close_brace not in s:
+
+    s = s.replace(' ', '')
+    if open_brace not in s and separator not in s:
         return s
-    t = [s.split(open_brace, 1)[0]]
-    targs = split_template_args(s, open_brace=open_brace,
-                                close_brace=close_brace, separator=separator)
-    for targ in targs:
-        t.append(parse_template(targ, open_brace=open_brace,
-                                close_brace=close_brace, separator=separator))
+
+    i = s.find(open_brace)
+    j = s.rfind(close_brace)
+    t = [s[:i]]
+    inner = s[i+1:j]
+    t.extend(parse_arg(inner, open_brace, close_brace, separator))
     return t
+
+def parse_arg(s, open_brace='<', close_brace='>', separator=','):
+    """Takes a string containing one or more c++ template args and returns a
+    list of the argument types as strings.
+    
+    This is called by parse_template to handle the inner portion of the
+    template braces.  For example:
+
+    >>> parse_arg('int, double')
+    ['int', 'double']
+    >>> parse_arg('std::map<int, double>')
+    [['std::map', 'int', 'double']]
+    >>> parse_arg('int, std::map<int, double>')
+    ['int', ['std::map', 'int', 'double']]
+    """
+
+    nest = 0
+    ts = []
+    start = 0
+    for i in range(len(s)):
+        ch = s[i]
+        if ch == open_brace:
+            nest += 1
+        elif ch == close_brace:
+            nest -= 1
+        
+        if ch == separator and nest == 0:
+            t = parse_template(s[start:i], open_brace, close_brace, separator)
+            ts.append(t)
+            start = i+1
+
+    if start < len(s):
+        t = parse_template(s[start:], open_brace, close_brace, separator)
+        ts.append(t)
+    return ts
 
 def type_to_str(t):
     if t in PRIMITIVES:

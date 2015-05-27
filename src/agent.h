@@ -375,9 +375,29 @@ class Agent : public StateWrangler, virtual public Ider {
   /// the agent has never been built).
   inline const int enter_time() const { return enter_time_; }
 
+  /// Sets the number of time steps this agent operates between building and
+  /// decommissioning (-1 if the agent has an infinite lifetime).  This should
+  /// generally only be called BEFORE an agent is added to a context as a
+  /// prototype.  Throws ValueError if the agent has already been deployed.
+  void lifetime(int n_timesteps);
+
   /// Returns the number of time steps this agent operates between building and
   /// decommissioning (-1 if the agent has an infinite lifetime).
   inline const int lifetime() const { return lifetime_; }
+
+  /// Returns the default time step at which this agent will exit the
+  /// simulation (-1 if the agent has an infinite lifetime).
+  ///
+  /// Deomissioning happens at the end of a time step. With a lifetime of 1, we
+  /// expect an agent to go through only 1 entire time step. In this case, the
+  /// agent should be decommissioned on the same time step it was
+  /// created. Therefore, for agents with non-infinite lifetimes, the exit_time
+  /// will be the enter time plus its lifetime less 1.
+  inline const int exit_time() const {
+    if (lifetime() == -1)
+      return -1;
+    return enter_time_ + lifetime_ - 1;
+  }
 
   /// Returns a list of children this agent has
   inline const std::set<Agent*>& children() const { return children_; }
@@ -418,6 +438,9 @@ class Agent : public StateWrangler, virtual public Ider {
   std::string kind_;
 
  private:
+  /// length of time this agent is intended to operate
+  int lifetime_;
+
   /// Prevents creation/use of copy constructors (including in subclasses).
   /// Cloning and InitFrom should be used instead.
   Agent(const Agent& m) {}
@@ -444,9 +467,6 @@ class Agent : public StateWrangler, virtual public Ider {
 
   /// born on date of this agent
   int enter_time_;
-
-  /// length of time this agent is intended to operate
-  int lifetime_;
 
   std::string prototype_;
 

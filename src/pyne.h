@@ -14,6 +14,7 @@
 //   src/enrichment_cascade.h
 //   src/enrichment.h
 //   src/enrichment_symbolic.h
+//   src/_decay.h
 
 // PyNE amalgated header http://pyne.io/
 #ifndef PYNE_52BMSKGZ3FHG3NQI566D4I2ZLY
@@ -24,7 +25,7 @@
 //
 // start of license.txt
 //
-// Copyright 2011-2014, the PyNE Development Team. All rights reserved.
+// Copyright 2011-2015, the PyNE Development Team. All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
@@ -1006,7 +1007,7 @@ namespace nucname
   /// \param nuc a possible nuclide
   /// \return a bool
   bool isnuclide(std::string nuc);
-  bool isnuclide(char * nuc);
+  bool isnuclide(const char * nuc);
   bool isnuclide(int nuc);
   /// \}
 
@@ -1016,7 +1017,7 @@ namespace nucname
   /// \param nuc a possible element
   /// \return a bool
   bool iselement(std::string nuc);
-  bool iselement(char * nuc);
+  bool iselement(const char * nuc);
   bool iselement(int nuc);
 
   /// \}
@@ -1051,7 +1052,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return nucid 32-bit integer identifier
   int id(int nuc);
-  int id(char * nuc);
+  int id(const char * nuc);
   int id(std::string nuc);
   /// \}
 
@@ -1069,7 +1070,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
   std::string name(int nuc);
-  std::string name(char * nuc);
+  std::string name(const char * nuc);
   std::string name(std::string nuc);
   /// \}
 
@@ -1080,7 +1081,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return an integer Z-number.
   int znum(int nuc);
-  int znum(char * nuc);
+  int znum(const char * nuc);
   int znum(std::string nuc);
   /// \}
 
@@ -1091,7 +1092,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return an integer A-number.
   int anum(int nuc);
-  int anum(char * nuc);
+  int anum(const char * nuc);
   int anum(std::string nuc);
   /// \}
 
@@ -1103,7 +1104,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return an integer A-number.
   int snum(int nuc);
-  int snum(char * nuc);
+  int snum(const char * nuc);
   int snum(std::string nuc);
   /// \}
 
@@ -1117,7 +1118,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return an integer nuclide identifier.
   int zzaaam(int nuc);
-  int zzaaam(char * nuc);
+  int zzaaam(const char * nuc);
   int zzaaam(std::string nuc);
   /// \}
 
@@ -1128,7 +1129,7 @@ namespace nucname
   /// \param nuc a nuclide in ZZAAAM form.
   /// \return an integer id nuclide identifier.
   int zzaaam_to_id(int nuc);
-  int zzaaam_to_id(char * nuc);
+  int zzaaam_to_id(const char * nuc);
   int zzaaam_to_id(std::string nuc);
   /// \}
 
@@ -1142,7 +1143,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return an integer nuclide identifier.
   int zzzaaa(int nuc);
-  int zzzaaa(char * nuc);
+  int zzzaaa(const char * nuc);
   int zzzaaa(std::string nuc);
   /// \}
 
@@ -1154,7 +1155,7 @@ namespace nucname
   /// \param nuc a nuclide in ZZZAAA form.
   /// \return an integer id nuclide identifier.
   int zzzaaa_to_id(int nuc);
-  int zzzaaa_to_id(char * nuc);
+  int zzzaaa_to_id(const char * nuc);
   int zzzaaa_to_id(std::string nuc);
   /// \}
 
@@ -1168,7 +1169,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return an integer nuclide identifier.
   std::string zzllaaam(int nuc);
-  std::string zzllaaam(char * nuc);
+  std::string zzllaaam(const char * nuc);
   std::string zzllaaam(std::string nuc);
   /// \}
 
@@ -1180,7 +1181,7 @@ namespace nucname
   /// \param nuc a nuclide in ZZLLAAAM form.
   /// \return an integer id nuclide identifier.
   //int zzllaaam_to_id(int nuc);
-  int zzllaaam_to_id(char * nuc);
+  int zzllaaam_to_id(const char * nuc);
   int zzllaaam_to_id(std::string nuc);
   /// \}
 
@@ -1195,7 +1196,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
   int mcnp(int nuc);
-  int mcnp(char * nuc);
+  int mcnp(const char * nuc);
   int mcnp(std::string nuc);
   /// \}
 
@@ -1206,7 +1207,7 @@ namespace nucname
   /// \param nuc a nuclide in MCNP form.
   /// \return an integer id nuclide identifier.
   int mcnp_to_id(int nuc);
-  int mcnp_to_id(char * nuc);
+  int mcnp_to_id(const char * nuc);
   int mcnp_to_id(std::string nuc);
   /// \}
 
@@ -1242,7 +1243,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
   std::string serpent(int nuc);
-  std::string serpent(char * nuc);
+  std::string serpent(const char * nuc);
   std::string serpent(std::string nuc);
   /// \}
 
@@ -1253,7 +1254,7 @@ namespace nucname
   /// \param nuc a nuclide in Serpent form.
   /// \return an integer id nuclide identifier.
   //int serpent_to_id(int nuc);  Should be ZAID
-  int serpent_to_id(char * nuc);
+  int serpent_to_id(const char * nuc);
   int serpent_to_id(std::string nuc);
   /// \}
 
@@ -1266,7 +1267,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
   std::string nist(int nuc);
-  std::string nist(char * nuc);
+  std::string nist(const char * nuc);
   std::string nist(std::string nuc);
   /// \}
 
@@ -1277,7 +1278,7 @@ namespace nucname
   /// \param nuc a nuclide in NIST form.
   /// \return an integer id nuclide identifier.
   //int serpent_to_id(int nuc);  NON-EXISTANT
-  int nist_to_id(char * nuc);
+  int nist_to_id(const char * nuc);
   int nist_to_id(std::string nuc);
   /// \}
 
@@ -1290,7 +1291,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
   int cinder(int nuc);
-  int cinder(char * nuc);
+  int cinder(const char * nuc);
   int cinder(std::string nuc);
   /// \}
 
@@ -1301,7 +1302,7 @@ namespace nucname
   /// \param nuc a nuclide in Cinder form.
   /// \return an integer id nuclide identifier.
   int cinder_to_id(int nuc);
-  int cinder_to_id(char * nuc);
+  int cinder_to_id(const char * nuc);
   int cinder_to_id(std::string nuc);
   /// \}
 
@@ -1313,7 +1314,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
   std::string alara(int nuc);
-  std::string alara(char * nuc);
+  std::string alara(const char * nuc);
   std::string alara(std::string nuc);
   /// \}
 
@@ -1324,7 +1325,7 @@ namespace nucname
   /// \param nuc a nuclide in ALARA form.
   /// \return an integer id nuclide identifier.
   //int alara_to_id(int nuc); NOT POSSIBLE
-  int alara_to_id(char * nuc);
+  int alara_to_id(const char * nuc);
   int alara_to_id(std::string nuc);
   /// \}
 
@@ -1339,7 +1340,7 @@ namespace nucname
   /// \param nuc a nuclide
   /// \return a string nuclide identifier.
   int sza(int nuc);
-  int sza(char * nuc);
+  int sza(const char * nuc);
   int sza(std::string nuc);
   /// \}
 
@@ -1350,7 +1351,7 @@ namespace nucname
   /// \param nuc a nuclide in SZA form.
   /// \return an integer id nuclide identifier.
   int sza_to_id(int nuc);
-  int sza_to_id(char * nuc);
+  int sza_to_id(const char * nuc);
   int sza_to_id(std::string nuc);
   /// \}
 
@@ -1363,7 +1364,7 @@ namespace nucname
   /// \return a integer groundstate id
   inline int groundstate(int nuc) {return (id(nuc) / 10000 ) * 10000;};
   inline int groundstate(std::string nuc) {return groundstate(id(nuc));};
-  inline int groundstate(char * nuc) {return groundstate(std::string(nuc));};
+  inline int groundstate(const char * nuc) {return groundstate(std::string(nuc));};
   /// \}
 
   /// \name State Map functions
@@ -1374,7 +1375,16 @@ namespace nucname
   int state_id_to_id(int state);
   int id_to_state_id(int nuc_id);
   extern std::map<int, int> state_id_map;
+  /// \}
 
+  /// \name ENSDF Form Functions
+  /// \{
+  /// This converts id's stored using standard ensdf syntax to nuc_id's
+  /// \param ensdf nuc string
+  /// \return PyNE nuc_id
+  int ensdf_to_id(const char * nuc);
+  int ensdf_to_id(std::string nuc);
+  /// \}
 
 };
 };
@@ -1793,6 +1803,9 @@ namespace pyne
   extern const double cm2_per_barn;   ///< cm^2 per barn
   extern const double sec_per_day;    ///< seconds per day
   extern const double MeV_per_K;    ///< MeV per Kelvin
+  extern const double MeV_per_MJ;  ///< MeV per MJ
+  extern const double Bq_per_Ci;   ///< Becquerel per Curie
+  extern const double Ci_per_Bq;   ///< Curies per Becquerel
   /// \}
 
   extern std::string NUC_DATA_PATH; ///< Path to the nuc_data.h5 file.
@@ -2238,6 +2251,7 @@ namespace pyne
     double half_life; ///< half life of the decay [s]
     double half_life_error; ///< half life error of the decay [s]
     double branch_ratio; ///< branching ratio of this decay [fraction]
+    double branch_ratio_error; ///< branching ratio of this decay [fraction]
     /// photon branching ratio of this decay [fraction]
     double photon_branch_ratio;
     /// photon branching ratio error of this decay [fraction]
@@ -2259,7 +2273,7 @@ namespace pyne
   std::vector<int> decay_data_children(int parent);
   std::pair<double, double> decay_half_life(std::pair<int,int>);
   std::vector<std::pair<double, double> > decay_half_lifes(int);
-  double decay_branch_ratio(std::pair<int,int>);
+  std::pair<double, double> decay_branch_ratio(std::pair<int,int>);
   std::vector<double> decay_branch_ratios(int parent);
   std::pair<double, double> decay_photon_branch_ratio(std::pair<int,int>);
   std::vector<std::pair<double, double> >decay_photon_branch_ratios(int parent);
@@ -2311,6 +2325,10 @@ namespace pyne
   std::vector<std::pair<int, int> > gamma_parent_child(double energy, double error);
   //returns a list of parent nuclides associated with an input decay energy
   std::vector<int> gamma_parent(double energy, double error);
+  // returns a list of child state_id's based on a gamma-ray energy
+  std::vector<int> gamma_child(double energy, double error);
+  // returns a list of child state_id's based on a parent state_id
+  std::vector<int> gamma_child(int parent);
   //returns an array of arrays of X-ray energies and intesities for a
   //given parent
   std::vector<std::pair<double, double> > gamma_xrays(int parent);
@@ -4712,6 +4730,7 @@ namespace Json {
 #include "utils.h"
 #include "nucname.h"
 #include "data.h"
+#include "decay.h"
 #endif
 
 namespace pyne
@@ -4719,6 +4738,13 @@ namespace pyne
   // Set Type Definitions
   typedef std::map<int, double> comp_map; ///< Nuclide-mass composition map type
   typedef comp_map::iterator comp_iter;   ///< Nuclide-mass composition iter type
+
+  #ifdef PYNE_IS_AMALGAMATED
+  namespace decayers {
+    extern comp_map decay(comp_map, double);
+  }  // namespace decayers
+  #endif
+
 
   // These 37 strings are predefined FLUKA materials. 
   // Materials not on this list requires a MATERIAL card. 
@@ -4904,6 +4930,22 @@ namespace pyne
     /// If \a apm and atoms_per_molecule on this instance are both negative, then the best
     /// guess value calculated from the normailized composition is used here.
     double molecular_mass(double apm=-1.0);
+    /// Calculates the activity of a material based on the composition and each
+    /// nuclide's mass, decay_const, and atmoic_mass. 
+    comp_map activity();
+    /// Calculates the decay heat of a material based on the composition and
+    /// each nuclide's mass, q_val, decay_const, and atomic_mass.
+    comp_map decay_heat();
+    /// Caclulates the dose per gram using the composition of the the
+    /// material, the dose type desired, and the source for dose factors
+    ///   dose_type is one of:
+    ///     ext_air -- returns mrem/h per g per m^3
+    ///     ext_soil -- returns mrem/h per g per m^2
+    ///     ingest -- returns mrem per g
+    ///     inhale -- returns mrem per g
+    ///   source is: 
+    ///     {EPA=0, DOE=1, GENII=2}, default is EPA
+    comp_map dose_per_g(std::string dose_type, int source=0);
     /// Returns a copy of the current material where all natural elements in the
     /// composition are expanded to their natural isotopic abundances.
     Material expand_elements();
@@ -4972,11 +5014,15 @@ namespace pyne
 
     // Atom fraction functions
     /// Returns a mapping of the nuclides in this material to their atom fractions.
-    /// This calculation is based off of the materials molecular weight.
+    /// This calculation is based off of the material's molecular weight.
     std::map<int, double> to_atom_frac();
     /// Sets the composition, mass, and atoms_per_molecule of this material to those
     /// calculated from \a atom_fracs, a mapping of nuclides to atom fractions values.
     void from_atom_frac(std::map<int, double> atom_fracs);
+    
+    /// Returns a mapping of the nuclides in this material to their atom densities.
+    /// This calculation is based off of the material's density.
+    std::map<int, double> to_atom_dens();
 
     // Radioactive Material functions
     /// Returns a list of gamma-rays energies in keV and intensities in
@@ -4993,6 +5039,8 @@ namespace pyne
     std::vector<std::pair<double, double> > normalize_radioactivity(
       std::vector<std::pair<double, double> > unnormed);
 
+    /// Decays this material for a given amount of time in seconds
+    Material decay(double t);
 
     // Overloaded Operators
     /// Adds mass to a material instance.
@@ -5320,6 +5368,46 @@ namespace enrichment {
 #endif
 //
 // end of src/enrichment_symbolic.h
+//
+
+
+//
+// start of src/_decay.h
+//
+#ifdef PYNE_DECAY_IS_DUMMY
+#ifndef PYNE_GEUP5PGEJBFGNHGI36TRBB4WGM
+#define PYNE_GEUP5PGEJBFGNHGI36TRBB4WGM
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//              WARNING
+// This file has been auto generated
+// Do not modify directly. You have
+// been warned. This is that warning
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+#include <map>
+//#include <cmath>
+
+#ifndef PYNE_IS_AMALGAMATED
+#include "data.h"
+#include "nucname.h"
+#endif
+
+namespace pyne {
+namespace decayers {
+
+extern const int all_nucs[4];
+
+std::map<int, double> decay(std::map<int, double> comp, double t);
+
+}  // namespace decayers
+}  // namespace pyne
+
+#endif  // PYNE_GEUP5PGEJBFGNHGI36TRBB4WGM
+#endif  // PYNE_DECAY_IS_DUMMY//
+// end of src/_decay.h
 //
 
 

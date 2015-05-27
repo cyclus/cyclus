@@ -26,6 +26,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow")
 
 IF(NOT CYCLUS_DOC_ONLY)
 
+    # download pre-generated decay source code files from pyne
+    EXECUTE_PROCESS(COMMAND python ${PROJECT_SOURCE_DIR}/getdecay.py --root ${PROJECT_SOURCE_DIR})
+
     ##############################################################################################
     ################################# begin cmake configuration ##################################
     ##############################################################################################
@@ -135,14 +138,18 @@ IF(NOT CYCLUS_DOC_ONLY)
     FIND_PACKAGE( HDF5 REQUIRED)
     ADD_DEFINITIONS(${HDF5_DEFINITIONS})
     set(LIBS ${LIBS} ${HDF5_LIBRARIES} )
-
+    MESSAGE("--    HDF5 Root: ${HDF5_ROOT}")
+    MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
+    MESSAGE("--    HDF5 Library directories: ${HDF5_LIBRARY_DIRS}")
+    MESSAGE("--    HDF5 Libraries: ${HDF5_LIBRARIES}")
+    
     # Include the boost header files and the program_options library
     # Please be sure to use Boost rather than BOOST.
     # Capitalization matters on some platforms
     SET(Boost_USE_STATIC_LIBS       OFF)
     SET(Boost_USE_STATIC_RUNTIME    OFF)
     # SET(Boost_USE_MULTITHREADED    OFF)
-    FIND_PACKAGE( Boost 1.46.1 COMPONENTS program_options filesystem system REQUIRED)
+    FIND_PACKAGE( Boost 1.46.1 COMPONENTS program_options filesystem system serialization REQUIRED)
     MESSAGE("--    Boost Root: ${Boost_ROOT}")
     MESSAGE("--    Boost Include directory: ${Boost_INCLUDE_DIR}")
     MESSAGE("--    Boost Library directories: ${Boost_LIBRARY_DIRS}")
@@ -152,6 +159,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost System location: ${Boost_SYSTEM_LIBRARY}")
     SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
     MESSAGE("--    Boost Filesystem location: ${Boost_FILESYSTEM_LIBRARY}")
+    SET(LIBS ${LIBS} ${Boost_SERIALIZATION_LIBRARY})
+    MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find lapack and link to it
     FIND_PACKAGE( LAPACK REQUIRED )

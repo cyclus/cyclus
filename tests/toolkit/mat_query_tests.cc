@@ -33,6 +33,13 @@ TEST(MatQueryTests, MassAndMoles) {
   double nmoles = mq.moles(922350000) + mq.moles(10070000);
   EXPECT_DOUBLE_EQ(mq.atom_frac(922350000), 1500 / pyne::atomic_mass(922350000) / nmoles);
   EXPECT_DOUBLE_EQ(mq.atom_frac(10070000), 2500 / pyne::atomic_mass(10070000) / nmoles);
+
+  std::set<cyclus::Nuc> nucs ;
+  nucs.insert(922350000);
+  double out_frac=mq.mass_frac(nucs);
+  EXPECT_DOUBLE_EQ(mq.mass_frac(nucs), 1.5/(1.5+2.5));  
+  nucs.insert(10070000);
+  EXPECT_DOUBLE_EQ(mq.mass_frac(nucs), 1.0);  
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -179,7 +186,7 @@ TEST_F(MaterialMatQueryTest, ExtractDiffComp) {
   const double orig_am241 = mq.mass(am241_);
   const double orig_pb208 = mq.mass(pb208_);
 
-  EXPECT_NO_THROW(m1 = diff_mat_->ExtractComp(mq.mass(u235_), test_comp_));
+  ASSERT_NO_THROW(m1 = diff_mat_->ExtractComp(mq.mass(u235_), test_comp_));
   EXPECT_DOUBLE_EQ(orig - m1->quantity(), diff_mat_->quantity());
   EXPECT_EQ(m1->comp(), test_comp_);
   EXPECT_NE(diff_mat_->comp(), test_comp_);

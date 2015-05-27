@@ -1,5 +1,7 @@
 import os
 import sys
+import uuid
+import pprint
 from collections import OrderedDict
 
 import nose
@@ -15,12 +17,16 @@ from cycpp import NamespaceFilter, TypedefFilter, UsingFilter,\
 
 # pass 2 Filters
 from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter, \
-    NoteDecorationFilter
+    NoteDecorationFilter, StateAccumulator
 
 # pass 3 Filters
 from cycpp import CloneFilter, InitFromCopyFilter, \
         InitFromDbFilter, InfileToDbFilter, SchemaFilter, SnapshotFilter, \
         SnapshotInvFilter, InitInvFilter, DefaultPragmaFilter, AnnotationsFilter
+
+import cycpp
+
+assert_equal.__self__.maxDiff = None
 
 class MockMachine(object):
     def __init__(self):
@@ -197,6 +203,62 @@ def test_vdeclarfilter():
     f.transform(statement, sep)
     yield assert_equal, m.var_annotations, None
 
+def test_vdeclarfilter_canonize_alias():
+    m = MockMachine()
+    f = VarDeclarationFilter(m)
+    cases = [
+        # exp   type  name  alias
+        ('x', 'float', 'x', None),
+        (['x', 'val'], ['std::set', 'float'], 'x', None),
+        (['x', 'first', 'second'], ['std::pair', 'int', 'int'], 'x', None),
+        ([['x', 'item'], 'key', 'val'], ['std::map', 'int', 'int'], 'x', None),
+        ([['x', 'item'], ['key', 'first', 'second'], ['val', 'val']], 
+            ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+            'x', None),
+        ('y', 'float', 'x', 'y'),
+        (['x', 'y'], ['std::set', 'float'], 'x', [None, 'y']),
+        (['y', 'first', 'second'], ['std::pair', 'int', 'int'], 
+            'x', ['y']),
+        ([['x', 'item'], 'y', 'val'], ['std::map', 'int', 'int'], 'x', 
+            [None, 'y']),
+        ([['x', 'ytem'], 'y', 'val'], ['std::map', 'int', 'int'], 'x', 
+            [['x', 'ytem'], 'y']),
+        ([['x', 'ytem'], ['key', 'f', 's'], ['data', 'val']], 
+            ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+            'x', [[None, 'ytem'], [None, 'f', 's'], 'data']),
+        ]
+    for exp, t, name, alias in cases:
+        obs = f.canonize_alias(t, name, alias=alias)
+        yield assert_equal, exp, obs
+
+def test_vdeclarfilter_canonize_ui():
+    m = MockMachine()
+    f = VarDeclarationFilter(m)
+    cases = [
+        # exp   type  name  uilabel/tooltip
+        ('foo', 'float', 'x', 'foo'),
+        (['foo', ''], ['std::set', 'float'], 'x', 'foo'),
+        (['foo', 'bar'], ['std::set', 'float'], 'x', ['foo', 'bar']),
+        ([['foo', ''], ['', '', ''], ['', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         'foo'),
+        ([['foo', ''], ['bar', '', ''], ['', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         ['foo', 'bar']),
+        ([['foo', ''], ['bar', '', ''], ['baz', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         ['foo', 'bar', 'baz']),
+    ]
+    for exp, t, name, x in cases:
+        obs = f.canonize_uilabel(t, name, uilabel=x)
+        yield assert_equal, exp, obs
+        obs = f.canonize_tooltip(t, name, tooltip=x)
+        yield assert_equal, exp, obs
+
+
 def test_execfilter():
     """Test ExecFilter"""
     m = MockMachine()
@@ -249,6 +311,22 @@ class MockAliasCodeGenMachine(object):
 
     def classname(self):
         return self.local_classname
+
+
+def test_canon_type():
+    sa = StateAccumulator()
+    cases = [
+        ('double', 'double'),
+        ('std::string', 'std::string'),
+        ('std::vector<int>', ('std::vector', 'int')),
+        ('std::map<int, cyclus::Blob>', ('std::map', 'int', 'cyclus::Blob')),
+        ('std::pair<int,std::string>', ('std::pair', 'int', 'std::string')),
+        ('std::map<std::pair<int, std::string>, double>', 
+            ('std::map', ('std::pair', 'int', 'std::string'), 'double')),
+        ]
+    for t, exp in cases:
+        obs = sa.canonize_type(t)
+        yield assert_equal, exp, obs
 
 #
 # pass 3 Filters
@@ -373,20 +451,162 @@ def test_itdbfilter():
     yield assert_equal, exp_args, args
 
     impl = f.impl()
-    exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
-                '  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, '
-                                                   'rawcycpp_shape_y + 1);\n'
-                '  tree = tree->SubTree("config/*");\n'
-                '  cyclus::InfileTree* sub;\n'
-                '  int i;\n'
-                '  int n;\n'
-                '  x = cyclus::Query<int>(tree, "x");\n'
-                'THINGFISH\n'
-                '  di.NewDatum("Info")\n'
-                '  ->AddVal("x", x)\n'
-                'ABSOLUTELY FREE\n'
-                '  ->Record();\n')
+    exp_impl = (
+        '  int rawcycpp_shape_y[1] = {42};\n  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, rawcycpp_shape_y + 1);\n  cyclus::InfileTree* sub = tree->SubTree("config/*");\n  int i;\n  int n;\n  {\n    int x_val = cyclus::Query<int>(sub, "x");\n    x = x_val;\n  }\nTHINGFISH\n  di.NewDatum("Info")\n  ->AddVal("x", x)\nABSOLUTELY FREE\n  ->Record();\n'
+        )
+
     yield assert_equal, exp_impl, impl
+
+def test_itdbfilter_val():
+    """Test InfileToDbFilter._val() Defaults"""
+    m = MockCodeGenMachine()
+    f = InfileToDbFilter(m)
+
+    cases = [
+        ('bool', True, 'foo', None, 'bool foo = true;\n'), 
+        ('bool', False, 'foo', None, 'bool foo = false;\n'), 
+        ('int', 42, 'foo', None, 'int foo = 42;\n'), 
+        ('int', 92235, 'foo', 'nuclide', 'int foo = pyne::nucname::id(92235);\n'), 
+        ('int', 'U-235', 'foo', 'nuclide', 'int foo = pyne::nucname::id("U-235");\n'), 
+        ('float', 42.0, 'foo', None, 'double foo = 42.0;\n'), 
+        ('double', 42.0, 'foo', None, 'double foo = 42.0;\n'), 
+        ('std::string', 'wakka', 'foo', None, 'std::string foo("wakka");\n'),
+        ('cyclus::Blob', 'wakka', 'foo', None, 'cyclus::Blob foo("wakka");\n'),
+        ('boost::uuids::uuid', 
+            '/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb', 'foo', None, 
+            'boost::uuids::uuid foo = "/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb";\n'),
+        ('boost::uuids::uuid', 
+            uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), 'foo', None, 
+            'boost::uuids::uuid foo = {0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, 0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92};\n'),
+        (('std::vector', 'int'), [42], 'foo', None, 
+            ('std::vector< int > foo;\n'
+             'foo.resize(1);\n'
+             '{\n'
+             '  {\n'
+             '    int elem = 42;\n'
+             '    foo[0] = elem;\n'
+             '  }\n'
+             '}\n'),
+            ),
+        (('std::vector', 'int'), [92235], 'foo', [None, 'nuclide'], 
+            ('std::vector< int > foo;\n'
+             'foo.resize(1);\n'
+             '{\n'
+             '  {\n'
+             '    int elem = pyne::nucname::id(92235);\n'
+             '    foo[0] = elem;\n'
+             '  }\n'
+             '}\n'),
+            ),
+        (('std::set', 'int'), [42, 65], 'foo', None, 
+            ('std::set< int > foo;\n'
+             '{\n'
+             '  {\n'
+             '    int elem = 42;\n'
+             '    foo.insert(elem);\n'
+             '  }\n'
+             '  {\n'
+             '    int elem = 65;\n'
+             '    foo.insert(elem);\n'
+             '  }\n'
+             '}\n'),
+            ),
+        (('std::list', 'int'), [42, 65], 'foo', None, 
+            ('std::list< int > foo;\n'
+             '{\n'
+             '  {\n'
+             '    int elem = 42;\n'
+             '    foo.push_back(elem);\n'
+             '  }\n'
+             '  {\n'
+             '    int elem = 65;\n'
+             '    foo.push_back(elem);\n'
+             '  }\n'
+             '}\n'),
+            ),
+        (('std::pair', 'int', 'double'), [42, 65.0], 'foo', None, 
+            ('std::pair< int, double > foo;\n'
+             '{\n'
+             '  int first = 42;\n'
+             '  double second = 65.0;\n'
+             '  foo.first = first;\n'
+             '  foo.second = second;\n'
+             '}\n'),
+            ),
+        (('std::map', 'int', 'double'), {42: 65.0}, 'foo', None, 
+            ('std::map< int, double > foo;\n'
+             '{\n'
+             '  {\n'
+             '    int key = 42;\n'
+             '    double val = 65.0;\n'
+             '    foo[key] = val;\n'
+             '  }\n'
+             '}\n'),
+            ),
+        (('std::map', 'std::string', ('std::pair', 'bool', ('std::vector', 'double'))),
+            OrderedDict([('hello', [True, [1.1, 2.2, 3.3]]), ('goodbye', [False, [3.3, 2.2, 1.1]])]),
+            'foo', None,
+            ('std::map< std::string, std::pair< bool, std::vector< double > > > foo;\n'
+             '{\n'
+             '  {\n'
+             '    std::string key("hello");\n'
+             '    std::pair< bool, std::vector< double > > val;\n'
+             '    {\n'
+             '      bool first = true;\n'
+             '      std::vector< double > second;\n'
+             '      second.resize(3);\n'
+             '      {\n'
+             '        {\n'
+             '          double elem = 1.1;\n'
+             '          second[0] = elem;\n'
+             '        }\n'
+             '        {\n'
+             '          double elem = 2.2;\n'
+             '          second[1] = elem;\n'
+             '        }\n'
+             '        {\n'
+             '          double elem = 3.3;\n'
+             '          second[2] = elem;\n'
+             '        }\n'
+             '      }\n'
+             '      val.first = first;\n'
+             '      val.second = second;\n'
+             '    }\n'
+             '    foo[key] = val;\n'
+             '  }\n'
+             '  {\n'
+             '    std::string key("goodbye");\n'
+             '    std::pair< bool, std::vector< double > > val;\n'
+             '    {\n'
+             '      bool first = false;\n'
+             '      std::vector< double > second;\n'
+             '      second.resize(3);\n'
+             '      {\n'
+             '        {\n'
+             '          double elem = 3.3;\n'
+             '          second[0] = elem;\n'
+             '        }\n'
+             '        {\n'
+             '          double elem = 2.2;\n'
+             '          second[1] = elem;\n'
+             '        }\n'
+             '        {\n'
+             '          double elem = 1.1;\n'
+             '          second[2] = elem;\n'
+             '        }\n'
+             '      }\n'
+             '      val.first = first;\n'
+             '      val.second = second;\n'
+             '    }\n'
+             '    foo[key] = val;\n'
+             '  }\n'
+             '}\n'),
+            ),
+        ]
+
+    for t, v, name, uitype, exp in cases:
+        obs = f._val(t, val=v, name=name, uitype=uitype)
+        yield assert_equal, exp, obs
 
 def test_schemafilter():
     """Test SchemaFilter"""
@@ -401,11 +621,11 @@ def test_schemafilter():
     impl = f.impl()
     exp_impl = ('  return ""\n'
                 '    "<interleave>\\n"\n'
-                '    "<element name=\\"x\\">\\n"\n'
-                '    "    <data type=\\"positiveInteger\\" />\\n"\n'
-                '    "</element>\\n"\n'
-                "FREAK OUT\n"
-                '    "</interleave>\\n"\n    ;\n')
+                '    "    <element name=\\"x\\">\\n"\n'
+                '    "        <data type=\\"positiveInteger\\"/>\\n"\n'
+                '    "    </element>\\n"\n'
+                '    "    FREAK OUT\\n"\n'
+                '    "</interleave>\\n";\n')
     yield assert_equal, exp_impl, impl
 
     # schema type tests
@@ -418,19 +638,24 @@ def test_schemafilter():
             ]))
             ])}
     impl = f.impl()
-    exp_impl = ('  return ""\n'
-                '    "<interleave>\\n"\n'
-                '    "<element name=\\"x\\">\\n"\n'
-                '    "    <oneOrMore>\\n"\n'
-                '    "        <element name=\\"key\\">\\n"\n'
-                '    "            <data type=\\"int\\" />\\n"\n'
-                '    "        </element>\\n"\n'
-                '    "        <element name=\\"val\\">\\n"\n'
-                '    "            <data type=\\"double\\" />\\n"\n'
-                '    "        </element>\\n"\n'
-                '    "    </oneOrMore>\\n"\n'
-                '    "</element>\\n"\n'
-                '    "</interleave>\\n"\n    ;\n')
+    exp_impl = (
+        '  return ""\n'
+        '    "<interleave>\\n"\n'
+        '    "    <element name=\\"x\\">\\n"\n'
+        '    "        <oneOrMore>\\n"\n'
+        '    "            <element name=\\"item\\">\\n"\n'
+        '    "                <interleave>\\n"\n'
+        '    "                    <element name=\\"key\\">\\n"\n'
+        '    "                        <data type=\\"int\\"/>\\n"\n'
+        '    "                    </element>\\n"\n'
+        '    "                    <element name=\\"val\\">\\n"\n'
+        '    "                        <data type=\\"double\\"/>\\n"\n'
+        '    "                    </element>\\n"\n'
+        '    "                </interleave>\\n"\n'
+        '    "            </element>\\n"\n'
+        '    "        </oneOrMore>\\n"\n'
+        '    "    </element>\\n"\n'
+        '    "</interleave>\\n";\n')
     yield assert_equal, exp_impl, impl
 
 def test_annotationsfilter():
@@ -478,6 +703,13 @@ def test_sshinvfilter():
                 "  return invs;\n")
     yield assert_equal, exp_impl, impl
 
+    f = SnapshotInvFilter(m)
+    f.given_classname = 'MyFactory'
+    f.mode = 'impl'
+    impl = f.impl()
+    exp_impl = ("  cyclus::Inventories invs;\n")
+    yield assert_equal, exp_impl, impl
+
 def test_intinvfilter():
     """Test InitInvFilter"""
     m = MockCodeGenMachine()
@@ -497,6 +729,281 @@ def test_defpragmafilter():
     m = MockCodeGenMachine()
     f = DefaultPragmaFilter(m)
 
+def test_schemafilter_buildschema():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = SchemaFilter(m)
+
+    schematype = None
+    uitype = None
+    names = None
+
+    cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
+    names = ['streams']
+    exp = ('<element name="streams"><oneOrMore><element name="item">'
+           '<interleave><element name="key"><data type="string" /></element>'
+           '<element name="val"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
+
+    cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
+    names = ['streams', 'name', ['efficiencies', 'val']]
+    exp = ('<element name="streams"><oneOrMore><element name="item">'
+           '<interleave><element name="name"><data type="string" /></element>'
+           '<element name="efficiencies"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
+
+    # test item aliasing
+    cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
+    names = [['streams', 'entry'], 'name', ['efficiencies', 'val']]
+    exp = ('<element name="streams"><oneOrMore><element name="entry">'
+           '<interleave><element name="name"><data type="string" /></element>'
+           '<element name="efficiencies"><oneOrMore><element name="val">'
+           '<data type="double" /></element></oneOrMore></element>'
+           '</interleave></element></oneOrMore></element>')
+    obs = f._buildschema(cpptype, schematype, uitype, names)
+    yield assert_equal, exp, obs
+
+def test_escape_xml():
+    """Test escape_xml"""
+    xml = '<element name="mymap">' \
+          '<element name="key"><text1/></element><element name="val"><text2/></element>' \
+          '</element>'
+    got = cycpp.escape_xml(xml)
+
+    s = '    "<element name=\\"mymap\\">\\n"\n' \
+        '    "    <element name=\\"key\\">\\n"\n' \
+        '    "        <text1/>\\n"\n' \
+        '    "    </element>\\n"\n' \
+        '    "    <element name=\\"val\\">\\n"\n' \
+        '    "        <text2/>\\n"\n' \
+        '    "    </element>\\n"\n' \
+        '    "</element>\\n"'
+
+    yield assert_equal, s, got
+
+def test_infiletodb_read_member1():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+    
+    cpptype = ('std::map', 'std::string', ('std::vector', 
+                ('std::vector', ('std::pair', 'double', 
+                  ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
+    alias = ['streams', 'name', ['efficiencies', 'val']]
+    gen = f.read_member('mymap', alias, cpptype, uitype=None)
+    exp_gen = (
+        '  std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap;\n'
+        '  {\n'
+        '    cyclus::InfileTree* bub = sub->SubTree("streams", 0);\n'
+        '    cyclus::InfileTree* sub = bub;\n'
+        '    int n1 = sub->NMatches("item");\n'
+        '    std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap_in;\n'
+        '    for (int i1 = 0; i1 < n1; ++i1) {\n'
+        '      std::string key;\n'
+        '      {\n'
+        '        std::string key_in = cyclus::Query<std::string>(sub, "item/name", i1);\n'
+        '        key = key_in;\n'
+        '      }\n'
+        '      std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val;\n'
+        '      {\n'
+        '        cyclus::InfileTree* bub = sub->SubTree("item/efficiencies", i1);\n'
+        '        cyclus::InfileTree* sub = bub;\n'
+        '        int n2 = sub->NMatches("val");\n'
+        '        std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > val_in;\n'
+        '        val_in.resize(n2);\n'
+        '        for (int i2 = 0; i2 < n2; ++i2) {\n'
+        '          std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > elem;\n'
+        '          {\n'
+        '            cyclus::InfileTree* bub = sub->SubTree("val", i2);\n'
+        '            cyclus::InfileTree* sub = bub;\n'
+        '            int n3 = sub->NMatches("val");\n'
+        '            std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > elem_in;\n'
+        '            elem_in.resize(n3);\n'
+        '            for (int i3 = 0; i3 < n3; ++i3) {\n'
+        '              std::pair< double, std::pair< int, std::list< std::set< bool > > > > elem;\n'
+        '              {\n'
+        '                cyclus::InfileTree* bub = sub->SubTree("val", i3);\n'
+        '                cyclus::InfileTree* sub = bub;\n'
+        '                  double firsti3;\n'
+        '                  {\n'
+        '                    double firsti3_in = cyclus::Query<double>(sub, "first", 0);\n'
+        '                    firsti3 = firsti3_in;\n'
+        '                  }\n'
+        '                  std::pair< int, std::list< std::set< bool > > > secondi3;\n'
+        '                  {\n'
+        '                    cyclus::InfileTree* bub = sub->SubTree("second", 0);\n'
+        '                    cyclus::InfileTree* sub = bub;\n'
+        '                      int first0;\n'
+        '                      {\n'
+        '                        int first0_in = cyclus::Query<int>(sub, "first", 0);\n'
+        '                        first0 = first0_in;\n'
+        '                      }\n'
+        '                      std::list< std::set< bool > > second0;\n'
+        '                      {\n'
+        '                        cyclus::InfileTree* bub = sub->SubTree("second", 0);\n'
+        '                        cyclus::InfileTree* sub = bub;\n'
+        '                        int n4 = sub->NMatches("val");\n'
+        '                        std::list< std::set< bool > > second0_in;\n'
+        '                        for (int i4 = 0; i4 < n4; ++i4) {\n'
+        '                          std::set< bool > elem;\n'
+        '                          {\n'
+        '                            cyclus::InfileTree* bub = sub->SubTree("val", i4);\n'
+        '                            cyclus::InfileTree* sub = bub;\n'
+        '                            int n5 = sub->NMatches("val");\n'
+        '                            std::set< bool > elem_in;\n'
+        '                            for (int i5 = 0; i5 < n5; ++i5) {\n'
+        '                              bool elem;\n'
+        '                              {\n'
+        '                                bool elem_in = cyclus::Query<bool>(sub, "val", i5);\n'
+        '                                elem = elem_in;\n'
+        '                              }\n'
+        '                              elem_in.insert(elem);\n'
+        '                            }\n'
+        '                            elem = elem_in;\n'
+        '                          }\n'
+        '                          second0_in.push_back(elem);\n'
+        '                        }\n'
+        '                        second0 = second0_in;\n'
+        '                      }\n'
+        '                    std::pair< int, std::list< std::set< bool > > > secondi3_in(first0, second0);\n'
+        '                    secondi3 = secondi3_in;\n'
+        '                  }\n'
+        '                std::pair< double, std::pair< int, std::list< std::set< bool > > > > elem_in(firsti3, secondi3);\n'
+        '                elem = elem_in;\n'
+        '              }\n'
+        '              elem_in[i3] = elem;\n'
+        '            }\n'
+        '            elem = elem_in;\n'
+        '          }\n'
+        '          val_in[i2] = elem;\n'
+        '        }\n'
+        '        val = val_in;\n'
+        '      }\n'
+        '      mymap_in[key] = val;\n'
+        '    }\n'
+        '    mymap = mymap_in;\n'
+        '  }\n')
+    
+    ## useful for debugging test failures
+    #print(gen)
+    #print(exp_gen)
+
+    yield assert_equal, exp_gen, gen
+
+def test_infiletodb_read_member2():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+
+    alias = ['map', 'int', ['vector', ['pair', 'str1', 'str2']]]
+    cpptype = ('std::map', 'int', ('std::vector', ('std::pair', 'std::string', 'std::string')))
+    gen = f.read_member('mymap', alias, cpptype, uitype=None)
+    exp_gen = (
+        '  std::map< int, std::vector< std::pair< std::string, std::string > > > mymap;\n'
+        '  {\n'
+        '    cyclus::InfileTree* bub = sub->SubTree("map", 0);\n'
+        '    cyclus::InfileTree* sub = bub;\n'
+        '    int n1 = sub->NMatches("item");\n'
+        '    std::map< int, std::vector< std::pair< std::string, std::string > > > mymap_in;\n'
+        '    for (int i1 = 0; i1 < n1; ++i1) {\n'
+        '      int key;\n'
+        '      {\n'
+        '        int key_in = cyclus::Query<int>(sub, "item/int", i1);\n'
+        '        key = key_in;\n'
+        '      }\n'
+        '      std::vector< std::pair< std::string, std::string > > val;\n'
+        '      {\n'
+        '        cyclus::InfileTree* bub = sub->SubTree("item/vector", i1);\n'
+        '        cyclus::InfileTree* sub = bub;\n'
+        '        int n2 = sub->NMatches("pair");\n'
+        '        std::vector< std::pair< std::string, std::string > > val_in;\n'
+        '        val_in.resize(n2);\n'
+        '        for (int i2 = 0; i2 < n2; ++i2) {\n'
+        '          std::pair< std::string, std::string > elem;\n'
+        '          {\n'
+        '            cyclus::InfileTree* bub = sub->SubTree("pair", i2);\n'
+        '            cyclus::InfileTree* sub = bub;\n'
+        '              std::string firsti2;\n'
+        '              {\n'
+        '                std::string firsti2_in = cyclus::Query<std::string>(sub, "str1", 0);\n'
+        '                firsti2 = firsti2_in;\n'
+        '              }\n'
+        '              std::string secondi2;\n'
+        '              {\n'
+        '                std::string secondi2_in = cyclus::Query<std::string>(sub, "str2", 0);\n'
+        '                secondi2 = secondi2_in;\n'
+        '              }\n'
+        '            std::pair< std::string, std::string > elem_in(firsti2, secondi2);\n'
+        '            elem = elem_in;\n'
+        '          }\n'
+        '          val_in[i2] = elem;\n'
+        '        }\n'
+        '        val = val_in;\n'
+        '      }\n'
+        '      mymap_in[key] = val;\n'
+        '    }\n'
+        '    mymap = mymap_in;\n'
+        '  }\n'
+    )
+    # # useful for debugging test failures
+    # print()
+    # print(gen)
+    # print(exp_gen)
+    yield assert_equal, exp_gen, gen
+
+def test_infiletodb_read_map():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+
+    cpptype = ('std::map', 'int', 'double') 
+    alias = [['streams', 'entry'], 'id', 'mass']
+    obs = f.read_member('mymap', alias, cpptype, uitype=None)
+
+    exp = (
+        '  std::map< int, double > mymap;\n'
+        '  {\n'
+        '    cyclus::InfileTree* bub = sub->SubTree("streams", 0);\n'
+        '    cyclus::InfileTree* sub = bub;\n'
+        '    int n1 = sub->NMatches("entry");\n'
+        '    std::map< int, double > mymap_in;\n'
+        '    for (int i1 = 0; i1 < n1; ++i1) {\n'
+        '      int key;\n'
+        '      {\n'
+        '        int key_in = cyclus::Query<int>(sub, "entry/id", i1);\n'
+        '        key = key_in;\n'
+        '      }\n'
+        '      double val;\n'
+        '      {\n'
+        '        double val_in = cyclus::Query<double>(sub, "entry/mass", i1);\n'
+        '        val = val_in;\n'
+        '      }\n'
+        '      mymap_in[key] = val;\n'
+        '    }\n'
+        '    mymap = mymap_in;\n'
+        '  }\n')
+
+    yield assert_equal, exp, obs
+
+
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
     m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
@@ -510,24 +1017,18 @@ def test_nuclide_uitype():
     impl = f.impl()
     exp_impl = ('  return ""\n'
                 '    "<interleave>\\n"\n'
-                '    "<element name=\\"x\\">\\n"\n'
-                '    "    <data type=\\"string\\" />\\n"\n'
-                '    "</element>\\n"\n'
-                '    "</interleave>\\n"\n    ;\n')
+                '    "    <element name=\\"x\\">\\n"\n'
+                '    "        <data type=\\"string\\"/>\\n"\n'
+                '    "    </element>\\n"\n'
+                '    "</interleave>\\n";\n')
     yield assert_equal, exp_impl, impl
 
     # test infiletodb updates
     f = InfileToDbFilter(m)
     f.given_classname = 'MyFactory'
     impl = f.impl()
-    exp_impl = ('  tree = tree->SubTree("config/*");\n'
-                '  cyclus::InfileTree* sub;\n'
-                '  int i;\n'
-                '  int n;\n'
-                '  x = pyne::nucname::id(cyclus::Query<std::string>(tree, "x"));\n'
-                '  di.NewDatum("Info")\n'
-                '  ->AddVal("x", x)\n'
-                '  ->Record();\n')
+    exp_impl = '  cyclus::InfileTree* sub = tree->SubTree("config/*");\n  int i;\n  int n;\n  {\n    int x_val = pyne::nucname::id(cyclus::Query<std::string>(sub, "x"));\n    x = x_val;\n  }\n  di.NewDatum("Info")\n  ->AddVal("x", x)\n  ->Record();\n'
+
     yield assert_equal, exp_impl, impl
 
     # test bad uitypes values fail

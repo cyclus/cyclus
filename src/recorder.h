@@ -46,16 +46,20 @@ class Recorder {
   friend class Datum;
 
  public:
-  /// create a new recorder with default dump frequency and random
-  /// simulation id.
+  /// create a new recorder with default dump frequency, random
+  /// simulation id, and simulation id injection.
   Recorder();
+
+  /// create a new recorder with the given dump count, random
+  /// simulation id, and given flag for injecting the simulation id.
+  Recorder(bool inject_sim_id);
 
   /// create a new recorder with the given dump count and random
   /// simulation id.
   Recorder(unsigned int dump_count);
 
-  /// create a new recorder with default dump frequency and the specified
-  /// simulation id.
+  /// create a new recorder with default dump frequency. the specified
+  /// simulation id, and simulation id injection.
   Recorder(boost::uuids::uuid simid);
 
   ~Recorder();
@@ -75,6 +79,19 @@ class Recorder {
   /// returns the unique id associated with this cyclus simulation.
   boost::uuids::uuid sim_id();
 
+  /// returns whether or not the unique simulation id will be injected.
+  bool inject_sim_id() { return inject_sim_id_; };
+
+  /// sets whether or not the unique simulation id will be injected.
+  void inject_sim_id(bool x) {
+    if (x == inject_sim_id_) {
+      return;
+    }
+    Flush();
+    inject_sim_id_ = x;
+    set_dump_count(dump_count_);
+  };
+ 
   /// Creates a new datum namespaced under the specified title.
   ///
   /// @warning choose title carefully to not conflict with Datum objects from other
@@ -106,6 +123,7 @@ class Recorder {
   std::list<RecBackend*> backs_;
   unsigned int dump_count_;
   boost::uuids::uuid uuid_;
+  bool inject_sim_id_;
 };
 
 }  // namespace cyclus

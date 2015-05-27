@@ -89,6 +89,10 @@ class Hdf5Back : public FullBackend {
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
+  virtual std::map<std::string, DbTypes> ColumnTypes(std::string table);
+
+  virtual std::set<std::string> Tables();
+
  private:
   /// Creates a QueryResult from a table description.
   QueryResult GetTableInfo(std::string title, hid_t dset, hid_t dt);
@@ -180,6 +184,7 @@ class Hdf5Back : public FullBackend {
   hvl_t VLValToBuf(const std::map<std::string, int>& x);
   hvl_t VLValToBuf(const std::map<std::string, double>& x);
   hvl_t VLValToBuf(const std::map<std::string, std::string>& x);
+  hvl_t VLValToBuf(const std::map<std::pair<int, std::string>, double>& x);
   /// \}
 
   /// Converts a variable length buffer to a value for HDF5.

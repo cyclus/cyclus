@@ -74,6 +74,8 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   if (qty_ < qty) {
     throw ValueError("mass extraction causes negative quantity");
   }
+
+  // TODO: decide if ExtractComp should force lazy-decay by calling comp()
   if (comp_ != c) {
     CompMap v(comp_->mass());
     compmath::Normalize(&v, qty_);
@@ -88,19 +90,36 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
   Material::Ptr other(new Material(ctx_, qty, c));
 
+  // Decay called on the extracted material should have the same dt as for
+  // this material regardless of composition.
+  other->prev_decay_time_ = prev_decay_time_;
+
   tracker_.Extract(&other->tracker_);
 
   return other;
 }
 
 void Material::Absorb(Material::Ptr mat) {
-  if (comp_ != mat->comp()) {
-    CompMap v(comp_->mass());
+  // these calls force lazy evaluation if in lazy decay mode
+  Composition::Ptr c0 = comp();
+  Composition::Ptr c1 = mat->comp();
+
+  if (c0 != c1) {
+    CompMap v(c0->mass());
     compmath::Normalize(&v, qty_);
-    CompMap otherv(mat->comp()->mass());
-    compmath::Normalize(&otherv, mat->quantity());
+    CompMap otherv(c1->mass());
+    compmath::Normalize(&otherv, mat->qty_);
     comp_ = Composition::CreateFromMass(compmath::Add(v, otherv));
   }
+
+  // Set the decay time to the value of the material that had the larger
+  // quantity.  This helps avoid inheriting erroneous prev decay times if, for
+  // example, you absorb a material into a zero-quantity material that had a
+  // prev decay time prior to the current simulation time step.
+  if (qty_ < mat->qty_) {
+    prev_decay_time_ = mat->prev_decay_time_;
+  }
+
   qty_ += mat->qty_;
   mat->qty_ = 0;
   tracker_.Absorb(&mat->tracker_);
@@ -109,41 +128,76 @@ void Material::Absorb(Material::Ptr mat) {
 void Material::Transmute(Composition::Ptr c) {
   comp_ = c;
   tracker_.Modify();
-}
 
-void Material::Decay(int curr_time) {
-  if (ctx_ != NULL && ctx_->sim_info().decay != "never") {
-    int dt = curr_time - prev_decay_time_;
-    double eps = 1e-3;
-    bool decay = false;
-  
-    const CompMap c = comp_->atom();
-    if (c.size() > 100) {
-      decay = true;
-    } else {
-      CompMap::const_iterator it;
-      for (it = c.end(); it != c.begin(); --it) {
-        int nuc = it->first;
-        // 2419200 == secs / month
-        double lambda_months = pyne::decay_const(nuc) * 2419200;
-  
-        if (eps <= 1 - std::exp(-lambda_months * dt)) {
-          decay = true;
-          break;
-        }
-      }
-    }
-  
-    if (decay) {
-      prev_decay_time_ = curr_time;
-      if (dt > 0) {
-        Transmute(comp_->Decay(dt));
-      }
-    }
+  // Presumably the user has chosen the new composition to be accurate for
+  // the current simulation time.  The next call to decay should not include
+  // accumulated decay delta t from a composition that no longer exists in
+  // this material.  This ---------+ condition allows testing to work.
+  //                               |
+  //                               |
+  //                               V
+  if (ctx_ != NULL && ctx_->time() > prev_decay_time_) {
+    prev_decay_time_ = ctx_->time();
   }
 }
 
+void Material::Decay(int curr_time) {
+  if (ctx_ != NULL && ctx_->sim_info().decay == "never") {
+    return;
+  } else if (curr_time < 0 && ctx_ == NULL) {
+    throw ValueError("decay cannot use default time with NULL context");
+  }
+
+  if (curr_time < 0) {
+    curr_time = ctx_->time();
+  }
+
+  int dt = curr_time - prev_decay_time_;
+  if (dt == 0) {
+    return;
+  }
+
+  double eps = 1e-3;
+  const CompMap c = comp_->atom();
+
+  // If composition has too many nuclides (i.e. > 100), it is cheaper to
+  // just do the decay rather than check all the decay constants.
+  bool decay = c.size() > 100;
+
+  if (!decay) {
+    // Only do the decay calc if one of the nuclides would change in number
+    // density more than fraction eps.
+    // i.e. decay if   (1 - eps) > exp(-lambda*dt)
+    CompMap::const_iterator it;
+    for (it = c.end(); it != c.begin(); --it) {
+      int nuc = it->first;
+      // 2629152 == secs / month
+      double lambda_months = pyne::decay_const(nuc) * 2629152.0;
+      double change = 1.0 - std::exp(-lambda_months * static_cast<double>(dt));
+      if (change >= eps) {
+        decay = true;
+        break;
+      }
+    }
+    if (!decay) {
+      return;
+    }
+  }
+
+  prev_decay_time_ = curr_time; // this must go before Transmute call
+  Composition::Ptr decayed = comp_->Decay(dt);
+  Transmute(decayed);
+}
+
 Composition::Ptr Material::comp() const {
+  throw Error("comp() const is deprecated - use non-const comp() function."
+              " Recompilation should fix the problem.");
+}
+
+Composition::Ptr Material::comp() {
+  if (ctx_ != NULL && ctx_->sim_info().decay == "lazy") {
+    Decay(-1);
+  }
   return comp_;
 }
 

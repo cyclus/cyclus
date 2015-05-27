@@ -65,6 +65,16 @@ class SimInit {
   /// must be called first.
   Timer* timer() { return &ti_; }
 
+  /// Convenience function for reconstructing an untracked material object with
+  /// the given resource state id from a database backend b.  Particularly
+  /// useful for running mock simulations/tests.
+  static Material::Ptr BuildMaterial(QueryableBackend* b, int resid);
+
+  /// Convenience function for reconstructing an untracked product object with
+  /// the given resource state id from a database backend b.  Particularly
+  /// useful for running mock simulations/tests.
+  static Product::Ptr BuildProduct(QueryableBackend* b, int resid);
+
  private:
   void InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t);
 
@@ -78,10 +88,12 @@ class SimInit {
   void LoadDecomSched();
   void LoadNextIds();
 
-  Resource::Ptr LoadResource(int resid);
-  Resource::Ptr LoadMaterial(int resid);
-  Resource::Ptr LoadProduct(int resid);
-  Composition::Ptr LoadComposition(int stateid);
+  void* LoadPreconditioner(std::string name);
+  ExchangeSolver* LoadGreedySolver(bool exclusive, std::set<std::string> tables);
+  static Resource::Ptr LoadResource(Context* ctx, QueryableBackend* b, int resid);
+  static Material::Ptr LoadMaterial(Context* ctx, QueryableBackend* b, int resid);
+  static Product::Ptr LoadProduct(Context* ctx, QueryableBackend* b, int resid);
+  static Composition::Ptr LoadComposition(QueryableBackend* b, int stateid);
 
   // std::map<AgentId, Agent*>
   std::map<int, Agent*> agents_;

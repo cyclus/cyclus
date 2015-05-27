@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "comp_math.h"
 #include "composition.h"
 #include "context.h"
 #include "facility.h"
@@ -86,7 +87,7 @@ Agent* ConstructInver(cy::Context* ctx) {
 
 class SimInitTest : public ::testing::Test {
  public:
-  SimInitTest() : rec(300) {}
+  SimInitTest() : rec((unsigned int) 300) {}
 
  protected:
   virtual void SetUp() {
@@ -116,8 +117,6 @@ class SimInitTest : public ::testing::Test {
     a2->prototype_ = "proto2";
 
     // manually snap and add prototypes
-    cy::SimInit::SnapAgent(a1);
-    cy::SimInit::SnapAgent(a2);
     ctx->AddPrototype("proto1", a1);
     ctx->AddPrototype("proto2", a2);
 
@@ -224,12 +223,14 @@ TEST_F(SimInitTest, InitRecipes) {
   cy::Context* init_ctx = si.context();
 
   cy::CompMap orig1 = ctx->GetRecipe("recipe1")->mass();
+  cy::compmath::Normalize(&orig1);
   cy::CompMap init1 = init_ctx->GetRecipe("recipe1")->mass();
   EXPECT_EQ(ctx->GetRecipe("recipe1")->id(), init_ctx->GetRecipe("recipe1")->id());
   EXPECT_FLOAT_EQ(orig1[922350000], init1[922350000]);
   EXPECT_FLOAT_EQ(orig1[922380000], init1[922380000]);
 
   cy::CompMap orig2 = ctx->GetRecipe("recipe1")->mass();
+  cy::compmath::Normalize(&orig2);
   cy::CompMap init2 = init_ctx->GetRecipe("recipe1")->mass();
   EXPECT_EQ(ctx->GetRecipe("recipe2")->id(), init_ctx->GetRecipe("recipe2")->id());
   EXPECT_FLOAT_EQ(orig2[922350000], init2[922350000]);

@@ -2,7 +2,7 @@
 #define CYCLUS_SRC_VERSION_H_
 
 #define CYCLUS_VERSION_MAJOR 1
-#define CYCLUS_VERSION_MINOR 2
+#define CYCLUS_VERSION_MINOR 3
 #define CYCLUS_VERSION_MICRO 0
 
 namespace cyclus {

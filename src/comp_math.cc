@@ -12,32 +12,29 @@ namespace compmath {
 
 CompMap Add(const CompMap& v1, const CompMap& v2) {
   CompMap out(v1);
-  CompMap vv2(v2);
   for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
     int nuc = it->first;
-    out[nuc] += vv2[nuc];
+    out[nuc] += it->second;
   }
   return out;
 }
 
 CompMap Sub(const CompMap& v1, const CompMap& v2) {
   CompMap out(v1);
-  CompMap vv2(v2);
   for (CompMap::const_iterator it = v2.begin(); it != v2.end(); ++it) {
     int nuc = it->first;
-    out[nuc] -= vv2[nuc];
+    out[nuc] -= it->second;
   }
   return out;
 }
 
 double Sum(const CompMap& v) {
   std::vector<double> vec;
+  vec.reserve(v.size());
   for (CompMap::const_iterator it = v.begin(); it != v.end(); ++it) {
     vec.push_back(it->second);
   }
-
-  double sum = CycArithmetic::KahanSum(vec);
-  return sum;
+  return CycArithmetic::KahanSum(vec);
 }
 
 void ApplyThreshold(CompMap* v, double threshold) {
@@ -61,8 +58,9 @@ void ApplyThreshold(CompMap* v, double threshold) {
 void Normalize(CompMap* v, double val) {
   double sum = Sum(*v);
   if (sum != val && sum != 0) {
+    double mult = val / sum;
     for (CompMap::iterator it = v->begin(); it != v->end(); ++it) {
-      (*v)[it->first] = it->second / sum * val;
+      it->second *= mult;
     }
   }
 }

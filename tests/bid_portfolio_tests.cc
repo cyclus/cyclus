@@ -62,7 +62,6 @@ TEST_F(BidPortfolioTests, RespAdd) {
   EXPECT_EQ(*rp->bids().begin(), r1);
 
   EXPECT_THROW(rp->AddBid(req2, get_mat(), fac2), KeyError);
-  EXPECT_THROW(rp->AddBid(req2, get_mat(), fac1), KeyError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

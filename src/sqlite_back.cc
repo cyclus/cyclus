@@ -6,6 +6,17 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/archive/tmpdir.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/list.hpp>
+#include <boost/serialization/set.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/assume_abstract.hpp>
+
 
 #include "blob.h"
 #include "datum.h"
@@ -36,7 +47,10 @@ SqliteBack::~SqliteBack() {
 SqliteBack::SqliteBack(std::string path) : db_(path) {
   path_ = path;
   db_.open();
-  hasher_ = Sha1();
+
+  db_.Execute("PRAGMA synchronous=OFF;");
+  db_.Execute("PRAGMA journal_mode=MEMORY;");
+  db_.Execute("PRAGMA temp_store=MEMORY;");
 
   // cache pre-existing table names
   SqlStatement::Ptr stmt;
@@ -50,124 +64,6 @@ SqliteBack::SqliteBack(std::string path) : db_(path) {
     std::string cmd = "CREATE TABLE IF NOT EXISTS FieldTypes";
     cmd += "(TableName TEXT,Field TEXT,Type INTEGER);";
     db_.Execute(cmd);
-  }
-
-  // initialize template type table statements
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS VectorInt (Sum BLOB,Val INTEGER);");
-  stmt->Exec();
-  vect_int_ins_ = db_.Prepare("INSERT INTO VectorInt VALUES (?,?);");
-  vect_int_get_ = db_.Prepare("SELECT Val FROM VectorInt WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM VectorInt;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    vect_int_keys_.insert(d);
-  }
-
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS VectorDbl (Sum BLOB,Val REAL);");
-  stmt->Exec();
-  vect_dbl_ins_ = db_.Prepare("INSERT INTO VectorDbl VALUES (?,?);");
-  vect_dbl_get_ = db_.Prepare("SELECT Val FROM VectorDbl WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM VectorDbl;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    vect_dbl_keys_.insert(d);
-  }
-
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS VectorStr (Sum BLOB,Val TEXT);");
-  stmt->Exec();
-  vect_str_ins_ = db_.Prepare("INSERT INTO VectorStr VALUES (?,?);");
-  vect_str_get_ = db_.Prepare("SELECT Val FROM VectorStr WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM VectorStr;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    vect_str_keys_.insert(d);
-  }
-
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS MapIntDouble (Sum BLOB,Key INTEGER,Val REAL);");
-  stmt->Exec();
-  map_int_double_ins_ = db_.Prepare("INSERT INTO MapIntDouble VALUES (?,?,?);");
-  map_int_double_get_ = db_.Prepare("SELECT Key,Val FROM MapIntDouble WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM MapIntDouble;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    map_int_double_keys_.insert(d);
-  }
-
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS MapIntInt (Sum BLOB,Key INTEGER,Val INTEGER);");
-  stmt->Exec();
-  map_int_int_ins_ = db_.Prepare("INSERT INTO MapIntInt VALUES (?,?,?);");
-  map_int_int_get_ = db_.Prepare("SELECT Key,Val FROM MapIntInt WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM MapIntInt;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    map_int_int_keys_.insert(d);
-  }
-
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS MapIntStr (Sum BLOB,Key INTEGER,Val TEXT);");
-  stmt->Exec();
-  map_int_str_ins_ = db_.Prepare("INSERT INTO MapIntStr VALUES (?,?,?);");
-  map_int_str_get_ = db_.Prepare("SELECT Key,Val FROM MapIntStr WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM MapIntStr;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    map_int_str_keys_.insert(d);
-  }
-
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS MapStrInt (Sum BLOB,Key TEXT,Val INTEGER);");
-  stmt->Exec();
-  map_str_int_ins_ = db_.Prepare("INSERT INTO MapStrInt VALUES (?,?,?);");
-  map_str_int_get_ = db_.Prepare("SELECT Key,Val FROM MapStrInt WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM MapStrInt;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    map_str_int_keys_.insert(d);
-  }
-
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS MapStrDouble (Sum BLOB,Key TEXT,Val REAL);");
-  stmt->Exec();
-  map_str_double_ins_ = db_.Prepare("INSERT INTO MapStrDouble VALUES (?,?,?);");
-  map_str_double_get_ = db_.Prepare("SELECT Key,Val FROM MapStrDouble WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM MapStrDouble;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    map_str_double_keys_.insert(d);
-  }
-
-  stmt = db_.Prepare("CREATE TABLE IF NOT EXISTS MapStrStr (Sum BLOB,Key TEXT,Val TEXT);");
-  stmt->Exec();
-  map_str_str_ins_ = db_.Prepare("INSERT INTO MapStrStr VALUES (?,?,?);");
-  map_str_str_get_ = db_.Prepare("SELECT Key,Val FROM MapStrStr WHERE Sum = ?;");
-  stmt = db_.Prepare("SELECT Sum FROM MapStrStr;");
-  while (stmt->Step()) {
-    Digest d;
-    int n;
-    char* data = stmt->GetText(0, &n);
-    memcpy(d.val, data, n);
-    map_str_str_keys_.insert(d);
   }
 }
 
@@ -228,6 +124,31 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
     q.rows.push_back(r);
   }
   return q;
+}
+
+std::map<std::string, DbTypes> SqliteBack::ColumnTypes(std::string table) {
+  QueryResult qr = GetTableInfo(table);
+  std::map<std::string, DbTypes> rtn;
+  for (int i = 0; i < qr.fields.size(); ++i)
+    rtn[qr.fields[i]] = qr.types[i];
+  return rtn;
+}
+
+std::set<std::string> SqliteBack::Tables() {
+  using std::set;
+  using std::string;
+  set<string> rtn;
+  std::string sql = "SELECT name FROM sqlite_master WHERE type='table';";
+  SqlStatement::Ptr stmt;
+  stmt = db_.Prepare(sql);
+  while (stmt->Step()) {
+    rtn.insert(stmt->GetText(0, NULL));
+  }
+  return rtn;
+}
+
+SqliteDb& SqliteBack::db() {
+  return db_;
 }
 
 QueryResult SqliteBack::GetTableInfo(std::string table) {
@@ -315,6 +236,21 @@ void SqliteBack::WriteDatum(Datum* d) {
 
 void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt,
                       int index) {
+
+// serializes the value v of type T and DBType D and binds it to stmt (inside
+// a case statement
+#define CYCLUS_COMMA ,
+#define CYCLUS_BINDVAL(D, T) \
+    case D: { \
+    T vect = v.cast<T>(); \
+    std::stringstream ss; \
+    boost::archive::xml_oarchive ar(ss); \
+    ar & BOOST_SERIALIZATION_NVP(vect); \
+    std::string s = ss.str(); \
+    stmt->BindBlob(index, s.c_str(), s.size()); \
+    break; \
+    }
+
   switch (type) {
   case INT: {
     stmt->BindInt(index, v.cast<int>());
@@ -346,267 +282,65 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
     stmt->BindBlob(index, ui.data, 16);
     break;
   }
-  case SET_INT: {
-    std::set<int> vect = v.cast<std::set<int> >();
-    hasher_.Clear();
-    hasher_.Update(vect);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (vect_int_keys_.count(d) == 0) {
-      std::set<int>::iterator it;
-      for (it = vect.begin(); it != vect.end(); ++it) {
-        vect_int_ins_->BindBlob(1, d.val, nbytes);
-        vect_int_ins_->BindInt(2, *it);
-        vect_int_ins_->Exec();
-      }
-      vect_int_keys_.insert(d);
-    }
-    break;
-  }
-  case SET_STRING: {
-    std::set<std::string> vect = v.cast<std::set<std::string> >();
-    hasher_.Clear();
-    hasher_.Update(vect);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (vect_str_keys_.count(d) == 0) {
-      std::set<std::string>::iterator it;
-      for (it = vect.begin(); it != vect.end(); ++it) {
-        vect_str_ins_->BindBlob(1, d.val, nbytes);
-        vect_str_ins_->BindText(2, it->c_str());
-        vect_str_ins_->Exec();
-      }
-      vect_str_keys_.insert(d);
-    }
-    break;
-  }
-  case LIST_INT: {
-    std::list<int> vect = v.cast<std::list<int> >();
-    hasher_.Clear();
-    hasher_.Update(vect);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (vect_int_keys_.count(d) == 0) {
-      std::list<int>::iterator it;
-      for (it = vect.begin(); it != vect.end(); ++it) {
-        vect_int_ins_->BindBlob(1, d.val, nbytes);
-        vect_int_ins_->BindInt(2, *it);
-        vect_int_ins_->Exec();
-      }
-      vect_int_keys_.insert(d);
-    }
-    break;
-  }
-  case LIST_STRING: {
-    std::list<std::string> vect = v.cast<std::list<std::string> >();
-    hasher_.Clear();
-    hasher_.Update(vect);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (vect_str_keys_.count(d) == 0) {
-      std::list<std::string>::iterator it;
-      for (it = vect.begin(); it != vect.end(); ++it) {
-        vect_str_ins_->BindBlob(1, d.val, nbytes);
-        vect_str_ins_->BindText(2, it->c_str());
-        vect_str_ins_->Exec();
-      }
-      vect_str_keys_.insert(d);
-    }
-    break;
-  }
-  case VECTOR_INT: {
-    std::vector<int> vect = v.cast<std::vector<int> >();
-    hasher_.Clear();
-    hasher_.Update(vect);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (vect_int_keys_.count(d) == 0) {
-      for (int i = 0; i < vect.size(); ++i) {
-        vect_int_ins_->BindBlob(1, d.val, nbytes);
-        vect_int_ins_->BindInt(2, vect[i]);
-        vect_int_ins_->Exec();
-      }
-      vect_int_keys_.insert(d);
-    }
-    break;
-  }
-  case VECTOR_DOUBLE: {
-    std::vector<double> vect = v.cast<std::vector<double> >();
-    hasher_.Clear();
-    hasher_.Update(vect);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (vect_dbl_keys_.count(d) == 0) {
-      for (int i = 0; i < vect.size(); ++i) {
-        vect_dbl_ins_->BindBlob(1, d.val, nbytes);
-        vect_dbl_ins_->BindDouble(2, vect[i]);
-        vect_dbl_ins_->Exec();
-      }
-      vect_dbl_keys_.insert(d);
-    }
-    break;
-  }
-  case VECTOR_STRING: {
-    std::vector<std::string> vect = v.cast<std::vector<std::string> >();
-    hasher_.Clear();
-    hasher_.Update(vect);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (vect_str_keys_.count(d) == 0) {
-      for (int i = 0; i < vect.size(); ++i) {
-        vect_str_ins_->BindBlob(1, d.val, nbytes);
-        vect_str_ins_->BindText(2, vect[i].c_str());
-        vect_str_ins_->Exec();
-      }
-      vect_str_keys_.insert(d);
-    }
-    break;
-  }
-  case MAP_INT_DOUBLE: {
-    std::map<int, double> m = v.cast<std::map<int, double> >();
-    hasher_.Clear();
-    hasher_.Update(m);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (map_int_double_keys_.count(d) == 0) {
-      std::map<int, double>::iterator it;
-      for (it = m.begin(); it != m.end(); ++it) {
-        map_int_double_ins_->BindBlob(1, d.val, nbytes);
-        map_int_double_ins_->BindInt(2, it->first);
-        map_int_double_ins_->BindDouble(3, it->second);
-        map_int_double_ins_->Exec();
-      }
-      map_int_double_keys_.insert(d);
-    }
-    break;
-  }
-  case MAP_INT_INT: {
-    std::map<int, int> m = v.cast<std::map<int, int> >();
-    hasher_.Clear();
-    hasher_.Update(m);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (map_int_int_keys_.count(d) == 0) {
-      std::map<int, int>::iterator it;
-      for (it = m.begin(); it != m.end(); ++it) {
-        map_int_int_ins_->BindBlob(1, d.val, nbytes);
-        map_int_int_ins_->BindInt(2, it->first);
-        map_int_int_ins_->BindInt(3, it->second);
-        map_int_int_ins_->Exec();
-      }
-      map_int_int_keys_.insert(d);
-    }
-    break;
-  }
-  case MAP_INT_STRING: {
-    std::map<int, std::string> m = v.cast<std::map<int, std::string> >();
-    hasher_.Clear();
-    hasher_.Update(m);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (map_int_str_keys_.count(d) == 0) {
-      std::map<int, std::string>::iterator it;
-      for (it = m.begin(); it != m.end(); ++it) {
-        map_int_str_ins_->BindBlob(1, d.val, nbytes);
-        map_int_str_ins_->BindInt(2, it->first);
-        map_int_str_ins_->BindText(3, it->second.c_str());
-        map_int_str_ins_->Exec();
-      }
-      map_int_str_keys_.insert(d);
-    }
-    break;
-  }
-  case MAP_STRING_INT: {
-    std::map<std::string, int> m = v.cast<std::map<std::string, int> >();
-    hasher_.Clear();
-    hasher_.Update(m);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (map_str_int_keys_.count(d) == 0) {
-      std::map<std::string, int>::iterator it;
-      for (it = m.begin(); it != m.end(); ++it) {
-        map_str_int_ins_->BindBlob(1, d.val, nbytes);
-        map_str_int_ins_->BindText(2, it->first.c_str());
-        map_str_int_ins_->BindInt(3, it->second);
-        map_str_int_ins_->Exec();
-      }
-      map_str_int_keys_.insert(d);
-    }
-    break;
-  }
-  case MAP_STRING_DOUBLE: {
-    std::map<std::string, double> m = v.cast<std::map<std::string, double> >();
-    hasher_.Clear();
-    hasher_.Update(m);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (map_str_double_keys_.count(d) == 0) {
-      std::map<std::string, double>::iterator it;
-      for (it = m.begin(); it != m.end(); ++it) {
-        map_str_double_ins_->BindBlob(1, d.val, nbytes);
-        map_str_double_ins_->BindText(2, it->first.c_str());
-        map_str_double_ins_->BindDouble(3, it->second);
-        map_str_double_ins_->Exec();
-      }
-      map_str_double_keys_.insert(d);
-    }
-    break;
-  }
-  case MAP_STRING_STRING: {
-    std::map<std::string, std::string> m =
-        v.cast<std::map<std::string, std::string> >();
-    hasher_.Clear();
-    hasher_.Update(m);
-    Digest d = hasher_.digest();
-    int nbytes = CYCLUS_SHA1_NINT*4;
-    stmt->BindBlob(index, d.val, nbytes);
-
-    if (map_str_str_keys_.count(d) == 0) {
-      std::map<std::string, std::string>::iterator it;
-      for (it = m.begin(); it != m.end(); ++it) {
-        map_str_str_ins_->BindBlob(1, d.val, nbytes);
-        map_str_str_ins_->BindText(2, it->first.c_str());
-        map_str_str_ins_->BindText(3, it->second.c_str());
-        map_str_str_ins_->Exec();
-      }
-      map_str_str_keys_.insert(d);
-    }
-    break;
-  }
+  CYCLUS_BINDVAL(SET_INT, std::set<int>);
+  CYCLUS_BINDVAL(SET_STRING, std::set<std::string>);
+  CYCLUS_BINDVAL(LIST_INT, std::list<int>);
+  CYCLUS_BINDVAL(LIST_STRING, std::list<std::string>);
+  CYCLUS_BINDVAL(VECTOR_INT, std::vector<int>);
+  CYCLUS_BINDVAL(VECTOR_DOUBLE, std::vector<double>);
+  CYCLUS_BINDVAL(VECTOR_STRING, std::vector<std::string>);
+  CYCLUS_BINDVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
+  CYCLUS_BINDVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
+  CYCLUS_BINDVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
+  CYCLUS_BINDVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
+  CYCLUS_BINDVAL(MAP_STRING_DOUBLE, std::map<std::string CYCLUS_COMMA double>);
+  CYCLUS_BINDVAL(MAP_STRING_STRING,
+                 std::map<std::string CYCLUS_COMMA std::string>);
+  CYCLUS_BINDVAL(MAP_STRING_VECTOR_DOUBLE,
+                 std::map<std::string CYCLUS_COMMA std::vector<double> >);
+  CYCLUS_BINDVAL(
+      MAP_STRING_MAP_INT_DOUBLE,
+      std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
+  CYCLUS_BINDVAL(MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+                 std::map<std::string CYCLUS_COMMA std::pair<
+                     double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
+  CYCLUS_BINDVAL(MAP_INT_MAP_STRING_DOUBLE,
+                 std::map<int CYCLUS_COMMA
+                          std::map<std::string CYCLUS_COMMA double> >);
+  CYCLUS_BINDVAL(
+      MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+      std::map<std::string CYCLUS_COMMA
+      std::vector<std::pair<int CYCLUS_COMMA
+      std::pair<std::string CYCLUS_COMMA std::string> > > >);
   default: {
     throw ValueError("attempted to retrieve unsupported sqlite backend type");
   }
   }
+#undef CYCLUS_BINDVAL
+#undef CYCLUS_COMMA
 }
 
 boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
                                              int col,
                                              DbTypes type) {
+
   boost::spirit::hold_any v;
+
+// reconstructs from a serialization in stmt of type T and DbType D and
+// store it in v.
+#define CYCLUS_COMMA ,
+#define CYCLUS_LOADVAL(D, T) \
+      case D: { \
+      char* data =  stmt->GetText(col, NULL); \
+      std::stringstream ss; \
+      ss << data; \
+      boost::archive::xml_iarchive ar(ss); \
+      T vect; \
+      ar & BOOST_SERIALIZATION_NVP(vect); \
+      v = vect; \
+      break; \
+      }
+
   switch (type) {
   case INT: {
     v = stmt->GetInt(col);
@@ -633,177 +367,44 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
     memcpy(&u, stmt->GetText(col, NULL), 16);
     v = u;
     break;
-  } case SET_INT: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::set<int> vect;
-    vect_int_get_->BindBlob(1, data, n);
-    while (vect_int_get_->Step()) {
-      vect.insert(vect_int_get_->GetInt(0));
-    }
-    vect_int_get_->Reset();
-    v = vect;
-    break;
-  } case SET_STRING: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::set<std::string> vect;
-    vect_str_get_->BindBlob(1, data, n);
-    while (vect_str_get_->Step()) {
-      vect.insert(vect_str_get_->GetText(0, NULL));
-    }
-    vect_str_get_->Reset();
-    v = vect;
-    break;
-  } case LIST_INT: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::list<int> vect;
-    vect_int_get_->BindBlob(1, data, n);
-    while (vect_int_get_->Step()) {
-      vect.push_back(vect_int_get_->GetInt(0));
-    }
-    vect_int_get_->Reset();
-    v = vect;
-    break;
-  } case LIST_STRING: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::list<std::string> vect;
-    vect_str_get_->BindBlob(1, data, n);
-    while (vect_str_get_->Step()) {
-      vect.push_back(vect_str_get_->GetText(0, NULL));
-    }
-    vect_str_get_->Reset();
-    v = vect;
-    break;
-  } case VECTOR_INT: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::vector<int> vect;
-    vect_int_get_->BindBlob(1, data, n);
-    while (vect_int_get_->Step()) {
-      vect.push_back(vect_int_get_->GetInt(0));
-    }
-    vect_int_get_->Reset();
-    v = vect;
-    break;
-  } case VECTOR_DOUBLE: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::vector<double> vect;
-    vect_dbl_get_->BindBlob(1, data, n);
-    while (vect_dbl_get_->Step()) {
-      vect.push_back(vect_dbl_get_->GetDouble(0));
-    }
-    vect_dbl_get_->Reset();
-    v = vect;
-    break;
-  } case VECTOR_STRING: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::vector<std::string> vect;
-    vect_str_get_->BindBlob(1, data, n);
-    while (vect_str_get_->Step()) {
-      vect.push_back(vect_str_get_->GetText(0, NULL));
-    }
-    vect_str_get_->Reset();
-    v = vect;
-    break;
-  } case MAP_INT_DOUBLE: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::map<int, double> m;
-    map_int_double_get_->BindBlob(1, data, n);
-    while (map_int_double_get_->Step()) {
-      int key = map_int_double_get_->GetInt(0);
-      double val = map_int_double_get_->GetDouble(1);
-      m[key] = val;
-    }
-    map_int_double_get_->Reset();
-    v = m;
-    break;
-  } case MAP_INT_INT: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::map<int, int> m;
-    map_int_int_get_->BindBlob(1, data, n);
-    while (map_int_int_get_->Step()) {
-      int key = map_int_int_get_->GetInt(0);
-      int val = map_int_int_get_->GetInt(1);
-      m[key] = val;
-    }
-    map_int_int_get_->Reset();
-    v = m;
-    break;
-  } case MAP_INT_STRING: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::map<int, std::string> m;
-    map_int_str_get_->BindBlob(1, data, n);
-    while (map_int_str_get_->Step()) {
-      int key = map_int_str_get_->GetInt(0);
-      std::string val = map_int_str_get_->GetText(1, NULL);
-      m[key] = val;
-    }
-    map_int_str_get_->Reset();
-    v = m;
-    break;
-  } case MAP_STRING_DOUBLE: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::map<std::string, double> m;
-    map_str_double_get_->BindBlob(1, data, n);
-    while (map_str_double_get_->Step()) {
-      std::string key = map_str_double_get_->GetText(0, NULL);
-      double val = map_str_double_get_->GetDouble(1);
-      m[key] = val;
-    }
-    map_str_double_get_->Reset();
-    v = m;
-    break;
-  } case MAP_STRING_INT: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::map<std::string, int> m;
-    map_str_int_get_->BindBlob(1, data, n);
-    while (map_str_int_get_->Step()) {
-      std::string key = map_str_int_get_->GetText(0, NULL);
-      int val = map_str_int_get_->GetInt(1);
-      m[key] = val;
-    }
-    map_str_int_get_->Reset();
-    v = m;
-    break;
-  } case MAP_STRING_STRING: {
-    int n;
-    char* data = stmt->GetText(col, &n);
-
-    std::map<std::string, std::string> m;
-    map_str_str_get_->BindBlob(1, data, n);
-    while (map_str_str_get_->Step()) {
-      std::string key = map_str_str_get_->GetText(0, NULL);
-      std::string val = map_str_str_get_->GetText(1, NULL);
-      m[key] = val;
-    }
-    map_str_str_get_->Reset();
-    v = m;
-    break;
-  } default: {
+  }
+  CYCLUS_LOADVAL(SET_INT, std::set<int>);
+  CYCLUS_LOADVAL(SET_STRING, std::set<std::string>);
+  CYCLUS_LOADVAL(LIST_INT, std::list<int>);
+  CYCLUS_LOADVAL(LIST_STRING, std::list<std::string>);
+  CYCLUS_LOADVAL(VECTOR_INT, std::vector<int>);
+  CYCLUS_LOADVAL(VECTOR_DOUBLE, std::vector<double>);
+  CYCLUS_LOADVAL(VECTOR_STRING, std::vector<std::string>);
+  CYCLUS_LOADVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
+  CYCLUS_LOADVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
+  CYCLUS_LOADVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
+  CYCLUS_LOADVAL(MAP_STRING_DOUBLE, std::map<std::string CYCLUS_COMMA double>);
+  CYCLUS_LOADVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
+  CYCLUS_LOADVAL(MAP_STRING_STRING,
+                 std::map<std::string CYCLUS_COMMA std::string>);
+  CYCLUS_LOADVAL(MAP_STRING_VECTOR_DOUBLE,
+                 std::map<std::string CYCLUS_COMMA std::vector<double> >);
+  CYCLUS_LOADVAL(
+      MAP_STRING_MAP_INT_DOUBLE,
+      std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
+  CYCLUS_LOADVAL(MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+                 std::map<std::string CYCLUS_COMMA std::pair<
+                     double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
+  CYCLUS_LOADVAL(MAP_INT_MAP_STRING_DOUBLE,
+                 std::map<int CYCLUS_COMMA
+                          std::map<std::string CYCLUS_COMMA double> >);
+  CYCLUS_LOADVAL(
+      MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+      std::map<std::string CYCLUS_COMMA
+      std::vector<std::pair<int CYCLUS_COMMA
+      std::pair<std::string CYCLUS_COMMA std::string> > > >);
+  default: {
     throw ValueError("Attempted to retrieve unsupported backend type");
   }}
+  
+#undef CYCLUS_LOADVAL
+#undef CYCLUS_COMMA
+
   return v;
 }
 
@@ -841,41 +442,33 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
     type_map[&typeid(Blob)] = BLOB;
     type_map[&typeid(boost::uuids::uuid)] = UUID;
     type_map[&typeid(std::string)] = STRING;
-
     type_map[&typeid(std::set<int>)] = SET_INT;
-    // type_map[&typeid(std::set<double>)] = SET_DOUBLE;
-    // type_map[&typeid(std::set<float>)] = SET_FLOAT;
-    // type_map[&typeid(std::set<Blob>)] = SET_BLOB;
-    // type_map[&typeid(std::set<boost::uuids::uuid>)] = SET_UUID;
     type_map[&typeid(std::set<std::string>)] = SET_STRING;
-
     type_map[&typeid(std::vector<int>)] = VECTOR_INT;
     type_map[&typeid(std::vector<double>)] = VECTOR_DOUBLE;
-    // type_map[&typeid(std::vector<float>)] = VECTOR_FLOAT;
-    // type_map[&typeid(std::vector<Blob>)] = VECTOR_BLOB;
-    // type_map[&typeid(std::vector<boost::uuids::uuid>)] = VECTOR_UUID;
     type_map[&typeid(std::vector<std::string>)] = VECTOR_STRING;
-
     type_map[&typeid(std::list<int>)] = LIST_INT;
-    // type_map[&typeid(std::list<double>)] = LIST_DOUBLE;
-    // type_map[&typeid(std::list<float>)] = LIST_FLOAT;
-    // type_map[&typeid(std::list<Blob>)] = LIST_BLOB;
-    // type_map[&typeid(std::list<boost::uuids::uuid>)] = LIST_UUID;
     type_map[&typeid(std::list<std::string>)] = LIST_STRING;
-
     type_map[&typeid(std::map<int, int>)] = MAP_INT_INT;
     type_map[&typeid(std::map<int, double>)] = MAP_INT_DOUBLE;
-    // type_map[&typeid(std::map<int, float>)] = MAP_INT_FLOAT;
-    // type_map[&typeid(std::map<int, Blob>)] = MAP_INT_BLOB;
-    // type_map[&typeid(std::map<int, boost::uuids::uuid>)] = MAP_INT_UUID;
     type_map[&typeid(std::map<int, std::string>)] = MAP_INT_STRING;
-
     type_map[&typeid(std::map<std::string, int>)] = MAP_STRING_INT;
     type_map[&typeid(std::map<std::string, double>)] = MAP_STRING_DOUBLE;
-    // type_map[&typeid(std::map<std::string, float>)] = MAP_STRING_FLOAT;
-    // type_map[&typeid(std::map<std::string, Blob>)] = MAP_STRING_BLOB;
-    // type_map[&typeid(std::map<std::string, boost::uuids::uuid>)] = MAP_STRING_UUID;
     type_map[&typeid(std::map<std::string, std::string>)] = MAP_STRING_STRING;
+    type_map[&typeid(std::map<std::string, std::vector<double> >)] =
+        MAP_STRING_VECTOR_DOUBLE;
+    type_map[&typeid(std::map<std::string, std::map<int, double> >)] =
+        MAP_STRING_MAP_INT_DOUBLE;
+    type_map[&typeid(std::map<std::string,
+                              std::pair<double, std::map<int, double> > >)] =
+        MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE;
+    type_map[&typeid(std::map<int, std::map<std::string, double> >)] =
+        MAP_INT_MAP_STRING_DOUBLE;
+    type_map[&typeid(
+        std::map<std::string,
+                 std::vector<std::pair<int, std::pair<std::string,
+                                                      std::string> > > >)] =
+        MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING;
   }
 
   const std::type_info* ti = &v.type();

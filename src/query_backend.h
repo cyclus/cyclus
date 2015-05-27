@@ -160,6 +160,87 @@ enum DbTypes {
   VL_MAP_VL_STRING_BLOB,
   MAP_VL_STRING_UUID,
   VL_MAP_VL_STRING_UUID,
+  // maps with pair<int, string> keys and double values
+  MAP_PAIR_INT_STRING_DOUBLE,
+  VL_MAP_PAIR_INT_STRING_DOUBLE,
+  MAP_PAIR_INT_VL_STRING_DOUBLE,
+  VL_MAP_PAIR_INT_VL_STRING_DOUBLE,
+
+  // append new types only:
+
+  // map<string, vector<double> >
+  MAP_STRING_VECTOR_DOUBLE,
+  MAP_STRING_VL_VECTOR_DOUBLE,
+  VL_MAP_STRING_VECTOR_DOUBLE,
+  MAP_VL_STRING_VECTOR_DOUBLE,
+  MAP_VL_STRING_VL_VECTOR_DOUBLE,
+  VL_MAP_STRING_VL_VECTOR_DOUBLE,
+  VL_MAP_VL_STRING_VECTOR_DOUBLE,
+  VL_MAP_VL_STRING_VL_VECTOR_DOUBLE,
+
+  // map<string, map<int, double> >
+  MAP_STRING_MAP_INT_DOUBLE,
+  MAP_STRING_VL_MAP_INT_DOUBLE,
+  VL_MAP_STRING_MAP_INT_DOUBLE,
+  MAP_VL_STRING_MAP_INT_DOUBLE,
+  MAP_VL_STRING_VL_MAP_INT_DOUBLE,
+  VL_MAP_STRING_VL_MAP_INT_DOUBLE,
+  VL_MAP_VL_STRING_MAP_INT_DOUBLE,
+  VL_MAP_VL_STRING_VL_MAP_INT_DOUBLE,
+
+  // map<string, pair<double, map<int, double> > >
+  MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+  VL_MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+  MAP_VL_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+  MAP_STRING_PAIR_DOUBLE_VL_MAP_INT_DOUBLE,
+  VL_MAP_VL_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+  VL_MAP_STRING_PAIR_DOUBLE_VL_MAP_INT_DOUBLE,
+  MAP_VL_STRING_PAIR_DOUBLE_VL_MAP_INT_DOUBLE,
+  VL_MAP_VL_STRING_PAIR_DOUBLE_VL_MAP_INT_DOUBLE,
+
+  // map<map< string, double > >
+  MAP_INT_MAP_STRING_DOUBLE,
+  MAP_INT_MAP_VL_STRING_DOUBLE,
+  VL_MAP_INT_MAP_STRING_DOUBLE,
+  VL_MAP_INT_MAP_VL_STRING_DOUBLE,
+  MAP_INT_VL_MAP_STRING_DOUBLE,
+  MAP_INT_VL_MAP_VL_STRING_DOUBLE,
+  VL_MAP_INT_VL_MAP_STRING_DOUBLE,
+  VL_MAP_INT_VL_MAP_VL_STRING_DOUBLE,
+
+  // map< string, vector< pair<int, pair<string string> > > >
+  MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+  MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,
+  MAP_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,
+  MAP_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,
+  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,
+  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,
+  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,
+  MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+  MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,
+  MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,
+  MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,
+  MAP_VL_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+  MAP_VL_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,
+  MAP_VL_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,
+  MAP_VL_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,
+  VL_MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+  VL_MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,
+  VL_MAP_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,
+  VL_MAP_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,
+  VL_MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+  VL_MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,
+  VL_MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,
+  VL_MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,
+  VL_MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+  VL_MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,
+  VL_MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,
+  VL_MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,
+  VL_MAP_VL_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+  VL_MAP_VL_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,
+  VL_MAP_VL_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,
+  VL_MAP_VL_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,
 };
 
 /// Represents operation codes for condition checking.
@@ -248,8 +329,12 @@ class QueryResult {
   /// @endcode
   template <class T>
   T GetVal(std::string field, int row = 0) {
+    if (rows.empty())
+      throw StateError("No rows found during query for field " + field);
+
     if (row >= rows.size()) {
-      throw KeyError("index larger than number of query rows");
+      throw KeyError("index larger than number of query rows for field "
+                     + field);
     }
 
     int field_idx = -1;
@@ -275,6 +360,13 @@ class QueryableBackend {
   /// Return a set of rows from the specificed table that match all given
   /// conditions.  Conditions are AND'd together.  conds may be NULL.
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) = 0;
+
+  /// Return a map of column names of the specified table to the associated 
+  /// database type.
+  virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) = 0;
+
+  /// Return a set of all table names currently in the database.
+  virtual std::set<std::string> Tables() = 0;
 };
 
 /// Interface implemented by backends that support recording and querying.
@@ -303,6 +395,12 @@ class CondInjector: public QueryableBackend {
     return b_->Query(table, &c);
   }
 
+  virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
+    return b_->ColumnTypes(table);
+  }
+
+  virtual std::set<std::string> Tables() { return b_->Tables(); }
+
  private:
   QueryableBackend* b_;
   std::vector<Cond> to_inject_;
@@ -321,6 +419,12 @@ class PrefixInjector: public QueryableBackend {
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
     return b_->Query(prefix_ + table, conds);
   }
+
+  virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
+    return b_->ColumnTypes(table);
+  }
+
+  virtual std::set<std::string> Tables() { return b_->Tables(); }
 
  private:
   QueryableBackend* b_;
@@ -508,6 +612,11 @@ class Sha1 {
     hash_.process_bytes(&(x.second), sizeof(int));
   }
 
+  inline void Update(const std::pair<int, std::string>& x) {
+    hash_.process_bytes(&(x.first), sizeof(int));
+    hash_.process_bytes(x.second.c_str(), x.second.size());
+  }
+
   inline void Update(const std::map<int, int>& x) {
     std::map<int, int>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -553,6 +662,15 @@ class Sha1 {
     for (; it != x.end(); ++it) {
       hash_.process_bytes(it->first.c_str(), it->first.size());
       hash_.process_bytes(it->second.c_str(), it->second.size());
+    }
+  }
+
+  inline void Update(const std::map<std::pair<int, std::string>, double>& x) {
+    std::map<std::pair<int, std::string>, double>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first.first), sizeof(int));
+      hash_.process_bytes(it->first.second.c_str(), it->first.second.size());
+      hash_.process_bytes(&(it->second), sizeof(double));
     }
   }
   /// \}

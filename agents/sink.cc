@@ -21,7 +21,12 @@ Sink::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
   double amt = Capacity();
+
   Material::Ptr mat = cyclus::NewBlankMaterial(amt);
+  if (!recipe_name.empty()) {
+    Composition::Ptr c = context()->GetRecipe(recipe_name);
+    mat = Material::CreateUntracked(amt, c);
+  }
 
   if (amt > cyclus::eps()) {
     CapacityConstraint<Material> cc(amt);
@@ -91,30 +96,27 @@ void Sink::AcceptProductTrades(
 void Sink::Tick() {
   using std::string;
   using std::vector;
-  LOG(cyclus::LEV_INFO3, "SnkFac") << prototype() << " is ticking";
-
   double request_amt = Capacity();
   // Inform the simulation about what the sink facility will be requesting
   if (request_amt > cyclus::eps()) {
     for (vector<string>::iterator commod = in_commods.begin();
          commod != in_commods.end();
          commod++) {
-      LOG(cyclus::LEV_INFO4, "SnkFac") << " will request " << request_amt
-          << " kg of " << *commod << ".";
+      LOG(cyclus::LEV_INFO3, "Sink")  << prototype()
+                                      << " will request " << request_amt
+                                      << " kg of " << *commod << ".";
     }
   }
 }
 
 void Sink::Tock() {
-  LOG(cyclus::LEV_INFO3, "SnkFac") << prototype() << " is tocking";
-
   // On the tock, the sink facility doesn't really do much.
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  LOG(cyclus::LEV_INFO4, "SnkFac") << "Sink " << this->id()
-                                   << " is holding " << inventory.quantity()
-                                   << " units of material at the close of month "
-                                   << context()->time() << ".";
+  LOG(cyclus::LEV_INFO3, "Sink") << prototype()
+                                 << " is holding " << inventory.quantity()
+                                 << " units of material at the close of month "
+                                 << context()->time() << ".";
 }
 
 extern "C" cyclus::Agent* ConstructSink(cyclus::Context* ctx) {

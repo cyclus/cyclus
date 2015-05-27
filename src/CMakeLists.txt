@@ -34,12 +34,14 @@ SET(
     PARENT_SCOPE
     )
 
-FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
+FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
 SET(
     CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
     ${cc_files}
     "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
     )
+
+set_source_files_properties(pyne_decay.cc PROPERTIES COMPILE_FLAGS "-O0")
 
 # write the include directories to a file for later use
 get_property(incdirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
