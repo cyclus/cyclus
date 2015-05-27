@@ -450,12 +450,15 @@ void SimInit::Init(Context* src, int dur) {
 
   ////////// clone build and decom schedules //////////////
   std::map<int, std::vector<std::pair<std::string, Agent*> > >::iterator bit;
-  std::map<int, std::vector<std::pair<std::string, Agent*> > >& builds = src->ti_->build_queue_;
+  std::map<int, std::vector<std::pair<std::string, Agent*> > > builds = src->ti_->build_queue_;
   for (bit = builds.begin(); bit != builds.end(); ++bit) {
     int t = bit->first;
-    std::vector<std::pair<std::string, Agent*> >& list = bit->second;
+    std::vector<std::pair<std::string, Agent*> > list = bit->second;
     for (int i = 0; i < list.size(); i++) {
-      Agent* a = agentmap[list[i].second->id()];
+      Agent* orig = list[i].second;
+      int id = orig->id_;
+      std::cout << "id = " << id << "\n";
+      Agent* a = agentmap[id];
       dst->ti_->build_queue_[t].push_back(std::make_pair(list[i].first, a));
     }
   }

@@ -243,6 +243,10 @@ Datum* Context::NewDatum(std::string title) {
   return rec_->NewDatum(title);
 }
 
+Context* Context::clone() {
+  return ti_->SnapdContext();
+}
+
 void Context::Snapshot() {
   ti_->Snapshot();
 }

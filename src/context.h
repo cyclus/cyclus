@@ -291,6 +291,11 @@ class Context {
     rec_->Flush();
   }
 
+  // Returns a clone of the context as generated at the last call of Snapshot
+  // (with all agents and everything copied.  This is NULL unless Snapshot has
+  // been called at least once previously.
+  Context* clone();
+
  private:
   /// Registers an agent as a participant in the simulation.
   inline void RegisterAgent(Agent* a) {
