@@ -21,7 +21,9 @@ void Agent::InitFrom(Agent* m) {
   kind_ = m->kind_;
   spec_ = m->spec_;
   lifetime_ = m->lifetime_;
+  parent_id_ = m->parent_id_;
   ctx_ = m->ctx_;
+  enter_time_ = m->enter_time_;
 }
 
 std::string Agent::InformErrorMsg(std::string msg) {

@@ -32,6 +32,11 @@ class SimInit {
   /// context's recorder is set to r.
   void Init(Recorder* r, QueryableBackend* b);
 
+  /// Initialize a simulation with data from b for simulation id in r. SimInit
+  /// does not take ownership of the recorder or backend. the configured
+  /// context's recorder is set to r.
+  void Init(Context* src, int dur);
+
   /// EXPERIMENTAL (might not work properly). Restarts a simulation from time t
   /// with data from b identified by simid.  The newly configured simulation
   /// will run with a new simulation id.

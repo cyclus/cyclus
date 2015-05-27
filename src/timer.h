@@ -21,6 +21,7 @@ class Agent;
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
   friend class ::SimInitTest;
+  friend class SimInit;
  public:
   Timer();
 

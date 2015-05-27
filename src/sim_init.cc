@@ -333,6 +333,138 @@ void SimInit::LoadPrototypes() {
   }
 }
 
+void SimInit::Init(Context* src, int dur) {
+  // DO NOT call the agents' Build methods because the agents might modify the
+  // state of their children and/or the simulation in ways that are only meant
+  // to be done once; remember that we are initializing agents from a
+  // simulation that was already started.
+  Warn<EXPERIMENTAL_WARNING>("init from context capability is not fully"
+                             " tested");
+  rec_ = new Recorder();
+  si_ = src->sim_info();
+  si_.parent_sim = src->sim_id();
+  si_.parent_type = "context-clone";
+  si_.branch_time = src->time();
+  si_.duration = dur;
+
+  Context* dst = new Context(&ti_, rec_);
+  dst->solver(src->solver_);
+  dst->trans_id_ = src->trans_id_;
+  dst->protos_ = src->protos_;
+  dst->recipes_ = src->recipes_;
+  dst->n_prototypes_ = src->n_prototypes_;
+  dst->n_specs_ = src->n_specs_;
+  dst->InitSim(si_);
+  ctx_ = dst;
+
+  ////////// Clone and rebuild agent hierarchy ///////////
+  std::set<Agent*>::iterator its;
+  std::map<int, int> parentmap;  // map<agentid, parentid>
+  std::map<int, Agent*> unbuilt;  // map<agentid, agent_ptr>
+  for (its = src->agent_list_.begin(); its != src->agent_list_.end(); ++its) {
+    Agent* a = *its;
+    if (a->enter_time() < 0) {
+      // not a live agent
+      continue;
+    }
+
+    a->ctx_ = dst;
+    Agent* copy = a->Clone();
+    a->ctx_ = src;
+
+    // agent-kernel init
+    copy->prototype_ = a->prototype_;
+    copy->id_ = a->id_;
+    copy->enter_time_ = a->enter_time_;
+    copy->parent_id_ = a->parent_id_;
+    parentmap[copy->id()] = a->parent_id();
+    unbuilt[copy->id()] = copy;
+  }
+
+  // construct agent hierarchy starting at roots (no parent) down
+  std::map<int, Agent*>::iterator it = unbuilt.begin();
+  std::vector<Agent*> enter_list;
+  std::map<int, Agent*> agentmap;
+  while (unbuilt.size() > 0) {
+    int id = it->first;
+    Agent* m = it->second;
+    int parentid = parentmap[id];
+
+    if (parentid == -1) {  // root agent
+      m->Connect(NULL);
+      agentmap[id] = m;
+      ++it;
+      unbuilt.erase(id);
+      enter_list.push_back(m);
+    } else if (agentmap.count(parentid) > 0) {  // parent is built
+      m->Connect(agentmap[parentid]);
+      agentmap[id] = m;
+      ++it;
+      unbuilt.erase(id);
+      enter_list.push_back(m);
+    } else {  // parent not built yet
+      ++it;
+    }
+    if (it == unbuilt.end()) {
+      it = unbuilt.begin();
+    }
+  }
+
+  // notify all agents that they are active in a simulation AFTER the
+  // parent-child hierarchy has been reconstructed.
+  for (int i = 0; i < enter_list.size(); ++i) {
+    enter_list[i]->EnterNotify();
+  }
+
+  ////////// clone and load all agent inventories /////////
+  for (its = src->agent_list_.begin(); its != src->agent_list_.end(); ++its) {
+    Agent* orig = *its;
+    if (orig->enter_time() < 0) {
+      // not a live agent
+      continue;
+    }
+
+    Agent* a = agentmap[orig->id()];
+    Inventories invs = orig->SnapshotInv();
+    Inventories copyinvs;
+    Inventories::iterator invit;
+    for (invit = invs.begin(); invit != invs.end(); ++invit) {
+      std::string name = invit->first;
+      std::vector<Resource::Ptr>& resvec = invit->second;
+      std::vector<Resource::Ptr> copyvec;
+      for (int i = 0; i < resvec.size(); i++) {
+        copyvec.push_back(resvec[i]->Clone());
+      }
+      copyinvs[name] = copyvec;
+    }
+    a->InitInv(copyinvs);
+  }
+
+  ////////// clone build and decom schedules //////////////
+  std::map<int, std::vector<std::pair<std::string, Agent*> > >::iterator bit;
+  std::map<int, std::vector<std::pair<std::string, Agent*> > >& builds = src->ti_->build_queue_;
+  for (bit = builds.begin(); bit != builds.end(); ++bit) {
+    int t = bit->first;
+    std::vector<std::pair<std::string, Agent*> >& list = bit->second;
+    for (int i = 0; i < list.size(); i++) {
+      Agent* a = agentmap[list[i].second->id()];
+      dst->ti_->build_queue_[t].push_back(std::make_pair(list[i].first, a));
+    }
+  }
+
+  std::map<int, std::vector<Agent*> >::iterator dit;
+  std::map<int, std::vector<Agent*> >& decoms = src->ti_->decom_queue_;
+  for (dit = decoms.begin(); dit != decoms.end(); ++dit) {
+    int t = dit->first;
+    std::vector<Agent*>& list = dit->second;
+    for (int i = 0; i < list.size(); i++) {
+      Agent* a = agentmap[list[i]->id()];
+      dst->ti_->decom_queue_[t].push_back(a);
+    }
+  }
+
+}
+
 void SimInit::LoadInitialAgents() {
   // DO NOT call the agents' Build methods because the agents might modify the
   // state of their children and/or the simulation in ways that are only meant

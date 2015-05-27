@@ -79,7 +79,9 @@ Context::Context(Timer* ti, Recorder* rec)
 
 Context::~Context() {
   if (solver_ != NULL) {
-    delete solver_;
+    // deleting the solver prevents multiple simulations in memory from
+    // sharing a single solver.
+    //delete solver_;
   }
 
   // initiate deletion of agents that don't have parents.
