@@ -286,6 +286,11 @@ class Context {
     return db_;
   }
 
+  /// Flush records all buffered data to the output database.
+  void Flush() {
+    rec_->Flush();
+  }
+
  private:
   /// Registers an agent as a participant in the simulation.
   inline void RegisterAgent(Agent* a) {
