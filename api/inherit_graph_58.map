@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classcyclus_1_1Resource.html" title="Resource defines an abstract interface implemented by types that are offered, requested, and transferred between simulation agents. " alt="" coords="6,31,130,57"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1Material.html" title="The material class is primarily responsible for enabling basic material manipulation while helping en..." alt="" coords="179,5,293,32"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1Product.html" title="A Product is a general type of resource in the Cyclus simulation, and is a catch&#45;all for non&#45;standard..." alt="" coords="179,56,293,83"/>
+</map>

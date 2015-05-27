@@ -1,0 +1,6 @@
+<map id="cyclus::Institution" name="cyclus::Institution">
+<area shape="rect" id="node2" href="$classcyclus_1_1Agent.html" title="The abstract base class used by all types of agents that live and interact in a simulation. " alt="" coords="29,80,131,107"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1StateWrangler.html" title="An abjstract interface that must be implemented by all simulation agents and all agent member variabl..." alt="" coords="5,5,155,32"/>
+<area shape="rect" id="node4" href="$classcyclus_1_1Ider.html" title="cyclus::Ider" alt="" coords="180,5,271,32"/>
+<area shape="rect" id="node5" href="$classcyclus_1_1TimeListener.html" title="The TimeListener class is an inheritable class for any Agent that requires knowlege of ticks and tock..." alt="" coords="155,80,297,107"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="cyclus::Error" name="cyclus::Error">
+<area shape="rect" id="node3" href="$classcyclus_1_1CastError.html" title="For failed casts that shouldn&#39;t. " alt="" coords="293,5,417,32"/>
+<area shape="rect" id="node4" href="$classcyclus_1_1IOError.html" title="for failed reading/writing to files, network connections, etc.. " alt="" coords="299,56,410,83"/>
+<area shape="rect" id="node5" href="$classcyclus_1_1KeyError.html" title="For failed retrieval/insertion of key&#45;based data into/from data structures. " alt="" coords="295,107,414,133"/>
+<area shape="rect" id="node6" href="$classcyclus_1_1StateError.html" title="For failed object state expectations. " alt="" coords="291,157,418,184"/>
+<area shape="rect" id="node7" href="$classcyclus_1_1ValidationError.html" title="For validating files received via IO. " alt="" coords="278,208,431,235"/>
+<area shape="rect" id="node8" href="$classcyclus_1_1ValueError.html" title="For values that are too big, too small, etc. " alt="" coords="290,259,419,285"/>
+</map>

@@ -1,3 +1,5 @@
 \form#0:\[ \min \sum_{i=1}^{N}c_i*y_i \\ s.t. \sum_{i=1}^{N}\phi_i*y_i \ge \Phi \\ n_i \in [0,\infty) \forall i \in I, y_i integer \]
 \form#1:$\phi_i$
 \form#2:$\Phi$
+\form#3:\[ y = mx + b \]
+\form#4:\[ y = ce^{ax} + b \]

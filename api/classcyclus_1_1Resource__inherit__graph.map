@@ -1,0 +1,4 @@
+<map id="cyclus::Resource" name="cyclus::Resource">
+<area shape="rect" id="node2" href="$classcyclus_1_1Material.html" title="The material class is primarily responsible for enabling basic material manipulation while helping en..." alt="" coords="5,80,120,107"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1Product.html" title="A Product is a general type of resource in the Cyclus simulation, and is a catch&#45;all for non&#45;standard..." alt="" coords="145,80,257,107"/>
+</map>
