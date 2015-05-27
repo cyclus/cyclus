@@ -350,12 +350,20 @@ void SimInit::Init(Context* src, int dur) {
   Context* dst = new Context(&ti_, rec_);
   dst->solver(src->solver_);
   dst->trans_id_ = src->trans_id_;
-  dst->protos_ = src->protos_;
   dst->recipes_ = src->recipes_;
   dst->n_prototypes_ = src->n_prototypes_;
   dst->n_specs_ = src->n_specs_;
   dst->InitSim(si_);
   ctx_ = dst;
+
+  // all the prototypes need to be cloned into the new context
+  std::map<std::string, Agent*>::iterator pit;
+  for (pit = src->protos_.begin(); pit != src->protos_.end(); ++pit) {
+    Agent* a = pit->second;
+    a->ctx_ = dst;
+    dst->protos_[pit->first] = a->Clone();
+    a->ctx_ = src;
+  }
 
   ////////// Clone and rebuild agent hierarchy ///////////
   std::set<Agent*>::iterator its;
@@ -458,7 +466,9 @@ void SimInit::Init(Context* src, int dur) {
     int t = dit->first;
     std::vector<Agent*>& list = dit->second;
     for (int i = 0; i < list.size(); i++) {
-      Agent* a = agentmap[list[i]->id()];
+      Agent* srca = list[i];
+      int id = srca->id_;
+      Agent* a = agentmap[id];
       dst->ti_->decom_queue_[t].push_back(a);
     }
   }
