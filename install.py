@@ -73,6 +73,9 @@ def install_cyclus(args):
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
 
+    if args.config_only:
+        return
+
     if args.update:
         update_describe()
 
@@ -123,6 +126,9 @@ def main():
 
     prefix = "the relative path to the installation directory"
     parser.add_argument('--prefix', help=prefix, default=localdir)
+
+    config_only = 'only configure the package, do not build or install'
+    parser.add_argument('--config-only', action='store_true', help=config_only)
 
     build_only = 'only build the package, do not install'
     parser.add_argument('--build-only', action='store_true', help=build_only)
