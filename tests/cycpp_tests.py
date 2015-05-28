@@ -1047,7 +1047,7 @@ def test_integration():
     outf = tempfile.NamedTemporaryFile()
     cmd = 'cycpp.py {} -o {}'.format(inf, outf.name)
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-    assert_equal('', p.stdout.read())
+    assert_equal('', p.stdout.read().decode())
     
 if __name__ == "__main__":
     nose.runmodule()
