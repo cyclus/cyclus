@@ -133,7 +133,7 @@ class ResBuf {
         rs_.push_front(r);
         r = tmp;
       } else {
-        rs_present_.erase(r);
+        rs_present_.erase(r.get());
       }
 
       qty_ -= r->quantity();
@@ -182,7 +182,7 @@ class ResBuf {
       qty_ -= r->quantity();
       rs_.pop_front();
       rs.push_back(r);
-      rs_present_.erase(r);
+      rs_present_.erase(r.get());
     }
 
     UpdateQty();
@@ -213,7 +213,7 @@ class ResBuf {
 
     typename T::Ptr r = rs_.front();
     rs_.pop_front();
-    rs_present_.erase(r);
+    rs_present_.erase(r.get());
     qty_ -= r->quantity();
     UpdateQty();
     return r;
@@ -227,7 +227,7 @@ class ResBuf {
 
     typename T::Ptr r = rs_.back();
     rs_.pop_back();
-    rs_present_.erase(r);
+    rs_present_.erase(r.get());
     qty_ -= r->quantity();
     UpdateQty();
     return r;
@@ -252,12 +252,12 @@ class ResBuf {
       ss << "resource pushing breaks capacity limit: space=" << space()
          << ", rsrc->quantity()=" << r->quantity();
       throw ValueError(ss.str());
-    } else if (rs_present_.count(m) == 1) {
+    } else if (rs_present_.count(m.get()) == 1) {
       throw KeyError("duplicate resource push attempted");
     }
 
     rs_.push_back(m);
-    rs_present_.insert(m);
+    rs_present_.insert(m.get());
     qty_ += r->quantity();
     UpdateQty();
   }
@@ -294,14 +294,14 @@ class ResBuf {
     }
 
     for (int i = 0; i < rss.size(); i++) {
-      if (rs_present_.count(rss.at(i)) == 1) {
+      if (rs_present_.count(rss.at(i).get()) == 1) {
         throw KeyError("Duplicate resource pushing attempted");
       }
     }
 
     for (int i = 0; i < rss.size(); i++) {
       rs_.push_back(rss[i]);
-      rs_present_.insert(rss[i]);
+      rs_present_.insert(rss[i].get());
     }
     qty_ += tot_qty;
   }
@@ -323,7 +323,7 @@ class ResBuf {
 
   /// List of constituent resource objects forming the buffer's inventory
   std::list<typename T::Ptr> rs_;
-  std::set<typename T::Ptr> rs_present_;
+  std::set<T*> rs_present_;
 };
 
 }  // namespace toolkit
