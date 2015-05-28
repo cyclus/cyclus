@@ -248,6 +248,11 @@ class Context {
   /// the beginning of the next timestep.
   void Snapshot();
 
+  /// Schedules a clone of simulation context/state for
+  /// the beginning of the next timestep.  The clone can be retrieved by
+  /// calling GetClone().
+  void CloneSim();
+
   /// Schedules the simulation to be terminated at the end of this timestep.
   void KillSim();
 
@@ -294,7 +299,7 @@ class Context {
   // Returns a clone of the context as generated at the last call of Snapshot
   // (with all agents and everything copied.  This is NULL unless Snapshot has
   // been called at least once previously.
-  Context* clone();
+  Context* GetClone();
 
  private:
   /// Registers an agent as a participant in the simulation.

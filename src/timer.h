@@ -57,6 +57,8 @@ class Timer {
   /// the beginning of the next timestep.
   void Snapshot() { want_snapshot_ = true; }
 
+  void CloneSim() { want_clone_ = true; }
+
   // Returns a clone of the context as generated at the last call of Snapshot
   // (with all agents and everything copied.  This is NULL unless Snapshot has
   // been called at least once previously.
@@ -109,6 +111,7 @@ class Timer {
   SimInit* sinit_;
 
   bool want_snapshot_;
+  bool want_clone_;
   bool want_kill_;
 
   /// Concrete agents that desire to receive tick and tock notifications

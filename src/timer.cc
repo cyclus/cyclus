@@ -22,8 +22,6 @@ void Timer::RunSim() {
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
   Recorder rec((unsigned int)2);
-  sinit_ = new SimInit();
-  sinit_->Init(&rec, ctx_, si_.duration);
 
   while (time_ < si_.duration) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
@@ -31,7 +29,9 @@ void Timer::RunSim() {
     if (want_snapshot_) {
       want_snapshot_ = false;
       SimInit::Snapshot(ctx_);
-
+    }
+    if (want_clone_) {
+      want_clone_ = false;
       if (sinit_ != NULL) {
         delete sinit_;
       }
@@ -268,6 +268,7 @@ Timer::Timer()
       si_(0),
       want_snapshot_(false),
       want_kill_(false),
+      want_clone_(true),
       sinit_(NULL) {}
 
 }  // namespace cyclus
