@@ -8,6 +8,10 @@
 
 #include "cyclus.h"
 
+// superfluous include to make sure other archetypes build with this can still
+// be compiled through possible cycpp regressions
+#include "prettyprint.hpp"
+
 namespace cyclus {
 
 class Context;
