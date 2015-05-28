@@ -21,8 +21,9 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
+  Recorder rec((unsigned int)2);
   sinit_ = new SimInit();
-  sinit_->Init(ctx_, si_.duration);
+  sinit_->Init(&rec, ctx_, si_.duration);
 
   while (time_ < si_.duration) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
@@ -32,11 +33,10 @@ void Timer::RunSim() {
       SimInit::Snapshot(ctx_);
 
       if (sinit_ != NULL) {
-        delete sinit_->recorder();
         delete sinit_;
       }
       sinit_ = new SimInit();
-      sinit_->Init(ctx_, si_.duration);
+      sinit_->Init(&rec, ctx_, si_.duration);
     }
 
     // run through phases
@@ -66,6 +66,10 @@ void Timer::RunSim() {
       ->Record();
 
   SimInit::Snapshot(ctx_);  // always do a snapshot at the end of every simulation
+
+  if (sinit_ != NULL) {
+    delete sinit_;
+  }
 }
 
 Context* Timer::SnapdContext() {

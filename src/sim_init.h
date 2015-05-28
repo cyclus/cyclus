@@ -35,7 +35,7 @@ class SimInit {
   /// Initialize a simulation with data from b for simulation id in r. SimInit
   /// does not take ownership of the recorder or backend. the configured
   /// context's recorder is set to r.
-  void Init(Context* src, int dur);
+  void Init(Recorder* r, Context* src, int dur);
 
   /// EXPERIMENTAL (might not work properly). Restarts a simulation from time t
   /// with data from b identified by simid.  The newly configured simulation
@@ -108,6 +108,7 @@ class SimInit {
 
   Context* ctx_;
   Recorder* rec_;
+  Recorder* todel_rec_;
   Timer ti_;
   boost::uuids::uuid simid_;
   SimInfo si_;

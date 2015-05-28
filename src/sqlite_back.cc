@@ -36,6 +36,10 @@ std::vector<std::string> split(const std::string& s, char delim) {
 }
 
 SqliteBack::~SqliteBack() {
+  // the statements must all be deallocated before the database will allow
+  // itself to be closed:
+  stmts_.clear();
+
   try {
     Flush();
     db_.close();
