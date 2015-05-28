@@ -287,7 +287,8 @@ class UsingFilter(AliasFilter):
     def transform(self, statement, sep):
         state = self.machine
         name = self.match.group(1)
-        state.aliases.add((state.depth, name, name.rsplit('::', 1)[1]))
+        if len(name.rsplit('::', 1)) > 1:
+            state.aliases.add((state.depth, name, name.rsplit('::', 1)[1]))
 
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
