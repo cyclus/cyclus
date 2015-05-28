@@ -2,6 +2,7 @@ import os
 import sys
 import uuid
 import pprint
+import subprocess
 from collections import OrderedDict
 
 import nose
@@ -1040,6 +1041,13 @@ def test_nuclide_uitype():
     f.given_classname = 'MyFactory'
     yield assert_raises, TypeError, f.impl
 
+def test_integration():
+    inf = os.path.join(os.path.dirname(__file__), 'cycpp_tests.h')
+    outf = os.path.join(os.path.dirname(__file__), '.cycpp_tests.out')
+    cmd = 'cycpp.py {} -o {}'.format(inf, outf)
+    rtn = subprocess.call(cmd.split())
+    assert_equal(rtn, 1)
+    os.remove(outf)
 
 if __name__ == "__main__":
     nose.runmodule()
