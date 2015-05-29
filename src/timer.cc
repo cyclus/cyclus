@@ -268,7 +268,7 @@ Timer::Timer()
       si_(0),
       want_snapshot_(false),
       want_kill_(false),
-      want_clone_(true),
+      want_clone_(false),
       sinit_(NULL) {}
 
 }  // namespace cyclus

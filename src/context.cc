@@ -84,15 +84,14 @@ Context::~Context() {
     //delete solver_;
   }
 
-  // initiate deletion of agents that don't have parents.
-  // dealloc will propagate through hierarchy as agents delete their children
+  // because agens remove themselves from the agent_list_ when destructed, we
+  // can't delete them while iterating over the list
   std::vector<Agent*> to_del;
   std::set<Agent*>::iterator it;
   for (it = agent_list_.begin(); it != agent_list_.end(); ++it) {
-    if ((*it)->parent() == NULL) {
-      to_del.push_back(*it);
-    }
+    to_del.push_back(*it);
   }
+
   for (int i = 0; i < to_del.size(); ++i) {
     DelAgent(to_del[i]);
   }

@@ -58,13 +58,14 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
   for (pit = src->protos_.begin(); pit != src->protos_.end(); ++pit) {
     Agent* a = pit->second;
     a->ctx_ = dst;
-    dst->protos_[pit->first] = a->Clone();
+    Agent* copy = a->Clone();
+    copy->id_ = a->id_;
+    dst->protos_[pit->first] = copy;
     a->ctx_ = src;
   }
 
   ////////// Clone and rebuild agent hierarchy ///////////
   std::set<Agent*>::iterator its;
-  std::map<int, int> parentmap;  // map<agentid, parentid>
   std::map<int, Agent*> unbuilt;  // map<agentid, agent_ptr>
   for (its = src->agent_list_.begin(); its != src->agent_list_.end(); ++its) {
     Agent* a = *its;
@@ -82,7 +83,6 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
     copy->id_ = a->id_;
     copy->enter_time_ = a->enter_time_;
     copy->parent_id_ = a->parent_id_;
-    parentmap[copy->id()] = a->parent_id();
     unbuilt[copy->id()] = copy;
   }
 
@@ -93,7 +93,7 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
   while (unbuilt.size() > 0) {
     int id = it->first;
     Agent* m = it->second;
-    int parentid = parentmap[id];
+    int parentid = m->parent_id_;
 
     if (parentid == -1) {  // root agent
       m->Connect(NULL);
