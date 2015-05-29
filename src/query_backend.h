@@ -319,6 +319,12 @@ enum DbTypes {
   RES_MAP_STRING_PRODUCT,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Product>", 2, [], ["RES_MAP", "STRING", "PRODUCT"], false]
   RES_MAP_VL_STRING_MATERIAL,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Material>", 2, [], ["RES_MAP", "VL_STRING", "MATERIAL"], false]
   RES_MAP_VL_STRING_PRODUCT,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Product>", 2, [], ["RES_MAP", "VL_STRING", "PRODUCT"], false]
+
+  // std::vector<std::vector<int> >
+  VECTOR_VECTOR_INT,
+  VL_VECTOR_VECTOR_INT,
+  VECTOR_VL_VECTOR_INT,
+  VL_VECTOR_VL_VECTOR_INT,
 };
 
 /// Represents operation codes for condition checking.
@@ -660,7 +666,7 @@ class Sha1 {
     for (unsigned int i = 0; i < x.size(); ++i)
       hash_.process_bytes(x[i].c_str(), x[i].size());
   }
-  
+
   inline void Update(const std::vector<cyclus::Blob>& x) {
     for (unsigned int i = 0; i < x.size(); ++i)
       hash_.process_bytes(x[i].str().c_str(), x[i].str().size());
@@ -677,7 +683,7 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
   }
-  
+
   inline void Update(const std::set<bool>& x) {
     std::set<bool>::iterator it = x.begin();
     for (; it != x.end(); ++it)
@@ -689,7 +695,7 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(double));
   }
-  
+
   inline void Update(const std::set<float>& x) {
     std::set<float>::iterator it = x.begin();
     for (; it != x.end(); ++it)
@@ -719,19 +725,19 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
   }
-  
+
   inline void Update(const std::list<bool>& x) {
     std::list<bool>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(bool));
   }
-  
+
   inline void Update(const std::list<double>& x) {
     std::list<double>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(double));
   }
-  
+
   inline void Update(const std::list<float>& x) {
     std::list<float>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
@@ -743,7 +749,7 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(it->c_str(), it->size());
   }
-  
+
   inline void Update(const std::list<cyclus::Blob>& x) {
     std::list<cyclus::Blob>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
@@ -773,7 +779,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(int));
     }
   }
-  
+
   inline void Update(const std::map<int, bool>& x) {
     std::map<int, bool>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -797,7 +803,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(float));
     }
   }
-  
+
   inline void Update(const std::map<int, cyclus::Blob>& x) {
     std::map<int, cyclus::Blob>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -805,7 +811,7 @@ class Sha1 {
       hash_.process_bytes(it->second.str().c_str(), it->second.str().size());
     }
   }
-  
+
   inline void Update(const std::map<int, boost::uuids::uuid>& x) {
     std::map<int, boost::uuids::uuid>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -845,7 +851,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(float));
     }
   }
-  
+
   inline void Update(const std::map<std::string, bool>& x) {
     std::map<std::string, bool>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -853,7 +859,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(bool));
     }
   }
-  
+
   inline void Update(const std::map<std::string, cyclus::Blob>& x) {
     std::map<std::string, cyclus::Blob>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -861,7 +867,7 @@ class Sha1 {
       hash_.process_bytes(it->second.str().c_str(), it->second.str().size());
     }
   }
-  
+
   inline void Update(const std::map<std::string, boost::uuids::uuid>& x) {
     std::map<std::string, boost::uuids::uuid>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
