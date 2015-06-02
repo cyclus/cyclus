@@ -10,16 +10,7 @@ To see user and developer documentation for this code, please visit
 the `Cyclus Homepage`_.
 
 ******************************
-Installing Cyclus the Easy Way
-******************************
-Cyclus provides easy-to-install binary packages via the 
-`conda package manager <http://conda.pydata.org/docs/>`_. These are 
-great for users but may not be suitable for developers. For detailed
-instructions on installing conda and Cyclus, please 
-`see the install documentation <http://fuelcycle.org/user/install.html>`_.
-
-******************************
-Building and Installing Cyclus
+Depedencies
 ******************************
 
 In order to facilitate future compatibility with multiple platforms,
@@ -62,9 +53,41 @@ tcmalloc (for speed)   any?
 *Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
 by our build system.  Instead use `libgoogle-perftools-dev`.*
 
+Installing Dependencies
+=========================
+
+Cyclus depedencies can either be installed via a operating system's pacakge
+manager or via Conda.
+
+Via Conda
+---------
+
+*Note, at present, Conda dependency downloading is only supported for Linux*
+
+A conda installation may be the most straightforward for a new developer. These
+instructions will be similar to those shown for Cyclus user's `conda
+installation <http://fuelcycle.org/user/install.html>`_.
+
+#. Download the appropriate `miniconda installer <http://conda.pydata.org/miniconda.html>`_
+
+#. Install miniconda
+
+    .. code-block:: console
+
+        $ bash Miniconda-3.5.2-Linux-x86_64.sh -b -p ~/miniconda
+
+#. Add the following line to your ``.bashrc`` (``.bash_profile`` for Mac users):
+
+    ``export PATH-"${HOME}/miniconda/bin:${PATH}"``
+
+#. Install the depedencies
+
+    .. code-block:: console
+
+        $ conda install cyclus-deps
 
 Installing Dependencies (Linux and Unix)
-========================================
+----------------------------------------
 
 This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
@@ -114,10 +137,10 @@ dependencies:
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-de
 
 Boost Note
-----------
+^^^^^^^^^^
 
 The `libboost-all-dev` used above will install the entire Boost library, which
 is not strictly needed. We currently depend on a small subset of the Boost
@@ -133,7 +156,7 @@ because they are an industry standard. Accordingly, we suggest simply installing
 in the future.
 
 Installing Dependencies (Mac OSX)
-========================================
+----------------------------------------
 
 Cyclus archetype development is not fully supported on Mac.  Nonetheless,
 because there are some use cases which require installation from source,
@@ -218,7 +241,7 @@ Finally, update your path and the following environment variables in your
 
 
 Installing Cyclus (Linux, Unix, and Mac OSX)
-==================================
+=============================================
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
