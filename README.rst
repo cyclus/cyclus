@@ -9,6 +9,27 @@ framework upon which to develop innovative fuel cycle simulations.
 To see user and developer documentation for this code, please visit
 the `Cyclus Homepage`_.
 
+*******************
+Quick Start
+*******************
+
+If you want to get up and running as quickly as possible:
+
+#. Install `VirtualBox <https://www.virtualbox.org/>`_
+#. Download the `environment
+   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus-conda-devs.ova>`_
+#. Open the .ova file using VirtualBox (File->Import Appliance).
+#. Login with the username ``ubuntu`` and pw ``reverse``
+#. Skip to "Installing Cyclus"
+
+Note that the cyclus source code exists already on the virtual machine. You can
+update it with
+
+.. code-block:: console
+
+    $ cd cyclus
+	$ git pull origin cyclus
+
 ******************************
 Depedencies
 ******************************
