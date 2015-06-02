@@ -262,23 +262,6 @@ There are additional options which can be inspected via `install.py`'s help:
 
     .../cyclus/cyclus$ python install.py -h
 
-Windows
-=======
-
-A native Windows installation is not currently explicitly supported. However, a
-Virtual Machine image can be downloaded which includes a pre-installation of all
-of these dependencies as well as a pre-installation of Cyclus. If you do not
-have access to a Linux or Unix (MacOS) machine, please follow these three steps:
-
-#. Install `VirtualBox <https://www.virtualbox.org/>`_
-#. Download `cyclus_user_environment.ova
-   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus_user_environment.ova>`_
-#. Open the .ova file using VirtualBox (File->Import Appliance).
-
-The user name is "cyclus-user" and the password is "cyclus". You now have the
-same user environment as someone who installed cyclus on an Ubuntu Linux
-machine. Congratulations. You may skip to `Running Tests`_ .
-
 
 Running Tests
 =============
