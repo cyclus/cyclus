@@ -1045,7 +1045,7 @@ def test_nuclide_uitype():
 def test_integration():
     inf = os.path.join(os.path.dirname(__file__), 'cycpp_tests.h')
     outf = tempfile.NamedTemporaryFile()
-    cmd = 'cycpp.py {} -o {}'.format(inf, outf.name)
+    cmd = 'cycpp.py {} -o {} --cpp-path `which g++`'.format(inf, outf.name)
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     assert_equal('', p.stdout.read().decode())
     
