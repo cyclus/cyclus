@@ -22,7 +22,7 @@ If you want to get up and running as quickly as possible:
 #. Login with the username ``ubuntu`` and pw ``reverse``
 #. Skip to "Installing Cyclus"
 
-Note that the cyclus source code exists already on the virtual machine. You can
+Note that the Cyclus source code exists already on the virtual machine. You can
 update it with
 
 .. code-block:: console
@@ -31,7 +31,7 @@ update it with
 	$ git pull origin cyclus
 
 ******************************
-Depedencies
+Dependencies
 ******************************
 
 In order to facilitate future compatibility with multiple platforms,
@@ -77,7 +77,7 @@ by our build system.  Instead use `libgoogle-perftools-dev`.*
 Installing Dependencies
 =========================
 
-Cyclus depedencies can either be installed via a operating system's pacakge
+Cyclus dependencies can either be installed via an operating system's package
 manager or via Conda.
 
 Via Conda
@@ -85,8 +85,8 @@ Via Conda
 
 *Note, at present, Conda dependency downloading is only supported for Linux*
 
-A conda installation may be the most straightforward for a new developer. These
-instructions will be similar to those shown for Cyclus user's `conda
+A Conda installation may be the most straightforward for a new developer. These
+instructions will be similar to those shown for Cyclus users `conda
 installation <http://fuelcycle.org/user/install.html>`_.
 
 #. Download the appropriate `miniconda installer <http://conda.pydata.org/miniconda.html>`_
@@ -101,7 +101,7 @@ installation <http://fuelcycle.org/user/install.html>`_.
 
     ``export PATH-"${HOME}/miniconda/bin:${PATH}"``
 
-#. Install the depedencies
+#. Install the dependencies
 
     .. code-block:: console
 
@@ -158,7 +158,7 @@ dependencies:
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-de
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev
 
 Boost Note
 ^^^^^^^^^^
@@ -320,7 +320,7 @@ our tests). You can run the tests yourself via:
 Running Cyclus
 ==============
 
-You can find instructions for writng an input file for cyclus from `Cyclus User
+You can find instructions for writing an input file for cyclus from `Cyclus User
 Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
 file `input.xml`, you can run Cyclus via:
 
@@ -372,7 +372,7 @@ Reviewing a Pull Request
 * Look over the code.
 
   * Check that it meets `our style guidelines
-    <http://cyclus.github.com/devdoc/style_guide.html>`_.
+    <http://fuelcycle.org/kernel/pr_review.html>`_.
 
   * Make inline review comments concerning improvements.
 
@@ -485,7 +485,7 @@ See also
 --------
 
 A good description of a git workflow with good graphics is available at
-http://nvie.com/posts/a-successful-git-branching-agent/
+http://nvie.com/posts/a-successful-git-branching-model/
 
 Releases
 ========
