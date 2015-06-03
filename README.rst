@@ -331,6 +331,7 @@ file `input.xml`, you can run Cyclus via:
 For a more detailed explanation, checkout the user guide.
 
 .. _`Cyclus Homepage`: http://fuelcycle.org/
+.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
@@ -349,8 +350,7 @@ General Notes
 
 * Keep your own "master" and "develop" branches in sync with the blessed
   repository's "master" and "develop" branches. Specifically, do not push your
-  own commits directly to your "master" and "develop" branches (see `Updating
-  Your Repositories`_ below).
+  own commits directly to your "master" and "develop" branches.
 
 * Any commit should *pass all tests* (see `Running Tests`_).
 
