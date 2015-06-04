@@ -2,7 +2,9 @@ import os
 import sys
 import uuid
 import pprint
+import tempfile
 from collections import OrderedDict
+from subprocess import Popen, PIPE, STDOUT
 
 import nose
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises
@@ -1040,6 +1042,12 @@ def test_nuclide_uitype():
     f.given_classname = 'MyFactory'
     yield assert_raises, TypeError, f.impl
 
-
+def test_integration():
+    inf = os.path.join(os.path.dirname(__file__), 'cycpp_tests.h')
+    outf = tempfile.NamedTemporaryFile()
+    cmd = 'cycpp.py {} -o {} --cpp-path `which g++`'.format(inf, outf.name)
+    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+    assert_equal('', p.stdout.read().decode())
+    
 if __name__ == "__main__":
     nose.runmodule()
