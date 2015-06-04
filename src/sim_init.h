@@ -82,6 +82,8 @@ class SimInit {
   /// useful for running mock simulations/tests.
   static Product::Ptr BuildProduct(QueryableBackend* b, int resid);
 
+  std::vector<Agent*> agents();
+
  private:
   void InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t);
 

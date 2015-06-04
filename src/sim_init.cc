@@ -7,6 +7,15 @@
 
 namespace cyclus {
 
+std::vector<Agent*> SimInit::agents() {
+  std::vector<Agent*> ags;
+  std::map<int, Agent*>::iterator it;
+  for (it = agents_.begin(); it != agents_.end(); ++it) {
+    ags.push_back(it->second);
+  }
+  return ags;
+}
+
 class Dummy : public Region {
  public:
   Dummy(Context* ctx) : Region(ctx) {}
@@ -89,7 +98,6 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
   // construct agent hierarchy starting at roots (no parent) down
   std::map<int, Agent*>::iterator it = unbuilt.begin();
   std::vector<Agent*> enter_list;
-  std::map<int, Agent*> agentmap;
   while (unbuilt.size() > 0) {
     int id = it->first;
     Agent* m = it->second;
@@ -97,13 +105,13 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
 
     if (parentid == -1) {  // root agent
       m->Connect(NULL);
-      agentmap[id] = m;
+      agents_[id] = m;
       ++it;
       unbuilt.erase(id);
       enter_list.push_back(m);
-    } else if (agentmap.count(parentid) > 0) {  // parent is built
-      m->Connect(agentmap[parentid]);
-      agentmap[id] = m;
+    } else if (agents_.count(parentid) > 0) {  // parent is built
+      m->Connect(agents_[parentid]);
+      agents_[id] = m;
       ++it;
       unbuilt.erase(id);
       enter_list.push_back(m);
@@ -129,7 +137,7 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
       continue;
     }
 
-    Agent* a = agentmap[orig->id()];
+    Agent* a = agents_[orig->id()];
     Inventories invs = orig->SnapshotInv();
     Inventories copyinvs;
     Inventories::iterator invit;
@@ -158,7 +166,7 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
     for (int i = 0; i < list.size(); i++) {
       Agent* orig = list[i].second;
       if (orig != NULL) {
-        Agent* a = agentmap[orig->id_];
+        Agent* a = agents_[orig->id_];
         dst->ti_->build_queue_[t].push_back(std::make_pair(list[i].first, a));
       } else {
         dst->ti_->build_queue_[t].push_back(std::make_pair(list[i].first, orig));
@@ -178,7 +186,7 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
     for (int i = 0; i < list.size(); i++) {
       Agent* srca = list[i];
       int id = srca->id_;
-      Agent* a = agentmap[id];
+      Agent* a = agents_[id];
       dst->ti_->decom_queue_[t].push_back(a);
     }
   }
