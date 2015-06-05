@@ -310,7 +310,7 @@ Finally, add the following line to the **bottom** your ``~/.bashrc`` file
 
 .. code-block:: bash
 
-    export PATH="$HOME/.local:$PATH"
+    export PATH="$HOME/.local/bin:$PATH"
 
 Then update your environment
 
