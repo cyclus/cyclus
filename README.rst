@@ -271,8 +271,7 @@ We make the following assumptions in this guide:
 
 #. there is some master directory in which you're placing all
    Cyclus-related files called .../cyclus
-#. you have a directory named .../cyclus/install in which you plan
-   to install all Cyclus-related files
+#. you want to install cyclus **locally** (in ``~/.local``)
 #. you have acquired the Cyclus source code from the `Cyclus repo`_
 #. you have placed the Cyclus repository in .../cyclus/cyclus
 
@@ -282,7 +281,7 @@ Cyclus building and installation process will look like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$ python install.py --prefix=../install
+    .../cyclus/cyclus$ python install.py
 
 If you have installed coin-Cbc from source or otherwise have it
 installed in a non-standard location, you should make use of the
@@ -291,14 +290,14 @@ like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$  python install.py --prefix=../install --coin_root=path/to/coin
+    .../cyclus/cyclus$  python install.py --coin_root=path/to/coin
 
 Additionally, if you have installed Boost in a non-standard location
 you should make use of the boostRoot installation flag.
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$ python install.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
+    .../cyclus/cyclus$ python install.py --coin_root=/path/to/coin --boost_root=/path/to/boost
 
 There are additional options which can be inspected via `install.py`'s help:
 
@@ -306,6 +305,18 @@ There are additional options which can be inspected via `install.py`'s help:
 
     .../cyclus/cyclus$ python install.py -h
 
+Finally, add the following line to the **bottom** your ``~/.bashrc`` file
+(``~/.bash_profile`` on Macs):
+
+.. code-block:: bash
+
+    export PATH="$HOME/.local/bin:$PATH"
+
+Then update your environment
+
+.. code-block:: bash
+
+    $ source ~/.bashrc
 
 Running Tests
 =============
@@ -315,7 +326,7 @@ our tests). You can run the tests yourself via:
 
 .. code-block:: bash
 
-    ...$ prefix/bin/cyclus_unit_tests
+    $ cyclus_unit_tests
 
 Running Cyclus
 ==============
@@ -326,7 +337,7 @@ file `input.xml`, you can run Cyclus via:
 
 .. code-block:: bash
 
-    ...$ prefix/bin/cyclus path/to/input.xml
+    $ cyclus path/to/input.xml
 
 For a more detailed explanation, checkout the user guide.
 
