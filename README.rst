@@ -271,8 +271,7 @@ We make the following assumptions in this guide:
 
 #. there is some master directory in which you're placing all
    Cyclus-related files called .../cyclus
-#. you have a directory named .../cyclus/install in which you plan
-   to install all Cyclus-related files
+#. you want to install cyclus **locally** (in ``~/.local``)
 #. you have acquired the Cyclus source code from the `Cyclus repo`_
 #. you have placed the Cyclus repository in .../cyclus/cyclus
 
@@ -306,12 +305,18 @@ There are additional options which can be inspected via `install.py`'s help:
 
     .../cyclus/cyclus$ python install.py -h
 
-Finally, add the following line to the **bottom** your ``.bashrc``
-(``.bash_profile`` on Macs):
+Finally, add the following line to the **bottom** your ``~/.bashrc`` file
+(``~/.bash_profile`` on Macs):
 
 .. code-block:: bash
 
     export PATH="$HOME/.local:$PATH"
+
+Then update your environment
+
+.. code-block:: bash
+
+    $ source ~/.bashrc
 
 Running Tests
 =============
