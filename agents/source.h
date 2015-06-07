@@ -86,11 +86,13 @@ class Source : public cyclus::Facility {
   }
 
  private:
-  #pragma cyclus var {"doc": "commodity that the source facility " \
-                             "supplies", \
-                      "tooltip": "source commodity", \
-                      "schematype": "token", \
-                      "uitype": "outcommodity"}
+  #pragma cyclus var { \
+    "doc": "commodity that the source facility supplies",	\
+    "tooltip": "source commodity",			\
+    "schematype": "token",				\
+    "uilabel": "Commodity",			\
+    "uitype": "outcommodity" \
+  }
   std::string commod;
 
   #pragma cyclus var { \
@@ -99,16 +101,19 @@ class Source : public cyclus::Facility {
     "tooltip": "commodity recipe name", \
     "schematype": "token", \
     "default": "", \
-    "uitype": "recipe", \
+    "uilabel": "Recipe",			\
+   "uitype": "recipe", \
   }
   std::string recipe_name;
 
   /// The capacity is defined in terms of the number of units of the
   /// recipe that can be provided each time step.  A very large number
   /// can be provided to represent infinte capacity.
-  #pragma cyclus var {"doc": "amount of commodity that can be " \
-                             "supplied at each time step", \
-                      "tooltip": "source capacity"}
+  #pragma cyclus var {					   \
+    "doc": "amount of commodity that can be supplied at each time step",   \
+    "uilabel": "Maximum Throughput",			   \
+    "tooltip": "source capacity" \
+  }
   double capacity;
 };
 
