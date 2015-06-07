@@ -53,78 +53,122 @@ class Predator : public cyclus::Facility  {
   void GiveBirth();
 
  private:
-  #pragma cyclus var {"tooltip": "predator commodity", \
-                      "doc": "commodity that the predator supplies", \
-                      "schematype": "token", \
-                      "uitype": "outcommodity"}
+  #pragma cyclus var { \
+    "tooltip": "predator commodity",				     \
+    "doc": "commodity that the predator supplies",		     \
+    "schematype": "token",					     \
+    "uilabel": "Predator Commodity",				     \
+    "uitype": "outcommodity" \
+  }
   std::string commod;
 
-  #pragma cyclus var {"tooltip": "predator's prey", \
-                      "doc": "prey that the predator hunts", \
-                      "schematype": "token", \
-                      "uitype": "incommodity"}
+  #pragma cyclus var { \
+    "tooltip": "predator's prey",			     \
+    "doc": "prey that the predator hunts",		     \
+    "schematype": "token",					     \
+    "uilabel": "Prey Commodity",				     \
+    "uitype": "incommodity" \
+  }
   std::string prey;
 
   /// How many prey until we're full
-  #pragma cyclus var {'default': 1, "tooltip": "feast size", \
-                      "doc": "how many units of prey a predator " \
-                             "consumes until it is satisfied"}
+  #pragma cyclus var { \
+    'default': 1,						  \
+    "tooltip": "feast size",						\
+    "doc": "how many units of prey a predator consumes until it is satisfied",\
+    "uilabel": "Feast Size" 						\
+  }
   double full;
 
-  /// How many prey we can catch on the hunt
-  #pragma cyclus var {'default': 1, "tooltip": "hunting yield", \
-                      "doc": "how many units of prey a predator " \
-                             "can catch during a hunt"}
-  double hunt_cap;
-
   /// How often we hunt
-  #pragma cyclus var {'default': 1, "tooltip": "hunting frequency", \
-                      "doc": "how often a predator needs to hunt"}
+  #pragma cyclus var {\
+    'default': 1,				 \
+    "tooltip": "hunting frequency",		 \
+    "doc": "how often a predator needs to hunt", \
+    "uilabel": "Hunting Frequency"               \
+  }
   int hunt_freq;
 
+  /// How many prey we can catch on the hunt
+  #pragma cyclus var { \
+    'default': 1, \
+    "tooltip": "hunting yield",					  \
+    "doc": "how many units of prey a predator can catch during a hunt", \
+    "uilabel": "Hunting Yield" 					\
+  }
+  double hunt_cap;
+
   /// Hunting success on a scale from 0 to 1
-  #pragma cyclus var {'default': 1, "tooltip": "hunting success fraction", \
-                      "doc": "fraction of hunting success on a scale " \
-                             "from 0 to 1"}
+  #pragma cyclus var {\
+    'default': 1,						       \
+    "tooltip": "hunting success fraction",			       \
+    "doc": "fraction of hunting success on a scale from 0 to 1",      \
+    "uilabel": "Hunting Success Fraction" 		\
+  }
   double success;
 
-  #pragma cyclus var {'default': 1, "tooltip": "number of children", \
-                      "doc": "number of predator children born at " \
-                             "each birthing instance"}
-  double nchildren;
-
-  /// Age of a predator
-  #pragma cyclus var {'default': 0, "tooltip": "predator age", \
-                      "doc": "age of predator at beginning of simulation"}
-  int age;
-
-  #pragma cyclus var {'default': 1, "tooltip": "predator lifespan", \
-                      "doc": "how long a predator lives"}
-  int lifespan;
-
-  #pragma cyclus var {'default': 0, "tooltip": "dead?", \
-                      "doc": "flag for whether predator is currently dead"}
-  bool dead;
+  /// Consumption this time step
+  #pragma cyclus var {\
+    'default': 0, \
+    "tooltip": "prey consumed",						\
+    "doc": "how many units of prey consumed per time step", \
+    "uilabel": "Prey Consumed" 			       \
+  }
+  double consumed;
 
   /// Whether or not to base hunt succes on relative prey/predator populations
-  #pragma cyclus var {'default': 0, "tooltip": "hunting success factor", \
-                      "doc": "whether or not to base hunting success on " \
-                             "relative predator/prey populations"}  // false
+  #pragma cyclus var { \
+    'default': 0, \
+    "tooltip": "hunting success factor",				\
+    "doc": "whether or not to base hunting success on "			\
+           "relative predator/prey populations", \
+    "uilabel": "Hunting Success Factor" 	\
+  }  // false
   bool hunt_factor;
 
+  /// Age of a predator
+  #pragma cyclus var {\
+    'default': 0, \
+    "tooltip": "predator age",						\
+    "doc": "age of predator at beginning of simulation", \
+    "uilabel": "Predator Age" \
+  }
+  int age;
+
+  #pragma cyclus var { \
+    'default': 1, \
+    "tooltip": "predator lifespan",	\
+    "doc": "how long a predator lives",		\
+    "uilabel": "Predator Lifespan" 	\
+  }
+  int lifespan;
+
+  #pragma cyclus var { \
+    'default': 0, \
+    "tooltip": "dead?",							\
+    "doc": "flag for whether predator is currently dead", \
+    "uilabel": "Predator Dead?"				  \
+  }
+  bool dead;
+
+  #pragma cyclus var {				\
+    'default': 1, \
+    "tooltip": "number of children",				    \
+    "doc": "number of predator children born at each birthing instance", \
+    "uilabel": "Number Predator Children"				\
+  }
+  double nchildren;
+
   /// Whether or not an agent can give birth and die in the same timestep
-  #pragma cyclus var {'default': 0, "tooltip": "simultaneous birth " \
-                                               "and death?", \
-                      "doc": "whether or not simultaneous birth and " \
-                             "and death are allowed (i.e., can a " \
-                             "facility give birth and die in the " \
-                             "same time step?)"}  // false
+  #pragma cyclus var { \
+    'default': 0, \
+    "tooltip": "simultaneous birth and death?",				\
+    "doc": "whether or not simultaneous birth and death are allowed "	\
+           "(i.e., can a facility give birth and die in the same time step?)", \
+    "uilabel": "Simultaneous Birth and Death?" 			       \
+  }  // false
   bool birth_and_death;
 
-  /// Consumption this time step
-  #pragma cyclus var {'default': 0, "tooltip": "prey consumed", \
-                      "doc": "how many units of prey consumed per time step"}
-  double consumed;
 };
 
 }  // namespace cyclus
