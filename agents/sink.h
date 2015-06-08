@@ -72,31 +72,40 @@ class Sink : public cyclus::Facility  {
   }
 
  private:
+  #pragma cyclus var {\
+    "doc": "commodities that the sink facility accepts ",	   \
+    "tooltip": "input commodities for the sink",		   \
+    "uilabel": "List of Input Commodities",			   \
+    "uitype": ["oneormore", "incommodity"]			   \
+  }
+  std::vector<std::string> in_commods;
+
   #pragma cyclus var { \
     "tooltip": "input/request recipe name", \
     "doc": "Name of recipe to request." \
            "If empty, sink requests material no particular composition.", \
     "default": "", \
+    "uilabel": "Input Recipe",			\
     "uitype": "recipe", \
   }
   std::string recipe_name;
 
-  #pragma cyclus var {"doc": "commodities that the sink facility " \
-                             "accepts", \
-                      "tooltip": "input commodities for the sink", \
-                      "uitype": ["oneormore", "incommodity"]}
-  std::vector<std::string> in_commods;
-
-  #pragma cyclus var {"doc": "capacity the sink facility can " \
-                             "accept at each time step", \
-                      "tooltip": "sink capacity"}
-  double capacity;
-
-  #pragma cyclus var {"default": 1e299, \
-                      "doc": "total maximum inventory size of " \
-                             "sink facility", \
-                      "tooltip": "sink maximum inventory size"}
+  #pragma cyclus var {\
+    "default": 1e299,						\
+    "doc": "total maximum inventory size of "			\
+           "sink facility",						\
+    "uilabel": "Maximum Inventory",				\
+    "tooltip": "sink maximum inventory size" \
+  }
   double max_inv_size;
+
+  #pragma cyclus var { \
+    "doc": "capacity the sink facility can "		 \
+           "accept at each time step",				 \
+    "uilabel": "Maximum Throughput",			 \
+    "tooltip": "sink capacity"  \
+  }
+  double capacity;
 
   #pragma cyclus var {'capacity': 'max_inv_size'}
   cyclus::toolkit::ResourceBuff inventory;

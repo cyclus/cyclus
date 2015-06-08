@@ -137,67 +137,92 @@ class KFacility : public cyclus::Facility {
 
  private:
   /// This facility has one output commodity and one input commodity
-  #pragma cyclus var {"tooltip": "input commodity", \
-                      "doc": "commodity that the k-facility consumes", \
-                      "schematype": "token", \
-                      "uitype": "incommodity"}
+  #pragma cyclus var { \
+    "tooltip": "input commodity",				       \
+    "doc": "commodity that the k-facility consumes",		       \
+    "schematype": "token",					       \
+    "uilabel": "Input Commodity",				       \
+    "uitype": "incommodity" \
+  }
   std::string in_commod;
 
-  #pragma cyclus var {"tooltip": "output commodity", \
-                      "doc": "commodity that the k-facility supplies", \
-                      "schematype": "token", \
-                      "uitype": "outcommodity"}
-  std::string out_commod;
-
   /// Name of the recipe this facility uses.
-  #pragma cyclus var {"shape": [50], "tooltip": "in-commodity recipe name", \
-                      "doc": "recipe name for the k-facility's in-commodity", \
-                      "schematype": "token", \
-                      "uitype": "recipe"}
+  #pragma cyclus var { \
+    "shape": [50],  \
+    "tooltip": "in-commodity recipe name",				\
+    "doc": "recipe name for the k-facility's in-commodity",		\
+    "schematype": "token",						\
+    "uilabel": "Input Recipe",						\
+    "uitype": "recipe" \
+  }
   std::string recipe_name;
+
+  #pragma cyclus var { \
+    "tooltip": "output commodity",				       \
+    "doc": "commodity that the k-facility supplies",		       \
+    "schematype": "token",					       \
+    "uilabel": "Output Commodity",				       \
+    "uitype": "outcommodity" \
+  }
+  std::string out_commod;
 
   /// The capacity is defined in terms of the number of units of the
   /// recipe that can be provided each time step.  A very large number
   /// can be provided to represent infinte capacity.
   /// In and out commodity capacities are defined.
-  #pragma cyclus var {"tooltip": "input commodity capacity", \
-                      "doc": "number of commodity units that can be taken " \
-                             "at each time step (infinite capacity can be " \
-                             "represented by a very large number"}
+  #pragma cyclus var { \
+    "tooltip": "input commodity capacity",				\
+    "doc": "number of commodity units that can be taken at each timestep "  \
+           "(infinite capacity can be represented by a very large number)", \
+    "uilabel": "Incoming Throughput"			 \
+  }
   double in_capacity;
 
-  #pragma cyclus var {"tooltip": "output commodity capacity", \
-                      "doc": "number of commodity units that can be " \
-                             "supplied at each time step (infinite " \
-                             "capacity can be represented by a very large " \
-                             "number"}
+  #pragma cyclus var { \
+    "tooltip": "output commodity capacity",			      \
+    "doc": "number of commodity units that can be supplied at each timestep " \
+           "(infinite capacity can be represented by a very large number)", \
+    "uilabel": "Outgoing Throughput"					\
+  }
   double out_capacity;
 
   /// The output capacity at the current time step.
-  #pragma cyclus var {"default": 0, "tooltip": "current output capacity", \
-                      "doc": "number of output commodity units that can be " \
-                             "supplied at the current time step (infinite " \
-                             "capacity can be represented by a very large " \
-                             "number"}
+  #pragma cyclus var { \
+    "default": 0,							\
+    "tooltip": "current output capacity",				\
+    "doc": "number of output commodity units that can be supplied at " \
+           "the current time step (infinite "		 \
+           "capacity can be represented by a very large number )", 	\
+    "uilabel": "Current Capacity"		\
+  }
   double current_capacity;
 
-  #pragma cyclus var {"default": 1e299, "tooltip": "k-facility maximum " \
-                                                   "inventory size", \
-                      "doc": "total maximum inventory size of the k-facility"}
+  #pragma cyclus var { \
+    "default": 1e299, \
+    "tooltip": "k-facility maximum inventory size", \
+    "doc": "total maximum inventory size of the k-facility", \
+    "uilabel": "Maximum Inventory"			     \
+  }
   double max_inv_size;
 
   #pragma cyclus var {'capacity': 'max_inv_size'}
   cyclus::toolkit::ResourceBuff inventory;
 
   /// Conversion factors for input and output amounts.
-  #pragma cyclus var {"tooltip": "input k-factor", \
-                      "doc": "conversion factor that governs the behavior " \
-                             "of the k-facility's input commodity capacity"}
+  #pragma cyclus var { \
+    "tooltip": "input k-factor",					\
+    "doc": "conversion factor that governs the behavior "		\
+           "of the k-facility's input commodity capacity", \
+    "uilabel": "Input K-Factor"		    \
+  }
   double k_factor_in;
 
-  #pragma cyclus var {"tooltip": "output k-factor", \
-                      "doc": "conversion factor that governs the behavior " \
-                             "of the k-facility's output commodity capacity"}
+  #pragma cyclus var { \
+    "tooltip": "output k-factor",					\
+    "doc": "conversion factor that governs the behavior "		\
+           "of the k-facility's output commodity capacity", \
+    "uilabel": "Output K-Factor"				    \
+  }
   double k_factor_out;
 };
 

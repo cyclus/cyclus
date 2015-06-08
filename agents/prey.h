@@ -8,6 +8,11 @@
 
 #include "cyclus.h"
 
+// superfluous include to make sure other archetypes build with this can still
+// be compiled through possible cycpp regressions. Uncomment to use (breaks on
+// OSX)
+//#include "prettyprint.hpp"
+
 namespace cyclus {
 
 class Context;
@@ -50,38 +55,56 @@ class Prey : public cyclus::Facility {
   void GiveBirth();
 
  private:
-  #pragma cyclus var {"schematype": "token", \
-                      "uitype": "outcommodity"}
+  #pragma cyclus var { \
+    "schematype": "token",			\
+    "uilabel": "Prey Commodity",		\
+    "uitype": "outcommodity"			\
+  }
   std::string commod;
 
-  /// Number of timsteps between having children
-  #pragma cyclus var {'default': 1, "tooltip": "birth frequency", \
-                      "doc": "number of time steps between birth " \
-                             "of children"}
-  int birth_freq;
-
-  // Number of children
-  #pragma cyclus var {'default': 1, "tooltip": "number of children", \
-                      "doc": "number of children born at each " \
-                             "birthing instance"}
-  int nchildren;
-
-  /// Age of a prey
-  #pragma cyclus var {'default': 0, "tooltip": "prey age", \
-                      "doc": "age of prey at start of simulation"}
+ /// Age of a prey
+  #pragma cyclus var { \
+    'default': 0, \
+    "tooltip": "prey age",						\
+    "doc": "age of prey at start of simulation",			\
+    "uilabel": "Prey Age"						\
+  }
   int age;
 
-  #pragma cyclus var {'default': 0, "tooltip": "dead?", \
-                      "doc": "flag for whether prey is currently dead"}
+  #pragma cyclus var { \
+    'default': 0, \
+    "tooltip": "dead?",							\
+    "doc": "flag for whether prey is currently dead", \
+    "uilabel": "Dead?"			      \
+  }
   bool dead;
 
+  // Number of children
+  #pragma cyclus var { \
+    'default': 1,						\
+    "tooltip": "number of children",				\
+    "doc": "number of children born at each birthing instance", \
+    "uilabel": "Number of Children"				\
+  }
+  int nchildren;
+
+  /// Number of timsteps between having children
+  #pragma cyclus var { \
+    'default': 1, \
+    "tooltip": "birth frequency",				   \
+    "doc": "number of time steps between birth of children", \
+    "uilabel": "Birth Frequency"			     \
+  }
+  int birth_freq;
+
   /// Whether or not an agent can give birth and die in the same timestep
-  #pragma cyclus var {'default': 1, "tooltip": "simultaneous birth " \
-                                    "and death?", \
-                      "doc": "whether or not simultaneous birth and " \
-                             "and death are allowed (i.e., can a " \
-                             "facility give birth and die in the " \
-                             "same time step?)"}  // true
+  #pragma cyclus var { \
+    'default': 1, \
+    "tooltip": "simultaneous birth and death?", \
+    "doc": "whether or not simultaneous birth and death are allowed (i.e., " \
+           "can a facility give birth and die in the same time step?)", \
+    "uilabel": "Simultaneous Birth and Death?"			\
+  }  // true
   bool birth_and_death;
 };
 
