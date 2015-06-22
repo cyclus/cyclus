@@ -49,10 +49,10 @@ class SolverFactory {
   inline void solver_t(std::string t) { t_ = t; }
   inline const std::string solver_t() const { return t_; }
   inline std::string solver_t() { return t_; }
-
+  
   /// get the configured solver
   OsiSolverInterface* get();
-
+  
  private:
   std::string t_;
   double tmax_;

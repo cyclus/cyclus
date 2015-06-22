@@ -2,6 +2,7 @@
 
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
+#include "prog_solver.h"
 #include "region.h"
 
 namespace cyclus {
@@ -230,6 +231,27 @@ ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
   return solver;
 }
 
+ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive, 
+                                        std::set<std::string> tables) {
+  ExchangeSolver* solver;
+  double timeout = -1;
+  
+  std::string solver_info = "CoinSolverInfo";
+  if (0 < tables.count(solver_info)) {
+    QueryResult qr = b_->Query(solver_info, NULL);
+    if (qr.rows.size() > 0) {
+      timeout = qr.GetVal<double>("Timeout");
+    }
+  }
+
+  if (timeout <= 0) {
+    solver = new ProgSolver("cbc", exclusive);
+  } else {
+    solver = new ProgSolver("cbc", timeout, exclusive);
+  }
+  return solver;
+}
+
 void SimInit::LoadSolverInfo() {
   using std::set;
   using std::string;
@@ -252,6 +274,8 @@ void SimInit::LoadSolverInfo() {
 
   if (solver_name == "greedy") {
     solver = LoadGreedySolver(exclusive_orders, tables);
+  } else if (solver_name == "coin-or") {
+    solver = LoadCoinSolver(exclusive_orders, tables);
   } else {
     throw ValueError("The name of the solver was not recognized, "
                      "got '" + solver_name + "'.");
