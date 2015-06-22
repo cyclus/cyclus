@@ -37,7 +37,7 @@ ProgSolver::ProgSolver(std::string solver_t, double tmax, bool exclusive_orders)
 ProgSolver::~ProgSolver() {}
 
 double ProgSolver::SolveGraph() {
-  SolverFactory sf(solver_t_);
+  SolverFactory sf(solver_t_, tmax_);
   OsiSolverInterface* iface = sf.get();
   try {
     // get greedy solution
