@@ -32,8 +32,8 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
                   </optional>
                 </interleave>
               </element>
-              <element name="optimize">
-                <element name="library"> <text/> </element>
+              <element name="coin-or">
+                <empty/>
               </element>
             </choice>
             <optional>

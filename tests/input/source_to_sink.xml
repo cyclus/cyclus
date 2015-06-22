@@ -5,7 +5,7 @@
     <duration>100</duration>
     <startmonth>1</startmonth>
     <startyear>2000</startyear>
-    <solver><optimize><library>coin</library></optimize></solver>
+    <solver><coin-or/></solver>
   </control>
 
   <archetypes>
