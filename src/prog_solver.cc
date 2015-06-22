@@ -53,6 +53,7 @@ double ProgSolver::SolveGraph() {
     // set noise level
     CoinMessageHandler h;
     h.setLogLevel(0);
+    verbose_ = true;
     if (verbose_) {
       Report(iface);
       h.setLogLevel(4);
@@ -62,7 +63,8 @@ double ProgSolver::SolveGraph() {
       std::cout << "Solving problem, message handler has log level of "
                 << iface->messageHandler()->logLevel() << "\n";
     }
-    bool verbose = false; // turn this off, solveprog prints a lot
+    //bool verbose = false; // turn this off, solveprog prints a lot
+    bool verbose = true; // turn this on for logging
 
     // solve and back translate
     SolveProg(iface, greedy_obj, verbose);
