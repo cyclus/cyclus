@@ -33,7 +33,11 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
                 </interleave>
               </element>
               <element name="coin-or">
-                <empty/>
+                <interleave>
+                  <optional>
+                    <element name="timeout">  <data type="positiveInteger"/>  </element>
+                  </optional>
+                </interleave>
               </element>
             </choice>
             <optional>
