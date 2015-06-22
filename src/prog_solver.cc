@@ -14,8 +14,24 @@ void Report(OsiSolverInterface* iface) {
   std::cout << iface->getNumRows() << " constraints\n";
 }
 
+ProgSolver::ProgSolver(std::string solver_t)
+    : solver_t_(solver_t),
+      tmax_(ProgSolver::KOptimizeDefaultTimeout),
+      ExchangeSolver(false) {}
+
 ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
     : solver_t_(solver_t),
+      tmax_(ProgSolver::KOptimizeDefaultTimeout),
+      ExchangeSolver(exclusive_orders) {}
+
+ProgSolver::ProgSolver(std::string solver_t, double tmax)
+    : solver_t_(solver_t),
+      tmax_(tmax),
+      ExchangeSolver(false) {}
+
+ProgSolver::ProgSolver(std::string solver_t, double tmax, bool exclusive_orders)
+    : solver_t_(solver_t),
+      tmax_(tmax),
       ExchangeSolver(exclusive_orders) {}
 
 ProgSolver::~ProgSolver() {}

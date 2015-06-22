@@ -14,7 +14,18 @@ class ExchangeGraph;
 /// programming solution to a resource exchange graph.
 class ProgSolver: public ExchangeSolver {
  public:
-  ProgSolver(std::string solver_t, bool exclusive_orders = false);
+  static const int KOptimizeDefaultTimeout = 5 * 60; // 5 * 60 s/min == 5 minutes
+
+  /// @param solver_t the solver type, either "cbc" or "clp"
+  /// @param tmax the maximum solution time, default kOptimizeDefaultTimeout
+  /// @param exclusive_orders whether all orders must be exclusive or not,
+  /// default false
+  /// @{
+  ProgSolver(std::string solver_t);
+  ProgSolver(std::string solver_t, double tmax);
+  ProgSolver(std::string solver_t, bool exclusive_orders);
+  ProgSolver(std::string solver_t, double tmax, bool exclusive_orders);
+  /// @}
   virtual ~ProgSolver();
 
  protected:
@@ -23,6 +34,7 @@ class ProgSolver: public ExchangeSolver {
   
  private:
   std::string solver_t_;
+  double tmax_;
 };
 
 }  // namespace cyclus
