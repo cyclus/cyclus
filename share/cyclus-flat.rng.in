@@ -24,19 +24,18 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional>
         <element name="solver"> 
           <interleave>
-            <optional>
-              <element name="config">
-                <choice>
-                  <element name="greedy">
-                    <interleave>
-                      <optional>
-                        <element name="preconditioner"> <text/> </element>
-                      </optional>
-                    </interleave>
-                  </element>
-                </choice>
+            <choice>
+              <element name="greedy">
+                <interleave>
+                  <optional>
+                    <element name="preconditioner"> <text/> </element>
+                  </optional>
+                </interleave>
               </element>
-            </optional>
+              <element name="optimize">
+                <element name="library"> <text/> </element>
+              </element>
+            </choice>
             <optional>
               <element name="exclusive_orders_only">
                 <data type="boolean" />
@@ -44,7 +43,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
             </optional>
           </interleave>
         </element>
-      </optional> 
+      </optional>
     </interleave>
   </element>
 
