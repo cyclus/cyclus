@@ -210,10 +210,11 @@ void XMLFileLoader::LoadSolver() {
   // now load the solver info
   string config = "config";
   string greedy = "greedy";
+  string coinor = "coin-or";
   string solver_name = greedy;
   bool exclusive = false;
-  if (xqe.NMatches("/control/solver") == 1) {
-    qe = xqe.SubTree("/control/solver");
+  if (xqe.NMatches("/*/control/solver") == 1) {
+    qe = xqe.SubTree("/*/control/solver");
     if (qe->NMatches(config) == 1) {
       solver_name = qe->SubTree(config)->GetElementName(0);
     }
@@ -226,11 +227,17 @@ void XMLFileLoader::LoadSolver() {
       ->Record();
 
   // now load the actual solver
-  if (solver_name == "greedy") {
-    query = string("/control/solver/config/greedy/preconditioner");
+  if (solver_name == greedy) {
+    query = string("/*/control/solver/config/greedy/preconditioner");
     string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
     ctx_->NewDatum("GreedySolverInfo")
       ->AddVal("Preconditioner", precon_name)
+      ->Record();
+  } else if (solver_name == coinor) {
+    query = string("/*/control/solver/config/coin-or/timeout");
+    double timeout = cyclus::OptionalQuery<double>(&xqe, query, -1);
+    ctx_->NewDatum("CoinSolverInfo")
+      ->AddVal("Timeout", timeout)
       ->Record();
   } else {
     throw ValueError("unknown solver name: " + solver_name);
