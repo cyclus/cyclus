@@ -212,7 +212,7 @@ void XMLFileLoader::LoadSolver() {
   string greedy = "greedy";
   string coinor = "coin-or";
   string solver_name = greedy;
-  bool exclusive = false;
+  bool exclusive = true;
   if (xqe.NMatches("/*/control/solver") == 1) {
     qe = xqe.SubTree("/*/control/solver");
     if (qe->NMatches(config) == 1) {
