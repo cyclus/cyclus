@@ -7,6 +7,7 @@
 
 #include "cyc_limits.h"
 #include "exchange_graph.h"
+#include "logger.h"
 
 namespace cyclus {
 
@@ -74,6 +75,8 @@ void ProgTranslator::Translate() {
   }
 
   // add each false arc
+  CLOG(LEV_DEBUG1) << "Adding " << arc_offset_ - g_->arcs().size()
+                   << " false arcs.";
   double inf = iface_->getInfinity();
   for (int i = g_->arcs().size(); i != arc_offset_; i++) {
     ctx_.obj_coeffs[i] = pseudo_cost_;
@@ -160,8 +163,9 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
     if (request) {
       cap_rows[i].insert(faux_id, 1.0);  // faux arc
     }
-    
-    ctx_.row_lbs.push_back(request ? caps[i] : 0);
+
+    double rlb = std::min(caps[i], 1e99); // 1e99 is max value for COIN solvers
+    ctx_.row_lbs.push_back(request ? rlb : 0);
     ctx_.row_ubs.push_back(request ? inf : caps[i]);
     ctx_.m.appendRow(cap_rows[i]);
   }
