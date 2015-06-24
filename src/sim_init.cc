@@ -257,8 +257,8 @@ void SimInit::LoadSolverInfo() {
   using std::string;
   // context will delete solver
   ExchangeSolver* solver;
-  string solver_name = string("greedy");
-  bool exclusive_orders = false;
+  string solver_name;
+  bool exclusive_orders; // exclusive orders allowed
 
   // load in possible Solver info, needs to be optional to
   // maintain backwards compatibility, defaults above.
