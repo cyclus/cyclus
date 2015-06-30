@@ -17,21 +17,26 @@ void Report(OsiSolverInterface* iface) {
 ProgSolver::ProgSolver(std::string solver_t)
     : solver_t_(solver_t),
       tmax_(ProgSolver::KOptimizeDefaultTimeout),
+      verbose_(false),
       ExchangeSolver(false) {}
 
 ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
     : solver_t_(solver_t),
       tmax_(ProgSolver::KOptimizeDefaultTimeout),
+      verbose_(false),
       ExchangeSolver(exclusive_orders) {}
 
 ProgSolver::ProgSolver(std::string solver_t, double tmax)
     : solver_t_(solver_t),
       tmax_(tmax),
+      verbose_(false),
       ExchangeSolver(false) {}
 
-ProgSolver::ProgSolver(std::string solver_t, double tmax, bool exclusive_orders)
+ProgSolver::ProgSolver(std::string solver_t, double tmax, bool exclusive_orders,
+                       bool verbose)
     : solver_t_(solver_t),
       tmax_(tmax),
+      verbose_(verbose),
       ExchangeSolver(exclusive_orders) {}
 
 ProgSolver::~ProgSolver() {}
@@ -53,7 +58,6 @@ double ProgSolver::SolveGraph() {
     // set noise level
     CoinMessageHandler h;
     h.setLogLevel(0);
-    verbose_ = true;
     if (verbose_) {
       Report(iface);
       h.setLogLevel(4);
@@ -63,11 +67,9 @@ double ProgSolver::SolveGraph() {
       std::cout << "Solving problem, message handler has log level of "
                 << iface->messageHandler()->logLevel() << "\n";
     }
-    //bool verbose = false; // turn this off, solveprog prints a lot
-    bool verbose = true; // turn this on for logging
 
     // solve and back translate
-    SolveProg(iface, greedy_obj, verbose);
+    SolveProg(iface, greedy_obj, verbose_);
     xlator.FromProg();
   } catch(...) {
     delete iface;

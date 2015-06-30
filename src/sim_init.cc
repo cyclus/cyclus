@@ -234,20 +234,20 @@ ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
 ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive, 
                                         std::set<std::string> tables) {
   ExchangeSolver* solver;
-  double timeout = -1;
+  double timeout;
+  bool verbose;
   
   std::string solver_info = "CoinSolverInfo";
   if (0 < tables.count(solver_info)) {
     QueryResult qr = b_->Query(solver_info, NULL);
-    if (qr.rows.size() > 0) {
-      timeout = qr.GetVal<double>("Timeout");
-    }
+    timeout = qr.GetVal<double>("Timeout");
+    verbose = qr.GetVal<bool>("Verbose");
   }
 
   if (timeout <= 0) {
     solver = new ProgSolver("cbc", exclusive);
   } else {
-    solver = new ProgSolver("cbc", timeout, exclusive);
+    solver = new ProgSolver("cbc", timeout, exclusive, verbose);
   }
   return solver;
 }

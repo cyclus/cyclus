@@ -20,11 +20,12 @@ class ProgSolver: public ExchangeSolver {
   /// @param tmax the maximum solution time, default kOptimizeDefaultTimeout
   /// @param exclusive_orders whether all orders must be exclusive or not,
   /// default false
+  /// @param verbose print out a lot to stdout
   /// @{
   ProgSolver(std::string solver_t);
   ProgSolver(std::string solver_t, double tmax);
   ProgSolver(std::string solver_t, bool exclusive_orders);
-  ProgSolver(std::string solver_t, double tmax, bool exclusive_orders);
+  ProgSolver(std::string solver_t, double tmax, bool exclusive_orders, bool verbose);
   /// @}
   virtual ~ProgSolver();
 
@@ -35,6 +36,7 @@ class ProgSolver: public ExchangeSolver {
  private:
   std::string solver_t_;
   double tmax_;
+  bool verbose_;
 };
 
 }  // namespace cyclus
