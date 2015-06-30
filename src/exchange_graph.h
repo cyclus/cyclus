@@ -148,6 +148,17 @@ class ExchangeNodeGroup {
     excl_node_groups_.push_back(nodes);
   }
 
+  /// @return true of any nodes have arcs associated with them
+  bool HasArcs() {
+    for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
+         it != nodes_.end();
+         ++it) {
+      if (it->get()->prefs.size() > 0)
+        return true;
+    }
+    return false;
+  }
+  
   /// @brief adds a single node to the set of exclusive node groupings, in
   /// general this function is used for demand exclusivity
   void AddExclNode(ExchangeNode::Ptr n);

@@ -57,8 +57,12 @@ void ProgTranslator::Init() {
 }
 
 void ProgTranslator::Translate() {
-  // number of variables = number of arcs + 1 faux arc per request group
-  int n_cols = g_->arcs().size() + g_->request_groups().size();
+  // number of variables = number of arcs + 1 faux arc per request group with arcs
+  int nfalse = 0;
+  std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
+  for (int i = 0; i != g_->request_groups().size(); ++i)
+    nfalse += rgs[i].get()->HasArcs() ? 1 : 0;
+  int n_cols = g_->arcs().size() + nfalse;
   ctx_.m.setDimensions(0, n_cols);
 
   bool request;
@@ -68,7 +72,6 @@ void ProgTranslator::Translate() {
     XlateGrp_(sgs[i].get(), request);
   }
 
-  std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
   for (int i = 0; i != rgs.size(); i++) {
     request = true;
     XlateGrp_(rgs[i].get(), request);
@@ -114,6 +117,9 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
   double inf = iface_->getInfinity();
   std::vector<double>& caps = grp->capacities();
 
+  if (request && !grp->HasArcs())
+    return; // no arcs, no reason to add variables/constraints
+  
   std::vector<CoinPackedVector> cap_rows;
   std::vector<CoinPackedVector> excl_rows;
   for (int i = 0; i != caps.size(); i++) {
