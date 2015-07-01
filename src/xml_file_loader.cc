@@ -238,9 +238,12 @@ void XMLFileLoader::LoadSolver() {
     double timeout = cyclus::OptionalQuery<double>(&xqe, query, -1);
     query = string("/*/control/solver/config/coin-or/verbose");
     bool verbose = cyclus::OptionalQuery<bool>(&xqe, query, false);
+    query = string("/*/control/solver/config/coin-or/dump");
+    bool mps = cyclus::OptionalQuery<bool>(&xqe, query, false);
     ctx_->NewDatum("CoinSolverInfo")
       ->AddVal("Timeout", timeout)
       ->AddVal("Verbose", verbose)
+      ->AddVal("Mps", mps)
       ->Record();
   } else {
     throw ValueError("unknown solver name: " + solver_name);

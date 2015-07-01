@@ -19,25 +19,29 @@ ProgSolver::ProgSolver(std::string solver_t)
     : solver_t_(solver_t),
       tmax_(ProgSolver::KOptimizeDefaultTimeout),
       verbose_(false),
+      mps_(false),
       ExchangeSolver(false) {}
 
 ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
     : solver_t_(solver_t),
       tmax_(ProgSolver::KOptimizeDefaultTimeout),
       verbose_(false),
+      mps_(false),
       ExchangeSolver(exclusive_orders) {}
 
 ProgSolver::ProgSolver(std::string solver_t, double tmax)
     : solver_t_(solver_t),
       tmax_(tmax),
       verbose_(false),
+      mps_(false),
       ExchangeSolver(false) {}
 
 ProgSolver::ProgSolver(std::string solver_t, double tmax, bool exclusive_orders,
-                       bool verbose)
+                       bool verbose, bool mps)
     : solver_t_(solver_t),
       tmax_(tmax),
       verbose_(verbose),
+      mps_(mps),
       ExchangeSolver(exclusive_orders) {}
 
 ProgSolver::~ProgSolver() {}
@@ -45,7 +49,6 @@ ProgSolver::~ProgSolver() {}
 void ProgSolver::WriteMPS() {
   std::stringstream ss;
   ss << "exchng_" << sim_ctx_->time();
-  std::cout << "filename: " << ss.str() << "\n";
   iface_->writeMps(ss.str().c_str());
 }
 
@@ -63,8 +66,7 @@ double ProgSolver::SolveGraph() {
     double pseudo_cost = PseudoCost(); // from ExchangeSolver API
     ProgTranslator xlator(graph_, iface_, exclusive_orders_, pseudo_cost);
     xlator.ToProg();
-    bool write = true;
-    if (write)
+    if (mps_)
       WriteMPS();
     
     // set noise level
@@ -79,9 +81,10 @@ double ProgSolver::SolveGraph() {
       std::cout << "Solving problem, message handler has log level of "
                 << iface_->messageHandler()->logLevel() << "\n";
     }
-
+        
     // solve and back translate
     SolveProg(iface_, greedy_obj, verbose_);
+
     xlator.FromProg();
   } catch(...) {
     delete iface_;

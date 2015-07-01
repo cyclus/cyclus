@@ -22,12 +22,14 @@ class ProgSolver: public ExchangeSolver {
   /// @param tmax the maximum solution time, default kOptimizeDefaultTimeout
   /// @param exclusive_orders whether all orders must be exclusive or not,
   /// default false
-  /// @param verbose print out a lot to stdout
+  /// @param verbose print out a lot to stdout, default false
+  /// @param mps dump mps files for every solve, default false
   /// @{
   ProgSolver(std::string solver_t);
   ProgSolver(std::string solver_t, double tmax);
   ProgSolver(std::string solver_t, bool exclusive_orders);
-  ProgSolver(std::string solver_t, double tmax, bool exclusive_orders, bool verbose);
+  ProgSolver(std::string solver_t, double tmax, bool exclusive_orders,
+             bool verbose, bool mps);
   /// @}
   virtual ~ProgSolver();
 
@@ -40,7 +42,7 @@ class ProgSolver: public ExchangeSolver {
   
   std::string solver_t_;
   double tmax_;
-  bool verbose_;
+  bool verbose_, mps_;
   OsiSolverInterface* iface_;
 };
 
