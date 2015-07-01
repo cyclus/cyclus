@@ -101,6 +101,12 @@ class ResourceExchange {
             this));
   }
 
+  /// check if this is an empty exchange (i.e., no requests exist, therefore no
+  /// bids)
+  bool Empty() {
+    return ex_ctx_.bids_by_request.empty();
+  }
+
  private:
   void InitTraders() {
     if (traders_.size() == 0) {
