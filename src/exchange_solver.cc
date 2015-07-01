@@ -7,6 +7,14 @@
 
 namespace cyclus {
 
+double ExchangeSolver::PseudoCost() {
+  return PseudoCost(1);
+}
+
+double ExchangeSolver::PseudoCost(double cost_add) {
+  return PseudoCostByPref(cost_add);
+}
+
 double ExchangeSolver::PseudoCostByCap(double cost_add) {
   std::vector<ExchangeNode::Ptr>::iterator n_it;
   std::map<Arc, std::vector<double> >::iterator c_it;
