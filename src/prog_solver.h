@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "OsiSolverInterface.hpp"
+
 #include "exchange_graph.h"
 #include "exchange_solver.h"
 
@@ -34,9 +36,12 @@ class ProgSolver: public ExchangeSolver {
   virtual double SolveGraph();
   
  private:
+  void WriteMPS();
+  
   std::string solver_t_;
   double tmax_;
   bool verbose_;
+  OsiSolverInterface* iface_;
 };
 
 }  // namespace cyclus

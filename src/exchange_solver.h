@@ -5,6 +5,7 @@
 
 namespace cyclus {
 
+class Context;
 class ExchangeGraph;
 
 /// @class ExchangeSolver
@@ -14,9 +15,16 @@ class ExchangeSolver {
  public:
   explicit ExchangeSolver(bool exclusive_orders = false)
     : exclusive_orders_(exclusive_orders),
+      sim_ctx_(NULL),
       verbose_(false) {}
   virtual ~ExchangeSolver() {}
 
+  /// simulation context get/set
+  /// @{
+  inline void sim_ctx(Context* c) { sim_ctx_ = c; }
+  inline Context* sim_ctx() { return sim_ctx_; } 
+  /// @}
+  
   /// tell the solver to be verbose
   inline void verbose() { verbose_ = true; }
   inline void graph(ExchangeGraph* graph) { graph_ = graph; }
@@ -47,6 +55,7 @@ class ExchangeSolver {
   ExchangeGraph* graph_;
   bool exclusive_orders_;
   bool verbose_;
+  Context* sim_ctx_;
 };
 
 }  // namespace cyclus

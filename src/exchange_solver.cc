@@ -69,5 +69,5 @@ double ExchangeSolver::PseudoCost(double cost_add) {
 
   return max_coeff / min_unit_cap + cost_add;
 }
-
+  
 } // namespace cyclus
