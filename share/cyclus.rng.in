@@ -40,6 +40,7 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
                     <element name="timeout">  <data type="positiveInteger"/>  </element>
                   </optional>
                   <optional><element name="verbose"><data type="boolean"/></element></optional>
+                  <optional><element name="mps"><data type="boolean"/></element></optional>
                 </interleave>
               </element>
             </choice>

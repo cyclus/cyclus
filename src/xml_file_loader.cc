@@ -238,7 +238,7 @@ void XMLFileLoader::LoadSolver() {
     double timeout = cyclus::OptionalQuery<double>(&xqe, query, -1);
     query = string("/*/control/solver/config/coin-or/verbose");
     bool verbose = cyclus::OptionalQuery<bool>(&xqe, query, false);
-    query = string("/*/control/solver/config/coin-or/dump");
+    query = string("/*/control/solver/config/coin-or/mps");
     bool mps = cyclus::OptionalQuery<bool>(&xqe, query, false);
     ctx_->NewDatum("CoinSolverInfo")
       ->AddVal("Timeout", timeout)
