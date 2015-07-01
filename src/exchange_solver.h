@@ -45,7 +45,9 @@ class ExchangeSolver {
   /// @param cost_add the amount to add to the calculated ratio
   /// @{
   double PseudoCost() { return PseudoCost(1); }
-  double PseudoCost(double cost_add);
+  double PseudoCost(double cost_add) { return PseudoCostByPref(cost_add); }
+  double PseudoCostByCap(double cost_add);
+  double PseudoCostByPref(double cost_add);
   /// @}
 
  protected:

@@ -7,7 +7,7 @@
 
 namespace cyclus {
 
-double ExchangeSolver::PseudoCost(double cost_add) {
+double ExchangeSolver::PseudoCostByCap(double cost_add) {
   std::vector<ExchangeNode::Ptr>::iterator n_it;
   std::map<Arc, std::vector<double> >::iterator c_it;
   std::map<Arc, double>::iterator p_it;
@@ -69,5 +69,28 @@ double ExchangeSolver::PseudoCost(double cost_add) {
 
   return max_coeff / min_unit_cap + cost_add;
 }
-  
+
+double ExchangeSolver::PseudoCostByPref(double cost_add) {
+  double cost;
+  double max_cost = 0;
+  std::vector<Arc>& arcs = graph_->arcs();
+  for (int i = 0; i != arcs.size(); i++) {
+    Arc& a = arcs[i];
+    if (!a.exclusive()) {
+      cost = 1 / a.pref();
+    } else {
+      cost = a.unode()->qty / a.pref();
+      // special case for small exclusive quantities
+      // cost add must satisfy x > 1/ p * (1 - q)
+      // guarantee strict greater than by multiply by an increase factor
+      // (e.g., 5% -> multiply by 1.05)
+      if (a.unode()->qty < 1) 
+        cost_add = std::max(cost_add, 1.05 * (1 - a.unode()->qty) / a.pref());
+    }
+    max_cost = std::max(max_cost, cost);
+    std::cout << "bar: " << max_cost << "\n";
+  }
+  return max_cost + cost_add;
+}
+
 } // namespace cyclus
