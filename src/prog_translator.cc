@@ -6,6 +6,7 @@
 #include "OsiSolverInterface.hpp"
 
 #include "cyc_limits.h"
+#include "error.h"
 #include "exchange_graph.h"
 #include "logger.h"
 
@@ -54,6 +55,15 @@ void ProgTranslator::Init() {
   ctx_.col_ubs.resize(n_cols);
   ctx_.col_lbs.resize(n_cols);
   ctx_.m = CoinPackedMatrix(false, 0, 0);
+}
+
+void ProgTranslator::CheckPref(double pref) {
+  if (pref <= 0) {
+    std::stringstream ss;
+    ss << "Preference value found to be nonpositive (" << pref
+       << "). Preferences must be positive when using an optimization solver.";
+    throw ValueError(ss.str());
+  }
 }
 
 void ProgTranslator::Translate() {
@@ -150,6 +160,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       if (request) {
         // add obj coeff for arc
         double pref = nodes[i]->prefs[a];
+        CheckPref(pref);
         double col_ub = std::min(nodes[i]->qty, inf);
         double obj_coeff = (excl_ && a.exclusive()) ? a.excl_val() / pref : 1.0 / pref;
         ctx_.obj_coeffs[arc_id] = obj_coeff;
