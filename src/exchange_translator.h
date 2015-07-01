@@ -95,7 +95,7 @@ class ExchangeTranslator {
     }
     // get translated arc
     Arc a = TranslateArc(xlation_ctx_, bid);
-    
+    a.pref(pref);
     a.unode()->prefs[a] = pref;  // request node is a.unode()
     int n_prefs = a.unode()->prefs.size();
     

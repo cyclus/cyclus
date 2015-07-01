@@ -78,6 +78,7 @@ Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
 Arc::Arc(const Arc& other)
     : unode_(other.unode()),
       vnode_(other.vnode()),
+      pref_(other.pref()),
       exclusive_(other.exclusive()),
       excl_val_(other.excl_val()) {}
 

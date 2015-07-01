@@ -97,12 +97,14 @@ class Arc {
   inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
-
+  inline double pref() const { return pref_; }
+  inline void pref(double pref) { pref_ = pref; }
+  
  private:
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
-  double excl_val_;
+  double excl_val_, pref_;
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
