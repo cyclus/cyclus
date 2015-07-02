@@ -227,8 +227,8 @@ class ExchangeGraph {
   void AddMatch(const Arc& a, double qty);
 
   /// clears all matches
-  inline void ClearMatches() { matches_.clear(); }
-
+  void ClearMatches();
+  
   inline const std::vector<RequestGroup::Ptr>& request_groups() const {
     return request_groups_;
   }
