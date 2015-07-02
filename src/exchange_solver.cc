@@ -96,7 +96,6 @@ double ExchangeSolver::PseudoCostByPref(double cost_add) {
         cost_add = std::max(cost_add, 1.05 * (1 - a.unode()->qty) / a.pref());
     }
     max_cost = std::max(max_cost, cost);
-    std::cout << "bar: " << max_cost << "\n";
   }
   return max_cost + cost_add;
 }
