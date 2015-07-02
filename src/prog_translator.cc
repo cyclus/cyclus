@@ -181,7 +181,9 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       cap_rows[i].insert(faux_id, 1.0);  // faux arc
     }
 
-    double rlb = std::min(caps[i], 1e99); // 1e99 is max value for COIN solvers
+    // 1e15 is the largest value that doesn't make the solver fall over
+    // (by emperical testing)
+    double rlb = std::min(caps[i], 1e15); 
     ctx_.row_lbs.push_back(request ? rlb : 0);
     ctx_.row_ubs.push_back(request ? inf : caps[i]);
     ctx_.m.appendRow(cap_rows[i]);
