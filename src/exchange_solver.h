@@ -7,6 +7,7 @@ namespace cyclus {
 
 class Context;
 class ExchangeGraph;
+class Arc;
 
 /// @class ExchangeSolver
 ///
@@ -42,14 +43,18 @@ class ExchangeSolver {
   /// minimum unit capacity plus an added cost. This is guaranteed to be larger
   /// than any other arc cost measure and can be used as a cost for unmet
   /// demand.
-  /// @param cost_add the amount to add to the calculated ratio
+  /// @param cost_factor the additional cost for false arc costs, i.e., max_cost
+  /// * (1 + cost_factor)
   /// @{
   double PseudoCost();
-  double PseudoCost(double cost_add);
-  double PseudoCostByCap(double cost_add);
-  double PseudoCostByPref(double cost_add);
+  double PseudoCost(double cost_factor);
+  double PseudoCostByCap(double cost_factor);
+  double PseudoCostByPref(double cost_factor);
   /// @}
 
+  /// return the cost of an arc
+  double Cost(const Arc& a);
+  
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by
   /// any solver.
