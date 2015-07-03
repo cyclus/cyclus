@@ -2,7 +2,7 @@
 
 <simulation>
   <control>
-    <duration>100</duration>
+    <duration>50</duration>
     <startmonth>1</startmonth>
     <startyear>2000</startyear>
   <solver><config><coin-or><timeout>100</timeout><verbose>1</verbose></coin-or></config></solver></control>
