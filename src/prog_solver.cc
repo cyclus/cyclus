@@ -17,14 +17,14 @@ void Report(OsiSolverInterface* iface) {
 
 ProgSolver::ProgSolver(std::string solver_t)
     : solver_t_(solver_t),
-      tmax_(ProgSolver::KOptimizeDefaultTimeout),
+      tmax_(ProgSolver::kDefaultTimeoutOptimize),
       verbose_(false),
       mps_(false),
       ExchangeSolver(false) {}
 
 ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
     : solver_t_(solver_t),
-      tmax_(ProgSolver::KOptimizeDefaultTimeout),
+      tmax_(ProgSolver::kDefaultTimeoutOptimize),
       verbose_(false),
       mps_(false),
       ExchangeSolver(exclusive_orders) {}
@@ -56,11 +56,10 @@ double ProgSolver::SolveGraph() {
   SolverFactory sf(solver_t_, tmax_);
   iface_ = sf.get();
   try {
-    // // get greedy solution
-    // GreedySolver greedy(exclusive_orders_);
-    // double greedy_obj = greedy.Solve(graph_);
-    double greedy_obj = 0;
-    // graph_->ClearMatches();
+    // get greedy solution
+    GreedySolver greedy(exclusive_orders_);
+    double greedy_obj = greedy.Solve(graph_);
+    graph_->ClearMatches();
     
     // translate graph to iface_ instance
     double pseudo_cost = PseudoCost(); // from ExchangeSolver API
