@@ -8,6 +8,7 @@
 #include "cyc_limits.h"
 #include "error.h"
 #include "exchange_graph.h"
+#include "exchange_solver.h"
 #include "logger.h"
 
 namespace cyclus {
@@ -46,7 +47,6 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
       pseudo_cost_(pseudo_cost) {
   Init();
 }
-
 
 void ProgTranslator::Init() {
   arc_offset_ = g_->arcs().size();
@@ -162,7 +162,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
         double pref = nodes[i]->prefs[a];
         CheckPref(pref);
         double col_ub = std::min(nodes[i]->qty, inf);
-        double obj_coeff = (excl_ && a.exclusive()) ? a.excl_val() / pref : 1.0 / pref;
+        double obj_coeff = ExchangeSolver::Cost(a, excl_);
         ctx_.obj_coeffs[arc_id] = obj_coeff;
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] = (excl_ && a.exclusive()) ? 1 : col_ub;
