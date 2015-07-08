@@ -73,7 +73,6 @@ class Arc {
 
   Arc(boost::shared_ptr<ExchangeNode> unode,
       boost::shared_ptr<ExchangeNode> vnode);
-
   Arc(const Arc& other);
 
   inline Arc& operator=(const Arc& other) {

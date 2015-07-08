@@ -158,12 +158,11 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       }
 
       if (request) {
-        // add obj coeff for arc
-        double pref = nodes[i]->prefs[a];
+        double pref = a.pref();
         CheckPref(pref);
         double col_ub = std::min(nodes[i]->qty, inf);
-        double obj_coeff = ExchangeSolver::Cost(a, excl_);
-        ctx_.obj_coeffs[arc_id] = obj_coeff;
+        double solver_cost = ExchangeSolver::Cost(a, excl_);
+        ctx_.obj_coeffs[arc_id] = solver_cost;
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] = (excl_ && a.exclusive()) ? 1 : col_ub;
       }

@@ -94,8 +94,7 @@ class ExchangeTranslator {
       throw ValueError(ss.str());
     }
     // get translated arc
-    Arc a = TranslateArc(xlation_ctx_, bid);
-    a.pref(pref);
+    Arc a = TranslateArc(xlation_ctx_, bid, pref);
     a.unode()->prefs[a] = pref;  // request node is a.unode()
     int n_prefs = a.unode()->prefs.size();
     
@@ -235,12 +234,18 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
                  Bid<T>* bid) {
-  Request<T>* req = bid->request();
+  return TranslateArc<T>(translation_ctx, bid, 1);
+}
 
+template <class T>
+Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
+                 Bid<T>* bid, double pref) {
+  Request<T>* req = bid->request();
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
-
+  arc.pref(pref); 
+  
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
   typename RequestPortfolio<T>::Ptr rp = req->portfolio();
