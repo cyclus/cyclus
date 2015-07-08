@@ -8,17 +8,17 @@
 
 namespace cyclus {
 
+double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
+  return (exclusive_orders && a.exclusive()) ?
+      a.excl_val() / a.pref() : 1.0 / a.pref();  
+}
+
 double ExchangeSolver::PseudoCost() {
   return PseudoCost(1e-1);
 }
 
 double ExchangeSolver::PseudoCost(double cost_factor) {
   return PseudoCostByPref(cost_factor);
-}
-
-double ExchangeSolver::Cost(const Arc& a) {
-  return (exclusive_orders_ && a.exclusive()) ?
-      a.excl_val() / a.pref() : 1.0 / a.pref();  
 }
 
 double ExchangeSolver::PseudoCostByCap(double cost_factor) {
@@ -73,7 +73,7 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
       for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
         pref = p_it->second;
         const Arc& a = p_it->first;
-        coeff = Cost(a);
+        coeff = ArcCost(a);
         if (coeff > max_coeff)
           max_coeff = coeff;
       }
@@ -84,27 +84,14 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
 }
 
 double ExchangeSolver::PseudoCostByPref(double cost_factor) {
-  double cost;
   double max_cost = 0;
   std::vector<Arc>& arcs = graph_->arcs();
   for (int i = 0; i != arcs.size(); i++) {
     const Arc& a = arcs[i];
-    // if (!a.exclusive()) {
-    //   cost = 1 / a.pref();
-    // } else {
-    //   double factor = a.unode()->qty < 1 ? 1 : a.unode()->qty;
-    //   cost = factor / a.pref();
-    //   // cost = a.unode()->qty / a.pref();
-    //   // // special case for small exclusive quantities
-    //   // // cost add must satisfy x > 1/ p * (1 - q)
-    //   // // guarantee strict greater than by multiply by an increase factor
-    //   // // (e.g., 5% -> multiply by 1.05)
-    //   // if (a.unode()->qty < 1) 
-    //   //   cost_factor = std::max(cost_factor, 1.05 * (1 - a.unode()->qty) / a.pref());
-    // }
-    // max_cost = std::max(max_cost, cost);
-    cost = (a.exclusive() && a.excl_val() < 1) ? 1 / a.pref() : Cost(arcs[i]);
-    max_cost = std::max(max_cost, cost);
+    // remove exclusive value factor from costs for preferences that are less
+    // than unity. otherwise they can artificially raise the maximum cost.
+    double factor = (a.exclusive() && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
+    max_cost = std::max(max_cost, ArcCost(a) * factor);
   }
   return max_cost * (1 + cost_factor);
 }

@@ -14,7 +14,13 @@ class Arc;
 /// @brief a very simple interface for solving translated resource exchanges
 class ExchangeSolver {
  public:
-  explicit ExchangeSolver(bool exclusive_orders = false)
+  /// default value to allow exclusive orders or not
+  static const bool kDefaultExclusive = true;
+  
+  /// return the cost of an arc
+  static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
+
+  explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
     : exclusive_orders_(exclusive_orders),
       sim_ctx_(NULL),
       verbose_(false) {}
@@ -51,9 +57,9 @@ class ExchangeSolver {
   double PseudoCostByCap(double cost_factor);
   double PseudoCostByPref(double cost_factor);
   /// @}
-
+  
   /// return the cost of an arc
-  double Cost(const Arc& a);
+  inline double ArcCost(const Arc& a) { return Cost(a, exclusive_orders_); }
   
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by
