@@ -134,8 +134,4 @@ void ExchangeGraph::AddMatch(const Arc& a, double qty) {
   matches_.push_back(std::make_pair(a, qty));
 }
 
-void ExchangeGraph::ClearMatches() {
-  matches_.clear();
-}
-
 }  // namespace cyclus
