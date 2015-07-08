@@ -63,7 +63,9 @@ class ResourceExchange {
   /// @brief default constructor
   ///
   /// @param ctx the simulation context
-  ResourceExchange(Context* ctx) : ctx_(ctx) { }
+  ResourceExchange(Context* ctx) {
+    sim_ctx_ = ctx;
+  }
 
   inline ExchangeContext<T>& ex_ctx() {
     return ex_ctx_;
@@ -101,16 +103,14 @@ class ResourceExchange {
             this));
   }
 
-  /// check if this is an empty exchange (i.e., no requests exist, therefore no
-  /// bids)
-  bool Empty() {
-    return ex_ctx_.bids_by_request.empty();
-  }
+  /// return true if this is an empty exchange (i.e., no requests exist,
+  /// therefore no bids)
+  inline bool Empty() { return ex_ctx_.bids_by_request.empty(); }
 
  private:
   void InitTraders() {
     if (traders_.size() == 0) {
-      std::set<Trader*> orig = ctx_->traders();
+      std::set<Trader*> orig = sim_ctx_->traders();
       std::set<Trader*>::iterator it;
       for (it = orig.begin(); it != orig.end(); ++it) {
         traders_.insert(*it);
@@ -155,14 +155,13 @@ class ResourceExchange {
     }
   };
 
-  Context* ctx_;
-
   // this sorts traders (and results in iteration...) based on traders'
   // manager id.  Iterating over traders in this order helps increase the
   // determinism of Cyclus overall.  This allows all traders' resource
   // exchange functions are called in a much closer to deterministic order.
   std::set<Trader*, trader_compare> traders_;
 
+  Context* sim_ctx_;
   ExchangeContext<T> ex_ctx_;
 };
 
