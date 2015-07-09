@@ -17,14 +17,14 @@ void Report(OsiSolverInterface* iface) {
 
 ProgSolver::ProgSolver(std::string solver_t)
     : solver_t_(solver_t),
-      tmax_(ProgSolver::kDefaultTimeoutOptimize),
+      tmax_(ProgSolver::kDefaultTimeout),
       verbose_(false),
       mps_(false),
       ExchangeSolver(false) {}
 
 ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
     : solver_t_(solver_t),
-      tmax_(ProgSolver::kDefaultTimeoutOptimize),
+      tmax_(ProgSolver::kDefaultTimeout),
       verbose_(false),
       mps_(false),
       ExchangeSolver(exclusive_orders) {}

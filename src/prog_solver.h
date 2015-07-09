@@ -16,10 +16,10 @@ class ExchangeGraph;
 /// programming solution to a resource exchange graph.
 class ProgSolver: public ExchangeSolver {
  public:
-  static const int kDefaultTimeoutOptimize = 5 * 60; // 5 * 60 s/min == 5 minutes
+  static const int kDefaultTimeout = 5 * 60; // 5 * 60 s/min == 5 minutes
 
   /// @param solver_t the solver type, either "cbc" or "clp"
-  /// @param tmax the maximum solution time, default kDefaultTimeoutOptimize
+  /// @param tmax the maximum solution time, default kDefaultTimeout
   /// @param exclusive_orders whether all orders must be exclusive or not,
   /// default false
   /// @param verbose print out a lot to stdout, default false
