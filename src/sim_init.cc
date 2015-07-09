@@ -245,6 +245,7 @@ ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive,
     mps = qr.GetVal<bool>("Mps");
   }
 
+  // set timeout to default if input value is non-positive
   timeout = timeout <= 0 ? ProgSolver::kDefaultTimeout : timeout;
   solver = new ProgSolver("cbc", timeout, exclusive, verbose, mps);
   return solver;
