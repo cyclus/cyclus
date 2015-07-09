@@ -257,7 +257,7 @@ void SimInit::LoadSolverInfo() {
   // context will delete solver
   ExchangeSolver* solver;
   string solver_name;
-  bool exclusive_orders; // exclusive orders allowed
+  bool exclusive_orders;
 
   // load in possible Solver info, needs to be optional to
   // maintain backwards compatibility, defaults above.

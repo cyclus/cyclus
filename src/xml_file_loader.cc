@@ -14,6 +14,7 @@
 #include "cyc_std.h"
 #include "env.h"
 #include "error.h"
+#include "exchange_solver.h"
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
 #include "infile_tree.h"
@@ -212,7 +213,7 @@ void XMLFileLoader::LoadSolver() {
   string greedy = "greedy";
   string coinor = "coin-or";
   string solver_name = greedy;
-  bool exclusive = true;
+  bool exclusive = ExchangeSolver::kDefaultExclusive;
   if (xqe.NMatches("/*/control/solver") == 1) {
     qe = xqe.SubTree("/*/control/solver");
     if (qe->NMatches(config) == 1) {
