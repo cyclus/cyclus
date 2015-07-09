@@ -126,6 +126,15 @@ void Context::AddPrototype(std::string name, Agent* p) {
       ->AddVal("AgentId", p->id())
       ->AddVal("Spec", p->spec())
       ->Record();
+
+  std::string spec = p->spec();
+  if (rec_ver_.count(spec) == 0) {
+    rec_ver_.insert(spec);
+    NewDatum("AgentVersions")
+      ->AddVal("Spec", spec)
+      ->AddVal("Version", p->version())
+      ->Record();
+  }
 }
 
 void Context::AddRecipe(std::string name, Composition::Ptr c) {

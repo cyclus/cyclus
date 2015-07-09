@@ -12,6 +12,8 @@ class NullInst : public cyclus::Institution {
   NullInst(cyclus::Context* ctx);
   virtual ~NullInst();
 
+  virtual std::string version() { return cyclus::version::describe(); }
+
   #pragma cyclus
 
   #pragma cyclus note {"doc": "An instition that owns facilities in the " \

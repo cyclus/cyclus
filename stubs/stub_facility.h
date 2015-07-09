@@ -4,6 +4,7 @@
 #include <string>
 
 #include "cyclus.h"
+#include "stub_version.h"
 
 namespace stubs {
 
@@ -35,6 +36,8 @@ class StubFacility : public cyclus::Facility  {
   /// Constructor for StubFacility Class
   /// @param ctx the cyclus context for access to simulation-wide parameters
   explicit StubFacility(cyclus::Context* ctx);
+
+  virtual std::string version() { return version_str; }
 
   /// The Prime Directive
   /// Generates code that handles all input file reading and restart operations

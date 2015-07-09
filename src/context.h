@@ -259,6 +259,10 @@ class Context {
     n_specs_[a->spec()]--;
   }
 
+  /// contains archetype specs of all agents for which version have already
+  /// been recorded in the db
+  std::set<std::string> rec_ver_;
+
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::set<Agent*> agent_list_;

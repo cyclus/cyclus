@@ -223,6 +223,8 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
        "dump the cyclus master schema including all installed module schemas")
       ("agent-schema", po::value<std::string>(),
        "dump the schema for the named agent")
+      ("agent-version", po::value<std::string>(),
+       "print the version of the specified agent")
       ("schema-path", po::value<std::string>(),
        "manually specify the path to the cyclus master schema")
       ("flat-schema", "use the flat master simulation schema")
@@ -325,6 +327,20 @@ int EarlyExitArgs(const ArgInfo& ai) {
       Context* ctx = new Context(&ti, &rec);
       Agent* m = DynamicModule::Make(ctx, name);
       std::cout << m->schema();
+      ctx->DelAgent(m);
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("agent-version")) {
+    std::string name(ai.vm["agent-version"].as<std::string>());
+    cyclus::warn_limit = 0;
+    try {
+      Recorder rec;
+      Timer ti;
+      Context* ctx = new Context(&ti, &rec);
+      Agent* m = DynamicModule::Make(ctx, name);
+      std::cout << m->version() << "\n";
       ctx->DelAgent(m);
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
