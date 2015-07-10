@@ -1,8 +1,11 @@
 #ifndef CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 #define CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 
+#include <sstream>
+
 #include "bid.h"
 #include "bid_portfolio.h"
+#include "error.h"
 #include "exchange_graph.h"
 #include "exchange_translation_context.h"
 #include "logger.h"
@@ -80,22 +83,27 @@ class ExchangeTranslator {
         ex_ctx_->trader_prefs.at(req->requester())[req][bid];
     if (pref < 0) {
       CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
-    } else {
-      // get translated arc
-      Arc a = TranslateArc(xlation_ctx_, bid);
-
-      a.unode()->prefs[a] = pref;  // request node is a.unode()
-      int n_prefs = a.unode()->prefs.size();
-
-      CLOG(LEV_DEBUG5) << "Updating preference for one of "
-                       << req->requester()->manager()->prototype()
-                       << "'s trade nodes:";
-      CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-
-      graph->AddArc(a);
+      return;
+    } else if (pref == 0) {
+      std::stringstream ss;
+      ss << "0-valued preferences have been deprecated. "
+         << "Please make preference value positive.";
+      throw ValueError(ss.str());
     }
+    // get translated arc
+    Arc a = TranslateArc(xlation_ctx_, bid);
+    
+    a.unode()->prefs[a] = pref;  // request node is a.unode()
+    int n_prefs = a.unode()->prefs.size();
+    
+    CLOG(LEV_DEBUG5) << "Updating preference for one of "
+                     << req->requester()->manager()->prototype()
+                     << "'s trade nodes:";
+    CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
+    
+    graph->AddArc(a);
   }
-
+  
   /// @brief Provide a vector of Trades given a vector of Matches
   void BackTranslateSolution(const std::vector<Match>& matches,
                              std::vector< Trade<T> >& ret) {

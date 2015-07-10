@@ -4,6 +4,7 @@
 #include "bid_portfolio.h"
 #include "capacity_constraint.h"
 #include "composition.h"
+#include "error.h"
 #include "exchange_context.h"
 #include "exchange_graph.h"
 #include "exchange_translator.h"
@@ -95,6 +96,25 @@ TEST(ExXlateTests, NegPref) {
 
   xlator.AddArc(req, bid, graph);
   EXPECT_EQ(graph->arcs().size(), 0);
+}
+
+TEST(ExXlateTests, ZeroPref) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  double pref = 0;
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  Request<Material>* req =
+      rp->AddRequest(get_mat(u235, qty), trader, "", pref);
+  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
+  ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());
+
+  ExchangeContext<Material> ctx;
+  ctx.AddRequestPortfolio(rp);
+  ctx.AddBidPortfolio(bp);
+  ExchangeTranslator<Material> xlator(&ctx);
+
+  EXPECT_THROW(xlator.AddArc(req, bid, graph), cyclus::ValueError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
