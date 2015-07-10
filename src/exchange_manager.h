@@ -95,6 +95,8 @@ class ExchangeManager {
       typename std::set<Bid<T>*>::iterator it4;
       for (it4 = bids.begin(); it4 != bids.end(); ++it4) {
         Bid<T>* b = *it4;
+        Request<T>* r = b->request();
+        double pref = exctx.trader_prefs[r->requester()][r][b];
         std::stringstream ss;
         ss << ctx_->time() << "_" << b->request();
         ctx_->NewDatum("DebugBids")
@@ -102,6 +104,7 @@ class ExchangeManager {
           ->AddVal("BidderId", b->bidder()->manager()->id())
           ->AddVal("BidQuantity", b->offer()->quantity())
           ->AddVal("Exclusive", b->exclusive())
+          ->AddVal("Preference", pref)
           ->Record();
       }
     }
