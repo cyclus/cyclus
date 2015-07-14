@@ -312,6 +312,9 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
       std::map<std::string CYCLUS_COMMA
       std::vector<std::pair<int CYCLUS_COMMA
       std::pair<std::string CYCLUS_COMMA std::string> > > >);
+
+  CYCLUS_BINDVAL(LIST_PAIR_INT_INT, std::list< std::pair<int CYCLUS_COMMA int> >);
+
   default: {
     throw ValueError("attempted to retrieve unsupported sqlite backend type");
   }
@@ -398,6 +401,9 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
       std::map<std::string CYCLUS_COMMA
       std::vector<std::pair<int CYCLUS_COMMA
       std::pair<std::string CYCLUS_COMMA std::string> > > >);
+
+  CYCLUS_LOADVAL(LIST_PAIR_INT_INT, std::list< std::pair<int CYCLUS_COMMA int> >);
+
   default: {
     throw ValueError("Attempted to retrieve unsupported backend type");
   }}
@@ -469,6 +475,7 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
                  std::vector<std::pair<int, std::pair<std::string,
                                                       std::string> > > >)] =
         MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING;
+    type_map[&typeid(std::list<std::pair<int, int> >)] = LIST_PAIR_INT_INT;
   }
 
   const std::type_info* ti = &v.type();

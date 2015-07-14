@@ -507,3 +507,21 @@ TEST_F(SqliteBackTests, Tables) {
   EXPECT_LE(1, tabs.size());
   EXPECT_EQ(1, tabs.count("IntTable"));
 }
+
+TEST_F(SqliteBackTests, ListPairIntInt) {
+  std::list<std::pair<int, int> > l;
+  l.push_back(std::make_pair(4, 2));
+  l.push_back(std::make_pair(5, 3));
+
+  r.NewDatum("foo")
+      ->AddVal("bar", l)
+      ->Record();
+
+  r.Close();
+  cyclus::QueryResult qr = b->Query("foo", NULL);
+  l = qr.GetVal<std::list<std::pair<int, int> > >("bar", 0);
+
+  ASSERT_EQ(2, l.size());
+  EXPECT_EQ(std::make_pair(4, 2), l.front());
+  EXPECT_EQ(std::make_pair(5, 3), l.back());
+}
