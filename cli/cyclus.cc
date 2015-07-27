@@ -246,6 +246,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("path,p", "print the CYCLUS_PATH")
       ("include", "print the cyclus include directory")
       ("install-path", "print the cyclus install directory")
+      ("cmake-module-path", "print the cyclus CMake module path")
       ("build-path", "print the cyclus build directory")
       ("rng-schema", "print the path to cyclus.rng.in")
       ("nuc-data", "print the path to cyclus_nuc_data.h5")
@@ -303,6 +304,9 @@ int EarlyExitArgs(const ArgInfo& ai) {
     return 0;
   } else if (ai.vm.count("install-path")) {
     std::cout << Env::GetInstallPath() << "\n";
+    return 0;
+  } else if (ai.vm.count("cmake-module-path")) {
+    std::cout << Env::GetInstallPath() << "/share/cyclus/cmake/\n";
     return 0;
   } else if (ai.vm.count("build-path")) {
     std::cout << Env::GetBuildPath() << "\n";
