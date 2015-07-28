@@ -10,9 +10,10 @@ import shutil
 import os.path
 import re
 
-def rename_stub(files, name):
-    low, cap, upp = name.lower(), name.capitalize(), name.upper()
-    stublow, stubcap, stubupp = 'stub', 'Stub', 'STUB'
+def rename_stub(files, name, stubname):
+    low, cap, upp, underscore = name.lower(), name, name.upper(), fromcapcase(name)
+    stublow, stubcap, stubupp, stubunderscore = stubname.lower(), stubname, stubname.upper(), fromcapcase(stubname)
+    print(stubunderscore)
     for f in files:
         with open(f, 'r') as inp:
             s = inp.read()
@@ -20,6 +21,8 @@ def rename_stub(files, name):
         s = s.replace(stublow, low)
         s = s.replace(stubcap, cap)
         s = s.replace(stubupp, upp)
+        s = s.replace(stubunderscore, underscore)
+        s = s.replace(stubunderscore.upper(), underscore.upper())
         os.remove(f)
         d = os.path.dirname(f)
         name = os.path.basename(f)
@@ -65,4 +68,7 @@ if __name__ == '__main__':
     os.makedirs('src')
     for (src, dst) in archfiles:
         shutil.copy(os.path.join(stubpath, 'src', src), os.path.join('./src', dst))
+
+    allfiles = copyfiles + [os.path.join('src', dst[1]) for dst in archfiles]
+    rename_stub(allfiles, archname, 'Stub{0}'.format(args.type.capitalize()))
 
