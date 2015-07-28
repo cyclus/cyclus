@@ -1,0 +1,6 @@
+
+#include <string>
+
+namespace stubs {
+const std::string version_str = "@stubs_version@";
+}

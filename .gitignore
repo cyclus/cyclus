@@ -23,6 +23,7 @@ suffix.h
 *.tex
 src/Core/Utility/Env.cpp
 src/cyclus_nuc_data.h5
+stubs/stub_version.h
 src/env.cc
 src/version.cc
 share/cyclus_nuc_data.h5

@@ -42,6 +42,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_STUB_DIR "${PROJECT_SOURCE_DIR}/stubs")
     SET(CYCLUS_TEST_DIR "${PROJECT_SOURCE_DIR}/tests")
     SET(CYCLUS_AGENTS_DIR "${PROJECT_SOURCE_DIR}/agents")
+    SET(CYCLUS_CMAKE_DIR "${PROJECT_SOURCE_DIR}/cmake")
 
     # set cycpp var
     SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
@@ -197,6 +198,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
+    ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
 
     ##############################################################################################
     ####################################### end includes #########################################

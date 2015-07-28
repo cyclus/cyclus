@@ -4,6 +4,7 @@
 #include <string>
 
 #include "cyclus.h"
+#include "stub_version.h"
 
 namespace stubs {
 
@@ -35,6 +36,8 @@ class StubRegion : public cyclus::Region {
   /// Constructor for StubRegion Class
   /// @param ctx the cyclus context for access to simulation-wide parameters
   explicit StubRegion(cyclus::Context* ctx);
+
+  virtual std::string version() { return version_str; }
 
   /// Every agent should be destructable
   virtual ~StubRegion();

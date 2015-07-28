@@ -57,6 +57,8 @@ class Agent : public StateWrangler, virtual public Ider {
   /// etc. All subclass destructors should also be virtual.
   virtual ~Agent();
 
+  virtual std::string version() { return "unspecified"; }
+
   /// Returns a newly created/allocated prototype that is an exact copy of this.
   /// All initialization and state cloning operations should be done in the
   /// agent's InitFrom(Agent*) function. The new agent instance should NOT be
