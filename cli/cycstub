@@ -1,0 +1,68 @@
+#!/bin/python
+
+from __future__ import print_function
+
+import argparse
+import subprocess
+import sys
+import os
+import shutil
+import os.path
+import re
+
+def rename_stub(files, name):
+    low, cap, upp = name.lower(), name.capitalize(), name.upper()
+    stublow, stubcap, stubupp = 'stub', 'Stub', 'STUB'
+    for f in files:
+        with open(f, 'r') as inp:
+            s = inp.read()
+        s = s.replace('stubs', low)
+        s = s.replace(stublow, low)
+        s = s.replace(stubcap, cap)
+        s = s.replace(stubupp, upp)
+        os.remove(f)
+        d = os.path.dirname(f)
+        name = os.path.basename(f)
+        with open(os.path.join(d, name.replace('stub', low)), 'w') as out:
+            out.write(s)
+
+def fromcapcase(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+if __name__ == '__main__':
+    devnull = open(os.devnull, 'w')
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('spec', help='[path]:[library-name]:[archetype-name]')
+    parser.add_argument('--type', help='the type of archetype to generate', choices=['region', 'inst','facility'], default='facility')
+    args = parser.parse_args()
+
+    libpath, libname, archname = args.spec.strip().split(':')
+    archfname = fromcapcase(archname)
+
+    ret = subprocess.call(['which', 'cyclus'], stderr=devnull)
+    if ret != 0:
+        print('cannot find cyclus', file=sys.stderr)
+        sys.exit(1)
+
+    cycpath = subprocess.check_output(["cyclus", "--install"], universal_newlines=True).strip()
+    stubpath = os.path.join(cycpath, 'share/cyclus/stubs')
+
+    copyfiles = ['CMakeLists.txt', 'example.xml', 'install.py', 'README.rst']
+    for fname in copyfiles:
+        shutil.copy(os.path.join(stubpath, fname), './')
+
+    os.makedirs('cmake')
+    shutil.copy(os.path.join(cycpath, 'share/cyclus/cmake/FindCyclus.cmake'), './cmake/')
+
+    archfiles = [
+        ('stub_{0}.h'.format(args.type), '{0}.h'.format(archfname)),
+        ('stub_{0}.cc'.format(args.type), '{0}.cc'.format(archfname)),
+        ('stub_{0}_tests.cc'.format(args.type), '{0}_tests.cc'.format(archfname)),
+        ]
+
+    os.makedirs('src')
+    for (src, dst) in archfiles:
+        shutil.copy(os.path.join(stubpath, 'src', src), os.path.join('./src', dst))
+

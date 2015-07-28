@@ -195,7 +195,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_STUB_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
@@ -204,6 +203,33 @@ IF(NOT CYCLUS_DOC_ONLY)
     ####################################### end includes #########################################
     ##############################################################################################
 
+    ################# stub files #################################################################
+    INSTALL(
+        FILES
+        stubs/CMakeLists.txt
+        stubs/example.xml
+        stubs/install.py
+        stubs/README.rst
+        DESTINATION share/cyclus/stubs
+        COMPONENT stubs
+        )
+
+    INSTALL(
+        FILES
+            stubs/src/CMakeLists.txt
+            stubs/src/stub_facility.h
+            stubs/src/stub_facility.cc
+            stubs/src/stub_facility_tests.cc
+            stubs/src/stub_inst.h
+            stubs/src/stub_inst.cc
+            stubs/src/stub_inst_tests.cc
+            stubs/src/stub_region.h
+            stubs/src/stub_region.cc
+            stubs/src/stub_region_tests.cc
+            stubs/src/stub_unit_test_driver.cc
+        DESTINATION share/cyclus/stubs/src
+        COMPONENT stubs
+        )
     ##############################################################################################
     ################################## begin uninstall target ####################################
     ##############################################################################################

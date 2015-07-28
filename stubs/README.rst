@@ -77,13 +77,13 @@ The install script puts the project into your cyclus userspace,
 
 ------------
 
-Let's run |cyclus| with the TutorialFacility! In the input directory there is
+Let's run |cyclus| with the TutorialFacility! In the directory there is
 an :file:`example.xml`. Running |cyclus| on this file with the command
-``cyclus input/example.xml`` should produce the following output.
+``cyclus example.xml`` should produce the following output.
 
 .. code-block:: bash
 
-    tutorial $ cyclus input/example.xml
+    tutorial $ cyclus example.xml
                   :
               .CL:CC CC             _Q     _Q  _Q_Q    _Q    _Q              _Q
             CC;CCCCCCCC:C;         /_\)   /_\)/_/\\)  /_\)  /_\)            /_\)
