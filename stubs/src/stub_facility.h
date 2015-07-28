@@ -1,19 +1,18 @@
-#ifndef CYCLUS_STUBS_STUB_REGION_H_
-#define CYCLUS_STUBS_STUB_REGION_H_
+#ifndef CYCLUS_STUBS_STUB_FACILITY_H_
+#define CYCLUS_STUBS_STUB_FACILITY_H_
 
 #include <string>
 
 #include "cyclus.h"
-#include "stub_version.h"
 
 namespace stubs {
 
-/// @class StubRegion
+/// @class StubFacility
 ///
-/// This Region is intended
-/// as a skeleton to guide the implementation of new Region agents.
-///
-/// The StubRegion class inherits from the Region class and is
+/// This Facility is intended
+/// as a skeleton to guide the implementation of new Facility
+/// agents.
+/// The StubFacility class inherits from the Facility class and is
 /// dynamically loaded by the Agent class when requested.
 ///
 /// @section intro Introduction
@@ -31,16 +30,11 @@ namespace stubs {
 /// Place a description of the detailed behavior of the agent. Consider
 /// describing the behavior at the tick and tock as well as the behavior
 /// upon sending and receiving materials and messages.
-class StubRegion : public cyclus::Region {
+class StubFacility : public cyclus::Facility  {
  public:
-  /// Constructor for StubRegion Class
+  /// Constructor for StubFacility Class
   /// @param ctx the cyclus context for access to simulation-wide parameters
-  explicit StubRegion(cyclus::Context* ctx);
-
-  virtual std::string version() { return version_str; }
-
-  /// Every agent should be destructable
-  virtual ~StubRegion();
+  explicit StubFacility(cyclus::Context* ctx);
 
   /// The Prime Directive
   /// Generates code that handles all input file reading and restart operations
@@ -50,15 +44,23 @@ class StubRegion : public cyclus::Region {
 
   #pragma cyclus
 
-  #pragma cyclus note {"doc": "A stub region is provided as a skeleton " \
-                              "for the design of new region agents."}
+  #pragma cyclus note {"doc": "A stub facility is provided as a skeleton " \
+                              "for the design of new facility agents."}
 
-  /// A verbose printer for the StubRegion
+  /// A verbose printer for the StubFacility
   virtual std::string str();
+
+  /// The handleTick function specific to the StubFacility.
+  /// @param time the time of the tick
+  virtual void Tick();
+
+  /// The handleTick function specific to the StubFacility.
+  /// @param time the time of the tock
+  virtual void Tock();
 
   // And away we go!
 };
 
 }  // namespace stubs
 
-#endif  // CYCLUS_STUBS_STUB_REGION_H_
+#endif  // CYCLUS_STUBS_STUB_FACILITY_H_

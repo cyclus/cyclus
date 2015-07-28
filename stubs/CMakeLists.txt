@@ -1,9 +1,36 @@
-INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE stubs_version OUTPUT_STRIP_TRAILING_WHITESPACE)
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/stub_version.h.in" "${CMAKE_CURRENT_SOURCE_DIR}/stub_version.h" @ONLY)
+INSTALL(
+    FILES
+        AUTHORS.rst 
+        license.rst
+        README.rst
+        usercmake/CMakeLists.txt
+    DESTINATION share/cyclus/stubs
+    COMPONENT stubs
+    )
 
-install_cyclus_standalone("StubFacility" "stub_facility" "stubs")
-install_cyclus_standalone("StubInst" "stub_inst" "stubs")
-install_cyclus_standalone("StubRegion" "stub_region" "stubs")
+INSTALL(
+    FILES
+        input/example.xml
+        input/README.rst
+    DESTINATION share/cyclus/stubs/input
+    COMPONENT stubs
+    )
+
+INSTALL(
+    FILES
+        src/CMakeLists.txt
+        src/stub_facility.h
+        src/stub_facility.cc
+        src/stub_facility_tests.cc
+        src/stub_inst.h
+        src/stub_inst.cc
+        src/stub_inst_tests.cc
+        src/stub_region.h
+        src/stub_region.cc
+        src/stub_region_tests.cc
+        src/stub_unit_test_driver.cc
+    DESTINATION share/cyclus/stubs/src
+    COMPONENT stubs
+    )

@@ -4,7 +4,6 @@
 #include <string>
 
 #include "cyclus.h"
-#include "stub_version.h"
 
 namespace stubs {
 
@@ -36,8 +35,6 @@ class StubInst : public cyclus::Institution {
   /// Constructor for StubInst Class
   /// @param ctx the cyclus context for access to simulation-wide parameters
   explicit  StubInst(cyclus::Context* ctx);
-
-  virtual std::string version() { return version_str; }
 
   /// Every agent should be destructable
   virtual ~StubInst();
