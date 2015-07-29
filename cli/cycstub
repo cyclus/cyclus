@@ -100,27 +100,29 @@ if __name__ == '__main__':
     cycpath = subprocess.check_output(["cyclus", "--install"], universal_newlines=True).strip()
     stubpath = os.path.join(cycpath, 'share/cyclus/stubs')
 
-    archfiles = [
-        ('stub_{0}.h'.format(args.type), '{0}.h'.format(archfname)),
-        ('stub_{0}.cc'.format(args.type), '{0}.cc'.format(archfname)),
-        ('stub_{0}_tests.cc'.format(args.type), '{0}_tests.cc'.format(archfname)),
+    allfiles = [
+        ('src/stub_{0}.h'.format(args.type), 'src/{0}.h'.format(archfname)),
+        ('src/stub_{0}.cc'.format(args.type), 'src/{0}.cc'.format(archfname)),
+        ('src/stub_{0}_tests.cc'.format(args.type), 'src/{0}_tests.cc'.format(archfname)),
+        ('example_{0}.xml'.format(args.type), 'example_{0}.xml'.format(archfname)),
+        ('CMakeLists.txt', 'CMakeLists.txt'),
+        ('src/CMakeLists.txt', 'src/CMakeLists.txt'),
+        ('install.py', 'install.py'),
+        ('README.rst', 'README.rst'),
         ]
 
-    os.makedirs('src')
-    for (src, dst) in archfiles:
-        shutil.copy(os.path.join(stubpath, 'src', src), os.path.join('./src', dst))
+    dstfiles = [dst for _, dst in allfiles]
 
-    copyfiles = ['CMakeLists.txt', 'example.xml', 'install.py', 'README.rst']
-    for fname in copyfiles:
-        shutil.copy(os.path.join(stubpath, fname), './')
-    shutil.copy(os.path.join(stubpath, 'src/CMakeLists.txt'), './src/')
+    os.makedirs('src')
+    for (src, dst) in allfiles:
+        shutil.copy(os.path.join(stubpath, src), dst)
 
     os.makedirs('cmake')
     shutil.copy(os.path.join(cycpath, 'share/cyclus/cmake/FindCyclus.cmake'), './cmake/')
     shutil.copy(os.path.join(cycpath, 'share/cyclus/cmake/cmake_uninstall.cmake.in'), './cmake/')
 
-    allfiles = copyfiles + [os.path.join('src', dst[1]) for dst in archfiles] + ['src/CMakeLists.txt']
     rename_cmake(['CMakeLists.txt', 'src/CMakeLists.txt'], libpath, libname, archname)
-    rename_stub(allfiles, archname, 'Stub{0}'.format(args.type.capitalize()))
-    rename_stub(allfiles, libname, 'LibName')
+    rename_stub(dstfiles, archname, 'Stub{0}'.format(args.type.capitalize()))
+    rename_stub(dstfiles, libname, 'LibName')
+    rename_stub(dstfiles, libpath, 'LibPath')
 

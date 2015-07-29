@@ -207,7 +207,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     INSTALL(
         FILES
         stubs/CMakeLists.txt
-        stubs/example.xml
+        stubs/example_facility.xml
+        stubs/example_inst.xml
+        stubs/example_region.xml
         stubs/install.py
         stubs/README.rst
         DESTINATION share/cyclus/stubs
