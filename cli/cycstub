@@ -76,6 +76,7 @@ if __name__ == '__main__':
 
     os.makedirs('cmake')
     shutil.copy(os.path.join(cycpath, 'share/cyclus/cmake/FindCyclus.cmake'), './cmake/')
+    shutil.copy(os.path.join(cycpath, 'share/cyclus/cmake/cmake_uninstall.cmake.in'), './cmake/')
 
     allfiles = copyfiles + [os.path.join('src', dst[1]) for dst in archfiles] + ['src/CMakeLists.txt']
     rename_cmake(['CMakeLists.txt', 'src/CMakeLists.txt'], libpath, libname, archfname)

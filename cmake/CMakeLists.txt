@@ -11,6 +11,7 @@ INSTALL(
         FindTcmalloc.cmake
         LibFindMacros.cmake
         UseCyclus.cmake
+	cmake_uninstall.cmake.in
     DESTINATION share/cyclus/cmake
     COMPONENT core
     )
