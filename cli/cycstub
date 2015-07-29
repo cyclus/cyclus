@@ -66,6 +66,23 @@ def insert_line(fpath, below, toinsert):
     with open(fpath, 'w') as out:
         out.write(''.join(lines))
 
+def copy_srcfiles(stubpath, arch_type, arch_fname):
+    allfiles = [
+        ('src/stub_{0}.h'.format(arch_type), 'src/{0}.h'.format(arch_fname)),
+        ('src/stub_{0}.cc'.format(arch_type), 'src/{0}.cc'.format(arch_fname)),
+        ('src/stub_{0}_tests.cc'.format(arch_type), 'src/{0}_tests.cc'.format(arch_fname)),
+        ('example_{0}.xml'.format(arch_type), 'example_{0}.xml'.format(arch_fname)),
+        ]
+
+    try:
+        os.makedirs('src')
+    except: pass
+
+    for (src, dst) in allfiles:
+        shutil.copy(os.path.join(stubpath, src), dst)
+
+    return allfiles
+
 if __name__ == '__main__':
     devnull = open(os.devnull, 'w')
 
@@ -76,6 +93,14 @@ if __name__ == '__main__':
 
     libpath, libname, archname = parse_spec(args.spec)
     archfname = fromcapcase(archname)
+
+    ret = subprocess.call(['which', 'cyclus'], stderr=devnull)
+    if ret != 0:
+        print('cannot find cyclus', file=sys.stderr)
+        sys.exit(1)
+
+    cycpath = subprocess.check_output(["cyclus", "--install"], universal_newlines=True).strip()
+    stubpath = os.path.join(cycpath, 'share/cyclus/stubs')
 
     if os.path.exists('CMakeLists.txt'):
         prevlibpath, prevlibname, _ = read_cmake_spec()
@@ -88,36 +113,34 @@ if __name__ == '__main__':
 
         toinsert = 'USE_CYCLUS("{0}" "{1}")\n'.format(libname, archfname)
         insert_line('src/CMakeLists.txt', 'INSERT_ARCHETYPES_HERE', toinsert)
+        allfiles = copy_srcfiles(stubpath, args.type, archfname)
+        dstfiles = [dst for _, dst in allfiles]
+        rename_stub(dstfiles, archname, 'Stub{0}'.format(args.type.capitalize()))
+        rename_stub(dstfiles, libname, 'LibName')
+        rename_stub(dstfiles, libpath, 'LibPath')
         
         print('new archetype appended to existing stub project')
         sys.exit(0)
 
-    ret = subprocess.call(['which', 'cyclus'], stderr=devnull)
-    if ret != 0:
-        print('cannot find cyclus', file=sys.stderr)
-        sys.exit(1)
+    allfiles = copy_srcfiles(stubpath, args.type, archfname)
 
-    cycpath = subprocess.check_output(["cyclus", "--install"], universal_newlines=True).strip()
-    stubpath = os.path.join(cycpath, 'share/cyclus/stubs')
-
-    allfiles = [
-        ('src/stub_{0}.h'.format(args.type), 'src/{0}.h'.format(archfname)),
-        ('src/stub_{0}.cc'.format(args.type), 'src/{0}.cc'.format(archfname)),
-        ('src/stub_{0}_tests.cc'.format(args.type), 'src/{0}_tests.cc'.format(archfname)),
-        ('example_{0}.xml'.format(args.type), 'example_{0}.xml'.format(archfname)),
+    otherfiles = [
         ('CMakeLists.txt', 'CMakeLists.txt'),
         ('src/CMakeLists.txt', 'src/CMakeLists.txt'),
         ('install.py', 'install.py'),
         ('README.rst', 'README.rst'),
         ]
+    allfiles += otherfiles
 
     dstfiles = [dst for _, dst in allfiles]
 
-    os.makedirs('src')
-    for (src, dst) in allfiles:
+    for (src, dst) in otherfiles:
         shutil.copy(os.path.join(stubpath, src), dst)
 
-    os.makedirs('cmake')
+    try:
+        os.makedirs('cmake')
+    except: pass
+
     shutil.copy(os.path.join(cycpath, 'share/cyclus/cmake/FindCyclus.cmake'), './cmake/')
     shutil.copy(os.path.join(cycpath, 'share/cyclus/cmake/cmake_uninstall.cmake.in'), './cmake/')
 
