@@ -10,8 +10,7 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "in-source build detected")
 ENDIF()
 
-# This project name is stub.
-PROJECT(stub)
+PROJECT(@lib_name@)
 
 # quiets fortify_source warnings when not compiling with optimizations
 # in linux distros where compilers were compiled with fortify_source enabled by

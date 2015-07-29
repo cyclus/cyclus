@@ -1,11 +1,11 @@
-#ifndef CYCLUS_STUBS_STUB_INST_H_
-#define CYCLUS_STUBS_STUB_INST_H_
+#ifndef CYCLUS_LIBNAME_STUB_INST_H_
+#define CYCLUS_LIBNAME_STUB_INST_H_
 
 #include <string>
 
 #include "cyclus.h"
 
-namespace stubs {
+namespace libname {
 
 /// @class StubInst
 ///
@@ -57,6 +57,6 @@ class StubInst : public cyclus::Institution {
   // And away we go!
 };
 
-}  // namespace stubs
+}  // namespace libname
 
-#endif  // CYCLUS_STUBS_STUB_INST_H_
+#endif  // CYCLUS_LIBNAME_STUB_INST_H_

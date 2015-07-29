@@ -1,6 +1,6 @@
 #include "stub_facility.h"
 
-namespace stubs {
+namespace libname {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StubFacility::StubFacility(cyclus::Context* ctx) : cyclus::Facility(ctx) {}
@@ -23,4 +23,4 @@ extern "C" cyclus::Agent* ConstructStubFacility(cyclus::Context* ctx) {
   return new StubFacility(ctx);
 }
 
-}  // namespace stubs
+}  // namespace libname

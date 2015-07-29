@@ -1,11 +1,11 @@
-#ifndef CYCLUS_STUBS_STUB_FACILITY_H_
-#define CYCLUS_STUBS_STUB_FACILITY_H_
+#ifndef CYCLUS_LIBNAME_STUB_FACILITY_H_
+#define CYCLUS_LIBNAME_STUB_FACILITY_H_
 
 #include <string>
 
 #include "cyclus.h"
 
-namespace stubs {
+namespace libname {
 
 /// @class StubFacility
 ///
@@ -61,6 +61,6 @@ class StubFacility : public cyclus::Facility  {
   // And away we go!
 };
 
-}  // namespace stubs
+}  // namespace libname
 
-#endif  // CYCLUS_STUBS_STUB_FACILITY_H_
+#endif  // CYCLUS_LIBNAME_STUB_FACILITY_H_

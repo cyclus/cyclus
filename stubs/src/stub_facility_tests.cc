@@ -6,7 +6,7 @@
 #include "context.h"
 #include "facility_tests.h"
 
-using stubs::StubFacility;
+using libname::StubFacility;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubFacilityTest : public ::testing::Test {
