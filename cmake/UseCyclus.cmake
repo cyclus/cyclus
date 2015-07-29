@@ -218,11 +218,11 @@ MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
     SET("${lib_root}_TEST_LIB" "" CACHE INTERNAL "Agent test library alias." FORCE)
 
     # check if a test driver was provided, otherwise use the default
-    IF(${ARGC} GREATER 3)
+    IF(${ARGC} GREATER 3 AND NOT "${ARGV4}" STREQUAL "")
         SET(DRIVER "${ARGV4}")
-    ELSE(${ARGC} GREATER 3)
+    ELSE(${ARGC} GREATER 3  AND NOT "${ARGV4}" STREQUAL "")
         SET(DRIVER "${CYCLUS_DEFAULT_TEST_DRIVER}")
-    ENDIF(${ARGC} GREATER 3)
+    ENDIF(${ARGC} GREATER 3  AND NOT "${ARGV4}" STREQUAL "")
 
     USE_CYCLUS("${lib_root}" "${src_root}")
     INSTALL_CYCLUS_MODULE("${lib_root}" "${lib_dir}" ${DRIVER})
@@ -237,11 +237,11 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
     SET(INST_DIR "${lib_dir}")
 
     # check if a test driver was provided, otherwise use the default
-    IF(${ARGC} GREATER 2)
+    IF(${ARGC} GREATER 2 AND NOT "${ARGV2}" STREQUAL "")
         SET(DRIVER "${ARGV2}")
-    ELSE(${ARGC} GREATER 2)
+    ELSE(${ARGC} GREATER 2 AND NOT "${ARGV2}" STREQUAL "")
         SET(DRIVER "${CYCLUS_DEFAULT_TEST_DRIVER}")
-    ENDIF(${ARGC} GREATER 2)
+    ENDIF(${ARGC} GREATER 2 AND NOT "${ARGV2}" STREQUAL "")
 
     INSTALL_AGENT_LIB_("${LIB_NAME}" "${LIB_SRC}" "${LIB_H}" "${INST_DIR}")
     INSTALL_AGENT_TESTS_("${LIB_NAME}" "${TEST_SRC}" "${TEST_H}" "${DRIVER}" "${INST_DIR}")
