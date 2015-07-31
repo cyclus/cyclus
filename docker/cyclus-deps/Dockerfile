@@ -27,3 +27,6 @@ RUN apt-get install -y --force-yes \
     python-numpy \
     python-nose
 
+RUN rm /usr/bin/python
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
