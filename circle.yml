@@ -9,7 +9,7 @@ dependencies:
 test:
   override:
     - docker run cyclus/cyclus:latest cyclus_unit_tests
-    - docker run cyclus/cyclus:latest nosetests -w /cyclus/tests
+    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
 
 deployment:
   develop:

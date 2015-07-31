@@ -22,11 +22,11 @@ RUN apt-get install -y --force-yes \
     g++ \
     libgoogle-perftools-dev \
     git \
-    python \
-    python-tables \
-    python-numpy \
-    python-nose
+    python3 \
+    python3-tables \
+    python3-numpy \
+    python3-nose
 
 RUN rm /usr/bin/python
-
 RUN ln -s /usr/bin/python3 /usr/bin/python
+
