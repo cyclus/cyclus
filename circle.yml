@@ -1,0 +1,19 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker build -t cyclus/cyclus:latest .
+
+test:
+  override:
+    - docker run cyclus/cyclus:latest cyclus_unit_tests
+    - docker run cyclus/cyclus:latest nosetests -w /cyclus/tests
+
+deployment:
+  develop:
+    branch: develop
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push cyclus/cyclus:latest
