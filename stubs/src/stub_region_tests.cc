@@ -5,7 +5,7 @@
 #include "agent_tests.h"
 #include "region_tests.h"
 
-using stubs::StubRegion;
+using libname::StubRegion;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubRegionTest : public ::testing::Test {

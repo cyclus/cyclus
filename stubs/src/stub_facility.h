@@ -1,12 +1,11 @@
-#ifndef CYCLUS_STUBS_STUB_FACILITY_H_
-#define CYCLUS_STUBS_STUB_FACILITY_H_
+#ifndef CYCLUS_LIBNAME_STUB_FACILITY_H_
+#define CYCLUS_LIBNAME_STUB_FACILITY_H_
 
 #include <string>
 
 #include "cyclus.h"
-#include "stub_version.h"
 
-namespace stubs {
+namespace libname {
 
 /// @class StubFacility
 ///
@@ -37,8 +36,6 @@ class StubFacility : public cyclus::Facility  {
   /// @param ctx the cyclus context for access to simulation-wide parameters
   explicit StubFacility(cyclus::Context* ctx);
 
-  virtual std::string version() { return version_str; }
-
   /// The Prime Directive
   /// Generates code that handles all input file reading and restart operations
   /// (e.g., reading from the database, instantiating a new object, etc.).
@@ -64,6 +61,6 @@ class StubFacility : public cyclus::Facility  {
   // And away we go!
 };
 
-}  // namespace stubs
+}  // namespace libname
 
-#endif  // CYCLUS_STUBS_STUB_FACILITY_H_
+#endif  // CYCLUS_LIBNAME_STUB_FACILITY_H_
