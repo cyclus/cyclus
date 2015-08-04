@@ -31,6 +31,7 @@ INSTALL(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus.rng.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus-flat.rng.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dbtypes.json"
     DESTINATION share/cyclus
     COMPONENT core
     )
