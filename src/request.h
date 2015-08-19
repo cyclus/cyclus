@@ -9,6 +9,9 @@
 
 namespace cyclus {
 
+/// Default preference values are unity. This has been updated from values of
+/// zero (which was the case prior to release 1.4). Preferences can be lower or
+/// higher than the default value, but must be positive.
 static const double kDefaultPref = 1; 
   
 class Trader;

@@ -81,13 +81,16 @@ class ExchangeTranslator {
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
     double pref =
         ex_ctx_->trader_prefs.at(req->requester())[req][bid];
+    // TODO: make the following check `pref <=0` and remove the `else if` block
+    // before release 1.4
     if (pref < 0) {
       CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
       return;
     } else if (pref == 0) {
       std::stringstream ss;
       ss << "0-valued preferences have been deprecated. "
-         << "Please make preference value positive.";
+         << "Please make preference value positive."
+         << "This message will go away in before the next release (1.4).";
       throw ValueError(ss.str());
     }
     // get translated arc

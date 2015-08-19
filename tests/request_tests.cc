@@ -35,6 +35,7 @@ TEST(RequestTests, Defaults) {
   EXPECT_EQ("", r->commodity());
   EXPECT_FALSE(r->exclusive());
   EXPECT_EQ(1., r->preference());
+  EXPECT_EQ(1., cyclus::kDefaultPref);
 
   delete r;
 }
@@ -42,7 +43,6 @@ TEST(RequestTests, Defaults) {
 TEST(RequestTests, MaterialGetSet) {
   TestContext tc;
   TestFacility* fac = tc.trader();
-  Trader* excast = dynamic_cast<Trader*>(fac);
 
   string commod = "name";
   double pref = 2.4;
@@ -55,7 +55,7 @@ TEST(RequestTests, MaterialGetSet) {
   Request<Material>* r = Request<Material>::Create(mat, fac, commod, pref);
 
   EXPECT_EQ(commod, r->commodity());
-  EXPECT_EQ(excast, r->requester());
+  EXPECT_EQ(fac, r->requester());
   EXPECT_EQ(mat, r->target());
   EXPECT_EQ(pref, r->preference());
 
