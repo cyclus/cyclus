@@ -118,8 +118,13 @@ boost::uuids::uuid Context::sim_id() {
 }
 
 void Context::AddPrototype(std::string name, Agent* p) {
-  if (protos_.count(name) != 0) {
-    throw KeyError("Prototype name " + name + " has already been added");
+  AddPrototype(name, p, false);
+}
+
+void Context::AddPrototype(std::string name, Agent* p, bool overwrite) {
+  if (!overwrite && protos_.count(name) != 0) {
+    throw KeyError("Prototype name " + name + " has already been added" +
+                   " and cannot be overwritten.");
   }
 
   protos_[name] = p;

@@ -119,6 +119,8 @@ TEST_F(ContextTests, DoubleAgentNameThrow) {
   Agent* m2 = new DonutShop(ctx, "apple fritter");
   ASSERT_THROW(ctx->AddPrototype("dunkin donuts", m2),
                cyclus::KeyError);
+  bool overwrite = true;
+  ASSERT_NO_THROW(ctx->AddPrototype("dunkin donuts", m2, overwrite));
   
   delete ctx;
 }
