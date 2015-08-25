@@ -9,6 +9,11 @@
 
 namespace cyclus {
 
+/// Default preference values are unity. This has been updated from values of
+/// zero (which was the case prior to release 1.4). Preferences can be lower or
+/// higher than the default value, but must be positive.
+static const double kDefaultPref = 1; 
+  
 class Trader;
 template <class T> class RequestPortfolio;
 
@@ -35,7 +40,7 @@ class Request {
       Trader* requester,
       typename RequestPortfolio<T>::Ptr portfolio,
       std::string commodity = "",
-      double preference = 0,
+      double preference = kDefaultPref,
       bool exclusive = false) {
     return new Request<T>(target, requester, portfolio,
                           commodity, preference, exclusive);
@@ -46,7 +51,7 @@ class Request {
   inline static Request<T>* Create(boost::shared_ptr<T> target,
                                    Trader* requester,
                                    std::string commodity = "",
-                                   double preference = 0,
+                                   double preference = kDefaultPref,
                                    bool exclusive = false) {
     return new Request<T>(target, requester, commodity, preference,
                           exclusive);
@@ -75,7 +80,7 @@ class Request {
  private:
   /// @brief constructors are private to require use of factory methods
   Request(boost::shared_ptr<T> target, Trader* requester,
-          std::string commodity = "", double preference = 0,
+          std::string commodity = "", double preference = kDefaultPref,
           bool exclusive = false)
       : target_(target),
         requester_(requester),
@@ -85,7 +90,7 @@ class Request {
 
   Request(boost::shared_ptr<T> target, Trader* requester,
           typename RequestPortfolio<T>::Ptr portfolio,
-          std::string commodity = "", double preference = 0,
+          std::string commodity = "", double preference = kDefaultPref,
           bool exclusive = false)
       : target_(target),
         requester_(requester),

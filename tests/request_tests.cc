@@ -19,11 +19,30 @@ using cyclus::TestContext;
 using cyclus::Trader;
 using std::string;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(RequestTests, MaterialGetSet) {
+TEST(RequestTests, Defaults) {
   TestContext tc;
   TestFacility* fac = tc.trader();
   Trader* excast = dynamic_cast<Trader*>(fac);
+
+  cyclus::CompMap cm;
+  cm[92235] = 1.0;
+  Composition::Ptr comp = Composition::CreateFromMass(cm);
+  double qty = 1.0;
+  Material::Ptr mat = Material::CreateUntracked(qty, comp);
+
+  Request<Material>* r = Request<Material>::Create(mat, fac);
+
+  EXPECT_EQ("", r->commodity());
+  EXPECT_FALSE(r->exclusive());
+  EXPECT_EQ(1., r->preference());
+  EXPECT_EQ(1., cyclus::kDefaultPref);
+
+  delete r;
+}
+
+TEST(RequestTests, MaterialGetSet) {
+  TestContext tc;
+  TestFacility* fac = tc.trader();
 
   string commod = "name";
   double pref = 2.4;
@@ -36,14 +55,13 @@ TEST(RequestTests, MaterialGetSet) {
   Request<Material>* r = Request<Material>::Create(mat, fac, commod, pref);
 
   EXPECT_EQ(commod, r->commodity());
-  EXPECT_EQ(excast, r->requester());
+  EXPECT_EQ(fac, r->requester());
   EXPECT_EQ(mat, r->target());
   EXPECT_EQ(pref, r->preference());
 
   delete r;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(RequestTests, ProductGetSet) {
   TestContext tc;
   TestFacility* fac = tc.trader();
