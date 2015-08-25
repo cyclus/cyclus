@@ -101,10 +101,10 @@ TEST(ExXlateTests, NegPref) {
 /// this test checks the condition of an arc with a zero-valued preference value
 /// being added to an exchange graph. the throw check is neccesary because of
 /// transition from simulation backwards incompatability from releases 1.3 to
-/// 1.4.
+/// 1.5.
 ///
 /// TODO: check that arcs().size() is zero instead of throwing before release
-/// 1.4
+/// 1.5
 TEST(ExXlateTests, ZeroPref) {
   TestContext tc;
   TestFacility* trader = tc.trader();

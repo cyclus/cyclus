@@ -82,7 +82,7 @@ class ExchangeTranslator {
     double pref =
         ex_ctx_->trader_prefs.at(req->requester())[req][bid];
     // TODO: make the following check `pref <=0` and remove the `else if` block
-    // before release 1.4
+    // before release 1.5
     if (pref < 0) {
       CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
       return;
@@ -90,7 +90,7 @@ class ExchangeTranslator {
       std::stringstream ss;
       ss << "0-valued preferences have been deprecated. "
          << "Please make preference value positive."
-         << "This message will go away in before the next release (1.4).";
+         << "This message will go away in before the next release (1.5).";
       throw ValueError(ss.str());
     }
     // get translated arc
