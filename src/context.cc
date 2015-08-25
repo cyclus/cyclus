@@ -122,7 +122,7 @@ void Context::AddPrototype(std::string name, Agent* p) {
 }
 
 void Context::AddPrototype(std::string name, Agent* p, bool overwrite) {
-  if (!overwrite && protos_.count(name) != 0) {
+  if (!overwrite && protos_.find(name) != protos_.end()) {
     throw KeyError("Prototype name " + name + " has already been added" +
                    " and cannot be overwritten.");
   }
