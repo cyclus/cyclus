@@ -108,3 +108,17 @@ TEST_F(ContextTests, CreateAgent) {
 
   EXPECT_EQ(6, DonutShop::destruct_count);
 }
+
+TEST_F(ContextTests, DoubleAgentNameThrow) {
+  Timer ti;
+  Recorder rec;
+  Context* ctx = new Context(&ti, &rec);
+
+  Agent* m1 = new DonutShop(ctx, "old fashion");
+  ctx->AddPrototype("dunkin donuts", m1);
+  Agent* m2 = new DonutShop(ctx, "apple fritter");
+  ASSERT_THROW(ctx->AddPrototype("dunkin donuts", m2),
+               cyclus::KeyError);
+  
+  delete ctx;
+}

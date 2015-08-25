@@ -121,7 +121,9 @@ class Context {
   /// See Recorder::sim_id documentation.
   boost::uuids::uuid sim_id();
 
-  /// Adds a prototype to a simulation-wide accessible list.
+  /// Adds a prototype to a simulation-wide accessible list, a prototype **can
+  /// not** be added more than once.
+  /// @throws if a prototype name has already been added
   void AddPrototype(std::string name, Agent* m);
 
   /// Registers an agent as a participant in resource exchanges. Agents should
