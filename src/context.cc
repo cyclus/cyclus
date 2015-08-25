@@ -118,6 +118,15 @@ boost::uuids::uuid Context::sim_id() {
 }
 
 void Context::AddPrototype(std::string name, Agent* p) {
+  AddPrototype(name, p, false);
+}
+
+void Context::AddPrototype(std::string name, Agent* p, bool overwrite) {
+  if (!overwrite && protos_.find(name) != protos_.end()) {
+    throw KeyError("Prototype name " + name + " has already been added" +
+                   " and cannot be overwritten.");
+  }
+
   protos_[name] = p;
   // explicit snapshot required for in situ (non-xml) prototype addition
   SimInit::SnapAgent(p); 
