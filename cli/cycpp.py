@@ -1526,13 +1526,14 @@ class InfileToDbFilter(CodeGeneratorFilter):
                 continue
             d = info['default'] if 'default' in info else None
 
-            if 'internal' in info:
+            if 'internal' in info and info['internal'] == True:
                 # do NOT combine above and below ifs into a single if
                 if d is not None:
                     mname = member + '_tmp'
                     impl += self._val(t, val=d, name=mname, uitype=uitype, ind=ind)
                     impl += ind + '{0} = {1};\n'.format(member, mname)
-                # else: skip else clause below
+                else:
+                    raise RuntimeError('state variables marked as internal must have a default')
             else:
                 labels = info.get('alias', None)
                 if labels is None:

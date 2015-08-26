@@ -1005,6 +1005,142 @@ def test_infiletodb_read_map():
 
     yield assert_equal, exp, obs
 
+def test_internal_schema():
+    cases = [
+        {'params': {'internal': True, 'default': 7}, 'want':
+            '  return ""\n    "<interleave/>\\n";\n'
+            },
+        {'params': {'derived_init': 'x *= 42;'}, 'want':
+            ('  return ""\n'
+             '    "<interleave>\\n"\n'
+             '    "    <element name=\\"x\\">\\n"\n'
+             '    "        <data type=\\"int\\"/>\\n"\n'
+             '    "    </element>\\n"\n'
+             '    "</interleave>\\n";\n')
+            },
+        {'params': {'derived_init': 'x *= 42;', 'default': 7}, 'want':
+            ('  return ""\n'
+             '    "<interleave>\\n"\n'
+             '    "    <optional>\\n"\n'
+             '    "        <element name=\\"x\\">\\n"\n'
+             '    "            <data type=\\"int\\"/>\\n"\n'
+             '    "        </element>\\n"\n'
+             '    "    </optional>\\n"\n'
+             '    "</interleave>\\n";\n')
+            },
+        {'params': {'internal': True, 'derived_init': 'x *= 42;', 'default': 7}, 'want':
+            '  return ""\n    "<interleave/>\\n";\n'
+            },
+    ]
+
+    for i, case in enumerate(cases):
+        keys = case['params'].copy()
+        m = MockCodeGenMachine()
+        params = {'type': 'int'}
+        params.update(keys)
+        m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+                ('x', params),
+            ]))])}
+        f = SchemaFilter(m)
+        f.given_classname = 'MyFactory'
+
+        impl = f.impl()
+
+        want = case['want']
+        msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
+        if want != impl:
+            pprint.pprint(impl)
+            assert_true(False, msg)
+
+def test_internal_infiletodb():
+    # the expected output (i.e. 'want':...) is set as 'throw' if the
+    # configuration should cause an exception.
+    cases = [
+        {'params': {'internal': True}, 'want': 'throw'},
+        {'params': {'internal': True, 'default': 7}, 'want':
+            ('  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+             '  int i;\n'
+             '  int n;\n'
+             '  int x_tmp = 7;\n'
+             '  x = x_tmp;\n'
+             '  di.NewDatum("Info")\n'
+             '  ->AddVal("x", x)\n'
+             '  ->Record();\n')
+            },
+        {'params': {'derived_init': 'x *= 42;'}, 'want':
+            ('  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+             '  int i;\n'
+             '  int n;\n'
+             '  {\n'
+             '    int x_val = cyclus::Query<int>(sub, "x");\n'
+             '    x = x_val;\n'
+             '  }\n'
+             '  x *= 42;\n'
+             '  di.NewDatum("Info")\n'
+             '  ->AddVal("x", x)\n'
+             '  ->Record();\n')
+            },
+        {'params': {'derived_init': 'x *= 42;', 'default': 7}, 'want':
+            ('  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+             '  int i;\n'
+             '  int n;\n'
+             '  if (sub->NMatches("x") > 0) {\n'
+             '    {\n'
+             '      int x_val = cyclus::Query<int>(sub, "x");\n'
+             '      x = x_val;\n'
+             '    }\n'
+             '  } else {\n'
+             '    int x_tmp = 7;\n'
+             '    x = x_tmp;\n'
+             '  }\n'
+             '  x *= 42;\n'
+             '  di.NewDatum("Info")\n'
+             '  ->AddVal("x", x)\n'
+             '  ->Record();\n')
+            },
+        {'params': {'internal': True, 'derived_init': 'x *= 42;', 'default': 7}, 'want':
+            ('  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+             '  int i;\n'
+             '  int n;\n'
+             '  int x_tmp = 7;\n'
+             '  x = x_tmp;\n'
+             '  x *= 42;\n'
+             '  di.NewDatum("Info")\n'
+             '  ->AddVal("x", x)\n'
+             '  ->Record();\n')
+            },
+    ]
+
+    for i, case in enumerate(cases):
+        keys = case['params'].copy()
+        m = MockCodeGenMachine()
+        params = {'type': 'int'}
+        params.update(keys)
+        m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+                ('x', params),
+            ]))])}
+        f = InfileToDbFilter(m)
+        f.given_classname = 'MyFactory'
+
+        want = case['want']
+
+        impl = ''
+        if want == 'throw':
+            haderr = False
+            try:
+                impl = f.impl()
+            except:
+                haderr = True
+            msg = 'case {0} failed: expected raised exception, got none.'
+            assert_true(haderr, msg)
+            continue
+        else:
+            impl = f.impl()
+
+        msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
+        if want != impl:
+            pprint.pprint(impl)
+            assert_true(False, msg)
 
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
