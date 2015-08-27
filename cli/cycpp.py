@@ -1525,8 +1525,15 @@ class InfileToDbFilter(CodeGeneratorFilter):
             if key in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
-            if 'derived_init' in info:
-                impl += ind + info['derived_init'] + '\n'
+
+            if 'internal' in info and info['internal'] == True:
+                # do NOT combine above and below ifs into a single if
+                if d is not None:
+                    mname = member + '_tmp'
+                    impl += self._val(t, val=d, name=mname, uitype=uitype, ind=ind)
+                    impl += ind + '{0} = {1};\n'.format(member, mname)
+                else:
+                    raise RuntimeError('state variables marked as internal must have a default')
             else:
                 labels = info.get('alias', None)
                 if labels is None:
@@ -1557,6 +1564,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
                     impl += ind + '{0} = {1};\n'.format(member, mname)
                     ind = ind[:-2]
                     impl += ind + '}\n'
+
+            # this must run after all other codegen for the current statevar:
+            if 'derived_init' in info:
+                impl += ind + info['derived_init'] + '\n'
 
         # write obj to database
         impl += ind + 'di.NewDatum("Info")\n'
@@ -1732,7 +1743,7 @@ class SchemaFilter(CodeGeneratorFilter):
 
             if key in BUFFERS:  # buffer state, skip
                 continue
-            if 'derived_init' in info:  # derived state, skip
+            if 'internal' in info:
                 continue
 
             opt = True if 'default' in info else False

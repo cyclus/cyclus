@@ -97,6 +97,19 @@ class Villan: public mi6::Spy {
     }
   std::string enemy;
 
+  #pragma cyclus var {"internal": False}
+  int foo1;
+  #pragma cyclus var {"internal": False, "derived_init": "foo3 = std::exp(2);"}
+  int foo3;
+  #pragma cyclus var {"internal": False, "default": 7}
+  int foo5;
+  #pragma cyclus var {"internal": True, "default": 7}
+  int foo6;
+  #pragma cyclus var {"internal": False, "derived_init": "foo3 = std::exp(2);", "default": 7}
+  int foo7;
+  #pragma cyclus var {"internal": True, "derived_init": "foo4 = std::exp(2);", "default": 7}
+  int foo8;
+
   #pragma cyclus var {\
     "default": [1, 2, 5],\
     }
