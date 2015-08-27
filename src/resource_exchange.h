@@ -73,7 +73,7 @@ class ResourceExchange {
 
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
-    std::set<Trader*> traders = ctx_->traders();
+    std::set<Trader*, trader_compare> traders = OrderedTraders();
     std::for_each(
         traders.begin(),
         traders.end(),
@@ -83,7 +83,7 @@ class ResourceExchange {
 
   /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
-    std::set<Trader*> traders = ctx_->traders();
+    std::set<Trader*, trader_compare> traders = OrderedTraders();
     std::for_each(
         traders.begin(),
         traders.end(),
@@ -132,6 +132,22 @@ class ResourceExchange {
       AdjustPrefs(m, prefs);
       m = m->parent();
     }
+  }
+
+  struct trader_compare {
+    bool operator()(Trader* lhs, Trader* rhs) const {
+      return lhs->manager()->id() < rhs->manager()->id();
+    }
+  };
+
+  std::set<Trader*, trader_compare> OrderedTraders() {
+    std::set<Trader*> orig = ctx_->traders();
+    std::set<Trader*>::iterator it;
+    std::set<Trader*, trader_compare> ordered;
+    for (it = orig.begin(); it != orig.end(); ++it) {
+      ordered.insert(*it);
+    }
+    return ordered;
   }
 
   Context* ctx_;
