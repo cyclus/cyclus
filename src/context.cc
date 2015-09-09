@@ -16,6 +16,7 @@ SimInfo::SimInfo()
     : duration(0),
       y0(0),
       m0(0),
+      dt(kDefaultTimeStepDur),
       decay("manual"),
       branch_time(-1),
       parent_sim(boost::uuids::nil_uuid()),
@@ -25,6 +26,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
     : duration(dur),
       y0(y0),
       m0(m0),
+      dt(kDefaultTimeStepDur),
       decay("manual"),
       branch_time(-1),
       handle(handle),
@@ -35,6 +37,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
     : duration(dur),
       y0(y0),
       m0(m0),
+      dt(kDefaultTimeStepDur),
       decay(d),
       branch_time(-1),
       handle(handle),
@@ -47,6 +50,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
     : duration(dur),
       y0(-1),
       m0(-1),
+      dt(kDefaultTimeStepDur),
       decay("manual"),
       parent_sim(parent_sim),
       parent_type(parent_type),
@@ -181,6 +185,10 @@ void Context::InitSim(SimInfo si) {
 
   NewDatum("DecayMode")
       ->AddVal("Decay", si.decay)
+      ->Record();
+
+  NewDatum("TimeStepDur")
+      ->AddVal("DurationSecs", static_cast<int>(si.dt))
       ->Record();
 
   NewDatum("XMLPPInfo")

@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "context.h"
 #include "composition.h"
 #include "comp_math.h"
 #include "env.h"
@@ -80,7 +81,7 @@ TEST(CompositionTests, decay) {
   cyclus::compmath::Normalize(&v);
   Composition::Ptr c = Composition::CreateFromAtom(v);
 
-  double secs_per_timestep = 2419200.0;
+  double secs_per_timestep = kDefaultTimeStepDur;
   Composition::Ptr newc = c->Decay(int(pyne::half_life("Cs137") / secs_per_timestep));
 
   CompMap newv = newc->atom();

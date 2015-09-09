@@ -17,6 +17,8 @@
 #include "greedy_solver.h"
 #include "recorder.h"
 
+const uint64_t kDefaultTimeStepDur = 2629846;
+
 class SimInitTest;
 
 namespace cyclus {
@@ -91,6 +93,9 @@ class SimInfo {
 
   /// timestep at which simulation branching occurs if any
   int branch_time;
+
+  /// Duration in seconds of a single time step in the simulation.
+  uint64_t dt;
 };
 
 /// A simulation context provides access to necessary simulation-global

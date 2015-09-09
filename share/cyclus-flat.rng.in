@@ -18,6 +18,9 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional> 
         <element name="decay"><text/></element> 
       </optional>
+      <optional> 
+        <element name="dt"><data type="nonNegativeInteger"/></element> 
+      </optional>
       <optional>
         <element name="solver"> 
           <interleave>
