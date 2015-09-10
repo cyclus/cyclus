@@ -71,6 +71,7 @@ INSTALL(FILES ${header_files}
     COMPONENT testing
     )
 
+ADD_SUBDIRECTORY(input)
 ADD_SUBDIRECTORY(toolkit)
 ADD_SUBDIRECTORY(agent_tests)
 SET(

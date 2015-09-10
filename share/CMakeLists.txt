@@ -35,3 +35,4 @@ INSTALL(FILES
     DESTINATION share/cyclus
     COMPONENT core
     )
+
