@@ -67,7 +67,6 @@ TEST(IntegTests, RunAllInfiles) {
   infiles.push_back("predator.xml");
   infiles.push_back("prey.xml");
   infiles.push_back("source_to_sink.xml");
-  infiles.push_back("stub_example.xml");
   infiles.push_back("trivial_cycle.xml");
 
   for (int i = 0; i < infiles.size(); i++) {

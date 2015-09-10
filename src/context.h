@@ -215,6 +215,9 @@ class Context {
   /// Returns the current simulation timestep.
   virtual int time();
 
+  /// Returns the duration of a single time step in seconds.
+  inline uint64_t dt() {return si_.dt;};
+
   /// Return static simulation info.
   inline SimInfo sim_info() const {
     return si_;
