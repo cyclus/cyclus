@@ -187,6 +187,8 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("Decay", si.decay)
       ->Record();
 
+  // TODO: when the backends get uint64_t support, the static_cast here should
+  // be removed.
   NewDatum("TimeStepDur")
       ->AddVal("DurationSecs", static_cast<int>(si.dt))
       ->Record();

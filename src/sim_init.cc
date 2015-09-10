@@ -152,6 +152,8 @@ void SimInit::LoadInfo() {
   std::string d = dq.GetVal<std::string>("Decay");
 
   dq = b_->Query("TimeStepDur", NULL);
+  // TODO: when the backends support uint64_t, the int template here
+  // should be updated to uint64_t.
   uint64_t ts = dq.GetVal<int>("DurationSecs");
 
   si_ = SimInfo(dur, y0, m0, h, d);
