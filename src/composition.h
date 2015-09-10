@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_COMPOSITION_H_
 
 #include <map>
+#include <stdint.h>
 #include <boost/shared_ptr.hpp>
 
 class SimInitTest;

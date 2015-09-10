@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <stdint.h>
 
 #ifndef CYCPP
 // The cyclus preprocessor cannot handle this file since there are two
