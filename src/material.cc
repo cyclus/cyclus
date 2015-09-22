@@ -164,16 +164,20 @@ void Material::Decay(int curr_time) {
   // just do the decay rather than check all the decay constants.
   bool decay = c.size() > 100;
 
+  uint64_t secs_per_timestep = kDefaultTimeStepDur;
+  if (ctx_ != NULL) {
+    secs_per_timestep = ctx_->sim_info().dt;
+  }
+
   if (!decay) {
     // Only do the decay calc if one of the nuclides would change in number
     // density more than fraction eps.
     // i.e. decay if   (1 - eps) > exp(-lambda*dt)
-    CompMap::const_iterator it;
-    for (it = c.end(); it != c.begin(); --it) {
+    CompMap::const_reverse_iterator it;
+    for (it = c.rbegin(); it != c.rend(); ++it) {
       int nuc = it->first;
-      // 2629152 == secs / month
-      double lambda_months = pyne::decay_const(nuc) * 2629152.0;
-      double change = 1.0 - std::exp(-lambda_months * static_cast<double>(dt));
+      double lambda_timesteps = pyne::decay_const(nuc) * static_cast<double>(secs_per_timestep);
+      double change = 1.0 - std::exp(-lambda_timesteps * static_cast<double>(dt));
       if (change >= eps) {
         decay = true;
         break;
@@ -185,7 +189,7 @@ void Material::Decay(int curr_time) {
   }
 
   prev_decay_time_ = curr_time; // this must go before Transmute call
-  Composition::Ptr decayed = comp_->Decay(dt);
+  Composition::Ptr decayed = comp_->Decay(dt, secs_per_timestep);
   Transmute(decayed);
 }
 

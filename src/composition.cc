@@ -61,7 +61,7 @@ const CompMap& Composition::mass() {
   return mass_;
 }
 
-Composition::Ptr Composition::Decay(int delta) {
+Composition::Ptr Composition::Decay(int delta, uint64_t secs_per_timestep) {
   int tot_decay = prev_decay_ + delta;
   if (decay_line_->count(tot_decay) == 1) {
     // decay_line_ has cached, pre-computed result of this decay
@@ -72,9 +72,13 @@ Composition::Ptr Composition::Decay(int delta) {
   // It will automagically appear in the decay chain for all other compositions
   // that are a part of this decay chain because decay_line_ is a pointer that
   // all compositions in the chain share.
-  Composition::Ptr decayed = NewDecay(delta);
+  Composition::Ptr decayed = NewDecay(delta, secs_per_timestep);
   (*decay_line_)[tot_decay] = decayed;
   return decayed;
+}
+
+Composition::Ptr Composition::Decay(int delta) {
+  return Decay(delta, kDefaultTimeStepDur);
 }
 
 void Composition::Record(Context* ctx) {
@@ -109,7 +113,7 @@ Composition::Composition(int prev_decay, ChainPtr decay_line)
   next_id_++;
 }
 
-Composition::Ptr Composition::NewDecay(int delta) {
+Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
   int tot_decay = prev_decay_ + delta;
   atom();  // force evaluation of atom-composition if not calculated already
 
@@ -121,7 +125,7 @@ Composition::Ptr Composition::NewDecay(int delta) {
   if (atom_.size() == 0)
     return decayed;
 
-  decayed->atom_ = pyne::decayers::decay(atom_, 2419200.0 * delta);
+  decayed->atom_ = pyne::decayers::decay(atom_, static_cast<double>(secs_per_timestep) * delta);
   return decayed;
 }
 

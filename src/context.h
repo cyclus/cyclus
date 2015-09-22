@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <stdint.h>
 
 #ifndef CYCPP
 // The cyclus preprocessor cannot handle this file since there are two
@@ -16,6 +17,8 @@
 #include "agent.h"
 #include "greedy_solver.h"
 #include "recorder.h"
+
+const uint64_t kDefaultTimeStepDur = 2629846;
 
 class SimInitTest;
 
@@ -91,6 +94,9 @@ class SimInfo {
 
   /// timestep at which simulation branching occurs if any
   int branch_time;
+
+  /// Duration in seconds of a single time step in the simulation.
+  uint64_t dt;
 };
 
 /// A simulation context provides access to necessary simulation-global
@@ -208,6 +214,9 @@ class Context {
 
   /// Returns the current simulation timestep.
   virtual int time();
+
+  /// Returns the duration of a single time step in seconds.
+  inline uint64_t dt() {return si_.dt;};
 
   /// Return static simulation info.
   inline SimInfo sim_info() const {

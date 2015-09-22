@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_COMPOSITION_H_
 
 #include <map>
+#include <stdint.h>
 #include <boost/shared_ptr.hpp>
 
 class SimInitTest;
@@ -63,9 +64,14 @@ class Composition {
   /// Returns the unnormalized mass composition.
   const CompMap& mass();
 
-  /// Returns a decayed version of this composition (decayed
-  /// delta timesteps). This composition remains unchanged.
+  /// Returns a decayed version of this composition (decayed delta timesteps)
+  /// assuming a time step is 1/12 of one year in duration. This composition
+  /// remains unchanged.
   Ptr Decay(int delta);
+
+  /// Returns a decayed version of this composition (decayed
+  /// delta timesteps) using the seconds to timestep conversion specified.
+  Ptr Decay(int delta, uint64_t secs_per_timestep);
 
   /// Records the composition in output database Compositions table (if
   /// not done previously).
@@ -89,7 +95,7 @@ class Composition {
   Composition(int prev_decay, ChainPtr decay_line);
 
   /// Performs a decay calculation and creates a new decayed composition.
-  Ptr NewDecay(int delta);
+  Ptr NewDecay(int delta, uint64_t secs_per_timestep);
 
   static int next_id_;
   int id_;
