@@ -98,7 +98,7 @@ class SimInitTest : public ::testing::Test {
     rec.RegisterBackend(b);
     ctx = new cy::Context(&ti, &rec);
     ctx->NewDatum("SolverInfo")
-        ->AddVal("Solver", "greedy")
+        ->AddVal("Solver", std::string("greedy")) // str constructor for macs
         ->AddVal("ExclusiveOrders", true)
         ->Record();
     ctx->InitSim(cy::SimInfo(5));
