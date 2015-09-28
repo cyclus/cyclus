@@ -30,16 +30,19 @@ inline static void AdjustPrefs(Agent* m, PrefMap<Product>::type& prefs) {}
 template<class T>
 inline static double AdjustPref(Agent* m,
                                 Request<T>* req, Bid<T>* bid,
-                                double pref, TradeSense sense) { return pref; }
+                                double pref, TradeSense sense,
+                                ExchangeContext<T>* ex_ctx) { return pref; }
 inline static double AdjustPref(Agent* m,
                                 Request<Material>* req, Bid<Material>* bid,
-                                double pref, TradeSense sense) {
-  return m->AdjustMatlPref(req, bid, pref, sense);
+                                double pref, TradeSense sense,
+                                ExchangeContext<Material>* ex_ctx) {
+  return m->AdjustMatlPref(req, bid, pref, sense, ex_ctx);
 }
 inline static double AdjustPref(Agent* m,
                                 Request<Product>* req, Bid<Product>* bid,
-                                double pref, TradeSense sense) {
-  return m->AdjustProductPref(req, bid, pref, sense);
+                                double pref, TradeSense sense,
+                                ExchangeContext<Product>* ex_ctx) {
+  return m->AdjustProductPref(req, bid, pref, sense, ex_ctx);
 }
 inline static void AdjustPrefs(Trader* t, PrefMap<Material>::type& prefs) {
   t->AdjustMatlPrefs(prefs);
@@ -166,13 +169,13 @@ class ResourceExchange {
         // requester insts/regions/etc get to update the pref first
         a = reqr->manager()->parent();
         while (a != NULL) {
-          pref = AdjustPref(a, req, bid, pref, REQUEST);
+          pref = AdjustPref(a, req, bid, pref, REQUEST, &ex_ctx_);
           a = a->parent();
         }
         // followed by bidder inst/regions/etc
         a = bid->bidder()->manager()->parent();
         while (a != NULL) {
-          pref = AdjustPref(a, req, bid, pref, BID);
+          pref = AdjustPref(a, req, bid, pref, BID, &ex_ctx_);
           a = a->parent();
         }
         // update the actual preference in the data structure

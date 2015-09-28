@@ -62,7 +62,8 @@ class Requester: public TestFacility {
   }
 
   virtual double AdjustMatlPref(Request<Material>* req, Bid<Material>* bid,
-                                double pref, TradeSense sense) {
+                                double pref, TradeSense sense,
+                                ExchangeContext<Material>* ex_ctx) {
     pref_ctr_++;
     return std::pow(pref, 2);
   }
@@ -97,7 +98,8 @@ class Bidder: public TestFacility {
   }
 
   virtual double AdjustMatlPref(Request<Material>* req, Bid<Material>* bid,
-                                double pref, TradeSense sense) {
+                                double pref, TradeSense sense,
+                                ExchangeContext<Material>* ex_ctx) {
     pref_ctr_++;
     return pref;
   }
