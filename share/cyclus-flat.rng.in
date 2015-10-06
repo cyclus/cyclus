@@ -45,6 +45,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
             </choice>
             </element></optional>
             <optional>
+              <element name="allow_exclusive_orders">
+                <data type="boolean" />
+              </element>
+            <optional><!--deprecated. @TODO remove in release 1.5 -->
               <element name="exclusive_orders_only">
                 <data type="boolean" />
               </element>
