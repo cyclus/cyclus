@@ -112,6 +112,15 @@ std::string MockAgent::Finalize() {
 
 ///////// MockSim ////////////
 
+MockSim::MockSim(int duration)
+    : ctx_(&ti_, &rec_), back_(NULL), agent(NULL) {
+  Env::SetNucDataPath();
+  warn_limit = 0;
+  back_ = new SqliteBack(":memory:");
+  rec_.RegisterBackend(back_);
+  ti_.Initialize(&ctx_, SimInfo(duration));
+}
+
 MockSim::MockSim(AgentSpec spec, std::string config, int duration)
     : ctx_(&ti_, &rec_), back_(NULL), agent(NULL) {
   Env::SetNucDataPath();

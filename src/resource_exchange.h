@@ -145,7 +145,13 @@ class ResourceExchange {
 
   struct trader_compare {
     bool operator()(Trader* lhs, Trader* rhs) const {
-      return lhs->manager()->id() < rhs->manager()->id();
+      int left = lhs->manager()->id();
+      int right = rhs->manager()->id();
+      if (left != right) {
+        return left < right;
+      } else {
+        return lhs < rhs;
+      }
     }
   };
 
