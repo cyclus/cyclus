@@ -61,10 +61,7 @@ typedef std::vector<Product::Ptr> ProdVec;
 template <class T>
 class ResBuf {
  public:
-  ResBuf() : cap_(INFINITY), qty_(0) {
-    Warn<EXPERIMENTAL_WARNING>(
-        "ResBuf is experimental and its API may be subject to change");
-  }
+  ResBuf() : cap_(INFINITY), qty_(0) { }
 
   virtual ~ResBuf() {}
 
