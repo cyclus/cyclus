@@ -131,6 +131,11 @@ class MockAgent {
 /// @endcode
 class MockSim {
  public:
+  /// Creates and initializes a new empty mock simulation environment where
+  /// duration is the length of the simulation in time steps. An agent must be
+  /// specified before running an empty-constructed MockSim (i.e. manually
+  /// construct an agent using MockSim::context() and setting MockSim::agent.
+  MockSim(int duration);
 
   /// Creates and initializes a new mock simulation environment to test the
   /// archetype identified by spec.  config should contain the
@@ -214,6 +219,10 @@ class MockSim {
   /// anything.
   SqliteBack& db();
 
+  /// Returns the context for the mock simulation environment.
+  Context* context() {return &ctx_;}
+
+  /// the agent being tested by the mock simulation environment.
   Agent* agent;
 
  private:
