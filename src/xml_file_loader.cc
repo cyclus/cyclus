@@ -221,6 +221,15 @@ void XMLFileLoader::LoadSolver() {
     }
     exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders", 
                                             exclusive);
+    
+    // @TODO remove this after release 1.5
+    // check for deprecated input values
+    if (qe->NMatches(std::string("exclusive_orders_only")) != 0) {
+      std::stringstream ss;
+      ss << "Use of 'exclusive_orders_only' is deprecated."
+         << " Please see http://fuelcycle.org/user/input_specs/control.html";
+      Warn<DEPRECATION_WARNING>(ss.str());
+    }
   }
 
   if (!exclusive) {
@@ -234,17 +243,7 @@ void XMLFileLoader::LoadSolver() {
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
       ->AddVal("ExclusiveOrders", exclusive)
-      ->Record();
-
-  // @TODO remove this after release 1.5
-  // check for deprecated input values
-  if (qe->NMatches("exclusive_orders_only") > 0) {
-    std::stringstream ss;
-    ss << "Use of 'exclusive_orders_only' is deprecated."
-       << " Please see http://fuelcycle.org/user/input_specs/control.html";
-    Warn<DEPRECATION_WARNING>(ss.str());
-  }
-  
+      ->Record();  
   
   // now load the actual solver
   if (solver_name == greedy) {
