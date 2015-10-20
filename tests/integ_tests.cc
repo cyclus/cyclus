@@ -84,7 +84,9 @@ TEST(IntegTests, CustomTimestepDur) {
     QueryResult qr = back.Query("TimeStepDur", NULL);
     EXPECT_EQ(86400, qr.GetVal<int>("DurationSecs"));
   }
+}
 
+TEST(IntegTests, CustomTimestepDurFlat) {
   {
     SqliteBack back(":memory:");
     RunSim("custom_dt_flat.xml", &back);
