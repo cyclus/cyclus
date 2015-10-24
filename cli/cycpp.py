@@ -287,7 +287,8 @@ class UsingFilter(AliasFilter):
     def transform(self, statement, sep):
         state = self.machine
         name = self.match.group(1)
-        state.aliases.add((state.depth, name, name.rsplit('::', 1)[1]))
+        if len(name.rsplit('::', 1)) > 1:
+            state.aliases.add((state.depth, name, name.rsplit('::', 1)[1]))
 
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
@@ -474,7 +475,7 @@ class VarDecorationFilter(DecorationFilter):
         state.var_annotations = self._eval()
 
 class VarDeclarationFilter(Filter):
-    """State varible declaration.  Only oeprates if state.var_annotations is
+    """State varible declaration.  Only operates if state.var_annotations is
     not None. Access for member variable must be public.
     """
     regex = re.compile("(.*\w+.*?)\s+(\w+)")
@@ -498,8 +499,12 @@ class VarDeclarationFilter(Filter):
                 alias = alias[0] 
             state.context[classname]['vars'][alias] = vname
         if annotations['type'][0] not in BUFFERS:
-            annotations['alias'] = self.canonize_alias(annotations['type'], 
-                                        vname, alias=annotations.get('alias'))
+            annotations['alias'] = self.canonize_alias(
+                annotations['type'], vname, alias=annotations.get('alias'))
+            annotations['tooltip'] = self.canonize_tooltip(
+                annotations['type'], vname, tooltip=annotations.get('tooltip'))
+            annotations['uilabel'] = self.canonize_uilabel(
+                annotations['type'], vname, uilabel=annotations.get('uilabel'))
         state.var_annotations = None
 
     def transform_pass3(self, statement, sep):
@@ -526,6 +531,38 @@ class VarDeclarationFilter(Filter):
             rtn = None
         return rtn
 
+    def _canonize_ann(self, defaults, t, name, ann=None):
+        """Computes the nested default annotation structure for a C++ type for with the
+        given state variable name and defaults for non-nested containers.
+        """
+        if isinstance(t, STRING_TYPES):
+            return ann or name 
+        template = defaults[t[0]]
+        # expand ann if needed
+        if ann is None:
+            ann = [None] * len(t)
+        elif isinstance(ann, STRING_TYPES):
+            ann = [ann] + [None]*(len(t) - 1)
+        elif len(ann) < len(t):
+            ann = ann + [None]*(len(t) - len(ann))
+        # find template name
+        if template[0] is None: 
+            t0 = ann[0] or name
+        else:
+            # expand t0 ann if needed
+            if ann[0] is None:
+                ann[0] = [None] * len(template[0])
+            elif isinstance(ann[0], STRING_TYPES):
+                ann[0] = [ann[0]] + [None]*(len(template[0]) - 1)
+            elif len(ann[0]) < len(template[0]):
+                ann[0] = ann[0] + [None]*(len(template[0]) - len(ann[0]))
+            t0 = [ann[0][0] or name] + \
+                 [ai or ti for ai, ti in zip(ann[0][1:], template[0][1:])]
+        a = [t0]
+        for t_i, template_i, ann_i in zip(t[1:], template[1:], ann[1:]):
+            a.append(self._canonize_ann(defaults, t_i, template_i, ann=ann_i))
+        return a
+
     _default_aliases = {
         'std::vector': (None, 'val'),
         'std::set': (None, 'val'),
@@ -535,36 +572,30 @@ class VarDeclarationFilter(Filter):
         }
 
     def canonize_alias(self, t, name, alias=None):
-        """Computes the default alias structure for a C++ type for with the 
-        given state variable name.
+        """Computes the default alias structure for a C++ type for with the given state
+        variable name.
         """
-        if isinstance(t, STRING_TYPES):
-            return alias or name 
-        template = self._default_aliases[t[0]]
-        # expand alias if needed
-        if alias is None:
-            alias = [None] * len(t)
-        elif isinstance(alias, STRING_TYPES):
-            alias = [alias] + [None]*(len(t) - 1)
-        elif len(alias) < len(t):
-            alias = alias + [None]*(len(t) - len(alias))
-        # find template name
-        if template[0] is None: 
-            t0 = alias[0] or name
-        else:
-            # expand t0 alias if needed
-            if alias[0] is None:
-                alias[0] = [None] * len(template[0])
-            elif isinstance(alias[0], STRING_TYPES):
-                alias[0] = [alias[0]] + [None]*(len(template[0]) - 1)
-            elif len(alias[0]) < len(template[0]):
-                alias[0] = alias[0] + [None]*(len(template[0]) - len(alias[0]))
-            t0 = [alias[0][0] or name] + \
-                 [ai or ti for ai, ti in zip(alias[0][1:], template[0][1:])]
-        a = [t0]
-        for t_i, template_i, alias_i in zip(t[1:], template[1:], alias[1:]):
-            a.append(self.canonize_alias(t_i, template_i, alias=alias_i))
-        return a
+        return self._canonize_ann(self._default_aliases, t, name, alias)
+
+    _default_ui = {
+        'std::vector': (None, ''),
+        'std::set': (None, ''),
+        'std::list': (None, ''),
+        'std::pair': (None, '', ''),
+        'std::map': ((None, ''), '', ''),
+        }
+
+    def canonize_tooltip(self, t, name, tooltip=None):
+        """Computes the default tooltip structure for a C++ type for with the given state
+        variable name.
+        """
+        return self._canonize_ann(self._default_ui, t, name, tooltip)
+
+    def canonize_uilabel(self, t, name, uilabel=None):
+        """Computes the default uilabel structure for a C++ type for with the given state
+        variable name.
+        """
+        return self._canonize_ann(self._default_ui, t, name, uilabel)
 
 class ExecFilter(Filter):
     """Filter for executing arbitrary python code in the exec pragma and
@@ -1307,7 +1338,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
 
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
@@ -1319,7 +1355,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=lev)
+                val, lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + '{0}.resize(n{lev});\n'.format(member, lev=lev)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
@@ -1337,7 +1373,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
@@ -1348,7 +1389,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=self._idx_lev)
+                val, lev=self._idx_lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=self._idx_lev) + ' {\n'
@@ -1364,7 +1405,12 @@ class InfileToDbFilter(CodeGeneratorFilter):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
         if alias[1] is None:
-            alias[1] = 'val'
+            val = 'val'
+            alias[1] = val
+        elif isinstance(alias[1], STRING_TYPES):
+            val = alias[1]
+        else:
+            val = alias[1][0]
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
@@ -1375,7 +1421,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         with self._nest_idx():
             lev = self._idx_lev
             s += ind + 'int n{lev} = sub->NMatches("{0}");\n'.format(
-                alias[1], lev=lev)
+                val, lev=lev)
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
@@ -1398,12 +1444,14 @@ class InfileToDbFilter(CodeGeneratorFilter):
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
+        first = 'first{}'.format(tree_idx)
+        second = 'second{}'.format(tree_idx)
         s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
         s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
-        s += self.read_member('first', alias[1], t[1], uitype[1], ind+'  ', idx='0')
-        s += self.read_member('second', alias[2], t[2], uitype[2], ind+'  ', idx='0')
-        s += ind + '{0} {1}(first, second);\n'.format(type_to_str(t), member)
+        s += self.read_member(first, alias[1], t[1], uitype[1], ind+'  ', idx='0')
+        s += self.read_member(second, alias[2], t[2], uitype[2], ind+'  ', idx='0')
+        s += ind + '{0} {1}({2}, {3});\n'.format(type_to_str(t), member, first, second)
         return s
 
     def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None,
@@ -1477,8 +1525,15 @@ class InfileToDbFilter(CodeGeneratorFilter):
             if key in BUFFERS:
                 continue
             d = info['default'] if 'default' in info else None
-            if 'derived_init' in info:
-                impl += ind + info['derived_init'] + '\n'
+
+            if 'internal' in info and info['internal'] == True:
+                # do NOT combine above and below ifs into a single if
+                if d is not None:
+                    mname = member + '_tmp'
+                    impl += self._val(t, val=d, name=mname, uitype=uitype, ind=ind)
+                    impl += ind + '{0} = {1};\n'.format(member, mname)
+                else:
+                    raise RuntimeError('state variables marked as internal must have a default')
             else:
                 labels = info.get('alias', None)
                 if labels is None:
@@ -1509,6 +1564,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
                     impl += ind + '{0} = {1};\n'.format(member, mname)
                     ind = ind[:-2]
                     impl += ind + '}\n'
+
+            # this must run after all other codegen for the current statevar:
+            if 'derived_init' in info:
+                impl += ind + info['derived_init'] + '\n'
 
         # write obj to database
         impl += ind + 'di.NewDatum("Info")\n'
@@ -1684,7 +1743,7 @@ class SchemaFilter(CodeGeneratorFilter):
 
             if key in BUFFERS:  # buffer state, skip
                 continue
-            if 'derived_init' in info:  # derived state, skip
+            if 'internal' in info:
                 continue
 
             opt = True if 'default' in info else False

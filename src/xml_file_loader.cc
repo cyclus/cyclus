@@ -383,7 +383,12 @@ void XMLFileLoader::LoadControlParams() {
   // get decay mode
   std::string d = OptionalQuery<std::string>(qe, "decay", "manual");
 
-  ctx_->InitSim(SimInfo(dur, y0, m0, handle, d));
+  SimInfo si(dur, y0, m0, handle, d);
+
+  // get time step duration
+  si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
+
+  ctx_->InitSim(si);
 }
 
 }  // namespace cyclus

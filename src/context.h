@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <stdint.h>
 
 #ifndef CYCPP
 // The cyclus preprocessor cannot handle this file since there are two
@@ -16,6 +17,8 @@
 #include "agent.h"
 #include "greedy_solver.h"
 #include "recorder.h"
+
+const uint64_t kDefaultTimeStepDur = 2629846;
 
 class SimInitTest;
 
@@ -91,6 +94,9 @@ class SimInfo {
 
   /// timestep at which simulation branching occurs if any
   int branch_time;
+
+  /// Duration in seconds of a single time step in the simulation.
+  uint64_t dt;
 };
 
 /// A simulation context provides access to necessary simulation-global
@@ -121,9 +127,17 @@ class Context {
   /// See Recorder::sim_id documentation.
   boost::uuids::uuid sim_id();
 
-  /// Adds a prototype to a simulation-wide accessible list.
+  /// Adds a prototype to a simulation-wide accessible list, a prototype **can
+  /// not** be added more than once.
+  /// @param name the prototype name
+  /// @param m a pointer to the agent prototype
+  /// @param overwrite, allow overwrites to the prototype listing, default: false
+  /// @throws if overwrite is false and a prototype name has already been added
+  /// @{
   void AddPrototype(std::string name, Agent* m);
-
+  void AddPrototype(std::string name, Agent* m, bool overwrite);
+  /// @}
+  
   /// Registers an agent as a participant in resource exchanges. Agents should
   /// register from their Deploy method.
   inline void RegisterTrader(Trader* e) {
@@ -201,6 +215,9 @@ class Context {
   /// Returns the current simulation timestep.
   virtual int time();
 
+  /// Returns the duration of a single time step in seconds.
+  inline uint64_t dt() {return si_.dt;};
+
   /// Return static simulation info.
   inline SimInfo sim_info() const {
     return si_;
@@ -258,6 +275,10 @@ class Context {
     n_prototypes_[a->prototype()]--;
     n_specs_[a->spec()]--;
   }
+
+  /// contains archetype specs of all agents for which version have already
+  /// been recorded in the db
+  std::set<std::string> rec_ver_;
 
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;

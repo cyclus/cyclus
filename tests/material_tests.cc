@@ -8,6 +8,8 @@
 #include "toolkit/mat_query.h"
 #include "error.h"
 
+using pyne::nucname::id;
+
 namespace cyclus {
 
 TEST_F(MaterialTest, Constructors) {
@@ -314,6 +316,35 @@ TEST_F(MaterialTest, DecayShortcut) {
   // performed and the composition should remain the same.
   m->Decay(threshold * 0.9);
   EXPECT_EQ(c, m->comp());
+}
+
+// this test checks that we handle potentially non-default custom time step
+// durations correctly w.r.t. decay.
+TEST_F(MaterialTest, DecayCustomTimeStep) {
+  cyclus::Env::SetNucDataPath();
+  uint64_t custom_timestep = pyne::half_life("Cs137");
+
+  SimInfo si(10, 2015, 1, "", "manual");
+  si.dt = custom_timestep;
+  cyclus::Context ctx(&ti, &rec);
+  ctx.InitSim(si);
+  Agent* a = new TestFacility(&ctx);
+
+  CompMap v;
+  v[id("Cs137")] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  CompMap tmp = c->atom();
+  Material::Ptr m = Material::Create(a, 1.0, c);
+
+  m->Decay(1);
+
+  Composition::Ptr newc = m->comp();
+  CompMap newv = newc->atom();
+  cyclus::compmath::Normalize(&newv);
+
+  // one half of atoms should have decayed away
+  double eps = 1e-6;
+  EXPECT_NEAR(0.5, newv[id("Cs137")], eps) << "one Cs137 half-life duration time step did not decay half of Cs atoms";
 }
 
 TEST_F(MaterialTest, ExtractPrevDecay) {

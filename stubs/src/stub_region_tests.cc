@@ -5,25 +5,22 @@
 #include "agent_tests.h"
 #include "region_tests.h"
 
-using stubs::StubRegion;
+using libname::StubRegion;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubRegionTest : public ::testing::Test {
  protected:
-  cyclus::TestContext tc_;
-  StubRegion* src_region_;
+  cyclus::TestContext tc;
+  StubRegion* region;
 
   virtual void SetUp() {
-    src_region_ = new StubRegion(tc_.get());
+    region = new StubRegion(tc.get());
   }
 
-  virtual void TearDown() {}
+  virtual void TearDown() {
+    delete region;
+  }
 };
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubRegionTest, clone) {
-  StubRegion* cloned_fac = dynamic_cast<StubRegion*> (src_region_->Clone());
-}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubRegionTest, InitialState) {
@@ -32,36 +29,35 @@ TEST_F(StubRegionTest, InitialState) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubRegionTest, Print) {
-  EXPECT_NO_THROW(std::string s = src_region_->str());
+  EXPECT_NO_THROW(std::string s = region->str());
   // Test StubRegion specific aspects of the print method here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubRegionTest, Tick) {
-  EXPECT_NO_THROW(src_region_->Tick());
+  EXPECT_NO_THROW(region->Tick());
   // Test StubRegion specific behaviors of the handleTick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(StubRegionTest, Tock) {
-  EXPECT_NO_THROW(src_region_->Tock());
+  EXPECT_NO_THROW(region->Tock());
   // Test StubRegion specific behaviors of the handleTock function here
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Do Not Touch! Below section required for connection with Cyclus
 cyclus::Agent* StubRegionConstructor(cyclus::Context* ctx) {
   return new StubRegion(ctx);
 }
-
 // Required to get functionality in cyclus agent unit tests library
 #ifndef CYCLUS_AGENT_TESTS_CONNECTED
 int ConnectAgentTests();
 static int cyclus_agent_tests_connected = ConnectAgentTests();
 #define CYCLUS_AGENT_TESTS_CONNECTED cyclus_agent_tests_connected
 #endif  // CYCLUS_AGENT_TESTS_CONNECTED
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 INSTANTIATE_TEST_CASE_P(StubRegion, RegionTests,
                         ::testing::Values(&StubRegionConstructor));
 INSTANTIATE_TEST_CASE_P(StubRegion, AgentTests,
                         ::testing::Values(&StubRegionConstructor));
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

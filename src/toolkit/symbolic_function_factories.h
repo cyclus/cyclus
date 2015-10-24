@@ -27,9 +27,18 @@ class SymbFunctionFactory {
 class LinFunctionFactory : public SymbFunctionFactory {
  public:
   /// Return a function pointer to a linear function
-  /// @param params the parameters for the linear function in order:
-  /// slope, intercept
+  ///
+  /// @param params a string of space-separated values for m and b in the equation
+  /// \f[
+  ///   y = mx + b
+  /// \f]
+  ///
   /// @return the linear function
+  ///
+  /// \b Example
+  /// @code
+  ///   SymFunction::Ptr func = fac.GetFunctionPtr("2.5 5"); // y = 2.5x + 5
+  /// @endcode
   virtual SymFunction::Ptr GetFunctionPtr(std::string params);
 };
 
@@ -37,9 +46,19 @@ class LinFunctionFactory : public SymbFunctionFactory {
 class ExpFunctionFactory : public SymbFunctionFactory {
  public:
   /// Return a function pointer to a exponential function
-  /// @param params the parameters for the exponential function in
-  /// order: constant, exponent, intercept
+  ///
+  /// @param params a string of space-separated values for c, a, and b in the
+  /// equation
+  /// \f[
+  ///   y = ce^{ax} + b
+  /// \f]
+  ///
   /// @return the exponential function
+  ///
+  /// \b Example
+  /// @code
+  ///   SymFunction::Ptr func = fac.GetFunctionPtr("2.5 0.1 5"); // y = 2.5exp(0.1x) + 5
+  /// @endcode
   virtual SymFunction::Ptr GetFunctionPtr(std::string params);
 };
 
@@ -73,13 +92,23 @@ class PiecewiseFunctionFactory : public SymbFunctionFactory {
 class BasicFunctionFactory {
  public:
   /// The type of functions this factory can provide
-  enum FunctionType { LIN, EXP };
+  enum FunctionType {
+    /// See cyclus::toolkit::LinFunctionFactory for a description of function
+    /// parameters
+    LIN,
+    /// See cyclus::toolkit::ExpFunctionFactory for a description of function
+    /// parameters
+    EXP  
+  };
 
   /// Constructor sets up the enum names map
   BasicFunctionFactory();
 
   /// Return a function pointer to a registered function type
-  /// @param type the function type
+  /// @param type the function type, see BasicFunctionFactory::FunctionType for
+  /// supported function types. For each supported function type, either the
+  /// full name or the first three letters are acceptable. For example, for a
+  /// "linear" function, either "linear" or "lin" are acceptable.
   /// @param params the function parameters
   /// @return the function
   SymFunction::Ptr GetFunctionPtr(std::string type, std::string params);

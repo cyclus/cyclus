@@ -2,7 +2,9 @@ import os
 import sys
 import uuid
 import pprint
+import tempfile
 from collections import OrderedDict
+from subprocess import Popen, PIPE, STDOUT
 
 import nose
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises
@@ -229,6 +231,33 @@ def test_vdeclarfilter_canonize_alias():
         ]
     for exp, t, name, alias in cases:
         obs = f.canonize_alias(t, name, alias=alias)
+        yield assert_equal, exp, obs
+
+def test_vdeclarfilter_canonize_ui():
+    m = MockMachine()
+    f = VarDeclarationFilter(m)
+    cases = [
+        # exp   type  name  uilabel/tooltip
+        ('foo', 'float', 'x', 'foo'),
+        (['foo', ''], ['std::set', 'float'], 'x', 'foo'),
+        (['foo', 'bar'], ['std::set', 'float'], 'x', ['foo', 'bar']),
+        ([['foo', ''], ['', '', ''], ['', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         'foo'),
+        ([['foo', ''], ['bar', '', ''], ['', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         ['foo', 'bar']),
+        ([['foo', ''], ['bar', '', ''], ['baz', '']], 
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+         'x', 
+         ['foo', 'bar', 'baz']),
+    ]
+    for exp, t, name, x in cases:
+        obs = f.canonize_uilabel(t, name, uilabel=x)
+        yield assert_equal, exp, obs
+        obs = f.canonize_tooltip(t, name, tooltip=x)
         yield assert_equal, exp, obs
 
 
@@ -763,20 +792,19 @@ def test_escape_xml():
 
     yield assert_equal, s, got
 
-def test_infiletodb_read_member():
+def test_infiletodb_read_member1():
     m = MockCodeGenMachine()
     m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
             ('x', {'type': 'int', 'uitype': 'nuclide'}),
             ]))
             ])}
     f = InfileToDbFilter(m)
-
+    
     cpptype = ('std::map', 'std::string', ('std::vector', 
                 ('std::vector', ('std::pair', 'double', 
                   ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
     alias = ['streams', 'name', ['efficiencies', 'val']]
     gen = f.read_member('mymap', alias, cpptype, uitype=None)
-
     exp_gen = (
         '  std::map< std::string, std::vector< std::vector< std::pair< double, std::pair< int, std::list< std::set< bool > > > > > > > mymap;\n'
         '  {\n'
@@ -810,26 +838,26 @@ def test_infiletodb_read_member():
         '              {\n'
         '                cyclus::InfileTree* bub = sub->SubTree("val", i3);\n'
         '                cyclus::InfileTree* sub = bub;\n'
-        '                  double first;\n'
+        '                  double firsti3;\n'
         '                  {\n'
-        '                    double first_in = cyclus::Query<double>(sub, "first", 0);\n'
-        '                    first = first_in;\n'
+        '                    double firsti3_in = cyclus::Query<double>(sub, "first", 0);\n'
+        '                    firsti3 = firsti3_in;\n'
         '                  }\n'
-        '                  std::pair< int, std::list< std::set< bool > > > second;\n'
+        '                  std::pair< int, std::list< std::set< bool > > > secondi3;\n'
         '                  {\n'
         '                    cyclus::InfileTree* bub = sub->SubTree("second", 0);\n'
         '                    cyclus::InfileTree* sub = bub;\n'
-        '                      int first;\n'
+        '                      int first0;\n'
         '                      {\n'
-        '                        int first_in = cyclus::Query<int>(sub, "first", 0);\n'
-        '                        first = first_in;\n'
+        '                        int first0_in = cyclus::Query<int>(sub, "first", 0);\n'
+        '                        first0 = first0_in;\n'
         '                      }\n'
-        '                      std::list< std::set< bool > > second;\n'
+        '                      std::list< std::set< bool > > second0;\n'
         '                      {\n'
         '                        cyclus::InfileTree* bub = sub->SubTree("second", 0);\n'
         '                        cyclus::InfileTree* sub = bub;\n'
         '                        int n4 = sub->NMatches("val");\n'
-        '                        std::list< std::set< bool > > second_in;\n'
+        '                        std::list< std::set< bool > > second0_in;\n'
         '                        for (int i4 = 0; i4 < n4; ++i4) {\n'
         '                          std::set< bool > elem;\n'
         '                          {\n'
@@ -847,14 +875,14 @@ def test_infiletodb_read_member():
         '                            }\n'
         '                            elem = elem_in;\n'
         '                          }\n'
-        '                          second_in.push_back(elem);\n'
+        '                          second0_in.push_back(elem);\n'
         '                        }\n'
-        '                        second = second_in;\n'
+        '                        second0 = second0_in;\n'
         '                      }\n'
-        '                    std::pair< int, std::list< std::set< bool > > > second_in(first, second);\n'
-        '                    second = second_in;\n'
+        '                    std::pair< int, std::list< std::set< bool > > > secondi3_in(first0, second0);\n'
+        '                    secondi3 = secondi3_in;\n'
         '                  }\n'
-        '                std::pair< double, std::pair< int, std::list< std::set< bool > > > > elem_in(first, second);\n'
+        '                std::pair< double, std::pair< int, std::list< std::set< bool > > > > elem_in(firsti3, secondi3);\n'
         '                elem = elem_in;\n'
         '              }\n'
         '              elem_in[i3] = elem;\n'
@@ -869,9 +897,76 @@ def test_infiletodb_read_member():
         '    }\n'
         '    mymap = mymap_in;\n'
         '  }\n')
+    
+    ## useful for debugging test failures
+    #print(gen)
+    #print(exp_gen)
 
     yield assert_equal, exp_gen, gen
 
+def test_infiletodb_read_member2():
+    m = MockCodeGenMachine()
+    m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+            ('x', {'type': 'int', 'uitype': 'nuclide'}),
+            ]))
+            ])}
+    f = InfileToDbFilter(m)
+
+    alias = ['map', 'int', ['vector', ['pair', 'str1', 'str2']]]
+    cpptype = ('std::map', 'int', ('std::vector', ('std::pair', 'std::string', 'std::string')))
+    gen = f.read_member('mymap', alias, cpptype, uitype=None)
+    exp_gen = (
+        '  std::map< int, std::vector< std::pair< std::string, std::string > > > mymap;\n'
+        '  {\n'
+        '    cyclus::InfileTree* bub = sub->SubTree("map", 0);\n'
+        '    cyclus::InfileTree* sub = bub;\n'
+        '    int n1 = sub->NMatches("item");\n'
+        '    std::map< int, std::vector< std::pair< std::string, std::string > > > mymap_in;\n'
+        '    for (int i1 = 0; i1 < n1; ++i1) {\n'
+        '      int key;\n'
+        '      {\n'
+        '        int key_in = cyclus::Query<int>(sub, "item/int", i1);\n'
+        '        key = key_in;\n'
+        '      }\n'
+        '      std::vector< std::pair< std::string, std::string > > val;\n'
+        '      {\n'
+        '        cyclus::InfileTree* bub = sub->SubTree("item/vector", i1);\n'
+        '        cyclus::InfileTree* sub = bub;\n'
+        '        int n2 = sub->NMatches("pair");\n'
+        '        std::vector< std::pair< std::string, std::string > > val_in;\n'
+        '        val_in.resize(n2);\n'
+        '        for (int i2 = 0; i2 < n2; ++i2) {\n'
+        '          std::pair< std::string, std::string > elem;\n'
+        '          {\n'
+        '            cyclus::InfileTree* bub = sub->SubTree("pair", i2);\n'
+        '            cyclus::InfileTree* sub = bub;\n'
+        '              std::string firsti2;\n'
+        '              {\n'
+        '                std::string firsti2_in = cyclus::Query<std::string>(sub, "str1", 0);\n'
+        '                firsti2 = firsti2_in;\n'
+        '              }\n'
+        '              std::string secondi2;\n'
+        '              {\n'
+        '                std::string secondi2_in = cyclus::Query<std::string>(sub, "str2", 0);\n'
+        '                secondi2 = secondi2_in;\n'
+        '              }\n'
+        '            std::pair< std::string, std::string > elem_in(firsti2, secondi2);\n'
+        '            elem = elem_in;\n'
+        '          }\n'
+        '          val_in[i2] = elem;\n'
+        '        }\n'
+        '        val = val_in;\n'
+        '      }\n'
+        '      mymap_in[key] = val;\n'
+        '    }\n'
+        '    mymap = mymap_in;\n'
+        '  }\n'
+    )
+    # # useful for debugging test failures
+    # print()
+    # print(gen)
+    # print(exp_gen)
+    yield assert_equal, exp_gen, gen
 
 def test_infiletodb_read_map():
     m = MockCodeGenMachine()
@@ -910,6 +1005,142 @@ def test_infiletodb_read_map():
 
     yield assert_equal, exp, obs
 
+def test_internal_schema():
+    cases = [
+        {'params': {'internal': True, 'default': 7}, 'want':
+            '  return ""\n    "<interleave/>\\n";\n'
+            },
+        {'params': {'derived_init': 'x *= 42;'}, 'want':
+            ('  return ""\n'
+             '    "<interleave>\\n"\n'
+             '    "    <element name=\\"x\\">\\n"\n'
+             '    "        <data type=\\"int\\"/>\\n"\n'
+             '    "    </element>\\n"\n'
+             '    "</interleave>\\n";\n')
+            },
+        {'params': {'derived_init': 'x *= 42;', 'default': 7}, 'want':
+            ('  return ""\n'
+             '    "<interleave>\\n"\n'
+             '    "    <optional>\\n"\n'
+             '    "        <element name=\\"x\\">\\n"\n'
+             '    "            <data type=\\"int\\"/>\\n"\n'
+             '    "        </element>\\n"\n'
+             '    "    </optional>\\n"\n'
+             '    "</interleave>\\n";\n')
+            },
+        {'params': {'internal': True, 'derived_init': 'x *= 42;', 'default': 7}, 'want':
+            '  return ""\n    "<interleave/>\\n";\n'
+            },
+    ]
+
+    for i, case in enumerate(cases):
+        keys = case['params'].copy()
+        m = MockCodeGenMachine()
+        params = {'type': 'int'}
+        params.update(keys)
+        m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+                ('x', params),
+            ]))])}
+        f = SchemaFilter(m)
+        f.given_classname = 'MyFactory'
+
+        impl = f.impl()
+
+        want = case['want']
+        msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
+        if want != impl:
+            pprint.pprint(impl)
+            assert_true(False, msg)
+
+def test_internal_infiletodb():
+    # the expected output (i.e. 'want':...) is set as 'throw' if the
+    # configuration should cause an exception.
+    cases = [
+        {'params': {'internal': True}, 'want': 'throw'},
+        {'params': {'internal': True, 'default': 7}, 'want':
+            ('  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+             '  int i;\n'
+             '  int n;\n'
+             '  int x_tmp = 7;\n'
+             '  x = x_tmp;\n'
+             '  di.NewDatum("Info")\n'
+             '  ->AddVal("x", x)\n'
+             '  ->Record();\n')
+            },
+        {'params': {'derived_init': 'x *= 42;'}, 'want':
+            ('  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+             '  int i;\n'
+             '  int n;\n'
+             '  {\n'
+             '    int x_val = cyclus::Query<int>(sub, "x");\n'
+             '    x = x_val;\n'
+             '  }\n'
+             '  x *= 42;\n'
+             '  di.NewDatum("Info")\n'
+             '  ->AddVal("x", x)\n'
+             '  ->Record();\n')
+            },
+        {'params': {'derived_init': 'x *= 42;', 'default': 7}, 'want':
+            ('  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+             '  int i;\n'
+             '  int n;\n'
+             '  if (sub->NMatches("x") > 0) {\n'
+             '    {\n'
+             '      int x_val = cyclus::Query<int>(sub, "x");\n'
+             '      x = x_val;\n'
+             '    }\n'
+             '  } else {\n'
+             '    int x_tmp = 7;\n'
+             '    x = x_tmp;\n'
+             '  }\n'
+             '  x *= 42;\n'
+             '  di.NewDatum("Info")\n'
+             '  ->AddVal("x", x)\n'
+             '  ->Record();\n')
+            },
+        {'params': {'internal': True, 'derived_init': 'x *= 42;', 'default': 7}, 'want':
+            ('  cyclus::InfileTree* sub = tree->SubTree("config/*");\n'
+             '  int i;\n'
+             '  int n;\n'
+             '  int x_tmp = 7;\n'
+             '  x = x_tmp;\n'
+             '  x *= 42;\n'
+             '  di.NewDatum("Info")\n'
+             '  ->AddVal("x", x)\n'
+             '  ->Record();\n')
+            },
+    ]
+
+    for i, case in enumerate(cases):
+        keys = case['params'].copy()
+        m = MockCodeGenMachine()
+        params = {'type': 'int'}
+        params.update(keys)
+        m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
+                ('x', params),
+            ]))])}
+        f = InfileToDbFilter(m)
+        f.given_classname = 'MyFactory'
+
+        want = case['want']
+
+        impl = ''
+        if want == 'throw':
+            haderr = False
+            try:
+                impl = f.impl()
+            except:
+                haderr = True
+            msg = 'case {0} failed: expected raised exception, got none.'
+            assert_true(haderr, msg)
+            continue
+        else:
+            impl = f.impl()
+
+        msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
+        if want != impl:
+            pprint.pprint(impl)
+            assert_true(False, msg)
 
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
@@ -947,6 +1178,12 @@ def test_nuclide_uitype():
     f.given_classname = 'MyFactory'
     yield assert_raises, TypeError, f.impl
 
-
+def test_integration():
+    inf = os.path.join(os.path.dirname(__file__), 'cycpp_tests.h')
+    outf = tempfile.NamedTemporaryFile()
+    cmd = 'cycpp.py {} -o {} --cpp-path `which g++`'.format(inf, outf.name)
+    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+    assert_equal('', p.stdout.read().decode())
+    
 if __name__ == "__main__":
     nose.runmodule()

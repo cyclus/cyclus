@@ -63,9 +63,6 @@ TEST(DiscoveryTests, DiscoverSpecsInInstallPath) {
   exp.insert(":agents:KFacility");
   exp.insert(":agents:Prey");
   exp.insert(":agents:Predator");
-  exp.insert("stubs:StubFacility:StubFacility");
-  exp.insert("stubs:StubInst:StubInst");
-  exp.insert("stubs:StubRegion:StubRegion");
   for (set<string>::iterator it = exp.begin(); it != exp.end(); ++it)
     EXPECT_EQ(1, obs.count(*it));
 }

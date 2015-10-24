@@ -5,8 +5,9 @@
 #include "error.h"
 
 #define LG(X) LOG(LEV_##X, "buypol")
-#define LGH(X)                                               \
-  LOG(LEV_##X, "buypol") << "policy " << name_ << " (agent " \
+#define LGH(X)                                                    \
+  LOG(LEV_##X, "buypol") << "policy " << name_ << " (agent "      \
+                         << Trader::manager()->prototype() << "-" \
                          << Trader::manager()->id() << "): "
 
 namespace cyclus {
@@ -48,11 +49,11 @@ void MatlBuyPolicy::set_quantize(double x) {
 }
 
 void MatlBuyPolicy::set_throughput(double x) {
-  assert(x > 0);
+  assert(x >= 0);
   throughput_ = x;
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name) {
   Trader::manager_ = manager;
   buf_ = buf;
@@ -60,7 +61,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, double throughput) {
   Trader::manager_ = manager;
   buf_ = buf;
@@ -69,7 +70,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name,
                                    double fill_to, double req_when_under) {
   Trader::manager_ = manager;
@@ -80,7 +81,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   return *this;
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, double throughput,
                                    double fill_to, double req_when_under,
                                    double quantize) {
@@ -92,6 +93,16 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResourceBuff* buf,
   set_quantize(quantize);
   set_throughput(throughput);
   return *this;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod) {
+  CompMap c;
+  c[10010000] = 1e-100;
+  return Set(commod, Composition::CreateFromMass(c), 1.0);
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c) {
+  return Set(commod, c, 1.0);
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,
@@ -143,7 +154,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     for (it = commod_details_.begin(); it != commod_details_.end(); ++it) {
       std::string commod = it->first;
       CommodDetail d = it->second;
-      LG(INFO4) << "  - one " << amt << " kg request of " << commod;
+      LG(INFO3) << "  - one " << amt << " kg request of " << commod;
       Material::Ptr m = Material::CreateUntracked(req_amt, d.comp);
       grps[i].push_back(port->AddRequest(m, this, commod, d.pref, excl));
     }

@@ -5,7 +5,7 @@
 
 #include "composition.h"
 #include "material.h"
-#include "resource_buff.h"
+#include "res_buf.h"
 #include "trader.h"
 
 namespace cyclus {
@@ -35,7 +35,7 @@ namespace toolkit {
 ///
 ///  private:
 ///   MatlBuyPolicy policy_;
-///   ResourceBuff inbuf_;
+///   ResBuf<Material> inbuf_;
 ///    ...
 /// }
 /// @endcode
@@ -79,12 +79,12 @@ class MatlBuyPolicy : public Trader {
   /// @warning, (s, S) policy values are ambiguous for buffers with a capacity
   /// in (0, 1]. However that is a rare case.
   /// @{
-  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name);
-  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double throughput);
-  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double fill_to, double req_when_under);
-  MatlBuyPolicy& Init(Agent* manager, ResourceBuff* buf, std::string name,
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double throughput, double fill_to,
                       double req_when_under, double quantize);
   /// @}
@@ -98,7 +98,11 @@ class MatlBuyPolicy : public Trader {
   /// @param commod the commodity name
   /// @param c the composition to request for the given commodity
   /// @param pref the preference value for the commodity
-  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double pref=1.0);
+  /// @{
+  MatlBuyPolicy& Set(std::string commod);
+  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c);
+  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double pref);
+  /// @}
 
   /// Registers this policy as a trader in the current simulation.  This
   /// function must be called for the policy to begin participating in resource
@@ -158,7 +162,7 @@ class MatlBuyPolicy : public Trader {
   void set_quantize(double x); 
   void set_throughput(double x); 
   
-  ResourceBuff* buf_;
+  ResBuf<Material>* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
   std::map<Material::Ptr, std::string> rsrc_commods_;

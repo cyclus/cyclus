@@ -54,15 +54,15 @@ TEST_F(SqliteBackTests, MapIntMapStringDouble) {
   expb["foo"] = 4.9;
   expb["baz"] = 5.1;
   exp[65] = expb;
-  
+
   r.NewDatum("monty")->AddVal("count", exp)->Record();
   r.Close();
 
   cyclus::QueryResult qr = b->Query("monty", NULL);
   std::map<int, std::map<std::string, double> > obs;
-  obs = qr.GetVal<
-    std::map<int, std::map<std::string, double> > >("count", 0);
-  EXPECT_EQ(obs, exp);
+    obs = qr.GetVal<
+      std::map<int, std::map<std::string, double> > >("count", 0);
+    EXPECT_EQ(obs, exp);
 }
 
 TEST_F(SqliteBackTests, MapStrPairDoubleMapIntDouble) {
@@ -91,6 +91,33 @@ TEST_F(SqliteBackTests, MapStrPairDoubleMapIntDouble) {
   EXPECT_EQ(.42, mnew["two"].first);
   EXPECT_EQ(1.2, mnew["two"].second[1]);
   EXPECT_EQ(3.3, mnew["two"].second[3]);
+}
+
+TEST_F(SqliteBackTests, MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING) {
+  std::map<std::string,
+      std::vector<std::pair<int, std::pair<std::string, std::string> > > > exp;
+  
+  std::vector<std::pair<int, std::pair<std::string, std::string> > > va;
+  va.push_back(std::make_pair(42, std::make_pair("foo", "bar")));
+  va.push_back(std::make_pair(43, std::make_pair("foo", "baz")));
+  exp["hi"] = va;
+  std::vector<std::pair<int, std::pair<std::string, std::string> > > vb;
+  vb.push_back(std::make_pair(-3, std::make_pair("baz", "bar")));
+  vb.push_back(std::make_pair(-4, std::make_pair("baz", "foo")));
+  exp["mom"] = vb;
+  
+  r.NewDatum("monty")->AddVal("count", exp)->Record();
+  r.Close();
+
+  cyclus::QueryResult qr = b->Query("monty", NULL);
+  std::map<std::string,
+      std::vector<
+        std::pair<int, std::pair<std::string, std::string> > > > obs;
+  obs = qr.GetVal<
+    std::map<std::string,
+      std::vector<
+        std::pair<int, std::pair<std::string, std::string> > > > >("count", 0);
+  EXPECT_EQ(obs, exp);
 }
 
 TEST_F(SqliteBackTests, MapStrVectorDouble) {
@@ -479,4 +506,22 @@ TEST_F(SqliteBackTests, Tables) {
   set<string> tabs = b->Tables();
   EXPECT_LE(1, tabs.size());
   EXPECT_EQ(1, tabs.count("IntTable"));
+}
+
+TEST_F(SqliteBackTests, ListPairIntInt) {
+  std::list<std::pair<int, int> > l;
+  l.push_back(std::make_pair(4, 2));
+  l.push_back(std::make_pair(5, 3));
+
+  r.NewDatum("foo")
+      ->AddVal("bar", l)
+      ->Record();
+
+  r.Close();
+  cyclus::QueryResult qr = b->Query("foo", NULL);
+  l = qr.GetVal<std::list<std::pair<int, int> > >("bar", 0);
+
+  ASSERT_EQ(2, l.size());
+  EXPECT_EQ(std::make_pair(4, 2), l.front());
+  EXPECT_EQ(std::make_pair(5, 3), l.back());
 }

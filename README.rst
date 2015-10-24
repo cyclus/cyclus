@@ -9,17 +9,29 @@ framework upon which to develop innovative fuel cycle simulations.
 To see user and developer documentation for this code, please visit
 the `Cyclus Homepage`_.
 
-******************************
-Installing Cyclus the Easy Way
-******************************
-Cyclus provides easy-to-install binary packages via the 
-`conda package manager <http://conda.pydata.org/docs/>`_. These are 
-great for users but may not be suitable for developers. For detailed
-instructions on installing conda and Cyclus, please 
-`see the install documentation <http://fuelcycle.org/user/install.html>`_.
+*******************
+Quick Start
+*******************
+
+If you want to get up and running as quickly as possible:
+
+#. Install `VirtualBox <https://www.virtualbox.org/>`_
+#. Download the `environment
+   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus-conda-devs.ova>`_
+#. Open the .ova file using VirtualBox (File->Import Appliance).
+#. Login with the username ``ubuntu`` and pw ``reverse``
+#. Skip to "Installing Cyclus"
+
+Note that the Cyclus source code exists already on the virtual machine. You can
+update it with
+
+.. code-block:: console
+
+    $ cd cyclus
+	$ git pull origin cyclus
 
 ******************************
-Building and Installing Cyclus
+Dependencies
 ******************************
 
 In order to facilitate future compatibility with multiple platforms,
@@ -62,9 +74,41 @@ tcmalloc (for speed)   any?
 *Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
 by our build system.  Instead use `libgoogle-perftools-dev`.*
 
+Installing Dependencies
+=========================
+
+Cyclus dependencies can either be installed via an operating system's package
+manager or via Conda.
+
+Via Conda
+---------
+
+*Note, at present, Conda dependency downloading is only supported for Linux*
+
+A Conda installation may be the most straightforward for a new developer. These
+instructions will be similar to those shown for Cyclus users `conda
+installation <http://fuelcycle.org/user/install.html>`_.
+
+#. Download the appropriate `miniconda installer <http://conda.pydata.org/miniconda.html>`_
+
+#. Install miniconda
+
+    .. code-block:: console
+
+        $ bash Miniconda-3.5.2-Linux-x86_64.sh -b -p ~/miniconda
+
+#. Add the following line to your ``.bashrc`` (``.bash_profile`` for Mac users):
+
+    ``export PATH-"${HOME}/miniconda/bin:${PATH}"``
+
+#. Install the dependencies
+
+    .. code-block:: console
+
+        $ conda install cyclus-deps
 
 Installing Dependencies (Linux and Unix)
-========================================
+----------------------------------------
 
 This guide assumes that the user has root access (to issue sudo commands) and
 access to a package manager or has some other suitable method of automatically
@@ -117,7 +161,7 @@ dependencies:
    sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev
 
 Boost Note
-----------
+^^^^^^^^^^
 
 The `libboost-all-dev` used above will install the entire Boost library, which
 is not strictly needed. We currently depend on a small subset of the Boost
@@ -133,7 +177,7 @@ because they are an industry standard. Accordingly, we suggest simply installing
 in the future.
 
 Installing Dependencies (Mac OSX)
-========================================
+----------------------------------------
 
 Cyclus archetype development is not fully supported on Mac.  Nonetheless,
 because there are some use cases which require installation from source,
@@ -218,7 +262,7 @@ Finally, update your path and the following environment variables in your
 
 
 Installing Cyclus (Linux, Unix, and Mac OSX)
-==================================
+=============================================
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
@@ -227,8 +271,7 @@ We make the following assumptions in this guide:
 
 #. there is some master directory in which you're placing all
    Cyclus-related files called .../cyclus
-#. you have a directory named .../cyclus/install in which you plan
-   to install all Cyclus-related files
+#. you want to install cyclus **locally** (in ``~/.local``)
 #. you have acquired the Cyclus source code from the `Cyclus repo`_
 #. you have placed the Cyclus repository in .../cyclus/cyclus
 
@@ -238,7 +281,7 @@ Cyclus building and installation process will look like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$ python install.py --prefix=../install
+    .../cyclus/cyclus$ python install.py
 
 If you have installed coin-Cbc from source or otherwise have it
 installed in a non-standard location, you should make use of the
@@ -247,14 +290,14 @@ like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$  python install.py --prefix=../install --coin_root=path/to/coin
+    .../cyclus/cyclus$  python install.py --coin_root=path/to/coin
 
 Additionally, if you have installed Boost in a non-standard location
 you should make use of the boostRoot installation flag.
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$ python install.py --prefix=../install --coin_root=/path/to/coin --boost_root=/path/to/boost
+    .../cyclus/cyclus$ python install.py --coin_root=/path/to/coin --boost_root=/path/to/boost
 
 There are additional options which can be inspected via `install.py`'s help:
 
@@ -262,23 +305,18 @@ There are additional options which can be inspected via `install.py`'s help:
 
     .../cyclus/cyclus$ python install.py -h
 
-Windows
-=======
+Finally, add the following line to the **bottom** your ``~/.bashrc`` file
+(``~/.bash_profile`` on Macs):
 
-A native Windows installation is not currently explicitly supported. However, a
-Virtual Machine image can be downloaded which includes a pre-installation of all
-of these dependencies as well as a pre-installation of Cyclus. If you do not
-have access to a Linux or Unix (MacOS) machine, please follow these three steps:
+.. code-block:: bash
 
-#. Install `VirtualBox <https://www.virtualbox.org/>`_
-#. Download `cyclus_user_environment.ova
-   <http://cnergdata.engr.wisc.edu/cyclus/virtual-box/current/cyclus_user_environment.ova>`_
-#. Open the .ova file using VirtualBox (File->Import Appliance).
+    export PATH="$HOME/.local/bin:$PATH"
 
-The user name is "cyclus-user" and the password is "cyclus". You now have the
-same user environment as someone who installed cyclus on an Ubuntu Linux
-machine. Congratulations. You may skip to `Running Tests`_ .
+Then update your environment
 
+.. code-block:: bash
+
+    $ source ~/.bashrc
 
 Running Tests
 =============
@@ -288,22 +326,23 @@ our tests). You can run the tests yourself via:
 
 .. code-block:: bash
 
-    ...$ prefix/bin/cyclus_unit_tests
+    $ cyclus_unit_tests
 
 Running Cyclus
 ==============
 
-You can find instructions for writng an input file for cyclus from `Cyclus User
+You can find instructions for writing an input file for cyclus from `Cyclus User
 Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
 file `input.xml`, you can run Cyclus via:
 
 .. code-block:: bash
 
-    ...$ prefix/bin/cyclus path/to/input.xml
+    $ cyclus path/to/input.xml
 
 For a more detailed explanation, checkout the user guide.
 
 .. _`Cyclus Homepage`: http://fuelcycle.org/
+.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
@@ -322,8 +361,7 @@ General Notes
 
 * Keep your own "master" and "develop" branches in sync with the blessed
   repository's "master" and "develop" branches. Specifically, do not push your
-  own commits directly to your "master" and "develop" branches (see `Updating
-  Your Repositories`_ below).
+  own commits directly to your "master" and "develop" branches.
 
 * Any commit should *pass all tests* (see `Running Tests`_).
 
@@ -345,7 +383,7 @@ Reviewing a Pull Request
 * Look over the code.
 
   * Check that it meets `our style guidelines
-    <http://cyclus.github.com/devdoc/style_guide.html>`_.
+    <http://fuelcycle.org/kernel/pr_review.html>`_.
 
   * Make inline review comments concerning improvements.
 
@@ -458,7 +496,7 @@ See also
 --------
 
 A good description of a git workflow with good graphics is available at
-http://nvie.com/posts/a-successful-git-branching-agent/
+http://nvie.com/posts/a-successful-git-branching-model/
 
 Releases
 ========

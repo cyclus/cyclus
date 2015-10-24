@@ -1,0 +1,179 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import argparse
+import subprocess
+import sys
+import os
+import shutil
+import os.path
+import re
+
+def rename_cmake(files, libpath, libname, archname):
+    archfname = fromcapcase(archname)
+    for f in files:
+        with open(f, 'r') as inp:
+            s = inp.read()
+        s = s.replace('@archetype_spec@', '{0}:{1}:{2}'.format(
+            libpath, libname, archname))
+        s = s.replace('@lib_path@', libpath)
+        s = s.replace('@lib_name@', libname)
+        s = s.replace('@agent_name@', archfname)
+        os.remove(f)
+        with open(f, 'w') as out:
+            out.write(s)
+
+def parse_spec(archspec):
+    return archspec.strip().split(':')
+
+def read_cmake_spec():
+    with open('CMakeLists.txt') as f:
+        s = f.readlines()
+    _, spec = s[0].split('::')
+    return parse_spec(spec.strip())
+
+def rename_stub(files, name, stubname):
+    low, cap, upp, underscore = name.lower(), name, name.upper(), \
+                                fromcapcase(name)
+    stublow, stubcap, stubupp, stubunderscore = \
+                stubname.lower(), stubname, stubname.upper(), \
+                fromcapcase(stubname)
+    for f in files:
+        with open(f, 'r') as inp:
+            s = inp.read()
+        s = s.replace(stublow, low)
+        s = s.replace(stubcap, cap)
+        s = s.replace(stubupp, upp)
+        s = s.replace(stubunderscore, underscore)
+        s = s.replace(stubunderscore.upper(), underscore.upper())
+        os.remove(f)
+        with open(f, 'w') as out:
+            out.write(s)
+
+def cleanfiles(files):
+    for f in files:
+        with open(f, 'r') as inp:
+            s = inp.read()
+        s = s.replace('<path></path>', '')
+        os.remove(f)
+        with open(f, 'w') as out:
+            out.write(s)
+
+def fromcapcase(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+def insert_line(fpath, below, toinsert):
+    with open(fpath) as f:
+        lines = f.readlines()
+    for i, line in enumerate(lines):
+        if below in line:
+            lines.insert(i+1, toinsert)
+            break
+    else:
+            print('cannot find new archetype insert location in {0}'.format(fpath), file=sys.stderr)
+            sys.exit(1)
+
+    os.remove(fpath)
+    with open(fpath, 'w') as out:
+        out.write(''.join(lines))
+
+def copy_srcfiles(stubpath, arch_type, arch_fname):
+    allfiles = [
+        ('src/stub_{0}.h'.format(arch_type), 
+         'src/{0}.h'.format(arch_fname)),
+        ('src/stub_{0}.cc'.format(arch_type), 
+         'src/{0}.cc'.format(arch_fname)),
+        ('src/stub_{0}_tests.cc'.format(arch_type), 
+         'src/{0}_tests.cc'.format(arch_fname)),
+        ('example_{0}.xml'.format(arch_type), 
+         'example_{0}.xml'.format(arch_fname)),
+        ]
+
+    try:
+        os.makedirs('src')
+    except: pass
+
+    for (src, dst) in allfiles:
+        shutil.copy(os.path.join(stubpath, src), dst)
+
+    return allfiles
+
+if __name__ == '__main__':
+    devnull = open(os.devnull, 'w')
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('spec', help='[path]:[library-name]:[archetype-name]')
+    parser.add_argument('--type', help='the type of archetype to generate', 
+                        choices=['region', 'inst','facility'], 
+                        default='facility')
+    args = parser.parse_args()
+
+    libpath, libname, archname = parse_spec(args.spec)
+    archfname = fromcapcase(archname)
+
+    ret = subprocess.call(['which', 'cyclus'], stderr=devnull)
+    if ret != 0:
+        print('cannot find cyclus', file=sys.stderr)
+        sys.exit(1)
+
+    cycpath = subprocess.check_output(["cyclus", "--install"], 
+                                      universal_newlines=True).strip()
+    stubpath = os.path.join(cycpath, 'share/cyclus/stubs')
+
+    if os.path.exists('CMakeLists.txt'):
+        prevlibpath, prevlibname, _ = read_cmake_spec()
+        if libpath != prevlibpath:
+            print('inconsistent library paths: {0} != {1}'.format(
+                prevlibpath, libpath), file=sys.stderr)
+            sys.exit(1)
+        elif libname != prevlibname:
+            print('inconsistent library names: {0} != {1}'.format(
+                prevlibname, libname), file=sys.stderr)
+            sys.exit(1)
+
+        toinsert = 'USE_CYCLUS("{0}" "{1}")\n'.format(libname, archfname)
+        insert_line('src/CMakeLists.txt', 'INSERT_ARCHETYPES_HERE', toinsert)
+        allfiles = copy_srcfiles(stubpath, args.type, archfname)
+        dstfiles = [dst for _, dst in allfiles]
+        rename_stub(dstfiles, archname, 'Stub{0}'.format(
+            args.type.capitalize()))
+        rename_stub(dstfiles, libname, 'LibName')
+        rename_stub(dstfiles, libpath, 'LibPath')
+        cleanfiles(dstfiles)
+        
+        print('new archetype appended to existing stub project')
+        sys.exit(0)
+
+    allfiles = copy_srcfiles(stubpath, args.type, archfname)
+
+    otherfiles = [
+        ('CMakeLists.txt', 'CMakeLists.txt'),
+        ('src/CMakeLists.txt', 'src/CMakeLists.txt'),
+        ('install.py', 'install.py'),
+        ('README.rst', 'README.rst'),
+        ]
+    allfiles += otherfiles
+
+    dstfiles = [dst for _, dst in allfiles]
+
+    for (src, dst) in otherfiles:
+        shutil.copy(os.path.join(stubpath, src), dst)
+
+    try:
+        os.makedirs('cmake')
+    except: pass
+
+    shutil.copy(os.path.join(
+        cycpath, 'share/cyclus/cmake/FindCyclus.cmake'), './cmake/')
+    shutil.copy(os.path.join(
+        cycpath, 'share/cyclus/cmake/cmake_uninstall.cmake.in'), './cmake/')
+
+    rename_cmake(['CMakeLists.txt', 'src/CMakeLists.txt'], libpath, libname, 
+                 archname)
+    rename_stub(dstfiles, archname, 'Stub{0}'.format(args.type.capitalize()))
+    rename_stub(dstfiles, libname, 'LibName')
+    rename_stub(dstfiles, libpath, 'LibPath')
+    cleanfiles(dstfiles)
+
