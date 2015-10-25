@@ -22,7 +22,7 @@ IF(NOT ${BUILD_TYPE} STREQUAL "release")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0")
 ENDIF()
 # no overflow warnings because of silly coin-ness
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow -std=c++11")
 
 IF(NOT CYCLUS_DOC_ONLY)
 
