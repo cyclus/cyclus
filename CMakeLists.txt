@@ -13,6 +13,14 @@ ENDIF()
 # This project name is cyclus.
 PROJECT( CYCLUS )
 
+INCLUDE(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+IF(COMPILER_SUPPORTS_CXX11)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+ELSE()
+    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+ENDIF()
+
 # quiets fortify_source warnings when not compiling with optimizations
 # in linux distros where compilers were compiled with fortify_source enabled by
 # default (e.g. Arch linux).
