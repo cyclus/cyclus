@@ -105,7 +105,7 @@ void pyne::pyne_start() {
   NUC_DATA_PATH = std::string(tmppath);
 #endif
   return;
-};
+}
 
 
 
@@ -285,7 +285,7 @@ std::string pyne::replace_all_substrings(std::string s, std::string substr, std:
     n_found = s.find(substr);
   }
   return s;
-};
+}
 
 
 
@@ -342,7 +342,7 @@ std::string pyne::natural_naming(std::string name) {
     nat_name.insert(0, "_");
 
   return nat_name;
-};
+}
 
 
 //
@@ -352,21 +352,21 @@ std::string pyne::natural_naming(std::string name) {
 double pyne::slope(double x2, double y2, double x1, double y1) {
   // Finds the slope of a line.
   return (y2 - y1) / (x2 - x1);
-};
+}
 
 
 double pyne::solve_line(double x, double x2, double y2, double x1, double y1) {
   return (slope(x2,y2,x1,y1) * (x - x2)) + y2;
-};
+}
 
 
 double pyne::tanh(double x) {
   return std::tanh(x);
-};
+}
 
 double pyne::coth(double x) {
   return 1.0 / std::tanh(x);
-};
+}
 
 
 
@@ -398,7 +398,7 @@ bool pyne::file_exists(std::string strfilename) {
   }
 
   return(blnReturn);
-};
+}
 
 // Message Helpers
  
@@ -2421,7 +2421,7 @@ pyne::nucname::name_zz_t pyne::nucname::get_name_zz() {
   lzd["Lv"] = 116;
 
   return lzd;
-};
+}
 pyne::nucname::name_zz_t pyne::nucname::name_zz = pyne::nucname::get_name_zz();
 
 
@@ -2434,7 +2434,7 @@ pyne::nucname::zzname_t pyne::nucname::get_zz_name()
     zld[i->second] = i->first;
   }
   return zld;
-};
+}
 pyne::nucname::zzname_t pyne::nucname::zz_name = pyne::nucname::get_zz_name();
 
 
@@ -2587,7 +2587,7 @@ pyne::nucname::name_zz_t pyne::nucname::get_fluka_zz() {
   fzd["238-U"]    = 922380000;   // fluka "238-U"
 
   return fzd;
-};
+}
 pyne::nucname::name_zz_t pyne::nucname::fluka_zz = pyne::nucname::get_fluka_zz();
 
 
@@ -2600,7 +2600,7 @@ pyne::nucname::zzname_t pyne::nucname::get_zz_fluka()
     zfd[i->second] = i->first;
   }
   return zfd;
-};
+}
 pyne::nucname::zzname_t pyne::nucname::zz_fluka = pyne::nucname::get_zz_fluka();
 
 
@@ -2615,7 +2615,7 @@ pyne::nucname::zz_group pyne::nucname::name_to_zz_group(pyne::nucname::name_grou
   for (name_group_iter i = eg.begin(); i != eg.end(); i++)
     zg.insert(name_zz[*i]);
   return zg;
-};
+}
 
 // Lanthanides
 pyne::nucname::name_t pyne::nucname::LAN_array[15] = {"La", "Ce", "Pr", "Nd", 
@@ -2677,13 +2677,13 @@ bool pyne::nucname::isnuclide(std::string nuc) {
   }
   catch(IndeterminateNuclideForm) {
     return false;
-  };
+  }
   return isnuclide(n);
-};
+}
 
 bool pyne::nucname::isnuclide(const char * nuc) {
   return isnuclide(std::string(nuc));
-};
+}
 
 bool pyne::nucname::isnuclide(int nuc) {
   int n;
@@ -2695,7 +2695,7 @@ bool pyne::nucname::isnuclide(int nuc) {
   }
   catch(IndeterminateNuclideForm) {
     return false;
-  };
+  }
   if (n <= 10000000)
     return false;
   int zzz = n / 10000000;
@@ -2705,7 +2705,7 @@ bool pyne::nucname::isnuclide(int nuc) {
   else if (aaa < zzz)
     return false;
   return true;
-};
+}
 
 
 
@@ -2765,7 +2765,7 @@ int pyne::nucname::id(int nuc) {
   if (nuc >= 1000000){
     // From now we assume no metastable info has been given.
     throw IndeterminateNuclideForm(nuc, "");
-  };
+  }
 
   // Nuclide is not in zzaaam form, 
   // Try MCNP form, ie zzaaa
@@ -2798,12 +2798,12 @@ int pyne::nucname::id(int nuc) {
   if (0 < zz_name.count(nuc))
     return nuc * 10000000;
   throw IndeterminateNuclideForm(nuc, "");
-};
+}
 
 int pyne::nucname::id(const char * nuc) {
   std::string newnuc (nuc);
   return id(newnuc);
-};
+}
 
 int pyne::nucname::id(std::string nuc) {
   size_t npos = std::string::npos;
@@ -2854,7 +2854,7 @@ int pyne::nucname::id(std::string nuc) {
         newnuc = (10000000 * name_zz[elem_name]) + newnuc;
       else
         throw NotANuclide(nucstr, newnuc);
-    };
+    }
   } else if (pyne::contains_substring(pyne::alphabet, nucstr.substr(0, 1))) {
     // Nuclide is probably in name form, or some variation therein
     std::string anum_str = pyne::remove_characters(nucstr, pyne::alphabet);
@@ -2893,7 +2893,7 @@ int pyne::nucname::id(std::string nuc) {
     throw NotANuclide(nuc, nucstr);
   }
   return newnuc;  
-};
+}
 
 
 /***************************/
@@ -2909,11 +2909,11 @@ bool pyne::nucname::iselement(std::string nuc) {
     return false;
   }
   return iselement(n);
-};
+}
 
 bool pyne::nucname::iselement(const char * nuc) {
   return iselement(std::string(nuc));
-};
+}
 
 bool pyne::nucname::iselement(int nuc) {
   int n;
@@ -2931,7 +2931,7 @@ bool pyne::nucname::iselement(int nuc) {
   if (zzz > 0 && aaa == 0)
     return true;  // is element
   return false;
-};
+}
 
 /**********************/
 /*** name functions ***/
@@ -2961,7 +2961,7 @@ std::string pyne::nucname::name(int nuc) {
     newnuc += "M";
 
   return newnuc;
-};
+}
 
 
 
@@ -2981,45 +2981,45 @@ std::string pyne::nucname::name(std::string nuc) {
 /**********************/
 int pyne::nucname::znum(int nuc) {
   return id(nuc) / 10000000;
-};
+}
 
 int pyne::nucname::znum(const char * nuc) {
   return id(nuc) / 10000000;
-};
+}
 
 int pyne::nucname::znum(std::string nuc) {
   return id(nuc) / 10000000;
-};
+}
 
 /**********************/
 /*** anum functions ***/
 /**********************/
 int pyne::nucname::anum(int nuc) {
   return (id(nuc) / 10000) % 1000;
-};
+}
 
 int pyne::nucname::anum(const char * nuc) {
   return (id(nuc) / 10000) % 1000;
-};
+}
 
 int pyne::nucname::anum(std::string nuc) {
   return (id(nuc) / 10000) % 1000;
-};
+}
 
 /**********************/
 /*** snum functions ***/
 /**********************/
 int pyne::nucname::snum(int nuc) {
   return id(nuc) % 10000;
-};
+}
 
 int pyne::nucname::snum(const char * nuc) {
   return id(nuc) % 10000;
-};
+}
 
 int pyne::nucname::snum(std::string nuc) {
   return id(nuc) % 10000;
-};
+}
 
 /************************/
 /*** zzaaam functions ***/
@@ -3031,33 +3031,33 @@ int pyne::nucname::zzaaam(int nuc) {
   if (10 <= ssss)
     ssss = 9;
   return zzzaaa*10 + ssss;
-};
+}
 
 
 int pyne::nucname::zzaaam(const char * nuc) {
   std::string newnuc (nuc);
   return zzaaam(newnuc);
-};
+}
 
 
 int pyne::nucname::zzaaam(std::string nuc) {
   return zzaaam(id(nuc));
-};
+}
 
 
 int pyne::nucname::zzaaam_to_id(int nuc) {
   return (nuc/10)*10000 + (nuc%10);
-};
+}
 
 
 int pyne::nucname::zzaaam_to_id(const char * nuc) {
   return zzaaam_to_id(std::string(nuc));
-};
+}
 
 
 int pyne::nucname::zzaaam_to_id(std::string nuc) {
   return zzaaam_to_id(pyne::to_int(nuc));
-};
+}
 
 /************************/
 /*** zzzaaa functions ***/
@@ -3067,33 +3067,33 @@ int pyne::nucname::zzzaaa(int nuc) {
   int zzzaaa = nucid/10000;
 
   return zzzaaa;
-};
+}
 
 
 int pyne::nucname::zzzaaa(const char * nuc) {
   std::string newnuc (nuc);
   return zzzaaa(newnuc);
-};
+}
 
 
 int pyne::nucname::zzzaaa(std::string nuc) {
   return zzzaaa(id(nuc));
-};
+}
 
 
 int pyne::nucname::zzzaaa_to_id(int nuc) {
   return (nuc)*10000;
-};
+}
 
 
 int pyne::nucname::zzzaaa_to_id(const char * nuc) {
   return zzzaaa_to_id(std::string(nuc));
-};
+}
 
 
 int pyne::nucname::zzzaaa_to_id(std::string nuc) {
   return zzzaaa_to_id(pyne::to_int(nuc));
-};
+}
 
 /*************************/
 /*** zzllaaam functions ***/
@@ -3124,23 +3124,23 @@ std::string pyne::nucname::zzllaaam(int nuc) {
   if (0 < ssss)
     newnuc += "m";
   return newnuc;
-};
+}
 
 
 std::string pyne::nucname::zzllaaam(const char * nuc) {
   std::string newnuc (nuc);
   return zzllaaam(newnuc);
-};
+}
 
 
 std::string pyne::nucname::zzllaaam(std::string nuc) {
   return zzllaaam(id(nuc));
-};
+}
 
 
 int pyne::nucname::zzllaaam_to_id(const char * nuc) {
   return zzllaaam_to_id(std::string(nuc));
-};
+}
 
 
 int pyne::nucname::zzllaaam_to_id(std::string nuc) {
@@ -3188,7 +3188,7 @@ int pyne::nucname::zzllaaam_to_id(std::string nuc) {
   else
     throw NotANuclide(nucstr, nucid);
   return nucid;
-};
+}
 
 /**********************/
 /*** mcnp functions ***/
@@ -3207,20 +3207,20 @@ int pyne::nucname::mcnp(int nuc) {
     newnuc += 300 + (ssss * 100);
 
   return newnuc;
-};
+}
 
 
 
 int pyne::nucname::mcnp(const char * nuc) {
   std::string newnuc (nuc);
   return mcnp(newnuc);
-};
+}
 
 
 
 int pyne::nucname::mcnp(std::string nuc) {
   return mcnp(id(nuc));
-};
+}
 
 //
 // MCNP -> id
@@ -3249,17 +3249,17 @@ int pyne::nucname::mcnp_to_id(int nuc) {
     // MCNP form natural nuclide
     return zzz * 10000000;
   throw IndeterminateNuclideForm(nuc, "");
-};
+}
 
 
 int pyne::nucname::mcnp_to_id(const char * nuc) {
   return mcnp_to_id(std::string(nuc));
-};
+}
 
 
 int pyne::nucname::mcnp_to_id(std::string nuc) {
   return mcnp_to_id(pyne::to_int(nuc));
-};
+}
 
 
 /**********************/
@@ -3271,7 +3271,7 @@ std::string pyne::nucname::fluka(int nuc) {
     throw NotANuclide(nuc, "fluka name could not be found");
   }
   return zz_fluka[x];
-};
+}
 
 
 //
@@ -3326,18 +3326,18 @@ std::string pyne::nucname::serpent(int nuc) {
     newnuc += "m";
 
   return newnuc;
-};
+}
 
 
 std::string pyne::nucname::serpent(const char * nuc) {
   std::string newnuc (nuc);
   return serpent(newnuc);
-};
+}
 
 
 std::string pyne::nucname::serpent(std::string nuc) {
   return serpent(id(nuc));
-};
+}
 
 //
 // Serpent -> id
@@ -3345,12 +3345,12 @@ std::string pyne::nucname::serpent(std::string nuc) {
 //int pyne::nucname::serpent_to_id(int nuc)
 //{
 // Should be ZAID
-//};
+//}
 
 
 int pyne::nucname::serpent_to_id(const char * nuc) {
   return serpent_to_id(std::string(nuc));
-};
+}
 
 
 int pyne::nucname::serpent_to_id(std::string nuc) {
@@ -3392,7 +3392,7 @@ int pyne::nucname::serpent_to_id(std::string nuc) {
   else
     throw NotANuclide(nucstr, nucid);
   return nucid;
-};
+}
 
 
 /**********************/
@@ -3429,18 +3429,18 @@ std::string pyne::nucname::nist(int nuc) {
   //  newnuc += "*";
 
   return newnuc;
-};
+}
 
 
 std::string pyne::nucname::nist(const char * nuc) {
   std::string newnuc (nuc);
   return nist(newnuc);
-};
+}
 
 
 std::string pyne::nucname::nist(std::string nuc) {
   return nist(id(nuc));
-};
+}
 
 
 //
@@ -3453,7 +3453,7 @@ std::string pyne::nucname::nist(std::string nuc) {
 
 int pyne::nucname::nist_to_id(const char * nuc) {
   return nist_to_id(std::string(nuc));
-};
+}
 
 int pyne::nucname::nist_to_id(std::string nuc) {
   if (nuc.empty())
@@ -3482,7 +3482,7 @@ int pyne::nucname::nist_to_id(std::string nuc) {
   else
     throw NotANuclide(nuc, nucid);
   return nucid;
-};
+}
 
 
 /************************/
@@ -3498,20 +3498,20 @@ int pyne::nucname::cinder(int nuc) {
   if (10 <= ssss)
     ssss = 9;
   return (aaa*10000) + (zzz*10) + ssss;
-};
+}
 
 
 
 int pyne::nucname::cinder(const char * nuc) {
   std::string newnuc (nuc);
   return cinder(newnuc);
-};
+}
 
 
 
 int pyne::nucname::cinder(std::string nuc) {
   return cinder(id(nuc));
-};
+}
 
 //
 // Cinder -> Id
@@ -3522,17 +3522,17 @@ int pyne::nucname::cinder_to_id(int nuc) {
   int zzz = aaazzz % 1000;
   int aaa = aaazzz / 1000;
   return (zzz * 10000000) + (aaa * 10000) + ssss;
-};
+}
 
 
 int pyne::nucname::cinder_to_id(const char * nuc) {
   return cinder_to_id(std::string(nuc));
-};
+}
 
 
 int pyne::nucname::cinder_to_id(std::string nuc) {
   return cinder_to_id(pyne::to_int(nuc));
-};
+}
 
 
 
@@ -3569,7 +3569,7 @@ std::string pyne::nucname::alara(int nuc) {
 
   // Note, ALARA input format does not use metastable flag
   return newnuc;
-};
+}
 
 
 std::string pyne::nucname::alara(const char * nuc) {
@@ -3589,12 +3589,12 @@ std::string pyne::nucname::alara(std::string nuc) {
 //int pyne::nucname::alara_to_id(int nuc)
 //{
 // Not Possible
-//};
+//}
 
 
 int pyne::nucname::alara_to_id(const char * nuc) {
   return alara_to_id(std::string(nuc));
-};
+}
 
 
 int pyne::nucname::alara_to_id(std::string nuc) {
@@ -3624,7 +3624,7 @@ int pyne::nucname::alara_to_id(std::string nuc) {
   else
     throw NotANuclide(nuc, nucid);
   return nucid;
-};
+}
 
 
 
@@ -3732,7 +3732,7 @@ int pyne::nucname::id_to_state_id(int nuc_id) {
 
 int pyne::nucname::ensdf_to_id(const char * nuc) {
   return ensdf_to_id(std::string(nuc));
-};
+}
 
 int pyne::nucname::ensdf_to_id(std::string nuc) {
   if (nuc.size() < 4) {
@@ -3748,7 +3748,7 @@ int pyne::nucname::ensdf_to_id(std::string nuc) {
     return nucname::id(nuc);
   }
   
-};
+}
 
 //
 // end of src/nucname.cpp
@@ -6086,10 +6086,10 @@ void * pyne::rxname::_fill_maps() {
     if (0 < _mts[i]) {
       id_mt[rxid] = _mts[i];
       mt_id[_mts[i]] = rxid;
-    };
+    }
     labels[rxid] = _labels[i];
     docs[rxid] = _docs[i];
-  };
+  }
 
   // set alternative names
   altnames["tot"] = name_id["total"];
@@ -6292,7 +6292,7 @@ void * pyne::rxname::_fill_maps() {
   std::map<std::pair<std::string, int>, unsigned int>::iterator ioffid;
   for (ioffid = offset_id.begin(); ioffid != offset_id.end(); ioffid++) {
     id_offset[make_pair(ioffid->first.first, ioffid->second)] = ioffid->first.second;
-  };
+  }
   // neutrons:
   id_offset[make_pair("n", name_id["nHe3"])] = offset(-2, -3);
   id_offset[make_pair("n", name_id["nHe3_1"])] = offset(-2, -3, 2);
@@ -6315,13 +6315,13 @@ void * pyne::rxname::_fill_maps() {
   id_offset[make_pair("decay", name_id["eca"])] = offset(-3, -4);
   id_offset[make_pair("decay", name_id["decay_2ec"])] = offset(-2, 0);
   return NULL;
-};
+}
 void * pyne::rxname::_ = pyne::rxname::_fill_maps();
 
 
 unsigned int pyne::rxname::hash(std::string s) {
   return pyne::rxname::hash(s.c_str());
-  };
+}
 
 unsigned int pyne::rxname::hash(const char * s) {
   // Modified from http://cboard.cprogramming.com/tech-board/114650-string-hashing-algorithm.html#post853145
@@ -6332,7 +6332,7 @@ unsigned int pyne::rxname::hash(const char * s) {
     h = ((h << 5) + h) ^ c;
   }
   return h;
-};
+}
 
 
 // ************************
@@ -6341,7 +6341,7 @@ unsigned int pyne::rxname::hash(const char * s) {
 
 std::string pyne::rxname::name(char * s) {
   return pyne::rxname::name(std::string(s));
-  };
+}
 
 std::string pyne::rxname::name(std::string s) {
   if (0 < names.count(s))
@@ -6360,12 +6360,12 @@ std::string pyne::rxname::name(std::string s) {
     return pyne::rxname::name(atoi(s.c_str()));
   // dead...
   throw NotAReaction(s, "???");
-};
+}
 
 
 std::string pyne::rxname::name(int n) {
   return pyne::rxname::name((unsigned int) n);
-};
+}
 
 std::string pyne::rxname::name(unsigned int n) {
   if (0 < id_name.count(n))
@@ -6373,7 +6373,7 @@ std::string pyne::rxname::name(unsigned int n) {
   if (0 < mt_id.count(n))
     return id_name[mt_id[n]];
   throw NotAReaction(n, "???");
-};
+}
 
 
 std::string pyne::rxname::name(int from_nuc, int to_nuc, std::string z) {
@@ -6383,22 +6383,22 @@ std::string pyne::rxname::name(int from_nuc, int to_nuc, std::string z) {
     throw IndeterminateReactionForm("z=" + z + ", " + pyne::to_str(from_nuc) + \
                                     ", " + pyne::to_str(to_nuc), "???");
   return id_name[offset_id[key]];
-};
+}
 
 std::string pyne::rxname::name(std::string from_nuc, int to_nuc, std::string z) {
   return pyne::rxname::name(pyne::nucname::id(from_nuc), 
                             pyne::nucname::id(to_nuc), z);
-};
+}
 
 std::string pyne::rxname::name(int from_nuc, std::string to_nuc, std::string z) {
   return pyne::rxname::name(pyne::nucname::id(from_nuc), 
                             pyne::nucname::id(to_nuc), z);
-};
+}
 
 std::string pyne::rxname::name(std::string from_nuc, std::string to_nuc, std::string z) {
   return pyne::rxname::name(pyne::nucname::id(from_nuc), 
                             pyne::nucname::id(to_nuc), z);
-};
+}
 
 
 
@@ -6407,7 +6407,7 @@ std::string pyne::rxname::name(std::string from_nuc, std::string to_nuc, std::st
 // **********************
 unsigned int pyne::rxname::id(int x) {
   return name_id[pyne::rxname::name(x)];
-};
+}
   
 unsigned int pyne::rxname::id(unsigned int x) {
   if (0 < id_name.count(x))
@@ -6415,11 +6415,11 @@ unsigned int pyne::rxname::id(unsigned int x) {
   if (0 < mt_id.count(x))
     return mt_id[x];
   return name_id[pyne::rxname::name(x)];
-};
+}
   
 unsigned int pyne::rxname::id(const char * x) {
   return name_id[pyne::rxname::name(x)];
-};
+}
   
 unsigned int pyne::rxname::id(std::string x) {
   if (0 < names.count(x))
@@ -6427,7 +6427,7 @@ unsigned int pyne::rxname::id(std::string x) {
   if (0 < altnames.count(x))
     return altnames[x];
   return name_id[pyne::rxname::name(x)];  
-};
+}
   
 unsigned int pyne::rxname::id(int from_nuc, int to_nuc, std::string z) {
   // This assumes nuclides are in id form
@@ -6436,22 +6436,22 @@ unsigned int pyne::rxname::id(int from_nuc, int to_nuc, std::string z) {
     throw IndeterminateReactionForm("z=" + z + ", " + pyne::to_str(from_nuc) + \
                                     ", " + pyne::to_str(to_nuc), "???");
   return offset_id[key];
-};
+}
   
 unsigned int pyne::rxname::id(int from_nuc, std::string to_nuc, std::string z) {
   return pyne::rxname::id(pyne::nucname::id(from_nuc), 
                           pyne::nucname::id(to_nuc), z);
-};
+}
   
 unsigned int pyne::rxname::id(std::string from_nuc, int to_nuc, std::string z) {
   return pyne::rxname::id(pyne::nucname::id(from_nuc), 
                           pyne::nucname::id(to_nuc), z);
-};
+}
   
 unsigned int pyne::rxname::id(std::string from_nuc, std::string to_nuc, std::string z) {
   return pyne::rxname::id(pyne::nucname::id(from_nuc), 
                           pyne::nucname::id(to_nuc), z);
-};
+}
 
 
 // **********************
@@ -6462,56 +6462,56 @@ unsigned int pyne::rxname::mt(int x) {
   if (0 == id_mt.count(rxid))
     throw NotAReaction();
   return id_mt[rxid];
-};
+}
   
 unsigned int pyne::rxname::mt(unsigned int x) {
   unsigned int rxid = pyne::rxname::id(x);
   if (0 == id_mt.count(rxid))
     throw NotAReaction();
   return id_mt[rxid];
-};
+}
   
 unsigned int pyne::rxname::mt(char * x) {
   unsigned int rxid = pyne::rxname::id(x);
   if (0 == id_mt.count(rxid))
     throw NotAReaction();
   return id_mt[rxid];
-};
+}
   
 unsigned int pyne::rxname::mt(std::string x) {
   unsigned int rxid = pyne::rxname::id(x);
   if (0 == id_mt.count(rxid))
     throw NotAReaction();
   return id_mt[rxid];
-};
+}
   
 unsigned int pyne::rxname::mt(int from_nuc, int to_nuc, std::string z) {
   unsigned int rxid = pyne::rxname::id(from_nuc, to_nuc, z);
   if (0 == id_mt.count(rxid))
     throw NotAReaction();
   return id_mt[rxid];
-};
+}
   
 unsigned int pyne::rxname::mt(int from_nuc, std::string to_nuc, std::string z) {
   unsigned int rxid = pyne::rxname::id(from_nuc, to_nuc, z);
   if (0 == id_mt.count(rxid))
     throw NotAReaction();
   return id_mt[rxid];
-};
+}
   
 unsigned int pyne::rxname::mt(std::string from_nuc, int to_nuc, std::string z) {
   unsigned int rxid = pyne::rxname::id(from_nuc, to_nuc, z);
   if (0 == id_mt.count(rxid))
     throw NotAReaction();
   return id_mt[rxid];
-};
+}
   
 unsigned int pyne::rxname::mt(std::string from_nuc, std::string to_nuc, std::string z) {
   unsigned int rxid = pyne::rxname::id(from_nuc, to_nuc, z);
   if (0 == id_mt.count(rxid))
     throw NotAReaction();
   return id_mt[rxid];
-};
+}
 
 
 // ***********************
@@ -6519,35 +6519,35 @@ unsigned int pyne::rxname::mt(std::string from_nuc, std::string to_nuc, std::str
 // ***********************
 std::string pyne::rxname::label(int x) {
   return labels[pyne::rxname::id(x)];
-};
+}
   
 std::string pyne::rxname::label(unsigned int x) {
   return labels[pyne::rxname::id(x)];
-};
+}
   
 std::string pyne::rxname::label(char * x) {
   return labels[pyne::rxname::id(x)];
-};
+}
   
 std::string pyne::rxname::label(std::string x) {
   return labels[pyne::rxname::id(x)];
-};
+}
   
 std::string pyne::rxname::label(int from_nuc, int to_nuc, std::string z) {
   return labels[pyne::rxname::id(from_nuc, to_nuc, z)];
-};
+}
   
 std::string pyne::rxname::label(int from_nuc, std::string to_nuc, std::string z) {
   return labels[pyne::rxname::id(from_nuc, to_nuc, z)];
-};
+}
   
 std::string pyne::rxname::label(std::string from_nuc, int to_nuc, std::string z) {
   return labels[pyne::rxname::id(from_nuc, to_nuc, z)];
-};
+}
   
 std::string pyne::rxname::label(std::string from_nuc, std::string to_nuc, std::string z) {
   return labels[pyne::rxname::id(from_nuc, to_nuc, z)];
-};
+}
 
 
 // *********************
@@ -6555,35 +6555,35 @@ std::string pyne::rxname::label(std::string from_nuc, std::string to_nuc, std::s
 // *********************
 std::string pyne::rxname::doc(int x) {
   return docs[pyne::rxname::id(x)];
-};
+}
   
 std::string pyne::rxname::doc(unsigned int x) {
   return docs[pyne::rxname::id(x)];
-};
+}
   
 std::string pyne::rxname::doc(char * x) {
   return docs[pyne::rxname::id(x)];
-};
+}
   
 std::string pyne::rxname::doc(std::string x) {
   return docs[pyne::rxname::id(x)];
-};
+}
   
 std::string pyne::rxname::doc(int from_nuc, int to_nuc, std::string z) {
   return docs[pyne::rxname::id(from_nuc, to_nuc, z)];
-};
+}
   
 std::string pyne::rxname::doc(int from_nuc, std::string to_nuc, std::string z) {
   return docs[pyne::rxname::id(from_nuc, to_nuc, z)];
-};
+}
   
 std::string pyne::rxname::doc(std::string from_nuc, int to_nuc, std::string z) {
   return docs[pyne::rxname::id(from_nuc, to_nuc, z)];
-};
+}
   
 std::string pyne::rxname::doc(std::string from_nuc, std::string to_nuc, std::string z) {
   return docs[pyne::rxname::id(from_nuc, to_nuc, z)];
-};
+}
 
 
 // ***********************
@@ -6599,20 +6599,19 @@ int pyne::rxname::child(int nuc, unsigned int rx, std::string z) {
   if (!pyne::nucname::isnuclide(to_nuc))
     throw pyne::nucname::NotANuclide(nuc, to_nuc);
   return to_nuc;
-};
+}
 
 int pyne::rxname::child(int nuc, std::string rx, std::string z) {
   return child(nuc, id(rx), z);
-};
+}
 
 int pyne::rxname::child(std::string nuc, unsigned int rx, std::string z) {
   return child(pyne::nucname::id(nuc), rx, z);
-};
+}
 
 int pyne::rxname::child(std::string nuc, std::string rx, std::string z) {
   return child(pyne::nucname::id(nuc), id(rx), z);
-};
-
+}
 
 // ************************
 // *** parent functions ***
@@ -6627,19 +6626,19 @@ int pyne::rxname::parent(int nuc, unsigned int rx, std::string z) {
   if (!pyne::nucname::isnuclide(from_nuc))
     throw pyne::nucname::NotANuclide(from_nuc, nuc);
   return from_nuc;
-};
+}
 
 int pyne::rxname::parent(int nuc, std::string rx, std::string z) {
   return parent(nuc, id(rx), z);
-};
+}
 
 int pyne::rxname::parent(std::string nuc, unsigned int rx, std::string z) {
   return parent(pyne::nucname::id(nuc), rx, z);
-};
+}
 
 int pyne::rxname::parent(std::string nuc, std::string rx, std::string z) {
   return parent(pyne::nucname::id(nuc), id(rx), z);
-};
+}
 
 //
 // end of src/rxname.cpp
@@ -6684,7 +6683,7 @@ std::map<std::string, std::string> pyne::get_data_checksums() {
     temp_map["/decay"]="4f41f3e46f4306cc44449f08a20922e0";
     temp_map["/dose_factors"]="dafa32c24b2303850a0bebdf3e6b122e";
     return temp_map;
-};
+}
 
 std::map<std::string, std::string> pyne::data_checksums =
   pyne::get_data_checksums();
@@ -6737,7 +6736,7 @@ void pyne::_load_atomic_mass_map() {
   }
 
   delete[] atomic_mass_array;
-};
+}
 
 
 double pyne::atomic_mass(int nuc) {
@@ -6781,19 +6780,19 @@ double pyne::atomic_mass(int nuc) {
     atomic_mass_map.insert(std::pair<int, double>(nuc, aw));
   }
   return aw;
-};
+}
 
 
 double pyne::atomic_mass(char * nuc) {
   int nuc_zz = nucname::id(nuc);
   return atomic_mass(nuc_zz);
-};
+}
 
 
 double pyne::atomic_mass(std::string nuc) {
   int nuc_zz = nucname::id(nuc);
   return atomic_mass(nuc_zz);
-};
+}
 
 
 /*******************************/
@@ -6819,7 +6818,7 @@ double pyne::natural_abund(int nuc) {
     // Don't fail if we can't load the library
       _load_atomic_mass_map();
       return natural_abund(nuc);
-  };
+  }
 
   double na;
   int nucid = nucname::id(nuc);
@@ -6830,7 +6829,7 @@ double pyne::natural_abund(int nuc) {
     na = natural_abund((nucid/10000)*10000);
     natural_abund_map[nuc] = na;
     return na;
-  };
+  }
 
   // Finally, if none of these work,
   // take a best guess based on the
@@ -6838,19 +6837,19 @@ double pyne::natural_abund(int nuc) {
   na = 0.0;
   natural_abund_map[nuc] = na;
   return na;
-};
+}
 
 
 double pyne::natural_abund(char * nuc) {
   int nuc_zz = nucname::id(nuc);
   return natural_abund(nuc_zz);
-};
+}
 
 
 double pyne::natural_abund(std::string nuc) {
   int nuc_zz = nucname::id(nuc);
   return natural_abund(nuc_zz);
-};
+}
 
 
 
@@ -6898,7 +6897,7 @@ void pyne::_load_q_val_map() {
   }
 
   delete[] q_val_array;
-};
+}
 
 std::map<int, double> pyne::q_val_map = std::map<int, double>();
 
@@ -6928,19 +6927,19 @@ double pyne::q_val(int nuc) {
   qv = 0.0;
   q_val_map[nuc] = qv;
   return qv;
-};
+}
 
 
 double pyne::q_val(const char * nuc) {
   int nuc_zz = nucname::id(nuc);
   return q_val(nuc_zz);
-};
+}
 
 
 double pyne::q_val(std::string nuc) {
   int nuc_zz = nucname::id(nuc);
   return q_val(nuc_zz);
-};
+}
 
 
 /****************************/
@@ -6964,7 +6963,7 @@ double pyne::gamma_frac(int nuc) {
   if (gamma_frac_map.empty()) {
       _load_q_val_map();
       return gamma_frac(nuc);
-  };
+  }
 
   double gf;
   int nucid = nucname::id(nuc);
@@ -6975,19 +6974,19 @@ double pyne::gamma_frac(int nuc) {
   gf = 0.0;
   gamma_frac_map[nucid] = gf;
   return gf;
-};
+}
 
 
 double pyne::gamma_frac(const char * nuc) {
   int nuc_zz = nucname::id(nuc);
   return gamma_frac(nuc_zz);
-};
+}
 
 
 double pyne::gamma_frac(std::string nuc) {
   int nuc_zz = nucname::id(nuc);
   return gamma_frac(nuc_zz);
-};
+}
 
 
 /*****************************/
@@ -7050,7 +7049,7 @@ void pyne::_load_dose_map(std::map<int, dose>& dm, std::string source_path) {
   // Put array of structs in the map
   for (int n = 0; n < dose_length; n++) {
     dm[dose_array[n].nuc] = dose_array[n];
-  };
+  }
 
   // Close the nuc_data library
   H5Dclose(dose_set);
@@ -7058,7 +7057,7 @@ void pyne::_load_dose_map(std::map<int, dose>& dm, std::string source_path) {
   H5Fclose(nuc_data_h5);
 
   delete[] dose_array;
-};
+}
 
 ///
 /// Functions for Source Location in nuc_data.h5
@@ -7075,7 +7074,7 @@ std::string source_string(int source) {
     source_location = "/dose_factors/EPA";
   }
   return source_location;
-};
+}
 
 std::map<int, pyne::dose>& dose_source_map(int source) {
   std::map<int, pyne::dose>* dm;
@@ -7091,7 +7090,7 @@ std::map<int, pyne::dose>& dose_source_map(int source) {
       _load_dose_map(*dm, source_path);
   }
   return *dm;
-};
+}
 
 std::map<int, pyne::dose> pyne::epa_dose_map;
 std::map<int, pyne::dose> pyne::doe_dose_map;
@@ -7112,18 +7111,18 @@ double pyne::ext_air_dose(int nuc, int source) {
   } else {
     return -1;
   }
-};
+}
 
 double pyne::ext_air_dose(const char * nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return ext_air_dose(nuc_zz, source);
-};
+}
 
 
 double pyne::ext_air_dose(std::string nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return ext_air_dose(nuc_zz, source);
-};
+}
 
 /// Dose Ratio
 double pyne::dose_ratio(int nuc, int source) {
@@ -7135,18 +7134,18 @@ double pyne::dose_ratio(int nuc, int source) {
   } else {
     return -1;
   }
-};
+}
 
 double pyne::dose_ratio(const char * nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return dose_ratio(nuc_zz, source);
-};
+}
 
 
 double pyne::dose_ratio(std::string nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return dose_ratio(nuc_zz, source);
-};
+}
 
 ///
 /// Function for External Soil Dose Factors
@@ -7161,18 +7160,18 @@ double pyne::ext_soil_dose(int nuc, int source) {
   } else {
     return -1;
   }
-};
+}
 
 double pyne::ext_soil_dose(const char * nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return ext_soil_dose(nuc_zz, source);
-};
+}
 
 
 double pyne::ext_soil_dose(std::string nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return ext_soil_dose(nuc_zz, source);
-};
+}
 
 ///
 /// Functions for Ingestion Dose Factors and
@@ -7189,18 +7188,17 @@ double pyne::ingest_dose(int nuc, int source) {
   } else {
     return -1;
   }
-};
+}
 
 double pyne::ingest_dose(const char * nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return ingest_dose(nuc_zz, source);
-};
-
+}
 
 double pyne::ingest_dose(std::string nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return ingest_dose(nuc_zz, source);
-};
+}
 
 /// Fluid Fraction
 double pyne::dose_fluid_frac(int nuc, int source) {
@@ -7212,18 +7210,17 @@ double pyne::dose_fluid_frac(int nuc, int source) {
   } else {
     return -1;
   }
-};
+}
 
 double pyne::dose_fluid_frac(const char * nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return dose_fluid_frac(nuc_zz, source);
-};
-
+}
 
 double pyne::dose_fluid_frac(std::string nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return dose_fluid_frac(nuc_zz, source);
-};
+}
 
 ///
 /// Functions for Inhalation Dose Factors and
@@ -7240,18 +7237,17 @@ double pyne::inhale_dose(int nuc, int source) {
   } else {
     return -1;
   }
-};
+}
 
 double pyne::inhale_dose(const char * nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return inhale_dose(nuc_zz, source);
-};
-
+}
 
 double pyne::inhale_dose(std::string nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return inhale_dose(nuc_zz, source);
-};
+}
 
 /// Lung Model
 std::string pyne::dose_lung_model(int nuc, int source) {
@@ -7263,18 +7259,18 @@ std::string pyne::dose_lung_model(int nuc, int source) {
   } else {
     return "Nada";
   }
-};
+}
 
 std::string pyne::dose_lung_model(const char * nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return dose_lung_model(nuc_zz, source);
-};
+}
 
 
 std::string pyne::dose_lung_model(std::string nuc, int source) {
   int nuc_zz = nucname::id(nuc);
   return dose_lung_model(nuc_zz, source);
-};
+}
 
 
 /***********************************/
@@ -7330,10 +7326,10 @@ void pyne::_load_scattering_lengths() {
   for(int n = 0; n < scat_len_length; n++) {
     b_coherent_map[scat_len_array[n].nuc] = scat_len_array[n].b_coherent;
     b_incoherent_map[scat_len_array[n].nuc] = scat_len_array[n].b_incoherent;
-  };
+  }
 
   delete[] scat_len_array;
-};
+}
 
 
 
@@ -7358,7 +7354,7 @@ xd_complex_t pyne::b_coherent(int nuc) {
   if (b_coherent_map.empty()) {
     _load_scattering_lengths();
     return b_coherent(nuc);
-  };
+  }
 
   xd_complex_t bc;
   int nucid = nucname::id(nuc);
@@ -7372,9 +7368,9 @@ xd_complex_t pyne::b_coherent(int nuc) {
       bc = (*nuc_iter).second;
       b_coherent_map[nuc] = bc;
       return bc;
-    };
+    }
     nuc_iter++;
-  };
+  }
 
   // Try to find a nuclide with matching Z-number
   nuc_iter = b_coherent_map.begin();
@@ -7383,9 +7379,9 @@ xd_complex_t pyne::b_coherent(int nuc) {
       bc = (*nuc_iter).second;
       b_coherent_map[nuc] = bc;
       return bc;
-    };
+    }
     nuc_iter++;
-  };
+  }
 
   // Finally, if none of these work,
   // just return zero...
@@ -7393,19 +7389,19 @@ xd_complex_t pyne::b_coherent(int nuc) {
   bc.im = 0.0;
   b_coherent_map[nuc] = bc;
   return bc;
-};
+}
 
 
 xd_complex_t pyne::b_coherent(char * nuc) {
   int nuc_zz = nucname::id(nuc);
   return b_coherent(nuc_zz);
-};
+}
 
 
 xd_complex_t pyne::b_coherent(std::string nuc) {
   int nuc_zz = nucname::id(nuc);
   return b_coherent(nuc_zz);
-};
+}
 
 
 
@@ -7430,7 +7426,7 @@ xd_complex_t pyne::b_incoherent(int nuc) {
   if (b_incoherent_map.empty()) {
     _load_scattering_lengths();
     return b_incoherent(nuc);
-  };
+  }
 
   xd_complex_t bi;
   int nucid = nucname::id(nuc);
@@ -7444,9 +7440,9 @@ xd_complex_t pyne::b_incoherent(int nuc) {
       bi = (*nuc_iter).second;
       b_incoherent_map[nuc] = bi;
       return bi;
-    };
+    }
     nuc_iter++;
-  };
+  }
 
   // Try to find a nuclide with matching Z-number
   nuc_iter = b_incoherent_map.begin();
@@ -7455,9 +7451,9 @@ xd_complex_t pyne::b_incoherent(int nuc) {
       bi = (*nuc_iter).second;
       b_incoherent_map[nuc] = bi;
       return bi;
-    };
+    }
     nuc_iter++;
-  };
+  }
 
   // Finally, if none of these work,
   // just return zero...
@@ -7465,17 +7461,17 @@ xd_complex_t pyne::b_incoherent(int nuc) {
   bi.im = 0.0;
   b_incoherent_map[nuc] = bi;
   return bi;
-};
+}
 
 
 xd_complex_t pyne::b_incoherent(char * nuc) {
   return b_incoherent(nucname::id(nuc));
-};
+}
 
 
 xd_complex_t pyne::b_incoherent(std::string nuc) {
   return b_incoherent(nucname::id(nuc));
-};
+}
 
 
 
@@ -7501,19 +7497,19 @@ double pyne::b(int nuc) {
   double b_val = sqrt(bc.re*bc.re + bc.im*bc.im + bi.re*bi.re + bi.im*bi.im);
 
   return b_val;
-};
+}
 
 
 double pyne::b(char * nuc) {
   int nucid = nucname::id(nuc);
   return b(nucid);
-};
+}
 
 
 double pyne::b(std::string nuc) {
   int nucid = nucname::id(nuc);
   return b(nucid);
-};
+}
 
 
 
@@ -7565,10 +7561,10 @@ void pyne::_load_wimsdfpy() {
   for(int n=0; n < wimsdfpy_length; n++) {
     wimsdfpy_data[std::make_pair(wimsdfpy_array[n].from_nuc,
       wimsdfpy_array[n].to_nuc)] = wimsdfpy_array[n].yields;
-  };
+  }
 
   delete[] wimsdfpy_array;
-};
+}
 
 
 std::map<std::pair<int, int>, pyne::ndsfpysub> pyne::ndsfpy_data = \
@@ -7634,12 +7630,12 @@ void pyne::_load_ndsfpy() {
     ndsfpysub_temp.yield_14MeV_err = ndsfpy_array[n].yield_14MeV_err;
     ndsfpy_data[std::make_pair(ndsfpy_array[n].from_nuc,
       ndsfpy_array[n].to_nuc)] = ndsfpysub_temp;
-  };
+  }
 
 
 
   delete[] ndsfpy_array;
-};
+}
 
 double pyne::fpyield(std::pair<int, int> from_to, int source, bool get_error) {
   // Note that this may be expanded eventually to include other
@@ -7694,23 +7690,23 @@ double pyne::fpyield(std::pair<int, int> from_to, int source, bool get_error) {
   double fpy = 0.0;
   wimsdfpy_data[from_to] = fpy;
   return fpy;
-};
+}
 
 double pyne::fpyield(int from_nuc, int to_nuc, int source, bool get_error) {
   return fpyield(std::pair<int, int>(nucname::id(from_nuc),
                                      nucname::id(to_nuc)), source, get_error);
-};
+}
 
 double pyne::fpyield(char * from_nuc, char * to_nuc, int source, bool get_error) {
   return fpyield(std::pair<int, int>(nucname::id(from_nuc),
                                      nucname::id(to_nuc)), source, get_error);
-};
+}
 
 double pyne::fpyield(std::string from_nuc, std::string to_nuc, int source,
                      bool get_error) {
   return fpyield(std::pair<int, int>(nucname::id(from_nuc),
                                      nucname::id(to_nuc)), source, get_error);
-};
+}
 
 
 /***********************/
@@ -7725,7 +7721,7 @@ bool pyne::swapmapcompare::operator()(const std::pair<int, double>& lhs,
 const std::pair<int, double>& rhs) const {
     return lhs.second<rhs.second || (!(rhs.second<lhs.second) &&
       lhs.first<rhs.first);
-};
+}
 
 template<typename T, typename U> std::vector<T> pyne::data_access(
 double energy_min, double energy_max, size_t valoffset, std::map<std::pair<int,
@@ -7754,9 +7750,9 @@ double>, U>  &data) {
   {
     _load_data<U>();
     return data_access<T, U>(energy_min, energy_max, valoffset, data);
-  };
+  }
   return result;
-};
+}
 
 template<typename T, typename U> std::vector<T> pyne::data_access(int parent,
 double min, double max, size_t valoffset,
@@ -7777,9 +7773,9 @@ std::map<std::pair<int, double>, U>  &data) {
   {
     _load_data<U>();
     return data_access<T, U>(parent, min, max, valoffset, data);
-  };
+  }
   return result;
-};
+}
 
 template<typename T, typename U> T pyne::data_access(std::pair<int, int>
 from_to, size_t valoffset, std::map<std::pair<int, int>, U> &data) {
@@ -7799,7 +7795,7 @@ from_to, size_t valoffset, std::map<std::pair<int, int>, U> &data) {
   {
     _load_data<U>();
     return data_access<T, U>(from_to, valoffset, data);
-  };
+  }
   // This is okay for now because we only return ints and doubles
   return 0;
 }
@@ -7822,9 +7818,9 @@ size_t valoffset, std::map<std::pair<int, int>, U> &data){
   {
     _load_data<U>();
     return data_access<T, U>(parent, valoffset, data);
-  };
+  }
   return result;
-};
+}
 
 template<typename T, typename U> std::vector<T> pyne::data_access(int parent,
 size_t valoffset, std::map<std::pair<int, unsigned int>, U> &data){
@@ -7845,9 +7841,9 @@ size_t valoffset, std::map<std::pair<int, unsigned int>, U> &data){
   {
     _load_data<U>();
     return data_access<T, U>(parent, valoffset, data);
-  };
+  }
   return result;
-};
+}
 
 template<typename U> double pyne::data_access(int nuc,
 size_t valoffset, std::map<int, U> &data){
@@ -7865,9 +7861,9 @@ size_t valoffset, std::map<int, U> &data){
   {
     _load_data<U>();
     return data_access<U>(nuc, valoffset, data);
-  };
+  }
   throw pyne::nucname::NotANuclide(nuc, "");
-};
+}
 
 
 //
@@ -8181,12 +8177,12 @@ std::set<int> pyne::decay_children(int nuc) {
 std::set<int> pyne::decay_children(char * nuc)
 {
   return decay_children(nucname::id(nuc));
-};
+}
 
 std::set<int> pyne::decay_children(std::string nuc)
 {
   return decay_children(nucname::id(nuc));
-};
+}
 
 //
 // Excitation state energy data
@@ -8204,13 +8200,13 @@ double pyne::state_energy(int nuc)
 double pyne::state_energy(char * nuc)
 {
   return state_energy(nucname::id(nuc));
-};
+}
 
 
 double pyne::state_energy(std::string nuc)
 {
   return state_energy(nucname::id(nuc));
-};
+}
 
 
 //
@@ -8231,13 +8227,13 @@ double pyne::decay_const(int nuc)
 double pyne::decay_const(char * nuc) {
   int nuc_zz = nucname::id(nuc);
   return decay_const(nuc_zz);
-};
+}
 
 
 double pyne::decay_const(std::string nuc) {
   int nuc_zz = nucname::id(nuc);
   return decay_const(nuc_zz);
-};
+}
 
 
 //
@@ -8250,18 +8246,18 @@ double pyne::half_life(int nuc) {
         return result[0];
     }
     return 1.0/0.0;
-};
+}
 
 
 double pyne::half_life(char * nuc) {
   int nuc_zz = nucname::id(nuc);
   return half_life(nuc_zz);
-};
+}
 
 double pyne::half_life(std::string nuc) {
   int nuc_zz = nucname::id(nuc);
   return half_life(nuc_zz);
-};
+}
 
 
 //
@@ -8304,17 +8300,17 @@ double pyne::branch_ratio(std::pair<int, int> from_to) {
 double pyne::branch_ratio(int from_nuc, int to_nuc) {
   return branch_ratio(std::pair<int, int>(nucname::id(from_nuc),
                                           nucname::id(to_nuc)));
-};
+}
 
 double pyne::branch_ratio(char * from_nuc, char * to_nuc) {
   return branch_ratio(std::pair<int, int>(nucname::id(from_nuc),
                                           nucname::id(to_nuc)));
-};
+}
 
 double pyne::branch_ratio(std::string from_nuc, std::string to_nuc) {
   return branch_ratio(std::pair<int, int>(nucname::id(from_nuc),
                                           nucname::id(to_nuc)));
-};
+}
 
 std::map<std::pair<int, int>, pyne::decay> pyne::decay_data = \
   std::map<std::pair<int, int>, pyne::decay>();
@@ -8393,7 +8389,7 @@ std::pair<double, double> pyne::decay_half_life(std::pair<int, int> from_to){
   return std::make_pair(data_access<double, decay>(from_to, offsetof(
    decay, half_life), decay_data), data_access<double, decay>(
    from_to, offsetof(decay, half_life_error), decay_data));
-};
+}
 
 std::vector<std::pair<double, double> >pyne::decay_half_lifes(int parent) {
   std::vector<std::pair<double, double> > result;
@@ -8411,7 +8407,7 @@ std::pair<double, double> pyne::decay_branch_ratio(std::pair<int, int> from_to) 
   return std::make_pair(data_access<double, decay>(from_to, offsetof(decay,
     branch_ratio), decay_data),data_access<double, decay>(from_to, offsetof(decay,
     branch_ratio_error), decay_data));
-};
+}
 
 std::vector<double> pyne::decay_branch_ratios(int parent) {
   return data_access<double, decay>(parent, offsetof(decay,
@@ -8424,7 +8420,7 @@ from_to) {
     offsetof(decay, photon_branch_ratio), decay_data),
     data_access<double, decay>(from_to, offsetof(decay,
     photon_branch_ratio_error), decay_data));
-};
+}
 
 std::vector<std::pair<double, double> >pyne::decay_photon_branch_ratios(
 int parent) {
@@ -8445,7 +8441,7 @@ from_to) {
     offsetof(decay, beta_branch_ratio), decay_data),
     data_access<double, decay>(from_to, offsetof(decay,
     beta_branch_ratio_error), decay_data));
-};
+}
 
 std::vector<std::pair<double, double> >pyne::decay_beta_branch_ratios(
 int parent) {
@@ -8545,7 +8541,7 @@ std::vector<std::pair<double, double> > pyne::gamma_energy(int parent) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 std::vector<std::pair<double, double> > pyne::gamma_energy(double energy,
 double error) {
@@ -8558,7 +8554,7 @@ double error) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 std::vector<std::pair<double, double> > pyne::gamma_photon_intensity(
 int parent) {
@@ -8571,7 +8567,7 @@ int parent) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 std::vector<std::pair<double, double> > pyne::gamma_photon_intensity(
 double energy, double error) {
@@ -8584,7 +8580,7 @@ double energy, double error) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 std::vector<std::pair<double, double> > pyne::gamma_conversion_intensity(
 int parent) {
@@ -8597,7 +8593,7 @@ int parent) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 std::vector<std::pair<double, double> > pyne::gamma_total_intensity(
 int parent) {
@@ -8610,7 +8606,7 @@ int parent) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 std::vector<std::pair<int, int> > pyne::gamma_from_to(int parent) {
   std::vector<std::pair<int, int> > result;
@@ -8622,7 +8618,7 @@ std::vector<std::pair<int, int> > pyne::gamma_from_to(int parent) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 std::vector<std::pair<int, int> > pyne::gamma_from_to(double energy,
 double error) {
@@ -8635,7 +8631,7 @@ double error) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 
 std::vector<std::pair<int, int> > pyne::gamma_parent_child(double energy,
@@ -8649,22 +8645,22 @@ double error) {
     result.push_back(std::make_pair(part1[i],part2[i]));
   }
   return result;
-};
+}
 
 std::vector<int> pyne::gamma_parent(double energy, double error) {
   return data_access<int, gamma>(energy+error, energy-error,
     offsetof(gamma, parent_nuc), gamma_data);
-};
+}
 
 std::vector<int> pyne::gamma_child(double energy, double error) {
   return data_access<int, gamma>(energy+error, energy-error,
   offsetof(gamma, child_nuc), gamma_data);
-};
+}
 
 std::vector<int> pyne::gamma_child(int parent) {
   return data_access<int, gamma>(parent, 0.0, DBL_MAX,
   offsetof(gamma, child_nuc), gamma_data);
-};
+}
 
 std::vector<std::pair<double, double> > pyne::gamma_xrays(int parent) {
   std::vector<std::pair<double, double> > result;
@@ -8703,7 +8699,7 @@ std::vector<std::pair<double, double> > pyne::gamma_xrays(int parent) {
     }
   }
   return result;
-};
+}
 
 std::map<std::pair<int, double>, pyne::alpha> pyne::alpha_data;
 
@@ -8761,26 +8757,26 @@ template<> void pyne::_load_data<pyne::alpha>() {
 std::vector<double > pyne::alpha_energy(int parent){
   return data_access<double, alpha>(parent, 0.0, DBL_MAX,
                      offsetof(alpha,energy), alpha_data);
-};
+}
 std::vector<double> pyne::alpha_intensity(int parent){
   return data_access<double, alpha>(parent, 0.0, DBL_MAX,
                      offsetof(alpha,intensity), alpha_data);
-};
+}
 
 std::vector<int> pyne::alpha_parent(double energy, double error) {
   return data_access<int, alpha>(energy+error, energy-error,
                      offsetof(alpha, from_nuc), alpha_data);
-};
+}
 
 std::vector<int> pyne::alpha_child(double energy, double error) {
   return data_access<int, alpha>(energy+error, energy-error,
                      offsetof(alpha, to_nuc), alpha_data);
-};
+}
 
 std::vector<int> pyne::alpha_child(int parent){
   return data_access<int, alpha>(parent, 0.0, DBL_MAX,
                      offsetof(alpha, to_nuc), alpha_data);
-};
+}
 
 std::map<std::pair<int, double>, pyne::beta> pyne::beta_data;
 
@@ -8839,32 +8835,32 @@ template<> void pyne::_load_data<pyne::beta>() {
 std::vector<double > pyne::beta_endpoint_energy(int parent){
   return data_access<double, beta>(parent, 0.0, DBL_MAX,
                      offsetof(beta, endpoint_energy), beta_data);
-};
+}
 
 std::vector<double > pyne::beta_average_energy(int parent){
   return data_access<double, beta>(parent, 0.0, DBL_MAX,
                      offsetof(beta, avg_energy), beta_data);
-};
+}
 
 std::vector<double> pyne::beta_intensity(int parent){
   return data_access<double, beta>(parent, 0.0, DBL_MAX,
                      offsetof(beta, intensity), beta_data);
-};
+}
 
 std::vector<int> pyne::beta_parent(double energy, double error) {
   return data_access<int, beta>(energy+error, energy-error,
                      offsetof(beta, from_nuc), beta_data);
-};
+}
 
 std::vector<int> pyne::beta_child(double energy, double error) {
   return data_access<int, beta>(energy+error, energy-error,
                      offsetof(beta, to_nuc), beta_data);
-};
+}
 
 std::vector<int> pyne::beta_child(int parent){
   return data_access<int, beta>(parent, 0.0, DBL_MAX,
                      offsetof(beta, to_nuc),beta_data);
-};
+}
 
 
 std::map<std::pair<int, double>, pyne::ecbp> pyne::ecbp_data;
@@ -8931,37 +8927,37 @@ template<> void pyne::_load_data<pyne::ecbp>() {
 std::vector<double > pyne::ecbp_endpoint_energy(int parent){
   return data_access<double, ecbp>(parent, 0.0, DBL_MAX,
                      offsetof(ecbp,endpoint_energy), ecbp_data);
-};
+}
 
 std::vector<double > pyne::ecbp_average_energy(int parent){
   return data_access<double, ecbp>(parent, 0.0, DBL_MAX,
                      offsetof(ecbp, avg_energy), ecbp_data);
-};
+}
 
 std::vector<double> pyne::ec_intensity(int parent){
   return data_access<double, ecbp>(parent, 0.0, DBL_MAX,
                      offsetof(ecbp, ec_intensity), ecbp_data);
-};
+}
 
 std::vector<double> pyne::bp_intensity(int parent){
   return data_access<double, ecbp>(parent, 0.0, DBL_MAX,
                      offsetof(ecbp, beta_plus_intensity), ecbp_data);
-};
+}
 
 std::vector<int> pyne::ecbp_parent(double energy, double error) {
   return data_access<int, ecbp>(energy+error, energy-error,
                      offsetof(ecbp, from_nuc), ecbp_data);
-};
+}
 
 std::vector<int> pyne::ecbp_child(double energy, double error) {
   return data_access<int, ecbp>(energy+error, energy-error,
                      offsetof(ecbp, to_nuc), ecbp_data);
-};
+}
 
 std::vector<int> pyne::ecbp_child(int parent){
   return data_access<int, ecbp>(parent, 0.0, DBL_MAX,
                      offsetof(ecbp, to_nuc), ecbp_data);
-};
+}
 
 std::vector<std::pair<double, double> > pyne::ecbp_xrays(int parent) {
   std::vector<std::pair<double, double> > result;
@@ -9000,7 +8996,7 @@ std::vector<std::pair<double, double> > pyne::ecbp_xrays(int parent) {
     }
   }
   return result;
-};
+}
 
 ///////////////////////////
 /// Combined decay data ///
@@ -9140,7 +9136,7 @@ std::vector<std::pair<double, double> > pyne::xrays(int parent) {
   for(int i = 0; i < result.size(); ++i)
     result[i].second = result[i].second * decay_c;
   return result;
-};
+}
 
 //////////////////////////////////////////
 //////////// simple xs data //////////////
@@ -13370,7 +13366,7 @@ double pyne::Material::get_comp_sum() {
     sum = sum + i->second;
   }
   return sum;
-};
+}
 
 
 
@@ -13420,11 +13416,11 @@ void pyne::Material::_load_comp_protocol0(hid_t db, std::string datapath, int ro
 
     H5Dclose(nucset);
     delete[] nkey;
-  };
+  }
 
   // Set meta data
   atoms_per_molecule = -1.0;
-};
+}
 
 
 
@@ -13432,14 +13428,14 @@ void pyne::Material::_load_comp_protocol1(hid_t db, std::string datapath, int ro
   std::string nucpath;
   hid_t data_set = H5Dopen2(db, datapath.c_str(), H5P_DEFAULT);
 
-  hsize_t data_offset[1] = {row};
+  hsize_t data_offset[1] = {static_cast<hsize_t>(row)};
   if (row < 0) {
     // Handle negative row indices
     hid_t data_space = H5Dget_space(data_set);
     hsize_t data_dims[1];
     H5Sget_simple_extent_dims(data_space, data_dims, NULL);
     data_offset[0] += data_dims[0];
-  };
+  }
 
   // Grab the nucpath
   hid_t nuc_attr = H5Aopen(data_set, "nucpath", H5P_DEFAULT);
@@ -13456,7 +13452,7 @@ void pyne::Material::_load_comp_protocol1(hid_t db, std::string datapath, int ro
   // Grab the nuclides
   std::vector<int> nuclides = h5wrap::h5_array_to_cpp_vector_1d<int>(db, nucpath, H5T_NATIVE_INT);
   int nuc_size = nuclides.size();
-  hsize_t nuc_dims[1] = {nuc_size};
+  hsize_t nuc_dims[1] = {static_cast<hsize_t>(nuc_size)};
 
   // Get the data hyperslab
   hid_t data_hyperslab = H5Dget_space(data_set);
@@ -13467,7 +13463,7 @@ void pyne::Material::_load_comp_protocol1(hid_t db, std::string datapath, int ro
   hid_t mem_space = H5Screate_simple(1, data_count, NULL);
 
   // Get material type
-  size_t material_data_size = sizeof(pyne::material_data) + sizeof(double)*nuc_size;
+  size_t material_data_size = sizeof(pyne::material_data) + sizeof(double)*(nuc_size-1);
   hid_t desc = H5Tcreate(H5T_COMPOUND, material_data_size);
   hid_t comp_values_array_type = H5Tarray_create2(H5T_NATIVE_DOUBLE, 1, nuc_dims);
 
@@ -13527,7 +13523,7 @@ void pyne::Material::_load_comp_protocol1(hid_t db, std::string datapath, int ro
 
   // Close out the HDF5 file
   H5Fclose(db);
-};
+}
 
 
 
@@ -13537,7 +13533,7 @@ void pyne::Material::from_hdf5(char * filename, char * datapath, int row, int pr
   std::string fname (filename);
   std::string dpath (datapath);
   from_hdf5(fname, dpath, row, protocol);
-};
+}
 
 
 
@@ -13582,7 +13578,7 @@ void pyne::Material::from_hdf5(std::string filename, std::string datapath, int r
 
   // Renormalize the composition, just to be safe.
   norm_comp();
-};
+}
 
 
 
@@ -13593,7 +13589,7 @@ void pyne::Material::write_hdf5(char * filename, char * datapath, char * nucpath
   std::string groupname (datapath);
   std::string nuclist (nucpath);
   write_hdf5(fname, groupname, nuclist, row, chunksize);
-};
+}
 
 
 
@@ -13647,7 +13643,7 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
                                H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     H5Dwrite(nuc_set, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, nuc_data);
     H5Fflush(db, H5F_SCOPE_GLOBAL);
-  };
+  }
 
 
   //
@@ -13659,7 +13655,7 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
   hsize_t data_max_dims[1] = {H5S_UNLIMITED};
   hsize_t data_offset[1] = {0};
 
-  size_t material_data_size = sizeof(pyne::material_data) + sizeof(double)*nuc_size;
+  size_t material_data_size = sizeof(pyne::material_data) + sizeof(double)*(nuc_size-1);
   hid_t desc = H5Tcreate(H5T_COMPOUND, material_data_size);
   hid_t comp_values_array_type = H5Tarray_create2(H5T_NATIVE_DOUBLE, 1, nuc_dims);
 
@@ -13681,7 +13677,7 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
       (*mat_data).comp[n] = comp[nuclides[n]];
     else
       (*mat_data).comp[n] = 0.0;
-  };
+  }
 
   // get / make the data set
   bool datapath_exists = h5wrap::path_exists(db, datapath);
@@ -13708,7 +13704,7 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
 
     // Make data set properties to enable chunking
     hid_t data_set_params = H5Pcreate(H5P_DATASET_CREATE);
-    hsize_t chunk_dims[1] ={chunksize};
+    hsize_t chunk_dims[1] = {static_cast<hsize_t>(chunksize)};
     H5Pset_chunk(data_set_params, 1, chunk_dims);
     H5Pset_deflate(data_set_params, 1);
 
@@ -13725,7 +13721,7 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
                                 H5P_DEFAULT, H5P_DEFAULT);
     H5Awrite(nuc_attr, nuc_attr_type, nucpath.c_str());
     H5Fflush(db, H5F_SCOPE_GLOBAL);
-  };
+  }
 
   // Get the data hyperslab
   data_hyperslab = H5Dget_space(data_set);
@@ -13789,7 +13785,7 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
                          H5P_DEFAULT, metadataetparams, H5P_DEFAULT);
     H5Dset_extent(metadataet, data_dims);
     H5Pclose(metadataetparams);
-  };
+  }
 
   // set the attr string
   hvl_t attrdata [1];
@@ -13815,7 +13811,7 @@ void pyne::Material::write_hdf5(std::string filename, std::string datapath,
   // Remember the milk!
   // ...by which I mean to deallocate
   delete[] mat_data;
-};
+}
 
 std::string pyne::Material::mcnp(std::string frac_type) {
   //////////////////// Begin card creation ///////////////////////
@@ -14154,7 +14150,7 @@ std::string pyne::Material::fluka_compound_str(int id, std::string frac_type) {
 void pyne::Material::from_text(char * filename) {
   std::string fname (filename);
   from_text(fname);
-};
+}
 
 
 void pyne::Material::from_text(std::string filename) {
@@ -14194,18 +14190,18 @@ void pyne::Material::from_text(std::string filename) {
       metadata[keystr]= valstr;
       continue;
    }
-   };
+   }
 
    f.close();
    norm_comp();
-};
+}
 
 
 
 void pyne::Material::write_text(char * filename) {
   std::string fname (filename);
   write_text(fname);
-};
+}
 
 
 void pyne::Material::write_text(std::string filename) {
@@ -14234,10 +14230,10 @@ void pyne::Material::write_text(std::string filename) {
     while (nuc_name.length() < 8)
       nuc_name += " ";
     f << nuc_name << i->second << "\n";
-  };
+  }
 
   f.close();
-};
+}
 
 
 void pyne::Material::load_json(Json::Value json) {
@@ -14252,7 +14248,7 @@ void pyne::Material::load_json(Json::Value json) {
   density = json["density"].asDouble();
   atoms_per_molecule = json["atoms_per_molecule"].asDouble();
   metadata = json["metadata"];
-};
+}
 
 
 Json::Value pyne::Material::dump_json() {
@@ -14266,13 +14262,13 @@ Json::Value pyne::Material::dump_json() {
     jcomp[nucname::name(i->first)] = (i->second);
   json["comp"] = jcomp;
   return json;
-};
+}
 
 
 void pyne::Material::from_json(char * filename) {
   std::string fname (filename);
   from_json(fname);
-};
+}
 
 void pyne::Material::from_json(std::string filename) {
   if (!pyne::file_exists(filename))
@@ -14288,13 +14284,13 @@ void pyne::Material::from_json(std::string filename) {
   Json::Value json;
   reader.parse(s, json);
   load_json(json);
-};
+}
 
 
 void pyne::Material::write_json(char * filename) {
   std::string fname (filename);
   write_json(fname);
-};
+}
 
 void pyne::Material::write_json(std::string filename) {
   Json::Value json = dump_json();
@@ -14304,7 +14300,7 @@ void pyne::Material::write_json(std::string filename) {
   f.open(filename.c_str(), std::ios_base::trunc);
   f << s << "\n";
   f.close();
-};
+}
 
 
 /************************/
@@ -14332,7 +14328,7 @@ pyne::Material::Material(pyne::comp_map cm, double m, double d, double apm,
   metadata = attributes;
   if (!comp.empty())
     norm_comp();
-};
+}
 
 
 
@@ -14354,7 +14350,7 @@ pyne::Material::Material(char * filename, double m, double d, double apm,
     from_hdf5(fname);
   else
     from_text(fname);
-};
+}
 
 
 pyne::Material::Material(std::string filename, double m, double d, double apm,
@@ -14375,11 +14371,11 @@ pyne::Material::Material(std::string filename, double m, double d, double apm,
     from_hdf5(filename);
   else
     from_text(filename);
-};
+}
 
 
 pyne::Material::~Material() {
-};
+}
 
 
 
@@ -14393,9 +14389,9 @@ std::ostream& operator<<(std::ostream& os, pyne::Material mat) {
   for(pyne::comp_iter i = mat.comp.begin(); i != mat.comp.end(); i++)
   {
     os << "\t" << pyne::nucname::name( i->first ) << "\t" << i->second << "\n";
-  };
+  }
   return os;
-};
+}
 
 // Note this refines << for an inheritor of std::ostream.
 std::ostringstream& operator<<(std::ostringstream& os, pyne::Material mat) {
@@ -14405,7 +14401,7 @@ std::ostringstream& operator<<(std::ostringstream& os, pyne::Material mat) {
 void pyne::Material::normalize () {
   // normalizes the mass
   mass = 1.0;
-};
+}
 
 
 pyne::comp_map pyne::Material::mult_by_mass() {
@@ -14416,9 +14412,9 @@ pyne::comp_map pyne::Material::mult_by_mass() {
   pyne::comp_map cm;
   for (pyne::comp_iter i = comp.begin(); i != comp.end(); i++) {
     cm[i->first] = (i->second) * mass;
-  };
+  }
   return cm;
-};
+}
 
 
 
@@ -14499,7 +14495,7 @@ double pyne::Material::molecular_mass(double apm) {
     atsperm = atoms_per_molecule;  // select the class's value
 
   return atsperm / inverseA;
-};
+}
 
 
 pyne::Material pyne::Material::expand_elements() {
@@ -14537,12 +14533,12 @@ pyne::Material pyne::Material::expand_elements() {
           break;
         }
         zabund = nucname::znum(nabund);
-      };
+      }
     } else
       newcomp.insert(*nuc);
-  };
+  }
   return Material(newcomp, mass, density, atoms_per_molecule, metadata);
-};
+}
 
 pyne::Material pyne::Material::collapse_elements(std::set<int> exception_ids) {
   ////////////////////////////////////////////////////////////////////////
@@ -14604,9 +14600,9 @@ double pyne::Material::mass_density(double num_dens, double apm) {
   if (0.0 <= num_dens) {
     double mw = molecular_mass(apm);
     density = num_dens * mw / pyne::N_A / atoms_per_molecule;
-  };
+  }
   return density;
-};
+}
 
 
 double pyne::Material::number_density(double mass_dens, double apm) {
@@ -14615,7 +14611,7 @@ double pyne::Material::number_density(double mass_dens, double apm) {
   double mw = molecular_mass(apm);
   double num_dens = density * pyne::N_A * atoms_per_molecule / mw;
   return num_dens;
-};
+}
 
 
 /*--- Stub-Stream Computation ---*/
@@ -14628,10 +14624,10 @@ pyne::Material pyne::Material::sub_mat(std::set<int> nucset) {
   for (pyne::comp_iter i = comp.begin(); i != comp.end(); i++) {
     if ( 0 < nucset.count(i->first) )
       cm[i->first] = (i->second) * mass;
-  };
+  }
 
   return pyne::Material(cm, -1, -1);
-};
+}
 
 
 
@@ -14641,10 +14637,10 @@ pyne::Material pyne::Material::sub_mat(std::set<std::string> nucset) {
   std::set<int> iset;
   for (std::set<std::string>::iterator i = nucset.begin(); i != nucset.end(); i++) {
     iset.insert(pyne::nucname::id(*i));
-  };
+  }
 
   return sub_mat(iset);
-};
+}
 
 
 
@@ -14659,14 +14655,14 @@ pyne::Material pyne::Material::set_mat (std::set<int> nucset, double value) {
   for (pyne::comp_iter i = comp.begin(); i != comp.end(); i++) {
     if ( 0 == nucset.count(i->first) )
       cm[i->first] = (i->second) * mass;
-  };
+  }
 
   // Add set component
   for (std::set<int>::iterator nuc = nucset.begin(); nuc != nucset.end(); nuc++)
     cm[*nuc] = value;
 
   return pyne::Material(cm, -1, -1);
-};
+}
 
 
 
@@ -14676,10 +14672,10 @@ pyne::Material pyne::Material::set_mat(std::set<std::string> nucset, double valu
   std::set<int> iset;
   for (std::set<std::string>::iterator i = nucset.begin(); i != nucset.end(); i++) {
     iset.insert(pyne::nucname::id(*i));
-  };
+  }
 
   return set_mat(iset, value);
-};
+}
 
 
 
@@ -14694,10 +14690,10 @@ pyne::Material pyne::Material::del_mat(std::set<int> nucset) {
     // Only add to new comp if not in nucset
     if ( 0 == nucset.count(i->first) )
       cm[i->first] = (i->second) * mass;
-  };
+  }
 
   return pyne::Material(cm, -1, -1);
-};
+}
 
 
 
@@ -14707,10 +14703,10 @@ pyne::Material pyne::Material::del_mat (std::set<std::string> nucset) {
   std::set<int> iset;
   for (std::set<std::string>::iterator i = nucset.begin(); i != nucset.end(); i++) {
     iset.insert(pyne::nucname::id(*i));
-  };
+  }
 
   return del_mat(iset);
-};
+}
 
 
 
@@ -14724,37 +14720,37 @@ pyne::Material pyne::Material::sub_range(int lower, int upper) {
     int temp_upper = upper;
     upper = lower;
     lower = temp_upper;
-  };
+  }
 
   pyne::comp_map cm;
   for (pyne::comp_iter i = comp.begin(); i != comp.end(); i++) {
     if ((lower <= (i->first)) && ((i->first) < upper))
       cm[i->first] = (i->second) * mass;
-  };
+  }
 
   return pyne::Material(cm, -1,-1);
-};
+}
 
 
 
 pyne::Material pyne::Material::set_range(int lower, int upper, double value) {
-// Sets a sub-material from this mat based on a range of integers.
-if (upper < lower) {
-int temp_upper = upper;
-upper = lower;
-lower = temp_upper;
-};
+  // Sets a sub-material from this mat based on a range of integers.
+  if (upper < lower) {
+    int temp_upper = upper;
+    upper = lower;
+    lower = temp_upper;
+  }
 
-pyne::comp_map cm;
-for (pyne::comp_iter i = comp.begin(); i != comp.end(); i++) {
-  if ((lower <= (i->first)) && ((i->first) < upper))
-    cm[i->first] = value;
-  else
-    cm[i->first] = (i->second) * mass;
-};
+  pyne::comp_map cm;
+  for (pyne::comp_iter i = comp.begin(); i != comp.end(); i++) {
+    if ((lower <= (i->first)) && ((i->first) < upper))
+      cm[i->first] = value;
+    else
+      cm[i->first] = (i->second) * mass;
+  }
 
   return pyne::Material(cm, -1,-1);
-};
+}
 
 
 
@@ -14764,16 +14760,16 @@ pyne::Material pyne::Material::del_range(int lower, int upper) {
     int temp_upper = upper;
     upper = lower;
     lower = temp_upper;
-  };
+  }
 
   pyne::comp_map cm;
   for (pyne::comp_iter i = comp.begin(); i != comp.end(); i++) {
     if ((upper <= (i->first)) || ((i->first) < lower))
       cm[i->first] = (i->second) * mass;
-  };
+  }
 
   return pyne::Material(cm, -1, -1);
-};
+}
 
 
 
@@ -14787,41 +14783,41 @@ pyne::Material pyne::Material::del_range(int lower, int upper) {
 pyne::Material pyne::Material::sub_elem(int elem) {
   // Returns a material of the element that is a submaterial of this one.
   return sub_range(elem, elem + 10000000);
-};
+}
 
 
 
 pyne::Material pyne::Material::sub_lan() {
   // Returns a material of Lanthanides that is a sub-material of this one.
   return sub_range(570000000, 720000000);
-};
+}
 
 
 
 pyne::Material pyne::Material::sub_act() {
   //Returns a material of Actindes that is a sub-material of this one.
   return sub_range(890000000, 1040000000);
-};
+}
 
 
 pyne::Material pyne::Material::sub_tru() {
   // Returns a material of Transuranics that is a sub-material of this one.
   return sub_range(930000000, INT_MAX);
-};
+}
 
 
 
 pyne::Material pyne::Material::sub_ma() {
   // Returns a material of Minor Actinides that is a sub-material of this one.
   return sub_range(930000000, 1040000000).del_range(940000000, 950000000);
-};
+}
 
 
 
 pyne::Material pyne::Material::sub_fp() {
   // Returns a material of Fission Products that is a sub-material of this one.
   return sub_range(0, 890000000);
-};
+}
 
 
 
@@ -14839,7 +14835,7 @@ std::map<int, double> pyne::Material::to_atom_frac() {
     atom_fracs[ci->first] = (ci->second) * mat_mw / pyne::atomic_mass(ci->first);
 
   return atom_fracs;
-};
+}
 
 
 void pyne::Material::from_atom_frac(std::map<int, double> atom_fracs) {
@@ -14854,10 +14850,10 @@ void pyne::Material::from_atom_frac(std::map<int, double> atom_fracs) {
   for (std::map<int, double>::iterator afi = atom_fracs.begin(); afi != atom_fracs.end(); afi++) {
     comp[afi->first] = (afi->second) * pyne::atomic_mass(afi->first);
     atoms_per_molecule += (afi->second);
-  };
+  }
 
   norm_comp();
-};
+}
 
 
 std::map<int, double> pyne::Material::to_atom_dens() {
@@ -14870,7 +14866,7 @@ std::map<int, double> pyne::Material::to_atom_dens() {
     atom_dens[ci->first] = (ci->second) * density * pyne::N_A / pyne::atomic_mass(ci->first);
 
   return atom_dens;
-};
+}
 
 
 std::vector<std::pair<double, double> > pyne::Material::gammas() {
@@ -14945,13 +14941,13 @@ pyne::Material pyne::Material::decay(double t) {
   rtn.from_atom_frac(out);
   rtn.mass = mass * rtn.molecular_mass() / molecular_mass();
   return rtn;
-};
+}
 
 
 pyne::Material pyne::Material::operator+ (double y) {
   // Overloads x + y
   return pyne::Material(comp, mass + y, density);
-};
+}
 
 
 
@@ -14966,22 +14962,22 @@ pyne::Material pyne::Material::operator+ (Material y) {
       cm[i->first] = xwgt[i->first] + ywgt[i->first];
     else
       cm[i->first] = xwgt[i->first];
-  };
+  }
 
   for (pyne::comp_iter i = ywgt.begin(); i != ywgt.end(); i++) {
     if ( 0 == cm.count(i->first) )
       cm[i->first] = ywgt[i->first];
-  };
+  }
 
   return pyne::Material(cm, -1, -1);
-};
+}
 
 
 
 pyne::Material pyne::Material::operator* (double y) {
   // Overloads x * y
   return pyne::Material(comp, mass * y, density);
-};
+}
 
 
 
@@ -15028,11 +15024,11 @@ pyne_enr::Cascade::Cascade() {
   l_t_per_feed = 0.0;
   swu_per_feed = 0.0;
   swu_per_prod = 0.0;
-};
+}
 
 
 pyne_enr::Cascade::~Cascade() {
-};
+}
 
 
 void pyne_enr::Cascade::_reset_xjs() {
@@ -15040,7 +15036,7 @@ void pyne_enr::Cascade::_reset_xjs() {
   x_feed_j = mat_feed.comp[j];
   x_prod_j = mat_prod.comp[j];
   x_tail_j = mat_tail.comp[j];
-};
+}
 
 //
 // end of src/enrichment_cascade.cpp
@@ -15081,7 +15077,7 @@ pyne_enr::Cascade pyne_enr::_fill_default_uranium_cascade() {
   duc.mat_feed = pyne::Material(cm, 1.0, 1.0);
 
   return duc;
-};
+}
 pyne_enr::Cascade pyne_enr::default_uranium_cascade(pyne_enr::_fill_default_uranium_cascade());
 
 
@@ -15169,30 +15165,30 @@ void pyne_enr::_recompute_nm(pyne_enr::Cascade & casc, double tolerance) {
     if (tolerance < fabs(delta_prod)) {
       N = N - (delta_prod * N);
       rhs_prod = (pow(astar_j, M+1.0) - 1.0) / (pow(astar_j, M+1.0) - pow(astar_j, -N));
-    };
+    }
 
     if (tolerance < fabs(delta_tail)) {
       M = M - (delta_tail * M);
       rhs_tail = (1.0 - pow(astar_j, -N)) / (pow(astar_j, M+1.0) - pow(astar_j, -N));
-    };
+    }
 
     if (N < tolerance) {
       N = origN + n;
       M = origM + n;
       n = n + 1.0;
-    };
+    }
 
     if (M < tolerance) {
       N = origN + n;
       M = origM + n;
       n = n + 1.0;
-    };
-  };
+    }
+  }
 
   casc.N = N;
   casc.M = M;
   return; 
-};
+}
 
 
 
@@ -15227,12 +15223,12 @@ void pyne_enr::_recompute_prod_tail_mats(pyne_enr::Cascade & casc) {
     numer_tail = casc.mat_feed.comp[nuc] * (1.0 - pow(astar_i, -N));
     denom_tail = (pow(astar_i, M+1.0) - pow(astar_i, -N)) / tpf;
     comp_tail[nuc] = numer_tail / denom_tail;
-  };
+  }
 
   casc.mat_prod = pyne::Material(comp_prod);
   casc.mat_tail = pyne::Material(comp_tail);
   return;
-};
+}
 
 
 
@@ -15301,7 +15297,7 @@ pyne_enr::Cascade pyne_enr::_norm_comp_secant(pyne_enr::Cascade & casc, \
       // If the new value of N is less than zero, reset.
       if (curr_N < 0.0)
         curr_N = (temp_curr_N + temp_prev_N)/2.0;
-    };
+    }
 
     if (tolerance <= fabs(delta_x_tail_j)/curr_casc.mat_tail.comp[j]) {
       // Make a new guess for M
@@ -15314,7 +15310,7 @@ pyne_enr::Cascade pyne_enr::_norm_comp_secant(pyne_enr::Cascade & casc, \
       // If the new value of M is less than zero, reset.
       if (curr_M < 0.0)
         curr_M = (temp_curr_M + temp_prev_M)/2.0;
-    };
+    }
 
     // Check for infinite loops
     for (h = 0; h < historyN.size(); h++) {
@@ -15324,13 +15320,13 @@ pyne_enr::Cascade pyne_enr::_norm_comp_secant(pyne_enr::Cascade & casc, \
         curr_M = curr_M + delta_x_tail_j * \
                ((curr_M - prev_M)/(curr_casc.mat_tail.comp[j] - prev_casc.mat_tail.comp[j]));;
         break;
-      };
-    };
+      }
+    }
 
     if (max_hist <= historyN.size()) {
       historyN.erase(historyN.begin());
       historyM.erase(historyM.begin());
-    };
+    }
     historyN.push_back(curr_N);
     historyM.push_back(curr_M);
 
@@ -15342,9 +15338,9 @@ pyne_enr::Cascade pyne_enr::_norm_comp_secant(pyne_enr::Cascade & casc, \
     curr_casc.M = curr_M;
     _recompute_nm(curr_casc, tolerance);
     _recompute_prod_tail_mats(curr_casc);
-  };
+  }
   return curr_casc;
-};
+}
 
 
 
@@ -15360,7 +15356,7 @@ double pyne_enr::_deltaU_i_OverG(pyne_enr::Cascade & casc, int i) {
   double astar_i = alphastar_i(casc.alpha, casc.Mstar, pyne::atomic_mass(i));
   return log(pow(casc.alpha, (casc.Mstar - pyne::atomic_mass(casc.j)) )) * \
                              ((astar_i - 1.0)/(astar_i + 1.0));
-};
+}
 
 
 pyne_enr::Cascade pyne_enr::solve_numeric(pyne_enr::Cascade & orig_casc, \
@@ -15392,7 +15388,7 @@ pyne_enr::Cascade pyne_enr::solve_numeric(pyne_enr::Cascade & orig_casc, \
                       casc.mat_feed.comp[nuc]*log(rfeed));
     ltotpf = ltotpf + (temp_numer / _deltaU_i_OverG(casc, nuc));
     swupf = swupf + temp_numer;
-  };
+  }
 
   // Assign flow rates
   casc.l_t_per_feed = ltotpf;
@@ -15408,13 +15404,13 @@ pyne_enr::Cascade pyne_enr::solve_numeric(pyne_enr::Cascade & orig_casc, \
   casc.mat_prod.mass = casc.mat_feed.mass * ppf;
   casc.mat_tail.mass = casc.mat_feed.mass * tpf;
   return casc;
-};
+}
 
 pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
                                     char * solver, double tolerance, int max_iter) {
   std::string strsolver(solver);
   return multicomponent(orig_casc, strsolver, tolerance, max_iter);
-};
+}
 
 pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
                                     std::string solver, double tolerance, int max_iter) {
@@ -15442,7 +15438,7 @@ pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
     double ms = (pyne::atomic_mass(orig_casc.j) + pyne::atomic_mass(orig_casc.k)) / 2.0;
     prev_casc.Mstar = ms;
     curr_casc.Mstar = ms;
-  };
+  }
 
   // xpn is the exponential index 
   double ooe = -log10(tolerance);
@@ -15456,7 +15452,7 @@ pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
     case 1:
       prev_casc = solve_numeric(prev_casc, tolerance, max_iter);
       break;
-  };
+  }
 
   // Initialize curr_ent point
   curr_casc.Mstar = (pyne::atomic_mass(curr_casc.j) + curr_casc.Mstar) / 2.0;
@@ -15467,7 +15463,7 @@ pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
     case 1:
       curr_casc = solve_numeric(curr_casc, tolerance, max_iter);
       break;
-  };
+  }
 
   double m = pyne::slope(curr_casc.Mstar, curr_casc.l_t_per_feed, \
                          prev_casc.Mstar, prev_casc.l_t_per_feed);
@@ -15492,7 +15488,7 @@ pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
       case 1:
         curr_casc = solve_numeric(curr_casc, tolerance, max_iter);
         break;
-    };
+    }
 
     if (prev_casc.l_t_per_feed < curr_casc.l_t_per_feed) {
       temp_casc = curr_casc;
@@ -15504,7 +15500,7 @@ pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
         case 1:
           temp_casc = solve_numeric(temp_casc, tolerance, max_iter);
           break;
-      };
+      }
 
       temp_m = pyne::slope(curr_casc.Mstar, curr_casc.l_t_per_feed, \
                            temp_casc.Mstar, temp_casc.l_t_per_feed);
@@ -15512,7 +15508,7 @@ pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
         prev_casc = curr_casc;
         curr_casc = temp_casc;
         break;
-      };
+      }
 
       temp_m_sign = temp_m / fabs(temp_m);
       if (m_sign != temp_m_sign) {
@@ -15527,7 +15523,7 @@ pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
           case 1:
             temp_casc = solve_numeric(temp_casc, tolerance, max_iter);
             break;
-        };
+        }
         temp_m = pyne::slope(prev_casc.Mstar, prev_casc.l_t_per_feed, \
                              temp_casc.Mstar, temp_casc.l_t_per_feed);
 
@@ -15535,18 +15531,18 @@ pyne_enr::Cascade pyne_enr::multicomponent(pyne_enr::Cascade & orig_casc, \
           prev_casc = curr_casc;
           curr_casc = temp_casc;
           break;
-        };
+        }
 
         m_sign = temp_m / fabs(temp_m);
         m = temp_m;
         prev_casc = curr_casc;
         curr_casc = temp_casc;
-      };
-    };
-  };
+      }
+    }
+  }
 
   return curr_casc;
-};
+}
 //
 // end of src/enrichment.cpp
 //
