@@ -2,8 +2,12 @@
 #define CYCLUS_SRC_XML_PARSER_H_
 
 #include <sstream>
-#include <libxml++/libxml++.h>
 #include <boost/shared_ptr.hpp>
+
+namespace xmlpp {
+  class DomParser;
+  class Document;
+}
 
 namespace cyclus {
 
@@ -15,7 +19,7 @@ class XMLParser {
   XMLParser();
 
   /// destructor
-  ~XMLParser();
+  virtual ~XMLParser();
 
   /// initializes a parser with an xml snippet
   /// @param input an xml snippet to be used as input
@@ -30,7 +34,7 @@ class XMLParser {
 
  private:
   /// file parser
-  boost::shared_ptr<xmlpp::DomParser> parser_;
+  xmlpp::DomParser* parser_;
 };
 
 }  // namespace cyclus

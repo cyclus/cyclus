@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 
+#include <libxml++/libxml++.h>
 #include <boost/lexical_cast.hpp>
 
 #include "error.h"
