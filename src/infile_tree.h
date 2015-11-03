@@ -5,11 +5,14 @@
 #include <vector>
 #include <set>
 
-#include <libxml++/libxml++.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "xml_parser.h"
+
+namespace xmlpp {
+  class Node;
+}
 
 namespace cyclus {
 
