@@ -29,8 +29,13 @@ $PREFIX/bin/cyclus_base \$*
 " > $PREFIX/bin/cyclus
 chmod 755 $PREFIX/bin/cyclus
 
+# The library path modifications are here because cyclus installs 
+# libgtest and libbaseagentunittests into the lib/cyclus directory.
+# We make this directory the last possible location to be searched.
 mv $PREFIX/bin/cyclus_unit_tests $PREFIX/bin/cyclus_unit_tests_base
 echo "#!/bin/bash
+export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:$PREFIX/lib/cyclus\"
+export DYLD_FALLBACK_LIBRARY_PATH=\"\$DYLD_FALLBACK_LIBRARY_PATH:$PREFIX/lib/cyclus\"
 export CYCLUS_PATH=\"\$CYCLUS_PATH:\$HOME/.local/lib/cyclus:$PREFIX/lib/cyclus\"
 if [ -z \"\$CYCLUS_NUC_DATA\" ]; then
   export CYCLUS_NUC_DATA=\"$PREFIX/share/cyclus/cyclus_nuc_data.h5\"
