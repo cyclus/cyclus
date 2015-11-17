@@ -46,10 +46,9 @@ double ProgSolver::SolveGraph() {
       std::cout << "Solving problem, message handler has log level of "
                 << iface->messageHandler()->logLevel() << "\n";
     }
-    bool verbose = false; // turn this off, solveprog prints a lot
 
     // solve and back translate
-    SolveProg(iface, greedy_obj, verbose);
+    SolveProg(iface, greedy_obj, verbose_);
     xlator.FromProg();
   } catch(...) {
     delete iface;

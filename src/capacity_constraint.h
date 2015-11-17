@@ -6,6 +6,7 @@
 #include "error.h"
 #include "exchange_graph.h"
 #include "exchange_translation_context.h"
+#include "capacity_types.h"
 
 namespace cyclus {
 
@@ -63,36 +64,69 @@ struct TrivialConverter : public Converter<T> {
 template <class T>
 class CapacityConstraint {
  public:
-  /// @brief constructor for a constraint with a non-trivial converter
+  /// constructor
+  /// @param capacity a capacitating value
+  /// @param type the type, e.g., LTEQ or GTEQ
+  /// @param converter a conversion function pointer
+  /// @{
   CapacityConstraint(double capacity, typename Converter<T>::Ptr converter)
       : capacity_(capacity),
         converter_(converter),
+        cap_type_(NONE),
         id_(next_id_++) {
     if (capacity_ <= 0)
       throw ValueError("Capacity is not positive, no trades will be executed");
   }
 
-  /// @brief constructor for a constraint with a trivial converter (i.e., one
-  /// that simply returns 1)
   explicit CapacityConstraint(double capacity)
       : capacity_(capacity),
+        cap_type_(NONE),
         id_(next_id_++) {
     if (capacity_ <= 0)
       throw ValueError("Capacity is not positive, no trades will be executed");
     converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
   }
 
+  CapacityConstraint(double capacity, cap_t type)
+      : capacity_(capacity),
+        cap_type_(type),
+        id_(next_id_++) {
+    if (capacity_ <= 0)
+      throw ValueError("Capacity is not positive, no trades will be executed");
+    converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
+  }
+
+  CapacityConstraint(double capacity, cap_t type, typename Converter<T>::Ptr converter)
+      : capacity_(capacity),
+        converter_(converter),
+        cap_type_(type),
+        id_(next_id_++) {
+    if (capacity_ <= 0)
+      throw ValueError("Capacity is not positive, no trades will be executed");
+  }
+  /// @}
+  
   /// @brief constructor for a constraint with a non-trivial converter
   CapacityConstraint(const CapacityConstraint& other)
       : capacity_(other.capacity_),
         converter_(other.converter_),
-        id_(next_id_++) {}
-
-  /// @return the constraints capacity
-  inline double capacity() const {
-    return capacity_;
+        cap_type_(other.cap_type_),
+        id_(next_id_++) {
+    assert(capacity_ > 0);
   }
 
+  /// capacity getters/setters
+  /// @{
+  inline double capacity() const { return capacity_; }
+  inline void capacity(double c) { capacity_ = c; }
+  /// @}
+  
+  /// type getters/setters
+  /// @{
+  inline cap_t cap_type() const { return cap_type_; }
+  inline void cap_type(cap_t t) const { cap_type_ = t; }
+  /// @}
+  
   /// @return the converter
   inline typename Converter<T>::Ptr converter() const {
     return converter_;
@@ -112,6 +146,7 @@ class CapacityConstraint {
 
  private:
   double capacity_;
+  cap_t cap_type_;
   typename Converter<T>::Ptr converter_;
   int id_;
   static int next_id_;
@@ -124,7 +159,15 @@ template<class T>
 inline bool operator==(const CapacityConstraint<T>& lhs,
                        const CapacityConstraint<T>& rhs) {
   return  ((lhs.capacity() == rhs.capacity()) &&
-           (*lhs.converter() == *rhs.converter()));
+           (*lhs.converter() == *rhs.converter()) &&
+           (lhs.cap_type() == rhs.cap_type()));
+}
+
+/// @brief CapacityConstraint-CapacityConstraint equality operator
+template<class T>
+inline bool operator!=(const CapacityConstraint<T>& lhs,
+                       const CapacityConstraint<T>& rhs) {
+  return  !(lhs == rhs);
 }
 
 /// @brief CapacityConstraint-CapacityConstraint comparison operator, allows

@@ -16,7 +16,25 @@
 
 namespace cyclus {
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ProgTranslatorTests, xlatecaps) {
+  int ncaps = 2;
+  std::vector<CoinPackedVector> cap_rows;
+  cap_rows.resize(2);
+  
+  ProgTranslator::Context ctx;
+  int faux_id = 0;
+  bool request = false;
+  ExchangeNodeGroup::Ptr grp(new ExchangeNodeGroup());
+  grp->AddCapacity(5, LTEQ);
+  grp->AddCapacity(6, GTEQ);
+
+  ProgTranslator::XlateCaps(grp.get(), request, faux_id, cap_rows, ctx);
+  EXPECT_EQ(ctx.row_lbs[0], 0);
+  EXPECT_EQ(ctx.row_ubs[0], 5);
+  EXPECT_EQ(ctx.row_lbs[1], 6);
+  EXPECT_EQ(ctx.row_ubs[1], ctx.inf);
+}
+
 TEST(ProgTranslatorTests, translation) {
   // Logger::ReportLevel() = Logger::ToLogLevel("LEV_DEBUG2");
   SolverFactory sf("cbc");

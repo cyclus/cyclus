@@ -11,9 +11,12 @@
 
 namespace cyclus {
 
+// deprecated
 void Capacity(cyclus::Arc const&, double, double) {};
 void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
               double) {};
+double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
+                              double curr_qty) {};
 
 GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
     : conditioner_(c),
@@ -77,9 +80,8 @@ double GreedySolver::SolveGraph() {
 
 double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
                                double v_curr_qty) {
-  bool min = true;
-  double ucap = Capacity(a.unode(), a, !min, u_curr_qty);
-  double vcap = Capacity(a.vnode(), a, min, v_curr_qty);
+  double ucap = Capacity(a.unode(), a, u_curr_qty);
+  double vcap = Capacity(a.vnode(), a, v_curr_qty);
 
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for unode of arc: " << ucap;
   CLOG(cyclus::LEV_DEBUG1) << "Capacity for vnode of arc: " << vcap;
@@ -89,8 +91,8 @@ double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
   return std::min(ucap, vcap);
 }
 
-double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
-                               double curr_qty) {
+double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a,
+                              double curr_qty) {
   if (n->group == NULL) {
     throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
   }
@@ -101,30 +103,43 @@ double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
 
   std::vector<double>& unit_caps = n->unit_capacities[a];
   const std::vector<double>& group_caps = grp_caps_[n->group];
+  const std::vector<cap_t>& cap_types = cap_types_[n->group];
   std::vector<double> caps;
   double grp_cap, u_cap, cap;
 
+  double stdmax = std::numeric_limits<double>::max();
+  double gtcap = stdmax;
+  double ltcap = stdmax;
   for (int i = 0; i < unit_caps.size(); i++) {
     grp_cap = group_caps[i];
     u_cap = unit_caps[i];
-    cap = grp_cap / u_cap;
+    // special case for unlimited capacities
+    cap = grp_cap == stdmax ? stdmax : grp_cap / u_cap;
     CLOG(cyclus::LEV_DEBUG1) << "Capacity for node: ";
     CLOG(cyclus::LEV_DEBUG1) << "   group capacity: " << grp_cap;
     CLOG(cyclus::LEV_DEBUG1) << "    unit capacity: " << u_cap;
     CLOG(cyclus::LEV_DEBUG1) << "         capacity: " << cap;
 
-    // special case for unlimited capacities
-    if (grp_cap == std::numeric_limits<double>::max()) {
-      caps.push_back(std::numeric_limits<double>::max());
-    } else {
-      caps.push_back(cap);
+    switch(cap_types[i]) {
+      case GTEQ:
+        gtcap = std::min(gtcap, cap);
+        break;
+      case LTEQ:
+        ltcap = std::min(ltcap, cap);
+        break;
+      default:
+          std::stringstream ss;
+          ss << "A capacity has a type of NONE.";
+          throw ValueError(ss.str());
     }
   }
 
-  if (min_cap) {  // the smallest value is constraining (for bids)
-    cap = *std::min_element(caps.begin(), caps.end());
-  } else {  // the largest value must be met (for requests)
-    cap = *std::max_element(caps.begin(), caps.end());
+  if (ltcap == stdmax) {
+    cap = gtcap; // never saw a LTEQ
+  } else if (gtcap == stdmax) {
+    cap = ltcap; // never saw a GTEQ
+  } else {
+    cap = std::min(ltcap, gtcap); // saw both, take minimum
   }
   return std::min(cap, n->qty - curr_qty);
 }
@@ -134,6 +149,7 @@ void GreedySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
     n_qty_[g->nodes()[i]] = 0;
   }
   grp_caps_[g.get()] = g->capacities();
+  cap_types_[g.get()] = g->cap_types();
 }
 
 void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
@@ -171,7 +187,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
         tomatch = std::min(remain, Capacity(a, n_qty_[u], n_qty_[v]));
 
         // exclusivity adjustment
-        if (arc_it->exclusive()) {
+        if (exclusive_orders_ && arc_it->exclusive()) {
           excl_val = a.excl_val();
           tomatch = (tomatch < excl_val) ? 0 : excl_val;
         }
