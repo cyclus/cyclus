@@ -40,6 +40,7 @@ api_blacklist = {
     'cyclus::SimInit::LoadComposition',
     'cyclus::TradeExecutor<cyclus::Material>::ExecuteTrades',
     'cyclus::TradeExecutor<cyclus::Product>::ExecuteTrades',
+    'cyclus::Composition::NewDecay',
 }
 
 def load(ns):
