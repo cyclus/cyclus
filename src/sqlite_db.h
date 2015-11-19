@@ -3,10 +3,12 @@
 
 #include <vector>
 #include <string>
-#include <sqlite3.h>
 #include <boost/shared_ptr.hpp>
 
 #include "error.h"
+
+class sqlite3;
+class sqlite3_stmt;
 
 namespace cyclus {
 
@@ -22,92 +24,48 @@ class SqlStatement {
  public:
   typedef boost::shared_ptr<SqlStatement> Ptr;
 
-  ~SqlStatement() {
-    Must(sqlite3_finalize(stmt_));
-  }
+  ~SqlStatement();
 
   /// Executes the prepared statement.
-  void Exec() {
-    Must(sqlite3_step(stmt_));
-    Reset();
-  }
+  void Exec();
 
   /// Executes the prepared statement.
-  void Reset() {
-    Must(sqlite3_reset(stmt_));
-    Must(sqlite3_clear_bindings(stmt_));
-  }
+  void Reset();
 
   /// Step to next row of previously executed query. Returns false when there
   /// are no more rows. Previously retrieved text or blob column data memory
   /// is deallocated.
-  bool Step() {
-    int status = sqlite3_step(stmt_);
-    if (status == SQLITE_ROW) {
-      return true;
-    }
-    Must(status);
-    return false;
-  }
+  bool Step();
 
   /// Returns an int value for the specified column of the current query row.
-  int GetInt(int col) {
-    return sqlite3_column_int(stmt_, col);
-  }
+  int GetInt(int col);
 
   /// Returns a double value for the specified column of the current query row.
-  double GetDouble(int col) {
-    return sqlite3_column_double(stmt_, col);
-  }
+  double GetDouble(int col);
 
   /// Returns a byte array value for the specified column of the current query
   /// row. This can be used for retrieving TEXT and BLOB column data.
-  char* GetText(int col, int* n) {
-    char* v = const_cast<char*>(reinterpret_cast<const char *>(
-                                    sqlite3_column_text(stmt_, col)));
-    if (n != NULL) {
-      *n = sqlite3_column_bytes(stmt_, col);
-    }
-    return v;
-  }
+  char* GetText(int col, int* n);
 
   /// Binds the templated sql parameter at index i to val.
-  void BindInt(int i, int val) {
-    Must(sqlite3_bind_int(stmt_, i, val));
-  }
+  void BindInt(int i, int val);
 
   /// Binds the templated sql parameter at index i to val.
-  void BindDouble(int i, double val) {
-    Must(sqlite3_bind_double(stmt_, i, val));
-  }
+  void BindDouble(int i, double val);
 
   /// Binds the templated sql parameter at index i to val.
-  void BindText(int i, const char* val) {
-    Must(sqlite3_bind_text(stmt_, i, val, -1, SQLITE_TRANSIENT));
-  }
+  void BindText(int i, const char* val);
 
   /// Binds the templated sql parameter at index i to the value pointed to by
   /// val. n is the length in bytes of the value.
-  void BindBlob(int i, const void* val, int n) {
-    Must(sqlite3_bind_blob(stmt_, i, val, n, SQLITE_TRANSIENT));
-  }
+  void BindBlob(int i, const void* val, int n);
 
  private:
-  SqlStatement(sqlite3* db, std::string zSql)
-      : db_(db),
-        zSql_(zSql),
-        stmt_(NULL) {
-    Must(sqlite3_prepare_v2(db_, zSql.c_str(), -1, &stmt_, NULL));
-  }
+  SqlStatement(sqlite3* db, std::string zSql);
 
   /// throws an exception if status (the return value of an sqlite function)
   /// does not represent success.
-  void Must(int status) {
-    if (status != SQLITE_OK && status != SQLITE_DONE && status != SQLITE_ROW) {
-      std::string err = sqlite3_errmsg(db_);
-      throw IOError("SQL error [" + zSql_ + "]: " + err);
-    }
-  }
+  void Must(int status);
 
   sqlite3* db_;
   std::string zSql_;

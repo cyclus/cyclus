@@ -7,13 +7,13 @@
 #include "agent_managed.h"
 #include "builder.h"
 #include "commodity_producer.h"
-#include "prog_translator.h"
 
-// Headers in this file below this pragma have all warnings shushed.
-#pragma GCC system_header
-#include "OsiCbcSolverInterface.hpp"
+class OsiCbcSolverInterface;
 
 namespace cyclus {
+
+class ProgTranslatorContext;
+
 namespace toolkit {
 
 /// A struct for a build order: the number of producers to build.
@@ -73,14 +73,14 @@ class BuildingManager : public AgentManaged {
   std::set<Builder*> builders_;
 
   void SetUp_(OsiCbcSolverInterface& iface,
-              ProgTranslator::Context& ctx,
+              ProgTranslatorContext& ctx,
               std::map<CommodityProducer*, Builder*>& p_to_b,
               std::map<int, CommodityProducer*>& idx_to_p,
               Commodity& commodity,
               double demand);
 
   void Solve_(OsiCbcSolverInterface& iface,
-              ProgTranslator::Context& ctx,
+              ProgTranslatorContext& ctx,
               std::map<CommodityProducer*, Builder*>& p_to_b,
               std::map<int, CommodityProducer*>& idx_to_p,
               std::vector<BuildOrder>& orders);

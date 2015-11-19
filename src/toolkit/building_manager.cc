@@ -1,6 +1,11 @@
 #include "building_manager.h"
 
+#include "prog_translator.h"
 #include "CoinPackedVector.hpp"
+
+// Headers in this file below this pragma have all warnings shushed.
+#pragma GCC system_header
+#include "OsiCbcSolverInterface.hpp"
 
 namespace cyclus {
 namespace toolkit {

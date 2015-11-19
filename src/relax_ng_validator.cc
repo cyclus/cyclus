@@ -11,6 +11,8 @@
 #include "relax_ng_validator.h"
 
 #include <libxml/xmlerror.h>
+#include <libxml/relaxng.h>
+#include <libxml++/document.h>
 
 #include "error.h"
 
