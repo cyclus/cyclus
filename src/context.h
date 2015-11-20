@@ -249,6 +249,7 @@ class Context {
   /// sets the solver associated with this context
   void solver(ExchangeSolver* solver) {
     solver_ = solver;
+    solver_->sim_ctx(this);
   }
 
   /// @return the number of agents of a given prototype currently in the

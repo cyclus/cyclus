@@ -3,11 +3,25 @@
 #include <vector>
 #include <map>
 
+#include "context.h"
 #include "exchange_graph.h"
 
 namespace cyclus {
 
-double ExchangeSolver::PseudoCost(double cost_add) {
+double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
+  return (exclusive_orders && a.exclusive()) ?
+      a.excl_val() / a.pref() : 1.0 / a.pref();  
+}
+
+double ExchangeSolver::PseudoCost() {
+  return PseudoCost(1e-1);
+}
+
+double ExchangeSolver::PseudoCost(double cost_factor) {
+  return PseudoCostByPref(cost_factor);
+}
+
+double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   std::vector<ExchangeNode::Ptr>::iterator n_it;
   std::map<Arc, std::vector<double> >::iterator c_it;
   std::map<Arc, double>::iterator p_it;
@@ -59,15 +73,27 @@ double ExchangeSolver::PseudoCost(double cost_add) {
       for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
         pref = p_it->second;
         const Arc& a = p_it->first;
-        coeff = (exclusive_orders_ && a.exclusive()) ?
-                a.excl_val() / pref : 1.0 / pref;
+        coeff = ArcCost(a);
         if (coeff > max_coeff)
           max_coeff = coeff;
       }
     }
   }
 
-  return max_coeff / min_unit_cap + cost_add;
+  return max_coeff / min_unit_cap  * (1 + cost_factor);
+}
+
+double ExchangeSolver::PseudoCostByPref(double cost_factor) {
+  double max_cost = 0;
+  std::vector<Arc>& arcs = graph_->arcs();
+  for (int i = 0; i != arcs.size(); i++) {
+    const Arc& a = arcs[i];
+    // remove exclusive value factor from costs for preferences that are less
+    // than unity. otherwise they can artificially raise the maximum cost.
+    double factor = (a.exclusive() && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
+    max_cost = std::max(max_cost, ArcCost(a) * factor);
+  }
+  return max_cost * (1 + cost_factor);
 }
 
 } // namespace cyclus

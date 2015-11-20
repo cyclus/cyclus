@@ -181,17 +181,17 @@ def test_minimal_cycle():
 
             yield assert_array_equal, \
                 np.where(sender_ids == facility_a[0])[0], \
-                pattern_a
+                pattern_a, "Fac A Pattern A"
             yield assert_array_equal, \
                 np.where(receiver_ids == facility_a[0])[0], \
-                pattern_b  # reverse pattern when acted as a receiver
+                pattern_b, "Fac A Pattern B"  # reverse pattern when acted as a receiver
 
             yield assert_array_equal, \
                 np.where(sender_ids == facility_b[0])[0], \
-                pattern_b
+                pattern_b, "Fac B Pattern A"
             yield assert_array_equal, \
                 np.where(receiver_ids == facility_b[0])[0], \
-                pattern_a  # reverse pattern when acted as a receiver
+                pattern_a, "Fac B Pattern B"  # reverse pattern when acted as a receiver
 
             # Transaction ids must be equal range from 1 to the number of rows
             expected_trans_ids = np.arange(sender_ids.size)
@@ -204,7 +204,9 @@ def test_minimal_cycle():
             # limit cyclus::eps() for transaction amounts.
             # Expect not to have shortened transactions, so for two facilities,
             # there must be (2 * duration) number of transactions.
-            yield assert_equal, sender_ids.size, 2 * duration
+            exp = 2 * duration
+            obs = sender_ids.size
+            yield assert_equal, exp, obs, "number of transactions, {} != {}".format(exp, obs)
 
             # Track transacted resources
             quantities = to_ary(resources, "Quantity")

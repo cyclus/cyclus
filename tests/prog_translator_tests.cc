@@ -79,10 +79,15 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNode::Ptr d1(new ExchangeNode());
 
   Arc x0(a0, c0);
+  x0.pref(prefs[0]);
   Arc x1(b0, c1);
+  x1.pref(prefs[1]);
   Arc x2(b1, c2);
+  x2.pref(prefs[2]);
   Arc x3(a1, d0);
+  x3.pref(prefs[3]);
   Arc x4(b1, d1);
+  x4.pref(prefs[4]);
 
   a0->unit_capacities[x0] = std::vector<double>(
       ucaps_a_0, ucaps_a_0 + sizeof(ucaps_a_0) / sizeof(ucaps_a_0[0]) );

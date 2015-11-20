@@ -39,10 +39,12 @@ class ExchangeManager {
     exchng.AddAllBids();
     exchng.AdjustAll();
     CLOG(LEV_DEBUG1) << "done with info gathering";
-
-    if (debug_) {
+    
+    if (debug_)
       RecordDebugInfo(exchng.ex_ctx());
-    }
+
+    if (exchng.Empty())
+      return; // empty exchange, move on
 
     // translate graph
     ExchangeTranslator<T> xlator(&exchng.ex_ctx());

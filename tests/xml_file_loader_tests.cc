@@ -88,7 +88,7 @@ std::string XMLFileLoaderTests::ControlSequenceWithSolver() {
           "        <preconditioner>greedy</preconditioner>"
           "      </greedy>"
           "    </config>"
-          "    <exclusive_orders_only>true</exclusive_orders_only>"
+          "    <allow_exclusive_orders>true</allow_exclusive_orders>"
           "  </solver>"
           " </control>"
           "</simulation>";
