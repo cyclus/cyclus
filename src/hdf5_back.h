@@ -81,6 +81,9 @@ class Hdf5Back : public FullBackend {
   /// cleans up resources and closes the file.
   virtual ~Hdf5Back();
 
+  /// Closes and flushes the backend.
+  virtual void Close();
+
   virtual void Notify(DatumList data);
 
   virtual std::string Name();
