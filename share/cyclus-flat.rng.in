@@ -24,27 +24,39 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional>
         <element name="solver"> 
           <interleave>
+            <optional><element name="config">
+            <choice>
+              <element name="greedy">
+                <interleave>
+                  <optional>
+                    <element name="preconditioner"> <text/> </element>
+                  </optional>
+                </interleave>
+              </element>
+              <element name="coin-or">
+                <interleave>
+                  <optional>
+                    <element name="timeout">  <data type="positiveInteger"/>  </element>
+                  </optional>
+                  <optional><element name="verbose"><data type="boolean"/></element></optional>
+                  <optional><element name="mps"><data type="boolean"/></element></optional>
+                </interleave>
+              </element>
+            </choice>
+            </element></optional>
             <optional>
-              <element name="config">
-                <choice>
-                  <element name="greedy">
-                    <interleave>
-                      <optional>
-                        <element name="preconditioner"> <text/> </element>
-                      </optional>
-                    </interleave>
-                  </element>
-                </choice>
+              <element name="allow_exclusive_orders">
+                <data type="boolean" />
               </element>
             </optional>
-            <optional>
+            <optional><!--deprecated. @TODO remove in release 1.5 -->
               <element name="exclusive_orders_only">
                 <data type="boolean" />
               </element>
             </optional>
           </interleave>
         </element>
-      </optional> 
+      </optional>
     </interleave>
   </element>
 

@@ -1,6 +1,7 @@
 #include <sstream>
 
 #include <boost/shared_ptr.hpp>
+#include <libxml++/libxml++.h>
 
 #include "error.h"
 #include "infile_converters.h"

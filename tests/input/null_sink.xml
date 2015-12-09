@@ -5,7 +5,7 @@
     <duration>100</duration>
     <startmonth>1</startmonth>
     <startyear>2000</startyear>
-  </control>
+  <solver><config><coin-or><timeout>10</timeout></coin-or></config></solver></control>
 
   <archetypes>
     <spec><lib>agents</lib><name>Sink</name></spec>

@@ -11,9 +11,18 @@
 #ifndef CYCLUS_SRC_RELAX_NG_VALIDATOR_H_
 #define CYCLUS_SRC_RELAX_NG_VALIDATOR_H_
 
-#include <libxml/relaxng.h>
-#include <libxml++/document.h>
 #include <glibmm/ustring.h>
+
+class _xmlRelaxNG;
+class _xmlRelaxNGParserCtxt;
+class _xmlRelaxNGValidCtxt;
+typedef _xmlRelaxNG xmlRelaxNG;
+typedef _xmlRelaxNGParserCtxt xmlRelaxNGParserCtxt;
+typedef _xmlRelaxNGValidCtxt xmlRelaxNGValidCtxt;
+
+namespace xmlpp {
+  class Document;
+}
 
 namespace cyclus {
 
@@ -43,13 +52,13 @@ class RelaxNGValidator {
 
   /// parse a relaxng schema context
   /// @param context the context
-  void parse_context(xmlRelaxNGParserCtxtPtr context);
+  void parse_context(xmlRelaxNGParserCtxt* context);
 
   /// the schema
-  xmlRelaxNGPtr schema_;
+  xmlRelaxNG* schema_;
 
   /// the validated context
-  xmlRelaxNGValidCtxtPtr valid_context_;
+  xmlRelaxNGValidCtxt* valid_context_;
 };
 
 }  // namespace cyclus

@@ -78,6 +78,7 @@ Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
 Arc::Arc(const Arc& other)
     : unode_(other.unode()),
       vnode_(other.vnode()),
+      pref_(other.pref()),
       exclusive_(other.exclusive()),
       excl_val_(other.excl_val()) {}
 
@@ -120,7 +121,7 @@ void ExchangeGraph::AddSupplyGroup(ExchangeNodeGroup::Ptr pss) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddArc(const Arc& a) {
-  arcs_.push_back(a);
+  arcs_.push_back(a);    
   int id = next_arc_id_++;
   arc_ids_.insert(std::pair<Arc, int>(a, id));
   arc_by_id_.insert(std::pair<int, Arc>(id, a));

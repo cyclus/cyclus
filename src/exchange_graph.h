@@ -73,7 +73,6 @@ class Arc {
 
   Arc(boost::shared_ptr<ExchangeNode> unode,
       boost::shared_ptr<ExchangeNode> vnode);
-
   Arc(const Arc& other);
 
   inline Arc& operator=(const Arc& other) {
@@ -97,12 +96,14 @@ class Arc {
   inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
-
+  inline double pref() const { return pref_; }
+  inline void pref(double pref) { pref_ = pref; }
+  
  private:
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
-  double excl_val_;
+  double excl_val_, pref_;
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
@@ -148,6 +149,17 @@ class ExchangeNodeGroup {
     excl_node_groups_.push_back(nodes);
   }
 
+  /// @return true of any nodes have arcs associated with them
+  bool HasArcs() {
+    for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
+         it != nodes_.end();
+         ++it) {
+      if (it->get()->prefs.size() > 0)
+        return true;
+    }
+    return false;
+  }
+  
   /// @brief adds a single node to the set of exclusive node groupings, in
   /// general this function is used for demand exclusivity
   void AddExclNode(ExchangeNode::Ptr n);
@@ -215,7 +227,7 @@ class ExchangeGraph {
 
   /// clears all matches
   inline void ClearMatches() { matches_.clear(); }
-
+  
   inline const std::vector<RequestGroup::Ptr>& request_groups() const {
     return request_groups_;
   }

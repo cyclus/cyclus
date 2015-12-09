@@ -1,12 +1,83 @@
 #include "sqlite_db.h"
 
 #include <fstream>
+#include <sqlite3.h>
 
 #include "datum.h"
 #include "error.h"
 #include "logger.h"
 
 namespace cyclus {
+
+SqlStatement::~SqlStatement() {
+  Must(sqlite3_finalize(stmt_));
+}
+
+void SqlStatement::Exec() {
+  Must(sqlite3_step(stmt_));
+  Reset();
+}
+
+void SqlStatement::Reset() {
+  Must(sqlite3_reset(stmt_));
+  Must(sqlite3_clear_bindings(stmt_));
+}
+
+bool SqlStatement::Step() {
+  int status = sqlite3_step(stmt_);
+  if (status == SQLITE_ROW) {
+    return true;
+  }
+  Must(status);
+  return false;
+}
+
+int SqlStatement::GetInt(int col) {
+  return sqlite3_column_int(stmt_, col);
+}
+
+double SqlStatement::GetDouble(int col) {
+  return sqlite3_column_double(stmt_, col);
+}
+
+char* SqlStatement::GetText(int col, int* n) {
+  char* v = const_cast<char*>(reinterpret_cast<const char *>(
+                                  sqlite3_column_text(stmt_, col)));
+  if (n != NULL) {
+    *n = sqlite3_column_bytes(stmt_, col);
+  }
+  return v;
+}
+
+void SqlStatement::BindInt(int i, int val) {
+  Must(sqlite3_bind_int(stmt_, i, val));
+}
+
+void SqlStatement::BindDouble(int i, double val) {
+  Must(sqlite3_bind_double(stmt_, i, val));
+}
+
+void SqlStatement::BindText(int i, const char* val) {
+  Must(sqlite3_bind_text(stmt_, i, val, -1, SQLITE_TRANSIENT));
+}
+
+void SqlStatement::BindBlob(int i, const void* val, int n) {
+  Must(sqlite3_bind_blob(stmt_, i, val, n, SQLITE_TRANSIENT));
+}
+
+SqlStatement::SqlStatement(sqlite3* db, std::string zSql)
+    : db_(db),
+      zSql_(zSql),
+      stmt_(NULL) {
+  Must(sqlite3_prepare_v2(db_, zSql.c_str(), -1, &stmt_, NULL));
+}
+
+void SqlStatement::Must(int status) {
+  if (status != SQLITE_OK && status != SQLITE_DONE && status != SQLITE_ROW) {
+    std::string err = sqlite3_errmsg(db_);
+    throw IOError("SQL error [" + zSql_ + "]: " + err);
+  }
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SqliteDb::SqliteDb(std::string path, bool readonly)
