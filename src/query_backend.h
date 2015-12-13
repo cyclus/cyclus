@@ -377,6 +377,13 @@ class QueryableBackend {
 class FullBackend: public QueryableBackend, public RecBackend {
  public:
   virtual ~FullBackend() {}
+
+  /// Closes the backend, if approriate.
+  virtual void Close() {}
+
+ protected:
+  /// Flag for whether the backend is closed or not.
+  bool closed_ = false;
 };
 
 /// Wrapper class for QueryableBackends that injects a set of Cond's into every
