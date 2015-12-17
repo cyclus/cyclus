@@ -33,6 +33,9 @@ class SqliteBack: public FullBackend {
   /// Executes all pending commands.
   void Flush();
 
+  /// Closes the backend, if approriate.
+  void Close() {};
+
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table);

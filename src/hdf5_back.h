@@ -196,6 +196,9 @@ class Hdf5Back : public FullBackend {
   T VLBufToVal(const hvl_t& buf);
   /// \}
 
+  /// Flag for whether the backend is closed or not.
+  bool closed_ = false;
+
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;
 
