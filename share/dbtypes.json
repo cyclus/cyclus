@@ -1055,5 +1055,9 @@
     [141, "VL_MAP_STRING_VL_MAP_INT_DOUBLE", "std::map<std::string, std::map<int, double> >", 3, "HDF5", "v1.3", 0],
     [142, "VL_MAP_VL_STRING_MAP_INT_DOUBLE", "std::map<std::string, std::map<int, double> >", 3, "HDF5", "v1.3", 0],
     [143, "VL_MAP_VL_STRING_VL_MAP_INT_DOUBLE", "std::map<std::string, std::map<int, double> >", 3, "HDF5", "v1.3", 0],
+    [144, "MAP_PAIR_INT_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1],
+    [145, "VL_MAP_PAIR_INT_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1],
+    [146, "MAP_PAIR_INT_VL_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1],
+    [147, "VL_MAP_PAIR_INT_VL_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1],
     [0, "BOOL", "bool", 0, "HDF5", "v1.3", 1]
 ]
