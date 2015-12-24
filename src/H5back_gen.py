@@ -17,7 +17,10 @@ def parse_template(s, open_brace = '<', close_brace = '>', separator = ','):
     t = [s[:i]]
     inner = s[i+1:j]
     t.extend(parse_arg(inner, open_brace, close_brace, separator))
-    return t
+    if isinstance(t, str):
+        return t
+    else:
+        return tuple(t)
 
 def parse_arg(s, open_brace = '<', close_brace = '>', separator = ','):
     nest = 0
@@ -40,31 +43,36 @@ def parse_arg(s, open_brace = '<', close_brace = '>', separator = ','):
         ts.append(t)
     return ts
 
+dbtest = []
 db_to_cpp = {}
 cpptypes = {}
+canon = {}
 for row in v3_table:
     if row[6] == 1 and row[4] == "HDF5":
+        dbtest+=[row[1]]
         #print(tuple(parse_template(row[2])))
         current = parse_template(row[2])
         #print(current)
         #print(len(current))
-        if isinstance(current, str):
-            cpptypes[current] = row[2]
-        else:
-            cpptypes[tuple(current)] = row[2]
+        cpptypes[current] = row[2]
+        canon[row[1]] = current
         db_to_cpp[row[1]] = row[2]
 
 class TypeStr(object):
-    def __init__(self, t):
-        self.t = t
-        self.sub = [self] + [TypeStr(u) for u in t[1:0]]
+    def __init__(self, db):
+        self.db = db
+        self.canon = canon[db]
+        self.sub = [self] + [TypeStr(u) for u in list(self.canon)[1:]]
+        #self.sub = [self] + [TypeStr(u) for u in t[1:0]]
 
     def __str__(self):
-        return str(self.t)
-
+        #return str(self.t)
+        return str(canon[self.db])
+    
     @property
     def cpptype(self):
-        return cpptypes[self.t]
+        #return cpptypes[self.db]
+        return db_to_cpp[self.db]
 
 case_template = """
 case {dbtype}: {{
@@ -76,64 +84,6 @@ case {dbtype}: {{
 }}"""
 
 indent = '    '
-#db_to_cpp = {row[1]: row[2] for row in table}
-#db_to_cpp = {'INT': 'int',
-#             'DOUBLE': 'double',
-#             'FLOAT': 'float',
-#             'BOOL': 'bool',
-#             'STRING': 'std::string',
-#             'VL_STRING': 'std::string',
-#             'BLOB': 'cyclus::Blob',
-#         'UUID': 'boost::uuids::uuid',
-#             'VECTOR_INT': 'std::vector<int>',
-#             'VL_VECTOR_INT': 'std::vector<int>',
-#             'VECTOR_DOUBLE': 'std::vector<double>',
-#             'VL_VECTOR_DOUBLE': 'std::vector<double>',
-#             'VECTOR_FLOAT': 'std::vector<float>',
-#             'VL_VECTOR_FLOAT': 'std::vector<float>',
-#             'VECTOR_STRING': 'std::vector<std::string>',
-#             'VL_VECTOR_STRING': 'std::vector<std::string>',
-#             'VECTOR_VL_STRING': 'std::vector<std::string>',
-#             'VL_VECTOR_VL_STRING': 'std::vector<std::string>',
-#             'SET_INT': 'std::set<int>',
-#             'VL_SET_INT': 'std::set<int>',
-#             'SET_STRING': 'std::set<std::string>',
-#             'VL_SET_STRING': 'std::set<std::string>',
-#             'SET_VL_STRING': 'std::set<std::string>',
-#             'VL_SET_VL_STRING': 'std::set<std::string>',
-#             'LIST_INT': 'std::list<int>',
-#             'VL_LIST_INT': 'std::list<int>',
-#             'LIST_STRING': 'std::list<std::string>',
-#             'VL_LIST_STRING': 'std::list<std::string>',
-#             'LIST_VL_STRING': 'std::list<std::string>',
-#             'VL_LIST_VL_STRING': 'std::list<std::string>',
-#             'PAIR_INT_INT': 'std::pair<int, int>',
-#             'PAIR_INT_STRING': 'std::pair<int, std::string>',
-#             'PAIR_INT_VL_STRING': 'std::pair<int, std::string>',
-#             'MAP_INT_INT': 'std::map<int, int>',
-#             'VL_MAP_INT_INT': 'std::map<int, int>',
-#             'MAP_INT_DOUBLE': 'std::map<int, double>',
-#             'VL_MAP_INT_DOUBLE': 'std::map<int, double>',
-#             'MAP_INT_STRING': 'std::map<int, std::string>',
-#             'VL_MAP_INT_STRING': 'std::map<int, std::string>',
-#             'MAP_INT_VL_STRING': 'std::map<int, std::string>',
-#             'VL_MAP_INT_VL_STRING': 'std::map<int, std::string>',
-#             'MAP_STRING_INT': 'std::map<std::string, int>',
-#             'VL_MAP_STRING_INT': 'std::map<std::string, int>',
-#             'MAP_VL_STRING_INT': 'std::map<std::string, int>',
-#             'VL_MAP_VL_STRING_INT': 'std::map<std::string, int>',
-#             'MAP_STRING_DOUBLE': 'std::map<std::string, double>',
-#             'VL_MAP_STRING_DOUBLE': 'std::map<std::string, double>',
-#             'MAP_STRING_STRING': 'std::map<std::string, std::string>',
-#             'VL_MAP_STRING_STRING': 'std::map<std::string, std::string>',
-#             'MAP_STRING_VL_STRING': 'std::map<std:string, std::string>',
-#             'VL_MAP_STRING_VL_STRING': 'std::map<std::string, std::string>',
-#             'MAP_VL_STRING_DOUBLE': 'std::map<std::string, double>',
-#             'VL_MAP_VL_STRING_DOUBLE': 'std::map<std::string, double>',
-#             'MAP_VL_STRING_STRING': 'std::map<std::string, std::string>',
-#             'VL_MAP_VL_STRING_STRING': 'std::map<std::string, std::string>',
-#             'MAP_VL_STRING_VL_STRING': 'std::map<std::string, std::string>',
-#             'VL_MAP_VL_STRING_VL_STRING': 'std::map<std::string, std::string>'}
 
 cpp_to_db = {}
 for row in v3_table:
@@ -418,13 +368,10 @@ readers = {'INT': reinterpret_cast_reader,
            'VL_MAP_VL_STRING_VL_STRING': vl_reader}
 
 query_cases = ''
-for dbtype, cpptype in db_to_cpp.items():
-    current_type = parse_template(cpptype)
-    if isinstance(current_type, str):
-        current_type = TypeStr(current_type)
-    else:
-        current_type = TypeStr(tuple(current_type))
-    print(current_type.__str__())
+for dbtype, cpptype in db_to_cpp.items(): 
+    #current_type = TypeStr(dbtype)
+
+    #print(current_type.sub[0])
     reader = readers[dbtype]
     cpp_primitive_as_string = parse_template(cpptype)[1]
     ctx = {'dbtype': dbtype,
@@ -436,7 +383,8 @@ for dbtype, cpptype in db_to_cpp.items():
         ctx['vl_second_primitive_dbtype'] = 'VL_' + cpp_to_db.get(parse_template(cpptype)[2], "error")
     ctx['read_x'] = textwrap.indent(reader.format(**ctx), indent)
     query_cases += case_template.format(**ctx)
-
+for i in dbtest:
+    print(i)
 #print(query_cases)
 
 #for t in db_to_cpp.values():
