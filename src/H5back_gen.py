@@ -11,7 +11,6 @@ def parse_template(s, open_brace = '<', close_brace = '>', separator = ','):
     s = s.replace(' ', '')
     if open_brace not in s and separator not in s:
         return s
-
     i = s.find(open_brace)
     j = s.rfind(close_brace)
     t = [s[:i]]
@@ -32,21 +31,49 @@ def parse_arg(s, open_brace = '<', close_brace = '>', separator = ','):
             nest += 1
         elif ch == close_brace:
             nest -= 1
-
         if ch == separator and nest == 0:
             t = parse_template(s[start:i], open_brace, close_brace, separator)
             ts.append(t)
-            start = i+1
-    
+            start = i+1 
     if start < len(s):
         t = parse_template(s[start:], open_brace, close_brace, separator)
         ts.append(t)
     return ts
 
+def list_dep(s):
+    pieces = s.split("_")
+    if len(pieces) == 1:
+        return pieces
+    containers1 = ["VECTOR", "SET", "LIST", "VL_VECTOR", "VL_SET", "VL_LIST"]
+    containers2 = ["MAP", "PAIR", "VL_MAP", "VL_PAIR"]
+
+    if pieces[0] == "VL":
+        del pieces[0:2]
+    else:
+        del pieces[0]
+
+    for i in range(0, len(pieces)):
+        if pieces[i] == "VL":
+            pieces[i] = pieces[i] + "_" + pieces[i + 1]
+            del pieces[i + 1]
+        if i == len(pieces) - 1:
+            break
+    
+    for i in range(len(pieces) - 1, -1, -1):
+        if pieces[i] in containers1:
+            pieces[i] += "_" + pieces[i + 1]
+            del pieces[i + 1]
+        elif pieces[i] in containers2:
+            pieces[i]+= "_" + pieces[i + 1] + "_" + pieces[i + 2]
+            del pieces[i + 1:i + 3]
+    pieces = [s] + pieces
+    return pieces
+
 dbtest = []
 db_to_cpp = {}
 cpptypes = {}
 canon = {}
+
 for row in v3_table:
     if row[6] == 1 and row[4] == "HDF5":
         dbtest+=[row[1]]
@@ -61,23 +88,24 @@ for row in v3_table:
 class TypeStr(object):
     def __init__(self, db):
         self.db = db
-        self.canon = canon[db]
-        self.sub = [self] + [TypeStr(u) for u in list(self.canon)[1:]]
-        #self.sub = [self] + [TypeStr(u) for u in t[1:0]]
+        self.canon = canon[self.db]
+        self.sub = [self] + [TypeStr(u) for u in list_dep(self.db)[1:]]
 
     def __str__(self):
-        #return str(self.t)
         return str(canon[self.db])
     
     @property
     def cpptype(self):
-        #return cpptypes[self.db]
         return db_to_cpp[self.db]
 
+    @property
+    def dbtype(self):
+        return self.db
+
 case_template = """
-case {dbtype}: {{
+case {t.dbtype}: {{
 {read_x}
-    is_row_selected = CmpConds<{cpptype}>(&x, &(field_conds[qr.fields[j]]));
+    is_row_selected = CmpConds<{t.cpptype}>(&x, &(field_conds[qr.fields[j]]));
     if (is_row_selected)
         row[j] = x;
     break;
@@ -85,24 +113,19 @@ case {dbtype}: {{
 
 indent = '    '
 
-cpp_to_db = {}
-for row in v3_table:
-    if "VL_" not in row[1]:
-        cpp_to_db[row[2]] = row[1]
-
-reinterpret_cast_reader = '{cpptype} x = *reinterpret_cast<{cpptype}*>(buf + offset);'
+reinterpret_cast_reader = '{t.cpptype} x = *reinterpret_cast<{t.cpptype}*>(buf + offset);'
 
 string_reader = """\
-{cpptype} x = {cpptype}(buf + offset, col_sizes_[table][j]);
+{t.cpptype} x = {t.cpptype}(buf + offset, col_sizes_[table][j]);
 size_t nullpos = x.find('\0');
-if (nullpos != {cpptype}::npos)
+if (nullpos != {t.cpptype}::npos)
     x.resize(nullpos);\
 """
-vl_reader = '{cpptype} x = VLRead<{cpptype}, {dbtype}>(buf + offset);'
+vl_reader = '{t.cpptype} x = VLRead<{t.cpptype}, {t.dbtype}>(buf + offset);'
 
-uuid_reader = '{cpptype} x;' + '\nmemcpy(&x, buf+offset, 16);'
+uuid_reader = '{t.cpptype} x;' + '\nmemcpy(&x, buf+offset, 16);'
 
-vector_reader = '{cpptype} x = {cpptype}(col_sizes_[table][j] / sizeof({first_primitive})); \nmemcpy(&x[0], buf + offset, col_sizes_[table][j]);'
+vector_reader = '{t.cpptype} x = {t.cpptype}(col_sizes_[table][j] / sizeof({t.sub[1].cpptype})); \nmemcpy(&x[0], buf + offset, col_sizes_[table][j]);'
 
 vector_string_reader = """\
 hid_t field_type = H5Tget_member_type(tb_type, j);
@@ -110,27 +133,27 @@ size_t nullpos;
 hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int strlen = col_sizes_[table][j] / fieldlen;
-{cpptype} x = {cpptype}(fieldlen);
+{t.cpptype} x = {t.cpptype}(fieldlen);
 for(unsigned int k = 0; k < fieldlen; ++k) {{
-    x[k] = {first_primitive}(buf + offset + strlen*k, strlen);
+    x[k] = {t.sub[1].cpptype}(buf + offset + strlen*k, strlen);
     nullpos = x[k].find('\0');
-    if(nullpos != {first_primitive}::npos)
+    if(nullpos != {t.sub[1].cpptype}::npos)
         x[k].resize(nullpos);'
 }}\
 """
 
 vector_vl_string_reader = """\
 jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
-{cpptype} x = {cpptype}(jlen);
+{t.cpptype} x = {t.cpptype}(jlen);
 for (unsigned int k = 0; k < jlen; ++k) {{
-    x[k] = VLRead<{first_primitive}, {vl_first_primitive_dbtype}>(buf + offset + CYCLUS_SHA1_SIZE*k);
+    x[k] = VLRead<{t.sub[1].cpptype}, {t.sub[1].dbtype}>(buf + offset + CYCLUS_SHA1_SIZE*k);
 }}\
 """
 
 set_list_reader = """\
-jlen = col_sizes_[table][j] / sizeof({first_primitive});
-{first_primitive}* xraw = reinterpret_cast<{first_primitive}*>(buf + offset);
-{cpptype} x = {cpptype}(xraw, xraw+jlen);\
+jlen = col_sizes_[table][j] / sizeof({t.sub[1].cpptype});
+{t.sub[1].cpptype}* xraw = reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset);
+{t.cpptype} x = {t.cpptype}(xraw, xraw+jlen);\
 """
 
 #changed x.insert(s) to x.insert(k, s) to allow for list and set use
@@ -140,11 +163,11 @@ size_t nullpos;
 hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int strlen = col_sizes_[table][j] / fieldlen;
-{cpptype} x;
+{t.cpptype} x;
 for(unsigned int k = 0; k < fieldlen; ++k) {{
-    {first_primitive} s = {first_primitive}(buf + offset + strlen*k, strlen);
+    {t.sub[1].cpptype} s = {t.sub[1].cpptype}(buf + offset + strlen*k, strlen);
     nullpos = s.find('\0');
-    if(nullpos != {first_primitive}::npos)
+    if(nullpos != {t.sub[1].cpptype}::npos)
         s.resize(nullpos);
     x.insert(k, s);
 }}\
@@ -153,37 +176,37 @@ for(unsigned int k = 0; k < fieldlen; ++k) {{
 #changed insert method to insert(k, value) to allow for list use
 set_list_vl_string_reader = """\
 jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
-{cpptype} x;
+{t.cpptype} x;
 for (unsigned int k = 0; k < jlen; ++k) {{
-    x.insert(k, VLRead<{first_primitive}, {vl_first_primitive_dbtype}>(buf + offset + CYCLUS_SHA1_SIZE*k));
+    x.insert(k, VLRead<{t.sub[1].cpptype}, {t.sub[1].dbtype}>(buf + offset + CYCLUS_SHA1_SIZE*k));
 }}\
 """
 
-pair_int_int_reader = '{cpptype} x = std::make_pair(*reinterpret_cast<{first_primitive}*>(buf + offset), *reinterpret_cast<{first_primitive}*>(buf + offset + siizeof({first_primitive})));'
+pair_int_int_reader = '{t.cpptype} x = std::make_pair(*reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset), *reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset + siizeof({t.sub[1].cpptype})));'
 
 pair_int_string_reader = """\
 size_t nullpos;
 unsigned int strlen = col_sizes_[table][j] - sizeof(int);
-{first_primitive} xfirst = *reinterpret_cast<{first_primitive}*>(buf + offset);
-{second_primitive} s = {second_primitive}(buf + offset + sizeof(int), strlen);
+{t.sub[1].cpptype} xfirst = *reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset);
+{t.sub[2].cpptype} s = {t.sub[2].cpptype}(buf + offset + sizeof(int), strlen);
 nullpos = s.find('\0');
-if(nullpos != {second_primitive}::npos)
+if(nullpos != {t.sub[2].cpptype}::npos)
     s.resize(nullpos);
-{cpptype} x = std::make_pair(xfirst, s);\
+{t.cpptype} x = std::make_pair(xfirst, s);\
 """
 
 pair_int_vl_string_reader = """\
 unsigned int itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
 jlen = col_sizes_[table][j] / itemsize;
-{cpptype} x = std::make_pair(*reinterpret_cast<{first_primitive}*>(buf + offset), VLRead<{second_primitive}, {vl_second_primitive_dbtype}>(buf + offset + sizeof(int)));\
+{t.cpptype} x = std::make_pair(*reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset), VLRead<{t.sub[2].cpptype}, {t.sub[2].dbtype}>(buf + offset + sizeof(int)));\
 """
 
 map_xy_reader = """\
-{cpptype} x = {cpptype}();
-size_t itemsize = sizeof({first_primitive}) + sizeof({second_primitive})
+{t.cpptype} x = {t.cpptype}();
+size_t itemsize = sizeof({t.sub[1].cpptype}) + sizeof({t.sub[2].cpptype})
 jlen = col_sizes_[table][j] / itemsize;
 for (unsigned int k = 0; k < jlen; ++k) {{
-    x[*reinterpret_cast<{first_primitive}*>(buf + offset + itemsize*k)] = *reinterpret_cast<{second_primitive}*>(buf + offset + itemsize*k + sizeof({first_primitive}));
+    x[*reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset + itemsize*k)] = *reinterpret_cast<{t.sub[2].cpptype}*>(buf + offset + itemsize*k + sizeof({t.sub[1].cpptype}));
 }}\
 """
 
@@ -194,22 +217,22 @@ hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int itemsize = col_sizes_[table][j] / fieldlen;
 unsigned int strlen = itemsize - sizeof(int);
-{cpptype} x;
+{t.cpptype} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {second_primitive} s = {second_primitive}(buf + offset + itemsize*k + sizeof({first_primitive}), strlen);
+    {t.sub[2].cpptype} s = {t.sub[2].cpptype}(buf + offset + itemsize*k + sizeof({t.sub[1].cpptype}), strlen);
     nullpos = s.find('\0');
-    if(nullpos != {second_primitive}::npos)
+    if(nullpos != {t.sub[2].cpptype}::npos)
         s.resize(nullpos);
-    x[*reinterpret_cast<{first_primitive}*>(buf + offset + itemsize*k)] = s;
+    x[*reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset + itemsize*k)] = s;
 }}\
 """
 
 map_int_vl_string_reader = """\
-unsigned int itemsize = sizeof({first_primitive}) + CYCLUS_SHA1_SIZE;
+unsigned int itemsize = sizeof({t.sub[1].cpptype}) + CYCLUS_SHA1_SIZE;
 jlen = col_sizes_[table][j] / itemsize;
-{cpptype} x;
+{t.cpptype} x;
 for(unsigned int k = 0; k < jlen; ++k) {{
-    x[*reinterpret_cast<{first_primitive}*>(buf + offset + itemsize*k)] = VLRead<{second_primitive}, {vl_second_primitive_dbtype}>(buf + offset + itemsize*k + sizeof({first_primitive}));
+    x[*reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset + itemsize*k)] = VLRead<{t.sub[2].cpptype}, {t.sub[2].dbtype}>(buf + offset + itemsize*k + sizeof({t.sub[1].cpptype}));
 }}\
 """
 
@@ -219,23 +242,23 @@ size_t nullpos;
 hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int itemsize = col_sizes_[table][j] / fieldlen;
-unsigned int strlen = itemsize - sizeof({second_primitive});
-{cpptype} x;
+unsigned int strlen = itemsize - sizeof({t.sub[2].cpptype});
+{t.cpptype} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {first_primitive} s = {first_primitive}(buf + offset + itemsize*k, strlen);
+    {t.sub[1].cpptype} s = {t.sub[1].cpptype}(buf + offset + itemsize*k, strlen);
     nullpos = s.find('\0');
-    if (nullpos != {first_primitive}::npos)
+    if (nullpos != {t.sub[1].cpptype}::npos)
         s.resize(nullpos);
-    x[s] = *reinterpret_cast<{second_primitive}*>(buf + offset + itemsize*k + strlen);
+    x[s] = *reinterpret_cast<{t.sub[2].cpptype}*>(buf + offset + itemsize*k + strlen);
 }}\
 """
 
 map_vl_string_x_reader =  """\
-unsigned int itemsize = sizeof({second_primitive}) + CYCLUS_SHA1_SIZE;
+unsigned int itemsize = sizeof({t.sub[2].cpptype}) + CYCLUS_SHA1_SIZE;
 jlen = col_sizes_[table][j] / itemsize;
-{cpptype} x;
+{t.cpptype} x;
 for (unsigned int k = 0; k < jlen; ++k) {{
-    x[VLRead<{first_primitive}, {vl_first_primitive_dbtype}>(buf + offset + itemsize*k)] = *reinterpret_cast<{second_primitive}*>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
+    x[VLRead<{t.sub[1].cpptype}, {t.sub[1].dbtype}>(buf + offset + itemsize*k)] = *reinterpret_cast<{t.sub[2].cpptype}*>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
 }}\
 """
 
@@ -249,15 +272,15 @@ H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int itemsize = col_sizes_[table][j] / fieldlen;
 unsigned int keylen = H5Tget_size(key_type);
 unsigned int vallen = itemsize - keylen;
-{cpptype} x;
+{t.cpptype} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {first_primitive} key = {first_primitive}(buf + offset + itemsize*k, keylen);
+    {t.sub[1].cpptype} key = {t.sub[1].cpptype}(buf + offset + itemsize*k, keylen);
     nullpos = key.find('\0');
-    if (nullpos != {first_primitive}::npos)
+    if (nullpos != {t.sub[1].cpptype}::npos)
         key.resize(nullpos);
-    {second_primitive} val = {second_primitive}(buf + offset + itemsize*k + keylen, vallen);
+    {t.sub[2].cpptype} val = {t.sub[2].cpptype}(buf + offset + itemsize*k + keylen, vallen);
     nullpos = val.find('\0');
-    if (nullpos != {second_primitive}::npos)
+    if (nullpos != {t.sub[2].cpptype}::npos)
         val.resize(nullpos);
     x[key] = val;
 }}\
@@ -270,13 +293,13 @@ hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int itemsize = col_sizes_[table][j] / fieldlen;
 unsigned int keylen = itemsize - CYCLUS_SHA1_SIZE;
-{cpptype} x;
+{t.cpptype} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {first_primitive} key = {first_primitive}(buf + offset + itemsize*k, keylen);
+    {t.sub[1].cpptype} key = {t.sub[1].cpptype}(buf + offset + itemsize*k, keylen);
     nullpos = key.find('\0');
-    if (nullpos != {first_primitive}::npos)
+    if (nullpos != {t.sub[1].cpptype}::npos)
         key.resize(nullpos);
-    x[key] = VLRead<{second_primitive}, {vl_second_primitive_dbtype}>(buf + offset + itemsize*k + keylen);
+    x[key] = VLRead<{t.sub[2].cpptype}, {t.sub[2].dbtype}>(buf + offset + itemsize*k + keylen);
 }}\
 """
 
@@ -287,13 +310,13 @@ hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int itemsize = col_sizes_[table][j] / fieldlen;
 unsigned int vallen = itemsize - CYCLUS_SHA1_SIZE;
-{cpptype} x;
+{t.cpptype} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {second_primitive} val = {second_primitive}(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE, vallen);
+    {t.sub[2].cpptype} val = {t.sub[2].cpptype}(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE, vallen);
     nullpos = val.find('\0');
-    if (nullpos != {second_primitive}::npos)
+    if (nullpos != {t.sub[2].cpptype}::npos)
         val.resize(nullpos);
-    x[VLRead<{first_primitive}, {vl_first_primitive_dbtype}>(buf + offset + itemsize*k)] = val;
+    x[VLRead<{t.sub[1].cpptype}, {t.sub[1].dbtype}>(buf + offset + itemsize*k)] = val;
 }}\
 """
 
@@ -303,9 +326,9 @@ size_t nullpos;
 hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int itemsize = 2*CYCLUS_SHA1_SIZE;
-{cpptype} x;
+{t.cpptype} x;
 for(unsigned int k = 0; k < fieldlen; ++k) {{
-    x[VLRead<{first_primitive}, {vl_first_primitive_dbtype}>(buf + offset + itemsize*k)] = VLRead<{second_primitive}, {vl_second_primitive_dbtype}>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
+    x[VLRead<{t.sub[1].cpptype}, {t.sub[1].dbtype}>(buf + offset + itemsize*k)] = VLRead<{t.sub[2].cpptype}, {t.sub[2].dbtype}>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
 }}\
 """
 
@@ -368,24 +391,13 @@ readers = {'INT': reinterpret_cast_reader,
            'VL_MAP_VL_STRING_VL_STRING': vl_reader}
 
 query_cases = ''
-for dbtype, cpptype in db_to_cpp.items(): 
-    #current_type = TypeStr(dbtype)
+for db in dbtest: 
+    current_type = TypeStr(db)
+    reader = readers[db]
+    #reader.format(t=db)
+    #ctx = {}
+    #ctx['read_x'] = textwrap.indent(reader.format(t =current_type), indent)
+    query_cases += case_template.format(t = current_type, read_x = textwrap.indent(reader.format(t = current_type), indent))
 
-    #print(current_type.sub[0])
-    reader = readers[dbtype]
-    cpp_primitive_as_string = parse_template(cpptype)[1]
-    ctx = {'dbtype': dbtype,
-           'cpptype': cpptype, 
-           'first_primitive': parse_template(cpptype)[1],
-           'vl_first_primitive_dbtype': 'VL_' + cpp_to_db.get(parse_template(cpptype)[1], "error")}
-    if ',' in cpptype:
-        ctx['second_primitive'] = parse_template(cpptype)[2]
-        ctx['vl_second_primitive_dbtype'] = 'VL_' + cpp_to_db.get(parse_template(cpptype)[2], "error")
-    ctx['read_x'] = textwrap.indent(reader.format(**ctx), indent)
-    query_cases += case_template.format(**ctx)
-for i in dbtest:
-    print(i)
-#print(query_cases)
+print(query_cases)
 
-#for t in db_to_cpp.values():
-    #print(t)
