@@ -37,7 +37,11 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   vldts_[BLOB] = blob_type_;
 }
 
-Hdf5Back::~Hdf5Back() {
+void Hdf5Back::Close() {
+  // make sure we are still open
+  if (closed_)
+    return;
+
   // cleanup HDF5
   Flush();
   H5Fclose(file_);
@@ -60,6 +64,13 @@ Hdf5Back::~Hdf5Back() {
   for (dbtit = schemas_.begin(); dbtit != schemas_.end(); ++dbtit) {
     delete[](dbtit->second);
   }
+
+  closed_ = true;
+}
+
+Hdf5Back::~Hdf5Back() {
+  if (!closed_)
+    Close();
 }
 
 void Hdf5Back::Notify(DatumList data) {

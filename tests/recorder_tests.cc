@@ -25,6 +25,8 @@ class TestBack : public cyclus::RecBackend {
     flushed = true;
   }
 
+  virtual void Close() {};
+
   int flush_count;  // # Datum objects in last notify
   int notify_count;  // # times notify called
   bool flushed;
