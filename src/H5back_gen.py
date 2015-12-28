@@ -180,15 +180,14 @@ for (unsigned int k = 0; k < jlen; ++k) {{
 {no_close}\
 """
 
-set_list_reader = """\
+set_list_x_reader = """\
 jlen = col_sizes_[table][j] / sizeof({t.sub[1].cpptype});
 {t.sub[1].cpptype}* xraw = reinterpret_cast<{t.sub[1].cpptype}*>(buf + offset);
 {t.cpptype} x = {t.cpptype}(xraw, xraw+jlen);
 {no_close}\
 """
 
-#changed x.insert(s) to x.insert(k, s) to allow for list and set use
-set_list_string_reader = """\
+set_string_reader = """\
 hid_t field_type = H5Tget_member_type(tb_type, j);
 size_t nullpos;
 hsize_t fieldlen;
@@ -200,17 +199,42 @@ for(unsigned int k = 0; k < fieldlen; ++k) {{
     nullpos = s.find('\0');
     if(nullpos != {t.sub[1].cpptype}::npos)
         s.resize(nullpos);
-    x.insert(k, s);
+    x.insert(s);
 }}
 {H5Tclose}\
 """
 
-#changed insert method to insert(k, value) to allow for list use
-set_list_vl_string_reader = """\
+set_vl_string_reader = """\
 jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
 {t.cpptype} x;
 for (unsigned int k = 0; k < jlen; ++k) {{
-    x.insert(k, VLRead<{t.sub[1].cpptype}, {t.sub[1].dbtype}>(buf + offset + CYCLUS_SHA1_SIZE*k));
+    x.insert(VLRead<{t.sub[1].cpptype}, {t.sub[1].dbtype}>(buf + offset + CYCLUS_SHA1_SIZE*k));
+}}
+{no_close}\
+"""
+
+list_string_reader = """\
+hid_t field_type = H5Tget_member_type(tb_type, j);
+size_t nullpos;
+hsize_t fieldlen;
+H5Tget_array_dims2(field_type, &fieldlen);
+unsigned int strlen = col_sizes_[table][j] / fieldlen;
+{t.cpptype} x;
+for(unsigned int k = 0; k < fieldlen; ++k) {{
+    {t.sub[1].cpptype} s = {t.sub[1].cpptype}(buf + offset + strlen*k, strlen);
+    nullpos = s.find('\0');
+    if(nullpos != {t.sub[1].cpptype}::npos)
+        s.resize(nullpos);
+    x.push_back(s);
+}}
+{H5Tclose}\
+"""
+
+list_vl_string_reader = """\
+jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
+{t.cpptype} x;
+for (unsigned int k = 0; k < jlen; ++k) {{
+    x.push_back(VLRead<{t.sub[1].cpptype}, {t.sub[1].dbtype}>(buf + offset + CYCLUS_SHA1_SIZE*k));
 }}
 {no_close}\
 """
@@ -429,18 +453,18 @@ readers = {'INT': reinterpret_cast_reader,
            'VECTOR_VL_STRING': vector_vl_string_reader,
            'VL_VECTOR_STRING': vl_reader,
            'VL_VECTOR_VL_STRING': vl_reader,
-           'SET_INT': set_list_reader,
+           'SET_INT': set_list_x_reader,
            'VL_SET_INT': vl_reader,
-           'SET_STRING': set_list_string_reader,
+           'SET_STRING': set_string_reader,
            'VL_SET_STRING': vl_reader,
-           'SET_VL_STRING': set_list_vl_string_reader,
+           'SET_VL_STRING': set_vl_string_reader,
            'VL_SET_VL_STRING': vl_reader,
-           'LIST_INT': set_list_reader,
+           'LIST_INT': set_list_x_reader,
            'VL_LIST_INT': vl_reader,
-           'LIST_STRING': set_list_string_reader,
+           'LIST_STRING': list_string_reader,
            'VL_LIST_STRING': vl_reader,
            'VL_LIST_VL_STRING': vl_reader,
-           'LIST_VL_STRING': set_list_vl_string_reader,
+           'LIST_VL_STRING': list_vl_string_reader,
            'PAIR_INT_INT': pair_int_int_reader,
            'PAIR_INT_STRING': pair_int_string_reader,
            'PAIR_INT_VL_STRING': pair_int_vl_string_reader,
@@ -484,4 +508,3 @@ for db in dbtest:
     query_cases += case_template.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), indent))
 
 print(query_cases)
-
