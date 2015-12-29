@@ -4,42 +4,11 @@ import textwrap
 with open('../share/dbtypes.json') as f:
     rawtable = json.load(f)
 
-table = set(tuple(row[:-3]) for row in rawtable[1:])
+#table = set(tuple(row[:-3]) for row in rawtable[1:])
 v3_table = set(tuple(row) for row in rawtable[897:])
 
-def parse_template(s, open_brace = '<', close_brace = '>', separator = ','):
-    s = s.replace(' ', '')
-    if open_brace not in s and separator not in s:
-        return s
-    i = s.find(open_brace)
-    j = s.rfind(close_brace)
-    t = [s[:i]]
-    inner = s[i+1:j]
-    t.extend(parse_arg(inner, open_brace, close_brace, separator))
-    if isinstance(t, str):
-        return t
-    else:
-        return tuple(t)
-
-def parse_arg(s, open_brace = '<', close_brace = '>', separator = ','):
-    nest = 0
-    ts = []
-    start = 0
-    for i in range(len(s)):
-        ch = s[i]
-        if ch == open_brace:
-            nest += 1
-        elif ch == close_brace:
-            nest -= 1
-        if ch == separator and nest == 0:
-            t = parse_template(s[start:i], open_brace, close_brace, separator)
-            ts.append(t)
-            start = i+1 
-    if start < len(s):
-        t = parse_template(s[start:], open_brace, close_brace, separator)
-        ts.append(t)
-    return ts
-
+#Takes dbtype as a parameter, returns list of dependecies' dbtypes,
+#first element of list is always original dbtype.
 def list_dep(s):
     pieces = s.split("_")
     if len(pieces) == 1:
@@ -71,24 +40,17 @@ def list_dep(s):
 
 dbtest = []
 db_to_cpp = {}
-cpptypes = {}
-canon = {}
 indent = '    '
 
 for row in v3_table:
     if row[6] == 1 and row[4] == "HDF5":
         dbtest+=[row[1]]
-        canon[row[1]] = parse_template(row[2])
         db_to_cpp[row[1]] = row[2]
 
 class TypeStr(object):
     def __init__(self, db):
         self.db = db
-        self.canon = canon[self.db]
         self.sub = [self] + [TypeStr(u) for u in list_dep(self.db)[1:]]
-
-    def __str__(self):
-        return str(canon[self.db])
     
     @property
     def cpptype(self):
