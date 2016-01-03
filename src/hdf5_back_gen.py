@@ -2,56 +2,33 @@
 """This module generates HDF5 backend code found in src/hdf5_back.cc"""
 import json
 import textwrap
+from ast import literal_eval
 
 with open('../share/dbtypes.json') as f:
     RAW_TABLE = json.load(f)
 
 V3_TABLE = set(tuple(row) for row in RAW_TABLE[897:])
 
-def list_dep(orig):
-    """Returns a list of dependent dbtypes.
-    
-    Keyword arguments: 
-    orig -- original dbtype.
-    
-    First element of returned list will always be orig itself.
-    """
-    pieces = orig.split("_")
-    if len(pieces) == 1:
-        return pieces
-    containers1 = ["VECTOR", "SET", "LIST", "VL_VECTOR", "VL_SET", "VL_LIST"]
-    containers2 = ["MAP", "PAIR", "VL_MAP", "VL_PAIR"]
-
-    if pieces[0] == "VL":
-        del pieces[0:2]
-    else:
-        del pieces[0]
-
-    for i in range(0, len(pieces)):
-        if pieces[i] == "VL":
-            pieces[i] = pieces[i] + "_" + pieces[i + 1]
-            del pieces[i + 1]
-        if i == len(pieces) - 1:
-            break
-    
-    for i in range(len(pieces) - 1, -1, -1):
-        if pieces[i] in containers1:
-            pieces[i] += "_" + pieces[i + 1]
-            del pieces[i + 1]
-        elif pieces[i] in containers2:
-            pieces[i]+= "_" + pieces[i + 1] + "_" + pieces[i + 2]
-            del pieces[i + 1:i + 3]
-    pieces = [orig] + pieces
-    return pieces
-
-DB_LIST = []
+CANON_LIST = []
 DB_TO_CPP = {}
+CANON_TO_DB = {}
 INDENT = '    '
 
 for row in V3_TABLE:
     if row[6] == 1 and row[4] == "HDF5":
-        DB_LIST+=[row[1]]
+        CANON_LIST += [row[7]]
         DB_TO_CPP[row[1]] = row[2]
+        CANON_TO_DB[row[7]] = row[1]
+
+def list_dep(canon):
+    if "(" not in canon:
+        #is a primitive type, no tuples
+        return canon
+    current = literal_eval(canon)
+    
+    dep_list = [str(u) for u in current[1:]]
+    #print([canon] + dep_list)
+    return [canon] + dep_list 
 
 class TypeStr(object):
     """Represents a archetype data type.
@@ -63,9 +40,14 @@ class TypeStr(object):
     db -- dbtype of the data type
     sub -- list of dependencies as TypeStr objects (including self as element 0)
     """
-    def __init__(self, db):
-        self.db = db
-        self.sub = [self] + [TypeStr(u) for u in list_dep(self.db)[1:]]
+    def __init__(self, canon):
+        self.canon = canon
+        print(canon)
+        self.db = CANON_TO_DB[canon]
+        if "(" not in canon:
+            self.sub = [self]
+        else:
+            self.sub = [self] + [TypeStr(u) for u in list_dep(self.canon)[1:]]
     
     @property
     def cpptype(self):
@@ -481,13 +463,14 @@ QUERY_CASES = ''
 
 def main():
     global QUERY_CASES
-    for db in DB_LIST: 
-        current_type = TypeStr(db)
-        reader = READERS[db]
+    for ca in CANON_LIST: 
+        current_type = TypeStr(ca)
+        reader = READERS[current_type.dbtype]
         ctx = {"t": current_type,
-               "NO_CLOSE": NO_CLOSE,
-               "H5TCLOSE": H5TCLOSE,
-               "H5TCLOSE_MULTI": H5TCLOSE_MULTI}
+               "NO_CLOSE": NO_CLOSE.format(t = current_type),
+               "H5TCLOSE": H5TCLOSE.format(t = current_type),
+               "H5TCLOSE_MULTI": H5TCLOSE_MULTI.format(t = current_type)}
+                  
         QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
 
     print(QUERY_CASES)
