@@ -19,6 +19,8 @@ SimInfo::SimInfo()
       dt(kDefaultTimeStepDur),
       decay("manual"),
       branch_time(-1),
+      explicit_inventory(false),
+      explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
@@ -30,6 +32,8 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       decay("manual"),
       branch_time(-1),
       handle(handle),
+      explicit_inventory(false),
+      explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
@@ -41,6 +45,8 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
       decay(d),
       branch_time(-1),
       handle(handle),
+      explicit_inventory(false),
+      explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
@@ -55,6 +61,8 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
       parent_sim(parent_sim),
       parent_type(parent_type),
       branch_time(branch_time),
+      explicit_inventory(false),
+      explicit_inventory_compact(false),
       handle(handle) {}
 
 Context::Context(Timer* ti, Recorder* rec)
@@ -185,6 +193,11 @@ void Context::InitSim(SimInfo si) {
 
   NewDatum("DecayMode")
       ->AddVal("Decay", si.decay)
+      ->Record();
+
+  NewDatum("InfoExplicitInv")
+      ->AddVal("RecordInventory", si.explicit_inventory)
+      ->AddVal("RecordInventoryCompact", si.explicit_inventory_compact)
       ->Record();
 
   // TODO: when the backends get uint64_t support, the static_cast here should

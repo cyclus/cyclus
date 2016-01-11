@@ -22,6 +22,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="dt"><data type="nonNegativeInteger"/></element> 
       </optional>
       <optional>
+        <element name="explicit_inventory"> <data type="boolean"/> </element>
+      </optional>
+      <optional>
+        <element name="explicit_inventory_compact"> <data type="boolean"/> </element>
+      </optional>
+      <optional>
         <element name="solver"> 
           <interleave>
             <optional><element name="config">

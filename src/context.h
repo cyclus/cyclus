@@ -97,6 +97,15 @@ class SimInfo {
 
   /// Duration in seconds of a single time step in the simulation.
   uint64_t dt;
+
+  /// True if per-agent inventories should be explicitly queried/recorded
+  /// every time step in a table (i.e. agent ID, Time, Nuclide, Quantity).
+  bool explicit_inventory;
+
+  /// True if per-agent inventories should be explicitly queried/recorded
+  /// every time step in a table (i.e. agent ID, Time, Quantity,
+  /// Composition-object and/or reference).
+  bool explicit_inventory_compact;
 };
 
 /// A simulation context provides access to necessary simulation-global
@@ -115,6 +124,7 @@ class Context {
   friend class ::SimInitTest;
   friend class SimInit;
   friend class Agent;
+  friend class Timer;
 
   /// Creates a new context working with the specified timer and datum manager.
   /// The timer does not have to be initialized (yet).
