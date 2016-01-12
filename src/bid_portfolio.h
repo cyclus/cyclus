@@ -58,15 +58,13 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
         Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
                        exclusive);
     VerifyResponder_(b);
-      if(offer->quantity() > 0 )
-          bids_.insert(b);
-      else{
-
-          std::stringstream ss;
-          ss << GetTraderPrototype(bidder) << " from " << GetTraderSpec(bidder) << " is offering a bid quantity <= 0, Q = " << offer->quantity() ;
-          throw ValueError(ss.str());
-
-      }
+    if(offer->quantity() > 0 )
+      bids_.insert(b);
+    else{
+      std::stringstream ss;
+      ss << GetTraderPrototype(bidder) << " from " << GetTraderSpec(bidder) << " is offering a bid quantity <= 0, Q = " << offer->quantity() ;
+      throw ValueError(ss.str());
+    }
     return b;
   }
 
