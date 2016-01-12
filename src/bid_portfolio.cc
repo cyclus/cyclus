@@ -1,6 +1,6 @@
 #include "bid_portfolio.h"
 
-#include "Trader.h"
+#include "trader.h"
 
 
 
