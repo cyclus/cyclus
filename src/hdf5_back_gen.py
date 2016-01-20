@@ -15,26 +15,31 @@ for row in range(0, len(RAW_TABLE)):
         TABLE_START = row
         break
 
-V3_TABLE = set(tuple(row) for row in RAW_TABLE[TABLE_START:])
+V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
 
 CANON_LIST = []
 DB_TO_CPP = {}
 CANON_TO_DB = {}
 INDENT = '    '
 
+def convert_canonical(raw_list):
+    if isinstance(raw_list, str):
+        return raw_list
+    return tuple(convert_canonical(x) for x in raw_list)
+
 for row in V3_TABLE:
     if row[6] == 1 and row[4] == "HDF5":
-        CANON_LIST += [row[7]]
+        CANON_LIST += [convert_canonical(row[7])]
         DB_TO_CPP[row[1]] = row[2]
-        CANON_TO_DB[row[7]] = row[1]
+        CANON_TO_DB[convert_canonical(row[7])] = row[1]
 
-def list_dep(canon):
+def list_dependencies(canon):
     """A list of a type's dependencies, in canonical form.
     
     Parameters
     ----------
-    canon : str
-        The string representation of the canonical form of the type. Exactly as found in dbtypes.json
+    canon : tuple, str
+        The canonical form of the type, after conversion from list
     
     Returns
     -------
@@ -44,15 +49,13 @@ def list_dep(canon):
     Examples
     --------
     >>> list_dep("('PAIR', 'INT', 'VL_STRING')")
-    [('PAIR', 'INT', 'VL_STRING'), 'INT', 'STRING']
+    [('PAIR', 'INT', 'VL_STRING'), 'INT', 'VL_STRING']
     """
-    if "(" not in canon:
-        #is a primitive type, no tuples
+    if isinstance(canon, str):
         return canon
-    current = literal_eval(canon)
     
-    dep_list = [str(u) for u in current[1:]]
-    return [canon] + dep_list 
+    dependency_list = [u for u in canon[1:]]
+    return [canon] + dependency_list 
 
 class TypeStr(object):
     """Represents a archetype data type.
@@ -77,10 +80,10 @@ class TypeStr(object):
         self.canon = canon
         self.db = CANON_TO_DB[canon]
         self.cpp = DB_TO_CPP[self.db]
-        if "(" not in canon:
+        if isinstance(canon, str):
             self.sub = [self]
         else:
-            self.sub = [self] + [TypeStr(u) for u in list_dep(self.canon)[1:]]
+            self.sub = [self] + [TypeStr(u) for u in list_dependencies(self.canon)[1:]]
 
 CASE_TEMPLATE = """
 case {t.db}: {{
