@@ -253,7 +253,7 @@ jlen = col_sizes_[table][j] / itemsize;
 
 MAP_XY_READER = """
 {t.cpp} x = {t.cpp}();
-size_t itemsize = sizeof({t.sub[1].cpp}) + sizeof({t.sub[2].cpp})
+size_t itemsize = sizeof({t.sub[1].cpp}) + sizeof({t.sub[2].cpp});
 jlen = col_sizes_[table][j] / itemsize;
 for (unsigned int k = 0; k < jlen; ++k) {{
     x[*reinterpret_cast<{t.sub[1].cpp}*>(buf + offset + itemsize*k)] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + sizeof({t.sub[1].cpp}));
@@ -290,7 +290,7 @@ for(unsigned int k = 0; k < jlen; ++k) {{
 """.strip()
 
 MAP_STRING_X_READER = """
-hid_t field_type = H5get_member_type(tb_type, j);
+hid_t field_type = H5Tget_member_type(tb_type, j);
 size_t nullpos;
 hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
@@ -401,23 +401,23 @@ unsigned int strlen = itemsize - sizeof({t.sub[1].sub[0].cpp}) - sizeof({t.sub[2
 {t.sub[1].cpp} key;
 {t.cpp} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[1].sub[1].cpp} s = {t.sub[1].sub[1].cpp}(buf + offset + itemsize*k + sizeof({t.sub[1].sub[0].cpp}), strlen);
+    {t.sub[1].sub[2].cpp} s = {t.sub[1].sub[2].cpp}(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp}), strlen);
     nullpos = s.find('\\0');
-    if (nullpos != {t.sub[1].sub[1].cpp}::npos)
+    if (nullpos != {t.sub[1].sub[2].cpp}::npos)
         s.resize(nullpos);
-    key = std::make_pair(*reinterpret_cast<{t.sub[1].sub[0].cpp}*>(buf + offset + itemsize*k), s);
+    key = std::make_pair(*reinterpret_cast<{t.sub[1].sub[1].cpp}*>(buf + offset + itemsize*k), s);
     x[key] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[0].cpp}) + strlen);
 }}
 {H5TCLOSE}
 """.strip()
 
 MAP_PAIR_INT_VL_STRING_DOUBLE_READER = """
-unsigned int itemsize = sizeof({t.sub[1].sub[0].cpp}) + CYCLUS_SHA1_SIZE + sizeof({t.sub[2].cpp});
+unsigned int itemsize = sizeof({t.sub[1].sub[1].cpp}) + CYCLUS_SHA1_SIZE + sizeof({t.sub[2].cpp});
 jlen = col_sizes_[table][j] / itemsize;
 {t.sub[1].cpp} key;
 {t.cpp} x;
 for (unsigned int k = 0; k < jlen; ++k) {{
-    key = std::make_pair(*reinterpret_cast<{t.sub[1].sub[1].cpp}*>(buf + offset + itemsize*k), VLREAD<{t.sub[1].sub[2].cpp}, {t.sub[1].sub[2].db}>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp})));
+    key = std::make_pair(*reinterpret_cast<{t.sub[1].sub[1].cpp}*>(buf + offset + itemsize*k), VLRead<{t.sub[1].sub[2].cpp}, {t.sub[1].sub[2].db}>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp})));
     x[key] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp}) + CYCLUS_SHA1_SIZE);
 }}
 {NO_CLOSE}
