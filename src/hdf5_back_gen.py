@@ -120,7 +120,7 @@ REINTERPRET_CAST_READER = """
 
 STRING_READER = """
 {t.cpp} x = {t.cpp}(buf + offset, col_sizes_[table][j]);
-size_t nullpos = x.find('\0');
+size_t nullpos = x.find('\\0');
 if (nullpos != {t.cpp}::npos)
     x.resize(nullpos);
 {NO_CLOSE}
@@ -152,9 +152,9 @@ unsigned int strlen = col_sizes_[table][j] / fieldlen;
 {t.cpp} x = {t.cpp}(fieldlen);
 for(unsigned int k = 0; k < fieldlen; ++k) {{
     x[k] = {t.sub[1].cpp}(buf + offset + strlen*k, strlen);
-    nullpos = x[k].find('\0');
+    nullpos = x[k].find('\\0');
     if(nullpos != {t.sub[1].cpp}::npos)
-        x[k].resize(nullpos);'
+        x[k].resize(nullpos);
 }}
 {H5TCLOSE}
 """.strip()
@@ -184,7 +184,7 @@ unsigned int strlen = col_sizes_[table][j] / fieldlen;
 {t.cpp} x;
 for(unsigned int k = 0; k < fieldlen; ++k) {{
     {t.sub[1].cpp} s = {t.sub[1].cpp}(buf + offset + strlen*k, strlen);
-    nullpos = s.find('\0');
+    nullpos = s.find('\\0');
     if(nullpos != {t.sub[1].cpp}::npos)
         s.resize(nullpos);
     x.insert(s);
@@ -210,7 +210,7 @@ unsigned int strlen = col_sizes_[table][j] / fieldlen;
 {t.cpp} x;
 for(unsigned int k = 0; k < fieldlen; ++k) {{
     {t.sub[1].cpp} s = {t.sub[1].cpp}(buf + offset + strlen*k, strlen);
-    nullpos = s.find('\0');
+    nullpos = s.find('\\0');
     if(nullpos != {t.sub[1].cpp}::npos)
         s.resize(nullpos);
     x.push_back(s);
@@ -237,7 +237,7 @@ size_t nullpos;
 unsigned int strlen = col_sizes_[table][j] - sizeof(int);
 {t.sub[1].cpp} xfirst = *reinterpret_cast<{t.sub[1].cpp}*>(buf + offset);
 {t.sub[2].cpp} s = {t.sub[2].cpp}(buf + offset + sizeof(int), strlen);
-nullpos = s.find('\0');
+nullpos = s.find('\\0');
 if(nullpos != {t.sub[2].cpp}::npos)
     s.resize(nullpos);
 {t.cpp} x = std::make_pair(xfirst, s);
@@ -271,7 +271,7 @@ unsigned int strlen = itemsize - sizeof(int);
 {t.cpp} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
     {t.sub[2].cpp} s = {t.sub[2].cpp}(buf + offset + itemsize*k + sizeof({t.sub[1].cpp}), strlen);
-    nullpos = s.find('\0');
+    nullpos = s.find('\\0');
     if(nullpos != {t.sub[2].cpp}::npos)
         s.resize(nullpos);
     x[*reinterpret_cast<{t.sub[1].cpp}*>(buf + offset + itemsize*k)] = s;
@@ -299,7 +299,7 @@ unsigned int strlen = itemsize - sizeof({t.sub[2].cpp});
 {t.cpp} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
     {t.sub[1].cpp} s = {t.sub[1].cpp}(buf + offset + itemsize*k, strlen);
-    nullpos = s.find('\0');
+    nullpos = s.find('\\0');
     if (nullpos != {t.sub[1].cpp}::npos)
         s.resize(nullpos);
     x[s] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + strlen);
@@ -330,11 +330,11 @@ unsigned int vallen = itemsize - keylen;
 {t.cpp} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
     {t.sub[1].cpp} key = {t.sub[1].cpp}(buf + offset + itemsize*k, keylen);
-    nullpos = key.find('\0');
+    nullpos = key.find('\\0');
     if (nullpos != {t.sub[1].cpp}::npos)
         key.resize(nullpos);
     {t.sub[2].cpp} val = {t.sub[2].cpp}(buf + offset + itemsize*k + keylen, vallen);
-    nullpos = val.find('\0');
+    nullpos = val.find('\\0');
     if (nullpos != {t.sub[2].cpp}::npos)
         val.resize(nullpos);
     x[key] = val;
@@ -352,7 +352,7 @@ unsigned int keylen = itemsize - CYCLUS_SHA1_SIZE;
 {t.cpp} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
     {t.sub[1].cpp} key = {t.sub[1].cpp}(buf + offset + itemsize*k, keylen);
-    nullpos = key.find('\0');
+    nullpos = key.find('\\0');
     if (nullpos != {t.sub[1].cpp}::npos)
         key.resize(nullpos);
     x[key] = VLRead<{t.sub[2].cpp}, {t.sub[2].db}>(buf + offset + itemsize*k + keylen);
@@ -370,7 +370,7 @@ unsigned int vallen = itemsize - CYCLUS_SHA1_SIZE;
 {t.cpp} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
     {t.sub[2].cpp} val = {t.sub[2].cpp}(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE, vallen);
-    nullpos = val.find('\0');
+    nullpos = val.find('\\0');
     if (nullpos != {t.sub[2].cpp}::npos)
         val.resize(nullpos);
     x[VLRead<{t.sub[1].cpp}, {t.sub[1].db}>(buf + offset + itemsize*k)] = val;
@@ -402,7 +402,7 @@ unsigned int strlen = itemsize - sizeof({t.sub[1].sub[0].cpp}) - sizeof({t.sub[2
 {t.cpp} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
     {t.sub[1].sub[1].cpp} s = {t.sub[1].sub[1].cpp}(buf + offset + itemsize*k + sizeof({t.sub[1].sub[0].cpp}), strlen);
-    nullpos = s.find('\0');
+    nullpos = s.find('\\0');
     if (nullpos != {t.sub[1].sub[1].cpp}::npos)
         s.resize(nullpos);
     key = std::make_pair(*reinterpret_cast<{t.sub[1].sub[0].cpp}*>(buf + offset + itemsize*k), s);
@@ -499,6 +499,6 @@ def main():
                   
         QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
 
-    print(QUERY_CASES)
+    print(textwrap.indent(QUERY_CASES, INDENT*2))
 if __name__ == '__main__':
     main()
