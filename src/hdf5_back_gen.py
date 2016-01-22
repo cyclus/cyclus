@@ -262,7 +262,7 @@ for (unsigned int k = 0; k < jlen; ++k) {{
 """.strip()
 
 MAP_INT_STRING_READER = """
-hid_t fieldtype = H5Tget_member_type(tb_type, j);
+hid_t field_type = H5Tget_member_type(tb_type, j);
 size_t nullpos;
 hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
