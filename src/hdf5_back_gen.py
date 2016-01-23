@@ -397,7 +397,7 @@ size_t nullpos;
 hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int itemsize = col_sizes_[table][j] / fieldlen;
-unsigned int strlen = itemsize - sizeof({t.sub[1].sub[0].cpp}) - sizeof({t.sub[2].cpp});
+unsigned int strlen = itemsize - sizeof({t.sub[1].sub[1].cpp}) - sizeof({t.sub[2].cpp});
 {t.sub[1].cpp} key;
 {t.cpp} x;
 for (unsigned int k = 0; k < fieldlen; ++k) {{
@@ -406,7 +406,7 @@ for (unsigned int k = 0; k < fieldlen; ++k) {{
     if (nullpos != {t.sub[1].sub[2].cpp}::npos)
         s.resize(nullpos);
     key = std::make_pair(*reinterpret_cast<{t.sub[1].sub[1].cpp}*>(buf + offset + itemsize*k), s);
-    x[key] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[0].cpp}) + strlen);
+    x[key] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp}) + strlen);
 }}
 {H5TCLOSE}
 """.strip()
