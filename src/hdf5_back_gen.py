@@ -17,7 +17,7 @@ for row in range(0, len(RAW_TABLE)):
 
 V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
 
-CANON_LIST = []
+CANON_SET = set()
 DB_TO_CPP = {}
 CANON_TO_DB = {}
 INDENT = '    '
@@ -29,7 +29,7 @@ def convert_canonical(raw_list):
 
 for row in V3_TABLE:
     if row[6] == 1 and row[4] == "HDF5":
-        CANON_LIST += [convert_canonical(row[7])]
+        CANON_SET.add(convert_canonical(row[7]))
         DB_TO_CPP[row[1]] = row[2]
         CANON_TO_DB[convert_canonical(row[7])] = row[1]
 
@@ -489,7 +489,7 @@ QUERY_CASES = ''
 
 def main():
     global QUERY_CASES
-    for ca in CANON_LIST: 
+    for ca in CANON_SET: 
         current_type = TypeStr(ca)
         reader = READERS[current_type.db]
         ctx = {"t": current_type,
@@ -500,5 +500,6 @@ def main():
         QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
 
     print(textwrap.indent(QUERY_CASES, INDENT*2))
+    
 if __name__ == '__main__':
     main()
