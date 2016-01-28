@@ -16,6 +16,12 @@ CONFIGURE_FILE(
     @ONLY
     )
 
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py OUTPUT_VARIABLE HDF5_BACK_CC_QUERY)
+CONFIGURE_FILE(
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
+    @ONLY
+    )
 ############################################################
 ############# end special configuration ####################
 ############################################################
