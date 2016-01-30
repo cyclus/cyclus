@@ -84,6 +84,11 @@ class TypeStr(object):
             self.sub = [self]
         else:
             self.sub = [self] + [TypeStr(u) for u in list_dependencies(self.canon)[1:]]
+NORMAL_CLOSE = """
+is_row_selected = CmpConds<{t.cpp}>>(&x, &(field_conds[qr.fields[j]]));
+if(is_row_selected)
+    row[j] = x;
+""".strip()
 
 CASE_TEMPLATE = """
 case {t.db}: {{
@@ -91,44 +96,22 @@ case {t.db}: {{
     break;
 }}"""
 
-NO_CLOSE = """
-is_row_selected = CmpConds<{t.cpp}>(&x, &(field_conds[qr.fields[j]]));
-if (is_row_selected)
-    row[j] = x;
-""".strip()
-
-H5TCLOSE = """
-is_row_selected = CmpConds<{t.cpp}>(&x, &(field_conds[qr.fields[j]]));
-if (is_row_selected)
-    row[j] = x;
-H5Tclose(field_type);
-""".strip()
-
-H5TCLOSE_MULTI = """
-is_row_selected = CmpConds<{t.cpp}>(&x, &(field_conds[qr.fields[j]]));
-if (is_row_selected)
-    row[j] = x;
-H5Tclose(key_type);
-H5Tclose(item_type);
-H5Tclose(field_type);
-""".strip()
-
 REINTERPRET_CAST_READER = """
-{t.cpp} x = *reinterpret_cast<{t.cpp}*>(buf + offset);
-{NO_CLOSE}
+{t.cpp}{*1} xraw = {*2}reinterpret_cast<{t.cpp}*>(buf+offset);
+{teardown}
 """.strip()
 
 STRING_READER = """
-{t.cpp} x = {t.cpp}(buf + offset, col_sizes_[table][j]);
-size_t nullpos = x.find('\\0');
+{left_side} = {t.cpp}(buf + offset, col_sizes_[table][j]);
+size_t nullpos = {left_side}.find('\\0');
 if (nullpos != {t.cpp}::npos)
-    x.resize(nullpos);
-{NO_CLOSE}
+    {left_side}.resize(nullpos);
+{teardown}
 """.strip()
 
 VL_READER = """
-{t.cpp} x = VLRead<{t.cpp}, {t.db}>(buf + offset);
-{NO_CLOSE}
+{left_side} x = VLRead<{t.cpp}, {t.db}>(buf + offset {cyclus_constant});
+{teardown}
 """.strip()
 
 UUID_READER = """
@@ -138,290 +121,28 @@ memcpy(&x, buf+offset, 16);
 """.strip()
 
 VECTOR_READER = """
-{t.cpp} x = {t.cpp}(col_sizes_[table][j] / sizeof({t.sub[1].cpp}));
-memcpy(&x[0], buf + offset, col_sizes_[table][j]);
-{NO_CLOSE}
+{setup}
+{t.cpp} x = {t.cpp}({fieldlen});
+{read_type}
+{teardown}
 """.strip()
 
-VECTOR_STRING_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int strlen = col_sizes_[table][j] / fieldlen;
-{t.cpp} x = {t.cpp}(fieldlen);
-for(unsigned int k = 0; k < fieldlen; ++k) {{
-    x[k] = {t.sub[1].cpp}(buf + offset + strlen*k, strlen);
-    nullpos = x[k].find('\\0');
-    if(nullpos != {t.sub[1].cpp}::npos)
-        x[k].resize(nullpos);
-}}
-{H5TCLOSE}
+SET_READER = """
+{setup}
+{sub_type}
+{t.cpp} x = {t.cpp}({fieldlen});
+{teardown}
 """.strip()
 
-VECTOR_VL_STRING_READER = """
-jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
-{t.cpp} x = {t.cpp}(jlen);
-for (unsigned int k = 0; k < jlen; ++k) {{
-    x[k] = VLRead<{t.sub[1].cpp}, {t.sub[1].db}>(buf + offset + CYCLUS_SHA1_SIZE*k);
-}}
-{NO_CLOSE}
+LIST_READER = """
 """.strip()
 
-SET_LIST_X_READER = """
-jlen = col_sizes_[table][j] / sizeof({t.sub[1].cpp});
-{t.sub[1].cpp}* xraw = reinterpret_cast<{t.sub[1].cpp}*>(buf + offset);
-{t.cpp} x = {t.cpp}(xraw, xraw+jlen);
-{NO_CLOSE}
+PAIR_READER = """
 """.strip()
 
-SET_STRING_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int strlen = col_sizes_[table][j] / fieldlen;
-{t.cpp} x;
-for(unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[1].cpp} s = {t.sub[1].cpp}(buf + offset + strlen*k, strlen);
-    nullpos = s.find('\\0');
-    if(nullpos != {t.sub[1].cpp}::npos)
-        s.resize(nullpos);
-    x.insert(s);
-}}
-{H5TCLOSE}
+MAP_READER = """
 """.strip()
 
-SET_VL_STRING_READER = """
-jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
-{t.cpp} x;
-for (unsigned int k = 0; k < jlen; ++k) {{
-    x.insert(VLRead<{t.sub[1].cpp}, {t.sub[1].db}>(buf + offset + CYCLUS_SHA1_SIZE*k));
-}}
-{NO_CLOSE}
-""".strip()
-
-LIST_STRING_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int strlen = col_sizes_[table][j] / fieldlen;
-{t.cpp} x;
-for(unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[1].cpp} s = {t.sub[1].cpp}(buf + offset + strlen*k, strlen);
-    nullpos = s.find('\\0');
-    if(nullpos != {t.sub[1].cpp}::npos)
-        s.resize(nullpos);
-    x.push_back(s);
-}}
-{H5TCLOSE}
-""".strip()
-
-LIST_VL_STRING_READER = """
-jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;
-{t.cpp} x;
-for (unsigned int k = 0; k < jlen; ++k) {{
-    x.push_back(VLRead<{t.sub[1].cpp}, {t.sub[1].db}>(buf + offset + CYCLUS_SHA1_SIZE*k));
-}}
-{NO_CLOSE}
-""".strip()
-
-PAIR_INT_INT_READER = """
-{t.cpp} x = std::make_pair(*reinterpret_cast<{t.sub[1].cpp}*>(buf + offset), *reinterpret_cast<{t.sub[1].cpp}*>(buf + offset + sizeof({t.sub[1].cpp})));
-{NO_CLOSE}
-""".strip()
-
-PAIR_INT_STRING_READER = """
-size_t nullpos;
-unsigned int strlen = col_sizes_[table][j] - sizeof(int);
-{t.sub[1].cpp} xfirst = *reinterpret_cast<{t.sub[1].cpp}*>(buf + offset);
-{t.sub[2].cpp} s = {t.sub[2].cpp}(buf + offset + sizeof(int), strlen);
-nullpos = s.find('\\0');
-if(nullpos != {t.sub[2].cpp}::npos)
-    s.resize(nullpos);
-{t.cpp} x = std::make_pair(xfirst, s);
-{NO_CLOSE}
-""".strip()
-
-PAIR_INT_VL_STRING_READER = """
-unsigned int itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
-jlen = col_sizes_[table][j] / itemsize;
-{t.cpp} x = std::make_pair(*reinterpret_cast<{t.sub[1].cpp}*>(buf + offset), VLRead<{t.sub[2].cpp}, {t.sub[2].db}>(buf + offset + sizeof(int)));
-{NO_CLOSE}
-""".strip()
-
-MAP_XY_READER = """
-{t.cpp} x = {t.cpp}();
-size_t itemsize = sizeof({t.sub[1].cpp}) + sizeof({t.sub[2].cpp});
-jlen = col_sizes_[table][j] / itemsize;
-for (unsigned int k = 0; k < jlen; ++k) {{
-    x[*reinterpret_cast<{t.sub[1].cpp}*>(buf + offset + itemsize*k)] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + sizeof({t.sub[1].cpp}));
-}}
-{NO_CLOSE}
-""".strip()
-
-MAP_INT_STRING_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int itemsize = col_sizes_[table][j] / fieldlen;
-unsigned int strlen = itemsize - sizeof(int);
-{t.cpp} x;
-for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[2].cpp} s = {t.sub[2].cpp}(buf + offset + itemsize*k + sizeof({t.sub[1].cpp}), strlen);
-    nullpos = s.find('\\0');
-    if(nullpos != {t.sub[2].cpp}::npos)
-        s.resize(nullpos);
-    x[*reinterpret_cast<{t.sub[1].cpp}*>(buf + offset + itemsize*k)] = s;
-}}
-{H5TCLOSE}
-""".strip()
-
-MAP_INT_VL_STRING_READER = """
-unsigned int itemsize = sizeof({t.sub[1].cpp}) + CYCLUS_SHA1_SIZE;
-jlen = col_sizes_[table][j] / itemsize;
-{t.cpp} x;
-for(unsigned int k = 0; k < jlen; ++k) {{
-    x[*reinterpret_cast<{t.sub[1].cpp}*>(buf + offset + itemsize*k)] = VLRead<{t.sub[2].cpp}, {t.sub[2].db}>(buf + offset + itemsize*k + sizeof({t.sub[1].cpp}));
-}}
-{NO_CLOSE}
-""".strip()
-
-MAP_STRING_X_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int itemsize = col_sizes_[table][j] / fieldlen;
-unsigned int strlen = itemsize - sizeof({t.sub[2].cpp});
-{t.cpp} x;
-for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[1].cpp} s = {t.sub[1].cpp}(buf + offset + itemsize*k, strlen);
-    nullpos = s.find('\\0');
-    if (nullpos != {t.sub[1].cpp}::npos)
-        s.resize(nullpos);
-    x[s] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + strlen);
-}}
-{H5TCLOSE}
-""".strip()
-
-MAP_VL_STRING_X_READER =  """
-unsigned int itemsize = sizeof({t.sub[2].cpp}) + CYCLUS_SHA1_SIZE;
-jlen = col_sizes_[table][j] / itemsize;
-{t.cpp} x;
-for (unsigned int k = 0; k < jlen; ++k) {{
-    x[VLRead<{t.sub[1].cpp}, {t.sub[1].db}>(buf + offset + itemsize*k)] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
-}}
-{NO_CLOSE}
-""".strip()
-
-MAP_STRING_STRING_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-hid_t item_type = H5Tget_super(field_type);
-hid_t key_type = H5Tget_member_type(item_type, 0);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int itemsize = col_sizes_[table][j] / fieldlen;
-unsigned int keylen = H5Tget_size(key_type);
-unsigned int vallen = itemsize - keylen;
-{t.cpp} x;
-for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[1].cpp} key = {t.sub[1].cpp}(buf + offset + itemsize*k, keylen);
-    nullpos = key.find('\\0');
-    if (nullpos != {t.sub[1].cpp}::npos)
-        key.resize(nullpos);
-    {t.sub[2].cpp} val = {t.sub[2].cpp}(buf + offset + itemsize*k + keylen, vallen);
-    nullpos = val.find('\\0');
-    if (nullpos != {t.sub[2].cpp}::npos)
-        val.resize(nullpos);
-    x[key] = val;
-}}
-{H5TCLOSE_MULTI}
-""".strip()
-
-MAP_STRING_VL_STRING_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int itemsize = col_sizes_[table][j] / fieldlen;
-unsigned int keylen = itemsize - CYCLUS_SHA1_SIZE;
-{t.cpp} x;
-for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[1].cpp} key = {t.sub[1].cpp}(buf + offset + itemsize*k, keylen);
-    nullpos = key.find('\\0');
-    if (nullpos != {t.sub[1].cpp}::npos)
-        key.resize(nullpos);
-    x[key] = VLRead<{t.sub[2].cpp}, {t.sub[2].db}>(buf + offset + itemsize*k + keylen);
-}}
-{H5TCLOSE}
-""".strip()
-
-MAP_VL_STRING_STRING_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int itemsize = col_sizes_[table][j] / fieldlen;
-unsigned int vallen = itemsize - CYCLUS_SHA1_SIZE;
-{t.cpp} x;
-for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[2].cpp} val = {t.sub[2].cpp}(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE, vallen);
-    nullpos = val.find('\\0');
-    if (nullpos != {t.sub[2].cpp}::npos)
-        val.resize(nullpos);
-    x[VLRead<{t.sub[1].cpp}, {t.sub[1].db}>(buf + offset + itemsize*k)] = val;
-}}
-{H5TCLOSE}
-""".strip()
-
-MAP_VL_STRING_VL_STRING_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int itemsize = 2*CYCLUS_SHA1_SIZE;
-{t.cpp} x;
-for(unsigned int k = 0; k < fieldlen; ++k) {{
-    x[VLRead<{t.sub[1].cpp}, {t.sub[1].db}>(buf + offset + itemsize*k)] = VLRead<{t.sub[2].cpp}, {t.sub[2].db}>(buf + offset + itemsize*k + CYCLUS_SHA1_SIZE);
-}}
-{H5TCLOSE}
-""".strip()
-
-MAP_PAIR_INT_STRING_DOUBLE_READER = """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int itemsize = col_sizes_[table][j] / fieldlen;
-unsigned int strlen = itemsize - sizeof({t.sub[1].sub[1].cpp}) - sizeof({t.sub[2].cpp});
-{t.sub[1].cpp} key;
-{t.cpp} x;
-for (unsigned int k = 0; k < fieldlen; ++k) {{
-    {t.sub[1].sub[2].cpp} s = {t.sub[1].sub[2].cpp}(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp}), strlen);
-    nullpos = s.find('\\0');
-    if (nullpos != {t.sub[1].sub[2].cpp}::npos)
-        s.resize(nullpos);
-    key = std::make_pair(*reinterpret_cast<{t.sub[1].sub[1].cpp}*>(buf + offset + itemsize*k), s);
-    x[key] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp}) + strlen);
-}}
-{H5TCLOSE}
-""".strip()
-
-MAP_PAIR_INT_VL_STRING_DOUBLE_READER = """
-unsigned int itemsize = sizeof({t.sub[1].sub[1].cpp}) + CYCLUS_SHA1_SIZE + sizeof({t.sub[2].cpp});
-jlen = col_sizes_[table][j] / itemsize;
-{t.sub[1].cpp} key;
-{t.cpp} x;
-for (unsigned int k = 0; k < jlen; ++k) {{
-    key = std::make_pair(*reinterpret_cast<{t.sub[1].sub[1].cpp}*>(buf + offset + itemsize*k), VLRead<{t.sub[1].sub[2].cpp}, {t.sub[1].sub[2].db}>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp})));
-    x[key] = *reinterpret_cast<{t.sub[2].cpp}*>(buf + offset + itemsize*k + sizeof({t.sub[1].sub[1].cpp}) + CYCLUS_SHA1_SIZE);
-}}
-{NO_CLOSE}
-""".strip()
 
 READERS = {'INT': REINTERPRET_CAST_READER,
            'BOOL': REINTERPRET_CAST_READER,
@@ -431,75 +152,150 @@ READERS = {'INT': REINTERPRET_CAST_READER,
            'VL_STRING': VL_READER,
            'BLOB': VL_READER,
            'UUID': UUID_READER,
-           'VECTOR_INT': VECTOR_READER,
-           'VL_VECTOR_INT': VL_READER,
-           'VECTOR_DOUBLE': VECTOR_READER,
-           'VL_VECTOR_DOUBLE': VL_READER,
-           'VECTOR_FLOAT': VECTOR_READER,
-           'VL_VECTOR_FLOAT': VL_READER,
-           'VECTOR_STRING': VECTOR_STRING_READER,
-           'VECTOR_VL_STRING': VECTOR_VL_STRING_READER,
-           'VL_VECTOR_STRING': VL_READER,
-           'VL_VECTOR_VL_STRING': VL_READER,
-           'SET_INT': SET_LIST_X_READER,
-           'VL_SET_INT': VL_READER,
-           'SET_STRING': SET_STRING_READER,
-           'VL_SET_STRING': VL_READER,
-           'SET_VL_STRING': SET_VL_STRING_READER,
-           'VL_SET_VL_STRING': VL_READER,
-           'LIST_INT': SET_LIST_X_READER,
-           'VL_LIST_INT': VL_READER,
-           'LIST_STRING': LIST_STRING_READER,
-           'VL_LIST_STRING': VL_READER,
-           'VL_LIST_VL_STRING': VL_READER,
-           'LIST_VL_STRING': LIST_VL_STRING_READER,
-           'PAIR_INT_INT': PAIR_INT_INT_READER,
-           'PAIR_INT_STRING': PAIR_INT_STRING_READER,
-           'PAIR_INT_VL_STRING': PAIR_INT_VL_STRING_READER,
-           'MAP_INT_INT': MAP_XY_READER,
-           'VL_MAP_INT_INT': VL_READER,
-           'MAP_INT_DOUBLE': MAP_XY_READER,
-           'VL_MAP_INT_DOUBLE': VL_READER,
-           'MAP_INT_STRING': MAP_INT_STRING_READER,
-           'VL_MAP_INT_STRING': VL_READER,
-           'MAP_INT_VL_STRING': MAP_INT_VL_STRING_READER,
-           'VL_MAP_INT_VL_STRING': VL_READER,
-           'MAP_STRING_INT': MAP_STRING_X_READER,
-           'VL_MAP_STRING_INT': VL_READER,
-           'MAP_VL_STRING_INT': MAP_VL_STRING_X_READER,
-           'VL_MAP_VL_STRING_INT': VL_READER,
-           'MAP_STRING_DOUBLE': MAP_STRING_X_READER,
-           'VL_MAP_STRING_DOUBLE': VL_READER,
-           'MAP_STRING_STRING': MAP_STRING_STRING_READER,
-           'VL_MAP_STRING_STRING': VL_READER,
-           'MAP_STRING_VL_STRING': MAP_STRING_VL_STRING_READER,
-           'VL_MAP_STRING_VL_STRING': VL_READER,
-           'MAP_VL_STRING_DOUBLE': MAP_VL_STRING_X_READER,
-           'VL_MAP_VL_STRING_DOUBLE': VL_READER,
-           'MAP_VL_STRING_STRING': MAP_VL_STRING_STRING_READER,
-           'VL_MAP_VL_STRING_STRING': VL_READER,
-           'MAP_VL_STRING_VL_STRING': MAP_VL_STRING_VL_STRING_READER,
-           'VL_MAP_VL_STRING_VL_STRING': VL_READER,
-           'MAP_PAIR_INT_STRING_DOUBLE': MAP_PAIR_INT_STRING_DOUBLE_READER,
-           'VL_MAP_PAIR_INT_STRING_DOUBLE': VL_READER,
-           'MAP_PAIR_INT_VL_STRING_DOUBLE': MAP_PAIR_INT_VL_STRING_DOUBLE_READER,
-           'VL_MAP_PAIR_INT_VL_STRING_DOUBLE': VL_READER}
+           'VECTOR': VECTOR_READER,
+           'VL_VECTOR': VL_READER,
+           'SET': SET_READER,
+           'VL_SET': VL_READER,
+           'LIST': LIST_READER,
+           'VL_LIST': VL_READER,
+           'PAIR': PAIR_READER,
+           'MAP': MAP_READER,
+           'VL_MAP': VL_READER}
 
 QUERY_CASES = ''
 
-def main():
-    global QUERY_CASES
-    for ca in CANON_SET: 
-        current_type = TypeStr(ca)
-        reader = READERS[current_type.db]
-        ctx = {"t": current_type,
-               "NO_CLOSE": NO_CLOSE.format(t = current_type),
-               "H5TCLOSE": H5TCLOSE.format(t = current_type),
-               "H5TCLOSE_MULTI": H5TCLOSE_MULTI.format(t = current_type)}
-                  
-        QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
+#CLOSURE_STACK = []
 
-    print(textwrap.indent(QUERY_CASES, INDENT*2))
+def create_reader(a_type, depth=0):
+    current_type = a_type
+    if isinstance(current_type.canon, str):
+        reader = READERS[current_type.canon]
+        rtn = create_primitive_reader(current_type.canon, current_type, reader, depth+1)
+    else:
+        reader = READERS[current_type.canon[0]]
+        if current_type.canon[0] == "VECTOR":
+            rtn = create_vector_reader(current_type.canon, current_type, reader, depth+1)
+        if current_type.canon[0] == "SET":
+            rtn = create_set_reader(current_type.canon, current_type, reader, depth+1)
+    return rtn
+
+def create_setup(a_type):
+    if a_type.sub[1].canon[0] == "STRING":
+        return """
+hid_t field_type = H5Tget_member_type(tb_type, j);
+size_t nullpos;
+hsize_t fieldlen;
+H5Tget_array_dims2(field_type, &fieldlen);
+unsigned int strlen = col_sizes_[table][j] / fieldlen;
+""".strip()
+    elif a_type.sub[1].canon[0] == "VL_STRING":
+        return "jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;"
+    elif a_type.canon[0] == "SET":
+        return "jlen = col_sizes_[table][j] / sizeof({t.sub[1].cpp});".format(t=a_type)
+    else:
+        return ""
+
+import re
+def find_whole_word(word):
+    return re.compile(r'\b({0})\b'.format(word)).search
+
+def create_teardown(setup=""):
+    closure = NORMAL_CLOSE
+    if "hid_t" not in setup:
+        return closure + "\nbreak;"
+    else:
+        for line in setup.split("\n"):
+            if find_whole_word("hid_t")(line) != None:
+                closure += "\nH5Tclose("+line.split("=")[0].strip("hid_t").strip()+");"
+        return closure + "\nbreak;"
+                
+
+def create_read_type(a_type):
+    if a_type.db == "STRING":
+        string = STRING_READER.format(left_side="x[k]", t = a_type, teardown = "")
+        return """
+for(unsigned int k = 0; k < fieldlen; ++k) {{
+    {middle}
+}}
+""".strip().format(middle=string)
+    if a_type.db == "VL_STRING":
+        string = VL_READER.format(left_side="x[k]", t = a_type, cyclus_constant = "CYCLUS_SHA1_SIZE*k", teardown = "")
+        return """
+for(unsigned int k = 0; k < jlen; ++k) {{
+    {middle}
+}}
+""".strip().format(middle=string)
+    else:
+        return "memcpy(&x[0], buf + offset, col_sizes_[table][j]);"
+
+def create_fieldlen(a_type):
+    if a_type.sub[1].canon[0] == "STRING":
+        return "fieldlen"
+    elif a_type.sub[1].canon[0] == "VL_STRING":
+        return "jlen"
+    elif a_type.canon[0] == "SET":
+        return "xraw, xraw+jlen"
+    else:
+        return "col_sizes_[table][j] / sizeof({t.cpp})"
+
+def create_primitive_reader(t, current_type, reader, depth):
+    ctx = {"t": current_type}
+    if depth == 1:
+        ctx["*2"] = "*"
+        ctx["*1"] = ""
+        ctx["teardown"] = create_teardown()
+    else:
+        ctx["*2"] = ""
+        ctx["*1"] = "*"
+        ctx["teardown"] = ""
+    return reader.format(**ctx)
+    
+def create_vector_reader(t, current_type, reader, depth):
+    ctx = {"t": current_type}
+    if isinstance(current_type.canon[1], str):
+        ctx["setup"] = create_setup(current_type)
+        ctx["fieldlen"] = create_fieldlen(current_type).format(t=current_type)
+        ctx["read_type"] = create_read_type(current_type.sub[1])
+        if depth == 1:
+            ctx["teardown"] = create_teardown(ctx["setup"]).format(t=current_type)
+        else:
+            ctx["teardown"] = ""
+    else:
+        ctx["read_type"] = create_reader(current_type.canon[1])
+    return reader.format(**ctx)
+
+def create_set_reader(t, current_type, reader, depth):
+    ctx = {"t": current_type}
+    if isinstance(current_type.canon[1],str):
+        ctx["setup"] = create_setup(current_type)
+        ctx["sub_type"] = create_reader(current_type.sub[1], depth)
+        ctx["fieldlen"] = create_fieldlen(current_type).format(t=current_type)
+        if depth == 1:
+            ctx["teardown"] = create_teardown(ctx["setup"]).format(t=current_type)
+        else:
+            ctx["teardown"] = ""
+    else:
+        return
+    return reader.format(**ctx)
+    
+
+def main():
+    #global QUERY_CASES
+    #for ca in CANON_SET: 
+   #     current_type = TypeStr(ca)
+   #     reader = READERS[current_type.db]
+   #     ctx = {"t": current_type,
+   #            "NO_CLOSE": NO_CLOSE.format(t = current_type),
+   #            "H5TCLOSE": H5TCLOSE.format(t = current_type),
+   #            "H5TCLOSE_MULTI": H5TCLOSE_MULTI.format(t = current_type)}
+                  
+   #     QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
+
+    #print(textwrap.indent(QUERY_CASES, INDENT*2))
+    
+    s = create_reader(TypeStr(("SET","STRING")))
+    
+    print(textwrap.indent(s, INDENT)) 
     
 if __name__ == '__main__':
     main()
