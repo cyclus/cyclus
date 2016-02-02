@@ -23,15 +23,12 @@ class FacilityTests : public TestWithParam<AgentConstructor*> {
  public:
   virtual void SetUp() {
     facility_ = dynamic_cast<cyclus::Facility*>((*GetParam())(tc_.get()));
-    test_inst_ = new TestInst(tc_.get());
-    facility_->Build(test_inst_);
   }
 
   virtual void TearDown() {}
 
  protected:
   cyclus::Facility* facility_;
-  TestInst* test_inst_;
   cyclus::TestContext tc_;
 };
 
