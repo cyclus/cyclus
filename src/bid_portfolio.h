@@ -135,7 +135,6 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   Trader* bidder_;
 };
 
-
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_BID_PORTFOLIO_H_
