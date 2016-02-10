@@ -5,6 +5,7 @@ from numpy.testing import assert_array_equal
 import os
 import tables
 import numpy as np
+import sqlite3
 from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
@@ -19,7 +20,7 @@ def test_inventories_false():
     paths = [["/ExplicitInventory"], ["/ExplicitInventoryCompact"]]
     for sim, path in zip(sim_inputs, paths):
         holdsrtn = [1]  # needed because nose does not send() to test generator
-        outfile = which_outfile()
+        outfile = sqliteout
         cmd = ["cyclus", "-o", outfile, "--input-file", sim]
         yield check_cmd, cmd, '.', holdsrtn
         rtn = holdsrtn[0]
@@ -43,7 +44,7 @@ def test_inventories():
     paths = [["/ExplicitInventory"], ["/ExplicitInventoryCompact"]]
     for sim, path in zip(sim_inputs, paths):
         holdsrtn = [1]  # needed because nose does not send() to test generator
-        outfile = which_outfile()
+        outfile = sqliteout
         cmd = ["cyclus", "-o", outfile, "--input-file", sim]
         yield check_cmd, cmd, '.', holdsrtn
         rtn = holdsrtn[0]
