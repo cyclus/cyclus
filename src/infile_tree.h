@@ -139,6 +139,19 @@ inline int OptionalQuery(InfileTree* tree, std::string query,
 }
 
 template <>
+inline bool OptionalQuery(InfileTree* tree, std::string query,
+                         bool default_val) {
+  if (tree->NMatches(query) == 0) {
+    return default_val;
+  }
+
+  std::string s = tree->GetString(query);
+  boost::trim(s);
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  return s == "true" || s == "t" || s == "1";
+}
+
+template <>
 inline float OptionalQuery(InfileTree* tree, std::string query,
                            float default_val) {
   float val = default_val;

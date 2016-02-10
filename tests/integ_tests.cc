@@ -61,6 +61,10 @@ void RunSim(std::string infile, SqliteBack* back) {
 TEST(IntegTests, RunAllInfiles) {
   std::vector<std::string> infiles;
   infiles.push_back("custom_dt.xml");
+  infiles.push_back("inventory.xml");
+  infiles.push_back("inventory_compact.xml");
+  infiles.push_back("inventory_compact_false.xml");
+  infiles.push_back("inventory_false.xml");
   infiles.push_back("lotka_volterra_determ.xml");
   infiles.push_back("minimal_cycle.xml");
   infiles.push_back("null_sink.xml");

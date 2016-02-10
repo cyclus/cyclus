@@ -417,6 +417,9 @@ void XMLFileLoader::LoadControlParams() {
 
   SimInfo si(dur, y0, m0, handle, d);
 
+  si.explicit_inventory = OptionalQuery<bool>(qe, "explicit_inventory", false);
+  si.explicit_inventory_compact = OptionalQuery<bool>(qe, "explicit_inventory_compact", false);
+
   // get time step duration
   si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
 

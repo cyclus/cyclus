@@ -10,6 +10,7 @@
 #include "material.h"
 #include "infile_tree.h"
 #include "time_listener.h"
+#include "comp_math.h"
 
 class SimInitTest;
 
@@ -83,6 +84,9 @@ class Timer {
   /// sends the tock signal to all of the agents receiving time
   /// notifications.
   void DoTock();
+
+  void RecordInventories(Agent* a);
+  void RecordInventory(Agent* a, std::string name, Material::Ptr m);
 
   /// decommissions all agents queued for the current timestep.
   void DoDecom();
