@@ -4,8 +4,111 @@ import os
 import json
 import textwrap
 from ast import literal_eval
+from pprint import pformat
 
+class Node(object):
+    fields = ()
+    
+    def __init__(self, **kwargs):
+        seen = set()
+        for field, value in kwargs.items():
+            if field not in self.fields:
+                raise RuntimeError
+            setattr(self, field, value)
+            seen.add(field)
+        for field in self.fields:
+            if field not in seen:
+                setattr(self, field, None)           
 
+class Var(Node):
+    fields = ("name",)
+    
+class Type(Node):
+    fields = ("cpp", "db", "canon")
+
+class Decl(Node):
+    fields = ("type", "name")
+    
+class Expr(Node):
+    fields = ("value",)
+
+class Assign(Node):
+    fields = ("target", "value")
+    
+class If(Node):
+    fields = ("cond", "body", "elifs", "else")
+    
+class For(Node):
+    fields = ("var", "start", "end", "body")
+    
+class BinOp(Node):
+    fields = ("x", "op", "y")
+
+class LeftUnaryOp(Node):
+    fields = ("op", "x")
+
+class RightUnaryOp(Node):
+    fields = ("x", "op")
+
+class FuncCall(Node):
+    #targs means template args
+    fields = ("name", "args", "targs") 
+    
+class Raw(Node):
+    #for cheating and literals
+    fields = ("code",)
+
+_lowername = lambda cls: cls.__name__.lower()
+
+class Visitor(object):
+    """Super-class for all classes that should walk over a tree of nodes.
+    This implements the visit() method.
+    """
+
+    def __init__(self, tree=None):
+        self.tree = tree
+
+    def visit(self, node=None):
+        """Walks over a node.  If no node is provided, the tree is used."""
+        if node is None:
+            node = self.tree
+        if node is None:
+            raise RuntimeError('no node or tree given!')
+        for clsname in map(_lowername, type.mro(node.__class__)):
+            meth = getattr(self, 'visit_' + clsname, None)
+            if callable(meth):
+                rtn = meth(node)
+                break
+        else:
+            msg = 'could not find valid visitor method for {0} on {1}'
+            nodename = node.__class__.__name__ 
+            selfname = self.__class__.__name__
+            raise AttributeError(msg.format(nodename, selfname))
+        return rtn
+
+class PrettyFormatter(Visitor):
+    """Formats a tree of nodes into a pretty string"""
+
+    def __init__(self, tree=None, indent=' '):
+        super().__init__(tree=tree)
+        self.level = 0
+        self.indent = indent
+
+    def visit_node(self, node):
+        s = node.__class__.__name__ + '('
+        if len(node.fields) == 0:
+            return s + ')'
+        s += '\n'
+        self.level += 1
+        t = []
+        for field in node.fields:
+            a = getattr(node, field)
+            t.append(self.visit(a) if isinstance(a, Node) else pformat(a))
+        t = ['{0}={1}'.format(n, x) for n, x in zip(node.fields, t)]
+        s += textwrap.indent(',\n'.join(t), self.indent)
+        self.level -= 1
+        s += '\n)'
+        return s
 
 
 
