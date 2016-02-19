@@ -19,7 +19,10 @@ class Node(object):
         for field in self.fields:
             if field not in seen:
                 setattr(self, field, None)           
-
+    
+    def __str__(self):
+        return PrettyFormatter(self).visit()
+    
 class Var(Node):
     fields = ("name",)
     
@@ -36,7 +39,7 @@ class Assign(Node):
     fields = ("target", "value")
     
 class If(Node):
-    fields = ("cond", "body", "elifs", "else")
+    fields = ("cond", "body", "elifs", "el")
     
 class For(Node):
     fields = ("var", "start", "end", "body")
@@ -45,10 +48,10 @@ class BinOp(Node):
     fields = ("x", "op", "y")
 
 class LeftUnaryOp(Node):
-    fields = ("op", "x")
+    fields = ("op", "name")
 
 class RightUnaryOp(Node):
-    fields = ("x", "op")
+    fields = ("name", "op")
 
 class FuncCall(Node):
     #targs means template args
@@ -83,7 +86,13 @@ class Visitor(object):
             msg = 'could not find valid visitor method for {0} on {1}'
             nodename = node.__class__.__name__ 
             selfname = self.__class__.__name__
-            raise AttributeError(msg.format(nodename, selfname))
+            msg = msg.format(nodename, selfname)
+            try:
+                msg += "\n"
+                msg += str(node)
+            except Exception:
+                pass    
+            raise AttributeError(msg)
         return rtn
 
 class PrettyFormatter(Visitor):
@@ -110,7 +119,80 @@ class PrettyFormatter(Visitor):
         s += '\n)'
         return s
 
+class CppGen(Visitor):
+    def __init__(self, tree=None, indent='  '):
+        super().__init__(tree=tree)
+        self.level = 0
+        self.indent = indent
+        
+    def visit_var(self, node):
+        return node.name
+    
+    def visit_type(self, node):
+        return node.cpp
+        
+    def visit_decl(self, node):
+        s = self.visit(node.type)
+        s += " "
+        s += self.visit(node.name)
+        s += ";"
+        return s
+    
+    def visit_assign(self, node):
+        s = self.visit(node.target)
+        s += " = "
+        s += self.visit(node.value)
+        s += ";"
+        return s
+        
+    def visit_binop(self, node):
+        s = self.visit(node.x)
+        s += " "
+        s += node.op
+        s += " "
+        s += self.visit(node.y)
+        return s
+        
+    def visit_leftunaryop(self, node):
+        s = node.op
+        s += self.visit(node.name)
+        return s
+        
+    def visit_rightunaryop(self, node):
+        s = self.visit(node.name)
+        s += node.op
+        return s
+        
+    def visit_raw(self, node):
+        s = node.code
+        return s
+        
+    def visit_if(self, node):
+        s = "if("
+        s += self.visit(node.cond)
+        s += "){\n"
+        for n in node.body:
+            s += textwrap.indent(self.visit(n), self.indent)
+        s += "\n}"
+        for cond, body in node.elifs:
+            s += "else if("
+            s += self.visit(cond)
+            s += "){\n"
+            for n in body:
+                s += textwrap.indent(self.visit(n), self.indent)
+            s += "\n}"  
+        s += "else{\n"
+        s += textwrap.indent(self.visit(node.el), self.indent)
+        s += "\n}"
+        return s
+        
+    def visit_for(self, node):
+        return s
+        
+    def visit_funccall(self, node):
+        return s
 
+    
 
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
     RAW_TABLE = json.load(f)
