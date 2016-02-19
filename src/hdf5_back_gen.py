@@ -5,6 +5,10 @@ import json
 import textwrap
 from ast import literal_eval
 
+
+
+
+
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
     RAW_TABLE = json.load(f)
 
@@ -122,15 +126,15 @@ memcpy(&x, buf+offset, 16);
 
 VECTOR_READER = """
 {setup}
-{t.cpp} x = {t.cpp}({fieldlen});
-{read_type}
+{t.cpp} x;
+{body}
 {teardown}
 """.strip()
 
 SET_READER = """
 {setup}
-{sub_type}
-{t.cpp} x = {t.cpp}({fieldlen});
+{t.cpp} x;
+{body}
 {teardown}
 """.strip()
 
@@ -138,11 +142,13 @@ LIST_READER = """
 """.strip()
 
 PAIR_READER = """
+{setup1}
+{setup2}
+
 """.strip()
 
 MAP_READER = """
 """.strip()
-
 
 READERS = {'INT': REINTERPRET_CAST_READER,
            'BOOL': REINTERPRET_CAST_READER,
@@ -162,6 +168,43 @@ READERS = {'INT': REINTERPRET_CAST_READER,
            'MAP': MAP_READER,
            'VL_MAP': VL_READER}
 
+DEF_BODY = "x = {t.cpp}(xraw, xraw+jlen);"
+
+MEMCPY_BODY = """
+x = {t.cpp}({col_size} / {fieldlen});
+memcpy(&x[0], buf + offset, {col_size});
+""".strip()
+
+ELEMENTWISE_BODY = """
+for (unsigned int k = 0; k < {fieldlen}; ++k) {{
+    {decl_k};
+    {def_k} = {t.cpp}(buf + offset + strlen*k, strlen);
+    nullpos = {def_k}.find('\\0');
+    if (nullpos != {t.cpp}::npos)
+        {def_k}.resize(nullpos);
+    {apply}
+}}
+""".strip()
+
+VL_BODY = """
+jlen = {col_size} / CYCLUS_SHA1_SIZE;
+x = {t.cpp}(jlen);
+x[k] = VLRead<{t.sub[1].cpp}, {t.sub[1].db}>(buf + offset + CYCLUS_SHA1_SIZE*k);
+""".strip()
+
+TEMPLATE_BODY = """
+for (unsigned int k = 0; k < {fieldlen} ++k) {
+    {sub_body}
+}
+""".strip()
+
+BODIES = {'INT': DEF_BODY,
+          'DOUBLE': MEMCPY_BODY,
+          'STRING': ELEMENTWISE_BODY,
+          'VL_STRING': VL_BODY,
+          'VECTOR': TEMPLATE_BODY,
+          'SET': TEMPLATE_BODY}
+
 QUERY_CASES = ''
 
 #CLOSURE_STACK = []
@@ -176,30 +219,67 @@ def create_reader(a_type, depth=0):
         if current_type.canon[0] == "VECTOR":
             rtn = create_vector_reader(current_type.canon, current_type, reader, depth+1)
         if current_type.canon[0] == "SET":
-            rtn = create_set_reader(current_type.canon, current_type, reader, depth+1)
-    return rtn
+            rtn = create_set_reader(current_type.canon, current_type, reader, depth)
+    
+    ctx = {"t": a_type,
+           "setup": rtn[0],
+           "body": rtn[1],
+           "teardown": rtn[2],
+           "fieldlen": create_fieldlen(a_type).format(t = a_type.sub[1])}
+    
+    return reader.format(**ctx)
 
-def create_setup(a_type):
-    if a_type.sub[1].canon[0] == "STRING":
-        return """
+def create_setup(a_type, depth):
+    #we know how to do setup explicitly if it's a primitive type
+    if isinstance(a_type.canon, str):
+        if a_type.db == "STRING":
+            return """
 hid_t field_type = H5Tget_member_type(tb_type, j);
 size_t nullpos;
 hsize_t fieldlen;
 H5Tget_array_dims2(field_type, &fieldlen);
 unsigned int strlen = col_sizes_[table][j] / fieldlen;
 """.strip()
-    elif a_type.sub[1].canon[0] == "VL_STRING":
-        return "jlen = col_sizes_[table][j] / CYCLUS_SHA1_SIZE;"
-    elif a_type.canon[0] == "SET":
-        return "jlen = col_sizes_[table][j] / sizeof({t.sub[1].cpp});".format(t=a_type)
+        else:
+            return """
+jlen = col_sizes_[table][j] / {fieldlen};
+{t.cpp}* xraw = reinterpret_cast<{t.cpp}*>(buf + offset);
+""".strip().format(t = a_type, fieldlen = create_fieldlen(a_type).format(t = a_type))    
+    #however, if the type is a dependent type, there's no explicit way
     else:
-        return ""
+        #recurse!
+        return create_setup(a_type.sub[1], depth+1)
 
+def create_body(a_type, depth):
+    body = ""
+    if isinstance(a_type.sub[1].canon, str):
+        ctx = create_body_ctx(a_type, depth)
+        body = BODIES[a_type.sub[1].canon].format(**ctx)
+    else:
+        body = BODIES[a_type.canon[0]]
+        #recurse!
+        body = body.format(t = a_type, fieldlen = create_fieldlen(a_type), col_size = "col_sizes_[table][j]", sub_body = create_body(a_type.sub[1], depth+1))
+    return body
+
+def create_body_ctx(a_type, depth):
+    ctx = {"t": a_type,
+           "fieldlen": create_fieldlen(a_type.sub[1]),
+           "col_size": "col_sizes_[table][j]"}
+    if a_type.canon[0] == "SET":
+        ctx["decl_k"] = "{t.sub[1].cpp} x_k;".format(t=a_type)
+        ctx["def_k"] = "x_k"
+        ctx["apply"] = "x.insert(x_k);"
+    elif a_type.canon[0] == "VECTOR":        
+        ctx["decl_k"] = ""
+        ctx["def_k"] = "x[k]"
+        ctx["apply"] = ""
+    return ctx
+#helper method for create_teardown
 import re
 def find_whole_word(word):
     return re.compile(r'\b({0})\b'.format(word)).search
 
-def create_teardown(setup=""):
+def create_teardown(a_type, setup=""):
     closure = NORMAL_CLOSE
     if "hid_t" not in setup:
         return closure + "\nbreak;"
@@ -207,36 +287,15 @@ def create_teardown(setup=""):
         for line in setup.split("\n"):
             if find_whole_word("hid_t")(line) != None:
                 closure += "\nH5Tclose("+line.split("=")[0].strip("hid_t").strip()+");"
-        return closure + "\nbreak;"
-                
-
-def create_read_type(a_type):
-    if a_type.db == "STRING":
-        string = STRING_READER.format(left_side="x[k]", t = a_type, teardown = "")
-        return """
-for(unsigned int k = 0; k < fieldlen; ++k) {{
-    {middle}
-}}
-""".strip().format(middle=string)
-    if a_type.db == "VL_STRING":
-        string = VL_READER.format(left_side="x[k]", t = a_type, cyclus_constant = "CYCLUS_SHA1_SIZE*k", teardown = "")
-        return """
-for(unsigned int k = 0; k < jlen; ++k) {{
-    {middle}
-}}
-""".strip().format(middle=string)
-    else:
-        return "memcpy(&x[0], buf + offset, col_sizes_[table][j]);"
+        return (closure + "\nbreak;").format(t = a_type)
 
 def create_fieldlen(a_type):
-    if a_type.sub[1].canon[0] == "STRING":
+    if a_type.db == "STRING":
         return "fieldlen"
-    elif a_type.sub[1].canon[0] == "VL_STRING":
-        return "jlen"
-    elif a_type.canon[0] == "SET":
-        return "xraw, xraw+jlen"
+    elif a_type.db == "VL_STRING":
+        return "CYCLUS_SHA1_SIZE"
     else:
-        return "col_sizes_[table][j] / sizeof({t.cpp})"
+        return "sizeof({t.cpp})"
 
 def create_primitive_reader(t, current_type, reader, depth):
     ctx = {"t": current_type}
@@ -253,7 +312,7 @@ def create_primitive_reader(t, current_type, reader, depth):
 def create_vector_reader(t, current_type, reader, depth):
     ctx = {"t": current_type}
     if isinstance(current_type.canon[1], str):
-        ctx["setup"] = create_setup(current_type)
+        ctx["setup"] = create_setup(current_type, depth)
         ctx["fieldlen"] = create_fieldlen(current_type).format(t=current_type)
         ctx["read_type"] = create_read_type(current_type.sub[1])
         if depth == 1:
@@ -265,20 +324,35 @@ def create_vector_reader(t, current_type, reader, depth):
     return reader.format(**ctx)
 
 def create_set_reader(t, current_type, reader, depth):
-    ctx = {"t": current_type}
-    if isinstance(current_type.canon[1],str):
-        ctx["setup"] = create_setup(current_type)
-        ctx["sub_type"] = create_reader(current_type.sub[1], depth)
-        ctx["fieldlen"] = create_fieldlen(current_type).format(t=current_type)
-        if depth == 1:
-            ctx["teardown"] = create_teardown(ctx["setup"]).format(t=current_type)
-        else:
-            ctx["teardown"] = ""
-    else:
-        return
-    return reader.format(**ctx)
+    pieces = []
     
-
+    ctx = {"t": current_type, "fieldlen": create_fieldlen(current_type.sub[1]), "col_size": "col_sizes_[table][j]"}
+    
+    setup = create_setup(current_type.sub[1], depth)
+    pieces.append(setup)
+    
+    body = create_body(current_type, depth)
+    pieces.append(body)
+    
+    teardown = create_teardown(current_type, setup)
+    pieces.append(teardown)
+    
+    #pieces = [p.format(**ctx) for p in pieces]
+    
+    return tuple(pieces)
+    
+def create_list_reader(t, current_type, reader, depth):
+    return
+def create_pair_reader(t, current_type, reader, depth):
+    ctx = {"t": current_type}
+    ctx["setup1"] = create_setup(current_type.sub[1], depth)
+    ctx["setup2"] = create_setup(current_type.sub[2], depth)
+    
+    
+    return reader.format(**ctx)
+def create_map_reader(t, current_type, reader, depth):
+    return
+    
 def main():
     #global QUERY_CASES
     #for ca in CANON_SET: 
@@ -293,7 +367,7 @@ def main():
 
     #print(textwrap.indent(QUERY_CASES, INDENT*2))
     
-    s = create_reader(TypeStr(("SET","STRING")))
+    s = create_reader(TypeStr(("VECTOR","STRING")))
     
     print(textwrap.indent(s, INDENT)) 
     
