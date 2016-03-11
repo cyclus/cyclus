@@ -22,7 +22,10 @@ class Node(object):
     
     def __str__(self):
         return PrettyFormatter(self).visit()
-    
+
+class Block(Node):
+    fields = ("nodes",)
+
 class Var(Node):
     fields = ("name",)
     
@@ -35,14 +38,24 @@ class Decl(Node):
 class Expr(Node):
     fields = ("value",)
 
+class ExprStmt(Node):
+    fields = ("child",)
+
 class Assign(Node):
     fields = ("target", "value")
+
+class DeclAssign(Node):
+    fields = ("type", "target", "value")
+
+class Case(Node):
+    fields = ("cond", "body")
     
 class If(Node):
     fields = ("cond", "body", "elifs", "el")
-    
+
+#how to allow ';' as decl    
 class For(Node):
-    fields = ("var", "start", "end", "body")
+    fields = ("adecl", "cond", "incr", "body")
     
 class BinOp(Node):
     fields = ("x", "op", "y")
@@ -138,18 +151,32 @@ class CppGen(Visitor):
         s += ";"
         return s
     
+    def visit_exprstmt(self, node):
+        s = self.visit(node.child)
+        s += ";\n"
+        return s
+    
     def visit_assign(self, node):
         s = self.visit(node.target)
         s += " = "
         s += self.visit(node.value)
         s += ";"
         return s
-        
+    
+    def visit_declassign(self, node):
+        s = self.visit(node.type)
+        s += " "
+        s += self.visit(node.target)
+        s += "="
+        s += self.visit(node.value)
+        s += ";"
+        return s
+    
     def visit_binop(self, node):
         s = self.visit(node.x)
-        s += " "
+        #s += " "
         s += node.op
-        s += " "
+        #s += " "
         s += self.visit(node.y)
         return s
         
@@ -166,6 +193,15 @@ class CppGen(Visitor):
     def visit_raw(self, node):
         s = node.code
         return s
+    
+    def visit_case(self, node):
+        s = "case "
+        s += self.visit(node.cond)
+        s += ": {\n"
+        for n in node.body:
+            s += textwrap.indent(self.visit(n), self.indent)
+        s += "}\n"
+        return s
         
     def visit_if(self, node):
         s = "if("
@@ -174,25 +210,57 @@ class CppGen(Visitor):
         for n in node.body:
             s += textwrap.indent(self.visit(n), self.indent)
         s += "\n}"
-        for cond, body in node.elifs:
-            s += "else if("
-            s += self.visit(cond)
-            s += "){\n"
-            for n in body:
-                s += textwrap.indent(self.visit(n), self.indent)
-            s += "\n}"  
-        s += "else{\n"
-        s += textwrap.indent(self.visit(node.el), self.indent)
-        s += "\n}"
+        #check if elifs is an empty list
+        if node.elifs:
+            for cond, body in node.elifs:
+                s += "else if("
+                s += self.visit(cond)
+                s += "){\n"
+                for n in body:
+                    b = ""
+                    b += self.visit(n)
+                    s += textwrap.indent(b, self.indent)
+                s += "\n}"  
+        #check if else attribute exists
+        if node.el is not None:
+            s += "else{\n"
+            s += textwrap.indent(self.visit(node.el), self.indent)
+            s += "\n}"
         return s
         
     def visit_for(self, node):
+        s = "for("
+        if node.adecl is not None:
+            s += self.visit(node.adecl)
+        else:
+            s += ";" 
+        s += self.visit(node.cond)
+        s += ";"
+        s += self.visit(node.incr)
+        s += "){\n"
+        for n in node.body:
+            s += textwrap.indent(self.visit(n), self.indent)
+        s += "\n}"
         return s
         
     def visit_funccall(self, node):
+        s = self.visit(node.name)
+        if node.targs is not None:
+            s += "<"
+            for i in range(0, len(node.targs)):
+                #print(node.targs[i])
+                #print(self.visit(node.targs[i]))
+                s += self.visit(node.targs[i])
+                if i < (len(node.targs)-1):
+                    s += ","
+            s += ">"
+        s += "("
+        for i in range(0, len(node.args)):
+            s += self.visit(node.args[i])
+            if i < (len(node.args)-1):
+                s += ","
+        s += ")"
         return s
-
-    
 
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
     RAW_TABLE = json.load(f)
@@ -273,35 +341,92 @@ class TypeStr(object):
             self.sub = [self]
         else:
             self.sub = [self] + [TypeStr(u) for u in list_dependencies(self.canon)[1:]]
-NORMAL_CLOSE = """
-is_row_selected = CmpConds<{t.cpp}>>(&x, &(field_conds[qr.fields[j]]));
-if(is_row_selected)
-    row[j] = x;
-""".strip()
 
-CASE_TEMPLATE = """
-case {t.db}: {{
-{read_x}
-    break;
-}}"""
+def normal_close(t):
+    """
+    is_row_selected = CmpConds<{t.cpp}>>(&x, &(field_conds[qr.fields[j]]));
+    if(is_row_selected)
+        row[j] = x;
+    """
+    tree = Block(nodes=[
+        Assign(target=Var(name="is_row_selected"),
+               value=FuncCall(name=Var(name="CmpConds"), targs=[t],
+                              args=[Raw(code="&x"),
+                                    Raw(code="&(field_conds[qr.fields[j]]))")])),
+        If(cond=Var(name="is_row_selected"),
+           body=[Assign(target=Var(name="row[j]"), value=Var(name="x"))])])
+    return tree
 
-REINTERPRET_CAST_READER = """
-{t.cpp}{*1} xraw = {*2}reinterpret_cast<{t.cpp}*>(buf+offset);
-{teardown}
-""".strip()
+def case_template(t, read_x):
+    """
+    case {t.db}: {
+        {read_x}
+        break;
+    }
+    """
+    if isinstance(read_x, Block):
+        body = read_x.nodes
+    else:
+        body = read_x
+    body += [ExprStmt(child=Var(name="break"))]
+    tree = Case(cond=Var(name=t.db), body=body)
+    return tree
 
-STRING_READER = """
-{left_side} = {t.cpp}(buf + offset, col_sizes_[table][j]);
-size_t nullpos = {left_side}.find('\\0');
-if (nullpos != {t.cpp}::npos)
-    {left_side}.resize(nullpos);
-{teardown}
-""".strip()
+def reinterpret_cast_reader(t):
+    """
+    {t.cpp} x = *reinterpret_cast<{t.cpp}*>(buf+offset);
+    {teardown}
+    """
+    tree = Block(nodes=[
+                 DeclAssign(type=t, target=Var(name="x"), 
+                            value=FuncCall(name=Var(name="reinterpret_cast"),
+                            targs=[t], args=[Raw(code="buf+offset")])),
+                 create_teardown(t)])
+    return tree
+    
+#REINTERPRET_CAST_READER = """
+#{t.cpp}{*1} xraw = {*2}reinterpret_cast<{t.cpp}*>(buf+offset);
+#{teardown}
+#""".strip()
 
-VL_READER = """
-{left_side} x = VLRead<{t.cpp}, {t.db}>(buf + offset {cyclus_constant});
-{teardown}
-""".strip()
+def string_reader(t):
+    """
+    {left_side} = {t.cpp}(buf + offset, col_sizes_[table][j]);
+    size_t nullpos = {left_side}.find('\\0');
+    if (nullpos != {t.cpp}::npos)
+        {left_side}.resize(nullpos);
+    {teardown}
+    """
+    tree = Block(nodes=[
+                 DeclAssign(type=t, target=Var(name="x"), 
+                            value=FuncCall(name=t.cpp,
+                                    args=[Raw(code="buf+offset"),
+                                          Raw(code="col_sizes_[table][j]")])),
+                 DeclAssign(type=Raw(code="size_t"), 
+                            target=Var(name="nullpos"),
+                            value=BinOp(x=Var(name="x"), op=".", 
+                                        y=FuncCall(name=Raw(code="find"),
+                                                   args=[Raw(code="'\\0'")]))),
+                 If(cond=BinOp(x=Var(name="nullpos"), op="!=",
+                               y=BinOp(x=t.cpp, op="::", y=Raw(code="npos"))), 
+                    body=[BinOp(x=Var(name="x"), op=".", 
+                                y=FuncCall(name=Raw(code="resize"),
+                                           args=[Raw(code="nullpos")]))]),
+                 create_teardown(t)])
+    return tree      
+
+def vl_string_reader(t):
+    """
+    {left_side} x = VLRead<{t.cpp}, {t.db}>(buf + offset {cyclus_constant});
+    {teardown}
+    """
+    tree = Block(nodes=[
+                 DeclAssign(type=t, target=Var(name="x"), 
+                            value=FuncCall(name=Raw(code="VLRead"),
+                               args=[Raw(code="buf+offset+CYCLUS_SHA1_SIZE")],
+                               targs=[t])),
+                 create_teardown(t)])
+    return tree
 
 UUID_READER = """
 {t.cpp} x;
@@ -410,7 +535,7 @@ def create_reader(a_type, depth=0):
            "setup": rtn[0],
            "body": rtn[1],
            "teardown": rtn[2],
-           "fieldlen": create_fieldlen(a_type).format(t = a_type.sub[1])}
+           "fieldlen": create_fieldlen(a_type).format(t=a_type.sub[1])}
     
     return reader.format(**ctx)
 

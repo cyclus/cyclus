@@ -9,7 +9,7 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, PrettyFormatter, CppGen
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -61,7 +61,7 @@ def test_cppgen_assign():
     assert_equal(exp, obs)  
     
 def test_cppgen_binop():
-    exp = "x + y"
+    exp = "x+y"
     n = BinOp(x=Var(name="x"), op="+", y=Var(name="y"))
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
@@ -80,9 +80,9 @@ def test_cppgen_rightunaryop():
 
 def test_cppgen_if():
     exp = """
-if(x == y){
+if(x==y){
   x = 1;
-}else if(x > y){
+}else if(x>y){
   x = 2;
 }else{
   x = 3;
@@ -94,10 +94,40 @@ if(x == y){
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
     
+def test_cppgen_for():
+    exp = """
+for(int i=0;i<5;i++){
+  a++;
+  b++;
+  c[i] = a+b;
+}""".strip()
+    n = For(adecl=DeclAssign(type=Type(cpp="int"), target=Var(name="i"), value=Raw(code="0")),\
+            cond=BinOp(x=Var(name="i"), op="<", y=Raw(code="5")),\
+            incr=RightUnaryOp(name=Var(name="i"), op="++"),\
+            body=[ExprStmt(child=RightUnaryOp(name=Var(name="a"), op="++")),
+                  ExprStmt(child=RightUnaryOp(name=Var(name="b"), op="++")),
+                  Assign(target=RightUnaryOp(name=Var(name="c"), op="[i]"),
+                         value=BinOp(x=Var(name="a"), op="+", y=Var(name="b")))])
+    obs = CPPGEN.visit(n)
+    assert_equal(exp, obs)
+
+def test_cppgen_funccall():
+    exp = """
+mult_two<std::string,STRING>(a,b)""".strip()
+    n = FuncCall(name=Var(name="mult_two"),\
+                 args=[Var(name="a"), Var(name="b")],\
+                 targs=[Type(cpp="std::string"), Var(name="STRING")])
+    obs = CPPGEN.visit(n)
+    assert_equal(exp, obs)
     
-    
-    
-    
+def test_cppgen_case():
+    exp = """
+case 3:
+  b++;
+  break;""".strip()
+    n = Case(cond=Raw(code="3"), 
+             body=[ExprStmt(child=RightUnaryOp(name=Var(name="b"), op="++")),
+                   Raw(code="break;")])
     
     
     
