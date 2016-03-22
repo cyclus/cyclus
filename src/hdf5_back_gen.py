@@ -15,7 +15,29 @@ for row in range(0, len(RAW_TABLE)):
         TABLE_START = row
         break
 
+def resolve_unicode(item):
+    if isinstance(item, str):
+        item.encode('utf-8')	
+        return item
+    elif isinstance(item, tuple):
+        return tuple([resolve_unicode(i) for i in item])
+    elif isinstance(item, list):
+        return [resolve_unicode(i) for i in item]
+    else: 
+        print("Reading in ", type(item))
+        try:
+            item.encode('utf-8')
+            return item
+        except Exception:
+            print('could not encode ',type(item))
+        return item
+
 V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
+#for row in V3_TABLE:
+#    row_as_list = list(row)    
+#    for col in range(0, len(row_as_list)):     
+#        row_as_list[col] = resolve_unicode(row_as_list[col])
+#    row = tuple(row_as_list)
 
 CANON_SET = set()
 DB_TO_CPP = {}
@@ -23,14 +45,19 @@ CANON_TO_DB = {}
 INDENT = '    '
 
 def convert_canonical(raw_list):
-    if isinstance(raw_list, str):
+    if type(raw_list) is str:
         return raw_list
     return tuple(convert_canonical(x) for x in raw_list)
 
 for row in V3_TABLE:
     if row[6] == 1 and row[4] == "HDF5":
+        print(row[1])
+        print(row[7])
+        print(type(row[7]))        
+        print(convert_canonical(row[7]))	
         CANON_SET.add(convert_canonical(row[7]))
         DB_TO_CPP[row[1]] = row[2]
+        #print(row[7])
         CANON_TO_DB[convert_canonical(row[7])] = row[1]
 
 def list_dependencies(canon):
@@ -488,7 +515,8 @@ READERS = {'INT': REINTERPRET_CAST_READER,
 QUERY_CASES = ''
 
 def main():
-    global QUERY_CASES
+    global QUERY_CASES    
+      
     for ca in CANON_SET: 
         current_type = TypeStr(ca)
         reader = READERS[current_type.db]
@@ -497,7 +525,7 @@ def main():
                "H5TCLOSE": H5TCLOSE.format(t = current_type),
                "H5TCLOSE_MULTI": H5TCLOSE_MULTI.format(t = current_type)}
                   
-        QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
+        QUERY_CASES += CASE_TEMPLATE.format(t=current_type, read_x=textwrap.indent(reader.format(**ctx), INDENT))
 
     print(textwrap.indent(QUERY_CASES, INDENT*2))
     
