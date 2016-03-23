@@ -1,12 +1,27 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 """This module generates HDF5 backend code found in src/hdf5_back.cc"""
 import os
 import json
-import textwrap
 from ast import literal_eval
 
+def resolve_unicode(item):
+    if isinstance(item, str):
+        return item.encode('utf-8')	
+    elif isinstance(item, tuple):
+        return tuple([resolve_unicode(i) for i in item])
+    elif isinstance(item, list):
+        return [resolve_unicode(i) for i in item]
+    else: 
+        #print("Reading in ", type(item))
+        try:
+            return item.encode('utf-8')
+        except Exception:
+            #print('could not encode ',type(item))
+            pass
+        return item
+
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
-    RAW_TABLE = json.load(f)
+    RAW_TABLE = resolve_unicode(json.load(f))
 
 TABLE_START = 0
 for row in range(0, len(RAW_TABLE)):
@@ -15,29 +30,12 @@ for row in range(0, len(RAW_TABLE)):
         TABLE_START = row
         break
 
-def resolve_unicode(item):
-    if isinstance(item, str):
-        item.encode('utf-8')	
-        return item
-    elif isinstance(item, tuple):
-        return tuple([resolve_unicode(i) for i in item])
-    elif isinstance(item, list):
-        return [resolve_unicode(i) for i in item]
-    else: 
-        print("Reading in ", type(item))
-        try:
-            item.encode('utf-8')
-            return item
-        except Exception:
-            print('could not encode ',type(item))
-        return item
-
 V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
-#for row in V3_TABLE:
-#    row_as_list = list(row)    
+#for row in range(0, len(V3_TABLE)):
+#    row_as_list = list(V3_TABLE[row])    
 #    for col in range(0, len(row_as_list)):     
 #        row_as_list[col] = resolve_unicode(row_as_list[col])
-#    row = tuple(row_as_list)
+#    V3_TABLE[row] = tuple(row_as_list)
 
 CANON_SET = set()
 DB_TO_CPP = {}
@@ -51,13 +49,9 @@ def convert_canonical(raw_list):
 
 for row in V3_TABLE:
     if row[6] == 1 and row[4] == "HDF5":
-        print(row[1])
-        print(row[7])
-        print(type(row[7]))        
-        print(convert_canonical(row[7]))	
+        print(row)        
         CANON_SET.add(convert_canonical(row[7]))
         DB_TO_CPP[row[1]] = row[2]
-        #print(row[7])
         CANON_TO_DB[convert_canonical(row[7])] = row[1]
 
 def list_dependencies(canon):
@@ -514,9 +508,24 @@ READERS = {'INT': REINTERPRET_CAST_READER,
 
 QUERY_CASES = ''
 
+def indent(text, prefix, predicate=None):
+    """Adds 'prefix' to the beginning of selected lines in 'text'.
+    If 'predicate' is provided, 'prefix' will only be added to the lines
+    where 'predicate(line)' is True. If 'predicate' is not provided,
+    it will default to adding 'prefix' to all non-empty lines that do not
+    consist solely of whitespace characters.
+    """
+    if predicate is None:
+        def predicate(line):
+            return line.strip()
+
+    def prefixed_lines():
+        for line in text.splitlines(True):
+            yield (prefix + line if predicate(line) else line)
+    return ''.join(prefixed_lines())
+
 def main():
-    global QUERY_CASES    
-      
+    global QUERY_CASES
     for ca in CANON_SET: 
         current_type = TypeStr(ca)
         reader = READERS[current_type.db]
@@ -525,9 +534,9 @@ def main():
                "H5TCLOSE": H5TCLOSE.format(t = current_type),
                "H5TCLOSE_MULTI": H5TCLOSE_MULTI.format(t = current_type)}
                   
-        QUERY_CASES += CASE_TEMPLATE.format(t=current_type, read_x=textwrap.indent(reader.format(**ctx), INDENT))
+        QUERY_CASES += CASE_TEMPLATE.format(t=current_type, read_x=indent(reader.format(**ctx), INDENT))
 
-    print(textwrap.indent(QUERY_CASES, INDENT*2))
+    print(indent(QUERY_CASES, INDENT))
     
 if __name__ == '__main__':
     main()
