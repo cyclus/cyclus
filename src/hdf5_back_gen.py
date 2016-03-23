@@ -4,19 +4,20 @@ import os
 import json
 from ast import literal_eval
 
-def resolve_unicode(item):
+def resolve_unicode(item):	   
+    #Python3, if we can handle it, don't bother.    
     if isinstance(item, str):
-        return item.encode('utf-8')	
+        return item        
+    #We must check every element in tuples and lists.    
     elif isinstance(item, tuple):
         return tuple([resolve_unicode(i) for i in item])
     elif isinstance(item, list):
         return [resolve_unicode(i) for i in item]
+    #Not a string, either unicode (Python2.7) or an int.    
     else: 
-        #print("Reading in ", type(item))
         try:
             return item.encode('utf-8')
         except Exception:
-            #print('could not encode ',type(item))
             pass
         return item
 
@@ -31,11 +32,6 @@ for row in range(0, len(RAW_TABLE)):
         break
 
 V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
-#for row in range(0, len(V3_TABLE)):
-#    row_as_list = list(V3_TABLE[row])    
-#    for col in range(0, len(row_as_list)):     
-#        row_as_list[col] = resolve_unicode(row_as_list[col])
-#    V3_TABLE[row] = tuple(row_as_list)
 
 CANON_SET = set()
 DB_TO_CPP = {}
@@ -48,8 +44,7 @@ def convert_canonical(raw_list):
     return tuple(convert_canonical(x) for x in raw_list)
 
 for row in V3_TABLE:
-    if row[6] == 1 and row[4] == "HDF5":
-        print(row)        
+    if row[6] == 1 and row[4] == "HDF5":        
         CANON_SET.add(convert_canonical(row[7]))
         DB_TO_CPP[row[1]] = row[2]
         CANON_TO_DB[convert_canonical(row[7])] = row[1]
@@ -506,8 +501,6 @@ READERS = {'INT': REINTERPRET_CAST_READER,
            'MAP_PAIR_INT_VL_STRING_DOUBLE': MAP_PAIR_INT_VL_STRING_DOUBLE_READER,
            'VL_MAP_PAIR_INT_VL_STRING_DOUBLE': VL_READER}
 
-QUERY_CASES = ''
-
 def indent(text, prefix, predicate=None):
     """Adds 'prefix' to the beginning of selected lines in 'text'.
     If 'predicate' is provided, 'prefix' will only be added to the lines
@@ -523,6 +516,8 @@ def indent(text, prefix, predicate=None):
         for line in text.splitlines(True):
             yield (prefix + line if predicate(line) else line)
     return ''.join(prefixed_lines())
+
+QUERY_CASES = ''
 
 def main():
     global QUERY_CASES
