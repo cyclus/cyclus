@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 """This module generates HDF5 backend code found in src/hdf5_back.cc"""
 import os
 import json
