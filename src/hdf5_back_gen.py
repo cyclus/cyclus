@@ -39,7 +39,7 @@ CANON_TO_DB = {}
 INDENT = '    '
 
 def convert_canonical(raw_list):
-    if type(raw_list) is str:
+    if isinstance(raw_list, str):
         return raw_list
     return tuple(convert_canonical(x) for x in raw_list)
 
@@ -502,7 +502,9 @@ READERS = {'INT': REINTERPRET_CAST_READER,
            'VL_MAP_PAIR_INT_VL_STRING_DOUBLE': VL_READER}
 
 def indent(text, prefix, predicate=None):
-    """Adds 'prefix' to the beginning of selected lines in 'text'.
+    """This function copied from textwrap library version 3.3.
+
+    Adds 'prefix' to the beginning of selected lines in 'text'.
     If 'predicate' is provided, 'prefix' will only be added to the lines
     where 'predicate(line)' is True. If 'predicate' is not provided,
     it will default to adding 'prefix' to all non-empty lines that do not
