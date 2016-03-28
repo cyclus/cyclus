@@ -11,4 +11,3 @@ RUN cmake .. -DCMAKE_BUILD_TYPE=Release
 WORKDIR /cyclus/deb
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 RUN cpack ..
-COPY :/cyclus/deb/CYCLUS-1.0.1-Linux.deb ./
