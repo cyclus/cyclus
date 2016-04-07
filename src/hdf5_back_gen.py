@@ -2,11 +2,27 @@
 """This module generates HDF5 backend code found in src/hdf5_back.cc"""
 import os
 import json
-import textwrap
 from ast import literal_eval
 
+def resolve_unicode(item):	   
+    #Python3, if we can handle it, don't bother.    
+    if isinstance(item, str):
+        return item        
+    #We must check every element in tuples and lists.    
+    elif isinstance(item, tuple):
+        return tuple([resolve_unicode(i) for i in item])
+    elif isinstance(item, list):
+        return [resolve_unicode(i) for i in item]
+    #Not a string, either unicode (Python2.7) or an int.    
+    else: 
+        try:
+            return item.encode('utf-8')
+        except Exception:
+            pass
+        return item
+
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
-    RAW_TABLE = json.load(f)
+    RAW_TABLE = resolve_unicode(json.load(f))
 
 TABLE_START = 0
 for row in range(0, len(RAW_TABLE)):
@@ -28,7 +44,7 @@ def convert_canonical(raw_list):
     return tuple(convert_canonical(x) for x in raw_list)
 
 for row in V3_TABLE:
-    if row[6] == 1 and row[4] == "HDF5":
+    if row[6] == 1 and row[4] == "HDF5":        
         CANON_SET.add(convert_canonical(row[7]))
         DB_TO_CPP[row[1]] = row[2]
         CANON_TO_DB[convert_canonical(row[7])] = row[1]
@@ -485,6 +501,24 @@ READERS = {'INT': REINTERPRET_CAST_READER,
            'MAP_PAIR_INT_VL_STRING_DOUBLE': MAP_PAIR_INT_VL_STRING_DOUBLE_READER,
            'VL_MAP_PAIR_INT_VL_STRING_DOUBLE': VL_READER}
 
+def indent(text, prefix, predicate=None):
+    """This function copied from textwrap library version 3.3.
+
+    Adds 'prefix' to the beginning of selected lines in 'text'.
+    If 'predicate' is provided, 'prefix' will only be added to the lines
+    where 'predicate(line)' is True. If 'predicate' is not provided,
+    it will default to adding 'prefix' to all non-empty lines that do not
+    consist solely of whitespace characters.
+    """
+    if predicate is None:
+        def predicate(line):
+            return line.strip()
+
+    def prefixed_lines():
+        for line in text.splitlines(True):
+            yield (prefix + line if predicate(line) else line)
+    return ''.join(prefixed_lines())
+
 QUERY_CASES = ''
 
 def main():
@@ -497,9 +531,9 @@ def main():
                "H5TCLOSE": H5TCLOSE.format(t = current_type),
                "H5TCLOSE_MULTI": H5TCLOSE_MULTI.format(t = current_type)}
                   
-        QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
+        QUERY_CASES += CASE_TEMPLATE.format(t=current_type, read_x=indent(reader.format(**ctx), INDENT))
 
-    print(textwrap.indent(QUERY_CASES, INDENT*2))
+    print(indent(QUERY_CASES, INDENT))
     
 if __name__ == '__main__':
     main()
