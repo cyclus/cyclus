@@ -196,17 +196,17 @@ int main(int argc, char* argv[]) {
   }
 
   
-  char* CYCLUS_NO_EXCEPTION = getenv("CYCLUS_NO_EXCEPTION");
-  if( CYCLUS_NO_EXCEPTION !=NULL && CYCLUS_NO_EXCEPTION != "0" ){
+  char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
+  if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
     si.timer()->RunSim();
-  }
-  else {
+  }   else {
     try {
       si.timer()->RunSim();
     } catch (cyclus::Error err) {
       std::cerr << err.what() << "\n";
       return 1;
-    }  }
+    }
+  }
   
   rec.Flush();
 
