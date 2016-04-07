@@ -195,13 +195,19 @@ int main(int argc, char* argv[]) {
     si.recorder()->RegisterBackend(fback);
   }
 
-  try {
+  
+  char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
+  if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
     si.timer()->RunSim();
-  } catch (cyclus::Error err) {
-    std::cerr << err.what() << "\n";
-    return 1;
+  }   else {
+    try {
+      si.timer()->RunSim();
+    } catch (cyclus::Error err) {
+      std::cerr << err.what() << "\n";
+      return 1;
+    }
   }
-
+  
   rec.Flush();
 
   std::cout << std::endl;
