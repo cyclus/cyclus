@@ -428,11 +428,36 @@ def vl_string_reader(t):
                  create_teardown(t)])
     return tree
 
-UUID_READER = """
-{t.cpp} x;
-memcpy(&x, buf+offset, 16);
-{NO_CLOSE}
-""".strip()
+def uuid_reader(t):
+    """
+    {t.cpp} x;
+    memcpy(&x, buf+offset, 16);
+    {teardown}
+    """
+    tree = Block(nodes=[
+                 Decl(type=t, name=Var(name="x")),
+                 ExprStmt(child=FuncCall(name=Raw(code="memcpy"), 
+                          args=[Raw(code="&x"), 
+                                Raw(code="buf+offset"), Raw(code="16")])),
+                 create_teardown(t)])
+    return tree
+
+def vector_reader(t):
+    """
+    {t.cpp} x = {t.cpp}(col_sizes_[table][j] / sizeof({t.sub[1].cpp}));
+    memcpy(&x[0], buf + offset, col_sizes_[table][j]);
+    {NO_CLOSE}
+    """
+    tree = Block(nodes=[
+                 #setup
+                 get_setup("VECTOR", t),
+                 #decl
+                 get_decl("VECTOR", t),
+                 #body
+                 get_body("VECTOR", t),
+                 #close
+                 normal_close(t)])
+    return tree
 
 VECTOR_READER = """
 {setup}
@@ -441,6 +466,16 @@ VECTOR_READER = """
 {teardown}
 """.strip()
 
+def set_reader(t):
+    tree = Block(nodes=[
+                 Assign(target=Var(name="jlen"), 
+                        value=BinOp(x=Raw(code="col_sizes_[table][j]"),
+                                    op="/", y=FuncCall(name=Raw(code="sizeof"),
+                                            args=[Raw(code=t.sub[1].cpp)]))),
+                 get_body(t),
+                 ])
+    return tree
+    
 SET_READER = """
 {setup}
 {t.cpp} x;
@@ -459,6 +494,69 @@ PAIR_READER = """
 
 MAP_READER = """
 """.strip()
+
+PRIMITIVE_SETUP = Block(nodes=[])
+
+STRING_SETUP = Block(nodes=[
+                 DeclAssign(type=Type(cpp="hid_t"), 
+                            target=Var(name="field_type"), 
+                            value=FuncCall(name=Raw(code="H5Tget_member_type"),
+                                           args=[Raw(code="tb_type"), 
+                                                 Raw(code="j")])),
+                 Decl(type=Type(cpp="size_t"), name=Var(name="nullpos")),
+                 Decl(type=Type(cpp="hsize_t"), name=Var(name="fieldlen")),
+                 FuncCall(name=Raw(code="H5Tget_array_dims2"),
+                          args=[Raw(code="field_type"), Raw(code="&fieldlen")]),
+                 DeclAssign(type=Type(cpp="unsigned int"), 
+                                 target=Var(name="strlen"),
+                                 value=Raw(code="col_sizes_[table][j] / fieldlen"))])
+
+VL_STRING_SETUP = Block(nodes=[])
+
+#recurse over all types if they are containers
+def get_setup(container, t, depth=0):
+    if not isinstance(t, str):
+        get_setup(container, t.canon[depth+1])
+    if container == "SET":
+        if t.db == "STRING":
+            return STRING_SETUP
+        elif t.db == "VL_STRING":
+            return VL_STRING_SETUP
+        else:
+            return PRIMITIVE_SETUP
+
+def get_decl(container, t):
+    return
+
+def get_body(container, t):
+    if container == "SET":
+        if t.db == "STRING":
+            return elementwise_body(t)
+        elif t.db == "VL_STRING":
+            return vl_body(t)
+        else:
+            return def_body(t)   
+    
+    elif container == "VECTOR":
+        if t.db == "STRING":
+            return indexed_elementwise_body(t)
+        elif t.db == "VL_STRING":
+            return vl_body(t)
+        else:
+            return memcpy_body(t)
+    
+    elif container == "LIST":
+        if t.db == "STRING":
+            return elementwise_body(t)
+        if t.db == "VL_STRING":
+            return vl_body(t)
+        else:
+            return def_body(t)
+    else:
+        return None
+
+
+
 
 READERS = {'INT': REINTERPRET_CAST_READER,
            'BOOL': REINTERPRET_CAST_READER,
@@ -507,6 +605,7 @@ for (unsigned int k = 0; k < {fieldlen} ++k) {
     {sub_body}
 }
 """.strip()
+            
 
 BODIES = {'INT': DEF_BODY,
           'DOUBLE': MEMCPY_BODY,
@@ -584,6 +683,7 @@ def create_body_ctx(a_type, depth):
         ctx["def_k"] = "x[k]"
         ctx["apply"] = ""
     return ctx
+
 #helper method for create_teardown
 import re
 def find_whole_word(word):
@@ -591,10 +691,11 @@ def find_whole_word(word):
 
 def create_teardown(a_type, setup=""):
     closure = NORMAL_CLOSE
-    if "hid_t" not in setup:
-        return closure + "\nbreak;"
+    setup_as_str = PrettyFormatter.visit(setup)
+    if "hid_t" not in setup_as_str:
+        return (closure + "\nbreak;")
     else:
-        for line in setup.split("\n"):
+        for node in setup.nodes:
             if find_whole_word("hid_t")(line) != None:
                 closure += "\nH5Tclose("+line.split("=")[0].strip("hid_t").strip()+");"
         return (closure + "\nbreak;").format(t = a_type)
