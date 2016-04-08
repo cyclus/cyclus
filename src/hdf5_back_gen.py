@@ -73,6 +73,10 @@ class FuncCall(Node):
 class Raw(Node):
     #for cheating and literals
     fields = ("code",)
+    
+class Nothing(Node):
+    #for "nothing"
+    fields = ()
 
 _lowername = lambda cls: cls.__name__.lower()
 
@@ -261,6 +265,9 @@ class CppGen(Visitor):
                 s += ","
         s += ")"
         return s
+    
+    def visit_nothing(self, node):
+        return ""
 
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
     RAW_TABLE = json.load(f)
