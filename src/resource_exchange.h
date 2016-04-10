@@ -7,6 +7,8 @@
 
 #include "bid_portfolio.h"
 #include "context.h"
+#include "cyc_limits.h"
+#include "capacity_constraint.h"
 #include "exchange_context.h"
 #include "product.h"
 #include "material.h"
@@ -121,9 +123,16 @@ class ResourceExchange {
   /// @brief queries a given facility agent for
   void AddRequests_(Trader* t) {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
-    typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;
+    typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;    
+    auto is_positive = [](CapacityConstraint<T> const & x){ return x.capacity() > cyclus::eps(); };
     for (it = rp.begin(); it != rp.end(); ++it) {
-      ex_ctx_.AddRequestPortfolio(*it);
+      const std::set< CapacityConstraint<T> >& ctrs = (*it)->constraints();
+      if (std::all_of(ctrs.begin(), ctrs.end(), is_positive)) {
+        ex_ctx_.AddRequestPortfolio(*it);
+      } else {
+        CLOG(LEV_DEBUG2) << "Removing RequestPortfolio "
+                         << "with non-positive capacity.";
+      }
     }
   }
 
@@ -132,8 +141,15 @@ class ResourceExchange {
     std::set<typename BidPortfolio<T>::Ptr> bp =
         QueryBids<T>(t, ex_ctx_.commod_requests);
     typename std::set<typename BidPortfolio<T>::Ptr>::iterator it;
+    auto is_positive = [](CapacityConstraint<T> const & x){ return x.capacity() > cyclus::eps(); };
     for (it = bp.begin(); it != bp.end(); ++it) {
-      ex_ctx_.AddBidPortfolio(*it);
+      const std::set< CapacityConstraint<T> >& ctrs = (*it)->constraints();
+      if (std::all_of(ctrs.begin(), ctrs.end(), is_positive)) {
+        ex_ctx_.AddBidPortfolio(*it);
+      } else {
+        CLOG(LEV_DEBUG2) << "Removing BidPortfolio "
+                         << "with non-positive capacity.";
+      }
     }
   }
 

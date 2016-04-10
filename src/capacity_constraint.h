@@ -67,18 +67,13 @@ class CapacityConstraint {
   CapacityConstraint(double capacity, typename Converter<T>::Ptr converter)
       : capacity_(capacity),
         converter_(converter),
-        id_(next_id_++) {
-    if (capacity_ <= 0)
-      throw ValueError("Capacity is not positive, no trades will be executed");
-  }
+      id_(next_id_++) {}
 
   /// @brief constructor for a constraint with a trivial converter (i.e., one
   /// that simply returns 1)
   explicit CapacityConstraint(double capacity)
       : capacity_(capacity),
         id_(next_id_++) {
-    if (capacity_ <= 0)
-      throw ValueError("Capacity is not positive, no trades will be executed");
     converter_ = typename Converter<T>::Ptr(new TrivialConverter<T>());
   }
 

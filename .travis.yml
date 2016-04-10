@@ -4,12 +4,16 @@ python:
   - "2.7"
   - "3.4"
 before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
 install:
   # You may want to periodically update this, although the conda update
   # conda line below will keep everything up-to-date.  We do this
   # conditionally because it saves us some downloading if the version is
   # the same.
+  # First two lines install g++4.8 and enable compilation using it for c++11 capability:
+  - sudo apt-get install -qq gcc-4.8 g++-4.8
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
     else
