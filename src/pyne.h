@@ -6,6 +6,7 @@
 //   src/h5wrap.h
 //   src/nucname.h
 //   src/rxname.h
+//   src/_atomic_data.h
 //   src/data.h
 //   src/json-forwards.h
 //   src/json.h
@@ -93,14 +94,12 @@
 #include <vector>
 #include <algorithm>
 
-#if defined __APPLE__ || defined __WIN_GNUC__
 #if (__GNUC__ >= 4)
   #include <cmath>
   #define isnan(x) std::isnan(x)
 #else
   #include <math.h>
   #define isnan(x) __isnand((double)x)
-#endif
 #endif
 
 #ifdef __WIN_MSVC__
@@ -1757,6 +1756,44 @@ namespace rxname
 #endif  // PYNE_7DOEB2PKSBEFFIA3Q2NARI3KFY
 //
 // end of src/rxname.h
+//
+
+
+//
+// start of src/_atomic_data.h
+//
+/// \/file atomic_nuclear_data.h
+/// \/author Andrew Davis (andrew.davis@wisc.edu)
+///
+/// \/brief Impliments all the fundamental atomic & nuclear data data
+#include <map>
+
+namespace pyne
+{
+  /// main function to be called when you whish to load the nuclide data 
+  /// into memory 
+  void _load_atomic_mass_map_memory();
+  /// function to create mapping from nuclides in id form
+  /// to their atomic masses
+  
+  void _insert_atomic_mass_map();
+  
+  /// function to create mapping from nuclides in id form 
+  /// to their natural abundances
+  void _insert_abund_map();
+  
+  /// Mapping from nuclides in id form to their natural abundances
+  extern std::map<int,double> natural_abund_map;
+  
+  /// Mapping from nuclides in id form to their atomic masses.
+  extern std::map<int,double> atomic_mass_map;
+  
+  /// Mapping from nuclides in id form to the associated error in 
+  /// abdundance 
+  extern std::map<int,double> atomic_mass_error_map;
+} // namespace pyne
+//
+// end of src/_atomic_data.h
 //
 
 
