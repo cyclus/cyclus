@@ -6,6 +6,8 @@ import textwrap
 from ast import literal_eval
 from pprint import pformat
 
+is_primitive = lambda t: isinstance(t.canon, str)
+
 class Node(object):
     fields = ()
     
@@ -281,6 +283,7 @@ for row in range(0, len(RAW_TABLE)):
 
 V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
 
+CANON_TO_NODE = {}
 CANON_SET = set()
 DB_TO_CPP = {}
 CANON_TO_DB = {}
@@ -293,9 +296,14 @@ def convert_canonical(raw_list):
 
 for row in V3_TABLE:
     if row[6] == 1 and row[4] == "HDF5":
-        CANON_SET.add(convert_canonical(row[7]))
-        DB_TO_CPP[row[1]] = row[2]
-        CANON_TO_DB[convert_canonical(row[7])] = row[1]
+        db = row[1]
+        cpp = row[2]
+        canon = convert_canonical(row[7])
+        CANON_SET.add(canon)
+        DB_TO_CPP[db] = cpp
+        CANON_TO_DB[canon] = db
+        CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
+        
 
 def list_dependencies(canon):
     """A list of a type's dependencies, in canonical form.
@@ -522,8 +530,6 @@ VL_STRING_SETUP = Block(nodes=[])
 
 #recurse over all types if they are containers
 def get_setup(container, t, depth=0):
-    if not isinstance(t, str):
-        get_setup(container, t.canon[depth+1])
     if container == "SET":
         if t.db == "STRING":
             return STRING_SETUP
@@ -531,36 +537,55 @@ def get_setup(container, t, depth=0):
             return VL_STRING_SETUP
         else:
             return PRIMITIVE_SETUP
+            
+    elif not isinstance(t.canon[depth], str):
+        return get_setup(t.canon[depth], CANON_TO_NODE[t.canon[depth+1]])
+    
 
-def get_decl(container, t):
+def get_decl(container, t, depth=0):
     return
 
-def get_body(container, t):
-    if container == "SET":
-        if t.db == "STRING":
-            return elementwise_body(t)
-        elif t.db == "VL_STRING":
-            return vl_body(t)
-        else:
-            return def_body(t)   
-    
-    elif container == "VECTOR":
-        if t.db == "STRING":
-            return indexed_elementwise_body(t)
-        elif t.db == "VL_STRING":
-            return vl_body(t)
-        else:
-            return memcpy_body(t)
-    
-    elif container == "LIST":
-        if t.db == "STRING":
-            return elementwise_body(t)
-        if t.db == "VL_STRING":
-            return vl_body(t)
-        else:
-            return def_body(t)
+def get_body(t, depth=0):
+    if is_primitive(t):
+        #this is for primitives
+        pass
     else:
-        return None
+        #this is for dependent types
+        #sub_bodies = [get_body(targ, depth=depth+1) for targ in t.sub] 
+        container = t.canon[0]
+    
+    ##########
+        if container == "SET":
+            targ0 = t.sub[0]
+            if targ0.db == "STRING":
+                return elementwise_body(targ0)
+            elif targ0.db == "VL_STRING":
+                return vl_body(targ0)
+            elif is_primitive(targ0):
+                return def_body(targ0)
+            else:
+                sub_body = get_body(targ0, depth=depth+1)
+                
+    
+        elif container == "VECTOR":
+            targ0 = t.sub[0]
+            if targ0.db == "STRING":
+                return indexed_elementwise_body(targ0)
+            elif targ0.db == "VL_STRING":
+                return vl_body(targ0)
+            else:
+                return memcpy_body(targ0)
+    
+        elif container == "LIST":
+            if t.db == "STRING":
+                return elementwise_body(t)
+            if t.db == "VL_STRING":
+                return vl_body(t)
+            else:
+                return def_body(t)
+    
+    elif not isinstance(t.canon, str):
+        return get_body(t.canon[depth], CANON_TO_NODE[t.canon[depth+1]])
 
 
 
