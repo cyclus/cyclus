@@ -146,6 +146,10 @@ void SimInit::Init(Recorder* r, Context* src, int dur) {
       std::vector<Resource::Ptr>& resvec = invit->second;
       std::vector<Resource::Ptr> copyvec;
       for (int i = 0; i < resvec.size(); i++) {
+        // TODO: note that cloned resources are untracked w.r.t. the database.  In
+        // the future, we might want to find a way to mark them as tracked so
+        // the users of a cloned context can see resource/material info in the
+        // in-mem database.
         copyvec.push_back(resvec[i]->Clone());
       }
       copyinvs[name] = copyvec;
