@@ -80,12 +80,23 @@ Context::Context(Timer* ti, Recorder* rec)
 Context::~Context() {
   if (solver_ != NULL) {
     // deleting the solver prevents multiple simulations in memory from
-    // sharing a single solver.
+    // sharing a single solver.  Sharing a solver is okay because they dont
+    // have inter-timestep mutable/evolving state.  In the future, this
+    // sharing could be eliminated (and the 'delete solver_' below can be
+    // reinstated) by carefully rebuilding/cloning configured
+    // solvers.
     //delete solver_;
   }
 
-  // because agens remove themselves from the agent_list_ when destructed, we
-  // can't delete them while iterating over the list
+  // Because agents remove themselves from the agent_list_ when destructed, we
+  // can't delete them while iterating over the list - so build up a to-delete
+  // list in a separate step.
+  //
+  // Also - previously, when a context was destructed, it would only delete the
+  // root-agents (agents without parents).  Later on, in order to enable agents to
+  // deploy other agents and then leave the simulation, we changed agents to not
+  // destruct their children when they are destructed.  So the context destructor
+  // needs to destruct non-root agents too.
   std::vector<Agent*> to_del;
   std::set<Agent*>::iterator it;
   for (it = agent_list_.begin(); it != agent_list_.end(); ++it) {
