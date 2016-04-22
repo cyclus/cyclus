@@ -512,34 +512,48 @@ MAP_READER = """
 
 PRIMITIVE_SETUP = Block(nodes=[])
 
-STRING_SETUP = Block(nodes=[
-                 DeclAssign(type=Type(cpp="hid_t"), 
-                            target=Var(name="field_type"), 
-                            value=FuncCall(name=Raw(code="H5Tget_member_type"),
-                                           args=[Raw(code="tb_type"), 
-                                                 Raw(code="j")])),
-                 Decl(type=Type(cpp="size_t"), name=Var(name="nullpos")),
-                 Decl(type=Type(cpp="hsize_t"), name=Var(name="fieldlen")),
-                 FuncCall(name=Raw(code="H5Tget_array_dims2"),
-                          args=[Raw(code="field_type"), Raw(code="&fieldlen")]),
-                 DeclAssign(type=Type(cpp="unsigned int"), 
-                                 target=Var(name="strlen"),
-                                 value=Raw(code="col_sizes_[table][j] / fieldlen"))])
+def string_setup(depth=0, prefix=""): 
+    field_type = "field_type" + str(depth) + prefix
+    nullpos = "nullpos" + str(depth) + prefix
+    fieldlen = "fieldlen" + str(depth) + prefix
+    strlen = "strlen" + str(depth) + prefix
+    
+    node = Block(nodes=[
+        DeclAssign(typ=Type(cpp="hid_t"), 
+                   target=Var(name=fieldlen), 
+                   value=FuncCall(name=Raw(code="H5Tget_member_type"),
+                                  args=[Raw(code="tb_type"), 
+                                  Raw(code="j")])),
+        Decl(type=Type(cpp="size_t"), name=Var(name=nullpos),
+        Decl(type=Type(cpp="hsize_t"), name=Var(name=fieldlen),
+        FuncCall(name=Raw(code="H5Tget_array_dims2"),
+                 args=[Raw(code=field_type), Raw(code="&"+fieldlen)]),
+        DeclAssign(type=Type(cpp="unsigned int"), 
+                   target=Var(name=strlen),
+                   value=Raw(code="col_sizes_[table][j] / "+fieldlen))])
+    return node
 
-VL_STRING_SETUP = Block(nodes=[])
+def vl_string_setup(depth=0, prefix=""):
+    node = Block(nodes=[])
+    return node
+
+
+template_args = {"MAP": ("KEY", "VALUE"),
+                 "VECTOR": ("ELEM",),
+                 "SET": ("ELEM",),
+                 "PAIR": ("ITEM1", "ITEM2")}
 
 #recurse over all types if they are containers
-def get_setup(container, t, depth=0):
-    if container == "SET":
-        if t.db == "STRING":
-            return STRING_SETUP
-        elif t.db == "VL_STRING":
-            return VL_STRING_SETUP
-        else:
-            return PRIMITIVE_SETUP
-            
-    elif not isinstance(t.canon[depth], str):
-        return get_setup(t.canon[depth], CANON_TO_NODE[t.canon[depth+1]])
+def get_setup(t, depth=0, prefix=""):
+    node = Node()
+    if is_primitive(t):
+        if t.sub[0] == "STRING":
+            node = string_setup(depth, prefix)
+        elif t.sub[0] == "VL_STRING":
+            node = vl_string_setup(depth, prefix)
+    else:
+        node = Block(nodes=[get_setup(i, depth=depth+1, prefix=prefix+part) for i, part in zip(t.sub[1:], template_args[t.sub[0]])])
+    return node
     
 
 def get_decl(container, t, depth=0):
@@ -815,4 +829,4 @@ def main():
     print(textwrap.indent(s, INDENT)) 
     
 if __name__ == '__main__':
-    main()
+    main()e
