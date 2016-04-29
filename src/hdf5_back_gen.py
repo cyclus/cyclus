@@ -510,7 +510,14 @@ PAIR_READER = """
 MAP_READER = """
 """.strip()
 
-PRIMITIVE_SETUP = Block(nodes=[])
+#setup functions
+
+def primitive_setup(depth=0, prefix="", t):
+    jlen = "jlen" + str(depth) + prefix
+    node = Block(nodes=[
+        Assign(target=Var(name=jlen),
+               value=Raw(code="col_sizes_[table][j] / sizeof("+t.cpp+")"))])
+    return node
 
 def string_setup(depth=0, prefix=""): 
     field_type = "field_type" + str(depth) + prefix
@@ -534,16 +541,12 @@ def string_setup(depth=0, prefix=""):
     return node
 
 def vl_string_setup(depth=0, prefix=""):
-    node = Block(nodes=[])
+    jlen = "jlen" + str(depth) + prefix
+    node = Block(nodes=[
+        Assign(target=Var(name=jlen), 
+               value=Raw(code="col_sizes_[table][j] / CYCLUS_SHA1_SIZE"))])
     return node
 
-
-template_args = {"MAP": ("KEY", "VALUE"),
-                 "VECTOR": ("ELEM",),
-                 "SET": ("ELEM",),
-                 "PAIR": ("ITEM1", "ITEM2")}
-
-#recurse over all types if they are containers
 def get_setup(t, depth=0, prefix=""):
     node = Node()
     if is_primitive(t):
@@ -551,24 +554,73 @@ def get_setup(t, depth=0, prefix=""):
             node = string_setup(depth, prefix)
         elif t.sub[0] == "VL_STRING":
             node = vl_string_setup(depth, prefix)
+        else
+            node = primitive_setup(depth, prefix, t)
     else:
         node = Block(nodes=[get_setup(i, depth=depth+1, prefix=prefix+part) for i, part in zip(t.sub[1:], template_args[t.sub[0]])])
     return node
     
+#declaration
 
-def get_decl(container, t, depth=0):
-    return
+def get_decl(t, depth=0, prefix=""):
+    variable = "x" + str(depth) + prefix
+    node = Decl(type=t, name=Var(name=variable))
+    return node
 
-def get_body(t, depth=0):
+#bodies
+
+#to-do: fill these out
+def def_body(t, depth=0, prefix=""):
+    pass
+
+def memcpy_body(t, depth=0, prefix=""):
+    pass
+
+def elementwise_body(t, depth=0, prefix=""):
+    pass
+
+def vl_body(t, depth=0, prefix=""):
+    pass
+
+def vec_string_body(t, depth=0, prefix=""):
+    pass
+    
+def set_string_body(t, depth=0, prefix=""):
+    pass
+
+template_args = {"MAP": ("KEY", "VALUE"),
+                 "VECTOR": ("ELEM",),
+                 "SET": ("ELEM",),
+                 "LIST": ("ELEM",),
+                 "PAIR": ("ITEM1", "ITEM2")}
+
+BODIES = {"INT": def_body,
+          "DOUBLE": memcpy_body,
+          "STRING": elementwise_body,
+          "VL_STRING": vl_body,
+          "VECTOR_STRING": vec_string_body,
+          "SET_STRING": set_string_body}
+
+def get_body(t, depth=0, prefix=""):
+    body = Node()
+    initial_decl = Node()
+    if depth == 0:
+        initial_decl = get_decl(t, depth, prefix)
+    
     if is_primitive(t):
-        #this is for primitives
-        pass
+        return BODIES[t.db](t, depth, prefix)
+    elif t in BODIES:
+        return BODIES[t.db](t, depth, prefix)
     else:
         #this is for dependent types
         #sub_bodies = [get_body(targ, depth=depth+1) for targ in t.sub] 
+        nodes = []
+        for i, part in zip(t.sub[1:], template_args[t[0]]):
+            new_prefix = prefix + part
+            nodes.append(get_decl(i, depth=depth+1, prefix=new_prefix))
+            nodes.append(get_body(i, depth=depth+1, prefix=new_prefix))
+        
         container = t.canon[0]
-    
-    ##########
         if container == "SET":
             targ0 = t.sub[0]
             if targ0.db == "STRING":
@@ -651,14 +703,6 @@ for (unsigned int k = 0; k < {fieldlen} ++k) {
     {sub_body}
 }
 """.strip()
-            
-
-BODIES = {'INT': DEF_BODY,
-          'DOUBLE': MEMCPY_BODY,
-          'STRING': ELEMENTWISE_BODY,
-          'VL_STRING': VL_BODY,
-          'VECTOR': TEMPLATE_BODY,
-          'SET': TEMPLATE_BODY}
 
 QUERY_CASES = ''
 
