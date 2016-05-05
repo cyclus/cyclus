@@ -270,6 +270,10 @@ class CppGen(Visitor):
     
     def visit_nothing(self, node):
         return ""
+        
+    def visit_block(self, node):
+        for n in node.nodes:
+            if n !isinstance(list)
 
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
     RAW_TABLE = json.load(f)
@@ -602,58 +606,18 @@ BODIES = {"INT": def_body,
           "SET_STRING": set_string_body}
 
 def get_body(t, depth=0, prefix=""):
-    body = Node()
-    initial_decl = Node()
-    if depth == 0:
-        initial_decl = get_decl(t, depth, prefix)
-    
+    block = []
+    block.append(get_decl(t, depth, prefix))
     if is_primitive(t):
         return BODIES[t.db](t, depth, prefix)
     elif t in BODIES:
         return BODIES[t.db](t, depth, prefix)
     else:
-        #this is for dependent types
-        #sub_bodies = [get_body(targ, depth=depth+1) for targ in t.sub] 
-        nodes = []
         for i, part in zip(t.sub[1:], template_args[t[0]]):
             new_prefix = prefix + part
-            nodes.append(get_decl(i, depth=depth+1, prefix=new_prefix))
-            nodes.append(get_body(i, depth=depth+1, prefix=new_prefix))
-        
-        container = t.canon[0]
-        if container == "SET":
-            targ0 = t.sub[0]
-            if targ0.db == "STRING":
-                return elementwise_body(targ0)
-            elif targ0.db == "VL_STRING":
-                return vl_body(targ0)
-            elif is_primitive(targ0):
-                return def_body(targ0)
-            else:
-                sub_body = get_body(targ0, depth=depth+1)
-                
-    
-        elif container == "VECTOR":
-            targ0 = t.sub[0]
-            if targ0.db == "STRING":
-                return indexed_elementwise_body(targ0)
-            elif targ0.db == "VL_STRING":
-                return vl_body(targ0)
-            else:
-                return memcpy_body(targ0)
-    
-        elif container == "LIST":
-            if t.db == "STRING":
-                return elementwise_body(t)
-            if t.db == "VL_STRING":
-                return vl_body(t)
-            else:
-                return def_body(t)
-    
-    elif not isinstance(t.canon, str):
-        return get_body(t.canon[depth], CANON_TO_NODE[t.canon[depth+1]])
-
-
+            block.append(get_body(i, depth=depth+1, prefix=new_prefix))
+        block.insert(0, initial_decl)
+        return Block(nodes=block)
 
 
 READERS = {'INT': REINTERPRET_CAST_READER,
@@ -873,4 +837,4 @@ def main():
     print(textwrap.indent(s, INDENT)) 
     
 if __name__ == '__main__':
-    main()e
+    main()
