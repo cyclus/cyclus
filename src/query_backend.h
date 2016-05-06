@@ -25,21 +25,21 @@ namespace cyclus {
 /// Thus only append to this enum if it is post-1.0.
 enum DbTypes {
   // primitive types
-  BOOL = 0,
-  INT,
-  FLOAT,
-  DOUBLE,
-  STRING,
-  VL_STRING,
-  BLOB,
-  UUID,
+  BOOL = 0,//["bool",0,["SQLite"],1,"BOOL",false]
+  INT,//["int", 0, ["HDF5","SQL"], 1, "INT", false]
+  FLOAT,//["float",0,["SQLite"],1,"FLOAT",false]
+  DOUBLE,//["double",0,["SQLite"],1,"DOUBLE",false]
+  STRING,//["std::string",1,["SQLite"],1,"STRING",false]
+  VL_STRING,//["std::string",1,["SQLite"],1,"VL_STRING",true]
+  BLOB,//["cyclus::Blob",0,["SQLite"],1,"BLOB",true]
+  UUID,//["boost::uuids::uuid",0,["SQLite"],1,"UUID",false]
   // vector types
-  VECTOR_BOOL,
-  VL_VECTOR_BOOL,
-  VECTOR_INT,
-  VL_VECTOR_INT,
-  VECTOR_FLOAT,
-  VL_VECTOR_FLOAT,
+  VECTOR_BOOL,//["std::vector<bool>",1,["SQLite"],0,["VECTOR","BOOL"],false]
+  VL_VECTOR_BOOL,//["std::vector<bool>",1,["SQLite"],0,["VL_VECTOR","BOOL"],true]
+  VECTOR_INT,//["std::vector<int>",1,["SQLite"],1,["VECTOR","INT"],false]
+  VL_VECTOR_INT,//["std::vector<int>",1,["SQLite"],1,["VL_VECTOR","INT"],true]
+  VECTOR_FLOAT,//["std::vector<float>",1,["SQLite"],0,["VECTOR","FLOAT"],false]
+  VL_VECTOR_FLOAT,//["std::vector<float>",1,["SQLite"],0,["VECTOR","BOOL"],true]
   VECTOR_DOUBLE,
   VL_VECTOR_DOUBLE,
   VECTOR_STRING,
