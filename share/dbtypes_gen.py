@@ -43,7 +43,7 @@ for back in ALL_BACK:
     for i in range(ENUM_START+1,len(lines)):
         s = lines[i].split("//")[-1].strip()
         DB = lines[i].split("//")[0].strip().strip(",")
-        if "MAP_STRING_PAIR" in lines[i]:
+        if "};" in lines[i]:
             break
         if "[" in s:        
             x = json.loads(s)
