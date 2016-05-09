@@ -25,141 +25,141 @@ namespace cyclus {
 /// Thus only append to this enum if it is post-1.0.
 enum DbTypes {
   // primitive types
-  BOOL = 0,  // ["bool",0,["SQLite"],1,"BOOL",false]
-  INT,  // ["int", 0, ["HDF5","SQL"], 1, "INT", false]
-  FLOAT,  // ["float",0,["SQLite"],1,"FLOAT",false]
-  DOUBLE,//["double",0,["SQLite"],1,"DOUBLE",false]
-  STRING,//["std::string",1,["SQLite"],1,"STRING",false]
-  VL_STRING,//["std::string",1,["SQLite"],1,"VL_STRING",true]
-  BLOB,//["cyclus::Blob",0,["SQLite"],1,"BLOB",true]
-  UUID,//["boost::uuids::uuid",0,["SQLite"],1,"UUID",false]
+  BOOL = 0,  // ["bool",0,["SQLite"],"BOOL",false]
+  INT,  // ["int", 0, ["HDF5","SQLite"], "INT", false]
+  FLOAT,  // ["float",0,["SQLite"],"FLOAT",false]
+  DOUBLE,  // ["double",0,["SQLite"],"DOUBLE",false]
+  STRING,  // ["std::string",1,["SQLite"],"STRING",false]
+  VL_STRING,  // ["std::string",1,["SQLite"],"VL_STRING",true]
+  BLOB,  // ["cyclus::Blob",0,["SQLite"],"BLOB",true]
+  UUID,  // ["boost::uuids::uuid",0,["SQLite"],"UUID",false]
   // vector types
-  VECTOR_BOOL,//["std::vector<bool>",1,["SQLite"],0,["VECTOR","BOOL"],false]
-  VL_VECTOR_BOOL,//["std::vector<bool>",1,["SQLite"],0,["VL_VECTOR","BOOL"],true]
-  VECTOR_INT,//["std::vector<int>",1,["SQLite"],1,["VECTOR","INT"],false]
-  VL_VECTOR_INT,//["std::vector<int>",1,["SQLite"],1,["VL_VECTOR","INT"],true]
-  VECTOR_FLOAT,//["std::vector<float>",1,["SQLite"],0,["VECTOR","FLOAT"],false]
-  VL_VECTOR_FLOAT,//["std::vector<float>",1,["SQLite"],0,["VECTOR","BOOL"],true]
-  VECTOR_DOUBLE,//["std::vector<double>",1,["SQLite"],1,["VECTOR","DOUBLE"],false]
-  VL_VECTOR_DOUBLE,//["std::vector<double>",1,["SQLite"],1,["VL_VECTOR","DOUBLE"],true]
-  VECTOR_STRING,//["std::vector<std::string>",2,["SQLite"],1,["VECTOR","STRING"],false]
-  VL_VECTOR_STRING,//["std::vector<std::string>",2,["SQLite"],1,["VL_VECTOR","STRING"],true]
-  VECTOR_VL_STRING,//["std::vector<std::string>",2,["SQLite"],1,["VECTOR","VL_STRING"],false]
-  VL_VECTOR_VL_STRING,//["std::vector<std::string>",2,["SQLite"],1,["VL_VECTOR","VL_STRING"],true]
-  VECTOR_BLOB,//["std::vector<cyclus::Blob>",1,[],0,["VECTOR","BLOB"],false]
-  VL_VECTOR_BLOB,//["std::vector<cyclus:Blob>",1,[],0,["VL_VECTOR","BLOB"],true]
-  VECTOR_UUID,//["std::vector<boost::uuids::uuid>",1,[],0,["VECTOR","UUID"],false]
-  VL_VECTOR_UUID,//["std::vector<boost::uuids::uuid>",1,[],0,["VL_VECTOR","UUID"],true]
+  VECTOR_BOOL,  // ["std::vector<bool>",1,[],["VECTOR","BOOL"],false]
+  VL_VECTOR_BOOL,  // ["std::vector<bool>",1,[],["VL_VECTOR","BOOL"],true]
+  VECTOR_INT,  // ["std::vector<int>",1,["SQLite"],["VECTOR","INT"],false]
+  VL_VECTOR_INT,  // ["std::vector<int>",1,["SQLite"],["VL_VECTOR","INT"],true]
+  VECTOR_FLOAT,  // ["std::vector<float>",1,[],["VECTOR","FLOAT"],false]
+  VL_VECTOR_FLOAT,  // ["std::vector<float>",1,[],["VECTOR","BOOL"],true]
+  VECTOR_DOUBLE,  // ["std::vector<double>",1,["SQLite"],["VECTOR","DOUBLE"],false]
+  VL_VECTOR_DOUBLE,  // ["std::vector<double>",1,["SQLite"],["VL_VECTOR","DOUBLE"],true]
+  VECTOR_STRING,  // ["std::vector<std::string>",2,["SQLite"],["VECTOR","STRING"],false]
+  VL_VECTOR_STRING,  // ["std::vector<std::string>",2,["SQLite"],["VL_VECTOR","STRING"],true]
+  VECTOR_VL_STRING,  // ["std::vector<std::string>",2,["SQLite"],["VECTOR","VL_STRING"],false]
+  VL_VECTOR_VL_STRING,  // ["std::vector<std::string>",2,["SQLite"],["VL_VECTOR","VL_STRING"],true]
+  VECTOR_BLOB,  // ["std::vector<cyclus::Blob>",1,[],["VECTOR","BLOB"],false]
+  VL_VECTOR_BLOB,  // ["std::vector<cyclus:Blob>",1,[],["VL_VECTOR","BLOB"],true]
+  VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>",1,[],["VECTOR","UUID"],false]
+  VL_VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>",1,[],["VL_VECTOR","UUID"],true]
   // set types
-  SET_BOOL,//["std::set<bool>",1,["SQLite"],0,["SET","BOOL"],false]
-  VL_SET_BOOL,//["std::set<bool>",1,["SQLite"],0,["VL_SET","BOOL"],true]
-  SET_INT,//["std::set<int>",1,["SQLite"],1,["SET","INT"],false]
-  VL_SET_INT,//["std::set<int>",1,["SQLite"],1,["VL_SET","INT"],true]
-  SET_FLOAT,//["std::set<float>",1,["SQLite"],0,["SET","FLOAT"],false]
-  VL_SET_FLOAT,//["std::set<float>",1,["SQLite"],0,["VL_SET","FLOAT"],true]
-  SET_DOUBLE,//["std::set<double>",1,["SQLite"],0,["SET","DOUBLE"],false]
-  VL_SET_DOUBLE,//["std::set<double>",1,["SQLite"],0,["VL_SET","DOUBLE"],true]
-  SET_STRING,//["std::set<std::string>",2,["SQLite"],1,["SET","STRING"],false]
-  VL_SET_STRING,//["std::set<std::string>",2,["SQLite"],1,["VL_SET","STRING"],true]
-  SET_VL_STRING,//["std::set<std::string>",2,["SQLite"],1,["SET","VL_STRING"],false]
-  VL_SET_VL_STRING,//["std::set<std::string>",2,["SQLite"],1,["VL_SET","VL_STRING"],true]
-  SET_BLOB,//["std::set<cyclus::Blob>",1,["SQLite"],0,["SET","BLOB"],false]
-  VL_SET_BLOB,//["std::set<cyclus::Blob>",1,["SQLite"],0,["VL_SET","BLOB"],true]
-  SET_UUID,//["std::set<boost::uuids::uuid>",1,["SQLite"],0,["SET","UUID"],false]
-  VL_SET_UUID,//["std::set<boost::uuids::uuid>",1,["SQLite"],0,["VL_SET","UUID"],true]
+  SET_BOOL,  // ["std::set<bool>",1,[],["SET","BOOL"],false]
+  VL_SET_BOOL,  // ["std::set<bool>",1,[],["VL_SET","BOOL"],true]
+  SET_INT,  // ["std::set<int>",1,["SQLite"],["SET","INT"],false]
+  VL_SET_INT,  // ["std::set<int>",1,["SQLite"],["VL_SET","INT"],true]
+  SET_FLOAT,  // ["std::set<float>",1,[],["SET","FLOAT"],false]
+  VL_SET_FLOAT,  // ["std::set<float>",1,[],["VL_SET","FLOAT"],true]
+  SET_DOUBLE,  // ["std::set<double>",1,[],["SET","DOUBLE"],false]
+  VL_SET_DOUBLE,  // ["std::set<double>",1,[],["VL_SET","DOUBLE"],true]
+  SET_STRING,  // ["std::set<std::string>",2,["SQLite"],["SET","STRING"],false]
+  VL_SET_STRING,  // ["std::set<std::string>",2,["SQLite"],["VL_SET","STRING"],true]
+  SET_VL_STRING,  // ["std::set<std::string>",2,["SQLite"],["SET","VL_STRING"],false]
+  VL_SET_VL_STRING,  // ["std::set<std::string>",2,["SQLite"],["VL_SET","VL_STRING"],true]
+  SET_BLOB,  // ["std::set<cyclus::Blob>",1,[],["SET","BLOB"],false]
+  VL_SET_BLOB,  // ["std::set<cyclus::Blob>",1,[],["VL_SET","BLOB"],true]
+  SET_UUID,  // ["std::set<boost::uuids::uuid>",1,[],["SET","UUID"],false]
+  VL_SET_UUID,  // ["std::set<boost::uuids::uuid>",1,[],["VL_SET","UUID"],true]
   // list types
-  LIST_BOOL,
-  VL_LIST_BOOL,
-  LIST_INT,
-  VL_LIST_INT,
-  LIST_FLOAT,
-  VL_LIST_FLOAT,
-  LIST_DOUBLE,
-  VL_LIST_DOUBLE,
-  LIST_STRING,
-  VL_LIST_STRING,
-  LIST_VL_STRING,
-  VL_LIST_VL_STRING,
-  LIST_BLOB,
-  VL_LIST_BLOB,
-  LIST_UUID,
-  VL_LIST_UUID,
+  LIST_BOOL,  // ["std::list<bool>",1,[],["LIST","BOOL"],false]
+  VL_LIST_BOOL,  // ["std::list<bool>",1,[],["VL_LIST","BOOL"],true]
+  LIST_INT,  // ["std::list<int>",1,["SQLite"],["LIST","INT"],false]
+  VL_LIST_INT,  // ["std::list<int>",1,["SQLite"],["VL_LIST","INT"],true]
+  LIST_FLOAT,  // ["std::list<float>",1,[],["LIST","FLOAT"],false]
+  VL_LIST_FLOAT,  // ["std::list<float>",1,[],["VL_LIST","FLOAT"],true]
+  LIST_DOUBLE,  // ["std::list<double>",1,[],["LIST","DOUBLE"],false]
+  VL_LIST_DOUBLE,  // ["std::list<double>",1,[],["VL_LIST","DOUBLE"],true]
+  LIST_STRING,  // ["std::list<std::string>",2,["SQLite"],["LIST","STRING"],false]
+  VL_LIST_STRING,  // ["std::list<std::string>",2,["SQLite"],["VL_LIST","STRING"],true]
+  LIST_VL_STRING,  // ["std::list<std::string>",2,["SQLite"],["LIST","VL_STRING"],false]
+  VL_LIST_VL_STRING,  // ["std::list<std::string>",2,["SQLite"],["VL_LIST","VL_STRING"],true] 
+  LIST_BLOB,  // ["std::list<cyclus::Blob>",1,[],["LIST","BLOB"],false]
+  VL_LIST_BLOB,  // ["std::list<cyclus::Blob>",1,[],["VL_LIST","BLOB"],false]
+  LIST_UUID,  // ["std::list<boost::uuids::uuid>",1,[],["LIST","UUID"],false]
+  VL_LIST_UUID,  // ["std::list<boost::uuids::uuid>",1,[],["VL_LIST","UUID"],false]
   // pairs - not variable length
-  PAIR_INT_BOOL,
-  PAIR_INT_INT,
-  PAIR_INT_FLOAT,
-  PAIR_INT_DOUBLE,
-  PAIR_INT_STRING,
-  PAIR_INT_VL_STRING,
-  PAIR_INT_BLOB,
-  PAIR_INT_UUID,
-  PAIR_STRING_BOOL,
-  PAIR_STRING_INT,
-  PAIR_STRING_FLOAT,
-  PAIR_STRING_DOUBLE,
-  PAIR_STRING_STRING,
-  PAIR_STRING_VL_STRING,
-  PAIR_STRING_BLOB,
-  PAIR_STRING_UUID,
-  PAIR_VL_STRING_BOOL,
-  PAIR_VL_STRING_INT,
-  PAIR_VL_STRING_FLOAT,
-  PAIR_VL_STRING_DOUBLE,
-  PAIR_VL_STRING_STRING,
-  PAIR_VL_STRING_VL_STRING,
-  PAIR_VL_STRING_BLOB,
-  PAIR_VL_STRING_UUID,
+  PAIR_INT_BOOL,  // ["std::pair<int,bool>",0,[],["PAIR","INT","BOOL"],false] 
+  PAIR_INT_INT,  // ["std::pair<int,int>",0,[],["PAIR","INT","int"],false] 
+  PAIR_INT_FLOAT,  // ["std::pair<int,float>",0,[],["PAIR","INT","FLOAT"],false]
+  PAIR_INT_DOUBLE,  // ["std::pair<int,double>",0,[],["PAIR","INT","DOUBLE"],false]
+  PAIR_INT_STRING,  // ["std::pair<int,std::string>",1,[],["PAIR","INT","STRING"],false]
+  PAIR_INT_VL_STRING,  // ["std::pair<int,std::string>",1,[],["PAIR","INT","VL_STRING"],false]
+  PAIR_INT_BLOB,  // ["std::pair<int,cyclus::Blob>",0,[],["PAIR","INT","BLOB"],false]
+  PAIR_INT_UUID,  // ["std::pair<int,boost::uuids::uuid>",0,[],["PAIR","INT","UUID"],false]
+  PAIR_STRING_BOOL,  // ["std::pair<std::string,bool>",1,[],["PAIR","STRING","BOOL"],false]
+  PAIR_STRING_INT,  // ["std::pair<std::string,int>",1,[],["PAIR","STRING","INT"],false]
+  PAIR_STRING_FLOAT,  // ["std::pair<std::string,float>",1,[],["PAIR","STRING","FLOAT"],false]
+  PAIR_STRING_DOUBLE,  // ["std::pair<std::string,double>",1,[],["PAIR","STRING","DOUBLE"],false] 
+  PAIR_STRING_STRING,  // ["std::pair<std::string,std::string>",2,[],["PAIR","STRING","STRING"],false]
+  PAIR_STRING_VL_STRING,  // ["std::pair<std::string,std::string>",2,[],["PAIR","STRING","VL_STRING"],false]
+  PAIR_STRING_BLOB,  // ["std::pair<std::string,cyclus::Blob>",1,[],["PAIR","STRING","BLOB"],false]
+  PAIR_STRING_UUID,  // ["std::pair<std::string,boost::uuids::uuid>",1,[],["PAIR","STRING","UUID"],false]
+  PAIR_VL_STRING_BOOL,  // ["std::pair<std::string,bool>",1,[],["PAIR","VL_STRING","BOOL"],false]
+  PAIR_VL_STRING_INT,  // ["std::pair<std::string,int>",1,[],["PAIR","VL_STRING","INT"],false]
+  PAIR_VL_STRING_FLOAT,  // ["std::pair<std::string,float>",1,[],["PAIR","VL_STRING","FLOAT"],false]
+  PAIR_VL_STRING_DOUBLE,  // ["std::pair<std::string,double>",1,[],["PAIR","VL_STRING","DOUBLE"],false]
+  PAIR_VL_STRING_STRING,  // ["std::pair<std::string,std::string>",2,[],["PAIR","VL_STRING","STRING"],false]
+  PAIR_VL_STRING_VL_STRING,  // ["std::pair<std::string,std::string>",2,[],["PAIR","VL_STRING","VL_STRING"],false]
+  PAIR_VL_STRING_BLOB,  // ["std::pair<std::string,cyclus::Blob>",1,[],["PAIR","VL_STRING","BLOB"],false]
+  PAIR_VL_STRING_UUID,  // ["std::pair<std::string,boost::uuids::uuid>",1,[],["PAIR","VL_STRING","UUID"],false]
   // maps with int keys
-  MAP_INT_BOOL,
-  VL_MAP_INT_BOOL,
-  MAP_INT_INT,
-  VL_MAP_INT_INT,
-  MAP_INT_FLOAT,
-  VL_MAP_INT_FLOAT,
-  MAP_INT_DOUBLE,
-  VL_MAP_INT_DOUBLE,
-  MAP_INT_STRING,
-  VL_MAP_INT_STRING,
-  MAP_INT_VL_STRING,
-  VL_MAP_INT_VL_STRING,
-  MAP_INT_BLOB,
-  VL_MAP_INT_BLOB,
-  MAP_INT_UUID,
-  VL_MAP_INT_UUID,
+  MAP_INT_BOOL,  // ["std::map<int,bool>",1,[],["MAP","INT","BOOL"],false]
+  VL_MAP_INT_BOOL,  // ["std::map<int,bool>",1,[],["VL_MAP","INT","BOOL"],true]
+  MAP_INT_INT,  // ["std::map<int,int>",1,["SQLite"],["MAP","INT","INT"],false]
+  VL_MAP_INT_INT,  // ["std::map<int,int>",1,["SQLite"],["VL_MAP","INT","INT"],true]
+  MAP_INT_FLOAT,  // ["std::map<int,float>",1,[],["MAP","INT","FLOAT"],false]
+  VL_MAP_INT_FLOAT,  // ["std::map<int,float>",1,[],["VL_MAP","INT","FLOAT"],true]
+  MAP_INT_DOUBLE,  // ["std::map<int,double>",1,["SQLite"],["MAP","INT","DOUBLE"],false]
+  VL_MAP_INT_DOUBLE,  // ["std::map<int,double>",1,["SQLite"],["VL_MAP","INT","DOUBLE"],true]
+  MAP_INT_STRING,  // ["std::map<int,std::string>",2,["SQLite"],["MAP","INT","STRING"],false]
+  VL_MAP_INT_STRING,  // ["std::map<int,std::string>",2,["SQLite"],["VL_MAP","INT","STRING"],true]
+  MAP_INT_VL_STRING,  // ["std::map<int,std::string>",2,["SQLite"],["MAP","INT","VL_STRING"],false]
+  VL_MAP_INT_VL_STRING,  // ["std::map<int,std::string>",2,["SQLite"],["VL_MAP","INT","VL_STRING"],true]
+  MAP_INT_BLOB,  // ["std::map<int,cyclus::Blob>",1,[],["MAP","INT","BLOB"],false]
+  VL_MAP_INT_BLOB,  // ["std::map<int,cyclus::Blob>",1,[],["VL_MAP","INT","BLOB"],true]
+  MAP_INT_UUID,  // ["std::map<int,boost::uuids::uuid>",1,[],["MAP","INT","UUID"],false]
+  VL_MAP_INT_UUID,  // ["std::map<int,boost::uuids::uuid>",1,[],["VL_MAP","INT","UUID"],true]
   // maps with fixed-length string keys
-  MAP_STRING_BOOL,
-  VL_MAP_STRING_BOOL,
-  MAP_STRING_INT,
-  VL_MAP_STRING_INT,
-  MAP_STRING_FLOAT,
-  VL_MAP_STRING_FLOAT,
-  MAP_STRING_DOUBLE,
-  VL_MAP_STRING_DOUBLE,
-  MAP_STRING_STRING,
-  VL_MAP_STRING_STRING,
-  MAP_STRING_VL_STRING,
-  VL_MAP_STRING_VL_STRING,
-  MAP_STRING_BLOB,
-  VL_MAP_STRING_BLOB,
-  MAP_STRING_UUID,
-  VL_MAP_STRING_UUID,
+  MAP_STRING_BOOL,  // ["std::map<std::string,bool>",2,[],["MAP","STRING","BOOL"],false]
+  VL_MAP_STRING_BOOL,  // ["std::map<std::string,bool>",2,[],["VL_MAP","STRING","BOOL"],true]
+  MAP_STRING_INT,  // ["std::map<std::string,int>",2,["SQLite"],["MAP","STRING","INT"],false]
+  VL_MAP_STRING_INT,  // ["std::map<std::string,int>",2,[],["VL_MAP","STRING","INT"],true]
+  MAP_STRING_FLOAT,  // ["std::map<std::string,float>",2,[],["MAP","STRING","FLOAT"],false]
+  VL_MAP_STRING_FLOAT,  // ["std::map<std::string,float>",2,[],["VL_MAP","STRING","FLOAT"],true]
+  MAP_STRING_DOUBLE,  // ["std::map<std::string,double>",2,["SQLite"],["MAP","STRING","DOUBLE"],false]
+  VL_MAP_STRING_DOUBLE,  // ["std::map<std::string,double>",2,["SQLite"],["VL_MAP","STRING","DOUBLE"],true]
+  MAP_STRING_STRING,  // ["std::map<std::string,std::string>",3,["SQLite"],["MAP","STRING","STRING"],false]
+  VL_MAP_STRING_STRING,  // ["std::map<std::string,std::string>",3,["SQLite"],["VL_MAP","STRING","STRING"],true]
+  MAP_STRING_VL_STRING,  // ["std::map<std::string,std::string>",3,["SQLite"],["MAP","STRING","VL_STRING"],false]
+  VL_MAP_STRING_VL_STRING,  // ["std::map<std::string,std::string>",3,["SQLite"],["VL_MAP","STRING","VL_STRING"],true]
+  MAP_STRING_BLOB,  // ["std::map<std::string,cyclus::Blob>",2,[],["MAP","STRING","BLOB"],false]
+  VL_MAP_STRING_BLOB,  // ["std::map<std::string,cyclus::Blob>",2,[],["VL_MAP","STRING","BLOB"],true]
+  MAP_STRING_UUID,  // ["std::map<std::string,boost::uuids::uuid>",2,[],["MAP","STRING","UUID"],false]
+  VL_MAP_STRING_UUID,  // ["std::map<std::string,boost::uuids::uuid>",2,[],["VL_MAP","STRING","UUID"],true]
   // maps with variable length string keys
-  MAP_VL_STRING_BOOL,
-  VL_MAP_VL_STRING_BOOL,
-  MAP_VL_STRING_INT,
-  VL_MAP_VL_STRING_INT,
-  MAP_VL_STRING_FLOAT,
-  VL_MAP_VL_STRING_FLOAT,
-  MAP_VL_STRING_DOUBLE,
-  VL_MAP_VL_STRING_DOUBLE,
-  MAP_VL_STRING_STRING,
-  VL_MAP_VL_STRING_STRING,
-  MAP_VL_STRING_VL_STRING,
-  VL_MAP_VL_STRING_VL_STRING,
-  MAP_VL_STRING_BLOB,
-  VL_MAP_VL_STRING_BLOB,
-  MAP_VL_STRING_UUID,
-  VL_MAP_VL_STRING_UUID,
+  MAP_VL_STRING_BOOL,  // ["std::map<std::string,bool>",2,[],["MAP","VL_STRING","BOOL"],false]
+  VL_MAP_VL_STRING_BOOL,  // ["std::map<std::string,bool>",2,[],["VL_MAP","VL_STRING","BOOL"],true]
+  MAP_VL_STRING_INT,  // ["std::map<std::string,int>",2,["SQLite"],["MAP","VL_STRING","INT"],false]
+  VL_MAP_VL_STRING_INT,  // ["std::map<std::string,int>",2,["SQLite"],["VL_MAP","VL_STRING","INT"],true]
+  MAP_VL_STRING_FLOAT,  // ["std::map<std::string,float>",2,[],["MAP","VL_STRING","FLOAT"],false]
+  VL_MAP_VL_STRING_FLOAT,  // ["std::map<std::string,float>",2,[],["VL_MAP","VL_STRING","FLOAT"],true]
+  MAP_VL_STRING_DOUBLE,  // ["std::map<std::string,double>",2,["SQLite"],["MAP","VL_STRING","DOUBLE"],false]
+  VL_MAP_VL_STRING_DOUBLE,  // ["std::map<std::string,double>",2,["SQLite"],["VL_MAP","VL_STRING","DOUBLE"],true]
+  MAP_VL_STRING_STRING,  // ["std::map<std::string,std::string>",3,["SQLite"],["MAP","VL_STRING","STRING"],false]
+  VL_MAP_VL_STRING_STRING,  // ["std::map<std::string,std::string>",3,["SQLite"],["VL_MAP","VL_STRING","STRING"],true]
+  MAP_VL_STRING_VL_STRING,  // ["std::map<std::string,std::string>",3,["SQLite"],["MAP","VL_STRING","VL_STRING"],false]
+  VL_MAP_VL_STRING_VL_STRING,  // ["std::map<std::string,std::string>",3,["SQLite"],["VL_MAP","VL_STRING","VL_STRING"],true]
+  MAP_VL_STRING_BLOB,  // ["std::map<std::string,cyclus::Blob>",2,[],["MAP","VL_STRING","BLOB"],false]
+  VL_MAP_VL_STRING_BLOB,  // ["std::map<std::string,cyclus::Blob>",2,[],["VL_MAP","VL_STRING","BLOB"],true]
+  MAP_VL_STRING_UUID,  // ["std::map<std::string,boost::uuids::uuid>",2,[],["MAP","VL_STRING","UUID"],false]
+  VL_MAP_VL_STRING_UUID,  // ["std::map<std::string,boost::uuids::uuid>",2,[],["VL_MAP","VL_STRING","UUID"],true]
   // maps with pair<int, string> keys and double values
   MAP_PAIR_INT_STRING_DOUBLE,
   VL_MAP_PAIR_INT_STRING_DOUBLE,
@@ -169,24 +169,24 @@ enum DbTypes {
   // append new types only:
 
   // map<string, vector<double> >
-  MAP_STRING_VECTOR_DOUBLE,
-  MAP_STRING_VL_VECTOR_DOUBLE,
-  VL_MAP_STRING_VECTOR_DOUBLE,
-  MAP_VL_STRING_VECTOR_DOUBLE,
-  MAP_VL_STRING_VL_VECTOR_DOUBLE,
-  VL_MAP_STRING_VL_VECTOR_DOUBLE,
-  VL_MAP_VL_STRING_VECTOR_DOUBLE,
-  VL_MAP_VL_STRING_VL_VECTOR_DOUBLE,
+  MAP_STRING_VECTOR_DOUBLE,  // ["std::map<std::string,std::vector<double>>",3,["SQLite"],["MAP","STRING",["VECTOR","DOUBLE"]],false]
+  MAP_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string,std::vector<double>>",3,["SQLite"],["MAP","STRING",["VL_VECTOR","DOUBLE"]],false]
+  VL_MAP_STRING_VECTOR_DOUBLE,  // ["std::map<std::string,std::vector<double>>",3,["SQLite"],["VL_MAP","STRING",["VECTOR","DOUBLE"]],true]
+  MAP_VL_STRING_VECTOR_DOUBLE,  // ["std::map<std::string,std::vector<double>>",3,["SQLite"],["MAP","VL_STRING",["VECTOR","DOUBLE"]],false]
+  MAP_VL_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string,std::vector<double>>",3,["SQLite"],["MAP","VL_STRING",["VL_VECTOR","DOUBLE"]],false]
+  VL_MAP_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string,std::vector<double>>",3,["SQLite"],["VL_MAP","STRING",["VL_VECTOR","DOUBLE"]],true]
+  VL_MAP_VL_STRING_VECTOR_DOUBLE,  // ["std::map<std::string,std::vector<double>>",3,["SQLite"],["VL_MAP","VL_STRING",["VECTOR","DOUBLE"]],true]
+  VL_MAP_VL_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string,std::vector<double>>",3,["SQLite"],["VL_MAP","VL_STRING",["VL_VECTOR","DOUBLE"]],true]
 
   // map<string, map<int, double> >
-  MAP_STRING_MAP_INT_DOUBLE,
-  MAP_STRING_VL_MAP_INT_DOUBLE,
-  VL_MAP_STRING_MAP_INT_DOUBLE,
-  MAP_VL_STRING_MAP_INT_DOUBLE,
-  MAP_VL_STRING_VL_MAP_INT_DOUBLE,
-  VL_MAP_STRING_VL_MAP_INT_DOUBLE,
-  VL_MAP_VL_STRING_MAP_INT_DOUBLE,
-  VL_MAP_VL_STRING_VL_MAP_INT_DOUBLE,
+  MAP_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string,std::map<int,double>>",3,["SQLite"],["MAP","STRING",["MAP","INT","DOUBLE"]],false]
+  MAP_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string,std::map<int,double>>",3,["SQLite"],["MAP","STRING",["VL_MAP","INT","DOUBLE"]],false]
+  VL_MAP_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string,std::map<int,double>>",3,["SQLite"],["VL_MAP","STRING",["MAP","INT","DOUBLE"]],true]
+  MAP_VL_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string,std::map<int,double>>",3,["SQLite"],["MAP","VL_STRING",["MAP","INT","DOUBLE"]],false]
+  MAP_VL_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string,std::map<int,double>>",3,["SQLite"],["MAP","VL_STRING",["VL_MAP","INT","DOUBLE"]],false]
+  VL_MAP_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string,std::map<int,double>>",3,["SQLite"],["VL_MAP","STRING",["VL_MAP","INT","DOUBLE"]],true]
+  VL_MAP_VL_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string,std::map<int,double>>",3,["SQLite"],["VL_MAP","VL_STRING",["MAP","INT","DOUBLE"]],true]
+  VL_MAP_VL_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string,std::map<int,double>>",3,["SQLite"],["VL_MAP","VL_STRING",["VL_MAP","INT","DOUBLE"]],true]
 
   // map<string, pair<double, map<int, double> > >
   MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
