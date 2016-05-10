@@ -42,7 +42,7 @@ for back in ALL_BACK:
     inner = []
     for i in range(ENUM_START+1,len(lines)):
         s = lines[i].split("//")[-1].strip()
-        DB = lines[i].split("//")[0].strip().strip(",")
+        DB = lines[i].split("//")[0].strip().strip(",").strip("0").strip(" =")
         if "};" in lines[i]:
             break
         if "[" in s:        
@@ -61,6 +61,5 @@ for back in ALL_BACK:
 #s = s.replace("],","],\n    ")
 
 s = ",\n    ".join(map(json.dumps, outer))
-s = "    " + s
 print(s)
 

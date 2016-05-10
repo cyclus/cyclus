@@ -86,7 +86,7 @@ enum DbTypes {
   VL_LIST_UUID,  // ["std::list<boost::uuids::uuid>",1,[],["VL_LIST","UUID"],true]
   // pairs - not variable length
   PAIR_INT_BOOL,  // ["std::pair<int,bool>",0,[],["PAIR","INT","BOOL"],false] 
-  PAIR_INT_INT,  // ["std::pair<int,int>",0,["HDF5"],["PAIR","INT","int"],false] 
+  PAIR_INT_INT,  // ["std::pair<int,int>",0,["HDF5"],["PAIR","INT","INT"],false] 
   PAIR_INT_FLOAT,  // ["std::pair<int,float>",0,[],["PAIR","INT","FLOAT"],false]
   PAIR_INT_DOUBLE,  // ["std::pair<int,double>",0,[],["PAIR","INT","DOUBLE"],false]
   PAIR_INT_STRING,  // ["std::pair<int,std::string>",1,["HDF5"],["PAIR","INT","STRING"],false]
