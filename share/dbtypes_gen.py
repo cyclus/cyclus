@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os
 import sys
 import json
@@ -6,15 +7,18 @@ import json
 with open(os.path.join(os.path.dirname(__file__), '..', 'src', 'query_backend.h')) as f:
     lines = f.readlines()
 
-VERSION = "v"+sys.argv[1]
+VERSION = "v" + sys.argv[1]
 
-ALL_BACK = ["SQLite", "HDF5"]
+ALL_BACKS = ["SQLite", "HDF5"]
 
 ENUM_START = 0
 
-for i in range(0,len(lines)):
-    if "enum DbTypes {" in lines[i]:
+for i in range(len(lines)):
+    if lines[i].strip() == "enum DbTypes {":
         ENUM_START = i
+        break
+else:
+    raise RuntimeError('could not find the start of the DbTypes enum')
 
 ID_INDEX = 0
 DB_INDEX = 1
@@ -28,27 +32,33 @@ VL_INDEX = 8
 
 def main():
     outer = []
-    for back in ALL_BACK:
-        ID = 0
+    for back in ALL_BACKS:
+        enum = 0
         inner = []
-        for i in range(ENUM_START+1,len(lines)):
+        for i in range(ENUM_START+1, len(lines)):
+            if lines[i].strip() == '};':
+                break
             s = lines[i].split("//")[-1].strip()
             #The extra strip statements keep the " = 0" out of the BOOL dbtype name.
-            DB = lines[i].split("//")[0].strip().strip(",").strip("0").strip(" =")
-            if "};" in lines[i]:
-                break
+            pre = lines[i].split("//")[0].strip().strip(",")
+            db, eq, num = pre.partition("=")
+            db = db.strip()
+            if len(eq) > 0:
+                enum = int(num.strip())
+            if db == "":
+                continue
             try:
                 x = json.loads(s)
-                x.insert(ID_INDEX, ID)
-                x.insert(DB_INDEX, DB)
-                supported_backends = x[BACK_INDEX]
-                x[BACK_INDEX] = back
-                x.insert(VERSION_INDEX,VERSION)
-                x.insert(SUPPORTED_INDEX, 1 if back in supported_backends else 0)
-                inner.append(x)
-                ID += 1
             except ValueError:
                 continue
+            x.insert(ID_INDEX, enum)
+            x.insert(DB_INDEX, db)
+            supported_backends = x[BACK_INDEX]
+            x[BACK_INDEX] = back
+            x.insert(VERSION_INDEX, VERSION)
+            x.insert(SUPPORTED_INDEX, 1 if back in supported_backends else 0)
+            inner.append(x)
+            enum += 1
         outer += inner
 
     s = ",\n    ".join(map(json.dumps, outer))
