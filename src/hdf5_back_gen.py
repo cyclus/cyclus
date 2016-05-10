@@ -33,12 +33,6 @@ for row in range(0, len(RAW_TABLE)):
         VERSION = current[5]
         TABLE_START = row
 
-#for row in range(0, len(RAW_TABLE)):
-#    current = tuple(RAW_TABLE[row])
-#    if current[5] == "v1.3" and current[4] == "HDF5":
-#        TABLE_START = row
-#        break
-
 V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
 
 CANON_SET = set()
