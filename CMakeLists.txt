@@ -201,7 +201,14 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
 
-    EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
+    configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/script.cmake.in
+      ${CMAKE_CURRENT_BINARY_DIR}/script.cmake
+      COPYONLY
+    )
+    add_custom_command(COMMAND ${CMAKE_COMMAND} -P
+      ${CMAKE_CURRENT_BINARY_DIR}/script.cmake
+    )
 
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
