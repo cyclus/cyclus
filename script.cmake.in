@@ -1,4 +1,0 @@
-execute_process(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
-if("${core_version}" STREQUAL "")
-  message(FATAL_ERROR "unable to read version")
-endif()
