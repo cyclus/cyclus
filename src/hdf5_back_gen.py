@@ -26,14 +26,17 @@ with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')
 
 VERSION = ""
 TABLE_START = 0
-
+TABLE_END = 0
 for row in range(len(RAW_TABLE)):
     current = tuple(RAW_TABLE[row])
-    if current[4] == "HDF5" and current[5] > VERSION:
-        VERSION = current[5]
-        TABLE_START = row
+    if current[4] == "HDF5":
+        if current[5] > VERSION:
+            VERSION = current[5]
+            TABLE_START = row
+        if current[5] == VERSION:
+            TABLE_END = row    
 
-TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
+TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:TABLE_END+1])
 
 CANON_SET = set()
 DB_TO_CPP = {}
