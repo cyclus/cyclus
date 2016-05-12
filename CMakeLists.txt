@@ -204,7 +204,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
     
     IF("${core_version}" STREQUAL "")
-      MESSAGE(WARNING "unable to read current core version, falling back to previous version")
+      MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
       SET(core_version "-1")
     ENDIF()
 
