@@ -27,13 +27,13 @@ with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')
 VERSION = ""
 TABLE_START = 0
 
-for row in range(0, len(RAW_TABLE)):
+for row in range(len(RAW_TABLE)):
     current = tuple(RAW_TABLE[row])
     if current[4] == "HDF5" and current[5] > VERSION:
         VERSION = current[5]
         TABLE_START = row
 
-V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
+TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
 
 CANON_SET = set()
 DB_TO_CPP = {}
@@ -45,7 +45,7 @@ def convert_canonical(raw_list):
         return raw_list
     return tuple(convert_canonical(x) for x in raw_list)
 
-for row in V3_TABLE:
+for row in TYPES_TABLE:
     if row[6] == 1 and row[4] == "HDF5" and row[5] == VERSION:        
         CANON_SET.add(convert_canonical(row[7]))
         DB_TO_CPP[row[1]] = row[2]
