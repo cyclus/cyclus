@@ -204,7 +204,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
     
     IF("${core_version}" STREQUAL "")
-      message(FATAL_ERROR "unable to read core version")
+      MESSAGE(WARNING "unable to read current core version, falling back to previous version")
+      SET(core_version "-1")
     ENDIF()
 
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")

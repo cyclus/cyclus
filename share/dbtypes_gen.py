@@ -4,14 +4,17 @@ import os
 import sys
 import json
 
+VERSION_READ_FAIL = "-1"
+
 with open(os.path.join(os.path.dirname(__file__), '..', 'src', 'query_backend.h')) as f:
     lines = f.readlines()
 
-VERSION = "v" + sys.argv[1]
+if sys.argv[1] == VERSION_READ_FAIL:
+    sys.exit()
 
 ALL_BACKS = ["SQLite", "HDF5"]
-
 ENUM_START = 0
+VERSION = "v" + sys.argv[1]
 
 for i in range(len(lines)):
     if lines[i].strip() == "enum DbTypes {":
@@ -61,7 +64,7 @@ def main():
             enum += 1
         outer += inner
 
-    s = ",\n    ".join(map(json.dumps, outer))
+    s = "," + ",\n    ".join(map(json.dumps, outer))
     print(s)
 
 if __name__ == '__main__':
