@@ -20,7 +20,10 @@ CONFIGURE_FILE(
     COPYONLY
     )
 
-EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/dbtypes_gen.py ${core_version} OUTPUT_VARIABLE DBTYPES_JSON_ENTRIES)
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/dbtypes_gen.py ${core_version} OUTPUT_VARIABLE DBTYPES_JSON_ENTRIES RESULT_VARIABLE res_var)
+IF(NOT "${res_var}" STREQUAL "0")
+  message(FATAL_ERROR "Process dbtypes_gen.py failed, res_var = '${res_var}'")
+ENDIF()
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/dbtypes.json.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/dbtypes.json"
