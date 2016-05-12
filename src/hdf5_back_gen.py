@@ -24,14 +24,19 @@ def resolve_unicode(item):
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
     RAW_TABLE = resolve_unicode(json.load(f))
 
+VERSION = ""
 TABLE_START = 0
-for row in range(0, len(RAW_TABLE)):
+TABLE_END = 0
+for row in range(len(RAW_TABLE)):
     current = tuple(RAW_TABLE[row])
-    if current[5] == "v1.3" and current[4] == "HDF5":
-        TABLE_START = row
-        break
+    if current[4] == "HDF5":
+        if current[5] > VERSION:
+            VERSION = current[5]
+            TABLE_START = row
+        if current[5] == VERSION:
+            TABLE_END = row    
 
-V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
+TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:TABLE_END+1])
 
 CANON_SET = set()
 DB_TO_CPP = {}
@@ -43,8 +48,8 @@ def convert_canonical(raw_list):
         return raw_list
     return tuple(convert_canonical(x) for x in raw_list)
 
-for row in V3_TABLE:
-    if row[6] == 1 and row[4] == "HDF5":        
+for row in TYPES_TABLE:
+    if row[6] == 1 and row[4] == "HDF5" and row[5] == VERSION:        
         CANON_SET.add(convert_canonical(row[7]))
         DB_TO_CPP[row[1]] = row[2]
         CANON_TO_DB[convert_canonical(row[7])] = row[1]
@@ -534,6 +539,6 @@ def main():
         QUERY_CASES += CASE_TEMPLATE.format(t=current_type, read_x=indent(reader.format(**ctx), INDENT))
 
     print(indent(QUERY_CASES, INDENT))
-    
+
 if __name__ == '__main__':
     main()
