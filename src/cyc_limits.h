@@ -25,6 +25,10 @@ inline bool AlmostEq(double d1, double d2) {
   return std::fabs(d1 - d2) < eps();
 }
 
+/// distance in ULP within which floating point numbers should be considered
+/// equal.
+static const double float_ulp_eq = 2;
+
 /// maximum value for a function modifier (i.e., a_i for variable x_i)
 static const double kModifierLimit = pow(10, 10);
 

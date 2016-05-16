@@ -200,6 +200,13 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
+    
+    EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
+    
+    IF("${core_version}" STREQUAL "")
+      MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
+      SET(core_version "-1")
+    ENDIF()
 
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")

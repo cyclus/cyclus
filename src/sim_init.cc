@@ -148,17 +148,21 @@ void SimInit::LoadInfo() {
   int y0 = qr.GetVal<int>("InitialYear");
   int m0 = qr.GetVal<int>("InitialMonth");
   std::string h = qr.GetVal<std::string>("Handle");
-
   QueryResult dq = b_->Query("DecayMode", NULL);
   std::string d = dq.GetVal<std::string>("Decay");
+  si_ = SimInfo(dur, y0, m0, h, d);
 
-  dq = b_->Query("TimeStepDur", NULL);
+  si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
+
+  qr = b_->Query("TimeStepDur", NULL);
   // TODO: when the backends support uint64_t, the int template here
   // should be updated to uint64_t.
-  uint64_t ts = dq.GetVal<int>("DurationSecs");
+  si_.dt = qr.GetVal<int>("DurationSecs");
 
-  si_ = SimInfo(dur, y0, m0, h, d);
-  si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
+  qr = b_->Query("InfoExplicitInv", NULL);
+  si_.explicit_inventory = qr.GetVal<bool>("RecordInventory");
+  si_.explicit_inventory_compact = qr.GetVal<bool>("RecordInventoryCompact");
+
   ctx_->InitSim(si_);
 }
 

@@ -916,7 +916,8 @@ void Hdf5Back::CreateTable(Datum* d) {
     dst_size += dst_sizes[i];
   }
 
-  const char* title = d->title().c_str();
+  std::string titlestr = d->title();
+  const char* title = titlestr.c_str();
   int compress = 1;
   int chunk_size = 1024;
   void* fill_data = NULL;

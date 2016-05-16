@@ -18,13 +18,11 @@ TEST_P(AgentTests, Clone) {
   delete clone;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(AgentTests, Print) {
   std::string s = agent_->str();
   EXPECT_NO_THROW(std::string s = agent_->str());
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(AgentTests, Schema) {
   std::stringstream schema;
   schema << ("<element name=\"foo\">\n");
@@ -34,27 +32,26 @@ TEST_P(AgentTests, Schema) {
   EXPECT_NO_THROW(p.Init(schema));
 }
 
+TEST_P(AgentTests, GetAgentType) {
+  EXPECT_NE(std::string("Agent"), agent_->kind());
+}
+
 TEST_P(AgentTests, Annotations) {
   Json::Value anno = agent_->annotations();
   EXPECT_TRUE(anno.isObject());
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(AgentTests, GetAgentType) {
-  EXPECT_NE(std::string("Agent"), agent_->kind());
-}
-
-TEST_P(AgentTests, Name) {
+TEST_P(AgentTests, Annotations_Name) {
   Json::Value a = agent_->annotations();
   EXPECT_TRUE(a["name"].isString());
 }
 
-TEST_P(AgentTests, Parents) {
+TEST_P(AgentTests, Annotations_Parents) {
   Json::Value a = agent_->annotations();
   EXPECT_FALSE(a["parents"].empty());
 }
 
-TEST_P(AgentTests, AllParents) {
+TEST_P(AgentTests, Annotations_AllParents) {
   Json::Value all_parents = agent_->annotations()["all_parents"];
   EXPECT_FALSE(all_parents.empty());
 

@@ -2,7 +2,6 @@
 """This module generates HDF5 backend code found in src/hdf5_back.cc"""
 import os
 import json
-import textwrap
 from ast import literal_eval
 from pprint import pformat
 
@@ -275,17 +274,39 @@ class CppGen(Visitor):
         for n in node.nodes:
             if n !isinstance(list)
 
+def resolve_unicode(item):	   
+    #Python3, if we can handle it, don't bother.    
+    if isinstance(item, str):
+        return item        
+    #We must check every element in tuples and lists.    
+    elif isinstance(item, tuple):
+        return tuple([resolve_unicode(i) for i in item])
+    elif isinstance(item, list):
+        return [resolve_unicode(i) for i in item]
+    #Not a string, either unicode (Python2.7) or an int.    
+    else: 
+        try:
+            return item.encode('utf-8')
+        except Exception:
+            pass
+        return item
+
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
-    RAW_TABLE = json.load(f)
+    RAW_TABLE = resolve_unicode(json.load(f))
 
+VERSION = ""
 TABLE_START = 0
-for row in range(0, len(RAW_TABLE)):
+TABLE_END = 0
+for row in range(len(RAW_TABLE)):
     current = tuple(RAW_TABLE[row])
-    if current[5] == "v1.3" and current[4] == "HDF5":
-        TABLE_START = row
-        break
+    if current[4] == "HDF5":
+        if current[5] > VERSION:
+            VERSION = current[5]
+            TABLE_START = row
+        if current[5] == VERSION:
+            TABLE_END = row    
 
-V3_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:])
+TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:TABLE_END+1])
 
 CANON_TO_NODE = {}
 CANON_SET = set()
@@ -297,9 +318,9 @@ def convert_canonical(raw_list):
     if isinstance(raw_list, str):
         return raw_list
     return tuple(convert_canonical(x) for x in raw_list)
-
-for row in V3_TABLE:
-    if row[6] == 1 and row[4] == "HDF5":
+        
+for row in TYPES_TABLE:
+    if row[6] == 1 and row[4] == "HDF5" and row[5] == VERSION:        
         db = row[1]
         cpp = row[2]
         canon = convert_canonical(row[7])
@@ -307,7 +328,6 @@ for row in V3_TABLE:
         DB_TO_CPP[db] = cpp
         CANON_TO_DB[canon] = db
         CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
-        
 
 def list_dependencies(canon):
     """A list of a type's dependencies, in canonical form.
@@ -817,7 +837,27 @@ def create_pair_reader(t, current_type, reader, depth):
     return reader.format(**ctx)
 def create_map_reader(t, current_type, reader, depth):
     return
-    
+
+def indent(text, prefix, predicate=None):
+    """This function copied from textwrap library version 3.3.
+
+    Adds 'prefix' to the beginning of selected lines in 'text'.
+    If 'predicate' is provided, 'prefix' will only be added to the lines
+    where 'predicate(line)' is True. If 'predicate' is not provided,
+    it will default to adding 'prefix' to all non-empty lines that do not
+    consist solely of whitespace characters.
+    """
+    if predicate is None:
+        def predicate(line):
+            return line.strip()
+
+    def prefixed_lines():
+        for line in text.splitlines(True):
+            yield (prefix + line if predicate(line) else line)
+    return ''.join(prefixed_lines())
+
+QUERY_CASES = ''
+
 def main():
     #global QUERY_CASES
     #for ca in CANON_SET: 
@@ -827,14 +867,13 @@ def main():
    #            "NO_CLOSE": NO_CLOSE.format(t = current_type),
    #            "H5TCLOSE": H5TCLOSE.format(t = current_type),
    #            "H5TCLOSE_MULTI": H5TCLOSE_MULTI.format(t = current_type)}
-                  
    #     QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
 
     #print(textwrap.indent(QUERY_CASES, INDENT*2))
     
     s = create_reader(TypeStr(("VECTOR","STRING")))
     
-    print(textwrap.indent(s, INDENT)) 
+    print(indent(s, INDENT)) 
     
 if __name__ == '__main__':
     main()

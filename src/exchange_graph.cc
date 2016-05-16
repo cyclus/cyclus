@@ -1,6 +1,7 @@
 #include "exchange_graph.h"
 
 #include <algorithm>
+#include <boost/math/special_functions/next.hpp>
 
 #include "cyc_limits.h"
 #include "error.h"
@@ -62,12 +63,15 @@ Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
   if (exclusive_) {
     double fqty = unode->qty;
     double sqty = vnode->qty;
+    // this careful float comparison is vital for preventing false positive
+    // constraint violations w.r.t. exclusivity-related capacity.
+    double dist = boost::math::float_distance(fqty, sqty);
     if (unode->exclusive && vnode->exclusive) {
-      excl_val_ = fqty == sqty ? fqty : 0;
+      excl_val_ = (std::abs(dist) <= float_ulp_eq) ? fqty : 0;
     } else if (unode->exclusive) {
-      excl_val_ = sqty >= fqty ? fqty : 0;
+      excl_val_ = dist >= -float_ulp_eq ? fqty : 0;
     } else {
-      excl_val_ = fqty >= sqty ? sqty : 0;
+      excl_val_ = dist <= float_ulp_eq ? sqty : 0;
     }
   } else {
     excl_val_ = 0;

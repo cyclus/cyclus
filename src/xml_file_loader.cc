@@ -7,6 +7,7 @@
 #include <streambuf>
 
 #include <boost/filesystem.hpp>
+#include <libxml++/libxml++.h>
 
 #include "agent.h"
 #include "blob.h"
@@ -155,10 +156,13 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->Init(input);
 
+  std::stringstream ss;
+  parser_->Document()->write_to_stream_formatted(ss);
+
   std::stringstream orig_input;
   LoadRawStringstreamFromFile(orig_input, file_);
   ctx_->NewDatum("InputFiles")
-      ->AddVal("Data", Blob(orig_input.str()))
+      ->AddVal("Data", Blob(ss.str()))
       ->Record();
 }
 
@@ -416,6 +420,9 @@ void XMLFileLoader::LoadControlParams() {
   std::string d = OptionalQuery<std::string>(qe, "decay", "manual");
 
   SimInfo si(dur, y0, m0, handle, d);
+
+  si.explicit_inventory = OptionalQuery<bool>(qe, "explicit_inventory", false);
+  si.explicit_inventory_compact = OptionalQuery<bool>(qe, "explicit_inventory_compact", false);
 
   // get time step duration
   si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);

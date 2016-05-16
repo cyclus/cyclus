@@ -88,6 +88,66 @@ void Timer::DoTock() {
        agent++) {
     agent->second->Tock();
   }
+
+  if (si_.explicit_inventory || si_.explicit_inventory_compact) {
+    std::set<Agent*> ags = ctx_->agent_list_;
+    std::set<Agent*>::iterator it;
+    for (it = ags.begin(); it != ags.end(); ++it) {
+      Agent* a = *it;
+      if (a->enter_time() == -1) {
+        continue; // skip agents that aren't alive
+      }
+      RecordInventories(a);
+    }
+  }
+}
+
+
+void Timer::RecordInventories(Agent* a) {
+  Inventories invs = a->SnapshotInv();
+  Inventories::iterator it2;
+  for (it2 = invs.begin(); it2 != invs.end(); ++it2) {
+    std::string name = it2->first;
+    std::vector<Resource::Ptr> mats = it2->second;
+    if (mats.empty() || ResCast<Material>(mats[0]) == NULL) {
+      continue; // skip non-material inventories
+    }
+
+    Material::Ptr m = ResCast<Material>(mats[0]->Clone());
+    for (int i = 1; i < mats.size(); i++) {
+      m->Absorb(ResCast<Material>(mats[i]->Clone()));
+    }
+    RecordInventory(a, name, m);
+  }
+}
+
+void Timer::RecordInventory(Agent* a, std::string name, Material::Ptr m) {
+  if (si_.explicit_inventory) {
+    CompMap c = m->comp()->mass();
+    compmath::Normalize(&c, m->quantity());
+    CompMap::iterator it;
+    for (it = c.begin(); it != c.end(); ++it) {
+      ctx_->NewDatum("ExplicitInventory")
+          ->AddVal("AgentId", a->id())
+          ->AddVal("Time", time_)
+          ->AddVal("InventoryName", name)
+          ->AddVal("NucId", it->first)
+          ->AddVal("Quantity", it->second)
+          ->Record();
+    }
+  }
+
+  if (si_.explicit_inventory_compact) {
+    CompMap c = m->comp()->mass();
+    compmath::Normalize(&c, 1);
+    ctx_->NewDatum("ExplicitInventoryCompact")
+        ->AddVal("AgentId", a->id())
+        ->AddVal("Time", time_)
+        ->AddVal("InventoryName", name)
+        ->AddVal("Quantity", m->quantity())
+        ->AddVal("Composition", c)
+        ->Record();
+  }
 }
 
 void Timer::DoDecom() {

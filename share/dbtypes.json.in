@@ -1060,4 +1060,5 @@
     [146, "MAP_PAIR_INT_VL_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1, ["MAP", ["PAIR", "INT", "VL_STRING"], "DOUBLE"]],
     [147, "VL_MAP_PAIR_INT_VL_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1, ["VL_MAP", ["PAIR", "INT", "VL_STRING"], "DOUBLE"]],
     [0, "BOOL", "bool", 0, "HDF5", "v1.3", 1, "BOOL"]
+    @DBTYPES_JSON_ENTRIES@
 ]
