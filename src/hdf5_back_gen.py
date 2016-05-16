@@ -272,7 +272,8 @@ class CppGen(Visitor):
         
     def visit_block(self, node):
         for n in node.nodes:
-            if n !isinstance(list)
+            if not isinstance(list, n):
+                pass
 
 def resolve_unicode(item):	   
     #Python3, if we can handle it, don't bother.    
@@ -536,7 +537,7 @@ MAP_READER = """
 
 #setup functions
 
-def primitive_setup(depth=0, prefix="", t):
+def primitive_setup(t, depth=0, prefix=""):
     jlen = "jlen" + str(depth) + prefix
     node = Block(nodes=[
         Assign(target=Var(name=jlen),
@@ -555,8 +556,8 @@ def string_setup(depth=0, prefix=""):
                    value=FuncCall(name=Raw(code="H5Tget_member_type"),
                                   args=[Raw(code="tb_type"), 
                                   Raw(code="j")])),
-        Decl(type=Type(cpp="size_t"), name=Var(name=nullpos),
-        Decl(type=Type(cpp="hsize_t"), name=Var(name=fieldlen),
+        Decl(type=Type(cpp="size_t"), name=Var(name=nullpos)),
+        Decl(type=Type(cpp="hsize_t"), name=Var(name=fieldlen)),
         FuncCall(name=Raw(code="H5Tget_array_dims2"),
                  args=[Raw(code=field_type), Raw(code="&"+fieldlen)]),
         DeclAssign(type=Type(cpp="unsigned int"), 
@@ -578,7 +579,7 @@ def get_setup(t, depth=0, prefix=""):
             node = string_setup(depth, prefix)
         elif t.sub[0] == "VL_STRING":
             node = vl_string_setup(depth, prefix)
-        else
+        else:
             node = primitive_setup(depth, prefix, t)
     else:
         node = Block(nodes=[get_setup(i, depth=depth+1, prefix=prefix+part) for i, part in zip(t.sub[1:], template_args[t.sub[0]])])

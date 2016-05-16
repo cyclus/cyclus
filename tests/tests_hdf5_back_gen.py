@@ -6,7 +6,7 @@ import nose
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
 cycdir = os.path.dirname(os.path.dirname(__file__))
-sys.path.insert(0, os.path.join(cycdir, 'src'))
+sys.path.insert(0, os.path.join(cycdir, '../src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
     RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case
