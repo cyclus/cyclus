@@ -132,7 +132,7 @@ class PrettyFormatter(Visitor):
             a = getattr(node, field)
             t.append(self.visit(a) if isinstance(a, Node) else pformat(a))
         t = ['{0}={1}'.format(n, x) for n, x in zip(node.fields, t)]
-        s += textwrap.indent(',\n'.join(t), self.indent)
+        s += indent(',\n'.join(t), self.indent)
         self.level -= 1
         s += '\n)'
         return s
@@ -204,7 +204,7 @@ class CppGen(Visitor):
         s += self.visit(node.cond)
         s += ": {\n"
         for n in node.body:
-            s += textwrap.indent(self.visit(n), self.indent)
+            s += indent(self.visit(n), self.indent)
         s += "}\n"
         return s
         
@@ -213,7 +213,7 @@ class CppGen(Visitor):
         s += self.visit(node.cond)
         s += "){\n"
         for n in node.body:
-            s += textwrap.indent(self.visit(n), self.indent)
+            s += indent(self.visit(n), self.indent)
         s += "\n}"
         #check if elifs is an empty list
         if node.elifs:
@@ -224,12 +224,12 @@ class CppGen(Visitor):
                 for n in body:
                     b = ""
                     b += self.visit(n)
-                    s += textwrap.indent(b, self.indent)
+                    s += indent(b, self.indent)
                 s += "\n}"  
         #check if else attribute exists
         if node.el is not None:
             s += "else{\n"
-            s += textwrap.indent(self.visit(node.el), self.indent)
+            s += indent(self.visit(node.el), self.indent)
             s += "\n}"
         return s
         
@@ -244,7 +244,7 @@ class CppGen(Visitor):
         s += self.visit(node.incr)
         s += "){\n"
         for n in node.body:
-            s += textwrap.indent(self.visit(n), self.indent)
+            s += indent(self.visit(n), self.indent)
         s += "\n}"
         return s
         
@@ -641,23 +641,23 @@ def get_body(t, depth=0, prefix=""):
         return Block(nodes=block)
 
 
-READERS = {'INT': REINTERPRET_CAST_READER,
-           'BOOL': REINTERPRET_CAST_READER,
-           'FLOAT': REINTERPRET_CAST_READER,
-           'DOUBLE': REINTERPRET_CAST_READER,
-           'STRING': STRING_READER,
-           'VL_STRING': VL_READER,
-           'BLOB': VL_READER,
-           'UUID': UUID_READER,
-           'VECTOR': VECTOR_READER,
-           'VL_VECTOR': VL_READER,
-           'SET': SET_READER,
-           'VL_SET': VL_READER,
-           'LIST': LIST_READER,
-           'VL_LIST': VL_READER,
-           'PAIR': PAIR_READER,
-           'MAP': MAP_READER,
-           'VL_MAP': VL_READER}
+#READERS = {'INT': REINTERPRET_CAST_READER,
+#           'BOOL': REINTERPRET_CAST_READER,
+#           'FLOAT': REINTERPRET_CAST_READER,
+#           'DOUBLE': REINTERPRET_CAST_READER,
+#           'STRING': STRING_READER,
+#           'VL_STRING': VL_READER,
+#           'BLOB': VL_READER,
+#           'UUID': UUID_READER,
+#           'VECTOR': VECTOR_READER,
+#           'VL_VECTOR': VL_READER,
+#           'SET': SET_READER,
+#           'VL_SET': VL_READER,
+#           'LIST': LIST_READER,
+#           'VL_LIST': VL_READER,
+#           'PAIR': PAIR_READER,
+#           'MAP': MAP_READER,
+#           'VL_MAP': VL_READER}
 
 DEF_BODY = "x = {t.cpp}(xraw, xraw+jlen);"
 
@@ -690,154 +690,6 @@ for (unsigned int k = 0; k < {fieldlen} ++k) {
 """.strip()
 
 QUERY_CASES = ''
-
-#CLOSURE_STACK = []
-
-def create_reader(a_type, depth=0):
-    current_type = a_type
-    if isinstance(current_type.canon, str):
-        reader = READERS[current_type.canon]
-        rtn = create_primitive_reader(current_type.canon, current_type, reader, depth+1)
-    else:
-        reader = READERS[current_type.canon[0]]
-        if current_type.canon[0] == "VECTOR":
-            rtn = create_vector_reader(current_type.canon, current_type, reader, depth+1)
-        if current_type.canon[0] == "SET":
-            rtn = create_set_reader(current_type.canon, current_type, reader, depth)
-    
-    ctx = {"t": a_type,
-           "setup": rtn[0],
-           "body": rtn[1],
-           "teardown": rtn[2],
-           "fieldlen": create_fieldlen(a_type).format(t=a_type.sub[1])}
-    
-    return reader.format(**ctx)
-
-def create_setup(a_type, depth):
-    #we know how to do setup explicitly if it's a primitive type
-    if isinstance(a_type.canon, str):
-        if a_type.db == "STRING":
-            return """
-hid_t field_type = H5Tget_member_type(tb_type, j);
-size_t nullpos;
-hsize_t fieldlen;
-H5Tget_array_dims2(field_type, &fieldlen);
-unsigned int strlen = col_sizes_[table][j] / fieldlen;
-""".strip()
-        else:
-            return """
-jlen = col_sizes_[table][j] / {fieldlen};
-{t.cpp}* xraw = reinterpret_cast<{t.cpp}*>(buf + offset);
-""".strip().format(t = a_type, fieldlen = create_fieldlen(a_type).format(t = a_type))    
-    #however, if the type is a dependent type, there's no explicit way
-    else:
-        #recurse!
-        return create_setup(a_type.sub[1], depth+1)
-
-def create_body(a_type, depth):
-    body = ""
-    if isinstance(a_type.sub[1].canon, str):
-        ctx = create_body_ctx(a_type, depth)
-        body = BODIES[a_type.sub[1].canon].format(**ctx)
-    else:
-        body = BODIES[a_type.canon[0]]
-        #recurse!
-        body = body.format(t = a_type, fieldlen = create_fieldlen(a_type), col_size = "col_sizes_[table][j]", sub_body = create_body(a_type.sub[1], depth+1))
-    return body
-
-def create_body_ctx(a_type, depth):
-    ctx = {"t": a_type,
-           "fieldlen": create_fieldlen(a_type.sub[1]),
-           "col_size": "col_sizes_[table][j]"}
-    if a_type.canon[0] == "SET":
-        ctx["decl_k"] = "{t.sub[1].cpp} x_k;".format(t=a_type)
-        ctx["def_k"] = "x_k"
-        ctx["apply"] = "x.insert(x_k);"
-    elif a_type.canon[0] == "VECTOR":        
-        ctx["decl_k"] = ""
-        ctx["def_k"] = "x[k]"
-        ctx["apply"] = ""
-    return ctx
-
-#helper method for create_teardown
-import re
-def find_whole_word(word):
-    return re.compile(r'\b({0})\b'.format(word)).search
-
-def create_teardown(a_type, setup=""):
-    closure = NORMAL_CLOSE
-    setup_as_str = PrettyFormatter.visit(setup)
-    if "hid_t" not in setup_as_str:
-        return (closure + "\nbreak;")
-    else:
-        for node in setup.nodes:
-            if find_whole_word("hid_t")(line) != None:
-                closure += "\nH5Tclose("+line.split("=")[0].strip("hid_t").strip()+");"
-        return (closure + "\nbreak;").format(t = a_type)
-
-def create_fieldlen(a_type):
-    if a_type.db == "STRING":
-        return "fieldlen"
-    elif a_type.db == "VL_STRING":
-        return "CYCLUS_SHA1_SIZE"
-    else:
-        return "sizeof({t.cpp})"
-
-def create_primitive_reader(t, current_type, reader, depth):
-    ctx = {"t": current_type}
-    if depth == 1:
-        ctx["*2"] = "*"
-        ctx["*1"] = ""
-        ctx["teardown"] = create_teardown()
-    else:
-        ctx["*2"] = ""
-        ctx["*1"] = "*"
-        ctx["teardown"] = ""
-    return reader.format(**ctx)
-    
-def create_vector_reader(t, current_type, reader, depth):
-    ctx = {"t": current_type}
-    if isinstance(current_type.canon[1], str):
-        ctx["setup"] = create_setup(current_type, depth)
-        ctx["fieldlen"] = create_fieldlen(current_type).format(t=current_type)
-        ctx["read_type"] = create_read_type(current_type.sub[1])
-        if depth == 1:
-            ctx["teardown"] = create_teardown(ctx["setup"]).format(t=current_type)
-        else:
-            ctx["teardown"] = ""
-    else:
-        ctx["read_type"] = create_reader(current_type.canon[1])
-    return reader.format(**ctx)
-
-def create_set_reader(t, current_type, reader, depth):
-    pieces = []
-    
-    ctx = {"t": current_type, "fieldlen": create_fieldlen(current_type.sub[1]), "col_size": "col_sizes_[table][j]"}
-    
-    setup = create_setup(current_type.sub[1], depth)
-    pieces.append(setup)
-    
-    body = create_body(current_type, depth)
-    pieces.append(body)
-    
-    teardown = create_teardown(current_type, setup)
-    pieces.append(teardown)
-    
-    #pieces = [p.format(**ctx) for p in pieces]
-    
-    return tuple(pieces)
-    
-def create_list_reader(t, current_type, reader, depth):
-    return
-def create_pair_reader(t, current_type, reader, depth):
-    ctx = {"t": current_type}
-    ctx["setup1"] = create_setup(current_type.sub[1], depth)
-    ctx["setup2"] = create_setup(current_type.sub[2], depth)
-    
-    
-    return reader.format(**ctx)
-def create_map_reader(t, current_type, reader, depth):
-    return
 
 def indent(text, prefix, predicate=None):
     """This function copied from textwrap library version 3.3.
@@ -872,8 +724,8 @@ def main():
 
     #print(textwrap.indent(QUERY_CASES, INDENT*2))
     
-    s = create_reader(TypeStr(("VECTOR","STRING")))
-    
+    #s = create_reader(TypeStr(("VECTOR","STRING")))
+    s = "hello world"
     print(indent(s, INDENT)) 
     
 if __name__ == '__main__':
