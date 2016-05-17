@@ -122,7 +122,11 @@ MACRO(USE_CYCLUS lib_root src_root)
     # not sure if needed..
     IF(NOT EXISTS ${CCOUT})
         MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
-        EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
+        EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG}
+                        ${ORIG} ${INCL_ARGS} RESULT_VARIABLE res_var)
+        IF(NOT "${res_var}" STREQUAL "0")
+            message(FATAL_ERROR "cycpp failed with exit code '${res_var}'")
+        ENDIF()
     ENDIF(NOT EXISTS ${CCOUT})
     SET(
         "${lib_root}_CC"
