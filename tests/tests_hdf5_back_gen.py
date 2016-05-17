@@ -9,7 +9,7 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -49,13 +49,13 @@ def test_cppgen_type():
     assert_equal(exp, obs)
     
 def test_cppgen_decl():
-    exp = "std::string s;"
+    exp = "std::string s"
     n = Decl(type=Type(cpp="std::string"), name=Var(name="s"))
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
     
 def test_cppgen_assign():
-    exp = "x = y;"
+    exp = "x=y;"
     n = Assign(target=Var(name="x"), value=Var(name="y"))
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)  
@@ -81,11 +81,11 @@ def test_cppgen_rightunaryop():
 def test_cppgen_if():
     exp = """
 if(x==y){
-  x = 1;
+  x=1;
 }else if(x>y){
-  x = 2;
+  x=2;
 }else{
-  x = 3;
+  x=3;
 }""".strip()
     n = If(cond=BinOp(x=Var(name="x"), op="==", y=Var(name="y")),\
            body=[Assign(target=Var(name="x"), value=Raw(code="1"))],\
@@ -99,9 +99,9 @@ def test_cppgen_for():
 for(int i=0;i<5;i++){
   a++;
   b++;
-  c[i] = a+b;
+  c[i]=a+b;
 }""".strip()
-    n = For(adecl=DeclAssign(type=Type(cpp="int"), target=Var(name="i"), value=Raw(code="0")),\
+    n = For(adecl=Assign(target=Decl(type=Type(cpp="int"), name=Var(name="i")), value=Raw(code="0")),\
             cond=BinOp(x=Var(name="i"), op="<", y=Raw(code="5")),\
             incr=RightUnaryOp(name=Var(name="i"), op="++"),\
             body=[ExprStmt(child=RightUnaryOp(name=Var(name="a"), op="++")),
@@ -128,6 +128,18 @@ case 3:
     n = Case(cond=Raw(code="3"), 
              body=[ExprStmt(child=RightUnaryOp(name=Var(name="b"), op="++")),
                    Raw(code="break;")])
+                   
+def test_cppgen_block():
+    exp = """int x=5;
+int y=6;
+int z=x+y;\n"""
+    n = Block(nodes=[DeclAssign(type=Type(cpp="int"), target=Var(name="x"), value=Raw(code="5")),
+                     Block(nodes=[DeclAssign(type=Type(cpp="int"), target=Var(name="y"), value=Raw(code="6")),
+                                  DeclAssign(type=Type(cpp="int"), target=Var(name="z"), 
+                                             value=BinOp(x=Var(name="x"), op="+", y=Var(name="y")))])])
+    obs = CPPGEN.visit(n)
+    assert_equal(exp, obs)
+    
     
     
     

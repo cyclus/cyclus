@@ -153,7 +153,6 @@ class CppGen(Visitor):
         s = self.visit(node.type)
         s += " "
         s += self.visit(node.name)
-        s += ";"
         return s
     
     def visit_exprstmt(self, node):
@@ -163,7 +162,7 @@ class CppGen(Visitor):
     
     def visit_assign(self, node):
         s = self.visit(node.target)
-        s += " = "
+        s += "="
         s += self.visit(node.value)
         s += ";"
         return s
@@ -174,7 +173,7 @@ class CppGen(Visitor):
         s += self.visit(node.target)
         s += "="
         s += self.visit(node.value)
-        s += ";"
+        s += ";\n"
         return s
     
     def visit_binop(self, node):
@@ -271,9 +270,10 @@ class CppGen(Visitor):
         return ""
         
     def visit_block(self, node):
+        s = ""
         for n in node.nodes:
-            if not isinstance(list, n):
-                pass
+            s += self.visit(n)
+        return s  
 
 def resolve_unicode(item):	   
     #Python3, if we can handle it, don't bother.    
