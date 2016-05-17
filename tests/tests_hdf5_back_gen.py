@@ -9,7 +9,7 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -121,13 +121,15 @@ mult_two<std::string,STRING>(a,b)""".strip()
     assert_equal(exp, obs)
     
 def test_cppgen_case():
-    exp = """
-case 3:
+    exp = """case 3: {
   b++;
-  break;""".strip()
+  break;
+}\n"""
     n = Case(cond=Raw(code="3"), 
              body=[ExprStmt(child=RightUnaryOp(name=Var(name="b"), op="++")),
                    Raw(code="break;")])
+    obs = CPPGEN.visit(n)
+    assert_equal(exp, obs)
                    
 def test_cppgen_block():
     exp = """int x=5;
@@ -140,7 +142,47 @@ int z=x+y;\n"""
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
     
+#test various node structures
+
+def test_primitive_setup():
+    exp = """jlen0=col_sizes_[table][j] / sizeof(double);"""
+    obs = CPPGEN.visit(primitive_setup(Type(cpp="double")))
+    assert_equal(exp, obs)
     
+def test_string_setup():
+    exp = """
+hid_t fieldlen0=H5Tget_member_type(tb_type,j);
+size_t nullpos0;
+hsize_t fieldlen0;
+H5Tget_array_dims2(field_type0,&fieldlen0);
+unsigned int strlen0=col_sizes_[table][j] / fieldlen0;""".strip()
+    exp += "\n"
+    obs = CPPGEN.visit(string_setup())
+    assert_equal(exp, obs)
+    
+def test_vl_string_setup():
+    exp = """
+jlen0=col_sizes_[table][j] / CYCLUS_SHA1_SIZE;""".strip()
+    obs = CPPGEN.visit(vl_string_setup())
+    assert_equal(exp, obs)
+    
+def test_get_setup():
+    exp = """
+hid_t fieldlen1KEY=H5Tget_member_type(tb_type,j);
+size_t nullpos1KEY;
+hsize_t fieldlen1KEY;
+H5Tget_array_dims2(field_type1KEY,&fieldlen1KEY);
+unsigned int strlen1KEY=col_sizes_[table][j] / fieldlen1KEY;
+jlen1VALUE=col_sizes_[table][j] / CYCLUS_SHA1_SIZE;""".strip()
+    obs = CPPGEN.visit(get_setup(Type(cpp="std::map<std::string,std::string>", db="MAP_STRING_VL_STRING", canon=("MAP", "STRING", "VL_STRING"))))
+    assert_equal(exp, obs)
+    
+def test_get_decl():
+    exp = """double x0;\n"""
+    obs = CPPGEN.visit(get_decl(Type(cpp="double")))
+    assert_equal(exp, obs)
+
+
     
     
     

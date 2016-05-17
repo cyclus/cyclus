@@ -204,7 +204,7 @@ class CppGen(Visitor):
         s += ": {\n"
         for n in node.body:
             s += indent(self.visit(n), self.indent)
-        s += "}\n"
+        s += "\n}\n"
         return s
         
     def visit_if(self, node):
@@ -551,15 +551,15 @@ def string_setup(depth=0, prefix=""):
     strlen = "strlen" + str(depth) + prefix
     
     node = Block(nodes=[
-        DeclAssign(typ=Type(cpp="hid_t"), 
+        DeclAssign(type=Type(cpp="hid_t"), 
                    target=Var(name=fieldlen), 
                    value=FuncCall(name=Raw(code="H5Tget_member_type"),
                                   args=[Raw(code="tb_type"), 
                                   Raw(code="j")])),
-        Decl(type=Type(cpp="size_t"), name=Var(name=nullpos)),
-        Decl(type=Type(cpp="hsize_t"), name=Var(name=fieldlen)),
-        FuncCall(name=Raw(code="H5Tget_array_dims2"),
-                 args=[Raw(code=field_type), Raw(code="&"+fieldlen)]),
+        ExprStmt(child=Decl(type=Type(cpp="size_t"), name=Var(name=nullpos))),
+        ExprStmt(child=Decl(type=Type(cpp="hsize_t"), name=Var(name=fieldlen))),
+        ExprStmt(child=FuncCall(name=Raw(code="H5Tget_array_dims2"),
+                 args=[Raw(code=field_type), Raw(code="&"+fieldlen)])),
         DeclAssign(type=Type(cpp="unsigned int"), 
                    target=Var(name=strlen),
                    value=Raw(code="col_sizes_[table][j] / "+fieldlen))])
@@ -572,26 +572,31 @@ def vl_string_setup(depth=0, prefix=""):
                value=Raw(code="col_sizes_[table][j] / CYCLUS_SHA1_SIZE"))])
     return node
 
+template_args = {"MAP": ("KEY", "VALUE"),
+                 "VECTOR": ("ELEM",),
+                 "SET": ("ELEM",),
+                 "LIST": ("ELEM",),
+                 "PAIR": ("ITEM1", "ITEM2")}
+
 def get_setup(t, depth=0, prefix=""):
     node = Node()
     if is_primitive(t):
-        if t.sub[0] == "STRING":
+        if t.canon == "STRING":
             node = string_setup(depth, prefix)
-        elif t.sub[0] == "VL_STRING":
+        elif t.canon == "VL_STRING":
             node = vl_string_setup(depth, prefix)
         else:
-            node = primitive_setup(depth, prefix, t)
+            node = primitive_setup(t, depth, prefix)
     else:
-        node = Block(nodes=[get_setup(i, depth=depth+1, prefix=prefix+part) for i, part in zip(t.sub[1:], template_args[t.sub[0]])])
+        node = Block(nodes=[get_setup(CANON_TO_NODE[i], depth=depth+1, prefix=prefix+part) for i, part in zip(t.canon[1:], template_args[t.canon[0]])])
     return node
     
 #declaration
 
 def get_decl(t, depth=0, prefix=""):
     variable = "x" + str(depth) + prefix
-    node = Decl(type=t, name=Var(name=variable))
+    node = ExprStmt(child=Decl(type=t, name=Var(name=variable)))
     return node
-
 #bodies
 
 #to-do: fill these out
@@ -612,12 +617,6 @@ def vec_string_body(t, depth=0, prefix=""):
     
 def set_string_body(t, depth=0, prefix=""):
     pass
-
-template_args = {"MAP": ("KEY", "VALUE"),
-                 "VECTOR": ("ELEM",),
-                 "SET": ("ELEM",),
-                 "LIST": ("ELEM",),
-                 "PAIR": ("ITEM1", "ITEM2")}
 
 BODIES = {"INT": def_body,
           "DOUBLE": memcpy_body,
@@ -640,6 +639,8 @@ def get_body(t, depth=0, prefix=""):
         block.insert(0, initial_decl)
         return Block(nodes=block)
 
+def get_teardown():
+    return
 
 #READERS = {'INT': REINTERPRET_CAST_READER,
 #           'BOOL': REINTERPRET_CAST_READER,
