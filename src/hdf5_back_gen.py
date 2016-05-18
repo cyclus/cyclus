@@ -14,6 +14,7 @@ class Node(object):
         seen = set()
         for field, value in kwargs.items():
             if field not in self.fields:
+                print(field, " is not a valid field")
                 raise RuntimeError
             setattr(self, field, value)
             seen.add(field)
@@ -40,6 +41,9 @@ class Expr(Node):
     fields = ("value",)
 
 class ExprStmt(Node):
+    fields = ("child",)
+
+class Line(Node):
     fields = ("child",)
 
 class Assign(Node):
@@ -164,7 +168,6 @@ class CppGen(Visitor):
         s = self.visit(node.target)
         s += "="
         s += self.visit(node.value)
-        s += ";"
         return s
     
     def visit_declassign(self, node):
@@ -173,7 +176,6 @@ class CppGen(Visitor):
         s += self.visit(node.target)
         s += "="
         s += self.visit(node.value)
-        s += ";\n"
         return s
     
     def visit_binop(self, node):
@@ -235,7 +237,7 @@ class CppGen(Visitor):
     def visit_for(self, node):
         s = "for("
         if node.adecl is not None:
-            s += self.visit(node.adecl)
+            s += self.visit(node.adecl) + ";"
         else:
             s += ";" 
         s += self.visit(node.cond)
@@ -244,7 +246,7 @@ class CppGen(Visitor):
         s += "){\n"
         for n in node.body:
             s += indent(self.visit(n), self.indent)
-        s += "\n}"
+        s += "\n}\n"
         return s
         
     def visit_funccall(self, node):
@@ -499,49 +501,13 @@ def vector_reader(t):
                  normal_close(t)])
     return tree
 
-VECTOR_READER = """
-{setup}
-{t.cpp} x;
-{body}
-{teardown}
-""".strip()
-
-def set_reader(t):
-    tree = Block(nodes=[
-                 Assign(target=Var(name="jlen"), 
-                        value=BinOp(x=Raw(code="col_sizes_[table][j]"),
-                                    op="/", y=FuncCall(name=Raw(code="sizeof"),
-                                            args=[Raw(code=t.sub[1].cpp)]))),
-                 get_body(t),
-                 ])
-    return tree
-    
-SET_READER = """
-{setup}
-{t.cpp} x;
-{body}
-{teardown}
-""".strip()
-
-LIST_READER = """
-""".strip()
-
-PAIR_READER = """
-{setup1}
-{setup2}
-
-""".strip()
-
-MAP_READER = """
-""".strip()
-
 #setup functions
 
 def primitive_setup(t, depth=0, prefix=""):
     jlen = "jlen" + str(depth) + prefix
     node = Block(nodes=[
-        Assign(target=Var(name=jlen),
-               value=Raw(code="col_sizes_[table][j] / sizeof("+t.cpp+")"))])
+        ExprStmt(child=Assign(target=Var(name=jlen),
+               value=Raw(code="col_sizes_[table][j] / sizeof("+t.cpp+")")))])
     return node
 
 def string_setup(depth=0, prefix=""): 
@@ -551,25 +517,25 @@ def string_setup(depth=0, prefix=""):
     strlen = "strlen" + str(depth) + prefix
     
     node = Block(nodes=[
-        DeclAssign(type=Type(cpp="hid_t"), 
+        ExprStmt(child=DeclAssign(type=Type(cpp="hid_t"), 
                    target=Var(name=fieldlen), 
                    value=FuncCall(name=Raw(code="H5Tget_member_type"),
                                   args=[Raw(code="tb_type"), 
-                                  Raw(code="j")])),
+                                  Raw(code="j")]))),
         ExprStmt(child=Decl(type=Type(cpp="size_t"), name=Var(name=nullpos))),
         ExprStmt(child=Decl(type=Type(cpp="hsize_t"), name=Var(name=fieldlen))),
         ExprStmt(child=FuncCall(name=Raw(code="H5Tget_array_dims2"),
                  args=[Raw(code=field_type), Raw(code="&"+fieldlen)])),
-        DeclAssign(type=Type(cpp="unsigned int"), 
+        ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"), 
                    target=Var(name=strlen),
-                   value=Raw(code="col_sizes_[table][j] / "+fieldlen))])
+                   value=Raw(code="col_sizes_[table][j] / "+fieldlen)))])
     return node
 
 def vl_string_setup(depth=0, prefix=""):
     jlen = "jlen" + str(depth) + prefix
     node = Block(nodes=[
-        Assign(target=Var(name=jlen), 
-               value=Raw(code="col_sizes_[table][j] / CYCLUS_SHA1_SIZE"))])
+        ExprStmt(child=Assign(target=Var(name=jlen), 
+               value=Raw(code="col_sizes_[table][j] / CYCLUS_SHA1_SIZE")))])
     return node
 
 template_args = {"MAP": ("KEY", "VALUE"),
@@ -601,7 +567,7 @@ def get_decl(t, depth=0, prefix=""):
 
 #to-do: fill these out
 def def_body(t, depth=0, prefix=""):
-    pass
+    
 
 def memcpy_body(t, depth=0, prefix=""):
     pass
@@ -610,10 +576,37 @@ def elementwise_body(t, depth=0, prefix=""):
     pass
 
 def vl_body(t, depth=0, prefix=""):
-    pass
+    x = "x" + str(depth) + prefix
+    node = Block(nodes=[ExprStmt(child=Assign(target=Var(name=x),
+                            value=FuncCall(name=Var(name="VLRead"),
+                                           args=[Raw(code="buf+offset")],
+                                           targs=[Raw(code=t.cpp), Raw(code=t.db)])))])
+    return node
 
 def vec_string_body(t, depth=0, prefix=""):
-    pass
+    k = "k" + str(depth) + prefix
+    index = "x[" + k + "]"
+    nullpos = "nullpos" + str(depth+1) + "ELEM"
+    fieldlen = "fieldlen" + str(depth+1) + "ELEM"
+    strlen = "strlen" + str(depth+1) + "ELEM"
+    node = Block(nodes = 
+         [For(adecl=DeclAssign(type=Type(cpp="unsigned int"), target=Var(name=k), 
+                               value=Raw(code="0")),
+              cond=BinOp(x=Var(name=k), op="<", y=Var(name=fieldlen)),
+              incr=LeftUnaryOp(op="++", name=Var(name=k)),
+              body=[
+                ExprStmt(child=Assign(target=Var(name=index), 
+                                value=FuncCall(name=Var(name="std::string"),
+                                    args=[Raw(code="buf+offset+"+strlen+"*k"),
+                                          Raw(code=strlen)]))),
+                ExprStmt(child=Assign(target=Var(name=nullpos),
+                                value=FuncCall(name=Var(name=index+".find"),
+                                               args=[Raw(code="'\\0'")]))),
+                If(cond=BinOp(x=Var(name=nullpos), op="!=", 
+                              y=Raw(code="std::string::npos")),
+                   body=[ExprStmt(child=FuncCall(name=Var(name=index+".resize"), 
+                                                 args=[Raw(code=nullpos)]))])])])
+    return node
     
 def set_string_body(t, depth=0, prefix=""):
     pass

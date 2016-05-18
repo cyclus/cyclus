@@ -9,7 +9,7 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl, vec_string_body, vl_body
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -55,7 +55,7 @@ def test_cppgen_decl():
     assert_equal(exp, obs)
     
 def test_cppgen_assign():
-    exp = "x=y;"
+    exp = "x=y"
     n = Assign(target=Var(name="x"), value=Var(name="y"))
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)  
@@ -81,16 +81,16 @@ def test_cppgen_rightunaryop():
 def test_cppgen_if():
     exp = """
 if(x==y){
-  x=1;
+  x=1;\n
 }else if(x>y){
-  x=2;
+  x=2;\n
 }else{
-  x=3;
+  x=3;\n
 }""".strip()
     n = If(cond=BinOp(x=Var(name="x"), op="==", y=Var(name="y")),\
-           body=[Assign(target=Var(name="x"), value=Raw(code="1"))],\
-           elifs=[(BinOp(x=Var(name="x"), op=">", y=Var(name="y")), [Assign(target=Var(name="x"), value=Raw(code="2"))])],\
-           el=Assign(target=Var(name="x"), value=Raw(code="3")))
+           body=[ExprStmt(child=Assign(target=Var(name="x"), value=Raw(code="1")))],\
+           elifs=[(BinOp(x=Var(name="x"), op=">", y=Var(name="y")), [ExprStmt(child=Assign(target=Var(name="x"), value=Raw(code="2")))])],\
+           el=ExprStmt(child=Assign(target=Var(name="x"), value=Raw(code="3"))))
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
     
@@ -99,15 +99,15 @@ def test_cppgen_for():
 for(int i=0;i<5;i++){
   a++;
   b++;
-  c[i]=a+b;
-}""".strip()
-    n = For(adecl=Assign(target=Decl(type=Type(cpp="int"), name=Var(name="i")), value=Raw(code="0")),\
+  c[i]=a+b;\n
+}""".strip() + "\n"
+    n = For(adecl=DeclAssign(type=Type(cpp="int"), target=Var(name="i"), value=Raw(code="0")),\
             cond=BinOp(x=Var(name="i"), op="<", y=Raw(code="5")),\
             incr=RightUnaryOp(name=Var(name="i"), op="++"),\
             body=[ExprStmt(child=RightUnaryOp(name=Var(name="a"), op="++")),
                   ExprStmt(child=RightUnaryOp(name=Var(name="b"), op="++")),
-                  Assign(target=RightUnaryOp(name=Var(name="c"), op="[i]"),
-                         value=BinOp(x=Var(name="a"), op="+", y=Var(name="b")))])
+                  ExprStmt(child=Assign(target=RightUnaryOp(name=Var(name="c"), op="[i]"),
+                         value=BinOp(x=Var(name="a"), op="+", y=Var(name="b"))))])
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
 
@@ -135,17 +135,17 @@ def test_cppgen_block():
     exp = """int x=5;
 int y=6;
 int z=x+y;\n"""
-    n = Block(nodes=[DeclAssign(type=Type(cpp="int"), target=Var(name="x"), value=Raw(code="5")),
-                     Block(nodes=[DeclAssign(type=Type(cpp="int"), target=Var(name="y"), value=Raw(code="6")),
-                                  DeclAssign(type=Type(cpp="int"), target=Var(name="z"), 
-                                             value=BinOp(x=Var(name="x"), op="+", y=Var(name="y")))])])
+    n = Block(nodes=[ExprStmt(child=DeclAssign(type=Type(cpp="int"), target=Var(name="x"), value=Raw(code="5"))),
+                     Block(nodes=[ExprStmt(child=DeclAssign(type=Type(cpp="int"), target=Var(name="y"), value=Raw(code="6"))),
+                                  ExprStmt(child=DeclAssign(type=Type(cpp="int"), target=Var(name="z"), 
+                                             value=BinOp(x=Var(name="x"), op="+", y=Var(name="y"))))])])
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
     
 #test various node structures
 
 def test_primitive_setup():
-    exp = """jlen0=col_sizes_[table][j] / sizeof(double);"""
+    exp = """jlen0=col_sizes_[table][j] / sizeof(double);\n"""
     obs = CPPGEN.visit(primitive_setup(Type(cpp="double")))
     assert_equal(exp, obs)
     
@@ -162,7 +162,7 @@ unsigned int strlen0=col_sizes_[table][j] / fieldlen0;""".strip()
     
 def test_vl_string_setup():
     exp = """
-jlen0=col_sizes_[table][j] / CYCLUS_SHA1_SIZE;""".strip()
+jlen0=col_sizes_[table][j] / CYCLUS_SHA1_SIZE;""".strip() + "\n"
     obs = CPPGEN.visit(vl_string_setup())
     assert_equal(exp, obs)
     
@@ -173,7 +173,7 @@ size_t nullpos1KEY;
 hsize_t fieldlen1KEY;
 H5Tget_array_dims2(field_type1KEY,&fieldlen1KEY);
 unsigned int strlen1KEY=col_sizes_[table][j] / fieldlen1KEY;
-jlen1VALUE=col_sizes_[table][j] / CYCLUS_SHA1_SIZE;""".strip()
+jlen1VALUE=col_sizes_[table][j] / CYCLUS_SHA1_SIZE;""".strip() + "\n"
     obs = CPPGEN.visit(get_setup(Type(cpp="std::map<std::string,std::string>", db="MAP_STRING_VL_STRING", canon=("MAP", "STRING", "VL_STRING"))))
     assert_equal(exp, obs)
     
@@ -181,8 +181,22 @@ def test_get_decl():
     exp = """double x0;\n"""
     obs = CPPGEN.visit(get_decl(Type(cpp="double")))
     assert_equal(exp, obs)
+    
+def test_vec_string_body():
+    exp = """for(unsigned int k0=0;k0<fieldlen1ELEM;++k0){
+  x[k0]=std::string(buf+offset+strlen1ELEM*k,strlen1ELEM);
+  nullpos1ELEM=x[k0].find('\\0');
+  if(nullpos1ELEM!=std::string::npos){
+    x[k0].resize(nullpos1ELEM);\n
+  }
+}\n"""
+    obs = CPPGEN.visit(vec_string_body(Type(cpp="std::vector<std::string>")))
+    assert_equal(exp, obs)
 
-
+def test_vl_body():
+    exp = """x0=VLRead<std::map<std::string,std::string>,VL_MAP_STRING_STRING>(buf+offset);\n"""
+    obs = CPPGEN.visit(vl_body(t=Type(cpp="std::map<std::string,std::string>", db="VL_MAP_STRING_STRING", canon=("VL_MAP","STRING","STRING"))))
+    assert_equal(exp, obs)
     
     
     
