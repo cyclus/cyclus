@@ -9,7 +9,7 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl, vec_string_body, vl_body
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl, vec_string_body, vl_body, set_string_body, list_string_body
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -86,7 +86,7 @@ if(x==y){
   x=2;\n
 }else{
   x=3;\n
-}""".strip()
+}""".strip()+"\n"
     n = If(cond=BinOp(x=Var(name="x"), op="==", y=Var(name="y")),\
            body=[ExprStmt(child=Assign(target=Var(name="x"), value=Raw(code="1")))],\
            elifs=[(BinOp(x=Var(name="x"), op=">", y=Var(name="y")), [ExprStmt(child=Assign(target=Var(name="x"), value=Raw(code="2")))])],\
@@ -184,13 +184,13 @@ def test_get_decl():
     
 def test_vec_string_body():
     exp = """for(unsigned int k0=0;k0<fieldlen1ELEM;++k0){
-  x[k0]=std::string(buf+offset+strlen1ELEM*k,strlen1ELEM);
-  nullpos1ELEM=x[k0].find('\\0');
+  x0[k0]=std::string(buf+offset+strlen1ELEM*k0,strlen1ELEM);
+  nullpos1ELEM=x0[k0].find('\\0');
   if(nullpos1ELEM!=std::string::npos){
-    x[k0].resize(nullpos1ELEM);\n
-  }
+    x0[k0].resize(nullpos1ELEM);\n
+  }\n
 }\n"""
-    obs = CPPGEN.visit(vec_string_body(Type(cpp="std::vector<std::string>")))
+    obs = CPPGEN.visit(vec_string_body(Type(cpp="std::vector<std::string>", db="VECTOR_STRING", canon=("VECTOR", "STRING"))))
     assert_equal(exp, obs)
 
 def test_vl_body():
@@ -198,9 +198,29 @@ def test_vl_body():
     obs = CPPGEN.visit(vl_body(t=Type(cpp="std::map<std::string,std::string>", db="VL_MAP_STRING_STRING", canon=("VL_MAP","STRING","STRING"))))
     assert_equal(exp, obs)
     
+def test_set_string_body():
+    exp = """for(unsigned int k0=0;k0<fieldlen1ELEM;++k0){
+  s1ELEM=std::string(buf+offset+strlen1ELEM*k0,strlen1ELEM);
+  nullpos1ELEM=s1ELEM.find('\\0');
+  if(nullpos1ELEM!=std::string::npos){
+    s1ELEM.resize(nullpos1ELEM);\n
+  }
+  x0.insert(s1ELEM);\n
+}\n"""
+    obs = CPPGEN.visit(set_string_body(Type(cpp="std::set<std::string>", db="SET_STRING", canon=("SET", "STRING"))))
+    assert_equal(exp, obs) 
     
-    
-    
+def test_list_string_body():
+    exp = """for(unsigned int k0=0;k0<fieldlen1ELEM;++k0){
+  s1ELEM=std::string(buf+offset+strlen1ELEM*k0,strlen1ELEM);
+  nullpos1ELEM=s1ELEM.find('\\0');
+  if(nullpos1ELEM!=std::string::npos){
+    s1ELEM.resize(nullpos1ELEM);\n
+  }
+  x0.pushback(s1ELEM);\n
+}\n"""
+    obs = CPPGEN.visit(list_string_body(Type(cpp="std::set<std::string>", db="SET_STRING", canon=("SET", "STRING"))))
+    assert_equal(exp, obs)
     
     
     
