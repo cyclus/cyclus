@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 import tarfile
+import platform
 import subprocess
 import shutil
 import io
@@ -48,6 +49,8 @@ def install_cyclus(args):
 
     root_dir = os.path.split(__file__)[0]
     makefile = os.path.join(args.build_dir, 'Makefile')
+    on_darwin = platform.system() == 'Darwin'
+    libext = '.dylib' if on_darwin else '.so'
 
     if not os.path.exists(makefile):
         rtn = subprocess.call(['which', 'cmake'], shell=(os.name == 'nt'))
@@ -65,6 +68,13 @@ def install_cyclus(args):
             cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
             cmake_cmd += ['-DBOOST_ROOT=' + absexpanduser(args.boost_root)]
+        if args.hdf5_root:
+            h5root = absexpanduser(args.boost_root)
+            cmake_cmd += ['-DHDF5_ROOT=' + h5root,
+                          '-DHDF5_LIBRARIES={0}/lib/libhdf5{1};{0}/lib/libhdf5_hl{1}'.format(h5root, libext),
+                          '-DHDF5_LIBRARY_DIRS=' + h5root + '/lib',
+                          '-DHDF5_INCLUDE_DIRS=' + h5root + '/include',
+                          ]
         if args.build_type:
             cmake_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
         if args.D is not None:
@@ -115,7 +125,7 @@ def main():
     parser.add_argument('--uninstall', action='store_true', help=uninst, default=False)
 
     noupdate = 'do not update the hash in version.cc'
-    parser.add_argument('--no-update', dest='update', action='store_false', 
+    parser.add_argument('--no-update', dest='update', action='store_false',
                         help=noupdate, default=True)
 
     clean = 'attempt to remove the build directory before building'
@@ -141,6 +151,9 @@ def main():
 
     boost = "the relative path to the Boost libraries directory"
     parser.add_argument('--boost_root', help=boost)
+
+    hdf5 = "the path to the HDF5 libraries directory"
+    parser.add_argument('--hdf5_root', help=hdf5)
 
     cmake_prefix_path = "the cmake prefix path for use with FIND_PACKAGE, " + \
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
