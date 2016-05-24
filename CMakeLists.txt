@@ -185,53 +185,53 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Some optional libraries to link in, as availble. Required for conda.
     #
     # pcre
-    FIND_LIBRARY(PRCE_LIBRARIES pcre)
-    MESSAGE("-- Found PRCE Libraries (optional): ${PRCE_LIBRARIES}")
-    IF("$PRCE_LIBRARIES")
+    FIND_LIBRARY(PCRE_LIBRARIES pcre)
+    MESSAGE("-- Found PCRE Libraries (optional): ${PCRE_LIBRARIES}")
+    IF(PCRE_LIBRARIES)
         set(LIBS ${LIBS} ${PCRE_LIBRARIES})
-    ENDIF("$PRCE_LIBRARIES")
+    ENDIF(PCRE_LIBRARIES)
 
     # openblas
     FIND_LIBRARY(OPENBLAS_LIBRARIES openblas)
     MESSAGE("-- Found OPENBLAS Libraries (optional): ${OPENBLAS_LIBRARIES}")
-    IF("$OPENBLAS_LIBRARIES")
+    IF(OPENBLAS_LIBRARIES)
         set(LIBS ${LIBS} ${OPENBLAS_LIBRARIES})
-    ENDIF("$OPENBLAS_LIBRARIES")
+    ENDIF(OPENBLAS_LIBRARIES)
 
     # ClpSolver
     FIND_LIBRARY(CLPSOLVER_LIBRARIES ClpSolver)
     MESSAGE("-- Found CLPSOLVER Libraries (optional): ${CLPSOLVER_LIBRARIES}")
-    IF("$CLPSOLVER_LIBRARIES")
+    IF(CLPSOLVER_LIBRARIES)
         set(LIBS ${LIBS} ${CLPSOLVER_LIBRARIES})
-    ENDIF("$CLPSOLVER_LIBRARIES")
+    ENDIF(CLPSOLVER_LIBRARIES)
 
     # iconv
     FIND_LIBRARY(ICONV_LIBRARIES iconv)
     MESSAGE("-- Found ICONV Libraries (optional): ${ICONV_LIBRARIES}")
-    IF("$ICONV_LIBRARIES")
+    IF(ICONV_LIBRARIES)
         set(LIBS ${LIBS} ${ICONV_LIBRARIES})
-    ENDIF("$ICONV_LIBRARIES")
+    ENDIF(ICONV_LIBRARIES)
 
     # icudata
     FIND_LIBRARY(ICUDATA_LIBRARIES icudata)
     MESSAGE("-- Found ICUDATA Libraries (optional): ${ICUDATA_LIBRARIES}")
-    IF("$ICUDATA_LIBRARIES")
+    IF(ICUDATA_LIBRARIES)
         set(LIBS ${LIBS} ${ICUDATA_LIBRARIES})
-    ENDIF("$ICUDATA_LIBRARIES")
+    ENDIF(ICUDATA_LIBRARIES)
 
     # icui18n
     FIND_LIBRARY(ICUI18N_LIBRARIES icui18n)
     MESSAGE("-- Found ICUI18N Libraries (optional): ${ICUI18N_LIBRARIES}")
-    IF("$ICUI18N_LIBRARIES")
+    IF(ICUI18N_LIBRARIES)
         set(LIBS ${LIBS} ${ICUI18N_LIBRARIES})
-    ENDIF("$ICUI18N_LIBRARIES")
+    ENDIF(ICUI18N_LIBRARIES)
 
     # icuuc
     FIND_LIBRARY(ICUUC_LIBRARIES icuuc)
     MESSAGE("-- Found ICUUC Libraries (optional): ${ICUUC_LIBRARIES}")
-    IF("$ICUUC_LIBRARIES")
+    IF(ICUUC_LIBRARIES)
         set(LIBS ${LIBS} ${ICUUC_LIBRARIES})
-    ENDIF("$ICUUC_LIBRARIES")
+    ENDIF(ICUUC_LIBRARIES)
 
     ##############################################################################################
     #################################### end find libraries ######################################
