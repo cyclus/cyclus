@@ -152,7 +152,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
     MESSAGE("--    HDF5 Library directories: ${HDF5_LIBRARY_DIRS}")
     MESSAGE("--    HDF5 Libraries: ${HDF5_LIBRARIES}")
-    
+
     # Include the boost header files and the program_options library
     # Please be sure to use Boost rather than BOOST.
     # Capitalization matters on some platforms
@@ -181,6 +181,58 @@ IF(NOT CYCLUS_DOC_ONLY)
     FIND_PACKAGE( COIN REQUIRED )
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
 
+    #
+    # Some optional libraries to link in, as availble. Required for conda.
+    #
+    # pcre
+    FIND_LIBRARY(PCRE_LIBRARIES pcre)
+    MESSAGE("-- Found PCRE Libraries (optional): ${PCRE_LIBRARIES}")
+    IF(PCRE_LIBRARIES)
+        set(LIBS ${LIBS} ${PCRE_LIBRARIES})
+    ENDIF(PCRE_LIBRARIES)
+
+    # openblas
+    FIND_LIBRARY(OPENBLAS_LIBRARIES openblas)
+    MESSAGE("-- Found OPENBLAS Libraries (optional): ${OPENBLAS_LIBRARIES}")
+    IF(OPENBLAS_LIBRARIES)
+        set(LIBS ${LIBS} ${OPENBLAS_LIBRARIES})
+    ENDIF(OPENBLAS_LIBRARIES)
+
+    # ClpSolver
+    FIND_LIBRARY(CLPSOLVER_LIBRARIES ClpSolver)
+    MESSAGE("-- Found CLPSOLVER Libraries (optional): ${CLPSOLVER_LIBRARIES}")
+    IF(CLPSOLVER_LIBRARIES)
+        set(LIBS ${LIBS} ${CLPSOLVER_LIBRARIES})
+    ENDIF(CLPSOLVER_LIBRARIES)
+
+    # iconv
+    FIND_LIBRARY(ICONV_LIBRARIES iconv)
+    MESSAGE("-- Found ICONV Libraries (optional): ${ICONV_LIBRARIES}")
+    IF(ICONV_LIBRARIES)
+        set(LIBS ${LIBS} ${ICONV_LIBRARIES})
+    ENDIF(ICONV_LIBRARIES)
+
+    # icudata
+    FIND_LIBRARY(ICUDATA_LIBRARIES icudata)
+    MESSAGE("-- Found ICUDATA Libraries (optional): ${ICUDATA_LIBRARIES}")
+    IF(ICUDATA_LIBRARIES)
+        set(LIBS ${LIBS} ${ICUDATA_LIBRARIES})
+    ENDIF(ICUDATA_LIBRARIES)
+
+    # icui18n
+    FIND_LIBRARY(ICUI18N_LIBRARIES icui18n)
+    MESSAGE("-- Found ICUI18N Libraries (optional): ${ICUI18N_LIBRARIES}")
+    IF(ICUI18N_LIBRARIES)
+        set(LIBS ${LIBS} ${ICUI18N_LIBRARIES})
+    ENDIF(ICUI18N_LIBRARIES)
+
+    # icuuc
+    FIND_LIBRARY(ICUUC_LIBRARIES icuuc)
+    MESSAGE("-- Found ICUUC Libraries (optional): ${ICUUC_LIBRARIES}")
+    IF(ICUUC_LIBRARIES)
+        set(LIBS ${LIBS} ${ICUUC_LIBRARIES})
+    ENDIF(ICUUC_LIBRARIES)
+
     ##############################################################################################
     #################################### end find libraries ######################################
     ##############################################################################################
@@ -194,15 +246,15 @@ IF(NOT CYCLUS_DOC_ONLY)
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
     INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
         "${LibXML++_INCLUDE_DIR}"
-        ${Glibmm_INCLUDE_DIRS}
+        "${Glibmm_INCLUDE_DIRS}"
         "${LibXML++Config_INCLUDE_DIR}"
         "${SQLITE3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
-    
+
     EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
-    
+
     IF("${core_version}" STREQUAL "")
       MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
       SET(core_version "-1")
