@@ -125,7 +125,7 @@ MACRO(USE_CYCLUS lib_root src_root)
         EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG}
                         ${ORIG} ${INCL_ARGS} RESULT_VARIABLE res_var)
         IF(NOT "${res_var}" STREQUAL "0")
-            message(FATAL_ERROR "cycpp failed with exit code '${res_var}'")
+            message(FATAL_ERROR "cycpp failed on '${CCIN}' with exit code '${res_var}'")
         ENDIF()
     ENDIF(NOT EXISTS ${CCOUT})
     SET(
@@ -137,7 +137,13 @@ MACRO(USE_CYCLUS lib_root src_root)
         # not sure if we still need this...
         IF(NOT EXISTS ${HOUT})
             MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
-            EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
+            EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
+                            RESULT_VARIABLE res_var)
+
+            IF(NOT "${res_var}" STREQUAL "0")
+                message(FATAL_ERROR "archetype preprocessing failed for ${HIN}, res_var = '${res_var}'")
+            ENDIF()
+
         ENDIF(NOT EXISTS ${HOUT})
         ADD_CUSTOM_COMMAND(
             OUTPUT ${CCOUT}
