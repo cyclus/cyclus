@@ -263,6 +263,24 @@ enum DbTypes {
   VL_MAP_VL_STRING_PAIR_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string, std::pair<std::string, std::vector<double>>>", 5, ["SQLite"], ["VL_MAP", "VL_STRING", ["PAIR", "STRING", ["VL_VECTOR", "DOUBLE"]]], true]
   VL_MAP_STRING_PAIR_VL_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string, std::pair<std::string, std::vector<double>>>", 5, ["SQLite"], ["VL_MAP", "STRING", ["PAIR", "VL_STRING", ["VL_VECTOR", "DOUBLE"]]], true]
   VL_MAP_VL_STRING_PAIR_VL_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string, std::pair<std::string, std::vector<double>>>", 5, ["SQLite"], ["VL_MAP", "VL_STRING", ["PAIR", "VL_STRING", ["VL_VECTOR", "DOUBLE"]]], true]
+
+  // map<string,  map<string,  int> >
+  MAP_STRING_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["MAP", "STRING", ["MAP", "STRING", "INT"]], false]
+  MAP_STRING_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["MAP", "STRING", ["MAP", "VL_STRING", "INT"]], false]
+  MAP_STRING_VL_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["MAP", "STRING", ["VL_MAP", "STRING", "INT"]], false]
+  MAP_STRING_VL_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["MAP", "STRING", ["VL_MAP", "VL_STRING", "INT"]], false]
+  MAP_VL_STRING_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["MAP", "VL_STRING", ["MAP", "STRING", "INT"]], false]
+  MAP_VL_STRING_VL_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["MAP", "VL_STRING", ["VL_MAP", "STRING", "INT"]], false]
+  MAP_VL_STRING_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["MAP", "VL_STRING", ["MAP", "VL_STRING", "INT"]], false]
+  MAP_VL_STRING_VL_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["MAP", "VL_STRING", ["VL_MAP", "VL_STRING", "INT"]], false]
+  VL_MAP_STRING_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "STRING", ["MAP", "STRING", "INT"]], false]
+  VL_MAP_VL_STRING_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["MAP", "STRING", "INT"]], false]
+  VL_MAP_STRING_VL_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "STRING", ["VL_MAP", "STRING", "INT"]], false]
+  VL_MAP_STRING_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "STRING", ["MAP", "VL_STRING", "INT"]], false]
+  VL_MAP_STRING_VL_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "STRING", ["VL_MAP", "VL_STRING", "INT"]], false]
+  VL_MAP_VL_STRING_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["MAP", "VL_STRING", "INT"]], false]
+  VL_MAP_VL_STRING_VL_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "STRING", "INT"]], false]
+  VL_MAP_VL_STRING_VL_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "VL_STRING", "INT"]], false]
 };
 
 /// Represents operation codes for condition checking.
