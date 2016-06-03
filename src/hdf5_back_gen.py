@@ -57,8 +57,7 @@ class Case(Node):
     
 class If(Node):
     fields = ("cond", "body", "elifs", "el")
-
-#how to allow ';' as decl    
+   
 class For(Node):
     fields = ("adecl", "cond", "incr", "body")
     
@@ -72,15 +71,15 @@ class RightUnaryOp(Node):
     fields = ("name", "op")
 
 class FuncCall(Node):
-    #targs means template args
+    # targs means template args
     fields = ("name", "args", "targs") 
     
 class Raw(Node):
-    #for cheating and literals
+    # for cheating and literals
     fields = ("code",)
     
 class Nothing(Node):
-    #for "nothing"
+    # for "nothing"
     fields = ()
 
 _lowername = lambda cls: cls.__name__.lower()
@@ -180,9 +179,9 @@ class CppGen(Visitor):
     
     def visit_binop(self, node):
         s = self.visit(node.x)
-        #s += " "
+        # s += " "
         s += node.op
-        #s += " "
+        # s += " "
         s += self.visit(node.y)
         return s
         
@@ -216,7 +215,7 @@ class CppGen(Visitor):
         for n in node.body:
             s += indent(self.visit(n), self.indent)
         s += "\n}"
-        #check if elifs is an empty list
+        # check if elifs is an empty list
         if node.elifs:
             for cond, body in node.elifs:
                 s += "else if("
@@ -227,7 +226,7 @@ class CppGen(Visitor):
                     b += self.visit(n)
                     s += indent(b, self.indent)
                 s += "\n}"  
-        #check if else attribute exists
+        # check if else attribute exists
         if node.el is not None:
             s += "else{\n"
             s += indent(self.visit(node.el), self.indent)
@@ -253,15 +252,15 @@ class CppGen(Visitor):
         s = self.visit(node.name)
         if node.targs is not None:
             s += "<"
-            for i in range(0, len(node.targs)):
-                #print(node.targs[i])
-                #print(self.visit(node.targs[i]))
+            for i in range(len(node.targs)):
+                # print(node.targs[i])
+                # print(self.visit(node.targs[i]))
                 s += self.visit(node.targs[i])
                 if i < (len(node.targs)-1):
                     s += ","
             s += ">"
         s += "("
-        for i in range(0, len(node.args)):
+        for i in range(len(node.args)):
             s += self.visit(node.args[i])
             if i < (len(node.args)-1):
                 s += ","
@@ -278,15 +277,15 @@ class CppGen(Visitor):
         return s  
 
 def resolve_unicode(item):	   
-    #Python3, if we can handle it, don't bother.    
+    # Python3, if we can handle it, don't bother.    
     if isinstance(item, str):
         return item        
-    #We must check every element in tuples and lists.    
+    # We must check every element in tuples and lists.    
     elif isinstance(item, tuple):
         return tuple([resolve_unicode(i) for i in item])
     elif isinstance(item, list):
         return [resolve_unicode(i) for i in item]
-    #Not a string, either unicode (Python2.7) or an int.    
+    # Not a string, either unicode (Python2.7) or an int.    
     else: 
         try:
             return item.encode('utf-8')
@@ -456,17 +455,16 @@ def string_reader(t, depth=0, prefix="", variable="x", offset="buf+offset", col_
                                            args=[Raw(code=nullpos)])))])])
     return tree      
 
-def vl_string_reader(t):
+def vl_string_reader(t, depth=0, prefix="", variable="x", offset="buf+offset"):
     """
     {left_side} x = VLRead<{t.cpp}, {t.db}>(buf + offset {cyclus_constant});
     {teardown}
     """
     tree = Block(nodes=[
-                 DeclAssign(type=t, target=Var(name="x"), 
+                 ExprStmt(child=Assign(target=Var(name=variable), 
                             value=FuncCall(name=Raw(code="VLRead"),
-                               args=[Raw(code="buf+offset+CYCLUS_SHA1_SIZE")],
-                               targs=[t])),
-                 create_teardown(t)])
+                               args=[Raw(code=offset)],
+                               targs=[Raw(code=t.cpp), Raw(code=t.db)])))])
     return tree
 
 def uuid_reader(t):
@@ -490,17 +488,13 @@ def vector_reader(t):
     {NO_CLOSE}
     """
     tree = Block(nodes=[
-                 #setup
                  get_setup("VECTOR", t),
-                 #decl
                  get_decl("VECTOR", t),
-                 #body
                  get_body("VECTOR", t),
-                 #close
                  normal_close(t)])
     return tree
 
-#setup functions
+# setup functions
 
 def primitive_setup(t, depth=0, prefix=""):
     jlen = "jlen" + str(depth) + prefix
@@ -556,15 +550,15 @@ def get_setup(t, depth=0, prefix=""):
         node = Block(nodes=[get_setup(CANON_TO_NODE[i], depth=depth+1, prefix=prefix+part) for i, part in zip(t.canon[1:], template_args[t.canon[0]])])
     return node
     
-#declaration
+# declaration
 
 def get_decl(t, depth=0, prefix=""):
     variable = "x" + str(depth) + prefix
     node = ExprStmt(child=Decl(type=t, name=Var(name=variable)))
     return node
-#bodies
+# bodies
 
-#to-do: fill these out
+# to-do: fill these out
 def def_body(t, depth=0, prefix=""):
     pass
 
@@ -600,6 +594,24 @@ def vec_string_body(t, depth=0, prefix=""):
                               prefix="ELEM", variable=index,
                               offset="buf+offset+"+strlen+"*"+k,
                               col_size=strlen)
+                ])])
+    return node
+
+def vec_vl_string_body(t, depth=0, prefix=""):
+    x = "x" + str(depth) + prefix
+    k = "k" + str(depth) + prefix
+    index = x + "[" + k + "]"
+    jlen = "jlen" + str(depth+1) + "ELEM"
+    node = Block(nodes=[
+          For(adecl=DeclAssign(type=Type(cpp="unsigned int"), 
+                               target=Var(name=k), 
+                               value=Raw(code="0")),
+              cond=BinOp(x=Var(name=k), op="<", y=Var(name=jlen)),
+              incr=LeftUnaryOp(op="++", name=Var(name=k)),
+              body=[
+                vl_string_reader(CANON_TO_NODE[t.canon[1]], depth=depth+1,
+                              prefix="ELEM", variable=index,
+                              offset="buf+offset+CYCLUS_SHA1_SIZE*"+k)
                 ])])
     return node
     
@@ -657,10 +669,10 @@ def get_body(t, depth=0, prefix=""):
     block.append(get_decl(t, depth, prefix))
     if is_primitive(t):
         if depth == 0:
-            pass #eventually do primitive
+            pass # eventually do primitive
         else:
             return BODIES[t.db](t, depth, prefix)
-    #catch vl types here:
+    # catch vl types here:
     elif DB_TO_VL[t.db]:
         return vl_body(t, depth, prefix)
     elif t in BODIES:
@@ -674,24 +686,6 @@ def get_body(t, depth=0, prefix=""):
 
 def get_teardown():
     return
-
-#READERS = {'INT': REINTERPRET_CAST_READER,
-#           'BOOL': REINTERPRET_CAST_READER,
-#           'FLOAT': REINTERPRET_CAST_READER,
-#           'DOUBLE': REINTERPRET_CAST_READER,
-#           'STRING': STRING_READER,
-#           'VL_STRING': VL_READER,
-#           'BLOB': VL_READER,
-#           'UUID': UUID_READER,
-#           'VECTOR': VECTOR_READER,
-#           'VL_VECTOR': VL_READER,
-#           'SET': SET_READER,
-#           'VL_SET': VL_READER,
-#           'LIST': LIST_READER,
-#           'VL_LIST': VL_READER,
-#           'PAIR': PAIR_READER,
-#           'MAP': MAP_READER,
-#           'VL_MAP': VL_READER}
 
 DEF_BODY = "x = {t.cpp}(xraw, xraw+jlen);"
 
@@ -740,19 +734,6 @@ def indent(text, prefix, predicate=None):
 QUERY_CASES = ''
 
 def main():
-    #global QUERY_CASES
-    #for ca in CANON_SET: 
-   #     current_type = TypeStr(ca)
-   #     reader = READERS[current_type.db]
-   #     ctx = {"t": current_type,
-   #            "NO_CLOSE": NO_CLOSE.format(t = current_type),
-   #            "H5TCLOSE": H5TCLOSE.format(t = current_type),
-   #            "H5TCLOSE_MULTI": H5TCLOSE_MULTI.format(t = current_type)}
-   #     QUERY_CASES += CASE_TEMPLATE.format(t = current_type, read_x = textwrap.indent(reader.format(**ctx), INDENT))
-
-    #print(textwrap.indent(QUERY_CASES, INDENT*2))
-    
-    #s = create_reader(TypeStr(("VECTOR","STRING")))
     s = "hello world"
     print(indent(s, INDENT)) 
     

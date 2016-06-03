@@ -9,7 +9,7 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl, vec_string_body, vl_body, set_string_body, list_string_body
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl, vec_string_body, vl_body, set_string_body, list_string_body, vec_vl_string_body
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -181,7 +181,14 @@ def test_get_decl():
     exp = """double x0;\n"""
     obs = CPPGEN.visit(get_decl(Type(cpp="double")))
     assert_equal(exp, obs)
-    
+
+def test_vec_vl_string_reader():
+    exp = """for(unsigned int k0=0;k0<jlen1ELEM;++k0){
+  x0[k0]=VLRead<std::string,VL_STRING>(buf+offset+CYCLUS_SHA1_SIZE*k0);\n
+}\n"""
+    obs = CPPGEN.visit(vec_vl_string_body(Type(cpp="std::vector<std::string>",db="VECTOR_VL_STRING",canon=("VECTOR", "VL_STRING"))))
+    assert_equal(exp, obs)
+
 def test_vec_string_body():
     exp = """for(unsigned int k0=0;k0<fieldlen1ELEM;++k0){
   x0[k0]=std::string(buf+offset+strlen1ELEM*k0,strlen1ELEM);
