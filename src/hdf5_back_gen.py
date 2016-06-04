@@ -387,6 +387,9 @@ class TypeStr(object):
 
 def normal_close(t):
     """
+    This function represents the generic close to an hdf5 type
+    code block.
+ 
     is_row_selected = CmpConds<{t.cpp}>>(&x, &(field_conds[qr.fields[j]]));
     if(is_row_selected)
         row[j] = x;
@@ -417,8 +420,10 @@ def case_template(t, read_x):
 
 def reinterpret_cast_reader(t):
     """
+    This function represents a primitive reader using the reinterpret_cast
+    method. This includes int, double, float, etc.
+    
     {t.cpp} x = *reinterpret_cast<{t.cpp}*>(buf+offset);
-    {teardown}
     """
     tree = Block(nodes=[
                  DeclAssign(type=t, target=Var(name="x"), 
@@ -429,6 +434,8 @@ def reinterpret_cast_reader(t):
 
 def string_reader(t, depth=0, prefix="", variable="x", offset="buf+offset", col_size="col_sizes_[table][j]"):
     """
+    This function represents the reader for the string primitive.
+    
     {left_side} = {t.cpp}(buf + offset, col_sizes_[table][j]);
     size_t nullpos = {left_side}.find('\\0');
     if (nullpos != {t.cpp}::npos)
@@ -457,6 +464,8 @@ def string_reader(t, depth=0, prefix="", variable="x", offset="buf+offset", col_
 
 def vl_string_reader(t, depth=0, prefix="", variable="x", offset="buf+offset"):
     """
+    This function represents the reader for the vl_string primitive.
+    
     {left_side} x = VLRead<{t.cpp}, {t.db}>(buf + offset {cyclus_constant});
     {teardown}
     """
@@ -469,6 +478,8 @@ def vl_string_reader(t, depth=0, prefix="", variable="x", offset="buf+offset"):
 
 def uuid_reader(t):
     """
+    This function represents the reader for the boost uuid primitive.
+    
     {t.cpp} x;
     memcpy(&x, buf+offset, 16);
     {teardown}
@@ -483,6 +494,8 @@ def uuid_reader(t):
 
 def vector_reader(t):
     """
+    This function represents the reader for the vector container type.
+    
     {t.cpp} x = {t.cpp}(col_sizes_[table][j] / sizeof({t.sub[1].cpp}));
     memcpy(&x[0], buf + offset, col_sizes_[table][j]);
     {NO_CLOSE}
@@ -497,6 +510,9 @@ def vector_reader(t):
 # setup functions
 
 def primitive_setup(t, depth=0, prefix=""):
+    """
+    This function represents the setup for primitive types.
+    """
     jlen = "jlen" + str(depth) + prefix
     node = Block(nodes=[
         ExprStmt(child=Assign(target=Var(name=jlen),
@@ -504,6 +520,9 @@ def primitive_setup(t, depth=0, prefix=""):
     return node
 
 def string_setup(depth=0, prefix=""): 
+    """
+    This function represents the setup for the string primitive.
+    """
     field_type = "field_type" + str(depth) + prefix
     nullpos = "nullpos" + str(depth) + prefix
     fieldlen = "fieldlen" + str(depth) + prefix
@@ -525,6 +544,9 @@ def string_setup(depth=0, prefix=""):
     return node
 
 def vl_string_setup(depth=0, prefix=""):
+    """
+    This function represents the setup for the vl_string primitive.
+    """
     jlen = "jlen" + str(depth) + prefix
     node = Block(nodes=[
         ExprStmt(child=Assign(target=Var(name=jlen), 
@@ -538,6 +560,10 @@ template_args = {"MAP": ("KEY", "VALUE"),
                  "PAIR": ("ITEM1", "ITEM2")}
 
 def get_setup(t, depth=0, prefix=""):
+    """
+    This function is the dispatch for various setups. Primitives are directly
+    setup, while template types are setup recursively.
+    """
     node = Node()
     if is_primitive(t):
         if t.canon == "STRING":
@@ -553,9 +579,14 @@ def get_setup(t, depth=0, prefix=""):
 # declaration
 
 def get_decl(t, depth=0, prefix=""):
+    """
+    This function is the dispatch for declarations. Declarations occur
+    directly before bodies, so they are created without recursion.
+    """
     variable = "x" + str(depth) + prefix
     node = ExprStmt(child=Decl(type=t, name=Var(name=variable)))
     return node
+
 # bodies
 
 # to-do: fill these out
