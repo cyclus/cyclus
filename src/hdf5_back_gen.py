@@ -418,18 +418,20 @@ def case_template(t, read_x):
     tree = Case(cond=Var(name=t.db), body=body)
     return tree
 
-def reinterpret_cast_reader(t):
+def reinterpret_cast_reader(t, depth=0, prefix="", variable="x", offset="buf+offset"):
     """
     This function represents a primitive reader using the reinterpret_cast
     method. This includes int, double, float, etc.
     
     {t.cpp} x = *reinterpret_cast<{t.cpp}*>(buf+offset);
     """
+    
+    
     tree = Block(nodes=[
-                 DeclAssign(type=t, target=Var(name="x"), 
-                            value=FuncCall(name=Var(name="*reinterpret_cast"),
-                            targs=[Raw(code=t.cpp+"*")], args=[Raw(code="buf+offset")])),
-                 create_teardown(t)])
+                 ExprStmt(child=Assign(=target=Var(name=variable), 
+                            value=FuncCall(name=Raw(code="*reinterpret_cast"),
+                            targs=[Raw(code=t.cpp+"*")], 
+                            args=[Raw(code=offset)])))])
     return tree
 
 def string_reader(t, depth=0, prefix="", variable="x", offset="buf+offset", col_size="col_sizes_[table][j]"):
@@ -591,13 +593,101 @@ def get_decl(t, depth=0, prefix=""):
 
 # to-do: fill these out
 def def_body(t, depth=0, prefix=""):
-    pass
+    """
+    This function represents a body which requires only an assignment
+    elem decl
+    elem body
+    x = {t.cpp}(pointer to elem, pointer to elem + jlen);
+    """
+    elem = CANON_TO_NODE[t.canon[1]]
+    elem_prefix = prefix + template_args[t.canon[0]]
+    elem_var = "x" + str(depth + 1) + elem_prefix
+    x = "x" + str(depth) + prefix
+    jlen = "jlen" + str(depth) + prefix
+    
+    node = Block(nodes=[get_body(elem, depth=depth+1, elem_prefix),
+                        ExprStmt(child=Assign(
+                                    target=Raw(code=x),
+                                    value=FuncCall(
+                                        name=Raw(code=t.cpp),
+                                        args=[Raw(code="buf+offset")])))])
+    return node
 
 def memcpy_body(t, depth=0, prefix=""):
-    pass
+    """
+    This function represents the generic memcpy body. 
+    elem decl
+    elem body
+    x = {t.cpp}(col_sizes_[table][j] / {fieldlen});
+    memcpy(&x[0], buf + offset, col_sizes_[table][j]);
+    """
+    variable = "x" + str(depth) + prefix
+    
+    elem = CANON_TO_NODE[t.canon[1]]
+    elem_prefix = prefix + template_args[t.canon[0]][0]
+    arg = "col_sizes_[table][j]/sizeof(" + elem.cpp +")"
+    
+    node = Block(nodes=[get_body(elem, depth=depth+1, elem_prefix),
+                        ExprStmt(child=Assign(
+                                       target=Raw(code=x),
+                                       value=FuncCall(name=Raw(code=t.cpp),
+                                                      args=[Raw(code=arg)]))),
+                        ExprStmt(child=FuncCall(
+                                    name=Raw(code="memcpy"),
+                                    args=[Raw(code="&"+x+"[0]"),
+                                          Raw(code="buf+offset"), 
+                                          Raw(code="col_sizes_[table][j]")]))])
+    return node
 
 def elementwise_body(t, depth=0, prefix=""):
+    """
+    x = t.cpp(fieldlen)
+    for(unsigned int k = 0; k < fieldlen; ++k) {
+        elem decl
+        elem body // using x[k]
+    }
+    """
     pass
+    
+def map_body(t, depth=0, prefix=""):
+    """
+    for(unsigned int k = 0; k < jlen; ++k) {
+        key decl
+        key body
+        val decl
+        val body
+        x[key] = val
+    }
+    """
+    pass
+
+def pair_body(t, depth=0, prefix=""):
+    """
+    item1 decl
+    item1 body
+    item2 decl
+    item2 body
+    x = std::make_pair(item1, item2);
+    """
+    x = "x" + str(depth) + prefix
+    
+    item1 = CANON_TO_NODE[t.canon[1]]
+    item2 = CANON_TO_NODE[t.canon[2]]
+    
+    item1_prefix = prefix + template_args[t.canon[0]][0]
+    item2_prefix = prefix + template_args[t.canon[0]][1]
+    
+    item1_name = + str(depth + 1) + item1_prefix
+    item2_name = + str(depth + 1) + item2_prefix
+    
+    node = Block(nodes=[get_body(item1, depth=depth+1, item1_prefix), 
+                        get_body(item2, depth=depth+1, item2_prefix),
+                        ExprStmt(child=Assign(
+                            target=Raw(code=x),
+                            value=FuncCall(name=Raw(code="std::make_pair"),
+                                           args=[Raw(code=item1_name),
+                                                 Raw(code=item2_name)])))])
+    return node
 
 def vl_body(t, depth=0, prefix=""):
     x = "x" + str(depth) + prefix
@@ -706,7 +796,7 @@ def get_body(t, depth=0, prefix=""):
     # catch vl types here:
     elif DB_TO_VL[t.db]:
         return vl_body(t, depth, prefix)
-    elif t in BODIES:
+    elif t.db in BODIES:
         return BODIES[t.db](t, depth, prefix)
     else:
         for i, part in zip(t.canon[1:], template_args[t[0]]):
