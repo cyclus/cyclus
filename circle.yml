@@ -6,10 +6,10 @@ dependencies:
   override:
     - docker build -t cyclus/cyclus:latest .
 
-test:
-  override:
-    - docker run cyclus/cyclus:latest cyclus_unit_tests
-    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
+#test:
+#  override:
+#    - docker run cyclus/cyclus:latest cyclus_unit_tests
+#    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
 
 deployment:
   develop:
@@ -29,11 +29,15 @@ deployment:
       - docker create deb/ubuntu-14 --name deb-14.04
       - docker cp deb-14.04:/cyclus/deb/CYCLUS-1.0.1-Linux.deb ./CYCLUS-1.0.1-Linux-ubuntu-14.04.deb
   
-  dummy:
+  ci-testing:
     branch: ci-testing
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - rm Dockerfile && ln -s docker/release-14.04/Dockerfile
-      - docker build -t deb/ubuntu-14
+      - docker build -t deb/ubuntu-14 .
       - docker create deb/ubuntu-14 --name deb-14.04
       - docker cp deb-14.04:/cyclus/deb/CYCLUS-1.0.1-Linux.deb ./CYCLUS-1.0.1-Linux-ubuntu-14.04.deb
+        #      - rm Dockerfile && ln -s docker/release-16.04/Dockerfile
+        #      - docker build -t deb/ubuntu-16
+        #      - docker create deb/ubuntu-16 --name deb-16.04
+        #      - docker cp deb-14.04:/cyclus/deb/CYCLUS-1.0.1-Linux.deb ./CYCLUS-1.0.1-Linux-ubuntu-16.04.deb
