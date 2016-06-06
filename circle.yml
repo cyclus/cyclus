@@ -33,8 +33,6 @@ deployment:
     branch: ci-testing
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable
-      - docker push cyclus/cyclus:stable
       - rm Dockerfile && ln -s docker/release-14.04/Dockerfile
       - docker build -t deb/ubuntu-14
       - docker create deb/ubuntu-14 --name deb-14.04
