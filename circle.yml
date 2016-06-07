@@ -35,7 +35,8 @@ deployment:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - rm Dockerfile && ln -s docker/release-14.04/Dockerfile
       - docker build -t deb/ubuntu-14 .
-      - docker create --name=deb-14.04 deb/ubuntu-14 
+      - docker create --name=deb-14.04 deb/ubuntu-14:
+          timeout: 1200 #set 20 minute timeout
       - docker cp deb-14.04:/cyclus/deb/CYCLUS-1.0.1-Linux.deb ./CYCLUS-1.0.1-Linux-ubuntu-14.04.deb
         #      - rm Dockerfile && ln -s docker/release-16.04/Dockerfile
         #      - docker build -t deb/ubuntu-16
