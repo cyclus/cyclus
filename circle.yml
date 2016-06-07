@@ -2,13 +2,13 @@ machine:
   services:
     - docker
 
-dependencies:
-  override:
-    - docker build -t cyclus/cyclus:latest .
+#dependencies:
+#  override:
+#    - docker build -t cyclus/cyclus:latest .
 
-test:
-  override:
-    - docker run cyclus/cyclus:latest cyclus_unit_tests
+#test:
+#  override:
+#    - docker run cyclus/cyclus:latest cyclus_unit_tests
 #    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
 
 deployment:
