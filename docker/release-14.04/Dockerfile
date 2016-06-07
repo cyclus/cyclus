@@ -35,4 +35,4 @@ WORKDIR cyclus
 RUN mkdir deb
 WORKDIR /cyclus/deb
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-RUN cpack ..
+RUN cpack -v ..
