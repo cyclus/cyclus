@@ -428,7 +428,7 @@ def reinterpret_cast_reader(t, depth=0, prefix="", variable="x", offset="buf+off
     
     
     tree = Block(nodes=[
-                 ExprStmt(child=Assign(=target=Var(name=variable), 
+                 ExprStmt(child=Assign(target=Var(name=variable), 
                             value=FuncCall(name=Raw(code="*reinterpret_cast"),
                             targs=[Raw(code=t.cpp+"*")], 
                             args=[Raw(code=offset)])))])
@@ -659,7 +659,31 @@ def map_body(t, depth=0, prefix=""):
         x[key] = val
     }
     """
-    pass
+    x = "x" + str(depth) + prefix
+    k = "k" + str(depth) + prefix
+    
+    key = CANON_TO_NODE[t.canon[1]]
+    value = CANON_TO_NODE[t.canon[2]]
+    key_prefix = prefix + template_args[t.canon[0]][0]
+    value_prefix = prefix + template_args[t.canon[0]][1]
+    key_name = "x" + str(depth + 1) + key_prefix
+    value_name = "x" + str(depth + 1) + value_prefix
+    
+    #we need to figure out what to do for fieldlen here. This variable changes
+    #depending on data type of the key and value. String is fieldlen, otherwise
+    #we get jlen.
+    node = Block(nodes=[
+          For(adecl=DeclAssign(type=Type(cpp="unsigned int"), 
+                               target=Var(name=k), 
+                               value=Raw(code="0")),
+              cond=BinOp(x=Var(name=k), op="<", y=Var(name="fieldlen")),
+              incr=LeftUnaryOp(op="++", name=Var(name=k)),
+              body=[
+                get_body(key, depth=depth+1, key_prefix),
+                get_body(value, depth=depth+1, value_prefix),
+                ExprStmt(child=Assign(target=Raw(code=x+"["+key_name+"]"),
+                                      value=Raw(code=value_name)))])])
+    return node
 
 def pair_body(t, depth=0, prefix=""):
     """
@@ -677,8 +701,8 @@ def pair_body(t, depth=0, prefix=""):
     item1_prefix = prefix + template_args[t.canon[0]][0]
     item2_prefix = prefix + template_args[t.canon[0]][1]
     
-    item1_name = + str(depth + 1) + item1_prefix
-    item2_name = + str(depth + 1) + item2_prefix
+    item1_name = "x" + str(depth + 1) + item1_prefix
+    item2_name = "x" + str(depth + 1) + item2_prefix
     
     node = Block(nodes=[get_body(item1, depth=depth+1, item1_prefix), 
                         get_body(item2, depth=depth+1, item2_prefix),
