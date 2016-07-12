@@ -176,7 +176,7 @@ void MatlSellPolicy::GetMatlTrades(
   for (it = trades.begin(); it != trades.end(); ++it) {
     double qty = it->amt;
     LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
-    Material::Ptr mat = buf_->Pop(qty, buf_->quantity() * 1e-12);
+    Material::Ptr mat = buf_->Pop(qty, cyclus::eps()*qty);
     if (ignore_comp_)
       mat->Transmute(it->request->target()->comp());
     responses.push_back(std::make_pair(*it, mat));
