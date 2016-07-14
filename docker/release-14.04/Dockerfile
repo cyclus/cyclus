@@ -34,5 +34,5 @@ COPY . /cyclus
 WORKDIR cyclus
 RUN mkdir deb
 WORKDIR /cyclus/deb
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DCPACK_SYSTEM_NAME=ubuntu.14.04 ..
 RUN cpack -v ..
