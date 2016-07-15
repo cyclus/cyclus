@@ -63,7 +63,7 @@ installation methods:
 
 
 Other installation method  and detailled installation proccedure
-can be found in `INSTALL.rst`_ or on the Cyclus website.
+can be found in `INSTALL`_ or on the Cyclus website.
 
 Installing Dependencies (Linux-Ubuntu)
 ----------------------------------------
@@ -179,6 +179,7 @@ For a more detailed explanation, checkout the user guide.
 .. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
+.. _`INSTALL`: INSTALL.rst
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
 **********************
