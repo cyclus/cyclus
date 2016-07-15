@@ -54,188 +54,46 @@ by our build system.  Instead use `libgoogle-perftools-dev`.*
 Installing Dependencies
 =========================
 
-Cyclus dependencies can either be installed via an operating system's package
-manager or via Conda.
+Cyclus support Linux and MacOs, Cyclus dependencies can be install using several
+installation methods:
+- `apt-get` (linux), 
+- `macport` (MacOS),
+- Conda (Linux only)
+- VirtualBox (dependencies & Cyclus)
 
-Via Conda
----------
 
-*Note, at present, Conda dependency downloading is only supported for Linux*
+Other installation method  and detailled installation proccedure
+can be found in INSTALL.rst or on the Cyclus website.
 
-A Conda installation may be the most straightforward for a new developer. These
-instructions will be similar to those shown for Cyclus users `conda
-installation <http://fuelcycle.org/user/install.html>`_.
-
-#. Download the appropriate `miniconda installer <http://conda.pydata.org/miniconda.html>`_
-
-#. Install miniconda
-
-    .. code-block:: console
-
-        $ bash Miniconda-3.5.2-Linux-x86_64.sh -b -p ~/miniconda
-
-#. Add the following line to your ``.bashrc`` (``.bash_profile`` for Mac users):
-
-    ``export PATH-"${HOME}/miniconda/bin:${PATH}"``
-
-#. Install the dependencies
-
-    .. code-block:: console
-
-        $ conda install cyclus-deps
-
-Installing Dependencies (Linux and Unix)
+Installing Dependencies (Linux-Ubuntu)
 ----------------------------------------
-
-This guide assumes that the user has root access (to issue sudo commands) and
-access to a package manager or has some other suitable method of automatically
-installing established libraries. This process was tested using a fresh install
-of Ubuntu 12.10 using apt-get as the package manager (scroll down further for
-Mac OSX instructions).
 
 The command to install a dependency takes the form of:
 
 .. code-block:: bash
 
-  sudo apt-get install package
-
-where "package" is replaced by the correct package name. The minimal list of
-required library package names is:
-
-#. make
-#. cmake
-#. libboost-all-dev (see note below)
-#. libxml2-dev
-#. libxml++2.6-dev
-#. libsqlite3-dev
-#. libhdf5-serial-dev
-#. libbz2-dev
-#. coinor-libcbc-dev
-#. coinor-libcoinutils-dev
-#. coinor-libosi-dev
-#. coinor-libclp-dev
-#. coinor-libcgl-dev
+  sudo apt-get install make cmake libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev 
 
 and (optionally):
 
-#. doxygen
-#. g++
-#. libblas-dev
-#. liblapack-dev
-#. libgoogle-perftools-dev
-
-For example, in order to install libxml++ (and libxml2) on your system, type:
-
 .. code-block:: bash
 
-  sudo apt-get install libxml++2.6-dev
+  sudo apt-get install doxygen g++ libblas-dev liblapack-dev libgoogle-perftools-dev
 
-If you'd prefer to copy/paste, the following line will install all *Cyclus*
-dependencies:
-
-.. code-block:: bash
-
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev
-
-Boost Note
-^^^^^^^^^^
-
-The `libboost-all-dev` used above will install the entire Boost library, which
-is not strictly needed. We currently depend on a small subset of the Boost
-libraries:
-
-#. libboost-program-options-dev
-#. libboost-system-dev
-#. libboost-filesystem-dev
-
-However, it is possible (likely) that additional Boost libraries will be used
-because they are an industry standard. Accordingly, we suggest simply installing
-`libboost-all-dev` to limit any headaches due to possible dependency additions
-in the future.
 
 Installing Dependencies (Mac OSX)
 ----------------------------------------
 
-Cyclus archetype development is not fully supported on Mac.  Nonetheless,
-because there are some use cases which require installation from source,
-we have compiled a list of instructions that should be successful. (Note that
-the HDF5 interface is not working on Yosemite as of 1-Apr-2015. Ignore related
-warnings when building cyclus). Use a Mac platform at your own risk, we strongly
-recommend sticking to Linux for development.
-
-This guide assumes that the user has root access (to issue sudo commands) and
-access to a package manager or has some other suitable method of automatically
-installing established libraries. This process was tested using a fresh install
-of Yosemite 10.10.2 using macports as the package manager.  Macports installs
-packages in /opt/local.  If installing to a different location,
-(i.e. /usr/local) change paths in the following instructions accordingly. If
-you use homebrew, try the following instructions with brew commands in place of
-the port commands.
-
-The command to install a dependency takes the form of:
+The command to install a dependency, using macport, takes the form of:
 
 .. code-block:: bash
 
-  sudo port install package
+  sudo port install cmake boost libxml2 libxmlxx2 sqlite3 doxygen glibmm
 
-where "package" is replaced by the correct package name. The minimal list of
-required library package names is:
+Then install Coin-Cbc and HDF5 from source. Coin-Cbc 2.9 and HDF5 1.8.16 have
+been successfully tested on Mac OS El Captain (10.11.5).
 
-#. cmake
-#. boost
-#. libxml2
-#. libxmlxx2
-#. sqlite3
-#. doxygen
-#. glibmm
 
-Then install Coin-Cbc and HDF5 from source. They can be downloaded to any
-directory on your computer:
-   
-**Coin-Cbc**: Download and build using the svn command in the terminal:
-   
-.. code-block:: bash
-
-  svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc
-  cd Coin-Cbc/
-  mkdir build
-  cd build/
-  ../configure --prefix=/opt/local
-  make
-  sudo make install
-
-**HDF5**: The 1.8.13 version appears to work better than 1.8.14.  Do not use
-the macports distribution, it is definitely broken.
-Download and build using the gzip Linux/Unix distribution of
-`HDF5. <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/hdf5-1.8.13.tar.gz>`_   (For Safari users - the file will be automatically unzipped so change
-the *mv* command in the the following codeblock to *mv hdf5-1.8.13.tar hdf5/* ).
-
-.. code-block:: bash
-
-  mkdir hdf5/
-  mv hdf5-1.8.13.tar.gz hdf5/
-  cd hdf5/
-  mkdir build
-  cd build/
-  ../configure --prefix=/opt/local
-  make
-  sudo make install
-
-Finally, update your path and the following environment variables in your
-~/.profile (or ~/.bashrc ) file:
-
-.. code-block:: bash
-
-  export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local:$DYLD_FALLBACK_LIBRARY_PATH
-
-  export CMAKE_MODULE_PATH=/opt/local/include:$CMAKE_MODULE_PATH
-  export CMAKE_PREFIX_PATH=/opt/local:$CMAKE_PREFIX_PATH
-
-  export HDF5_DIR=/opt/local/hdf5/lib
-  export HDF5_ROOT=/opt/local/hdf5
-
-  # add to PATH:
-  export PATH=${HDF5_DIR}:/opt/local/bin:${HOME}/.local/bin:$PATH
 
 
 Installing Cyclus (Linux, Unix, and Mac OSX)
