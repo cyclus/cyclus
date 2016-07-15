@@ -56,10 +56,10 @@ Installing Dependencies
 
 Cyclus support Linux and MacOs, Cyclus dependencies can be install using several
 installation methods:
-- `apt-get` (linux), 
-- `macport` (MacOS),
-- Conda (Linux only)
-- VirtualBox (dependencies & Cyclus)
+#- `apt-get` (linux), 
+#- `macport` (MacOS),
+#- Conda (Linux only)
+#- VirtualBox (dependencies & Cyclus)
 
 
 Other installation method  and detailled installation proccedure
@@ -182,7 +182,7 @@ For a more detailed explanation, checkout the user guide.
 .. _`INSTALL`: INSTALL.rst
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 .. _`Cyclus website`: http://fuelcycle.org/user/install.html
-_
+
 **********************
 The Developer Workflow
 **********************
