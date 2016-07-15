@@ -29,7 +29,9 @@ Package                Minimum Version
 `HDF5`                 1.8.4
 `Coin-Cbc`             2.5
 ====================   ==================
+
 On some platforms, (i.e. Ubuntu 14.04):
+
 ====================   ==================
 `g++`                  4.8.2
 `libblas-dev`          1.2
