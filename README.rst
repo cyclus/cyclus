@@ -181,7 +181,6 @@ For a more detailed explanation, checkout the user guide.
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`INSTALL`: INSTALL.rst
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
-.. _`Cyclus website`: http://fuelcycle.org/user/install.html
 _
 **********************
 The Developer Workflow
