@@ -56,10 +56,10 @@ Installing Dependencies
 
 Cyclus support Linux and MacOs, Cyclus dependencies can be install using several
 installation methods:
-- `apt-get` (linux), 
-- `macport` (MacOS),
-- Conda (Linux only)
-- VirtualBox (dependencies & Cyclus)
+  - `apt-get` (linux), 
+  - `macport` (MacOS),
+  - Conda (Linux only)
+  - VirtualBox (dependencies & Cyclus)
 
 
 Other installation method  and detailled installation proccedure
