@@ -63,7 +63,7 @@ installation methods:
 
 
 Other installation method  and detailled installation proccedure
-can be found in INSTALL.rst or on the Cyclus website.
+can be found in `INSTALL.rst`_ or on the Cyclus website.
 
 Installing Dependencies (Linux-Ubuntu)
 ----------------------------------------
