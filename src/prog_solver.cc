@@ -48,13 +48,8 @@ ProgSolver::~ProgSolver() {}
 
 void ProgSolver::WriteMPS() {
   std::stringstream ss;
-  //ss << "exchng_" << sim_ctx_->time();
-  //iface_->writeMps(ss.str().c_str());
-  std::string s = ss.str();
-  //const char* cs = s.c_str();
-  const char* cs = "exchng";
-  std::cout << "prog: " << cs << "\n";
-  iface_->writeMps(cs);
+  ss << "exchng_" << sim_ctx_->time();
+  iface_->writeMps(ss.str().c_str());
 }
 
 double ProgSolver::SolveGraph() {
