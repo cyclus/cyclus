@@ -123,19 +123,34 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
   if (verbose)
     ReportProg(si);
 
+  //const char *argv[] = {"exchng", "-log", "0", "-solve", "-quit"};
   ObjValueHandler* handler = new ObjValueHandler(greedy_obj, 0, false);
   if (HasInt(si)) {
     const char *argv[] = {"exchng", "-log", "0", "-solve", "-quit"};
+    //const char *argv[] = {"exchng", "log", "0", "solve", "quit"};
+    //const char *argv[] = {"exchng", "log 0 solve quit"};
     //const char *argv[] = {"log", "0", "solve", "quit", "exchng"};
-    //const char *argv[] = {"exchng", "-log", "0"};
+    //const char *argv[] = {"exchng", "-solve", "-quit"};
+    //const char *argv[] = {"Cbc_Test", "-log", "0", "-solve", "-quit"};
     int argc = 5;
+    std::cout << "argc: " << argc << "\n";
+    for (int i=0; i < argc; i++) {
+      std::cout << "argv " << i << ": " << argv[i] << "\n";
+    }
+    std::cout << "got 00\n";
     CbcModel model(*si);
+    std::cout << "got 01\n";
     //ObjValueHandler handler(greedy_obj);
     CbcMain0(model);
+    std::cout << "got 02\n";
     //model.passInEventHandler(&handler);
-    model.passInEventHandler(handler);
-    CbcMain1(argc, argv, model, CbcCallBack);
+    //model.passInEventHandler(handler);
+    std::cout << "got 03\n";
+    //CbcMain1(argc, argv, model, CbcCallBack);
+    CbcMain1(argc, argv, model);
+    std::cout << "got 04\n";
     si->setColSolution(model.getColSolution());
+    std::cout << "got 05\n";
     if (verbose) {
       //std::cout << "Greedy equivalent time: " << handler.time()
       //          << " and obj " << handler.obj()
@@ -144,6 +159,7 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
                 << " and obj " << handler->obj()
                 << " and found " << std::boolalpha << handler->found() << "\n";
     }
+    std::cout << "got 06\n";
   } else {
     // no ints, just solve 'initial lp relaxation'
     si->initialSolve();
