@@ -401,7 +401,7 @@ void XMLFileLoader::LoadControlParams() {
   InfileTree xqe(*parser_);
   std::string query = "/*/control";
   InfileTree* qe = xqe.SubTree(query);
-
+  
   std::string handle;
   if (qe->NMatches("simhandle") > 0) {
     handle = qe->GetString("simhandle");
@@ -426,6 +426,16 @@ void XMLFileLoader::LoadControlParams() {
 
   // get time step duration
   si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
+  
+  // get epsilon
+  double eps_ = OptionalQuery<double>(qe, "eps", 1e-6);
+  cyclus::cy_eps = eps_;
+
+  // get epsilon ressrouces
+  double eps_rsrc_ = OptionalQuery<double>(qe, "eps_rsrc", 1e-6);
+  cyclus::cy_eps_rsrc = eps_rsrc_;
+
+
 
   ctx_->InitSim(si);
 }
