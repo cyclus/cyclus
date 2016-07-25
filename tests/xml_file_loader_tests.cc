@@ -248,7 +248,7 @@ TEST_F(XMLFileLoaderTests, solverfile) {
   EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, solver_control_file));
 }
 
-// Checking default values
+// Checking default eps values
 TEST_F(XMLFileLoaderTests, EpsDefault) {
   XMLFileLoader file(&rec_, b_, schema_path, controlFile);
 
@@ -256,7 +256,7 @@ TEST_F(XMLFileLoaderTests, EpsDefault) {
   EXPECT_DOUBLE_EQ(1e-6, cyclus::eps_rsrc());
 }
 
-// Checking default values
+// Changing eps values
 TEST_F(XMLFileLoaderTests, EpsFile) {
   XMLFileLoader file(&rec_, b_, schema_path, epsFile);
   file.LoadSim();
