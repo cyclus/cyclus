@@ -429,12 +429,11 @@ void XMLFileLoader::LoadControlParams() {
   
   // get epsilon
   double eps_ = OptionalQuery<double>(qe, "eps", 1e-6);
-  cyclus::cy_eps = eps_;
+  cy_eps = si.eps = eps_;
 
   // get epsilon resources
   double eps_rsrc_ = OptionalQuery<double>(qe, "eps_rsrc", 1e-6);
-  cyclus::cy_eps_rsrc = eps_rsrc_;
-
+  cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
 
 
   ctx_->InitSim(si);

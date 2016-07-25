@@ -7,14 +7,14 @@
 namespace cyclus {
 
 /// generic epsilon values
-static double cy_eps = 1e-6;
+extern double cy_eps;
 /// a generic epsilon value
 inline double eps() {
   return cy_eps;
 }
 
 /// epsilon values to be used by resources
-static double cy_eps_rsrc = 1e-6;
+extern double cy_eps_rsrc;
 /// an epsilon value to be used by resources
 inline double eps_rsrc() {
   return cy_eps_rsrc;

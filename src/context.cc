@@ -12,6 +12,9 @@
 
 namespace cyclus {
 
+double cy_eps = 1e-6;
+double cy_eps_rsrc = 1e-6;
+
 SimInfo::SimInfo()
     : duration(0),
       y0(0),

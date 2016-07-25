@@ -31,11 +31,15 @@ void XMLFileLoaderTests::SetUp() {
   solver_control_file = "solvercontrol.xml";
   CreateTestInputFile(solver_control_file, ControlSequenceWithSolver());
 
+  epsFile = "eps.xml";
+  CreateTestInputFile(epsFile, ControlSequenceWithEps());
+  
   recipeFile = "recipes.xml";
   CreateTestInputFile(recipeFile, RecipeSequence());
 
   moduleFile = "modules.xml";
   CreateTestInputFile(moduleFile, ModuleSequence());
+  
 }
 
 void XMLFileLoaderTests::TearDown() {
@@ -43,6 +47,7 @@ void XMLFileLoaderTests::TearDown() {
   unlink(falseFile.c_str());
   unlink(controlFile.c_str());
   unlink(decayControlFile.c_str());
+  unlink(epsFile.c_str());
   unlink(solver_control_file.c_str());
   unlink(recipeFile.c_str());
   unlink(moduleFile.c_str());
@@ -91,6 +96,62 @@ std::string XMLFileLoaderTests::ControlSequenceWithSolver() {
           "    <allow_exclusive_orders>true</allow_exclusive_orders>"
           "  </solver>"
           " </control>"
+          "</simulation>";
+}
+
+std::string XMLFileLoaderTests::ControlSequenceWithEps() {
+  return  
+          "<simulation>"
+          "  <control>"
+          "    <duration>1</duration>"
+          "    <startmonth>1</startmonth>"
+          "    <startyear>2000</startyear>"
+          "    <eps>0.5e-5</eps>"
+          "    <eps_rsrc>3e-4</eps_rsrc>"
+          "  </control>"
+          "  <archetypes>"
+          "    <spec><lib>agents</lib><name>Source</name></spec>"
+          "    <spec><lib>agents</lib><name>Sink</name></spec>"
+          "    <spec><lib>agents</lib><name>NullRegion</name></spec>"
+          "    <spec><lib>agents</lib><name>NullInst</name></spec>"
+          "  </archetypes>"
+          "  <facility>"
+          "    <name>src</name>"
+          "    <lifetime>1</lifetime>"
+          "    <config>"
+          "      <Source>"
+          "        <commod>commod</commod>"
+          "        <capacity>1</capacity>"
+          "      </Source>"
+          "    </config>"
+          "  </facility>"
+          "  <facility>"
+          "    <name>snk</name>"
+          "    <config>"
+          "      <Sink>"
+          "        <in_commods><val>commod</val></in_commods>"
+          "        <recipe_name>commod_recipe</recipe_name>"
+          "        <capacity>1</capacity>"
+          "      </Sink>"
+          "    </config>"
+          "  </facility>"
+          "  <region>"
+          "    <name>SingleRegion</name>"
+          "    <config> <NullRegion/> </config>"
+          "    <institution>"
+          "      <name>SingleInstitution</name>"
+          "      <initialfacilitylist>"
+          "        <entry> <prototype>src</prototype> <number>1</number> </entry>"
+          "        <entry> <prototype>snk</prototype> <number>1</number> </entry>"
+          "      </initialfacilitylist>"
+          "      <config> <NullInst/> </config>"
+          "    </institution>"
+          "  </region>"
+          "  <recipe>"
+          "    <name>commod_recipe</name>"
+          "    <basis>mass</basis>"
+          "    <nuclide> <id>cs137</id> <comp>1</comp> </nuclide>"
+          "  </recipe>"
           "</simulation>";
 }
 
@@ -185,6 +246,23 @@ TEST_F(XMLFileLoaderTests, decayfile) {
 
 TEST_F(XMLFileLoaderTests, solverfile) {
   EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, solver_control_file));
+}
+
+// Checking default values
+TEST_F(XMLFileLoaderTests, EpsDefault) {
+  XMLFileLoader file(&rec_, b_, schema_path, controlFile);
+
+  EXPECT_DOUBLE_EQ(1e-6, cyclus::eps());
+  EXPECT_DOUBLE_EQ(1e-6, cyclus::eps_rsrc());
+}
+
+// Checking default values
+TEST_F(XMLFileLoaderTests, EpsFile) {
+  XMLFileLoader file(&rec_, b_, schema_path, epsFile);
+  file.LoadSim();
+
+  EXPECT_DOUBLE_EQ(0.5e-5, cyclus::eps());
+  EXPECT_DOUBLE_EQ(3e-4, cyclus::eps_rsrc());
 }
 
 TEST_F(XMLFileLoaderTests, throws) {

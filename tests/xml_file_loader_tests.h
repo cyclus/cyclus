@@ -14,8 +14,8 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class XMLFileLoaderTests : public ::testing::Test {
  public:
-  std::string controlFile, decayControlFile, solver_control_file, falseFile, \
-    moduleFile, recipeFile;
+  std::string controlFile, decayControlFile, solver_control_file, epsFile,
+      falseFile, moduleFile, recipeFile;
 
   cyclus::FullBackend* b_;
   cyclus::Recorder rec_;
@@ -29,6 +29,7 @@ class XMLFileLoaderTests : public ::testing::Test {
   std::string ControlSequence();
   std::string ControlSequenceWithDecay();
   std::string ControlSequenceWithSolver();
+  std::string ControlSequenceWithEps();
   std::string RecipeSequence();
   std::string ModuleSequence();
   std::string ControlSchema();
