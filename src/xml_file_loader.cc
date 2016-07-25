@@ -431,7 +431,7 @@ void XMLFileLoader::LoadControlParams() {
   double eps_ = OptionalQuery<double>(qe, "eps", 1e-6);
   cyclus::cy_eps = eps_;
 
-  // get epsilon ressrouces
+  // get epsilon resources
   double eps_rsrc_ = OptionalQuery<double>(qe, "eps_rsrc", 1e-6);
   cyclus::cy_eps_rsrc = eps_rsrc_;
 
