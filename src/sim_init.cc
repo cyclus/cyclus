@@ -159,6 +159,10 @@ void SimInit::LoadInfo() {
   // should be updated to uint64_t.
   si_.dt = qr.GetVal<int>("DurationSecs");
 
+  qr = b_->Query("Epsilon", NULL);
+  si_.eps = qr.GetVal<double>("GenericEpsilon");
+  si_.eps_rsrc = qr.GetVal<double>("ResourceEpsilon");
+  
   qr = b_->Query("InfoExplicitInv", NULL);
   si_.explicit_inventory = qr.GetVal<bool>("RecordInventory");
   si_.explicit_inventory_compact = qr.GetVal<bool>("RecordInventoryCompact");

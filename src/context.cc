@@ -208,6 +208,11 @@ void Context::InitSim(SimInfo si) {
   NewDatum("TimeStepDur")
       ->AddVal("DurationSecs", static_cast<int>(si.dt))
       ->Record();
+  
+  NewDatum("Epsilon")
+      ->AddVal("GenericEpsilon", si.eps)
+      ->AddVal("ResourceEpsilon", si.eps_rsrc)
+      ->Record();
 
   NewDatum("XMLPPInfo")
       ->AddVal("LibXMLPlusPlusVersion", std::string(version::xmlpp()))
