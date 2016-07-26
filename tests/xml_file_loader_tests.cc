@@ -19,38 +19,38 @@ void XMLFileLoaderTests::SetUp() {
   b_ = new cyclus::SqliteBack("xmlfileloadtestdb.sqlite");
   rec_.RegisterBackend(b_);
 
-  falseFile = "false.xml";
-  CreateTestInputFile(falseFile, FalseSequence());
+  false_file = "false.xml";
+  CreateTestInputFile(false_file, FalseSequence());
 
-  controlFile = "control.xml";
-  CreateTestInputFile(controlFile, ControlSequence());
+  control_file = "control.xml";
+  CreateTestInputFile(control_file, ControlSequence());
 
-  decayControlFile = "decaycontrol.xml";
-  CreateTestInputFile(decayControlFile, ControlSequenceWithDecay());
+  decay_control_file = "decaycontrol.xml";
+  CreateTestInputFile(decay_control_file, ControlSequenceWithDecay());
 
   solver_control_file = "solvercontrol.xml";
   CreateTestInputFile(solver_control_file, ControlSequenceWithSolver());
 
-  epsFile = "eps.xml";
-  CreateTestInputFile(epsFile, ControlSequenceWithEps());
+  eps_file = "eps.xml";
+  CreateTestInputFile(eps_file, ControlSequenceWithEps());
   
-  recipeFile = "recipes.xml";
-  CreateTestInputFile(recipeFile, RecipeSequence());
+  recipe_file = "recipes.xml";
+  CreateTestInputFile(recipe_file, RecipeSequence());
 
-  moduleFile = "modules.xml";
-  CreateTestInputFile(moduleFile, ModuleSequence());
+  module_file = "modules.xml";
+  CreateTestInputFile(module_file, ModuleSequence());
   
 }
 
 void XMLFileLoaderTests::TearDown() {
   remove("xmlfileloadtestdb.sqlite");
-  unlink(falseFile.c_str());
-  unlink(controlFile.c_str());
-  unlink(decayControlFile.c_str());
-  unlink(epsFile.c_str());
+  unlink(false_file.c_str());
+  unlink(control_file.c_str());
+  unlink(decay_control_file.c_str());
+  unlink(eps_file.c_str());
   unlink(solver_control_file.c_str());
-  unlink(recipeFile.c_str());
-  unlink(moduleFile.c_str());
+  unlink(recipe_file.c_str());
+  unlink(module_file.c_str());
 }
 
 std::string XMLFileLoaderTests::FalseSequence() {
@@ -237,11 +237,11 @@ std::string XMLFileLoaderTests::ControlSchema() {
 }
 
 TEST_F(XMLFileLoaderTests, openfile) {
-  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, controlFile));
+  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, control_file));
 }
 
 TEST_F(XMLFileLoaderTests, decayfile) {
-  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, decayControlFile));
+  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, decay_control_file));
 }
 
 TEST_F(XMLFileLoaderTests, solverfile) {
@@ -250,7 +250,7 @@ TEST_F(XMLFileLoaderTests, solverfile) {
 
 // Checking default eps values
 TEST_F(XMLFileLoaderTests, EpsDefault) {
-  XMLFileLoader file(&rec_, b_, schema_path, controlFile);
+  XMLFileLoader file(&rec_, b_, schema_path, control_file);
 
   EXPECT_DOUBLE_EQ(1e-6, cyclus::eps());
   EXPECT_DOUBLE_EQ(1e-6, cyclus::eps_rsrc());
@@ -258,7 +258,7 @@ TEST_F(XMLFileLoaderTests, EpsDefault) {
 
 // Changing eps values
 TEST_F(XMLFileLoaderTests, EpsFile) {
-  XMLFileLoader file(&rec_, b_, schema_path, epsFile);
+  XMLFileLoader file(&rec_, b_, schema_path, eps_file);
   file.LoadSim();
 
   EXPECT_DOUBLE_EQ(0.5e-5, cyclus::eps());
