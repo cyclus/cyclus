@@ -35,11 +35,11 @@ deployment:
           timeout: 1200 #set 20 minute timeout
       - docker create --name=deb-14.04 deb/ubuntu-14 #build deb in docker
       - docker cp deb-14.04:/cyclus/deb/CYCLUS-1.4.0-ubuntu.14.04.deb ./ #extract deb
-      - scp ./CYCLUS-?.?.0_*-ubuntu.??.04.deb root@dory.fuelcycle.org:./cyclus-deb/ #push the deb on dory
+      - scp ./CYCLUS-?.?.?_???????-ubuntu.??.04.deb root@dory.fuelcycle.org:./cyclus-deb/ #push the deb on dory
         # Ubuntu 16.04
       - rm Dockerfile && ln -s docker/release-16.04/Dockerfile #place the correct Dockerfile
       - docker build -t deb/ubuntu-16 .:
           timeout: 1200 #set 20 minute timeout
       - docker create --name=deb-16.04 deb/ubuntu-16 #build deb in docker
       - docker cp deb-16.04:/cyclus/deb/CYCLUS-1.4.0-ubuntu.16.04.deb ./ #extract deb
-      - scp ./CYCLUS-?.?.0_*-ubuntu.??.04.deb root@dory.fuelcycle.org:./cyclus-deb/ #push the deb on dory
+      - scp ./CYCLUS-?.?.?_???????-ubuntu.??.04.deb root@dory.fuelcycle.org:./cyclus-deb/ #push the deb on dory
