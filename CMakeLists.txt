@@ -372,6 +372,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_PACKAGE_INSTALL_DIRECTORY
       "cyclus_${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${Git_Commit_Hash}")
     #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev  (>= 1.46.0-1), libxml++2.6-dev (>= 2.6.0), libsqlite3-dev (>= 3.7.9), libhdf5-serial-dev (>= 1.8.0)")
+    set(CPACK_PACKAGE_NAME
+      "cyclus_${CPACK_VERSION_MAJOR}.${CPACK_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${Git_Commit_Hash}")
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/cmake/CyclusCPackOptions.cmake.in"
         "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake" @ONLY)
