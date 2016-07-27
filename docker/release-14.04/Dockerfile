@@ -32,7 +32,7 @@ RUN apt-get install -y --force-yes \
 # build cyclus deb
 COPY . /cyclus 
 WORKDIR cyclus
-RUN mkdir deb
+RUN mkdir -p deb
 WORKDIR /cyclus/deb
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DCPACK_SYSTEM_NAME=ubuntu.14.04 ..
 RUN cpack -v ..
