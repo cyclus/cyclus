@@ -6,10 +6,10 @@ dependencies:
   override:
     - docker build -t cyclus/cyclus:latest .
 
-test:
-  override:
-    - docker run cyclus/cyclus:latest cyclus_unit_tests
-    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
+#test:
+#  override:
+#    - docker run cyclus/cyclus:latest cyclus_unit_tests
+#    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
 
 deployment:
   develop:
@@ -35,7 +35,7 @@ deployment:
           timeout: 1200 #set 20 minute timeout
       - docker create --name=deb-14.04 deb/ubuntu-14 #build deb in docker
       - docker cp deb-14.04:/cyclus/deb ./ #extract deb
-      - ls
+      - ls deb
       - scp ./deb/CYCLUS-*-ubuntu.??.04.deb root@dory.fuelcycle.org:./cyclus-deb/ #push the deb on dory
         # Ubuntu 16.04
       - rm Dockerfile && ln -s docker/release-16.04/Dockerfile #place the correct Dockerfile
