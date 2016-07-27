@@ -322,13 +322,13 @@ IF(NOT CYCLUS_DOC_ONLY)
     ################################## begin uninstall target ####################################
     ##############################################################################################
 
-    configure_file(
+    CONFIGURE_FILE(
         "${PROJECT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
         IMMEDIATE @ONLY
         )
 
-    add_custom_target(uninstall
+      ADD_CUSTOM_TARGET(uninstall
         COMMAND "${CMAKE_COMMAND}" -P "\"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake\"")
 
     ##############################################################################################
@@ -339,49 +339,56 @@ IF(NOT CYCLUS_DOC_ONLY)
     ####################################### begin cpack ##########################################
     ##############################################################################################
 
-    SET(CPACK_COMPONENTS_ALL cyclus testing libraries data core)
 
     # Here's where we package it with CPack
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
-
+    
+    # Here we set some components for installation with cpack
+    SET(CPACK_COMPONENTS_ALL cyclus testing libraries data core)
     SET(CPACK_GENERATOR "DEB")
+
+    #Organisation
     SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "CNERG, UW-Madison") #required
     SET(CPACK_PACKAGE_VENDOR "CNERG, UW-Madison")
     SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.rst")
     SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE.rst")
+
+    #Version
     SET(CPACK_PACKAGE_VERSION_MAJOR "1")
     SET(CPACK_PACKAGE_VERSION_MINOR "4")
     SET(CPACK_PACKAGE_VERSION_PATCH "0") 
-    SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
 
-    #Get git HASH number
-    # First try to find the git-executable
-    find_program( Git_EXECUTABLE NAMES git git.cmd PATHS
-      ${Git_DIR}
-      ENV PATHS
-      $ENV{Git_DIR}
-    )
-    # Run "git log -n 1 --pretty="%h" for the current commit-hash
-    execute_process( COMMAND ${Git_EXECUTABLE} "log" "-n" "1" "--pretty=\"%h\"" 
+    #Git hash
+    FIND_PROGRAM( GIT_EXECUTABLE NAMES git git.cmd PATHS ${GIT_DIR}  ENV PATHS $ENV{GIT_DIR} )
+    EXECUTE_PROCESS( 
+      COMMAND ${GIT_EXECUTABLE} "log" "-n" "1" "--pretty=\"%h\"" 
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-      OUTPUT_VARIABLE Git_Commit_Hash 
+      OUTPUT_VARIABLE GIT_COMMIT_HASH 
       OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    # and use a regex to strip quotes.
-    string( REGEX REPLACE "^\"(.*)\"$" "\\1" Git_Commit_Hash ${Git_Commit_Hash} )
-    MESSAGE("git HASH is: #${Git_Commit_Hash}")
+      )
+    STRING( REGEX REPLACE "^\"(.*)\"$" "\\1" GIT_COMMIT_HASH ${GIT_COMMIT_HASH} )
+    MESSAGE("git HASH is: #${GIT_COMMIT_HASH}")
 
-    SET(CPACK_PACKAGE_INSTALL_DIRECTORY
-      "cyclus_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-    #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev  (>= 1.46.0-1), libxml++2.6-dev (>= 2.6.0), libsqlite3-dev (>= 3.7.9), libhdf5-serial-dev (>= 1.8.0)")
+    #Names
     set(CPACK_PACKAGE_NAME "cyclus")
-    set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${Git_Commit_Hash}")
+    SET(
+      CPACK_PACKAGE_INSTALL_DIRECTORY
+      "cyclus_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}"
+      )
+    set(
+      CPACK_PACKAGE_VERSION 
+      "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${GIT_COMMIT_HASH}"
+      )
+
+    SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/cmake/CyclusCPackOptions.cmake.in"
-        "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake" @ONLY)
+    CONFIGURE_FILE(
+      "${PROJECT_SOURCE_DIR}/cmake/CyclusCPackOptions.cmake.in"
+      "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake" @ONLY
+      )
     SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake")
     SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
-
+    
     INCLUDE(CPack)
 
     ##############################################################################################
