@@ -353,6 +353,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_PACKAGE_VERSION_MINOR "4")
     SET(CPACK_PACKAGE_VERSION_PATCH "0") 
     SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
+
+    #Get git HASH number
     # First try to find the git-executable
     find_program( Git_EXECUTABLE NAMES git git.cmd PATHS
       ${Git_DIR}
@@ -367,13 +369,13 @@ IF(NOT CYCLUS_DOC_ONLY)
     )
     # and use a regex to strip quotes.
     string( REGEX REPLACE "^\"(.*)\"$" "\\1" Git_Commit_Hash ${Git_Commit_Hash} )
-    MESSAGE("HASH ${Git_Commit_Hash}")
+    MESSAGE("git HASH is: #${Git_Commit_Hash}")
+
     SET(CPACK_PACKAGE_INSTALL_DIRECTORY
-      "cyclus_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.
-      ${CPACK_PACKAGE_VERSION_PATCH}_${Git_Commit_Hash}")
+      "cyclus_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
     #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev  (>= 1.46.0-1), libxml++2.6-dev (>= 2.6.0), libsqlite3-dev (>= 3.7.9), libhdf5-serial-dev (>= 1.8.0)")
-    set(CPACK_PACKAGE_NAME
-      "cyclus_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${Git_Commit_Hash}")
+    set(CPACK_PACKAGE_NAME "cyclus"}
+    set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${Git_Commit_Hash}")
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/cmake/CyclusCPackOptions.cmake.in"
         "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake" @ONLY)
