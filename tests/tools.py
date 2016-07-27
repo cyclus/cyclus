@@ -37,10 +37,12 @@ def check_cmd(args, cwd, holdsrtn):
     print("TESTING: running command in {0}:\n\n{1}\n".format(cwd, args))
     f = tempfile.NamedTemporaryFile()
     env = dict(os.environ)
-    env['_'] = subprocess.check_output(['which', 'cyclus'], cwd=cwd).strip()
+    env['_'] = cp = subprocess.check_output(['which', 'cyclus'], cwd=cwd,
+                                            universal_newlines=True).strip()
     rtn = subprocess.call(args, shell=True, cwd=cwd, stdout=f, stderr=f, env=env)
     if rtn != 0:
         f.seek(0)
+        print('CYCLUS COMMAND: ' + cp)
         print("STDOUT + STDERR:\n\n" + f.read().decode())
     f.close()
     holdsrtn[0] = rtn
