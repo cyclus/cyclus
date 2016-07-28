@@ -2,8 +2,8 @@
 #define CYCLUS_SRC_BID_PORTFOLIO_H_
 
 #include <set>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include <boost/shared_ptr.hpp>
 
@@ -15,10 +15,8 @@ namespace cyclus {
 
 class Trader;
 
-
 std::string GetTraderPrototype(Trader* bidder);
 std::string GetTraderSpec(Trader* bidder);
-
 
 /// @class BidPortfolio
 ///
@@ -31,9 +29,9 @@ std::string GetTraderSpec(Trader* bidder);
 /// portfolio. Responses are grouped by the bidder. Constraints are assumed to
 /// act over the entire set of possible bids.
 template <class T>
-class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
+class BidPortfolio : public boost::enable_shared_from_this<BidPortfolio<T> > {
  public:
-  typedef boost::shared_ptr< BidPortfolio<T> > Ptr;
+  typedef boost::shared_ptr<BidPortfolio<T> > Ptr;
 
   /// @brief default constructor
   BidPortfolio() : bidder_(NULL) {}
@@ -54,15 +52,15 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// original
   Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
                  Trader* bidder, bool exclusive = false) {
-    Bid<T>* b =
-        Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
-                       exclusive);
+    Bid<T>* b = Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
+                               exclusive);
     VerifyResponder_(b);
-    if(offer->quantity() > 0 )
+    if (offer->quantity() > 0)
       bids_.insert(b);
-    else{
+    else {
       std::stringstream ss;
-      ss << GetTraderPrototype(bidder) << " from " << GetTraderSpec(bidder) << " is offering a bid quantity <= 0, Q = " << offer->quantity() ;
+      ss << GetTraderPrototype(bidder) << " from " << GetTraderSpec(bidder)
+         << " is offering a bid quantity <= 0, Q = " << offer->quantity();
       throw ValueError(ss.str());
     }
     return b;
@@ -76,22 +74,16 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
 
   /// @return the agent associated with the portfolio. If no bids have
   /// been added, the bidder is NULL.
-  inline Trader* bidder() const {
-    return bidder_;
-  }
+  inline Trader* bidder() const { return bidder_; }
 
   /// @return *deprecated* the commodity associated with the portfolio.
-  inline std::string commodity() const { 
-    return "";
-  }
+  inline std::string commodity() const { return ""; }
 
   /// @return const access to the bids
-  inline const std::set<Bid<T>*>& bids() const {
-    return bids_;
-  }
+  inline const std::set<Bid<T>*>& bids() const { return bids_; }
 
   /// @return the set of constraints over the bids
-  inline const std::set< CapacityConstraint<T> >& constraints() const {
+  inline const std::set<CapacityConstraint<T> >& constraints() const {
     return constraints_;
   }
 
@@ -123,14 +115,14 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   }
 
   /// @brief *deprecated*
-  void VerifyCommodity_(const Bid<T>* r) { }
-  
+  void VerifyCommodity_(const Bid<T>* r) {}
+
   // bid_ is a set because there is a one-to-one correspondence between a
   // bid and a request, i.e., bids are unique
   std::set<Bid<T>*> bids_;
 
   // constraints_ is a set because constraints are assumed to be unique
-  std::set< CapacityConstraint<T> > constraints_;
+  std::set<CapacityConstraint<T> > constraints_;
 
   Trader* bidder_;
 };
