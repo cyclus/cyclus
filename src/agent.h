@@ -10,8 +10,8 @@
 
 #include "db_init.h"
 #include "dynamic_module.h"
-#include "infile_tree.h"
 #include "exchange_context.h"
+#include "infile_tree.h"
 #include "pyne.h"
 #include "query_backend.h"
 #include "resource.h"
@@ -282,12 +282,12 @@ class Agent : public StateWrangler, virtual public Ider {
   /// above an other agent in the family tree)
   /// @param other the other agent
   bool AncestorOf(Agent* other);
-  
+
   /// returns true if this agent is an decendent of an other agent (i.e., resides
   /// below an other agent in the family tree)
   /// @param other the other agent
   bool DecendentOf(Agent* other);
-  
+
   /// Called when the agent enters the smiulation as an active participant and
   /// is only ever called once.  Agents should NOT register for services (such
   /// as ticks/tocks and resource exchange) in this function. If agents implement
@@ -327,16 +327,12 @@ class Agent : public StateWrangler, virtual public Ider {
   /// Returns an agent's xml rng schema for initializing from input files. All
   /// concrete agents should override this function. This must validate the same
   /// xml input that the InfileToDb function receives.
-  virtual std::string schema() {
-    return "<text />\n";
-  }
+  virtual std::string schema() { return "<text />\n"; }
 
   /// Returns an agent's json annotations for all state variables and any other
   /// information the developer wishes to provide. All concrete agents should
   /// override this function.
-  virtual Json::Value annotations() {
-    return Json::Value(Json::objectValue);
-  }
+  virtual Json::Value annotations() { return Json::Value(Json::objectValue); }
 
   /// Returns the agent's prototype.
   inline const std::string prototype() const { return prototype_; }
@@ -396,8 +392,7 @@ class Agent : public StateWrangler, virtual public Ider {
   /// created. Therefore, for agents with non-infinite lifetimes, the exit_time
   /// will be the enter time plus its lifetime less 1.
   inline const int exit_time() const {
-    if (lifetime() == -1)
-      return -1;
+    if (lifetime() == -1) return -1;
     return enter_time_ + lifetime_ - 1;
   }
 
