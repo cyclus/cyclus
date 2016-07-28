@@ -1,7 +1,8 @@
 #include "greedy_preconditioner.h"
 
-#include <algorithm>
 #include <assert.h>
+
+#include <algorithm>
 #include <numeric>
 #include <string>
 
@@ -20,26 +21,24 @@ inline double SumPref(double total, std::pair<Arc, double> pref) {
 
 double AvgPref(ExchangeNode::Ptr n) {
   std::map<Arc, double>& prefs = n->prefs;
-  return prefs.size() > 0 ?
-      std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) / prefs.size() :
-      0;
+  return prefs.size() > 0
+             ? std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) /
+                   prefs.size()
+             : 0;
 }
 
-GreedyPreconditioner::GreedyPreconditioner() {};
+GreedyPreconditioner::GreedyPreconditioner(){};
 
 GreedyPreconditioner::GreedyPreconditioner(
     const std::map<std::string, double>& commod_weights)
     : commod_weights_(commod_weights) {
-  if (commod_weights_.size() != 0)
-    ProcessWeights_(END);
+  if (commod_weights_.size() != 0) ProcessWeights_(END);
 };
 
 GreedyPreconditioner::GreedyPreconditioner(
-    const std::map<std::string, double>& commod_weights,
-    WgtOrder order)
+    const std::map<std::string, double>& commod_weights, WgtOrder order)
     : commod_weights_(commod_weights) {
-  if (commod_weights_.size() != 0)
-    ProcessWeights_(order);
+  if (commod_weights_.size() != 0) ProcessWeights_(order);
 };
 
 void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
@@ -80,24 +79,20 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
-  double min = std::min_element(
-      commod_weights_.begin(),
-      commod_weights_.end(),
-      SecondLT< std::pair<std::string, double> >())->second;
+  double min = std::min_element(commod_weights_.begin(), commod_weights_.end(),
+                                SecondLT<std::pair<std::string, double> >())
+                   ->second;
 
-  double max = std::max_element(
-      commod_weights_.begin(),
-      commod_weights_.end(),
-      SecondLT< std::pair<std::string, double> >())->second;
+  double max = std::max_element(commod_weights_.begin(), commod_weights_.end(),
+                                SecondLT<std::pair<std::string, double> >())
+                   ->second;
 
   assert(commod_weights_.size() == 0 || min >= 0);
 
   std::map<std::string, double>::iterator it;
   switch (order) {
     case REVERSE:
-      for (it = commod_weights_.begin();
-           it != commod_weights_.end();
-           ++it) {
+      for (it = commod_weights_.begin(); it != commod_weights_.end(); ++it) {
         it->second = max + min - it->second;  // reverses order
       }
       break;
@@ -105,18 +100,14 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
       break;
   }
 
-  for (it = commod_weights_.begin();
-       it != commod_weights_.end();
-       ++it) {
+  for (it = commod_weights_.begin(); it != commod_weights_.end(); ++it) {
     CLOG(LEV_INFO1) << "GreedyPreconditioner commodity weight value for "
-                    << it->first
-                    << " is " << it->second;
+                    << it->first << " is " << it->second;
   }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double GroupWeight(RequestGroup::Ptr g,
-                   std::map<std::string, double>* weights,
+double GroupWeight(RequestGroup::Ptr g, std::map<std::string, double>* weights,
                    std::map<ExchangeNode::Ptr, double>* avg_prefs) {
   std::vector<ExchangeNode::Ptr>& nodes = g->nodes();
   double sum = 0;
@@ -130,8 +121,7 @@ double GroupWeight(RequestGroup::Ptr g,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double NodeWeight(ExchangeNode::Ptr n,
-                  std::map<std::string, double>* weights,
+double NodeWeight(ExchangeNode::Ptr n, std::map<std::string, double>* weights,
                   double avg_pref) {
   double commod_weight = (weights->size() != 0) ? (*weights)[n->commod] : 1;
   double node_weight = commod_weight * (1 + avg_pref / (1 + avg_pref));

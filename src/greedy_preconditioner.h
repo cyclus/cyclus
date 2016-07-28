@@ -9,13 +9,11 @@
 namespace cyclus {
 
 /// @returns the node's weight given the node and commodity weight
-double NodeWeight(ExchangeNode::Ptr n,
-                  std::map<std::string, double>* weights,
+double NodeWeight(ExchangeNode::Ptr n, std::map<std::string, double>* weights,
                   double avg_pref);
 
 /// @returns average RequestGroup weight
-double GroupWeight(RequestGroup::Ptr g,
-                   std::map<std::string, double>* weights,
+double GroupWeight(RequestGroup::Ptr g, std::map<std::string, double>* weights,
                    std::map<ExchangeNode::Ptr, double>* avg_prefs);
 
 /// @returns the average preference across arcs for a node
@@ -62,8 +60,8 @@ class GreedyPreconditioner {
   /// @brief the order of commodity weights
   enum WgtOrder {
     REVERSE,  /// a flag for commodity weights given in the reverse order,
-             /// i.e, lightest first
-    END  /// default flag, indicating heaviest-first ordering
+              /// i.e, lightest first
+    END       /// default flag, indicating heaviest-first ordering
   };
 
   /// @brief constructor if weights are given in heaviest-first order
@@ -76,7 +74,7 @@ class GreedyPreconditioner {
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights,
                        WgtOrder order);
   /// @}
-  
+
   /// @brief conditions the graph as described above
   /// @throws KeyError if a commodity is in the graph but not in the weight
   /// mapping
@@ -84,17 +82,14 @@ class GreedyPreconditioner {
 
   /// @brief a comparitor for ordering containers of ExchangeNode::Ptrs in
   /// descending order based on their commodity's weight
-  inline bool NodeComp(const ExchangeNode::Ptr l,
-                       const ExchangeNode::Ptr r) {
-    return
-        NodeWeight(l, &commod_weights_, avg_prefs_[l]) >
-        NodeWeight(r, &commod_weights_, avg_prefs_[r]);
+  inline bool NodeComp(const ExchangeNode::Ptr l, const ExchangeNode::Ptr r) {
+    return NodeWeight(l, &commod_weights_, avg_prefs_[l]) >
+           NodeWeight(r, &commod_weights_, avg_prefs_[r]);
   }
 
   /// @brief a comparitor for ordering containers of Request::Ptrs in
   /// descending order based on their average commodity weight
-  inline bool GroupComp(const RequestGroup::Ptr l,
-                        const RequestGroup::Ptr r) {
+  inline bool GroupComp(const RequestGroup::Ptr l, const RequestGroup::Ptr r) {
     return group_weights_[l] > group_weights_[r];
   }
 
