@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+
 #include <boost/shared_ptr.hpp>
 
 class SimInitTest;
@@ -36,9 +37,7 @@ class Resource {
   /// state.  All resource id's are unique - even across different resource
   /// types/implementations. Runtime tracking of resources should generally
   /// use the obj_id rather than this.
-  const int state_id() const {
-    return state_id_;
-  }
+  const int state_id() const { return state_id_; }
 
   /// Assigns a new, unique internal id to this resource and its state. This should be
   /// called by resource implementations whenever their state changes.  A call to
