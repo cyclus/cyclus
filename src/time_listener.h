@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "context.h"
 #include "agent.h"
+#include "context.h"
 
 namespace cyclus {
 
@@ -20,7 +20,7 @@ namespace cyclus {
 /// }
 ///
 /// @endcode
-class TimeListener: virtual public Ider {
+class TimeListener : virtual public Ider {
  public:
   /// Simulation agents do their beginning-of-timestep activities in the Tick
   /// method.
