@@ -1,9 +1,9 @@
 #ifndef CYCLUS_SRC_FACILITY_H_
 #define CYCLUS_SRC_FACILITY_H_
 
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 #include "agent.h"
 #include "time_listener.h"

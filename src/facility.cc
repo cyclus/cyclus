@@ -1,9 +1,10 @@
 // Implements the Facility class
 #include "facility.h"
 
+#include <stdlib.h>
+
 #include <limits>
 #include <sstream>
-#include <stdlib.h>
 
 #include "error.h"
 #include "infile_tree.h"
@@ -19,14 +20,9 @@ Facility::Facility(Context* ctx) : Trader(this), Agent(ctx) {
 
 Facility::~Facility() {}
 
+void Facility::InitFrom(Facility* m) { Agent::InitFrom(m); }
 
-void Facility::InitFrom(Facility* m) {
-  Agent::InitFrom(m);
-}
-
-void Facility::Build(Agent* parent) {
-  Agent::Build(parent);
-}
+void Facility::Build(Agent* parent) { Agent::Build(parent); }
 
 void Facility::EnterNotify() {
   Agent::EnterNotify();
@@ -37,8 +33,7 @@ void Facility::EnterNotify() {
 std::string Facility::str() {
   std::stringstream ss("");
   ss << Agent::str() << " with: "
-     << " lifetime: " << lifetime()
-     << " build date: " << enter_time();
+     << " lifetime: " << lifetime() << " build date: " << enter_time();
   return ss.str();
 }
 
@@ -52,8 +47,6 @@ void Facility::Decommission() {
   Agent::Decommission();
 }
 
-bool Facility::CheckDecommissionCondition() {
-  return true;
-}
+bool Facility::CheckDecommissionCondition() { return true; }
 
 }  // namespace cyclus
