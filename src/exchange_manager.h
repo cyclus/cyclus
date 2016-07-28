@@ -3,13 +3,13 @@
 
 #include <algorithm>
 
+#include "env.h"
 #include "exchange_graph.h"
 #include "exchange_solver.h"
 #include "exchange_translator.h"
 #include "resource_exchange.h"
 #include "trade_executor.h"
 #include "trader_management.h"
-#include "env.h"
 
 namespace cyclus {
 
@@ -39,12 +39,10 @@ class ExchangeManager {
     exchng.AddAllBids();
     exchng.AdjustAll();
     CLOG(LEV_DEBUG1) << "done with info gathering";
-    
-    if (debug_)
-      RecordDebugInfo(exchng.ex_ctx());
 
-    if (exchng.Empty())
-      return; // empty exchange, move on
+    if (debug_) RecordDebugInfo(exchng.ex_ctx());
+
+    if (exchng.Empty()) return;  // empty exchange, move on
 
     // translate graph
     ExchangeTranslator<T> xlator(&exchng.ex_ctx());
@@ -58,7 +56,7 @@ class ExchangeManager {
     CLOG(LEV_DEBUG1) << "graph solved!";
 
     // get trades
-    std::vector< Trade<T> > trades;
+    std::vector<Trade<T> > trades;
     xlator.BackTranslateSolution(graph->matches(), trades);
     CLOG(LEV_DEBUG1) << "trades translated!";
 
@@ -78,16 +76,16 @@ class ExchangeManager {
         std::stringstream ss;
         ss << ctx_->time() << "_" << r;
         ctx_->NewDatum("DebugRequests")
-          ->AddVal("Time", ctx_->time())
-          ->AddVal("ReqId", ss.str())
-          ->AddVal("RequesterID", r->requester()->manager()->id())
-          ->AddVal("Commodity", r->commodity())
-          ->AddVal("Preference", r->preference())
-          ->AddVal("Exclusive", r->exclusive())
-          ->AddVal("ResType", r->target()->type())
-          ->AddVal("Quantity", r->target()->quantity())
-          ->AddVal("ResUnits", r->target()->units())
-          ->Record();
+            ->AddVal("Time", ctx_->time())
+            ->AddVal("ReqId", ss.str())
+            ->AddVal("RequesterID", r->requester()->manager()->id())
+            ->AddVal("Commodity", r->commodity())
+            ->AddVal("Preference", r->preference())
+            ->AddVal("Exclusive", r->exclusive())
+            ->AddVal("ResType", r->target()->type())
+            ->AddVal("Quantity", r->target()->quantity())
+            ->AddVal("ResUnits", r->target()->units())
+            ->Record();
       }
     }
 
@@ -102,12 +100,12 @@ class ExchangeManager {
         std::stringstream ss;
         ss << ctx_->time() << "_" << b->request();
         ctx_->NewDatum("DebugBids")
-          ->AddVal("ReqId", ss.str())
-          ->AddVal("BidderId", b->bidder()->manager()->id())
-          ->AddVal("BidQuantity", b->offer()->quantity())
-          ->AddVal("Exclusive", b->exclusive())
-          ->AddVal("Preference", pref)
-          ->Record();
+            ->AddVal("ReqId", ss.str())
+            ->AddVal("BidderId", b->bidder()->manager()->id())
+            ->AddVal("BidQuantity", b->offer()->quantity())
+            ->AddVal("Exclusive", b->exclusive())
+            ->AddVal("Preference", pref)
+            ->Record();
       }
     }
   }
