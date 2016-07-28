@@ -109,7 +109,7 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     //std::cout << "errc: " << errc << "\n";
     if (errc != no_err) {
       std::cout << "level " << it.level() << "\n";
-      it.no_push();
+      //it.no_push();
       std::cout << "no pushed\n";
       if (it.level() > 0) {
         it.pop();
@@ -127,12 +127,12 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     //std::cout << "new pth regfile 0 errc: " << (errc == no_err) << "\n";
     //std::cout << "  errc: " << errc << "\n";
     if (errc != no_err || !irf) {
-      std::cout << "not regfile, continuing\n";
+      //std::cout << "not regfile, continuing\n";
       it.no_push();
-      std::cout << "no pushed\n";
+      //std::cout << "no pushed\n";
       if (it.level() > 0) {
         it.pop();
-        std::cout << "popped\n";
+      //  std::cout << "popped\n";
       }
       continue;
     } else if (fs::is_directory(pth, errc)) {
