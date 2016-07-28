@@ -117,11 +117,11 @@ bool AlmostEq(const CompMap& v1, const CompMap& v2, double threshold) {
     double subtrahend = n1[nuc];
     double diff = minuend - subtrahend;
     if (std::abs(minuend) == 0 || std::abs(subtrahend) == 0) {
-      if (std::abs(diff) > std::abs(diff)*threshold) {
+      if (std::abs(diff) > std::abs(diff) * threshold) {
         return false;
       }
-    } else if (std::abs(diff) > std::abs(minuend)*threshold ||
-               std::abs(diff) > std::abs(subtrahend)*threshold) {
+    } else if (std::abs(diff) > std::abs(minuend) * threshold ||
+               std::abs(diff) > std::abs(subtrahend) * threshold) {
       return false;
     }
   }
