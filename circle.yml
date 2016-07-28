@@ -36,6 +36,7 @@ deployment:
       - docker create --name=deb-14.04 deb/ubuntu-14 #build deb in docker
       - docker cp deb-14.04:/cyclus/deb ./ #extract deb
       - scp ./deb/cyclus-*-ubuntu.??.04.deb root@dory.fuelcycle.org:./cyclus-deb/ #push the deb on dory
+      - rm -rf deb
         # Ubuntu 16.04
       - rm Dockerfile && ln -s docker/release-16.04/Dockerfile #place the correct Dockerfile
       - docker build -t deb/ubuntu-16 .:
