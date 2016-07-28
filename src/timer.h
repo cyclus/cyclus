@@ -4,13 +4,13 @@
 #include <utility>
 #include <vector>
 
+#include "comp_math.h"
 #include "context.h"
 #include "exchange_manager.h"
-#include "product.h"
-#include "material.h"
 #include "infile_tree.h"
+#include "material.h"
+#include "product.h"
 #include "time_listener.h"
-#include "comp_math.h"
 
 class SimInitTest;
 
@@ -21,6 +21,7 @@ class Agent;
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
   friend class ::SimInitTest;
+
  public:
   Timer();
 
@@ -42,7 +43,6 @@ class Timer {
   /// Removes an agent from receiving tick/tock notifications.
   /// Agents should unregister from their Decommission method.
   void UnregisterTimeListener(TimeListener* tl);
-
 
   /// Schedules the named prototype to be built for the specified parent at
   /// timestep t.

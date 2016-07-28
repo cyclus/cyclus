@@ -12,8 +12,8 @@
 namespace cyclus {
 
 void Timer::RunSim() {
-  CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << 0 << " to end=" << si_.duration;
+  CLOG(LEV_INFO1) << "Simulation set to run from start=" << 0
+                  << " to end=" << si_.duration;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
   ExchangeManager<Material> matl_manager(ctx_);
@@ -45,10 +45,11 @@ void Timer::RunSim() {
 
   ctx_->NewDatum("Finish")
       ->AddVal("EarlyTerm", want_kill_)
-      ->AddVal("EndTime", time_-1)
+      ->AddVal("EndTime", time_ - 1)
       ->Record();
 
-  SimInit::Snapshot(ctx_);  // always do a snapshot at the end of every simulation
+  SimInit::Snapshot(
+      ctx_);  // always do a snapshot at the end of every simulation
 }
 
 void Timer::DoBuild() {
@@ -57,8 +58,8 @@ void Timer::DoBuild() {
   for (int i = 0; i < build_list.size(); ++i) {
     Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
     Agent* parent = build_list[i].second;
-    CLOG(LEV_INFO3) << "Building a " << build_list[i].first
-                    << " from parent " << build_list[i].second;
+    CLOG(LEV_INFO3) << "Building a " << build_list[i].first << " from parent "
+                    << build_list[i].second;
     m->Build(parent);
     if (parent != NULL) {
       parent->BuildNotify(m);
@@ -70,8 +71,7 @@ void Timer::DoBuild() {
 
 void Timer::DoTick() {
   for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+       agent != tickers_.end(); agent++) {
     agent->second->Tick();
   }
 }
@@ -84,8 +84,7 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 
 void Timer::DoTock() {
   for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+       agent != tickers_.end(); agent++) {
     agent->second->Tock();
   }
 
@@ -95,13 +94,12 @@ void Timer::DoTock() {
     for (it = ags.begin(); it != ags.end(); ++it) {
       Agent* a = *it;
       if (a->enter_time() == -1) {
-        continue; // skip agents that aren't alive
+        continue;  // skip agents that aren't alive
       }
       RecordInventories(a);
     }
   }
 }
-
 
 void Timer::RecordInventories(Agent* a) {
   Inventories invs = a->SnapshotInv();
@@ -110,7 +108,7 @@ void Timer::RecordInventories(Agent* a) {
     std::string name = it2->first;
     std::vector<Resource::Ptr> mats = it2->second;
     if (mats.empty() || ResCast<Material>(mats[0]) == NULL) {
-      continue; // skip non-material inventories
+      continue;  // skip non-material inventories
     }
 
     Material::Ptr m = ResCast<Material>(mats[0]->Clone());
@@ -194,8 +192,9 @@ void Timer::SchedDecom(Agent* m, int t) {
     std::vector<Agent*> ags = it->second;
     for (int i = 0; i < ags.size(); i++) {
       if (ags[i] == m) {
-        CLOG(LEV_WARN) << "scheduled over previous decommissioning of " << m->id();
-        decom_queue_[t].erase(decom_queue_[t].begin()+i);
+        CLOG(LEV_WARN) << "scheduled over previous decommissioning of "
+                       << m->id();
+        decom_queue_[t].erase(decom_queue_[t].begin() + i);
         done = true;
         break;
       }
@@ -208,9 +207,7 @@ void Timer::SchedDecom(Agent* m, int t) {
   decom_queue_[t].push_back(m);
 }
 
-int Timer::time() {
-  return time_;
-}
+int Timer::time() { return time_; }
 
 void Timer::Reset() {
   tickers_.clear();
@@ -234,9 +231,7 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   }
 }
 
-int Timer::dur() {
-  return si_.duration;
-}
+int Timer::dur() { return si_.duration; }
 
 Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
