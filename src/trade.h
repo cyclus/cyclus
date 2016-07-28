@@ -22,19 +22,14 @@ struct Trade {
   Trade() : amt(0), price(0) {}
 
   Trade(Request<T>* request, Bid<T>* bid, double amt)
-      : request(request),
-        bid(bid),
-        amt(amt),
-        price(0) {}
+      : request(request), bid(bid), amt(amt), price(0) {}
 };
 
 /// @brief Trade-Trade equality operator
-template<class T>
+template <class T>
 bool operator==(const cyclus::Trade<T>& lhs, const cyclus::Trade<T>& rhs) {
-  return  ((lhs.request == rhs.request) &&
-           (lhs.bid == rhs.bid) &&
-           (lhs.price == rhs.price) &&
-           (lhs.amt == rhs.amt));
+  return ((lhs.request == rhs.request) && (lhs.bid == rhs.bid) &&
+          (lhs.price == rhs.price) && (lhs.amt == rhs.amt));
 }
 
 }  // namespace cyclus
