@@ -9,7 +9,8 @@
 namespace cyclus {
 
 class Trader;
-template<class T> class BidPortfolio;
+template <class T>
+class BidPortfolio;
 
 /// @class Bid
 ///
@@ -24,8 +25,7 @@ class Bid {
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
   /// @param portfolio the porftolio of which this bid is a part
-  inline static Bid<T>* Create(Request<T>* request,
-                               boost::shared_ptr<T> offer,
+  inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
                                Trader* bidder,
                                typename BidPortfolio<T>::Ptr portfolio,
                                bool exclusive = false) {
@@ -40,29 +40,19 @@ class Bid {
   }
 
   /// @return the request being responded to
-  inline Request<T>* request() const {
-    return request_;
-  }
+  inline Request<T>* request() const { return request_; }
 
   /// @return the bid object for the request
-  inline boost::shared_ptr<T> offer() const {
-    return offer_;
-  }
+  inline boost::shared_ptr<T> offer() const { return offer_; }
 
   /// @return the agent responding the request
-  inline Trader* bidder() const {
-    return bidder_;
-  }
+  inline Trader* bidder() const { return bidder_; }
 
   /// @return the portfolio of which this bid is a part
-  inline typename BidPortfolio<T>::Ptr portfolio() {
-    return portfolio_.lock();
-  }
+  inline typename BidPortfolio<T>::Ptr portfolio() { return portfolio_.lock(); }
 
   /// @return whether or not this an exclusive bid
-  inline bool exclusive() const {
-    return exclusive_;
-  }
+  inline bool exclusive() const { return exclusive_; }
 
  private:
   /// @brief constructors are private to require use of factory methods
