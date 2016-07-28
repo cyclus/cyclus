@@ -1,8 +1,9 @@
 #ifndef CYCLUS_SRC_SQLITE_DB_H_
 #define CYCLUS_SRC_SQLITE_DB_H_
 
-#include <vector>
 #include <string>
+#include <vector>
+
 #include <boost/shared_ptr.hpp>
 
 #include "error.h"
@@ -21,6 +22,7 @@ class SqliteDb;
 /// work.
 class SqlStatement {
   friend class SqliteDb;
+
  public:
   typedef boost::shared_ptr<SqlStatement> Ptr;
 
