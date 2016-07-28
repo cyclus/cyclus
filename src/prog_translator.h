@@ -48,8 +48,8 @@ class ProgTranslator {
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive);
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                  double pseudo_cost);
-  ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
-                 bool exclusive, double pseudo_cost);
+  ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive,
+                 double pseudo_cost);
 
   /// @brief translates the graph, filling the translators Context
   void Translate();
@@ -72,7 +72,7 @@ class ProgTranslator {
 
   /// @throws if preference is unsatisfactory (i.e., not greater than 0)
   void CheckPref(double pref);
-  
+
   /// perform all translation for a node group
   /// @param grp a pointer to the node group
   /// @param req a boolean flag, true if grp is a request group

@@ -32,19 +32,13 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
 
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                                double pseudo_cost)
-    : g_(g),
-      iface_(iface),
-      excl_(false),
-      pseudo_cost_(pseudo_cost) {
+    : g_(g), iface_(iface), excl_(false), pseudo_cost_(pseudo_cost) {
   Init();
 }
 
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                                bool exclusive, double pseudo_cost)
-    : g_(g),
-      iface_(iface),
-      excl_(exclusive),
-      pseudo_cost_(pseudo_cost) {
+    : g_(g), iface_(iface), excl_(exclusive), pseudo_cost_(pseudo_cost) {
   Init();
 }
 
@@ -63,14 +57,16 @@ void ProgTranslator::CheckPref(double pref) {
     ss << "Preference value found to be nonpositive (" << pref
        << "). Preferences must be positive when using an optimization solver."
        << " If using Cyclus in simulation mode (e.g., from the command line),"
-       << " this error is likely a bug in Cyclus. Please report it to the developer's "
+       << " this error is likely a bug in Cyclus. Please report it to the "
+          "developer's "
        << "list (https://groups.google.com/forum/#!forum/cyclus-dev).";
     throw ValueError(ss.str());
   }
 }
 
 void ProgTranslator::Translate() {
-  // number of variables = number of arcs + 1 faux arc per request group with arcs
+  // number of variables = number of arcs + 1 faux arc per request group with
+  // arcs
   int nfalse = 0;
   std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
   for (int i = 0; i != g_->request_groups().size(); ++i)
@@ -108,7 +104,6 @@ void ProgTranslator::Populate() {
   iface_->loadProblem(ctx_.m, &ctx_.col_lbs[0], &ctx_.col_ubs[0],
                       &ctx_.obj_coeffs[0], &ctx_.row_lbs[0], &ctx_.row_ubs[0]);
 
-  
   if (excl_) {
     std::vector<Arc>& arcs = g_->arcs();
     for (int i = 0; i != arcs.size(); i++) {
@@ -118,7 +113,6 @@ void ProgTranslator::Populate() {
       }
     }
   }
-
 }
 
 void ProgTranslator::ToProg() {
@@ -131,8 +125,8 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
   std::vector<double>& caps = grp->capacities();
 
   if (request && !grp->HasArcs())
-    return; // no arcs, no reason to add variables/constraints
-  
+    return;  // no arcs, no reason to add variables/constraints
+
   std::vector<CoinPackedVector> cap_rows;
   std::vector<CoinPackedVector> excl_rows;
   for (int i = 0; i != caps.size(); i++) {
@@ -164,8 +158,8 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
         CheckPref(a.pref());
         ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
         ctx_.col_lbs[arc_id] = 0;
-        ctx_.col_ubs[arc_id] = (excl_ && a.exclusive()) ? 1 :
-                               std::min(nodes[i]->qty, inf);
+        ctx_.col_ubs[arc_id] =
+            (excl_ && a.exclusive()) ? 1 : std::min(nodes[i]->qty, inf);
       }
     }
   }
@@ -183,7 +177,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
 
     // 1e15 is the largest value that doesn't make the solver fall over
     // (by emperical testing)
-    double rlb = std::min(caps[i], 1e15); 
+    double rlb = std::min(caps[i], 1e15);
     ctx_.row_lbs.push_back(request ? rlb : 0);
     ctx_.row_ubs.push_back(request ? inf : caps[i]);
     ctx_.m.appendRow(cap_rows[i]);
@@ -191,7 +185,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
 
   if (excl_) {
     // add exclusive arcs
-    std::vector< std::vector<ExchangeNode::Ptr> >& exngs =
+    std::vector<std::vector<ExchangeNode::Ptr> >& exngs =
         grp->excl_node_groups();
     for (int i = 0; i != exngs.size(); i++) {
       CoinPackedVector excl_row;
