@@ -21,9 +21,7 @@ Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Datum::Record() {
-  manager_->AddDatum(this);
-}
+void Datum::Record() { manager_->AddDatum(this); }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Datum::Datum(Recorder* m, std::string title) : title_(title), manager_(m) {
@@ -37,17 +35,11 @@ Datum::Datum(Recorder* m, std::string title) : title_(title), manager_(m) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Datum::~Datum() {}
 
-std::string Datum::title() {
-  return title_;
-}
+std::string Datum::title() { return title_; }
 
-const Datum::Vals& Datum::vals() {
-  return vals_;
-}
+const Datum::Vals& Datum::vals() { return vals_; }
 
-const Datum::Shapes& Datum::shapes() {
-  return shapes_;
-}
+const Datum::Shapes& Datum::shapes() { return shapes_; }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void* Datum::operator new(size_t size) {

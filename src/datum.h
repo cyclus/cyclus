@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "any.hpp"
+
 #include "recorder.h"
 
 namespace cyclus {
