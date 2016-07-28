@@ -83,9 +83,9 @@ class Arc {
     return *this;
   }
 
-  inline bool operator <(const Arc& rhs) const {
+  inline bool operator<(const Arc& rhs) const {
     return unode_ < rhs.unode_ ||
-        (!(rhs.unode_ < unode_) && vnode_ < rhs.vnode_);
+           (!(rhs.unode_ < unode_) && vnode_ < rhs.vnode_);
   }
 
   inline bool operator==(const Arc& rhs) const {
@@ -98,7 +98,7 @@ class Arc {
   inline double excl_val() const { return excl_val_; }
   inline double pref() const { return pref_; }
   inline void pref(double pref) { pref_ = pref; }
-  
+
  private:
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
@@ -124,11 +124,10 @@ class ExchangeNodeGroup {
 
   /// @brief exclusive node groups represent nodes over whose combined arcs flow
   /// can only exist on one arc
-  const std::vector< std::vector<ExchangeNode::Ptr> >&
-      excl_node_groups() const {
+  const std::vector<std::vector<ExchangeNode::Ptr> >& excl_node_groups() const {
     return excl_node_groups_;
   }
-  std::vector< std::vector<ExchangeNode::Ptr> >& excl_node_groups() {
+  std::vector<std::vector<ExchangeNode::Ptr> >& excl_node_groups() {
     return excl_node_groups_;
   }
 
@@ -152,14 +151,12 @@ class ExchangeNodeGroup {
   /// @return true of any nodes have arcs associated with them
   bool HasArcs() {
     for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
-         it != nodes_.end();
-         ++it) {
-      if (it->get()->prefs.size() > 0)
-        return true;
+         it != nodes_.end(); ++it) {
+      if (it->get()->prefs.size() > 0) return true;
     }
     return false;
   }
-  
+
   /// @brief adds a single node to the set of exclusive node groupings, in
   /// general this function is used for demand exclusivity
   void AddExclNode(ExchangeNode::Ptr n);
@@ -169,7 +166,7 @@ class ExchangeNodeGroup {
 
  private:
   std::vector<ExchangeNode::Ptr> nodes_;
-  std::vector< std::vector<ExchangeNode::Ptr> > excl_node_groups_;
+  std::vector<std::vector<ExchangeNode::Ptr> > excl_node_groups_;
   std::vector<double> capacities_;
 };
 
@@ -227,7 +224,7 @@ class ExchangeGraph {
 
   /// clears all matches
   inline void ClearMatches() { matches_.clear(); }
-  
+
   inline const std::vector<RequestGroup::Ptr>& request_groups() const {
     return request_groups_;
   }
@@ -242,8 +239,8 @@ class ExchangeGraph {
     return supply_groups_;
   }
 
-  inline const std::map<ExchangeNode::Ptr, std::vector<Arc> >&
-      node_arc_map() const {
+  inline const std::map<ExchangeNode::Ptr, std::vector<Arc> >& node_arc_map()
+      const {
     return node_arc_map_;
   }
   inline std::map<ExchangeNode::Ptr, std::vector<Arc> >& node_arc_map() {
@@ -260,7 +257,7 @@ class ExchangeGraph {
 
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
-  
+
  private:
   std::vector<RequestGroup::Ptr> request_groups_;
   std::vector<ExchangeNodeGroup::Ptr> supply_groups_;
