@@ -13,16 +13,11 @@
 
 namespace cyclus {
 
-Institution::Institution(Context* ctx) : Agent(ctx) {
-  kind_ = "Inst";
-}
+Institution::Institution(Context* ctx) : Agent(ctx) { kind_ = "Inst"; }
 
-Institution::~Institution() {
-}
+Institution::~Institution() {}
 
-void Institution::InitFrom(Institution* m) {
-  Agent::InitFrom(m);
-}
+void Institution::InitFrom(Institution* m) { Agent::InitFrom(m); }
 
 std::string Institution::str() {
   if (parent() != NULL) {
@@ -32,13 +27,9 @@ std::string Institution::str() {
   }
 }
 
-void Institution::Build(Agent* parent) {
-  Agent::Build(parent);
-}
+void Institution::Build(Agent* parent) { Agent::Build(parent); }
 
-void Institution::EnterNotify() {
-  context()->RegisterTimeListener(this);
-}
+void Institution::EnterNotify() { context()->RegisterTimeListener(this); }
 
 void Institution::Decommission() {
   context()->UnregisterTimeListener(this);
