@@ -6,19 +6,13 @@
 
 namespace cyclus {
 /// a generic epsilon value
-inline double eps() {
-  return 1e-6;
-}
+inline double eps() { return 1e-6; }
 
 /// an epsilon value to be used by resources
-inline double eps_rsrc() {
-  return 1e-6;
-}
+inline double eps_rsrc() { return 1e-6; }
 
 /// returns true if a double is less than 0 - eps()
-inline bool IsNegative(double d) {
-  return (d < (-1 * eps()));
-}
+inline bool IsNegative(double d) { return (d < (-1 * eps())); }
 
 /// returns true if two doubles are within eps() of one another
 inline bool AlmostEq(double d1, double d2) {
