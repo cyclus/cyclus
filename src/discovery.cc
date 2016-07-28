@@ -108,9 +108,9 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     //std::cout << "path: " << it->path().string() << "\n";
     //std::cout << "errc: " << errc << "\n";
     if (errc != no_err) {
-      //std::cout << "level " << it.level() << "\n";
-      //it.no_push();
-      //std::cout << "no pushed\n";
+      std::cout << "level " << it.level() << "\n";
+      it.no_push();
+      std::cout << "no pushed\n";
       if (it.level() > 0) {
         it.pop();
         //std::cout << "popped\n";
@@ -127,13 +127,17 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     //std::cout << "new pth regfile 0 errc: " << (errc == no_err) << "\n";
     //std::cout << "  errc: " << errc << "\n";
     if (errc != no_err || !irf) {
-      //std::cout << "not regfile, continuing\n";
-      //it.no_push();
-      //std::cout << "no pushed\n";
-      //if (it.level() > 0) {
-      //  it.pop();
-      //  std::cout << "popped\n";
-      //}
+      std::cout << "not regfile, continuing\n";
+      it.no_push();
+      std::cout << "no pushed\n";
+      if (it.level() > 0) {
+        it.pop();
+        std::cout << "popped\n";
+      }
+      continue;
+    } else if (fs::is_directory(pth, errc)) {
+      //std::cout << "is dir, continuing\n";
+      //it.pop();
       continue;
     } else if (!boost::algorithm::ends_with(pthstr, SUFFIX)) {
       //std::cout << "does not end in suffix, continuing\n";
@@ -141,10 +145,6 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
       //  it.pop();
       //  std::cout << "popped\n";
       //}
-      continue;
-    } else if (fs::is_directory(pth, errc)) {
-      //std::cout << "is dir, continuing\n";
-      //it.pop();
       continue;
     }
     string p = pth.parent_path().string();
