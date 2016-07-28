@@ -1,8 +1,8 @@
 #ifndef CYCLUS_SRC_DYNAMIC_MODULE_H_
 #define CYCLUS_SRC_DYNAMIC_MODULE_H_
 
-#include <string>
 #include <map>
+#include <string>
 
 #include "error.h"
 
@@ -52,9 +52,7 @@ class DynamicModule {
   /// dynamic modules.
   class Closer {
    public:
-    ~Closer() {
-      CloseAll();
-    }
+    ~Closer() { CloseAll(); }
   };
 
   /// Returns a newly constructed agent for the given module spec.

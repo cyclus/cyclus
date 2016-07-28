@@ -1,11 +1,11 @@
 #include "dynamic_module.h"
 
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 
+#include "agent.h"
 #include "context.h"
 #include "env.h"
-#include "agent.h"
 #include "suffix.h"
 
 #include DYNAMICLOADLIB
@@ -16,11 +16,7 @@ namespace cyclus {
 
 AgentSpec::AgentSpec(std::string path, std::string lib, std::string agent,
                      std::string alias)
-    : path_(path),
-      lib_(lib),
-      agent_(agent),
-      alias_(alias) {
-
+    : path_(path), lib_(lib), agent_(agent), alias_(alias) {
   if (lib_ == "") {
     lib_ = agent_;
   }
@@ -61,9 +57,7 @@ std::string AgentSpec::LibPath() {
   return (fs::path(path_) / fs::path("lib" + lib_ + SUFFIX)).string();
 }
 
-std::string AgentSpec::str() {
-  return path_ + ":" + lib_ + ":" + agent_;
-}
+std::string AgentSpec::str() { return path_ + ":" + lib_ + ":" + agent_; }
 
 std::map<std::string, DynamicModule*> DynamicModule::modules_;
 std::map<std::string, AgentCtor*> DynamicModule::man_ctors_;
@@ -86,7 +80,7 @@ Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
 
 bool DynamicModule::Exists(AgentSpec spec) {
   bool rtn = true;
-  try { 
+  try {
     DynamicModule dyn(spec);
   } catch (cyclus::Error& e) {
     rtn = false;
@@ -104,21 +98,15 @@ void DynamicModule::CloseAll() {
   man_ctors_.clear();
 }
 
-DynamicModule::DynamicModule(AgentSpec spec)
-    : module_library_(0),
-      ctor_(NULL) {
+DynamicModule::DynamicModule(AgentSpec spec) : module_library_(0), ctor_(NULL) {
   path_ = Env::FindModule(spec.LibPath());
   ctor_name_ = "Construct" + spec.agent();
   OpenLibrary();
   SetConstructor();
 }
 
-Agent* DynamicModule::ConstructInstance(Context* ctx) {
-  return ctor_(ctx);
-}
+Agent* DynamicModule::ConstructInstance(Context* ctx) { return ctor_(ctx); }
 
-std::string DynamicModule::path() {
-  return path_;
-}
+std::string DynamicModule::path() { return path_; }
 
 }  // namespace cyclus
