@@ -2,16 +2,17 @@
 #define CYCLUS_SRC_XML_FILE_LOADER_H_
 
 #include <map>
-#include <string>
 #include <sstream>
+#include <string>
+
 #include <boost/shared_ptr.hpp>
 
 #include "composition.h"
 #include "dynamic_module.h"
 #include "infile_tree.h"
-#include "xml_parser.h"
-#include "timer.h"
 #include "recorder.h"
+#include "timer.h"
+#include "xml_parser.h"
 
 namespace cyclus {
 

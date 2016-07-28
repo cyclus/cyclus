@@ -6,8 +6,8 @@
 #include <set>
 #include <streambuf>
 
-#include <boost/filesystem.hpp>
 #include <libxml++/libxml++.h>
+#include <boost/filesystem.hpp>
 
 #include "agent.h"
 #include "blob.h"
@@ -102,7 +102,8 @@ std::string BuildMasterSchema(std::string schema_path, std::string infile) {
   // replace refs in master rng template file
   std::map<std::string, std::string>::iterator it;
   for (it = subschemas.begin(); it != subschemas.end(); ++it) {
-    std::string search_str = std::string("@") + it->first + std::string("_REFS@");
+    std::string search_str =
+        std::string("@") + it->first + std::string("_REFS@");
     size_t pos = master.find(search_str);
     if (pos != std::string::npos) {
       master.replace(pos, search_str.size(), it->second);
@@ -143,10 +144,10 @@ Composition::Ptr ReadRecipe(InfileTree* qe) {
   }
 }
 
-XMLFileLoader::XMLFileLoader(Recorder* r,
-                             QueryableBackend* b,
+XMLFileLoader::XMLFileLoader(Recorder* r, QueryableBackend* b,
                              std::string schema_file,
-                             const std::string input_file) : b_(b), rec_(r) {
+                             const std::string input_file)
+    : b_(b), rec_(r) {
   ctx_ = new Context(&ti_, rec_);
 
   schema_path_ = schema_file;
@@ -161,14 +162,10 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
 
   std::stringstream orig_input;
   LoadRawStringstreamFromFile(orig_input, file_);
-  ctx_->NewDatum("InputFiles")
-      ->AddVal("Data", Blob(ss.str()))
-      ->Record();
+  ctx_->NewDatum("InputFiles")->AddVal("Data", Blob(ss.str()))->Record();
 }
 
-XMLFileLoader::~XMLFileLoader() {
-  delete ctx_;
-}
+XMLFileLoader::~XMLFileLoader() { delete ctx_; }
 
 std::string XMLFileLoader::master_schema() {
   return BuildMasterSchema(schema_path_, file_);
@@ -223,9 +220,9 @@ void XMLFileLoader::LoadSolver() {
     if (qe->NMatches(config) == 1) {
       solver_name = qe->SubTree(config)->GetElementName(0);
     }
-    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders", 
-                                            exclusive);
-    
+    exclusive =
+        cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders", exclusive);
+
     // @TODO remove this after release 1.5
     // check for deprecated input values
     if (qe->NMatches(std::string("exclusive_orders_only")) != 0) {
@@ -243,19 +240,19 @@ void XMLFileLoader::LoadSolver() {
        << " as intended with this feature turned off.";
     Warn<VALUE_WARNING>(ss.str());
   }
-  
+
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
       ->AddVal("ExclusiveOrders", exclusive)
-      ->Record();  
-  
+      ->Record();
+
   // now load the actual solver
   if (solver_name == greedy) {
     query = string("/*/control/solver/config/greedy/preconditioner");
     string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
     ctx_->NewDatum("GreedySolverInfo")
-      ->AddVal("Preconditioner", precon_name)
-      ->Record();
+        ->AddVal("Preconditioner", precon_name)
+        ->Record();
   } else if (solver_name == coinor) {
     query = string("/*/control/solver/config/coin-or/timeout");
     double timeout = cyclus::OptionalQuery<double>(&xqe, query, -1);
@@ -264,34 +261,32 @@ void XMLFileLoader::LoadSolver() {
     query = string("/*/control/solver/config/coin-or/mps");
     bool mps = cyclus::OptionalQuery<bool>(&xqe, query, false);
     ctx_->NewDatum("CoinSolverInfo")
-      ->AddVal("Timeout", timeout)
-      ->AddVal("Verbose", verbose)
-      ->AddVal("Mps", mps)
-      ->Record();
+        ->AddVal("Timeout", timeout)
+        ->AddVal("Verbose", verbose)
+        ->AddVal("Mps", mps)
+        ->Record();
   } else {
     throw ValueError("unknown solver name: " + solver_name);
   }
 }
 
 void XMLFileLoader::ProcessCommodities(
-  std::map<std::string, double>* commod_priority) {
-  double max = std::max_element(
-                 commod_priority->begin(),
-                 commod_priority->end(),
-                 SecondLT< std::pair<std::string, double> >())->second;
+    std::map<std::string, double>* commod_priority) {
+  double max =
+      std::max_element(commod_priority->begin(), commod_priority->end(),
+                       SecondLT<std::pair<std::string, double> >())
+          ->second;
   if (max < 1) {
     max = 0;  // in case no priorities are specified
   }
 
   std::map<std::string, double>::iterator it;
-  for (it = commod_priority->begin();
-       it != commod_priority->end();
-       ++it) {
+  for (it = commod_priority->begin(); it != commod_priority->end(); ++it) {
     if (it->second < 1) {
       it->second = max + 1;
     }
-    CLOG(LEV_INFO1) << "Commodity priority for " << it->first
-                    << " is " << it->second;
+    CLOG(LEV_INFO1) << "Commodity priority for " << it->first << " is "
+                    << it->second;
   }
 }
 
@@ -422,7 +417,8 @@ void XMLFileLoader::LoadControlParams() {
   SimInfo si(dur, y0, m0, handle, d);
 
   si.explicit_inventory = OptionalQuery<bool>(qe, "explicit_inventory", false);
-  si.explicit_inventory_compact = OptionalQuery<bool>(qe, "explicit_inventory_compact", false);
+  si.explicit_inventory_compact =
+      OptionalQuery<bool>(qe, "explicit_inventory_compact", false);
 
   // get time step duration
   si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
