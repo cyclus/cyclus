@@ -12,10 +12,11 @@ namespace cyclus {
 /// Default preference values are unity. This has been updated from values of
 /// zero (which was the case prior to release 1.4). Preferences can be lower or
 /// higher than the default value, but must be positive.
-static const double kDefaultPref = 1; 
-  
+static const double kDefaultPref = 1;
+
 class Trader;
-template <class T> class RequestPortfolio;
+template <class T>
+class RequestPortfolio;
 
 /// @class Request
 ///
@@ -35,15 +36,14 @@ class Request {
   /// others in the portfolio)
   /// @param exclusive a flag denoting that this request must be met exclusively,
   /// i.e., in its entirety by a single offer
-  inline static Request<T>* Create(
-      boost::shared_ptr<T> target,
-      Trader* requester,
-      typename RequestPortfolio<T>::Ptr portfolio,
-      std::string commodity = "",
-      double preference = kDefaultPref,
-      bool exclusive = false) {
-    return new Request<T>(target, requester, portfolio,
-                          commodity, preference, exclusive);
+  inline static Request<T>* Create(boost::shared_ptr<T> target,
+                                   Trader* requester,
+                                   typename RequestPortfolio<T>::Ptr portfolio,
+                                   std::string commodity = "",
+                                   double preference = kDefaultPref,
+                                   bool exclusive = false) {
+    return new Request<T>(target, requester, portfolio, commodity, preference,
+                          exclusive);
   }
 
   /// @brief a factory method for a bid for a bid without a portfolio
@@ -53,8 +53,7 @@ class Request {
                                    std::string commodity = "",
                                    double preference = kDefaultPref,
                                    bool exclusive = false) {
-    return new Request<T>(target, requester, commodity, preference,
-                          exclusive);
+    return new Request<T>(target, requester, commodity, preference, exclusive);
   }
 
   /// @return this request's target
