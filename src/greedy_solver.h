@@ -18,7 +18,7 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 /// double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
 ///     return 0;
 /// }
-      
+
 /// @brief A comparison function for sorting a container of Arcs by the
 /// requester's (unode's) preference, in decensing order (i.e., most preferred
 /// Arc first). In the case of a tie, a lexicalgraphic ordering of node ids is
@@ -30,7 +30,8 @@ inline bool ReqPrefComp(const Arc& l, const Arc& r) {
   int rv = r.vnode()->agent_id;
   double lpref = l.unode()->prefs[l];
   double rpref = r.unode()->prefs[r];
-  return (lpref != rpref) ? (lpref > rpref) : (lu > ru || (lu == ru && lv > rv));
+  return (lpref != rpref) ? (lpref > rpref)
+                          : (lu > ru || (lu == ru && lv > rv));
 }
 
 /// @brief A comparison function for sorting a container of Nodes by the nodes
@@ -39,7 +40,7 @@ inline bool ReqPrefComp(const Arc& l, const Arc& r) {
 inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
   int lid = l->agent_id;
   int rid = r->agent_id;
-  double lpref =  AvgPref(l);
+  double lpref = AvgPref(l);
   double rpref = AvgPref(r);
   return (lpref != rpref) ? (lpref > rpref) : (lid > rid);
 }
@@ -60,7 +61,7 @@ class GreedyPreconditioner;
 ///   2) All SupplySets are at capacity
 ///
 /// @warning the GreedySolver is responsible for deleting is conditioner!
-class GreedySolver: public ExchangeSolver {
+class GreedySolver : public ExchangeSolver {
  public:
   /// GreedySolver constructor
   /// @param exclusive_orders a flag for enforcing integral, quantized orders
@@ -73,7 +74,7 @@ class GreedySolver: public ExchangeSolver {
   explicit GreedySolver(GreedyPreconditioner* c);
   GreedySolver(bool exclusive_orders, GreedyPreconditioner* c);
   /// @}
-  
+
   virtual ~GreedySolver();
 
   /// Uses the provided (or a default) GreedyPreconditioner to condition the
@@ -145,7 +146,7 @@ class GreedySolver: public ExchangeSolver {
   void GreedilySatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
   void UpdateObj(double qty, double pref);
-  
+
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
   std::map<ExchangeNodeGroup*, std::vector<double> > grp_caps_;
