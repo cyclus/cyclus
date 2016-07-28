@@ -5,15 +5,9 @@
 namespace cyclus {
 
 ResTracker::ResTracker(Context* ctx, Resource* r)
-    : tracked_(true),
-      res_(r),
-      ctx_(ctx),
-      parent1_(0),
-      parent2_(0) {}
+    : tracked_(true), res_(r), ctx_(ctx), parent1_(0), parent2_(0) {}
 
-void ResTracker::DontTrack() {
-  tracked_ = false;
-}
+void ResTracker::DontTrack() { tracked_ = false; }
 
 void ResTracker::Create(Agent* creator) {
   if (!tracked_) {
