@@ -99,10 +99,10 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
   fs::recursive_directory_iterator last;
   //std::cout << "got recur iterator last\n";
   //std::cout << "initial path: " << it->path().string() << "\n";
-  if (errc != no_err || !fs::is_directory(it->path(), errc)) {
+  //if (errc != no_err || !fs::is_directory(it->path(), errc)) {
     //std::cout << "initial error, returning\n";
-    return specs;
-  }
+  //  return specs;
+  //}
   //std::cout << "no initial error\n";
   for (; it != last; it.increment(errc)) {
     //std::cout << "path: " << it->path().string() << "\n";
