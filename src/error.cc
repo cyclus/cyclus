@@ -6,16 +6,14 @@ namespace cyclus {
 Error::Error(std::string msg) : msg_(msg) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const char* Error::what() const throw() {
-  return msg_.c_str();
-}
+const char* Error::what() const throw() { return msg_.c_str(); }
 
 unsigned int warn_limit = 42;
 
 bool warn_as_error = false;
 
-std::map<Warnings, unsigned int> warn_count = std::map<Warnings,
-                                                       unsigned int>();
+std::map<Warnings, unsigned int> warn_count =
+    std::map<Warnings, unsigned int>();
 
 std::map<Warnings, std::string> warn_prefixes() {
   std::map<Warnings, std::string> wp;
