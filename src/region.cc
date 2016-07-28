@@ -13,21 +13,13 @@
 
 namespace cyclus {
 
-void Region::InitFrom(Region* m) {
-  Agent::InitFrom(m);
-}
+void Region::InitFrom(Region* m) { Agent::InitFrom(m); }
 
-Region::Region(Context* ctx) : Agent(ctx) {
-  kind_ = "Region";
-}
+Region::Region(Context* ctx) : Agent(ctx) { kind_ = "Region"; }
 
-void Region::Build(Agent* parent) {
-  Agent::Build(parent);
-}
+void Region::Build(Agent* parent) { Agent::Build(parent); }
 
-void Region::EnterNotify() {
-  context()->RegisterTimeListener(this);
-}
+void Region::EnterNotify() { context()->RegisterTimeListener(this); }
 
 void Region::Decommission() {
   context()->UnregisterTimeListener(this);
@@ -39,8 +31,7 @@ std::string Region::str() {
 
   s += " has insts: ";
   for (std::set<Agent*>::const_iterator inst = children().begin();
-       inst != children().end();
-       inst++) {
+       inst != children().end(); inst++) {
     s += (*inst)->prototype() + ", ";
   }
   return s;

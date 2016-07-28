@@ -3,8 +3,8 @@
 
 #include <set>
 
-#include "time_listener.h"
 #include "infile_tree.h"
+#include "time_listener.h"
 
 namespace cyclus {
 

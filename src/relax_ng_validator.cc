@@ -10,9 +10,9 @@
 
 #include "relax_ng_validator.h"
 
-#include <libxml/xmlerror.h>
-#include <libxml/relaxng.h>
 #include <libxml++/document.h>
+#include <libxml/relaxng.h>
+#include <libxml/xmlerror.h>
 
 #include "error.h"
 
@@ -22,9 +22,7 @@ namespace cyclus {
 RelaxNGValidator::RelaxNGValidator() : schema_(0), valid_context_(0) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-RelaxNGValidator::~RelaxNGValidator() {
-  release_underlying();
-}
+RelaxNGValidator::~RelaxNGValidator() { release_underlying(); }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RelaxNGValidator::parse_context(xmlRelaxNGParserCtxtPtr context) {
@@ -38,7 +36,7 @@ void RelaxNGValidator::parse_context(xmlRelaxNGParserCtxtPtr context) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RelaxNGValidator::parse_memory(const Glib::ustring& contents) {
   xmlRelaxNGParserCtxtPtr context =
-    xmlRelaxNGNewMemParserCtxt(contents.c_str(), contents.bytes());
+      xmlRelaxNGNewMemParserCtxt(contents.c_str(), contents.bytes());
   parse_context(context);
 }
 
