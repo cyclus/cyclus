@@ -65,8 +65,7 @@ std::string InfileTree::GetString(std::string query, int index) {
     throw ValueError("Index exceeds number of nodes in query: " + query);
   }
 
-  const Element* element =
-    dynamic_cast<const Element*>(nodeset.at(index));
+  const Element* element = dynamic_cast<const Element*>(nodeset.at(index));
 
   if (!element) {
     throw CastError("Node: " + element->get_name() +
@@ -80,7 +79,7 @@ std::string InfileTree::GetString(std::string query, int index) {
   }
 
   const TextNode* text =
-    dynamic_cast<const xmlpp::TextNode*>(element->get_children().front());
+      dynamic_cast<const xmlpp::TextNode*>(element->get_children().front());
 
   if (!text) {
     throw CastError("Node: " + text->get_name() + " is not a Text node.");
@@ -103,8 +102,8 @@ std::string InfileTree::GetElementName(int index) {
     }
   }
   if (elements.size() < index + 1) {
-    throw ValueError("Index exceeds number of elements in node: "
-                     + current_node_->get_name());
+    throw ValueError("Index exceeds number of elements in node: " +
+                     current_node_->get_name());
   }
   return elements.at(index)->get_name();
 }
@@ -130,8 +129,7 @@ InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
 }
 
 InfileTree* InfileTree::SubTree(std::string query, int index) {
-  InfileTree* qe_child =
-    GetEngineFromQuery(query, index);
+  InfileTree* qe_child = GetEngineFromQuery(query, index);
   spawned_children_.insert(qe_child);
   return qe_child;
 }

@@ -1,9 +1,9 @@
 #ifndef CYCLUS_SRC_INFILE_TREE_H_
 #define CYCLUS_SRC_INFILE_TREE_H_
 
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -11,7 +11,7 @@
 #include "xml_parser.h"
 
 namespace xmlpp {
-  class Node;
+class Node;
 }
 
 namespace cyclus {
@@ -120,15 +120,14 @@ inline double Query(InfileTree* tree, std::string query, int index) {
 template <typename T>
 inline T OptionalQuery(InfileTree* tree, std::string query, T default_val) {
   T val;
-  tree->NMatches(query) == 1 ?
-    val = boost::lexical_cast<T>(tree->GetString(query).c_str()) :
-    val = default_val;
+  tree->NMatches(query) == 1
+      ? val = boost::lexical_cast<T>(tree->GetString(query).c_str())
+      : val = default_val;
   return val;
 }
 
 template <>
-inline int OptionalQuery(InfileTree* tree, std::string query,
-                         int default_val) {
+inline int OptionalQuery(InfileTree* tree, std::string query, int default_val) {
   int val = default_val;
   if (tree->NMatches(query) == 1) {
     std::string s = tree->GetString(query);
@@ -140,7 +139,7 @@ inline int OptionalQuery(InfileTree* tree, std::string query,
 
 template <>
 inline bool OptionalQuery(InfileTree* tree, std::string query,
-                         bool default_val) {
+                          bool default_val) {
   if (tree->NMatches(query) == 0) {
     return default_val;
   }
