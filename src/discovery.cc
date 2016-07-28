@@ -70,8 +70,9 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
   for (set<string>::iterator it = archs.begin(); it != archs.end(); ++it) {
     spec = p + ":" + lib + ":" + (*it);
     agentspec = AgentSpec(spec);
-    if (DynamicModule::Exists(agentspec))
+    if (DynamicModule::Exists(agentspec)) {
       specs.insert(spec);
+    }
   }
   return specs;
 }
