@@ -21,19 +21,14 @@ Material::Ptr Material::Create(Agent* creator, double quantity,
   return m;
 }
 
-Material::Ptr Material::CreateUntracked(double quantity,
-                                        Composition::Ptr c) {
+Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c) {
   Material::Ptr m(new Material(NULL, quantity, c));
   return m;
 }
 
-int Material::qual_id() const {
-  return comp_->id();
-}
+int Material::qual_id() const { return comp_->id(); }
 
-const ResourceType Material::type() const {
-  return Material::kType;
-}
+const ResourceType Material::type() const { return Material::kType; }
 
 Resource::Ptr Material::Clone() const {
   Material* m = new Material(*this);
@@ -53,13 +48,9 @@ void Material::Record(Context* ctx) const {
   comp_->Record(ctx);
 }
 
-std::string Material::units() const {
-  return "kg";
-}
+std::string Material::units() const { return "kg"; }
 
-double Material::quantity() const {
-  return qty_;
-}
+double Material::quantity() const { return qty_; }
 
 Resource::Ptr Material::ExtractRes(double qty) {
   return boost::static_pointer_cast<Resource>(ExtractQty(qty));
@@ -176,8 +167,10 @@ void Material::Decay(int curr_time) {
     CompMap::const_reverse_iterator it;
     for (it = c.rbegin(); it != c.rend(); ++it) {
       int nuc = it->first;
-      double lambda_timesteps = pyne::decay_const(nuc) * static_cast<double>(secs_per_timestep);
-      double change = 1.0 - std::exp(-lambda_timesteps * static_cast<double>(dt));
+      double lambda_timesteps =
+          pyne::decay_const(nuc) * static_cast<double>(secs_per_timestep);
+      double change =
+          1.0 - std::exp(-lambda_timesteps * static_cast<double>(dt));
       if (change >= eps) {
         decay = true;
         break;
@@ -188,14 +181,15 @@ void Material::Decay(int curr_time) {
     }
   }
 
-  prev_decay_time_ = curr_time; // this must go before Transmute call
+  prev_decay_time_ = curr_time;  // this must go before Transmute call
   Composition::Ptr decayed = comp_->Decay(dt, secs_per_timestep);
   Transmute(decayed);
 }
 
 Composition::Ptr Material::comp() const {
-  throw Error("comp() const is deprecated - use non-const comp() function."
-              " Recompilation should fix the problem.");
+  throw Error(
+      "comp() const is deprecated - use non-const comp() function."
+      " Recompilation should fix the problem.");
 }
 
 Composition::Ptr Material::comp() {

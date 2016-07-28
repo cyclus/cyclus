@@ -2,12 +2,13 @@
 #define CYCLUS_SRC_MATERIAL_H_
 
 #include <list>
+
 #include <boost/shared_ptr.hpp>
 
 #include "composition.h"
 #include "cyc_limits.h"
-#include "resource.h"
 #include "res_tracker.h"
+#include "resource.h"
 
 namespace cyclus {
 
@@ -15,9 +16,9 @@ class Context;
 
 namespace units {
 const double kg = 1.0;
-const double g =  kg* .001;
-const double mg = kg* .000001;
-const double ug = kg* .000000001;
+const double g = kg * .001;
+const double mg = kg * .000001;
+const double ug = kg * .000000001;
 }  // namespace units
 
 /// The material class is primarily responsible for enabling basic material
@@ -68,7 +69,7 @@ const double ug = kg* .000000001;
 ///   Material::Ptr mox = bucket.ExtractComp(qty, comp);
 ///   @endcode
 ///
-class Material: public Resource {
+class Material : public Resource {
   friend class SimInit;
 
  public:
