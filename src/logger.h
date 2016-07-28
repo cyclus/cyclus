@@ -9,12 +9,11 @@
 #ifndef CYCLUS_SRC_LOGGER_H_
 #define CYCLUS_SRC_LOGGER_H_
 
-
 #include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
 #include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace cyclus {
 
@@ -32,34 +31,47 @@ namespace cyclus {
 /// @warning do not place any state-changing expressions with this macro
 /// as they may not run if the report level excludes the specified log
 /// 'level'.
-#define LOG(level, prefix) \
-  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoAgent()) ; \
-  else cyclus::Logger().Get(level, prefix)
+#define LOG(level, prefix)                                                 \
+  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoAgent()) \
+    ;                                                                      \
+  else                                                                     \
+  cyclus::Logger().Get(level, prefix)
 
-#define CLOG(level) \
-  if (level > cyclus::Logger::ReportLevel()) ; \
-  else cyclus::Logger().Get(level, "core")
+#define CLOG(level)                          \
+  if (level > cyclus::Logger::ReportLevel()) \
+    ;                                        \
+  else                                       \
+  cyclus::Logger().Get(level, "core")
 
-#define MLOG(level) \
-  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoMem()) ; \
-  else cyclus::Logger().Get(level, "memory")
+#define MLOG(level)                                                      \
+  if ((level > cyclus::Logger::ReportLevel()) | cyclus::Logger::NoMem()) \
+    ;                                                                    \
+  else                                                                   \
+  cyclus::Logger().Get(level, "memory")
 
 /// @enum LogLevel
 ///
 /// categorical (verbosity) levels for log statements.
 enum LogLevel {
-  LEV_ERROR,  //!< Use for errors that require agent code or input file modification (use extremely sparingly)
-  LEV_WARN,  //!< Use to report questionable simulation state (use extremely sparingly)
-  LEV_INFO1,  //!< Information helpful for simulation users and developers alike - least verbose.
-  LEV_INFO2,  //!< Information helpful for simulation users and developers alike.
-  LEV_INFO3,  //!< Information helpful for simulation users and developers alike.
-  LEV_INFO4,  //!< Information helpful for simulation users and developers alike.
-  LEV_INFO5,  //!< Information helpful for simulation users and developers alike - most verbose.
+  LEV_ERROR,  //!< Use for errors that require agent code or input file
+              //!modification (use extremely sparingly)
+  LEV_WARN,   //!< Use to report questionable simulation state (use extremely
+              //!sparingly)
+  LEV_INFO1,  //!< Information helpful for simulation users and developers alike
+              //!- least verbose.
+  LEV_INFO2,  //!< Information helpful for simulation users and developers
+              //!alike.
+  LEV_INFO3,  //!< Information helpful for simulation users and developers
+              //!alike.
+  LEV_INFO4,  //!< Information helpful for simulation users and developers
+              //!alike.
+  LEV_INFO5,  //!< Information helpful for simulation users and developers alike
+              //!- most verbose.
   LEV_DEBUG1,  //!< debugging information - least verbose
   LEV_DEBUG2,  //!< debugging information
   LEV_DEBUG3,  //!< debugging information
   LEV_DEBUG4,  //!< debugging information
-  LEV_DEBUG5  //!< debugging information - most verbose
+  LEV_DEBUG5   //!< debugging information - most verbose
 };
 
 /// A logging tool providing finer grained control over standard output
@@ -78,19 +90,13 @@ class Logger {
 
   /// Use to get/set the (global) log level report cutoff.
   /// @return the report level cutoff by reference
-  static LogLevel& ReportLevel() {
-    return report_level;
-  }
+  static LogLevel& ReportLevel() { return report_level; }
 
   /// Set whether or not agent/agent log entries should be printed
-  static bool& NoAgent() {
-    return no_agent;
-  }
+  static bool& NoAgent() { return no_agent; }
 
   /// Set whether or not agent/agent log entries should be printed
-  static bool& NoMem() {
-    return no_mem;
-  }
+  static bool& NoMem() { return no_mem; }
 
   /// Converts a string into a corresponding LogLevel value.
   ///
@@ -113,7 +119,7 @@ class Logger {
  private:
   Logger(const Logger&);
 
-  Logger& operator =(const Logger&);
+  Logger& operator=(const Logger&);
 
   /// Cuttoff for outputing LOG(level) statement content.  Statments where
   /// level==report_level will print.
