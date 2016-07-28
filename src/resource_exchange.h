@@ -8,8 +8,8 @@
 #include "bid_portfolio.h"
 #include "context.h"
 #include "exchange_context.h"
-#include "product.h"
 #include "material.h"
+#include "product.h"
 #include "request_portfolio.h"
 #include "trader.h"
 #include "trader_management.h"
@@ -18,7 +18,7 @@ namespace cyclus {
 
 /// @brief Preference adjustment method helpers to convert from templates to the
 /// Agent inheritance hierarchy
-template<class T>
+template <class T>
 inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
 inline static void AdjustPrefs(Agent* m, PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
@@ -63,20 +63,15 @@ class ResourceExchange {
   /// @brief default constructor
   ///
   /// @param ctx the simulation context
-  ResourceExchange(Context* ctx) {
-    sim_ctx_ = ctx;
-  }
+  ResourceExchange(Context* ctx) { sim_ctx_ = ctx; }
 
-  inline ExchangeContext<T>& ex_ctx() {
-    return ex_ctx_;
-  }
+  inline ExchangeContext<T>& ex_ctx() { return ex_ctx_; }
 
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
     InitTraders();
     std::for_each(
-        traders_.begin(),
-        traders_.end(),
+        traders_.begin(), traders_.end(),
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
                      this));
   }
@@ -85,8 +80,7 @@ class ResourceExchange {
   void AddAllBids() {
     InitTraders();
     std::for_each(
-        traders_.begin(),
-        traders_.end(),
+        traders_.begin(), traders_.end(),
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids_),
                      this));
   }
@@ -96,11 +90,9 @@ class ResourceExchange {
     InitTraders();
     std::set<Trader*> traders = ex_ctx_.requesters;
     std::for_each(
-        traders.begin(),
-        traders.end(),
-        std::bind1st(
-            std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs_),
-            this));
+        traders.begin(), traders.end(),
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs_),
+                     this));
   }
 
   /// return true if this is an empty exchange (i.e., no requests exist,
