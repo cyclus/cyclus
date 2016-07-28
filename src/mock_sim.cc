@@ -1,8 +1,9 @@
 #include "mock_sim.h"
 
+#include <sstream>
+
 #include "cyclus.h"
 #include "sim_init.h"
-#include <sstream>
 
 namespace cyclus {
 
@@ -111,8 +112,7 @@ std::string MockAgent::Finalize() {
 }
 
 ///////// MockSim ////////////
-MockSim::MockSim(int duration)
-    : ctx_(&ti_, &rec_), back_(NULL), agent(NULL) {
+MockSim::MockSim(int duration) : ctx_(&ti_, &rec_), back_(NULL), agent(NULL) {
   Env::SetNucDataPath();
   warn_limit = 0;
   back_ = new SqliteBack(":memory:");

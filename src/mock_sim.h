@@ -24,7 +24,6 @@ class Sink;
 /// For examples on how to use MockAgent, see the MockSim API documentation.
 class MockAgent {
  public:
-  
   /// Initializes a MockAgent to create a source (is_source == true) or a
   /// sink (is_source == false) in the provided simulation context.  rec must be
   /// the recorder used to initialize ctx and b must be a backend registered
@@ -220,7 +219,7 @@ class MockSim {
   SqliteBack& db();
 
   /// Returns the context for the mock simulation environment.
-  Context* context() {return &ctx_;}
+  Context* context() { return &ctx_; }
 
   /// the agent being tested by the mock simulation environment.
   Agent* agent;
