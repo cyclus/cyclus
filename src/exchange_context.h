@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_EXCHANGE_CONTEXT_H_
 
 #include <assert.h>
+
 #include <map>
 #include <string>
 #include <utility>
@@ -99,8 +100,7 @@ struct ExchangeContext {
   typename CommodMap<T>::type commod_requests;
 
   /// @brief maps request to all bids for request
-  std::map< Request<T>*, std::vector<Bid<T>*> >
-      bids_by_request;
+  std::map<Request<T>*, std::vector<Bid<T>*> > bids_by_request;
 
   /// @brief maps commodity name to requests for that commodity
   std::map<Trader*, typename PrefMap<T>::type> trader_prefs;
