@@ -15,7 +15,8 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
                              std::string quality) {
   if (qualids_.count(quality) == 0) {
     qualids_[quality] = next_qualid_++;
-    creator->context()->NewDatum("Products")
+    creator->context()
+        ->NewDatum("Products")
         ->AddVal("QualId", qualids_[quality])
         ->AddVal("Quality", quality)
         ->Record();
@@ -28,8 +29,7 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Product::Ptr Product::CreateUntracked(double quantity,
-                                      std::string quality) {
+Product::Ptr Product::CreateUntracked(double quantity, std::string quality) {
   Product::Ptr r(new Product(NULL, quantity, quality));
   r->tracker_.DontTrack();
   return r;
@@ -74,9 +74,6 @@ Resource::Ptr Product::ExtractRes(double qty) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Product(Context* ctx, double quantity, std::string quality)
-    : quality_(quality),
-      quantity_(quantity),
-      tracker_(ctx, this),
-      ctx_(ctx) {}
+    : quality_(quality), quantity_(quantity), tracker_(ctx, this), ctx_(ctx) {}
 
 }  // namespace cyclus

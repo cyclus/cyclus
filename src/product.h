@@ -4,8 +4,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "context.h"
-#include "resource.h"
 #include "res_tracker.h"
+#include "resource.h"
 
 class SimInitTest;
 
@@ -20,8 +20,7 @@ class Product : public Resource {
   friend class ::SimInitTest;
 
  public:
-  typedef
-  boost::shared_ptr<Product> Ptr;
+  typedef boost::shared_ptr<Product> Ptr;
   static const ResourceType kType;
 
   /// Creates a new product that is "live" and tracked. creator is a
@@ -35,14 +34,10 @@ class Product : public Resource {
   static Ptr CreateUntracked(double quantity, std::string quality);
 
   /// Returns 0 (for now).
-  virtual int qual_id() const {
-    return qualids_[quality_];
-  }
+  virtual int qual_id() const { return qualids_[quality_]; }
 
   /// Returns Product::kType.
-  virtual const ResourceType type() const {
-    return kType;
-  }
+  virtual const ResourceType type() const { return kType; }
 
   virtual Resource::Ptr Clone() const;
 
@@ -50,14 +45,10 @@ class Product : public Resource {
 
   virtual std::string units() const { return "NONE"; }
 
-  virtual double quantity() const {
-    return quantity_;
-  }
+  virtual double quantity() const { return quantity_; }
 
   /// Returns the quality of this resource (e.g. bananas, human labor, water, etc.).
-  virtual const std::string& quality() const {
-    return quality_;
-  }
+  virtual const std::string& quality() const { return quality_; }
 
   virtual Resource::Ptr ExtractRes(double quantity);
 
