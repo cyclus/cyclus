@@ -15,7 +15,7 @@ namespace cyclus {
 /// for this map type is the parent's Nuc number, and the value is a pair
 /// that contains the corresponding decay matrix column and decay
 /// constant associated with that parent.
-typedef std::map< int, std::pair<int, double> > ParentMap;
+typedef std::map<int, std::pair<int, double> > ParentMap;
 
 /// A map type to represent all of the daughter nuclides tracked. The
 /// key for this map type is the decay matrix column associated with the
@@ -41,14 +41,10 @@ class Decayer {
   void Decay(double secs);
 
   /// the number of tracked nuclides
-  int n_tracked_nuclides() {
-    return nuclides_tracked_.size();
-  }
+  int n_tracked_nuclides() { return nuclides_tracked_.size(); }
 
   /// the tracked nuclide at position i
-  int TrackedNuclide(int i) {
-    return nuclides_tracked_.at(i);
-  }
+  int TrackedNuclide(int i) { return nuclides_tracked_.at(i); }
 
  private:
   /// Builds the decay matrix needed for the decay calculations from

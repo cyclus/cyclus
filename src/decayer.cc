@@ -35,8 +35,7 @@ Decayer::Decayer(const CompMap& comp) {
     }
   }
 
-  if (needs_build)
-    BuildDecayMatrix();
+  if (needs_build) BuildDecayMatrix();
 
   pre_vect_ = Vector(parent_.size(), 1);
   for (comp_iter = comp.begin(); comp_iter != comp.end(); ++comp_iter) {
@@ -57,8 +56,7 @@ void Decayer::AddNucToMaps(int nuc) {
   std::set<int> daughters;
   std::set<int>::iterator d;
 
-  if (IsNucTracked(nuc))
-    return;
+  if (IsNucTracked(nuc)) return;
 
   col = parent_.size() + 1;
   parent_[nuc] = std::make_pair(col, pyne::decay_const(nuc));
@@ -66,7 +64,7 @@ void Decayer::AddNucToMaps(int nuc) {
 
   i = 0;
   daughters = pyne::decay_children(nuc);
-  std::vector< std::pair<int, double> > dvec(daughters.size());
+  std::vector<std::pair<int, double> > dvec(daughters.size());
   for (d = daughters.begin(); d != daughters.end(); ++d) {
     daughter = *d;
     AddNucToMaps(daughter);
@@ -78,8 +76,8 @@ void Decayer::AddNucToMaps(int nuc) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool Decayer::IsNucTracked(int nuc) {
-  return (find(nuclides_tracked_.begin(), nuclides_tracked_.end(), nuc)
-          != nuclides_tracked_.end());
+  return (find(nuclides_tracked_.begin(), nuclides_tracked_.end(), nuc) !=
+          nuclides_tracked_.end());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -134,15 +132,16 @@ void Decayer::BuildDecayMatrix() {
     if (!daughters_.find(jcol)->second.empty()) {
       // an iterator that points to 1st daughter in the vector
       // pair<nuclide,branch_ratio>
-      std::vector< std::pair<int, double> >::const_iterator
-      nuc_iter = daughters_.find(jcol)->second.begin();
+      std::vector<std::pair<int, double> >::const_iterator nuc_iter =
+          daughters_.find(jcol)->second.begin();
 
       // processes all daughters of the parent
       while (nuc_iter != daughters_.find(jcol)->second.end()) {
         int nuc = nuc_iter->first;
         int irow = parent_.find(nuc)->second.first;  // determines row index
         double branch_ratio = nuc_iter->second;
-        decay_matrix_(irow, jcol) = branch_ratio * decay_const;  // sets A(i,j) value
+        decay_matrix_(irow, jcol) =
+            branch_ratio * decay_const;  // sets A(i,j) value
 
         ++nuc_iter;  // get next daughter
       }
@@ -153,8 +152,9 @@ void Decayer::BuildDecayMatrix() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Decayer::Decay(double secs) {
-  Warn<VALIDATION_WARNING>("the cyclus decayer has not yet been benchmarked and "
-                           "should be considered experimental.");
+  Warn<VALIDATION_WARNING>(
+      "the cyclus decayer has not yet been benchmarked and "
+      "should be considered experimental.");
   // solves the decay equation for the final composition
   post_vect_ = UniformTaylor::MatrixExpSolver(decay_matrix_, pre_vect_, secs);
 }
