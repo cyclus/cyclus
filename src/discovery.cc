@@ -95,7 +95,6 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
   for (; it != last; it.increment(errc)) {
     if (errc != no_err) {
       //it.no_push();
-      std::cout << "no pushed\n";
       if (it.level() > 0) {
         it.pop();
       }
