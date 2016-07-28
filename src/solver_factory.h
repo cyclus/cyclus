@@ -8,12 +8,12 @@
 class OsiSolverInterface;
 
 namespace cyclus {
- 
+
 /// this is taken exactly from driver4.cpp in the Cbc examples
-static int CbcCallBack(CbcModel * model, int from);
-  
-/// An event handler that records the time that a better solution is found  
-class ObjValueHandler: public CbcEventHandler {
+static int CbcCallBack(CbcModel* model, int from);
+
+/// An event handler that records the time that a better solution is found
+class ObjValueHandler : public CbcEventHandler {
  public:
   ObjValueHandler(double obj, double time, bool found);
   explicit ObjValueHandler(double obj);
@@ -25,7 +25,7 @@ class ObjValueHandler: public CbcEventHandler {
   inline double time() const { return time_; }
   inline double obj() const { return obj_; }
   inline bool found() const { return found_; }
-    
+
  private:
   double obj_, time_;
   bool found_;
@@ -49,10 +49,10 @@ class SolverFactory {
   inline void solver_t(std::string t) { t_ = t; }
   inline const std::string solver_t() const { return t_; }
   inline std::string solver_t() { return t_; }
-  
+
   /// get the configured solver
   OsiSolverInterface* get();
-  
+
  private:
   std::string t_;
   double tmax_;
