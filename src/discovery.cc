@@ -51,7 +51,6 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
   namespace fs = boost::filesystem;
   // find file
   string libpath = (fs::path(p) / fs::path("lib" + lib + SUFFIX)).string();
-  std::cerr << "libpath: " << libpath << "\n";
   libpath = Env::FindModule(libpath);
 
   // read in file, pre-allocates space
@@ -70,10 +69,8 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
   AgentSpec agentspec;
   for (set<string>::iterator it = archs.begin(); it != archs.end(); ++it) {
     spec = p + ":" + lib + ":" + (*it);
-    std::cerr << "spec name: " << spec << "\n";
     agentspec = AgentSpec(spec);
     if (DynamicModule::Exists(agentspec))
-      std::cerr << "found spec: " << spec << "\n";
       specs.insert(spec);
   }
   return specs;
@@ -83,96 +80,55 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
   using std::string;
   using std::set;
   namespace fs = boost::filesystem;
-  //std::cout << "Discovering dir pre " << d << "\n";
   set<string> specs;
   set<string> libspecs;
   fs::path pth;
   boost::system::error_code errc;
   boost::system::error_code no_err;
-  //std::cout << "setting pth \n";
   pth = d;
-  //std::cout << "pth is : " << pth.string() << "\n";
-  //std::cout << "Discovering dir " << d << "\n";
   //fs::recursive_directory_iterator it(d, errc);
   fs::recursive_directory_iterator it(pth, errc);
-  //std::cout << "got recur iterator\n";
   fs::recursive_directory_iterator last;
-  //std::cout << "got recur iterator last\n";
-  //std::cout << "initial path: " << it->path().string() << "\n";
   //if (errc != no_err || !fs::is_directory(it->path(), errc)) {
-    //std::cout << "initial error, returning\n";
   //  return specs;
   //}
-  //std::cout << "no initial error\n";
   for (; it != last; it.increment(errc)) {
-    //std::cout << "path: " << it->path().string() << "\n";
-    //std::cout << "errc: " << errc << "\n";
     if (errc != no_err) {
-      std::cout << "level " << it.level() << "\n";
       //it.no_push();
       std::cout << "no pushed\n";
       if (it.level() > 0) {
         it.pop();
-        //std::cout << "popped\n";
       }
-      //std::cout << "continuing\n";
       continue;
     }
     pth = it->path();
     string pthstr = pth.string();
-    //std::cout << "new pth: " << pth << "\n";
-    //std::cout << "new pthstr: " << pthstr << "\n";
     bool irf = fs::is_regular_file(pth, errc);
-    //std::cout << "new pth regfile: " << irf << "\n";
-    //std::cout << "new pth regfile 0 errc: " << (errc == no_err) << "\n";
-    //std::cout << "  errc: " << errc << "\n";
     if (errc != no_err || !irf) {
-      //std::cout << "not regfile, continuing\n";
       it.no_push();
-      //std::cout << "no pushed\n";
       if (it.level() > 0) {
         it.pop();
-      //  std::cout << "popped\n";
       }
       continue;
     } else if (fs::is_directory(pth, errc)) {
-      //std::cout << "is dir, continuing\n";
-      //it.pop();
       continue;
     } else if (!boost::algorithm::ends_with(pthstr, SUFFIX)) {
-      //std::cout << "does not end in suffix, continuing\n";
-      //if (it.level() > 0) {
-      //  it.pop();
-      //  std::cout << "popped\n";
-      //}
       continue;
     }
     string p = pth.parent_path().string();
-    //std::cout << "parent path: " << p << "\n";
     string lib = pth.filename().string();
-    //std::cout << "path lib: " << lib << "\n";
     if (d.length() < p.length())
       p = p.substr(d.length()+1, string::npos);
     else
       p = "";
-    //std::cout << "parent path revised: " << p << "\n";
     lib = lib.substr(3, lib.rfind(".") - 3);  // remove 'lib' prefix and suffix
-    //std::cout << "path lib revised: " << lib << "\n";
     try {
-      //std::cout << "discovering specs\n";
       libspecs = DiscoverSpecs(p, lib);
-      //std::cout << "discovered specs\n";
-    } catch (cyclus::IOError& e) {
-      //std::cout << "failed discovering specs\n";
-    }
+    } catch (cyclus::IOError& e) { }
     for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls) {
-      //std::cout << "  adding spec" << (*ls) << "\n";
       specs.insert(*ls);
-      //std::cout << "  added spec" << (*ls) << "\n";
     }
-    //std::cout << " found all in dir\n";
   }
-  //std::cout << "returning specs\n";
   return specs;
 }
 
@@ -184,13 +140,8 @@ std::set<std::string> DiscoverSpecsInCyclusPath() {
   set<string> dirspecs;
   vector<string> cycpath = Env::cyclus_path();
   for (vector<string>::iterator it = cycpath.begin(); it != cycpath.end(); ++it) {
-    //std::cout << "dir on path: " << (*it) << "\n";
-    //std::cout << "dir on length: " << (*it).length() << "\n";
-    //std::cout << "dir on result: " << ((*it).length() == 0 ? "." : (*it)) << "\n";
     dirspecs = DiscoverSpecsInDir((*it).length() == 0 ? "." : (*it));
-    //std::cout << "found specs on " << (*it) << ":\n";
     for (set<string>::iterator ds = dirspecs.begin(); ds != dirspecs.end(); ++ds) {
-      //std::cout << "  spec in dir: " << (*ds) << "\n";
       specs.insert(*ds);
     }
   }
