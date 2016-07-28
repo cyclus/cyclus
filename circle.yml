@@ -9,7 +9,7 @@ dependencies:
 test:
   override:
     - docker run cyclus/cyclus:latest cyclus_unit_tests
-#    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
+    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
 
 deployment:
   develop:
@@ -22,25 +22,24 @@ deployment:
     branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable
-      - docker push cyclus/cyclus:stable
-  
-  ci-testing:
-    branch: ci-testing
-    commands:
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-        #ubuntu 14.04
-      - rm Dockerfile && ln -s docker/release-14.04/Dockerfile #place the correct Dockerfile
-      - docker build -t deb/ubuntu-14 .:
-          timeout: 1200 #set 20 minute timeout
-      - docker create --name=deb-14.04 deb/ubuntu-14 #build deb in docker
-      - docker cp deb-14.04:/cyclus/deb ./ #extract deb
-      - scp ./deb/cyclus-*-ubuntu.??.04.deb root@dory.fuelcycle.org:./cyclus-deb/ #push the deb on dory
-      - rm -rf deb
-        # Ubuntu 16.04
-      - rm Dockerfile && ln -s docker/release-16.04/Dockerfile #place the correct Dockerfile
-      - docker build -t deb/ubuntu-16 .:
-          timeout: 1200 #set 20 minute timeout
+      # Update cyclus/ccylus:stable docker container
+      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
+      - docker push cyclus/cyclus:stable # push to docker depot
+        ## DEB GENERATION
+          #ubuntu 14.04
+      - rm Dockerfile && ln -s docker/release-14.04/Dockerfile # place the correct Dockerfile
+      - docker build -t deb/ubuntu-14 .: # build cyclus against ubuntu 14.04 in the docker container
+          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
+      - docker create --name=deb-14.04 deb/ubuntu-14 # build deb in docker
+      - docker cp deb-14.04:/cyclus/deb ./ # extract deb
+      - scp ./deb/cyclus-*-ubuntu.??.04.deb root@dory.fuelcycle.org:./cyclus-deb/ # push the deb on dory
+      - rm -rf deb  # clean the deb folder
+          # Ubuntu 16.04
+      - rm Dockerfile && ln -s docker/release-16.04/Dockerfile # place the correct Dockerfile
+      - docker build -t deb/ubuntu-16 .: # build cyclus against ubuntu 16.04 in the docker container
+          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
       - docker create --name=deb-16.04 deb/ubuntu-16 #build deb in docker
-      - docker cp deb-16.04:/cyclus/deb ./ #extract deb
-      - scp ./deb/cyclus*.deb root@dory.fuelcycle.org:./cyclus-deb/ #push the deb on dory
+      - docker cp deb-16.04:/cyclus/deb ./ # extract deb
+      - scp ./deb/cyclus*.deb root@dory.fuelcycle.org:./cyclus-deb/ # push the deb on dory
+      - rm -rf deb  # clean the deb folder
+        ## END DEB GENERATION
