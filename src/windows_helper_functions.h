@@ -23,8 +23,7 @@ void DynamicModule::OpenLibrary() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
-  ctor_ = (AgentCtor*)
-                 GetProcAddress(module_library_, ctor_name_.c_str());
+  ctor_ = (AgentCtor*)GetProcAddress(module_library_, ctor_name_.c_str());
 
   if (!ctor_) {
     std::stringstream ss;
