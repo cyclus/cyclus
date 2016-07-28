@@ -1,7 +1,9 @@
 #include "xml_parser.h"
 
 #include <stdlib.h>
+
 #include <string>
+
 #include <libxml++/libxml++.h>
 
 #include "error.h"
@@ -11,14 +13,10 @@
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLParser::XMLParser() : parser_(NULL) {
-  parser_ = new xmlpp::DomParser();
-}
+XMLParser::XMLParser() : parser_(NULL) { parser_ = new xmlpp::DomParser(); }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLParser::~XMLParser() {
-  delete parser_;
-}
+XMLParser::~XMLParser() { delete parser_; }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLParser::Init(const std::stringstream& xml_input_snippet) {
