@@ -1,8 +1,10 @@
 #ifndef CYCLUS_SRC_COMPOSITION_H_
 #define CYCLUS_SRC_COMPOSITION_H_
 
-#include <map>
 #include <stdint.h>
+
+#include <map>
+
 #include <boost/shared_ptr.hpp>
 
 class SimInitTest;

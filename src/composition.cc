@@ -4,16 +4,15 @@
 #include "context.h"
 #include "decayer.h"
 #include "error.h"
-#include "recorder.h"
 #include "pyne_decay.h"
+#include "recorder.h"
 
 namespace cyclus {
 
 int Composition::next_id_ = 1;
 
 Composition::Ptr Composition::CreateFromAtom(CompMap v) {
-  if (!compmath::ValidNucs(v))
-    throw ValueError("invalid nuclide in CompMap");
+  if (!compmath::ValidNucs(v)) throw ValueError("invalid nuclide in CompMap");
 
   if (!compmath::AllPositive(v))
     throw ValueError("negative quantity in CompMap");
@@ -24,8 +23,7 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
 }
 
 Composition::Ptr Composition::CreateFromMass(CompMap v) {
-  if (!compmath::ValidNucs(v))
-    throw ValueError("invalid nuclide in CompMap");
+  if (!compmath::ValidNucs(v)) throw ValueError("invalid nuclide in CompMap");
 
   if (!compmath::AllPositive(v))
     throw ValueError("negative quantity in CompMap");
@@ -35,9 +33,7 @@ Composition::Ptr Composition::CreateFromMass(CompMap v) {
   return c;
 }
 
-int Composition::id() {
-  return id_;
-}
+int Composition::id() { return id_; }
 
 const CompMap& Composition::atom() {
   if (atom_.size() == 0) {
@@ -106,9 +102,7 @@ Composition::Composition() : prev_decay_(0), recorded_(false) {
 }
 
 Composition::Composition(int prev_decay, ChainPtr decay_line)
-    : recorded_(false),
-      prev_decay_(prev_decay),
-      decay_line_(decay_line) {
+    : recorded_(false), prev_decay_(prev_decay), decay_line_(decay_line) {
   id_ = next_id_;
   next_id_++;
 }
@@ -122,10 +116,10 @@ Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
   Composition::Ptr decayed(new Composition(tot_decay, decay_line_));
 
   // FIXME this is only here for testing, see issue #761
-  if (atom_.size() == 0)
-    return decayed;
+  if (atom_.size() == 0) return decayed;
 
-  decayed->atom_ = pyne::decayers::decay(atom_, static_cast<double>(secs_per_timestep) * delta);
+  decayed->atom_ = pyne::decayers::decay(
+      atom_, static_cast<double>(secs_per_timestep) * delta);
   return decayed;
 }
 
