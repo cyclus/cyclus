@@ -14,9 +14,9 @@ class ExchangeGraph;
 
 /// @brief The ProgSolver provides the implementation for a mathematical
 /// programming solution to a resource exchange graph.
-class ProgSolver: public ExchangeSolver {
+class ProgSolver : public ExchangeSolver {
  public:
-  static const int kDefaultTimeout = 5 * 60; // 5 * 60 s/min == 5 minutes
+  static const int kDefaultTimeout = 5 * 60;  // 5 * 60 s/min == 5 minutes
 
   /// @param solver_t the solver type, either "cbc" or "clp"
   /// @param tmax the maximum solution time, default kDefaultTimeout
@@ -36,10 +36,10 @@ class ProgSolver: public ExchangeSolver {
  protected:
   /// @brief the ProgSolver solves an ExchangeGraph...
   virtual double SolveGraph();
-  
+
  private:
   void WriteMPS();
-  
+
   std::string solver_t_;
   double tmax_;
   bool verbose_, mps_;
