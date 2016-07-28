@@ -3,8 +3,8 @@
 
 #include <map>
 #include <set>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "boost/filesystem.hpp"
 
@@ -157,7 +157,6 @@ class Hdf5Back : public FullBackend {
   /// @param key the SHA1 digest to append
   void AppendVLKey(hid_t dset, DbTypes dbtype, const Digest& key);
 
-
   /// Inserts a variable length data into it value dataset
   ///
   /// @param dset an open HDF5 dataset
@@ -167,8 +166,7 @@ class Hdf5Back : public FullBackend {
   /// \{
   void InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
                    const std::string& val);
-  void InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
-                   hvl_t buf);
+  void InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key, hvl_t buf);
   /// \}
 
   /// Converts a value to a variable length buffer for HDF5.
