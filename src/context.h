@@ -1,10 +1,11 @@
 #ifndef CYCLUS_SRC_CONTEXT_H_
 #define CYCLUS_SRC_CONTEXT_H_
 
+#include <stdint.h>
+
 #include <map>
 #include <set>
 #include <string>
-#include <stdint.h>
 
 #ifndef CYCPP
 // The cyclus preprocessor cannot handle this file since there are two
@@ -13,8 +14,8 @@
 #include <boost/uuid/uuid_generators.hpp>
 #endif
 
-#include "composition.h"
 #include "agent.h"
+#include "composition.h"
 #include "greedy_solver.h"
 #include "recorder.h"
 
@@ -46,8 +47,7 @@ class SimInfo {
   /// @param m0 start month for the simulation
   /// @param handle is this simulation's unique simulation handle
   /// @return a SimInfo instance
-  SimInfo(int dur, int y0 = 2010, int m0 = 1, 
-          std::string handle = "");
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, std::string handle = "");
 
   /// @brief constructs a SimInfo instance using no default variables
   /// @param dur simulation duration in number of timesteps
@@ -56,8 +56,7 @@ class SimInfo {
   /// @param handle is this simulation's unique simulation handle
   /// @param d the decay data member, "never" for no decay. "manual" otherwise
   /// @return a SimInfo instance
-  SimInfo(int dur, int y0, int m0, 
-          std::string handle, std::string d);
+  SimInfo(int dur, int y0, int m0, std::string handle, std::string d);
 
   /// @brief constructs a SimInfo instance
   /// @param dur simulation duration in number of timesteps
@@ -66,9 +65,8 @@ class SimInfo {
   /// @param parent_type a string indicating the type of the parent simulation
   /// @param handle is this simulation's unique simulation handle
   /// @return a SimInfo instance
-  SimInfo(int dur, boost::uuids::uuid parent_sim,
-          int branch_time, std::string parent_type,
-          std::string handle = "");
+  SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
+          std::string parent_type, std::string handle = "");
 
   /// user-defined label associated with a particular simulation
   std::string handle;
@@ -147,22 +145,16 @@ class Context {
   void AddPrototype(std::string name, Agent* m);
   void AddPrototype(std::string name, Agent* m, bool overwrite);
   /// @}
-  
+
   /// Registers an agent as a participant in resource exchanges. Agents should
   /// register from their Deploy method.
-  inline void RegisterTrader(Trader* e) {
-    traders_.insert(e);
-  }
+  inline void RegisterTrader(Trader* e) { traders_.insert(e); }
 
   /// Unregisters an agent as a participant in resource exchanges.
-  inline void UnregisterTrader(Trader* e) {
-    traders_.erase(e);
-  }
+  inline void UnregisterTrader(Trader* e) { traders_.erase(e); }
 
   /// @return the current set of traders registered for resource exchange.
-  inline const std::set<Trader*>& traders() const {
-    return traders_;
-  }
+  inline const std::set<Trader*>& traders() const { return traders_; }
 
   /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
@@ -226,12 +218,10 @@ class Context {
   virtual int time();
 
   /// Returns the duration of a single time step in seconds.
-  inline uint64_t dt() {return si_.dt;};
+  inline uint64_t dt() { return si_.dt; };
 
   /// Return static simulation info.
-  inline SimInfo sim_info() const {
-    return si_;
-  }
+  inline SimInfo sim_info() const { return si_; }
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
@@ -244,9 +234,7 @@ class Context {
   void KillSim();
 
   /// @return the next transaction id
-  inline int NextTransactionID() {
-    return trans_id_++;
-  }
+  inline int NextTransactionID() { return trans_id_++; }
 
   /// Returns the exchange solver associated with this context
   ExchangeSolver* solver() {
@@ -264,15 +252,11 @@ class Context {
 
   /// @return the number of agents of a given prototype currently in the
   /// simulation
-  inline int n_prototypes(std::string type) {
-    return n_prototypes_[type];
-  }
+  inline int n_prototypes(std::string type) { return n_prototypes_[type]; }
 
   /// @return the number of agents of a given implementation currently in the
   /// simulation
-  inline int n_specs(std::string impl) {
-    return n_specs_[impl];
-  }
+  inline int n_specs(std::string impl) { return n_specs_[impl]; }
 
  private:
   /// Registers an agent as a participant in the simulation.

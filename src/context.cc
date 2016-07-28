@@ -1,6 +1,7 @@
 #include "context.h"
 
 #include <vector>
+
 #include <boost/uuid/uuid_generators.hpp>
 
 #include "error.h"
@@ -50,9 +51,8 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
-SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
-                 int branch_time, std::string parent_type,
-                 std::string handle)
+SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
+                 std::string parent_type, std::string handle)
     : duration(dur),
       y0(-1),
       m0(-1),
@@ -66,11 +66,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
       handle(handle) {}
 
 Context::Context(Timer* ti, Recorder* rec)
-    : ti_(ti),
-      rec_(rec),
-      solver_(NULL),
-      trans_id_(0),
-      si_(0) {}
+    : ti_(ti), rec_(rec), solver_(NULL), trans_id_(0), si_(0) {}
 
 Context::~Context() {
   if (solver_ != NULL) {
@@ -125,9 +121,7 @@ void Context::SchedDecom(Agent* m, int t) {
       ->Record();
 }
 
-boost::uuids::uuid Context::sim_id() {
-  return rec_->sim_id();
-}
+boost::uuids::uuid Context::sim_id() { return rec_->sim_id(); }
 
 void Context::AddPrototype(std::string name, Agent* p) {
   AddPrototype(name, p, false);
@@ -141,7 +135,7 @@ void Context::AddPrototype(std::string name, Agent* p, bool overwrite) {
 
   protos_[name] = p;
   // explicit snapshot required for in situ (non-xml) prototype addition
-  SimInit::SnapAgent(p); 
+  SimInit::SnapAgent(p);
   NewDatum("Prototypes")
       ->AddVal("Prototype", name)
       ->AddVal("AgentId", p->id())
@@ -152,9 +146,9 @@ void Context::AddPrototype(std::string name, Agent* p, bool overwrite) {
   if (rec_ver_.count(spec) == 0) {
     rec_ver_.insert(spec);
     NewDatum("AgentVersions")
-      ->AddVal("Spec", spec)
-      ->AddVal("Version", p->version())
-      ->Record();
+        ->AddVal("Spec", spec)
+        ->AddVal("Version", p->version())
+        ->Record();
   }
 }
 
@@ -191,9 +185,7 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("CoinCBCVersion", std::string(version::coincbc()))
       ->Record();
 
-  NewDatum("DecayMode")
-      ->AddVal("Decay", si.decay)
-      ->Record();
+  NewDatum("DecayMode")->AddVal("Decay", si.decay)->Record();
 
   NewDatum("InfoExplicitInv")
       ->AddVal("RecordInventory", si.explicit_inventory)
@@ -214,9 +206,7 @@ void Context::InitSim(SimInfo si) {
   ti_->Initialize(this, si);
 }
 
-int Context::time() {
-  return ti_->time();
-}
+int Context::time() { return ti_->time(); }
 
 void Context::RegisterTimeListener(TimeListener* tl) {
   ti_->RegisterTimeListener(tl);
@@ -226,16 +216,10 @@ void Context::UnregisterTimeListener(TimeListener* tl) {
   ti_->UnregisterTimeListener(tl);
 }
 
-Datum* Context::NewDatum(std::string title) {
-  return rec_->NewDatum(title);
-}
+Datum* Context::NewDatum(std::string title) { return rec_->NewDatum(title); }
 
-void Context::Snapshot() {
-  ti_->Snapshot();
-}
+void Context::Snapshot() { ti_->Snapshot(); }
 
-void Context::KillSim() {
-  ti_->KillSim();
-}
+void Context::KillSim() { ti_->KillSim(); }
 
 }  // namespace cyclus
