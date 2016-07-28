@@ -3,20 +3,19 @@
 #include <iomanip>
 #include <sstream>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/archive/tmpdir.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/list.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/map.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/serialization/assume_abstract.hpp>
-
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/list.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/set.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 #include "blob.h"
 #include "datum.h"
@@ -88,7 +87,7 @@ void SqliteBack::Notify(DatumList data) {
   Flush();
 }
 
-void SqliteBack::Flush() { }
+void SqliteBack::Flush() {}
 
 QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
   QueryResult q = GetTableInfo(table);
@@ -112,7 +111,7 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
   if (conds != NULL) {
     for (int i = 0; i < conds->size(); ++i) {
       boost::spirit::hold_any v = (*conds)[i].val;
-      Bind(v, Type(v), stmt, i+1);
+      Bind(v, Type(v), stmt, i + 1);
     }
   }
 
@@ -129,8 +128,7 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
 std::map<std::string, DbTypes> SqliteBack::ColumnTypes(std::string table) {
   QueryResult qr = GetTableInfo(table);
   std::map<std::string, DbTypes> rtn;
-  for (int i = 0; i < qr.fields.size(); ++i)
-    rtn[qr.fields[i]] = qr.types[i];
+  for (int i = 0; i < qr.fields.size(); ++i) rtn[qr.fields[i]] = qr.types[i];
   return rtn;
 }
 
@@ -147,13 +145,11 @@ std::set<std::string> SqliteBack::Tables() {
   return rtn;
 }
 
-SqliteDb& SqliteBack::db() {
-  return db_;
-}
+SqliteDb& SqliteBack::db() { return db_; }
 
 QueryResult SqliteBack::GetTableInfo(std::string table) {
-  std::string sql = "SELECT Field,Type FROM FieldTypes WHERE TableName = '" +
-                    table + "';";
+  std::string sql =
+      "SELECT Field,Type FROM FieldTypes WHERE TableName = '" + table + "';";
   SqlStatement::Ptr stmt;
   stmt = db_.Prepare(sql);
 
@@ -169,9 +165,7 @@ QueryResult SqliteBack::GetTableInfo(std::string table) {
   return info;
 }
 
-std::string SqliteBack::Name() {
-  return path_;
-}
+std::string SqliteBack::Name() { return path_; }
 
 void SqliteBack::BuildStmt(Datum* d) {
   std::string name = d->title();
@@ -198,9 +192,8 @@ void SqliteBack::CreateTable(Datum* d) {
   Datum::Vals::iterator it = vals.begin();
 
   std::stringstream types;
-  types << "INSERT INTO FieldTypes VALUES ('"
-        << name << "','" << it->first << "','"
-        << Type(it->second) << "');";
+  types << "INSERT INTO FieldTypes VALUES ('" << name << "','" << it->first
+        << "','" << Type(it->second) << "');";
   db_.Execute(types.str());
 
   std::string cmd = "CREATE TABLE " + name + " (";
@@ -210,9 +203,8 @@ void SqliteBack::CreateTable(Datum* d) {
   while (it != vals.end()) {
     cmd += ", " + std::string(it->first) + " " + SqlType(it->second);
     std::stringstream types;
-    types << "INSERT INTO FieldTypes VALUES ('"
-          << name << "','" << it->first << "','"
-          << Type(it->second) << "');";
+    types << "INSERT INTO FieldTypes VALUES ('" << name << "','" << it->first
+          << "','" << Type(it->second) << "');";
     db_.Execute(types.str());
     ++it;
   }
@@ -228,203 +220,211 @@ void SqliteBack::WriteDatum(Datum* d) {
 
   for (int i = 0; i < vals.size(); ++i) {
     boost::spirit::hold_any v = vals[i].second;
-    Bind(v, schema[i], stmt, i+1);
+    Bind(v, schema[i], stmt, i + 1);
   }
 
   stmt->Exec();
 }
 
-void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt,
-                      int index) {
-
+void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type,
+                      SqlStatement::Ptr stmt, int index) {
 // serializes the value v of type T and DBType D and binds it to stmt (inside
 // a case statement
 #define CYCLUS_COMMA ,
-#define CYCLUS_BINDVAL(D, T) \
-    case D: { \
-    T vect = v.cast<T>(); \
-    std::stringstream ss; \
-    boost::archive::xml_oarchive ar(ss); \
-    ar & BOOST_SERIALIZATION_NVP(vect); \
-    std::string s = ss.str(); \
+#define CYCLUS_BINDVAL(D, T)                    \
+  case D: {                                     \
+    T vect = v.cast<T>();                       \
+    std::stringstream ss;                       \
+    boost::archive::xml_oarchive ar(ss);        \
+    ar& BOOST_SERIALIZATION_NVP(vect);          \
+    std::string s = ss.str();                   \
     stmt->BindBlob(index, s.c_str(), s.size()); \
-    break; \
-    }
+    break;                                      \
+  }
 
   switch (type) {
-  case INT: {
-    stmt->BindInt(index, v.cast<int>());
-    break;
-  }
-  case BOOL: {
-    stmt->BindInt(index, v.cast<bool>());
-    break;
-  }
-  case DOUBLE: {
-    stmt->BindDouble(index, v.cast<double>());
-    break;
-  }
-  case FLOAT: {
-    stmt->BindDouble(index, v.cast<float>());
-    break;
-  }
-  case BLOB: {
+    case INT: {
+      stmt->BindInt(index, v.cast<int>());
+      break;
+    }
+    case BOOL: {
+      stmt->BindInt(index, v.cast<bool>());
+      break;
+    }
+    case DOUBLE: {
+      stmt->BindDouble(index, v.cast<double>());
+      break;
+    }
+    case FLOAT: {
+      stmt->BindDouble(index, v.cast<float>());
+      break;
+    }
+    case BLOB: {
       std::string s = v.cast<Blob>().str();
       stmt->BindBlob(index, s.c_str(), s.size());
       break;
     }
-  case STRING: {
-    stmt->BindText(index, v.cast<std::string>().c_str());
-    break;
-  }
-  case UUID: {
-    boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
-    stmt->BindBlob(index, ui.data, 16);
-    break;
-  }
-  CYCLUS_BINDVAL(SET_INT, std::set<int>);
-  CYCLUS_BINDVAL(SET_STRING, std::set<std::string>);
-  CYCLUS_BINDVAL(LIST_INT, std::list<int>);
-  CYCLUS_BINDVAL(LIST_STRING, std::list<std::string>);
-  CYCLUS_BINDVAL(VECTOR_INT, std::vector<int>);
-  CYCLUS_BINDVAL(VECTOR_DOUBLE, std::vector<double>);
-  CYCLUS_BINDVAL(VECTOR_STRING, std::vector<std::string>);
-  CYCLUS_BINDVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
-  CYCLUS_BINDVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
-  CYCLUS_BINDVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
-  CYCLUS_BINDVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
-  CYCLUS_BINDVAL(MAP_STRING_DOUBLE, std::map<std::string CYCLUS_COMMA double>);
-  CYCLUS_BINDVAL(MAP_STRING_STRING,
-                 std::map<std::string CYCLUS_COMMA std::string>);
-  CYCLUS_BINDVAL(MAP_STRING_VECTOR_DOUBLE,
-                 std::map<std::string CYCLUS_COMMA std::vector<double> >);
-  CYCLUS_BINDVAL(
-      MAP_STRING_MAP_INT_DOUBLE,
-      std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
-  CYCLUS_BINDVAL(MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
-                 std::map<std::string CYCLUS_COMMA std::pair<
-                     double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
-  CYCLUS_BINDVAL(MAP_INT_MAP_STRING_DOUBLE,
-                 std::map<int CYCLUS_COMMA
-                          std::map<std::string CYCLUS_COMMA double> >);
-  CYCLUS_BINDVAL(
-      MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
-      std::map<std::string CYCLUS_COMMA
-      std::vector<std::pair<int CYCLUS_COMMA
-      std::pair<std::string CYCLUS_COMMA std::string> > > >);
+    case STRING: {
+      stmt->BindText(index, v.cast<std::string>().c_str());
+      break;
+    }
+    case UUID: {
+      boost::uuids::uuid ui = v.cast<boost::uuids::uuid>();
+      stmt->BindBlob(index, ui.data, 16);
+      break;
+    }
+      CYCLUS_BINDVAL(SET_INT, std::set<int>);
+      CYCLUS_BINDVAL(SET_STRING, std::set<std::string>);
+      CYCLUS_BINDVAL(LIST_INT, std::list<int>);
+      CYCLUS_BINDVAL(LIST_STRING, std::list<std::string>);
+      CYCLUS_BINDVAL(VECTOR_INT, std::vector<int>);
+      CYCLUS_BINDVAL(VECTOR_DOUBLE, std::vector<double>);
+      CYCLUS_BINDVAL(VECTOR_STRING, std::vector<std::string>);
+      CYCLUS_BINDVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
+      CYCLUS_BINDVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
+      CYCLUS_BINDVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
+      CYCLUS_BINDVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
+      CYCLUS_BINDVAL(MAP_STRING_DOUBLE,
+                     std::map<std::string CYCLUS_COMMA double>);
+      CYCLUS_BINDVAL(MAP_STRING_STRING,
+                     std::map<std::string CYCLUS_COMMA std::string>);
+      CYCLUS_BINDVAL(MAP_STRING_VECTOR_DOUBLE,
+                     std::map<std::string CYCLUS_COMMA std::vector<double> >);
+      CYCLUS_BINDVAL(MAP_STRING_MAP_INT_DOUBLE,
+                     std::map<std::string CYCLUS_COMMA
+                                  std::map<int CYCLUS_COMMA double> >);
+      CYCLUS_BINDVAL(
+          MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+          std::map<std::string CYCLUS_COMMA std::pair<
+              double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
+      CYCLUS_BINDVAL(MAP_INT_MAP_STRING_DOUBLE,
+                     std::map<int CYCLUS_COMMA
+                                  std::map<std::string CYCLUS_COMMA double> >);
+      CYCLUS_BINDVAL(
+          MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+          std::map<std::string CYCLUS_COMMA
+                       std::vector<std::pair<int CYCLUS_COMMA std::pair<
+                           std::string CYCLUS_COMMA std::string> > > >);
 
-  CYCLUS_BINDVAL(
-      MAP_STRING_PAIR_STRING_VECTOR_DOUBLE,
-      std::map<std::string CYCLUS_COMMA
-      std::pair<std::string CYCLUS_COMMA std::vector<double> > > );
+      CYCLUS_BINDVAL(MAP_STRING_PAIR_STRING_VECTOR_DOUBLE,
+                     std::map<std::string CYCLUS_COMMA std::pair<
+                         std::string CYCLUS_COMMA std::vector<double> > >);
 
-  CYCLUS_BINDVAL(LIST_PAIR_INT_INT, std::list< std::pair<int CYCLUS_COMMA int> >);
+      CYCLUS_BINDVAL(LIST_PAIR_INT_INT,
+                     std::list<std::pair<int CYCLUS_COMMA int> >);
 
-  CYCLUS_BINDVAL(
-      MAP_STRING_MAP_STRING_INT,
-      std::map<std::string CYCLUS_COMMA std::map<std::string CYCLUS_COMMA int> >);
+      CYCLUS_BINDVAL(MAP_STRING_MAP_STRING_INT,
+                     std::map<std::string CYCLUS_COMMA
+                                  std::map<std::string CYCLUS_COMMA int> >);
 
-  default: {
-    throw ValueError("attempted to retrieve unsupported sqlite backend type");
-  }
+    default: {
+      throw ValueError("attempted to retrieve unsupported sqlite backend type");
+    }
   }
 #undef CYCLUS_BINDVAL
 #undef CYCLUS_COMMA
 }
 
-boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
-                                             int col,
+boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt, int col,
                                              DbTypes type) {
-
   boost::spirit::hold_any v;
 
 // reconstructs from a serialization in stmt of type T and DbType D and
 // store it in v.
 #define CYCLUS_COMMA ,
-#define CYCLUS_LOADVAL(D, T) \
-      case D: { \
-      char* data =  stmt->GetText(col, NULL); \
-      std::stringstream ss; \
-      ss << data; \
-      boost::archive::xml_iarchive ar(ss); \
-      T vect; \
-      ar & BOOST_SERIALIZATION_NVP(vect); \
-      v = vect; \
-      break; \
-      }
+#define CYCLUS_LOADVAL(D, T)               \
+  case D: {                                \
+    char* data = stmt->GetText(col, NULL); \
+    std::stringstream ss;                  \
+    ss << data;                            \
+    boost::archive::xml_iarchive ar(ss);   \
+    T vect;                                \
+    ar& BOOST_SERIALIZATION_NVP(vect);     \
+    v = vect;                              \
+    break;                                 \
+  }
 
   switch (type) {
-  case INT: {
-    v = stmt->GetInt(col);
-    break;
-  } case BOOL: {
-    v = static_cast<bool>(stmt->GetInt(col));
-    break;
-  } case DOUBLE: {
-    v = stmt->GetDouble(col);
-    break;
-  } case FLOAT: {
-    v = static_cast<float>(stmt->GetDouble(col));
-    break;
-  } case STRING: {
-    v = std::string(stmt->GetText(col, NULL));
-    break;
-  } case BLOB: {
-    int n;
-    char* s = stmt->GetText(col, &n);
-    v = Blob(std::string(s, n));
-    break;
-  } case UUID: {
-    boost::uuids::uuid u;
-    memcpy(&u, stmt->GetText(col, NULL), 16);
-    v = u;
-    break;
+    case INT: {
+      v = stmt->GetInt(col);
+      break;
+    }
+    case BOOL: {
+      v = static_cast<bool>(stmt->GetInt(col));
+      break;
+    }
+    case DOUBLE: {
+      v = stmt->GetDouble(col);
+      break;
+    }
+    case FLOAT: {
+      v = static_cast<float>(stmt->GetDouble(col));
+      break;
+    }
+    case STRING: {
+      v = std::string(stmt->GetText(col, NULL));
+      break;
+    }
+    case BLOB: {
+      int n;
+      char* s = stmt->GetText(col, &n);
+      v = Blob(std::string(s, n));
+      break;
+    }
+    case UUID: {
+      boost::uuids::uuid u;
+      memcpy(&u, stmt->GetText(col, NULL), 16);
+      v = u;
+      break;
+    }
+      CYCLUS_LOADVAL(SET_INT, std::set<int>);
+      CYCLUS_LOADVAL(SET_STRING, std::set<std::string>);
+      CYCLUS_LOADVAL(LIST_INT, std::list<int>);
+      CYCLUS_LOADVAL(LIST_STRING, std::list<std::string>);
+      CYCLUS_LOADVAL(VECTOR_INT, std::vector<int>);
+      CYCLUS_LOADVAL(VECTOR_DOUBLE, std::vector<double>);
+      CYCLUS_LOADVAL(VECTOR_STRING, std::vector<std::string>);
+      CYCLUS_LOADVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
+      CYCLUS_LOADVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
+      CYCLUS_LOADVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
+      CYCLUS_LOADVAL(MAP_STRING_DOUBLE,
+                     std::map<std::string CYCLUS_COMMA double>);
+      CYCLUS_LOADVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
+      CYCLUS_LOADVAL(MAP_STRING_STRING,
+                     std::map<std::string CYCLUS_COMMA std::string>);
+      CYCLUS_LOADVAL(MAP_STRING_VECTOR_DOUBLE,
+                     std::map<std::string CYCLUS_COMMA std::vector<double> >);
+      CYCLUS_LOADVAL(MAP_STRING_MAP_INT_DOUBLE,
+                     std::map<std::string CYCLUS_COMMA
+                                  std::map<int CYCLUS_COMMA double> >);
+      CYCLUS_LOADVAL(
+          MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
+          std::map<std::string CYCLUS_COMMA std::pair<
+              double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
+      CYCLUS_LOADVAL(MAP_INT_MAP_STRING_DOUBLE,
+                     std::map<int CYCLUS_COMMA
+                                  std::map<std::string CYCLUS_COMMA double> >);
+      CYCLUS_LOADVAL(
+          MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
+          std::map<std::string CYCLUS_COMMA
+                       std::vector<std::pair<int CYCLUS_COMMA std::pair<
+                           std::string CYCLUS_COMMA std::string> > > >);
+
+      CYCLUS_LOADVAL(MAP_STRING_PAIR_STRING_VECTOR_DOUBLE,
+                     std::map<std::string CYCLUS_COMMA std::pair<
+                         std::string CYCLUS_COMMA std::vector<double> > >);
+
+      CYCLUS_LOADVAL(LIST_PAIR_INT_INT,
+                     std::list<std::pair<int CYCLUS_COMMA int> >);
+      CYCLUS_LOADVAL(MAP_STRING_MAP_STRING_INT,
+                     std::map<std::string CYCLUS_COMMA
+                                  std::map<std::string CYCLUS_COMMA int> >);
+
+    default: {
+      throw ValueError("Attempted to retrieve unsupported backend type");
+    }
   }
-  CYCLUS_LOADVAL(SET_INT, std::set<int>);
-  CYCLUS_LOADVAL(SET_STRING, std::set<std::string>);
-  CYCLUS_LOADVAL(LIST_INT, std::list<int>);
-  CYCLUS_LOADVAL(LIST_STRING, std::list<std::string>);
-  CYCLUS_LOADVAL(VECTOR_INT, std::vector<int>);
-  CYCLUS_LOADVAL(VECTOR_DOUBLE, std::vector<double>);
-  CYCLUS_LOADVAL(VECTOR_STRING, std::vector<std::string>);
-  CYCLUS_LOADVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
-  CYCLUS_LOADVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
-  CYCLUS_LOADVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
-  CYCLUS_LOADVAL(MAP_STRING_DOUBLE, std::map<std::string CYCLUS_COMMA double>);
-  CYCLUS_LOADVAL(MAP_STRING_INT, std::map<std::string CYCLUS_COMMA int>);
-  CYCLUS_LOADVAL(MAP_STRING_STRING,
-                 std::map<std::string CYCLUS_COMMA std::string>);
-  CYCLUS_LOADVAL(MAP_STRING_VECTOR_DOUBLE,
-                 std::map<std::string CYCLUS_COMMA std::vector<double> >);
-  CYCLUS_LOADVAL(
-      MAP_STRING_MAP_INT_DOUBLE,
-      std::map<std::string CYCLUS_COMMA std::map<int CYCLUS_COMMA double> >);
-  CYCLUS_LOADVAL(MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,
-                 std::map<std::string CYCLUS_COMMA std::pair<
-                     double CYCLUS_COMMA std::map<int CYCLUS_COMMA double> > >);
-  CYCLUS_LOADVAL(MAP_INT_MAP_STRING_DOUBLE,
-                 std::map<int CYCLUS_COMMA
-                          std::map<std::string CYCLUS_COMMA double> >);
-  CYCLUS_LOADVAL(
-      MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,
-      std::map<std::string CYCLUS_COMMA
-      std::vector<std::pair<int CYCLUS_COMMA
-      std::pair<std::string CYCLUS_COMMA std::string> > > >);
 
-  CYCLUS_LOADVAL(
-      MAP_STRING_PAIR_STRING_VECTOR_DOUBLE,
-      std::map<std::string CYCLUS_COMMA
-      std::pair<std::string CYCLUS_COMMA std::vector<double> > > );
-
-  CYCLUS_LOADVAL(LIST_PAIR_INT_INT, std::list< std::pair<int CYCLUS_COMMA int> >);
-  CYCLUS_LOADVAL(
-      MAP_STRING_MAP_STRING_INT,
-      std::map<std::string CYCLUS_COMMA std::map<std::string CYCLUS_COMMA int> >);
-
-  default: {
-    throw ValueError("Attempted to retrieve unsupported backend type");
-  }}
-  
 #undef CYCLUS_LOADVAL
 #undef CYCLUS_COMMA
 
@@ -433,18 +433,18 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
 
 std::string SqliteBack::SqlType(boost::spirit::hold_any v) {
   switch (Type(v)) {
-  case INT:  // fallthrough
-  case BOOL:
-    return "INTEGER";
-  case DOUBLE:  // fallthrough
-  case FLOAT:
-    return "REAL";
-  case STRING:
-    return "TEXT";
-  case BLOB:  // fallthrough
-  case UUID:  // fallthrough
-  default:  // all templated types
-    return "BLOB";
+    case INT:  // fallthrough
+    case BOOL:
+      return "INTEGER";
+    case DOUBLE:  // fallthrough
+    case FLOAT:
+      return "REAL";
+    case STRING:
+      return "TEXT";
+    case BLOB:  // fallthrough
+    case UUID:  // fallthrough
+    default:    // all templated types
+      return "BLOB";
   }
 }
 
@@ -482,26 +482,24 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
         MAP_STRING_VECTOR_DOUBLE;
     type_map[&typeid(std::map<std::string, std::map<int, double> >)] =
         MAP_STRING_MAP_INT_DOUBLE;
-    type_map[&typeid(std::map<std::string,
-                              std::pair<double, std::map<int, double> > >)] =
+    type_map[&typeid(
+        std::map<std::string, std::pair<double, std::map<int, double> > >)] =
         MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE;
     type_map[&typeid(std::map<int, std::map<std::string, double> >)] =
         MAP_INT_MAP_STRING_DOUBLE;
     type_map[&typeid(
         std::map<std::string,
-                 std::vector<std::pair<int, std::pair<std::string,
-                                                      std::string> > > >)] =
+                 std::vector<std::pair<
+                     int, std::pair<std::string, std::string> > > >)] =
         MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING;
 
     type_map[&typeid(
-        std::map<std::string,
-	         std::pair<std::string,
-	                   std::vector<double> > >)] =
+        std::map<std::string, std::pair<std::string, std::vector<double> > >)] =
         MAP_STRING_PAIR_STRING_VECTOR_DOUBLE;
-    
-    type_map[&typeid(std::map<std::string, std::map<std::string,int> >)] =
+
+    type_map[&typeid(std::map<std::string, std::map<std::string, int> >)] =
         MAP_STRING_MAP_STRING_INT;
-    
+
     type_map[&typeid(std::list<std::pair<int, int> >)] = LIST_PAIR_INT_INT;
   }
 
