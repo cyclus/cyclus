@@ -1,7 +1,7 @@
 #include "db_init.h"
 
-#include "context.h"
 #include "agent.h"
+#include "context.h"
 
 namespace cyclus {
 
