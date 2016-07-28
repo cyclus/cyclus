@@ -33,36 +33,32 @@
 
 #include "l_matrix.h"
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 namespace cyclus {
 
 // constructs a 1x1 matrix of zeroes
 LMatrix::LMatrix() {
-  rows_ = 1;                   // sets number of rows
-  cols_ = 1;                   // sets number of columns
+  rows_ = 1;                            // sets number of rows
+  cols_ = 1;                            // sets number of columns
   std::vector<long double> element(1);  // creates a single element
-  M_.push_back(element);       // adds element to the matrix
+  M_.push_back(element);                // adds element to the matrix
 }
 
 // constructs an nxm matrix of zeroes
 LMatrix::LMatrix(int n, int m) {
-  rows_ = n;                     // sets number of rows
-  cols_ = m;                     // sets number of columns
-  std::vector<long double> row(m);   // creates a row with m elements
-  M_.assign(n, row);              // adds n rows_ to the matrix
+  rows_ = n;                        // sets number of rows
+  cols_ = m;                        // sets number of columns
+  std::vector<long double> row(m);  // creates a row with m elements
+  M_.assign(n, row);                // adds n rows_ to the matrix
 }
 
 // returns the number of rows n in the matrix
-int LMatrix::NumRows() const {
-  return rows_;
-}
+int LMatrix::NumRows() const { return rows_; }
 
 // returns the number of columns m in the matrix
-int LMatrix::NumCols() const {
-  return cols_;
-}
+int LMatrix::NumCols() const { return cols_; }
 
 // overloads the () operator so that A(i,j) will return a reference to
 // the element aij
@@ -76,9 +72,7 @@ void LMatrix::SetElement(int i, int j, long double aij) {
 }
 
 // overloads the () operator so that A(i,j) will write the element aij
-long double& LMatrix::operator()(int i, int j) {
-  return M_[i - 1][j - 1];
-}
+long double& LMatrix::operator()(int i, int j) { return M_[i - 1][j - 1]; }
 
 // adds a row at the end of the Matrix if it contains the same number of
 // elements as the number of columns in the Matrix
@@ -107,7 +101,7 @@ void LMatrix::Print() const {
       // prints all of the elements in the ith row of the matrix
       std::cout << "[";
       for (int j = 0; j < cols_ - 1; j++) {
-        std::cout << "  " << std::setw(9) << M_[i][j]  << "  ";
+        std::cout << "  " << std::setw(9) << M_[i][j] << "  ";
       }
       std::cout << std::setw(9) << M_[i][cols_ - 1] << "  ]" << std::endl;
     }
@@ -117,13 +111,13 @@ void LMatrix::Print() const {
 // overloads the assignment operator "A = B" for matrix objects
 const LMatrix& LMatrix::operator=(const LMatrix& rhs) {
   if (this == &rhs) {
-    return *this;     // returns A if it is already the same matrix as B
+    return *this;  // returns A if it is already the same matrix as B
   } else {
     rows_ = rhs.rows_;  // resets the number of rows to match B
     cols_ = rhs.cols_;  // resets the number of columns to match B
 
     // rebuilds A with the dimensions of B
-    std::vector<long double> row(cols_);   // creates a row with m elements
+    std::vector<long double> row(cols_);  // creates a row with m elements
     M_.assign(rows_, row);
 
     // copies all of the elements from B into A
@@ -284,7 +278,7 @@ LMatrix operator^(const LMatrix& A, const int k) {
 LMatrix identity(int n) {
   LMatrix I(n, n);
 
-  for (int i = 0; i < n ; i++) {
+  for (int i = 0; i < n; i++) {
     I.SetElement(i + 1, i + 1, 1);
   }
 
