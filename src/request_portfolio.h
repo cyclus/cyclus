@@ -19,7 +19,7 @@ namespace cyclus {
 class Trader;
 
 /// @brief accumulator sum for request quantities
-template<class T>
+template <class T>
 inline double SumQty(double total, Request<T>* r) {
   return total += r->target()->quantity();
 }
@@ -29,21 +29,19 @@ inline double SumQty(double total, Request<T>* r) {
 /// Coefficients are determiend by the request portfolio and are provided to the
 /// converter. The arc and exchange context are used in order to reference the
 /// original request so that the request's coefficient can be applied.
-template<class T>
+template <class T>
 struct QtyCoeffConverter : public Converter<T> {
   QtyCoeffConverter(const std::map<Request<T>*, double>& coeffs)
       : coeffs(coeffs) {}
 
   inline virtual double convert(
-      boost::shared_ptr<T> offer,
-      Arc const * a,
-      ExchangeTranslationContext<T> const * ctx) const {
+      boost::shared_ptr<T> offer, Arc const* a,
+      ExchangeTranslationContext<T> const* ctx) const {
     return offer->quantity() * coeffs.at(ctx->node_to_request.at(a->unode()));
   }
 
   virtual bool operator==(Converter<T>& other) const {
-    QtyCoeffConverter<T>* cast =
-        dynamic_cast<QtyCoeffConverter<T>*>(&other);
+    QtyCoeffConverter<T>* cast = dynamic_cast<QtyCoeffConverter<T>*>(&other);
     return cast != NULL && coeffs == cast->coeffs;
   }
 
@@ -82,11 +80,11 @@ struct QtyCoeffConverter : public Converter<T> {
 /// determine the demand as "met". In this case, the total demand is 9.5, the
 /// MOX order is given a coefficient of 9.5 / 10, and the UOX order is given a
 /// coefficient of 9.5 / 9.
-template<class T>
-class RequestPortfolio :
-public boost::enable_shared_from_this< RequestPortfolio<T> > {
+template <class T>
+class RequestPortfolio
+    : public boost::enable_shared_from_this<RequestPortfolio<T> > {
  public:
-  typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
+  typedef boost::shared_ptr<RequestPortfolio<T> > Ptr;
 
   RequestPortfolio() : requester_(NULL), qty_(0) {}
 
@@ -157,12 +155,10 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline double qty() const { return qty_; }
 
   /// @return const access to the unconstrained requests
-  inline const std::vector<Request<T>*>& requests() const {
-    return requests_;
-  }
+  inline const std::vector<Request<T>*>& requests() const { return requests_; }
 
   /// @return const access to the request constraints
-  inline const std::set< CapacityConstraint<T> >& constraints() const {
+  inline const std::set<CapacityConstraint<T> >& constraints() const {
     return constraints_;
   }
 
@@ -207,7 +203,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   std::map<Request<T>*, double> mass_coeffs_;
 
   /// constraints_ is a set because constraints are assumed to be unique
-  std::set< CapacityConstraint<T> > constraints_;
+  std::set<CapacityConstraint<T> > constraints_;
 
   /// the total quantity of resources assocaited with the portfolio
   double qty_;
