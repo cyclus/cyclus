@@ -387,9 +387,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
     return 0;
   } else if (ai.vm.count("all-agent-listing")) {
     try {
-      std::cout << "starting all agents\n";
       std::set<std::string> specs = cyclus::DiscoverSpecsInCyclusPath();
-      std::cout << "found all agents\n";
       for (std::set<std::string>::iterator it = specs.begin(); it != specs.end(); ++it)
         std::cout << *it << "\n";
     } catch (cyclus::IOError err) {
