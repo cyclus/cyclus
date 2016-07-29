@@ -8,8 +8,8 @@
 
 #include "cyc_limits.h"
 #include "error.h"
-#include "product.h"
 #include "material.h"
+#include "product.h"
 #include "resource.h"
 
 namespace cyclus {
@@ -32,10 +32,7 @@ typedef std::vector<Resource::Ptr> Manifest;
 /// ResBuf.
 class ResourceBuff {
  public:
-  enum AccessDir {
-    FRONT,
-    BACK
-  };
+  enum AccessDir { FRONT, BACK };
 
   ResourceBuff() : capacity_(kBuffInfinity), qty_(0) {}
 
@@ -44,9 +41,7 @@ class ResourceBuff {
   /// Capacity returns the maximum resource quantity this store can hold (units
   /// based on constituent resource objects' units).
   /// Never throws.
-  inline double capacity() const {
-    return capacity_;
-  }
+  inline double capacity() const { return capacity_; }
 
   /// Set_capacity sets the maximum quantity this store can hold (units based
   /// on constituent resource objects' units).
@@ -57,28 +52,20 @@ class ResourceBuff {
 
   /// Count returns the total number of constituent resource objects
   /// in the store. Never throws.
-  inline int count() const {
-    return mats_.size();
-  }
+  inline int count() const { return mats_.size(); }
 
   /// Quantity returns the total resource quantity of constituent resource
   /// objects in the store. Never throws.
-  inline double quantity() const {
-    return qty_;
-  }
+  inline double quantity() const { return qty_; }
 
   /// Space returns the quantity of space remaining in this store.
   ///
   /// It is effectively the difference between the capacity and the quantity
   /// and is never negative. Never throws.
-  inline double space() const {
-    return std::max(0.0, capacity_ - qty_);
-  }
+  inline double space() const { return std::max(0.0, capacity_ - qty_); }
 
   /// Returns true if there are no mats in mats_
-  inline bool empty() const {
-    return mats_.empty();
-  }
+  inline bool empty() const { return mats_.empty(); }
 
   /// PopQty pops the specified quantity of resources from the buffer.
   ///

@@ -1,7 +1,8 @@
 #include "resource_buff.h"
-#include "cyc_arithmetic.h"
 
 #include <iomanip>
+
+#include "cyc_arithmetic.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -9,7 +10,7 @@ namespace toolkit {
 void ResourceBuff::set_capacity(double cap) {
   if (quantity() - cap > eps_rsrc()) {
     std::stringstream ss;
-    ss << std::setprecision(17) <<"new capacity " << cap
+    ss << std::setprecision(17) << "new capacity " << cap
        << " lower than existing quantity " << quantity();
     throw ValueError(ss.str());
   }
@@ -19,7 +20,7 @@ void ResourceBuff::set_capacity(double cap) {
 Manifest ResourceBuff::PopQty(double qty) {
   if (qty > quantity()) {
     std::stringstream ss;
-    ss << std::setprecision(17) <<"removal quantity " << qty
+    ss << std::setprecision(17) << "removal quantity " << qty
        << " larger than buff quantity " << quantity();
     throw ValueError(ss.str());
   }
@@ -53,7 +54,7 @@ Manifest ResourceBuff::PopQty(double qty) {
 Manifest ResourceBuff::PopQty(double qty, double eps) {
   if (qty > quantity() + eps) {
     std::stringstream ss;
-    ss << std::setprecision(17) <<"removal quantity " << qty
+    ss << std::setprecision(17) << "removal quantity " << qty
        << " larger than buff quantity " << quantity();
     throw ValueError(ss.str());
   }
