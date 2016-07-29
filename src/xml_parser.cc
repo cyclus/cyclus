@@ -40,9 +40,13 @@ void XMLParser::Init(const std::stringstream& xml_input_snippet) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLParser::Validate(const std::stringstream& xml_schema_snippet) {
+  std::cout << "creating validator\n";
   RelaxNGValidator validator;
+  std::cout << "parsing memory snippet " << xml_schema_snippet.str() << "\n";
   validator.parse_memory(xml_schema_snippet.str());
+  std::cout << "validating doc\n";
   validator.Validate(this->Document());
+  std::cout << "validated\n";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

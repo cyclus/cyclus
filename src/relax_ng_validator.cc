@@ -28,18 +28,27 @@ RelaxNGValidator::~RelaxNGValidator() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RelaxNGValidator::parse_context(xmlRelaxNGParserCtxtPtr context) {
+  std::cout << "releasing underlying\n";
   release_underlying();  // Free any existing info
+  std::cout << "going to parse\n";
   schema_ = xmlRelaxNGParse(context);
+  std::cout << "parsed schema_\n";
   if (!schema_) {
+    std::cout << "bad schema\n";
     throw ValidationError("Schema could not be parsed");
   }
+  std::cout << "returning from parse context\n";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RelaxNGValidator::parse_memory(const Glib::ustring& contents) {
+  std::cout << "validator contents " << contents.c_str() << "\n";
+  std::cout << "validator bytes " << contents.bytes() << "\n";
   xmlRelaxNGParserCtxtPtr context =
     xmlRelaxNGNewMemParserCtxt(contents.c_str(), contents.bytes());
+  std::cout << "made context\n";
   parse_context(context);
+  std::cout << "parsed context\n";
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

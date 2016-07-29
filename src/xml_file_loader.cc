@@ -175,15 +175,25 @@ std::string XMLFileLoader::master_schema() {
 }
 
 void XMLFileLoader::LoadSim() {
+  std::cout << "loading sim schema " << master_schema() << "\n";
   std::stringstream ss(master_schema());
+  std::cout << "validating schema\n";
   parser_->Validate(ss);
+  std::cout << "loading control params\n";
   LoadControlParams();  // must be first
+  std::cout << "loading solver\n";
   LoadSolver();
+  std::cout << "loading recipies\n";
   LoadRecipes();
+  std::cout << "loading specs\n";
   LoadSpecs();
+  std::cout << "loading agents\n";
   LoadInitialAgents();  // must be last
+  std::cout << "snapshotting\n";
   SimInit::Snapshot(ctx_);
+  std::cout << "flushing\n";
   rec_->Flush();
+  std::cout << "loaded!\n";
 }
 
 void XMLFileLoader::LoadSolver() {
@@ -223,9 +233,9 @@ void XMLFileLoader::LoadSolver() {
     if (qe->NMatches(config) == 1) {
       solver_name = qe->SubTree(config)->GetElementName(0);
     }
-    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders", 
+    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders",
                                             exclusive);
-    
+
     // @TODO remove this after release 1.5
     // check for deprecated input values
     if (qe->NMatches(std::string("exclusive_orders_only")) != 0) {
@@ -243,12 +253,12 @@ void XMLFileLoader::LoadSolver() {
        << " as intended with this feature turned off.";
     Warn<VALUE_WARNING>(ss.str());
   }
-  
+
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
       ->AddVal("ExclusiveOrders", exclusive)
-      ->Record();  
-  
+      ->Record();
+
   // now load the actual solver
   if (solver_name == greedy) {
     query = string("/*/control/solver/config/greedy/preconditioner");
