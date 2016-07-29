@@ -175,25 +175,15 @@ std::string XMLFileLoader::master_schema() {
 }
 
 void XMLFileLoader::LoadSim() {
-  std::cout << "loading sim schema " << master_schema() << "\n";
   std::stringstream ss(master_schema());
-  std::cout << "validating schema\n";
   parser_->Validate(ss);
-  std::cout << "loading control params\n";
   LoadControlParams();  // must be first
-  std::cout << "loading solver\n";
   LoadSolver();
-  std::cout << "loading recipies\n";
   LoadRecipes();
-  std::cout << "loading specs\n";
   LoadSpecs();
-  std::cout << "loading agents\n";
   LoadInitialAgents();  // must be last
-  std::cout << "snapshotting\n";
   SimInit::Snapshot(ctx_);
-  std::cout << "flushing\n";
   rec_->Flush();
-  std::cout << "loaded!\n";
 }
 
 void XMLFileLoader::LoadSolver() {

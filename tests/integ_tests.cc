@@ -42,34 +42,20 @@ std::string FullPath(std::string infile) {
 // storing the results in back.
 void RunSim(std::string infile, SqliteBack* back) {
   Recorder r;
-  std::cout << "starting runsim\n";
   r.RegisterBackend(back);
 
-  std::cout << "making fullpath" << infile << "\n";
   infile = FullPath(infile);
-  std::cout << "made fullpath" << infile << "\n";
   SimInit si;
-  std::cout << "initialized sim\n";
   if (IsFlatSchema(infile)) {
-    std::cout << "making flat schema\n";
     XMLFlatLoader l(&r, back, Env::rng_schema(true), infile);
-    std::cout << "made xml flat\n";
     l.LoadSim();
-    std::cout << "loaded sim\n";
   } else {
-    std::cout << "loadinf non-flat\n";
     XMLFileLoader l(&r, back, Env::rng_schema(false), infile);
-    std::cout << "made non-flat\n";
     l.LoadSim();
-    std::cout << "loaded sim\n";
   }
-  std::cout << "initing sim\n";
   si.Init(&r, back);
-  std::cout << "running timer\n";
   si.timer()->RunSim();
-  std::cout << "ran sim\n";
   r.Flush();
-  std::cout << "flushed\n";
 }
 
 TEST(IntegTests, RunAllInfiles) {
@@ -106,15 +92,10 @@ TEST(IntegTests, CustomTimestepDur) {
 
 TEST(IntegTests, CustomTimestepDurFlat) {
   {
-    std::cout << "starting test\n";
     SqliteBack back(":memory:");
-    std::cout << "made backend\n";
     RunSim("custom_dt_flat.xml", &back);
-    std::cout << "ran sim\n";
     QueryResult qr = back.Query("TimeStepDur", NULL);
-    std::cout << "got query\n";
     EXPECT_EQ(86400, qr.GetVal<int>("DurationSecs"));
-    std::cout << "ran test\n";
   }
 }
 
