@@ -328,7 +328,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         IMMEDIATE @ONLY
         )
 
-      ADD_CUSTOM_TARGET(uninstall
+    ADD_CUSTOM_TARGET(uninstall
         COMMAND "${CMAKE_COMMAND}" -P "\"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake\"")
 
     ##############################################################################################
@@ -370,19 +370,19 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("git HASH is: #${GIT_COMMIT_HASH}")
 
     # Names
-    set(CPACK_PACKAGE_NAME "cyclus")
+    SET(CPACK_PACKAGE_NAME "cyclus")
     SET(
       CPACK_PACKAGE_INSTALL_DIRECTORY
       "cyclus_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}"
       )
-    set(
+    SET(
       CPACK_PACKAGE_VERSION 
       "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${GIT_COMMIT_HASH}"
       )
 
     # Configuration
     SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     CONFIGURE_FILE(
       "${PROJECT_SOURCE_DIR}/cmake/CyclusCPackOptions.cmake.in"
       "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake" @ONLY
