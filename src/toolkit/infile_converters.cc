@@ -1,10 +1,11 @@
+#include "infile_converters.h"
+
 #include <sstream>
 
-#include <boost/shared_ptr.hpp>
 #include <libxml++/libxml++.h>
+#include <boost/shared_ptr.hpp>
 
 #include "error.h"
-#include "infile_converters.h"
 #include "infile_tree.h"
 #include "pyne.h"
 
@@ -30,11 +31,9 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
       if (!indent_child && node[name].isArray())
         indent_child = node[name][0].isObject() || node[name][0].isArray();
       ss << indent << "<" << name << ">";
-      if (indent_child)
-        ss << "\n";
+      if (indent_child) ss << "\n";
       AddJsonToXml(node[name], ss, name, newindent);
-      if (indent_child)
-        ss << indent;
+      if (indent_child) ss << indent;
       ss << "</" << name << ">\n";
     }
   } else if (node.isArray()) {
@@ -50,13 +49,11 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
       indent_child = node[n].isObject() || node[n].isArray();
       if (n > 0) {
         ss << indent << "<" << parent_name << ">";
-        if (indent_child)
-          ss << "\n";
+        if (indent_child) ss << "\n";
       }
       AddJsonToXml(node[n], ss, parent_name, newindent);
       if (n < nchildren - 1) {
-        if (indent_child)
-          ss << indent;
+        if (indent_child) ss << indent;
         ss << "</" << parent_name << ">\n";
       }
     }
@@ -89,7 +86,7 @@ std::string JsonToXml(std::string s) {
   Json::Reader reader;
   bool parsed = reader.parse(s, root, false);
   if (!parsed) {
-    string msg = "Failed to parse JSON file into XML:\n" + \
+    string msg = "Failed to parse JSON file into XML:\n" +
                  reader.getFormattedErrorMessages();
     throw ValidationError(msg);
   }
@@ -146,17 +143,17 @@ std::string XmlToJson(std::string s) {
   using std::string;
   using std::stringstream;
   using Json::Value;
-  stringstream ss (s);
-  boost::shared_ptr<XMLParser> parser = boost::shared_ptr<XMLParser>(
-                                                            new XMLParser());
+  stringstream ss(s);
+  boost::shared_ptr<XMLParser> parser =
+      boost::shared_ptr<XMLParser>(new XMLParser());
   parser->Init(ss);
   InfileTree xroot(*parser);
   Value jroot(Json::objectValue);
   string rootname = parser->Document()->get_root_node()->get_name();
   jroot[rootname] = Value(Json::objectValue);
   AddXmlToJson(&xroot, jroot[rootname], rootname);
-  Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
-                                                 ", ", " ", 80);
+  Json::CustomWriter writer =
+      Json::CustomWriter("{", "}", "[", "]", ": ", ", ", " ", 80);
   return writer.write(jroot);
 }
 
