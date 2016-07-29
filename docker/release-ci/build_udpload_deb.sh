@@ -8,9 +8,8 @@ fi
 sed -e s/XX/${1}/g Dockerfile_sample > Dockerfile
 
 rn Dockerfile && ln -s docker/release-ci/Dockerfile
-docker build -t deb/ubuntu-${1} .: # build cyclus against ubuntu 14.04 in the
 docker build -t deb/ubuntu-${1} .: # build cyclus against ubuntu 14.04 in the docker container
-docker create --name=deb-14.04 deb/ubuntu-${1} # build deb in docker
+docker create --name=deb-${1}.04 deb/ubuntu-${1} # build deb in docker
 docker cp deb-${1}.04:/cyclus/deb ./ # extract deb
 scp ./deb/cyclus-*-ubuntu.${1}.04.deb root@dory.fuelcycle.org:./cyclus-deb/ # push the deb on dory
 rm -rf deb  # clean the deb folder
