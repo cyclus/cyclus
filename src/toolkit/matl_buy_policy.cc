@@ -13,32 +13,29 @@
 namespace cyclus {
 namespace toolkit {
 
-MatlBuyPolicy::MatlBuyPolicy() :
-    Trader(NULL),
-    name_(""),
-    throughput_(std::numeric_limits<double>::max()),
-    quantize_(-1),
-    fill_to_(1),
-    req_when_under_(1) {
+MatlBuyPolicy::MatlBuyPolicy()
+    : Trader(NULL),
+      name_(""),
+      throughput_(std::numeric_limits<double>::max()),
+      quantize_(-1),
+      fill_to_(1),
+      req_when_under_(1) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
 
 MatlBuyPolicy::~MatlBuyPolicy() {
-  if (manager() != NULL) 
-    manager()->context()->UnregisterTrader(this);
+  if (manager() != NULL) manager()->context()->UnregisterTrader(this);
 }
 
 void MatlBuyPolicy::set_fill_to(double x) {
-  if (x > 1)
-    x /= buf_->capacity();
+  if (x > 1) x /= buf_->capacity();
   assert(x > 0 && x <= 1.);
   fill_to_ = x;
 }
 
 void MatlBuyPolicy::set_req_when_under(double x) {
-  if (x > 1)
-    x /= buf_->capacity();
+  if (x > 1) x /= buf_->capacity();
   assert(x > 0 && x <= 1.);
   req_when_under_ = x;
 }
@@ -71,8 +68,8 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name,
-                                   double fill_to, double req_when_under) {
+                                   std::string name, double fill_to,
+                                   double req_when_under) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
@@ -137,8 +134,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt = TotalQty();
-  if (!make_req || amt < eps())
-    return ports;
+  if (!make_req || amt < eps()) return ports;
 
   bool excl = Excl();
   double req_amt = ReqQty();
@@ -168,7 +164,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     }
     ports.insert(port);
   }
-  
+
   return ports;
 }
 
