@@ -19,10 +19,8 @@ namespace toolkit {
 class CommodityRecipeContext : public StateWrangler {
  public:
   /// @brief add an input commodity and its relations
-  void AddInCommod(std::string in_commod,
-                   std::string in_recipe,
-                   std::string out_commod,
-                   std::string out_recipe);
+  void AddInCommod(std::string in_commod, std::string in_recipe,
+                   std::string out_commod, std::string out_recipe);
 
   /// @brief add a resource and its commodity affiliation
   void AddRsrc(std::string commod, Resource::Ptr rsrc);
@@ -37,9 +35,7 @@ class CommodityRecipeContext : public StateWrangler {
   void UpdateInRec(std::string in_commod, std::string recipe);
 
   /// @return input commodities
-  inline const std::set<std::string>& in_commods() const {
-    return in_commods_;
-  }
+  inline const std::set<std::string>& in_commods() const { return in_commods_; }
 
   /// @return output commodities
   inline const std::set<std::string>& out_commods() const {
@@ -68,12 +64,12 @@ class CommodityRecipeContext : public StateWrangler {
   }
 
   inline bool operator==(const CommodityRecipeContext& other) const {
-    return (in_commods_.size() == other.in_commods_.size()
-            && out_commods_.size() == other.out_commods_.size()
-            && map_compare(out_commod_map_, other.out_commod_map_)
-            && map_compare(in_recipes_, other.in_recipes_)
-            && map_compare(out_recipes_, other.out_recipes_)
-            && map_compare(rsrc_commod_map_, other.rsrc_commod_map_));
+    return (in_commods_.size() == other.in_commods_.size() &&
+            out_commods_.size() == other.out_commods_.size() &&
+            map_compare(out_commod_map_, other.out_commod_map_) &&
+            map_compare(in_recipes_, other.in_recipes_) &&
+            map_compare(out_recipes_, other.out_recipes_) &&
+            map_compare(rsrc_commod_map_, other.rsrc_commod_map_));
   }
 
   inline bool operator!=(const CommodityRecipeContext& other) const {
