@@ -1,13 +1,13 @@
 #ifndef CYCLUS_SRC_TOOLKIT_SUPPLY_DEMAND_MANAGER_H_
 #define CYCLUS_SRC_TOOLKIT_SUPPLY_DEMAND_MANAGER_H_
 
+#include <map>
+#include <set>
+
 #include "agent_managed.h"
 #include "commodity.h"
 #include "commodity_producer_manager.h"
 #include "symbolic_functions.h"
-
-#include <map>
-#include <set>
 
 namespace cyclus {
 namespace toolkit {
@@ -29,8 +29,7 @@ class SupplyDemandManager : public AgentManaged {
   /// necessary information.
   /// @param commodity the commodity
   /// @param demand a smart pointer to the demand function
-  inline void RegisterCommodity(Commodity& commodity,
-                                SymFunction::Ptr demand) {
+  inline void RegisterCommodity(Commodity& commodity, SymFunction::Ptr demand) {
     demand_functions_.insert(std::make_pair(commodity, demand));
   }
 
