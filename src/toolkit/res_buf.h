@@ -10,10 +10,10 @@
 #include "cyc_arithmetic.h"
 #include "cyc_limits.h"
 #include "error.h"
-#include "product.h"
 #include "material.h"
-#include "resource.h"
+#include "product.h"
 #include "res_manip.h"
+#include "resource.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -61,7 +61,7 @@ typedef std::vector<Product::Ptr> ProdVec;
 template <class T>
 class ResBuf {
  public:
-  ResBuf() : cap_(INFINITY), qty_(0) { }
+  ResBuf() : cap_(INFINITY), qty_(0) {}
 
   virtual ~ResBuf() {}
 
