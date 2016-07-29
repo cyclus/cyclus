@@ -1,15 +1,14 @@
 #ifndef CYCLUS_SRC_TOOLKIT_SYMBOLIC_FUNCTION_FACTORIES_H_
 #define CYCLUS_SRC_TOOLKIT_SYMBOLIC_FUNCTION_FACTORIES_H_
 
-#include <string>
 #include <map>
 #include <sstream>
+#include <string>
 
 #include "symbolic_functions.h"
 
 namespace cyclus {
 namespace toolkit {
-
 
 /// An abstract factory for pointers to symbolic functions
 class SymbFunctionFactory {
@@ -98,7 +97,7 @@ class BasicFunctionFactory {
     LIN,
     /// See cyclus::toolkit::ExpFunctionFactory for a description of function
     /// parameters
-    EXP  
+    EXP
   };
 
   /// Constructor sets up the enum names map
