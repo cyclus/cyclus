@@ -28,11 +28,12 @@ void RecordTimeSeries(cyclus::Agent* agent, double value);
 template <typename T>
 void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
   std::string tblname = "TimeSeries" + tsname;
-  agent->context()->NewDatum(tblname)
-       ->AddVal("AgentId", agent->id())
-       ->AddVal("Time", agent->context()->time())
-       ->AddVal("Value", value)
-       ->Record();
+  agent->context()
+      ->NewDatum(tblname)
+      ->AddVal("AgentId", agent->id())
+      ->AddVal("Time", agent->context()->time())
+      ->AddVal("Value", value)
+      ->Record();
 }
 
 }  // namespace toolkit
