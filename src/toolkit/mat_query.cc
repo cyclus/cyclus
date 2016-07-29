@@ -1,20 +1,17 @@
 #include "mat_query.h"
-#include "pyne.h"
 
 #include <cmath>
+
+#include "pyne.h"
 
 namespace cyclus {
 namespace toolkit {
 
 MatQuery::MatQuery(Material::Ptr m) : m_(m) {}
 
-double MatQuery::qty() {
-  return m_->quantity();
-}
+double MatQuery::qty() { return m_->quantity(); }
 
-double MatQuery::mass(Nuc nuc) {
-  return mass_frac(nuc) * qty();
-}
+double MatQuery::mass(Nuc nuc) { return mass_frac(nuc) * qty(); }
 
 double MatQuery::moles(Nuc nuc) {
   return mass(nuc) / (pyne::atomic_mass(nuc) * units::g);
@@ -28,11 +25,11 @@ double MatQuery::mass_frac(Nuc nuc) {
 
 double MatQuery::mass_frac(std::set<Nuc> nucs) {
   double m_tot = 0;
-  std::set<Nuc>::iterator it ;
+  std::set<Nuc>::iterator it;
   for (it = nucs.begin(); it != nucs.end(); ++it) {
     m_tot += mass(*it);
   }
-  return m_tot/qty(); 
+  return m_tot / qty();
 }
 
 double MatQuery::atom_frac(Nuc nuc) {
@@ -41,9 +38,7 @@ double MatQuery::atom_frac(Nuc nuc) {
   return v[nuc];
 }
 
-double MatQuery::mass(std::string nuc) {
-  return mass(pyne::nucname::id(nuc));
-}
+double MatQuery::mass(std::string nuc) { return mass(pyne::nucname::id(nuc)); }
 
 double MatQuery::moles(std::string nuc) {
   return moles(pyne::nucname::id(nuc));
