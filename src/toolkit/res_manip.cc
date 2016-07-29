@@ -1,4 +1,5 @@
 #include "res_manip.h"
+
 #include "comp_math.h"
 
 namespace cyclus {
@@ -44,7 +45,7 @@ Resource::Ptr Squash(std::vector<Resource::Ptr> rs) {
 
   throw Error("cannot squash resource type " + rs[0]->type());
 }
-  
+
 std::vector<Resource::Ptr> ResCast(std::vector<Material::Ptr> rs) {
   std::vector<Resource::Ptr> casted;
   for (int i = 0; i < rs.size(); ++i) {
@@ -61,10 +62,7 @@ std::vector<Resource::Ptr> ResCast(std::vector<Product::Ptr> rs) {
   return casted;
 }
 
-std::vector<Resource::Ptr> ResCast(std::vector<Resource::Ptr> rs) {
-  return rs;
-}
+std::vector<Resource::Ptr> ResCast(std::vector<Resource::Ptr> rs) { return rs; }
 
 }  // namespace toolkit
 }  // namespace cyclus
-

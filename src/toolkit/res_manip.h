@@ -2,8 +2,8 @@
 #define CYCLUS_SRC_TOOLKIT_RES_MANIP_H_
 
 #include "material.h"
-#include "resource.h"
 #include "product.h"
+#include "resource.h"
 
 namespace cyclus {
 namespace toolkit {
