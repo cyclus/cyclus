@@ -5,16 +5,15 @@
 #include <set>
 
 #include "agent_managed.h"
-#include "cyc_limits.h"
 #include "commodity.h"
+#include "cyc_limits.h"
 
 namespace cyclus {
 namespace toolkit {
 
 /// A container to hold information about a commodity
 struct CommodInfo {
-  CommodInfo(double default_capacity = 0,
-             double default_cost = kModifierLimit);
+  CommodInfo(double default_capacity = 0, double default_cost = kModifierLimit);
   double capacity;
   double cost;
 };
@@ -23,8 +22,7 @@ struct CommodInfo {
 class CommodityProducer : public AgentManaged {
  public:
   CommodityProducer(double default_capacity = 0,
-                    double default_cost = kModifierLimit,
-                    Agent* agent = NULL);
+                    double default_cost = kModifierLimit, Agent* agent = NULL);
   virtual ~CommodityProducer();
 
   /// @param commodity the commodity in question
@@ -75,9 +73,7 @@ class CommodityProducer : public AgentManaged {
 
   /// Unregister a commodity as being produced by this object
   /// @param commodity the commodity being produced
-  inline void Rm(const Commodity& commodity) {
-    commodities_.erase(commodity);
-  }
+  inline void Rm(const Commodity& commodity) { commodities_.erase(commodity); }
 
   /// @return the set of commodities produced by this producers
   std::set<Commodity, CommodityCompare> ProducedCommodities();

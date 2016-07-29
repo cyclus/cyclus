@@ -4,12 +4,10 @@ namespace cyclus {
 namespace toolkit {
 
 CommodInfo::CommodInfo(double default_capacity, double default_cost)
-    : capacity(default_capacity),
-      cost(default_cost) {}
+    : capacity(default_capacity), cost(default_cost) {}
 
 CommodityProducer::CommodityProducer(double default_capacity,
-                                     double default_cost,
-                                     Agent* agent)
+                                     double default_cost, Agent* agent)
     : AgentManaged(agent),
       default_capacity_(default_capacity),
       default_cost_(default_cost) {}
