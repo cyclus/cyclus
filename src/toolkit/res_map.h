@@ -10,10 +10,10 @@
 #include "cyc_arithmetic.h"
 #include "cyc_limits.h"
 #include "error.h"
-#include "product.h"
 #include "material.h"
-#include "resource.h"
+#include "product.h"
 #include "res_manip.h"
+#include "resource.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -41,8 +41,9 @@ template <class K, class R>
 class ResMap {
  public:
   ResMap() : dirty_quantity_(true), quantity_(0) {
-    Warn<EXPERIMENTAL_WARNING>("ResMap is experimental and its API may be "
-                               "subject to change");
+    Warn<EXPERIMENTAL_WARNING>(
+        "ResMap is experimental and its API may be "
+        "subject to change");
   }
 
   virtual ~ResMap() {}
@@ -64,8 +65,7 @@ class ResMap {
 
   /// Returns the total quantity of resources in the map.
   inline double quantity() {
-    if (dirty_quantity_)
-      UpdateQuantity();
+    if (dirty_quantity_) UpdateQuantity();
     return quantity_;
   };
 
@@ -153,14 +153,14 @@ class ResMap {
   };
 
   //
-  // Non-std::map interface 
+  // Non-std::map interface
   //
 
   /// Returns a vector of the values in the map
   std::vector<typename R::Ptr> Values() {
     int i = 0;
     int n = resources_.size();
-    std::vector<typename R::Ptr> vals (n);
+    std::vector<typename R::Ptr> vals(n);
     iterator it = resources_.begin();
     while (it != resources_.end()) {
       vals[i] = it->second;
@@ -210,7 +210,7 @@ class ResMap {
     dirty_quantity_ = true;
     return val;
   }
-  
+
  private:
   /// Recomputes the internal quantity variable.
   void UpdateQuantity() {
@@ -221,7 +221,7 @@ class ResMap {
     if (n == 0) {
       quantity_ = 0.0;
     } else {
-      vector<double> qtys (n, 0.0);
+      vector<double> qtys(n, 0.0);
       while (it != resources_.end()) {
         qtys[i] = (*(it->second)).quantity();
         ++i;
@@ -241,7 +241,7 @@ class ResMap {
   /// Underlying container
   map_type resources_;
 
-  /// Object ID mapping, primarily used for restart, 
+  /// Object ID mapping, primarily used for restart,
   obj_type obj_ids_;
 };
 
