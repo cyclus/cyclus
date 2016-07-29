@@ -11,19 +11,18 @@
 namespace cyclus {
 namespace toolkit {
 
-MatlSellPolicy::MatlSellPolicy() :
-    Trader(NULL),
-    name_(""),
-    quantize_(-1),
-    throughput_(std::numeric_limits<double>::max()),
-    ignore_comp_(false) {
+MatlSellPolicy::MatlSellPolicy()
+    : Trader(NULL),
+      name_(""),
+      quantize_(-1),
+      throughput_(std::numeric_limits<double>::max()),
+      ignore_comp_(false) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlSellPolicy is experimental and its API may be subject to change");
 }
 
 MatlSellPolicy::~MatlSellPolicy() {
-  if (manager() != NULL)
-    manager()->context()->UnregisterTrader(this);
+  if (manager() != NULL) manager()->context()->UnregisterTrader(this);
 }
 
 void MatlSellPolicy::set_quantize(double x) {
@@ -36,9 +35,7 @@ void MatlSellPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
-void MatlSellPolicy::set_ignore_comp(bool x) {
-  ignore_comp_ = x;
-}
+void MatlSellPolicy::set_ignore_comp(bool x) { ignore_comp_ = x; }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name) {
@@ -112,19 +109,18 @@ void MatlSellPolicy::Stop() {
   manager()->context()->UnregisterTrader(this);
 }
 
-
 double MatlSellPolicy::Limit() const {
   double bcap = buf_->quantity();
-  double limit = Excl() ?                                               \
-                 quantize_ * static_cast<int>(std::floor(bcap / quantize_)) : bcap;
+  double limit =
+      Excl() ? quantize_ * static_cast<int>(std::floor(bcap / quantize_))
+             : bcap;
   return std::min(throughput_, limit);
 }
 
 std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     CommodMap<Material>::type& commod_requests) {
   std::set<BidPortfolio<Material>::Ptr> ports;
-  if (buf_->empty() || buf_->quantity() < eps())
-    return ports;
+  if (buf_->empty() || buf_->quantity() < eps()) return ports;
 
   BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
 
@@ -133,7 +129,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   port->AddConstraint(cc);
   ports.insert(port);
   LGH(INFO3) << "bidding out " << limit << " kg";
-  
+
   bool excl = Excl();
   std::string commod;
   Request<Material>* req;
@@ -144,8 +140,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   std::vector<Request<Material>*>::const_iterator rit;
   for (sit = commods_.begin(); sit != commods_.end(); ++sit) {
     commod = *sit;
-    if (commod_requests.count(commod) < 1)
-      continue;
+    if (commod_requests.count(commod) < 1) continue;
 
     const std::vector<Request<Material>*>& requests =
         commod_requests.at(commod);
@@ -157,9 +152,9 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       for (int i = 0; i < nbids; i++) {
         m = buf_->Pop();
         buf_->Push(m);
-        offer = ignore_comp_ ? \
-                Material::CreateUntracked(qty, req->target()->comp()) : \
-                Material::CreateUntracked(qty, m->comp());
+        offer = ignore_comp_
+                    ? Material::CreateUntracked(qty, req->target()->comp())
+                    : Material::CreateUntracked(qty, m->comp());
         port->AddBid(req, offer, this, excl);
         LG(INFO3) << "  - bid " << qty << " kg on a request for " << commod;
       }
@@ -177,8 +172,7 @@ void MatlSellPolicy::GetMatlTrades(
     double qty = it->amt;
     LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
     Material::Ptr mat = buf_->Pop(qty, buf_->quantity() * 1e-12);
-    if (ignore_comp_)
-      mat->Transmute(it->request->target()->comp());
+    if (ignore_comp_) mat->Transmute(it->request->target()->comp());
     responses.push_back(std::make_pair(*it, mat));
   }
 }
