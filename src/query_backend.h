@@ -8,9 +8,9 @@
 
 #include <boost/uuid/sha1.hpp>
 
+#include "any.hpp"
 #include "blob.h"
 #include "rec_backend.h"
-#include "any.hpp"
 
 #define CYCLUS_UUID_SIZE 16
 #define CYCLUS_SHA1_SIZE 20
@@ -299,9 +299,7 @@ class Cond {
   Cond() {}
 
   Cond(std::string field, std::string op, boost::spirit::hold_any val)
-      : field(field),
-        op(op),
-        val(val) {
+      : field(field), op(op), val(val) {
     if (op == "<")
       opcode = LT;
     else if (op == ">")
@@ -315,8 +313,8 @@ class Cond {
     else if (op == "!=")
       opcode = NE;
     else
-      throw ValueError("operation '" + op + "' not valid for field '" + \
-                       field + "'.");
+      throw ValueError("operation '" + op + "' not valid for field '" + field +
+                       "'.");
   }
 
   /// table column name
@@ -373,8 +371,8 @@ class QueryResult {
       throw StateError("No rows found during query for field " + field);
 
     if (row >= rows.size()) {
-      throw KeyError("index larger than number of query rows for field "
-                     + field);
+      throw KeyError("index larger than number of query rows for field " +
+                     field);
     }
 
     int field_idx = -1;
@@ -401,7 +399,7 @@ class QueryableBackend {
   /// conditions.  Conditions are AND'd together.  conds may be NULL.
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) = 0;
 
-  /// Return a map of column names of the specified table to the associated 
+  /// Return a map of column names of the specified table to the associated
   /// database type.
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) = 0;
 
@@ -410,18 +408,17 @@ class QueryableBackend {
 };
 
 /// Interface implemented by backends that support recording and querying.
-class FullBackend: public QueryableBackend, public RecBackend {
+class FullBackend : public QueryableBackend, public RecBackend {
  public:
   virtual ~FullBackend() {}
 };
 
 /// Wrapper class for QueryableBackends that injects a set of Cond's into every
 /// query before being executed.
-class CondInjector: public QueryableBackend {
+class CondInjector : public QueryableBackend {
  public:
   CondInjector(QueryableBackend* b, std::vector<Cond> to_inject)
-      : b_(b),
-        to_inject_(to_inject) {}
+      : b_(b), to_inject_(to_inject) {}
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
     if (conds == NULL) {
@@ -450,11 +447,10 @@ class CondInjector: public QueryableBackend {
 /// title/table for every query before being executed.  A query to the
 /// "MyAgentTable" table will actually be passed to the wrapped backend as
 /// [prefix] + "MyAgentTable".
-class PrefixInjector: public QueryableBackend {
+class PrefixInjector : public QueryableBackend {
  public:
   PrefixInjector(QueryableBackend* b, std::string prefix)
-      : b_(b),
-        prefix_(prefix) {}
+      : b_(b), prefix_(prefix) {}
 
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds) {
     return b_->Query(prefix_ + table, conds);
@@ -509,8 +505,7 @@ template <typename T>
 inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
   int i;
   for (i = 0; i < conds->size(); ++i)
-    if (!CmpCond<T>(&(*x), (*conds)[i]))
-      return false;
+    if (!CmpCond<T>(&(*x), (*conds)[i])) return false;
   return true;
 }
 
@@ -545,11 +540,11 @@ class Digest {
 
   // operators
   inline std::ostream& operator<<(std::ostream& out) const {
-    return out << "[" << val[0] << ", " << val[1] << ", " <<  val[2] << \
-                  ", " << val[3] << ", " << val[4] << "]";
+    return out << "[" << val[0] << ", " << val[1] << ", " << val[2] << ", "
+               << val[3] << ", " << val[4] << "]";
   }
 
-  inline bool operator< (const cyclus::Digest& rhs) const {
+  inline bool operator<(const cyclus::Digest& rhs) const {
     bool rtn = false;
     for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
       if (val[i] < rhs.val[i]) {
@@ -563,7 +558,7 @@ class Digest {
     return rtn;
   }
 
-  inline bool operator> (const cyclus::Digest& rhs) const {
+  inline bool operator>(const cyclus::Digest& rhs) const {
     return !operator<(rhs) && !operator==(rhs);
   }
 
@@ -625,26 +620,22 @@ class Sha1 {
 
   inline void Update(const std::set<int>& x) {
     std::set<int>::iterator it = x.begin();
-    for (; it != x.end(); ++it)
-      hash_.process_bytes(&(*it), sizeof(int));
+    for (; it != x.end(); ++it) hash_.process_bytes(&(*it), sizeof(int));
   }
 
   inline void Update(const std::set<std::string>& x) {
     std::set<std::string>::iterator it = x.begin();
-    for (; it != x.end(); ++it)
-      hash_.process_bytes(it->c_str(), it->size());
+    for (; it != x.end(); ++it) hash_.process_bytes(it->c_str(), it->size());
   }
 
   inline void Update(const std::list<int>& x) {
     std::list<int>::const_iterator it = x.begin();
-    for (; it != x.end(); ++it)
-      hash_.process_bytes(&(*it), sizeof(int));
+    for (; it != x.end(); ++it) hash_.process_bytes(&(*it), sizeof(int));
   }
 
   inline void Update(const std::list<std::string>& x) {
     std::list<std::string>::const_iterator it = x.begin();
-    for (; it != x.end(); ++it)
-      hash_.process_bytes(it->c_str(), it->size());
+    for (; it != x.end(); ++it) hash_.process_bytes(it->c_str(), it->size());
   }
 
   inline void Update(const std::pair<int, int>& x) {
@@ -706,7 +697,8 @@ class Sha1 {
   }
 
   inline void Update(const std::map<std::pair<int, std::string>, double>& x) {
-    std::map<std::pair<int, std::string>, double>::const_iterator it = x.begin();
+    std::map<std::pair<int, std::string>, double>::const_iterator it =
+        x.begin();
     for (; it != x.end(); ++it) {
       hash_.process_bytes(&(it->first.first), sizeof(int));
       hash_.process_bytes(it->first.second.c_str(), it->first.second.size());
