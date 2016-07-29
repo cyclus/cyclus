@@ -29,10 +29,10 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
         <element name="explicit_inventory_compact"> <data type="boolean"/> </element>
       </optional>
       <optional>
-          <element name="eps"><data type="double"/></element>
+          <element name="tolerance_generic"><data type="double"/></element>
       </optional>
       <optional>
-          <element name="eps_rsrc"><data type="double"/></element>
+          <element name="tolerance_resource"><data type="double"/></element>
       </optional>
       <optional>
         <element name="solver"> 

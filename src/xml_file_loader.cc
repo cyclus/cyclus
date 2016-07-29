@@ -428,11 +428,11 @@ void XMLFileLoader::LoadControlParams() {
   si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
   
   // get epsilon
-  double eps_ = OptionalQuery<double>(qe, "eps", 1e-6);
+  double eps_ = OptionalQuery<double>(qe, "tolerance_generic", 1e-6);
   cy_eps = si.eps = eps_;
 
   // get epsilon resources
-  double eps_rsrc_ = OptionalQuery<double>(qe, "eps_rsrc", 1e-6);
+  double eps_rsrc_ = OptionalQuery<double>(qe, "tolerance_resource", 1e-6);
   cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
 
 
