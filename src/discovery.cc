@@ -87,15 +87,10 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
   boost::system::error_code errc;
   boost::system::error_code no_err;
   pth = d;
-  //fs::recursive_directory_iterator it(d, errc);
   fs::recursive_directory_iterator it(pth, errc);
   fs::recursive_directory_iterator last;
-  //if (errc != no_err || !fs::is_directory(it->path(), errc)) {
-  //  return specs;
-  //}
   for (; it != last; it.increment(errc)) {
     if (errc != no_err) {
-      //it.no_push();
       if (it.level() > 0) {
         it.pop();
       }
@@ -124,7 +119,7 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     lib = lib.substr(3, lib.rfind(".") - 3);  // remove 'lib' prefix and suffix
     try {
       libspecs = DiscoverSpecs(p, lib);
-    } catch (cyclus::IOError& e) { }
+    } catch (cyclus::IOError& e) {}
     for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls) {
       specs.insert(*ls);
     }
