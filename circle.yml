@@ -9,7 +9,7 @@ dependencies:
 test:
   override:
     - docker run cyclus/cyclus:latest cyclus_unit_tests
-    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
+#    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
 
 deployment:
   develop:
@@ -25,6 +25,11 @@ deployment:
       # Update cyclus/cylus:stable docker container
       - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
       - docker push cyclus/cyclus:stable # push to docker depot
+  
+    
+  ci-testing:
+    branch: ci-testing
+    commands:
         ## DEB GENERATION
           #ubuntu 14.04
       - docker/release-ci/build_udpload_deb.sh 14 :

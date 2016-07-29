@@ -6,6 +6,8 @@ fi
 
 
 sed -e s/XX/${1}/g docker/release-ci/Dockerfile_sample > Dockerfile
+sed -e s/HASH/`git rev-parse --short HEAD`/g docker/release-ci/Dockerfile > Dockerfile
+
 docker build -t deb/ubuntu-${1} . # build cyclus against ubuntu 14.04 in the docker container
 docker create --name=deb-${1}.04 deb/ubuntu-${1} # build deb in docker
 docker cp deb-${1}.04:/cyclus/deb ./ # extract deb
