@@ -61,9 +61,7 @@ class ExponentialFunction : public SymFunction {
   /// @param e the exponent multiplier
   /// @param i the intercept, with the default being 0
   ExponentialFunction(double c, double e, double i = 0.0)
-      : constant_(c),
-        exponent_(e),
-        intercept_(i) {}
+      : constant_(c), exponent_(e), intercept_(i) {}
 
   /// Evaluation for a double argument
   virtual double value(double x);
@@ -89,9 +87,7 @@ class PiecewiseFunction : public SymFunction {
   struct PiecewiseFunctionInfo {
     PiecewiseFunctionInfo(SymFunction::Ptr function_, double xoff_ = 0,
                           double yoff_ = 0)
-        : function(function_),
-          xoffset(xoff_),
-          yoffset(yoff_) {}
+        : function(function_), xoffset(xoff_), yoffset(yoff_) {}
 
     SymFunction::Ptr function;
     double xoffset, yoffset;

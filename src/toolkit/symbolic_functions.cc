@@ -1,7 +1,8 @@
 #include "symbolic_functions.h"
 
-#include <limits>
 #include <math.h>
+
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -9,9 +10,7 @@ namespace cyclus {
 namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double LinearFunction::value(double x) {
-  return slope_ * x + intercept_;
-}
+double LinearFunction::value(double x) { return slope_ * x + intercept_; }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string LinearFunction::Print() {
@@ -28,8 +27,8 @@ double ExponentialFunction::value(double x) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string ExponentialFunction::Print() {
   std::stringstream ss("");
-  ss << "y = " << constant_
-     << " * exp(" << exponent_ << " * x) + " << intercept_;
+  ss << "y = " << constant_ << " * exp(" << exponent_ << " * x) + "
+     << intercept_;
   return ss.str();
 }
 
@@ -55,9 +54,8 @@ std::string PiecewiseFunction::Print() {
   ss << "Piecewise Function comprised of: ";
   std::list<PiecewiseFunctionInfo>::iterator f;
   for (f = functions_.begin(); f != functions_.end(); f++) {
-    ss << " * " << f->function->Print()
-       << " starting at coordinate (" << f->xoffset << ","
-       << f->yoffset << ")";
+    ss << " * " << f->function->Print() << " starting at coordinate ("
+       << f->xoffset << "," << f->yoffset << ")";
   }
   return ss.str();
 }
