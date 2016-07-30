@@ -223,9 +223,9 @@ void XMLFileLoader::LoadSolver() {
     if (qe->NMatches(config) == 1) {
       solver_name = qe->SubTree(config)->GetElementName(0);
     }
-    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders", 
+    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders",
                                             exclusive);
-    
+
     // @TODO remove this after release 1.5
     // check for deprecated input values
     if (qe->NMatches(std::string("exclusive_orders_only")) != 0) {
@@ -243,12 +243,12 @@ void XMLFileLoader::LoadSolver() {
        << " as intended with this feature turned off.";
     Warn<VALUE_WARNING>(ss.str());
   }
-  
+
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
       ->AddVal("ExclusiveOrders", exclusive)
-      ->Record();  
-  
+      ->Record();
+
   // now load the actual solver
   if (solver_name == greedy) {
     query = string("/*/control/solver/config/greedy/preconditioner");
