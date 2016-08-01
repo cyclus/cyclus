@@ -5,8 +5,8 @@ if [ $# -ne 1 ]; then
 fi
 
 rm Dockerfile
-sed -e s/XX/${1}/g docker/release-ci/Dockerfile_sample > Dockerfile__
-sed -e s/HASH/`git rev-parse --short HEAD`/g Dockerfile__ > Dockerfile
+sed -e s/CYCLUS_UBUNTU_MAJOR_VERSION/${1}/g docker/release-ci/Dockerfile_sample > Dockerfile__
+sed -e s/CYCLUS_REPO_HASH/`git rev-parse --short HEAD`/g Dockerfile__ > Dockerfile
 rm Dockerfile__
 
 docker build -t deb/ubuntu-${1} . # build cyclus against ubuntu 14.04 in the docker container

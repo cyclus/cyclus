@@ -1,4 +1,4 @@
-FROM ubuntu:XX.04
+FROM ubuntu:CYCLUS_UBUNTU_MAJOR_VERSION.04
 
 RUN echo "1"
 
@@ -33,5 +33,5 @@ COPY . /cyclus
 WORKDIR cyclus
 RUN mkdir -p deb
 WORKDIR /cyclus/deb
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCPACK_SYSTEM_NAME=HASH-ubuntu.XX.04 ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCPACK_HASH_NAME=CYCLUS_REPO_HASH --DCPACK_SYSTEM_NAME=ubuntu.CYCLUS_UBUNTU_MAJOR_VERSION.04 ..
 RUN cpack -v ..
