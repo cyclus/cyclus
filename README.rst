@@ -39,13 +39,7 @@ Quick Cyclus Installation
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
-
-To install Cyclus locally (in ``~/.local/``) just run:
-
-.. code-block:: bash
-
-    .../cyclus/cyclus$ python install.py
-
+To install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
 Finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
 **bottom** on your ``$PATH``.
 
