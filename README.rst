@@ -39,7 +39,9 @@ Quick Cyclus Installation
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
+
 To install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
+
 Finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
 **bottom** on your ``$PATH``.
 
@@ -68,7 +70,7 @@ file `input.xml`, you can run Cyclus via:
 
     $ cyclus path/to/input.xml
 
-For a more detailed explanation, checkout the user guide.
+For a more detailed explanation, checkout the `Cyclus User Guide`_.
 
 .. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
