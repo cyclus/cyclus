@@ -62,6 +62,7 @@ Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
 
 To install Cyclus locALLY (IN ``~/.local/``) just run:
+
 .. code-block:: bash
 
     .../cyclus/cyclus$ python install.py
