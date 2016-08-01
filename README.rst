@@ -39,7 +39,8 @@ Package                Minimum Version
 ====================   ==================
 
 Other installation method and detailed installation procedure
-can be found in `INSTALL`_ or on the `Cyclus website`_.
+can be found in `INSTALL`_ or on the `Cyclus
+Website <http://fuelcycle.org/user/index.html>`_.
 
 
 Quick Cyclus Installation
@@ -49,6 +50,7 @@ Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
 
 To install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
+from cyclus folder.
 
 Finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
 **bottom** on your ``$PATH``.
@@ -85,7 +87,6 @@ For a more detailed explanation, checkout the `Cyclus User Guide`_.
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
-.. _`Cyclus website`: http://fuelcycle.org/user/install.html
 .. _`INSTALL`: INSTALL.rst
 .. _`CONTRIBUTING`: CONTRIBUTING.rst
 
