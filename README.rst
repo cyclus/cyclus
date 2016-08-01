@@ -30,32 +30,11 @@ Package                Minimum Version
 `Coin-Cbc`             2.5
 ====================   ==================
 
-On some platforms, (i.e. Ubuntu 14.04):
-
-====================   ==================
-`g++`                  4.8.2
-`libblas-dev`          1.2
-`liblapack-dev`        3.5.0
-====================   ==================
-
-
-And a few optional dependencies:
-
-====================   ==================
-Package                Minimum Version
-====================   ==================
-doxygen (for docs)     1.7.6.1
-tcmalloc (for speed)   any?
-====================   ==================
-
-*Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
-by our build system.  Instead use `libgoogle-perftools-dev`.*
-
 Other installation method and detailed installation procedure
 can be found in `INSTALL`_ or on the `Cyclus website`_.
 
 
-Installing Cyclus (Linux, Unix, and Mac OSX)
+Quick Cyclus Installation
 =============================================
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
@@ -70,8 +49,8 @@ To install Cyclus locally (in ``~/.local/``) just run:
 Finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
 **bottom** on your ``$PATH``.
 
-For more detailled installation procedure, and/or custom installation please
-refer to the `INSTALLATION guide <INSTALL.rst>`_ (also availale on `Cyclus
+For more detailed installation procedure, and/or custom installation please
+refer to the `INSTALLATION guide <INSTALL.rst>`_ (also available on `Cyclus
 Website <http://fuelcycle.org/user/index.html>`_)
 
 Running Tests
