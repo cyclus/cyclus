@@ -12,6 +12,9 @@
 
 namespace cyclus {
 
+double cy_eps = 1e-6;
+double cy_eps_rsrc = 1e-6;
+
 SimInfo::SimInfo()
     : duration(0),
       y0(0),
@@ -204,6 +207,11 @@ void Context::InitSim(SimInfo si) {
   // be removed.
   NewDatum("TimeStepDur")
       ->AddVal("DurationSecs", static_cast<int>(si.dt))
+      ->Record();
+  
+  NewDatum("Epsilon")
+      ->AddVal("GenericEpsilon", si.eps)
+      ->AddVal("ResourceEpsilon", si.eps_rsrc)
       ->Record();
 
   NewDatum("XMLPPInfo")

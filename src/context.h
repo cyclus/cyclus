@@ -98,6 +98,12 @@ class SimInfo {
   /// Duration in seconds of a single time step in the simulation.
   uint64_t dt;
 
+  /// Epsilon in the simulation.
+  double eps;
+  
+  /// Epsilon for resources in the simulation.
+  double eps_rsrc;
+  
   /// True if per-agent inventories should be explicitly queried/recorded
   /// every time step in a table (i.e. agent ID, Time, Nuclide, Quantity).
   bool explicit_inventory;
