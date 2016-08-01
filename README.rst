@@ -51,21 +51,8 @@ tcmalloc (for speed)   any?
 *Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
 by our build system.  Instead use `libgoogle-perftools-dev`.*
 
-Installing Dependencies
-=========================
-
-Cyclus support Linux and MacOs, Cyclus dependencies can be install using several
-installation methods:
-
-- `apt-get` (linux), 
-- `macport` (MacOS),
-- Conda (Linux only)
-- VirtualBox (dependencies & Cyclus).
-
-
 Other installation method  and detailled installation proccedure
 can be found in `INSTALL`_ or on the `Cyclus website`_.
-
 
 
 Installing Cyclus (Linux, Unix, and Mac OSX)
