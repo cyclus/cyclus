@@ -51,7 +51,7 @@ tcmalloc (for speed)   any?
 *Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
 by our build system.  Instead use `libgoogle-perftools-dev`.*
 
-Other installation method  and detailled installation proccedure
+Other installation method and detailed installation procedure
 can be found in `INSTALL`_ or on the `Cyclus website`_.
 
 
@@ -61,18 +61,14 @@ Installing Cyclus (Linux, Unix, and Mac OSX)
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
 
-To install Cyclus locALLY (IN ``~/.local/``) just run:
+To install Cyclus locally (in ``~/.local/``) just run:
 
 .. code-block:: bash
 
     .../cyclus/cyclus$ python install.py
 
 Finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
-**bottom** on your ``$PATH``:
-
-.. code-block:: bash
-
-    export PATH="$HOME/.local/bin:$PATH"
+**bottom** on your ``$PATH``.
 
 For more detailled installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_ (also availale on `Cyclus
