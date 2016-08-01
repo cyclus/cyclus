@@ -9,6 +9,13 @@ framework upon which to develop innovative fuel cycle simulations.
 To see user and developer documentation for this code, please visit
 the `Cyclus Homepage`_.
 
+If you would like to contribute to Cyclus, please check our `contribution
+guidelines <CONTRIBUTING.rst`
+
+For detailed installation instruction, visit the `Cyclus Website
+<http://fuelcycle.org/user/index.html>`_ or `INSTALLATION guide <INSTALL.rst>`_
+
+
 ******************************
 Dependencies
 ******************************
