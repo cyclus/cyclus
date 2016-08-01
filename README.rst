@@ -75,7 +75,8 @@ Finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
     export PATH="$HOME/.local/bin:$PATH"
 
 For more detailled installation procedure, and/or custom installation please
-refer to the INSTALLATION guide (also availale on Cyclus Website)
+refer to the `INSTALLATION guide <INSTALL.rst>` (also availale on `Cyclus
+Website<http://fuelcycle.org/user/index.html>`)
 
 Running Tests
 =============
@@ -103,7 +104,8 @@ For a more detailed explanation, checkout the user guide.
 .. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
-.. _`INSTALL`: INSTALL.rst
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 .. _`Cyclus website`: http://fuelcycle.org/user/install.html
+.. _`INSTALL`: INSTALL.rst
+.. _`CONTRIBUTING`: CONTRIBUTING.rst
 
