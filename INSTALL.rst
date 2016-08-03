@@ -6,6 +6,8 @@ Cyclus uses the CMake cross platformbuild-generator as a build system. TO
 simplify the usage of cmake to build Cyclus from source, a python script is
 provided with the source.
 
+.. contents:: Table of Contents
+
 ******************************
 Dependencies
 ******************************
@@ -41,6 +43,19 @@ system you are working on.
 
 Installing Cyclus from source:
 =============================================
+ 
+Once you have installed all the dependency you can follow those step the
+complete the default installation of Cyclus:
+
+#. Create a folder to host the Cyclus environment: ``mkdir cyclusENV && cd
+   cyclusENV``
+#. Download the source from there
+   or from the Git-repository: ``git clone https://github.com/cyclus/cyclus . &&
+   git fetch && git checkout master``
+#. move into the new Cyclus directory:  ``cd cyclus``
+#. run the install script: ``python instal.py``
+
+
 
 
 
