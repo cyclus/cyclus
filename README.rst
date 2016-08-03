@@ -40,9 +40,8 @@ Package                Minimum Version
 `Coin-Cbc`             2.5
 ====================   ==================
 
-Other installation method and detailed installation procedure
-can be found in `INSTALL`_ or on the `Cyclus
-Website <http://fuelcycle.org/user/index.html>`_.
+If you need some help to install those dependencies please check our
+dependencies notices available `here <DEPENDENCIES.rst>`_ or `Cyclus Website <http://fuelcycle.org/user/index.html>`_.
 
 
 ******************************
