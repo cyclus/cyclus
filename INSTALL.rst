@@ -44,24 +44,25 @@ system you are working on.
 Installing Cyclus from source:
 =============================================
  
-Once you have installed all the dependency you can follow those step the
-complete the default installation of Cyclus:
+Assuming you have the dependencies installed correctly, installing Cyclus is
+fairly straightforward. You can follow those step the complete the default
+installation of Cyclus:
 
-#. Create a folder to host the Cyclus environment: 
+1. Create a folder to host the Cyclus environment: 
 
 .. code-block:: bash
   
   mkdir cyclusENV && cd cyclusENV
 
-#. Download the source from there
-   or from the Git-repository: 
+2a. Download the source from there
+2b. from the Git-repository: 
 
 .. code-block:: bash
 
   git clone https://github.com/cyclus/cyclus . && git fetch && git checkout master
 
-#. Move into the new Cyclus directory:``cd cyclus``
-#. Run the install script:
+3. Move into the new Cyclus directory:``cd cyclus``
+4. Run the install script:
 
 .. code-block:: bash
   
