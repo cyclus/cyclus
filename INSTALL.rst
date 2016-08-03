@@ -41,7 +41,7 @@ all the required dependencies listed above. You can also find `there
 <DEPENDENCIES.rst>`_ instruction to install those dependencies depending of the
 system you are working on.
 
-Installing Cyclus from source:
+Installing Cyclus from source
 =============================================
  
 Assuming you have the dependencies installed correctly, installing Cyclus is

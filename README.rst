@@ -45,8 +45,9 @@ can be found in `INSTALL`_ or on the `Cyclus
 Website <http://fuelcycle.org/user/index.html>`_.
 
 
+******************************
 Quick Cyclus Installation
-=============================================
+******************************
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
@@ -61,8 +62,9 @@ For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_ (also available on `Cyclus
 Website <http://fuelcycle.org/user/index.html>`_)
 
+******************************
 Running Tests
-=============
+******************************
 
 Installing Cyclus will also install a test driver (i.e., an executable of all of
 our tests). You can run the tests yourself via:
@@ -71,8 +73,9 @@ our tests). You can run the tests yourself via:
 
     $ cyclus_unit_tests
 
+******************************
 Running Cyclus
-==============
+******************************
 
 You can find instructions for writing an input file for cyclus from `Cyclus User
 Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
