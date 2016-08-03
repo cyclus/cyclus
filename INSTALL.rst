@@ -52,14 +52,33 @@ complete the default installation of Cyclus:
 #. Download the source from there
    or from the Git-repository: ``git clone https://github.com/cyclus/cyclus . &&
    git fetch && git checkout master``
-#. move into the new Cyclus directory:  ``cd cyclus``
-#. run the install script: ``python instal.py``
+#. Move into the new Cyclus directory:  ``cd cyclus``
+#. Run the install script: ``python install.py``
 
 
 
 
+Custom Cyclus installation
+============================================
 
-
+The installation using the install script can be customized using the following
+flag:
+#.  ``-h, --help``                         show the help message and exit
+#.  ``--build_dir BUILD_DIR``              where to place the build directory
+#.  ``--uninstall``                        uninstall
+#.  ``--no-update``                        do not update the hash in version.cc
+#.  ``--clean-build``                      attempt to remove the build directory before building
+#.  ``-j THREADS, --threads``              THREADS the number of threads to use in the make step
+#.  ``--prefix PREFIX``                    the relative path to the installation directory
+#.  ``--config-only``                      only configure the package, do not build or install
+#.  ``--build-only``                       only build the package, do not install
+#.  ``--test``                             run tests after building
+#.  ``--coin_root COIN_ROOT``              the relative path to the Coin-OR libraries directory
+#.  ``--boost_root BOOST_ROOT``            the relative path to the Boost libraries directory
+#.  ``--hdf5_root HDF5_ROOT``              the path to the HDF5 libraries directory
+#.  ``--cmake_prefix_path CMAKE_PREFIX_PATH`` the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros
+#.  ``--build_type BUILD_TYPE`` change  the CMAKE_BUILD_TYPE
+#.  ``-D VAR``                Set enviornment variable(s).
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
