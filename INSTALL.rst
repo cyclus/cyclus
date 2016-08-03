@@ -54,7 +54,8 @@ installation of Cyclus:
   
   mkdir cyclusENV && cd cyclusENV
 
-2a. Download the source from there
+2a. Download the source from `there`_.
+
 2b. from the Git-repository: 
 
 .. code-block:: bash
