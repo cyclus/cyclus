@@ -48,14 +48,19 @@ Once you have installed all the dependency you can follow those step the
 complete the default installation of Cyclus:
 
 #. Create a folder to host the Cyclus environment: 
+
 .. code-block:: bash
    mkdir cyclusENV && cd cyclusENV
+
 #. Download the source from there
    or from the Git-repository: 
+
 .. code-block:: bash
    git clone https://github.com/cyclus/cyclus . && git fetch && git checkout master
+
 #. Move into the new Cyclus directory:``cd cyclus``
 #. Run the install script:
+
 .. code-block:: bash
    python install.py
 
