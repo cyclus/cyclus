@@ -96,7 +96,7 @@ flag:
 #.  ``--boost_root BOOST_ROOT``            the relative path to the Boost libraries directory
 #.  ``--hdf5_root HDF5_ROOT``              the path to the HDF5 libraries directory
 #.  ``--cmake_prefix_path CMAKE_PREFIX_PATH`` the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros
-#.  ``--build_type BUILD_TYPE`` change  the CMAKE_BUILD_TYPE
+#.  ``--build_type BUILD_TYPE`` change the CMAKE_BUILD_TYPE
 #.  ``-D VAR``                Set environment variable(s).
 
 
@@ -124,6 +124,18 @@ install.py python script and use directly ``cmake`` which should look like:
   make
   make install
 
+As usually you can custom you cmake installation using the proper cmake flag.
+All cmake variable can be listed using: ``cmake -LAH``.
+The main variable used are:
+
+#. ``COIN_ROOT_DIR`` set Coin-OT library directory 
+#. ``BOOST_ROOT``    set Boost liraries directory
+#. ``HDF5_ROOT``     set HDF5 root directory
+#. ``HDF5_LIBRARIES`` set HDF5 libraries path
+#. ``HDF5_LIBRARY_DIRS`` set HDF5 library directory
+#. ``HDF5_INCLUDE_DIRS`` set HDF5 include directory
+
+All variable can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
 
 ******************************
