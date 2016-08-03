@@ -56,7 +56,7 @@ installation of Cyclus:
 
 2a. Download the source from `there`_.
 
-2b. from the Git-repository: 
+2b. Or from the Git-repository: 
 
 .. code-block:: bash
 
@@ -97,28 +97,11 @@ flag:
 #.  ``--hdf5_root HDF5_ROOT``              the path to the HDF5 libraries directory
 #.  ``--cmake_prefix_path CMAKE_PREFIX_PATH`` the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros
 #.  ``--build_type BUILD_TYPE`` change  the CMAKE_BUILD_TYPE
-#.  ``-D VAR``                Set enviornment variable(s).
+#.  ``-D VAR``                Set environment variable(s).
 
-Assuming you have the dependencies installed correctly, installing Cyclus is
-fairly straightforward.
 
-We make the following assumptions in this guide:
 
-#. there is some master directory in which you're placing all
-   Cyclus-related files called .../cyclus
-#. you want to install cyclus **locally** (in ``~/.local``)
-#. you have acquired the Cyclus source code from the `Cyclus repo`_
-#. you have placed the Cyclus repository in .../cyclus/cyclus
-
-Under these assumptions **and** if you used a package manager to
-install coin-Cbc (i.e. it's installed in a standard location), the
-Cyclus building and installation process will look like:
-
-.. code-block:: bash
-
-    .../cyclus/cyclus$ python install.py
-
-If you have installed coin-Cbc from source or otherwise have it
+ For example, if you have installed coin-Cbc from source or otherwise have it
 installed in a non-standard location, you should make use of the
 coinRoot installation flag. The otherwise identical process would look
 like:
@@ -127,31 +110,21 @@ like:
 
     .../cyclus/cyclus$  python install.py --coin_root=path/to/coin
 
-Additionally, if you have installed Boost in a non-standard location
-you should make use of the boostRoot installation flag.
+CMake Cyclus installation
+============================================
+If you are ``CMake`` aficionado you can also install Cyclus without using the
+install.py python script and use directly ``cmake`` which should look like:
+
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$ python install.py --coin_root=/path/to/coin --boost_root=/path/to/boost
+  mkdir bld
+  cd build
+  cmake .. -DCMAKE_INSTALL_PREFIX=~/.local/
+  make
+  make install
 
-There are additional options which can be inspected via `install.py`'s help:
 
-.. code-block:: bash
-
-    .../cyclus/cyclus$ python install.py -h
-
-Finally, add the following line to the **bottom** your ``~/.bashrc`` file
-(``~/.bash_profile`` on Macs):
-
-.. code-block:: bash
-
-    export PATH="$HOME/.local/bin:$PATH"
-
-Then update your environment
-
-.. code-block:: bash
-
-    $ source ~/.bashrc
 
 Running Tests
 =============
