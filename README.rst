@@ -7,6 +7,8 @@ University of Wisconsin - Madison is intended to be a simulation
 framework upon which to develop innovative fuel cycle simulations.
 
 
+.. contents:: Table of Contents
+
 **For detailed installation instruction, visit the** `Cyclus Website
 <http://fuelcycle.org/user/index.html>`_ **or** `INSTALLATION guide
 <INSTALL.rst>`_.
