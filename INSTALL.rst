@@ -2,7 +2,7 @@
 Cyclus Installation Guide
 ###########
 
-Cyclus uses the CMake cross platformbuild-generator as a build system. TO
+Cyclus uses the CMake cross platform bailed-generator as a build system. TO
 simplify the usage of cmake to build Cyclus from source, a python script is
 provided with the source.
 
@@ -36,7 +36,7 @@ the major supported system.
 Installation
 ******************************
 
-Before going further on the installation proccedure be sure you have installied
+Before going further on the installation procedure be sure you have installed
 all the required dependencies listed above. You can also find `there
 <DEPENDENCIES.rst>`_ instruction to install those dependencies depending of the
 system you are working on.
@@ -70,7 +70,7 @@ installation of Cyclus:
   python install.py
 
 
-If you successfully followed the instruction above cyclus binanry have been
+If you successfully followed the instruction above cyclus binary have been
 generated and be placed in the  ``.local/`` in your home directory. 
 You need to had ``~/.local/bin`` to the bottom of your ``$PATH``:
 .. code-block:: bash
@@ -126,18 +126,22 @@ install.py python script and use directly ``cmake`` which should look like:
 
 
 
+******************************
 Running Tests
-=============
+******************************
 
 Installing Cyclus will also install a test driver (i.e., an executable of all of
-our tests). You can run the tests yourself via:
+our tests). We strongly recommend after installing a fresh install of Cyclus, or
+any modification on the source code to rerun those tests in order to insure the
+proper functioning of Cyclus. You can run the tests yourself via:
 
 .. code-block:: bash
 
     $ cyclus_unit_tests
 
+******************************
 Running Cyclus
-==============
+******************************
 
 You can find instructions for writing an input file for cyclus from `Cyclus User
 Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
