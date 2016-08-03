@@ -47,16 +47,24 @@ Installing Cyclus from source:
 Once you have installed all the dependency you can follow those step the
 complete the default installation of Cyclus:
 
-#. Create a folder to host the Cyclus environment: ``mkdir cyclusENV && cd
-   cyclusENV``
+#. Create a folder to host the Cyclus environment: 
+.. code-block:: bash
+   mkdir cyclusENV && cd cyclusENV
 #. Download the source from there
-   or from the Git-repository: ``git clone https://github.com/cyclus/cyclus . &&
-   git fetch && git checkout master``
-#. Move into the new Cyclus directory:  ``cd cyclus``
-#. Run the install script: ``python install.py``
+   or from the Git-repository: 
+.. code-block:: bash
+   git clone https://github.com/cyclus/cyclus . && git fetch && git checkout master
+#. Move into the new Cyclus directory:``cd cyclus``
+#. Run the install script:
+.. code-block:: bash
+   python install.py
 
 
-
+If you successfully followed the instruction above cyclus binanry have been
+generated and be placed in the  ``.local/`` in your home directory. 
+You need to had ``~/.local/bin`` to the bottom of your ``$PATH``:
+.. code-block:: bash
+  $> echo 'export PATH="$HOME/.local/bin:$PATH' >> .bashrc
 
 Custom Cyclus installation
 ============================================
