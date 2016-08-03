@@ -63,6 +63,7 @@ Custom Cyclus installation
 
 The installation using the install script can be customized using the following
 flag:
+
 #.  ``-h, --help``                         show the help message and exit
 #.  ``--build_dir BUILD_DIR``              where to place the build directory
 #.  ``--uninstall``                        uninstall
