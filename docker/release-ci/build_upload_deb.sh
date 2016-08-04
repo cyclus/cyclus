@@ -5,7 +5,7 @@ if [ $# -ne 1 ]; then
 fi
 
 rm Dockerfile
-sed -e s/CYCLUS_UBUNTU_MAJOR_VERSION/${1}/g docker/release-ci/Dockerfile_sample > Dockerfile__
+sed -e s/CYCLUS_UBUNTU_MAJOR_VERSION/${1}/g docker/release-ci/Dockerfile_template > Dockerfile__
 sed -e s/CYCLUS_REPO_HASH/`git rev-parse --short HEAD`/g Dockerfile__ > Dockerfile
 rm Dockerfile__
 
