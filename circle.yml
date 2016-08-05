@@ -30,9 +30,9 @@ deployment:
     commands:
       ## DEB GENERATION
         #ubuntu 14.04
-      - docker/release-ci/build_upload_deb.sh 14 :
+      - docker/deb-ci/build_upload_deb.sh 14 :
           timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
           # Ubuntu 16.04
-      - docker/release-ci/build_upload_deb.sh 16 :
+      - docker/deb-ci/build_upload_deb.sh 16 :
           timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
         ## END DEB GENERATION
