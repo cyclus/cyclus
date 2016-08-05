@@ -359,7 +359,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_PACKAGE_VERSION_PATCH "0") 
 
     # Dependencies
-    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libtcmalloc-minimal4 (= 2.1-2ubuntu1.1)")
+    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libtcmalloc-minimal4 (= 2.1-2ubuntu1.1), libboost-filesystem (>= 1.46.0-1)")
 
 
     SET(CPACK_PACKAGE_NAME "cyclus")
