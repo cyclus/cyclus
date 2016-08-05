@@ -1,7 +1,6 @@
 FROM ubuntu:CYCLUS_UBUNTU_MAJOR_VERSION.04
 
-RUN echo "1"
-
+# Because we used specific Ubuntu version can't use cyclus-deps docker container
 RUN apt-get -y --force-yes update
 
 RUN apt-get install -y --force-yes \
@@ -28,10 +27,11 @@ RUN apt-get install -y --force-yes \
     python-numpy \
     python-nose
 
-# build cyclus deb
 COPY . /cyclus 
 WORKDIR cyclus
 RUN mkdir -p deb
 WORKDIR /cyclus/deb
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCPACK_HASH_NAME=CYCLUS_REPO_HASH -DCPACK_SYSTEM_NAME=ubuntu.CYCLUS_UBUNTU_MAJOR_VERSION.04 ..
+
+# Build the deb file in the docker container
 RUN cpack -v ..
