@@ -359,7 +359,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_PACKAGE_VERSION_PATCH "0") 
 
     # Dependencies
-    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libtcmalloc-minimal4 (= 2.1-2ubuntu1.1), libboost-filesystem1.54.0 (>= 1.54.0-4ubuntu3.1), libboost-program-options1.54.0 (>= 1.54.0-4ubuntu3.1), libboost-serialization1.54.0 (>= 1.54.0-4ubuntu3.1), libhdf5-7 (>= 1.8.11-5ubuntu7), libxml++2.6-2 (>= 2.36.0-2ubuntu1), coinor-libcbc3 (>= 2.8.7-1ubuntu2)")
+    #    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libtcmalloc-minimal4 (= 2.1-2ubuntu1.1), libboost-filesystem1.54.0 (>= 1.54.0-4ubuntu3.1), libboost-program-options1.54.0 (>= 1.54.0-4ubuntu3.1), libboost-serialization1.54.0 (>= 1.54.0-4ubuntu3.1), libhdf5-7 (>= 1.8.11-5ubuntu7), libxml++2.6-2 (>= 2.36.0-2ubuntu1), coinor-libcbc3 (>= 2.8.7-1ubuntu2)")
 
 
     SET(CPACK_PACKAGE_NAME "cyclus")
