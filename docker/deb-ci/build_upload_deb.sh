@@ -2,6 +2,7 @@
 
 if [ $# -ne 1 ]; then 
   echo "illegal number of parameters"
+  exit 1
 fi
 
 rm Dockerfile
