@@ -274,7 +274,7 @@ MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
 
     # install headers
     IF(NOT "${lib_h}" STREQUAL "")
-        INSTALL(FILES ${lib_h} DESTINATION include/cyclus COMPONENT "${lib_name}")
+        INSTALL(FILES ${lib_h} DESTINATION include/${lib_name} COMPONENT "${lib_name}")
     ENDIF(NOT "${lib_h}" STREQUAL "")
 ENDMACRO()
 
@@ -283,7 +283,7 @@ MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
     IF(NOT "${test_h}" STREQUAL "")
         INSTALL(
             FILES ${test_h}
-            DESTINATION include/cyclus/${inst_dir}
+            DESTINATION include/${lib_name}/${inst_dir}
             COMPONENT ${lib_name}
             )
     ENDIF(NOT "${test_h}" STREQUAL "")
