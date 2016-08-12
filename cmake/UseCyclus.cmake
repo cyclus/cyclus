@@ -272,21 +272,9 @@ MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
         )
     SET(${lib_name}_LIB ${lib_name} CACHE INTERNAL "Agent library alias." FORCE)
 
-    # install headers
-    IF(NOT "${lib_h}" STREQUAL "")
-        INSTALL(FILES ${lib_h} DESTINATION include/cyclus COMPONENT "${lib_name}")
-    ENDIF(NOT "${lib_h}" STREQUAL "")
 ENDMACRO()
 
 MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
-    # install test header
-    IF(NOT "${test_h}" STREQUAL "")
-        INSTALL(
-            FILES ${test_h}
-            DESTINATION include/cyclus/${inst_dir}
-            COMPONENT ${lib_name}
-            )
-    ENDIF(NOT "${test_h}" STREQUAL "")
 
     # build & install test impl
     IF(NOT "${test_src}" STREQUAL "" AND NOT "${driver}" STREQUAL "NONE")
