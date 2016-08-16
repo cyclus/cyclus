@@ -567,17 +567,67 @@ def get_setup(t, depth=0, prefix=""):
     setup, while template types are setup recursively.
     """
     node = Node()
+    setup_nodes = []
     if is_primitive(t):
+        setup_nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"), 
+                                                     target=Var(name="item_size" + str(depth) + prefix), 
+                                                     value=Raw(code=get_size(t, depth, prefix)))))
         if t.canon == "STRING":
-            node = string_setup(depth, prefix)
+            setup_nodes.append(string_setup(depth, prefix))
         elif t.canon == "VL_STRING":
-            node = vl_string_setup(depth, prefix)
+            setup_nodes.append(vl_string_setup(depth, prefix))
         else:
-            node = primitive_setup(t, depth, prefix)
+            setup_nodes.append(primitive_setup(t, depth, prefix))
+        node = Block(nodes=setup_nodes)
     else:
-        node = Block(nodes=[get_setup(CANON_TO_NODE[i], depth=depth+1, prefix=prefix+part) for i, part in zip(t.canon[1:], template_args[t.canon[0]])])
+        item_size_variable = "item_size" + str(depth) + prefix
+        item_size = ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
+                                              target=Var(name=item_size_variable),
+                                              value=Raw(code=get_size(t, depth, prefix))))
+        jlen_variable = "jlen" + str(depth) + prefix
+        jlen = ExprStmt(child=Assign(target=Var(name=jlen_variable),
+                                     value=Raw(code="col_sizes_[table][j] / " + item_size_variable)))
+        setup_nodes.append(item_size)
+        setup_nodes.append(jlen)
+        setup_nodes.append(Block(nodes=[get_setup(CANON_TO_NODE[i], depth=depth+1, prefix=prefix+part) 
+                                        for i, part in zip(t.canon[1:], template_args[t.canon[0]])]))
+        node = Block(nodes=setup_nodes)
     return node
+
+variable_length_types = ["MAP", "LIST", "SET", "VECTOR"]
+
+current_type_has_string = False
+
+def get_size(t, depth=0, prefix=""):
+    global current_type_has_string
+    s = ""
+    if is_primitive(t):
+        if t.canon =="VL_STRING":
+            s = "CYCLUS_SHA1_SIZE"
+        elif t.canon == "STRING":
+            s = "strlen" + str(depth) + prefix
+            current_type_has_string = True
+        else:
+            s = "sizeof(" + str.lower(t.canon) + ")"
+    else:
+        pieces = []
+        s += "("
+        zipped = list(zip(t.canon[1:], template_args[the_type[0]]))
+        for index in range(len(zipped)):
+            i = zipped[index][0]
+            part = zipped[index][1]
+            new_prefix = prefix + part
+            s += get_size(i, depth=depth+1, prefix=new_prefix)
+            if index != len(zipped) - 1:
+                s += "+"
+        s += ")"
+        if t.canon[0] in variable_length_types and depth != 0:
+            multiplier = "fieldlen" if current_type_has_string else "jlen"
+            s += "*" + multiplier + str(depth) + prefix
+            current_type_has_string = False
+    return s
     
+
 # declaration
 
 def get_decl(t, depth=0, prefix=""):
@@ -605,7 +655,7 @@ def def_body(t, depth=0, prefix=""):
     x = "x" + str(depth) + prefix
     jlen = "jlen" + str(depth) + prefix
     
-    node = Block(nodes=[get_body(elem, depth=depth+1, elem_prefix),
+    node = Block(nodes=[get_body(elem, depth=depth+1, prefix=elem_prefix),
                         ExprStmt(child=Assign(
                                     target=Raw(code=x),
                                     value=FuncCall(
@@ -627,7 +677,7 @@ def memcpy_body(t, depth=0, prefix=""):
     elem_prefix = prefix + template_args[t.canon[0]][0]
     arg = "col_sizes_[table][j]/sizeof(" + elem.cpp +")"
     
-    node = Block(nodes=[get_body(elem, depth=depth+1, elem_prefix),
+    node = Block(nodes=[get_body(elem, depth=depth+1, prefix=elem_prefix),
                         ExprStmt(child=Assign(
                                        target=Raw(code=x),
                                        value=FuncCall(name=Raw(code=t.cpp),
@@ -679,8 +729,8 @@ def map_body(t, depth=0, prefix=""):
               cond=BinOp(x=Var(name=k), op="<", y=Var(name="fieldlen")),
               incr=LeftUnaryOp(op="++", name=Var(name=k)),
               body=[
-                get_body(key, depth=depth+1, key_prefix),
-                get_body(value, depth=depth+1, value_prefix),
+                get_body(key, depth=depth+1, prefix=key_prefix),
+                get_body(value, depth=depth+1, prefix=value_prefix),
                 ExprStmt(child=Assign(target=Raw(code=x+"["+key_name+"]"),
                                       value=Raw(code=value_name)))])])
     return node
@@ -704,8 +754,8 @@ def pair_body(t, depth=0, prefix=""):
     item1_name = "x" + str(depth + 1) + item1_prefix
     item2_name = "x" + str(depth + 1) + item2_prefix
     
-    node = Block(nodes=[get_body(item1, depth=depth+1, item1_prefix), 
-                        get_body(item2, depth=depth+1, item2_prefix),
+    node = Block(nodes=[get_body(item1, depth=depth+1, prefix=item1_prefix), 
+                        get_body(item2, depth=depth+1, prefix=item2_prefix),
                         ExprStmt(child=Assign(
                             target=Raw(code=x),
                             value=FuncCall(name=Raw(code="std::make_pair"),
@@ -809,7 +859,7 @@ BODIES = {"INT": def_body,
           "VECTOR_STRING": vec_string_body,
           "SET_STRING": set_string_body}
 
-def get_body(t, depth=0, prefix=""):
+def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
     block = []
     block.append(get_decl(t, depth, prefix))
     if is_primitive(t):
