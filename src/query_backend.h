@@ -292,7 +292,6 @@ enum DbTypes {
   VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
   VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_VL_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
 
-   65   std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > streams_;
 };
 
 /// Represents operation codes for condition checking.
