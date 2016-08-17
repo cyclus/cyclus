@@ -281,6 +281,18 @@ enum DbTypes {
   VL_MAP_VL_STRING_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["MAP", "VL_STRING", "INT"]], false]
   VL_MAP_VL_STRING_VL_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "STRING", "INT"]], false]
   VL_MAP_VL_STRING_VL_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "VL_STRING", "INT"]], false]
+
+  // vector<pair<pair<double, double>, vector<pair<string, double > > > > >
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_VL_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_VL_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_VL_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_VL_STRING_DOUBLE // ["std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > ", 8, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], "VECTOR", ["PAIR", "STRING", "DOUBLE"], false]
+
+   65   std::vector<std::pair<std::pair<std::double, double>, std::vector<std::pair<std::string, double> > > > > streams_;
 };
 
 /// Represents operation codes for condition checking.
