@@ -12,11 +12,11 @@
 #endif
 
 
-#ifdef __APPLE__
 // for some reason these symbol doesn't exist in the mac binaries
-void OsiCbcSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
-                                   double colub, double obj, std::string name) {
+void OsiSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
+                                double colub, double obj, std::string name) {
   // just ignore the name
   addCol(vec, collb, colub, obj);
 }
+#ifdef __APPLE__
 #endif
