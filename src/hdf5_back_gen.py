@@ -515,10 +515,11 @@ def primitive_setup(t, depth=0, prefix=""):
     """
     This function represents the setup for primitive types.
     """
-    jlen = "jlen" + str(depth) + prefix
-    node = Block(nodes=[
-        ExprStmt(child=Assign(target=Var(name=jlen),
-               value=Raw(code="col_sizes_[table][j] / sizeof("+t.cpp+")")))])
+    #jlen = "jlen" + str(depth) + prefix
+    #node = Block(nodes=[
+    #    ExprStmt(child=Assign(target=Var(name=jlen),
+    #           value=Raw(code="col_sizes_[table][j] / sizeof("+t.cpp+")")))])
+    node = Nothing()
     return node
 
 def string_setup(depth=0, prefix=""): 
@@ -569,9 +570,9 @@ def get_setup(t, depth=0, prefix=""):
     node = Node()
     setup_nodes = []
     if is_primitive(t):
-        setup_nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"), 
-                                                     target=Var(name="item_size" + str(depth) + prefix), 
-                                                     value=Raw(code=get_size(t, depth, prefix)))))
+        #setup_nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"), 
+        #                                             target=Var(name="item_size" + str(depth) + prefix), 
+        #                                             value=Raw(code=get_size(t, depth=depth, prefix=prefix, origin_depth=depth)))))
         if t.canon == "STRING":
             setup_nodes.append(string_setup(depth, prefix))
         elif t.canon == "VL_STRING":
@@ -583,14 +584,14 @@ def get_setup(t, depth=0, prefix=""):
         item_size_variable = "item_size" + str(depth) + prefix
         item_size = ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
                                               target=Var(name=item_size_variable),
-                                              value=Raw(code=get_size(t, depth, prefix))))
+                                              value=Raw(code=get_size(t, depth=depth, prefix=prefix, origin_depth=depth))))
         jlen_variable = "jlen" + str(depth) + prefix
         jlen = ExprStmt(child=Assign(target=Var(name=jlen_variable),
                                      value=Raw(code="col_sizes_[table][j] / " + item_size_variable)))
-        setup_nodes.append(item_size)
-        setup_nodes.append(jlen)
         setup_nodes.append(Block(nodes=[get_setup(CANON_TO_NODE[i], depth=depth+1, prefix=prefix+part) 
                                         for i, part in zip(t.canon[1:], template_args[t.canon[0]])]))
+        setup_nodes.append(item_size)
+        setup_nodes.append(jlen)
         node = Block(nodes=setup_nodes)
     return node
 
@@ -598,7 +599,7 @@ variable_length_types = ["MAP", "LIST", "SET", "VECTOR"]
 
 current_type_has_string = False
 
-def get_size(t, depth=0, prefix=""):
+def get_size(t, depth=0, prefix="", origin_depth=0):
     global current_type_has_string
     s = ""
     if is_primitive(t):
@@ -612,16 +613,17 @@ def get_size(t, depth=0, prefix=""):
     else:
         pieces = []
         s += "("
-        zipped = list(zip(t.canon[1:], template_args[the_type[0]]))
+        zipped = list(zip(t.canon[1:], template_args[t.canon[0]]))
         for index in range(len(zipped)):
             i = zipped[index][0]
             part = zipped[index][1]
             new_prefix = prefix + part
-            s += get_size(i, depth=depth+1, prefix=new_prefix)
+            #CANON_TO_NODE should be used here!
+            s += get_size(CANON_TO_NODE[i], depth=depth+1, prefix=new_prefix, origin_depth=origin_depth)
             if index != len(zipped) - 1:
                 s += "+"
         s += ")"
-        if t.canon[0] in variable_length_types and depth != 0:
+        if t.canon[0] in variable_length_types and depth != origin_depth:
             multiplier = "fieldlen" if current_type_has_string else "jlen"
             s += "*" + multiplier + str(depth) + prefix
             current_type_has_string = False
@@ -929,8 +931,10 @@ def indent(text, prefix, predicate=None):
 QUERY_CASES = ''
 
 def main():
-    s = "hello world"
-    print(indent(s, INDENT)) 
-    
+    CPPGEN = CppGen()
+    test_setup = get_setup(Type(cpp="std::map<std::vector<int>, double>", 
+                                db="MAP_VECTOR_INT_DOUBLE", 
+                                canon=("MAP", ("VECTOR", "INT"), "DOUBLE")))
+    print(CPPGEN.visit(test_setup))
 if __name__ == '__main__':
     main()
