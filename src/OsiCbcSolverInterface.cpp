@@ -10,3 +10,13 @@
 #else
 #error "Cyclus cannot yet handle your version of CoinCBC. Please open an issue with your CoinCBC version."
 #endif
+
+
+#ifdef __APPLE__
+// for some reason this symbol doesn't exist in the mac binaries
+#include <stdexcept>
+void OsiSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
+                                double colub, double obj, std::string name) {
+  throw std::runtime_error("OsiSolverInterface::addCol() not implemented");
+}
+#endif
