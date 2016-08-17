@@ -498,9 +498,12 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
         MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING;
 
     type_map[&typeid(
-        std::map<std::string,
-	         std::pair<std::string,
-	                   std::vector<double> > >)] =
+        std::vector<std::pair<std::pair<std::double, double>,
+                              std::vector<std::pair<std::string, double> > > > >)] =
+        MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING;
+
+    type_map[&typeid(
+        std::map<std::string, std::pair<std::string, std::vector<double>>>)] =
         MAP_STRING_PAIR_STRING_VECTOR_DOUBLE;
     
     type_map[&typeid(std::map<std::string, std::map<std::string,int> >)] =
