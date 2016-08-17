@@ -13,10 +13,10 @@
 
 
 #ifdef __APPLE__
-// for some reason this symbol doesn't exist in the mac binaries
-#include <stdexcept>
-void OsiSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
+// for some reason these symbol doesn't exist in the mac binaries
+void _OsiSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
                                 double colub, double obj, std::string name) {
-  throw std::runtime_error("OsiSolverInterface::addCol() not implemented");
+  // just ignore the name
+  addCol(vec, collb, colub, obj);
 }
 #endif
