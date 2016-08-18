@@ -19,10 +19,20 @@ void OsiSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
   addCol(vec, collb, colub, obj);
 }
 
-void addCol(int numberElements, const int* rows, const double* elements,
-            double collb, double colub, double obj, std::string name) {
+void OsiSolverInterface::addCol(int numberElements, const int* rows,
+                                const double* elements, double collb, double colub,
+                                double obj, std::string name) {
   // just ignore the name
   //addCol(numberElements, rows, elements, collb, colub, obj);
 }
+
+/*
+OsiSolverInterface::addCol(int, int const*, double const*, double, double, double, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >)", referenced from:
+      vtable for OsiCbcSolverInterface in OsiCbcSolverInterface.cpp.o
+  "OsiSolverInterface::addRow(CoinPackedVectorBase const&, char, double, double, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >)", referenced from:
+      vtable for OsiCbcSolverInterface in OsiCbcSolverInterface.cpp.o
+  "OsiSolverInterface::addRow(CoinPackedVectorBase const&, double, double, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >)
+*/
+
 #ifdef __APPLE__
 #endif
