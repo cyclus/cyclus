@@ -20,8 +20,7 @@ void OsiSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
 }
 
 void addCol(int numberElements, const int* rows, const double* elements,
-            const double collb, const double colub,
-            const double obj, std::string name) {
+            double collb, double colub, double obj, std::string name) {
   // just ignore the name
   //addCol(numberElements, rows, elements, collb, colub, obj);
 }
