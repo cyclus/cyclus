@@ -64,6 +64,8 @@ def install_cyclus(args):
         if args.cmake_prefix_path:
             cmake_cmd += ['-DCMAKE_PREFIX_PATH=' +
                           absexpanduser(args.cmake_prefix_path)]
+        if args.deps_root:
+            cmake_cmd += ['-DDEPS_ROOT_DIR=' + absexpanduser(args.deps_root)]
         if args.coin_root:
             cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
@@ -146,6 +148,10 @@ def main():
     test = 'run tests after building'
     parser.add_argument('--test', action='store_true', help=test)
 
+    deps = "the path to the directory containing all dependencies"
+    parser.add_argument('--deps-root', '--deps_root', help=deps,
+                        default=None, dest='deps_root')
+
     coin = "the relative path to the Coin-OR libraries directory"
     parser.add_argument('--coin_root', help=coin)
 
@@ -166,6 +172,13 @@ def main():
                         help='Set enviornment variable(s).')
 
     args = parser.parse_args()
+    # modify roots as needed
+    if args.deps_root is not None:
+        roots = ['coin_root', 'boost_root', 'hdf5_root']
+        for name in roots:
+            if not getattr(args, name, None):
+                setattr(args, name, args.deps_root)
+    # run code
     if args.uninstall:
         uninstall_cyclus(args)
     else:
