@@ -36,6 +36,7 @@ MESSAGE(STATUS "Coin multiple library dependency status:")
 FIND_PATH(COIN_INCLUDE_DIR coin/CbcModel.hpp
     HINTS "${COIN_INCLUDE_DIR}"
     HINTS "${COIN_ROOT_DIR}/include"
+    HINTS "${DEPS_ROOT_DIR}/include"
     HINTS /usr/
     HINTS /usr/include/
     HINTS /usr/local/
@@ -55,6 +56,7 @@ FIND_LIBRARY(COIN_CBC_LIBRARY
     NAMES Cbc libCbc #libCbc.so.0
     HINTS "${COIN_INCLUDE_DIR}/../../lib/"
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN CBC: ${COIN_CBC_LIBRARY}")
 
@@ -62,6 +64,7 @@ FIND_LIBRARY(COIN_CBC_SOLVER_LIBRARY
     NAMES CbcSolver libCbcSolver libCbcSolver.so.0
     HINTS ${COIN_INCLUDE_DIR}/../../lib/
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN CBC solver: ${COIN_CBC_SOLVER_LIBRARY}")
 
@@ -69,6 +72,7 @@ FIND_LIBRARY(COIN_CGL_LIBRARY
     NAMES Cgl libCgl libCgl.so.0
     HINTS ${COIN_INCLUDE_DIR}/../../lib/
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN CGL: ${COIN_CGL_LIBRARY}")
 
@@ -76,6 +80,7 @@ FIND_LIBRARY(COIN_CLP_SOLVER_LIBRARY
     NAMES ClpSolver libClpSolver libClpSolver.so.0
     HINTS ${COIN_INCLUDE_DIR}/../../lib/
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN CLP SOLVER: ${COIN_CLP_SOLVER_LIBRARY}")
 
@@ -83,6 +88,7 @@ FIND_LIBRARY(COIN_CLP_LIBRARY
     NAMES Clp libClp libClp.so.0
     HINTS ${COIN_INCLUDE_DIR}/../../lib/
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN CLP: ${COIN_CLP_LIBRARY}")
 
@@ -90,6 +96,7 @@ FIND_LIBRARY(COIN_COIN_UTILS_LIBRARY
     NAMES CoinUtils libCoinUtils libCoinUtils.so.0
     HINTS ${COIN_INCLUDE_DIR}/../../lib/
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN UTILS: ${COIN_COIN_UTILS_LIBRARY}")
 
@@ -97,13 +104,15 @@ FIND_LIBRARY(COIN_OSI_LIBRARY
     NAMES Osi libOsi libOsi.so.0
     HINTS ${COIN_INCLUDE_DIR}/../../lib/
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN OSI: ${COIN_OSI_LIBRARY}")
 
 FIND_LIBRARY(COIN_OSI_CBC_LIBRARY
-  NAMES OsiCbc libOsiCbc #libOsiCbc.so.0
-  HINTS ${COIN_INCLUDE_DIR}/../../lib/
-  HINTS "${COIN_ROOT_DIR}/lib"
+    NAMES OsiCbc libOsiCbc #libOsiCbc.so.0
+    HINTS ${COIN_INCLUDE_DIR}/../../lib/
+    HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
 )
 MESSAGE("\tCOIN OSI CBC: ${COIN_OSI_CBC_LIBRARY}")
 
@@ -111,6 +120,7 @@ FIND_LIBRARY(COIN_OSI_CLP_LIBRARY
     NAMES OsiClp libOsiClp libOsiClp.so.0
     HINTS ${COIN_INCLUDE_DIR}/../../lib/
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN OSI CLP: ${COIN_OSI_CLP_LIBRARY}")
 
@@ -118,6 +128,7 @@ FIND_LIBRARY(COIN_ZLIB_LIBRARY
     NAMES z libz libz.so.1
     HINTS ${COIN_ROOT_DIR}/lib
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN ZLIB: ${COIN_ZLIB_LIBRARY}")
 
@@ -125,6 +136,7 @@ FIND_LIBRARY(COIN_BZ2_LIBRARY
     NAMES bz2 libz2 libz2.so.1
     HINTS ${COIN_ROOT_DIR}/lib
     HINTS "${COIN_ROOT_DIR}/lib"
+    HINTS "${DEPS_ROOT_DIR}/lib"
     )
 MESSAGE("\tCOIN BZ2: ${COIN_BZ2_LIBRARY}")
 
