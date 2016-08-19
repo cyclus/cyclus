@@ -420,20 +420,20 @@ def case_template(t, read_x):
     tree = Case(cond=Var(name=t.db), body=body)
     return tree
 
-def reinterpret_cast_reader(t, depth=0, prefix="", variable="x", offset="buf+offset"):
+def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
     """
     This function represents a primitive reader using the reinterpret_cast
     method. This includes int, double, float, etc.
     
     {t.cpp} x = *reinterpret_cast<{t.cpp}*>(buf+offset);
     """
-    
+    x = "x" + str(depth) + prefix
     
     tree = Block(nodes=[
-                 ExprStmt(child=Assign(target=Var(name=variable), 
+                 ExprStmt(child=Assign(target=Var(name=x), 
                             value=FuncCall(name=Raw(code="*reinterpret_cast"),
                             targs=[Raw(code=t.cpp+"*")], 
-                            args=[Raw(code=offset)])))])
+                            args=[Raw(code=base_offset)])))])
     return tree
 
 def string_reader(t, depth=0, prefix="", variable="x", offset="buf+offset", 
@@ -573,16 +573,25 @@ def get_setup(t, depth=0, prefix=""):
     """
     node = Node()
     setup_nodes = []
+    total_size_variable = "total_size" + str(depth) + prefix
     if is_primitive(t):
         #setup_nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"), 
         #                                             target=Var(name="item_size" + str(depth) + prefix), 
         #                                             value=Raw(code=get_size(t, depth=depth, prefix=prefix, origin_depth=depth)))))
         if t.canon == "STRING":
             setup_nodes.append(string_setup(depth, prefix))
+            total_size_value = "strlen" + str(depth) + prefix
         elif t.canon == "VL_STRING":
             setup_nodes.append(vl_string_setup(depth, prefix))
+            total_size_value = "CYCLUS_SHA1_SIZE"
         else:
             setup_nodes.append(primitive_setup(t, depth, prefix))
+            total_size_value = "sizeof(" + t.cpp + ")"
+        total_size = ExprStmt(child=DeclAssign(
+                                        type=Type(cpp="unsigned int"),
+                                        target=Var(name=total_size_variable),
+                                        value=Raw(code=total_size_value)))
+        setup_nodes.append(total_size)
         node = Block(nodes=setup_nodes)
     else:
         item_size_variable = "item_size" + str(depth) + prefix
@@ -597,6 +606,12 @@ def get_setup(t, depth=0, prefix=""):
         jlen = ExprStmt(child=Assign(target=Var(name=jlen_variable),
                                      value=Raw(code="col_sizes_[table][j] / " 
                                                     + item_size_variable)))
+        total_size = ExprStmt(child=DeclAssign(
+                                         type=Type(cpp="unsigned int"),
+                                         target=Var(name=total_size_variable),
+                                         value=Raw(code=item_size_variable
+                                                        + "*" 
+                                                        + jlen_variable)))
         setup_nodes.append(Block(nodes=[get_setup(CANON_TO_NODE[i], 
                                                   depth=depth+1, 
                                                   prefix=prefix+part) 
@@ -605,6 +620,7 @@ def get_setup(t, depth=0, prefix=""):
                                             template_args[t.canon[0]])]))
         setup_nodes.append(item_size)
         setup_nodes.append(jlen)
+        setup_nodes.append(total_size)
         node = Block(nodes=setup_nodes)
     return node
 
@@ -622,7 +638,7 @@ def get_item_size(t, depth=0, prefix="", origin_depth=0):
             s = "strlen" + str(depth) + prefix
             current_type_contains_string = True
         else:
-            s = "sizeof(" + str.lower(t.canon) + ")"
+            s = "sizeof(" + t.cpp + ")"
     else:
         current_type_contains_string = False
         pieces = []
@@ -727,7 +743,11 @@ def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
     }
     """
     x = "x" + str(depth) + prefix
+    
     k = "k" + str(depth) + prefix
+    
+    item_size = "item_size" + str(depth) + prefix
+    jlen = "jlen" + str(depth) + prefix
     
     key = CANON_TO_NODE[t.canon[1]]
     value = CANON_TO_NODE[t.canon[2]]
@@ -736,6 +756,14 @@ def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
     key_name = "x" + str(depth + 1) + key_prefix
     value_name = "x" + str(depth + 1) + value_prefix
     
+    key_size = "total_size" + str(depth + 1) + key_prefix
+    
+    key_offset = base_offset + "+" + item_size + "*" + k
+    value_offset = key_offset + "+" + key_size
+    
+    print(key_offset)
+    print(value_offset)
+    
     #we need to figure out what to do for fieldlen here. This variable changes
     #depending on data type of the key and value. String is fieldlen, otherwise
     #we get jlen.
@@ -743,11 +771,13 @@ def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
           For(adecl=DeclAssign(type=Type(cpp="unsigned int"), 
                                target=Var(name=k), 
                                value=Raw(code="0")),
-              cond=BinOp(x=Var(name=k), op="<", y=Var(name="fieldlen")),
+              cond=BinOp(x=Var(name=k), op="<", y=Var(name=jlen)),
               incr=LeftUnaryOp(op="++", name=Var(name=k)),
               body=[
-                get_body(key, depth=depth+1, prefix=key_prefix),
-                get_body(value, depth=depth+1, prefix=value_prefix),
+                get_body(key, depth=depth+1, prefix=key_prefix,
+                         base_offset=key_offset),
+                get_body(value, depth=depth+1, prefix=value_prefix,
+                         base_offset=value_offset),
                 ExprStmt(child=Assign(target=Raw(code=x+"["+key_name+"]"),
                                       value=Raw(code=value_name)))])])
     return node
@@ -869,12 +899,13 @@ def list_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
                                         args=[Raw(code=s)]))])])
     return node
 
-BODIES = {"INT": def_body,
+BODIES = {"INT": reinterpret_cast_body,
           "DOUBLE": memcpy_body,
           "STRING": elementwise_body,
           "VL_STRING": vl_body,
           "VECTOR_STRING": vec_string_body,
-          "SET_STRING": set_string_body}
+          "SET_STRING": set_string_body,
+          "MAP": map_body}
 
 def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
     block = []
@@ -883,12 +914,14 @@ def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
         if depth == 0:
             pass # eventually do primitive
         else:
-            return BODIES[t.db](t, depth, prefix)
+            return BODIES[t.db](t, depth, prefix, base_offset)
     # catch vl types here:
     elif DB_TO_VL[t.db]:
-        return vl_body(t, depth, prefix)
+        return vl_body(t, depth, prefix, base_offset)
     elif t.db in BODIES:
-        return BODIES[t.db](t, depth, prefix)
+        return BODIES[t.db](t, depth, prefix, base_offset)
+    elif t.canon[0] in BODIES:
+        return BODIES[t.canon[0]](t, depth, prefix, base_offset)
     else:
         for i, part in zip(t.canon[1:], template_args[t[0]]):
             new_prefix = prefix + part
@@ -946,9 +979,12 @@ QUERY_CASES = ''
 
 def main():
     CPPGEN = CppGen()
-    test_setup = get_setup(Type(cpp="std::map<int, int>", 
-                                db="MAP_INT_INT", 
-                                canon=("MAP", "INT", "INT")))
+    test_type = Type(cpp="std::map<int, int>", 
+                     db="MAP_INT_INT", 
+                     canon=("MAP", "INT", "INT"))
+    test_setup = get_setup(test_type)
+    test_body = get_body(test_type)
     print(CPPGEN.visit(test_setup))
+    print(CPPGEN.visit(test_body))
 if __name__ == '__main__':
     main()
