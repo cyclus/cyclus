@@ -1,30 +1,38 @@
-pkg_check_modules(GLIB_PKG glib-2.0)
+#pkg_check_modules(GLIB_PKG glib-2.0)
+libfind_pkg_check_modules(GLIB_PKG glib-2.0)
 
 if(GLIB_PKG_FOUND)
     find_path(GLIB_INCLUDE_DIR  NAMES glib.h PATH_SUFFIXES glib-2.0
+        HINTS "${DEPS_ROOT_DIR}/include"
         PATHS
         ${GLIB_PKG_INCLUDE_DIRS}
         /usr/include/glib-2.0
         /usr/include
         /usr/local/include
         )
-    find_path(GLIB_CONFIG_INCLUDE_DIR NAMES glibconfig.h PATHS ${GLIB_PKG_LIBDIR} PATH_SUFFIXES glib-2.0/include)
+    find_path(GLIB_CONFIG_INCLUDE_DIR NAMES glibconfig.h
+              HINTS "${DEPS_ROOT_DIR}/include"
+              PATHS ${GLIB_PKG_LIBDIR} PATH_SUFFIXES glib-2.0/include)
 
     find_library(GLIB_LIBRARIES NAMES glib-2.0
+        HINTS "${DEPS_ROOT_DIR}/lib"
         PATHS
         ${GLIB_PKG_LIBRARY_DIRS}
         /usr/lib
         /usr/local/lib
         )
-
 else(GLIB_PKG_FOUND)
     # Find Glib even if pkg-config is not working (eg. cross compiling to Windows)
-    find_library(GLIB_LIBRARIES NAMES glib-2.0)
+    find_library(GLIB_LIBRARIES NAMES glib-2.0 HINTS "${DEPS_ROOT_DIR}/lib")
     string(REGEX REPLACE "/[^/]*$" "" GLIB_LIBRARIES_DIR ${GLIB_LIBRARIES})
 
-    find_path(GLIB_INCLUDE_DIR NAMES glib.h PATH_SUFFIXES glib-2.0)
-    find_path(GLIB_CONFIG_INCLUDE_DIR NAMES glibconfig.h PATHS ${GLIB_LIBRARIES_DIR} PATH_SUFFIXES glib-2.0/include)
-
+    find_path(GLIB_INCLUDE_DIR NAMES glib.h
+              HINTS "${DEPS_ROOT_DIR}/include"
+              PATH_SUFFIXES glib-2.0
+              )
+    find_path(GLIB_CONFIG_INCLUDE_DIR NAMES glibconfig.h
+              HINTS "${DEPS_ROOT_DIR}/include"
+              PATHS ${GLIB_LIBRARIES_DIR} PATH_SUFFIXES glib-2.0/include)
 endif(GLIB_PKG_FOUND)
 
 if(GLIB_INCLUDE_DIR AND GLIB_CONFIG_INCLUDE_DIR AND GLIB_LIBRARIES)

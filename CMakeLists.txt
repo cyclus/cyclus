@@ -78,7 +78,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_EXECUTABLE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
     # use, i.e. don't skip the full RPATH for the build tree
-    SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+    SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 
     # when building, don't use the install RPATH already
     # (but later on when installing)
@@ -131,26 +131,27 @@ IF(NOT CYCLUS_DOC_ONLY)
     ################################### begin find libraries #####################################
     ##############################################################################################
 
-    FIND_PACKAGE( Tcmalloc )
+    MESSAGE("-- Dependency Root Dir (DEPS_ROOT_DIR): ${DEPS_ROOT_DIR}")
+
+    FIND_PACKAGE(Tcmalloc)
     SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
-    FIND_PACKAGE( LibXml2 REQUIRED )
+    FIND_PACKAGE(LibXml2 REQUIRED HINTS "${DEPS_ROOT_DIR}")
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
     SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
     # Find LibXML++ and dependencies
-    FIND_PACKAGE( LibXML++ REQUIRED )
+    FIND_PACKAGE(LibXML++ REQUIRED)
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
-    MESSAGE(${LIBS})
 
     # Find Sqlite3
-    FIND_PACKAGE( Sqlite3 REQUIRED )
+    FIND_PACKAGE(Sqlite3 REQUIRED)
     SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
     # Find HDF5
-    FIND_PACKAGE( HDF5 REQUIRED)
+    FIND_PACKAGE(HDF5 REQUIRED)
     ADD_DEFINITIONS(${HDF5_DEFINITIONS})
     set(LIBS ${LIBS} ${HDF5_LIBRARIES} )
     MESSAGE("--    HDF5 Root: ${HDF5_ROOT}")
@@ -161,8 +162,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Include the boost header files and the program_options library
     # Please be sure to use Boost rather than BOOST.
     # Capitalization matters on some platforms
-    SET(Boost_USE_STATIC_LIBS       OFF)
-    SET(Boost_USE_STATIC_RUNTIME    OFF)
+    SET(Boost_USE_STATIC_LIBS OFF)
+    SET(Boost_USE_STATIC_RUNTIME OFF)
     # SET(Boost_USE_MULTITHREADED    OFF)
     FIND_PACKAGE( Boost 1.46.1 COMPONENTS program_options filesystem system serialization REQUIRED)
     MESSAGE("--    Boost Root: ${Boost_ROOT}")
@@ -190,7 +191,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Some optional libraries to link in, as availble. Required for conda.
     #
     # pcre
-    FIND_LIBRARY(PCRE_LIBRARIES pcre)
+    FIND_LIBRARY(PCRE_LIBRARIES pcre HINTS "${DEPS_ROOT_DIR}")
     MESSAGE("-- Found PCRE Libraries (optional): ${PCRE_LIBRARIES}")
     IF(PCRE_LIBRARIES)
         set(LIBS ${LIBS} ${PCRE_LIBRARIES})

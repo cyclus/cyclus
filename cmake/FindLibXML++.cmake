@@ -8,7 +8,12 @@
 include(LibFindMacros)
 
 # Dependencies
-libfind_package(LibXML++ LibXml2)
+libfind_package(LibXML++ LibXml2 HINTS "${DEPS_ROOT_DIR}")
+find_path(LIBXML2_INCLUDE_DIR
+    NAMES libxml
+    HINTS "${DEPS_ROOT_DIR}/include"
+    PATH_SUFFIXES libxml2 include/libxml2
+    )
 libfind_package(LibXML++ Glibmm)
 
 # Use pkg-config to get hints about paths
@@ -17,6 +22,7 @@ libfind_pkg_check_modules(LibXML++_PKGCONF libxml++-2.6)
 # Main include dir
 find_path(LibXML++_INCLUDE_DIR
     NAMES libxml++/libxml++.h
+    HINTS "${DEPS_ROOT_DIR}/include"
     PATHS ${LibXML++_PKGCONF_INCLUDE_DIRS}
     PATH_SUFFIXES libxml++-2.6 include/libxml++-2.6
     )
@@ -24,6 +30,7 @@ find_path(LibXML++_INCLUDE_DIR
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(LibXML++Config_INCLUDE_DIR
     NAMES libxml++config.h
+    HINTS "${DEPS_ROOT_DIR}"
     PATHS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr
     PATH_SUFFIXES lib/libxml++-2.6/include
     )
@@ -31,12 +38,14 @@ find_path(LibXML++Config_INCLUDE_DIR
 # find lib
 find_path(LibXML++_PKGCONF_LIBRARY_DIRS
     NAMES xml++-2.6
+    HINTS "${DEPS_ROOT_DIR}/lib"
     PATH_SUFFIXES lib
     )
 libfind_library(LibXML++ xml++ 2.6)
-# # Finally the library itself
-# find_library(LibXML++_LIBRARY
+ # Finally the library itself
+#find_library(LibXML++_LIBRARY
 #   NAMES xml++-2.6
+#   HINTS "${DEPS_ROOT_DIR}/lib"
 #   PATHS ${LibXML++_PKGCONF_LIBRARY_DIRS}
 # )
 
