@@ -325,10 +325,10 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
       std::map<std::string CYCLUS_COMMA std::map<std::string CYCLUS_COMMA int> >);
 
   CYCLUS_BINDVAL(
-      VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_STRING_DOUBLE,
+      VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE,
       std::vector<std::pair<
               std::pair<double CYCLUS_COMMA double> CYCLUS_COMMA
-                  std::vector<std::pair<std::string CYCLUS_COMMA double> > > > );
+                  std::map<std::string CYCLUS_COMMA double> > > );
 
   default: {
     throw ValueError("attempted to retrieve unsupported sqlite backend type");
@@ -428,10 +428,10 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
       std::map<std::string CYCLUS_COMMA std::map<std::string CYCLUS_COMMA int> >);
 
   CYCLUS_LOADVAL(
-      VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_STRING_DOUBLE,
+      VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE,
       std::vector<std::pair<
               std::pair<double CYCLUS_COMMA double> CYCLUS_COMMA
-                  std::vector<std::pair<std::string CYCLUS_COMMA double> > > > );
+                  std::map<std::string CYCLUS_COMMA double> > > );
   
   default: {
     throw ValueError("Attempted to retrieve unsupported backend type");
@@ -506,11 +506,6 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
         MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING;
 
     type_map[&typeid(
-        std::vector<std::pair<std::pair<double, double>,
-                              std::vector<std::pair<std::string, double> > > >)] =
-        VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_STRING_DOUBLE;
-
-    type_map[&typeid(
         std::map<std::string,
                   std::pair<std::string,
                             std::vector<double> > >)] =
@@ -520,6 +515,12 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
         MAP_STRING_MAP_STRING_INT;
     
     type_map[&typeid(std::list<std::pair<int, int> >)] = LIST_PAIR_INT_INT;
+    
+    type_map[&typeid(
+        std::vector<std::pair<std::pair<double, double>,
+                              std::map<std::string, double> > > )] =
+        VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE;
+
   }
 
   const std::type_info* ti = &v.type();

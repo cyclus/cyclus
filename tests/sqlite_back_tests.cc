@@ -42,7 +42,7 @@ class SqliteBackTests : public ::testing::Test {
 //     }
 
 TEST_F(SqliteBackTests, VecPairPairDoubleDoubleVecPairStringDouble) {
-  typedef std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > Foo;
+  typedef std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > Foo;
   
   Foo f;
   r.NewDatum("monty")
