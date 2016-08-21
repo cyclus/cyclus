@@ -282,15 +282,15 @@ enum DbTypes {
   VL_MAP_VL_STRING_VL_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "STRING", "INT"]], false]
   VL_MAP_VL_STRING_VL_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "VL_STRING", "INT"]], false]
 
-  // vector<pair<pair<double, double>, vector<pair<string, double > > > >
-  VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > ", 6, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VECTOR", ["PAIR", "STRING", "DOUBLE"]]], false]
-  VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > ", 6, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VECTOR", ["PAIR", "VL_STRING", "DOUBLE"]]], false]
-  VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > ", 6, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_VECTOR", ["PAIR", "STRING", "DOUBLE"]]], false]
-  VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > ", 6, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_VECTOR", ["PAIR", "VL_STRING", "DOUBLE"]]], false]
-  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > ", 6, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VECTOR", ["PAIR", "STRING", "DOUBLE"]]], true]
-  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VECTOR_PAIR_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > ", 6, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VECTOR", ["PAIR", "VL_STRING", "DOUBLE"]]], true]
-  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > ", 6, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_VECTOR", ["PAIR", "STRING", "DOUBLE"]]], true]
-  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_VECTOR_PAIR_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::vector<std::pair<std::string, double> > > > ", 6, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_VECTOR", ["PAIR", "VL_STRING", "DOUBLE"]]], true]
+  // vector<pair<pair<double, double>, map<string, double > > > >
+  VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "STRING", "DOUBLE"]]], false]
+  VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "VL_STRING", "DOUBLE"]]], false]
+  VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]]], false]
+  VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]]], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "STRING", "DOUBLE"]]], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "VL_STRING", "DOUBLE"]]], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]]], false]
+  VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]]], false]
 
 };
 
