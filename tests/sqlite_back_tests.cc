@@ -41,7 +41,7 @@ class SqliteBackTests : public ::testing::Test {
 //       EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
 //     }
 
-TEST_F(SqliteBackTests, VecPairPairDoubleDoubleVecPairStringDouble) {
+TEST_F(SqliteBackTests, VecPairPairDoubleDoubleMapStringDouble) {
   typedef std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > Foo;
   
   Foo f;
