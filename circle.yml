@@ -23,11 +23,6 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       # Update cyclus/cylus:stable docker container
-
-
-  ci_testing:
-    branch: ci-testing
-    commands:
       - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
       - docker push cyclus/cyclus:stable # push to docker depot
 
@@ -39,3 +34,11 @@ deployment:
       - docker/deb-ci/build_upload_deb.sh 16 :
           timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
         ## END DEB GENERATION
+
+
+  ci_testing:
+    branch: ci-testing
+    commands:
+      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
+      - docker push cyclus/cyclus:stable # push to docker depot
+
