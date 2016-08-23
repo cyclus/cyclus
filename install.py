@@ -64,6 +64,8 @@ def install_cyclus(args):
         if args.cmake_prefix_path:
             cmake_cmd += ['-DCMAKE_PREFIX_PATH=' +
                           absexpanduser(args.cmake_prefix_path)]
+        cmake_cmd += ['-DDEFAULT_ALLOW_MILPS=' +
+                      ('TRUE' if args.allow_milps else 'FALSE')]
         if args.deps_root:
             cmake_cmd += ['-DDEPS_ROOT_DIR=' + absexpanduser(args.deps_root)]
         if args.coin_root:
@@ -147,6 +149,14 @@ def main():
 
     test = 'run tests after building'
     parser.add_argument('--test', action='store_true', help=test)
+
+    parser.add_argument('--allow-milps', action='store_true',
+                        dest='allow_milps', default=True,
+                        help='Allows mixed integer linear programs by default')
+    parser.add_argument('--dont-allow-milps', action='store_false',
+                        dest='allow_milps',
+                        help="Don't Allows mixed integer linear programs "
+                             "by default")
 
     deps = "the path to the directory containing all dependencies"
     parser.add_argument('--deps-root', '--deps_root', help=deps,
