@@ -25,6 +25,9 @@ deployment:
       # Update cyclus/cylus:stable docker container
       - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
       - docker push cyclus/cyclus:stable # push to docker depot
+  ci-testing:
+    branch: ci-testing
+    commands:
       ## DEB GENERATION
         #ubuntu 14.04
       - docker/deb-ci/build_upload_deb.sh 14 :

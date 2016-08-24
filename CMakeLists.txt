@@ -359,8 +359,14 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_PACKAGE_VERSION_PATCH "0") 
 
     # Dependencies
-    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libtcmalloc-minimal4 (>= 2.1), libboost-filesystem-dev (>= 1.54.0), libboost-program-options-dev (>= 1.54.0), libboost-serialization-dev (>= 1.54.0), libhdf5-dev (>= 1.8.11), libxml++2.6-dev (>= 2.36.0), coinor-libcbc-dev (>= 2.8.7)")
-
+    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libtcmalloc-minimal4 (>= 2.1), \
+                                     libboost-filesystem-dev (>= 1.54.0), \
+                                     libboost-program-options-dev (>= 1.54.0), \
+                                     libboost-serialization-dev (>= 1.54.0), \
+                                     libhdf5-dev (>= 1.8.11), \
+                                     libxml++2.6-dev (>= 2.36.0), \
+                                     coinor-libcbc-dev (>= 2.8.7)")
+    MESSAGE("CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS}")
 
     SET(CPACK_PACKAGE_NAME "cyclus")
     SET(
@@ -368,10 +374,12 @@ IF(NOT CYCLUS_DOC_ONLY)
       "cyclus_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}"
       )
     
-    SET(
-      CPACK_PACKAGE_FILE_NAME
-      "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${CPACK_HASH_NAME}_${CPACK_SYSTEM_NAME}"
-      )
+    SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}")
+    SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_DEPENDS}_${CPACK_PACKAGE_VERSION_MAJOR}")
+    SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_DEPENDS}.${CPACK_PACKAGE_VERSION_MINOR}")
+    SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_DEPENDS}.${CPACK_PACKAGE_VERSION_PATCH}")
+    SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_DEPENDS}_${CPACK_HASH_NAME}")
+    SET(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_DEPENDS}_${CPACK_SYSTEM_NAME}")
 
     # Configuration
     SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY "1")
