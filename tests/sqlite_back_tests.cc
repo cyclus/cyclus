@@ -41,6 +41,17 @@ class SqliteBackTests : public ::testing::Test {
 //       EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
 //     }
 
+TEST_F(SqliteBackTests, VecPairPairDoubleDoubleMapStringDouble) {
+  typedef std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > Foo;
+  
+  Foo f;
+  r.NewDatum("monty")
+    ->AddVal("python", f)
+    ->Record();
+  r.Close();
+  cyclus::QueryResult qr = b->Query("monty", NULL);
+  EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
+}
 TEST_F(SqliteBackTests, MapStrMapStrInt) {
   typedef std::map<std::string, std::map<std::string, int > > Foo;
   
