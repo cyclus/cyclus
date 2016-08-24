@@ -41,29 +41,10 @@ all the required dependencies listed above. You can also find `there
 <DEPENDENCIES.rst>`_ instruction to install those dependencies depending of the
 system you are working on.
 
-Installing Cyclus from source
-=============================================
- 
-Assuming you have the dependencies installed correctly, installing Cyclus is
-fairly straightforward. You can follow those step the complete the default
-installation of Cyclus:
+Default installation
+..........................
 
-1. Create a folder to host the Cyclus environment: 
-
-.. code-block:: bash
-  
-  mkdir cyclusENV && cd cyclusENV
-
-2a. Download the source from `there`_.
-
-2b. Or from the Git-repository: 
-
-.. code-block:: bash
-
-  git clone https://github.com/cyclus/cyclus . && git fetch && git checkout master
-
-3. Move into the new Cyclus directory:``cd cyclus``
-4. Run the install script:
+Run the install script:
 
 .. code-block:: bash
   
@@ -73,54 +54,58 @@ installation of Cyclus:
 If you successfully followed the instruction above cyclus binary have been
 generated and be placed in the  ``.local/`` in your home directory. 
 You need to had ``~/.local/bin`` to the bottom of your ``$PATH``:
+
 .. code-block:: bash
   $> echo 'export PATH="$HOME/.local/bin:$PATH' >> .bashrc
 
 Custom Cyclus installation
-============================================
+..........................
 
 The installation using the install script can be customized using the following
 flag:
 
-#.  ``-h, --help``                         show the help message and exit
-#.  ``--build_dir BUILD_DIR``              where to place the build directory
-#.  ``--uninstall``                        uninstall
-#.  ``--no-update``                        do not update the hash in version.cc
-#.  ``--clean-build``                      attempt to remove the build directory before building
-#.  ``-j THREADS, --threads``              THREADS the number of threads to use in the make step
-#.  ``--prefix PREFIX``                    the relative path to the installation directory
-#.  ``--config-only``                      only configure the package, do not build or install
-#.  ``--build-only``                       only build the package, do not install
-#.  ``--test``                             run tests after building
-#.  ``--coin_root COIN_ROOT``              the relative path to the Coin-OR libraries directory
-#.  ``--boost_root BOOST_ROOT``            the relative path to the Boost libraries directory
-#.  ``--hdf5_root HDF5_ROOT``              the path to the HDF5 libraries directory
-#.  ``--cmake_prefix_path CMAKE_PREFIX_PATH`` the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros
-#.  ``--build_type BUILD_TYPE`` change the CMAKE_BUILD_TYPE
-#.  ``-D VAR``                Set environment variable(s).
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``-h, --help``                            | show the help message and exit                                                                   |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--build_dir BUILD_DIR``                 | where to place the build directory                                                               |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--uninstall``                           | uninstall                                                                                        |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--no-update``                           | do not update the hash in version.cc                                                             |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--clean-build``                         | attempt to remove the build directory before building                                            |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``-j THREADS, --threads``                 | THREADS the number of threads to use in the make step                                            |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--prefix PREFIX``                       | the relative path to the installation directory                                                  |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--config-only``                         | only configure the package, do not build or install                                              |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--build-only``                          | only build the package, do not install                                                           |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--test``                                | run tests after  building                                                                        |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--coin_root COIN_ROOT``                 | the relative path to the Coin-OR libraries directory                                             |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--boost_root BOOST_ROOT``               | the relative path to the Boost libraries directory                                               |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--hdf5_root HDF5_ROOT``                 | the path to the HDF5 libraries directory                                                         |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--cmake_prefix_path CMAKE_PREFIX_PATH`` | the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``--build_type BUILD_TYPE``               | change the CMAKE_BUILD_TYPE                                                                      |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
+|  ``-D VAR``                                |  Set environment variable(s).                                                                    |
++--------------------------------------------+--------------------------------------------------------------------------------------------------+
 
 
-
- For example, if you have installed coin-Cbc from source or otherwise have it
-installed in a non-standard location, you should make use of the
-coinRoot installation flag. The otherwise identical process would look
-like:
+For example, if you have installed coin-Cbc from source or otherwise have it
+installed in a non-standard location, you should make use of the coinRoot
+installation flag. The otherwise identical process would look like:
 
 .. code-block:: bash
 
-    .../cyclus/cyclus$  python install.py --coin_root=path/to/coin
-
-
-
-.. include:: install_cyclus_from_source.rst
-
-
-
-
-
-
-
-
+    .../cyclus$  python install.py --coin_root=path/to/coin
 
 
 CMake Cyclus installation
