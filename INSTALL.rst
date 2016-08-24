@@ -47,7 +47,6 @@ Default installation
 Run the install script:
 
 .. code-block:: bash
-
   $> python install.py
 
 
@@ -56,7 +55,6 @@ generated and be placed in the  ``.local/`` in your home directory.
 You need to had ``~/.local/bin`` to the bottom of your ``$PATH``:
 
 .. code-block:: bash
-
   $> echo 'export PATH="$HOME/.local/bin:$PATH' >> .bashrc
 
 Custom Cyclus installation
