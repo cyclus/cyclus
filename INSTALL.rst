@@ -47,7 +47,6 @@ Default installation
 Run the install script:
 
 .. code-block:: bash
-  
   python install.py
 
 
