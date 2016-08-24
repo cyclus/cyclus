@@ -42,7 +42,7 @@ all the required dependencies listed above. You can also find `there
 system you are working on.
 
 Default installation
-..........................
+------------------------
 
 Run the install script:
 
@@ -60,8 +60,7 @@ You need to had ``~/.local/bin`` to the bottom of your ``$PATH``:
   $> echo 'export PATH="$HOME/.local/bin:$PATH' >> .bashrc
 
 Custom Cyclus installation
-..........................
-
+---------------------------
 The installation using the install script can be customized using the following
 flag:
 
@@ -111,6 +110,7 @@ installation flag. The otherwise identical process would look like:
 
 CMake Cyclus installation
 ---------------------------
+
 If you are ``CMake`` aficionado you can also install Cyclus without using the
 install.py python script and use directly ``cmake`` which should look like:
 
