@@ -123,7 +123,7 @@ install.py python script and use directly ``cmake`` which should look like:
   make
   make install
 
-As usually you can custom you cmake installation using the proper cmake flag.
+As usual you can custom you cmake installation using the proper cmake flag.
 All cmake variable can be listed using: ``cmake -LAH``.
 The main variable used are:
 
