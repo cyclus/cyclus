@@ -110,6 +110,19 @@ like:
 
     .../cyclus/cyclus$  python install.py --coin_root=path/to/coin
 
+
+
+.. include:: install_cyclus_from_source.rst
+
+
+
+
+
+
+
+
+
+
 CMake Cyclus installation
 ============================================
 If you are ``CMake`` aficionado you can also install Cyclus without using the
