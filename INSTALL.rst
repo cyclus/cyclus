@@ -47,7 +47,7 @@ Default installation
 Run the install script:
 
 .. code-block:: bash
-  python install.py
+  $> python install.py
 
 
 If you successfully followed the instruction above cyclus binary have been
