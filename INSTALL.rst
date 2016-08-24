@@ -47,6 +47,7 @@ Default installation
 Run the install script:
 
 .. code-block:: bash
+
   $> python install.py
 
 
@@ -55,6 +56,7 @@ generated and be placed in the  ``.local/`` in your home directory.
 You need to had ``~/.local/bin`` to the bottom of your ``$PATH``:
 
 .. code-block:: bash
+
   $> echo 'export PATH="$HOME/.local/bin:$PATH' >> .bashrc
 
 Custom Cyclus installation
@@ -108,7 +110,7 @@ installation flag. The otherwise identical process would look like:
 
 
 CMake Cyclus installation
-============================================
+---------------------------
 If you are ``CMake`` aficionado you can also install Cyclus without using the
 install.py python script and use directly ``cmake`` which should look like:
 
