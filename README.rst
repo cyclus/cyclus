@@ -1,7 +1,6 @@
 ###########
 Cyclus Core
 ###########
-
 The core of the Cyclus nuclear fuel cycle simulator from the
 University of Wisconsin - Madison is intended to be a simulation
 framework upon which to develop innovative fuel cycle simulations.
@@ -214,9 +213,9 @@ required library package names is:
 
 Then install Coin-Cbc and HDF5 from source. They can be downloaded to any
 directory on your computer:
-   
+
 **Coin-Cbc**: Download and build using the svn command in the terminal:
-   
+
 .. code-block:: bash
 
   svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc
