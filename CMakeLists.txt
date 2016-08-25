@@ -132,7 +132,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     ##############################################################################################
 
     MESSAGE("-- Dependency Root Dir (DEPS_ROOT_DIR): ${DEPS_ROOT_DIR}")
-    SET(LIB_HINTS "/usr/lib/x86_64-linux-gnu /usr/lib /usr /")
+    SET(LIB_HINTS /usr/lib/x86_64-linux-gnu /usr/lib /usr /)
     MESSAGE("-- Library Location Hints (LIB_HINTS): ${LIB_HINTS}")
 
     FIND_PACKAGE(Tcmalloc)
