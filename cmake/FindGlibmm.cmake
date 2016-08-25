@@ -17,7 +17,7 @@ libfind_pkg_check_modules(Glibmm_PKGCONF glibmm-2.4)
 # Main include dir
 find_path(Glibmm_INCLUDE_DIR
     NAMES glibmm/main.h
-    HINTS "${DEPS_ROOT_DIR}/include"
+    ${DEPS_INCLUDE_HINTS}
     PATHS ${Glibmm_PKGCONF_INCLUDE_DIRS}
     PATH_SUFFIXES glibmm-2.4 include/glibmm-2.4
     )
@@ -25,7 +25,7 @@ find_path(Glibmm_INCLUDE_DIR
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(GlibmmConfig_INCLUDE_DIR
     NAMES glibmmconfig.h
-    HINTS "${DEPS_ROOT_DIR}/include"
+    ${DEPS_INCLUDE_HINTS}
     PATHS ${Glibmm_PKGCONF_INCLUDE_DIRS} /usr
     PATH_SUFFIXES lib/glibmm-2.4/include
     )
@@ -33,7 +33,7 @@ find_path(GlibmmConfig_INCLUDE_DIR
 # find lib
 find_path(Glibmm_PKGCONF_LIBRARY_DIRS
     NAMES libglib-2.0.so
-    HINTS "${DEPS_ROOT_DIR}/lib"
+    ${DEPS_LIB_HINTS}
     PATH_SUFFIXES lib
     )
 libfind_library(Glibmm glibmm 2.4)
