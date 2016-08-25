@@ -13,6 +13,7 @@
 #include "logger.h"
 #include "prog_translator.h"
 #include "solver_factory.h"
+#include "env.h"
 
 namespace cyclus {
 
@@ -59,7 +60,7 @@ TEST(ProgTranslatorTests, translation) {
                          excl_flow[i] / prefs[i] : 1 / prefs[i]);
   }
 
-  
+
   double cost_add = 1;
   double max_obj_coeff = 1 / 0.2;  // 1 / prefs[0]
   double min_row_coeff = 0.3;  // ucaps_a_3
@@ -234,6 +235,10 @@ TEST(ProgTranslatorTests, translation) {
   checkface.branchAndBound();
 
   // verify solution
+  if (!Env::allow_milps()) {
+    std::cout << "[  SKIPPED ] MILPS have been disabled.\n";
+    return;
+  }
   EXPECT_NO_THROW(SolveProg(iface));
   const double* soln = iface->getColSolution();
   const double* check = checkface.getColSolution();

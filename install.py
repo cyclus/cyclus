@@ -64,6 +64,10 @@ def install_cyclus(args):
         if args.cmake_prefix_path:
             cmake_cmd += ['-DCMAKE_PREFIX_PATH=' +
                           absexpanduser(args.cmake_prefix_path)]
+        cmake_cmd += ['-DDEFAULT_ALLOW_MILPS=' +
+                      ('TRUE' if args.allow_milps else 'FALSE')]
+        if args.deps_root:
+            cmake_cmd += ['-DDEPS_ROOT_DIR=' + absexpanduser(args.deps_root)]
         if args.coin_root:
             cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
@@ -146,8 +150,20 @@ def main():
     test = 'run tests after building'
     parser.add_argument('--test', action='store_true', help=test)
 
+    parser.add_argument('--allow-milps', action='store_true',
+                        dest='allow_milps', default=True,
+                        help='Allows mixed integer linear programs by default')
+    parser.add_argument('--dont-allow-milps', action='store_false',
+                        dest='allow_milps',
+                        help="Don't Allows mixed integer linear programs "
+                             "by default")
+
+    deps = "the path to the directory containing all dependencies"
+    parser.add_argument('--deps-root', '--deps_root', help=deps,
+                        default=None, dest='deps_root')
+
     coin = "the relative path to the Coin-OR libraries directory"
-    parser.add_argument('--coin_root', help=coin)
+    parser.add_argument('--coin-root', '--coin_root', help=coin)
 
     boost = "the relative path to the Boost libraries directory"
     parser.add_argument('--boost_root', help=boost)
@@ -160,12 +176,19 @@ def main():
     parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
 
     build_type = "the CMAKE_BUILD_TYPE"
-    parser.add_argument('--build_type', help=build_type)
+    parser.add_argument('--build-type', '--build_type', help=build_type)
 
     parser.add_argument('-D', metavar='VAR', action='append',
                         help='Set enviornment variable(s).')
 
     args = parser.parse_args()
+    # modify roots as needed
+    if args.deps_root is not None:
+        roots = ['coin_root', 'boost_root', 'hdf5_root']
+        for name in roots:
+            if not getattr(args, name, None):
+                setattr(args, name, args.deps_root)
+    # run code
     if args.uninstall:
         uninstall_cyclus(args)
     else:

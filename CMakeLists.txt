@@ -78,7 +78,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_EXECUTABLE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
     # use, i.e. don't skip the full RPATH for the build tree
-    SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+    SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 
     # when building, don't use the install RPATH already
     # (but later on when installing)
@@ -131,26 +131,39 @@ IF(NOT CYCLUS_DOC_ONLY)
     ################################### begin find libraries #####################################
     ##############################################################################################
 
-    FIND_PACKAGE( Tcmalloc )
+    MESSAGE("-- Dependency Root Dir (DEPS_ROOT_DIR): ${DEPS_ROOT_DIR}")
+    if (DEPS_ROOT_DIR)
+        SET(DEPS_HINTS HINTS "${DEPS_ROOT_DIR}")
+        SET(DEPS_LIB_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/lib")
+        SET(DEPS_INCLUDE_HINTS HINTS "${DEPS_ROOT_DIR}/include")
+    else (DEPS_ROOT_DIR)
+        SET(DEPS_HINTS)
+        SET(DEPS_LIB_HINTS)
+        SET(DEPS_INCLUDE_HINTS)
+    endif (DEPS_ROOT_DIR)
+    MESSAGE("-- Dependency Hints (DEPS_HINTS): ${DEPS_HINTS}")
+    MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
+    MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
+
+    FIND_PACKAGE(Tcmalloc)
     SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
-    FIND_PACKAGE( LibXml2 REQUIRED )
+    FIND_PACKAGE(LibXml2 REQUIRED ${DEPS_HINTS})
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
     SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
     # Find LibXML++ and dependencies
-    FIND_PACKAGE( LibXML++ REQUIRED )
+    FIND_PACKAGE(LibXML++ REQUIRED)
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
-    MESSAGE(${LIBS})
 
     # Find Sqlite3
-    FIND_PACKAGE( Sqlite3 REQUIRED )
+    FIND_PACKAGE(Sqlite3 REQUIRED)
     SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
     # Find HDF5
-    FIND_PACKAGE( HDF5 REQUIRED)
+    FIND_PACKAGE(HDF5 REQUIRED)
     ADD_DEFINITIONS(${HDF5_DEFINITIONS})
     set(LIBS ${LIBS} ${HDF5_LIBRARIES} )
     MESSAGE("--    HDF5 Root: ${HDF5_ROOT}")
@@ -161,8 +174,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Include the boost header files and the program_options library
     # Please be sure to use Boost rather than BOOST.
     # Capitalization matters on some platforms
-    SET(Boost_USE_STATIC_LIBS       OFF)
-    SET(Boost_USE_STATIC_RUNTIME    OFF)
+    SET(Boost_USE_STATIC_LIBS OFF)
+    SET(Boost_USE_STATIC_RUNTIME OFF)
     # SET(Boost_USE_MULTITHREADED    OFF)
     FIND_PACKAGE( Boost 1.46.1 COMPONENTS program_options filesystem system serialization REQUIRED)
     MESSAGE("--    Boost Root: ${Boost_ROOT}")
@@ -190,49 +203,49 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Some optional libraries to link in, as availble. Required for conda.
     #
     # pcre
-    FIND_LIBRARY(PCRE_LIBRARIES pcre)
+    FIND_LIBRARY(PCRE_LIBRARIES pcre ${DEPS_LIB_HINTS})
     MESSAGE("-- Found PCRE Libraries (optional): ${PCRE_LIBRARIES}")
     IF(PCRE_LIBRARIES)
         set(LIBS ${LIBS} ${PCRE_LIBRARIES})
     ENDIF(PCRE_LIBRARIES)
 
     # openblas
-    FIND_LIBRARY(OPENBLAS_LIBRARIES openblas)
+    FIND_LIBRARY(OPENBLAS_LIBRARIES openblas ${DEPS_LIB_HINTS})
     MESSAGE("-- Found OPENBLAS Libraries (optional): ${OPENBLAS_LIBRARIES}")
     IF(OPENBLAS_LIBRARIES)
         set(LIBS ${LIBS} ${OPENBLAS_LIBRARIES})
     ENDIF(OPENBLAS_LIBRARIES)
 
     # ClpSolver
-    FIND_LIBRARY(CLPSOLVER_LIBRARIES ClpSolver)
+    FIND_LIBRARY(CLPSOLVER_LIBRARIES ClpSolver ${DEPS_LIB_HINTS})
     MESSAGE("-- Found CLPSOLVER Libraries (optional): ${CLPSOLVER_LIBRARIES}")
     IF(CLPSOLVER_LIBRARIES)
         set(LIBS ${LIBS} ${CLPSOLVER_LIBRARIES})
     ENDIF(CLPSOLVER_LIBRARIES)
 
     # iconv
-    FIND_LIBRARY(ICONV_LIBRARIES iconv)
+    FIND_LIBRARY(ICONV_LIBRARIES iconv ${DEPS_LIB_HINTS})
     MESSAGE("-- Found ICONV Libraries (optional): ${ICONV_LIBRARIES}")
     IF(ICONV_LIBRARIES)
         set(LIBS ${LIBS} ${ICONV_LIBRARIES})
     ENDIF(ICONV_LIBRARIES)
 
     # icudata
-    FIND_LIBRARY(ICUDATA_LIBRARIES icudata)
+    FIND_LIBRARY(ICUDATA_LIBRARIES icudata ${DEPS_LIB_HINTS})
     MESSAGE("-- Found ICUDATA Libraries (optional): ${ICUDATA_LIBRARIES}")
     IF(ICUDATA_LIBRARIES)
         set(LIBS ${LIBS} ${ICUDATA_LIBRARIES})
     ENDIF(ICUDATA_LIBRARIES)
 
     # icui18n
-    FIND_LIBRARY(ICUI18N_LIBRARIES icui18n)
+    FIND_LIBRARY(ICUI18N_LIBRARIES icui18n ${DEPS_LIB_HINTS})
     MESSAGE("-- Found ICUI18N Libraries (optional): ${ICUI18N_LIBRARIES}")
     IF(ICUI18N_LIBRARIES)
         set(LIBS ${LIBS} ${ICUI18N_LIBRARIES})
     ENDIF(ICUI18N_LIBRARIES)
 
     # icuuc
-    FIND_LIBRARY(ICUUC_LIBRARIES icuuc)
+    FIND_LIBRARY(ICUUC_LIBRARIES icuuc ${DEPS_LIB_HINTS})
     MESSAGE("-- Found ICUUC Libraries (optional): ${ICUUC_LIBRARIES}")
     IF(ICUUC_LIBRARIES)
         set(LIBS ${LIBS} ${ICUUC_LIBRARIES})
