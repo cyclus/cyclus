@@ -140,7 +140,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
-    FIND_PACKAGE(LibXml2 REQUIRED HINTS "${DEPS_ROOT_DIR}" ${LIB_HINTS})
+    FIND_PACKAGE(LibXml2 REQUIRED HINTS "${DEPS_ROOT_DIR};${LIB_HINTS}")
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
     SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
