@@ -12,7 +12,7 @@ endif ()
 
 find_library(Tcmalloc_LIBRARY NO_DEFAULT_PATH
   NAMES ${Tcmalloc_NAMES}
-  HINTS "${DEPS_ROOT_DIR}"
+  ${DEPS_HINTS}
   PATHS ${HT_DEPENDENCY_LIB_DIR} /lib /usr/lib /usr/local/lib /opt/local/lib
 )
 

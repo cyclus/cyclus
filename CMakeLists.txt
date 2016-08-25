@@ -133,11 +133,17 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     MESSAGE("-- Dependency Root Dir (DEPS_ROOT_DIR): ${DEPS_ROOT_DIR}")
     if (${DEPS_ROOT_DIR})
-        SET(DEPS_HINTS HINTS ${DEPS_ROOT_DIR})
+        SET(DEPS_HINTS HINTS "${DEPS_ROOT_DIR}")
+        SET(DEPS_LIB_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/lib")
+        SET(DEPS_INCLUDE_HINTS HINTS "${DEPS_ROOT_DIR}/include")
     else (${DEPS_ROOT_DIR})
         SET(DEPS_HINTS)
+        SET(DEPS_LIB_HINTS)
+        SET(DEPS_INCLUDE_HINTS)
     endif (${DEPS_ROOT_DIR})
     MESSAGE("-- Dependency Hints (DEPS_HINTS): ${DEPS_HINTS}")
+    MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
+    MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
 
     FIND_PACKAGE(Tcmalloc)
     SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
@@ -197,56 +203,49 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Some optional libraries to link in, as availble. Required for conda.
     #
     # pcre
-    FIND_LIBRARY(PCRE_LIBRARIES pcre
-                 HINTS "${DEPS_ROOT_DIR}" "${DEPS_ROOT_DIR}/lib")
+    FIND_LIBRARY(PCRE_LIBRARIES pcre ${DEPS_LIB_HINTS})
     MESSAGE("-- Found PCRE Libraries (optional): ${PCRE_LIBRARIES}")
     IF(PCRE_LIBRARIES)
         set(LIBS ${LIBS} ${PCRE_LIBRARIES})
     ENDIF(PCRE_LIBRARIES)
 
     # openblas
-    FIND_LIBRARY(OPENBLAS_LIBRARIES openblas
-                 HINTS "${DEPS_ROOT_DIR}" "${DEPS_ROOT_DIR}/lib")
+    FIND_LIBRARY(OPENBLAS_LIBRARIES openblas ${DEPS_LIB_HINTS})
     MESSAGE("-- Found OPENBLAS Libraries (optional): ${OPENBLAS_LIBRARIES}")
     IF(OPENBLAS_LIBRARIES)
         set(LIBS ${LIBS} ${OPENBLAS_LIBRARIES})
     ENDIF(OPENBLAS_LIBRARIES)
 
     # ClpSolver
-    FIND_LIBRARY(CLPSOLVER_LIBRARIES ClpSolver
-                 HINTS "${DEPS_ROOT_DIR}" "${DEPS_ROOT_DIR}/lib")
+    FIND_LIBRARY(CLPSOLVER_LIBRARIES ClpSolver ${DEPS_LIB_HINTS})
     MESSAGE("-- Found CLPSOLVER Libraries (optional): ${CLPSOLVER_LIBRARIES}")
     IF(CLPSOLVER_LIBRARIES)
         set(LIBS ${LIBS} ${CLPSOLVER_LIBRARIES})
     ENDIF(CLPSOLVER_LIBRARIES)
 
     # iconv
-    FIND_LIBRARY(ICONV_LIBRARIES iconv
-                 HINTS "${DEPS_ROOT_DIR}" "${DEPS_ROOT_DIR}/lib")
+    FIND_LIBRARY(ICONV_LIBRARIES iconv ${DEPS_LIB_HINTS})
     MESSAGE("-- Found ICONV Libraries (optional): ${ICONV_LIBRARIES}")
     IF(ICONV_LIBRARIES)
         set(LIBS ${LIBS} ${ICONV_LIBRARIES})
     ENDIF(ICONV_LIBRARIES)
 
     # icudata
-    FIND_LIBRARY(ICUDATA_LIBRARIES icudata
-                 HINTS "${DEPS_ROOT_DIR}" "${DEPS_ROOT_DIR}/lib")
+    FIND_LIBRARY(ICUDATA_LIBRARIES icudata ${DEPS_LIB_HINTS})
     MESSAGE("-- Found ICUDATA Libraries (optional): ${ICUDATA_LIBRARIES}")
     IF(ICUDATA_LIBRARIES)
         set(LIBS ${LIBS} ${ICUDATA_LIBRARIES})
     ENDIF(ICUDATA_LIBRARIES)
 
     # icui18n
-    FIND_LIBRARY(ICUI18N_LIBRARIES icui18n
-                 HINTS "${DEPS_ROOT_DIR}" "${DEPS_ROOT_DIR}/lib")
+    FIND_LIBRARY(ICUI18N_LIBRARIES icui18n ${DEPS_LIB_HINTS})
     MESSAGE("-- Found ICUI18N Libraries (optional): ${ICUI18N_LIBRARIES}")
     IF(ICUI18N_LIBRARIES)
         set(LIBS ${LIBS} ${ICUI18N_LIBRARIES})
     ENDIF(ICUI18N_LIBRARIES)
 
     # icuuc
-    FIND_LIBRARY(ICUUC_LIBRARIES icuuc
-                 HINTS "${DEPS_ROOT_DIR}" "${DEPS_ROOT_DIR}/lib")
+    FIND_LIBRARY(ICUUC_LIBRARIES icuuc ${DEPS_LIB_HINTS})
     MESSAGE("-- Found ICUUC Libraries (optional): ${ICUUC_LIBRARIES}")
     IF(ICUUC_LIBRARIES)
         set(LIBS ${LIBS} ${ICUUC_LIBRARIES})
