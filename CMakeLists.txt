@@ -132,14 +132,15 @@ IF(NOT CYCLUS_DOC_ONLY)
     ##############################################################################################
 
     MESSAGE("-- Dependency Root Dir (DEPS_ROOT_DIR): ${DEPS_ROOT_DIR}")
+    SET(LIB_HINTS /usr/lib/x86_64-linux-gnu /usr/lib /usr /)
+    MESSAGE("-- Library Location Hints (LIB_HINTS): ${LIB_HINTS}")
 
     FIND_PACKAGE(Tcmalloc)
     SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
-    FIND_PACKAGE(LibXml2 REQUIRED
-                 HINTS "${DEPS_ROOT_DIR}" /usr/lib/x86_64-linux-gnu /usr/lib /usr /)
+    FIND_PACKAGE(LibXml2 REQUIRED HINTS "${DEPS_ROOT_DIR}" ${LIB_HINTS})
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
     SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
