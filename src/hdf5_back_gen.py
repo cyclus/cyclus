@@ -544,7 +544,7 @@ def get_decl(t, depth=0, prefix=""):
     This function is the dispatch for declarations. Declarations occur
     directly before bodies, so they are created without recursion.
     """
-    variable = "x" + str(depth) + prefix
+    variable = get_variable("x", depth=depth, prefix=prefix)
     node = ExprStmt(child=Decl(type=t, name=Var(name=variable)))
     return node
 
@@ -633,7 +633,7 @@ def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
     
     tree = Block(nodes=[
                  ExprStmt(child=FuncCall(name=Raw(code="memcpy"), 
-                                         args=[Raw(code="&x"), 
+                                         args=[Raw(code="&"+x), 
                                                Raw(code=base_offset),
                                                Raw(code=total_size)]))])
     return tree
@@ -954,7 +954,7 @@ def list_body(t, depth=0, prefix="", base_offset="buf+offset"):
               body=[
                 get_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
                             prefix=child_prefix, base_offset=offset),
-                ExprStmt(child=FuncCall(name=Raw(code=x+".pushback"),
+                ExprStmt(child=FuncCall(name=Raw(code=x+".push_back"),
                                         args=[Raw(code=child_variable)]))])])
     return node
 
@@ -967,7 +967,7 @@ BODIES = {"INT": reinterpret_cast_body,
           "VL_STRING": vl_body,
           "BLOB": vl_body,
           "VECTOR_STRING": vec_string_body,
-          "SET_STRING": set_string_body,
+          #"SET_STRING": set_string_body,
           "MAP": map_body,
           "PAIR": pair_body,
           "LIST_INT": list_primitive_body,
