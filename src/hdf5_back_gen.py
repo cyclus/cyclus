@@ -435,10 +435,8 @@ def vl_string_setup(depth=0, prefix=""):
     """
     This function represents the setup for the vl_string primitive.
     """
-    jlen = "jlen" + str(depth) + prefix
-    node = Block(nodes=[
-        ExprStmt(child=Assign(target=Var(name=jlen), 
-               value=Raw(code="col_sizes_[table][j] / CYCLUS_SHA1_SIZE")))])
+    
+    node = Block(nodes=[Nothing()])
     return node
 
 template_args = {"MAP": ("KEY", "VALUE"),
@@ -491,8 +489,7 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tbtype", child_index='j'):
         setup_nodes.append(total_size)
         
         if t.canon[0] in variable_length_types:
-            fieldlen_var = get_variable("fieldlen", depth=depth,
-                                             prefix=prefix)
+            fieldlen_var = get_variable("fieldlen", depth=depth, prefix=prefix)
             fieldlen = Block(nodes=[ExprStmt(child=Decl(
                                                   type=Type(cpp="hsize_t"),
                                                   name=Var(name=fieldlen_var))),
@@ -523,17 +520,19 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tbtype", child_index='j'):
             setup_nodes.append(item_type)
         
         children = len(t.canon) - 1
-        setup_nodes.append(Block(nodes=[get_setup(CANON_TO_NODE[new_type], 
-                                                  depth=depth+1, 
-                                                  prefix=prefix+part,
-                                                  HDF5_type=(item_type_var 
+        if not DB_TO_VL[t.db]:
+            setup_nodes.append(Block(nodes=[get_setup(
+                                                CANON_TO_NODE[new_type], 
+                                                depth=depth+1, 
+                                                prefix=prefix+part,
+                                                HDF5_type=(item_type_var 
                                                            if multi_items 
                                                            else field_type_var),
-                                                  child_index=index) 
-                                        for new_type, part, index in zip(
-                                            t.canon[1:], 
-                                            template_args[t.canon[0]],
-                                            [i for i in range(children)])]))
+                                                child_index=index) 
+                                            for new_type, part, index in zip(
+                                                t.canon[1:], 
+                                                template_args[t.canon[0]],
+                                                [i for i in range(children)])]))
         
         node = Block(nodes=setup_nodes)
     return node
@@ -820,9 +819,10 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     x = get_variable("x", depth, prefix)
     k = get_variable("k", depth, prefix)
     index = x + "[" + k + "]"
-    fieldlen = get_variable("fieldlen", depth, prefix)
+    fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
+    item_size = get_variable("item_size", depth=depth, prefix=prefix)
     
-    string_offset = base_offset + "+" + strlen + "*" + k
+    child_offset = base_offset + "+" + item_size + "*" + k
     string_prefix = get_prefix(prefix, t, 0)
     
     node = Block(nodes=[
@@ -834,7 +834,7 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
               body=[
                 string_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
                               prefix=string_prefix, variable=index,
-                              base_offset=string_offset)
+                              base_offset=child_offset)
                 ])])
     return node
 
@@ -912,7 +912,7 @@ def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
                                         args=[Raw(code=string_name)]))])])
     return node
     
-def list_primitive_body():
+def list_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     x = get_variable("x", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     child_prefix = get_prefix(prefix, t, 0)
@@ -961,9 +961,11 @@ def list_body(t, depth=0, prefix="", base_offset="buf+offset"):
 BODIES = {"INT": reinterpret_cast_body,
           "DOUBLE": reinterpret_cast_body,
           "FLOAT": reinterpret_cast_body,
+          "BOOL": reinterpret_cast_body,
           "UUID": uuid_body,
           "STRING": string_body,
           "VL_STRING": vl_body,
+          "BLOB": vl_body,
           "VECTOR_STRING": vec_string_body,
           "SET_STRING": set_string_body,
           "MAP": map_body,
@@ -993,11 +995,14 @@ def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
                          base_offset=base_offset))
     # catch vl types here:
     elif DB_TO_VL[t.db]:
-        block.append(vl_body(t, depth, prefix, base_offset))
+        block.append(vl_body(t, depth=depth, prefix=prefix,
+                             base_offset=base_offset))
     elif t.db in BODIES:
-        block.append(BODIES[t.db](t, depth, prefix, base_offset))
+        block.append(BODIES[t.db](t, depth=depth, prefix=prefix,
+                                  base_offset=base_offset))
     elif t.canon[0] in BODIES:
-        block.append(BODIES[t.canon[0]](t, depth, prefix, base_offset))
+        block.append(BODIES[t.canon[0]](t, depth=depth, prefix=prefix,
+                                        base_offset=base_offset))
     else:
         for i, part in zip(t.canon[1:], template_args[t.canon[0]]):
             new_prefix = prefix + part
@@ -1065,20 +1070,23 @@ QUERY_CASES = ''
 def main():
     output = ""
     CPPGEN = CppGen()
-    #for type in CANON_SET:
-    #    type_node = CANON_TO_NODE[type]
-    #    setup = get_setup(type_node)
-    #    body = get_body(type_node)
-    #    teardown = get_teardown(type_node)
-    #    read_x = Block(nodes=[test_setup, test_body, test_teardown])
-    #    output += CPPGEN.visit(case_template(type_node, read_x))
-    input_type = literal_eval(sys.argv[1])
-    test_type = CANON_TO_NODE[input_type]
-    test_setup = get_setup(test_type)
-    test_body = get_body(test_type)
-    test_teardown = get_teardown(test_type)
-    read_x = Block(nodes=[test_setup, test_body, test_teardown])
-    print(CPPGEN.visit(case_template(test_type, read_x)))
+    for type in CANON_SET:
+        type_node = CANON_TO_NODE[type]
+        #print(type_node.db)
+        setup = get_setup(type_node)
+        body = get_body(type_node)
+        teardown = get_teardown(type_node)
+        read_x = Block(nodes=[setup, body, teardown])
+        output += CPPGEN.visit(case_template(type_node, read_x))
+    print(output)
+    
+    #input_type = literal_eval(sys.argv[1])
+    #test_type = CANON_TO_NODE[input_type]
+    #test_setup = get_setup(test_type)
+    #test_body = get_body(test_type)
+    #test_teardown = get_teardown(test_type)
+    #read_x = Block(nodes=[test_setup, test_body, test_teardown])
+    #print(CPPGEN.visit(case_template(test_type, read_x)))
 
 if __name__ == '__main__':
     main()
