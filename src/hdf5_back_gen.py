@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """This module generates HDF5 backend code found in src/hdf5_back.cc"""
 import os
+import sys
 import json
 from ast import literal_eval
 from pprint import pformat
@@ -484,35 +485,50 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tbtype", child_index='j'):
         setup_nodes.append(total_size)
         node = Block(nodes=setup_nodes)
     else:
-        fieldlen_var = get_variable("fieldlen", depth=depth,
-                                         prefix=prefix)
-        fieldlen = Block(nodes=[ExprStmt(child=Decl(
-                                           type=Type(cpp="hsize_t"),
-                                           name=Var(name=fieldlen_var))),
-                                ExprStmt(child=FuncCall(
-                                          name=Raw(code="H5Tget_array_dims2"),
-                                          args=[Raw(code=field_type_var),
-                                                Raw(code="&"+fieldlen_var)]))])
+        multi_items = len(t.canon[1:]) > 1
         
-        item_size_var = get_variable("item_size", depth=depth, prefix=prefix)
-        item_size = ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
-                                              target=Var(name=item_size_var),
-                                              value=BinOp(
+        setup_nodes.append(field_type)
+        setup_nodes.append(total_size)
+        
+        if t.canon[0] in variable_length_types:
+            fieldlen_var = get_variable("fieldlen", depth=depth,
+                                             prefix=prefix)
+            fieldlen = Block(nodes=[ExprStmt(child=Decl(
+                                                  type=Type(cpp="hsize_t"),
+                                                  name=Var(name=fieldlen_var))),
+                                    ExprStmt(child=FuncCall(
+                                           name=Raw(code="H5Tget_array_dims2"),
+                                           args=[Raw(code=field_type_var),
+                                                 Raw(code="&"+fieldlen_var)]))])
+            setup_nodes.append(fieldlen)
+            
+            item_size_var = get_variable("item_size", depth=depth, 
+                                         prefix=prefix)
+            item_size = ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
+                                                 target=Var(name=item_size_var),
+                                                 value=BinOp(
                                                    x=Var(name=total_size_var),
                                                    op="/",
                                                    y=Var(name=fieldlen_var))))
-        setup_nodes.append(field_type)
-        if t.canon[0] in variable_length_types:
-            setup_nodes.append(fieldlen)
-        setup_nodes.append(total_size)
-        if t.canon[0] in variable_length_types:
             setup_nodes.append(item_size)
+        
+        if multi_items:
+            item_type_var = get_variable("item_type", depth, prefix)
+            item_type = ExprStmt(child=DeclAssign(
+                                        type=Type(cpp="hid_t"),
+                                        target=Var(name=item_type_var),
+                                        value=FuncCall(
+                                            name=Raw(code="H5Tget_super"),
+                                            args=[Raw(code=field_type_var)])))
+            setup_nodes.append(item_type)
         
         children = len(t.canon) - 1
         setup_nodes.append(Block(nodes=[get_setup(CANON_TO_NODE[new_type], 
                                                   depth=depth+1, 
                                                   prefix=prefix+part,
-                                                  HDF5_type=field_type_var,
+                                                  HDF5_type=(item_type_var 
+                                                           if multi_items 
+                                                           else field_type_var),
                                                   child_index=index) 
                                         for new_type, part, index in zip(
                                             t.canon[1:], 
@@ -605,7 +621,7 @@ def vl_string_body(t, depth=0, prefix="", variable=None,
                                targs=[Raw(code=t.cpp), Raw(code=t.db)])))])
     return tree
 
-def uuid_body(t):
+def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
     """
     This function represents the reader for the boost uuid primitive.
     
@@ -613,12 +629,14 @@ def uuid_body(t):
     memcpy(&x, buf+offset, 16);
     {teardown}
     """
+    x = get_variable("x", depth=depth, prefix=prefix)
+    total_size = get_variable("total_size", depth=depth, prefix=prefix)
+    
     tree = Block(nodes=[
-                 Decl(type=t, name=Var(name="x")),
                  ExprStmt(child=FuncCall(name=Raw(code="memcpy"), 
-                          args=[Raw(code="&x"), 
-                                Raw(code="buf+offset"), Raw(code="16")])),
-                 create_teardown(t)])
+                                         args=[Raw(code="&x"), 
+                                               Raw(code=base_offset),
+                                               Raw(code=total_size)]))])
     return tree
 
 
@@ -669,16 +687,15 @@ def memcpy_body(t, depth=0, prefix="", base_offset="buf+offset"):
                                           Raw(code="col_sizes_[table][j]")]))])
     return node
 
-def elementwise_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """
-    x = t.cpp(fieldlen)
-    for(unsigned int k = 0; k < fieldlen; ++k) {
-        elem decl
-        elem body // using x[k]
-    }
-    """
-    pass
-    
+def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
+    x = get_variable("x", depth, prefix)
+    node = Block(nodes=[ExprStmt(child=Assign(target=Var(name=x),
+                            value=FuncCall(name=Var(name="VLRead"),
+                                           args=[Raw(code=base_offset)],
+                                           targs=[Raw(code=t.cpp), 
+                                                  Raw(code=t.db)])))])
+    return node
+
 def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
     """
     for(unsigned int k = 0; k < jlen; ++k) {
@@ -754,13 +771,13 @@ def pair_body(t, depth=0, prefix="", base_offset="buf+offset"):
                                                  Raw(code=item2_name)])))])
     return node
 
-def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
+def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     x = get_variable("x", depth, prefix)
     k = get_variable("k", depth, prefix)
     fieldlen = get_variable("fieldlen", depth, prefix)
+    total_size = get_variable("total_size", depth, prefix)
     
     vector_start = "&" + x + "[0]"
-    col_size = "col_sizes_[table][j]"
     
     node = Block(nodes=[ExprStmt(child=Assign(target=Var(name=x),
                                               value=FuncCall(
@@ -769,18 +786,36 @@ def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
                        ExprStmt(child=FuncCall(name=Var(name="memcpy"),
                                                args=[Raw(code=vector_start),
                                                      Raw(code=base_offset),
-                                                     Raw(code=col_size)]))])
+                                                     Raw(code=total_size)]))])
     return node
 
-def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
+def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
     x = get_variable("x", depth, prefix)
-    node = Block(nodes=[ExprStmt(child=Assign(target=Var(name=x),
-                            value=FuncCall(name=Var(name="VLRead"),
-                                           args=[Raw(code=base_offset)],
-                                           targs=[Raw(code=t.cpp), 
-                                                  Raw(code=t.db)])))])
+    k = get_variable("k", depth, prefix)
+    fieldlen = get_variable("fieldlen", depth, prefix)
+    index = x + "[" + k + "]"
+    
+    child_prefix = get_prefix(prefix, t, 0) 
+    child_var = get_variable("x", depth+1, child_prefix)
+    
+    child_size = get_variable("item_size", depth, prefix)
+    child_offset = base_offset + "+" + child_size + "*" + k
+    
+    node = Block(nodes=[
+          For(adecl=DeclAssign(type=Type(cpp="unsigned int"), 
+                               target=Var(name=k), 
+                               value=Raw(code="0")),
+              cond=BinOp(x=Var(name=k), op="<", y=Var(name=fieldlen)),
+              incr=LeftUnaryOp(op="++", name=Var(name=k)),
+              body=[
+                get_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
+                         prefix=child_prefix,
+                         base_offset=child_offset),
+                ExprStmt(child=Assign(target=Var(name=index), 
+                                      value=Raw(code=child_var)))
+                ])])
     return node
-
+    
 def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     x = get_variable("x", depth, prefix)
     k = get_variable("k", depth, prefix)
@@ -803,16 +838,40 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
                 ])])
     return node
 
-def vec_vl_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    x = "x" + str(depth) + prefix
-    k = "k" + str(depth) + prefix
-    index = x + "[" + k + "]"
-    fieldlen = get_variable("fieldlen", depth, prefix)
+def set_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
+    x = get_variable("x", depth=depth, prefix=prefix)
+    fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
+    child_prefix = get_prefix(prefix, t, 0)
+    xraw = get_variable("xraw", depth=depth+1, prefix=child_prefix)
     
-    vl_string_prefix = get_prefix(prefix, t, 0)
-    vl_string_size = get_variable("total_size", depth+1, vl_string_prefix) 
+    xraw_type = CANON_TO_NODE[t.canon[1]].cpp + "*"
     
-    offset = base_offset + "+" + vl_string_size + "*" + k
+    node = Block(nodes=[ExprStmt(child=DeclAssign(
+                           type=Type(cpp=xraw_type),
+                           target=Var(name=xraw),
+                           value=FuncCall(name=Raw(code="reinterpret_cast"),
+                                          targs=[Raw(code=xraw_type)],
+                                          args=[Raw(code=base_offset)]))),
+                        ExprStmt(child=Assign(
+                                        target=Var(name=x),
+                                        value=FuncCall(name=Raw(code=t.cpp),
+                                                       args=[Raw(code=xraw), 
+                                                             Raw(code=xraw
+                                                                 +"+"
+                                                                 +fieldlen)
+                                                                 ])))])
+    return node
+    
+def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
+    x = get_variable("x", depth=depth, prefix=prefix)
+    k = get_variable("k", depth=depth, prefix=prefix)
+    
+    fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
+    
+    child_prefix = get_prefix(prefix, t, 0)
+    child_var = get_variable("x", depth=depth+1, prefix=child_prefix)
+    item_size = get_variable("item_size", depth, prefix)
+    child_offset = base_offset + "+" + item_size + "*" + k
     
     node = Block(nodes=[
           For(adecl=DeclAssign(type=Type(cpp="unsigned int"), 
@@ -821,12 +880,13 @@ def vec_vl_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
               cond=BinOp(x=Var(name=k), op="<", y=Var(name=fieldlen)),
               incr=LeftUnaryOp(op="++", name=Var(name=k)),
               body=[
-                vl_string_reader(CANON_TO_NODE[t.canon[1]], depth=depth+1,
-                              prefix=vl_string_prefix, variable=index,
-                              base_offset=offset)
-                ])])
+                get_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
+                              prefix=child_prefix,
+                              base_offset=child_offset),
+                ExprStmt(child=FuncCall(name=Raw(code=x+".insert"), 
+                                        args=[Raw(code=child_var)]))])])
     return node
-    
+
 def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     x = get_variable("x", depth, prefix)
     k = get_variable("k", depth, prefix) 
@@ -852,14 +912,38 @@ def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
                                         args=[Raw(code=string_name)]))])])
     return node
     
-def list_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
+def list_primitive_body():
+    x = get_variable("x", depth=depth, prefix=prefix)
+    fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
+    child_prefix = get_prefix(prefix, t, 0)
+    xraw = get_variable("xraw", depth=depth+1, prefix=child_prefix)
+    
+    xraw_type = CANON_TO_NODE[t.canon[1]].cpp + "*"
+    
+    node = Block(nodes=[ExprStmt(child=DeclAssign(
+                           type=Type(cpp=xraw_type),
+                           target=Var(name=xraw),
+                           value=FuncCall(name=Raw(code="reinterpret_cast"),
+                                          targs=[Raw(code=xraw_type)],
+                                          args=[Raw(code=base_offset)]))),
+                        ExprStmt(child=Assign(
+                                        target=Var(name=x),
+                                        value=FuncCall(name=Raw(code=t.cpp),
+                                                       args=[Raw(code=xraw), 
+                                                             Raw(code=xraw
+                                                                 +"+"
+                                                                 +fieldlen)
+                                                                 ])))])
+    return node
+
+def list_body(t, depth=0, prefix="", base_offset="buf+offset"):
     x = get_variable("x", depth, prefix)
     k = get_variable("k", depth, prefix)
-    string_prefix = get_prefix(prefix, t, 0)
-    string_variable = get_variable("x", depth+1, string_prefix)
+    child_prefix = get_prefix(prefix, t, 0)
+    child_variable = get_variable("x", depth+1, child_prefix)
     fieldlen = get_variable("fieldlen", depth, prefix)
-    total_size = get_variable("total_size", depth+1, string_prefix)
-    offset = base_offset + "+" + total_size + "*" + k
+    item_size = get_variable("item_size", depth, prefix)
+    offset = base_offset + "+" + item_size + "*" + k
     
     node = Block(nodes=[ 
           For(adecl=DeclAssign(type=Type(cpp="unsigned int"), 
@@ -868,11 +952,10 @@ def list_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
               cond=BinOp(x=Var(name=k), op="<", y=Var(name=fieldlen)),
               incr=LeftUnaryOp(op="++", name=Var(name=k)),
               body=[
-                string_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
-                            prefix=string_prefix, base_offset=offset,
-                            variable=string_variable),
+                get_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
+                            prefix=child_prefix, base_offset=offset),
                 ExprStmt(child=FuncCall(name=Raw(code=x+".pushback"),
-                                        args=[Raw(code=string_variable)]))])])
+                                        args=[Raw(code=child_variable)]))])])
     return node
 
 BODIES = {"INT": reinterpret_cast_body,
@@ -885,6 +968,17 @@ BODIES = {"INT": reinterpret_cast_body,
           "SET_STRING": set_string_body,
           "MAP": map_body,
           "PAIR": pair_body,
+          "LIST_INT": list_primitive_body,
+          "LIST_DOUBLE": list_primitive_body,
+          "LIST_FLOAT": list_primitive_body,
+          "LIST": list_body,
+          "SET_INT": set_primitive_body,
+          "SET_DOUBLE": set_primitive_body,
+          "SET_FLOAT": set_primitive_body,
+          "SET": set_body,
+          "VECTOR_INT": vector_primitive_body,
+          "VECTOR_DOUBLE": vector_primitive_body,
+          "VECTOR_FLOAT": vector_primitive_body,
           "VECTOR": vector_body}
 
 def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
@@ -907,7 +1001,8 @@ def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
     else:
         for i, part in zip(t.canon[1:], template_args[t.canon[0]]):
             new_prefix = prefix + part
-            block.append(get_body(CANON_TO_NODE[i], depth=depth+1, prefix=new_prefix))
+            block.append(get_body(CANON_TO_NODE[i], depth=depth+1, 
+            prefix=new_prefix))
     return Block(nodes=block)
 
 #teardown functions
@@ -968,12 +1063,22 @@ def indent(text, prefix, predicate=None):
 QUERY_CASES = ''
 
 def main():
+    output = ""
     CPPGEN = CppGen()
-    test_type = CANON_TO_NODE[('MAP', 'INT', 'STRING')]
+    #for type in CANON_SET:
+    #    type_node = CANON_TO_NODE[type]
+    #    setup = get_setup(type_node)
+    #    body = get_body(type_node)
+    #    teardown = get_teardown(type_node)
+    #    read_x = Block(nodes=[test_setup, test_body, test_teardown])
+    #    output += CPPGEN.visit(case_template(type_node, read_x))
+    input_type = literal_eval(sys.argv[1])
+    test_type = CANON_TO_NODE[input_type]
     test_setup = get_setup(test_type)
     test_body = get_body(test_type)
     test_teardown = get_teardown(test_type)
     read_x = Block(nodes=[test_setup, test_body, test_teardown])
     print(CPPGEN.visit(case_template(test_type, read_x)))
+
 if __name__ == '__main__':
     main()
