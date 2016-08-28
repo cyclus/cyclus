@@ -1030,7 +1030,7 @@ def normal_close(t):
                  value=FuncCall(name=Var(name="CmpConds"), 
                                 targs=[Raw(code=t.cpp)],
                             args=[Raw(code="&"+x),
-                                  Raw(code="&(field_conds[qr.fields[j]]))")]))),
+                                  Raw(code="&(field_conds[qr.fields[j]])")]))),
         If(cond=Var(name="is_row_selected"),
            body=[ExprStmt(child=Assign(target=Var(name="row[j]"),
                                        value=Var(name=x)))])])
