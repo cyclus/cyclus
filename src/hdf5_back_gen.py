@@ -447,7 +447,7 @@ template_args = {"MAP": ("KEY", "VALUE"),
 
 variable_length_types = ["MAP", "LIST", "SET", "VECTOR"]
 
-def get_setup(t, depth=0, prefix="", HDF5_type="tbtype", child_index='j'):
+def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
     """
     This function is the dispatch for various setups. Primitives are directly
     setup, while template types are setup recursively.
