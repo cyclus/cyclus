@@ -72,6 +72,8 @@ def install_cyclus(args):
             cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
             cmake_cmd += ['-DBOOST_ROOT=' + absexpanduser(args.boost_root)]
+        if args.cyclus_root:
+            cmake_cmd += ['-DCYCLUS_ROOT_DIR='+absexpanduser(args.cyclus_root)]
         if args.hdf5_root:
             h5root = absexpanduser(args.hdf5_root)
             cmake_cmd += ['-DHDF5_ROOT=' + h5root,
@@ -171,6 +173,9 @@ def main():
     hdf5 = "the path to the HDF5 libraries directory"
     parser.add_argument('--hdf5_root', help=hdf5)
 
+    cyclus = "the relative path to Cyclus installation directory"
+    parser.add_argument('--cyclus-root', '--cyclus_root', help=cyclus)
+
     cmake_prefix_path = "the cmake prefix path for use with FIND_PACKAGE, " + \
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
     parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
@@ -184,7 +189,7 @@ def main():
     args = parser.parse_args()
     # modify roots as needed
     if args.deps_root is not None:
-        roots = ['coin_root', 'boost_root', 'hdf5_root']
+        roots = ['coin_root', 'boost_root', 'hdf5_root', 'cyclus_root']
         for name in roots:
             if not getattr(args, name, None):
                 setattr(args, name, args.deps_root)
