@@ -2,7 +2,7 @@
 Cyclus Installation Guide
 ###########
 
-Cyclus uses the CMake cross platform bailed-generator as a build system. TO
+Cyclus uses the CMake cross platform bailed-generator as a build system. To
 simplify the usage of cmake to build Cyclus from source, a python script is
 provided with the source.
 
@@ -148,19 +148,6 @@ proper functioning of Cyclus. You can run the tests yourself via:
 
     $ cyclus_unit_tests
 
-******************************
-Running Cyclus
-******************************
-
-You can find instructions for writing an input file for cyclus from `Cyclus User
-Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
-file `input.xml`, you can run Cyclus via:
-
-.. code-block:: bash
-
-    $ cyclus path/to/input.xml
-
-For a more detailed explanation, checkout the user guide.
 
 .. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
