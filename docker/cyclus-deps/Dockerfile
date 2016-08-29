@@ -1,4 +1,3 @@
-
 FROM ubuntu
 
 RUN apt-get -y --force-yes update
