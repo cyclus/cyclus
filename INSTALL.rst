@@ -141,12 +141,25 @@ As usual you can custom you cmake installation using the proper cmake flag.
 All cmake variable can be listed using: ``cmake -LAH``.
 The main variable used are:
 
-#. ``COIN_ROOT_DIR`` set Coin-OT library directory 
-#. ``BOOST_ROOT``    set Boost liraries directory
-#. ``HDF5_ROOT``     set HDF5 root directory
-#. ``HDF5_LIBRARIES`` set HDF5 libraries path
-#. ``HDF5_LIBRARY_DIRS`` set HDF5 library directory
-#. ``HDF5_INCLUDE_DIRS`` set HDF5 include directory
+.. list-table::
+
+  * - ``COIN_ROOT_DIR`` 
+    - set Coin-OT library directory 
+
+  * - ``BOOST_ROOT``    
+    - set Boost liraries directory
+
+  * - ``HDF5_ROOT``     
+    - set HDF5 root directory
+
+  * - ``HDF5_LIBRARIES`` 
+    - set HDF5 libraries path
+
+  * - ``HDF5_LIBRARY_DIRS`` 
+    - set HDF5 library directory
+
+  * - ``HDF5_INCLUDE_DIRS`` 
+    - set HDF5 include directory
 
 All variable can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
