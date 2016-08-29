@@ -62,10 +62,7 @@ Custom Cyclus installation
 The installation using the install script can be customized using the following
 flag:
 
-.. list-table:: installation FLag
-   :widths: 15 20
-   :header-rows: 0
-
+.. list-table::
 
   * - ``-h, --help``                              
     - show the help message and exit                                                                   
