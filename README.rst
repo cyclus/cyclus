@@ -70,7 +70,7 @@ Quick Cyclus Installation
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward:
 
-- Clone the Cyclus Repo: `git clone https://github.com/Baaaaam/cyclus.git`, 
+- Clone the Cyclus Repo: ``git clone https://github.com/Baaaaam/cyclus.git``, 
 
 - to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
   from cyclus folder,
