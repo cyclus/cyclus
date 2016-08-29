@@ -102,7 +102,7 @@ As explain previously, the Cyclus Core will not allow you to run simulation as
 ti does not include facilities. The Cyclus developper Team support the
 development of facility modules, Cycamore (Cyclus Additionnal Modules
 Repositiory), can be downloaded from 
-`GitHub <https://github.com/Baaaaam/cycamore>`. 
+`GitHub <https://github.com/cyclus/cycamore>`. 
 
 
 ******************************
