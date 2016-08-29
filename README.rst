@@ -66,15 +66,16 @@ dependencies notices available `here <DEPENDENCIES.rst>`_ or `Cyclus Website <ht
 ******************************
 Quick Cyclus Installation
 ******************************
-**If you are attempting to contribute to Cyclus please clone the Cyclus Repo first.**
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
-fairly straightforward.
+fairly straightforward:
 
-To install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
-from cyclus folder.
+- Clone the Cyclus Repo: `git clone https://github.com/Baaaaam/cyclus.git`, 
 
-Finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
+- to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
+from cyclus folder,
+
+- finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
 **bottom** on your ``$PATH``.
 
 For more detailed installation procedure, and/or custom installation please
