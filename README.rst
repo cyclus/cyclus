@@ -73,10 +73,10 @@ fairly straightforward:
 - Clone the Cyclus Repo: `git clone https://github.com/Baaaaam/cyclus.git`, 
 
 - to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
-from cyclus folder,
+  from cyclus folder,
 
 - finally, add the following Cyclus installation path (``~/.local/cyclus``) to the
-**bottom** on your ``$PATH``.
+  **bottom** on your ``$PATH``.
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_ (also available on `Cyclus
