@@ -11,24 +11,21 @@ This readme provides basics informations about:
  - the Cyclus installation command line,
  - how to run Cyclus and the cyclus unit test.
 
-**For detailed installation instruction, visit the** `Cyclus Website
+* **For detailed installation instruction, visit the** `Cyclus Website
 <http://fuelcycle.org/user/index.html>`_ **or** `INSTALLATION guide
 <INSTALL.rst>`_.
-
-**To see user and developer documentation for this code, please visit
+* **To see user and developer documentation for this code, please visit
 the** `Cyclus Homepage`_.
-
-**If you would like to contribute to Cyclus, please check our** `contribution
+* **If you would like to contribute to Cyclus, please check our** `contribution
 guidelines <CONTRIBUTING.rst>`_.
 
 
 The Cyclus Core contain all the fundamental pieces of the Cyclus framework
 allowing interfacing the input file, the writting of the output file, the
-management of the material flux, the Dynamical Ressource Exchange but it did not
-contain any physical facilities. 
-
-A set of facilities  can be obtain installing Cycamore, the Cyclus Additionnal
-Modules. The Cycamore module is supported by the Cyclus Developpers Team.
+management of the material flux, the Dynamical Ressource Exchange... but it did
+not contain any physical facilities. A set of facilities  can be obtain
+installing Cycamore, the Cyclus Additionnal Modules. The Cycamore module is
+supported by the Cyclus Developpers Team.
 
 Other modules can be installed (or developped) to use other facilities
 (with or without the Cycamore facilities).  Please visit the Cyclus website to
