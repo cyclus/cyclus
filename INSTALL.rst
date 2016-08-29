@@ -66,39 +66,54 @@ flag:
    :widths: 15 20
    :header-rows: 0
 
-  * - ``-h, --help``                            
-    - ``--build_dir BUILD_DIR``                 
-    - ``--uninstall``                           
-    - ``--no-update``                           
-    - ``--clean-build``                         
-    - ``-j THREADS, --threads``                 
-    - ``--prefix PREFIX``                       
-    - ``--config-only``                         
-    - ``--build-only``                          
-    - ``--test``                                
-    - ``--coin_root COIN_ROOT``                 
-    - ``--boost_root BOOST_ROOT``               
-    - ``--hdf5_root HDF5_ROOT``                 
-    - ``--cmake_prefix_path CMAKE_PREFIX_PATH`` 
-    - ``--build_type BUILD_TYPE``               
-    - ``-D VAR``                                
 
-  *  - show the help message and exit                                                                   
-     - where to place the build directory                                                               
-     - uninstall                                                                                        
-     - do not update the hash in version.cc                                                             
-     - attempt to remove the build directory before building                                            
-     - THREADS the number of threads to use in the make step                                            
-     - the relative path to the installation directory                                                  
-     - only configure the package, do not build or install                                              
-     - only build the package, do not install                                                           
-     - run tests after  building                                                                        
-     - the relative path to the Coin-OR libraries directory                                             
-     - the relative path to the Boost libraries directory                                               
-     - the path to the HDF5 libraries directory                                                         
-     - the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros 
-     - change the CMAKE_BUILD_TYPE                                                                      
-     - set environment variable(s).                                                                    
+  * - ``-h, --help``                              
+    - show the help message and exit                                                                   
+
+  * - ``--build_dir BUILD_DIR``                   
+    - where to place the build directory                                                               
+
+  * - ``--uninstall``                             
+    - uninstall                                                                                        
+
+  * - ``--no-update``                             
+    - do not update the hash in version.cc                                                             
+
+  * - ``--clean-build``                           
+    - attempt to remove the build directory before building                                            
+
+  * - ``-j THREADS, --threads``                   
+    - THREADS the number of threads to use in the make step                                            
+
+  * - ``--prefix PREFIX``                         
+    - the relative path to the installation directory                                                  
+
+  * - ``--config-only``                           
+    - only configure the package, do not build or install                                              
+
+  * - ``--build-only``                            
+    - only build the package, do not install                                                           
+
+  * - ``--test``                                  
+    - run tests after  building                                                                        
+
+  * - ``--coin_root COIN_ROOT``                   
+    - the relative path to the Coin-OR libraries directory                                             
+
+  * - ``--boost_root BOOST_ROOT``                 
+    - the relative path to the Boost libraries directory                                               
+
+  * - ``--hdf5_root HDF5_ROOT``                   
+    - the path to the HDF5 libraries directory                                                         
+
+  * - ``--cmake_prefix_path CMAKE_PREFIX_PATH``   
+    - the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros 
+
+  * - ``--build_type BUILD_TYPE``                 
+    - change the CMAKE_BUILD_TYPE                                                                      
+
+  * - ``-D VAR``                                  
+    - set environment variable(s).                                                                    
 
 
 For example, if you have installed coin-Cbc from source or otherwise have it
