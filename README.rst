@@ -66,7 +66,7 @@ dependencies notices available `here <DEPENDENCIES.rst>`_ or `Cyclus Website <ht
 ******************************
 Quick Cyclus Installation
 ******************************
-** If you attempt to contribute to Cyclus please clone the Cyclus Repo first**
+**If you are attempting to contribute to Cyclus please clone the Cyclus Repo first.**
 
 Assuming you have the dependencies installed correctly, installing Cyclus is
 fairly straightforward.
