@@ -186,6 +186,7 @@ where "package" is replaced by the correct package name. The minimal list of
 required library package names is:
 
 #. cmake
+#. hdf5
 #. boost
 #. libxml2
 #. libxmlxx2
@@ -193,8 +194,8 @@ required library package names is:
 #. doxygen
 #. glibmm
 
-Then install Coin-Cbc and HDF5 from source. They can be downloaded to any
-directory on your computer:
+Then install Coin-Cbc from source. They can be downloaded to any directory on
+your computer:
    
 **Coin-Cbc**: Download and build using the svn command in the terminal:
    
@@ -208,22 +209,6 @@ directory on your computer:
   make
   sudo make install
 
-**HDF5**: The 1.8.13 version appears to work better than 1.8.14.  Do not use
-the macports distribution, it is definitely broken.
-Download and build using the gzip Linux/Unix distribution of
-`HDF5. <http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.13/src/hdf5-1.8.13.tar.gz>`_   (For Safari users - the file will be automatically unzipped so change
-the *mv* command in the the following codeblock to *mv hdf5-1.8.13.tar hdf5/* ).
-
-.. code-block:: bash
-
-  mkdir hdf5/
-  mv hdf5-1.8.13.tar.gz hdf5/
-  cd hdf5/
-  mkdir build
-  cd build/
-  ../configure --prefix=/opt/local
-  make
-  sudo make install
 
 Finally, update your path and the following environment variables in your
 ~/.profile (or ~/.bashrc ) file:
@@ -242,85 +227,6 @@ Finally, update your path and the following environment variables in your
   export PATH=${HDF5_DIR}:/opt/local/bin:${HOME}/.local/bin:$PATH
 
 
-Installing Cyclus (Linux, Unix, and Mac OSX)
-=============================================
-
-Assuming you have the dependencies installed correctly, installing Cyclus is
-fairly straightforward.
-
-We make the following assumptions in this guide:
-
-#. there is some master directory in which you're placing all
-   Cyclus-related files called .../cyclus
-#. you want to install cyclus **locally** (in ``~/.local``)
-#. you have acquired the Cyclus source code from the `Cyclus repo`_
-#. you have placed the Cyclus repository in .../cyclus/cyclus
-
-Under these assumptions **and** if you used a package manager to
-install coin-Cbc (i.e. it's installed in a standard location), the
-Cyclus building and installation process will look like:
-
-.. code-block:: bash
-
-    .../cyclus/cyclus$ python install.py
-
-If you have installed coin-Cbc from source or otherwise have it
-installed in a non-standard location, you should make use of the
-coinRoot installation flag. The otherwise identical process would look
-like:
-
-.. code-block:: bash
-
-    .../cyclus/cyclus$  python install.py --coin_root=path/to/coin
-
-Additionally, if you have installed Boost in a non-standard location
-you should make use of the boostRoot installation flag.
-
-.. code-block:: bash
-
-    .../cyclus/cyclus$ python install.py --coin_root=/path/to/coin --boost_root=/path/to/boost
-
-There are additional options which can be inspected via `install.py`'s help:
-
-.. code-block:: bash
-
-    .../cyclus/cyclus$ python install.py -h
-
-Finally, add the following line to the **bottom** your ``~/.bashrc`` file
-(``~/.bash_profile`` on Macs):
-
-.. code-block:: bash
-
-    export PATH="$HOME/.local/bin:$PATH"
-
-Then update your environment
-
-.. code-block:: bash
-
-    $ source ~/.bashrc
-
-Running Tests
-=============
-
-Installing Cyclus will also install a test driver (i.e., an executable of all of
-our tests). You can run the tests yourself via:
-
-.. code-block:: bash
-
-    $ cyclus_unit_tests
-
-Running Cyclus
-==============
-
-You can find instructions for writing an input file for cyclus from `Cyclus User
-Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
-file `input.xml`, you can run Cyclus via:
-
-.. code-block:: bash
-
-    $ cyclus path/to/input.xml
-
-For a more detailed explanation, checkout the user guide.
 
 .. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html

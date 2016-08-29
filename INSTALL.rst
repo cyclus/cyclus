@@ -12,9 +12,7 @@ provided with the source.
 Dependencies
 ******************************
 
-In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using `CMake`_. A full list of the Cyclus package
-dependencies is shown below:
+A full list of the Cyclus package dependencies is shown below:
 
 ====================   ==================
 Package                Minimum Version
