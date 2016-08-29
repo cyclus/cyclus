@@ -99,9 +99,9 @@ Installing Cycamore
 ******************************
 
 As explain previously, the Cyclus Core will not allow you to run simulation as
-ti does not include facilities. The Cyclus developper Team support the
-development of facility modules, Cycamore (Cyclus Additionnal Modules
-Repositiory), can be downloaded from 
+it does not include facilities. The Cyclus developper Team support the
+development of facility module, Cycamore (Cyclus Additionnal Modules
+Repositiory),which can be downloaded from the 
 `GitHub Cyamore Repository <https://github.com/cyclus/cycamore>`_. 
 
 
