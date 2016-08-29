@@ -11,12 +11,12 @@ This readme provides basics informations about:
  - the Cyclus installation command line,
  - how to run Cyclus and the cyclus unit test.
 
-* **For detailed installation instruction, visit the** `Cyclus Website
+- **For detailed installation instruction, visit the** `Cyclus Website
 <http://fuelcycle.org/user/index.html>`_ **or** `INSTALLATION guide
 <INSTALL.rst>`_.
-* **To see user and developer documentation for this code, please visit
+- **To see user and developer documentation for this code, please visit
 the** `Cyclus Homepage`_.
-* **If you would like to contribute to Cyclus, please check our** `contribution
+- **If you would like to contribute to Cyclus, please check our** `contribution
 guidelines <CONTRIBUTING.rst>`_.
 
 
