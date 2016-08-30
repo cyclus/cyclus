@@ -9,7 +9,7 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl, vec_string_body, vl_body, set_string_body, list_string_body, vec_vl_string_body
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl, vec_string_body, vl_body, set_string_body, vec_vl_string_body
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -216,19 +216,6 @@ def test_set_string_body():
 }\n"""
     obs = CPPGEN.visit(set_string_body(Type(cpp="std::set<std::string>", db="SET_STRING", canon=("SET", "STRING"))))
     assert_equal(exp, obs) 
-    
-def test_list_string_body():
-    exp = """for(unsigned int k0=0;k0<fieldlen1ELEM;++k0){
-  s1ELEM=std::string(buf+offset+strlen1ELEM*k0,strlen1ELEM);
-  nullpos1ELEM=s1ELEM.find('\\0');
-  if(nullpos1ELEM!=std::string::npos){
-    s1ELEM.resize(nullpos1ELEM);\n
-  }
-  x0.pushback(s1ELEM);\n
-}\n"""
-    obs = CPPGEN.visit(list_string_body(Type(cpp="std::set<std::string>", db="SET_STRING", canon=("SET", "STRING"))))
-    assert_equal(exp, obs)
-    
     
     
     
