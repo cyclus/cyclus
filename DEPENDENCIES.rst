@@ -188,8 +188,8 @@ where "package" is replaced by the correct package name. The minimal list of
 required library package names is:
 
 #. cmake
-#. hdf5
 #. boost
+#. hdf5
 #. libxml2
 #. libxmlxx2
 #. sqlite3
@@ -221,9 +221,6 @@ Finally, update your path and the following environment variables in your
 
   export CMAKE_MODULE_PATH=/opt/local/include:$CMAKE_MODULE_PATH
   export CMAKE_PREFIX_PATH=/opt/local:$CMAKE_PREFIX_PATH
-
-  export HDF5_DIR=/opt/local/hdf5/lib
-  export HDF5_ROOT=/opt/local/hdf5
 
   # add to PATH:
   export PATH=${HDF5_DIR}:/opt/local/bin:${HOME}/.local/bin:$PATH
