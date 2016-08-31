@@ -13,10 +13,10 @@ This readme provides basic information about:
 
 The Cyclus Core contains all the fundamental pieces of the Cyclus framework
 required to interface with the input file, write the output file, and manage
- material flow during the simulation via the Dynamic Resource Exchange... but '
- it does not contain any fuel cycle facilities. A set of nuclear facilities
-can be obtained by installing Cycamore, the Cyclus Additionnal Module.
-Cycamore is supported by the Cyclus Developer Team.
+material flow during the simulation via the Dynamic Resource Exchange... but it
+does not contain any fuel cycle facilities. A set of nuclear facilities can be
+obtained by installing Cycamore, the Cyclus Additionnal Module.  Cycamore is
+supported by the Cyclus Developer Team.
 
 Third party modules can also be installed (or developed) with additional
 facilities.  Please visit the Cyclus website for a list of contributed modules.
@@ -24,7 +24,7 @@ facilities.  Please visit the Cyclus website for a list of contributed modules.
 - **For general information about Cyclus, visit the**  `Cyclus Homepage`_
 
 - **For detailed installation instructions, visit the**
-`INSTALLATION Guide <INSTALL.rst>`_.
+  `INSTALLATION Guide <INSTALL.rst>`_.
 
 - **To see user and developer documentation for this code, please visit
   the** `Users Guide <http://fuelcycle.org/user/index.html>`_ 
