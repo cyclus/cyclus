@@ -125,10 +125,15 @@ Contributing
 
 We happily welcome new developers into the Cyclus Developer Team. If you are willing
 to contribute into Cyclus, please follow this procedure:
+
 #. Fork Cyclus repository,
+
 #. Create a working branch on you fork from the `develop` branch,
+
 #. Implement your modification of the Cyclus source code,
+
 #. Submit a Pull request into `Cyclus/develop` branch,
+
 #. Wait for reviews/merge (the Puller cannot be the Merger).
 
 You may also want to read our `Contribution Guidelines <CONTRIBUTING.rst>`_.
