@@ -10,7 +10,7 @@ To see user and developer documentation for this code, please visit
 the `Cyclus Homepage`_.
 
 .. contents:: Table of Contents
-   :depth: 2
+   :depth: 3
 
 ******************************
 Dependencies
