@@ -97,7 +97,7 @@ Installing Cycamore
 As noted previously, the Cyclus Core will not allow you to run fuel cycle
 simulations as it does not include nuclear facilities. To run fuel cycle
 simulations, first download Cycamore
-(`GitHub Cyamore Repository <https://github.com/cyclus/cycamore>`_)
+(`GitHub Cyamore Repository <https://github.com/cyclus/cycamore>`_):
 
 - Clone the Cycamore Repo: ``git clone
   https://github.com/Baaaaam/cycamore.git``,
