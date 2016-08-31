@@ -21,13 +21,13 @@ supported by the Cyclus Developer Team.
 Third party modules can also be installed (or developed) with additional
 facilities.  Please visit the Cyclus website for a list of contributed modules.
 
-- **For general information about Cyclus, visit the**  `Cyclus Homepage`_
+- **For general information about Cyclus, visit the**  `Cyclus Homepage`_,
 
 - **For detailed installation instructions, visit the**
-  `INSTALLATION Guide <INSTALL.rst>`_.
+  `INSTALLATION Guide <INSTALL.rst>`_,
 
 - **To see user and developer documentation for this code, please visit
-  the** `Users Guide <http://fuelcycle.org/user/index.html>`_ 
+  the** `Users Guide <http://fuelcycle.org/user/index.html>`_, 
 
 - **If you would like to contribute to Cyclus, please check our** 
   `Contribution Guidelines <CONTRIBUTING.rst>`_.
@@ -57,7 +57,7 @@ Package                Minimum Version
 `Coin-Cbc`             2.5
 ====================   ==================
 
-For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_
+For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
 
 ******************************
 Quick Cyclus Installation
@@ -66,16 +66,16 @@ Quick Cyclus Installation
 Assuming you have the dependencies installed correctly, installing Cyclus using
 github is fairly straightforward:
 
-- Clone the Cyclus Repo: ``git clone https://github.com/Baaaaam/cyclus.git``
+- Clone the Cyclus Repo: ``git clone https://github.com/Baaaaam/cyclus.git``,
 
 - to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
-  from cyclus folder
+  from cyclus folder,
 
 - finally, add the following Cyclus installation path (``~/.local/cyclus``) to
   the **bottom** on your ``$PATH``.
 
 For more detailed installation procedure, and/or custom installation please
-refer to the `INSTALLATION guide <INSTALL.rst>`_
+refer to the `INSTALLATION guide <INSTALL.rst>`_.
 
 
 ******************************
@@ -97,12 +97,13 @@ Installing Cycamore
 As noted previously, the Cyclus Core will not allow you to run fuel cycle
 simulations as it does not include nuclear facilities. To run fuel cycle
 simulations, first download Cycamore
-(`GitHub Cyamore Repository <https://github.com/cyclus/cycamore>`_ )
+(`GitHub Cyamore Repository <https://github.com/cyclus/cycamore>`_)
 
-- Clone the Cycamore Repo: ``git clone https://github.com/Baaaaam/cycamore.git``
+- Clone the Cycamore Repo: ``git clone
+  https://github.com/Baaaaam/cycamore.git``,
 
 - Install in the same location you installed Cyclus (eg. in ``~/.local/``):
-  ``python install.py`` from the cycamore folder
+  ``python install.py`` from the cycamore folder.
 
 
 ******************************
