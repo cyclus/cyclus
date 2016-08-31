@@ -56,8 +56,9 @@ tcmalloc (for speed)   any?
 *Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
 by our build system.  Instead use `libgoogle-perftools-dev`.*
 
+******************************
 Installing Dependencies
-=========================
+******************************
 
 Cyclus dependencies can either be installed via an operating system's package
 manager or via Conda.
