@@ -13,7 +13,7 @@ class ExchangeGraph;
 class ExchangeNodeGroup;
 
 /// @brief struct to hold all problem instance state
-struct ProgTranslatorContext {
+struct Context {
   std::vector<double> obj_coeffs;
   std::vector<double> row_ubs;
   std::vector<double> row_lbs;
@@ -65,7 +65,7 @@ class ProgTranslator {
   /// @brief translates solution from iface back into graph matches
   void FromProg();
 
-  const Context& ctx() const { return ctx_; }
+  const ProgTranslator::Context& ctx() const { return ctx_; }
 
  private:
   void Init();
