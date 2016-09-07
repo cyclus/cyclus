@@ -7,12 +7,11 @@
 #include "agent_managed.h"
 #include "builder.h"
 #include "commodity_producer.h"
+#include "prog_translator.h"
 
 class OsiCbcSolverInterface;
 
 namespace cyclus {
-
-class ProgTranslatorContext;
 
 namespace toolkit {
 
@@ -73,14 +72,14 @@ class BuildingManager : public AgentManaged {
   std::set<Builder*> builders_;
 
   void SetUp_(OsiCbcSolverInterface& iface,
-              ProgTranslatorContext& ctx,
+              ProgTranslator::Context& ctx,
               std::map<CommodityProducer*, Builder*>& p_to_b,
               std::map<int, CommodityProducer*>& idx_to_p,
               Commodity& commodity,
               double demand);
 
   void Solve_(OsiCbcSolverInterface& iface,
-              ProgTranslatorContext& ctx,
+              ProgTranslator::Context& ctx,
               std::map<CommodityProducer*, Builder*>& p_to_b,
               std::map<int, CommodityProducer*>& idx_to_p,
               std::vector<BuildOrder>& orders);

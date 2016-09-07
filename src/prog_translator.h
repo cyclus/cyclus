@@ -12,15 +12,6 @@ namespace cyclus {
 class ExchangeGraph;
 class ExchangeNodeGroup;
 
-/// @brief struct to hold all problem instance state
-struct ProgTranslatorContext {
-  std::vector<double> obj_coeffs;
-  std::vector<double> row_ubs;
-  std::vector<double> row_lbs;
-  std::vector<double> col_ubs;
-  std::vector<double> col_lbs;
-  CoinPackedMatrix m;
-};
 
 /// a helper class to translate a product exchange into a mathematical
 /// program.
@@ -36,7 +27,14 @@ struct ProgTranslatorContext {
 class ProgTranslator {
  public:
   /// @brief struct to hold all problem instance state
-  typedef ProgTranslatorContext Context;
+  struct Context {
+    std::vector<double> obj_coeffs;
+    std::vector<double> row_ubs;
+    std::vector<double> row_lbs;
+    std::vector<double> col_ubs;
+    std::vector<double> col_lbs;
+    CoinPackedMatrix m;
+  };
 
   /// constructor
   ///
@@ -65,7 +63,7 @@ class ProgTranslator {
   /// @brief translates solution from iface back into graph matches
   void FromProg();
 
-  const Context& ctx() const { return ctx_; }
+  const ProgTranslator::Context& ctx() const { return ctx_; }
 
  private:
   void Init();
