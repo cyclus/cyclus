@@ -35,8 +35,8 @@ Installation
 ******************************
 
 Before going further on the installation procedure be sure you have installed
-all the required dependencies listed above. You can also find `here
-<DEPENDENCIES.rst>`_ instruction to install those dependencies depending of the
+all the required dependencies listed above. You can also find `here <DEPENDENCIES.rst>`_ 
+instruction to install those dependencies depending of the
 system you are working on.
 
 Default installation
