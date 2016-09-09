@@ -27,7 +27,10 @@ class ExchangeNodeGroup;
 class ProgTranslator {
  public:
   /// @brief This class is now deprecated.
-  struct Context { Context(); ~Context(); };
+  struct Context { 
+    Context(); 
+    ~Context(); 
+  };
 
   /// constructor
   ///
