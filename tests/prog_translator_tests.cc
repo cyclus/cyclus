@@ -8,6 +8,7 @@
 #include "OsiSolverInterface.hpp"
 
 #include "coin_helpers.h"
+#include "error.h"
 #include "equality_helpers.h"
 #include "exchange_graph.h"
 #include "logger.h"
@@ -277,5 +278,12 @@ TEST(ProgTranslatorTests, translation) {
 
   delete iface;
 }
+
+TEST(ProgTranslatorTests, depricated) {
+
+  // confirm depricated error is thrown
+  ASSERT_THROW(new ProgTranslator::Context(),DepricatedApiError);
+}
+
 
 }  // namespace cyclus

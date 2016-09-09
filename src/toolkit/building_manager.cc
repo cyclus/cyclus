@@ -20,7 +20,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(Commodity& commodity,
   std::vector<BuildOrder> orders;
   if (demand > 0) {
     OsiCbcSolverInterface iface;
-    ProgTranslator::Context ctx;
+    ProgTranslatorContext ctx;
     std::map<CommodityProducer*, Builder*> p_to_b;
     std::map<int, CommodityProducer*> idx_to_p;
     SetUp_(iface, ctx, p_to_b, idx_to_p, commodity, demand);
@@ -30,7 +30,7 @@ std::vector<BuildOrder> BuildingManager::MakeBuildDecision(Commodity& commodity,
 }
 
 void BuildingManager::SetUp_(OsiCbcSolverInterface& iface,
-                             ProgTranslator::Context& ctx,
+                             ProgTranslatorContext& ctx,
                              std::map<CommodityProducer*, Builder*>& p_to_b,
                              std::map<int, CommodityProducer*>& idx_to_p,
                              Commodity& commodity,
@@ -64,7 +64,7 @@ void BuildingManager::SetUp_(OsiCbcSolverInterface& iface,
 }
 
 void BuildingManager::Solve_(OsiCbcSolverInterface& iface,
-                             ProgTranslator::Context& ctx,
+                             ProgTranslatorContext& ctx,
                              std::map<CommodityProducer*, Builder*>& p_to_b,
                              std::map<int, CommodityProducer*>& idx_to_p,
                              std::vector<BuildOrder>& orders) {

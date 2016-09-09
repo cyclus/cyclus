@@ -73,6 +73,13 @@ class ValidationError : public Error {
   ValidationError(std::string msg) : Error(msg) {}
 };
 
+/// For depricating API until a next major release
+class DepricatedApiError : public Error {
+ public:
+  DepricatedApiError(std::string msg) : Error(msg) {}
+};
+
+
 enum Warnings {
   WARNING = 0,
   VALUE_WARNING,
