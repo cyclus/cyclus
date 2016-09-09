@@ -99,6 +99,12 @@ MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
 MESSAGE("--    HDF5 Library directories: ${HDF5_LIBRARY_DIRS}")
 MESSAGE("--    HDF5 Libraries: ${HDF5_LIBRARIES}")
 
+# find Coin
+FIND_PACKAGE( COIN REQUIRED )
+SET(STUB_INCLUDE_DIRS ${STUB_INCLUDE_DIRS} ${COIN_INCLUDE_DIR})
+set(LIBS ${LIBS} ${COIN_LIBRARIES})
+
+
 # include all the directories we just found
 INCLUDE_DIRECTORIES(${STUB_INCLUDE_DIRS})
 
