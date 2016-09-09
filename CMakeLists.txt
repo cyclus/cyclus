@@ -11,7 +11,7 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 ENDIF()
 
 # This project name is cyclus.
-PROJECT( CYCLUS )
+PROJECT(CYCLUS)
 
 # check for and enable c++11 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
@@ -117,8 +117,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     ENDIF()
 
     # enable testing, must be at top-level cmake file
-    OPTION( USE_TESTING "Build testing" ON )
-    IF( USE_TESTING )
+    OPTION(USE_TESTING "Build testing" ON)
+    IF(USE_TESTING)
         enable_testing()
         INCLUDE(CTest)
     ENDIF()
@@ -165,7 +165,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Find HDF5
     FIND_PACKAGE(HDF5 REQUIRED)
     ADD_DEFINITIONS(${HDF5_DEFINITIONS})
-    set(LIBS ${LIBS} ${HDF5_LIBRARIES} )
+    set(LIBS ${LIBS} ${HDF5_LIBRARIES})
     MESSAGE("--    HDF5 Root: ${HDF5_ROOT}")
     MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
     MESSAGE("--    HDF5 Library directories: ${HDF5_LIBRARY_DIRS}")
@@ -177,7 +177,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(Boost_USE_STATIC_LIBS OFF)
     SET(Boost_USE_STATIC_RUNTIME OFF)
     # SET(Boost_USE_MULTITHREADED    OFF)
-    FIND_PACKAGE( Boost 1.46.1 COMPONENTS program_options filesystem system serialization REQUIRED)
+    FIND_PACKAGE(Boost 1.46.1 COMPONENTS program_options filesystem system serialization REQUIRED)
     MESSAGE("--    Boost Root: ${Boost_ROOT}")
     MESSAGE("--    Boost Include directory: ${Boost_INCLUDE_DIR}")
     MESSAGE("--    Boost Library directories: ${Boost_LIBRARY_DIRS}")
@@ -191,12 +191,12 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find lapack and link to it
-    FIND_PACKAGE( LAPACK REQUIRED )
+    FIND_PACKAGE(LAPACK REQUIRED)
     set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
     MESSAGE("\tFound LAPACK Libraries: ${LAPACK_LIBRARIES}")
 
     # find coin and link to it
-    FIND_PACKAGE( COIN REQUIRED )
+    FIND_PACKAGE(COIN REQUIRED)
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
 
     #
