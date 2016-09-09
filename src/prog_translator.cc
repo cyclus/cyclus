@@ -231,11 +231,11 @@ void ProgTranslator::FromProg() {
 }
 
 ProgTranslator::Context::Context() {
-  throw DepricatedApiError("Class ProgTranslator::Context is not deprecated in favor of ProgTranslatorContext.");
+  throw DepricatedApiError("Class ProgTranslator::Context is now deprecated in favor of ProgTranslatorContext.");
 }
 
 ProgTranslator::Context::~Context() {
-  throw DepricatedApiError("Class ProgTranslator::Context is not deprecated in favor of ProgTranslatorContext.");
+  throw DepricatedApiError("Class ProgTranslator::Context is now deprecated in favor of ProgTranslatorContext.");
 }
 
 
