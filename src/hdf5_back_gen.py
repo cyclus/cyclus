@@ -445,7 +445,7 @@ template_args = {"MAP": ("KEY", "VALUE"),
                  "LIST": ("ELEM",),
                  "PAIR": ("ITEM1", "ITEM2")}
 
-variable_length_types = ["MAP", "LIST", "SET", "VECTOR"]
+variable_length_types = ["MAP", "LIST", "SET", "VECTOR", "PAIR"]
 
 def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
     """
@@ -505,7 +505,8 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                            name=Raw(code="H5Tget_array_dims2"),
                                            args=[Raw(code=field_type_var),
                                                  Raw(code="&"+fieldlen_var)]))])
-            setup_nodes.append(fieldlen)
+            if t.canon[0] != "PAIR":
+                setup_nodes.append(fieldlen)
             
             item_size_var = get_variable("item_size", depth=depth, prefix=prefix)
             item_size = ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
@@ -514,28 +515,35 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                                    x=Var(name=total_size_var),
                                                    op="/",
                                                    y=Var(name=fieldlen_var))))
-            setup_nodes.append(item_size)
+            if t.canon[0] != "PAIR":
+                setup_nodes.append(item_size)
             
             HDF5_type = field_type_var
         
         #If the type has multiple items, create type and size variables for them
         if multi_items:
-            item_type_var = get_variable("item_type", depth, prefix)
-            item_type = ExprStmt(child=DeclAssign(
+            top_level_var = None
+            if t.canon[0] != "PAIR":
+                item_type_var = get_variable("item_type", depth, prefix)
+                item_type = ExprStmt(child=DeclAssign(
                                         type=Type(cpp="hid_t"),
                                         target=Var(name=item_type_var),
                                         value=FuncCall(
                                             name=Raw(code="H5Tget_super"),
                                             args=[Raw(code=field_type_var)])))
-            setup_nodes.append(item_type)
+                setup_nodes.append(item_type)
+                top_level_var = item_type_var
+            else:
+                top_level_var = HDF5_type
             elem_type_vars = [get_variable("elem"+str(i)+"_type", depth, prefix) 
                               for i in range(children)]
+            
             elem_types = [ExprStmt(child=DeclAssign(
                                         type=Type(cpp="hid_t"),
                                         target=Var(name=elem_type_vars[i]),
                                         value=FuncCall(
                                             name=Raw(code="H5Tget_member_type"),
-                                            args=[Raw(code=item_type_var),
+                                            args=[Raw(code=top_level_var),
                                                   Raw(code=str(i))]))) 
                           for i in range(children)]
             for elem in elem_types:
@@ -545,6 +553,10 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
             elem_size_vars = [get_variable("elem"+str(i)+"_size", depth=depth,
                                            prefix=prefix) 
                                            for i in range(children)]
+            
+            for size_var in elem_size_vars:
+                VARS.append(size_var)
+                
             elem_sizes = [ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
                                            target=Var(name=elem_size_vars[i]),
                                            value=FuncCall(
@@ -554,7 +566,8 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
             for size in elem_sizes:
                 setup_nodes.append(size)
         
-            HDF5_type = item_type_var
+            if t.canon[0] != "PAIR":
+                HDF5_type = item_type_var
         
         #Recurse over inner types.
         setup_nodes.append(Block(nodes=[get_setup(
@@ -796,6 +809,13 @@ def pair_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     item1_size = get_variable("elem0_size", depth=depth, prefix=prefix)
     item2_size = get_variable("elem1_size", depth=depth, prefix=prefix)
     
+    #if these variables do not exist, we attempt to lookup the sizes.
+    #if item1_size not in VARS:
+    #    item1_size = 0
+    #    
+    #if item2_size not in VARS:
+    #    item2_size = 0
+    
     item2_offset = base_offset + "+" + item1_size
     
     node = Block(nodes=[get_body(item1, depth=depth+1, prefix=item1_prefix,
@@ -840,6 +860,9 @@ def vector_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     child_offset = base_offset + "+" + child_size + "*" + k
     
     node = Block(nodes=[
+          ExprStmt(child=Assign(target=Raw(code=x),
+                                value=FuncCall(name=Raw(code=t.cpp),
+                                               args=[Raw(code=fieldlen)]))),
           For(adecl=DeclAssign(type=Type(cpp="unsigned int"), 
                                target=Var(name=k), 
                                value=Raw(code="0")),
@@ -866,6 +889,9 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     string_prefix = get_prefix(prefix, t, 0)
     
     node = Block(nodes=[
+          ExprStmt(child=Assign(target=Raw(code=x),
+                                value=FuncCall(name=Raw(code=t.cpp),
+                                               args=[Raw(code=fieldlen)]))),
           For(adecl=DeclAssign(type=Type(cpp="unsigned int"), 
                                target=Var(name=k), 
                                value=Raw(code="0")),
@@ -1056,6 +1082,7 @@ def get_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
 #teardown functions
 
 TEARDOWN_STACK = []
+VARS = []
 
 def normal_close(t):
     """
