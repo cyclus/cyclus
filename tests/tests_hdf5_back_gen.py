@@ -9,7 +9,7 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, primitive_setup, string_setup, vl_string_setup, get_setup, get_decl, vec_string_body, vl_body, set_string_body, vec_vl_string_body
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -143,79 +143,6 @@ int z=x+y;\n"""
     assert_equal(exp, obs)
     
 #test various node structures
-
-def test_primitive_setup():
-    exp = """jlen0=col_sizes_[table][j] / sizeof(double);\n"""
-    obs = CPPGEN.visit(primitive_setup(Type(cpp="double")))
-    assert_equal(exp, obs)
-    
-def test_string_setup():
-    exp = """
-hid_t fieldlen0=H5Tget_member_type(tb_type,j);
-size_t nullpos0;
-hsize_t fieldlen0;
-H5Tget_array_dims2(field_type0,&fieldlen0);
-unsigned int strlen0=col_sizes_[table][j] / fieldlen0;""".strip()
-    exp += "\n"
-    obs = CPPGEN.visit(string_setup())
-    assert_equal(exp, obs)
-    
-def test_vl_string_setup():
-    exp = """
-jlen0=col_sizes_[table][j] / CYCLUS_SHA1_SIZE;""".strip() + "\n"
-    obs = CPPGEN.visit(vl_string_setup())
-    assert_equal(exp, obs)
-    
-def test_get_setup():
-    exp = """
-hid_t fieldlen1KEY=H5Tget_member_type(tb_type,j);
-size_t nullpos1KEY;
-hsize_t fieldlen1KEY;
-H5Tget_array_dims2(field_type1KEY,&fieldlen1KEY);
-unsigned int strlen1KEY=col_sizes_[table][j] / fieldlen1KEY;
-jlen1VALUE=col_sizes_[table][j] / CYCLUS_SHA1_SIZE;""".strip() + "\n"
-    obs = CPPGEN.visit(get_setup(Type(cpp="std::map<std::string,std::string>", db="MAP_STRING_VL_STRING", canon=("MAP", "STRING", "VL_STRING"))))
-    assert_equal(exp, obs)
-    
-def test_get_decl():
-    exp = """double x0;\n"""
-    obs = CPPGEN.visit(get_decl(Type(cpp="double")))
-    assert_equal(exp, obs)
-
-def test_vec_vl_string_reader():
-    exp = """for(unsigned int k0=0;k0<jlen1ELEM;++k0){
-  x0[k0]=VLRead<std::string,VL_STRING>(buf+offset+CYCLUS_SHA1_SIZE*k0);\n
-}\n"""
-    obs = CPPGEN.visit(vec_vl_string_body(Type(cpp="std::vector<std::string>",db="VECTOR_VL_STRING",canon=("VECTOR", "VL_STRING"))))
-    assert_equal(exp, obs)
-
-def test_vec_string_body():
-    exp = """for(unsigned int k0=0;k0<fieldlen1ELEM;++k0){
-  x0[k0]=std::string(buf+offset+strlen1ELEM*k0,strlen1ELEM);
-  nullpos1ELEM=x0[k0].find('\\0');
-  if(nullpos1ELEM!=std::string::npos){
-    x0[k0].resize(nullpos1ELEM);\n
-  }\n
-}\n"""
-    obs = CPPGEN.visit(vec_string_body(Type(cpp="std::vector<std::string>", db="VECTOR_STRING", canon=("VECTOR", "STRING"))))
-    assert_equal(exp, obs)
-
-def test_vl_body():
-    exp = """x0=VLRead<std::map<std::string,std::string>,VL_MAP_STRING_STRING>(buf+offset);\n"""
-    obs = CPPGEN.visit(vl_body(t=Type(cpp="std::map<std::string,std::string>", db="VL_MAP_STRING_STRING", canon=("VL_MAP","STRING","STRING"))))
-    assert_equal(exp, obs)
-    
-def test_set_string_body():
-    exp = """for(unsigned int k0=0;k0<fieldlen1ELEM;++k0){
-  s1ELEM=std::string(buf+offset+strlen1ELEM*k0,strlen1ELEM);
-  nullpos1ELEM=s1ELEM.find('\\0');
-  if(nullpos1ELEM!=std::string::npos){
-    s1ELEM.resize(nullpos1ELEM);\n
-  }
-  x0.insert(s1ELEM);\n
-}\n"""
-    obs = CPPGEN.visit(set_string_body(Type(cpp="std::set<std::string>", db="SET_STRING", canon=("SET", "STRING"))))
-    assert_equal(exp, obs) 
     
     
     
