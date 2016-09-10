@@ -282,7 +282,7 @@ TEST(ProgTranslatorTests, translation) {
 TEST(ProgTranslatorTests, depricated) {
 
   // confirm depricated error is thrown
-  ASSERT_THROW(new ProgTranslator::Context(),DepricatedApiError);
+  ASSERT_THROW(new ProgTranslator::Context(), DepricationError);
 }
 
 

@@ -74,9 +74,9 @@ class ValidationError : public Error {
 };
 
 /// For depricating API until a next major release
-class DepricatedApiError : public Error {
+class DepricationError : public Error {
  public:
-  DepricatedApiError(std::string msg) : Error(msg) {}
+  DepricationError(std::string msg) : Error(msg) {}
 };
 
 
