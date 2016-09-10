@@ -461,7 +461,7 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                                   Raw(code=str(child_index))])))
         HDF5_type = field_type_var
     
-    total_size_var = get_variable("total_size", depth, prefix)
+    total_size_var = get_variable("total_size", depth=depth, prefix=prefix)
     total_size = ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
                                            target=Var(name=total_size_var),
                                            value=FuncCall(
@@ -469,11 +469,11 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                               args=[Raw(code=HDF5_type)])))
     if is_primitive(t):
         if t.canon == "STRING":
-            setup_nodes.append(string_setup(depth, prefix))
+            setup_nodes.append(string_setup(depth=depth, prefix=prefix))
         elif t.canon == "VL_STRING":
-            setup_nodes.append(vl_string_setup(depth, prefix))
+            setup_nodes.append(vl_string_setup(depth=depth, prefix=prefix))
         else:
-            setup_nodes.append(primitive_setup(t, depth, prefix))
+            setup_nodes.append(primitive_setup(t, depth=depth, prefix=prefix))
         if not child_index is None:
             setup_nodes.append(field_type)
             TEARDOWN_STACK.append(field_type_var)
@@ -503,7 +503,7 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                            args=[Raw(code=HDF5_type),
                                                  Raw(code="&"+fieldlen_var)]))])
             setup_nodes.append(fieldlen)
-            item_type_var = get_variable("item_type", depth, prefix)
+            item_type_var = get_variable("item_type", depth=depth, prefix=prefix)
             item_type = ExprStmt(child=DeclAssign(
                                         type=Type(cpp="hid_t"),
                                         target=Var(name=item_type_var),
@@ -590,11 +590,11 @@ def string_body(t, depth=0, prefix="", base_offset="buf+offset", variable=None):
     {teardown}
     """
     if variable == None:
-        variable = get_variable("x", depth, prefix)
+        variable = get_variable("x", depth=depth, prefix=prefix)
     
-    nullpos = get_variable("nullpos", depth, prefix)
+    nullpos = get_variable("nullpos", depth=depth, prefix=prefix)
     
-    total_size = get_variable("total_size", depth, prefix)
+    total_size = get_variable("total_size", depth=depth, prefix=prefix)
     
     tree = Block(nodes=[
                  ExprStmt(child=Assign(target=Var(name=variable),
@@ -624,7 +624,7 @@ def vl_string_body(t, depth=0, prefix="", base_offset="buf+offset",
     """
     
     if variable == None:
-        variable = get_variable("x", depth, prefix)
+        variable = get_variable("x", depth=depth, prefix=prefix)
     
     tree = Block(nodes=[
                  ExprStmt(child=Assign(target=Var(name=variable), 
@@ -652,7 +652,7 @@ def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return tree
 
 def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    x = get_variable("x", depth, prefix)
+    x = get_variable("x", depth=depth, prefix=prefix)
     node = Block(nodes=[ExprStmt(child=Assign(target=Var(name=x),
                             value=FuncCall(name=Var(name="VLRead"),
                                            args=[Raw(code=base_offset)],
@@ -740,10 +740,10 @@ def pair_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    x = get_variable("x", depth, prefix)
-    k = get_variable("k", depth, prefix)
-    fieldlen = get_variable("fieldlen", depth, prefix)
-    total_size = get_variable("total_size", depth, prefix)
+    x = get_variable("x", depth=depth, prefix=prefix)
+    k = get_variable("k", depth=depth, prefix=prefix)
+    fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
+    total_size = get_variable("total_size", depth=depth, prefix=prefix)
     
     vector_start = "&" + x + "[0]"
     
@@ -758,15 +758,15 @@ def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    x = get_variable("x", depth, prefix)
-    k = get_variable("k", depth, prefix)
-    fieldlen = get_variable("fieldlen", depth, prefix)
+    x = get_variable("x", depth=depth, prefix=prefix)
+    k = get_variable("k", depth=depth, prefix=prefix)
+    fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     index = x + "[" + k + "]"
     
     child_prefix = get_prefix(prefix, t, 0) 
-    child_var = get_variable("x", depth+1, child_prefix)
+    child_var = get_variable("x", depth=depth+1, prefix=child_prefix)
     
-    child_size = get_variable("total_size", depth+1, child_prefix)
+    child_size = get_variable("total_size", depth=depth+1, prefix=child_prefix)
     child_offset = base_offset + "+" + child_size + "*" + k
     
     node = Block(nodes=[
@@ -788,8 +788,8 @@ def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    x = get_variable("x", depth, prefix)
-    k = get_variable("k", depth, prefix)
+    x = get_variable("x", depth=depth, prefix=prefix)
+    k = get_variable("k", depth=depth, prefix=prefix)
     index = x + "[" + k + "]"
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     
@@ -865,14 +865,14 @@ def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    x = get_variable("x", depth, prefix)
-    k = get_variable("k", depth, prefix) 
+    x = get_variable("x", depth=depth, prefix=prefix)
+    k = get_variable("k", depth=depth, prefix=prefix) 
     
-    fieldlen = get_variable("fieldlen", depth, prefix)
+    fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     
     string_prefix = get_prefix(prefix, t, 0)
     string_size = get_variable("total_size", depth=depth+1, prefix=string_prefix)
-    string_name = get_variable("x", depth+1, string_prefix)
+    string_name = get_variable("x", depth=depth+1, prefix=string_prefix)
     
     offset = base_offset + "+" + string_size + "*" + k
     
@@ -914,11 +914,11 @@ def list_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def list_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    x = get_variable("x", depth, prefix)
-    k = get_variable("k", depth, prefix)
+    x = get_variable("x", depth=depth, prefix=prefix)
+    k = get_variable("k", depth=depth, prefix=prefix)
     child_prefix = get_prefix(prefix, t, 0)
-    child_variable = get_variable("x", depth+1, child_prefix)
-    fieldlen = get_variable("fieldlen", depth, prefix)
+    child_variable = get_variable("x", depth=depth+1, prefix=child_prefix)
+    fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     item_size = get_variable("total_size", depth=depth+1, prefix=child_prefix)
     offset = base_offset + "+" + item_size + "*" + k
     
@@ -961,7 +961,7 @@ BODIES = {"INT": reinterpret_cast_body,
 
 def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
     block = []
-    block.append(get_decl(t, depth, prefix))
+    block.append(get_decl(t, depth=depth, prefix=prefix))
     if is_primitive(t):
         if depth == 0:
             block.append(BODIES[t.db](t, depth=depth, prefix=prefix, 
