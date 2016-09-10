@@ -280,8 +280,15 @@ def resolve_unicode(item):
     
     This function exists to support Python 2.7.
     
-    Parameters:
-    item -- the list of items, or item to potentially encode.
+    Parameters
+    ----------
+    item : int or str or list
+        The list of items, or item to potentially encode.
+        
+    Returns
+    -------
+    int or str or list
+        The same type as was passed to the function, encoded if necessary
     """   
     if isinstance(item, str):
         return item         
@@ -322,7 +329,18 @@ DB_TO_VL = {}
 INDENT = '    '
 
 def convert_canonical(raw_list):
-    """Converts JSON list of lists to tuple of tuples."""
+    """Converts JSON list of lists to tuple of tuples.
+    
+    Parameters
+    ----------
+    raw_list : list or str
+        List to be converted, or str
+    
+    Returns
+    -------
+    str or tuple
+        Converted list, or str
+        """
     if isinstance(raw_list, str):
         return raw_list
     return tuple(convert_canonical(x) for x in raw_list)
@@ -341,8 +359,15 @@ for row in TYPES_TABLE:
 def list_dependencies(canon):
     """Return a list of a type's dependencies, each in canonical form.
     
-    Parameters:
-    canon -- the canonical form of the type, after conversion from list   
+    Parameters
+    ----------
+    canon : tuple or str
+        the canonical form of the type
+        
+    Returns
+    -------
+    list or str
+        list of dependencies or str if base type is primitive  
     
     Examples:
     >>> list_dep("('PAIR', 'INT', 'VL_STRING')")
@@ -355,34 +380,66 @@ def list_dependencies(canon):
     return [canon] + dependency_list 
 
 def get_variable(name, depth=0, prefix=""):
-    """Return a C++ variable, appropriately formatted for depth.""" 
+    """Return a C++ variable, appropriately formatted for depth.
+    
+    Parameters
+    ----------
+    name : str
+        Base variable name.
+    depth : int, optional
+        Depth of variable in relation to depth 0 type.
+    prefix : str, optional
+        New prefix to add, based on direct parent type.
+        
+    Returns
+    -------
+    str
+        Variable name.
+    
+    """ 
     return name + str(depth) + prefix
 
 def get_prefix(base_prefix, parent_type, child_index):
     """Return the prefix of a C++ variable, appropriately formatted for depth.
+    
+    Parameters
+    ----------
+    base_prefix : str
+        Prefix of direct parent type.
+    parent_type : Type
+        Node of parent type.
+    child_index : int
+        Index relative to direct parent.
+        
+    Returns
+    -------
+    str
+        New prefix.
     """
     return base_prefix + template_args[parent_type.canon[0]][child_index]
 
 def case_template(t, read_x):
-    """Represents C++ case statement
+    """Represents C++ case statement.
     
-    Parameters:
-    t -- depth 0 type
-    read_x -- nodes of case statement body
+    Parameters
+    ----------
+    t : Type
+        Depth 0 type.
+    read_x : Node
+        Nodes of case statement body.
     
-    Format:
-    case {t.db}: {
-        {read_x}
-        break;
-    }
+    Returns
+    -------
+    Node
+        Complete case statement block.
     """
     if isinstance(read_x, Block):
         body = read_x.nodes
     else:
         body = read_x
     body += [ExprStmt(child=Var(name="break"))]
-    tree = Case(cond=Var(name=t.db), body=body)
-    return tree
+    node = Case(cond=Var(name=t.db), body=body)
+    return node
 
 def primitive_setup(t, depth=0, prefix=""):
     """Represents necessary setup steps for C++ primitives."""
@@ -418,13 +475,22 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
     recursively.
     
     Parameters
-    t -- C++ type, canonical form
-    
-    Keyword arguments:
-    depth -- depth relative to initial, depth 0 type (default 0)
-    prefix -- current prefix, determined by parent type (default "")
-    HDF5_type -- hid_t type used to access HDF5 methods (default "tb_type")
-    child_index -- index into parent type, None if only child (default 'j')
+    ----------
+    t : Type
+        C++ type, canonical form.
+    depth : int, optional
+        Depth relative to initial, depth 0 type.
+    prefix : str, optional
+        Current prefix, determined by parent type.
+    HDF5_type : str
+        hid_t type used to access HDF5 methods
+    child_index : str or int
+        Index into parent type, None if only child
+        
+    Returns
+    -------
+    Block
+        Nodes required for type t setup.
     """
     
     node = Node()
@@ -534,12 +600,19 @@ def get_decl(t, depth=0, prefix=""):
     
     Declarations occur directly before bodies, created without recursion.
     
-    Parameters:
-    t -- C++ type, canonical form
-    
-    Keyword arguments:
-    depth -- depth relative to initial, depth 0 type (default 0)
-    prefix -- prefix determined by parent type (default "")
+    Parameters
+    ----------
+    t : Type
+        C++ type, canonical form.
+    depth : int, optional
+        Depth relative to initial, depth 0 type.
+    prefix : str, optional
+        Prefix determined by parent type.
+        
+    Returns
+    -------
+    Node
+        Declaration statement as a node.
     """
     variable = get_variable("x", depth=depth, prefix=prefix)
     node = ExprStmt(child=Decl(type=t, name=Var(name=variable)))
@@ -549,9 +622,6 @@ def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
     """Represents a body using the reinterpret_cast method.
     
     This includes int, double, float, etc.
-    
-    Format:
-    x = *reinterpret_cast<{t.cpp}*>(buf+offset);
     """
     x = get_variable("x", depth=depth, prefix=prefix)
     tree = Block(nodes=[
@@ -562,14 +632,7 @@ def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return tree
 
 def string_body(t, depth=0, prefix="", base_offset="buf+offset", variable=None):
-    """Represents body for the C++ String primitive.
-    
-    Format:
-    {variable} = {t.cpp}(buf + offset, col_sizes_[table][j]);
-    size_t nullpos = {variable}.find('\\0');
-    if (nullpos != {t.cpp}::npos)
-        {left_side}.resize(nullpos);
-    """
+    """Represents body for the C++ String primitive."""
     if variable == None:
         variable = get_variable("x", depth=depth, prefix=prefix)
     
@@ -597,11 +660,7 @@ def string_body(t, depth=0, prefix="", base_offset="buf+offset", variable=None):
 
 def vl_string_body(t, depth=0, prefix="", base_offset="buf+offset", 
                    variable=None):
-    """Represents the body for the VL_String primitive.
-    
-    Format:
-    x = VLRead<{t.cpp}, {t.db}>(buf + offset {cyclus_constant});
-    """
+    """Represents the body for the VL_String primitive."""
     
     if variable == None:
         variable = get_variable("x", depth=depth, prefix=prefix)
@@ -614,11 +673,7 @@ def vl_string_body(t, depth=0, prefix="", base_offset="buf+offset",
     return tree
 
 def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for the boost::uuid primitive.
-    
-    Format:
-    memcpy(&x, buf+offset, 16);
-    """
+    """Represents the body for the boost::uuid primitive."""
     x = get_variable("x", depth=depth, prefix=prefix)
     total_size = get_variable("total_size", depth=depth, prefix=prefix)
     
@@ -630,11 +685,7 @@ def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return tree
 
 def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for all C++ VL types.
-    
-    Format:
-    x = VLRead<{x.cpp},{x.db}>({base_offset});
-    """
+    """Represents the body for all C++ VL types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     node = Block(nodes=[ExprStmt(child=Assign(target=Var(name=x),
                             value=FuncCall(name=Var(name="VLRead"),
@@ -644,17 +695,7 @@ def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for C++ map type.
-    
-    Format:
-    for(unsigned int k = 0; k < jlen; ++k) {
-        key decl
-        key body
-        val decl
-        val body
-        x[key] = val
-    }
-    """
+    """Represents the body for C++ map type."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -691,15 +732,7 @@ def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def pair_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body for C++ pair type.
-    
-    Format:
-    item1 decl
-    item1 body
-    item2 decl
-    item2 body
-    x = std::make_pair(item1, item2);
-    """
+    """Represents body for C++ pair type."""
     x = get_variable("x", depth=depth, prefix=prefix)
     
     item1 = CANON_TO_NODE[t.canon[1]]
@@ -727,12 +760,7 @@ def pair_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<primitive> types.
-    
-    Format:
-    x = std::vector<{x.cpp}>({fieldlen});
-    memcpy(&x[0],{offset},{total_size});
-    """
+    """Represents body of C++ Vector<primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -751,16 +779,7 @@ def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<non-primitive> types.
-    
-    Format:
-    x = std::vector<{x.cpp}>({fieldlen});
-    for(unsigned int {k}=0; {k}<{fieldlen}; ++{k}) {
-        {elem_decl}
-        {elem_body}
-        x[{k}] = {elem}
-    } 
-    """
+    """Represents body of C++ Vector<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -791,16 +810,7 @@ def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<std::string> types.
-    
-    Format:
-    x = std::vector<{x.cpp}>({fieldlen});
-    for(unsigned int {k}=0; {k}<{fieldlen}; ++{k}) {
-        {elem_decl}
-        {elem_body}
-        x[{k}] = {elem}
-    } 
-    """
+    """Represents body of C++ Vector<std::string> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     index = x + "[" + k + "]"
@@ -827,12 +837,7 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def set_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<primitive> types.
-    
-    Format:
-    {elem.cpp}* elem = reinterpret_cast<{elem.cpp}*>({offset});
-    x = std::set(elem, elem + {fieldlen});
-    """
+    """Represents body of C++ set<primitive> types."""
     
     x = get_variable("x", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -858,16 +863,7 @@ def set_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<non-primitive> types.
-    
-    Format:
-    x = std::set<{x.cpp}>({fieldlen});
-    for(unsigned int {k}=0; {k}<{fieldlen}; ++{k}) {
-        {elem_decl}
-        {elem_body}
-        x.insert({elem})
-    } 
-    """
+    """Represents body of C++ set<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     
@@ -894,16 +890,7 @@ def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<std::string> types.
-    
-    Format:
-    x = std::set<{x.cpp}>({fieldlen});
-    for(unsigned int {k}=0; {k}<{fieldlen}; ++{k}) {
-        {elem_decl}
-        {elem_body}
-        x.insert({elem})
-    } 
-    """
+    """Represents body of C++ set<std::string> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix) 
     
@@ -929,12 +916,7 @@ def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def list_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ list<primitive> types.
-    
-    Format:
-    {elem.cpp}* elem = reinterpret_cast<{elem.cpp}*>({offset});
-    x = std::list(elem, elem + {fieldlen});
-    """
+    """Represents body of C++ list<primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     child_prefix = get_prefix(prefix, t, 0)
@@ -959,16 +941,7 @@ def list_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def list_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ list<non-primitive> types.
-    
-    Format:
-    x = std::list<{x.cpp}>({fieldlen});
-    for(unsigned int {k}=0; {k}<{fieldlen}; ++{k}) {
-        {elem_decl}
-        {elem_body}
-        x.push_back({elem})
-    } 
-    """
+    """Represents body of C++ list<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     child_prefix = get_prefix(prefix, t, 0)
@@ -1017,13 +990,19 @@ BODIES = {"INT": reinterpret_cast_body,
 def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
     """Get body nodes for a C++ type.
     
-    Parameters:
-    t -- C++ type, canonical form
+    Parameters
+    ----------
+    t : Type
+        C++ type, canonical form.
+    depth : int, optional
+        Depth relative to initial, depth 0 type.
+    prefix : str, optional
+        Current prefix, determined by parent type.
     
-    Keyword arguments:
-    depth -- depth relative to initial, depth 0 type (default 0)
-    prefix -- current prefix, determined by parent type (default "")
-    
+    Returns
+    -------
+    Node
+        Body nodes required for the type.
     """
     block = []
     block.append(get_decl(t, depth=depth, prefix=prefix))
@@ -1053,13 +1032,7 @@ TEARDOWN_STACK = []
 VARS = []
 
 def normal_close(t):
-    """Represents the generic close to an hdf5 type code block.
-    
-    Format:
-    is_row_selected = CmpConds<{t.cpp}>>(&x, &(field_conds[qr.fields[j]]));
-    if(is_row_selected)
-        row[j] = x;
-    """
+    """Represents the generic close to an hdf5 type code block."""
     x = get_variable("x", depth=0, prefix="")
     
     tree = Block(nodes=[
