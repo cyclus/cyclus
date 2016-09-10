@@ -292,7 +292,8 @@ def resolve_unicode(item):
             pass
         return item
 
-with open(os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')) as f:
+with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
+                       'dbtypes.json')) as f:
     RAW_TABLE = resolve_unicode(json.load(f))
 
 VERSION = ""
@@ -525,7 +526,6 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                                 template_args[t.canon[0]],
                                                 [i for i in range(children)])]))
             else:
-                #print("got here: ", t.db)
                 setup_nodes.append(Block(nodes=[get_setup(
                                                 CANON_TO_NODE[new_type], 
                                                 depth=depth+1, 
@@ -550,8 +550,6 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
         node = Block(nodes=setup_nodes)
     return node
 
-# declaration
-
 def get_decl(t, depth=0, prefix=""):
     """
     This function is the dispatch for declarations. Declarations occur
@@ -560,8 +558,6 @@ def get_decl(t, depth=0, prefix=""):
     variable = get_variable("x", depth=depth, prefix=prefix)
     node = ExprStmt(child=Decl(type=t, name=Var(name=variable)))
     return node
-
-# bodies
 
 def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
     """
@@ -858,8 +854,7 @@ def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
               incr=LeftUnaryOp(op="++", name=Var(name=k)),
               body=[
                 get_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
-                              prefix=child_prefix,
-                              base_offset=child_offset),
+                         prefix=child_prefix, base_offset=child_offset),
                 ExprStmt(child=FuncCall(name=Raw(code=x+".insert"), 
                                         args=[Raw(code=child_var)]))])])
     return node
@@ -884,7 +879,7 @@ def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
               incr=LeftUnaryOp(op="++", name=Var(name=k)),
               body=[
                 string_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
-                              prefix=string_prefix, base_offset=offset),
+                            prefix=string_prefix, base_offset=offset),
                 ExprStmt(child=FuncCall(name=Raw(code=x+".insert"), 
                                         args=[Raw(code=string_name)]))])])
     return node
@@ -969,7 +964,6 @@ def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
         else:
             block.append(BODIES[t.db](t, depth=depth, prefix=prefix, 
                          base_offset=base_offset))
-    # catch vl types here:
     elif DB_TO_VL[t.db]:
         block.append(vl_body(t, depth=depth, prefix=prefix,
                              base_offset=base_offset))
@@ -980,10 +974,7 @@ def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
         block.append(BODIES[t.canon[0]](t, depth=depth, prefix=prefix,
                                         base_offset=base_offset))
     else:
-        for i, part in zip(t.canon[1:], template_args[t.canon[0]]):
-            new_prefix = prefix + part
-            block.append(get_body(CANON_TO_NODE[i], depth=depth+1, 
-            prefix=new_prefix))
+        raise ValueError("No generation path specified for type " + t.db)
     return Block(nodes=block)
 
 #teardown functions
