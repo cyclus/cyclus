@@ -445,34 +445,34 @@ template_args = {"MAP": ("KEY", "VALUE"),
                  "LIST": ("ELEM",),
                  "PAIR": ("ITEM1", "ITEM2")}
 
-variable_length_types = ["MAP", "LIST", "SET", "VECTOR", "PAIR"]
+variable_length_types = ["MAP", "LIST", "SET", "VECTOR"]
 
 def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
     """
     This function is the dispatch for various setups. Primitives are directly
     setup, while template types are setup recursively.
     """
-    if DB_TO_VL[t.db]:
-        return Nothing()
     
     node = Node()
     setup_nodes = []
     
-    field_type_var = get_variable("fieldtype", depth=depth, prefix=prefix)
-    field_type = ExprStmt(child=DeclAssign(
+    if not child_index is None:
+        field_type_var = get_variable("fieldtype", depth=depth, prefix=prefix)
+        field_type = ExprStmt(child=DeclAssign(
                                         type=Type(cpp="hid_t"),
                                         target=Var(name=field_type_var),
                                         value=FuncCall(
                                             name=Raw(code="H5Tget_member_type"),
                                             args=[Raw(code=HDF5_type),
                                                   Raw(code=str(child_index))])))
+        HDF5_type = field_type_var
     
     total_size_var = get_variable("total_size", depth, prefix)
     total_size = ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
                                            target=Var(name=total_size_var),
                                            value=FuncCall(
                                               name=Raw(code="H5Tget_size"), 
-                                              args=[Raw(code=field_type_var)])))
+                                              args=[Raw(code=HDF5_type)])))
     if is_primitive(t):
         if t.canon == "STRING":
             setup_nodes.append(string_setup(depth, prefix))
@@ -480,97 +480,71 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
             setup_nodes.append(vl_string_setup(depth, prefix))
         else:
             setup_nodes.append(primitive_setup(t, depth, prefix))
-        if depth == 0:
+        if not child_index is None:
             setup_nodes.append(field_type)
-            setup_nodes.append(total_size)
             TEARDOWN_STACK.append(field_type_var)
+        setup_nodes.append(total_size)
         node = Block(nodes=setup_nodes)
     else:
-        multi_items = (len(t.canon[1:]) > 1) and t.canon[0] in variable_length_types
+        if DB_TO_VL[t.db]:
+            return Nothing()
+        
+        multi_items = (len(t.canon[1:]) > 1)
         
         children = len(t.canon) - 1
         
         #Add original type variables to depth of 0 types or to any additional
         #multi-item types.
-        if depth == 0 or multi_items:
+        if not child_index is None:
             setup_nodes.append(field_type)
-            setup_nodes.append(total_size)
             TEARDOWN_STACK.append(field_type_var)
-            
+        
+        setup_nodes.append(total_size)
+        
+        if t.canon[0] in variable_length_types:
             fieldlen_var = get_variable("fieldlen", depth=depth, prefix=prefix)
             fieldlen = Block(nodes=[ExprStmt(child=Decl(
                                                   type=Type(cpp="hsize_t"),
                                                   name=Var(name=fieldlen_var))),
                                     ExprStmt(child=FuncCall(
                                            name=Raw(code="H5Tget_array_dims2"),
-                                           args=[Raw(code=field_type_var),
+                                           args=[Raw(code=HDF5_type),
                                                  Raw(code="&"+fieldlen_var)]))])
-            if t.canon[0] != "PAIR":
-                setup_nodes.append(fieldlen)
-            
-            item_size_var = get_variable("item_size", depth=depth, prefix=prefix)
-            item_size = ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
-                                                 target=Var(name=item_size_var),
-                                                 value=BinOp(
-                                                   x=Var(name=total_size_var),
-                                                   op="/",
-                                                   y=Var(name=fieldlen_var))))
-            if t.canon[0] != "PAIR":
-                setup_nodes.append(item_size)
-            
-            HDF5_type = field_type_var
-        
-        #If the type has multiple items, create type and size variables for them
-        if multi_items:
-            top_level_var = None
-            if t.canon[0] != "PAIR":
-                item_type_var = get_variable("item_type", depth, prefix)
-                item_type = ExprStmt(child=DeclAssign(
+            setup_nodes.append(fieldlen)
+            item_type_var = get_variable("item_type", depth, prefix)
+            item_type = ExprStmt(child=DeclAssign(
                                         type=Type(cpp="hid_t"),
                                         target=Var(name=item_type_var),
                                         value=FuncCall(
                                             name=Raw(code="H5Tget_super"),
-                                            args=[Raw(code=field_type_var)])))
-                setup_nodes.append(item_type)
-                top_level_var = item_type_var
+                                            args=[Raw(code=HDF5_type)])))
+            setup_nodes.append(item_type)
+            TEARDOWN_STACK.append(item_type_var)
+            HDF5_type = item_type_var
+            if multi_items:
+                setup_nodes.append(Block(nodes=[get_setup(
+                                                CANON_TO_NODE[new_type], 
+                                                depth=depth+1, 
+                                                prefix=prefix+part,
+                                                HDF5_type=HDF5_type,
+                                                child_index=index) 
+                                            for new_type, part, index in zip(
+                                                t.canon[1:], 
+                                                template_args[t.canon[0]],
+                                                [i for i in range(children)])]))
             else:
-                top_level_var = HDF5_type
-            elem_type_vars = [get_variable("elem"+str(i)+"_type", depth, prefix) 
-                              for i in range(children)]
-            
-            elem_types = [ExprStmt(child=DeclAssign(
-                                        type=Type(cpp="hid_t"),
-                                        target=Var(name=elem_type_vars[i]),
-                                        value=FuncCall(
-                                            name=Raw(code="H5Tget_member_type"),
-                                            args=[Raw(code=top_level_var),
-                                                  Raw(code=str(i))]))) 
-                          for i in range(children)]
-            for elem in elem_types:
-                setup_nodes.append(elem)
-            for elem_var in elem_type_vars:
-                TEARDOWN_STACK.append(elem_var)
-            elem_size_vars = [get_variable("elem"+str(i)+"_size", depth=depth,
-                                           prefix=prefix) 
-                                           for i in range(children)]
-            
-            for size_var in elem_size_vars:
-                VARS.append(size_var)
-                
-            elem_sizes = [ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
-                                           target=Var(name=elem_size_vars[i]),
-                                           value=FuncCall(
-                                              name=Raw(code="H5Tget_size"), 
-                                              args=[Raw(code=elem_type_vars[i])]))) 
-                          for i in range(children)]
-            for size in elem_sizes:
-                setup_nodes.append(size)
-        
-            if t.canon[0] != "PAIR":
-                HDF5_type = item_type_var
-        
-        #Recurse over inner types.
-        setup_nodes.append(Block(nodes=[get_setup(
+                #print("got here: ", t.db)
+                setup_nodes.append(Block(nodes=[get_setup(
+                                                CANON_TO_NODE[new_type], 
+                                                depth=depth+1, 
+                                                prefix=prefix+part,
+                                                HDF5_type=HDF5_type,
+                                                child_index=None) 
+                                            for new_type, part in zip(
+                                                t.canon[1:], 
+                                                template_args[t.canon[0]])]))
+        else:
+            setup_nodes.append(Block(nodes=[get_setup(
                                                 CANON_TO_NODE[new_type], 
                                                 depth=depth+1, 
                                                 prefix=prefix+part,
@@ -757,7 +731,6 @@ def map_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
-    item_size = get_variable("item_size", depth=depth, prefix=prefix)
     
     key = CANON_TO_NODE[t.canon[1]]
     value = CANON_TO_NODE[t.canon[2]]
@@ -767,8 +740,10 @@ def map_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     value_prefix = prefix + template_args[t.canon[0]][1]
     value_name = get_variable("x", depth=depth+1, prefix=value_prefix)
     
-    key_size = get_variable("elem0_size", depth=depth, prefix=prefix)
-    value_size = get_variable("elem1_size", depth=depth, prefix=prefix)
+    key_size = get_variable("total_size", depth=depth+1, prefix=key_prefix)
+    value_size = get_variable("total_size", depth=depth+1, prefix=value_prefix)
+    
+    item_size = "(" + key_size + "+" + value_size + ")"
     
     key_offset = base_offset + "+" + item_size + "*" + k
     value_offset = key_offset + "+" + key_size
@@ -806,8 +781,8 @@ def pair_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     item1_name = get_variable("x", depth=depth+1, prefix=item1_prefix)
     item2_name = get_variable("x", depth=depth+1, prefix=item2_prefix)
     
-    item1_size = get_variable("elem0_size", depth=depth, prefix=prefix)
-    item2_size = get_variable("elem1_size", depth=depth, prefix=prefix)
+    item1_size = get_variable("total_size", depth=depth+1, prefix=item1_prefix)
+    item2_size = get_variable("total_size", depth=depth+1, prefix=item2_prefix)
     
     #if these variables do not exist, we attempt to lookup the sizes.
     #if item1_size not in VARS:
@@ -856,7 +831,7 @@ def vector_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     child_prefix = get_prefix(prefix, t, 0) 
     child_var = get_variable("x", depth+1, child_prefix)
     
-    child_size = get_variable("item_size", depth, prefix)
+    child_size = get_variable("total_size", depth+1, child_prefix)
     child_offset = base_offset + "+" + child_size + "*" + k
     
     node = Block(nodes=[
@@ -883,10 +858,10 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     k = get_variable("k", depth, prefix)
     index = x + "[" + k + "]"
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
-    item_size = get_variable("item_size", depth=depth, prefix=prefix)
     
-    child_offset = base_offset + "+" + item_size + "*" + k
     string_prefix = get_prefix(prefix, t, 0)
+    child_size = get_variable("total_size", depth=depth+1, prefix=string_prefix)
+    child_offset = base_offset + "+" + child_size + "*" + k
     
     node = Block(nodes=[
           ExprStmt(child=Assign(target=Raw(code=x),
@@ -900,7 +875,7 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
               body=[
                 string_body(CANON_TO_NODE[t.canon[1]], depth=depth+1,
                               prefix=string_prefix, base_offset=child_offset, 
-                              size=item_size, variable=index)
+                              size=child_size, variable=index)
                 ])])
     return node
 
@@ -936,7 +911,9 @@ def set_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     
     child_prefix = get_prefix(prefix, t, 0)
     child_var = get_variable("x", depth=depth+1, prefix=child_prefix)
-    item_size = get_variable("item_size", depth, prefix)
+    
+    item_size = get_variable("total_size", depth=depth+1, prefix=child_prefix)
+    
     child_offset = base_offset + "+" + item_size + "*" + k
     
     node = Block(nodes=[
@@ -961,7 +938,7 @@ def set_string_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     fieldlen = get_variable("fieldlen", depth, prefix)
     
     string_prefix = get_prefix(prefix, t, 0)
-    string_size = get_variable("item_size", depth, prefix)
+    string_size = get_variable("total_size", depth=depth+1, prefix=string_prefix)
     string_name = get_variable("x", depth+1, string_prefix)
     
     offset = base_offset + "+" + string_size + "*" + k
@@ -1010,7 +987,7 @@ def list_body(t, depth=0, prefix="", base_offset="buf+offset", size=None):
     child_prefix = get_prefix(prefix, t, 0)
     child_variable = get_variable("x", depth+1, child_prefix)
     fieldlen = get_variable("fieldlen", depth, prefix)
-    item_size = get_variable("item_size", depth, prefix)
+    item_size = get_variable("total_size", depth=depth+1, prefix=child_prefix)
     offset = base_offset + "+" + item_size + "*" + k
     
     node = Block(nodes=[ 
