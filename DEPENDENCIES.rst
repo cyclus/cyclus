@@ -66,7 +66,8 @@ manager or via Conda.
 Via Conda
 ---------
 
-*Note, at present, Conda dependency downloading is only supported for Linux*
+*Note, at present, Conda dependency downloading is supported for Linux and Mac
+OS*
 
 A Conda installation may be the most straightforward for a new developer. These
 instructions will be similar to those shown for Cyclus users `conda

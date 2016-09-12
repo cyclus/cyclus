@@ -66,7 +66,7 @@ Quick Cyclus Installation
 Assuming you have the dependencies installed correctly, installing Cyclus using
 github is fairly straightforward:
 
-- Clone the Cyclus Repo: ``git clone https://github.com/Baaaaam/cyclus.git``,
+- Clone the Cyclus Repo: ``git clone https://github.com/cyclus/cyclus.git``,
 
 - to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
   from cyclus folder,
@@ -100,7 +100,7 @@ simulations, first download Cycamore
 (`GitHub Cyamore Repository <https://github.com/cyclus/cycamore>`_):
 
 - Clone the Cycamore Repo: ``git clone
-  https://github.com/Baaaaam/cycamore.git``,
+  https://github.com/cyclus/cycamore.git``,
 
 - Install in the same location you installed Cyclus (eg. in ``~/.local/``):
   ``python install.py`` from the cycamore folder.
