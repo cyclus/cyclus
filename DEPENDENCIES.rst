@@ -60,36 +60,8 @@ by our build system.  Instead use `libgoogle-perftools-dev`.*
 Installing Dependencies
 ******************************
 
-Cyclus dependencies can either be installed via an operating system's package
-manager or via Conda.
-
-Via Conda
----------
-
-*Note, at present, Conda dependency downloading is supported for Linux and Mac
-OS*
-
-A Conda installation may be the most straightforward for a new developer. These
-instructions will be similar to those shown for Cyclus users `conda
-installation <http://fuelcycle.org/user/install.html>`_.
-
-#. Download the appropriate `miniconda installer <http://conda.pydata.org/miniconda.html>`_
-
-#. Install miniconda
-
-    .. code-block:: console
-
-        $ bash Miniconda-3.5.2-Linux-x86_64.sh -b -p ~/miniconda
-
-#. Add the following line to your ``.bashrc`` (``.bash_profile`` for Mac users):
-
-    ``export PATH-"${HOME}/miniconda/bin:${PATH}"``
-
-#. Install the dependencies
-
-    .. code-block:: console
-
-        $ conda install cyclus-deps
+Cyclus dependencies can either be installed mannualy or using an operating system's package
+manager.
 
 Installing Dependencies (Linux and Unix)
 ----------------------------------------
