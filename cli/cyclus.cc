@@ -195,7 +195,7 @@ int main(int argc, char* argv[]) {
     si.recorder()->RegisterBackend(fback);
   }
 
-  
+
   char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
   if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
     si.timer()->RunSim();
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
   }
-  
+
   rec.Flush();
 
   std::cout << std::endl;

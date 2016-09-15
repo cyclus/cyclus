@@ -19,6 +19,15 @@ Each subdirectory contains a dockerfile that does something useful:
   the docker container and used for the build.  The dockerfile in the cyclus
   repository root is a symbolic link to this dockerfile.
 
+* ``deb-ci`` is the dockerfile used to generate the Cyclus debian installation
+  package. It contains 2 files, one Dockerfile_template and a script which:
+    * replace the template variables to the appropriate values: the major ubuntu
+      version require (provided as an parameter) and the commit hash tag in the
+      Dockerfile_template (recover by the script),
+    * runs the Dockerfile,
+    * extract the debian package,
+    * upload it on dory.fuelcycle.org.
+
 The script ``dockercyclus.sh`` downloads (if not already downloaded before)
 the cyclus/cycamore docker image and passes all given arguments to an cyclus
 command run inside a docker container.  The current working directory is also

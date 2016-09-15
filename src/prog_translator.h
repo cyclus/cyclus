@@ -35,8 +35,11 @@ struct ProgTranslatorContext {
 /// @endcode
 class ProgTranslator {
  public:
-  /// @brief struct to hold all problem instance state
-  typedef ProgTranslatorContext Context;
+  /// @brief This class is now deprecated.
+  struct Context { 
+    Context(); 
+    ~Context(); 
+  };
 
   /// constructor
   ///
@@ -65,7 +68,7 @@ class ProgTranslator {
   /// @brief translates solution from iface back into graph matches
   void FromProg();
 
-  const Context& ctx() const { return ctx_; }
+  const ProgTranslatorContext& ctx() const { return ctx_; }
 
  private:
   void Init();
@@ -82,7 +85,7 @@ class ProgTranslator {
   OsiSolverInterface* iface_;
   bool excl_;
   int arc_offset_;
-  ProgTranslator::Context ctx_;
+  ProgTranslatorContext ctx_;
   double pseudo_cost_;
 };
 

@@ -148,7 +148,11 @@ TEST(ExXlateTests, XlateCapacities) {
   ExchangeNode::Ptr bnode(new ExchangeNode());
   Arc arc(rnode, bnode);
 
+#ifdef __APPLE__
+  double rarr[] = {(c1->convert(mat) / qty), (c2->convert(mat) / qty)};
+#else
   double rarr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
+#endif
   std::vector<double> rexp(rarr, rarr +sizeof(rarr) / sizeof(rarr[0]));
 
   double barr[] = {(c1->convert(mat) / qty)};

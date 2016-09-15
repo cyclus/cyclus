@@ -10,6 +10,7 @@ macro(libfind_package PREFIX)
     if(${PREFIX}_FIND_REQUIRED)
         set(LIBFIND_PACKAGE_ARGS ${LIBFIND_PACKAGE_ARGS} REQUIRED)
     endif(${PREFIX}_FIND_REQUIRED)
+    message("-- ${PREFIX} find package args: ${LIBFIND_PACKAGE_ARGS}")
     find_package(${LIBFIND_PACKAGE_ARGS})
 endmacro(libfind_package)
 
@@ -93,6 +94,7 @@ macro(libfind_library PREFIX basename)
     endif(${ARGC} GREATER 2)
     find_library(${PREFIX}_LIBRARY
         NAMES ${${PREFIX}_LIBNAMES}
+        ${DEPS_HINTS}
         PATHS ${${PREFIX}_PKGCONF_LIBRARY_DIRS}
         )
 endmacro(libfind_library)

@@ -60,14 +60,14 @@ double ProgSolver::SolveGraph() {
     GreedySolver greedy(exclusive_orders_);
     double greedy_obj = greedy.Solve(graph_);
     graph_->ClearMatches();
-    
+
     // translate graph to iface_ instance
     double pseudo_cost = PseudoCost(); // from ExchangeSolver API
     ProgTranslator xlator(graph_, iface_, exclusive_orders_, pseudo_cost);
     xlator.ToProg();
     if (mps_)
       WriteMPS();
-    
+
     // set noise level
     CoinMessageHandler h;
     h.setLogLevel(0);
@@ -80,7 +80,7 @@ double ProgSolver::SolveGraph() {
       std::cout << "Solving problem, message handler has log level of "
                 << iface_->messageHandler()->logLevel() << "\n";
     }
-        
+
     // solve and back translate
     SolveProg(iface_, greedy_obj, verbose_);
 
@@ -89,7 +89,7 @@ double ProgSolver::SolveGraph() {
     delete iface_;
     throw;
   }
-  double ret = iface_->getObjValue(); 
+  double ret = iface_->getObjValue();
   delete iface_;
   return ret;
 }
