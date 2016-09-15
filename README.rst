@@ -36,9 +36,9 @@ facilities.  Please visit the Cyclus website for a list of contributed modules.
 .. contents:: Table of Contents
 
 
-******************************
+************
 Dependencies
-******************************
+************
 
 In order to facilitate future compatibility with multiple platforms,
 Cyclus is built using `CMake`_. A full list of the Cyclus package
@@ -59,9 +59,9 @@ Package                Minimum Version
 
 For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
 
-******************************
+*************************
 Quick Cyclus Installation
-******************************
+*************************
 
 Assuming you have the dependencies installed correctly, installing Cyclus using
 github is fairly straightforward:
@@ -78,9 +78,9 @@ For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
 
 
-******************************
+*************
 Running Tests
-******************************
+*************
 
 Installing Cyclus will also install a test driver (i.e., an executable of all of
 our tests). You can run the tests yourself via:
@@ -90,9 +90,9 @@ our tests). You can run the tests yourself via:
     $ cyclus_unit_tests
 
 
-******************************
+*******************
 Installing Cycamore
-******************************
+*******************
 
 As noted previously, the Cyclus Core will not allow you to run fuel cycle
 simulations as it does not include nuclear facilities. To run fuel cycle
@@ -106,9 +106,9 @@ simulations, first download Cycamore
   ``python install.py`` from the cycamore folder.
 
 
-******************************
+**************
 Running Cyclus
-******************************
+**************
 
 You can find instructions for writing an input file for cyclus from `Cyclus User
 Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
@@ -120,9 +120,9 @@ file `input.xml`, you can run Cyclus via:
 
 For a more detailed explanation, check out the `Cyclus User Guide`_.
 
-******************************
+************
 Contributing
-******************************
+************
 
 We happily welcome new developers into the Cyclus Developer Team. If you are willing
 to contribute into Cyclus, please follow this procedure:

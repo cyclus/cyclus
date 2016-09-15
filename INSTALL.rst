@@ -1,6 +1,6 @@
-###########
+#########################
 Cyclus Installation Guide
-###########
+########################
 
 Cyclus uses the CMake cross platform bailed-generator as a build system. To
 simplify the usage of cmake to build Cyclus from source, a python script is
@@ -8,9 +8,9 @@ provided with the source.
 
 .. contents:: Table of Contents
 
-******************************
+************
 Dependencies
-******************************
+************
 
 A full list of the Cyclus package dependencies is shown below:
 
@@ -30,24 +30,24 @@ Package                Minimum Version
 You can find `here <DEPENDENCIES.rst>`_  help to install those dependencies for
 the major supported system.
 
-******************************
+************
 Installation
-******************************
+************
 
 Before going further on the installation procedure be sure you have installed
 all the required dependencies listed above. You can also find `here <DEPENDENCIES.rst>`_ 
 instruction to install those dependencies depending of the
 system you are working on.
 
+
 Default installation
-------------------------
+--------------------
 
 Run the install script:
 
 .. code-block:: bash
   
   python install.py
-
 
 If you successfully followed the instruction above cyclus binary have been
 generated and be placed in the  ``.local/`` in your home directory. 
@@ -57,8 +57,10 @@ You need to had ``~/.local/bin`` to the bottom of your ``$PATH``:
   
   echo 'export PATH="$HOME/.local/bin:$PATH' >> .bashrc
 
+
 Custom Cyclus installation
----------------------------
+--------------------------
+
 The installation using the install script can be customized using the following
 flag:
 
@@ -123,7 +125,7 @@ installation flag. The otherwise identical process would look like:
 
 
 CMake Cyclus installation
----------------------------
+-------------------------
 
 If you are ``CMake`` aficionado you can also install Cyclus without using the
 install.py python script and use directly ``cmake`` which should look like:
@@ -164,9 +166,9 @@ The main variable used are:
 All variable can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
 
-******************************
+*************
 Running Tests
-******************************
+*************
 
 Installing Cyclus will also install a test driver (i.e., an executable of all of
 our tests). We strongly recommend after installing a fresh install of Cyclus, or

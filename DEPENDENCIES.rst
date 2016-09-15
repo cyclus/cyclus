@@ -12,9 +12,9 @@ the `Cyclus Homepage`_.
 .. contents:: Table of Contents
    :depth: 2
 
-******************************
+************
 Dependencies
-******************************
+************
 
 In order to facilitate future compatibility with multiple platforms,
 Cyclus is built using `CMake`_. A full list of the Cyclus package
@@ -56,9 +56,9 @@ tcmalloc (for speed)   any?
 *Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
 by our build system.  Instead use `libgoogle-perftools-dev`.*
 
-******************************
+***********************
 Installing Dependencies
-******************************
+***********************
 
 Cyclus dependencies can either be installed mannualy or using an operating system's package
 manager.
@@ -133,7 +133,7 @@ because they are an industry standard. Accordingly, we suggest simply installing
 in the future.
 
 Installing Dependencies (Mac OSX)
-----------------------------------------
+---------------------------------
 
 Cyclus archetype development is not fully supported on Mac.  Nonetheless,
 because there are some use cases which require installation from source, we have
