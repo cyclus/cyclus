@@ -3,7 +3,6 @@
 import os
 import sys
 import json
-from ast import literal_eval
 from pprint import pformat
 
 is_primitive = lambda t: isinstance(t.canon, str)
@@ -1055,8 +1054,6 @@ def normal_close(t):
 def get_teardown(t):
     return normal_close(t)
 
-QUERY_CASES = ''
-
 def indent(text, prefix, predicate=None):
     """This function copied from textwrap library version 3.3.
 
@@ -1075,19 +1072,46 @@ def indent(text, prefix, predicate=None):
             yield (prefix + line if predicate(line) else line)
     return ''.join(prefixed_lines())
 
-QUERY_CASES = ''
+def typeid(t):
+    return FuncCall(name=Raw(code="typeid"), args=[Raw(code=t)])
 
 def main():
     output = ""
     CPPGEN = CppGen()
-    for type in CANON_SET:
-        type_node = CANON_TO_NODE[type]
-        setup = get_setup(type_node)
-        body = get_body(type_node)
-        teardown = get_teardown(type_node)
-        read_x = Block(nodes=[setup, body, teardown])
-        output += CPPGEN.visit(case_template(type_node, read_x))
-    print(output)
-
+    try:
+        if sys.argv[1] == "QUERY":
+            for type in CANON_SET:
+                type_node = CANON_TO_NODE[type]
+                setup = get_setup(type_node)
+                body = get_body(type_node)
+                teardown = get_teardown(type_node)
+                read_x = Block(nodes=[setup, body, teardown])
+                output += CPPGEN.visit(case_template(type_node, read_x))
+            print(output)
+        elif sys.argv[1] == "CREATE":
+            if_bodies = {n: Block(nodes=[]) for n in set([CANON_TO_NODE[t].cpp
+                                                        for t in CANON_SET])}
+            for type in CANON_SET:
+                type_node = CANON_TO_NODE[type]
+            
+            initial_type = CANON_SET.pop()
+            initial_node = CANON_TO_NODE[initial_type].cpp
+            if_statement = If(cond=BinOp(x=Var(name="valtype"), op="==", 
+                                         y=typeid(initial_node)),
+                              body=[if_bodies[initial_node]],
+                              elifs=[(BinOp(x=Var(name="valtype"), op="==",
+                                            y=typeid(t)), [if_bodies[t]])
+                                            for t in if_bodies.keys()],
+                              el=Nothing())
+            output += CPPGEN.visit(if_statement)
+            print(output)
+        elif sys.argv[1] == "FILL":
+            print(output)
+        elif sys.argv[1] == "VL":
+            print(output)
+        else:
+            raise ValueError("No valid generation instruction provided")   
+    except:
+        raise ValueError("No valid generation instruction provided")
 if __name__ == '__main__':
     main()
