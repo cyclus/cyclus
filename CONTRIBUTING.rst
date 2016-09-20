@@ -47,6 +47,20 @@ Reviewing a Pull Request
   * Note: if the button is not available, the requester needs to merge or rebase
     from the current HEAD of the blessed's "develop" (or "master") branch
 
+Running Tests
+=============
+
+You can run the tests yourself using:
+  - for Cyclus:
+    .. code-block:: bash
+
+      $ cyclus_unit_tests
+
+  - for Cycamore:
+    .. code-block:: bash
+
+      $ cycamore_unit_tests
+
 Cautions
 ========
 
