@@ -1,6 +1,6 @@
 #########################
 Cyclus Installation Guide
-########################
+#########################
 
 Cyclus uses the CMake cross platform bailed-generator as a build system. To
 simplify the usage of cmake to build Cyclus from source, a python script is
