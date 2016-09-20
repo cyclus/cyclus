@@ -52,11 +52,13 @@ Running Tests
 
 You can run the tests yourself using:
   - for Cyclus:
+
     .. code-block:: bash
 
       $ cyclus_unit_tests
 
   - for Cycamore:
+    
     .. code-block:: bash
 
       $ cycamore_unit_tests
