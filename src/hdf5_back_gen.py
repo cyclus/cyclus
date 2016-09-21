@@ -121,7 +121,7 @@ class PrettyFormatter(Visitor):
     """Formats a tree of nodes into a pretty string"""
 
     def __init__(self, tree=None, indent=' '):
-        super().__init__(tree=tree)
+        super(PrettyFormatter, self).__init__(tree=tree)
         self.level = 0
         self.indent = indent
 
@@ -143,7 +143,7 @@ class PrettyFormatter(Visitor):
 
 class CppGen(Visitor):
     def __init__(self, tree=None, indent='  '):
-        super().__init__(tree=tree)
+        super(CppGen, self).__init__(tree=tree)
         self.level = 0
         self.indent = indent
         
