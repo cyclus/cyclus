@@ -271,12 +271,19 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
 
-    EXECUTE_PROCESS(COMMAND git describe --tags OUTPUT_VARIABLE core_version OUTPUT_STRIP_TRAILING_WHITESPACE)
-
+    # set core version, one way or the other
+    IF(NOT "${CORE_VERSION}" STREQUAL "")
+        SET(core_version "${CORE_VERSION}")
+    ELSE(NOT "${CORE_VERSION}" STREQUAL "")
+        EXECUTE_PROCESS(COMMAND git describe --tags
+                        OUTPUT_VARIABLE core_version
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    ENDIF(NOT "${CORE_VERSION}" STREQUAL "")
     IF("${core_version}" STREQUAL "")
       MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
       SET(core_version "-1")
     ENDIF()
+    MESSAGE("-- core version set to: ${core_version}")
 
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
@@ -342,7 +349,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Here's where we package it with CPack
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
-    
+
     # Here we set some components for installation with cpack
     SET(CPACK_COMPONENTS_ALL cyclus testing libraries data core)
     SET(CPACK_GENERATOR "DEB")
@@ -356,7 +363,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Version
     SET(CPACK_PACKAGE_VERSION_MAJOR "1")
     SET(CPACK_PACKAGE_VERSION_MINOR "4")
-    SET(CPACK_PACKAGE_VERSION_PATCH "0") 
+    SET(CPACK_PACKAGE_VERSION_PATCH "0")
 
     # Dependencies
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libtcmalloc-minimal4 (>= 2.1)")
@@ -373,7 +380,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_PACKAGE_INSTALL_DIRECTORY "cyclus_${CPACK_PACKAGE_VERSION_MAJOR}")
     SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_INSTALL_DIRECTORY}.${CPACK_PACKAGE_VERSION_MINOR}")
     SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_INSTALL_DIRECTORY}.${CPACK_PACKAGE_VERSION_PATCH}")
-    
+
     SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}")
     SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}")
     SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}.${CPACK_PACKAGE_VERSION_MINOR}")
@@ -390,7 +397,7 @@ IF(NOT CYCLUS_DOC_ONLY)
       )
     SET(CPACK_PROJECT_CONFIG_FILE "${CYCLUS_BINARY_DIR}/cmake/CyclusCPackOptions.cmake")
     SET(CPACK_PACKAGE_EXECUTABLES "cyclus" "CyclusUnitTestDriver")
-    
+
     INCLUDE(CPack)
 
     ##############################################################################################
