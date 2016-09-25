@@ -223,7 +223,7 @@ QueryResult Hdf5Back::Query(std::string table, std::vector<Cond>* conds) {
       QueryRow row = QueryRow(nfields);
       for (j = 0; j < nfields; ++j) {
         switch (qr.types[j]) {
-          @HDF5_BACK_CC_QUERY@
+@HDF5_BACK_CC_QUERY@
           default: {
             throw IOError("querying column '" + qr.fields[j] + "' in table '" + \
                           table + "' failed due to unsupported data type.");

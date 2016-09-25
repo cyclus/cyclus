@@ -24,7 +24,10 @@ CONFIGURE_FILE(
     @ONLY
     )
 
-EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py OUTPUT_VARIABLE HDF5_BACK_CC_QUERY)
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py OUTPUT_VARIABLE HDF5_BACK_CC_QUERY RESULT_VARIABLE res_var)
+IF(NOT "${res_var}" STREQUAL "0")
+  message(FATAL_ERROR "Process hdf5_back_gen.py failed, res_var = '${res_var}'")
+ENDIF()
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"

@@ -326,7 +326,7 @@ CANON_SET = set()
 DB_TO_CPP = {}
 CANON_TO_DB = {}
 DB_TO_VL = {}
-INDENT = '    '
+INDENT = '  '
 
 def convert_canonical(raw_list):
     """Converts JSON list of lists to tuple of tuples.
@@ -1087,6 +1087,7 @@ def main():
         teardown = get_teardown(type_node)
         read_x = Block(nodes=[setup, body, teardown])
         output += CPPGEN.visit(case_template(type_node, read_x))
+    output = indent(output, INDENT * 5)
     print(output)
 
 if __name__ == '__main__':
