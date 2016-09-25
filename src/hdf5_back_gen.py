@@ -1073,7 +1073,61 @@ def indent(text, prefix, predicate=None):
     return ''.join(prefixed_lines())
 
 def typeid(t):
-    return FuncCall(name=Raw(code="typeid"), args=[Raw(code=t)])
+    return FuncCall(name=Raw(code="typeid"), args=[Raw(code=t.cpp)])
+
+def no_vl(t):
+    if DB_TO_VL[t.db]:
+        return False
+    else:
+        if is_primitive(t):
+            return True
+        else:
+            ret = True
+            for i in t.canon[1:]:
+                ret = ret and no_vl(CANON_TO_NODE[i])
+            return ret
+
+HDF5_TYPES = {"INT": "H5T_NATIVE_INT",
+              "DOUBLE": "H5T_NATIVE_DOUBLE",
+              "FLOAT": "H5T_NATIVE_FLOAT",
+              "BOOL": "H5T_NATIVE_CHAR",
+              "STRING": "sha1_type_",
+              "BLOB": "sha1_type_",
+              "UUID": "uuid_type_"}
+              
+def create_item_type(t, depth=0, prefix=""):
+    node = Block()
+    item_type_var = get_variable("item_type", depth=depth, prefix=prefix)
+    if is_primitive(t):
+        item_type = HDF5_TYPES[t.db]
+    
+    return node
+
+NOT_VL = []
+
+def get_vl_cond(t):
+    vl_count = 0
+    if isinstance(t.canon, str):
+        actual_canon = []
+    else:
+        actual_canon = list(t.canon[1:])
+    actual_canon.insert(0,t.canon)
+    vl_list = [BinOp(x=Raw(code="shape["+str(i)+"]"),op="",y=Raw(code="1")) 
+               for i in range(len(actual_canon)) if CANON_TO_NODE[actual_canon[i]].db not in NOT_VL]
+    for i in range(len(vl_list)):
+        if not no_vl(CANON_TO_NODE[actual_canon[i]]):
+            vl_list[i].op = "<"
+            vl_count += 1
+        else:
+            vl_list[i].op = ">="
+    current_bool = vl_list[0]
+    for i in range(1,len(vl_list)):
+        current_bool = BinOp(x=current_bool, op="&&", y=vl_list[i])
+    
+    if vl_count == 1 and vl_list[0].op == "<":
+        current_bool = BinOp(x=Raw(code="shape.empty()"), op="||", 
+                             y=current_bool)
+    return current_bool
 
 def main():
     output = ""
@@ -1088,23 +1142,89 @@ def main():
                 read_x = Block(nodes=[setup, body, teardown])
                 output += CPPGEN.visit(case_template(type_node, read_x))
             print(output)
+        elif sys.argv[1] == "VL_ADD":
+            node = Block(nodes=[])
+            vl_types = set([CANON_TO_NODE[t] for t in CANON_SET 
+                                             if DB_TO_VL[CANON_TO_NODE[t].db]])
+            for t in vl_types:
+                is_compound = (variable_length_types[t.canon[0]] 
+                               and len(t.canon[1:]) > 1)
+                
+                #this needs to be either a primitive HDF5 type,
+                #or a compound item_type built from the size of
+                #the individual primitives.
+                item_type = ""
+                if_statement = If(cond=BinOp(x=FuncCall(
+                                                  name=Raw(code="vldts_.count"),
+                                                  args=[Raw(code=t.db)]),
+                                             op="==",
+                                             y=Raw(code="0")),
+                                  body=[ExprStmt(child=Assign(
+                                            target=Raw(code="vldts_["+t.db+"]"),
+                                            value=FuncCall(
+                                                name=Raw(code="H5Tvlen_create"),
+                                                args=[Raw(code=item_type)]))),
+                                        ExprStmt(child=FuncCall(
+                                                name=Raw(
+                                                   code="opened_types_.insert"), 
+                                                args=[Raw(
+                                                   code="vldts_["+t.db+"]")]))])
+                node.nodes.append(if_statement)
+            output += CPPGEN.visit(node)
+            print(output)
         elif sys.argv[1] == "CREATE":
-            if_bodies = {n: Block(nodes=[]) for n in set([CANON_TO_NODE[t].cpp
-                                                        for t in CANON_SET])}
-            for type in CANON_SET:
-                type_node = CANON_TO_NODE[type]
+            global NOT_VL
             
-            initial_type = CANON_SET.pop()
-            initial_node = CANON_TO_NODE[initial_type].cpp
+            #get all base types as node.
+            fixed_length_types = set([CANON_TO_NODE[t] for t in CANON_SET 
+                                                   if no_vl(CANON_TO_NODE[t])])
+            
+            #Use base types as keys, vals are lists of VL variant nodes.
+            variation_dict = {n: [CANON_TO_NODE[x] for x in CANON_SET 
+                                                        if (CANON_TO_NODE[x].cpp 
+                                                            == n.cpp)
+                                                        and (CANON_TO_NODE[x].db 
+                                                            != n.db)]
+                              for n in fixed_length_types}
+            
+            #Add Blob because it was initially filtered out as a VL type
+            variation_dict[CANON_TO_NODE[('BLOB')]] = []
+            
+            NOT_VL = [x.db for x in variation_dict.keys() if not variation_dict[x]] 
+            
+            #bodies of base types to use as top level if/else if stmts
+            if_bodies = {n: Block(nodes=[]) for n in variation_dict.keys()}
+            
+            for n in variation_dict.keys():
+                variations = variation_dict[n]
+                try:
+                    initial_type = variations.pop()
+                    sub_if = If(cond=get_vl_cond(initial_type),
+                                body=[ExprStmt(child=Raw(code="dbtypes[i]=" 
+                                                      + initial_type.db))],
+                                elifs=[(get_vl_cond(v), 
+                                       [ExprStmt(child=Raw(code="dbtypes[i]=" 
+                                                                + v.db))]) 
+                                      for v in variations],
+                                el=Block(nodes=[ExprStmt(child=Raw(
+                                                            code="dbtypes[i]=" 
+                                                                 + n.db))]))
+                    if_bodies[n].nodes.append(sub_if)
+                except IndexError:
+                    lone_node = ExprStmt(child=Raw(code="dbtypes[i]=" + n.db))
+                    if_bodies[n].nodes.append(lone_node)
+ 
+            initial_node, initial_body = if_bodies.popitem()
             if_statement = If(cond=BinOp(x=Var(name="valtype"), op="==", 
                                          y=typeid(initial_node)),
-                              body=[if_bodies[initial_node]],
+                              body=[initial_body],
                               elifs=[(BinOp(x=Var(name="valtype"), op="==",
                                             y=typeid(t)), [if_bodies[t]])
                                             for t in if_bodies.keys()],
                               el=Nothing())
             output += CPPGEN.visit(if_statement)
             print(output)
+            print(NOT_VL)
         elif sys.argv[1] == "FILL":
             print(output)
         elif sys.argv[1] == "VL":
