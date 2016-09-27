@@ -152,7 +152,7 @@ Perhaps you have found Nirvana. In any case, you've performed the final commit t
 so it's time to make a pull request online and wait for our developer friends to
 review and accept it.
 
-Sometimes, your pull request will be hold by the reviewer until further changes
+Sometimes, your pull request will be held by the reviewer until further changes
 are made to appease the reviewer's concerns. This may be frustrating, but please
 act rationally, discuss the issues on the GitHub space made for your pull
 request, consult the `style guide
