@@ -492,6 +492,8 @@ class VarDeclarationFilter(Filter):
         annotations['type'] = state.canonize_type(vtype, vname, 
                                                   statement=statement)
         annotations['index'] = len(state.context[classname]['vars'])
+        #added this
+        annotations['shape'] = state.canonize_shape(annotations)
         state.context[classname]['vars'][vname] = annotations
         if 'alias' in annotations:
             alias = annotations['alias']
@@ -813,12 +815,15 @@ class StateAccumulator(object):
                     p=pformat(self.supported_types))
                 raise TypeError(msg)
         return t
-
+    
     def _canonize_targs(self, newtname, targs):
         newt = [newtname]
         newt += [self.canonize_type(targ) for targ in targs]
         return tuple(newt)
 
+    def canonize_shape(self, ann_dict):
+        return None
+    
     def canonize_class(self, cls, _usens=True):
         """This canonizes a classname.  The class name need not be the current
         class whose scope we are in, but may be any class whatsoever. Returns
