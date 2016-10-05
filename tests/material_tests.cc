@@ -397,4 +397,17 @@ TEST_F(MaterialTest, AbsorbPrevDecay) {
   EXPECT_EQ(10, m1->prev_decay_time());
 }
 
+TEST_F(MaterialTest, DecayHeatTest) {
+  CompMap v;
+  v[922350000] = 0.05;
+  v[922380000] = 0.95;
+  Composition::Ptr diff_test_comp = Composition::CreateFromMass(
+                                              v);
+  Material::Ptr diff_test_mat = Material::CreateUntracked(
+                                        1.,
+                                        diff_test_comp);
+  double dec_heat = diff_test_mat->DecayHeat();
+  ASSERT_NEAR(1.66E-13 , dec_heat, 0.0005);
+}
+
 }  // namespace cyclus
