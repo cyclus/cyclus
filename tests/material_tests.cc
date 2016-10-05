@@ -407,7 +407,7 @@ TEST_F(MaterialTest, DecayHeatTest) {
                                         1.,
                                         diff_test_comp);
   double dec_heat = diff_test_mat->DecayHeat();
-  ASSERT_NEAR(1.66E-13 , dec_heat, 0.0005);
+  ASSERT_NEAR(3.614E-14 , dec_heat, 0.0005);
 }
 
 }  // namespace cyclus
