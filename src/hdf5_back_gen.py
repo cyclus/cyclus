@@ -1125,6 +1125,8 @@ def get_dim_shape(canon, start=0, depth=0):
         return i, tshape
 
 def flatten(canon):
+    if isinstance(canon, str):
+        return [canon]
     result = list(canon)
     result[0] = canon
     i = 1
@@ -1136,6 +1138,8 @@ def flatten(canon):
             i += 1
             for j in range(0, len(temp)):
                 result.insert(i+j, temp[j])
+    if isinstance(canon, str):
+        print(result)
     return tuple(result)  
 
 def get_vl_cond(t):
