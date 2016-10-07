@@ -1176,6 +1176,33 @@ def get_vl_cond(t):
                              y=current_bool)
     return current_bool
 
+def VL_ADD_BLOCK(t):
+    node = If(cond=BinOp(x=FuncCall(name=Raw(code="vldts_.count"),
+                                    args=[Raw(code=t.db)]),
+                         op="==",
+                         y=Raw(code="0")),
+              body=[ExprStmt(child=BinOp(
+                                    x=Raw(code="vldts_["+t.db+"]"),
+                                    op="=",
+                                    y=Raw(code="H5Tvlen_create(item_type)"))),
+                    ExprStmt(child=FuncCall(
+                                        name=Raw(code="opened_types_.insert"),
+                                        args=[Raw(code="vldts_["+t.db+"]")]))])
+    return node
+    
+def get_vl_body(t):
+    body = Block(nodes=[])
+    body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
+    if DB_TO_VL[t.db]:
+        body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
+                                               op="=",
+                                               y=Raw(code="sha1_type_"))))
+        body.nodes.append(VL_ADD_BLOCK(t))
+        body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
+                                           op="=",
+                                           y=Raw(code="CYCLUS_SHA1_SIZE"))))
+    return body
+
 def main():
     global NOT_VL
     global VARIATION_DICT
@@ -1260,11 +1287,9 @@ def main():
             try:
                 initial_type = variations.pop()
                 sub_if = If(cond=get_vl_cond(initial_type),
-                            body=[ExprStmt(child=Raw(code="dbtypes[i]=" 
-                                                  + initial_type.db))],
+                            body=[get_vl_body(initial_type)],
                             elifs=[(get_vl_cond(v), 
-                                   [ExprStmt(child=Raw(code="dbtypes[i]=" 
-                                                            + v.db))]) 
+                                   [get_vl_body(v)]) 
                                   for v in variations],
                             el=Block(nodes=[ExprStmt(child=Raw(
                                                         code="dbtypes[i]=" 
