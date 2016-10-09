@@ -1089,22 +1089,6 @@ def no_vl(t):
                 ret = ret and no_vl(CANON_TO_NODE[i])
             return ret
 
-HDF5_TYPES = {"INT": "H5T_NATIVE_INT",
-              "DOUBLE": "H5T_NATIVE_DOUBLE",
-              "FLOAT": "H5T_NATIVE_FLOAT",
-              "BOOL": "H5T_NATIVE_CHAR",
-              "STRING": "sha1_type_",
-              "BLOB": "sha1_type_",
-              "UUID": "uuid_type_"}
-              
-def create_item_type(t, depth=0, prefix=""):
-    node = Block()
-    item_type_var = get_variable("item_type", depth=depth, prefix=prefix)
-    if is_primitive(t):
-        item_type = HDF5_TYPES[t.db]
-    
-    return node
-
 NOT_VL = []
 
 VARIATION_DICT = {}
@@ -1190,9 +1174,12 @@ def VL_ADD_BLOCK(t):
                                         args=[Raw(code="vldts_["+t.db+"]")]))])
     return node
     
-def get_vl_body(t):
+def get_vl_body(t, current_shape_index=0):
     body = Block(nodes=[])
+    body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
     body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
+    #do this for every variation.
+    body.nodes.append(get_item_type(t))
     if DB_TO_VL[t.db]:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
@@ -1202,6 +1189,59 @@ def get_vl_body(t):
                                            op="=",
                                            y=Raw(code="CYCLUS_SHA1_SIZE"))))
     return body
+
+HDF5_TYPES = {"INT": "H5T_NATIVE_INT",
+              "DOUBLE": "H5T_NATIVE_DOUBLE",
+              "FLOAT": "H5T_NATIVE_FLOAT",
+              "BOOL": "H5T_NATIVE_CHAR",
+              "STRING": "sha1_type_",
+              "BLOB": "sha1_type_",
+              "UUID": "uuid_type_"}
+
+PRIMITIVE_SIZES = {"INT": "sizeof(int)",
+                   "DOUBLE": "sizeof(double)",
+                   "FLOAT": "sizeof(float)",
+                   "BOOL": "sizeof(char)",
+                   "STRING": "CYCLUS_SHA1_SIZE",
+                   "VL_STRING": "CYCLUS_SHA1_SIZE",
+                   "BLOB": "CYCLUS_SHA1_SIZE",
+                   "UUID": "CYCLUS_UUID_SIZE"}
+
+def get_item_type(t, depth=0):
+    dim_shape, shape_len = get_dim_shape(t.canon)
+    node = Block(nodes=[])
+    item_type_var = get_variable("item_type", prefix="", depth=depth)
+    node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
+                                          name=item_type_var)))
+    #handle primitive
+    if isinstance(t.canon, str):
+        if DB_TO_VL[t.db]:
+            node.nodes.append(ExprStmt(child=Assign(
+                                            target=Var(name=item_type_var),
+                                            value=Raw(code="sha1_type_"))))
+            return node
+        else:
+            node.nodes.append(ExprStmt(child=Assign(
+                                            target=Var(name=item_type_var),
+                                            value=Raw(code=HDF5_TYPES[t.db]))))
+            return node
+    #handle VL
+    #dependent types
+    else:
+        canon_shape = zip(t.canon, dim_shape)
+        #only one child
+        if len(canon_shape[1:]) == 1:
+            shape_var = get_variable("")
+            node.nodes.append(ExprStmt(
+                                child=DeclAssign(
+                                         type=Type(cpp="hsize_t"),
+                                         target=Var(name=shape_var),
+                                         value=Raw(code="shape["+dim_shape[0]+"]"))))
+        for can, shape in canon_shape[1:]: #item at 0 index is irrelevant
+            pass
+
+def H5Tarray_create2(t, rank, dims):
+     pass
 
 def main():
     global NOT_VL
@@ -1294,6 +1334,7 @@ def main():
                             el=Block(nodes=[ExprStmt(child=Raw(
                                                         code="dbtypes[i]=" 
                                                              + key_node.db))]))
+                #Nodes for every base type
                 if_bodies[n].nodes.append(sub_if)
             except IndexError:
                 lone_node = ExprStmt(child=Raw(code="dbtypes[i]=" + key_node.db))
