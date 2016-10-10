@@ -143,6 +143,10 @@ class Material: public Resource {
   /// step the material's Decay function was called.
   int prev_decay_time() { return prev_decay_time_; }
 
+  /// Returns a double with the decay heat of the material in units of
+  /// W/kg. 
+  double DecayHeat();
+
   /// Returns the nuclide composition of this material.
   Composition::Ptr comp();
 
