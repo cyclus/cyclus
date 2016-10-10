@@ -28,7 +28,7 @@ template <class T> class RequestPortfolio;
 template <class T>
 class Request {
  public:
-  typedef double (*cost_function_t)(boost::shared_ptr<Material>);
+  typedef double (*cost_function_t)(boost::shared_ptr<T>);
 
   /// @brief a factory method for a request
   /// @param target the target resource associated with this request
