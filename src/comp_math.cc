@@ -7,6 +7,11 @@
 #include "error.h"
 #include "pyne.h"
 
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
+
 namespace cyclus {
 namespace compmath {
 

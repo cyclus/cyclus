@@ -59,4 +59,9 @@
 #include "toolkit/symbolic_functions.h"
 #include "toolkit/timeseries.h"
 
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
+
 #endif  // CYCLUS_SRC_CYCLUS_H_

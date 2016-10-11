@@ -3,6 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <limits>
 
 #include "request.h"
 
@@ -28,15 +29,17 @@ class Bid {
                                boost::shared_ptr<T> offer,
                                Trader* bidder,
                                typename BidPortfolio<T>::Ptr portfolio,
-                               bool exclusive = false) {
-    return new Bid<T>(request, offer, bidder, portfolio, exclusive);
+                               bool exclusive = false,
+                               double preference = std::numeric_limits<double>::quiet_NaN()) {
+    return new Bid<T>(request, offer, bidder, portfolio, exclusive, preference);
   }
 
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
   inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
-                               Trader* bidder, bool exclusive = false) {
-    return new Bid<T>(request, offer, bidder, exclusive);
+                               Trader* bidder, bool exclusive = false,
+                               double preference = std::numeric_limits<double>::quiet_NaN()) {
+    return new Bid<T>(request, offer, bidder, exclusive, preference);
   }
 
   /// @return the request being responded to
@@ -63,29 +66,37 @@ class Bid {
   inline bool exclusive() const {
     return exclusive_;
   }
+  inline double preference() const {
+    return preference_;
+  }
 
  private:
   /// @brief constructors are private to require use of factory methods
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
-      bool exclusive = false)
+      bool exclusive = false, 
+      double preference = std::numeric_limits<double>::quiet_NaN())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
-        exclusive_(exclusive) {}
+        exclusive_(exclusive),
+        preference_(preference) {}
 
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
-      typename BidPortfolio<T>::Ptr portfolio, bool exclusive = false)
+      typename BidPortfolio<T>::Ptr portfolio, bool exclusive = false,
+      double preference = std::numeric_limits<double>::quiet_NaN())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
         portfolio_(portfolio),
-        exclusive_(exclusive) {}
+        exclusive_(exclusive),
+        preference_(preference) {}
 
   Request<T>* request_;
   boost::shared_ptr<T> offer_;
   Trader* bidder_;
   boost::weak_ptr<BidPortfolio<T> > portfolio_;
   bool exclusive_;
+  double preference_;
 };
 
 }  // namespace cyclus
