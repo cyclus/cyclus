@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_REQUEST_PORTFOLIO_H_
 #define CYCLUS_SRC_REQUEST_PORTFOLIO_H_
 
+#include <functional>
 #include <numeric>
 #include <set>
 #include <string>
@@ -87,6 +88,7 @@ class RequestPortfolio :
 public boost::enable_shared_from_this< RequestPortfolio<T> > {
  public:
   typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
+  typedef std::function<double(boost::shared_ptr<T>)> cost_function_t;
 
   RequestPortfolio() : requester_(NULL), qty_(0) {}
 
@@ -106,15 +108,18 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// others in the portfolio)
   /// @param exclusive a flag denoting that this request must be met exclusively,
   /// i.e., in its entirety by a single offer
+  /// @param cost_function The cost function that the requester sets so that the
+  /// bidder may evaluate many potential resources.
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
   Request<T>* AddRequest(boost::shared_ptr<T> target, Trader* requester,
                          std::string commodity = "",
                          double preference = kDefaultPref,
-                         bool exclusive = false) {
+                         bool exclusive = false,
+                         cost_function_t cost_function = NULL) {
     Request<T>* r =
         Request<T>::Create(target, requester, this->shared_from_this(),
-                           commodity, preference, exclusive);
+                           commodity, preference, exclusive, cost_function);
     VerifyRequester_(r);
     requests_.push_back(r);
     mass_coeffs_[r] = 1;
