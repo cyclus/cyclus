@@ -54,10 +54,10 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// original
   Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
                  Trader* bidder, bool exclusive = false, 
-                 double pref = std::numeric_limits<double>::quiet_NaN()) {
+                 double preference = std::numeric_limits<double>::quiet_NaN()) {
     Bid<T>* b =
         Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
-                       exclusive, pref);
+                       exclusive, preference);
     VerifyResponder_(b);
     if(offer->quantity() > 0 )
       bids_.insert(b);

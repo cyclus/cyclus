@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <map>
+#include <math.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -79,8 +80,9 @@ struct ExchangeContext {
 
     bids_by_request[pb->request()].push_back(pb);
 
+    double bid_pref = pd->preference();
     trader_prefs[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, pb->request()->preference()));
+        std::make_pair(pb, std::isnan(bid_pref) ? pb->request()->preference() : bid_pref));
   }
 
   /// @brief a reference to an exchange's set of requests
