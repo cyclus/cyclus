@@ -17,6 +17,11 @@
 #include "resource.h"
 #include "state_wrangler.h"
 
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
+
 class SimInitTest;
 
 namespace cyclus {

@@ -35,7 +35,7 @@ TEST(BidTests, MaterialGetSet) {
   EXPECT_EQ(fac, bid->bidder());
   EXPECT_EQ(req, bid->request());
   EXPECT_EQ(mat, bid->offer());
-  EXPECT_EQ(1.0, bid->pref());
+  EXPECT_EQ(1.0, bid->preference());
 
   delete bid;
 }
@@ -56,7 +56,7 @@ TEST(BidTests, ProductGetSet) {
   EXPECT_EQ(fac, bid->bidder());
   EXPECT_EQ(req, bid->request());
   EXPECT_EQ(rsrc, bid->offer());
-  EXPECT_EQ(1.0, bid->pref());
+  EXPECT_EQ(1.0, bid->preference());
 
   delete bid;
   delete req;
