@@ -33,6 +33,7 @@ the major supported system.
 ************
 Installation
 ************
+.. website_include_start
 
 Before going further on the installation procedure be sure you have installed
 all the required dependencies listed above. You can also find `here <DEPENDENCIES.rst>`_ 
@@ -165,6 +166,7 @@ The main variable used are:
 
 All variable can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
+.. website_include_stop
 
 *************
 Running Tests
