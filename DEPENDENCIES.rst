@@ -16,6 +16,7 @@ the `Cyclus Homepage`_.
 Dependencies
 ************
 
+.. website_include_start
 In order to facilitate future compatibility with multiple platforms,
 Cyclus is built using CMake_. A full list of the Cyclus package
 dependencies is shown below:
@@ -32,6 +33,8 @@ Package                Minimum Version
 `HDF5`                 1.8.4
 `Coin-Cbc`             2.5
 ====================   ==================
+
+.. website_include_stop
 
 On some platforms, such as Ubuntu 14.04, the following are also necessary:
 
