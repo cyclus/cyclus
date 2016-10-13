@@ -166,7 +166,7 @@ The main variable used are:
 
 All variable can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
-.. website_include_stop
+.. website_include_end
 
 *************
 Running Tests

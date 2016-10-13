@@ -34,7 +34,7 @@ Package                Minimum Version
 `Coin-Cbc`             2.5
 ====================   ==================
 
-.. website_include_stop
+.. website_include_end
 
 On some platforms, such as Ubuntu 14.04, the following are also necessary:
 
