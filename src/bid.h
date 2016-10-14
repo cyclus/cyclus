@@ -25,6 +25,12 @@ class Bid {
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
   /// @param portfolio the porftolio of which this bid is a part
+  /// @param exclusive flag for whether the bid is exclusive
+  /// @param preference specifies the preference of a bid in a request 
+  ///        to bid arc. If NaN the request preference is used. 
+  ///        WARNING: This should only be set by the bidder using the
+  ///        requests callback cost function. Bidders should not 
+  ///        arbitrarily set this preference. 
   inline static Bid<T>* Create(Request<T>* request,
                                boost::shared_ptr<T> offer,
                                Trader* bidder,
@@ -66,6 +72,8 @@ class Bid {
   inline bool exclusive() const {
     return exclusive_;
   }
+
+  /// @return the preference of this bid
   inline double preference() const {
     return preference_;
   }
