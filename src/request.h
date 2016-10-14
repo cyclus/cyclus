@@ -40,6 +40,8 @@ class Request {
   /// others in the portfolio)
   /// @param exclusive a flag denoting that this request must be met exclusively,
   /// i.e., in its entirety by a single offer
+  /// @param cost_function a standard function object that returns the cost of a
+  /// potential resource when called. 
   inline static Request<T>* Create(
       boost::shared_ptr<T> target,
       Trader* requester,
