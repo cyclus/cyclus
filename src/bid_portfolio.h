@@ -50,6 +50,9 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @param request the request being responded to by this bid
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
+  /// @param exclusive indicates whether the bid is exclusive
+  /// @param preference sets the preference of the bid on a request
+  ///        bid arc. 
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original
   Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
