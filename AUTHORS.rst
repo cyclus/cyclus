@@ -9,6 +9,8 @@ order):
 * Robert Flanagan
 * Matthew Gidden
 * Katy Huff
+* Meghan McGarry
+* Baptiste Mouginot
 * Olzhas Rakhimov
 * Anthony Scopatz
 * Zach Welch
