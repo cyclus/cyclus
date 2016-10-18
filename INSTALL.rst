@@ -128,8 +128,8 @@ installation flag. The otherwise identical process would look like:
 CMake Cyclus installation
 -------------------------
 
-If you are ``CMake`` aficionado you can also install Cyclus without using the
-install.py python script and use directly ``cmake`` which should look like:
+If you are `CMake` aficionado you can also install Cyclus without using the
+install.py python script and use directly `cmake` which should look like:
 
 
 .. code-block:: bash
