@@ -1098,12 +1098,15 @@ def get_dim_shape(canon, start=0, depth=0):
     tshape = []
     i = 0
     if isinstance(canon, str):
-        tshape.append(start+i)
+        tshape = start + i
         i += 1
-        return i, tshape
+        if depth == 0:
+            return i, [tshape]
+        else:
+            return i, tshape
     else:
         for u in canon:
-            j, jshape = get_dim_shape(u, start=i, depth=depth+1)
+            j, jshape = get_dim_shape(u, start=start+i, depth=depth+1)
             i += j
             tshape.append(jshape)
         return i, tshape
@@ -1190,13 +1193,13 @@ def get_vl_body(t, current_shape_index=0):
                                            y=Raw(code="CYCLUS_SHA1_SIZE"))))
     return body
 
-HDF5_TYPES = {"INT": "H5T_NATIVE_INT",
-              "DOUBLE": "H5T_NATIVE_DOUBLE",
-              "FLOAT": "H5T_NATIVE_FLOAT",
-              "BOOL": "H5T_NATIVE_CHAR",
-              "STRING": "sha1_type_",
-              "BLOB": "sha1_type_",
-              "UUID": "uuid_type_"}
+HDF5_TYPES = {"INT": Raw(code="H5T_NATIVE_INT"),
+              "DOUBLE": Raw(code="H5T_NATIVE_DOUBLE"),
+              "FLOAT": Raw(code="H5T_NATIVE_FLOAT"),
+              "BOOL": Raw(code="H5T_NATIVE_CHAR"),
+              "STRING": Raw(code="CreateFLStrType({size})"),
+              "BLOB": Raw(code="sha1_type_"),
+              "UUID": Raw(code="uuid_type_")}
 
 PRIMITIVE_SIZES = {"INT": "sizeof(int)",
                    "DOUBLE": "sizeof(double)",
@@ -1208,11 +1211,11 @@ PRIMITIVE_SIZES = {"INT": "sizeof(int)",
                    "UUID": "CYCLUS_UUID_SIZE"}
 
 def get_item_type(t, depth=0):
-    dim_shape, shape_len = get_dim_shape(t.canon)
+    shape_len, dim_shape = get_dim_shape(t.canon)
     node = Block(nodes=[])
     item_type_var = get_variable("item_type", prefix="", depth=depth)
     node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
-                                          name=item_type_var)))
+                                          name=Var(name=item_type_var))))
     #handle primitive
     if isinstance(t.canon, str):
         if DB_TO_VL[t.db]:
@@ -1221,24 +1224,30 @@ def get_item_type(t, depth=0):
                                             value=Raw(code="sha1_type_"))))
             return node
         else:
+            primitive_type = HDF5_TYPES[t.db]
+            primitive_type.code = primitive_type.code.format(size="shape["+str(dim_shape[0])+"]")
             node.nodes.append(ExprStmt(child=Assign(
                                             target=Var(name=item_type_var),
-                                            value=Raw(code=HDF5_TYPES[t.db]))))
+                                            value=primitive_type)))
             return node
     #handle VL
     #dependent types
     else:
-        canon_shape = zip(t.canon, dim_shape)
-        #only one child
-        if len(canon_shape[1:]) == 1:
+        canon_shape = list(zip(t.canon, dim_shape))
+        #print(t.canon)
+        #print(dim_shape)
+        if len(canon_shape[1:]) == 1: 
+            #this is an array type
             shape_var = get_variable("")
             node.nodes.append(ExprStmt(
                                 child=DeclAssign(
                                          type=Type(cpp="hsize_t"),
                                          target=Var(name=shape_var),
-                                         value=Raw(code="shape["+dim_shape[0]+"]"))))
-        for can, shape in canon_shape[1:]: #item at 0 index is irrelevant
+                                         value=Raw(code="shape["+str(dim_shape[0])+"]"))))
+        for can, shape in canon_shape[1:]:
+            #this is a compound type
             pass
+    return node
 
 def H5Tarray_create2(t, rank, dims):
      pass
@@ -1331,9 +1340,7 @@ def main():
                             elifs=[(get_vl_cond(v), 
                                    [get_vl_body(v)]) 
                                   for v in variations],
-                            el=Block(nodes=[ExprStmt(child=Raw(
-                                                        code="dbtypes[i]=" 
-                                                             + key_node.db))]))
+                            el=Block(nodes=[get_vl_body(key_node)]))
                 #Nodes for every base type
                 if_bodies[n].nodes.append(sub_if)
             except IndexError:
