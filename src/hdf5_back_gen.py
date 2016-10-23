@@ -1249,8 +1249,27 @@ def get_item_type(t, depth=0):
             pass
     return node
 
-def H5Tarray_create2(t, rank, dims):
-     pass
+def H5Tarray_create2(item_variable, rank=1, dims="&shape0"):
+    """Node representation of the C++ H5Tarray_create2 method.
+    
+    Parameters
+    ----------
+    item_variable : str
+        Variable name of HDF5 array item.
+    rank : int, optional
+        Number of HDF5 array dimensions.
+    dims : str, optional
+        Variable (by reference) of shape array belonging to HDF5 array
+
+    Returns
+    -------
+    node : FuncCall
+        Node of H5Tarray_create2 function call.
+    """     
+    node = FuncCall(name="H5Tarray_create2", args=[Raw(code=item_varaible),
+                                                   Raw(code=str(rank)),
+                                                   Raw(code=dims)])
+    return node
 
 def main():
     global NOT_VL
