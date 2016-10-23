@@ -1205,13 +1205,17 @@ PRIMITIVE_SIZES = {"INT": "sizeof(int)",
                    "DOUBLE": "sizeof(double)",
                    "FLOAT": "sizeof(float)",
                    "BOOL": "sizeof(char)",
-                   "STRING": "CYCLUS_SHA1_SIZE",
                    "VL_STRING": "CYCLUS_SHA1_SIZE",
                    "BLOB": "CYCLUS_SHA1_SIZE",
                    "UUID": "CYCLUS_UUID_SIZE"}
 
-def get_item_type(t, depth=0):
-    shape_len, dim_shape = get_dim_shape(t.canon)
+def get_item_type(t, shape_array=None, depth=0):
+    #We need to keep a persistant shape array, unless initial call.
+    if shape_array == None:
+        shape_len, dim_shape = get_dim_shape(t.canon)
+    else:
+        dim_shape = shape_array
+    
     node = Block(nodes=[])
     type_var = get_variable("item_type", prefix="", depth=depth)
     node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
@@ -1236,18 +1240,32 @@ def get_item_type(t, depth=0):
     #dependent types
     else:
         canon_shape = list(zip(t.canon, dim_shape))
-        if len(canon_shape[1:]) == 1: 
-            #this is an array type
-            shape_var = get_variable("shape", prefix="", depth=depth+1)
-            node.nodes.append(ExprStmt(
+        shape_var = get_variable("shape0", prefix="", depth=depth+1)
+        node.nodes.append(ExprStmt(
                                 child=DeclAssign(
                                          type=Type(cpp="hsize_t"),
                                          target=Var(name=shape_var),
                                          value=Raw(code="shape["
                                                    +str(dim_shape[0])+"]"))))
+        if len(canon_shape[1:]) == 1:
+            #not a compound type.
             item_canon, item_shape = canon_shape[1]
             #get nodes initializing our child type
-            node.nodes.append(get_item_type(item_canon, depth=depth+1))
+            child_array = (dim_shape[1] if isinstance(dim_shape[1], list) 
+                                        else [dim_shape[1]])
+            node.nodes.append(get_item_type(CANON_TO_NODE[item_canon],
+                                            shape_array=child_array,
+                                            depth=depth+1))
+        else:
+            #this is a compound type.
+            #1. Get item sizes.
+            #2. Create compound type using total item size.
+            #3. Insert individual children into the compound type.            
+            #children = Block(nodes=[get_item_type(CANON_TO_NODE[i])])
+            
+            for can, shape in canon_shape[1:]:
+                pass
+        if t.canon[0] in variable_length_types:
             child_item_var = get_variable("item_type", prefix="", depth=depth+1)
             array_node = ExprStmt(child=Assign(target=Var(name=type_var),
                                                value=H5Tarray_create2(
@@ -1255,11 +1273,63 @@ def get_item_type(t, depth=0):
                                                            rank=1,
                                                            dims="&"+shape_var)))
             
-        else:
-            #this is a compound type, maybe a compound array.            
-            for can, shape in canon_shape[1:]:
-                pass
+            node.nodes.append(array_node)
     return node
+
+def get_item_size(t, shape_array, depth=0):
+    """Resolves item size recursively.
+    
+    We can dig down into a type until we reach eventual primitives, and then
+    multiply the known sizes of those primitives by the lengths of their
+    containers. Container length is defined in the C++ shape array.
+    
+    Parameters
+    ----------
+    t : Type
+        The type whose size is in question
+    shape_array : list
+        Dimensioned list of shape array indicies, same shape as t.canon
+    depth : int
+        Recursive depth counter
+    
+    Returns
+    -------
+    size : str
+        String of C++ expression representing t's size.
+    """
+    if is_primitive(t):
+        if t.db in PRIMITIVE_SIZES.keys():
+            return PRIMITIVE_SIZES[t.db]
+        else:
+            return "shape[" + str(shape_array[0]) + "]"
+    else:
+        size = "("
+        if DB_TO_VL[t.db]:
+            size += "CYCLUS_SHA1_SIZE"
+        else:
+            size += "("
+            if len(t.canon[1:]) > 1:
+                children = []
+                for child_index in range(1, len(t.canon)):
+                    child_array = shape_array[child_index]
+                    if not isinstance(child_array, list):
+                        child_array = [child_array]
+                    children.append(get_item_size(
+                                           CANON_TO_NODE[t.canon[child_index]],
+                                           child_array,
+                                           depth=depth+1))
+                size += "+".join(children)
+            else:
+                child_array = shape_array[1]
+                if not isinstance(child_array, list):
+                    child_array = [child_array]
+                size += get_item_size(CANON_TO_NODE[t.canon[1]], child_array,
+                                      depth=depth+1)
+            size += ")"
+            if t.canon[0] in variable_length_types:
+                size += "*" + "shape[" + str(shape_array[0]) + "]"
+        size += ")"
+        return size    
 
 def H5Tarray_create2(item_variable, rank=1, dims="&shape0"):
     """Node representation of the C++ H5Tarray_create2 method.
