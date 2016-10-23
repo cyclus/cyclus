@@ -1254,6 +1254,7 @@ def get_item_type(t, depth=0):
                                                            child_item_var,
                                                            rank=1,
                                                            dims="&"+shape_var)))
+            
         else:
             #this is a compound type, maybe a compound array.            
             for can, shape in canon_shape[1:]:
