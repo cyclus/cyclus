@@ -1224,8 +1224,8 @@ def get_item_type(t, shape_array=None, depth=0):
     if isinstance(t.canon, str):
         if DB_TO_VL[t.db]:
             node.nodes.append(ExprStmt(child=Assign(
-                                            target=Var(name=type_var),
-                                            value=Raw(code="sha1_type_"))))
+                                                 target=Var(name=type_var),
+                                                 value=Raw(code="sha1_type_"))))
             return node
         else:
             primitive_type = HDF5_TYPES[t.db]
@@ -1233,9 +1233,8 @@ def get_item_type(t, shape_array=None, depth=0):
                                                          size="shape["
                                                               +str(dim_shape[0])
                                                               +"]")
-            node.nodes.append(ExprStmt(child=Assign(
-                                            target=Var(name=type_var),
-                                            value=primitive_type)))
+            node.nodes.append(ExprStmt(child=Assign(target=Var(name=type_var),
+                                                    value=primitive_type)))
             return node
     #dependent types
     else:
@@ -1251,20 +1250,36 @@ def get_item_type(t, shape_array=None, depth=0):
             #not a compound type.
             item_canon, item_shape = canon_shape[1]
             #get nodes initializing our child type
-            child_array = (dim_shape[1] if isinstance(dim_shape[1], list) 
-                                        else [dim_shape[1]])
+            child_array = (item_shape if isinstance(item_shape, list) 
+                                      else [item_shape])
             node.nodes.append(get_item_type(CANON_TO_NODE[item_canon],
                                             shape_array=child_array,
                                             depth=depth+1))
         else:
             #this is a compound type.
-            #1. Get item sizes.
-            #2. Create compound type using total item size.
-            #3. Insert individual children into the compound type.            
-            #children = Block(nodes=[get_item_type(CANON_TO_NODE[i])])
+            child_dict = {}
+            #1. Get all child item type nodes, recursively.
+            for i in range(1, len(canon_shape)):
+                item_canon, item_shape = canon_shape[i]
+                item_node = CANON_TO_NODE[item_canon]
+                child_array = (item_shape if isinstance(item_shape, list)
+                                          else [item_shape])
+                node.nodes.append(get_item_type(item_node,
+                                                shape_array=child_array,
+                                                depth=depth+1))
+                item_var = get_variable("item_type", 
+                                        prefix=template_args[t.canon[0]][i-1],
+                                        depth=depth+1)
+                #2. Get item sizes.
+                child_dict[item_var] = get_item_size(item_node, child_array,
+                                                     depth=depth+1)
+            #3. Create compound type using total item size.
+            compound = H5Tcreate_compound(list(child_dict.values()))
+            node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
+                                                    value=compound)))
+            #4. Insert individual children into the compound type.            
+            node.nodes.append(H5Tinsert(t.canon[0], type_var, child_dict))
             
-            for can, shape in canon_shape[1:]:
-                pass
         if t.canon[0] in variable_length_types:
             child_item_var = get_variable("item_type", prefix="", depth=depth+1)
             array_node = ExprStmt(child=Assign(target=Var(name=type_var),
@@ -1348,9 +1363,43 @@ def H5Tarray_create2(item_variable, rank=1, dims="&shape0"):
     node : FuncCall
         Node of H5Tarray_create2 function call.
     """     
-    node = FuncCall(name="H5Tarray_create2", args=[Raw(code=item_varaible),
+    node = FuncCall(name="H5Tarray_create2", args=[Raw(code=item_variable),
                                                    Raw(code=str(rank)),
                                                    Raw(code=dims)])
+    return node
+
+def H5Tcreate_compound(sizes):
+    """Node representation of the HDF5 compound type creation function.
+    
+    Parameters
+    ----------
+    sizes : list
+        List of type sizes, all must be str type.
+    
+    Returns
+    -------
+    node : FuncCall
+        H5Tcreate function call node.
+    """
+    node = FuncCall(name="H5Tcreate", args=[Raw(code="H5T_COMPOUND"),
+                                            Raw(code="+".join(sizes))])
+    return node
+    
+def H5Tinsert(container_type, compound_var, types_sizes_dict):
+    node = Block(nodes=[])
+    buf = str(0)
+    keys = list(types_sizes_dict.keys())
+    for i in range(len(types_sizes_dict)):
+        type_var = keys[i]
+        type_size = types_sizes_dict[type_var]
+        descriptor = template_args[container_type][i]
+        func = FuncCall(name=Var(name="H5Tinsert"), args=[])
+        func.args.append(Raw(code=compound_var))
+        func.args.append(Raw(code=descriptor))
+        func.args.append(buf)
+        buf += "+" + type_size
+        func.args.append(type_var)
+        node.nodes.append(ExprStmt(child=func))
     return node
 
 def main():
