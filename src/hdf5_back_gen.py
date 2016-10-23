@@ -1182,7 +1182,6 @@ def get_vl_body(t, current_shape_index=0):
     body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
     body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
     #do this for every variation.
-    body.nodes.append(get_item_type(t))
     if DB_TO_VL[t.db]:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
@@ -1191,6 +1190,8 @@ def get_vl_body(t, current_shape_index=0):
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
                                            op="=",
                                            y=Raw(code="CYCLUS_SHA1_SIZE"))))
+    else:
+        body.nodes.append(get_item_type(t))
     return body
 
 HDF5_TYPES = {"INT": Raw(code="H5T_NATIVE_INT"),
@@ -1215,7 +1216,7 @@ def get_item_type(t, shape_array=None, depth=0):
         shape_len, dim_shape = get_dim_shape(t.canon)
     else:
         dim_shape = shape_array
-    
+    #print(t.db, dim_shape)
     node = Block(nodes=[])
     type_var = get_variable("item_type", prefix="", depth=depth)
     node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
@@ -1363,9 +1364,9 @@ def H5Tarray_create2(item_variable, rank=1, dims="&shape0"):
     node : FuncCall
         Node of H5Tarray_create2 function call.
     """     
-    node = FuncCall(name="H5Tarray_create2", args=[Raw(code=item_variable),
-                                                   Raw(code=str(rank)),
-                                                   Raw(code=dims)])
+    node = FuncCall(name=Var(name="H5Tarray_create2"), 
+                    args=[Raw(code=item_variable), Raw(code=str(rank)),
+                          Raw(code=dims)])
     return node
 
 def H5Tcreate_compound(sizes):
@@ -1381,7 +1382,7 @@ def H5Tcreate_compound(sizes):
     node : FuncCall
         H5Tcreate function call node.
     """
-    node = FuncCall(name="H5Tcreate", args=[Raw(code="H5T_COMPOUND"),
+    node = FuncCall(name=Var(name="H5Tcreate"), args=[Raw(code="H5T_COMPOUND"),
                                             Raw(code="+".join(sizes))])
     return node
     
@@ -1392,13 +1393,13 @@ def H5Tinsert(container_type, compound_var, types_sizes_dict):
     for i in range(len(types_sizes_dict)):
         type_var = keys[i]
         type_size = types_sizes_dict[type_var]
-        descriptor = template_args[container_type][i]
+        descriptor = "\"" + template_args[container_type][i] + "\""
         func = FuncCall(name=Var(name="H5Tinsert"), args=[])
         func.args.append(Raw(code=compound_var))
         func.args.append(Raw(code=descriptor))
-        func.args.append(buf)
+        func.args.append(Raw(code=buf))
         buf += "+" + type_size
-        func.args.append(type_var)
+        func.args.append(Raw(code=type_var))
         node.nodes.append(ExprStmt(child=func))
     return node
 
