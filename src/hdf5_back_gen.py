@@ -1213,40 +1213,51 @@ PRIMITIVE_SIZES = {"INT": "sizeof(int)",
 def get_item_type(t, depth=0):
     shape_len, dim_shape = get_dim_shape(t.canon)
     node = Block(nodes=[])
-    item_type_var = get_variable("item_type", prefix="", depth=depth)
+    type_var = get_variable("item_type", prefix="", depth=depth)
     node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
-                                          name=Var(name=item_type_var))))
+                                          name=Var(name=type_var))))
     #handle primitive
     if isinstance(t.canon, str):
         if DB_TO_VL[t.db]:
             node.nodes.append(ExprStmt(child=Assign(
-                                            target=Var(name=item_type_var),
+                                            target=Var(name=type_var),
                                             value=Raw(code="sha1_type_"))))
             return node
         else:
             primitive_type = HDF5_TYPES[t.db]
-            primitive_type.code = primitive_type.code.format(size="shape["+str(dim_shape[0])+"]")
+            primitive_type.code = primitive_type.code.format(
+                                                         size="shape["
+                                                              +str(dim_shape[0])
+                                                              +"]")
             node.nodes.append(ExprStmt(child=Assign(
-                                            target=Var(name=item_type_var),
+                                            target=Var(name=type_var),
                                             value=primitive_type)))
             return node
-    #handle VL
     #dependent types
     else:
         canon_shape = list(zip(t.canon, dim_shape))
-        #print(t.canon)
-        #print(dim_shape)
         if len(canon_shape[1:]) == 1: 
             #this is an array type
-            shape_var = get_variable("")
+            shape_var = get_variable("shape", prefix="", depth=depth+1)
             node.nodes.append(ExprStmt(
                                 child=DeclAssign(
                                          type=Type(cpp="hsize_t"),
                                          target=Var(name=shape_var),
-                                         value=Raw(code="shape["+str(dim_shape[0])+"]"))))
-        for can, shape in canon_shape[1:]:
-            #this is a compound type
-            pass
+                                         value=Raw(code="shape["
+                                                   +str(dim_shape[0])+"]"))))
+            item_canon, item_shape = canon_shape[1]
+            #get nodes initializing our child type
+            node.nodes.append(get_item_type(item_canon, depth=depth+1))
+            child_item_var = get_variable("item_type", prefix="", depth=depth+1)
+            array_node = ExprStmt(child=Assign(target=Var(name=type_var),
+                                               value=H5Tarray_create2(
+                                                           child_item_var,
+                                                           rank=1,
+                                                           dims="&"+shape_var)))
+        else:
+            #this is a compound type, maybe a compound array.            
+            for can, shape in canon_shape[1:]:
+                pass
     return node
 
 def H5Tarray_create2(item_variable, rank=1, dims="&shape0"):
