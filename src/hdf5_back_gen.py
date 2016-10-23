@@ -5,6 +5,7 @@ import sys
 import json
 from pprint import pformat
 from itertools import chain
+from collections import OrderedDict
 
 is_primitive = lambda t: isinstance(t.canon, str)
 
@@ -1194,13 +1195,13 @@ def get_vl_body(t, current_shape_index=0):
         body.nodes.append(get_item_type(t))
     return body
 
-HDF5_TYPES = {"INT": Raw(code="H5T_NATIVE_INT"),
-              "DOUBLE": Raw(code="H5T_NATIVE_DOUBLE"),
-              "FLOAT": Raw(code="H5T_NATIVE_FLOAT"),
-              "BOOL": Raw(code="H5T_NATIVE_CHAR"),
-              "STRING": Raw(code="CreateFLStrType({size})"),
-              "BLOB": Raw(code="sha1_type_"),
-              "UUID": Raw(code="uuid_type_")}
+HDF5_TYPES = {"INT": "H5T_NATIVE_INT",
+              "DOUBLE": "H5T_NATIVE_DOUBLE",
+              "FLOAT": "H5T_NATIVE_FLOAT",
+              "BOOL": "H5T_NATIVE_CHAR",
+              "STRING": "CreateFLStrType({size})",
+              "BLOB": "sha1_type_",
+              "UUID": "uuid_type_"}
 
 PRIMITIVE_SIZES = {"INT": "sizeof(int)",
                    "DOUBLE": "sizeof(double)",
@@ -1229,11 +1230,9 @@ def get_item_type(t, shape_array=None, depth=0):
                                                  value=Raw(code="sha1_type_"))))
             return node
         else:
-            primitive_type = HDF5_TYPES[t.db]
-            primitive_type.code = primitive_type.code.format(
-                                                         size="shape["
+            primitive_type = Raw(code=HDF5_TYPES[t.db].format(size="shape["
                                                               +str(dim_shape[0])
-                                                              +"]")
+                                                              +"]"))
             node.nodes.append(ExprStmt(child=Assign(target=Var(name=type_var),
                                                     value=primitive_type)))
             return node
@@ -1258,7 +1257,7 @@ def get_item_type(t, shape_array=None, depth=0):
                                             depth=depth+1))
         else:
             #this is a compound type.
-            child_dict = {}
+            child_dict = OrderedDict()
             #1. Get all child item type nodes, recursively.
             for i in range(1, len(canon_shape)):
                 item_canon, item_shape = canon_shape[i]
