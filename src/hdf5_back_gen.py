@@ -1164,7 +1164,7 @@ def get_vl_cond(t):
                              y=current_bool)
     return current_bool
 
-def VL_ADD_BLOCK(t):
+def VL_ADD_BLOCK(t, item_var):
     node = If(cond=BinOp(x=FuncCall(name=Raw(code="vldts_.count"),
                                     args=[Raw(code=t.db)]),
                          op="==",
@@ -1172,7 +1172,7 @@ def VL_ADD_BLOCK(t):
               body=[ExprStmt(child=BinOp(
                                     x=Raw(code="vldts_["+t.db+"]"),
                                     op="=",
-                                    y=Raw(code="H5Tvlen_create(item_type)"))),
+                                    y=Raw(code="H5Tvlen_create("+item_var+")"))),
                     ExprStmt(child=FuncCall(
                                         name=Raw(code="opened_types_.insert"),
                                         args=[Raw(code="vldts_["+t.db+"]")]))])
@@ -1183,16 +1183,24 @@ def get_vl_body(t, current_shape_index=0):
     body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
     body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
     #do this for every variation.
+    body.nodes.append(get_item_type(t))
+    type_var = get_variable("item_type", prefix="", depth=0)
+    size_expression = Raw(code=get_item_size(t))
+    body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
+                                               op="=",
+                                               y=size_expression)))
     if DB_TO_VL[t.db]:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
-                                               op="=",
-                                               y=Raw(code="sha1_type_"))))
-        body.nodes.append(VL_ADD_BLOCK(t))
-        body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
                                            op="=",
-                                           y=Raw(code="CYCLUS_SHA1_SIZE"))))
+                                           y=Raw(code="sha1_type_"))))
+        body.nodes.append(VL_ADD_BLOCK(t, type_var))
     else:
-        body.nodes.append(get_item_type(t))
+        body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
+                                           op="=",
+                                           y=Raw(code=type_var))))
+        body.nodes.append(ExprStmt(child=FuncCall(
+                                        name=Raw(code="opened_types_.insert"),
+                                        args=[Raw(code="field_types[i]")])))
     return body
 
 HDF5_TYPES = {"INT": "H5T_NATIVE_INT",
@@ -1211,15 +1219,19 @@ PRIMITIVE_SIZES = {"INT": "sizeof(int)",
                    "BLOB": "CYCLUS_SHA1_SIZE",
                    "UUID": "CYCLUS_UUID_SIZE"}
 
-def get_item_type(t, shape_array=None, depth=0):
+VL_TO_FL_CONTAINERS = {"VL_VECTOR": "VECTOR",
+                       "VL_SET": "SET",
+                       "VL_LIST": "LIST",
+                       "VL_MAP": "MAP"}
+
+def get_item_type(t, shape_array=None, prefix="", depth=0):
     #We need to keep a persistant shape array, unless initial call.
     if shape_array == None:
         shape_len, dim_shape = get_dim_shape(t.canon)
     else:
         dim_shape = shape_array
-    #print(t.db, dim_shape)
     node = Block(nodes=[])
-    type_var = get_variable("item_type", prefix="", depth=depth)
+    type_var = get_variable("item_type", prefix=prefix, depth=depth)
     node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
                                           name=Var(name=type_var))))
     #handle primitive
@@ -1238,6 +1250,9 @@ def get_item_type(t, shape_array=None, depth=0):
             return node
     #dependent types
     else:
+        container_type = t.canon[0]
+        if DB_TO_VL[t.db]:
+            container_type = VL_TO_FL_CONTAINERS[t.canon[0]]
         canon_shape = list(zip(t.canon, dim_shape))
         shape_var = get_variable("shape0", prefix="", depth=depth+1)
         node.nodes.append(ExprStmt(
@@ -1254,6 +1269,7 @@ def get_item_type(t, shape_array=None, depth=0):
                                       else [item_shape])
             node.nodes.append(get_item_type(CANON_TO_NODE[item_canon],
                                             shape_array=child_array,
+                                            prefix=template_args[container_type][0],
                                             depth=depth+1))
         else:
             #this is a compound type.
@@ -1266,9 +1282,10 @@ def get_item_type(t, shape_array=None, depth=0):
                                           else [item_shape])
                 node.nodes.append(get_item_type(item_node,
                                                 shape_array=child_array,
+                                                prefix=template_args[container_type][i-1],
                                                 depth=depth+1))
                 item_var = get_variable("item_type", 
-                                        prefix=template_args[t.canon[0]][i-1],
+                                        prefix=template_args[container_type][i-1],
                                         depth=depth+1)
                 #2. Get item sizes.
                 child_dict[item_var] = get_item_size(item_node, child_array,
@@ -1278,9 +1295,9 @@ def get_item_type(t, shape_array=None, depth=0):
             node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
                                                     value=compound)))
             #4. Insert individual children into the compound type.            
-            node.nodes.append(H5Tinsert(t.canon[0], type_var, child_dict))
+            node.nodes.append(H5Tinsert(container_type, type_var, child_dict))
             
-        if t.canon[0] in variable_length_types:
+        if container_type in variable_length_types:
             child_item_var = get_variable("item_type", prefix="", depth=depth+1)
             array_node = ExprStmt(child=Assign(target=Var(name=type_var),
                                                value=H5Tarray_create2(
@@ -1291,7 +1308,7 @@ def get_item_type(t, shape_array=None, depth=0):
             node.nodes.append(array_node)
     return node
 
-def get_item_size(t, shape_array, depth=0):
+def get_item_size(t, shape_array=None, depth=0):
     """Resolves item size recursively.
     
     We can dig down into a type until we reach eventual primitives, and then
@@ -1302,9 +1319,9 @@ def get_item_size(t, shape_array, depth=0):
     ----------
     t : Type
         The type whose size is in question
-    shape_array : list
+    shape_array : list, optional
         Dimensioned list of shape array indicies, same shape as t.canon
-    depth : int
+    depth : int, optional
         Recursive depth counter
     
     Returns
@@ -1312,6 +1329,8 @@ def get_item_size(t, shape_array, depth=0):
     size : str
         String of C++ expression representing t's size.
     """
+    if shape_array == None:
+        shape_array = get_dim_shape(t.canon)[1]
     if is_primitive(t):
         if t.db in PRIMITIVE_SIZES.keys():
             return PRIMITIVE_SIZES[t.db]
@@ -1494,7 +1513,7 @@ def main():
                 #Nodes for every base type
                 if_bodies[n].nodes.append(sub_if)
             except IndexError:
-                lone_node = ExprStmt(child=Raw(code="dbtypes[i]=" + key_node.db))
+                lone_node = get_vl_body(key_node)
                 if_bodies[n].nodes.append(lone_node)
 
         initial_node, initial_body = if_bodies.popitem()
