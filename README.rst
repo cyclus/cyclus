@@ -1,3 +1,11 @@
+Cyclus
+------
+
+The Cyclus fuel cycle simulator is an agent-based and extensible framework for
+modeling the flow of material through future nuclear fuel cycles.  For more
+information on the entire "ecosystem" please refer to the `Cyclus website
+<http://fuelcycle.org>`_.
+
 ###########
 Cyclus Core
 ###########
