@@ -2,7 +2,7 @@
 Cyclus Installation Guide
 #########################
 
-Cyclus uses the `CMake` cross platform bailed-generator as a build system. To
+Cyclus uses the ``CMake`` cross platform bailed-generator as a build system. To
 simplify the usage of cmake to build Cyclus from source, a python script is
 provided with the source.
 
@@ -17,14 +17,14 @@ A full list of the Cyclus package dependencies is shown below:
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
-`CMake`                2.8
-`boost`                1.46.1
-`libxml2`              2
-`libxml++`             2.36
-`python`               2.7 or 3.3+
-`sqlite3`              3.7.10
-`HDF5`                 1.8.4
-`Coin-Cbc`             2.5
+``CMake``                2.8
+``boost``                1.46.1
+``libxml2``              2
+``libxml++``             2.36
+``python``               2.7 or 3.3+
+``sqlite3``              3.7.10
+``HDF5``                 1.8.4
+``Coin-Cbc``             2.5
 ====================   ==================
 
 ************
@@ -34,8 +34,8 @@ Installation
 
 Before going further on the installation procedure be sure you have installed
 all the required dependencies listed above. We have provided detailed
-instructions `for installing those dependencies for the major supported
-systems <DEPENDENCIES.rst>`_.
+instructions ``for installing those dependencies for the major supported
+systems <DEPENDENCIES.rst>``_.
 
 
 Default installation
@@ -115,7 +115,7 @@ flag:
 
 
 For example, if you have installed coin-Cbc from source or otherwise have it
-installed in a non-standard location, you should make use of the `coin_root`
+installed in a non-standard location, you should make use of the ``coin_root``
 installation flag. The otherwise identical process would look like:
 
 .. code-block:: bash
@@ -126,8 +126,8 @@ installation flag. The otherwise identical process would look like:
 CMake Cyclus installation
 -------------------------
 
-If you are `CMake` aficionado you can also install Cyclus without using the
-`install.py` python script and use directly `cmake` which should look like:
+If you are ``CMake`` aficionado you can also install Cyclus without using the
+``install.py`` python script and use directly ``cmake`` which should look like:
 
 
 .. code-block:: bash
@@ -180,8 +180,8 @@ proper functioning of Cyclus. You can run the tests yourself via:
     $ cyclus_unit_tests
 
 
-.. _`Cyclus Homepage`: http://fuelcycle.org/
-.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
-.. _`Cyclus repo`: https://github.com/cyclus/cyclus
-.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
+.. _``Cyclus Homepage``: http://fuelcycle.org/
+.. _``Cyclus User Guide``: http://fuelcycle.org/user/index.html
+.. _``Cyclus repo``: https://github.com/cyclus/cyclus
+.. _``Cycamore Repo``: https://github.com/cyclus/cycamore
 
