@@ -1183,24 +1183,33 @@ def get_vl_body(t, current_shape_index=0):
     body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
     body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
     #do this for every variation.
-    body.nodes.append(get_item_type(t))
-    type_var = get_variable("item_type", prefix="", depth=0)
+    item_nodes, opened_types = get_item_type(t)
+    body.nodes.append(item_nodes)
+    type_var = opened_types[-1] if opened_types != [] else get_variable(
+                                                                  "item_type",
+                                                                   prefix="",
+                                                                   depth=0)
     size_expression = Raw(code=get_item_size(t))
     body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
-                                               op="=",
-                                               y=size_expression)))
+                                                 op="=",
+                                                 y=size_expression)))
     if DB_TO_VL[t.db]:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
-                                           op="=",
-                                           y=Raw(code="sha1_type_"))))
+                                               op="=",
+                                               y=Raw(code="sha1_type_"))))
         body.nodes.append(VL_ADD_BLOCK(t, type_var))
     else:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
-                                           op="=",
-                                           y=Raw(code=type_var))))
-        body.nodes.append(ExprStmt(child=FuncCall(
-                                        name=Raw(code="opened_types_.insert"),
-                                        args=[Raw(code="field_types[i]")])))
+                                               op="=",
+                                               y=Raw(code=type_var))))
+        for opened in opened_types:
+            body.nodes.append(ExprStmt(child=FuncCall(
+                                          name=Raw(code="opened_types_.insert"),
+                                          args=[Raw(code=opened)])))
+        if not is_primitive(t) or t.db == "STRING":
+            body.nodes.append(ExprStmt(child=FuncCall(
+                                          name=Raw(code="opened_types_.insert"),
+                                          args=[Raw(code="field_types[i]")])))
     return body
 
 HDF5_TYPES = {"INT": "H5T_NATIVE_INT",
@@ -1231,6 +1240,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
     else:
         dim_shape = shape_array
     node = Block(nodes=[])
+    opened_stack = []
     type_var = get_variable("item_type", prefix=prefix, depth=depth)
     node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
                                           name=Var(name=type_var))))
@@ -1240,14 +1250,14 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
             node.nodes.append(ExprStmt(child=Assign(
                                                  target=Var(name=type_var),
                                                  value=Raw(code="sha1_type_"))))
-            return node
+            return node, opened_stack
         else:
             primitive_type = Raw(code=HDF5_TYPES[t.db].format(size="shape["
                                                               +str(dim_shape[0])
                                                               +"]"))
             node.nodes.append(ExprStmt(child=Assign(target=Var(name=type_var),
                                                     value=primitive_type)))
-            return node
+            return node, opened_stack
     #dependent types
     else:
         container_type = t.canon[0]
@@ -1267,10 +1277,12 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
             #get nodes initializing our child type
             child_array = (item_shape if isinstance(item_shape, list) 
                                       else [item_shape])
-            node.nodes.append(get_item_type(CANON_TO_NODE[item_canon],
+            child_node, child_opened = get_item_type(CANON_TO_NODE[item_canon],
                                             shape_array=child_array,
                                             prefix=template_args[container_type][0],
-                                            depth=depth+1))
+                                            depth=depth+1)
+            node.nodes.append(child_node)
+            opened_stack.extend(child_opened)
         else:
             #this is a compound type.
             child_dict = OrderedDict()
@@ -1280,10 +1292,12 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                 item_node = CANON_TO_NODE[item_canon]
                 child_array = (item_shape if isinstance(item_shape, list)
                                           else [item_shape])
-                node.nodes.append(get_item_type(item_node,
+                child_node, child_opened = get_item_type(item_node,
                                                 shape_array=child_array,
                                                 prefix=template_args[container_type][i-1],
-                                                depth=depth+1))
+                                                depth=depth+1)
+                node.nodes.append(child_node)
+                opened_stack.extend(child_opened)
                 item_var = get_variable("item_type", 
                                         prefix=template_args[container_type][i-1],
                                         depth=depth+1)
@@ -1292,10 +1306,12 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                                      depth=depth+1)
             #3. Create compound type using total item size.
             compound = H5Tcreate_compound(list(child_dict.values()))
-            node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
+            compound_var = get_variable("item_type", prefix="", depth=depth+1)
+            node.nodes.append(ExprStmt(child=Assign(target=Raw(code=compound_var),
                                                     value=compound)))
+            opened_stack.append(compound_var)
             #4. Insert individual children into the compound type.            
-            node.nodes.append(H5Tinsert(container_type, type_var, child_dict))
+            node.nodes.append(H5Tinsert(container_type, compound_var, child_dict))
             
         if container_type in variable_length_types:
             child_item_var = get_variable("item_type", prefix="", depth=depth+1)
@@ -1304,9 +1320,9 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                                            child_item_var,
                                                            rank=1,
                                                            dims="&"+shape_var)))
-            
+            opened_stack.append(type_var)
             node.nodes.append(array_node)
-    return node
+    return node, opened_stack
 
 def get_item_size(t, shape_array=None, depth=0):
     """Resolves item size recursively.
