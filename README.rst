@@ -16,18 +16,18 @@ framework for the development of innovative fuel cycle simulations.
 
 This readme provides basic information about:
  - the dependencies required by Cyclus 
- - the Cyclus installation command line
+ - installation of Cyclus from the command line
  - how to run Cyclus and the Cyclus unit tests
 
 The Cyclus Core contains all the fundamental pieces of the Cyclus framework
 required to interface with the input file, write the output file, and manage
-material flow during the simulation via the Dynamic Resource Exchange... but it
-does not contain any fuel cycle facilities. A set of nuclear facilities can be
+material flow during the simulation via the Dynamic Resource Exchange.  It
+does not contain any fuel cycle facility models. A set of nuclear facilities can be
 obtained by installing Cycamore, the Cyclus Additionnal Module.  Cycamore is
-supported by the Cyclus Developer Team.
+supported by the Cyclus Developer Team.  
 
 Third party modules can also be installed (or developed) with additional
-facilities.  Please visit the Cyclus website for a list of contributed modules.
+facilities.  Please visit the Cyclus website for a `list of contributed modules <http://fuelcycle.org/user/index.html#archetypes>`_.
 
 - **For general information about Cyclus, visit the**  `Cyclus Homepage`_,
 
@@ -49,7 +49,7 @@ Dependencies
 ************
 
 In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using `CMake`_. A full list of the Cyclus package
+Cyclus is built using `CMake`. A full list of the Cyclus package
 dependencies is shown below:
 
 ====================   ==================
@@ -71,16 +71,16 @@ For detailed instructions on installing dependencies, see `Installing Dependenci
 Quick Cyclus Installation
 *************************
 
-Assuming you have the dependencies installed correctly, installing Cyclus using
-github is fairly straightforward:
+Assuming you have the dependencies installed correctly, installing Cyclus based 
+on the source code from github is fairly straightforward:
 
-- Clone the Cyclus Repo: ``git clone https://github.com/cyclus/cyclus.git``,
+- Clone the Cyclus repository: ``git clone https://github.com/cyclus/cyclus.git``,
 
 - to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
-  from cyclus folder,
+  from the `cyclus` folder,
 
 - finally, add the following Cyclus installation path (``~/.local/cyclus``) to
-  the **bottom** on your ``$PATH``.
+  the **end** on your ``$PATH``.
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
@@ -111,7 +111,7 @@ simulations, first download Cycamore
   https://github.com/cyclus/cycamore.git``,
 
 - Install in the same location you installed Cyclus (eg. in ``~/.local/``):
-  ``python install.py`` from the cycamore folder.
+  ``python install.py`` from the `cycamore` folder.
 
 
 **************
@@ -137,17 +137,16 @@ to contribute into Cyclus, please follow this procedure:
 
 #. Fork Cyclus repository,
 
-#. Create a working branch on you fork from the `develop` branch,
+#. Create a working branch on your fork from the `develop` branch,
 
 #. Implement your modification of the Cyclus source code,
 
 #. Submit a Pull request into `Cyclus/develop` branch,
 
-#. Wait for reviews/merge (the Puller cannot be the Merger).
+#. Wait for reviews/merge (the proposer of a pull request cannot be the Merger).
 
 You may also want to read our `Contribution Guidelines <CONTRIBUTING.rst>`_.
 
-.. _`CMake`: https://cmake.org
 .. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
