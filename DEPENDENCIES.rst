@@ -18,7 +18,7 @@ Dependencies
 
 .. website_include_start
 In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using CMake_. A full list of the Cyclus package
+Cyclus is built using `CMake`. A full list of the Cyclus package
 dependencies is shown below:
 
 ====================   ==================
@@ -69,10 +69,10 @@ manager.
 Installing Dependencies (Linux and Unix)
 ----------------------------------------
 
-This guide assumes that the user has root access (to issue sudo commands) and
+This guide assumes that the user has root access (to issue `sudo` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Ubuntu 12.10 using apt-get as the package manager (scroll down further for
+of Ubuntu versions 12.10, 14.04 and 16.04, using `apt-get` as the package manager (scroll down further for
 Mac OSX instructions).
 
 The command to install a dependency takes the form of:
@@ -141,15 +141,15 @@ Installing Dependencies (Mac OSX)
 Cyclus archetype development is not fully supported on Mac.  Nonetheless,
 because there are some use cases which require installation from source, we have
 compiled a list of instructions that should be successful.  Use a Mac platform
-at your own risk, we strongly recommend sticking to Linux for development.
+at your own risk; we strongly recommend Linux as a primary development environment.
 
-This guide assumes that the user has root access (to issue sudo commands) and
+This guide assumes that the user has root access (to issue `sudo` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Yosemite 10.10.2 using macports as the package manager.  Macports installs
-packages in /opt/local.  If installing to a different location,
-(i.e. /usr/local) change paths in the following instructions accordingly. If
-you use homebrew, try the following instructions with brew commands in place of
+of Yosemite 10.10.2 using `macports` as the package manager.  Macports installs
+packages in `/opt/local`.  If installing to a different location,
+(i.e. `/usr/local`) change paths in the following instructions accordingly. If
+you use `homebrew`, try the following instructions with brew commands in place of
 the port commands.
 
 The command to install a dependency takes the form of:
@@ -187,7 +187,7 @@ your computer:
 
 
 Finally, update your path and the following environment variables in your
-~/.profile (or ~/.bashrc ) file:
+`~/.profile` (or `~/.bashrc` ) file:
 
 .. code-block:: bash
 

@@ -11,6 +11,7 @@ order):
 * Katy Huff
 * Meghan McGarry
 * Baptiste Mouginot
+* Arielle Opotowsky
 * Olzhas Rakhimov
 * Anthony Scopatz
 * Zach Welch

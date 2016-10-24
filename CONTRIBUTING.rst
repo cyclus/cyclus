@@ -20,6 +20,12 @@ General Notes
 
 * See the `An Example`_ section below for a full walk through
 
+* In addition to a review of the algorithmic and logical changes in your
+  contribution, it will be reviewed on a variety of levels including such
+  things as style, documentation, tests, etc.  While such review can appear
+  tedious, these aspects are important for the long term success of the
+  project.
+
 Issuing a Pull Request
 ======================
 
@@ -71,7 +77,7 @@ Cautions
 
 * **DO NOT** rebase any commits that have been pulled/pushed anywhere else other
   than your own fork (especially if those commits have been integrated into the
-  blessed repository.  You should NEVER rebase commits that are a part of the
+  blessed repository).  You should NEVER rebase commits that are a part of the
   'master' branch. *If you do, we will never, ever accept your pull request*.
 
 An Example
@@ -100,7 +106,7 @@ Acquiring a Fork of the Cyclus Repository
 
 A fork is *your* copy of Cyclus. Github offers an excellent
 `tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
-example assumes you have set up the "upstream" repository as cyclus/core. Note that git
+example assumes you have set up the "upstream" repository as `cyclus/core`. Note that git
 refers to your fork as "origin".
 
 First, let's make our "work" branch:
