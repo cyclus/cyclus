@@ -7,7 +7,7 @@ University of Wisconsin - Madison is intended to be a simulation
 framework upon which to develop innovative fuel cycle simulations.
 
 To see user and developer documentation for this code, please visit
-the ``Cyclus Homepage``_.
+the `Cyclus Homepage`_.
 
 .. contents:: Table of Contents
    :depth: 2

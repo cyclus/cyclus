@@ -3,8 +3,8 @@ Cyclus
 
 The Cyclus fuel cycle simulator is an agent-based and extensible framework for
 modeling the flow of material through future nuclear fuel cycles.  For more
-information on the entire "ecosystem" please refer to the ``Cyclus website
-<http://fuelcycle.org>``_.
+information on the entire "ecosystem" please refer to the `Cyclus website
+<http://fuelcycle.org>`_.
 
 ###########
 Cyclus Core
@@ -27,18 +27,18 @@ obtained by installing Cycamore, the Cyclus Additionnal Module.  Cycamore is
 supported by the Cyclus Developer Team.  
 
 Third party modules can also be installed (or developed) with additional
-facilities.  Please visit the Cyclus website for a ``list of contributed modules <http://fuelcycle.org/user/index.html#archetypes>``_.
+facilities.  Please visit the Cyclus website for a `list of contributed modules <http://fuelcycle.org/user/index.html#archetypes>`_.
 
-- **For general information about Cyclus, visit the**  ``Cyclus Homepage``_,
+- **For general information about Cyclus, visit the**  `Cyclus Homepage`_,
 
 - **For detailed installation instructions, visit the**
-  ``INSTALLATION Guide <INSTALL.rst>``_,
+  `INSTALLATION Guide <INSTALL.rst>`_,
 
 - **To see user and developer documentation for this code, please visit
-  the** ``Users Guide <http://fuelcycle.org/user/index.html>``_, 
+  the** `Users Guide <http://fuelcycle.org/user/index.html>`_, 
 
 - **If you would like to contribute to Cyclus, please check our** 
-  ``Contribution Guidelines <CONTRIBUTING.rst>``_.
+  `Contribution Guidelines <CONTRIBUTING.rst>`_.
 
 
 .. contents:: Table of Contents
@@ -65,7 +65,7 @@ Package                Minimum Version
 ``Coin-Cbc``             2.5
 ====================   ==================
 
-For detailed instructions on installing dependencies, see ``Installing Dependencies <DEPENDENCIES.rst>``_.
+For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
 
 *************************
 Quick Cyclus Installation
@@ -83,7 +83,7 @@ on the source code from github is fairly straightforward:
   the **front** on your ``$PATH``.
 
 For more detailed installation procedure, and/or custom installation please
-refer to the ``INSTALLATION guide <INSTALL.rst>``_.
+refer to the `INSTALLATION guide <INSTALL.rst>`_.
 
 
 *************
@@ -105,7 +105,7 @@ Installing Cycamore
 As noted previously, the Cyclus Core will not allow you to run fuel cycle
 simulations as it does not include nuclear facilities. To run fuel cycle
 simulations, first download Cycamore
-(``GitHub Cyamore Repository <https://github.com/cyclus/cycamore>``_):
+(`GitHub Cyamore Repository <https://github.com/cyclus/cycamore>`_):
 
 - Clone the Cycamore Repo: ``git clone
   https://github.com/cyclus/cycamore.git``,
@@ -118,15 +118,15 @@ simulations, first download Cycamore
 Running Cyclus
 **************
 
-You can find instructions for writing an input file for cyclus from ``Cyclus User
-Guide``_ or use sample input files from ``Cycamore Repo``_. Assuming you have some
+You can find instructions for writing an input file for cyclus from `Cyclus User
+Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
 file ``input.xml``, you can run Cyclus via:
 
 .. code-block:: bash
 
     $ cyclus path/to/input.xml
 
-For a more detailed explanation, check out the ``Cyclus User Guide``_.
+For a more detailed explanation, check out the `Cyclus User Guide`_.
 
 ************
 Contributing
@@ -145,7 +145,7 @@ to contribute into Cyclus, please follow this procedure:
 
 #. Wait for reviews/merge (the proposer of a pull request cannot be the Merger).
 
-You may also want to read our ``Contribution Guidelines <CONTRIBUTING.rst>``_.
+You may also want to read our `Contribution Guidelines <CONTRIBUTING.rst>`_.
 
 .. _``Cyclus Homepage``: http://fuelcycle.org/
 .. _``Cyclus User Guide``: http://fuelcycle.org/user/index.html

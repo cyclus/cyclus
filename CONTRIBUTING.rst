@@ -6,8 +6,8 @@ The Developer Workflow
 General Notes
 =============
 
-* The terminology we use is based on the ``Integrator Workflow
-  <http://en.wikipedia.org/wiki/Integrator_workflow>``_
+* The terminology we use is based on the `Integrator Workflow
+  <http://en.wikipedia.org/wiki/Integrator_workflow>`_
 
 * Use a branching workflow similar to the one described at
   http://progit.org/book/ch3-4.html.
@@ -16,9 +16,9 @@ General Notes
   repository's "master" and "develop" branches. Specifically, do not push your
   own commits directly to your "master" and "develop" branches.
 
-* Any commit should *pass all tests* (see ``Running Tests``_).
+* Any commit should *pass all tests* (see `Running Tests`_).
 
-* See the ``An Example``_ section below for a full walk through
+* See the `An Example`_ section below for a full walk through
 
 * In addition to a review of the algorithmic and logical changes in your
   contribution, it will be reviewed on a variety of levels including such
@@ -32,8 +32,8 @@ Issuing a Pull Request
 * When you are ready to move changes from one of your topic branches into the
   "develop" branch, it must be reviewed and accepted by another developer.
 
-* You may want to review this ``tutorial
-  <https://help.github.com/articles/using-pull-requests/>``_ before you make a
+* You may want to review this `tutorial
+  <https://help.github.com/articles/using-pull-requests/>`_ before you make a
   pull request to the develop branch.
 
 Reviewing a Pull Request
@@ -41,8 +41,8 @@ Reviewing a Pull Request
 
 * Look over the code.
 
-  * Check that it meets ``our style guidelines
-    <http://fuelcycle.org/kernel/pr_review.html>``_.
+  * Check that it meets `our style guidelines
+    <http://fuelcycle.org/kernel/pr_review.html>`_.
 
   * Make inline review comments concerning improvements.
 
@@ -105,7 +105,7 @@ Acquiring a Fork of the Cyclus Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A fork is *your* copy of Cyclus. Github offers an excellent
-``tutorial <http://help.github.com/fork-a-repo/>``_ on how to set one up. The rest of this
+`tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
 example assumes you have set up the "upstream" repository as ``cyclus/core``. Note that git
 refers to your fork as "origin".
 
@@ -161,8 +161,8 @@ review and accept it.
 Sometimes, your pull request will be held by the reviewer until further changes
 are made to appease the reviewer's concerns. This may be frustrating, but please
 act rationally, discuss the issues on the GitHub space made for your pull
-request, consult the ``style guide
-<http://cyclus.github.com/devdoc/style_guide.html>``_, email the developer
+request, consult the `style guide
+<http://cyclus.github.com/devdoc/style_guide.html>`_, email the developer
 listhost for further advice, and make changes to your topic branch accordingly.
 The pull request will be updated with those changes when you push them to your
 fork.  When you think your request is ready for another review, you can reopen
@@ -178,6 +178,6 @@ Releases
 ========
 
 If you are going through a release of Cyclus and Cycamore, check out the release
-procedure notes ``here
-<https://github.com/cyclus/cyclus/blob/develop/doc/release_procedure.rst>``_ and
-on the ``website <http://fuelcycle.org/cep/cep3.html>``_.
+procedure notes `here
+<https://github.com/cyclus/cyclus/blob/develop/doc/release_procedure.rst>`_ and
+on the `website <http://fuelcycle.org/cep/cep3.html>`_.
