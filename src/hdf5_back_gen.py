@@ -122,7 +122,7 @@ class PrettyFormatter(Visitor):
     """Formats a tree of nodes into a pretty string"""
 
     def __init__(self, tree=None, indent=' '):
-        super().__init__(tree=tree)
+        super(PrettyFormatter, self).__init__(tree=tree)
         self.level = 0
         self.indent = indent
 
@@ -144,7 +144,7 @@ class PrettyFormatter(Visitor):
 
 class CppGen(Visitor):
     def __init__(self, tree=None, indent='  '):
-        super().__init__(tree=tree)
+        super(CppGen, self).__init__(tree=tree)
         self.level = 0
         self.indent = indent
         
@@ -327,7 +327,7 @@ CANON_SET = set()
 DB_TO_CPP = {}
 CANON_TO_DB = {}
 DB_TO_VL = {}
-INDENT = '    '
+INDENT = '  '
 
 def convert_canonical(raw_list):
     """Converts JSON list of lists to tuple of tuples.
@@ -1531,6 +1531,6 @@ def main():
     elif gen_instruction == "VL":
         print(output)
     else:
-        raise ValueError("No valid generation instruction provided")   
+        raise ValueError("No valid generation instruction provided")
 if __name__ == '__main__':
     main()

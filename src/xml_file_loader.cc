@@ -223,9 +223,9 @@ void XMLFileLoader::LoadSolver() {
     if (qe->NMatches(config) == 1) {
       solver_name = qe->SubTree(config)->GetElementName(0);
     }
-    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders", 
+    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders",
                                             exclusive);
-    
+
     // @TODO remove this after release 1.5
     // check for deprecated input values
     if (qe->NMatches(std::string("exclusive_orders_only")) != 0) {
@@ -243,12 +243,12 @@ void XMLFileLoader::LoadSolver() {
        << " as intended with this feature turned off.";
     Warn<VALUE_WARNING>(ss.str());
   }
-  
+
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
       ->AddVal("ExclusiveOrders", exclusive)
-      ->Record();  
-  
+      ->Record();
+
   // now load the actual solver
   if (solver_name == greedy) {
     query = string("/*/control/solver/config/greedy/preconditioner");
@@ -401,7 +401,7 @@ void XMLFileLoader::LoadControlParams() {
   InfileTree xqe(*parser_);
   std::string query = "/*/control";
   InfileTree* qe = xqe.SubTree(query);
-
+  
   std::string handle;
   if (qe->NMatches("simhandle") > 0) {
     handle = qe->GetString("simhandle");
@@ -426,6 +426,15 @@ void XMLFileLoader::LoadControlParams() {
 
   // get time step duration
   si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
+  
+  // get epsilon
+  double eps_ = OptionalQuery<double>(qe, "tolerance_generic", 1e-6);
+  cy_eps = si.eps = eps_;
+
+  // get epsilon resources
+  double eps_rsrc_ = OptionalQuery<double>(qe, "tolerance_resource", 1e-6);
+  cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
+
 
   ctx_->InitSim(si);
 }

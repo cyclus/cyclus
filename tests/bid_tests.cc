@@ -30,11 +30,12 @@ TEST(BidTests, MaterialGetSet) {
   double qty = 1.0;
   Material::Ptr mat = tc.mat();
   Request<Material>* req = tc.NewReq();
-  Bid<Material>* bid = Bid<Material>::Create(req, mat, fac);
+  Bid<Material>* bid = Bid<Material>::Create(req, mat, fac, false, 1.0);
 
   EXPECT_EQ(fac, bid->bidder());
   EXPECT_EQ(req, bid->request());
   EXPECT_EQ(mat, bid->offer());
+  EXPECT_EQ(1.0, bid->preference());
 
   delete bid;
 }
@@ -50,11 +51,12 @@ TEST(BidTests, ProductGetSet) {
 
   Request<Product>* req = Request<Product>::Create(rsrc, fac);
 
-  Bid<Product>* bid = Bid<Product>::Create(req, rsrc, fac);
+  Bid<Product>* bid = Bid<Product>::Create(req, rsrc, fac, false, 1.0);
 
   EXPECT_EQ(fac, bid->bidder());
   EXPECT_EQ(req, bid->request());
   EXPECT_EQ(rsrc, bid->offer());
+  EXPECT_EQ(1.0, bid->preference());
 
   delete bid;
   delete req;

@@ -5,14 +5,19 @@
 #include <limits>
 
 namespace cyclus {
+
+/// generic epsilon values
+extern double cy_eps;
 /// a generic epsilon value
 inline double eps() {
-  return 1e-6;
+  return cy_eps;
 }
 
+/// epsilon values to be used by resources
+extern double cy_eps_rsrc;
 /// an epsilon value to be used by resources
 inline double eps_rsrc() {
-  return 1e-6;
+  return cy_eps_rsrc;
 }
 
 /// returns true if a double is less than 0 - eps()

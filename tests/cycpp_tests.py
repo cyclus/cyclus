@@ -100,7 +100,7 @@ def test_nsfilt():
     yield assert_true, f.isvalid(statement)
     f.transform(statement, sep)
     yield assert_equal, len(m.namespaces), 1
-    yield assert_equal, m.namespaces[0], (0, None)
+    yield assert_equal, m.namespaces[0], (0, '<anonymous>')
     f.revert(statement, sep)
     yield assert_equal, len(m.namespaces), 0
 
@@ -214,19 +214,19 @@ def test_vdeclarfilter_canonize_alias():
         (['x', 'val'], ['std::set', 'float'], 'x', None),
         (['x', 'first', 'second'], ['std::pair', 'int', 'int'], 'x', None),
         ([['x', 'item'], 'key', 'val'], ['std::map', 'int', 'int'], 'x', None),
-        ([['x', 'item'], ['key', 'first', 'second'], ['val', 'val']], 
-            ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+        ([['x', 'item'], ['key', 'first', 'second'], ['val', 'val']],
+            ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']],
             'x', None),
         ('y', 'float', 'x', 'y'),
         (['x', 'y'], ['std::set', 'float'], 'x', [None, 'y']),
-        (['y', 'first', 'second'], ['std::pair', 'int', 'int'], 
+        (['y', 'first', 'second'], ['std::pair', 'int', 'int'],
             'x', ['y']),
-        ([['x', 'item'], 'y', 'val'], ['std::map', 'int', 'int'], 'x', 
+        ([['x', 'item'], 'y', 'val'], ['std::map', 'int', 'int'], 'x',
             [None, 'y']),
-        ([['x', 'ytem'], 'y', 'val'], ['std::map', 'int', 'int'], 'x', 
+        ([['x', 'ytem'], 'y', 'val'], ['std::map', 'int', 'int'], 'x',
             [['x', 'ytem'], 'y']),
-        ([['x', 'ytem'], ['key', 'f', 's'], ['data', 'val']], 
-            ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
+        ([['x', 'ytem'], ['key', 'f', 's'], ['data', 'val']],
+            ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']],
             'x', [[None, 'ytem'], [None, 'f', 's'], 'data']),
         ]
     for exp, t, name, alias in cases:
@@ -241,17 +241,17 @@ def test_vdeclarfilter_canonize_ui():
         ('foo', 'float', 'x', 'foo'),
         (['foo', ''], ['std::set', 'float'], 'x', 'foo'),
         (['foo', 'bar'], ['std::set', 'float'], 'x', ['foo', 'bar']),
-        ([['foo', ''], ['', '', ''], ['', '']], 
-         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
-         'x', 
+        ([['foo', ''], ['', '', ''], ['', '']],
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']],
+         'x',
          'foo'),
-        ([['foo', ''], ['bar', '', ''], ['', '']], 
-         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
-         'x', 
+        ([['foo', ''], ['bar', '', ''], ['', '']],
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']],
+         'x',
          ['foo', 'bar']),
-        ([['foo', ''], ['bar', '', ''], ['baz', '']], 
-         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']], 
-         'x', 
+        ([['foo', ''], ['bar', '', ''], ['baz', '']],
+         ['std::map', ['std::pair', 'int', 'int'], ['std::set', 'int']],
+         'x',
          ['foo', 'bar', 'baz']),
     ]
     for exp, t, name, x in cases:
@@ -323,7 +323,7 @@ def test_canon_type():
         ('std::vector<int>', ('std::vector', 'int')),
         ('std::map<int, cyclus::Blob>', ('std::map', 'int', 'cyclus::Blob')),
         ('std::pair<int,std::string>', ('std::pair', 'int', 'std::string')),
-        ('std::map<std::pair<int, std::string>, double>', 
+        ('std::map<std::pair<int, std::string>, double>',
             ('std::map', ('std::pair', 'int', 'std::string'), 'double')),
         ]
     for t, exp in cases:
@@ -465,22 +465,22 @@ def test_itdbfilter_val():
     f = InfileToDbFilter(m)
 
     cases = [
-        ('bool', True, 'foo', None, 'bool foo = true;\n'), 
-        ('bool', False, 'foo', None, 'bool foo = false;\n'), 
-        ('int', 42, 'foo', None, 'int foo = 42;\n'), 
-        ('int', 92235, 'foo', 'nuclide', 'int foo = pyne::nucname::id(92235);\n'), 
-        ('int', 'U-235', 'foo', 'nuclide', 'int foo = pyne::nucname::id("U-235");\n'), 
-        ('float', 42.0, 'foo', None, 'double foo = 42.0;\n'), 
-        ('double', 42.0, 'foo', None, 'double foo = 42.0;\n'), 
+        ('bool', True, 'foo', None, 'bool foo = true;\n'),
+        ('bool', False, 'foo', None, 'bool foo = false;\n'),
+        ('int', 42, 'foo', None, 'int foo = 42;\n'),
+        ('int', 92235, 'foo', 'nuclide', 'int foo = pyne::nucname::id(92235);\n'),
+        ('int', 'U-235', 'foo', 'nuclide', 'int foo = pyne::nucname::id("U-235");\n'),
+        ('float', 42.0, 'foo', None, 'double foo = 42.0;\n'),
+        ('double', 42.0, 'foo', None, 'double foo = 42.0;\n'),
         ('std::string', 'wakka', 'foo', None, 'std::string foo("wakka");\n'),
         ('cyclus::Blob', 'wakka', 'foo', None, 'cyclus::Blob foo("wakka");\n'),
-        ('boost::uuids::uuid', 
-            '/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb', 'foo', None, 
+        ('boost::uuids::uuid',
+            '/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb', 'foo', None,
             'boost::uuids::uuid foo = "/#\xfb\xaf\x90\xc9N\xe9\x98:S\xea\xd6\xd6\x0fb";\n'),
-        ('boost::uuids::uuid', 
-            uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), 'foo', None, 
+        ('boost::uuids::uuid',
+            uuid.UUID('2f23fbaf-90c9-4ee9-983a-53ead6d60f62'), 'foo', None,
             'boost::uuids::uuid foo = {0x2f, 0xf3, 0x2b, 0x3f, 0xf0, 0xb9, 0xae, 0xf9, 0x98, 0x0a, 0xc3, 0x9a, 0x46, 0xe6, 0xef, 0x92};\n'),
-        (('std::vector', 'int'), [42], 'foo', None, 
+        (('std::vector', 'int'), [42], 'foo', None,
             ('std::vector< int > foo;\n'
              'foo.resize(1);\n'
              '{\n'
@@ -490,7 +490,7 @@ def test_itdbfilter_val():
              '  }\n'
              '}\n'),
             ),
-        (('std::vector', 'int'), [92235], 'foo', [None, 'nuclide'], 
+        (('std::vector', 'int'), [92235], 'foo', [None, 'nuclide'],
             ('std::vector< int > foo;\n'
              'foo.resize(1);\n'
              '{\n'
@@ -500,7 +500,7 @@ def test_itdbfilter_val():
              '  }\n'
              '}\n'),
             ),
-        (('std::set', 'int'), [42, 65], 'foo', None, 
+        (('std::set', 'int'), [42, 65], 'foo', None,
             ('std::set< int > foo;\n'
              '{\n'
              '  {\n'
@@ -513,7 +513,7 @@ def test_itdbfilter_val():
              '  }\n'
              '}\n'),
             ),
-        (('std::list', 'int'), [42, 65], 'foo', None, 
+        (('std::list', 'int'), [42, 65], 'foo', None,
             ('std::list< int > foo;\n'
              '{\n'
              '  {\n'
@@ -526,7 +526,7 @@ def test_itdbfilter_val():
              '  }\n'
              '}\n'),
             ),
-        (('std::pair', 'int', 'double'), [42, 65.0], 'foo', None, 
+        (('std::pair', 'int', 'double'), [42, 65.0], 'foo', None,
             ('std::pair< int, double > foo;\n'
              '{\n'
              '  int first = 42;\n'
@@ -535,7 +535,7 @@ def test_itdbfilter_val():
              '  foo.second = second;\n'
              '}\n'),
             ),
-        (('std::map', 'int', 'double'), {42: 65.0}, 'foo', None, 
+        (('std::map', 'int', 'double'), {42: 65.0}, 'foo', None,
             ('std::map< int, double > foo;\n'
              '{\n'
              '  {\n'
@@ -799,9 +799,9 @@ def test_infiletodb_read_member1():
             ]))
             ])}
     f = InfileToDbFilter(m)
-    
-    cpptype = ('std::map', 'std::string', ('std::vector', 
-                ('std::vector', ('std::pair', 'double', 
+
+    cpptype = ('std::map', 'std::string', ('std::vector',
+                ('std::vector', ('std::pair', 'double',
                   ('std::pair', 'int', ('std::list', ('std::set', 'bool')))))))
     alias = ['streams', 'name', ['efficiencies', 'val']]
     gen = f.read_member('mymap', alias, cpptype, uitype=None)
@@ -897,7 +897,7 @@ def test_infiletodb_read_member1():
         '    }\n'
         '    mymap = mymap_in;\n'
         '  }\n')
-    
+
     ## useful for debugging test failures
     #print(gen)
     #print(exp_gen)
@@ -976,7 +976,7 @@ def test_infiletodb_read_map():
             ])}
     f = InfileToDbFilter(m)
 
-    cpptype = ('std::map', 'int', 'double') 
+    cpptype = ('std::map', 'int', 'double')
     alias = [['streams', 'entry'], 'id', 'mass']
     obs = f.read_member('mymap', alias, cpptype, uitype=None)
 
@@ -1184,6 +1184,6 @@ def test_integration():
     cmd = 'cycpp.py {} -o {} --cpp-path `which g++`'.format(inf, outf.name)
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     assert_equal('', p.stdout.read().decode())
-    
+
 if __name__ == "__main__":
     nose.runmodule()

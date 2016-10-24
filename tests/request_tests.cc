@@ -83,3 +83,26 @@ TEST(RequestTests, ProductGetSet) {
 
   delete r;
 }
+
+TEST(RequestTests, FunctionPointer) {
+  TestContext tc;
+  TestFacility* fac = tc.trader();
+  Trader* excast = dynamic_cast<Trader*>(fac);
+
+  cyclus::CompMap cm;
+  cm[92235] = 1.0;
+  Composition::Ptr comp = Composition::CreateFromMass(cm);
+  double qty = 1.0;
+  Material::Ptr mat = Material::CreateUntracked(qty, comp);
+  string commod = "name";
+  double pref = 2.4;
+  string quality = "qual";
+
+  Request<Material>* r = Request<Material>::Create(
+    mat, fac, commod, pref, false,
+    [](Material::Ptr m)->double { return 1.0; });
+
+  EXPECT_EQ(1.0, r->cost_function()(mat));
+
+  delete r;
+}

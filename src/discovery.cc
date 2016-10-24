@@ -70,8 +70,9 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
   for (set<string>::iterator it = archs.begin(); it != archs.end(); ++it) {
     spec = p + ":" + lib + ":" + (*it);
     agentspec = AgentSpec(spec);
-    if (DynamicModule::Exists(agentspec))
+    if (DynamicModule::Exists(agentspec)) {
       specs.insert(spec);
+    }
   }
   return specs;
 }
@@ -85,19 +86,28 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
   fs::path pth;
   boost::system::error_code errc;
   boost::system::error_code no_err;
-  fs::recursive_directory_iterator it(d, errc);
+  pth = d;
+  fs::recursive_directory_iterator it(pth, errc);
   fs::recursive_directory_iterator last;
   for (; it != last; it.increment(errc)) {
     if (errc != no_err) {
-      if (it.level() > 0)
+      if (it.level() > 0) {
         it.pop();
+      }
       continue;
     }
     pth = it->path();
     string pthstr = pth.string();
-    if (!boost::algorithm::ends_with(pthstr, SUFFIX)) {
+    bool irf = fs::is_regular_file(pth, errc);
+    if (errc != no_err || !irf) {
+      it.no_push();
+      if (it.level() > 0) {
+        it.pop();
+      }
       continue;
-    } else if (is_directory(pth)) {
+    } else if (fs::is_directory(pth, errc)) {
+      continue;
+    } else if (!boost::algorithm::ends_with(pthstr, SUFFIX)) {
       continue;
     }
     string p = pth.parent_path().string();
@@ -110,8 +120,9 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     try {
       libspecs = DiscoverSpecs(p, lib);
     } catch (cyclus::IOError& e) {}
-    for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls)
+    for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls) {
       specs.insert(*ls);
+    }
   }
   return specs;
 }
@@ -125,8 +136,9 @@ std::set<std::string> DiscoverSpecsInCyclusPath() {
   vector<string> cycpath = Env::cyclus_path();
   for (vector<string>::iterator it = cycpath.begin(); it != cycpath.end(); ++it) {
     dirspecs = DiscoverSpecsInDir((*it).length() == 0 ? "." : (*it));
-    for (set<string>::iterator ds = dirspecs.begin(); ds != dirspecs.end(); ++ds)
+    for (set<string>::iterator ds = dirspecs.begin(); ds != dirspecs.end(); ++ds) {
       specs.insert(*ds);
+    }
   }
   return specs;
 }
@@ -156,7 +168,7 @@ Json::Value DiscoverMetadataInCyclusPath() {
   root["specs"] = spec;
   root["annotations"] = anno;
   root["schema"] = schm;
-  
+
   return root;
 }
 

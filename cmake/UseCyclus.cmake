@@ -122,7 +122,11 @@ MACRO(USE_CYCLUS lib_root src_root)
     # not sure if needed..
     IF(NOT EXISTS ${CCOUT})
         MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
-        EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
+        EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG}
+                        ${ORIG} ${INCL_ARGS} RESULT_VARIABLE res_var)
+        IF(NOT "${res_var}" STREQUAL "0")
+            message(FATAL_ERROR "cycpp failed on '${CCIN}' with exit code '${res_var}'")
+        ENDIF()
     ENDIF(NOT EXISTS ${CCOUT})
     SET(
         "${lib_root}_CC"
@@ -133,7 +137,13 @@ MACRO(USE_CYCLUS lib_root src_root)
         # not sure if we still need this...
         IF(NOT EXISTS ${HOUT})
             MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
-            EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
+            EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
+                            RESULT_VARIABLE res_var)
+
+            IF(NOT "${res_var}" STREQUAL "0")
+                message(FATAL_ERROR "archetype preprocessing failed for ${HIN}, res_var = '${res_var}'")
+            ENDIF()
+
         ENDIF(NOT EXISTS ${HOUT})
         ADD_CUSTOM_COMMAND(
             OUTPUT ${CCOUT}
@@ -262,21 +272,9 @@ MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
         )
     SET(${lib_name}_LIB ${lib_name} CACHE INTERNAL "Agent library alias." FORCE)
 
-    # install headers
-    IF(NOT "${lib_h}" STREQUAL "")
-        INSTALL(FILES ${lib_h} DESTINATION include/cyclus COMPONENT "${lib_name}")
-    ENDIF(NOT "${lib_h}" STREQUAL "")
 ENDMACRO()
 
 MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
-    # install test header
-    IF(NOT "${test_h}" STREQUAL "")
-        INSTALL(
-            FILES ${test_h}
-            DESTINATION include/cyclus/${inst_dir}
-            COMPONENT ${lib_name}
-            )
-    ENDIF(NOT "${test_h}" STREQUAL "")
 
     # build & install test impl
     IF(NOT "${test_src}" STREQUAL "" AND NOT "${driver}" STREQUAL "NONE")

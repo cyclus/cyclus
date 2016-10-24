@@ -9,13 +9,25 @@ CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
 
 SET(cyclus_install_dir "${CMAKE_INSTALL_PREFIX}")
 SET(cyclus_build_dir "${CYCLUS_BINARY_DIR}")
+if(DEFINED DEFAULT_ALLOW_MILPS)
+    if (${DEFAULT_ALLOW_MILPS})
+        SET(default_allow_milps "true")
+    else (${DEFAULT_ALLOW_MILPS})
+        SET(default_allow_milps "false")
+    endif (${DEFAULT_ALLOW_MILPS})
+else(DEFINED DEFAULT_ALLOW_MILPS)
+    SET(default_allow_milps "true")
+endif(DEFINED DEFAULT_ALLOW_MILPS)
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
     @ONLY
     )
 
-EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "QUERY" OUTPUT_VARIABLE HDF5_BACK_CC_QUERY)
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "QUERY" OUTPUT_VARIABLE HDF5_BACK_CC_QUERY RESULT_VARIABLE res_var)
+IF(NOT "${res_var}" STREQUAL "0")
+  message(FATAL_ERROR "Process hdf5_back_gen.py failed, res_var = '${res_var}'")
+ENDIF()
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"

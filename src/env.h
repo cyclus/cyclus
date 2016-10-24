@@ -9,6 +9,11 @@
 #include "error.h"
 #include "pyne.h"
 
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
+
 namespace cyclus {
 
 /// @class Env
@@ -73,6 +78,11 @@ class Env {
   /// @return the current value of the module environment variable
   /// CYCLUS_PATH
   static const std::vector<std::string> cyclus_path();
+
+  /// @return whether or not Cyclus should allow Mixed-Integer Linear Programs
+  /// The default depends on a compile time option DEFAULT_ALLOW_MILPS, but
+  /// may be specified at run time with the ALLOW_MILPS environment variable
+  static const bool allow_milps();
 
   /// @return the correct environment variable delimiter based on the file system
   static const std::string EnvDelimiter();

@@ -111,7 +111,7 @@ WRANGLERS = {
     'mi6::Spy',  # for testing!!
     }
 
-ENTITIES = [('cyclus::Region', 'region'), ('cyclus::Institution', 'institution'), 
+ENTITIES = [('cyclus::Region', 'region'), ('cyclus::Institution', 'institution'),
             ('cyclus::Facility', 'facility'), ('cyclus::Agent', 'archetype')]
 
 def escape_xml(s, ind='    '):
@@ -217,12 +217,12 @@ class Filter(object):
         elif varname is None:
             s = ("The {0!r} class in the {1} machine has the following "
                  "annotations:\n{2}")
-            s = s.format(classname, mc.__class__.__name__, 
+            s = s.format(classname, mc.__class__.__name__,
                          pformat(mc.context[classname]))
         else:
             s = ("The {0!r} state variable on the {1!r} class in the {2} machine "
                  "has the following annotations:\n\n{3}\n")
-            s = s.format(varname, classname, mc.__class__.__name__, 
+            s = s.format(varname, classname, mc.__class__.__name__,
                          pformat(mc.context[classname]['vars'][varname]))
         return s
 
@@ -299,7 +299,7 @@ class NamespaceFilter(Filter):
         state = self.machine
         name = self.match.group(1)
         if name is not None:
-            name = name.strip() or None
+            name = name.strip() or '<anonymous>'
         state.namespaces.append((state.depth, name))
 
     def revert(self, statement, sep):
@@ -489,7 +489,7 @@ class VarDeclarationFilter(Filter):
         vtype, vname = self.match.groups()
         access = state.access[tuple(state.classes)]
         state.ensure_class_context(classname)
-        annotations['type'] = state.canonize_type(vtype, vname, 
+        annotations['type'] = state.canonize_type(vtype, vname,
                                                   statement=statement)
         annotations['index'] = len(state.context[classname]['vars'])
         #added this
@@ -498,7 +498,7 @@ class VarDeclarationFilter(Filter):
         if 'alias' in annotations:
             alias = annotations['alias']
             while not isinstance(alias, STRING_TYPES):
-                alias = alias[0] 
+                alias = alias[0]
             state.context[classname]['vars'][alias] = vname
         if annotations['type'][0] not in BUFFERS:
             annotations['alias'] = self.canonize_alias(
@@ -538,7 +538,7 @@ class VarDeclarationFilter(Filter):
         given state variable name and defaults for non-nested containers.
         """
         if isinstance(t, STRING_TYPES):
-            return ann or name 
+            return ann or name
         template = defaults[t[0]]
         # expand ann if needed
         if ann is None:
@@ -548,7 +548,7 @@ class VarDeclarationFilter(Filter):
         elif len(ann) < len(t):
             ann = ann + [None]*(len(t) - len(ann))
         # find template name
-        if template[0] is None: 
+        if template[0] is None:
             t0 = ann[0] or name
         else:
             # expand t0 ann if needed
@@ -774,13 +774,13 @@ class StateAccumulator(object):
                     # the alias - which is impossible.
                     continue
                 try:
-                    return self.canonize_type([nsa + scopz + tname] + targs, name, 
+                    return self.canonize_type([nsa + scopz + tname] + targs, name,
                                               statement=statement)
                 except TypeError:
                     pass  # This is the TypeError from below
             else:
                 msg = ("{i}The type of {c}::{n} ({t}) is not a recognized "
-                       "template type: {p}.").format(i=self.includeloc(statement=statement), 
+                       "template type: {p}.").format(i=self.includeloc(statement=statement),
                        t=t, n=name, c=self.classname(),
                        p=", ".join(sorted(self.known_templates)))
                 raise TypeError(msg)
@@ -1198,8 +1198,8 @@ class InfileToDbFilter(CodeGeneratorFilter):
         return '"{0}"' if t == 'std::string' else '{0}'
 
     def _val(self, t, val=None, name=None, uitype=None, ind=''):
-        """Returns a string that represents a Python value (val) of a given 
-        type (t) in C++. For types that do not have an expression 
+        """Returns a string that represents a Python value (val) of a given
+        type (t) in C++. For types that do not have an expression
         representation, the variable (name) may also be used. If a value
         is not provided, the default for the type will be provided.
         """
@@ -1303,7 +1303,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
 
         return v
 
-    def _val_pair(self, t, val=(None, None), name=None, 
+    def _val_pair(self, t, val=(None, None), name=None,
                   uitype=(None, None, None), ind=''):
         ftype, stype = t[1], t[2]
         uitype = prepare_type(t, uitype)
@@ -1346,7 +1346,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         if tstr.endswith('>'):
             tstr += " "
         # Get keys
-        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree, 
+        kw = {'cycns': CYCNS, 'type': tstr, 'alias': alias, 'tree': tree,
               'path': path}
         kw['index'] = '' if idx is None else ', {0}'.format(idx)
         # get template
@@ -1355,10 +1355,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
                         '"{path}{alias}"{index}))')
         else:
             template = '{cycns}::Query<{type}>({tree}, "{path}{alias}"{index})'
-        # fill in template and return 
+        # fill in template and return
         return template.format(**kw)
 
-    def read_member(self, member, alias, t, uitype=None, ind='  ', idx=None, 
+    def read_member(self, member, alias, t, uitype=None, ind='  ', idx=None,
                     path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
@@ -1409,7 +1409,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
             s += self.read_member(
-                'elem', alias[1], t[1], uitype[1], 
+                'elem', alias[1], t[1], uitype[1],
                 ind+'  ', idx='i{lev}'.format(lev=lev))
             s += ind + '  {0}[{idx}] = elem;\n'.format(
                 member, idx='i{lev}'.format(lev=lev))
@@ -1442,7 +1442,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=self._idx_lev) + ' {\n'
             s += self.read_member(
-                'elem', alias[1], t[1], uitype[1], 
+                'elem', alias[1], t[1], uitype[1],
                 ind+'  ', idx='i{lev}'.format(lev=self._idx_lev))
             s += ind + '  {0}.insert(elem);\n'.format(member)
             s += ind + '}\n'
@@ -1474,7 +1474,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
             s += self.read_member(
-                'elem', alias[1], t[1], uitype[1], 
+                'elem', alias[1], t[1], uitype[1],
                 ind+'  ', idx='i{lev}'.format(lev=lev))
             s += ind + '  {0}.push_back(elem);\n'.format(member)
             s += ind + '}\n'
@@ -1531,10 +1531,10 @@ class InfileToDbFilter(CodeGeneratorFilter):
             s += ind + '{0} {1};\n'.format(type_to_str(t), member)
             s += ind + 'for (int i{lev} = 0; i{lev} < n{lev}; ++i{lev})'.format(
                 lev=lev) + ' {\n'
-            s += self.read_member('key', alias[1], t[1], uitype[1], 
+            s += self.read_member('key', alias[1], t[1], uitype[1],
                                   ind+'  ', idx='i{lev}'.format(lev=lev),
                                   path=itempath)
-            s += self.read_member('val', alias[2], t[2], uitype[2], 
+            s += self.read_member('val', alias[2], t[2], uitype[2],
                                   ind+'  ', idx='i{lev}'.format(lev=lev),
                                   path=itempath)
             s += ind + '  {0}[key] = val;\n'.format(member)
@@ -1665,13 +1665,13 @@ class SchemaFilter(CodeGeneratorFilter):
         'boost::uuids::uuid': 'token',
         # UI types
         'nuclide': 'string',
-        'commodity': None, 
-        'incommodity': None, 
-        'outcommodity': None, 
-        'range': None, 
-        'combobox': None, 
-        'facility': None, 
-        'prototype': None, 
+        'commodity': None,
+        'incommodity': None,
+        'outcommodity': None,
+        'range': None,
+        'combobox': None,
+        'facility': None,
+        'prototype': None,
         'recipe': None,
         'none': None,
         None: None,
@@ -2213,7 +2213,7 @@ def outter_split(s, open_brace='(', close_brace=')', separator=','):
 def parse_template(s, open_brace='<', close_brace='>', separator=','):
     """Takes a string -- which may represent a template specialization -- and
     returns the corresponding type.
-    
+
     It calls parse_arg to return the type(s) for any template arguments the
     type may have. For example:
 
@@ -2237,7 +2237,7 @@ def parse_template(s, open_brace='<', close_brace='>', separator=','):
 def parse_arg(s, open_brace='<', close_brace='>', separator=','):
     """Takes a string containing one or more c++ template args and returns a
     list of the argument types as strings.
-    
+
     This is called by parse_template to handle the inner portion of the
     template braces.  For example:
 
@@ -2258,7 +2258,7 @@ def parse_arg(s, open_brace='<', close_brace='>', separator=','):
             nest += 1
         elif ch == close_brace:
             nest -= 1
-        
+
         if ch == separator and nest == 0:
             t = parse_template(s[start:i], open_brace, close_brace, separator)
             ts.append(t)

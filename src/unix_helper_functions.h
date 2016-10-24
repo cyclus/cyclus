@@ -16,7 +16,7 @@ void DynamicModule::OpenLibrary() {
 
   if (!module_library_) {
     std::string err_msg = "Unable to load agent shared object file: ";
-    err_msg  += dlerror();
+    err_msg += dlerror();
     throw IOError(err_msg);
   }
 

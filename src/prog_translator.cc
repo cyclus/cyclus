@@ -230,4 +230,15 @@ void ProgTranslator::FromProg() {
   }
 }
 
+ProgTranslator::Context::Context() {
+  throw DepricationError("Class ProgTranslator::Context is now deprecated "
+                         "in favor of ProgTranslatorContext.");
+}
+
+ProgTranslator::Context::~Context() {
+  throw DepricationError("Class ProgTranslator::Context is now deprecated "
+                         "in favor of ProgTranslatorContext.");
+}
+
+
 }  // namespace cyclus
