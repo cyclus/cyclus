@@ -180,8 +180,8 @@ proper functioning of Cyclus. You can run the tests yourself via:
     $ cyclus_unit_tests
 
 
-.. _``Cyclus Homepage``: http://fuelcycle.org/
-.. _``Cyclus User Guide``: http://fuelcycle.org/user/index.html
-.. _``Cyclus repo``: https://github.com/cyclus/cyclus
-.. _``Cycamore Repo``: https://github.com/cyclus/cycamore
+.. _`Cyclus Homepage`: http://fuelcycle.org/
+.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
+.. _`Cyclus repo`: https://github.com/cyclus/cyclus
+.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
