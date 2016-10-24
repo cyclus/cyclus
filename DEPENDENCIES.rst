@@ -146,7 +146,7 @@ at your own risk; we strongly recommend Linux as a primary development environme
 This guide assumes that the user has root access (to issue `sudo` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of 10.10.5 (Yosemite) and 10.11.6 (El Capitan) using `macports` as the package
+of 10.11.6 (El Capitan) using `macports` as the package
 manager.  Macports installs packages in `/opt/local`.  If installing to a
 different location, (i.e. `/usr/local`) change paths in the following
 instructions accordingly. If you use `homebrew`, try the following instructions
