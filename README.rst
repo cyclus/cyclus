@@ -49,20 +49,20 @@ Dependencies
 ************
 
 In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using `CMake`. A full list of the Cyclus package
+Cyclus is built using ``CMake``. A full list of the Cyclus package
 dependencies is shown below:
 
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
-`CMake`                2.8
-`boost`                1.46.1
-`libxml2`              2
-`libxml++`             2.36
-`python`               2.7 or 3.3+
-`sqlite3`              3.7.10
-`HDF5`                 1.8.4
-`Coin-Cbc`             2.5
+``CMake``                2.8
+``boost``                1.46.1
+``libxml2``              2
+``libxml++``             2.36
+``python``               2.7 or 3.3+
+``sqlite3``              3.7.10
+``HDF5``                 1.8.4
+``Coin-Cbc``             2.5
 ====================   ==================
 
 For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
@@ -77,7 +77,7 @@ on the source code from github is fairly straightforward:
 - Clone the Cyclus repository: ``git clone https://github.com/cyclus/cyclus.git``,
 
 - to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
-  from the `cyclus` folder,
+  from the ``cyclus`` folder,
 
 - finally, add the following Cyclus installation path (``~/.local/cyclus``) to
   the **front** on your ``$PATH``.
@@ -111,7 +111,7 @@ simulations, first download Cycamore
   https://github.com/cyclus/cycamore.git``,
 
 - Install in the same location you installed Cyclus (eg. in ``~/.local/``):
-  ``python install.py`` from the `cycamore` folder.
+  ``python install.py`` from the ``cycamore`` folder.
 
 
 **************
@@ -120,7 +120,7 @@ Running Cyclus
 
 You can find instructions for writing an input file for cyclus from `Cyclus User
 Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
-file `input.xml`, you can run Cyclus via:
+file ``input.xml``, you can run Cyclus via:
 
 .. code-block:: bash
 
@@ -137,11 +137,11 @@ to contribute into Cyclus, please follow this procedure:
 
 #. Fork Cyclus repository,
 
-#. Create a working branch on your fork from the `develop` branch,
+#. Create a working branch on your fork from the ``develop`` branch,
 
 #. Implement your modification of the Cyclus source code,
 
-#. Submit a Pull request into `Cyclus/develop` branch,
+#. Submit a Pull request into ``Cyclus/develop`` branch,
 
 #. Wait for reviews/merge (the proposer of a pull request cannot be the Merger).
 

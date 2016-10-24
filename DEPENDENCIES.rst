@@ -18,20 +18,20 @@ Dependencies
 
 .. website_include_start
 In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using `CMake`. A full list of the Cyclus package
+Cyclus is built using ``CMake``. A full list of the Cyclus package
 dependencies is shown below:
 
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
-`CMake`                2.8
-`boost`                1.46.1
-`libxml2`              2
-`libxml++`             2.36
-`python`               2.7 or 3.3+
-`sqlite3`              3.7.10
-`HDF5`                 1.8.4
-`Coin-Cbc`             2.5
+``CMake``                2.8
+``boost``                1.46.1
+``libxml2``              2
+``libxml++``             2.36
+``python``               2.7 or 3.3+
+``sqlite3``              3.7.10
+``HDF5``                 1.8.4
+``Coin-Cbc``             2.5
 ====================   ==================
 
 .. website_include_end
@@ -41,9 +41,9 @@ On some platforms, such as Ubuntu 14.04, the following are also necessary:
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
-`g++`                  4.8.2
-`libblas-dev`          1.2
-`liblapack-dev`        3.5.0
+``g++``                  4.8.2
+``libblas-dev``          1.2
+``liblapack-dev``        3.5.0
 ====================   ==================
 
 
@@ -56,8 +56,8 @@ doxygen (for docs)     1.7.6.1
 tcmalloc (for speed)   any?
 ====================   ==================
 
-*Note that the Debian/Ubuntu package `libtcmalloc` is NOT discovered correctly
-by our build system.  Instead use `libgoogle-perftools-dev`.*
+*Note that the Debian/Ubuntu package ``libtcmalloc`` is NOT discovered correctly
+by our build system.  Instead use ``libgoogle-perftools-dev``.*
 
 ***********************
 Installing Dependencies
@@ -69,11 +69,11 @@ manager.
 Installing Dependencies (Linux and Unix)
 ----------------------------------------
 
-This guide assumes that the user has root access (to issue `sudo` commands) and
+This guide assumes that the user has root access (to issue ``sudo`` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Ubuntu versions 12.10, 14.04 and 16.04, using `apt-get` as the package manager (scroll down further for
-Mac OSX instructions).
+of Ubuntu versions 14.04 and 16.04, using ``apt-get`` as the package
+manager (scroll down further for Mac OSX instructions).
 
 The command to install a dependency takes the form of:
 
@@ -122,7 +122,7 @@ dependencies:
 Boost Note
 ^^^^^^^^^^
 
-The `libboost-all-dev` used above will install the entire Boost library, which
+The ``libboost-all-dev`` used above will install the entire Boost library, which
 is not strictly needed. We currently depend on a small subset of the Boost
 libraries:
 
@@ -132,7 +132,7 @@ libraries:
 
 However, it is possible (likely) that additional Boost libraries will be used
 because they are an industry standard. Accordingly, we suggest simply installing
-`libboost-all-dev` to limit any headaches due to possible dependency additions
+``libboost-all-dev`` to limit any headaches due to possible dependency additions
 in the future.
 
 Installing Dependencies (Mac OSX)
@@ -143,14 +143,14 @@ because there are some use cases which require installation from source, we have
 compiled a list of instructions that should be successful.  Use a Mac platform
 at your own risk; we strongly recommend Linux as a primary development environment.
 
-This guide assumes that the user has root access (to issue `sudo` commands) and
+This guide assumes that the user has root access (to issue ``sudo`` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Yosemite 10.10.2 using `macports` as the package manager.  Macports installs
-packages in `/opt/local`.  If installing to a different location,
-(i.e. `/usr/local`) change paths in the following instructions accordingly. If
-you use `homebrew`, try the following instructions with brew commands in place of
-the port commands.
+of 10.11.6 (El Capitan) using ``macports`` as the package
+manager.  Macports installs packages in ``/opt/local``.  If installing to a
+different location, (i.e. ``/usr/local``) change paths in the following
+instructions accordingly. If you use ``homebrew``, try the following instructions
+with brew commands in place of the port commands.
 
 The command to install a dependency takes the form of:
 
@@ -187,7 +187,7 @@ your computer:
 
 
 Finally, update your path and the following environment variables in your
-`~/.profile` (or `~/.bashrc` ) file:
+``~/.profile`` (or ``~/.bashrc`` ) file:
 
 .. code-block:: bash
 
@@ -201,9 +201,9 @@ Finally, update your path and the following environment variables in your
 
 
 
-.. _`Cyclus Homepage`: http://fuelcycle.org/
-.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
-.. _`Cyclus repo`: https://github.com/cyclus/cyclus
-.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
+.. _`gCyclus Homepage`: http://fuelcycle.org/
+.. _`gCyclus User Guide`: http://fuelcycle.org/user/index.html
+.. _`gCyclus repo`: https://github.com/cyclus/cyclus
+.. _`gCycamore Repo`: https://github.com/cyclus/cycamore
 .. _CMake: http://cmake.org
 
