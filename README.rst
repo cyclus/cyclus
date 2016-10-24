@@ -147,10 +147,10 @@ to contribute into Cyclus, please follow this procedure:
 
 You may also want to read our `Contribution Guidelines <CONTRIBUTING.rst>`_.
 
-.. _``Cyclus Homepage``: http://fuelcycle.org/
-.. _``Cyclus User Guide``: http://fuelcycle.org/user/index.html
-.. _``Cyclus repo``: https://github.com/cyclus/cyclus
-.. _``Cycamore Repo``: https://github.com/cyclus/cycamore
-.. _``INSTALL``: INSTALL.rst
-.. _``CONTRIBUTING``: CONTRIBUTING.rst
+.. _`Cyclus Homepage`: http://fuelcycle.org/
+.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
+.. _`Cyclus repo`: https://github.com/cyclus/cyclus
+.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
+.. _`INSTALL`: INSTALL.rst
+.. _`CONTRIBUTING`: CONTRIBUTING.rst
 
