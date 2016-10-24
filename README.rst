@@ -80,7 +80,7 @@ on the source code from github is fairly straightforward:
   from the `cyclus` folder,
 
 - finally, add the following Cyclus installation path (``~/.local/cyclus``) to
-  the **end** on your ``$PATH``.
+  the **front** on your ``$PATH``.
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.

@@ -2,7 +2,7 @@
 Cyclus Installation Guide
 #########################
 
-Cyclus uses the CMake cross platform bailed-generator as a build system. To
+Cyclus uses the `CMake` cross platform bailed-generator as a build system. To
 simplify the usage of cmake to build Cyclus from source, a python script is
 provided with the source.
 
@@ -27,18 +27,15 @@ Package                Minimum Version
 `Coin-Cbc`             2.5
 ====================   ==================
 
-You can find `here <DEPENDENCIES.rst>`_  help to install those dependencies for
-the major supported system.
-
 ************
 Installation
 ************
 .. website_include_start
 
 Before going further on the installation procedure be sure you have installed
-all the required dependencies listed above. You can also find `here <DEPENDENCIES.rst>`_ 
-instruction to install those dependencies depending of the
-system you are working on.
+all the required dependencies listed above. We have provided detailed
+instructions `for installing those dependencies for the major supported
+systems <DEPENDENCIES.rst>`_.
 
 
 Default installation
@@ -50,13 +47,14 @@ Run the install script:
   
   python install.py
 
-If you successfully followed the instruction above cyclus binary have been
-generated and be placed in the  ``.local/`` in your home directory. 
-You need to had ``~/.local/bin`` to the bottom of your ``$PATH``:
+If you successfully followed the instruction above, the cyclus binary has been
+generated and placed in the  ``~/.local/`` in your home directory. 
+You need to add ``~/.local/bin`` to the front of your ``$PATH``:
 
 .. code-block:: bash
   
-  echo 'export PATH="$HOME/.local/bin:$PATH' >> .bashrc
+  echo 'export PATH="$HOME/.local/bin:$PATH' >> ~/.bashrc
+  source ~/.bashrc
 
 
 Custom Cyclus installation
@@ -117,7 +115,7 @@ flag:
 
 
 For example, if you have installed coin-Cbc from source or otherwise have it
-installed in a non-standard location, you should make use of the coinRoot
+installed in a non-standard location, you should make use of the `coin_root`
 installation flag. The otherwise identical process would look like:
 
 .. code-block:: bash
@@ -129,7 +127,7 @@ CMake Cyclus installation
 -------------------------
 
 If you are `CMake` aficionado you can also install Cyclus without using the
-install.py python script and use directly `cmake` which should look like:
+`install.py` python script and use directly `cmake` which should look like:
 
 
 .. code-block:: bash
