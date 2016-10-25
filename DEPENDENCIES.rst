@@ -17,6 +17,7 @@ Dependencies
 ************
 
 .. website_include_start
+
 In order to facilitate future compatibility with multiple platforms,
 Cyclus is built using ``CMake``. A full list of the Cyclus package
 dependencies is shown below:
@@ -201,9 +202,8 @@ Finally, update your path and the following environment variables in your
 
 
 
-.. _`gCyclus Homepage`: http://fuelcycle.org/
-.. _`gCyclus User Guide`: http://fuelcycle.org/user/index.html
-.. _`gCyclus repo`: https://github.com/cyclus/cyclus
-.. _`gCycamore Repo`: https://github.com/cyclus/cycamore
-.. _CMake: http://cmake.org
+.. _`Cyclus Homepage`: http://fuelcycle.org/
+.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
+.. _`Cyclus repo`: https://github.com/cyclus/cyclus
+.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 
