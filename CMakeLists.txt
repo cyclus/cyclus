@@ -134,14 +134,17 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Dependency Root Dir (DEPS_ROOT_DIR): ${DEPS_ROOT_DIR}")
     if (DEPS_ROOT_DIR)
         SET(DEPS_HINTS HINTS "${DEPS_ROOT_DIR}")
+        SET(DEPS_BIN_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/bin")
         SET(DEPS_LIB_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/lib")
         SET(DEPS_INCLUDE_HINTS HINTS "${DEPS_ROOT_DIR}/include")
     else (DEPS_ROOT_DIR)
         SET(DEPS_HINTS)
+        SET(DEPS_bin_HINTS)
         SET(DEPS_LIB_HINTS)
         SET(DEPS_INCLUDE_HINTS)
     endif (DEPS_ROOT_DIR)
     MESSAGE("-- Dependency Hints (DEPS_HINTS): ${DEPS_HINTS}")
+    MESSAGE("-- Dependency Binary Hints (DEPS_BIN_HINTS): ${DEPS_BIN_HINTS}")
     MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
     MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
 
@@ -255,13 +258,20 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Cython & Python Bindings
     #
     # Use new Python library finder
-    find_package(PythonInterp ${DEPS_LIB_HINTS})
-    find_package(PythonLibsNew ${DEPS_LIB_HINTS})
+    find_package(PythonInterp)
+    find_package(PythonLibs)
     message("-- PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
 
     # Include the CMake script UseCython.cmake.  This defines add_cython_module().
     # Instruction for use can be found at the top of cmake/UseCython.cmake.
     include(UseCython)
+    message("-- Found Cython: ${Cython_FOUND}")
+    if(Cython_FOUND)
+        execute_process(COMMAND "${CYTHON_EXECUTABLE}" "-V"
+                        ERROR_VARIABLE CYTHON_VERSION
+                        ERROR_STRIP_TRAILING_WHITESPACE)
+        message(STATUS "Cython Version: ${CYTHON_VERSION}")
+    endif(Cython_FOUND)
 
     ##############################################################################################
     #################################### end find libraries ######################################
