@@ -35,7 +35,7 @@ Installation
 Before going further on the installation procedure be sure you have installed
 all the required dependencies listed above. We have provided detailed
 instructions `for installing those dependencies for the major supported
-systems <DEPENDENCIES.rst>`_.
+systems`_.
 
 
 Default installation
@@ -184,4 +184,4 @@ proper functioning of Cyclus. You can run the tests yourself via:
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
-
+.. _`for installing those dependencies for the major supported systems`: DEPENDENCIES.rst
