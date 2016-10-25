@@ -57,6 +57,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_TEST_DIR "${PROJECT_SOURCE_DIR}/tests")
     SET(CYCLUS_AGENTS_DIR "${PROJECT_SOURCE_DIR}/agents")
     SET(CYCLUS_CMAKE_DIR "${PROJECT_SOURCE_DIR}/cmake")
+    SET(CYCLUS_PYSOURCE_DIR "${PROJECT_SOURCE_DIR}/cyclus")
 
     # set cycpp var
     SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
@@ -271,6 +272,10 @@ IF(NOT CYCLUS_DOC_ONLY)
                         ERROR_VARIABLE CYTHON_VERSION
                         ERROR_STRIP_TRAILING_WHITESPACE)
         message(STATUS "Cython Version: ${CYTHON_VERSION}")
+
+        find_package(Numpy REQUIRED)
+    else(Cython_FOUND)
+        set(NUMPY_INCLUDE_DIRS "")
     endif(Cython_FOUND)
 
     ##############################################################################################
@@ -291,7 +296,8 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${SQLITE3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
-        "${COIN_INCLUDE_DIRS}")
+        "${COIN_INCLUDE_DIRS}"
+        "${NUMPY_INCLUDE_DIRS}")
 
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
@@ -313,6 +319,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
+    if(Cython_FOUND)
+        ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
+    endif(Cython_FOUND)
 
     ##############################################################################################
     ####################################### end includes #########################################
