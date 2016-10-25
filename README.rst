@@ -14,7 +14,11 @@ The core of the Cyclus nuclear fuel cycle simulator from the
 University of Wisconsin-Madison is intended to be a simulation
 framework for the development of innovative fuel cycle simulations.
 
-This readme provides basic information about:
+This README is intended primarily for those who intend to contribute to the
+development of the Cyclus Core.  If you are interested Cyclus as a user or in
+developing Cyclus archetypes, you may want to consult `Getting Started with Cyclus <http://fuelcycle.org/user/install.html>`_.
+
+This README provides basic information about:
  - the dependencies required by Cyclus 
  - installation of Cyclus from the command line
  - how to run Cyclus and the Cyclus unit tests
