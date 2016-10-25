@@ -251,6 +251,18 @@ IF(NOT CYCLUS_DOC_ONLY)
         set(LIBS ${LIBS} ${ICUUC_LIBRARIES})
     ENDIF(ICUUC_LIBRARIES)
 
+    #
+    # Cython & Python Bindings
+    #
+    # Use new Python library finder
+    find_package(PythonInterp ${DEPS_LIB_HINTS})
+    find_package(PythonLibsNew ${DEPS_LIB_HINTS})
+    message("-- PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
+
+    # Include the CMake script UseCython.cmake.  This defines add_cython_module().
+    # Instruction for use can be found at the top of cmake/UseCython.cmake.
+    include(UseCython)
+
     ##############################################################################################
     #################################### end find libraries ######################################
     ##############################################################################################
