@@ -902,35 +902,48 @@ def parse_args(argv):
                         dest='typesystem_pxd',
                         help="the name of the Cython typesystem wrapper header, "
                              "default 'typesystem.pxd'")
-
+    dbtd = os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json'))
+    parser.add_argument('--dbtypes-json', default=dbtd,
+                        dest='dbtypes_json',
+                        help="the path to dbtypes.json file, "
+                             "default " + dbtd)
+    parser.add_argument('--cyclus-version', default=None,
+                        dest='cyclus_version',
+                        help="The Cyclus API version to target."
+                        )
     ns = parser.parse_args(argv)
     return ns
+
 
 def setup(ns):
     """Ensure that we are ready to perform code generation. Returns typesystem."""
     if not os.path.exists(ns.build_dir):
         os.mkdir(ns.build_dir)
-    try:
-        instdir = safe_output(['cyclus', '--install-path'])
-    except (subprocess.CalledProcessError, OSError):
-        # fallback for conda version of cyclus
-        instdir = safe_output(['cyclus_base', '--install-path'])
-    fname = os.path.join(instdir.strip().decode(), 'share', 'cyclus', 'dbtypes.json')
-    with io.open(fname, 'r') as f:
+    if not os.path.isfile(ns.dbtypes_json):
+        try:
+            instdir = safe_output(['cyclus', '--install-path'])
+        except (subprocess.CalledProcessError, OSError):
+            # fallback for conda version of cyclus
+            instdir = safe_output(['cyclus_base', '--install-path'])
+        ns.dbtypes_json = os.path.join(instdir.strip().decode(), 'share',
+                                       'cyclus', 'dbtypes.json')
+    with io.open(ns.dbtypes_json, 'r') as f:
         tab = json.load(f)
     # get cyclus version
-    verstr = None
-    try:
-        verstr = safe_output(['cyclus', '--version'])
-    except (subprocess.CalledProcessError, OSError):
-        # fallback for conda version of cyclus
+    verstr = ns.cyclus_version
+    if verstr is None:
         try:
-            verstr = safe_output(['cyclus_base', '--version'])
+            verstr = safe_output(['cyclus', '--version'])
         except (subprocess.CalledProcessError, OSError):
-            # fallback using the most recent value in JSON
-            ver = set([row[5] for row in tab[1:]])
-            ver = max([tuple(map(int, s[1:].split('.'))) for s in ver])
+            # fallback for conda version of cyclus
+            try:
+                verstr = safe_output(['cyclus_base', '--version'])
+            except (subprocess.CalledProcessError, OSError):
+                # fallback using the most recent value in JSON
+                ver = set([row[5] for row in tab[1:]])
+                ver = max([tuple(map(int, s[1:].split('.'))) for s in ver])
     if verstr is not None:
+        ns.cyclus_version = verstr
         if isinstance(verstr, bytes):
             verstr = verstr.decode()
         ver = tuple(map(int, verstr.split()[2].split('.')))
