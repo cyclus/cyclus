@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-"""Generates Cyclus Type System bindings."""
+"""Generates Cyclus Type System bindings.
+
+Module history:
+
+- 2016-10-12: scopatz: This file used to be called genapi.py in cymetric.
+"""
 from __future__ import print_function, unicode_literals
 
 import io

@@ -274,6 +274,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         message(STATUS "Cython Version: ${CYTHON_VERSION}")
 
         find_package(Numpy REQUIRED)
+        find_package(Jinja2 REQUIRED)
     else(Cython_FOUND)
         set(NUMPY_INCLUDE_DIRS "")
     endif(Cython_FOUND)

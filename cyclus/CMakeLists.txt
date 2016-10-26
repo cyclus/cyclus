@@ -3,6 +3,17 @@
 #include_directories(${CYCLUS_INCLUDE_DIRECTORIES})
 #SET(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${CYCLUS_CORE_INCLUDE_DIR})
 
+#
+# First things first, code-generation
+#
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py RESULT_VARIABLE res_var)
+IF(NOT "${res_var}" STREQUAL "0")
+  message(FATAL_ERROR "Generating type system failed (gentypesystem.py), res_var = '${res_var}'")
+ENDIF()
+
+#
+# Build cython files
+#
 file(GLOB CYCLUS_CYTHON_FILES "${CYCLUS_PYSOURCE_DIR}/*.pyx")
 
 set_source_files_properties(${CYCLUS_CYTHON_FILES}
