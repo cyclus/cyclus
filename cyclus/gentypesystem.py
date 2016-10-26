@@ -902,7 +902,7 @@ def parse_args(argv):
                         dest='typesystem_pxd',
                         help="the name of the Cython typesystem wrapper header, "
                              "default 'typesystem.pxd'")
-    dbtd = os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json'))
+    dbtd = os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')
     parser.add_argument('--dbtypes-json', default=dbtd,
                         dest='dbtypes_json',
                         help="the path to dbtypes.json file, "
