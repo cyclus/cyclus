@@ -1089,12 +1089,7 @@ def no_vl(t):
             for i in t.canon[1:]:
                 ret = ret and no_vl(CANON_TO_NODE[i])
             return ret
-
-NOT_VL = []
-
-VARIATION_DICT = {}
-ORIGIN_DICT = {}
-
+            
 def get_dim_shape(canon, start=0, depth=0):
     tshape = []
     i = 0
@@ -1212,7 +1207,7 @@ def get_vl_body(t, current_shape_index=0):
                                           args=[Raw(code="field_types[i]")])))
     return body
 
-HDF5_TYPES = {"INT": "H5T_NATIVE_INT",
+HDF5_PRIMITIVES = {"INT": "H5T_NATIVE_INT",
               "DOUBLE": "H5T_NATIVE_DOUBLE",
               "FLOAT": "H5T_NATIVE_FLOAT",
               "BOOL": "H5T_NATIVE_CHAR",
@@ -1234,6 +1229,39 @@ VL_TO_FL_CONTAINERS = {"VL_VECTOR": "VECTOR",
                        "VL_MAP": "MAP"}
 
 def get_item_type(t, shape_array=None, prefix="", depth=0):
+    """Build specified HDF5 type, recursively if necessary.
+    
+    HDF5 types are Primitive, Compound, or Array. We handle each of these cases
+    here differently. Primitives are immediately returned by querying the 
+    HDF5_PRIMITIVES dictionary. Compound types are made up of multiple
+    Primitive or Compound types, so each of these child types must be declared
+    and created before the parent type can be created. This is accomplished via
+    recursion over every child type in the type's canon. It should be noted that
+    Compound types depend heavily on the size of those types they contain,
+    and this function relies on get_item_size for that information. Finally, 
+    Arrays can contain one Primitive or Compound type, and are created by 
+    specifying this child type, Array dimensions, and the Array length.
+    
+    Parameters
+    ----------
+    t : Type
+        Type node representing C++ type
+    shape_array : list, optional
+        Dimensioned list of current type shape
+    prefix : str, optional
+        Used to name C++ variables throughout multiple levels of recursion
+    depth : int, optional
+        Recursive depth counter
+    
+    Returns
+    -------
+    node : Block
+        Cumulative collection of nodes necessary for specified item type
+    opened_stack : list
+        Cumulative collection of opened HDF5 types which must eventually be
+        closed
+    
+    """
     #We need to keep a persistant shape array, unless initial call.
     if shape_array == None:
         shape_len, dim_shape = get_dim_shape(t.canon)
@@ -1244,7 +1272,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
     type_var = get_variable("item_type", prefix=prefix, depth=depth)
     node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
                                           name=Var(name=type_var))))
-    #handle primitive
+    #Handle primitives
     if isinstance(t.canon, str):
         if DB_TO_VL[t.db]:
             node.nodes.append(ExprStmt(child=Assign(
@@ -1252,13 +1280,13 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                                  value=Raw(code="sha1_type_"))))
             return node, opened_stack
         else:
-            primitive_type = Raw(code=HDF5_TYPES[t.db].format(size="shape["
+            primitive_type = Raw(code=HDF5_PRIMITIVES[t.db].format(size="shape["
                                                               +str(dim_shape[0])
                                                               +"]"))
             node.nodes.append(ExprStmt(child=Assign(target=Var(name=type_var),
                                                     value=primitive_type)))
             return node, opened_stack
-    #dependent types
+    #Handle dependent types
     else:
         container_type = t.canon[0]
         if DB_TO_VL[t.db]:
@@ -1272,19 +1300,20 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                          value=Raw(code="shape["
                                                    +str(dim_shape[0])+"]"))))
         if len(canon_shape[1:]) == 1:
-            #not a compound type.
+            #Not a compound type.
             item_canon, item_shape = canon_shape[1]
-            #get nodes initializing our child type
+            #Get nodes initializing our child type
             child_array = (item_shape if isinstance(item_shape, list) 
                                       else [item_shape])
             child_node, child_opened = get_item_type(CANON_TO_NODE[item_canon],
                                             shape_array=child_array,
-                                            prefix=template_args[container_type][0],
+                                            prefix=
+                                               template_args[container_type][0],
                                             depth=depth+1)
             node.nodes.append(child_node)
             opened_stack.extend(child_opened)
         else:
-            #this is a compound type.
+            #This is a compound type.
             child_dict = OrderedDict()
             #1. Get all child item type nodes, recursively.
             for i in range(1, len(canon_shape)):
@@ -1404,7 +1433,7 @@ def H5Tarray_create2(item_variable, rank=1, dims="&shape0"):
     return node
 
 def H5Tcreate_compound(sizes):
-    """Node representation of the HDF5 compound type creation function.
+    """Node representation of the C++ HDF5 compound type creation function.
     
     Parameters
     ----------
@@ -1421,6 +1450,26 @@ def H5Tcreate_compound(sizes):
     return node
     
 def H5Tinsert(container_type, compound_var, types_sizes_dict):
+    """Node representation of the C++ H5Tinsert function.
+    
+    This function is used to identify partitions within an already established
+    HDF5 Compound type. That is, we specify which inner types are located at
+    what memory location within the Compound type.
+    
+    Parameters
+    ----------
+    container_type : str
+        Should be a key in the template_args dict
+    compound_var : str
+        C++ variable to which the function should refer
+    types_sizes_dict : dict
+        Dictionary of C++ type variables mapped to their size in memory
+         
+    Returns
+    -------
+    node : Block
+        Cumulative nodes for H5Tinsert function
+    """
     node = Block(nodes=[])
     buf = str(0)
     keys = list(types_sizes_dict.keys())
@@ -1437,116 +1486,89 @@ def H5Tinsert(container_type, compound_var, types_sizes_dict):
         node.nodes.append(ExprStmt(child=func))
     return node
 
-def main():
+def main_query():
+    """Generate hdf5_back.cc HDF5 type reading code."""
+    CPPGEN = CppGen()
+    output = ""
+    for type in CANON_SET:
+        type_node = CANON_TO_NODE[type]
+        setup = get_setup(type_node)
+        body = get_body(type_node)
+        teardown = get_teardown(type_node)
+        read_x = Block(nodes=[setup, body, teardown])
+        output += CPPGEN.visit(case_template(type_node, read_x))
+    return output
+
+NOT_VL = []
+VARIATION_DICT = {}
+ORIGIN_DICT = {}
+
+def main_create():
+    """Generate hdf5_back.cc HDF5 type creation code."""
+    CPPGEN = CppGen()
     global NOT_VL
     global VARIATION_DICT
     global ORIGIN_DICT
-    
     output = ""
-    CPPGEN = CppGen()
+    fixed_length_types = set(t for t in CANON_SET if no_vl(CANON_TO_NODE[t]))
+        
+    VARIATION_DICT = {n: [CANON_TO_NODE[x] for x in CANON_SET 
+                                                  if (CANON_TO_NODE[x].cpp 
+                                                      == CANON_TO_NODE[n].cpp)
+                                                  and (CANON_TO_NODE[x].db 
+                                                       != CANON_TO_NODE[n].db)]
+                      for n in fixed_length_types}
+    
+    VARIATION_DICT[('BLOB')] = []
+        
+    for i in VARIATION_DICT.keys():
+        ORIGIN_DICT[i] = i
+        if VARIATION_DICT[i] != []:
+            for j in VARIATION_DICT[i]:
+                ORIGIN_DICT[j.canon] = i
+                
+    NOT_VL = [x for x in VARIATION_DICT.keys() if not VARIATION_DICT[x]] 
+        
+    outer_if_bodies = {n: Block(nodes=[]) for n in VARIATION_DICT.keys()}
+    
+    for n in VARIATION_DICT.keys():
+        variations = VARIATION_DICT[n]
+        key_node = CANON_TO_NODE[n]
+        try:
+            initial_type = variations.pop()
+            sub_if = If(cond=get_vl_cond(initial_type),
+                        body=[get_vl_body(initial_type)],
+                        elifs=[(get_vl_cond(v), 
+                               [get_vl_body(v)]) 
+                              for v in variations],
+                        el=Block(nodes=[get_vl_body(key_node)]))
+            outer_if_bodies[n].nodes.append(sub_if)
+        except IndexError:
+            lone_node = get_vl_body(key_node)
+            outer_if_bodies[n].nodes.append(lone_node)
+
+    initial_node, initial_body = outer_if_bodies.popitem()
+    if_statement = If(cond=BinOp(x=Var(name="valtype"), op="==", 
+                                 y=typeid(initial_node)),
+                      body=[initial_body],
+                      elifs=[(BinOp(x=Var(name="valtype"), op="==",
+                                    y=typeid(t)), 
+                              [outer_if_bodies[t]])
+                             for t in outer_if_bodies.keys()],
+                      el=Nothing())
+    output += CPPGEN.visit(if_statement)
+    return output
+
+MAIN_DISPATCH = {"QUERY": main_query,
+                 "CREATE": main_create}
+
+def main():
     try:
         gen_instruction = sys.argv[1]
     except:
-        raise ValueError("No valid generation instruction provided")    
-    if gen_instruction == "QUERY":
-        for type in CANON_SET:
-            type_node = CANON_TO_NODE[type]
-            setup = get_setup(type_node)
-            body = get_body(type_node)
-            teardown = get_teardown(type_node)
-            read_x = Block(nodes=[setup, body, teardown])
-            output += CPPGEN.visit(case_template(type_node, read_x))
-        print(output)
-    elif gen_instruction == "VL_ADD":
-        node = Block(nodes=[])
-        vl_types = set([CANON_TO_NODE[t] for t in CANON_SET 
-                                         if DB_TO_VL[CANON_TO_NODE[t].db]])
-        for t in vl_types:
-            is_compound = (variable_length_types[t.canon[0]] 
-                           and len(t.canon[1:]) > 1)
-            
-            #this needs to be either a primitive HDF5 type,
-            #or a compound item_type built from the size of
-            #the individual primitives.
-            item_type = ""
-            if_statement = If(cond=BinOp(x=FuncCall(
-                                              name=Raw(code="vldts_.count"),
-                                              args=[Raw(code=t.db)]),
-                                         op="==",
-                                         y=Raw(code="0")),
-                              body=[ExprStmt(child=Assign(
-                                        target=Raw(code="vldts_["+t.db+"]"),
-                                        value=FuncCall(
-                                            name=Raw(code="H5Tvlen_create"),
-                                            args=[Raw(code=item_type)]))),
-                                    ExprStmt(child=FuncCall(
-                                            name=Raw(
-                                               code="opened_types_.insert"), 
-                                            args=[Raw(
-                                               code="vldts_["+t.db+"]")]))])
-            node.nodes.append(if_statement)
-        output += CPPGEN.visit(node)
-        print(output)
-    elif gen_instruction == "CREATE":
-        
-        #get all base types as node.
-        fixed_length_types = set(t for t in CANON_SET 
-                                 if no_vl(CANON_TO_NODE[t]))
-        
-        #Use base types as keys, vals are lists of VL variant nodes.
-        VARIATION_DICT = {n: [CANON_TO_NODE[x] for x in CANON_SET 
-                                                    if (CANON_TO_NODE[x].cpp 
-                                                        == CANON_TO_NODE[n].cpp)
-                                                    and (CANON_TO_NODE[x].db 
-                                                        != CANON_TO_NODE[n].db)]
-                          for n in fixed_length_types}
-        
-        #Add Blob because it was initially filtered out as a VL type
-        VARIATION_DICT[('BLOB')] = []
-        
-        for i in VARIATION_DICT.keys():
-            ORIGIN_DICT[i] = i
-            if VARIATION_DICT[i] != []:
-                for j in VARIATION_DICT[i]:
-                    ORIGIN_DICT[j.canon] = i
-                    
-        NOT_VL = [x for x in VARIATION_DICT.keys() if not VARIATION_DICT[x]] 
-        
-        #bodies of base types to use as top level if/else if stmts
-        if_bodies = {n: Block(nodes=[]) for n in VARIATION_DICT.keys()}
-        
-        for n in VARIATION_DICT.keys():
-            variations = VARIATION_DICT[n]
-            key_node = CANON_TO_NODE[n]
-            try:
-                initial_type = variations.pop()
-                sub_if = If(cond=get_vl_cond(initial_type),
-                            body=[get_vl_body(initial_type)],
-                            elifs=[(get_vl_cond(v), 
-                                   [get_vl_body(v)]) 
-                                  for v in variations],
-                            el=Block(nodes=[get_vl_body(key_node)]))
-                #Nodes for every base type
-                if_bodies[n].nodes.append(sub_if)
-            except IndexError:
-                lone_node = get_vl_body(key_node)
-                if_bodies[n].nodes.append(lone_node)
-
-        initial_node, initial_body = if_bodies.popitem()
-        if_statement = If(cond=BinOp(x=Var(name="valtype"), op="==", 
-                                     y=typeid(initial_node)),
-                          body=[initial_body],
-                          elifs=[(BinOp(x=Var(name="valtype"), op="==",
-                                        y=typeid(t)), [if_bodies[t]])
-                                        for t in if_bodies.keys()],
-                          el=Nothing())
-        output += CPPGEN.visit(if_statement)
-        print(output)
-    elif gen_instruction == "FILL":
-        print(output)
-    elif gen_instruction == "VL":
-        print(output)
-    else:
-        raise ValueError("No valid generation instruction provided")
+        raise ValueError("No generation instruction provided")    
+    function = MAIN_DISPATCH[gen_instruction]
+    print(function())
+    
 if __name__ == '__main__':
     main()
