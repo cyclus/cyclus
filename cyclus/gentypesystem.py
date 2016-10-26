@@ -933,20 +933,20 @@ def setup(ns):
     verstr = ns.cyclus_version
     if verstr is None:
         try:
-            verstr = safe_output(['cyclus', '--version'])
+            verstr = safe_output(['cyclus', '--version']).split()[2]
         except (subprocess.CalledProcessError, OSError):
             # fallback for conda version of cyclus
             try:
-                verstr = safe_output(['cyclus_base', '--version'])
+                verstr = safe_output(['cyclus_base', '--version']).split()[2]
             except (subprocess.CalledProcessError, OSError):
                 # fallback using the most recent value in JSON
                 ver = set([row[5] for row in tab[1:]])
-                ver = max([tuple(map(int, s[1:].split('.'))) for s in ver])
+                ver = max([tuple(map(int, s[1:].partition('-')[0].split('.'))) for s in ver])
     if verstr is not None:
         ns.cyclus_version = verstr
         if isinstance(verstr, bytes):
             verstr = verstr.decode()
-        ver = tuple(map(int, verstr.split()[2].split('.')))
+        ver = tuple(map(int, verstr.partition('-')[0].split('.')))
     # make and return a type system
     ts = TypeSystem(table=tab, cycver=ver,
             cpp_typesystem=os.path.splitext(ns.cpp_typesystem)[0])
