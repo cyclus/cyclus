@@ -2,6 +2,7 @@
 #include_directories(${CYMETRIC_INCLUDE_DIRS} ${INCLUDE_DIRECTORIES})
 #include_directories(${CYCLUS_INCLUDE_DIRECTORIES})
 #SET(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${CYCLUS_CORE_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
 #
 # First things first, code-generation
@@ -28,9 +29,10 @@ message("-- Include paths for ${CMAKE_CURRENT_SOURCE_DIR}: ${inc_dirs}")
 
 foreach(file ${CYCLUS_CYTHON_FILES})
     get_filename_component(name ${file} NAME_WE)
-    set(targ "py${name}")
+    set(targ "__py_${name}__")
     cython_add_module(${targ} ${file})
     target_link_libraries(${targ} dl ${LIBS} cyclus)
-    set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX)
+    set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX
+                                             OUTPUT_NAME ${name})
 endforeach()
 

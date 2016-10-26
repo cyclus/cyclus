@@ -6,7 +6,7 @@ from libcpp.utility cimport pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 
-from cpp_typesystem cimport DbTypes
+from .cpp_typesystem cimport DbTypes
 
 
 cdef extern from "cyclus.h" namespace "boost::spirit":
@@ -65,7 +65,7 @@ cdef extern from "cyclus.h" namespace "cyclus":
     cdef cppclass Cond:
         Cond() except +
         Cond(std_string, std_string, hold_any) except +
-    
+
         std_string field
         std_string op
         CmpOpCode opcode
@@ -106,7 +106,7 @@ cdef extern from "cyclus.h" namespace "cyclus":
 
 
 cdef extern from "sqlite_back.h" namespace "cyclus":
-    
+
     cdef cppclass SqliteBack(FullBackend):
         SqliteBack(std_string) except +
 

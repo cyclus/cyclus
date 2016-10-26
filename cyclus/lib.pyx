@@ -21,9 +21,9 @@ import numpy as np
 import pandas as pd
 
 # local imports
-from cymetric cimport cpp_cyclus
-from cymetric cimport cpp_typesystem
-from cymetric.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
+from cyclus cimport cpp_cyclus
+from cyclus cimport cpp_typesystem
+from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp
 
 
@@ -57,7 +57,7 @@ cdef class _Datum:
             Value in table column.
         shape : list or tuple of ints
             Length of value.
-        dbtype : cpp data type 
+        dbtype : cpp data type
             Data type as defined by cyclus typesystem
 
         Returns
@@ -67,7 +67,7 @@ cdef class _Datum:
         cdef int i, n
         cdef std_vector[int] cpp_shape
         cdef cpp_cyclus.hold_any v = py_to_any(value, dbtype)
-        cdef std_string cfield 
+        cdef std_string cfield
         if shape is None:
             (<cpp_cyclus.Datum*> self.ptx).AddVal(field, v)
         else:
@@ -138,10 +138,10 @@ cdef class _FullBackend:
                 field = std_string(<const char*> cond0)
                 if coltypes.count(field) == 0:
                     continue  # skips non-existent columns
-                cpp_conds.push_back(cpp_cyclus.Cond(field, cond1, 
+                cpp_conds.push_back(cpp_cyclus.Cond(field, cond1,
                     py_to_any(cond[2], coltypes[field])))
             if cpp_conds.size() == 0:
-                conds_ptx = NULL 
+                conds_ptx = NULL
             else:
                 conds_ptx = &cpp_conds
         # query, convert, and return
@@ -290,7 +290,7 @@ cdef class _Recorder:
 
     def register_backend(self, backend):
         """Registers a backend with the recorder."""
-        cdef cpp_cyclus.RecBackend* b 
+        cdef cpp_cyclus.RecBackend* b
         if isinstance(backend, Hdf5Back):
             b = <cpp_cyclus.RecBackend*> (
                 <cpp_cyclus.Hdf5Back*> (<_Hdf5Back> backend).ptx)

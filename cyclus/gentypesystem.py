@@ -667,8 +667,8 @@ TYPESYSTEM_PYX = JENV.from_string('''
 {{ npy_imports }}
 
 # local imports
-from cymetric cimport cpp_typesystem
-from cymetric cimport cpp_cyclus
+from cyclus cimport cpp_typesystem
+from cyclus cimport cpp_cyclus
 
 # pure python imports
 import uuid
@@ -820,8 +820,8 @@ TYPESYSTEM_PXD = JENV.from_string('''
 {{ stl_cimports }}
 
 # local imports
-from cymetric cimport cpp_typesystem
-from cymetric cimport cpp_cyclus
+from cyclus cimport cpp_typesystem
+from cyclus cimport cpp_cyclus
 
 #
 # raw
