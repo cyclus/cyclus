@@ -32,3 +32,6 @@ src/pyne_decay.cc
 src/hdf5_back.cc
 share/dbtypes.json
 tests/db.h5
+cyclus/cpp_typesystem.pxd
+cyclus/typesystem.pxd
+cyclus/typesystem.pyx

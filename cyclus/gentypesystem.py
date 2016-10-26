@@ -884,7 +884,7 @@ def typesystem_pxd(ts, ns):
 def parse_args(argv):
     """Parses typesystem arguments for code generation."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('--src-dir', default='cymetric', dest='src_dir',
+    parser.add_argument('--src-dir', default='.', dest='src_dir',
                         help="the local source directory, default 'cymetric'")
     parser.add_argument('--test-dir', default='tests', dest='test_dir',
                         help="the local tests directory, default 'tests'")
