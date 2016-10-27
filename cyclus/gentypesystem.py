@@ -430,7 +430,7 @@ TO_PY_CONVERTERS = {
         '{firstname} = {var}.first'
         '{firstbody}\n'
         'pyfirst = {firstexpr}\n'
-        '{secondname} = {var}.second'
+        '{secondname} = {var}.second\n'
         '{secondbody}\n'
         'pysecond = {secondexpr}\n',
         '(pyfirst, pysecond)'),
