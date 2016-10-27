@@ -292,6 +292,11 @@ enum DbTypes {
   VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > ", 5, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]]], false]
   VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > >", 5, ["SQLite"], ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]]], false]
 
+  // pair<int, pair<string, string>>
+  PAIR_INT_PAIR_STRING_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "STRING", "STRING"]], false]
+  PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]], false]
+  PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]], false]
+  PAIR_INT_PAIR_VL_STRING_VL_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]], false]
 };
 
 /// Represents operation codes for condition checking.
