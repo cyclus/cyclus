@@ -864,7 +864,7 @@ class StateAccumulator(object):
             err_string = ("Shape array for type {t} is not formatted correctly."
                           + " Expected length {length} or less.")
             raise ValueError(err_string.format(t=str(type_canon), 
-                                               length=str(expected_shape_length))
+                                               length=str(expected_shape_length)))
         return new_shape
     
     def canonize_class(self, cls, _usens=True):
