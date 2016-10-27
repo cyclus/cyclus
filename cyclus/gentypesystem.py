@@ -427,7 +427,7 @@ TO_PY_CONVERTERS = {
         '{seconddecl}\n'
         'cdef {firsttype} {firstname}\n'
         'cdef {secondtype} {secondname}\n',
-        '{firstname} = {var}.first'
+        '{firstname} = {var}.first\n'
         '{firstbody}\n'
         'pyfirst = {firstexpr}\n'
         '{secondname} = {var}.second\n'
