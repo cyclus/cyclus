@@ -282,7 +282,7 @@ enum DbTypes {
   VL_MAP_VL_STRING_VL_MAP_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "STRING", "INT"]], false]
   VL_MAP_VL_STRING_VL_MAP_VL_STRING_INT,  // ["std::map<std::string, std::map<std::string, int>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "VL_STRING", "INT"]], false]
 
-  // vector<pair<pair<double, double>, map<string, double > > >
+  // vector<pair<pair<double, double>, map<string, double>>>
   VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > >", 5, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "STRING", "DOUBLE"]]], false]
   VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > ", 5, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "VL_STRING", "DOUBLE"]]], false]
   VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE, // ["std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > ", 5, ["SQLite"], ["VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]]], false]
@@ -297,6 +297,15 @@ enum DbTypes {
   PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]], false]
   PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]], false]
   PAIR_INT_PAIR_VL_STRING_VL_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]], false]
+
+  // pair<double, double>
+  PAIR_DOUBLE_DOUBLE,  // ["std::pair<double, double>", 0, [], ["PAIR", "DOUBLE", "DOUBLE"], false]
+
+  // pair<pair<double, double>, map<string, double>>
+  PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE,        // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "STRING", "DOUBLE"]], false]
+  PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE,     // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "VL_STRING", "DOUBLE"]], false]
+  PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE,     // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]], false]
+  PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE,  // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]], false]
 };
 
 /// Represents operation codes for condition checking.
