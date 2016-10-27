@@ -275,6 +275,16 @@ IF(NOT CYCLUS_DOC_ONLY)
 
         find_package(Numpy REQUIRED)
         find_package(Jinja2 REQUIRED)
+
+        # With CMake, a clean separation can be made between the source tree and the
+        # build tree.  When all source is compiled, as with pure C/C++, the source is
+        # no-longer needed in the build tree.  However, with pure *.py source, the
+        # source is processed directly.  To handle this, we reproduce the availability
+        # of the source files in the build tree.
+        add_custom_target(ReplicatePythonSourceTree ALL "${CMAKE_COMMAND}" -P
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ReplicatePythonSourceTree.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
     else(Cython_FOUND)
         set(NUMPY_INCLUDE_DIRS "")
     endif(Cython_FOUND)

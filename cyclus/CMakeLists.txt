@@ -35,6 +35,7 @@ foreach(file ${CYCLUS_CYTHON_FILES})
     cython_add_module(${targ} ${file})
     target_link_libraries(${targ} dl ${LIBS} cyclus)
     set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX
-                                             OUTPUT_NAME ${name})
+                                             OUTPUT_NAME ${name}
+                                             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endforeach()
 
