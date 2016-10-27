@@ -555,8 +555,8 @@ def split_template_args(s, open_brace='<', close_brace='>', separator=','):
     count = 0
     targ_name = ''
     for n in ns:
-        count += int(open_brace in n)
-        count -= int(close_brace in n)
+        count += n.count(open_brace)
+        count -= n.count(close_brace)
         if len(targ_name) > 0:
             targ_name += separator
         targ_name += n
