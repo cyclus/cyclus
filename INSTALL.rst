@@ -38,7 +38,7 @@ instructions `for installing dependencies for the major supported
 systems`_.
 
 
-Default installation
+Default Installation
 --------------------
 
 Run the install script:
@@ -60,7 +60,7 @@ You need to add ``~/.local/bin`` to the front of your ``$PATH``:
 
 .. website_custom_start
 
-Custom Cyclus installation
+Custom Cyclus Installation
 --------------------------
 
 The installation using the install script can be customized using the following
@@ -126,7 +126,7 @@ installation flag. The otherwise identical process would look like:
     .../cyclus$  python install.py --coin_root=path/to/coin
 
 
-CMake Cyclus installation
+CMake Cyclus Installation
 -------------------------
 
 If you are ``CMake`` aficionado you can also install Cyclus without using the
