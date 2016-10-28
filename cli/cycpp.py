@@ -839,7 +839,7 @@ class StateAccumulator(object):
         if isinstance(type_canon, str):
             result = [type_canon]
         else:
-            result = type_canon
+            result = list(type_canon)
             i = 0
             while i < len(result):
                 if isinstance(result[i], str):

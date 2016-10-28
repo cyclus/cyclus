@@ -1332,15 +1332,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
             child_var = get_variable("item_type", 
                                           prefix=template_args[container_type][0], 
                                           depth=depth+1)
-            #item_var = get_variable("item_type", 
-                                    #prefix=template_args[container_type][0],
-            #                        prefix="",
-            #                        depth=depth+1)
-            #node.nodes.append(ExprStmt(child=DeclAssign(
-            #                                        type=Type(cpp="hid_t"),
-            #                                        target=Raw(code=item_var),
-            #
-            #                                        value=Raw(code=child_var))))
+                                                 value=Raw(code=child_var))))
             item_var = child_var
         else:
             #This is a compound type.
