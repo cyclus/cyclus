@@ -1059,10 +1059,8 @@
     [145, "VL_MAP_PAIR_INT_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1, ["VL_MAP", ["PAIR", "INT", "STRING"], "DOUBLE"]],
     [146, "MAP_PAIR_INT_VL_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1, ["MAP", ["PAIR", "INT", "VL_STRING"], "DOUBLE"]],
     [147, "VL_MAP_PAIR_INT_VL_STRING_DOUBLE", "std::map<std::pair<int, std::string>, double>", 3, "HDF5", "v1.3", 1, ["VL_MAP", ["PAIR", "INT", "VL_STRING"], "DOUBLE"]],
-    [0, "BOOL", "bool", 0, "HDF5", "v1.3", 1, "BOOL"]
-    @DBTYPES_JSON_ENTRIES@
-]
-,[0, "BOOL", "bool", 0, "SQLite", "v1.4", 1],
+    [0, "BOOL", "bool", 0, "HDF5", "v1.3", 1, "BOOL"],
+    [0, "BOOL", "bool", 0, "SQLite", "v1.4", 1],
     [1, "INT", "int", 0, "SQLite", "v1.4", 1],
     [2, "FLOAT", "float", 0, "SQLite", "v1.4", 1],
     [3, "DOUBLE", "double", 0, "SQLite", "v1.4", 1],
@@ -1538,3 +1536,5 @@
     [235, "VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE", "std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, "HDF5", "v1.4", 0, ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "VL_STRING", "DOUBLE"]]]],
     [236, "VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE", "std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, "HDF5", "v1.4", 0, ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]]]],
     [237, "VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE", "std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > > ", 5, "HDF5", "v1.4", 0, ["VL_VECTOR", ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]]]]
+    @DBTYPES_JSON_ENTRIES@
+]
