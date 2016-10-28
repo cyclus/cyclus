@@ -1211,7 +1211,7 @@ def get_vl_body(t, current_shape_index=0):
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
                                                y=Raw(code=type_var))))
-        for opened in opened_types:
+        for opened in opened_types[:-1]:
             body.nodes.append(ExprStmt(child=FuncCall(
                                           name=Raw(code="opened_types_.insert"),
                                           args=[Raw(code=opened)])))
@@ -1307,9 +1307,10 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
         if DB_TO_VL[t.db]:
             container_type = VL_TO_FL_CONTAINERS[t.canon[0]]
         else:
-            shape_var = get_variable("shape0", prefix="", depth=depth+1)
-            node.nodes.append(ExprStmt(
-                                child=DeclAssign(
+            if t.canon[0] in variable_length_types:
+                shape_var = get_variable("shape0", prefix="", depth=depth+1)
+                node.nodes.append(ExprStmt(
+                                    child=DeclAssign(
                                          type=Type(cpp="hsize_t"),
                                          target=Var(name=shape_var),
                                          value=Raw(code="shape["
@@ -1348,6 +1349,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
             for i in range(1, len(canon_shape)):
                 item_canon, item_shape = canon_shape[i]
                 item_node = CANON_TO_NODE[item_canon]
+                pre_opened_len = len(opened_stack)
                 child_array = (item_shape if isinstance(item_shape, list)
                                           else [item_shape])
                 child_node, child_opened = get_item_type(item_node,
@@ -1356,9 +1358,18 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                                 depth=depth+1)
                 node.nodes.append(child_node)
                 opened_stack.extend(child_opened)
-                child_item_var = get_variable("item_type", 
+               
+                #if the previous opened stack and current stack are the same,
+                #we know that the child is a primitive, and we can generate
+                #its variable accordingly.
+                if  len(opened_stack) == pre_opened_len:
+                    child_item_var = get_variable("item_type", 
                                         prefix=template_args[container_type][i-1],
                                         depth=depth+1)
+                #However, if the current opened stack is longer, the first new
+                #variable there will be our child variable.
+                else:
+                    child_item_var = opened_stack[pre_opened_len]
                 #2. Get item sizes.
                 child_dict[child_item_var] = get_item_size(item_node, child_array,
                                                      depth=depth+1)
@@ -1367,10 +1378,11 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
             
             item_var = get_variable("item_type", prefix="", depth=depth+1)
             node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"),
-                                              name=Raw(code=item_var))))
+                                                  name=Raw(code=item_var))))
             
             node.nodes.append(ExprStmt(child=Assign(target=Raw(code=item_var),
                                                     value=compound)))
+            
             opened_stack.append(item_var)
             #4. Insert individual children into the compound type.            
             node.nodes.append(H5Tinsert(container_type, item_var, child_dict))
@@ -1381,8 +1393,8 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                                            item_var,
                                                            rank=1,
                                                            dims="&"+shape_var)))
-            if depth != 0:
-                opened_stack.append(type_var)
+            
+            opened_stack.append(type_var)
             node.nodes.append(array_node)
     return node, opened_stack
 
