@@ -3,6 +3,7 @@ import re
 import os
 import sys
 from distutils.core import setup
+from pprint import pprint
 
 PROJECT = 'cyclus'
 
@@ -38,6 +39,30 @@ def version_update(ver):
         replace_in_file(p, n, os.path.join(*f))
 
 
+def run_setup(ver):
+    """Runs the setup function."""
+    skw = dict(
+        name=PROJECT,
+        description='A general purpose, Python-ish shell',
+        long_description=readme,
+        license='BSD',
+        version=ver,
+        author='Cyclus Developers',
+        maintainer='Cyclus Developers',
+        author_email='cyclus-users@googlegroups.com',
+        url='http://fuelcycle.org',
+        platforms='Cross Platform',
+        classifiers=['Programming Language :: Python :: 3'],
+        packages=['xonsh', 'xonsh.ply.ply', 'xonsh.ptk', 'xonsh.parsers',
+                  'xonsh.xoreutils', 'xontrib',
+                  'xonsh.completers', 'xonsh.prompt'],
+        package_dir={'xonsh': 'xonsh', 'xontrib': 'xontrib'},
+        package_data={'xonsh': ['*.json', '*.githash'], 'xontrib': ['*.xsh']},
+        cmdclass=cmdclass,
+        scripts=scripts,
+        )
+
+
 def main(argv=None):
     """The main installer for cyclus Python bindings."""
     core_version = os.environ.get('CYCLUS_CORE_VERSION', '')
@@ -47,10 +72,9 @@ def main(argv=None):
         msg += "not be running setup.py directly."
         raise RuntimeError(msg)
     version_update(core_version)
+    run_setup(core_version)
 
 
 if __name__ == '__main__':
     main()
-
-
 

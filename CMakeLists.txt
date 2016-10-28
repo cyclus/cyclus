@@ -339,7 +339,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     ####################################### end includes #########################################
     ##############################################################################################
 
-    ################# stub files #################################################################
+    ################# custom install files #######################################################
     INSTALL(
         FILES
         stubs/CMakeLists.txt
@@ -368,6 +368,12 @@ IF(NOT CYCLUS_DOC_ONLY)
         DESTINATION share/cyclus/stubs/src
         COMPONENT stubs
         )
+
+    if(Cython_FOUND)
+        set(pyinstallscript "${CMAKE_CURRENT_BINARY_DIR}/cmake/SetupPyInstall.cmake")
+        configure_file(cmake/SetupPyInstall.cmake.in ${pyinstallscript} @ONLY)
+        install(SCRIPT ${pyinstallscript})
+    endif(Cython_FOUND)
     ##############################################################################################
     ################################## begin uninstall target ####################################
     ##############################################################################################
