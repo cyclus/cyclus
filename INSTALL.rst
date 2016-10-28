@@ -2,7 +2,7 @@
 Cyclus Installation Guide
 #########################
 
-Cyclus uses the ``CMake`` cross platform bailed-generator as a build system. To
+Cyclus uses the ``CMake`` cross-platform build-generator. To
 simplify the usage of cmake to build Cyclus from source, a python script is
 provided with the source.
 
@@ -34,8 +34,8 @@ Installation
 
 Before going further with the installation procedure be sure you have installed
 all the required dependencies listed above. We have provided detailed
-instructions `for installing dependencies for the major supported
-systems`_.
+instructions for `installing dependencies <DEPENDENCIES.rst>`_ for the major supported
+systems.
 
 
 Default Installation
