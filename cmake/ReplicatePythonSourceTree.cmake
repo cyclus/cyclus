@@ -1,15 +1,16 @@
 # Note: when executed in the build dir, then CMAKE_CURRENT_SOURCE_DIR is the
 # build dir.
-file(COPY cyclus DESTINATION "${CMAKE_ARGV3}"
-    FILES_MATCHING PATTERN "*.py"
-                   PATTERN "*.pxd"
-                   PATTERN "*.pyw"
-                   PATTERN "*.csv"
-                   PATTERN "*.txt"
-                   PATTERN "*.inp"
-                   PATTERN "*.html"
-                   PATTERN "*.pxi"
-                   PATTERN "*.mas12")
+file(COPY setup.py cyclus DESTINATION "${CMAKE_ARGV3}"
+     FILES_MATCHING PATTERN "*.py"
+                    PATTERN "*.pyi"
+                    PATTERN "*.pyw"
+                    PATTERN "*.csv"
+                    PATTERN "*.txt"
+                    PATTERN "*.inp"
+                    PATTERN "*.html"
+                    PATTERN "*.pxi"
+                    PATTERN "*.pxd"
+                    )
 
 #set(PY_SOURCE_DIR "${CMAKE_SOURCE_DIR}/cyclus")
 #file(GLOB pyfiles "${PY_SOURCE_DIR}/*.py"
