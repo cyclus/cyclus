@@ -41,26 +41,30 @@ def version_update(ver):
 
 def run_setup(ver):
     """Runs the setup function."""
+    scripts = []
+    with open('README.rst') as f:
+        readme = f.read()
     skw = dict(
         name=PROJECT,
-        description='A general purpose, Python-ish shell',
+        description='Agent-based fuel cycle simulator.',
         long_description=readme,
-        license='BSD',
-        version=ver,
+        license='BSD 3-clause',
+        version=ver.partition('-')[0],
         author='Cyclus Developers',
         maintainer='Cyclus Developers',
         author_email='cyclus-users@googlegroups.com',
         url='http://fuelcycle.org',
-        platforms='Cross Platform',
-        classifiers=['Programming Language :: Python :: 3'],
-        packages=['xonsh', 'xonsh.ply.ply', 'xonsh.ptk', 'xonsh.parsers',
-                  'xonsh.xoreutils', 'xontrib',
-                  'xonsh.completers', 'xonsh.prompt'],
-        package_dir={'xonsh': 'xonsh', 'xontrib': 'xontrib'},
-        package_data={'xonsh': ['*.json', '*.githash'], 'xontrib': ['*.xsh']},
-        cmdclass=cmdclass,
+        platforms=['posix'],
+        classifiers=['Operating System :: POSIX',
+                     'Programming Language :: Python :: 3',
+                     'Programming Language :: Python :: 2'],
+        packages=['cyclus'],
+        package_dir={'cyclus': 'cyclus'},
+        package_data={'cyclus': ['*.pxd', '*.so', '*.dylib']},
         scripts=scripts,
+        zip_safe=False,
         )
+    setup(**skw)
 
 
 def main(argv=None):
