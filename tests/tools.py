@@ -115,7 +115,8 @@ def indir(d):
 
 LIBCYCLUS_HAS_BEEN_RUN = False
 DBS = [('libcyclus-test.h5', 'libcyclus-orig.h5', libcyclus.Hdf5Back),
-       ('libcyclus-test.sqlite', 'libcyclus-orig.sqlite', libcyclus.SqliteBack)]
+       #('libcyclus-test.sqlite', 'libcyclus-orig.sqlite', libcyclus.SqliteBack)
+       ]
 
 
 def safe_call(cmd, shell=False, *args, **kwargs):
