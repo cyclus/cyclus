@@ -1197,7 +1197,12 @@ def get_vl_body(t, current_shape_index=0):
         if is_primitive(t):
             default_item_var = type_var
         else:
-            default_item_var = get_variable("item_type", prefix="", depth=1)
+            if opened_types == []:
+                default_item_var = get_variable("item_type", 
+                                                prefix=template_args[VL_TO_FL_CONTAINERS[t.canon[0]]][0],
+                                                depth=1)
+            else:
+                default_item_var = get_variable("item_type", prefix="", depth=1)
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
                                                y=Raw(code="sha1_type_"))))
@@ -1298,11 +1303,12 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
     #Handle dependent types
     else:
         container_type = t.canon[0]
+        canon_shape = list(zip(t.canon, dim_shape))
         if DB_TO_VL[t.db]:
             container_type = VL_TO_FL_CONTAINERS[t.canon[0]]
-        canon_shape = list(zip(t.canon, dim_shape))
-        shape_var = get_variable("shape0", prefix="", depth=depth+1)
-        node.nodes.append(ExprStmt(
+        else:
+            shape_var = get_variable("shape0", prefix="", depth=depth+1)
+            node.nodes.append(ExprStmt(
                                 child=DeclAssign(
                                          type=Type(cpp="hsize_t"),
                                          target=Var(name=shape_var),
@@ -1325,14 +1331,16 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
             child_var = get_variable("item_type", 
                                           prefix=template_args[container_type][0], 
                                           depth=depth+1)
-            item_var = get_variable("item_type", 
+            #item_var = get_variable("item_type", 
                                     #prefix=template_args[container_type][0],
-                                    prefix="",
-                                    depth=depth+1)
-            node.nodes.append(ExprStmt(child=DeclAssign(
-                                                    type=Type(cpp="hid_t"),
-                                                    target=Raw(code=item_var),
-                                                    value=Raw(code=child_var))))
+            #                        prefix="",
+            #                        depth=depth+1)
+            #node.nodes.append(ExprStmt(child=DeclAssign(
+            #                                        type=Type(cpp="hid_t"),
+            #                                        target=Raw(code=item_var),
+            #
+            #                                        value=Raw(code=child_var))))
+            item_var = child_var
         else:
             #This is a compound type.
             child_dict = OrderedDict()
@@ -1373,7 +1381,8 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                                            item_var,
                                                            rank=1,
                                                            dims="&"+shape_var)))
-            opened_stack.append(type_var)
+            if depth != 0:
+                opened_stack.append(type_var)
             node.nodes.append(array_node)
     return node, opened_stack
 
