@@ -39,7 +39,7 @@ enum DbTypes {
   VECTOR_INT,  // ["std::vector<int>", 1, ["HDF5", "SQLite"], ["VECTOR", "INT"], false]
   VL_VECTOR_INT,  // ["std::vector<int>", 1, ["HDF5", "SQLite"], ["VL_VECTOR", "INT"], true]
   VECTOR_FLOAT,  // ["std::vector<float>", 1, ["HDF5"], ["VECTOR", "FLOAT"], false]
-  VL_VECTOR_FLOAT,  // ["std::vector<float>", 1, ["HDF5"], ["VECTOR", "BOOL"], true]
+  VL_VECTOR_FLOAT,  // ["std::vector<float>", 1, ["HDF5"], ["VL_VECTOR", "FLOAT"], true]
   VECTOR_DOUBLE,  // ["std::vector<double>", 1, ["HDF5", "SQLite"], ["VECTOR", "DOUBLE"], false]
   VL_VECTOR_DOUBLE,  // ["std::vector<double>", 1, ["HDF5", "SQLite"], ["VL_VECTOR", "DOUBLE"], true]
   VECTOR_STRING,  // ["std::vector<std::string>", 2, ["HDF5", "SQLite"], ["VECTOR", "STRING"], false]
@@ -47,7 +47,7 @@ enum DbTypes {
   VECTOR_VL_STRING,  // ["std::vector<std::string>", 2, ["HDF5", "SQLite"], ["VECTOR", "VL_STRING"], false]
   VL_VECTOR_VL_STRING,  // ["std::vector<std::string>", 2, ["HDF5", "SQLite"], ["VL_VECTOR", "VL_STRING"], true]
   VECTOR_BLOB,  // ["std::vector<cyclus::Blob>", 1, [], ["VECTOR", "BLOB"], false]
-  VL_VECTOR_BLOB,  // ["std::vector<cyclus:Blob>", 1, [], ["VL_VECTOR", "BLOB"], true]
+  VL_VECTOR_BLOB,  // ["std::vector<cyclus::Blob>", 1, [], ["VL_VECTOR", "BLOB"], true]
   VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>", 1, [], ["VECTOR", "UUID"], false]
   VL_VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>", 1, [], ["VL_VECTOR", "UUID"], true]
   // set types
