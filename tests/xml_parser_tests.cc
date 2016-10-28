@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <gtest/gtest.h>
+#include <libxml++/libxml++.h>
 
 #include "error.h"
 

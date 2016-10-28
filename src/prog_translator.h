@@ -12,6 +12,16 @@ namespace cyclus {
 class ExchangeGraph;
 class ExchangeNodeGroup;
 
+/// @brief struct to hold all problem instance state
+struct ProgTranslatorContext {
+  std::vector<double> obj_coeffs;
+  std::vector<double> row_ubs;
+  std::vector<double> row_lbs;
+  std::vector<double> col_ubs;
+  std::vector<double> col_lbs;
+  CoinPackedMatrix m;
+};
+
 /// a helper class to translate a product exchange into a mathematical
 /// program.
 ///
@@ -25,14 +35,10 @@ class ExchangeNodeGroup;
 /// @endcode
 class ProgTranslator {
  public:
-  /// @brief struct to hold all problem instance state
-  struct Context {
-    std::vector<double> obj_coeffs;
-    std::vector<double> row_ubs;
-    std::vector<double> row_lbs;
-    std::vector<double> col_ubs;
-    std::vector<double> col_lbs;
-    CoinPackedMatrix m;
+  /// @brief This class is now deprecated.
+  struct Context { 
+    Context(); 
+    ~Context(); 
   };
 
   /// constructor
@@ -62,11 +68,14 @@ class ProgTranslator {
   /// @brief translates solution from iface back into graph matches
   void FromProg();
 
-  const ProgTranslator::Context& ctx() const { return ctx_; }
+  const ProgTranslatorContext& ctx() const { return ctx_; }
 
  private:
   void Init();
- 
+
+  /// @throws if preference is unsatisfactory (i.e., not greater than 0)
+  void CheckPref(double pref);
+  
   /// perform all translation for a node group
   /// @param grp a pointer to the node group
   /// @param req a boolean flag, true if grp is a request group
@@ -76,7 +85,7 @@ class ProgTranslator {
   OsiSolverInterface* iface_;
   bool excl_;
   int arc_offset_;
-  ProgTranslator::Context ctx_;
+  ProgTranslatorContext ctx_;
   double pseudo_cost_;
 };
 

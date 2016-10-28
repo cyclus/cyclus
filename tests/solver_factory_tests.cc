@@ -7,6 +7,7 @@
 
 #include "equality_helpers.h"
 #include "solver_factory.h"
+#include "env.h"
 
 namespace cyclus {
 
@@ -126,6 +127,10 @@ TEST_F(SolverFactoryTests, ClpRedundant) {
 }
 
 TEST_F(SolverFactoryTests, Cbc) {
+  if (!Env::allow_milps()) {
+    std::cout << "[  SKIPPED ] MILPS have been disabled.\n";
+    return;
+  }
   sf_.solver_t("cbc");
   OsiSolverInterface* si = sf_.get();
   CoinMessageHandler h;
@@ -141,6 +146,10 @@ TEST_F(SolverFactoryTests, Cbc) {
 }
 
 TEST_F(SolverFactoryTests, CbcRedundant) {
+  if (!Env::allow_milps()) {
+    std::cout << "[  SKIPPED ] MILPS have been disabled.\n";
+    return;
+  }
   sf_.solver_t("clp");
   OsiSolverInterface* si = sf_.get();
   CoinMessageHandler h;

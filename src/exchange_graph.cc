@@ -1,6 +1,7 @@
 #include "exchange_graph.h"
 
 #include <algorithm>
+#include <boost/math/special_functions/next.hpp>
 
 #include "cyc_limits.h"
 #include "error.h"
@@ -62,12 +63,15 @@ Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
   if (exclusive_) {
     double fqty = unode->qty;
     double sqty = vnode->qty;
+    // this careful float comparison is vital for preventing false positive
+    // constraint violations w.r.t. exclusivity-related capacity.
+    double dist = boost::math::float_distance(fqty, sqty);
     if (unode->exclusive && vnode->exclusive) {
-      excl_val_ = fqty == sqty ? fqty : 0;
+      excl_val_ = (std::abs(dist) <= float_ulp_eq) ? fqty : 0;
     } else if (unode->exclusive) {
-      excl_val_ = sqty >= fqty ? fqty : 0;
+      excl_val_ = dist >= -float_ulp_eq ? fqty : 0;
     } else {
-      excl_val_ = fqty >= sqty ? sqty : 0;
+      excl_val_ = dist <= float_ulp_eq ? sqty : 0;
     }
   } else {
     excl_val_ = 0;
@@ -78,6 +82,7 @@ Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
 Arc::Arc(const Arc& other)
     : unode_(other.unode()),
       vnode_(other.vnode()),
+      pref_(other.pref()),
       exclusive_(other.exclusive()),
       excl_val_(other.excl_val()) {}
 
@@ -120,7 +125,7 @@ void ExchangeGraph::AddSupplyGroup(ExchangeNodeGroup::Ptr pss) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddArc(const Arc& a) {
-  arcs_.push_back(a);
+  arcs_.push_back(a);    
   int id = next_arc_id_++;
   arc_ids_.insert(std::pair<Arc, int>(a, id));
   arc_by_id_.insert(std::pair<int, Arc>(id, a));

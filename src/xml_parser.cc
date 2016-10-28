@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string>
+#include <libxml++/libxml++.h>
 
 #include "error.h"
 #include "logger.h"
@@ -10,16 +11,21 @@
 namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-XMLParser::XMLParser() {}
+XMLParser::XMLParser() : parser_(NULL) {
+  parser_ = new xmlpp::DomParser();
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLParser::~XMLParser() {
-  parser_.reset();
+  delete parser_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void XMLParser::Init(const std::stringstream& xml_input_snippet) {
-  parser_ = boost::shared_ptr<xmlpp::DomParser>(new xmlpp::DomParser());
+  if (parser_ != NULL) {
+    delete parser_;
+  }
+  parser_ = new xmlpp::DomParser();
   try {
     CLOG(LEV_DEBUG5) << "Parsing the snippet: " << xml_input_snippet.str();
 

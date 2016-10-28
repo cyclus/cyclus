@@ -6,7 +6,10 @@
 #include "OsiSolverInterface.hpp"
 
 #include "cyc_limits.h"
+#include "error.h"
 #include "exchange_graph.h"
+#include "exchange_solver.h"
+#include "logger.h"
 
 namespace cyclus {
 
@@ -45,7 +48,6 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
   Init();
 }
 
-
 void ProgTranslator::Init() {
   arc_offset_ = g_->arcs().size();
   int n_cols = arc_offset_ + g_->request_groups().size();
@@ -55,9 +57,25 @@ void ProgTranslator::Init() {
   ctx_.m = CoinPackedMatrix(false, 0, 0);
 }
 
+void ProgTranslator::CheckPref(double pref) {
+  if (pref <= 0) {
+    std::stringstream ss;
+    ss << "Preference value found to be nonpositive (" << pref
+       << "). Preferences must be positive when using an optimization solver."
+       << " If using Cyclus in simulation mode (e.g., from the command line),"
+       << " this error is likely a bug in Cyclus. Please report it to the developer's "
+       << "list (https://groups.google.com/forum/#!forum/cyclus-dev).";
+    throw ValueError(ss.str());
+  }
+}
+
 void ProgTranslator::Translate() {
-  // number of variables = number of arcs + 1 faux arc per request group
-  int n_cols = g_->arcs().size() + g_->request_groups().size();
+  // number of variables = number of arcs + 1 faux arc per request group with arcs
+  int nfalse = 0;
+  std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
+  for (int i = 0; i != g_->request_groups().size(); ++i)
+    nfalse += rgs[i].get()->HasArcs() ? 1 : 0;
+  int n_cols = g_->arcs().size() + nfalse;
   ctx_.m.setDimensions(0, n_cols);
 
   bool request;
@@ -67,13 +85,14 @@ void ProgTranslator::Translate() {
     XlateGrp_(sgs[i].get(), request);
   }
 
-  std::vector<RequestGroup::Ptr>& rgs = g_->request_groups();
   for (int i = 0; i != rgs.size(); i++) {
     request = true;
     XlateGrp_(rgs[i].get(), request);
   }
 
   // add each false arc
+  CLOG(LEV_DEBUG1) << "Adding " << arc_offset_ - g_->arcs().size()
+                   << " false arcs.";
   double inf = iface_->getInfinity();
   for (int i = g_->arcs().size(); i != arc_offset_; i++) {
     ctx_.obj_coeffs[i] = pseudo_cost_;
@@ -111,6 +130,9 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
   double inf = iface_->getInfinity();
   std::vector<double>& caps = grp->capacities();
 
+  if (request && !grp->HasArcs())
+    return; // no arcs, no reason to add variables/constraints
+  
   std::vector<CoinPackedVector> cap_rows;
   std::vector<CoinPackedVector> excl_rows;
   for (int i = 0; i != caps.size(); i++) {
@@ -139,13 +161,11 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       }
 
       if (request) {
-        // add obj coeff for arc
-        double pref = nodes[i]->prefs[a];
-        double col_ub = std::min(nodes[i]->qty, inf);
-        double obj_coeff = (excl_ && a.exclusive()) ? a.excl_val() / pref : 1.0 / pref;
-        ctx_.obj_coeffs[arc_id] = obj_coeff;
+        CheckPref(a.pref());
+        ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
         ctx_.col_lbs[arc_id] = 0;
-        ctx_.col_ubs[arc_id] = (excl_ && a.exclusive()) ? 1 : col_ub;
+        ctx_.col_ubs[arc_id] = (excl_ && a.exclusive()) ? 1 :
+                               std::min(nodes[i]->qty, inf);
       }
     }
   }
@@ -160,8 +180,11 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
     if (request) {
       cap_rows[i].insert(faux_id, 1.0);  // faux arc
     }
-    
-    ctx_.row_lbs.push_back(request ? caps[i] : 0);
+
+    // 1e15 is the largest value that doesn't make the solver fall over
+    // (by emperical testing)
+    double rlb = std::min(caps[i], 1e15); 
+    ctx_.row_lbs.push_back(request ? rlb : 0);
     ctx_.row_ubs.push_back(request ? inf : caps[i]);
     ctx_.m.appendRow(cap_rows[i]);
   }
@@ -206,5 +229,16 @@ void ProgTranslator::FromProg() {
     }
   }
 }
+
+ProgTranslator::Context::Context() {
+  throw DepricationError("Class ProgTranslator::Context is now deprecated "
+                         "in favor of ProgTranslatorContext.");
+}
+
+ProgTranslator::Context::~Context() {
+  throw DepricationError("Class ProgTranslator::Context is now deprecated "
+                         "in favor of ProgTranslatorContext.");
+}
+
 
 }  // namespace cyclus

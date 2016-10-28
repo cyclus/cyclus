@@ -21,6 +21,8 @@ class Predator : public cyclus::Facility  {
   Predator(cyclus::Context* ctx);
   virtual ~Predator() {}
 
+  virtual std::string version() { return cyclus::version::describe(); }
+
   #pragma cyclus
 
   #pragma cyclus note {"doc": "A facility that represents predators " \

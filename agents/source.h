@@ -24,6 +24,8 @@ class Source : public cyclus::Facility {
   Source(cyclus::Context* ctx);
   virtual ~Source() {}
 
+  virtual std::string version() { return cyclus::version::describe(); }
+
   #pragma cyclus
 
   #pragma cyclus note {"doc": "A minimum implementation source " \

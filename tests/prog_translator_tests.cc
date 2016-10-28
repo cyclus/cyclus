@@ -8,11 +8,13 @@
 #include "OsiSolverInterface.hpp"
 
 #include "coin_helpers.h"
+#include "error.h"
 #include "equality_helpers.h"
 #include "exchange_graph.h"
 #include "logger.h"
 #include "prog_translator.h"
 #include "solver_factory.h"
+#include "env.h"
 
 namespace cyclus {
 
@@ -59,7 +61,7 @@ TEST(ProgTranslatorTests, translation) {
                          excl_flow[i] / prefs[i] : 1 / prefs[i]);
   }
 
-  
+
   double cost_add = 1;
   double max_obj_coeff = 1 / 0.2;  // 1 / prefs[0]
   double min_row_coeff = 0.3;  // ucaps_a_3
@@ -79,10 +81,15 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNode::Ptr d1(new ExchangeNode());
 
   Arc x0(a0, c0);
+  x0.pref(prefs[0]);
   Arc x1(b0, c1);
+  x1.pref(prefs[1]);
   Arc x2(b1, c2);
+  x2.pref(prefs[2]);
   Arc x3(a1, d0);
+  x3.pref(prefs[3]);
   Arc x4(b1, d1);
+  x4.pref(prefs[4]);
 
   a0->unit_capacities[x0] = std::vector<double>(
       ucaps_a_0, ucaps_a_0 + sizeof(ucaps_a_0) / sizeof(ucaps_a_0[0]) );
@@ -229,6 +236,10 @@ TEST(ProgTranslatorTests, translation) {
   checkface.branchAndBound();
 
   // verify solution
+  if (!Env::allow_milps()) {
+    std::cout << "[  SKIPPED ] MILPS have been disabled.\n";
+    return;
+  }
   EXPECT_NO_THROW(SolveProg(iface));
   const double* soln = iface->getColSolution();
   const double* check = checkface.getColSolution();
@@ -267,5 +278,12 @@ TEST(ProgTranslatorTests, translation) {
 
   delete iface;
 }
+
+TEST(ProgTranslatorTests, depricated) {
+
+  // confirm depricated error is thrown
+  ASSERT_THROW(new ProgTranslator::Context(), DepricationError);
+}
+
 
 }  // namespace cyclus

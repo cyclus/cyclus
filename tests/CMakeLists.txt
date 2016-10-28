@@ -37,17 +37,17 @@ IF(CMAKE_USE_PTHREADS_INIT)
 ENDIF()
 
 SET_TARGET_PROPERTIES(gtest
-    PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+    PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/cyclus"
+    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/cyclus"
     )
 
 INSTALL(TARGETS gtest
-    LIBRARY DESTINATION lib
+    LIBRARY DESTINATION lib/cyclus
     COMPONENT testing
     )
 
 INSTALL(FILES GoogleTest/gtest/gtest.h
-    DESTINATION include/gtest
+    DESTINATION include/cyclus/gtest
     COMPONENT testing
     )
 
@@ -71,6 +71,7 @@ INSTALL(FILES ${header_files}
     COMPONENT testing
     )
 
+ADD_SUBDIRECTORY(input)
 ADD_SUBDIRECTORY(toolkit)
 ADD_SUBDIRECTORY(agent_tests)
 SET(

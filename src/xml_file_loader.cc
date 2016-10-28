@@ -7,6 +7,7 @@
 #include <streambuf>
 
 #include <boost/filesystem.hpp>
+#include <libxml++/libxml++.h>
 
 #include "agent.h"
 #include "blob.h"
@@ -14,6 +15,7 @@
 #include "cyc_std.h"
 #include "env.h"
 #include "error.h"
+#include "exchange_solver.h"
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
 #include "infile_tree.h"
@@ -154,10 +156,13 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->Init(input);
 
+  std::stringstream ss;
+  parser_->Document()->write_to_stream_formatted(ss);
+
   std::stringstream orig_input;
   LoadRawStringstreamFromFile(orig_input, file_);
   ctx_->NewDatum("InputFiles")
-      ->AddVal("Data", Blob(orig_input.str()))
+      ->AddVal("Data", Blob(ss.str()))
       ->Record();
 }
 
@@ -210,27 +215,58 @@ void XMLFileLoader::LoadSolver() {
   // now load the solver info
   string config = "config";
   string greedy = "greedy";
+  string coinor = "coin-or";
   string solver_name = greedy;
-  bool exclusive = false;
-  if (xqe.NMatches("/control/solver") == 1) {
-    qe = xqe.SubTree("/control/solver");
+  bool exclusive = ExchangeSolver::kDefaultExclusive;
+  if (xqe.NMatches("/*/control/solver") == 1) {
+    qe = xqe.SubTree("/*/control/solver");
     if (qe->NMatches(config) == 1) {
       solver_name = qe->SubTree(config)->GetElementName(0);
     }
-    exclusive = cyclus::OptionalQuery<bool>(qe, "exclusive_orders_only", 
+    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders",
                                             exclusive);
-  } 
+
+    // @TODO remove this after release 1.5
+    // check for deprecated input values
+    if (qe->NMatches(std::string("exclusive_orders_only")) != 0) {
+      std::stringstream ss;
+      ss << "Use of 'exclusive_orders_only' is deprecated."
+         << " Please see http://fuelcycle.org/user/input_specs/control.html";
+      Warn<DEPRECATION_WARNING>(ss.str());
+    }
+  }
+
+  if (!exclusive) {
+    std::stringstream ss;
+    ss << "You have set allow_exclusive_orders to False."
+       << " Many archetypes (e.g., :cycamore:Reactor will not work"
+       << " as intended with this feature turned off.";
+    Warn<VALUE_WARNING>(ss.str());
+  }
+
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
       ->AddVal("ExclusiveOrders", exclusive)
       ->Record();
 
   // now load the actual solver
-  if (solver_name == "greedy") {
-    query = string("/control/solver/config/greedy/preconditioner");
+  if (solver_name == greedy) {
+    query = string("/*/control/solver/config/greedy/preconditioner");
     string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
     ctx_->NewDatum("GreedySolverInfo")
       ->AddVal("Preconditioner", precon_name)
+      ->Record();
+  } else if (solver_name == coinor) {
+    query = string("/*/control/solver/config/coin-or/timeout");
+    double timeout = cyclus::OptionalQuery<double>(&xqe, query, -1);
+    query = string("/*/control/solver/config/coin-or/verbose");
+    bool verbose = cyclus::OptionalQuery<bool>(&xqe, query, false);
+    query = string("/*/control/solver/config/coin-or/mps");
+    bool mps = cyclus::OptionalQuery<bool>(&xqe, query, false);
+    ctx_->NewDatum("CoinSolverInfo")
+      ->AddVal("Timeout", timeout)
+      ->AddVal("Verbose", verbose)
+      ->AddVal("Mps", mps)
       ->Record();
   } else {
     throw ValueError("unknown solver name: " + solver_name);
@@ -365,7 +401,7 @@ void XMLFileLoader::LoadControlParams() {
   InfileTree xqe(*parser_);
   std::string query = "/*/control";
   InfileTree* qe = xqe.SubTree(query);
-
+  
   std::string handle;
   if (qe->NMatches("simhandle") > 0) {
     handle = qe->GetString("simhandle");
@@ -383,7 +419,24 @@ void XMLFileLoader::LoadControlParams() {
   // get decay mode
   std::string d = OptionalQuery<std::string>(qe, "decay", "manual");
 
-  ctx_->InitSim(SimInfo(dur, y0, m0, handle, d));
+  SimInfo si(dur, y0, m0, handle, d);
+
+  si.explicit_inventory = OptionalQuery<bool>(qe, "explicit_inventory", false);
+  si.explicit_inventory_compact = OptionalQuery<bool>(qe, "explicit_inventory_compact", false);
+
+  // get time step duration
+  si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
+  
+  // get epsilon
+  double eps_ = OptionalQuery<double>(qe, "tolerance_generic", 1e-6);
+  cy_eps = si.eps = eps_;
+
+  // get epsilon resources
+  double eps_rsrc_ = OptionalQuery<double>(qe, "tolerance_resource", 1e-6);
+  cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
+
+
+  ctx_->InitSim(si);
 }
 
 }  // namespace cyclus

@@ -97,6 +97,10 @@ class SimInitTest : public ::testing::Test {
     b = new cy::SqliteBack(dbpath);
     rec.RegisterBackend(b);
     ctx = new cy::Context(&ti, &rec);
+    ctx->NewDatum("SolverInfo")
+        ->AddVal("Solver", std::string("greedy")) // str constructor for macs
+        ->AddVal("ExclusiveOrders", true)
+        ->Record();
     ctx->InitSim(cy::SimInfo(5));
 
     cy::CompMap v;

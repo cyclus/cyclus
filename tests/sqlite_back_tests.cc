@@ -25,6 +25,46 @@ class SqliteBackTests : public ::testing::Test {
   cyclus::Recorder r;
 };
 
+// For future types, since the code generation and serialization has been
+// sufficiently proven with existing tests, just use the following template -
+// only adjusting the typedef at the top:
+//
+//     TEST_F(SqliteBackTests, MapStrDouble) {
+//       typedef std::map<std::string, std::map<int, std::vector<int> > > Foo;
+//     
+//       Foo f;
+//       r.NewDatum("monty")
+//           ->AddVal("python", f)
+//           ->Record();
+//       r.Close();
+//       cyclus::QueryResult qr = b->Query("monty", NULL);
+//       EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
+//     }
+
+TEST_F(SqliteBackTests, VecPairPairDoubleDoubleMapStringDouble) {
+  typedef std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > Foo;
+  
+  Foo f;
+  r.NewDatum("monty")
+    ->AddVal("python", f)
+    ->Record();
+  r.Close();
+  cyclus::QueryResult qr = b->Query("monty", NULL);
+  EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
+}
+TEST_F(SqliteBackTests, MapStrMapStrInt) {
+  typedef std::map<std::string, std::map<std::string, int > > Foo;
+  
+  Foo f;
+  r.NewDatum("monty")
+    ->AddVal("python", f)
+    ->Record();
+  r.Close();
+  cyclus::QueryResult qr = b->Query("monty", NULL);
+  EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
+}
+
+
 TEST_F(SqliteBackTests, MapStrDouble) {
   std::map<std::string, double> m;
   m["one"] = 1.1;
@@ -506,4 +546,22 @@ TEST_F(SqliteBackTests, Tables) {
   set<string> tabs = b->Tables();
   EXPECT_LE(1, tabs.size());
   EXPECT_EQ(1, tabs.count("IntTable"));
+}
+
+TEST_F(SqliteBackTests, ListPairIntInt) {
+  std::list<std::pair<int, int> > l;
+  l.push_back(std::make_pair(4, 2));
+  l.push_back(std::make_pair(5, 3));
+
+  r.NewDatum("foo")
+      ->AddVal("bar", l)
+      ->Record();
+
+  r.Close();
+  cyclus::QueryResult qr = b->Query("foo", NULL);
+  l = qr.GetVal<std::list<std::pair<int, int> > >("bar", 0);
+
+  ASSERT_EQ(2, l.size());
+  EXPECT_EQ(std::make_pair(4, 2), l.front());
+  EXPECT_EQ(std::make_pair(5, 3), l.back());
 }

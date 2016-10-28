@@ -96,8 +96,9 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod) {
-  Composition::Ptr c;
-  return Set(commod, c, 1.0);
+  CompMap c;
+  c[10010000] = 1e-100;
+  return Set(commod, Composition::CreateFromMass(c), 1.0);
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c) {

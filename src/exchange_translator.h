@@ -1,8 +1,11 @@
 #ifndef CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 #define CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 
+#include <sstream>
+
 #include "bid.h"
 #include "bid_portfolio.h"
+#include "error.h"
 #include "exchange_graph.h"
 #include "exchange_translation_context.h"
 #include "logger.h"
@@ -78,24 +81,31 @@ class ExchangeTranslator {
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
     double pref =
         ex_ctx_->trader_prefs.at(req->requester())[req][bid];
+    // TODO: make the following check `pref <=0` and remove the `else if` block
+    // before release 1.5
     if (pref < 0) {
       CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
-    } else {
-      // get translated arc
-      Arc a = TranslateArc(xlation_ctx_, bid);
-
-      a.unode()->prefs[a] = pref;  // request node is a.unode()
-      int n_prefs = a.unode()->prefs.size();
-
-      CLOG(LEV_DEBUG5) << "Updating preference for one of "
-                       << req->requester()->manager()->prototype()
-                       << "'s trade nodes:";
-      CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-
-      graph->AddArc(a);
+      return;
+    } else if (pref == 0) {
+      std::stringstream ss;
+      ss << "0-valued preferences have been deprecated. "
+         << "Please make preference value positive."
+         << "This message will go away in before the next release (1.5).";
+      throw ValueError(ss.str());
     }
+    // get translated arc
+    Arc a = TranslateArc(xlation_ctx_, bid, pref);
+    a.unode()->prefs[a] = pref;  // request node is a.unode()
+    int n_prefs = a.unode()->prefs.size();
+    
+    CLOG(LEV_DEBUG5) << "Updating preference for one of "
+                     << req->requester()->manager()->prototype()
+                     << "'s trade nodes:";
+    CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
+    
+    graph->AddArc(a);
   }
-
+  
   /// @brief Provide a vector of Trades given a vector of Matches
   void BackTranslateSolution(const std::vector<Match>& matches,
                              std::vector< Trade<T> >& ret) {
@@ -224,12 +234,18 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
                  Bid<T>* bid) {
-  Request<T>* req = bid->request();
+  return TranslateArc<T>(translation_ctx, bid, 1);
+}
 
+template <class T>
+Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
+                 Bid<T>* bid, double pref) {
+  Request<T>* req = bid->request();
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
-
+  arc.pref(pref); 
+  
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
   typename RequestPortfolio<T>::Ptr rp = req->portfolio();

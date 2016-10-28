@@ -2,6 +2,7 @@
 
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
+#include "prog_solver.h"
 #include "region.h"
 
 namespace cyclus {
@@ -147,11 +148,25 @@ void SimInit::LoadInfo() {
   int y0 = qr.GetVal<int>("InitialYear");
   int m0 = qr.GetVal<int>("InitialMonth");
   std::string h = qr.GetVal<std::string>("Handle");
-
   QueryResult dq = b_->Query("DecayMode", NULL);
   std::string d = dq.GetVal<std::string>("Decay");
   si_ = SimInfo(dur, y0, m0, h, d);
+
   si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
+
+  qr = b_->Query("TimeStepDur", NULL);
+  // TODO: when the backends support uint64_t, the int template here
+  // should be updated to uint64_t.
+  si_.dt = qr.GetVal<int>("DurationSecs");
+
+  qr = b_->Query("Epsilon", NULL);
+  si_.eps = qr.GetVal<double>("GenericEpsilon");
+  si_.eps_rsrc = qr.GetVal<double>("ResourceEpsilon");
+  
+  qr = b_->Query("InfoExplicitInv", NULL);
+  si_.explicit_inventory = qr.GetVal<bool>("RecordInventory");
+  si_.explicit_inventory_compact = qr.GetVal<bool>("RecordInventoryCompact");
+
   ctx_->InitSim(si_);
 }
 
@@ -224,13 +239,33 @@ ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
   return solver;
 }
 
+ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive, 
+                                        std::set<std::string> tables) {
+  ExchangeSolver* solver;
+  double timeout;
+  bool verbose, mps;
+  
+  std::string solver_info = "CoinSolverInfo";
+  if (0 < tables.count(solver_info)) {
+    QueryResult qr = b_->Query(solver_info, NULL);
+    timeout = qr.GetVal<double>("Timeout");
+    verbose = qr.GetVal<bool>("Verbose");
+    mps = qr.GetVal<bool>("Mps");
+  }
+
+  // set timeout to default if input value is non-positive
+  timeout = timeout <= 0 ? ProgSolver::kDefaultTimeout : timeout;
+  solver = new ProgSolver("cbc", timeout, exclusive, verbose, mps);
+  return solver;
+}
+
 void SimInit::LoadSolverInfo() {
   using std::set;
   using std::string;
   // context will delete solver
   ExchangeSolver* solver;
-  string solver_name = string("greedy");
-  bool exclusive_orders = false;
+  string solver_name;
+  bool exclusive_orders;
 
   // load in possible Solver info, needs to be optional to
   // maintain backwards compatibility, defaults above.
@@ -246,6 +281,8 @@ void SimInit::LoadSolverInfo() {
 
   if (solver_name == "greedy") {
     solver = LoadGreedySolver(exclusive_orders, tables);
+  } else if (solver_name == "coin-or") {
+    solver = LoadCoinSolver(exclusive_orders, tables);
   } else {
     throw ValueError("The name of the solver was not recognized, "
                      "got '" + solver_name + "'.");

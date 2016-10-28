@@ -5,11 +5,14 @@
 #include <vector>
 #include <set>
 
-#include <libxml++/libxml++.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "xml_parser.h"
+
+namespace xmlpp {
+  class Node;
+}
 
 namespace cyclus {
 
@@ -133,6 +136,19 @@ inline int OptionalQuery(InfileTree* tree, std::string query,
     val = boost::lexical_cast<int>(s.c_str());
   }
   return val;
+}
+
+template <>
+inline bool OptionalQuery(InfileTree* tree, std::string query,
+                         bool default_val) {
+  if (tree->NMatches(query) == 0) {
+    return default_val;
+  }
+
+  std::string s = tree->GetString(query);
+  boost::trim(s);
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  return s == "true" || s == "t" || s == "1";
 }
 
 template <>

@@ -64,7 +64,7 @@ class ResourceExchange {
   ///
   /// @param ctx the simulation context
   ResourceExchange(Context* ctx) {
-    ctx_ = ctx;
+    sim_ctx_ = ctx;
   }
 
   inline ExchangeContext<T>& ex_ctx() {
@@ -73,26 +73,27 @@ class ResourceExchange {
 
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
-    std::set<Trader*> traders = ctx_->traders();
+    InitTraders();
     std::for_each(
-        traders.begin(),
-        traders.end(),
+        traders_.begin(),
+        traders_.end(),
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
                      this));
   }
 
   /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
-    std::set<Trader*> traders = ctx_->traders();
+    InitTraders();
     std::for_each(
-        traders.begin(),
-        traders.end(),
+        traders_.begin(),
+        traders_.end(),
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids_),
                      this));
   }
 
   /// @brief adjust preferences for requests given bid responses
   void AdjustAll() {
+    InitTraders();
     std::set<Trader*> traders = ex_ctx_.requesters;
     std::for_each(
         traders.begin(),
@@ -102,7 +103,21 @@ class ResourceExchange {
             this));
   }
 
+  /// return true if this is an empty exchange (i.e., no requests exist,
+  /// therefore no bids)
+  inline bool Empty() { return ex_ctx_.bids_by_request.empty(); }
+
  private:
+  void InitTraders() {
+    if (traders_.size() == 0) {
+      std::set<Trader*> orig = sim_ctx_->traders();
+      std::set<Trader*>::iterator it;
+      for (it = orig.begin(); it != orig.end(); ++it) {
+        traders_.insert(*it);
+      }
+    }
+  }
+
   /// @brief queries a given facility agent for
   void AddRequests_(Trader* t) {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
@@ -134,7 +149,25 @@ class ResourceExchange {
     }
   }
 
-  Context* ctx_;
+  struct trader_compare {
+    bool operator()(Trader* lhs, Trader* rhs) const {
+      int left = lhs->manager()->id();
+      int right = rhs->manager()->id();
+      if (left != right) {
+        return left < right;
+      } else {
+        return lhs < rhs;
+      }
+    }
+  };
+
+  // this sorts traders (and results in iteration...) based on traders'
+  // manager id.  Iterating over traders in this order helps increase the
+  // determinism of Cyclus overall.  This allows all traders' resource
+  // exchange functions are called in a much closer to deterministic order.
+  std::set<Trader*, trader_compare> traders_;
+
+  Context* sim_ctx_;
   ExchangeContext<T> ex_ctx_;
 };
 

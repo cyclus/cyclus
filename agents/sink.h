@@ -17,6 +17,8 @@ class Sink : public cyclus::Facility  {
   Sink(cyclus::Context* ctx);
   virtual ~Sink() {}
 
+  virtual std::string version() { return cyclus::version::describe(); }
+
   #pragma cyclus
 
   #pragma cyclus note {"doc": "A minimum implementation sink " \

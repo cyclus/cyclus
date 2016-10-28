@@ -35,6 +35,8 @@ class KFacility : public cyclus::Facility {
   KFacility(cyclus::Context* ctx);
   virtual ~KFacility();
 
+  virtual std::string version() { return cyclus::version::describe(); }
+
   #pragma cyclus
 
   #pragma cyclus note {"doc": "A facility designed for integration tests " \

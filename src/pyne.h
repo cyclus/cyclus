@@ -6,6 +6,7 @@
 //   src/h5wrap.h
 //   src/nucname.h
 //   src/rxname.h
+//   src/_atomic_data.h
 //   src/data.h
 //   src/json-forwards.h
 //   src/json.h
@@ -93,14 +94,12 @@
 #include <vector>
 #include <algorithm>
 
-#if defined __APPLE__ || defined __WIN_GNUC__
 #if (__GNUC__ >= 4)
   #include <cmath>
   #define isnan(x) std::isnan(x)
 #else
   #include <math.h>
   #define isnan(x) __isnand((double)x)
-#endif
 #endif
 
 #ifdef __WIN_MSVC__
@@ -248,7 +247,7 @@ namespace pyne {
 
 
 // End PyNE namespace
-};
+}
 
 #endif  // PYNE_KMMHYNANYFF5BFMEYIP7TUNLHA
 //
@@ -304,7 +303,7 @@ namespace extra_types
   };
 
 // End namespace extra_types
-};
+}
 
 #elif defined(__STDC__)
 
@@ -503,7 +502,7 @@ namespace h5wrap
     H5Dread(dset, dtype, memspace, dspace, H5P_DEFAULT, data_out);
 
     return data_out[0];
-  };
+  }
 
 
   // Conversion functions
@@ -536,7 +535,7 @@ namespace h5wrap
 
     delete[] mem_arr;
     return cpp_set;
-  };
+  }
 
 
   /// Reads in data from an HDF5 file as a 1 dimiensional vector.  \a T should roughly
@@ -566,7 +565,7 @@ namespace h5wrap
 
     H5Dclose(dset);
     return cpp_vec;
-  };
+  }
 
 
   /// Reads in data from an HDF5 file as a 2 dimiensional vector.  \a T should roughly
@@ -601,7 +600,7 @@ namespace h5wrap
 
     H5Dclose(dset);
     return cpp_vec;
-  };
+  }
 
 
   /// Reads in data from an HDF5 file as a 3 dimiensional vector.  \a T should roughly
@@ -640,7 +639,7 @@ namespace h5wrap
 
     H5Dclose(dset);
     return cpp_vec;
-  };
+  }
 
 
 
@@ -739,7 +738,7 @@ namespace h5wrap
     H5Tinsert(ct, "r", HOFFSET(xd_complex_t, re), H5T_NATIVE_DOUBLE);
     H5Tinsert(ct, "i", HOFFSET(xd_complex_t, im), H5T_NATIVE_DOUBLE);
     return ct;
-  };
+  }
 
   /// The HDF5 id for a complex data type compatible with PyTables generated data.
   static hid_t PYTABLES_COMPLEX128 = _get_PYTABLES_COMPLEX128();
@@ -768,11 +767,11 @@ namespace h5wrap
       }
     }
     return rtn;
-  };
+  }
 
 
 // End namespace h5wrap
-};
+}
 
 
 
@@ -1362,9 +1361,9 @@ namespace nucname
   /// form as ID, but the four last digits are all zeros.
   /// \param nuc a nuclide
   /// \return a integer groundstate id
-  inline int groundstate(int nuc) {return (id(nuc) / 10000 ) * 10000;};
-  inline int groundstate(std::string nuc) {return groundstate(id(nuc));};
-  inline int groundstate(const char * nuc) {return groundstate(std::string(nuc));};
+  inline int groundstate(int nuc) {return (id(nuc) / 10000 ) * 10000;}
+  inline int groundstate(std::string nuc) {return groundstate(id(nuc));}
+  inline int groundstate(const char * nuc) {return groundstate(std::string(nuc));}
   /// \}
 
   /// \name State Map functions
@@ -1386,8 +1385,8 @@ namespace nucname
   int ensdf_to_id(std::string nuc);
   /// \}
 
-};
-};
+}
+}
 
 #endif  // PYNE_D35WIXV5DZAA5LLOWBY2BL2DPA
 //
@@ -1453,7 +1452,7 @@ namespace rxname
   extern void * _;  ///< A dummy variable used when calling #_fill_maps().
 
   /// A helper function to compute nuclide id offsets from z-, a-, and s- deltas
-  inline int offset(int dz, int da, int ds=0) {return dz*10000000 + da*10000 + ds;};
+  inline int offset(int dz, int da, int ds=0) {return dz*10000000 + da*10000 + ds;}
 
   /// \name Hash Functions
   /// \{
@@ -1751,12 +1750,50 @@ namespace rxname
     std::string rxwas;  ///< previous reaction state
     std::string rxnow;  ///< current reaction state
   };
-};
-};
+}
+}
 
 #endif  // PYNE_7DOEB2PKSBEFFIA3Q2NARI3KFY
 //
 // end of src/rxname.h
+//
+
+
+//
+// start of src/_atomic_data.h
+//
+/// \/file atomic_nuclear_data.h
+/// \/author Andrew Davis (andrew.davis@wisc.edu)
+///
+/// \/brief Impliments all the fundamental atomic & nuclear data data
+#include <map>
+
+namespace pyne
+{
+  /// main function to be called when you whish to load the nuclide data 
+  /// into memory 
+  void _load_atomic_mass_map_memory();
+  /// function to create mapping from nuclides in id form
+  /// to their atomic masses
+  
+  void _insert_atomic_mass_map();
+  
+  /// function to create mapping from nuclides in id form 
+  /// to their natural abundances
+  void _insert_abund_map();
+  
+  /// Mapping from nuclides in id form to their natural abundances
+  extern std::map<int,double> natural_abund_map;
+  
+  /// Mapping from nuclides in id form to their atomic masses.
+  extern std::map<int,double> atomic_mass_map;
+  
+  /// Mapping from nuclides in id form to the associated error in 
+  /// abdundance 
+  extern std::map<int,double> atomic_mass_error_map;
+} // namespace pyne
+//
+// end of src/_atomic_data.h
 //
 
 
@@ -4756,6 +4793,7 @@ namespace pyne
    "NICKEL",   "WATER",    "POLYSTYR", "PLASCINT", "PMMA",     "BONECOMP", 
    "BONECORT", "MUSCLESK", "MUSCLEST", "ADTISSUE", "KAPTON", "POLYETHY", "AIR"
   };
+
   static int FLUKA_MAT_NUM = 37;
 
   /// Material composed of nuclides.
@@ -4934,7 +4972,8 @@ namespace pyne
     /// nuclide's mass, decay_const, and atmoic_mass. 
     comp_map activity();
     /// Calculates the decay heat of a material based on the composition and
-    /// each nuclide's mass, q_val, decay_const, and atomic_mass.
+    /// each nuclide's mass, q_val, decay_const, and atomic_mass. This assumes
+    /// input mass of grams. Return values is in megawatts. 
     comp_map decay_heat();
     /// Caclulates the dose per gram using the composition of the the
     /// material, the dose type desired, and the source for dose factors
@@ -5063,7 +5102,7 @@ namespace pyne
     double mass;  ///< material mass
     double density; ///< material density
     double atoms_per_mol; ///< material atoms per mole
-    double comp []; ///< array of material composition mass weights.
+    double comp[1]; ///< array of material composition mass weights.
   } material_data;
 
   /// Custom exception for invalid HDF5 protocol numbers
@@ -5073,11 +5112,11 @@ namespace pyne
     virtual const char* what() const throw()
     {
       return "Invalid loading protocol number; please use 0 or 1.";
-    };
+    }
   };
 
 // End pyne namespace
-};
+}
 
 #endif  // PYNE_MR34UE5INRGMZK2QYRDWICFHVM
 //
@@ -5146,9 +5185,9 @@ namespace enrichment {
   };
 
 // end enrichment
-};
+}
 // end pyne
-};
+}
 
 #endif
 
@@ -5290,7 +5329,7 @@ namespace enrichment {
     virtual const char* what() const throw()
     {
       return "Inifinite loop found while calculating enrichment cascade.";
-    };
+    }
   };
 
   /// Custom exception for when an enrichment solver has reached its maximum
@@ -5301,7 +5340,7 @@ namespace enrichment {
     virtual const char* what() const throw()
     {
       return "Iteration limit hit durring enrichment calculation.";
-    };
+    }
   };
 
   /// Custom exception for when an enrichment solver iteration has produced a NaN.
@@ -5311,13 +5350,13 @@ namespace enrichment {
     virtual const char* what() const throw()
     {
       return "Iteration has hit a point where some values are not-a-number.";
-    };
+    }
   };
 
 // end enrichment
-};
+}
 // end pyne
-};
+}
 
 #endif
 //
@@ -5361,9 +5400,9 @@ namespace enrichment {
   Cascade solve_symbolic(Cascade & orig_casc);
 
 // end enrichment
-};
+}
 // end pyne
-};
+}
 
 #endif
 //

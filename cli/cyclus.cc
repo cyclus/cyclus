@@ -195,11 +195,17 @@ int main(int argc, char* argv[]) {
     si.recorder()->RegisterBackend(fback);
   }
 
-  try {
+
+  char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
+  if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
     si.timer()->RunSim();
-  } catch (cyclus::Error err) {
-    std::cerr << err.what() << "\n";
-    return 1;
+  }   else {
+    try {
+      si.timer()->RunSim();
+    } catch (cyclus::Error err) {
+      std::cerr << err.what() << "\n";
+      return 1;
+    }
   }
 
   rec.Flush();
@@ -223,6 +229,8 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
        "dump the cyclus master schema including all installed module schemas")
       ("agent-schema", po::value<std::string>(),
        "dump the schema for the named agent")
+      ("agent-version", po::value<std::string>(),
+       "print the version of the specified agent")
       ("schema-path", po::value<std::string>(),
        "manually specify the path to the cyclus master schema")
       ("flat-schema", "use the flat master simulation schema")
@@ -244,6 +252,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("path,p", "print the CYCLUS_PATH")
       ("include", "print the cyclus include directory")
       ("install-path", "print the cyclus install directory")
+      ("cmake-module-path", "print the cyclus CMake module path")
       ("build-path", "print the cyclus build directory")
       ("rng-schema", "print the path to cyclus.rng.in")
       ("nuc-data", "print the path to cyclus_nuc_data.h5")
@@ -302,6 +311,9 @@ int EarlyExitArgs(const ArgInfo& ai) {
   } else if (ai.vm.count("install-path")) {
     std::cout << Env::GetInstallPath() << "\n";
     return 0;
+  } else if (ai.vm.count("cmake-module-path")) {
+    std::cout << Env::GetInstallPath() << "/share/cyclus/cmake/\n";
+    return 0;
   } else if (ai.vm.count("build-path")) {
     std::cout << Env::GetBuildPath() << "\n";
     return 0;
@@ -325,6 +337,20 @@ int EarlyExitArgs(const ArgInfo& ai) {
       Context* ctx = new Context(&ti, &rec);
       Agent* m = DynamicModule::Make(ctx, name);
       std::cout << m->schema();
+      ctx->DelAgent(m);
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("agent-version")) {
+    std::string name(ai.vm["agent-version"].as<std::string>());
+    cyclus::warn_limit = 0;
+    try {
+      Recorder rec;
+      Timer ti;
+      Context* ctx = new Context(&ti, &rec);
+      Agent* m = DynamicModule::Make(ctx, name);
+      std::cout << m->version() << "\n";
       ctx->DelAgent(m);
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";

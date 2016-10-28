@@ -19,24 +19,50 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <optional>
         <element name="decay"> <text/> </element>
       </optional>
+      <optional> 
+        <element name="dt"><data type="nonNegativeInteger"/></element> 
+      </optional>
+      <optional>
+        <element name="explicit_inventory"> <data type="boolean"/> </element>
+      </optional>
+      <optional>
+        <element name="explicit_inventory_compact"> <data type="boolean"/> </element>
+      </optional>
+      <optional>
+          <element name="tolerance_generic"><data type="double"/></element>
+      </optional>
+      <optional>
+          <element name="tolerance_resource"><data type="double"/></element>
+      </optional>
       <optional>
         <element name="solver"> 
           <interleave>
+            <optional><element name="config">
+            <choice>
+              <element name="greedy">
+                <interleave>
+                  <optional>
+                    <element name="preconditioner"> <text/> </element>
+                  </optional>
+                </interleave>
+              </element>
+              <element name="coin-or">
+                <interleave>
+                  <optional>
+                    <element name="timeout">  <data type="positiveInteger"/>  </element>
+                  </optional>
+                  <optional><element name="verbose"><data type="boolean"/></element></optional>
+                  <optional><element name="mps"><data type="boolean"/></element></optional>
+                </interleave>
+              </element>
+            </choice>
+            </element></optional>
             <optional>
-              <element name="name"> <text/> </element>
+              <element name="allow_exclusive_orders">
+                <data type="boolean" />
+              </element>
             </optional>
-            <optional>
-              <choice>
-                <element name="greedy">
-                  <interleave>
-                    <optional>
-                      <element name="preconditioner"> <text/> </element>
-                    </optional>
-                  </interleave>
-                </element>
-              </choice>
-            </optional>
-            <optional>
+            <optional><!--deprecated. @TODO remove in release 1.5 -->
               <element name="exclusive_orders_only">
                 <data type="boolean" />
               </element>
@@ -152,4 +178,3 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 </start>
 
 </grammar>
-

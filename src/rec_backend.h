@@ -45,6 +45,9 @@ class RecBackend {
 
   /// Flushes all buffered data in the backend to its final format/location.
   virtual void Flush() = 0;
+
+  /// Closes the backend, if approriate.
+  virtual void Close() = 0;
 };
 
 }  // namespace cyclus

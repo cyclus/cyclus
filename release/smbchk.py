@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-"""Collects & diffs public symobls in libcyclus.so. Used to ensure stability 
+"""Collects & diffs public symobls in libcyclus.so. Used to ensure stability
 between versions. Now with 100% fewer vowels!
 
 The following tasks may be useful:
@@ -40,6 +40,9 @@ api_blacklist = {
     'cyclus::SimInit::LoadComposition',
     'cyclus::TradeExecutor<cyclus::Material>::ExecuteTrades',
     'cyclus::TradeExecutor<cyclus::Product>::ExecuteTrades',
+    'cyclus::Arc cyclus::TranslateArc<cyclus::Material>',
+    'cyclus::Arc cyclus::TranslateArc<cyclus::Product>',
+    'cyclus::Composition::NewDecay',
 }
 
 def load(ns):
@@ -56,8 +59,8 @@ def save(db, ns):
         json.dump(db, f, indent=1, separators=(',', ': '))
 
 def nm(ns):
-    """Obtains the latest symbols as a sorted list by running and parsing the 
-    posix nm utility. Note that this is *not* compatible with Darwin's nm 
+    """Obtains the latest symbols as a sorted list by running and parsing the
+    posix nm utility. Note that this is *not* compatible with Darwin's nm
     utility because Apple is unfathomably 'special.'
     """
     # in the nm command, the following option are for:
@@ -99,7 +102,8 @@ def git_log():
     return stdout.decode().strip().split('/')
 
 def core_version():
-    stdout = subprocess.check_output(['cyclus', '--version'])
+    stdout = subprocess.check_output(['cyclus', '--version'],
+                                     universal_newlines=True)
     return stdout.splitlines()[0].strip()
 
 def update(db, ns):
@@ -108,7 +112,7 @@ def update(db, ns):
         sys.exit("a tag for the version must be given when updating, eg '--tag 1.1'")
     symbols = nm(ns)
     sha, d, t = git_log()
-    entry = {'symbols': symbols, 'sha': sha, 'date': d, 'timestamp': t, 
+    entry = {'symbols': symbols, 'sha': sha, 'date': d, 'timestamp': t,
              'tag': ns.tag, 'version': core_version(),}
     db.append(entry)
 
@@ -118,8 +122,8 @@ def diff(db, i, j):
     y = db[j]
     xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in api_blacklist]
     ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in api_blacklist]
-    lines = difflib.unified_diff(xsym, ysym, 
-                                 fromfile=x['version'], tofile=y['version'], 
+    lines = difflib.unified_diff(xsym, ysym,
+                                 fromfile=x['version'], tofile=y['version'],
                                  fromfiledate=x['date'], tofiledate=y['date'])
     return '\n'.join(map(lambda x: x[:-1] if x.endswith('\n') else x, lines))
 
@@ -143,25 +147,25 @@ def main(args=None):
     if os.name != 'posix':
         sys.exit("must be run on a posix system, "
                  "'nm' utility not compatible elsewhere.")
-    p = argparse.ArgumentParser('smbchk', description=__doc__, 
+    p = argparse.ArgumentParser('smbchk', description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter,)
-    p.add_argument('--prefix', dest='prefix', default='../build', 
+    p.add_argument('--prefix', dest='prefix', default='../build',
                    help="location of lib dir with libcyclus, default '../build'")
-    p.add_argument('-f', '--filename', dest='filename', default='symbols.json', 
+    p.add_argument('-f', '--filename', dest='filename', default='symbols.json',
                    help="historical symbols database, default 'symbols.json'")
-    p.add_argument('--dump', action='store_true', default=False, dest='dump', 
+    p.add_argument('--dump', action='store_true', default=False, dest='dump',
                    help='dumps existing symbols')
-    p.add_argument('--update', dest='update', action='store_true', default=False, 
+    p.add_argument('--update', dest='update', action='store_true', default=False,
                    help='updates the symbols with the current version')
-    p.add_argument('--save', action='store_true', default=True, dest='save', 
+    p.add_argument('--save', action='store_true', default=True, dest='save',
                    help='saves the database')
-    p.add_argument('--no-save', action='store_false', default=True, dest='save', 
+    p.add_argument('--no-save', action='store_false', default=True, dest='save',
                    help='does not save the database')
-    p.add_argument('-t', '--tag', dest='tag', default=None, 
+    p.add_argument('-t', '--tag', dest='tag', default=None,
                    help='version tag used when updating, eg 1.0.0-rc5')
-    p.add_argument('-c', '--check', action='store_true', dest='check', default=False, 
+    p.add_argument('-c', '--check', action='store_true', dest='check', default=False,
                    help='checks that the API is stable')
-    p.add_argument('-d', '--diff', nargs=2, dest='diff', type=int, default=(), 
+    p.add_argument('-d', '--diff', nargs=2, dest='diff', type=int, default=(),
                    help='takes the difference between two database indices')
     ns = p.parse_args(args=args)
 

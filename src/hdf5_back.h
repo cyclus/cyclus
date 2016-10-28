@@ -81,6 +81,9 @@ class Hdf5Back : public FullBackend {
   /// cleans up resources and closes the file.
   virtual ~Hdf5Back();
 
+  /// Closes and flushes the backend.
+  virtual void Close();
+
   virtual void Notify(DatumList data);
 
   virtual std::string Name();
@@ -192,6 +195,9 @@ class Hdf5Back : public FullBackend {
   template <typename T>
   T VLBufToVal(const hvl_t& buf);
   /// \}
+
+  /// Flag for whether the backend is closed or not.
+  bool closed_ = false;
 
   /// A class to help with hashing variable length datatypes
   Sha1 hasher_;

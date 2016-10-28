@@ -12,6 +12,8 @@ class NullRegion : public cyclus::Region {
   NullRegion(cyclus::Context* ctx);
   virtual ~NullRegion();
 
+  virtual std::string version() { return cyclus::version::describe(); }
+
   #pragma cyclus
 
   #pragma cyclus note {"doc": "A region that owns the simulation's " \

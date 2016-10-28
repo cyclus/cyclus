@@ -4,6 +4,7 @@
 #include <cassert>
 #include <functional>
 #include <vector>
+#include <boost/math/special_functions/next.hpp>
 
 #include "cyc_limits.h"
 #include "error.h"
@@ -173,7 +174,15 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
         // exclusivity adjustment
         if (arc_it->exclusive()) {
           excl_val = a.excl_val();
-          tomatch = (tomatch < excl_val) ? 0 : excl_val;
+
+          // this careful float comparison is vital for preventing false positive
+          // constraint violations w.r.t. exclusivity-related capacity.
+          double dist = boost::math::float_distance(tomatch, excl_val);
+          if (dist >= float_ulp_eq ) {
+            tomatch = 0;
+          } else {
+            tomatch = excl_val;
+          }
         }
 
         if (tomatch > eps()) {

@@ -52,6 +52,7 @@ TEST_F(RequestPortfolioTests, ReqAdd) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   EXPECT_EQ(rp->requests().size(), 0);
   Request<Material>* r1 = rp->AddRequest(get_mat(), fac1);
+  EXPECT_EQ(r1->preference(), 1);
   EXPECT_EQ(rp->requester(), fac1);
   EXPECT_EQ(rp->requests().size(), 1);
   EXPECT_EQ(rp->qty(), get_mat()->quantity());

@@ -7,7 +7,7 @@
 #include "institution_tests.h"
 #include "agent_tests.h"
 
-using stubs::StubInst;
+using libname::StubInst;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubInstTest : public ::testing::Test {

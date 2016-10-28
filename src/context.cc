@@ -12,12 +12,18 @@
 
 namespace cyclus {
 
+double cy_eps = 1e-6;
+double cy_eps_rsrc = 1e-6;
+
 SimInfo::SimInfo()
     : duration(0),
       y0(0),
       m0(0),
+      dt(kDefaultTimeStepDur),
       decay("manual"),
       branch_time(-1),
+      explicit_inventory(false),
+      explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
@@ -25,9 +31,12 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
     : duration(dur),
       y0(y0),
       m0(m0),
+      dt(kDefaultTimeStepDur),
       decay("manual"),
       branch_time(-1),
       handle(handle),
+      explicit_inventory(false),
+      explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
@@ -35,9 +44,12 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
     : duration(dur),
       y0(y0),
       m0(m0),
+      dt(kDefaultTimeStepDur),
       decay(d),
       branch_time(-1),
       handle(handle),
+      explicit_inventory(false),
+      explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
       parent_type("init") {}
 
@@ -47,10 +59,13 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
     : duration(dur),
       y0(-1),
       m0(-1),
+      dt(kDefaultTimeStepDur),
       decay("manual"),
       parent_sim(parent_sim),
       parent_type(parent_type),
       branch_time(branch_time),
+      explicit_inventory(false),
+      explicit_inventory_compact(false),
       handle(handle) {}
 
 Context::Context(Timer* ti, Recorder* rec)
@@ -118,6 +133,15 @@ boost::uuids::uuid Context::sim_id() {
 }
 
 void Context::AddPrototype(std::string name, Agent* p) {
+  AddPrototype(name, p, false);
+}
+
+void Context::AddPrototype(std::string name, Agent* p, bool overwrite) {
+  if (!overwrite && protos_.find(name) != protos_.end()) {
+    throw KeyError("Prototype name " + name + " has already been added" +
+                   " and cannot be overwritten.");
+  }
+
   protos_[name] = p;
   // explicit snapshot required for in situ (non-xml) prototype addition
   SimInit::SnapAgent(p); 
@@ -126,6 +150,15 @@ void Context::AddPrototype(std::string name, Agent* p) {
       ->AddVal("AgentId", p->id())
       ->AddVal("Spec", p->spec())
       ->Record();
+
+  std::string spec = p->spec();
+  if (rec_ver_.count(spec) == 0) {
+    rec_ver_.insert(spec);
+    NewDatum("AgentVersions")
+      ->AddVal("Spec", spec)
+      ->AddVal("Version", p->version())
+      ->Record();
+  }
 }
 
 void Context::AddRecipe(std::string name, Composition::Ptr c) {
@@ -163,6 +196,22 @@ void Context::InitSim(SimInfo si) {
 
   NewDatum("DecayMode")
       ->AddVal("Decay", si.decay)
+      ->Record();
+
+  NewDatum("InfoExplicitInv")
+      ->AddVal("RecordInventory", si.explicit_inventory)
+      ->AddVal("RecordInventoryCompact", si.explicit_inventory_compact)
+      ->Record();
+
+  // TODO: when the backends get uint64_t support, the static_cast here should
+  // be removed.
+  NewDatum("TimeStepDur")
+      ->AddVal("DurationSecs", static_cast<int>(si.dt))
+      ->Record();
+  
+  NewDatum("Epsilon")
+      ->AddVal("GenericEpsilon", si.eps)
+      ->AddVal("ResourceEpsilon", si.eps_rsrc)
       ->Record();
 
   NewDatum("XMLPPInfo")

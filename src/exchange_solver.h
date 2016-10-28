@@ -5,18 +5,33 @@
 
 namespace cyclus {
 
+class Context;
 class ExchangeGraph;
+class Arc;
 
 /// @class ExchangeSolver
 ///
 /// @brief a very simple interface for solving translated resource exchanges
 class ExchangeSolver {
  public:
-  explicit ExchangeSolver(bool exclusive_orders = false)
+  /// default value to allow exclusive orders or not
+  static const bool kDefaultExclusive = true;
+  
+  /// return the cost of an arc
+  static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
+
+  explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
     : exclusive_orders_(exclusive_orders),
+      sim_ctx_(NULL),
       verbose_(false) {}
   virtual ~ExchangeSolver() {}
 
+  /// simulation context get/set
+  /// @{
+  inline void sim_ctx(Context* c) { sim_ctx_ = c; }
+  inline Context* sim_ctx() { return sim_ctx_; } 
+  /// @}
+  
   /// tell the solver to be verbose
   inline void verbose() { verbose_ = true; }
   inline void graph(ExchangeGraph* graph) { graph_ = graph; }
@@ -34,12 +49,18 @@ class ExchangeSolver {
   /// minimum unit capacity plus an added cost. This is guaranteed to be larger
   /// than any other arc cost measure and can be used as a cost for unmet
   /// demand.
-  /// @param cost_add the amount to add to the calculated ratio
+  /// @param cost_factor the additional cost for false arc costs, i.e., max_cost
+  /// * (1 + cost_factor)
   /// @{
-  double PseudoCost() { return PseudoCost(1); }
-  double PseudoCost(double cost_add);
+  double PseudoCost();
+  double PseudoCost(double cost_factor);
+  double PseudoCostByCap(double cost_factor);
+  double PseudoCostByPref(double cost_factor);
   /// @}
-
+  
+  /// return the cost of an arc
+  inline double ArcCost(const Arc& a) { return Cost(a, exclusive_orders_); }
+  
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by
   /// any solver.
@@ -47,6 +68,7 @@ class ExchangeSolver {
   ExchangeGraph* graph_;
   bool exclusive_orders_;
   bool verbose_;
+  Context* sim_ctx_;
 };
 
 }  // namespace cyclus

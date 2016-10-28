@@ -2,18 +2,19 @@
 
 #include <gtest/gtest.h>
 
-// extern int ConnectFacTests() {return 0;}
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(FacilityTests, Tick) {
-  int time = 1;
-  facility_->Tick();
-}
+// The FacilityTests initialization does not honor the normal initialization
+// guarantees for archetypes.  And so any type of remotely sophisticated
+// configuration validation of archetypes will be triggered to fail if we try
+// to call methods like e.g. Tick, Tock, Build, etc.  We already know the
+// agents satisfy the Agent class interface implicitly by being able to load
+// them and cast/assign them to Agent*/Facility*/etc. without compiler errors.
+// From now on, only call state-reporting functions with no side-effects in
+// these tests.
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(FacilityTests, Tock) {
-  int time = 1;
-  EXPECT_NO_THROW(facility_->Tock());
+TEST_P(FacilityTests, Construct) {
+  // make sure setup construction worked successfully
+  ASSERT_NE(facility_, nullptr);
 }
 
 TEST_P(FacilityTests, Entity) {

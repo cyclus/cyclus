@@ -6,7 +6,7 @@
 #include "context.h"
 #include "facility_tests.h"
 
-using stubs::StubFacility;
+using libname::StubFacility;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class StubFacilityTest : public ::testing::Test {
@@ -58,8 +58,8 @@ int ConnectAgentTests();
 static int cyclus_agent_tests_connected = ConnectAgentTests();
 #define CYCLUS_AGENT_TESTS_CONNECTED cyclus_agent_tests_connected
 #endif  // CYCLUS_AGENT_TESTS_CONNECTED
-INSTANTIATE_TEST_CASE_P(StubFac, FacilityTests,
+INSTANTIATE_TEST_CASE_P(StubFacility, FacilityTests,
                         ::testing::Values(&StubFacilityConstructor));
-INSTANTIATE_TEST_CASE_P(StubFac, AgentTests,
+INSTANTIATE_TEST_CASE_P(StubFacility, AgentTests,
                         ::testing::Values(&StubFacilityConstructor));
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
