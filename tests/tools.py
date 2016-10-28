@@ -9,10 +9,13 @@ import unittest
 import subprocess
 import tempfile
 from contextlib import contextmanager
+from functools import wraps
 
 from nose.tools import assert_true, assert_equal
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
+
+from cyclus import lib as libcyclus
 
 if sys.version_info[0] >= 3:
     basestring = str
@@ -105,6 +108,56 @@ def indir(d):
     os.chdir(d)
     yield
     os.chdir(cwd)
+
+#
+# Some Database API test helpers
+#
+
+LIBCYCLUS_HAS_BEEN_RUN = False
+DBS = [('libcyclus-test.h5', 'libcyclus-orig.h5', libcyclus.Hdf5Back),
+       ('libcyclus-test.sqlite', 'libcyclus-orig.sqlite', libcyclus.SqliteBack)]
+
+
+def safe_call(cmd, shell=False, *args, **kwargs):
+    """Checks that a command successfully runs with/without shell=True.
+    Returns the process return code.
+    """
+    try:
+        rtn = subprocess.call(cmd, shell=False, *args, **kwargs)
+    except (subprocess.CalledProcessError, OSError):
+        cmd = ' '.join(cmd)
+        rtn = subprocess.call(cmd, shell=True, *args, **kwargs)
+    return rtn
+
+
+def libcyclus_setup():
+    global LIBCYCLUS_HAS_BEEN_RUN
+    if not LIBCYCLUS_HAS_BEEN_RUN:
+        LIBCYCLUS_HAS_BEEN_RUN = True
+        for fname, oname, _ in DBS:
+            if os.path.isfile(fname):
+                os.remove(fname)
+            if os.path.isfile(oname):
+                os.remove(oname)
+    for fname, oname, _ in DBS:
+        if os.path.isfile(oname):
+            continue
+        safe_call(['cyclus', '-o' + oname, 'input/libcyclus.xml'])
+
+
+def dbtest(f):
+    @wraps(f)
+    def wrapper():
+        for fname, oname, backend in DBS:
+            if os.path.exists(fname):
+                os.remove(fname)
+            shutil.copy(oname, fname)
+            db = backend(fname)
+            yield f, db, fname, backend
+    return wrapper
+
+
+
 
 #
 # Here there be Hackons!
