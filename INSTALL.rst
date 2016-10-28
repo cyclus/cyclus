@@ -32,9 +32,9 @@ Installation
 ************
 .. website_include_start
 
-Before going further on the installation procedure be sure you have installed
+Before going further with the installation procedure be sure you have installed
 all the required dependencies listed above. We have provided detailed
-instructions `for installing those dependencies for the major supported
+instructions `for installing dependencies for the major supported
 systems`_.
 
 
@@ -56,12 +56,15 @@ You need to add ``~/.local/bin`` to the front of your ``$PATH``:
   echo 'export PATH="$HOME/.local/bin:$PATH' >> ~/.bashrc
   source ~/.bashrc
 
+.. website_include_end
+
+.. website_custom_start
 
 Custom Cyclus installation
 --------------------------
 
 The installation using the install script can be customized using the following
-flag:
+flags:
 
 .. list-table::
 
@@ -127,7 +130,7 @@ CMake Cyclus installation
 -------------------------
 
 If you are ``CMake`` aficionado you can also install Cyclus without using the
-``install.py`` python script and use directly ``cmake`` which should look like:
+``install.py`` python script and use ``cmake`` directly, which should look like:
 
 
 .. code-block:: bash
@@ -138,9 +141,9 @@ If you are ``CMake`` aficionado you can also install Cyclus without using the
   make
   make install
 
-As usual you can custom you cmake installation using the proper cmake flag.
-All cmake variable can be listed using: ``cmake -LAH``.
-The main variable used are:
+As usual you can customize your cmake installation using the proper cmake flag.
+All cmake variables can be listed using: ``cmake -LAH``.
+The main variables used are:
 
 .. list-table::
 
@@ -162,17 +165,17 @@ The main variable used are:
   * - ``HDF5_INCLUDE_DIRS`` 
     - set HDF5 include directory
 
-All variable can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
+All variables can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
-.. website_include_end
+.. website_custom_end
 
 *************
 Running Tests
 *************
 
 Installing Cyclus will also install a test driver (i.e., an executable of all of
-our tests). We strongly recommend after installing a fresh install of Cyclus, or
-any modification on the source code to rerun those tests in order to insure the
+our tests). We strongly recommend after a fresh install of Cyclus, or after
+any modification on the source code, to rerun those tests in order to insure the
 proper functioning of Cyclus. You can run the tests yourself via:
 
 .. code-block:: bash
