@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['m',['M',['../classpyne_1_1enrichment_1_1Cascade.html#a9a337df5a380a86cf1d814c817fcaa37',1,'pyne::enrichment::Cascade::M()'],['../structcyclus_1_1ProgTranslator_1_1Context.html#a1a9734f0ad7b11cf83c858038d7a3fe7',1,'cyclus::ProgTranslator::Context::m()']]],
+  ['m',['m',['../structcyclus_1_1ProgTranslatorContext.html#add8feaf68f6a414a1864de2afbbea2f9',1,'cyclus::ProgTranslatorContext::m()'],['../classpyne_1_1enrichment_1_1Cascade.html#a9a337df5a380a86cf1d814c817fcaa37',1,'pyne::enrichment::Cascade::M()']]],
   ['m0',['m0',['../classcyclus_1_1SimInfo.html#a355fae6dc1e2026eb12f28f4b2364f07',1,'cyclus::SimInfo']]],
   ['m_5fconv_5fe',['m_conv_e',['../structpyne_1_1gamma.html#a6c664717050818947e2e79d75e914c41',1,'pyne::gamma::m_conv_e()'],['../structpyne_1_1ecbp.html#afed47f1b2eea323a4de63f67fdd236c6',1,'pyne::ecbp::m_conv_e()']]],
   ['ma',['ma',['../namespacepyne_1_1nucname.html#ac487913e792a1d98664af236f1c567b7',1,'pyne::nucname::ma()'],['../namespacepyne_1_1nucname.html#a361c7b8fb365a6e606ab45ef8b5688d8',1,'pyne::nucname::MA()']]],
@@ -28,8 +28,8 @@ var searchData=
   ['minint',['minInt',['../classJson_1_1Value.html#a7df8a39e2502b8c92a6a41e3d752d2c8',1,'Json::Value']]],
   ['minint64',['minInt64',['../classJson_1_1Value.html#a815ef899bc312c93bc426511acfe31a7',1,'Json::Value']]],
   ['minlargestint',['minLargestInt',['../classJson_1_1Value.html#af91df130daa50dd43d2cd89e6ee67706',1,'Json::Value']]],
-  ['modelptr_5f',['modelPtr_',['../classOsiCbcSolverInterface.html#adac2aa87b7a4085c1ca09e8d8be981bb',1,'OsiCbcSolverInterface']]],
-  ['move',['move',['../structboost_1_1spirit_1_1detail_1_1fxn__ptr__table.html#a6791a3113396e2db6ac0e97b417adc34',1,'boost::spirit::detail::fxn_ptr_table']]],
+  ['modelptr_5f',['modelPtr_',['../classOsiCbcSolverInterface.html#a7fa3b9f2b24d9110dfa33d1762a4e135',1,'OsiCbcSolverInterface']]],
+  ['move',['move',['../structboost_1_1spirit_1_1detail_1_1fxn__ptr__table.html#a04af4aab86ccd9cb7e1292be7a32458e',1,'boost::spirit::detail::fxn_ptr_table']]],
   ['msg_5f',['msg_',['../classcyclus_1_1Error.html#aee9cb08c39ef8bce4f766284b4d466d4',1,'cyclus::Error']]],
   ['mstar',['Mstar',['../classpyne_1_1enrichment_1_1Cascade.html#aa81f85d2b30d009aa3baef9dd660b8cf',1,'pyne::enrichment::Cascade']]],
   ['mt_5fid',['mt_id',['../namespacepyne_1_1rxname.html#aca6dede953b1e7c1400ea23d40dce88c',1,'pyne::rxname']]]

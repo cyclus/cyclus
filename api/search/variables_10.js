@@ -11,6 +11,8 @@ var searchData=
   ['photon_5fintensity',['photon_intensity',['../structpyne_1_1gamma.html#a5d7ca7cc0667ebc41b8f046739c0dc1b',1,'pyne::gamma']]],
   ['photon_5fintensity_5ferr',['photon_intensity_err',['../structpyne_1_1gamma.html#a38f1045e9df163a740c657ca6cac490b',1,'pyne::gamma']]],
   ['pi',['pi',['../namespacepyne.html#a3b91aba14e56f740dc75b78b9eba037a',1,'pyne']]],
+  ['postfix',['postfix',['../structpretty__print_1_1delimiters__values.html#a42ae14ea7f194e4da3c7327a5f807949',1,'pretty_print::delimiters_values']]],
+  ['prefix',['prefix',['../structpretty__print_1_1delimiters__values.html#af3da98377295ee9e0999aefcf4d197cc',1,'pretty_print::delimiters_values']]],
   ['prefs',['prefs',['../structcyclus_1_1ExchangeNode.html#a7e3754f774007215d5882880bdd0e5a1',1,'cyclus::ExchangeNode']]],
   ['price',['price',['../structcyclus_1_1Trade.html#a5b28dd3b9c8866b8c1023f6f7f3714d5',1,'cyclus::Trade']]],
   ['prob',['prob',['../structpyne_1_1atomic.html#a018b03f4b2b8fcab0ed7b535f1816d54',1,'pyne::atomic']]],

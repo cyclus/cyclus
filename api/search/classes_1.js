@@ -7,7 +7,9 @@ var searchData=
   ['beta',['beta',['../structpyne_1_1beta.html',1,'pyne']]],
   ['bid',['Bid',['../classcyclus_1_1Bid.html',1,'cyclus']]],
   ['bidportfolio',['BidPortfolio',['../classcyclus_1_1BidPortfolio.html',1,'cyclus']]],
+  ['binop',['BinOp',['../classhdf5__back__gen_1_1BinOp.html',1,'hdf5_back_gen']]],
   ['blob',['Blob',['../classcyclus_1_1Blob.html',1,'cyclus']]],
+  ['block',['Block',['../classhdf5__back__gen_1_1Block.html',1,'hdf5_back_gen']]],
   ['builder',['Builder',['../classcyclus_1_1toolkit_1_1Builder.html',1,'cyclus::toolkit']]],
   ['buildingmanager',['BuildingManager',['../classcyclus_1_1toolkit_1_1BuildingManager.html',1,'cyclus::toolkit']]],
   ['buildorder',['BuildOrder',['../structcyclus_1_1toolkit_1_1BuildOrder.html',1,'cyclus::toolkit']]]

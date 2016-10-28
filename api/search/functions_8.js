@@ -5,6 +5,7 @@ var searchData=
   ['h5_5farray_5fto_5fcpp_5fvector_5f2d',['h5_array_to_cpp_vector_2d',['../namespaceh5wrap.html#a0cc2fdb859631d95b9fe1dd85954f359',1,'h5wrap']]],
   ['h5_5farray_5fto_5fcpp_5fvector_5f3d',['h5_array_to_cpp_vector_3d',['../namespaceh5wrap.html#a30f0c9d34b6e369db5807362b8e1c1be',1,'h5wrap']]],
   ['half_5flife',['half_life',['../namespacepyne.html#a98f776164d1812878cb4b4ee4ef943f5',1,'pyne::half_life(int nuc)'],['../namespacepyne.html#a120acb7c7ff96c26ff012aa192212160',1,'pyne::half_life(char *nuc)'],['../namespacepyne.html#a8fe3c8e42a1de1edd2547146da3c68b3',1,'pyne::half_life(std::string nuc)']]],
+  ['hasarcs',['HasArcs',['../classcyclus_1_1ExchangeNodeGroup.html#a0efbbdba946a01be724e6e8c8e949cb3',1,'cyclus::ExchangeNodeGroup']]],
   ['hascomment',['hasComment',['../classJson_1_1Value.html#a06567a00363cab9601be7e31336db03a',1,'Json::Value']]],
   ['hash',['hash',['../namespacepyne_1_1rxname.html#a937f163bf6ea3f5361c870ae6e9e93e5',1,'pyne::rxname::hash(std::string s)'],['../namespacepyne_1_1rxname.html#a7b5f23ed32cb01c6b9877b4b67815a11',1,'pyne::rxname::hash(const char *s)']]],
   ['hasint',['HasInt',['../namespacecyclus.html#aab6db65d315191ec01154af2af3be1be',1,'cyclus']]],

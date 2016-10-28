@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['raw',['Raw',['../classhdf5__back__gen_1_1Raw.html',1,'hdf5_back_gen']]],
   ['reader',['Reader',['../classJson_1_1Reader.html',1,'Json']]],
   ['recbackend',['RecBackend',['../classcyclus_1_1RecBackend.html',1,'cyclus']]],
   ['recorder',['Recorder',['../classcyclus_1_1Recorder.html',1,'cyclus']]],
@@ -14,5 +15,6 @@ var searchData=
   ['resource',['Resource',['../classcyclus_1_1Resource.html',1,'cyclus']]],
   ['resourcebuff',['ResourceBuff',['../classcyclus_1_1toolkit_1_1ResourceBuff.html',1,'cyclus::toolkit']]],
   ['resourceexchange',['ResourceExchange',['../classcyclus_1_1ResourceExchange.html',1,'cyclus']]],
-  ['restracker',['ResTracker',['../classcyclus_1_1ResTracker.html',1,'cyclus']]]
+  ['restracker',['ResTracker',['../classcyclus_1_1ResTracker.html',1,'cyclus']]],
+  ['rightunaryop',['RightUnaryOp',['../classhdf5__back__gen_1_1RightUnaryOp.html',1,'hdf5_back_gen']]]
 ];

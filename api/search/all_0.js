@@ -1,11 +1,16 @@
 var searchData=
 [
   ['_5f',['_',['../namespacepyne_1_1rxname.html#ac59f8c4154e812420e0dfef0388a592b',1,'pyne::rxname']]],
+  ['_5f_5finit_5f_5f',['__init__',['../classhdf5__back__gen_1_1Node.html#ad9d1466ac2c230c5f387e80607b14c53',1,'hdf5_back_gen.Node.__init__()'],['../classhdf5__back__gen_1_1Visitor.html#a15531d35a85e9bd2b4e45c998a1dd9c9',1,'hdf5_back_gen.Visitor.__init__()'],['../classhdf5__back__gen_1_1PrettyFormatter.html#afcc26dcd02c594f1e57f7c52bf8847a8',1,'hdf5_back_gen.PrettyFormatter.__init__()'],['../classhdf5__back__gen_1_1CppGen.html#a2725d6ad6568d60ce0720999f4462ced',1,'hdf5_back_gen.CppGen.__init__()']]],
+  ['_5f_5fstr_5f_5f',['__str__',['../classhdf5__back__gen_1_1Node.html#a3b7e9bf922b027b777147e0701696c94',1,'hdf5_back_gen::Node']]],
   ['_5fdeltau_5fi_5foverg',['_deltaU_i_OverG',['../namespacepyne_1_1enrichment.html#ab8f3f7b06c2d2d0ec291aaa9c0aef0f6',1,'pyne::enrichment']]],
   ['_5ffill_5fdefault_5furanium_5fcascade',['_fill_default_uranium_cascade',['../namespacepyne_1_1enrichment.html#af7c9529aaf7c9ec69c68ef0ec4d917fa',1,'pyne::enrichment']]],
   ['_5ffill_5fmaps',['_fill_maps',['../namespacepyne_1_1rxname.html#a4f97a2c91bfc51caf1e34eb21ed6c290',1,'pyne::rxname']]],
   ['_5fget_5fpytables_5fcomplex128',['_get_PYTABLES_COMPLEX128',['../namespaceh5wrap.html#a2ddc38d8445aba6996a31fc0dde6b7bf',1,'h5wrap']]],
+  ['_5finsert_5fabund_5fmap',['_insert_abund_map',['../namespacepyne.html#a6acc3972fa6eeb9761f4c858af078529',1,'pyne']]],
+  ['_5finsert_5fatomic_5fmass_5fmap',['_insert_atomic_mass_map',['../namespacepyne.html#a7deefcb42d075c174f1cf4f196246cce',1,'pyne']]],
   ['_5fload_5fatomic_5fmass_5fmap',['_load_atomic_mass_map',['../namespacepyne.html#afc84ecca5a23b416bd3bf42b0756e68e',1,'pyne']]],
+  ['_5fload_5fatomic_5fmass_5fmap_5fmemory',['_load_atomic_mass_map_memory',['../namespacepyne.html#a17db902268741d241fcc9d57ff7eef13',1,'pyne']]],
   ['_5fload_5fcomp_5fprotocol0',['_load_comp_protocol0',['../classpyne_1_1Material.html#a53c124ac70017813b4893a2f7fe3db6a',1,'pyne::Material']]],
   ['_5fload_5fcomp_5fprotocol1',['_load_comp_protocol1',['../classpyne_1_1Material.html#a8b46ba10cebb01cd36a5379e363267b1',1,'pyne::Material']]],
   ['_5fload_5fdata',['_load_data',['../namespacepyne.html#a730e33590dd1c1df41027d7ca952fb6a',1,'pyne']]],

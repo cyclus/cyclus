@@ -5,5 +5,7 @@ var searchData=
   ['osicbcsolverinterface_5f2_5f5_2ecpp',['OsiCbcSolverInterface_2_5.cpp',['../OsiCbcSolverInterface__2__5_8cpp.html',1,'']]],
   ['osicbcsolverinterface_5f2_5f5_2ehpp',['OsiCbcSolverInterface_2_5.hpp',['../OsiCbcSolverInterface__2__5_8hpp.html',1,'']]],
   ['osicbcsolverinterface_5f2_5f8_2ecpp',['OsiCbcSolverInterface_2_8.cpp',['../OsiCbcSolverInterface__2__8_8cpp.html',1,'']]],
-  ['osicbcsolverinterface_5f2_5f8_2ehpp',['OsiCbcSolverInterface_2_8.hpp',['../OsiCbcSolverInterface__2__8_8hpp.html',1,'']]]
+  ['osicbcsolverinterface_5f2_5f8_2ehpp',['OsiCbcSolverInterface_2_8.hpp',['../OsiCbcSolverInterface__2__8_8hpp.html',1,'']]],
+  ['osicbcsolverinterface_5f2_5f9_2ecpp',['OsiCbcSolverInterface_2_9.cpp',['../OsiCbcSolverInterface__2__9_8cpp.html',1,'']]],
+  ['osicbcsolverinterface_5f2_5f9_2ehpp',['OsiCbcSolverInterface_2_9.hpp',['../OsiCbcSolverInterface__2__9_8hpp.html',1,'']]]
 ];

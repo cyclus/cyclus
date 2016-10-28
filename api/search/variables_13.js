@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['schema_5f',['schema_',['../classcyclus_1_1RelaxNGValidator.html#a55f5719361a18de3340ae339f1d6f935',1,'cyclus::RelaxNGValidator']]],
+  ['schema_5f',['schema_',['../classcyclus_1_1RelaxNGValidator.html#aa758c33694d388c557f0855094a9f05f',1,'cyclus::RelaxNGValidator']]],
   ['schema_5fpath_5f',['schema_path_',['../classcyclus_1_1XMLFileLoader.html#aa97366141471d496a4a255c766eed2f8',1,'cyclus::XMLFileLoader']]],
   ['sec_5fper_5fday',['sec_per_day',['../namespacepyne.html#a3a54f183e7323b4d62c12f309c3af081',1,'pyne']]],
   ['shape',['shape',['../classh5wrap_1_1HomogenousTypeTable.html#ab0e03ddbee134e775ea6fa389897fc8b',1,'h5wrap::HomogenousTypeTable']]],
@@ -18,11 +18,12 @@ var searchData=
   ['sigma_5fs',['sigma_s',['../structsimple__xs.html#a97a8d722f1ad811c776206d4c82dffce',1,'simple_xs']]],
   ['sigma_5ft',['sigma_t',['../structsimple__xs.html#a351503384563324b11a7dbf285ab9d10',1,'simple_xs']]],
   ['sigma_5ftrit',['sigma_trit',['../structsimple__xs.html#ac94cd1b3c4d07c830484563268c9e3b4',1,'simple_xs']]],
+  ['sim_5fctx_5f',['sim_ctx_',['../classcyclus_1_1ExchangeSolver.html#abc1976c2e7d49fbd5e56db975eb3c3d7',1,'cyclus::ExchangeSolver']]],
   ['simple_5fxs_5fmap',['simple_xs_map',['../namespacepyne.html#a75b3d385906d5d2f078a6d099629a5c8',1,'pyne']]],
   ['special',['special',['../structpyne_1_1level__data.html#acabc31aa71741dbc2ea5485ca51da0d6',1,'pyne::level_data']]],
   ['specs_5f',['specs_',['../classcyclus_1_1XMLFileLoader.html#aaed627be5a2fccd24a6833d6918e7b59',1,'cyclus::XMLFileLoader']]],
   ['state_5fid_5fmap',['state_id_map',['../namespacepyne_1_1nucname.html#a1bfcc87b4ac9c3f6634ea5a495871d7b',1,'pyne::nucname']]],
-  ['static_5fdelete',['static_delete',['../structboost_1_1spirit_1_1detail_1_1fxn__ptr__table.html#a2895e1375f760b7364c520bf6c3bca04',1,'boost::spirit::detail::fxn_ptr_table']]],
+  ['static_5fdelete',['static_delete',['../structboost_1_1spirit_1_1detail_1_1fxn__ptr__table.html#a1808888039d448b8f5500eef13103041',1,'boost::spirit::detail::fxn_ptr_table']]],
   ['strictroot_5f',['strictRoot_',['../classJson_1_1Features.html#a1162c37a1458adc32582b585b552f9c3',1,'Json::Features']]],
   ['suppliers',['suppliers',['../structcyclus_1_1TradeExecutionContext.html#a8724fdcc24efe14ee3947a1622925c9c',1,'cyclus::TradeExecutionContext']]],
   ['swu_5fper_5ffeed',['swu_per_feed',['../classpyne_1_1enrichment_1_1Cascade.html#a241ee887e3dd9483e5fb18084cb40951',1,'pyne::enrichment::Cascade']]],

@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['material',['Material',['../classpyne_1_1Material.html',1,'pyne']]],
   ['material',['Material',['../classcyclus_1_1Material.html',1,'cyclus']]],
+  ['material',['Material',['../classpyne_1_1Material.html',1,'pyne']]],
   ['material_5fdata',['material_data',['../structpyne_1_1material__data.html',1,'pyne']]],
   ['materialprotocolerror',['MaterialProtocolError',['../classpyne_1_1MaterialProtocolError.html',1,'pyne']]],
   ['matlbuypolicy',['MatlBuyPolicy',['../classcyclus_1_1toolkit_1_1MatlBuyPolicy.html',1,'cyclus::toolkit']]],
