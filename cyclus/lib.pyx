@@ -34,17 +34,19 @@ np.import_ufunc()
 
 cdef class _Datum:
 
-    def __cinit__(self, bint _new=True, bint _free=False):
+    def __cinit__(self):
         """Constructor for Datum type conversion."""
-        self._free = _free
+        self._free = False
         self.ptx = NULL
-        #if _new:
-        #    self.ptx = new Datum()
 
-    #def __dealloc__(self):
-    #    """Datum destructor."""
-    #    if self._free:
-    #        free(self.ptx)
+    def __dealloc__(self):
+        """Datum destructor."""
+        if self.ptx == NULL:
+            return
+        cdef cpp_cyclus.Datum* cpp_ptx
+        if self._free:
+            cpp_ptx = <cpp_cyclus.Datum*> self.ptx
+            del cpp_ptx
 
     def add_val(self, const char* field, value, shape=None, dbtype=cpp_typesystem.BLOB):
         """Adds Datum value to current record as the corresponding cyclus data type.
@@ -101,8 +103,9 @@ cdef class _FullBackend:
 
     def __dealloc__(self):
         """Full backend C++ destructor."""
-        #del self.ptx  # don't know why this doesn't work
-        free(self.ptx)
+        # Note that we have to do it this way since self.ptx is void*
+        cdef cpp_cyclus.FullBackend * cpp_ptx = <cpp_cyclus.FullBackend *> self.ptx
+        del cpp_ptx
 
     def query(self, table, conds=None):
         """Queries a database table.
@@ -198,6 +201,12 @@ cdef class _SqliteBack(_FullBackend):
         cdef std_string cpp_path = str(path).encode()
         self.ptx = new cpp_cyclus.SqliteBack(cpp_path)
 
+    def __dealloc__(self):
+        """Full backend C++ destructor."""
+        # Note that we have to do it this way since self.ptx is void*
+        cdef cpp_cyclus.SqliteBack * cpp_ptx = <cpp_cyclus.SqliteBack *> self.ptx
+        del cpp_ptx
+
     def flush(self):
         """Flushes the database to disk."""
         (<cpp_cyclus.SqliteBack*> self.ptx).Flush()
@@ -225,6 +234,12 @@ cdef class _Hdf5Back(_FullBackend):
         """Hdf5 backend C++ constructor"""
         cdef std_string cpp_path = str(path).encode()
         self.ptx = new cpp_cyclus.Hdf5Back(cpp_path)
+
+    def __dealloc__(self):
+        """Full backend C++ destructor."""
+        # Note that we have to do it this way since self.ptx is void*
+        cdef cpp_cyclus.Hdf5Back * cpp_ptx = <cpp_cyclus.Hdf5Back *> self.ptx
+        del cpp_ptx
 
     def flush(self):
         """Flushes the database to disk."""
@@ -254,11 +269,12 @@ cdef class _Recorder:
 
     def __dealloc__(self):
         """Recorder C++ destructor."""
-        #del self.ptx  # don't know why this doesn't work
         if self.ptx == NULL:
             return
         self.close()
-        free(self.ptx)
+        # Note that we have to do it this way since self.ptx is void*
+        cdef cpp_cyclus.Recorder * cpp_ptx = <cpp_cyclus.Recorder *> self.ptx
+        del cpp_ptx
 
     property dump_count:
         """The frequency of recording."""
@@ -284,7 +300,7 @@ cdef class _Recorder:
     def new_datum(self, title):
         """Registers a backend with the recorder."""
         cdef std_string cpp_title = str_py_to_cpp(title)
-        cdef _Datum d = Datum(_new=False)
+        cdef _Datum d = Datum(new=False)
         (<_Datum> d).ptx = (<cpp_cyclus.Recorder*> self.ptx).NewDatum(cpp_title)
         return d
 

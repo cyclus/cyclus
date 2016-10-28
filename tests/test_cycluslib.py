@@ -13,7 +13,6 @@ from tools import libcyclus_setup, dbtest
 
 setup = libcyclus_setup
 
-"""
 @dbtest
 def test_name(db, fname, backend):
     obs = db.name
@@ -35,7 +34,6 @@ def test_conds_ae(db, fname, backend):
     assert_equal('Region', obs['Kind'][0])
     assert_equal(':agents:NullRegion', obs['Spec'][0])
 
-"""
 
 @dbtest
 def test_conds_comp(db, fname, backend):
@@ -44,6 +42,7 @@ def test_conds_comp(db, fname, backend):
     assert_less(0, len(df))
     for row in df['MassFrac']:
         assert_less(0.0072, row)
+
 
 if __name__ == "__main__":
     nose.runmodule()
