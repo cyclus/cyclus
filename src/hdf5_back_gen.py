@@ -461,11 +461,11 @@ def vl_string_setup(depth=0, prefix=""):
     node = Block(nodes=[Nothing()])
     return node
 
-template_args = {"MAP": ("KEY", "VALUE"),
-                 "VECTOR": ("ELEM",),
-                 "SET": ("ELEM",),
-                 "LIST": ("ELEM",),
-                 "PAIR": ("ITEM1", "ITEM2")}
+template_args = {"MAP": ("key", "value"),
+                 "VECTOR": ("elem",),
+                 "SET": ("elem",),
+                 "LIST": ("elem",),
+                 "PAIR": ("first", "second")}
 
 variable_length_types = ["MAP", "LIST", "SET", "VECTOR"]
 
@@ -1332,7 +1332,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
             child_var = get_variable("item_type", 
                                           prefix=template_args[container_type][0], 
                                           depth=depth+1)
-                                                 value=Raw(code=child_var))))
+                                                 
             item_var = child_var
         else:
             #This is a compound type.

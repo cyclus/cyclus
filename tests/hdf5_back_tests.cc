@@ -58,6 +58,7 @@ class Hdf5BackTests : public ::testing::Test {
     rec.NewDatum(title)
         ->AddVal("vals", x, shape_ptr)
         ->Record();
+    rec.Flush();
     rec.NewDatum(title)
         ->AddVal("vals", y, shape_ptr)
         ->Record();
