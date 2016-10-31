@@ -849,6 +849,7 @@ class StateAccumulator(object):
                     for j in range(0, len(temp)):
                         result.insert(i+j, temp[j])
         expected_shape_length = len(result)
+        #print(ann_dict['type'], "expected len: " + str(expected_shape_length), end=" ")
         #Shape wasn't given.
         if current_shape is None:
             new_shape = [-1] * expected_shape_length
@@ -865,6 +866,7 @@ class StateAccumulator(object):
                           + " Expected length {length} or less.")
             raise ValueError(err_string.format(t=str(type_canon), 
                                                length=str(expected_shape_length)))
+        #print("old: " + str(current_shape), "new: " + str(new_shape))
         return new_shape
     
     def canonize_class(self, cls, _usens=True):

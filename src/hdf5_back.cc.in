@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <string.h>
+#include <iostream>
 
 #include "blob.h"
 
@@ -349,6 +350,7 @@ void Hdf5Back::CreateTable(Datum* d) {
     dst_offset[i] = dst_size;
     field_names[i] = vals[i].first;
     const std::type_info& valtype = vals[i].second.type();
+    //std::cerr << "DEBUG: type: " << valtype.name() << std::endl;
 @HDF5_BACK_CC_CREATE@
     dst_size += dst_sizes[i];
   }
@@ -825,7 +827,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         case PAIR_INT_STRING: {
           pair<int, string> val = a->cast<pair<int, string> >();
           shape = shapes[col];
-          int strlen = shape[0];
+          int strlen = shape[2];
           fieldlen = sizeof(int) + strlen;
           memcpy(buf + offset, &(val.first), sizeof(int));
           valuelen = std::min(static_cast<int>(val.second.size()), strlen);
@@ -883,7 +885,8 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         case MAP_INT_STRING: {
           map<int, string> val = a->cast<map<int, string> >();
           shape = shapes[col];
-          int strlen = shape[1];
+          //adjusted for testing
+          int strlen = shape[2];
           fieldlen = sizeof(int) + strlen;
           unsigned int cnt = 0;
           map<int, string>::iterator valit = val.begin();
@@ -1153,7 +1156,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
           map<pair<int, string>, double> val = \
             a->cast<map<pair<int, string>, double> >();
           shape = shapes[col];
-          int strlen = shape[1];
+          int strlen = shape[3];
           fieldlen = sizeof(int) + strlen + sizeof(double);
           unsigned int cnt = 0;
           map<pair<int, string>, double>::iterator valit = val.begin();
@@ -1173,7 +1176,7 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
         }
         case VL_MAP_PAIR_INT_STRING_DOUBLE: {
           shape = shapes[col];
-          size_t strlen = shape[1];
+          size_t strlen = shape[3];
           map<pair<int, string>, double> givenval = \
             a->cast<map<pair<int, string>, double> >();
           map<pair<int, string>, double> val;

@@ -461,7 +461,7 @@ def vl_string_setup(depth=0, prefix=""):
     node = Block(nodes=[Nothing()])
     return node
 
-template_args = {"MAP": ("key", "value"),
+template_args = {"MAP": ("key", "val"),
                  "VECTOR": ("elem",),
                  "SET": ("elem",),
                  "LIST": ("elem",),
@@ -1145,10 +1145,16 @@ def get_vl_cond(t):
         #Find out if type could be VL
         else:
             orig_type = ORIGIN_DICT[sub_type]
-            if VARIATION_DICT[orig_type]:
-                vl_potential_count += 1
-                op_list.append(BinOp(x=Raw(code="shape["+str(index)+"]"),
-                                     op=">=", y=Raw(code="1"))) 
+            if is_primitive(CANON_TO_NODE[orig_type]):
+                if VARIATION_DICT[orig_type]:
+                    vl_potential_count += 1
+                    op_list.append(BinOp(x=Raw(code="shape["+str(index)+"]"),
+                                         op=">=", y=Raw(code="1"))) 
+            else:
+                if orig_type[0] in variable_length_types:
+                    vl_potential_count += 1
+                    op_list.append(BinOp(x=Raw(code="shape["+str(index)+"]"),
+                                         op=">=", y=Raw(code="1"))) 
     
     current_bool = op_list[0]
     for i in range(1,len(op_list)):
@@ -1172,18 +1178,25 @@ def VL_ADD_BLOCK(t, item_var):
                                         name=Raw(code="opened_types_.insert"),
                                         args=[Raw(code="vldts_["+t.db+"]")]))])
     return node
-    
+
+def print_statement(t, identifier):
+    msg_string = t.db + ": got here: " + str(identifier)
+    return ExprStmt(child=Raw(code="std::cerr<<\"" + msg_string + "\" << std::endl"))
+
 def get_vl_body(t, current_shape_index=0):
     body = Block(nodes=[])
     #cheating
     if t.db in RAW_TYPES:
         return RAW_TYPES[t.db]
     
-    body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
+    #body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
+    #body.nodes.append(print_statement(t, 0))
+    
     body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
     #do this for every variation.
     item_nodes, opened_types = get_item_type(t)
     body.nodes.append(item_nodes)
+    body.nodes.append(print_statement(t, 1))
     type_var = opened_types[-1] if opened_types != [] else get_variable(
                                                                   "item_type",
                                                                    prefix="",
@@ -1193,6 +1206,7 @@ def get_vl_body(t, current_shape_index=0):
     body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
                                                  op="=",
                                                  y=size_expression)))
+    body.nodes.append(print_statement(t, 2))
     if DB_TO_VL[t.db]:
         if is_primitive(t):
             default_item_var = type_var
@@ -1207,18 +1221,22 @@ def get_vl_body(t, current_shape_index=0):
                                                op="=",
                                                y=Raw(code="sha1_type_"))))
         body.nodes.append(VL_ADD_BLOCK(t, default_item_var))
+        body.nodes.append(print_statement(t, 5))
     else:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
                                                y=Raw(code=type_var))))
+        body.nodes.append(print_statement(t, 3))
         for opened in opened_types[:-1]:
             body.nodes.append(ExprStmt(child=FuncCall(
                                           name=Raw(code="opened_types_.insert"),
                                           args=[Raw(code=opened)])))
+            body.nodes.append(print_statement(t, 4))
         if not is_primitive(t):
             body.nodes.append(ExprStmt(child=FuncCall(
                                           name=Raw(code="opened_types_.insert"),
                                           args=[Raw(code="field_types[i]")])))
+            body.nodes.append(print_statement(t, 4))
     return body
 
 HDF5_PRIMITIVES = {"INT": "H5T_NATIVE_INT",
@@ -1557,6 +1575,8 @@ raw_blob = Raw(code="dbtypes[i]=BLOB;\n"
 RAW_TYPES = {"STRING": raw_string,
              "BLOB": raw_blob}
 
+DEBUG_TYPES = ["VECTOR_STRING"]
+
 def main_create():
     """Generate hdf5_back.cc HDF5 type creation code."""
     CPPGEN = CppGen()
@@ -1574,6 +1594,8 @@ def main_create():
                       for n in fixed_length_types}
     
     VARIATION_DICT[('BLOB')] = []
+    VARIATION_DICT['STRING'] = [CANON_TO_NODE['VL_STRING']]
+    #print(VARIATION_DICT)
         
     for i in VARIATION_DICT.keys():
         ORIGIN_DICT[i] = i
@@ -1586,7 +1608,7 @@ def main_create():
     outer_if_bodies = {n: Block(nodes=[]) for n in VARIATION_DICT.keys()}
     
     for n in VARIATION_DICT.keys():
-        variations = VARIATION_DICT[n]
+        variations = VARIATION_DICT[n][:]
         key_node = CANON_TO_NODE[n]
         try:
             initial_type = variations.pop()
@@ -1601,13 +1623,15 @@ def main_create():
             lone_node = get_vl_body(key_node)
             outer_if_bodies[n].nodes.append(lone_node)
 
+    shape_line = ExprStmt(child=Raw(code="shape=shapes[i]"))
+    
     initial_node, initial_body = outer_if_bodies.popitem()
     if_statement = If(cond=BinOp(x=Var(name="valtype"), op="==", 
                                  y=typeid(initial_node)),
-                      body=[initial_body],
+                      body=[shape_line, initial_body],
                       elifs=[(BinOp(x=Var(name="valtype"), op="==",
                                     y=typeid(t)), 
-                              [outer_if_bodies[t]])
+                              [shape_line, outer_if_bodies[t]])
                              for t in outer_if_bodies.keys()],
                       el=io_error)
     output += CPPGEN.visit(if_statement)
