@@ -24,6 +24,7 @@ RUN apt-get install -y --force-yes \
     python3 \
     python3-dev \
     python3-tables \
+    python3-pandas \
     python3-numpy \
     python3-nose \
     python3-jinja2 \
