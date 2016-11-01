@@ -64,6 +64,8 @@ def run_setup(ver):
         scripts=scripts,
         zip_safe=False,
         )
+    if sys.version_info[0] < 3:
+        skw['packages'] = [x.encode() for x in skw['packages']]
     setup(**skw)
 
 
