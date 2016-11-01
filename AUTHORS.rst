@@ -8,6 +8,7 @@ order):
 * Royal Elmore
 * Robert Flanagan
 * Matthew Gidden
+* Ryan Hodge
 * Katy Huff
 * Meghan McGarry
 * Baptiste Mouginot
