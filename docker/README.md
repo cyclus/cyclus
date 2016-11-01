@@ -9,7 +9,7 @@ Each subdirectory contains a dockerfile that does something useful:
   ```
   cd cyclus-deps
   docker build -t cyclus/cyclus-deps:X.X .
-  docker tag cyclus/cyclus-deps:X.X cyclus/cyclus:latest
+  docker tag cyclus/cyclus-deps:X.X cyclus/cyclus-deps:latest
   docker push cyclus/cyclus-deps
   ```
 
