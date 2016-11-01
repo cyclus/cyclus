@@ -22,9 +22,13 @@ RUN apt-get install -y --force-yes \
     libgoogle-perftools-dev \
     git \
     python3 \
+    python3-dev \
     python3-tables \
+    python3-pandas \
     python3-numpy \
-    python3-nose
+    python3-nose \
+    python3-jinja2 \
+    cython3
 
 RUN rm /usr/bin/python
 RUN ln -s /usr/bin/python3 /usr/bin/python
