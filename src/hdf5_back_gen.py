@@ -1459,6 +1459,7 @@ def get_item_size(t, shape_array=None, vl_flag=False, depth=0):
                     children.append(get_item_size(
                                            CANON_TO_NODE[t.canon[child_index]],
                                            child_array,
+                                           vl_flag=vl_flag,
                                            depth=depth+1))
                 size += "+".join(children)
             else:
@@ -1466,7 +1467,7 @@ def get_item_size(t, shape_array=None, vl_flag=False, depth=0):
                 if not isinstance(child_array, list):
                     child_array = [child_array]
                 size += get_item_size(CANON_TO_NODE[t.canon[1]], child_array,
-                                      depth=depth+1)
+                                      vl_flag=vl_flag, depth=depth+1)
             size += ")"
             if t.canon[0] in variable_length_types:
                 size += "*" + "shape[" + str(shape_array[0]) + "]"
