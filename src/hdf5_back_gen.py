@@ -1202,7 +1202,8 @@ def get_vl_body(t, current_shape_index=0):
                                                                    prefix="",
                                                                    depth=0)
      
-    size_expression = Raw(code=get_item_size(t))
+    is_vl = True if DB_TO_VL[t.db] else False
+    size_expression = Raw(code=get_item_size(t, vl_flag=is_vl))
     body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
                                                  op="=",
                                                  y=size_expression)))
@@ -1260,7 +1261,7 @@ VL_TO_FL_CONTAINERS = {"VL_VECTOR": "VECTOR",
                        "VL_LIST": "LIST",
                        "VL_MAP": "MAP"}
 
-def get_item_type(t, shape_array=None, prefix="", depth=0):
+def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
     """Build specified HDF5 type, recursively if necessary.
     
     HDF5 types are Primitive, Compound, or Array. We handle each of these cases
@@ -1306,12 +1307,12 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                           name=Var(name=type_var))))
     #Handle primitives
     if isinstance(t.canon, str):
-        if DB_TO_VL[t.db]:
+        if DB_TO_VL[t.db] or (t.canon == "STRING" and vl_flag):
             node.nodes.append(ExprStmt(child=Assign(
                                                  target=Var(name=type_var),
                                                  value=Raw(code="sha1_type_"))))
             return node, opened_stack
-        else:
+        else:   
             primitive_type = Raw(code=HDF5_PRIMITIVES[t.db].format(size="shape["
                                                               +str(dim_shape[0])
                                                               +"]"))
@@ -1322,8 +1323,10 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
     else:
         container_type = t.canon[0]
         canon_shape = list(zip(t.canon, dim_shape))
+        is_vl = False
         if DB_TO_VL[t.db]:
             container_type = VL_TO_FL_CONTAINERS[t.canon[0]]
+            is_vl = True
         else:
             if t.canon[0] in variable_length_types:
                 shape_var = get_variable("shape0", prefix="", depth=depth+1)
@@ -1342,6 +1345,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                       else [item_shape])
             child_node, child_opened = get_item_type(CANON_TO_NODE[item_canon],
                                             shape_array=child_array,
+                                            vl_flag=is_vl,
                                             prefix=
                                                template_args[container_type][0],
                                             depth=depth+1)
@@ -1364,6 +1368,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                                           else [item_shape])
                 child_node, child_opened = get_item_type(item_node,
                                                 shape_array=child_array,
+                                                vl_flag=is_vl,
                                                 prefix=template_args[container_type][i-1],
                                                 depth=depth+1)
                 node.nodes.append(child_node)
@@ -1382,7 +1387,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
                     child_item_var = opened_stack[pre_opened_len]
                 #2. Get item sizes.
                 child_dict[child_item_var] = get_item_size(item_node, child_array,
-                                                     depth=depth+1)
+                                                           vl_flag=True, depth=depth+1)
             #3. Create compound type using total item size.
             compound = H5Tcreate_compound(list(child_dict.values()))
             
@@ -1408,7 +1413,7 @@ def get_item_type(t, shape_array=None, prefix="", depth=0):
             node.nodes.append(array_node)
     return node, opened_stack
 
-def get_item_size(t, shape_array=None, depth=0):
+def get_item_size(t, shape_array=None, vl_flag=False, depth=0):
     """Resolves item size recursively.
     
     We can dig down into a type until we reach eventual primitives, and then
@@ -1435,7 +1440,10 @@ def get_item_size(t, shape_array=None, depth=0):
         if t.db in PRIMITIVE_SIZES.keys():
             return PRIMITIVE_SIZES[t.db]
         else:
-            return "shape[" + str(shape_array[0]) + "]"
+            if not vl_flag:
+                return "shape[" + str(shape_array[0]) + "]"
+            else:
+                return "CYCLUS_SHA1_SIZE"
     else:
         size = "("
         if DB_TO_VL[t.db]:
