@@ -1323,7 +1323,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
     else:
         container_type = t.canon[0]
         canon_shape = list(zip(t.canon, dim_shape))
-        is_vl = False
+        is_vl = vl_flag
         if DB_TO_VL[t.db]:
             container_type = VL_TO_FL_CONTAINERS[t.canon[0]]
             is_vl = True
