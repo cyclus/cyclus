@@ -1387,7 +1387,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                     child_item_var = opened_stack[pre_opened_len]
                 #2. Get item sizes.
                 child_dict[child_item_var] = get_item_size(item_node, child_array,
-                                                           vl_flag=True, depth=depth+1)
+                                                           vl_flag=is_vl, depth=depth+1)
             #3. Create compound type using total item size.
             compound = H5Tcreate_compound(list(child_dict.values()))
             
