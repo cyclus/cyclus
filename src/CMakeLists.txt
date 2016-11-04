@@ -47,19 +47,15 @@ CONFIGURE_FILE(
 ######### build libcyclus #######################################
 #################################################################
 
-INCLUDE_DIRECTORIES(
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    )
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 
-SET(
-    CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
+SET(CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}"
     PARENT_SCOPE
     )
 
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
-SET(
-    CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
+SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
     ${cc_files}
     "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
     )
@@ -72,15 +68,9 @@ file(WRITE "${CMAKE_BINARY_DIR}/includes.txt" "${incdirs}")
 
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB hpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-SET(
-    h_files ${h_files} ${hpp_files}
-    )
+SET(h_files ${h_files} ${hpp_files})
 
-INSTALL(
-    FILES ${h_files}
-    DESTINATION include/cyclus
-    COMPONENT core
-    )
+INSTALL(FILES ${h_files} DESTINATION include/cyclus COMPONENT core)
 
 ADD_SUBDIRECTORY(toolkit)
 
