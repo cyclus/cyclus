@@ -834,7 +834,6 @@ class StateAccumulator(object):
             ann_dict['shape'] = None
             current_shape = ann_dict['shape']
         new_shape = []
-        
         #flatten list dimensions
         if isinstance(type_canon, str):
             result = [type_canon]
@@ -845,8 +844,9 @@ class StateAccumulator(object):
                 if isinstance(result[i], str):
                     i += 1
                 else:
-                    temp = result[i]
-                    for j in range(0, len(temp)):
+                    temp = result[i][1:]
+                    i += 1
+                    for j in range(len(temp)):
                         result.insert(i+j, temp[j])
         expected_shape_length = len(result)
         #print(ann_dict['type'], "expected len: " + str(expected_shape_length), end=" ")

@@ -15,6 +15,9 @@ from nose.tools import assert_true, assert_equal
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 
+import pyximport
+pyximport.install()
+
 from cyclus import lib as libcyclus
 
 if sys.version_info[0] >= 3:
