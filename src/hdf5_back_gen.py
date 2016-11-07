@@ -1421,7 +1421,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                                            vl_flag=is_vl, 
                                                            depth=depth+1)
             # 3. Create compound type using total item size.
-            compound = H5Tcreate_compound(list(child_dict.values()))
+            compound = hdf5_create_compound(list(child_dict.values()))
             
             item_var = get_variable("item_type", prefix="", depth=depth+1)
             node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"),
@@ -1432,11 +1432,11 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
             
             opened_stack.append(item_var)
             # 4. Insert individual children into the compound type.            
-            node.nodes.append(H5Tinsert(container_type, item_var, child_dict))
+            node.nodes.append(hdf5_insert(container_type, item_var, child_dict))
             
         if container_type in variable_length_types and not DB_TO_VL[t.db]:
             array_node = ExprStmt(child=Assign(target=Var(name=type_var),
-                                               value=H5Tarray_create2(
+                                               value=hdf5_array_create(
                                                            item_var,
                                                            rank=1,
                                                            dims="&"+shape_var)))
@@ -1506,7 +1506,7 @@ def get_item_size(t, shape_array=None, vl_flag=False, depth=0):
         size += ")"
         return size    
 
-def H5Tarray_create2(item_variable, rank=1, dims="&shape0"):
+def hdf5_array_create(item_variable, rank=1, dims="&shape0"):
     """Node representation of the C++ H5Tarray_create2 method.
     
     Parameters
@@ -1528,7 +1528,7 @@ def H5Tarray_create2(item_variable, rank=1, dims="&shape0"):
                           Raw(code=dims)])
     return node
 
-def H5Tcreate_compound(sizes):
+def hdf5_create_compound(sizes):
     """Node representation of the C++ HDF5 compound type creation function.
     
     Parameters
@@ -1545,7 +1545,7 @@ def H5Tcreate_compound(sizes):
                                             Raw(code="+".join(sizes))])
     return node
     
-def H5Tinsert(container_type, compound_var, types_sizes_dict):
+def hdf5_insert(container_type, compound_var, types_sizes_dict):
     """Node representation of the C++ H5Tinsert function.
     
     This function is used to identify partitions within an already established
