@@ -1187,14 +1187,10 @@ def get_vl_body(t, current_shape_index=0):
     if t.db in RAW_TYPES:
         return RAW_TYPES[t.db]
     
-    # body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
-    # body.nodes.append(print_statement(t, 0))
-    
     body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
     # do this for every variation.
     item_nodes, opened_types = get_item_type(t)
     body.nodes.append(item_nodes)
-    body.nodes.append(print_statement(t, 1))
     type_var = opened_types[-1] if opened_types != [] else get_variable(
                                                                   "item_type",
                                                                    prefix="",
@@ -1205,7 +1201,6 @@ def get_vl_body(t, current_shape_index=0):
     body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
                                                  op="=",
                                                  y=size_expression)))
-    body.nodes.append(print_statement(t, 2))
     if DB_TO_VL[t.db]:
         if is_primitive(t):
             default_item_var = type_var
@@ -1220,22 +1215,18 @@ def get_vl_body(t, current_shape_index=0):
                                                op="=",
                                                y=Raw(code="sha1_type_"))))
         body.nodes.append(VL_ADD_BLOCK(t, default_item_var))
-        body.nodes.append(print_statement(t, 5))
     else:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
                                                y=Raw(code=type_var))))
-        body.nodes.append(print_statement(t, 3))
         for opened in opened_types[:-1]:
             body.nodes.append(ExprStmt(child=FuncCall(
                                           name=Raw(code="opened_types_.insert"),
                                           args=[Raw(code=opened)])))
-            body.nodes.append(print_statement(t, 4))
         if not is_primitive(t):
             body.nodes.append(ExprStmt(child=FuncCall(
                                           name=Raw(code="opened_types_.insert"),
                                           args=[Raw(code="field_types[i]")])))
-            body.nodes.append(print_statement(t, 4))
     return body
 
 HDF5_PRIMITIVES = {"INT": "H5T_NATIVE_INT",

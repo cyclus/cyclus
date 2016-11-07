@@ -52,39 +52,29 @@ class Hdf5BackTests : public ::testing::Test {
   template <typename T>
   inline void ResultBasic(std::string title, const T& x, const T& y) {
     std::vector<int>* shape_ptr;
-    std::cout << "working on shape" << std::endl;
     if (shape.empty()) {
       shape_ptr = NULL;
-      std::cout << "made shape_ptr null." << std::endl;
     } else {
       shape_ptr = &shape;
-      std::cout << "made shape_ptr not null." << std::endl;
     }
     rec.NewDatum(title)
         ->AddVal("vals", x, shape_ptr)
         ->Record();
     rec.Flush();
-    std::cout << "First datum done." << std::endl;
     rec.NewDatum(title)
         ->AddVal("vals", y, shape_ptr)
         ->Record();
     rec.Flush();
-    std::cout << "Second datum done." << std::endl;
     qr = db->Query(title, NULL);
-    std::cout << "created db query." << std::endl;
   }
 
   template <typename T>
   inline void TestBasic(std::string title, const T& x, const T& y) {
     ResultBasic<T>(title, x, y);
-    std::cout << "done with ResultBasic" << std::endl;
     T obsx = qr.GetVal<T>("vals", 0);
-    std::cout << "Query first result." << std::endl;
     EXPECT_EQ(x, obsx);
     T obsy = qr.GetVal<T>("vals", 1);
-    std::cout << "Query second result." << std::endl;
     EXPECT_EQ(y, obsy);
-    std::cout << "Test done." << std::endl;
   }
 
   void TestBasicString(std::string title, std::string x, std::string y) {
@@ -255,13 +245,9 @@ TEST_F(Hdf5BackTests, ReadWriteVectorString) {
   shape[0] = 2;
   shape[1] = 6;
   string x_[] = {"wakka", "jawaka"};
-  std::cout << "established string array" << std::endl;
   vector<string> x = vector<string>(x_, x_+2);
-  std::cout << "established vector of strings" << std::endl;
   string y_[] = {"Frank", "Zappa"};
-  std::cout << "established string array" << std::endl;
   vector<string> y = vector<string>(y_, y_+2);
-  std::cout << "established vector of strings y" << std::endl;
   TestBasic<vector<string> >("vector_string", x, y);
 }
 
