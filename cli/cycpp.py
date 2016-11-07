@@ -492,7 +492,6 @@ class VarDeclarationFilter(Filter):
         annotations['type'] = state.canonize_type(vtype, vname,
                                                   statement=statement)
         annotations['index'] = len(state.context[classname]['vars'])
-        #added this
         annotations['shape'] = state.canonize_shape(annotations)
         state.context[classname]['vars'][vname] = annotations
         if 'alias' in annotations:
