@@ -350,7 +350,6 @@ void Hdf5Back::CreateTable(Datum* d) {
     dst_offset[i] = dst_size;
     field_names[i] = vals[i].first;
     const std::type_info& valtype = vals[i].second.type();
-    //std::cerr << "DEBUG: type: " << valtype.name() << std::endl;
 @HDF5_BACK_CC_CREATE@
     dst_size += dst_sizes[i];
   }
