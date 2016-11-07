@@ -834,7 +834,7 @@ class StateAccumulator(object):
             ann_dict['shape'] = None
             current_shape = ann_dict['shape']
         new_shape = []
-        #flatten list dimensions
+        # Flatten list dimensions
         if isinstance(type_canon, str):
             result = [type_canon]
         else:
@@ -849,24 +849,22 @@ class StateAccumulator(object):
                     for j in range(len(temp)):
                         result.insert(i+j, temp[j])
         expected_shape_length = len(result)
-        #print(ann_dict['type'], "expected len: " + str(expected_shape_length), end=" ")
-        #Shape wasn't given.
+        # Shape wasn't given.
         if current_shape is None:
             new_shape = [-1] * expected_shape_length
-        #Shape is correct as is.
+        # Shape is correct as is.
         elif len(current_shape) == expected_shape_length:
             new_shape = current_shape
-        #Shape is too short.
+        # Shape is too short.
         elif len(current_shape) < expected_shape_length:    
             diff = expected_shape_length - len(current_shape)
             new_shape = current_shape.extend([-1] * diff)
-        #Shape is too long- we throw an error.
+        # Shape is too long- we throw an error.
         elif len(current_shape) > expected_shape_length:
             err_string = ("Shape array for type {t} is not formatted correctly."
-                          + " Expected length {length} or less.")
+                          " Expected length {length} or less.")
             raise ValueError(err_string.format(t=str(type_canon), 
                                                length=str(expected_shape_length)))
-        #print("old: " + str(current_shape), "new: " + str(new_shape))
         return new_shape
     
     def canonize_class(self, cls, _usens=True):

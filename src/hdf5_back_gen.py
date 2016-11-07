@@ -1027,7 +1027,7 @@ def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
         raise ValueError("No generation specified for type " + t.db)
     return Block(nodes=block)
 
-#teardown functions
+# teardown functions
 
 TEARDOWN_STACK = []
 VARS = []
@@ -1121,8 +1121,6 @@ def flatten(canon):
             i += 1
             for j in range(0, len(temp)):
                 result.insert(i+j, temp[j])
-    if isinstance(canon, str):
-        print(result)
     return tuple(result)  
 
 def get_vl_cond(t):
@@ -1136,13 +1134,13 @@ def get_vl_cond(t):
     
     for sub_type, index in flat_shape:
         node = CANON_TO_NODE[sub_type]
-        #This type is VL
+        # This type is VL
         if DB_TO_VL[node.db]:
             vl_count += 1
             vl_potential_count += 1
             op_list.append(BinOp(x=Raw(code="shape["+str(index)+"]"), 
                                  op="<", y=Raw(code="1")))
-        #Find out if type could be VL
+        # Find out if type could be VL
         else:
             orig_type = ORIGIN_DICT[sub_type]
             if is_primitive(CANON_TO_NODE[orig_type]):
@@ -1185,15 +1183,15 @@ def print_statement(t, identifier):
 
 def get_vl_body(t, current_shape_index=0):
     body = Block(nodes=[])
-    #cheating
+    # cheating
     if t.db in RAW_TYPES:
         return RAW_TYPES[t.db]
     
-    #body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
-    #body.nodes.append(print_statement(t, 0))
+    # body.nodes.append(ExprStmt(child=Raw(code="shape=shapes[i]")))
+    # body.nodes.append(print_statement(t, 0))
     
     body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
-    #do this for every variation.
+    # do this for every variation.
     item_nodes, opened_types = get_item_type(t)
     body.nodes.append(item_nodes)
     body.nodes.append(print_statement(t, 1))
@@ -1241,12 +1239,12 @@ def get_vl_body(t, current_shape_index=0):
     return body
 
 HDF5_PRIMITIVES = {"INT": "H5T_NATIVE_INT",
-              "DOUBLE": "H5T_NATIVE_DOUBLE",
-              "FLOAT": "H5T_NATIVE_FLOAT",
-              "BOOL": "H5T_NATIVE_CHAR",
-              "STRING": "CreateFLStrType({size})",
-              "BLOB": "sha1_type_",
-              "UUID": "uuid_type_"}
+                   "DOUBLE": "H5T_NATIVE_DOUBLE",
+                   "FLOAT": "H5T_NATIVE_FLOAT",
+                   "BOOL": "H5T_NATIVE_CHAR",
+                   "STRING": "CreateFLStrType({size})",
+                   "BLOB": "sha1_type_",
+                   "UUID": "uuid_type_"}
 
 PRIMITIVE_SIZES = {"INT": "sizeof(int)",
                    "DOUBLE": "sizeof(double)",
@@ -1295,7 +1293,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
         closed
     
     """
-    #We need to keep a persistant shape array, unless initial call.
+    # We need to keep a persistant shape array, unless initial call.
     if shape_array == None:
         shape_len, dim_shape = get_dim_shape(t.canon)
     else:
@@ -1305,7 +1303,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
     type_var = get_variable("item_type", prefix=prefix, depth=depth)
     node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
                                           name=Var(name=type_var))))
-    #Handle primitives
+    # Handle primitives
     if isinstance(t.canon, str):
         if DB_TO_VL[t.db] or (t.canon == "STRING" and vl_flag):
             node.nodes.append(ExprStmt(child=Assign(
@@ -1319,7 +1317,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
             node.nodes.append(ExprStmt(child=Assign(target=Var(name=type_var),
                                                     value=primitive_type)))
             return node, opened_stack
-    #Handle dependent types
+    # Handle dependent types
     else:
         container_type = t.canon[0]
         canon_shape = list(zip(t.canon, dim_shape))
@@ -1338,9 +1336,9 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                                    +str(dim_shape[0])+"]"))))
         item_var = ""
         if len(canon_shape[1:]) == 1:
-            #Not a compound type.
+            # Not a compound type.
             item_canon, item_shape = canon_shape[1]
-            #Get nodes initializing our child type
+            # Get nodes initializing our child type
             child_array = (item_shape if isinstance(item_shape, list) 
                                       else [item_shape])
             child_node, child_opened = get_item_type(CANON_TO_NODE[item_canon],
@@ -1357,9 +1355,9 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                                  
             item_var = child_var
         else:
-            #This is a compound type.
+            # This is a compound type.
             child_dict = OrderedDict()
-            #1. Get all child item type nodes, recursively.
+            # 1. Get all child item type nodes, recursively.
             for i in range(1, len(canon_shape)):
                 item_canon, item_shape = canon_shape[i]
                 item_node = CANON_TO_NODE[item_canon]
@@ -1374,21 +1372,21 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                 node.nodes.append(child_node)
                 opened_stack.extend(child_opened)
                
-                #if the previous opened stack and current stack are the same,
-                #we know that the child is a primitive, and we can generate
-                #its variable accordingly.
+                # if the previous opened stack and current stack are the same,
+                # we know that the child is a primitive, and we can generate
+                # its variable accordingly.
                 if  len(opened_stack) == pre_opened_len:
                     child_item_var = get_variable("item_type", 
                                         prefix=template_args[container_type][i-1],
                                         depth=depth+1)
-                #However, if the current opened stack is longer, the first new
-                #variable there will be our child variable.
+                # However, if the current opened stack is longer, the first new
+                # variable there will be our child variable.
                 else:
                     child_item_var = opened_stack[pre_opened_len]
-                #2. Get item sizes.
+                # 2. Get item sizes.
                 child_dict[child_item_var] = get_item_size(item_node, child_array,
                                                            vl_flag=is_vl, depth=depth+1)
-            #3. Create compound type using total item size.
+            # 3. Create compound type using total item size.
             compound = H5Tcreate_compound(list(child_dict.values()))
             
             item_var = get_variable("item_type", prefix="", depth=depth+1)
@@ -1399,7 +1397,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                                     value=compound)))
             
             opened_stack.append(item_var)
-            #4. Insert individual children into the compound type.            
+            # 4. Insert individual children into the compound type.            
             node.nodes.append(H5Tinsert(container_type, item_var, child_dict))
             
         if container_type in variable_length_types and not DB_TO_VL[t.db]:
@@ -1568,18 +1566,20 @@ NOT_VL = []
 VARIATION_DICT = {}
 ORIGIN_DICT = {}
 
-io_error = Raw(code="throw IOError(\"the type for column \'\"+std::string(field_names[i])+\"\' is not yet supported in HDF5.\");")
+io_error = Raw(code=("throw IOError(\"the type for column \'\"+"
+                     "std::string(field_names[i])+\"\' is not yet supported "
+                     "in HDF5.\");"))
 
-raw_string = Raw(code="dbtypes[i]=STRING;\n"
-                      +"field_types[i]=H5Tcopy(H5T_C_S1);\n"
-                      +"H5Tset_size(field_types[i], shape[0]);\n"
-                      +"H5Tset_strpad(field_types[i], H5T_STR_NULLPAD);\n"
-                      +"opened_types_.insert(field_types[i]);\n"
-                      +"dst_sizes[i]=sizeof(char)*shape[0];\n")
+raw_string = Raw(code=("dbtypes[i]=STRING;\n"
+                      "field_types[i]=H5Tcopy(H5T_C_S1);\n"
+                      "H5Tset_size(field_types[i], shape[0]);\n"
+                      "H5Tset_strpad(field_types[i], H5T_STR_NULLPAD);\n"
+                      "opened_types_.insert(field_types[i]);\n"
+                      "dst_sizes[i]=sizeof(char)*shape[0];\n"))
 
-raw_blob = Raw(code="dbtypes[i]=BLOB;\n"
-                    +"field_types[i]=sha1_type_;\n"
-                    +"dst_sizes[i]=CYCLUS_SHA1_SIZE;\n")
+raw_blob = Raw(code=("dbtypes[i]=BLOB;\n"
+                     "field_types[i]=sha1_type_;\n"
+                     "dst_sizes[i]=CYCLUS_SHA1_SIZE;\n"))
 
 RAW_TYPES = {"STRING": raw_string,
              "BLOB": raw_blob}
@@ -1594,17 +1594,19 @@ def main_create():
     global ORIGIN_DICT
     output = ""
     fixed_length_types = set(t for t in CANON_SET if no_vl(CANON_TO_NODE[t]))
-        
-    VARIATION_DICT = {n: [CANON_TO_NODE[x] for x in CANON_SET 
-                                                  if (CANON_TO_NODE[x].cpp 
-                                                      == CANON_TO_NODE[n].cpp)
-                                                  and (CANON_TO_NODE[x].db 
-                                                       != CANON_TO_NODE[n].db)]
-                      for n in fixed_length_types}
+    
+    VARIATION_DICT = {}
+    for n in fixed_length_types:
+        key = CANON_TO_NODE[n]
+        vals = []
+        for x in CANON_SET:
+            val_node = CANON_TO_NODE[x]
+            if val_node.cpp == key.cpp and val_node.db != key.db: 
+                vals.append(val_node)
+        VARIATION_DICT[n] = vals
     
     VARIATION_DICT[('BLOB')] = []
     VARIATION_DICT['STRING'] = [CANON_TO_NODE['VL_STRING']]
-    #print(VARIATION_DICT)
         
     for i in VARIATION_DICT.keys():
         ORIGIN_DICT[i] = i
