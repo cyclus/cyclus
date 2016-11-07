@@ -443,12 +443,12 @@ def case_template(t, read_x):
     return node
 
 def primitive_setup(t, depth=0, prefix=""):
-    """Represents necessary setup steps for C++ primitives."""
+    """HDF5 Query: Represents necessary setup steps for C++ primitives."""
     node = Nothing()
     return node
 
 def string_setup(depth=0, prefix=""): 
-    """Represents necessary setup steps for C++ String."""
+    """HDF5 Query: Represents necessary setup steps for C++ String."""
     nullpos = "nullpos" + str(depth) + prefix
     
     node = Block(nodes=[
@@ -456,7 +456,7 @@ def string_setup(depth=0, prefix=""):
     return node
 
 def vl_string_setup(depth=0, prefix=""):
-    """Represents necessary setup steps for C++ VL_String."""
+    """HDF5 Query: Represents necessary setup steps for C++ VL_String."""
     
     node = Block(nodes=[Nothing()])
     return node
@@ -470,7 +470,7 @@ template_args = {"MAP": ("key", "val"),
 variable_length_types = ["MAP", "LIST", "SET", "VECTOR"]
 
 def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
-    """Get nodes representing C++ setup. 
+    """HDF5 Query: Get nodes representing C++ setup. 
     
     Primitive setups are called directly, while template types are handled
     recursively.
@@ -550,7 +550,8 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                            args=[Raw(code=HDF5_type),
                                                  Raw(code="&"+fieldlen_var)]))])
             setup_nodes.append(fieldlen)
-            item_type_var = get_variable("item_type", depth=depth, prefix=prefix)
+            item_type_var = get_variable("item_type", depth=depth, 
+                                         prefix=prefix)
             item_type = ExprStmt(child=DeclAssign(
                                         type=Type(cpp="hid_t"),
                                         target=Var(name=item_type_var),
@@ -597,7 +598,7 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
     return node
 
 def get_decl(t, depth=0, prefix=""):
-    """Get node representing C++ type declaration. 
+    """HDF5 Query: Get node representing C++ type declaration. 
     
     Declarations occur directly before bodies, created without recursion.
     
@@ -620,7 +621,7 @@ def get_decl(t, depth=0, prefix=""):
     return node
 
 def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents a body using the reinterpret_cast method.
+    """HDF5 Query: Represents a body using the reinterpret_cast method.
     
     This includes int, double, float, etc.
     """
@@ -633,7 +634,7 @@ def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return tree
 
 def string_body(t, depth=0, prefix="", base_offset="buf+offset", variable=None):
-    """Represents body for the C++ String primitive."""
+    """HDF5 Query: Represents body for the C++ String primitive."""
     if variable == None:
         variable = get_variable("x", depth=depth, prefix=prefix)
     
@@ -661,7 +662,7 @@ def string_body(t, depth=0, prefix="", base_offset="buf+offset", variable=None):
 
 def vl_string_body(t, depth=0, prefix="", base_offset="buf+offset", 
                    variable=None):
-    """Represents the body for the VL_String primitive."""
+    """HDF5 Query: Represents the body for the VL_String primitive."""
     
     if variable == None:
         variable = get_variable("x", depth=depth, prefix=prefix)
@@ -674,7 +675,7 @@ def vl_string_body(t, depth=0, prefix="", base_offset="buf+offset",
     return tree
 
 def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for the boost::uuid primitive."""
+    """HDF5 Query: Represents the body for the boost::uuid primitive."""
     x = get_variable("x", depth=depth, prefix=prefix)
     total_size = get_variable("total_size", depth=depth, prefix=prefix)
     
@@ -686,7 +687,7 @@ def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return tree
 
 def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for all C++ VL types."""
+    """HDF5 Query: Represents the body for all C++ VL types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     node = Block(nodes=[ExprStmt(child=Assign(target=Var(name=x),
                             value=FuncCall(name=Var(name="VLRead"),
@@ -696,7 +697,7 @@ def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for C++ map type."""
+    """HDF5 Query: Represents the body for C++ map type."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -733,7 +734,7 @@ def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def pair_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body for C++ pair type."""
+    """HDF5 Query: Represents body for C++ pair type."""
     x = get_variable("x", depth=depth, prefix=prefix)
     
     item1 = CANON_TO_NODE[t.canon[1]]
@@ -761,7 +762,7 @@ def pair_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<primitive> types."""
+    """HDF5 Query: Represents body of C++ Vector<primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -780,7 +781,7 @@ def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<non-primitive> types."""
+    """HDF5 Query: Represents body of C++ Vector<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -811,7 +812,7 @@ def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<std::string> types."""
+    """HDF5 Query: Represents body of C++ Vector<std::string> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     index = x + "[" + k + "]"
@@ -838,7 +839,7 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def set_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<primitive> types."""
+    """HDF5 Query: Represents body of C++ set<primitive> types."""
     
     x = get_variable("x", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -864,7 +865,7 @@ def set_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<non-primitive> types."""
+    """HDF5 Query: Represents body of C++ set<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     
@@ -891,14 +892,15 @@ def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<std::string> types."""
+    """HDF5 Query: Represents body of C++ set<std::string> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix) 
     
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     
     string_prefix = get_prefix(prefix, t, 0)
-    string_size = get_variable("total_size", depth=depth+1, prefix=string_prefix)
+    string_size = get_variable("total_size", depth=depth+1, 
+                               prefix=string_prefix)
     string_name = get_variable("x", depth=depth+1, prefix=string_prefix)
     
     offset = base_offset + "+" + string_size + "*" + k
@@ -917,7 +919,7 @@ def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def list_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ list<primitive> types."""
+    """HDF5 Query: Represents body of C++ list<primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     child_prefix = get_prefix(prefix, t, 0)
@@ -942,7 +944,7 @@ def list_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def list_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ list<non-primitive> types."""
+    """HDF5 Query: Represents body of C++ list<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     child_prefix = get_prefix(prefix, t, 0)
@@ -989,7 +991,7 @@ BODIES = {"INT": reinterpret_cast_body,
           "VECTOR": vector_body}
 
 def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Get body nodes for a C++ type.
+    """HDF5 Query: Get body nodes for a C++ type.
     
     Parameters
     ----------
@@ -1123,7 +1125,27 @@ def flatten(canon):
                 result.insert(i+j, temp[j])
     return tuple(result)  
 
-def get_vl_cond(t):
+def get_variation_cond(t):
+    """HDF5 Create: Generate C++ if-statement condition for a given type.
+    
+    These if-statements are always a string of boolean expressions of the form
+    'shape[n]<1' or 'shape[n]>=1', where n is an index into the C++ shape array.
+    A shape index less than one (<1) denotes a variable length type, whereas an 
+    index greater than one (>=1) denotes fixed length type. These boolean
+    expressions are joined by '&&' operators. For instance, a type of 
+    VL_MAP_VL_STRING_VL_STRING would receive the condition 
+    'shape[0]<1 && shape[1]<1 && shape[2]<1'.
+    
+    Parameters
+    ----------
+    t : Type
+        C++ type for the boolean condition.
+        
+    Returns
+    -------
+    current_bool : BinOp
+        Node representing the boolean condition.
+    """
     vl_count = 0
     vl_potential_count = 0
     op_list = []
@@ -1153,7 +1175,6 @@ def get_vl_cond(t):
                     vl_potential_count += 1
                     op_list.append(BinOp(x=Raw(code="shape["+str(index)+"]"),
                                          op=">=", y=Raw(code="1"))) 
-    
     current_bool = op_list[0]
     for i in range(1,len(op_list)):
         current_bool = BinOp(x=current_bool, op="&&", y=op_list[i])
@@ -1169,26 +1190,45 @@ def VL_ADD_BLOCK(t, item_var):
                          op="==",
                          y=Raw(code="0")),
               body=[ExprStmt(child=BinOp(
-                                    x=Raw(code="vldts_["+t.db+"]"),
-                                    op="=",
-                                    y=Raw(code="H5Tvlen_create("+item_var+")"))),
+                                   x=Raw(code="vldts_["+t.db+"]"),
+                                   op="=",
+                                   y=Raw(code="H5Tvlen_create("+item_var+")"))),
                     ExprStmt(child=FuncCall(
                                         name=Raw(code="opened_types_.insert"),
                                         args=[Raw(code="vldts_["+t.db+"]")]))])
     return node
 
 def print_statement(t, identifier):
+    """Generate C++ print statement for debugging generated code."""
     msg_string = t.db + ": got here: " + str(identifier)
-    return ExprStmt(child=Raw(code="std::cerr<<\"" + msg_string + "\" << std::endl"))
+    return ExprStmt(child=Raw(code="std::cerr<<\"" + msg_string 
+                                   + "\" << std::endl"))
 
-def get_vl_body(t, current_shape_index=0):
+def get_variation_body(t):
+    """HDF5 Create: Generate C++ if-statement body for a given type.
+    
+    Called in coordination with get_variation_cond. For a given C++ type, this 
+    function returns the necessary C++ statements to create the HDF5 version 
+    of that type.
+    
+    Parameters
+    ----------
+    t : Type
+        C++ type for which to create an if-statement body.
+    
+    Returns
+    -------
+    body : Block
+        Node containing necessary C++ statements for HDF5 creation.
+    """
     body = Block(nodes=[])
-    # cheating
+    # This handles types with non-standard bodies that we wish to
+    # handle directly.
     if t.db in RAW_TYPES:
         return RAW_TYPES[t.db]
     
     body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
-    # do this for every variation.
+
     item_nodes, opened_types = get_item_type(t)
     body.nodes.append(item_nodes)
     type_var = opened_types[-1] if opened_types != [] else get_variable(
@@ -1206,8 +1246,9 @@ def get_vl_body(t, current_shape_index=0):
             default_item_var = type_var
         else:
             if opened_types == []:
+                item_prefix = template_args[VL_TO_FL_CONTAINERS[t.canon[0]]][0]
                 default_item_var = get_variable("item_type", 
-                                                prefix=template_args[VL_TO_FL_CONTAINERS[t.canon[0]]][0],
+                                                prefix=item_prefix,
                                                 depth=1)
             else:
                 default_item_var = get_variable("item_type", prefix="", depth=1)
@@ -1251,7 +1292,7 @@ VL_TO_FL_CONTAINERS = {"VL_VECTOR": "VECTOR",
                        "VL_MAP": "MAP"}
 
 def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
-    """Build specified HDF5 type, recursively if necessary.
+    """HDF5 Create: Build specified HDF5 type, recursively if necessary.
     
     HDF5 types are Primitive, Compound, or Array. We handle each of these cases
     here differently. Primitives are immediately returned by querying the 
@@ -1332,17 +1373,16 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
             # Get nodes initializing our child type
             child_array = (item_shape if isinstance(item_shape, list) 
                                       else [item_shape])
+            new_prefix = template_args[container_type][0]
             child_node, child_opened = get_item_type(CANON_TO_NODE[item_canon],
                                             shape_array=child_array,
                                             vl_flag=is_vl,
-                                            prefix=
-                                               template_args[container_type][0],
+                                            prefix=new_prefix,
                                             depth=depth+1)
             node.nodes.append(child_node)
             opened_stack.extend(child_opened)
-            child_var = get_variable("item_type", 
-                                          prefix=template_args[container_type][0], 
-                                          depth=depth+1)
+            child_var = get_variable("item_type", prefix=new_prefix, 
+                                     depth=depth+1)
                                                  
             item_var = child_var
         else:
@@ -1355,11 +1395,12 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                 pre_opened_len = len(opened_stack)
                 child_array = (item_shape if isinstance(item_shape, list)
                                           else [item_shape])
+                new_prefix = template_args[container_type][i-1]
                 child_node, child_opened = get_item_type(item_node,
-                                                shape_array=child_array,
-                                                vl_flag=is_vl,
-                                                prefix=template_args[container_type][i-1],
-                                                depth=depth+1)
+                                                        shape_array=child_array,
+                                                        vl_flag=is_vl,
+                                                        prefix=new_prefix,
+                                                        depth=depth+1)
                 node.nodes.append(child_node)
                 opened_stack.extend(child_opened)
                
@@ -1368,15 +1409,17 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                 # its variable accordingly.
                 if  len(opened_stack) == pre_opened_len:
                     child_item_var = get_variable("item_type", 
-                                        prefix=template_args[container_type][i-1],
-                                        depth=depth+1)
+                                                  prefix=new_prefix,
+                                                  depth=depth+1)
                 # However, if the current opened stack is longer, the first new
                 # variable there will be our child variable.
                 else:
                     child_item_var = opened_stack[pre_opened_len]
                 # 2. Get item sizes.
-                child_dict[child_item_var] = get_item_size(item_node, child_array,
-                                                           vl_flag=is_vl, depth=depth+1)
+                child_dict[child_item_var] = get_item_size(item_node, 
+                                                           child_array,
+                                                           vl_flag=is_vl, 
+                                                           depth=depth+1)
             # 3. Create compound type using total item size.
             compound = H5Tcreate_compound(list(child_dict.values()))
             
@@ -1540,7 +1583,7 @@ def H5Tinsert(container_type, compound_var, types_sizes_dict):
     return node
 
 def main_query():
-    """Generate hdf5_back.cc HDF5 type reading code."""
+    """HDF5 Query: Generate Query case statement code."""
     CPPGEN = CppGen()
     output = ""
     for type in CANON_SET:
@@ -1578,7 +1621,7 @@ RAW_TYPES = {"STRING": raw_string,
 DEBUG_TYPES = ["VECTOR_STRING"]
 
 def main_create():
-    """Generate hdf5_back.cc HDF5 type creation code."""
+    """HDF5 Create: Generate CreateTable if-statements."""
     CPPGEN = CppGen()
     global NOT_VL
     global VARIATION_DICT
@@ -1614,15 +1657,15 @@ def main_create():
         key_node = CANON_TO_NODE[n]
         try:
             initial_type = variations.pop()
-            sub_if = If(cond=get_vl_cond(initial_type),
-                        body=[get_vl_body(initial_type)],
-                        elifs=[(get_vl_cond(v), 
-                               [get_vl_body(v)]) 
+            sub_if = If(cond=get_variation_cond(initial_type),
+                        body=[get_variation_body(initial_type)],
+                        elifs=[(get_variation_cond(v), 
+                               [get_variation_body(v)]) 
                               for v in variations],
-                        el=Block(nodes=[get_vl_body(key_node)]))
+                        el=Block(nodes=[get_variation_body(key_node)]))
             outer_if_bodies[n].nodes.append(sub_if)
         except IndexError:
-            lone_node = get_vl_body(key_node)
+            lone_node = get_variation_body(key_node)
             outer_if_bodies[n].nodes.append(lone_node)
 
     shape_line = ExprStmt(child=Raw(code="shape=shapes[i]"))
