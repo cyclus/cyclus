@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 
 #include <gtest/gtest.h>
 
@@ -51,13 +52,15 @@ class Hdf5BackTests : public ::testing::Test {
   template <typename T>
   inline void ResultBasic(std::string title, const T& x, const T& y) {
     std::vector<int>* shape_ptr;
-    if (shape.empty())
+    if (shape.empty()) {
       shape_ptr = NULL;
-    else
+    } else {
       shape_ptr = &shape;
+    }
     rec.NewDatum(title)
         ->AddVal("vals", x, shape_ptr)
         ->Record();
+    rec.Flush();
     rec.NewDatum(title)
         ->AddVal("vals", y, shape_ptr)
         ->Record();
@@ -277,7 +280,10 @@ TEST_F(Hdf5BackTests, ReadWriteVLVectorString) {
 TEST_F(Hdf5BackTests, ReadWriteVLVectorVLString) {
   using std::string;
   using std::vector;
-  shape.clear();
+  //shape.clear();
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = -1;
   string x_[] = {"wakka", "jawaka", "Hot Rats"};
   vector<string> x = vector<string>(x_, x_+3);
   string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
@@ -353,7 +359,10 @@ TEST_F(Hdf5BackTests, ReadWriteVLSetVLString) {
   using std::string;
   using std::vector;
   using std::set;
-  shape.clear();
+  //shape.clear();
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = -1;
   string x_[] = {"wakka", "jawaka", "Hot Rats"};
   set<string> x = set<string>(x_, x_+3);
   string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
@@ -429,7 +438,10 @@ TEST_F(Hdf5BackTests, ReadWriteVLListVLString) {
   using std::string;
   using std::vector;
   using std::list;
-  shape.clear();
+  //shape.clear();
+  shape.resize(2);
+  shape[0] = -1;
+  shape[1] = -1;
   string x_[] = {"wakka", "jawaka", "Hot Rats"};
   list<string> x = list<string>(x_, x_+3);
   string y_[] = {"Frank", "Zappa", "It", "Just", "Might", "Be", "a", "One‐Shot", "Deal"};
@@ -449,7 +461,10 @@ TEST_F(Hdf5BackTests, ReadWritePairIntInt) {
 TEST_F(Hdf5BackTests, ReadWritePairIntString) {
   using std::string;
   using std::pair;
-  shape.clear();
+  shape.resize(3);
+  shape[0] = 3;
+  shape[1] = -1;
+  shape[2] = 3;
   pair<int, string> x = pair<int, string>(6, "yo");
   pair<int, string> y = pair<int, string>(42, "mom");
   TestBasic<pair<int, string> >("pair_int_string", x, y);
@@ -525,9 +540,10 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapIntDouble) {
 TEST_F(Hdf5BackTests, ReadWriteMapIntString) {
   using std::map;
   using std::string;
-  shape.resize(2);
+  shape.resize(3);
   shape[0] = 3;
-  shape[1] = 4;
+  shape[1] = -1;
+  shape[2] = 4;
   map<int, string> x;
   x[6] = "jazz";
   x[28] = "from";
@@ -542,9 +558,10 @@ TEST_F(Hdf5BackTests, ReadWriteMapIntString) {
 TEST_F(Hdf5BackTests, ReadWriteVLMapIntString) {
   using std::map;
   using std::string;
-  shape.resize(2);
+  shape.resize(3);
   shape[0] = -1;
-  shape[1] = 4;
+  shape[1] = -1;
+  shape[2] = 4;
   map<int, string> x;
   x[6] = "abso";
   x[28] = "lute";
@@ -559,9 +576,10 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapIntString) {
 TEST_F(Hdf5BackTests, ReadWriteMapIntVLString) {
   using std::map;
   using std::string;
-  shape.resize(2);
+  shape.resize(3);
   shape[0] = 3;
   shape[1] = -1;
+  shape[2] = -1;
   map<int, string> x;
   x[6] = "you";
   x[28] = "are";
@@ -576,7 +594,11 @@ TEST_F(Hdf5BackTests, ReadWriteMapIntVLString) {
 TEST_F(Hdf5BackTests, ReadWriteVLMapIntVLString) {
   using std::map;
   using std::string;
-  shape.clear();
+  //shape.clear();
+  shape.resize(3);
+  shape[0] = -1;
+  shape[1] = -1;
+  shape[2] = -1;
   map<int, string> x;
   x[6] = "I am lonesome";
   x[28] = "Cowboy Burt";
@@ -640,7 +662,11 @@ TEST_F(Hdf5BackTests, ReadWriteMapVLStringInt) {
 TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringInt) {
   using std::map;
   using std::string;
-  shape.clear();
+  //shape.clear();
+  shape.resize(3);
+  shape[0] = -1;
+  shape[1] = -1;
+  shape[2] = -1;
   map<string, int> x;
   x["I am lonesome"] = 6;
   x["Cowboy Burt"] = 28;
@@ -703,7 +729,11 @@ TEST_F(Hdf5BackTests, ReadWriteMapVLStringDouble) {
 TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringDouble) {
   using std::map;
   using std::string;
-  shape.clear();
+  //shape.clear();
+  shape.resize(3);
+  shape[0] = -1;
+  shape[1] = -1;
+  shape[2] = -1;
   map<string, double> x;
   x["I am lonesome"] = 6.0;
   x["Cowboy Burt"] = 28.0;
@@ -839,7 +869,11 @@ TEST_F(Hdf5BackTests, ReadWriteMapVLStringVLString) {
 TEST_F(Hdf5BackTests, ReadWriteVLMapVLStringVLString) {
   using std::map;
   using std::string;
-  shape.clear();
+  //shape.clear();
+  shape.resize(3);
+  shape[0] = -1;
+  shape[1] = -1;
+  shape[2] = -1;
   map<string, string> x;
   x["Arf!"] = "I am lonesome";
   x["She said"] = "Cowboy Burt";
@@ -853,9 +887,12 @@ TEST_F(Hdf5BackTests, ReadWriteMapPairIntStringDouble) {
   using std::string;
   using std::pair;
   using std::make_pair;
-  shape.resize(2);
+  shape.resize(5);
   shape[0] = 3;
-  shape[1] = 4;
+  shape[1] = -1;
+  shape[2] = -1;
+  shape[3] = 4;
+  shape[4] = -1;
   map<pair<int, string>, double> x;
   x[make_pair(1, "jazz")] = 6.0;
   x[make_pair(2, "from")] = 28.0;
@@ -873,9 +910,12 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapPairIntStringDouble) {
   using std::string;
   using std::pair;
   using std::make_pair;
-  shape.resize(2);
+  shape.resize(5);
   shape[0] = -1;
-  shape[1] = 4;
+  shape[1] = -1;
+  shape[2] = -1;
+  shape[3] = 4;
+  shape[4] = -1;
   map<pair<int, string>, double> x;
   x[make_pair(11, "abso")] = 6.0;
   x[make_pair(17, "lute")] = 28.0;
@@ -892,9 +932,12 @@ TEST_F(Hdf5BackTests, ReadWriteMapPairIntVLStringDouble) {
   using std::string;
   using std::pair;
   using std::make_pair;
-  shape.resize(2);
+  shape.resize(5);
   shape[0] = 3;
   shape[1] = -1;
+  shape[2] = -1;
+  shape[3] = -1;
+  shape[4] = -1;
   map<pair<int, string>, double> x;
   x[make_pair(1, "you")] = 6.0;
   x[make_pair(2, "are")] = 28.0;
@@ -911,7 +954,13 @@ TEST_F(Hdf5BackTests, ReadWriteVLMapPairIntVLStringDouble) {
   using std::string;
   using std::pair;
   using std::make_pair;
-  shape.clear();
+  //shape.clear();
+  shape.resize(5);
+  shape[0] = -1;
+  shape[1] = -1;
+  shape[2] = -1;
+  shape[3] = -1;
+  shape[4] = -1;
   map<pair<int, string>, double> x;
   x[make_pair(24, "I am lonesome")] = 6.0;
   x[make_pair(12, "Cowboy Burt")] = 28.0;

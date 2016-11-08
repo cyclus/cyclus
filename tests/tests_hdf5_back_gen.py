@@ -9,7 +9,8 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
-    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block
+    RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, \
+    get_item_size
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -135,16 +136,43 @@ def test_cppgen_block():
     exp = """int x=5;
 int y=6;
 int z=x+y;\n"""
-    n = Block(nodes=[ExprStmt(child=DeclAssign(type=Type(cpp="int"), target=Var(name="x"), value=Raw(code="5"))),
-                     Block(nodes=[ExprStmt(child=DeclAssign(type=Type(cpp="int"), target=Var(name="y"), value=Raw(code="6"))),
-                                  ExprStmt(child=DeclAssign(type=Type(cpp="int"), target=Var(name="z"), 
-                                             value=BinOp(x=Var(name="x"), op="+", y=Var(name="y"))))])])
+    n = Block(nodes=[ExprStmt(child=DeclAssign(type=Type(cpp="int"), 
+                                               target=Var(name="x"), 
+                                               value=Raw(code="5"))),
+                     Block(nodes=[ExprStmt(child=DeclAssign(
+                                                       type=Type(cpp="int"), 
+                                                       target=Var(name="y"), 
+                                                       value=Raw(code="6"))),
+                                  ExprStmt(child=DeclAssign(
+                                                      type=Type(cpp="int"), 
+                                                      target=Var(name="z"), 
+                                                      value=BinOp(x=Var(name="x"),
+                                                                  op="+", 
+                                                                  y=Var(name="y"))))])])
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
     
 #test various node structures
     
-    
+def test_get_item_size():
+    exp1 = """((sizeof(int)+CYCLUS_SHA1_SIZE)*shape[0])"""
+    obs1 = get_item_size(Type(cpp="std::map<int,std::string>", 
+                              db="MAP_INT_VL_STRING", 
+                              canon=("MAP","INT","VL_STRING")),
+                         [0,1,2])
+    exp2 = """((sizeof(int)+shape[2]))"""
+    obs2 = get_item_size(Type(cpp="std::pair<int,std::string>", 
+                              db="PAIR_INT_STRING", 
+                              canon=("PAIR","INT","STRING")), 
+                         [0,1,2])
+    exp3 = """((sizeof(double))*shape[0])"""
+    obs3 = get_item_size(Type(cpp="std::vector<double>", 
+                              db="VECTOR_DOUBLE", 
+                              canon=("VECTOR","DOUBLE")), 
+                         [0,1])
+    assert_equal(exp1, obs1)
+    assert_equal(exp2, obs2)
+    assert_equal(exp3, obs3)
     
     
     
