@@ -47,6 +47,7 @@ cdef class _Datum:
         if self._free:
             cpp_ptx = <cpp_cyclus.Datum*> self.ptx
             del cpp_ptx
+            self.ptx = NULL
 
     def add_val(self, const char* field, value, shape=None, dbtype=cpp_typesystem.BLOB):
         """Adds Datum value to current record as the corresponding cyclus data type.
@@ -104,8 +105,11 @@ cdef class _FullBackend:
     def __dealloc__(self):
         """Full backend C++ destructor."""
         # Note that we have to do it this way since self.ptx is void*
+        if self.ptx == NULL:
+            return
         cdef cpp_cyclus.FullBackend * cpp_ptx = <cpp_cyclus.FullBackend *> self.ptx
         del cpp_ptx
+        self.ptx = NULL
 
     def query(self, table, conds=None):
         """Queries a database table.
@@ -204,8 +208,11 @@ cdef class _SqliteBack(_FullBackend):
     def __dealloc__(self):
         """Full backend C++ destructor."""
         # Note that we have to do it this way since self.ptx is void*
+        if self.ptx == NULL:
+            return
         cdef cpp_cyclus.SqliteBack * cpp_ptx = <cpp_cyclus.SqliteBack *> self.ptx
         del cpp_ptx
+        self.ptx = NULL
 
     def flush(self):
         """Flushes the database to disk."""
@@ -238,8 +245,11 @@ cdef class _Hdf5Back(_FullBackend):
     def __dealloc__(self):
         """Full backend C++ destructor."""
         # Note that we have to do it this way since self.ptx is void*
+        if self.ptx == NULL:
+            return
         cdef cpp_cyclus.Hdf5Back * cpp_ptx = <cpp_cyclus.Hdf5Back *> self.ptx
         del cpp_ptx
+        self.ptx = NULL
 
     def flush(self):
         """Flushes the database to disk."""
@@ -275,6 +285,7 @@ cdef class _Recorder:
         # Note that we have to do it this way since self.ptx is void*
         cdef cpp_cyclus.Recorder * cpp_ptx = <cpp_cyclus.Recorder *> self.ptx
         del cpp_ptx
+        self.ptx = NULL
 
     property dump_count:
         """The frequency of recording."""
