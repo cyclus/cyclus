@@ -32,6 +32,7 @@ def cleanfs(paths):
         elif os.path.isdir(p):
             shutil.rmtree(p)
 
+
 def check_cmd(args, cwd, holdsrtn):
     """Runs a command in a subprocess and verifies that it executed properly.
     """
@@ -51,6 +52,7 @@ def check_cmd(args, cwd, holdsrtn):
     holdsrtn[0] = rtn
     assert_equal(rtn, 0)
 
+
 @contextmanager
 def clean_import(name, paths=None):
     """Imports and returns a module context manager and then removes
@@ -68,6 +70,7 @@ def clean_import(name, paths=None):
     for newmod in newmods:
         del sys.modules[newmod]
 
+
 TESTNAME_RE = re.compile('(?:^|[\\b_\\.-])[Tt]est')
 
 def modtests(mod):
@@ -82,6 +85,7 @@ def modtests(mod):
         tests.append(test)
     return tests
 
+
 def dirtests(d):
     """Finds all of the test files in a directory."""
     files = os.listdir(d)
@@ -93,6 +97,7 @@ def dirtests(d):
             continue
         filenames.append(file[:-3])
     return filenames
+
 
 def skip_then_continue(msg=""):
     """A simple function to yield such that a test is marked as skipped
@@ -143,7 +148,7 @@ def libcyclus_setup():
     for fname, oname, _ in DBS:
         if os.path.isfile(oname):
             continue
-        safe_call(['cyclus', '-o' + oname, 'input/libcyclus.xml'])
+        safe_call(['cyclus', '-o' + oname, 'input/inventory.xml'])
 
 
 def dbtest(f):
