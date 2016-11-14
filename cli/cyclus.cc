@@ -19,6 +19,11 @@
 #include "xml_file_loader.h"
 #include "xml_flat_loader.h"
 
+#ifdef CYCLUS_WITH_PYTHON
+#include "Python.h"
+#include "py_events_.h"
+#endif
+
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
@@ -196,10 +201,13 @@ int main(int argc, char* argv[]) {
   }
 
   #ifdef CYCLUS_WITH_PYTHON
-  #include "Python.h"
-  #include "py_events_.h"
   Py_Initialize();
+  #if PY_MAJOR_VERSION < 3
   initevents();
+  #else
+  PyInit_events();
+  #endif
+  //initevents();
   #endif
   char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
   if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
