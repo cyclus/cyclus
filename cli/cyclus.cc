@@ -195,7 +195,12 @@ int main(int argc, char* argv[]) {
     si.recorder()->RegisterBackend(fback);
   }
 
-
+  #ifdef CYCLUS_WITH_PYTHON
+  #include "Python.h"
+  #include "py_events_.h"
+  Py_Initialize();
+  initevents();
+  #endif
   char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
   if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
     si.timer()->RunSim();
@@ -209,6 +214,10 @@ int main(int argc, char* argv[]) {
   }
 
   rec.Flush();
+
+  #ifdef CYCLUS_WITH_PYTHON
+  Py_Finalize();
+  #endif
 
   std::cout << std::endl;
   std::cout << "Status: Cyclus run successful!" << std::endl;
