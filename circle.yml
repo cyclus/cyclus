@@ -27,6 +27,7 @@ deployment:
       - docker tag cyclus/cyclus:latest cyclus/cyclus:ci-test # creation
       - docker push cyclus/cyclus:ci-test # push to docker depot
       - curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
+      - curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
 
   master:
     branch: master
