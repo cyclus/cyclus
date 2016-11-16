@@ -9,6 +9,7 @@ https://circleci.com/gh/cyclus/cyclus/tree/develop.png?&amp;circle-token=35d82ba
 
 [![CircleCI Build Status](https://circleci.com/gh/circleci/circleci-docs.svg?style=shield)](https://circleci.com/gh/circleci/circleci-docs)
 
+.. image:: https://circleci.com/gh/cyclus/cyclus/tree/develop.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262
 
 ) | [![Build Status](https://circleci.com/gh/cyclus/cyclus/tree/develop)](https://circleci.com/gh/cyclus/cyclus/tree/develop.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262) | [![Build Status](https://circleci.com/gh/cyclus/cyclus/tree/develop)](https://circleci.com/gh/cyclus/cyclus/tree/develop.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262) |
 +-----------------+-----------------+-------------------------------------------------------------+
