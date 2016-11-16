@@ -1,8 +1,13 @@
 
+Cyclus
+------
+
+The Cyclus fuel cycle simulator is an agent-based and extensible framework for
+modeling the flow of material through future nuclear fuel cycles.  For more
+information on the entire "ecosystem" please refer to the `Cyclus website
+<http://fuelcycle.org>`_.
 
 
-.. table:: Cyclus Projects Status
-  :align: center
 ================    ==================    ==================
 Cyclus Projects Status
 ------------------------------------------------------------ 
@@ -13,30 +18,10 @@ Cyclus Projects Status
 
 
 
-
-
-
 .. |cyclus_status| image:: https://circleci.com/gh/cyclus/cyclus/tree/develop.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262
 .. |cycamore_status| image:: https://circleci.com/gh/cyclus/cycamore/tree/develop.png?&amp;circle-token= 333211090d5d5a15110eed1adbe079a6f3a4a704
 .. |cymetric_status| image:: https://circleci.com/gh/cyclus/cymetric/tree/develop.png?&amp;circle-token= 72639b59387f077973af98e7ce72996eac18b96c
 
-
-
-
-
-
-
-
-
-
-
-Cyclus
-------
-
-The Cyclus fuel cycle simulator is an agent-based and extensible framework for
-modeling the flow of material through future nuclear fuel cycles.  For more
-information on the entire "ecosystem" please refer to the `Cyclus website
-<http://fuelcycle.org>`_.
 
 ###########
 Cyclus Core
