@@ -1,7 +1,9 @@
 
 
 
-.. class:: center
+.. table:: Cyclus Projects Status
+  :align: center
+
 ================    ==================    ==================
 Cyclus Projects Status
 ------------------------------------------------------------ 
