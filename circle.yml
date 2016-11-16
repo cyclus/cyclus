@@ -6,6 +6,7 @@ dependencies:
   override:
     - docker build --rm=false -t cyclus/cyclus:latest .
 
+
 test:
   override:
     - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
@@ -17,6 +18,14 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push cyclus/cyclus:latest
+
+ 
+  ci-test:
+    branch: ci-test
+    commands:
+      - docker tag cyclus/cyclus:latest cyclus/cyclus:ci-test # creation
+      - docker push cyclus/cyclus:ci-test # push to docker depot
+      - curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
 
   master:
     branch: master
