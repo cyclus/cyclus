@@ -23,6 +23,7 @@ deployment:
   ci-test:
     branch: ci-test
     commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker tag cyclus/cyclus:latest cyclus/cyclus:ci-test # creation
       - docker push cyclus/cyclus:ci-test # push to docker depot
       - curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
