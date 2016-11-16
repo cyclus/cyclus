@@ -4,7 +4,7 @@
 ================    ==================    ==================
   **`Cyclus`**        **`Cycamore`**        **`Cymetric`** 
 ================    ==================    ==================
-|cyclus_status|    |cycamore_statuts|    |cycamore_statuts|
+|cyclus_status|     |cycamore_status|     |cycamore_status|
 ================    ==================    ==================
 
 
