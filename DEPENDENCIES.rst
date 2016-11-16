@@ -54,11 +54,19 @@ And a few optional dependencies:
 Package                Minimum Version
 ====================   ==================
 doxygen (for docs)     1.7.6.1
-tcmalloc (for speed)   any?
+tcmalloc (for speed)   any
+Cython                 0.13.1
+Python (dev version)   2.7 or 3.3+
+Jinja2                 any
+NumPy                  1.9+
+Pandas                 any
 ====================   ==================
 
 *Note that the Debian/Ubuntu package ``libtcmalloc`` is NOT discovered correctly
 by our build system.  Instead use ``libgoogle-perftools-dev``.*
+
+*Also note that the development version of Python, Jinja2, NumPy, and Pandas are
+only needed if Cython is installed.*
 
 ***********************
 Installing Dependencies
@@ -106,6 +114,14 @@ and (optionally):
 #. libblas-dev
 #. liblapack-dev
 #. libgoogle-perftools-dev
+#. python3
+#. python3-dev
+#. python3-tables
+#. python3-pandas
+#. python3-numpy
+#. python3-nose
+#. python3-jinja2
+#. cython3
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -173,9 +189,9 @@ required library package names is:
 
 Then install Coin-Cbc from source. They can be downloaded to any directory on
 your computer:
-   
+
 **Coin-Cbc**: Download and build using the svn command in the terminal:
-   
+
 .. code-block:: bash
 
   svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc
