@@ -1,3 +1,5 @@
+version: 2
+
 machine:
   services:
     - docker
@@ -6,41 +8,197 @@ dependencies:
   override:
     - docker build --rm=false -t cyclus/cyclus:latest .
 
+jobs:
+    build:
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/cyclus
+        steps:
+            - checkout
+            - run:
+                name: Build Docker Image
+                command: |
+                    python install.py -j 2 --build-type=Release --core-version 999999.999999 \
+                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
+                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
+            - run:
+                name: save SHA to a file
+                command: echo $CIRCLE_SHA1 > .circle-sha
+            - save_cache:
+                key: v1-repo-{{ checksum ".circle-sha" }}
+                paths:
+                  - /root
 
-test:
-  override:
-    - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
-    - docker run cyclus/cyclus:latest nosetests -w /cyclus/tests; exit $?
+    deploy:
+        docker:
+            - image: circleci/ruby:2.4-node
+            - image: cyclus/cyclus-deps
+        working_directory: ~/cyclus
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Install Docker client
+                command: |
+                    set -x
+                    VER="17.03.0-ce"
+                    curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+                    tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+                    mv /tmp/docker/* /usr/bin
+            - run:
+                name: Push to DockerHub
+                command: |
+                    docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+                    #docker push cyclus/cyclus:latest
 
-deployment:
-  develop:
-    branch: develop
-    commands:
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker push cyclus/cyclus:latest
+    stable_deploy:
+        docker:
+            - image: circleci/ruby:2.4-node
+            - image: cyclus/cyclus-deps
+        working_directory: ~/cyclus
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Install Docker client
+                command: |
+                    set -x
+                    VER="17.03.0-ce"
+                    curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+                    tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+                    mv /tmp/docker/* /usr/bin
+            - run:
+                name: Log on DockerHub
+                command: |
+                  docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            - run:
+                name: Tag and Push on DockerHub
+                command: |
+                  docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
+                  docker push cyclus/cyclus:stable # push to docker depot
 
- 
-  ci-test:
-    branch: ci-test
-    commands:
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker tag cyclus/cyclus:latest cyclus/cyclus:ci-test # creation
-      - docker push cyclus/cyclus:ci-test # push to docker depot
-      - curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
-      - curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
+    deb_generation:
+        docker:
+            - image: circleci/ruby:2.4-node
+            - image: cyclus/cyclus-deps
+        working_directory: ~/cyclus
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Install Docker client
+                command: |
+                    set -x
+                    VER="17.03.0-ce"
+                    curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+                    tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+                    mv /tmp/docker/* /usr/bin
+            - run:
+                name: Tag and Push on DockerHub
+                command: |
+                  docker/deb-ci/build_upload_deb.sh 14
+                  docker/deb-ci/build_upload_deb.sh 16
 
-  master:
-    branch: master
-    commands:
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-     # Update cyclus/cylus:stable docker container
-      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
-      - docker push cyclus/cyclus:stable # push to docker depot
-      ## DEB GENERATION
-      # Ubuntu 14.04
-      - docker/deb-ci/build_upload_deb.sh 14 :
-          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
-      # Ubuntu 16.04
-      - docker/deb-ci/build_upload_deb.sh 16 :
-          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
-        ## END DEB GENERATION
+    cystuff_test:
+        machine: true
+        steps:
+            - run:
+                name: Cycamore/Cymetric tests
+                command: |
+                    curl -u ${CYCAMORE_CIRCLE_TOKEN}: \
+                        --request POST \ 
+                        https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop
+                        #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
+                        #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
+    ci_test_push:
+        docker:
+            - image: circleci/ruby:2.4-node
+            - image: cyclus/cyclus-deps
+        working_directory: ~/cyclus
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: log into Docker
+                command: |
+                    docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            - run:
+                name: build Docker container
+                command: |
+                    docker build --rm=false -t cyclus/cyclus:latest .
+                    docker tag cyclus/cyclus:latest cyclus/cyclus:ci-test # creation
+            - run:
+                name: Push on DockerHub
+                command: |
+                    docker push cyclus/cyclus:ci-test # push to docker depot
+
+    unit_test:
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/root
+        steps:
+            - run:
+                name: save SHA to a file
+                command: echo $CIRCLE_SHA1 > .circle-sha
+            - restore_cache:
+                keys:
+                  - v1-repo-{{ checksum ".circle-sha" }}
+            - run:
+                name: Unit Test
+                command: /root/.local/bin/cyclus_unit_tests; exit $?
+    nosetest:
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/root
+        steps:
+            - run:
+                name: save SHA to a file
+                command: echo $CIRCLE_SHA1 > .circle-sha
+            - restore_cache:
+                keys:
+                  - v1-repo-{{ checksum ".circle-sha" }}
+            - run:
+                name: Install nosetest
+                command: pip install nose
+            - run:
+                name: Nosetest
+                command: nosetests -w ~/cyclus/tests; exit $?
+
+workflows:
+    version: 2
+    build_and_test:
+        jobs:
+            - build
+            - unit_test:
+                requires:
+                    - build
+            - nosetest:
+                requires:
+                    - build
+            - deploy:
+                filters:
+                    branches:
+                        only:
+                            - develop
+                            - master
+                requires:
+                    - unit_test
+                    - nosetest
+
+            - cystuff_test
+            
+            - ci_test_push:
+                filters:
+                    branches:
+                        only: ci-test
+                requires:
+                    - unit_test
+                    - nosetest
+
+            - deb_generation:
+                filters:
+                    branches:
+                        only: master
+                requires:
+                    - unit_test
+                    - nosetest
