@@ -138,6 +138,7 @@ If you'd prefer to copy/paste, the following line will install all required
    coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
 
 And to install all *Cyclus* dependencies (required and optional):
+
 - if using python 2.7:
 
 .. code-block:: bash
