@@ -114,13 +114,13 @@ and (optionally):
 #. libblas-dev
 #. liblapack-dev
 #. libgoogle-perftools-dev
-#. python-dev
-#. python-tables
-#. python-pandas
-#. python-numpy
-#. python-nose
-#. python-jinja2
-#. cython
+#. python2-dev    or  python3-dev
+#. python2-tables or  python3-tables
+#. python2-pandas or  python3-pandas
+#. python2-numpy  or  python3-numpy
+#. python2-nose   or  python3-nose
+#. python2-jinja2 or  python3-jinja2
+#. cython2        or  cython3       
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -128,21 +128,41 @@ For example, in order to install libxml++ (and libxml2) on your system, type:
 
   sudo apt-get install libxml++2.6-dev
 
-If you'd prefer to copy/paste, the following line will install all require
+If you'd prefer to copy/paste, the following line will install all required
 *Cyclus* dependencies:
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
+   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
 
-And to install all *Cyclus* dependencies (required and optionnal):
+And to install all *Cyclus* dependencies (required and optional):
+- if using python 2.7:
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev python-dev python-tables python-pandas python-numpy python-nose python-jinja2 cython
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
+   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
+   libgoogle-perftools-dev python-dev python-tables python-pandas python-numpy python-nose \
+   python-jinja2 cython
 
+- if using python 3.5:
 
+.. code-block:: bash
 
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
+   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
+   libgoogle-perftools-dev python3-dev python3-tables python3-pandas python3-numpy python3-nose \
+   python3-jinja2 cython
+
+To determine which version of Python is already installed on your computer, run:
+
+.. code-block:: bash
+
+   python -V
 
 Boost Note
 ^^^^^^^^^^
