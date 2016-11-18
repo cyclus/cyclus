@@ -157,7 +157,7 @@ And to install all *Cyclus* dependencies (required and optional):
    libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
    coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
    libgoogle-perftools-dev python3-dev python3-tables python3-pandas python3-numpy python3-nose \
-   python3-jinja2 cython
+   python3-jinja2 cython3
 
 To determine which version of Python is already installed on your computer, run:
 
