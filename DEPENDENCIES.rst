@@ -114,14 +114,13 @@ and (optionally):
 #. libblas-dev
 #. liblapack-dev
 #. libgoogle-perftools-dev
-#. python3
-#. python3-dev
-#. python3-tables
-#. python3-pandas
-#. python3-numpy
-#. python3-nose
-#. python3-jinja2
-#. cython3
+#. python-dev
+#. python-tables
+#. python-pandas
+#. python-numpy
+#. python-nose
+#. python-jinja2
+#. cython
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -129,12 +128,21 @@ For example, in order to install libxml++ (and libxml2) on your system, type:
 
   sudo apt-get install libxml++2.6-dev
 
-If you'd prefer to copy/paste, the following line will install all *Cyclus*
-dependencies:
+If you'd prefer to copy/paste, the following line will install all require
+*Cyclus* dependencies:
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
+
+And to install all *Cyclus* dependencies (required and optionnal):
+
+.. code-block:: bash
+
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev python-dev python-tables python-pandas python-numpy python-nose python-jinja2 cython
+
+
+
 
 Boost Note
 ^^^^^^^^^^
