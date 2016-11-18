@@ -139,7 +139,7 @@ If you'd prefer to copy/paste, the following line will install all required
 
 And to install all *Cyclus* dependencies (required and optional):
 
-- if using python 2.7:
+- if using python 2.x:
 
 .. code-block:: bash
 
@@ -149,7 +149,7 @@ And to install all *Cyclus* dependencies (required and optional):
    libgoogle-perftools-dev python-dev python-tables python-pandas python-numpy python-nose \
    python-jinja2 cython
 
-- if using python 3.5:
+- if using python 3.x:
 
 .. code-block:: bash
 
