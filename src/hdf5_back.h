@@ -140,7 +140,10 @@ class Hdf5Back : public FullBackend {
     return VLWrite<T, U>(x->cast<T>());
   }
   /// \}
-
+  
+  template <DbTypes U>
+  void WriteToBuf<U>(char* buf, std::vector<int>& shape);
+  
   /// Gets an HDF5 reference dataset for a variable length datatype
   /// If the dataset does not exist in the database, it will create it.
   ///

@@ -34,6 +34,11 @@ IF(NOT "${res_var_c}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'CREATE' failed, result = '${res_var_c}'")
 ENDIF()
 
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VL_DATASET" OUTPUT_VARIABLE HDF5_BACK_CC_VL_DATASET RESULT_VARIABLE res_var_v)
+IF(NOT "${res_var_v}" STREQUAL "0")
+  message(FATAL_ERROR "Process hdf5_back_gen.py 'VL_DATASET' failed, result = '${res_var_v}'")
+ENDIF()
+
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"

@@ -76,6 +76,9 @@ class FuncCall(Node):
     # targs means template args
     fields = ("name", "args", "targs") 
     
+class FuncDef(Node):
+    fields = ("type", "name", "args", "targs", "body", "tspecial")
+    
 class Raw(Node):
     # for cheating and literals
     fields = ("code",)
@@ -267,6 +270,29 @@ class CppGen(Visitor):
         s += ")"
         return s
     
+    def visit_funcdef(self, node):
+        s = ""
+        if node.tspecial:
+            s += "template<>\n"
+        elif node.targs is not None:
+            s += "template<"
+            for i in range(len(node.targs)):
+                s += self.visit(t)
+                if i < (len(node.targs)-1):
+                    s += ","
+            s += ">\n"
+            #We've taken care of the targs and no longer need them to appear
+            node.targs = None
+        s += self.visit(node.type)
+        s += " "
+        f = FuncCall(name=node.name, args=node.args, targs=node.targs)
+        s += self.visit(f)
+        b = Block(nodes=node.body)
+        s += " {\n"
+        s += indent(self.visit(b), self.indent)
+        s += "}\n"
+        return s
+    
     def visit_nothing(self, node):
         return ""
         
@@ -437,8 +463,8 @@ def case_template(t, read_x):
     if isinstance(read_x, Block):
         body = read_x.nodes
     else:
-        body = read_x
-    body += [ExprStmt(child=Var(name="break"))]
+        body = [read_x]
+    body.append(ExprStmt(child=Var(name="break")))
     node = Case(cond=Var(name=t.db), body=body)
     return node
 
@@ -1596,10 +1622,6 @@ def main_query():
     output = indent(output, INDENT * 5)
     return output
 
-NOT_VL = []
-VARIATION_DICT = {}
-ORIGIN_DICT = {}
-
 io_error = Raw(code=("throw IOError(\"the type for column \'\"+"
                      "std::string(field_names[i])+\"\' is not yet supported "
                      "in HDF5.\");"))
@@ -1623,32 +1645,7 @@ DEBUG_TYPES = ["VECTOR_STRING"]
 def main_create():
     """HDF5 Create: Generate CreateTable if-statements."""
     CPPGEN = CppGen()
-    global NOT_VL
-    global VARIATION_DICT
-    global ORIGIN_DICT
     output = ""
-    fixed_length_types = set(t for t in CANON_SET if no_vl(CANON_TO_NODE[t]))
-    
-    VARIATION_DICT = {}
-    for n in fixed_length_types:
-        key = CANON_TO_NODE[n]
-        vals = []
-        for x in CANON_SET:
-            val_node = CANON_TO_NODE[x]
-            if val_node.cpp == key.cpp and val_node.db != key.db: 
-                vals.append(val_node)
-        VARIATION_DICT[n] = vals
-    
-    VARIATION_DICT[('BLOB')] = []
-    VARIATION_DICT['STRING'] = [CANON_TO_NODE['VL_STRING']]
-        
-    for i in VARIATION_DICT.keys():
-        ORIGIN_DICT[i] = i
-        if VARIATION_DICT[i] != []:
-            for j in VARIATION_DICT[i]:
-                ORIGIN_DICT[j.canon] = i
-                
-    NOT_VL = [x for x in VARIATION_DICT.keys() if not VARIATION_DICT[x]] 
         
     outer_if_bodies = {n: Block(nodes=[]) for n in VARIATION_DICT.keys()}
     
@@ -1683,14 +1680,117 @@ def main_create():
     output = indent(output, INDENT)
     return output
 
+def camel_case(db):
+    parts = db.split("_")
+    for i in range(len(parts)):
+        parts[i] = parts[i].lower()
+        parts[i] = parts[i][0].upper() + parts[i][1:]
+    camel = "".join(parts)
+    return camel 
+
+def string(s):
+    return "\"" + s + "\""
+
+def main_vl_dataset():
+    CPPGEN = CppGen()
+    output = ""
+    origin_types = list(VARIATION_DICT.keys())
+    for origin in origin_types:
+        vals = [v.canon for v in VARIATION_DICT[origin] if DB_TO_VL[v.db]]
+        origin_node = CANON_TO_NODE[origin]
+        case_body = Block()
+        if vals == []:
+            if DB_TO_VL[origin_node.db]:
+                vals.append(origin)
+            else:   
+                continue
+        for v in vals:
+            node = Assign(
+                       target=Var(name="name"),
+                       value=Raw(code=string(camel_case(origin_node.db))))
+            case_body = ExprStmt(child=node)
+            output += CPPGEN.visit(case_template(CANON_TO_NODE[v], case_body))
+    
+    output = indent(output, INDENT*2)
+    return output
+
+def main_fill_buf():
+    CPPGEN = CppGen()
+    output = ""
+    for i in CANON_SET:
+        node = CANON_TO_NODE[i]
+        write_to_buf = FuncCall(name=Var(name="WriteToBuf"), 
+                                targs=[Raw(code=node.cpp), Raw(code=node.db)],
+                                args=[Raw(code="buf+offset")])
+        case_body = ExprStmt(child=write_to_buf)
+        output += CPPGEN.visit(case_template(node, case_body))
+    output = indent(output, INDENT*4)
+    return output
+
+def main_write():
+    CPPGEN = CppGen()
+    output = ""
+    for i in CANON_SET:
+        block = Block(nodes=[])
+        t = CANON_TO_NODE[i]
+        node = FuncDef(type=Raw(code="void"), 
+                       name=Var(name="Hdf5Back::WriteToBuf"),
+                       targs=[Raw(code=t.db)], 
+                       args=[Decl(type=Type(cpp="char*"), name=Var(name="buf")),
+                             Decl(type=Type(cpp="std::vector<int>&"), 
+                                  name=Var(name="shape"))],
+                       body=[], tspecial=True)
+       
+        block.nodes.append(node)       
+        output += CPPGEN.visit(block)
+    return output
+
+NOT_VL = []
+VARIATION_DICT = {}
+ORIGIN_DICT = {}
+
 MAIN_DISPATCH = {"QUERY": main_query,
-                 "CREATE": main_create}
+                 "CREATE": main_create,
+                 "VL_DATASET": main_vl_dataset,
+                 "FILL_BUF": main_fill_buf,
+                 "WRITE": main_write}
 
 def main():
+    global NOT_VL
+    global VARIATION_DICT
+    global ORIGIN_DICT
+    
     try:
         gen_instruction = sys.argv[1]
     except:
         raise ValueError("No generation instruction provided")    
+    
+    # Setup for global util dictionaries
+    
+    fixed_length_types = set(t for t in CANON_SET if no_vl(CANON_TO_NODE[t]))
+    
+    for n in fixed_length_types:
+        key = CANON_TO_NODE[n]
+        vals = []
+        for x in CANON_SET:
+            val_node = CANON_TO_NODE[x]
+            if val_node.cpp == key.cpp and val_node.db != key.db: 
+                vals.append(val_node)
+        VARIATION_DICT[n] = vals
+    
+    VARIATION_DICT['BLOB'] = []
+    VARIATION_DICT['STRING'] = [CANON_TO_NODE['VL_STRING']]
+        
+    for i in VARIATION_DICT.keys():
+        ORIGIN_DICT[i] = i
+        if VARIATION_DICT[i] != []:
+            for j in VARIATION_DICT[i]:
+                ORIGIN_DICT[j.canon] = i
+                
+    NOT_VL = [x for x in VARIATION_DICT.keys() if not VARIATION_DICT[x]] 
+    
+    # Dispatch to requested generation function
+    
     function = MAIN_DISPATCH[gen_instruction]
     print(function())
     
