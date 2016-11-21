@@ -89,11 +89,11 @@ def nm(ns):
             continue
         if typ not in ok_types:
             continue
-#        if ' ' in name:
-#            # handle funny private pointer cases
-#            pre, post = name.split(' ', 1)
-#            if pre.endswith('*') or post.startswith('std::__') or post.startswith('const* std::__'):
-#                continue
+        if ' ' in name:
+            # handle funny private pointer cases
+            pre, post = name.split(' ', 1)
+            if pre.endswith('*') or post.startswith('std::__') or post.startswith('const* std::__'):
+                continue
         # use trailing underscore naming convention to skip private variables
         m = NAME_RE.match(name)
         if m is None or m.group(1).endswith('_'):
