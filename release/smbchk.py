@@ -76,6 +76,11 @@ def nm(ns):
     names = set()
     ok_types = {'B', 'b', 'D', 'd', 'R', 'r', 'S', 's', 'T', 't', 'W', 'w', 'u'}
     for line in stdout.splitlines():
+        line = line.replace("std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >","std::string")
+        line = line.replace("std::__cxx11::list","std::list")
+        line = line.replace("std::__cxx11::basic_stringstream","std::basic_stringstream")
+        line = line.replace("[abi:cxx11]","")
+        line = line.replace("string >","string>")
         line = line.strip().decode()
         if len(line) == 0 or not line[0].isdigit():
             continue
@@ -84,11 +89,11 @@ def nm(ns):
             continue
         if typ not in ok_types:
             continue
-        if ' ' in name:
-            # handle funny private pointer cases
-            pre, post = name.split(' ', 1)
-            if pre.endswith('*') or post.startswith('std::__') or post.startswith('const* std::__'):
-                continue
+#        if ' ' in name:
+#            # handle funny private pointer cases
+#            pre, post = name.split(' ', 1)
+#            if pre.endswith('*') or post.startswith('std::__') or post.startswith('const* std::__'):
+#                continue
         # use trailing underscore naming convention to skip private variables
         m = NAME_RE.match(name)
         if m is None or m.group(1).endswith('_'):
