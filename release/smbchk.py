@@ -70,17 +70,21 @@ def nm(ns):
     #   -C: demangles the C++ symbols.
     #   -fbsd: formats output in default 'bsd' style
     # note that we are only going to pick up symbols in the cyclus namespace
-    # because everything else should be external to the cares of cyclus stability
+    # because everything else should be external to the cares of cyclus
+    # stability
     lib = os.path.abspath(os.path.join(ns.prefix, 'lib', 'libcyclus.so'))
     stdout = subprocess.check_output(['nm', '-g', '-p', '-C', '-fbsd', lib])
     names = set()
-    ok_types = {'B', 'b', 'D', 'd', 'R', 'r', 'S', 's', 'T', 't', 'W', 'w', 'u'}
+    ok_types = {'B', 'b', 'D', 'd', 'R', 'r',
+                'S', 's', 'T', 't', 'W', 'w', 'u'}
     for line in stdout.splitlines():
-        line = line.replace("std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >","std::string")
-        line = line.replace("std::__cxx11::list","std::list")
-        line = line.replace("std::__cxx11::basic_stringstream","std::basic_stringstream")
-        line = line.replace("[abi:cxx11]","")
-        line = line.replace("string >","string>")
+        line = line.replace(
+            "std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >", "std::string")
+        line = line.replace("std::__cxx11::list", "std::list")
+        line = line.replace("std::__cxx11::basic_stringstream",
+                            "std::basic_stringstream")
+        line = line.replace("[abi:cxx11]", "")
+        line = line.replace("string >", "string>")
         line = line.strip().decode()
         if len(line) == 0 or not line[0].isdigit():
             continue
