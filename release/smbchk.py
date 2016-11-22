@@ -52,12 +52,6 @@ cpp11_symbols = [
     ["[abi:cxx11]", ""]
 ]
 
-
-
-
-
-
-
 def load(ns):
     """Loads a database of symbols or returns an empty list."""
     if not os.path.isfile(ns.filename):
