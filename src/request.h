@@ -46,13 +46,31 @@ class Request {
       boost::shared_ptr<T> target,
       Trader* requester,
       typename RequestPortfolio<T>::Ptr portfolio,
-      std::string commodity = "",
-      double preference = kDefaultPref,
-      bool exclusive = false,
-      cost_function_t cost_function = NULL) {
+      std::string commodity,
+      double preference,
+      bool exclusive,
+      cost_function_t cost_function) {
     return new Request<T>(target, requester, portfolio,
                           commodity, preference, exclusive,
                           cost_function);
+  }
+  /// @brief a factory method for a request
+  /// @param target the target resource associated with this request
+  /// @param requester the requester
+  /// @param portfolio the porftolio of which this request is a part
+  /// @param commodity the commodity associated with this request
+  /// @param preference the preference associated with this request (relative to
+  /// others in the portfolio)
+  /// @param exclusive a flag denoting that this request must be met exclusively,
+  /// i.e., in its entirety by a single offer
+  inline static Request<T>* Create(
+      boost::shared_ptr<T> target,
+      Trader* requester,
+      typename RequestPortfolio<T>::Ptr portfolio,
+      std::string commodity = "",
+      double preference = kDefaultPref,
+      bool exclusive = false) {
+    return Create(target, requester, portfolio, commodity, preference, exclusive, NULL);
   }
 
   /// @brief a factory method for a bid for a bid without a portfolio
