@@ -45,6 +45,19 @@ api_blacklist = {
     'cyclus::Composition::NewDecay',
 }
 
+cpp11_symbols = [
+    ["std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >", "std::string"],
+    ["std::__cxx11::list", "std::list"],
+    ["std::basic_stringstream", "std::basic_stringstream"],
+    ["[abi:cxx11]", ""]
+]
+
+
+
+
+
+
+
 def load(ns):
     """Loads a database of symbols or returns an empty list."""
     if not os.path.isfile(ns.filename):
@@ -78,13 +91,12 @@ def nm(ns):
     ok_types = {'B', 'b', 'D', 'd', 'R', 'r',
                 'S', 's', 'T', 't', 'W', 'w', 'u'}
     for line in stdout.splitlines():
-        line = line.replace(
-            "std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >", "std::string")
-        line = line.replace("std::__cxx11::list", "std::list")
-        line = line.replace("std::__cxx11::basic_stringstream",
-                            "std::basic_stringstream")
-        line = line.replace("[abi:cxx11]", "")
+        # replace c++11 symbol by standart one
+        for symbol in cpp11_symbols:
+            line  =line.replace(symbol[0],symbol[1])
+        #fix string replament when a '>' follows the string
         line = line.replace("string >", "string>")
+
         line = line.strip().decode()
         if len(line) == 0 or not line[0].isdigit():
             continue
