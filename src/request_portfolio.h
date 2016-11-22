@@ -20,8 +20,7 @@ namespace cyclus {
 class Trader;
 
 /// @brief accumulator sum for request quantities
-template<class T>
-inline double SumQty(double total, Request<T>* r) {
+template <class T> inline double SumQty(double total, Request<T>* r) {
   return total += r->target()->quantity();
 }
 
@@ -30,21 +29,19 @@ inline double SumQty(double total, Request<T>* r) {
 /// Coefficients are determiend by the request portfolio and are provided to the
 /// converter. The arc and exchange context are used in order to reference the
 /// original request so that the request's coefficient can be applied.
-template<class T>
-struct QtyCoeffConverter : public Converter<T> {
+template <class T> struct QtyCoeffConverter : public Converter<T> {
   QtyCoeffConverter(const std::map<Request<T>*, double>& coeffs)
       : coeffs(coeffs) {}
 
   inline virtual double convert(
       boost::shared_ptr<T> offer,
-      Arc const * a,
-      ExchangeTranslationContext<T> const * ctx) const {
+      Arc const* a,
+      ExchangeTranslationContext<T> const* ctx) const {
     return offer->quantity() * coeffs.at(ctx->node_to_request.at(a->unode()));
   }
 
   virtual bool operator==(Converter<T>& other) const {
-    QtyCoeffConverter<T>* cast =
-        dynamic_cast<QtyCoeffConverter<T>*>(&other);
+    QtyCoeffConverter<T>* cast = dynamic_cast<QtyCoeffConverter<T>*>(&other);
     return cast != NULL && coeffs == cast->coeffs;
   }
 
@@ -58,7 +55,8 @@ struct QtyCoeffConverter : public Converter<T> {
 ///
 /// The portfolio contains a grouping of resource requests that may be mutually
 /// met by suppliers. These requests may share a common set of
-/// constraints. Take, for instance, a facility that needs fuel, of which there are
+/// constraints. Take, for instance, a facility that needs fuel, of which there
+/// are
 /// two commodity types, fuelA and fuelB. If some combination of the two suffice
 /// the facility's needs, then requests for both would be added to the portfolio
 /// along with a capacity constraint.
@@ -67,7 +65,8 @@ struct QtyCoeffConverter : public Converter<T> {
 /// accounts for mutual requests, if the portfolio has them. , e.g.,
 /// @code
 ///
-/// RequestPortfolio<SomeResource>::Ptr rp(new RequestPortfolio<SomeResource>());
+/// RequestPortfolio<SomeResource>::Ptr rp(new
+/// RequestPortfolio<SomeResource>());
 /// // add some requests
 /// rp->AddRequest(/* args */);
 /// // declare some of them as multicommodity requsts (i.e., any one will
@@ -83,11 +82,11 @@ struct QtyCoeffConverter : public Converter<T> {
 /// determine the demand as "met". In this case, the total demand is 9.5, the
 /// MOX order is given a coefficient of 9.5 / 10, and the UOX order is given a
 /// coefficient of 9.5 / 9.
-template<class T>
-class RequestPortfolio :
-public boost::enable_shared_from_this< RequestPortfolio<T> > {
+template <class T>
+class RequestPortfolio
+    : public boost::enable_shared_from_this<RequestPortfolio<T>> {
  public:
-  typedef boost::shared_ptr< RequestPortfolio<T> > Ptr;
+  typedef boost::shared_ptr<RequestPortfolio<T>> Ptr;
   typedef std::function<double(boost::shared_ptr<T>)> cost_function_t;
 
   RequestPortfolio() : requester_(NULL), qty_(0) {}
@@ -106,17 +105,16 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @param commodity the commodity associated with this request
   /// @param preference the preference associated with this request (relative to
   /// others in the portfolio)
-  /// @param exclusive a flag denoting that this request must be met exclusively,
+  /// @param exclusive a flag denoting that this request must be met
+  /// exclusively,
   /// i.e., in its entirety by a single offer
   /// @param cost_function The cost function that the requester sets so that the
   /// bidder may evaluate many potential resources.
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
   Request<T>* AddRequest(boost::shared_ptr<T> target, Trader* requester,
-                         std::string commodity = "",
-                         double preference = kDefaultPref,
-                         bool exclusive = false,
-                         cost_function_t cost_function = NULL) {
+                         std::string commodity, double preference,
+                         bool exclusive, cost_function_t cost_function) {
     Request<T>* r =
         Request<T>::Create(target, requester, this->shared_from_this(),
                            commodity, preference, exclusive, cost_function);
@@ -125,6 +123,24 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     mass_coeffs_[r] = 1;
     qty_ += target->quantity();
     return r;
+  }
+  /// @brief add a request to the portfolio
+  /// @param target the target resource associated with this request
+  /// @param requester the requester
+  /// @param commodity the commodity associated with this request
+  /// @param preference the preference associated with this request (relative to
+  /// others in the portfolio)
+  /// @param exclusive a flag denoting that this request must be met
+  /// exclusively,
+  /// i.e., in its entirety by a single offer
+  /// @throws KeyError if a request is added from a different requester than the
+  /// original or if the request quantity is different than the original
+  Request<T>* AddRequest(boost::shared_ptr<T> target, Trader* requester,
+                         std::string commodity = "",
+                         double preference = kDefaultPref,
+                         bool exclusive = false) {
+    return AddRequest(target, requester, commodity, preference, exclusive,
+                      NULL);
   }
 
   /// @brief adds a collection of requests (already having been registered with
@@ -162,12 +178,10 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   inline double qty() const { return qty_; }
 
   /// @return const access to the unconstrained requests
-  inline const std::vector<Request<T>*>& requests() const {
-    return requests_;
-  }
+  inline const std::vector<Request<T>*>& requests() const { return requests_; }
 
   /// @return const access to the request constraints
-  inline const std::set< CapacityConstraint<T> >& constraints() const {
+  inline const std::set<CapacityConstraint<T>>& constraints() const {
     return constraints_;
   }
 
@@ -191,7 +205,8 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   }
 
   /// @brief if the requester has not been determined yet, it is set. otherwise
-  /// VerifyRequester() verifies the the request is associated with the portfolio's
+  /// VerifyRequester() verifies the the request is associated with the
+  /// portfolio's
   /// requester
   /// @throws KeyError if a request is added from a different requester than the
   /// original
@@ -212,7 +227,7 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   std::map<Request<T>*, double> mass_coeffs_;
 
   /// constraints_ is a set because constraints are assumed to be unique
-  std::set< CapacityConstraint<T> > constraints_;
+  std::set<CapacityConstraint<T>> constraints_;
 
   /// the total quantity of resources assocaited with the portfolio
   double qty_;
