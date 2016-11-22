@@ -60,12 +60,22 @@ class Request {
   inline static Request<T>* Create(
       boost::shared_ptr<T> target,
       Trader* requester,
-      std::string commodity = "",
-      double preference = kDefaultPref,
-      bool exclusive = false,
-      cost_function_t cost_function = NULL) {
+      std::string commodity,
+      double preference,
+      bool exclusive,
+      cost_function_t cost_function) {
     return new Request<T>(target, requester, commodity, preference,
                           exclusive, cost_function);
+  }
+  /// @brief a factory method for a bid for a bid without a portfolio
+  /// @warning this factory should generally only be used for testing
+  inline static Request<T>* Create(
+      boost::shared_ptr<T> target,
+      Trader* requester,
+      std::string commodity = "",
+      double preference = kDefaultPref,
+      bool exclusive = false) {
+    return Create(target, requester, commodity, preference, exclusive, NULL);
   }
 
   /// @return this request's target
@@ -96,15 +106,26 @@ class Request {
  private:
   /// @brief constructors are private to require use of factory methods
   Request(boost::shared_ptr<T> target, Trader* requester,
-          std::string commodity = "", double preference = kDefaultPref,
-          bool exclusive = false,
-          cost_function_t cost_function = NULL)
+          std::string commodity, double preference,
+          bool exclusive,
+          cost_function_t cost_function)
       : target_(target),
         requester_(requester),
         commodity_(commodity),
         preference_(preference),
         exclusive_(exclusive),
         cost_function_(cost_function) {}
+
+  /// @brief constructors are private to require use of factory methods
+  Request(boost::shared_ptr<T> target, Trader* requester,
+          std::string commodity = "", double preference = kDefaultPref,
+          bool exclusive = false)
+      : target_(target),
+        requester_(requester),
+        commodity_(commodity),
+        preference_(preference),
+        exclusive_(exclusive),
+        cost_function_(NULL) {}
 
   Request(boost::shared_ptr<T> target, Trader* requester,
           typename RequestPortfolio<T>::Ptr portfolio,

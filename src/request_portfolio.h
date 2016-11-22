@@ -113,10 +113,10 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
   Request<T>* AddRequest(boost::shared_ptr<T> target, Trader* requester,
-                         std::string commodity = "",
-                         double preference = kDefaultPref,
-                         bool exclusive = false,
-                         cost_function_t cost_function = NULL) {
+                         std::string commodity,
+                         double preference,
+                         bool exclusive,
+                         cost_function_t cost_function) {
     Request<T>* r =
         Request<T>::Create(target, requester, this->shared_from_this(),
                            commodity, preference, exclusive, cost_function);
@@ -125,6 +125,22 @@ public boost::enable_shared_from_this< RequestPortfolio<T> > {
     mass_coeffs_[r] = 1;
     qty_ += target->quantity();
     return r;
+  }
+  /// @brief add a request to the portfolio
+  /// @param target the target resource associated with this request
+  /// @param requester the requester
+  /// @param commodity the commodity associated with this request
+  /// @param preference the preference associated with this request (relative to
+  /// others in the portfolio)
+  /// @param exclusive a flag denoting that this request must be met exclusively,
+  /// i.e., in its entirety by a single offer
+  /// @throws KeyError if a request is added from a different requester than the
+  /// original or if the request quantity is different than the original
+  Request<T>* AddRequest(boost::shared_ptr<T> target, Trader* requester,
+                         std::string commodity = "",
+                         double preference = kDefaultPref,
+                         bool exclusive = false) {
+    return AddRequest(target, requester, commodity, preference, exclusive, NULL);
   }
 
   /// @brief adds a collection of requests (already having been registered with

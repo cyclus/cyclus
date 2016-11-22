@@ -35,17 +35,36 @@ class Bid {
                                boost::shared_ptr<T> offer,
                                Trader* bidder,
                                typename BidPortfolio<T>::Ptr portfolio,
-                               bool exclusive = false,
-                               double preference = std::numeric_limits<double>::quiet_NaN()) {
+                               bool exclusive,
+                               double preference) {
     return new Bid<T>(request, offer, bidder, portfolio, exclusive, preference);
   }
 
+  /// @brief a factory method for a bid
+  /// @param request the request being responded to by this bid
+  /// @param offer the resource being offered in response to the request
+  /// @param bidder the bidder
+  /// @param portfolio the porftolio of which this bid is a part
+  /// @param exclusive flag for whether the bid is exclusive
+  inline static Bid<T>* Create(Request<T>* request,
+                               boost::shared_ptr<T> offer,
+                               Trader* bidder,
+                               typename BidPortfolio<T>::Ptr portfolio,
+                               bool exclusive = false) {
+    return Create(request, offer, bidder, portfolio, exclusive, std::numeric_limits<double>::quiet_NaN());
+  }
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
   inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
-                               Trader* bidder, bool exclusive = false,
-                               double preference = std::numeric_limits<double>::quiet_NaN()) {
+                               Trader* bidder, bool exclusive,
+                               double preference) {
     return new Bid<T>(request, offer, bidder, exclusive, preference);
+  }
+  /// @brief a factory method for a bid for a bid without a portfolio
+  /// @warning this factory should generally only be used for testing
+  inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
+                               Trader* bidder, bool exclusive = false) {
+    return  Create(request, offer, bidder, exclusive, std::numeric_limits<double>::quiet_NaN());
   }
 
   /// @return the request being responded to

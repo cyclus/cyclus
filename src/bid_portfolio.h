@@ -56,8 +56,7 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original
   Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
-                 Trader* bidder, bool exclusive = false, 
-                 double preference = std::numeric_limits<double>::quiet_NaN()) {
+                 Trader* bidder, bool exclusive, double preference) {
     Bid<T>* b =
         Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
                        exclusive, preference);
@@ -72,6 +71,19 @@ class BidPortfolio : public boost::enable_shared_from_this< BidPortfolio<T> > {
     return b;
   }
 
+  /// @brief add a bid to the portfolio
+  /// @param request the request being responded to by this bid
+  /// @param offer the resource being offered in response to the request
+  /// @param bidder the bidder
+  /// @param exclusive indicates whether the bid is exclusive
+  /// @throws KeyError if a bid is added from a different bidder than the
+  /// original
+  Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
+                 Trader* bidder, bool exclusive = false) {
+    return AddBid(request, offer, bidder, exclusive, std::numeric_limits<double>::quiet_NaN());
+  }
+    
+    
   /// @brief add a capacity constraint associated with the portfolio
   /// @param c the constraint to add
   inline void AddConstraint(const CapacityConstraint<T>& c) {
