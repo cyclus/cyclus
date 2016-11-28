@@ -33,7 +33,7 @@ NAME_RE = re.compile('([A-Za-z0-9~_:]+)')
 """A blacklist for private API that gets caught by `nm`. Add additional
 functions as needed.
 """
-api_blacklist = {
+API_BLACKLIST = {
     'cyclus::SimInit::LoadResource',
     'cyclus::SimInit::LoadMaterial',
     'cyclus::SimInit::LoadProduct',
@@ -45,10 +45,11 @@ api_blacklist = {
     'cyclus::Composition::NewDecay',
 }
 
-CPP11_SYMBOLS_REPLACEMENTS = [
+SYMBOLS_REPLACEMENTS = [
     ("std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >", "std::string"),
     ("std::__cxx11::list", "std::list"),
     ("[abi:cxx11]", "")
+    ("string >", "string>") # fix string replacement when a '>' follows the string
 ]
 
 
@@ -88,10 +89,8 @@ def nm(ns):
                 'S', 's', 'T', 't', 'W', 'w', 'u'}
     for line in stdout.splitlines():
         # replace c++11 symbol by standard one
-        for symbol in CPP11_SYMBOLS_REPLACEMENTS:
+        for symbol in SYMBOLS_REPLACEMENTS:
             line = line.replace(symbol[0], symbol[1])
-        # fix string replacement when a '>' follows the string
-        line = line.replace("string >", "string>")
 
         line = line.strip().decode()
         if len(line) == 0 or not line[0].isdigit():
@@ -142,8 +141,8 @@ def diff(db, i, j):
     """Diffs two database indices, returns string unified diff."""
     x = db[i]
     y = db[j]
-    xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in api_blacklist]
-    ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in api_blacklist]
+    xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in API_BLACKLIST]
+    ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in API_BLACKLIST]
     lines = difflib.unified_diff(xsym, ysym,
                                  fromfile=x['version'], tofile=y['version'],
                                  fromfiledate=x['date'], tofiledate=y['date'])
@@ -157,9 +156,9 @@ def check(db):
     stable = True
     for i, (x, y) in enumerate(zip(db[:-1], db[1:])):
         x = set(_ for _ in x['symbols'] if _.split(
-            '(')[0] not in api_blacklist)
+            '(')[0] not in API_BLACKLIST)
         y = set(_ for _ in y['symbols'] if _.split(
-            '(')[0] not in api_blacklist)
+            '(')[0] not in API_BLACKLIST)
         if not (frozenset(x) <= frozenset(y)):
             stable = False
             d = diff(db, i, i + 1)
