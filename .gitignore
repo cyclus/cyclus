@@ -32,3 +32,10 @@ src/pyne_decay.cc
 src/hdf5_back.cc
 share/dbtypes.json
 tests/db.h5
+cyclus/cpp_typesystem.pxd
+cyclus/typesystem.pxd
+cyclus/typesystem.pyx
+tests/libcyclus-orig.h5
+tests/libcyclus-orig.sqlite
+tests/libcyclus-test.h5
+tests/libcyclus-test.sqlite

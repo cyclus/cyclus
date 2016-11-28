@@ -7,6 +7,11 @@
 
 #include "pyne.h"
 
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
+
 namespace cyclus {
 
 /// This function returns a vector of archetype names in a given
