@@ -114,13 +114,13 @@ and (optionally):
 #. libblas-dev
 #. liblapack-dev
 #. libgoogle-perftools-dev
-#. python2-dev    or  python3-dev
-#. python2-tables or  python3-tables
-#. python2-pandas or  python3-pandas
-#. python2-numpy  or  python3-numpy
-#. python2-nose   or  python3-nose
-#. python2-jinja2 or  python3-jinja2
-#. cython2        or  cython3       
+#. python-dev    or  python3-dev
+#. python-tables or  python3-tables
+#. python-pandas or  python3-pandas
+#. python-numpy  or  python3-numpy
+#. python-nose   or  python3-nose
+#. python-jinja2 or  python3-jinja2
+#. cython        or  cython3       
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
