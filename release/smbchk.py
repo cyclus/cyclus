@@ -45,11 +45,11 @@ api_blacklist = {
     'cyclus::Composition::NewDecay',
 }
 
-CPP11_SYMBOLS_REPLACEMENTS = {
-    ["std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >", "std::string"],
-    ["std::__cxx11::list", "std::list"],
-    ["[abi:cxx11]", ""]
-}
+CPP11_SYMBOLS_REPLACEMENTS = [
+    ("std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >", "std::string"),
+    ("std::__cxx11::list", "std::list"),
+    ("[abi:cxx11]", "")
+]
 
 
 def load(ns):
