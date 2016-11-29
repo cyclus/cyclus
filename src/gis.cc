@@ -57,19 +57,44 @@ double GIS::get_distance(GIS target) const{
 	double c = 2 * atan2(sqrt(angle), sqrt(1-angle));
 	return 6371.01 * c;	
 }
-
+/*
 GIS[] GIS::nearby(double range) const{
 }
 
 GIS[] GIS::nearby(const GIS *reference, double range) const{
 }
-
+*/
 string GIS::toString() const{
+	stringstream lat_string;
+	stringstream lon_string;
+	float lat = this.get_latitude_decimal();
+	float lon = this.get_longitude_decimal();
+	int temp_lat = to_string(setPrecision(fabs(lat),0)).length();
+	int temp_lon = to_string(setPrecision(fabs(lon),0)).length();
+	if(lat > 0){
+		lat_string << "+";
+	} else {
+		lat_string << "-";
+	}
+	if(temp_lat < 2){
+		lat_string << "0";
+	}
+	lat_string << setprecision(7) << fabs(lat);
+	if(lon > 0){
+		lon_string << "+";
+	} else {
+		lon_string << "-";
+	}
+	for(int i = temp_lon; i < 3; i++){
+		lon_string << "0";
+	}
+	lon_string << setprecision(7) << fabs(lon) << "/";
+	return lat_string.str() + lon_string.str();
 }
-
+/*
 double GIS::sort(double &list[]){
 }
-
+*/
 /// Converts decimal to sexagesimal
 float GIS::decimaltoSexagesimal(float decimal){
 }
