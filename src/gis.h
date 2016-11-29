@@ -3,12 +3,13 @@
 
 // @TODO: find what to include
 
+#include <math.h>
+#include <stdio.h>
 #include <map>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <stdio.h>
-#include <math.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -40,30 +41,30 @@ namespace cyclus {
 /// The class is adapted from 'https://github.com/jaime-olivares/coordinate'
 /// under the MIT License.
 ///
-/// @TODO Imprementation of GIS information. 
+/// @TODO Imprementation of GIS information.
 
 class GIS : public cyclus::Ider {
   friend class GISTests public :
-  /// The default constructor for GIS.
-  GIS();
-/*
-  /// GIS constructor with latitude and longditude as sexagesimal number.
-  /// @param latitude and longditude expressed in Degrees. Latitude: DDMMSS,
-  /// Longitude: DDMMSS (DD: Degree, MM: minutes, SS: seconds)
-  GIS(float sexagesimal_lat, float sexagesimal_lon);
-*/  
+      /// The default constructor for GIS.
+      GIS();
+  /*
+    /// GIS constructor with latitude and longditude as sexagesimal number.
+    /// @param latitude and longditude expressed in Degrees. Latitude: DDMMSS,
+    /// Longitude: DDMMSS (DD: Degree, MM: minutes, SS: seconds)
+    GIS(float sexagesimal_lat, float sexagesimal_lon);
+  */
   /// GIS constructor with latitude and longditude as decimal number.
-  /// @param latitude and longditude expressed in Degrees. 
+  /// @param latitude and longditude expressed in Degrees.
   GIS(float decimal_lat, float decimal_lon);
-  
+
   /// The default destructor for GIS
   ~GIS();
 
   /// Getters
   float get_latitude_decimal() const;
-  //float get_latitude_degrees() const;  
+  // float get_latitude_degrees() const;
   float get_longitude_decimal() const;
-  //float get_longitude_degrees() const;  
+  // float get_longitude_degrees() const;
 
   /// Setter for latitude in decimals
   /// @param latitude in decimals
@@ -72,36 +73,34 @@ class GIS : public cyclus::Ider {
   /// Setter for latitude in sexagesimal number (degrees)
   /// @param latitude in degrees: DDMMSS (DD: degrees, MM: minutes, SS:
   /// seconds)
-  //void set_latitude_degrees(float lat);
-  
+  // void set_latitude_degrees(float lat);
+
   /// Setter for latitude in decimals
   /// @param longitude in decimals
   void set_longitude_decimal(float lon);
-  
+
   /// Setter for longitude in sexagesimal number (degrees)
   /// @param longitude in degrees: DDDMMSS (DD: degrees, MM: minutes, SS:
-  /// seconds)  
-  //void set_longitude_degrees(float lon);
+  /// seconds)
+  // void set_longitude_degrees(float lon);
 
   /// returns the distance between the GIS object the function has been called
   /// on and the parameter.
   double get_distance(GIS target) const;
 
-  /// returns the distance between two GIS objects in kilometers.
-  double get_distance(GIS a, GIS b) const;
-
   /// returns an array of agents that are within a specified distance, in
   /// kilometers, from an agent in ascending order.
   /// @param range should be in kilometers not miles.
-  GIS[] nearby(double range) const;
+  // GIS[] nearby(double range) const;
 
   /// returns an array of agents that are within a specified distance, in
   /// kilometers, from an agent in ascending order.
   /// @param range should be in kilometers not miles. reference should be an gis
   /// object.
-  GIS[] nearby(const GIS *reference, double range) const;
-  
-  /// converts GIS location into a string expression that follows ISO 6709 Annex H.
+  // GIS[] nearby(const GIS *reference, double range) const;
+
+  /// converts GIS location into a string expression that follows ISO 6709 Annex
+  /// H.
   string toString() const;
 
  private:
@@ -112,15 +111,16 @@ class GIS : public cyclus::Ider {
   float longitude;
 
   /// HELPER Functions
+  /*
   /// Sorts the array of agents by distance in ascending order.
   double sort(double &list[]);
-  
+  */
   /// Converts decimal to sexagesimal
   float decimaltoSexagesimal(float decimal)
-  /// Converts degrees of seconds to sexagesimal
-  float degreeSecondstoSexagesimal(float degreeSeconds)
-  
-  float setPrecision(float value, double precision);
+      /// Converts degrees of seconds to sexagesimal
+      float degreeSecondstoSexagesimal(float degreeSeconds)
+
+          float setPrecision(float value, double precision);
 };
 }
 
