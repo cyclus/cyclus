@@ -285,8 +285,6 @@ IF(NOT CYCLUS_DOC_ONLY)
             "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ReplicatePythonSourceTree.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}"
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-    else(Cython_FOUND)
-        set(NUMPY_INCLUDE_DIRS "")
     endif(Cython_FOUND)
 
     ##############################################################################################
