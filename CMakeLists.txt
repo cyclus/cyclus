@@ -265,9 +265,11 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Include the CMake script UseCython.cmake.  This defines add_cython_module().
     # Instruction for use can be found at the top of cmake/UseCython.cmake.
-    include(UseCython)
+    
+    FIND_PACKAGE(Cython)
     message("-- Found Cython: ${Cython_FOUND}")
     if(Cython_FOUND)
+        include(UseCython)
         execute_process(COMMAND "${CYTHON_EXECUTABLE}" "-V"
                         ERROR_VARIABLE CYTHON_VERSION
                         ERROR_STRIP_TRAILING_WHITESPACE)
