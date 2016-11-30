@@ -287,8 +287,6 @@ IF(NOT CYCLUS_DOC_ONLY)
             "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ReplicatePythonSourceTree.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}"
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-    else(Cython_FOUND)
-        set(NUMPY_INCLUDE_DIRS "")
     endif(Cython_FOUND)
 
     ##############################################################################################
@@ -309,9 +307,10 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${SQLITE3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
-        "${COIN_INCLUDE_DIRS}"
-        "${NUMPY_INCLUDE_DIRS}")
-
+        "${COIN_INCLUDE_DIRS}")
+    if(Cython_FOUND)
+      INCLUDE_DIRECTORIES("${NUMPY_INCLUDE_DIRS}")
+  endif(Cython_FOUND)
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
         SET(core_version "${CORE_VERSION}")
