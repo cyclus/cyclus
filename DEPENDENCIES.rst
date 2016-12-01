@@ -128,7 +128,7 @@ For example, in order to install libxml++ (and libxml2) on your system, type:
 
   sudo apt-get install libxml++2.6-dev
 
-If you'd prefer to copy/paste, the following line will install all required
+If you'd prefer to copy/paste, the following line will install all **required**
 *Cyclus* dependencies:
 
 .. code-block:: bash
@@ -137,7 +137,7 @@ If you'd prefer to copy/paste, the following line will install all required
    libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
    coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
 
-And to install all *Cyclus* dependencies (required and optional):
+And to install all *Cyclus* dependencies (**required and optional**):
 
 - if using python 2.x:
 
