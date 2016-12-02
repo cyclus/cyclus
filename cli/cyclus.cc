@@ -12,6 +12,7 @@
 
 #include "cyclus.h"
 #include "hdf5_back.h"
+#include "pyhooks.h"
 #include "pyne.h"
 #include "query_backend.h"
 #include "sim_init.h"
@@ -19,10 +20,6 @@
 #include "xml_file_loader.h"
 #include "xml_flat_loader.h"
 
-#ifdef CYCLUS_WITH_PYTHON
-#include "Python.h"
-#include "eventhooks.h"
-#endif
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;

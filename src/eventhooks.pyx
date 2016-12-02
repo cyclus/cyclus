@@ -2,4 +2,4 @@
 from __future__ import print_function, unicode_literals
 
 cdef public void eventloophook():
-    print("In the loop!")
+    print("Shoop the loop!")

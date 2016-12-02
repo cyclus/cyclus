@@ -7,12 +7,9 @@
 #include "agent.h"
 #include "error.h"
 #include "logger.h"
+#include "pyhooks.h"
 #include "sim_init.h"
 
-#ifdef CYCLUS_WITH_PYTHON
-#include <Python.h>
-#include "eventhooks.h"
-#endif
 
 namespace cyclus {
 
@@ -42,9 +39,7 @@ void Timer::RunSim() {
     DoDecom();
 
 #ifdef CYCLUS_WITH_PYTHON
-    //PyInit_eventhooks();
-    //eventloophook();
-    __pyx_f_10eventhooks_eventloophook();
+    EventLoop();
 #endif
 
     time_++;
