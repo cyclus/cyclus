@@ -338,3 +338,73 @@ cdef class _Recorder:
 class Recorder(_Recorder, object):
     """Cyclus recorder interface."""
 
+#
+# Agent Spec
+#
+cdef class _AgentSpec:
+
+    def __cinit__(self, spec=None, lib=None, agent=None, alias=None):
+        cdef std_string cpp_spec, cpp_lib, cpp_agent, cpp_alias
+        if spec is None:
+            self.ptx = new cpp_cyclus.AgentSpec()
+        elif lib is None:
+            cpp_spec = str_py_to_cpp(spec)
+            self.ptx = new cpp_cyclus.AgentSpec(cpp_spec)
+        else:
+            cpp_spec = str_py_to_cpp(spec)
+            cpp_lib = str_py_to_cpp(lib)
+            cpp_agent = str_py_to_cpp(agent)
+            cpp_alias = str_py_to_cpp(alias)
+            self.ptx = new cpp_cyclus.AgentSpec(cpp_spec, cpp_lib,
+                                                cpp_agent, cpp_alias)
+
+    def __dealloc__(self):
+        del self.ptx
+
+    def __str__(self):
+        cdef std_string cpp_rtn = self.ptx.str()
+        rtn = cpp_rtn
+        return rtn
+
+    def sanatize(self):
+        cdef std_string cpp_rtn = self.ptx.Sanatize()
+        rtn = cpp_rtn
+        return rtn
+
+    @property
+    def path(self)
+        cdef std_string cpp_rtn = self.ptx.path()
+        rtn = cpp_rtn
+        return rtn
+
+    @property
+    def lib(self)
+        cdef std_string cpp_rtn = self.ptx.lib()
+        rtn = cpp_rtn
+        return rtn
+
+    @property
+    def agent(self)
+        cdef std_string cpp_rtn = self.ptx.agent()
+        rtn = cpp_rtn
+        return rtn
+
+    @property
+    def alias(self)
+        cdef std_string cpp_rtn = self.ptx.alias()
+        rtn = cpp_rtn
+        return rtn
+
+
+class AgentSpec(_AgentSpec):
+    """AgentSpec C++ wrapper
+
+    Parameters
+    ----------
+    spec : str or None, optional
+        This repesents either the full string form of the spec or
+        just the path.
+    lib : str or None, optional
+    agent : str or None, optional
+    alias : str or None, optional
+    """
