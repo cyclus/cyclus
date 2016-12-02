@@ -24,7 +24,7 @@ import pandas as pd
 from cyclus cimport cpp_cyclus
 from cyclus cimport cpp_typesystem
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
-    str_py_to_cpp
+    str_py_to_cpp, std_string_to_py
 
 
 # startup numpy
@@ -363,36 +363,36 @@ cdef class _AgentSpec:
 
     def __str__(self):
         cdef std_string cpp_rtn = self.ptx.str()
-        rtn = cpp_rtn
+        rtn = std_string_to_py(cpp_rtn)
         return rtn
 
     def sanatize(self):
-        cdef std_string cpp_rtn = self.ptx.Sanatize()
-        rtn = cpp_rtn
+        cdef std_string cpp_rtn = self.ptx.Sanitize()
+        rtn = std_string_to_py(cpp_rtn)
         return rtn
 
     @property
-    def path(self)
+    def path(self):
         cdef std_string cpp_rtn = self.ptx.path()
-        rtn = cpp_rtn
+        rtn = std_string_to_py(cpp_rtn)
         return rtn
 
     @property
-    def lib(self)
+    def lib(self):
         cdef std_string cpp_rtn = self.ptx.lib()
-        rtn = cpp_rtn
+        rtn = std_string_to_py(cpp_rtn)
         return rtn
 
     @property
-    def agent(self)
+    def agent(self):
         cdef std_string cpp_rtn = self.ptx.agent()
-        rtn = cpp_rtn
+        rtn = std_string_to_py(cpp_rtn)
         return rtn
 
     @property
-    def alias(self)
+    def alias(self):
         cdef std_string cpp_rtn = self.ptx.alias()
-        rtn = cpp_rtn
+        rtn = std_string_to_py(cpp_rtn)
         return rtn
 
 
@@ -408,3 +408,33 @@ class AgentSpec(_AgentSpec):
     agent : str or None, optional
     alias : str or None, optional
     """
+
+#
+# Dynamic Module
+#
+cdef class _DynamicModule:
+
+    def __cinit__(self):
+        self.ptx = new cpp_cyclus.DynamicModule()
+
+    def __dealloc__(self):
+        del self.ptx
+
+    def exists(self, _AgentSpec spec):
+        """Tests whether an agent spec exists."""
+        cdef cpp_bool rtn = self.ptx.Exists(deref(spec.ptx))
+        return rtn
+
+    def close_all(self):
+        """Closes all dynamic modules."""
+        self.ptx.CloseAll()
+
+    @property
+    def path(self):
+        cdef std_string cpp_rtn = self.ptx.path()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+
+class DynamicModule(_DynamicModule):
+    """Dynamic Module wrapper class."""
