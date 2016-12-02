@@ -1726,7 +1726,117 @@ def main_fill_buf():
         output += CPPGEN.visit(case_template(node, case_body))
     output = indent(output, INDENT*4)
     return output
+                    
+vl_write_vl_string = """hasher_.Clear();
+hasher_.Update({var});
+Digest {key} = hasher_.digest();
+hid_t {keysds} = VLDataset({t.db}, true);
+hid_t {valsds} = VLDataset({t.db}, false);
+if (vlkeys_[{t.db}].count(key) != 1) {{
+  AppendVLKey({keysds}, {t.db}, {key});
+  InsertVLVal({valsds}, {t.db}, {key}, {var});
+}}\n"""
 
+vl_write_blob = """hasher_.Clear();
+hasher_.Update({var});
+Digest {key} = hasher_.digest();
+hid_t {keysds} = VLDataset({t.db}, true);
+hid_t {valsds} = VLDataset({t.db}, false);
+if (vlkeys_[{t.db}].count(key) != 1) {{
+  AppendVLKey({keysds}, {t.db}, {key});
+  InsertVLVal({valsds}, {t.db}, {key}, {var}.str());
+}}\n"""
+
+VL_SPECIAL_TYPES = {"VL_STRING": vl_write_vl_string,
+                    "BLOB": vl_write_blob}
+
+def vl_write(t, variable, depth=0, prefix=""):
+    buf_variable = get_variable("buf", depth=depth, prefix=prefix)
+    key_variable = get_variable("key", depth=depth, prefix=prefix)
+    keysds_variable = get_variable("keysds", depth=depth, prefix=prefix)
+    valsds_variable = get_variable("valsds", depth=depth, prefix=prefix)
+    node_str = ""
+    if t.db in VL_SPECIAL_TYPES:
+        node_str = VL_SPECIAL_TYPES[t.db]
+    else:
+        node_str = """hasher_.Clear();
+hasher_.Update({var});
+Digest {key} = hasher_.digest();
+hid_t {keysds} = VLDataset({t.db}, true);
+hid_t {valsds} = VLDataset({t.db}, false);
+if (vlkeys_[{t.db}].count({key}) != 1) {{
+  hvl_t {buf} = VLValToBuf({var});
+  AppendVLKey({keysds}, {t.db}, {key});
+  InsertVLVal({valsds}, {t.db}, {key}, {buf});
+}}\n"""
+    node = Raw(code=node_str.format(var=variable, key=key_variable,
+                                    keysds=keysds_variable, t=t,  
+                                    valsds=valsds_variable,
+                                    buf=buf_variable))
+    return node
+
+def memcpy(dest, src, size):
+    return FuncCall(name=Var(name="memcpy"), args=[Raw(code=dest),
+                                                   Raw(code=src),
+                                                   Raw(code=size)])
+
+def get_write_setup(t, shape_array, depth=0, prefix=""):
+    setup = Block(nodes=[])
+    variable = get_variable("item_size", depth=depth, prefix=prefix)
+    setup.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
+                                                 target=Var(name=variable),
+                                                 value=Raw(code=get_item_size(t, shape_array)))))
+    if is_primitive(t):
+        return setup
+    else:
+        container = t.canon[0]
+        if DB_TO_VL[t.db]:
+            container = VL_TO_FL_CONTAINERS[container]
+        for c, s, p in zip(t.canon[1:], shape_array[1:], template_args[container]):
+            node = CANON_TO_NODE[c]
+            if isinstance(s, int):
+                s = [s]
+            setup.nodes.append(get_write_setup(node, s, depth=depth+1, 
+                                               prefix=prefix+p))
+    return setup
+
+def get_write_body(t, shape_array, depth=0, prefix="", variable='a'):
+    all_vl = True
+    result = Block(nodes=[])
+    if depth == 0:
+        result.nodes.append(get_write_setup(t, shape_array))
+    if is_primitive(t):
+        if not DB_TO_VL[t.db]:
+            all_vl = False
+    else:
+        for i in flatten(t.canon):
+            node = CANON_TO_NODE[i]
+            if not DB_TO_VL[node.db] and not node.canon in NOT_VL:
+                all_vl = False
+                break
+    if all_vl:
+        result.nodes.append(vl_write(t, variable, depth=depth, prefix=prefix))
+        key = get_variable("key", depth=depth, prefix=prefix)
+        result.nodes.append(ExprStmt(child=memcpy("buf", key + ".val", 
+                                                  "CYCLUS_SHA1_SIZE")))
+        return result
+    #primitive 
+    elif is_primitive(t):
+        if depth == 0:
+            pass
+        else:
+            pass
+        return result
+    else:
+        iterator = get_variable("it", depth=depth, prefix=prefix)
+        result.nodes.append(ExprStmt(child=DeclAssign(
+                                              type=Type(cpp=t.cpp + "::iterator"),
+                                              target=Raw(code=iterator),
+                                              value=Raw(code=variable 
+                                                             +".begin()"))))
+        #result.nodes.append(For())
+        return result
+        
 def main_write():
     CPPGEN = CppGen()
     output = ""
@@ -1739,8 +1849,8 @@ def main_write():
                        args=[Decl(type=Type(cpp="char*"), name=Var(name="buf")),
                              Decl(type=Type(cpp="std::vector<int>&"), 
                                   name=Var(name="shape"))],
-                       body=[], tspecial=True)
-       
+                       body=[get_write_body(t, get_dim_shape(t.canon)[1])], 
+                       tspecial=True)
         block.nodes.append(node)       
         output += CPPGEN.visit(block)
     return output
