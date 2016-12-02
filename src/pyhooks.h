@@ -9,6 +9,15 @@ extern "C" {
 }
 
 namespace cyclus {
+  /// Convience function for initializing Python hooks
+  void PyInitHooks(void) {
+  #if PY_MAJOR_VERSION < 3
+    initeventhooks();
+  #else
+    PyInit_eventhooks();
+  #endif
+  };
+
   // Add some simple shims that attach C++ to Python C hooks
   void EventLoop(void) { __pyx_f_10eventhooks_eventloophook(); };
 }

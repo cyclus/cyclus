@@ -87,11 +87,7 @@ int main(int argc, char* argv[]) {
   // Initialize Python functionality
   #ifdef CYCLUS_WITH_PYTHON
   Py_Initialize();
-  #if PY_MAJOR_VERSION < 3
-  initeventhooks();
-  #else
-  PyInit_eventhooks();
-  #endif
+  PyInitHooks();
   #endif
 
   // Announce yourself
