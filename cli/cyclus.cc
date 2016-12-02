@@ -84,6 +84,16 @@ int main(int argc, char* argv[]) {
     infile = ai.vm["input-file"].as<std::string>();
   }
 
+  // Initialize Python functionality
+  #ifdef CYCLUS_WITH_PYTHON
+  Py_Initialize();
+  #if PY_MAJOR_VERSION < 3
+  initeventhooks();
+  #else
+  PyInit_eventhooks();
+  #endif
+  #endif
+
   // Announce yourself
   std::cout << "              :                                                               " << std::endl;
   std::cout << "          .CL:CC CC             _Q     _Q  _Q_Q    _Q    _Q              _Q   " << std::endl;
@@ -197,14 +207,6 @@ int main(int argc, char* argv[]) {
     si.recorder()->RegisterBackend(fback);
   }
 
-  #ifdef CYCLUS_WITH_PYTHON
-  Py_Initialize();
-  #if PY_MAJOR_VERSION < 3
-  initeventhooks();
-  #else
-  PyInit_eventhooks();
-  #endif
-  #endif
   char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
   if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
     si.timer()->RunSim();
