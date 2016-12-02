@@ -9,6 +9,11 @@
 #include "logger.h"
 #include "sim_init.h"
 
+#ifdef CYCLUS_WITH_PYTHON
+#include <Python.h>
+#include "eventhooks.h"
+#endif
+
 namespace cyclus {
 
 void Timer::RunSim() {
@@ -35,6 +40,12 @@ void Timer::RunSim() {
     CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
     DoTock();
     DoDecom();
+
+#ifdef CYCLUS_WITH_PYTHON
+    //PyInit_eventhooks();
+    //eventloophook();
+    __pyx_f_10eventhooks_eventloophook();
+#endif
 
     time_++;
 

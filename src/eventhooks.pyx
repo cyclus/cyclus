@@ -1,5 +1,5 @@
 """The event handling module in cyclus."""
 from __future__ import print_function, unicode_literals
 
-cdef public void loop():
+cdef public void eventloophook():
     print("In the loop!")

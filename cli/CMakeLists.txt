@@ -12,7 +12,7 @@ SET(CYCLUS_SOURCE ${CYCLUS_SOURCE}
 ADD_EXECUTABLE(cyclus_cli ${CYCLUS_SOURCE})
 set_target_properties(cyclus_cli PROPERTIES OUTPUT_NAME cyclus)
 
-TARGET_LINK_LIBRARIES(cyclus_cli dl ${LIBS} py_events_ cyclus)
+TARGET_LINK_LIBRARIES(cyclus_cli dl ${LIBS} cyclus)
 
 INSTALL(
     TARGETS cyclus_cli

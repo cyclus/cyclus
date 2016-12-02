@@ -21,7 +21,7 @@
 
 #ifdef CYCLUS_WITH_PYTHON
 #include "Python.h"
-#include "py_events_.h"
+#include "eventhooks.h"
 #endif
 
 namespace po = boost::program_options;
@@ -203,11 +203,10 @@ int main(int argc, char* argv[]) {
   #ifdef CYCLUS_WITH_PYTHON
   Py_Initialize();
   #if PY_MAJOR_VERSION < 3
-  initevents();
+  initeventhooks();
   #else
-  PyInit_events();
+  PyInit_eventhooks();
   #endif
-  //initevents();
   #endif
   char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
   if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){

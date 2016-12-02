@@ -1,3 +1,3 @@
 """Header for cyclus events."""
 
-cdef public void loop()
+cdef public void eventloophook()
