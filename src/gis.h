@@ -112,7 +112,7 @@ private:
   /// Longitude is stored as seconds of degree.
   float longitude;
 
-  /// HELPER Functions
+  /// HELPER Function
   /*
   /// Sorts the array of agents by distance in ascending order.
   double sort(double &list[]);
