@@ -83,7 +83,7 @@ on the source code from github is fairly straightforward:
 - to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
   from the ``cyclus`` folder,
 
-- finally, add the following Cyclus installation path (``~/.local/cyclus``) to
+- finally, add the following Cyclus installation path (``~/.local/bin``) to
   the **front** on your ``$PATH``.
 
 For more detailed installation procedure, and/or custom installation please
