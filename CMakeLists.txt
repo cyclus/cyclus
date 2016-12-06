@@ -285,7 +285,13 @@ IF(NOT CYCLUS_DOC_ONLY)
             "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ReplicatePythonSourceTree.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}"
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
+        # make sure we know about having python
+        add_definitions(-DCYCLUS_WITH_PYTHON)
+        set(LIBS ${LIBS} ${PYTHON_LIBRARIES})
+        INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
     else(Cython_FOUND)
+        set(PYTHON_INCLUDE_DIRS "")
         set(NUMPY_INCLUDE_DIRS "")
     endif(Cython_FOUND)
 
@@ -308,6 +314,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}"
+        "${PYTHON_INCLUDE_DIRS}"
         "${NUMPY_INCLUDE_DIRS}")
 
     # set core version, one way or the other

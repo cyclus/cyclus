@@ -46,4 +46,3 @@ def test_conds_comp(db, fname, backend):
 
 if __name__ == "__main__":
     nose.runmodule()
-    pass

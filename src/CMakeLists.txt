@@ -1,4 +1,3 @@
-
 #################################################################
 ############# special file configuration ########################
 #################################################################
@@ -42,6 +41,60 @@ CONFIGURE_FILE(
 ############################################################
 ############# end special configuration ####################
 ############################################################
+
+###########################################################
+############# cython configuration ########################
+###########################################################
+if(Cython_FOUND)
+    # some setup
+    set(cython_include_directories "")
+    get_directory_property(cmake_include_directories
+                           DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                           INCLUDE_DIRECTORIES)
+    list(APPEND cython_include_directories ${cmake_include_directories})
+    list(REMOVE_DUPLICATES cython_include_directories)
+    set(include_directory_arg "")
+    foreach(_include_dir ${cython_include_directories})
+        set(include_directory_arg ${include_directory_arg} "-I" "${_include_dir}")
+    endforeach()
+
+    if( "${PYTHONLIBS_VERSION_STRING}" MATCHES "^2." )
+        set( version_arg "-2" )
+    elseif( "${PYTHONLIBS_VERSION_STRING}" MATCHES "^3." )
+        set( version_arg "-3" )
+    else()
+        set( version_arg )
+    endif()
+
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
+       "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+        set( cython_debug_arg "--gdb" )
+    endif()
+
+    # OK compile everything
+    file(GLOB CYCLUS_CORE_CYTHON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.pyx")
+    set_source_files_properties(${CYCLUS_CORE_CYTHON_FILES}
+        PROPERTIES CYTHON_IS_CXX TRUE)
+    foreach(file ${CYCLUS_CORE_CYTHON_FILES})
+        message(STATUS "Cython Compiling ${file}")
+        get_filename_component(name ${file} NAME_WE)
+        set(_generated_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc")
+        set_source_files_properties(${_generated_file} PROPERTIES GENERATED TRUE)
+
+        EXECUTE_PROCESS(COMMAND ${CYTHON_EXECUTABLE} --cplus
+            ${include_directory_arg} ${version_arg}
+            ${cython_debug_arg} ${CYTHON_FLAGS}
+            --output-file  ${_generated_file} ${file}
+            #OUTPUT_VARIABLE CYTHON_OUTPUT
+            RESULT_VARIABLE res_var_c)
+        IF(NOT "${res_var_c}" STREQUAL "0")
+            message(FATAL_ERROR "Cython compilation of ${file} failed!")
+        ENDIF()
+    endforeach()
+endif(Cython_FOUND)
+###########################################################
+########### end cython configuration ######################
+###########################################################
 
 #################################################################
 ######### build libcyclus #######################################

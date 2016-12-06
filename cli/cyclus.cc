@@ -12,12 +12,14 @@
 
 #include "cyclus.h"
 #include "hdf5_back.h"
+#include "pyhooks.h"
 #include "pyne.h"
 #include "query_backend.h"
 #include "sim_init.h"
 #include "sqlite_back.h"
 #include "xml_file_loader.h"
 #include "xml_flat_loader.h"
+
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -81,6 +83,12 @@ int main(int argc, char* argv[]) {
   } else if (ai.vm.count("input-file") > 0) {
     infile = ai.vm["input-file"].as<std::string>();
   }
+
+  // Initialize Python functionality
+  #ifdef CYCLUS_WITH_PYTHON
+  Py_Initialize();
+  PyInitHooks();
+  #endif
 
   // Announce yourself
   std::cout << "              :                                                               " << std::endl;
@@ -195,7 +203,6 @@ int main(int argc, char* argv[]) {
     si.recorder()->RegisterBackend(fback);
   }
 
-
   char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
   if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
     si.timer()->RunSim();
@@ -209,6 +216,10 @@ int main(int argc, char* argv[]) {
   }
 
   rec.Flush();
+
+  #ifdef CYCLUS_WITH_PYTHON
+  Py_Finalize();
+  #endif
 
   std::cout << std::endl;
   std::cout << "Status: Cyclus run successful!" << std::endl;

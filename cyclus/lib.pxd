@@ -29,3 +29,10 @@ cdef class _Hdf5Back(_FullBackend):
 
 cdef class _Recorder:
     cdef void * ptx
+
+cdef class _AgentSpec:
+    cdef cpp_cyclus.AgentSpec * ptx
+
+cdef class _DynamicModule:
+    cdef cpp_cyclus.DynamicModule * ptx
+

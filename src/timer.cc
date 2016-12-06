@@ -7,7 +7,9 @@
 #include "agent.h"
 #include "error.h"
 #include "logger.h"
+#include "pyhooks.h"
 #include "sim_init.h"
+
 
 namespace cyclus {
 
@@ -35,6 +37,10 @@ void Timer::RunSim() {
     CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
     DoTock();
     DoDecom();
+
+#ifdef CYCLUS_WITH_PYTHON
+    EventLoop();
+#endif
 
     time_++;
 
