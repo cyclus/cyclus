@@ -48,6 +48,7 @@ API_BLACKLIST = {
 SYMBOLS_REPLACEMENTS = [
     ("std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >", "std::string"),
     ("std::__cxx11::list", "std::list"),
+    ("std::__cxx11::basic_stringstream", "std::basic_stringstream"),
     ("[abi:cxx11]", ""),
     ("string >", "string>") # fix string replacement when a '>' follows the string
 ]
