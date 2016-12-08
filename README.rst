@@ -85,6 +85,8 @@ on the source code from github is fairly straightforward:
 
 - finally, add the following Cyclus installation path (``~/.local/bin``) to
   the **front** on your ``$PATH``.
+- additionnaly if you are using MacOSX, also add
+  ``~/.local/lib/pythonX.Y/site-packages``
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.

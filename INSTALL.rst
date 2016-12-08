@@ -60,6 +60,7 @@ On MacOSX you also need to add ~/.local/lib/pythonX.Y/site-packages to your
 ``$PYTHONPATH``:
 
 .. code-block:: bash
+
   echo "export PYTHONPATH=\"\$HOME/.local/lib/python`python -c 'import sys; \
   print(".".join(map(str, sys.version_info[:2])))'`/site-packages:\$PYTHONPATH\"" >> ~/.bashrc
   source ~/.bashrc
