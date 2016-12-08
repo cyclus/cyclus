@@ -1,13 +1,19 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 #taken from http://geant4.cern.ch/support/source/geant4/CMakeLists.txt
 IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-    message(STATUS "Cyclus requires an out-of-source build.")
-    message(STATUS "Please remove these files from ${CMAKE_BINARY_DIR} first:")
-    message(STATUS "CMakeCache.txt")
-    message(STATUS "CMakeFiles")
-    message(STATUS "Once these files are removed, create a separate directory")
-    message(STATUS "and run CMake from there")
-    message(FATAL_ERROR "in-source build detected")
+    MESSAGE(STATUS "Cyclus requires an out-of-source build.")
+    MESSAGE(STATUS "Please remove these files from ${CMAKE_BINARY_DIR} first:")
+    MESSAGE(STATUS "CMakeCache.txt")
+    MESSAGE(STATUS "CMakeFiles")
+    MESSAGE(STATUS "Once these files are removed, create a separate directory")
+    MESSAGE(STATUS "and run CMake from there")
+    MESSAGE(FATAL_ERROR "in-source build detected")
+ENDIF()
+
+MESSAGE(STATUS "USER_SET_PREFIX ${USER_SET_PREFIX}")
+IF(NOT ${USER_SET_PREFIX})
+  SET(CMAKE_PREFIX_PATH "~/.local")
+  MESSAGE(STATUS "CMAKE_USER_PREFIX set to ~/.local")
 ENDIF()
 
 # This project name is cyclus.
