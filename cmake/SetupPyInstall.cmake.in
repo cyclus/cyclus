@@ -10,9 +10,15 @@ message("  PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
 message("  CYCLUS_CORE_VERSION: $ENV{CYCLUS_CORE_VERSION}")
 message("  CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message("  CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
-execute_process(COMMAND ${PYTHON_EXECUTABLE} setup.py install "--prefix=${CMAKE_INSTALL_PREFIX}"
-                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                RESULT_VARIABLE res_var)
+if(${USER_SET_PREFIX})
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} setup.py install "--prefix=${CMAKE_INSTALL_PREFIX}"
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                  RESULT_VARIABLE res_var)
+else()
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} setup.py install "--user"
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                  RESULT_VARIABLE res_var)
+endif()
 if(NOT "${res_var}" STREQUAL "0")
   message(FATAL_ERROR "Process setup.py install failed, res_var = '${res_var}'")
 endif()

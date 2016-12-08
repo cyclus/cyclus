@@ -61,9 +61,13 @@ def install_cyclus(args):
         if args.prefix:
             cmake_cmd += ['-DCMAKE_INSTALL_PREFIX=' +
                           absexpanduser(args.prefix)]
+            cmake_cmd += ['-DUSER_SET_PREFIX=' + 'TRUE']
         if args.cmake_prefix_path:
             cmake_cmd += ['-DCMAKE_PREFIX_PATH=' +
                           absexpanduser(args.cmake_prefix_path)]
+            cmake_cmd += ['-DUSER_SET_PREFIX=' + 'TRUE']
+        if not (args.prefix or args.prefix) :
+            cmake_cmd += ['-DUSER_SET_PREFIX=' + 'FALSE']
         cmake_cmd += ['-DDEFAULT_ALLOW_MILPS=' +
                       ('TRUE' if args.allow_milps else 'FALSE')]
         if args.deps_root:
@@ -120,7 +124,6 @@ def uninstall_cyclus(args):
 
 
 def main():
-    localdir = absexpanduser('~/.local')
 
     description = "A Cyclus installation helper script. " +\
         "For more information, please see cyclus.github.com."
@@ -142,8 +145,8 @@ def main():
     threads = "the number of threads to use in the make step"
     parser.add_argument('-j', '--threads', type=int, help=threads)
 
-    prefix = "the relative path to the installation directory"
-    parser.add_argument('--prefix', help=prefix, default=localdir)
+    prefix = "the relative path to the installation directory, default ~/.local/"
+    parser.add_argument('--prefix', help=prefix)
 
     config_only = 'only configure the package, do not build or install'
     parser.add_argument('--config-only', action='store_true', help=config_only)
