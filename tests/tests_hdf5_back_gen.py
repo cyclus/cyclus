@@ -114,7 +114,7 @@ for(int i=0;i<5;i++){
 
 def test_cppgen_funccall():
     exp = """
-mult_two<std::string,STRING>(a,b)""".strip()
+mult_two<std::string,STRING>(a, b)""".strip()
     n = FuncCall(name=Var(name="mult_two"),\
                  args=[Var(name="a"), Var(name="b")],\
                  targs=[Type(cpp="std::string"), Var(name="STRING")])
@@ -154,7 +154,7 @@ int z=x+y;\n"""
     
 def test_cppgen_funcdef():
     exp = """template<>
-void hello(int a,std::string b) {
+void hello(int a, std::string b) {
   int x=5;
   int y=6;
   int z=x+y;

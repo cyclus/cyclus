@@ -266,7 +266,7 @@ class CppGen(Visitor):
         for i in range(len(node.args)):
             s += self.visit(node.args[i])
             if i < (len(node.args)-1):
-                s += ","
+                s += ", "
         s += ")"
         return s
     
@@ -653,10 +653,11 @@ def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
     """
     x = get_variable("x", depth=depth, prefix=prefix)
     tree = Block(nodes=[
-                 ExprStmt(child=Assign(target=Var(name=x), 
-                            value=FuncCall(name=Raw(code="*reinterpret_cast"),
-                            targs=[Raw(code=t.cpp+"*")], 
-                            args=[Raw(code=base_offset)])))])
+                 ExprStmt(child=Assign(
+                              target=Var(name=x), 
+                              value=FuncCall(name=Raw(code="*reinterpret_cast"),
+                                             targs=[Raw(code=t.cpp+"*")], 
+                                             args=[Raw(code=base_offset)])))])
     return tree
 
 def string_body(t, depth=0, prefix="", base_offset="buf+offset", variable=None):
@@ -1721,7 +1722,8 @@ def main_fill_buf():
         node = CANON_TO_NODE[i]
         write_to_buf = FuncCall(name=Var(name="WriteToBuf"), 
                                 targs=[Raw(code=node.cpp), Raw(code=node.db)],
-                                args=[Raw(code="buf+offset")])
+                                args=[Raw(code="buf+offset"), Raw(code="shapes[col]"),
+                                      Raw(code="a")])
         case_body = ExprStmt(child=write_to_buf)
         output += CPPGEN.visit(case_template(node, case_body))
     output = indent(output, INDENT*4)
@@ -1780,31 +1782,79 @@ def memcpy(dest, src, size):
                                                    Raw(code=src),
                                                    Raw(code=size)])
 
+def memset(dest, src, size):
+    return FuncCall(name=Var(name="memset"), args=[Raw(code=dest),
+                                                   Raw(code=src),
+                                                   Raw(code=size)])
+
+def a_cast(t):
+    return "a->cast<" + t.cpp + ">()"
+
 def get_write_setup(t, shape_array, depth=0, prefix=""):
     setup = Block(nodes=[])
     variable = get_variable("item_size", depth=depth, prefix=prefix)
     setup.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
                                                  target=Var(name=variable),
                                                  value=Raw(code=get_item_size(t, shape_array)))))
+    if t.db == "STRING":
+        valuelen = get_variable("valuelen", depth=depth, prefix=prefix)
+        setup.nodes.append(ExprStmt(child=Decl(type=Type(cpp="size_t"),
+                                               name=Var(name=(valuelen)))))
     if is_primitive(t):
         return setup
     else:
         container = t.canon[0]
         if DB_TO_VL[t.db]:
             container = VL_TO_FL_CONTAINERS[container]
-        for c, s, p in zip(t.canon[1:], shape_array[1:], template_args[container]):
+        prefixes = template_args[container]
+        for c, s, p in zip(t.canon[1:], shape_array[1:], prefixes):
             node = CANON_TO_NODE[c]
             if isinstance(s, int):
                 s = [s]
             setup.nodes.append(get_write_setup(node, s, depth=depth+1, 
                                                prefix=prefix+p))
+        total_item_size = get_variable("total_item_size", depth=depth, 
+                                       prefix=prefix)
+        children = []
+        for i in range(len(t.canon[1:])):
+            children.append(get_variable("item_size", depth=depth+1, 
+                                         prefix=prefix+prefixes[i]))
+        if len(children) == 1:
+            setup.nodes.append(ExprStmt(child=DeclAssign(
+                                               type=Type(cpp="size_t"),
+                                               target=Var(name=total_item_size),
+                                               value=Raw(code=children[0]))))
+        else:
+            setup.nodes.append(ExprStmt(child=DeclAssign(
+                                               type=Type(cpp="size_t"),
+                                               target=Var(name=total_item_size),
+                                               value=Raw(
+                                                     code="+".join(children)))))        
     return setup
 
-def get_write_body(t, shape_array, depth=0, prefix="", variable='a'):
+def write_body_string(t, depth=0, prefix="", variable=None, offset="buf"):
+    if variable is None:
+        variable = get_variable("val", depth=depth, prefix=prefix)
+    node = Block(nodes=[])
+    size = ".size()" if depth == 0 else "->size()"
+    c_str = ".c_str()" if depth == 0 else "->c_str()"
+    valuelen = get_variable("valuelen", depth=depth, prefix=prefix)
+    item_size = get_variable("item_size", depth=depth, prefix=prefix)
+    node.nodes.append(ExprStmt(child=Assign(target=Var(name=valuelen),
+                                            value=FuncCall(
+                                                 name=Raw(code="std::min"),
+                                                 args=[
+                                                   Raw(code=variable+size),
+                                                   Raw(code=item_size)]))))
+    node.nodes.append(ExprStmt(child=memcpy(offset, variable+c_str, valuelen)))
+    node.nodes.append(ExprStmt(child=memset(offset+"+"+valuelen, "0", item_size+"-"+valuelen)))
+    return node
+
+WRITE_BODY_PRIMITIVES = {"STRING": write_body_string}
+
+def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf"):
     all_vl = True
     result = Block(nodes=[])
-    if depth == 0:
-        result.nodes.append(get_write_setup(t, shape_array))
     if is_primitive(t):
         if not DB_TO_VL[t.db]:
             all_vl = False
@@ -1817,24 +1867,49 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable='a'):
     if all_vl:
         result.nodes.append(vl_write(t, variable, depth=depth, prefix=prefix))
         key = get_variable("key", depth=depth, prefix=prefix)
-        result.nodes.append(ExprStmt(child=memcpy("buf", key + ".val", 
+        result.nodes.append(ExprStmt(child=memcpy(offset, key + ".val", 
                                                   "CYCLUS_SHA1_SIZE")))
         return result
+    if depth == 0:
+        result.nodes.append(get_write_setup(t, shape_array))
+        variable = get_variable("val", depth=depth, prefix=prefix)
+        result.nodes.append(ExprStmt(child=DeclAssign(
+                                                    type=t, 
+                                                    target=Var(name=variable),
+                                                    value=Raw(code=a_cast(t)))))
     #primitive 
-    elif is_primitive(t):
-        if depth == 0:
-            pass
-        else:
-            pass
+    if is_primitive(t):
+        if t.db in WRITE_BODY_PRIMITIVES:
+            result.nodes.append(WRITE_BODY_PRIMITIVES[t.db](t, depth=depth, 
+                                                            prefix=prefix, 
+                                                            variable=variable, 
+                                                            offset=offset))
         return result
-    else:
+    elif t.canon[0] in variable_length_types:
+        count = get_variable ("count", depth=depth, prefix=prefix)
+        result.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
+                                                      target=Var(name=count),
+                                                      value=Raw(code="0"))))
         iterator = get_variable("it", depth=depth, prefix=prefix)
         result.nodes.append(ExprStmt(child=DeclAssign(
                                               type=Type(cpp=t.cpp + "::iterator"),
                                               target=Raw(code=iterator),
                                               value=Raw(code=variable 
                                                              +".begin()"))))
-        #result.nodes.append(For())
+        child_bodies = []
+        prefixes = template_args[t.canon[0]]
+        for c, s, p in zip(t.canon[1:], shape_array[1:], prefixes):
+            child_node = CANON_TO_NODE[c]
+            child_size = get_variable("item_size", depth=depth+1, prefix=prefix+p)
+            child_bodies.append(get_write_body(child_node, s, depth=depth+1,
+                                               prefix=prefix+p, variable=iterator, 
+                                               offset=offset+"+"+child_size+"*"+count))
+        result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="==", 
+                                           y=Var(name=variable+".end()")),
+                                incr=Raw(code="++" + iterator),
+                                body=[*child_bodies, ExprStmt(child=LeftUnaryOp(op="++", name=Var(name=count)))]))
+        return result
+    else:
         return result
         
 def main_write():
@@ -1848,7 +1923,9 @@ def main_write():
                        targs=[Raw(code=t.db)], 
                        args=[Decl(type=Type(cpp="char*"), name=Var(name="buf")),
                              Decl(type=Type(cpp="std::vector<int>&"), 
-                                  name=Var(name="shape"))],
+                                  name=Var(name="shape")),
+                             Decl(type=Type(cpp="boost::spirit::hold_any*"),
+                                  name=Var(name="a"))],
                        body=[get_write_body(t, get_dim_shape(t.canon)[1])], 
                        tspecial=True)
         block.nodes.append(node)       
@@ -1869,7 +1946,6 @@ def main():
     global NOT_VL
     global VARIATION_DICT
     global ORIGIN_DICT
-    
     try:
         gen_instruction = sys.argv[1]
     except:
