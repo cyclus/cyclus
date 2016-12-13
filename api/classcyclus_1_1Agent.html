@@ -101,7 +101,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><p>The abstract base class used by all types of agents that live and interact in a simulation. </p>
 <p>There are several functions that must be implemented in support of simulation initialization, snapshotting and restart: <a class="el" href="classcyclus_1_1Agent.html#a699e1696abea8f1f50c379daaceed909" title="Translates info for the agent from an input file to the database by reading parameters from the passe...">InfileToDb</a>, <a class="el" href="classcyclus_1_1Agent.html#a14e9de3702149e667c73834b5b93bf51" title="Intializes an agent&#39;s internal state from the database. ">InitFrom(QueryableBackend*)</a>, <a class="el" href="classcyclus_1_1Agent.html#a9717490b4719d65f5a6ad421e20d9c6c" title="Snapshots agent-internal state to the database via the DbInit var di. ">Snapshot</a>, <a class="el" href="classcyclus_1_1Agent.html#af80bd4f2946e617e699d163315bc432d" title="Snapshots an agent&#39;s resource inventories to the database. ">SnapshotInv</a>, and <a class="el" href="classcyclus_1_1Agent.html#a449cf1cdc033239b4cd59b2eb75c1434" title="Provides an agent&#39;s initial inventory of resources before a simulation begins. ">InitInv</a>. These functions all do inter-related things. Notably, the <a class="el" href="classcyclus_1_1Agent.html#a699e1696abea8f1f50c379daaceed909" title="Translates info for the agent from an input file to the database by reading parameters from the passe...">InfileToDb</a>, <a class="el" href="classcyclus_1_1Agent.html#a14e9de3702149e667c73834b5b93bf51" title="Intializes an agent&#39;s internal state from the database. ">InitFrom</a>, and <a class="el" href="classcyclus_1_1Agent.html#a9717490b4719d65f5a6ad421e20d9c6c" title="Snapshots agent-internal state to the database via the DbInit var di. ">Snapshot</a> functions must all write/read to/from the same database tables (and table schemas). </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00046">46</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00051">51</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 </div>
 <p><code>#include &lt;<a class="el" href="agent_8h_source.html">agent.h</a>&gt;</code></p>
 <div class="dynheader">
@@ -285,7 +285,7 @@ Protected Attributes</h2></td></tr>
 
 <p>default implementation for material preferences. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00322">322</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00327">327</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -313,7 +313,7 @@ Protected Attributes</h2></td></tr>
 
 <p>default implementation for material preferences. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00325">325</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00330">330</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -367,7 +367,7 @@ Protected Attributes</h2></td></tr>
 <p>Returns an agent's json annotations for all state variables and any other information the developer wishes to provide. </p>
 <p>All concrete agents should override this function. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00337">337</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00342">342</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -433,7 +433,7 @@ Protected Attributes</h2></td></tr>
 <p>Called when a new child of this agent has just been built. </p>
 <p>It is possible for this function to be called before the simulation has started when initially existing agents are being setup. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00310">310</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00315">315</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -460,7 +460,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns a list of children this agent has. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00405">405</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00410">410</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -517,7 +517,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns this agent's simulation context. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00364">364</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00369">369</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -601,7 +601,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Called when a new child of this agent is about to be decommissioned. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00313">313</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00318">318</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -628,7 +628,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Returns the time step at which this agent's Build function was called (-1 if the agent has never been built). </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00378">378</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00383">383</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -686,7 +686,7 @@ Protected Attributes</h2></td></tr>
 <p>Returns the default time step at which this agent will exit the simulation (-1 if the agent has an infinite lifetime). </p>
 <p>Deomissioning happens at the end of a time step. With a lifetime of 1, we expect an agent to go through only 1 entire time step. In this case, the agent should be decommissioned on the same time step it was created. Therefore, for agents with non-infinite lifetimes, the exit_time will be the enter time plus its lifetime less 1. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00398">398</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00403">403</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -741,7 +741,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classcyclus_1_1Ider.html#ab931b262ad70d4621d17ac887cf581d1">cyclus::Ider</a>.</p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00349">349</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00354">354</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -971,7 +971,7 @@ this function MUST NOT modify the agent's state. </dd></dl>
 <p>Returns a string that describes the agent subclass (e.g. </p>
 <p><a class="el" href="classcyclus_1_1Region.html" title="The Region class is the abstract class/interface used by all region agents. ">Region</a>, <a class="el" href="classcyclus_1_1Facility.html" title="The Facility class is the abstract class/interface used by all facility agents. ">Facility</a>, etc.) </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00361">361</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00366">366</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1019,7 +1019,7 @@ this function MUST NOT modify the agent's state. </dd></dl>
 
 <p>Returns the number of time steps this agent operates between building and decommissioning (-1 if the agent has an infinite lifetime). </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00388">388</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00393">393</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1046,7 +1046,7 @@ this function MUST NOT modify the agent's state. </dd></dl>
 
 <p>Returns parent of this agent. Returns NULL if the agent has no parent. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00370">370</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00375">375</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1074,7 +1074,7 @@ this function MUST NOT modify the agent's state. </dd></dl>
 <p>Returns the id for this agent's parent. </p>
 <p>Returns -1 if this agent has no parent. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00374">374</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00379">379</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1120,7 +1120,7 @@ this function MUST NOT modify the agent's state. </dd></dl>
 
 <p>Returns the agent's prototype. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00342">342</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00347">347</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1149,7 +1149,7 @@ this function MUST NOT modify the agent's state. </dd></dl>
 <p>Sets the agent's prototype. </p>
 <p>This should generally NEVER be called explicitly by code outside the cyclus kernel. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00346">346</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00351">351</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1179,7 +1179,7 @@ this function MUST NOT modify the agent's state. </dd></dl>
 
 <p>Implements <a class="el" href="classcyclus_1_1StateWrangler.html#acf528d41bbab7ace022d522d6bdfd617">cyclus::StateWrangler</a>.</p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00330">330</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00335">335</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1274,7 +1274,7 @@ Do not record any information via the context's NewDatum function. </dd></dl>
 <p>The string representation of the agent spec that uniquely identifies the concrete agent class/module. </p>
 <p>See CEP21 for details.. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00353">353</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00358">358</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1303,7 +1303,7 @@ Do not record any information via the context's NewDatum function. </dd></dl>
 <p>Sets this agent's agent spec. </p>
 <p>This should generally NEVER be called explicitly by code outside the cyclus kernel. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00357">357</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00362">362</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1357,7 +1357,7 @@ Do not record any information via the context's NewDatum function. </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00060">60</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00065">65</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1383,7 +1383,7 @@ Do not record any information via the context's NewDatum function. </dd></dl>
 <p>describes the agent subclass (e.g. </p>
 <p><a class="el" href="classcyclus_1_1Region.html" title="The Region class is the abstract class/interface used by all region agents. ">Region</a>, Inst, etc.). The in-kernel subclasses must set this variable in their constructor(s). </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00440">440</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00445">445</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>

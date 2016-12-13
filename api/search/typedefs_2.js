@@ -8,5 +8,6 @@ var searchData=
   ['comp_5fmap',['comp_map',['../namespacepyne.html#a86738cecccf4ce3f4ecc2ff6f45ce1a2',1,'pyne']]],
   ['compmap',['CompMap',['../namespacecyclus.html#a66de06f3d3c1e2f8f401f11fb119217c',1,'cyclus']]],
   ['const_5fiterator',['const_iterator',['../structpretty__print_1_1has__begin__end_1_1Dummy.html#a36b0c8b7623123cbfa7dec12bed3a7de',1,'pretty_print::has_begin_end::Dummy::const_iterator()'],['../structpretty__print_1_1array__wrapper__n.html#aa8b7b8cc2f85a27f7ffadaa2174e725e',1,'pretty_print::array_wrapper_n::const_iterator()'],['../classJson_1_1Value.html#af92282ca92b58b320debd486afb7696a',1,'Json::Value::const_iterator()'],['../classcyclus_1_1toolkit_1_1ResMap.html#a48854739b6592299409dc63f7dd57b77',1,'cyclus::toolkit::ResMap::const_iterator()']]],
-  ['const_5fobj_5fiterator',['const_obj_iterator',['../classcyclus_1_1toolkit_1_1ResMap.html#a028cb6124849b091ad5778edc02190eb',1,'cyclus::toolkit::ResMap']]]
+  ['const_5fobj_5fiterator',['const_obj_iterator',['../classcyclus_1_1toolkit_1_1ResMap.html#a028cb6124849b091ad5778edc02190eb',1,'cyclus::toolkit::ResMap']]],
+  ['cost_5ffunction_5ft',['cost_function_t',['../classcyclus_1_1Request.html#ac349c5a878ae6274e9006aa6844f057c',1,'cyclus::Request::cost_function_t()'],['../classcyclus_1_1RequestPortfolio.html#a30c2bbc323911850825acd1a16e80c0b',1,'cyclus::RequestPortfolio::cost_function_t()']]]
 ];

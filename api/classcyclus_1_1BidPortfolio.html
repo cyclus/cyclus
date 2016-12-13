@@ -103,7 +103,7 @@ class cyclus::BidPortfolio&lt; T &gt;</h3>
 <p>A <a class="el" href="classcyclus_1_1BidPortfolio.html" title="A BidPortfolio is a collection of bids as responses to requests for resources and associated constrai...">BidPortfolio</a> is a collection of bids as responses to requests for resources and associated constraints on those bids. </p>
 <p>A <a class="el" href="classcyclus_1_1BidPortfolio.html" title="A BidPortfolio is a collection of bids as responses to requests for resources and associated constrai...">BidPortfolio</a> contains all the information corresponding to a bidder's response to resource requests. It is a light wrapper around the set of bids and constraints for a given bidder, guaranteeing a single bidder per portfolio. Responses are grouped by the bidder. Constraints are assumed to act over the entire set of possible bids. </p>
 
-<p>Definition at line <a class="el" href="bid_8h_source.html#l00012">12</a> of file <a class="el" href="bid_8h_source.html">bid.h</a>.</p>
+<p>Definition at line <a class="el" href="bid_8h_source.html#l00013">13</a> of file <a class="el" href="bid_8h_source.html">bid.h</a>.</p>
 </div>
 <p><code>#include &lt;<a class="el" href="bid_8h_source.html">bid.h</a>&gt;</code></p>
 <div class="dynheader">
@@ -117,11 +117,13 @@ Inheritance diagram for cyclus::BidPortfolio&lt; T &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a009584d873f02f9b30a98478767d1eb3"><td class="memItemLeft" align="right" valign="top">typedef boost::shared_ptr&lt; <a class="el" href="classcyclus_1_1BidPortfolio.html">BidPortfolio</a>&lt; T &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#a009584d873f02f9b30a98478767d1eb3">Ptr</a></td></tr>
-<tr class="separator:a009584d873f02f9b30a98478767d1eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2229704500e5282f9926009493d7a42"><td class="memItemLeft" align="right" valign="top">typedef boost::shared_ptr&lt; <a class="el" href="classcyclus_1_1BidPortfolio.html">BidPortfolio</a>&lt; T &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#ad2229704500e5282f9926009493d7a42">Ptr</a></td></tr>
+<tr class="separator:ad2229704500e5282f9926009493d7a42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a980ec0d09c84ac2a739593d213c8166c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcyclus_1_1Bid.html">Bid</a>&lt; T &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#a980ec0d09c84ac2a739593d213c8166c">AddBid</a> (<a class="el" href="classcyclus_1_1Request.html">Request</a>&lt; T &gt; *request, boost::shared_ptr&lt; T &gt; offer, <a class="el" href="classcyclus_1_1Trader.html">Trader</a> *<a class="el" href="classcyclus_1_1BidPortfolio.html#ad5c787f04c01ab79245a1bc4c8f69171">bidder</a>, bool exclusive, double preference)</td></tr>
+<tr class="separator:a980ec0d09c84ac2a739593d213c8166c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5150fa4d4fd211bec041a2ea2a0fb24d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcyclus_1_1Bid.html">Bid</a>&lt; T &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#a5150fa4d4fd211bec041a2ea2a0fb24d">AddBid</a> (<a class="el" href="classcyclus_1_1Request.html">Request</a>&lt; T &gt; *request, boost::shared_ptr&lt; T &gt; offer, <a class="el" href="classcyclus_1_1Trader.html">Trader</a> *<a class="el" href="classcyclus_1_1BidPortfolio.html#ad5c787f04c01ab79245a1bc4c8f69171">bidder</a>, bool exclusive=false)</td></tr>
 <tr class="separator:a5150fa4d4fd211bec041a2ea2a0fb24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6360684e02526c0ebd89ca0e29348093"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#a6360684e02526c0ebd89ca0e29348093">AddConstraint</a> (const <a class="el" href="classcyclus_1_1CapacityConstraint.html">CapacityConstraint</a>&lt; T &gt; &amp;c)</td></tr>
@@ -134,25 +136,25 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a75876b862f9a942da32208f5c9cef795"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11c29bcf3de188e4aad1ad681955d4a6"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#a11c29bcf3de188e4aad1ad681955d4a6">commodity</a> () const </td></tr>
 <tr class="separator:a11c29bcf3de188e4aad1ad681955d4a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2de93a6ff4a6f32de26936ea2b86bdd2"><td class="memItemLeft" align="right" valign="top">const std::set&lt; <a class="el" href="classcyclus_1_1CapacityConstraint.html">CapacityConstraint</a>&lt; T &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#a2de93a6ff4a6f32de26936ea2b86bdd2">constraints</a> () const </td></tr>
-<tr class="separator:a2de93a6ff4a6f32de26936ea2b86bdd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab72f9bef9a748ce3582798eaf1aeb3d0"><td class="memItemLeft" align="right" valign="top">const std::set&lt; <a class="el" href="classcyclus_1_1CapacityConstraint.html">CapacityConstraint</a>&lt; T &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#ab72f9bef9a748ce3582798eaf1aeb3d0">constraints</a> () const </td></tr>
+<tr class="separator:ab72f9bef9a748ce3582798eaf1aeb3d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a637fab984fd3d63d1c20c121da786e11"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1BidPortfolio.html#a637fab984fd3d63d1c20c121da786e11">~BidPortfolio</a> ()</td></tr>
 <tr class="separator:a637fab984fd3d63d1c20c121da786e11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Typedef Documentation</h2>
-<a class="anchor" id="a009584d873f02f9b30a98478767d1eb3"></a>
+<a class="anchor" id="ad2229704500e5282f9926009493d7a42"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class T&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef boost::shared_ptr&lt; <a class="el" href="classcyclus_1_1BidPortfolio.html">BidPortfolio</a>&lt;T&gt; &gt; <a class="el" href="classcyclus_1_1BidPortfolio.html">cyclus::BidPortfolio</a>&lt; T &gt;::<a class="el" href="classcyclus_1_1BidPortfolio.html#a009584d873f02f9b30a98478767d1eb3">Ptr</a></td>
+          <td class="memname">typedef boost::shared_ptr&lt;<a class="el" href="classcyclus_1_1BidPortfolio.html">BidPortfolio</a>&lt;T&gt; &gt; <a class="el" href="classcyclus_1_1BidPortfolio.html">cyclus::BidPortfolio</a>&lt; T &gt;::<a class="el" href="classcyclus_1_1BidPortfolio.html#ad2229704500e5282f9926009493d7a42">Ptr</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00036">36</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00034">34</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>
@@ -182,7 +184,7 @@ template&lt;class T&gt; </div>
 
 <p>default constructor </p>
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00039">39</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00037">37</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>
@@ -211,11 +213,85 @@ template&lt;class T&gt; </div>
 
 <p>deletes all bids associated with it </p>
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00042">42</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00040">40</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a980ec0d09c84ac2a739593d213c8166c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcyclus_1_1Bid.html">Bid</a>&lt;T&gt;* <a class="el" href="classcyclus_1_1BidPortfolio.html">cyclus::BidPortfolio</a>&lt; T &gt;::AddBid </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classcyclus_1_1Request.html">Request</a>&lt; T &gt; *&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boost::shared_ptr&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>offer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classcyclus_1_1Trader.html">Trader</a> *&#160;</td>
+          <td class="paramname"><em>bidder</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>exclusive</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>preference</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>add a bid to the portfolio </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">request</td><td>the request being responded to by this bid </td></tr>
+    <tr><td class="paramname">offer</td><td>the resource being offered in response to the request </td></tr>
+    <tr><td class="paramname">bidder</td><td>the bidder </td></tr>
+    <tr><td class="paramname">exclusive</td><td>indicates whether the bid is exclusive </td></tr>
+    <tr><td class="paramname">preference</td><td>sets the preference of the bid on a request bid arc. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classcyclus_1_1KeyError.html" title="For failed retrieval/insertion of key-based data into/from data structures. ">KeyError</a></td><td>if a bid is added from a different bidder than the original </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00056">56</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a5150fa4d4fd211bec041a2ea2a0fb24d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -268,6 +344,7 @@ template&lt;class T&gt; </div>
     <tr><td class="paramname">request</td><td>the request being responded to by this bid </td></tr>
     <tr><td class="paramname">offer</td><td>the resource being offered in response to the request </td></tr>
     <tr><td class="paramname">bidder</td><td>the bidder </td></tr>
+    <tr><td class="paramname">exclusive</td><td>indicates whether the bid is exclusive </td></tr>
   </table>
   </dd>
 </dl>
@@ -278,7 +355,7 @@ template&lt;class T&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00055">55</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00079">79</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>
@@ -314,7 +391,7 @@ template&lt;class T&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00073">73</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00087">87</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>
@@ -342,7 +419,7 @@ template&lt;class T&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the agent associated with the portfolio. If no bids have been added, the bidder is NULL. </dd></dl>
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00079">79</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00093">93</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>
@@ -370,7 +447,7 @@ template&lt;class T&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>const access to the bids </dd></dl>
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00089">89</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00099">99</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>
@@ -398,11 +475,11 @@ template&lt;class T&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd><em>deprecated</em> the commodity associated with the portfolio. </dd></dl>
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00084">84</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00096">96</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a2de93a6ff4a6f32de26936ea2b86bdd2"></a>
+<a class="anchor" id="ab72f9bef9a748ce3582798eaf1aeb3d0"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -412,7 +489,7 @@ template&lt;class T&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::set&lt; <a class="el" href="classcyclus_1_1CapacityConstraint.html">CapacityConstraint</a>&lt;T&gt; &gt;&amp; <a class="el" href="classcyclus_1_1BidPortfolio.html">cyclus::BidPortfolio</a>&lt; T &gt;::constraints </td>
+          <td class="memname">const std::set&lt;<a class="el" href="classcyclus_1_1CapacityConstraint.html">CapacityConstraint</a>&lt;T&gt; &gt;&amp; <a class="el" href="classcyclus_1_1BidPortfolio.html">cyclus::BidPortfolio</a>&lt; T &gt;::constraints </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -426,7 +503,7 @@ template&lt;class T&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the set of constraints over the bids </dd></dl>
 
-<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00094">94</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
+<p>Definition at line <a class="el" href="bid__portfolio_8h_source.html#l00102">102</a> of file <a class="el" href="bid__portfolio_8h_source.html">bid_portfolio.h</a>.</p>
 
 </div>
 </div>

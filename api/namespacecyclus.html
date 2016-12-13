@@ -640,7 +640,18 @@ Enumerations</h2></td></tr>
 <a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09ad7a37ccfa927066c23ba33925fdf689d">VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE</a>, 
 <br />
 &#160;&#160;<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09a2500a7b8da2ca9d8fc7ce215d44232e5">VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE</a>, 
-<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09aad776a49d94a492c019d34867cb8dc38">VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE</a>
+<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09aad776a49d94a492c019d34867cb8dc38">VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE</a>, 
+<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09a2c0241056b1d282da9479f10776af5f6">PAIR_INT_PAIR_STRING_STRING</a>, 
+<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09a91aec49dbdf45773eb4c6121bf715a4d">PAIR_INT_PAIR_VL_STRING_STRING</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09ae04e4d0ed4be66350f87e632bcbf7b8c">PAIR_INT_PAIR_STRING_VL_STRING</a>, 
+<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09a6cf5422f98b8f4e51d7d55ab8741a701">PAIR_INT_PAIR_VL_STRING_VL_STRING</a>, 
+<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09a7d55cf47bb35f733587c32e107be21aa">PAIR_DOUBLE_DOUBLE</a>, 
+<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09afcbbf3bffbdc9f435bbf5c11fb79dd4b">PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09aed29d2b4a2e49ce744ebf6aec56ed08c">PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE</a>, 
+<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09a1bc7cd42655a9adac02adaec88caf6d4">PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE</a>, 
+<a class="el" href="namespacecyclus.html#a5ad06ad1981c22df2232192ef64b4e09a73c2b64316e530e5b8efb685e4d5d281">PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE</a>
 <br />
  }</td></tr>
 <tr class="separator:a5ad06ad1981c22df2232192ef64b4e09"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1077,7 +1088,7 @@ Variables</h2></td></tr>
 <p>A map type to represent all of the daughter nuclides tracked. </p>
 <p>The key for this map type is the decay matrix column associated with the parent, and the value is a vector of pairs of all the daughters for that parent. Each of the daughters are represented by a pair that contains the daughter's Nuc number and its branching ratio. </p>
 
-<p>Definition at line <a class="el" href="decayer_8h_source.html#l00025">25</a> of file <a class="el" href="decayer_8h_source.html">decayer.h</a>.</p>
+<p>Definition at line <a class="el" href="decayer_8h_source.html#l00030">30</a> of file <a class="el" href="decayer_8h_source.html">decayer.h</a>.</p>
 
 </div>
 </div>
@@ -1094,7 +1105,7 @@ Variables</h2></td></tr>
 <p>map&lt;inventory_name, vector&lt;resources_in_inventory&gt; &gt;. </p>
 <p>Used by agents in their #SnapshotInv and #InitInv functions for saving+loading their internal resource inventories. </p>
 
-<p>Definition at line <a class="el" href="agent_8h_source.html#l00030">30</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
+<p>Definition at line <a class="el" href="agent_8h_source.html#l00035">35</a> of file <a class="el" href="agent_8h_source.html">agent.h</a>.</p>
 
 </div>
 </div>
@@ -1150,7 +1161,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="decayer_8h_source.html#l00027">27</a> of file <a class="el" href="decayer_8h_source.html">decayer.h</a>.</p>
+<p>Definition at line <a class="el" href="decayer_8h_source.html#l00032">32</a> of file <a class="el" href="decayer_8h_source.html">decayer.h</a>.</p>
 
 </div>
 </div>
@@ -1167,7 +1178,7 @@ Variables</h2></td></tr>
 <p>A map type to represent all of the parent nuclides tracked. </p>
 <p>The key for this map type is the parent's Nuc number, and the value is a pair that contains the corresponding decay matrix column and decay constant associated with that parent. </p>
 
-<p>Definition at line <a class="el" href="decayer_8h_source.html#l00018">18</a> of file <a class="el" href="decayer_8h_source.html">decayer.h</a>.</p>
+<p>Definition at line <a class="el" href="decayer_8h_source.html#l00023">23</a> of file <a class="el" href="decayer_8h_source.html">decayer.h</a>.</p>
 
 </div>
 </div>
@@ -1209,7 +1220,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="query__backend_8h_source.html#l00346">346</a> of file <a class="el" href="query__backend_8h_source.html">query_backend.h</a>.</p>
+<p>Definition at line <a class="el" href="query__backend_8h_source.html#l00360">360</a> of file <a class="el" href="query__backend_8h_source.html">query_backend.h</a>.</p>
 
 </div>
 </div>
@@ -1282,7 +1293,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p>Definition at line <a class="el" href="query__backend_8h_source.html#l00298">298</a> of file <a class="el" href="query__backend_8h_source.html">query_backend.h</a>.</p>
+<p>Definition at line <a class="el" href="query__backend_8h_source.html#l00312">312</a> of file <a class="el" href="query__backend_8h_source.html">query_backend.h</a>.</p>
 
 </div>
 </div>
@@ -1774,6 +1785,24 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09a2500a7b8da2ca9d8fc7ce215d44232e5"></a>VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE&#160;</td><td class="fielddoc">
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09aad776a49d94a492c019d34867cb8dc38"></a>VL_VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09a2c0241056b1d282da9479f10776af5f6"></a>PAIR_INT_PAIR_STRING_STRING&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09a91aec49dbdf45773eb4c6121bf715a4d"></a>PAIR_INT_PAIR_VL_STRING_STRING&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09ae04e4d0ed4be66350f87e632bcbf7b8c"></a>PAIR_INT_PAIR_STRING_VL_STRING&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09a6cf5422f98b8f4e51d7d55ab8741a701"></a>PAIR_INT_PAIR_VL_STRING_VL_STRING&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09a7d55cf47bb35f733587c32e107be21aa"></a>PAIR_DOUBLE_DOUBLE&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09afcbbf3bffbdc9f435bbf5c11fb79dd4b"></a>PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09aed29d2b4a2e49ce744ebf6aec56ed08c"></a>PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09a1bc7cd42655a9adac02adaec88caf6d4"></a>PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a5ad06ad1981c22df2232192ef64b4e09a73c2b64316e530e5b8efb685e4d5d281"></a>PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE&#160;</td><td class="fielddoc">
 </td></tr>
 </table>
 
@@ -2587,7 +2616,7 @@ template&lt;typename T &gt; </div>
 
 <p>Compares a condiontion for a single value. </p>
 
-<p>Definition at line <a class="el" href="query__backend_8h_source.html#l00487">487</a> of file <a class="el" href="query__backend_8h_source.html">query_backend.h</a>.</p>
+<p>Definition at line <a class="el" href="query__backend_8h_source.html#l00501">501</a> of file <a class="el" href="query__backend_8h_source.html">query_backend.h</a>.</p>
 
 </div>
 </div>
@@ -2627,7 +2656,7 @@ template&lt;typename T &gt; </div>
 
 <p>Compares all condiontions for a value. </p>
 
-<p>Definition at line <a class="el" href="query__backend_8h_source.html#l00520">520</a> of file <a class="el" href="query__backend_8h_source.html">query_backend.h</a>.</p>
+<p>Definition at line <a class="el" href="query__backend_8h_source.html#l00534">534</a> of file <a class="el" href="query__backend_8h_source.html">query_backend.h</a>.</p>
 
 </div>
 </div>
@@ -2995,7 +3024,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03410">3410</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03845">3845</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3015,7 +3044,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03434">3434</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03869">3869</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3035,7 +3064,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03483">3483</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03918">3918</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3055,7 +3084,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03458">3458</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03893">3893</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3075,7 +3104,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03513">3513</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03948">3948</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3095,7 +3124,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03645">3645</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l04080">4080</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3115,7 +3144,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03576">3576</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l04011">4011</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3135,7 +3164,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03544">3544</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03979">3979</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3155,7 +3184,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03611">3611</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l04046">4046</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3175,7 +3204,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03363">3363</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03798">3798</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3195,7 +3224,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03387">3387</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03822">3822</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3215,7 +3244,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03319">3319</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03754">3754</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3235,7 +3264,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03303">3303</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03738">3738</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3255,7 +3284,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03287">3287</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03722">3722</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3275,7 +3304,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03340">3340</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l03775">3775</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3295,7 +3324,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l00099">99</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l00100">100</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3315,7 +3344,7 @@ template&lt;&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l02327">2327</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
+<p>Definition at line <a class="el" href="hdf5__back_8cc_source.html#l02761">2761</a> of file <a class="el" href="hdf5__back_8cc_source.html">hdf5_back.cc</a>.</p>
 
 </div>
 </div>
@@ -3528,7 +3557,7 @@ template&lt;typename Map &gt; </div>
 <p>Creates and returns a new material with the specified quantity and a default, meaningless composition. </p>
 <p>This is intended only for testing purposes. </p>
 
-<p>Definition at line <a class="el" href="material_8cc_source.html#l00221">221</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
+<p>Definition at line <a class="el" href="material_8cc_source.html#l00232">232</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
 
 </div>
 </div>
@@ -5443,7 +5472,7 @@ template&lt;Warnings T&gt; </div>
 <p>Default preference values are unity. </p>
 <p>This has been updated from values of zero (which was the case prior to release 1.4). Preferences can be lower or higher than the default value, but must be positive. </p>
 
-<p>Definition at line <a class="el" href="request_8h_source.html#l00015">15</a> of file <a class="el" href="request_8h_source.html">request.h</a>.</p>
+<p>Definition at line <a class="el" href="request_8h_source.html#l00018">18</a> of file <a class="el" href="request_8h_source.html">request.h</a>.</p>
 
 </div>
 </div>

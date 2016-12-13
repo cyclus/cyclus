@@ -129,6 +129,7 @@ var searchData=
   ['decay_5fzn',['decay_zn',['../namespacepyne_1_1decayers.html#acbe7de84c8dfa5bcf0a2f9901264648a',1,'pyne::decayers']]],
   ['decay_5fzr',['decay_zr',['../namespacepyne_1_1decayers.html#a66deacfd71a9ecdf9f67a9aa65b0cabe',1,'pyne::decayers']]],
   ['decayer',['Decayer',['../classcyclus_1_1Decayer.html#a53c03279c3c7991d3d0068686019cff8',1,'cyclus::Decayer']]],
+  ['decayheat',['DecayHeat',['../classcyclus_1_1Material.html#a355da32ff9a4810df11fbdd6649436de',1,'cyclus::Material']]],
   ['decendentof',['DecendentOf',['../classcyclus_1_1Agent.html#a6859a95e136c1090ec3f6fae6394907e',1,'cyclus::Agent']]],
   ['decommission',['Decommission',['../classcyclus_1_1Agent.html#a912d793d93d62e9c7a536ffd7b372669',1,'cyclus::Agent::Decommission()'],['../classcyclus_1_1Facility.html#a05b1b2eb866271a7f81182eafa289d08',1,'cyclus::Facility::Decommission()'],['../classcyclus_1_1Institution.html#a238bc57087fced1c564b0c72fdde4d8c',1,'cyclus::Institution::Decommission()'],['../classcyclus_1_1Region.html#afd41d2a8071581c6d6a3c35258326737',1,'cyclus::Region::Decommission()']]],
   ['decomnotify',['DecomNotify',['../classcyclus_1_1Agent.html#a0cf3fb6563bad0ec2b605c1b53935e61',1,'cyclus::Agent']]],

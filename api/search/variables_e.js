@@ -11,6 +11,7 @@ var searchData=
   ['ni_5fshell_5fbe_5ferr',['ni_shell_be_err',['../structpyne_1_1atomic.html#aaf211665d5f535c602a07c396d63b56d',1,'pyne::atomic']]],
   ['node_5fto_5fbid',['node_to_bid',['../structcyclus_1_1ExchangeTranslationContext.html#a990c2854cee2d5fd8f46a27d1e1e75e8',1,'cyclus::ExchangeTranslationContext']]],
   ['node_5fto_5frequest',['node_to_request',['../structcyclus_1_1ExchangeTranslationContext.html#af5e864b4a916440bb0769005faae2ea2',1,'cyclus::ExchangeTranslationContext']]],
+  ['not_5fvl',['NOT_VL',['../namespacehdf5__back__gen.html#af284a65963c4d3db119e2772b130b4f9',1,'hdf5_back_gen']]],
   ['nuc',['nuc',['../structsimple__xs.html#a3b9ab3ba1c7c702c2c967d4039cd9b03',1,'simple_xs::nuc()'],['../structpyne_1_1atomic__mass__data.html#ae0315c2d1f8504ad3ef3a47ca5d77e9e',1,'pyne::atomic_mass_data::nuc()'],['../structpyne_1_1q__val__data.html#a39dbf1ad0347f0f68f09c94a9ff9157f',1,'pyne::q_val_data::nuc()'],['../structpyne_1_1dose.html#aecdcc915d5508f34715be42e13498d54',1,'pyne::dose::nuc()'],['../structpyne_1_1scattering__lengths.html#a0a7eab28f0d7ff075524950827cfb4d1',1,'pyne::scattering_lengths::nuc()']]],
   ['nuc_5fdata_5fpath',['NUC_DATA_PATH',['../namespacepyne.html#ac4b3b3dcf295d033b906bf921d820ae2',1,'pyne']]],
   ['nuc_5fid',['nuc_id',['../structpyne_1_1level__data.html#aefac68a7a5aaedafd0b01f459e75adc8',1,'pyne::level_data']]],

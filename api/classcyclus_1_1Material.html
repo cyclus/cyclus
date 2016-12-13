@@ -149,6 +149,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9b9fee424e9d8caac2a2201dd9c63cb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5d428758bf620f0a46fad41e581608c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1Material.html#ab5d428758bf620f0a46fad41e581608c">Decay</a> (int curr_time)</td></tr>
 <tr class="separator:ab5d428758bf620f0a46fad41e581608c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a355da32ff9a4810df11fbdd6649436de"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1Material.html#a355da32ff9a4810df11fbdd6649436de">DecayHeat</a> ()</td></tr>
+<tr class="separator:a355da32ff9a4810df11fbdd6649436de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4245356577bd840916c33341d20c4ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcyclus_1_1Material.html#a7ccfc89ee031403e889e16c9f72a4c24">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1Material.html#ad4245356577bd840916c33341d20c4ee">ExtractComp</a> (double qty, <a class="el" href="classcyclus_1_1Composition.html#a382b7d2e82b935476b1f4213a15f3eee">Composition::Ptr</a> c, double threshold=<a class="el" href="namespacecyclus.html#a30171ba9be60919543e67145b834fc7d">eps_rsrc</a>())</td></tr>
 <tr class="separator:ad4245356577bd840916c33341d20c4ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29daa23d0d6777e137fa4bb3a4c08440"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcyclus_1_1Material.html#a7ccfc89ee031403e889e16c9f72a4c24">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcyclus_1_1Material.html#a29daa23d0d6777e137fa4bb3a4c08440">ExtractQty</a> (double qty)</td></tr>
@@ -279,7 +281,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="material_8cc_source.html#l00208">208</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
+<p>Definition at line <a class="el" href="material_8cc_source.html#l00219">219</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
 
 </div>
 </div>
@@ -348,7 +350,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Returns the nuclide composition of this material. </p>
 
-<p>Definition at line <a class="el" href="material_8cc_source.html#l00201">201</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
+<p>Definition at line <a class="el" href="material_8cc_source.html#l00212">212</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
 
 </div>
 </div>
@@ -367,7 +369,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>DEPRECATED - use non-const <a class="el" href="classcyclus_1_1Material.html#a4ae593372b62d46cb7471be2a0c2a8a8" title="Returns the nuclide composition of this material. ">comp()</a> function. </p>
 
-<p>Definition at line <a class="el" href="material_8cc_source.html#l00196">196</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
+<p>Definition at line <a class="el" href="material_8cc_source.html#l00207">207</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
 
 </div>
 </div>
@@ -472,6 +474,25 @@ Protected Member Functions</h2></td></tr>
 <p>This is a special case of Transmute where the new composition is calculated automatically. The time delta is calculated as the difference between curr_time and the last time the material's composition was updated with a decay calculation (i.e. prev_decay_time). This may or may not result in an updated material composition. Does nothing if the simulation decay mode is set to "never" or none of the nuclides' decay constants are significant with respect to the time delta. </p>
 
 <p>Definition at line <a class="el" href="material_8cc_source.html#l00144">144</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a355da32ff9a4810df11fbdd6649436de"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double cyclus::Material::DecayHeat </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns a double with the decay heat of the material in units of W/kg. </p>
+
+<p>Definition at line <a class="el" href="material_8cc_source.html#l00196">196</a> of file <a class="el" href="material_8cc_source.html">material.cc</a>.</p>
 
 </div>
 </div>

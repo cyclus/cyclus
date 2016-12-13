@@ -13,7 +13,7 @@ var searchData=
   ['trades_5fby_5frequester',['trades_by_requester',['../structcyclus_1_1TradeExecutionContext.html#ac264667cf2a07dc202811b642fcd7878',1,'cyclus::TradeExecutionContext']]],
   ['trades_5fby_5fsupplier',['trades_by_supplier',['../structcyclus_1_1TradeExecutionContext.html#ad00e4b56687ff5bbd9b2696c63c59b03',1,'cyclus::TradeExecutionContext']]],
   ['tree',['tree',['../classhdf5__back__gen_1_1Visitor.html#a53a1bcaa2d00cb5e5be70aa1bfc6b829',1,'hdf5_back_gen::Visitor']]],
-  ['tru',['tru',['../namespacepyne_1_1nucname.html#af6669ddbefba8098a45e4fc27edc5c68',1,'pyne::nucname::tru()'],['../namespacepyne_1_1nucname.html#adfc1f43df3ea014a500e2c79e0c2f053',1,'pyne::nucname::TRU()']]],
+  ['tru',['TRU',['../namespacepyne_1_1nucname.html#adfc1f43df3ea014a500e2c79e0c2f053',1,'pyne::nucname::TRU()'],['../namespacepyne_1_1nucname.html#af6669ddbefba8098a45e4fc27edc5c68',1,'pyne::nucname::tru()']]],
   ['tru_5farray',['TRU_array',['../namespacepyne_1_1nucname.html#ab148461391c413fb7a7176821d65d2e6',1,'pyne::nucname']]],
   ['type_5fmap',['type_map',['../namespacecyclus.html#ad0a5d5c3ae6ac6646ed239cabfef040b',1,'cyclus']]],
   ['types',['types',['../classcyclus_1_1QueryResult.html#a17eb0225b16a1b6d0ee6ee0cb7a120d0',1,'cyclus::QueryResult']]],
