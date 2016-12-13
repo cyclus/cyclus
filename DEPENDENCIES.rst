@@ -37,7 +37,7 @@ Package                Minimum Version
 
 .. website_include_end
 
-On some platforms, such as Ubuntu 14.04, the following are also necessary:
+On some platforms, such as Ubuntu 16.04, the following are also necessary:
 
 ====================   ==================
 Package                Minimum Version
@@ -54,11 +54,19 @@ And a few optional dependencies:
 Package                Minimum Version
 ====================   ==================
 doxygen (for docs)     1.7.6.1
-tcmalloc (for speed)   any?
+tcmalloc (for speed)   any
+Cython                 0.13.1
+Python (dev version)   2.7 or 3.3+
+Jinja2                 any
+NumPy                  1.9+
+Pandas                 any
 ====================   ==================
 
 *Note that the Debian/Ubuntu package ``libtcmalloc`` is NOT discovered correctly
 by our build system.  Instead use ``libgoogle-perftools-dev``.*
+
+*Also note that the development version of Python, Jinja2, NumPy, and Pandas are
+only needed if Cython is installed.*
 
 ***********************
 Installing Dependencies
@@ -73,7 +81,7 @@ Installing Dependencies (Linux and Unix)
 This guide assumes that the user has root access (to issue ``sudo`` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Ubuntu versions 14.04 and 16.04, using ``apt-get`` as the package
+of Ubuntu versions 16.04, using ``apt-get`` as the package
 manager (scroll down further for Mac OSX instructions).
 
 The command to install a dependency takes the form of:
@@ -106,6 +114,13 @@ and (optionally):
 #. libblas-dev
 #. liblapack-dev
 #. libgoogle-perftools-dev
+#. python-dev    or  python3-dev
+#. python-tables or  python3-tables
+#. python-pandas or  python3-pandas
+#. python-numpy  or  python3-numpy
+#. python-nose   or  python3-nose
+#. python-jinja2 or  python3-jinja2
+#. cython        or  cython3       
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -113,12 +128,42 @@ For example, in order to install libxml++ (and libxml2) on your system, type:
 
   sudo apt-get install libxml++2.6-dev
 
-If you'd prefer to copy/paste, the following line will install all *Cyclus*
-dependencies:
+If you'd prefer to copy/paste, the following line will install all **required**
+*Cyclus* dependencies:
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ libgoogle-perftools-dev
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
+   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
+
+And to install all *Cyclus* dependencies (**required and optional**):
+
+- if using python 2.x:
+
+.. code-block:: bash
+
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
+   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
+   libgoogle-perftools-dev python-dev python-tables python-pandas python-numpy python-nose \
+   python-jinja2 cython
+
+- if using python 3.x:
+
+.. code-block:: bash
+
+   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
+   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
+   libgoogle-perftools-dev python3-dev python3-tables python3-pandas python3-numpy python3-nose \
+   python3-jinja2 cython3
+
+To determine which version of Python is already installed on your computer, run:
+
+.. code-block:: bash
+
+   python -V
 
 Boost Note
 ^^^^^^^^^^
@@ -173,9 +218,9 @@ required library package names is:
 
 Then install Coin-Cbc from source. They can be downloaded to any directory on
 your computer:
-   
+
 **Coin-Cbc**: Download and build using the svn command in the terminal:
-   
+
 .. code-block:: bash
 
   svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc

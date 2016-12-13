@@ -3,8 +3,9 @@
 import os
 import sys
 import json
-from ast import literal_eval
 from pprint import pformat
+from itertools import chain
+from collections import OrderedDict
 
 is_primitive = lambda t: isinstance(t.canon, str)
 
@@ -442,12 +443,12 @@ def case_template(t, read_x):
     return node
 
 def primitive_setup(t, depth=0, prefix=""):
-    """Represents necessary setup steps for C++ primitives."""
+    """HDF5 Query: Represents necessary setup steps for C++ primitives."""
     node = Nothing()
     return node
 
 def string_setup(depth=0, prefix=""): 
-    """Represents necessary setup steps for C++ String."""
+    """HDF5 Query: Represents necessary setup steps for C++ String."""
     nullpos = "nullpos" + str(depth) + prefix
     
     node = Block(nodes=[
@@ -455,21 +456,21 @@ def string_setup(depth=0, prefix=""):
     return node
 
 def vl_string_setup(depth=0, prefix=""):
-    """Represents necessary setup steps for C++ VL_String."""
+    """HDF5 Query: Represents necessary setup steps for C++ VL_String."""
     
     node = Block(nodes=[Nothing()])
     return node
 
-template_args = {"MAP": ("KEY", "VALUE"),
-                 "VECTOR": ("ELEM",),
-                 "SET": ("ELEM",),
-                 "LIST": ("ELEM",),
-                 "PAIR": ("ITEM1", "ITEM2")}
+template_args = {"MAP": ("key", "val"),
+                 "VECTOR": ("elem",),
+                 "SET": ("elem",),
+                 "LIST": ("elem",),
+                 "PAIR": ("first", "second")}
 
 variable_length_types = ["MAP", "LIST", "SET", "VECTOR"]
 
 def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
-    """Get nodes representing C++ setup. 
+    """HDF5 Query: Get nodes representing C++ setup. 
     
     Primitive setups are called directly, while template types are handled
     recursively.
@@ -549,7 +550,8 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                            args=[Raw(code=HDF5_type),
                                                  Raw(code="&"+fieldlen_var)]))])
             setup_nodes.append(fieldlen)
-            item_type_var = get_variable("item_type", depth=depth, prefix=prefix)
+            item_type_var = get_variable("item_type", depth=depth, 
+                                         prefix=prefix)
             item_type = ExprStmt(child=DeclAssign(
                                         type=Type(cpp="hid_t"),
                                         target=Var(name=item_type_var),
@@ -596,7 +598,7 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
     return node
 
 def get_decl(t, depth=0, prefix=""):
-    """Get node representing C++ type declaration. 
+    """HDF5 Query: Get node representing C++ type declaration. 
     
     Declarations occur directly before bodies, created without recursion.
     
@@ -619,7 +621,7 @@ def get_decl(t, depth=0, prefix=""):
     return node
 
 def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents a body using the reinterpret_cast method.
+    """HDF5 Query: Represents a body using the reinterpret_cast method.
     
     This includes int, double, float, etc.
     """
@@ -632,7 +634,7 @@ def reinterpret_cast_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return tree
 
 def string_body(t, depth=0, prefix="", base_offset="buf+offset", variable=None):
-    """Represents body for the C++ String primitive."""
+    """HDF5 Query: Represents body for the C++ String primitive."""
     if variable == None:
         variable = get_variable("x", depth=depth, prefix=prefix)
     
@@ -660,7 +662,7 @@ def string_body(t, depth=0, prefix="", base_offset="buf+offset", variable=None):
 
 def vl_string_body(t, depth=0, prefix="", base_offset="buf+offset", 
                    variable=None):
-    """Represents the body for the VL_String primitive."""
+    """HDF5 Query: Represents the body for the VL_String primitive."""
     
     if variable == None:
         variable = get_variable("x", depth=depth, prefix=prefix)
@@ -673,7 +675,7 @@ def vl_string_body(t, depth=0, prefix="", base_offset="buf+offset",
     return tree
 
 def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for the boost::uuid primitive."""
+    """HDF5 Query: Represents the body for the boost::uuid primitive."""
     x = get_variable("x", depth=depth, prefix=prefix)
     total_size = get_variable("total_size", depth=depth, prefix=prefix)
     
@@ -685,7 +687,7 @@ def uuid_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return tree
 
 def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for all C++ VL types."""
+    """HDF5 Query: Represents the body for all C++ VL types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     node = Block(nodes=[ExprStmt(child=Assign(target=Var(name=x),
                             value=FuncCall(name=Var(name="VLRead"),
@@ -695,7 +697,7 @@ def vl_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents the body for C++ map type."""
+    """HDF5 Query: Represents the body for C++ map type."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -732,7 +734,7 @@ def map_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def pair_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body for C++ pair type."""
+    """HDF5 Query: Represents body for C++ pair type."""
     x = get_variable("x", depth=depth, prefix=prefix)
     
     item1 = CANON_TO_NODE[t.canon[1]]
@@ -760,7 +762,7 @@ def pair_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<primitive> types."""
+    """HDF5 Query: Represents body of C++ Vector<primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -779,7 +781,7 @@ def vector_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<non-primitive> types."""
+    """HDF5 Query: Represents body of C++ Vector<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -810,7 +812,7 @@ def vector_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ Vector<std::string> types."""
+    """HDF5 Query: Represents body of C++ Vector<std::string> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     index = x + "[" + k + "]"
@@ -837,7 +839,7 @@ def vec_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def set_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<primitive> types."""
+    """HDF5 Query: Represents body of C++ set<primitive> types."""
     
     x = get_variable("x", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
@@ -863,7 +865,7 @@ def set_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<non-primitive> types."""
+    """HDF5 Query: Represents body of C++ set<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     
@@ -890,14 +892,15 @@ def set_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ set<std::string> types."""
+    """HDF5 Query: Represents body of C++ set<std::string> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix) 
     
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     
     string_prefix = get_prefix(prefix, t, 0)
-    string_size = get_variable("total_size", depth=depth+1, prefix=string_prefix)
+    string_size = get_variable("total_size", depth=depth+1, 
+                               prefix=string_prefix)
     string_name = get_variable("x", depth=depth+1, prefix=string_prefix)
     
     offset = base_offset + "+" + string_size + "*" + k
@@ -916,7 +919,7 @@ def set_string_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
     
 def list_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ list<primitive> types."""
+    """HDF5 Query: Represents body of C++ list<primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     fieldlen = get_variable("fieldlen", depth=depth, prefix=prefix)
     child_prefix = get_prefix(prefix, t, 0)
@@ -941,7 +944,7 @@ def list_primitive_body(t, depth=0, prefix="", base_offset="buf+offset"):
     return node
 
 def list_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Represents body of C++ list<non-primitive> types."""
+    """HDF5 Query: Represents body of C++ list<non-primitive> types."""
     x = get_variable("x", depth=depth, prefix=prefix)
     k = get_variable("k", depth=depth, prefix=prefix)
     child_prefix = get_prefix(prefix, t, 0)
@@ -988,7 +991,7 @@ BODIES = {"INT": reinterpret_cast_body,
           "VECTOR": vector_body}
 
 def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
-    """Get body nodes for a C++ type.
+    """HDF5 Query: Get body nodes for a C++ type.
     
     Parameters
     ----------
@@ -1026,7 +1029,7 @@ def get_body(t, depth=0, prefix="", base_offset="buf+offset"):
         raise ValueError("No generation specified for type " + t.db)
     return Block(nodes=block)
 
-#teardown functions
+# teardown functions
 
 TEARDOWN_STACK = []
 VARS = []
@@ -1055,8 +1058,6 @@ def normal_close(t):
 def get_teardown(t):
     return normal_close(t)
 
-QUERY_CASES = ''
-
 def indent(text, prefix, predicate=None):
     """This function copied from textwrap library version 3.3.
 
@@ -1075,11 +1076,516 @@ def indent(text, prefix, predicate=None):
             yield (prefix + line if predicate(line) else line)
     return ''.join(prefixed_lines())
 
-QUERY_CASES = ''
+def typeid(t):
+    node = CANON_TO_NODE[t]
+    return FuncCall(name=Raw(code="typeid"), args=[Raw(code=node.cpp)])
 
-def main():
-    output = ""
+def no_vl(t):
+    if DB_TO_VL[t.db]:
+        return False
+    else:
+        if is_primitive(t):
+            return True
+        else:
+            ret = True
+            for i in t.canon[1:]:
+                ret = ret and no_vl(CANON_TO_NODE[i])
+            return ret
+            
+def get_dim_shape(canon, start=0, depth=0):
+    tshape = []
+    i = 0
+    if isinstance(canon, str):
+        tshape = start + i
+        i += 1
+        if depth == 0:
+            return i, [tshape]
+        else:
+            return i, tshape
+    else:
+        for u in canon:
+            j, jshape = get_dim_shape(u, start=start+i, depth=depth+1)
+            i += j
+            tshape.append(jshape)
+        return i, tshape
+
+def flatten(canon):
+    if isinstance(canon, str):
+        return [canon]
+    result = list(canon)
+    result[0] = canon
+    i = 1
+    while i < len(result):
+        if isinstance(result[i], str):
+            i += 1
+        else:
+            temp = result[i][1:]
+            i += 1
+            for j in range(0, len(temp)):
+                result.insert(i+j, temp[j])
+    return tuple(result)  
+
+def get_variation_cond(t):
+    """HDF5 Create: Generate C++ if-statement condition for a given type.
+    
+    These if-statements are always a string of boolean expressions of the form
+    'shape[n]<1' or 'shape[n]>=1', where n is an index into the C++ shape array.
+    A shape index less than one (<1) denotes a variable length type, whereas an 
+    index greater than one (>=1) denotes fixed length type. These boolean
+    expressions are joined by '&&' operators. For instance, a type of 
+    VL_MAP_VL_STRING_VL_STRING would receive the condition 
+    'shape[0]<1 && shape[1]<1 && shape[2]<1'.
+    
+    Parameters
+    ----------
+    t : Type
+        C++ type for the boolean condition.
+        
+    Returns
+    -------
+    current_bool : BinOp
+        Node representing the boolean condition.
+    """
+    vl_count = 0
+    vl_potential_count = 0
+    op_list = []
+    shape_len, dim_shape = get_dim_shape(t.canon)
+    
+    flat_canon = flatten(t.canon)
+    flat_shape = zip(flat_canon, [x for x in range(shape_len)])
+    
+    for sub_type, index in flat_shape:
+        node = CANON_TO_NODE[sub_type]
+        # This type is VL
+        if DB_TO_VL[node.db]:
+            vl_count += 1
+            vl_potential_count += 1
+            op_list.append(BinOp(x=Raw(code="shape["+str(index)+"]"), 
+                                 op="<", y=Raw(code="1")))
+        # Find out if type could be VL
+        else:
+            orig_type = ORIGIN_DICT[sub_type]
+            if is_primitive(CANON_TO_NODE[orig_type]):
+                if VARIATION_DICT[orig_type]:
+                    vl_potential_count += 1
+                    op_list.append(BinOp(x=Raw(code="shape["+str(index)+"]"),
+                                         op=">=", y=Raw(code="1"))) 
+            else:
+                if orig_type[0] in variable_length_types:
+                    vl_potential_count += 1
+                    op_list.append(BinOp(x=Raw(code="shape["+str(index)+"]"),
+                                         op=">=", y=Raw(code="1"))) 
+    current_bool = op_list[0]
+    for i in range(1,len(op_list)):
+        current_bool = BinOp(x=current_bool, op="&&", y=op_list[i])
+    
+    if vl_count == vl_potential_count:
+        current_bool = BinOp(x=Raw(code="shape.empty()"), op="||", 
+                             y=current_bool)
+    return current_bool
+
+def VL_ADD_BLOCK(t, item_var):
+    node = If(cond=BinOp(x=FuncCall(name=Raw(code="vldts_.count"),
+                                    args=[Raw(code=t.db)]),
+                         op="==",
+                         y=Raw(code="0")),
+              body=[ExprStmt(child=BinOp(
+                                   x=Raw(code="vldts_["+t.db+"]"),
+                                   op="=",
+                                   y=Raw(code="H5Tvlen_create("+item_var+")"))),
+                    ExprStmt(child=FuncCall(
+                                        name=Raw(code="opened_types_.insert"),
+                                        args=[Raw(code="vldts_["+t.db+"]")]))])
+    return node
+
+def print_statement(t, identifier):
+    """Generate C++ print statement for debugging generated code."""
+    msg_string = t.db + ": got here: " + str(identifier)
+    return ExprStmt(child=Raw(code="std::cerr<<\"" + msg_string 
+                                   + "\" << std::endl"))
+
+def get_variation_body(t):
+    """HDF5 Create: Generate C++ if-statement body for a given type.
+    
+    Called in coordination with get_variation_cond. For a given C++ type, this 
+    function returns the necessary C++ statements to create the HDF5 version 
+    of that type.
+    
+    Parameters
+    ----------
+    t : Type
+        C++ type for which to create an if-statement body.
+    
+    Returns
+    -------
+    body : Block
+        Node containing necessary C++ statements for HDF5 creation.
+    """
+    body = Block(nodes=[])
+    # This handles types with non-standard bodies that we wish to
+    # handle directly.
+    if t.db in RAW_TYPES:
+        return RAW_TYPES[t.db]
+    
+    body.nodes.append(ExprStmt(child=Raw(code="dbtypes[i]="+ t.db)))
+
+    item_nodes, opened_types = get_item_type(t)
+    body.nodes.append(item_nodes)
+    type_var = opened_types[-1] if opened_types != [] else get_variable(
+                                                                  "item_type",
+                                                                   prefix="",
+                                                                   depth=0)
+     
+    is_vl = True if DB_TO_VL[t.db] else False
+    size_expression = Raw(code=get_item_size(t, vl_flag=is_vl))
+    body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="dst_sizes[i]"),
+                                                 op="=",
+                                                 y=size_expression)))
+    if DB_TO_VL[t.db]:
+        if is_primitive(t):
+            default_item_var = type_var
+        else:
+            if opened_types == []:
+                item_prefix = template_args[VL_TO_FL_CONTAINERS[t.canon[0]]][0]
+                default_item_var = get_variable("item_type", 
+                                                prefix=item_prefix,
+                                                depth=1)
+            else:
+                default_item_var = get_variable("item_type", prefix="", depth=1)
+        body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
+                                               op="=",
+                                               y=Raw(code="sha1_type_"))))
+        body.nodes.append(VL_ADD_BLOCK(t, default_item_var))
+    else:
+        body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
+                                               op="=",
+                                               y=Raw(code=type_var))))
+        for opened in opened_types[:-1]:
+            body.nodes.append(ExprStmt(child=FuncCall(
+                                          name=Raw(code="opened_types_.insert"),
+                                          args=[Raw(code=opened)])))
+        if not is_primitive(t):
+            body.nodes.append(ExprStmt(child=FuncCall(
+                                          name=Raw(code="opened_types_.insert"),
+                                          args=[Raw(code="field_types[i]")])))
+    return body
+
+HDF5_PRIMITIVES = {"INT": "H5T_NATIVE_INT",
+                   "DOUBLE": "H5T_NATIVE_DOUBLE",
+                   "FLOAT": "H5T_NATIVE_FLOAT",
+                   "BOOL": "H5T_NATIVE_CHAR",
+                   "STRING": "CreateFLStrType({size})",
+                   "BLOB": "sha1_type_",
+                   "UUID": "uuid_type_"}
+
+PRIMITIVE_SIZES = {"INT": "sizeof(int)",
+                   "DOUBLE": "sizeof(double)",
+                   "FLOAT": "sizeof(float)",
+                   "BOOL": "sizeof(char)",
+                   "VL_STRING": "CYCLUS_SHA1_SIZE",
+                   "BLOB": "CYCLUS_SHA1_SIZE",
+                   "UUID": "CYCLUS_UUID_SIZE"}
+
+VL_TO_FL_CONTAINERS = {"VL_VECTOR": "VECTOR",
+                       "VL_SET": "SET",
+                       "VL_LIST": "LIST",
+                       "VL_MAP": "MAP"}
+
+def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
+    """HDF5 Create: Build specified HDF5 type, recursively if necessary.
+    
+    HDF5 types are Primitive, Compound, or Array. We handle each of these cases
+    here differently. Primitives are immediately returned by querying the 
+    HDF5_PRIMITIVES dictionary. Compound types are made up of multiple
+    Primitive or Compound types, so each of these child types must be declared
+    and created before the parent type can be created. This is accomplished via
+    recursion over every child type in the type's canon. It should be noted that
+    Compound types depend heavily on the size of those types they contain,
+    and this function relies on get_item_size for that information. Finally, 
+    Arrays can contain one Primitive or Compound type, and are created by 
+    specifying this child type, Array dimensions, and the Array length.
+    
+    Parameters
+    ----------
+    t : Type
+        Type node representing C++ type
+    shape_array : list, optional
+        Dimensioned list of current type shape
+    prefix : str, optional
+        Used to name C++ variables throughout multiple levels of recursion
+    depth : int, optional
+        Recursive depth counter
+    
+    Returns
+    -------
+    node : Block
+        Cumulative collection of nodes necessary for specified item type
+    opened_stack : list
+        Cumulative collection of opened HDF5 types which must eventually be
+        closed
+    
+    """
+    # We need to keep a persistant shape array, unless initial call.
+    if shape_array == None:
+        shape_len, dim_shape = get_dim_shape(t.canon)
+    else:
+        dim_shape = shape_array
+    node = Block(nodes=[])
+    opened_stack = []
+    type_var = get_variable("item_type", prefix=prefix, depth=depth)
+    node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"), 
+                                          name=Var(name=type_var))))
+    # Handle primitives
+    if isinstance(t.canon, str):
+        if DB_TO_VL[t.db] or (t.canon == "STRING" and vl_flag):
+            node.nodes.append(ExprStmt(child=Assign(
+                                                 target=Var(name=type_var),
+                                                 value=Raw(code="sha1_type_"))))
+            return node, opened_stack
+        else:   
+            primitive_type = Raw(code=HDF5_PRIMITIVES[t.db].format(size="shape["
+                                                              +str(dim_shape[0])
+                                                              +"]"))
+            node.nodes.append(ExprStmt(child=Assign(target=Var(name=type_var),
+                                                    value=primitive_type)))
+            return node, opened_stack
+    # Handle dependent types
+    else:
+        container_type = t.canon[0]
+        canon_shape = list(zip(t.canon, dim_shape))
+        is_vl = vl_flag
+        if DB_TO_VL[t.db]:
+            container_type = VL_TO_FL_CONTAINERS[t.canon[0]]
+            is_vl = True
+        else:
+            if t.canon[0] in variable_length_types:
+                shape_var = get_variable("shape0", prefix="", depth=depth+1)
+                node.nodes.append(ExprStmt(
+                                    child=DeclAssign(
+                                         type=Type(cpp="hsize_t"),
+                                         target=Var(name=shape_var),
+                                         value=Raw(code="shape["
+                                                   +str(dim_shape[0])+"]"))))
+        item_var = ""
+        if len(canon_shape[1:]) == 1:
+            # Not a compound type.
+            item_canon, item_shape = canon_shape[1]
+            # Get nodes initializing our child type
+            child_array = (item_shape if isinstance(item_shape, list) 
+                                      else [item_shape])
+            new_prefix = template_args[container_type][0]
+            child_node, child_opened = get_item_type(CANON_TO_NODE[item_canon],
+                                            shape_array=child_array,
+                                            vl_flag=is_vl,
+                                            prefix=new_prefix,
+                                            depth=depth+1)
+            node.nodes.append(child_node)
+            opened_stack.extend(child_opened)
+            child_var = get_variable("item_type", prefix=new_prefix, 
+                                     depth=depth+1)
+                                                 
+            item_var = child_var
+        else:
+            # This is a compound type.
+            child_dict = OrderedDict()
+            # 1. Get all child item type nodes, recursively.
+            for i in range(1, len(canon_shape)):
+                item_canon, item_shape = canon_shape[i]
+                item_node = CANON_TO_NODE[item_canon]
+                pre_opened_len = len(opened_stack)
+                child_array = (item_shape if isinstance(item_shape, list)
+                                          else [item_shape])
+                new_prefix = template_args[container_type][i-1]
+                child_node, child_opened = get_item_type(item_node,
+                                                        shape_array=child_array,
+                                                        vl_flag=is_vl,
+                                                        prefix=new_prefix,
+                                                        depth=depth+1)
+                node.nodes.append(child_node)
+                opened_stack.extend(child_opened)
+               
+                # if the previous opened stack and current stack are the same,
+                # we know that the child is a primitive, and we can generate
+                # its variable accordingly.
+                if  len(opened_stack) == pre_opened_len:
+                    child_item_var = get_variable("item_type", 
+                                                  prefix=new_prefix,
+                                                  depth=depth+1)
+                # However, if the current opened stack is longer, the first new
+                # variable there will be our child variable.
+                else:
+                    child_item_var = opened_stack[pre_opened_len]
+                # 2. Get item sizes.
+                child_dict[child_item_var] = get_item_size(item_node, 
+                                                           child_array,
+                                                           vl_flag=is_vl, 
+                                                           depth=depth+1)
+            # 3. Create compound type using total item size.
+            compound = hdf5_create_compound(list(child_dict.values()))
+            
+            item_var = get_variable("item_type", prefix="", depth=depth+1)
+            node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"),
+                                                  name=Raw(code=item_var))))
+            
+            node.nodes.append(ExprStmt(child=Assign(target=Raw(code=item_var),
+                                                    value=compound)))
+            
+            opened_stack.append(item_var)
+            # 4. Insert individual children into the compound type.            
+            node.nodes.append(hdf5_insert(container_type, item_var, child_dict))
+            
+        if container_type in variable_length_types and not DB_TO_VL[t.db]:
+            array_node = ExprStmt(child=Assign(target=Var(name=type_var),
+                                               value=hdf5_array_create(
+                                                           item_var,
+                                                           rank=1,
+                                                           dims="&"+shape_var)))
+            
+            opened_stack.append(type_var)
+            node.nodes.append(array_node)
+    return node, opened_stack
+
+def get_item_size(t, shape_array=None, vl_flag=False, depth=0):
+    """Resolves item size recursively.
+    
+    We can dig down into a type until we reach eventual primitives, and then
+    multiply the known sizes of those primitives by the lengths of their
+    containers. Container length is defined in the C++ shape array.
+    
+    Parameters
+    ----------
+    t : Type
+        The type whose size is in question
+    shape_array : list, optional
+        Dimensioned list of shape array indicies, same shape as t.canon
+    depth : int, optional
+        Recursive depth counter
+    
+    Returns
+    -------
+    size : str
+        String of C++ expression representing t's size.
+    """
+    if shape_array == None:
+        shape_array = get_dim_shape(t.canon)[1]
+    if is_primitive(t):
+        if t.db in PRIMITIVE_SIZES.keys():
+            return PRIMITIVE_SIZES[t.db]
+        else:
+            if not vl_flag:
+                return "shape[" + str(shape_array[0]) + "]"
+            else:
+                return "CYCLUS_SHA1_SIZE"
+    else:
+        size = "("
+        if DB_TO_VL[t.db]:
+            size += "CYCLUS_SHA1_SIZE"
+        else:
+            size += "("
+            if len(t.canon[1:]) > 1:
+                children = []
+                for child_index in range(1, len(t.canon)):
+                    child_array = shape_array[child_index]
+                    if not isinstance(child_array, list):
+                        child_array = [child_array]
+                    children.append(get_item_size(
+                                           CANON_TO_NODE[t.canon[child_index]],
+                                           child_array,
+                                           vl_flag=vl_flag,
+                                           depth=depth+1))
+                size += "+".join(children)
+            else:
+                child_array = shape_array[1]
+                if not isinstance(child_array, list):
+                    child_array = [child_array]
+                size += get_item_size(CANON_TO_NODE[t.canon[1]], child_array,
+                                      vl_flag=vl_flag, depth=depth+1)
+            size += ")"
+            if t.canon[0] in variable_length_types:
+                size += "*" + "shape[" + str(shape_array[0]) + "]"
+        size += ")"
+        return size    
+
+def hdf5_array_create(item_variable, rank=1, dims="&shape0"):
+    """Node representation of the C++ H5Tarray_create2 method.
+    
+    Parameters
+    ----------
+    item_variable : str
+        Variable name of HDF5 array item.
+    rank : int, optional
+        Number of HDF5 array dimensions.
+    dims : str, optional
+        Variable (by reference) of shape array belonging to HDF5 array
+
+    Returns
+    -------
+    node : FuncCall
+        Node of H5Tarray_create2 function call.
+    """     
+    node = FuncCall(name=Var(name="H5Tarray_create2"), 
+                    args=[Raw(code=item_variable), Raw(code=str(rank)),
+                          Raw(code=dims)])
+    return node
+
+def hdf5_create_compound(sizes):
+    """Node representation of the C++ HDF5 compound type creation function.
+    
+    Parameters
+    ----------
+    sizes : list
+        List of type sizes, all must be str type.
+    
+    Returns
+    -------
+    node : FuncCall
+        H5Tcreate function call node.
+    """
+    node = FuncCall(name=Var(name="H5Tcreate"), args=[Raw(code="H5T_COMPOUND"),
+                                            Raw(code="+".join(sizes))])
+    return node
+    
+def hdf5_insert(container_type, compound_var, types_sizes_dict):
+    """Node representation of the C++ H5Tinsert function.
+    
+    This function is used to identify partitions within an already established
+    HDF5 Compound type. That is, we specify which inner types are located at
+    what memory location within the Compound type.
+    
+    Parameters
+    ----------
+    container_type : str
+        Should be a key in the template_args dict
+    compound_var : str
+        C++ variable to which the function should refer
+    types_sizes_dict : dict
+        Dictionary of C++ type variables mapped to their size in memory
+         
+    Returns
+    -------
+    node : Block
+        Cumulative nodes for H5Tinsert function
+    """
+    node = Block(nodes=[])
+    buf = str(0)
+    keys = list(types_sizes_dict.keys())
+    for i in range(len(types_sizes_dict)):
+        type_var = keys[i]
+        type_size = types_sizes_dict[type_var]
+        descriptor = "\"" + template_args[container_type][i] + "\""
+        func = FuncCall(name=Var(name="H5Tinsert"), args=[])
+        func.args.append(Raw(code=compound_var))
+        func.args.append(Raw(code=descriptor))
+        func.args.append(Raw(code=buf))
+        buf += "+" + type_size
+        func.args.append(Raw(code=type_var))
+        node.nodes.append(ExprStmt(child=func))
+    return node
+
+def main_query():
+    """HDF5 Query: Generate Query case statement code."""
     CPPGEN = CppGen()
+    output = ""
     for type in CANON_SET:
         type_node = CANON_TO_NODE[type]
         setup = get_setup(type_node)
@@ -1088,7 +1594,105 @@ def main():
         read_x = Block(nodes=[setup, body, teardown])
         output += CPPGEN.visit(case_template(type_node, read_x))
     output = indent(output, INDENT * 5)
-    print(output)
+    return output
 
+NOT_VL = []
+VARIATION_DICT = {}
+ORIGIN_DICT = {}
+
+io_error = Raw(code=("throw IOError(\"the type for column \'\"+"
+                     "std::string(field_names[i])+\"\' is not yet supported "
+                     "in HDF5.\");"))
+
+raw_string = Raw(code=("dbtypes[i]=STRING;\n"
+                      "field_types[i]=H5Tcopy(H5T_C_S1);\n"
+                      "H5Tset_size(field_types[i], shape[0]);\n"
+                      "H5Tset_strpad(field_types[i], H5T_STR_NULLPAD);\n"
+                      "opened_types_.insert(field_types[i]);\n"
+                      "dst_sizes[i]=sizeof(char)*shape[0];\n"))
+
+raw_blob = Raw(code=("dbtypes[i]=BLOB;\n"
+                     "field_types[i]=sha1_type_;\n"
+                     "dst_sizes[i]=CYCLUS_SHA1_SIZE;\n"))
+
+RAW_TYPES = {"STRING": raw_string,
+             "BLOB": raw_blob}
+
+DEBUG_TYPES = ["VECTOR_STRING"]
+
+def main_create():
+    """HDF5 Create: Generate CreateTable if-statements."""
+    CPPGEN = CppGen()
+    global NOT_VL
+    global VARIATION_DICT
+    global ORIGIN_DICT
+    output = ""
+    fixed_length_types = set(t for t in CANON_SET if no_vl(CANON_TO_NODE[t]))
+    
+    VARIATION_DICT = {}
+    for n in fixed_length_types:
+        key = CANON_TO_NODE[n]
+        vals = []
+        for x in CANON_SET:
+            val_node = CANON_TO_NODE[x]
+            if val_node.cpp == key.cpp and val_node.db != key.db: 
+                vals.append(val_node)
+        VARIATION_DICT[n] = vals
+    
+    VARIATION_DICT[('BLOB')] = []
+    VARIATION_DICT['STRING'] = [CANON_TO_NODE['VL_STRING']]
+        
+    for i in VARIATION_DICT.keys():
+        ORIGIN_DICT[i] = i
+        if VARIATION_DICT[i] != []:
+            for j in VARIATION_DICT[i]:
+                ORIGIN_DICT[j.canon] = i
+                
+    NOT_VL = [x for x in VARIATION_DICT.keys() if not VARIATION_DICT[x]] 
+        
+    outer_if_bodies = {n: Block(nodes=[]) for n in VARIATION_DICT.keys()}
+    
+    for n in VARIATION_DICT.keys():
+        variations = VARIATION_DICT[n][:]
+        key_node = CANON_TO_NODE[n]
+        try:
+            initial_type = variations.pop()
+            sub_if = If(cond=get_variation_cond(initial_type),
+                        body=[get_variation_body(initial_type)],
+                        elifs=[(get_variation_cond(v), 
+                               [get_variation_body(v)]) 
+                              for v in variations],
+                        el=Block(nodes=[get_variation_body(key_node)]))
+            outer_if_bodies[n].nodes.append(sub_if)
+        except IndexError:
+            lone_node = get_variation_body(key_node)
+            outer_if_bodies[n].nodes.append(lone_node)
+
+    shape_line = ExprStmt(child=Raw(code="shape=shapes[i]"))
+    
+    initial_node, initial_body = outer_if_bodies.popitem()
+    if_statement = If(cond=BinOp(x=Var(name="valtype"), op="==", 
+                                 y=typeid(initial_node)),
+                      body=[shape_line, initial_body],
+                      elifs=[(BinOp(x=Var(name="valtype"), op="==",
+                                    y=typeid(t)), 
+                              [shape_line, outer_if_bodies[t]])
+                             for t in outer_if_bodies.keys()],
+                      el=io_error)
+    output += CPPGEN.visit(if_statement)
+    output = indent(output, INDENT)
+    return output
+
+MAIN_DISPATCH = {"QUERY": main_query,
+                 "CREATE": main_create}
+
+def main():
+    try:
+        gen_instruction = sys.argv[1]
+    except:
+        raise ValueError("No generation instruction provided")    
+    function = MAIN_DISPATCH[gen_instruction]
+    print(function())
+    
 if __name__ == '__main__':
     main()

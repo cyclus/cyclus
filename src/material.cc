@@ -193,6 +193,17 @@ void Material::Decay(int curr_time) {
   Transmute(decayed);
 }
 
+double Material::DecayHeat() {
+    double decay_heat = 0.;    
+    // Pyne decay heat operates with grams, cyclus generally in kilograms.
+    pyne::Material p_map = pyne::Material(comp_->mass(), qty_ * 1000);
+    std::map<int, double> dec_heat = p_map.decay_heat();
+    for (auto nuc : dec_heat) {
+        decay_heat += nuc.second;
+    }
+    return decay_heat;
+}
+
 Composition::Ptr Material::comp() const {
   throw Error("comp() const is deprecated - use non-const comp() function."
               " Recompilation should fix the problem.");

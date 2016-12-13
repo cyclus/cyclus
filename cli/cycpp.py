@@ -492,6 +492,7 @@ class VarDeclarationFilter(Filter):
         annotations['type'] = state.canonize_type(vtype, vname,
                                                   statement=statement)
         annotations['index'] = len(state.context[classname]['vars'])
+        annotations['shape'] = state.canonize_shape(annotations)
         state.context[classname]['vars'][vname] = annotations
         if 'alias' in annotations:
             alias = annotations['alias']
@@ -813,12 +814,58 @@ class StateAccumulator(object):
                     p=pformat(self.supported_types))
                 raise TypeError(msg)
         return t
-
+    
     def _canonize_targs(self, newtname, targs):
         newt = [newtname]
         newt += [self.canonize_type(targ) for targ in targs]
         return tuple(newt)
 
+    def canonize_shape(self, ann_dict):
+        """This canonizes a shape. We take a look at the current shape, and 
+        standardize its format if necessary. We append -1's to the shape if 
+        its length does not match our expected length. Returns the new shape
+        or raises an error if the given shape was longer than expected.
+        """
+        type_canon = ann_dict['type']
+        try: 
+            current_shape = ann_dict['shape']
+        except KeyError:
+            ann_dict['shape'] = None
+            current_shape = ann_dict['shape']
+        new_shape = []
+        # Flatten list dimensions
+        if isinstance(type_canon, str):
+            result = [type_canon]
+        else:
+            result = list(type_canon)
+            i = 0
+            while i < len(result):
+                if isinstance(result[i], str):
+                    i += 1
+                else:
+                    temp = result[i][1:]
+                    i += 1
+                    for j in range(len(temp)):
+                        result.insert(i+j, temp[j])
+        expected_shape_length = len(result)
+        # Shape wasn't given.
+        if current_shape is None:
+            new_shape = [-1] * expected_shape_length
+        # Shape is correct as is.
+        elif len(current_shape) == expected_shape_length:
+            new_shape = current_shape
+        # Shape is too short.
+        elif len(current_shape) < expected_shape_length:    
+            diff = expected_shape_length - len(current_shape)
+            new_shape = current_shape.extend([-1] * diff)
+        # Shape is too long- we throw an error.
+        elif len(current_shape) > expected_shape_length:
+            err_string = ("Shape array for type {t} is not formatted correctly."
+                          " Expected length {length} or less.")
+            raise ValueError(err_string.format(t=str(type_canon), 
+                                               length=str(expected_shape_length)))
+        return new_shape
+    
     def canonize_class(self, cls, _usens=True):
         """This canonizes a classname.  The class name need not be the current
         class whose scope we are in, but may be any class whatsoever. Returns
