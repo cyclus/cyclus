@@ -142,7 +142,7 @@ class Hdf5Back : public FullBackend {
   /// \}
   
   template <DbTypes U>
-  void WriteToBuf<U>(char* buf, std::vector<int>& shape, const boost::spirit::hold_any* a, size_t column);
+  void WriteToBuf(char* buf, std::vector<int>& shape, const boost::spirit::hold_any* a, size_t column);
   
   /// Gets an HDF5 reference dataset for a variable length datatype
   /// If the dataset does not exist in the database, it will create it.

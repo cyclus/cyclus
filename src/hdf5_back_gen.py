@@ -1719,7 +1719,7 @@ def main_fill_buf():
     for i in CANON_SET:
         node = CANON_TO_NODE[i]
         write_to_buf = FuncCall(name=Var(name="WriteToBuf"), 
-                                targs=[Raw(code=node.cpp), Raw(code=node.db)],
+                                targs=[Raw(code=node.db)],
                                 args=[Raw(code="buf+offset"), Raw(code="shapes[col]"),
                                       Raw(code="a"), Raw(code="sizes[col]")])
         case_body = ExprStmt(child=write_to_buf)
@@ -1898,13 +1898,6 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
                 else:
                     all_vl = False
                     break
-    #If entirely variable length, we can simply use the VLWrite definition
-    if all_vl:
-        result.nodes.append(vl_write(t, variable, depth=depth, prefix=prefix))
-        key = get_variable("key", depth=depth, prefix=prefix)
-        result.nodes.append(ExprStmt(child=memcpy(offset, key + ".val", 
-                                                  "CYCLUS_SHA1_SIZE")))
-        return result
     #Declare and assign the 'val' variable
     if depth == 0:
         result.nodes.append(get_write_setup(t, shape_array))
@@ -1913,6 +1906,13 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
                                                     type=t, 
                                                     target=Var(name=variable),
                                                     value=Raw(code=a_cast(t)))))
+    #If entirely variable length, we can simply use the VLWrite definition
+    if all_vl:
+        result.nodes.append(vl_write(t, variable, depth=depth, prefix=prefix))
+        key = get_variable("key", depth=depth, prefix=prefix)
+        result.nodes.append(ExprStmt(child=memcpy(offset, key + ".val", 
+                                                  "CYCLUS_SHA1_SIZE")))
+        return result
     #Handle primitive bodies 
     if is_primitive(t):
         if t.db in WRITE_BODY_PRIMITIVES:
@@ -1928,66 +1928,87 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
                                                      offset=offset,
                                                      pointer=pointer))
         return result
-    #Handle variable length bodies
+    #Handle potentially variable length bodies
     else:
         #Declare count and iterator variables for the loop.
-        count = get_variable ("count", depth=depth, prefix=prefix)
+        count = get_variable("count", depth=depth, prefix=prefix)
         iterator = get_variable("it", depth=depth, prefix=prefix)
         #Recursively gather child bodies
         child_bodies = []
         container = t.canon[0]
+        #Handle variable length container
         if DB_TO_VL[t.db]:
             container = VL_TO_FL_CONTAINERS[container]
-        prefixes = template_args[container]
-        if len(t.canon[1:]) == 1:
-            pointer_var = "*" + iterator
-            child_node = CANON_TO_NODE[t.canon[1]]
-            child_size = get_variable("item_size", depth=depth+1, 
-                                      prefix=prefix+prefixes[0])
-            child_bodies.append(get_write_body(child_node, shape_array[1], 
-                                               depth=depth+1, 
-                                               prefix=prefix+prefixes[0],
-                                               variable=pointer_var,
-                                               offset=offset+"+"+child_size+"*"+count))
-        else:
-            partial_size = "0"
-            if container in variable_length_types:
-                labels = ['->first', '->second']
-            else:
-                labels = ['.first', '.second']
-            for c, s, p, l in zip(t.canon[1:], shape_array[1:], prefixes, labels):
-                child_node = CANON_TO_NODE[c]
-                item_label = iterator+l
-                child_size = get_variable("item_size", depth=depth+1, 
-                                          prefix=prefix+p)
-                child_bodies.append(get_write_body(child_node, s, depth=depth+1,
-                                                   prefix=prefix+p, 
-                                                   variable=item_label, 
-                                                   offset=offset+"+("+child_size
-                                                          +"*"+count+")+"
-                                                          +partial_size))
-                partial_size += "+" + child_size
-        if container in variable_length_types:
-            #For loop uses child bodies
+            prefixes = template_args[container]
+            fixed_val = get_variable("fixed_val", depth=depth, prefix=prefix)
+            result.nodes.append(ExprStmt(child=Decl(type=Type(cpp=t.cpp),
+                                                    name=Raw(code=fixed_val))))
             result.nodes.append(ExprStmt(child=DeclAssign(
-                                                  type=Type(cpp="unsigned int"),
-                                                  target=Var(name=count),
-                                                  value=Raw(code="0"))))
+                                                      type=Type(cpp="unsigned int"),
+                                                      target=Var(name=count),
+                                                      value=Raw(code="0"))))
             result.nodes.append(ExprStmt(child=DeclAssign(
-                                              type=Type(cpp=t.cpp+"::iterator"),
-                                              target=Raw(code=iterator),
-                                              value=Raw(code=variable 
-                                                             +".begin()"))))
+                                                  type=Type(cpp=t.cpp+"::iterator"),
+                                                  target=Raw(code=iterator),
+                                                  value=Raw(code=variable 
+                                                                 +".begin()"))))
+            
             result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="==", 
                                                y=Var(name=variable+".end()")),
                                     incr=Raw(code="++" + iterator),
-                                    body=[*child_bodies, 
-                                          ExprStmt(child=LeftUnaryOp(
-                                                             op="++", 
-                                                             name=Var(
-                                                                name=count)))]))
+                                    body=[]))
+        #Handle fixed length containers
         else:
-            result.nodes.extend(child_bodies)
+            prefixes = template_args[container]
+            if len(t.canon[1:]) == 1:
+                pointer_var = "*" + iterator
+                child_node = CANON_TO_NODE[t.canon[1]]
+                child_size = get_variable("item_size", depth=depth+1, 
+                                          prefix=prefix+prefixes[0])
+                child_bodies.append(get_write_body(child_node, shape_array[1], 
+                                                   depth=depth+1, 
+                                                   prefix=prefix+prefixes[0],
+                                                   variable=pointer_var,
+                                                   offset=offset+"+"+child_size+"*"+count))
+            else:
+                partial_size = "0"
+                if container in variable_length_types:
+                    labels = ['->first', '->second']
+                else:
+                    labels = ['.first', '.second']
+                for c, s, p, l in zip(t.canon[1:], shape_array[1:], prefixes, labels):
+                    child_node = CANON_TO_NODE[c]
+                    item_label = iterator+l
+                    child_size = get_variable("item_size", depth=depth+1, 
+                                              prefix=prefix+p)
+                    child_bodies.append(get_write_body(child_node, s, depth=depth+1,
+                                                       prefix=prefix+p, 
+                                                       variable=item_label, 
+                                                       offset=offset+"+("+child_size
+                                                              +"*"+count+")+"
+                                                              +partial_size))
+                    partial_size += "+" + child_size
+            if container in variable_length_types:
+                #For loop uses child bodies
+                result.nodes.append(ExprStmt(child=DeclAssign(
+                                                      type=Type(cpp="unsigned int"),
+                                                      target=Var(name=count),
+                                                      value=Raw(code="0"))))
+                result.nodes.append(ExprStmt(child=DeclAssign(
+                                                  type=Type(cpp=t.cpp+"::iterator"),
+                                                  target=Raw(code=iterator),
+                                                  value=Raw(code=variable 
+                                                                 +".begin()"))))
+                result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="==", 
+                                                   y=Var(name=variable+".end()")),
+                                        incr=Raw(code="++" + iterator),
+                                        body=[*child_bodies, 
+                                              ExprStmt(child=LeftUnaryOp(
+                                                                 op="++", 
+                                                                 name=Var(
+                                                                    name=count)))]))
+            else:
+                result.nodes.extend(child_bodies)
         #Add memset statement outside of loop
         item_size = get_variable("total_item_size", depth=depth, prefix=prefix)
         container_length = get_variable("length", depth=depth, prefix=prefix)
@@ -2010,7 +2031,7 @@ def main_write():
                        args=[Decl(type=Type(cpp="char*"), name=Var(name="buf")),
                              Decl(type=Type(cpp="std::vector<int>&"), 
                                   name=Var(name="shape")),
-                             Decl(type=Type(cpp="boost::spirit::hold_any*"),
+                             Decl(type=Type(cpp="const boost::spirit::hold_any*"),
                                   name=Var(name="a")),
                              Decl(type=Type(cpp="size_t"),
                                   name=Var(name="column"))],

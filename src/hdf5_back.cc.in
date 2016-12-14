@@ -510,6 +510,8 @@ void Hdf5Back::WriteGroup(DatumList& group) {
   delete[] buf;
 }
 
+@HDF5_BACK_CC_WRITE@
+
 void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
                        size_t* sizes, size_t rowsize) {
   using std::min;
@@ -546,8 +548,6 @@ void Hdf5Back::FillBuf(std::string title, char* buf, DatumList& group,
     }
   }
 }
-
-@HDF5_BACK_CC_WRITE@
 
 template <typename T, DbTypes U>
 T Hdf5Back::VLRead(const char* rawkey) {
