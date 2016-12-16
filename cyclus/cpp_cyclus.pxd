@@ -205,3 +205,8 @@ cdef extern from "logger.h" namespace "cyclus":
         @staticmethod
         std_string ToString(LogLevel) except +
 
+
+cdef extern from "error.h" namespace "cyclus":
+
+    cdef unsigned int warn_limit
+    cdef cpp_bool warn_as_error

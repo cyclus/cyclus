@@ -640,3 +640,29 @@ class Logger(_Logger):
     """A logging tool providing finer grained control over standard output
     for debugging and other purposes.
     """
+
+#
+# Errors
+#
+def get_warn_limit():
+    """Returns the current warning limit."""
+    wl = cpp_cyclus.warn_limit
+    return wl
+
+
+def set_warn_limit(unsigned int wl):
+    """Sets the warning limit."""
+    cpp_cyclus.warn_limit = wl
+
+
+def get_warn_as_error():
+    """Returns the current value for wether warnings should be treated
+    as errors.
+    """
+    wae = bool_to_py(cpp_cyclus.warn_as_error)
+    return wae
+
+
+def set_warn_as_error(bint wae):
+    """Sets whether warnings should be treated as errors."""
+    cpp_cyclus.warn_as_error = wae
