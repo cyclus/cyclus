@@ -25,7 +25,7 @@ from cyclus cimport cpp_cyclus
 from cyclus cimport cpp_typesystem
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
-    bool_to_py
+    bool_to_py, int_to_py
 
 
 # startup numpy
@@ -552,4 +552,91 @@ class Env(_Env):
     An environment utility to help locate files and find environment
     settings. The environment for a given simulation can be accessed via the
     simulation's Context.
+    """
+
+
+#
+# Logger
+#
+
+# LogLevel
+LEV_ERROR = cpp_cyclus.LEV_ERROR
+LEV_WARN = cpp_cyclus.LEV_WARN
+LEV_INFO1 = cpp_cyclus.LEV_INFO1
+LEV_INFO2 = cpp_cyclus.LEV_INFO2
+LEV_INFO3 = cpp_cyclus.LEV_INFO3
+LEV_INFO4 = cpp_cyclus.LEV_INFO4
+LEV_INFO5 = cpp_cyclus.LEV_INFO5
+LEV_DEBUG1 = cpp_cyclus.LEV_INFO5
+LEV_DEBUG2 = cpp_cyclus.LEV_DEBUG2
+LEV_DEBUG3 = cpp_cyclus.LEV_DEBUG3
+LEV_DEBUG4 = cpp_cyclus.LEV_DEBUG4
+LEV_DEBUG5 = cpp_cyclus.LEV_DEBUG5
+
+
+cdef class _Logger:
+
+    @property
+    def report_level(self):
+        """Use to get/set the (global) log level report cutoff."""
+        cdef cpp_cyclus.LogLevel cpp_rtn = cpp_cyclus.Logger.ReportLevel()
+        rtn = int_to_py(cpp_rtn)
+        return rtn
+
+    @report_level.setter
+    def report_level(self, int level):
+        cpp_cyclus.Logger.SetReportLevel(<cpp_cyclus.LogLevel> level)
+
+    @property
+    def no_agent(self):
+        """Set whether or not agent/agent log entries should be printed"""
+        cdef cpp_bool cpp_rtn = cpp_cyclus.Logger.NoAgent()
+        rtn = bool_to_py(cpp_rtn)
+        return rtn
+
+    @no_agent.setter
+    def no_agent(self, bint na):
+        cpp_cyclus.Logger.SetNoAgent(na)
+
+    @property
+    def no_mem(self):
+        cdef cpp_bool cpp_rtn = cpp_cyclus.Logger.NoMem()
+        rtn = bool_to_py(cpp_rtn)
+        return rtn
+
+    @no_mem.setter
+    def no_mem(self, bint nm):
+        cpp_cyclus.Logger.SetNoMem(nm)
+
+    @staticmethod
+    def to_log_level(text):
+        """Converts a string into a corresponding LogLevel value.
+
+        For strings that do not correspond to any particular LogLevel enum value
+        the method returns the LogLevel value `LEV_ERROR`.  This method is
+        primarily intended for translating command line verbosity argument(s) in
+        appropriate report levels.  LOG(level) statements
+        """
+        cdef std_string cpp_text = str_py_to_cpp(text)
+        cdef cpp_cyclus.LogLevel cpp_rtn = cpp_cyclus.Logger.ToLogLevel(cpp_text)
+        rtn = <int> cpp_rtn
+        return rtn
+
+    @staticmethod
+    def to_string(level):
+        """Converts a LogLevel enum value into a corrsponding string.
+
+        For a level argments that have no corresponding string value, the string
+        `BAD_LEVEL` is returned.  This method is primarily intended for translating
+        LOG(level) statement levels into appropriate strings for output to stdout.
+        """
+        cdef cpp_cyclus.LogLevel cpp_level = <cpp_cyclus.LogLevel> level
+        cdef std_string cpp_rtn = cpp_cyclus.Logger.ToString(cpp_level)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+
+class Logger(_Logger):
+    """A logging tool providing finer grained control over standard output
+    for debugging and other purposes.
     """

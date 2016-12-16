@@ -38,3 +38,7 @@ cdef class _DynamicModule:
 
 cdef class _Env:
     pass
+
+cdef class _Logger:
+    # everything that we use on this class is static
+    pass

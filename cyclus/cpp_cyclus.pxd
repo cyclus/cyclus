@@ -169,3 +169,39 @@ cdef extern from "env.h" namespace "cyclus":
         const void SetNucDataPath(std_string) except +
         @staticmethod
         std_string FindModule(std_string) except +
+
+cdef extern from "logger.h" namespace "cyclus":
+
+    cdef enum LogLevel:
+        LEV_ERROR
+        LEV_WARN
+        LEV_INFO1
+        LEV_INFO2
+        LEV_INFO3
+        LEV_INFO4
+        LEV_INFO5
+        LEV_DEBUG1
+        LEV_DEBUG2
+        LEV_DEBUG3
+        LEV_DEBUG4
+        LEV_DEBUG5
+
+    cdef cppclass Logger:
+        Logger() except +
+        @staticmethod
+        LogLevel& ReportLevel() except +
+        @staticmethod
+        void SetReportLevel(LogLevel) except +
+        @staticmethod
+        cpp_bool& NoAgent() except +
+        @staticmethod
+        void SetNoAgent(cpp_bool) except +
+        @staticmethod
+        cpp_bool& NoMem() except +
+        @staticmethod
+        void SetNoMem(cpp_bool) except +
+        @staticmethod
+        LogLevel ToLogLevel(std_string) except +
+        @staticmethod
+        std_string ToString(LogLevel) except +
+
