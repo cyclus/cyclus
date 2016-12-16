@@ -24,7 +24,8 @@ import pandas as pd
 from cyclus cimport cpp_cyclus
 from cyclus cimport cpp_typesystem
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
-    str_py_to_cpp, std_string_to_py
+    str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
+    bool_to_py
 
 
 # startup numpy
@@ -438,3 +439,117 @@ cdef class _DynamicModule:
 
 class DynamicModule(_DynamicModule):
     """Dynamic Module wrapper class."""
+
+
+#
+# Env
+#
+cdef class _Env:
+
+    @staticmethod
+    def path_base(path):
+        """Effectively basename"""
+        cdef std_string cpp_path = str_py_to_cpp(path)
+        cdef std_string cpp_rtn = cpp_cyclus.Env.PathBase(cpp_path)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def install_path(self):
+        """The Cyclus install path."""
+        cdef std_string cpp_rtn = cpp_cyclus.Env.GetInstallPath()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def build_path(self):
+        """The Cyclus build path."""
+        cdef std_string cpp_rtn = cpp_cyclus.Env.GetBuildPath()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @staticmethod
+    def get(var):
+        """Obtains an environment variable."""
+        cdef std_string cpp_var = str_py_to_cpp(var)
+        cdef std_string cpp_rtn = cpp_cyclus.Env.GetEnv(cpp_var)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def nuc_data(self):
+        """The nuc_data path."""
+        cdef std_string cpp_rtn = cpp_cyclus.Env.nuc_data()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @nuc_data.setter
+    def nuc_data(self, path):
+        cdef std_string cpp_path = str_py_to_cpp(path)
+        cpp_cyclus.Env.SetNucDataPath(cpp_path)
+
+    @staticmethod
+    def rng_schema(flat=False):
+        """Returns the current rng schema.  Uses CYCLUS_RNG_SCHEMA env var
+        if set; otherwise uses the default install location. If using the
+        default ocation, set flat=True for the default flat schema.
+        """
+        cdef std_string cpp_rtn = cpp_cyclus.Env.rng_schema(flat)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def cyclus_path(self):
+        """A tuple of strings representing where cyclus searches for
+        modules.
+        """
+        cdef std_vector[std_string] cpp_rtn = cpp_cyclus.Env.cyclus_path()
+        rtn = std_vector_std_string_to_py(cpp_rtn)
+        return tuple(rtn)
+
+    @property
+    def allow_milps(self):
+        """whether or not Cyclus should allow Mixed-Integer Linear Programs
+        The default depends on a compile time option DEFAULT_ALLOW_MILPS, but
+        may be specified at run time with the ALLOW_MILPS environment variable.
+        """
+        cdef cpp_bool cpp_rtn = cpp_cyclus.Env.allow_milps()
+        rtn = bool_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def env_delimiter(self):
+        """the correct environment variable delimiter based on the file
+        system.
+        """
+        cdef std_string cpp_rtn = cpp_cyclus.Env.EnvDelimiter()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def path_delimiter(self):
+        """the correct path delimiter based on the file
+        system.
+        """
+        cdef std_string cpp_rtn = cpp_cyclus.Env.PathDelimiter()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @staticmethod
+    def find_module(path):
+        """Returns the full path to a module by searching through default
+        install and CYCLUS_PATH directories.
+        """
+        cdef std_string cpp_path = str_py_to_cpp(path)
+        cdef std_string cpp_rtn = cpp_cyclus.Env.FindModule(cpp_path)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+
+class Env(_Env):
+    """Environment wrapper class.
+
+    An environment utility to help locate files and find environment
+    settings. The environment for a given simulation can be accessed via the
+    simulation's Context.
+    """

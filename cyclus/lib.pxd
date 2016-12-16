@@ -36,3 +36,5 @@ cdef class _AgentSpec:
 cdef class _DynamicModule:
     cdef cpp_cyclus.DynamicModule * ptx
 
+cdef class _Env:
+    pass

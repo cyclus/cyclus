@@ -138,3 +138,34 @@ cdef extern from "dynamic_module.h" namespace "cyclus":
         void CloseAll() except +
         std_string path() except +
 
+cdef extern from "env.h" namespace "cyclus":
+
+    cdef cppclass Env:
+        @staticmethod
+        std_string PathBase(std_string) except +
+        @staticmethod
+        const std_string GetInstallPath() except +
+        @staticmethod
+        const std_string GetBuildPath() except +
+        @staticmethod
+        std_string GetEnv(std_string) except +
+        @staticmethod
+        const std_string nuc_data() except +
+        @staticmethod
+        const std_string rng_schema() except +
+        @staticmethod
+        const std_string rng_schema(cpp_bool) except +
+        @staticmethod
+        const vector[std_string] cyclus_path() except +
+        @staticmethod
+        const cpp_bool allow_milps() except +
+        @staticmethod
+        const std_string EnvDelimiter() except +
+        @staticmethod
+        const std_string PathDelimiter() except +
+        @staticmethod
+        const void SetNucDataPath() except +
+        @staticmethod
+        const void SetNucDataPath(std_string) except +
+        @staticmethod
+        std_string FindModule(std_string) except +
