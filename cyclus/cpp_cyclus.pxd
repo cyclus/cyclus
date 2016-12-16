@@ -210,3 +210,8 @@ cdef extern from "error.h" namespace "cyclus":
 
     cdef unsigned int warn_limit
     cdef cpp_bool warn_as_error
+
+
+cdef extern from "pyhooks.h" namespace "cyclus":
+
+    cdef void PyInitHooks() except +

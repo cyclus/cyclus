@@ -666,3 +666,14 @@ def get_warn_as_error():
 def set_warn_as_error(bint wae):
     """Sets whether warnings should be treated as errors."""
     cpp_cyclus.warn_as_error = wae
+
+
+#
+# PyHooks
+#
+def py_init_hooks():
+    """Initializes Cyclus-internal Python hooks. This is called
+    automatically when cyclus is importd. Users should not need to call
+    this function.
+    """
+    cpp_cyclus.PyInitHooks()
