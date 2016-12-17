@@ -54,3 +54,6 @@ cdef class _InfileTree:
     # For now, there are no subclasses  so we can get away with
     # the fully typed pointer.
     cdef cpp_cyclus.InfileTree * ptx
+
+cdef class _SimInit:
+    cdef cpp_cyclus.SimInit * ptx

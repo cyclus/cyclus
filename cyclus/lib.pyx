@@ -719,6 +719,9 @@ cdef class _InfileTree:
     def __cinit__(self, _XMLParser parser):
         self.ptx = new cpp_cyclus.InfileTree(parser.ptx[0])
 
+    def __dealloc__(self):
+        del self.ptx
+
     def optional_query(self, query, default):
         """A query method for optional parameters.
 
@@ -751,4 +754,34 @@ class InfileTree(_InfileTree):
     ----------
     parser : XMLParser
         An XMLParser instance.
+    """
+
+#
+# Simulation Managment
+#
+
+cdef class _SimInit:
+
+    def __cinit__(self, recorder, backend):
+        self.ptx = new cpp_cyclus.SimInit()
+        self.ptx.Init(
+            <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
+            <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
+            )
+
+    def __dealloc__(self):
+        del self.ptx
+
+
+class SimInit(_SimInit):
+    """Handles initialization of a simulation from the output database. After
+    calling Init, Restart, or Branch, the initialized Context, Timer, and
+    Recorder can be retrieved.
+
+    Parameters
+    ----------
+    recorder : Recorder
+        The recorder class for the simulation.
+    backend : QueryableBackend
+        A backend to use for this simulation.
     """

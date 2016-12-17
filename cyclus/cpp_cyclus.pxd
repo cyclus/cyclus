@@ -237,3 +237,10 @@ cdef extern from "infile_tree.h" namespace "cyclus":
         InfileTree(XMLParser&) except +
 
     T OptionalQuery[T](InfileTree*, std_string, T) except +
+
+
+cdef extern from "sim_init.h" namespace "cyclus":
+
+    cdef cppclass SimInit:
+        SimInit() except +
+        void Init(Recorder*, QueryableBackend*) except +
