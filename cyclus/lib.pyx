@@ -712,3 +712,43 @@ class XMLParser(_XMLParser):
     raw : str, optional
         XML string to load.
     """
+
+
+cdef class _InfileTree:
+
+    def __cinit__(self, _XMLParser parser):
+        self.ptx = new cpp_cyclus.InfileTree(parser.ptx[0])
+
+    def optional_query(self, query, default):
+        """A query method for optional parameters.
+
+        Parameters
+        ----------
+        query : str
+            The XML path to test if it exists.
+        default : any type
+            The default value to return if the XML path does not exist in
+            the tree. The type of the return value (str, bool, int, etc)
+            is determined by the type of the default.
+        """
+        cdef std_string cpp_query = str_py_to_cpp(query)
+        cdef std_string str_default, str_rtn
+        if isinstance(default, str):
+            str_default = str_py_to_cpp(default)
+            str_rtn = cpp_cyclus.OptionalQuery[std_string](self.ptx, cpp_query,
+                                                           str_default)
+            rtn = std_string_to_py(str_rtn)
+        else:
+            raise TypeError("Type of default value not recognized, only "
+                            "str is currently supported.")
+        return rtn
+
+
+class InfileTree(_InfileTree):
+    """A class for extracting information from a given XML parser
+
+    Parameters
+    ----------
+    parser : XMLParser
+        An XMLParser instance.
+    """

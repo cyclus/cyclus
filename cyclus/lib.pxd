@@ -46,3 +46,11 @@ cdef class _Logger:
 
 cdef class _XMLParser:
     cdef cpp_cyclus.XMLParser * ptx
+
+cdef class _InfileTree:
+    # if InfileTree ever has C++ subclasses that we then also want
+    # to wrap in Cython, the pointer will need to become
+    # cdef void * ptx, and we'll need to cast each access.
+    # For now, there are no subclasses  so we can get away with
+    # the fully typed pointer.
+    cdef cpp_cyclus.InfileTree * ptx
