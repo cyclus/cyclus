@@ -19,7 +19,7 @@ namespace cyclus {
   };
 
   // Add some simple shims that attach C++ to Python C hooks
-  inline void EventLoop(void) { __pyx_f_10eventhooks_eventloophook(); };
+  inline void EventLoop(void) { CyclusEventLoopHook(); };
 }
 #endif  // ends CYCLUS_WITH_PYTHON
 #endif  // ends CYCLUS_SRC_PYHOOKS_H_
