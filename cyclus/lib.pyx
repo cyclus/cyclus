@@ -23,6 +23,7 @@ import pandas as pd
 # local imports
 from cyclus cimport cpp_cyclus
 from cyclus cimport cpp_typesystem
+from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
     bool_to_py, int_to_py
@@ -677,3 +678,37 @@ def py_init_hooks():
     this function.
     """
     cpp_cyclus.PyInitHooks()
+
+#
+# XML
+#
+cdef class _XMLParser:
+
+    def __cinit__(self, filename=None, raw=None):
+        cdef std_string s, inp
+        self.ptx = new cpp_cyclus.XMLParser()
+        if filename is not None:
+            s = str_py_to_cpp(filename)
+            inp = cpp_cyclus.LoadStringFromFile(s)
+        elif raw is not None:
+            inp = str_py_to_cpp(raw)
+        else:
+            raise RuntimeError("Either a filename or a raw XML string "
+                               "must be provided to XMLParser")
+        self.ptx.Init(inp)
+
+    def __dealloc__(self):
+        del self.ptx
+
+
+class XMLParser(_XMLParser):
+    """A helper class to hold xml file data and provide automatic
+    validation.
+
+    Parameters
+    ----------
+    filename : str, optional
+        Path to file to load.
+    raw : str, optional
+        XML string to load.
+    """

@@ -7,7 +7,7 @@ from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 
 from .cpp_typesystem cimport DbTypes
-
+from .cpp_stringstream cimport stringstream
 
 cdef extern from "cyclus.h" namespace "boost::spirit":
 
@@ -215,3 +215,17 @@ cdef extern from "error.h" namespace "cyclus":
 cdef extern from "pyhooks.h" namespace "cyclus":
 
     cdef void PyInitHooks() except +
+
+
+cdef extern from "xml_file_loader.h" namespace "cyclus":
+
+    cdef void LoadStringstreamFromFile(stringstream&, std_string)
+    cdef std_string LoadStringFromFile(std_string)
+
+
+cdef extern from "xml_parser.h" namespace "cyclus":
+
+    cdef cppclass XMLParser:
+        XMLParser() except +
+        void Init(const stringstream) except +
+        void Init(const std_string) except +

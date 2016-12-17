@@ -12,6 +12,7 @@ from libcpp cimport bool as cpp_bool
 
 # local imports
 from cyclus cimport cpp_cyclus
+from cyclus.cpp_stringstream cimport stringstream
 
 
 cdef class _Datum:
@@ -42,3 +43,6 @@ cdef class _Env:
 cdef class _Logger:
     # everything that we use on this class is static
     pass
+
+cdef class _XMLParser:
+    cdef cpp_cyclus.XMLParser * ptx
