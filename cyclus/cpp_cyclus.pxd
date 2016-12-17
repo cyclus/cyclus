@@ -222,6 +222,20 @@ cdef extern from "xml_file_loader.h" namespace "cyclus":
     cdef void LoadStringstreamFromFile(stringstream&, std_string)
     cdef std_string LoadStringFromFile(std_string)
 
+    cdef cppclass XMLFileLoader:
+        XMLFileLoader(Recorder*, QueryableBackend*, std_string) except +
+        XMLFileLoader(Recorder*, QueryableBackend*, std_string,
+                      const std_string) except +
+        void LoadSim() except +
+
+
+cdef extern from "xml_flat_loader.h" namespace "cyclus":
+
+    cdef cppclass XMLFlatLoader(XMLFileLoader):
+        XMLFlatLoader(Recorder*, QueryableBackend*, std_string) except +
+        XMLFlatLoader(Recorder*, QueryableBackend*, std_string,
+                      const std_string) except +
+
 
 cdef extern from "xml_parser.h" namespace "cyclus":
 

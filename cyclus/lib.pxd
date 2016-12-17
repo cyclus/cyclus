@@ -57,3 +57,10 @@ cdef class _InfileTree:
 
 cdef class _SimInit:
     cdef cpp_cyclus.SimInit * ptx
+
+cdef class _XMLFileLoader:
+    cdef cpp_cyclus.XMLFileLoader * ptx
+
+cdef class _XMLFlatLoader:
+    cdef cpp_cyclus.XMLFlatLoader * ptx
+

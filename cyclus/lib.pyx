@@ -674,7 +674,7 @@ def set_warn_as_error(bint wae):
 #
 def py_init_hooks():
     """Initializes Cyclus-internal Python hooks. This is called
-    automatically when cyclus is importd. Users should not need to call
+    automatically when cyclus is imported. Users should not need to call
     this function.
     """
     cpp_cyclus.PyInitHooks()
@@ -682,6 +682,71 @@ def py_init_hooks():
 #
 # XML
 #
+cdef class _XMLFileLoader:
+
+    def __cinit__(self, recorder, backend, schema_file, input_file=""):
+        cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
+        cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        self.ptx = new cpp_cyclus.XMLFileLoader(
+            <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
+            <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
+            cpp_schema_file, cpp_input_file)
+
+    def __dealloc__(self):
+        del self.ptx
+
+    def load_sim(self):
+        """Load an entire simulation from the inputfile."""
+        self.ptx.LoadSim()
+
+
+class XMLFileLoader(_XMLFileLoader):
+    """Handles initialization of a database with information from
+    a cyclus xml input file.
+
+    Create a new loader reading from the xml simulation input file and writing
+    to and initializing the backends in the recorder. The recorder must
+    already have the backend registered. schema_file identifies the master
+    xml rng schema used to validate the input file.
+    """
+
+
+cdef class _XMLFlatLoader:
+
+    def __cinit__(self, recorder, backend, schema_file, input_file=""):
+        cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
+        cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        self.ptx = new cpp_cyclus.XMLFlatLoader(
+            <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
+            <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
+            cpp_schema_file, cpp_input_file)
+
+    def __dealloc__(self):
+        del self.ptx
+
+    def load_sim(self):
+        """Load an entire simulation from the inputfile."""
+        self.ptx.LoadSim()
+
+
+class XMLFlatLoader(_XMLFlatLoader):
+    """Handles initialization of a database with information from
+    a cyclus xml input file.
+
+    Create a new loader reading from the xml simulation input file and writing
+    to and initializing the backends in the recorder. The recorder must
+    already have the backend registered. schema_file identifies the master
+    xml rng schema used to validate the input file.
+
+    Notes
+    -----
+    This is not a subclass of the XMLFileLoader Python bindings, even
+    though the C++ class is a subclass in C++. Rather, they are duck
+    typed by exposing the same interface. This makes handling the
+    instance pointers in Cython a little easier.
+    """
+
+
 cdef class _XMLParser:
 
     def __cinit__(self, filename=None, raw=None):
