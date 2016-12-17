@@ -825,6 +825,36 @@ class InfileTree(_InfileTree):
 # Simulation Managment
 #
 
+cdef class _Timer:
+
+    def __cinit__(self, bint init=True):
+        self._free = init
+        if init:
+            self.ptx = new cpp_cyclus.Timer()
+        else:
+            self.ptx == NULL
+
+    def __dealloc__(self):
+        if self.ptx == NULL:
+            return
+        elif self._free:
+            del self.ptx
+
+    def run_sim(self):
+        """Runs the simulation."""
+        self.ptx.RunSim()
+
+
+class Timer(_Timer):
+    """Controls simulation timestepping and inter-timestep phases.
+
+    Parameters
+    ----------
+    init : bool, optional
+        Whether or not we should initialize a new C++ Timer instance.
+    """
+
+
 cdef class _SimInit:
 
     def __cinit__(self, recorder, backend):
@@ -833,9 +863,20 @@ cdef class _SimInit:
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
             <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
             )
+        self._timer = None
 
     def __dealloc__(self):
         del self.ptx
+
+    @property
+    def timer(self):
+        """Returns the initialized timer. Note that either Init, Restart,
+        or Branch must be called first.
+        """
+        if self._timer is None:
+            self._timer = Timer(init=False)
+            (<_Timer> self._timer).ptx = self.ptx.timer()
+        return self._timer
 
 
 class SimInit(_SimInit):

@@ -55,6 +55,10 @@ cdef class _InfileTree:
     # the fully typed pointer.
     cdef cpp_cyclus.InfileTree * ptx
 
+cdef class _Timer:
+    cdef cpp_cyclus.Timer * ptx
+    cdef bint _free
+
 cdef class _SimInit:
     cdef cpp_cyclus.SimInit * ptx
 
@@ -63,4 +67,3 @@ cdef class _XMLFileLoader:
 
 cdef class _XMLFlatLoader:
     cdef cpp_cyclus.XMLFlatLoader * ptx
-

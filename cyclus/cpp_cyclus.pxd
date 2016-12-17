@@ -253,8 +253,17 @@ cdef extern from "infile_tree.h" namespace "cyclus":
     T OptionalQuery[T](InfileTree*, std_string, T) except +
 
 
+cdef extern from "timer.h" namespace "cyclus":
+
+    cdef cppclass Timer:
+        Timer() except +
+        void RunSim() except +
+
+
 cdef extern from "sim_init.h" namespace "cyclus":
 
     cdef cppclass SimInit:
         SimInit() except +
         void Init(Recorder*, QueryableBackend*) except +
+        Timer* timer() except +
+
