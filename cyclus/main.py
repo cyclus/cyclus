@@ -3,7 +3,7 @@ from __future__ import unicode_literals, print_function
 import atexit
 from argparse import ArgumentParser, Action
 
-from cyclus.lib import DynamicModule, Env, version
+from cyclus.lib import DynamicModule, Env, version, load_string_from_file
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -32,12 +32,32 @@ class Restart(Action):
         raise RuntimeError("Restart is experimental, not supported!")
 
 
+class Schema(ZeroArgAction):
+    """Displays cyclus schema"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        path = Env.rng_schema(ns.flat_schema)
+        schema = load_string_from_file(path)
+        print(schema)
+
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
                                              "(from Python)")
-    p.add_argument('-V', action=CyclusVersion)
-    p.add_argument('--restart', action=Restart)
+    p.add_argument('-V', action=CyclusVersion,
+                   help='print cyclus core and dependency versions')
+    p.add_argument('--restart', action=Restart,
+                   help='restart from the specified simulation snapshot, '
+                        'not supported.')
+    p.add_argument('--schema', action=Schema,
+                   help='dump the cyclus master schema including all '
+                        'installed module schemas')
+
+    p.add_argument('--flat-schema', action='store_true', default=False,
+                   dest='flat_schema',
+                   help='use the flat master simulation schema')
     return p
 
 

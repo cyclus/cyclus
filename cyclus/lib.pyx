@@ -757,6 +757,15 @@ class XMLFlatLoader(_XMLFlatLoader):
     """
 
 
+def load_string_from_file(filename):
+    """Loads an XML file from a path."""
+    cdef std_string cpp_filename = str_py_to_cpp(filename)
+    cdef std_string cpp_rtn = cpp_cyclus.LoadStringFromFile(cpp_filename)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn
+
+
+
 cdef class _XMLParser:
 
     def __cinit__(self, filename=None, raw=None):
