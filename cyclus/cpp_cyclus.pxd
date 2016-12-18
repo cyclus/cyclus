@@ -267,3 +267,15 @@ cdef extern from "sim_init.h" namespace "cyclus":
         void Init(Recorder*, QueryableBackend*) except +
         Timer* timer() except +
 
+
+cdef extern from "version.h" namespace "cyclus::version":
+
+    const char* describe() except +
+    const char* core() except +
+    const char* boost() except +
+    const char* sqlite3() except +
+    const char* hdf5() except +
+    const char* xml2() except +
+    const char* xmlpp() except +
+    const char* coincbc() except +
+    const char* coinclp() except +

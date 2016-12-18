@@ -484,10 +484,20 @@ cdef class _Env:
         rtn = std_string_to_py(cpp_rtn)
         return rtn
 
-    @nuc_data.setter
-    def nuc_data(self, path):
-        cdef std_string cpp_path = str_py_to_cpp(path)
-        cpp_cyclus.Env.SetNucDataPath(cpp_path)
+    @staticmethod
+    def set_nuc_data_path(path=None):
+        """Initializes the path to the cyclus_nuc_data.h5 file
+
+        By default, it is assumed to be located in the path given by
+        GetInstallPath()/share; however, paths in environment variable
+        CYCLUS_NUC_DATA are checked first.
+        """
+        cdef std_string cpp_path
+        if path is None:
+            cpp_cyclus.Env.SetNucDataPath(cpp_cyclus.Env.nuc_data())
+        else:
+            cpp_path = str_py_to_cpp(path)
+            cpp_cyclus.Env.SetNucDataPath(cpp_path)
 
     @staticmethod
     def rng_schema(flat=False):
@@ -891,3 +901,84 @@ class SimInit(_SimInit):
     backend : QueryableBackend
         A backend to use for this simulation.
     """
+
+#
+# Version Info
+#
+
+def describe_version():
+    """Describes the Cyclus version."""
+    rtn = cpp_cyclus.describe()
+    rtn = rtn.decode()
+    return rtn
+
+
+def core_version():
+    """Cyclus core version."""
+    rtn = cpp_cyclus.core()
+    rtn = rtn.decode()
+    return rtn
+
+
+def boost_version():
+    """Boost version."""
+    rtn = cpp_cyclus.boost()
+    rtn = rtn.decode()
+    return rtn
+
+
+def sqlite3_version():
+    """SQLite3 version."""
+    rtn = cpp_cyclus.sqlite3()
+    rtn = rtn.decode()
+    return rtn
+
+
+def hdf5_version():
+    """HDF5 version."""
+    rtn = cpp_cyclus.hdf5()
+    rtn = rtn.decode()
+    return rtn
+
+
+def xml2_version():
+    """libxml 2 version."""
+    rtn = cpp_cyclus.xml2()
+    rtn = rtn.decode()
+    return rtn
+
+
+def xmlpp_version():
+    """libxml++ version."""
+    rtn = cpp_cyclus.xmlpp()
+    rtn = rtn.decode()
+    return rtn
+
+
+def coincbc_version():
+    """Coin CBC version."""
+    rtn = cpp_cyclus.coincbc()
+    rtn = rtn.decode()
+    return rtn
+
+
+def coinclp_version():
+    """Coin CLP version."""
+    rtn = cpp_cyclus.coinclp()
+    rtn = rtn.decode()
+    return rtn
+
+
+def version():
+    """Returns string of the cyclus version and its dependencies."""
+    s = "Cyclus Core " + core_version() + " (" + describe_version() + ")\n\n"
+    s += "Dependencies:\n"
+    s += "   Boost    " + boost_version() + "\n"
+    s += "   Coin-Cbc " + coincbc_version() + "\n"
+    s += "   Coin-Clp " + coinclp_version() + "\n"
+    s += "   Hdf5     " + hdf5_version() + "\n"
+    s += "   Sqlite3  " + sqlite3_version() + "\n"
+    s += "   xml2     " + xml2_version() + "\n"
+    s += "   xml++    " + xmlpp_version() + "\n"
+    return s
+
