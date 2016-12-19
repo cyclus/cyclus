@@ -18,6 +18,7 @@ def test_main():
         ['--agent-listing', ':agents'],
         ['--no-agent'],
         ['--no-mem'],
+        ['-v', '5'],
         ]
     for case in cases:
         try:

@@ -142,6 +142,18 @@ class NoMem(ZeroArgAction):
         Logger().no_mem = True
 
 
+class Verbosity(Action):
+    """Sets versbosity level"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        logger = Logger()
+        try:
+            ns.verbosity = int(values)
+        except ValueError:
+            ns.verbosity = logger.to_log_level(values)
+        logger.report_level = ns.verbosity
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
@@ -179,6 +191,8 @@ def make_parser():
                    help='only print log entries from cyclus core code')
     p.add_argument('--no-mem', action=NoMem,
                    help='exclude memory log statement from logger output')
+    p.add_argument('-v', '--verb', action=Verbosity, dest='verbosity',
+                   help='log verbosity. integer from 0 (quiet) to 11 (verbose)')
     return p
 
 
