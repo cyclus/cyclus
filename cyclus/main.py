@@ -135,6 +135,13 @@ class NoAgent(ZeroArgAction):
         Logger().no_agent = True
 
 
+class NoMem(ZeroArgAction):
+    """Disables mem logging"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        Logger().no_mem = True
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
@@ -170,6 +177,8 @@ def make_parser():
                    help='dump metadata for all the agents cyclus knows about')
     p.add_argument('--no-agent', action=NoAgent,
                    help='only print log entries from cyclus core code')
+    p.add_argument('--no-mem', action=NoMem,
+                   help='exclude memory log statement from logger output')
     return p
 
 

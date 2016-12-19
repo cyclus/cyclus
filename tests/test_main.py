@@ -17,6 +17,7 @@ def test_main():
         ['--agent-annotations', ':agents:NullRegion'],
         ['--agent-listing', ':agents'],
         ['--no-agent'],
+        ['--no-mem'],
         ]
     for case in cases:
         try:
