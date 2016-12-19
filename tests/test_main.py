@@ -19,6 +19,7 @@ def test_main():
         ['--no-agent'],
         ['--no-mem'],
         ['-v', '5'],
+        ['--warn-limit', '21'],
         ]
     for case in cases:
         try:

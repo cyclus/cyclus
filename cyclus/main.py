@@ -6,7 +6,8 @@ from argparse import ArgumentParser, Action
 from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs,
-    discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger)
+    discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
+    set_warn_limit)
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -154,6 +155,16 @@ class Verbosity(Action):
         logger.report_level = ns.verbosity
 
 
+class WarnLimit(Action):
+    """Sets warning limit"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        ns.warn_limit = int(values)
+        set_warn_limit(ns.warn_limit)
+
+
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
@@ -193,6 +204,12 @@ def make_parser():
                    help='exclude memory log statement from logger output')
     p.add_argument('-v', '--verb', action=Verbosity, dest='verbosity',
                    help='log verbosity. integer from 0 (quiet) to 11 (verbose)')
+    p.add_argument('-o', '--output-path', dest='output_path',
+                   help='output path')
+    p.add_argument('--input-file', dest='input_file',
+                   help="path to input file")
+    p.add_argument('--warn-limit', dest='warn_limit', action=WarnLimit,
+                   help='number of warnings to issue per kind, defaults to 42')
     return p
 
 
