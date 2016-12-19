@@ -1068,7 +1068,7 @@ cdef class _Context:
         self.ptx.DelAgent(<cpp_cyclus.Agent*> (<_Agent> agent).ptx)
 
 
-class Context(Context):
+class Context(_Context):
     """A simulation context provides access to necessary simulation-global
     functions and state. All code that writes to the output database, needs to
     know simulation time, creates/builds facilities, and/or uses loaded
