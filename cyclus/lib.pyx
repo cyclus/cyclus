@@ -1126,3 +1126,12 @@ def discover_specs(path, library):
                                                                 cpp_library)
     rtn = std_set_std_string_to_py(cpp_rtn)
     return rtn
+
+
+def discover_specs_in_cyclus_path():
+    """Discover archetype specifications that live recursively in CYCLUS_PATH
+    directories. Returns a set of strings.
+    """
+    cdef std_set[std_string] cpp_rtn = cpp_cyclus.DiscoverSpecsInCyclusPath()
+    rtn = std_set_std_string_to_py(cpp_rtn)
+    return rtn

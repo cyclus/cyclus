@@ -5,7 +5,8 @@ from argparse import ArgumentParser, Action
 
 from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
-    Recorder, Timer, Context, set_warn_limit, discover_specs)
+    Recorder, Timer, Context, set_warn_limit, discover_specs,
+    discover_specs_in_cyclus_path)
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -108,6 +109,16 @@ class AgentListing(Action):
         print(s)
 
 
+class AllAgentListing(ZeroArgAction):
+    """Displays all known cyclus agents"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        specs = discover_specs_in_cyclus_path()
+        s = '\n'.join(sorted(specs))
+        print(s)
+
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
@@ -137,6 +148,8 @@ def make_parser():
     p.add_argument('-l', '--agent-listing', action=AgentListing,
                    dest='agent_listing',
                    help='dump the agents in a library')
+    p.add_argument('-a', '--all-agent-listing', action=AllAgentListing,
+                   help='dump all the agents cyclus knows about')
     return p
 
 
