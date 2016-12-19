@@ -1135,3 +1135,13 @@ def discover_specs_in_cyclus_path():
     cdef std_set[std_string] cpp_rtn = cpp_cyclus.DiscoverSpecsInCyclusPath()
     rtn = std_set_std_string_to_py(cpp_rtn)
     return rtn
+
+
+def discover_metadata_in_cyclus_path():
+    """Discover archetype metadata in cyclus path. Returns a Jason.Value
+    object.
+    """
+    cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
+    cpp_rtn._inst[0] = cpp_cyclus.DiscoverMetadataInCyclusPath()
+    rtn = cpp_rtn
+    return rtn
