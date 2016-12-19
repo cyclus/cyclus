@@ -442,7 +442,7 @@ cdef class _DynamicModule:
         cpp_spec = <_AgentSpec> spec
         agent.ptx = cpp_cyclus.DynamicModule.Make(
             (<_Context> ctx).ptx,
-            cpp_spec.ptx[0],
+            deref(cpp_spec.ptx),
             )
         return agent
 

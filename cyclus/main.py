@@ -46,12 +46,13 @@ class AgentSchema(Action):
     """Displays and agent schema"""
 
     def __call__(self, parser, ns, values, option_string=None):
-        #set_warn_limit(0)
+        ns.agent_schema = values
+        set_warn_limit(0)
         rec = Recorder()
         ti = Timer()
         ctx = Context(ti, rec)
         agent = DynamicModule.make(ctx, ns.agent_schema)
-        print(agent.schema, "wajja")
+        print(agent.schema)
         ctx.del_agent(agent)
 
 
