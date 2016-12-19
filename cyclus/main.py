@@ -3,7 +3,8 @@ from __future__ import unicode_literals, print_function
 import atexit
 from argparse import ArgumentParser, Action
 
-from cyclus.lib import DynamicModule, Env, version, load_string_from_file
+from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
+    Recorder, Timer, set_warn_limit)
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -41,6 +42,14 @@ class Schema(ZeroArgAction):
         print(schema)
 
 
+class AgentSchema(Action):
+    """Displays and agent schema"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        set_warn_limit(0)
+        rec = Recorder()
+        ti = Timer()
+
 
 def make_parser():
     """Makes the Cyclus CLI parser."""
@@ -54,6 +63,8 @@ def make_parser():
     p.add_argument('--schema', action=Schema,
                    help='dump the cyclus master schema including all '
                         'installed module schemas')
+    p.add_argument('--agent-schema', action=AgentSchema,
+                   help='dump the schema for the named agent')
 
     p.add_argument('--flat-schema', action='store_true', default=False,
                    dest='flat_schema',

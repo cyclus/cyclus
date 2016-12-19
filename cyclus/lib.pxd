@@ -62,8 +62,15 @@ cdef class _Timer:
 cdef class _SimInit:
     cdef cpp_cyclus.SimInit * ptx
 
+cdef class _Agent:
+    cdef void * ptx
+    cdef bint _free
+
 cdef class _XMLFileLoader:
     cdef cpp_cyclus.XMLFileLoader * ptx
 
 cdef class _XMLFlatLoader:
     cdef cpp_cyclus.XMLFlatLoader * ptx
+
+cdef class _Context:
+    cdef cpp_cyclus.Context * ptx

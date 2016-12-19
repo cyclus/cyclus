@@ -132,12 +132,6 @@ cdef extern from "dynamic_module.h" namespace "cyclus":
         std_string agent() except +
         std_string alias() except +
 
-    cdef cppclass DynamicModule:
-        DynamicModule() except +
-        cpp_bool Exists(AgentSpec) except +
-        void CloseAll() except +
-        std_string path() except +
-
 cdef extern from "env.h" namespace "cyclus":
 
     cdef cppclass Env:
@@ -268,6 +262,24 @@ cdef extern from "sim_init.h" namespace "cyclus":
         Timer* timer() except +
 
 
+cdef extern from "agent.h" namespace "cyclus":
+
+    cdef cppclass Agent:
+        Agent(Context*) except +
+        std_string schema() except +
+
+
+cdef extern from "dynamic_module.h" namespace "cyclus":
+
+    cdef cppclass DynamicModule:
+        DynamicModule() except +
+        @staticmethod
+        Agent* Make(Context*, AgentSpec) except +
+        cpp_bool Exists(AgentSpec) except +
+        void CloseAll() except +
+        std_string path() except +
+
+
 cdef extern from "version.h" namespace "cyclus::version":
 
     const char* describe() except +
@@ -279,3 +291,10 @@ cdef extern from "version.h" namespace "cyclus::version":
     const char* xmlpp() except +
     const char* coincbc() except +
     const char* coinclp() except +
+
+
+cdef extern from "context.h" namespace "cyclus":
+
+    cdef cppclass Context:
+        Context(Timer*, Recorder*) except +
+        void DelAgent(Agent*) except +

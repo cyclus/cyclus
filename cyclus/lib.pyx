@@ -422,6 +422,30 @@ cdef class _DynamicModule:
     def __dealloc__(self):
         del self.ptx
 
+    @staticmethod
+    def make(ctx, spec):
+        """Returns a newly constructed agent for the given module spec.
+
+        Paramters
+        ---------
+        ctx : Context
+        spec : AgentSpec or str
+
+        Returns
+        -------
+        rtn : Agent
+        """
+        cdef _Agent agent = Agent()
+        cdef _AgentSpec cpp_spec
+        if isinstance(spec, str):
+            spec = AgentSpec(spec)
+        cpp_spec = <_AgentSpec> spec
+        agent.ptx = cpp_cyclus.DynamicModule.Make(
+            (<_Context> ctx).ptx,
+            cpp_spec.ptx[0],
+            )
+        return agent
+
     def exists(self, _AgentSpec spec):
         """Tests whether an agent spec exists."""
         cdef cpp_bool rtn = self.ptx.Exists(deref(spec.ptx))
@@ -912,6 +936,40 @@ class SimInit(_SimInit):
     """
 
 #
+# Agent
+#
+cdef class _Agent:
+
+    def __cinit__(self, bint free=False):
+        self._free = free
+        self.ptx == NULL
+
+    def __dealloc__(self):
+        cdef cpp_cyclus.Agent* cpp_ptx
+        if self.ptx == NULL:
+            return
+        elif self._free:
+            cpp_ptx = <cpp_cyclus.Agent*> self.ptx
+            del cpp_ptx
+
+    @property
+    def schema(self):
+        """An agent's xml rng schema for initializing from input files. All
+        concrete agents should override this function. This must validate the same
+        xml input that the InfileToDb function receives.
+        """
+        cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).schema()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+
+class Agent(_Agent):
+    """The abstract base class used by all types of agents
+    that live and interact in a simulation.
+    """
+
+
+#
 # Version Info
 #
 
@@ -990,4 +1048,46 @@ def version():
     s += "   xml2     " + xml2_version() + "\n"
     s += "   xml++    " + xmlpp_version() + "\n"
     return s
+
+#
+# Context
+#
+cdef class _Context:
+
+    def __cinit__(self, timer, recorder):
+        self.ptx = new cpp_cyclus.Context(
+            (<_Timer> timer).ptx,
+            (<cpp_cyclus.Recorder*> (<_Recorder> recorder).ptx),
+            )
+
+    def __dealloc__(self):
+        del self.ptx
+
+    def del_agent(self, agent):
+        """Destructs and cleans up an agent (and it's children recursively)."""
+        self.ptx.DelAgent(<cpp_cyclus.Agent*> (<_Agent> agent).ptx)
+
+
+class Context(Context):
+    """A simulation context provides access to necessary simulation-global
+    functions and state. All code that writes to the output database, needs to
+    know simulation time, creates/builds facilities, and/or uses loaded
+    composition recipes will need a context pointer. In general, all global
+    state should be accessed through a simulation context.
+
+    Parameters
+    ----------
+    timer : Timer
+        An instance of the timer class.
+    recorder : Recorder
+        An instance of the recorder class.
+
+    Warnings
+    --------
+    * The context takes ownership of and manages the lifetime/destruction
+      of all agents constructed with it (including Cloned agents). Agents should
+      generally NEVER be allocated on the stack.
+    * The context takes ownership of the solver and will manage its
+      destruction.
+    """
 
