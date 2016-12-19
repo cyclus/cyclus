@@ -16,6 +16,7 @@ def test_main():
         ['--schema-path', '/path/to/schema'],
         ['--agent-annotations', ':agents:NullRegion'],
         ['--agent-listing', ':agents'],
+        ['--no-agent'],
         ]
     for case in cases:
         try:

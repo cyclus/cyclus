@@ -6,7 +6,7 @@ from argparse import ArgumentParser, Action
 from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs,
-    discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path)
+    discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger)
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -128,6 +128,13 @@ class Metadata(ZeroArgAction):
         print(s.rstrip())
 
 
+class NoAgent(ZeroArgAction):
+    """Disables agent logging"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        Logger().no_agent = True
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
@@ -161,6 +168,8 @@ def make_parser():
                    help='dump all the agents cyclus knows about')
     p.add_argument('-m', '--metadata', action=Metadata,
                    help='dump metadata for all the agents cyclus knows about')
+    p.add_argument('--no-agent', action=NoAgent,
+                   help='only print log entries from cyclus core code')
     return p
 
 
