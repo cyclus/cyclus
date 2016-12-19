@@ -12,6 +12,7 @@ def test_main():
         ['--schema'],
         ['--flat-schema', '--schema'],
         ['--agent-schema', ':agents:KFacility'],
+        ['--agent-version', ':agents:KFacility'],
         ]
     for case in cases:
         try:

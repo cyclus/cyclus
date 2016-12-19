@@ -43,7 +43,7 @@ class Schema(ZeroArgAction):
 
 
 class AgentSchema(Action):
-    """Displays and agent schema"""
+    """Displays an agent schema"""
 
     def __call__(self, parser, ns, values, option_string=None):
         ns.agent_schema = values
@@ -53,6 +53,20 @@ class AgentSchema(Action):
         ctx = Context(ti, rec)
         agent = DynamicModule.make(ctx, ns.agent_schema)
         print(agent.schema)
+        ctx.del_agent(agent)
+
+
+class AgentVersion(Action):
+    """Displays an agent version"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        ns.agent_version = values
+        set_warn_limit(0)
+        rec = Recorder()
+        ti = Timer()
+        ctx = Context(ti, rec)
+        agent = DynamicModule.make(ctx, ns.agent_version)
+        print(agent.version)
         ctx.del_agent(agent)
 
 
@@ -71,6 +85,9 @@ def make_parser():
     p.add_argument('--agent-schema', action=AgentSchema,
                    dest='agent_schema',
                    help='dump the schema for the named agent')
+    p.add_argument('--agent-version', action=AgentVersion,
+                   dest='agent_version',
+                   help='dump the version for the named agent')
 
     p.add_argument('--flat-schema', action='store_true', default=False,
                    dest='flat_schema',

@@ -962,6 +962,13 @@ cdef class _Agent:
         rtn = std_string_to_py(cpp_rtn)
         return rtn
 
+    @property
+    def version(self):
+        """Agent version string."""
+        cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).version()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
 
 class Agent(_Agent):
     """The abstract base class used by all types of agents

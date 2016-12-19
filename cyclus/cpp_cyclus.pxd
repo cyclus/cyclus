@@ -267,6 +267,7 @@ cdef extern from "agent.h" namespace "cyclus":
     cdef cppclass Agent:
         Agent(Context*) except +
         std_string schema() except +
+        std_string version() except +
 
 
 cdef extern from "dynamic_module.h" namespace "cyclus":
