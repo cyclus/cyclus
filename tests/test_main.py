@@ -13,6 +13,7 @@ def test_main():
         ['--flat-schema', '--schema'],
         ['--agent-schema', ':agents:KFacility'],
         ['--agent-version', ':agents:KFacility'],
+        ['--schema-path', '/path/to/schema']
         ]
     for case in cases:
         try:

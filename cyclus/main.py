@@ -12,6 +12,17 @@ _DYNAMIC_MODULE = DynamicModule()
 atexit.register(_DYNAMIC_MODULE.close_all)
 
 
+def set_schema_path(ns):
+    """Sets the schema path on the namespace."""
+    if ns.flat_schema:
+        path = Env.rng_schema(True)
+    elif ns.schema_path is not None:
+        path = ns.schema_path
+    else:
+        path = Env.rng_schema(False)
+    ns.schema_path = path
+
+
 class ZeroArgAction(Action):
     """An action with no arguments."""
 
@@ -37,8 +48,8 @@ class Schema(ZeroArgAction):
     """Displays cyclus schema"""
 
     def __call__(self, parser, ns, values, option_string=None):
-        path = Env.rng_schema(ns.flat_schema)
-        schema = load_string_from_file(path)
+        set_schema_path(ns)
+        schema = load_string_from_file(ns.schema_path)
         print(schema)
 
 
@@ -88,7 +99,8 @@ def make_parser():
     p.add_argument('--agent-version', action=AgentVersion,
                    dest='agent_version',
                    help='dump the version for the named agent')
-
+    p.add_argument('--schema-path', dest='schema_path', default=None,
+                   help='manually specify the path to the cyclus master schema')
     p.add_argument('--flat-schema', action='store_true', default=False,
                    dest='flat_schema',
                    help='use the flat master simulation schema')
