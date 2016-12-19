@@ -15,6 +15,7 @@ def test_main():
         ['--agent-version', ':agents:KFacility'],
         ['--schema-path', '/path/to/schema'],
         ['--agent-annotations', ':agents:NullRegion'],
+        ['--agent-listing', ':agents'],
         ]
     for case in cases:
         try:

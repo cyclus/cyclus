@@ -301,3 +301,8 @@ cdef extern from "context.h" namespace "cyclus":
     cdef cppclass Context:
         Context(Timer*, Recorder*) except +
         void DelAgent(Agent*) except +
+
+
+cdef extern from "discovery.h" namespace "cyclus":
+
+    cdef set[std_string] DiscoverSpecs(std_string, std_string) except +

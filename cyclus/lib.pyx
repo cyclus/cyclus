@@ -31,7 +31,7 @@ from cyclus cimport cpp_typesystem
 from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
-    bool_to_py, int_to_py
+    bool_to_py, int_to_py, std_set_std_string_to_py
 
 
 # startup numpy
@@ -1113,3 +1113,16 @@ class Context(_Context):
       destruction.
     """
 
+#
+# Discovery
+#
+def discover_specs(path, library):
+    """Discover archetype specifications for a path and library.
+    Returns a set of strings.
+    """
+    cdef std_string cpp_path = str_py_to_cpp(path)
+    cdef std_string cpp_library = str_py_to_cpp(library)
+    cdef std_set[std_string] cpp_rtn = cpp_cyclus.DiscoverSpecs(cpp_path,
+                                                                cpp_library)
+    rtn = std_set_std_string_to_py(cpp_rtn)
+    return rtn

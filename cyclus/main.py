@@ -5,7 +5,7 @@ from argparse import ArgumentParser, Action
 
 from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
-    Recorder, Timer, Context, set_warn_limit)
+    Recorder, Timer, Context, set_warn_limit, discover_specs)
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -54,16 +54,22 @@ class Schema(ZeroArgAction):
         print(schema)
 
 
+def make_agent_ctx(spec):
+    """Contsructs and agent and returns the agent and the context."""
+    set_warn_limit(0)
+    rec = Recorder()
+    ti = Timer()
+    ctx = Context(ti, rec)
+    agent = DynamicModule.make(ctx, spec)
+    return agent, ctx
+
+
 class AgentSchema(Action):
     """Displays an agent schema"""
 
     def __call__(self, parser, ns, values, option_string=None):
         ns.agent_schema = values
-        set_warn_limit(0)
-        rec = Recorder()
-        ti = Timer()
-        ctx = Context(ti, rec)
-        agent = DynamicModule.make(ctx, ns.agent_schema)
+        agent, ctx = make_agent_ctx(ns.agent_schema)
         print(agent.schema.rstrip())
         ctx.del_agent(agent)
 
@@ -73,11 +79,7 @@ class AgentVersion(Action):
 
     def __call__(self, parser, ns, values, option_string=None):
         ns.agent_version = values
-        set_warn_limit(0)
-        rec = Recorder()
-        ti = Timer()
-        ctx = Context(ti, rec)
-        agent = DynamicModule.make(ctx, ns.agent_version)
+        agent, ctx = make_agent_ctx(ns.agent_version)
         print(agent.version)
         ctx.del_agent(agent)
 
@@ -87,16 +89,23 @@ class AgentAnnotations(Action):
 
     def __call__(self, parser, ns, values, option_string=None):
         ns.agent_annotations = values
-        set_warn_limit(0)
-        rec = Recorder()
-        ti = Timer()
-        ctx = Context(ti, rec)
-        agent = DynamicModule.make(ctx, ns.agent_annotations)
+        agent, ctx = make_agent_ctx(ns.agent_annotations)
         anno = agent.annotations
         writer = CustomWriter("{", "}", "[", "]", ": ", ", ", " ", 80)
         s = writer.write(anno)
         print(s.rstrip())
         ctx.del_agent(agent)
+
+
+class AgentListing(Action):
+    """Displays an agent listing"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        ns.agent_listing = values
+        path, library = ns.agent_listing.split(':')
+        specs = discover_specs(path, library)
+        s = '\n'.join(sorted(specs))
+        print(s)
 
 
 def make_parser():
@@ -125,6 +134,9 @@ def make_parser():
     p.add_argument('--agent-annotations', action=AgentAnnotations,
                    dest='agent_annotations',
                    help='dump the annotations for the named agent')
+    p.add_argument('-l', '--agent-listing', action=AgentListing,
+                   dest='agent_listing',
+                   help='dump the agents in a library')
     return p
 
 
