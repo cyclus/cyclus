@@ -28,7 +28,7 @@ def test_paths():
 
 def test_nuc_data():
     yield assert_true, len(ENV.nuc_data) > 0
-    ENV.nuc_data = ENV.nuc_data
+    ENV.set_nuc_data_path(ENV.nuc_data)
 
 
 def test_allow_milps():

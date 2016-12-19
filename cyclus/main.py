@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function
 import atexit
 from argparse import ArgumentParser, Action
 
+from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit)
 
@@ -63,7 +64,7 @@ class AgentSchema(Action):
         ti = Timer()
         ctx = Context(ti, rec)
         agent = DynamicModule.make(ctx, ns.agent_schema)
-        print(agent.schema)
+        print(agent.schema.rstrip())
         ctx.del_agent(agent)
 
 
@@ -78,6 +79,23 @@ class AgentVersion(Action):
         ctx = Context(ti, rec)
         agent = DynamicModule.make(ctx, ns.agent_version)
         print(agent.version)
+        ctx.del_agent(agent)
+
+
+class AgentAnnotations(Action):
+    """Displays an agent annotations"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        ns.agent_annotations = values
+        set_warn_limit(0)
+        rec = Recorder()
+        ti = Timer()
+        ctx = Context(ti, rec)
+        agent = DynamicModule.make(ctx, ns.agent_annotations)
+        anno = agent.annotations
+        writer = CustomWriter("{", "}", "[", "]", ": ", ", ", " ", 80)
+        s = writer.write(anno)
+        print(s.rstrip())
         ctx.del_agent(agent)
 
 
@@ -104,6 +122,9 @@ def make_parser():
     p.add_argument('--flat-schema', action='store_true', default=False,
                    dest='flat_schema',
                    help='use the flat master simulation schema')
+    p.add_argument('--agent-annotations', action=AgentAnnotations,
+                   dest='agent_annotations',
+                   help='dump the annotations for the named agent')
     return p
 
 

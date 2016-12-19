@@ -6,6 +6,7 @@ from libcpp.utility cimport pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 
+from . cimport cpp_jsoncpp
 from .cpp_typesystem cimport DbTypes
 from .cpp_stringstream cimport stringstream
 
@@ -268,6 +269,7 @@ cdef extern from "agent.h" namespace "cyclus":
         Agent(Context*) except +
         std_string schema() except +
         std_string version() except +
+        cpp_jsoncpp.Value annotations() except +
 
 
 cdef extern from "dynamic_module.h" namespace "cyclus":

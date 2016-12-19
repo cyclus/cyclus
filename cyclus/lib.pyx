@@ -21,6 +21,11 @@ import numpy as np
 import pandas as pd
 
 # local imports
+
+from cyclus cimport cpp_jsoncpp
+from cyclus cimport jsoncpp
+from cyclus import jsoncpp
+
 from cyclus cimport cpp_cyclus
 from cyclus cimport cpp_typesystem
 from cyclus.cpp_stringstream cimport stringstream
@@ -943,6 +948,7 @@ cdef class _Agent:
     def __cinit__(self, bint free=False):
         self._free = free
         self.ptx == NULL
+        self._annotations = None
 
     def __dealloc__(self):
         cdef cpp_cyclus.Agent* cpp_ptx
@@ -968,6 +974,15 @@ cdef class _Agent:
         cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).version()
         rtn = std_string_to_py(cpp_rtn)
         return rtn
+
+    @property
+    def annotations(self):
+        """Agent annotations."""
+        cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
+        if self._annotations is None:
+            cpp_rtn._inst[0] = (<cpp_cyclus.Agent*> self.ptx).annotations()
+        self._annotations = cpp_rtn
+        return self._annotations
 
 
 class Agent(_Agent):
