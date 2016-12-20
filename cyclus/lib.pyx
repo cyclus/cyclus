@@ -31,7 +31,7 @@ from cyclus cimport cpp_typesystem
 from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
-    bool_to_py, int_to_py, std_set_std_string_to_py
+    bool_to_py, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py
 
 
 # startup numpy
@@ -912,6 +912,7 @@ cdef class _SimInit:
             <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
             )
         self._timer = None
+        self._context = None
 
     def __dealloc__(self):
         del self.ptx
@@ -925,6 +926,16 @@ cdef class _SimInit:
             self._timer = Timer(init=False)
             (<_Timer> self._timer).ptx = self.ptx.timer()
         return self._timer
+
+    @property
+    def context(self):
+        """Returns the initialized context. Note that either Init, Restart, or Branch
+        must be called first.
+        """
+        if self._context is None:
+            self._context = Context(init=False)
+            (<_Context> self._context).ptx = self.ptx.context()
+        return self._context
 
 
 class SimInit(_SimInit):
@@ -1076,18 +1087,31 @@ def version():
 #
 cdef class _Context:
 
-    def __cinit__(self, timer, recorder):
-        self.ptx = new cpp_cyclus.Context(
-            (<_Timer> timer).ptx,
-            (<cpp_cyclus.Recorder*> (<_Recorder> recorder).ptx),
-            )
+    def __cinit__(self, timer=None, recorder=None, init=True):
+        self._free = init
+        if init:
+            self.ptx = new cpp_cyclus.Context(
+                (<_Timer> timer).ptx,
+                (<cpp_cyclus.Recorder*> (<_Recorder> recorder).ptx),
+                )
+        else:
+            self.ptx = NULL
 
     def __dealloc__(self):
+        if self.ptx == NULL or not self._free:
+            return
         del self.ptx
 
     def del_agent(self, agent):
         """Destructs and cleans up an agent (and it's children recursively)."""
         self.ptx.DelAgent(<cpp_cyclus.Agent*> (<_Agent> agent).ptx)
+
+    @property
+    def sim_id(self):
+        """The simulation ID."""
+        cdef cpp_cyclus.uuid cpp_sim_id = self.ptx.sim_id()
+        rtn = uuid_cpp_to_py(cpp_sim_id)
+        return rtn
 
 
 class Context(_Context):
@@ -1099,10 +1123,12 @@ class Context(_Context):
 
     Parameters
     ----------
-    timer : Timer
+    timer : Timer, optional
         An instance of the timer class.
-    recorder : Recorder
+    recorder : Recorder, optional
         An instance of the recorder class.
+    init : bool, optional
+        Whether or not to initialize a new context object.
 
     Warnings
     --------

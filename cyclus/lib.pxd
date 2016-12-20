@@ -74,3 +74,4 @@ cdef class _XMLFlatLoader:
 
 cdef class _Context:
     cdef cpp_cyclus.Context * ptx
+    cdef bint _free

@@ -6,14 +6,44 @@ from argparse import ArgumentParser, Action
 
 from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
-    Recorder, Timer, Context, set_warn_limit, discover_specs,
+    Recorder, Timer, Context, set_warn_limit, discover_specs, XMLParser,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
-    set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml)
+    set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml,
+    Hdf5Back, SqliteBack, InfileTree, SimInit, XMLFileLoader, XMLFlatLoader)
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
 _DYNAMIC_MODULE = DynamicModule()
 atexit.register(_DYNAMIC_MODULE.close_all)
+
+
+LOGO = """              :
+          .CL:CC CC             _Q     _Q  _Q_Q    _Q    _Q              _Q
+        CC;CCCCCCCC:C;         /_\\)   /_\\)/_/\\\\)  /_\\)  /_\\)            /_\\)
+        CCCCCCCCCCCCCl       __O|/O___O|/O_OO|/O__O|/O__O|/O____________O|/O__
+     CCCCCCf     iCCCLCC     /////////////////////////////////////////////////
+     iCCCt  ;;;;;.  CCCC
+    CCCC  ;;;;;;;;;. CClL.                          c
+   CCCC ,;;       ;;: CCCC  ;                   : CCCCi
+    CCC ;;         ;;  CC   ;;:                CCC`   `C;
+  lCCC ;;              CCCC  ;;;:             :CC .;;. C;   ;    :   ;  :;;
+  CCCC ;.              CCCC    ;;;,           CC ;    ; Ci  ;    :   ;  :  ;
+   iCC :;               CC       ;;;,        ;C ;       CC  ;    :   ; .
+  CCCi ;;               CCC        ;;;.      .C ;       tf  ;    :   ;  ;.
+  CCC  ;;               CCC          ;;;;;;; fC :       lC  ;    :   ;    ;:
+   iCf ;;               CC         :;;:      tC ;       CC  ;    :   ;     ;
+  fCCC :;              LCCf      ;;;:         LC :.  ,: C   ;    ;   ; ;   ;
+  CCCC  ;;             CCCC    ;;;:           CCi `;;` CC.  ;;;; :;.;.  ; ,;
+    CCl ;;             CC    ;;;;              CCC    CCL
+   tCCC  ;;        ;; CCCL  ;;;                  tCCCCC.
+    CCCC  ;;     :;; CCCCf  ;                     ,L
+     lCCC   ;;;;;;  CCCL
+     CCCCCC  :;;  fCCCCC
+      . CCCC     CCCC .
+       .CCCCCCCCCCCCCi
+          iCCCCCLCf
+           .  C. ,
+              :  """
 
 
 def set_schema_path(ns):
@@ -317,7 +347,51 @@ def make_parser():
     p.add_argument('--xml-to-json', action=XmlToJson,
                    dest='xml_to_json', default=None,
                    help='*.xml input file')
+    p.add_argument('input_file', nargs='?',
+                   help='path to input file')
     return p
+
+
+def run_simulation(ns):
+    """Runs the simulation when we recieve an input file."""
+    Env.set_nuc_data_path()
+    print(LOGO)
+    rec = Recorder()
+    # setup database backend
+    _, ext = os.path.splitext(ns.output_path)
+    if ext == '.h5':
+        backend = Hdf5Back(ns.output_path)
+    elif ext == '.sqlite':
+        backend = SqliteBack(ns.output_path)
+    else:
+        raise RuntimeError('Backend extension type not recognised, ' +
+                           ns.output_path)
+    rec.register_backend(backend)
+    # find schema type
+    parser = XMLParser(filename=ns.input_file)
+    tree = InfileTree(parser)
+    schema_type = tree.optional_query("/simulation/schematype", "")
+    if schema_type == "flat" and not ns.flat_schema:
+        print("flat schema tag detected - switching to flat input schema",
+              file=sys.stderr)
+        ns.flat_schema = True
+    set_schema_path(ns)
+    # Load input file and initialize simulation
+    if ns.flat_schema:
+        loader = XMLFlatLoader(rec, backend, ns.schema_path, ns.input_file)
+    else:
+        loader = XMLFileLoader(rec, backend, ns.schema_path, ns.input_file)
+    loader.load_sim()
+    si = SimInit(rec, backend)
+    # run simulation and report back
+    si.timer.run_sim()
+    rec.flush()
+    msg = ("Status: Cyclus run successful!\n"
+           "Output location: {0}\n"
+           "Simulation ID: {1}").format(ns.output_path,
+                                        si.context.sim_id)
+    print(msg)
+
 
 
 def main(args=None):
@@ -325,6 +399,8 @@ def main(args=None):
     Env.set_nuc_data_path()
     p = make_parser()
     ns = p.parse_args(args=args)
+    if ns.input_file is not None:
+        run_simulation(ns)
 
 
 if __name__ == '__main__':

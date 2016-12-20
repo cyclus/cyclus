@@ -261,6 +261,7 @@ cdef extern from "sim_init.h" namespace "cyclus":
         SimInit() except +
         void Init(Recorder*, QueryableBackend*) except +
         Timer* timer() except +
+        Context* context() except +
 
 
 cdef extern from "agent.h" namespace "cyclus":
@@ -301,6 +302,7 @@ cdef extern from "context.h" namespace "cyclus":
     cdef cppclass Context:
         Context(Timer*, Recorder*) except +
         void DelAgent(Agent*) except +
+        uuid sim_id() except +
 
 
 cdef extern from "discovery.h" namespace "cyclus":
