@@ -1,5 +1,6 @@
 """Main Cyclus CLI entry point."""
 from __future__ import unicode_literals, print_function
+import os
 import atexit
 from argparse import ArgumentParser, Action
 
@@ -7,7 +8,7 @@ from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
-    set_warn_limit)
+    set_warn_limit, set_warn_as_error)
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -163,6 +164,20 @@ class WarnLimit(Action):
         set_warn_limit(ns.warn_limit)
 
 
+class WarnAsError(ZeroArgAction):
+    """Sets warning to be errors"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        set_warn_as_error(True)
+
+
+class CyclusPath(ZeroArgAction):
+    """Prints the Cyclus Path"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        cp = Env().cyclus_path
+        s = os.pathsep.join(cp)
+        print(s)
 
 
 def make_parser():
@@ -205,11 +220,15 @@ def make_parser():
     p.add_argument('-v', '--verb', action=Verbosity, dest='verbosity',
                    help='log verbosity. integer from 0 (quiet) to 11 (verbose)')
     p.add_argument('-o', '--output-path', dest='output_path',
-                   help='output path')
-    p.add_argument('--input-file', dest='input_file',
+                   default='cyclus.sqlite', help='output path')
+    p.add_argument('--input-file', dest='input_file', default=None,
                    help="path to input file")
     p.add_argument('--warn-limit', dest='warn_limit', action=WarnLimit,
                    help='number of warnings to issue per kind, defaults to 42')
+    p.add_argument('--warn-as-error', action=WarnAsError,
+                   help='throw errors when warnings are issued')
+    p.add_argument('-p', '--path', action=CyclusPath,
+                   help='print the CYCLUS_PATH')
     return p
 
 

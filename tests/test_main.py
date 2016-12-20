@@ -20,6 +20,7 @@ def test_main():
         ['--no-mem'],
         ['-v', '5'],
         ['--warn-limit', '21'],
+        ['-p'],
         ]
     for case in cases:
         try:
