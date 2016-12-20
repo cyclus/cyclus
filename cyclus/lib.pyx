@@ -1145,3 +1145,22 @@ def discover_metadata_in_cyclus_path():
     cpp_rtn._inst[0] = cpp_cyclus.DiscoverMetadataInCyclusPath()
     rtn = cpp_rtn
     return rtn
+
+
+#
+# Infile Converters
+#
+def json_to_xml(s):
+    """Converts a JSON string into an equivalent XML string"""
+    cdef std_string cpp_s = str_py_to_cpp(s)
+    cdef std_string cpp_rtn = cpp_cyclus.JsonToXml(cpp_s)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn
+
+
+def xml_to_json(s):
+    """Converts an XML string into an equivalent JSON string"""
+    cdef std_string cpp_s = str_py_to_cpp(s)
+    cdef std_string cpp_rtn = cpp_cyclus.XmlToJson(cpp_s)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn

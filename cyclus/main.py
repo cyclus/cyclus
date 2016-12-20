@@ -8,7 +8,7 @@ from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
-    set_warn_limit, set_warn_as_error)
+    set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml)
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -228,6 +228,28 @@ class NucData(ZeroArgAction):
         print(s)
 
 
+class JsonToXml(Action):
+    """converts JSON to XML"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        ns.json_to_xml = values
+        with open(ns.json_to_xml, 'r') as f:
+            s = f.read()
+        t = json_to_xml(s)
+        print(t.rstrip())
+
+
+class XmlToJson(Action):
+    """converts XML to JSON"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        ns.xml_to_json = values
+        with open(ns.xml_to_json, 'r') as f:
+            s = f.read()
+        t = xml_to_json(s)
+        print(t.rstrip())
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
@@ -289,6 +311,12 @@ def make_parser():
                    help='print the path to cyclus.rng.in')
     p.add_argument('--nuc-data', action=NucData,
                    help='print the path to cyclus_nuc_data.h5')
+    p.add_argument('--json-to-xml', action=JsonToXml,
+                   dest='json_to_xml', default=None,
+                   help='*.json input file')
+    p.add_argument('--xml-to-json', action=XmlToJson,
+                   dest='xml_to_json', default=None,
+                   help='*.xml input file')
     return p
 
 

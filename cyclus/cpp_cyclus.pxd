@@ -308,3 +308,10 @@ cdef extern from "discovery.h" namespace "cyclus":
     cdef set[std_string] DiscoverSpecs(std_string, std_string) except +
     cdef set[std_string] DiscoverSpecsInCyclusPath() except +
     cdef cpp_jsoncpp.Value DiscoverMetadataInCyclusPath() except +
+
+
+cdef extern from "toolkit/infile_converters.h" namespace "cyclus::toolkit":
+
+    cdef std_string JsonToXml(std_string) except +
+    cdef std_string XmlToJson(std_string) except +
+
