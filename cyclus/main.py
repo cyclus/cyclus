@@ -180,6 +180,30 @@ class CyclusPath(ZeroArgAction):
         print(s)
 
 
+class IncludePath(ZeroArgAction):
+    """Prints the Cyclus Include Path"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        s = os.path.join(Env().install_path, "include", "cyclus")
+        print(s)
+
+
+class InstallPath(ZeroArgAction):
+    """Prints the Cyclus Install Path"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        s = Env().install_path
+        print(s)
+
+
+class CMakeModulePath(ZeroArgAction):
+    """Prints the Cyclus CMake Module Path"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        s = os.path.join(Env().install_path, "share", "cyclus", "cmake")
+        print(s)
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
@@ -229,6 +253,12 @@ def make_parser():
                    help='throw errors when warnings are issued')
     p.add_argument('-p', '--path', action=CyclusPath,
                    help='print the CYCLUS_PATH')
+    p.add_argument('--include', action=IncludePath,
+                   help='print the cyclus include directory')
+    p.add_argument('--install-path', action=InstallPath,
+                   help='print the cyclus install directory')
+    p.add_argument('--cmake-module-path', action=CMakeModulePath,
+                   help='print the cyclus CMake module path')
     return p
 
 

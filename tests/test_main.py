@@ -21,6 +21,9 @@ def test_main():
         ['-v', '5'],
         ['--warn-limit', '21'],
         ['-p'],
+        ['--include'],
+        ['--install-path'],
+        ['--cmake-module-path'],
         ]
     for case in cases:
         try:
