@@ -24,6 +24,9 @@ def test_main():
         ['--include'],
         ['--install-path'],
         ['--cmake-module-path'],
+        ['--build-path'],
+        ['--rng-schema'],
+        ['--nuc-data'],
         ]
     for case in cases:
         try:

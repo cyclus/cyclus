@@ -204,6 +204,30 @@ class CMakeModulePath(ZeroArgAction):
         print(s)
 
 
+class BuildPath(ZeroArgAction):
+    """Prints the Cyclus Build Path"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        s = Env().build_path
+        print(s)
+
+
+class RngSchema(ZeroArgAction):
+    """Displays path to the rng schema"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        set_schema_path(ns)
+        print(ns.schema_path)
+
+
+class NucData(ZeroArgAction):
+    """Prints the Nuclear data Path"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        s = Env().nuc_data
+        print(s)
+
+
 def make_parser():
     """Makes the Cyclus CLI parser."""
     p = ArgumentParser("cyclus", description="Cyclus command line "
@@ -259,6 +283,12 @@ def make_parser():
                    help='print the cyclus install directory')
     p.add_argument('--cmake-module-path', action=CMakeModulePath,
                    help='print the cyclus CMake module path')
+    p.add_argument('--build-path', action=BuildPath,
+                   help='print the cyclus build directory')
+    p.add_argument('--rng-schema', action=RngSchema,
+                   help='print the path to cyclus.rng.in')
+    p.add_argument('--nuc-data', action=NucData,
+                   help='print the path to cyclus_nuc_data.h5')
     return p
 
 
