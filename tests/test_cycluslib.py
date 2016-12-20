@@ -37,13 +37,12 @@ def test_conds_ae(db, fname, backend):
 
 @dbtest
 def test_conds_comp(db, fname, backend):
-    conds = [('NucId', '==', 922350000), ('MassFrac', '>', 0.0072)]
+    conds = [('NucId', '==', 922350000), ('MassFrac', '<=', 0.0072)]
     df = db.query("Compositions", conds)
     assert_less(0, len(df))
     for row in df['MassFrac']:
-        assert_less(0.0072, row)
+        assert_less(row, 0.00720000001)
 
 
 if __name__ == "__main__":
     nose.runmodule()
-    pass

@@ -116,3 +116,25 @@ cdef extern from "hdf5_back.h" namespace "cyclus":
     cdef cppclass Hdf5Back(FullBackend):
         Hdf5Back(std_string) except +
 
+
+cdef extern from "dynamic_module.h" namespace "cyclus":
+
+    cdef cppclass AgentSpec:
+        AgentSpec() except +
+        #AgentSpec(InfileTree* t);
+        AgentSpec(std_string, std_string, std_string, std_string) except +
+        AgentSpec(std_string) except +
+        std_string Sanitize() except +
+        std_string LibPath() except +
+        std_string str() except +
+        std_string path() except +
+        std_string lib() except +
+        std_string agent() except +
+        std_string alias() except +
+
+    cdef cppclass DynamicModule:
+        DynamicModule() except +
+        cpp_bool Exists(AgentSpec) except +
+        void CloseAll() except +
+        std_string path() except +
+
