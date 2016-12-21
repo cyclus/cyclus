@@ -27,6 +27,7 @@ from cyclus cimport jsoncpp
 from cyclus import jsoncpp
 
 from cyclus cimport cpp_cyclus
+from cyclus cimport memback
 from cyclus cimport cpp_typesystem
 from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
@@ -331,6 +332,9 @@ cdef class _Recorder:
         elif isinstance(backend, SqliteBack):
             b = <cpp_cyclus.RecBackend*> (
                 <cpp_cyclus.SqliteBack*> (<_SqliteBack> backend).ptx)
+        elif isinstance(backend, memback._MemBack):
+            b = <cpp_cyclus.RecBackend*> (
+                <memback.CppMemBack*> (<memback._MemBack> backend).ptx)
         (<cpp_cyclus.Recorder*> self.ptx).RegisterBackend(b)
 
     def flush(self):
