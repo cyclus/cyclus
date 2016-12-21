@@ -1790,7 +1790,7 @@ def memset(dest, src, size):
 def a_cast(t, depth=0, prefix=""):
     cast = Block(nodes=[])
     val = get_variable("val", depth=depth, prefix=prefix)
-    if is_primitive(t) and t.db != "STRING" and not DB_TO_VL[t.db]:
+    if is_primitive(t) and t.db not in WRITE_BODY_PRIMITIVES and not DB_TO_VL[t.db]:
         cast.nodes.append(ExprStmt(child=Decl(type=Type(cpp="const void*"),
                                               name=Var(name=val))))
         cast_string = "a->castsmallvoid()"
@@ -1877,7 +1877,18 @@ def write_body_string(t, depth=0, prefix="", variable=None, offset="buf", pointe
     node.nodes.append(ExprStmt(child=memset(offset+"+"+valuelen, "0", 
                                             item_size+"-"+valuelen)))
     return node
-    
+
+def write_body_uuid(t, depth=0, prefix="", variable=None, offset="buf", pointer=False):
+    if variable is None:
+        variable = get_variable("val", depth=depth, prefix=prefix)
+    node = Block(nodes=[])
+    size = get_variable("item_size", depth=depth, prefix=prefix)
+    if pointer:
+        variable = "*" + variable
+    variable = "&(" + variable + ")"
+    node.nodes.append(ExprStmt(child=memcpy(offset, variable, size)))
+    return node
+   
 def write_body_primitive(t, depth=0, prefix="", variable=None, offset="buf", pointer=False):
     if variable is None:
         variable = get_variable("val", depth=depth, prefix=prefix)
@@ -1892,7 +1903,8 @@ def write_body_primitive(t, depth=0, prefix="", variable=None, offset="buf", poi
     node.nodes.append(ExprStmt(child=memcpy(offset, variable, size)))
     return node
 
-WRITE_BODY_PRIMITIVES = {"STRING": write_body_string}
+WRITE_BODY_PRIMITIVES = {"STRING": write_body_string,
+                         "UUID": write_body_uuid}
 
 def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf", pointer=False):
     all_vl = False
@@ -2036,12 +2048,12 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
                 container_length = get_variable("length", depth=depth, prefix=prefix)
                 dest = offset + "+" + item_size + "*" + count
                 length = item_size + "*" + "(" + container_length + "-" + count + ")"
-                if (len(child_bodies) == 1 and t.canon[1] != "STRING" 
-                    and t.canon[1] != "VL_STRING" 
-                    and is_primitive(CANON_TO_NODE[t.canon[1]]) 
-                    and depth == 0):
-                    length = ("column - std::min(column, " + container_length 
-                             + "*" + item_size + ")")
+                #if (len(child_bodies) == 1 and t.canon[1] != "STRING" 
+                #    and t.canon[1] != "VL_STRING" 
+                #    and is_primitive(CANON_TO_NODE[t.canon[1]]) 
+                #    and depth == 0):
+                #    length = ("column - std::min(column, " + container_length 
+                #             + "*" + item_size + ")")
                 result.nodes.append(ExprStmt(child=memset(dest, str(0), length)))
             else:
                 result.nodes.extend(child_bodies)
