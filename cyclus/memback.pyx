@@ -7,17 +7,56 @@ from libcpp.utility cimport pair as std_pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 
+from cpython cimport PyObject, PyDict_New
+
 from cyclus cimport cpp_cyclus
 from cyclus cimport lib
 from cyclus import lib
 
+from cyclus.typesystem cimport py_to_any, db_to_py
 
 cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
     # A C++ class that acts as a rec backend, but stores its data in
     # memory in a Python friendly format.
 
-    void Notify(cpp_cyclus.DatumList dl):
+    void Init():
+        """Initilaizer"""
+        cache = PyDict_New()
+
+    void Notify(cpp_cyclus.DatumList data):
         """Stores the data in a cache."""
+        cdef std_map<std_string, DatumList> groups
+        cdef std_pair<std_string, DatumList> group
+        cdef cpp_cyclus.Datum* d
+        cdef std_pair[const char*, cpp_cyclus.hold_any] val
+        cdef std_string name
+        cdef dict g, res
+        cdef list fields
+        cdef bytes bfield
+        cdef str field
+        # combine into like groups
+        for d in data:
+            name = d.title()
+            groups[name].push_back(d)
+        # convert groups
+        for group in groups:
+            # init group
+            res = {}
+            fields = []
+            d = group.second[0]
+            for val in d.vals():
+                bfield = val.first
+                field = bfield.decode()
+                fields.append(fields)
+                res[field] = []
+            # fill group
+            for d in group.second:
+                for val in d.vals():
+                    bfield = val.first
+                    field = bfield.decode()
+                    res[field].append(db_to_py(val.second, qr.types[j]))
+
+
 
     std_string Name():
         """The name of the backend"""
@@ -36,6 +75,7 @@ cdef class _MemBack(lib._FullBackend):
 
     def __cinit__(self):
         self.ptx = new CyclusMemBack()
+        (<CyclusMemBack*> self.ptx).Init()
 
     def __dealloc__(self):
         cdef CyclusMemBack* cpp_ptx = <CyclusMemBack*> self.ptx
@@ -80,7 +120,7 @@ cdef class _MemBack(lib._FullBackend):
     @property
     def name(self):
         """The name of the database."""
-        return "<Python In-Memory Backend at " + str(self.ptx) + ">"
+        return "<Python In-Memory Backend at " + str(<unsigned long> self.ptx) + ">"
 
 
 class MemBack(_MemBack, lib.FullBackend):

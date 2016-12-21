@@ -31,8 +31,8 @@ cdef extern from "cyclus.h" namespace "cyclus":
         Datum* AddVal(const char*, hold_any, vector[int]*) except +
         void Record() except +
         std_string title() except +
-        #vector[pair[char*, hold_any]] vals() except +
-        vector[vector[int]] shapes() except +
+        const vector[pair[const char*, hold_any]] vals() except +
+        const vector[vector[int]] shapes() except +
 
 
 cdef extern from "rec_backend.h" namespace "cyclus":
