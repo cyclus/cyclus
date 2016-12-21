@@ -7,13 +7,24 @@ from libcpp.utility cimport pair as std_pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 
-from cpython cimport PyObject, PyDict_New
+from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
+    PyDict_GetItemString, PyDict_SetItemString)
 
 from cyclus cimport cpp_cyclus
 from cyclus cimport lib
 from cyclus import lib
 
-from cyclus.typesystem cimport py_to_any, any_to_py
+from cyclus.typesystem cimport (py_to_any, any_to_py, str_py_to_cpp,
+    std_string_to_py)
+
+# startup numpy
+cimport numpy as np
+import numpy as np
+import pandas as pd
+
+np.import_array()
+np.import_ufunc()
+
 
 cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
     # A C++ class that acts as a rec backend, but stores its data in
@@ -21,7 +32,7 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
 
     void Init():
         """Initilaizer"""
-        cache = PyDict_New()
+        this.cache = PyDict_New()
 
     void Notify(cpp_cyclus.DatumList data):
         """Stores the data in a cache."""
@@ -33,7 +44,10 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         cdef dict g, res
         cdef list fields
         cdef bytes bfield
-        cdef str field
+        cdef str field, pyname
+        cdef char* cname
+        cdef object results, pyval
+        cdef int key_exists
         # combine into like groups
         for d in data:
             name = d.title()
@@ -50,12 +64,20 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
                 fields.append(fields)
                 res[field] = []
             # fill group
+            name = group.first
             for d in group.second:
                 for val in d.vals():
                     bfield = val.first
                     field = bfield.decode()
                     res[field].append(any_to_py(val.second))
-
+            results = pd.DataFrame(res, columns=fields)
+            cname = name.c_str()
+            pyname = std_string_to_py(name)
+            key_exists = PyDict_Contains(<object> this.cache, pyname)
+            if key_exists:
+                pyval = PyDict_GetItemString(<object> this.cache, cname)
+                results = pd.concatenate(pyval, results, axis=1)
+            PyDict_SetItemString(<object> this.cache, cname, results)
 
 
     std_string Name():

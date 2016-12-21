@@ -811,10 +811,10 @@ cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype):
 
 cdef object any_to_py(cpp_cyclus.hold_any value):
     """Converts any C++ object to its Python equivalent."""
-    cdef object rtn
-    cdef type_info& valtype = value.type()
-    {%- for i, t in enumerate(dbtypes) %}
-    {% if i > 0 %}el{% endif %}if valtype == typeid({{ ts.cython_type(t) }}):
+    cdef object rtn = None
+    cdef size_t valhash = value.type().hash_code()
+    {%- for i, t in enumerate(dbtypes[:1]) %}
+    {% if i > 0 %}el{% endif %}if valhash == typeid({{ ts.cython_type(t) }}).hash_code():
         rtn = {{ ts.hold_any_to_py('value', t) }}
     {%- endfor %}
     else:

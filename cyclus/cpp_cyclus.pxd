@@ -18,7 +18,7 @@ cdef extern from "cyclus.h" namespace "boost::spirit":
         hold_any(const char*) except +
         hold_any assign[T](T) except +
         T cast[T]() except +
-        type_info& type() except +
+        const type_info& type() except +
 
 cdef extern from "cyclus.h" namespace "boost::uuids":
 
