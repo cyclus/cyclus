@@ -103,14 +103,14 @@ class TypeSystem(object):
         self.dbtypes = sorted(types, key=lambda t: ids[t])
         # find unique types
         seen = set()
-        self.uniquetypes = uniquetypes= []
+        self.uniquetypes = uniquetypes = []
         for t in self.dbtypes:
-            cppt = cpptypes[t]
-            if cppt in seen:
+            normt = self.norms[t]
+            if normt in seen:
                 continue
             else:
                 uniquetypes.append(t)
-                seen.add(cppt)
+                seen.add(normt)
 
         # caches
         self._cython_cpp_name = {}
@@ -827,8 +827,10 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
     """Converts any C++ object to its Python equivalent."""
     cdef object rtn = None
     cdef size_t valhash = value.type().hash_code()
+    # Note that we need to use the *_t tyedefs here because of
+    # Bug #1561 in Cython
     {%- for i, t in enumerate(ts.uniquetypes) %}
-    {% if i > 0 %}el{% endif %}if valhash == typeid({{ ts.cython_type(t) }}).hash_code():
+    {% if i > 0 %}el{% endif %}if valhash == typeid({{ ts.funcname(t) }}_t).hash_code():
         rtn = {{ ts.hold_any_to_py('value', t) }}
     {%- endfor %}
     else:
@@ -837,6 +839,7 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
     return rtn
 
 '''.strip())
+
 
 def typesystem_pyx(ts, ns):
     """Creates the Cython wrapper for the Cyclus type system."""
@@ -871,6 +874,13 @@ cpdef dict C_NAMES
 cpdef dict C_IDS
 cpdef dict C_CPPTYPES
 cpdef dict C_NORMS
+
+#
+# typedefs
+#
+{% for t in ts.uniquetypes %}
+ctypedef {{ ts.cython_type(t) }} {{ ts.funcname(t) }}_t
+{%- endfor %}
 
 #
 # converters
