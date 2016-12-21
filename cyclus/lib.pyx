@@ -27,7 +27,6 @@ from cyclus cimport jsoncpp
 from cyclus import jsoncpp
 
 from cyclus cimport cpp_cyclus
-from cyclus cimport memback
 from cyclus cimport cpp_typesystem
 from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
@@ -57,12 +56,12 @@ cdef class _Datum:
             del cpp_ptx
             self.ptx = NULL
 
-    def add_val(self, const char* field, value, shape=None, dbtype=cpp_typesystem.BLOB):
+    def add_val(self, field, value, shape=None, dbtype=cpp_typesystem.BLOB):
         """Adds Datum value to current record as the corresponding cyclus data type.
 
         Parameters
         ----------
-        field : pointer to char/str
+        field : str or bytes
             The column name.
         value : object
             Value in table column.
@@ -78,15 +77,22 @@ cdef class _Datum:
         cdef int i, n
         cdef std_vector[int] cpp_shape
         cdef cpp_cyclus.hold_any v = py_to_any(value, dbtype)
-        cdef std_string cfield
+        cdef const char* cfield
+        if isinstance(field, str):
+            bfield = field.encode()
+            cfield = bfield
+        elif isinstance(field, bytes):
+            cfield = field
+        else:
+            raise ValueError('field name must be str or bytes.')
         if shape is None:
-            (<cpp_cyclus.Datum*> self.ptx).AddVal(field, v)
+            (<cpp_cyclus.Datum*> self.ptx).AddVal(cfield, v)
         else:
             n = len(shape)
             cpp_shape.resize(n)
             for i in range(n):
                 cpp_shape[i] = <int> shape[i]
-            (<cpp_cyclus.Datum*> self.ptx).AddVal(field, v, &cpp_shape)
+            (<cpp_cyclus.Datum*> self.ptx).AddVal(cfield, v, &cpp_shape)
         return self
 
     def record(self):
@@ -332,9 +338,11 @@ cdef class _Recorder:
         elif isinstance(backend, SqliteBack):
             b = <cpp_cyclus.RecBackend*> (
                 <cpp_cyclus.SqliteBack*> (<_SqliteBack> backend).ptx)
-        elif isinstance(backend, memback._MemBack):
-            b = <cpp_cyclus.RecBackend*> (
-                <memback.CyclusMemBack*> (<memback._MemBack> backend).ptx)
+        elif isinstance(backend, FullBackend):
+            b = <cpp_cyclus.RecBackend*> ((<_FullBackend> backend).ptx)
+        else:
+            raise ValueError("type of backend not recognized for " +
+                             str(type(backend)))
         (<cpp_cyclus.Recorder*> self.ptx).RegisterBackend(b)
 
     def flush(self):

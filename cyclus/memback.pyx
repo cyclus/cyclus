@@ -32,7 +32,8 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
 
     void Init():
         """Initilaizer"""
-        this.cache = PyDict_New()
+        c = {}
+        this.cache = <PyObject*> c
 
     void Notify(cpp_cyclus.DatumList data):
         """Stores the data in a cache."""
@@ -45,9 +46,11 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         cdef list fields
         cdef bytes bfield
         cdef str field, pyname
-        cdef char* cname
+        cdef const char* cname
+        cdef PyObject* pyobval
         cdef object results, pyval
         cdef int key_exists
+        print("here")
         # combine into like groups
         for d in data:
             name = d.title()
@@ -75,7 +78,8 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
             pyname = std_string_to_py(name)
             key_exists = PyDict_Contains(<object> this.cache, pyname)
             if key_exists:
-                pyval = PyDict_GetItemString(<object> this.cache, cname)
+                pyobval = PyDict_GetItemString(<object> this.cache, cname)
+                pyval = <object> pyobval
                 results = pd.concatenate(pyval, results, axis=1)
             PyDict_SetItemString(<object> this.cache, cname, results)
 
@@ -89,8 +93,9 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         pass
 
     void Close():
-        """No-op for in-memory"""
-        pass
+        """Closes the In-memory backend by setting the cache to None."""
+        c = None
+        this.cache = <PyObject*> c
 
 
 cdef class _MemBack(lib._FullBackend):
@@ -118,17 +123,20 @@ cdef class _MemBack(lib._FullBackend):
         results : pd.DataFrame
             Pandas DataFrame the represents the table
         """
-        raise NotImplementedError
+        cdef dict cache = <dict> (<CyclusMemBack*> self.ptx).cache
+        if table not in cache:
+            return None
+        return cache[table]
 
     @property
     def tables(self):
-        raise NotImplementedError
+        cdef dict cache = <dict> (<CyclusMemBack*> self.ptx).cache
+        return frozenset(cache.keys())
 
     @tables.setter
     def tables(self, value):
         """Retrieves the set of tables present in the database."""
         raise NotImplementedError
-
 
     def flush(self):
         """No-op since in-memory."""

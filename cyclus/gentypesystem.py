@@ -70,6 +70,9 @@ class TypeSystem(object):
             VECTOR_STRING -> ('std::vector', 'std::string').
         dbtypes : list of str
             The type names in the type system, sorted by id.
+        uniquetypes : list of str
+            The type names in the type system, sorted by id,
+            which map to a unique C++ type.
         """
         self.cpp_typesystem = cpp_typesystem
         self.cycver = cycver
@@ -98,6 +101,16 @@ class TypeSystem(object):
             ranks[t] = row[rank]
         self.norms = {t: parse_template(c) for t, c in cpptypes.items()}
         self.dbtypes = sorted(types, key=lambda t: ids[t])
+        # find unique types
+        seen = set()
+        self.uniquetypes = uniquetypes= []
+        for t in self.dbtypes:
+            cppt = cpptypes[t]
+            if cppt in seen:
+                continue
+            else:
+                uniquetypes.append(t)
+                seen.add(cppt)
 
         # caches
         self._cython_cpp_name = {}
@@ -432,8 +445,9 @@ TO_PY_CONVERTERS = {
         'pyfirst = {firstexpr}\n'
         '{secondname} = {var}.second\n'
         '{secondbody}\n'
-        'pysecond = {secondexpr}\n',
-        '(pyfirst, pysecond)'),
+        'pysecond = {secondexpr}\n'
+        'py{var} = (pyfirst, pysecond)\n',
+        'py{var}'),
     'std::list': (
         '{valdecl}\n'
         'cdef {valtype} {valname}\n'
@@ -813,7 +827,7 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
     """Converts any C++ object to its Python equivalent."""
     cdef object rtn = None
     cdef size_t valhash = value.type().hash_code()
-    {%- for i, t in enumerate(dbtypes[:1]) %}
+    {%- for i, t in enumerate(ts.uniquetypes) %}
     {% if i > 0 %}el{% endif %}if valhash == typeid({{ ts.cython_type(t) }}).hash_code():
         rtn = {{ ts.hold_any_to_py('value', t) }}
     {%- endfor %}
