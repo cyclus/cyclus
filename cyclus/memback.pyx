@@ -13,7 +13,7 @@ from cyclus cimport cpp_cyclus
 from cyclus cimport lib
 from cyclus import lib
 
-from cyclus.typesystem cimport py_to_any, db_to_py
+from cyclus.typesystem cimport py_to_any, any_to_py
 
 cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
     # A C++ class that acts as a rec backend, but stores its data in
@@ -25,8 +25,8 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
 
     void Notify(cpp_cyclus.DatumList data):
         """Stores the data in a cache."""
-        cdef std_map<std_string, DatumList> groups
-        cdef std_pair<std_string, DatumList> group
+        cdef std_map[std_string, cpp_cyclus.DatumList] groups
+        cdef std_pair[std_string, cpp_cyclus.DatumList] group
         cdef cpp_cyclus.Datum* d
         cdef std_pair[const char*, cpp_cyclus.hold_any] val
         cdef std_string name
@@ -54,7 +54,7 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
                 for val in d.vals():
                     bfield = val.first
                     field = bfield.decode()
-                    res[field].append(db_to_py(val.second, qr.types[j]))
+                    res[field].append(any_to_py(val.second))
 
 
 

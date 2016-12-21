@@ -633,8 +633,10 @@ from libcpp.list cimport list as std_list
 from libcpp.vector cimport vector as std_vector
 from libcpp.utility cimport pair as std_pair
 from libcpp.string cimport string as std_string
+from libcpp.typeinfo cimport type_info
 from cython.operator cimport dereference as deref
 from cython.operator cimport preincrement as inc
+from cython.operator cimport typeid
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
@@ -793,6 +795,7 @@ cdef object db_to_py(cpp_cyclus.hold_any value, cpp_cyclus.DbTypes dbtype):
         raise TypeError(msg.format(dbtype))
     return rtn
 
+
 cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype):
     """Converts python object to database type in a hold_any instance."""
     cdef cpp_cyclus.hold_any rtn
@@ -805,6 +808,19 @@ cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype):
         raise TypeError(msg.format(dbtype))
     return rtn
 
+
+cdef object any_to_py(cpp_cyclus.hold_any value):
+    """Converts any C++ object to its Python equivalent."""
+    cdef object rtn
+    cdef type_info& valtype = value.type()
+    {%- for i, t in enumerate(dbtypes) %}
+    {% if i > 0 %}el{% endif %}if valtype == typeid({{ ts.cython_type(t) }}):
+        rtn = {{ ts.hold_any_to_py('value', t) }}
+    {%- endfor %}
+    else:
+        msg = "C++ type could not be found while converting to Python"
+        raise TypeError(msg)
+    return rtn
 
 '''.strip())
 
@@ -869,6 +885,8 @@ cdef {{ ts.cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x)
 cdef object db_to_py(cpp_cyclus.hold_any value, cpp_cyclus.DbTypes dbtype)
 
 cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype)
+
+cdef object any_to_py(cpp_cyclus.hold_any value)
 '''.strip())
 
 def typesystem_pxd(ts, ns):
