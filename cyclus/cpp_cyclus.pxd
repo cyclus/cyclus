@@ -42,7 +42,7 @@ cdef extern from "rec_backend.h" namespace "cyclus":
     cdef cppclass RecBackend:
         void Notify(DatumList) except +
         std_string Name() except +
-        void Flush()  except +
+        void Flush() except +
         void Close() except +
 
 

@@ -334,7 +334,7 @@ cdef class _Recorder:
                 <cpp_cyclus.SqliteBack*> (<_SqliteBack> backend).ptx)
         elif isinstance(backend, memback._MemBack):
             b = <cpp_cyclus.RecBackend*> (
-                <memback.CppMemBack*> (<memback._MemBack> backend).ptx)
+                <memback.CyclusMemBack*> (<memback._MemBack> backend).ptx)
         (<cpp_cyclus.Recorder*> self.ptx).RegisterBackend(b)
 
     def flush(self):
