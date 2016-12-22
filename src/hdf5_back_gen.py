@@ -1691,6 +1691,7 @@ def string(s):
     return "\"" + s + "\""
 
 def main_vl_dataset():
+    """HDF5 VL_DATASET: Generate the VLDataset function code."""
     CPPGEN = CppGen()
     output = ""
     origin_types = list(VARIATION_DICT.keys())
@@ -1714,13 +1715,15 @@ def main_vl_dataset():
     return output
 
 def main_fill_buf():
+    """HDF5 FILL_BUF: Generates the FillBuf function code."""
     CPPGEN = CppGen()
     output = ""
     for i in CANON_SET:
         node = CANON_TO_NODE[i]
         write_to_buf = FuncCall(name=Var(name="WriteToBuf"), 
                                 targs=[Raw(code=node.db)],
-                                args=[Raw(code="buf+offset"), Raw(code="shapes[col]"),
+                                args=[Raw(code="buf+offset"), 
+                                      Raw(code="shapes[col]"),
                                       Raw(code="a"), Raw(code="sizes[col]")])
         case_body = ExprStmt(child=write_to_buf)
         output += CPPGEN.visit(case_template(node, case_body))
@@ -1751,6 +1754,7 @@ VL_SPECIAL_TYPES = {"VL_STRING": vl_write_vl_string,
                     "BLOB": vl_write_blob}
 
 def vl_write(t, variable, depth=0, prefix="", pointer=False):
+    """HDF5 Write: Return code previously found in VLWrite."""
     buf_variable = get_variable("buf", depth=depth, prefix=prefix)
     key_variable = get_variable("key", depth=depth, prefix=prefix)
     keysds_variable = get_variable("keysds", depth=depth, prefix=prefix)
@@ -1778,19 +1782,23 @@ if (vlkeys_[{t.db}].count({key}) != 1) {{
     return node
 
 def memcpy(dest, src, size):
+    """HDF5 Write: Node representation of memcpy function."""
     return FuncCall(name=Var(name="memcpy"), args=[Raw(code=dest),
                                                    Raw(code=src),
                                                    Raw(code=size)])
 
 def memset(dest, src, size):
+    """HDF5 Write: Node representation of memset function."""
     return FuncCall(name=Var(name="memset"), args=[Raw(code=dest),
                                                    Raw(code=src),
                                                    Raw(code=size)])
 
 def a_cast(t, depth=0, prefix=""):
+    """HDF5 Write: Node representation of boost hold_any casting."""
     cast = Block(nodes=[])
     val = get_variable("val", depth=depth, prefix=prefix)
-    if is_primitive(t) and t.db not in WRITE_BODY_PRIMITIVES and not DB_TO_VL[t.db]:
+    if (is_primitive(t) and t.db not in WRITE_BODY_PRIMITIVES 
+        and not DB_TO_VL[t.db]):
         cast.nodes.append(ExprStmt(child=Decl(type=Type(cpp="const void*"),
                                               name=Var(name=val))))
         cast_string = "a->castsmallvoid()"
@@ -1805,11 +1813,28 @@ def a_cast(t, depth=0, prefix=""):
     return cast
 
 def get_write_setup(t, shape_array, depth=0, prefix=""):
+    """HDF5 Write: Creates setup variables (lengths, sizes) for function body.
+    
+    This function recursively declares the sizes, lengths and other necessary 
+    variables for the parent and children types. Called by get_write_body.
+    
+    Parameters
+    ----------
+    t : Type
+    shape_array : list
+    depth : int
+    prefix : str
+    
+    Returns
+    -------
+    setup : Block
+    """
     setup = Block(nodes=[])
     variable = get_variable("item_size", depth=depth, prefix=prefix)
     setup.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
                                                  target=Var(name=variable),
-                                                 value=Raw(code=get_item_size(t, shape_array)))))
+                                                 value=Raw(code=get_item_size(t, 
+                                                                shape_array)))))
     if t.db == "STRING":
         valuelen = get_variable("valuelen", depth=depth, prefix=prefix)
         setup.nodes.append(ExprStmt(child=Decl(type=Type(cpp="size_t"),
@@ -1826,9 +1851,10 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
             setup.nodes.append(ExprStmt(child=DeclAssign(
                                                     type=Type(cpp="size_t"),
                                                     target=Var(name=length),
-                                                    value=Raw(code="shape["
-                                                                    +str(shape_array[0])
-                                                                    +"]"))))
+                                                    value=Raw(code=
+                                                            "shape["
+                                                            +str(shape_array[0])
+                                                            +"]"))))
         prefixes = template_args[container]
         
         #Add sizes of any children.
@@ -1859,7 +1885,9 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
                                                      code="+".join(children)))))        
     return setup
 
-def write_body_string(t, depth=0, prefix="", variable=None, offset="buf", pointer=False):
+def write_body_string(t, depth=0, prefix="", variable=None, offset="buf", 
+                      pointer=False):
+    """HDF5 Write: Specialization of the write_body function for STRING type"""
     if variable is None:
         variable = get_variable("val", depth=depth, prefix=prefix)
     node = Block(nodes=[])
@@ -1878,7 +1906,9 @@ def write_body_string(t, depth=0, prefix="", variable=None, offset="buf", pointe
                                             item_size+"-"+valuelen)))
     return node
 
-def write_body_uuid(t, depth=0, prefix="", variable=None, offset="buf", pointer=False):
+def write_body_uuid(t, depth=0, prefix="", variable=None, offset="buf", 
+                    pointer=False):
+    """HDF5 Write: Specialization of the write_body function for UUID type"""
     if variable is None:
         variable = get_variable("val", depth=depth, prefix=prefix)
     node = Block(nodes=[])
@@ -1889,7 +1919,9 @@ def write_body_uuid(t, depth=0, prefix="", variable=None, offset="buf", pointer=
     node.nodes.append(ExprStmt(child=memcpy(offset, variable, size)))
     return node
    
-def write_body_primitive(t, depth=0, prefix="", variable=None, offset="buf", pointer=False):
+def write_body_primitive(t, depth=0, prefix="", variable=None, offset="buf", 
+                         pointer=False):
+    """HDF5 Write: Specialization of the write_body function for primitives"""
     if variable is None:
         variable = get_variable("val", depth=depth, prefix=prefix)
     node = Block(nodes=[])
@@ -1913,6 +1945,21 @@ CONTAINER_INSERT_STRINGS = {"MAP": "{var}[{child0}] = {child1}",
                             "PAIR": "{var} = std::make_pair({child0},{child1})"}
 
 def is_all_vl(t):
+    """HDF5 Write: Determines if type is entirely VL.
+    
+    A type is entirely VL if the top level type is VL, as well as all children 
+    that have the potential to be VL. This means that VL_VECTOR_INT will return
+    True here, but VL_VECTOR_STRING will return False.
+    
+    Parameters
+    ----------
+    t : Type
+    
+    Returns
+    -------
+    result : bool
+        True if type is entirely VL, else False
+    """
     if is_primitive(t):
         if DB_TO_VL[t.db]:
             return True
@@ -1934,14 +1981,31 @@ def is_all_vl(t):
                 break
     return result
 
-def pad_item(t, variable, depth=0, prefix=""):
-    pass
-
-def resolve_fl_children(vl_t, variable, fixed_var=None, depth=0, prefix="", pointer=True):
-    if DB_TO_VL[vl_t.db]:
-        container = VL_TO_FL_CONTAINERS[vl_t.canon[0]]
+def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
+    """HDF5 Write: Pads FL children of VL parent types.
+    
+    This function is used on top-level VL container types which contain 1 or 
+    more FL child types (i.e. VL_VECTOR_STRING). These children should be
+    padded to their max length if they do not already meet it. This is done 
+    recursively.
+    
+    Parameters
+    ----------
+    t : Type
+    variable : str
+    fixed_var : None or str, optional
+    depth : int, optional
+    prefix : str, optional
+    
+    Returns
+    -------
+    result : Block
+        Nodes required for padding
+    """
+    if DB_TO_VL[t.db]:
+        container = VL_TO_FL_CONTAINERS[t.canon[0]]
     else:
-        container = vl_t.canon[0]
+        container = t.canon[0]
     result = Block(nodes=[])
     body_nodes = []
     keywords = {}
@@ -1950,12 +2014,12 @@ def resolve_fl_children(vl_t, variable, fixed_var=None, depth=0, prefix="", poin
     #by its parent.
     if fixed_var == None:
         fixed_var = get_variable("fixed_val", depth=depth, prefix=prefix)
-    result.nodes.append(ExprStmt(child=Decl(type=Type(cpp=vl_t.cpp),
+    result.nodes.append(ExprStmt(child=Decl(type=Type(cpp=t.cpp),
                                             name=Raw(code=fixed_var))))
     iterator = get_variable("it", depth=depth, prefix=prefix)
     prefixes = template_args[container]
     keywords['var'] = fixed_var
-    num = len(vl_t.canon[1:])
+    num = len(t.canon[1:])
     if num == 1:
         children = ["*" + iterator]
     else:
@@ -1968,7 +2032,7 @@ def resolve_fl_children(vl_t, variable, fixed_var=None, depth=0, prefix="", poin
             children = ["{}{}".format(a, b) for a, b in zip([variable]*num,
                                                             members)]
     count = 0
-    for i in vl_t.canon[1:]:
+    for i in t.canon[1:]:
         child_node = CANON_TO_NODE[i]
         child_keyword = "child" + str(count)
         child_variable = get_variable("child", depth=depth+1, 
@@ -1980,9 +2044,12 @@ def resolve_fl_children(vl_t, variable, fixed_var=None, depth=0, prefix="", poin
                                          prefix=prefix+prefixes[count])
                 constructor = ("std::string(" + children[count] + ",0," 
                               + item_size + ")")
-                body_nodes.append(ExprStmt(child=DeclAssign(type=child_node,
-                                                            target=Var(name=child_variable),
-                                                            value=Raw(code=constructor))))
+                body_nodes.append(ExprStmt(child=DeclAssign(
+                                                   type=child_node,
+                                                   target=Var(
+                                                           name=child_variable),
+                                                   value=Raw(
+                                                           code=constructor))))
                 keywords[child_keyword] = child_variable
             #Leave other primitives alone.
             else:
@@ -1994,25 +2061,21 @@ def resolve_fl_children(vl_t, variable, fixed_var=None, depth=0, prefix="", poin
                     #Skip child
                     keywords[child_keyword] = children[count]
                 else:
-                    #Recurse over child to fix it. Adds another For loop
-                    #body_nodes.append(resolve_fl_children(child_node, 
-                    #                                      depth=depth+1, 
-                    #                                      prefix=prefix
-                    #                                             +prefixes[count],
-                    #                                      pointer=(num==1)))                                   
+                    #TODO: Recursion for VL container children                                  
                     keywords[child_keyword] = child_variable
             #FL variable length containers
             elif child_node.canon[0] in variable_length_types:
+                #TODO Recursion for FL container children
                 keywords[child_keyword] = children[count]
             #PAIRS, etc.
             else:
                 #Recursive call on the PAIR, using the parent iterator as the
                 #new origin variable. We specify that the fixed variable should
                 #simply be the 'child' variable we created in this loop.
-                body_nodes.append(resolve_fl_children(child_node, children[count], 
-                                                      fixed_var=child_variable,
-                                                      depth=depth+1,
-                                                      prefix=prefix+prefixes[count]))
+                body_nodes.append(pad_children(child_node, children[count], 
+                                               fixed_var=child_variable,
+                                               depth=depth+1, prefix=prefix
+                                                              +prefixes[count]))
                 keywords[child_keyword] = child_variable
         count += 1
     
@@ -2021,12 +2084,40 @@ def resolve_fl_children(vl_t, variable, fixed_var=None, depth=0, prefix="", poin
     if container in variable_length_types:
         result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="!=", 
                                            y=Var(name=variable+".end()")),
-                                incr=Raw(code="++" + iterator), body=body_nodes))
+                                incr=Raw(code="++" + iterator), 
+                                body=body_nodes))
     else:
         result.nodes.extend(body_nodes)
     return result
 
-def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf", pointer=False):
+def get_write_body(t, shape_array, depth=0, prefix="", variable="a", 
+                   offset="buf", pointer=False):
+    """HDF5 Write: Generates the body of the WriteToBuf function definition.
+    
+    Parameters
+    ----------
+    t : Type
+        Node representing the desired C++ type
+    shape_array : list
+        Dimensioned list of shape array indicies corresponding to types in 
+        t.canon
+    depth : int, optional
+        Recursive depth
+    prefix : str, optional
+        Used for recursive variable naming convention
+    variable : str, optional
+        Name of the type's C++ variable
+    offset : str, optional
+        Location of current memory offset
+    pointer : bool, optional
+        Denotes if current variable is a pointer, and whether member access 
+        should be achieved using arrow or dot notation
+        
+    Returns
+    -------
+    result : Block
+        Nodes required for body of the function definition
+    """
     result = Block(nodes=[])
     #Determine if type is entirely variable length
     all_vl = is_all_vl(t)
@@ -2075,14 +2166,15 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
             container = VL_TO_FL_CONTAINERS[container]
             prefixes = template_args[container]
             result.nodes.append(ExprStmt(child=DeclAssign(
-                                                  type=Type(cpp=t.cpp+"::iterator"),
-                                                  target=Raw(code=iterator),
-                                                  value=Raw(code=variable 
-                                                                 +".begin()"))))
-            result.nodes.append(resolve_fl_children(t, variable, depth=depth, 
+                                              type=Type(cpp=t.cpp+"::iterator"),
+                                              target=Raw(code=iterator),
+                                              value=Raw(code=variable 
+                                                             +".begin()"))))
+            result.nodes.append(pad_children(t, variable, depth=depth, 
                                                     prefix=prefix))
             fixed_val = get_variable("fixed_val", depth=depth, prefix=prefix)
-            result.nodes.append(vl_write(t, fixed_val, depth=depth, prefix=prefix))
+            result.nodes.append(vl_write(t, fixed_val, depth=depth, 
+                                         prefix=prefix))
             key = get_variable("key", depth=depth, prefix=prefix)
             result.nodes.append(ExprStmt(child=memcpy(offset, key + ".val", 
                                                       "CYCLUS_SHA1_SIZE")))
@@ -2101,7 +2193,8 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
                                                    depth=depth+1, 
                                                    prefix=prefix+prefixes[0],
                                                    variable=new_variable,
-                                                   offset=offset+"+"+child_size+"*"+count,
+                                                   offset=offset+"+"+child_size
+                                                          +"*"+count,
                                                    pointer=True))
             else:
                 partial_size = "0"
@@ -2111,12 +2204,14 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
                     labels = ['.first', '.second']
                 total_size = get_variable("total_item_size", depth=depth,
                                           prefix=prefix)
-                for c, s, p, l in zip(t.canon[1:], shape_array[1:], prefixes, labels):
+                for c, s, p, l in zip(t.canon[1:], shape_array[1:], prefixes, 
+                                      labels):
                     child_node = CANON_TO_NODE[c]
                     item_label = new_variable+l
                     child_size = get_variable("item_size", depth=depth+1, 
                                               prefix=prefix+p)
-                    child_bodies.append(get_write_body(child_node, s, depth=depth+1,
+                    child_bodies.append(get_write_body(child_node, s, 
+                                                       depth=depth+1,
                                                        prefix=prefix+p, 
                                                        variable=item_label, 
                                                        offset=offset+"+("+count
@@ -2127,36 +2222,36 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
             if container in variable_length_types:
                 #For loop uses child bodies
                 result.nodes.append(ExprStmt(child=DeclAssign(
-                                                  type=Type(cpp=t.cpp+"::iterator"),
+                                                  type=Type(cpp=t.cpp
+                                                                +"::iterator"),
                                                   target=Raw(code=new_variable),
                                                   value=Raw(code=variable 
                                                                  +".begin()"))))
                 result.nodes.append(For(cond=BinOp(x=Var(name=new_variable), 
                                                    op="!=", 
-                                                   y=Var(name=variable+".end()")),
+                                                   y=Var(name=variable
+                                                              +".end()")),
                                         incr=Raw(code="++" + new_variable),
                                         body=[*child_bodies, 
                                               ExprStmt(child=LeftUnaryOp(
-                                                                 op="++", 
-                                                                 name=Var(
-                                                                    name=count)))]))
+                                                              op="++", 
+                                                              name=Var(
+                                                                name=count)))]))
                 #Add memset statement outside of loop
-                item_size = get_variable("total_item_size", depth=depth, prefix=prefix)
-                container_length = get_variable("length", depth=depth, prefix=prefix)
+                item_size = get_variable("total_item_size", depth=depth, 
+                                         prefix=prefix)
+                container_length = get_variable("length", depth=depth, 
+                                                prefix=prefix)
                 dest = offset + "+" + item_size + "*" + count
-                length = item_size + "*" + "(" + container_length + "-" + count + ")"
-                #if (len(child_bodies) == 1 and t.canon[1] != "STRING" 
-                #    and t.canon[1] != "VL_STRING" 
-                #    and is_primitive(CANON_TO_NODE[t.canon[1]]) 
-                #    and depth == 0):
-                #    length = ("column - std::min(column, " + container_length 
-                #             + "*" + item_size + ")")
+                length = (item_size + "*" + "(" + container_length + "-" 
+                          + count + ")")
                 result.nodes.append(ExprStmt(child=memset(dest, str(0), length)))
             else:
                 result.nodes.extend(child_bodies)
         return result
         
 def main_write():
+    """HDF5 Write: Generate the WriteToBuf templated function definitions."""
     CPPGEN = CppGen()
     output = ""
     for i in CANON_SET:
