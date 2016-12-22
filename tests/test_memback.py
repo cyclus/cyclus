@@ -193,6 +193,22 @@ def test_record_flush_thrice():
     rec.close()
 
 
+def test_many_cols_one_table():
+    n = 100
+    rec, back = make_rec_back()
+    d = rec.new_datum("test")
+    for i in range(n):
+        d.add_val("col" + str(i), i, dbtype=ts.INT)
+    d.record()
+    rec.flush()
+
+    cols = ["col" + str(i) for i in range(n)]
+    exp = pd.DataFrame({c: [i] for c, i in zip(cols, range(n))}, columns=cols)
+    obs = back.query("test")
+    assert_frame_equal(exp, obs)
+    rec.close()
+
+
 
 if __name__ == "__main__":
     nose.runmodule()
