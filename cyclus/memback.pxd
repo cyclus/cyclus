@@ -18,12 +18,10 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
     std_string Name() except +
     void Flush() except +
     void Close() except +
-    # Queryable backend interface
-    #cpp_cyclus.QueryResult Query(std_string, vector[cpp_cyclus.Cond]*) except +
-    #std_map[std_string, cpp_cyclus.DbTypes] ColumnTypes(std_string) except +
-    #std_set[std_string] Tables() except +
-    void Init() except +
+    # Extra interface
+    dict Init() except +
     PyObject* cache
+
 
 cdef class _MemBack(lib._FullBackend):
     pass  # pointer declared on full backend

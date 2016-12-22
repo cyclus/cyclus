@@ -12,6 +12,7 @@ typedef boost::singleton_pool<Datum, sizeof(Datum)> DatumPool;
 Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val,
                      std::vector<int>* shape) {
   vals_.push_back(std::pair<const char*, boost::spirit::hold_any>(field, val));
+  std::cout << "vals[0].first = " << vals_[0].first << "\n";
   std::vector<int> s;
   if (shape == NULL)
     shapes_.push_back(s);
@@ -22,6 +23,7 @@ Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Datum::Record() {
+  std::cout << "Record vals[0].first = " << vals_[0].first << "\n";
   manager_->AddDatum(this);
 }
 

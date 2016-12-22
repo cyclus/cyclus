@@ -21,16 +21,18 @@ def test_simple():
     d.add_val("col0", 1, dbtype=ts.INT)
     d.add_val("col1", 42.0, dbtype=ts.DOUBLE)
     d.add_val("col2", "wakka", dbtype=ts.VL_STRING)
-    print(0)
     d.record()
-    print(1)
     rec.flush()
-    print(2)
+    print(0)
 
     exp = pd.DataFrame({"col0": [1], "col1": [42.0], "col2": ["wakka"]},
                        columns=['col0', 'col1', 'col2'])
+    print(1)
     obs = back.query("test")
+    print(2)
+    print(back.cache)
     assert_frame_equal(exp, obs)
+    print(3)
     rec.close()
     print(100)
 
