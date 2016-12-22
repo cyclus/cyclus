@@ -9,7 +9,7 @@ from libcpp cimport bool as cpp_bool
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
     PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
-    PyBytes_FromString)
+    PyBytes_FromString, PyDict_GetItem, PyDict_SetItem)
 
 from cyclus cimport cpp_cyclus
 from cyclus cimport lib
@@ -48,12 +48,9 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         cdef std_string name
         cdef dict g, res
         cdef list fields
-        #cdef bytes bfield
-        #cdef str field, pyname
-        cdef const char* cname
         cdef PyObject* pyobval
         cdef object results, pyval
-        cdef int key_exists
+        cdef int key_exists, i
         # combine into like groups
         for d in data:
             name = d.title()
@@ -72,20 +69,18 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
             # fill group
             name = group.first
             for d in group.second:
+                i = 0
                 for val in d.vals():
-                    bfield = val.first
-                    field = bfield.decode()
-                    res[field].append(any_to_py(val.second))
+                    res[fields[i]].append(any_to_py(val.second))
+                    i += 1
             results = pd.DataFrame(res, columns=fields)
-            cname = name.c_str()
             pyname = std_string_to_py(name)
             key_exists = PyDict_Contains(<object> this.cache, pyname)
             if key_exists:
-                pyobval = PyDict_GetItemString(<object> this.cache, cname)
+                pyobval = PyDict_GetItem(<object> this.cache, pyname)
                 pyval = <object> pyobval
                 results = pd.concatenate([pyval, results])
-            PyDict_SetItemString(<object> this.cache, cname, results)
-
+            PyDict_SetItem(<object> this.cache, pyname, results)
 
     std_string Name():
         """The name of the backend"""

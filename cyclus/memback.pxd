@@ -24,5 +24,5 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
 
 
 cdef class _MemBack(lib._FullBackend):
-    #pass  # pointer declared on full backend
-    cpdef dict cache
+    pass  # pointer declared on full backend
+    #cpdef dict cache
