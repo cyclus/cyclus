@@ -130,5 +130,34 @@ def test_three_tables_grouped():
     rec.close()
 
 
+def test_record_flush_twice():
+    n = 10
+    rec, back = make_rec_back()
+    for i in range(n//2):
+        d = rec.new_datum("test")
+        d.add_val("col0", i, dbtype=ts.INT)
+        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.record()
+    rec.flush()
+    for i in range(n//2, n):
+        d = rec.new_datum("test")
+        d.add_val("col0", i, dbtype=ts.INT)
+        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.record()
+    rec.flush()
+
+    exp = pd.DataFrame({
+        "col0": list(range(n)),
+        "col1": [42.0*i for i in range(n)],
+        "col2": ["wakka"*i for i in range(n)]},
+        columns=['col0', 'col1', 'col2'])
+    obs = back.query("test")
+    assert_frame_equal(exp, obs)
+    rec.close()
+
+
+
 if __name__ == "__main__":
     nose.runmodule()

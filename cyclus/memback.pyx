@@ -50,6 +50,7 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         cdef PyObject* pyobval
         cdef object results, pyval
         cdef int key_exists, i
+        cdef list fields
         # combine into like groups
         for d in data:
             name = d.title()
@@ -71,13 +72,13 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
                 for val in d.vals():
                     res[fields[i]].append(any_to_py(val.second))
                     i += 1
-            results = pd.DataFrame(res, columns=fields)
+            results = pd.DataFrame(res, columns=fields[:])
             pyname = std_string_to_py(name)
             key_exists = PyDict_Contains(<object> this.cache, pyname)
             if key_exists:
                 pyobval = PyDict_GetItem(<object> this.cache, pyname)
                 pyval = <object> pyobval
-                results = pd.concatenate([pyval, results])
+                results = pyval.append(results, ignore_index=True)
             PyDict_SetItem(<object> this.cache, pyname, results)
 
     std_string Name():

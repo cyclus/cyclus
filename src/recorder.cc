@@ -72,9 +72,11 @@ Datum* Recorder::NewDatum(std::string title) {
   if (inject_sim_id_) {
     d->vals_.resize(1);
     d->shapes_.resize(1);
+    d->fields_.resize(1);
   } else {
     d->vals_.resize(0);
     d->shapes_.resize(0);
+    d->fields_.resize(0);
   }
 
   index_++;

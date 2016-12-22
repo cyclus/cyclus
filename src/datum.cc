@@ -44,6 +44,7 @@ Datum::Datum(Recorder* m, std::string title) : title_(title), manager_(m) {
   // vector as vals are added to the datum.
   vals_.reserve(10);
   shapes_.reserve(10);
+  fields_.reserve(10);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
