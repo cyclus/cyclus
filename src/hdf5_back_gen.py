@@ -1906,29 +1906,101 @@ def write_body_primitive(t, depth=0, prefix="", variable=None, offset="buf", poi
 WRITE_BODY_PRIMITIVES = {"STRING": write_body_string,
                          "UUID": write_body_uuid}
 
-def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf", pointer=False):
-    all_vl = False
-    result = Block(nodes=[])
-    #Determine if type is entirely variable length
+CONTAINER_INSERT_STRINGS = {"MAP": "{var}[{child0}] = {child1}",
+                            "LIST": "{var}.push_back({child0})",
+                            "SET": "{var}.insert({child0})",
+                            "VECTOR": "{var}.push_back({child0})"}
+
+def is_all_vl(t):
     if is_primitive(t):
         if DB_TO_VL[t.db]:
-            all_vl = True
-    else:
-        flat = flatten(t.canon)
-        for i in range(len(flat)):
-            canon = flat[i]
-            node = CANON_TO_NODE[canon]
-            if DB_TO_VL[node.db]:
-                all_vl = True
+            return True
+    result = False
+    flat = flatten(t.canon)
+    for i in range(len(flat)):
+        canon = flat[i]
+        node = CANON_TO_NODE[canon]
+        if DB_TO_VL[node.db]:
+            result = True
+            continue
+        else:
+            if i == 0:
+                break
+            elif node.canon in NOT_VL:
                 continue
             else:
-                if i == 0:
-                    break
-                elif node.canon in NOT_VL:
-                    continue
+                result = False
+                break
+    return result
+
+def pad_item(t, variable, depth=0, prefix=""):
+    pass
+
+def resolve_fl_children(vl_t, depth=0, prefix="", pointer=True):
+    result = Block(nodes=[])
+    body_nodes = []
+    keywords = {}
+    variable = get_variable("val", depth=depth, prefix=prefix)
+    new_variable = get_variable("fixed_val", depth=depth, prefix=prefix)
+    iterator = get_variable("it", depth=depth, prefix=prefix)
+    count = 0
+    container = VL_TO_FL_CONTAINERS[vl_t.canon[0]]
+    prefixes = template_args[container]
+    keywords['var'] = new_variable
+    pointers = ['->first', '->second'] if container in variable_length_types else ['.first', '.second']
+    num = len(vl_t.canon[1:])
+    if num == 1:
+        children = ["*" + iterator]
+    else:
+        children = ["{}{}".format(a, b) for a, b in zip([iterator]*num, 
+                                                        pointers)]
+    for i in vl_t.canon[1:]:
+        child_node = CANON_TO_NODE[i]
+        child_keyword = "child" + str(count)
+        child_variable = get_variable("child", depth=depth+1, 
+                                      prefix=prefix+prefixes[count])
+        if is_primitive(child_node):
+            if child_node.db == 'STRING':
+                item_size = get_variable("item_size", depth=depth+1, 
+                                         prefix=prefix+prefixes[count])
+                constructor = ("std::string(" + children[count] + ",0," 
+                              + item_size + ")")
+                body_nodes.append(ExprStmt(child=DeclAssign(type=child_node,
+                                                            target=Var(name=child_variable),
+                                                            value=Raw(code=constructor))))
+                keywords[child_keyword] = child_variable
+            else:
+                keywords[child_keyword] = children[count]   
+        else:
+            if DB_TO_VL[child_node.db]:
+                if is_all_vl(child_node):
+                    #Skip child
+                    keywords[child_keyword] = children[count]
                 else:
-                    all_vl = False
-                    break
+                    #Recurse over child to fix it. Adds another For loop
+                    #body_nodes.append(resolve_fl_children(child_node, 
+                    #                                      depth=depth+1, 
+                    #                                      prefix=prefix
+                    #                                             +prefixes[count],
+                    #                                      pointer=(num==1)))                                   
+                    keywords[child_keyword] = child_variable
+            elif child_node.canon[0] in variable_length_types:
+                keywords[child_keyword] = children[count]
+            else:
+                keywords[child_keyword] = children[count]
+        count += 1
+    
+    assignment = CONTAINER_INSERT_STRINGS[container].format(**keywords)
+    body_nodes.append(ExprStmt(child=Raw(code=assignment)))
+    result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="!=", 
+                                       y=Var(name=variable+".end()")),
+                            incr=Raw(code="++" + iterator), body=body_nodes))
+    return result
+
+def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf", pointer=False):
+    result = Block(nodes=[])
+    #Determine if type is entirely variable length
+    all_vl = is_all_vl(t)
     #Declare and assign the 'val' variable
     if depth == 0:
         variable = get_variable("val", depth=depth, prefix=prefix)
@@ -1962,9 +2034,9 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
         #Declare count and iterator variables for the loop.
         count = get_variable("count", depth=depth, prefix=prefix)
         result.nodes.append(ExprStmt(child=DeclAssign(
-                                                      type=Type(cpp="unsigned int"),
-                                                      target=Var(name=count),
-                                                      value=Raw(code="0"))))
+                                                  type=Type(cpp="unsigned int"),
+                                                  target=Var(name=count),
+                                                  value=Raw(code="0"))))
         iterator = get_variable("it", depth=depth, prefix=prefix)
         #Recursively gather child bodies
         child_bodies = []
@@ -1981,10 +2053,8 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
                                                   target=Raw(code=iterator),
                                                   value=Raw(code=variable 
                                                                  +".begin()"))))
-            result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="==", 
-                                               y=Var(name=variable+".end()")),
-                                    incr=Raw(code="++" + iterator),
-                                    body=[]))
+            result.nodes.append(resolve_fl_children(t, depth=depth, 
+                                                    prefix=prefix))
             result.nodes.append(vl_write(t, fixed_val, depth=depth, prefix=prefix))
             key = get_variable("key", depth=depth, prefix=prefix)
             result.nodes.append(ExprStmt(child=memcpy(offset, key + ".val", 
@@ -2035,7 +2105,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
                                                   value=Raw(code=variable 
                                                                  +".begin()"))))
                 result.nodes.append(For(cond=BinOp(x=Var(name=new_variable), 
-                                                   op="==", 
+                                                   op="!=", 
                                                    y=Var(name=variable+".end()")),
                                         incr=Raw(code="++" + new_variable),
                                         body=[*child_bodies, 
