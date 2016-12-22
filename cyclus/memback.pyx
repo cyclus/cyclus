@@ -16,7 +16,8 @@ from cyclus cimport lib
 from cyclus import lib
 
 from cyclus.typesystem cimport (py_to_any, any_to_py, str_py_to_cpp,
-    std_string_to_py)
+    std_string_to_py, bool_to_py, bool_to_cpp, std_set_int_to_py,
+    std_set_std_string_to_cpp)
 
 # startup numpy
 cimport numpy as np
@@ -35,6 +36,7 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         """Initilaizer that returns cache, so that we can keep an extra
         reference to it around.
         """
+        this.store_all_tables = 1  # set to true, by default
         c = {}
         this.cache = <PyObject*> c
         return c
@@ -97,9 +99,11 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
 
 cdef class _MemBack(lib._FullBackend):
 
-    def __cinit__(self):
+    def __cinit__(self, registry=True):
         self.ptx = new CyclusMemBack()
         self.cache = (<CyclusMemBack*> self.ptx).Init()
+        self._registry = None
+        self.registry = registry
 
     def __dealloc__(self):
         # Note that we have to do it this way since self.ptx is void*
@@ -110,6 +114,9 @@ cdef class _MemBack(lib._FullBackend):
         del cpp_ptx
         self.ptx = NULL
 
+    #
+    # RecBackened Interface
+    #
     def query(self, table, conds=None):
         """Queries a database table.
 
@@ -152,6 +159,47 @@ cdef class _MemBack(lib._FullBackend):
     def name(self):
         """The name of the database."""
         return "<Python In-Memory Backend at " + str(<unsigned long> self.ptx) + ">"
+
+    #
+    # Extra Interface
+    #
+    @property
+    def store_all_tables(self):
+        """Whether or not the backend will store all tables or only
+        those in the registry.
+        """
+        return bool_to_py((<CyclusMemBack*> self.ptx).store_all_tables)
+
+    @property
+    def registry(self):
+        """A set of table names to store when store_all_tables is true.
+        Setting this to True will store all tables. Setting this to None
+        or False will clear all currently registered table names. Otherwise,
+        Setting this to a set of strings will restrict the storage to
+        just the specified tables. Setting the registry will also clear
+        old cache values.
+        """
+        if self._registry is None:
+            r = std_set_std_string_to_py((<CyclusMemBack*> self.ptx).registry)
+            self._registry = frozenset(r)
+        return self._registry
+
+    @registry.setter
+    def registry(self, val):
+        cdef CyclusMemBack* cpp_ptx = <CyclusMemBack*> self.ptx
+        if val is None or isinstance(val, bool):
+            cpp_ptx.registry.clear()
+            if val:
+                cpp_ptx.store_all_table = True
+            else:
+                cpp_ptx.store_all_table = False
+                self.cache.clear()
+            self._registry = None
+        else:
+            cpp_ptx.registry = std_set_std_string_to_cpp(val)
+            cpp_ptx.store_all_table = False
+            self._registry = None
+
 
 
 class MemBack(_MemBack, lib.FullBackend):

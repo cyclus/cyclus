@@ -21,6 +21,8 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
     # Extra interface
     dict Init() except +
     PyObject* cache
+    cpp_bool store_all_tables
+    std_set[std_string] registry
 
 
 cdef class _MemBack(lib._FullBackend):
