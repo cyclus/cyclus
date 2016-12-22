@@ -94,17 +94,10 @@ void Recorder::Flush() {
   tmp.resize(index_);
   index_ = 0;
   std::list<RecBackend*>::iterator it;
-  std::cout << "notify0\n";
   for (it = backs_.begin(); it != backs_.end(); it++) {
-    std::cout << "notify1\n";
-    std::cout << "notify1.5 " << (*it) <<"\n";
-    std::cout << "notify1.75 " << (*it)->Name() <<"\n";
     (*it)->Notify(tmp);
-    std::cout << "notify2\n";
     (*it)->Flush();
-    std::cout << "notify3\n";
   }
-  std::cout << "notify4\n";
 }
 
 void Recorder::NotifyBackends() {

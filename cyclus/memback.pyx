@@ -54,57 +54,37 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         cdef PyObject* pyobval
         cdef object results, pyval
         cdef int key_exists
-        #print("memnot0")
         # combine into like groups
         for d in data:
             name = d.title()
             groups[name].push_back(d)
         # convert groups
-        #print("memnot1")
         for group in groups:
             # init group
             res = {}
             fields = []
             d = group.second[0]
-            #print("memnot2")
             for val in d.vals():
                 bfield = val.first
-                #bfield = PyBytes_FromString(<char*> val.first)
                 field = bfield.decode()
-                #field = std_string_to_py(std_string(val.first))
-                #print("get field", val.first)
                 fields.append(field)
                 res[field] = []
             # fill group
-            #print("memnot3")
             name = group.first
             for d in group.second:
                 for val in d.vals():
-                    #print("memnot4")
                     bfield = val.first
                     field = bfield.decode()
-                    #print("my field", field)
                     res[field].append(any_to_py(val.second))
-            print("memnot5")
-            print("res", res)
-            print("fields", fields)
             results = pd.DataFrame(res, columns=fields)
-            print(results)
-            print("memnot5.25")
             cname = name.c_str()
-            print("memnot5.5")
             pyname = std_string_to_py(name)
-            print("memnot5.75")
             key_exists = PyDict_Contains(<object> this.cache, pyname)
-            print("memnot6")
             if key_exists:
                 pyobval = PyDict_GetItemString(<object> this.cache, cname)
                 pyval = <object> pyobval
                 results = pd.concatenate([pyval, results])
-            print("memnot7")
             PyDict_SetItemString(<object> this.cache, cname, results)
-            print("memnot8")
-        print("memnot9")
 
 
     std_string Name():
@@ -132,11 +112,8 @@ cdef class _MemBack(lib._FullBackend):
         if self.ptx == NULL:
             return
         cdef CyclusMemBack* cpp_ptx = <CyclusMemBack*> self.ptx
-        print("me")
         cpp_ptx.Close()
-        print("I")
         del cpp_ptx
-        print("you")
         self.ptx = NULL
 
     def query(self, table, conds=None):
@@ -154,22 +131,9 @@ cdef class _MemBack(lib._FullBackend):
         results : pd.DataFrame
             Pandas DataFrame the represents the table
         """
-        #cdef dict cache = <dict> (<CyclusMemBack*> self.ptx).cache
-        #cache = <dict> (<CyclusMemBack*> self.ptx).cache
-        #print("cache id", str(<unsigned long> (<CyclusMemBack*> self.ptx).cache))
-        #cdef object rtn
-        #cdef char* ctable
-        #table = table.encode()
-        #ctable = table
-        #print("query0")
-        #if (<CyclusMemBack*> self.ptx).cache == NULL:
-        #    print("Seeing Null")
-        #print(cache)
-        #if table not in cache:
-        #    return None
+        if table not in self.cache:
+            return None
         return self.cache[table]
-        #rtn = <object> PyDict_GetItemString(cache, ctable)
-        #return rtn
 
     @property
     def tables(self):

@@ -23,18 +23,12 @@ def test_simple():
     d.add_val("col2", "wakka", dbtype=ts.VL_STRING)
     d.record()
     rec.flush()
-    print(0)
 
     exp = pd.DataFrame({"col0": [1], "col1": [42.0], "col2": ["wakka"]},
                        columns=['col0', 'col1', 'col2'])
-    print(1)
     obs = back.query("test")
-    print(2)
-    print(back.cache)
     assert_frame_equal(exp, obs)
-    print(3)
     rec.close()
-    print(100)
 
 
 if __name__ == "__main__":
