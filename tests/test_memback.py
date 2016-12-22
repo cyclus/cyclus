@@ -58,5 +58,35 @@ def test_many_rows_one_table():
     rec.close()
 
 
+def test_two_tables_interleaved():
+    n = 10
+    rec, back = make_rec_back()
+    for i in range(n):
+        d = rec.new_datum("test0" if i%2 == 0 else "test1")
+        d.add_val("col0", i, dbtype=ts.INT)
+        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.record()
+    rec.flush()
+
+    exp0 = pd.DataFrame({
+        "col0": list(range(0, n, 2)),
+        "col1": [42.0*i for i in range(0, n, 2)],
+        "col2": ["wakka"*i for i in range(0, n, 2)]},
+        columns=['col0', 'col1', 'col2'])
+    obs0 = back.query("test0")
+    yield assert_frame_equal, exp0, obs0
+
+
+    exp1 = pd.DataFrame({
+        "col0": list(range(1, n, 2)),
+        "col1": [42.0*i for i in range(1, n, 2)],
+        "col2": ["wakka"*i for i in range(1, n, 2)]},
+        columns=['col0', 'col1', 'col2'])
+    obs1 = back.query("test1")
+    yield assert_frame_equal, exp1, obs1
+    rec.close()
+
+
 if __name__ == "__main__":
     nose.runmodule()

@@ -86,7 +86,6 @@ cdef class _Datum:
             raise ValueError('field name must be str or bytes.')
         # have to keep refs around so don't dealloc field names
         self._fieldnames.append(field)
-        #print("field", field)
         if shape is None:
             (<cpp_cyclus.Datum*> self.ptx).AddVal(field, v)
         else:
