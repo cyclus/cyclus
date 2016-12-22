@@ -77,7 +77,6 @@ def test_two_tables_interleaved():
     obs0 = back.query("test0")
     yield assert_frame_equal, exp0, obs0
 
-
     exp1 = pd.DataFrame({
         "col0": list(range(1, n, 2)),
         "col1": [42.0*i for i in range(1, n, 2)],
@@ -85,6 +84,49 @@ def test_two_tables_interleaved():
         columns=['col0', 'col1', 'col2'])
     obs1 = back.query("test1")
     yield assert_frame_equal, exp1, obs1
+    rec.close()
+
+
+
+def test_three_tables_grouped():
+    names = ["test0", "test1", "test2"]
+    n = 10
+    rec, back = make_rec_back()
+    for j, name in enumerate(names):
+        for i in range(n):
+            d = rec.new_datum(name)
+            if j%3 != 0:
+                d.add_val("col0", i*j, dbtype=ts.INT)
+            if j%3 != 1:
+                d.add_val("col1", 42.0*i*j, dbtype=ts.DOUBLE)
+            if j%3 != 2:
+                d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+            d.record()
+    rec.flush()
+
+    j = 0
+    exp0 = pd.DataFrame({
+        "col1": [42.0*i*j for i in range(n)],
+        "col2": ["wakka"*i for i in range(n)]},
+        columns=['col1', 'col2'])
+    obs0 = back.query("test0")
+    yield assert_frame_equal, exp0, obs0
+
+    j = 1
+    exp1 = pd.DataFrame({
+        "col0": [i*j for i in range(n)],
+        "col2": ["wakka"*i for i in range(n)]},
+        columns=['col0', 'col2'])
+    obs1 = back.query("test1")
+    yield assert_frame_equal, exp1, obs1
+
+    j = 2
+    exp2 = pd.DataFrame({
+        "col0": [i*j for i in range(n)],
+        "col1": [42.0*i*j for i in range(n)]},
+        columns=['col0', 'col1'])
+    obs2 = back.query("test2")
+    yield assert_frame_equal, exp2, obs2
     rec.close()
 
 

@@ -45,9 +45,8 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         cdef std_pair[std_string, cpp_cyclus.DatumList] group
         cdef cpp_cyclus.Datum* d
         cdef std_pair[const char*, cpp_cyclus.hold_any] val
-        cdef std_string name
+        cdef std_string name, cpp_field
         cdef dict g, res
-        cdef list bfields, fields
         cdef PyObject* pyobval
         cdef object results, pyval
         cdef int key_exists, i
@@ -59,13 +58,10 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         for group in groups:
             # init group
             res = {}
-            bfields = []
             fields = []
             d = group.second.front()
-            for val in d.vals():
-                bfield = val.first
-                bfields.append(bfield)
-                field = bfield.decode()
+            for cpp_field in d.fields():
+                field = std_string_to_py(cpp_field)
                 fields.append(field)
                 res[field] = []
             # fill group

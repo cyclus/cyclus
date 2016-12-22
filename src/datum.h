@@ -20,6 +20,7 @@ class Datum {
   typedef std::vector<Entry> Vals;
   typedef std::vector<int> Shape;
   typedef std::vector<Shape> Shapes;
+  typedef std::vector<std::string> Fields;
 
   virtual ~Datum();
 
@@ -47,6 +48,8 @@ class Datum {
   /// depends on what the backend(s) in use are designed to handle.
   Datum* AddVal(const char* field, boost::spirit::hold_any val,
                 std::vector<int>* shape = NULL);
+  Datum* AddVal(std::string field, boost::spirit::hold_any val,
+                std::vector<int>* shape = NULL);
 
   /// Record this datum to its Recorder. Recorded Datum objects of the same
   /// title (e.g. same table) must not contain any fields that were not
@@ -63,6 +66,9 @@ class Datum {
   /// added to this datum. The length of shapes must match the length of vals.
   const Shapes& shapes();
 
+  /// Returns a vector of all field names that have been added to this datum.
+  const Fields& fields();
+
   static void* operator new(size_t size);
   static void operator delete(void* rawMemory) throw();
 
@@ -70,11 +76,14 @@ class Datum {
   /// Datum objects should generally not be created using a constructor (i.e.
   /// use the recorder interface).
   Datum(Recorder* m, std::string title);
+  Datum* AddValBase(const char* field, boost::spirit::hold_any val,
+                    std::vector<int>* shape = NULL);
 
   Recorder* manager_;
   std::string title_;
   Vals vals_;
   Shapes shapes_;
+  Fields fields_;
 };
 
 }  // namespace cyclus

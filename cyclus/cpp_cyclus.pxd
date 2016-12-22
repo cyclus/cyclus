@@ -33,13 +33,17 @@ cdef extern from "cyclus.h" namespace "cyclus":
         ctypedef vector[Entry] Vals
         ctypedef vector[int] Shape
         ctypedef vector[Shape] Shapes
+        ctypedef vector[std_string] Fields
 
         Datum* AddVal(const char*, hold_any) except +
         Datum* AddVal(const char*, hold_any, vector[int]*) except +
+        Datum* AddVal(std_string, hold_any) except +
+        Datum* AddVal(std_string, hold_any, vector[int]*) except +
         void Record() except +
         std_string title() except +
         vector[Entry] vals() except +
         vector[vector[int]] shapes() except +
+        vector[std_string] fields() except +
 
 
 cdef extern from "rec_backend.h" namespace "cyclus":
