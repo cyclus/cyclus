@@ -1909,7 +1909,8 @@ WRITE_BODY_PRIMITIVES = {"STRING": write_body_string,
 CONTAINER_INSERT_STRINGS = {"MAP": "{var}[{child0}] = {child1}",
                             "LIST": "{var}.push_back({child0})",
                             "SET": "{var}.insert({child0})",
-                            "VECTOR": "{var}.push_back({child0})"}
+                            "VECTOR": "{var}.push_back({child0})",
+                            "PAIR": "{var} = std::make_pair({child0},{child1})"}
 
 def is_all_vl(t):
     if is_primitive(t):
@@ -1936,30 +1937,44 @@ def is_all_vl(t):
 def pad_item(t, variable, depth=0, prefix=""):
     pass
 
-def resolve_fl_children(vl_t, depth=0, prefix="", pointer=True):
+def resolve_fl_children(vl_t, variable, fixed_var=None, depth=0, prefix="", pointer=True):
+    if DB_TO_VL[vl_t.db]:
+        container = VL_TO_FL_CONTAINERS[vl_t.canon[0]]
+    else:
+        container = vl_t.canon[0]
     result = Block(nodes=[])
     body_nodes = []
     keywords = {}
-    variable = get_variable("val", depth=depth, prefix=prefix)
-    new_variable = get_variable("fixed_val", depth=depth, prefix=prefix)
+    #Depth 0 should have no specified fixed_var variable. If this type is a 
+    #child, we'll want to use the child variable that was created for it
+    #by its parent.
+    if fixed_var == None:
+        fixed_var = get_variable("fixed_val", depth=depth, prefix=prefix)
+    result.nodes.append(ExprStmt(child=Decl(type=Type(cpp=vl_t.cpp),
+                                            name=Raw(code=fixed_var))))
     iterator = get_variable("it", depth=depth, prefix=prefix)
-    count = 0
-    container = VL_TO_FL_CONTAINERS[vl_t.canon[0]]
     prefixes = template_args[container]
-    keywords['var'] = new_variable
-    pointers = ['->first', '->second'] if container in variable_length_types else ['.first', '.second']
+    keywords['var'] = fixed_var
     num = len(vl_t.canon[1:])
     if num == 1:
         children = ["*" + iterator]
     else:
-        children = ["{}{}".format(a, b) for a, b in zip([iterator]*num, 
-                                                        pointers)]
+        if container in variable_length_types:
+            members = ['->first', '->second']
+            children = ["{}{}".format(a, b) for a, b in zip([iterator]*num, 
+                                                            members)]
+        else:
+            members = ['.first', '.second']
+            children = ["{}{}".format(a, b) for a, b in zip([variable]*num,
+                                                            members)]
+    count = 0
     for i in vl_t.canon[1:]:
         child_node = CANON_TO_NODE[i]
         child_keyword = "child" + str(count)
         child_variable = get_variable("child", depth=depth+1, 
                                       prefix=prefix+prefixes[count])
         if is_primitive(child_node):
+            #Strings are the only primitive we are looking for
             if child_node.db == 'STRING':
                 item_size = get_variable("item_size", depth=depth+1, 
                                          prefix=prefix+prefixes[count])
@@ -1969,9 +1984,11 @@ def resolve_fl_children(vl_t, depth=0, prefix="", pointer=True):
                                                             target=Var(name=child_variable),
                                                             value=Raw(code=constructor))))
                 keywords[child_keyword] = child_variable
+            #Leave other primitives alone.
             else:
                 keywords[child_keyword] = children[count]   
         else:
+            #All VL containers
             if DB_TO_VL[child_node.db]:
                 if is_all_vl(child_node):
                     #Skip child
@@ -1984,17 +2001,29 @@ def resolve_fl_children(vl_t, depth=0, prefix="", pointer=True):
                     #                                             +prefixes[count],
                     #                                      pointer=(num==1)))                                   
                     keywords[child_keyword] = child_variable
+            #FL variable length containers
             elif child_node.canon[0] in variable_length_types:
                 keywords[child_keyword] = children[count]
+            #PAIRS, etc.
             else:
-                keywords[child_keyword] = children[count]
+                #Recursive call on the PAIR, using the parent iterator as the
+                #new origin variable. We specify that the fixed variable should
+                #simply be the 'child' variable we created in this loop.
+                body_nodes.append(resolve_fl_children(child_node, children[count], 
+                                                      fixed_var=child_variable,
+                                                      depth=depth+1,
+                                                      prefix=prefix+prefixes[count]))
+                keywords[child_keyword] = child_variable
         count += 1
     
     assignment = CONTAINER_INSERT_STRINGS[container].format(**keywords)
     body_nodes.append(ExprStmt(child=Raw(code=assignment)))
-    result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="!=", 
-                                       y=Var(name=variable+".end()")),
-                            incr=Raw(code="++" + iterator), body=body_nodes))
+    if container in variable_length_types:
+        result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="!=", 
+                                           y=Var(name=variable+".end()")),
+                                incr=Raw(code="++" + iterator), body=body_nodes))
+    else:
+        result.nodes.extend(body_nodes)
     return result
 
 def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf", pointer=False):
@@ -2045,16 +2074,14 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a", offset="buf
         if DB_TO_VL[t.db]:
             container = VL_TO_FL_CONTAINERS[container]
             prefixes = template_args[container]
-            fixed_val = get_variable("fixed_val", depth=depth, prefix=prefix)
-            result.nodes.append(ExprStmt(child=Decl(type=Type(cpp=t.cpp),
-                                                    name=Raw(code=fixed_val))))
             result.nodes.append(ExprStmt(child=DeclAssign(
                                                   type=Type(cpp=t.cpp+"::iterator"),
                                                   target=Raw(code=iterator),
                                                   value=Raw(code=variable 
                                                                  +".begin()"))))
-            result.nodes.append(resolve_fl_children(t, depth=depth, 
+            result.nodes.append(resolve_fl_children(t, variable, depth=depth, 
                                                     prefix=prefix))
+            fixed_val = get_variable("fixed_val", depth=depth, prefix=prefix)
             result.nodes.append(vl_write(t, fixed_val, depth=depth, prefix=prefix))
             key = get_variable("key", depth=depth, prefix=prefix)
             result.nodes.append(ExprStmt(child=memcpy(offset, key + ".val", 
