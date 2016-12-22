@@ -100,11 +100,11 @@ cdef class _Datum:
         """Records the Datum."""
         (<cpp_cyclus.Datum*> self.ptx).Record()
 
-    property title:
+    @property
+    def title(self):
         """The datum name."""
-        def __get__(self):
-            s = (<cpp_cyclus.Datum*> self.ptx).title()
-            return s
+        s = (<cpp_cyclus.Datum*> self.ptx).title()
+        return s
 
 
 class Datum(_Datum):
@@ -183,24 +183,25 @@ cdef class _FullBackend:
         results = pd.DataFrame(res, columns=fields)
         return results
 
-    property tables:
+    @property
+    def tables(self):
         """Retrieves the set of tables present in the database."""
-        def __get__(self):
-            if self._tables is not None:
-                return self._tables
-            cdef std_set[std_string] ctabs = \
-                (<cpp_cyclus.FullBackend*> self.ptx).Tables()
-            cdef std_set[std_string].iterator it = ctabs.begin()
-            cdef set tabs = set()
-            while it != ctabs.end():
-                tab = deref(it)
-                tabs.add(tab.decode())
-                inc(it)
-            self._tables = tabs
+        if self._tables is not None:
             return self._tables
+        cdef std_set[std_string] ctabs = \
+            (<cpp_cyclus.FullBackend*> self.ptx).Tables()
+        cdef std_set[std_string].iterator it = ctabs.begin()
+        cdef set tabs = set()
+        while it != ctabs.end():
+            tab = deref(it)
+            tabs.add(tab.decode())
+            inc(it)
+        self._tables = tabs
+        return self._tables
 
-        def __set__(self, value):
-            self._tables = value
+    @tables.setter
+    def tables(self, value):
+        self._tables = value
 
 
 class FullBackend(_FullBackend, object):
@@ -238,12 +239,12 @@ cdef class _SqliteBack(_FullBackend):
         self.flush()  # just in case
         (<cpp_cyclus.SqliteBack*> self.ptx).Close()
 
-    property name:
+    @property
+    def name(self):
         """The name of the database."""
-        def __get__(self):
-            name = (<cpp_cyclus.SqliteBack*> self.ptx).Name()
-            name = name.decode()
-            return name
+        name = (<cpp_cyclus.SqliteBack*> self.ptx).Name()
+        name = name.decode()
+        return name
 
 
 class SqliteBack(_SqliteBack, FullBackend):
@@ -274,12 +275,12 @@ cdef class _Hdf5Back(_FullBackend):
         """Closes the backend, flushing it in the process."""
         (<cpp_cyclus.Hdf5Back*> self.ptx).Close()
 
-    property name:
+    @property
+    def name(self):
         """The name of the database."""
-        def __get__(self):
-            name = (<cpp_cyclus.Hdf5Back*> self.ptx).Name()
-            name = name.decode()
-            return name
+        name = (<cpp_cyclus.Hdf5Back*> self.ptx).Name()
+        name = name.decode()
+        return name
 
 
 class Hdf5Back(_Hdf5Back, FullBackend):
@@ -302,26 +303,28 @@ cdef class _Recorder:
         del cpp_ptx
         self.ptx = NULL
 
-    property dump_count:
+    @property
+    def dump_count(self):
         """The frequency of recording."""
-        def __get__(self):
-            return (<cpp_cyclus.Recorder*> self.ptx).dump_count()
+        return (<cpp_cyclus.Recorder*> self.ptx).dump_count()
 
-        def __set__(self, value):
-            (<cpp_cyclus.Recorder*> self.ptx).set_dump_count(<unsigned int> value)
+    @dump_count.setter
+    def dump_count(self, value):
+        (<cpp_cyclus.Recorder*> self.ptx).set_dump_count(<unsigned int> value)
 
-    property sim_id:
+    @property
+    def sim_id(self):
         """The simulation id of the recorder."""
-        def __get__(self):
-            return uuid_cpp_to_py((<cpp_cyclus.Recorder*> self.ptx).sim_id())
+        return uuid_cpp_to_py((<cpp_cyclus.Recorder*> self.ptx).sim_id())
 
-    property inject_sim_id:
+    @property
+    def inject_sim_id(self):
         """Whether or not to inject the simulation id into the tables."""
-        def __get__(self):
-            return (<cpp_cyclus.Recorder*> self.ptx).inject_sim_id()
+        return (<cpp_cyclus.Recorder*> self.ptx).inject_sim_id()
 
-        def __set__(self, value):
-            (<cpp_cyclus.Recorder*> self.ptx).inject_sim_id(<bint> value)
+    @inject_sim_id.setter
+    def inject_sim_id(self, value):
+        (<cpp_cyclus.Recorder*> self.ptx).inject_sim_id(<bint> value)
 
     def new_datum(self, title):
         """Registers a backend with the recorder."""
