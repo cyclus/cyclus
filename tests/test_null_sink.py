@@ -9,6 +9,9 @@ from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
+
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
 def test_null_sink():
     """Testing for null sink case without a source facility.
 
@@ -18,7 +21,7 @@ def test_null_sink():
     clean_outs()
 
     # Cyclus simulation input for null sink testing
-    sim_input = "./input/null_sink.xml"
+    sim_input = os.path.join(INPUT, "null_sink.xml")
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
@@ -55,7 +58,7 @@ def test_null_sink():
     # Sink's deployment
     agent_ids = to_ary(agent_entry, "AgentId")
     spec = to_ary(agent_entry, "Spec")
-        
+
     sink_id = find_ids(":agents:Sink", spec, agent_ids)
     # Test if one SimpleSink is deployed
     yield assert_equal, len(sink_id), 1

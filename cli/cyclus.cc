@@ -84,11 +84,7 @@ int main(int argc, char* argv[]) {
     infile = ai.vm["input-file"].as<std::string>();
   }
 
-  // Initialize Python functionality
-  #ifdef CYCLUS_WITH_PYTHON
-  Py_Initialize();
-  PyInitHooks();
-  #endif
+  PyStart();
 
   // Announce yourself
   std::cout << "              :                                                               " << std::endl;
@@ -217,9 +213,7 @@ int main(int argc, char* argv[]) {
 
   rec.Flush();
 
-  #ifdef CYCLUS_WITH_PYTHON
-  Py_Finalize();
-  #endif
+  PyStop();
 
   std::cout << std::endl;
   std::cout << "Status: Cyclus run successful!" << std::endl;

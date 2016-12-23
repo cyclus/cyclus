@@ -8,8 +8,8 @@ dependencies:
 
 test:
   override:
-    - docker run cyclus/cyclus:latest cyclus_unit_tests
-    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
+    - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
+    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
 
 deployment:
   develop:
