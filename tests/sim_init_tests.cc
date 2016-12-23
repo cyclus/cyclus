@@ -5,6 +5,7 @@
 #include "context.h"
 #include "facility.h"
 #include "material.h"
+#include "pyhooks.h"
 #include "recorder.h"
 #include "sim_init.h"
 #include "sqlite_back.h"
@@ -421,11 +422,13 @@ TEST_F(SimInitTest, InitAgentInventories) {
 }
 
 TEST_F(SimInitTest, RestartSimInfo) {
+  cy::PyStart();
   ti.RunSim();
   rec.Flush();
   cy::SimInit si;
   si.Restart(b, rec.sim_id(), 2);
   cy::SimInfo info = si.context()->sim_info();
+  cy::PyStop();
 
   EXPECT_NE(rec.sim_id(), si.recorder()->sim_id());
   EXPECT_EQ(2, si.context()->time());

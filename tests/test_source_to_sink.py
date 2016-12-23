@@ -10,7 +10,8 @@ from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
-"""Tests"""
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
 def test_source_to_sink():
     """Tests linear growth of sink inventory by checking if the transactions
     were of equal quantities and only between sink and source facilities.
@@ -18,7 +19,7 @@ def test_source_to_sink():
     clean_outs()
 
     # Cyclus simulation input for Source and Sink
-    sim_inputs = ["./input/source_to_sink.xml"]
+    sim_inputs = [os.path.join(INPUT, "source_to_sink.xml")]
 
     for sim_input in sim_inputs:
         holdsrtn = [1]  # needed because nose does not send() to test generator
@@ -58,7 +59,7 @@ def test_source_to_sink():
             resources = exc('SELECT * FROM Resources').fetchall()
             transactions = exc('SELECT * FROM Transactions').fetchall()
             conn.close()
-        
+
         # Find agent ids of source and sink facilities
         agent_ids = to_ary(agent_entry, "AgentId")
         spec = to_ary(agent_entry, "Spec")
