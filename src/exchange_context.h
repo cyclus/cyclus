@@ -13,6 +13,12 @@
 #include "request.h"
 #include "request_portfolio.h"
 
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
+
+
 namespace cyclus {
 
 template <class T>
