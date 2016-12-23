@@ -19,7 +19,10 @@ from cyclus.typesystem cimport (py_to_any, any_to_py, str_py_to_cpp,
     std_string_to_py, bool_to_py, bool_to_cpp, std_set_std_string_to_py,
     std_set_std_string_to_cpp)
 
+from collections import deque
 from collections.abc import Set
+from ast import (Name, Compare, Load, Eq, NotEq, Lt, LtE, Gt, GtE,
+    BinOp, BitAnd, Expression)
 
 # startup numpy
 cimport numpy as np
@@ -122,6 +125,8 @@ cdef class _MemBack(lib._FullBackend):
         self._registry = None
         self.registry = registry
         self.fallback = fallback
+        self._query_code_cache = {}
+        self._query_code_lru = deque()
 
     def __dealloc__(self):
         # Note that we have to do it this way since self.ptx is void*
@@ -155,7 +160,7 @@ cdef class _MemBack(lib._FullBackend):
             if conds is None:
                 return self.cache[table]
             else:
-                raise NotImplementedError
+                return self._apply_conds(self.cache[table], conds)
         elif self.fallback is not None:
             if self.store_all_tables or table in self.registry:
                 t = self.fallback.query(table, conds=None)
@@ -163,7 +168,7 @@ cdef class _MemBack(lib._FullBackend):
                 if conds is None:
                     return t
                 else:
-                    raise NotImplementedError
+                    return self._apply_conds(self.cache[table], conds)
             else:
                 return self.fallback.query(table, conds=conds)
         else:
@@ -241,6 +246,63 @@ cdef class _MemBack(lib._FullBackend):
             dirty_keys = frozenset(cache.keys()) & (old - val)
             for key in dirty_keys:
                 del cache[key]
+
+    #
+    # Condition application
+    #
+    def _apply_conds(self, df, conds):
+        """Applies the condition query to data frame."""
+        key = ''
+        ctx = {'__builtins__': None}
+        for i, (field, op, val) in enumerate(conds):
+            key += field + op  # the value doesn't affect the key since it is loaded.
+            if field not in ctx:
+                ctx[field] = df[field]
+            ctx['val' + str(i)] = val
+        qccache = self._query_code_cache
+        if key in qccache:
+            code = qccache[key]
+        else:
+            code = qccache[key] = self._compile_conds(conds)
+            qclru = self._query_code_lru
+            if len(qclru) == 256:
+                del qccache[qclru.popleft()]
+            qclru.append(key)
+        mask = eval(code, ctx, ctx)
+        res = df[mask]
+        return res
+
+    def _compile_conds(self, conds):
+        """Compiles conditions into a code object."""
+        tree = Expression(body=self._parse_conds(conds))
+        code = compile(tree, '<MemBack Query>', 'eval')
+        return code
+
+    def _parse_conds(self, conds):
+        """Parses conditions and then ANDs them together, eg.
+        cond0 & cond1 & cond2, etc.
+        """
+        for i, (field, op, _) in enumerate(conds):
+            cond_tree = self._parse_cond(field, op, 'val' + str(i))
+            if i == 0:
+                tree = cond_tree
+            else:
+                tree = BinOp(left=tree, op=BitAnd(), right=cond_tree,
+                             lineno=1, col_offset=0)
+        return tree
+
+    def _parse_cond(self, field, op, val):
+        """Parses a single condition into the expression of the form
+        field < val, field == val, etc.
+        """
+        return Compare(left=Name(id=field, ctx=Load(), lineno=1, col_offset=1),
+                       ops=[self._cmpnodes[op]()],
+                       comparators=[Name(id=val, ctx=Load(),
+                                         lineno=1, col_offset=1)],
+                       lineno=1, col_offset=1)
+
+    _cmpnodes = {'==': Eq, '!=': NotEq, '<': Lt, '<=': LtE, '>': Gt, '>=': GtE}
+
 
 
 class MemBack(_MemBack, lib.FullBackend):

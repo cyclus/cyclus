@@ -294,5 +294,60 @@ def test_fallback():
     yield assert_frame_equal, x, back.query("yo")
 
 
+def test_query():
+    back = memback.MemBack()
+    n = 10
+    x = pd.DataFrame({
+        "col0": list(range(n)),
+        "col1": [42.0*i for i in range(n)],
+        "col2": ["wakka"*i for i in range(n)]},
+        columns=['col0', 'col1', 'col2'])
+    back.cache["x"] = x
+
+    # test ==
+    obs = back.query('x', [('col0', '==', 4)])
+    yield assert_equal, 1, len(obs)
+    yield assert_equal, 4, obs['col0'].loc[4]
+
+    # test !=
+    obs = back.query('x', [('col2', '!=', 'wakka')])
+    yield assert_equal, n-1, len(obs)
+    yield assert_not_in, 1, obs['col0']
+
+    # test <
+    obs = back.query('x', [('col1', '<', 42.0*6.0)])
+    yield assert_equal, 6, len(obs)
+    yield assert_frame_equal, x[x.col1 < 42.0*6.0], obs
+
+    # test <=
+    obs = back.query('x', [('col1', '<=', 42.0*3.1)])
+    yield assert_equal, 4, len(obs)
+    yield assert_frame_equal, x[x.col1 <= 42.0*3.1], obs
+
+    # test <
+    obs = back.query('x', [('col1', '>', 42.0*6.0)])
+    yield assert_equal, 3, len(obs)
+    yield assert_frame_equal, x[x.col1 > 42.0*6.0], obs
+
+    # test <=
+    obs = back.query('x', [('col1', '>=', 42.0*3.1)])
+    yield assert_equal, 6, len(obs)
+    yield assert_frame_equal, x[x.col1 >= 42.0*3.1], obs
+
+    # Test two conds
+    obs = back.query('x', [('col1', '<', 42.0*6.0),
+                           ('col1', '>=', 42.0*3.1)])
+    yield assert_equal, 2, len(obs)
+    yield assert_frame_equal, x[(x.col1 < 42.0*6.0) & (x.col1 >= 42.0*3.1)], obs
+
+    # Test three conds
+    obs = back.query('x', [('col1', '<', 42.0*6.0),
+                           ('col1', '>=', 42.0*3.1),
+                           ('col2', '!=', 'wakka')])
+    yield assert_equal, 2, len(obs)
+    yield assert_frame_equal, x[(x.col1 < 42.0*6.0) & (x.col1 >= 42.0*3.1)], obs
+
+
+
 if __name__ == "__main__":
     nose.runmodule()

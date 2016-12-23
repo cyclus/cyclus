@@ -17,7 +17,7 @@ TEST(DecayTests, simple) {
   v[id("U238")] = 10;
   cyclus::compmath::Normalize(&v);
 
-  CompMap newv = pyne::decayers::decay(v, pyne::half_life("Cs137"));
+  CompMap newv = pyne::decayers::decay(v, pyne::half_life(std::string("Cs137")));
   cyclus::compmath::Normalize(&newv);
 
   ASSERT_TRUE(newv.size() > 0) << "decayed composition has zero nuclides - what?";
