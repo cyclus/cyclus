@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import nose
 from nose.tools import assert_equal, assert_true, assert_is_instance, \
-    assert_in, assert_false
+    assert_in, assert_false, assert_not_in
 
 from cyclus import memback
 from cyclus import lib
@@ -59,9 +59,7 @@ def test_many_rows_one_table():
     rec.close()
 
 
-def test_two_tables_interleaved():
-    n = 10
-    rec, back = make_rec_back()
+def make_two_interleaved(rec, n):
     for i in range(n):
         d = rec.new_datum("test0" if i%2 == 0 else "test1")
         d.add_val("col0", i, dbtype=ts.INT)
@@ -69,6 +67,12 @@ def test_two_tables_interleaved():
         d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
         d.record()
     rec.flush()
+
+
+def test_two_tables_interleaved():
+    n = 10
+    rec, back = make_rec_back()
+    make_two_interleaved(rec, n)
 
     exp0 = pd.DataFrame({
         "col0": list(range(0, n, 2)),
@@ -220,17 +224,41 @@ def test_registry_operations():
     back.registry = ["test0"]
     yield assert_false, back.store_all_tables
     yield assert_is_instance, back.registry, frozenset
+    yield assert_equal, 1, len(back.registry)
     yield assert_equal, 0, len(back.cache)
-    for i in range(n):
-        d = rec.new_datum("test0" if i%2 == 0 else "test1")
-        d.add_val("col0", i, dbtype=ts.INT)
-        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
-        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
-        d.record()
-    rec.flush()
+    make_two_interleaved(rec, n)
     yield assert_equal, 1, len(back.cache)
     yield assert_in, "test0", back.cache
 
+    # test removing registry with False
+    back.registry = False
+    yield assert_false, back.store_all_tables
+    yield assert_is_instance, back.registry, frozenset
+    yield assert_equal, 0, len(back.cache)
+    rec.flush()
+
+    # test partial registry
+    back.registry = ["test0", "test1"]
+    yield assert_false, back.store_all_tables
+    yield assert_is_instance, back.registry, frozenset
+    yield assert_equal, 2, len(back.registry)
+    yield assert_equal, 0, len(back.cache)
+    make_two_interleaved(rec, n)
+    yield assert_equal, 2, len(back.cache)
+    yield assert_in, "test0", back.cache
+    yield assert_in, "test1", back.cache
+    # stop following test1
+    back.registry = ["test0", "test42", "test43"]
+    yield assert_equal, 3, len(back.registry)
+    yield assert_equal, 1, len(back.cache)
+    yield assert_in, "test0", back.cache
+    yield assert_not_in, "test1", back.cache
+
+    # test removing registry with None
+    back.registry = None
+    yield assert_false, back.store_all_tables
+    yield assert_is_instance, back.registry, frozenset
+    yield assert_equal, 0, len(back.cache)
     rec.close()
 
 
