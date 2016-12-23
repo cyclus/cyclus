@@ -2,7 +2,8 @@
 from __future__ import print_function, unicode_literals
 
 import nose
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_is_instance, \
+    assert_in, assert_false
 
 from cyclus import memback
 from cyclus import lib
@@ -206,6 +207,30 @@ def test_many_cols_one_table():
     exp = pd.DataFrame({c: [i] for c, i in zip(cols, range(n))}, columns=cols)
     obs = back.query("test")
     assert_frame_equal(exp, obs)
+    rec.close()
+
+
+def test_registry_operations():
+    n = 10
+    rec, back = make_rec_back()
+    yield assert_true, back.store_all_tables
+    rec.flush()  # test empty datalist
+
+    # test storing only one table
+    back.registry = ["test0"]
+    yield assert_false, back.store_all_tables
+    yield assert_is_instance, back.registry, frozenset
+    yield assert_equal, 0, len(back.cache)
+    for i in range(n):
+        d = rec.new_datum("test0" if i%2 == 0 else "test1")
+        d.add_val("col0", i, dbtype=ts.INT)
+        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.record()
+    rec.flush()
+    yield assert_equal, 1, len(back.cache)
+    yield assert_in, "test0", back.cache
+
     rec.close()
 
 

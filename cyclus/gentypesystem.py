@@ -494,7 +494,14 @@ TO_CPP_CONVERTERS = {
     'int': ('', '', '<int> {var}'),
     'float': ('', '', '<float> {var}'),
     'double': ('', '', '<double> {var}'),
-    'std::string': ('', '', 'std_string(<const char*> {var})'),
+    'std::string': ('',
+        'if isinstance({var}, str):\n'
+        '   b{var} = {var}.encode()\n'
+        'elif isinstance({var}, str):\n'
+        '   b{var} = {var}\n'
+        'else:\n'
+        '   b{var} = bytes({var})\n',
+        'std_string(<const char*> b{var})'),
     'cyclus::Blob': ('', '', 'cpp_cyclus.Blob(std_string(<const char*> {var}))'),
     'boost::uuids::uuid': ('', '', 'uuid_py_to_cpp({var})'),
     # templates

@@ -16,8 +16,10 @@ from cyclus cimport lib
 from cyclus import lib
 
 from cyclus.typesystem cimport (py_to_any, any_to_py, str_py_to_cpp,
-    std_string_to_py, bool_to_py, bool_to_cpp, std_set_int_to_py,
+    std_string_to_py, bool_to_py, bool_to_cpp, std_set_std_string_to_py,
     std_set_std_string_to_cpp)
+
+from collections.abc import Set
 
 # startup numpy
 cimport numpy as np
@@ -53,10 +55,25 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
         cdef object results, pyval
         cdef int key_exists, i
         cdef list fields
+        # check if there is anything to do
+        if not this.store_all_tables and this.registry.size() == 0:
+            return
+        if data.size() == 0:
+            return
         # combine into like groups
-        for d in data:
-            name = d.title()
-            groups[name].push_back(d)
+        if this.store_all_tables:
+            for d in data:
+                name = d.title()
+                groups[name].push_back(d)
+        else:
+            for d in data:
+                name = d.title()
+                if this.registry.count(name) == 0:
+                    continue
+                groups[name].push_back(d)
+            if groups.size() == 0:
+                # no tables seen that are in the registry
+                return
         # convert groups
         for group in groups:
             # init group
@@ -138,11 +155,11 @@ cdef class _MemBack(lib._FullBackend):
 
     @property
     def tables(self):
+        """Retrieves the set of tables present in the database."""
         return frozenset(self.cache.keys())
 
     @tables.setter
     def tables(self, value):
-        """Retrieves the set of tables present in the database."""
         raise NotImplementedError
 
     def flush(self):
@@ -187,19 +204,27 @@ cdef class _MemBack(lib._FullBackend):
     @registry.setter
     def registry(self, val):
         cdef CyclusMemBack* cpp_ptx = <CyclusMemBack*> self.ptx
+        cache = self.cache
         if val is None or isinstance(val, bool):
             cpp_ptx.registry.clear()
             if val:
-                cpp_ptx.store_all_table = True
+                cpp_ptx.store_all_tables = True
             else:
-                cpp_ptx.store_all_table = False
-                self.cache.clear()
+                cpp_ptx.store_all_tables = False
+                cache.clear()
             self._registry = None
         else:
+            if not isinstance(val, Set):
+                val = frozenset(val)
+            old = self.registry
             cpp_ptx.registry = std_set_std_string_to_cpp(val)
-            cpp_ptx.store_all_table = False
+            cpp_ptx.store_all_tables = False
             self._registry = None
-
+            # find keys in the old registry but not in the new one and
+            # also in the current cache. Then remove them.
+            dirty_keys = frozenset(cache.keys()) & (old - val)
+            for key in dirty_keys:
+                del cache[key]
 
 
 class MemBack(_MemBack, lib.FullBackend):
@@ -208,4 +233,10 @@ class MemBack(_MemBack, lib.FullBackend):
     Note that even though the underlying C++ class is a RecBackend,
     the Python wrapper inherits from FullBackend and the QueryableBackend
     interface in implemented in Cython.
+
+    Parameters
+    ----------
+    registry : set, bool, or None, optional
+        The initial registry to start the backend with. Defaults is True,
+        which stores all of the tables.
     """
