@@ -4,6 +4,7 @@
 #include "facility.h"
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
+#include "pyhooks.h"
 #include "recorder.h"
 #include "timer.h"
 #include "sqlite_back.h"
@@ -64,6 +65,7 @@ class Snapper : public cyclus::Facility {
 };
 
 TEST(TimerTests, BareSim) {
+  cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -71,9 +73,11 @@ TEST(TimerTests, BareSim) {
   ti.Initialize(&ctx, cyclus::SimInfo(5));
 
   ASSERT_NO_THROW(ti.RunSim());
+  cyclus::PyStop();
 }
 
 TEST(TimerTests, EarlyTermination) {
+  cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -94,9 +98,11 @@ TEST(TimerTests, EarlyTermination) {
 
   EXPECT_TRUE(early);
   EXPECT_EQ(0, end);
+  cyclus::PyStop();
 }
 
 TEST(TimerTests, DefaultSnapshot) {
+  cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -114,9 +120,11 @@ TEST(TimerTests, DefaultSnapshot) {
   cyclus::QueryResult qr = b.Query("Snapshots", NULL);
   EXPECT_EQ(1, qr.rows.size());
   EXPECT_EQ(10, qr.GetVal<int>("Time", 0));
+  cyclus::PyStop();
 }
 
 TEST(TimerTests, CustomSnapshot) {
+  cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -138,9 +146,11 @@ TEST(TimerTests, CustomSnapshot) {
   EXPECT_EQ(4, qr.GetVal<int>("Time", 1));
   EXPECT_EQ(7, qr.GetVal<int>("Time", 2));
   EXPECT_EQ(10, qr.GetVal<int>("Time", 3));
+  cyclus::PyStop();
 }
 
 TEST(TimerTests, NullParentDecomNoSegfault) {
+  cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -152,9 +162,11 @@ TEST(TimerTests, NullParentDecomNoSegfault) {
 
   // EXPECT_NO_SEGFAULT
   ti.RunSim();
+  cyclus::PyStop();
 }
 
 TEST(TimerTests, DoubleDecom) {
+  cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
@@ -168,4 +180,5 @@ TEST(TimerTests, DoubleDecom) {
   Dier::decom_count = 0;
   ti.RunSim();
   EXPECT_EQ(1, Dier::decom_count);
+  cyclus::PyStop();
 }

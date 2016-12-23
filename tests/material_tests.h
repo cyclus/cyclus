@@ -7,6 +7,7 @@
 #include "material.h"
 #include "env.h"
 #include "context.h"
+#include "pyhooks.h"
 #include "test_agents/test_facility.h"
 #include "recorder.h"
 #include "timer.h"
@@ -40,6 +41,7 @@ class MaterialTest : public ::testing::Test {
   SimInfo si;
 
   virtual void SetUp() {
+    PyStart();
     ctx = new cyclus::Context(&ti, &rec);
     fac = new TestFacility(ctx);
 
@@ -86,6 +88,7 @@ class MaterialTest : public ::testing::Test {
   virtual void TearDown() {
     delete ctx;
     delete ctx_no_decay;
+    PyStop();
   }
 };
 
