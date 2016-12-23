@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import nose
 from nose.tools import assert_equal, assert_true, assert_is_instance, \
-    assert_in, assert_false, assert_not_in
+    assert_in, assert_false, assert_not_in, assert_is, assert_is_not
 
 from cyclus import memback
 from cyclus import lib
@@ -261,6 +261,37 @@ def test_registry_operations():
     yield assert_equal, 0, len(back.cache)
     rec.close()
 
+
+def test_no_fallback():
+    back = memback.MemBack()
+    yield assert_is, back.fallback, None
+    yield assert_is, back.query("yo"), None
+
+
+class FallBackend(object):
+    """A mock backend for testing"""
+
+    def query(self, table, conds=None):
+        n = 10
+        x = pd.DataFrame({
+            "col0": list(range(n)),
+            "col1": [42.0*i for i in range(n)],
+            "col2": ["wakka"*i for i in range(n)]},
+            columns=['col0', 'col1', 'col2'])
+        return x
+
+
+def test_fallback():
+    fallback = FallBackend()
+    back = memback.MemBack(fallback=fallback)
+    yield assert_is_not, back.fallback, None
+    n = 10
+    x = pd.DataFrame({
+        "col0": list(range(n)),
+        "col1": [42.0*i for i in range(n)],
+        "col2": ["wakka"*i for i in range(n)]},
+        columns=['col0', 'col1', 'col2'])
+    yield assert_frame_equal, x, back.query("yo")
 
 
 if __name__ == "__main__":

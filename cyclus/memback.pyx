@@ -116,11 +116,12 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
 
 cdef class _MemBack(lib._FullBackend):
 
-    def __cinit__(self, registry=True):
+    def __cinit__(self, registry=True, fallback=None):
         self.ptx = new CyclusMemBack()
         self.cache = (<CyclusMemBack*> self.ptx).Init()
         self._registry = None
         self.registry = registry
+        self.fallback = fallback
 
     def __dealloc__(self):
         # Note that we have to do it this way since self.ptx is void*
@@ -147,11 +148,26 @@ cdef class _MemBack(lib._FullBackend):
         Returns
         -------
         results : pd.DataFrame
-            Pandas DataFrame the represents the table
+            Pandas DataFrame the represents the table. If None is returned,
+            the table could not be found.
         """
-        if table not in self.cache:
+        if table in self.cache:
+            if conds is None:
+                return self.cache[table]
+            else:
+                raise NotImplementedError
+        elif self.fallback is not None:
+            if self.store_all_tables or table in self.registry:
+                t = self.fallback.query(table, conds=None)
+                self.cache[table] = t
+                if conds is None:
+                    return t
+                else:
+                    raise NotImplementedError
+            else:
+                return self.fallback.query(table, conds=conds)
+        else:
             return None
-        return self.cache[table]
 
     @property
     def tables(self):
@@ -239,4 +255,7 @@ class MemBack(_MemBack, lib.FullBackend):
     registry : set, bool, or None, optional
         The initial registry to start the backend with. Defaults is True,
         which stores all of the tables.
+    fallback : QueryableBackend-like, optional
+        A backend, which implements query(), that this backend can use
+        to look up values if the table is not in the current cache.
     """
