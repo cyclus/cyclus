@@ -10,12 +10,9 @@ from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
     set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml,
     Hdf5Back, SqliteBack, InfileTree, SimInit, XMLFileLoader, XMLFlatLoader)
-from cyclus.simstate import get_schema_path, SimState
+from cyclus.simstate import (get_schema_path, SimState,
+    ensure_close_dynamic_modules)
 
-
-# ensure that Cyclus dynamic modules are closed when Python exits.
-_DYNAMIC_MODULE = DynamicModule()
-atexit.register(_DYNAMIC_MODULE.close_all)
 
 
 LOGO = """              :
@@ -365,6 +362,7 @@ def run_simulation(ns):
 
 def main(args=None):
     """Main function for Cyclus CLI"""
+    ensure_close_dynamic_modules()
     Env.set_nuc_data_path()
     p = make_parser()
     ns = p.parse_args(args=args)

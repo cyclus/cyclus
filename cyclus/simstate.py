@@ -1,6 +1,7 @@
 """Tools for representing and driving the simulation."""
 from __future__ import print_function, unicode_literals
 import os
+import atexit
 
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs, XMLParser,
@@ -19,6 +20,21 @@ def get_schema_path(flat_schema=False, schema_path=None):
     else:
         path = Env.rng_schema(False)
     return path
+
+
+_DM_REGISTERED = False
+
+
+def ensure_close_dynamic_modules():
+    """Ensures that the dynamic module library is closed at the end of
+    the process.
+    """
+    global _DM_REGISTERED
+    if _DM_REGISTERED:
+        return
+    _dynamic_module = DynamicModule()
+    atexit.register(_dynamic_module.close_all)
+    _DM_REGISTERED = True
 
 
 class SimState(object):
@@ -54,7 +70,7 @@ class SimState(object):
     def __init__(self, input_file, output_path='cyclus.sqlite',
                  memory_backend=False, registry=True, schema_path=None,
                  flat_schema=False,):
-        self._dynamic_module = DynamicModule()
+        ensure_close_dynamic_modules()
         self.input_file = input_file
         self.output_path = output_path
         self.memory_backend = memory_backend
@@ -65,7 +81,6 @@ class SimState(object):
 
     def __del__(self):
         self.rec.flush()
-        self._dynamic_module.close_all()
 
     def load(self):
         """Loads the simulation."""
