@@ -35,8 +35,12 @@ ENDIF()
 
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.gen"
     @ONLY
+    )
+copy_when_diff(
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.gen"
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
     )
 ############################################################
 ############# end special configuration ####################

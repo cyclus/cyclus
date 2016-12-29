@@ -5,6 +5,7 @@
 
 macro(copy_when_diff src target)
   if(EXISTS "${target}")
+    # check if the file is actually different before copying
     file(READ ${src} _SRC_CONTENTS)
     file(READ ${target} _TARGET_CONTENTS)
     if(NOT _SRC_CONTENTS STREQUAL _TARGET_CONTENTS)
