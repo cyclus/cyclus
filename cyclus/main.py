@@ -10,6 +10,7 @@ from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
     set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml,
     Hdf5Back, SqliteBack, InfileTree, SimInit, XMLFileLoader, XMLFlatLoader)
+from cyclus.simstate import get_schema_path, SimState
 
 
 # ensure that Cyclus dynamic modules are closed when Python exits.
@@ -48,13 +49,8 @@ LOGO = """              :
 
 def set_schema_path(ns):
     """Sets the schema path on the namespace."""
-    if ns.flat_schema:
-        path = Env.rng_schema(True)
-    elif ns.schema_path is not None:
-        path = ns.schema_path
-    else:
-        path = Env.rng_schema(False)
-    ns.schema_path = path
+    ns.schema_path = get_schema_path(flat_schema=ns.flat_schema,
+                                     schema_path=ns.schema_path)
 
 
 class ZeroArgAction(Action):
@@ -354,42 +350,15 @@ def make_parser():
 
 def run_simulation(ns):
     """Runs the simulation when we recieve an input file."""
-    Env.set_nuc_data_path()
     print(LOGO)
-    rec = Recorder()
-    # setup database backend
-    _, ext = os.path.splitext(ns.output_path)
-    if ext == '.h5':
-        backend = Hdf5Back(ns.output_path)
-    elif ext == '.sqlite':
-        backend = SqliteBack(ns.output_path)
-    else:
-        raise RuntimeError('Backend extension type not recognised, ' +
-                           ns.output_path)
-    rec.register_backend(backend)
-    # find schema type
-    parser = XMLParser(filename=ns.input_file)
-    tree = InfileTree(parser)
-    schema_type = tree.optional_query("/simulation/schematype", "")
-    if schema_type == "flat" and not ns.flat_schema:
-        print("flat schema tag detected - switching to flat input schema",
-              file=sys.stderr)
-        ns.flat_schema = True
-    set_schema_path(ns)
-    # Load input file and initialize simulation
-    if ns.flat_schema:
-        loader = XMLFlatLoader(rec, backend, ns.schema_path, ns.input_file)
-    else:
-        loader = XMLFileLoader(rec, backend, ns.schema_path, ns.input_file)
-    loader.load_sim()
-    si = SimInit(rec, backend)
-    # run simulation and report back
-    si.timer.run_sim()
-    rec.flush()
+    state = SimState(input_file=ns.input_file, output_path=ns.output_path,
+                     schema_path=ns.schema_path, flat_schema=ns.flat_schema)
+    state.load()
+    state.run()
     msg = ("Status: Cyclus run successful!\n"
            "Output location: {0}\n"
            "Simulation ID: {1}").format(ns.output_path,
-                                        si.context.sim_id)
+                                        state.si.context.sim_id)
     print(msg)
 
 

@@ -15,7 +15,7 @@ def loop():
         return
     for action in REPEATING_ACTIONS:
         QUEUE.put(action)
-    QUEUE.join()
+    #QUEUE.join()
 
 
 async def action_consumer():
