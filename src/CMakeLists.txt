@@ -78,18 +78,22 @@ if(Cython_FOUND)
     foreach(file ${CYCLUS_CORE_CYTHON_FILES})
         message(STATUS "Cython Compiling ${file}")
         get_filename_component(name ${file} NAME_WE)
-        set(_generated_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc")
-        set_source_files_properties(${_generated_file} PROPERTIES GENERATED TRUE)
+        set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.h")
+        set(_generated_cc "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.gen")
+        set(_h_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h")
+        set(_cc_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc")
+        set_source_files_properties(${_cc_file} PROPERTIES GENERATED TRUE)
 
         EXECUTE_PROCESS(COMMAND ${CYTHON_EXECUTABLE} --cplus
             ${include_directory_arg} ${version_arg}
             ${cython_debug_arg} ${CYTHON_FLAGS}
-            --output-file  ${_generated_file} ${file}
-            #OUTPUT_VARIABLE CYTHON_OUTPUT
+            --output-file  ${_generated_cc} ${file}
             RESULT_VARIABLE res_var_c)
         IF(NOT "${res_var_c}" STREQUAL "0")
             message(FATAL_ERROR "Cython compilation of ${file} failed!")
         ENDIF()
+        copy_when_diff(${_generated_h} ${_h_file})
+        copy_when_diff(${_generated_cc} ${_cc_file})
     endforeach()
 endif(Cython_FOUND)
 ###########################################################
