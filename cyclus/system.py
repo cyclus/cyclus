@@ -1,5 +1,6 @@
 """Some system-specific info for cyclus."""
 import sys
+import queue
 import importlib
 
 from cyclus.lazyasd import lazyobject
@@ -24,6 +25,7 @@ def curio():
 @lazyobject
 def QUEUE():
     """A global queue whose tasks should be spawned."""
+    return queue.Queue()
     if hasattr(curio, 'Queue'):
         return curio.Queue()
     else:

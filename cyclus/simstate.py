@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 import os
 import atexit
 
+from cyclus.system import curio
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs, XMLParser,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
@@ -44,16 +45,17 @@ class SimState(object):
     ----------
     input_file : str
         The path to input file.
-    output_path : str
-        The path to the file system database, default 'cyclus.sqlite'.
-    memory_backend : MemBack, bool, or None
+    output_path : str or None, optional
+        The path to the file system database, default (if None) is based
+        on the input file path.
+    memory_backend : MemBack, bool, or None, optional
         An in-memory backend, if specified.
     registry : set, bool, or None, optional
         The initial registry to start the in-memory backend with. Defaults
         is True, which stores all of the tables.
-    schema_path : str or None:
+    schema_path : str or None, optional:
         The path to the cyclus master schema.
-    flat_schema : bool
+    flat_schema : bool, optional
         Whether or not to use the flat master simulation schema.
 
     Attributes
@@ -65,19 +67,26 @@ class SimState(object):
     si : SimInit or None
         The main simulation initializer object that then can be used
         to drive the simulation.
+    tasks : dict
+        A str-keyed dictionary mapping to current tasks that may be
+        shared among many actions.
     """
 
-    def __init__(self, input_file, output_path='cyclus.sqlite',
+    def __init__(self, input_file, output_path=None,
                  memory_backend=False, registry=True, schema_path=None,
                  flat_schema=False,):
         ensure_close_dynamic_modules()
         self.input_file = input_file
+        if output_path is None:
+            base, _ = os.path.splitext(os.path.basename(input_file))
+            output_path = base + '.h5'
         self.output_path = output_path
         self.memory_backend = memory_backend
         self._registry = registry
         self.flat_schema = flat_schema
         self.schema_path = schema_path
         self.rec = self.file_backend = self.si = None
+        self.tasks = {}
 
     def __del__(self):
         self.rec.flush()
@@ -143,5 +152,20 @@ class SimState(object):
 
     def run(self):
         """Starts running the simulation."""
+        import time
+        time.sleep(1)
         self.si.timer.run_sim()
         self.rec.flush()
+
+    @property
+    def send_queue(self):
+        """A queue for sending data over the TCP server. This is
+        not instantiated until it is first accessed.
+        """
+        if hasattr(curio, 'Queue'):
+            q = curio.Queue()
+        else:
+            q = None
+        self.__dict__['send_queue'] = q
+        return q
+
