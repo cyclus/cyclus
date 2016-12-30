@@ -3,7 +3,7 @@ import time
 from collections.abc import Set, Sequence
 
 from cyclus.lazyasd import lazyobject
-from cyclus.system import curio, QUEUE
+from cyclus.system import asyncio, QUEUE
 
 # The default amount of time algorithms should sleep for.
 FREQUENCY = 0.001
@@ -26,7 +26,6 @@ def loop():
         else:
             action, args = action[0], action[1:]
         QUEUE.put(action(*args))
-    #QUEUE.join()
     while 'pause' in STATE.tasks or not QUEUE.empty():
         time.sleep(FREQUENCY)
 
@@ -35,16 +34,13 @@ async def action_consumer():
     staged_tasks = []
     while True:
         while not QUEUE.empty():
-            #action = await QUEUE.get()
             action = QUEUE.get()
-            action_task = await curio.spawn(action())
+            action_task = await asyncio.ensure_future(action())
             staged_tasks.append(action_task)
-            #await QUEUE.task_done()
         else:
-            for task in staged_tasks:
-                await task.join()
+            await asyncio.wait(staged_tasks)
             staged_tasks.clear()
-        await curio.sleep(FREQUENCY)
+        await asyncio.sleep(FREQUENCY)
 
 
 def action(f):
@@ -133,7 +129,7 @@ async def send_table(table):
     else:
         data = df.to_json()
     print("Sending data: " + data)
-    await STATE.send_queue.put(data)
+    STATE.send_queue.put(data)
     #await STATE.send_queue.join()
     print("Sent data: " + data)
     #async with sock:
@@ -144,4 +140,4 @@ async def send_table(table):
 @action
 async def sleep(n=FREQUENCY):
     """Asynchronously sleeps for n seconds."""
-    await curio.sleep(n)
+    await asyncio.sleep(n)

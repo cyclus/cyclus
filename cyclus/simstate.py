@@ -1,9 +1,10 @@
 """Tools for representing and driving the simulation."""
 from __future__ import print_function, unicode_literals
 import os
+import queue
 import atexit
 
-from cyclus.system import curio
+#from cyclus.system import curio
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs, XMLParser,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
@@ -163,7 +164,7 @@ class SimState(object):
         not instantiated until it is first accessed.
         """
         if hasattr(curio, 'Queue'):
-            q = curio.Queue()
+            q = queue.Queue()
         else:
             q = None
         self.__dict__['send_queue'] = q

@@ -23,10 +23,40 @@ def curio():
 
 
 @lazyobject
+def asyncio():
+    if PY_VERSION_TUPLE < (3, 5, 0):
+        return None
+    else:
+        try:
+            return importlib.import_module('asyncio')
+        except ImportError:
+            return None
+
+
+@lazyobject
+def websockets():
+    if PY_VERSION_TUPLE < (3, 5, 0):
+        return None
+    else:
+        try:
+            return importlib.import_module('websockets')
+        except ImportError:
+            return None
+
+
+@lazyobject
+def concurrent_futures():
+    if PY_VERSION_TUPLE < (3, 2, 0):
+        return None
+    else:
+        try:
+            import concurrent.futures as m
+            return m
+        except ImportError:
+            return None
+
+
+@lazyobject
 def QUEUE():
     """A global queue whose tasks should be spawned."""
     return queue.Queue()
-    if hasattr(curio, 'Queue'):
-        return curio.Queue()
-    else:
-        return None

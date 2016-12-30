@@ -2,7 +2,7 @@
 from argparse import ArgumentParser
 
 import cyclus.events
-from cyclus.system import curio, QUEUE
+from cyclus.system import asyncio, concurrent_futures, QUEUE
 from cyclus.simstate import SimState
 from cyclus.events import (action_consumer, echo, register_tables, send_table,
     sleep)
@@ -24,7 +24,7 @@ async def cyclus_client(client, addr):
     while True:
         print("send queue size", q.qsize())
         while not q.empty():
-            data = await q.get()
+            data = q.get()
             await client.sendall(data.encode())
             #await q.task_done()
             print("send queue size", q.qsize())
@@ -36,7 +36,7 @@ async def cyclus_client(client, addr):
 
 
 async def run_sim(state):
-    await curio.run_in_thread(state.run)
+    await asyncio.run_in_thread(state.run)
 
 
 async def mainbody(state=None):
@@ -100,8 +100,15 @@ def main(args=None):
                                            output_path=ns.output_path,
                                            memory_backend=True)
     state.load()
-    curio.run(mainbody(state=state), with_monitor=True)
-    #curio.run(curio.tcp_server('localhost', 4242, mb2), with_monitor=True)
+
+    executor = concurrent_futures.ThreadPoolExecutor(max_workers=5)
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(asyncio.gather(
+            o,
+            ))
+    finally:
+        loop.close()
 
 
 if __name__ == '__main__':
