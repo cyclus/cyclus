@@ -71,6 +71,8 @@ class SimState(object):
     tasks : dict
         A str-keyed dictionary mapping to current tasks that may be
         shared among many actions.
+    send_queue : Queue or None
+        A queue of data to send from the server to the client.
     """
 
     def __init__(self, input_file, output_path=None,
@@ -163,10 +165,7 @@ class SimState(object):
         """A queue for sending data over the TCP server. This is
         not instantiated until it is first accessed.
         """
-        if hasattr(curio, 'Queue'):
-            q = queue.Queue()
-        else:
-            q = None
+        q = queue.Queue()
         self.__dict__['send_queue'] = q
         return q
 

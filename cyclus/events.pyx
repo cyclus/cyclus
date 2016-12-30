@@ -18,9 +18,10 @@ STATE = None
 
 def loop():
     """Adds tasks to the queue"""
-    if curio is None:
+    if STATE is None:
         return
     for action in REPEATING_ACTIONS:
+        print("putting", action)
         if callable(action):
             args = ()
         else:
@@ -35,11 +36,13 @@ async def action_consumer():
     while True:
         while not QUEUE.empty():
             action = QUEUE.get()
-            action_task = await asyncio.ensure_future(action())
+            print("getting", action)
+            action_task = asyncio.ensure_future(action())
             staged_tasks.append(action_task)
         else:
-            await asyncio.wait(staged_tasks)
-            staged_tasks.clear()
+            if len(staged_tasks) > 0:
+                await asyncio.wait(staged_tasks)
+                staged_tasks.clear()
         await asyncio.sleep(FREQUENCY)
 
 
@@ -62,7 +65,7 @@ async def echo(s):
 @action
 async def pause():
     """Asynchronous pause."""
-    task = await curio.sleep(1e100)
+    task = await asyncio.sleep(1e100)
     STATE.tasks['pause'] = task
 
 

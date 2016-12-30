@@ -35,8 +35,10 @@ async def cyclus_client(client, addr):
     print('Connection closed')
 
 
-async def run_sim(state):
-    await asyncio.run_in_thread(state.run)
+async def run_sim(state, loop, executor):
+    run_task = loop.run_in_executor(executor, state.run)
+    state.tasks['run'] = run_task
+    await asyncio.wait([run_task])
 
 
 async def mainbody(state=None):
@@ -64,34 +66,6 @@ async def mainbody(state=None):
     #await cons_task.cancel()
 
 
-
-async def mb2(client, addr):
-    state = cyclus.events.STATE
-
-    QUEUE.put(register_tables("Transactions"))
-    cyclus.events.REPEATING_ACTIONS.append([echo, "repeating task"])
-    cyclus.events.REPEATING_ACTIONS.append([sleep, 1])
-    cyclus.events.REPEATING_ACTIONS.append([send_table, "Transactions"])
-    cons_task = await curio.spawn(action_consumer())
-
-    run_task = await curio.spawn(run_sim(state))
-    state.tasks['run'] = run_task
-    print("started sim")
-
-    # tcp part
-    q = state.send_queue
-    print('Connection from', addr)
-    while True:
-        while not q.empty():
-            data = await q.get()
-            await client.sendall(data)
-            await q.task_done()
-        #data = await client.recv(1000)
-        #if not data:
-        #    break
-    print('Connection closed')
-
-
 def main(args=None):
     """Main cyclus server entry point."""
     p = make_parser()
@@ -101,11 +75,15 @@ def main(args=None):
                                            memory_backend=True)
     state.load()
 
-    executor = concurrent_futures.ThreadPoolExecutor(max_workers=5)
+    cyclus.events.REPEATING_ACTIONS.append([echo, "repeating task"])
+    cyclus.events.REPEATING_ACTIONS.append([sleep, 1])
+    cyclus.events.REPEATING_ACTIONS.append([send_table, "Transactions"])
+    executor = concurrent_futures.ThreadPoolExecutor(max_workers=16)
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(asyncio.gather(
-            o,
+            asyncio.ensure_future(run_sim(state, loop, executor)),
+            asyncio.ensure_future(action_consumer()),
             ))
     finally:
         loop.close()
