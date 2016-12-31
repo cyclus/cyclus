@@ -117,30 +117,19 @@ async def deregister_tables(tables):
 @action
 async def send_table(table):
     """Sends all table data in JSON format."""
-    #sock = STATE.sock
-    #if sock is None:
-    #    address = (host, port)
-    #    sock = curio.socket.socket(curio.socket.AF_INET, curio.socket.SOCK_STREAM)
-    #    sock.setsockopt(curio.socket.SOL_SOCKET, curio.socket.SO_REUSEADDR, 1)
-    #    sock.bind(address)
-    #    sock.listen(5)
-    #    STATE.sock = sock
-    #print('Server listening at', address)
+    print("tables", STATE.memory_backend.tables)
+    print("registry", STATE.memory_backend.registry)
     df = STATE.memory_backend.query(table)
+    print("yo, df", df)
     if df is None:
         data = '"{} is not available."'.format(table)
     else:
-        data = df.to_json()
-    print("Sending data: " + data)
-    #put_task = asyncio.ensure_future(STATE.send_queue.put(data))
-    #await asyncio.wait([put_task])
-    STATE.send_queue.put_nowait(data)
-    print("Sent data: " + data)
-    #await STATE.send_queue.join()
+        print("about to convert to JSON")
+        data = df.to_json(default_handler=str, orient='split')
+    print("Sending data: ", data)
+    await STATE.send_queue.put(data)
+    print("Sent data: ", data)
     print("sending queue size: ", STATE.send_queue.qsize())
-    #async with sock:
-    #    client, addr = await sock.accept()
-    #    await client.sendall(data)
 
 
 @action

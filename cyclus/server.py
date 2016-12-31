@@ -17,24 +17,6 @@ def make_parser():
     return p
 
 
-async def cyclus_client(client, addr):
-    state = cyclus.events.STATE
-    q = state.send_queue
-    print('Connection from', addr)
-    while True:
-        print("send queue size", q.qsize())
-        while not q.empty():
-            data = q.get()
-            await client.sendall(data.encode())
-            #await q.task_done()
-            print("send queue size", q.qsize())
-        data = await client.recv(100)
-        print(data)
-        #if not data:
-        #    break
-    print('Connection closed')
-
-
 async def run_sim(state, loop, executor):
     """Runs a cyclus simulation in an executor, which should be on another
     thread.
@@ -96,42 +78,6 @@ async def websocket_handler(websocket, path):
             send_task.cancel()
 
 
-async def websockets_server(loop, executor):
-    """Runs a cyclus simulation in an executor, which should be on another
-    thread.
-    """
-    #serv_task = loop.run_in_executor(executor, websockets.serve,
-    #                                 websocket_handler, 'localhost', 4242)
-    #await asyncio.wait([serv_task])
-    #server = websockets.serve(websocket_handler, 'localhost', 4242)
-    #return server
-
-
-async def mainbody(state=None):
-    """Main cyclus server entry point."""
-    if state is None:
-        state = cyclus.events.STATE
-    #await QUEUE.put(register_tables("Transactions"))
-    #QUEUE.put(register_tables("Transactions"))
-    cyclus.events.REPEATING_ACTIONS.append([echo, "repeating task"])
-    cyclus.events.REPEATING_ACTIONS.append([sleep, 1])
-    cyclus.events.REPEATING_ACTIONS.append([send_table, "Transactions"])
-    cons_task = await curio.spawn(action_consumer())
-    #cons_task = await curio.run_in_thread(action_consumer)
-    #run_task = await curio.run_in_thread(run_sim, state)
-    tcp_task = await curio.spawn(curio.tcp_server('localhost', 4242,
-                                                  cyclus_client), daemon=True)
-    print("started tcp")
-    #run_task = await curio.run_in_thread(state.run)
-    run_task = await curio.spawn(run_sim(state))
-    state.tasks['run'] = run_task
-    print("started sim")
-    #cons_task.join()
-    #run_task.join()
-    #await QUEUE.put(echo("yo"))
-    #await cons_task.cancel()
-
-
 def main(args=None):
     """Main cyclus server entry point."""
     p = make_parser()
@@ -146,9 +92,11 @@ def main(args=None):
     logger.setLevel(logging.ERROR)
     logger.addHandler(logging.StreamHandler())
 
+    #QUEUE.put(register_tables("Compositions"))
     cyclus.events.REPEATING_ACTIONS.append([echo, "repeating task"])
     cyclus.events.REPEATING_ACTIONS.append([sleep, 1])
-    cyclus.events.REPEATING_ACTIONS.append([send_table, "Transactions"])
+    cyclus.events.REPEATING_ACTIONS.append([send_table, "Compositions"])
+    #cyclus.events.REPEATING_ACTIONS.append([send_table, "WAKKA"])
     executor = concurrent_futures.ThreadPoolExecutor(max_workers=16)
     loop = asyncio.get_event_loop()
     server = websockets.serve(websocket_handler, 'localhost', 4242)
@@ -156,7 +104,6 @@ def main(args=None):
         loop.run_until_complete(asyncio.gather(
             asyncio.ensure_future(run_sim(state, loop, executor)),
             asyncio.ensure_future(action_consumer()),
-            #asyncio.ensure_future(websockets_server(loop, executor)),
             asyncio.ensure_future(server),
             ))
     finally:
