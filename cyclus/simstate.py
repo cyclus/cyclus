@@ -90,6 +90,7 @@ class SimState(object):
         self.schema_path = schema_path
         self.rec = self.file_backend = self.si = None
         self.tasks = {}
+        self._send_queue = None
 
     def __del__(self):
         self.rec.flush()
@@ -165,7 +166,12 @@ class SimState(object):
         """A queue for sending data over the TCP server. This is
         not instantiated until it is first accessed.
         """
-        q = queue.Queue()
-        self.__dict__['send_queue'] = q
-        return q
+        if self._send_queue is None:
+            from cyclus.system import asyncio
+            print("!!!! making new send queue")
+            q = asyncio.Queue()
+            #q = queue.Queue()
+            #self.__dict__['send_queue'] = q
+            self._send_queue = q
+        return self._send_queue
 

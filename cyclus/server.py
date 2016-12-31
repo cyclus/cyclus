@@ -44,7 +44,7 @@ async def run_sim(state, loop, executor):
     await asyncio.wait([run_task])
 
 
-async def get_send_data(future):
+async def get_send_data():
     """Asynchronously grabs the next data to send from the queue."""
     print("gsd-0")
     f = cyclus.events.FREQUENCY
@@ -54,14 +54,15 @@ async def get_send_data(future):
     q = state.send_queue
     print("gsd-3")
     print("seend_q size", q.qsize())
-    while q.empty():
-        await asyncio.sleep(f)
-    print("gsd-5")
-    data = q.get()
+    #while q.empty():
+    #    await asyncio.sleep(f)
+    #print("gsd-5")
+    #data = q.get()
+    data = await state.send_queue.get()
     #return data
     print("gsd-6")
-    future.set_result(data)
     print("gsd-7")
+    return data
 
 
 async def websocket_handler(websocket, path):
@@ -70,8 +71,7 @@ async def websocket_handler(websocket, path):
     while True:
         print(1)
         recv_task = asyncio.ensure_future(websocket.recv())
-        send_future = asyncio.Future()
-        send_task = asyncio.ensure_future(get_send_data(send_future))
+        send_task = asyncio.ensure_future(get_send_data())
         print(2)
         done, pending = await asyncio.wait([recv_task, send_task],
                                            return_when=asyncio.FIRST_COMPLETED)
@@ -94,6 +94,17 @@ async def websocket_handler(websocket, path):
         else:
             print("ws: not sending data")
             send_task.cancel()
+
+
+async def websockets_server(loop, executor):
+    """Runs a cyclus simulation in an executor, which should be on another
+    thread.
+    """
+    #serv_task = loop.run_in_executor(executor, websockets.serve,
+    #                                 websocket_handler, 'localhost', 4242)
+    #await asyncio.wait([serv_task])
+    #server = websockets.serve(websocket_handler, 'localhost', 4242)
+    #return server
 
 
 async def mainbody(state=None):
@@ -140,11 +151,12 @@ def main(args=None):
     cyclus.events.REPEATING_ACTIONS.append([send_table, "Transactions"])
     executor = concurrent_futures.ThreadPoolExecutor(max_workers=16)
     loop = asyncio.get_event_loop()
-    server = websockets.serve(websocket_handler, 'localhost', 4242, loop=loop)
+    server = websockets.serve(websocket_handler, 'localhost', 4242)
     try:
         loop.run_until_complete(asyncio.gather(
             asyncio.ensure_future(run_sim(state, loop, executor)),
             asyncio.ensure_future(action_consumer()),
+            #asyncio.ensure_future(websockets_server(loop, executor)),
             asyncio.ensure_future(server),
             ))
     finally:

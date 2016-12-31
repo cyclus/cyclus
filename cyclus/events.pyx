@@ -132,9 +132,11 @@ async def send_table(table):
     else:
         data = df.to_json()
     print("Sending data: " + data)
-    STATE.send_queue.put(data)
-    #await STATE.send_queue.join()
+    #put_task = asyncio.ensure_future(STATE.send_queue.put(data))
+    #await asyncio.wait([put_task])
+    STATE.send_queue.put_nowait(data)
     print("Sent data: " + data)
+    #await STATE.send_queue.join()
     print("sending queue size: ", STATE.send_queue.qsize())
     #async with sock:
     #    client, addr = await sock.accept()
