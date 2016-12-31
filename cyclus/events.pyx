@@ -135,6 +135,7 @@ async def send_table(table):
     STATE.send_queue.put(data)
     #await STATE.send_queue.join()
     print("Sent data: " + data)
+    print("sending queue size: ", STATE.send_queue.qsize())
     #async with sock:
     #    client, addr = await sock.accept()
     #    await client.sendall(data)
