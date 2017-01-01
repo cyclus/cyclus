@@ -1,11 +1,82 @@
-"""An asyncronous cyclus server."""
+"""An asyncronous cyclus server that provides as JSON API over websockets.
+
+The webserver has a number of 'events' that it may send or recieve. These
+in turn affect how a cyclus simulation runs.
+
+The server, which operates both asynchronously and in parallel, has three
+top-level tasks which it manages:
+
+* The cyclus simulation object, run on a separate thread,
+* A action consumer, which executes actions that have been queued either
+  by the cyclus simulation or the user,
+* A websockets server that sends and recieves JSON-formatted events from
+  the client.
+
+For purposes of this document, the following terminology is used:
+
+**event:** A JSON object / dictionary that contains behaviour instructions.
+
+**message:** The string form of an event.
+
+**action:** A delayed asynchronous coroutine function that carries out the
+behaviour specified in a cooresponding event. These do the actual work of
+the event system.
+
+**repeating action:** An action coroutine function (or event name) or a list
+of the  coroutine function and arguments that is added to the action queue
+each time step of the simulation. This enables pausing each time step,
+streaming table data, etc.
+
+**task:** A future object that resulsts from calling an action. See
+asyncio for more details.
+
+
+Events
+======
+Events are JSON-formatted strings that represent JSON-objects (dicts) at
+their top-most level. All events must have an "event" key whose value is
+the string name that distinguishes the event from all other kinds of events.
+
+Often times, events may have parameters that they send/recieve. These live
+in the "params" key as a JSON object / dict.
+
+Events maybe conceptually divided into server-sent and client-sent events.
+
+Server Events
+-------------
+Server-sent event are those that the server sends to the client. These are
+often repsonse to requests for data about the state of the simulation.
+They typically contain a "data" key which holds data about the simulation
+state. They may also have a "success" key, whose value is true/false, that
+specifies whether the data was able to be computed.
+
+**registry:** The in-memory backend regsty value in its current form::
+
+    {"event": "registry",
+     "params": {},
+     "data": ["table0", "table1", ...]
+    }
+
+Client Events
+-------------
+Client events are often requests originating from users. They may either
+express a request for behaviour (pause the simulation, restart, etc.) or
+a request for data. These events may or may not have additional parameters,
+depending on the type of request.
+
+**registry_request:** A simple reqest for the in-memory backend regsitry::
+
+    {"event": "registry_request"}
+
+"""
+import json
 from argparse import ArgumentParser
 
 import cyclus.events
 from cyclus.system import asyncio, concurrent_futures, websockets
 from cyclus.simstate import SimState
 from cyclus.events import (action_consumer, echo, register_tables, send_table,
-    sleep)
+    sleep, send_registry_action, EVENT_ACTIONS)
 
 
 def make_parser():
@@ -34,34 +105,33 @@ async def get_send_data():
     return data
 
 
+async def queue_message_action(message):
+    state = cyclus.events.STATE
+    event = json.loads(message)
+    params = event.get("params", {})
+    kind = event["event"]
+    action = EVENT_ACTIONS[kind]
+    state.action_queue.put(action(**params))
+
+
 async def websocket_handler(websocket, path):
     """Sends and recieves data via a websocket."""
-    print(0)
     while True:
-        print(1)
         recv_task = asyncio.ensure_future(websocket.recv())
         send_task = asyncio.ensure_future(get_send_data())
-        print(2)
         done, pending = await asyncio.wait([recv_task, send_task],
                                            return_when=asyncio.FIRST_COMPLETED)
-        print("done", done)
-        print("pending", pending)
         # handle incoming
-        print("recv_task", recv_task)
         if recv_task in done:
             message = recv_task.result()
-            #await consumer(message)
-            print(message)
+            await queue_message_action(message)
         else:
             recv_task.cancel()
         # handle sending of data
-        print("send_task", send_task)
         if send_task in done:
-            data = send_task.result()
-            print("ws: sending data", data)
-            await websocket.send(data)
+            message = send_task.result()
+            await websocket.send(message)
         else:
-            print("ws: not sending data")
             send_task.cancel()
 
 
@@ -82,7 +152,7 @@ def main(args=None):
     #QUEUE.put(register_tables("Compositions"))
     state.repeating_actions.append([echo, "repeating task"])
     state.repeating_actions.append([sleep, 1])
-    state.repeating_actions.append([send_table, "Compositions"])
+    state.repeating_actions.append([send_table, "TimeSeriesPower"])
     executor = concurrent_futures.ThreadPoolExecutor(max_workers=16)
     loop = asyncio.get_event_loop()
     server = websockets.serve(websocket_handler, 'localhost', 4242)

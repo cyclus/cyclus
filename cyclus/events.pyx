@@ -100,6 +100,11 @@ async def send_registry():
 
 
 @action
+async def send_registry_action():
+    await send_registry()
+
+
+@action
 async def register_tables(tables):
     """Add table names to the in-memory backend registry. The lone
     argument here may either be a str (single table), or a set or sequence
@@ -168,3 +173,9 @@ async def send_table(table, conds=None, orient='split'):
 async def sleep(n):
     """Asynchronously sleeps for n seconds."""
     await asyncio.sleep(n)
+
+
+EVENT_ACTIONS = {
+    "registry_request": send_registry_action,
+    "sleep": sleep,
+    }
