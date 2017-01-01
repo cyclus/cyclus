@@ -1,6 +1,5 @@
 """Some system-specific info for cyclus."""
 import sys
-import queue
 import importlib
 
 from cyclus.lazyasd import lazyobject
@@ -55,8 +54,3 @@ def concurrent_futures():
         except ImportError:
             return None
 
-
-@lazyobject
-def QUEUE():
-    """A global queue whose tasks should be spawned."""
-    return queue.Queue()

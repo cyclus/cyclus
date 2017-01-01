@@ -58,6 +58,12 @@ class SimState(object):
         The path to the cyclus master schema.
     flat_schema : bool, optional
         Whether or not to use the flat master simulation schema.
+    frequency : int or float, optional
+        The amount of time [sec] to sleep for in tight loops, default 1 ms.
+    repeating_actions : list or None, optional
+        A list of actions that should be added to the queue at the start of
+        each timestep when the cyclus.events.loop() is called. If this is
+        None, a new empty list is instantiated.
 
     Attributes
     ----------
@@ -71,13 +77,15 @@ class SimState(object):
     tasks : dict
         A str-keyed dictionary mapping to current tasks that may be
         shared among many actions.
-    send_queue : Queue or None
+    send_queue : asyncio.Queue or None
         A queue of data to send from the server to the client.
+    action_queue : queue.Queue or None
+        A queue for pending actions to be loaded to popped from.
     """
 
     def __init__(self, input_file, output_path=None,
                  memory_backend=False, registry=True, schema_path=None,
-                 flat_schema=False,):
+                 flat_schema=False, frequency=0.001, repeating_actions=None):
         ensure_close_dynamic_modules()
         self.input_file = input_file
         if output_path is None:
@@ -88,9 +96,12 @@ class SimState(object):
         self._registry = registry
         self.flat_schema = flat_schema
         self.schema_path = schema_path
+        self.frequency = frequency
+        self.repeating_actions = [] if repeating_actions is None \
+                                    else repeating_actions
         self.rec = self.file_backend = self.si = None
         self.tasks = {}
-        self._send_queue = None
+        self._send_queue = self._action_queue = None
 
     def __del__(self):
         self.rec.flush()
@@ -169,9 +180,12 @@ class SimState(object):
         if self._send_queue is None:
             from cyclus.system import asyncio
             print("!!!! making new send queue")
-            q = asyncio.Queue()
-            #q = queue.Queue()
-            #self.__dict__['send_queue'] = q
-            self._send_queue = q
+            self._send_queue = asyncio.Queue()
         return self._send_queue
 
+    @property
+    def action_queue(self):
+        """A queue for pending actions."""
+        if self._action_queue is None:
+            self._action_queue = queue.Queue()
+        return self._action_queue

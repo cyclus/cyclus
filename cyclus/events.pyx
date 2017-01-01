@@ -1,17 +1,11 @@
 from __future__ import unicode_literals, print_function
 import time
 import json
+from functools import wraps
 from collections.abc import Set, Sequence
 
 from cyclus.lazyasd import lazyobject
-from cyclus.system import asyncio, QUEUE
-
-# The default amount of time algorithms should sleep for.
-FREQUENCY = 0.001
-
-# A list of actions that should be added to the queue at the start of
-# each timestep, when the loop() is called.
-REPEATING_ACTIONS = []
+from cyclus.system import asyncio
 
 # A SimState instance representing the current simuation.
 STATE = None
@@ -21,22 +15,22 @@ def loop():
     """Adds tasks to the queue"""
     if STATE is None:
         return
-    for action in REPEATING_ACTIONS:
+    for action in STATE.repeating_actions:
         print("putting", action)
         if callable(action):
             args = ()
         else:
             action, args = action[0], action[1:]
-        QUEUE.put(action(*args))
-    while 'pause' in STATE.tasks or not QUEUE.empty():
-        time.sleep(FREQUENCY)
+        STATE.action_queue.put(action(*args))
+    while 'pause' in STATE.tasks or not STATE.action_queue.empty():
+        time.sleep(STATE.frequency)
 
 
 async def action_consumer():
     staged_tasks = []
     while True:
-        while not QUEUE.empty():
-            action = QUEUE.get()
+        while not STATE.action_queue.empty():
+            action = STATE.action_queue.get()
             print("getting", action)
             action_task = asyncio.ensure_future(action())
             staged_tasks.append(action_task)
@@ -44,11 +38,12 @@ async def action_consumer():
             if len(staged_tasks) > 0:
                 await asyncio.wait(staged_tasks)
                 staged_tasks.clear()
-        await asyncio.sleep(FREQUENCY)
+        await asyncio.sleep(STATE.frequency)
 
 
 def action(f):
     """Decorator for declaring async functions as actions."""
+    @wraps
     def dec(*args, **kwargs):
         async def bound():
             rtn = await f(*args, **kwargs)
@@ -153,6 +148,7 @@ async def send_table(table, conds=None, orient='split'):
          "params": {...}
          "data": {...}
          }
+
     """
     df = STATE.memory_backend.query(table, conds=conds)
     if df is None:
@@ -169,6 +165,6 @@ async def send_table(table, conds=None, orient='split'):
 
 
 @action
-async def sleep(n=FREQUENCY):
+async def sleep(n):
     """Asynchronously sleeps for n seconds."""
     await asyncio.sleep(n)
