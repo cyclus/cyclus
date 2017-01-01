@@ -43,7 +43,7 @@ async def action_consumer():
 
 def action(f):
     """Decorator for declaring async functions as actions."""
-    @wraps
+    @wraps(f)
     def dec(*args, **kwargs):
         async def bound():
             rtn = await f(*args, **kwargs)

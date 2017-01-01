@@ -2,7 +2,7 @@
 from argparse import ArgumentParser
 
 import cyclus.events
-from cyclus.system import asyncio, concurrent_futures, websockets, QUEUE
+from cyclus.system import asyncio, concurrent_futures, websockets
 from cyclus.simstate import SimState
 from cyclus.events import (action_consumer, echo, register_tables, send_table,
     sleep)
