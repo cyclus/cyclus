@@ -28,22 +28,10 @@ async def run_sim(state, loop, executor):
 
 async def get_send_data():
     """Asynchronously grabs the next data to send from the queue."""
-    print("gsd-0")
     f = cyclus.events.FREQUENCY
-    print("gsd-1")
     state = cyclus.events.STATE
-    print("gsd-2")
     q = state.send_queue
-    print("gsd-3")
-    print("seend_q size", q.qsize())
-    #while q.empty():
-    #    await asyncio.sleep(f)
-    #print("gsd-5")
-    #data = q.get()
     data = await state.send_queue.get()
-    #return data
-    print("gsd-6")
-    print("gsd-7")
     return data
 
 
@@ -96,7 +84,6 @@ def main(args=None):
     cyclus.events.REPEATING_ACTIONS.append([echo, "repeating task"])
     cyclus.events.REPEATING_ACTIONS.append([sleep, 1])
     cyclus.events.REPEATING_ACTIONS.append([send_table, "Compositions"])
-    #cyclus.events.REPEATING_ACTIONS.append([send_table, "WAKKA"])
     executor = concurrent_futures.ThreadPoolExecutor(max_workers=16)
     loop = asyncio.get_event_loop()
     server = websockets.serve(websocket_handler, 'localhost', 4242)
