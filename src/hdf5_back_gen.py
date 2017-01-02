@@ -349,7 +349,7 @@ for row in range(len(RAW_TABLE)):
 TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:TABLE_END+1])
 
 CANON_TO_NODE = {}
-CANON_SET = set()
+CANON_TYPES = []
 DB_TO_CPP = {}
 CANON_TO_DB = {}
 DB_TO_VL = {}
@@ -377,7 +377,8 @@ for row in TYPES_TABLE:
         db = row[1]
         cpp = row[2]
         canon = convert_canonical(row[7])
-        CANON_SET.add(canon)
+        if canon not in CANON_TYPES:
+            CANON_TYPES.append(canon)
         DB_TO_CPP[db] = cpp
         CANON_TO_DB[canon] = db
         CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
@@ -1613,7 +1614,7 @@ def main_query():
     """HDF5 Query: Generate Query case statement code."""
     CPPGEN = CppGen()
     output = ""
-    for type in CANON_SET:
+    for type in CANON_TYPES:
         type_node = CANON_TO_NODE[type]
         setup = get_setup(type_node)
         body = get_body(type_node)
@@ -1648,7 +1649,9 @@ def main_create():
     CPPGEN = CppGen()
     output = ""
         
-    outer_if_bodies = {n: Block(nodes=[]) for n in VARIATION_DICT.keys()}
+    outer_if_bodies = OrderedDict()
+    for n in VARIATION_DICT.keys():
+        outer_if_bodies[n] = Block(nodes=[])
     
     for n in VARIATION_DICT.keys():
         variations = VARIATION_DICT[n][:]
@@ -1718,7 +1721,7 @@ def main_fill_buf():
     """HDF5 FILL_BUF: Generates the FillBuf function code."""
     CPPGEN = CppGen()
     output = ""
-    for i in CANON_SET:
+    for i in CANON_TYPES:
         node = CANON_TO_NODE[i]
         write_to_buf = FuncCall(name=Var(name="WriteToBuf"), 
                                 targs=[Raw(code=node.db)],
@@ -2254,7 +2257,7 @@ def main_write():
     """HDF5 Write: Generate the WriteToBuf templated function definitions."""
     CPPGEN = CppGen()
     output = ""
-    for i in CANON_SET:
+    for i in CANON_TYPES:
         block = Block(nodes=[])
         t = CANON_TO_NODE[i]
         node = FuncDef(type=Raw(code="void"), 
@@ -2274,8 +2277,8 @@ def main_write():
     return output
 
 NOT_VL = []
-VARIATION_DICT = {}
-ORIGIN_DICT = {}
+VARIATION_DICT = OrderedDict()
+ORIGIN_DICT = OrderedDict()
 
 MAIN_DISPATCH = {"QUERY": main_query,
                  "CREATE": main_create,
@@ -2285,8 +2288,6 @@ MAIN_DISPATCH = {"QUERY": main_query,
 
 def main():
     global NOT_VL
-    global VARIATION_DICT
-    global ORIGIN_DICT
     try:
         gen_instruction = sys.argv[1]
     except:
@@ -2294,12 +2295,15 @@ def main():
     
     # Setup for global util dictionaries
     
-    fixed_length_types = set(t for t in CANON_SET if no_vl(CANON_TO_NODE[t]))
+    fixed_length_types = []
+    for n in CANON_TYPES:
+        if no_vl(CANON_TO_NODE[n]) and n not in fixed_length_types:
+            fixed_length_types.append(n)
     
     for n in fixed_length_types:
         key = CANON_TO_NODE[n]
         vals = []
-        for x in CANON_SET:
+        for x in CANON_TYPES:
             val_node = CANON_TO_NODE[x]
             if val_node.cpp == key.cpp and val_node.db != key.db: 
                 vals.append(val_node)
