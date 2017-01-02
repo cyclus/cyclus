@@ -6,8 +6,9 @@ from libcpp.utility cimport pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 
+from . cimport cpp_jsoncpp
 from .cpp_typesystem cimport DbTypes
-
+from .cpp_stringstream cimport stringstream
 
 cdef extern from "cyclus.h" namespace "boost::spirit":
 
@@ -132,9 +133,187 @@ cdef extern from "dynamic_module.h" namespace "cyclus":
         std_string agent() except +
         std_string alias() except +
 
+cdef extern from "env.h" namespace "cyclus":
+
+    cdef cppclass Env:
+        @staticmethod
+        std_string PathBase(std_string) except +
+        @staticmethod
+        const std_string GetInstallPath() except +
+        @staticmethod
+        const std_string GetBuildPath() except +
+        @staticmethod
+        std_string GetEnv(std_string) except +
+        @staticmethod
+        const std_string nuc_data() except +
+        @staticmethod
+        const std_string rng_schema() except +
+        @staticmethod
+        const std_string rng_schema(cpp_bool) except +
+        @staticmethod
+        const vector[std_string] cyclus_path() except +
+        @staticmethod
+        const cpp_bool allow_milps() except +
+        @staticmethod
+        const std_string EnvDelimiter() except +
+        @staticmethod
+        const std_string PathDelimiter() except +
+        @staticmethod
+        const void SetNucDataPath() except +
+        @staticmethod
+        const void SetNucDataPath(std_string) except +
+        @staticmethod
+        std_string FindModule(std_string) except +
+
+cdef extern from "logger.h" namespace "cyclus":
+
+    cdef enum LogLevel:
+        LEV_ERROR
+        LEV_WARN
+        LEV_INFO1
+        LEV_INFO2
+        LEV_INFO3
+        LEV_INFO4
+        LEV_INFO5
+        LEV_DEBUG1
+        LEV_DEBUG2
+        LEV_DEBUG3
+        LEV_DEBUG4
+        LEV_DEBUG5
+
+    cdef cppclass Logger:
+        Logger() except +
+        @staticmethod
+        LogLevel& ReportLevel() except +
+        @staticmethod
+        void SetReportLevel(LogLevel) except +
+        @staticmethod
+        cpp_bool& NoAgent() except +
+        @staticmethod
+        void SetNoAgent(cpp_bool) except +
+        @staticmethod
+        cpp_bool& NoMem() except +
+        @staticmethod
+        void SetNoMem(cpp_bool) except +
+        @staticmethod
+        LogLevel ToLogLevel(std_string) except +
+        @staticmethod
+        std_string ToString(LogLevel) except +
+
+
+cdef extern from "error.h" namespace "cyclus":
+
+    cdef unsigned int warn_limit
+    cdef cpp_bool warn_as_error
+
+
+cdef extern from "pyhooks.h" namespace "cyclus":
+
+    cdef void PyInitHooks() except +
+
+
+cdef extern from "xml_file_loader.h" namespace "cyclus":
+
+    cdef void LoadStringstreamFromFile(stringstream&, std_string)
+    cdef std_string LoadStringFromFile(std_string)
+
+    cdef cppclass XMLFileLoader:
+        XMLFileLoader(Recorder*, QueryableBackend*, std_string) except +
+        XMLFileLoader(Recorder*, QueryableBackend*, std_string,
+                      const std_string) except +
+        void LoadSim() except +
+
+
+cdef extern from "xml_flat_loader.h" namespace "cyclus":
+
+    cdef cppclass XMLFlatLoader(XMLFileLoader):
+        XMLFlatLoader(Recorder*, QueryableBackend*, std_string) except +
+        XMLFlatLoader(Recorder*, QueryableBackend*, std_string,
+                      const std_string) except +
+
+
+cdef extern from "xml_parser.h" namespace "cyclus":
+
+    cdef cppclass XMLParser:
+        XMLParser() except +
+        void Init(const stringstream) except +
+        void Init(const std_string) except +
+
+
+cdef extern from "infile_tree.h" namespace "cyclus":
+
+    cdef cppclass InfileTree:
+        InfileTree(XMLParser&) except +
+
+    T OptionalQuery[T](InfileTree*, std_string, T) except +
+
+
+cdef extern from "timer.h" namespace "cyclus":
+
+    cdef cppclass Timer:
+        Timer() except +
+        void RunSim() except +
+
+
+cdef extern from "sim_init.h" namespace "cyclus":
+
+    cdef cppclass SimInit:
+        SimInit() except +
+        void Init(Recorder*, QueryableBackend*) except +
+        Timer* timer() except +
+        Context* context() except +
+
+
+cdef extern from "agent.h" namespace "cyclus":
+
+    cdef cppclass Agent:
+        Agent(Context*) except +
+        std_string schema() except +
+        std_string version() except +
+        cpp_jsoncpp.Value annotations() except +
+
+
+cdef extern from "dynamic_module.h" namespace "cyclus":
+
     cdef cppclass DynamicModule:
         DynamicModule() except +
+        @staticmethod
+        Agent* Make(Context*, AgentSpec) except +
         cpp_bool Exists(AgentSpec) except +
         void CloseAll() except +
         std_string path() except +
+
+
+cdef extern from "version.h" namespace "cyclus::version":
+
+    const char* describe() except +
+    const char* core() except +
+    const char* boost() except +
+    const char* sqlite3() except +
+    const char* hdf5() except +
+    const char* xml2() except +
+    const char* xmlpp() except +
+    const char* coincbc() except +
+    const char* coinclp() except +
+
+
+cdef extern from "context.h" namespace "cyclus":
+
+    cdef cppclass Context:
+        Context(Timer*, Recorder*) except +
+        void DelAgent(Agent*) except +
+        uuid sim_id() except +
+
+
+cdef extern from "discovery.h" namespace "cyclus":
+
+    cdef set[std_string] DiscoverSpecs(std_string, std_string) except +
+    cdef set[std_string] DiscoverSpecsInCyclusPath() except +
+    cdef cpp_jsoncpp.Value DiscoverMetadataInCyclusPath() except +
+
+
+cdef extern from "toolkit/infile_converters.h" namespace "cyclus::toolkit":
+
+    cdef std_string JsonToXml(std_string) except +
+    cdef std_string XmlToJson(std_string) except +
 

@@ -3,9 +3,10 @@
 #include <gtest/gtest.h>
 
 #include "cyclus.h"
+#include "pyhooks.h"
+#include "sim_init.h"
 #include "xml_file_loader.h"
 #include "xml_flat_loader.h"
-#include "sim_init.h"
 
 using pyne::nucname::id;
 namespace fs = boost::filesystem;
@@ -41,6 +42,7 @@ std::string FullPath(std::string infile) {
 // RunSim runs the cyclus input file at path infile
 // storing the results in back.
 void RunSim(std::string infile, SqliteBack* back) {
+  PyStart();
   Recorder r;
   r.RegisterBackend(back);
 
@@ -56,6 +58,7 @@ void RunSim(std::string infile, SqliteBack* back) {
   si.Init(&r, back);
   si.timer()->RunSim();
   r.Flush();
+  PyStop();
 }
 
 TEST(IntegTests, RunAllInfiles) {

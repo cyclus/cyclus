@@ -21,10 +21,17 @@ import numpy as np
 import pandas as pd
 
 # local imports
+
+from cyclus cimport cpp_jsoncpp
+from cyclus cimport jsoncpp
+from cyclus import jsoncpp
+
 from cyclus cimport cpp_cyclus
 from cyclus cimport cpp_typesystem
+from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
-    str_py_to_cpp, std_string_to_py
+    str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
+    bool_to_py, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py
 
 
 # startup numpy
@@ -420,6 +427,30 @@ cdef class _DynamicModule:
     def __dealloc__(self):
         del self.ptx
 
+    @staticmethod
+    def make(ctx, spec):
+        """Returns a newly constructed agent for the given module spec.
+
+        Paramters
+        ---------
+        ctx : Context
+        spec : AgentSpec or str
+
+        Returns
+        -------
+        rtn : Agent
+        """
+        cdef _Agent agent = Agent()
+        cdef _AgentSpec cpp_spec
+        if isinstance(spec, str):
+            spec = AgentSpec(spec)
+        cpp_spec = <_AgentSpec> spec
+        agent.ptx = cpp_cyclus.DynamicModule.Make(
+            (<_Context> ctx).ptx,
+            deref(cpp_spec.ptx),
+            )
+        return agent
+
     def exists(self, _AgentSpec spec):
         """Tests whether an agent spec exists."""
         cdef cpp_bool rtn = self.ptx.Exists(deref(spec.ptx))
@@ -438,3 +469,724 @@ cdef class _DynamicModule:
 
 class DynamicModule(_DynamicModule):
     """Dynamic Module wrapper class."""
+
+
+#
+# Env
+#
+cdef class _Env:
+
+    @staticmethod
+    def path_base(path):
+        """Effectively basename"""
+        cdef std_string cpp_path = str_py_to_cpp(path)
+        cdef std_string cpp_rtn = cpp_cyclus.Env.PathBase(cpp_path)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def install_path(self):
+        """The Cyclus install path."""
+        cdef std_string cpp_rtn = cpp_cyclus.Env.GetInstallPath()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def build_path(self):
+        """The Cyclus build path."""
+        cdef std_string cpp_rtn = cpp_cyclus.Env.GetBuildPath()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @staticmethod
+    def get(var):
+        """Obtains an environment variable."""
+        cdef std_string cpp_var = str_py_to_cpp(var)
+        cdef std_string cpp_rtn = cpp_cyclus.Env.GetEnv(cpp_var)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def nuc_data(self):
+        """The nuc_data path."""
+        cdef std_string cpp_rtn = cpp_cyclus.Env.nuc_data()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @staticmethod
+    def set_nuc_data_path(path=None):
+        """Initializes the path to the cyclus_nuc_data.h5 file
+
+        By default, it is assumed to be located in the path given by
+        GetInstallPath()/share; however, paths in environment variable
+        CYCLUS_NUC_DATA are checked first.
+        """
+        cdef std_string cpp_path
+        if path is None:
+            cpp_cyclus.Env.SetNucDataPath(cpp_cyclus.Env.nuc_data())
+        else:
+            cpp_path = str_py_to_cpp(path)
+            cpp_cyclus.Env.SetNucDataPath(cpp_path)
+
+    @staticmethod
+    def rng_schema(flat=False):
+        """Returns the current rng schema.  Uses CYCLUS_RNG_SCHEMA env var
+        if set; otherwise uses the default install location. If using the
+        default ocation, set flat=True for the default flat schema.
+        """
+        cdef std_string cpp_rtn = cpp_cyclus.Env.rng_schema(flat)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def cyclus_path(self):
+        """A tuple of strings representing where cyclus searches for
+        modules.
+        """
+        cdef std_vector[std_string] cpp_rtn = cpp_cyclus.Env.cyclus_path()
+        rtn = std_vector_std_string_to_py(cpp_rtn)
+        return tuple(rtn)
+
+    @property
+    def allow_milps(self):
+        """whether or not Cyclus should allow Mixed-Integer Linear Programs
+        The default depends on a compile time option DEFAULT_ALLOW_MILPS, but
+        may be specified at run time with the ALLOW_MILPS environment variable.
+        """
+        cdef cpp_bool cpp_rtn = cpp_cyclus.Env.allow_milps()
+        rtn = bool_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def env_delimiter(self):
+        """the correct environment variable delimiter based on the file
+        system.
+        """
+        cdef std_string cpp_rtn = cpp_cyclus.Env.EnvDelimiter()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def path_delimiter(self):
+        """the correct path delimiter based on the file
+        system.
+        """
+        cdef std_string cpp_rtn = cpp_cyclus.Env.PathDelimiter()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @staticmethod
+    def find_module(path):
+        """Returns the full path to a module by searching through default
+        install and CYCLUS_PATH directories.
+        """
+        cdef std_string cpp_path = str_py_to_cpp(path)
+        cdef std_string cpp_rtn = cpp_cyclus.Env.FindModule(cpp_path)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+
+class Env(_Env):
+    """Environment wrapper class.
+
+    An environment utility to help locate files and find environment
+    settings. The environment for a given simulation can be accessed via the
+    simulation's Context.
+    """
+
+
+#
+# Logger
+#
+
+# LogLevel
+LEV_ERROR = cpp_cyclus.LEV_ERROR
+LEV_WARN = cpp_cyclus.LEV_WARN
+LEV_INFO1 = cpp_cyclus.LEV_INFO1
+LEV_INFO2 = cpp_cyclus.LEV_INFO2
+LEV_INFO3 = cpp_cyclus.LEV_INFO3
+LEV_INFO4 = cpp_cyclus.LEV_INFO4
+LEV_INFO5 = cpp_cyclus.LEV_INFO5
+LEV_DEBUG1 = cpp_cyclus.LEV_INFO5
+LEV_DEBUG2 = cpp_cyclus.LEV_DEBUG2
+LEV_DEBUG3 = cpp_cyclus.LEV_DEBUG3
+LEV_DEBUG4 = cpp_cyclus.LEV_DEBUG4
+LEV_DEBUG5 = cpp_cyclus.LEV_DEBUG5
+
+
+cdef class _Logger:
+
+    @property
+    def report_level(self):
+        """Use to get/set the (global) log level report cutoff."""
+        cdef cpp_cyclus.LogLevel cpp_rtn = cpp_cyclus.Logger.ReportLevel()
+        rtn = int_to_py(cpp_rtn)
+        return rtn
+
+    @report_level.setter
+    def report_level(self, int level):
+        cpp_cyclus.Logger.SetReportLevel(<cpp_cyclus.LogLevel> level)
+
+    @property
+    def no_agent(self):
+        """Set whether or not agent/agent log entries should be printed"""
+        cdef cpp_bool cpp_rtn = cpp_cyclus.Logger.NoAgent()
+        rtn = bool_to_py(cpp_rtn)
+        return rtn
+
+    @no_agent.setter
+    def no_agent(self, bint na):
+        cpp_cyclus.Logger.SetNoAgent(na)
+
+    @property
+    def no_mem(self):
+        cdef cpp_bool cpp_rtn = cpp_cyclus.Logger.NoMem()
+        rtn = bool_to_py(cpp_rtn)
+        return rtn
+
+    @no_mem.setter
+    def no_mem(self, bint nm):
+        cpp_cyclus.Logger.SetNoMem(nm)
+
+    @staticmethod
+    def to_log_level(text):
+        """Converts a string into a corresponding LogLevel value.
+
+        For strings that do not correspond to any particular LogLevel enum value
+        the method returns the LogLevel value `LEV_ERROR`.  This method is
+        primarily intended for translating command line verbosity argument(s) in
+        appropriate report levels.  LOG(level) statements
+        """
+        cdef std_string cpp_text = str_py_to_cpp(text)
+        cdef cpp_cyclus.LogLevel cpp_rtn = cpp_cyclus.Logger.ToLogLevel(cpp_text)
+        rtn = <int> cpp_rtn
+        return rtn
+
+    @staticmethod
+    def to_string(level):
+        """Converts a LogLevel enum value into a corrsponding string.
+
+        For a level argments that have no corresponding string value, the string
+        `BAD_LEVEL` is returned.  This method is primarily intended for translating
+        LOG(level) statement levels into appropriate strings for output to stdout.
+        """
+        cdef cpp_cyclus.LogLevel cpp_level = <cpp_cyclus.LogLevel> level
+        cdef std_string cpp_rtn = cpp_cyclus.Logger.ToString(cpp_level)
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+
+class Logger(_Logger):
+    """A logging tool providing finer grained control over standard output
+    for debugging and other purposes.
+    """
+
+#
+# Errors
+#
+def get_warn_limit():
+    """Returns the current warning limit."""
+    wl = cpp_cyclus.warn_limit
+    return wl
+
+
+def set_warn_limit(unsigned int wl):
+    """Sets the warning limit."""
+    cpp_cyclus.warn_limit = wl
+
+
+def get_warn_as_error():
+    """Returns the current value for wether warnings should be treated
+    as errors.
+    """
+    wae = bool_to_py(cpp_cyclus.warn_as_error)
+    return wae
+
+
+def set_warn_as_error(bint wae):
+    """Sets whether warnings should be treated as errors."""
+    cpp_cyclus.warn_as_error = wae
+
+
+#
+# PyHooks
+#
+def py_init_hooks():
+    """Initializes Cyclus-internal Python hooks. This is called
+    automatically when cyclus is imported. Users should not need to call
+    this function.
+    """
+    cpp_cyclus.PyInitHooks()
+
+#
+# XML
+#
+cdef class _XMLFileLoader:
+
+    def __cinit__(self, recorder, backend, schema_file, input_file=""):
+        cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
+        cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        self.ptx = new cpp_cyclus.XMLFileLoader(
+            <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
+            <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
+            cpp_schema_file, cpp_input_file)
+
+    def __dealloc__(self):
+        del self.ptx
+
+    def load_sim(self):
+        """Load an entire simulation from the inputfile."""
+        self.ptx.LoadSim()
+
+
+class XMLFileLoader(_XMLFileLoader):
+    """Handles initialization of a database with information from
+    a cyclus xml input file.
+
+    Create a new loader reading from the xml simulation input file and writing
+    to and initializing the backends in the recorder. The recorder must
+    already have the backend registered. schema_file identifies the master
+    xml rng schema used to validate the input file.
+    """
+
+
+cdef class _XMLFlatLoader:
+
+    def __cinit__(self, recorder, backend, schema_file, input_file=""):
+        cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
+        cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        self.ptx = new cpp_cyclus.XMLFlatLoader(
+            <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
+            <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
+            cpp_schema_file, cpp_input_file)
+
+    def __dealloc__(self):
+        del self.ptx
+
+    def load_sim(self):
+        """Load an entire simulation from the inputfile."""
+        self.ptx.LoadSim()
+
+
+class XMLFlatLoader(_XMLFlatLoader):
+    """Handles initialization of a database with information from
+    a cyclus xml input file.
+
+    Create a new loader reading from the xml simulation input file and writing
+    to and initializing the backends in the recorder. The recorder must
+    already have the backend registered. schema_file identifies the master
+    xml rng schema used to validate the input file.
+
+    Notes
+    -----
+    This is not a subclass of the XMLFileLoader Python bindings, even
+    though the C++ class is a subclass in C++. Rather, they are duck
+    typed by exposing the same interface. This makes handling the
+    instance pointers in Cython a little easier.
+    """
+
+
+def load_string_from_file(filename):
+    """Loads an XML file from a path."""
+    cdef std_string cpp_filename = str_py_to_cpp(filename)
+    cdef std_string cpp_rtn = cpp_cyclus.LoadStringFromFile(cpp_filename)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn
+
+
+
+cdef class _XMLParser:
+
+    def __cinit__(self, filename=None, raw=None):
+        cdef std_string s, inp
+        self.ptx = new cpp_cyclus.XMLParser()
+        if filename is not None:
+            s = str_py_to_cpp(filename)
+            inp = cpp_cyclus.LoadStringFromFile(s)
+        elif raw is not None:
+            inp = str_py_to_cpp(raw)
+        else:
+            raise RuntimeError("Either a filename or a raw XML string "
+                               "must be provided to XMLParser")
+        self.ptx.Init(inp)
+
+    def __dealloc__(self):
+        del self.ptx
+
+
+class XMLParser(_XMLParser):
+    """A helper class to hold xml file data and provide automatic
+    validation.
+
+    Parameters
+    ----------
+    filename : str, optional
+        Path to file to load.
+    raw : str, optional
+        XML string to load.
+    """
+
+
+cdef class _InfileTree:
+
+    def __cinit__(self, _XMLParser parser):
+        self.ptx = new cpp_cyclus.InfileTree(parser.ptx[0])
+
+    def __dealloc__(self):
+        del self.ptx
+
+    def optional_query(self, query, default):
+        """A query method for optional parameters.
+
+        Parameters
+        ----------
+        query : str
+            The XML path to test if it exists.
+        default : any type
+            The default value to return if the XML path does not exist in
+            the tree. The type of the return value (str, bool, int, etc)
+            is determined by the type of the default.
+        """
+        cdef std_string cpp_query = str_py_to_cpp(query)
+        cdef std_string str_default, str_rtn
+        if isinstance(default, str):
+            str_default = str_py_to_cpp(default)
+            str_rtn = cpp_cyclus.OptionalQuery[std_string](self.ptx, cpp_query,
+                                                           str_default)
+            rtn = std_string_to_py(str_rtn)
+        else:
+            raise TypeError("Type of default value not recognized, only "
+                            "str is currently supported.")
+        return rtn
+
+
+class InfileTree(_InfileTree):
+    """A class for extracting information from a given XML parser
+
+    Parameters
+    ----------
+    parser : XMLParser
+        An XMLParser instance.
+    """
+
+#
+# Simulation Managment
+#
+
+cdef class _Timer:
+
+    def __cinit__(self, bint init=True):
+        self._free = init
+        if init:
+            self.ptx = new cpp_cyclus.Timer()
+        else:
+            self.ptx == NULL
+
+    def __dealloc__(self):
+        if self.ptx == NULL:
+            return
+        elif self._free:
+            del self.ptx
+
+    def run_sim(self):
+        """Runs the simulation."""
+        self.ptx.RunSim()
+
+
+class Timer(_Timer):
+    """Controls simulation timestepping and inter-timestep phases.
+
+    Parameters
+    ----------
+    init : bool, optional
+        Whether or not we should initialize a new C++ Timer instance.
+    """
+
+
+cdef class _SimInit:
+
+    def __cinit__(self, recorder, backend):
+        self.ptx = new cpp_cyclus.SimInit()
+        self.ptx.Init(
+            <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
+            <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
+            )
+        self._timer = None
+        self._context = None
+
+    def __dealloc__(self):
+        del self.ptx
+
+    @property
+    def timer(self):
+        """Returns the initialized timer. Note that either Init, Restart,
+        or Branch must be called first.
+        """
+        if self._timer is None:
+            self._timer = Timer(init=False)
+            (<_Timer> self._timer).ptx = self.ptx.timer()
+        return self._timer
+
+    @property
+    def context(self):
+        """Returns the initialized context. Note that either Init, Restart, or Branch
+        must be called first.
+        """
+        if self._context is None:
+            self._context = Context(init=False)
+            (<_Context> self._context).ptx = self.ptx.context()
+        return self._context
+
+
+class SimInit(_SimInit):
+    """Handles initialization of a simulation from the output database. After
+    calling Init, Restart, or Branch, the initialized Context, Timer, and
+    Recorder can be retrieved.
+
+    Parameters
+    ----------
+    recorder : Recorder
+        The recorder class for the simulation.
+    backend : QueryableBackend
+        A backend to use for this simulation.
+    """
+
+#
+# Agent
+#
+cdef class _Agent:
+
+    def __cinit__(self, bint free=False):
+        self._free = free
+        self.ptx == NULL
+        self._annotations = None
+
+    def __dealloc__(self):
+        cdef cpp_cyclus.Agent* cpp_ptx
+        if self.ptx == NULL:
+            return
+        elif self._free:
+            cpp_ptx = <cpp_cyclus.Agent*> self.ptx
+            del cpp_ptx
+
+    @property
+    def schema(self):
+        """An agent's xml rng schema for initializing from input files. All
+        concrete agents should override this function. This must validate the same
+        xml input that the InfileToDb function receives.
+        """
+        cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).schema()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def version(self):
+        """Agent version string."""
+        cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).version()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
+    def annotations(self):
+        """Agent annotations."""
+        cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
+        if self._annotations is None:
+            cpp_rtn._inst[0] = (<cpp_cyclus.Agent*> self.ptx).annotations()
+        self._annotations = cpp_rtn
+        return self._annotations
+
+
+class Agent(_Agent):
+    """The abstract base class used by all types of agents
+    that live and interact in a simulation.
+    """
+
+
+#
+# Version Info
+#
+
+def describe_version():
+    """Describes the Cyclus version."""
+    rtn = cpp_cyclus.describe()
+    rtn = rtn.decode()
+    return rtn
+
+
+def core_version():
+    """Cyclus core version."""
+    rtn = cpp_cyclus.core()
+    rtn = rtn.decode()
+    return rtn
+
+
+def boost_version():
+    """Boost version."""
+    rtn = cpp_cyclus.boost()
+    rtn = rtn.decode()
+    return rtn
+
+
+def sqlite3_version():
+    """SQLite3 version."""
+    rtn = cpp_cyclus.sqlite3()
+    rtn = rtn.decode()
+    return rtn
+
+
+def hdf5_version():
+    """HDF5 version."""
+    rtn = cpp_cyclus.hdf5()
+    rtn = rtn.decode()
+    return rtn
+
+
+def xml2_version():
+    """libxml 2 version."""
+    rtn = cpp_cyclus.xml2()
+    rtn = rtn.decode()
+    return rtn
+
+
+def xmlpp_version():
+    """libxml++ version."""
+    rtn = cpp_cyclus.xmlpp()
+    rtn = rtn.decode()
+    return rtn
+
+
+def coincbc_version():
+    """Coin CBC version."""
+    rtn = cpp_cyclus.coincbc()
+    rtn = rtn.decode()
+    return rtn
+
+
+def coinclp_version():
+    """Coin CLP version."""
+    rtn = cpp_cyclus.coinclp()
+    rtn = rtn.decode()
+    return rtn
+
+
+def version():
+    """Returns string of the cyclus version and its dependencies."""
+    s = "Cyclus Core " + core_version() + " (" + describe_version() + ")\n\n"
+    s += "Dependencies:\n"
+    s += "   Boost    " + boost_version() + "\n"
+    s += "   Coin-Cbc " + coincbc_version() + "\n"
+    s += "   Coin-Clp " + coinclp_version() + "\n"
+    s += "   Hdf5     " + hdf5_version() + "\n"
+    s += "   Sqlite3  " + sqlite3_version() + "\n"
+    s += "   xml2     " + xml2_version() + "\n"
+    s += "   xml++    " + xmlpp_version() + "\n"
+    return s
+
+#
+# Context
+#
+cdef class _Context:
+
+    def __cinit__(self, timer=None, recorder=None, init=True):
+        self._free = init
+        if init:
+            self.ptx = new cpp_cyclus.Context(
+                (<_Timer> timer).ptx,
+                (<cpp_cyclus.Recorder*> (<_Recorder> recorder).ptx),
+                )
+        else:
+            self.ptx = NULL
+
+    def __dealloc__(self):
+        if self.ptx == NULL or not self._free:
+            return
+        del self.ptx
+
+    def del_agent(self, agent):
+        """Destructs and cleans up an agent (and it's children recursively)."""
+        self.ptx.DelAgent(<cpp_cyclus.Agent*> (<_Agent> agent).ptx)
+
+    @property
+    def sim_id(self):
+        """The simulation ID."""
+        cdef cpp_cyclus.uuid cpp_sim_id = self.ptx.sim_id()
+        rtn = uuid_cpp_to_py(cpp_sim_id)
+        return rtn
+
+
+class Context(_Context):
+    """A simulation context provides access to necessary simulation-global
+    functions and state. All code that writes to the output database, needs to
+    know simulation time, creates/builds facilities, and/or uses loaded
+    composition recipes will need a context pointer. In general, all global
+    state should be accessed through a simulation context.
+
+    Parameters
+    ----------
+    timer : Timer, optional
+        An instance of the timer class.
+    recorder : Recorder, optional
+        An instance of the recorder class.
+    init : bool, optional
+        Whether or not to initialize a new context object.
+
+    Warnings
+    --------
+    * The context takes ownership of and manages the lifetime/destruction
+      of all agents constructed with it (including Cloned agents). Agents should
+      generally NEVER be allocated on the stack.
+    * The context takes ownership of the solver and will manage its
+      destruction.
+    """
+
+#
+# Discovery
+#
+def discover_specs(path, library):
+    """Discover archetype specifications for a path and library.
+    Returns a set of strings.
+    """
+    cdef std_string cpp_path = str_py_to_cpp(path)
+    cdef std_string cpp_library = str_py_to_cpp(library)
+    cdef std_set[std_string] cpp_rtn = cpp_cyclus.DiscoverSpecs(cpp_path,
+                                                                cpp_library)
+    rtn = std_set_std_string_to_py(cpp_rtn)
+    return rtn
+
+
+def discover_specs_in_cyclus_path():
+    """Discover archetype specifications that live recursively in CYCLUS_PATH
+    directories. Returns a set of strings.
+    """
+    cdef std_set[std_string] cpp_rtn = cpp_cyclus.DiscoverSpecsInCyclusPath()
+    rtn = std_set_std_string_to_py(cpp_rtn)
+    return rtn
+
+
+def discover_metadata_in_cyclus_path():
+    """Discover archetype metadata in cyclus path. Returns a Jason.Value
+    object.
+    """
+    cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
+    cpp_rtn._inst[0] = cpp_cyclus.DiscoverMetadataInCyclusPath()
+    rtn = cpp_rtn
+    return rtn
+
+
+#
+# Infile Converters
+#
+def json_to_xml(s):
+    """Converts a JSON string into an equivalent XML string"""
+    cdef std_string cpp_s = str_py_to_cpp(s)
+    cdef std_string cpp_rtn = cpp_cyclus.JsonToXml(cpp_s)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn
+
+
+def xml_to_json(s):
+    """Converts an XML string into an equivalent JSON string"""
+    cdef std_string cpp_s = str_py_to_cpp(s)
+    cdef std_string cpp_rtn = cpp_cyclus.XmlToJson(cpp_s)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn

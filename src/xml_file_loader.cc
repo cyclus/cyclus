@@ -46,6 +46,12 @@ void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
   }
 }
 
+std::string LoadStringFromFile(std::string file) {
+  std::stringstream input;
+  LoadStringstreamFromFile(input, file);
+  return input.str();
+}
+
 std::vector<AgentSpec> ParseSpecs(std::string infile) {
   std::stringstream input;
   LoadStringstreamFromFile(input, infile);
@@ -401,7 +407,7 @@ void XMLFileLoader::LoadControlParams() {
   InfileTree xqe(*parser_);
   std::string query = "/*/control";
   InfileTree* qe = xqe.SubTree(query);
-  
+
   std::string handle;
   if (qe->NMatches("simhandle") > 0) {
     handle = qe->GetString("simhandle");
@@ -426,7 +432,7 @@ void XMLFileLoader::LoadControlParams() {
 
   // get time step duration
   si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
-  
+
   // get epsilon
   double eps_ = OptionalQuery<double>(qe, "tolerance_generic", 1e-6);
   cy_eps = si.eps = eps_;
