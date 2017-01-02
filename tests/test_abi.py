@@ -17,16 +17,59 @@ try:
 except ImportError:
     smbchk = None
 
+def find_libcyc():
+    libcyc = os.path.join(cycdir, 'build', 'lib', 'libcyclus.so')
+    tried = [libcyc]
+    if os.path.exists(libcyc):
+        print('lib cyclus exists: ', libcyc)
+        return libcyc, tried
+
+    try:
+        base = subprocess.check_output('which cyclus'.split()).strip()
+        libcyc = os.path.join(os.path.dirname(base), 
+                              '..', 'lib', 'libcyclus.so')
+        tried.append(libcyc)
+        if os.path.exists(libcyc):
+            print('lib cyclus exists: ', libcyc)
+            return libcyc, tried
+    except subprocess.CalledProcessError:
+        pass
+
+    base = os.path.expanduser('~/anaconda/envs/_build')
+    libcyc = os.path.join(os.path.dirname(base), 'lib', 'libcyclus.so')
+    tried.append(libcyc)
+    if os.path.exists(libcyc):
+        print('lib cyclus exists: ', libcyc)
+        return libcyc, tried
+    
+    cmd = "find / -type f -name libcyclus.so -executable 2>/dev/null"
+    try:
+        output = subprocess.check_output(cmd, shell=True, 
+                                         stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        output = e.output
+    
+    libcyc = output.split('\n')[0]
+    tried.append(libcyc)
+    print('lib cyc found with find: ', output)
+    return libcyc, tried
+
 def test_abi_stability():
     if smbchk is None:
         raise SkipTest('Could not import smbchk!')
     if os.name != 'posix':
         raise SkipTest('can only check for ABI stability on posix systems.')
-    libcyc = os.path.join(cycdir, 'build', 'lib', 'libcyclus.so')
+    libcyc, tried = find_libcyc()
+    print('libcyc', libcyc)
+    print('tried', tried)
     if not os.path.exists(libcyc):
-        raise SkipTest('libcyclus could not be found, '
-                       'cannot check for ABI stability')
-    args = '--update -t HEAD --no-save --check'.split()
+        msg = 'libcyclus could not be found, cannot check for ABI stability '
+        msg += 'Final libcyc: {} Tried: {} HOME: {}'.format(
+            libcyc, tried, os.environ['HOME']) 
+        raise SkipTest(msg)
+    prefix = os.path.join(os.path.dirname(libcyc), '..')
+    args = '--update -t HEAD --no-save --check --prefix {}'
+    args = args.format(prefix).split()
     with tools.indir(reldir):
         obs = smbchk.main(args=args)
     assert_true(obs)
