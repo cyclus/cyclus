@@ -75,8 +75,8 @@ from argparse import ArgumentParser
 import cyclus.events
 from cyclus.system import asyncio, concurrent_futures, websockets
 from cyclus.simstate import SimState
-from cyclus.events import (action_consumer, echo, register_tables, send_table,
-    sleep, send_registry_action, EVENT_ACTIONS)
+from cyclus.actions import sleep
+from cyclus.events import EVENT_ACTIONS
 
 
 def make_parser():
@@ -97,21 +97,52 @@ async def run_sim(state, loop, executor):
     await asyncio.wait([run_task])
 
 
+async def action_consumer(state):
+    staged_tasks = []
+    while True:
+        while not state.action_queue.empty():
+            action = state.action_queue.get()
+            print("getting", action)
+            #action_task = asyncio.ensure_future(action())
+            action_obj = action()
+            action_obj.__name__ = action_obj.__qualname__ = action.__name__
+            action_task = asyncio.ensure_future(action_obj)
+            print("action task")
+            staged_tasks.append(action_task)
+            print("task appended")
+        else:
+            #print("len(staged_tasks)", len(staged_tasks))
+            if len(staged_tasks) > 0:
+                print("awaiting staged tasks.", len(staged_tasks))
+                await asyncio.wait(staged_tasks)
+                print("print clearing")
+                staged_tasks.clear()
+        #print("sleeping")
+        await asyncio.sleep(state.frequency)
+
+
 async def get_send_data():
     """Asynchronously grabs the next data to send from the queue."""
     state = cyclus.events.STATE
-    q = state.send_queue
+    print("awaiting sending data")
     data = await state.send_queue.get()
+    print("sending data", data)
     return data
 
 
 async def queue_message_action(message):
     state = cyclus.events.STATE
+    print("got message", message)
     event = json.loads(message)
+    print("found event", event)
     params = event.get("params", {})
+    print("found params", params)
     kind = event["event"]
+    print("print kind", kind)
     action = EVENT_ACTIONS[kind]
-    state.action_queue.put(action(**params))
+    print("looked up action", action)
+    state.action_queue.put(action(state, **params))
+    print("added action to queue")
 
 
 async def websocket_handler(websocket, path):
@@ -122,15 +153,22 @@ async def websocket_handler(websocket, path):
         done, pending = await asyncio.wait([recv_task, send_task],
                                            return_when=asyncio.FIRST_COMPLETED)
         # handle incoming
+        print("len(done)", len(done))
+        print("len(pending)", len(pending))
         if recv_task in done:
+            print("~~~ got incoming message")
             message = recv_task.result()
+            print("prepping to parse message", message)
             await queue_message_action(message)
+            print("queued the prepped message")
         else:
             recv_task.cancel()
         # handle sending of data
         if send_task in done:
             message = send_task.result()
+            print("sending message", message)
             await websocket.send(message)
+            print("message sent")
         else:
             send_task.cancel()
 
@@ -145,21 +183,22 @@ def main(args=None):
     state.load()
 
     import logging
+    logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger('websockets.server')
     logger.setLevel(logging.ERROR)
     logger.addHandler(logging.StreamHandler())
 
     #QUEUE.put(register_tables("Compositions"))
-    state.repeating_actions.append([echo, "repeating task"])
     state.repeating_actions.append([sleep, 1])
-    state.repeating_actions.append([send_table, "TimeSeriesPower"])
+    #state.repeating_actions.append([send_table, "TimeSeriesPower"])
     executor = concurrent_futures.ThreadPoolExecutor(max_workers=16)
     loop = asyncio.get_event_loop()
+    loop.set_debug(True)
     server = websockets.serve(websocket_handler, 'localhost', 4242)
     try:
         loop.run_until_complete(asyncio.gather(
             asyncio.ensure_future(run_sim(state, loop, executor)),
-            asyncio.ensure_future(action_consumer()),
+            asyncio.ensure_future(action_consumer(state)),
             asyncio.ensure_future(server),
             ))
     finally:
