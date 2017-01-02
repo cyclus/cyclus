@@ -17,7 +17,7 @@ class TestComp : public Composition {
   TestComp() {}
   Composition::Chain DecayLine() {
     return *decay_line_.get();
-  }  
+  }
 };
 
 TEST(CompositionTests, create_atom) {
@@ -82,7 +82,8 @@ TEST(CompositionTests, decay) {
   Composition::Ptr c = Composition::CreateFromAtom(v);
 
   double secs_per_timestep = kDefaultTimeStepDur;
-  Composition::Ptr newc = c->Decay(int(pyne::half_life("Cs137") / secs_per_timestep));
+  Composition::Ptr newc = \
+    c->Decay(int(pyne::half_life(std::string("Cs137")) / secs_per_timestep));
 
   CompMap newv = newc->atom();
   cyclus::compmath::Normalize(&newv);

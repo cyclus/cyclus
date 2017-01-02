@@ -5,6 +5,7 @@ from libcpp.vector cimport vector
 from libcpp.utility cimport pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
+from libcpp.typeinfo cimport type_info
 
 from . cimport cpp_jsoncpp
 from .cpp_typesystem cimport DbTypes
@@ -17,6 +18,7 @@ cdef extern from "cyclus.h" namespace "boost::spirit":
         hold_any(const char*) except +
         hold_any assign[T](T) except +
         T cast[T]() except +
+        const type_info& type() except +
 
 cdef extern from "cyclus.h" namespace "boost::uuids":
 
@@ -27,12 +29,21 @@ cdef extern from "cyclus.h" namespace "boost::uuids":
 cdef extern from "cyclus.h" namespace "cyclus":
 
     cdef cppclass Datum:
+        ctypedef pair[const char*, hold_any] Entry
+        ctypedef vector[Entry] Vals
+        ctypedef vector[int] Shape
+        ctypedef vector[Shape] Shapes
+        ctypedef vector[std_string] Fields
+
         Datum* AddVal(const char*, hold_any) except +
         Datum* AddVal(const char*, hold_any, vector[int]*) except +
+        Datum* AddVal(std_string, hold_any) except +
+        Datum* AddVal(std_string, hold_any, vector[int]*) except +
         void Record() except +
         std_string title() except +
-        #vector[pair[char*, hold_any]] vals() except +
+        vector[Entry] vals() except +
         vector[vector[int]] shapes() except +
+        vector[std_string] fields() except +
 
 
 cdef extern from "rec_backend.h" namespace "cyclus":
@@ -42,7 +53,7 @@ cdef extern from "rec_backend.h" namespace "cyclus":
     cdef cppclass RecBackend:
         void Notify(DatumList) except +
         std_string Name() except +
-        void Flush()  except +
+        void Flush() except +
         void Close() except +
 
 

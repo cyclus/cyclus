@@ -18,6 +18,7 @@ from cyclus.cpp_stringstream cimport stringstream
 cdef class _Datum:
     cdef void * ptx
     cdef bint _free
+    cdef list _fieldnames
 
 cdef class _FullBackend:
     cdef void * ptx

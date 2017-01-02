@@ -70,6 +70,9 @@ class TypeSystem(object):
             VECTOR_STRING -> ('std::vector', 'std::string').
         dbtypes : list of str
             The type names in the type system, sorted by id.
+        uniquetypes : list of str
+            The type names in the type system, sorted by id,
+            which map to a unique C++ type.
         """
         self.cpp_typesystem = cpp_typesystem
         self.cycver = cycver
@@ -98,6 +101,16 @@ class TypeSystem(object):
             ranks[t] = row[rank]
         self.norms = {t: parse_template(c) for t, c in cpptypes.items()}
         self.dbtypes = sorted(types, key=lambda t: ids[t])
+        # find unique types
+        seen = set()
+        self.uniquetypes = uniquetypes = []
+        for t in self.dbtypes:
+            normt = self.norms[t]
+            if normt in seen:
+                continue
+            else:
+                uniquetypes.append(t)
+                seen.add(normt)
 
         # caches
         self._cython_cpp_name = {}
@@ -432,8 +445,9 @@ TO_PY_CONVERTERS = {
         'pyfirst = {firstexpr}\n'
         '{secondname} = {var}.second\n'
         '{secondbody}\n'
-        'pysecond = {secondexpr}\n',
-        '(pyfirst, pysecond)'),
+        'pysecond = {secondexpr}\n'
+        'py{var} = (pyfirst, pysecond)\n',
+        'py{var}'),
     'std::list': (
         '{valdecl}\n'
         'cdef {valtype} {valname}\n'
@@ -480,7 +494,14 @@ TO_CPP_CONVERTERS = {
     'int': ('', '', '<int> {var}'),
     'float': ('', '', '<float> {var}'),
     'double': ('', '', '<double> {var}'),
-    'std::string': ('', '', 'std_string(<const char*> {var})'),
+    'std::string': ('cdef bytes b_{var}',
+        'if isinstance({var}, str):\n'
+        '   b_{var} = {var}.encode()\n'
+        'elif isinstance({var}, str):\n'
+        '   b_{var} = {var}\n'
+        'else:\n'
+        '   b_{var} = bytes({var})\n',
+        'std_string(<const char*> b_{var})'),
     'cyclus::Blob': ('', '', 'cpp_cyclus.Blob(std_string(<const char*> {var}))'),
     'boost::uuids::uuid': ('', '', 'uuid_py_to_cpp({var})'),
     # templates
@@ -633,8 +654,10 @@ from libcpp.list cimport list as std_list
 from libcpp.vector cimport vector as std_vector
 from libcpp.utility cimport pair as std_pair
 from libcpp.string cimport string as std_string
+from libcpp.typeinfo cimport type_info
 from cython.operator cimport dereference as deref
 from cython.operator cimport preincrement as inc
+from cython.operator cimport typeid
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
@@ -793,6 +816,7 @@ cdef object db_to_py(cpp_cyclus.hold_any value, cpp_cyclus.DbTypes dbtype):
         raise TypeError(msg.format(dbtype))
     return rtn
 
+
 cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype):
     """Converts python object to database type in a hold_any instance."""
     cdef cpp_cyclus.hold_any rtn
@@ -806,7 +830,23 @@ cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype):
     return rtn
 
 
+cdef object any_to_py(cpp_cyclus.hold_any value):
+    """Converts any C++ object to its Python equivalent."""
+    cdef object rtn = None
+    cdef size_t valhash = value.type().hash_code()
+    # Note that we need to use the *_t tyedefs here because of
+    # Bug #1561 in Cython
+    {%- for i, t in enumerate(ts.uniquetypes) %}
+    {% if i > 0 %}el{% endif %}if valhash == typeid({{ ts.funcname(t) }}_t).hash_code():
+        rtn = {{ ts.hold_any_to_py('value', t) }}
+    {%- endfor %}
+    else:
+        msg = "C++ type could not be found while converting to Python"
+        raise TypeError(msg)
+    return rtn
+
 '''.strip())
+
 
 def typesystem_pyx(ts, ns):
     """Creates the Cython wrapper for the Cyclus type system."""
@@ -843,6 +883,13 @@ cpdef dict C_CPPTYPES
 cpdef dict C_NORMS
 
 #
+# typedefs
+#
+{% for t in ts.uniquetypes %}
+ctypedef {{ ts.cython_type(t) }} {{ ts.funcname(t) }}_t
+{%- endfor %}
+
+#
 # converters
 #
 cdef bytes blob_to_bytes(cpp_cyclus.Blob value)
@@ -869,6 +916,8 @@ cdef {{ ts.cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x)
 cdef object db_to_py(cpp_cyclus.hold_any value, cpp_cyclus.DbTypes dbtype)
 
 cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype)
+
+cdef object any_to_py(cpp_cyclus.hold_any value)
 '''.strip())
 
 def typesystem_pxd(ts, ns):
