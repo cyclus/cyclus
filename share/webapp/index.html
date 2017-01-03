@@ -67,8 +67,13 @@
 
     /* Functions to call on button clicks. */
 
-    var loadTableNames = function() {
-      var event = {"event": "table_names_request"};
+    var pause = function() {
+      var event = {"event": "pause"};
+      ws.send(event);
+    };
+
+    var unpause = function() {
+      var event = {"event": "unpause"};
       ws.send(event);
     };
 
@@ -85,6 +90,10 @@
 
   <h2>Heartbeat</h2>
   <p id="heartbeat">Disconected</p>
+
+  <h2>Pause</h2>
+  <button onclick="pause()">Pause</button>
+  <button onclick="unpause()">Unpause</button>
 
   <h2>Table Names</h2>
   <button onclick="loadTableNames()">Load Table Names</button>

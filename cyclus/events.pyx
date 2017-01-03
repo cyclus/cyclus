@@ -39,8 +39,10 @@ if cyclus.system.PY_VERSION_TUPLE >= (3, 5, 0):
     from cyclus import actions
     EVENT_ACTIONS.update(
         echo=actions.echo,
+        pause=actions.pause,
         registry_request=actions.send_registry_action,
         sleep=actions.sleep,
         table_names_request=actions.send_table_names,
+        unpause=actions.unpause,
         )
     del actions

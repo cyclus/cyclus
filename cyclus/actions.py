@@ -54,7 +54,6 @@ async def send_message(state, event, params=None, data='null'):
     await state.send_queue.put(message)
 
 
-
 @action
 async def echo(state, s):
     """Simple asyncronous echo."""
@@ -63,17 +62,19 @@ async def echo(state, s):
 
 
 @action
-async def pause():
+async def pause(state):
     """Asynchronous pause."""
-    task = await asyncio.sleep(1e100)
-    STATE.tasks['pause'] = task
+    task = asyncio.ensure_future(asyncio.sleep(1e100))
+    state.tasks['pause'] = task
+    await asyncio.wait([task])
 
 
 @action
-async def unpause():
+async def unpause(state):
     """Cancels and removes the pause action."""
-    pause = STATE.tasks.pop('pause', None)
-    pause.cancel()
+    pause = state.tasks.pop('pause', None)
+    if pause is not None:
+        pause.cancel()
 
 
 def ensure_tables(tables):
