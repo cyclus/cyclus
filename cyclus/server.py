@@ -3,7 +3,7 @@
 The webserver has a number of 'events' that it may send or recieve. These
 in turn affect how a cyclus simulation runs.
 
-The server, which operates both asynchronously and in parallel, has three
+The server, which operates both asynchronously and in parallel, has four
 top-level tasks which it manages:
 
 * The cyclus simulation object, run on a separate thread,
@@ -11,6 +11,7 @@ top-level tasks which it manages:
   by the cyclus simulation or the user,
 * A websockets server that sends and recieves JSON-formatted events from
   the client.
+* A heartbeat that sends special events every so often.
 
 For purposes of this document, the following terminology is used:
 
@@ -40,7 +41,8 @@ the string name that distinguishes the event from all other kinds of events.
 Often times, events may have parameters that they send/recieve. These live
 in the "params" key as a JSON object / dict.
 
-Events maybe conceptually divided into server-sent and client-sent events.
+Events may be conceptually divided into server-sent, client-sent events, and
+bidirectional events which are sent by either the client or the server.
 
 Server Events
 -------------
@@ -49,6 +51,12 @@ often repsonse to requests for data about the state of the simulation.
 They typically contain a "data" key which holds data about the simulation
 state. They may also have a "success" key, whose value is true/false, that
 specifies whether the data was able to be computed.
+
+**heartbeat:** A simple event the lets the client know that the server is
+still alive. The data value is the approximate time of the next heartbeat
+in seconds::
+
+    {"event": "heartbeat", "data": val}
 
 **registry:** The in-memory backend registy value in its current form::
 
@@ -79,6 +87,25 @@ depending on the type of request.
 file system backend::
 
     {"event": "table_names_request"}
+
+Bidirectional Events
+--------------------
+These are events that may logically originate from either the client or the
+server. Certian keys in the event may or not be present depending on the
+sender, but the event name stays the same.
+
+**echo:** Echos back a single string parameter. When requesting an echo,
+the data key need not be present::
+
+    {"event": "table_names",
+     "params": {"s": value},
+     "data": value
+    }
+
+**sleep:** The requester instructs the reciever to sleep for n seconds::
+
+    {"event": "sleep", "params": {"n": value}}
+
 
 """
 import json
@@ -123,22 +150,18 @@ async def action_consumer(state):
             staged_tasks.append(action_task)
             print("task appended")
         else:
-            #print("len(staged_tasks)", len(staged_tasks))
             if len(staged_tasks) > 0:
                 print("awaiting staged tasks.", len(staged_tasks))
                 await asyncio.wait(staged_tasks)
                 print("print clearing")
                 staged_tasks.clear()
-        #print("sleeping")
         await asyncio.sleep(state.frequency)
 
 
 async def get_send_data():
     """Asynchronously grabs the next data to send from the queue."""
     state = cyclus.events.STATE
-    print("awaiting sending data")
     data = await state.send_queue.get()
-    print("sending data", data)
     return data
 
 
@@ -185,6 +208,23 @@ async def websocket_handler(websocket, path):
             send_task.cancel()
 
 
+async def heartbeat(state):
+    """This sends a heartbeat event to the client with a nominal period.
+    This occurs outside of the normal action-consumer event system. The
+    client is then able to detect the lack of a heartbeat and know that the
+    server has been disconected.
+    """
+    message_template = '{{"event": "heartbeat", "data": {f}}}'
+    f = state.heartbeat_frequency
+    message = message_template.format(f=f)
+    while True:
+        if state.heartbeat_frequency != f:
+            f = state.heartbeat_frequency
+            message = message_template.format(f=f)
+        await state.send_queue.put(message)
+        await asyncio.sleep(f)
+
+
 def main(args=None):
     """Main cyclus server entry point."""
     p = make_parser()
@@ -211,6 +251,7 @@ def main(args=None):
         loop.run_until_complete(asyncio.gather(
             asyncio.ensure_future(run_sim(state, loop, executor)),
             asyncio.ensure_future(action_consumer(state)),
+            asyncio.ensure_future(heartbeat(state)),
             asyncio.ensure_future(server),
             ))
     finally:

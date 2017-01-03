@@ -6,10 +6,8 @@
 <body>
   <script src="ws_events_dispatcher.js"></script>
   <script>
-    /* New connection to server */
-    var ws = new EventsDispatcher("ws://127.0.0.1:4242/"),
-        messages = document.createElement('ul');
-    document.body.appendChild(messages);
+    /* New connection to server and other global varaibles */
+    var ws = new EventsDispatcher("ws://127.0.0.1:4242/");
 
     /* Some helper functions */
     var replaceList = function(elem, vals) {
@@ -34,6 +32,22 @@
       messages.appendChild(message);
       });
     */
+
+    /* Heartbeat handling code */
+
+    var heartbeatNoPulse = function () {
+      var hb = document.getElementById('heartbeat');
+      hb.innerHTML = "Disconected ";
+    };
+
+    var heartbeatTimeout = setTimeout(heartbeatNoPulse, 1);
+
+    ws.bind('heartbeat', function (event) {
+        clearTimeout(heartbeatTimeout);
+        var hb = document.getElementById('heartbeat');
+        hb.innerHTML = "Conected ";
+        heartbeatTimeout = setTimeout(heartbeatNoPulse, 1500*event.data);
+    });
 
     /* bind event names to functions when recieved */
 
@@ -68,6 +82,9 @@
       ws.send(event);
     };
   </script>
+
+  <h2>Heartbeat</h2>
+  <p id="heartbeat">Disconected</p>
 
   <h2>Table Names</h2>
   <button onclick="loadTableNames()">Load Table Names</button>

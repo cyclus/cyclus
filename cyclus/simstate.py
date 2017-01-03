@@ -64,6 +64,8 @@ class SimState(object):
         A list of actions that should be added to the queue at the start of
         each timestep when the cyclus.events.loop() is called. If this is
         None, a new empty list is instantiated.
+    heartbeat_frequency : float or int, optional
+        The frequency with which to send heartbeat events.
 
     Attributes
     ----------
@@ -85,7 +87,8 @@ class SimState(object):
 
     def __init__(self, input_file, output_path=None,
                  memory_backend=False, registry=True, schema_path=None,
-                 flat_schema=False, frequency=0.001, repeating_actions=None):
+                 flat_schema=False, frequency=0.001, repeating_actions=None,
+                 heartbeat_frequency=1):
         ensure_close_dynamic_modules()
         self.input_file = input_file
         if output_path is None:
@@ -99,6 +102,7 @@ class SimState(object):
         self.frequency = frequency
         self.repeating_actions = [] if repeating_actions is None \
                                     else repeating_actions
+        self.heartbeat_frequency = heartbeat_frequency
         self.rec = self.file_backend = self.si = None
         self.tasks = {}
         self._send_queue = self._action_queue = None
