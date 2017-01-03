@@ -19,7 +19,6 @@ suffix.h
 *#
 #*
 *.zip
-*.html
 *.tex
 src/Core/Utility/Env.cpp
 src/cyclus_nuc_data.h5

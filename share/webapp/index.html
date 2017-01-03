@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket demo</title>
+</head>
+<body>
+  <script src="ws_events_dispatcher.js"></script>
+  <script>
+    var ws = new EventsDispatcher("ws://127.0.0.1:4242/"),
+        messages = document.createElement('ul');
+    document.body.appendChild(messages);
+
+    /*
+    ws.bind('tabledata', function (event) {
+      var messages = document.getElementsByTagName('ul')[0],
+        message = document.createElement('li'),
+        content = document.createTextNode(event.data.columns);
+      message.appendChild(content);
+      messages.appendChild(message);
+      });
+    */
+
+    ws.bind('registry', function (event) {
+      var reg = document.getElementById('registryList');
+      while (reg.hasChildNodes()) {
+        reg.removeChild(reg.firstChild);
+      }
+      var vals = event.data;
+      for (var i = 0; i < vals.length; i++) {
+        var elem = document.createElement('li');
+        var content = document.createTextNode(vals[i]);
+        alert(vals[i]);
+        reg.appendChild(elem);
+      }
+    });
+
+    ws.bind('echo', function(event) {
+      alert(event.data);
+    });
+
+    var loadRegistry = function() {
+      var event = {"event": "registry_request"};
+      ws.send(event);
+    };
+
+    var echoBravo = function() {
+      var event = {"event": "echo", "params": {"s": "Bravo"}};
+      ws.send(event);
+    };
+  </script>
+
+  <button onclick="loadRegistry()">Registry</button>
+  <ul id="registryList"></ul>
+
+  <button onclick="echoBravo()">Echo</button>
+</body>
+</html>

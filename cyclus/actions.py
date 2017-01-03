@@ -4,7 +4,8 @@ import json
 """Cyclus actions.
 
 This file cannot be Cythonized due to current errors in Cython async
-handling. -- scopatz 2017-01-02
+handling. -- scopatz 2017-01-02, for more information see.
+see https://github.com/cython/cython/issues/1573
 """
 
 from functools import wraps
