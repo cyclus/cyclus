@@ -50,10 +50,17 @@ They typically contain a "data" key which holds data about the simulation
 state. They may also have a "success" key, whose value is true/false, that
 specifies whether the data was able to be computed.
 
-**registry:** The in-memory backend regsty value in its current form::
+**registry:** The in-memory backend registy value in its current form::
 
     {"event": "registry",
-     "params": {},
+     "params": null,
+     "data": ["table0", "table1", ...]
+    }
+
+**table_names:** The current file system backend table names::
+
+    {"event": "table_names",
+     "params": null,
      "data": ["table0", "table1", ...]
     }
 
@@ -67,6 +74,11 @@ depending on the type of request.
 **registry_request:** A simple reqest for the in-memory backend regsitry::
 
     {"event": "registry_request"}
+
+**table_names_request:** A simple reqest for the table names present in the
+file system backend::
+
+    {"event": "table_names_request"}
 
 """
 import json

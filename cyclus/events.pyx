@@ -4,6 +4,7 @@ import json
 from functools import wraps
 from collections.abc import Set, Sequence
 
+import cyclus.system
 from cyclus.lazyasd import lazyobject
 from cyclus.system import asyncio
 
@@ -28,10 +29,18 @@ def loop():
         time.sleep(STATE.frequency)
 
 
-from cyclus.actions import echo, sleep
+#
+# Set up event actions dict
+#
 
-EVENT_ACTIONS = {
-    "echo": echo,
-    #"registry_request": send_registry_action,
-    "sleep": sleep,
-    }
+EVENT_ACTIONS = {}
+
+if cyclus.system.PY_VERSION_TUPLE >= (3, 5, 0):
+    from cyclus import actions
+    EVENT_ACTIONS.update(
+        echo=actions.echo,
+        registry_request=actions.send_registry_action,
+        sleep=actions.sleep,
+        table_names_request=actions.send_table_names,
+        )
+    del actions

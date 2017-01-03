@@ -31,20 +31,35 @@ def action(f):
     return dec
 
 
+async def send_message(state, event, params=None, data='null'):
+    """Formats and puts a message on the send queue.
+
+    Parameters
+    ----------
+    state : SimState
+        The state to put the message in
+    event : str
+        The name of event to send.
+    params : dict or None, optional
+        A params dict that the event was called with. This will be
+        converted to JSON.
+    data : str, optional
+        The payload to send, this should already be in JSON form.
+    """
+    params = json.dumps(params)
+    message = ('{{"event":"{event}",'
+               '"params":{params},'
+               '"data":{data}}}'
+               ).format(event=event, params=params, data=data)
+    await state.send_queue.put(message)
+
+
+
 @action
 async def echo(state, s):
     """Simple asyncronous echo."""
     print(s)
-    params = json.dumps({"s": s})
-    data = json.dumps(s)
-    message = ('{"event":"echo",'
-               '"params":' + params + ','
-               '"data":' + data + '}'
-               )
-    print("echo message", message)
-    await state.send_queue.put(message)
-    print("put echo message")
-    return "returning from echo with " + message
+    await send_message(state, "echo", params={"s": s}, data=json.dumps(s))
 
 
 @action
@@ -77,20 +92,16 @@ def ensure_tables(tables):
     return tables
 
 
-async def send_registry():
+async def send_registry(state):
     """Sends the current value of the registry of the in-memory backend."""
-    reg = list(STATE.memory_backend.registry)
+    reg = sorted(state.memory_backend.registry)
     data = json.dumps(reg)
-    message = ('{"event":"registry",'
-               '"params":{},'
-               '"data":' + data + '}'
-               )
-    await STATE.send_queue.put(message)
+    await send_message(state, "registry", data=data)
 
 
 @action
-async def send_registry_action():
-    await send_registry()
+async def send_registry_action(state):
+    await send_registry(state)
 
 
 @action
@@ -115,6 +126,14 @@ async def deregister_tables(tables):
     curr = STATE.memory_backend.registry
     STATE.memory_backend.registry = curr - tables
     await send_registry()
+
+
+@action
+async def send_table_names(state):
+    """Send the table names from the file-system backend."""
+    names = sorted(state.file_backend.tables)
+    data = json.dumps(names)
+    await send_message(state, "table_names", data=data)
 
 
 @action

@@ -2,13 +2,28 @@
 import os
 import http.server
 import socketserver
+from argparse import ArgumentParser
 
 from cyclus.lib import Env
 
 
-def run_app():
-    """Runs the Cyclus web app."""
-    d = os.path.join(Env().install_path, 'share', 'cyclus', 'webapp')
+def make_parser():
+    p = ArgumentParser('webapp')
+    p.add_argument('-d', '--dir', dest='d',
+                   default=os.path.join(Env().install_path, 'share',
+                                        'cyclus', 'webapp'),
+                   help='directory to host.')
+    return p
+
+
+def run_app(d):
+    """Runs the Cyclus web app.
+
+    Parameters
+    ----------
+    d : str
+        Directory to serve.
+    """
     os.chdir(d)
     Handler = http.server.SimpleHTTPRequestHandler
     host = 'localhost'
@@ -25,7 +40,9 @@ def run_app():
 
 def main(args=None):
     """Main cyclus websapp CLI"""
-    run_app()
+    p = make_parser()
+    ns = p.parse_args()
+    run_app(d=ns.d)
 
 
 if __name__ == '__main__':
