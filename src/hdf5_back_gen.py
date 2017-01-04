@@ -1860,7 +1860,7 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
                                                             +"]"))))
         prefixes = template_args[container]
         
-        #Add sizes of any children.
+        #Add setup of any children.
         for c, s, p in zip(t.canon[1:], shape_array[1:], prefixes):
             node = CANON_TO_NODE[c]
             if isinstance(s, int):
@@ -2069,6 +2069,11 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
             #FL variable length containers
             elif child_node.canon[0] in variable_length_types:
                 #TODO Recursion for FL container children
+                body_nodes.append(pad_children(child_node, children[count],
+                                               fixed_var=child_variable,
+                                               depth=depth+1, prefix=prefix
+                                                              +prefixes[count]))
+                #body_nodes.append(memset())
                 keywords[child_keyword] = children[count]
             #PAIRS, etc.
             else:
@@ -2248,7 +2253,12 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                 dest = offset + "+" + item_size + "*" + count
                 length = (item_size + "*" + "(" + container_length + "-" 
                           + count + ")")
-                result.nodes.append(ExprStmt(child=memset(dest, str(0), length)))
+                if depth == 0:
+                    result.nodes.append(If(cond=BinOp(x=Raw(code=item_size+"*"+count),
+                                                      op="<", y=Raw(code="column")),
+                                           body=[ExprStmt(child=memset(dest, str(0), length))]))
+                else:
+                    result.nodes.append(ExprStmt(child=memset(dest, str(0), length)))
             else:
                 result.nodes.extend(child_bodies)
         return result
