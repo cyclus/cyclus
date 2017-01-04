@@ -20,10 +20,7 @@ def action(f):
     @wraps(f)
     def dec(*args, **kwargs):
         async def bound():
-            print("args", args)
-            print("kw", kwargs)
             rtn = await f(*args, **kwargs)
-            print("return", rtn)
             return rtn
         bound.__name__ = f.__name__
         bound.__qualname__ = f.__name__

@@ -143,11 +143,34 @@ will respond with the requested table::
     }
 
 
+Command Line Interface
+======================
+You may launch the cyclus server by running::
+
+    $ python -m cyclus.server input.xml
+
+Most of the arguments are relatively self-explanatory. However, the CLI here
+also allows you to load initial and repeating actions. The syntax for this
+is an event name followed by parameter tokens (which must contain an equals
+sign)::
+
+    $ python -m cyclus.server input.xml --repeating-actions sleep n=1
+
+You may load many actions by repeating the name-params pattern:
+
+    $ python -m cyclus.server input.xml --repeating-actions \
+        sleep n=1 \
+        table_data table="TimeSeriesPower"
+
+Note that everything right of an equals sign in a parameter token is passed
+to Python's eval() builtin function. It thererfore must be valid Python.
+For string values, make sure that you properly escape quotation marks as
+per the syntax of your shell language.
 """
 from __future__ import print_function, unicode_literals
 import json
 import logging
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Action
 
 import cyclus.events
 from cyclus.system import asyncio, concurrent_futures, websockets
@@ -170,16 +193,11 @@ async def action_consumer(state):
     while True:
         while not state.action_queue.empty():
             action = state.action_queue.get()
-            print("getting", action)
             action_task = asyncio.ensure_future(action())
-            print("action task")
             staged_tasks.append(action_task)
-            print("task appended")
         else:
             if len(staged_tasks) > 0:
-                print("awaiting staged tasks.", len(staged_tasks))
                 await asyncio.wait(staged_tasks)
-                print("print clearing")
                 staged_tasks.clear()
         await asyncio.sleep(state.frequency)
 
@@ -192,7 +210,6 @@ async def action_monitor(state):
     while True:
         while not state.monitor_queue.empty():
             action = state.monitor_queue.get()
-            print("getting monitor", action)
             await action()
         await asyncio.sleep(max(state.frequency, 0.05))
 
@@ -228,22 +245,15 @@ async def websocket_handler(websocket, path):
         done, pending = await asyncio.wait([recv_task, send_task],
                                            return_when=asyncio.FIRST_COMPLETED)
         # handle incoming
-        print("len(done)", len(done))
-        print("len(pending)", len(pending))
         if recv_task in done:
-            print("~~~ got incoming message")
             message = recv_task.result()
-            print("prepping to parse message", message)
             await queue_message_action(message)
-            print("queued the prepped message")
         else:
             recv_task.cancel()
         # handle sending of data
         if send_task in done:
             message = send_task.result()
-            print("sending message", message)
             await websocket.send(message)
-            print("message sent")
         else:
             send_task.cancel()
 
@@ -265,6 +275,27 @@ async def heartbeat(state):
         await asyncio.sleep(f)
 
 
+class EventCLIAction(Action):
+    """A basic class for parsing action specs on the command line."""
+
+    def __init__(self, option_strings, dest, nargs='+', **kwargs):
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, ns, values, option_string=None):
+        specs = []
+        for tok in values:
+            if '=' not in tok:
+                # must have new action name
+                specs.append((tok, {}))
+            else:
+                params = specs[-1][1]
+                name, _, s = tok.partition('=')
+                ctx = {}  # isolate teh evaluation context
+                val = eval(s, ctx, ctx)
+                params[name] = val
+        setattr(ns, self.dest, specs)
+
+
 def make_parser():
     """Makes the argument parser for the cyclus server."""
     p = ArgumentParser("cyclus", description="Cyclus Server CLI")
@@ -278,6 +309,12 @@ def make_parser():
                    help='port to run the server on')
     p.add_argument('-n', '--nthreads', type=int, dest='nthreads', default=16,
                    help='Maximum number of thread workers to run with.')
+    p.add_argument('-r', '--repeating-actions', action=EventCLIAction,
+                   dest='repeating_actions', default=(),
+                   help='list of repeating actions')
+    p.add_argument('-i', '--initial-actions', action=EventCLIAction,
+                   dest='initial_actions', default=(),
+                   help='list of initial actions to queue')
     p.add_argument('input_file', help='path to input file')
     return p
 
@@ -296,18 +333,23 @@ def main(args=None):
     ns = p.parse_args(args=args)
     cyclus.events.STATE = state = SimState(input_file=ns.input_file,
                                            output_path=ns.output_path,
-                                           memory_backend=True)
+                                           memory_backend=True,
+                                           debug=ns.debug)
     state.load()
-
-    #QUEUE.put(register_tables("Compositions"))
-    state.repeating_actions.append(["sleep", 1])
-    state.repeating_actions.append(["table_data", "TimeSeriesPower"])
+    # load initial and repeating actions
+    for kind, params in ns.initial_actions:
+        action = EVENT_ACTIONS[kind]
+        state.action_queue.put(action(state, **params))
+    state.repeating_actions.extend(ns.repeating_actions)
+    # start up tasks
     executor = concurrent_futures.ThreadPoolExecutor(max_workers=ns.nthreads)
     state.executor = executor
     loop = state.loop = asyncio.get_event_loop()
     if ns.debug:
         _start_debug(loop)
     server = websockets.serve(websocket_handler, ns.host, ns.port)
+    print("serving cyclus at http://{}:{}".format(ns.host, ns.port))
+    # run the loop!
     try:
         loop.run_until_complete(asyncio.gather(
             asyncio.ensure_future(run_sim(state, loop, executor)),

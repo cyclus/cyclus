@@ -66,6 +66,8 @@ class SimState(object):
         None, a new empty list is instantiated.
     heartbeat_frequency : float or int, optional
         The frequency with which to send heartbeat events.
+    debug : bool, optional
+        Whether the simulation should provide debugging information.
 
     Attributes
     ----------
@@ -95,7 +97,7 @@ class SimState(object):
     def __init__(self, input_file, output_path=None,
                  memory_backend=False, registry=True, schema_path=None,
                  flat_schema=False, frequency=0.001, repeating_actions=None,
-                 heartbeat_frequency=5):
+                 heartbeat_frequency=5, debug=False):
         ensure_close_dynamic_modules()
         self.input_file = input_file
         if output_path is None:
@@ -110,6 +112,7 @@ class SimState(object):
         self.repeating_actions = [] if repeating_actions is None \
                                     else repeating_actions
         self.heartbeat_frequency = heartbeat_frequency
+        self.debug = debug
         self.rec = self.file_backend = self.si = None
         self.tasks = {}
         self._send_queue = self._action_queue = self._monitor_queue = None
@@ -179,8 +182,6 @@ class SimState(object):
 
     def run(self):
         """Starts running the simulation."""
-        import time
-        time.sleep(1)
         self.si.timer.run_sim()
         self.rec.flush()
 
@@ -191,7 +192,6 @@ class SimState(object):
         """
         if self._send_queue is None:
             from cyclus.system import asyncio
-            print("!!!! making new send queue")
             self._send_queue = asyncio.Queue()
         return self._send_queue
 

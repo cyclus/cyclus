@@ -18,14 +18,13 @@ def loop():
         return
     STATE.rec.flush()
     for action in STATE.repeating_actions:
-        print("putting", action)
         if callable(action):
             args = ()
         else:
-            action, args = action[0], action[1:]
+            action, params = action[0], action[1]
             if isinstance(action, str):
                 action = EVENT_ACTIONS[action]
-        STATE.action_queue.put(action(STATE, *args))
+        STATE.action_queue.put(action(STATE, **params))
     while 'pause' in STATE.tasks or not STATE.action_queue.empty():
         time.sleep(STATE.frequency)
 
