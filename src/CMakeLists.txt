@@ -42,7 +42,6 @@ copy_when_diff(
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.gen"
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
     )
-set(generated_cc_files "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc")
 ############################################################
 ############# end special configuration ####################
 ############################################################
@@ -99,7 +98,6 @@ if(Cython_FOUND)
         ENDIF()
         copy_when_diff(${_generated_h} ${_h_file})
         copy_when_diff(${_generated_cc} ${_cc_file})
-        set(generated_cc_files ${generated_cc_files} "${_cc_file}")
     endforeach()
 endif(Cython_FOUND)
 ###########################################################
@@ -116,12 +114,10 @@ SET(CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}"
     PARENT_SCOPE
     )
-message("!!! generated_cc_files: ${generated_cc_files}")
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
     ${cc_files}
     "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
-    ${generated_cc_files}
     )
 
 set_source_files_properties(pyne_decay.cc PROPERTIES COMPILE_FLAGS "-O0")
