@@ -3,7 +3,7 @@
 The webserver has a number of 'events' that it may send or recieve. These
 in turn affect how a cyclus simulation runs.
 
-The server, which operates both asynchronously and in parallel, has four
+The server, which operates both asynchronously and in parallel, has five
 top-level tasks which it manages:
 
 * The cyclus simulation object, run on a separate thread,
@@ -12,6 +12,7 @@ top-level tasks which it manages:
 * A websockets server that sends and recieves JSON-formatted events from
   the client.
 * A heartbeat that sends special events every so often.
+* A monitor for presenting data about certain other future actions.
 
 For purposes of this document, the following terminology is used:
 
@@ -65,6 +66,16 @@ in seconds::
      "data": ["table0", "table1", ...]
     }
 
+**table_data:** Data about a table with the conditions and other parameters
+applied::
+
+    {"event": "table_data",
+     "params": {"table": "<name of table>",
+                "conds": ["<list of condition lists, if any>"],
+                "orient": "<orientation of JSON, see Pandas>"},
+     "data": {"<keys>": "<values subject to orientation>"}
+    }
+
 **table_names:** The current file system backend table names::
 
     {"event": "table_names",
@@ -79,6 +90,10 @@ express a request for behaviour (pause the simulation, restart, etc.) or
 a request for data. These events may or may not have additional parameters,
 depending on the type of request.
 
+**pause:** Pauses the simulation until it is unpaused::
+
+    {"event": "pause"}
+
 **registry_request:** A simple reqest for the in-memory backend regsitry::
 
     {"event": "registry_request"}
@@ -87,6 +102,11 @@ depending on the type of request.
 file system backend::
 
     {"event": "table_names_request"}
+
+**unpause:** Unpauses the simulation by canceling the pause task::
+
+    {"event": "unpause"}
+
 
 Bidirectional Events
 --------------------
@@ -115,7 +135,7 @@ import cyclus.events
 from cyclus.system import asyncio, concurrent_futures, websockets
 from cyclus.simstate import SimState
 from cyclus.actions import sleep
-from cyclus.events import EVENT_ACTIONS
+from cyclus.events import EVENT_ACTIONS, MONITOR_ACTIONS
 
 
 def make_parser():
@@ -137,15 +157,13 @@ async def run_sim(state, loop, executor):
 
 
 async def action_consumer(state):
+    """The basic consumer of actions."""
     staged_tasks = []
     while True:
         while not state.action_queue.empty():
             action = state.action_queue.get()
             print("getting", action)
-            #action_task = asyncio.ensure_future(action())
-            action_obj = action()
-            action_obj.__name__ = action_obj.__qualname__ = action.__name__
-            action_task = asyncio.ensure_future(action_obj)
+            action_task = asyncio.ensure_future(action())
             print("action task")
             staged_tasks.append(action_task)
             print("task appended")
@@ -158,6 +176,19 @@ async def action_consumer(state):
         await asyncio.sleep(state.frequency)
 
 
+async def action_monitor(state):
+    """Consumes actions that have been scheduled for monitoring tasks,
+    such as status reporting, sending signals, or canceling other task.
+    These are awaited in the order recieved.
+    """
+    while True:
+        while not state.monitor_queue.empty():
+            action = state.monitor_queue.get()
+            print("getting monitor", action)
+            await action()
+        await asyncio.sleep(max(state.frequency, 0.05))
+
+
 async def get_send_data():
     """Asynchronously grabs the next data to send from the queue."""
     state = cyclus.events.STATE
@@ -167,17 +198,18 @@ async def get_send_data():
 
 async def queue_message_action(message):
     state = cyclus.events.STATE
-    print("got message", message)
     event = json.loads(message)
-    print("found event", event)
     params = event.get("params", {})
-    print("found params", params)
     kind = event["event"]
-    print("print kind", kind)
-    action = EVENT_ACTIONS[kind]
-    print("looked up action", action)
-    state.action_queue.put(action(state, **params))
-    print("added action to queue")
+    if kind in EVENT_ACTIONS:
+        action = EVENT_ACTIONS[kind]
+        state.action_queue.put(action(state, **params))
+    elif kind in MONITOR_ACTIONS:
+        action = MONITOR_ACTIONS[kind]
+        state.monitor_queue.put(action(state, **params))
+    else:
+        raise KeyError(kind + "action could not be found in either"
+                       "EVENT_ACTIONS or MONITOR_ACTIONS.")
 
 
 async def websocket_handler(websocket, path):
@@ -242,15 +274,17 @@ def main(args=None):
 
     #QUEUE.put(register_tables("Compositions"))
     state.repeating_actions.append([sleep, 1])
-    #state.repeating_actions.append([send_table, "TimeSeriesPower"])
+    state.repeating_actions.append(["table_data", "TimeSeriesPower"])
     executor = concurrent_futures.ThreadPoolExecutor(max_workers=16)
-    loop = asyncio.get_event_loop()
+    state.executor = executor
+    loop = state.loop = asyncio.get_event_loop()
     loop.set_debug(True)
     server = websockets.serve(websocket_handler, 'localhost', 4242)
     try:
         loop.run_until_complete(asyncio.gather(
             asyncio.ensure_future(run_sim(state, loop, executor)),
             asyncio.ensure_future(action_consumer(state)),
+            asyncio.ensure_future(action_monitor(state)),
             asyncio.ensure_future(heartbeat(state)),
             asyncio.ensure_future(server),
             ))

@@ -137,8 +137,18 @@ async def send_table_names(state):
     await send_message(state, "table_names", data=data)
 
 
+def table_data_as_json(state, table, conds, orient):
+    """Obtains table data as a JSON string."""
+    df = state.memory_backend.query(table, conds=conds)
+    if df is None:
+        data = '"{} is not available."'.format(table)
+    else:
+        data = df.to_json(default_handler=str, orient=orient)
+    return data
+
+
 @action
-async def send_table(state, table, conds=None, orient='split'):
+async def send_table_data(state, table, conds=None, orient='split'):
     """Sends all table data in JSON format.
 
     Parameters
@@ -152,30 +162,14 @@ async def send_table(state, table, conds=None, orient='split'):
         The orientation of the JSON representation of the data. See
         the pandas.DataFrame.to_json() method documentation for more
         information.
-
-    Notes
-    -----
-    This action adds a message to the send queue with the following
-    form::
-
-        {"event": "tabledata",
-         "params": {...}
-         "data": {...}
-         }
-
     """
-    df = state.memory_backend.query(table, conds=conds)
-    if df is None:
-        data = '"{} is not available."'.format(table)
-    else:
-        data = df.to_json(default_handler=str, orient=orient)
+    # get the table data in another thread, just in case.
+    task = state.loop.run_in_executor(state.executor, table_data_as_json,
+                                      state, table, conds, orient)
+    await asyncio.wait([task])
+    data = task.result()
     params = {'table': table, 'conds': conds, 'orient': orient}
-    params = json.dumps(params)
-    message = ('{"event":"tabledata",'
-               '"params":' + params + ','
-               '"data":' + data + '}'
-               )
-    await state.send_queue.put(message)
+    await send_message(state, "table_data", params=params, data=data)
 
 
 @action

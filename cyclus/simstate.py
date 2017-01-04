@@ -76,6 +76,11 @@ class SimState(object):
     si : SimInit or None
         The main simulation initializer object that then can be used
         to drive the simulation.
+    loop : event loop or None
+        The Python event loop the current simulation is running under.
+    executor : Executor or None,
+        The Python Executor that the simulation should use when running as
+        a server. This is typically a thread pool.
     tasks : dict
         A str-keyed dictionary mapping to current tasks that may be
         shared among many actions.
@@ -83,12 +88,14 @@ class SimState(object):
         A queue of data to send from the server to the client.
     action_queue : queue.Queue or None
         A queue for pending actions to be loaded to popped from.
+    monitor_queue : queue.Queue or None
+        A queue for pending actions for monitoring tasks.
     """
 
     def __init__(self, input_file, output_path=None,
                  memory_backend=False, registry=True, schema_path=None,
                  flat_schema=False, frequency=0.001, repeating_actions=None,
-                 heartbeat_frequency=1):
+                 heartbeat_frequency=5):
         ensure_close_dynamic_modules()
         self.input_file = input_file
         if output_path is None:
@@ -105,7 +112,8 @@ class SimState(object):
         self.heartbeat_frequency = heartbeat_frequency
         self.rec = self.file_backend = self.si = None
         self.tasks = {}
-        self._send_queue = self._action_queue = None
+        self._send_queue = self._action_queue = self._monitor_queue = None
+        self.loop = self.executor = None
 
     def __del__(self):
         self.rec.flush()
@@ -193,3 +201,10 @@ class SimState(object):
         if self._action_queue is None:
             self._action_queue = queue.Queue()
         return self._action_queue
+
+    @property
+    def monitor_queue(self):
+        """A queue for pending monitoring actions."""
+        if self._monitor_queue is None:
+            self._monitor_queue = queue.Queue()
+        return self._monitor_queue
