@@ -66,15 +66,6 @@ in seconds::
      "data": ["table0", "table1", ...]
     }
 
-**table_data:** Data about a table with the conditions and other parameters
-applied::
-
-    {"event": "table_data",
-     "params": {"table": "<name of table>",
-                "conds": ["<list of condition lists, if any>"],
-                "orient": "<orientation of JSON, see Pandas>"},
-     "data": {"<keys>": "<values subject to orientation>"}
-    }
 
 **table_names:** The current file system backend table names::
 
@@ -90,9 +81,23 @@ express a request for behaviour (pause the simulation, restart, etc.) or
 a request for data. These events may or may not have additional parameters,
 depending on the type of request.
 
+**deregister_tables:** Remove table names from the in-memory backend registry.
+A registry event from the server will follow the completion of this event::
+
+    {"event": "deregister_tables",
+     "params": {"tables": ["table0", "table1", ...]}
+     }
+
 **pause:** Pauses the simulation until it is unpaused::
 
     {"event": "pause"}
+
+**register_tables:** Add table names to the in-memory backend registry.
+A registry event from the server will follow the completion of this event::
+
+    {"event": "register_tables",
+     "params": {"tables": ["table0", "table1", ...]}
+     }
 
 **registry_request:** A simple reqest for the in-memory backend regsitry::
 
@@ -126,25 +131,28 @@ the data key need not be present::
 
     {"event": "sleep", "params": {"n": value}}
 
+**table_data:** Data about a table with the conditions and other parameters
+applied. If the client sends this event without the "data" key, the server
+will respond with the requested table::
+
+    {"event": "table_data",
+     "params": {"table": "<name of table>",
+                "conds": ["<list of condition lists, if any>"],
+                "orient": "<orientation of JSON, see Pandas>"},
+     "data": {"<keys>": "<values subject to orientation>"}
+    }
+
 
 """
+from __future__ import print_function, unicode_literals
 import json
+import logging
 from argparse import ArgumentParser
 
 import cyclus.events
 from cyclus.system import asyncio, concurrent_futures, websockets
 from cyclus.simstate import SimState
-from cyclus.actions import sleep
 from cyclus.events import EVENT_ACTIONS, MONITOR_ACTIONS
-
-
-def make_parser():
-    """Makes the argument parser for the cyclus server."""
-    p = ArgumentParser("cyclus", description="Cyclus Server CLI")
-    p.add_argument('-o', '--output-path', dest='output_path',
-                   default=None, help='output path')
-    p.add_argument('input_file', help='path to input file')
-    return p
 
 
 async def run_sim(state, loop, executor):
@@ -257,6 +265,31 @@ async def heartbeat(state):
         await asyncio.sleep(f)
 
 
+def make_parser():
+    """Makes the argument parser for the cyclus server."""
+    p = ArgumentParser("cyclus", description="Cyclus Server CLI")
+    p.add_argument('-o', '--output-path', dest='output_path',
+                   default=None, help='output path')
+    p.add_argument('--debug', action='store_true', default=False,
+                   dest='debug', help="runs the server in debug mode.")
+    p.add_argument('--host', dest='host', default='localhost',
+                   help='hostname to run the server on')
+    p.add_argument('-p', '--port', dest='port', type=int, default=4242,
+                   help='port to run the server on')
+    p.add_argument('-n', '--nthreads', type=int, dest='nthreads', default=16,
+                   help='Maximum number of thread workers to run with.')
+    p.add_argument('input_file', help='path to input file')
+    return p
+
+
+def _start_debug(loop):
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger('websockets.server')
+    logger.setLevel(logging.ERROR)
+    logger.addHandler(logging.StreamHandler())
+    loop.set_debug(True)
+
+
 def main(args=None):
     """Main cyclus server entry point."""
     p = make_parser()
@@ -266,20 +299,15 @@ def main(args=None):
                                            memory_backend=True)
     state.load()
 
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-    logger = logging.getLogger('websockets.server')
-    logger.setLevel(logging.ERROR)
-    logger.addHandler(logging.StreamHandler())
-
     #QUEUE.put(register_tables("Compositions"))
-    state.repeating_actions.append([sleep, 1])
+    state.repeating_actions.append(["sleep", 1])
     state.repeating_actions.append(["table_data", "TimeSeriesPower"])
-    executor = concurrent_futures.ThreadPoolExecutor(max_workers=16)
+    executor = concurrent_futures.ThreadPoolExecutor(max_workers=ns.nthreads)
     state.executor = executor
     loop = state.loop = asyncio.get_event_loop()
-    loop.set_debug(True)
-    server = websockets.serve(websocket_handler, 'localhost', 4242)
+    if ns.debug:
+        _start_debug(loop)
+    server = websockets.serve(websocket_handler, ns.host, ns.port)
     try:
         loop.run_until_complete(asyncio.gather(
             asyncio.ensure_future(run_sim(state, loop, executor)),

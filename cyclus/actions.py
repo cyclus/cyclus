@@ -106,26 +106,26 @@ async def send_registry_action(state):
 
 
 @action
-async def register_tables(tables):
+async def register_tables(state, tables):
     """Add table names to the in-memory backend registry. The lone
     argument here may either be a str (single table), or a set or sequence
     of strings (many tables) to add.
     """
     tables = ensure_tables(tables)
-    curr = STATE.memory_backend.registry
-    STATE.memory_backend.registry = curr | tables
+    curr = state.memory_backend.registry
+    state.memory_backend.registry = curr | tables
     await send_registry()
 
 
 @action
-async def deregister_tables(tables):
+async def deregister_tables(state, tables):
     """Remove table names to the in-memory backend registry. The lone
     argument here may either be a str (single table), or a set or sequence
     of strings (many tables) to add.
     """
     tables = ensure_tables(tables)
-    curr = STATE.memory_backend.registry
-    STATE.memory_backend.registry = curr - tables
+    curr = state.memory_backend.registry
+    state.memory_backend.registry = curr - tables
     await send_registry()
 
 
