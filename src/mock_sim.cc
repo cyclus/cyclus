@@ -200,19 +200,14 @@ void MockSim::AddRecipe(std::string name, Composition::Ptr c) {
 
 int MockSim::Run() {
   // Initialize Python functionality
-  #ifdef CYCLUS_WITH_PYTHON
-  Py_Initialize();
-  PyInitHooks();
-  #endif
+  PyStart();
 
   agent->Build(NULL);
   int id = agent->id();
   ti_.RunSim();
   rec_.Flush();
 
-  #ifdef CYCLUS_WITH_PYTHON
-  Py_Finalize();
-  #endif
+  PyStop();
   return id;
 }
 
