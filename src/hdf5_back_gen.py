@@ -2065,6 +2065,11 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                     keywords[child_keyword] = children[count]
                 else:
                     #TODO: Recursion for VL container children                                  
+                    body_nodes.append(pad_children(child_node, children[count],
+                                                   fixed_var=child_variable,
+                                                   depth=depth+1, 
+                                                   prefix=prefix
+                                                          +prefixes[count]))
                     keywords[child_keyword] = child_variable
             #FL variable length containers
             elif child_node.canon[0] in variable_length_types:
@@ -2193,7 +2198,6 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                 new_variable = iterator
             prefixes = template_args[container]
             if len(t.canon[1:]) == 1:
-                #pointer_var = "*" + iterator
                 child_node = CANON_TO_NODE[t.canon[1]]
                 child_size = get_variable("item_size", depth=depth+1, 
                                           prefix=prefix+prefixes[0])
@@ -2254,11 +2258,17 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                 length = (item_size + "*" + "(" + container_length + "-" 
                           + count + ")")
                 if depth == 0:
-                    result.nodes.append(If(cond=BinOp(x=Raw(code=item_size+"*"+count),
-                                                      op="<", y=Raw(code="column")),
-                                           body=[ExprStmt(child=memset(dest, str(0), length))]))
+                    result.nodes.append(If(cond=BinOp(
+                                                  x=Raw(code=item_size+"*"
+                                                             +count),
+                                                  op="<", y=Raw(code="column")),
+                                           body=[ExprStmt(child=memset(
+                                                                     dest, 
+                                                                     str(0), 
+                                                                     length))]))
                 else:
-                    result.nodes.append(ExprStmt(child=memset(dest, str(0), length)))
+                    result.nodes.append(ExprStmt(child=memset(dest, str(0), 
+                                                              length)))
             else:
                 result.nodes.extend(child_bodies)
         return result
@@ -2276,7 +2286,8 @@ def main_write():
                        args=[Decl(type=Type(cpp="char*"), name=Var(name="buf")),
                              Decl(type=Type(cpp="std::vector<int>&"), 
                                   name=Var(name="shape")),
-                             Decl(type=Type(cpp="const boost::spirit::hold_any*"),
+                             Decl(type=Type(
+                                          cpp="const boost::spirit::hold_any*"),
                                   name=Var(name="a")),
                              Decl(type=Type(cpp="size_t"),
                                   name=Var(name="column"))],
