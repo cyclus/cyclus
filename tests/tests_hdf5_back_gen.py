@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(cycdir, 'src'))
 
 from hdf5_back_gen import Node, Var, Type, Decl, Expr, Assign, If, For, BinOp, LeftUnaryOp, \
     RightUnaryOp, FuncCall, Raw, DeclAssign, PrettyFormatter, CppGen, ExprStmt, Case, Block, \
-    get_item_size
+    FuncDef, get_item_size
 
 PRETTY = PrettyFormatter()
 CPPGEN = CppGen()
@@ -114,7 +114,7 @@ for(int i=0;i<5;i++){
 
 def test_cppgen_funccall():
     exp = """
-mult_two<std::string,STRING>(a,b)""".strip()
+mult_two<std::string,STRING>(a, b)""".strip()
     n = FuncCall(name=Var(name="mult_two"),\
                  args=[Var(name="a"), Var(name="b")],\
                  targs=[Type(cpp="std::string"), Var(name="STRING")])
@@ -149,6 +149,32 @@ int z=x+y;\n"""
                                                       value=BinOp(x=Var(name="x"),
                                                                   op="+", 
                                                                   y=Var(name="y"))))])])
+    obs = CPPGEN.visit(n)
+    assert_equal(exp, obs)
+    
+def test_cppgen_funcdef():
+    exp = """template<>
+void hello(int a, std::string b) {
+  int x=5;
+  int y=6;
+  int z=x+y;
+}
+"""
+    n = FuncDef(type=Raw(code="void"), name=Var(name="hello"), 
+                args=[Decl(type=Type(cpp="int"), name=Var(name="a")),
+                      Decl(type=Type(cpp="std::string"), name=Var(name="b"))], 
+                body=[ExprStmt(child=DeclAssign(type=Type(cpp="int"), 
+                                               target=Var(name="x"), 
+                                               value=Raw(code="5"))),
+                      ExprStmt(child=DeclAssign(type=Type(cpp="int"), 
+                                               target=Var(name="y"), 
+                                               value=Raw(code="6"))),
+                      ExprStmt(child=DeclAssign(type=Type(cpp="int"), 
+                                                target=Var(name="z"), 
+                                                value=BinOp(x=Var(name="x"),
+                                                            op="+", 
+                                                            y=Var(name="y"))))], 
+                tspecial=True)
     obs = CPPGEN.visit(n)
     assert_equal(exp, obs)
     
