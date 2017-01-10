@@ -29,7 +29,7 @@ of the  coroutine function and arguments that is added to the action queue
 each time step of the simulation. This enables pausing each time step,
 streaming table data, etc.
 
-**task:** A future object that resulsts from calling an action. See
+**task:** A future object that results from calling an action. See
 asyncio for more details.
 
 
@@ -47,7 +47,7 @@ bidirectional events which are sent by either the client or the server.
 
 Server Events
 -------------
-Server-sent event are those that the server sends to the client. These are
+Server-sent events are those that the server sends to the client. These are
 often repsonse to requests for data about the state of the simulation.
 They typically contain a "data" key which holds data about the simulation
 state. They may also have a "success" key, whose value is true/false, that
