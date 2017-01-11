@@ -2297,6 +2297,27 @@ def main_write():
         output += CPPGEN.visit(block)
     return output
 
+def main_val_to_buf():
+    pass
+
+def main_buf_to_val():
+    pass
+    
+def main_val_to_buf_h():
+    CPPGEN = CppGen()
+    output = ""
+    block = Block(nodes=[])
+    for i in VARIATION_DICT:
+        node = CANON_TO_NODE[i]
+        if node.canon[0] in variable_length_types:
+            block.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
+                                                   name=FuncCall(name=Var(name="VLValToBuf"),
+                                                                 args=[Decl(type=Type(cpp="const "+node.cpp+"&"),
+                                                                            name=Raw(code="x"))]))))
+    output += CPPGEN.visit(block)
+    output = indent(output, INDENT)
+    return output
+
 NOT_VL = []
 VARIATION_DICT = OrderedDict()
 ORIGIN_DICT = OrderedDict()
@@ -2305,7 +2326,10 @@ MAIN_DISPATCH = {"QUERY": main_query,
                  "CREATE": main_create,
                  "VL_DATASET": main_vl_dataset,
                  "FILL_BUF": main_fill_buf,
-                 "WRITE": main_write}
+                 "WRITE": main_write,
+                 "VAL_TO_BUF": main_val_to_buf,
+                 "BUF_TO_VAL": main_buf_to_val,
+                 "VAL_TO_BUF_H": main_val_to_buf_h}
 
 def main():
     global NOT_VL

@@ -30,6 +30,7 @@ share/cyclus_nuc_data.h5
 src/pyne_decay.h
 src/pyne_decay.cc
 src/hdf5_back.cc
+src/hdf5_back.h
 src/eventhooks.cc
 src/eventhooks.h
 share/dbtypes.json

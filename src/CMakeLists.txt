@@ -23,6 +23,17 @@ CONFIGURE_FILE(
     @ONLY
     )
 
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF_H" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF_H RESULT_VARIABLE res_var_h)
+IF(NOT "${res_var_h}" STREQUAL "0")
+  message(FATAL_ERROR "Process hdf5_back_gen.py 'VAL_TO_BUF_H' failed, result = '${res_var_h}'")
+ENDIF()
+
+CONFIGURE_FILE(
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h"
+    @ONLY
+    )
+
 EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "QUERY" OUTPUT_VARIABLE HDF5_BACK_CC_QUERY RESULT_VARIABLE res_var_q)
 IF(NOT "${res_var_q}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'QUERY' failed, result = '${res_var_q}'")
