@@ -168,7 +168,9 @@ For string values, make sure that you properly escape quotation marks as
 per the syntax of your shell language.
 """
 from __future__ import print_function, unicode_literals
+import sys
 import json
+import socket
 import logging
 from argparse import ArgumentParser, Action
 
@@ -327,6 +329,24 @@ def _start_debug(loop):
     loop.set_debug(True)
 
 
+def _find_open_port(host, port):
+    found = False
+    while not found:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.bind((host, port))
+        except socket.error as e:
+            if e.errno == 98:
+                port += 1
+                continue
+            else:
+                raise
+        finally:
+            s.close()
+        found = True
+    return port
+
+
 def main(args=None):
     """Main cyclus server entry point."""
     p = make_parser()
@@ -347,6 +367,11 @@ def main(args=None):
     loop = state.loop = asyncio.get_event_loop()
     if ns.debug:
         _start_debug(loop)
+    open_port = _find_open_port(ns.host, ns.port)
+    if open_port != ns.port:
+        msg = "port {} already bound, next available port is {}"
+        print(msg.format(ns.port, open_port), file=sys.stderr)
+        ns.port = open_port
     server = websockets.serve(websocket_handler, ns.host, ns.port)
     print("serving cyclus at http://{}:{}".format(ns.host, ns.port))
     # run the loop!
