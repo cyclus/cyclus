@@ -100,7 +100,7 @@ BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
            }
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
-             'std::map', '{0}::toolkit::ResBuf'.format(CYCNS),
+        'std::map', 'std::tuple', '{0}::toolkit::ResBuf'.format(CYCNS),
              CYCNS + '::toolkit::ResMap',}
 
 WRANGLERS = {
@@ -570,6 +570,7 @@ class VarDeclarationFilter(Filter):
         'std::list': (None, 'val'),
         'std::pair': (None, 'first', 'second'),
         'std::map': ((None, 'item'), 'key', 'val'),
+        'std::tuple': ((None, 'item'), 'val'),
         }
 
     def canonize_alias(self, t, name, alias=None):
@@ -584,6 +585,7 @@ class VarDeclarationFilter(Filter):
         'std::list': (None, ''),
         'std::pair': (None, '', ''),
         'std::map': ((None, ''), '', ''),
+        'std::tuple': ((None, ''), ''),
         }
 
     def canonize_tooltip(self, t, name, tooltip=None):
@@ -746,6 +748,7 @@ class StateAccumulator(object):
         'std::list': ('T',),
         'std::pair': ('T1', 'T2'),
         'std::map': ('Key', 'T'),
+        'std::tuple': ('T',),
         '{0}::toolkit::ResBuf'.format(CYCNS): ('T',),
         '{0}::toolkit::ResMap'.format(CYCNS): ('K', 'R'),
         }
@@ -1166,6 +1169,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             'std::list': self.read_list,
             'std::pair': self.read_pair,
             'std::map': self.read_map,
+            'std::tuple': self.read_tuple,
             }
         self._vals = {
             'bool': self._val_bool,
@@ -1180,6 +1184,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             'std::list': self._val_list,
             'std::pair': self._val_pair,
             'std::map': self._val_map,
+            'std::tuple': self._val_tuple,
             }
         self._idx_lev = 0
 
@@ -1318,6 +1323,26 @@ class InfileToDbFilter(CodeGeneratorFilter):
         ind = ind[:-2]
         v += ind + '}\n'
         return v
+
+    def _val_tuple(t, val=(), name=None, uitype=None, ind=''):
+        uitype = prepare_type(t, uitype)
+
+        v = ind + '{0} {1};\n'.format(type_to_str(t), name)
+        v += ind + '{\n'
+        ind += '  '
+        for i,x in enumerate(val):
+            elemname = 'elem_{0}'.format(i)
+            v += self._val(ftype, val=val[i], uitype=uitype[i], name=fname, ind=ind)
+        
+        v += ind + '{0} = std::make_tuple('.format(name)
+        for i,x in enumerate(val):
+            v += 'elem_{0}, '.format(i)
+        v = v[:-2]
+        v += ')\n'
+        ind = ind[:-2]
+        v += ind + '}\n'
+        return v
+
 
     def _val_map(self, t, val=None, name=None, uitype=None, ind=''):
         uitype = prepare_type(t, uitype)
@@ -1499,6 +1524,35 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += self.read_member(first, alias[1], t[1], uitype[1], ind+'  ', idx='0')
         s += self.read_member(second, alias[2], t[2], uitype[2], ind+'  ', idx='0')
         s += ind + '{0} {1}({2}, {3});\n'.format(type_to_str(t), member, first, second)
+        return s
+    
+    def read_tuple(self, member, alias, t, uitype=None, ind="  ", idx=None,
+                  path=''):
+        uitype = prepare_type(t, uitype)
+        alias = prepare_type(t, alias)
+        
+        # the extra assignment (bub, sub) is because we want the intial sub
+        # rhs to be from outer scope - otherwise the newly defined sub will be
+        # in scope causing segfaults
+        tree_idx = idx or '0'
+        n_val = len(range(alias))
+
+        varname = [] 
+        for i in n_val:
+            varname.append( 'varnam{0}{1}'.format(i, tree_idx))
+        
+        s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
+        s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
+        s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
+        for i in n_val:
+            s += self.read_member(varname[i], alias[i], t[i], uitype[i], ind+'  ', idx='0')
+        
+        s += ind + '{0} {1}('.format(type_to_str(t), member)
+        for i in n:
+            s+= '{0}, '.format(varname[i])
+        s = s[:-2]
+        s += '(;\n}'
+            
         return s
 
     def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None,
@@ -1739,6 +1793,22 @@ class SchemaFilter(CodeGeneratorFilter):
             impl += '</element>'
         elif t == 'std::pair':
             name = 'pair'
+            if names[0] is not None:
+                name = names[0]
+            firstname = 'first' if isinstance(cpptype[1], STRING_TYPES) else ['first']
+            if names[1] is not None:
+                firstname = names[1]
+            secondname = 'second' if isinstance(cpptype[2], STRING_TYPES) else ['second']
+            if names[2] is not None:
+                secondname = names[2]
+            impl += '<element name="{0}">'.format(name)
+            impl += '<interleave>'
+            impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
+            impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
+            impl += '</interleave>'
+            impl += '</element>'
+        elif t == 'std::tuple':
+            name = 'tuple'
             if names[0] is not None:
                 name = names[0]
             firstname = 'first' if isinstance(cpptype[1], STRING_TYPES) else ['first']
