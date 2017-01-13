@@ -7,6 +7,7 @@
 
 extern "C" {
 #include "eventhooks.h"
+#include "pyinfile.h"
 }
 
 namespace cyclus {
@@ -16,8 +17,10 @@ bool PY_INTERP_INIT = false;
 void PyInitHooks(void) {
 #if PY_MAJOR_VERSION < 3
   initeventhooks();
+  initpyinfile();
 #else
   PyInit_eventhooks();
+  PyInit_pyinfile();
 #endif
 };
 
@@ -41,6 +44,12 @@ void PyStop(void) {
 };
 
 void EventLoop(void) { CyclusEventLoopHook(); };
+
+namespace toolkit {
+std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };
+
+std::string JsonToPy(std::string infile) { return CyclusJsonToPy(infile); };
+}  // namespace toolkit
 }  // namespace cyclus
 #else   // else CYCLUS_WITH_PYTHON
 namespace cyclus {
@@ -54,5 +63,19 @@ void PyStart(void) {};
 void PyStop(void) {};
 
 void EventLoop(void) {};
+
+namespace toolkit {
+std::string PyToJson(std::string infile) {
+  throw cyclus::ValidationError("Cannot convert from Python input files since "
+                                "Cyclus was not built with Python bindings.");
+  return "";
+};
+
+std::string JsonToPy(std::string infile) {
+  throw cyclus::ValidationError("Cannot convert to Python input files since "
+                                "Cyclus was not built with Python bindings.");
+  return "";
+};
+} // namespace toolkit
 } // namespace cyclus
 #endif  // ends CYCLUS_WITH_PYTHON

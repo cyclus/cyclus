@@ -29,8 +29,6 @@ share/cyclus_nuc_data.h5
 src/pyne_decay.h
 src/pyne_decay.cc
 src/hdf5_back.cc
-src/eventhooks.cc
-src/eventhooks.h
 share/dbtypes.json
 tests/db.h5
 cyclus/cpp_typesystem.pxd
@@ -44,3 +42,7 @@ tests/libcyclus-test.sqlite
 # generated cython ignores
 *.cc.gen
 *.cc.h
+src/eventhooks.cc
+src/eventhooks.h
+src/pyinfile.cc
+src/pyinfile.h

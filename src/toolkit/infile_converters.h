@@ -12,6 +12,8 @@ std::string JsonToXml(std::string s);
 /// Converts an XML string into an equivalent JSON string
 std::string XmlToJson(std::string s);
 
+// PyToJson declared in pyhooks.h
+// JsonToPy declared in pyhooks.h
 }  // namespace toolkit
 }  // namespace cyclus
 

@@ -1,6 +1,8 @@
 #ifndef CYCLUS_SRC_PYHOOKS_H_
 #define CYCLUS_SRC_PYHOOKS_H_
 
+#include <string>
+
 namespace cyclus {
 /// Because of NumPy #7595, we can only initialize & finalize the Python
 /// interpreter once. This variable keeps a count of how many times we have
@@ -24,5 +26,13 @@ void PyStop(void);
 
 // Add some simple shims that attach C++ to Python C hooks
 void EventLoop(void);
-}
+
+namespace toolkit {
+/// Convert Python simulation string to JSON
+std::string PyToJson(std::string);
+
+/// Convert JSON string to Python simulation string
+std::string JsonToPy(std::string);
+}  // ends namespace toolkit
+}  // ends namespace cyclus
 #endif  // ends CYCLUS_SRC_PYHOOKS_H_
