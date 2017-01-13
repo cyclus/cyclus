@@ -17,11 +17,12 @@ extern bool PY_INTERP_INIT;
 void PyInitHooks(void);
 
 /// Initialize Python functionality, this is a no-op if Python was not
-/// installed along with Cyclus.
+/// installed along with Cyclus. This may be called many times and safely
+/// initializes the Python interpreter only once.
 void PyStart(void);
 
 /// Closes the current Python session. This is a no-op if Python was
-/// not installed with Cyclus.
+/// not installed with Cyclus. This may safely be called many times.
 void PyStop(void);
 
 // Add some simple shims that attach C++ to Python C hooks

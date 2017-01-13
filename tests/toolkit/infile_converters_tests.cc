@@ -80,3 +80,31 @@ TEST(InfileConverters, JsonXmlRoundTrip) {
   EXPECT_STREQ(j1.c_str(), j2.c_str());
   EXPECT_STREQ(x1.c_str(), x2.c_str());
 }
+
+TEST(InfileConverters, JsonPyRoundTrip) {
+  using std::string;
+  cyclus::PyStart();
+  string inp = cyclus::toolkit::XmlToJson(MakeInput());
+  string p1 = cyclus::toolkit::JsonToPy(inp);
+  string j1 = cyclus::toolkit::PyToJson(p1);
+  string p2 = cyclus::toolkit::JsonToPy(j1);
+  string j2 = cyclus::toolkit::PyToJson(p2);
+  cyclus::PyStop();
+
+  EXPECT_STREQ(j1.c_str(), j2.c_str());
+  EXPECT_STREQ(p1.c_str(), p2.c_str());
+}
+
+TEST(InfileConverters, PyXmlRoundTrip) {
+  using std::string;
+  cyclus::PyStart();
+  string inp = MakeInput();
+  string p1 = cyclus::toolkit::XmlToPy(inp);
+  string x1 = cyclus::toolkit::PyToXml(p1);
+  string p2 = cyclus::toolkit::XmlToPy(x1);
+  string x2 = cyclus::toolkit::PyToXml(p2);
+  cyclus::PyStop();
+
+  EXPECT_STREQ(p1.c_str(), p2.c_str());
+  EXPECT_STREQ(x1.c_str(), x2.c_str());
+}

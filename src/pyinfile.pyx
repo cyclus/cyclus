@@ -39,7 +39,7 @@ cdef public std_string py_to_json "CyclusPyToJson" (std_string cpp_infile):
         sim = sim.decode()  # assume in JSON format, get into str
     elif isinstance(sim, Mapping):
         import json
-        sim = json.dumps(sim, sort_keys=True)
+        sim = json.dumps(sim, sort_keys=True, indent=1)
     else:
         raise RuntimeError('top-level simulation object does not have proper type.')
     cdef std_string cpp_rtn = str_py_to_cpp(sim)
