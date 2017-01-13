@@ -748,7 +748,7 @@ class StateAccumulator(object):
         'std::list': ('T',),
         'std::pair': ('T1', 'T2'),
         'std::map': ('Key', 'T'),
-        'std::tuple': ('T',),
+        'std::tuple': ('T{n}',),
         '{0}::toolkit::ResBuf'.format(CYCNS): ('T',),
         '{0}::toolkit::ResMap'.format(CYCNS): ('K', 'R'),
         }
@@ -1526,33 +1526,33 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + '{0} {1}({2}, {3});\n'.format(type_to_str(t), member, first, second)
         return s
     
-    def read_tuple(self, member, alias, t, uitype=None, ind="  ", idx=None,
-                  path=''):
+    def read_tuple(member, alias, t, uitype=None, ind="  ", idx=None,
+                   path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
-        
+
         # the extra assignment (bub, sub) is because we want the intial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
-        n_val = len(range(alias))
+        n_val = len(alias)
 
-        varname = [] 
-        for i in n_val:
-            varname.append( 'varnam{0}{1}'.format(i, tree_idx))
-        
+        varname = []
+        for i in range(n_val):
+            varname.append('varnam{0}_{1}'.format(i, tree_idx))
+
         s = '{ind}{0}::InfileTree* bub = sub->SubTree("{path}{1}", {2});\n'
         s = s.format(CYCNS, alias[0], tree_idx, path=path, ind=ind)
         s += ind + '{0}::InfileTree* sub = bub;\n'.format(CYCNS)
         for i in n_val:
-            s += self.read_member(varname[i], alias[i], t[i], uitype[i], ind+'  ', idx='0')
-        
+            s += self.read_member(varname[i], alias[i],
+                                  t[i], uitype[i], ind + '  ', idx='0')
+
         s += ind + '{0} {1}('.format(type_to_str(t), member)
-        for i in n:
-            s+= '{0}, '.format(varname[i])
+        for i in range(n_val):
+            s += '{0}, '.format(varname[i])
         s = s[:-2]
-        s += '(;\n}'
-            
+
         return s
 
     def read_map(self, member, alias, t, uitype=None, ind="  ", idx=None,
