@@ -43,6 +43,9 @@ void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
   if (inext == ".json") {
     std::string inxml = cyclus::toolkit::JsonToXml(stream.str());
     stream.str(inxml);
+  } else if (inext == ".py") {
+    std::string inxml = cyclus::toolkit::PyToXml(stream.str());
+    stream.str(inxml);
   }
 }
 

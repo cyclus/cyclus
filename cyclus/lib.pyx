@@ -1206,3 +1206,35 @@ def xml_to_json(s):
     cdef std_string cpp_rtn = cpp_cyclus.XmlToJson(cpp_s)
     rtn = std_string_to_py(cpp_rtn)
     return rtn
+
+
+def json_to_py(s):
+    """Converts a JSON string into an equivalent Python string"""
+    cdef std_string cpp_s = str_py_to_cpp(s)
+    cdef std_string cpp_rtn = cpp_cyclus.JsonToPy(cpp_s)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn
+
+
+def py_to_json(s):
+    """Converts a Python string into an equivalent JSON string"""
+    cdef std_string cpp_s = str_py_to_cpp(s)
+    cdef std_string cpp_rtn = cpp_cyclus.PyToJson(cpp_s)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn
+
+
+def py_to_xml(s):
+    """Converts a Python string into an equivalent XML string"""
+    cdef std_string cpp_s = str_py_to_cpp(s)
+    cdef std_string cpp_rtn = cpp_cyclus.PyToXml(cpp_s)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn
+
+
+def xml_to_py(s):
+    """Converts an XML string into an equivalent Python string"""
+    cdef std_string cpp_s = str_py_to_cpp(s)
+    cdef std_string cpp_rtn = cpp_cyclus.XmlToPy(cpp_s)
+    rtn = std_string_to_py(cpp_rtn)
+    return rtn
