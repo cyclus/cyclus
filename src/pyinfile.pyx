@@ -2,6 +2,11 @@
 from __future__ import print_function, unicode_literals
 from libcpp.string cimport string as std_string
 
+try:
+    from pprintpp import pformat
+except ImportError:
+    from pprint import pformat
+
 
 cdef object std_string_to_py(std_string x):
     pyx = x
@@ -51,7 +56,6 @@ cdef public std_string json_to_py "CyclusJsonToPy" (std_string cpp_infile):
     infile = std_string_to_py(cpp_infile)
     import json
     sim = json.loads(infile)
-    from pprint import pformat
-    s = 'SIMULATION = ' + pformat(sim, indent=4) + '\n'
+    s = 'SIMULATION = ' + pformat(sim, indent=1) + '\n'
     cdef std_string cpp_rtn = str_py_to_cpp(s)
     return cpp_rtn
