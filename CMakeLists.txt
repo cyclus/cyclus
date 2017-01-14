@@ -62,6 +62,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     # set cycpp var
     SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
 
+    # set cython post-processor var
+    SET(CYTHON_POST_PROCESSOR "${CYCLUS_CLI_DIR}/post-process-cython.py")
+
     # This makes all the libraries build as SHARED
     SET(BUILD_SHARED_LIBS true)
 
