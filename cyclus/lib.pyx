@@ -31,7 +31,8 @@ from cyclus cimport cpp_typesystem
 from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
-    bool_to_py, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py
+    bool_to_py, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py, \
+    std_vector_std_string_to_py
 
 
 # startup numpy
@@ -970,12 +971,21 @@ class SimInit(_SimInit):
 #
 # Agent
 #
+
+cdef object agent_to_py(cpp_cyclus.Agent* a_ptx):
+    """Converts and agent pointer to Python."""
+    if a_ptx == NULL:
+        return None
+    cdef _Agent a = Agent()
+    a.ptx = a_ptx
+    return a
+
 cdef class _Agent:
 
     def __cinit__(self, bint free=False):
         self._free = free
         self.ptx == NULL
-        self._annotations = None
+        self._annotations = self._context = None
 
     def __dealloc__(self):
         cdef cpp_cyclus.Agent* cpp_ptx
@@ -991,6 +1001,51 @@ cdef class _Agent:
         cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).version()
         rtn = std_string_to_py(cpp_rtn)
         return rtn
+
+    def children_str(self):
+        """Returns recursively generated string of the parent-child tree."""
+        return std_string_to_py((<cpp_cyclus.Agent*> self.ptx).PrintChildren())
+
+    def tree_strs(self, m):
+        """Returns a list of children strings representing the parent-child tree
+        at the node for Agent m.
+        """
+        cdef cpp_cyclus.Agent* cpp_m = <cpp_cyclus.Agent*> (<_Agent> m).ptx
+        rtn = std_vector_std_string_to_py(
+                (<cpp_cyclus.Agent*> self.ptx).GetTreePrintOuts(cpp_m))
+        return rtn
+
+    def in_family_tree(self, other):
+        """Returns true if this agent is in the parent-child family tree of an
+        other agent.
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<cpp_cyclus.Agent*> self.ptx).InFamilyTree(cpp_other))
+        return rtn
+
+    def ancestor_of(self, other):
+        """Returns true if this agent is an ancestor of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<cpp_cyclus.Agent*> self.ptx).AncestorOf(cpp_other))
+        return rtn
+
+    def decendent_of(self, other):
+        """Returns true if this agent is an decendent of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<cpp_cyclus.Agent*> self.ptx).DecendentOf(cpp_other))
+        return rtn
+
+    def decomission(self):
+        """Decommissions the agent, removing it from the simulation. Results in
+        destruction of the agent object. If agents write their own decommission()
+        function, they must call their superclass' decommission function at the
+        END of their decommission() function.
+        """
+        (<cpp_cyclus.Agent*> self.ptx).Decommission()
 
     @property
     def schema(self):
@@ -1011,15 +1066,110 @@ cdef class _Agent:
         self._annotations = cpp_rtn
         return self._annotations
 
-    def children_str(self):
-        """Returns recursively generated string of the parent-child tree."""
-        return std_string_to_py((<cpp_cyclus.Agent*> self.ptx).PrintChildren())
+    @property
+    def prototype(self):
+        """The agent's prototype."""
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).prototype())
+        return rtn
+
+    @prototype.setter
+    def prototype(self, str p):
+        cdef std_string cpp_p = str_py_to_cpp(p)
+        (<cpp_cyclus.Agent*> self.ptx).prototype(cpp_p)
+
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<cpp_cyclus.Agent*> self.ptx).id()
+
+    @property
+    def spec(self):
+        """The agent's spec."""
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).spec())
+        return rtn
+
+    @spec.setter
+    def spec(self, str new_impl):
+        cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
+        (<cpp_cyclus.Agent*> self.ptx).prototype(cpp_new_impl)
+
+    @property
+    def kind(self):
+        """Returns a string that describes the agent subclass (e.g. Region,
+        Facility, etc.)
+        """
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).kind())
+        return rtn
+
+    @property
+    def context(self):
+        """Returns this agent's simulation context."""
+        if self._context is None:
+            self._context = Context(init=False)
+            (<_Context> self._context).ptx = (<cpp_cyclus.Agent*> self.ptx).context()
+        return self._context
+
+    def __str__(self):
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).str())
+        return rtn
+
+    def parent(self):
+        """Returns parent of this agent.  Returns None if the agent has no parent.
+        """
+        rtn = agent_to_py((<cpp_cyclus.Agent*> self.ptx).parent())
+        return rtn
+
+    @property
+    def parent_id(self):
+        """The id for this agent's parent or -1 if this agent has no parent."""
+        return (<cpp_cyclus.Agent*> self.ptx).parent_id()
+
+    @property
+    def enter_time(self):
+        """The time step at which this agent's Build function was called
+        (-1 if the agent has never been built).
+        """
+        return (<cpp_cyclus.Agent*> self.ptx).enter_time()
+
+    @property
+    def lifetime(self):
+        """The number of time steps this agent operates between building and
+        decommissioning (-1 if the agent has an infinite lifetime)
+        """
+        return (<cpp_cyclus.Agent*> self.ptx).lifetime()
+
+    @lifetime.setter
+    def lifetime(self, int n_timesteps):
+        (<cpp_cyclus.Agent*> self.ptx).lifetime(n_timesteps)
+
+    @property
+    def exit_time(self):
+        """The default time step at which this agent will exit the
+        simulation (-1 if the agent has an infinite lifetime).
+
+        Decomissioning happens at the end of a time step. With a lifetime of 1, we
+        expect an agent to go through only 1 entire time step. In this case, the
+        agent should be decommissioned on the same time step it was
+        created. Therefore, for agents with non-infinite lifetimes, the exit_time
+        will be the enter time plus its lifetime less 1.
+        """
+        return (<cpp_cyclus.Agent*> self.ptx).exit_time()
+
+    @property
+    def children(self):
+        """A frozen set of the children of this agent."""
+        kids = []
+        for kid_ptx in (<cpp_cyclus.Agent*> self.ptx).children():
+            kid = agent_to_py(kid_ptx)
+            kids.append(kid)
+        return frozenset(kids)
 
 
 class Agent(_Agent):
     """The abstract base class used by all types of agents
     that live and interact in a simulation.
     """
+
 
 #
 # Version Info

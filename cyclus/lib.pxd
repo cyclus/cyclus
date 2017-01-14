@@ -63,9 +63,13 @@ cdef class _Timer:
 cdef class _SimInit:
     cdef cpp_cyclus.SimInit * ptx
 
+
+cdef object agent_to_py(cpp_cyclus.Agent* a_ptr)
+
 cdef class _Agent:
     cdef void * ptx
     cdef bint _free
+    cdef object _context
 
 cdef class _XMLFileLoader:
     cdef cpp_cyclus.XMLFileLoader * ptx

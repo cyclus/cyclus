@@ -613,7 +613,7 @@ cdef extern from "agent.h" namespace "cyclus":
         void AdjustProductPrefs(PrefMap[Product].type&)
         std_string schema()
         cpp_jsoncpp.Value annotations() except +
-        const std_string prototype(std_string)
+        const std_string prototype()
         void prototype(std_string)
         std_string spec()
         void spec(std_string)
