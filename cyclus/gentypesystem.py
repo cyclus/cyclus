@@ -116,6 +116,7 @@ class TypeSystem(object):
         self._cython_cpp_name = {}
         self._cython_types = dict(CYTHON_TYPES)
         self._funcnames = dict(FUNCNAMES)
+        self._classnames = dict(CLASSNAMES)
         self._vars_to_py = dict(VARS_TO_PY)
         self._vars_to_cpp = dict(VARS_TO_CPP)
         self._nptypes = dict(NPTYPES)
@@ -152,6 +153,18 @@ class TypeSystem(object):
         f = '_'.join(map(self.funcname, t))
         self._funcnames[t] = f
         return f
+
+    def classname(self, t):
+        """Returns a version of the type name suitable for use in a class name.
+        """
+        if t in self._classnames:
+            return self._classnames[t]
+        if isinstance(t, str_types):
+            n = self.norms[t]
+            return self.classname(n)
+        c = ''.join(map(self.classname, t))
+        self._classnames[t] = c
+        return c
 
     def var_to_py(self, x, t):
         """Returns an expression for converting an object to Python."""
@@ -334,7 +347,6 @@ FUNCNAMES = {
     'float': 'float',
     'double': 'double',
     'std::string': 'std_string',
-    'std::string': 'std_string',
     'cyclus::Blob': 'blob',
     'boost::uuids::uuid': 'uuid',
     # Template Types
@@ -343,6 +355,32 @@ FUNCNAMES = {
     'std::pair': 'std_pair',
     'std::list': 'std_list',
     'std::vector': 'std_vector',
+    }
+
+CLASSNAMES = {
+    # type system types
+    'BOOL': 'Bool',
+    'INT': 'Int',
+    'FLOAT': 'Float',
+    'DOUBLE': 'Double',
+    'STRING': 'String',
+    'VL_STRING': 'String',
+    'BLOB': 'Blob',
+    'UUID': 'Uuid',
+    # C++ normal types
+    'bool': 'Bool',
+    'int': 'Int',
+    'float': 'Float',
+    'double': 'Double',
+    'std::string': 'String',
+    'cyclus::Blob': 'Blob',
+    'boost::uuids::uuid': 'Uuid',
+    # Template Types
+    'std::set': 'Set',
+    'std::map': 'Map',
+    'std::pair': 'Pair',
+    'std::list': 'List',
+    'std::vector': 'Vector',
     }
 
 # note that this maps normal forms to python
@@ -566,6 +604,33 @@ TO_CPP_CONVERTERS = {
         '    cpp{var}[i] = {val_to_cpp}\n',
         'cpp{var}'),
     }
+
+# annotation info key (pyname), C++ name,  cython type names
+ANNOTATIONS = [
+    ('type', 'type', 'object'),
+    ('index', 'index', 'int'),
+    ('default', 'dflt', 'object'),
+    ('internal', 'internal', 'bint'),
+    ('shape', 'shape', 'object'),
+    ('doc', 'doc', 'str'),
+    ('tooltip', 'tooltip', 'str'),
+    ('units', 'units', 'str'),
+    ('userlevel', 'userlevel', 'int'),
+    ('alias', 'alias', 'object'),
+    ('uilabel', 'uilabel', 'str'),
+    ('uitype', 'uitype', 'object'),
+    ('range', 'range', 'object'),
+    ('categorical', 'categorical', 'object'),
+    ('schematype', 'schematype', 'object'),
+    ('initfromcopy', 'initfromcopy', 'str'),
+    ('initfromdb', 'initfromdb', 'str'),
+    ('infiletodb', 'infiletodb', 'str'),
+    ('schema', 'schema', 'str'),
+    ('snapshot', 'snapshot', 'str'),
+    ('snapshotinv', 'snapshotinv', 'str'),
+    ('initinv', 'initinv', 'str'),
+    ]
+
 
 def split_template_args(s, open_brace='<', close_brace='>', separator=','):
     """Takes a string with template specialization and returns a list
@@ -845,6 +910,181 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
         raise TypeError(msg)
     return rtn
 
+#
+# State Variable Descriptors
+#
+
+cdef class StateVar:
+    """This class represents a state variable on a Cyclus agent.
+
+    ============ ==============================================================
+    key          meaning
+    ============ ==============================================================
+    type         The C++ type.  Valid types may be found on the :doc:`dbtypes`
+                 page. **READ ONLY:** Do not set this key in
+                 ``#pragma cyclus var {...}`` as it is set automatically by
+                 cycpp. Feel free to use this downstream in your class or in a
+                 post-process.
+    index        Which number state variable is this, 0-indexed.
+                 **READ ONLY:** Do not set this key in
+                 ``#pragma cyclus var {...}`` as it is set automatically by
+                 cycpp. Feel free to use this downstream in your class or in a
+                 post-process.
+    default      The default value for this variable that is used if otherwise
+                 unspecified. The value must match the type of the variable.
+    internal     ``True`` if this state variable is only for
+                 archetype-internal usage.  Although the variable will still
+                 be persisted in the database and initialized normally (e.g.
+                 with any default), it will not be included in the XML schema
+                 or input file.
+    shape        The shape of a variable length datatypes. If present this must
+                 be a list of integers whose length (rank) makes sense for this
+                 type. Specifying positive values will (depending on the
+                 backend) turn a variable length type into a fixed length one
+                 with the length of the given value. Putting a ``-1`` in the
+                 shape will retain the variable length nature along that axis.
+                 Fixed length variables are normally more performant so it is
+                 often a good idea to specify the shape where possible. For
+                 example, a length-5 string would have a shape of ``[5]`` and
+                 a length-10 vector of variable length strings would have a
+                 shape of ``[10, -1]``.
+    doc          Documentation string.
+    tooltip      Brief documentation string for user interfaces.
+    units        The physical units, if any.
+    userlevel    Integer from 0 - 10 for representing ease (0) or difficulty (10)
+                 in using this variable, default 0.
+    alias        The name of the state variable in the schema and input file.
+                 If this is not present it defaults to the C++ variable name.
+                 The alias may also be a nested list of strings that matches
+                 the C++ template type. Each member of the hierarchy will
+                 recieve the corresponding alias.  For example, a
+                 ``[std::map, int, double]`` could be aliased by
+                 ``['recipe', 'id', 'mass']``. For maps, an additional item
+                 tag is inserted. To also alias the item tag, make the top
+                 alias into a 2-element list, whose first string represents
+                 the map and whose second string is the item alias, e.g.
+                 ``[['recipe', 'entry'], 'id', 'mass']``
+    uilabel      The text string a UI will display as the name of this input on
+                 the UI input form.
+    uitype       The type of the input field in reference in a UI,
+                 currently supported types are; incommodity, outcommodity,
+                 commodity, range, combobox, facility, prototype, recipe, nuclide,
+                 and none.
+                 For 'nuclide' when the type is an int, the values will be read in
+                 from the input file in human readable string format ('U-235') and
+                 automatically converted to results of ``pyne::nucname::id()``
+                 (922350000) in the database and on the archetype.
+    range        This indicates the range associated with a range type.
+                 It must take the form of ``[min, max]`` or
+                 ``[min, max, (optional) step size]``.
+    categorical  This indicates the decrete values a combobox Type can take. It
+                 must take the form of ``[value1, value2, value3, etc]``.
+    schematype   This is the data type that is used in the schema for input file
+                 validation. This enables you to supply just the data type
+                 rather than having to overwrite the full schema for this state
+                 variable. In most cases - when the shape is rank 0 or 1 such
+                 as for scalars or vectors - this is simply a string. In cases
+                 where the rank is 2+ this is a list of strings. Please refer to
+                 the `XML Schema Datatypes <http://www.w3.org/TR/xmlschema-2/>`_
+                 page for more information. *New in v1.1.*
+    initfromcopy Code snippet to use in the ``InitFrom(Agent* m)`` function for
+                 this state variable instead of using code generation.
+                 This is a string.
+    initfromdb   Code snippet to use in the ``InitFrom(QueryableBackend* b)``
+                 function for this state variable instead of using code generation.
+                 This is a string.
+    infiletodb   Code snippets to use in the ``InfileToDb()`` function
+                 for this state variable instead of using code generation.
+                 This is a dictionary of string values with the two keys 'read'
+                 and 'write' which represent reading values from the input file
+                 writing them out to the database respectively.
+    schema       Code snippet to use in the ``schema()`` function for
+                 this state variable instead of using code generation.
+                 This is an RNG string. If you supply this then you likely need
+                 to supply ``infiletodb`` as well to ensure that your custom
+                 schema is read into the database correctly.
+    snapshot     Code snippet to use in the ``Snapshot()`` function for
+                 this state variable instead of using code generation.
+                 This is a string.
+    snapshotinv  Code snippet to use in the ``SnapshotInv()`` function for
+                 this state variable instead of using code generation.
+                 This is a string.
+    initinv      Code snippet to use in the ``InitInv()`` function for
+                 this state variable instead of using code generation.
+                 This is a string.
+    ============ ==============================================================
+    """
+
+
+    def __cinit__(self, object value=None,
+            {%- for pyname, cppname, typename in annotations -%}
+            {{typename}} {{pyname}}=None,
+            {%- endfor -%}):
+        self.value = value
+        {% for pyname, cppname, _ in annotations -%}
+        self.{{cppname}} = {{pyname}}
+        {% endfor %}
+
+    {% for pyname, cppname, typename in annotations -%}{% if pyname != cppname %}
+    @property
+    def {{pyname}}(self):
+        return self.{{cppname}}
+
+    @{{pyname}}.setter
+    def {{pyname}}(self, {{typename}} value):
+        self.{{cppname}} = value
+    {% endif %}{% endfor %}
+
+    #
+    # Descriptor interface
+    #
+    def __get__(self, obj, cls):
+        return self.value
+
+    def __set__(self, obj, val):
+        self.value = val
+
+    cpdef dict to_dict(self):
+        """Returns a representation of this state variable as a dict."""
+        return {'value': self.value,
+            {%- for pyname, cppname, _ in annotations -%}
+            '{{pyname}}': self.{{cppname}},
+            {%- endfor -%}
+            }
+
+    cpdef StateVar copy(self):
+        """Copies the state variable into a new instance."""
+        return StateVar(value=self.value,
+            {%- for pyname, cppname, _ in annotations -%}
+            {{pyname}}=self.{{cppname}},
+            {%- endfor -%}
+            )
+
+{% for t in ts.uniquetypes %}{% set tclassname = ts.classname(t) %}
+cdef class {{tclassname}}(StateVar):
+    """State variable descriptor for {{ts.cpptypes[t]}}"""
+
+    def __cinit__(self, object value=None,
+            {%- for pyname, cppname, typename in annotations -%}{%- if pyname != 'type' -%}
+            {{typename}} {{pyname}}=None,
+            {%- endif -%}{%- endfor -%}):
+        self.value = value
+        {% for pyname, cppname, _ in annotations -%}
+        {% if pyname == 'type' %}
+        self.type = {{repr(ts.norms[t])}}
+        {%- else %}
+        self.{{cppname}} = {{pyname}}
+        {%- endif -%}{% endfor %}
+
+    cpdef {{tclassname}} copy(self):
+        """Copies the {{tclassname}} into a new instance."""
+        return {{tclassname}}(value=self.value,
+            {%- for pyname, cppname, _ in annotations -%}{%- if pyname != 'type' -%}
+            {{pyname}}=self.{{cppname}},
+            {%- endif -%}{%- endfor -%}
+            )
+
+{% endfor %}
 '''.strip())
 
 
@@ -860,6 +1100,7 @@ def typesystem_pyx(ts, ns):
         repr=repr,
         sorted=sorted,
         enumerate=enumerate,
+        annotations=ANNOTATIONS,
         )
     rtn = TYPESYSTEM_PYX.render(ctx)
     return rtn
@@ -918,7 +1159,25 @@ cdef object db_to_py(cpp_cyclus.hold_any value, cpp_cyclus.DbTypes dbtype)
 cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype)
 
 cdef object any_to_py(cpp_cyclus.hold_any value)
-'''.strip())
+
+#
+# State Variable Descriptors
+#
+
+cdef class StateVar:
+    cdef public object value
+    {% for pyname, cppname, typename in annotations %}
+    cdef public {{typename}} {{cppname}}
+    {%- endfor %}
+    cpdef dict to_dict(self)
+    cpdef StateVar copy(self)
+
+{% for t in ts.uniquetypes %}{% set tclassname = ts.classname(t) %}
+cdef class {{tclassname}}(StateVar):
+    cpdef {{tclassname}} copy(self)
+{% endfor %}
+
+''')
 
 def typesystem_pxd(ts, ns):
     """Creates the Cython wrapper header for the Cyclus type system."""
@@ -931,6 +1190,7 @@ def typesystem_pxd(ts, ns):
         set=set,
         sorted=sorted,
         enumerate=enumerate,
+        annotations=ANNOTATIONS,
         )
     rtn = TYPESYSTEM_PXD.render(ctx)
     return rtn
