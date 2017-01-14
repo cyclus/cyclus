@@ -986,19 +986,19 @@ cdef class _Agent:
             del cpp_ptx
 
     @property
+    def version(self):
+        """Agent version string."""
+        cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).version()
+        rtn = std_string_to_py(cpp_rtn)
+        return rtn
+
+    @property
     def schema(self):
         """An agent's xml rng schema for initializing from input files. All
         concrete agents should override this function. This must validate the same
         xml input that the InfileToDb function receives.
         """
         cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).schema()
-        rtn = std_string_to_py(cpp_rtn)
-        return rtn
-
-    @property
-    def version(self):
-        """Agent version string."""
-        cdef std_string cpp_rtn = (<cpp_cyclus.Agent*> self.ptx).version()
         rtn = std_string_to_py(cpp_rtn)
         return rtn
 
@@ -1011,12 +1011,15 @@ cdef class _Agent:
         self._annotations = cpp_rtn
         return self._annotations
 
+    def children_str(self):
+        """Returns recursively generated string of the parent-child tree."""
+        return std_string_to_py((<cpp_cyclus.Agent*> self.ptx).PrintChildren())
+
 
 class Agent(_Agent):
     """The abstract base class used by all types of agents
     that live and interact in a simulation.
     """
-
 
 #
 # Version Info

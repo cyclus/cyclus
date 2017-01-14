@@ -341,6 +341,62 @@ cdef extern from "resource.h" namespace "cyclus":
         shared_ptr[Resource] ExtractRes(double)
 
 
+cdef extern from "composition.h" namespace "cyclus":
+
+    ctypedef int Nuc
+    ctypedef map[Nuc, double] CompMap
+
+    cdef cppclass Composition:
+        ctypedef shared_ptr[Composition] Ptr
+        @staticmethod
+        shared_ptr[Composition] CreateFromAtom(CompMap)
+        @staticmethod
+        shared_ptr[Composition] CreateFromMass(CompMap)
+        int id()
+        const CompMap& atom()
+        const CompMap& mass()
+        shared_ptr[Composition] Decay(int)
+        shared_ptr[Composition] Decay(int, uint64_t)
+        void Record(Context*)
+
+
+cdef extern from "material.h" namespace "cyclus":
+
+    cdef cppclass Agent
+
+    cdef cppclass Material(Resource):
+        ctypedef shared_ptr[Material] Ptr
+        const ResourceType kType
+        @staticmethod
+        shared_ptr[Material] Create(Agent*, double, Composition.Ptr)
+        @staticmethod
+        shared_ptr[Material] CreateUntracked(double, Composition.Ptr)
+        shared_ptr[Material] ExtractQty(double)
+        shared_ptr[Material] ExtractComp(double, Composition.Ptr)
+        shared_ptr[Material] ExtractComp(double, Composition.Ptr, double)
+        void Absorb(shared_ptr[Material])
+        void Transmute(Composition.Ptr)
+        void Decay(int)
+        int prev_decay_time()
+        double DecayHeat()
+        Composition.Ptr comp()
+
+
+cdef extern from "product.h" namespace "cyclus":
+
+    cdef cppclass Agent
+
+    cdef cppclass Product(Resource):
+        ctypedef shared_ptr[Product] Ptr
+        const ResourceType kType
+        @staticmethod
+        shared_ptr[Product] Create(Agent*, double, std_string)
+        @staticmethod
+        shared_ptr[Product] CreateUntracked(double, std_string)
+        const std_string& quality()
+        shared_ptr[Product] Extract(double)
+        void Absorb(shared_ptr[Product])
+
 
 cdef extern from "request.h" namespace "cyclus":
 
@@ -351,12 +407,12 @@ cdef extern from "request.h" namespace "cyclus":
         ctypedef function[double(shared_ptr[T])] cost_function_t
         @staticmethod
         Request[T]* Create(shared_ptr[T], Trader*, shared_ptr[RequestPortfolio[T]],
-                           std_string, double, bool)
+                           std_string, double, cpp_bool)
         @staticmethod
         Request[T]* Create(shared_ptr[T], Trader*, shared_ptr[RequestPortfolio[T]],
-                           std_string, double, bool, cost_function_t)
+                           std_string, double, cpp_bool, cost_function_t)
         @staticmethod
-        Request[T]* Create(shared_ptr[T], Trader*, std_string, double, bool)
+        Request[T]* Create(shared_ptr[T], Trader*, std_string, double, cpp_bool)
         @staticmethod
         Request[T]* Create(shared_ptr[T], Trader*, std_string, double, bool,
                            cost_function_t)
@@ -364,7 +420,7 @@ cdef extern from "request.h" namespace "cyclus":
         Trader* requester()
         double preference()
         shared_ptr[RequestPortfolio[T]] portfolio()
-        bool exclusive()
+        cpp_bool exclusive()
         cost_function_t cost_function()
 
 
@@ -374,15 +430,16 @@ cdef extern from "exchange_graph.h" namespace "cyclus":
     cdef cppclass ExchangeNodeGroup
 
     cdef cppclass ExchangeNode:
+        ctypedef shared_ptr[ExchangeNode] Ptr
         ExchangeNode()
         ExchangeNode(double)
-        ExchangeNode(double, bool)
-        ExchangeNode(double, bool, std_string)
-        ExchangeNode(double, bool, std_string, int)
+        ExchangeNode(double, cpp_bool)
+        ExchangeNode(double, cpp_bool, std_string)
+        ExchangeNode(double, cpp_bool, std_string, int)
         ExchangeNodeGroup* group
         map[Arc, vector[double]] unit_capacities
         map[Arc, double] prefs
-        bool exclusives
+        cpp_bool exclusives
         std_string commod
         int agent_id
         double qty
@@ -392,16 +449,16 @@ cdef extern from "exchange_graph.h" namespace "cyclus":
         Arc(shared_ptr[ExchangeNode], shared_ptr[ExchangeNode])
         Arc(const Arc&)
         Arc& operator=(const Arc&)
-        bool operator<(const Arc&)
-        bool operator==(const Arc&)
-        shared_ptr[ExchangeNode] unode()
-        shared_ptr[ExchangeNode] vnode()
-        bool exclusive()
+        cpp_bool operator<(const Arc&)
+        cpp_bool operator==(const Arc&)
+        ExchangeNode.Ptr unode()
+        ExchangeNode.Ptr vnode()
+        cpp_bool exclusive()
         double excl_val()
         double pref()
         void pref(double)
 
-    bool operator==(const ExchangeNode&, const ExchangeNode&)
+    cpp_bool operator==(const ExchangeNode&, const ExchangeNode&)
 
     cdef cppclass ExchangeNodeGroup:
         ctypedef shared_ptr[ExchangeNodeGroup] Ptr
@@ -410,7 +467,7 @@ cdef extern from "exchange_graph.h" namespace "cyclus":
         vector[double]& capacities()
         void AddExchangeNode(ExchangeNode.Ptr)
         void AddExclGroup(vector[ExchangeNode.Ptr]&)
-        bool HasArcs()
+        cpp_bool HasArcs()
         void AddExclNode(ExchangeNode.Ptr)
         void AddCapacity(double)
 
@@ -418,10 +475,12 @@ cdef extern from "exchange_graph.h" namespace "cyclus":
 cdef extern from "exchange_translation_context.h" namespace "cyclus":
 
     cdef cppclass ExchangeTranslationContext[T]:
-        map[Request[T]*, ExchangeNode.Ptr] request_to_node
-        map[ExchangeNode.Ptr, Request[T]*] node_to_request
-        map[Bid[T]*, ExchangeNode.Ptr] bid_to_node
-        map[ExchangeNode.Ptr, Bid[T]*] node_to_bid
+        ctypedef Request[T]* request_ptr
+        ctypedef Bid[T]* bid_ptr
+        map[request_ptr, ExchangeNode.Ptr] request_to_node
+        map[ExchangeNode.Ptr, request_ptr] node_to_request
+        map[bid_ptr, ExchangeNode.Ptr] bid_to_node
+        map[ExchangeNode.Ptr, bid_ptr] node_to_bid
 
 
 cdef extern from "capacity_constraint.h" namespace "cyclus":
@@ -456,15 +515,16 @@ cdef extern from "request_portfolio.h" namespace "cyclus":
     cdef cppclass RequestPortfolio[T]:
         ctypedef shared_ptr[RequestPortfolio[T]] Ptr
         ctypedef function[double(shared_ptr[T])] cost_function_t
+        ctypedef Request[T]* request_ptr
         RequestPortfolio()
-        Request[T]* AddRequest(shared_ptr[T], Trader*, std_string, double, bool)
+        Request[T]* AddRequest(shared_ptr[T], Trader*, std_string, double, cpp_bool)
         Request[T]* AddRequest(shared_ptr[T], Trader*, std_string, double,
-                               bool, cost_function_t)
-        void AddMutualReqs(const vector[Request[T]*]&)
+                               cpp_bool, cost_function_t)
+        void AddMutualReqs(const vector[request_ptr]&)
         void AddConstraint(const CapacityConstraint[T]&)
         Trader* requester()
         double qty()
-        vector[Request[T]*]& requests()
+        vector[request_ptr]& requests()
         set[CapacityConstraint[T]]& constraints()
         Converter[T].Ptr qty_converter()
 
@@ -476,20 +536,20 @@ cdef extern from "bid.h" namespace "cyclus":
 
     cdef cppclass Bid[T]:
         @staticmethod
-        Bid[T]* Create(Request[T], shared_ptr[T], Trader*, bool)
+        Bid[T]* Create(Request[T], shared_ptr[T], Trader*, cpp_bool)
         @staticmethod
-        Bid[T]* Create(Request[T], shared_ptr[T], Trader*, bool, double)
-        @staticmethod
-        Bid[T]* Create(Request[T], shared_ptr[T], Trader*,
-                       shared_ptr[BidPortfolio[T]], bool)
+        Bid[T]* Create(Request[T], shared_ptr[T], Trader*, cpp_bool, double)
         @staticmethod
         Bid[T]* Create(Request[T], shared_ptr[T], Trader*,
-                       shared_ptr[BidPortfolio[T]], bool, double)
+                       shared_ptr[BidPortfolio[T]], cpp_bool)
+        @staticmethod
+        Bid[T]* Create(Request[T], shared_ptr[T], Trader*,
+                       shared_ptr[BidPortfolio[T]], cpp_bool, double)
         Request[T]* request()
         shared_ptr[T] offer()
         Trader* bidder()
         shared_ptr[BidPortfolio[T]] portfolio()
-        bool exclusive()
+        cpp_bool exclusive()
         double preference()
 
 
@@ -499,23 +559,27 @@ cdef extern from "bid_portfolio.h" namespace "cyclus":
 
     cdef cppclass BidPortfolio[T]:
         ctypedef shared_ptr[BidPortfolio[T]] Ptr
+        ctypedef Bid[T]* bid_ptr
         BidPortfolio()
-        Bid[T]* AddBid(Request[T]*, shared_ptr[T], Trader*, bool)
-        Bid[T]* AddBid(Request[T]*, shared_ptr[T], Trader*, bool, double)
+        Bid[T]* AddBid(Request[T]*, shared_ptr[T], Trader*, cpp_bool)
+        Bid[T]* AddBid(Request[T]*, shared_ptr[T], Trader*, cpp_bool, double)
         void AddConstraint(const CapacityConstraint[T]&)
         Trader* bidder()
         std_string commodity()
-        set[Bid[T]*]& bids()
+        set[bid_ptr]& bids()
         set[CapacityConstraint[T]]& constraints()
 
 
 cdef extern from "exchange_context.h" namespace "cyclus":
 
     cdef cppclass PrefMap[T]:
-        ctypedef map[Request[T]*, map[Bid[T]*, double]] type
+        ctypedef Request[T]* request_ptr
+        ctypedef Bid[T]* bid_ptr
+        ctypedef map[request_ptr, map[bid_ptr, double]] type
 
     cdef cppclass CommodMap[T]:
-        ctypedef map[std_string, vector[Request[T]*]] type
+        ctypedef Request[T]* request_ptr
+        ctypedef map[std_string, vector[request_ptr]] type
 
 
 cdef extern from "agent.h" namespace "cyclus":
@@ -537,9 +601,9 @@ cdef extern from "agent.h" namespace "cyclus":
         Inventories SnapshotInv() except +
         std_string PrintChildren() except +
         vector[std_string] GetTreePrintOuts(Agent*)
-        bool InFamilyTree(Agent*)
-        bool AncestorOf(Agent*)
-        bool DecendentOf(Agent*)
+        cpp_bool InFamilyTree(Agent*)
+        cpp_bool AncestorOf(Agent*)
+        cpp_bool DecendentOf(Agent*)
         void Build(Agent*)
         void EnterNotify()
         void BuildNotify(Agent*)
@@ -548,7 +612,6 @@ cdef extern from "agent.h" namespace "cyclus":
         void AdjustMatlPrefs(PrefMap[Material].type&)
         void AdjustProductPrefs(PrefMap[Product].type&)
         std_string schema()
-        annotations()
         cpp_jsoncpp.Value annotations() except +
         const std_string prototype(std_string)
         void prototype(std_string)
@@ -619,60 +682,8 @@ cdef extern from "facility.h" namespace "cyclus":
 
     cdef cppclass Facility(Agent, TimeListener, Trader):
         Facility(Context*)
-        bool CheckDecommissionCondition()
+        cpp_bool CheckDecommissionCondition()
 
-
-cdef extern from "composition.h" namespace "cyclus":
-
-    ctypedef Nuc
-    ctypedef map[Nuc, double] CompMap
-
-    cdef cppclass Composition:
-        ctypedef shared_ptr[Composition] Ptr
-        @staticmethod
-        shared_ptr[Composition] CreateFromAtom(CompMap)
-        @staticmethod
-        shared_ptr[Composition] CreateFromMass(CompMap)
-        int id()
-        const CompMap& atom()
-        const CompMap& mass()
-        shared_ptr[Composition] Decay(int)
-        shared_ptr[Composition] Decay(int, uint64_t)
-        void Record(Context*)
-
-
-cdef extern from "material.h" namespace "cyclus":
-
-    cdef cppclass Material(Resource):
-        ctypedef shared_ptr[Material] Ptr
-        const ResourceType kType
-        @staticmethod
-        shared_ptr[Material] Create(Agent*, double, Composition.Ptr)
-        @staticmethod
-        shared_ptr[Material] CreateUntracked(double, Composition.Ptr)
-        shared_ptr[Material] ExtractQty(double)
-        shared_ptr[Material] ExtractComp(double, Composition.Ptr)
-        shared_ptr[Material] ExtractComp(double, Composition.Ptr, double)
-        void Absorb(shared_ptr[Material])
-        void Transmute(Composition.Ptr)
-        void Decay(int)
-        int prev_decay_time()
-        double DecayHeat()
-        Composition.Ptr comp()
-
-
-cdef extern from "product.h" namespace "cyclus":
-
-    cdef cppclass Product(Resource):
-        ctypedef shared_ptr[Product] Ptr
-        const ResourceType kType
-        @staticmethod
-        shared_ptr[Product] Create(Agent*, double, std_string)
-        @staticmethod
-        shared_ptr[Product] CreateUntracked(double, std_string)
-        const std::string& quality()
-        shared_ptr[Product] Extract(double)
-        void Absorb(shared_ptr[Product])
 
 cdef extern from "dynamic_module.h" namespace "cyclus":
 
