@@ -368,6 +368,107 @@ cdef extern from "request.h" namespace "cyclus":
         cost_function_t cost_function()
 
 
+cdef extern from "exchange_graph.h" namespace "cyclus":
+
+    cdef cppclass Arc
+    cdef cppclass ExchangeNodeGroup
+
+    cdef cppclass ExchangeNode:
+        ExchangeNode()
+        ExchangeNode(double)
+        ExchangeNode(double, bool)
+        ExchangeNode(double, bool, std_string)
+        ExchangeNode(double, bool, std_string, int)
+        ExchangeNodeGroup* group
+        map[Arc, vector[double]] unit_capacities
+        map[Arc, double] prefs
+        bool exclusives
+        std_string commod
+        int agent_id
+        double qty
+
+    cdef cppclass Arc:
+        Arc()
+        Arc(shared_ptr[ExchangeNode], shared_ptr[ExchangeNode])
+        Arc(const Arc&)
+        Arc& operator=(const Arc&)
+        bool operator<(const Arc&)
+        bool operator==(const Arc&)
+        shared_ptr[ExchangeNode] unode()
+        shared_ptr[ExchangeNode] vnode()
+        bool exclusive()
+        double excl_val()
+        double pref()
+        void pref(double)
+
+    bool operator==(const ExchangeNode&, const ExchangeNode&)
+
+    cdef cppclass ExchangeNodeGroup:
+        ctypedef shared_ptr[ExchangeNodeGroup] Ptr
+        vector[ExchangeNode.Ptr]& nodes()
+        vector[vector[ExchangeNode.Ptr]]& excl_node_groups()
+        vector[double]& capacities()
+        void AddExchangeNode(ExchangeNode.Ptr)
+        void AddExclGroup(vector[ExchangeNode.Ptr]&)
+        bool HasArcs()
+        void AddExclNode(ExchangeNode.Ptr)
+        void AddCapacity(double)
+
+
+cdef extern from "exchange_translation_context.h" namespace "cyclus":
+
+    cdef cppclass ExchangeTranslationContext[T]:
+        map[Request[T]*, ExchangeNode.Ptr] request_to_node
+        map[ExchangeNode.Ptr, Request[T]*] node_to_request
+        map[Bid[T]*, ExchangeNode.Ptr] bid_to_node
+        map[ExchangeNode.Ptr, Bid[T]*] node_to_bid
+
+
+cdef extern from "capacity_constraint.h" namespace "cyclus":
+
+    cdef cppclass Converter[T]:
+        ctypedef shared_ptr[Converter[T]] Ptr
+        double convert(shared_ptr[T])
+        double convert(shared_ptr[T], const Arc*)
+        double convert(shared_ptr[T], const Arc*,
+                       const ExchangeTranslationContext[T]*)
+
+    cdef cppclass TrvialConverter[T](Converter[T]):
+        pass
+
+    cdef cppclass CapacityConstraint[T]:
+        CapacityConstraint(double)
+        CapacityConstraint(double, Converter[T].Ptr)
+        double capacity()
+        Converter[T].Ptr converter()
+        double convert(shared_ptr[T])
+        double convert(shared_ptr[T], const Arc*)
+        double convert(shared_ptr[T], const Arc*,
+                       const ExchangeTranslationContext[T]*)
+        int id()
+
+
+
+cdef extern from "request_portfolio.h" namespace "cyclus":
+
+    cdef cppclass Trader
+
+    cdef cppclass RequestPortfolio[T]:
+        ctypedef shared_ptr[RequestPortfolio[T]] Ptr
+        ctypedef function[double(shared_ptr[T])] cost_function_t
+        RequestPortfolio()
+        Request[T]* AddRequest(shared_ptr[T], Trader*, std_string, double, bool)
+        Request[T]* AddRequest(shared_ptr[T], Trader*, std_string, double,
+                               bool, cost_function_t)
+        void AddMutualReqs(const vector[Request[T]*]&)
+        void AddConstraint(const CapacityConstraint[T]&)
+        Trader* requester()
+        double qty()
+        vector[Request[T]*]& requests()
+        set[CapacityConstraint[T]]& constraints()
+        Converter[T].Ptr qty_converter()
+
+
 cdef extern from "bid.h" namespace "cyclus":
 
     cdef cppclass Trader
@@ -392,10 +493,29 @@ cdef extern from "bid.h" namespace "cyclus":
         double preference()
 
 
+cdef extern from "bid_portfolio.h" namespace "cyclus":
+
+    cdef cppclass Trader
+
+    cdef cppclass BidPortfolio[T]:
+        ctypedef shared_ptr[BidPortfolio[T]] Ptr
+        BidPortfolio()
+        Bid[T]* AddBid(Request[T]*, shared_ptr[T], Trader*, bool)
+        Bid[T]* AddBid(Request[T]*, shared_ptr[T], Trader*, bool, double)
+        void AddConstraint(const CapacityConstraint[T]&)
+        Trader* bidder()
+        std_string commodity()
+        set[Bid[T]*]& bids()
+        set[CapacityConstraint[T]]& constraints()
+
+
 cdef extern from "exchange_context.h" namespace "cyclus":
 
     cdef cppclass PrefMap[T]:
         ctypedef map[Request[T]*, map[Bid[T]*, double]] type
+
+    cdef cppclass CommodMap[T]:
+        ctypedef map[std_string, vector[Request[T]*]] type
 
 
 cdef extern from "agent.h" namespace "cyclus":
@@ -404,7 +524,10 @@ cdef extern from "agent.h" namespace "cyclus":
     cdef cppclass Product
     ctypedef map[std_string, vector[Resource.Ptr]] Inventories
 
-    cdef cppclass Agent:
+    cdef cppclass Ider:
+        const int id()
+
+    cdef cppclass Agent(Ider):
         Agent(Context*) except +
         std_string version() except +
         Agent* Clone() except +
@@ -429,7 +552,6 @@ cdef extern from "agent.h" namespace "cyclus":
         cpp_jsoncpp.Value annotations() except +
         const std_string prototype(std_string)
         void prototype(std_string)
-        const int id()
         std_string spec()
         void spec(std_string)
         const std_string kind()
@@ -442,6 +564,62 @@ cdef extern from "agent.h" namespace "cyclus":
         const int lifetime()
         const int exit_time()
         const set[Agent*]& children()
+
+
+cdef extern from "time_listener.h" namespace "cyclus":
+
+    cdef cppclass TimeListener(Ider):
+        void Tick()
+        void Tock()
+
+
+cdef extern from "trade.h" namespace "cyclus":
+
+    cdef cppclass Trade[T]:
+        Trade()
+        Trade(Request[T]*, Bid[T]*, double)
+        Request[T]* request
+        Bid[T]* bid
+        double amt
+        double price
+
+
+
+cdef extern from "trader.h" namespace "cyclus":
+
+    cdef cppclass Trader:
+        Trader(Agent*)
+        Agent* manager()
+        set[RequestPortfolio[Material].Ptr] GetMatlRequests()
+        set[RequestPortfolio[Product].Ptr] GetProductRequests()
+        set[BidPortfolio[Material].Ptr] GetMatlBids(CommodMap[Material].type&)
+        set[BidPortfolio[Product].Ptr] GetProductBids(CommodMap[Product].type&)
+        void AdjustMatlPrefs(PrefMap[Material].type&)
+        void AdjustProductPrefs(PrefMap[Product].type&)
+        void GetMatlTrades(vector[Trade[Material]]&,
+                           vector[pair[Trade[Material], Material.Ptr]]&)
+        void GetProductTrades(vector[Trade[Product]]&,
+                              vector[pair[Trade[Product], Product.Ptr]]&)
+        void AcceptMatlTrades(vector[pair[Trade[Material], Material.Ptr]]&)
+        void AcceptProductTrades(vector[pair[Trade[Product], Product.Ptr]]&)
+
+cdef extern from "region.h" namespace "cyclus":
+
+    cdef cppclass Region(Agent, TimeListener):
+        Region(Context*)
+
+
+cdef extern from "institution.h" namespace "cyclus":
+
+    cdef cppclass Institution(Agent, TimeListener):
+        Institution(Context*)
+
+
+cdef extern from "facility.h" namespace "cyclus":
+
+    cdef cppclass Facility(Agent, TimeListener, Trader):
+        Facility(Context*)
+        bool CheckDecommissionCondition()
 
 
 cdef extern from "composition.h" namespace "cyclus":
