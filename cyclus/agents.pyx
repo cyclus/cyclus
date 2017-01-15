@@ -193,7 +193,75 @@ class Agent(_Agent, lib.Agent):
             rtn = tree.query(query, type, idx)
         return rtn
 
-    def _read_from_infile(self, tree, name, alias, type, uitype, idx=0):
+    def _read_from_infile(self, tree, alias, type, uitype, idx=0, path=''):
         if isinstance(type, str):
             # read primitive
-            return self._query_infile(tree, alias, type, uitype)
+            rtn = self._query_infile(tree, path + alias, type, uitype, idx)
+        else:
+            type0 = type[0]
+            sub = tree.subtree(alias[0], idx)
+            if type0 == 'std::vector':
+                rtn = self._vector_from_infile(sub, alias, type, uitype, idx, path)
+            elif type0 == 'std::set':
+                rtn = self._set_from_infile(sub, alias, type, uitype, idx, path)
+            elif type0 == 'std::list':
+                # note we can reuse vector implementation
+                rtn = self._vector_from_infile(sub, alias, type, uitype, idx, path)
+            elif type0 == 'std::pair':
+                rtn = self._pair_from_infile(sub, alias, type, uitype, idx, path)
+            elif type0 == 'std::map':
+                rtn = self._map_from_infile(sub, alias, type, uitype, idx, path)
+            else:
+                raise TypeError('type not recognized while reading input file: '
+                                + type0 + ' of ' + repr(type) + ' in ' + repr(alias))
+        return rtn
+
+    def _vector_from_infile(self, tree, alias, type, uitype, idx=0, path=''):
+        cdef int i, n
+        cdef list rtn = []
+        # get val name
+        if alias[1] is None:
+            val = 'val'
+        elif isinstance(alias[1], str):
+            val = alias[1]
+        else:
+            val = alias[1][0]
+        # read in values.
+        n = tree.nmatches(val)
+        for i in range(n):
+            x = self._read_from_infile(tree, val, type[1], uitype[1], i, path)
+            rtn.append(x)
+        return rtn
+
+    def _set_from_infile(self, tree, alias, type, uitype, idx=0, path=''):
+        rtn = self._vector_from_infile(tree, alias, type, uitype, idx)
+        rtn = set(rtn)
+        return rtn
+
+    def _pair_from_infile(self, tree, alias, type, uitype, idx=0, path=''):
+        first = 'first' if alias[1] is None else alias[1]
+        second = 'second' if alias[2] is None else alias[2]
+        x = self._read_from_infile(tree, first, type[1], uitype[1], idx, path)
+        y = self._read_from_infile(tree, second, type[2], uitype[2], idx, path)
+        return (x, y)
+
+    def _map_from_infile(self, tree, alias, type, uitype, idx=0, path=''):
+        cdef int i, n
+        cdef dict rtn = {}
+        # get query names
+        if isinstance(alias[0], str):
+            item = 'item'
+        elif alias[0][1] is None:
+            item = 'item'
+        else:
+            item = alias[0][1]
+        key = 'key' if alias[1] is None else alias[1]
+        val = 'val' if alias[2] is None else alias[2]
+        # read in values.
+        itempath = item + '/'
+        n = tree.nmatches(item)
+        for i in range(n):
+            k = self._read_from_infile(tree, key, type[1], uitype[1], i, itempath)
+            v = self._read_from_infile(tree, val, type[2], uitype[2], i, itempath)
+            rtn[k] = v
+        return rtn
