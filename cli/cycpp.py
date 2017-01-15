@@ -1811,16 +1811,15 @@ class SchemaFilter(CodeGeneratorFilter):
             name = 'tuple'
             if names[0] is not None:
                 name = names[0]
-            firstname = 'first' if isinstance(cpptype[1], STRING_TYPES) else ['first']
-            if names[1] is not None:
-                firstname = names[1]
-            secondname = 'second' if isinstance(cpptype[2], STRING_TYPES) else ['second']
-            if names[2] is not None:
-                secondname = names[2]
             impl += '<element name="{0}">'.format(name)
             impl += '<interleave>'
-            impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
-            impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
+            for i in range(1, len(names)):
+                var_name = 'val' if isinstance(
+                    cpptype[i], STRING_TYPES) else ['val']
+                if names[i] is not None:
+                    var_name = names[i]
+                impl += self._buildschema(cpptype[i], schematype[i], uitype[i],
+                        var_name)
             impl += '</interleave>'
             impl += '</element>'
         else:
