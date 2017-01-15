@@ -38,12 +38,20 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     CyclusAgentShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Agent(ctx)
         pass
 
-    #std_string version():
-    #    rtn = self.version
-    #    return str_py_to_cpp(py_rtn)
+    std_string version():
+        rtn = (<object> this.self).version
+        return str_py_to_cpp(rtn)
 
     cpp_cyclus.Agent* Clone():
-        return NULL
+        cdef lib._Context ctx = lib.Context(init=False)
+        (<lib._Context> ctx).ptx = this.context()
+        cdef _Agent a = type(<object> this.self)(ctx)
+        #a.shim.InitFrom(this)
+        # call self clone
+        return a.shim
+
+    #void InitFrom(CyclusAgentShim* a):
+    #    cpp_cyclus.Agent.InitFrom(a)
 
     #void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
     #void InitFrom(cpp_cyclus.QueryableBackend*)
@@ -68,5 +76,23 @@ cdef class _Agent(lib._Agent):
 
 
 class Agent(_Agent, lib.Agent):
+    """Python Agent that is subclassable into any kind of agent.
+
+    Parameters
+    ----------
+    ctx : cyclus.lib.Context
+        The simulation execution context.  You don't normally
+        need to call the initilaizer.
     """
-    """
+
+    def __init__(self, ctx):
+        super().__init__(ctx)
+        # gather the state variables
+        vars = {}
+        for name in dir(self):
+            attr = getattr(self, name)
+            if not isinstance(attr, ts.StateVar):
+                continue
+            #if attr.alias is None:
+
+

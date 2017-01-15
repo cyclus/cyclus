@@ -46,3 +46,6 @@ src/eventhooks.cc
 src/eventhooks.h
 src/pyinfile.cc
 src/pyinfile.h
+
+# this is copied over by the installer
+cyclus/cycpp.py
