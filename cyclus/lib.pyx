@@ -888,12 +888,12 @@ cdef class _InfileTree:
         cdef std_string cpp_query = str_py_to_cpp(query)
         return self.ptx.NMatches(cpp_query)
 
-    def query(self, query, dbtype, int index=0):
+    def query(self, path, dbtype, int index=0):
         """A query method for required parameters.
 
         Parameters
         ----------
-        query : str
+        path : str
             The XML path to test if it exists.
         dbtype : str or int
             Represents primitive type in type system. Note that only
@@ -902,7 +902,7 @@ cdef class _InfileTree:
         index : int, optional
             The instance to query.
         """
-        cdef std_string cpp_query = str_py_to_cpp(query)
+        cdef std_string cpp_query = str_py_to_cpp(path)
         cdef std_string str_default, str_rtn
         cdef cpp_bool bool_rtn
         cdef cpp_typesystem.DbTypes i

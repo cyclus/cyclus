@@ -16,12 +16,14 @@ from copy import deepcopy
 from cyclus cimport cpp_cyclus
 from cyclus cimport lib
 from cyclus import lib
-
+from cyclus cimport cpp_typesystem
 from cyclus.typesystem cimport (py_to_any, any_to_py, str_py_to_cpp,
     std_string_to_py, bool_to_py, bool_to_cpp, std_set_std_string_to_py,
     std_set_std_string_to_cpp)
 from cyclus cimport typesystem as ts
 from cyclus import typesystem as ts
+
+from cyclus import nucname
 
 from cyclus.cycpp import VarDeclarationFilter
 
@@ -183,13 +185,15 @@ class Agent(_Agent, lib.Agent):
             datum.add_val(name, var.value, shape=var.shape, type=var.uniquetypeid)
         datum.record()
 
-    def _query_infile(self, tree, query, type, uitype, idx=None):
+    def _query_infile(self, tree, query, type, uitype, idx=0):
         if uitype == 'nuclide':
-            pass
+            rtn = tree.query(query, cpp_typesystem.STRING, idx)
+            rtn = nucname.id(rtn)
         else:
-            pass
+            rtn = tree.query(query, type, idx)
+        return rtn
 
-    def _read_from_infile(self, tree, name, alias, type, uitype, idx=None):
+    def _read_from_infile(self, tree, name, alias, type, uitype, idx=0):
         if isinstance(type, str):
             # read primitive
-            pass
+            return self._query_infile(tree, alias, type, uitype)
