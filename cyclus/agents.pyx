@@ -159,6 +159,9 @@ class Agent(_Agent, lib.Agent):
         However, brave users may choose to override it in exceptional cases.
         """
         sub = tree.subtree("config/*")
+        #for name, var in self._statevars:
+        #    if var.default is None:
+        #
         datum = di.new_datum("Info")
         for name, var in self._statevars:
             datum.add_val(name, var.value, shape=var.shape, type=var.uniquetypeid)

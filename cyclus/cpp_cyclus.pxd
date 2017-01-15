@@ -284,10 +284,13 @@ cdef extern from "infile_tree.h" namespace "cyclus":
 
     cdef cppclass InfileTree:
         InfileTree(XMLParser&)
+        int NMatches(std_string)
         InfileTree* SubTree(std_string)
         InfileTree* SubTree(std_string, int)
 
-    T OptionalQuery[T](InfileTree*, std_string, T) except +
+    T Query[T](InfileTree*, std_string)
+    T Query[T](InfileTree*, std_string, int)
+    T OptionalQuery[T](InfileTree*, std_string, T)
 
 
 cdef extern from "timer.h" namespace "cyclus":

@@ -871,6 +871,23 @@ cdef class _InfileTree:
         cdef _InfileTree self = cls(free=True)
         self.ptx = new cpp_cyclus.InfileTree(parser.ptx[0])
 
+    def nmatches(self, query):
+        """investigates the current status and returns the number of elements
+        matching a query.
+
+        Parameters
+        ----------
+        query : str
+            The XML path to count.
+
+        Returns
+        -------
+        n : int
+            The number of query matches.
+        """
+        cdef std_string cpp_query = str_py_to_cpp(query)
+        return self.ptx.NMatches(cpp_query)
+
     def optional_query(self, query, default):
         """A query method for optional parameters.
 
