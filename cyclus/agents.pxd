@@ -15,12 +15,17 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTR
     # Agent interface
     CyclusAgentShim(cpp_cyclus.Context*)
     std_string version()
+    cpp_cyclus.Agent* Clone()
+    #void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
+    #void InitFrom(cpp_cyclus.QueryableBackend*)
+    void Snapshot(cpp_cyclus.DbInit)
+    void InitInv(cpp_cyclus.Inventories&)
+    cpp_cyclus.Inventories SnapshotInv()
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
 
 ctypedef CyclusAgentShim* agent_shim_ptr
-
 
 cdef class _Agent(lib._Agent):
     # pointer declared on full backend, but that is untyped, shim is typed

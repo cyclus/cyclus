@@ -42,6 +42,22 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     #    rtn = self.version
     #    return str_py_to_cpp(py_rtn)
 
+    cpp_cyclus.Agent* Clone():
+        return NULL
+
+    #void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
+    #void InitFrom(cpp_cyclus.QueryableBackend*)
+
+    void Snapshot(cpp_cyclus.DbInit di):
+        pass
+
+    void InitInv(cpp_cyclus.Inventories& inv):
+        pass
+
+    cpp_cyclus.Inventories SnapshotInv():
+        cdef cpp_cyclus.Inventories inv = cpp_cyclus.Inventories()
+        return inv
+
 
 cdef class _Agent(lib._Agent):
 

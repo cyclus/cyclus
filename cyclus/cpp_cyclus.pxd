@@ -597,6 +597,7 @@ cdef extern from "agent.h" namespace "cyclus":
         Agent* Clone()
         void InfileToDb(InfileTree*, DbInit)
         void InitFrom(QueryableBackend*)
+        void Snapshot(DbInit)
         void InitInv(Inventories&)
         Inventories SnapshotInv()
         std_string PrintChildren()
