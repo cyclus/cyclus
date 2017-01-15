@@ -54,11 +54,11 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<lib._Context> ctx).ptx = this.context()
         cdef _Agent a = type(<object> this.self)(ctx)
         a.shim.InitFromAgent(this)
-        a._init_from_agent(<object> this.self)
         return a.shim
 
     void InitFromAgent "InitFrom" (CyclusAgentShim* a):
         cpp_cyclus.Agent.InitFromAgent(a)
+        (<object> a.self)._init_from_agent(<object> this.self)
 
     #void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
     #void InitFrom(cpp_cyclus.QueryableBackend*)
