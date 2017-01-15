@@ -722,6 +722,89 @@ cdef extern from "discovery.h" namespace "cyclus":
 
 
 #
+# Inventories and Resource Buffers
+#
+
+cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit":
+
+    ctypedef vector[Resource.Ptr] Manifest
+
+    cdef cppclass ResourceBuff:
+        enum AccessDir:
+            FRONT
+            BACK
+        ResourceBuff()
+        double capacity()
+        void set_capacity(double)
+        int count()
+        double quantity()
+        double space()
+        cpp_bool empty()
+        Manifest PopQty(double)
+        Manifest PopQty(double, double)
+        Manifest PopN(int)
+        Resource.Ptr Pop(AccessDir)
+        #T.Ptr Pop[T]()
+        void Push(Resource.Ptr)
+        void PushAll[B](vector[B])
+
+
+cdef extern from "toolkit/res_buf.h" namespace "cyclus::toolkit":
+
+    ctypedef vector[Resource.Ptr] ResVec
+    ctypedef vector[Material.Ptr] MatVec
+    ctypedef vector[Product.Ptr] ProdVec
+
+    cdef cppclass ResBuf[T]:
+        double capacity()
+        void capacity(double)
+        int count()
+        double quantity()
+        double space()
+        cpp_bool empty()
+        shared_ptr[T] Pop(double)
+        shared_ptr[T] Pop(double, double)
+        vector[shared_ptr[T]] PopN(int)
+        ResVec PopNRes(int)
+        shared_ptr[T] Peek()
+        shared_ptr[T] Pop()
+        shared_ptr[T] PopBack()
+        void Push(Resource.Ptr)
+        void Push[B](vector[B])
+
+cdef extern from "toolkit/res_map.h" namespace "cyclus::toolkit":
+
+    cdef cppclass ResMap[K,R]:
+        ctypedef map[K, shared_ptr[R]] map_type
+        ctypedef map[K, shared_ptr[R]].iterator iterator
+        ctypedef map[K, shared_ptr[R]].const_iterator const_iterator
+
+        ctypedef map[K, int] obj_type
+        ctypedef map[K, int].iterator obj_iterator
+        ctypedef map[K, int].const_iterator const_obj_iterator
+
+        int size()
+        double quantity()
+        void obj_ids(obj_type)
+        cpp_bool empty()
+        shared_ptr[R]& operator[](const K&)
+        const shared_ptr[R]& operator[](const K&)
+        iterator begin()
+        const_iterator begin()
+        const_iterator cbegin()
+        iterator end()
+        const_iterator end()
+        const_iterator cend()
+        void erase(iterator)
+        void erase(iterator, iterator)
+        void clear()
+        vector[shared_ptr[R]] Values()
+        vector[Resource.Ptr] ResValues()
+        void Values(vector[shared_ptr[R]])
+        void ResValues(vector[Resource.Ptr] vals)
+        shared_ptr[R] Pop(const K)
+
+#
 # Some cutsom pyne wrapping
 #
 

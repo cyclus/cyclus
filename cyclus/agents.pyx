@@ -102,8 +102,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
         py_di.ptx = &di
-        (<object> this.self).snapshot(py_tree, py_di)
-
+        (<object> this.self).snapshot(py_di)
 
     void InitInv(cpp_cyclus.Inventories& inv):
         pass
