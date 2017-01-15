@@ -15,6 +15,7 @@ import json
 import argparse
 import platform
 import warnings
+import itertools
 import subprocess
 from glob import glob
 from distutils import core, dir_util
@@ -629,6 +630,7 @@ ANNOTATIONS = [
     ('snapshot', 'snapshot', 'str'),
     ('snapshotinv', 'snapshotinv', 'str'),
     ('initinv', 'initinv', 'str'),
+    ('uniquetypeid', 'uniquetypeid', 'int'),
     ]
 
 
@@ -882,8 +884,25 @@ cdef object db_to_py(cpp_cyclus.hold_any value, cpp_cyclus.DbTypes dbtype):
     return rtn
 
 
-cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype):
-    """Converts python object to database type in a hold_any instance."""
+cdef cpp_cyclus.hold_any py_to_any(object value, object t):
+    """Converts a Python object into int a hold_any instance by inspecting the
+    type.
+
+    Parameters
+    ----------
+    value : object
+        A Python object to encapsulate.
+    t : dbtype or norm type (str or tupe of str)
+        The type to use in the conversion.
+    """
+    if isinstance(t, int):
+        return py_to_any_by_dbtype(value, t)
+    else:
+        return py_to_any_by_norm(value, t)
+
+
+cdef cpp_cyclus.hold_any py_to_any_by_dbtype(object value, cpp_cyclus.DbTypes dbtype):
+    """Converts Python object to a hold_any instance by knowing the dbtype."""
     cdef cpp_cyclus.hold_any rtn
     {%- for i, t in enumerate(dbtypes) %}
     {% if i > 0 %}el{% endif %}if dbtype == {{ ts.cython_cpp_name(t) }}:
@@ -892,6 +911,36 @@ cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype):
     else:
         msg = "dbtype {0} could not be found while converting from Python"
         raise TypeError(msg.format(dbtype))
+    return rtn
+
+
+cdef cpp_cyclus.hold_any py_to_any_by_norm(object value, object norm):
+    """Converts Python object to a hold_any instance by knowing the dbtype."""
+    cdef cpp_cyclus.hold_any rtn
+    if isinstance(norm, str):
+        {%- for i, t in enumerate(uniquestrtypes) %}
+        {% if i > 0 %}el{% endif %}if norm == {{ repr(ts.norms[t]) }}:
+            rtn = {{ ts.py_to_any('rtn', 'value', t) }}
+        {%- endfor %}
+        else:
+            msg = "norm type {0} could not be found while converting from Python"
+            raise TypeError(msg.format(norm))
+    else:
+        norm0 = norm[0]
+        normrest = norm[1:]
+        {% for i, (key, group) in enumerate(groupby(uniquetuptypes, key=firstfirst)) %}
+        {% if i > 0 %}el{% endif %}if norm0 == {{ repr(key) }}:
+            {%- for n, (tnorm, t) in enumerate(group) %}
+            {% if n > 0 %}el{% endif %}if normrest == {{ repr(tnorm[1:]) }}:
+                rtn = {{ ts.py_to_any('rtn', 'value', t) }}
+            {%- endfor %}
+            else:
+                msg = "norm type {0} could not be found while converting from Python"
+                raise TypeError(msg.format(norm))
+        {% endfor %}
+        else:
+            msg = "norm type {0} could not be found while converting from Python"
+            raise TypeError(msg.format(norm))
     return rtn
 
 
@@ -1012,6 +1061,9 @@ cdef class StateVar:
     initinv      Code snippet to use in the ``InitInv()`` function for
                  this state variable instead of using code generation.
                  This is a string.
+    uniquetypeid The dbtype id for the type that is unique among all dbtypes
+                 for a given C++ representations. **READ ONLY:** Do not set this
+                 key!!!
     ============ ==============================================================
     """
 
@@ -1065,13 +1117,15 @@ cdef class {{tclassname}}(StateVar):
     """State variable descriptor for {{ts.cpptypes[t]}}"""
 
     def __cinit__(self, object value=None,
-            {%- for pyname, cppname, typename in annotations -%}{%- if pyname != 'type' -%}
+            {%- for pyname, cppname, typename in annotations -%}{%- if pyname not in nonuser_annotations -%}
             {{typename}} {{pyname}}=None,
             {%- endif -%}{%- endfor -%}):
         self.value = value
         {% for pyname, cppname, _ in annotations -%}
         {% if pyname == 'type' %}
         self.type = {{repr(ts.norms[t])}}
+        {% elif pyname == 'uniquetypeid' %}
+        self.uniquetypeid = {{ts.ids[t]}}
         {%- else %}
         self.{{cppname}} = {{pyname}}
         {%- endif -%}{% endfor %}
@@ -1079,7 +1133,7 @@ cdef class {{tclassname}}(StateVar):
     cpdef {{tclassname}} copy(self):
         """Copies the {{tclassname}} into a new instance."""
         return {{tclassname}}(value=self.value,
-            {%- for pyname, cppname, _ in annotations -%}{%- if pyname != 'type' -%}
+            {%- for pyname, cppname, _ in annotations -%}{%- if pyname not in nonuser_annotations -%}
             {{pyname}}=self.{{cppname}},
             {%- endif -%}{%- endfor -%}
             )
@@ -1090,6 +1144,7 @@ cdef class {{tclassname}}(StateVar):
 
 def typesystem_pyx(ts, ns):
     """Creates the Cython wrapper for the Cyclus type system."""
+    nonuser_annotations = ('type', 'uniquetypeid')
     ctx = dict(
         ts=ts,
         dbtypes=ts.dbtypes,
@@ -1101,6 +1156,14 @@ def typesystem_pyx(ts, ns):
         sorted=sorted,
         enumerate=enumerate,
         annotations=ANNOTATIONS,
+        nonuser_annotations=nonuser_annotations,
+        uniquestrtypes = [t for t in ts.uniquetypes
+                          if isinstance(ts.norms[t], str)],
+        uniquetuptypes = sorted([(ts.norms[t], t) for t in ts.uniquetypes
+                                 if not isinstance(ts.norms[t], str)], reverse=True,
+                                key=lambda x: (x[0][0], x[1])),
+        groupby=itertools.groupby,
+        firstfirst=lambda x: x[0][0],
         )
     rtn = TYPESYSTEM_PYX.render(ctx)
     return rtn
@@ -1156,7 +1219,11 @@ cdef {{ ts.cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x)
 #
 cdef object db_to_py(cpp_cyclus.hold_any value, cpp_cyclus.DbTypes dbtype)
 
-cdef cpp_cyclus.hold_any py_to_any(object value, cpp_cyclus.DbTypes dbtype)
+cdef cpp_cyclus.hold_any py_to_any(object value, object t)
+
+cdef cpp_cyclus.hold_any py_to_any_by_dbtype(object value, cpp_cyclus.DbTypes dbtype)
+
+cdef cpp_cyclus.hold_any py_to_any_by_norm(object value, object norm)
 
 cdef object any_to_py(cpp_cyclus.hold_any value)
 

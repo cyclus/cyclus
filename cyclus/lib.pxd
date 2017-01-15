@@ -55,6 +55,11 @@ cdef class _InfileTree:
     # For now, there are no subclasses  so we can get away with
     # the fully typed pointer.
     cdef cpp_cyclus.InfileTree * ptx
+    cdef bint _free
+
+cdef class _DbInit:
+    cdef cpp_cyclus.DbInit * ptx
+    cdef bint _free
 
 cdef class _Timer:
     cdef cpp_cyclus.Timer * ptx

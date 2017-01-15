@@ -16,7 +16,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTR
     CyclusAgentShim(cpp_cyclus.Context*)
     std_string version()
     cpp_cyclus.Agent* Clone()
-    #void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
+    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
     void InitFromAgent "InitFrom" (CyclusAgentShim*)
     void InitFrom(cpp_cyclus.QueryableBackend*)
     void Snapshot(cpp_cyclus.DbInit)

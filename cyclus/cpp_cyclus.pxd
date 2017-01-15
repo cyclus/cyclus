@@ -283,7 +283,9 @@ cdef extern from "xml_parser.h" namespace "cyclus":
 cdef extern from "infile_tree.h" namespace "cyclus":
 
     cdef cppclass InfileTree:
-        InfileTree(XMLParser&) except +
+        InfileTree(XMLParser&)
+        InfileTree* SubTree(std_string)
+        InfileTree* SubTree(std_string, int)
 
     T OptionalQuery[T](InfileTree*, std_string, T) except +
 

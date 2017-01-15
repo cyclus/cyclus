@@ -58,9 +58,17 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
 
     void InitFromAgent "InitFrom" (CyclusAgentShim* a):
         cpp_cyclus.Agent.InitFromAgent(a)
-        (<object> a.self)._init_from_agent(<object> this.self)
+        (<object> a.self).init_from_agent(<object> this.self)
 
-    #void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
+    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
+        cpp_cyclus.Agent.InfileToDb(tree, di)
+        cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
+        py_tree.ptx = tree
+        cdef lib._DbInit py_di = lib.DbInit(free=False)
+        py_di.ptx = &di
+        (<object> this.self).infile_to_db(py_tree, py_di)
+
+
     #void InitFrom(cpp_cyclus.QueryableBackend*)
 
     void Snapshot(cpp_cyclus.DbInit di):
@@ -137,6 +145,21 @@ class Agent(_Agent, lib.Agent):
                 svs[i][1].index = i
         cls._statevars = tuple(svs)
 
-    def _init_from_agent(self, other):
+    def init_from_agent(self, other):
+        """A dynamic version of InitFrom(Agent) that should work for all
+        subclasses. Users should not need to call this ever. However, brave
+        users may choose to override it in exceptional cases.
+        """
         for name, var in self._statevars:
             setattr(self, name, deepcopy(getattr(other, name, None)))
+
+    def infile_to_db(self, tree, di):
+        """A dynamic version of InfileToDb(InfileTree*, DbInit) that should
+        work for all subclasses. Users should not need to call this ever.
+        However, brave users may choose to override it in exceptional cases.
+        """
+        sub = tree.subtree("config/*")
+        datum = di.new_datum("Info")
+        for name, var in self._statevars:
+            datum.add_val(name, var.value, shape=var.shape, type=var.uniquetypeid)
+        datum.record()

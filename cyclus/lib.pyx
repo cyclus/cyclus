@@ -57,7 +57,7 @@ cdef class _Datum:
             del cpp_ptx
             self.ptx = NULL
 
-    def add_val(self, field, value, shape=None, dbtype=cpp_typesystem.BLOB):
+    def add_val(self, field, value, shape=None, type=None):
         """Adds Datum value to current record as the corresponding cyclus data type.
 
         Parameters
@@ -65,10 +65,10 @@ cdef class _Datum:
         field : str or bytes
             The column name.
         value : object
-            Value in table column.
+            Value in table column, optional
         shape : list or tuple of ints
             Length of value.
-        dbtype : cpp data type
+        type : dbtype or norm type
             Data type as defined by cyclus typesystem
 
         Returns
@@ -77,7 +77,10 @@ cdef class _Datum:
         """
         cdef int i, n
         cdef std_vector[int] cpp_shape
-        cdef cpp_cyclus.hold_any v = py_to_any(value, dbtype)
+        if type is None:
+            raise TypeError('a database or C++ type must be supplied to add a '
+                            'value to the datum, got None.')
+        cdef cpp_cyclus.hold_any v = py_to_any(value, type)
         cdef std_string cpp_field
         if isinstance(field, str):
             pass
@@ -328,7 +331,7 @@ cdef class _Recorder:
         (<cpp_cyclus.Recorder*> self.ptx).inject_sim_id(<bint> value)
 
     def new_datum(self, title):
-        """Registers a backend with the recorder."""
+        """Returns a new datum instance."""
         cdef std_string cpp_title = str_py_to_cpp(title)
         cdef _Datum d = Datum(new=False)
         (<_Datum> d).ptx = (<cpp_cyclus.Recorder*> self.ptx).NewDatum(cpp_title)
@@ -846,11 +849,27 @@ class XMLParser(_XMLParser):
 
 cdef class _InfileTree:
 
-    def __cinit__(self, _XMLParser parser):
-        self.ptx = new cpp_cyclus.InfileTree(parser.ptx[0])
+    def __cinit__(self, bint free=False):
+        self.ptx = NULL
+        self._free = free
 
     def __dealloc__(self):
-        del self.ptx
+        if self.ptx == NULL:
+            return
+        if self._free:
+            del self.ptx
+
+    @classmethod
+    def from_parser(cls, _XMLParser parser):
+        """Initializes an input file tree from an XML parser.
+
+        Parameters
+        ----------
+        parser : XMLParser
+            An XMLParser instance.
+        """
+        cdef _InfileTree self = cls(free=True)
+        self.ptx = new cpp_cyclus.InfileTree(parser.ptx[0])
 
     def optional_query(self, query, default):
         """A query method for optional parameters.
@@ -876,14 +895,71 @@ cdef class _InfileTree:
                             "str is currently supported.")
         return rtn
 
+    def subtree(self, query, int index=0):
+        """Populates a child infile based on a query and index.
+
+        Parameters
+        ----------
+        query : str
+            The XML path to test if it exists.
+        index : int, optional
+            The index of the queried element, default 0.
+
+        Returns
+        -------
+        sub : InfileTree
+            A sub-tree repreresenting the query and the index.
+        """
+        cdef std_string cpp_query = str_py_to_cpp(query)
+        cdef _InfileTree sub = InfileTree(free=False)
+        sub.ptx = self.ptx.SubTree(cpp_query, index)
+        rtn = sub
+        return rtn
+
 
 class InfileTree(_InfileTree):
     """A class for extracting information from a given XML parser
 
     Parameters
     ----------
-    parser : XMLParser
-        An XMLParser instance.
+    free : bool, optional
+        Whether or not to free the C++ instance on deallocation.
+    """
+
+
+cdef class _DbInit:
+
+    def __cinit__(self, bint free=False):
+        self.ptx = NULL
+        self._free = free
+
+    def __dealloc__(self):
+        if self.ptx == NULL:
+            return
+        if self._free:
+            del self.ptx
+
+    def new_datum(self, title):
+        """Returns a new datum to be used exactly as the Context.new_datum() method.
+        Users must not add fields to the datum that are automatically injected:
+        'SimId', 'AgentId', and 'SimTime'.
+        """
+        cdef std_string cpp_title = str_py_to_cpp(title)
+        cdef _Datum d = Datum(new=False)
+        (<_Datum> d).ptx = self.ptx.NewDatum(cpp_title)
+        return d
+
+
+class DbInit(_DbInit):
+    """DbInit provides an interface for agents to record data to the output db that
+    automatically injects the agent's id and current timestep alongside all
+    recorded data.  The prefix 'AgentState' + [spec] (e.g. MyReactor) is also added
+    to the datum title.
+
+    Parameters
+    ----------
+    free : bool, optional
+        Whether or not to free the C++ instance on deallocation.
     """
 
 #
