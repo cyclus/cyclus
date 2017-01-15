@@ -123,6 +123,9 @@ class Agent(_Agent, lib.Agent):
             if not isinstance(attr, ts.StateVar):
                 continue
             attr.alias = _VAR_DECL.canonize_alias(attr.type, name, attr.alias)
+            attr.tooltip = _VAR_DECL.canonize_tooltip(attr.type, name, attr.tooltip)
+            attr.uilabel = _VAR_DECL.canonize_uilabel(attr.type, name, attr.uilabel)
+            attr.uitype = ts.prepare_type_representation(attr.uitype)
             vars[name] = attr
         # make sure all state vars have a consistent index
         cdef int nvars = len(vars)
@@ -159,10 +162,34 @@ class Agent(_Agent, lib.Agent):
         However, brave users may choose to override it in exceptional cases.
         """
         sub = tree.subtree("config/*")
-        #for name, var in self._statevars:
-        #    if var.default is None:
-        #
+        for name, var in self._statevars:
+            # set internal state variable values to default
+            if var.internal:
+                if var.default is None:
+                    raise RuntimeError('state variables marked as internal '
+                                       'must have a default')
+                var.value = var.default
+                continue
+            query = var.alias if isinstance(var.alias, str) else var.alias[0]
+            if var.default is not None and tree.nmatches(query) == 0:
+                var.value = var.default
+                continue
+            else:
+                var.value = self._read_from_infile(sub, name, var.alias,
+                                                   var.type, var.uitype)
+        # Write out to db
         datum = di.new_datum("Info")
         for name, var in self._statevars:
             datum.add_val(name, var.value, shape=var.shape, type=var.uniquetypeid)
         datum.record()
+
+    def _query_infile(self, tree, query, type, uitype, idx=None):
+        if uitype == 'nuclide':
+            pass
+        else:
+            pass
+
+    def _read_from_infile(self, tree, name, alias, type, uitype, idx=None):
+        if isinstance(type, str):
+            # read primitive
+            pass

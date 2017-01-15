@@ -32,7 +32,7 @@ from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
     bool_to_py, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py, \
-    std_vector_std_string_to_py
+    std_vector_std_string_to_py, C_IDS, blob_to_bytes
 
 
 # startup numpy
@@ -872,7 +872,7 @@ cdef class _InfileTree:
         self.ptx = new cpp_cyclus.InfileTree(parser.ptx[0])
 
     def nmatches(self, query):
-        """investigates the current status and returns the number of elements
+        """Investigates the current status and returns the number of elements
         matching a query.
 
         Parameters
@@ -887,6 +887,50 @@ cdef class _InfileTree:
         """
         cdef std_string cpp_query = str_py_to_cpp(query)
         return self.ptx.NMatches(cpp_query)
+
+    def query(self, query, dbtype, int index=0):
+        """A query method for required parameters.
+
+        Parameters
+        ----------
+        query : str
+            The XML path to test if it exists.
+        dbtype : str or int
+            Represents primitive type in type system. Note that only
+            primitive types are queryable, by design, and not all primitive types.
+            Blobs and UUIDs are not included because they cannot be lexically cast.
+        index : int, optional
+            The instance to query.
+        """
+        cdef std_string cpp_query = str_py_to_cpp(query)
+        cdef std_string str_default, str_rtn
+        cdef cpp_bool bool_rtn
+        cdef cpp_typesystem.DbTypes i
+        # get an dbtype
+        if isinstance(dbtype, int):
+            i = dbtype
+        else:
+            i = C_IDS[dbtype]
+        # run the query
+        if i == cpp_typesystem.BOOL:
+            bool_rtn = cpp_cyclus.Query[cpp_bool](self.ptx, cpp_query, index)
+            rtn = bool_to_py(bool_rtn)
+        elif i == cpp_typesystem.INT:
+            rtn = cpp_cyclus.Query[int](self.ptx, cpp_query, index)
+        elif i == cpp_typesystem.FLOAT:
+            rtn = cpp_cyclus.Query[float](self.ptx, cpp_query, index)
+        elif i == cpp_typesystem.DOUBLE:
+            rtn = cpp_cyclus.Query[double](self.ptx, cpp_query, index)
+        elif i == cpp_typesystem.STRING:
+            str_rtn = cpp_cyclus.Query[std_string](self.ptx, cpp_query, index)
+            rtn = std_string_to_py(str_rtn)
+        elif i == cpp_typesystem.VL_STRING:
+            str_rtn = cpp_cyclus.Query[std_string](self.ptx, cpp_query, index)
+            rtn = std_string_to_py(str_rtn)
+        else:
+            raise TypeError("Type {} not recognized, only ".format(dbtype) +
+                            "primitive types are supported.")
+        return rtn
 
     def optional_query(self, query, default):
         """A query method for optional parameters.

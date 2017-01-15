@@ -606,7 +606,7 @@ TO_CPP_CONVERTERS = {
         'cpp{var}'),
     }
 
-# annotation info key (pyname), C++ name,  cython type names
+# annotation info key (pyname), C++ name,  cython type names, init snippet
 ANNOTATIONS = [
     ('type', 'type', 'object'),
     ('index', 'index', 'int'),
@@ -799,6 +799,9 @@ NAMES = C_NAMES
 cdef dict C_IDS = {
 {%- for t in dbtypes %}
     '{{ t }}': {{ ts.cython_cpp_name(t) }},
+{%- endfor %}
+{%- for t in ts.uniquetypes %}
+    {{ repr(ts.norms[t]) }}: {{ ts.cython_cpp_name(t) }},
 {%- endfor %}
     }
 IDS = C_IDS
@@ -1139,7 +1142,31 @@ cdef class {{tclassname}}(StateVar):
             )
 
 {% endfor %}
-'''.strip())
+
+#
+# Helpers
+#
+def prepare_type_representation(cpptype, othertype):
+    """Updates othertype to conform to the length of cpptype using None's.
+    """
+    cdef int i, n
+    if not isinstance(cpptype, str):
+        n = len(cpptype)
+        if isinstance(othertype, str):
+            othertype = [othertype]
+        if othertype is None:
+            othertype = [None] * n
+        elif len(othertype) < n:
+            othertype.extend([None] * (n - len(othertype)))
+        # recurse down
+        for i in range(1, n):
+            othertype[i] = prepare_type_representation(cpptype[i], othertype[i])
+        return othertype
+    else:
+        return othertype
+
+
+'''.lstrip())
 
 
 def typesystem_pyx(ts, ns):
