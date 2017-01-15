@@ -63,18 +63,47 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<object> a.self).init_from_agent(<object> this.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
+        # check the kind so we don't need to override in subclasses.
+        #cdef std_string k = this.kind()
+        #if k == b"Region":
+        #    cpp_cyclus.Region.InfileToDb(tree, di)
+        #elif k == std_string("Inst"):
+        #    cpp_cyclus.Institution.InfileToDb(tree, di)
+        #elif k == std_string("Facility"):
+        #    cpp_cyclus.Facility.InfileToDb(tree, di)
+        #else:
+        #    cpp_cyclus.Agent.InfileToDb(tree, di)
         cpp_cyclus.Agent.InfileToDb(tree, di)
+        # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
         py_tree.ptx = tree
         cdef lib._DbInit py_di = lib.DbInit(free=False)
         py_di.ptx = &di
+        # call generic python
         (<object> this.self).infile_to_db(py_tree, py_di)
 
-
-    #void InitFrom(cpp_cyclus.QueryableBackend*)
+    void InitFrom(cpp_cyclus.QueryableBackend* b):
+        # check the kind so we don't need to override in subclasses.
+        #cdef std_string k = this.kind()
+        #if k == std_string("Region"):
+        #    cpp_cyclus.Region.InitFrom(b)
+        #elif k == std_string("Inst"):
+        #    cpp_cyclus.Institution.InitFrom(b)
+        #elif k == std_string("Facility"):
+        #    cpp_cyclus.Facility.InitFrom(b)
+        #else:
+        #    cpp_cyclus.Agent.InitFrom(b)
+        cpp_cyclus.Agent.InitFrom(b)
+        cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
+        res, _ = lib.query_result_to_py(qr)
+        # call generic python
+        (<object> this.self).init_from_dict(res)
 
     void Snapshot(cpp_cyclus.DbInit di):
-        pass
+        cdef lib._DbInit py_di = lib.DbInit(free=False)
+        py_di.ptx = &di
+        (<object> this.self).snapshot(py_tree, py_di)
+
 
     void InitInv(cpp_cyclus.Inventories& inv):
         pass
@@ -265,3 +294,23 @@ class Agent(_Agent, lib.Agent):
             v = self._read_from_infile(tree, val, type[2], uitype[2], i, itempath)
             rtn[k] = v
         return rtn
+
+    def init_from_dict(self, d):
+        """An initializer that reads state varaible values from a dictionary.
+        This is used when InitFrom(QueryableBackend) is called.
+        Users should not need to call this ever. However, brave
+        users may choose to override it in exceptional cases.
+        """
+        for name, val in d.items():
+            setattr(self, name, val)
+
+    def snapshot(self, di):
+        """A dynamic version of Snapshot(DbInit) that should
+        work for all subclasses.
+        Users should not need to call this ever. However, brave
+        users may choose to override it in exceptional cases.
+        """
+        datum = di.new_datum("Info")
+        for name, var in self._statevars:
+            datum.add_val(name, var.value, shape=var.shape, type=var.uniquetypeid)
+        datum.record()

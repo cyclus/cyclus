@@ -115,6 +115,28 @@ class Datum(_Datum):
     """Datum class."""
 
 
+cdef object query_result_to_py(cpp_cyclus.QueryResult qr):
+    """Converts a query result object to a dictionary mapping fields to values
+    and a list of field names in order.
+    """
+    cdef int i, j
+    cdef int nrows, ncols
+    nrows = qr.rows.size()
+    ncols = qr.fields.size()
+    cdef dict res = {}
+    cdef list fields = []
+    for j in range(ncols):
+        res[j] = []
+        f = qr.fields[j]
+        fields.append(f.decode())
+    for i in range(nrows):
+        for j in range(ncols):
+            res[j].append(db_to_py(qr.rows[i][j], qr.types[j]))
+    res = {fields[j]: v for j, v in res.items()}
+    rtn = (res, fields)
+    return rtn
+
+
 cdef class _FullBackend:
 
     def __cinit__(self):
@@ -145,8 +167,6 @@ cdef class _FullBackend:
         results : pd.DataFrame
             Pandas DataFrame the represents the table
         """
-        cdef int i, j
-        cdef int nrows, ncols
         cdef std_string tab = str(table).encode()
         cdef std_string field
         cdef cpp_cyclus.QueryResult qr
@@ -172,18 +192,7 @@ cdef class _FullBackend:
                 conds_ptx = &cpp_conds
         # query, convert, and return
         qr = (<cpp_cyclus.FullBackend*> self.ptx).Query(tab, conds_ptx)
-        nrows = qr.rows.size()
-        ncols = qr.fields.size()
-        cdef dict res = {}
-        cdef list fields = []
-        for j in range(ncols):
-            res[j] = []
-            f = qr.fields[j]
-            fields.append(f.decode())
-        for i in range(nrows):
-            for j in range(ncols):
-                res[j].append(db_to_py(qr.rows[i][j], qr.types[j]))
-        res = {fields[j]: v for j, v in res.items()}
+        res, fields = query_result_to_py(qr)
         results = pd.DataFrame(res, columns=fields)
         return results
 

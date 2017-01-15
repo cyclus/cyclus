@@ -20,6 +20,8 @@ cdef class _Datum:
     cdef bint _free
     cdef list _fieldnames
 
+cdef object query_result_to_py(cpp_cyclus.QueryResult)
+
 cdef class _FullBackend:
     cdef void * ptx
 
