@@ -65,7 +65,7 @@ def cppbases_replace_one(src, start):
 
 
 def cppbases(src):
-    """Finds and replaces instance of C++BASES and replaces the relevant
+    """Finds and replaces instances of C++BASES and replaces the relevant
     Cython-generated code with actual calls to the base class constructors.
     For example, in Cython you would write::
 
@@ -89,11 +89,52 @@ def cppbases(src):
     return src
 
 
+def cppconstructors_replace_one(src, start):
+    """Replaces a single instace of C++CONSTRUCTORS at the start location."""
+    # now get bases str
+    next_nl = src.find('\n', start)
+    con_str = src[start+15:next_nl]
+    con_str, _, _ = con_str.rpartition('#')
+    con_str = con_str.strip()
+    cons = [c.strip() for c in con_str.split(';')]
+    cons = ';\n  '.join(cons)
+    # Now, insert into code
+    comment_end = src.find('*/', next_nl)
+    next_nl = src.find('\n', comment_end) + 1
+    prev, post = src[:next_nl], src[next_nl:]
+    src = prev + '  ' + cons + ';\n' + post
+    return src, next_nl + 4 + len(cons)
+
+
+def cppconstructors(src):
+    """Finds instances of C++CONSTRUCTORS and adds the relevant
+    constructors that Cython may have not declared.
+    For example, in Cython you would write::
+
+        cdef cppclass Child "Child" (Base): # C++CONSTRUCTORS Child(char*); Child(int)
+            Child(char*)
+            Child(int)
+
+    Note that the must fully-qualified C++. Constructors are separated by semicolons
+    so as to not overlap with other C++ declaration syntax.
+
+    Also note that even without this post-processor, this is still valid Cython.
+    It likely won't compile due to missing declarations.
+    """
+    start = src.find('C++CONSTRUCTORS', 0)
+    while start != -1:
+        src, stop = cppconstructors_replace_one(src, start)
+        start = src.find('C++CONSTRUCTORS', stop)
+    return src
+
+
+
 def main(args=None):
     fname = args[1]
     with open(fname, 'r') as f:
         orig = src = f.read()
     src = cppbases(src)
+    src = cppconstructors(src)
     if src != orig:
         with open(fname, 'w') as f:
             f.write(src)

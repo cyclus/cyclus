@@ -592,14 +592,14 @@ cdef extern from "agent.h" namespace "cyclus":
         const int id()
 
     cdef cppclass Agent(Ider):
-        Agent(Context*) except +
-        std_string version() except +
-        Agent* Clone() except +
-        void InfileToDb(InfileTree*, DbInit) except +
-        void InitFrom(QueryableBackend*) except +
-        void InitInv(Inventories&) except +
-        Inventories SnapshotInv() except +
-        std_string PrintChildren() except +
+        Agent(Context*)
+        std_string version()
+        Agent* Clone()
+        void InfileToDb(InfileTree*, DbInit)
+        void InitFrom(QueryableBackend*)
+        void InitInv(Inventories&)
+        Inventories SnapshotInv()
+        std_string PrintChildren()
         vector[std_string] GetTreePrintOuts(Agent*)
         cpp_bool InFamilyTree(Agent*)
         cpp_bool AncestorOf(Agent*)

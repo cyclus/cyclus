@@ -38,13 +38,17 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     CyclusAgentShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Agent(ctx)
         pass
 
+    #std_string version():
+    #    rtn = self.version
+    #    return str_py_to_cpp(py_rtn)
+
 
 cdef class _Agent(lib._Agent):
 
     def __cinit__(self, lib._Context ctx):
-        self.ptx = new CyclusAgentShim(ctx.ptx)
-        #self.ptx = new CyclusAgentShim((<lib._Context> context).ptx)
-
+        self.ptx = self.shim = new CyclusAgentShim(ctx.ptx)
+        self._free = True
+        self.shim.self = <PyObject*> self
 
 
 class Agent(_Agent, lib.Agent):
