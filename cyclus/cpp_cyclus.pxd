@@ -596,7 +596,7 @@ cdef extern from "agent.h" namespace "cyclus":
         std_string version()
         Agent* Clone()
         void InfileToDb(InfileTree*, DbInit)
-        void InitFrom(Agent*)
+        void InitFromAgent "InitFrom" (Agent*)
         void InitFrom(QueryableBackend*)
         void Snapshot(DbInit)
         void InitInv(Inventories&)
@@ -672,21 +672,21 @@ cdef extern from "region.h" namespace "cyclus":
 
     cdef cppclass Region(Agent, TimeListener):
         Region(Context*)
-        void InitFrom(Region*)
+        void InitFromAgent "InitFrom" (Region*)
 
 
 cdef extern from "institution.h" namespace "cyclus":
 
     cdef cppclass Institution(Agent, TimeListener):
         Institution(Context*)
-        void InitFrom(Institution*)
+        void InitFromAgent "InitFrom" (Institution*)
 
 
 cdef extern from "facility.h" namespace "cyclus":
 
     cdef cppclass Facility(Agent, TimeListener, Trader):
         Facility(Context*)
-        void InitFrom(Facility*)
+        void InitFromAgent "InitFrom" (Facility*)
         cpp_bool CheckDecommissionCondition()
 
 
