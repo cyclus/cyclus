@@ -2305,13 +2305,20 @@ def main_write():
         output += CPPGEN.visit(block)
     return output
 
-def to_buf_setup(t, depth=0, prefix=""):
+def to_from_buf_setup(t, depth=0, prefix="", spec=None):
     node = Block(nodes=[])
     if depth == 0:
-        node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
-                                              name=Var(name="buf"))))
-        node.nodes.append(ExprStmt(child=Assign(target=Var(name="buf.len"),
-                                                value=Raw(code="x.size()"))))
+        if spec == 'TO_BUF':
+            node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
+                                                  name=Var(name="buf"))))
+            node.nodes.append(ExprStmt(child=Assign(target=Var(name="buf.len"),
+                                                    value=Raw(code="x.size()"))))
+        elif spec == 'TO_VAL':
+            val = get_variable('x', depth=depth, prefix=prefix)
+            node.nodes.append(ExprStmt(child=Decl(type=t, name=Var(name=val))))
+            node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp='char*'),
+                                                        target=Var(name='p'),
+                                                        value=Raw(code='reinterpret_cast<char*>(buf.p)'))))
     child_sizes = OrderedDict()
     container = t.canon[0]
     prefixes = template_args[container]
@@ -2335,7 +2342,7 @@ def to_buf_setup(t, depth=0, prefix=""):
             vl_list.append(1)
         else:
             child_sizes[variable] = get_variable("total_item_size", depth+1, prefix=prefix+p)
-            new_node, new_list = to_buf_setup(child_node, depth=depth+1, prefix=prefix+p)
+            new_node, new_list = to_from_buf_setup(child_node, depth=depth+1, prefix=prefix+p)
             node.nodes.append(new_node)
             vl_list.append(new_list)
     for k, v in child_sizes.items():
@@ -2349,11 +2356,12 @@ def to_buf_setup(t, depth=0, prefix=""):
                                         value=Raw(
                                            code="+".join(child_sizes.keys())))))
     if depth == 0:
-        node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
-                                                    target=Var(name="nbytes"),
-                                                    value=Raw(code=total_var+"*buf.len"))))
-        node.nodes.append(ExprStmt(child=Assign(target=Var(name="buf.p"),
-                                                value=Raw(code="new char[nbytes]"))))
+        if spec == 'TO_BUF':
+            node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
+                                                        target=Var(name="nbytes"),
+                                                        value=Raw(code=total_var+"*buf.len"))))
+            node.nodes.append(ExprStmt(child=Assign(target=Var(name="buf.p"),
+                                                    value=Raw(code="new char[nbytes]"))))
     return node, vl_list
 
 def to_buf_body(t, vl_list, depth=0, prefix="", variable=None, 
@@ -2424,7 +2432,7 @@ def main_val_to_buf():
     for i in VARIATION_DICT:
         t = CANON_TO_NODE[i]
         if t.canon[0] in variable_length_types:
-            setup, vl_list = to_buf_setup(t)
+            setup, vl_list = to_from_buf_setup(t, spec='TO_BUF')
             node = FuncDef(type=Type(cpp="hvl_t"),
                            name=Var(name="Hdf5Back::VLValToBuf"),
                            args=[Decl(type=Type(cpp="const "+t.cpp+"&"),
@@ -2454,8 +2462,65 @@ def main_val_to_buf_h():
     output = indent(output, INDENT)
     return output
 
-def to_val_setup():
-    pass
+def vl_read(t, offset):
+    node = FuncCall(name=Var(name='VLRead'), 
+                    targs=[Raw(code=t.cpp), 
+                           Raw(code=ORIGIN_TO_VL[t.canon].db)], 
+                    args=[Raw(code=offset)])
+    return node
+
+def reinterpret_cast(t, offset):
+    node = FuncCall(name=Var(name='*reinterpret_cast'), 
+                    targs=[Raw(code=t.cpp+'*')], args=[Raw(code=offset)])
+    return node
+
+def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
+    block = Block(nodes=[])
+    child_count = 0
+    args = {}
+    total_item_size = get_variable('total_item_size', depth=depth, prefix=prefix)
+    count = get_variable('count', depth=depth, prefix=prefix)
+    if offset == None:
+        offset = 'p+' + "(" + total_item_size + '*' + count + ")"
+    container = t.canon[0]
+    args['var'] = variable
+    loop_block = Block(nodes=[])
+    for child, part, vl in zip(t.canon[1:], template_args[t.canon[0]], vl_list):
+        type_node = CANON_TO_NODE[child]
+        child_var = get_variable('x', depth=depth+1, prefix=prefix+part)
+        child_size = get_variable('item_size', depth=depth+1, prefix=prefix+part)
+        child_arg = 'child' + str(child_count)
+        if vl == 1:
+            loop_block.nodes.append(ExprStmt(child=DeclAssign(type=type_node,
+                                                              target=Var(name=child_var),
+                                                              value=vl_read(type_node, offset))))
+        elif vl == 0:
+            loop_block.nodes.append(ExprStmt(child=DeclAssign(type=type_node,
+                                                              target=Var(name=child_var),
+                                                              value=reinterpret_cast(type_node, offset))))
+        else:
+            loop_block.nodes.append(ExprStmt(child=Decl(type=type_node,
+                                                        name=Var(name=child_var))))
+            loop_block.nodes.append(to_val_body(type_node, vl, depth=depth+1, 
+                                                prefix=prefix+part, offset=offset, 
+                                                variable=child_var))
+        args[child_arg] = child_var
+        offset += "+" + child_size
+        child_count += 1
+    if container in variable_length_types:
+        block.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp='unsigned int'),
+                                                     target=Var(name=count),
+                                                     value=Raw(code='0'))))
+        block.nodes.append(For(cond=BinOp(x=Var(name=count), op='<', y=Var(name='buf.len')),
+                               incr=Raw(code='++'+count),
+                               body=[loop_block, 
+                                     ExprStmt(child=Raw(code=CONTAINER_INSERT_STRINGS[container].format(**args)))]))
+    else:
+        block.nodes.append(loop_block)
+        block.nodes.append(ExprStmt(child=Raw(code=CONTAINER_INSERT_STRINGS[container].format(**args))))
+    if depth == 0:
+        block.nodes.append(ExprStmt(child=Raw(code='return ' + variable)))
+    return block
 
 def main_buf_to_val():
     CPPGEN = CppGen()
@@ -2464,13 +2529,13 @@ def main_buf_to_val():
     for i in VARIATION_DICT:
         t = CANON_TO_NODE[i]
         if t.canon[0] in variable_length_types:
+            setup, vl_list = to_from_buf_setup(t, spec='TO_VAL')
             node = FuncDef(type=Type(cpp=t.cpp),
                            name=Var(name="Hdf5Back::VLBufToVal"),
                            targs=[Raw(code=t.cpp)],
                            args=[Decl(type=Type(cpp="const hvl_t&"),
                                       name=Var(name="buf"))],
-                           #probably need a body function!
-                           body=[],
+                           body=[setup, to_val_body(t, vl_list)],
                            tspecial=True)
             block.nodes.append(node)
     output += CPPGEN.visit(block)
@@ -2486,9 +2551,9 @@ MAIN_DISPATCH = {"QUERY": main_query,
                  "VL_DATASET": main_vl_dataset,
                  "FILL_BUF": main_fill_buf,
                  "WRITE": main_write,
+                 "VAL_TO_BUF_H": main_val_to_buf_h,
                  "VAL_TO_BUF": main_val_to_buf,
-                 "BUF_TO_VAL": main_buf_to_val,
-                 "VAL_TO_BUF_H": main_val_to_buf_h}
+                 "BUF_TO_VAL": main_buf_to_val}
 
 def main():
     global NOT_VL
