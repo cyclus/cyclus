@@ -112,6 +112,12 @@ class TypeSystem(object):
             else:
                 uniquetypes.append(t)
                 seen.add(normt)
+        self.resources = tuple(RESOURCES)
+        self.inventory_types = inventory_types = []
+        for t in uniquetypes:
+            normt = self.norms[t]
+            if normt in INVENTORIES or normt[0] in INVENTORIES:
+                inventory_types.append(t)
 
         # caches
         self._cython_cpp_name = {}
@@ -315,6 +321,9 @@ CYTHON_TYPES = {
     'VL_STRING': 'std_string',
     'BLOB': 'cpp_cyclus.Blob',
     'UUID': 'cpp_cyclus.uuid',
+    'MATERIAL': 'cpp_cyclus.Material',
+    'PRODUCT': 'cpp_cyclus.Product',
+    'RESOURCE_BUFF': 'cpp_cyclus.ResourceBuff',
     # C++ normal types
     'bool': 'cpp_bool',
     'int': 'int',
@@ -324,13 +333,24 @@ CYTHON_TYPES = {
     'std::string': 'std_string',
     'cyclus::Blob': 'cpp_cyclus.Blob',
     'boost::uuids::uuid': 'cpp_cyclus.uuid',
+    'cyclus::Material': 'cpp_cyclus.Material',
+    'cyclus::Product': 'cpp_cyclus.Product',
+    'cyclus::toolkit::ResourceBuff': 'cpp_cyclus.ResourceBuff',
     # Template Types
     'std::set': 'std_set',
     'std::map': 'std_map',
     'std::pair': 'std_pair',
     'std::list': 'std_list',
     'std::vector': 'std_vector',
+    'cyclus::toolkit::ResBuf': 'cpp_cyclus.ResBuf',
+    'cyclus::toolkit::ResMap': 'cpp_cyclus.ResMap',
     }
+
+# Don't include the base resource class here since it is pure virtual.
+RESOURCES = ['MATERIAL', 'PRODUCT']
+
+INVENTORIES = ['cyclus::toolkit::ResourceBuff', 'cyclus::toolkit::ResBuf',
+               'cyclus::toolkit::ResMap']
 
 FUNCNAMES = {
     # type system types
@@ -342,6 +362,9 @@ FUNCNAMES = {
     'VL_STRING': 'std_string',
     'BLOB': 'blob',
     'UUID': 'uuid',
+    'MATERIAL': 'material',
+    'PRODUCT': 'product',
+    'RESOURCE_BUFF': 'resource_buff',
     # C++ normal types
     'bool': 'bool',
     'int': 'int',
@@ -350,12 +373,17 @@ FUNCNAMES = {
     'std::string': 'std_string',
     'cyclus::Blob': 'blob',
     'boost::uuids::uuid': 'uuid',
+    'cyclus::Material': 'material',
+    'cyclus::Product': 'product',
+    'cyclus::toolkit::ResourceBuff': 'resource_buff',
     # Template Types
     'std::set': 'std_set',
     'std::map': 'std_map',
     'std::pair': 'std_pair',
     'std::list': 'std_list',
     'std::vector': 'std_vector',
+    'cyclus::toolkit::ResBuf': 'res_buf',
+    'cyclus::toolkit::ResMap': 'res_map',
     }
 
 CLASSNAMES = {
@@ -368,6 +396,9 @@ CLASSNAMES = {
     'VL_STRING': 'String',
     'BLOB': 'Blob',
     'UUID': 'Uuid',
+    'MATERIAL': 'Material',
+    'PRODUCT': 'Product',
+    'RESOURCE_BUFF': 'ResourceBuff',
     # C++ normal types
     'bool': 'Bool',
     'int': 'Int',
@@ -376,13 +407,20 @@ CLASSNAMES = {
     'std::string': 'String',
     'cyclus::Blob': 'Blob',
     'boost::uuids::uuid': 'Uuid',
+    'cyclus::Material': 'Material',
+    'cyclus::Product': 'Product',
+    'cyclus::toolkit::ResourceBuff': 'ResourceBuff',
     # Template Types
     'std::set': 'Set',
     'std::map': 'Map',
     'std::pair': 'Pair',
     'std::list': 'List',
     'std::vector': 'Vector',
+    'cyclus::toolkit::ResBuf': 'ResBuf',
+    'cyclus::toolkit::ResMap': 'ResMap',
     }
+
+
 
 # note that this maps normal forms to python
 VARS_TO_PY = {
@@ -393,6 +431,9 @@ VARS_TO_PY = {
     'std::string': 'bytes({var}).decode()',
     'cyclus::Blob': 'blob_to_bytes({var})',
     'boost::uuids::uuid': 'uuid_cpp_to_py({var})',
+    'cyclus::Material': 'None',
+    'cyclus::Product': 'None',
+    'cyclus::toolkit::ResourceBuff': 'None',
     }
 
 # note that this maps normal forms to python
@@ -404,6 +445,9 @@ VARS_TO_CPP = {
     'std::string': 'str_py_to_cpp({var})',
     'cyclus::Blob': 'cpp_cyclus.Blob(std_string(<const char*> {var}))',
     'boost::uuids::uuid': 'uuid_py_to_cpp({var})',
+    'cyclus::Material': 'None',
+    'cyclus::Product': 'None',
+    'cyclus::toolkit::ResourceBuff': 'None',
     }
 
 TEMPLATE_ARGS = {
@@ -412,6 +456,8 @@ TEMPLATE_ARGS = {
     'std::pair': ('first', 'second'),
     'std::list': ('val',),
     'std::vector': ('val',),
+    'cyclus::toolkit::ResBuf': ('val',),
+    'cyclus::toolkit::ResMap': ('key', 'val'),
     }
 
 NPTYPES = {
@@ -422,11 +468,16 @@ NPTYPES = {
     'std::string': 'np.NPY_OBJECT',
     'cyclus::Blob': 'np.NPY_OBJECT',
     'boost::uuids::uuid': 'np.NPY_OBJECT',
+    'cyclus::Material': 'None',
+    'cyclus::Product': 'None',
+    'cyclus::toolkit::ResourceBuff': 'None',
     'std::set': 'np.NPY_OBJECT',
     'std::map': 'np.NPY_OBJECT',
     'std::pair': 'np.NPY_OBJECT',
     'std::list': 'np.NPY_OBJECT',
     'std::vector': 'np.NPY_OBJECT',
+    'cyclus::toolkit::ResBuf': 'np.NPY_OBJECT',
+    'cyclus::toolkit::ResMap': 'np.NPY_OBJECT',
     }
 
 # note that this maps normal forms to python
@@ -440,6 +491,9 @@ TO_PY_CONVERTERS = {
                     'py{var}'),
     'cyclus::Blob': ('', '', 'blob_to_bytes({var})'),
     'boost::uuids::uuid': ('', '', 'uuid_cpp_to_py({var})'),
+    'cyclus::Material': ('', '', 'None'),
+    'cyclus::Product': ('', '', 'None'),
+    'cyclus::toolkit::ResourceBuff': ('', '', 'None'),
     # templates
     'std::set': (
         '{valdecl}\n'
@@ -525,6 +579,8 @@ TO_PY_CONVERTERS = {
         '    {var}_i = {elem_to_py}\n'
         '    py{var}[i] = {var}_i\n',
         'py{var}'),
+    'cyclus::toolkit::ResBuf': ('', '', 'None'),
+    'cyclus::toolkit::ResMap': ('', '', 'None'),
     }
 
 TO_CPP_CONVERTERS = {
@@ -543,6 +599,9 @@ TO_CPP_CONVERTERS = {
         'std_string(<const char*> b_{var})'),
     'cyclus::Blob': ('', '', 'cpp_cyclus.Blob(std_string(<const char*> {var}))'),
     'boost::uuids::uuid': ('', '', 'uuid_py_to_cpp({var})'),
+    'cyclus::Material': ('', '', 'None'),
+    'cyclus::Product': ('', '', 'None'),
+    'cyclus::toolkit::ResourceBuff': ('', '', 'None'),
     # templates
     'std::set': (
         '{valdecl}\n'
@@ -604,6 +663,8 @@ TO_CPP_CONVERTERS = {
         'for i, {valname} in enumerate({var}):\n'
         '    cpp{var}[i] = {val_to_cpp}\n',
         'cpp{var}'),
+    'cyclus::toolkit::ResBuf': ('', '', 'None'),
+    'cyclus::toolkit::ResMap': ('', '', 'None'),
     }
 
 # annotation info key (pyname), C++ name,  cython type names, init snippet
@@ -769,11 +830,165 @@ TYPESYSTEM_PYX = JENV.from_string('''
 # local imports
 from cyclus cimport cpp_typesystem
 from cyclus cimport cpp_cyclus
+from cyclus cimport lib
 
 # pure python imports
 import uuid
 import collections
 from binascii import hexlify
+
+#
+# Resources & Inventories
+#
+
+cdef class _Resource:
+
+    def __cinit__(self, bint init=False):
+        self._free = init
+        self.ptx = NULL
+
+    def __dealloc__(self):
+        """C++ destructor."""
+        # Note that we have to do it this way since self.ptx is void*
+        if self.ptx == NULL or not self._free:
+            return
+        cdef cpp_cyclus.Resource* cpp_ptx = <cpp_cyclus.Resource*> self.ptx
+        del cpp_ptx
+        self.ptx = NULL
+
+    @property
+    def obj_id(self):
+        """The unique id corresponding to this resource object. Can be used
+        to track and/or associate other information with this resource object.
+        You should NOT track resources by pointer.
+        """
+        return (<cpp_cyclus.Resource*> self.ptx).obj_id()
+
+    @property
+    def state_id(self):
+        """The unique id corresponding to this resource and its current
+        state.  All resource id's are unique - even across different resource
+        types/implementations. Runtime tracking of resources should generally
+        use the obj_id rather than this.
+        """
+        return (<cpp_cyclus.Resource*> self.ptx).state_id()
+
+    def bump_state_id(self):
+        """Assigns a new, unique internal id to this resource and its state. This
+        should be called by resource implementations whenever their state changes.
+        A call to bump_state_id is not necessarily accompanied by a change to the
+        state id. This should NEVER be called by agents.
+        """
+        (<cpp_cyclus.Resource*> self.ptx).BumpStateId()
+
+    @property
+    def qual_id(self):
+        """Returns an id representing the specific resource implementation's internal
+        state that is not accessible via the Resource class public interface.  Any
+        change to the qual_id should always be accompanied by a call to
+        bump_state_id().
+        """
+        return (<cpp_cyclus.Resource*> self.ptx).qual_id()
+
+    @property
+    def type(self):
+        """A unique type/name for the concrete resource implementation."""
+        t = std_string_to_py((<cpp_cyclus.Resource*> self.ptx).type())
+        return t
+
+    def clone(self):
+        """Returns an untracked (not part of the simulation) copy of the resource.
+        A cloned resource should never record anything in the output database.
+        """
+        cdef _Resource co = Resource()
+        co._free = True
+        co.ptx = <void*> (<cpp_cyclus.Resource*> self.ptx).Clone()
+        copy = co
+        return copy
+
+    def record(self, lib._Context ctx):
+        """Records the resource's state to the output database.  This method
+        should generally NOT record data accessible via the Resource class
+        public methods (e.g.  qual_id, units, type, quantity).
+        """
+        (<cpp_cyclus.Resource*> self.ptx).Record(ctx.ptx)
+
+    @property
+    def units(self):
+        """Returns the units this resource is based in (e.g. "kg")."""
+        return (<cpp_cyclus.Resource*> self.ptx).units()
+
+    @property
+    def quantity(self):
+        """Returns the quantity of this resource with dimensions as specified by
+        the return value of units().
+        """
+        return (<cpp_cyclus.Resource*> self.ptx).quantity()
+
+    def extract_res(self, double quantity):
+        """Splits the resource and returns the extracted portion as a new resource
+        object.  Allows for things like ResBuf and Traders to split
+        offers/requests of arbitrary resource implementation type.
+        """
+        cdef _Resource res = Resource()
+        res._free = True
+        res.ptx = <void*> (<cpp_cyclus.Resource*> self.ptx).ExtractRes(quantity)
+        respy = res
+        return respy
+
+
+class Resource(_Resource):
+    """Resource defines an abstract interface implemented by types that are
+    offered, requested, and transferred between simulation agents. Resources
+    represent the lifeblood of a simulation.
+    """
+
+
+cdef class _Material(_Resource):
+
+    @staticmethod
+    def create(creator, double quantity):
+        cdef lib._Agent a = <lib._Agent> creator
+
+
+class Material(_Material, Resource):
+    """The material class is primarily responsible for enabling basic material
+    manipulation while helping enforce mass conservation.  It also provides the
+    ability to easily decay a material up to the current simulation time; it
+    does not perform any decay related logic itself.
+    """
+
+
+cdef class _Product(_Resource):
+    pass
+
+
+class Product(_Product, Resource):
+    """yo"""
+
+
+
+{% for t in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
+cdef class _{{tclassname}}:
+
+    def __cinit__(self, init=False):
+        self._free = init
+        if init:
+            self.ptx = new {{ts.cython_type(t)}}()
+        else:
+            self.ptx = NULL
+
+    def __dealloc__(self):
+        if self.ptx == NULL or not self._free:
+            return
+        del self.ptx
+
+
+class {{tclassname}}(_{{tclassname}}):
+    """An Inventory wrapper class for {{ts.norms[t]}}."""
+
+{% endfor %}
+
 
 #
 # raw type definitions
@@ -1115,7 +1330,7 @@ cdef class StateVar:
             {%- endfor -%}
             )
 
-{% for t in ts.uniquetypes %}{% set tclassname = ts.classname(t) %}
+{% for t in ts.uniquetypes %}{% if t not in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
 cdef class {{tclassname}}(StateVar):
     """State variable descriptor for {{ts.cpptypes[t]}}"""
 
@@ -1141,7 +1356,7 @@ cdef class {{tclassname}}(StateVar):
             {%- endif -%}{%- endfor -%}
             )
 
-{% endfor %}
+{% endif %}{% endfor %}
 
 #
 # Helpers
@@ -1205,6 +1420,27 @@ from cyclus cimport cpp_typesystem
 from cyclus cimport cpp_cyclus
 
 #
+# Resources & Inventories
+#
+
+cdef class _Resource:
+    cdef void * ptx
+    cdef bint _free
+
+cdef class _Material(_Resource):
+    pass
+
+cdef class _Product(_Resource):
+    pass
+
+{% for t in ts.inventory_types %}
+{% set tclassname = ts.classname(t)%}
+cdef class _{{tclassname}}:
+    cdef {{ts.cython_type(t)}}* ptx
+    cdef bint _free
+{% endfor %}
+
+#
 # raw
 #
 cpdef dict C_RANKS
@@ -1266,10 +1502,10 @@ cdef class StateVar:
     cpdef dict to_dict(self)
     cpdef StateVar copy(self)
 
-{% for t in ts.uniquetypes %}{% set tclassname = ts.classname(t) %}
+{% for t in ts.uniquetypes %}{% if t not in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
 cdef class {{tclassname}}(StateVar):
     cpdef {{tclassname}} copy(self)
-{% endfor %}
+{% endif %}{% endfor %}
 
 ''')
 

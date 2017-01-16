@@ -306,6 +306,19 @@ enum DbTypes {
   PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE,     // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "VL_STRING", "DOUBLE"]], false]
   PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE,     // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]], false]
   PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE,  // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]], false]
+
+  // Resource Tools
+  MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", fasle]
+  PRODUCT,  // ["cyclus::Product, 0, [], "Product", false]
+  RESOURCE_BUFF,  // ["cyclus::toolkit::ResourceBuff", 0, [], "RESOURCE_BUFF", false]
+  RES_BUF_MATERIAL,  // ["cyclus::toolkit::ResBuf<cyclus::Material>", 1, [], ["RES_BUF", "MATERIAL"], false]
+  RES_BUF_PRODUCT,  // ["cyclus::toolkit::ResBuf<cyclus::Product>", 1, [], ["RES_BUF", "PRODUCT"], false]
+  RES_MAP_INT_MATERIAL,  // ["cyclus::toolkit::ResMap<int, cyclus::Material>", 2, [], ["RES_MAP", "INT", "MATERIAL"], false]
+  RES_MAP_INT_PRODUCT,  // ["cyclus::toolkit::ResMap<int, cyclus::Product>", 2, [], ["RES_MAP", "INT", "PRODUCT"], false]
+  RES_MAP_STRING_MATERIAL,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Material>", 2, [], ["RES_MAP", "STRING", "MATERIAL"], false]
+  RES_MAP_STRING_PRODUCT,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Product>", 2, [], ["RES_MAP", "STRING", "PRODUCT"], false]
+  RES_MAP_VL_STRING_MATERIAL,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Material>", 2, [], ["RES_MAP", "VL_STRING", "MATERIAL"], false]
+  RES_MAP_VL_STRING_PRODUCT,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Product>", 2, [], ["RES_MAP", "VL_STRING", "PRODUCT"], false]
 };
 
 /// Represents operation codes for condition checking.
