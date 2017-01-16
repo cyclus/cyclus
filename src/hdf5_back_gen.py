@@ -1887,6 +1887,22 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
                                                target=Var(name=total_item_size),
                                                value=Raw(
                                                      code="+".join(children)))))        
+        #remove elements that exceed column.
+        if depth == 0 and not DB_TO_VL[t.db]:
+            if container in variable_length_types:
+                variable = get_variable("val", depth=depth, prefix=prefix)
+                column_check = If(cond=BinOp(x=Raw(code=total_item_size+"*"
+                                                        +variable+".size()"), 
+                                             op=">", y=Raw(code='column')),
+                                  body=[ExprStmt(child=Raw(code=t.cpp+"::iterator eraseit="+variable+".begin()")),
+                                        ExprStmt(child=Raw(code="std::advance(eraseit, column/"+total_item_size+")")),
+                                        ExprStmt(child=Raw(code=variable
+                                                                +".erase("
+                                                                +"eraseit,"
+                                                                +variable
+                                                                +".end())"))])
+                setup.nodes.append(column_check)
+                
     return setup
 
 def write_body_string(t, depth=0, prefix="", variable=None, offset="buf", 
@@ -2137,8 +2153,9 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
     #Declare and assign the 'val' variable
     if depth == 0:
         variable = get_variable("val", depth=depth, prefix=prefix)
-        result.nodes.append(get_write_setup(t, shape_array))
         result.nodes.append(a_cast(t))
+        result.nodes.append(get_write_setup(t, shape_array))
+        
     #If entirely variable length, we can simply use the VLWrite definition
     if all_vl:
         result.nodes.append(vl_write(t, variable, depth=depth, prefix=prefix, 
@@ -2170,6 +2187,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                   target=Var(name=count),
                                                   value=Raw(code="0"))))
         iterator = get_variable("it", depth=depth, prefix=prefix)
+        total_size = get_variable("total_item_size", depth=depth, prefix=prefix)
         #Recursively gather child bodies
         child_bodies = []
         container = t.canon[0]
@@ -2212,8 +2230,6 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                     labels = ['->first', '->second']
                 else:
                     labels = ['.first', '.second']
-                total_size = get_variable("total_item_size", depth=depth,
-                                          prefix=prefix)
                 for c, s, p, l in zip(t.canon[1:], shape_array[1:], prefixes, 
                                       labels):
                     child_node = CANON_TO_NODE[c]
@@ -2237,7 +2253,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                   target=Raw(code=new_variable),
                                                   value=Raw(code=variable 
                                                                  +".begin()"))))
-                result.nodes.append(For(cond=BinOp(x=Var(name=new_variable), 
+                result.nodes.append(For(cond=BinOp(x=Var(name=new_variable),
                                                    op="!=", 
                                                    y=Var(name=variable
                                                               +".end()")),
@@ -2248,17 +2264,15 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                               name=Var(
                                                                 name=count)))]))
                 #Add memset statement outside of loop
-                item_size = get_variable("total_item_size", depth=depth, 
-                                         prefix=prefix)
                 container_length = get_variable("length", depth=depth, 
                                                 prefix=prefix)
-                dest = offset + "+" + item_size + "*" + count
-                length = (item_size + "*" + "(" + container_length + "-" 
+                dest = offset + "+" + total_size + "*" + count
+                length = (total_size + "*" + "(" + container_length + "-" 
                           + count + ")")
                 if depth == 0:
                     result.nodes.append(If(cond=BinOp(
-                                                  x=Raw(code=item_size+"*"
-                                                             +count),
+                                                  x=Raw(code=total_size+"*"
+                                                             +container_length),
                                                   op="<", y=Raw(code="column")),
                                            body=[memset(dest, str(0), length)]))
                 else:
@@ -2439,7 +2453,6 @@ def main_val_to_buf_h():
     output += CPPGEN.visit(block)
     output = indent(output, INDENT)
     return output
-
 
 def to_val_setup():
     pass
