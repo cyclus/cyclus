@@ -750,10 +750,15 @@ cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit":
         Manifest PopQty(double, double)
         Manifest PopN(int)
         Resource.Ptr Pop(AccessDir)
-        #T.Ptr Pop[T]()
+        shared_ptr[T] Pop[T]()
         void Push(Resource.Ptr)
         void PushAll[B](vector[B])
 
+cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit::Resource":
+
+        enum AccessDir:
+            FRONT
+            BACK
 
 cdef extern from "toolkit/res_buf.h" namespace "cyclus::toolkit":
 

@@ -1092,14 +1092,78 @@ class Material(_Material, Resource):
 
 
 cdef class _Product(_Resource):
-    pass
+
+    @staticmethod
+    def create(lib._Agent creator, double quantity, quality):
+        """Creates a new product resource that is "live" and tracked. creator is a
+        pointer to the agent creating the resource (usually will be the caller's
+        "this" pointer). All future output data recorded will be done using the
+        creator's context.
+        """
+        cdef _Product prod = Product(free=True)
+        prod.ptx = <void*> cpp_cyclus.Product.Create(<cpp_cyclus.Agent*> creator.ptx,
+                                                     quantity, str_py_to_cpp(quality))
+        rtn = prod
+        return prod
+
+    @staticmethod
+    def create_untracked(double quantity, quality):
+        """Creates a new product that does not actually exist as part of
+        the simulation and is untracked.
+        """
+        cdef _Product prod = Product(free=True)
+        prod.ptx = <void*> cpp_cyclus.Product.CreateUntracked(quantity, str_py_to_cpp(quality))
+        rtn = prod
+        return prod
+
+    def clone(self):
+        """Returns an untracked (not part of the simulation) copy of the product.
+        """
+        cdef _Product co = Product(free=True)
+        co._free = True
+        co.ptx = <void*> (<cpp_cyclus.Product*> self.ptx).Clone()
+        copy = co
+        return copy
+
+    def extract(self, double qty):
+        """Extracts the specified mass from this resource and returns it as a
+        new product object with the same quality/type.
+        """
+        cdef _Product res = Product(free=True)
+        res.ptx = <void*> (<cpp_cyclus.Product*> self.ptx).Extract(qty)
+        respy = res
+        return respy
+
+    def absorb(self, _Product other):
+        """Absorbs the contents of the given 'other' resource into this resource."""
+        cdef shared_ptr[cpp_cyclus.Product] p = \
+            shared_ptr[cpp_cyclus.Product](<cpp_cyclus.Product*> other.ptx)
+        (<cpp_cyclus.Product*> self.ptx).Absorb(p)
 
 
 class Product(_Product, Resource):
-    """yo"""
+    """A Product is a general type of resource in the Cyclus simulation,
+    and is a catch-all for non-standard resources.  It implements the Resource
+    class interface in a simple way usable for things such as: bananas,
+    water, buying power, etc.
+    """
 
 
+cdef object manifest_to_py(cpp_cyclus.Manifest manifest, bint free):
+    """Turns a manifest into a list of Resources."""
+    cdef list m = []
+    cdef _Resource r
+    for ptr in manifest:
+        r = Resource(free=free)
+        r.ptx = <void*> ptr
+        m.append(r)
+    rtn = m
+    return rtn
 
+
+#
+# Inventories block
+#
 {% for t in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
 cdef class _{{tclassname}}:
 
@@ -1115,9 +1179,73 @@ cdef class _{{tclassname}}:
             return
         del self.ptx
 
+    @property
+    def quantity(self):
+        """The total resource quantity of constituent resource objects in the store."""
+        return self.ptx.quantity()
+
+    def empty(self):
+        """Returns true if nothing is stored."""
+        return self.ptx.empty()
+
+{% if t == 'RESOURCE_BUFF' %}
+    @property
+    def capacity(self):
+        """The maximum resource quantity this store can hold."""
+        return self.ptx.capacity()
+
+    @capacity.setter
+    def capacity(self, double val):
+        self.ptx.set_capacity(val)
+
+    @property
+    def count(self):
+        """the total number of constituent resource objects in the store."""
+        return self.ptx.count()
+
+    @property
+    def space(self):
+        """The quantity of space remaining in this store."""
+        return self.ptx.space()
+
+    def pop_qty(self, double quantity, double esp=None):
+        """Pops the specified quantity of resources from the buffer."""
+        cdef cpp_cyclus.Manifest manifest
+        if esp is None:
+            manifest = self.ptx.PopQty(quantity)
+        else:
+            manifest = self.ptx.PopQty(quantity, esp)
+        rtn = manifest_to_py(manifest, True)
+        return rtn
+
+    def pop_n(self, int num):
+        """Pops the specified number of resources from the buffer."""
+        rtn = manifest_to_py(self.ptx.PopQty(num), True)
+        return rtn
+
+    def pop(self, bint back=False):
+        """Pops one resource object from the store."""
+        cdef _Resource r = Resource(free=True)
+        r.ptx = <void*> self.ptx.Pop(<cpp_cyclus.AccessDir> back)
+        rtn = r
+        return rtn
+
+    {% for r in ts.resources %}{% set rfname = ts.funcname(r) %}{% set rcname = ts.classname(r) %}
+    def pop_{{rfname}}(self, bint front=True):
+        """Pops one resource object from the store as a {{rfname}}."""
+        cdef _{{rcname}} r = {{rcname}}(free=True)
+        r.ptx = <void*> self.ptx.Pop[{{ ts.cython_type(r) }}]()
+        rtn = r
+        return rtn
+
+    {% endfor %}
+
+
+{% endif %}
+
 
 class {{tclassname}}(_{{tclassname}}):
-    """An Inventory wrapper class for {{ts.norms[t]}}."""
+    """An Inventory wrapper class for {{ts.cpptypes[t]}}."""
 
 {% endfor %}
 
@@ -1567,6 +1695,8 @@ cdef class _Material(_Resource):
 
 cdef class _Product(_Resource):
     pass
+
+cdef object manifest_to_py(cpp_cyclus.Manifest, bint)
 
 {% for t in ts.inventory_types %}
 {% set tclassname = ts.classname(t)%}
