@@ -783,6 +783,7 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.utility cimport pair as std_pair
 from libcpp.string cimport string as std_string
 from libcpp.typeinfo cimport type_info
+from libcpp.memory cimport shared_ptr
 from cython.operator cimport dereference as deref
 from cython.operator cimport preincrement as inc
 from cython.operator cimport typeid
@@ -836,6 +837,8 @@ from cyclus cimport lib
 import uuid
 import collections
 from binascii import hexlify
+
+from cyclus import nucname
 
 #
 # Resources & Inventories
@@ -944,11 +947,140 @@ class Resource(_Resource):
     """
 
 
+cdef shared_ptr[cpp_cyclus.Composition] composition_ptr_from_py(object comp,
+                                                                object basis):
+    """Converts a dict-like to a composition."""
+    if not isinstance(comp, dict):
+        comp = dict(comp)
+    cdef int k
+    cdef double v
+    cdef cpp_cyclus.CompMap c
+    for key, val in comp.items():
+        k = nucname.id(key)
+        v = val
+        c[k] = v
+    cdef shared_ptr[cpp_cyclus.Composition] p
+    if basis == 'mass':
+        p = cpp_cyclus.Composition.CreateFromMass(c)
+    elif basis == 'atom':
+        p = cpp_cyclus.Composition.CreateFromAtom(c)
+    else:
+        raise ValueError('Composition basis must be either mass or atom, '
+                         'not ' + str(basis))
+    return p
+
+
+cdef object composition_from_cpp(shared_ptr[cpp_cyclus.Composition] comp, object basis):
+    """Converts a composition to a dict."""
+    cdef cpp_cyclus.CompMap c
+    if basis == 'mass':
+        c = deref(comp).mass()
+    elif basis == 'atom':
+        c = deref(comp).atom()
+    else:
+        raise ValueError('Composition basis must be either mass or atom, '
+                         'not ' + str(basis))
+    rtn = std_map_int_double_to_py(<std_map[int, double]> c)
+    return rtn
+
+
 cdef class _Material(_Resource):
 
     @staticmethod
-    def create(creator, double quantity):
-        cdef lib._Agent a = <lib._Agent> creator
+    def create(lib._Agent creator, double quantity, c, basis='mass'):
+        """Creates a new material resource that is "live" and tracked. creator is a
+        pointer to the agent creating the resource (usually will be the caller's
+        "this" pointer). All future output data recorded will be done using the
+        creator's context.
+        """
+        cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
+        cdef _Material mat = Material(free=True)
+        mat.ptx = <void*> cpp_cyclus.Material.Create(<cpp_cyclus.Agent*> creator.ptx,
+                                                     quantity, comp)
+        rtn = mat
+        return mat
+
+    @staticmethod
+    def create_untracked(double quantity, c, basis='mass'):
+        """Creates a new material resource that does not actually exist as part of
+        the simulation and is untracked.
+        """
+        cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
+        cdef _Material mat = Material(free=True)
+        mat.ptx = <void*> cpp_cyclus.Material.CreateUntracked(quantity, comp)
+        rtn = mat
+        return mat
+
+    def clone(self):
+        """Returns an untracked (not part of the simulation) copy of the material.
+        """
+        cdef _Material co = Material(free=True)
+        co._free = True
+        co.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).Clone()
+        copy = co
+        return copy
+
+    def extract_qty(self, double quantity):
+        """Same as ExtractComp with c = this->comp() and returns a Material,
+        not a Resource.
+        """
+        cdef _Material res = Material(free=True)
+        res.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).ExtractQty(quantity)
+        respy = res
+        return respy
+
+    def extract_comp(self, double qty, c, basis='mass', threshold=None):
+        """Creates a new material by extracting from this one. """
+        cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
+        cdef double t
+        t = cpp_cyclus.eps_rsrc() if threshold is None else threshold
+        cdef _Material res = Material(free=True)
+        res.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).ExtractComp(qty, comp, t)
+        respy = res
+        return respy
+
+    def absorb(self, _Material mat):
+        """Combines material mat with this one.  mat's quantity becomes zero."""
+        cdef shared_ptr[cpp_cyclus.Material] p = \
+            shared_ptr[cpp_cyclus.Material](<cpp_cyclus.Material*> mat.ptx)
+        (<cpp_cyclus.Material*> self.ptx).Absorb(p)
+
+    def transmute(self, c, basis='mass'):
+        """Changes the material's composition to c without changing its mass.  Use
+        this method for things like converting fresh to spent fuel via burning in
+        a reactor.
+        """
+        cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
+        (<cpp_cyclus.Material*> self.ptx).Transmute(comp)
+
+    def decay(self, int curr_time):
+        """Updates the material's composition by performing a decay calculation.
+        This is a special case of Transmute where the new composition is
+        calculated automatically.  The time delta is calculated as the difference
+        between curr_time and the last time the material's composition was
+        updated with a decay calculation (i.e. prev_decay_time).  This may or may
+        not result in an updated material composition.  Does nothing if the
+        simulation decay mode is set to "never" or none of the nuclides' decay
+        constants are significant with respect to the time delta.
+        """
+        (<cpp_cyclus.Material*> self.ptx).Decay(curr_time)
+
+    @property
+    def prev_decay_time(self):
+        """The last time step on which a decay calculation was performed
+        for the material.  This is not necessarily synonymous with the last time
+        step the material's Decay function was called.
+        """
+        return (<cpp_cyclus.Material*> self.ptx).prev_decay_time()
+
+    def decay_heat(self):
+        """Returns a double with the decay heat of the material in units of W/kg."""
+        return (<cpp_cyclus.Material*> self.ptx).DecayHeat()
+
+    def comp(self, basis='mass'):
+        """Returns the nuclide composition of this material."""
+        rtn = composition_from_cpp((<cpp_cyclus.Material*> self.ptx).comp(), basis)
+        return rtn
 
 
 class Material(_Material, Resource):
@@ -1426,6 +1558,9 @@ from cyclus cimport cpp_cyclus
 cdef class _Resource:
     cdef void * ptx
     cdef bint _free
+
+cdef shared_ptr[cpp_cyclus.Composition] composition_ptr_from_py(object, object)
+cdef object composition_from_cpp(shared_ptr[cpp_cyclus.Composition] comp, object basis)
 
 cdef class _Material(_Resource):
     pass

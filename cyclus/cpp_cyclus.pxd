@@ -49,6 +49,12 @@ cdef extern from "version.h" namespace "cyclus::version":
     const char* coinclp() except +
 
 
+cdef extern from "cyc_limits.h" namespace "cyclus":
+
+    cdef double eps()
+    cdef double eps_rsrc()
+
+
 cdef extern from "cyclus.h" namespace "cyclus":
 
     cdef cppclass Datum:
@@ -358,8 +364,8 @@ cdef extern from "composition.h" namespace "cyclus":
         @staticmethod
         shared_ptr[Composition] CreateFromMass(CompMap)
         int id()
-        const CompMap& atom()
-        const CompMap& mass()
+        CompMap& atom()
+        CompMap& mass()
         shared_ptr[Composition] Decay(int)
         shared_ptr[Composition] Decay(int, uint64_t)
         void Record(Context*)
