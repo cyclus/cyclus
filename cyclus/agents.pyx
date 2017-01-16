@@ -130,20 +130,31 @@ class Agent(_Agent, lib.Agent):
         need to call the initilaizer.
     """
     _statevars = None
+    _inventories = None
 
     def __init__(self, ctx):
         super().__init__(ctx)
-        # gather the state variables
+        # gather the state variables and inventories
         cls = type(self)
         if cls._statevars is None:
             cls._init_statevars()
+        if cls._inventories is None:
+            cls._init_inventories()
         # copy state vars from class
-        svs = []
+        cdef list svs = []
         for name, var in cls._statevars:
             var = var.copy()
             self.__dict__[name] = var
             svs.append((name, var))
         self._statevars = tuple(svs)
+        # copy and init inventories from class
+        cdef list invs = []
+        for name, inv in cls._inventories:
+            inv = inv.copy()
+            inv._init()
+            self.__dict__[name] = inv
+            inv.append((name, inv))
+        self._inventories = tuple(invs)
 
     @classmethod
     def _init_statevars(cls):
@@ -158,25 +169,17 @@ class Agent(_Agent, lib.Agent):
             attr.uitype = ts.prepare_type_representation(attr.uitype)
             vars[name] = attr
         # make sure all state vars have a consistent index
-        cdef int nvars = len(vars)
-        cdef list svs = [None] * nvars
-        cdef list left = []
-        for name, var in vars.items():
-            if var.index is None:
-                left.append((name, var))
-            else:
-                if svs[var.index] is not None:
-                    raise ValueError("two state varaiables cannot have the "
-                                     "same index: " + name + " & " +
-                                     svs[var.index][0])
-                svs[var.index] = (name, var)
-        left = sorted(left, reverse=True)
-        cdef int i
-        for i in range(nvars):
-            if svs[i] is None:
-                svs[i] = left.pop()
-                svs[i][1].index = i
-        cls._statevars = tuple(svs)
+        cls._statevars = index_and_sort_vars(vars)
+
+    @classmethod
+    def _init_inventories(cls):
+        cdef dict invs = {}
+        for name in dir(cls):
+            attr = getattr(cls, name)
+            if not isinstance(attr, ts.Inventory):
+                continue
+            invs[name] = attr
+        cls._inventories = index_and_sort_vars(vars)
 
     def init_from_agent(self, other):
         """A dynamic version of InitFrom(Agent) that should work for all
@@ -313,3 +316,28 @@ class Agent(_Agent, lib.Agent):
         for name, var in self._statevars:
             datum.add_val(name, var.value, shape=var.shape, type=var.uniquetypeid)
         datum.record()
+
+#
+# Tools
+#
+cdef tuple index_and_sort_vars(dict vars):
+    cdef int nvars = len(vars)
+    cdef list svs = [None] * nvars
+    cdef list left = []
+    for name, var in vars.items():
+        if var.index is None:
+            left.append((name, var))
+        else:
+            if svs[var.index] is not None:
+                raise ValueError("two state varaiables cannot have the "
+                                 "same index: " + name + " & " +
+                                 svs[var.index][0])
+            svs[var.index] = (name, var)
+    left = sorted(left, reverse=True)
+    cdef int i
+    for i in range(nvars):
+        if svs[i] is None:
+            svs[i] = left.pop()
+            svs[i][1].index = i
+    rtn = tuple(svs)
+    return rtn

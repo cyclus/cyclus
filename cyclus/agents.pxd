@@ -31,3 +31,5 @@ ctypedef CyclusAgentShim* agent_shim_ptr
 cdef class _Agent(lib._Agent):
     # pointer declared on full backend, but that is untyped, shim is typed
     cdef agent_shim_ptr shim
+
+cdef tuple index_and_sort_vars(dict)
