@@ -1778,7 +1778,8 @@ if (vlkeys_[{t.db}].count({key}) != 1) {{
   AppendVLKey({keysds}, {t.db}, {key});
   InsertVLVal({valsds}, {t.db}, {key}, {buf});
 }}\n"""
-    node = Raw(code=node_str.format(var=variable, key=key_variable,
+    node = Raw(code=node_str.format(var=variable, no_p_var=variable.strip("*"), 
+                                    key=key_variable,
                                     keysds=keysds_variable, t=t,  
                                     valsds=valsds_variable,
                                     buf=buf_variable))
@@ -1786,15 +1787,15 @@ if (vlkeys_[{t.db}].count({key}) != 1) {{
 
 def memcpy(dest, src, size):
     """HDF5 Write: Node representation of memcpy function."""
-    return FuncCall(name=Var(name="memcpy"), args=[Raw(code=dest),
-                                                   Raw(code=src),
-                                                   Raw(code=size)])
+    return ExprStmt(child=FuncCall(name=Var(name="memcpy"), args=[Raw(code=dest),
+                                                                  Raw(code=src),
+                                                                  Raw(code=size)]))
 
 def memset(dest, src, size):
     """HDF5 Write: Node representation of memset function."""
-    return FuncCall(name=Var(name="memset"), args=[Raw(code=dest),
-                                                   Raw(code=src),
-                                                   Raw(code=size)])
+    return ExprStmt(child=FuncCall(name=Var(name="memset"), args=[Raw(code=dest),
+                                                                  Raw(code=src),
+                                                                  Raw(code=size)]))
 
 def a_cast(t, depth=0, prefix=""):
     """HDF5 Write: Node representation of boost hold_any casting."""
@@ -1904,9 +1905,8 @@ def write_body_string(t, depth=0, prefix="", variable=None, offset="buf",
                                                  args=[
                                                    Raw(code=variable+size),
                                                    Raw(code=item_size)]))))
-    node.nodes.append(ExprStmt(child=memcpy(offset, variable+c_str, valuelen)))
-    node.nodes.append(ExprStmt(child=memset(offset+"+"+valuelen, "0", 
-                                            item_size+"-"+valuelen)))
+    node.nodes.append(memcpy(offset, variable+c_str, valuelen))
+    node.nodes.append(memset(offset+"+"+valuelen, "0", item_size+"-"+valuelen))
     return node
 
 def write_body_uuid(t, depth=0, prefix="", variable=None, offset="buf", 
@@ -1919,7 +1919,7 @@ def write_body_uuid(t, depth=0, prefix="", variable=None, offset="buf",
     if pointer:
         variable = "*" + variable
     variable = "&(" + variable + ")"
-    node.nodes.append(ExprStmt(child=memcpy(offset, variable, size)))
+    node.nodes.append(memcpy(offset, variable, size))
     return node
    
 def write_body_primitive(t, depth=0, prefix="", variable=None, offset="buf", 
@@ -1935,7 +1935,7 @@ def write_body_primitive(t, depth=0, prefix="", variable=None, offset="buf",
         if pointer:
             variable = "*" + variable
         variable = "&(" + variable + ")"
-    node.nodes.append(ExprStmt(child=memcpy(offset, variable, size)))
+    node.nodes.append(memcpy(offset, variable, size))
     return node
 
 WRITE_BODY_PRIMITIVES = {"STRING": write_body_string,
@@ -2144,8 +2144,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
         result.nodes.append(vl_write(t, variable, depth=depth, prefix=prefix, 
                                      pointer=pointer))
         key = get_variable("key", depth=depth, prefix=prefix)
-        result.nodes.append(ExprStmt(child=memcpy(offset, key + ".val", 
-                                                  "CYCLUS_SHA1_SIZE")))
+        result.nodes.append(memcpy(offset, key + ".val", "CYCLUS_SHA1_SIZE"))
         return result
     #Handle primitive bodies 
     if is_primitive(t):
@@ -2189,8 +2188,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
             result.nodes.append(vl_write(t, fixed_val, depth=depth, 
                                          prefix=prefix))
             key = get_variable("key", depth=depth, prefix=prefix)
-            result.nodes.append(ExprStmt(child=memcpy(offset, key + ".val", 
-                                                      "CYCLUS_SHA1_SIZE")))
+            result.nodes.append(memcpy(offset, key + ".val", "CYCLUS_SHA1_SIZE"))
         #Handle fixed length containers
         else:
             new_variable = variable
@@ -2262,13 +2260,9 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                   x=Raw(code=item_size+"*"
                                                              +count),
                                                   op="<", y=Raw(code="column")),
-                                           body=[ExprStmt(child=memset(
-                                                                     dest, 
-                                                                     str(0), 
-                                                                     length))]))
+                                           body=[memset(dest, str(0), length)]))
                 else:
-                    result.nodes.append(ExprStmt(child=memset(dest, str(0), 
-                                                              length)))
+                    result.nodes.append(memset(dest, str(0), length))
             else:
                 result.nodes.extend(child_bodies)
         return result
@@ -2297,11 +2291,134 @@ def main_write():
         output += CPPGEN.visit(block)
     return output
 
-def main_val_to_buf():
-    pass
+def to_buf_setup(t, depth=0, prefix=""):
+    node = Block(nodes=[])
+    if depth == 0:
+        node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
+                                              name=Var(name="buf"))))
+        node.nodes.append(ExprStmt(child=Assign(target=Var(name="buf.len"),
+                                                value=Raw(code="x.size()"))))
+    child_sizes = OrderedDict()
+    container = t.canon[0]
+    prefixes = template_args[container]
+    children = t.canon[1:]
+    vl_list = []
+    for c, p in zip(children, prefixes):
+        child_node = CANON_TO_NODE[c]
+        variable = get_variable("item_size", depth=depth+1, prefix=prefix+p)
+        if is_primitive(child_node):
+            if child_node.db == "BLOB":
+                child_sizes[variable] = "CYCLUS_SHA1_SIZE"
+                vl_list.append(1)
+            elif VARIATION_DICT[c]:
+                child_sizes[variable] = "CYCLUS_SHA1_SIZE"
+                vl_list.append(1)
+            else:
+                child_sizes[variable] = PRIMITIVE_SIZES[child_node.db]
+                vl_list.append(0)
+        elif child_node.canon[0] in variable_length_types:
+            child_sizes[variable] = "CYCLUS_SHA1_SIZE"
+            vl_list.append(1)
+        else:
+            child_sizes[variable] = get_variable("total_item_size", depth+1, prefix=prefix+p)
+            new_node, new_list = to_buf_setup(child_node, depth=depth+1, prefix=prefix+p)
+            node.nodes.append(new_node)
+            vl_list.append(new_list)
+    for k, v in child_sizes.items():
+        node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
+                                                    target=Raw(code=k),
+                                                    value=Raw(code=v))))
+    total_var = get_variable("total_item_size", depth=depth, prefix=prefix)
+    node.nodes.append(ExprStmt(child=DeclAssign(
+                                        type=Type(cpp="size_t"),
+                                        target=Raw(code=total_var),
+                                        value=Raw(
+                                           code="+".join(child_sizes.keys())))))
+    if depth == 0:
+        node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
+                                                    target=Var(name="nbytes"),
+                                                    value=Raw(code=total_var+"*buf.len"))))
+        node.nodes.append(ExprStmt(child=Assign(target=Var(name="buf.p"),
+                                                value=Raw(code="new char[nbytes]"))))
+    return node, vl_list
 
-def main_buf_to_val():
-    pass
+def to_buf_body(t, vl_list, depth=0, prefix="", variable=None, 
+                offset="reinterpret_cast<char*>(buf.p)"):
+    if variable == None:
+        variable = 'x'
+    block = Block(nodes=[])
+    total_size_var = get_variable("total_item_size", depth=depth, prefix=prefix)
+    prefixes = template_args[t.canon[0]]
+    children = t.canon[1:]
+    loop_block = Block(nodes=[])
+    new_offset = offset
+    if t.canon[0] in variable_length_types:
+        count_var = get_variable("count", depth=depth, prefix=prefix)
+        block.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
+                                                     target=Var(name=count_var),
+                                                     value=Raw(code="0"))))
+        iter_var = get_variable("it", depth=depth, prefix=prefix)
+        block.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp=t.cpp
+                                                                   +"::const_iterator"),
+                                                     target=Var(name=iter_var),
+                                                     value=Raw(code=variable 
+                                                                    +".begin()"))))                
+        new_variable = iter_var
+        labels = ['->first', '->second']
+        new_offset += "+(" + total_size_var + "*" + count_var + ")"
+    else: 
+        labels = ['.first', '.second']
+        new_variable = variable
+    if len(children) == 1:
+        new_variable = "*" + new_variable
+        labels = ['']
+    for child, part, vl, label in zip(children, prefixes, vl_list, labels):
+        child_node = CANON_TO_NODE[child]
+        child_var = new_variable + label
+        item_size = get_variable("item_size", depth=depth+1, prefix=prefix+part)
+        if vl == 1:
+            loop_block.nodes.append(vl_write(ORIGIN_TO_VL[child], child_var, 
+                                             depth=depth+1, prefix=prefix+part))
+            key_var = get_variable("key", depth=depth+1, prefix=prefix+part)
+            loop_block.nodes.append(memcpy(new_offset, key_var+".val", item_size))
+        elif vl == 0:
+            loop_block.nodes.append(memcpy(new_offset, "&("+child_var+")", item_size))
+        else:
+            loop_block.nodes.append(to_buf_body(child_node, vl, depth=depth+1,
+                                    prefix=prefix+part, variable=child_var, offset=new_offset))
+        new_offset += "+" + item_size
+            
+    if t.canon[0] in variable_length_types:    
+        block.nodes.append(For(cond=BinOp(x=Var(name=iter_var), op="!=", 
+                                          y=Var(name=variable+".end()")),
+                               incr=Raw(code="++"+iter_var),
+                               body=[loop_block, 
+                                     ExprStmt(child=LeftUnaryOp(
+                                                          op="++", 
+                                                          name=Var(
+                                                                name=count_var)))]))
+    else:
+        block.nodes.append(loop_block)
+    if depth == 0:
+        block.nodes.append(ExprStmt(child=Raw(code="return buf")))
+    return block
+
+def main_val_to_buf():
+    CPPGEN = CppGen()
+    output = ""
+    block = Block(nodes=[])
+    for i in VARIATION_DICT:
+        t = CANON_TO_NODE[i]
+        if t.canon[0] in variable_length_types:
+            setup, vl_list = to_buf_setup(t)
+            node = FuncDef(type=Type(cpp="hvl_t"),
+                           name=Var(name="Hdf5Back::VLValToBuf"),
+                           args=[Decl(type=Type(cpp="const "+t.cpp+"&"),
+                                      name=Var(name="x"))],
+                           body=[setup, to_buf_body(t, vl_list)])
+            block.nodes.append(node)
+    output += CPPGEN.visit(block)
+    return output
     
 def main_val_to_buf_h():
     CPPGEN = CppGen()
@@ -2310,17 +2427,46 @@ def main_val_to_buf_h():
     for i in VARIATION_DICT:
         node = CANON_TO_NODE[i]
         if node.canon[0] in variable_length_types:
-            block.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
-                                                   name=FuncCall(name=Var(name="VLValToBuf"),
-                                                                 args=[Decl(type=Type(cpp="const "+node.cpp+"&"),
-                                                                            name=Raw(code="x"))]))))
+            decl = ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
+                                       name=FuncCall(
+                                             name=Var(name="VLValToBuf"),
+                                             args=[Decl(type=Type(
+                                                                cpp="const "
+                                                                    +node.cpp
+                                                                    +"&"),
+                                                        name=Raw(code="x"))])))
+            block.nodes.append(decl)
     output += CPPGEN.visit(block)
     output = indent(output, INDENT)
     return output
 
+
+def to_val_setup():
+    pass
+
+def main_buf_to_val():
+    CPPGEN = CppGen()
+    output = ""
+    block = Block(nodes=[])
+    for i in VARIATION_DICT:
+        t = CANON_TO_NODE[i]
+        if t.canon[0] in variable_length_types:
+            node = FuncDef(type=Type(cpp=t.cpp),
+                           name=Var(name="Hdf5Back::VLBufToVal"),
+                           targs=[Raw(code=t.cpp)],
+                           args=[Decl(type=Type(cpp="const hvl_t&"),
+                                      name=Var(name="buf"))],
+                           #probably need a body function!
+                           body=[],
+                           tspecial=True)
+            block.nodes.append(node)
+    output += CPPGEN.visit(block)
+    return output    
+
 NOT_VL = []
 VARIATION_DICT = OrderedDict()
 ORIGIN_DICT = OrderedDict()
+ORIGIN_TO_VL = {}
 
 MAIN_DISPATCH = {"QUERY": main_query,
                  "CREATE": main_create,
@@ -2376,10 +2522,15 @@ def main():
         if not VARIATION_DICT[i]:
             NOT_VL.append(i)
     NOT_VL = set(NOT_VL)
+    
+    for n in CANON_TYPES:
+        node = CANON_TO_NODE[n]
+        if is_all_vl(node):
+            ORIGIN_TO_VL[ORIGIN_DICT[n]] = node
         
     # Dispatch to requested generation function
     function = MAIN_DISPATCH[gen_instruction]
     print(function())
-    
+
 if __name__ == '__main__':
     main()

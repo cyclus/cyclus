@@ -59,6 +59,11 @@ IF(NOT "${res_var_w}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'WRITE' failed, result = '${res_var_w}'")
 ENDIF()
 
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF RESULT_VARIABLE res_var_vb)
+IF(NOT "${res_var_vb}" STREQUAL "0")
+  message(FATAL_ERROR "Process hdf5_back_gen.py 'VAL_TO_BUF' failed, result = '${res_var_vb}'")
+ENDIF()
+
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"

@@ -769,29 +769,13 @@ void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
   H5Sclose(dspace);
 }
 
-hvl_t Hdf5Back::VLValToBuf(const std::vector<int>& x) {
-  hvl_t buf;
-  buf.len = x.size();
-  size_t nbytes = buf.len * sizeof(int);
-  buf.p = new char[nbytes];
-  memcpy(buf.p, &x[0], nbytes);
-  return buf;
-}
+@HDF5_BACK_CC_VAL_TO_BUF@
 
 template <>
 std::vector<int> Hdf5Back::VLBufToVal<std::vector<int> >(const hvl_t& buf) {
   std::vector<int> x = std::vector<int>(buf.len);
   memcpy(&x[0], buf.p, buf.len * sizeof(int));
   return x;
-}
-
-hvl_t Hdf5Back::VLValToBuf(const std::vector<float>& x) {
-  hvl_t buf;
-  buf.len = x.size();
-  size_t nbytes = buf.len * sizeof(float);
-  buf.p = new char[nbytes];
-  memcpy(buf.p, &x[0], nbytes);
-  return buf;
 }
 
 template <>
@@ -801,34 +785,11 @@ std::vector<float> Hdf5Back::VLBufToVal<std::vector<float> >(const hvl_t& buf) {
   return x;
 }
 
-hvl_t Hdf5Back::VLValToBuf(const std::vector<double>& x) {
-  hvl_t buf;
-  buf.len = x.size();
-  size_t nbytes = buf.len * sizeof(double);
-  buf.p = new char[nbytes];
-  memcpy(buf.p, &x[0], nbytes);
-  return buf;
-}
-
 template <>
 std::vector<double> Hdf5Back::VLBufToVal<std::vector<double> >(const hvl_t& buf) {
   std::vector<double> x = std::vector<double>(buf.len);
   memcpy(&x[0], buf.p, buf.len * sizeof(double));
   return x;
-}
-
-hvl_t Hdf5Back::VLValToBuf(const std::vector<std::string>& x) {
-  // VL_VECTOR_STRING implemented as VL_VECTOR_VL_STRING
-  hvl_t buf;
-  Digest key;
-  buf.len = x.size();
-  size_t nbytes = CYCLUS_SHA1_SIZE * buf.len;
-  buf.p = new char[nbytes];
-  for (unsigned int i = 0; i < buf.len; ++i) {
-    key = VLWrite<std::string, VL_STRING>(x[i]);
-    memcpy((char *) buf.p + CYCLUS_SHA1_SIZE*i, key.val, CYCLUS_SHA1_SIZE);
-  }
-  return buf;
 }
 
 template <>
@@ -840,42 +801,11 @@ std::vector<std::string> Hdf5Back::VLBufToVal<std::vector<std::string> >(const h
   return x;
 }
 
-hvl_t Hdf5Back::VLValToBuf(const std::set<int>& x) {
-  hvl_t buf;
-  buf.len = x.size();
-  size_t nbytes = buf.len * sizeof(int);
-  buf.p = new char[nbytes];
-  unsigned int cnt = 0;
-  std::set<int>::iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    memcpy((char *) buf.p + cnt*sizeof(int), &(*it), sizeof(int));
-    ++cnt;
-  }
-  return buf;
-}
-
 template <>
 std::set<int> Hdf5Back::VLBufToVal<std::set<int> >(const hvl_t& buf) {
   int* xraw = reinterpret_cast<int*>(buf.p);
   std::set<int> x = std::set<int>(xraw, xraw+buf.len);
   return x;
-}
-
-hvl_t Hdf5Back::VLValToBuf(const std::set<std::string>& x) {
-  // VL_SET_STRING implemented as VL_SET_VL_STRING
-  hvl_t buf;
-  Digest key;
-  buf.len = x.size();
-  size_t nbytes = CYCLUS_SHA1_SIZE * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int i = 0;
-  std::set<std::string>::iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    key = VLWrite<std::string, VL_STRING>(*it);
-    memcpy((char *) buf.p + CYCLUS_SHA1_SIZE*i, key.val, CYCLUS_SHA1_SIZE);
-    ++i;
-  }
-  return buf;
 }
 
 template <>
@@ -887,42 +817,11 @@ std::set<std::string> Hdf5Back::VLBufToVal<std::set<std::string> >(const hvl_t& 
   return x;
 }
 
-hvl_t Hdf5Back::VLValToBuf(const std::list<int>& x) {
-  hvl_t buf;
-  buf.len = x.size();
-  size_t nbytes = buf.len * sizeof(int);
-  buf.p = new char[nbytes];
-  unsigned int cnt = 0;
-  std::list<int>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    memcpy((char *) buf.p + cnt*sizeof(int), &(*it), sizeof(int));
-    ++cnt;
-  }
-  return buf;
-}
-
 template <>
 std::list<int> Hdf5Back::VLBufToVal<std::list<int> >(const hvl_t& buf) {
   int* xraw = reinterpret_cast<int*>(buf.p);
   std::list<int> x = std::list<int>(xraw, xraw+buf.len);
   return x;
-}
-
-hvl_t Hdf5Back::VLValToBuf(const std::list<std::string>& x) {
-  // VL_LIST_STRING implemented as VL_LIST_VL_STRING
-  hvl_t buf;
-  Digest key;
-  buf.len = x.size();
-  size_t nbytes = CYCLUS_SHA1_SIZE * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int i = 0;
-  std::list<std::string>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    key = VLWrite<std::string, VL_STRING>(*it);
-    memcpy((char *) buf.p + CYCLUS_SHA1_SIZE*i, key.val, CYCLUS_SHA1_SIZE);
-    ++i;
-  }
-  return buf;
 }
 
 template <>
@@ -934,21 +833,6 @@ std::list<std::string> Hdf5Back::VLBufToVal<std::list<std::string> >(const hvl_t
   return x;
 }
 
-hvl_t Hdf5Back::VLValToBuf(const std::map<int, int>& x) {
-  hvl_t buf;
-  buf.len = x.size();
-  size_t nbytes = 2 * sizeof(int) * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int cnt = 0;
-  std::map<int, int>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    memcpy((char *) buf.p + 2*sizeof(int)*cnt, &(it->first), sizeof(int));
-    memcpy((char *) buf.p + 2*sizeof(int)*cnt + sizeof(int), &(it->second), sizeof(int));
-    ++cnt;
-  }
-  return buf;
-}
-
 template <>
 std::map<int, int> Hdf5Back::VLBufToVal<std::map<int, int> >(const hvl_t& buf) {
   int* xraw = reinterpret_cast<int*>(buf.p);
@@ -956,22 +840,6 @@ std::map<int, int> Hdf5Back::VLBufToVal<std::map<int, int> >(const hvl_t& buf) {
   for (unsigned int i = 0; i < buf.len; ++i)
     x[xraw[2*i]] = xraw[2*i + 1];
   return x;
-}
-
-hvl_t Hdf5Back::VLValToBuf(const std::map<int, double>& x) {
-  hvl_t buf;
-  buf.len = x.size();
-  size_t itemsize = sizeof(int) + sizeof(double);
-  size_t nbytes = itemsize * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int cnt = 0;
-  std::map<int, double>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    memcpy((char *) buf.p + itemsize*cnt, &(it->first), sizeof(int));
-    memcpy((char *) buf.p + itemsize*cnt + sizeof(int), &(it->second), sizeof(double));
-    ++cnt;
-  }
-  return buf;
 }
 
 template <>
@@ -983,25 +851,6 @@ std::map<int, double> Hdf5Back::VLBufToVal<std::map<int, double> >(const hvl_t& 
     x[*reinterpret_cast<int*>(p + itemsize*i)] = \
       *reinterpret_cast<double*>(p + itemsize*i + sizeof(int));
   return x;
-}
-
-hvl_t Hdf5Back::VLValToBuf(const std::map<int, std::string>& x) {
-  // VL_MAP_INT_STRING implemented as VL_MAP_INT_VL_STRING
-  hvl_t buf;
-  Digest valhash;
-  buf.len = x.size();
-  size_t itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
-  size_t nbytes = itemsize * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int i = 0;
-  std::map<int, std::string>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    memcpy((char *) buf.p + itemsize*i, &(it->first), sizeof(int));
-    valhash = VLWrite<std::string, VL_STRING>(it->second);
-    memcpy((char *) buf.p + itemsize*i + sizeof(int), valhash.val, CYCLUS_SHA1_SIZE);
-    ++i;
-  }
-  return buf;
 }
 
 template <> std::map<int, std::string>
@@ -1016,25 +865,6 @@ Hdf5Back::VLBufToVal<std::map<int, std::string> >(const hvl_t& buf) {
   return x;
 }
 
-hvl_t Hdf5Back::VLValToBuf(const std::map<std::string, int>& x) {
-  // VL_MAP_STRING_INT implemented as VL_MAP_VL_STRING_INT
-  hvl_t buf;
-  Digest keyhash;
-  buf.len = x.size();
-  size_t itemsize = sizeof(int) + CYCLUS_SHA1_SIZE;
-  size_t nbytes = itemsize * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int i = 0;
-  std::map<std::string, int>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    keyhash = VLWrite<std::string, VL_STRING>(it->first);
-    memcpy((char *) buf.p + itemsize*i, keyhash.val, CYCLUS_SHA1_SIZE);
-    memcpy((char *) buf.p + itemsize*i + CYCLUS_SHA1_SIZE, &(it->second), sizeof(int));
-    ++i;
-  }
-  return buf;
-}
-
 template <> std::map<std::string, int>
 Hdf5Back::VLBufToVal<std::map<std::string, int> >(const hvl_t& buf) {
   using std::string;
@@ -1045,26 +875,6 @@ Hdf5Back::VLBufToVal<std::map<std::string, int> >(const hvl_t& buf) {
     x[VLRead<string, VL_STRING>(p + itemsize*i)] = \
       *reinterpret_cast<int*>(p + itemsize*i + CYCLUS_SHA1_SIZE);
   return x;
-}
-
-hvl_t Hdf5Back::VLValToBuf(const std::map<std::string, double>& x) {
-  // VL_MAP_STRING_DOUBLE implemented as VL_MAP_VL_STRING_DOUBLE
-  hvl_t buf;
-  Digest keyhash;
-  buf.len = x.size();
-  size_t itemsize = sizeof(double) + CYCLUS_SHA1_SIZE;
-  size_t nbytes = itemsize * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int i = 0;
-  std::map<std::string, double>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    keyhash = VLWrite<std::string, VL_STRING>(it->first);
-    memcpy((char *) buf.p + itemsize*i, keyhash.val, CYCLUS_SHA1_SIZE);
-    memcpy((char *) buf.p + itemsize*i + CYCLUS_SHA1_SIZE, &(it->second),
-           sizeof(double));
-    ++i;
-  }
-  return buf;
 }
 
 template <> std::map<std::string, double>
@@ -1079,29 +889,6 @@ Hdf5Back::VLBufToVal<std::map<std::string, double> >(const hvl_t& buf) {
   return x;
 }
 
-hvl_t Hdf5Back::VLValToBuf(const std::map<std::string, std::string>& x) {
-  // VL_MAP_STRING_STRING, VL_MAP_STRING_VL_STRING, and VL_MAP_VL_STRING_STRING
-  // implemented as VL_MAP_VL_STRING_VL_STRING
-  hvl_t buf;
-  Digest keyhash;
-  Digest valhash;
-  buf.len = x.size();
-  size_t itemsize = 2*CYCLUS_SHA1_SIZE;
-  size_t nbytes = itemsize * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int i = 0;
-  std::map<std::string, std::string>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    keyhash = VLWrite<std::string, VL_STRING>(it->first);
-    memcpy((char *) buf.p + itemsize*i, keyhash.val, CYCLUS_SHA1_SIZE);
-    valhash = VLWrite<std::string, VL_STRING>(it->second);
-    memcpy((char *) buf.p + itemsize*i + CYCLUS_SHA1_SIZE, valhash.val,
-           CYCLUS_SHA1_SIZE);
-    ++i;
-  }
-  return buf;
-}
-
 template <> std::map<std::string, std::string>
 Hdf5Back::VLBufToVal<std::map<std::string, std::string> >(const hvl_t& buf) {
   using std::string;
@@ -1112,28 +899,6 @@ Hdf5Back::VLBufToVal<std::map<std::string, std::string> >(const hvl_t& buf) {
     x[VLRead<string, VL_STRING>(p + itemsize*i)] = \
       VLRead<string, VL_STRING>(p + itemsize*i + CYCLUS_SHA1_SIZE);
   return x;
-}
-
-
-hvl_t Hdf5Back::VLValToBuf(const std::map<std::pair<int, std::string>, double>& x) {
-  // VL_MAP_PAIR_INT_STRING_DOUBLE implemented as VL_MAP_PAIR_INT_VL_STRING_DOUBLE
-  hvl_t buf;
-  Digest keyhash;
-  buf.len = x.size();
-  size_t itemsize = sizeof(int) + CYCLUS_SHA1_SIZE + sizeof(double);
-  size_t nbytes = itemsize * buf.len;
-  buf.p = new char[nbytes];
-  unsigned int i = 0;
-  std::map<std::pair<int, std::string>, double>::const_iterator it = x.begin();
-  for (; it != x.end(); ++it) {
-    keyhash = VLWrite<std::string, VL_STRING>(it->first.second);
-    memcpy((char *) buf.p + itemsize*i, &(it->first.first), sizeof(int));
-    memcpy((char *) buf.p + itemsize*i + sizeof(int), keyhash.val, CYCLUS_SHA1_SIZE);
-    memcpy((char *) buf.p + itemsize*i + sizeof(int) + CYCLUS_SHA1_SIZE, &(it->second),
-           sizeof(double));
-    ++i;
-  }
-  return buf;
 }
 
 template <> std::map<std::pair<int, std::string>, double>
