@@ -1402,6 +1402,15 @@ cdef class _{{tclassname}}:
         rtn = v
         return rtn
 
+    def pop(self, key):
+        """Pops one {{rcname}} object from the store."""
+        cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
+        cdef _{{rcname}} r = {{rcname}}(free=True)
+        r.ptx = <void*> self.ptx.Pop(k)
+        rtn = r
+        return rtn
+
+
 {% endif %}
 
 

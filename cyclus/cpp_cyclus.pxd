@@ -815,7 +815,7 @@ cdef extern from "toolkit/res_map.h" namespace "cyclus::toolkit":
         vector[Resource.Ptr] ResValues()
         void Values(vector[shared_ptr[R]])
         void ResValues(vector[Resource.Ptr] vals)
-        shared_ptr[R] Pop(const K)
+        shared_ptr[R] Pop(K)
 
 #
 # Some cutsom pyne wrapping
