@@ -1225,6 +1225,9 @@ cdef class _{{tclassname}}:
         """the total number of constituent resource objects in the store."""
         return self.ptx.count()
 
+    def __len__(self):
+        return self.ptx.count()
+
     @property
     def space(self):
         """The quantity of space remaining in this store."""
@@ -1242,7 +1245,7 @@ cdef class _{{tclassname}}:
 
     def pop_n(self, int num):
         """Pops the specified number of resources from the buffer."""
-        rtn = manifest_to_py(self.ptx.PopQty(num))
+        rtn = manifest_to_py(self.ptx.PopN(num))
         return rtn
 
     def pop(self, bint back=False):
@@ -1267,6 +1270,19 @@ cdef class _{{tclassname}}:
             cpp_r = <_Resource> r
             v.push_back(cpp_r.ptx)
         self.ptx.PushAll[shared_ptr[cpp_cyclus.Resource]](v)
+
+    def pop_all_res(self):
+        """A consistent interface for popping all of the resources from the buffer.
+        For ResourceBuff, this is equivalent to self.pop_n(len(self))
+        """
+        rtn = manifest_to_py(self.ptx.PopN(self.ptx.count()))
+        return rtn
+
+    def push_many(self, rs):
+        """A consistent interface for pushing many resources into the buffer.
+        For ResourceBuff, this simply calls push_all().
+        """
+        self.push_all(rs)
 
     {% for r in ts.resources %}{% set rfname = ts.funcname(r) %}{% set rcname = ts.classname(r) %}
     def pop_{{rfname}}(self):
@@ -1293,6 +1309,9 @@ cdef class _{{tclassname}}:
     @property
     def count(self):
         """the total number of constituent resource objects in the store."""
+        return self.ptx.count()
+
+    def __len__(self):
         return self.ptx.count()
 
     @property
@@ -1362,6 +1381,19 @@ cdef class _{{tclassname}}:
         """Pushes a single resource object to the buffer."""
         self.ptx.Push(r.ptx)
 
+    def pop_all_res(self):
+        """A consistent interface for popping all of the resources from the buffer.
+        For ResBuf, this is equivalent to self.pop_n_res(len(self))
+        """
+        rtn = self.pop_n_res(self.ptx.count())
+        return rtn
+
+    def push_many(self, rs):
+        """A consistent interface for pushing many resources into the buffer.
+        For ResBuf, this iteratively calls push().
+        """
+        for r in rs:
+            self.push(rs)
 
 {% elif ts.norms[t][0] == 'cyclus::toolkit::ResMap' %}
 {% set k = ts.norms[t][1] %}
@@ -1425,8 +1457,10 @@ cdef class _{{tclassname}}:
         rtn = v
         return rtn
 
-    def res_values(self, int n):
-        """Pops the specified number of resources from the buffer."""
+    def res_values(self):
+        """Pops the resources from the buffer.
+        For the version of this method which sets resources, see push_many().
+        """
         cdef _Resource x
         cdef list v = []
         cdef std_vector[shared_ptr[cpp_cyclus.Resource]] rs = self.ptx.ResValues()
@@ -1447,6 +1481,21 @@ cdef class _{{tclassname}}:
         rtn = r
         return rtn
 
+    def pop_all_res(self):
+        """A consistent interface for popping all of the resources from the buffer.
+        For ResBuf, this is equivalent to self.res_values()
+        """
+        return self.res_values()
+
+    def push_many(self, rs):
+        """A consistent interface for pushing many resources into the buffer.
+        For ResMap, this calls ResValues(vals).
+        """
+        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] cpp_rs = \
+            std_vector[shared_ptr[cpp_cyclus.Resource]]()
+        for r in rs:
+            cpp_rs.push_back((<_Resource> r).ptx)
+        self.ptx.ResValues(cpp_rs)
 
 {% endif %}
 

@@ -14,6 +14,7 @@ from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
 from copy import deepcopy
 
 from cyclus cimport cpp_cyclus
+from cyclus.cpp_cyclus cimport shared_ptr
 from cyclus cimport lib
 from cyclus import lib
 from cyclus cimport cpp_typesystem
@@ -104,12 +105,31 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         py_di.ptx = &di
         (<object> this.self).snapshot(py_di)
 
-    void InitInv(cpp_cyclus.Inventories& inv):
-        pass
+    void InitInv(cpp_cyclus.Inventories& invs):
+        cdef dict pyinvs = {}
+        cdef list value
+        cdef ts._Resource r
+        for name_value in invs:
+            name = std_string_to_py(name_value.first)
+            value = []
+            for x in name_value.second:
+                r = ts.Resource()
+                r.ptx = x
+                value.append(r)
+            pyinvs[name] = value
+        (<object> this.self).init_inv(pyinvs)
 
     cpp_cyclus.Inventories SnapshotInv():
-        cdef cpp_cyclus.Inventories inv = cpp_cyclus.Inventories()
-        return inv
+        pyinvs = (<object> this.self).snapshot_inv()
+        cdef cpp_cyclus.Inventories invs = cpp_cyclus.Inventories()
+        cdef std_string name
+        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] value
+        for pyname, pyvalue in pyinvs.items():
+            name = str_py_to_cpp(pyname)
+            value = std_vector[shared_ptr[cpp_cyclus.Resource]]()
+            for r in pyvalue:
+                value.push_back((<ts._Resource> r).ptx)
+        return invs
 
 
 cdef class _Agent(lib._Agent):
@@ -188,6 +208,8 @@ class Agent(_Agent, lib.Agent):
         """
         for name, var in self._statevars:
             setattr(self, name, deepcopy(getattr(other, name, None)))
+        for name, inv in self._inventories:
+            inv.value.capacity = getattr(other, name).capacity
 
     def infile_to_db(self, tree, di):
         """A dynamic version of InfileToDb(InfileTree*, DbInit) that should
@@ -305,6 +327,8 @@ class Agent(_Agent, lib.Agent):
         """
         for name, val in d.items():
             setattr(self, name, val)
+        for name, inv in self._inventories:
+            inv.value.capacity = d[inv.capacity]
 
     def snapshot(self, di):
         """A dynamic version of Snapshot(DbInit) that should
@@ -317,6 +341,28 @@ class Agent(_Agent, lib.Agent):
             datum.add_val(name, var.value, shape=var.shape, type=var.uniquetypeid)
         datum.record()
 
+    def init_inv(self, invs):
+        """An initializer that sets up inventories.
+        This is used when InitInv(Inventories&) is called.
+        Users should not need to call this ever. However, brave
+        users may choose to override it in exceptional cases.
+        """
+        for name, inv in self._inventories:
+            if name not in invs:
+                continue
+            inv.value.push_many(invs[name])
+
+    def snapshot_inv(self):
+        """A dynamic version of SnapshotInv() that reports the current
+        state of the inventories.
+        Users should not need to call this ever. However, brave
+        users may choose to override it in exceptional cases.
+        """
+        cdef dict invs = {}
+        for name, inv in self._inventories:
+            invs[name] = inv.value.pop_all_res()
+            inv.value.push_many(invs[name])
+        return invs
 #
 # Tools
 #
