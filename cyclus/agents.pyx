@@ -11,6 +11,8 @@ from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
     PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
     PyBytes_FromString, PyDict_GetItem, PyDict_SetItem)
 
+import json
+from inspect import getmro, getdoc
 from copy import deepcopy
 
 from cyclus cimport cpp_cyclus
@@ -24,12 +26,15 @@ from cyclus.typesystem cimport (py_to_any, any_to_py, str_py_to_cpp,
 from cyclus cimport typesystem as ts
 from cyclus import typesystem as ts
 
+from cyclus cimport cpp_jsoncpp
+
 from cyclus import nucname
 
-from cyclus.cycpp import VarDeclarationFilter
+from cyclus.cycpp import VarDeclarationFilter, SchemaFilter
 
 
 _VAR_DECL = VarDeclarationFilter()
+_SCHEMA = SchemaFilter()
 
 # startup numpy
 #cimport numpy as np
@@ -131,6 +136,20 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
                 value.push_back((<ts._Resource> r).ptx)
         return invs
 
+    std_string schema():
+        pyschema = (<object> this.self).schema
+        return str_py_to_cpp(pyschema)
+
+    cpp_jsoncpp.Value annotations():
+        pyanno = (<object> this.self).annotations_json
+        cdef std_string anno = str_py_to_cpp(pyanno)
+        cdef cpp_jsoncpp.Value root
+        cdef cpp_jsoncpp.Reader reader
+        cdef cpp_bool parsed_ok = reader.parse(anno, root)
+        if not parsed_ok:
+            raise ValueError("annotation string is malformed")
+        return root
+
 
 cdef class _Agent(lib._Agent):
 
@@ -151,6 +170,12 @@ class Agent(_Agent, lib.Agent):
     """
     _statevars = None
     _inventories = None
+    _schema = None
+    _annotations_json = None
+    entity = 'archetype'
+    niche = None
+    tooltip = None
+    userlevel = 0
 
     def __init__(self, ctx):
         super().__init__(ctx)
@@ -363,7 +388,40 @@ class Agent(_Agent, lib.Agent):
             invs[name] = inv.value.pop_all_res()
             inv.value.push_many(invs[name])
         return invs
-#
+
+    @property
+    def schema(self):
+        if self._schema is None:
+            cls = type(self)
+            ctx = {name: var.to_dict() for name, var in cls._statevars}
+            self._schema = _SCHEMA.xml_from_ctx(ctx)
+        return self._schema
+
+    @property
+    def annotations_json(self):
+        if self._annotations_json is None:
+            cls = type(self)
+            vars = {}
+            for name, var in cls._statevars:
+                vars[name] = {k: v for k, v in var.to_dict() if v is not None}
+                vars[name].pop('value', None)
+            aj = {'vars': vars,
+                  'name': cls.__name__,
+                  'entity': cls.entity,
+                  'parents': cls.__bases__,
+                  'all_parents': getmro(cls)[1:],
+                  'doc': getdoc(cls),
+                  'userlevel': cls.userlevel,
+                  }
+            niche = getattr(cls, 'niche', None)
+            if niche is not None:
+                aj['niche'] = niche
+            tt = getattr(cls, 'tooltip', None)
+            if tt is not None:
+                aj['tooltip'] = tt
+            self._annotations_json = json.dumps(aj, separators=(',', ':'))
+        return self._annotations_json
+
 # Tools
 #
 cdef tuple index_and_sort_vars(dict vars):

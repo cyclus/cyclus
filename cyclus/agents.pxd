@@ -8,6 +8,7 @@ from libcpp cimport bool as cpp_bool
 
 from cpython cimport PyObject
 
+from cyclus cimport cpp_jsoncpp
 from cyclus cimport cpp_cyclus
 from cyclus cimport lib
 
@@ -22,6 +23,8 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTR
     void Snapshot(cpp_cyclus.DbInit)
     void InitInv(cpp_cyclus.Inventories&)
     cpp_cyclus.Inventories SnapshotInv()
+    std_string schema()
+    cpp_jsoncpp.Value annotations()
     # Extra interface
     PyObject* self  # the Python object we are shimming
 

@@ -1759,13 +1759,10 @@ class SchemaFilter(CodeGeneratorFilter):
 
         return impl
 
-    def impl(self, ind="  "):
-        cg = self.machine
-        context = cg.context
-        ctx = context[self.given_classname]['vars']
-
+    def xml_from_ctx(self, ctx, ind="  "):
+        """Creates an XML string for an agent."""
         if len(ctx.keys()) == 0:
-            return ind + 'return "<text/>";\n'
+            return '<text/>'
 
         xml = '<interleave>'
         for member, info in ctx.items():
@@ -1777,7 +1774,7 @@ class SchemaFilter(CodeGeneratorFilter):
             alias = member
             if 'alias' in info:
                 alias = info['alias']
-            if self.pragmaname in info:
+            if self.pragmaname in info and self.pragmaname is not None:
                 xml += info[self.pragmaname]
                 continue
             t = info['type']
@@ -1802,8 +1799,14 @@ class SchemaFilter(CodeGeneratorFilter):
             if opt:
                 xml += '</optional>'
         xml += '</interleave>'
-
         del self._member
+        return xml
+
+    def impl(self, ind="  "):
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.given_classname]['vars']
+        xml = self.xml_from_ctx(ctx, ind=ind)
         return ind + 'return ""\n' + escape_xml(xml, ind=ind+'  ') + ';\n'
 
 
