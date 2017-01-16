@@ -751,7 +751,7 @@ cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit":
         Manifest PopN(int)
         Resource.Ptr Pop(AccessDir)
         shared_ptr[T] Pop[T]()
-        void Push(Resource.Ptr)
+        void Push(shared_ptr[Resource])
         void PushAll[B](vector[B])
 
 cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit::Resource":
@@ -780,8 +780,10 @@ cdef extern from "toolkit/res_buf.h" namespace "cyclus::toolkit":
         shared_ptr[T] Peek()
         shared_ptr[T] Pop()
         shared_ptr[T] PopBack()
-        void Push(Resource.Ptr)
-        void Push[B](vector[B])
+        void Push(shared_ptr[Resource])
+        # cannot overload template and non-template functions in Cython.
+        # it is probably bad design on Cyclus's part anyway.
+        #void Push[B](vector[B])
 
 cdef extern from "toolkit/res_map.h" namespace "cyclus::toolkit":
 
@@ -798,14 +800,14 @@ cdef extern from "toolkit/res_map.h" namespace "cyclus::toolkit":
         double quantity()
         void obj_ids(obj_type)
         cpp_bool empty()
-        shared_ptr[R]& operator[](const K&)
-        const shared_ptr[R]& operator[](const K&)
+        shared_ptr[R]& operator[](K&)
         iterator begin()
         const_iterator begin()
         const_iterator cbegin()
         iterator end()
         const_iterator end()
         const_iterator cend()
+        void erase(K&)
         void erase(iterator)
         void erase(iterator, iterator)
         void clear()

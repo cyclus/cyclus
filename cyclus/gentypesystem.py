@@ -1230,6 +1230,22 @@ cdef class _{{tclassname}}:
         rtn = r
         return rtn
 
+    def push(self, _Resource r):
+        """Pushes a single resource object to the buffer."""
+        cdef shared_ptr[cpp_cyclus.Resource] p = shared_ptr[cpp_cyclus.Resource](r.ptx)
+        self.ptx.Push(p)
+
+    def push_all(self, rs):
+        """Pushes one or more resource objects to the store."""
+        cdef shared_ptr[cpp_cyclus.Resource] p
+        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] v
+        cdef _Resource cpp_r
+        for r in rs:
+            cpp_r = <_Resource> r
+            p = shared_ptr[cpp_cyclus.Resource](cpp_r.ptx)
+            v.push_back(p)
+        self.ptx.PushAll[shared_ptr[cpp_cyclus.Resource]](v)
+
     {% for r in ts.resources %}{% set rfname = ts.funcname(r) %}{% set rcname = ts.classname(r) %}
     def pop_{{rfname}}(self, bint front=True):
         """Pops one resource object from the store as a {{rfname}}."""
@@ -1240,6 +1256,151 @@ cdef class _{{tclassname}}:
 
     {% endfor %}
 
+{% elif ts.norms[t][0] == 'cyclus::toolkit::ResBuf' %}
+{% set r = ts.norms[t][1] %}
+{% set rcname = ts.classname(r) %}
+    @property
+    def capacity(self):
+        """The maximum resource quantity this store can hold."""
+        return self.ptx.capacity()
+
+    @capacity.setter
+    def capacity(self, double val):
+        self.ptx.capacity(val)
+
+    @property
+    def count(self):
+        """the total number of constituent resource objects in the store."""
+        return self.ptx.count()
+
+    @property
+    def space(self):
+        """The quantity of space remaining in this store."""
+        return self.ptx.space()
+
+    def pop(self, double qty=None, double eps=None):
+        """Pops one {{rcname}} object from the store."""
+        cdef _{{rcname}} r = {{rcname}}(free=True)
+        if qty is None:
+            r.ptx = <void*> self.ptx.Pop()
+        elif eps is None:
+            r.ptx = <void*> self.ptx.Pop(qty)
+        else:
+            r.ptx = <void*> self.ptx.Pop(qty, eps)
+        rtn = r
+        return rtn
+
+    def pop_n(self, int n):
+        """Pops the specified number of {{rcname}}s from the buffer."""
+        cdef _{{rcname}} x
+        cdef list v = []
+        cdef std_vector[shared_ptr[{{ts.cython_type(r)}}]] rs = self.ptx.PopN(n)
+        for r in rs:
+            x = {{rcname}}(free=True)
+            x.ptx = <void*> r
+            x.append(x)
+        rtn = v
+        return rtn
+
+    def pop_n_res(self, int n):
+        """Pops the specified number of resources from the buffer."""
+        cdef _Resource x
+        cdef list v = []
+        cdef cpp_cyclus.ResVec rs = self.ptx.PopNRes(n)
+        for r in rs:
+            x = Resource(free=True)
+            x.ptx = <void*> r
+            x.append(x)
+        rtn = v
+        return rtn
+
+    def peek(self):
+        """Returns the next resource in line to be popped from the buffer
+        without actually removing it from the buffer.
+        """
+        cdef _{{rcname}} r = {{rcname}}(free=False)
+        r.ptx = <void*> self.ptx.Peek()
+        rtn = r
+        return rtn
+
+    def pop_back(self):
+        """Same as Pop, except it returns the most recently added resource."""
+        cdef _{{rcname}} r = {{rcname}}(free=True)
+        r.ptx = <void*> self.ptx.PopBack()
+        rtn = r
+        return rtn
+
+    def push(self, _{{rcname}} r):
+        """Pushes a single resource object to the buffer."""
+        cdef shared_ptr[cpp_cyclus.Resource] p = shared_ptr[cpp_cyclus.Resource](r.ptx)
+        self.ptx.Push(p)
+
+{% elif ts.norms[t][0] == 'cyclus::toolkit::ResMap' %}
+{% set k = ts.norms[t][1] %}
+{% set r = ts.norms[t][2] %}
+{% set rcname = ts.classname(r) %}
+{% set rcytype = ts.cython_type(r) %}
+
+    @property
+    def size(self):
+        """The total number of resources in the map."""
+        return self.ptx.size()
+
+    def __len__(self):
+        return self.ptx.size()
+
+    def __iter__(self):
+        cdef _{{rcname}} r
+        for rp in self.ptx:
+            r = {{rcname}}()
+            r.ptx = <void*> rp
+            rtn = r
+            yield rtn
+
+    def __getitem__(self, key):
+        cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
+        cdef shared_ptr[{{rcytype}}] p = deref(self.ptx)[k]
+        cdef _{{rcname}} r = {{rcname}}()
+        r.ptx = <void*> p
+        rtn = r
+        return rtn
+
+    def __setitem__(self, key, _{{rcname}} value):
+        cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
+        cdef shared_ptr[{{rcytype}}] p = shared_ptr[{{rcytype}}](value.ptx)
+        deref(self.ptx)[k] = p
+
+    def __delitem__(self, key):
+        cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
+        self.ptx.erase(k)
+
+    def clear(self):
+        """Removes all elements from the map."""
+        self.ptx.clear()
+
+    def values(self):
+        """Returns a vector of the values in the map"""
+        cdef _{{rcname}} x
+        cdef list v = []
+        cdef std_vector[shared_ptr[{{ts.cython_type(r)}}]] rs = self.ptx.Values()
+        for r in rs:
+            x = {{rcname}}(free=True)
+            x.ptx = <void*> r
+            x.append(x)
+        rtn = v
+        return rtn
+
+    def res_values(self, int n):
+        """Pops the specified number of resources from the buffer."""
+        cdef _Resource x
+        cdef list v = []
+        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] rs = self.ptx.ResValues()
+        for r in rs:
+            x = Resource(free=True)
+            x.ptx = <void*> r
+            x.append(x)
+        rtn = v
+        return rtn
 
 {% endif %}
 
