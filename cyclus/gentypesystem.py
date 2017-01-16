@@ -235,7 +235,8 @@ class TypeSystem(object):
             Return expression.
         """
         n = self.norms.get(t, t)
-        ctx = {'type': self.cython_type(t), 'var': x, 'nptypes': []}
+        ctx = {'type': self.cython_type(t), 'var': x, 'nptypes': [],
+               'classname': self.classname(t), 'funcname': self.funcname(t)}
         if n in self._to_py_converters:
             # basic type or str
             n0 = ()
@@ -282,7 +283,8 @@ class TypeSystem(object):
             Return expression.
         """
         n = self.norms.get(t, t)
-        ctx = {'type': self.cython_type(t), 'var': x, 'nptypes': []}
+        ctx = {'type': self.cython_type(t), 'var': x, 'nptypes': [],
+               'classname': self.classname(t), 'funcname': self.funcname(t)}
         if n in self._to_cpp_converters:
             # basic type or str
             n0 = ()
@@ -447,7 +449,7 @@ VARS_TO_CPP = {
     'boost::uuids::uuid': 'uuid_py_to_cpp({var})',
     'cyclus::Material': 'None',
     'cyclus::Product': 'None',
-    'cyclus::toolkit::ResourceBuff': 'None',
+    'cyclus::toolkit::ResourceBuff': 'resource_buff_to_cpp({var})',
     }
 
 TEMPLATE_ARGS = {
@@ -601,7 +603,12 @@ TO_CPP_CONVERTERS = {
     'boost::uuids::uuid': ('', '', 'uuid_py_to_cpp({var})'),
     'cyclus::Material': ('', '', 'None'),
     'cyclus::Product': ('', '', 'None'),
-    'cyclus::toolkit::ResourceBuff': ('', '', 'None'),
+    'cyclus::toolkit::ResourceBuff': (
+        'cdef _{classname} py{var}\n'
+        'cdef cpp_cyclus.ResourceBuff cpp{var}\n',  #
+        'py{var} = <_{classname}> {var}\n'
+        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var}'),
     # templates
     'std::set': (
         '{valdecl}\n'
@@ -663,8 +670,18 @@ TO_CPP_CONVERTERS = {
         'for i, {valname} in enumerate({var}):\n'
         '    cpp{var}[i] = {val_to_cpp}\n',
         'cpp{var}'),
-    'cyclus::toolkit::ResBuf': ('', '', 'None'),
-    'cyclus::toolkit::ResMap': ('', '', 'None'),
+    'cyclus::toolkit::ResBuf': (
+        'cdef _{classname} py{var}\n'
+        'cdef cpp_cyclus.ResBuf[{valtype}] cpp{var}\n',  #
+        'py{var} = <_{classname}> {var}\n'
+        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var}'),
+    'cyclus::toolkit::ResMap': (
+        'cdef _{classname} py{var}\n'
+        'cdef cpp_cyclus.ResMap[{keytype}, {valtype}] cpp{var}\n',  #
+        'py{var} = <_{classname}> {var}\n'
+        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var}'),
     }
 
 # annotation info key (pyname), C++ name,  cython type names, init snippet
@@ -905,7 +922,7 @@ cdef class _Resource:
         """
         cdef _Resource co = Resource()
         co._free = True
-        co.ptx = <void*> (<cpp_cyclus.Resource*> self.ptx).Clone()
+        co.ptx = <void*> (<cpp_cyclus.Resource*> self.ptx).Clone().get()
         copy = co
         return copy
 
@@ -935,7 +952,7 @@ cdef class _Resource:
         """
         cdef _Resource res = Resource()
         res._free = True
-        res.ptx = <void*> (<cpp_cyclus.Resource*> self.ptx).ExtractRes(quantity)
+        res.ptx = <void*> (<cpp_cyclus.Resource*> self.ptx).ExtractRes(quantity).get()
         respy = res
         return respy
 
@@ -996,7 +1013,7 @@ cdef class _Material(_Resource):
         cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
         cdef _Material mat = Material(free=True)
         mat.ptx = <void*> cpp_cyclus.Material.Create(<cpp_cyclus.Agent*> creator.ptx,
-                                                     quantity, comp)
+                                                     quantity, comp).get()
         rtn = mat
         return mat
 
@@ -1007,7 +1024,7 @@ cdef class _Material(_Resource):
         """
         cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
         cdef _Material mat = Material(free=True)
-        mat.ptx = <void*> cpp_cyclus.Material.CreateUntracked(quantity, comp)
+        mat.ptx = <void*> cpp_cyclus.Material.CreateUntracked(quantity, comp).get()
         rtn = mat
         return mat
 
@@ -1016,7 +1033,7 @@ cdef class _Material(_Resource):
         """
         cdef _Material co = Material(free=True)
         co._free = True
-        co.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).Clone()
+        co.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).Clone().get()
         copy = co
         return copy
 
@@ -1025,7 +1042,7 @@ cdef class _Material(_Resource):
         not a Resource.
         """
         cdef _Material res = Material(free=True)
-        res.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).ExtractQty(quantity)
+        res.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).ExtractQty(quantity).get()
         respy = res
         return respy
 
@@ -1035,7 +1052,7 @@ cdef class _Material(_Resource):
         cdef double t
         t = cpp_cyclus.eps_rsrc() if threshold is None else threshold
         cdef _Material res = Material(free=True)
-        res.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).ExtractComp(qty, comp, t)
+        res.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).ExtractComp(qty, comp, t).get()
         respy = res
         return respy
 
@@ -1102,7 +1119,7 @@ cdef class _Product(_Resource):
         """
         cdef _Product prod = Product(free=True)
         prod.ptx = <void*> cpp_cyclus.Product.Create(<cpp_cyclus.Agent*> creator.ptx,
-                                                     quantity, str_py_to_cpp(quality))
+                                                     quantity, str_py_to_cpp(quality)).get()
         rtn = prod
         return prod
 
@@ -1112,7 +1129,7 @@ cdef class _Product(_Resource):
         the simulation and is untracked.
         """
         cdef _Product prod = Product(free=True)
-        prod.ptx = <void*> cpp_cyclus.Product.CreateUntracked(quantity, str_py_to_cpp(quality))
+        prod.ptx = <void*> cpp_cyclus.Product.CreateUntracked(quantity, str_py_to_cpp(quality)).get()
         rtn = prod
         return prod
 
@@ -1121,7 +1138,7 @@ cdef class _Product(_Resource):
         """
         cdef _Product co = Product(free=True)
         co._free = True
-        co.ptx = <void*> (<cpp_cyclus.Product*> self.ptx).Clone()
+        co.ptx = <void*> (<cpp_cyclus.Product*> self.ptx).Clone().get()
         copy = co
         return copy
 
@@ -1130,7 +1147,7 @@ cdef class _Product(_Resource):
         new product object with the same quality/type.
         """
         cdef _Product res = Product(free=True)
-        res.ptx = <void*> (<cpp_cyclus.Product*> self.ptx).Extract(qty)
+        res.ptx = <void*> (<cpp_cyclus.Product*> self.ptx).Extract(qty).get()
         respy = res
         return respy
 
@@ -1155,7 +1172,7 @@ cdef object manifest_to_py(cpp_cyclus.Manifest manifest, bint free):
     cdef _Resource r
     for ptr in manifest:
         r = Resource(free=free)
-        r.ptx = <void*> ptr
+        r.ptx = <void*> ptr.get()
         m.append(r)
     rtn = m
     return rtn
@@ -1226,7 +1243,7 @@ cdef class _{{tclassname}}:
     def pop(self, bint back=False):
         """Pops one resource object from the store."""
         cdef _Resource r = Resource(free=True)
-        r.ptx = <void*> self.ptx.Pop(<cpp_cyclus.AccessDir> back)
+        r.ptx = <void*> self.ptx.Pop(<cpp_cyclus.AccessDir> back).get()
         rtn = r
         return rtn
 
@@ -1250,7 +1267,7 @@ cdef class _{{tclassname}}:
     def pop_{{rfname}}(self, bint front=True):
         """Pops one resource object from the store as a {{rfname}}."""
         cdef _{{rcname}} r = {{rcname}}(free=True)
-        r.ptx = <void*> self.ptx.Pop[{{ ts.cython_type(r) }}]()
+        r.ptx = <void*> self.ptx.Pop[{{ ts.cython_type(r) }}]().get()
         rtn = r
         return rtn
 
@@ -1282,11 +1299,11 @@ cdef class _{{tclassname}}:
         """Pops one {{rcname}} object from the store."""
         cdef _{{rcname}} r = {{rcname}}(free=True)
         if qty is None:
-            r.ptx = <void*> self.ptx.Pop()
+            r.ptx = <void*> self.ptx.Pop().get()
         elif eps is None:
-            r.ptx = <void*> self.ptx.Pop(qty)
+            r.ptx = <void*> self.ptx.Pop(qty).get()
         else:
-            r.ptx = <void*> self.ptx.Pop(qty, eps)
+            r.ptx = <void*> self.ptx.Pop(qty, eps).get()
         rtn = r
         return rtn
 
@@ -1297,7 +1314,7 @@ cdef class _{{tclassname}}:
         cdef std_vector[shared_ptr[{{ts.cython_type(r)}}]] rs = self.ptx.PopN(n)
         for r in rs:
             x = {{rcname}}(free=True)
-            x.ptx = <void*> r
+            x.ptx = <void*> r.get()
             x.append(x)
         rtn = v
         return rtn
@@ -1309,7 +1326,7 @@ cdef class _{{tclassname}}:
         cdef cpp_cyclus.ResVec rs = self.ptx.PopNRes(n)
         for r in rs:
             x = Resource(free=True)
-            x.ptx = <void*> r
+            x.ptx = <void*> r.get()
             x.append(x)
         rtn = v
         return rtn
@@ -1319,14 +1336,14 @@ cdef class _{{tclassname}}:
         without actually removing it from the buffer.
         """
         cdef _{{rcname}} r = {{rcname}}(free=False)
-        r.ptx = <void*> self.ptx.Peek()
+        r.ptx = <void*> self.ptx.Peek().get()
         rtn = r
         return rtn
 
     def pop_back(self):
         """Same as Pop, except it returns the most recently added resource."""
         cdef _{{rcname}} r = {{rcname}}(free=True)
-        r.ptx = <void*> self.ptx.PopBack()
+        r.ptx = <void*> self.ptx.PopBack().get()
         rtn = r
         return rtn
 
@@ -1351,7 +1368,7 @@ cdef class _{{tclassname}}:
 
     def __iter__(self):
         cdef _{{rcname}} r
-        for rp in self.ptx:
+        for rp in deref(self.ptx):
             r = {{rcname}}()
             r.ptx = <void*> rp
             rtn = r
@@ -1361,7 +1378,7 @@ cdef class _{{tclassname}}:
         cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
         cdef shared_ptr[{{rcytype}}] p = deref(self.ptx)[k]
         cdef _{{rcname}} r = {{rcname}}()
-        r.ptx = <void*> p
+        r.ptx = <void*> p.get()
         rtn = r
         return rtn
 
@@ -1385,7 +1402,7 @@ cdef class _{{tclassname}}:
         cdef std_vector[shared_ptr[{{ts.cython_type(r)}}]] rs = self.ptx.Values()
         for r in rs:
             x = {{rcname}}(free=True)
-            x.ptx = <void*> r
+            x.ptx = <void*> r.get()
             x.append(x)
         rtn = v
         return rtn
@@ -1397,7 +1414,7 @@ cdef class _{{tclassname}}:
         cdef std_vector[shared_ptr[cpp_cyclus.Resource]] rs = self.ptx.ResValues()
         for r in rs:
             x = Resource(free=True)
-            x.ptx = <void*> r
+            x.ptx = <void*> r.get()
             x.append(x)
         rtn = v
         return rtn
@@ -1406,7 +1423,7 @@ cdef class _{{tclassname}}:
         """Pops one {{rcname}} object from the store."""
         cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
         cdef _{{rcname}} r = {{rcname}}(free=True)
-        r.ptx = <void*> self.ptx.Pop(k)
+        r.ptx = <void*> self.ptx.Pop(k).get()
         rtn = r
         return rtn
 
