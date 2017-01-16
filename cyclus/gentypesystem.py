@@ -800,7 +800,6 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.utility cimport pair as std_pair
 from libcpp.string cimport string as std_string
 from libcpp.typeinfo cimport type_info
-from libcpp.memory cimport shared_ptr
 from cython.operator cimport dereference as deref
 from cython.operator cimport preincrement as inc
 from cython.operator cimport typeid
@@ -848,6 +847,7 @@ TYPESYSTEM_PYX = JENV.from_string('''
 # local imports
 from cyclus cimport cpp_typesystem
 from cyclus cimport cpp_cyclus
+from cyclus.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
 from cyclus cimport lib
 
 # pure python imports
@@ -863,26 +863,13 @@ from cyclus import nucname
 
 cdef class _Resource:
 
-    def __cinit__(self, bint init=False):
-        self._free = init
-        self.ptx = NULL
-
-    def __dealloc__(self):
-        """C++ destructor."""
-        # Note that we have to do it this way since self.ptx is void*
-        if self.ptx == NULL or not self._free:
-            return
-        cdef cpp_cyclus.Resource* cpp_ptx = <cpp_cyclus.Resource*> self.ptx
-        del cpp_ptx
-        self.ptx = NULL
-
     @property
     def obj_id(self):
         """The unique id corresponding to this resource object. Can be used
         to track and/or associate other information with this resource object.
         You should NOT track resources by pointer.
         """
-        return (<cpp_cyclus.Resource*> self.ptx).obj_id()
+        return self.ptx.get().obj_id()
 
     @property
     def state_id(self):
@@ -891,7 +878,7 @@ cdef class _Resource:
         types/implementations. Runtime tracking of resources should generally
         use the obj_id rather than this.
         """
-        return (<cpp_cyclus.Resource*> self.ptx).state_id()
+        return self.ptx.get().state_id()
 
     def bump_state_id(self):
         """Assigns a new, unique internal id to this resource and its state. This
@@ -899,7 +886,7 @@ cdef class _Resource:
         A call to bump_state_id is not necessarily accompanied by a change to the
         state id. This should NEVER be called by agents.
         """
-        (<cpp_cyclus.Resource*> self.ptx).BumpStateId()
+        self.ptx.get().BumpStateId()
 
     @property
     def qual_id(self):
@@ -908,12 +895,12 @@ cdef class _Resource:
         change to the qual_id should always be accompanied by a call to
         bump_state_id().
         """
-        return (<cpp_cyclus.Resource*> self.ptx).qual_id()
+        return self.ptx.get().qual_id()
 
     @property
     def type(self):
         """A unique type/name for the concrete resource implementation."""
-        t = std_string_to_py((<cpp_cyclus.Resource*> self.ptx).type())
+        t = std_string_to_py(self.ptx.get().type())
         return t
 
     def clone(self):
@@ -921,8 +908,7 @@ cdef class _Resource:
         A cloned resource should never record anything in the output database.
         """
         cdef _Resource co = Resource()
-        co._free = True
-        co.ptx = <void*> (<cpp_cyclus.Resource*> self.ptx).Clone().get()
+        co.ptx = self.ptx.get().Clone()
         copy = co
         return copy
 
@@ -931,19 +917,20 @@ cdef class _Resource:
         should generally NOT record data accessible via the Resource class
         public methods (e.g.  qual_id, units, type, quantity).
         """
-        (<cpp_cyclus.Resource*> self.ptx).Record(ctx.ptx)
+        self.ptx.get().Record(ctx.ptx)
 
     @property
     def units(self):
         """Returns the units this resource is based in (e.g. "kg")."""
-        return (<cpp_cyclus.Resource*> self.ptx).units()
+        u = std_string_to_py(self.ptx.get().units())
+        return u
 
     @property
     def quantity(self):
         """Returns the quantity of this resource with dimensions as specified by
         the return value of units().
         """
-        return (<cpp_cyclus.Resource*> self.ptx).quantity()
+        return self.ptx.get().quantity()
 
     def extract_res(self, double quantity):
         """Splits the resource and returns the extracted portion as a new resource
@@ -951,8 +938,7 @@ cdef class _Resource:
         offers/requests of arbitrary resource implementation type.
         """
         cdef _Resource res = Resource()
-        res._free = True
-        res.ptx = <void*> (<cpp_cyclus.Resource*> self.ptx).ExtractRes(quantity).get()
+        res.ptx = self.ptx.get().ExtractRes(quantity)
         respy = res
         return respy
 
@@ -1011,9 +997,11 @@ cdef class _Material(_Resource):
         creator's context.
         """
         cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
-        cdef _Material mat = Material(free=True)
-        mat.ptx = <void*> cpp_cyclus.Material.Create(<cpp_cyclus.Agent*> creator.ptx,
-                                                     quantity, comp).get()
+        cdef _Material mat = Material()
+        mat.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
+                                                      cpp_cyclus.Material](
+                    cpp_cyclus.Material.Create(<cpp_cyclus.Agent*> creator.ptx,
+                                               quantity, comp))
         rtn = mat
         return mat
 
@@ -1023,17 +1011,17 @@ cdef class _Material(_Resource):
         the simulation and is untracked.
         """
         cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
-        cdef _Material mat = Material(free=True)
-        mat.ptx = <void*> cpp_cyclus.Material.CreateUntracked(quantity, comp).get()
+        cdef _Material mat = Material()
+        mat.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Material](
+                    cpp_cyclus.Material.CreateUntracked(quantity, comp))
         rtn = mat
         return mat
 
     def clone(self):
         """Returns an untracked (not part of the simulation) copy of the material.
         """
-        cdef _Material co = Material(free=True)
-        co._free = True
-        co.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).Clone().get()
+        cdef _Material co = Material()
+        co.ptx = self.ptx.get().Clone()
         copy = co
         return copy
 
@@ -1041,8 +1029,10 @@ cdef class _Material(_Resource):
         """Same as ExtractComp with c = this->comp() and returns a Material,
         not a Resource.
         """
-        cdef _Material res = Material(free=True)
-        res.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).ExtractQty(quantity).get()
+        cdef _Material res = Material()
+        res.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Material](
+                  reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+                    self.ptx).get().ExtractQty(quantity))
         respy = res
         return respy
 
@@ -1051,16 +1041,20 @@ cdef class _Material(_Resource):
         cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
         cdef double t
         t = cpp_cyclus.eps_rsrc() if threshold is None else threshold
-        cdef _Material res = Material(free=True)
-        res.ptx = <void*> (<cpp_cyclus.Material*> self.ptx).ExtractComp(qty, comp, t).get()
+        cdef _Material res = Material()
+        res.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Material](
+                  reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+                    self.ptx).get().ExtractComp(qty, comp, t))
         respy = res
         return respy
 
     def absorb(self, _Material mat):
         """Combines material mat with this one.  mat's quantity becomes zero."""
         cdef shared_ptr[cpp_cyclus.Material] p = \
-            shared_ptr[cpp_cyclus.Material](<cpp_cyclus.Material*> mat.ptx)
-        (<cpp_cyclus.Material*> self.ptx).Absorb(p)
+            reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+                mat.ptx)
+        reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+            self.ptx).get().Absorb(p)
 
     def transmute(self, c, basis='mass'):
         """Changes the material's composition to c without changing its mass.  Use
@@ -1068,7 +1062,8 @@ cdef class _Material(_Resource):
         a reactor.
         """
         cdef shared_ptr[cpp_cyclus.Composition] comp = composition_ptr_from_py(c, basis)
-        (<cpp_cyclus.Material*> self.ptx).Transmute(comp)
+        reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+            self.ptx).get().Transmute(comp)
 
     def decay(self, int curr_time):
         """Updates the material's composition by performing a decay calculation.
@@ -1080,7 +1075,8 @@ cdef class _Material(_Resource):
         simulation decay mode is set to "never" or none of the nuclides' decay
         constants are significant with respect to the time delta.
         """
-        (<cpp_cyclus.Material*> self.ptx).Decay(curr_time)
+        reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+            self.ptx).get().Decay(curr_time)
 
     @property
     def prev_decay_time(self):
@@ -1088,15 +1084,19 @@ cdef class _Material(_Resource):
         for the material.  This is not necessarily synonymous with the last time
         step the material's Decay function was called.
         """
-        return (<cpp_cyclus.Material*> self.ptx).prev_decay_time()
+        return reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+            self.ptx).get().prev_decay_time()
 
     def decay_heat(self):
         """Returns a double with the decay heat of the material in units of W/kg."""
-        return (<cpp_cyclus.Material*> self.ptx).DecayHeat()
+        return reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+            self.ptx).get().DecayHeat()
 
     def comp(self, basis='mass'):
         """Returns the nuclide composition of this material."""
-        rtn = composition_from_cpp((<cpp_cyclus.Material*> self.ptx).comp(), basis)
+        rtn = composition_from_cpp(
+                reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+                    self.ptx).get().comp(), basis)
         return rtn
 
 
@@ -1117,9 +1117,10 @@ cdef class _Product(_Resource):
         "this" pointer). All future output data recorded will be done using the
         creator's context.
         """
-        cdef _Product prod = Product(free=True)
-        prod.ptx = <void*> cpp_cyclus.Product.Create(<cpp_cyclus.Agent*> creator.ptx,
-                                                     quantity, str_py_to_cpp(quality)).get()
+        cdef _Product prod = Product()
+        prod.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Product](
+                    cpp_cyclus.Product.Create(<cpp_cyclus.Agent*> creator.ptx,
+                                              quantity, str_py_to_cpp(quality)))
         rtn = prod
         return prod
 
@@ -1128,17 +1129,18 @@ cdef class _Product(_Resource):
         """Creates a new product that does not actually exist as part of
         the simulation and is untracked.
         """
-        cdef _Product prod = Product(free=True)
-        prod.ptx = <void*> cpp_cyclus.Product.CreateUntracked(quantity, str_py_to_cpp(quality)).get()
+        cdef _Product prod = Product()
+        prod.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Product](
+                    cpp_cyclus.Product.CreateUntracked(quantity,
+                                                       str_py_to_cpp(quality)))
         rtn = prod
         return prod
 
     def clone(self):
         """Returns an untracked (not part of the simulation) copy of the product.
         """
-        cdef _Product co = Product(free=True)
-        co._free = True
-        co.ptx = <void*> (<cpp_cyclus.Product*> self.ptx).Clone().get()
+        cdef _Product co = Product()
+        co.ptx = self.ptx.get().Clone()
         copy = co
         return copy
 
@@ -1146,16 +1148,19 @@ cdef class _Product(_Resource):
         """Extracts the specified mass from this resource and returns it as a
         new product object with the same quality/type.
         """
-        cdef _Product res = Product(free=True)
-        res.ptx = <void*> (<cpp_cyclus.Product*> self.ptx).Extract(qty).get()
+        cdef _Product res = Product()
+        res.ptx = reinterpret_pointer_cast[cpp_cyclus.Product, cpp_cyclus.Resource](
+                    self.ptx).get().ExtractRes(qty)
         respy = res
         return respy
 
     def absorb(self, _Product other):
         """Absorbs the contents of the given 'other' resource into this resource."""
         cdef shared_ptr[cpp_cyclus.Product] p = \
-            shared_ptr[cpp_cyclus.Product](<cpp_cyclus.Product*> other.ptx)
-        (<cpp_cyclus.Product*> self.ptx).Absorb(p)
+            reinterpret_pointer_cast[cpp_cyclus.Product, cpp_cyclus.Resource](
+                other.ptx)
+        reinterpret_pointer_cast[cpp_cyclus.Product, cpp_cyclus.Resource](
+            self.ptx).get().Absorb(p)
 
 
 class Product(_Product, Resource):
@@ -1166,13 +1171,13 @@ class Product(_Product, Resource):
     """
 
 
-cdef object manifest_to_py(cpp_cyclus.Manifest manifest, bint free):
+cdef object manifest_to_py(cpp_cyclus.Manifest manifest):
     """Turns a manifest into a list of Resources."""
     cdef list m = []
     cdef _Resource r
     for ptr in manifest:
-        r = Resource(free=free)
-        r.ptx = <void*> ptr.get()
+        r = Resource()
+        r.ptx = ptr
         m.append(r)
     rtn = m
     return rtn
@@ -1232,42 +1237,42 @@ cdef class _{{tclassname}}:
             manifest = self.ptx.PopQty(quantity)
         else:
             manifest = self.ptx.PopQty(quantity, esp)
-        rtn = manifest_to_py(manifest, True)
+        rtn = manifest_to_py(manifest)
         return rtn
 
     def pop_n(self, int num):
         """Pops the specified number of resources from the buffer."""
-        rtn = manifest_to_py(self.ptx.PopQty(num), True)
+        rtn = manifest_to_py(self.ptx.PopQty(num))
         return rtn
 
     def pop(self, bint back=False):
         """Pops one resource object from the store."""
-        cdef _Resource r = Resource(free=True)
-        r.ptx = <void*> self.ptx.Pop(<cpp_cyclus.AccessDir> back).get()
+        cdef _Resource r = Resource()
+        if back:
+            r.ptx = self.ptx.Pop(cpp_cyclus.BACK)
+        else:
+            r.ptx = self.ptx.Pop(cpp_cyclus.FRONT)
         rtn = r
         return rtn
 
     def push(self, _Resource r):
         """Pushes a single resource object to the buffer."""
-        cdef shared_ptr[cpp_cyclus.Resource] p = shared_ptr[cpp_cyclus.Resource](r.ptx)
-        self.ptx.Push(p)
+        self.ptx.Push(r.ptx)
 
     def push_all(self, rs):
         """Pushes one or more resource objects to the store."""
-        cdef shared_ptr[cpp_cyclus.Resource] p
         cdef std_vector[shared_ptr[cpp_cyclus.Resource]] v
         cdef _Resource cpp_r
         for r in rs:
             cpp_r = <_Resource> r
-            p = shared_ptr[cpp_cyclus.Resource](cpp_r.ptx)
-            v.push_back(p)
+            v.push_back(cpp_r.ptx)
         self.ptx.PushAll[shared_ptr[cpp_cyclus.Resource]](v)
 
     {% for r in ts.resources %}{% set rfname = ts.funcname(r) %}{% set rcname = ts.classname(r) %}
-    def pop_{{rfname}}(self, bint front=True):
+    def pop_{{rfname}}(self):
         """Pops one resource object from the store as a {{rfname}}."""
-        cdef _{{rcname}} r = {{rcname}}(free=True)
-        r.ptx = <void*> self.ptx.Pop[{{ ts.cython_type(r) }}]().get()
+        cdef _{{rcname}} r = {{rcname}}()
+        r.ptx = self.ptx.Pop(cpp_cyclus.FRONT)  # don't bother casting back and forth
         rtn = r
         return rtn
 
@@ -1297,13 +1302,16 @@ cdef class _{{tclassname}}:
 
     def pop(self, double qty=None, double eps=None):
         """Pops one {{rcname}} object from the store."""
-        cdef _{{rcname}} r = {{rcname}}(free=True)
+        cdef _{{rcname}} r = {{rcname}}()
         if qty is None:
-            r.ptx = <void*> self.ptx.Pop().get()
+            r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                        self.ptx.Pop())
         elif eps is None:
-            r.ptx = <void*> self.ptx.Pop(qty).get()
+            r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                        self.ptx.Pop(qty))
         else:
-            r.ptx = <void*> self.ptx.Pop(qty, eps).get()
+            r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                        self.ptx.Pop(qty, eps))
         rtn = r
         return rtn
 
@@ -1313,8 +1321,9 @@ cdef class _{{tclassname}}:
         cdef list v = []
         cdef std_vector[shared_ptr[{{ts.cython_type(r)}}]] rs = self.ptx.PopN(n)
         for r in rs:
-            x = {{rcname}}(free=True)
-            x.ptx = <void*> r.get()
+            x = {{rcname}}()
+            x.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                    r)
             x.append(x)
         rtn = v
         return rtn
@@ -1325,8 +1334,8 @@ cdef class _{{tclassname}}:
         cdef list v = []
         cdef cpp_cyclus.ResVec rs = self.ptx.PopNRes(n)
         for r in rs:
-            x = Resource(free=True)
-            x.ptx = <void*> r.get()
+            x = Resource()
+            x.ptx = r
             x.append(x)
         rtn = v
         return rtn
@@ -1335,22 +1344,24 @@ cdef class _{{tclassname}}:
         """Returns the next resource in line to be popped from the buffer
         without actually removing it from the buffer.
         """
-        cdef _{{rcname}} r = {{rcname}}(free=False)
-        r.ptx = <void*> self.ptx.Peek().get()
+        cdef _{{rcname}} r = {{rcname}}()
+        r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                    self.ptx.Peek())
         rtn = r
         return rtn
 
     def pop_back(self):
         """Same as Pop, except it returns the most recently added resource."""
-        cdef _{{rcname}} r = {{rcname}}(free=True)
-        r.ptx = <void*> self.ptx.PopBack().get()
+        cdef _{{rcname}} r = {{rcname}}()
+        r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                    self.ptx.PopBack())
         rtn = r
         return rtn
 
     def push(self, _{{rcname}} r):
         """Pushes a single resource object to the buffer."""
-        cdef shared_ptr[cpp_cyclus.Resource] p = shared_ptr[cpp_cyclus.Resource](r.ptx)
-        self.ptx.Push(p)
+        self.ptx.Push(r.ptx)
+
 
 {% elif ts.norms[t][0] == 'cyclus::toolkit::ResMap' %}
 {% set k = ts.norms[t][1] %}
@@ -1368,23 +1379,28 @@ cdef class _{{tclassname}}:
 
     def __iter__(self):
         cdef _{{rcname}} r
-        for rp in deref(self.ptx):
+        for kr in deref(self.ptx):
+            ktn = {{ ts.funcname(k) }}_to_py(kr.first)
             r = {{rcname}}()
-            r.ptx = <void*> rp
+            r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                        kr.second)
             rtn = r
-            yield rtn
+            yield (ktn, rtn)
 
     def __getitem__(self, key):
         cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
         cdef shared_ptr[{{rcytype}}] p = deref(self.ptx)[k]
         cdef _{{rcname}} r = {{rcname}}()
-        r.ptx = <void*> p.get()
+        r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                    p)
         rtn = r
         return rtn
 
     def __setitem__(self, key, _{{rcname}} value):
         cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
-        cdef shared_ptr[{{rcytype}}] p = shared_ptr[{{rcytype}}](value.ptx)
+        cdef shared_ptr[{{rcytype}}] p = \
+            reinterpret_pointer_cast[{{ts.cython_type(r)}}, cpp_cyclus.Resource](
+                (value.ptx))
         deref(self.ptx)[k] = p
 
     def __delitem__(self, key):
@@ -1401,8 +1417,10 @@ cdef class _{{tclassname}}:
         cdef list v = []
         cdef std_vector[shared_ptr[{{ts.cython_type(r)}}]] rs = self.ptx.Values()
         for r in rs:
-            x = {{rcname}}(free=True)
-            x.ptx = <void*> r.get()
+            x = {{rcname}}()
+            x.ptx = \
+                reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                    r)
             x.append(x)
         rtn = v
         return rtn
@@ -1413,8 +1431,8 @@ cdef class _{{tclassname}}:
         cdef list v = []
         cdef std_vector[shared_ptr[cpp_cyclus.Resource]] rs = self.ptx.ResValues()
         for r in rs:
-            x = Resource(free=True)
-            x.ptx = <void*> r.get()
+            x = Resource()
+            x.ptx = r
             x.append(x)
         rtn = v
         return rtn
@@ -1422,8 +1440,10 @@ cdef class _{{tclassname}}:
     def pop(self, key):
         """Pops one {{rcname}} object from the store."""
         cdef {{ ts.cython_type(k) }} k = {{ ts.funcname(k) }}_to_cpp(key)
-        cdef _{{rcname}} r = {{rcname}}(free=True)
-        r.ptx = <void*> self.ptx.Pop(k).get()
+        cdef _{{rcname}} r = {{rcname}}()
+        r.ptx = \
+            reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
+                self.ptx.Pop(k))
         rtn = r
         return rtn
 
@@ -1865,14 +1885,14 @@ TYPESYSTEM_PXD = JENV.from_string('''
 # local imports
 from cyclus cimport cpp_typesystem
 from cyclus cimport cpp_cyclus
+from cyclus.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
 
 #
 # Resources & Inventories
 #
 
 cdef class _Resource:
-    cdef void * ptx
-    cdef bint _free
+    cdef shared_ptr[cpp_cyclus.Resource] ptx
 
 cdef shared_ptr[cpp_cyclus.Composition] composition_ptr_from_py(object, object)
 cdef object composition_from_cpp(shared_ptr[cpp_cyclus.Composition] comp, object basis)
@@ -1883,7 +1903,7 @@ cdef class _Material(_Resource):
 cdef class _Product(_Resource):
     pass
 
-cdef object manifest_to_py(cpp_cyclus.Manifest, bint)
+cdef object manifest_to_py(cpp_cyclus.Manifest)
 
 {% for t in ts.inventory_types %}
 {% set tclassname = ts.classname(t)%}

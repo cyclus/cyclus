@@ -7,7 +7,9 @@ from libcpp.utility cimport pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 from libcpp.typeinfo cimport type_info
-from libcpp.memory cimport shared_ptr
+
+# we use boost shared_ptrs
+#from libcpp.memory cimport shared_ptr
 
 from . cimport cpp_jsoncpp
 from .cpp_typesystem cimport DbTypes
@@ -35,6 +37,19 @@ cdef extern from "cyclus.h" namespace "boost::uuids":
     cdef cppclass uuid:
         unsigned char data[16]
 
+
+cdef extern from "cyclus.h" namespace "boost":
+
+    cdef cppclass shared_ptr[T]:
+        shared_ptr()
+        shared_ptr(T*)
+        T* get()
+        T& operator*()
+        cpp_bool unique()
+        long use_count()
+        swap(shared_ptr&)
+
+    shared_ptr[T] reinterpret_pointer_cast[T,U](shared_ptr[U])
 
 cdef extern from "version.h" namespace "cyclus::version":
 
@@ -754,7 +769,7 @@ cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit":
         void Push(shared_ptr[Resource])
         void PushAll[B](vector[B])
 
-cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit::Resource":
+cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit::ResourceBuff":
 
         enum AccessDir:
             FRONT
