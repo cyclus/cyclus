@@ -1762,16 +1762,6 @@ cdef class StateVar:
         self.{{cppname}} = {{pyname}}
         {% endfor %}
 
-    {% for pyname, cppname, typename in annotations -%}{% if pyname != cppname %}
-    @property
-    def {{pyname}}(self):
-        return self.{{cppname}}
-
-    @{{pyname}}.setter
-    def {{pyname}}(self, {{typename}} value):
-        self.{{cppname}} = value
-    {% endif %}{% endfor %}
-
     #
     # Descriptor interface
     #
@@ -1824,6 +1814,105 @@ cdef class {{tclassname}}(StateVar):
             )
 
 {% endif %}{% endfor %}
+
+cdef class Inventory:
+    """This class represents the special state variables that represent inventories
+    on a Cyclus agent. It presents the same duck-type interface to the StateVar
+    class, but does not inherit from StateVar.
+
+    In addition to the usual state variable annotations, this also has a
+    capacity annotation which can be used to specify another state var to
+    read the capcity value from. The capacity state var should be a Float or
+    Double.
+    """
+
+    def __cinit__(self, object value=None,
+            {%- for pyname, cppname, typename in annotations -%}
+            {{typename}} {{pyname}}=None,
+            {%- endfor -%}str capacity=None, object _kind=None):
+        self.value = value
+        {% for pyname, cppname, _ in annotations -%}
+        self.{{cppname}} = {{pyname}}
+        {% endfor %}
+
+    def _init(self):
+        """This is a delayed initializer for setting the value to a new
+        instance of the resource buffer. The reason this exists is because
+        inventory instances are present on both agent classes and agent
+        instances. We want to make sure that
+
+        1. resource buffers (value) are not shared between the objects and
+           their agent class.
+        2. resource buffers are not shared between different instances of a
+           class.
+        3. The class should not actually have a resource buffer (value=None)
+
+        So agent objects, after copying inventories from their class to self,
+        should call this method to get a real resource buffer instance.
+        """
+        self.value = self._kind()
+
+    #
+    # Descriptor interface
+    #
+    def __get__(self, obj, cls):
+        return self.value
+
+    def __set__(self, obj, val):
+        self.value = val
+
+    cpdef dict to_dict(self):
+        """Returns a representation of this inventory as a dict."""
+        return {'value': self.value,
+            {%- for pyname, cppname, _ in annotations -%}
+            '{{pyname}}': self.{{cppname}},
+            {%- endfor -%}
+            'capacity': self.capacity,
+            }
+
+    cpdef Inventory copy(self):
+        """Copies the inventory into a new instance. Note that copying an
+        inventory does not copy the underlying resource buffer.
+        """
+        return Inventory(value=self.value,
+            {%- for pyname, cppname, _ in annotations -%}
+            {{pyname}}=self.{{cppname}},
+            {%- endfor -%}
+            capacity=self.capacity,
+            _kind=self._kind,
+            )
+
+
+{% for t in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
+cdef class {{tclassname}}Inv(Inventory):
+    """Inventory descriptor for {{ts.cpptypes[t]}}"""
+
+    def __cinit__(self, object value=None,
+            {%- for pyname, cppname, typename in annotations -%}{%- if pyname not in nonuser_annotations -%}
+            {{typename}} {{pyname}}=None,
+            {%- endif -%}{%- endfor -%}str capacity=None,):
+        self.value = value
+        {% for pyname, cppname, _ in annotations -%}
+        {% if pyname == 'type' %}
+        self.type = {{repr(ts.norms[t])}}
+        {% elif pyname == 'uniquetypeid' %}
+        self.uniquetypeid = {{ts.ids[t]}}
+        {%- else %}
+        self.{{cppname}} = {{pyname}}
+        {%- endif -%}{% endfor %}
+        self.capacity = capacity
+        self._kind = {{tclassname}}
+
+    cpdef {{tclassname}}Inv copy(self):
+        """Copies the {{tclassname}} into a new instance."""
+        return {{tclassname}}Inv(value=self.value,
+            {%- for pyname, cppname, _ in annotations -%}{%- if pyname not in nonuser_annotations -%}
+            {{pyname}}=self.{{cppname}},
+            {%- endif -%}{%- endfor -%}
+            capacity=self.capacity,
+            )
+
+{% endfor %}
 
 #
 # Helpers
@@ -1969,7 +2058,7 @@ cdef object any_to_py(cpp_cyclus.hold_any value)
 cdef class StateVar:
     cdef public object value
     {% for pyname, cppname, typename in annotations %}
-    cdef public {{typename}} {{cppname}}
+    cdef public {{typename}} {{pyname}} {% if pyname != cppname %}"{{cppname}}"{% endif %}
     {%- endfor %}
     cpdef dict to_dict(self)
     cpdef StateVar copy(self)
@@ -1978,6 +2067,22 @@ cdef class StateVar:
 cdef class {{tclassname}}(StateVar):
     cpdef {{tclassname}} copy(self)
 {% endif %}{% endfor %}
+
+
+cdef class Inventory:
+    cdef public object value
+    {% for pyname, cppname, typename in annotations %}
+    cdef public {{typename}} {{pyname}} {% if pyname != cppname %}"{{cppname}}"{% endif %}
+    {%- endfor %}
+    cdef public str capacity
+    cdef object _kind
+    cpdef dict to_dict(self)
+    cpdef Inventory copy(self)
+
+{% for t in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
+cdef class {{tclassname}}Inv(Inventory):
+    cpdef {{tclassname}}Inv copy(self)
+{% endfor %}
 
 ''')
 
