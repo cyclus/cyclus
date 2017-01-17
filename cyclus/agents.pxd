@@ -11,6 +11,8 @@ from cpython cimport PyObject
 from cyclus cimport cpp_jsoncpp
 from cyclus cimport cpp_cyclus
 from cyclus cimport lib
+from cyclus.cpp_cyclus cimport shared_ptr
+
 
 cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTRUCTORS CyclusAgentShim(cyclus::Context*)
     # Agent interface
@@ -115,6 +117,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # 
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&)
     void Tick()
     void Tock()
+    cpp_bool CheckDecommissionCondition()
+    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests()
+    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests()
     # Extra interface
     PyObject* self  # the Python object we are shimming
 

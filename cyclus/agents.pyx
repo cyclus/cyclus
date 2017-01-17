@@ -14,6 +14,7 @@ from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
 import json
 from inspect import getmro, getdoc
 from copy import deepcopy
+from collections import Mapping
 
 from cyclus cimport cpp_cyclus
 from cyclus.cpp_cyclus cimport shared_ptr
@@ -389,7 +390,31 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
     void Tock():
         (<object> this.self).tock()
 
+    cpp_bool CheckDecommissionCondition():
+        rtn = (<object> this.self).check_decomission_condition()
+        return bool_to_cpp(rtn)
 
+    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests():
+        pyportfolios = (<object> this.self).get_material_requests()
+        cdef std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] ports = \
+            std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]]()
+        if isinstance(pyportfolios, Mapping):
+            pyportfolios = [pyportfolios]
+        for pyport in pyportfolios:
+            normport = lib.normalize_request_portfolio(pyport)
+            ports.insert(ts.material_request_portfolio_to_cpp(normport, this))
+        return ports
+
+    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests():
+        pyportfolios = (<object> this.self).get_product_requests()
+        cdef std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] ports = \
+            std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]]()
+        if isinstance(pyportfolios, Mapping):
+            pyportfolios = [pyportfolios]
+        for pyport in pyportfolios:
+            normport = lib.normalize_request_portfolio(pyport)
+            ports.insert(ts.product_request_portfolio_to_cpp(normport, this))
+        return ports
 
 #
 # Wrapper classes
@@ -798,6 +823,24 @@ class Facility(_Facility, Agent):
         """
         pass
 
+    def check_decomission_condition(self):
+        """facilities over write this method if a condition must be met
+        before their destructors can be called. Return True means that
+        the facility is ready for decomission. False prevents decomission.
+        """
+        return True
+
+    def get_material_requests(self):
+        """Returns material requests for this agent on this time step.
+        This is meant to be overridden is subclasses.
+        """
+        return []
+
+    def get_product_requests(self):
+        """Returns product requests for this agent on this time step.
+        This is meant to be overridden is subclasses.
+        """
+        return []
 
 #
 # Tools

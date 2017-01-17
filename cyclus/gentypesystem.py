@@ -1986,6 +1986,35 @@ def prepare_type_representation(cpptype, othertype):
         return othertype
 
 
+{% for r in ts.resources %}{% set cyr = ts.cython_type(r) %}{% set rclsname = ts.classname(r) %}
+cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_request_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester):
+    cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] port = \
+        shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]](
+            new cpp_cyclus.RequestPortfolio[{{cyr}}]()
+            )
+    cdef std_string commod
+    cdef _{{rclsname}} targ
+    cdef shared_ptr[{{cyr}}] targ_ptr
+    # add requests
+    for name, reqs in pyport['commodities'].items():
+        commod = str_py_to_cpp(name)
+        for req in reqs:
+            targ = <_{{rclsname}}> req['target']
+            targ_ptr = reinterpret_pointer_cast[{{ts.cython_type(r)}},
+                                                cpp_cyclus.Resource](targ.ptx)
+            if req['cost'] is not None:
+                raise ValueError('setting cost functions from Python is not yet '
+                                 'supported.')
+            port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
+                                  req['exclusive'])
+    # add constraints
+    for constr in pyport['constraints']:
+        port.get().AddConstraint(
+            cpp_cyclus.CapacityConstraint[{{ts.cython_type(r)}}](constr))
+    return port
+
+{% endfor %}
+
 '''.lstrip())
 
 
@@ -2133,6 +2162,12 @@ cdef class {{tclassname}}Inv(Inventory):
     cpdef {{tclassname}}Inv copy(self)
 {% endfor %}
 
+#
+# Helpers
+#
+{% for r in ts.resources %}{% set cyr = ts.cython_type(r) %}{% set rclsname = ts.classname(r) %}
+cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_request_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester)
+{% endfor %}
 ''')
 
 def typesystem_pxd(ts, ns):
