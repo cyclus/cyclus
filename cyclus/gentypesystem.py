@@ -686,29 +686,29 @@ TO_CPP_CONVERTERS = {
 
 # annotation info key (pyname), C++ name,  cython type names, init snippet
 ANNOTATIONS = [
-    ('type', 'type', 'object'),
-    ('index', 'index', 'int'),
-    ('default', 'dflt', 'object'),
-    ('internal', 'internal', 'bint'),
-    ('shape', 'shape', 'object'),
-    ('doc', 'doc', 'str'),
-    ('tooltip', 'tooltip', 'str'),
-    ('units', 'units', 'str'),
-    ('userlevel', 'userlevel', 'int'),
-    ('alias', 'alias', 'object'),
-    ('uilabel', 'uilabel', 'str'),
-    ('uitype', 'uitype', 'object'),
-    ('range', 'range', 'object'),
-    ('categorical', 'categorical', 'object'),
-    ('schematype', 'schematype', 'object'),
-    ('initfromcopy', 'initfromcopy', 'str'),
-    ('initfromdb', 'initfromdb', 'str'),
-    ('infiletodb', 'infiletodb', 'str'),
-    ('schema', 'schema', 'str'),
-    ('snapshot', 'snapshot', 'str'),
-    ('snapshotinv', 'snapshotinv', 'str'),
-    ('initinv', 'initinv', 'str'),
-    ('uniquetypeid', 'uniquetypeid', 'int'),
+    ('type', 'type', 'object', 'None'),
+    ('index', 'index', 'int', '-1'),
+    ('default', 'dflt', 'object', 'None'),
+    ('internal', 'internal', 'bint', 'False'),
+    ('shape', 'shape', 'object', 'None'),
+    ('doc', 'doc', 'str', '""'),
+    ('tooltip', 'tooltip', 'str', '""'),
+    ('units', 'units', 'str', '""'),
+    ('userlevel', 'userlevel', 'int', '0'),
+    ('alias', 'alias', 'object', 'None'),
+    ('uilabel', 'uilabel', 'str', '""'),
+    ('uitype', 'uitype', 'object', 'None'),
+    ('range', 'range', 'object', 'None'),
+    ('categorical', 'categorical', 'object', 'None'),
+    ('schematype', 'schematype', 'object', 'None'),
+    ('initfromcopy', 'initfromcopy', 'str', '""'),
+    ('initfromdb', 'initfromdb', 'str', '""'),
+    ('infiletodb', 'infiletodb', 'str', '""'),
+    ('schema', 'schema', 'str', '""'),
+    ('snapshot', 'snapshot', 'str', '""'),
+    ('snapshotinv', 'snapshotinv', 'str', '""'),
+    ('initinv', 'initinv', 'str', '""'),
+    ('uniquetypeid', 'uniquetypeid', 'int', '-1'),
     ]
 
 
@@ -1807,12 +1807,12 @@ cdef class StateVar:
 
 
     def __cinit__(self, object value=None,
-            {%- for pyname, cppname, typename in annotations -%}
-            {{typename}} {{pyname}}=None,
+            {%- for pyname, cppname, typename, kwval in annotations -%}
+            {{typename}} {{pyname}}={{kwval}},
             {%- endfor -%}):
         self.value = value
-        {% for pyname, cppname, _ in annotations -%}
-        self.{{cppname}} = {{pyname}}
+        {% for pyname, cppname, _, _ in annotations -%}
+        self.{{pyname}} = {{pyname}}
         {% endfor %}
 
     #
@@ -1827,16 +1827,16 @@ cdef class StateVar:
     cpdef dict to_dict(self):
         """Returns a representation of this state variable as a dict."""
         return {'value': self.value,
-            {%- for pyname, cppname, _ in annotations -%}
-            '{{pyname}}': self.{{cppname}},
+            {%- for pyname, cppname, _, _ in annotations -%}
+            '{{pyname}}': self.{{pyname}},
             {%- endfor -%}
             }
 
     cpdef StateVar copy(self):
         """Copies the state variable into a new instance."""
         return StateVar(value=self.value,
-            {%- for pyname, cppname, _ in annotations -%}
-            {{pyname}}=self.{{cppname}},
+            {%- for pyname, cppname, _, _ in annotations -%}
+            {{pyname}}=self.{{pyname}},
             {%- endfor -%}
             )
 
@@ -1845,24 +1845,24 @@ cdef class {{tclassname}}(StateVar):
     """State variable descriptor for {{ts.cpptypes[t]}}"""
 
     def __cinit__(self, object value=None,
-            {%- for pyname, cppname, typename in annotations -%}{%- if pyname not in nonuser_annotations -%}
-            {{typename}} {{pyname}}=None,
+            {%- for pyname, cppname, typename, kwval in annotations -%}{%- if pyname not in nonuser_annotations -%}
+            {{typename}} {{pyname}}={{kwval}},
             {%- endif -%}{%- endfor -%}):
         self.value = value
-        {% for pyname, cppname, _ in annotations -%}
+        {% for pyname, cppname, _, _ in annotations -%}
         {% if pyname == 'type' %}
         self.type = {{repr(ts.norms[t])}}
         {% elif pyname == 'uniquetypeid' %}
         self.uniquetypeid = {{ts.ids[t]}}
         {%- else %}
-        self.{{cppname}} = {{pyname}}
+        self.{{pyname}} = {{pyname}}
         {%- endif -%}{% endfor %}
 
     cpdef {{tclassname}} copy(self):
         """Copies the {{tclassname}} into a new instance."""
         return {{tclassname}}(value=self.value,
-            {%- for pyname, cppname, _ in annotations -%}{%- if pyname not in nonuser_annotations -%}
-            {{pyname}}=self.{{cppname}},
+            {%- for pyname, cppname, _, _ in annotations -%}{%- if pyname not in nonuser_annotations -%}
+            {{pyname}}=self.{{pyname}},
             {%- endif -%}{%- endfor -%}
             )
 
@@ -1880,12 +1880,12 @@ cdef class Inventory:
     """
 
     def __cinit__(self, object value=None,
-            {%- for pyname, cppname, typename in annotations -%}
-            {{typename}} {{pyname}}=None,
-            {%- endfor -%}str capacity=None, object _kind=None):
+            {%- for pyname, cppname, typename, kwval in annotations -%}
+            {{typename}} {{pyname}}={{kwval}},
+            {%- endfor -%}str capacity="", object _kind=None):
         self.value = value
-        {% for pyname, cppname, _ in annotations -%}
-        self.{{cppname}} = {{pyname}}
+        {% for pyname, cppname, _, _ in annotations -%}
+        self.{{pyname}} = {{pyname}}
         {% endfor %}
 
     def _init(self):
@@ -1917,8 +1917,8 @@ cdef class Inventory:
     cpdef dict to_dict(self):
         """Returns a representation of this inventory as a dict."""
         return {'value': self.value,
-            {%- for pyname, cppname, _ in annotations -%}
-            '{{pyname}}': self.{{cppname}},
+            {%- for pyname, cppname, _, _ in annotations -%}
+            '{{pyname}}': self.{{pyname}},
             {%- endfor -%}
             'capacity': self.capacity,
             }
@@ -1928,7 +1928,7 @@ cdef class Inventory:
         inventory does not copy the underlying resource buffer.
         """
         return Inventory(value=self.value,
-            {%- for pyname, cppname, _ in annotations -%}
+            {%- for pyname, cppname, _, _ in annotations -%}
             {{pyname}}=self.{{cppname}},
             {%- endfor -%}
             capacity=self.capacity,
@@ -1941,17 +1941,17 @@ cdef class {{tclassname}}Inv(Inventory):
     """Inventory descriptor for {{ts.cpptypes[t]}}"""
 
     def __cinit__(self, object value=None,
-            {%- for pyname, cppname, typename in annotations -%}{%- if pyname not in nonuser_annotations -%}
-            {{typename}} {{pyname}}=None,
-            {%- endif -%}{%- endfor -%}str capacity=None,):
+            {%- for pyname, cppname, typename, kwval in annotations -%}{%- if pyname not in nonuser_annotations -%}
+            {{typename}} {{pyname}}={{kwval}},
+            {%- endif -%}{%- endfor -%}str capacity="",):
         self.value = value
-        {% for pyname, cppname, _ in annotations -%}
+        {% for pyname, cppname, _, _ in annotations -%}
         {% if pyname == 'type' %}
         self.type = {{repr(ts.norms[t])}}
         {% elif pyname == 'uniquetypeid' %}
         self.uniquetypeid = {{ts.ids[t]}}
         {%- else %}
-        self.{{cppname}} = {{pyname}}
+        self.{{pyname}} = {{pyname}}
         {%- endif -%}{% endfor %}
         self.capacity = capacity
         self._kind = {{tclassname}}
@@ -1959,8 +1959,8 @@ cdef class {{tclassname}}Inv(Inventory):
     cpdef {{tclassname}}Inv copy(self):
         """Copies the {{tclassname}} into a new instance."""
         return {{tclassname}}Inv(value=self.value,
-            {%- for pyname, cppname, _ in annotations -%}{%- if pyname not in nonuser_annotations -%}
-            {{pyname}}=self.{{cppname}},
+            {%- for pyname, cppname, _, _ in annotations -%}{%- if pyname not in nonuser_annotations -%}
+            {{pyname}}=self.{{pyname}},
             {%- endif -%}{%- endfor -%}
             capacity=self.capacity,
             )
@@ -2139,7 +2139,7 @@ cdef object any_to_py(cpp_cyclus.hold_any value)
 
 cdef class StateVar:
     cdef public object value
-    {% for pyname, cppname, typename in annotations %}
+    {% for pyname, cppname, typename, _ in annotations %}
     cdef public {{typename}} {{pyname}} {% if pyname != cppname %}"{{cppname}}"{% endif %}
     {%- endfor %}
     cpdef dict to_dict(self)
@@ -2153,7 +2153,7 @@ cdef class {{tclassname}}(StateVar):
 
 cdef class Inventory:
     cdef public object value
-    {% for pyname, cppname, typename in annotations %}
+    {% for pyname, cppname, typename, _ in annotations %}
     cdef public {{typename}} {{pyname}} {% if pyname != cppname %}"{{cppname}}"{% endif %}
     {%- endfor %}
     cdef public str capacity
