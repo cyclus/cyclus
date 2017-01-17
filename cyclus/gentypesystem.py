@@ -1233,13 +1233,15 @@ cdef class _{{tclassname}}:
         """The quantity of space remaining in this store."""
         return self.ptx.space()
 
-    def pop_qty(self, double quantity, double esp=None):
-        """Pops the specified quantity of resources from the buffer."""
+    def pop_qty(self, double quantity, double eps=-1.0):
+        """Pops the specified quantity of resources from the buffer.
+        Negative eps values are ignored (default).
+        """
         cdef cpp_cyclus.Manifest manifest
-        if esp is None:
+        if eps < 0.0:
             manifest = self.ptx.PopQty(quantity)
         else:
-            manifest = self.ptx.PopQty(quantity, esp)
+            manifest = self.ptx.PopQty(quantity, eps)
         rtn = manifest_to_py(manifest)
         return rtn
 
