@@ -90,6 +90,34 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
+
+# Can't inherit from CyclusAgentShim due to diamond problem and
+# no way to avoid it in Cython. Also, due to cyclus, this **must be**
+# a region.
+cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # C++CONSTRUCTORS CyclusFacilityShim(cyclus::Context*)
+    # Agent interface
+    CyclusFacilityShim(cpp_cyclus.Context*)
+    std_string version()
+    cpp_cyclus.Agent* Clone()
+    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
+    void InitFromAgent "InitFrom" (CyclusFacilityShim*)
+    void InitFrom(cpp_cyclus.QueryableBackend*)
+    void Snapshot(cpp_cyclus.DbInit)
+    void InitInv(cpp_cyclus.Inventories&)
+    cpp_cyclus.Inventories SnapshotInv()
+    std_string schema()
+    cpp_jsoncpp.Value annotations()
+    void Build(cpp_cyclus.Agent*)
+    void EnterNotify()
+    void BuildNotify()
+    void DecomNotify()
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&)
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&)
+    void Tick()
+    void Tock()
+    # Extra interface
+    PyObject* self  # the Python object we are shimming
+
 #
 # Wrappers
 #
@@ -113,6 +141,13 @@ ctypedef CyclusInstitutionShim* institution_shim_ptr
 cdef class _Institution(lib._Agent):
     # pointer declared on full backend, but that is untyped, shim is typed
     cdef institution_shim_ptr shim
+
+
+ctypedef CyclusFacilityShim* facility_shim_ptr
+
+cdef class _Facility(lib._Agent):
+    # pointer declared on full backend, but that is untyped, shim is typed
+    cdef facility_shim_ptr shim
 
 
 cdef tuple index_and_sort_vars(dict)
