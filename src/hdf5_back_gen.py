@@ -2311,14 +2311,18 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
         if spec == 'TO_BUF':
             node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
                                                   name=Var(name="buf"))))
-            node.nodes.append(ExprStmt(child=Assign(target=Var(name="buf.len"),
-                                                    value=Raw(code="x.size()"))))
+            node.nodes.append(ExprStmt(child=Assign(
+                                                   target=Var(name="buf.len"),
+                                                   value=Raw(code="x.size()"))))
         elif spec == 'TO_VAL':
             val = get_variable('x', depth=depth, prefix=prefix)
             node.nodes.append(ExprStmt(child=Decl(type=t, name=Var(name=val))))
-            node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp='char*'),
-                                                        target=Var(name='p'),
-                                                        value=Raw(code='reinterpret_cast<char*>(buf.p)'))))
+            node.nodes.append(ExprStmt(child=DeclAssign(
+                                                type=Type(cpp='char*'),
+                                                target=Var(name='p'),
+                                                value=reinterpret_cast(
+                                                              Type(cpp='char'), 
+                                                              'buf.p'))))
     child_sizes = OrderedDict()
     container = t.canon[0]
     prefixes = template_args[container]
@@ -2341,8 +2345,10 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
             child_sizes[variable] = "CYCLUS_SHA1_SIZE"
             vl_list.append(1)
         else:
-            child_sizes[variable] = get_variable("total_item_size", depth+1, prefix=prefix+p)
-            new_node, new_list = to_from_buf_setup(child_node, depth=depth+1, prefix=prefix+p)
+            child_sizes[variable] = get_variable("total_item_size", depth+1, 
+                                                 prefix=prefix+p)
+            new_node, new_list = to_from_buf_setup(child_node, depth=depth+1, 
+                                                   prefix=prefix+p)
             node.nodes.append(new_node)
             vl_list.append(new_list)
     for k, v in child_sizes.items():
@@ -2357,11 +2363,15 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
                                            code="+".join(child_sizes.keys())))))
     if depth == 0:
         if spec == 'TO_BUF':
-            node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
-                                                        target=Var(name="nbytes"),
-                                                        value=Raw(code=total_var+"*buf.len"))))
-            node.nodes.append(ExprStmt(child=Assign(target=Var(name="buf.p"),
-                                                    value=Raw(code="new char[nbytes]"))))
+            node.nodes.append(ExprStmt(child=DeclAssign(
+                                                  type=Type(cpp="size_t"),
+                                                  target=Var(name="nbytes"),
+                                                  value=Raw(code=total_var
+                                                                 +"*buf.len"))))
+            node.nodes.append(ExprStmt(child=Assign(
+                                              target=Var(name="buf.p"),
+                                              value=Raw(
+                                                     code="new char[nbytes]"))))
     return node, vl_list
 
 def to_buf_body(t, vl_list, depth=0, prefix="", variable=None, 
@@ -2376,15 +2386,17 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
     new_offset = offset
     if t.canon[0] in variable_length_types:
         count_var = get_variable("count", depth=depth, prefix=prefix)
-        block.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
+        block.nodes.append(ExprStmt(child=DeclAssign(type=Type(
+                                                            cpp="unsigned int"),
                                                      target=Var(name=count_var),
                                                      value=Raw(code="0"))))
         iter_var = get_variable("it", depth=depth, prefix=prefix)
-        block.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp=t.cpp
-                                                                   +"::const_iterator"),
-                                                     target=Var(name=iter_var),
-                                                     value=Raw(code=variable 
-                                                                    +".begin()"))))                
+        block.nodes.append(ExprStmt(child=DeclAssign(
+                                             type=Type(cpp=t.cpp
+                                                           +"::const_iterator"),
+                                             target=Var(name=iter_var),
+                                             value=Raw(code=variable
+                                                            +".begin()"))))                
         new_variable = iter_var
         labels = ['->first', '->second']
         new_offset += "+(" + total_size_var + "*" + count_var + ")"
@@ -2402,12 +2414,15 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
             loop_block.nodes.append(vl_write(ORIGIN_TO_VL[child], child_var, 
                                              depth=depth+1, prefix=prefix+part))
             key_var = get_variable("key", depth=depth+1, prefix=prefix+part)
-            loop_block.nodes.append(memcpy(new_offset, key_var+".val", item_size))
+            loop_block.nodes.append(memcpy(new_offset, key_var+".val", 
+                                           item_size))
         elif vl == 0:
-            loop_block.nodes.append(memcpy(new_offset, "&("+child_var+")", item_size))
+            loop_block.nodes.append(memcpy(new_offset, "&("+child_var+")", 
+                                          item_size))
         else:
             loop_block.nodes.append(to_buf_body(child_node, vl, depth=depth+1,
-                                    prefix=prefix+part, variable=child_var, offset=new_offset))
+                                    prefix=prefix+part, variable=child_var, 
+                                    offset=new_offset))
         new_offset += "+" + item_size
             
     if t.canon[0] in variable_length_types:    
@@ -2416,9 +2431,9 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
                                incr=Raw(code="++"+iter_var),
                                body=[loop_block, 
                                      ExprStmt(child=LeftUnaryOp(
-                                                          op="++", 
-                                                          name=Var(
-                                                                name=count_var)))]))
+                                                      op="++", 
+                                                      name=Var(
+                                                            name=count_var)))]))
     else:
         block.nodes.append(loop_block)
     if depth == 0:
@@ -2469,8 +2484,12 @@ def vl_read(t, offset):
                     args=[Raw(code=offset)])
     return node
 
-def reinterpret_cast(t, offset):
-    node = FuncCall(name=Var(name='*reinterpret_cast'), 
+def reinterpret_cast(t, offset, deref=False):
+    if deref:
+        func_name = '*reinterpret_cast'
+    else:
+        func_name = 'reinterpret_cast'
+    node = FuncCall(name=Var(name=func_name), 
                     targs=[Raw(code=t.cpp+'*')], args=[Raw(code=offset)])
     return node
 
@@ -2478,7 +2497,8 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
     block = Block(nodes=[])
     child_count = 0
     args = {}
-    total_item_size = get_variable('total_item_size', depth=depth, prefix=prefix)
+    total_item_size = get_variable('total_item_size', depth=depth, 
+                                   prefix=prefix)
     count = get_variable('count', depth=depth, prefix=prefix)
     if offset == None:
         offset = 'p+' + "(" + total_item_size + '*' + count + ")"
@@ -2488,36 +2508,48 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
     for child, part, vl in zip(t.canon[1:], template_args[t.canon[0]], vl_list):
         type_node = CANON_TO_NODE[child]
         child_var = get_variable('x', depth=depth+1, prefix=prefix+part)
-        child_size = get_variable('item_size', depth=depth+1, prefix=prefix+part)
+        child_size = get_variable('item_size', depth=depth+1, 
+                                  prefix=prefix+part)
         child_arg = 'child' + str(child_count)
         if vl == 1:
-            loop_block.nodes.append(ExprStmt(child=DeclAssign(type=type_node,
-                                                              target=Var(name=child_var),
-                                                              value=vl_read(type_node, offset))))
+            loop_block.nodes.append(ExprStmt(child=DeclAssign(
+                                                     type=type_node,
+                                                     target=Var(name=child_var),
+                                                     value=vl_read(type_node, 
+                                                                   offset))))
         elif vl == 0:
-            loop_block.nodes.append(ExprStmt(child=DeclAssign(type=type_node,
-                                                              target=Var(name=child_var),
-                                                              value=reinterpret_cast(type_node, offset))))
+            loop_block.nodes.append(ExprStmt(child=DeclAssign(
+                                                     type=type_node,
+                                                     target=Var(name=child_var),
+                                                     value=reinterpret_cast(
+                                                                  type_node, 
+                                                                  offset,
+                                                                  deref=True))))
         else:
-            loop_block.nodes.append(ExprStmt(child=Decl(type=type_node,
-                                                        name=Var(name=child_var))))
+            loop_block.nodes.append(ExprStmt(child=Decl(
+                                                     type=type_node,
+                                                     name=Var(name=child_var))))
             loop_block.nodes.append(to_val_body(type_node, vl, depth=depth+1, 
-                                                prefix=prefix+part, offset=offset, 
+                                                prefix=prefix+part, 
+                                                offset=offset, 
                                                 variable=child_var))
         args[child_arg] = child_var
         offset += "+" + child_size
         child_count += 1
+    container_expr = CONTAINER_INSERT_STRINGS[container].format(**args)
     if container in variable_length_types:
-        block.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp='unsigned int'),
+        block.nodes.append(ExprStmt(child=DeclAssign(type=Type(
+                                                            cpp='unsigned int'),
                                                      target=Var(name=count),
                                                      value=Raw(code='0'))))
-        block.nodes.append(For(cond=BinOp(x=Var(name=count), op='<', y=Var(name='buf.len')),
+        block.nodes.append(For(cond=BinOp(x=Var(name=count), op='<', 
+                                          y=Var(name='buf.len')),
                                incr=Raw(code='++'+count),
                                body=[loop_block, 
-                                     ExprStmt(child=Raw(code=CONTAINER_INSERT_STRINGS[container].format(**args)))]))
+                                     ExprStmt(child=Raw(code=container_expr))]))
     else:
         block.nodes.append(loop_block)
-        block.nodes.append(ExprStmt(child=Raw(code=CONTAINER_INSERT_STRINGS[container].format(**args))))
+        block.nodes.append(ExprStmt(child=Raw(code=container_expr)))
     if depth == 0:
         block.nodes.append(ExprStmt(child=Raw(code='return ' + variable)))
     return block
