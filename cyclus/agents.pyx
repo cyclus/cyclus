@@ -215,6 +215,93 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     void Tock():
         (<object> this.self).tock()
 
+
+cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institution):
+    # A C++ class that acts as a Institution. It implements the Institution virtual
+    # methods and dispatches the work to a Python/Cython object
+    # that is has a reference to, as needed.
+
+    CyclusInstitutionShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Institution(ctx)
+        pass
+
+    std_string version():
+        rtn = (<object> this.self).version
+        return str_py_to_cpp(rtn)
+
+    cpp_cyclus.Agent* Clone():
+        cdef lib._Context ctx = lib.Context(init=False)
+        (<lib._Context> ctx).ptx = this.context()
+        cdef _Institution a = type(<object> this.self)(ctx)
+        a.shim.InitFromAgent(this)
+        return a.shim
+
+    void InitFromAgent "InitFrom" (CyclusInstitutionShim* a):
+        cpp_cyclus.Institution.InitFromAgent(a)
+        (<object> a.self).init_from_agent(<object> this.self)
+
+    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
+        cpp_cyclus.Institution.InfileToDb(tree, di)
+        # wrap interface
+        cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
+        py_tree.ptx = tree
+        cdef lib._DbInit py_di = lib.DbInit(free=False)
+        py_di.ptx = &di
+        # call generic python
+        (<object> this.self).infile_to_db(py_tree, py_di)
+
+    void InitFrom(cpp_cyclus.QueryableBackend* b):
+        cpp_cyclus.Institution.InitFrom(b)
+        cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
+        res, _ = lib.query_result_to_py(qr)
+        # call generic python
+        (<object> this.self).init_from_dict(res)
+
+    void Snapshot(cpp_cyclus.DbInit di):
+        cdef lib._DbInit py_di = lib.DbInit(free=False)
+        py_di.ptx = &di
+        (<object> this.self).snapshot(py_di)
+
+    void InitInv(cpp_cyclus.Inventories& invs):
+        pyinvs = lib.inventories_to_py(invs)
+        (<object> this.self).init_inv(pyinvs)
+
+    cpp_cyclus.Inventories SnapshotInv():
+        pyinvs = (<object> this.self).snapshot_inv()
+        return lib.inventories_to_cpp(pyinvs)
+
+    std_string schema():
+        pyschema = (<object> this.self).schema
+        return str_py_to_cpp(pyschema)
+
+    cpp_jsoncpp.Value annotations():
+        pyanno = (<object> this.self).annotations_json
+        return lib.str_to_json_value(pyanno)
+
+    void Build(cpp_cyclus.Agent* parent):
+        pyrent = lib.agent_to_py(parent)
+        (<object> this.self).build(pyrent)
+
+    void EnterNotify():
+        (<object> this.self).enter_notify()
+
+    void BuildNotify():
+        (<object> this.self).build_notify()
+
+    void DecomNotify():
+        (<object> this.self).decom_notify()
+
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs):
+        (<object> this.self).adjust_material_prefs(None)
+
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
+        (<object> this.self).adjust_product_prefs(None)
+
+    void Tick():
+        (<object> this.self).tick()
+
+    void Tock():
+        (<object> this.self).tock()
+
 #
 # Wrapper classes
 #
@@ -557,6 +644,39 @@ class Region(_Region, Agent):
         overlaoded in the subclass.
         """
         pass
+
+
+cdef class _Institution(lib._Agent):
+
+    def __cinit__(self, lib._Context ctx):
+        self.ptx = self.shim = new CyclusInstitutionShim(ctx.ptx)
+        self._free = True
+        self.shim.self = <PyObject*> self
+
+
+class Institution(_Institution, Agent):
+    """Python Institution that is subclassable into a institution archetype.
+
+    Parameters
+    ----------
+    ctx : cyclus.lib.Context
+        The simulation execution context.  You don't normally
+        need to call the initilaizer.
+    """
+    entity = 'institution'
+
+    def tick(self):
+        """This function is called each time step and is meant to be
+        overlaoded in the subclass.
+        """
+        pass
+
+    def tock(self):
+        """This function is called each time step and is meant to be
+        overlaoded in the subclass.
+        """
+        pass
+
 
 #
 # Tools
