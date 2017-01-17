@@ -25,6 +25,12 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTR
     cpp_cyclus.Inventories SnapshotInv()
     std_string schema()
     cpp_jsoncpp.Value annotations()
+    void Build(cpp_cyclus.Agent*)
+    void EnterNotify()
+    void BuildNotify()
+    void DecomNotify()
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&)
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&)
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -45,6 +51,12 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):  # C++CON
     cpp_cyclus.Inventories SnapshotInv()
     std_string schema()
     cpp_jsoncpp.Value annotations()
+    void Build(cpp_cyclus.Agent*)
+    void EnterNotify()
+    void BuildNotify()
+    void DecomNotify()
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&)
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&)
     void Tick()
     void Tock()
     # Extra interface

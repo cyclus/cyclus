@@ -109,6 +109,25 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         pyanno = (<object> this.self).annotations_json
         return lib.str_to_json_value(pyanno)
 
+    void Build(cpp_cyclus.Agent* parent):
+        pyrent = lib.agent_to_py(parent)
+        (<object> this.self).build(pyrent)
+
+    void EnterNotify():
+        (<object> this.self).enter_notify()
+
+    void BuildNotify():
+        (<object> this.self).build_notify()
+
+    void DecomNotify():
+        (<object> this.self).decom_notify()
+
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs):
+        (<object> this.self).adjust_material_prefs(None)
+
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
+        (<object> this.self).adjust_product_prefs(None)
+
 
 cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     # A C++ class that acts as a Region. It implements the Region virtual
@@ -170,6 +189,25 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     cpp_jsoncpp.Value annotations():
         pyanno = (<object> this.self).annotations_json
         return lib.str_to_json_value(pyanno)
+
+    void Build(cpp_cyclus.Agent* parent):
+        pyrent = lib.agent_to_py(parent)
+        (<object> this.self).build(pyrent)
+
+    void EnterNotify():
+        (<object> this.self).enter_notify()
+
+    void BuildNotify():
+        (<object> this.self).build_notify()
+
+    void DecomNotify():
+        (<object> this.self).decom_notify()
+
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs):
+        (<object> this.self).adjust_material_prefs(None)
+
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
+        (<object> this.self).adjust_product_prefs(None)
 
     void Tick():
         (<object> this.self).tick()
@@ -451,6 +489,43 @@ class Agent(_Agent, lib.Agent):
             self._annotations_json = json.dumps(aj, separators=(',', ':'))
         return self._annotations_json
 
+    def build(self, parent):
+        """Called when the agent enters the smiulation as an active participant and
+        is only ever called once.  Agents should NOT register for services (such
+        as ticks/tocks and resource exchange) in this function. If agents implement
+        this function, they must call their superclass' Build function at the
+        BEGINING of their Build function.
+        """
+        pass
+
+    def enter_notify(self):
+        """Called to give the agent an opportunity to register for services (e.g.
+        ticks/tocks and resource exchange).  Note that this may be called more
+        than once, and so agents should track their registrations carefully. If
+        agents implement this function, they must call their superclass's
+        EnterNotify function at the BEGINNING of their EnterNotify function.
+        """
+        pass
+
+    def build_notify(self):
+        """Called when a new child of this agent has just been built. It is possible
+        for this function to be called before the simulation has started when
+        initially existing agents are being setup.
+        """
+        pass
+
+    def decom_notify(self):
+        """Called when a new child of this agent is about to be decommissioned."""
+        pass
+
+    def adjust_material_prefs(self, prefs):
+        """Product preferences adjustment."""
+        raise NotImplementedError("AdjustMatlPrefs has not yet been wrapped")
+
+    def adjust_produc_prefs(self, prefs):
+        """Product preferences adjustment."""
+        raise NotImplementedError("AdjustMatlPrefs has not yet been wrapped")
+
 
 cdef class _Region(lib._Agent):
 
@@ -483,6 +558,7 @@ class Region(_Region, Agent):
         """
         pass
 
+#
 # Tools
 #
 cdef tuple index_and_sort_vars(dict vars):
