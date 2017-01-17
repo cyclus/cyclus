@@ -1321,13 +1321,15 @@ cdef class _{{tclassname}}:
         """The quantity of space remaining in this store."""
         return self.ptx.space()
 
-    def pop(self, double qty=None, double eps=None):
-        """Pops one {{rcname}} object from the store."""
+    def pop(self, double qty=-1.0, double eps=-1.0):
+        """Pops one {{rcname}} object from the store. Neagtive values of qty and eps are
+        ignored.
+        """
         cdef _{{rcname}} r = {{rcname}}()
-        if qty is None:
+        if qty < 0.0:
             r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
                         self.ptx.Pop())
-        elif eps is None:
+        elif eps < 0.0:
             r.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
                         self.ptx.Pop(qty))
         else:
