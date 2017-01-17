@@ -163,14 +163,20 @@ cdef class _MemBack(lib._FullBackend):
                 return self._apply_conds(self.cache[table], conds)
         elif self.fallback is not None:
             if self.store_all_tables or table in self.registry:
-                t = self.fallback.query(table, conds=None)
+                try:
+                    t = self.fallback.query(table, conds=None)
+                except RuntimeError:
+                    return None
                 self.cache[table] = t
                 if conds is None:
                     return t
                 else:
                     return self._apply_conds(self.cache[table], conds)
             else:
-                return self.fallback.query(table, conds=conds)
+                try:
+                    return self.fallback.query(table, conds=conds)
+                except RuntimeError:
+                    return None
         else:
             return None
 
