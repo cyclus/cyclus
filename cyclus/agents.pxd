@@ -29,10 +29,42 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTR
     PyObject* self  # the Python object we are shimming
 
 
+# Can't inherit from CyclusAgentShim due to diamond problem and
+# no way to avoid it in Cython. Also, due to cyclus, this **must be**
+# a region.
+cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):  # C++CONSTRUCTORS CyclusRegionShim(cyclus::Context*)
+    # Agent interface
+    CyclusRegionShim(cpp_cyclus.Context*)
+    std_string version()
+    cpp_cyclus.Agent* Clone()
+    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit)
+    void InitFromAgent "InitFrom" (CyclusRegionShim*)
+    void InitFrom(cpp_cyclus.QueryableBackend*)
+    void Snapshot(cpp_cyclus.DbInit)
+    void InitInv(cpp_cyclus.Inventories&)
+    cpp_cyclus.Inventories SnapshotInv()
+    std_string schema()
+    cpp_jsoncpp.Value annotations()
+    void Tick()
+    void Tock()
+    # Extra interface
+    PyObject* self  # the Python object we are shimming
+
+#
+# Wrappers
+#
+
 ctypedef CyclusAgentShim* agent_shim_ptr
 
 cdef class _Agent(lib._Agent):
     # pointer declared on full backend, but that is untyped, shim is typed
     cdef agent_shim_ptr shim
+
+
+ctypedef CyclusRegionShim* region_shim_ptr
+
+cdef class _Region(lib._Agent):
+    # pointer declared on full backend, but that is untyped, shim is typed
+    cdef region_shim_ptr shim
 
 cdef tuple index_and_sort_vars(dict)

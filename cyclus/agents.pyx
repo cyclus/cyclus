@@ -45,6 +45,9 @@ _SCHEMA = SchemaFilter()
 #np.import_ufunc()
 
 
+#
+# Shims
+#
 cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     # A C++ class that acts as an Agent. It implements the Agent virtual
     # methods and dispatches the work to a Python/Cython object
@@ -69,16 +72,6 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<object> a.self).init_from_agent(<object> this.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
-        # check the kind so we don't need to override in subclasses.
-        #cdef std_string k = this.kind()
-        #if k == b"Region":
-        #    cpp_cyclus.Region.InfileToDb(tree, di)
-        #elif k == std_string("Inst"):
-        #    cpp_cyclus.Institution.InfileToDb(tree, di)
-        #elif k == std_string("Facility"):
-        #    cpp_cyclus.Facility.InfileToDb(tree, di)
-        #else:
-        #    cpp_cyclus.Agent.InfileToDb(tree, di)
         cpp_cyclus.Agent.InfileToDb(tree, di)
         # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
@@ -89,16 +82,6 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<object> this.self).infile_to_db(py_tree, py_di)
 
     void InitFrom(cpp_cyclus.QueryableBackend* b):
-        # check the kind so we don't need to override in subclasses.
-        #cdef std_string k = this.kind()
-        #if k == std_string("Region"):
-        #    cpp_cyclus.Region.InitFrom(b)
-        #elif k == std_string("Inst"):
-        #    cpp_cyclus.Institution.InitFrom(b)
-        #elif k == std_string("Facility"):
-        #    cpp_cyclus.Facility.InitFrom(b)
-        #else:
-        #    cpp_cyclus.Agent.InitFrom(b)
         cpp_cyclus.Agent.InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.query_result_to_py(qr)
@@ -111,30 +94,12 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<object> this.self).snapshot(py_di)
 
     void InitInv(cpp_cyclus.Inventories& invs):
-        cdef dict pyinvs = {}
-        cdef list value
-        cdef ts._Resource r
-        for name_value in invs:
-            name = std_string_to_py(name_value.first)
-            value = []
-            for x in name_value.second:
-                r = ts.Resource()
-                r.ptx = x
-                value.append(r)
-            pyinvs[name] = value
+        pyinvs = lib.inventories_to_py(invs)
         (<object> this.self).init_inv(pyinvs)
 
     cpp_cyclus.Inventories SnapshotInv():
         pyinvs = (<object> this.self).snapshot_inv()
-        cdef cpp_cyclus.Inventories invs = cpp_cyclus.Inventories()
-        cdef std_string name
-        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] value
-        for pyname, pyvalue in pyinvs.items():
-            name = str_py_to_cpp(pyname)
-            value = std_vector[shared_ptr[cpp_cyclus.Resource]]()
-            for r in pyvalue:
-                value.push_back((<ts._Resource> r).ptx)
-        return invs
+        return lib.inventories_to_cpp(pyinvs)
 
     std_string schema():
         pyschema = (<object> this.self).schema
@@ -142,15 +107,79 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
 
     cpp_jsoncpp.Value annotations():
         pyanno = (<object> this.self).annotations_json
-        cdef std_string anno = str_py_to_cpp(pyanno)
-        cdef cpp_jsoncpp.Value root
-        cdef cpp_jsoncpp.Reader reader
-        cdef cpp_bool parsed_ok = reader.parse(anno, root)
-        if not parsed_ok:
-            raise ValueError("annotation string is malformed")
-        return root
+        return lib.str_to_json_value(pyanno)
 
 
+cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
+    # A C++ class that acts as a Region. It implements the Region virtual
+    # methods and dispatches the work to a Python/Cython object
+    # that is has a reference to, as needed.
+
+    CyclusRegionShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Region(ctx)
+        pass
+
+    std_string version():
+        rtn = (<object> this.self).version
+        return str_py_to_cpp(rtn)
+
+    cpp_cyclus.Agent* Clone():
+        cdef lib._Context ctx = lib.Context(init=False)
+        (<lib._Context> ctx).ptx = this.context()
+        cdef _Region a = type(<object> this.self)(ctx)
+        a.shim.InitFromAgent(this)
+        return a.shim
+
+    void InitFromAgent "InitFrom" (CyclusRegionShim* a):
+        cpp_cyclus.Region.InitFromAgent(a)
+        (<object> a.self).init_from_agent(<object> this.self)
+
+    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
+        cpp_cyclus.Region.InfileToDb(tree, di)
+        # wrap interface
+        cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
+        py_tree.ptx = tree
+        cdef lib._DbInit py_di = lib.DbInit(free=False)
+        py_di.ptx = &di
+        # call generic python
+        (<object> this.self).infile_to_db(py_tree, py_di)
+
+    void InitFrom(cpp_cyclus.QueryableBackend* b):
+        cpp_cyclus.Region.InitFrom(b)
+        cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
+        res, _ = lib.query_result_to_py(qr)
+        # call generic python
+        (<object> this.self).init_from_dict(res)
+
+    void Snapshot(cpp_cyclus.DbInit di):
+        cdef lib._DbInit py_di = lib.DbInit(free=False)
+        py_di.ptx = &di
+        (<object> this.self).snapshot(py_di)
+
+    void InitInv(cpp_cyclus.Inventories& invs):
+        pyinvs = lib.inventories_to_py(invs)
+        (<object> this.self).init_inv(pyinvs)
+
+    cpp_cyclus.Inventories SnapshotInv():
+        pyinvs = (<object> this.self).snapshot_inv()
+        return lib.inventories_to_cpp(pyinvs)
+
+    std_string schema():
+        pyschema = (<object> this.self).schema
+        return str_py_to_cpp(pyschema)
+
+    cpp_jsoncpp.Value annotations():
+        pyanno = (<object> this.self).annotations_json
+        return lib.str_to_json_value(pyanno)
+
+    void Tick():
+        (<object> this.self).tick()
+
+    void Tock():
+        (<object> this.self).tock()
+
+#
+# Wrapper classes
+#
 cdef class _Agent(lib._Agent):
 
     def __cinit__(self, lib._Context ctx):
@@ -421,6 +450,38 @@ class Agent(_Agent, lib.Agent):
                 aj['tooltip'] = tt
             self._annotations_json = json.dumps(aj, separators=(',', ':'))
         return self._annotations_json
+
+
+cdef class _Region(lib._Agent):
+
+    def __cinit__(self, lib._Context ctx):
+        self.ptx = self.shim = new CyclusRegionShim(ctx.ptx)
+        self._free = True
+        self.shim.self = <PyObject*> self
+
+
+class Region(_Region, Agent):
+    """Python Region that is subclassable into a region archetype.
+
+    Parameters
+    ----------
+    ctx : cyclus.lib.Context
+        The simulation execution context.  You don't normally
+        need to call the initilaizer.
+    """
+    entity = 'region'
+
+    def tick(self):
+        """This function is called each time step and is meant to be
+        overlaoded in the subclass.
+        """
+        pass
+
+    def tock(self):
+        """This function is called each time step and is meant to be
+        overlaoded in the subclass.
+        """
+        pass
 
 # Tools
 #

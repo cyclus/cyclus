@@ -27,7 +27,10 @@ from cyclus cimport jsoncpp
 from cyclus import jsoncpp
 
 from cyclus cimport cpp_cyclus
+from cyclus.cpp_cyclus cimport shared_ptr
 from cyclus cimport cpp_typesystem
+from cyclus cimport typesystem as ts
+from cyclus import typesystem as ts
 from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
@@ -1126,6 +1129,36 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx):
     a.ptx = a_ptx
     return a
 
+
+cdef dict inventories_to_py(cpp_cyclus.Inventories& invs):
+    """Converts inverories map to a dict of lists of Resources."""
+    cdef dict pyinvs = {}
+    cdef list value
+    cdef ts._Resource r
+    for name_value in invs:
+        name = std_string_to_py(name_value.first)
+        value = []
+        for x in name_value.second:
+            r = ts.Resource()
+            r.ptx = x
+            value.append(r)
+        pyinvs[name] = value
+    return pyinvs
+
+
+cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs):
+    """Converts a dict of lists of resources to inventories."""
+    cdef cpp_cyclus.Inventories invs = cpp_cyclus.Inventories()
+    cdef std_string name
+    cdef std_vector[shared_ptr[cpp_cyclus.Resource]] value
+    for pyname, pyvalue in pyinvs.items():
+        name = str_py_to_cpp(pyname)
+        value = std_vector[shared_ptr[cpp_cyclus.Resource]]()
+        for r in pyvalue:
+            value.push_back((<ts._Resource> r).ptx)
+    return invs
+
+
 cdef class _Agent:
 
     def __cinit__(self, bint free=False):
@@ -1537,3 +1570,16 @@ def xml_to_py(s):
     cdef std_string cpp_rtn = cpp_cyclus.XmlToPy(cpp_s)
     rtn = std_string_to_py(cpp_rtn)
     return rtn
+
+#
+# Tools
+#
+cdef cpp_jsoncpp.Value str_to_json_value(object pyanno):
+    """Converts a string to a JSON tree."""
+    cdef std_string anno = str_py_to_cpp(pyanno)
+    cdef cpp_jsoncpp.Value root
+    cdef cpp_jsoncpp.Reader reader
+    cdef cpp_bool parsed_ok = reader.parse(anno, root)
+    if not parsed_ok:
+        raise ValueError("JSON string is malformed")
+    return root

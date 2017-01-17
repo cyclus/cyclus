@@ -11,6 +11,7 @@ from libc.stdlib cimport malloc, free
 from libcpp cimport bool as cpp_bool
 
 # local imports
+from cyclus cimport cpp_jsoncpp
 from cyclus cimport cpp_cyclus
 from cyclus.cpp_stringstream cimport stringstream
 
@@ -72,6 +73,8 @@ cdef class _SimInit:
 
 
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptr)
+cdef dict inventories_to_py(cpp_cyclus.Inventories& invs)
+cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs)
 
 cdef class _Agent:
     cdef void * ptx
@@ -88,3 +91,7 @@ cdef class _Context:
     cdef cpp_cyclus.Context * ptx
     cdef bint _free
 
+#
+# Tools
+#
+cdef cpp_jsoncpp.Value str_to_json_value(object pyanno)
