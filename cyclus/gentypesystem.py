@@ -1968,29 +1968,87 @@ cdef class {{tclassname}}Inv(Inventory):
 {% endfor %}
 
 #
-# Helpers
+# Requests
 #
-def prepare_type_representation(cpptype, othertype):
-    """Updates othertype to conform to the length of cpptype using None's.
-    """
-    cdef int i, n
-    if not isinstance(cpptype, str):
-        n = len(cpptype)
-        if isinstance(othertype, str):
-            othertype = [othertype]
-        if othertype is None:
-            othertype = [None] * n
-        elif len(othertype) < n:
-            othertype.extend([None] * (n - len(othertype)))
-        # recurse down
-        for i in range(1, n):
-            othertype[i] = prepare_type_representation(cpptype[i], othertype[i])
-        return othertype
-    else:
-        return othertype
 
 
-{% for r in ts.resources %}{% set cyr = ts.cython_type(r) %}{% set rclsname = ts.classname(r) %}
+{% for r in ts.resources %}
+{% set cyr = ts.cython_type(r) %}
+{% set rclsname = ts.classname(r) %}
+{% set rfname = ts.funcname(r) %}
+
+cdef class _{{rclsname}}Request:
+
+    def __cinit__(self):
+        self._target = None
+        self._requester = None
+        self._commodity = None
+        self._preference = None
+        self._exclusive = None
+        self._cost_function = None
+
+    @property
+    def target(self):
+        """This request's target {{rfname}}"""
+        if self._target is not None:
+            return self._target
+        cdef _{{rclsname}} r = {{rclsname}}()
+        r.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
+                                                    {{cyr}}](
+                    self.ptx.target())
+        self._target = r
+        return self._target
+
+    @property
+    def requester(self):
+        """This request's agent"""
+        if self._requester is not None:
+            return self._requester
+        cdef lib._Agent a = lib.Agent()
+        a.ptx = <void*> self.ptx.requester()
+        self._requester = a
+        return self._requester
+
+    @property
+    def commodity(self):
+        """This request's commodity"""
+        if self._commodity is not None:
+            return self._commodity
+        cdef std_string c = self.ptx.commodity()
+        self._commodity = std_string_to_py(c)
+        return self._commodity
+
+    @property
+    def preference(self):
+        """This request's preference"""
+        if self._preference is not None:
+            return self._preference
+        self._preference = self.ptx.preference()
+        return self._preference
+
+    @property
+    def exclusive(self):
+        """This request's exclusivity"""
+        if self._exclusive is not None:
+            return self._exclusive
+        self._exclusive = bool_to_py(self.ptx.exclusive())
+        return self._exclusive
+
+    @property
+    def cost_function(self):
+        """This request's cost function"""
+        raise RuntimeError("Cost functions are not yet supported in the Python "
+                           "bindings.")
+        #if self._cost_function is not None:
+        #    return self._cost_function
+        #self._cost_function = self.ptx.cost_function()
+        #return self._cost_function
+
+
+class {{rclsname}}Request(_{{rclsname}}Request):
+    """An representation of a request for a {{rfname}}"""
+
+
 cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_request_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester):
     cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] port = \
         shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]](
@@ -2018,6 +2076,30 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
     return port
 
 {% endfor %}
+
+
+#
+# Helpers
+#
+def prepare_type_representation(cpptype, othertype):
+    """Updates othertype to conform to the length of cpptype using None's.
+    """
+    cdef int i, n
+    if not isinstance(cpptype, str):
+        n = len(cpptype)
+        if isinstance(othertype, str):
+            othertype = [othertype]
+        if othertype is None:
+            othertype = [None] * n
+        elif len(othertype) < n:
+            othertype.extend([None] * (n - len(othertype)))
+        # recurse down
+        for i in range(1, n):
+            othertype[i] = prepare_type_representation(cpptype[i], othertype[i])
+        return othertype
+    else:
+        return othertype
+
 
 '''.lstrip())
 
@@ -2167,9 +2249,22 @@ cdef class {{tclassname}}Inv(Inventory):
 {% endfor %}
 
 #
-# Helpers
+# Requests
 #
-{% for r in ts.resources %}{% set cyr = ts.cython_type(r) %}{% set rclsname = ts.classname(r) %}
+{% for r in ts.resources %}
+{% set cyr = ts.cython_type(r) %}
+{% set rclsname = ts.classname(r) %}
+{% set rfname = ts.funcname(r) %}
+cdef class _{{rclsname}}Request:
+    cdef cpp_cyclus.Request[{{cyr}}]* ptx
+    cdef object _target
+    cdef object _requester
+    cdef object _commodity
+    cdef object _preference
+    cdef object _exclusive
+    cdef object _cost_function
+
+
 cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_request_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester)
 {% endfor %}
 ''')

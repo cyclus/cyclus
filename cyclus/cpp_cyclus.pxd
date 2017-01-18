@@ -444,6 +444,7 @@ cdef extern from "request.h" namespace "cyclus":
                            cost_function_t)
         shared_ptr[T] target()
         Trader* requester()
+        std_string commodity()
         double preference()
         shared_ptr[RequestPortfolio[T]] portfolio()
         cpp_bool exclusive()
