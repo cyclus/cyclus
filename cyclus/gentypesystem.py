@@ -2044,6 +2044,9 @@ cdef class _{{rclsname}}Request:
         #self._cost_function = self.ptx.cost_function()
         #return self._cost_function
 
+    def __hash__(self):
+        return (<size_t> self.ptx)
+
 
 class {{rclsname}}Request(_{{rclsname}}Request):
     """An representation of a request for a {{rfname}}"""
@@ -2110,6 +2113,83 @@ cdef shared_ptr[cpp_cyclus.BidPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_bid_portf
         port.get().AddConstraint(
             cpp_cyclus.CapacityConstraint[{{ts.cython_type(r)}}](constr))
     return port
+
+
+cdef class _{{rclsname}}Bid:
+
+    def __cinit__(self):
+        self._request = None
+        self._offer = None
+        self._bidder = None
+        self._preference = None
+        self._exclusive = None
+
+
+    @property
+    def request(self):
+        """This bids request."""
+        if self._request is not None:
+            return self._request
+        cdef _{{rclsname}}Request req = {{rclsname}}Request()
+        req.ptx = self.ptx.request()
+        self._request = req
+        return self._request
+
+    @property
+    def offer(self):
+        """This bid's offer {{rfname}}"""
+        if self._offer is not None:
+            return self._offer
+        cdef _{{rclsname}} r = {{rclsname}}()
+        r.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
+                                                    {{cyr}}](
+                    self.ptx.offer())
+        self._offer = r
+        return self._offer
+
+    @property
+    def requester(self):
+        """This bid's requester"""
+        return self.request.requester
+
+    @property
+    def bidder(self):
+        """This bid's agent"""
+        if self._bidder is not None:
+            return self._bidder
+        cdef lib._Agent a = lib.Agent()
+        a.ptx = <void*> self.ptx.bidder()
+        self._bidder = a
+        return self._bidder
+
+    @property
+    def commodity(self):
+        """This bid's commodity"""
+        return self.request._commodity
+
+    @property
+    def preference(self):
+        """This bid's preference"""
+        if self._preference is not None:
+            return self._preference
+        self._preference = self.ptx.preference()
+        return self._preference
+
+    @property
+    def exclusive(self):
+        """This bid's exclusivity"""
+        if self._exclusive is not None:
+            return self._exclusive
+        self._exclusive = bool_to_py(self.ptx.exclusive())
+        return self._exclusive
+
+    def __hash__(self):
+        return (<size_t> self.ptx)
+
+
+class {{rclsname}}Bid(_{{rclsname}}Bid):
+    """An representation of a bid for a {{rfname}}"""
+
 
 {% endfor %}
 
@@ -2303,6 +2383,15 @@ cdef class _{{rclsname}}Request:
 cdef dict {{rfname}}_commod_map_to_py(cpp_cyclus.CommodMap[{{cyr}}].type& m)
 cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_request_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester)
 cdef shared_ptr[cpp_cyclus.BidPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_bid_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester)
+
+cdef class _{{rclsname}}Bid:
+    cdef cpp_cyclus.Bid[{{cyr}}]* ptx
+    cdef object _request
+    cdef object _offer
+    cdef object _bidder
+    cdef object _preference
+    cdef object _exclusive
+
 {% endfor %}
 ''')
 
