@@ -263,6 +263,10 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("nuc-data", "print the path to cyclus_nuc_data.h5")
       ("json-to-xml", po::value<std::string>(), "*.json input file")
       ("xml-to-json", po::value<std::string>(), "*.xml input file")
+      ("json-to-py", po::value<std::string>(), "*.json input file")
+      ("py-to-json", po::value<std::string>(), "*.py input file")
+      ("py-to-xml", po::value<std::string>(), "*.py input file")
+      ("xml-to-py", po::value<std::string>(), "*.xml input file")
       ;
 
   po::variables_map vm;
@@ -415,6 +419,46 @@ int EarlyExitArgs(const ArgInfo& ai) {
       std::stringstream input;
       LoadRawStringstreamFromFile(input, infile);
       std::cout << cyclus::toolkit::XmlToJson(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("json-to-py")) {
+    std::string infile(ai.vm["json-to-py"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadRawStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::JsonToPy(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("py-to-json")) {
+    std::string infile(ai.vm["py-to-json"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadRawStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::PyToJson(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("py-to-xml")) {
+    std::string infile(ai.vm["py-to-xml"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadRawStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::PyToXml(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("xml-to-py")) {
+    std::string infile(ai.vm["xml-to-py"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadRawStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::XmlToPy(input.str());
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
     }

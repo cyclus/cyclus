@@ -14,9 +14,9 @@ import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
 
-def make_rec_back():
+def make_rec_back(inject_sim_id=False):
     """Makes a new recorder and backend."""
-    rec = lib.Recorder(inject_sim_id=False)
+    rec = lib.Recorder(inject_sim_id=inject_sim_id)
     back = memback.MemBack()
     rec.register_backend(back)
     return rec, back
@@ -34,8 +34,27 @@ def test_simple():
     exp = pd.DataFrame({"col0": [1], "col1": [42.0], "col2": ["wakka"]},
                        columns=['col0', 'col1', 'col2'])
     obs = back.query("test")
-    assert_frame_equal(exp, obs)
+    yield assert_frame_equal, exp, obs
     rec.close()
+
+    # test covert to JSON
+    yield assert_is_instance, obs.to_json(), str
+
+
+def test_simple_with_sim_id():
+    rec, back = make_rec_back(inject_sim_id=True)
+    d = rec.new_datum("test")
+    d.add_val("col0", 1, dbtype=ts.INT)
+    d.add_val("col1", 42.0, dbtype=ts.DOUBLE)
+    d.add_val("col2", "wakka", dbtype=ts.VL_STRING)
+    d.record()
+    rec.flush()
+
+    obs = back.query("test")
+    rec.close()
+
+    # test covert to JSON
+    yield assert_is_instance, obs.to_json(default_handler=str), str
 
 
 def test_many_rows_one_table():
@@ -346,6 +365,9 @@ def test_query():
                            ('col2', '!=', 'wakka')])
     yield assert_equal, 2, len(obs)
     yield assert_frame_equal, x[(x.col1 < 42.0*6.0) & (x.col1 >= 42.0*3.1)], obs
+
+    # test convert to JSON
+    obs.to_json()
 
 
 

@@ -223,6 +223,12 @@ cdef extern from "pyhooks.h" namespace "cyclus":
     cdef void PyInitHooks() except +
 
 
+cdef extern from "pyhooks.h" namespace "cyclus::toolkit":
+
+    cdef std_string PyToJson(std_string) except +
+    cdef std_string JsonToPy(std_string) except +
+
+
 cdef extern from "xml_file_loader.h" namespace "cyclus":
 
     cdef void LoadStringstreamFromFile(stringstream&, std_string)
@@ -327,4 +333,6 @@ cdef extern from "toolkit/infile_converters.h" namespace "cyclus::toolkit":
 
     cdef std_string JsonToXml(std_string) except +
     cdef std_string XmlToJson(std_string) except +
+    cdef std_string PyToXml(std_string) except +
+    cdef std_string XmlToPy(std_string) except +
 

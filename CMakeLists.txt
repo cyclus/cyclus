@@ -102,6 +102,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/cmake")
 
     # Include macros
+    INCLUDE(CopyWhenDiffMacro)
     INCLUDE(UseCyclus)
 
     # set configuration for all library builds

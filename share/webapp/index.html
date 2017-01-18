@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cyclus WebApp Demo</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      }
+    th, td {
+      padding: 5px;
+      }
+</style>
+</head>
+<body>
+  <script src="ws_events_dispatcher.js"></script>
+  <script>
+    /* New connection to server and other global varaibles */
+    var ws = new EventsDispatcher("ws://127.0.0.1:4242/");
+
+    /* Some helper functions */
+    var replaceList = function(elem, vals) {
+      while (elem.hasChildNodes()) {
+        elem.removeChild(elem.firstChild);
+      }
+      for (var i = 0; i < vals.length; i++) {
+        var li_elem = document.createElement('li');
+        var content = document.createTextNode(vals[i]);
+        li_elem.appendChild(content);
+        elem.appendChild(li_elem);
+      }
+    };
+
+    var removeChildrenByTag = function (elem, tagname) {
+      var kids = elem.getElementsByTagName(tagname);
+      var nkids = kids.length;
+      for (var x=nkids-1; x>=0; x--) {
+        elem.removeChild(kids[x]);
+      }
+    };
+
+    var makeRow = function(vals, tag) {
+      var row = document.createElement('tr');
+      for (var i = 0; i < vals.length; i++) {
+        var col = document.createElement(tag);
+        var colText = document.createTextNode(vals[i]);
+        col.appendChild(colText);
+        row.appendChild(col);
+      }
+      return row;
+    };
+
+
+    /* Heartbeat handling code */
+
+    var heartbeatNoPulse = function () {
+      var hb = document.getElementById('heartbeat');
+      hb.innerHTML = "Disconected ";
+    };
+
+    var heartbeatTimeout = setTimeout(heartbeatNoPulse, 1);
+
+    ws.bind('heartbeat', function (event) {
+        clearTimeout(heartbeatTimeout);
+        var hb = document.getElementById('heartbeat');
+        hb.innerHTML = "Conected ";
+        heartbeatTimeout = setTimeout(heartbeatNoPulse, 1500*event.data);
+    });
+
+
+    /* table data handling */
+
+    ws.bind('table_data', function (event) {
+      var tdnElem = document.getElementById('tableDataName');
+      tdnElem.innerHTML = event.params.table;
+      var tdElem = document.getElementById('tableData');
+      while(tdElem.rows.length > 0) {
+        tdElem.deleteRow(0);
+      }
+      /* put headers in */
+      var headerRow = makeRow(event.data.columns, 'th');
+      tdElem.appendChild(headerRow);
+      /* put data in */
+      for (var n=0; n < event.data.data.length; n++) {
+        var dataRow = makeRow(event.data.data[n], 'td');
+        tdElem.appendChild(dataRow);
+      };
+    });
+
+
+    /* bind other event names to functions when recieved */
+
+    ws.bind('table_names', function (event) {
+      var elem = document.getElementById('tableNamesList');
+      replaceList(elem, event.data);
+    });
+
+    ws.bind('registry', function (event) {
+      var reg = document.getElementById('registryList');
+      replaceList(reg, event.data);
+    });
+
+    ws.bind('echo', function(event) {
+      alert(event.data);
+    });
+
+    /* Functions to call on button clicks. */
+
+    var pause = function() {
+      var event = {"event": "pause"};
+      ws.send(event);
+    };
+
+    var unpause = function() {
+      var event = {"event": "unpause"};
+      ws.send(event);
+    };
+
+    var loadTableNames = function() {
+      var event = {"event": "table_names_request"};
+      ws.send(event);
+    };
+
+    var loadRegistry = function() {
+      var event = {"event": "registry_request"};
+      ws.send(event);
+    };
+
+    var echoBravo = function() {
+      var event = {"event": "echo", "params": {"s": "Bravo"}};
+      ws.send(event);
+    };
+  </script>
+
+  <h2>Heartbeat</h2>
+  <p id="heartbeat">Disconected</p>
+
+  <h2>Pause</h2>
+  <button onclick="pause()">Pause</button>
+  <button onclick="unpause()">Unpause</button>
+
+  <h2>Table Data</h2>
+  <p id="tableDataName">Unknown Table</p>
+  <table id="tableData"></table>
+
+  <h2>Table Names</h2>
+  <button onclick="loadTableNames()">Load Table Names</button>
+  <ul id="tableNamesList"></ul>
+
+  <h2>Registry</h2>
+  <button onclick="loadRegistry()">Load Registry</button>
+  <ul id="registryList"></ul>
+
+  <h2>Echo Test</h2>
+  <button onclick="echoBravo()">Echo</button>
+</body>
+</html>

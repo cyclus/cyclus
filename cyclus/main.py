@@ -8,13 +8,12 @@ from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs, XMLParser,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
-    set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml,
-    Hdf5Back, SqliteBack, InfileTree, SimInit, XMLFileLoader, XMLFlatLoader)
+    set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml, py_to_json,
+    json_to_py, xml_to_py, py_to_xml, Hdf5Back, SqliteBack, InfileTree, SimInit,
+    XMLFileLoader, XMLFlatLoader)
+from cyclus.simstate import (get_schema_path, SimState,
+    ensure_close_dynamic_modules)
 
-
-# ensure that Cyclus dynamic modules are closed when Python exits.
-_DYNAMIC_MODULE = DynamicModule()
-atexit.register(_DYNAMIC_MODULE.close_all)
 
 
 LOGO = """              :
@@ -48,13 +47,8 @@ LOGO = """              :
 
 def set_schema_path(ns):
     """Sets the schema path on the namespace."""
-    if ns.flat_schema:
-        path = Env.rng_schema(True)
-    elif ns.schema_path is not None:
-        path = ns.schema_path
-    else:
-        path = Env.rng_schema(False)
-    ns.schema_path = path
+    ns.schema_path = get_schema_path(flat_schema=ns.flat_schema,
+                                     schema_path=ns.schema_path)
 
 
 class ZeroArgAction(Action):
@@ -258,26 +252,51 @@ class NucData(ZeroArgAction):
         print(s)
 
 
-class JsonToXml(Action):
+class InfileConverterAction(Action):
+
+    def __call__(self, parser, ns, values, option_string=None):
+        setattr(ns, self.name, values)
+        with open(values, 'r') as f:
+            s = f.read()
+        t = self.converter(s)
+        print(t.rstrip())
+
+
+class JsonToXml(InfileConverterAction):
     """converts JSON to XML"""
-
-    def __call__(self, parser, ns, values, option_string=None):
-        ns.json_to_xml = values
-        with open(ns.json_to_xml, 'r') as f:
-            s = f.read()
-        t = json_to_xml(s)
-        print(t.rstrip())
+    name = 'json_to_xml'
+    converter = json_to_xml
 
 
-class XmlToJson(Action):
+class XmlToJson(InfileConverterAction):
     """converts XML to JSON"""
+    name = 'xml_to_json'
+    converter = xml_to_json
 
-    def __call__(self, parser, ns, values, option_string=None):
-        ns.xml_to_json = values
-        with open(ns.xml_to_json, 'r') as f:
-            s = f.read()
-        t = xml_to_json(s)
-        print(t.rstrip())
+
+class JsonToPy(InfileConverterAction):
+    """converts JSON to Python"""
+    name = 'json_to_py'
+    converter = json_to_py
+
+
+class PyToJson(InfileConverterAction):
+    """converts Python to JSON"""
+    name = 'py_to_json'
+    converter = py_to_json
+
+
+class PyToXml(InfileConverterAction):
+    """converts Python to XML"""
+    name = 'py_to_xml'
+    converter = py_to_xml
+
+
+class XmlToPy(InfileConverterAction):
+    """converts XML to Python"""
+    name = 'xml_to_py'
+    converter = xml_to_py
+
 
 
 def make_parser():
@@ -347,6 +366,18 @@ def make_parser():
     p.add_argument('--xml-to-json', action=XmlToJson,
                    dest='xml_to_json', default=None,
                    help='*.xml input file')
+    p.add_argument('--json-to-py', action=JsonToPy,
+                   dest='json_to_py', default=None,
+                   help='*.json input file')
+    p.add_argument('--py-to-json', action=PyToJson,
+                   dest='py_to_json', default=None,
+                   help='*.py input file')
+    p.add_argument('--py-to-xml', action=PyToXml,
+                   dest='py_to_xml', default=None,
+                   help='*.py input file')
+    p.add_argument('--xml-to-py', action=XmlToPy,
+                   dest='xml_to_py', default=None,
+                   help='*.xml input file')
     p.add_argument('input_file', nargs='?',
                    help='path to input file')
     return p
@@ -354,48 +385,22 @@ def make_parser():
 
 def run_simulation(ns):
     """Runs the simulation when we recieve an input file."""
-    Env.set_nuc_data_path()
     print(LOGO)
-    rec = Recorder()
-    # setup database backend
-    _, ext = os.path.splitext(ns.output_path)
-    if ext == '.h5':
-        backend = Hdf5Back(ns.output_path)
-    elif ext == '.sqlite':
-        backend = SqliteBack(ns.output_path)
-    else:
-        raise RuntimeError('Backend extension type not recognised, ' +
-                           ns.output_path)
-    rec.register_backend(backend)
-    # find schema type
-    parser = XMLParser(filename=ns.input_file)
-    tree = InfileTree(parser)
-    schema_type = tree.optional_query("/simulation/schematype", "")
-    if schema_type == "flat" and not ns.flat_schema:
-        print("flat schema tag detected - switching to flat input schema",
-              file=sys.stderr)
-        ns.flat_schema = True
-    set_schema_path(ns)
-    # Load input file and initialize simulation
-    if ns.flat_schema:
-        loader = XMLFlatLoader(rec, backend, ns.schema_path, ns.input_file)
-    else:
-        loader = XMLFileLoader(rec, backend, ns.schema_path, ns.input_file)
-    loader.load_sim()
-    si = SimInit(rec, backend)
-    # run simulation and report back
-    si.timer.run_sim()
-    rec.flush()
+    state = SimState(input_file=ns.input_file, output_path=ns.output_path,
+                     schema_path=ns.schema_path, flat_schema=ns.flat_schema)
+    state.load()
+    state.run()
     msg = ("Status: Cyclus run successful!\n"
            "Output location: {0}\n"
            "Simulation ID: {1}").format(ns.output_path,
-                                        si.context.sim_id)
+                                        state.si.context.sim_id)
     print(msg)
 
 
 
 def main(args=None):
     """Main function for Cyclus CLI"""
+    ensure_close_dynamic_modules()
     Env.set_nuc_data_path()
     p = make_parser()
     ns = p.parse_args(args=args)
