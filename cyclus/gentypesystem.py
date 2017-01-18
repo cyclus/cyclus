@@ -2191,6 +2191,20 @@ class {{rclsname}}Bid(_{{rclsname}}Bid):
     """An representation of a bid for a {{rfname}}"""
 
 
+cdef dict {{rfname}}_pref_map_to_py(cpp_cyclus.PrefMap[{{cyr}}].type& pm):
+    """Converts a {{rfname}} prefmap to a Python dict."""
+    cdef dict rtn = {}
+    for rbd in pm:
+        r = {{rclsname}}Request()
+        (<_{{rclsname}}Request> r).ptx = rbd.first
+        for bd in rbd.second:
+            b = {{rclsname}}Bid()
+            (<_{{rclsname}}Bid> b).ptx = bd.first
+            rtn[(r, b)] = bd.second
+    return rtn
+
+
+
 {% endfor %}
 
 
@@ -2392,6 +2406,7 @@ cdef class _{{rclsname}}Bid:
     cdef object _preference
     cdef object _exclusive
 
+cdef dict {{rfname}}_pref_map_to_py(cpp_cyclus.PrefMap[{{cyr}}].type& pm)
 {% endfor %}
 ''')
 

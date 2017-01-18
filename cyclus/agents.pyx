@@ -46,6 +46,14 @@ _SCHEMA = SchemaFilter()
 #np.import_ufunc()
 
 
+cdef int _GET_MAT_PREFS_TIME = -9999999999
+cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* _GET_MAT_PREFS_PTR = NULL
+cdef dict _GET_MAT_PREFS = {}
+
+cdef int _GET_PROD_PREFS_TIME = -9999999999
+cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* _GET_PROD_PREFS_PTR = NULL
+cdef dict _GET_PROD_PREFS = {}
+
 #
 # Shims
 #
@@ -124,7 +132,23 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<object> this.self).decom_notify()
 
     void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs):
-        (<object> this.self).adjust_material_prefs(None)
+        # cache the commod_reqs wrappers globally
+        global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
+        cdef int curr_time = this.context().time()
+        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &pref
+        if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
+            pyprefs = _GET_MAT_PREFS
+        else:
+            pyprefs = ts.material_pref_map_to_py(prefs)
+            _GET_MAT_PREFS_TIME = curr_time
+            _GET_MAT_PREFS_PTR = curr_ptr
+            _GET_MAT_PREFS = pyprefs
+        # call the python function
+        updates = (<object> this.self).adjust_material_prefs(pyprefs)
+        if updates is None:
+            return
+        #for (req, bid), pref in updates.items():
+        #    prefs[]
 
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
         (<object> this.self).adjust_product_prefs(None)
@@ -208,6 +232,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         (<object> this.self).adjust_material_prefs(None)
 
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
+
         (<object> this.self).adjust_product_prefs(None)
 
     void Tick():
@@ -307,6 +332,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
 cdef int _GET_MAT_BIDS_TIME = -9999999999
 cdef cpp_cyclus.CommodMap[cpp_cyclus.Material].type* _GET_MAT_BIDS_PTR = NULL
 cdef dict _GET_MAT_BIDS = {}
+
 cdef int _GET_PROD_BIDS_TIME = -9999999999
 cdef cpp_cyclus.CommodMap[cpp_cyclus.Product].type* _GET_PROD_BIDS_PTR = NULL
 cdef dict _GET_PROD_BIDS = {}
@@ -424,8 +450,8 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return ports
 
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type& commod_requests):
-        global _GET_MAT_BIDS_TIME, _GET_MAT_BIDS_PTR, _GET_MAT_BIDS
         # cache the commod_reqs wrappers globally
+        global _GET_MAT_BIDS_TIME, _GET_MAT_BIDS_PTR, _GET_MAT_BIDS
         cdef int curr_time = this.context().time()
         cdef cpp_cyclus.CommodMap[cpp_cyclus.Material].type* curr_ptr = &commod_requests
         if curr_time == _GET_MAT_BIDS_TIME and curr_ptr == _GET_MAT_BIDS_PTR:
@@ -448,8 +474,8 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return ports
 
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type& commod_requests):
-        global _GET_PROD_BIDS_TIME, _GET_PROD_BIDS_PTR, _GET_PROD_BIDS
         # cache the commod_reqs wrappers globally
+        global _GET_PROD_BIDS_TIME, _GET_PROD_BIDS_PTR, _GET_PROD_BIDS
         cdef int curr_time = this.context().time()
         cdef cpp_cyclus.CommodMap[cpp_cyclus.Product].type* curr_ptr = &commod_requests
         if curr_time == _GET_PROD_BIDS_TIME and curr_ptr == _GET_PROD_BIDS_PTR:
