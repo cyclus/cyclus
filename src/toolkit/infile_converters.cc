@@ -6,6 +6,7 @@
 #include "error.h"
 #include "infile_converters.h"
 #include "infile_tree.h"
+#include "pyhooks.h"
 #include "pyne.h"
 
 namespace cyclus {
@@ -158,6 +159,14 @@ std::string XmlToJson(std::string s) {
   Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
                                                  ", ", " ", 80);
   return writer.write(jroot);
+}
+
+std::string PyToXml(std::string s) {
+  return JsonToXml(PyToJson(s));
+}
+
+std::string XmlToPy(std::string s) {
+  return JsonToPy(XmlToJson(s));
 }
 
 }  // namespace toolkit

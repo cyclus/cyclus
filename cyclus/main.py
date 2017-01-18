@@ -8,8 +8,9 @@ from cyclus.jsoncpp import CustomWriter
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
     Recorder, Timer, Context, set_warn_limit, discover_specs, XMLParser,
     discover_specs_in_cyclus_path, discover_metadata_in_cyclus_path, Logger,
-    set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml,
-    Hdf5Back, SqliteBack, InfileTree, SimInit, XMLFileLoader, XMLFlatLoader)
+    set_warn_limit, set_warn_as_error, xml_to_json, json_to_xml, py_to_json,
+    json_to_py, xml_to_py, py_to_xml, Hdf5Back, SqliteBack, InfileTree, SimInit,
+    XMLFileLoader, XMLFlatLoader)
 from cyclus.simstate import (get_schema_path, SimState,
     ensure_close_dynamic_modules)
 
@@ -251,26 +252,51 @@ class NucData(ZeroArgAction):
         print(s)
 
 
-class JsonToXml(Action):
+class InfileConverterAction(Action):
+
+    def __call__(self, parser, ns, values, option_string=None):
+        setattr(ns, self.name, values)
+        with open(values, 'r') as f:
+            s = f.read()
+        t = self.converter(s)
+        print(t.rstrip())
+
+
+class JsonToXml(InfileConverterAction):
     """converts JSON to XML"""
-
-    def __call__(self, parser, ns, values, option_string=None):
-        ns.json_to_xml = values
-        with open(ns.json_to_xml, 'r') as f:
-            s = f.read()
-        t = json_to_xml(s)
-        print(t.rstrip())
+    name = 'json_to_xml'
+    converter = json_to_xml
 
 
-class XmlToJson(Action):
+class XmlToJson(InfileConverterAction):
     """converts XML to JSON"""
+    name = 'xml_to_json'
+    converter = xml_to_json
 
-    def __call__(self, parser, ns, values, option_string=None):
-        ns.xml_to_json = values
-        with open(ns.xml_to_json, 'r') as f:
-            s = f.read()
-        t = xml_to_json(s)
-        print(t.rstrip())
+
+class JsonToPy(InfileConverterAction):
+    """converts JSON to Python"""
+    name = 'json_to_py'
+    converter = json_to_py
+
+
+class PyToJson(InfileConverterAction):
+    """converts Python to JSON"""
+    name = 'py_to_json'
+    converter = py_to_json
+
+
+class PyToXml(InfileConverterAction):
+    """converts Python to XML"""
+    name = 'py_to_xml'
+    converter = py_to_xml
+
+
+class XmlToPy(InfileConverterAction):
+    """converts XML to Python"""
+    name = 'xml_to_py'
+    converter = xml_to_py
+
 
 
 def make_parser():
@@ -339,6 +365,18 @@ def make_parser():
                    help='*.json input file')
     p.add_argument('--xml-to-json', action=XmlToJson,
                    dest='xml_to_json', default=None,
+                   help='*.xml input file')
+    p.add_argument('--json-to-py', action=JsonToPy,
+                   dest='json_to_py', default=None,
+                   help='*.json input file')
+    p.add_argument('--py-to-json', action=PyToJson,
+                   dest='py_to_json', default=None,
+                   help='*.py input file')
+    p.add_argument('--py-to-xml', action=PyToXml,
+                   dest='py_to_xml', default=None,
+                   help='*.py input file')
+    p.add_argument('--xml-to-py', action=XmlToPy,
+                   dest='xml_to_py', default=None,
                    help='*.xml input file')
     p.add_argument('input_file', nargs='?',
                    help='path to input file')
