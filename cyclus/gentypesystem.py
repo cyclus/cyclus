@@ -1968,7 +1968,7 @@ cdef class {{tclassname}}Inv(Inventory):
 {% endfor %}
 
 #
-# Requests
+# Requests & Bids
 #
 
 
@@ -2049,6 +2049,20 @@ class {{rclsname}}Request(_{{rclsname}}Request):
     """An representation of a request for a {{rfname}}"""
 
 
+cdef dict {{rfname}}_commod_map_to_py(cpp_cyclus.CommodMap[{{cyr}}].type m):
+    """Converts a CommodMap[{{rclsname}}] to a dict of tuples of requests."""
+    cdef dict rtn = {}
+    for item in m:
+        key = std_string_to_py(item.first)
+        val = []
+        for x in item.second:
+            r = {{rclsname}}Request()
+            (<_{{rclsname}}Request> r).ptx = x
+            val.append(r)
+        rtn[key] = tuple(val)
+    return rtn
+
+
 cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_request_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester):
     cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] port = \
         shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]](
@@ -2069,6 +2083,28 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
                                  'supported.')
             port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
                                   req['exclusive'])
+    # add constraints
+    for constr in pyport['constraints']:
+        port.get().AddConstraint(
+            cpp_cyclus.CapacityConstraint[{{ts.cython_type(r)}}](constr))
+    return port
+
+
+cdef shared_ptr[cpp_cyclus.BidPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_bid_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* bidder):
+    cdef shared_ptr[cpp_cyclus.BidPortfolio[{{cyr}}]] port = \
+        shared_ptr[cpp_cyclus.BidPortfolio[{{cyr}}]](
+            new cpp_cyclus.BidPortfolio[{{cyr}}]()
+            )
+    #cdef _{{rclsname}}
+    cdef shared_ptr[{{cyr}}] offer_ptr
+    # add requests
+    for bid in pyport['bids']:
+        #targ = <_{{rclsname}}> req['target']
+        offer_ptr = reinterpret_pointer_cast[{{ts.cython_type(r)}},
+                                             cpp_cyclus.Resource](
+                        (<_{{rclsname}}> bid['offer']).ptx)
+        port.get().AddBid((<_{{rclsname}}Request> bid['request']).ptx,
+                          offer_ptr, bidder, bid['exclusive'], bid['preference'])
     # add constraints
     for constr in pyport['constraints']:
         port.get().AddConstraint(
@@ -2249,7 +2285,7 @@ cdef class {{tclassname}}Inv(Inventory):
 {% endfor %}
 
 #
-# Requests
+# Requests & Bids
 #
 {% for r in ts.resources %}
 {% set cyr = ts.cython_type(r) %}
@@ -2264,8 +2300,9 @@ cdef class _{{rclsname}}Request:
     cdef object _exclusive
     cdef object _cost_function
 
-
+cdef dict {{rfname}}_commod_map_to_py(cpp_cyclus.CommodMap[{{cyr}}].type& m)
 cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_request_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester)
+cdef shared_ptr[cpp_cyclus.BidPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_bid_portfolio_to_cpp(object pyport, cpp_cyclus.Trader* requester)
 {% endfor %}
 ''')
 

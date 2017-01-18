@@ -741,6 +741,7 @@ cdef extern from "context.h" namespace "cyclus":
         Context(Timer*, Recorder*) except +
         void DelAgent(Agent*) except +
         uuid sim_id() except +
+        int time()
 
 
 cdef extern from "discovery.h" namespace "cyclus":

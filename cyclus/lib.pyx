@@ -1605,7 +1605,8 @@ cpdef dict normalize_request_portfolio(object inp):
     # canonize commods
     if not isinstance(commods, Mapping):
         commods = dict(commods)
-    default_req = {'target': None, 'preference': 1.0, 'exclusive': False, 'cost': None}
+    cdef dict default_req = {'target': None, 'preference': 1.0,
+                             'exclusive': False, 'cost': None}
     for key, val in commods.items():
         if isinstance(val, ts.Resource):
             req = default_req.copy()
@@ -1632,4 +1633,44 @@ cpdef dict normalize_request_portfolio(object inp):
             raise TypeError('Did not recognize type of commodity while '
                             'converting to portfolio: ' + repr(inp))
     cdef dict rtn = {'commodities': commods, 'constraints': constrs}
+    return rtn
+
+
+cpdef dict normalize_bid_portfolio(object inp):
+    """Normalizes a bid portfolio into a standard Python form, ready to be traded.
+    Note that this does not include the bidder object.
+    """
+    # get initial values
+    if not isinstance(inp, Mapping):
+        bids = inp
+        constrs = []
+    elif 'bids' in inp:
+        bids = inp['bids']
+        constrs = inp.get('constraints', [])
+    else:
+        bids = [inp]
+        constrs = []
+    # canonize constraints
+    if not isinstance(constrs, Iterable):
+        constrs = [constrs]
+    # canonize commods
+    if not isinstance(bids, Sequence):
+        bids = [bids]
+    cdef dict default_bid = {'request': None, 'offer': None,
+                             'preference': 1.0, 'exclusive': False}
+    cdef int i, n
+    cdef list normbids = []
+    n = len(bids)
+    for i in range(n):
+        b = bids[i]
+        bid = default_bid.copy()
+        if isinstance(b, Mapping):
+            bid.update(b)
+        elif isinstance(b, Sequence):
+            bid['request'], bid['offer'] = b
+        else:
+            raise TypeError('Did not recognize type of bid while '
+                            'converting to portfolio: ' + repr(inp))
+        normbids.append(bid)
+    cdef dict rtn = {'bids': normbids, 'constraints': constrs}
     return rtn

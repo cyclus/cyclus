@@ -24,11 +24,14 @@ namespace cyclus {
 template <class T>
 struct PrefMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double> > type;
+  typedef Request<T>* request_ptr;
+  typedef Bid<T>* bid_ptr;
 };
 
 template <class T>
 struct CommodMap {
   typedef std::map<std::string, std::vector<Request<T>*> > type;
+  typedef Request<T>* request_ptr;
 };
 
 /// @class ExchangeContext

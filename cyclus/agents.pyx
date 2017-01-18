@@ -304,6 +304,13 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).tock()
 
 
+cdef int _GET_MAT_BIDS_TIME = -9999999999
+cdef cpp_cyclus.CommodMap[cpp_cyclus.Material].type* _GET_MAT_BIDS_PTR = NULL
+cdef dict _GET_MAT_BIDS = {}
+cdef int _GET_PROD_BIDS_TIME = -9999999999
+cdef cpp_cyclus.CommodMap[cpp_cyclus.Product].type* _GET_PROD_BIDS_PTR = NULL
+cdef dict _GET_PROD_BIDS = {}
+
 cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
     # A C++ class that acts as a Facility. It implements the Facility virtual
     # methods and dispatches the work to a Python/Cython object
@@ -415,6 +422,55 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             normport = lib.normalize_request_portfolio(pyport)
             ports.insert(ts.product_request_portfolio_to_cpp(normport, this))
         return ports
+
+    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type& commod_requests):
+        global _GET_MAT_BIDS_TIME, _GET_MAT_BIDS_PTR, _GET_MAT_BIDS
+        # cache the commod_reqs wrappers globally
+        cdef int curr_time = this.context().time()
+        cdef cpp_cyclus.CommodMap[cpp_cyclus.Material].type* curr_ptr = &commod_requests
+        if curr_time == _GET_MAT_BIDS_TIME and curr_ptr == _GET_MAT_BIDS_PTR:
+            pyreq = _GET_MAT_BIDS
+        else:
+            pyreq = ts.material_commod_map_to_py(commod_requests)
+            _GET_MAT_BIDS_TIME = curr_time
+            _GET_MAT_BIDS_PTR = curr_ptr
+            _GET_MAT_BIDS = pyreq
+        # call the Python funtion
+        pyports = (<object> this.self).get_material_bids(pyreq)
+        # convert to c++ and return
+        cdef std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] ports = \
+            std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]]()
+        if isinstance(pyports, Mapping):
+            pyports = [pyports]
+        for pyport in pyports:
+            normport = lib.normalize_bid_portfolio(pyport)
+            ports.insert(ts.material_bid_portfolio_to_cpp(normport, this))
+        return ports
+
+    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type& commod_requests):
+        global _GET_PROD_BIDS_TIME, _GET_PROD_BIDS_PTR, _GET_PROD_BIDS
+        # cache the commod_reqs wrappers globally
+        cdef int curr_time = this.context().time()
+        cdef cpp_cyclus.CommodMap[cpp_cyclus.Product].type* curr_ptr = &commod_requests
+        if curr_time == _GET_PROD_BIDS_TIME and curr_ptr == _GET_PROD_BIDS_PTR:
+            pyreq = _GET_PROD_BIDS
+        else:
+            pyreq = ts.product_commod_map_to_py(commod_requests)
+            _GET_PROD_BIDS_TIME = curr_time
+            _GET_PROD_BIDS_PTR = curr_ptr
+            _GET_PROD_BIDS = pyreq
+        # call the Python funtion
+        pyports = (<object> this.self).get_product_bids(pyreq)
+        # convert to c++ and return
+        cdef std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] ports = \
+            std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]]()
+        if isinstance(pyports, Mapping):
+            pyports = [pyports]
+        for pyport in pyports:
+            normport = lib.normalize_bid_portfolio(pyport)
+            ports.insert(ts.product_bid_portfolio_to_cpp(normport, this))
+        return ports
+
 
 #
 # Wrapper classes
@@ -839,6 +895,18 @@ class Facility(_Facility, Agent):
     def get_product_requests(self):
         """Returns product requests for this agent on this time step.
         This is meant to be overridden is subclasses.
+        """
+        return []
+
+    def get_material_bids(self):
+        """Returns material bids for this agent on this time step.
+        This may be overridden is subclasses.
+        """
+        return []
+
+    def get_product_bids(self):
+        """Returns product bids for this agent on this time step.
+        This may be overridden is subclasses.
         """
         return []
 
