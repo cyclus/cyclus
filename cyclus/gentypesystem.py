@@ -2204,6 +2204,63 @@ cdef dict {{rfname}}_pref_map_to_py(cpp_cyclus.PrefMap[{{cyr}}].type& pm):
     return rtn
 
 
+cdef class _{{rclsname}}Trade:
+
+    def __cinit__(self):
+        self._request = None
+        self._bid = None
+
+    @property
+    def request(self):
+        """This trade's request."""
+        if self._request is not None:
+            return self._request
+        cdef _{{rclsname}}Request req = {{rclsname}}Request()
+        req.ptx = self.ptx.request
+        self._request = req
+        return self._request
+
+    @property
+    def bid(self):
+        """This trade's bid."""
+        if self._bid is not None:
+            return self._bid
+        cdef _{{rclsname}}Bid bid = {{rclsname}}Bid()
+        bid.ptx = self.ptx.bid
+        self._bid = bid
+        return self._bid
+
+    @property
+    def amt(self):
+        """The quantity assigned to the Trade. May be less than either the
+        request or bid quantity.
+        """
+        return self.ptx.amt
+
+    @property
+    def price(self):
+        """Trades have a price member which is not currently used."""
+        return self.ptx.price
+
+    def __hash__(self):
+        return id(self)
+
+
+class {{rclsname}}Trade(_{{rclsname}}Trade):
+    """ Trade is a simple container that associates a request for a
+    resource with a bid for that resource.
+    """
+
+
+cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] trades):
+    """Converts a vector of {{rfname}} trades to a tuple"""
+    cdef list pytrades = []
+    for trade in trades:
+        t = {{rclsname}}Trade()
+        (<_{{rclsname}}Trade> t).ptx = &trade
+        pytrades.append(t)
+    cdef tuple rtn = tuple(pytrades)
+    return rtn
 
 {% endfor %}
 
@@ -2407,6 +2464,15 @@ cdef class _{{rclsname}}Bid:
     cdef object _exclusive
 
 cdef dict {{rfname}}_pref_map_to_py(cpp_cyclus.PrefMap[{{cyr}}].type& pm)
+
+cdef class _{{rclsname}}Trade:
+    cdef cpp_cyclus.Trade[{{cyr}}]* ptx
+    cdef object _request
+    cdef object _bid
+
+
+cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] trades)
+
 {% endfor %}
 ''')
 
