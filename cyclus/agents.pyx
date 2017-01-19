@@ -656,6 +656,15 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                     (<ts._Product> resp).ptx)
                 ))
 
+    void AcceptMatlTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
+        pyresp = ts.material_responses_to_py(responses)
+        (<object> this.self).accept_material_trades(pyresp)
+
+    void AcceptProductTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
+        pyresp = ts.product_responses_to_py(responses)
+        (<object> this.self).accept_product_trades(pyresp)
+
+
 #
 # Wrapper classes
 #
@@ -1103,6 +1112,14 @@ class Facility(_Facility, Agent):
         """Implementation for responding to product trades.
         """
         return None
+
+    def accept_material_trades(self, responses):
+        """Method for accepting materials from a trade deal."""
+        pass
+
+    def accept_product_trades(self, responses):
+        """Method for accepting products from a trade deal."""
+        pass
 
 #
 # Tools

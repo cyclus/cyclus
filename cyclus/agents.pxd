@@ -124,6 +124,8 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # 
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type&)
     void GetMatlTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&)
     void GetProductTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&)
+    void AcceptMatlTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&)
+    void AcceptProductTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&)
     # Extra interface
     PyObject* self  # the Python object we are shimming
 

@@ -2262,6 +2262,19 @@ cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] t
     cdef tuple rtn = tuple(pytrades)
     return rtn
 
+
+cdef dict {{rfname}}_responses_to_py(std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses):
+    """Converts a vector of pairs of (trades, {{rfname}}) to a dict"""
+    cdef dict rtn = {}
+    for resp in responses:
+        t = {{rclsname}}Trade()
+        (<_{{rclsname}}Trade> t).ptx = &(resp.first)
+        r = {{rclsname}}()
+        (<_{{rclsname}}> r).ptx = reinterpret_pointer_cast[cpp_cyclus.Resource,
+                                                           {{cyr}}](resp.second)
+        rtn[t] = r
+    return rtn
+
 {% endfor %}
 
 
@@ -2472,6 +2485,7 @@ cdef class _{{rclsname}}Trade:
 
 
 cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] trades)
+cdef dict {{rfname}}_responses_to_py(std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses)
 
 {% endfor %}
 ''')
