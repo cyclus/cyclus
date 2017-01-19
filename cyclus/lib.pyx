@@ -1674,3 +1674,4 @@ cpdef dict normalize_bid_portfolio(object inp):
         normbids.append(bid)
     cdef dict rtn = {'bids': normbids, 'constraints': constrs}
     return rtn
+

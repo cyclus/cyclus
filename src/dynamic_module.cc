@@ -2,10 +2,12 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "context.h"
 #include "env.h"
 #include "agent.h"
+#include "pyhooks.h"
 #include "suffix.h"
 
 #include DYNAMICLOADLIB
@@ -79,6 +81,11 @@ Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
   }
 
   DynamicModule* dyn = modules_[spec.str()];
+  if (boost::starts_with(dyn->path(), "<py>:")) {
+    /// go down a separate execution pathway if we are asked to load a
+    /// Python module.
+    return reinterpret_cast<Agent*>(MakePyAgent(spec.lib(), spec.agent(), ctx));
+  }
   Agent* a = dyn->ConstructInstance(ctx);
   a->spec(spec.str());
   return a;
@@ -108,6 +115,10 @@ DynamicModule::DynamicModule(AgentSpec spec)
     : module_library_(0),
       ctor_(NULL) {
   path_ = Env::FindModule(spec.LibPath());
+  if (boost::starts_with(path_, "<py>:")) {
+    /// python module, so no need to do more
+    return;
+  }
   ctor_name_ = "Construct" + spec.agent();
   OpenLibrary();
   SetConstructor();

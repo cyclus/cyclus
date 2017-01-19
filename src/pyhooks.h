@@ -28,12 +28,19 @@ void PyStop(void);
 // Add some simple shims that attach C++ to Python C hooks
 void EventLoop(void);
 
+/// Finds a Python module and returns its filename.
+std::string PyFindModule(std::string);
+
+/// Finds a Python module and returns an agent pointer from it.
+void* MakePyAgent(std::string, std::string, void*);
+
 namespace toolkit {
 /// Convert Python simulation string to JSON
 std::string PyToJson(std::string);
 
 /// Convert JSON string to Python simulation string
 std::string JsonToPy(std::string);
+
 }  // ends namespace toolkit
 }  // ends namespace cyclus
 #endif  // ends CYCLUS_SRC_PYHOOKS_H_

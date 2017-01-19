@@ -8,6 +8,7 @@
 extern "C" {
 #include "eventhooks.h"
 #include "pyinfile.h"
+#include "pymodule.h"
 }
 
 namespace cyclus {
@@ -18,9 +19,11 @@ void PyInitHooks(void) {
 #if PY_MAJOR_VERSION < 3
   initeventhooks();
   initpyinfile();
+  initpymodule();
 #else
   PyInit_eventhooks();
   PyInit_pyinfile();
+  PyInit_pymodule();
 #endif
 };
 
@@ -45,6 +48,12 @@ void PyStop(void) {
 
 void EventLoop(void) { CyclusEventLoopHook(); };
 
+std::string PyFindModule(std::string lib) { CyclusPyFindModule(lib); };
+
+void* MakePyAgent(std::string lib, std::string agent, void* ctx) {
+  return CyclusMakePyAgent(lib, agent, ctx);
+};
+
 namespace toolkit {
 std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };
 
@@ -63,6 +72,10 @@ void PyStart(void) {};
 void PyStop(void) {};
 
 void EventLoop(void) {};
+
+std::string PyFindModule(std::string lib) { std::string(); };
+
+void* MakePyAgent(std::string lib, std::string agent, void* ctx) { return NULL; };
 
 namespace toolkit {
 std::string PyToJson(std::string infile) {
