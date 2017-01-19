@@ -6,6 +6,7 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.utility cimport pair as std_pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
+from cython.operator cimport dereference as deref
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
     PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
@@ -17,7 +18,7 @@ from copy import deepcopy
 from collections import Mapping
 
 from cyclus cimport cpp_cyclus
-from cyclus.cpp_cyclus cimport shared_ptr
+from cyclus.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
 from cyclus cimport lib
 from cyclus import lib
 from cyclus cimport cpp_typesystem
@@ -625,6 +626,35 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             ports.insert(ts.product_bid_portfolio_to_cpp(normport, this))
         return ports
 
+    void GetMatlTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
+        pytrades = ts.material_trade_vector_to_py(trades)
+        pyresp = (<object> this.self).get_material_trades(pytrades)
+        if pyresp is None or len(pyresp) == 0:
+            return
+        if not isinstance(pyresp, Mapping):
+            pyresp = dict(pyresp)
+        for trade, resp in pyresp.items():
+            responses.push_back(std_pair[cpp_cyclus.Trade[cpp_cyclus.Material],
+                                         shared_ptr[cpp_cyclus.Material]](
+                deref((<ts._MaterialTrade> trade).ptx),
+                reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
+                    (<ts._Material> resp).ptx)
+                ))
+
+    void GetProductTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
+        pytrades = ts.product_trade_vector_to_py(trades)
+        pyresp = (<object> this.self).get_product_trades(pytrades)
+        if pyresp is None or len(pyresp) == 0:
+            return
+        if not isinstance(pyresp, Mapping):
+            pyresp = dict(pyresp)
+        for trade, resp in pyresp.items():
+            responses.push_back(std_pair[cpp_cyclus.Trade[cpp_cyclus.Product],
+                                         shared_ptr[cpp_cyclus.Product]](
+                deref((<ts._ProductTrade> trade).ptx),
+                reinterpret_pointer_cast[cpp_cyclus.Product, cpp_cyclus.Resource](
+                    (<ts._Product> resp).ptx)
+                ))
 
 #
 # Wrapper classes
@@ -1063,6 +1093,16 @@ class Facility(_Facility, Agent):
         This may be overridden is subclasses.
         """
         return []
+
+    def get_material_trades(self, trades):
+        """Implementation for responding to material trades.
+        """
+        return None
+
+    def get_product_trades(self, trades):
+        """Implementation for responding to product trades.
+        """
+        return None
 
 #
 # Tools
