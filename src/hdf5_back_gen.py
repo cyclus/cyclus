@@ -2095,7 +2095,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
             #FL variable length containers
             elif child_node.canon[0] in variable_length_types:
                 length = get_variable("length", depth=depth+1, 
-                                      prefix=prefix+prefixes[count]))
+                                      prefix=prefix+prefixes[count])
                 body_nodes.append(pad_children(child_node, children[count],
                                                fixed_var=child_variable,
                                                depth=depth+1, prefix=prefix
