@@ -109,6 +109,7 @@ void DynamicModule::CloseAll() {
   }
   modules_.clear();
   man_ctors_.clear();
+  ClearPyAgentRefs();
 }
 
 DynamicModule::DynamicModule(AgentSpec spec)

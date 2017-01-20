@@ -1127,10 +1127,15 @@ class SimInit(_SimInit):
 
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptx):
     """Converts and agent pointer to Python."""
+    global _AGENT_REFS
     if a_ptx == NULL:
         return None
+    cdef int a_id = a_ptx.id()
+    if a_id in _AGENT_REFS:
+        return _AGENT_REFS[a_id]
     cdef _Agent a = Agent()
     a.ptx = a_ptx
+    _AGENT_REFS[a_id] = a
     return a
 
 
@@ -1264,6 +1269,9 @@ cdef class _Agent:
     def id(self):
         """The agent instance's unique ID within a simulation."""
         return (<cpp_cyclus.Agent*> self.ptx).id()
+
+    def __hash__(self):
+        return self.id
 
     @property
     def spec(self):
@@ -1679,14 +1687,23 @@ cpdef dict normalize_bid_portfolio(object inp):
     return rtn
 
 
+# This a cache for agents so Python doesn't gc them and end up deallocing early
+cdef dict _AGENT_REFS = {}
+
 cpdef object make_py_agent(object libname, object agentname, object ctx):
     """Makes a new Python agent instance."""
+    global _AGENT_REFS
     mod = import_module(libname)
     cls = getattr(mod, agentname)
     ctx = Context()
     (<_Context> ctx).ptx = <cpp_cyclus.Context*> PyCapsule_GetPointer(ctx, <char*> b"ctx")
     agent = cls(ctx)
+    _AGENT_REFS[agent.id] = agent
     rtn = PyCapsule_New((<_Agent> agent).ptx, <char*> b"agent", NULL)
     return rtn
 
 
+cpdef void _clear_agent_refs():
+    """Clears the agent references cache. Users should never need to call this."""
+    global _AGENT_REFS
+    _AGENT_REFS.clear()

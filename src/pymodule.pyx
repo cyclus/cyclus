@@ -33,21 +33,17 @@ cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib):
     return rtn
 
 
-cdef list AGENT_REFS = []
-
 cdef public void* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
                                                      std_string cpp_agent,
                                                      void* cpp_ctx):
     """Makes a new Python agent instance."""
     libname = std_string_to_py(cpp_lib)
     agentname = std_string_to_py(cpp_agent)
-    #mod = import_module(lib)
-    #cls = getattr(mod, name)
-    #ctx = cyclib.Context()
-    #(<cyclib._Context> ctx).ptx = <Context*> cpp_ctx
-    #agent = cls(ctx)
-    #return (<cyclib._Agent> agent).ptx
     ctx = PyCapsule_New(cpp_ctx, <char*> b"ctx", NULL)
     a = cyclib.make_py_agent(libname, agentname, ctx)
     return PyCapsule_GetPointer(a, <char*> b"agent")
 
+
+cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ():
+    """Clears the cache of agent referencess"""
+    cyclib._clear_agent_refs()

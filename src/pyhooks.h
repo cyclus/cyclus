@@ -34,6 +34,10 @@ std::string PyFindModule(std::string);
 /// Finds a Python module and returns an agent pointer from it.
 void* MakePyAgent(std::string, std::string, void*);
 
+/// Removes all Python agents from the internal cache. There is usually
+/// no need for a user to call this.
+void ClearPyAgentRefs(void);
+
 namespace toolkit {
 /// Convert Python simulation string to JSON
 std::string PyToJson(std::string);
