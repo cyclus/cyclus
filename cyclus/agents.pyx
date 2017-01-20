@@ -670,13 +670,24 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
 #
 cdef class _Agent(lib._Agent):
 
-    def __cinit__(self, lib._Context ctx):
-        self.ptx = self.shim = new CyclusAgentShim(ctx.ptx)
-        self._free = True
-        self.shim.self = <PyObject*> self
+    _statevars = None
+    _inventories = None
+    _schema = None
+    _annotations_json = None
+    entity = 'archetype'
+    niche = None
+    tooltip = None
+    userlevel = 0
+
+    def __init__(self, lib._Context ctx):
+        # Let subclasses do cinit() and if they don't make an new instance,
+        # make one here
+        if self.ptx == NULL:
+            self.ptx = self.shim = new CyclusAgentShim(ctx.ptx)
+            self._free = True
+            self.shim.self = <PyObject*> self
 
     def __init__(self, ctx):
-        #super().__init__(ctx)
         # gather the state variables and inventories
         cls = type(self)
         if cls._statevars is None:
@@ -967,15 +978,6 @@ class Agent(_Agent, lib.Agent):
         The simulation execution context.  You don't normally
         need to call the initilaizer.
     """
-    _statevars = None
-    _inventories = None
-    _schema = None
-    _annotations_json = None
-    entity = 'archetype'
-    niche = None
-    tooltip = None
-    userlevel = 0
-
 
 
 cdef class _Region(_Agent):
@@ -983,7 +985,18 @@ cdef class _Region(_Agent):
     def __cinit__(self, lib._Context ctx):
         self.ptx = self.shim = <CyclusAgentShim*> new CyclusRegionShim(ctx.ptx)
         self._free = True
-        self.shim.self = <PyObject*> self
+        (<CyclusRegionShim*> (<_Agent> self).shim).self = <PyObject*> self
+
+    def __dealloc__(self):
+        cdef CyclusRegionShim* cpp_ptx
+        if self.ptx == NULL:
+            return
+        elif self._free:
+            cpp_ptx = <CyclusRegionShim*> self.shim
+            del cpp_ptx
+        else:
+            self.ptx = self.shim = NULL
+
 
 
 #class Region(_Region, Agent):

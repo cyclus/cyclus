@@ -1700,6 +1700,7 @@ cpdef object make_py_agent(object libname, object agentname, object ctx_capsule)
     (<_Context> ctx).ptx = <cpp_cyclus.Context*> PyCapsule_GetPointer(ctx_capsule,
                                                                       <char*> b"ctx")
     agent = cls(ctx)
+    (<_Agent> agent)._free = False
     _AGENT_REFS[agent.id] = agent
     rtn = PyCapsule_New((<_Agent> agent).ptx, <char*> b"agent", NULL)
     return rtn
@@ -1709,3 +1710,11 @@ cpdef void _clear_agent_refs():
     """Clears the agent references cache. Users should never need to call this."""
     global _AGENT_REFS
     _AGENT_REFS.clear()
+
+cpdef void _del_agent(int i):
+    """Clears a single agent from the reference cache Users should never need to
+    call this.
+    """
+    global _AGENT_REFS
+    if i in _AGENT_REFS:
+        del _AGENT_REFS[i]
