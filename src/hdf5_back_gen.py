@@ -2037,6 +2037,10 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                             name=Raw(code=fixed_var))))
     iterator = get_variable("it", depth=depth, prefix=prefix)
     pad_count = get_variable("pad_count", depth=depth, prefix=prefix)
+    result.nodes.append(ExprStmt(child=DeclAssign(
+                                                  type=Type(cpp='unsigned int'), 
+                                                  target=Var(name=pad_count), 
+                                                  value=Raw(code='0'))))
     prefixes = template_args[container]
     keywords['var'] = fixed_var
     num = len(t.canon[1:])
@@ -2044,10 +2048,6 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
         children = ["*" + iterator]
     else:
         if container in variable_length_types:
-            result.nodes.append(ExprStmt(child=DeclAssign(
-                                                  type=Type(cpp='unsigned int'), 
-                                                  target=Var(name=pad_count), 
-                                                  value=Raw(code='0'))))
             members = ['->first', '->second']
             children = ["{}{}".format(a, b) for a, b in zip([iterator]*num, 
                                                             members)]
