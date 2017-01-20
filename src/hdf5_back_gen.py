@@ -2036,6 +2036,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     result.nodes.append(ExprStmt(child=Decl(type=Type(cpp=t.cpp),
                                             name=Raw(code=fixed_var))))
     iterator = get_variable("it", depth=depth, prefix=prefix)
+    pad_count = get_variable("pad_count", depth=depth, prefix=prefix)
     prefixes = template_args[container]
     keywords['var'] = fixed_var
     num = len(t.canon[1:])
@@ -2043,6 +2044,10 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
         children = ["*" + iterator]
     else:
         if container in variable_length_types:
+            result.nodes.append(ExprStmt(child=DeclAssign(
+                                                  type=Type(cpp='unsigned int'), 
+                                                  target=Var(name=pad_count), 
+                                                  value=Raw(code='0'))))
             members = ['->first', '->second']
             children = ["{}{}".format(a, b) for a, b in zip([iterator]*num, 
                                                             members)]
@@ -2058,9 +2063,9 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                       prefix=prefix+prefixes[count])
         if is_primitive(child_node):
             #Strings are the only primitive we are looking for
+            item_size = get_variable("item_size", depth=depth+1, 
+                                     prefix=prefix+prefixes[count])
             if child_node.db == 'STRING':
-                item_size = get_variable("item_size", depth=depth+1, 
-                                         prefix=prefix+prefixes[count])
                 constructor = ("std::string(" + children[count] + ",0," 
                               + item_size + ")")
                 body_nodes.append(ExprStmt(child=DeclAssign(
@@ -2080,7 +2085,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                     #Skip child
                     keywords[child_keyword] = children[count]
                 else:
-                    #TODO: Recursion for VL container children                                  
+                    #Recursion for VL containers may work this way                                 
                     body_nodes.append(pad_children(child_node, children[count],
                                                    fixed_var=child_variable,
                                                    depth=depth+1, 
@@ -2089,12 +2094,14 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                     keywords[child_keyword] = child_variable
             #FL variable length containers
             elif child_node.canon[0] in variable_length_types:
-                #TODO Recursion for FL container children
+                length = get_variable("length", depth=depth+1, 
+                                      prefix=prefix+prefixes[count]))
                 body_nodes.append(pad_children(child_node, children[count],
                                                fixed_var=child_variable,
                                                depth=depth+1, prefix=prefix
                                                               +prefixes[count]))
-                #body_nodes.append(memset())
+                size = "(" + length + "-" + pad_count + ")" + "*" + item_size
+                body_nodes.append(memset(children[count], str(0), size))
                 keywords[child_keyword] = children[count]
             #PAIRS, etc.
             else:
@@ -2111,6 +2118,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     assignment = CONTAINER_INSERT_STRINGS[container].format(**keywords)
     body_nodes.append(ExprStmt(child=Raw(code=assignment)))
     if container in variable_length_types:
+        body_nodes.append(ExprStmt(child=Raw(code="++" + pad_count)))
         result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="!=", 
                                            y=Var(name=variable+".end()")),
                                 incr=Raw(code="++" + iterator), 
