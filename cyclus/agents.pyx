@@ -229,13 +229,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         return lib.inventories_to_cpp(pyinvs)
 
     std_string schema():
-        #print(type(<object> this.self))
         pyschema = (<object> this.self).schema
-        #pyschema = (<object> this.self).schema
-        #return str_py_to_cpp(pyschema)
-        #pyschema = getattr((<object> this.self), "schema")
-        #pyschema = (<_Region> this.self).schema
-        #pyschema = PyObject_GetAttrString((<object> this.self), b"schema")
         return str_py_to_cpp(pyschema)
 
     cpp_jsoncpp.Value annotations():
@@ -728,7 +722,7 @@ cdef class _Agent(lib._Agent):
             if not isinstance(attr, ts.Inventory):
                 continue
             invs[name] = attr
-        cls._inventories = index_and_sort_vars(vars)
+        cls._inventories = index_and_sort_vars(invs)
 
     def init_from_agent(self, other):
         """A dynamic version of InitFrom(Agent) that should work for all
