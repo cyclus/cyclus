@@ -1,5 +1,6 @@
 """Header for Cyclus Python Input Files."""
 from libcpp.string cimport string as std_string
+from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 
 cdef std_string str_py_to_cpp(object x)
 cdef object std_string_to_py(std_string x)

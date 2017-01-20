@@ -1,7 +1,9 @@
 """Python wrapper for cyclus."""
 from __future__ import division, unicode_literals, print_function
+from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 
 # Cython imports
+from libc.stdint cimport intptr_t
 from libcpp.utility cimport pair as std_pair
 from libcpp.set cimport set as std_set
 from libcpp.map cimport map as std_map
@@ -12,17 +14,18 @@ from cython.operator cimport preincrement as inc
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
+from libcpp.cast cimport reinterpret_cast
 
 from binascii import hexlify
 import uuid
 from collections import Mapping, Sequence, Iterable
+from importlib import import_module
 
 cimport numpy as np
 import numpy as np
 import pandas as pd
 
 # local imports
-
 from cyclus cimport cpp_jsoncpp
 from cyclus cimport jsoncpp
 from cyclus import jsoncpp
@@ -1674,4 +1677,16 @@ cpdef dict normalize_bid_portfolio(object inp):
         normbids.append(bid)
     cdef dict rtn = {'bids': normbids, 'constraints': constrs}
     return rtn
+
+
+cpdef object make_py_agent(object libname, object agentname, object ctx):
+    """Makes a new Python agent instance."""
+    mod = import_module(libname)
+    cls = getattr(mod, agentname)
+    ctx = Context()
+    (<_Context> ctx).ptx = <cpp_cyclus.Context*> PyCapsule_GetPointer(ctx, <char*> b"ctx")
+    agent = cls(ctx)
+    rtn = PyCapsule_New((<_Agent> agent).ptx, <char*> b"agent", NULL)
+    return rtn
+
 

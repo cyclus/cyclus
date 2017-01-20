@@ -96,4 +96,4 @@ cdef class _Context:
 #
 cdef cpp_jsoncpp.Value str_to_json_value(object pyanno)
 cpdef dict normalize_request_portfolio(object inp)
-
+cpdef object make_py_agent(object libname, object agentname, object ctx)
