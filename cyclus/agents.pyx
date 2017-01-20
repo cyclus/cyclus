@@ -10,7 +10,7 @@ from cython.operator cimport dereference as deref
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
     PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
-    PyBytes_FromString, PyDict_GetItem, PyDict_SetItem)
+    PyBytes_FromString, PyDict_GetItem, PyDict_SetItem, PyObject_GetAttrString)
 
 import json
 from inspect import getmro, getdoc
@@ -191,7 +191,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Region a = type(<object> this.self)(ctx)
-        a.shim.InitFromAgent(this)
+        (<CyclusRegionShim*> a.shim).InitFromAgent(<CyclusRegionShim*> this)
         return a.shim
 
     void InitFromAgent "InitFrom" (CyclusRegionShim* a):
@@ -229,7 +229,13 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         return lib.inventories_to_cpp(pyinvs)
 
     std_string schema():
+        #print(type(<object> this.self))
         pyschema = (<object> this.self).schema
+        #pyschema = (<object> this.self).schema
+        #return str_py_to_cpp(pyschema)
+        #pyschema = getattr((<object> this.self), "schema")
+        #pyschema = (<_Region> this.self).schema
+        #pyschema = PyObject_GetAttrString((<object> this.self), b"schema")
         return str_py_to_cpp(pyschema)
 
     cpp_jsoncpp.Value annotations():
@@ -675,27 +681,8 @@ cdef class _Agent(lib._Agent):
         self._free = True
         self.shim.self = <PyObject*> self
 
-
-class Agent(_Agent, lib.Agent):
-    """Python Agent that is subclassable into any kind of agent.
-
-    Parameters
-    ----------
-    ctx : cyclus.lib.Context
-        The simulation execution context.  You don't normally
-        need to call the initilaizer.
-    """
-    _statevars = None
-    _inventories = None
-    _schema = None
-    _annotations_json = None
-    entity = 'archetype'
-    niche = None
-    tooltip = None
-    userlevel = 0
-
     def __init__(self, ctx):
-        super().__init__(ctx)
+        #super().__init__(ctx)
         # gather the state variables and inventories
         cls = type(self)
         if cls._statevars is None:
@@ -977,15 +964,36 @@ class Agent(_Agent, lib.Agent):
         return None
 
 
-cdef class _Region(lib._Agent):
+class Agent(_Agent, lib.Agent):
+    """Python Agent that is subclassable into any kind of agent.
+
+    Parameters
+    ----------
+    ctx : cyclus.lib.Context
+        The simulation execution context.  You don't normally
+        need to call the initilaizer.
+    """
+    _statevars = None
+    _inventories = None
+    _schema = None
+    _annotations_json = None
+    entity = 'archetype'
+    niche = None
+    tooltip = None
+    userlevel = 0
+
+
+
+cdef class _Region(_Agent):
 
     def __cinit__(self, lib._Context ctx):
-        self.ptx = self.shim = new CyclusRegionShim(ctx.ptx)
+        self.ptx = self.shim = <CyclusAgentShim*> new CyclusRegionShim(ctx.ptx)
         self._free = True
         self.shim.self = <PyObject*> self
 
 
-class Region(_Region, Agent):
+#class Region(_Region, Agent):
+class Region(_Region):
     """Python Region that is subclassable into a region archetype.
 
     Parameters
@@ -1017,7 +1025,8 @@ cdef class _Institution(lib._Agent):
         self.shim.self = <PyObject*> self
 
 
-class Institution(_Institution, Agent):
+#class Institution(_Institution, Agent):
+class Institution(_Institution):
     """Python Institution that is subclassable into a institution archetype.
 
     Parameters
@@ -1049,7 +1058,8 @@ cdef class _Facility(lib._Agent):
         self.shim.self = <PyObject*> self
 
 
-class Facility(_Facility, Agent):
+#class Facility(_Facility, Agent):
+class Facility(_Facility):
     """Python Facility that is subclassable into a facility archetype.
 
     Parameters

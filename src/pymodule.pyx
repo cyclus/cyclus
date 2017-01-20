@@ -28,8 +28,8 @@ cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib):
     try:
         mod = import_module(lib)
     except ImportError:
-        return std_string()
-    cdef std_string rtn = str_py_to_cpp(mod.__file__)
+        return std_string(b"")
+    cdef std_string rtn = str_py_to_cpp("<py>:" + mod.__file__)
     return rtn
 
 

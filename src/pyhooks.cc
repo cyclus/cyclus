@@ -48,7 +48,7 @@ void PyStop(void) {
 
 void EventLoop(void) { CyclusEventLoopHook(); };
 
-std::string PyFindModule(std::string lib) { CyclusPyFindModule(lib); };
+std::string PyFindModule(std::string lib) { return CyclusPyFindModule(lib); };
 
 void* MakePyAgent(std::string lib, std::string agent, void* ctx) {
   return CyclusMakePyAgent(lib, agent, ctx);
@@ -75,7 +75,7 @@ void PyStop(void) {};
 
 void EventLoop(void) {};
 
-std::string PyFindModule(std::string lib) { std::string(); };
+std::string PyFindModule(std::string lib) { return std::string(""); };
 
 void* MakePyAgent(std::string lib, std::string agent, void* ctx) { return NULL; };
 

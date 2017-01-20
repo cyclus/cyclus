@@ -115,7 +115,7 @@ void DynamicModule::CloseAll() {
 DynamicModule::DynamicModule(AgentSpec spec)
     : module_library_(0),
       ctor_(NULL) {
-  path_ = Env::FindModule(spec.LibPath());
+  path_ = Env::FindModule(spec.LibPath(), spec.lib());
   if (boost::starts_with(path_, "<py>:")) {
     /// python module, so no need to do more
     return;

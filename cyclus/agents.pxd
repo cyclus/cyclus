@@ -142,10 +142,10 @@ cdef class _Agent(lib._Agent):
 
 ctypedef CyclusRegionShim* region_shim_ptr
 
-cdef class _Region(lib._Agent):
+cdef class _Region(_Agent):
     # pointer declared on full backend, but that is untyped, shim is typed
-    cdef region_shim_ptr shim
-
+    #cdef region_shim_ptr shim
+    pass
 
 ctypedef CyclusInstitutionShim* institution_shim_ptr
 

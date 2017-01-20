@@ -964,6 +964,7 @@ cdef class _InfileTree:
         cdef std_string str_default, str_rtn
         if isinstance(default, str):
             str_default = str_py_to_cpp(default)
+            print(self.ptx == NULL, cpp_query, str_default,)
             str_rtn = cpp_cyclus.OptionalQuery[std_string](self.ptx, cpp_query,
                                                            str_default)
             rtn = std_string_to_py(str_rtn)
@@ -1690,13 +1691,14 @@ cpdef dict normalize_bid_portfolio(object inp):
 # This a cache for agents so Python doesn't gc them and end up deallocing early
 cdef dict _AGENT_REFS = {}
 
-cpdef object make_py_agent(object libname, object agentname, object ctx):
+cpdef object make_py_agent(object libname, object agentname, object ctx_capsule):
     """Makes a new Python agent instance."""
     global _AGENT_REFS
     mod = import_module(libname)
     cls = getattr(mod, agentname)
-    ctx = Context()
-    (<_Context> ctx).ptx = <cpp_cyclus.Context*> PyCapsule_GetPointer(ctx, <char*> b"ctx")
+    ctx = Context(init=False)
+    (<_Context> ctx).ptx = <cpp_cyclus.Context*> PyCapsule_GetPointer(ctx_capsule,
+                                                                      <char*> b"ctx")
     agent = cls(ctx)
     _AGENT_REFS[agent.id] = agent
     rtn = PyCapsule_New((<_Agent> agent).ptx, <char*> b"agent", NULL)
