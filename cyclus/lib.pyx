@@ -1182,11 +1182,11 @@ cdef class _Agent:
         if self.ptx == NULL:
             return
         elif self._free:
-            cpp_ptx = <cpp_cyclus.Agent*> self.shim
+            cpp_ptx = <cpp_cyclus.Agent*> self.ptx
             del cpp_ptx
-            self.ptx = self.shim = NULL
+            self.ptx = NULL
         else:
-            self.ptx = self.shim = NULL
+            self.ptx = NULL
 
     @property
     def version(self):
