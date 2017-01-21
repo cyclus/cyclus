@@ -1171,18 +1171,22 @@ cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs):
 
 cdef class _Agent:
 
-    def __cinit__(self, bint free=False):
-        self._free = free
-        self.ptx == NULL
-        self._annotations = self._context = None
+    def __cinit__(self, _Context ctx):
+        self._free = False
+        self.ptx = NULL
+        self._annotations = None
+        self._context = ctx
 
     def __dealloc__(self):
         cdef cpp_cyclus.Agent* cpp_ptx
         if self.ptx == NULL:
             return
         elif self._free:
-            cpp_ptx = <cpp_cyclus.Agent*> self.ptx
+            cpp_ptx = <cpp_cyclus.Agent*> self.shim
             del cpp_ptx
+            self.ptx = self.shim = NULL
+        else:
+            self.ptx = self.shim = NULL
 
     @property
     def version(self):
@@ -1710,6 +1714,7 @@ cpdef void _clear_agent_refs():
     """Clears the agent references cache. Users should never need to call this."""
     global _AGENT_REFS
     _AGENT_REFS.clear()
+
 
 cpdef void _del_agent(int i):
     """Clears a single agent from the reference cache Users should never need to

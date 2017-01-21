@@ -994,6 +994,7 @@ cdef class _Region(_Agent):
         elif self._free:
             cpp_ptx = <CyclusRegionShim*> self.shim
             del cpp_ptx
+            self.ptx = self.shim = NULL
         else:
             self.ptx = self.shim = NULL
 

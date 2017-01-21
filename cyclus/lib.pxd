@@ -99,3 +99,4 @@ cpdef dict normalize_request_portfolio(object inp)
 cdef dict _AGENT_REFS
 cpdef object make_py_agent(object libname, object agentname, object ctx)
 cpdef void _clear_agent_refs()
+cpdef void _del_agent(int i)
