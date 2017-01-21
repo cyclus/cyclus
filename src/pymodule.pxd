@@ -13,3 +13,4 @@ cdef public void* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
                                                      void* cpp_ctx)
 
 cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ()
+cdef public void py_del_agent "CyclusPyDelAgent" (int i)

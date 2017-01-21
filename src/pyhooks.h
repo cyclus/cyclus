@@ -38,6 +38,9 @@ void* MakePyAgent(std::string, std::string, void*);
 /// no need for a user to call this.
 void ClearPyAgentRefs(void);
 
+/// Removes a single Python agent from the reference cache.
+void PyDelAgent(int);
+
 namespace toolkit {
 /// Convert Python simulation string to JSON
 std::string PyToJson(std::string);

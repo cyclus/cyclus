@@ -47,3 +47,8 @@ cdef public void* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
 cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ():
     """Clears the cache of agent referencess"""
     cyclib._clear_agent_refs()
+
+
+cdef public void py_del_agent "CyclusPyDelAgent" (int i):
+    """Clears the cache of a single agent ref"""
+    cyclib._del_agent(i)

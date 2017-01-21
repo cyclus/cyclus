@@ -56,6 +56,8 @@ void* MakePyAgent(std::string lib, std::string agent, void* ctx) {
 
 void ClearPyAgentRefs(void) { CyclusClearPyAgentRefs(); };
 
+void PyDelAgent(int i) { CyclusPyDelAgent(i); };
+
 namespace toolkit {
 std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };
 
@@ -80,6 +82,8 @@ std::string PyFindModule(std::string lib) { return std::string(""); };
 void* MakePyAgent(std::string lib, std::string agent, void* ctx) { return NULL; };
 
 void ClearPyAgentRefs(void) {};
+
+void PyDelAgent(int i) {};
 
 namespace toolkit {
 std::string PyToJson(std::string infile) {
