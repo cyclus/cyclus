@@ -900,11 +900,20 @@ cdef class _Agent(lib._Agent):
 
     @property
     def schema(self):
+        """"The class schema based on the state variables."""
         if self._schema is None:
             cls = type(self)
             ctx = {name: var.to_dict() for name, var in cls._statevars}
             self._schema = _SCHEMA.xml_from_ctx(ctx)
         return self._schema
+
+    @property
+    def version(self):
+        """Property that represents version of this archetype. Overwrite this to return
+        a custom version string.
+        """
+        return "0.0.0"
+
 
     @property
     def annotations_json(self):
