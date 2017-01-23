@@ -76,6 +76,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<lib._Context> ctx).ptx = this.context()
         cdef _Agent a = type(<object> this.self)(ctx)
         a.shim.InitFromAgent(this)
+        (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
         return (<cpp_cyclus.Agent*> a.shim)
 
@@ -194,6 +195,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         (<lib._Context> ctx).ptx = this.context()
         cdef _Region a = type(<object> this.self)(ctx)
         (<CyclusRegionShim*> (<_Agent> a).shim).InitFromAgent(<CyclusRegionShim*> this)
+        (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
         return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
 
@@ -318,6 +320,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<lib._Context> ctx).ptx = this.context()
         cdef _Institution a = type(<object> this.self)(ctx)
         (<CyclusInstitutionShim*> (<_Agent> a).shim).InitFromAgent(<CyclusInstitutionShim*> this)
+        (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
         return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
 
@@ -450,6 +453,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         (<lib._Context> ctx).ptx = this.context()
         cdef _Facility a = type(<object> this.self)(ctx)
         (<CyclusFacilityShim*> (<_Agent> a).shim).InitFromAgent(<CyclusFacilityShim*> this)
+        (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
         return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
 
