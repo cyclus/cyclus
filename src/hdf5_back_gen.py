@@ -1891,16 +1891,15 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
         if depth == 0 and not DB_TO_VL[t.db]:
             if container in variable_length_types:
                 variable = get_variable("val", depth=depth, prefix=prefix)
+                init = t.cpp + "::iterator eraseit=" + variable + ".begin()"
+                advance = "std::advance(eraseit, column/" + total_item_size + ")"
+                erase = variable + ".erase(eraseit," + variable + ".end())"
                 column_check = If(cond=BinOp(x=Raw(code=total_item_size+"*"
                                                         +variable+".size()"), 
                                              op=">", y=Raw(code='column')),
-                                  body=[ExprStmt(child=Raw(code=t.cpp+"::iterator eraseit="+variable+".begin()")),
-                                        ExprStmt(child=Raw(code="std::advance(eraseit, column/"+total_item_size+")")),
-                                        ExprStmt(child=Raw(code=variable
-                                                                +".erase("
-                                                                +"eraseit,"
-                                                                +variable
-                                                                +".end())"))])
+                                  body=[ExprStmt(child=Raw(code=init)),
+                                        ExprStmt(child=Raw(code=advance)),
+                                        ExprStmt(child=Raw(code=erase))])
                 setup.nodes.append(column_check)
                 
     return setup
@@ -2314,7 +2313,36 @@ def main_write():
     return output
 
 def to_from_buf_setup(t, depth=0, prefix="", spec=None):
+    """HDF5 VAL_TO_BUF and BUF_TO_VAL: Generate setup for both functions.
+    
+    This setup is to be called one time for each type. It returns nodes for 
+    initial buffer/type declaration, item sizes, and a potentially dimensioned 
+    list describing which child types within the initial container t are VL. 
+    These are denoted by a 1, where fixed-length primitive types are denoted by 
+    a 0. Fixed-length containers (i.e. pairs) are denoted by a nested list of 
+    1's and 0's.
+    
+    Parameters
+    ----------
+    t : Type
+        C++ type node.
+    depth : int, optional
+        Recursive depth counter, used for variable names.
+    prefix : str, optional
+        Current prefix, used for variable name uniqueness.
+    spec : str or None, optional
+        Determines whether extra nodes are added for VAL_TO_BUF or BUF_TO_VAL
+    
+    Returns
+    -------
+    node : Block
+        All setup nodes.
+    vl_list : list
+        Potentially dimensioned list cooresponding to child types, with values
+        of 0 and 1 representing FL and VL types, respectively. 
+    """
     node = Block(nodes=[])
+    #Handle specializations for VLValToBuf and VLBufToVal functions.
     if depth == 0:
         if spec == 'TO_BUF':
             node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
@@ -2336,6 +2364,7 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
     prefixes = template_args[container]
     children = t.canon[1:]
     vl_list = []
+    #Iterate, determine sizes and whether type is VL
     for c, p in zip(children, prefixes):
         child_node = CANON_TO_NODE[c]
         variable = get_variable("item_size", depth=depth+1, prefix=prefix+p)
@@ -2359,6 +2388,7 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
                                                    prefix=prefix+p)
             node.nodes.append(new_node)
             vl_list.append(new_list)
+    #Unpack and declare all child sizes.
     for k, v in child_sizes.items():
         node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
                                                     target=Raw(code=k),
@@ -2369,6 +2399,7 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
                                         target=Raw(code=total_var),
                                         value=Raw(
                                            code="+".join(child_sizes.keys())))))
+    #Further specializations.
     if depth == 0:
         if spec == 'TO_BUF':
             node.nodes.append(ExprStmt(child=DeclAssign(
@@ -2384,6 +2415,34 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
 
 def to_buf_body(t, vl_list, depth=0, prefix="", variable=None, 
                 offset="reinterpret_cast<char*>(buf.p)"):
+    """HDF5 VAL_TO_BUF: Generates the body of the VLValToBuf function.
+    
+    The VLValToBuf function creates a new VL buffer from an original C++ data
+    type. All potentially variable length types are passed to VLWrite and a 
+    SHA1 hash is added to the buffer in place of the actual type data. 
+    Primitives and remaining container types are written as-is to the buffer.
+    
+    Parameters
+    ----------
+    t : Type
+        Node representing current C++ type
+    vl_list : list
+        Potentially dimensioned list of 1's and 0's, corresponding to each
+        child type and whether it is variable length or not, respectively.
+    depth : int, optional
+        Current recursive depth, used for naming variables.
+    prefix : str, optional
+        Current variable prefix, used to ensure unique variable names.
+    variable : str, optional
+        Current container variable name.
+    offset : str or None, optional
+        Current offset into data.
+        
+    Returns
+    -------
+    block : Block
+        Nodes representing the body.
+    """
     if variable == None:
         variable = 'x'
     block = Block(nodes=[])
@@ -2392,6 +2451,9 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
     children = t.canon[1:]
     loop_block = Block(nodes=[])
     new_offset = offset
+    #If a container is VL and has multiple children, we'll need to use pointer 
+    #notation to access the child data. Otherwise, we can use normal dot 
+    #notation.
     if t.canon[0] in variable_length_types:
         count_var = get_variable("count", depth=depth, prefix=prefix)
         block.nodes.append(ExprStmt(child=DeclAssign(type=Type(
@@ -2411,6 +2473,8 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
     else: 
         labels = ['.first', '.second']
         new_variable = variable
+    #Containers with only one child can simply use the iterator to reference
+    #their child data.
     if len(children) == 1:
         new_variable = "*" + new_variable
         labels = ['']
@@ -2418,21 +2482,26 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
         child_node = CANON_TO_NODE[child]
         child_var = new_variable + label
         item_size = get_variable("item_size", depth=depth+1, prefix=prefix+part)
+        #For variable length types we must use VLWrite to get the SHA1
         if vl == 1:
             loop_block.nodes.append(vl_write(ORIGIN_TO_VL[child], child_var, 
                                              depth=depth+1, prefix=prefix+part))
             key_var = get_variable("key", depth=depth+1, prefix=prefix+part)
             loop_block.nodes.append(memcpy(new_offset, key_var+".val", 
                                            item_size))
+        #Other primitives can be copied
         elif vl == 0:
             loop_block.nodes.append(memcpy(new_offset, "&("+child_var+")", 
                                           item_size))
+        #Other containers must be handled recursively.
         else:
             loop_block.nodes.append(to_buf_body(child_node, vl, depth=depth+1,
                                     prefix=prefix+part, variable=child_var, 
                                     offset=new_offset))
+        #Update current offset.
         new_offset += "+" + item_size
-            
+    
+    #For variable length containers, add the for loop.        
     if t.canon[0] in variable_length_types:    
         block.nodes.append(For(cond=BinOp(x=Var(name=iter_var), op="!=", 
                                           y=Var(name=variable+".end()")),
@@ -2442,6 +2511,7 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
                                                       op="++", 
                                                       name=Var(
                                                             name=count_var)))]))
+    #Other containers don't need a loop (i.e. pair).
     else:
         block.nodes.append(loop_block)
     if depth == 0:
@@ -2449,6 +2519,7 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
     return block
 
 def main_val_to_buf():
+    """HDF5 VAL_TO_BUF: Generates VLValToBuf function."""
     CPPGEN = CppGen()
     output = ""
     block = Block(nodes=[])
@@ -2466,6 +2537,7 @@ def main_val_to_buf():
     return output
     
 def main_val_to_buf_h():
+    """HDF5 VAL_TO_BUF_H: Generates header declarations for VLValToBuf function."""
     CPPGEN = CppGen()
     output = ""
     block = Block(nodes=[])
@@ -2486,6 +2558,20 @@ def main_val_to_buf_h():
     return output
 
 def vl_read(t, offset):
+    """Representation of C++ VLRead function.
+    
+    Parameters
+    ----------
+    t : Type
+        C++ type node.
+    offset : str
+        Memory location of SHA1 hash.
+        
+    Returns
+    -------
+    node : FuncCall
+        The final function call.
+    """
     node = FuncCall(name=Var(name='VLRead'), 
                     targs=[Raw(code=t.cpp), 
                            Raw(code=ORIGIN_TO_VL[t.canon].db)], 
@@ -2493,6 +2579,23 @@ def vl_read(t, offset):
     return node
 
 def reinterpret_cast(t, offset, deref=False):
+    """Representation of C++ reinterpret_cast function.
+    
+    Parameters
+    ----------
+    t : Type
+        C++ type to cast as.
+    offset : str
+        Memory location of the data to cast.
+    deref : bool, optional
+        Should the function be dereferenced? (This returns the newly casted 
+        data, rather than a pointer)
+    
+    Returns
+    -------
+    node : FuncCall
+        The final function call.
+    """
     if deref:
         func_name = '*reinterpret_cast'
     else:
@@ -2502,16 +2605,47 @@ def reinterpret_cast(t, offset, deref=False):
     return node
 
 def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
+    """Generates the body of the VLBufToVal function.
+    
+    The VLBufToVal function is responsible for reading the bytes of a VL buffer 
+    back into a C++ value. Importantly, we assume that all types which have the
+    capability of being VL *are* VL. When we encounter one of these types, we 
+    call VLRead, passing in the respective SHA1 hash value. Otherwise, we read
+    in the fixed length number of bytes associated with the type.
+    
+    Parameters
+    ----------
+    t : Type
+        Node representing current C++ type
+    vl_list : list
+        Potentially dimensioned list of 1's and 0's, corresponding to each
+        child type and whether it is variable length or not, respectively.
+    depth : int, optional
+        Current recursive depth, used for naming variables.
+    prefix : str, optional
+        Current variable prefix, used to ensure unique variable names.
+    variable : str, optional
+        Current container variable name.
+    offset : str or None, optional
+        Current offset into buffer.
+        
+    Returns
+    -------
+    block : Block
+        Nodes representing the body.
+    """
     block = Block(nodes=[])
     child_count = 0
+    #argument dict, for unpacking later in str formatting
     args = {}
+    args['var'] = variable
     total_item_size = get_variable('total_item_size', depth=depth, 
                                    prefix=prefix)
     count = get_variable('count', depth=depth, prefix=prefix)
+    #set default offset if none given
     if offset == None:
         offset = 'p+' + "(" + total_item_size + '*' + count + ")"
     container = t.canon[0]
-    args['var'] = variable
     loop_block = Block(nodes=[])
     for child, part, vl in zip(t.canon[1:], template_args[t.canon[0]], vl_list):
         type_node = CANON_TO_NODE[child]
@@ -2519,12 +2653,14 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
         child_size = get_variable('item_size', depth=depth+1, 
                                   prefix=prefix+part)
         child_arg = 'child' + str(child_count)
+        #any variable length type can be resolved using VLRead, even containers
         if vl == 1:
             loop_block.nodes.append(ExprStmt(child=DeclAssign(
                                                      type=type_node,
                                                      target=Var(name=child_var),
                                                      value=vl_read(type_node, 
                                                                    offset))))
+        #read in primitive, fixed-length types
         elif vl == 0:
             loop_block.nodes.append(ExprStmt(child=DeclAssign(
                                                      type=type_node,
@@ -2533,6 +2669,8 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
                                                                   type_node, 
                                                                   offset,
                                                                   deref=True))))
+        #structures which are neither primitive nor VL, i.e. std::pairs, must
+        #be handled recursively
         else:
             loop_block.nodes.append(ExprStmt(child=Decl(
                                                      type=type_node,
@@ -2544,6 +2682,9 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
         args[child_arg] = child_var
         offset += "+" + child_size
         child_count += 1
+    #This is the expression which adds a type to a given container, formatted 
+    #with the variables associated with child types. This must be placed in a 
+    #for loop if the container is variable length.
     container_expr = CONTAINER_INSERT_STRINGS[container].format(**args)
     if container in variable_length_types:
         block.nodes.append(ExprStmt(child=DeclAssign(type=Type(
@@ -2563,6 +2704,7 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
     return block
 
 def main_buf_to_val():
+    """HDF5 BUF_TO_VAL: Generates the VLBufToVal function code."""
     CPPGEN = CppGen()
     output = ""
     block = Block(nodes=[])
