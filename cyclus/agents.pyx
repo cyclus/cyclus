@@ -70,16 +70,18 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         rtn = (<object> this.self).version
         return str_py_to_cpp(rtn)
 
+
     cpp_cyclus.Agent* Clone():
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Agent a = type(<object> this.self)(ctx)
         a.shim.InitFromAgent(this)
-        return a.shim
+        lib._AGENT_REFS[a.id] = a
+        return (<cpp_cyclus.Agent*> a.shim)
 
     void InitFromAgent "InitFrom" (CyclusAgentShim* a):
         cpp_cyclus.Agent.InitFromAgent(a)
-        (<object> a.self).init_from_agent(<object> this.self)
+        (<object> this.self).init_from_agent(<object> a.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
         cpp_cyclus.Agent.InfileToDb(tree, di)
@@ -191,12 +193,13 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Region a = type(<object> this.self)(ctx)
-        (<CyclusRegionShim*> a.shim).InitFromAgent(<CyclusRegionShim*> this)
-        return a.shim
+        (<CyclusRegionShim*> (<_Agent> a).shim).InitFromAgent(<CyclusRegionShim*> this)
+        lib._AGENT_REFS[a.id] = a
+        return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
 
     void InitFromAgent "InitFrom" (CyclusRegionShim* a):
         cpp_cyclus.Region.InitFromAgent(a)
-        (<object> a.self).init_from_agent(<object> this.self)
+        (<object> this.self).init_from_agent(<object> a.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
         cpp_cyclus.Region.InfileToDb(tree, di)
@@ -314,12 +317,13 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Institution a = type(<object> this.self)(ctx)
-        a.shim.InitFromAgent(this)
-        return a.shim
+        (<CyclusInstitutionShim*> (<_Agent> a).shim).InitFromAgent(<CyclusInstitutionShim*> this)
+        lib._AGENT_REFS[a.id] = a
+        return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
 
     void InitFromAgent "InitFrom" (CyclusInstitutionShim* a):
         cpp_cyclus.Institution.InitFromAgent(a)
-        (<object> a.self).init_from_agent(<object> this.self)
+        (<object> this.self).init_from_agent(<object> a.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
         cpp_cyclus.Institution.InfileToDb(tree, di)
@@ -445,12 +449,13 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Facility a = type(<object> this.self)(ctx)
-        a.shim.InitFromAgent(this)
-        return a.shim
+        (<CyclusFacilityShim*> (<_Agent> a).shim).InitFromAgent(<CyclusFacilityShim*> this)
+        lib._AGENT_REFS[a.id] = a
+        return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
 
     void InitFromAgent "InitFrom" (CyclusFacilityShim* a):
         cpp_cyclus.Facility.InitFromAgent(a)
-        (<object> a.self).init_from_agent(<object> this.self)
+        (<object> this.self).init_from_agent(<object> a.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di):
         cpp_cyclus.Facility.InfileToDb(tree, di)
