@@ -701,6 +701,12 @@ cdef class _Agent(lib._Agent):
         cdef list svs = []
         for name, var in cls._statevars:
             var = var.copy()
+            if var.value is not None:
+                pass
+            elif var.default is None:
+                var.value = ts.new_py_inst(var.uniquetypeid)
+            else:
+                var.value = var.default
             self.__dict__[name] = var
             svs.append((name, var))
         self._statevars = tuple(svs)

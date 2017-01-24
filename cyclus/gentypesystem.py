@@ -127,6 +127,7 @@ class TypeSystem(object):
         self._vars_to_py = dict(VARS_TO_PY)
         self._vars_to_cpp = dict(VARS_TO_CPP)
         self._nptypes = dict(NPTYPES)
+        self._new_py_insts = dict(NEW_PY_INSTS)
         self._to_py_converters = dict(TO_PY_CONVERTERS)
         self._to_cpp_converters = dict(TO_CPP_CONVERTERS)
 
@@ -214,6 +215,18 @@ class TypeSystem(object):
             npt = 'np.NPY_OBJECT'
             self._nptypes[n] = npt
         return npt
+
+    def new_py_inst(self, t):
+        """Returns the new instance for the type."""
+        n = self.norms.get(t, t)
+        inst = self._new_py_insts.get(n, None)
+        if inst is None:
+            # look up base type
+            inst = self._new_py_insts.get(n[0], None)
+        if inst is None:
+            inst = 'None'
+            self._new_py_insts[n] = inst
+        return inst
 
     def convert_to_py(self, x, t):
         """Converts a C++ variable to python.
@@ -480,6 +493,26 @@ NPTYPES = {
     'std::vector': 'np.NPY_OBJECT',
     'cyclus::toolkit::ResBuf': 'np.NPY_OBJECT',
     'cyclus::toolkit::ResMap': 'np.NPY_OBJECT',
+    }
+
+NEW_PY_INSTS = {
+    'bool': 'False',
+    'int': '0',
+    'float': '0.0',
+    'double': '0.0',
+    'std::string': '""',
+    'cyclus::Blob': 'b""',
+    'boost::uuids::uuid': 'uuid.UUID(int=0)',
+    'cyclus::Material': 'None',
+    'cyclus::Product': 'None',
+    'cyclus::toolkit::ResourceBuff': 'None',
+    'std::set': 'set()',
+    'std::map': '{}',
+    'std::pair': '(None, None)',
+    'std::list': '[]',
+    'std::vector': '[]',
+    'cyclus::toolkit::ResBuf': 'None',
+    'cyclus::toolkit::ResMap': 'None',
     }
 
 # note that this maps normal forms to python
@@ -1697,6 +1730,19 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
         raise TypeError(msg)
     return rtn
 
+
+cdef object new_py_inst(cpp_cyclus.DbTypes dbtype):
+    """Creates a new, empty Python instance of a database type."""
+    cdef object rtn
+    {%- for i, t in enumerate(dbtypes) %}
+    {% if i > 0 %}el{% endif %}if dbtype == {{ ts.cython_cpp_name(t) }}:
+        rtn = {{ ts.new_py_inst(t) }}
+    {%- endfor %}
+    else:
+        msg = "dbtype {0} could not be found while making a new Python instance"
+        raise TypeError(msg.format(dbtype))
+    return rtn
+
 #
 # State Variable Descriptors
 #
@@ -2472,6 +2518,8 @@ cdef cpp_cyclus.hold_any py_to_any_by_dbtype(object value, cpp_cyclus.DbTypes db
 cdef cpp_cyclus.hold_any py_to_any_by_norm(object value, object norm)
 
 cdef object any_to_py(cpp_cyclus.hold_any value)
+
+cdef object new_py_inst(cpp_cyclus.DbTypes dbtype)
 
 #
 # State Variable Descriptors
