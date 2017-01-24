@@ -123,6 +123,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         return lib.str_to_json_value(pyanno)
 
     void Build(cpp_cyclus.Agent* parent):
+        cpp_cyclus.Agent.Build(parent)
         pyrent = lib.agent_to_py(parent)
         (<object> this.self).build(pyrent)
 
@@ -242,6 +243,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         return lib.str_to_json_value(pyanno)
 
     void Build(cpp_cyclus.Agent* parent):
+        cpp_cyclus.Region.Build(parent)
         pyrent = lib.agent_to_py(parent)
         (<object> this.self).build(pyrent)
 
@@ -367,6 +369,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         return lib.str_to_json_value(pyanno)
 
     void Build(cpp_cyclus.Agent* parent):
+        cpp_cyclus.Institution.Build(parent)
         pyrent = lib.agent_to_py(parent)
         (<object> this.self).build(pyrent)
 
@@ -500,6 +503,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return lib.str_to_json_value(pyanno)
 
     void Build(cpp_cyclus.Agent* parent):
+        cpp_cyclus.Facility.Build(parent)
         pyrent = lib.agent_to_py(parent)
         (<object> this.self).build(pyrent)
 

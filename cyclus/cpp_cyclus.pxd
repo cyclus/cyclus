@@ -702,6 +702,7 @@ cdef extern from "region.h" namespace "cyclus":
         void InitFromAgent "InitFrom" (Region*)
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
+        void Build(Agent*)
 
 
 
@@ -712,6 +713,7 @@ cdef extern from "institution.h" namespace "cyclus":
         void InitFromAgent "InitFrom" (Institution*)
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
+        void Build(Agent*)
 
 
 cdef extern from "facility.h" namespace "cyclus":
@@ -721,6 +723,7 @@ cdef extern from "facility.h" namespace "cyclus":
         void InitFromAgent "InitFrom" (Facility*)
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
+        void Build(Agent*)
         cpp_bool CheckDecommissionCondition()
 
 
