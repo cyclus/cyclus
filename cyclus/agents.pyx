@@ -977,7 +977,7 @@ cdef class _Agent(lib._Agent):
         """Product preferences adjustment."""
         return None
 
-    def adjust_produc_prefs(self, prefs):
+    def adjust_product_prefs(self, prefs):
         """Product preferences adjustment."""
         return None
 

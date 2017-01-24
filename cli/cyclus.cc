@@ -54,6 +54,7 @@ static std::string usage = "Usage:   cyclus [opts] [input-file]";
 int main(int argc, char* argv[]) {
   // Close all dlopen'd modules AFTER everything else destructs
   DynamicModule::Closer cl;
+  PyStart();
 
   // Tell ENV the path between the cwd and the cyclus executable
   std::string path = Env::PathBase(argv[0]);
@@ -83,8 +84,6 @@ int main(int argc, char* argv[]) {
   } else if (ai.vm.count("input-file") > 0) {
     infile = ai.vm["input-file"].as<std::string>();
   }
-
-  PyStart();
 
   // Announce yourself
   std::cout << "              :                                                               " << std::endl;
