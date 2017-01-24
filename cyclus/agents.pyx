@@ -908,7 +908,6 @@ cdef class _Agent(lib._Agent):
             cls = type(self)
             ctx = {name: var.to_dict() for name, var in cls._statevars}
             self._schema = _SCHEMA.xml_from_ctx(ctx)
-            print("schema from cython ", self._schema, ctx, cls._statevars, self._statevars)
         return self._schema
 
     @property

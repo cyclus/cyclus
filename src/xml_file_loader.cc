@@ -102,8 +102,6 @@ std::string BuildMasterSchema(std::string schema_path, std::string infile) {
 
   for (int i = 0; i < specs.size(); ++i) {
     Agent* m = DynamicModule::Make(&ctx, specs[i]);
-    std::cout << m << "  " << specs[i].alias() << "\n";
-    std::cout << m << "  " << m->schema() << "\n";
     subschemas[m->kind()] += "<element name=\"" + specs[i].alias() + "\">\n";
     subschemas[m->kind()] += m->schema() + "\n";
     subschemas[m->kind()] += "</element>\n";

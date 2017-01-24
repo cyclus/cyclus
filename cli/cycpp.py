@@ -1761,7 +1761,7 @@ class SchemaFilter(CodeGeneratorFilter):
 
     def xml_from_ctx(self, ctx, ind="  "):
         """Creates an XML string for an agent."""
-        if len(ctx.keys()) == 0:
+        if len(ctx) == 0:
             return '<text/>'
 
         xml = '<interleave>'
@@ -1774,7 +1774,7 @@ class SchemaFilter(CodeGeneratorFilter):
             alias = member
             if 'alias' in info:
                 alias = info['alias']
-            if self.pragmaname in info and self.pragmaname is not None:
+            if info.get(self.pragmaname, False):
                 xml += info[self.pragmaname]
                 continue
             t = info['type']
@@ -1787,10 +1787,10 @@ class SchemaFilter(CodeGeneratorFilter):
 
             if key in BUFFERS:  # buffer state, skip
                 continue
-            if 'internal' in info:
+            if info.get('internal', False):
                 continue
 
-            opt = True if 'default' in info else False
+            opt = info.get('default', None) is not None
             if opt:
                 xml += '<optional>'
 
