@@ -1478,7 +1478,7 @@ cdef class _Context:
         rtn = uuid_cpp_to_py(cpp_sim_id)
         return rtn
 
-    def get_recipe(self, name, basis):
+    def get_recipe(self, name, basis='mass'):
         """Retrieve a registered recipe. This is intended for retrieving
         compositions loaded from an input file(s) at the start of a
         simulation and NOT for communicating compositions between facilities

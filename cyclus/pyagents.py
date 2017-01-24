@@ -23,7 +23,7 @@ class Sink(Facility):
         )
     recipe = ts.String(
         tooltip="input/request recipe name",
-        doc="Name of recipe to request. If empty, sink requests material no
+        doc="Name of recipe to request. If empty, sink requests material no "
             "particular composition.",
         default="",
         uilabel="Input Recipe",
@@ -41,4 +41,28 @@ class Sink(Facility):
         tooltip="sink capacity",
         default=100.0,
         )
-    inventory = ts.ResourceBuff(capacity='max_inv_size')
+    inventory = ts.ResourceBuffInv(capacity='max_inv_size')
+
+    def get_material_requests(self):
+        if len(self.recipe) == 0:
+            comp = {}
+        else:
+            comp = self.context.get_recipe(self.recipe)
+        mat = ts.Material.create_untracked(self.capacity, comp)
+        port = {"commodities": {c: mat for c in self.in_commds},
+                "constraints": self.capacity}
+        return port
+
+    def get_product_requests(self):
+        prod = ts.Product.create_untracked(self.capacity, "")
+        port = {"commodities": {c: prod for c in self.in_commds},
+                "constraints": self.capacity}
+        return port
+
+    def accept_material_trades(self, responses):
+        for mat in responses.values():
+            self.inventory.push(mat)
+
+    def accept_product_trades(self, responses):
+        for prod in responses.values():
+            self.inventory.push(prod)

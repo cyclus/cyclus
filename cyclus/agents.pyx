@@ -485,6 +485,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         pyinvs = (<object> this.self).snapshot_inv()
         return lib.inventories_to_cpp(pyinvs)
 
+    #int id():
+    #    return this.id_
+
     std_string schema():
         pyschema = (<object> this.self).schema
         return str_py_to_cpp(pyschema)
@@ -506,7 +509,6 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
 
     void DecomNotify():
         (<object> this.self).decom_notify()
-
 
     void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs):
         # cache the commod_reqs wrappers globally
