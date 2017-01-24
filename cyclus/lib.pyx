@@ -1478,6 +1478,16 @@ cdef class _Context:
         rtn = uuid_cpp_to_py(cpp_sim_id)
         return rtn
 
+    def get_recipe(self, name, basis):
+        """Retrieve a registered recipe. This is intended for retrieving
+        compositions loaded from an input file(s) at the start of a
+        simulation and NOT for communicating compositions between facilities
+        during the simulation. You must provide the basis as either "mass" or
+        "atom".
+        """
+        c = ts.composition_from_cpp(self.ptx.GetRecipe(str_py_to_cpp(name)), basis)
+        return c
+
 
 class Context(_Context):
     """A simulation context provides access to necessary simulation-global
