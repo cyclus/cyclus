@@ -886,6 +886,7 @@ cdef class _InfileTree:
         """
         cdef _InfileTree self = cls(free=True)
         self.ptx = new cpp_cyclus.InfileTree(parser.ptx[0])
+        return self
 
     def nmatches(self, query):
         """Investigates the current status and returns the number of elements
@@ -964,7 +965,6 @@ cdef class _InfileTree:
         cdef std_string str_default, str_rtn
         if isinstance(default, str):
             str_default = str_py_to_cpp(default)
-            print(self.ptx == NULL, cpp_query, str_default,)
             str_rtn = cpp_cyclus.OptionalQuery[std_string](self.ptx, cpp_query,
                                                            str_default)
             rtn = std_string_to_py(str_rtn)

@@ -38,14 +38,6 @@ from cyclus.cycpp import VarDeclarationFilter, SchemaFilter
 _VAR_DECL = VarDeclarationFilter()
 _SCHEMA = SchemaFilter()
 
-# startup numpy
-#cimport numpy as np
-#import numpy as np
-#import pandas as pd
-
-#np.import_array()
-#np.import_ufunc()
-
 
 cdef int _GET_MAT_PREFS_TIME = -9999999999
 cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* _GET_MAT_PREFS_PTR = NULL
@@ -69,7 +61,6 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     std_string version():
         rtn = (<object> this.self).version
         return str_py_to_cpp(rtn)
-
 
     cpp_cyclus.Agent* Clone():
         cdef lib._Context ctx = lib.Context(init=False)
@@ -1022,7 +1013,6 @@ cdef class _Region(_Agent):
 
 
 
-#class Region(_Region, Agent):
 class Region(_Region):
     """Python Region that is subclassable into a region archetype.
 
@@ -1047,15 +1037,25 @@ class Region(_Region):
         pass
 
 
-cdef class _Institution(lib._Agent):
+cdef class _Institution(_Agent):
 
     def __cinit__(self, lib._Context ctx):
-        self.ptx = self.shim = new CyclusInstitutionShim(ctx.ptx)
+        self.ptx = self.shim = <CyclusAgentShim*> new CyclusInstitutionShim(ctx.ptx)
         self._free = True
-        self.shim.self = <PyObject*> self
+        (<CyclusInstitutionShim*> (<_Agent> self).shim).self = <PyObject*> self
+
+    def __dealloc__(self):
+        cdef CyclusInstitutionShim* cpp_ptx
+        if self.ptx == NULL:
+            return
+        elif self._free:
+            cpp_ptx = <CyclusInstitutionShim*> self.shim
+            del cpp_ptx
+            self.ptx = self.shim = NULL
+        else:
+            self.ptx = self.shim = NULL
 
 
-#class Institution(_Institution, Agent):
 class Institution(_Institution):
     """Python Institution that is subclassable into a institution archetype.
 
@@ -1080,15 +1080,25 @@ class Institution(_Institution):
         pass
 
 
-cdef class _Facility(lib._Agent):
+cdef class _Facility(_Agent):
 
     def __cinit__(self, lib._Context ctx):
-        self.ptx = self.shim = new CyclusFacilityShim(ctx.ptx)
+        self.ptx = self.shim = <CyclusAgentShim*> new CyclusFacilityShim(ctx.ptx)
         self._free = True
-        self.shim.self = <PyObject*> self
+        (<CyclusFacilityShim*> (<_Agent> self).shim).self = <PyObject*> self
+
+    def __dealloc__(self):
+        cdef CyclusFacilityShim* cpp_ptx
+        if self.ptx == NULL:
+            return
+        elif self._free:
+            cpp_ptx = <CyclusFacilityShim*> self.shim
+            del cpp_ptx
+            self.ptx = self.shim = NULL
+        else:
+            self.ptx = self.shim = NULL
 
 
-#class Facility(_Facility, Agent):
 class Facility(_Facility):
     """Python Facility that is subclassable into a facility archetype.
 

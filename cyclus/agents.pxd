@@ -143,22 +143,17 @@ cdef class _Agent(lib._Agent):
 ctypedef CyclusRegionShim* region_shim_ptr
 
 cdef class _Region(_Agent):
-    # pointer declared on full backend, but that is untyped, shim is typed
-    #cdef region_shim_ptr shim
     pass
 
 ctypedef CyclusInstitutionShim* institution_shim_ptr
 
-cdef class _Institution(lib._Agent):
-    # pointer declared on full backend, but that is untyped, shim is typed
-    cdef institution_shim_ptr shim
+cdef class _Institution(_Agent):
+    pass
 
 
 ctypedef CyclusFacilityShim* facility_shim_ptr
 
-cdef class _Facility(lib._Agent):
-    # pointer declared on full backend, but that is untyped, shim is typed
-    cdef facility_shim_ptr shim
-
+cdef class _Facility(_Agent):
+    pass
 
 cdef tuple index_and_sort_vars(dict)

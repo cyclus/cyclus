@@ -161,7 +161,7 @@ class SimState(object):
     def _load_schema_path(self):
         """find schema type"""
         parser = XMLParser(filename=self.input_file)
-        tree = InfileTree(parser)
+        tree = InfileTree.from_parser(parser)
         schema_type = tree.optional_query("/simulation/schematype", "")
         if schema_type == "flat" and not ns.flat_schema:
             print("flat schema tag detected - switching to flat input schema",
