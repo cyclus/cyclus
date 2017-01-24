@@ -84,8 +84,8 @@ Agent* DynamicModule::Make(Context* ctx, AgentSpec spec) {
   Agent* a;
   if (boost::starts_with(dyn->path(), "<py>")) {
     /// go down a separate execution pathway if we are asked to load a
-    /// oPython module.
-    a = reinterpret_cast<Agent*>(MakePyAgent(spec.lib(), spec.agent(), ctx));
+    /// Python module.
+    a = MakePyAgent(spec.lib(), spec.agent(), ctx);
   } else {
     // build a C++ agent.
     a = dyn->ConstructInstance(ctx);

@@ -705,7 +705,6 @@ cdef extern from "region.h" namespace "cyclus":
         void Build(Agent*)
 
 
-
 cdef extern from "institution.h" namespace "cyclus":
 
     cdef cppclass Institution(Agent, TimeListener):

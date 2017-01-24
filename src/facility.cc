@@ -13,8 +13,9 @@
 
 namespace cyclus {
 
-Facility::Facility(Context* ctx) : Trader(this), Agent(ctx) {
-  kind_ = "Facility";
+//Facility::Facility(Context* ctx) : Trader(this), Agent(ctx) {
+Facility::Facility(Context* ctx) : Agent(ctx), Trader(this) {
+  kind_ = std::string("Facility");
 }
 
 Facility::~Facility() {}

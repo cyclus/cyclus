@@ -1,6 +1,6 @@
 """Cyclus Python module loading tools."""
 from __future__ import print_function, unicode_literals
-from libcpp.cast cimport reinterpret_cast
+from libcpp.cast cimport reinterpret_cast, dynamic_cast
 from libcpp.string cimport string as std_string
 from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 
@@ -32,15 +32,25 @@ cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib):
     return rtn
 
 
-cdef public void* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
+cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
                                                      std_string cpp_agent,
                                                      void* cpp_ctx):
     """Makes a new Python agent instance."""
     libname = std_string_to_py(cpp_lib)
     agentname = std_string_to_py(cpp_agent)
     ctx = PyCapsule_New(cpp_ctx, <char*> b"ctx", NULL)
-    a = cyclib.make_py_agent(libname, agentname, ctx)
-    return PyCapsule_GetPointer(a, <char*> b"agent")
+    a, kind = cyclib.make_py_agent(libname, agentname, ctx)
+    cdef void* avoid = PyCapsule_GetPointer(a, <char*> b"agent")
+    cdef Agent* rtn
+    if kind == "Region":
+        rtn = dynamic_cast[agent_ptr](reinterpret_cast[region_ptr](avoid))
+    elif kind == "Institution":
+        rtn = dynamic_cast[agent_ptr](reinterpret_cast[institution_ptr](avoid))
+    elif kind == "Facility":
+        rtn = dynamic_cast[agent_ptr](reinterpret_cast[facility_ptr](avoid))
+    else:
+        rtn = dynamic_cast[agent_ptr](reinterpret_cast[agent_ptr](avoid))
+    return rtn
 
 
 cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ():

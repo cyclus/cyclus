@@ -932,8 +932,8 @@ cdef class _Agent(lib._Agent):
             aj = {'vars': vars,
                   'name': cls.__name__,
                   'entity': cls.entity,
-                  'parents': cls.__bases__,
-                  'all_parents': getmro(cls)[1:],
+                  'parents': [b.__name__ for b in cls.__bases__],
+                  'all_parents': [b.__name__ for b in getmro(cls)[1:]],
                   'doc': getdoc(cls),
                   'userlevel': cls.userlevel,
                   }
@@ -1104,6 +1104,14 @@ cdef class _Facility(_Agent):
     def id(self):
         """The agent instance's unique ID within a simulation."""
         return (<CyclusFacilityShim*> (<_Agent> self).shim).id()
+
+    @property
+    def kind(self):
+        """Returns a string that describes the agent subclass (e.g. Region,
+        Facility, etc.)
+        """
+        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).kind())
+        return rtn
 
 
 class Facility(_Facility):

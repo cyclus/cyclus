@@ -4,6 +4,8 @@
 #include <string>
 
 namespace cyclus {
+class Agent;
+
 /// Because of NumPy #7595, we can only initialize & finalize the Python
 /// interpreter once. This variable keeps a count of how many times we have
 /// initialized so that we can know when to really stop the interpreter.
@@ -32,7 +34,7 @@ void EventLoop(void);
 std::string PyFindModule(std::string);
 
 /// Finds a Python module and returns an agent pointer from it.
-void* MakePyAgent(std::string, std::string, void*);
+Agent* MakePyAgent(std::string, std::string, void*);
 
 /// Removes all Python agents from the internal cache. There is usually
 /// no need for a user to call this.

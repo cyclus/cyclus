@@ -1717,7 +1717,7 @@ cpdef object make_py_agent(object libname, object agentname, object ctx_capsule)
     (<_Agent> agent)._free = False
     _AGENT_REFS[agent.id] = agent
     rtn = PyCapsule_New((<_Agent> agent).ptx, <char*> b"agent", NULL)
-    return rtn
+    return rtn, agent.kind
 
 
 cpdef void _clear_agent_refs():

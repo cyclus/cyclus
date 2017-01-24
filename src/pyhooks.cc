@@ -50,7 +50,7 @@ void EventLoop(void) { CyclusEventLoopHook(); };
 
 std::string PyFindModule(std::string lib) { return CyclusPyFindModule(lib); };
 
-void* MakePyAgent(std::string lib, std::string agent, void* ctx) {
+Agent* MakePyAgent(std::string lib, std::string agent, void* ctx) {
   return CyclusMakePyAgent(lib, agent, ctx);
 };
 
@@ -79,7 +79,7 @@ void EventLoop(void) {};
 
 std::string PyFindModule(std::string lib) { return std::string(""); };
 
-void* MakePyAgent(std::string lib, std::string agent, void* ctx) { return NULL; };
+Agent* MakePyAgent(std::string lib, std::string agent, void* ctx) { return NULL; };
 
 void ClearPyAgentRefs(void) {};
 

@@ -102,6 +102,7 @@ class Facility : public TimeListener, public Agent, public Trader {
 
   /// every agent should be able to print a verbose description
   virtual std::string str();
+
 };
 
 }  // namespace cyclus
