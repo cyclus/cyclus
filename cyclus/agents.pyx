@@ -1100,6 +1100,11 @@ cdef class _Facility(_Agent):
         else:
             self.ptx = self.shim = NULL
 
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).id()
+
 
 class Facility(_Facility):
     """Python Facility that is subclassable into a facility archetype.

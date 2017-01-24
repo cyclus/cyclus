@@ -21,7 +21,6 @@ cdef std_string str_py_to_cpp(object x):
     return s
 
 
-
 cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib):
     """Finds a Python module and returns a string of the form '<py>:modulepath'"""
     lib = std_string_to_py(cpp_lib)

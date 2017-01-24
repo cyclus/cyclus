@@ -160,4 +160,8 @@ ctypedef CyclusFacilityShim* facility_shim_ptr
 cdef class _Facility(_Agent):
     pass
 
+#
+# Tools
+#
+
 cdef tuple index_and_sort_vars(dict)
