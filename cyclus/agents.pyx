@@ -485,9 +485,6 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         pyinvs = (<object> this.self).snapshot_inv()
         return lib.inventories_to_cpp(pyinvs)
 
-    #int id():
-    #    return this.id_
-
     std_string schema():
         pyschema = (<object> this.self).schema
         return str_py_to_cpp(pyschema)
@@ -713,7 +710,7 @@ cdef class _Agent(lib._Agent):
             inv = inv.copy()
             inv._init()
             self.__dict__[name] = inv
-            inv.append((name, inv))
+            invs.append((name, inv))
         self._inventories = tuple(invs)
 
     @classmethod
@@ -726,7 +723,7 @@ cdef class _Agent(lib._Agent):
             attr.alias = _VAR_DECL.canonize_alias(attr.type, name, attr.alias)
             attr.tooltip = _VAR_DECL.canonize_tooltip(attr.type, name, attr.tooltip)
             attr.uilabel = _VAR_DECL.canonize_uilabel(attr.type, name, attr.uilabel)
-            attr.uitype = ts.prepare_type_representation(attr.uitype)
+            attr.uitype = ts.prepare_type_representation(attr.type, attr.uitype)
             vars[name] = attr
         # make sure all state vars have a consistent index
         cls._statevars = index_and_sort_vars(vars)
@@ -911,6 +908,7 @@ cdef class _Agent(lib._Agent):
             cls = type(self)
             ctx = {name: var.to_dict() for name, var in cls._statevars}
             self._schema = _SCHEMA.xml_from_ctx(ctx)
+            print("schema from cython ", self._schema, ctx, cls._statevars, self._statevars)
         return self._schema
 
     @property
@@ -1189,24 +1187,17 @@ class Facility(_Facility):
 #
 # Tools
 #
+cpdef int _by_index(object x):
+    """key function for sorting by index."""
+    return x[1].index
+
+
 cdef tuple index_and_sort_vars(dict vars):
     cdef int nvars = len(vars)
-    cdef list svs = [None] * nvars
-    cdef list left = []
-    for name, var in vars.items():
-        if var.index is None:
-            left.append((name, var))
-        else:
-            if svs[var.index] is not None:
-                raise ValueError("two state varaiables cannot have the "
-                                 "same index: " + name + " & " +
-                                 svs[var.index][0])
-            svs[var.index] = (name, var)
-    left = sorted(left, reverse=True)
+    cdef list svs = list(vars.items())
+    svs.sort(key=_by_index)
     cdef int i
     for i in range(nvars):
-        if svs[i] is None:
-            svs[i] = left.pop()
-            svs[i][1].index = i
+        svs[i][1].index = i
     rtn = tuple(svs)
     return rtn

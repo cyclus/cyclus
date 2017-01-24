@@ -692,11 +692,11 @@ ANNOTATIONS = [
     ('internal', 'internal', 'bint', 'False'),
     ('shape', 'shape', 'object', 'None'),
     ('doc', 'doc', 'str', '""'),
-    ('tooltip', 'tooltip', 'str', '""'),
+    ('tooltip', 'tooltip', 'object', 'None'),
     ('units', 'units', 'str', '""'),
     ('userlevel', 'userlevel', 'int', '0'),
     ('alias', 'alias', 'object', 'None'),
-    ('uilabel', 'uilabel', 'str', '""'),
+    ('uilabel', 'uilabel', 'object', 'None'),
     ('uitype', 'uitype', 'object', 'None'),
     ('range', 'range', 'object', 'None'),
     ('categorical', 'categorical', 'object', 'None'),
@@ -1701,6 +1701,8 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
 # State Variable Descriptors
 #
 
+cdef int _N_STATEVARS = 0
+
 cdef class StateVar:
     """This class represents a state variable on a Cyclus agent.
 
@@ -1810,15 +1812,21 @@ cdef class StateVar:
             {%- for pyname, cppname, typename, kwval in annotations -%}
             {{typename}} {{pyname}}={{kwval}},
             {%- endfor -%}):
+        global _N_STATEVARS
         self.value = value
         {% for pyname, cppname, _, _ in annotations -%}
         self.{{pyname}} = {{pyname}}
         {% endfor %}
+        if index < 0:
+            self.index = _N_STATEVARS
+            _N_STATEVARS += 1
 
     #
     # Descriptor interface
     #
     def __get__(self, obj, cls):
+        if obj is None:
+            return self
         return self.value
 
     def __set__(self, obj, val):
@@ -1840,6 +1848,25 @@ cdef class StateVar:
             {%- endfor -%}
             )
 
+    def __str__(self):
+        s = self.__class__.__name__ + "(" + (
+            "value=" + str(self.value) + ", " +
+            {%- for pyname, _, _, _ in annotations -%}
+            "{{pyname}}=" + str(self.{{pyname}}) + ", " +
+            {%- endfor -%}
+            ")")
+        return s
+
+    def __repr__(self):
+        s = "cyclus.typesystem." + self.__class__.__name__ + "(" + (
+            "value=" + repr(self.value) + ", " +
+            {%- for pyname, _, _, _ in annotations -%}
+            "{{pyname}}=" + repr(self.{{pyname}}) + ", " +
+            {%- endfor -%}
+            ")")
+        return s
+
+
 {% for t in ts.uniquetypes %}{% if t not in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
 cdef class {{tclassname}}(StateVar):
     """State variable descriptor for {{ts.cpptypes[t]}}"""
@@ -1848,6 +1875,7 @@ cdef class {{tclassname}}(StateVar):
             {%- for pyname, cppname, typename, kwval in annotations -%}{%- if pyname not in nonuser_annotations -%}
             {{typename}} {{pyname}}={{kwval}},
             {%- endif -%}{%- endfor -%}):
+        global _N_STATEVARS
         self.value = value
         {% for pyname, cppname, _, _ in annotations -%}
         {% if pyname == 'type' %}
@@ -1857,6 +1885,9 @@ cdef class {{tclassname}}(StateVar):
         {%- else %}
         self.{{pyname}} = {{pyname}}
         {%- endif -%}{% endfor %}
+        if index < 0:
+            self.index = _N_STATEVARS
+            _N_STATEVARS += 1
 
     cpdef {{tclassname}} copy(self):
         """Copies the {{tclassname}} into a new instance."""
@@ -1883,10 +1914,14 @@ cdef class Inventory:
             {%- for pyname, cppname, typename, kwval in annotations -%}
             {{typename}} {{pyname}}={{kwval}},
             {%- endfor -%}str capacity="", object _kind=None):
+        global _N_STATEVARS
         self.value = value
         {% for pyname, cppname, _, _ in annotations -%}
         self.{{pyname}} = {{pyname}}
         {% endfor %}
+        if index < 0:
+            self.index = _N_STATEVARS
+            _N_STATEVARS += 1
 
     def _init(self):
         """This is a delayed initializer for setting the value to a new
@@ -1909,6 +1944,8 @@ cdef class Inventory:
     # Descriptor interface
     #
     def __get__(self, obj, cls):
+        if obj is None:
+            return self
         return self.value
 
     def __set__(self, obj, val):
@@ -1929,11 +1966,32 @@ cdef class Inventory:
         """
         return Inventory(value=self.value,
             {%- for pyname, cppname, _, _ in annotations -%}
-            {{pyname}}=self.{{cppname}},
+            {{pyname}}=self.{{pyname}},
             {%- endfor -%}
             capacity=self.capacity,
             _kind=self._kind,
             )
+
+    def __str__(self):
+        s = self.__class__.__name__ + "(" + (
+            "value=" + str(self.value) + ", " +
+            {%- for pyname, _, _, _ in annotations -%}
+            "{{pyname}}=" + str(self.{{pyname}}) + ", " +
+            {%- endfor -%}
+            "capacity=" + str(self.capacity) + ", " +
+            ")")
+        return s
+
+    def __repr__(self):
+        s = "cyclus.typesystem." + self.__class__.__name__ + "(" + (
+            "value=" + repr(self.value) + ", " +
+            {%- for pyname, _, _, _ in annotations -%}
+            "{{pyname}}=" + repr(self.{{pyname}}) + ", " +
+            {%- endfor -%}
+            "capacity=" + repr(self.capacity) + ", " +
+            ")")
+        return s
+
 
 
 {% for t in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
@@ -1944,6 +2002,7 @@ cdef class {{tclassname}}Inv(Inventory):
             {%- for pyname, cppname, typename, kwval in annotations -%}{%- if pyname not in nonuser_annotations -%}
             {{typename}} {{pyname}}={{kwval}},
             {%- endif -%}{%- endfor -%}str capacity="",):
+        global _N_STATEVARS
         self.value = value
         {% for pyname, cppname, _, _ in annotations -%}
         {% if pyname == 'type' %}
@@ -1955,6 +2014,9 @@ cdef class {{tclassname}}Inv(Inventory):
         {%- endif -%}{% endfor %}
         self.capacity = capacity
         self._kind = {{tclassname}}
+        if index < 0:
+            self.index = _N_STATEVARS
+            _N_STATEVARS += 1
 
     cpdef {{tclassname}}Inv copy(self):
         """Copies the {{tclassname}} into a new instance."""
