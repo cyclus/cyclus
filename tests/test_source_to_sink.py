@@ -12,7 +12,7 @@ from helper import tables_exist, find_ids, exit_times, \
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
-def test_source_to_sink():
+def check_source_to_sink(fname, source_spec, sink_spec):
     """Tests linear growth of sink inventory by checking if the transactions
     were of equal quantities and only between sink and source facilities.
     """
@@ -97,3 +97,12 @@ def test_source_to_sink():
         yield assert_array_equal, quantities, expected_quantities
 
         clean_outs()
+
+
+def test_source_to_sink():
+    cases = [("source_to_sink.xml", ":agents:Source", ":agents:Sink"),
+             ("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
+             ]
+    for case in cases:
+        for x in check_source_to_sink(*case):
+            yield x
