@@ -13,6 +13,7 @@ class NullInst(Institution):
     null behavior. No parameters are given when using the null institution.
     """
 
+
 class Sink(Facility):
     """This sink facility accepts specified amount of commodity."""
     in_commods = ts.VectorString(
@@ -66,3 +67,63 @@ class Sink(Facility):
     def accept_product_trades(self, responses):
         for prod in responses.values():
             self.inventory.push(prod)
+
+
+class Source(Facility):
+    """A minimum implementation source facility that provides a commodity with
+    a given capacity.
+    """
+    commod = ts.String(
+        doc="commodity that the source facility supplies",
+        tooltip="source commodity",
+        schematype="token",
+        uilabel="Commodity",
+        uitype="outcommodity",
+        )
+    recipe_name = ts.String(
+        doc="Recipe name for source facility's commodity. "
+            "If empty, source supplies material with requested compositions.",
+        tooltip="commodity recipe name",
+        schematype="token",
+        default="",
+        uilabel="Recipe",
+        uitype="recipe",
+        )
+    capacity = ts.Double(
+        doc="amount of commodity that can be supplied at each time step",
+        uilabel="Maximum Throughput",
+        tooltip="source capacity",
+        )
+
+    def build(self, parent):
+        super(Source, self).build(parent)
+        if self.lifetime >= 0:
+            self.context.schedule_decom(self, self.exit_time)
+
+    def get_material_bids(self, requests):
+        reqs = requests.get(self.commod, None)
+        if not reqs:
+            return
+        if len(self.recipe_name) == 0:
+            bids = [req.target for req in reqs]
+        else:
+            recipe_comp = self.context.get_recipe(self.recipe_name)
+            bids = []
+            for req in reqs:
+                qty = min(req.target.quantity, self.capacity)
+                mat = ts.Material.create_untracked(qty, recipe_comp)
+                bids.append(mat)
+        return {'bids': bids, 'constraints': self.capacity}
+
+    def get_material_trades(self, trades):
+        responses = {}
+        if len(self.recipe_name) == 0:
+            for trade in trades:
+                mat = ts.Material.create(self, trade.amt, trade.request.target.comp())
+                responses[trade] = mat
+        else:
+            recipe_comp = self.context.get_recipe(self.recipe_name)
+            for trade in trades:
+                mat = ts.Material.create(self, trade.amt, recipe_comp)
+                responses[trade] = mat
+        return responses

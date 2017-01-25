@@ -1508,6 +1508,21 @@ cdef class _Context:
         c = ts.composition_from_cpp(self.ptx.GetRecipe(str_py_to_cpp(name)), basis)
         return c
 
+    def schedule_build(self, parent, proto_name, int t=-1):
+        """Schedules the named prototype to be built for the specified parent at
+        timestep t. The default t=-1 results in the build being scheduled for the
+        next build phase (i.e. the start of the next timestep).
+        """
+        self.ptx.SchedBuild(<cpp_cyclus.Agent*> (<_Agent> parent).ptx,
+                            str_py_to_cpp(proto_name), t)
+
+    def schedule_decom(self, parent, int t=-1):
+        """Schedules the given Agent to be decommissioned at the specified timestep
+        t. The default t=-1 results in the decommission being scheduled for the
+        next decommission phase (i.e. the end of the current timestep).
+        """
+        self.ptx.SchedDecom(<cpp_cyclus.Agent*> (<_Agent> parent).ptx, t)
+
 
 class Context(_Context):
     """A simulation context provides access to necessary simulation-global

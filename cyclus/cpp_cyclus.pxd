@@ -745,6 +745,10 @@ cdef extern from "context.h" namespace "cyclus":
         uuid sim_id() except +
         int time()
         shared_ptr[Composition] GetRecipe(std_string)
+        void SchedBuild(Agent*, std_string)
+        void SchedBuild(Agent*, std_string, int)
+        void SchedDecom(Agent*)
+        void SchedDecom(Agent*, int)
 
 
 cdef extern from "discovery.h" namespace "cyclus":
