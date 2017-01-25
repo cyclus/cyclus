@@ -44,6 +44,9 @@ class Sink(Facility):
         )
     inventory = ts.ResourceBuffInv(capacity='max_inv_size')
 
+    def tick(self):
+        print("Sink is deployed!")
+
     def get_material_requests(self):
         if len(self.recipe) == 0:
             comp = {}

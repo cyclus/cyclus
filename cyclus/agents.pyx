@@ -6,6 +6,7 @@ from libcpp.vector cimport vector as std_vector
 from libcpp.utility cimport pair as std_pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
+from libcpp.cast cimport reinterpret_cast, dynamic_cast
 from cython.operator cimport dereference as deref
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
@@ -69,7 +70,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         a.shim.InitFromAgent(this)
         (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
-        return (<cpp_cyclus.Agent*> a.shim)
+        return dynamic_cast[agent_ptr]((<_Agent> a).shim)
 
     void InitFromAgent "InitFrom" (CyclusAgentShim* a):
         cpp_cyclus.Agent.InitFromAgent(a)
@@ -189,7 +190,8 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         (<CyclusRegionShim*> (<_Agent> a).shim).InitFromAgent(<CyclusRegionShim*> this)
         (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
-        return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
+        return dynamic_cast[agent_ptr](
+                reinterpret_cast[region_shim_ptr]((<_Agent> a).shim))
 
     void InitFromAgent "InitFrom" (CyclusRegionShim* a):
         cpp_cyclus.Region.InitFromAgent(a)
@@ -315,7 +317,8 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<CyclusInstitutionShim*> (<_Agent> a).shim).InitFromAgent(<CyclusInstitutionShim*> this)
         (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
-        return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
+        return dynamic_cast[agent_ptr](
+                reinterpret_cast[institution_shim_ptr]((<_Agent> a).shim))
 
     void InitFromAgent "InitFrom" (CyclusInstitutionShim* a):
         cpp_cyclus.Institution.InitFromAgent(a)
@@ -449,7 +452,8 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         (<CyclusFacilityShim*> (<_Agent> a).shim).InitFromAgent(<CyclusFacilityShim*> this)
         (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
-        return (<cpp_cyclus.Agent*> (<_Agent> a).shim)
+        return dynamic_cast[agent_ptr](
+                reinterpret_cast[facility_shim_ptr]((<_Agent> a).shim))
 
     void InitFromAgent "InitFrom" (CyclusFacilityShim* a):
         cpp_cyclus.Facility.InitFromAgent(a)

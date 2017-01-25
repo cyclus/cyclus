@@ -133,6 +133,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # 
 # Wrappers
 #
 
+ctypedef cpp_cyclus.Agent* agent_ptr
 ctypedef CyclusAgentShim* agent_shim_ptr
 
 cdef class _Agent(lib._Agent):
