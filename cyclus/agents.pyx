@@ -88,7 +88,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     void InitFrom(cpp_cyclus.QueryableBackend* b):
         cpp_cyclus.Agent.InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
-        res, _ = lib.query_result_to_py(qr)
+        res, _ = lib.single_query_result_to_py(qr)
         # call generic python
         (<object> this.self).init_from_dict(res)
 
@@ -208,7 +208,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     void InitFrom(cpp_cyclus.QueryableBackend* b):
         cpp_cyclus.Region.InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
-        res, _ = lib.query_result_to_py(qr)
+        res, _ = lib.single_query_result_to_py(qr)
         # call generic python
         (<object> this.self).init_from_dict(res)
 
@@ -334,7 +334,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     void InitFrom(cpp_cyclus.QueryableBackend* b):
         cpp_cyclus.Institution.InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
-        res, _ = lib.query_result_to_py(qr)
+        res, _ = lib.single_query_result_to_py(qr)
         # call generic python
         (<object> this.self).init_from_dict(res)
 
@@ -468,7 +468,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
     void InitFrom(cpp_cyclus.QueryableBackend* b):
         cpp_cyclus.Facility.InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
-        res, _ = lib.query_result_to_py(qr)
+        res, _ = lib.single_query_result_to_py(qr)
         # call generic python
         (<object> this.self).init_from_dict(res)
 
@@ -773,8 +773,7 @@ cdef class _Agent(lib._Agent):
                 var.value = var.default
                 continue
             else:
-                var.value = self._read_from_infile(sub, name, var.alias,
-                                                   var.type, var.uitype)
+                var.value = self._read_from_infile(sub, var.alias, var.type, var.uitype)
         # Write out to db
         datum = di.new_datum("Info")
         for name, var in self._statevars:

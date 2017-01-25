@@ -22,6 +22,7 @@ cdef class _Datum:
     cdef list _fieldnames
 
 cdef object query_result_to_py(cpp_cyclus.QueryResult)
+cdef object single_query_result_to_py(cpp_cyclus.QueryResult qr)
 
 cdef class _FullBackend:
     cdef void * ptx
