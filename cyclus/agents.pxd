@@ -141,17 +141,20 @@ cdef class _Agent(lib._Agent):
     cdef agent_shim_ptr shim
 
 
+ctypedef cpp_cyclus.Region* region_ptr
 ctypedef CyclusRegionShim* region_shim_ptr
 
 cdef class _Region(_Agent):
     pass
 
+ctypedef cpp_cyclus.Institution* institution_ptr
 ctypedef CyclusInstitutionShim* institution_shim_ptr
 
 cdef class _Institution(_Agent):
     pass
 
 
+ctypedef cpp_cyclus.Facility* facility_ptr
 ctypedef CyclusFacilityShim* facility_shim_ptr
 
 cdef class _Facility(_Agent):
@@ -162,3 +165,4 @@ cdef class _Facility(_Agent):
 #
 
 cdef tuple index_and_sort_vars(dict)
+cdef cpp_cyclus.Agent* dynamic_agent_ptr(object)

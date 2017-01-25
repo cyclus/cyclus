@@ -564,6 +564,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return bool_to_cpp(rtn)
 
     std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests():
+        print("getting reqs shim")
         pyportfolios = (<object> this.self).get_material_requests()
         cdef std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] ports = \
             std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]]()
@@ -586,6 +587,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return ports
 
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type& commod_requests):
+        print("getting bids shim")
         # cache the commod_reqs wrappers globally
         global _GET_MAT_BIDS_TIME, _GET_MAT_BIDS_PTR, _GET_MAT_BIDS
         cdef int curr_time = this.context().time()
@@ -634,6 +636,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return ports
 
     void GetMatlTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
+        print("getting trades shim")
         pytrades = ts.material_trade_vector_to_py(trades)
         pyresp = (<object> this.self).get_material_trades(pytrades)
         if pyresp is None or len(pyresp) == 0:
@@ -1209,3 +1212,32 @@ cdef tuple index_and_sort_vars(dict vars):
         svs[i][1].index = i
     rtn = tuple(svs)
     return rtn
+
+
+cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
+    """Dynamically casts an agent instance to the correct agent pointer"""
+    if a is None:
+        return NULL
+    elif isinstance(a, Region):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[region_shim_ptr]((<_Agent> a).shim))
+    elif isinstance(a, Institution):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[institution_shim_ptr]((<_Agent> a).shim))
+    elif isinstance(a, Facility):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[facility_shim_ptr]((<_Agent> a).shim))
+    elif a.kind == "Region":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[region_ptr]((<lib._Agent> a).ptx))
+    elif a.kind == "Institution":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[institution_ptr]((<lib._Agent> a).ptx))
+    elif a.kind == "Facility":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[facility_ptr]((<lib._Agent> a).ptx))
+    elif isinstance(a, Agent):
+        return dynamic_cast[agent_ptr]((<_Agent> a).shim)
+    else:
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[agent_ptr]((<lib._Agent> a).ptx))
