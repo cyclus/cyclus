@@ -120,6 +120,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Agent.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -241,6 +242,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Region.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -368,6 +370,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Institution.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -422,6 +425,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).tick()
 
     void Tock():
+        cpp_cyclus.Institution.Tock()
         (<object> this.self).tock()
 
 
@@ -503,6 +507,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Facility.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -1162,13 +1167,13 @@ class Facility(_Facility):
         """
         return []
 
-    def get_material_bids(self):
+    def get_material_bids(self, requests):
         """Returns material bids for this agent on this time step.
         This may be overridden is subclasses.
         """
         return []
 
-    def get_product_bids(self):
+    def get_product_bids(self, requests):
         """Returns product bids for this agent on this time step.
         This may be overridden is subclasses.
         """
@@ -1209,3 +1214,32 @@ cdef tuple index_and_sort_vars(dict vars):
         svs[i][1].index = i
     rtn = tuple(svs)
     return rtn
+
+
+cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
+    """Dynamically casts an agent instance to the correct agent pointer"""
+    if a is None:
+        return NULL
+    elif isinstance(a, Region):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[region_shim_ptr]((<_Agent> a).shim))
+    elif isinstance(a, Institution):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[institution_shim_ptr]((<_Agent> a).shim))
+    elif isinstance(a, Facility):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[facility_shim_ptr]((<_Agent> a).shim))
+    elif a.kind == "Region":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[region_ptr]((<lib._Agent> a).ptx))
+    elif a.kind == "Institution":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[institution_ptr]((<lib._Agent> a).ptx))
+    elif a.kind == "Facility":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[facility_ptr]((<lib._Agent> a).ptx))
+    elif isinstance(a, Agent):
+        return dynamic_cast[agent_ptr]((<_Agent> a).shim)
+    else:
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[agent_ptr]((<lib._Agent> a).ptx))

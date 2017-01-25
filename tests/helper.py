@@ -51,7 +51,7 @@ def tables_exist(outfile, table_names):
                              (t, )).fetchone()) for t in table_names])
         conn.close()
         return res
-    
+
 def find_ids(data, data_table, id_table):
     """Finds ids of the specified data located in the specified data_table,
     and extracts the corresponding id from the specified id_table.
@@ -110,7 +110,7 @@ def agent_time_series(names):
                      hasattr(f.root, 'AgentExit') else None
 
         f.close()
- 
+
     else :
         conn = sqlite3.connect(sqliteout)
         conn.row_factory = sqlite3.Row
@@ -140,7 +140,7 @@ def agent_time_series(names):
         for id in ids:
             idx = np.where(to_ary(agent_entry,'AgentId') == id)[0]
             entries[name][agent_entry[idx]['EnterTime']] += 1
-            
+
     # cumulative entries
     entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
                    for k, v in entries.items()}

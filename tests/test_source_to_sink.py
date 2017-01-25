@@ -19,7 +19,7 @@ def check_source_to_sink(fname, source_spec, sink_spec):
     clean_outs()
 
     # Cyclus simulation input for Source and Sink
-    sim_inputs = [os.path.join(INPUT, "source_to_sink.xml")]
+    sim_inputs = [os.path.join(INPUT, fname)]
 
     for sim_input in sim_inputs:
         holdsrtn = [1]  # needed because nose does not send() to test generator
@@ -35,7 +35,6 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         # Check if these tables exist
         yield assert_true, tables_exist(outfile, paths)
         if not tables_exist(outfile, paths):
-            outfile.close()
             clean_outs()
             return  # don't execute further commands
 
@@ -64,8 +63,8 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         agent_ids = to_ary(agent_entry, "AgentId")
         spec = to_ary(agent_entry, "Spec")
 
-        source_id = find_ids(":agents:Source", spec, agent_ids)
-        sink_id = find_ids(":agents:Sink", spec, agent_ids)
+        source_id = find_ids(source_spec, spec, agent_ids)
+        sink_id = find_ids(sink_spec, spec, agent_ids)
 
         # Test for only one source and one sink are deployed in the simulation
         yield assert_equal, len(source_id), 1
