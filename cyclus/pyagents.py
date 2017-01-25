@@ -62,6 +62,7 @@ class Sink(Facility):
 
     def accept_material_trades(self, responses):
         for mat in responses.values():
+            print("pushing mat", mat)
             self.inventory.push(mat)
 
     def accept_product_trades(self, responses):
@@ -116,6 +117,7 @@ class Source(Facility):
         return {'bids': bids, 'constraints': self.capacity}
 
     def get_material_trades(self, trades):
+        print("getting material trades", trades)
         responses = {}
         if len(self.recipe_name) == 0:
             for trade in trades:

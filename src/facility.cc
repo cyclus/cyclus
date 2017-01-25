@@ -30,7 +30,7 @@ void Facility::Build(Agent* parent) {
 
 void Facility::EnterNotify() {
   Agent::EnterNotify();
-  context()->RegisterTrader(this);
+  context()->RegisterTrader(dynamic_cast<Trader*>(this));
   context()->RegisterTimeListener(this);
 }
 
@@ -47,7 +47,7 @@ void Facility::Decommission() {
     throw Error("Cannot decommission " + prototype());
   }
 
-  context()->UnregisterTrader(this);
+  context()->UnregisterTrader(dynamic_cast<Trader*>(this));
   context()->UnregisterTimeListener(this);
   Agent::Decommission();
 }

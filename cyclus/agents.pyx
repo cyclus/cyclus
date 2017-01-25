@@ -48,6 +48,7 @@ cdef int _GET_PROD_PREFS_TIME = -9999999999
 cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* _GET_PROD_PREFS_PTR = NULL
 cdef dict _GET_PROD_PREFS = {}
 
+
 #
 # Shims
 #
@@ -576,7 +577,10 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             pyportfolios = [pyportfolios]
         for pyport in pyportfolios:
             normport = lib.normalize_request_portfolio(pyport)
-            ports.insert(ts.material_request_portfolio_to_cpp(normport, this))
+            #ports.insert(ts.material_request_portfolio_to_cpp(normport, this))
+            ports.insert(ts.material_request_portfolio_to_cpp(normport,
+                dynamic_cast[trader_ptr](reinterpret_cast[facility_shim_ptr](<CyclusFacilityShim*> this))
+                ))
         return ports
 
     std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests():
@@ -611,7 +615,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             pyports = [pyports]
         for pyport in pyports:
             normport = lib.normalize_bid_portfolio(pyport)
-            ports.insert(ts.material_bid_portfolio_to_cpp(normport, this))
+            #ports.insert(ts.material_bid_portfolio_to_cpp(normport, this))
+            ports.insert(ts.material_bid_portfolio_to_cpp(normport,
+                dynamic_cast[trader_ptr](reinterpret_cast[facility_shim_ptr](<CyclusFacilityShim*> this))
+                #dynamic_cast[trader_ptr](<CyclusFacilityShim*> this)
+                ))
         return ports
 
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type& commod_requests):
@@ -638,13 +646,19 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             ports.insert(ts.product_bid_portfolio_to_cpp(normport, this))
         return ports
 
-    void GetMatlTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
+    void GetMatlTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
+        print("shim material trades")
+        print("1")
         pytrades = ts.material_trade_vector_to_py(trades)
+        print("2")
         pyresp = (<object> this.self).get_material_trades(pytrades)
+        print("3")
         if pyresp is None or len(pyresp) == 0:
             return
+        print("4")
         if not isinstance(pyresp, Mapping):
             pyresp = dict(pyresp)
+        print("6")
         for trade, resp in pyresp.items():
             responses.push_back(std_pair[cpp_cyclus.Trade[cpp_cyclus.Material],
                                          shared_ptr[cpp_cyclus.Material]](
@@ -652,8 +666,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                 reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
                     (<ts._Material> resp).ptx)
                 ))
+        print("7")
 
-    void GetProductTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
+    void GetProductTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
         pytrades = ts.product_trade_vector_to_py(trades)
         pyresp = (<object> this.self).get_product_trades(pytrades)
         if pyresp is None or len(pyresp) == 0:
@@ -668,11 +683,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                     (<ts._Product> resp).ptx)
                 ))
 
-    void AcceptMatlTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
+    void AcceptMatlTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
         pyresp = ts.material_responses_to_py(responses)
         (<object> this.self).accept_material_trades(pyresp)
 
-    void AcceptProductTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
+    void AcceptProductTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
         pyresp = ts.product_responses_to_py(responses)
         (<object> this.self).accept_product_trades(pyresp)
 

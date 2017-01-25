@@ -839,6 +839,7 @@ from cython.operator cimport typeid
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
+from libcpp.cast cimport const_cast
 """.strip()
 
 NPY_IMPORTS = """
@@ -2115,11 +2116,19 @@ cdef class _{{rclsname}}Request:
         """This request's target {{rfname}}"""
         if self._target is not None:
             return self._target
+        print("a")
         cdef _{{rclsname}} r = {{rclsname}}()
+        print("b")
+        #r.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
+        #                                            {{cyr}}](
+        #            self.ptx.target())
+        cdef shared_ptr[{{cyr}}] tp = self.ptx.target()
+        print("c")
         r.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
-                                                    {{cyr}}](
-                    self.ptx.target())
+                                                    {{cyr}}](tp)
+        print("d")
         self._target = r
+        print("e")
         return self._target
 
     @property
@@ -2385,15 +2394,17 @@ cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] t
     return rtn
 
 
-cdef dict {{rfname}}_responses_to_py(std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses):
+cdef dict {{rfname}}_responses_to_py(const std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses):
     """Converts a vector of pairs of (trades, {{rfname}}) to a dict"""
     cdef dict rtn = {}
-    for resp in responses:
+    cdef int i, n
+    n = responses.size()
+    for i in range(n):
         t = {{rclsname}}Trade()
-        (<_{{rclsname}}Trade> t).ptx = &(resp.first)
+        (<_{{rclsname}}Trade> t).ptx = const_cast[{{rfname}}_trade_ptr](&(responses[i].first))
         r = {{rclsname}}()
         (<_{{rclsname}}> r).ptx = reinterpret_pointer_cast[cpp_cyclus.Resource,
-                                                           {{cyr}}](resp.second)
+                                                           {{cyr}}](responses[i].second)
         rtn[t] = r
     return rtn
 
@@ -2611,6 +2622,8 @@ cdef class _{{rclsname}}Bid:
 
 cdef dict {{rfname}}_pref_map_to_py(cpp_cyclus.PrefMap[{{cyr}}].type& pm)
 
+ctypedef cpp_cyclus.Trade[{{cyr}}]* {{rfname}}_trade_ptr
+
 cdef class _{{rclsname}}Trade:
     cdef cpp_cyclus.Trade[{{cyr}}]* ptx
     cdef object _request
@@ -2618,7 +2631,7 @@ cdef class _{{rclsname}}Trade:
 
 
 cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] trades)
-cdef dict {{rfname}}_responses_to_py(std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses)
+cdef dict {{rfname}}_responses_to_py(const std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses)
 
 {% endfor %}
 
