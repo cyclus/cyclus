@@ -1984,7 +1984,7 @@ cdef class Inventory:
         So agent objects, after copying inventories from their class to self,
         should call this method to get a real resource buffer instance.
         """
-        self.value = self._kind()
+        self.value = self._kind(init=True)
 
     #
     # Descriptor interface
