@@ -1,8 +1,6 @@
 #ifndef CYCLUS_SRC_TOOLKIT_RES_MAP_H_
 #define CYCLUS_SRC_TOOLKIT_RES_MAP_H_
 
-#include <signal.h>
-
 #include <iomanip>
 #include <limits>
 #include <map>
@@ -43,7 +41,6 @@ template <class K, class R>
 class ResMap {
  public:
   ResMap() : dirty_quantity_(true), quantity_(0) {
-    raise(SIGSEGV);
     Warn<EXPERIMENTAL_WARNING>("ResMap is experimental and its API may be "
                                "subject to change");
   }
