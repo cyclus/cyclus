@@ -100,7 +100,7 @@ def check_source_to_sink(fname, source_spec, sink_spec):
 
 def test_source_to_sink():
     cases = [("source_to_sink.xml", ":agents:Source", ":agents:Sink"),
-             #("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
+             ("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
              ]
     for case in cases:
         for x in check_source_to_sink(*case):

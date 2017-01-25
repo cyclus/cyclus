@@ -452,7 +452,7 @@ class Agent : public StateWrangler, virtual public Ider {
   /// Cloning and InitFrom should be used instead.
   Agent(const Agent& m) {}
 
-  /// adds an agent to the transactiont table
+  /// adds an agent to the transaction table
   void AddToTable();
 
   /// connects an agent to its parent.

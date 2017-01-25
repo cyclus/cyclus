@@ -120,6 +120,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Agent.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -241,6 +242,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Region.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -368,6 +370,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Institution.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -422,6 +425,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).tick()
 
     void Tock():
+        cpp_cyclus.Institution.Tock()
         (<object> this.self).tock()
 
 
@@ -565,7 +569,6 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return bool_to_cpp(rtn)
 
     std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests():
-        print("getting reqs shim")
         pyportfolios = (<object> this.self).get_material_requests()
         cdef std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] ports = \
             std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]]()
@@ -588,7 +591,6 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return ports
 
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type& commod_requests):
-        print("getting bids shim")
         # cache the commod_reqs wrappers globally
         global _GET_MAT_BIDS_TIME, _GET_MAT_BIDS_PTR, _GET_MAT_BIDS
         cdef int curr_time = this.context().time()
@@ -637,7 +639,6 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return ports
 
     void GetMatlTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
-        print("getting trades shim")
         pytrades = ts.material_trade_vector_to_py(trades)
         pyresp = (<object> this.self).get_material_trades(pytrades)
         if pyresp is None or len(pyresp) == 0:
@@ -1166,13 +1167,13 @@ class Facility(_Facility):
         """
         return []
 
-    def get_material_bids(self):
+    def get_material_bids(self, requests):
         """Returns material bids for this agent on this time step.
         This may be overridden is subclasses.
         """
         return []
 
-    def get_product_bids(self):
+    def get_product_bids(self, requests):
         """Returns product bids for this agent on this time step.
         This may be overridden is subclasses.
         """

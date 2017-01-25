@@ -1751,6 +1751,9 @@ cpdef dict normalize_bid_portfolio(object inp):
             bid.update(b)
         elif isinstance(b, Sequence):
             bid['request'], bid['offer'] = b
+        elif isinstance(b, ts.request_types):
+            bid['request'] = b
+            bid['offer'] = b.target
         else:
             raise TypeError('Did not recognize type of bid while '
                             'converting to portfolio: ' + repr(inp))

@@ -2400,6 +2400,11 @@ cdef dict {{rfname}}_responses_to_py(std_vector[std_pair[cpp_cyclus.Trade[{{cyr}
 {% endfor %}
 
 
+cpdef tuple request_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Request, {% endfor %})
+cpdef tuple bid_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Bid, {% endfor %})
+cpdef tuple trade_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Trade, {% endfor %})
+
+
 #
 # Helpers
 #
@@ -2616,6 +2621,10 @@ cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] t
 cdef dict {{rfname}}_responses_to_py(std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses)
 
 {% endfor %}
+
+cpdef tuple request_types
+cpdef tuple bid_types
+cpdef tuple trade_types
 ''')
 
 def typesystem_pxd(ts, ns):

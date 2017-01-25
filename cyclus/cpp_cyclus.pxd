@@ -703,6 +703,7 @@ cdef extern from "region.h" namespace "cyclus":
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
+        void EnterNotify()
 
 
 cdef extern from "institution.h" namespace "cyclus":
@@ -713,6 +714,8 @@ cdef extern from "institution.h" namespace "cyclus":
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
+        void EnterNotify()
+        void Tock()
 
 
 cdef extern from "facility.h" namespace "cyclus":

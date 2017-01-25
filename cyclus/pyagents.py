@@ -44,9 +44,6 @@ class Sink(Facility):
         )
     inventory = ts.ResourceBuffInv(capacity='max_inv_size')
 
-    def tick(self):
-        print("Sink is deployed!")
-
     def get_material_requests(self):
         if len(self.recipe) == 0:
             comp = {}
@@ -108,14 +105,14 @@ class Source(Facility):
         if not reqs:
             return
         if len(self.recipe_name) == 0:
-            bids = [req.target for req in reqs]
+            bids = [req for req in reqs]
         else:
             recipe_comp = self.context.get_recipe(self.recipe_name)
             bids = []
             for req in reqs:
                 qty = min(req.target.quantity, self.capacity)
                 mat = ts.Material.create_untracked(qty, recipe_comp)
-                bids.append(mat)
+                bids.append({'request': req, 'offer': mat})
         return {'bids': bids, 'constraints': self.capacity}
 
     def get_material_trades(self, trades):
