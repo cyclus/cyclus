@@ -933,7 +933,8 @@ cdef class _Resource:
     @property
     def type(self):
         """A unique type/name for the concrete resource implementation."""
-        t = std_string_to_py(self.ptx.get().type())
+        cdef std_string cpp_t = self.ptx.get().type()
+        t = std_string_to_py(cpp_t)
         return t
 
     def clone(self):
@@ -955,7 +956,8 @@ cdef class _Resource:
     @property
     def units(self):
         """Returns the units this resource is based in (e.g. "kg")."""
-        u = std_string_to_py(self.ptx.get().units())
+        cdef std_string cpp_u = self.ptx.get().units()
+        u = std_string_to_py(cpp_u)
         return u
 
     @property
@@ -1016,7 +1018,9 @@ cdef object composition_from_cpp(shared_ptr[cpp_cyclus.Composition] comp, object
     else:
         raise ValueError('Composition basis must be either mass or atom, '
                          'not ' + str(basis))
-    rtn = std_map_int_double_to_py(<std_map[int, double]> c)
+    rtn = {}
+    for item in c:
+        rtn[item.first] = item.second
     return rtn
 
 
@@ -1631,6 +1635,15 @@ cdef object {{ ts.funcname(n) }}_to_py({{ ts.cython_type(n) }} x):
 {%- endfor %}
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
+{% set decl, body, expr = ts.convert_to_py('x', n) %}
+cdef object any_{{ ts.funcname(n) }}_to_py(cpp_cyclus.hold_any value):
+    cdef {{ ts.cython_type(n) }} x = value.cast[{{ ts.cython_type(n) }}]()
+    {{ decl | indent(4) }}
+    {{ body | indent(4) }}
+    return {{ expr }}
+{%- endfor %}
+
+{% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
 {% set decl, body, expr = ts.convert_to_cpp('x', n) %}
 cdef {{ ts.cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x):
     {{ decl | indent(4) }}
@@ -1642,12 +1655,13 @@ cdef {{ ts.cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x):
 #
 # type system functions
 #
-cdef object db_to_py(cpp_cyclus.hold_any value, cpp_cyclus.DbTypes dbtype):
+cdef object db_to_py(cpp_cyclus.hold_any& value, cpp_cyclus.DbTypes dbtype):
     """Converts database types to python objects."""
     cdef object rtn
     {%- for i, t in enumerate(dbtypes) %}
     {% if i > 0 %}el{% endif %}if dbtype == {{ ts.cython_cpp_name(t) }}:
-        rtn = {{ ts.hold_any_to_py('value', t) }}
+        #rtn = {{ ts.hold_any_to_py('value', t) }}
+        rtn = any_{{ ts.funcname(t) }}_to_py(value)
     {%- endfor %}
     else:
         msg = "dbtype {0} could not be found while converting to Python"
@@ -1723,7 +1737,8 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
     # Bug #1561 in Cython
     {%- for i, t in enumerate(ts.uniquetypes) %}
     {% if i > 0 %}el{% endif %}if valhash == typeid({{ ts.funcname(t) }}_t).hash_code():
-        rtn = {{ ts.hold_any_to_py('value', t) }}
+        #rtn = {{ ts.hold_any_to_py('value', t) }}
+        rtn = any_{{ ts.funcname(t) }}_to_py(value)
     {%- endfor %}
     else:
         msg = "C++ type could not be found while converting to Python"
@@ -2137,7 +2152,8 @@ cdef class _{{rclsname}}Request:
         """This request's exclusivity"""
         if self._exclusive is not None:
             return self._exclusive
-        self._exclusive = bool_to_py(self.ptx.exclusive())
+        cdef cpp_bool ex = self.ptx.exclusive()
+        self._exclusive = bool_to_py(ex)
         return self._exclusive
 
     @property
@@ -2284,7 +2300,8 @@ cdef class _{{rclsname}}Bid:
         """This bid's exclusivity"""
         if self._exclusive is not None:
             return self._exclusive
-        self._exclusive = bool_to_py(self.ptx.exclusive())
+        cdef cpp_bool ex = self.ptx.exclusive()
+        self._exclusive = bool_to_py(ex)
         return self._exclusive
 
     def __hash__(self):
@@ -2499,6 +2516,10 @@ cdef std_string str_py_to_cpp(object x)
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
 cdef object {{ ts.funcname(n) }}_to_py({{ ts.cython_type(n) }} x)
+{%- endfor %}
+
+{% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
+cdef object any_{{ ts.funcname(n) }}_to_py(cpp_cyclus.hold_any value)
 {%- endfor %}
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}

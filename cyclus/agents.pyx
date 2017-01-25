@@ -751,8 +751,8 @@ cdef class _Agent(lib._Agent):
         """
         for name, var in self._statevars:
             setattr(self, name, deepcopy(getattr(other, name, None)))
-        for name, inv in self._inventories:
-            inv.value.capacity = getattr(other, name).capacity
+        for (name, inv), (_, other_inv) in zip(self._inventories, other._inventories):
+            inv.value.capacity = other_inv.value.capacity
 
     def infile_to_db(self, tree, di):
         """A dynamic version of InfileToDb(InfileTree*, DbInit) that should

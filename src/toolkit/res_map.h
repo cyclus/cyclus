@@ -1,6 +1,8 @@
 #ifndef CYCLUS_SRC_TOOLKIT_RES_MAP_H_
 #define CYCLUS_SRC_TOOLKIT_RES_MAP_H_
 
+#include <signal.h>
+
 #include <iomanip>
 #include <limits>
 #include <map>
@@ -41,6 +43,7 @@ template <class K, class R>
 class ResMap {
  public:
   ResMap() : dirty_quantity_(true), quantity_(0) {
+    raise(SIGSEGV);
     Warn<EXPERIMENTAL_WARNING>("ResMap is experimental and its API may be "
                                "subject to change");
   }
@@ -153,7 +156,7 @@ class ResMap {
   };
 
   //
-  // Non-std::map interface 
+  // Non-std::map interface
   //
 
   /// Returns a vector of the values in the map
@@ -210,7 +213,7 @@ class ResMap {
     dirty_quantity_ = true;
     return val;
   }
-  
+
  private:
   /// Recomputes the internal quantity variable.
   void UpdateQuantity() {
@@ -241,7 +244,7 @@ class ResMap {
   /// Underlying container
   map_type resources_;
 
-  /// Object ID mapping, primarily used for restart, 
+  /// Object ID mapping, primarily used for restart,
   obj_type obj_ids_;
 };
 
