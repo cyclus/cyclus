@@ -73,7 +73,7 @@ cdef class _SimInit:
     cdef cpp_cyclus.SimInit * ptx
 
 
-cdef object agent_to_py(cpp_cyclus.Agent* a_ptr)
+cdef object agent_to_py(cpp_cyclus.Agent* a_ptr, object ctx)
 cdef dict inventories_to_py(cpp_cyclus.Inventories& invs)
 cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs)
 

@@ -2127,7 +2127,8 @@ cdef class _{{rclsname}}Request:
         """This request's agent"""
         if self._requester is not None:
             return self._requester
-        self._requester = lib.agent_to_py(<cpp_cyclus.Agent*> self.ptx.requester())
+        self._requester = lib.agent_to_py(<cpp_cyclus.Agent*> self.ptx.requester(),
+                                          None)
         return self._requester
 
     @property
@@ -2279,7 +2280,7 @@ cdef class _{{rclsname}}Bid:
         """This bid's agent"""
         if self._bidder is not None:
             return self._bidder
-        self._bidder = lib.agent_to_py(<cpp_cyclus.Agent*> self.ptx.bidder())
+        self._bidder = lib.agent_to_py(<cpp_cyclus.Agent*> self.ptx.bidder(), None)
         return self._bidder
 
     @property

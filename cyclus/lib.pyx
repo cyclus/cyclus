@@ -496,15 +496,15 @@ cdef class _DynamicModule:
         -------
         rtn : Agent
         """
-        cdef _Agent agent = Agent()
         cdef _AgentSpec cpp_spec
         if isinstance(spec, str):
             spec = AgentSpec(spec)
         cpp_spec = <_AgentSpec> spec
-        agent.ptx = cpp_cyclus.DynamicModule.Make(
-            (<_Context> ctx).ptx,
-            deref(cpp_spec.ptx),
-            )
+        cdef cpp_cyclus.Agent* a_ptx = cpp_cyclus.DynamicModule.Make(
+                                            (<_Context> ctx).ptx,
+                                            deref(cpp_spec.ptx),
+                                            )
+        agent = agent_to_py(a_ptx, ctx)
         return agent
 
     def exists(self, _AgentSpec spec):
@@ -1146,7 +1146,7 @@ class SimInit(_SimInit):
 # Agent
 #
 
-cdef object agent_to_py(cpp_cyclus.Agent* a_ptx):
+cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     """Converts and agent pointer to Python."""
     global _AGENT_REFS
     if a_ptx == NULL:
@@ -1154,7 +1154,11 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx):
     cdef int a_id = a_ptx.id()
     if a_id in _AGENT_REFS:
         return _AGENT_REFS[a_id]
-    cdef _Agent a = Agent()
+    # have to make new wrapper instance
+    if ctx is None:
+        ctx = Context(init=False)
+        (<_Context> ctx).ptx = a_ptx.context()
+    cdef _Agent a = Agent(ctx)
     a.ptx = a_ptx
     _AGENT_REFS[a_id] = a
     return a
@@ -1332,7 +1336,7 @@ cdef class _Agent:
     def parent(self):
         """Returns parent of this agent.  Returns None if the agent has no parent.
         """
-        rtn = agent_to_py((<cpp_cyclus.Agent*> self.ptx).parent())
+        rtn = agent_to_py((<cpp_cyclus.Agent*> self.ptx).parent(), None)
         return rtn
 
     @property
@@ -1376,7 +1380,7 @@ cdef class _Agent:
         """A frozen set of the children of this agent."""
         kids = []
         for kid_ptx in (<cpp_cyclus.Agent*> self.ptx).children():
-            kid = agent_to_py(kid_ptx)
+            kid = agent_to_py(kid_ptx, None)
             kids.append(kid)
         return frozenset(kids)
 

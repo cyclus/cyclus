@@ -115,7 +115,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
 
     void Build(cpp_cyclus.Agent* parent):
         cpp_cyclus.Agent.Build(parent)
-        pyrent = lib.agent_to_py(parent)
+        pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
@@ -235,7 +235,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
 
     void Build(cpp_cyclus.Agent* parent):
         cpp_cyclus.Region.Build(parent)
-        pyrent = lib.agent_to_py(parent)
+        pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
@@ -361,7 +361,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
 
     void Build(cpp_cyclus.Agent* parent):
         cpp_cyclus.Institution.Build(parent)
-        pyrent = lib.agent_to_py(parent)
+        pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
@@ -495,7 +495,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
 
     void Build(cpp_cyclus.Agent* parent):
         cpp_cyclus.Facility.Build(parent)
-        pyrent = lib.agent_to_py(parent)
+        pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
