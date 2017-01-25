@@ -723,6 +723,7 @@ cdef extern from "facility.h" namespace "cyclus":
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
+        void EnterNotify()
         cpp_bool CheckDecommissionCondition()
 
 

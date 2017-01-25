@@ -503,6 +503,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Facility.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
