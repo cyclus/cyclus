@@ -144,7 +144,7 @@ cdef object query_result_to_py(cpp_cyclus.QueryResult qr):
     return rtn
 
 
-cdef object single_query_result_to_py(cpp_cyclus.QueryResult qr):
+cdef object single_query_result_to_py(cpp_cyclus.QueryResult qr, int row):
     """Converts a query result object with only one row to a dictionary mapping
     fields to values and a list of field names in order.
     """
@@ -152,14 +152,14 @@ cdef object single_query_result_to_py(cpp_cyclus.QueryResult qr):
     cdef int nrows, ncols
     nrows = qr.rows.size()
     ncols = qr.fields.size()
-    if nrows != 1:
-        raise ValueError("query result can only have one row!")
+    if nrows < row:
+        raise ValueError("query result does not have enough rows!")
     cdef dict res = {}
     cdef list fields = []
     for j in range(ncols):
         f = qr.fields[j]
         fields.append(f.decode())
-        res[fields[j]] = db_to_py(qr.rows[0][j], qr.types[j])
+        res[fields[j]] = db_to_py(qr.rows[row][j], qr.types[j])
     rtn = (res, fields)
     return rtn
 
