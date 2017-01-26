@@ -121,11 +121,13 @@ class Source(Facility):
         responses = {}
         if len(self.recipe_name) == 0:
             for trade in trades:
+                print(trade.request.commodity)
                 mat = ts.Material.create(self, trade.amt, trade.request.target.comp())
                 responses[trade] = mat
         else:
             recipe_comp = self.context.get_recipe(self.recipe_name)
             for trade in trades:
+                print(trade.request.commodity)
                 mat = ts.Material.create(self, trade.amt, recipe_comp)
                 responses[trade] = mat
         return responses

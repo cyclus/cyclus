@@ -647,18 +647,12 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return ports
 
     void GetMatlTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
-        print("shim material trades")
-        print("1")
         pytrades = ts.material_trade_vector_to_py(trades)
-        print("2")
         pyresp = (<object> this.self).get_material_trades(pytrades)
-        print("3")
         if pyresp is None or len(pyresp) == 0:
             return
-        print("4")
         if not isinstance(pyresp, Mapping):
             pyresp = dict(pyresp)
-        print("6")
         for trade, resp in pyresp.items():
             responses.push_back(std_pair[cpp_cyclus.Trade[cpp_cyclus.Material],
                                          shared_ptr[cpp_cyclus.Material]](
@@ -666,7 +660,6 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                 reinterpret_pointer_cast[cpp_cyclus.Material, cpp_cyclus.Resource](
                     (<ts._Material> resp).ptx)
                 ))
-        print("7")
 
     void GetProductTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
         pytrades = ts.product_trade_vector_to_py(trades)

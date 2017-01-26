@@ -2116,19 +2116,10 @@ cdef class _{{rclsname}}Request:
         """This request's target {{rfname}}"""
         if self._target is not None:
             return self._target
-        print("a")
         cdef _{{rclsname}} r = {{rclsname}}()
-        print("b")
-        #r.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
-        #                                            {{cyr}}](
-        #            self.ptx.target())
-        cdef shared_ptr[{{cyr}}] tp = self.ptx.target()
-        print("c")
         r.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
-                                                    {{cyr}}](tp)
-        print("d")
+                                                    {{cyr}}](self.ptx.target())
         self._target = r
-        print("e")
         return self._target
 
     @property
@@ -2383,12 +2374,14 @@ class {{rclsname}}Trade(_{{rclsname}}Trade):
     """
 
 
-cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] trades):
+cdef tuple {{rfname}}_trade_vector_to_py(const std_vector[cpp_cyclus.Trade[{{cyr}}]]& trades):
     """Converts a vector of {{rfname}} trades to a tuple"""
     cdef list pytrades = []
-    for trade in trades:
+    cdef int i, n
+    n = trades.size()
+    for i in range(n):
         t = {{rclsname}}Trade()
-        (<_{{rclsname}}Trade> t).ptx = &trade
+        (<_{{rclsname}}Trade> t).ptx = const_cast[{{rfname}}_trade_ptr](&(trades[i]))
         pytrades.append(t)
     cdef tuple rtn = tuple(pytrades)
     return rtn
@@ -2630,7 +2623,7 @@ cdef class _{{rclsname}}Trade:
     cdef object _bid
 
 
-cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] trades)
+cdef tuple {{rfname}}_trade_vector_to_py(const std_vector[cpp_cyclus.Trade[{{cyr}}]]& trades)
 cdef dict {{rfname}}_responses_to_py(const std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses)
 
 {% endfor %}
