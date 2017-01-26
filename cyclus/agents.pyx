@@ -8,6 +8,7 @@ from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport reinterpret_cast, dynamic_cast
 from cython.operator cimport dereference as deref
+cimport cython
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
     PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
@@ -699,7 +700,7 @@ cdef class _Agent(lib._Agent):
     tooltip = None
     userlevel = 0
 
-    def __init__(self, lib._Context ctx):
+    def __cinit__(self, lib._Context ctx):
         # Let subclasses do cinit() and if they don't make an new instance,
         # make one here
         if self.ptx == NULL:
@@ -743,6 +744,7 @@ cdef class _Agent(lib._Agent):
             attr = getattr(cls, name)
             if not isinstance(attr, ts.StateVar):
                 continue
+            attr.name = name
             attr.alias = _VAR_DECL.canonize_alias(attr.type, name, attr.alias)
             attr.tooltip = _VAR_DECL.canonize_tooltip(attr.type, name, attr.tooltip)
             attr.uilabel = _VAR_DECL.canonize_uilabel(attr.type, name, attr.uilabel)
@@ -758,6 +760,7 @@ cdef class _Agent(lib._Agent):
             attr = getattr(cls, name)
             if not isinstance(attr, ts.Inventory):
                 continue
+            attr.name = name
             invs[name] = attr
         cls._inventories = index_and_sort_vars(invs)
 

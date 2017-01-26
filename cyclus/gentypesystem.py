@@ -719,6 +719,7 @@ TO_CPP_CONVERTERS = {
 
 # annotation info key (pyname), C++ name,  cython type names, init snippet
 ANNOTATIONS = [
+    ('name', 'name', 'object', 'None'),
     ('type', 'type', 'object', 'None'),
     ('index', 'index', 'int', '-1'),
     ('default', 'dflt', 'object', 'None'),
@@ -1889,10 +1890,13 @@ cdef class StateVar:
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        return self.value
+        return obj.__dict__[self.name].value
 
     def __set__(self, obj, val):
-        self.value = val
+        if obj is None:
+            self.value = val
+        else:
+            obj.__dict__[self.name].value = val
 
     cpdef dict to_dict(self):
         """Returns a representation of this state variable as a dict."""
@@ -2008,10 +2012,13 @@ cdef class Inventory:
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        return self.value
+        return obj.__dict__[self.name].value
 
     def __set__(self, obj, val):
-        self.value = val
+        if obj is None:
+            self.value = val
+        else:
+            obj.__dict__[self.name].value = val
 
     cpdef dict to_dict(self):
         """Returns a representation of this inventory as a dict."""
