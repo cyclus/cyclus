@@ -23,6 +23,21 @@ CONFIGURE_FILE(
     @ONLY
     )
 
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF_H" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF_H RESULT_VARIABLE res_var_h)
+IF(NOT "${res_var_h}" STREQUAL "0")
+  message(FATAL_ERROR "Process hdf5_back_gen.py 'VAL_TO_BUF_H' failed, result = '${res_var_h}'")
+ENDIF()
+
+CONFIGURE_FILE(
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h.gen"
+    @ONLY
+    )
+copy_when_diff(
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h.gen"
+    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h"
+    )
+
 EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "QUERY" OUTPUT_VARIABLE HDF5_BACK_CC_QUERY RESULT_VARIABLE res_var_q)
 IF(NOT "${res_var_q}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'QUERY' failed, result = '${res_var_q}'")
@@ -46,6 +61,16 @@ ENDIF()
 EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "WRITE" OUTPUT_VARIABLE HDF5_BACK_CC_WRITE RESULT_VARIABLE res_var_w)
 IF(NOT "${res_var_w}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'WRITE' failed, result = '${res_var_w}'")
+ENDIF()
+
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF RESULT_VARIABLE res_var_vb)
+IF(NOT "${res_var_vb}" STREQUAL "0")
+  message(FATAL_ERROR "Process hdf5_back_gen.py 'VAL_TO_BUF' failed, result = '${res_var_vb}'")
+ENDIF()
+
+EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "BUF_TO_VAL" OUTPUT_VARIABLE HDF5_BACK_CC_BUF_TO_VAL RESULT_VARIABLE res_var_bv)
+IF(NOT "${res_var_bv}" STREQUAL "0")
+  message(FATAL_ERROR "Process hdf5_back_gen.py 'BUF_TO_VAL' failed, result = '${res_var_bv}'")
 ENDIF()
 
 CONFIGURE_FILE(
