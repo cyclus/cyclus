@@ -14,7 +14,7 @@ from cython.operator cimport preincrement as inc
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
-from libcpp.cast cimport reinterpret_cast
+from libcpp.cast cimport reinterpret_cast, dynamic_cast
 
 from binascii import hexlify
 import uuid
@@ -45,6 +45,24 @@ from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
 # startup numpy
 np.import_array()
 np.import_ufunc()
+
+
+cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
+    """Dynamically casts an agent instance to the correct agent pointer"""
+    if a is None:
+        return NULL
+    elif a.kind == "Region":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[region_ptr]((<_Agent> a).ptx))
+    elif a.kind == "Institution":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[institution_ptr]((<_Agent> a).ptx))
+    elif a.kind == "Facility":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[facility_ptr]((<_Agent> a).ptx))
+    else:
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[agent_ptr]((<_Agent> a).ptx))
 
 
 cdef class _Datum:
@@ -1493,7 +1511,7 @@ cdef class _Context:
 
     def del_agent(self, agent):
         """Destructs and cleans up an agent (and it's children recursively)."""
-        self.ptx.DelAgent(<cpp_cyclus.Agent*> (<_Agent> agent).ptx)
+        self.ptx.DelAgent(dynamic_agent_ptr(agent))
 
     @property
     def sim_id(self):
@@ -1517,7 +1535,7 @@ cdef class _Context:
         timestep t. The default t=-1 results in the build being scheduled for the
         next build phase (i.e. the start of the next timestep).
         """
-        self.ptx.SchedBuild(<cpp_cyclus.Agent*> (<_Agent> parent).ptx,
+        self.ptx.SchedBuild(dynamic_agent_ptr(parent),
                             str_py_to_cpp(proto_name), t)
 
     def schedule_decom(self, parent, int t=-1):
@@ -1525,7 +1543,7 @@ cdef class _Context:
         t. The default t=-1 results in the decommission being scheduled for the
         next decommission phase (i.e. the end of the current timestep).
         """
-        self.ptx.SchedDecom(<cpp_cyclus.Agent*> (<_Agent> parent).ptx, t)
+        self.ptx.SchedDecom(dynamic_agent_ptr(parent), t)
 
 
 class Context(_Context):
@@ -1733,6 +1751,9 @@ cpdef dict normalize_bid_portfolio(object inp):
             bid.update(b)
         elif isinstance(b, Sequence):
             bid['request'], bid['offer'] = b
+        elif isinstance(b, ts.request_types):
+            bid['request'] = b
+            bid['offer'] = b.target
         else:
             raise TypeError('Did not recognize type of bid while '
                             'converting to portfolio: ' + repr(inp))

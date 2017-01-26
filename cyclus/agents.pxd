@@ -122,10 +122,10 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # 
     std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests()
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type&)
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type&)
-    void GetMatlTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&)
-    void GetProductTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&)
-    void AcceptMatlTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&)
-    void AcceptProductTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&)
+    void GetMatlTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&)
+    void GetProductTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&)
+    void AcceptMatlTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&)
+    void AcceptProductTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&)
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -136,22 +136,28 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # 
 ctypedef cpp_cyclus.Agent* agent_ptr
 ctypedef CyclusAgentShim* agent_shim_ptr
 
+ctypedef cpp_cyclus.Trader* trader_ptr
+ctypedef cpp_cyclus.TimeListener* time_listener_ptr
+
 cdef class _Agent(lib._Agent):
     # pointer declared on full backend, but that is untyped, shim is typed
     cdef agent_shim_ptr shim
 
 
+ctypedef cpp_cyclus.Region* region_ptr
 ctypedef CyclusRegionShim* region_shim_ptr
 
 cdef class _Region(_Agent):
     pass
 
+ctypedef cpp_cyclus.Institution* institution_ptr
 ctypedef CyclusInstitutionShim* institution_shim_ptr
 
 cdef class _Institution(_Agent):
     pass
 
 
+ctypedef cpp_cyclus.Facility* facility_ptr
 ctypedef CyclusFacilityShim* facility_shim_ptr
 
 cdef class _Facility(_Agent):
@@ -162,3 +168,4 @@ cdef class _Facility(_Agent):
 #
 
 cdef tuple index_and_sort_vars(dict)
+cdef cpp_cyclus.Agent* dynamic_agent_ptr(object)

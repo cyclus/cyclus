@@ -8,6 +8,7 @@ from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport reinterpret_cast, dynamic_cast
 from cython.operator cimport dereference as deref
+cimport cython
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
     PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
@@ -47,6 +48,7 @@ cdef dict _GET_MAT_PREFS = {}
 cdef int _GET_PROD_PREFS_TIME = -9999999999
 cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* _GET_PROD_PREFS_PTR = NULL
 cdef dict _GET_PROD_PREFS = {}
+
 
 #
 # Shims
@@ -120,6 +122,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Agent.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -241,6 +244,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Region.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -368,6 +372,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Institution.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -422,6 +427,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).tick()
 
     void Tock():
+        cpp_cyclus.Institution.Tock()
         (<object> this.self).tock()
 
 
@@ -503,6 +509,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         (<object> this.self).build(pyrent)
 
     void EnterNotify():
+        cpp_cyclus.Facility.EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify():
@@ -571,7 +578,10 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             pyportfolios = [pyportfolios]
         for pyport in pyportfolios:
             normport = lib.normalize_request_portfolio(pyport)
-            ports.insert(ts.material_request_portfolio_to_cpp(normport, this))
+            #ports.insert(ts.material_request_portfolio_to_cpp(normport, this))
+            ports.insert(ts.material_request_portfolio_to_cpp(normport,
+                dynamic_cast[trader_ptr](reinterpret_cast[facility_shim_ptr](<CyclusFacilityShim*> this))
+                ))
         return ports
 
     std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests():
@@ -606,7 +616,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             pyports = [pyports]
         for pyport in pyports:
             normport = lib.normalize_bid_portfolio(pyport)
-            ports.insert(ts.material_bid_portfolio_to_cpp(normport, this))
+            #ports.insert(ts.material_bid_portfolio_to_cpp(normport, this))
+            ports.insert(ts.material_bid_portfolio_to_cpp(normport,
+                dynamic_cast[trader_ptr](reinterpret_cast[facility_shim_ptr](<CyclusFacilityShim*> this))
+                #dynamic_cast[trader_ptr](<CyclusFacilityShim*> this)
+                ))
         return ports
 
     std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type& commod_requests):
@@ -633,7 +647,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             ports.insert(ts.product_bid_portfolio_to_cpp(normport, this))
         return ports
 
-    void GetMatlTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
+    void GetMatlTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
         pytrades = ts.material_trade_vector_to_py(trades)
         pyresp = (<object> this.self).get_material_trades(pytrades)
         if pyresp is None or len(pyresp) == 0:
@@ -648,7 +662,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                     (<ts._Material> resp).ptx)
                 ))
 
-    void GetProductTrades(std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
+    void GetProductTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
         pytrades = ts.product_trade_vector_to_py(trades)
         pyresp = (<object> this.self).get_product_trades(pytrades)
         if pyresp is None or len(pyresp) == 0:
@@ -663,11 +677,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                     (<ts._Product> resp).ptx)
                 ))
 
-    void AcceptMatlTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
+    void AcceptMatlTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses):
         pyresp = ts.material_responses_to_py(responses)
         (<object> this.self).accept_material_trades(pyresp)
 
-    void AcceptProductTrades(std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
+    void AcceptProductTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses):
         pyresp = ts.product_responses_to_py(responses)
         (<object> this.self).accept_product_trades(pyresp)
 
@@ -686,7 +700,7 @@ cdef class _Agent(lib._Agent):
     tooltip = None
     userlevel = 0
 
-    def __init__(self, lib._Context ctx):
+    def __cinit__(self, lib._Context ctx):
         # Let subclasses do cinit() and if they don't make an new instance,
         # make one here
         if self.ptx == NULL:
@@ -730,6 +744,7 @@ cdef class _Agent(lib._Agent):
             attr = getattr(cls, name)
             if not isinstance(attr, ts.StateVar):
                 continue
+            attr.name = name
             attr.alias = _VAR_DECL.canonize_alias(attr.type, name, attr.alias)
             attr.tooltip = _VAR_DECL.canonize_tooltip(attr.type, name, attr.tooltip)
             attr.uilabel = _VAR_DECL.canonize_uilabel(attr.type, name, attr.uilabel)
@@ -745,6 +760,7 @@ cdef class _Agent(lib._Agent):
             attr = getattr(cls, name)
             if not isinstance(attr, ts.Inventory):
                 continue
+            attr.name = name
             invs[name] = attr
         cls._inventories = index_and_sort_vars(invs)
 
@@ -1162,13 +1178,13 @@ class Facility(_Facility):
         """
         return []
 
-    def get_material_bids(self):
+    def get_material_bids(self, requests):
         """Returns material bids for this agent on this time step.
         This may be overridden is subclasses.
         """
         return []
 
-    def get_product_bids(self):
+    def get_product_bids(self, requests):
         """Returns product bids for this agent on this time step.
         This may be overridden is subclasses.
         """
@@ -1209,3 +1225,32 @@ cdef tuple index_and_sort_vars(dict vars):
         svs[i][1].index = i
     rtn = tuple(svs)
     return rtn
+
+
+cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
+    """Dynamically casts an agent instance to the correct agent pointer"""
+    if a is None:
+        return NULL
+    elif isinstance(a, Region):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[region_shim_ptr]((<_Agent> a).shim))
+    elif isinstance(a, Institution):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[institution_shim_ptr]((<_Agent> a).shim))
+    elif isinstance(a, Facility):
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[facility_shim_ptr]((<_Agent> a).shim))
+    elif a.kind == "Region":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[region_ptr]((<lib._Agent> a).ptx))
+    elif a.kind == "Institution":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[institution_ptr]((<lib._Agent> a).ptx))
+    elif a.kind == "Facility":
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[facility_ptr]((<lib._Agent> a).ptx))
+    elif isinstance(a, Agent):
+        return dynamic_cast[agent_ptr]((<_Agent> a).shim)
+    else:
+        return dynamic_cast[agent_ptr](
+            reinterpret_cast[agent_ptr]((<lib._Agent> a).ptx))

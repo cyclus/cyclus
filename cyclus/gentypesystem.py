@@ -719,6 +719,7 @@ TO_CPP_CONVERTERS = {
 
 # annotation info key (pyname), C++ name,  cython type names, init snippet
 ANNOTATIONS = [
+    ('name', 'name', 'object', 'None'),
     ('type', 'type', 'object', 'None'),
     ('index', 'index', 'int', '-1'),
     ('default', 'dflt', 'object', 'None'),
@@ -839,6 +840,7 @@ from cython.operator cimport typeid
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
+from libcpp.cast cimport const_cast
 """.strip()
 
 NPY_IMPORTS = """
@@ -1037,7 +1039,7 @@ cdef class _Material(_Resource):
         cdef _Material mat = Material()
         mat.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
                                                       cpp_cyclus.Material](
-                    cpp_cyclus.Material.Create(<cpp_cyclus.Agent*> creator.ptx,
+                    cpp_cyclus.Material.Create(lib.dynamic_agent_ptr(creator),
                                                quantity, comp))
         rtn = mat
         return mat
@@ -1156,7 +1158,7 @@ cdef class _Product(_Resource):
         """
         cdef _Product prod = Product()
         prod.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Product](
-                    cpp_cyclus.Product.Create(<cpp_cyclus.Agent*> creator.ptx,
+                    cpp_cyclus.Product.Create(lib.dynamic_agent_ptr(creator),
                                               quantity, str_py_to_cpp(quality)))
         rtn = prod
         return prod
@@ -1888,10 +1890,13 @@ cdef class StateVar:
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        return self.value
+        return obj.__dict__[self.name].value
 
     def __set__(self, obj, val):
-        self.value = val
+        if obj is None:
+            self.value = val
+        else:
+            obj.__dict__[self.name].value = val
 
     cpdef dict to_dict(self):
         """Returns a representation of this state variable as a dict."""
@@ -2007,10 +2012,13 @@ cdef class Inventory:
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        return self.value
+        return obj.__dict__[self.name].value
 
     def __set__(self, obj, val):
-        self.value = val
+        if obj is None:
+            self.value = val
+        else:
+            obj.__dict__[self.name].value = val
 
     cpdef dict to_dict(self):
         """Returns a representation of this inventory as a dict."""
@@ -2117,8 +2125,7 @@ cdef class _{{rclsname}}Request:
             return self._target
         cdef _{{rclsname}} r = {{rclsname}}()
         r.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
-                                                    {{cyr}}](
-                    self.ptx.target())
+                                                    {{cyr}}](self.ptx.target())
         self._target = r
         return self._target
 
@@ -2374,30 +2381,39 @@ class {{rclsname}}Trade(_{{rclsname}}Trade):
     """
 
 
-cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] trades):
+cdef tuple {{rfname}}_trade_vector_to_py(const std_vector[cpp_cyclus.Trade[{{cyr}}]]& trades):
     """Converts a vector of {{rfname}} trades to a tuple"""
     cdef list pytrades = []
-    for trade in trades:
+    cdef int i, n
+    n = trades.size()
+    for i in range(n):
         t = {{rclsname}}Trade()
-        (<_{{rclsname}}Trade> t).ptx = &trade
+        (<_{{rclsname}}Trade> t).ptx = const_cast[{{rfname}}_trade_ptr](&(trades[i]))
         pytrades.append(t)
     cdef tuple rtn = tuple(pytrades)
     return rtn
 
 
-cdef dict {{rfname}}_responses_to_py(std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses):
+cdef dict {{rfname}}_responses_to_py(const std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses):
     """Converts a vector of pairs of (trades, {{rfname}}) to a dict"""
     cdef dict rtn = {}
-    for resp in responses:
+    cdef int i, n
+    n = responses.size()
+    for i in range(n):
         t = {{rclsname}}Trade()
-        (<_{{rclsname}}Trade> t).ptx = &(resp.first)
+        (<_{{rclsname}}Trade> t).ptx = const_cast[{{rfname}}_trade_ptr](&(responses[i].first))
         r = {{rclsname}}()
         (<_{{rclsname}}> r).ptx = reinterpret_pointer_cast[cpp_cyclus.Resource,
-                                                           {{cyr}}](resp.second)
+                                                           {{cyr}}](responses[i].second)
         rtn[t] = r
     return rtn
 
 {% endfor %}
+
+
+cpdef tuple request_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Request, {% endfor %})
+cpdef tuple bid_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Bid, {% endfor %})
+cpdef tuple trade_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Trade, {% endfor %})
 
 
 #
@@ -2606,16 +2622,22 @@ cdef class _{{rclsname}}Bid:
 
 cdef dict {{rfname}}_pref_map_to_py(cpp_cyclus.PrefMap[{{cyr}}].type& pm)
 
+ctypedef cpp_cyclus.Trade[{{cyr}}]* {{rfname}}_trade_ptr
+
 cdef class _{{rclsname}}Trade:
     cdef cpp_cyclus.Trade[{{cyr}}]* ptx
     cdef object _request
     cdef object _bid
 
 
-cdef tuple {{rfname}}_trade_vector_to_py(std_vector[cpp_cyclus.Trade[{{cyr}}]] trades)
-cdef dict {{rfname}}_responses_to_py(std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses)
+cdef tuple {{rfname}}_trade_vector_to_py(const std_vector[cpp_cyclus.Trade[{{cyr}}]]& trades)
+cdef dict {{rfname}}_responses_to_py(const std_vector[std_pair[cpp_cyclus.Trade[{{cyr}}], shared_ptr[{{cyr}}]]]& responses)
 
 {% endfor %}
+
+cpdef tuple request_types
+cpdef tuple bid_types
+cpdef tuple trade_types
 ''')
 
 def typesystem_pxd(ts, ns):

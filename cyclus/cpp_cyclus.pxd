@@ -688,12 +688,12 @@ cdef extern from "trader.h" namespace "cyclus":
         set[BidPortfolio[Product].Ptr] GetProductBids(CommodMap[Product].type&)
         void AdjustMatlPrefs(PrefMap[Material].type&)
         void AdjustProductPrefs(PrefMap[Product].type&)
-        void GetMatlTrades(vector[Trade[Material]]&,
+        void GetMatlTrades(const vector[Trade[Material]]&,
                            vector[pair[Trade[Material], Material.Ptr]]&)
-        void GetProductTrades(vector[Trade[Product]]&,
+        void GetProductTrades(const vector[Trade[Product]]&,
                               vector[pair[Trade[Product], Product.Ptr]]&)
-        void AcceptMatlTrades(vector[pair[Trade[Material], Material.Ptr]]&)
-        void AcceptProductTrades(vector[pair[Trade[Product], Product.Ptr]]&)
+        void AcceptMatlTrades(const vector[pair[Trade[Material], Material.Ptr]]&)
+        void AcceptProductTrades(const vector[pair[Trade[Product], Product.Ptr]]&)
 
 cdef extern from "region.h" namespace "cyclus":
 
@@ -703,6 +703,7 @@ cdef extern from "region.h" namespace "cyclus":
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
+        void EnterNotify()
 
 
 cdef extern from "institution.h" namespace "cyclus":
@@ -713,17 +714,32 @@ cdef extern from "institution.h" namespace "cyclus":
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
+        void EnterNotify()
+        void Tock()
 
 
 cdef extern from "facility.h" namespace "cyclus":
 
-    cdef cppclass Facility(Agent, TimeListener, Trader):
+    cdef cppclass Facility(TimeListener, Agent, Trader):
         Facility(Context*)
         void InitFromAgent "InitFrom" (Facility*)
         void InitFrom(QueryableBackend*)
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
+        void EnterNotify()
         cpp_bool CheckDecommissionCondition()
+        set[RequestPortfolio[Material].Ptr] GetMatlRequests()
+        set[RequestPortfolio[Product].Ptr] GetProductRequests()
+        set[BidPortfolio[Material].Ptr] GetMatlBids(CommodMap[Material].type&)
+        set[BidPortfolio[Product].Ptr] GetProductBids(CommodMap[Product].type&)
+        void AdjustMatlPrefs(PrefMap[Material].type&)
+        void AdjustProductPrefs(PrefMap[Product].type&)
+        void GetMatlTrades(const const vector[Trade[Material]]&,
+                           vector[pair[Trade[Material], Material.Ptr]]&)
+        void GetProductTrades(const vector[Trade[Product]]&,
+                              vector[pair[Trade[Product], Product.Ptr]]&)
+        void AcceptMatlTrades(const vector[pair[Trade[Material], Material.Ptr]]&)
+        void AcceptProductTrades(const vector[pair[Trade[Product], Product.Ptr]]&)
 
 
 cdef extern from "dynamic_module.h" namespace "cyclus":
@@ -744,11 +760,15 @@ cdef extern from "context.h" namespace "cyclus":
         void DelAgent(Agent*) except +
         uuid sim_id() except +
         int time()
+        const set[Trader*] traders()
         shared_ptr[Composition] GetRecipe(std_string)
         void SchedBuild(Agent*, std_string)
         void SchedBuild(Agent*, std_string, int)
         void SchedDecom(Agent*)
         void SchedDecom(Agent*, int)
+        #void RegisterAgent(Agent*)  # private
+        void RegisterTrader(Trader*)
+        void RegisterTimeListener(TimeListener*)
 
 
 cdef extern from "discovery.h" namespace "cyclus":
