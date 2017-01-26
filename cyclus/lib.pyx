@@ -106,7 +106,6 @@ cdef class _Datum:
             raise TypeError('a database or C++ type must be supplied to add a '
                             'value to the datum, got None.')
         cdef cpp_cyclus.hold_any v = py_to_any(value, type)
-        cdef std_string cpp_field
         if isinstance(field, str):
             pass
         elif isinstance(field, bytes):
@@ -114,7 +113,7 @@ cdef class _Datum:
         else:
             raise ValueError('field name must be str or bytes.')
         # have to keep refs around so don't dealloc field names
-        cpp_field = str_py_to_cpp(field)
+        cdef std_string cpp_field = str_py_to_cpp(field)
         if shape is None:
             (<cpp_cyclus.Datum*> self.ptx).AddVal(cpp_field, v)
         else:
