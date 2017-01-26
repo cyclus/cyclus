@@ -43,6 +43,7 @@ tests/libcyclus-test.sqlite
 # generated cython ignores
 *.cc.gen
 *.cc.h
+*.h.gen
 src/eventhooks.cc
 src/eventhooks.h
 src/pyinfile.cc
