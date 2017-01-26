@@ -1038,7 +1038,7 @@ cdef class _Material(_Resource):
         cdef _Material mat = Material()
         mat.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource,
                                                       cpp_cyclus.Material](
-                    cpp_cyclus.Material.Create(<cpp_cyclus.Agent*> creator.ptx,
+                    cpp_cyclus.Material.Create(lib.dynamic_agent_ptr(creator),
                                                quantity, comp))
         rtn = mat
         return mat
@@ -1157,7 +1157,7 @@ cdef class _Product(_Resource):
         """
         cdef _Product prod = Product()
         prod.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Product](
-                    cpp_cyclus.Product.Create(<cpp_cyclus.Agent*> creator.ptx,
+                    cpp_cyclus.Product.Create(lib.dynamic_agent_ptr(creator),
                                               quantity, str_py_to_cpp(quality)))
         rtn = prod
         return prod
