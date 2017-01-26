@@ -28,10 +28,17 @@ def clean_outs():
     if os.path.exists(sqliteout):
         os.remove(sqliteout)
 
+
 def which_outfile():
-    """Uses sqlite if platform is Mac, otherwise uses hdf5
+    """Uses sqlite if platform is Mac or on CI, otherwise uses hdf5
     """
-    return h5out if platform.system() == 'Linux' else sqliteout
+    if 'CI' in os.environ or 'CIRCLECI' in os.environ:
+        return sqliteout
+    elif platform.system() == 'Linux':
+        return h5out
+    else:
+        return sqliteout
+
 
 def tables_exist(outfile, table_names):
     """Checks if output database contains the specified tables.
