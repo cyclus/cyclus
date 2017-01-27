@@ -59,6 +59,13 @@ in seconds::
 
     {"event": "heartbeat", "data": val}
 
+**loaded:** A simple message that says that a simulation has been loaded.
+
+    {"event": "loaded",
+     "params": {"status": "ok"},
+     "data": null
+    }
+
 **registry:** The in-memory backend registy value in its current form::
 
     {"event": "registry",
@@ -74,6 +81,7 @@ in seconds::
      "data": ["table0", "table1", ...]
     }
 
+
 Client Events
 -------------
 Client events are often requests originating from users. They may either
@@ -87,6 +95,10 @@ A registry event from the server will follow the completion of this event::
     {"event": "deregister_tables",
      "params": {"tables": ["table0", "table1", ...]}
      }
+
+**load:** Loads the input file in the simulation and starts running the simulation::
+
+    {"event": "load"}
 
 **pause:** Pauses the simulation until it is unpaused::
 
@@ -118,6 +130,16 @@ Bidirectional Events
 These are events that may logically originate from either the client or the
 server. Certian keys in the event may or not be present depending on the
 sender, but the event name stays the same.
+
+**agent_annotations:** This event requests and returns the agent annotations
+for a given agent spec. If the data field is null, this is a request to the
+server for annotation information. If the data field is a dict, it represents
+the annotations for the spec::
+
+    {"event": "agent_annotations",
+     "params": {"spec": "<path>:<lib>:<name>"},
+     "data": null or object
+    }
 
 **echo:** Echos back a single string parameter. When requesting an echo,
 the data key need not be present::
@@ -355,7 +377,6 @@ def main(args=None):
                                            output_path=ns.output_path,
                                            memory_backend=True,
                                            debug=ns.debug)
-    state.load()
     # load initial and repeating actions
     for kind, params in ns.initial_actions:
         action = EVENT_ACTIONS[kind]

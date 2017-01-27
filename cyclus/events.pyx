@@ -39,8 +39,10 @@ MONITOR_ACTIONS = {}
 if cyclus.system.PY_VERSION_TUPLE >= (3, 5, 0):
     from cyclus import actions
     EVENT_ACTIONS.update(
+        agent_annotations=actions.agent_annotations,
         deregister_tables=actions.deregister_tables,
         echo=actions.echo,
+        load=actions.load,
         pause=actions.pause,
         register_tables=actions.register_tables,
         registry_request=actions.send_registry_action,
