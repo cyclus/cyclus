@@ -51,6 +51,7 @@ if cyclus.system.PY_VERSION_TUPLE >= (3, 5, 0):
         table_names_request=actions.send_table_names,
         )
     MONITOR_ACTIONS.update(
+        shutdown=actions.shutdown,
         unpause=actions.unpause,
         )
     del actions

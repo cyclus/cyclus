@@ -219,3 +219,10 @@ async def agent_annotations(state, spec):
     params = {'spec': spec}
     await send_message(state, "agent_annotations", params=params, data=data)
 
+
+@action
+async def shutdown(state):
+    """Shuts down the server."""
+    if not state.loop.is_closed():
+        state.loop.close()
+

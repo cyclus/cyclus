@@ -115,6 +115,10 @@ A registry event from the server will follow the completion of this event::
 
     {"event": "registry_request"}
 
+**shutdown:** A reqest to shutdown the server::
+
+    {"event": "shutdown"}
+
 **table_names_request:** A simple reqest for the table names present in the
 file system backend::
 
@@ -405,7 +409,8 @@ def main(args=None):
             asyncio.ensure_future(server),
             ))
     finally:
-        loop.close()
+        if not loop.is_closed():
+            loop.close()
 
 
 if __name__ == '__main__':
