@@ -221,8 +221,18 @@ async def agent_annotations(state, spec):
 
 
 @action
-async def shutdown(state):
-    """Shuts down the server."""
-    if not state.loop.is_closed():
-        state.loop.close()
+async def shutdown(state, when="empty"):
+    """Shuts down the server.
+
+    Parameters
+    ----------
+    when : str, optional
+        When to shutdown the server. Options are "empty" for when the action
+        queue is empty, and "now" for right now. Default is empty.
+    """
+    if when == 'empty':
+        await asyncio.sleep(0.1)
+        while state.action_queue.qsize() > 1:
+            await asyncio.sleep(0.001)
+    state.loop.call_soon_threadsafe(state.loop.stop)
 

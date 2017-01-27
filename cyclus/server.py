@@ -117,7 +117,9 @@ A registry event from the server will follow the completion of this event::
 
 **shutdown:** A reqest to shutdown the server::
 
-    {"event": "shutdown"}
+    {"event": "shutdown",
+     "params": {"when": "empty" or "now"}
+     }
 
 **table_names_request:** A simple reqest for the table names present in the
 file system backend::
@@ -343,7 +345,7 @@ def make_parser():
     p.add_argument('-i', '--initial-actions', action=EventCLIAction,
                    dest='initial_actions', default=(),
                    help='list of initial actions to queue')
-    p.add_argument('input_file', help='path to input file')
+    p.add_argument('input_file', nargs= '?', default='<no-input-file>', help='path to input file')
     return p
 
 
@@ -383,7 +385,12 @@ def main(args=None):
                                            debug=ns.debug)
     # load initial and repeating actions
     for kind, params in ns.initial_actions:
-        action = EVENT_ACTIONS[kind]
+        if kind in EVENT_ACTIONS:
+            action = EVENT_ACTIONS[kind]
+        else:
+            action = MONITOR_ACTIONS[kind]
+        # place all initial actions in action queue, even if it is a monitor action.
+        # this enables shutdown to happen after all actions when issues from command line.
         state.action_queue.put(action(state, **params))
     state.repeating_actions.extend(ns.repeating_actions)
     # start up tasks
