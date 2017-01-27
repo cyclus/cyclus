@@ -32,7 +32,6 @@ def clean_outs():
 def which_outfile():
     """Uses sqlite if platform is Mac or on CI, otherwise uses hdf5
     """
-    return sqliteout
     if 'CI' in os.environ or 'CIRCLECI' in os.environ:
         return sqliteout
     elif platform.system() == 'Linux':
