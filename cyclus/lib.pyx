@@ -71,6 +71,7 @@ cdef class _Datum:
         """Constructor for Datum type conversion."""
         self._free = False
         self.ptx = NULL
+        self._fields = []
 
     def __dealloc__(self):
         """Datum destructor."""
@@ -107,13 +108,14 @@ cdef class _Datum:
                             'value to the datum, got None.')
         cdef cpp_cyclus.hold_any v = py_to_any(value, type)
         if isinstance(field, str):
-            pass
+            field = field.encode()
         elif isinstance(field, bytes):
-            field = field.decode()
+            pass
         else:
             raise ValueError('field name must be str or bytes.')
         # have to keep refs around so don't dealloc field names
-        cdef std_string cpp_field = str_py_to_cpp(field)
+        self._fields.append(field)
+        cdef char* cpp_field = <char*> field
         if shape is None:
             (<cpp_cyclus.Datum*> self.ptx).AddVal(cpp_field, v)
         else:
@@ -127,6 +129,7 @@ cdef class _Datum:
     def record(self):
         """Records the Datum."""
         (<cpp_cyclus.Datum*> self.ptx).Record()
+        self._fields.clear()
 
     @property
     def title(self):
