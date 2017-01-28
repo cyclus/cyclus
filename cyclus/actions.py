@@ -1,18 +1,19 @@
-from __future__ import unicode_literals, print_function
-import time
-import json
 """Cyclus actions.
 
 This file cannot be Cythonized due to current errors in Cython async
 handling. -- scopatz 2017-01-02, for more information see.
 see https://github.com/cython/cython/issues/1573
 """
-
+from __future__ import unicode_literals, print_function
+import time
+import json
 from functools import wraps
 from collections.abc import Set, Sequence
 
 from cyclus.lazyasd import lazyobject
 from cyclus.system import asyncio
+from cyclus import lib
+from cyclus.jsoncpp import FastWriter
 
 
 def action(f):
@@ -174,4 +175,64 @@ async def sleep(state, n):
     """Asynchronously sleeps for n seconds."""
     await asyncio.sleep(n)
 
+
+@action
+async def load(state):
+    """Loads the simulation from the input file and starts executing it.
+    """
+    # load sim in another thread, just in case.
+    task = state.loop.run_in_executor(state.executor, state.load)
+    await asyncio.wait([task])
+    params = {'status': 'ok'}
+    await send_message(state, "loaded", params=params)
+
+
+def agent_annotations_as_json(state, spec):
+    """Returns the agent annotations as a JSON string."""
+    if state.si is None:
+        rec = lib.Recorder()
+        ti = lib.Timer()
+        ctx = lib.Context(ti, rec)
+    else:
+        ctx = state.si.context
+    agent = lib.DynamicModule.make(ctx, spec)
+    anno = agent.annotations
+    writer = FastWriter()
+    data = writer.write(anno)
+    ctx.del_agent(agent)
+    return data
+
+
+@action
+async def agent_annotations(state, spec):
+    """Returns agent annotations for a given spec.
+
+    Parameters
+    ----------
+    spec : str
+        The agent specification, e.g. ":agents:NullRegion"
+    """
+    task = state.loop.run_in_executor(state.executor, agent_annotations_as_json,
+                                      state, spec)
+    await asyncio.wait([task])
+    data = task.result()
+    params = {'spec': spec}
+    await send_message(state, "agent_annotations", params=params, data=data)
+
+
+@action
+async def shutdown(state, when="empty"):
+    """Shuts down the server.
+
+    Parameters
+    ----------
+    when : str, optional
+        When to shutdown the server. Options are "empty" for when the action
+        queue is empty, and "now" for right now. Default is empty.
+    """
+    if when == 'empty':
+        await asyncio.sleep(0.1)
+        while state.action_queue.qsize() > 1:
+            await asyncio.sleep(0.001)
+    state.loop.call_soon_threadsafe(state.loop.stop)
 
