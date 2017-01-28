@@ -704,6 +704,8 @@ cdef extern from "region.h" namespace "cyclus":
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
         void EnterNotify()
+        void Tick()
+        void Tock()
 
 
 cdef extern from "institution.h" namespace "cyclus":
@@ -715,6 +717,7 @@ cdef extern from "institution.h" namespace "cyclus":
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
         void EnterNotify()
+        void Tick()
         void Tock()
 
 
@@ -727,6 +730,8 @@ cdef extern from "facility.h" namespace "cyclus":
         void InfileToDb(InfileTree*, DbInit)
         void Build(Agent*)
         void EnterNotify()
+        void Tick()
+        void Tock()
         cpp_bool CheckDecommissionCondition()
         set[RequestPortfolio[Material].Ptr] GetMatlRequests()
         set[RequestPortfolio[Product].Ptr] GetProductRequests()

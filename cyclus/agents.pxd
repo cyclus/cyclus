@@ -67,7 +67,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):  # C++CON
 
 # Can't inherit from CyclusAgentShim due to diamond problem and
 # no way to avoid it in Cython. Also, due to cyclus, this **must be**
-# a region.
+# a institution.
 cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institution):  # C++CONSTRUCTORS CyclusInstitutionShim(cyclus::Context*)
     # Agent interface
     CyclusInstitutionShim(cpp_cyclus.Context*)
@@ -95,7 +95,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
 
 # Can't inherit from CyclusAgentShim due to diamond problem and
 # no way to avoid it in Cython. Also, due to cyclus, this **must be**
-# a region.
+# a facility.
 cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # C++CONSTRUCTORS CyclusFacilityShim(cyclus::Context*)
     # Agent interface
     CyclusFacilityShim(cpp_cyclus.Context*)
