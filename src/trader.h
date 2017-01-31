@@ -64,9 +64,7 @@ class Trader {
   /// @param responses a container to populate with responses to each trade
   virtual void GetMatlTrades(
       const std::vector< Trade<Material> >& trades,
-      std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
-    std::cout << "in material trader\n";
-    }
+      std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {}
 
   /// @brief default implementation for responding to product trades
   /// @param trades all trades in which this trader is the supplier
