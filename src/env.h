@@ -107,8 +107,10 @@ class Env {
   }
 
   /// Returns the full path to a module by searching through default install
-  /// and CYCLUS_PATH directories.
+  /// and CYCLUS_PATH directories. You may optionally pass in the lib name itself
+  /// without any frills. In this case, Python modules will also be searched.
   static std::string FindModule(std::string path);
+  static std::string FindModule(std::string path, std::string lib);
 
  private:
   /// the cwd path

@@ -9,7 +9,8 @@ from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, which_outfile
 
 
-INPUT = os.path.join(os.path.dirname(__file__), "input")
+CWD = os.path.dirname(__file__)
+INPUT = os.path.join(CWD, "input")
 
 def test_include_recipe():
     """Testing for including of other XML files.
@@ -20,7 +21,7 @@ def test_include_recipe():
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    yield check_cmd, cmd, CWD, holdsrtn
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands

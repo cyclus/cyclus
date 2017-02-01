@@ -62,6 +62,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     # set cycpp var
     SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
 
+    # set cython post-processor var
+    SET(CYTHON_POST_PROCESSOR "${CYCLUS_CLI_DIR}/post-process-cython.py")
+
     # This makes all the libraries build as SHARED
     SET(BUILD_SHARED_LIBS true)
 
@@ -150,9 +153,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
     MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
 
-    FIND_PACKAGE(Tcmalloc)
-    SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
-
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
     FIND_PACKAGE(LibXml2 REQUIRED ${DEPS_HINTS})
@@ -182,7 +182,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(Boost_USE_STATIC_LIBS OFF)
     SET(Boost_USE_STATIC_RUNTIME OFF)
     # SET(Boost_USE_MULTITHREADED    OFF)
-    FIND_PACKAGE(Boost 1.46.1 COMPONENTS program_options filesystem system serialization REQUIRED)
+    if (DEPS_ROOT_DIR)
+      SET(BOOST_ROOT "${DEPS_ROOT_DIR}")
+      SET(BOOST_INCLUDEDIR "${DEPS_INCLUDE_HINTS}")
+    endif (DEPS_ROOT_DIR)
+    FIND_PACKAGE(Boost COMPONENTS program_options filesystem system serialization REQUIRED)
     MESSAGE("--    Boost Root: ${Boost_ROOT}")
     MESSAGE("--    Boost Include directory: ${Boost_INCLUDE_DIR}")
     MESSAGE("--    Boost Library directories: ${Boost_LIBRARY_DIRS}")
@@ -293,6 +297,12 @@ IF(NOT CYCLUS_DOC_ONLY)
         add_definitions(-DCYCLUS_WITH_PYTHON)
         set(LIBS ${LIBS} ${PYTHON_LIBRARIES})
         INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
+    else(Cython_FOUND)
+        # If we don't have Python bindings, we may try to find tcmalloc.
+        # Python has to be specially compiled for tcmalloc support, which it
+        # normally isn't.
+        FIND_PACKAGE(Tcmalloc)
+        SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
     endif(Cython_FOUND)
 
     ##############################################################################################

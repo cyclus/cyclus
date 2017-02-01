@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import os
 import platform
 import sys
@@ -15,10 +15,10 @@ reldir = os.path.join(cycdir, 'release')
 blddir = os.path.join(cycdir, 'build')
 sys.path.insert(0, reldir)
 
-try: 
+try:
     import smbchk
 except ImportError:
-    smbchk = False    
+    smbchk = False
 
 def test_load():
     if not smbchk:
@@ -41,10 +41,10 @@ def test_nm():
 def test_diff():
     if not smbchk:
         return
-    db = [{'symbols': ["cyclus::Agent::Agent(cyclus::Context*)"], 
-           'version': 'X', 'date': 'x.x.x'}, 
-          {'symbols': ["cyclus::Agent::Agent(cyclus::Context*)", 
-                       "cyclus::Agent::~Agent()"], 
+    db = [{'symbols': ["cyclus::Agent::Agent(cyclus::Context*)"],
+           'version': 'X', 'date': 'x.x.x'},
+          {'symbols': ["cyclus::Agent::Agent(cyclus::Context*)",
+                       "cyclus::Agent::~Agent()"],
            'version': 'Y', 'date': 'y.y.y'},]
     obs = smbchk.diff(db, 0, 1)
     assert_true(len(obs) > 0)
@@ -53,16 +53,16 @@ def test_check():
     if not smbchk:
         return
     # adds to API
-    db = [{'symbols': ["cyclus::Agent::Agent(cyclus::Context*)"], 
-           'version': 'X', 'date': 'x.x.x'}, 
-          {'symbols': ["cyclus::Agent::Agent(cyclus::Context*)", 
-                       "cyclus::Agent::~Agent()"], 
+    db = [{'symbols': ["cyclus::Agent::Agent(cyclus::Context*)"],
+           'version': 'X', 'date': 'x.x.x'},
+          {'symbols': ["cyclus::Agent::Agent(cyclus::Context*)",
+                       "cyclus::Agent::~Agent()"],
            'version': 'Y', 'date': 'y.y.y'},]
     obs = smbchk.check(db)
     assert_true(obs)
 
     # removes from API
-    db.append({'symbols': ["cyclus::Agent::~Agent()"], 
+    db.append({'symbols': ["cyclus::Agent::~Agent()"],
                'version': 'Z', 'date': 'z.z.z'})
     obs = smbchk.check(db)
     assert_false(obs)

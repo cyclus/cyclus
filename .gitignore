@@ -43,7 +43,13 @@ tests/libcyclus-test.sqlite
 # generated cython ignores
 *.cc.gen
 *.cc.h
+*.h.gen
 src/eventhooks.cc
 src/eventhooks.h
 src/pyinfile.cc
 src/pyinfile.h
+src/pymodule.cc
+src/pymodule.h
+
+# this is copied over by the installer
+cyclus/cycpp.py

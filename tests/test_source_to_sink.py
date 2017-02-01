@@ -12,14 +12,14 @@ from helper import tables_exist, find_ids, exit_times, \
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
-def test_source_to_sink():
+def check_source_to_sink(fname, source_spec, sink_spec):
     """Tests linear growth of sink inventory by checking if the transactions
     were of equal quantities and only between sink and source facilities.
     """
     clean_outs()
 
     # Cyclus simulation input for Source and Sink
-    sim_inputs = [os.path.join(INPUT, "source_to_sink.xml")]
+    sim_inputs = [os.path.join(INPUT, fname)]
 
     for sim_input in sim_inputs:
         holdsrtn = [1]  # needed because nose does not send() to test generator
@@ -35,7 +35,6 @@ def test_source_to_sink():
         # Check if these tables exist
         yield assert_true, tables_exist(outfile, paths)
         if not tables_exist(outfile, paths):
-            outfile.close()
             clean_outs()
             return  # don't execute further commands
 
@@ -64,8 +63,8 @@ def test_source_to_sink():
         agent_ids = to_ary(agent_entry, "AgentId")
         spec = to_ary(agent_entry, "Spec")
 
-        source_id = find_ids(":agents:Source", spec, agent_ids)
-        sink_id = find_ids(":agents:Sink", spec, agent_ids)
+        source_id = find_ids(source_spec, spec, agent_ids)
+        sink_id = find_ids(sink_spec, spec, agent_ids)
 
         # Test for only one source and one sink are deployed in the simulation
         yield assert_equal, len(source_id), 1
@@ -97,3 +96,12 @@ def test_source_to_sink():
         yield assert_array_equal, quantities, expected_quantities
 
         clean_outs()
+
+
+def test_source_to_sink():
+    cases = [("source_to_sink.xml", ":agents:Source", ":agents:Sink"),
+             ("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
+             ]
+    for case in cases:
+        for x in check_source_to_sink(*case):
+            yield x

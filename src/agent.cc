@@ -119,7 +119,7 @@ bool Agent::AncestorOf(Agent* other) {
       return true;
     other = other->parent();
   }
-  return false;               
+  return false;
 }
 
 bool Agent::DecendentOf(Agent* other) {
@@ -128,8 +128,8 @@ bool Agent::DecendentOf(Agent* other) {
   for (; it != children.end(); ++it) {
     if (this == *(it) || this->DecendentOf(*(it)))
       return true;
-  }  
-  return false;               
+  }
+  return false;
 }
 
 bool Agent::InFamilyTree(Agent* other) {

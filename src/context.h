@@ -16,6 +16,7 @@
 #include "composition.h"
 #include "agent.h"
 #include "greedy_solver.h"
+#include "pyhooks.h"
 #include "recorder.h"
 
 const uint64_t kDefaultTimeStepDur = 2629846;
@@ -185,6 +186,7 @@ class Context {
     Agent* clone = m->Clone();
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
+      PyDelAgent(clone->id());
       DelAgent(clone);
       throw CastError("Invalid cast for prototype " + proto_name);
     }

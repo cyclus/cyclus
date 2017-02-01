@@ -25,9 +25,9 @@ def make_rec_back(inject_sim_id=False):
 def test_simple():
     rec, back = make_rec_back()
     d = rec.new_datum("test")
-    d.add_val("col0", 1, dbtype=ts.INT)
-    d.add_val("col1", 42.0, dbtype=ts.DOUBLE)
-    d.add_val("col2", "wakka", dbtype=ts.VL_STRING)
+    d.add_val("col0", 1, type=ts.INT)
+    d.add_val("col1", 42.0, type=ts.DOUBLE)
+    d.add_val("col2", "wakka", type=ts.VL_STRING)
     d.record()
     rec.flush()
 
@@ -44,9 +44,9 @@ def test_simple():
 def test_simple_with_sim_id():
     rec, back = make_rec_back(inject_sim_id=True)
     d = rec.new_datum("test")
-    d.add_val("col0", 1, dbtype=ts.INT)
-    d.add_val("col1", 42.0, dbtype=ts.DOUBLE)
-    d.add_val("col2", "wakka", dbtype=ts.VL_STRING)
+    d.add_val("col0", 1, type=ts.INT)
+    d.add_val("col1", 42.0, type=ts.DOUBLE)
+    d.add_val("col2", "wakka", type=ts.VL_STRING)
     d.record()
     rec.flush()
 
@@ -62,9 +62,9 @@ def test_many_rows_one_table():
     rec, back = make_rec_back()
     for i in range(n):
         d = rec.new_datum("test")
-        d.add_val("col0", i, dbtype=ts.INT)
-        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
-        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.add_val("col0", i, type=ts.INT)
+        d.add_val("col1", 42.0*i, type=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, type=ts.VL_STRING)
         d.record()
     rec.flush()
 
@@ -81,9 +81,9 @@ def test_many_rows_one_table():
 def make_two_interleaved(rec, n):
     for i in range(n):
         d = rec.new_datum("test0" if i%2 == 0 else "test1")
-        d.add_val("col0", i, dbtype=ts.INT)
-        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
-        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.add_val("col0", i, type=ts.INT)
+        d.add_val("col1", 42.0*i, type=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, type=ts.VL_STRING)
         d.record()
     rec.flush()
 
@@ -120,11 +120,11 @@ def test_three_tables_grouped():
         for i in range(n):
             d = rec.new_datum(name)
             if j%3 != 0:
-                d.add_val("col0", i*j, dbtype=ts.INT)
+                d.add_val("col0", i*j, type=ts.INT)
             if j%3 != 1:
-                d.add_val("col1", 42.0*i*j, dbtype=ts.DOUBLE)
+                d.add_val("col1", 42.0*i*j, type=ts.DOUBLE)
             if j%3 != 2:
-                d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+                d.add_val("col2", "wakka"*i, type=ts.VL_STRING)
             d.record()
     rec.flush()
 
@@ -159,16 +159,16 @@ def test_record_flush_twice():
     rec, back = make_rec_back()
     for i in range(n//2):
         d = rec.new_datum("test")
-        d.add_val("col0", i, dbtype=ts.INT)
-        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
-        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.add_val("col0", i, type=ts.INT)
+        d.add_val("col1", 42.0*i, type=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, type=ts.VL_STRING)
         d.record()
     rec.flush()
     for i in range(n//2, n):
         d = rec.new_datum("test")
-        d.add_val("col0", i, dbtype=ts.INT)
-        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
-        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.add_val("col0", i, type=ts.INT)
+        d.add_val("col1", 42.0*i, type=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, type=ts.VL_STRING)
         d.record()
     rec.flush()
 
@@ -187,23 +187,23 @@ def test_record_flush_thrice():
     rec, back = make_rec_back()
     for i in range(n//3):
         d = rec.new_datum("test")
-        d.add_val("col0", i, dbtype=ts.INT)
-        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
-        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.add_val("col0", i, type=ts.INT)
+        d.add_val("col1", 42.0*i, type=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, type=ts.VL_STRING)
         d.record()
     rec.flush()
     for i in range(n//3, 2*n//3):
         d = rec.new_datum("test")
-        d.add_val("col0", i, dbtype=ts.INT)
-        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
-        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.add_val("col0", i, type=ts.INT)
+        d.add_val("col1", 42.0*i, type=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, type=ts.VL_STRING)
         d.record()
     rec.flush()
     for i in range(2*n//3, n):
         d = rec.new_datum("test")
-        d.add_val("col0", i, dbtype=ts.INT)
-        d.add_val("col1", 42.0*i, dbtype=ts.DOUBLE)
-        d.add_val("col2", "wakka"*i, dbtype=ts.VL_STRING)
+        d.add_val("col0", i, type=ts.INT)
+        d.add_val("col1", 42.0*i, type=ts.DOUBLE)
+        d.add_val("col2", "wakka"*i, type=ts.VL_STRING)
         d.record()
     rec.flush()
 
@@ -222,7 +222,7 @@ def test_many_cols_one_table():
     rec, back = make_rec_back()
     d = rec.new_datum("test")
     for i in range(n):
-        d.add_val("col" + str(i), i, dbtype=ts.INT)
+        d.add_val("col" + str(i), i, type=ts.INT)
     d.record()
     rec.flush()
 
