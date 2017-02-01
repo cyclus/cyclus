@@ -765,6 +765,7 @@ cdef extern from "context.h" namespace "cyclus":
         void DelAgent(Agent*) except +
         uuid sim_id() except +
         int time()
+        uint64_t dt()
         const set[Trader*] traders()
         shared_ptr[Composition] GetRecipe(std_string)
         void SchedBuild(Agent*, std_string)

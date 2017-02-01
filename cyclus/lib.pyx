@@ -1522,6 +1522,16 @@ cdef class _Context:
         rtn = uuid_cpp_to_py(cpp_sim_id)
         return rtn
 
+    @property
+    def time(self):
+        """The simulation time step number."""
+        return self.ptx.time()
+
+    @property
+    def dt(self):
+        """The length of timer per time step, in seconds."""
+        return self.ptx.dt()
+
     def get_recipe(self, name, basis='mass'):
         """Retrieve a registered recipe. This is intended for retrieving
         compositions loaded from an input file(s) at the start of a
