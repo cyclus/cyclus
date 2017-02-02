@@ -612,7 +612,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         # convert to c++ and return
         cdef std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] ports = \
             std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]]()
-        if isinstance(pyports, Mapping):
+        if pyports is None:
+            return ports
+        elif isinstance(pyports, Mapping):
             pyports = [pyports]
         for pyport in pyports:
             normport = lib.normalize_bid_portfolio(pyport)
@@ -640,7 +642,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         # convert to c++ and return
         cdef std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] ports = \
             std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]]()
-        if isinstance(pyports, Mapping):
+        if pyports is None:
+            return ports
+        elif isinstance(pyports, Mapping):
             pyports = [pyports]
         for pyport in pyports:
             normport = lib.normalize_bid_portfolio(pyport)
