@@ -1557,6 +1557,13 @@ cdef class _Context:
         """
         self.ptx.SchedDecom(dynamic_agent_ptr(parent), t)
 
+    def new_datum(self, title):
+        """Returns a new datum instance."""
+        cdef std_string cpp_title = str_py_to_cpp(title)
+        cdef _Datum d = Datum(new=False)
+        (<_Datum> d).ptx = self.ptx.NewDatum(cpp_title)
+        return d
+
 
 class Context(_Context):
     """A simulation context provides access to necessary simulation-global
