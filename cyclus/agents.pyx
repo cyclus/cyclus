@@ -894,7 +894,10 @@ cdef class _Agent(lib._Agent):
         for name, val in d.items():
             setattr(self, name, val)
         for name, inv in self._inventories:
-            inv.value.capacity = d[inv.capacity]
+            if isinstance(inv.capacity, str):
+                inv.value.capacity = d[inv.capacity]
+            else:
+                inv.value.capacity = inv.capacity
 
     def snapshot(self, di):
         """A dynamic version of Snapshot(DbInit) that should
