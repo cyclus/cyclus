@@ -1979,7 +1979,7 @@ cdef class Inventory:
     def __cinit__(self, object value=None,
             {%- for pyname, cppname, typename, kwval in annotations -%}
             {{typename}} {{pyname}}={{kwval}},
-            {%- endfor -%}str capacity="", object _kind=None):
+            {%- endfor -%}object capacity=None, object _kind=None):
         global _N_STATEVARS
         self.value = value
         {% for pyname, cppname, _, _ in annotations -%}
@@ -2070,7 +2070,7 @@ cdef class {{tclassname}}Inv(Inventory):
     def __cinit__(self, object value=None,
             {%- for pyname, cppname, typename, kwval in annotations -%}{%- if pyname not in nonuser_annotations -%}
             {{typename}} {{pyname}}={{kwval}},
-            {%- endif -%}{%- endfor -%}str capacity="",):
+            {%- endif -%}{%- endfor -%}object capacity=None,):
         global _N_STATEVARS
         self.value = value
         {% for pyname, cppname, _, _ in annotations -%}
@@ -2582,7 +2582,7 @@ cdef class Inventory:
     {% for pyname, cppname, typename, _ in annotations %}
     cdef public {{typename}} {{pyname}} {% if pyname != cppname %}"{{cppname}}"{% endif %}
     {%- endfor %}
-    cdef public str capacity
+    cdef public object capacity
     cdef object _kind
     cpdef dict to_dict(self)
     cpdef Inventory copy(self)

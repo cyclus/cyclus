@@ -155,7 +155,7 @@ cdef extern from "cyclus.h" namespace "cyclus":
         cpp_bool inject_sim_id() except +
         void inject_sim_id(cpp_bool) except +
         uuid sim_id() except +
-        Datum* NewDatum(std_string) except +
+        Datum* NewDatum(std_string)
         void RegisterBackend(RecBackend*) except +
         void Flush() except +
         void Close() except +
@@ -765,12 +765,14 @@ cdef extern from "context.h" namespace "cyclus":
         void DelAgent(Agent*) except +
         uuid sim_id() except +
         int time()
+        uint64_t dt()
         const set[Trader*] traders()
         shared_ptr[Composition] GetRecipe(std_string)
         void SchedBuild(Agent*, std_string)
         void SchedBuild(Agent*, std_string, int)
         void SchedDecom(Agent*)
         void SchedDecom(Agent*, int)
+        Datum* NewDatum(std_string)
         #void RegisterAgent(Agent*)  # private
         void RegisterTrader(Trader*)
         void RegisterTimeListener(TimeListener*)

@@ -1522,6 +1522,16 @@ cdef class _Context:
         rtn = uuid_cpp_to_py(cpp_sim_id)
         return rtn
 
+    @property
+    def time(self):
+        """The simulation time step number."""
+        return self.ptx.time()
+
+    @property
+    def dt(self):
+        """The length of timer per time step, in seconds."""
+        return self.ptx.dt()
+
     def get_recipe(self, name, basis='mass'):
         """Retrieve a registered recipe. This is intended for retrieving
         compositions loaded from an input file(s) at the start of a
@@ -1546,6 +1556,13 @@ cdef class _Context:
         next decommission phase (i.e. the end of the current timestep).
         """
         self.ptx.SchedDecom(dynamic_agent_ptr(parent), t)
+
+    def new_datum(self, title):
+        """Returns a new datum instance."""
+        cdef std_string cpp_title = str_py_to_cpp(title)
+        cdef _Datum d = Datum(new=False)
+        (<_Datum> d).ptx = self.ptx.NewDatum(cpp_title)
+        return d
 
 
 class Context(_Context):

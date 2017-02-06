@@ -150,7 +150,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         # update the prefs objects
         pyprefs.update(updates)
         for (req, bid), pref in updates.items():
-            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> req).ptx] = pref
+            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
         # cache the commod_reqs wrappers globally
@@ -171,7 +171,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         # update the prefs objects
         pyprefs.update(updates)
         for (req, bid), pref in updates.items():
-            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> req).ptx] = pref
+            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
 
 cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
@@ -272,7 +272,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         # update the prefs objects
         pyprefs.update(updates)
         for (req, bid), pref in updates.items():
-            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> req).ptx] = pref
+            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
         # cache the commod_reqs wrappers globally
@@ -293,7 +293,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         # update the prefs objects
         pyprefs.update(updates)
         for (req, bid), pref in updates.items():
-            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> req).ptx] = pref
+            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
     void Tick():
         (<object> this.self).tick()
@@ -400,7 +400,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         # update the prefs objects
         pyprefs.update(updates)
         for (req, bid), pref in updates.items():
-            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> req).ptx] = pref
+            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
         # cache the commod_reqs wrappers globally
@@ -421,7 +421,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         # update the prefs objects
         pyprefs.update(updates)
         for (req, bid), pref in updates.items():
-            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> req).ptx] = pref
+            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
     void Tick():
         (<object> this.self).tick()
@@ -537,7 +537,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         # update the prefs objects
         pyprefs.update(updates)
         for (req, bid), pref in updates.items():
-            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> req).ptx] = pref
+            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs):
         # cache the commod_reqs wrappers globally
@@ -558,7 +558,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         # update the prefs objects
         pyprefs.update(updates)
         for (req, bid), pref in updates.items():
-            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> req).ptx] = pref
+            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
     void Tick():
         (<object> this.self).tick()
@@ -612,7 +612,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         # convert to c++ and return
         cdef std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] ports = \
             std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]]()
-        if isinstance(pyports, Mapping):
+        if pyports is None:
+            return ports
+        elif isinstance(pyports, Mapping):
             pyports = [pyports]
         for pyport in pyports:
             normport = lib.normalize_bid_portfolio(pyport)
@@ -640,7 +642,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         # convert to c++ and return
         cdef std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] ports = \
             std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]]()
-        if isinstance(pyports, Mapping):
+        if pyports is None:
+            return ports
+        elif isinstance(pyports, Mapping):
             pyports = [pyports]
         for pyport in pyports:
             normport = lib.normalize_bid_portfolio(pyport)
@@ -890,7 +894,10 @@ cdef class _Agent(lib._Agent):
         for name, val in d.items():
             setattr(self, name, val)
         for name, inv in self._inventories:
-            inv.value.capacity = d[inv.capacity]
+            if isinstance(inv.capacity, str):
+                inv.value.capacity = d[inv.capacity]
+            else:
+                inv.value.capacity = inv.capacity
 
     def snapshot(self, di):
         """A dynamic version of Snapshot(DbInit) that should
