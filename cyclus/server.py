@@ -407,6 +407,8 @@ def main(args=None):
         msg = "port {} already bound, next available port is {}"
         print(msg.format(ns.port, open_port), file=sys.stderr)
         ns.port = open_port
+    if ns.debug:
+        print("initilizing websockets at ws://{}:{}".format(ns.host, ns.port))
     server = websockets.serve(websocket_handler, ns.host, ns.port)
     print("serving cyclus at http://{}:{}".format(ns.host, ns.port))
     # run the loop!
