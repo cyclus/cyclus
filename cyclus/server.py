@@ -357,13 +357,16 @@ def _start_debug(loop):
     loop.set_debug(True)
 
 
-def _find_open_port(host, port):
+def _find_open_port(host, port, debug=False):
     found = False
     while not found:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.bind((host, port))
         except socket.error as e:
+            if debug:
+                msg = '[cyclus-server] port {} not available, trying port {}'
+                print(msg.format(port, port+1), file=sys.stderr)
             if e.errno == 98:
                 port += 1
                 continue
@@ -399,7 +402,7 @@ def main(args=None):
     loop = state.loop = asyncio.get_event_loop()
     if ns.debug:
         _start_debug(loop)
-    open_port = _find_open_port(ns.host, ns.port)
+    open_port = _find_open_port(ns.host, ns.port, debug=ns.debug)
     if open_port != ns.port:
         msg = "port {} already bound, next available port is {}"
         print(msg.format(ns.port, open_port), file=sys.stderr)
