@@ -37,21 +37,26 @@ void LoadRawStringstreamFromFile(std::stringstream& stream, std::string file) {
   file_stream.close();
 }
 
-void LoadStringstreamFromFile(std::stringstream& stream, std::string file) {
-  LoadRawStringstreamFromFile(stream, file);
-  std::string inext = fs::path(file).extension().string();
-  if (inext == ".json") {
+void LoadStringstreamFromFile(std::stringstream& stream, std::string file, std::string format) {
+  std::string inext;
+  if (format == "none") {
+    LoadRawStringstreamFromFile(stream, file);
+    inext = fs::path(file).extension().string();
+  } else {
+    stream << file;
+  }
+  if (inext == ".json" || format == "json") {
     std::string inxml = cyclus::toolkit::JsonToXml(stream.str());
     stream.str(inxml);
-  } else if (inext == ".py") {
+  } else if (inext == ".py" || format == "py") {
     std::string inxml = cyclus::toolkit::PyToXml(stream.str());
     stream.str(inxml);
   }
 }
 
-std::string LoadStringFromFile(std::string file) {
+std::string LoadStringFromFile(std::string file, std::string format) {
   std::stringstream input;
-  LoadStringstreamFromFile(input, file);
+  LoadStringstreamFromFile(input, file, format);
   return input.str();
 }
 

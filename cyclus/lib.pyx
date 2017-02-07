@@ -862,10 +862,13 @@ class XMLFlatLoader(_XMLFlatLoader):
     """
 
 
-def load_string_from_file(filename):
-    """Loads an XML file from a path."""
+def load_string_from_file(filename, format=None):
+    """Loads an XML file from a path or from a string and a format ('xml', 'json', or 'py')."""
     cdef std_string cpp_filename = str_py_to_cpp(filename)
-    cdef std_string cpp_rtn = cpp_cyclus.LoadStringFromFile(cpp_filename)
+    cdef std_string none = std_string(b"none")
+    cdef std_string cpp_format
+    cpp_format = none if format is None else str_py_to_cpp(format)
+    cdef std_string cpp_rtn = cpp_cyclus.LoadStringFromFile(cpp_filename, cpp_format)
     rtn = std_string_to_py(cpp_rtn)
     return rtn
 
@@ -873,16 +876,22 @@ def load_string_from_file(filename):
 
 cdef class _XMLParser:
 
-    def __cinit__(self, filename=None, raw=None):
-        cdef std_string s, inp
+    def __cinit__(self, filename=None, format=None, raw=None):
+        cdef std_string s, f, inp
+        cdef std_string none = std_string(b"none")
         self.ptx = new cpp_cyclus.XMLParser()
         if filename is not None:
             s = str_py_to_cpp(filename)
-            inp = cpp_cyclus.LoadStringFromFile(s)
+            f = none if format is None else str_py_to_cpp(format)
+            inp = cpp_cyclus.LoadStringFromFile(s, f)
         elif raw is not None:
-            inp = str_py_to_cpp(raw)
+            if format is None:
+                inp = str_py_to_cpp(raw)
+            else:
+                f = str_py_to_cpp(format)
+                inp = cpp_cyclus.LoadStringFromFile(s, f)
         else:
-            raise RuntimeError("Either a filename or a raw XML string "
+            raise RuntimeError("Either a filename or a raw string "
                                "must be provided to XMLParser")
         self.ptx.Init(inp)
 
@@ -898,6 +907,9 @@ class XMLParser(_XMLParser):
     ----------
     filename : str, optional
         Path to file to load.
+    format : str, optional
+        The format to read in as: "none", "xml", "json", or "py". Applies to either
+        filename or raw, if given.
     raw : str, optional
         XML string to load.
     """

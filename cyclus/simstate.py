@@ -44,8 +44,10 @@ class SimState(object):
 
     Parameters
     ----------
-    input_file : str
-        The path to input file.
+    input_file : str, optional
+        The path to input file or a raw string of the input file.
+    input_format : str, optional
+        The format that the input file should be read in as, if it is a raw string.
     output_path : str or None, optional
         The path to the file system database, default (if None) is based
         on the input file path.
@@ -94,14 +96,18 @@ class SimState(object):
         A queue for pending actions for monitoring tasks.
     """
 
-    def __init__(self, input_file, output_path=None,
+    def __init__(self, input_file=None, input_format=None, output_path=None,
                  memory_backend=False, registry=True, schema_path=None,
                  flat_schema=False, frequency=0.001, repeating_actions=None,
                  heartbeat_frequency=5, debug=False):
         ensure_close_dynamic_modules()
         self.input_file = input_file
+        self.input_format = input_format
         if output_path is None:
-            base, _ = os.path.splitext(os.path.basename(input_file))
+            if input_format is None:
+                base, _ = os.path.splitext(os.path.basename(input_file))
+            else:
+                base = "cyclus"
             output_path = base + '.h5'
         self.output_path = output_path
         self.memory_backend = memory_backend
@@ -160,7 +166,7 @@ class SimState(object):
 
     def _load_schema_path(self):
         """find schema type"""
-        parser = XMLParser(filename=self.input_file)
+        parser = XMLParser(filename=self.input_file, format=self.input_format)
         tree = InfileTree.from_parser(parser)
         schema_type = tree.optional_query("/simulation/schematype", "")
         if schema_type == "flat" and not ns.flat_schema:

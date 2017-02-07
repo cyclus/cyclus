@@ -21,10 +21,13 @@ class Context;
 void LoadRawStringstreamFromFile(std::stringstream& stream, std::string file);
 
 /// Reads the given file path as XML into the passed stream.
-void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
+/// The format may be "none", "xml", "json", or "py".
+void LoadStringstreamFromFile(std::stringstream& stream, std::string file,
+                              std::string format="none");
 
 /// Reads the given file path and returns an XML string.
-std::string LoadStringFromFile(std::string file);
+/// The format may be "none", "xml", "json", or "py".
+std::string LoadStringFromFile(std::string file, std::string format="none");
 
 /// Returns a list of the full module+agent spec for all agents in the given
 /// input file.
