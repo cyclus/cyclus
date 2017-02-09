@@ -1,15 +1,14 @@
 import os
 import sys
-import pprint
 import json
 import subprocess
 from random import randint
+import uuid
 
 from cyclus.lib import Hdf5Back, Recorder
 import cyclus.typesystem as ts
 
 import nose
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
@@ -26,6 +25,11 @@ init_dicts()
 with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
                        'dbtypes.json')) as f:
     RAW_TABLE = resolve_unicode(json.load(f))
+
+#NAUGHTY_STRINGS = []    
+#with open('blns.json', encoding="ISO-8859-1") as f:
+#    for line in f:
+#        NAUGHTY_STRINGS.append(line)
 
 VERSION = ""
 TABLE_START = 0
@@ -71,21 +75,38 @@ UNIQUE_TYPES = ['MAP', 'SET']
 def make_bytes(string):
     return bytes(string.encode())
 
-CONTAINER_MIN = 2
-CONTAINER_MAX = 6
-
 is_primitive = lambda canon: isinstance(canon, str)
 
 TYPE_SHAPE = 0
 TYPE_FUNCTION = 1
 TYPE_CANON = 2
-def generate_meta(canon, dist=0):
+def generate_meta(canon, depth=0):
+    """Produces metadata about a type to be created.
+    
+    This includes a shape, constructor function, and canonical form. This 
+    3-tuple can be passed to the populate function to create data in the form
+    specified by the metadata.
+    
+    Parameters
+    ----------
+    canon : tuple or str
+        Unique identifier of current data type
+    depth : int, optional
+        Recursive depth value
+        
+    Returns
+    -------
+    meta_shape : tuple or list
+        Meta data specification for type
+    """
     meta_shape = []
     my_shape = None
     my_type = None
     origin = ORIGIN_DICT[canon]
     if is_primitive(canon):
-        if origin in VARIABLE_LENGTH_TYPES:
+        if CANON_TO_VL[canon]:
+            my_shape = -1
+        elif origin in VARIABLE_LENGTH_TYPES:
             my_shape = randint(CONTAINER_MIN, CONTAINER_MAX)
         else:
             my_shape = -1
@@ -102,13 +123,26 @@ def generate_meta(canon, dist=0):
         my_type = CREATE_FUNCTIONS[origin[0]]
     meta_shape.append((my_shape, my_type, canon))
     for i in canon[1:]:
-        meta_shape.append(generate_meta(i, dist=dist+1))
+        meta_shape.append(generate_meta(i, depth=depth+1))
     return meta_shape
 
-chars = r'abcdefghijklmnopqrstuv1234567890`/\_.,-+@$#!% ' 
-ok_bytes = [b'\x01', b'\x02', b'\x03', b'\x04', b'\x05', b'\x06', b'\x07']
+CHARS = r'abcdefghijklmnopqrstuv1234567890`/\_.,-+@$#!% '
 
 def add_item(container, value):
+    """Attempts to add a value to a container of unknown type.
+    
+    Parameters
+    ----------
+    container : iterable
+        The type into which the value is inserted
+    value : type
+        Data point to insert
+        
+    Returns
+    -------
+    container : iterable
+        The container with added value
+    """
     if len(value) == 1:
         try:
             container.append(value[0])
@@ -134,6 +168,21 @@ def add_item(container, value):
     return container
 
 def populate(meta):
+    """Generate data based upon the metadata for a type.
+    
+    Uses the shape values within meta to create data with the correct dimensions
+    for adding to the table.
+    
+    Parameters
+    ----------
+    meta : tuple or list
+        Metadata for type
+    
+    Returns
+    -------
+    data : type specified in meta
+        Populated container or primitive
+    """
     if isinstance(meta, tuple):
         current_type = meta
     else:
@@ -146,22 +195,26 @@ def populate(meta):
     if is_primitive(canon):
         if origin == 'STRING' or origin == 'BLOB':
             if my_shape > 0:
+                #word = None
+                #while word is None:
+                #    random_naughty_string = NAUGHTY_STRINGS[randint(0, len(NAUGHTY_STRINGS))]
+                #    if len(random_naughty_string) < my_shape:
+                #        continue
+                #    else:
+                #        lower_bound = randint(0, len(random_naughty_string)-my_shape)
+                #        word = random_naughty_string[lower_bound:lower_bound+my_shape]
+                #data = word
                 for i in range(my_shape):
-                    data += chars[randint(0, len(chars)-1)]
+                    data += CHARS[randint(0, len(CHARS)-1)]
             else:
                 for i in range(randint(CONTAINER_MIN, CONTAINER_MAX)):
-                    data += chars[randint(0, len(chars)-1)]
+                    data += CHARS[randint(0, len(CHARS)-1)]
             if origin == 'BLOB':
                 data = make_bytes(data)
-        #elif canon == 'BLOB':
-        #    if my_shape < 0:
-        #        my_shape = randint(CONTAINER_MIN, CONTAINER_MAX)
-        #    for i in range(my_shape):
-        #        data += ok_bytes[randint(0, len(ok_bytes)-1)]
         elif canon == 'BOOL':               
             data = bool(randint(0,1))
         elif canon == 'UUID':
-            data = [1,1,1,1]
+            data = uuid.uuid5(uuid.NAMESPACE_DNS, CHARS[randint(0,len(CHARS)-1)])
         else:
             data = my_type(randint(0, 9) * (data + 1))
     elif origin[0] in VARIABLE_LENGTH_TYPES:
@@ -191,6 +244,7 @@ def populate(meta):
     return data
 
 def get_shape(meta):
+    """Make shape into a flat int list for the Hdf5 backend."""
     shape = []
     if isinstance(meta, tuple):
         return [meta[TYPE_SHAPE]]
@@ -201,37 +255,34 @@ def get_shape(meta):
             shape.extend(get_shape(i))
         return shape
 
-ROW_NUM = 2
-PATH = 'get_test_logs/{t}gen_db.h5'
+CONTAINER_MIN = 4
+CONTAINER_MAX = 10
+ROW_NUM = 3
+PATH = 'gen_db.h5'
 def generate_and_test():
-    #subprocess.run(['rm', PATH])
+    """Test generation for all supported tests."""
+    subprocess.run(['rm', '-f', PATH])
     for i in CANON_TYPES:
-        print(i)
-        MY_PATH = PATH.format(t=CANON_TO_DB[i])
-        subprocess.run(['rm', MY_PATH])
-        #print("\nCreating test for " + CANON_TO_DB[i])
+        print(CANON_TO_DB[i],'\n')                
         rec = Recorder(inject_sim_id=False)
-        back = Hdf5Back(MY_PATH)
+        back = Hdf5Back(PATH)
         rec.register_backend(back)
         data_meta = generate_meta(i)
         shape = get_shape(data_meta)
         data = []
         for j in range(ROW_NUM):
             data.append(populate(data_meta))
-            d = rec.new_datum("test" + str(j))
+            d = rec.new_datum("test0")
             d.add_val("col0", data[j], shape=shape, type=ts.IDS[CANON_TO_DB[i]])
             d.record()
-        rec.flush()
-        
-        for j in range(ROW_NUM):
-            print("Row " + str(j) + " is " + str(data[j]))
-            exp = pd.DataFrame({"col0": [data[j]]}, columns=['col0'])
-            obs = back.query("test" + str(j))
-            #print("---\n", obs)
-            yield assert_frame_equal, exp, obs
-        
+            rec.flush()
+        exp = pd.DataFrame({'col0': data}, columns=['col0'])
+        print("expected: \n", exp)
+        obs = back.query("test0")
+        print("observed: \n", obs)
+        yield assert_frame_equal, exp, obs
         rec.close()
-        
+        subprocess.run(['rm', PATH])
 
 if __name__ == "__main__":
     nose.runmodule()
