@@ -260,7 +260,7 @@ CONTAINER_MAX = 10
 ROW_NUM = 3
 PATH = 'gen_db.h5'
 def generate_and_test():
-    """Test generation for all supported tests."""
+    """Generate and run tests for supported Hdf5 datatypes."""
     subprocess.run(['rm', '-f', PATH])
     for i in CANON_TYPES:
         print(CANON_TO_DB[i],'\n')                
