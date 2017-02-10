@@ -267,6 +267,5 @@ def generate_and_test():
         subprocess.run(['rm', PATH])
 
 if __name__ == "__main__":
-    setup()
     nose.runmodule()
     
