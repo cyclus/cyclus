@@ -4,59 +4,57 @@ import json
 import subprocess
 from random import randint
 import uuid
+import nose
+import pandas as pd
+from pandas.util.testing import assert_frame_equal
 
 from cyclus.lib import Hdf5Back, Recorder
 import cyclus.typesystem as ts
 
-import nose
-
-import pandas as pd
-from pandas.util.testing import assert_frame_equal
-
 cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
-
 from hdf5_back_gen import resolve_unicode, convert_canonical, init_dicts, ORIGIN_DICT
 
 #Call to hdf5_back_gen function 
 init_dicts()
 
-#Find supported HDF5 types.
-with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
-                       'dbtypes.json')) as f:
-    RAW_TABLE = resolve_unicode(json.load(f))
+is_primitive = lambda canon: isinstance(canon, str)
 
-#NAUGHTY_STRINGS = []    
-#with open('blns.json', encoding="ISO-8859-1") as f:
-#    for line in f:
-#        NAUGHTY_STRINGS.append(line)
-
-VERSION = ""
-TABLE_START = 0
-TABLE_END = 0
-for row in range(len(RAW_TABLE)):
-    current = tuple(RAW_TABLE[row])
-    if current[4] == "HDF5":
-        if current[5] > VERSION:
-            VERSION = current[5]
-            TABLE_START = row
-        if current[5] == VERSION:
-            TABLE_END = row    
-
-TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:TABLE_END+1])
+CHARS = r'abcdefghijklmnopqrstuv1234567890`/\_.,-+@$#!% '
 
 CANON_TYPES = []
 CANON_TO_DB = {}      
 CANON_TO_VL = {}
-for row in TYPES_TABLE:
-    if row[6] == 1 and row[4] == "HDF5" and row[5] == VERSION:        
-        db = row[1]
-        is_vl = row[8]
-        canon = convert_canonical(row[7])
-        if canon not in CANON_TYPES:
-            CANON_TYPES.append(canon)
-        CANON_TO_DB[canon] = db
-        CANON_TO_VL[canon] = is_vl
+def setup():
+    with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
+                       'dbtypes.json')) as f:
+        RAW_TABLE = resolve_unicode(json.load(f))
+    
+    VERSION = ""
+    TABLE_START = 0
+    TABLE_END = 0
+    for row in range(len(RAW_TABLE)):
+        current = tuple(RAW_TABLE[row])
+        if current[4] == "HDF5":
+            if current[5] > VERSION:
+                VERSION = current[5]
+                TABLE_START = row
+            if current[5] == VERSION:
+                TABLE_END = row    
+
+    TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:TABLE_END+1])
+    for row in TYPES_TABLE:
+        if row[6] == 1 and row[4] == "HDF5" and row[5] == VERSION:        
+            db = row[1]
+            is_vl = row[8]
+            canon = convert_canonical(row[7])
+            if canon not in CANON_TYPES:
+                CANON_TYPES.append(canon)
+            CANON_TO_DB[canon] = db
+            CANON_TO_VL[canon] = is_vl
+
+def make_bytes(string):
+    return bytes(string.encode())
 
 VARIABLE_LENGTH_TYPES = ['LIST', 'VECTOR', 'MAP', 'SET', 'STRING'] 
 
@@ -72,14 +70,11 @@ CREATE_FUNCTIONS = {'MAP': dict, 'LIST': list, 'SET': set, 'PAIR': list,
 
 UNIQUE_TYPES = ['MAP', 'SET']
 
-def make_bytes(string):
-    return bytes(string.encode())
-
-is_primitive = lambda canon: isinstance(canon, str)
-
 TYPE_SHAPE = 0
 TYPE_FUNCTION = 1
 TYPE_CANON = 2
+CONTAINER_MIN = 4
+CONTAINER_MAX = 10
 def generate_meta(canon, depth=0):
     """Produces metadata about a type to be created.
     
@@ -125,8 +120,6 @@ def generate_meta(canon, depth=0):
     for i in canon[1:]:
         meta_shape.append(generate_meta(i, depth=depth+1))
     return meta_shape
-
-CHARS = r'abcdefghijklmnopqrstuv1234567890`/\_.,-+@$#!% '
 
 def add_item(container, value):
     """Attempts to add a value to a container of unknown type.
@@ -195,15 +188,6 @@ def populate(meta):
     if is_primitive(canon):
         if origin == 'STRING' or origin == 'BLOB':
             if my_shape > 0:
-                #word = None
-                #while word is None:
-                #    random_naughty_string = NAUGHTY_STRINGS[randint(0, len(NAUGHTY_STRINGS))]
-                #    if len(random_naughty_string) < my_shape:
-                #        continue
-                #    else:
-                #        lower_bound = randint(0, len(random_naughty_string)-my_shape)
-                #        word = random_naughty_string[lower_bound:lower_bound+my_shape]
-                #data = word
                 for i in range(my_shape):
                     data += CHARS[randint(0, len(CHARS)-1)]
             else:
@@ -255,8 +239,6 @@ def get_shape(meta):
             shape.extend(get_shape(i))
         return shape
 
-CONTAINER_MIN = 4
-CONTAINER_MAX = 10
 ROW_NUM = 3
 PATH = 'gen_db.h5'
 def generate_and_test():
@@ -285,5 +267,6 @@ def generate_and_test():
         subprocess.run(['rm', PATH])
 
 if __name__ == "__main__":
+    setup()
     nose.runmodule()
     
