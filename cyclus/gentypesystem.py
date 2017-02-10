@@ -691,6 +691,7 @@ TO_CPP_CONVERTERS = {
         '    cpp{var}.resize(<size_t> {var}_size)\n'
         '    memcpy(<void*> &cpp{var}[0], {var}_data, sizeof({valtype}) * {var}_size)\n'
         'else:\n'
+        '    cpp{var}.resize(<size_t> {var}_size)\n'
         '    for i, {valname} in enumerate({var}):\n'
         '        cpp{var}[i] = {val_to_cpp}\n',
         'cpp{var}'),

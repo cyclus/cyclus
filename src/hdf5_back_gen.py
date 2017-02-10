@@ -2737,15 +2737,7 @@ MAIN_DISPATCH = {"QUERY": main_query,
                  "VAL_TO_BUF": main_val_to_buf,
                  "BUF_TO_VAL": main_buf_to_val}
 
-def main():
-    global NOT_VL
-    try:
-        gen_instruction = sys.argv[1]
-    except:
-        raise ValueError("No generation instruction provided")    
-    
-    # Setup for global util dictionaries
-    
+def init_dicts():
     fixed_length_types = []
     for n in CANON_TYPES:
         if no_vl(CANON_TO_NODE[n]) and n not in fixed_length_types:
@@ -2787,6 +2779,16 @@ def main():
         node = CANON_TO_NODE[n]
         if is_all_vl(node):
             ORIGIN_TO_VL[ORIGIN_DICT[n]] = node
+
+def main():
+    global NOT_VL
+    try:
+        gen_instruction = sys.argv[1]
+    except:
+        raise ValueError("No generation instruction provided")    
+    
+    # Setup for global util dictionaries
+    init_dicts()
         
     # Dispatch to requested generation function
     function = MAIN_DISPATCH[gen_instruction]
