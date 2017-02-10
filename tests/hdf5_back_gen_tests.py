@@ -5,6 +5,7 @@ import subprocess
 from random import randint
 import uuid
 import nose
+from nose.plugins.skip import SkipTest
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
@@ -54,7 +55,7 @@ def setup():
             CANON_TO_VL[canon] = is_vl
 
 def make_bytes(string):
-    return bytes(string.encode())
+    return string.encode()
 
 VARIABLE_LENGTH_TYPES = ['LIST', 'VECTOR', 'MAP', 'SET', 'STRING'] 
 
@@ -243,7 +244,11 @@ ROW_NUM = 3
 PATH = 'gen_db.h5'
 def generate_and_test():
     """Generate and run tests for supported Hdf5 datatypes."""
-    subprocess.run(['rm', '-f', PATH])
+    if sys.version_info[0] == 2:
+        msg = 'Hdf5 backend gen tests do not support Python 2.x'
+        raise SkipTest(msg)
+    if os.path.isfile(PATH):
+        os.remove(PATH)
     for i in CANON_TYPES:
         print(CANON_TO_DB[i],'\n')                
         rec = Recorder(inject_sim_id=False)
@@ -264,7 +269,7 @@ def generate_and_test():
         print("observed: \n", obs)
         yield assert_frame_equal, exp, obs
         rec.close()
-        subprocess.run(['rm', PATH])
+        os.remove(PATH)
 
 if __name__ == "__main__":
     nose.runmodule()
