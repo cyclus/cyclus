@@ -47,7 +47,7 @@ enum DbTypes {
   VECTOR_VL_STRING,  // ["std::vector<std::string>", 2, ["HDF5", "SQLite"], ["VECTOR", "VL_STRING"], false]
   VL_VECTOR_VL_STRING,  // ["std::vector<std::string>", 2, ["HDF5", "SQLite"], ["VL_VECTOR", "VL_STRING"], true]
   VECTOR_BLOB,  // ["std::vector<cyclus::Blob>", 1, ["HDF5"], ["VECTOR", "BLOB"], false]
-  VL_VECTOR_BLOB,  // ["std::vector<cyclus::Blob>", 1, [], ["VL_VECTOR", "BLOB"], true]
+  VL_VECTOR_BLOB,  // ["std::vector<cyclus::Blob>", 1, ["HDF5"], ["VL_VECTOR", "BLOB"], true]
   VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>", 1, [], ["VECTOR", "UUID"], false]
   VL_VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>", 1, [], ["VL_VECTOR", "UUID"], true]
   // set types
@@ -659,6 +659,11 @@ class Sha1 {
   inline void Update(const std::vector<std::string>& x) {
     for (unsigned int i = 0; i < x.size(); ++i)
       hash_.process_bytes(x[i].c_str(), x[i].size());
+  }
+  
+  inline void Update(const std::vector<cyclus::Blob>& x) {
+    for (unsigned int i = 0; i < x.size(); ++i)
+      hash_.process_bytes(x[i].str().c_str(), x[i].str().size());
   }
 
   inline void Update(const std::set<int>& x) {
