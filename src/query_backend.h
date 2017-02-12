@@ -63,10 +63,10 @@ enum DbTypes {
   VL_SET_STRING,  // ["std::set<std::string>", 2, ["HDF5", "SQLite"], ["VL_SET", "STRING"], true]
   SET_VL_STRING,  // ["std::set<std::string>", 2, ["HDF5", "SQLite"], ["SET", "VL_STRING"], false]
   VL_SET_VL_STRING,  // ["std::set<std::string>", 2, ["HDF5", "SQLite"], ["VL_SET", "VL_STRING"], true]
-  SET_BLOB,  // ["std::set<cyclus::Blob>", 1, [], ["SET", "BLOB"], false]
-  VL_SET_BLOB,  // ["std::set<cyclus::Blob>", 1, [], ["VL_SET", "BLOB"], true]
-  SET_UUID,  // ["std::set<boost::uuids::uuid>", 1, [], ["SET", "UUID"], false]
-  VL_SET_UUID,  // ["std::set<boost::uuids::uuid>", 1, [], ["VL_SET", "UUID"], true]
+  SET_BLOB,  // ["std::set<cyclus::Blob>", 1, ["HDF5"], ["SET", "BLOB"], false]
+  VL_SET_BLOB,  // ["std::set<cyclus::Blob>", 1, ["HDF5"], ["VL_SET", "BLOB"], true]
+  SET_UUID,  // ["std::set<boost::uuids::uuid>", 1, ["HDF5"], ["SET", "UUID"], false]
+  VL_SET_UUID,  // ["std::set<boost::uuids::uuid>", 1, ["HDF5"], ["VL_SET", "UUID"], true]
   // list types
   LIST_BOOL,  // ["std::list<bool>", 1, [], ["LIST", "BOOL"], false]
   VL_LIST_BOOL,  // ["std::list<bool>", 1, [], ["VL_LIST", "BOOL"], true]
@@ -688,6 +688,18 @@ class Sha1 {
     std::set<float>::iterator it = x.begin();
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(float));
+  }
+
+  inline void Update(const std::set<cyclus::Blob>& x) {
+    std::set<cyclus::Blob>::iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(it->str().c_str(), it->str().size());
+  }
+
+  inline void Update(const std::set<boost::uuids::uuid>& x) {
+    std::set<boost::uuids::uuid>::iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), CYCLUS_UUID_SIZE);
   }
 
   inline void Update(const std::set<std::string>& x) {
