@@ -1,5 +1,7 @@
 #include "gis.h"
 
+using namespace std;
+
 namespace cyclus {
 
 GIS::GIS() {
@@ -46,15 +48,20 @@ void GIS::set_longitude_degrees(float lon){
 }
 */
 double GIS::get_distance(GIS target) const {
-  double curr_longitude = this.get_longitude_decimal();
-  double curr_latitude = this.get_latitude_decimal();
-  double target_longitude = target.get_longitude_decimal();
-  double target_latitude = target.get_latitude_decimal();
-  double diff_longitude = target_longitude - curr_longitude;
-  double diff_latitude = target_latitude - curr_latitude;
-  double angle = pow(sin(diff_latitude / 2), 2) + cos(curr_latitude)) * cos(target_latitude) * pow(sin(diff_longitude / 2), 2);
-  double c = 2 * atan2(sqrt(angle), sqrt(1 - angle));
-  return 6371.01 * c;
+  
+  double curr_longitude = this->get_longitude_decimal() * M_PI / 180;
+  double curr_latitude = this->get_latitude_decimal() * M_PI / 180;
+  double target_longitude = target.get_longitude_decimal() * M_PI / 180;
+  double target_latitude = target.get_latitude_decimal() * M_PI / 180;
+
+  double dlong = target_longitude - curr_longitude;
+  double dlat = target_latitude - curr_latitude;
+  
+  double temp = pow(sin(dlat / 2), 2) + pow(sin(dlong / 2), 2)
+                    * cos(curr_latitude) * cos(target_latitude);
+
+  double temp2 = 2 * atan2(sqrt(temp), sqrt(1-temp));
+  return 6372.8 * temp2;
 }
 /*
 GIS[] GIS::nearby(double range) const{
@@ -66,10 +73,10 @@ GIS[] GIS::nearby(const GIS *reference, double range) const{
 string GIS::toStringD() const {
   stringstream lat_string;
   stringstream lon_string;
-  float lat = this.get_latitude_decimal();
-  float lon = this.get_longitude_decimal();
-  int temp_lat = to_string(setPrecision(fabs(lat), 0)).length();
-  int temp_lon = to_string(setPrecision(fabs(lon), 0)).length();
+  float lat = this->get_latitude_decimal();
+  float lon = this->get_longitude_decimal();
+  int temp_lat = to_string((int) fabs(lat)).length();
+  int temp_lon = to_string((int) fabs(lon)).length();
   if (lat > 0) {
     lat_string << "+";
   } else {
@@ -95,8 +102,8 @@ string GIS::toStringD() const {
 string GIS::toStringDM() const {
   stringstream lat_string;
   stringstream lon_string;
-  double lat = this.get_latitude_decimal();
-  double lon = this.get_longitude_decimal();
+  double lat = this->get_latitude_decimal();
+  double lon = this->get_longitude_decimal();
 
   if (lat > 0) {
     lat_string << "+";
@@ -123,9 +130,14 @@ string GIS::toStringDM() const {
   }
   lat_string << fabs(lat_int);
   lon_string << fabs(lon_int);
-
   lat = fabs(lat) * 60;
   lon = fabs(lon) * 60;
+  if ((int) fabs(lat) / 10 == 0){
+    lat_string << "0";
+  }
+  if ((int) fabs(lon) / 10 == 0){
+    lon_string << "0";
+  }
   lat_string << setprecision(5) << lat;
   lon_string << setprecision(5) << lon << "/";
 
@@ -135,8 +147,8 @@ string GIS::toStringDM() const {
 string GIS::toStringDMS() const {
   stringstream lat_string;
   stringstream lon_string;
-  double lat = this.get_latitude_decimal();
-  double lon = this.get_longitude_decimal();
+  double lat = this->get_latitude_decimal();
+  double lon = this->get_longitude_decimal();
   if (lat > 0) {
     lat_string << "+";
   } else {
@@ -159,17 +171,29 @@ string GIS::toStringDMS() const {
     }
     lon_string << "0";
   }
-  lat_string << fabs(lat_int);
-  lon_string << fabs(lon_int);
+  lat_string << abs((int) lat_int);
+  lon_string << abs((int) lon_int);
 
   lat = modf(fabs(lat) * 60, &lat_int);
   lon = modf(fabs(lon) * 60, &lon_int);
+  if (((int) lat_int) / 10 == 0) {
+    lat_string << "0";
+  }
+  if (((int) lon_int) / 10 == 0) {
+      lon_string << "0";
+  }
   lat_string << fabs(lat_int);
   lon_string << fabs(lon_int);
   lat = lat * 60;
   lon = lon * 60;
-  lat_string << setprecision(3) << lat;
-  lon_string << setprecision(3) << lon << "/";
+  if ((int) fabs(lat) / 10 == 0){
+    lat_string << "0";
+  }
+  if ((int) fabs(lon) / 10 == 0){
+    lon_string << "0";
+  }
+  lat_string << setprecision(1) << fixed << lat;
+  lon_string << setprecision(1) << fixed << lon << "/";
   return lat_string.str() + lon_string.str();
 }
 
@@ -180,6 +204,7 @@ double GIS::sort(double &list[]){
 }
 */
 
-float GIS::setPrecision(float value, int precision) {
+float GIS::setPrecision(float value, double precision) const {
   return (floor((value * pow(10, precision) + 0.5)) / pow(10, precision));
+}
 }

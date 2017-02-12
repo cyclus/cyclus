@@ -13,7 +13,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "cycamore_version.h"
 #include "cyclus.h"
 
 // forward declarations
@@ -22,7 +21,7 @@ class GIS;
 }  // namespace cycamore
 
 // forward includes
-#include "gis_tests.h"
+//#include "tests/gis_tests.cc"
 
 namespace cyclus {
 
@@ -44,9 +43,10 @@ namespace cyclus {
 /// @TODO Imprementation of GIS information.
 
 class GIS {
-  friend class GISTests public :
+public:
+  //friend class GISTests :
   /// The default constructor for GIS.
-    GIS();
+  GIS();
   /*
     /// GIS constructor with latitude and longditude as sexagesimal number.
     /// @param latitude and longditude expressed in Degrees. Latitude: DDMMSS,
@@ -101,9 +101,9 @@ class GIS {
   */
   /// converts GIS location into a string expression that follows ISO 6709 Annex
   /// H.
-  string toStringD() const;
-  string toStringDM() const;
-  string toStringDMS() const;
+  std::string toStringD() const;
+  std::string toStringDM() const;
+  std::string toStringDMS() const;
 
 private:
   /// Latitude is stored as seconds of degree.
@@ -118,7 +118,7 @@ private:
   double sort(double &list[]);
   */
   /// Sets the precision for float values
-  float setPrecision(float value, double precision);
+  float setPrecision(float value, double precision) const;
 };
 }
 
