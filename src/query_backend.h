@@ -72,18 +72,18 @@ enum DbTypes {
   VL_LIST_BOOL,  // ["std::list<bool>", 1, [], ["VL_LIST", "BOOL"], true]
   LIST_INT,  // ["std::list<int>", 1, ["HDF5", "SQLite"], ["LIST", "INT"], false]
   VL_LIST_INT,  // ["std::list<int>", 1, ["HDF5", "SQLite"], ["VL_LIST", "INT"], true]
-  LIST_FLOAT,  // ["std::list<float>", 1, [], ["LIST", "FLOAT"], false]
-  VL_LIST_FLOAT,  // ["std::list<float>", 1, [], ["VL_LIST", "FLOAT"], true]
-  LIST_DOUBLE,  // ["std::list<double>", 1, [], ["LIST", "DOUBLE"], false]
-  VL_LIST_DOUBLE,  // ["std::list<double>", 1, [], ["VL_LIST", "DOUBLE"], true]
+  LIST_FLOAT,  // ["std::list<float>", 1, ["HDF5"], ["LIST", "FLOAT"], false]
+  VL_LIST_FLOAT,  // ["std::list<float>", 1, ["HDF5"], ["VL_LIST", "FLOAT"], true]
+  LIST_DOUBLE,  // ["std::list<double>", 1, ["HDF5"], ["LIST", "DOUBLE"], false]
+  VL_LIST_DOUBLE,  // ["std::list<double>", 1, ["HDF5"], ["VL_LIST", "DOUBLE"], true]
   LIST_STRING,  // ["std::list<std::string>", 2, ["HDF5", "SQLite"], ["LIST", "STRING"], false]
   VL_LIST_STRING,  // ["std::list<std::string>", 2, ["HDF5", "SQLite"], ["VL_LIST", "STRING"], true]
   LIST_VL_STRING,  // ["std::list<std::string>", 2, ["HDF5", "SQLite"], ["LIST", "VL_STRING"], false]
   VL_LIST_VL_STRING,  // ["std::list<std::string>", 2, ["HDF5", "SQLite"], ["VL_LIST", "VL_STRING"], true]
-  LIST_BLOB,  // ["std::list<cyclus::Blob>", 1, [], ["LIST", "BLOB"], false]
-  VL_LIST_BLOB,  // ["std::list<cyclus::Blob>", 1, [], ["VL_LIST", "BLOB"], true]
-  LIST_UUID,  // ["std::list<boost::uuids::uuid>", 1, [], ["LIST", "UUID"], false]
-  VL_LIST_UUID,  // ["std::list<boost::uuids::uuid>", 1, [], ["VL_LIST", "UUID"], true]
+  LIST_BLOB,  // ["std::list<cyclus::Blob>", 1, ["HDF5"], ["LIST", "BLOB"], false]
+  VL_LIST_BLOB,  // ["std::list<cyclus::Blob>", 1, ["HDF5"], ["VL_LIST", "BLOB"], true]
+  LIST_UUID,  // ["std::list<boost::uuids::uuid>", 1, ["HDF5"], ["LIST", "UUID"], false]
+  VL_LIST_UUID,  // ["std::list<boost::uuids::uuid>", 1, ["HDF5"], ["VL_LIST", "UUID"], true]
   // pairs - not variable length
   PAIR_INT_BOOL,  // ["std::pair<int, bool>", 0, [], ["PAIR", "INT", "BOOL"], false]
   PAIR_INT_INT,  // ["std::pair<int, int>", 0, ["HDF5"], ["PAIR", "INT", "INT"], false]
@@ -713,11 +713,35 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
   }
+  
+  inline void Update(const std::list<double>& x) {
+    std::list<double>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), sizeof(double));
+  }
+  
+  inline void Update(const std::list<float>& x) {
+    std::list<float>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), sizeof(float));
+  }
 
   inline void Update(const std::list<std::string>& x) {
     std::list<std::string>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
       hash_.process_bytes(it->c_str(), it->size());
+  }
+  
+  inline void Update(const std::list<cyclus::Blob>& x) {
+    std::list<cyclus::Blob>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(it->str().c_str(), it->str().size());
+  }
+
+  inline void Update(const std::list<boost::uuids::uuid>& x) {
+    std::list<boost::uuids::uuid>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), CYCLUS_UUID_SIZE);
   }
 
   inline void Update(const std::pair<int, int>& x) {
