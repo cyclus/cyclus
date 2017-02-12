@@ -49,16 +49,16 @@ enum DbTypes {
   VECTOR_BLOB,  // ["std::vector<cyclus::Blob>", 1, ["HDF5"], ["VECTOR", "BLOB"], false]
   VL_VECTOR_BLOB,  // ["std::vector<cyclus::Blob>", 1, ["HDF5"], ["VL_VECTOR", "BLOB"], true]
   VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>", 1, ["HDF5"], ["VECTOR", "UUID"], false]
-  VL_VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>", 1, [], ["VL_VECTOR", "UUID"], true]
+  VL_VECTOR_UUID,  // ["std::vector<boost::uuids::uuid>", 1, ["HDF5"], ["VL_VECTOR", "UUID"], true]
   // set types
   SET_BOOL,  // ["std::set<bool>", 1, [], ["SET", "BOOL"], false]
   VL_SET_BOOL,  // ["std::set<bool>", 1, [], ["VL_SET", "BOOL"], true]
   SET_INT,  // ["std::set<int>", 1, ["HDF5", "SQLite"], ["SET", "INT"], false]
   VL_SET_INT,  // ["std::set<int>", 1, ["HDF5", "SQLite"], ["VL_SET", "INT"], true]
-  SET_FLOAT,  // ["std::set<float>", 1, [], ["SET", "FLOAT"], false]
-  VL_SET_FLOAT,  // ["std::set<float>", 1, [], ["VL_SET", "FLOAT"], true]
-  SET_DOUBLE,  // ["std::set<double>", 1, [], ["SET", "DOUBLE"], false]
-  VL_SET_DOUBLE,  // ["std::set<double>", 1, [], ["VL_SET", "DOUBLE"], true]
+  SET_FLOAT,  // ["std::set<float>", 1, ["HDF5"], ["SET", "FLOAT"], false]
+  VL_SET_FLOAT,  // ["std::set<float>", 1, ["HDF5"], ["VL_SET", "FLOAT"], true]
+  SET_DOUBLE,  // ["std::set<double>", 1, ["HDF5"], ["SET", "DOUBLE"], false]
+  VL_SET_DOUBLE,  // ["std::set<double>", 1, ["HDF5"], ["VL_SET", "DOUBLE"], true]
   SET_STRING,  // ["std::set<std::string>", 2, ["HDF5", "SQLite"], ["SET", "STRING"], false]
   VL_SET_STRING,  // ["std::set<std::string>", 2, ["HDF5", "SQLite"], ["VL_SET", "STRING"], true]
   SET_VL_STRING,  // ["std::set<std::string>", 2, ["HDF5", "SQLite"], ["SET", "VL_STRING"], false]
@@ -666,10 +666,28 @@ class Sha1 {
       hash_.process_bytes(x[i].str().c_str(), x[i].str().size());
   }
 
+  inline void Update(const std::vector<boost::uuids::uuid>& x) {
+    std::vector<boost::uuids::uuid>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), CYCLUS_UUID_SIZE);
+  }
+
   inline void Update(const std::set<int>& x) {
     std::set<int>::iterator it = x.begin();
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
+  }
+
+  inline void Update(const std::set<double>& x) {
+    std::set<double>::iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), sizeof(double));
+  }
+  
+  inline void Update(const std::set<float>& x) {
+    std::set<float>::iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), sizeof(float));
   }
 
   inline void Update(const std::set<std::string>& x) {
