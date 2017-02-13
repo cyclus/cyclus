@@ -48,7 +48,6 @@ void GIS::set_longitude_degrees(float lon){
 }
 */
 double GIS::get_distance(GIS target) const {
-  
   double curr_longitude = this->get_longitude_decimal() * M_PI / 180;
   double curr_latitude = this->get_latitude_decimal() * M_PI / 180;
   double target_longitude = target.get_longitude_decimal() * M_PI / 180;
@@ -56,11 +55,12 @@ double GIS::get_distance(GIS target) const {
 
   double dlong = target_longitude - curr_longitude;
   double dlat = target_latitude - curr_latitude;
-  
-  double temp = pow(sin(dlat / 2), 2) + pow(sin(dlong / 2), 2)
-                    * cos(curr_latitude) * cos(target_latitude);
 
-  double temp2 = 2 * atan2(sqrt(temp), sqrt(1-temp));
+  double temp =
+      pow(sin(dlat / 2), 2) +
+      pow(sin(dlong / 2), 2) * cos(curr_latitude) * cos(target_latitude);
+
+  double temp2 = 2 * atan2(sqrt(temp), sqrt(1 - temp));
   return 6372.8 * temp2;
 }
 /*
@@ -75,8 +75,8 @@ string GIS::toStringD() const {
   stringstream lon_string;
   float lat = this->get_latitude_decimal();
   float lon = this->get_longitude_decimal();
-  int temp_lat = to_string((int) fabs(lat)).length();
-  int temp_lon = to_string((int) fabs(lon)).length();
+  int temp_lat = to_string((int)fabs(lat)).length();
+  int temp_lon = to_string((int)fabs(lon)).length();
   if (lat > 0) {
     lat_string << "+";
   } else {
@@ -119,11 +119,11 @@ string GIS::toStringDM() const {
   double lat_int, lon_int;
   lat = modf(lat, &lat_int);
   lon = modf(lon, &lon_int);
-  if (((int) lat_int) / 10 == 0) {
+  if (((int)lat_int) / 10 == 0) {
     lat_string << "0";
   }
-  if (((int) lon_int) / 100 == 0) {
-    if (((int) lon_int) / 10 == 0) {
+  if (((int)lon_int) / 100 == 0) {
+    if (((int)lon_int) / 10 == 0) {
       lon_string << "0";
     }
     lon_string << "0";
@@ -132,10 +132,10 @@ string GIS::toStringDM() const {
   lon_string << fabs(lon_int);
   lat = fabs(lat) * 60;
   lon = fabs(lon) * 60;
-  if ((int) fabs(lat) / 10 == 0){
+  if ((int)fabs(lat) / 10 == 0) {
     lat_string << "0";
   }
-  if ((int) fabs(lon) / 10 == 0){
+  if ((int)fabs(lon) / 10 == 0) {
     lon_string << "0";
   }
   lat_string << setprecision(5) << lat;
@@ -162,34 +162,34 @@ string GIS::toStringDMS() const {
   double lat_int, lon_int;
   lat = modf(lat, &lat_int);
   lon = modf(lon, &lon_int);
-  if (((int) lat_int) / 10 == 0) {
+  if (((int)lat_int) / 10 == 0) {
     lat_string << "0";
   }
-  if (((int) lon_int) / 100 == 0) {
-    if (((int) lon_int) / 10 == 0) {
+  if (((int)lon_int) / 100 == 0) {
+    if (((int)lon_int) / 10 == 0) {
       lon_string << "0";
     }
     lon_string << "0";
   }
-  lat_string << abs((int) lat_int);
-  lon_string << abs((int) lon_int);
+  lat_string << abs((int)lat_int);
+  lon_string << abs((int)lon_int);
 
   lat = modf(fabs(lat) * 60, &lat_int);
   lon = modf(fabs(lon) * 60, &lon_int);
-  if (((int) lat_int) / 10 == 0) {
+  if (((int)lat_int) / 10 == 0) {
     lat_string << "0";
   }
-  if (((int) lon_int) / 10 == 0) {
-      lon_string << "0";
+  if (((int)lon_int) / 10 == 0) {
+    lon_string << "0";
   }
   lat_string << fabs(lat_int);
   lon_string << fabs(lon_int);
   lat = lat * 60;
   lon = lon * 60;
-  if ((int) fabs(lat) / 10 == 0){
+  if ((int)fabs(lat) / 10 == 0) {
     lat_string << "0";
   }
-  if ((int) fabs(lon) / 10 == 0){
+  if ((int)fabs(lon) / 10 == 0) {
     lon_string << "0";
   }
   lat_string << setprecision(1) << fixed << lat;

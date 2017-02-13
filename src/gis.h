@@ -43,8 +43,8 @@ namespace cyclus {
 /// @TODO Imprementation of GIS information.
 
 class GIS {
-public:
-  //friend class GISTests :
+ public:
+  // friend class GISTests :
   /// The default constructor for GIS.
   GIS();
   /*
@@ -63,7 +63,6 @@ public:
   /// Getters
   float get_latitude_decimal() const;
   float get_longitude_decimal() const;
-
 
   /// Setter for latitude in decimals
   /// @param latitude in decimals
@@ -105,7 +104,7 @@ public:
   std::string toStringDM() const;
   std::string toStringDMS() const;
 
-private:
+ private:
   /// Latitude is stored as seconds of degree.
   float latitude;
 

@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
-#include "gis.h"
-#include <string>
 #include <iostream>
+#include <string>
+#include "gis.h"
 
 using namespace std;
 
 using cyclus::GIS;
 
-TEST(GISTests, check_distance){
+TEST(GISTests, check_distance) {
   GIS eiffel(48.858222, 2.2945);
   GIS museum(48.861111, 2.336389);
   GIS amsterdam(52.373056, 4.892222);
@@ -17,15 +17,21 @@ TEST(GISTests, check_distance){
   GIS newyork(40.7127, -74.0059);
   GIS bloomington(40.484167, -88.993611);
 
-  EXPECT_NEAR(eiffel.get_distance(museum), 3.188, 3.188*0.05);
-  EXPECT_NEAR(eiffel.get_distance(amsterdam), 432.126, 432.126*0.01);
-  EXPECT_NEAR(amsterdam.get_distance(barcelona), 1240.110, 1240.110*0.01);
-  EXPECT_NEAR(amsterdam.get_distance(newyork), 6172.619, 6172.619*0.01);
-  EXPECT_NEAR(newyork.get_distance(urbana), 1204.246, 1204.246*0.01);
-  EXPECT_NEAR(bloomington.get_distance(urbana), 78.663, 78.663*0.01);
+  EXPECT_NEAR(eiffel.get_distance(museum), 3.188, 3.188 * 0.05)
+      << "eiffel vs museum failed";
+  EXPECT_NEAR(eiffel.get_distance(amsterdam), 432.126, 432.126 * 0.01)
+      << "eiffel vs amsterdam failed";
+  EXPECT_NEAR(amsterdam.get_distance(barcelona), 1240.110, 1240.110 * 0.01)
+      << "amsterdam vs barcelona failed";
+  EXPECT_NEAR(amsterdam.get_distance(newyork), 5868.701, 5868.701 * 0.01)
+      << "amsterdam vs newyork failed";
+  EXPECT_NEAR(newyork.get_distance(urbana), 1204.246, 1204.246 * 0.01)
+      << "newyork vs urbana failed";
+  EXPECT_NEAR(bloomington.get_distance(urbana), 78.663, 78.663 * 0.01)
+      << "bloomington vs urbana failed";
 }
 
-TEST(GISTests, check_toStringD){
+TEST(GISTests, check_toStringD) {
   GIS amsterdam(52.373056, 4.892222);
   GIS sydney(-33.865, 151.209444);
   GIS saopaulo(-23.55, -46.633333);
@@ -41,7 +47,7 @@ TEST(GISTests, check_toStringD){
   ASSERT_TRUE(urb_str == "+40.10966-088.20425/");
 }
 
-TEST(GISTests, check_toStringDM){
+TEST(GISTests, check_toStringDM) {
   GIS amsterdam(52.373056, 4.892222);
   GIS sydney(-33.865, 151.209444);
   GIS saopaulo(-23.55, -46.633333);
@@ -57,7 +63,7 @@ TEST(GISTests, check_toStringDM){
   ASSERT_TRUE(urb_str == "+4006.5799-08812.255/");
 }
 
-TEST(GISTests, check_toStringDMS){
+TEST(GISTests, check_toStringDMS) {
   GIS amsterdam(52.373056, 4.892222);
   GIS sydney(-33.865, 151.209444);
   GIS saopaulo(-23.55, -46.633333);
