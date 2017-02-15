@@ -110,22 +110,22 @@ enum DbTypes {
   PAIR_VL_STRING_BLOB,  // ["std::pair<std::string, cyclus::Blob>", 1, ["HDF5"], ["PAIR", "VL_STRING", "BLOB"], false]
   PAIR_VL_STRING_UUID,  // ["std::pair<std::string, boost::uuids::uuid>", 1, ["HDF5"], ["PAIR", "VL_STRING", "UUID"], false]
   // maps with int keys
-  MAP_INT_BOOL,  // ["std::map<int, bool>", 1, [], ["MAP", "INT", "BOOL"], false]
-  VL_MAP_INT_BOOL,  // ["std::map<int, bool>", 1, [], ["VL_MAP", "INT", "BOOL"], true]
+  MAP_INT_BOOL,  // ["std::map<int, bool>", 1, ["HDF5"], ["MAP", "INT", "BOOL"], false]
+  VL_MAP_INT_BOOL,  // ["std::map<int, bool>", 1, ["HDF5"], ["VL_MAP", "INT", "BOOL"], true]
   MAP_INT_INT,  // ["std::map<int, int>", 1, ["HDF5", "SQLite"], ["MAP", "INT", "INT"], false]
   VL_MAP_INT_INT,  // ["std::map<int, int>", 1, ["HDF5", "SQLite"], ["VL_MAP", "INT", "INT"], true]
-  MAP_INT_FLOAT,  // ["std::map<int, float>", 1, [], ["MAP", "INT", "FLOAT"], false]
-  VL_MAP_INT_FLOAT,  // ["std::map<int, float>", 1, [], ["VL_MAP", "INT", "FLOAT"], true]
+  MAP_INT_FLOAT,  // ["std::map<int, float>", 1, ["HDF5"], ["MAP", "INT", "FLOAT"], false]
+  VL_MAP_INT_FLOAT,  // ["std::map<int, float>", 1, ["HDF5"], ["VL_MAP", "INT", "FLOAT"], true]
   MAP_INT_DOUBLE,  // ["std::map<int, double>", 1, ["HDF5", "SQLite"], ["MAP", "INT", "DOUBLE"], false]
   VL_MAP_INT_DOUBLE,  // ["std::map<int, double>", 1, ["HDF5", "SQLite"], ["VL_MAP", "INT", "DOUBLE"], true]
   MAP_INT_STRING,  // ["std::map<int, std::string>", 2, ["HDF5", "SQLite"], ["MAP", "INT", "STRING"], false]
   VL_MAP_INT_STRING,  // ["std::map<int, std::string>", 2, ["HDF5", "SQLite"], ["VL_MAP", "INT", "STRING"], true]
   MAP_INT_VL_STRING,  // ["std::map<int, std::string>", 2, ["HDF5", "SQLite"], ["MAP", "INT", "VL_STRING"], false]
   VL_MAP_INT_VL_STRING,  // ["std::map<int, std::string>", 2, ["HDF5", "SQLite"], ["VL_MAP", "INT", "VL_STRING"], true]
-  MAP_INT_BLOB,  // ["std::map<int, cyclus::Blob>", 1, [], ["MAP", "INT", "BLOB"], false]
-  VL_MAP_INT_BLOB,  // ["std::map<int, cyclus::Blob>", 1, [], ["VL_MAP", "INT", "BLOB"], true]
-  MAP_INT_UUID,  // ["std::map<int, boost::uuids::uuid>", 1, [], ["MAP", "INT", "UUID"], false]
-  VL_MAP_INT_UUID,  // ["std::map<int, boost::uuids::uuid>", 1, [], ["VL_MAP", "INT", "UUID"], true]
+  MAP_INT_BLOB,  // ["std::map<int, cyclus::Blob>", 1, ["HDF5"], ["MAP", "INT", "BLOB"], false]
+  VL_MAP_INT_BLOB,  // ["std::map<int, cyclus::Blob>", 1, ["HDF5"], ["VL_MAP", "INT", "BLOB"], true]
+  MAP_INT_UUID,  // ["std::map<int, boost::uuids::uuid>", 1, ["HDF5"], ["MAP", "INT", "UUID"], false]
+  VL_MAP_INT_UUID,  // ["std::map<int, boost::uuids::uuid>", 1, ["HDF5"], ["VL_MAP", "INT", "UUID"], true]
   // maps with fixed-length string keys
   MAP_STRING_BOOL,  // ["std::map<std::string, bool>", 2, [], ["MAP", "STRING", "BOOL"], false]
   VL_MAP_STRING_BOOL,  // ["std::map<std::string, bool>", 2, [], ["VL_MAP", "STRING", "BOOL"], true]
@@ -761,12 +761,44 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(int));
     }
   }
+  
+  inline void Update(const std::map<int, bool>& x) {
+    std::map<int, bool>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first), sizeof(int));
+      hash_.process_bytes(&(it->second), sizeof(bool));
+    }
+  }
 
   inline void Update(const std::map<int, double>& x) {
     std::map<int, double>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
       hash_.process_bytes(&(it->first), sizeof(int));
       hash_.process_bytes(&(it->second), sizeof(double));
+    }
+  }
+
+  inline void Update(const std::map<int, float>& x) {
+    std::map<int, float>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first), sizeof(int));
+      hash_.process_bytes(&(it->second), sizeof(float));
+    }
+  }
+  
+  inline void Update(const std::map<int, cyclus::Blob>& x) {
+    std::map<int, cyclus::Blob>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first), sizeof(int));
+      hash_.process_bytes(it->second.str().c_str(), it->second.str().size());
+    }
+  }
+  
+  inline void Update(const std::map<int, boost::uuids::uuid>& x) {
+    std::map<int, boost::uuids::uuid>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(&(it->first), sizeof(int));
+      hash_.process_bytes(&(it->second), CYCLUS_UUID_SIZE);
     }
   }
 
