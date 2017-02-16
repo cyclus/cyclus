@@ -68,8 +68,8 @@ enum DbTypes {
   SET_UUID,  // ["std::set<boost::uuids::uuid>", 1, ["HDF5"], ["SET", "UUID"], false]
   VL_SET_UUID,  // ["std::set<boost::uuids::uuid>", 1, ["HDF5"], ["VL_SET", "UUID"], true]
   // list types
-  LIST_BOOL,  // ["std::list<bool>", 1, [], ["LIST", "BOOL"], false]
-  VL_LIST_BOOL,  // ["std::list<bool>", 1, [], ["VL_LIST", "BOOL"], true]
+  LIST_BOOL,  // ["std::list<bool>", 1, ["HDF5"], ["LIST", "BOOL"], false]
+  VL_LIST_BOOL,  // ["std::list<bool>", 1, ["HDF5"], ["VL_LIST", "BOOL"], true]
   LIST_INT,  // ["std::list<int>", 1, ["HDF5", "SQLite"], ["LIST", "INT"], false]
   VL_LIST_INT,  // ["std::list<int>", 1, ["HDF5", "SQLite"], ["VL_LIST", "INT"], true]
   LIST_FLOAT,  // ["std::list<float>", 1, ["HDF5"], ["LIST", "FLOAT"], false]
@@ -127,39 +127,39 @@ enum DbTypes {
   MAP_INT_UUID,  // ["std::map<int, boost::uuids::uuid>", 1, ["HDF5"], ["MAP", "INT", "UUID"], false]
   VL_MAP_INT_UUID,  // ["std::map<int, boost::uuids::uuid>", 1, ["HDF5"], ["VL_MAP", "INT", "UUID"], true]
   // maps with fixed-length string keys
-  MAP_STRING_BOOL,  // ["std::map<std::string, bool>", 2, [], ["MAP", "STRING", "BOOL"], false]
-  VL_MAP_STRING_BOOL,  // ["std::map<std::string, bool>", 2, [], ["VL_MAP", "STRING", "BOOL"], true]
+  MAP_STRING_BOOL,  // ["std::map<std::string, bool>", 2, ["HDF5"], ["MAP", "STRING", "BOOL"], false]
+  VL_MAP_STRING_BOOL,  // ["std::map<std::string, bool>", 2, ["HDF5"], ["VL_MAP", "STRING", "BOOL"], true]
   MAP_STRING_INT,  // ["std::map<std::string, int>", 2, ["HDF5", "SQLite"], ["MAP", "STRING", "INT"], false]
   VL_MAP_STRING_INT,  // ["std::map<std::string, int>", 2, ["HDF5", "SQLite"], ["VL_MAP", "STRING", "INT"], true]
-  MAP_STRING_FLOAT,  // ["std::map<std::string, float>", 2, [], ["MAP", "STRING", "FLOAT"], false]
-  VL_MAP_STRING_FLOAT,  // ["std::map<std::string, float>", 2, [], ["VL_MAP", "STRING", "FLOAT"], true]
+  MAP_STRING_FLOAT,  // ["std::map<std::string, float>", 2, ["HDF5"], ["MAP", "STRING", "FLOAT"], false]
+  VL_MAP_STRING_FLOAT,  // ["std::map<std::string, float>", 2, ["HDF5"], ["VL_MAP", "STRING", "FLOAT"], true]
   MAP_STRING_DOUBLE,  // ["std::map<std::string, double>", 2, ["HDF5", "SQLite"], ["MAP", "STRING", "DOUBLE"], false]
   VL_MAP_STRING_DOUBLE,  // ["std::map<std::string, double>", 2, ["HDF5", "SQLite"], ["VL_MAP", "STRING", "DOUBLE"], true]
   MAP_STRING_STRING,  // ["std::map<std::string, std::string>", 3, ["HDF5", "SQLite"], ["MAP", "STRING", "STRING"], false]
   VL_MAP_STRING_STRING,  // ["std::map<std::string, std::string>", 3, ["HDF5", "SQLite"], ["VL_MAP", "STRING", "STRING"], true]
   MAP_STRING_VL_STRING,  // ["std::map<std::string, std::string>", 3, ["HDF5", "SQLite"], ["MAP", "STRING", "VL_STRING"], false]
   VL_MAP_STRING_VL_STRING,  // ["std::map<std::string, std::string>", 3, ["HDF5", "SQLite"], ["VL_MAP", "STRING", "VL_STRING"], true]
-  MAP_STRING_BLOB,  // ["std::map<std::string, cyclus::Blob>", 2, [], ["MAP", "STRING", "BLOB"], false]
-  VL_MAP_STRING_BLOB,  // ["std::map<std::string, cyclus::Blob>", 2, [], ["VL_MAP", "STRING", "BLOB"], true]
-  MAP_STRING_UUID,  // ["std::map<std::string, boost::uuids::uuid>", 2, [], ["MAP", "STRING", "UUID"], false]
-  VL_MAP_STRING_UUID,  // ["std::map<std::string, boost::uuids::uuid>", 2, [], ["VL_MAP", "STRING", "UUID"], true]
+  MAP_STRING_BLOB,  // ["std::map<std::string, cyclus::Blob>", 2, ["HDF5"], ["MAP", "STRING", "BLOB"], false]
+  VL_MAP_STRING_BLOB,  // ["std::map<std::string, cyclus::Blob>", 2, ["HDF5"], ["VL_MAP", "STRING", "BLOB"], true]
+  MAP_STRING_UUID,  // ["std::map<std::string, boost::uuids::uuid>", 2, ["HDF5"], ["MAP", "STRING", "UUID"], false]
+  VL_MAP_STRING_UUID,  // ["std::map<std::string, boost::uuids::uuid>", 2, ["HDF5"], ["VL_MAP", "STRING", "UUID"], true]
   // maps with variable length string keys
-  MAP_VL_STRING_BOOL,  // ["std::map<std::string, bool>", 2, [], ["MAP", "VL_STRING", "BOOL"], false]
-  VL_MAP_VL_STRING_BOOL,  // ["std::map<std::string, bool>", 2, [], ["VL_MAP", "VL_STRING", "BOOL"], true]
+  MAP_VL_STRING_BOOL,  // ["std::map<std::string, bool>", 2, ["HDF5"], ["MAP", "VL_STRING", "BOOL"], false]
+  VL_MAP_VL_STRING_BOOL,  // ["std::map<std::string, bool>", 2, ["HDF5"], ["VL_MAP", "VL_STRING", "BOOL"], true]
   MAP_VL_STRING_INT,  // ["std::map<std::string, int>", 2, ["HDF5", "SQLite"], ["MAP", "VL_STRING", "INT"], false]
   VL_MAP_VL_STRING_INT,  // ["std::map<std::string, int>", 2, ["HDF5", "SQLite"], ["VL_MAP", "VL_STRING", "INT"], true]
-  MAP_VL_STRING_FLOAT,  // ["std::map<std::string, float>", 2, [], ["MAP", "VL_STRING", "FLOAT"], false]
-  VL_MAP_VL_STRING_FLOAT,  // ["std::map<std::string, float>", 2, [], ["VL_MAP", "VL_STRING", "FLOAT"], true]
+  MAP_VL_STRING_FLOAT,  // ["std::map<std::string, float>", 2, ["HDF5"], ["MAP", "VL_STRING", "FLOAT"], false]
+  VL_MAP_VL_STRING_FLOAT,  // ["std::map<std::string, float>", 2, ["HDF5"], ["VL_MAP", "VL_STRING", "FLOAT"], true]
   MAP_VL_STRING_DOUBLE,  // ["std::map<std::string, double>", 2, ["HDF5", "SQLite"], ["MAP", "VL_STRING", "DOUBLE"], false]
   VL_MAP_VL_STRING_DOUBLE,  // ["std::map<std::string, double>", 2, ["HDF5", "SQLite"], ["VL_MAP", "VL_STRING", "DOUBLE"], true]
   MAP_VL_STRING_STRING,  // ["std::map<std::string, std::string>", 3, ["HDF5", "SQLite"], ["MAP", "VL_STRING", "STRING"], false]
   VL_MAP_VL_STRING_STRING,  // ["std::map<std::string, std::string>", 3, ["HDF5", "SQLite"], ["VL_MAP", "VL_STRING", "STRING"], true]
   MAP_VL_STRING_VL_STRING,  // ["std::map<std::string, std::string>", 3, ["HDF5", "SQLite"], ["MAP", "VL_STRING", "VL_STRING"], false]
   VL_MAP_VL_STRING_VL_STRING,  // ["std::map<std::string, std::string>", 3, ["HDF5", "SQLite"], ["VL_MAP", "VL_STRING", "VL_STRING"], true]
-  MAP_VL_STRING_BLOB,  // ["std::map<std::string, cyclus::Blob>", 2, [], ["MAP", "VL_STRING", "BLOB"], false]
-  VL_MAP_VL_STRING_BLOB,  // ["std::map<std::string, cyclus::Blob>", 2, [], ["VL_MAP", "VL_STRING", "BLOB"], true]
-  MAP_VL_STRING_UUID,  // ["std::map<std::string, boost::uuids::uuid>", 2, [], ["MAP", "VL_STRING", "UUID"], false]
-  VL_MAP_VL_STRING_UUID,  // ["std::map<std::string, boost::uuids::uuid>", 2, [], ["VL_MAP", "VL_STRING", "UUID"], true]
+  MAP_VL_STRING_BLOB,  // ["std::map<std::string, cyclus::Blob>", 2, ["HDF5"], ["MAP", "VL_STRING", "BLOB"], false]
+  VL_MAP_VL_STRING_BLOB,  // ["std::map<std::string, cyclus::Blob>", 2, ["HDF5"], ["VL_MAP", "VL_STRING", "BLOB"], true]
+  MAP_VL_STRING_UUID,  // ["std::map<std::string, boost::uuids::uuid>", 2, ["HDF5"], ["MAP", "VL_STRING", "UUID"], false]
+  VL_MAP_VL_STRING_UUID,  // ["std::map<std::string, boost::uuids::uuid>", 2, ["HDF5"], ["VL_MAP", "VL_STRING", "UUID"], true]
   // maps with pair<int,  string> keys and double values
   MAP_PAIR_INT_STRING_DOUBLE,  // ["std::map<std::pair<int, std::string>, double>", 3, ["HDF5"], ["MAP", ["PAIR", "INT", "STRING"], "DOUBLE"], false]
   VL_MAP_PAIR_INT_STRING_DOUBLE,  // ["std::map<std::pair<int, std::string>, double>", 3, ["HDF5"], ["VL_MAP", ["PAIR", "INT", "STRING"], "DOUBLE"], true]
@@ -677,6 +677,12 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
   }
+  
+  inline void Update(const std::set<bool>& x) {
+    std::set<bool>::iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), sizeof(bool));
+  }
 
   inline void Update(const std::set<double>& x) {
     std::set<double>::iterator it = x.begin();
@@ -712,6 +718,12 @@ class Sha1 {
     std::list<int>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
+  }
+  
+  inline void Update(const std::list<bool>& x) {
+    std::list<bool>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it)
+      hash_.process_bytes(&(*it), sizeof(bool));
   }
   
   inline void Update(const std::list<double>& x) {
@@ -823,6 +835,38 @@ class Sha1 {
     for (; it != x.end(); ++it) {
       hash_.process_bytes(it->first.c_str(), it->first.size());
       hash_.process_bytes(&(it->second), sizeof(double));
+    }
+  }
+
+  inline void Update(const std::map<std::string, float>& x) {
+    std::map<std::string, float>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      hash_.process_bytes(&(it->second), sizeof(float));
+    }
+  }
+  
+  inline void Update(const std::map<std::string, bool>& x) {
+    std::map<std::string, bool>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      hash_.process_bytes(&(it->second), sizeof(bool));
+    }
+  }
+  
+  inline void Update(const std::map<std::string, cyclus::Blob>& x) {
+    std::map<std::string, cyclus::Blob>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      hash_.process_bytes(it->second.str().c_str(), it->second.str().size());
+    }
+  }
+  
+  inline void Update(const std::map<std::string, boost::uuids::uuid>& x) {
+    std::map<std::string, boost::uuids::uuid>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      hash_.process_bytes(&(it->second), CYCLUS_UUID_SIZE);
     }
   }
 
