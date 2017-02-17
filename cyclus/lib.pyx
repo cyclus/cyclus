@@ -799,13 +799,14 @@ def py_init_hooks():
 #
 cdef class _XMLFileLoader:
 
-    def __cinit__(self, recorder, backend, schema_file, input_file=""):
+    def __cinit__(self, recorder, backend, schema_file, input_file="", format="none"):
         cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
         cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        cdef std_string cpp_format = str_py_to_cpp(format)
         self.ptx = new cpp_cyclus.XMLFileLoader(
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
             <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
-            cpp_schema_file, cpp_input_file)
+            cpp_schema_file, cpp_input_file, cpp_format)
 
     def __dealloc__(self):
         del self.ptx
@@ -822,19 +823,21 @@ class XMLFileLoader(_XMLFileLoader):
     Create a new loader reading from the xml simulation input file and writing
     to and initializing the backends in the recorder. The recorder must
     already have the backend registered. schema_file identifies the master
-    xml rng schema used to validate the input file.
+    xml rng schema used to validate the input file. The format specifies the
+    input file format from one of: "none", "xml", "json", or "py".
     """
 
 
 cdef class _XMLFlatLoader:
 
-    def __cinit__(self, recorder, backend, schema_file, input_file=""):
+    def __cinit__(self, recorder, backend, schema_file, input_file="", format="none"):
         cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
         cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        cdef std_string cpp_format = str_py_to_cpp(format)
         self.ptx = new cpp_cyclus.XMLFlatLoader(
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
             <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
-            cpp_schema_file, cpp_input_file)
+            cpp_schema_file, cpp_input_file, cpp_format)
 
     def __dealloc__(self):
         del self.ptx
@@ -851,7 +854,8 @@ class XMLFlatLoader(_XMLFlatLoader):
     Create a new loader reading from the xml simulation input file and writing
     to and initializing the backends in the recorder. The recorder must
     already have the backend registered. schema_file identifies the master
-    xml rng schema used to validate the input file.
+    xml rng schema used to validate the input file. The format specifies the
+    input file format from one of: "none", "xml", "json", or "py".
 
     Notes
     -----

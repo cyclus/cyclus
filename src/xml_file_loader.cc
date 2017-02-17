@@ -60,9 +60,9 @@ std::string LoadStringFromFile(std::string file, std::string format) {
   return input.str();
 }
 
-std::vector<AgentSpec> ParseSpecs(std::string infile) {
+std::vector<AgentSpec> ParseSpecs(std::string infile, std::string format) {
   std::stringstream input;
-  LoadStringstreamFromFile(input, infile);
+  LoadStringstreamFromFile(input, infile, format);
   XMLParser parser_;
   parser_.Init(input);
   InfileTree xqe(parser_);
@@ -87,7 +87,7 @@ std::vector<AgentSpec> ParseSpecs(std::string infile) {
   return specs;
 }
 
-std::string BuildMasterSchema(std::string schema_path, std::string infile) {
+std::string BuildMasterSchema(std::string schema_path, std::string infile, std::string format) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -96,7 +96,7 @@ std::string BuildMasterSchema(std::string schema_path, std::string infile) {
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
-  std::vector<AgentSpec> specs = ParseSpecs(infile);
+  std::vector<AgentSpec> specs = ParseSpecs(infile, format);
 
   std::map<std::string, std::string> subschemas;
 
@@ -160,21 +160,20 @@ Composition::Ptr ReadRecipe(InfileTree* qe) {
 XMLFileLoader::XMLFileLoader(Recorder* r,
                              QueryableBackend* b,
                              std::string schema_file,
-                             const std::string input_file) : b_(b), rec_(r) {
+                             const std::string input_file,
+                             const std::string format) : b_(b), rec_(r) {
   ctx_ = new Context(&ti_, rec_);
 
   schema_path_ = schema_file;
   file_ = input_file;
+  format_ = format;
   std::stringstream input;
-  LoadStringstreamFromFile(input, file_);
+  LoadStringstreamFromFile(input, file_, format);
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->Init(input);
 
   std::stringstream ss;
   parser_->Document()->write_to_stream_formatted(ss);
-
-  std::stringstream orig_input;
-  LoadRawStringstreamFromFile(orig_input, file_);
   ctx_->NewDatum("InputFiles")
       ->AddVal("Data", Blob(ss.str()))
       ->Record();
@@ -185,7 +184,7 @@ XMLFileLoader::~XMLFileLoader() {
 }
 
 std::string XMLFileLoader::master_schema() {
-  return BuildMasterSchema(schema_path_, file_);
+  return BuildMasterSchema(schema_path_, file_, format_);
 }
 
 void XMLFileLoader::LoadSim() {
@@ -325,7 +324,7 @@ void XMLFileLoader::LoadRecipes() {
 }
 
 void XMLFileLoader::LoadSpecs() {
-  std::vector<AgentSpec> specs = ParseSpecs(file_);
+  std::vector<AgentSpec> specs = ParseSpecs(file_, format_);
   for (int i = 0; i < specs.size(); ++i) {
     specs_[specs[i].alias()] = specs[i];
   }
