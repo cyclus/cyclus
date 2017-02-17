@@ -1526,7 +1526,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         s += ind + '{0} {1}({2}, {3});\n'.format(type_to_str(t), member, first, second)
         return s
     
-    def read_tuple(member, alias, t, uitype=None, ind="  ", idx=None,
+    def read_tuple(self, member, alias, t, uitype=None, ind="  ", idx=None,
                    path=''):
         uitype = prepare_type(t, uitype)
         alias = prepare_type(t, alias)
