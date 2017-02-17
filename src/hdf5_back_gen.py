@@ -1109,7 +1109,7 @@ def typeid(t):
     return FuncCall(name=Raw(code="typeid"), args=[Raw(code=node.cpp)])
 
 def no_vl(t):
-    if DB_TO_VL[t.db]:
+    if t.db != "BLOB" and DB_TO_VL[t.db]:
         return False
     else:
         if is_primitive(t):
@@ -1750,7 +1750,7 @@ hid_t {keysds} = VLDataset({t.db}, true);
 hid_t {valsds} = VLDataset({t.db}, false);
 if (vlkeys_[{t.db}].count({key}) != 1) {{
   AppendVLKey({keysds}, {t.db}, {key});
-  InsertVLVal({valsds}, {t.db}, {key}, {var}.str());
+  InsertVLVal({valsds}, {t.db}, {key}, ({var}).str());
 }}\n"""
 
 VL_SPECIAL_TYPES = {"VL_STRING": vl_write_vl_string,
