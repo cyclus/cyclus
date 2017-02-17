@@ -83,10 +83,8 @@ on the source code from github is fairly straightforward:
 - to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
   from the ``cyclus`` folder,
 
-- finally, add the following Cyclus installation path (``~/.local/bin``) to
+- finally, add the following Cyclus installation path (``~/.local/cyclus``) to
   the **front** on your ``$PATH``.
-- additionnaly if you are using MacOSX, also add
-  ``~/.local/lib/pythonX.Y/site-packages`` to your ``$PYTHONPATH``
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.

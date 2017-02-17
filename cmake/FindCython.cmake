@@ -39,11 +39,6 @@ else()
     )
 endif()
 
-if( ${CYTHON_EXECUTABLE} STREQUAL "" )
-  SET( Cython_FOUND FALSE )
-else( NOT ${CYTHON_EXECUTABLE} STREQUAL "" )
-  SET( Cython_FOUND TRUE )
-endif()
 
 include( FindPackageHandleStandardArgs )
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(Cython REQUIRED_VARS CYTHON_EXECUTABLE)

@@ -1,16 +1,12 @@
 #
 # Finds Jinja2 by trying to import it.
 #
-
-FIND_PACKAGE( PythonInterp )
-
-IF( PYTHONINTERP_FOUND )
-  EXECUTE_PROCESS( COMMAND ${PYTHON_EXECUTABLE} "-c" "import jinja2;print(jinja2.__version__)"
-    OUTPUT_VARIABLE JINJA2_VERSION_STRING )
-ENDIF()
-
-INCLUDE( FindPackageHandleStandardArgs )
-find_package_handle_standard_args( Jinja2
-  DEFAULT_MSG
-  JINJA2_VERSION_STRING
-  )
+execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" "import jinja2"
+    RESULT_VARIABLE JINJA2_RTN)
+if(JINJA2_RTN MATCHES 0)
+    set(JINJA2_FOUND 1)
+else()
+    set(JINJA2_FOUND 0)
+endif()
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(Jinja2 REQUIRED_VARS JINJA2_FOUND)

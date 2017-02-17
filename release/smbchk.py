@@ -33,7 +33,7 @@ NAME_RE = re.compile('([A-Za-z0-9~_:]+)')
 """A blacklist for private API that gets caught by `nm`. Add additional
 functions as needed.
 """
-API_BLACKLIST = {
+api_blacklist = {
     'cyclus::SimInit::LoadResource',
     'cyclus::SimInit::LoadMaterial',
     'cyclus::SimInit::LoadProduct',
@@ -45,15 +45,6 @@ API_BLACKLIST = {
     'cyclus::Composition::NewDecay',
 }
 
-SYMBOLS_REPLACEMENTS = [
-    ("std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >", "std::string"),
-    ("std::__cxx11::list", "std::list"),
-    ("std::__cxx11::basic_stringstream", "std::basic_stringstream"),
-    ("[abi:cxx11]", ""),
-    ("string >", "string>") # fix string replacement when a '>' follows the string
-]
-
-
 def load(ns):
     """Loads a database of symbols or returns an empty list."""
     if not os.path.isfile(ns.filename):
@@ -62,12 +53,10 @@ def load(ns):
         db = json.load(f)
     return db
 
-
 def save(db, ns):
     """Saves a database of symbols."""
     with io.open(ns.filename, 'wb') as f:
         json.dump(db, f, indent=1, separators=(',', ': '))
-
 
 def nm(ns):
     """Obtains the latest symbols as a sorted list by running and parsing the
@@ -81,18 +70,12 @@ def nm(ns):
     #   -C: demangles the C++ symbols.
     #   -fbsd: formats output in default 'bsd' style
     # note that we are only going to pick up symbols in the cyclus namespace
-    # because everything else should be external to the cares of cyclus
-    # stability
+    # because everything else should be external to the cares of cyclus stability
     lib = os.path.abspath(os.path.join(ns.prefix, 'lib', 'libcyclus.so'))
     stdout = subprocess.check_output(['nm', '-g', '-p', '-C', '-fbsd', lib])
     names = set()
-    ok_types = {'B', 'b', 'D', 'd', 'R', 'r',
-                'S', 's', 'T', 't', 'W', 'w', 'u'}
+    ok_types = {'B', 'b', 'D', 'd', 'R', 'r', 'S', 's', 'T', 't', 'W', 'w', 'u'}
     for line in stdout.splitlines():
-        # replace c++11 symbol by standard one
-        for symbol in SYMBOLS_REPLACEMENTS:
-            line = line.replace(symbol[0], symbol[1])
-
         line = line.strip().decode()
         if len(line) == 0 or not line[0].isdigit():
             continue
@@ -113,19 +96,15 @@ def nm(ns):
         names.add(name)
     return sorted(names)
 
-
 def git_log():
     """Returns git SHA, date, and timestamp from log."""
-    stdout = subprocess.check_output(
-        ['git', 'log', '--pretty=format:%H/%ci/%ct', '-n1'])
+    stdout = subprocess.check_output(['git', 'log', '--pretty=format:%H/%ci/%ct', '-n1'])
     return stdout.decode().strip().split('/')
-
 
 def core_version():
     stdout = subprocess.check_output(['cyclus', '--version'],
                                      universal_newlines=True)
     return stdout.splitlines()[0].strip()
-
 
 def update(db, ns):
     """Updates a symbol database with the latest values."""
@@ -134,21 +113,19 @@ def update(db, ns):
     symbols = nm(ns)
     sha, d, t = git_log()
     entry = {'symbols': symbols, 'sha': sha, 'date': d, 'timestamp': t,
-             'tag': ns.tag, 'version': core_version(), }
+             'tag': ns.tag, 'version': core_version(),}
     db.append(entry)
-
 
 def diff(db, i, j):
     """Diffs two database indices, returns string unified diff."""
     x = db[i]
     y = db[j]
-    xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in API_BLACKLIST]
-    ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in API_BLACKLIST]
+    xsym = [_ for _ in x['symbols'] if _.split('(')[0] not in api_blacklist]
+    ysym = [_ for _ in y['symbols'] if _.split('(')[0] not in api_blacklist]
     lines = difflib.unified_diff(xsym, ysym,
                                  fromfile=x['version'], tofile=y['version'],
                                  fromfiledate=x['date'], tofiledate=y['date'])
     return '\n'.join(map(lambda x: x[:-1] if x.endswith('\n') else x, lines))
-
 
 def check(db):
     """Checks if an API is stable, returns bool, prints debug info."""
@@ -156,18 +133,15 @@ def check(db):
         sys.exit('too few entries in database to check for stability')
     stable = True
     for i, (x, y) in enumerate(zip(db[:-1], db[1:])):
-        x = set(_ for _ in x['symbols'] if _.split(
-            '(')[0] not in API_BLACKLIST)
-        y = set(_ for _ in y['symbols'] if _.split(
-            '(')[0] not in API_BLACKLIST)
+        x = set(_ for _ in x['symbols'] if _.split('(')[0] not in api_blacklist)
+        y = set(_ for _ in y['symbols'] if _.split('(')[0] not in api_blacklist)
         if not (frozenset(x) <= frozenset(y)):
             stable = False
-            d = diff(db, i, i + 1)
+            d = diff(db, i, i+1)
             print(d)
     if stable:
         print('ABI stability has been achieved!')
     return stable
-
 
 def main(args=None):
     if os.name != 'posix':

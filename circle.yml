@@ -26,9 +26,6 @@ deployment:
       - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
       - docker push cyclus/cyclus:stable # push to docker depot
       ## DEB GENERATION
-      # Ubuntu 14.04
-      - docker/deb-ci/build_upload_deb.sh 14 :
-          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
       # Ubuntu 16.04
       - docker/deb-ci/build_upload_deb.sh 16 :
           timeout: 1200 # set 20 minute timeout (to avoid CI to fail)

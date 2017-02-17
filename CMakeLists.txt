@@ -40,7 +40,7 @@ IF(NOT CYCLUS_DOC_ONLY)
                     RESULT_VARIABLE res_var)
 
     IF(NOT "${res_var}" STREQUAL "0")
-        message(FATAL_ERROR "fetching decay source code failed, res_var = '${res_var}'")
+      message(FATAL_ERROR "fetching decay source code failed, res_var = '${res_var}'")
     ENDIF()
 
     ##############################################################################################
@@ -265,11 +265,9 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Include the CMake script UseCython.cmake.  This defines add_cython_module().
     # Instruction for use can be found at the top of cmake/UseCython.cmake.
-    
-    FIND_PACKAGE(Cython)
+    include(UseCython)
     message("-- Found Cython: ${Cython_FOUND}")
     if(Cython_FOUND)
-        include(UseCython)
         execute_process(COMMAND "${CYTHON_EXECUTABLE}" "-V"
                         ERROR_VARIABLE CYTHON_VERSION
                         ERROR_STRIP_TRAILING_WHITESPACE)
@@ -287,6 +285,8 @@ IF(NOT CYCLUS_DOC_ONLY)
             "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ReplicatePythonSourceTree.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}"
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+    else(Cython_FOUND)
+        set(NUMPY_INCLUDE_DIRS "")
     endif(Cython_FOUND)
 
     ##############################################################################################
@@ -307,10 +307,9 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${SQLITE3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
-        "${COIN_INCLUDE_DIRS}")
-    if(Cython_FOUND)
-        INCLUDE_DIRECTORIES("${NUMPY_INCLUDE_DIRS}")
-    endif(Cython_FOUND)
+        "${COIN_INCLUDE_DIRS}"
+        "${NUMPY_INCLUDE_DIRS}")
+
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
         SET(core_version "${CORE_VERSION}")
@@ -320,8 +319,8 @@ IF(NOT CYCLUS_DOC_ONLY)
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
     ENDIF(NOT "${CORE_VERSION}" STREQUAL "")
     IF("${core_version}" STREQUAL "")
-        MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
-        SET(core_version "-1")
+      MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
+      SET(core_version "-1")
     ENDIF()
     SET(ENV{CYCLUS_CORE_VERSION} "${core_version}")
     MESSAGE("-- core version ($CYCLUS_CORE_VERSION) set to: ${core_version}")
