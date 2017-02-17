@@ -104,7 +104,7 @@ class SimState(object):
         self.input_file = input_file
         self.input_format = input_format
         if output_path is None:
-            if input_format is None:
+            if input_format is None or input_format == "none":
                 base, _ = os.path.splitext(os.path.basename(input_file))
             else:
                 base = "cyclus"
@@ -180,10 +180,12 @@ class SimState(object):
         """Loads the input file for the simulation"""
         if self.flat_schema:
             loader = XMLFlatLoader(self.rec, self.file_backend,
-                                   self.schema_path, self.input_file)
+                                   self.schema_path, self.input_file,
+                                   self.input_format)
         else:
             loader = XMLFileLoader(self.rec, self.file_backend,
-                                   self.schema_path, self.input_file)
+                                   self.schema_path, self.input_file,
+                                   self.input_format)
         loader.load_sim()
 
     def run(self):

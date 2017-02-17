@@ -802,6 +802,7 @@ cdef class _XMLFileLoader:
     def __cinit__(self, recorder, backend, schema_file, input_file="", format="none"):
         cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
         cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        format = "none" if format is None else format
         cdef std_string cpp_format = str_py_to_cpp(format)
         self.ptx = new cpp_cyclus.XMLFileLoader(
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
@@ -833,6 +834,7 @@ cdef class _XMLFlatLoader:
     def __cinit__(self, recorder, backend, schema_file, input_file="", format="none"):
         cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
         cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        format = "none" if format is None else format
         cdef std_string cpp_format = str_py_to_cpp(format)
         self.ptx = new cpp_cyclus.XMLFlatLoader(
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
