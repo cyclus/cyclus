@@ -84,6 +84,13 @@ int main(int argc, char* argv[]) {
   } else if (ai.vm.count("input-file") > 0) {
     infile = ai.vm["input-file"].as<std::string>();
   }
+  // get infile format
+  std::string format;
+  if (ai.vm.count("format") == 0) {
+    format = "none";
+  } else {
+    format = ai.vm["format"].as<std::string>();
+  }
 
   // Announce yourself
   std::cout << "              :                                                               " << std::endl;
@@ -131,7 +138,7 @@ int main(int argc, char* argv[]) {
 
   // Try to detect schema type
   std::stringstream input;
-  LoadStringstreamFromFile(input, infile);
+  LoadStringstreamFromFile(input, infile, format);
   boost::shared_ptr<XMLParser> parser =
       boost::shared_ptr<XMLParser>(new XMLParser());
   parser->Init(input);
@@ -151,10 +158,10 @@ int main(int argc, char* argv[]) {
     // Read input file and initialize db and simulation from input file
     try {
       if (ai.flat_schema) {
-        XMLFlatLoader l(&rec, fback, ai.schema_path, infile);
+        XMLFlatLoader l(&rec, fback, ai.schema_path, infile, format);
         l.LoadSim();
       } else {
-        XMLFileLoader l(&rec, fback, ai.schema_path, infile);
+        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format);
         l.LoadSim();
       }
     } catch (cyclus::Error e) {
@@ -249,7 +256,10 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("verb,v", po::value<std::string>(),
        "log verbosity. integer from 0 (quiet) to 11 (verbose).")
       ("output-path,o", po::value<std::string>(), "output path")
-      ("input-file", po::value<std::string>(), "input file")
+      ("input-file,i", po::value<std::string>(),
+       "input file, may be a path or a raw string")
+      ("format,f", po::value<std::string>()->default_value("none"),
+       "input file format if a raw string, may be none, xml, json, or py.")
       ("warn-limit", po::value<unsigned int>(),
        "number of warnings to issue per kind, defaults to 42")
       ("warn-as-error", "throw errors when warnings are issued")

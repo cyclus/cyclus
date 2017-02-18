@@ -276,21 +276,27 @@ cdef extern from "pyhooks.h" namespace "cyclus::toolkit":
 cdef extern from "xml_file_loader.h" namespace "cyclus":
 
     cdef void LoadStringstreamFromFile(stringstream&, std_string)
+    cdef void LoadStringstreamFromFile(stringstream&, std_string, std_string)
     cdef std_string LoadStringFromFile(std_string)
+    cdef std_string LoadStringFromFile(std_string, std_string)
 
     cdef cppclass XMLFileLoader:
-        XMLFileLoader(Recorder*, QueryableBackend*, std_string) except +
+        XMLFileLoader(Recorder*, QueryableBackend*, std_string)
         XMLFileLoader(Recorder*, QueryableBackend*, std_string,
-                      const std_string) except +
+                      const std_string)
+        XMLFileLoader(Recorder*, QueryableBackend*, std_string,
+                      const std_string, const std_string)
         void LoadSim() except +
 
 
 cdef extern from "xml_flat_loader.h" namespace "cyclus":
 
     cdef cppclass XMLFlatLoader(XMLFileLoader):
-        XMLFlatLoader(Recorder*, QueryableBackend*, std_string) except +
+        XMLFlatLoader(Recorder*, QueryableBackend*, std_string)
         XMLFlatLoader(Recorder*, QueryableBackend*, std_string,
-                      const std_string) except +
+                      const std_string)
+        XMLFlatLoader(Recorder*, QueryableBackend*, std_string,
+                      const std_string, const std_string)
 
 
 cdef extern from "xml_parser.h" namespace "cyclus":
