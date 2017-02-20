@@ -799,13 +799,15 @@ def py_init_hooks():
 #
 cdef class _XMLFileLoader:
 
-    def __cinit__(self, recorder, backend, schema_file, input_file=""):
+    def __cinit__(self, recorder, backend, schema_file, input_file="", format="none"):
         cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
         cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        format = "none" if format is None else format
+        cdef std_string cpp_format = str_py_to_cpp(format)
         self.ptx = new cpp_cyclus.XMLFileLoader(
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
             <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
-            cpp_schema_file, cpp_input_file)
+            cpp_schema_file, cpp_input_file, cpp_format)
 
     def __dealloc__(self):
         del self.ptx
@@ -822,19 +824,22 @@ class XMLFileLoader(_XMLFileLoader):
     Create a new loader reading from the xml simulation input file and writing
     to and initializing the backends in the recorder. The recorder must
     already have the backend registered. schema_file identifies the master
-    xml rng schema used to validate the input file.
+    xml rng schema used to validate the input file. The format specifies the
+    input file format from one of: "none", "xml", "json", or "py".
     """
 
 
 cdef class _XMLFlatLoader:
 
-    def __cinit__(self, recorder, backend, schema_file, input_file=""):
+    def __cinit__(self, recorder, backend, schema_file, input_file="", format="none"):
         cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
         cdef std_string cpp_input_file = str_py_to_cpp(input_file)
+        format = "none" if format is None else format
+        cdef std_string cpp_format = str_py_to_cpp(format)
         self.ptx = new cpp_cyclus.XMLFlatLoader(
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
             <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
-            cpp_schema_file, cpp_input_file)
+            cpp_schema_file, cpp_input_file, cpp_format)
 
     def __dealloc__(self):
         del self.ptx
@@ -851,7 +856,8 @@ class XMLFlatLoader(_XMLFlatLoader):
     Create a new loader reading from the xml simulation input file and writing
     to and initializing the backends in the recorder. The recorder must
     already have the backend registered. schema_file identifies the master
-    xml rng schema used to validate the input file.
+    xml rng schema used to validate the input file. The format specifies the
+    input file format from one of: "none", "xml", "json", or "py".
 
     Notes
     -----
@@ -862,10 +868,13 @@ class XMLFlatLoader(_XMLFlatLoader):
     """
 
 
-def load_string_from_file(filename):
-    """Loads an XML file from a path."""
+def load_string_from_file(filename, format=None):
+    """Loads an XML file from a path or from a string and a format ('xml', 'json', or 'py')."""
     cdef std_string cpp_filename = str_py_to_cpp(filename)
-    cdef std_string cpp_rtn = cpp_cyclus.LoadStringFromFile(cpp_filename)
+    cdef std_string none = std_string(b"none")
+    cdef std_string cpp_format
+    cpp_format = none if format is None else str_py_to_cpp(format)
+    cdef std_string cpp_rtn = cpp_cyclus.LoadStringFromFile(cpp_filename, cpp_format)
     rtn = std_string_to_py(cpp_rtn)
     return rtn
 
@@ -873,16 +882,22 @@ def load_string_from_file(filename):
 
 cdef class _XMLParser:
 
-    def __cinit__(self, filename=None, raw=None):
-        cdef std_string s, inp
+    def __cinit__(self, filename=None, format=None, raw=None):
+        cdef std_string s, f, inp
+        cdef std_string none = std_string(b"none")
         self.ptx = new cpp_cyclus.XMLParser()
         if filename is not None:
             s = str_py_to_cpp(filename)
-            inp = cpp_cyclus.LoadStringFromFile(s)
+            f = none if format is None else str_py_to_cpp(format)
+            inp = cpp_cyclus.LoadStringFromFile(s, f)
         elif raw is not None:
-            inp = str_py_to_cpp(raw)
+            if format is None:
+                inp = str_py_to_cpp(raw)
+            else:
+                f = str_py_to_cpp(format)
+                inp = cpp_cyclus.LoadStringFromFile(s, f)
         else:
-            raise RuntimeError("Either a filename or a raw XML string "
+            raise RuntimeError("Either a filename or a raw string "
                                "must be provided to XMLParser")
         self.ptx.Init(inp)
 
@@ -898,6 +913,9 @@ class XMLParser(_XMLParser):
     ----------
     filename : str, optional
         Path to file to load.
+    format : str, optional
+        The format to read in as: "none", "xml", "json", or "py". Applies to either
+        filename or raw, if given.
     raw : str, optional
         XML string to load.
     """

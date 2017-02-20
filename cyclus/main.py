@@ -378,6 +378,9 @@ def make_parser():
     p.add_argument('--xml-to-py', action=XmlToPy,
                    dest='xml_to_py', default=None,
                    help='*.xml input file')
+    p.add_argument('-f', '--format', dest='format', default=None,
+                   help="specifies the input file format from one of: "
+                        "none, xml, json, or py.")
     p.add_argument('input_file', nargs='?',
                    help='path to input file')
     return p
@@ -386,8 +389,9 @@ def make_parser():
 def run_simulation(ns):
     """Runs the simulation when we recieve an input file."""
     print(LOGO)
-    state = SimState(input_file=ns.input_file, output_path=ns.output_path,
-                     schema_path=ns.schema_path, flat_schema=ns.flat_schema)
+    state = SimState(input_file=ns.input_file, input_format=ns.format,
+                     output_path=ns.output_path, schema_path=ns.schema_path,
+                     flat_schema=ns.flat_schema)
     state.load()
     state.run()
     msg = ("Status: Cyclus run successful!\n"
