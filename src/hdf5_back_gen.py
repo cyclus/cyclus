@@ -2097,7 +2097,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                                depth=depth+1, prefix=prefix
                                                               +prefixes[count]))
                 #attempt to resize container
-                #body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
+                body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
                 size = "(" + child_length + "-" + child_pad_count + ")" + "*" + item_size
                 body_nodes.append(memset("&"+child_variable, str(0), size))
                 keywords[child_keyword] = child_variable
@@ -2266,16 +2266,15 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                   target=Raw(code=new_variable),
                                                   value=Raw(code=variable 
                                                                  +".begin()"))))
+                child_bodies.append(ExprStmt(child=LeftUnaryOp(op="++", 
+                                                               name=Var(
+                                                                     name=count))))
                 result.nodes.append(For(cond=BinOp(x=Var(name=new_variable),
                                                    op="!=", 
                                                    y=Var(name=variable
                                                               +".end()")),
                                         incr=Raw(code="++" + new_variable),
-                                        body=[*child_bodies, 
-                                              ExprStmt(child=LeftUnaryOp(
-                                                              op="++", 
-                                                              name=Var(
-                                                                name=count)))]))
+                                        body=child_bodies))
                 #Add memset statement outside of loop
                 container_length = get_variable("length", depth=depth, 
                                                 prefix=prefix)
@@ -2766,6 +2765,9 @@ def setup():
             CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
             DB_TO_VL[db] = row[8]
 
+def init_dicts():
+    global NOT_VL
+    
     fixed_length_types = []
     for n in CANON_TYPES:
         if no_vl(CANON_TO_NODE[n]) and n not in fixed_length_types:
@@ -2817,7 +2819,6 @@ def setup():
                      "BUF_TO_VAL": main_buf_to_val}
 
 def main():
-    global NOT_VL
     try:
         gen_instruction = sys.argv[1]
     except:
