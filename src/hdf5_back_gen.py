@@ -2260,16 +2260,15 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                   target=Raw(code=new_variable),
                                                   value=Raw(code=variable 
                                                                  +".begin()"))))
+                child_bodies.append(ExprStmt(child=LeftUnaryOp(op="++", 
+                                                               name=Var(
+                                                                     name=count))))
                 result.nodes.append(For(cond=BinOp(x=Var(name=new_variable),
                                                    op="!=", 
                                                    y=Var(name=variable
                                                               +".end()")),
                                         incr=Raw(code="++" + new_variable),
-                                        body=[*child_bodies, 
-                                              ExprStmt(child=LeftUnaryOp(
-                                                              op="++", 
-                                                              name=Var(
-                                                                name=count)))]))
+                                        body=child_bodies))
                 #Add memset statement outside of loop
                 container_length = get_variable("length", depth=depth, 
                                                 prefix=prefix)
@@ -2738,6 +2737,8 @@ MAIN_DISPATCH = {"QUERY": main_query,
                  "BUF_TO_VAL": main_buf_to_val}
 
 def init_dicts():
+    global NOT_VL
+    
     fixed_length_types = []
     for n in CANON_TYPES:
         if no_vl(CANON_TO_NODE[n]) and n not in fixed_length_types:
@@ -2781,7 +2782,6 @@ def init_dicts():
             ORIGIN_TO_VL[ORIGIN_DICT[n]] = node
 
 def main():
-    global NOT_VL
     try:
         gen_instruction = sys.argv[1]
     except:
