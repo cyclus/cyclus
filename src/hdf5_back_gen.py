@@ -7,6 +7,20 @@ from pprint import pformat
 from itertools import chain
 from collections import OrderedDict
 
+MAIN_DISPATCH = {}
+
+CANON_TO_NODE = {}
+CANON_TYPES = []
+DB_TO_CPP = {}
+CANON_TO_DB = {}
+DB_TO_VL = {}
+INDENT = '  '
+
+NOT_VL = []
+VARIATION_DICT = OrderedDict()
+ORIGIN_DICT = OrderedDict()
+ORIGIN_TO_VL = {}
+
 is_primitive = lambda t: isinstance(t.canon, str)
 
 class Node(object):
@@ -330,31 +344,6 @@ def resolve_unicode(item):
             pass
         return item
 
-with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
-                       'dbtypes.json')) as f:
-    RAW_TABLE = resolve_unicode(json.load(f))
-
-VERSION = ""
-TABLE_START = 0
-TABLE_END = 0
-for row in range(len(RAW_TABLE)):
-    current = tuple(RAW_TABLE[row])
-    if current[4] == "HDF5":
-        if current[5] > VERSION:
-            VERSION = current[5]
-            TABLE_START = row
-        if current[5] == VERSION:
-            TABLE_END = row    
-
-TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:TABLE_END+1])
-
-CANON_TO_NODE = {}
-CANON_TYPES = []
-DB_TO_CPP = {}
-CANON_TO_DB = {}
-DB_TO_VL = {}
-INDENT = '  '
-
 def convert_canonical(raw_list):
     """Converts JSON list of lists to tuple of tuples.
     
@@ -371,18 +360,6 @@ def convert_canonical(raw_list):
     if isinstance(raw_list, str):
         return raw_list
     return tuple(convert_canonical(x) for x in raw_list)
-        
-for row in TYPES_TABLE:
-    if row[6] == 1 and row[4] == "HDF5" and row[5] == VERSION:        
-        db = row[1]
-        cpp = row[2]
-        canon = convert_canonical(row[7])
-        if canon not in CANON_TYPES:
-            CANON_TYPES.append(canon)
-        DB_TO_CPP[db] = cpp
-        CANON_TO_DB[canon] = db
-        CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
-        DB_TO_VL[db] = row[8]
 
 def list_dependencies(canon):
     """Return a list of a type's dependencies, each in canonical form.
@@ -2120,7 +2097,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                                depth=depth+1, prefix=prefix
                                                               +prefixes[count]))
                 #attempt to resize container
-                body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
+                #body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
                 size = "(" + child_length + "-" + child_pad_count + ")" + "*" + item_size
                 body_nodes.append(memset("&"+child_variable, str(0), size))
                 keywords[child_keyword] = child_variable
@@ -2753,24 +2730,42 @@ def main_buf_to_val():
                                tspecial=True)
                 block.nodes.append(node)
     output += CPPGEN.visit(block)
-    return output    
+    return output
 
-NOT_VL = []
-VARIATION_DICT = OrderedDict()
-ORIGIN_DICT = OrderedDict()
-ORIGIN_TO_VL = {}
-
-MAIN_DISPATCH = {"QUERY": main_query,
-                 "CREATE": main_create,
-                 "VL_DATASET": main_vl_dataset,
-                 "FILL_BUF": main_fill_buf,
-                 "WRITE": main_write,
-                 "VAL_TO_BUF_H": main_val_to_buf_h,
-                 "VAL_TO_BUF": main_val_to_buf,
-                 "BUF_TO_VAL": main_buf_to_val}
-
-def init_dicts():
+def setup():
     global NOT_VL
+    global MAIN_DISPATCH
+    
+    with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
+                       'dbtypes.json')) as f:
+        raw_table = resolve_unicode(json.load(f))
+
+    version = ""
+    table_start = 0
+    table_end = 0
+    for row in range(len(raw_table)):
+        current = tuple(raw_table[row])
+        if current[4] == "HDF5":
+            if current[5] > version:
+                version = current[5]
+                table_start = row
+            if current[5] == version:
+                table_end = row    
+    
+    types_table = list(tuple(row) for row in raw_table[table_start:table_end+1])
+               
+    for row in types_table:
+        if row[6] == 1 and row[4] == "HDF5" and row[5] == version:        
+            db = row[1]
+            cpp = row[2]
+            canon = convert_canonical(row[7])
+            if canon not in CANON_TYPES:
+                CANON_TYPES.append(canon)
+            DB_TO_CPP[db] = cpp
+            CANON_TO_DB[canon] = db
+            CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
+            DB_TO_VL[db] = row[8]
+
     fixed_length_types = []
     for n in CANON_TYPES:
         if no_vl(CANON_TO_NODE[n]) and n not in fixed_length_types:
@@ -2811,6 +2806,15 @@ def init_dicts():
         node = CANON_TO_NODE[n]
         if is_all_vl(node):
             ORIGIN_TO_VL[ORIGIN_DICT[n]] = node
+            
+    MAIN_DISPATCH = {"QUERY": main_query,
+                     "CREATE": main_create,
+                     "VL_DATASET": main_vl_dataset,
+                     "FILL_BUF": main_fill_buf,
+                     "WRITE": main_write,
+                     "VAL_TO_BUF_H": main_val_to_buf_h,
+                     "VAL_TO_BUF": main_val_to_buf,
+                     "BUF_TO_VAL": main_buf_to_val}
 
 def main():
     global NOT_VL
@@ -2820,7 +2824,7 @@ def main():
         raise ValueError("No generation instruction provided")    
     
     # Setup for global util dictionaries
-    init_dicts()
+    setup()
         
     # Dispatch to requested generation function
     function = MAIN_DISPATCH[gen_instruction]
