@@ -2097,9 +2097,10 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                                depth=depth+1, prefix=prefix
                                                               +prefixes[count]))
                 #attempt to resize container
-                body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
-                size = "(" + child_length + "-" + child_pad_count + ")" + "*" + item_size
-                body_nodes.append(memset("&"+child_variable, str(0), size))
+                if child_node.canon[0] == 'VECTOR':
+                    body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
+                    size = "(" + child_length + "-" + child_pad_count + ")" + "*" + item_size
+                    body_nodes.append(memset("&"+child_variable, str(0), size))
                 keywords[child_keyword] = child_variable
             #PAIRS, etc.
             else:
@@ -2765,9 +2766,6 @@ def setup():
             CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
             DB_TO_VL[db] = row[8]
 
-def init_dicts():
-    global NOT_VL
-    
     fixed_length_types = []
     for n in CANON_TYPES:
         if no_vl(CANON_TO_NODE[n]) and n not in fixed_length_types:
@@ -2828,6 +2826,7 @@ def main():
     setup()
         
     # Dispatch to requested generation function
+    #print(MAIN_DISPATCH)
     function = MAIN_DISPATCH[gen_instruction]
     print(function())
 
