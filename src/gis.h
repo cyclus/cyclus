@@ -97,6 +97,13 @@ class GIS {
   /// @param value to set the precision, and the precision
   /// @return value with the precision as defined
   float setPrecision(float value, double precision) const;
+
+  /// Helper for toString functions
+  /// @param value detemines which to string function this helps
+  /// 1:D, 2:DM, 3:DMS
+  /// @return partially formatted string
+  string toStringhelperlon(int mode, int lon);
+  string toStringhelperlat(int mode, int lat);
 };
 }
 
