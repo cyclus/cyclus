@@ -23,9 +23,11 @@ from pprint import pprint, pformat
 if sys.version_info[0] > 2:
     from urllib.request import urlopen
     str_types = (str, bytes)
+    unicode_types = (str,)
 else:
     from urllib2 import urlopen
     str_types = (str, unicode)
+    unicode_types = (str, unicode)
 
 import jinja2
 
@@ -2459,9 +2461,9 @@ def typesystem_pyx(ts, ns):
         annotations=ANNOTATIONS,
         nonuser_annotations=nonuser_annotations,
         uniquestrtypes = [t for t in ts.uniquetypes
-                          if isinstance(ts.norms[t], str)],
+                          if isinstance(ts.norms[t], unicode_types)],
         uniquetuptypes = sorted([(ts.norms[t], t) for t in ts.uniquetypes
-                                 if not isinstance(ts.norms[t], str)], reverse=True,
+                                 if not isinstance(ts.norms[t], unicode_types)], reverse=True,
                                 key=lambda x: (x[0][0], x[1])),
         groupby=itertools.groupby,
         firstfirst=lambda x: x[0][0],

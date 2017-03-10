@@ -834,13 +834,13 @@ class StateAccumulator(object):
             current_shape = ann_dict['shape']
         new_shape = []
         # Flatten list dimensions
-        if isinstance(type_canon, str):
+        if isinstance(type_canon, STRING_TYPES):
             result = [type_canon]
         else:
             result = list(type_canon)
             i = 0
             while i < len(result):
-                if isinstance(result[i], str):
+                if isinstance(result[i], STRING_TYPES):
                     i += 1
                 else:
                     temp = result[i][1:]
