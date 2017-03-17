@@ -179,7 +179,7 @@ enum DbTypes {
   VL_MAP_VL_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string, std::vector<double>>", 3, ["HDF5", "SQLite"], ["VL_MAP", "VL_STRING", ["VL_VECTOR", "DOUBLE"]], true]
 
   // map<string,  map<int,  double> >
-  MAP_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["MAP", "STRING", ["MAP", "INT", "DOUBLE"]], false]
+  MAP_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["MAP", "STRING", ["MAP", "INT", "DOUBLE"]], false]
   MAP_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["MAP", "STRING", ["VL_MAP", "INT", "DOUBLE"]], false]
   VL_MAP_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["VL_MAP", "STRING", ["MAP", "INT", "DOUBLE"]], true]
   MAP_VL_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["MAP", "VL_STRING", ["MAP", "INT", "DOUBLE"]], false]

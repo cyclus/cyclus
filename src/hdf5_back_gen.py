@@ -160,10 +160,11 @@ class PrettyFormatter(Visitor):
         return s
 
 class CppGen(Visitor):
-    def __init__(self, tree=None, indent='  '):
+    def __init__(self, tree=None, indent='  ', debug=False):
         super(CppGen, self).__init__(tree=tree)
         self.level = 0
         self.indent = indent
+        self.debug = debug
         
     def visit_var(self, node):
         return node.name
@@ -179,7 +180,10 @@ class CppGen(Visitor):
     
     def visit_exprstmt(self, node):
         s = self.visit(node.child)
-        s += ";\n"
+        s += ";"
+        if self.debug:
+            s = "std::cout << \"HDF5_DEBUG: " + s.replace('"', '\\"') + "\" << std::endl;\n" + s
+        s += '\n'
         return s
     
     def visit_assign(self, node):
@@ -1427,7 +1431,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                 # However, if the current opened stack is longer, the first new
                 # variable there will be our child variable.
                 else:
-                    child_item_var = opened_stack[pre_opened_len]
+                    child_item_var = opened_stack[-1]
                 # 2. Get item sizes.
                 child_dict[child_item_var] = get_item_size(item_node, 
                                                            child_array,
@@ -2260,6 +2264,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                               +partial_size))
                     partial_size += "+" + child_size
             if container in variable_length_types:
+                labels = ['->first', '->second']
                 #For loop uses child bodies
                 result.nodes.append(ExprStmt(child=DeclAssign(
                                                   type=Type(cpp=t.cpp
@@ -2270,6 +2275,10 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                 child_bodies.append(ExprStmt(child=LeftUnaryOp(op="++", 
                                                                name=Var(
                                                                      name=count))))
+                #result.nodes.append(Raw(code="std::cout << "+variable+".size() << std::endl;\n"))
+                #for whatever in labels:
+                #    if t.db == 'MAP_INT_DOUBLE' and depth > 0:
+                #        child_bodies.insert(0, Raw(code="std::cout << "+new_variable+whatever+" << std::endl;\n"))
                 result.nodes.append(For(cond=BinOp(x=Var(name=new_variable),
                                                    op="!=", 
                                                    y=Var(name=variable
@@ -2296,7 +2305,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
         
 def main_write():
     """HDF5 Write: Generate the WriteToBuf templated function definitions."""
-    CPPGEN = CppGen()
+    CPPGEN = CppGen(debug=False)
     output = ""
     for i in CANON_TYPES:
         block = Block(nodes=[])
@@ -2771,6 +2780,7 @@ def setup():
         if no_vl(CANON_TO_NODE[n]) and n not in fixed_length_types:
             fixed_length_types.append(n)
     
+    #print(fixed_length_types)
     for n in fixed_length_types:
         key = CANON_TO_NODE[n]
         vals = []
