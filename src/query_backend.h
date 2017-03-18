@@ -180,13 +180,13 @@ enum DbTypes {
 
   // map<string,  map<int,  double> >
   MAP_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["MAP", "STRING", ["MAP", "INT", "DOUBLE"]], false]
-  MAP_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["MAP", "STRING", ["VL_MAP", "INT", "DOUBLE"]], false]
-  VL_MAP_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["VL_MAP", "STRING", ["MAP", "INT", "DOUBLE"]], true]
-  MAP_VL_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["MAP", "VL_STRING", ["MAP", "INT", "DOUBLE"]], false]
-  MAP_VL_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["MAP", "VL_STRING", ["VL_MAP", "INT", "DOUBLE"]], false]
-  VL_MAP_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["VL_MAP", "STRING", ["VL_MAP", "INT", "DOUBLE"]], true]
-  VL_MAP_VL_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["MAP", "INT", "DOUBLE"]], true]
-  VL_MAP_VL_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "INT", "DOUBLE"]], true]
+  MAP_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["MAP", "STRING", ["VL_MAP", "INT", "DOUBLE"]], false]
+  VL_MAP_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["VL_MAP", "STRING", ["MAP", "INT", "DOUBLE"]], true]
+  MAP_VL_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["MAP", "VL_STRING", ["MAP", "INT", "DOUBLE"]], false]
+  MAP_VL_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["MAP", "VL_STRING", ["VL_MAP", "INT", "DOUBLE"]], false]
+  VL_MAP_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["VL_MAP", "STRING", ["VL_MAP", "INT", "DOUBLE"]], true]
+  VL_MAP_VL_STRING_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["VL_MAP", "VL_STRING", ["MAP", "INT", "DOUBLE"]], true]
+  VL_MAP_VL_STRING_VL_MAP_INT_DOUBLE,  // ["std::map<std::string, std::map<int, double>>", 3, ["HDF5", "SQLite"], ["VL_MAP", "VL_STRING", ["VL_MAP", "INT", "DOUBLE"]], true]
 
   // map<string,  pair<double,  map<int,  double> > >
   MAP_STRING_PAIR_DOUBLE_MAP_INT_DOUBLE,  // ["std::map<std::string, std::pair<double, std::map<int, double>>>", 4, ["SQLite"], ["MAP", "STRING", ["PAIR", "DOUBLE", ["MAP", "INT", "DOUBLE"]]], false]
@@ -889,6 +889,14 @@ class Sha1 {
   
   inline void Update(const std::map<std::string, std::vector<double>>& x) {
     std::map<std::string, std::vector<double>>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      Update(it->second);
+    }
+  }
+  
+  inline void Update(const std::map<std::string, std::map<int, double>>& x) {
+    std::map<std::string, std::map<int, double>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
       hash_.process_bytes(it->first.c_str(), it->first.size());
       Update(it->second);
