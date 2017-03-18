@@ -32,10 +32,17 @@ class SimInit {
   /// context's recorder is set to r.
   void Init(Recorder* r, QueryableBackend* b);
 
+  /// Initialize a simulation with data from b for simulation id in r. SimInit
+  /// does not take ownership of the recorder or backend. the configured
+  /// context's recorder is set to r.
+  void Init(Recorder* r, Context* src, int dur);
+
   /// EXPERIMENTAL (might not work properly). Restarts a simulation from time t
   /// with data from b identified by simid.  The newly configured simulation
   /// will run with a new simulation id.
   void Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t);
+
+  void Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t, int dur);
 
   /// NOT IMPLEMENTED. Initializes a simulation branched from prev_sim_id at
   /// time t with diverging state described in new_sim_id.
@@ -75,6 +82,8 @@ class SimInit {
   /// useful for running mock simulations/tests.
   static Product::Ptr BuildProduct(QueryableBackend* b, int resid);
 
+  std::vector<Agent*> agents();
+
  private:
   void InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t);
 
@@ -101,6 +110,7 @@ class SimInit {
 
   Context* ctx_;
   Recorder* rec_;
+  Recorder* todel_rec_;
   Timer ti_;
   boost::uuids::uuid simid_;
   SimInfo si_;

@@ -72,24 +72,37 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
 Context::Context(Timer* ti, Recorder* rec)
     : ti_(ti),
       rec_(rec),
+      db_(NULL),
       solver_(NULL),
       trans_id_(0),
       si_(0) {}
 
 Context::~Context() {
   if (solver_ != NULL) {
-    delete solver_;
+    // deleting the solver prevents multiple simulations in memory from
+    // sharing a single solver.  Sharing a solver is okay because they dont
+    // have inter-timestep mutable/evolving state.  In the future, this
+    // sharing could be eliminated (and the 'delete solver_' below can be
+    // reinstated) by carefully rebuilding/cloning configured
+    // solvers.
+    //delete solver_;
   }
 
-  // initiate deletion of agents that don't have parents.
-  // dealloc will propagate through hierarchy as agents delete their children
+  // Because agents remove themselves from the agent_list_ when destructed, we
+  // can't delete them while iterating over the list - so build up a to-delete
+  // list in a separate step.
+  //
+  // Also - previously, when a context was destructed, it would only delete the
+  // root-agents (agents without parents).  Later on, in order to enable agents to
+  // deploy other agents and then leave the simulation, we changed agents to not
+  // destruct their children when they are destructed.  So the context destructor
+  // needs to destruct non-root agents too.
   std::vector<Agent*> to_del;
   std::set<Agent*>::iterator it;
   for (it = agent_list_.begin(); it != agent_list_.end(); ++it) {
-    if ((*it)->parent() == NULL) {
-      to_del.push_back(*it);
-    }
+    to_del.push_back(*it);
   }
+
   for (int i = 0; i < to_del.size(); ++i) {
     DelAgent(to_del[i]);
   }
@@ -240,8 +253,16 @@ Datum* Context::NewDatum(std::string title) {
   return rec_->NewDatum(title);
 }
 
+Context* Context::GetClone() {
+  return ti_->SnapdContext();
+}
+
 void Context::Snapshot() {
   ti_->Snapshot();
+}
+
+void Context::CloneSim() {
+  ti_->CloneSim();
 }
 
 void Context::KillSim() {

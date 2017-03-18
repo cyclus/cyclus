@@ -21,6 +21,7 @@ class Agent;
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
   friend class ::SimInitTest;
+  friend class SimInit;
  public:
   Timer();
 
@@ -55,6 +56,13 @@ class Timer {
   /// Schedules a snapshot of simulation state to output database to occur at
   /// the beginning of the next timestep.
   void Snapshot() { want_snapshot_ = true; }
+
+  void CloneSim() { want_clone_ = true; }
+
+  // Returns a clone of the context as generated at the last call of Snapshot
+  // (with all agents and everything copied.  This is NULL unless Snapshot has
+  // been called at least once previously.
+  Context* SnapdContext();
 
   /// Schedules the simulation to be terminated at the end of this timestep.
   void KillSim() { want_kill_ = true; }
@@ -99,7 +107,11 @@ class Timer {
 
   SimInfo si_;
 
+  // used to hold snapshot clones of the context
+  SimInit* sinit_;
+
   bool want_snapshot_;
+  bool want_clone_;
   bool want_kill_;
 
   /// Concrete agents that desire to receive tick and tock notifications

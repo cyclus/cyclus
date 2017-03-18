@@ -100,6 +100,8 @@ void SqliteDb::close() {
   if (isOpen_) {
     if (sqlite3_close(db_) == SQLITE_OK) {
       isOpen_ = false;
+    } else {
+      CLOG(LEV_ERROR) << "failed to close sqlite database";
     }
   }
 }
@@ -150,6 +152,7 @@ void SqliteDb::Execute(std::string sql) {
   result = sqlite3_step(statement);
   if (result != SQLITE_DONE && result != SQLITE_ROW && result != SQLITE_OK) {
     std::string error = sqlite3_errmsg(db_);
+    sqlite3_finalize(statement);
     throw IOError("SQL error: " + sql + " " + error);
   }
 
@@ -194,6 +197,7 @@ std::vector<StrList> SqliteDb::Query(std::string sql) {
   // collect errors
   if (result != SQLITE_DONE && result != SQLITE_OK) {
     std::string error = sqlite3_errmsg(db_);
+    sqlite3_finalize(statement);
     throw IOError("SQL error: " + error);
   }
   sqlite3_finalize(statement);

@@ -7,18 +7,194 @@
 
 namespace cyclus {
 
+std::vector<Agent*> SimInit::agents() {
+  std::vector<Agent*> ags;
+  std::map<int, Agent*>::iterator it;
+  for (it = agents_.begin(); it != agents_.end(); ++it) {
+    ags.push_back(it->second);
+  }
+  return ags;
+}
+
 class Dummy : public Region {
  public:
   Dummy(Context* ctx) : Region(ctx) {}
   Dummy* Clone() { return NULL; }
 };
 
-SimInit::SimInit() : rec_(NULL), ctx_(NULL) {}
+SimInit::SimInit() : rec_(NULL), todel_rec_(NULL), ctx_(NULL) {}
 
 SimInit::~SimInit() {
   if (ctx_ != NULL) {
     delete ctx_;
   }
+  if (todel_rec_ != NULL) {
+    delete todel_rec_;
+  }
+}
+
+void SimInit::Init(Recorder* r, Context* src, int dur) {
+  // DO NOT call the agents' Build methods because the agents might modify the
+  // state of their children and/or the simulation in ways that are only meant
+  // to be done once; remember that we are initializing agents from a
+  // simulation that was already started.
+  Warn<EXPERIMENTAL_WARNING>("init from context capability is not fully"
+                             " tested");
+  if (r == NULL) {
+    rec_ = new Recorder();
+    todel_rec_ = rec_;
+  } else {
+    rec_ = r;
+  }
+
+  si_ = src->sim_info();
+  si_.parent_sim = src->sim_id();
+  si_.parent_type = "context-clone";
+  si_.branch_time = src->time();
+  si_.duration = dur;
+
+  Context* dst = new Context(&ti_, rec_);
+  dst->solver(src->solver_);
+  dst->trans_id_ = src->trans_id_;
+  dst->recipes_ = src->recipes_;
+  dst->n_prototypes_ = src->n_prototypes_;
+  dst->n_specs_ = src->n_specs_;
+  dst->InitSim(si_);
+  ctx_ = dst;
+
+  // all the prototypes need to be cloned into the new context
+  std::map<std::string, Agent*>::iterator pit;
+  for (pit = src->protos_.begin(); pit != src->protos_.end(); ++pit) {
+    Agent* a = pit->second;
+    a->ctx_ = dst;
+    Agent* copy = a->Clone();
+    copy->id_ = a->id_;
+    dst->protos_[pit->first] = copy;
+    a->ctx_ = src;
+  }
+
+  ////////// Clone and rebuild agent hierarchy ///////////
+  std::set<Agent*>::iterator its;
+  std::map<int, Agent*> unbuilt;  // map<agentid, agent_ptr>
+  for (its = src->agent_list_.begin(); its != src->agent_list_.end(); ++its) {
+    Agent* a = *its;
+    if (a->enter_time() < 0) {
+      // not a live agent
+      continue;
+    }
+
+    a->ctx_ = dst;
+    Agent* copy = a->Clone();
+    a->ctx_ = src;
+
+    // agent-kernel init
+    copy->prototype_ = a->prototype_;
+    copy->id_ = a->id_;
+    copy->enter_time_ = a->enter_time_;
+    copy->parent_id_ = a->parent_id_;
+    unbuilt[copy->id()] = copy;
+  }
+
+  // construct agent hierarchy starting at roots (no parent) down
+  std::map<int, Agent*>::iterator it = unbuilt.begin();
+  std::vector<Agent*> enter_list;
+  while (unbuilt.size() > 0) {
+    int id = it->first;
+    Agent* m = it->second;
+    int parentid = m->parent_id_;
+
+    if (parentid == -1) {  // root agent
+      m->Connect(NULL);
+      agents_[id] = m;
+      ++it;
+      unbuilt.erase(id);
+      enter_list.push_back(m);
+    } else if (agents_.count(parentid) > 0) {  // parent is built
+      m->Connect(agents_[parentid]);
+      agents_[id] = m;
+      ++it;
+      unbuilt.erase(id);
+      enter_list.push_back(m);
+    } else {  // parent not built yet
+      ++it;
+    }
+    if (it == unbuilt.end()) {
+      it = unbuilt.begin();
+    }
+  }
+
+  // notify all agents that they are active in a simulation AFTER the
+  // parent-child hierarchy has been reconstructed.
+  for (int i = 0; i < enter_list.size(); ++i) {
+    enter_list[i]->EnterNotify();
+  }
+
+  ////////// clone and load all agent inventories /////////
+  for (its = src->agent_list_.begin(); its != src->agent_list_.end(); ++its) {
+    Agent* orig = *its;
+    if (orig->enter_time() < 0) {
+      // not a live agent
+      continue;
+    }
+
+    Agent* a = agents_[orig->id()];
+    Inventories invs = orig->SnapshotInv();
+    Inventories copyinvs;
+    Inventories::iterator invit;
+    for (invit = invs.begin(); invit != invs.end(); ++invit) {
+      std::string name = invit->first;
+      std::vector<Resource::Ptr>& resvec = invit->second;
+      std::vector<Resource::Ptr> copyvec;
+      for (int i = 0; i < resvec.size(); i++) {
+        // TODO: note that cloned resources are untracked w.r.t. the database.  In
+        // the future, we might want to find a way to mark them as tracked so
+        // the users of a cloned context can see resource/material info in the
+        // in-mem database.
+        copyvec.push_back(resvec[i]->Clone());
+      }
+      copyinvs[name] = copyvec;
+    }
+    a->InitInv(copyinvs);
+  }
+
+  ////////// clone build and decom schedules //////////////
+  std::map<int, std::vector<std::pair<std::string, Agent*> > >::iterator bit;
+  std::map<int, std::vector<std::pair<std::string, Agent*> > > builds = src->ti_->build_queue_;
+  for (bit = builds.begin(); bit != builds.end(); ++bit) {
+    int t = bit->first;
+    if (t < context()->time()) {
+      // skip builds in the past
+      continue;
+    }
+    std::vector<std::pair<std::string, Agent*> > list = bit->second;
+    for (int i = 0; i < list.size(); i++) {
+      Agent* orig = list[i].second;
+      if (orig != NULL) {
+        Agent* a = agents_[orig->id_];
+        dst->ti_->build_queue_[t].push_back(std::make_pair(list[i].first, a));
+      } else {
+        dst->ti_->build_queue_[t].push_back(std::make_pair(list[i].first, orig));
+      }
+    }
+  }
+
+  std::map<int, std::vector<Agent*> >::iterator dit;
+  std::map<int, std::vector<Agent*> >& decoms = src->ti_->decom_queue_;
+  for (dit = decoms.begin(); dit != decoms.end(); ++dit) {
+    int t = dit->first;
+    if (t < context()->time()) {
+      // skip builds in the past
+      continue;
+    }
+    std::vector<Agent*>& list = dit->second;
+    for (int i = 0; i < list.size(); i++) {
+      Agent* srca = list[i];
+      int id = srca->id_;
+      Agent* a = agents_[id];
+      dst->ti_->decom_queue_[t].push_back(a);
+    }
+  }
+
 }
 
 void SimInit::Init(Recorder* r, QueryableBackend* b) {
@@ -33,10 +209,25 @@ void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
                              " tested. Its behavior may change in future"
                              " releases.");
   rec_ = new Recorder();
+  todel_rec_ = rec_;
   InitBase(b, sim_id, t);
   si_.parent_sim = sim_id;
   si_.parent_type = "restart";
   si_.branch_time = t;
+  ctx_->InitSim(si_);  // explicitly force this to show up in the new simulations output db
+}
+
+void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t, int dur) {
+  Warn<EXPERIMENTAL_WARNING>("restart capability is not finalized and fully"
+                             " tested. Its behavior may change in future"
+                             " releases.");
+  rec_ = new Recorder();
+  todel_rec_ = rec_;
+  InitBase(b, sim_id, t);
+  si_.parent_sim = sim_id;
+  si_.parent_type = "restart";
+  si_.branch_time = t;
+  si_.duration = dur;
   ctx_->InitSim(si_);  // explicitly force this to show up in the new simulations output db
 }
 
@@ -47,6 +238,7 @@ void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
 
 void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   ctx_ = new Context(&ti_, rec_);
+  ctx_->db_ = b;
 
   std::vector<Cond> conds;
   conds.push_back(Cond("SimId", "==", simid));

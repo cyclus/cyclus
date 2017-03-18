@@ -36,6 +36,10 @@ std::vector<std::string> split(const std::string& s, char delim) {
 }
 
 SqliteBack::~SqliteBack() {
+  // the statements must all be deallocated before the database will allow
+  // itself to be closed:
+  stmts_.clear();
+
   try {
     Flush();
     db_.close();
@@ -289,6 +293,7 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
   CYCLUS_BINDVAL(VECTOR_INT, std::vector<int>);
   CYCLUS_BINDVAL(VECTOR_DOUBLE, std::vector<double>);
   CYCLUS_BINDVAL(VECTOR_STRING, std::vector<std::string>);
+  CYCLUS_BINDVAL(VECTOR_VECTOR_INT, std::vector<std::vector<int> >);
   CYCLUS_BINDVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
   CYCLUS_BINDVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
   CYCLUS_BINDVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
@@ -393,6 +398,7 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
   CYCLUS_LOADVAL(VECTOR_INT, std::vector<int>);
   CYCLUS_LOADVAL(VECTOR_DOUBLE, std::vector<double>);
   CYCLUS_LOADVAL(VECTOR_STRING, std::vector<std::string>);
+  CYCLUS_LOADVAL(VECTOR_VECTOR_INT, std::vector<std::vector<int> >);
   CYCLUS_LOADVAL(MAP_INT_DOUBLE, std::map<int CYCLUS_COMMA double>);
   CYCLUS_LOADVAL(MAP_INT_INT, std::map<int CYCLUS_COMMA int>);
   CYCLUS_LOADVAL(MAP_INT_STRING, std::map<int CYCLUS_COMMA std::string>);
@@ -482,6 +488,7 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
     type_map[&typeid(std::vector<int>)] = VECTOR_INT;
     type_map[&typeid(std::vector<double>)] = VECTOR_DOUBLE;
     type_map[&typeid(std::vector<std::string>)] = VECTOR_STRING;
+    type_map[&typeid(std::vector<std::vector<int> >)] = VECTOR_VECTOR_INT;
     type_map[&typeid(std::list<int>)] = LIST_INT;
     type_map[&typeid(std::list<std::string>)] = LIST_STRING;
     type_map[&typeid(std::map<int, int>)] = MAP_INT_INT;

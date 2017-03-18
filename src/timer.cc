@@ -20,12 +20,23 @@ void Timer::RunSim() {
 
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
+
+  Recorder rec((unsigned int)2);
+
   while (time_ < si_.duration) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
 
     if (want_snapshot_) {
       want_snapshot_ = false;
       SimInit::Snapshot(ctx_);
+    }
+    if (want_clone_) {
+      want_clone_ = false;
+      if (sinit_ != NULL) {
+        delete sinit_;
+      }
+      sinit_ = new SimInit();
+      sinit_->Init(&rec, ctx_, si_.duration);
     }
 
     // run through phases
@@ -55,6 +66,14 @@ void Timer::RunSim() {
       ->Record();
 
   SimInit::Snapshot(ctx_);  // always do a snapshot at the end of every simulation
+
+  if (sinit_ != NULL) {
+    delete sinit_;
+  }
+}
+
+Context* Timer::SnapdContext() {
+  return sinit_->context();
 }
 
 void Timer::DoBuild() {
@@ -244,6 +263,12 @@ int Timer::dur() {
   return si_.duration;
 }
 
-Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
+Timer::Timer()
+    : time_(0),
+      si_(0),
+      want_snapshot_(false),
+      want_kill_(false),
+      want_clone_(false),
+      sinit_(NULL) {}
 
 }  // namespace cyclus

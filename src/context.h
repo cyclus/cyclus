@@ -248,6 +248,11 @@ class Context {
   /// the beginning of the next timestep.
   void Snapshot();
 
+  /// Schedules a clone of simulation context/state for
+  /// the beginning of the next timestep.  The clone can be retrieved by
+  /// calling GetClone().
+  void CloneSim();
+
   /// Schedules the simulation to be terminated at the end of this timestep.
   void KillSim();
 
@@ -282,6 +287,20 @@ class Context {
     return n_specs_[impl];
   }
 
+  inline QueryableBackend* db() {
+    return db_;
+  }
+
+  /// Flush records all buffered data to the output database.
+  void Flush() {
+    rec_->Flush();
+  }
+
+  // Returns a clone of the context as generated at the last call of Snapshot
+  // (with all agents and everything copied.  This is NULL unless Snapshot has
+  // been called at least once previously.
+  Context* GetClone();
+
  private:
   /// Registers an agent as a participant in the simulation.
   inline void RegisterAgent(Agent* a) {
@@ -310,6 +329,7 @@ class Context {
   Timer* ti_;
   ExchangeSolver* solver_;
   Recorder* rec_;
+  QueryableBackend* db_;
   int trans_id_;
 };
 
