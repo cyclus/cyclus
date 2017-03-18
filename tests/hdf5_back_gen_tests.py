@@ -14,10 +14,11 @@ import cyclus.typesystem as ts
 
 cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
-from hdf5_back_gen import resolve_unicode, convert_canonical, init_dicts, ORIGIN_DICT
+import hdf5_back_gen
+#from hdf5_back_gen import resolve_unicode, convert_canonical, setup, ORIGIN_DICT
 
 #Call to hdf5_back_gen function 
-init_dicts()
+hdf5_back_gen.setup()
 
 is_primitive = lambda canon: isinstance(canon, str)
 
@@ -29,7 +30,7 @@ CANON_TO_VL = {}
 def setup():
     with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
                        'dbtypes.json')) as f:
-        RAW_TABLE = resolve_unicode(json.load(f))
+        RAW_TABLE = hdf5_back_gen.resolve_unicode(json.load(f))
     
     VERSION = ""
     TABLE_START = 0
@@ -48,7 +49,7 @@ def setup():
         if row[6] == 1 and row[4] == "HDF5" and row[5] == VERSION:        
             db = row[1]
             is_vl = row[8]
-            canon = convert_canonical(row[7])
+            canon = hdf5_back_gen.convert_canonical(row[7])
             if canon not in CANON_TYPES:
                 CANON_TYPES.append(canon)
             CANON_TO_DB[canon] = db
@@ -75,7 +76,7 @@ TYPE_SHAPE = 0
 TYPE_FUNCTION = 1
 TYPE_CANON = 2
 CONTAINER_MIN = 4
-CONTAINER_MAX = 10
+CONTAINER_MAX = 8
 def generate_meta(canon, depth=0):
     """Produces metadata about a type to be created.
     
@@ -98,7 +99,7 @@ def generate_meta(canon, depth=0):
     meta_shape = []
     my_shape = None
     my_type = None
-    origin = ORIGIN_DICT[canon]
+    origin = hdf5_back_gen.ORIGIN_DICT[canon]
     if is_primitive(canon):
         if CANON_TO_VL[canon]:
             my_shape = -1
@@ -185,7 +186,7 @@ def populate(meta):
     my_type = current_type[TYPE_FUNCTION]
     canon = current_type[TYPE_CANON]
     data = my_type()
-    origin = ORIGIN_DICT[canon]
+    origin = hdf5_back_gen.ORIGIN_DICT[canon]
     if is_primitive(canon):
         if origin == 'STRING' or origin == 'BLOB':
             if my_shape > 0:
@@ -256,15 +257,17 @@ def generate_and_test():
         rec.register_backend(back)
         data_meta = generate_meta(i)
         shape = get_shape(data_meta)
+        print("shape: ", shape)
         data = []
         for j in range(ROW_NUM):
             data.append(populate(data_meta))
-            d = rec.new_datum("test0")
-            d.add_val("col0", data[j], shape=shape, type=ts.IDS[CANON_TO_DB[i]])
-            d.record()
-            rec.flush()
         exp = pd.DataFrame({'col0': data}, columns=['col0'])
         print("expected: \n", exp)
+        for j in data:
+            d = rec.new_datum("test0")
+            d.add_val("col0", j, shape=shape, type=ts.IDS[CANON_TO_DB[i]])
+            d.record()
+            rec.flush()
         obs = back.query("test0")
         print("observed: \n", obs)
         yield assert_frame_equal, exp, obs

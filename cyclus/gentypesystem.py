@@ -562,6 +562,7 @@ TO_PY_CONVERTERS = {
         '    {valname} = deref(it{var}).second\n'
         '    {valbody.indent4}\n'
         '    pyval = {valexpr}\n'
+        '    pykey = {keyexpr}\n'
         '    py{var}[pykey] = pyval\n'
         '    inc(it{var})\n',
         'py{var}'),
@@ -648,6 +649,7 @@ TO_CPP_CONVERTERS = {
     'std::set': (
         '{valdecl}\n'
         'cdef std_set[{valtype}] cpp{var}\n',
+        'cpp{var} = std_set[{valtype}]()\n'
         'for {valname} in {var}:\n'
         '    {valbody.indent4}\n'
         '    cpp{var}.insert({valexpr})\n',
@@ -656,6 +658,7 @@ TO_CPP_CONVERTERS = {
         '{keydecl}\n'
         '{valdecl}\n'
         'cdef {type} cpp{var}\n',
+        'cpp{var} = {type}()\n'
         'if not isinstance({var}, collections.Mapping):\n'
         '    {var} = dict({var})\n'
         'for {keyname}, {valname} in {var}.items():\n'
@@ -677,6 +680,7 @@ TO_CPP_CONVERTERS = {
     'std::list': (
         '{valdecl}\n'
         'cdef std_list[{valtype}] cpp{var}\n',
+        'cpp{var} = std_list[{valtype}]()\n'
         'for {valname} in {var}:\n'
         '    {valbody.indent4}\n'
         '    cpp{var}.push_back({valexpr})\n',
@@ -686,6 +690,7 @@ TO_CPP_CONVERTERS = {
         'cdef int {var}_size\n'
         'cdef {type} cpp{var}\n'
         'cdef {valtype} * {var}_data\n',
+        'cpp{var} = {type}()\n'
         '{var}_size = len({var})\n'
         'if isinstance({var}, np.ndarray) and '
         '(<np.ndarray> {var}).descr.type_num == {nptypes[0]}:\n'
@@ -701,6 +706,7 @@ TO_CPP_CONVERTERS = {
         'cdef int i\n'
         'cdef int {var}_size\n'
         'cdef {type} cpp{var}\n',
+        'cpp{var} = {type}()\n'
         '{var}_size = len({var})\n'
         'cpp{var}.resize(<size_t> {var}_size)\n'
         'for i, {valname} in enumerate({var}):\n'

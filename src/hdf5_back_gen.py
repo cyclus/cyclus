@@ -1,11 +1,42 @@
 #!/usr/bin/env python
-"""This module generates HDF5 backend code found in src/hdf5_back.cc"""
+"""This module generates HDF5 backend code found in src/hdf5_back.cc
+
+There are 8 distinct code generation options, one of which must be passed 
+as an argument to this module. They are CREATE, QUERY, VL_DATASET, 
+FILL_BUF, WRITE, VAL_TO_BUF_H, VAL_TO_BUF, and BUF_TO_VAL. Each of these 
+generates a different section of Hdf5 backend code. All are invoked by 
+src/CMakeLists.txt prior to C++ compilation. However, for debugging purposes, 
+each section can be printed individually by passing that section's identifier 
+as a command line argument. The entry point for each of these generation 
+routines is the function main_XXXX, where XXXX is a generation option.
+
+Example
+-------
+To generate the code found in src/hdf5_back.cc::Query, use
+
+    $ python hdf5_back_gen.py QUERY
+
+"""
 import os
 import sys
 import json
 from pprint import pformat
 from itertools import chain
 from collections import OrderedDict
+
+MAIN_DISPATCH = {}
+
+CANON_TO_NODE = {}
+CANON_TYPES = []
+DB_TO_CPP = {}
+CANON_TO_DB = {}
+DB_TO_VL = {}
+INDENT = '  '
+
+NOT_VL = []
+VARIATION_DICT = OrderedDict()
+ORIGIN_DICT = OrderedDict()
+ORIGIN_TO_VL = {}
 
 is_primitive = lambda t: isinstance(t.canon, str)
 
@@ -146,10 +177,11 @@ class PrettyFormatter(Visitor):
         return s
 
 class CppGen(Visitor):
-    def __init__(self, tree=None, indent='  '):
+    def __init__(self, tree=None, indent='  ', debug=False):
         super(CppGen, self).__init__(tree=tree)
         self.level = 0
         self.indent = indent
+        self.debug = debug
         
     def visit_var(self, node):
         return node.name
@@ -165,7 +197,10 @@ class CppGen(Visitor):
     
     def visit_exprstmt(self, node):
         s = self.visit(node.child)
-        s += ";\n"
+        s += ";"
+        if self.debug:
+            s = "std::cout << \"HDF5_DEBUG: " + s.replace('"', '\\"') + "\" << std::endl;\n" + s
+        s += '\n'
         return s
     
     def visit_assign(self, node):
@@ -281,7 +316,7 @@ class CppGen(Visitor):
                 if i < (len(node.targs)-1):
                     s += ","
             s += ">\n"
-            #We've taken care of the targs and no longer need them to appear
+            # We've taken care of the targs and no longer need them to appear
             node.targs = None
         s += self.visit(node.type)
         s += " "
@@ -330,31 +365,6 @@ def resolve_unicode(item):
             pass
         return item
 
-with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
-                       'dbtypes.json')) as f:
-    RAW_TABLE = resolve_unicode(json.load(f))
-
-VERSION = ""
-TABLE_START = 0
-TABLE_END = 0
-for row in range(len(RAW_TABLE)):
-    current = tuple(RAW_TABLE[row])
-    if current[4] == "HDF5":
-        if current[5] > VERSION:
-            VERSION = current[5]
-            TABLE_START = row
-        if current[5] == VERSION:
-            TABLE_END = row    
-
-TYPES_TABLE = list(tuple(row) for row in RAW_TABLE[TABLE_START:TABLE_END+1])
-
-CANON_TO_NODE = {}
-CANON_TYPES = []
-DB_TO_CPP = {}
-CANON_TO_DB = {}
-DB_TO_VL = {}
-INDENT = '  '
-
 def convert_canonical(raw_list):
     """Converts JSON list of lists to tuple of tuples.
     
@@ -371,18 +381,6 @@ def convert_canonical(raw_list):
     if isinstance(raw_list, str):
         return raw_list
     return tuple(convert_canonical(x) for x in raw_list)
-        
-for row in TYPES_TABLE:
-    if row[6] == 1 and row[4] == "HDF5" and row[5] == VERSION:        
-        db = row[1]
-        cpp = row[2]
-        canon = convert_canonical(row[7])
-        if canon not in CANON_TYPES:
-            CANON_TYPES.append(canon)
-        DB_TO_CPP[db] = cpp
-        CANON_TO_DB[canon] = db
-        CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
-        DB_TO_VL[db] = row[8]
 
 def list_dependencies(canon):
     """Return a list of a type's dependencies, each in canonical form.
@@ -555,7 +553,10 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
         node = Block(nodes=setup_nodes)
     else:
         if DB_TO_VL[t.db]:
-            return Nothing()
+            setup_nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
+                                                         target=Var(name=total_size_var),
+                                                         value=Raw(code="CYCLUS_SHA1_SIZE"))))
+            return Block(nodes=setup_nodes)
         
         multi_items = (len(t.canon[1:]) > 1)
         
@@ -1317,7 +1318,7 @@ PRIMITIVE_SIZES = {"INT": "sizeof(int)",
 VL_TO_FL_CONTAINERS = {"VL_VECTOR": "VECTOR",
                        "VL_SET": "SET",
                        "VL_LIST": "LIST",
-                       "VL_MAP": "MAP"}
+                       "VL_MAP": "MAP"}   
 
 def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
     """HDF5 Create: Build specified HDF5 type, recursively if necessary.
@@ -1382,6 +1383,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
         container_type = t.canon[0]
         canon_shape = list(zip(t.canon, dim_shape))
         is_vl = vl_flag
+        
         if DB_TO_VL[t.db]:
             container_type = VL_TO_FL_CONTAINERS[t.canon[0]]
             is_vl = True
@@ -1442,7 +1444,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                 # However, if the current opened stack is longer, the first new
                 # variable there will be our child variable.
                 else:
-                    child_item_var = opened_stack[pre_opened_len]
+                    child_item_var = opened_stack[-1]
                 # 2. Get item sizes.
                 child_dict[child_item_var] = get_item_size(item_node, 
                                                            child_array,
@@ -1461,16 +1463,26 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
             opened_stack.append(item_var)
             # 4. Insert individual children into the compound type.            
             node.nodes.append(hdf5_insert(container_type, item_var, child_dict))
-            
-        if container_type in variable_length_types and not DB_TO_VL[t.db]:
+        
+        if vl_flag and t.canon not in NOT_VL:
+            node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
+                                                    value=Raw(code='sha1_type_'))))
+            node.nodes.append(VL_ADD_BLOCK(ORIGIN_TO_VL[ORIGIN_DICT[t.canon]], item_var))
+        
+        elif container_type in variable_length_types and not DB_TO_VL[t.db]:
             array_node = ExprStmt(child=Assign(target=Var(name=type_var),
                                                value=hdf5_array_create(
                                                            item_var,
                                                            rank=1,
                                                            dims="&"+shape_var)))
-            
             opened_stack.append(type_var)
             node.nodes.append(array_node)
+            
+        if DB_TO_VL[t.db] and depth > 0:
+            node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
+                                                    value=Raw(code='sha1_type_'))))
+            node.nodes.append(VL_ADD_BLOCK(t, item_var))
+
     return node, opened_stack
 
 def get_item_size(t, shape_array=None, vl_flag=False, depth=0):
@@ -1506,7 +1518,7 @@ def get_item_size(t, shape_array=None, vl_flag=False, depth=0):
                 return "CYCLUS_SHA1_SIZE"
     else:
         size = "("
-        if DB_TO_VL[t.db]:
+        if DB_TO_VL[t.db] or (vl_flag and t.canon not in NOT_VL):
             size += "CYCLUS_SHA1_SIZE"
         else:
             size += "("
@@ -1846,7 +1858,7 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
     if is_primitive(t):
         return setup
     else:
-        #Setup prefixes and container-level length variable.
+        # Setup prefixes and container-level length variable.
         container = t.canon[0]
         if DB_TO_VL[t.db]:
             container = VL_TO_FL_CONTAINERS[container]
@@ -1861,7 +1873,7 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
                                                             +"]"))))
         prefixes = template_args[container]
         
-        #Add setup of any children.
+        # Add setup of any children.
         for c, s, p in zip(t.canon[1:], shape_array[1:], prefixes):
             node = CANON_TO_NODE[c]
             if isinstance(s, int):
@@ -1871,7 +1883,7 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
         total_item_size = get_variable("total_item_size", depth=depth, 
                                        prefix=prefix)
         
-        #Put together total_item_size variable.
+        # Put together total_item_size variable.
         children = []
         for i in range(len(t.canon[1:])):
             children.append(get_variable("item_size", depth=depth+1, 
@@ -1887,7 +1899,7 @@ def get_write_setup(t, shape_array, depth=0, prefix=""):
                                                target=Var(name=total_item_size),
                                                value=Raw(
                                                      code="+".join(children)))))        
-        #remove elements that exceed column.
+        # remove elements that exceed column.
         if depth == 0 and not DB_TO_VL[t.db]:
             if container in variable_length_types:
                 variable = get_variable("val", depth=depth, prefix=prefix)
@@ -2027,9 +2039,9 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     result = Block(nodes=[])
     body_nodes = []
     keywords = {}
-    #Depth 0 should have no specified fixed_var variable. If this type is a 
-    #child, we'll want to use the child variable that was created for it
-    #by its parent.
+    # Depth 0 should have no specified fixed_var variable. If this type is a 
+    # child, we'll want to use the child variable that was created for it
+    # by its parent.
     if fixed_var == None:
         fixed_var = get_variable("fixed_val", depth=depth, prefix=prefix)
     result.nodes.append(ExprStmt(child=Decl(type=Type(cpp=t.cpp),
@@ -2061,7 +2073,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
         child_variable = get_variable("child", depth=depth+1, 
                                       prefix=prefix+prefixes[count])
         if is_primitive(child_node):
-            #Strings are the only primitive we are looking for
+            # Strings are the only primitive we are looking for
             item_size = get_variable("item_size", depth=depth+1, 
                                      prefix=prefix+prefixes[count])
             if child_node.db == 'STRING':
@@ -2074,39 +2086,44 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                                    value=Raw(
                                                            code=constructor))))
                 keywords[child_keyword] = child_variable
-            #Leave other primitives alone.
+            # Leave other primitives alone.
             else:
                 keywords[child_keyword] = children[count]   
         else:
-            #All VL containers
+            # All VL containers
             if DB_TO_VL[child_node.db]:
                 if is_all_vl(child_node):
-                    #Skip child
+                    # Skip child
                     keywords[child_keyword] = children[count]
                 else:
-                    #Recursion for VL containers may work this way                                 
+                    # Recursion for VL containers may work this way                                 
                     body_nodes.append(pad_children(child_node, children[count],
                                                    fixed_var=child_variable,
                                                    depth=depth+1, 
                                                    prefix=prefix
                                                           +prefixes[count]))
                     keywords[child_keyword] = child_variable
-            #FL variable length containers
+            # FL variable length containers
             elif child_node.canon[0] in variable_length_types:
-                length = get_variable("length", depth=depth+1, 
+                child_length = get_variable("length", depth=depth+1, 
                                       prefix=prefix+prefixes[count])
+                child_pad_count = get_variable("pad_count", depth=depth+1, 
+                                         prefix=prefix+prefixes[count])
                 body_nodes.append(pad_children(child_node, children[count],
                                                fixed_var=child_variable,
                                                depth=depth+1, prefix=prefix
                                                               +prefixes[count]))
-                size = "(" + length + "-" + pad_count + ")" + "*" + item_size
-                body_nodes.append(memset(children[count], str(0), size))
-                keywords[child_keyword] = children[count]
-            #PAIRS, etc.
+                # attempt to resize container
+                if child_node.canon[0] == 'VECTOR':
+                    body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
+                    size = "(" + child_length + "-" + child_pad_count + ")" + "*" + item_size
+                    body_nodes.append(memset("&"+child_variable, str(0), size))
+                keywords[child_keyword] = child_variable
+            # PAIRS, etc.
             else:
-                #Recursive call on the PAIR, using the parent iterator as the
-                #new origin variable. We specify that the fixed variable should
-                #simply be the 'child' variable we created in this loop.
+                # Recursive call on the PAIR, using the parent iterator as the
+                # new origin variable. We specify that the fixed variable should
+                # simply be the 'child' variable we created in this loop.
                 body_nodes.append(pad_children(child_node, children[count], 
                                                fixed_var=child_variable,
                                                depth=depth+1, prefix=prefix
@@ -2118,6 +2135,13 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     body_nodes.append(ExprStmt(child=Raw(code=assignment)))
     if container in variable_length_types:
         body_nodes.append(ExprStmt(child=Raw(code="++" + pad_count)))
+        if depth != 0:
+            result.nodes.append(ExprStmt(child=DeclAssign(
+                                                  type=Type(cpp=t.cpp
+                                                                +"::iterator"),
+                                                  target=Raw(code=iterator),
+                                                  value=Raw(code=variable 
+                                                                 +".begin()"))))
         result.nodes.append(For(cond=BinOp(x=Var(name=iterator), op="!=", 
                                            y=Var(name=variable+".end()")),
                                 incr=Raw(code="++" + iterator), 
@@ -2155,22 +2179,22 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
         Nodes required for body of the function definition
     """
     result = Block(nodes=[])
-    #Determine if type is entirely variable length
+    # Determine if type is entirely variable length
     all_vl = is_all_vl(t)
-    #Declare and assign the 'val' variable
+    # Declare and assign the 'val' variable
     if depth == 0:
         variable = get_variable("val", depth=depth, prefix=prefix)
         result.nodes.append(a_cast(t))
         result.nodes.append(get_write_setup(t, shape_array))
         
-    #If entirely variable length, we can simply use the VLWrite definition
+    # If entirely variable length, we can simply use the VLWrite definition
     if all_vl:
         result.nodes.append(vl_write(t, variable, depth=depth, prefix=prefix, 
                                      pointer=pointer))
         key = get_variable("key", depth=depth, prefix=prefix)
         result.nodes.append(memcpy(offset, key + ".val", "CYCLUS_SHA1_SIZE"))
         return result
-    #Handle primitive bodies 
+    # Handle primitive bodies 
     if is_primitive(t):
         if t.db in WRITE_BODY_PRIMITIVES:
             result.nodes.append(WRITE_BODY_PRIMITIVES[t.db](t, depth=depth, 
@@ -2185,9 +2209,9 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                      offset=offset,
                                                      pointer=pointer))
         return result
-    #Handle potentially variable length bodies
+    # Handle potentially variable length bodies
     else:
-        #Declare count and iterator variables for the loop.
+        # Declare count and iterator variables for the loop.
         count = get_variable("count", depth=depth, prefix=prefix)
         result.nodes.append(ExprStmt(child=DeclAssign(
                                                   type=Type(cpp="unsigned int"),
@@ -2195,10 +2219,10 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                   value=Raw(code="0"))))
         iterator = get_variable("it", depth=depth, prefix=prefix)
         total_size = get_variable("total_item_size", depth=depth, prefix=prefix)
-        #Recursively gather child bodies
+        # Recursively gather child bodies
         child_bodies = []
         container = t.canon[0]
-        #Handle variable length container
+        # Handle variable length container
         if DB_TO_VL[t.db]:
             container = VL_TO_FL_CONTAINERS[container]
             prefixes = template_args[container]
@@ -2214,7 +2238,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                          prefix=prefix))
             key = get_variable("key", depth=depth, prefix=prefix)
             result.nodes.append(memcpy(offset, key + ".val", "CYCLUS_SHA1_SIZE"))
-        #Handle fixed length containers
+        # Handle fixed length containers
         else:
             new_variable = variable
             if container in variable_length_types:
@@ -2253,7 +2277,8 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                               +partial_size))
                     partial_size += "+" + child_size
             if container in variable_length_types:
-                #For loop uses child bodies
+                labels = ['->first', '->second']
+                # For loop uses child bodies
                 result.nodes.append(ExprStmt(child=DeclAssign(
                                                   type=Type(cpp=t.cpp
                                                                 +"::iterator"),
@@ -2269,7 +2294,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                               +".end()")),
                                         incr=Raw(code="++" + new_variable),
                                         body=child_bodies))
-                #Add memset statement outside of loop
+                # Add memset statement outside of loop
                 container_length = get_variable("length", depth=depth, 
                                                 prefix=prefix)
                 dest = offset + "+" + total_size + "*" + count
@@ -2289,7 +2314,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
         
 def main_write():
     """HDF5 Write: Generate the WriteToBuf templated function definitions."""
-    CPPGEN = CppGen()
+    CPPGEN = CppGen(debug=False)
     output = ""
     for i in CANON_TYPES:
         block = Block(nodes=[])
@@ -2341,7 +2366,7 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
         of 0 and 1 representing FL and VL types, respectively. 
     """
     node = Block(nodes=[])
-    #Handle specializations for VLValToBuf and VLBufToVal functions.
+    # Handle specializations for VLValToBuf and VLBufToVal functions.
     if depth == 0:
         if spec == 'TO_BUF':
             node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
@@ -2363,7 +2388,7 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
     prefixes = template_args[container]
     children = t.canon[1:]
     vl_list = []
-    #Iterate, determine sizes and whether type is VL
+    # Iterate, determine sizes and whether type is VL
     for c, p in zip(children, prefixes):
         child_node = CANON_TO_NODE[c]
         variable = get_variable("item_size", depth=depth+1, prefix=prefix+p)
@@ -2387,7 +2412,7 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
                                                    prefix=prefix+p)
             node.nodes.append(new_node)
             vl_list.append(new_list)
-    #Unpack and declare all child sizes.
+    # Unpack and declare all child sizes.
     for k, v in child_sizes.items():
         node.nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="size_t"),
                                                     target=Raw(code=k),
@@ -2398,7 +2423,7 @@ def to_from_buf_setup(t, depth=0, prefix="", spec=None):
                                         target=Raw(code=total_var),
                                         value=Raw(
                                            code="+".join(child_sizes.keys())))))
-    #Further specializations.
+    # Further specializations.
     if depth == 0:
         if spec == 'TO_BUF':
             node.nodes.append(ExprStmt(child=DeclAssign(
@@ -2450,9 +2475,9 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
     children = t.canon[1:]
     loop_block = Block(nodes=[])
     new_offset = offset
-    #If a container is VL and has multiple children, we'll need to use pointer 
-    #notation to access the child data. Otherwise, we can use normal dot 
-    #notation.
+    # If a container is VL and has multiple children, we'll need to use pointer 
+    # notation to access the child data. Otherwise, we can use normal dot 
+    # notation.
     if t.canon[0] in variable_length_types:
         count_var = get_variable("count", depth=depth, prefix=prefix)
         block.nodes.append(ExprStmt(child=DeclAssign(type=Type(
@@ -2472,8 +2497,8 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
     else: 
         labels = ['.first', '.second']
         new_variable = variable
-    #Containers with only one child can simply use the iterator to reference
-    #their child data.
+    # Containers with only one child can simply use the iterator to reference
+    # their child data.
     if len(children) == 1:
         new_variable = "*" + new_variable
         labels = ['']
@@ -2481,26 +2506,26 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
         child_node = CANON_TO_NODE[child]
         child_var = new_variable + label
         item_size = get_variable("item_size", depth=depth+1, prefix=prefix+part)
-        #For variable length types we must use VLWrite to get the SHA1
+        # For variable length types we must use VLWrite to get the SHA1
         if vl == 1:
             loop_block.nodes.append(vl_write(ORIGIN_TO_VL[child], child_var, 
                                              depth=depth+1, prefix=prefix+part))
             key_var = get_variable("key", depth=depth+1, prefix=prefix+part)
             loop_block.nodes.append(memcpy(new_offset, key_var+".val", 
                                            item_size))
-        #Other primitives can be copied
+        # Other primitives can be copied
         elif vl == 0:
             loop_block.nodes.append(memcpy(new_offset, "&("+child_var+")", 
                                           item_size))
-        #Other containers must be handled recursively.
+        # Other containers must be handled recursively.
         else:
             loop_block.nodes.append(to_buf_body(child_node, vl, depth=depth+1,
                                     prefix=prefix+part, variable=child_var, 
                                     offset=new_offset))
-        #Update current offset.
+        # Update current offset.
         new_offset += "+" + item_size
     
-    #For variable length containers, add the for loop.        
+    # For variable length containers, add the for loop.        
     if t.canon[0] in variable_length_types:    
         block.nodes.append(For(cond=BinOp(x=Var(name=iter_var), op="!=", 
                                           y=Var(name=variable+".end()")),
@@ -2510,7 +2535,7 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
                                                       op="++", 
                                                       name=Var(
                                                             name=count_var)))]))
-    #Other containers don't need a loop (i.e. pair).
+    # Other containers don't need a loop (i.e. pair).
     else:
         block.nodes.append(loop_block)
     if depth == 0:
@@ -2523,15 +2548,16 @@ def main_val_to_buf():
     output = ""
     block = Block(nodes=[])
     for i in VARIATION_DICT:
-        t = CANON_TO_NODE[i]
-        if t.canon[0] in variable_length_types:
-            setup, vl_list = to_from_buf_setup(t, spec='TO_BUF')
-            node = FuncDef(type=Type(cpp="hvl_t"),
-                           name=Var(name="Hdf5Back::VLValToBuf"),
-                           args=[Decl(type=Type(cpp="const "+t.cpp+"&"),
-                                      name=Var(name="x"))],
-                           body=[setup, to_buf_body(t, vl_list)])
-            block.nodes.append(node)
+        if VARIATION_DICT[i]:
+            t = CANON_TO_NODE[i]
+            if t.canon[0] in variable_length_types:
+                setup, vl_list = to_from_buf_setup(t, spec='TO_BUF')
+                node = FuncDef(type=Type(cpp="hvl_t"),
+                               name=Var(name="Hdf5Back::VLValToBuf"),
+                               args=[Decl(type=Type(cpp="const "+t.cpp+"&"),
+                                          name=Var(name="x"))],
+                               body=[setup, to_buf_body(t, vl_list)])
+                block.nodes.append(node)
     output += CPPGEN.visit(block)
     return output
     
@@ -2541,17 +2567,18 @@ def main_val_to_buf_h():
     output = ""
     block = Block(nodes=[])
     for i in VARIATION_DICT:
-        node = CANON_TO_NODE[i]
-        if node.canon[0] in variable_length_types:
-            decl = ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
-                                       name=FuncCall(
-                                             name=Var(name="VLValToBuf"),
-                                             args=[Decl(type=Type(
-                                                                cpp="const "
-                                                                    +node.cpp
-                                                                    +"&"),
-                                                        name=Raw(code="x"))])))
-            block.nodes.append(decl)
+        if VARIATION_DICT[i]:
+            node = CANON_TO_NODE[i]
+            if node.canon[0] in variable_length_types:
+                decl = ExprStmt(child=Decl(type=Type(cpp="hvl_t"),
+                                           name=FuncCall(
+                                                 name=Var(name="VLValToBuf"),
+                                                 args=[Decl(type=Type(
+                                                                    cpp="const "
+                                                                        +node.cpp
+                                                                        +"&"),
+                                                            name=Raw(code="x"))])))
+                block.nodes.append(decl)
     output += CPPGEN.visit(block)
     output = indent(output, INDENT)
     return output
@@ -2635,13 +2662,13 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
     """
     block = Block(nodes=[])
     child_count = 0
-    #argument dict, for unpacking later in str formatting
+    # argument dict, for unpacking later in str formatting
     args = {}
     args['var'] = variable
     total_item_size = get_variable('total_item_size', depth=depth, 
                                    prefix=prefix)
     count = get_variable('count', depth=depth, prefix=prefix)
-    #set default offset if none given
+    # set default offset if none given
     if offset == None:
         offset = 'p+' + "(" + total_item_size + '*' + count + ")"
     container = t.canon[0]
@@ -2652,14 +2679,14 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
         child_size = get_variable('item_size', depth=depth+1, 
                                   prefix=prefix+part)
         child_arg = 'child' + str(child_count)
-        #any variable length type can be resolved using VLRead, even containers
+        # any variable length type can be resolved using VLRead, even containers
         if vl == 1:
             loop_block.nodes.append(ExprStmt(child=DeclAssign(
                                                      type=type_node,
                                                      target=Var(name=child_var),
                                                      value=vl_read(type_node, 
                                                                    offset))))
-        #read in primitive, fixed-length types
+        # read in primitive, fixed-length types
         elif vl == 0:
             loop_block.nodes.append(ExprStmt(child=DeclAssign(
                                                      type=type_node,
@@ -2668,8 +2695,8 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
                                                                   type_node, 
                                                                   offset,
                                                                   deref=True))))
-        #structures which are neither primitive nor VL, i.e. std::pairs, must
-        #be handled recursively
+        # structures which are neither primitive nor VL, i.e. std::pairs, must
+        # be handled recursively
         else:
             loop_block.nodes.append(ExprStmt(child=Decl(
                                                      type=type_node,
@@ -2681,9 +2708,9 @@ def to_val_body(t, vl_list, depth=0, prefix='', variable='x0', offset=None):
         args[child_arg] = child_var
         offset += "+" + child_size
         child_count += 1
-    #This is the expression which adds a type to a given container, formatted 
-    #with the variables associated with child types. This must be placed in a 
-    #for loop if the container is variable length.
+    # This is the expression which adds a type to a given container, formatted 
+    # with the variables associated with child types. This must be placed in a 
+    # for loop if the container is variable length.
     container_expr = CONTAINER_INSERT_STRINGS[container].format(**args)
     if container in variable_length_types:
         block.nodes.append(ExprStmt(child=DeclAssign(type=Type(
@@ -2708,37 +2735,55 @@ def main_buf_to_val():
     output = ""
     block = Block(nodes=[])
     for i in VARIATION_DICT:
-        t = CANON_TO_NODE[i]
-        if t.canon[0] in variable_length_types:
-            setup, vl_list = to_from_buf_setup(t, spec='TO_VAL')
-            node = FuncDef(type=Type(cpp=t.cpp),
-                           name=Var(name="Hdf5Back::VLBufToVal"),
-                           targs=[Raw(code=t.cpp)],
-                           args=[Decl(type=Type(cpp="const hvl_t&"),
-                                      name=Var(name="buf"))],
-                           body=[setup, to_val_body(t, vl_list)],
-                           tspecial=True)
-            block.nodes.append(node)
+        if VARIATION_DICT[i]:
+            t = CANON_TO_NODE[i]
+            if t.canon[0] in variable_length_types:
+                setup, vl_list = to_from_buf_setup(t, spec='TO_VAL')
+                node = FuncDef(type=Type(cpp=t.cpp),
+                               name=Var(name="Hdf5Back::VLBufToVal"),
+                               targs=[Raw(code=t.cpp)],
+                               args=[Decl(type=Type(cpp="const hvl_t&"),
+                                          name=Var(name="buf"))],
+                               body=[setup, to_val_body(t, vl_list)],
+                               tspecial=True)
+                block.nodes.append(node)
     output += CPPGEN.visit(block)
-    return output    
+    return output
 
-NOT_VL = []
-VARIATION_DICT = OrderedDict()
-ORIGIN_DICT = OrderedDict()
-ORIGIN_TO_VL = {}
-
-MAIN_DISPATCH = {"QUERY": main_query,
-                 "CREATE": main_create,
-                 "VL_DATASET": main_vl_dataset,
-                 "FILL_BUF": main_fill_buf,
-                 "WRITE": main_write,
-                 "VAL_TO_BUF_H": main_val_to_buf_h,
-                 "VAL_TO_BUF": main_val_to_buf,
-                 "BUF_TO_VAL": main_buf_to_val}
-
-def init_dicts():
+def setup():
     global NOT_VL
+    global MAIN_DISPATCH
     
+    with open(os.path.join(os.path.dirname(__file__), '..', 'share', 
+                       'dbtypes.json')) as f:
+        raw_table = resolve_unicode(json.load(f))
+
+    version = ""
+    table_start = 0
+    table_end = 0
+    for row in range(len(raw_table)):
+        current = tuple(raw_table[row])
+        if current[4] == "HDF5":
+            if current[5] > version:
+                version = current[5]
+                table_start = row
+            if current[5] == version:
+                table_end = row    
+    
+    types_table = list(tuple(row) for row in raw_table[table_start:table_end+1])
+               
+    for row in types_table:
+        if row[6] == 1 and row[4] == "HDF5" and row[5] == version:        
+            db = row[1]
+            cpp = row[2]
+            canon = convert_canonical(row[7])
+            if canon not in CANON_TYPES:
+                CANON_TYPES.append(canon)
+            DB_TO_CPP[db] = cpp
+            CANON_TO_DB[canon] = db
+            CANON_TO_NODE[canon] = Type(cpp=cpp, db=db, canon=canon)
+            DB_TO_VL[db] = row[8]
+
     fixed_length_types = []
     for n in CANON_TYPES:
         if no_vl(CANON_TO_NODE[n]) and n not in fixed_length_types:
@@ -2762,7 +2807,6 @@ def init_dicts():
             for j in VARIATION_DICT[i]:
                 ORIGIN_DICT[j.canon] = i
                 
-    NOT_VL = []
     for i in VARIATION_DICT.keys():
         node = CANON_TO_NODE[i]
         if DB_TO_VL[node.db]:
@@ -2780,6 +2824,15 @@ def init_dicts():
         node = CANON_TO_NODE[n]
         if is_all_vl(node):
             ORIGIN_TO_VL[ORIGIN_DICT[n]] = node
+            
+    MAIN_DISPATCH = {"QUERY": main_query,
+                     "CREATE": main_create,
+                     "VL_DATASET": main_vl_dataset,
+                     "FILL_BUF": main_fill_buf,
+                     "WRITE": main_write,
+                     "VAL_TO_BUF_H": main_val_to_buf_h,
+                     "VAL_TO_BUF": main_val_to_buf,
+                     "BUF_TO_VAL": main_buf_to_val}
 
 def main():
     try:
@@ -2788,7 +2841,7 @@ def main():
         raise ValueError("No generation instruction provided")    
     
     # Setup for global util dictionaries
-    init_dicts()
+    setup()
         
     # Dispatch to requested generation function
     function = MAIN_DISPATCH[gen_instruction]
