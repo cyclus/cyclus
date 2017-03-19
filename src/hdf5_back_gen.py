@@ -1437,14 +1437,23 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                 # if the previous opened stack and current stack are the same,
                 # we know that the child is a primitive, and we can generate
                 # its variable accordingly.
-                if  len(opened_stack) == pre_opened_len:
+                if (DB_TO_VL[t.db] and item_canon[0] in variable_length_types):
                     child_item_var = get_variable("item_type", 
                                                   prefix=new_prefix,
                                                   depth=depth+1)
-                # However, if the current opened stack is longer, the first new
-                # variable there will be our child variable.
+                elif DB_TO_VL[item_node.db]:
+                    child_item_var = get_variable("item_type", 
+                                                  prefix=new_prefix,
+                                                  depth=depth+1)
                 else:
-                    child_item_var = opened_stack[-1]
+                    if len(opened_stack) == pre_opened_len:
+                        child_item_var = get_variable("item_type", 
+                                                      prefix=new_prefix,
+                                                      depth=depth+1)
+                    # However, if the current opened stack is longer, the first new
+                    # variable there will be our child variable.
+                    else:
+                        child_item_var = opened_stack[-1]
                 # 2. Get item sizes.
                 child_dict[child_item_var] = get_item_size(item_node, 
                                                            child_array,
@@ -1477,11 +1486,12 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                                            dims="&"+shape_var)))
             opened_stack.append(type_var)
             node.nodes.append(array_node)
-            
+        
         if DB_TO_VL[t.db] and depth > 0:
             node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
                                                     value=Raw(code='sha1_type_'))))
             node.nodes.append(VL_ADD_BLOCK(t, item_var))
+            
 
     return node, opened_stack
 
@@ -2011,7 +2021,7 @@ def is_all_vl(t):
                 break
     return result
 
-def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
+def pad_children(t, variable, fixed_var=None, depth=0, prefix="", called_depth=0):
     """HDF5 Write: Pads FL children of VL parent types.
     
     This function is used on top-level VL container types which contain 1 or 
@@ -2026,6 +2036,8 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     fixed_var : None or str, optional
     depth : int, optional
     prefix : str, optional
+    called_depth : int, optional
+        Records the origin depth to determine when we're at relative depth=0
     
     Returns
     -------
@@ -2101,7 +2113,8 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                                    fixed_var=child_variable,
                                                    depth=depth+1, 
                                                    prefix=prefix
-                                                          +prefixes[count]))
+                                                          +prefixes[count],
+                                                   called_depth=called_depth))
                     keywords[child_keyword] = child_variable
             # FL variable length containers
             elif child_node.canon[0] in variable_length_types:
@@ -2111,8 +2124,9 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                          prefix=prefix+prefixes[count])
                 body_nodes.append(pad_children(child_node, children[count],
                                                fixed_var=child_variable,
-                                               depth=depth+1, prefix=prefix
-                                                              +prefixes[count]))
+                                               depth=depth+1, 
+                                               prefix=prefix+prefixes[count],
+                                               called_depth=called_depth))
                 # attempt to resize container
                 if child_node.canon[0] == 'VECTOR':
                     body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
@@ -2126,8 +2140,9 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                 # simply be the 'child' variable we created in this loop.
                 body_nodes.append(pad_children(child_node, children[count], 
                                                fixed_var=child_variable,
-                                               depth=depth+1, prefix=prefix
-                                                              +prefixes[count]))
+                                               depth=depth+1, 
+                                               prefix=prefix+prefixes[count],
+                                               called_depth=called_depth))
                 keywords[child_keyword] = child_variable
         count += 1
     
@@ -2135,7 +2150,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     body_nodes.append(ExprStmt(child=Raw(code=assignment)))
     if container in variable_length_types:
         body_nodes.append(ExprStmt(child=Raw(code="++" + pad_count)))
-        if depth != 0:
+        if depth > called_depth:
             result.nodes.append(ExprStmt(child=DeclAssign(
                                                   type=Type(cpp=t.cpp
                                                                 +"::iterator"),
@@ -2232,7 +2247,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                               value=Raw(code=variable 
                                                              +".begin()"))))
             result.nodes.append(pad_children(t, variable, depth=depth, 
-                                                    prefix=prefix))
+                                             prefix=prefix, called_depth=depth))
             fixed_val = get_variable("fixed_val", depth=depth, prefix=prefix)
             result.nodes.append(vl_write(t, fixed_val, depth=depth, 
                                          prefix=prefix))
