@@ -1271,20 +1271,9 @@ def get_variation_body(t):
                                                  op="=",
                                                  y=size_expression)))
     if DB_TO_VL[t.db]:
-        if is_primitive(t):
-            default_item_var = type_var
-        else:
-            if opened_types == []:
-                item_prefix = template_args[VL_TO_FL_CONTAINERS[t.canon[0]]][0]
-                default_item_var = get_variable("item_type", 
-                                                prefix=item_prefix,
-                                                depth=1)
-            else:
-                default_item_var = get_variable("item_type", prefix="", depth=1)
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
                                                y=Raw(code="sha1_type_"))))
-        body.nodes.append(VL_ADD_BLOCK(t, default_item_var))
     else:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
@@ -1476,10 +1465,13 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
             # 4. Insert individual children into the compound type.            
             node.nodes.append(hdf5_insert(container_type, item_var, child_dict))
         
-        if vl_flag and t.canon not in NOT_VL:
+        if is_vl and t.canon not in NOT_VL:
             node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
                                                     value=Raw(code='sha1_type_'))))
-            node.nodes.append(VL_ADD_BLOCK(ORIGIN_TO_VL[ORIGIN_DICT[t.canon]], item_var))
+            if vl_flag:
+                node.nodes.append(VL_ADD_BLOCK(ORIGIN_TO_VL[ORIGIN_DICT[t.canon]], item_var))
+            else:
+                node.nodes.append(VL_ADD_BLOCK(t, item_var))
         
         elif container_type in variable_length_types and not DB_TO_VL[t.db]:
             array_node = ExprStmt(child=Assign(target=Var(name=type_var),
@@ -1489,12 +1481,6 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                                            dims="&"+shape_var)))
             opened_stack.append(type_var)
             node.nodes.append(array_node)
-        
-        if DB_TO_VL[t.db] and depth > 0:
-            node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
-                                                    value=Raw(code='sha1_type_'))))
-            node.nodes.append(VL_ADD_BLOCK(t, item_var))
-            
 
     return node, opened_stack
 
@@ -1637,7 +1623,7 @@ def hdf5_insert(container_type, compound_var, types_sizes_dict):
 
 def main_query():
     """HDF5 Query: Generate Query case statement code."""
-    CPPGEN = CppGen()
+    CPPGEN = CppGen(debug=False)
     output = ""
     for type in CANON_TYPES:
         type_node = CANON_TO_NODE[type]
@@ -1671,7 +1657,7 @@ DEBUG_TYPES = ["VECTOR_STRING"]
 
 def main_create():
     """HDF5 Create: Generate CreateTable if-statements."""
-    CPPGEN = CppGen()
+    CPPGEN = CppGen(debug=False)
     output = ""
         
     outer_if_bodies = OrderedDict()
@@ -2071,7 +2057,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix="", called_depth=0
     keywords['var'] = fixed_var
     num = len(t.canon[1:])
     if num == 1:
-        children = ["*" + iterator]
+        children = ["(*" + iterator + ")"]
     else:
         if container in variable_length_types:
             members = ['->first', '->second']
@@ -2521,7 +2507,7 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
     # Containers with only one child can simply use the iterator to reference
     # their child data.
     if len(children) == 1:
-        new_variable = "*" + new_variable
+        new_variable = "(*" + new_variable + ")"
         labels = ['']
     for child, part, vl, label in zip(children, prefixes, vl_list, labels):
         child_node = CANON_TO_NODE[child]
@@ -2565,7 +2551,7 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
 
 def main_val_to_buf():
     """HDF5 VAL_TO_BUF: Generates VLValToBuf function."""
-    CPPGEN = CppGen()
+    CPPGEN = CppGen(debug=False)
     output = ""
     block = Block(nodes=[])
     for i in VARIATION_DICT:
