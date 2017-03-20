@@ -210,13 +210,13 @@ enum DbTypes {
 
   // map< string,  vector< pair<int,  pair<string string> > > >
   MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["HDF5", "SQLite"], ["MAP", "STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]]], false]
-  MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]]], false]
-  MAP_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]]], false]
-  MAP_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]]], false]
-  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "STRING", ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]]], false]
-  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "STRING", ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]]], false]
-  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "STRING", ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]]], false]
-  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "STRING", ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]]], false]
+  MAP_STRING_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["HDF5", "SQLite"], ["MAP", "STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]]], false]
+  MAP_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["HDF5", "SQLite"], ["MAP", "STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]]], false]
+  MAP_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["HDF5", "SQLite"], ["MAP", "STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]]], false]
+  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["HDF5", "SQLite"], ["MAP", "STRING", ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]]], false]
+  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["HDF5", "SQLite"], ["MAP", "STRING", ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]]], false]
+  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["HDF5", "SQLite"], ["MAP", "STRING", ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]]], false]
+  MAP_STRING_VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["HDF5", "SQLite"], ["MAP", "STRING", ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]]], false]
   MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "VL_STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]]], false]
   MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "VL_STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]]], false]
   MAP_VL_STRING_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>", 7, ["SQLite"], ["MAP", "VL_STRING", ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]]], false]
@@ -294,9 +294,9 @@ enum DbTypes {
 
   // pair<int, pair<string, string>>
   PAIR_INT_PAIR_STRING_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, ["HDF5"], ["PAIR", "INT", ["PAIR", "STRING", "STRING"]], false]
-  PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]], false]
-  PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]], false]
-  PAIR_INT_PAIR_VL_STRING_VL_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, [], ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]], false]
+  PAIR_INT_PAIR_VL_STRING_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, ["HDF5"], ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]], false]
+  PAIR_INT_PAIR_STRING_VL_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, ["HDF5"], ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]], false]
+  PAIR_INT_PAIR_VL_STRING_VL_STRING,  // ["std::pair<int, std::pair<std::string, std::string>>", 2, ["HDF5"], ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]], false]
 
   // pair<double, double>
   PAIR_DOUBLE_DOUBLE,  // ["std::pair<double, double>", 0, [], ["PAIR", "DOUBLE", "DOUBLE"], false]
@@ -312,7 +312,14 @@ enum DbTypes {
   PAIR_DOUBLE_VL_MAP_INT_DOUBLE, // ["std::pair<double, std::map<int, double>>", 2, ["HDF5"], ["PAIR", "DOUBLE", ["VL_MAP", "INT", "DOUBLE"]], false]
   
   // vector<pair<int, pair<string, string>>>
-  VECTOR_PAIR_INT_PAIR_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]], false] 
+  VECTOR_PAIR_INT_PAIR_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]], false]
+  VECTOR_PAIR_INT_PAIR_VL_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]], false]
+  VECTOR_PAIR_INT_PAIR_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]], false]
+  VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]], false]
+  VL_VECTOR_PAIR_INT_PAIR_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]], true]
+  VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]], true]
+  VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]], true]
+  VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]], true]    
 
   // Resource Tools
   MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", fasle]
@@ -927,6 +934,27 @@ class Sha1 {
     std::map<std::string, std::pair<double, std::map<int, double>>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
       hash_.process_bytes(&(it->first), it->first.size());
+      Update(it->second);
+    }
+  }
+  
+  inline void Update(const std::pair<int, std::pair<std::string, std::string>>& x) {
+    hash_.process_bytes(&(x.first), sizeof(int));
+    hash_.process_bytes(x.second.first.c_str(), x.second.first.size());
+    hash_.process_bytes(x.second.second.c_str(), x.second.second.size()); 
+  }
+  
+  inline void Update(const std::vector<std::pair<int, std::pair<std::string, std::string>>>& x) {
+    std::vector<std::pair<int, std::pair<std::string, std::string>>>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      Update(*it);
+    }
+  }
+  
+  inline void Update(const std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>& x) {
+    std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
       Update(it->second);
     }
   }
