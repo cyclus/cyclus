@@ -1405,16 +1405,19 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                       else [item_shape])
             new_prefix = template_args[container_type][0]
             child_node, child_opened = get_item_type(CANON_TO_NODE[item_canon],
-                                            shape_array=child_array,
-                                            vl_flag=is_vl,
-                                            prefix=new_prefix,
-                                            depth=depth+1)
+                                                     shape_array=child_array,
+                                                     vl_flag=is_vl,
+                                                     prefix=new_prefix,
+                                                     depth=depth+1)
+            pre_opened_len = len(opened_stack)
             node.nodes.append(child_node)
             opened_stack.extend(child_opened)
-            child_var = get_variable("item_type", prefix=new_prefix, 
-                                     depth=depth+1)
-                                                 
-            item_var = child_var
+            if pre_opened_len < len(opened_stack):
+                item_var = opened_stack[-1]
+            else:
+                item_var = get_variable("item_type", prefix=new_prefix, 
+                                        depth=depth+1)
+
         else:
             # This is a compound type.
             child_dict = OrderedDict()
@@ -2186,7 +2189,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
         Location of current memory offset
     pointer : bool, optional
         Denotes if current variable is a pointer, and whether member access 
-        should be achieved using arrow or dot notation
+        should be performed via arrow or dot notation
         
     Returns
     -------
@@ -2274,6 +2277,8 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                 partial_size = "0"
                 if container in variable_length_types:
                     labels = ['->first', '->second']
+                elif pointer:
+                    labels = ['->first', '->second']
                 else:
                     labels = ['.first', '.second']
                 for c, s, p, l in zip(t.canon[1:], shape_array[1:], prefixes, 
@@ -2289,7 +2294,8 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                        offset=offset+"+("+count
                                                               +"*"+total_size
                                                               +")+"
-                                                              +partial_size))
+                                                              +partial_size,
+                                                       pointer=False))
                     partial_size += "+" + child_size
             if container in variable_length_types:
                 labels = ['->first', '->second']
