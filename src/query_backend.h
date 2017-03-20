@@ -166,8 +166,6 @@ enum DbTypes {
   MAP_PAIR_INT_VL_STRING_DOUBLE,  // ["std::map<std::pair<int, std::string>, double>", 3, ["HDF5"], ["MAP", ["PAIR", "INT", "VL_STRING"], "DOUBLE"], false]
   VL_MAP_PAIR_INT_VL_STRING_DOUBLE,  // ["std::map<std::pair<int, std::string>, double>", 3, ["HDF5"], ["VL_MAP", ["PAIR", "INT", "VL_STRING"], "DOUBLE"], true]
 
-  // append new types only:
-
   // map<string,  vector<double> >
   MAP_STRING_VECTOR_DOUBLE,  // ["std::map<std::string, std::vector<double>>", 3, ["HDF5", "SQLite"], ["MAP", "STRING", ["VECTOR", "DOUBLE"]], false]
   MAP_STRING_VL_VECTOR_DOUBLE,  // ["std::map<std::string, std::vector<double>>", 3, ["HDF5", "SQLite"], ["MAP", "STRING", ["VL_VECTOR", "DOUBLE"]], false]
@@ -305,21 +303,7 @@ enum DbTypes {
   PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE,        // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "STRING", "DOUBLE"]], false]
   PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE,     // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "VL_STRING", "DOUBLE"]], false]
   PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE,     // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]], false]
-  PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE,  // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]], false]
-
-  // pair<double, map<int, double>>
-  PAIR_DOUBLE_MAP_INT_DOUBLE, // ["std::pair<double, std::map<int, double>>", 2, ["HDF5"], ["PAIR", "DOUBLE", ["MAP", "INT", "DOUBLE"]], false]
-  PAIR_DOUBLE_VL_MAP_INT_DOUBLE, // ["std::pair<double, std::map<int, double>>", 2, ["HDF5"], ["PAIR", "DOUBLE", ["VL_MAP", "INT", "DOUBLE"]], false]
-  
-  // vector<pair<int, pair<string, string>>>
-  VECTOR_PAIR_INT_PAIR_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]], false]
-  VECTOR_PAIR_INT_PAIR_VL_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]], false]
-  VECTOR_PAIR_INT_PAIR_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]], false]
-  VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]], false]
-  VL_VECTOR_PAIR_INT_PAIR_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]], true]
-  VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]], true]
-  VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]], true]
-  VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]], true]    
+  PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE,  // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, [], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]], false]   
 
   // Resource Tools
   MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", fasle]
@@ -333,6 +317,22 @@ enum DbTypes {
   RES_MAP_STRING_PRODUCT,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Product>", 2, [], ["RES_MAP", "STRING", "PRODUCT"], false]
   RES_MAP_VL_STRING_MATERIAL,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Material>", 2, [], ["RES_MAP", "VL_STRING", "MATERIAL"], false]
   RES_MAP_VL_STRING_PRODUCT,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Product>", 2, [], ["RES_MAP", "VL_STRING", "PRODUCT"], false]
+  
+  // pair<double, map<int, double>>
+  PAIR_DOUBLE_MAP_INT_DOUBLE, // ["std::pair<double, std::map<int, double>>", 2, ["HDF5"], ["PAIR", "DOUBLE", ["MAP", "INT", "DOUBLE"]], false]
+  PAIR_DOUBLE_VL_MAP_INT_DOUBLE, // ["std::pair<double, std::map<int, double>>", 2, ["HDF5"], ["PAIR", "DOUBLE", ["VL_MAP", "INT", "DOUBLE"]], false]
+  
+  // vector<pair<int, pair<string, string>>>
+  VECTOR_PAIR_INT_PAIR_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]], false]
+  VECTOR_PAIR_INT_PAIR_VL_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]], false]
+  VECTOR_PAIR_INT_PAIR_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]], false]
+  VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]], false]
+  VL_VECTOR_PAIR_INT_PAIR_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]], true]
+  VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]], true]
+  VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]], true]
+  VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]], true] 
+  
+  // append new types only:
 };
 
 /// Represents operation codes for condition checking.
