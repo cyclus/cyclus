@@ -1271,20 +1271,9 @@ def get_variation_body(t):
                                                  op="=",
                                                  y=size_expression)))
     if DB_TO_VL[t.db]:
-        if is_primitive(t):
-            default_item_var = type_var
-        else:
-            if opened_types == []:
-                item_prefix = template_args[VL_TO_FL_CONTAINERS[t.canon[0]]][0]
-                default_item_var = get_variable("item_type", 
-                                                prefix=item_prefix,
-                                                depth=1)
-            else:
-                default_item_var = get_variable("item_type", prefix="", depth=1)
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
                                                y=Raw(code="sha1_type_"))))
-        body.nodes.append(VL_ADD_BLOCK(t, default_item_var))
     else:
         body.nodes.append(ExprStmt(child=BinOp(x=Raw(code="field_types[i]"),
                                                op="=",
@@ -1405,16 +1394,19 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                       else [item_shape])
             new_prefix = template_args[container_type][0]
             child_node, child_opened = get_item_type(CANON_TO_NODE[item_canon],
-                                            shape_array=child_array,
-                                            vl_flag=is_vl,
-                                            prefix=new_prefix,
-                                            depth=depth+1)
+                                                     shape_array=child_array,
+                                                     vl_flag=is_vl,
+                                                     prefix=new_prefix,
+                                                     depth=depth+1)
+            pre_opened_len = len(opened_stack)
             node.nodes.append(child_node)
             opened_stack.extend(child_opened)
-            child_var = get_variable("item_type", prefix=new_prefix, 
-                                     depth=depth+1)
-                                                 
-            item_var = child_var
+            if pre_opened_len < len(opened_stack):
+                item_var = opened_stack[-1]
+            else:
+                item_var = get_variable("item_type", prefix=new_prefix, 
+                                        depth=depth+1)
+
         else:
             # This is a compound type.
             child_dict = OrderedDict()
@@ -1437,14 +1429,23 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                 # if the previous opened stack and current stack are the same,
                 # we know that the child is a primitive, and we can generate
                 # its variable accordingly.
-                if  len(opened_stack) == pre_opened_len:
+                if (DB_TO_VL[t.db] and item_canon[0] in variable_length_types):
                     child_item_var = get_variable("item_type", 
                                                   prefix=new_prefix,
                                                   depth=depth+1)
-                # However, if the current opened stack is longer, the first new
-                # variable there will be our child variable.
+                elif DB_TO_VL[item_node.db]:
+                    child_item_var = get_variable("item_type", 
+                                                  prefix=new_prefix,
+                                                  depth=depth+1)
                 else:
-                    child_item_var = opened_stack[-1]
+                    if len(opened_stack) == pre_opened_len:
+                        child_item_var = get_variable("item_type", 
+                                                      prefix=new_prefix,
+                                                      depth=depth+1)
+                    # However, if the current opened stack is longer, the first new
+                    # variable there will be our child variable.
+                    else:
+                        child_item_var = opened_stack[-1]
                 # 2. Get item sizes.
                 child_dict[child_item_var] = get_item_size(item_node, 
                                                            child_array,
@@ -1464,10 +1465,13 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
             # 4. Insert individual children into the compound type.            
             node.nodes.append(hdf5_insert(container_type, item_var, child_dict))
         
-        if vl_flag and t.canon not in NOT_VL:
+        if is_vl and t.canon not in NOT_VL:
             node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
                                                     value=Raw(code='sha1_type_'))))
-            node.nodes.append(VL_ADD_BLOCK(ORIGIN_TO_VL[ORIGIN_DICT[t.canon]], item_var))
+            if vl_flag:
+                node.nodes.append(VL_ADD_BLOCK(ORIGIN_TO_VL[ORIGIN_DICT[t.canon]], item_var))
+            else:
+                node.nodes.append(VL_ADD_BLOCK(t, item_var))
         
         elif container_type in variable_length_types and not DB_TO_VL[t.db]:
             array_node = ExprStmt(child=Assign(target=Var(name=type_var),
@@ -1477,11 +1481,6 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                                                            dims="&"+shape_var)))
             opened_stack.append(type_var)
             node.nodes.append(array_node)
-            
-        if DB_TO_VL[t.db] and depth > 0:
-            node.nodes.append(ExprStmt(child=Assign(target=Raw(code=type_var),
-                                                    value=Raw(code='sha1_type_'))))
-            node.nodes.append(VL_ADD_BLOCK(t, item_var))
 
     return node, opened_stack
 
@@ -1624,7 +1623,7 @@ def hdf5_insert(container_type, compound_var, types_sizes_dict):
 
 def main_query():
     """HDF5 Query: Generate Query case statement code."""
-    CPPGEN = CppGen()
+    CPPGEN = CppGen(debug=False)
     output = ""
     for type in CANON_TYPES:
         type_node = CANON_TO_NODE[type]
@@ -1658,7 +1657,7 @@ DEBUG_TYPES = ["VECTOR_STRING"]
 
 def main_create():
     """HDF5 Create: Generate CreateTable if-statements."""
-    CPPGEN = CppGen()
+    CPPGEN = CppGen(debug=False)
     output = ""
         
     outer_if_bodies = OrderedDict()
@@ -2011,7 +2010,7 @@ def is_all_vl(t):
                 break
     return result
 
-def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
+def pad_children(t, variable, fixed_var=None, depth=0, prefix="", called_depth=0):
     """HDF5 Write: Pads FL children of VL parent types.
     
     This function is used on top-level VL container types which contain 1 or 
@@ -2026,6 +2025,8 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     fixed_var : None or str, optional
     depth : int, optional
     prefix : str, optional
+    called_depth : int, optional
+        Records the origin depth to determine when we're at relative depth=0
     
     Returns
     -------
@@ -2056,7 +2057,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     keywords['var'] = fixed_var
     num = len(t.canon[1:])
     if num == 1:
-        children = ["*" + iterator]
+        children = ["(*" + iterator + ")"]
     else:
         if container in variable_length_types:
             members = ['->first', '->second']
@@ -2101,7 +2102,8 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                                    fixed_var=child_variable,
                                                    depth=depth+1, 
                                                    prefix=prefix
-                                                          +prefixes[count]))
+                                                          +prefixes[count],
+                                                   called_depth=called_depth))
                     keywords[child_keyword] = child_variable
             # FL variable length containers
             elif child_node.canon[0] in variable_length_types:
@@ -2111,8 +2113,9 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                                          prefix=prefix+prefixes[count])
                 body_nodes.append(pad_children(child_node, children[count],
                                                fixed_var=child_variable,
-                                               depth=depth+1, prefix=prefix
-                                                              +prefixes[count]))
+                                               depth=depth+1, 
+                                               prefix=prefix+prefixes[count],
+                                               called_depth=called_depth))
                 # attempt to resize container
                 if child_node.canon[0] == 'VECTOR':
                     body_nodes.append(ExprStmt(child=Raw(code=child_variable+".resize("+child_length+")")))
@@ -2126,8 +2129,9 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
                 # simply be the 'child' variable we created in this loop.
                 body_nodes.append(pad_children(child_node, children[count], 
                                                fixed_var=child_variable,
-                                               depth=depth+1, prefix=prefix
-                                                              +prefixes[count]))
+                                               depth=depth+1, 
+                                               prefix=prefix+prefixes[count],
+                                               called_depth=called_depth))
                 keywords[child_keyword] = child_variable
         count += 1
     
@@ -2135,7 +2139,7 @@ def pad_children(t, variable, fixed_var=None, depth=0, prefix=""):
     body_nodes.append(ExprStmt(child=Raw(code=assignment)))
     if container in variable_length_types:
         body_nodes.append(ExprStmt(child=Raw(code="++" + pad_count)))
-        if depth != 0:
+        if depth > called_depth:
             result.nodes.append(ExprStmt(child=DeclAssign(
                                                   type=Type(cpp=t.cpp
                                                                 +"::iterator"),
@@ -2171,7 +2175,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
         Location of current memory offset
     pointer : bool, optional
         Denotes if current variable is a pointer, and whether member access 
-        should be achieved using arrow or dot notation
+        should be performed via arrow or dot notation
         
     Returns
     -------
@@ -2232,7 +2236,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                               value=Raw(code=variable 
                                                              +".begin()"))))
             result.nodes.append(pad_children(t, variable, depth=depth, 
-                                                    prefix=prefix))
+                                             prefix=prefix, called_depth=depth))
             fixed_val = get_variable("fixed_val", depth=depth, prefix=prefix)
             result.nodes.append(vl_write(t, fixed_val, depth=depth, 
                                          prefix=prefix))
@@ -2259,6 +2263,8 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                 partial_size = "0"
                 if container in variable_length_types:
                     labels = ['->first', '->second']
+                elif pointer:
+                    labels = ['->first', '->second']
                 else:
                     labels = ['.first', '.second']
                 for c, s, p, l in zip(t.canon[1:], shape_array[1:], prefixes, 
@@ -2274,7 +2280,8 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
                                                        offset=offset+"+("+count
                                                               +"*"+total_size
                                                               +")+"
-                                                              +partial_size))
+                                                              +partial_size,
+                                                       pointer=False))
                     partial_size += "+" + child_size
             if container in variable_length_types:
                 labels = ['->first', '->second']
@@ -2500,7 +2507,7 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
     # Containers with only one child can simply use the iterator to reference
     # their child data.
     if len(children) == 1:
-        new_variable = "*" + new_variable
+        new_variable = "(*" + new_variable + ")"
         labels = ['']
     for child, part, vl, label in zip(children, prefixes, vl_list, labels):
         child_node = CANON_TO_NODE[child]
@@ -2544,7 +2551,7 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
 
 def main_val_to_buf():
     """HDF5 VAL_TO_BUF: Generates VLValToBuf function."""
-    CPPGEN = CppGen()
+    CPPGEN = CppGen(debug=False)
     output = ""
     block = Block(nodes=[])
     for i in VARIATION_DICT:
