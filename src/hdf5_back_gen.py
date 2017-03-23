@@ -1454,7 +1454,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
             # 3. Create compound type using total item size.
             compound = hdf5_create_compound(list(child_dict.values()))
             
-            item_var = get_variable("item_type", prefix="", depth=depth+1)
+            item_var = get_variable("item_type", prefix=prefix+'compound', depth=depth+1)
             node.nodes.append(ExprStmt(child=Decl(type=Type(cpp="hid_t"),
                                                   name=Raw(code=item_var))))
             
@@ -1472,6 +1472,7 @@ def get_item_type(t, shape_array=None, vl_flag=False, prefix="", depth=0):
                 node.nodes.append(VL_ADD_BLOCK(ORIGIN_TO_VL[ORIGIN_DICT[t.canon]], item_var))
             else:
                 node.nodes.append(VL_ADD_BLOCK(t, item_var))
+            opened_stack.append(type_var)
         
         elif container_type in variable_length_types and not DB_TO_VL[t.db]:
             array_node = ExprStmt(child=Assign(target=Var(name=type_var),
@@ -2808,7 +2809,7 @@ def setup():
     VARIATION_DICT['BLOB'] = []
     VARIATION_DICT['STRING'] = [CANON_TO_NODE['VL_STRING']]
         
-    for i in VARIATION_DICT.keys():
+    for i in VARIATION_DICT:
         ORIGIN_DICT[i] = i
         if VARIATION_DICT[i] != []:
             for j in VARIATION_DICT[i]:
