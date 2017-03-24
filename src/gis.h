@@ -41,7 +41,7 @@ namespace cyclus {
 /// calculated by multiplying decimal degrees by 3600.
 /// example: 05.2169 -> 18780.84
 
-class GIS {
+class GIS : public Region, public Agent {
  public:
   /// The default constructor for GIS. This will creat an object with
   /// lat =0, and long=0.
