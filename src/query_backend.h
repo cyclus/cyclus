@@ -449,6 +449,20 @@ class QueryResult {
   }
 };
 
+/// Represents column information.
+struct ColumnInfo {
+  ColumnInfo() {};
+  ColumnInfo(std::string default_table, std::string default_col, int default_index, 
+             DbTypes default_dbtype, std::vector<int> default_shape) : 
+    table(default_table), col(default_col), index(default_index), dbtype(default_dbtype), 
+    shape(default_shape) {};
+  std::string table;
+  std::string col;
+  int index;
+  DbTypes dbtype;
+  std::vector<int> shape;
+};
+
 /// Interface implemented by backends that support rudimentary querying.
 class QueryableBackend {
  public:
@@ -461,7 +475,10 @@ class QueryableBackend {
   /// Return a map of column names of the specified table to the associated
   /// database type.
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) = 0;
-
+  
+  /// Return information about all columns of a table.
+  virtual std::list<ColumnInfo> Schema(std::string table) = 0;
+  
   /// Return a set of all table names currently in the database.
   virtual std::set<std::string> Tables() = 0;
 };
@@ -495,9 +512,13 @@ class CondInjector: public QueryableBackend {
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
     return b_->ColumnTypes(table);
   }
+  
+  virtual std::list<ColumnInfo> Schema(std::string table) {
+    return b_->Schema(table);
+  }
 
-  virtual std::set<std::string> Tables() { return b_->Tables(); }
-
+  virtual std::set<std::string> Tables() { return b_->Tables(); }  
+    
  private:
   QueryableBackend* b_;
   std::vector<Cond> to_inject_;
@@ -520,7 +541,11 @@ class PrefixInjector: public QueryableBackend {
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
     return b_->ColumnTypes(table);
   }
-
+  
+  virtual std::list<ColumnInfo> Schema(std::string table) {
+    return b_->Schema(table);
+  }
+  
   virtual std::set<std::string> Tables() { return b_->Tables(); }
 
  private:

@@ -3,6 +3,7 @@ from libc.stdint cimport uint64_t
 from libcpp.map cimport map
 from libcpp.set cimport set
 from libcpp.vector cimport vector
+from libcpp.list cimport list
 from libcpp.utility cimport pair
 from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
@@ -137,10 +138,20 @@ cdef extern from "cyclus.h" namespace "cyclus":
         vector[std_string] fields
         vector[DbTypes] types
         vector[QueryRow] rows
-
+    
+    cdef cppclass ColumnInfo:
+        ColumnInfo()
+        ColumnInfo(std_string, std_string, int, DbTypes, vector[int])
+        std_string table
+        std_string col
+        int index
+        DbTypes dbtype
+        vector[int] shape
+    
     cdef cppclass QueryableBackend:
         QueryResult Query(std_string, vector[Cond]*) except +
         map[std_string, DbTypes] ColumnTypes(std_string) except +
+        list[ColumnInfo] Schema(std_string)
         set[std_string] Tables() except +
 
     cdef cppclass FullBackend(QueryableBackend, RecBackend):

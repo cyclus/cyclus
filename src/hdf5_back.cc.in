@@ -390,6 +390,18 @@ void Hdf5Back::CreateTable(Datum* d) {
   H5Awrite(dbtypes_attr, H5T_NATIVE_INT, dbtypes);
   H5Aclose(dbtypes_attr);
   H5Sclose(attr_space);
+  for(int i = 0; i < nvals; ++i) {
+    shape = shapes[i];
+    hsize_t nshape = shape.size();
+    attr_space = H5Screate_simple(1, &nshape, &nshape);
+    std::stringstream col_name;
+    col_name << "shape" << i;
+    hid_t shape_attr = H5Acreate2(tb_set, col_name.str().c_str(), H5T_NATIVE_INT, 
+                                  attr_space, H5P_DEFAULT, H5P_DEFAULT);
+    H5Awrite(shape_attr, H5T_NATIVE_INT, &shape);
+    H5Aclose(shape_attr);
+    H5Sclose(attr_space);
+  }
   H5Dclose(tb_set);
 
   // record everything for later
@@ -424,6 +436,35 @@ std::map<std::string, DbTypes> Hdf5Back::ColumnTypes(std::string table) {
   H5Tclose(dt);
   H5Dclose(dset);
   return rtn;
+}
+
+std::list<ColumnInfo> Hdf5Back::Schema(std::string table) {
+  std::list<ColumnInfo> schema;
+  hid_t tb_set = H5Dopen2(file_, table.c_str(), H5P_DEFAULT);
+  hid_t tb_type = H5Dget_type(tb_set);
+  int i;
+  char * colname;
+  hsize_t ncols = H5Tget_nmembers(tb_type);
+  LoadTableTypes(table, tb_set, ncols);
+  DbTypes* dbtypes = schemas_[table];
+    
+  for (i = 0; i < ncols; ++i) {
+    colname = H5Tget_member_name(tb_type, i);
+    std::stringstream attr_name;
+    attr_name << "shape" << i;
+    hid_t attr_id = H5Aopen_by_name(tb_set, ".", attr_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT);
+    hid_t attr_type = H5Aget_type(attr_id);
+    hid_t attr_space = H5Aget_space(attr_id);
+    hsize_t nshape;
+    H5Sget_simple_extent_dims(attr_space, &nshape, NULL);
+    std::vector<int> shape(nshape);
+    H5Aread(attr_id, attr_type, &shape);
+    ColumnInfo info = ColumnInfo(table, colname, i, dbtypes[i], shape);
+    schema.push_back(info); 
+    free(colname);
+  }
+  
+  return schema;
 }
 
 std::set<std::string> Hdf5Back::Tables() {
