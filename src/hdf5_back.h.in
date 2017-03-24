@@ -93,7 +93,9 @@ class Hdf5Back : public FullBackend {
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table);
-
+  
+  virtual std::list<ColumnInfo> Schema(std::string table);
+    
   virtual std::set<std::string> Tables();
 
  private:

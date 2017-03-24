@@ -9,6 +9,7 @@ from libcpp.set cimport set as std_set
 from libcpp.map cimport map as std_map
 from libcpp.vector cimport vector as std_vector
 from libcpp.string cimport string as std_string
+from libcpp.list cimport list as std_list
 from cython.operator cimport dereference as deref
 from cython.operator cimport preincrement as inc
 from libc.stdlib cimport malloc, free
@@ -39,7 +40,7 @@ from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
     bool_to_py, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py, \
-    std_vector_std_string_to_py, C_IDS, blob_to_bytes
+    std_vector_std_string_to_py, C_IDS, blob_to_bytes, std_vector_int_to_py
 
 
 # startup numpy
@@ -242,6 +243,16 @@ cdef class _FullBackend:
         res, fields = query_result_to_py(qr)
         results = pd.DataFrame(res, columns=fields)
         return results
+        
+    def schema(self, table):
+        cdef std_string ctable = str_py_to_cpp(table)
+        cdef std_list[cpp_cyclus.ColumnInfo] cis = (<cpp_cyclus.QueryableBackend*> self.ptx).Schema(ctable)
+        rtn = []
+        for ci in cis:
+            py_ci = ColumnInfo()
+            (<_ColumnInfo> py_ci).copy_from(ci)
+            rtn.append(py_ci)
+        return rtn
 
     @property
     def tables(self):
@@ -867,6 +878,50 @@ class XMLFlatLoader(_XMLFlatLoader):
     instance pointers in Cython a little easier.
     """
 
+cdef class _ColumnInfo:
+    def __cinit__(self):
+        self.ptx = NULL
+    
+    cdef void copy_from(self, cpp_cyclus.ColumnInfo cinfo):
+        self.ptx = new cpp_cyclus.ColumnInfo(cinfo.table, cinfo.col, cinfo.index,
+                                             cinfo.dbtype, cinfo.shape)     
+    
+    def __dealloc__(self):
+        if self.ptx == NULL:
+            pass
+        else:
+            del self.ptx
+    
+    def __repr__(self):
+        s = 'ColumnInfo(table=' + self.table + ', col=' + self.col + ', index='\
+            + str(self.index) + ', dbtype=' + str(self.dbtype) + ', shape=' + repr(self.shape) + ')'
+        return s
+            
+    @property
+    def table(self):
+        table = std_string_to_py(self.ptx.table)
+        return table
+    
+    @property
+    def col(self):
+        col = std_string_to_py(self.ptx.col)
+        return col
+        
+    @property
+    def index(self):
+        return self.ptx.index
+        
+    @property
+    def dbtype(self):
+        return self.ptx.dbtype
+        
+    @property
+    def shape(self):
+        shape = std_vector_int_to_py(self.ptx.shape)
+        return shape
+        
+class ColumnInfo(_ColumnInfo):
+    """Python wrapper for ColumnInfo"""                                       
 
 def load_string_from_file(filename, format=None):
     """Loads an XML file from a path or from a string and a format ('xml', 'json', or 'py')."""
