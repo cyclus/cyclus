@@ -154,6 +154,7 @@ std::set<std::string> SqliteBack::Tables() {
   while (stmt->Step()) {
     rtn.insert(stmt->GetText(0, NULL));
   }
+  rtn.erase("FieldTypes");
   return rtn;
 }
 
