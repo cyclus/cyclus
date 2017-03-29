@@ -54,7 +54,8 @@ def test_schema(db, fname, backend):
         assert_equal(cols[i], ci.col)
         assert_equal(dbs[i], ci.dbtype)
         assert_equal(i, ci.index)
-        assert_equal(0, len(ci.shape))
+        assert_equal(1, len(ci.shape))
+        assert_equal(-1, ci.shape)
 
 if __name__ == "__main__":
     nose.runmodule()
