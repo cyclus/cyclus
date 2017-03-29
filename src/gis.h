@@ -41,7 +41,7 @@ namespace cyclus {
 /// calculated by multiplying decimal degrees by 3600.
 /// example: 05.2169 -> 18780.84
 
-class GIS : public Region, public Agent {
+class GIS {
  public:
   /// The default constructor for GIS. This will creat an object with
   /// lat =0, and long=0.
@@ -82,15 +82,15 @@ class GIS : public Region, public Agent {
   /// H.
   /// @param return_format
   /// @parblock
-  /// 			The format of output. Options are 'd', 'dm', or 'dms':
+  ///       The format of output. Options are '1', '2', or '3':
   ///
-  /// 			d:   return in degrees format
-  ///			dm:  return in degrees and minutes format
-  ///			dms: return in egrees minutes seconds format
+  ///     1:   return in degrees format
+  ///     2:   return in degrees and minutes format
+  ///     3:   return in egrees minutes seconds format
   /// @endparblock
   /// @return String representation of the GIS object that complies with ISO6709
   /// Annex H
-  std::string ToString(std::string return_format) const;
+  std::string ToString(int return_format) const;
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is
@@ -109,61 +109,45 @@ class GIS : public Region, public Agent {
   /// Formats longitude for toString function
   /// @param mode
   /// @parblock
-  /// 			The format of output. Options are 'd', 'dm' or 'dms' :
+  ///       The format of output. Options are '1', '2' or '3' :
   ///
-  /// 			d:   return in degrees format
-  ///			dm:  return in degrees and minutes format
-  ///			dms: return in degrees minutes seconds format
+  ///     1:   return in degrees format
+  ///     2:   return in degrees and minutes format
+  ///     3:   return in degrees minutes seconds format
   /// @endparblock
   /// @param lon longitude of the object
   /// @return partially formatted string
-  string ToStringHelperLon(std::string mode, int lon);
+  std::string ToStringHelperLon(int mode, float lon) const;
 
   /// Formats latitude for toString function
   /// @param mode
   /// @parblock
-  /// 			The format of output. Options are 'd', 'dm' or 'dms' :
+  ///       The format of output. Options are '1', '2' or '3' :
   ///
-  /// 			d:   return in degrees format
-  ///			dm:  return in degrees and minutes format
-  ///			dms: return in degrees minutes seconds format
+  ///     1:   return in degrees format
+  ///     2:   return in degrees and minutes format
+  ///     3:   return in degrees minutes seconds format
   /// @endparblock
   /// @param lat latitude of the object
   /// @return partially formatted string
-  string ToStringHelperLat(std::string mode, int lat);
+  std::string ToStringHelperLat(int mode, float lat) const;
 
   /// Adds "+" or "-" sign for the ToStringHelperLon/Lat function
   /// @param value longitude or latitude of the object
   /// @returns "+" or "-" for the ToString function
-  string ToStringHelper(float value);
+  std::string ToStringHelper(float value) const;
 
   /// Formats longitude and latitude in degrees and minutes for the
   /// ToStringHelperLon/Lat function
-  /// @param mode
-  /// @parblock
-  /// 			The format of input. Options are "lon" and "lat":
-  ///
-  /// 			lon:  return formatted string representation of
-  /// longitude
-  ///			lat:  return formatted string representation of latitude
-  /// @endparblock
   /// @param value longitude or latitude of the object
   /// @return formatted string representation of longiiiitude or latitude
-  string ToStringHelperDM(string mode, float value);
+  std::string ToStringHelperDM(float value) const;
 
   /// Formats longitude and latitude in degrees minutes and seconds for the
   /// ToStringHelperLon/Lat function
-  /// @param mode
-  /// @parblock
-  /// 			The format of input. Options are "lon" and "lat":
-  ///
-  /// 			lon:  return formatted string representation of
-  /// longitude
-  ///			lat:  return formatted string representation of latitude
-  /// @endparblock
   /// @param value longitude or latitude of the object
   /// @return formatted string representation of longiiiitude or latitude
-  string ToStringHelperDMS(string mode, float value);
+  std::string ToStringHelperDMS(float value) const;
 };
 }
 
