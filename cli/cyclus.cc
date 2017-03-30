@@ -156,12 +156,16 @@ int main(int argc, char* argv[]) {
   SimInit si;
   if (ai.restart == "") {
     // Read input file and initialize db and simulation from input file
+    bool ms_print;
+    if(ai.vm.count("rng-print") > 0){
+      ms_print = true;
+    }
     try {
       if (ai.flat_schema) {
-        XMLFlatLoader l(&rec, fback, ai.schema_path, infile, format);
+        XMLFlatLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
         l.LoadSim();
       } else {
-        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format);
+        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
         l.LoadSim();
       }
     } catch (cyclus::Error e) {
@@ -269,6 +273,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("cmake-module-path", "print the cyclus CMake module path")
       ("build-path", "print the cyclus build directory")
       ("rng-schema", "print the path to cyclus.rng.in")
+      ("rng-print", "prints the full relaxng schema for the simulation")
       ("nuc-data", "print the path to cyclus_nuc_data.h5")
       ("json-to-xml", po::value<std::string>(), "*.json input file")
       ("xml-to-json", po::value<std::string>(), "*.xml input file")
