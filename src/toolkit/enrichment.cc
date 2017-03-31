@@ -36,11 +36,11 @@ double Assays::Tails() const {
 double UraniumAssay(Material::Ptr rsrc) {
   double value;
   MatQuery mq(rsrc);
-  double u235 = mq.atom_frac(922350000);
-  double u238 = mq.atom_frac(922380000);
+  double u235 = mq.mass_frac(922350000);
+  double u238 = mq.mass_frac(922380000);
 
-  LOG(LEV_DEBUG1, "CEnr") << "Comparing u235 atom fraction : "
-                          << u235 << " with u238 atom fraction: "
+  LOG(LEV_DEBUG1, "CEnr") << "Comparing u235 mass fraction : "
+                          << u235 << " with u238 mass fraction: "
                           << u238;
 
   if (u235 + u238 > 0) {
