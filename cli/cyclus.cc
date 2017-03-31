@@ -165,14 +165,16 @@ int main(int argc, char* argv[]) {
         XMLFlatLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
         l.LoadSim();
       } else {
-        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
+        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);     
         l.LoadSim();
       }
     } catch (cyclus::Error e) {
       CLOG(LEV_ERROR) << e.what();
       return 1;
     }
-
+    if(ms_print){
+        return 1;
+    }
     si.Init(&rec, fback);
   } else {
     // Read output db and restart simulation from specified simid and timestep
