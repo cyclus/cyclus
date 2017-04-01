@@ -34,7 +34,7 @@ void EnrichmentTests::SetUp() {
   CompMap v;
   v[922350000] = assay_u_;
   v[922380000] = 1 - assay_u_;
-  Composition::Ptr comp = Composition::CreateFromAtom(v);
+  Composition::Ptr comp = Composition::CreateFromMass(v);
   mat_ = Material::CreateUntracked(mass_u_, comp);
 
   SetEnrichmentParameters();
