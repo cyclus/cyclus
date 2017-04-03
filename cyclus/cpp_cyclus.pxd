@@ -296,7 +296,7 @@ cdef extern from "xml_file_loader.h" namespace "cyclus":
         XMLFileLoader(Recorder*, QueryableBackend*, std_string,
                       const std_string)
         XMLFileLoader(Recorder*, QueryableBackend*, std_string,
-                      const std_string, const std_string)
+                      const std_string, const std_string, cpp_bool ms_print)
         void LoadSim() except +
 
 
@@ -307,7 +307,7 @@ cdef extern from "xml_flat_loader.h" namespace "cyclus":
         XMLFlatLoader(Recorder*, QueryableBackend*, std_string,
                       const std_string)
         XMLFlatLoader(Recorder*, QueryableBackend*, std_string,
-                      const std_string, const std_string)
+                      const std_string, const std_string, cpp_bool ms_print)
 
 
 cdef extern from "xml_parser.h" namespace "cyclus":

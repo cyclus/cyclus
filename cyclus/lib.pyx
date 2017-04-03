@@ -39,7 +39,7 @@ from cyclus import typesystem as ts
 from cyclus.cpp_stringstream cimport stringstream
 from cyclus.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
-    bool_to_py, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py, \
+    bool_to_py, bool_to_cpp, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py, \
     std_vector_std_string_to_py, C_IDS, blob_to_bytes, std_vector_int_to_py
 
 
@@ -810,15 +810,16 @@ def py_init_hooks():
 #
 cdef class _XMLFileLoader:
 
-    def __cinit__(self, recorder, backend, schema_file, input_file="", format="none"):
+    def __cinit__(self, recorder, backend, schema_file, input_file="", format="none", ms_print=False):
         cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
         cdef std_string cpp_input_file = str_py_to_cpp(input_file)
         format = "none" if format is None else format
         cdef std_string cpp_format = str_py_to_cpp(format)
+        cdef cpp_bool cpp_msprint = bool_to_cpp(ms_print)
         self.ptx = new cpp_cyclus.XMLFileLoader(
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
             <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
-            cpp_schema_file, cpp_input_file, cpp_format)
+            cpp_schema_file, cpp_input_file, cpp_format, cpp_msprint)
 
     def __dealloc__(self):
         del self.ptx
@@ -842,15 +843,16 @@ class XMLFileLoader(_XMLFileLoader):
 
 cdef class _XMLFlatLoader:
 
-    def __cinit__(self, recorder, backend, schema_file, input_file="", format="none"):
+    def __cinit__(self, recorder, backend, schema_file, input_file="", format="none", ms_print=False):
         cdef std_string cpp_schema_file = str_py_to_cpp(schema_file)
         cdef std_string cpp_input_file = str_py_to_cpp(input_file)
         format = "none" if format is None else format
         cdef std_string cpp_format = str_py_to_cpp(format)
+        cdef cpp_bool cpp_msprint = bool_to_cpp(ms_print)
         self.ptx = new cpp_cyclus.XMLFlatLoader(
             <cpp_cyclus.Recorder *> (<_Recorder> recorder).ptx,
             <cpp_cyclus.QueryableBackend *> (<_FullBackend> backend).ptx,
-            cpp_schema_file, cpp_input_file, cpp_format)
+            cpp_schema_file, cpp_input_file, cpp_format, cpp_msprint)
 
     def __dealloc__(self):
         del self.ptx
