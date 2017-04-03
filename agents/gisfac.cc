@@ -1,18 +1,18 @@
-#include "sink.h"
+#include "gisfac.h"
 
 namespace cyclus {
 
-Sink::Sink(cyclus::Context* ctx)
+GISFac::Sink(cyclus::Context* ctx)
     : cyclus::Facility(ctx),
       capacity(100) {}
 
-std::string Sink::str() {
+std::string GISFac::str() {
   // No info for now. Change later
   return Facility::str();
 }
 
 std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
-Sink::GetMatlRequests() {
+GISFac::GetMatlRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::Material;
   using cyclus::RequestPortfolio;
@@ -44,7 +44,7 @@ Sink::GetMatlRequests() {
 }
 
 std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
-Sink::GetProductRequests() {
+GISFac::GetProductRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::Product;
   using cyclus::RequestPortfolio;
@@ -72,7 +72,7 @@ Sink::GetProductRequests() {
   return ports;
 }
 
-void Sink::AcceptMatlTrades(
+void GISFac::AcceptMatlTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
                                  cyclus::Material::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Material>,
@@ -82,7 +82,7 @@ void Sink::AcceptMatlTrades(
   }
 }
 
-void Sink::AcceptProductTrades(
+void GISFac::AcceptProductTrades(
     const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
                                  cyclus::Product::Ptr> >& responses) {
   std::vector< std::pair<cyclus::Trade<cyclus::Product>,
@@ -93,34 +93,34 @@ void Sink::AcceptProductTrades(
 }
 
 
-void Sink::Tick() {
+void GISFac::Tick() {
   using std::string;
   using std::vector;
   double request_amt = Capacity();
-  // Inform the simulation about what the sink facility will be requesting
+  // Inform the simulation about what the gisfac facility will be requesting
   if (request_amt > cyclus::eps()) {
     for (vector<string>::iterator commod = in_commods.begin();
          commod != in_commods.end();
          commod++) {
-      LOG(cyclus::LEV_INFO3, "Sink")  << prototype()
+      LOG(cyclus::LEV_INFO3, "GISFac")  << prototype()
                                       << " will request " << request_amt
                                       << " kg of " << *commod << ".";
     }
   }
 }
 
-void Sink::Tock() {
-  // On the tock, the sink facility doesn't really do much.
+void GISFac::Tock() {
+  // On the tock, the gisfac facility doesn't really do much.
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  LOG(cyclus::LEV_INFO3, "Sink") << prototype()
+  LOG(cyclus::LEV_INFO3, "GISFac") << prototype()
                                  << " is holding " << inventory.quantity()
                                  << " units of material at the close of month "
                                  << context()->time() << ".";
 }
 
-extern "C" cyclus::Agent* ConstructSink(cyclus::Context* ctx) {
-  return new Sink(ctx);
+extern "C" cyclus::Agent* ConstructGISFac(cyclus::Context* ctx) {
+  return new GISFac(ctx);
 }
 
 }  // namespace cyclus

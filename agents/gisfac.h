@@ -1,5 +1,5 @@
-#ifndef CYCLUS_AGENTS_SINK_H_
-#define CYCLUS_AGENTS_SINK_H_
+#ifndef CYCLUS_AGENTS_GISFAC_H_
+#define CYCLUS_AGENTS_GISFAC_H_
 
 #include <string>
 
@@ -7,21 +7,21 @@
 
 namespace cyclus {
 
-/// @class Sink
-/// This sink facility accepts specified amount of commodity.
-/// This sink facility is similar to Sink provided in cycamore, but it
+/// @class GISFac
+/// This gisfac facility accepts specified amount of commodity.
+/// This gisfac facility is similar to GISFac provided in cycamore, but it
 /// has minimum implementation to run integration tests.
-/// Some parts of the code is directrly copied from cycamore Sink.
-class Sink : public cyclus::Facility  {
+/// Some parts of the code is directrly copied from cycamore GISFac.
+class GISFac : public cyclus::Facility  {
  public:
-  Sink(cyclus::Context* ctx);
-  virtual ~Sink() {}
+  GISFac(cyclus::Context* ctx);
+  virtual ~GISFac() {}
 
   virtual std::string version() { return cyclus::version::describe(); }
 
   #pragma cyclus
 
-  #pragma cyclus note {"doc": "A minimum implementation sink " \
+  #pragma cyclus note {"doc": "A minimum implementation gisfac " \
                               "facility that accepts specified " \
                               "amounts of commodities from " \
                               "other agents"}
@@ -32,23 +32,23 @@ class Sink : public cyclus::Facility  {
 
   virtual void Tock();
 
-  /// @brief Sink request Materials of their given commodity. Note
-  /// that it is assumed the Sink operates on a single resource type!
+  /// @brief GISFac request Materials of their given commodity. Note
+  /// that it is assumed the GISFac operates on a single resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
       GetMatlRequests();
 
-  /// @brief Sink request Product of their given
-  /// commodity. Note that it is assumed the Sink operates on a single
+  /// @brief GISFac request Product of their given
+  /// commodity. Note that it is assumed the GISFac operates on a single
   /// resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
       GetProductRequests();
 
-  /// @brief Sink place accepted trade Materials in their Inventory
+  /// @brief GISFac place accepted trade Materials in their Inventory
   virtual void AcceptMatlTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
                                    cyclus::Material::Ptr> >& responses);
 
-  /// @brief Sink place accepted trade Materials in their Inventory
+  /// @brief GISFac place accepted trade Materials in their Inventory
   virtual void AcceptProductTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
                                    cyclus::Product::Ptr> >& responses);
@@ -75,8 +75,8 @@ class Sink : public cyclus::Facility  {
 
  private:
   #pragma cyclus var {\
-    "doc": "commodities that the sink facility accepts ",	   \
-    "tooltip": "input commodities for the sink",		   \
+    "doc": "commodities that the gisfac facility accepts ",	   \
+    "tooltip": "input commodities for the gisfac",		   \
     "uilabel": "List of Input Commodities",			   \
     "uitype": ["oneormore", "incommodity"]			   \
   }
@@ -85,7 +85,7 @@ class Sink : public cyclus::Facility  {
   #pragma cyclus var { \
     "tooltip": "input/request recipe name", \
     "doc": "Name of recipe to request." \
-           "If empty, sink requests material no particular composition.", \
+           "If empty, gisfac requests material no particular composition.", \
     "default": "", \
     "uilabel": "Input Recipe",			\
     "uitype": "recipe", \
@@ -95,17 +95,17 @@ class Sink : public cyclus::Facility  {
   #pragma cyclus var {\
     "default": 1e299,						\
     "doc": "total maximum inventory size of "			\
-           "sink facility",						\
+           "gisfac facility",						\
     "uilabel": "Maximum Inventory",				\
-    "tooltip": "sink maximum inventory size" \
+    "tooltip": "gisfac maximum inventory size" \
   }
   double max_inv_size;
 
   #pragma cyclus var { \
-    "doc": "capacity the sink facility can "		 \
+    "doc": "capacity the gisfac facility can "		 \
            "accept at each time step",				 \
     "uilabel": "Maximum Throughput",			 \
-    "tooltip": "sink capacity"  \
+    "tooltip": "gisfac capacity"  \
   }
   double capacity;
 
@@ -115,4 +115,4 @@ class Sink : public cyclus::Facility  {
 
 }  // namespace cyclus
 
-#endif  // CYCLUS_AGENTS_SINK_H_
+#endif  // CYCLUS_AGENTS_GISFAC_H_
