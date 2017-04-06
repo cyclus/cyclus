@@ -15,6 +15,7 @@ namespace cyclus {
 
 double cy_eps = 1e-6;
 double cy_eps_rsrc = 1e-6;
+bool cy_assay_by_mass = false;
 
 SimInfo::SimInfo()
     : duration(0),

@@ -25,6 +25,9 @@ class SimInitTest;
 
 namespace cyclus {
 
+/// epsilon values to be used by resources
+extern bool cy_assay_by_mass;
+
 class Datum;
 class ExchangeSolver;
 class Recorder;
@@ -113,6 +116,11 @@ class SimInfo {
   /// every time step in a table (i.e. agent ID, Time, Quantity,
   /// Composition-object and/or reference).
   bool explicit_inventory_compact;
+
+
+  /// True if the assay should be returned by mass.
+  bool assay_by_mass;
+
 };
 
 /// A simulation context provides access to necessary simulation-global

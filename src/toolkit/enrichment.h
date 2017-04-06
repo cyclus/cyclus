@@ -31,8 +31,16 @@ class Assays {
 };
 
 /// @param mat the material inquired about
-/// @return the mass percent of U-235 w.r.t U-235+U-238 in a material
+/// @return the mass/atom percent of U-235 w.r.t U-235+U-238 in a material
 double UraniumAssay(Material::Ptr mat);
+
+/// @param mat the material inquired about
+/// @return the mass percent of U-235 w.r.t U-235+U-238 in a material
+double UraniumAssayMass(Material::Ptr mat);
+
+/// @param mat the material inquired about
+/// @return the atom percent of U-235 w.r.t U-235+U-238 in a material
+double UraniumAssayAtom(Material::Ptr mat);
 
 /// inline double UraniumAssay(Material::Ptr mat) {
 ///   return UraniumAssay(mat.get());
