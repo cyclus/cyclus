@@ -4,6 +4,7 @@
 #include <string>
 
 #include "cyclus.h"
+#include "gis.h"
 
 namespace cyclus {
 
@@ -12,16 +13,16 @@ namespace cyclus {
 /// This gisfac facility is similar to GISFac provided in cycamore, but it
 /// has minimum implementation to run integration tests.
 /// Some parts of the code is directrly copied from cycamore GISFac.
-class GISFac : public cyclus::Facility  {
+class GISFac : public cyclus::Facility {
  public:
   GISFac(cyclus::Context* ctx);
   virtual ~GISFac() {}
 
   virtual std::string version() { return cyclus::version::describe(); }
 
-  #pragma cyclus
+#pragma cyclus
 
-  #pragma cyclus note {"doc": "A minimum implementation gisfac " \
+#pragma cyclus note {"doc": "A minimum implementation gisfac " \
                               "facility that accepts specified " \
                               "amounts of commodities from " \
                               "other agents"}
@@ -35,30 +36,30 @@ class GISFac : public cyclus::Facility  {
   /// @brief GISFac request Materials of their given commodity. Note
   /// that it is assumed the GISFac operates on a single resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
-      GetMatlRequests();
+  GetMatlRequests();
 
   /// @brief GISFac request Product of their given
   /// commodity. Note that it is assumed the GISFac operates on a single
   /// resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
-      GetProductRequests();
+  GetProductRequests();
 
   /// @brief GISFac place accepted trade Materials in their Inventory
   virtual void AcceptMatlTrades(
-      const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
-                                   cyclus::Material::Ptr> >& responses);
+      const std::vector<std::pair<cyclus::Trade<cyclus::Material>,
+                                  cyclus::Material::Ptr> >& responses);
 
   /// @brief GISFac place accepted trade Materials in their Inventory
   virtual void AcceptProductTrades(
-      const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
-                                   cyclus::Product::Ptr> >& responses);
+      const std::vector<std::pair<cyclus::Trade<cyclus::Product>,
+                                  cyclus::Product::Ptr> >& responses);
 
   /// @brief determines the amount to request
   inline double Capacity() const { return capacity; }
 
   inline void Capacity(double cap) { capacity = cap; }
 
-  void AddIncommod(std::string commod) {in_commods.push_back(commod);};
+  void AddIncommod(std::string commod) { in_commods.push_back(commod); };
 
   /// sets the name of the recipe to be requested
   inline void recipe(std::string name) { recipe_name = name; }
@@ -73,43 +74,45 @@ class GISFac : public cyclus::Facility  {
     }
   }
 
+  /// the location of this facility
+  cyclus::GIS* gis;
+
  private:
-  #pragma cyclus var {\
-    "doc": "commodities that the gisfac facility accepts ",	   \
-    "tooltip": "input commodities for the gisfac",		   \
-    "uilabel": "List of Input Commodities",			   \
-    "uitype": ["oneormore", "incommodity"]			   \
-  }
+#pragma cyclus var {                                       \
+  "doc" : "commodities that the gisfac facility accepts ", \
+  "tooltip" : "input commodities for the gisfac",          \
+  "uilabel" : "List of Input Commodities",                 \
+  "uitype" : ["oneormore", "incommodity"] }
   std::vector<std::string> in_commods;
 
-  #pragma cyclus var { \
+#pragma cyclus var { \
     "tooltip": "input/request recipe name", \
     "doc": "Name of recipe to request." \
            "If empty, gisfac requests material no particular composition.", \
     "default": "", \
-    "uilabel": "Input Recipe",			\
+    "uilabel": "Input Recipe",      \
     "uitype": "recipe", \
   }
   std::string recipe_name;
 
-  #pragma cyclus var {\
-    "default": 1e299,						\
-    "doc": "total maximum inventory size of "			\
-           "gisfac facility",						\
-    "uilabel": "Maximum Inventory",				\
+#pragma cyclus var {\
+    "default": 1e299,           \
+    "doc": "total maximum inventory size of "     \
+           "gisfac facility",           \
+    "uilabel": "Maximum Inventory",       \
     "tooltip": "gisfac maximum inventory size" \
   }
   double max_inv_size;
 
-  #pragma cyclus var { \
-    "doc": "capacity the gisfac facility can "		 \
-           "accept at each time step",				 \
-    "uilabel": "Maximum Throughput",			 \
+#pragma cyclus var { \
+    "doc": "capacity the gisfac facility can "     \
+           "accept at each time step",         \
+    "uilabel": "Maximum Throughput",       \
     "tooltip": "gisfac capacity"  \
   }
   double capacity;
 
-  #pragma cyclus var {'capacity': 'max_inv_size'}
+#pragma cyclus var { 'capacity' : 'max_inv_size' }
   cyclus::toolkit::ResourceBuff inventory;
 };
 

@@ -2,9 +2,9 @@
 
 #include "gisfac.h"
 
+#include "agent_tests.h"
 #include "context.h"
 #include "facility_tests.h"
-#include "agent_tests.h"
 
 using cyclus::GISFac;
 
@@ -12,18 +12,22 @@ using cyclus::GISFac;
 class GISFacTest : public ::testing::Test {
  protected:
   cyclus::TestContext tc_;
-  GISFac* src_facility_;
+  GISFac* facility_a_;
+  GISFac* facility_b_;
 
-  virtual void SetUp() {
-    src_facility_ = new GISFac(tc_.get());
-  }
+  virtual void SetUp() { src_facility_ = new GISFac(tc_.get()); }
 
   virtual void TearDown() {}
 };
 
+TEST_F(GISFacTest, set_longitude) {
+  facility_a_.gis.set_longitude(92.3)
+      EXPECT_EQ(92.3, facility_a_.gis.get_longitude())
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, clone) {
-  GISFac* cloned_fac = dynamic_cast<Sink*> (src_facility_->Clone());
+  GISFac* cloned_fac = dynamic_cast<GISFac*>(facility_a_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,7 +40,6 @@ TEST_F(GISFacTest, Print) {
   EXPECT_NO_THROW(std::string s = src_facility_->str());
   // Test GISFac specific aspects of the print method here
 }
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, ReceiveMessage) {

@@ -2,9 +2,7 @@
 
 namespace cyclus {
 
-GISFac::Sink(cyclus::Context* ctx)
-    : cyclus::Facility(ctx),
-      capacity(100) {}
+GISFac::GISFac(cyclus::Context* ctx) : cyclus::Facility(ctx), capacity(100) {}
 
 std::string GISFac::str() {
   // No info for now. Change later
@@ -51,8 +49,7 @@ GISFac::GetProductRequests() {
   using cyclus::Request;
 
   std::set<RequestPortfolio<Product>::Ptr> ports;
-  RequestPortfolio<Product>::Ptr
-      port(new RequestPortfolio<Product>());
+  RequestPortfolio<Product>::Ptr port(new RequestPortfolio<Product>());
   double amt = Capacity();
 
   if (amt > cyclus::eps()) {
@@ -73,25 +70,24 @@ GISFac::GetProductRequests() {
 }
 
 void GISFac::AcceptMatlTrades(
-    const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
-                                 cyclus::Material::Ptr> >& responses) {
-  std::vector< std::pair<cyclus::Trade<cyclus::Material>,
-  cyclus::Material::Ptr> >::const_iterator it;
+    const std::vector<std::pair<cyclus::Trade<cyclus::Material>,
+                                cyclus::Material::Ptr> >& responses) {
+  std::vector<std::pair<cyclus::Trade<cyclus::Material>,
+                        cyclus::Material::Ptr> >::const_iterator it;
   for (it = responses.begin(); it != responses.end(); ++it) {
     inventory.Push(it->second);
   }
 }
 
 void GISFac::AcceptProductTrades(
-    const std::vector< std::pair<cyclus::Trade<cyclus::Product>,
-                                 cyclus::Product::Ptr> >& responses) {
-  std::vector< std::pair<cyclus::Trade<cyclus::Product>,
-  cyclus::Product::Ptr> >::const_iterator it;
+    const std::vector<std::pair<cyclus::Trade<cyclus::Product>,
+                                cyclus::Product::Ptr> >& responses) {
+  std::vector<std::pair<cyclus::Trade<cyclus::Product>,
+                        cyclus::Product::Ptr> >::const_iterator it;
   for (it = responses.begin(); it != responses.end(); ++it) {
     inventory.Push(it->second);
   }
 }
-
 
 void GISFac::Tick() {
   using std::string;
@@ -100,11 +96,10 @@ void GISFac::Tick() {
   // Inform the simulation about what the gisfac facility will be requesting
   if (request_amt > cyclus::eps()) {
     for (vector<string>::iterator commod = in_commods.begin();
-         commod != in_commods.end();
-         commod++) {
-      LOG(cyclus::LEV_INFO3, "GISFac")  << prototype()
-                                      << " will request " << request_amt
-                                      << " kg of " << *commod << ".";
+         commod != in_commods.end(); commod++) {
+      LOG(cyclus::LEV_INFO3, "GISFac") << prototype() << " will request "
+                                       << request_amt << " kg of " << *commod
+                                       << ".";
     }
   }
 }
@@ -113,10 +108,10 @@ void GISFac::Tock() {
   // On the tock, the gisfac facility doesn't really do much.
   // Maybe someday it will record things.
   // For now, lets just print out what we have at each timestep.
-  LOG(cyclus::LEV_INFO3, "GISFac") << prototype()
-                                 << " is holding " << inventory.quantity()
-                                 << " units of material at the close of month "
-                                 << context()->time() << ".";
+  LOG(cyclus::LEV_INFO3, "GISFac")
+      << prototype() << " is holding " << inventory.quantity()
+      << " units of material at the close of month " << context()->time()
+      << ".";
 }
 
 extern "C" cyclus::Agent* ConstructGISFac(cyclus::Context* ctx) {
