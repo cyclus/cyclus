@@ -3,7 +3,12 @@
 namespace cyclus {
 
 GISFacisa::GISFacisa(cyclus::Context* ctx)
-    : cyclus::Facility(ctx), capacity(100) {}
+    : cyclus::Facility(ctx), capacity(100), cyclus::GIS(0, 0) {}
+
+GISFacisa::GISFacisa(cyclus::Context* ctx, float decimal_lat, float decimal_lon)
+    : cyclus::Facility(ctx),
+      capacity(100),
+      cyclus::GIS(decimal_lat, decimal_lon) {}
 
 std::string GISFacisa::str() {
   // No info for now. Change later
