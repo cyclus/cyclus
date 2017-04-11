@@ -23,7 +23,12 @@ class GISFacTest : public ::testing::Test {
     facility_b_->gis = new cyclus::GIS();
   }
 
-  virtual void TearDown() {}
+  virtual void TearDown() {
+    delete facility_a_->gis;
+    delete facility_b_->gis;
+    delete facility_a_;
+    delete facility_b_;
+  }
 };
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, set_longitude) {
@@ -46,6 +51,13 @@ TEST_F(GISFacTest, InitialState) {
   // Test things about the initial state of the facility here
   EXPECT_NEAR(facility_a_->gis->get_longitude(), 0, 0.001);
   EXPECT_NEAR(facility_a_->gis->get_latitude(), 0, 0.001);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(GISFacTest, Constructor) {
+  delete facility_a_->gis;
+  facility_a_->gis = new cyclus::GIS(48.858222, 2.2945);
+  EXPECT_NEAR(facility_a_->gis->get_latitude(), 48.858222, 48.858222 * 0.01);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
