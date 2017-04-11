@@ -15,14 +15,14 @@ class GISFacTest : public ::testing::Test {
   GISFac* facility_a_;
   GISFac* facility_b_;
 
-  virtual void SetUp() { src_facility_ = new GISFac(tc_.get()); }
+  virtual void SetUp() {}
 
   virtual void TearDown() {}
 };
 
 TEST_F(GISFacTest, set_longitude) {
-  facility_a_.gis.set_longitude(92.3)
-      EXPECT_EQ(92.3, facility_a_.gis.get_longitude())
+  facility_a_->gis->set_longitude(92.3);
+  EXPECT_EQ(92.3, facility_a_->gis->get_longitude());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,31 +33,14 @@ TEST_F(GISFacTest, clone) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, InitialState) {
   // Test things about the initial state of the facility here
+  EXPECT_EQ(facility_a_->gis->get_longitude(), 0);
+  EXPECT_EQ(facility_a_->gis->get_latitude(), 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, Print) {
-  EXPECT_NO_THROW(std::string s = src_facility_->str());
+  EXPECT_NO_THROW(std::string s = facility_a_->str());
   // Test GISFac specific aspects of the print method here
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(GISFacTest, ReceiveMessage) {
-  // Test GISFac specific behaviors of the ReceiveMessage function here
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(GISFacTest, Tick) {
-  int time = 1;
-  ASSERT_NO_THROW(src_facility_->Tick());
-  // Test GISFac specific behaviors of the Tick function here
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(GISFacTest, Tock) {
-  int time = 1;
-  EXPECT_NO_THROW(src_facility_->Tock());
-  // Test GISFac specific behaviors of the Tock function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -73,7 +73,6 @@ class GISFac : public cyclus::Facility {
       context()->SchedDecom(this, exit_time());
     }
   }
-
   /// the location of this facility
   cyclus::GIS* gis;
 
