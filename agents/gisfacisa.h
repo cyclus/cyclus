@@ -13,9 +13,10 @@ namespace cyclus {
 /// This gisfacisa facility is similar to GISFacisa provided in cycamore, but it
 /// has minimum implementation to run integration tests.
 /// Some parts of the code is directrly copied from cycamore GISFacisa.
-class GISFacisa : public cyclus::Facility {
+class GISFacisa : public cyclus::Facility, public cyclus::GIS {
  public:
   GISFacisa(cyclus::Context* ctx);
+  GISFacisa(cyclus::Context* ctx, float decimal_lat, float decimal_lon);
   virtual ~GISFacisa() {}
 
   virtual std::string version() { return cyclus::version::describe(); }
@@ -73,8 +74,6 @@ class GISFacisa : public cyclus::Facility {
       context()->SchedDecom(this, exit_time());
     }
   }
-  /// the location of this facility
-  cyclus::GIS* gis;
 
  private:
 #pragma cyclus var {                                          \
