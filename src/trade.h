@@ -6,6 +6,7 @@
 
 namespace cyclus {
 
+
 /// @class Trade
 ///
 /// @brief A Trade is a simple container that associates a request for a
