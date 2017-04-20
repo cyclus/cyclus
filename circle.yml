@@ -41,7 +41,6 @@ jobs:
 #  override:
 #    - docker build --rm=false -t cyclus/cyclus:latest .
 
-
 #test:
 #  override:
 #    - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
