@@ -1,70 +1,69 @@
-version: 2
-jobs:
-  build:
-    working_directory: /root/cyclus
-    docker:
-      - image: cyclus/cyclus-deps:latest
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="17.03.0-ce"
-            apt-get install -y curl
-            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
-      - run:
-          name: Build and Push Cyclus
-          command: |
-            set -x
-            docker build -t cyclus/cyclus:latest .
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker push cyclus/cyclus:latest
-      - run:
-          name: Cyclus Tests
-          command: |
-            set -x
-            docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
-            docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
+#version: 2
+#jobs:
+#  build:
+#    working_directory: /root/cyclus
+#    docker:
+#      - image: cyclus/cyclus-deps:latest
+#    steps:
+#      - checkout
+#      - setup_remote_docker
+#      - run:
+#          name: Install Docker client
+#          command: |
+#            set -x
+#            VER="17.03.0-ce"
+#            apt-get install -y curl
+#            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+#            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+#            mv /tmp/docker/* /usr/bin
+#      - run:
+#          name: Build and Push Cyclus
+#          command: |
+#            docker build -t cyclus/cyclus:latest .
+#            docker login -u $DOCKER_USER -p $DOCKER_PASS
+#            docker push cyclus/cyclus:latest
+#      - run:
+#          name: Cyclus Tests
+#          command: |
+#            set -x
+#            docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
+#            docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
 #
 #
 #
 
-#machine:
-#  services:
-#    - docker
+machine:
+  services:
+    - docker
 
-#dependencies:
-#  override:
-#    - docker build --rm=false -t cyclus/cyclus:latest .
+dependencies:
+  override:
+    - docker build --rm=false -t cyclus/cyclus:latest .
 
-#test:
-#  override:
-#    - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
-#    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
+test:
+  override:
+    - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
+    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
 
-#deployment:
-#  develop:
-#    branch: develop
-#    commands:
-#      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-#      - docker push cyclus/cyclus:latest
+deployment:
+  develop:
+    branch: develop
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push cyclus/cyclus:latest
 
-#  master:
-#    branch: master
-#    commands:
-#      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-#      # Update cyclus/cylus:stable docker container
-#      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
-#      - docker push cyclus/cyclus:stable # push to docker depot
-#      ## DEB GENERATION
-#      # Ubuntu 14.04
-#      - docker/deb-ci/build_upload_deb.sh 14 :
-#          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
+  master:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      # Update cyclus/cylus:stable docker container
+      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
+      - docker push cyclus/cyclus:stable # push to docker depot
+      ## DEB GENERATION
+      # Ubuntu 14.04
+      - docker/deb-ci/build_upload_deb.sh 14 :
+          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
       # Ubuntu 16.04
-#      - docker/deb-ci/build_upload_deb.sh 16 :
-#          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
+      - docker/deb-ci/build_upload_deb.sh 16 :
+          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
         ## END DEB GENERATION
