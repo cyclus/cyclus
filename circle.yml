@@ -19,12 +19,14 @@ jobs:
       - run:
           name: Build and Push Cyclus
           command: |
+            set -x
             docker build -t cyclus/cyclus:latest .
-            docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push cyclus/cyclus:latest
       - run:
           name: Cyclus Tests
           command: |
+            set -x
             docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
             docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
 #
