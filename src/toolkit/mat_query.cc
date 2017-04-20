@@ -48,9 +48,10 @@ double MatQuery::atom_frac(std::set<Nuc> nucs) {
   double frac_tot = 0;
   std::set<Nuc>::iterator it ;
   for (it = nucs.begin(); it != nucs.end(); ++it) {
-    frac_tot += v[*it];
+    if (v.find(*it) != v.end()){
+      frac_tot += v[*it];
+    }
   }
-
   return frac_tot; 
 }
 

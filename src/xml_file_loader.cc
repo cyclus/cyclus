@@ -447,10 +447,6 @@ void XMLFileLoader::LoadControlParams() {
   // get epsilon resources
   double eps_rsrc_ = OptionalQuery<double>(qe, "tolerance_resource", 1e-6);
   cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
-  
-  // get Uranium Assay by Mass
-  double assay_by_mass_ = OptionalQuery<bool>(qe, "assay_by_mass", false);
-  cy_assay_by_mass = si.assay_by_mass = assay_by_mass_;
 
 
   ctx_->InitSim(si);

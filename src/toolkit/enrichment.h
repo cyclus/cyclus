@@ -31,7 +31,7 @@ class Assays {
 };
 
 /// @param mat the material inquired about
-/// @return the mass/atom percent of U-235 w.r.t U-235+U-238 in a material
+/// @return the atom percent of U-235 w.r.t U-235+U-238 in a material
 double UraniumAssay(Material::Ptr mat);
 
 /// @param mat the material inquired about
@@ -63,7 +63,8 @@ double FeedQty(double product_qty, const Assays& assays);
 /// @param product_qty the amount of product Uranium
 /// @param assays the assay of product, feed, and tails
 /// @return the quantity of tails resulting from enriching the product
-/// whose units match those of the given product
+/// whose units match those of the given product; product_qty and assay
+/// must share the same units: both in mass or in atom
 double TailsQty(double product_qty, const Assays& assays);
 
 /// @param product_qty the amount of product Uranium

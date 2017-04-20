@@ -34,8 +34,10 @@ void EnrichmentTests::SetUp() {
   CompMap v;
   v[922350000] = assay_u_;
   v[922380000] = 1 - assay_u_;
-  Composition::Ptr comp = Composition::CreateFromMass(v);
-  mat_ = Material::CreateUntracked(mass_u_, comp);
+  Composition::Ptr comp1 = Composition::CreateFromMass(v);
+  //Composition::Ptr comp2 = Composition::CreateFromMass(v);
+  mat_ = Material::CreateUntracked(mass_u_, comp1);
+  //mat2_ = Material::CreateUntracked(mass_u_, comp2);
 
   SetEnrichmentParameters();
 }
@@ -79,13 +81,13 @@ TEST_F(EnrichmentTests, valuefunction) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, material) {
-  EXPECT_DOUBLE_EQ(assay_u_, UraniumAssay(mat_));
+  EXPECT_DOUBLE_EQ(assay_u_, UraniumAssayMass(mat_));
   EXPECT_DOUBLE_EQ(mass_u_, UraniumQty(mat_));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, enrichmentcalcs) {
-  Assays assays(feed_, UraniumAssay(mat_),
+  Assays assays(feed_, UraniumAssayMass(mat_),
                                     tails_);
   double product_qty = UraniumQty(mat_);
   EXPECT_DOUBLE_EQ(feed_qty_, FeedQty(product_qty, assays));
@@ -94,4 +96,4 @@ TEST_F(EnrichmentTests, enrichmentcalcs) {
 }
 
 }  // namespace toolkit
-}  // namespace cyclus
+}  // namespace cycl1u1s

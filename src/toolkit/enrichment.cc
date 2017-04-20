@@ -34,12 +34,6 @@ double Assays::Tails() const {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double UraniumAssay(Material::Ptr rsrc) {
-  
-  // If UraniumAssayByMass is set return Assay by mass, return by atom
-  // otherwise.
-  if (cy_assay_by_mass) 
-    return UraniumAssayMass(rsrc);
-
   return UraniumAssayAtom(rsrc);
 }
 

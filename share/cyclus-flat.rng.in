@@ -34,9 +34,6 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
           <element name="tolerance_resource"><data type="double"/></element>
       </optional>
       <optional>
-          <element name="assay_by_mass"><data type="boolean"/></element>
-      </optional>
-      <optional>
         <element name="solver"> 
           <interleave>
             <optional><element name="config">
