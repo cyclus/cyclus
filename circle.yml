@@ -1,35 +1,60 @@
-machine:
-  services:
-    - docker
+version: 2
+jobs:
+  build:
+    working_directory: /root/cyclus
+    docker:
+      - image: cyclus/cyclus:latest
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Cyclus
+          command: |
+            docker build -t cyclus/cyclus:latest .
+            docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            docker push cyclus/cyclus:latest
+      - run:
+          name: Cyclus Tests
+          command: |
+            docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
+            docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
+#
+#
+#
 
-dependencies:
-  override:
-    - docker build --rm=false -t cyclus/cyclus:latest .
+#machine:
+#  services:
+#    - docker
 
-test:
-  override:
-    - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
-    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
+#dependencies:
+#  override:
+#    - docker build --rm=false -t cyclus/cyclus:latest .
 
-deployment:
-  develop:
-    branch: develop
-    commands:
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker push cyclus/cyclus:latest
 
-  master:
-    branch: master
-    commands:
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      # Update cyclus/cylus:stable docker container
-      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
-      - docker push cyclus/cyclus:stable # push to docker depot
-      ## DEB GENERATION
-      # Ubuntu 14.04
-      - docker/deb-ci/build_upload_deb.sh 14 :
-          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
+#test:
+#  override:
+#    - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
+#    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
+
+#deployment:
+#  develop:
+#    branch: develop
+#    commands:
+#      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+#      - docker push cyclus/cyclus:latest
+
+#  master:
+#    branch: master
+#    commands:
+#      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+#      # Update cyclus/cylus:stable docker container
+#      - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
+#      - docker push cyclus/cyclus:stable # push to docker depot
+#      ## DEB GENERATION
+#      # Ubuntu 14.04
+#      - docker/deb-ci/build_upload_deb.sh 14 :
+#          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
       # Ubuntu 16.04
-      - docker/deb-ci/build_upload_deb.sh 16 :
-          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
+#      - docker/deb-ci/build_upload_deb.sh 16 :
+#          timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
         ## END DEB GENERATION
