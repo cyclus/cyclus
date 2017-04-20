@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   override:
-    - docker build -t cyclus/cyclus:latest .
+    - docker build --rm=false -t cyclus/cyclus:latest .
 
 test:
   override:
