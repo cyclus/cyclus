@@ -1672,6 +1672,8 @@ class SchemaFilter(CodeGeneratorFilter):
         'facility': None,
         'prototype': None,
         'recipe': None,
+        'inrecipe': None,
+        'outrecipe': None,
         'none': None,
         None: None,
         '': None,

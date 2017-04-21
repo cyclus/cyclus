@@ -2,7 +2,5 @@ FROM cyclus/cyclus-deps
 
 COPY . /cyclus
 WORKDIR /cyclus
-RUN mkdir Release
-WORKDIR /cyclus/Release
-RUN cmake .. -DCMAKE_BUILD_TYPE=Release
-RUN make -j2 && make install
+ENV PATH="/root/.local/bin:${PATH}"
+RUN python install.py -j2 --build-type=Release --core-version 999999.999999

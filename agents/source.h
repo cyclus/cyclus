@@ -111,9 +111,11 @@ class Source : public cyclus::Facility {
   /// The capacity is defined in terms of the number of units of the
   /// recipe that can be provided each time step.  A very large number
   /// can be provided to represent infinte capacity.
-  #pragma cyclus var {					   \
-    "doc": "amount of commodity that can be supplied at each time step",   \
-    "uilabel": "Maximum Throughput",			   \
+  #pragma cyclus var { \
+    "doc": "amount of commodity that can be supplied at each time step", \
+    "uilabel": "Maximum Throughput", \
+    "uitype": "range", \
+    "range": [0.0, 1e299], \
     "tooltip": "source capacity" \
   }
   double capacity;
