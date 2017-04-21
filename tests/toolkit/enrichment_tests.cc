@@ -99,4 +99,4 @@ TEST_F(EnrichmentTests, enrichmentcalcs) {
 }
 
 }  // namespace toolkit
-}  // namespace cycl1u1s
+}  // namespace cyclus
