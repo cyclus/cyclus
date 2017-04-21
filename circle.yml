@@ -31,7 +31,6 @@ jobs:
             docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
 
 
-
 #machine:
 #  services:
 #    - docker
