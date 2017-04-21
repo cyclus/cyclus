@@ -35,9 +35,9 @@ void EnrichmentTests::SetUp() {
   v[922350000] = assay_u_;
   v[922380000] = 1 - assay_u_;
   Composition::Ptr comp1 = Composition::CreateFromMass(v);
-  //Composition::Ptr comp2 = Composition::CreateFromMass(v);
-  mat_ = Material::CreateUntracked(mass_u_, comp1);
-  //mat2_ = Material::CreateUntracked(mass_u_, comp2);
+  Composition::Ptr comp2 = Composition::CreateFromAtom(v);
+  mat_by_mass_ = Material::CreateUntracked(mass_u_, comp1);
+  mat_by_atom_ = Material::CreateUntracked(mass_u_, comp2);
 
   SetEnrichmentParameters();
 }
@@ -66,8 +66,7 @@ TEST_F(EnrichmentTests, assays) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, valuefunction) {
-  EXPECT_THROW(ValueFunc(0 - eps()),
-               ValueError);
+  EXPECT_THROW(ValueFunc(0 - eps()), ValueError);
   EXPECT_THROW(ValueFunc(1), ValueError);
 
   double step = 0.001;
@@ -78,18 +77,22 @@ TEST_F(EnrichmentTests, valuefunction) {
     test_value += step;
   }
 }
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(EnrichmentTests, UraniumAssays) {
+  EXPECT_DOUBLE_EQ(product_, UraniumAssayAtom(mat_by_atom_));
+  EXPECT_DOUBLE_EQ(product_, UraniumAssayMass(mat_by_mass_));
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, material) {
-  EXPECT_DOUBLE_EQ(assay_u_, UraniumAssayMass(mat_));
-  EXPECT_DOUBLE_EQ(mass_u_, UraniumQty(mat_));
+  EXPECT_DOUBLE_EQ(mass_u_, UraniumQty(mat_by_mass_));
+  EXPECT_DOUBLE_EQ(mass_u_, UraniumQty(mat_by_atom_));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(EnrichmentTests, enrichmentcalcs) {
-  Assays assays(feed_, UraniumAssayMass(mat_),
-                                    tails_);
-  double product_qty = UraniumQty(mat_);
+  Assays assays(feed_, UraniumAssayMass(mat_by_mass_), tails_);
+  double product_qty = UraniumQty(mat_by_mass_);
   EXPECT_DOUBLE_EQ(feed_qty_, FeedQty(product_qty, assays));
   EXPECT_DOUBLE_EQ(tails_qty_, TailsQty(product_qty, assays));
   EXPECT_NEAR(swu_, SwuRequired(product_qty, assays), 1e-8);
