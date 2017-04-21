@@ -19,7 +19,7 @@ jobs:
       - run:
           name: Build and Push Cyclus
           command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker build -t cyclus/cyclus:latest .
             docker push cyclus/cyclus:latest
       - run:
