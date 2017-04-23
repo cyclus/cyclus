@@ -40,7 +40,7 @@ IF(NOT CYCLUS_DOC_ONLY)
                     RESULT_VARIABLE res_var)
 
     IF(NOT "${res_var}" STREQUAL "0")
-      message(FATAL_ERROR "fetching decay source code failed, res_var = '${res_var}'")
+        message(FATAL_ERROR "fetching decay source code failed, res_var = '${res_var}'")
     ENDIF()
 
     ##############################################################################################
@@ -61,6 +61,9 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # set cycpp var
     SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
+
+    # set cython post-processor var
+    SET(CYTHON_POST_PROCESSOR "${CYCLUS_CLI_DIR}/post-process-cython.py")
 
     # This makes all the libraries build as SHARED
     SET(BUILD_SHARED_LIBS true)
@@ -102,6 +105,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/cmake")
 
     # Include macros
+    INCLUDE(CopyWhenDiffMacro)
     INCLUDE(UseCyclus)
 
     # set configuration for all library builds
@@ -149,9 +153,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
     MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
 
-    FIND_PACKAGE(Tcmalloc)
-    SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
-
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
     FIND_PACKAGE(LibXml2 REQUIRED ${DEPS_HINTS})
@@ -181,7 +182,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(Boost_USE_STATIC_LIBS OFF)
     SET(Boost_USE_STATIC_RUNTIME OFF)
     # SET(Boost_USE_MULTITHREADED    OFF)
-    FIND_PACKAGE(Boost 1.46.1 COMPONENTS program_options filesystem system serialization REQUIRED)
+    if (DEPS_ROOT_DIR)
+      SET(BOOST_ROOT "${DEPS_ROOT_DIR}")
+      SET(BOOST_INCLUDEDIR "${DEPS_INCLUDE_HINTS}")
+    endif (DEPS_ROOT_DIR)
+    FIND_PACKAGE(Boost COMPONENTS program_options filesystem system serialization REQUIRED)
     MESSAGE("--    Boost Root: ${Boost_ROOT}")
     MESSAGE("--    Boost Include directory: ${Boost_INCLUDE_DIR}")
     MESSAGE("--    Boost Library directories: ${Boost_LIBRARY_DIRS}")
@@ -265,13 +270,15 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Include the CMake script UseCython.cmake.  This defines add_cython_module().
     # Instruction for use can be found at the top of cmake/UseCython.cmake.
-    include(UseCython)
+
+    FIND_PACKAGE(Cython)
     message("-- Found Cython: ${Cython_FOUND}")
     if(Cython_FOUND)
-        execute_process(COMMAND "${CYTHON_EXECUTABLE}" "-V"
-                        ERROR_VARIABLE CYTHON_VERSION
-                        ERROR_STRIP_TRAILING_WHITESPACE)
         message(STATUS "Cython Version: ${CYTHON_VERSION}")
+        if("${CYTHON_VERSION}" VERSION_LESS "0.25")
+          message(FATAL_ERROR "Cython version is too old, must be 0.25+.")
+        endif()
+        include(UseCython)
 
         find_package(Numpy REQUIRED)
         find_package(Jinja2 REQUIRED)
@@ -285,8 +292,17 @@ IF(NOT CYCLUS_DOC_ONLY)
             "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ReplicatePythonSourceTree.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}"
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
+        # make sure we know about having python
+        add_definitions(-DCYCLUS_WITH_PYTHON)
+        set(LIBS ${LIBS} ${PYTHON_LIBRARIES})
+        INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
     else(Cython_FOUND)
-        set(NUMPY_INCLUDE_DIRS "")
+        # If we don't have Python bindings, we may try to find tcmalloc.
+        # Python has to be specially compiled for tcmalloc support, which it
+        # normally isn't.
+        FIND_PACKAGE(Tcmalloc)
+        SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
     endif(Cython_FOUND)
 
     ##############################################################################################
@@ -307,9 +323,12 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${SQLITE3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
-        "${COIN_INCLUDE_DIRS}"
-        "${NUMPY_INCLUDE_DIRS}")
+        "${COIN_INCLUDE_DIRS}")
 
+    if(Cython_FOUND)
+        INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}"
+            "${NUMPY_INCLUDE_DIRS}")
+    endif(Cython_FOUND)
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
         SET(core_version "${CORE_VERSION}")
@@ -319,8 +338,8 @@ IF(NOT CYCLUS_DOC_ONLY)
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
     ENDIF(NOT "${CORE_VERSION}" STREQUAL "")
     IF("${core_version}" STREQUAL "")
-      MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
-      SET(core_version "-1")
+        MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
+        SET(core_version "-1")
     ENDIF()
     SET(ENV{CYCLUS_CORE_VERSION} "${core_version}")
     MESSAGE("-- core version ($CYCLUS_CORE_VERSION) set to: ${core_version}")

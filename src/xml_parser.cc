@@ -21,21 +21,25 @@ XMLParser::~XMLParser() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void XMLParser::Init(const std::stringstream& xml_input_snippet) {
+void XMLParser::Init(const std::string& xml_input_snippet) {
   if (parser_ != NULL) {
     delete parser_;
   }
   parser_ = new xmlpp::DomParser();
   try {
-    CLOG(LEV_DEBUG5) << "Parsing the snippet: " << xml_input_snippet.str();
+    CLOG(LEV_DEBUG5) << "Parsing the snippet: " << xml_input_snippet;
 
-    parser_->parse_memory(xml_input_snippet.str());
+    parser_->parse_memory(xml_input_snippet);
     if (!parser_) {
       throw ValidationError("Could not parse xml file.");
     }
   } catch (const std::exception& ex) {
     throw ValidationError("Error loading xml file: " + std::string(ex.what()));
   }
+}
+
+void XMLParser::Init(const std::stringstream& xml_input_snippet) {
+  Init(xml_input_snippet.str());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

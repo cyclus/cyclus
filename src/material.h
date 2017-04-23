@@ -144,7 +144,7 @@ class Material: public Resource {
   int prev_decay_time() { return prev_decay_time_; }
 
   /// Returns a double with the decay heat of the material in units of
-  /// W/kg. 
+  /// W/kg.
   double DecayHeat();
 
   /// Returns the nuclide composition of this material.

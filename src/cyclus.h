@@ -24,6 +24,7 @@
 #include "material.h"
 #include "mock_sim.h"
 #include "agent.h"
+#include "pyhooks.h"
 #include "pyne.h"
 #include "pyne_decay.h"
 #include "query_backend.h"

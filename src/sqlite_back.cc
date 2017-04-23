@@ -90,6 +90,16 @@ void SqliteBack::Notify(DatumList data) {
 
 void SqliteBack::Flush() { }
 
+std::list<ColumnInfo> SqliteBack::Schema(std::string table) { 
+  std::list<ColumnInfo> schema;
+  QueryResult qr = GetTableInfo(table);
+  for (int i = 0; i < qr.fields.size(); ++i) {
+    ColumnInfo info = ColumnInfo(table, qr.fields[i], i, qr.types[i], std::vector<int>());
+    schema.push_back(info);
+  }
+  return schema;
+}
+
 QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
   QueryResult q = GetTableInfo(table);
 
@@ -144,6 +154,7 @@ std::set<std::string> SqliteBack::Tables() {
   while (stmt->Step()) {
     rtn.insert(stmt->GetText(0, NULL));
   }
+  rtn.erase("FieldTypes");
   return rtn;
 }
 

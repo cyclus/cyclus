@@ -31,7 +31,7 @@ message("-- Include paths for ${CMAKE_CURRENT_SOURCE_DIR}: ${inc_dirs}")
 
 foreach(file ${CYCLUS_CYTHON_FILES})
     get_filename_component(name ${file} NAME_WE)
-    set(targ "__py_${name}__")
+    set(targ "py_${name}_")
     cython_add_module(${targ} ${file})
     target_link_libraries(${targ} dl ${LIBS} cyclus)
     set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX

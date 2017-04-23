@@ -25,7 +25,10 @@ RUN apt-get install -y --force-yes \
     python \
     python-tables \
     python-numpy \
-    python-nose
+    python-nose \
+    python-pandas \
+    python-jinja2 \
+    cython
 
 COPY . /cyclus 
 WORKDIR cyclus

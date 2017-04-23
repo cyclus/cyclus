@@ -28,8 +28,9 @@ RUN apt-get install -y --force-yes \
     python3-numpy \
     python3-nose \
     python3-jinja2 \
-    cython3
+    python3-pip
 
+RUN pip3 install Cython
 RUN rm /usr/bin/python
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
