@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
     if(ms_print){
-        return 0;
+        return 1;
     }
     si.Init(&rec, fback);
   } else {
