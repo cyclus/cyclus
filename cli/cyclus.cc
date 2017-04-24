@@ -172,9 +172,6 @@ int main(int argc, char* argv[]) {
       CLOG(LEV_ERROR) << e.what();
       return 1;
     }
-    if(ms_print){
-        return 1;
-    }
     si.Init(&rec, fback);
   } else {
     // Read output db and restart simulation from specified simid and timestep
