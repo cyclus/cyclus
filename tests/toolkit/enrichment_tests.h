@@ -18,7 +18,8 @@ class EnrichmentTests : public ::testing::Test {
  protected:
   double feed_, product_, tails_;
   double assay_u_, mass_u_;
-  Material::Ptr mat_;
+  Material::Ptr mat_by_mass_;
+  Material::Ptr mat_by_atom_;
   double feed_qty_, tails_qty_, swu_;
 };
 
