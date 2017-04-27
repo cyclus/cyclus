@@ -243,7 +243,7 @@ cdef class _FullBackend:
         res, fields = query_result_to_py(qr)
         results = pd.DataFrame(res, columns=fields)
         return results
-        
+
     def schema(self, table):
         cdef std_string ctable = str_py_to_cpp(table)
         cdef std_list[cpp_cyclus.ColumnInfo] cis = (<cpp_cyclus.QueryableBackend*> self.ptx).Schema(ctable)
@@ -518,8 +518,8 @@ cdef class _DynamicModule:
     def make(ctx, spec):
         """Returns a newly constructed agent for the given module spec.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         ctx : Context
         spec : AgentSpec or str
 
@@ -881,47 +881,47 @@ class XMLFlatLoader(_XMLFlatLoader):
 cdef class _ColumnInfo:
     def __cinit__(self):
         self.ptx = NULL
-    
+
     cdef void copy_from(self, cpp_cyclus.ColumnInfo cinfo):
         self.ptx = new cpp_cyclus.ColumnInfo(cinfo.table, cinfo.col, cinfo.index,
-                                             cinfo.dbtype, cinfo.shape)     
-    
+                                             cinfo.dbtype, cinfo.shape)
+
     def __dealloc__(self):
         if self.ptx == NULL:
             pass
         else:
             del self.ptx
-    
+
     def __repr__(self):
         s = 'ColumnInfo(table=' + self.table + ', col=' + self.col + ', index='\
             + str(self.index) + ', dbtype=' + str(self.dbtype) + ', shape=' + repr(self.shape) + ')'
         return s
-            
+
     @property
     def table(self):
         table = std_string_to_py(self.ptx.table)
         return table
-    
+
     @property
     def col(self):
         col = std_string_to_py(self.ptx.col)
         return col
-        
+
     @property
     def index(self):
         return self.ptx.index
-        
+
     @property
     def dbtype(self):
         return self.ptx.dbtype
-        
+
     @property
     def shape(self):
         shape = std_vector_int_to_py(self.ptx.shape)
         return shape
-        
+
 class ColumnInfo(_ColumnInfo):
-    """Python wrapper for ColumnInfo"""                                       
+    """Python wrapper for ColumnInfo"""
 
 def load_string_from_file(filename, format=None):
     """Loads an XML file from a path or from a string and a format ('xml', 'json', or 'py')."""
