@@ -80,7 +80,7 @@ void Hdf5Back::Notify(DatumList data) {
     std::string name = (*it)->title();
     if (schema_sizes_.count(name) == 0) {
       if (H5Lexists(file_, name.c_str(), H5P_DEFAULT)) {
-        LoadTableTypes(name, (*it)->vals().size());
+        LoadTableTypes(name, (*it)->vals().size(), *it);
       } else {
         // Datum* d = *it;
         // CreateTable(d);
@@ -271,10 +271,15 @@ QueryResult Hdf5Back::GetTableInfo(std::string title, hid_t dset, hid_t dt) {
   return qr;
 }
 
-void Hdf5Back::LoadTableTypes(std::string title, hsize_t ncols) {
+void Hdf5Back::LoadTableTypes(std::string title, hsize_t ncols, Datum *d) {
   if (schemas_.count(title) > 0)
     return;
+    
   hid_t dset = H5Dopen2(file_, title.c_str(), H5P_DEFAULT);
+  if(dset < 0) {
+    CreateTable(d);
+    return;
+  }
   LoadTableTypes(title, dset, ncols);
   H5Dclose(dset);
 }
