@@ -104,7 +104,7 @@ class Hdf5Back : public FullBackend {
 
   /// Reads a table's column types into schemas_ if they aren't already there
   /// \{
-  void LoadTableTypes(std::string title, hsize_t ncols);
+  void LoadTableTypes(std::string title, hsize_t ncols, Datum *d);
   void LoadTableTypes(std::string title, hid_t dset, hsize_t ncols);
   /// \}
 
