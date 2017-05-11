@@ -303,7 +303,7 @@ enum DbTypes {
   PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE,        // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, ["HDF5"], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "STRING", "DOUBLE"]], false]
   PAIR_PAIR_DOUBLE_DOUBLE_MAP_VL_STRING_DOUBLE,     // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, ["HDF5"], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["MAP", "VL_STRING", "DOUBLE"]], false]
   PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_STRING_DOUBLE,     // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, ["HDF5"], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "STRING", "DOUBLE"]], false]
-  PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE,  // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, ["HDF5"], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]], false]   
+  PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE,  // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, ["HDF5"], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]], false]
 
   // Resource Tools
   MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", fasle]
@@ -317,11 +317,11 @@ enum DbTypes {
   RES_MAP_STRING_PRODUCT,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Product>", 2, [], ["RES_MAP", "STRING", "PRODUCT"], false]
   RES_MAP_VL_STRING_MATERIAL,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Material>", 2, [], ["RES_MAP", "VL_STRING", "MATERIAL"], false]
   RES_MAP_VL_STRING_PRODUCT,  // ["cyclus::toolkit::ResMap<std::string, cyclus::Product>", 2, [], ["RES_MAP", "VL_STRING", "PRODUCT"], false]
-  
+
   // pair<double, map<int, double>>
   PAIR_DOUBLE_MAP_INT_DOUBLE, // ["std::pair<double, std::map<int, double>>", 2, ["HDF5"], ["PAIR", "DOUBLE", ["MAP", "INT", "DOUBLE"]], false]
   PAIR_DOUBLE_VL_MAP_INT_DOUBLE, // ["std::pair<double, std::map<int, double>>", 2, ["HDF5"], ["PAIR", "DOUBLE", ["VL_MAP", "INT", "DOUBLE"]], false]
-  
+
   // vector<pair<int, pair<string, string>>>
   VECTOR_PAIR_INT_PAIR_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "STRING"]]], false]
   VECTOR_PAIR_INT_PAIR_VL_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]], false]
@@ -331,12 +331,22 @@ enum DbTypes {
   VL_VECTOR_PAIR_INT_PAIR_VL_STRING_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "STRING"]]], true]
   VL_VECTOR_PAIR_INT_PAIR_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "STRING", "VL_STRING"]]], true]
   VL_VECTOR_PAIR_INT_PAIR_VL_STRING_VL_STRING, // ["std::vector<std::pair<int, std::pair<std::string, std::string>>>", 1, ["HDF5"], ["VL_VECTOR", ["PAIR", "INT", ["PAIR", "VL_STRING", "VL_STRING"]]], true]
-  
+
   PAIR_STRING_VECTOR_DOUBLE, // ["std::pair<std::string, std::vector<double>>", 1, ["HDF5"], ["PAIR", "STRING", ["VECTOR", "DOUBLE"]], false]
   PAIR_VL_STRING_VECTOR_DOUBLE, // ["std::pair<std::string, std::vector<double>>", 1, ["HDF5"], ["PAIR", "VL_STRING", ["VECTOR", "DOUBLE"]], false]
   PAIR_STRING_VL_VECTOR_DOUBLE, // ["std::pair<std::string, std::vector<double>>", 1, ["HDF5"], ["PAIR", "STRING", ["VL_VECTOR", "DOUBLE"]], false]
   PAIR_VL_STRING_VL_VECTOR_DOUBLE, // ["std::pair<std::string, std::vector<double>>", 1, ["HDF5"], ["PAIR", "VL_STRING", ["VL_VECTOR", "DOUBLE"]], false]
   
+  //map<pair<string, string>, int>
+  MAP_PAIR_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, [], ["MAP", ["PAIR", "STRING", "STRING"], "INT"], false]
+  MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, [], ["MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], false]
+  MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, [], ["MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], false]
+  MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, [], ["MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], false]
+  VL_MAP_PAIR_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, [], ["VL_MAP", ["PAIR", "STRING", "STRING"], "INT"], false]
+  VL_MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, [], ["VL_MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], false]
+  VL_MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, [], ["VL_MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], false]
+  VL_MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, [], ["VL_MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], false]
+
   // append new types only:
 };
 
@@ -443,7 +453,6 @@ class QueryResult {
     }
     if (field_idx == -1) {
       throw KeyError("query result has no such field " + field);
-    }
 
     return rows[row][field_idx].cast<T>();
   }
@@ -452,9 +461,9 @@ class QueryResult {
 /// Represents column information.
 struct ColumnInfo {
   ColumnInfo() {};
-  ColumnInfo(std::string default_table, std::string default_col, int default_index, 
-             DbTypes default_dbtype, std::vector<int> default_shape) : 
-    table(default_table), col(default_col), index(default_index), dbtype(default_dbtype), 
+  ColumnInfo(std::string default_table, std::string default_col, int default_index,
+             DbTypes default_dbtype, std::vector<int> default_shape) :
+    table(default_table), col(default_col), index(default_index), dbtype(default_dbtype),
     shape(default_shape) {};
   std::string table;
   std::string col;
@@ -475,10 +484,10 @@ class QueryableBackend {
   /// Return a map of column names of the specified table to the associated
   /// database type.
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) = 0;
-  
+
   /// Return information about all columns of a table.
   virtual std::list<ColumnInfo> Schema(std::string table) = 0;
-  
+
   /// Return a set of all table names currently in the database.
   virtual std::set<std::string> Tables() = 0;
 };
@@ -512,13 +521,13 @@ class CondInjector: public QueryableBackend {
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
     return b_->ColumnTypes(table);
   }
-  
+
   virtual std::list<ColumnInfo> Schema(std::string table) {
     return b_->Schema(table);
   }
 
-  virtual std::set<std::string> Tables() { return b_->Tables(); }  
-    
+  virtual std::set<std::string> Tables() { return b_->Tables(); }
+
  private:
   QueryableBackend* b_;
   std::vector<Cond> to_inject_;
@@ -541,11 +550,11 @@ class PrefixInjector: public QueryableBackend {
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table) {
     return b_->ColumnTypes(table);
   }
-  
+
   virtual std::list<ColumnInfo> Schema(std::string table) {
     return b_->Schema(table);
   }
-  
+
   virtual std::set<std::string> Tables() { return b_->Tables(); }
 
  private:
@@ -704,7 +713,7 @@ class Sha1 {
     for (unsigned int i = 0; i < x.size(); ++i)
       hash_.process_bytes(x[i].c_str(), x[i].size());
   }
-  
+
   inline void Update(const std::vector<cyclus::Blob>& x) {
     for (unsigned int i = 0; i < x.size(); ++i)
       hash_.process_bytes(x[i].str().c_str(), x[i].str().size());
@@ -721,7 +730,7 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
   }
-  
+
   inline void Update(const std::set<bool>& x) {
     std::set<bool>::iterator it = x.begin();
     for (; it != x.end(); ++it)
@@ -733,7 +742,7 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(double));
   }
-  
+
   inline void Update(const std::set<float>& x) {
     std::set<float>::iterator it = x.begin();
     for (; it != x.end(); ++it)
@@ -763,19 +772,19 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(int));
   }
-  
+
   inline void Update(const std::list<bool>& x) {
     std::list<bool>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(bool));
   }
-  
+
   inline void Update(const std::list<double>& x) {
     std::list<double>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
       hash_.process_bytes(&(*it), sizeof(double));
   }
-  
+
   inline void Update(const std::list<float>& x) {
     std::list<float>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
@@ -787,7 +796,7 @@ class Sha1 {
     for (; it != x.end(); ++it)
       hash_.process_bytes(it->c_str(), it->size());
   }
-  
+
   inline void Update(const std::list<cyclus::Blob>& x) {
     std::list<cyclus::Blob>::const_iterator it = x.begin();
     for (; it != x.end(); ++it)
@@ -817,7 +826,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(int));
     }
   }
-  
+
   inline void Update(const std::map<int, bool>& x) {
     std::map<int, bool>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -841,7 +850,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(float));
     }
   }
-  
+
   inline void Update(const std::map<int, cyclus::Blob>& x) {
     std::map<int, cyclus::Blob>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -849,7 +858,7 @@ class Sha1 {
       hash_.process_bytes(it->second.str().c_str(), it->second.str().size());
     }
   }
-  
+
   inline void Update(const std::map<int, boost::uuids::uuid>& x) {
     std::map<int, boost::uuids::uuid>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -889,7 +898,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(float));
     }
   }
-  
+
   inline void Update(const std::map<std::string, bool>& x) {
     std::map<std::string, bool>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -897,7 +906,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(bool));
     }
   }
-  
+
   inline void Update(const std::map<std::string, cyclus::Blob>& x) {
     std::map<std::string, cyclus::Blob>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -905,7 +914,7 @@ class Sha1 {
       hash_.process_bytes(it->second.str().c_str(), it->second.str().size());
     }
   }
-  
+
   inline void Update(const std::map<std::string, boost::uuids::uuid>& x) {
     std::map<std::string, boost::uuids::uuid>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -930,7 +939,7 @@ class Sha1 {
       hash_.process_bytes(&(it->second), sizeof(double));
     }
   }
-  
+
   inline void Update(const std::map<std::string, std::vector<double>>& x) {
     std::map<std::string, std::vector<double>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -938,7 +947,7 @@ class Sha1 {
       Update(it->second);
     }
   }
-  
+
   inline void Update(const std::map<std::string, std::map<int, double>>& x) {
     std::map<std::string, std::map<int, double>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -946,7 +955,7 @@ class Sha1 {
       Update(it->second);
     }
   }
-  
+
   inline void Update(const std::map<int, std::map<std::string, double>>& x) {
     std::map<int, std::map<std::string, double>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -954,12 +963,12 @@ class Sha1 {
       Update(it->second);
     }
   }
-  
+
   inline void Update(const std::pair<double, std::map<int, double>>& x) {
     hash_.process_bytes(&(x.first), sizeof(double));
     Update(x.second);
   }
-  
+
   inline void Update(const std::map<std::string, std::pair<double, std::map<int, double>>>& x) {
     std::map<std::string, std::pair<double, std::map<int, double>>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -967,20 +976,20 @@ class Sha1 {
       Update(it->second);
     }
   }
-  
+
   inline void Update(const std::pair<int, std::pair<std::string, std::string>>& x) {
     hash_.process_bytes(&(x.first), sizeof(int));
     hash_.process_bytes(x.second.first.c_str(), x.second.first.size());
-    hash_.process_bytes(x.second.second.c_str(), x.second.second.size()); 
+    hash_.process_bytes(x.second.second.c_str(), x.second.second.size());
   }
-  
+
   inline void Update(const std::vector<std::pair<int, std::pair<std::string, std::string>>>& x) {
     std::vector<std::pair<int, std::pair<std::string, std::string>>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
       Update(*it);
     }
   }
-  
+
   inline void Update(const std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>& x) {
     std::map<std::string, std::vector<std::pair<int, std::pair<std::string, std::string>>>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
@@ -988,19 +997,19 @@ class Sha1 {
       Update(it->second);
     }
   }
-  
+
   inline void Update(const std::list<std::pair<int, int>>& x){
     std::list<std::pair<int, int>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
       Update(*it);
     }
   }
-  
+
   inline void Update(const std::pair<std::string, std::vector<double>>& x) {
     hash_.process_bytes(x.first.c_str(), x.first.size());
     Update(x.second);
   }
-  
+
   inline void Update(const std::map<std::string, std::pair<std::string, std::vector<double>>>& x) {
     std::map<std::string, std::pair<std::string, std::vector<double>>>::const_iterator it = x.begin();
     for(; it != x.end(); ++it) {
@@ -1008,7 +1017,7 @@ class Sha1 {
       Update(it->second);
     }
   }
-  
+
   inline void Update(const std::map<std::string, std::map<std::string, int>>& x) {
     std::map<std::string, std::map<std::string, int>>::const_iterator it = x.begin();
     for(; it != x.end(); ++it) {
@@ -1016,24 +1025,24 @@ class Sha1 {
       Update(it->second);
     }
   }
-  
+
   inline void Update(const std::pair<double, double>& x) {
     hash_.process_bytes(&(x.first), sizeof(double));
     hash_.process_bytes(&(x.second), sizeof(double));
   }
-  
+
   inline void Update(const std::pair<std::pair<double, double>, std::map<std::string, double>>& x) {
     Update(x.first);
     Update(x.second);
   }
-  
+
   inline void Update(const std::vector<std::pair<std::pair<double, double>, std::map<std::string, double>>>& x) {
     std::vector<std::pair<std::pair<double, double>, std::map<std::string, double>>>::const_iterator it = x.begin();
     for(; it != x.end(); ++it) {
       Update(*it);
     }
   }
-  
+
   /// \}
 
   Digest digest() {

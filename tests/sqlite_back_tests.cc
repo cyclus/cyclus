@@ -64,6 +64,17 @@ TEST_F(SqliteBackTests, MapStrMapStrInt) {
   EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
 }
 
+TEST_F(SqliteBackTests, MapPairStrStrInt) {
+  typedef std::map< std::pair<std::string, std::string >, int > Foo;
+  
+  Foo f;
+  r.NewDatum("monty")
+    ->AddVal("python", f)
+    ->Record();
+  r.Close();
+  cyclus::QueryResult qr = b->Query("monty", NULL);
+  EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
+}
 
 TEST_F(SqliteBackTests, MapStrDouble) {
   std::map<std::string, double> m;
