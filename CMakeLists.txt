@@ -323,11 +323,11 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${SQLITE3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
-        "${COIN_INCLUDE_DIRS}")
+        "${COIN_INCLUDE_DIRS}"
+        "${PYTHON_INCLUDE_DIRS}" )
 
     if(Cython_FOUND)
-        INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}"
-            "${NUMPY_INCLUDE_DIRS}")
+        INCLUDE_DIRECTORIES("${NUMPY_INCLUDE_DIRS}")
     endif(Cython_FOUND)
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
