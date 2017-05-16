@@ -165,6 +165,14 @@ To determine which version of Python is already installed on your computer, run:
 
    python -V
 
+By default ubuntu keeps pointing at python2.7. To get ubuntu to use, by default, the installed python3, use update-alternatives commands as follows:
+
+.. code-block:: bash
+   
+   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+   sudo update-alternatives --config python
+
+
 Boost Note
 ^^^^^^^^^^
 
