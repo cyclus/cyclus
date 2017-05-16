@@ -166,10 +166,10 @@ To determine which version of Python is already installed on your computer, run:
    python -V
 
 Cython Note
-^^^^^^^^^^
+^^^^^^^^^^^
 If you get an error related to an old Cython version, then this may be 
 because the Debian stable version of Cython is 0.23.4. However, 
-Cyclus requires .25+. To install the latest cython version, please 
+Cyclus requires 0.25.0+. To install the latest cython version, please 
 visit the `Cython Documentation`_.
 
 Boost Note
