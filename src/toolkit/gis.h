@@ -10,11 +10,13 @@
 
 // forward declarations
 namespace cyclus {
+namespace toolkt{
 class GIS;
+}
 }
 
 namespace cyclus {
-
+namespace toolkit {
 /// @class GIS
 /// The GIS class is a basic class that stores the geographic location of each
 /// agent in latitude and longitude and follows the ISO
@@ -149,6 +151,7 @@ class GIS {
   /// @return formatted string representation of longiiiitude or latitude
   std::string ToStringHelperDMS(float value) const;
 };
+}
 }
 
 #endif  // CYCLUS_SRC_GIS_H_
