@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "gisfacisa.h"
+#include "tests/test_agents/gisfac.h"
 
 #include <iostream>
 #include "agent_tests.h"
