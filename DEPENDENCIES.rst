@@ -55,7 +55,7 @@ Package                Minimum Version
 ====================   ==================
 doxygen (for docs)     1.7.6.1
 tcmalloc (for speed)   any
-Cython                 0.13.1
+Cython                 0.25+
 Python (dev version)   2.7 or 3.3+
 Jinja2                 any
 NumPy                  1.9+
@@ -120,7 +120,7 @@ and (optionally):
 #. python-numpy  or  python3-numpy
 #. python-nose   or  python3-nose
 #. python-jinja2 or  python3-jinja2
-#. cython        or  cython3       
+#. cython        or  cython3       (see note below)
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -172,6 +172,13 @@ By default ubuntu keeps pointing at python2.7. To change this default to python3
    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
    sudo update-alternatives --config python
 
+
+Cython Note
+^^^^^^^^^^^
+If you get an error related to an old Cython version, then this may be 
+because the Debian stable version of Cython is 0.23.4. However, 
+Cyclus requires 0.25.0+. To install the latest cython version, please 
+visit the `Cython Documentation`_.
 
 Boost Note
 ^^^^^^^^^^
@@ -254,7 +261,7 @@ Finally, update your path and the following environment variables in your
   export PATH=${HDF5_DIR}:/opt/local/bin:${HOME}/.local/bin:$PATH
 
 
-
+.. _`Cython Documentation`: http://cython.readthedocs.io/en/latest/src/quickstart/install.html
 .. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
