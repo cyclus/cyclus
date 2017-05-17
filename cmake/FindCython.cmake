@@ -43,9 +43,9 @@ else()
     )
 endif()
 
-if( ${CYTHON_EXECUTABLE} STREQUAL "" )
+if( ${CYTHON_EXECUTABLE} STREQUAL "" OR ${CYTHON_EXECUTABLE} STREQUAL "CYTHON_EXECUTABLE-NOTFOUND" )
   SET( Cython_FOUND FALSE )
-else( NOT ${CYTHON_EXECUTABLE} STREQUAL "" )
+else()
   SET( Cython_FOUND TRUE )
 
   # get the version strings
