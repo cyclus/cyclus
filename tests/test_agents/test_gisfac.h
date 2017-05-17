@@ -13,5 +13,7 @@ class TestGISFac : public cyclus::toolkit::GIS {
   virtual ~TestGISFac() {}
   // virtual cyclus::Agent* Clone() { return new TestGISFac(context()); }
 };
-}
+
+}  // namespace cyclus
+
 #endif  // CYCLUS_TESTS_TEST_AGENTS_TEST_GISFAC_H_

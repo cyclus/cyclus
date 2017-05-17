@@ -10,7 +10,7 @@
 
 // forward declarations
 namespace cyclus {
-namespace toolkt{
+namespace toolkt {
 class GIS;
 }
 }
@@ -151,7 +151,8 @@ class GIS {
   /// @return formatted string representation of longiiiitude or latitude
   std::string ToStringHelperDMS(float value) const;
 };
-}
-}
+
+}  // namespace toolkit
+}  // namespace cyclus
 
 #endif  // CYCLUS_SRC_GIS_H_

@@ -15,6 +15,8 @@ class GISTest : public ::testing::Test {
   GIS eiffel_, museum_, amsterdam_, barcelona_, urbana_, newyork_, bloomington_,
       sydney_, saopaulo_;
   virtual void SetUp() {
+    /// Longitude and Lattitude of all objects were obtained from GeoHack :
+    /// 'https://tools.wmflabs.org/geohack/'
     eiffel_.set_latitude(48.858222);
     eiffel_.set_longitude(2.2945);
     museum_.set_latitude(48.861111);
@@ -37,6 +39,9 @@ class GISTest : public ::testing::Test {
   virtual void TearDown(){};
 };
 
+/// Tests distance between two GIS objects or facilities in kilometers (KM)
+/// Distances were obtained from:
+/// 'https://www.freemaptools.com/how-far-is-it-between.htm'
 TEST_F(GISTest, Distance) {
   EXPECT_NEAR(eiffel_.Distance(museum_), 3.188, 3.188 * 0.05)
       << "eiffel vs museum failed";
@@ -89,4 +94,5 @@ TEST_F(GISTest, ToStringDMS) {
   ASSERT_LE(sao_str.length(), 20);
   ASSERT_LE(urb_str.length(), 20);
 }
-}
+
+}  // namespace cyclus

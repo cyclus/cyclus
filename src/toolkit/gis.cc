@@ -4,6 +4,7 @@ using namespace std;
 
 namespace cyclus {
 namespace toolkit {
+
 GIS::GIS() : latitude_(0), longitude_(0) {}
 
 GIS::GIS(float decimal_lat, float decimal_lon) {
@@ -152,5 +153,6 @@ string GIS::ToStringHelperDMS(float value) const {
 
   return temp.str();
 }
-}
-}
+
+}  // namespace toolkit
+}  // namespace cyclus
