@@ -2,11 +2,11 @@
 
 #include <iostream>
 #include <string>
-#include "gis.h"
+#include "toolkit/gis.h"
 
 using namespace std;
 
-using cyclus::GIS;
+using cyclus::toolkit::GIS;
 
 namespace cyclus {
 
