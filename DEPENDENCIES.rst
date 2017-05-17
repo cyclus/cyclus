@@ -173,6 +173,7 @@ By default ubuntu keeps pointing at python2.7. To change this default to python3
    sudo update-alternatives --config python
 
 
+
 Cython Note
 ^^^^^^^^^^^
 If you get an error related to an old Cython version, then this may be 
