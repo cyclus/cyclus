@@ -471,7 +471,7 @@ std::list<ColumnInfo> Hdf5Back::Schema(std::string table) {
     attr_name << "shape" << i;
     hid_t attr_id = H5Aopen_by_name(tb_set, ".", attr_name.str().c_str(), H5P_DEFAULT, H5P_DEFAULT);
     hid_t attr_space = H5Aget_space(attr_id);
-    int ndims = H5Sget_simple_extent_ndims(attr_space);
+    int ndims = H5Sget_simple_extent_npoints(attr_space);
     std::vector<int> shape(ndims);
     H5Aread(attr_id, H5T_NATIVE_INT, &shape[0]);
     std::string colname_str = std::string(colname);
