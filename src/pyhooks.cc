@@ -65,6 +65,8 @@ std::string JsonToPy(std::string infile) { return CyclusJsonToPy(infile); };
 }  // namespace toolkit
 }  // namespace cyclus
 #else   // else CYCLUS_WITH_PYTHON
+#include "error.h"
+
 namespace cyclus {
 int PY_INTERP_COUNT = 0;
 bool PY_INTERP_INIT = false;
