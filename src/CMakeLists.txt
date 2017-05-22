@@ -162,7 +162,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
     "${CMAKE_CURRENT_SOURCE_DIR}/transmute.c"
     )
 
-set_source_files_properties(pyne_decay.cc PROPERTIES COMPILE_FLAGS "-O0")
+add_definitions(-DPYNE_DECAY_IS_DUMMY)
 set_source_files_properties(transmute.c PROPERTIES COMPILE_FLAGS
     "-O0 -fcx-fortran-rules -fcx-limited-range -ftree-sra -ftree-ter -fexpensive-optimizations"
     )
