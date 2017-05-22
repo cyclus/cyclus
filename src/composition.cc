@@ -5,7 +5,10 @@
 #include "decayer.h"
 #include "error.h"
 #include "recorder.h"
+
+extern "C" {
 #include "transmute.h"
+}
 
 namespace cyclus {
 
@@ -146,7 +149,7 @@ Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
 
   // perform decay
   std::vector<double> n1 (cyclus_transmute_info.n);
-  cyclus_expm_multiply14(decay_matrix[0], n0[0], n1[0]);
+  cyclus_expm_multiply14(decay_matrix.data(), n0.data(), n1.data());
 
   // convert back to map
   CompMap cm;

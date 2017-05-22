@@ -37,7 +37,9 @@
 #include "time_listener.h"
 #include "trade.h"
 #include "trader.h"
+extern "C" {
 #include "transmute.h"
+}
 #include "version.h"
 
 #include "toolkit/builder.h"
