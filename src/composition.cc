@@ -137,11 +137,14 @@ Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
     if (i < 0) {
       continue;
     }
+    std::cerr << "Mat Inp (" << i << ") " << (it->first) << ": " << (it->second) << "\n";
     n0[i] = it->second;
   }
 
   // get decay matrix
   double t = static_cast<double>(secs_per_timestep) * delta;
+    std::cerr << "Decay time (got): " << delta << "\n";
+    std::cerr << "t: " << t << "\n";
   std::vector<double> decay_matrix (cyclus_transmute_info.nnz);
   for (i=0; i < cyclus_transmute_info.nnz; ++i) {
     decay_matrix[i] = cyclus_transmute_info.decay_matrix[i] * t;
@@ -153,9 +156,12 @@ Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
 
   // convert back to map
   CompMap cm;
+    std::cerr << "N: " << cyclus_transmute_info.n << "\n";
+    std::cerr << "NNZ: " << cyclus_transmute_info.nnz << "\n";
   for (i=0; i < cyclus_transmute_info.n; ++i) {
     if (n1[i] > 0.0) {
-      cm[cyclus_transmute_info.nucids[i]] = n1[i];
+      cm[(cyclus_transmute_info.nucids)[i]] = n1[i];
+    std::cerr << "Mat Out (" << i << ") " << cyclus_transmute_info.nucids[i] << ": " << (n1[i]) << "\n";
     }
   }
   decayed->atom_ = cm;
