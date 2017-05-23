@@ -188,7 +188,6 @@ From now on, to switch between different versions, use:
    sudo update-alternatives --config python
 
 
-
 Cython Note
 ^^^^^^^^^^^
 If you get an error related to an old Cython version, then this may be 
