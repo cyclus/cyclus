@@ -77,12 +77,11 @@ TEST(CompositionTests, decay) {
 
   CompMap v;
   v[id("Cs137")] = 1;
-  //v[id("U238")] = 10;
+  v[id("U238")] = 10;
   cyclus::compmath::Normalize(&v);
   Composition::Ptr c = Composition::CreateFromAtom(v);
 
   double secs_per_timestep = kDefaultTimeStepDur;
-  std::cerr << "Decay time (given): " << int(pyne::half_life(std::string("Cs137")) / secs_per_timestep) << "\n";
   Composition::Ptr newc = \
     c->Decay(int(pyne::half_life(std::string("Cs137")) / secs_per_timestep));
 
