@@ -166,7 +166,7 @@ To determine which version of Python is already installed on your computer, run:
    python -V
 
 
-Despite having installed python3, Ubuntu installations may still point at python2.7 by default. Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command. 
+Despite having installed python3, Ubuntu installations may still point at python2.7 by default. So Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command. 
 
 First, you can list alternatives with the following command:
 
