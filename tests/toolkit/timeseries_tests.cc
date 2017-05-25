@@ -10,6 +10,7 @@ namespace toolkit {
 
 template <TimeSeriesType T>
 void testseries(std::string tbl) {
+  cyclus::PyStart();
   Recorder rec;
   Timer ti;
   Context ctx(&ti, &rec);
@@ -27,6 +28,7 @@ void testseries(std::string tbl) {
   EXPECT_EQ(42.0, stmt->GetDouble(1));
 
   delete back;
+  cyclus::PyStop();
 }
 
 
