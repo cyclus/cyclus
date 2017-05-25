@@ -148,7 +148,10 @@ TEST(ExXlateTests, XlateCapacities) {
   ExchangeNode::Ptr bnode(new ExchangeNode());
   Arc arc(rnode, bnode);
 
-#ifdef __APPLE__
+// Check if using clang APPLE compiler 
+// then do the swap if APPLE CLANG version < 8.1
+#if defined(__apple_build_version__) && \
+    (__clang_major__ < 8 || (__clang_major__ == 8 && __clang_minor__ < 1))
   double rarr[] = {(c1->convert(mat) / qty), (c2->convert(mat) / qty)};
 #else
   double rarr[] = {(c2->convert(mat) / qty), (c1->convert(mat) / qty)};
