@@ -6,7 +6,7 @@
 
 #include "institution_tests.h"
 #include "agent_tests.h"
-#inlcude "pyhooks.h"
+#include "pyhooks.h"
 
 using libname::StubInst;
 
