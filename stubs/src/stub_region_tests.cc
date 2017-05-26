@@ -4,7 +4,7 @@
 
 #include "agent_tests.h"
 #include "region_tests.h"
-#inlcude "pyhooks.h"
+#include "pyhooks.h"
 
 using libname::StubRegion;
 
