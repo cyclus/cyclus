@@ -159,9 +159,13 @@ FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
     ${cc_files}
     "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/transmute.c"
     )
 
-set_source_files_properties(pyne_decay.cc PROPERTIES COMPILE_FLAGS "-O0")
+add_definitions(-DPYNE_DECAY_IS_DUMMY)
+set_source_files_properties(transmute.c PROPERTIES COMPILE_FLAGS
+    "-O0 -fcx-fortran-rules -fcx-limited-range -ftree-sra -ftree-ter -fexpensive-optimizations"
+    )
 
 # write the include directories to a file for later use
 get_property(incdirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)

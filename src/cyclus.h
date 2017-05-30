@@ -26,7 +26,6 @@
 #include "agent.h"
 #include "pyhooks.h"
 #include "pyne.h"
-#include "pyne_decay.h"
 #include "query_backend.h"
 #include "infile_tree.h"
 #include "recorder.h"
@@ -38,6 +37,9 @@
 #include "time_listener.h"
 #include "trade.h"
 #include "trader.h"
+extern "C" {
+#include "transmute.h"
+}
 #include "version.h"
 
 #include "toolkit/builder.h"

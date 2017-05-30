@@ -5,7 +5,10 @@
 #include "decayer.h"
 #include "error.h"
 #include "recorder.h"
-#include "pyne_decay.h"
+
+extern "C" {
+#include "transmute.h"
+}
 
 namespace cyclus {
 
@@ -125,7 +128,37 @@ Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
   if (atom_.size() == 0)
     return decayed;
 
-  decayed->atom_ = pyne::decayers::decay(atom_, static_cast<double>(secs_per_timestep) * delta);
+  // Get intial condition vector
+  std::vector<double> n0 (cyclus_transmute_info.n, 0.0);
+  CompMap::const_iterator it;
+  int i = -1;
+  for (it = atom_.begin(); it != atom_.end(); ++it) {
+    i = cyclus_transmute_nucid_to_i(it->first);
+    if (i < 0) {
+      continue;
+    }
+    n0[i] = it->second;
+  }
+
+  // get decay matrix
+  double t = static_cast<double>(secs_per_timestep) * delta;
+  std::vector<double> decay_matrix (cyclus_transmute_info.nnz);
+  for (i=0; i < cyclus_transmute_info.nnz; ++i) {
+    decay_matrix[i] = -cyclus_transmute_info.decay_matrix[i] * t;
+  }
+
+  // perform decay
+  std::vector<double> n1 (cyclus_transmute_info.n);
+  cyclus_expm_multiply14(decay_matrix.data(), n0.data(), n1.data());
+
+  // convert back to map
+  CompMap cm;
+  for (i=0; i < cyclus_transmute_info.n; ++i) {
+    if (n1[i] > 0.0) {
+      cm[(cyclus_transmute_info.nucids)[i]] = n1[i];
+    }
+  }
+  decayed->atom_ = cm;
   return decayed;
 }
 

@@ -34,15 +34,6 @@ ENDIF()
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow")
 
 IF(NOT CYCLUS_DOC_ONLY)
-
-    # download pre-generated decay source code files from pyne
-    EXECUTE_PROCESS(COMMAND python ${PROJECT_SOURCE_DIR}/getdecay.py --root ${PROJECT_SOURCE_DIR}
-                    RESULT_VARIABLE res_var)
-
-    IF(NOT "${res_var}" STREQUAL "0")
-        message(FATAL_ERROR "fetching decay source code failed, res_var = '${res_var}'")
-    ENDIF()
-
     ##############################################################################################
     ################################# begin cmake configuration ##################################
     ##############################################################################################
