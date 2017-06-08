@@ -8,13 +8,6 @@
 
 #include "cyclus.h"
 
-// forward declarations
-namespace cyclus {
-namespace toolkt {
-class GIS;
-}
-}
-
 namespace cyclus {
 namespace toolkit {
 /// @class GIS
@@ -67,7 +60,7 @@ namespace toolkit {
 class GIS {
  public:
   /// The default constructor for GIS. This will creat an object with
-  /// lat =0, and long=0.
+  /// lat=0, and long=0.
   GIS();
 
   /// GIS constructor with latitude and longditude as degrees as a decimal
