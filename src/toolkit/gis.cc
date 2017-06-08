@@ -20,6 +20,11 @@ void GIS::set_latitude(float lat) { latitude_ = SetPrecision(lat * 3600, 1); }
 
 void GIS::set_longitude(float lon) { longitude_ = SetPrecision(lon * 3600, 1); }
 
+void GIS::set_position(float lat, float lon) {
+  latitude_ = SetPrecision(lat * 3600, 1);
+  longitude_ = SetPrecision(lon * 3600, 1);
+}
+
 double GIS::Distance(GIS target) const {
   double curr_longitude = this->get_longitude() * M_PI / 180;
   double curr_latitude = this->get_latitude() * M_PI / 180;

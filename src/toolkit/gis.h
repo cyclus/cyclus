@@ -74,7 +74,12 @@ class GIS {
   /// @param lon longitude expressed in decimal degrees.
   void set_longitude(float lon);
 
-  /// Returns the distance (in km) between this GIS object and the target GIS
+  /// Sets a new latitude and longitude
+  /// @param lat latitude, and lon longitude expressed in decimal degrees.
+  void set_position(float lat, float lon);
+
+  /// Returns the distance (in km) between this GIS object and the target
+  /// GIS
   /// object.
   /// @param target the GIS object some distnace away from the current one
   /// @return distance between this and target in kilometers
