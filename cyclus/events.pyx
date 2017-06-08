@@ -2,10 +2,8 @@ from __future__ import unicode_literals, print_function
 import time
 import json
 from functools import wraps
-from collections.abc import Set, Sequence
 
 import cyclus.system
-from cyclus.lazyasd import lazyobject
 from cyclus.system import asyncio
 
 # A SimState instance representing the current simuation.

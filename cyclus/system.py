@@ -12,7 +12,7 @@ def PY_VERSION_TUPLE():
 
 @lazyobject
 def curio():
-    if PY_VERSION_TUPLE < (3, 5, 2):
+    if PY_VERSION_TUPLE() < (3, 5, 2):
         return None
     else:
         try:
@@ -23,7 +23,7 @@ def curio():
 
 @lazyobject
 def asyncio():
-    if PY_VERSION_TUPLE < (3, 5, 0):
+    if PY_VERSION_TUPLE() < (3, 5, 0):
         return None
     else:
         try:
@@ -34,7 +34,7 @@ def asyncio():
 
 @lazyobject
 def websockets():
-    if PY_VERSION_TUPLE < (3, 5, 0):
+    if PY_VERSION_TUPLE() < (3, 5, 0):
         return None
     else:
         try:
@@ -45,7 +45,7 @@ def websockets():
 
 @lazyobject
 def concurrent_futures():
-    if PY_VERSION_TUPLE < (3, 2, 0):
+    if PY_VERSION_TUPLE() < (3, 2, 0):
         return None
     else:
         try:
