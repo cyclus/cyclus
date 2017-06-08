@@ -1,7 +1,5 @@
 #include "gis.h"
 
-using namespace std;
-
 namespace cyclus {
 namespace toolkit {
 
@@ -38,9 +36,9 @@ double GIS::Distance(GIS target) const {
   return 6372.8 * temp2;  // 6372.8 is the radius of earth in KM
 }
 
-string GIS::ToString(int return_format) const {
-  stringstream lat_string;
-  stringstream lon_string;
+std::string GIS::ToString(int return_format) const {
+  std::stringstream lat_string;
+  std::stringstream lon_string;
   float lat = this->get_latitude();
   float lon = this->get_longitude();
   switch (return_format) {
@@ -67,8 +65,8 @@ float GIS::SetPrecision(float value, double precision) const {
   return (floor((value * pow(10, precision) + 0.5)) / pow(10, precision));
 }
 
-string GIS::ToStringHelperLat(int mode, float lat) const {
-  stringstream lat_string;
+std::string GIS::ToStringHelperLat(int mode, float lat) const {
+  std::stringstream lat_string;
   double lat_int;
   lat_string << ToStringHelper(lat);
 
@@ -78,7 +76,7 @@ string GIS::ToStringHelperLat(int mode, float lat) const {
   }
   switch (mode) {
     case 1:
-      lat_string << setprecision(7) << fabs(lat_int + lat);
+      lat_string << std::setprecision(7) << fabs(lat_int + lat);
       break;
     case 2:
       lat_string << abs((int)lat_int) << ToStringHelperDM(lat);
@@ -90,8 +88,8 @@ string GIS::ToStringHelperLat(int mode, float lat) const {
   return lat_string.str();
 }
 
-string GIS::ToStringHelperLon(int mode, float lon) const {
-  stringstream lon_string;
+std::string GIS::ToStringHelperLon(int mode, float lon) const {
+  std::stringstream lon_string;
   double lon_int;
   lon_string << ToStringHelper(lon);
   lon = modf(lon, &lon_int);
@@ -103,7 +101,7 @@ string GIS::ToStringHelperLon(int mode, float lon) const {
   }
   switch (mode) {
     case 1:
-      lon_string << setprecision(7) << fabs(lon_int + lon);
+      lon_string << std::setprecision(7) << fabs(lon_int + lon);
       break;
     case 2:
       lon_string << abs((int)lon_int) << ToStringHelperDM(lon);
@@ -115,8 +113,8 @@ string GIS::ToStringHelperLon(int mode, float lon) const {
   return lon_string.str();
 }
 
-string GIS::ToStringHelper(float value) const {
-  stringstream temp;
+std::string GIS::ToStringHelper(float value) const {
+  std::stringstream temp;
   if (value > 0) {
     temp << "+";
   } else {
@@ -125,19 +123,19 @@ string GIS::ToStringHelper(float value) const {
   return temp.str();
 }
 
-string GIS::ToStringHelperDM(float value) const {
-  stringstream temp;
+std::string GIS::ToStringHelperDM(float value) const {
+  std::stringstream temp;
   value = fabs(value) * 60;
   if (((int)fabs(value)) / 10 == 0) {
     temp << "0";
   }
-  temp << setprecision(5) << value;
+  temp << std::setprecision(5) << value;
 
   return temp.str();
 }
 
-string GIS::ToStringHelperDMS(float value) const {
-  stringstream temp;
+std::string GIS::ToStringHelperDMS(float value) const {
+  std::stringstream temp;
   double value_int;
   value = fabs(value) * 60;
   value = modf(value, &value_int);
@@ -149,7 +147,7 @@ string GIS::ToStringHelperDMS(float value) const {
   if ((int)fabs(value) / 10 == 0) {
     temp << "0";
   }
-  temp << setprecision(1) << fixed << value;
+  temp << std::setprecision(1) << std::fixed << value;
 
   return temp.str();
 }
