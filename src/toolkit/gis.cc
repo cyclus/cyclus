@@ -12,9 +12,9 @@ GIS::GIS(float decimal_lat, float decimal_lon) {
 
 GIS::~GIS() {}
 
-float GIS::get_latitude() const { return SetPrecision(latitude_ / 3600, 6); }
+float GIS::latitude() const { return SetPrecision(latitude_ / 3600, 6); }
 
-float GIS::get_longitude() const { return SetPrecision(longitude_ / 3600, 6); }
+float GIS::longitude() const { return SetPrecision(longitude_ / 3600, 6); }
 
 void GIS::set_latitude(float lat) { latitude_ = SetPrecision(lat * 3600, 1); }
 
@@ -26,16 +26,15 @@ void GIS::set_position(float lat, float lon) {
 }
 
 double GIS::Distance(GIS target) const {
-  double curr_longitude = this->get_longitude() * M_PI / 180;
-  double curr_latitude = this->get_latitude() * M_PI / 180;
-  double target_longitude = target.get_longitude() * M_PI / 180;
-  double target_latitude = target.get_latitude() * M_PI / 180;
-  double dlong = target_longitude - curr_longitude;
-  double dlat = target_latitude - curr_latitude;
+  double curr_longitude = this->longitude() * M_PI / 180;
+  double curr_latitude = this->latitude() * M_PI / 180;
+  double tarlongitude = target.longitude() * M_PI / 180;
+  double tarlatitude = target.latitude() * M_PI / 180;
+  double dlong = tarlongitude - curr_longitude;
+  double dlat = tarlatitude - curr_latitude;
 
-  double temp =
-      pow(sin(dlat / 2), 2) +
-      pow(sin(dlong / 2), 2) * cos(curr_latitude) * cos(target_latitude);
+  double temp = pow(sin(dlat / 2), 2) +
+                pow(sin(dlong / 2), 2) * cos(curr_latitude) * cos(tarlatitude);
 
   double temp2 = 2 * atan2(sqrt(temp), sqrt(1 - temp));
   return 6372.8 * temp2;  // 6372.8 is the radius of earth in KM
@@ -44,8 +43,8 @@ double GIS::Distance(GIS target) const {
 std::string GIS::ToString(int return_format) const {
   std::stringstream lat_string;
   std::stringstream lon_string;
-  float lat = this->get_latitude();
-  float lon = this->get_longitude();
+  float lat = this->latitude();
+  float lon = this->longitude();
   switch (return_format) {
     case 1:
       lat_string << ToStringHelperLat(return_format, lat);

@@ -63,10 +63,10 @@ class GIS {
   /// lat=0, and long=0.
   GIS();
 
-  /// GIS constructor with latitude and longditude as degrees as a decimal
-  /// number.
-  /// @param deciaml_lat latitude expressed in degrees as a decimal number.
-  /// @param decimal_lon longditude expressed in degrees as a decimal number.
+  /// GIS constructor with latitude and longditude as degrees as a floating
+  /// point.
+  /// @param deciaml_lat latitude expressed in degrees as a floating point.
+  /// @param decimal_lon longditude expressed in degrees as a floating point.
   GIS(float decimal_lat, float decimal_lon);
 
   /// The default destructor for GIS
@@ -74,11 +74,11 @@ class GIS {
 
   /// Returns the current latitude.
   /// @return decimal representation of latitude.
-  float get_latitude() const;
+  float latitude() const;
 
   /// Returns the current longitude.
   /// @return decimal representation of longitude.
-  float get_longitude() const;
+  float longitude() const;
 
   /// Sets a new latitude
   /// @param lat latitude expressed in decimal degrees.
