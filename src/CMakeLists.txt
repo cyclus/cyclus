@@ -163,9 +163,16 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
     )
 
 add_definitions(-DPYNE_DECAY_IS_DUMMY)
-set_source_files_properties(transmute.c PROPERTIES COMPILE_FLAGS
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # using Clang
+  # Add relevnt set_source_file_properties() call here, once it is known.
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  # using GCC
+  set_source_files_properties(transmute.c PROPERTIES COMPILE_FLAGS
     "-O0 -fcx-fortran-rules -fcx-limited-range -ftree-sra -ftree-ter -fexpensive-optimizations"
-    )
+  )
+endif()
+
 
 # write the include directories to a file for later use
 get_property(incdirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
