@@ -1,9 +1,6 @@
 #ifndef CYCLUS_SRC_GIS_H_
 #define CYCLUS_SRC_GIS_H_
 
-#include <math.h>
-#include <stdio.h>
-#include <sstream>
 #include <string>
 
 #include "cyclus.h"

@@ -1,3 +1,7 @@
+#include <math.h>
+#include <stdio.h>
+#include <sstream>
+
 #include "gis.h"
 
 namespace cyclus {
