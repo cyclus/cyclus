@@ -38,6 +38,7 @@ void GIS::set_position(float lat, float lon) {
 }
 
 double GIS::Distance(GIS target) const {
+  double earth_radius = 6372.8;  // in kilometers (KM)
   double curr_longitude = this->longitude() * M_PI / 180;
   double curr_latitude = this->latitude() * M_PI / 180;
   double tarlongitude = target.longitude() * M_PI / 180;
@@ -45,11 +46,13 @@ double GIS::Distance(GIS target) const {
   double dlong = tarlongitude - curr_longitude;
   double dlat = tarlatitude - curr_latitude;
 
-  double temp = pow(sin(dlat / 2), 2) +
-                pow(sin(dlong / 2), 2) * cos(curr_latitude) * cos(tarlatitude);
+  double half_chord_length_sq =
+      pow(sin(dlat / 2), 2) +
+      pow(sin(dlong / 2), 2) * cos(curr_latitude) * cos(tarlatitude);
 
-  double temp2 = 2 * atan2(sqrt(temp), sqrt(1 - temp));
-  return 6372.8 * temp2;  // 6372.8 is the radius of earth in KM
+  double angular_distance =
+      2 * atan2(sqrt(half_chord_length_sq), sqrt(1 - half_chord_length_sq));
+  return earth_radius * angular_distance;
 }
 
 std::string GIS::ToString(GIS::StringFormat format) const {

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SRC_GIS_H_
-#define CYCLUS_SRC_GIS_H_
+#ifndef CYCLUS_SRC_TOOLKIT_GIS_H_
+#define CYCLUS_SRC_TOOLKIT_GIS_H_
 
 #include <string>
 
@@ -181,4 +181,4 @@ class GIS {
 }  // namespace toolkit
 }  // namespace cyclus
 
-#endif  // CYCLUS_SRC_GIS_H_
+#endif  // CYCLUS_SRC_TOOLKIT_GIS_H_
