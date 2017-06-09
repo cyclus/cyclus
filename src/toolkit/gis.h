@@ -82,11 +82,11 @@ class GIS {
 
   /// Sets a new latitude
   /// @param lat latitude expressed in decimal degrees.
-  void set_latitude(float lat);
+  void latitude(float lat);
 
   /// Sets a new longitude
   /// @param lon longitude expressed in decimal degrees.
-  void set_longitude(float lon);
+  void longitude(float lon);
 
   /// Sets a new latitude and longitude
   /// @param lat latitude, and lon longitude expressed in decimal degrees.

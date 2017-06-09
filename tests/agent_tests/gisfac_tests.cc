@@ -27,17 +27,17 @@ class GISFacTest : public ::testing::Test {
 };
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, set_longitude) {
-  facility_a_->set_longitude(46.545821);
+  facility_a_->longitude(46.545821);
   EXPECT_NEAR(facility_a_->longitude(), 46.545821, 32.5 * 0.01);
-  facility_a_->set_longitude(-82.5546);
+  facility_a_->longitude(-82.5546);
   EXPECT_NEAR(facility_a_->longitude(), -82.5546, 82.5546 * 0.01);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, set_latitude) {
-  facility_a_->set_latitude(32.5);
+  facility_a_->latitude(32.5);
   EXPECT_NEAR(facility_a_->latitude(), 32.5, 32.5 * 0.01);
-  facility_a_->set_latitude(-2.5546);
+  facility_a_->latitude(-2.5546);
   EXPECT_NEAR(facility_a_->latitude(), -2.5546, 2.5546 * 0.01);
 }
 
@@ -50,8 +50,8 @@ TEST_F(GISFacTest, InitialState) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, Constructor) {
-  facility_a_->set_latitude(48.858222);
-  facility_a_->set_longitude(2.2945);
+  facility_a_->latitude(48.858222);
+  facility_a_->longitude(2.2945);
   EXPECT_NEAR(facility_a_->latitude(), 48.858222, 48.858222 * 0.01);
   EXPECT_NEAR(facility_a_->longitude(), 2.2945, 2.2945 * 0.01);
 }
@@ -59,10 +59,10 @@ TEST_F(GISFacTest, Constructor) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(GISFacTest, Distance) {
   EXPECT_NEAR(facility_a_->Distance(*(facility_b_)), 0, 0.0001);
-  facility_a_->set_latitude(48.858222);
-  facility_a_->set_longitude(2.2945);
-  facility_b_->set_latitude(52.37305);
-  facility_b_->set_longitude(4.892222);
+  facility_a_->latitude(48.858222);
+  facility_a_->longitude(2.2945);
+  facility_b_->latitude(52.37305);
+  facility_b_->longitude(4.892222);
   EXPECT_NEAR(facility_a_->Distance(*(facility_b_)), 432.126, 432.126 * 0.01);
 }
 

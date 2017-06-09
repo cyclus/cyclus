@@ -17,24 +17,24 @@ class GISTest : public ::testing::Test {
   virtual void SetUp() {
     /// Longitude and Lattitude of all objects were obtained from GeoHack :
     /// 'https://tools.wmflabs.org/geohack/'
-    eiffel_.set_latitude(48.858222);
-    eiffel_.set_longitude(2.2945);
-    museum_.set_latitude(48.861111);
-    museum_.set_longitude(2.336389);
-    amsterdam_.set_latitude(52.37305);
-    amsterdam_.set_longitude(4.892222);
-    barcelona_.set_latitude(41.383333);
-    barcelona_.set_longitude(2.183333);
-    urbana_.set_latitude(40.109665);
-    urbana_.set_longitude(-88.204247);
-    newyork_.set_latitude(40.7127);
-    newyork_.set_longitude(-74.0059);
-    bloomington_.set_latitude(40.484167);
-    bloomington_.set_longitude(-88.993611);
-    sydney_.set_latitude(-33.865);
-    sydney_.set_longitude(151.209444);
-    saopaulo_.set_latitude(-23.55);
-    saopaulo_.set_longitude(-46.633333);
+    eiffel_.latitude(48.858222);
+    eiffel_.longitude(2.2945);
+    museum_.latitude(48.861111);
+    museum_.longitude(2.336389);
+    amsterdam_.latitude(52.37305);
+    amsterdam_.longitude(4.892222);
+    barcelona_.latitude(41.383333);
+    barcelona_.longitude(2.183333);
+    urbana_.latitude(40.109665);
+    urbana_.longitude(-88.204247);
+    newyork_.latitude(40.7127);
+    newyork_.longitude(-74.0059);
+    bloomington_.latitude(40.484167);
+    bloomington_.longitude(-88.993611);
+    sydney_.latitude(-33.865);
+    sydney_.longitude(151.209444);
+    saopaulo_.latitude(-23.55);
+    saopaulo_.longitude(-46.633333);
   }
   virtual void TearDown(){};
 };

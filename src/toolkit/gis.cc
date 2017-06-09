@@ -16,9 +16,9 @@ float GIS::latitude() const { return SetPrecision(latitude_ / 3600, 6); }
 
 float GIS::longitude() const { return SetPrecision(longitude_ / 3600, 6); }
 
-void GIS::set_latitude(float lat) { latitude_ = SetPrecision(lat * 3600, 1); }
+void GIS::latitude(float lat) { latitude_ = SetPrecision(lat * 3600, 1); }
 
-void GIS::set_longitude(float lon) { longitude_ = SetPrecision(lon * 3600, 1); }
+void GIS::longitude(float lon) { longitude_ = SetPrecision(lon * 3600, 1); }
 
 void GIS::set_position(float lat, float lon) {
   latitude_ = SetPrecision(lat * 3600, 1);
