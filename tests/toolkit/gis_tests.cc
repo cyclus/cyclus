@@ -1,10 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
-#include <iostream>
 #include <string>
 #include "toolkit/gis.h"
-using namespace std;
 
 using cyclus::toolkit::GIS;
 
@@ -58,10 +55,10 @@ TEST_F(GISTest, Distance) {
 }
 
 TEST_F(GISTest, ToStringD) {
-  string ams_str = amsterdam_.ToString(GIS::StringFormat::D);
-  string syd_str = sydney_.ToString(GIS::StringFormat::D);
-  string sao_str = saopaulo_.ToString(GIS::StringFormat::D);
-  string urb_str = urbana_.ToString(GIS::StringFormat::D);
+  std::string ams_str = amsterdam_.ToString(GIS::StringFormat::D);
+  std::string syd_str = sydney_.ToString(GIS::StringFormat::D);
+  std::string sao_str = saopaulo_.ToString(GIS::StringFormat::D);
+  std::string urb_str = urbana_.ToString(GIS::StringFormat::D);
   ASSERT_TRUE(ams_str == "+52.37305+004.892222/");
   ASSERT_TRUE(syd_str == "-33.865+151.2094/");
   ASSERT_TRUE(sao_str == "-23.55-046.63334/");
@@ -69,10 +66,10 @@ TEST_F(GISTest, ToStringD) {
 }
 
 TEST_F(GISTest, ToStringDM) {
-  string ams_str = amsterdam_.ToString(GIS::StringFormat::DM);
-  string syd_str = sydney_.ToString(GIS::StringFormat::DM);
-  string sao_str = saopaulo_.ToString(GIS::StringFormat::DM);
-  string urb_str = urbana_.ToString(GIS::StringFormat::DM);
+  std::string ams_str = amsterdam_.ToString(GIS::StringFormat::DM);
+  std::string syd_str = sydney_.ToString(GIS::StringFormat::DM);
+  std::string sao_str = saopaulo_.ToString(GIS::StringFormat::DM);
+  std::string urb_str = urbana_.ToString(GIS::StringFormat::DM);
   ASSERT_TRUE(ams_str == "+5222.383+00453.533/");
   ASSERT_TRUE(syd_str == "-3351.9+15112.567/");
   ASSERT_TRUE(sao_str == "-2333-04638/");
@@ -80,10 +77,10 @@ TEST_F(GISTest, ToStringDM) {
 }
 
 TEST_F(GISTest, ToStringDMS) {
-  string ams_str = amsterdam_.ToString(GIS::StringFormat::DMS);
-  string syd_str = sydney_.ToString(GIS::StringFormat::DMS);
-  string sao_str = saopaulo_.ToString(GIS::StringFormat::DMS);
-  string urb_str = urbana_.ToString(GIS::StringFormat::DMS);
+  std::string ams_str = amsterdam_.ToString(GIS::StringFormat::DMS);
+  std::string syd_str = sydney_.ToString(GIS::StringFormat::DMS);
+  std::string sao_str = saopaulo_.ToString(GIS::StringFormat::DMS);
+  std::string urb_str = urbana_.ToString(GIS::StringFormat::DMS);
   ASSERT_TRUE(ams_str == "+522223.0+0045332.0/");
   ASSERT_TRUE(syd_str == "-335154.0+1511234.0/");
   ASSERT_TRUE(sao_str == "-233260.0-0463800.0/");
