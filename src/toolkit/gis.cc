@@ -40,23 +40,23 @@ double GIS::Distance(GIS target) const {
   return 6372.8 * temp2;  // 6372.8 is the radius of earth in KM
 }
 
-std::string GIS::ToString(int return_format) const {
+std::string GIS::ToString(GIS::StringFormat format) const {
   std::stringstream lat_string;
   std::stringstream lon_string;
   float lat = this->latitude();
   float lon = this->longitude();
-  switch (return_format) {
+  switch (format) {
     case 1:
-      lat_string << ToStringHelperLat(return_format, lat);
-      lon_string << ToStringHelperLon(return_format, lon);
+      lat_string << ToStringHelperLat(format, lat);
+      lon_string << ToStringHelperLon(format, lon);
       break;
     case 2:
-      lat_string << ToStringHelperLat(return_format, lat);
-      lon_string << ToStringHelperLon(return_format, lon);
+      lat_string << ToStringHelperLat(format, lat);
+      lon_string << ToStringHelperLon(format, lon);
       break;
     case 3:
-      lat_string << ToStringHelperLat(return_format, lat);
-      lon_string << ToStringHelperLon(return_format, lon);
+      lat_string << ToStringHelperLat(format, lat);
+      lon_string << ToStringHelperLon(format, lon);
       break;
   }
   return lat_string.str() + lon_string.str() + "/";

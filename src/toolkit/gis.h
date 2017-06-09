@@ -59,6 +59,12 @@ namespace toolkit {
 
 class GIS {
  public:
+  enum StringFormat {
+    D = 1,
+    DM,
+    DMS,
+  };
+
   /// The default constructor for GIS. This will creat an object with
   /// lat=0, and long=0.
   GIS();
@@ -103,15 +109,17 @@ class GIS {
   /// H.
   /// @param return_format
   /// @parblock
-  ///       The format of output. Options are '1', '2', or '3':
+  ///       The format of output. Options are 'GIS::StringFormat::D',
+  ///                                         'GIS::StringFormat::DM',
+  ///                                         'GIS::StringFormat::DMS':
   ///
-  ///     1:   return in degrees format
-  ///     2:   return in degrees and minutes format
-  ///     3:   return in egrees minutes seconds format
+  ///     GIS::StringFormat::D  :   return in degrees format
+  ///     GIS::StringFormat::DM :   return in degrees and minutes format
+  ///     GIS::StringFormat::DMS:   return in egrees minutes seconds format
   /// @endparblock
   /// @return String representation of the GIS object that complies with ISO6709
   /// Annex H
-  std::string ToString(int return_format) const;
+  std::string ToString(GIS::StringFormat format) const;
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is
