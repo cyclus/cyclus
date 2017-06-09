@@ -2,42 +2,42 @@
 #include <stdio.h>
 #include <sstream>
 
-#include "gis.h"
+#include "position.h"
 
 namespace cyclus {
 namespace toolkit {
 
-GIS::GIS() : latitude_(0), longitude_(0) {}
+Position::Position() : latitude_(0), longitude_(0) {}
 
-GIS::GIS(float decimal_lat, float decimal_lon) {
+Position::Position(float decimal_lat, float decimal_lon) {
   latitude_ = SetPrecision(decimal_lat * DecimalSecondsMultiplier, 1);
   longitude_ = SetPrecision(decimal_lon * DecimalSecondsMultiplier, 1);
 }
 
-GIS::~GIS() {}
+Position::~Position() {}
 
-float GIS::latitude() const {
+float Position::latitude() const {
   return SetPrecision(latitude_ / DecimalSecondsMultiplier, 6);
 }
 
-float GIS::longitude() const {
+float Position::longitude() const {
   return SetPrecision(longitude_ / DecimalSecondsMultiplier, 6);
 }
 
-void GIS::latitude(float lat) {
+void Position::latitude(float lat) {
   latitude_ = SetPrecision(lat * DecimalSecondsMultiplier, 1);
 }
 
-void GIS::longitude(float lon) {
+void Position::longitude(float lon) {
   longitude_ = SetPrecision(lon * DecimalSecondsMultiplier, 1);
 }
 
-void GIS::set_position(float lat, float lon) {
+void Position::set_position(float lat, float lon) {
   latitude_ = SetPrecision(lat * DecimalSecondsMultiplier, 1);
   longitude_ = SetPrecision(lon * DecimalSecondsMultiplier, 1);
 }
 
-double GIS::Distance(GIS target) const {
+double Position::Distance(Position target) const {
   double earth_radius = 6372.8;  // in kilometers (KM)
   double curr_longitude = this->longitude() * M_PI / 180;
   double curr_latitude = this->latitude() * M_PI / 180;
@@ -55,7 +55,7 @@ double GIS::Distance(GIS target) const {
   return earth_radius * angular_distance;
 }
 
-std::string GIS::ToString(GIS::StringFormat format) const {
+std::string Position::ToString(Position::StringFormat format) const {
   std::stringstream lat_string;
   std::stringstream lon_string;
   float lat = this->latitude();
@@ -77,14 +77,14 @@ std::string GIS::ToString(GIS::StringFormat format) const {
   return lat_string.str() + lon_string.str() + "/";
 }
 
-float GIS::SetPrecision(float value, double precision) const {
+float Position::SetPrecision(float value, double precision) const {
   if (precision == 0) {
     return floor(value);
   }
   return (floor((value * pow(10, precision) + 0.5)) / pow(10, precision));
 }
 
-std::string GIS::ToStringHelperLat(int mode, float lat) const {
+std::string Position::ToStringHelperLat(int mode, float lat) const {
   std::stringstream lat_string;
   double lat_int;
   lat_string << ToStringHelper(lat);
@@ -107,7 +107,7 @@ std::string GIS::ToStringHelperLat(int mode, float lat) const {
   return lat_string.str();
 }
 
-std::string GIS::ToStringHelperLon(int mode, float lon) const {
+std::string Position::ToStringHelperLon(int mode, float lon) const {
   std::stringstream lon_string;
   double lon_int;
   lon_string << ToStringHelper(lon);
@@ -132,7 +132,7 @@ std::string GIS::ToStringHelperLon(int mode, float lon) const {
   return lon_string.str();
 }
 
-std::string GIS::ToStringHelper(float value) const {
+std::string Position::ToStringHelper(float value) const {
   std::stringstream temp;
   if (value > 0) {
     temp << "+";
@@ -142,7 +142,7 @@ std::string GIS::ToStringHelper(float value) const {
   return temp.str();
 }
 
-std::string GIS::ToStringHelperDM(float value) const {
+std::string Position::ToStringHelperDM(float value) const {
   std::stringstream temp;
   value = fabs(value) * 60;
   if (((int)fabs(value)) / 10 == 0) {
@@ -153,7 +153,7 @@ std::string GIS::ToStringHelperDM(float value) const {
   return temp.str();
 }
 
-std::string GIS::ToStringHelperDMS(float value) const {
+std::string Position::ToStringHelperDMS(float value) const {
   std::stringstream temp;
   double value_int;
   value = fabs(value) * 60;

@@ -1,5 +1,5 @@
-#ifndef CYCLUS_SRC_TOOLKIT_GIS_H_
-#define CYCLUS_SRC_TOOLKIT_GIS_H_
+#ifndef CYCLUS_SRC_TOOLKIT_POSITION_H_
+#define CYCLUS_SRC_TOOLKIT_POSITION_H_
 
 #include <string>
 
@@ -7,10 +7,11 @@
 
 namespace cyclus {
 namespace toolkit {
-/// @class GIS
-/// The GIS class is a basic class that stores the geographic location of each
+/// @class Position
+/// The Position class is a basic class that stores the geographic location of
+/// each
 /// agent in latitude and longitude and follows the ISO
-/// 6709 standard. Allows string expression of GIS objects as specified in
+/// 6709 standard. Allows string expression of Position objects as specified in
 /// ANNEX H of ISO 6709 found here: 'https://www.iso.org/standard/39242.html'
 /// or a quick simplified version found here
 /// 'https://en.wikipedia.org/wiki/ISO_6709'
@@ -54,7 +55,7 @@ namespace toolkit {
 /// calculated by multiplying decimal degrees by 3600.
 /// example: 05.2169 -> 18780.84
 
-class GIS {
+class Position {
   static const int DecimalSecondsMultiplier = 3600;
 
  public:
@@ -64,18 +65,18 @@ class GIS {
     DMS,
   };
 
-  /// The default constructor for GIS. This will creat an object with
+  /// The default constructor for Position. This will creat an object with
   /// lat=0, and long=0.
-  GIS();
+  Position();
 
-  /// GIS constructor with latitude and longditude as degrees as a floating
+  /// Position constructor with latitude and longditude as degrees as a floating
   /// point.
   /// @param deciaml_lat latitude expressed in degrees as a floating point.
   /// @param decimal_lon longditude expressed in degrees as a floating point.
-  GIS(float decimal_lat, float decimal_lon);
+  Position(float decimal_lat, float decimal_lon);
 
-  /// The default destructor for GIS
-  ~GIS();
+  /// The default destructor for Position
+  ~Position();
 
   /// Returns the current latitude.
   /// @return decimal representation of latitude.
@@ -97,28 +98,30 @@ class GIS {
   /// @param lat latitude, and lon longitude expressed in decimal degrees.
   void set_position(float lat, float lon);
 
-  /// Returns the distance (in km) between this GIS object and the target
-  /// GIS
+  /// Returns the distance (in km) between this Position object and the target
+  /// Position
   /// object.
-  /// @param target the GIS object some distnace away from the current one
+  /// @param target the Position object some distnace away from the current one
   /// @return distance between this and target in kilometers
-  double Distance(GIS target) const;
+  double Distance(Position target) const;
 
-  /// Converts GIS location into a string expression that follows ISO 6709 Annex
+  /// Converts Position location into a string expression that follows ISO 6709
+  /// Annex
   /// H. Function can be passed without any parameters for degrees format.
   /// @param return_format
   /// @parblock
-  ///       The format of output. Options are 'GIS::StringFormat::D',
-  ///                                         'GIS::StringFormat::DM',
-  ///                                         'GIS::StringFormat::DMS':
+  ///       The format of output. Options are 'Position::StringFormat::D',
+  ///                                         'Position::StringFormat::DM',
+  ///                                         'Position::StringFormat::DMS':
   ///
-  ///     GIS::StringFormat::D  :   return in degrees format
-  ///     GIS::StringFormat::DM :   return in degrees and minutes format
-  ///     GIS::StringFormat::DMS:   return in egrees minutes seconds format
+  ///     Position::StringFormat::D  :   return in degrees format
+  ///     Position::StringFormat::DM :   return in degrees and minutes format
+  ///     Position::StringFormat::DMS:   return in egrees minutes seconds format
   /// @endparblock
-  /// @return String representation of the GIS object that complies with ISO6709
+  /// @return String representation of the Position object that complies with
+  /// ISO6709
   /// Annex H
-  std::string ToString(GIS::StringFormat format = StringFormat::D) const;
+  std::string ToString(Position::StringFormat format = StringFormat::D) const;
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is
@@ -181,4 +184,4 @@ class GIS {
 }  // namespace toolkit
 }  // namespace cyclus
 
-#endif  // CYCLUS_SRC_TOOLKIT_GIS_H_
+#endif  // CYCLUS_SRC_TOOLKIT_POSITION_H_

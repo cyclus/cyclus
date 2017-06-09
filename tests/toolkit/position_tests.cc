@@ -1,16 +1,16 @@
 #include <gtest/gtest.h>
 
 #include <string>
-#include "toolkit/gis.h"
+#include "toolkit/position.h"
 
-using cyclus::toolkit::GIS;
+using cyclus::toolkit::Position;
 
 namespace cyclus {
 
-class GISTest : public ::testing::Test {
+class PositionTest : public ::testing::Test {
  protected:
-  GIS eiffel_, museum_, amsterdam_, barcelona_, urbana_, newyork_, bloomington_,
-      sydney_, saopaulo_;
+  Position eiffel_, museum_, amsterdam_, barcelona_, urbana_, newyork_,
+      bloomington_, sydney_, saopaulo_;
   virtual void SetUp() {
     /// Longitude and Lattitude of all objects were obtained from GeoHack :
     /// 'https://tools.wmflabs.org/geohack/'
@@ -36,10 +36,10 @@ class GISTest : public ::testing::Test {
   virtual void TearDown(){};
 };
 
-/// Tests distance between two GIS objects or facilities in kilometers (KM)
+/// Tests distance between two Position objects or facilities in kilometers (KM)
 /// Distances were obtained from:
 /// 'https://www.freemaptools.com/how-far-is-it-between.htm'
-TEST_F(GISTest, Distance) {
+TEST_F(PositionTest, Distance) {
   EXPECT_NEAR(eiffel_.Distance(museum_), 3.188, 3.188 * 0.05)
       << "eiffel vs museum failed";
   EXPECT_NEAR(eiffel_.Distance(amsterdam_), 432.126, 432.126 * 0.01)
@@ -54,33 +54,33 @@ TEST_F(GISTest, Distance) {
       << "bloomington vs urbana failed";
 }
 
-TEST_F(GISTest, ToStringD) {
-  std::string ams_str = amsterdam_.ToString(GIS::StringFormat::D);
-  std::string syd_str = sydney_.ToString(GIS::StringFormat::D);
-  std::string sao_str = saopaulo_.ToString(GIS::StringFormat::D);
-  std::string urb_str = urbana_.ToString(GIS::StringFormat::D);
+TEST_F(PositionTest, ToStringD) {
+  std::string ams_str = amsterdam_.ToString(Position::StringFormat::D);
+  std::string syd_str = sydney_.ToString(Position::StringFormat::D);
+  std::string sao_str = saopaulo_.ToString(Position::StringFormat::D);
+  std::string urb_str = urbana_.ToString(Position::StringFormat::D);
   ASSERT_TRUE(ams_str == "+52.37305+004.892222/");
   ASSERT_TRUE(syd_str == "-33.865+151.2094/");
   ASSERT_TRUE(sao_str == "-23.55-046.63334/");
   ASSERT_TRUE(urb_str == "+40.10966-088.20425/");
 }
 
-TEST_F(GISTest, ToStringDM) {
-  std::string ams_str = amsterdam_.ToString(GIS::StringFormat::DM);
-  std::string syd_str = sydney_.ToString(GIS::StringFormat::DM);
-  std::string sao_str = saopaulo_.ToString(GIS::StringFormat::DM);
-  std::string urb_str = urbana_.ToString(GIS::StringFormat::DM);
+TEST_F(PositionTest, ToStringDM) {
+  std::string ams_str = amsterdam_.ToString(Position::StringFormat::DM);
+  std::string syd_str = sydney_.ToString(Position::StringFormat::DM);
+  std::string sao_str = saopaulo_.ToString(Position::StringFormat::DM);
+  std::string urb_str = urbana_.ToString(Position::StringFormat::DM);
   ASSERT_TRUE(ams_str == "+5222.383+00453.533/");
   ASSERT_TRUE(syd_str == "-3351.9+15112.567/");
   ASSERT_TRUE(sao_str == "-2333-04638/");
   ASSERT_TRUE(urb_str == "+4006.5799-08812.255/");
 }
 
-TEST_F(GISTest, ToStringDMS) {
-  std::string ams_str = amsterdam_.ToString(GIS::StringFormat::DMS);
-  std::string syd_str = sydney_.ToString(GIS::StringFormat::DMS);
-  std::string sao_str = saopaulo_.ToString(GIS::StringFormat::DMS);
-  std::string urb_str = urbana_.ToString(GIS::StringFormat::DMS);
+TEST_F(PositionTest, ToStringDMS) {
+  std::string ams_str = amsterdam_.ToString(Position::StringFormat::DMS);
+  std::string syd_str = sydney_.ToString(Position::StringFormat::DMS);
+  std::string sao_str = saopaulo_.ToString(Position::StringFormat::DMS);
+  std::string urb_str = urbana_.ToString(Position::StringFormat::DMS);
   ASSERT_TRUE(ams_str == "+522223.0+0045332.0/");
   ASSERT_TRUE(syd_str == "-335154.0+1511234.0/");
   ASSERT_TRUE(sao_str == "-233260.0-0463800.0/");

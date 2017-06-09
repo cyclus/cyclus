@@ -1,23 +1,23 @@
 #include <gtest/gtest.h>
 
-#include "test_agents/test_gisfac.h"
+#include "test_agents/test_positionfac.h"
 
 #include <iostream>
 #include "agent_tests.h"
 #include "context.h"
 #include "facility_tests.h"
 
-using cyclus::TestGISFac;
+using cyclus::TestPositionFac;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class GISFacTest : public ::testing::Test {
+class PositionFacTest : public ::testing::Test {
  protected:
-  TestGISFac* facility_a_;
-  TestGISFac* facility_b_;
+  TestPositionFac* facility_a_;
+  TestPositionFac* facility_b_;
 
   virtual void SetUp() {
-    facility_a_ = new TestGISFac(0, 0);
-    facility_b_ = new TestGISFac(0, 0);
+    facility_a_ = new TestPositionFac(0, 0);
+    facility_b_ = new TestPositionFac(0, 0);
   }
 
   virtual void TearDown() {
@@ -26,7 +26,7 @@ class GISFacTest : public ::testing::Test {
   }
 };
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(GISFacTest, set_longitude) {
+TEST_F(PositionFacTest, set_longitude) {
   facility_a_->longitude(46.545821);
   EXPECT_NEAR(facility_a_->longitude(), 46.545821, 32.5 * 0.01);
   facility_a_->longitude(-82.5546);
@@ -34,7 +34,7 @@ TEST_F(GISFacTest, set_longitude) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(GISFacTest, set_latitude) {
+TEST_F(PositionFacTest, set_latitude) {
   facility_a_->latitude(32.5);
   EXPECT_NEAR(facility_a_->latitude(), 32.5, 32.5 * 0.01);
   facility_a_->latitude(-2.5546);
@@ -42,14 +42,14 @@ TEST_F(GISFacTest, set_latitude) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(GISFacTest, InitialState) {
+TEST_F(PositionFacTest, InitialState) {
   // Test things about the initial state of the facility here
   EXPECT_NEAR(facility_a_->longitude(), 0, 0.001);
   EXPECT_NEAR(facility_a_->latitude(), 0, 0.001);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(GISFacTest, Constructor) {
+TEST_F(PositionFacTest, Constructor) {
   facility_a_->latitude(48.858222);
   facility_a_->longitude(2.2945);
   EXPECT_NEAR(facility_a_->latitude(), 48.858222, 48.858222 * 0.01);
@@ -57,7 +57,7 @@ TEST_F(GISFacTest, Constructor) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(GISFacTest, Distance) {
+TEST_F(PositionFacTest, Distance) {
   EXPECT_NEAR(facility_a_->Distance(*(facility_b_)), 0, 0.0001);
   facility_a_->latitude(48.858222);
   facility_a_->longitude(2.2945);

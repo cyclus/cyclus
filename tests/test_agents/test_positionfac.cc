@@ -1,4 +1,4 @@
-#include "test_gisfac.h"
+#include "test_positionfac.h"
 
 // required to get functionality in cyclus agent unit tests library
 #ifndef CYCLUS_AGENT_TESTS_CONNECTED
