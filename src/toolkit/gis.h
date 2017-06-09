@@ -106,7 +106,7 @@ class GIS {
   double Distance(GIS target) const;
 
   /// Converts GIS location into a string expression that follows ISO 6709 Annex
-  /// H.
+  /// H. Function can be passed without any parameters for degrees format.
   /// @param return_format
   /// @parblock
   ///       The format of output. Options are 'GIS::StringFormat::D',
@@ -119,7 +119,7 @@ class GIS {
   /// @endparblock
   /// @return String representation of the GIS object that complies with ISO6709
   /// Annex H
-  std::string ToString(GIS::StringFormat format) const;
+  std::string ToString(GIS::StringFormat format = StringFormat::D) const;
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is
