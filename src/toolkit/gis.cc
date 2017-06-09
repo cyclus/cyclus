@@ -6,23 +6,31 @@ namespace toolkit {
 GIS::GIS() : latitude_(0), longitude_(0) {}
 
 GIS::GIS(float decimal_lat, float decimal_lon) {
-  latitude_ = SetPrecision(decimal_lat * 3600, 1);
-  longitude_ = SetPrecision(decimal_lon * 3600, 1);
+  latitude_ = SetPrecision(decimal_lat * DecimalSecondsMultiplier, 1);
+  longitude_ = SetPrecision(decimal_lon * DecimalSecondsMultiplier, 1);
 }
 
 GIS::~GIS() {}
 
-float GIS::latitude() const { return SetPrecision(latitude_ / 3600, 6); }
+float GIS::latitude() const {
+  return SetPrecision(latitude_ / DecimalSecondsMultiplier, 6);
+}
 
-float GIS::longitude() const { return SetPrecision(longitude_ / 3600, 6); }
+float GIS::longitude() const {
+  return SetPrecision(longitude_ / DecimalSecondsMultiplier, 6);
+}
 
-void GIS::latitude(float lat) { latitude_ = SetPrecision(lat * 3600, 1); }
+void GIS::latitude(float lat) {
+  latitude_ = SetPrecision(lat * DecimalSecondsMultiplier, 1);
+}
 
-void GIS::longitude(float lon) { longitude_ = SetPrecision(lon * 3600, 1); }
+void GIS::longitude(float lon) {
+  longitude_ = SetPrecision(lon * DecimalSecondsMultiplier, 1);
+}
 
 void GIS::set_position(float lat, float lon) {
-  latitude_ = SetPrecision(lat * 3600, 1);
-  longitude_ = SetPrecision(lon * 3600, 1);
+  latitude_ = SetPrecision(lat * DecimalSecondsMultiplier, 1);
+  longitude_ = SetPrecision(lon * DecimalSecondsMultiplier, 1);
 }
 
 double GIS::Distance(GIS target) const {

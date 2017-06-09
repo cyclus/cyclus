@@ -58,6 +58,8 @@ namespace toolkit {
 /// example: 05.2169 -> 18780.84
 
 class GIS {
+  static const int DecimalSecondsMultiplier = 3600;
+
  public:
   enum StringFormat {
     D = 1,
