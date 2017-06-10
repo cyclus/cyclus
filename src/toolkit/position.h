@@ -1,6 +1,6 @@
 #ifndef CYCLUS_SRC_TOOLKIT_POSITION_H_
 #define CYCLUS_SRC_TOOLKIT_POSITION_H_
-#define DECIMAL_SECOND_MULTIPLIER = 3600
+#define DECIMAL_SECOND_MULTIPLIER 3600
 
 #include <string>
 
@@ -68,38 +68,37 @@ class Position {
   /// lat=0, and long=0.
   Position();
 
-  /// Position constructor with latitude and longditude as degrees as a floating
-  /// point.
-  /// @param deciaml_lat latitude expressed in degrees as a floating point.
-  /// @param decimal_lon longditude expressed in degrees as a floating point.
-  Position(float decimal_lat, float decimal_lon);
+  /// Position constructor with latitude and longditude as degrees as a double
+  /// point precision floating point.
+  /// @param deciaml_lat latitude expressed in degrees as a double.
+  /// @param decimal_lon longditude expressed in degrees as a double.
+  Position(double decimal_lat, double decimal_lon);
 
   /// The default destructor for Position
   ~Position();
 
   /// Returns the current latitude.
   /// @return decimal representation of latitude.
-  float latitude() const;
+  double latitude() const;
 
   /// Returns the current longitude.
   /// @return decimal representation of longitude.
-  float longitude() const;
+  double longitude() const;
 
   /// Sets a new latitude
   /// @param lat latitude expressed in decimal degrees.
-  void latitude(float lat);
+  void latitude(double lat);
 
   /// Sets a new longitude
   /// @param lon longitude expressed in decimal degrees.
-  void longitude(float lon);
+  void longitude(double lon);
 
   /// Sets a new latitude and longitude
   /// @param lat latitude, and lon longitude expressed in decimal degrees.
-  void set_position(float lat, float lon);
+  void set_position(double lat, double lon);
 
   /// Returns the distance (in km) between this Position object and the target
-  /// Position
-  /// object.
+  /// Position object.
   /// @param target the Position object some distnace away from the current one
   /// @return distance between this and target in kilometers
   double Distance(Position target) const;
@@ -109,32 +108,39 @@ class Position {
   /// H. Function can be passed without any parameters for degrees format.
   /// @param return_format
   /// @parblock
-  ///       The format of output. Options are 'Position::StringFormat::D',
-  ///                                         'Position::StringFormat::DM',
-  ///                                         'Position::StringFormat::DMS':
+  ///     The format of output. Options are 'Position::StringFormat::Degrees',
+  ///                                       'Position::StringFormat::Degrees
+  ///                                                                Minutes',
+  ///                                       'Position::StringFormat::Degrees
+  ///                                                                Minutes
+  ///                                                                Seconds':
   ///
-  ///     Position::StringFormat::D  :   return in degrees format
-  ///     Position::StringFormat::DM :   return in degrees and minutes format
-  ///     Position::StringFormat::DMS:   return in egrees minutes seconds format
+  ///     Position::StringFormat::Degrees             :   return in degrees
+  ///                                                     format
+  ///     Position::StringFormat::DegreesMinutes      :   return in degrees
+  ///                                                     and minutes format
+  ///     Position::StringFormat::DegreesMinutesSeonds:   return in degrees
+  ///                                                     minutes seconds
+  ///                                                     format
   /// @endparblock
   /// @return String representation of the Position object that complies with
-  /// ISO6709
-  /// Annex H
-  std::string ToString(Position::StringFormat format = StringFormat::D) const;
+  /// ISO6709 Annex H
+  std::string ToString(
+      Position::StringFormat format = StringFormat::Degrees) const;
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is
   /// available above in class documentation
-  float latitude_;
+  double latitude_;
 
   /// Longitude is stored as seconds of degree.
-  float longitude_;
+  double longitude_;
 
-  /// Sets the precision for float values.
+  /// Sets the precision for double values.
   /// @param value that requires change of precision
   /// @param precision the number decimal places wanted
   /// @return value with the number of decimal places (precision) as defined
-  float SetPrecision(float value, double precision) const;
+  double SetPrecision(double value, double precision) const;
 
   /// Formats longitude for toString function
   /// @param mode
@@ -147,7 +153,7 @@ class Position {
   /// @endparblock
   /// @param lon longitude of the object
   /// @return partially formatted string
-  std::string ToStringHelperLon(int mode, float lon) const;
+  std::string ToStringHelperLon(int mode, double lon) const;
 
   /// Formats latitude for toString function
   /// @param mode
@@ -160,24 +166,24 @@ class Position {
   /// @endparblock
   /// @param lat latitude of the object
   /// @return partially formatted string
-  std::string ToStringHelperLat(int mode, float lat) const;
+  std::string ToStringHelperLat(int mode, double lat) const;
 
   /// Adds "+" or "-" sign for the ToStringHelperLon/Lat function
   /// @param value longitude or latitude of the object
   /// @returns "+" or "-" for the ToString function
-  std::string ToStringHelper(float value) const;
+  std::string ToStringHelper(double value) const;
 
   /// Formats longitude and latitude in degrees and minutes for the
   /// ToStringHelperLon/Lat function
   /// @param value longitude or latitude of the object
   /// @return formatted string representation of longiiiitude or latitude
-  std::string ToStringHelperDM(float value) const;
+  std::string ToStringHelperDM(double value) const;
 
   /// Formats longitude and latitude in degrees minutes and seconds for the
   /// ToStringHelperLon/Lat function
   /// @param value longitude or latitude of the object
   /// @return formatted string representation of longiiiitude or latitude
-  std::string ToStringHelperDMS(float value) const;
+  std::string ToStringHelperDMS(double value) const;
 };
 
 }  // namespace toolkit

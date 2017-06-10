@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <iostream>
 #include <string>
 #include "toolkit/position.h"
-
 using cyclus::toolkit::Position;
 
 namespace cyclus {
@@ -59,10 +59,10 @@ TEST_F(PositionTest, ToStringD) {
   std::string syd_str = sydney_.ToString(Position::StringFormat::Degrees);
   std::string sao_str = saopaulo_.ToString(Position::StringFormat::Degrees);
   std::string urb_str = urbana_.ToString(Position::StringFormat::Degrees);
-  ASSERT_TRUE(ams_str == "+52.37305+004.892222/");
+  ASSERT_TRUE(ams_str == "+52.37306+004.892222/");
   ASSERT_TRUE(syd_str == "-33.865+151.2094/");
-  ASSERT_TRUE(sao_str == "-23.55-046.63334/");
-  ASSERT_TRUE(urb_str == "+40.10966-088.20425/");
+  ASSERT_TRUE(sao_str == "-23.55-046.63333/");
+  ASSERT_TRUE(urb_str == "+40.10967-088.20425/");
 }
 
 TEST_F(PositionTest, ToStringDM) {
@@ -77,7 +77,7 @@ TEST_F(PositionTest, ToStringDM) {
   ASSERT_TRUE(ams_str == "+5222.383+00453.533/");
   ASSERT_TRUE(syd_str == "-3351.9+15112.567/");
   ASSERT_TRUE(sao_str == "-2333-04638/");
-  ASSERT_TRUE(urb_str == "+4006.5799-08812.255/");
+  ASSERT_TRUE(urb_str == "+4006.58-08812.255/");
 }
 
 TEST_F(PositionTest, ToStringDMS) {
@@ -91,7 +91,7 @@ TEST_F(PositionTest, ToStringDMS) {
       urbana_.ToString(Position::StringFormat::DegreesMinutesSeconds);
   ASSERT_TRUE(ams_str == "+522223.0+0045332.0/");
   ASSERT_TRUE(syd_str == "-335154.0+1511234.0/");
-  ASSERT_TRUE(sao_str == "-233260.0-0463800.0/");
+  ASSERT_TRUE(sao_str == "-233300.0-0463760.0/");
   ASSERT_TRUE(urb_str == "+400634.8-0881215.3/");
   ASSERT_LE(ams_str.length(), 20);
   ASSERT_LE(syd_str.length(), 20);

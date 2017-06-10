@@ -9,30 +9,30 @@ namespace toolkit {
 
 Position::Position() : latitude_(0), longitude_(0) {}
 
-Position::Position(float decimal_lat, float decimal_lon) {
+Position::Position(double decimal_lat, double decimal_lon) {
   latitude_ = SetPrecision(decimal_lat * DECIMAL_SECOND_MULTIPLIER, 1);
   longitude_ = SetPrecision(decimal_lon * DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 Position::~Position() {}
 
-float Position::latitude() const {
+double Position::latitude() const {
   return SetPrecision(latitude_ / DECIMAL_SECOND_MULTIPLIER, 6);
 }
 
-float Position::longitude() const {
+double Position::longitude() const {
   return SetPrecision(longitude_ / DECIMAL_SECOND_MULTIPLIER, 6);
 }
 
-void Position::latitude(float lat) {
+void Position::latitude(double lat) {
   latitude_ = SetPrecision(lat * DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
-void Position::longitude(float lon) {
+void Position::longitude(double lon) {
   longitude_ = SetPrecision(lon * DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
-void Position::set_position(float lat, float lon) {
+void Position::set_position(double lat, double lon) {
   latitude_ = SetPrecision(lat * DECIMAL_SECOND_MULTIPLIER, 1);
   longitude_ = SetPrecision(lon * DECIMAL_SECOND_MULTIPLIER, 1);
 }
@@ -58,8 +58,8 @@ double Position::Distance(Position target) const {
 std::string Position::ToString(Position::StringFormat format) const {
   std::stringstream lat_string;
   std::stringstream lon_string;
-  float lat = this->latitude();
-  float lon = this->longitude();
+  double lat = this->latitude();
+  double lon = this->longitude();
   switch (format) {
     case 1:
       lat_string << ToStringHelperLat(format, lat);
@@ -77,14 +77,14 @@ std::string Position::ToString(Position::StringFormat format) const {
   return lat_string.str() + lon_string.str() + "/";
 }
 
-float Position::SetPrecision(float value, double precision) const {
+double Position::SetPrecision(double value, double precision) const {
   if (precision == 0) {
     return floor(value);
   }
   return (floor((value * pow(10, precision) + 0.5)) / pow(10, precision));
 }
 
-std::string Position::ToStringHelperLat(int mode, float lat) const {
+std::string Position::ToStringHelperLat(int mode, double lat) const {
   std::stringstream lat_string;
   double lat_int;
   lat_string << ToStringHelper(lat);
@@ -107,7 +107,7 @@ std::string Position::ToStringHelperLat(int mode, float lat) const {
   return lat_string.str();
 }
 
-std::string Position::ToStringHelperLon(int mode, float lon) const {
+std::string Position::ToStringHelperLon(int mode, double lon) const {
   std::stringstream lon_string;
   double lon_int;
   lon_string << ToStringHelper(lon);
@@ -132,7 +132,7 @@ std::string Position::ToStringHelperLon(int mode, float lon) const {
   return lon_string.str();
 }
 
-std::string Position::ToStringHelper(float value) const {
+std::string Position::ToStringHelper(double value) const {
   std::stringstream temp;
   if (value > 0) {
     temp << "+";
@@ -142,7 +142,7 @@ std::string Position::ToStringHelper(float value) const {
   return temp.str();
 }
 
-std::string Position::ToStringHelperDM(float value) const {
+std::string Position::ToStringHelperDM(double value) const {
   std::stringstream temp;
   value = fabs(value) * 60;
   if (((int)fabs(value)) / 10 == 0) {
@@ -153,7 +153,7 @@ std::string Position::ToStringHelperDM(float value) const {
   return temp.str();
 }
 
-std::string Position::ToStringHelperDMS(float value) const {
+std::string Position::ToStringHelperDMS(double value) const {
   std::stringstream temp;
   double value_int;
   value = fabs(value) * 60;
