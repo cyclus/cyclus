@@ -60,9 +60,9 @@ class Position {
 
  public:
   enum StringFormat {
-    D = 1,
-    DM,
-    DMS,
+    Degrees = 1,
+    DegreesMinutes,
+    DegreesMinutesSeconds,
   };
 
   /// The default constructor for Position. This will creat an object with
