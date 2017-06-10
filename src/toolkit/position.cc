@@ -10,31 +10,31 @@ namespace toolkit {
 Position::Position() : latitude_(0), longitude_(0) {}
 
 Position::Position(float decimal_lat, float decimal_lon) {
-  latitude_ = SetPrecision(decimal_lat * DecimalSecondsMultiplier, 1);
-  longitude_ = SetPrecision(decimal_lon * DecimalSecondsMultiplier, 1);
+  latitude_ = SetPrecision(decimal_lat * DECIMAL_SECOND_MULTIPLIER, 1);
+  longitude_ = SetPrecision(decimal_lon * DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 Position::~Position() {}
 
 float Position::latitude() const {
-  return SetPrecision(latitude_ / DecimalSecondsMultiplier, 6);
+  return SetPrecision(latitude_ / DECIMAL_SECOND_MULTIPLIER, 6);
 }
 
 float Position::longitude() const {
-  return SetPrecision(longitude_ / DecimalSecondsMultiplier, 6);
+  return SetPrecision(longitude_ / DECIMAL_SECOND_MULTIPLIER, 6);
 }
 
 void Position::latitude(float lat) {
-  latitude_ = SetPrecision(lat * DecimalSecondsMultiplier, 1);
+  latitude_ = SetPrecision(lat * DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 void Position::longitude(float lon) {
-  longitude_ = SetPrecision(lon * DecimalSecondsMultiplier, 1);
+  longitude_ = SetPrecision(lon * DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 void Position::set_position(float lat, float lon) {
-  latitude_ = SetPrecision(lat * DecimalSecondsMultiplier, 1);
-  longitude_ = SetPrecision(lon * DecimalSecondsMultiplier, 1);
+  latitude_ = SetPrecision(lat * DECIMAL_SECOND_MULTIPLIER, 1);
+  longitude_ = SetPrecision(lon * DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 double Position::Distance(Position target) const {

@@ -1,5 +1,6 @@
 #ifndef CYCLUS_SRC_TOOLKIT_POSITION_H_
 #define CYCLUS_SRC_TOOLKIT_POSITION_H_
+#define DECIMAL_SECOND_MULTIPLIER = 3600
 
 #include <string>
 
@@ -56,8 +57,6 @@ namespace toolkit {
 /// example: 05.2169 -> 18780.84
 
 class Position {
-  static const int DecimalSecondsMultiplier = 3600;
-
  public:
   enum StringFormat {
     Degrees = 1,
