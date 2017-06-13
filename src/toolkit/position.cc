@@ -10,31 +10,31 @@ namespace toolkit {
 Position::Position() : latitude_(0), longitude_(0) {}
 
 Position::Position(double decimal_lat, double decimal_lon) {
-  latitude_ = SetPrecision(decimal_lat * DECIMAL_SECOND_MULTIPLIER, 1);
-  longitude_ = SetPrecision(decimal_lon * DECIMAL_SECOND_MULTIPLIER, 1);
+  latitude_ = SetPrecision(decimal_lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+  longitude_ = SetPrecision(decimal_lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 Position::~Position() {}
 
 double Position::latitude() const {
-  return SetPrecision(latitude_ / DECIMAL_SECOND_MULTIPLIER, 6);
+  return SetPrecision(latitude_ / CYCLUS_DECIMAL_SECOND_MULTIPLIER, 6);
 }
 
 double Position::longitude() const {
-  return SetPrecision(longitude_ / DECIMAL_SECOND_MULTIPLIER, 6);
+  return SetPrecision(longitude_ / CYCLUS_DECIMAL_SECOND_MULTIPLIER, 6);
 }
 
 void Position::latitude(double lat) {
-  latitude_ = SetPrecision(lat * DECIMAL_SECOND_MULTIPLIER, 1);
+  latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 void Position::longitude(double lon) {
-  longitude_ = SetPrecision(lon * DECIMAL_SECOND_MULTIPLIER, 1);
+  longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 void Position::set_position(double lat, double lon) {
-  latitude_ = SetPrecision(lat * DECIMAL_SECOND_MULTIPLIER, 1);
-  longitude_ = SetPrecision(lon * DECIMAL_SECOND_MULTIPLIER, 1);
+  latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+  longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 double Position::Distance(Position target) const {
@@ -61,15 +61,15 @@ std::string Position::ToString(Position::StringFormat format) const {
   double lat = this->latitude();
   double lon = this->longitude();
   switch (format) {
-    case 1:
+    case StringFormat::DEGREES:
       lat_string << ToStringHelperLat(format, lat);
       lon_string << ToStringHelperLon(format, lon);
       break;
-    case 2:
+    case StringFormat::DEGREES_MINUTES:
       lat_string << ToStringHelperLat(format, lat);
       lon_string << ToStringHelperLon(format, lon);
       break;
-    case 3:
+    case StringFormat::DEGREES_MINUTES_SECONDS:
       lat_string << ToStringHelperLat(format, lat);
       lon_string << ToStringHelperLon(format, lon);
       break;
@@ -94,13 +94,13 @@ std::string Position::ToStringHelperLat(int mode, double lat) const {
     lat_string << "0";
   }
   switch (mode) {
-    case 1:
+    case StringFormat::DEGREES:
       lat_string << std::setprecision(7) << fabs(lat_int + lat);
       break;
-    case 2:
+    case StringFormat::DEGREES_MINUTES:
       lat_string << abs((int)lat_int) << ToStringHelperDM(lat);
       break;
-    case 3:
+    case StringFormat::DEGREES_MINUTES_SECONDS:
       lat_string << abs((int)lat_int) << ToStringHelperDMS(lat);
       break;
   }
@@ -119,13 +119,13 @@ std::string Position::ToStringHelperLon(int mode, double lon) const {
     lon_string << "0";
   }
   switch (mode) {
-    case 1:
+    case StringFormat::DEGREES:
       lon_string << std::setprecision(7) << fabs(lon_int + lon);
       break;
-    case 2:
+    case StringFormat::DEGREES_MINUTES:
       lon_string << abs((int)lon_int) << ToStringHelperDM(lon);
       break;
-    case 3:
+    case StringFormat::DEGREES_MINUTES_SECONDS:
       lon_string << abs((int)lon_int) << ToStringHelperDMS(lon);
       break;
   }

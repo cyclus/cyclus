@@ -1,6 +1,6 @@
 #ifndef CYCLUS_SRC_TOOLKIT_POSITION_H_
 #define CYCLUS_SRC_TOOLKIT_POSITION_H_
-#define DECIMAL_SECOND_MULTIPLIER 3600
+#define CYCLUS_DECIMAL_SECOND_MULTIPLIER 3600
 
 #include <string>
 
@@ -59,9 +59,9 @@ namespace toolkit {
 class Position {
  public:
   enum StringFormat {
-    Degrees = 1,
-    DegreesMinutes,
-    DegreesMinutesSeconds,
+    DEGREES = 1,
+    DEGREES_MINUTES,
+    DEGREES_MINUTES_SECONDS,
   };
 
   /// The default constructor for Position. This will creat an object with
@@ -106,27 +106,27 @@ class Position {
   /// Converts Position location into a string expression that follows ISO 6709
   /// Annex
   /// H. Function can be passed without any parameters for degrees format.
-  /// @param return_format
-  /// @parblock
-  ///     The format of output. Options are 'Position::StringFormat::Degrees',
-  ///                                       'Position::StringFormat::Degrees
-  ///                                                                Minutes',
-  ///                                       'Position::StringFormat::Degrees
-  ///                                                                Minutes
-  ///                                                                Seconds':
+  /// @param return_format_
+  /// @parblock_
+  ///     The format of output. Options are 'Position::StringFormat::DEGREES',
+  ///                                       'Position::StringFormat::DEGREES_
+  ///                                                                MINUTES_',
+  ///                                       'Position::StringFormat::DEGREES_
+  ///                                                                MINUTES_
+  ///                                    _                           SECONDS':
   ///
-  ///     Position::StringFormat::Degrees             :   return in degrees
+  ///     Position::StringFormat::DEGREES                :return in degrees
   ///                                                     format
-  ///     Position::StringFormat::DegreesMinutes      :   return in degrees
+  ///     Position::StringFormat::DEGREES_MINUTES        :return in degrees
   ///                                                     and minutes format
-  ///     Position::StringFormat::DegreesMinutesSeonds:   return in degrees
+  ///     Position::StringFormat::DEGREES_MINUTES_SECONDS:return in degrees
   ///                                                     minutes seconds
   ///                                                     format
   /// @endparblock
   /// @return String representation of the Position object that complies with
   /// ISO6709 Annex H
   std::string ToString(
-      Position::StringFormat format = StringFormat::Degrees) const;
+      Position::StringFormat format = StringFormat::DEGREES) const;
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is

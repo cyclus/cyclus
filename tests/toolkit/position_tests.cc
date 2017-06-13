@@ -55,10 +55,10 @@ TEST_F(PositionTest, Distance) {
 }
 
 TEST_F(PositionTest, ToStringD) {
-  std::string ams_str = amsterdam_.ToString(Position::StringFormat::Degrees);
-  std::string syd_str = sydney_.ToString(Position::StringFormat::Degrees);
-  std::string sao_str = saopaulo_.ToString(Position::StringFormat::Degrees);
-  std::string urb_str = urbana_.ToString(Position::StringFormat::Degrees);
+  std::string ams_str = amsterdam_.ToString(Position::StringFormat::DEGREES);
+  std::string syd_str = sydney_.ToString(Position::StringFormat::DEGREES);
+  std::string sao_str = saopaulo_.ToString(Position::StringFormat::DEGREES);
+  std::string urb_str = urbana_.ToString(Position::StringFormat::DEGREES);
   ASSERT_TRUE(ams_str == "+52.37306+004.892222/");
   ASSERT_TRUE(syd_str == "-33.865+151.2094/");
   ASSERT_TRUE(sao_str == "-23.55-046.63333/");
@@ -67,13 +67,13 @@ TEST_F(PositionTest, ToStringD) {
 
 TEST_F(PositionTest, ToStringDM) {
   std::string ams_str =
-      amsterdam_.ToString(Position::StringFormat::DegreesMinutes);
+      amsterdam_.ToString(Position::StringFormat::DEGREES_MINUTES);
   std::string syd_str =
-      sydney_.ToString(Position::StringFormat::DegreesMinutes);
+      sydney_.ToString(Position::StringFormat::DEGREES_MINUTES);
   std::string sao_str =
-      saopaulo_.ToString(Position::StringFormat::DegreesMinutes);
+      saopaulo_.ToString(Position::StringFormat::DEGREES_MINUTES);
   std::string urb_str =
-      urbana_.ToString(Position::StringFormat::DegreesMinutes);
+      urbana_.ToString(Position::StringFormat::DEGREES_MINUTES);
   ASSERT_TRUE(ams_str == "+5222.383+00453.533/");
   ASSERT_TRUE(syd_str == "-3351.9+15112.567/");
   ASSERT_TRUE(sao_str == "-2333-04638/");
@@ -82,13 +82,13 @@ TEST_F(PositionTest, ToStringDM) {
 
 TEST_F(PositionTest, ToStringDMS) {
   std::string ams_str =
-      amsterdam_.ToString(Position::StringFormat::DegreesMinutesSeconds);
+      amsterdam_.ToString(Position::StringFormat::DEGREES_MINUTES_SECONDS);
   std::string syd_str =
-      sydney_.ToString(Position::StringFormat::DegreesMinutesSeconds);
+      sydney_.ToString(Position::StringFormat::DEGREES_MINUTES_SECONDS);
   std::string sao_str =
-      saopaulo_.ToString(Position::StringFormat::DegreesMinutesSeconds);
+      saopaulo_.ToString(Position::StringFormat::DEGREES_MINUTES_SECONDS);
   std::string urb_str =
-      urbana_.ToString(Position::StringFormat::DegreesMinutesSeconds);
+      urbana_.ToString(Position::StringFormat::DEGREES_MINUTES_SECONDS);
   ASSERT_TRUE(ams_str == "+522223.0+0045332.0/");
   ASSERT_TRUE(syd_str == "-335154.0+1511234.0/");
   ASSERT_TRUE(sao_str == "-233300.0-0463760.0/");
