@@ -165,7 +165,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 add_definitions(-DPYNE_DECAY_IS_DUMMY)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # using Clang
-  # Add relevnt set_source_file_properties() call here, once it is known.
+  set_source_files_properties(transmute.c PROPERTIES COMPILE_FLAGS "-O0 -ffast-math")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # using GCC
   set_source_files_properties(transmute.c PROPERTIES COMPILE_FLAGS
