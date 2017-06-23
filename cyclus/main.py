@@ -243,6 +243,11 @@ class RngSchema(ZeroArgAction):
         set_schema_path(ns)
         print(ns.schema_path)
 
+class RngPrint(ZeroArgAction):
+    """Displays path to the rng schema"""
+
+    def __call__(self, parser, ns, values, option_string=None):
+        ns.rng_print=True
 
 class NucData(ZeroArgAction):
     """Prints the Nuclear data Path"""
@@ -358,6 +363,8 @@ def make_parser():
                    help='print the cyclus build directory')
     p.add_argument('--rng-schema', action=RngSchema,
                    help='print the path to cyclus.rng.in')
+    p.add_argument('--rng-print', action=RngPrint,
+                   help='print the master schema for the input simulation')
     p.add_argument('--nuc-data', action=NucData,
                    help='print the path to cyclus_nuc_data.h5')
     p.add_argument('--json-to-xml', action=JsonToXml,
@@ -400,6 +407,12 @@ def run_simulation(ns):
                                         state.si.context.sim_id)
     print(msg)
 
+def print_master_schema(ns):
+    """Prints the master schema for the simulation"""
+    state = SimState(input_file=ns.input_file, input_format=ns.format,
+                     output_path=ns.output_path, schema_path=ns.schema_path,
+                     flat_schema=ns.flat_schema, print_ms=True)
+    state.load() 
 
 
 def main(args=None):
@@ -408,7 +421,9 @@ def main(args=None):
     Env.set_nuc_data_path()
     p = make_parser()
     ns = p.parse_args(args=args)
-    if ns.input_file is not None:
+    if(ns.rng_print):
+        print_master_schema(ns)
+    elif ns.input_file is not None:
         run_simulation(ns)
 
 
