@@ -10,7 +10,6 @@ import json
 from functools import wraps
 from collections.abc import Set, Sequence
 
-from cyclus.lazyasd import lazyobject
 from cyclus.system import asyncio
 from cyclus import lib
 from cyclus.jsoncpp import FastWriter
@@ -235,4 +234,3 @@ async def shutdown(state, when="empty"):
         while state.action_queue.qsize() > 1:
             await asyncio.sleep(0.001)
     state.loop.call_soon_threadsafe(state.loop.stop)
-
