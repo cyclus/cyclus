@@ -156,13 +156,14 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
     # Find HDF5
-    FIND_PACKAGE(HDF5 REQUIRED)
+    FIND_PACKAGE(HDF5 REQUIRED COMPONENTS HL)
     ADD_DEFINITIONS(${HDF5_DEFINITIONS})
-    set(LIBS ${LIBS} ${HDF5_LIBRARIES})
+    set(LIBS ${LIBS} ${HDF5_C_LIBRARIES} ${HDF5_C_HL_LIBRARIES})
     MESSAGE("--    HDF5 Root: ${HDF5_ROOT}")
     MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
     MESSAGE("--    HDF5 Library directories: ${HDF5_LIBRARY_DIRS}")
-    MESSAGE("--    HDF5 Libraries: ${HDF5_LIBRARIES}")
+    MESSAGE("--    HDF5 Libraries: ${HDF5_C_LIBRARIES}")
+    MESSAGE("--    HDF5 High Level Libraries: ${HDF5_C_HL_LIBRARIES}")
 
     # Include the boost header files and the program_options library
     # Please be sure to use Boost rather than BOOST.
