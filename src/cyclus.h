@@ -24,8 +24,8 @@
 #include "material.h"
 #include "mock_sim.h"
 #include "agent.h"
+#include "pyhooks.h"
 #include "pyne.h"
-#include "pyne_decay.h"
 #include "query_backend.h"
 #include "infile_tree.h"
 #include "recorder.h"
@@ -37,6 +37,9 @@
 #include "time_listener.h"
 #include "trade.h"
 #include "trader.h"
+extern "C" {
+#include "transmute.h"
+}
 #include "version.h"
 
 #include "toolkit/builder.h"
@@ -58,5 +61,10 @@
 #include "toolkit/symbolic_function_factories.h"
 #include "toolkit/symbolic_functions.h"
 #include "toolkit/timeseries.h"
+
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
 
 #endif  // CYCLUS_SRC_CYCLUS_H_

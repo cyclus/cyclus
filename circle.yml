@@ -4,12 +4,12 @@ machine:
 
 dependencies:
   override:
-    - docker build -t cyclus/cyclus:latest .
+    - docker build --rm=false -t cyclus/cyclus:latest .
 
 test:
   override:
-    - docker run cyclus/cyclus:latest cyclus_unit_tests
-    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests
+    - docker run cyclus/cyclus:latest cyclus_unit_tests; exit $?
+    - docker run cyclus/cyclus:latest nosetests3 -w /cyclus/tests; exit $?
 
 deployment:
   develop:
@@ -22,14 +22,14 @@ deployment:
     branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      # Update cyclus/cylus:stable docker container
+     # Update cyclus/cylus:stable docker container
       - docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
       - docker push cyclus/cyclus:stable # push to docker depot
       ## DEB GENERATION
-        #ubuntu 14.04
+      # Ubuntu 14.04
       - docker/deb-ci/build_upload_deb.sh 14 :
           timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
-          # Ubuntu 16.04
+      # Ubuntu 16.04
       - docker/deb-ci/build_upload_deb.sh 16 :
           timeout: 1200 # set 20 minute timeout (to avoid CI to fail)
         ## END DEB GENERATION

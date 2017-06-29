@@ -9,7 +9,10 @@ from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
-def test_null_sink():
+
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
+def check_null_sink(fname, given_spec):
     """Testing for null sink case without a source facility.
 
     No transactions are expected in this test; therefore, a table with
@@ -18,7 +21,7 @@ def test_null_sink():
     clean_outs()
 
     # Cyclus simulation input for null sink testing
-    sim_input = "./input/null_sink.xml"
+    sim_input = os.path.join(INPUT, fname)
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
@@ -55,8 +58,8 @@ def test_null_sink():
     # Sink's deployment
     agent_ids = to_ary(agent_entry, "AgentId")
     spec = to_ary(agent_entry, "Spec")
-        
-    sink_id = find_ids(":agents:Sink", spec, agent_ids)
+
+    sink_id = find_ids(given_spec, spec, agent_ids)
     # Test if one SimpleSink is deployed
     yield assert_equal, len(sink_id), 1
 
@@ -64,3 +67,12 @@ def test_null_sink():
     yield assert_false, tables_exist(outfile, illegal_paths)
 
     clean_outs()
+
+
+def test_null_sink():
+    cases = [("null_sink.xml", ":agents:Sink"),
+             ("null_sink.py", ":cyclus.pyagents:Sink")]
+    for case in cases:
+        for x in check_null_sink(*case):
+            yield x
+

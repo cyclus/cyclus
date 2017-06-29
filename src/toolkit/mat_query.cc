@@ -41,6 +41,20 @@ double MatQuery::atom_frac(Nuc nuc) {
   return v[nuc];
 }
 
+double MatQuery::atom_frac(std::set<Nuc> nucs) {
+  CompMap v = m_->comp()->atom();
+  compmath::Normalize(&v);
+  
+  double frac_tot = 0;
+  std::set<Nuc>::iterator it ;
+  for (it = nucs.begin(); it != nucs.end(); ++it) {
+    if (v.find(*it) != v.end()){
+      frac_tot += v[*it];
+    }
+  }
+  return frac_tot; 
+}
+
 double MatQuery::mass(std::string nuc) {
   return mass(pyne::nucname::id(nuc));
 }

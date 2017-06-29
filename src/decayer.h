@@ -9,6 +9,11 @@
 #include "pyne.h"
 #include "use_matrix_lib.h"
 
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
+
 namespace cyclus {
 
 /// A map type to represent all of the parent nuclides tracked. The key

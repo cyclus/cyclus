@@ -6,6 +6,7 @@
 
 #include "institution_tests.h"
 #include "agent_tests.h"
+#include "pyhooks.h"
 
 using libname::StubInst;
 
@@ -16,11 +17,13 @@ class StubInstTest : public ::testing::Test {
   StubInst* inst;
 
   virtual void SetUp() {
+    cyclus::PyStart();
     inst = new StubInst(tc.get());
   }
 
   virtual void TearDown() {
     delete inst;
+    cyclus::PyStop();
   }
 };
 

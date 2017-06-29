@@ -34,15 +34,6 @@ ENDIF()
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow")
 
 IF(NOT CYCLUS_DOC_ONLY)
-
-    # download pre-generated decay source code files from pyne
-    EXECUTE_PROCESS(COMMAND python ${PROJECT_SOURCE_DIR}/getdecay.py --root ${PROJECT_SOURCE_DIR}
-                    RESULT_VARIABLE res_var)
-
-    IF(NOT "${res_var}" STREQUAL "0")
-      message(FATAL_ERROR "fetching decay source code failed, res_var = '${res_var}'")
-    ENDIF()
-
     ##############################################################################################
     ################################# begin cmake configuration ##################################
     ##############################################################################################
@@ -57,9 +48,13 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_TEST_DIR "${PROJECT_SOURCE_DIR}/tests")
     SET(CYCLUS_AGENTS_DIR "${PROJECT_SOURCE_DIR}/agents")
     SET(CYCLUS_CMAKE_DIR "${PROJECT_SOURCE_DIR}/cmake")
+    SET(CYCLUS_PYSOURCE_DIR "${PROJECT_SOURCE_DIR}/cyclus")
 
     # set cycpp var
     SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
+
+    # set cython post-processor var
+    SET(CYTHON_POST_PROCESSOR "${CYCLUS_CLI_DIR}/post-process-cython.py")
 
     # This makes all the libraries build as SHARED
     SET(BUILD_SHARED_LIBS true)
@@ -101,6 +96,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/cmake")
 
     # Include macros
+    INCLUDE(CopyWhenDiffMacro)
     INCLUDE(UseCyclus)
 
     # set configuration for all library builds
@@ -134,19 +130,19 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Dependency Root Dir (DEPS_ROOT_DIR): ${DEPS_ROOT_DIR}")
     if (DEPS_ROOT_DIR)
         SET(DEPS_HINTS HINTS "${DEPS_ROOT_DIR}")
+        SET(DEPS_BIN_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/bin")
         SET(DEPS_LIB_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/lib")
         SET(DEPS_INCLUDE_HINTS HINTS "${DEPS_ROOT_DIR}/include")
     else (DEPS_ROOT_DIR)
         SET(DEPS_HINTS)
+        SET(DEPS_bin_HINTS)
         SET(DEPS_LIB_HINTS)
         SET(DEPS_INCLUDE_HINTS)
     endif (DEPS_ROOT_DIR)
     MESSAGE("-- Dependency Hints (DEPS_HINTS): ${DEPS_HINTS}")
+    MESSAGE("-- Dependency Binary Hints (DEPS_BIN_HINTS): ${DEPS_BIN_HINTS}")
     MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
     MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
-
-    FIND_PACKAGE(Tcmalloc)
-    SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
@@ -177,7 +173,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(Boost_USE_STATIC_LIBS OFF)
     SET(Boost_USE_STATIC_RUNTIME OFF)
     # SET(Boost_USE_MULTITHREADED    OFF)
-    FIND_PACKAGE(Boost 1.46.1 COMPONENTS program_options filesystem system serialization REQUIRED)
+    if (DEPS_ROOT_DIR)
+      SET(BOOST_ROOT "${DEPS_ROOT_DIR}")
+      SET(BOOST_INCLUDEDIR "${DEPS_INCLUDE_HINTS}")
+    endif (DEPS_ROOT_DIR)
+    FIND_PACKAGE(Boost COMPONENTS program_options filesystem system serialization REQUIRED)
     MESSAGE("--    Boost Root: ${Boost_ROOT}")
     MESSAGE("--    Boost Include directory: ${Boost_INCLUDE_DIR}")
     MESSAGE("--    Boost Library directories: ${Boost_LIBRARY_DIRS}")
@@ -251,6 +251,52 @@ IF(NOT CYCLUS_DOC_ONLY)
         set(LIBS ${LIBS} ${ICUUC_LIBRARIES})
     ENDIF(ICUUC_LIBRARIES)
 
+    #
+    # Cython & Python Bindings
+    #
+    # Use new Python library finder
+    find_package(PythonInterp)
+    find_package(PythonLibs)
+    message("-- PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
+
+    # Include the CMake script UseCython.cmake.  This defines add_cython_module().
+    # Instruction for use can be found at the top of cmake/UseCython.cmake.
+
+    FIND_PACKAGE(Cython)
+    message("-- Found Cython: ${Cython_FOUND}")
+    if(Cython_FOUND)
+        message(STATUS "Cython Version: ${CYTHON_VERSION}")
+        if("${CYTHON_VERSION}" VERSION_LESS "0.25")
+          message(FATAL_ERROR "Cython version is too old, must be 0.25+.")
+        endif()
+        include(UseCython)
+
+        find_package(Numpy REQUIRED)
+        find_package(Jinja2 REQUIRED)
+        find_package(Pandas REQUIRED)
+
+        # With CMake, a clean separation can be made between the source tree and the
+        # build tree.  When all source is compiled, as with pure C/C++, the source is
+        # no-longer needed in the build tree.  However, with pure *.py source, the
+        # source is processed directly.  To handle this, we reproduce the availability
+        # of the source files in the build tree.
+        add_custom_target(ReplicatePythonSourceTree ALL "${CMAKE_COMMAND}" -P
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ReplicatePythonSourceTree.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}"
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
+        # make sure we know about having python
+        add_definitions(-DCYCLUS_WITH_PYTHON)
+        set(LIBS ${LIBS} ${PYTHON_LIBRARIES})
+        INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
+    else(Cython_FOUND)
+        # If we don't have Python bindings, we may try to find tcmalloc.
+        # Python has to be specially compiled for tcmalloc support, which it
+        # normally isn't.
+        FIND_PACKAGE(Tcmalloc)
+        SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
+    endif(Cython_FOUND)
+
     ##############################################################################################
     #################################### end find libraries ######################################
     ##############################################################################################
@@ -271,6 +317,10 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
 
+    if(Cython_FOUND)
+        INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}"
+            "${NUMPY_INCLUDE_DIRS}")
+    endif(Cython_FOUND)
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
         SET(core_version "${CORE_VERSION}")
@@ -280,10 +330,11 @@ IF(NOT CYCLUS_DOC_ONLY)
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
     ENDIF(NOT "${CORE_VERSION}" STREQUAL "")
     IF("${core_version}" STREQUAL "")
-      MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
-      SET(core_version "-1")
+        MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
+        SET(core_version "-1")
     ENDIF()
-    MESSAGE("-- core version set to: ${core_version}")
+    SET(ENV{CYCLUS_CORE_VERSION} "${core_version}")
+    MESSAGE("-- core version ($CYCLUS_CORE_VERSION) set to: ${core_version}")
 
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
@@ -291,12 +342,15 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
+    if(Cython_FOUND)
+        ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
+    endif(Cython_FOUND)
 
     ##############################################################################################
     ####################################### end includes #########################################
     ##############################################################################################
 
-    ################# stub files #################################################################
+    ################# custom install files #######################################################
     INSTALL(
         FILES
         stubs/CMakeLists.txt
@@ -325,6 +379,12 @@ IF(NOT CYCLUS_DOC_ONLY)
         DESTINATION share/cyclus/stubs/src
         COMPONENT stubs
         )
+
+    if(Cython_FOUND)
+        set(pyinstallscript "${CMAKE_CURRENT_BINARY_DIR}/cmake/SetupPyInstall.cmake")
+        configure_file(cmake/SetupPyInstall.cmake.in ${pyinstallscript} @ONLY)
+        install(SCRIPT ${pyinstallscript})
+    endif(Cython_FOUND)
     ##############################################################################################
     ################################## begin uninstall target ####################################
     ##############################################################################################

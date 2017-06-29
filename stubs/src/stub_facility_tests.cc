@@ -5,6 +5,7 @@
 #include "agent_tests.h"
 #include "context.h"
 #include "facility_tests.h"
+#include "pyhooks.h"
 
 using libname::StubFacility;
 
@@ -15,11 +16,13 @@ class StubFacilityTest : public ::testing::Test {
   StubFacility* facility;
 
   virtual void SetUp() {
+    cyclus::PyStart();
     facility = new StubFacility(tc.get());
   }
 
   virtual void TearDown() {
     delete facility;
+    cyclus::PyStop();
   }
 };
 

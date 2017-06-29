@@ -17,7 +17,9 @@ try:
 except ImportError:
     smbchk = None
 
+
 def test_abi_stability():
+    raise SkipTest('manually remove this skip to test ABI stability')
     if smbchk is None:
         raise SkipTest('Could not import smbchk!')
     if os.name != 'posix':
@@ -30,6 +32,7 @@ def test_abi_stability():
     with tools.indir(reldir):
         obs = smbchk.main(args=args)
     assert_true(obs)
+
 
 if __name__ == "__main__":
     nose.runmodule()

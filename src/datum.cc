@@ -9,8 +9,8 @@ namespace cyclus {
 typedef boost::singleton_pool<Datum, sizeof(Datum)> DatumPool;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val,
-                     std::vector<int>* shape) {
+Datum* Datum::AddValBase(const char* field, boost::spirit::hold_any val,
+                         std::vector<int>* shape) {
   vals_.push_back(std::pair<const char*, boost::spirit::hold_any>(field, val));
   std::vector<int> s;
   if (shape == NULL)
@@ -18,6 +18,18 @@ Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val,
   else
     shapes_.push_back(*shape);
   return this;
+}
+
+Datum* Datum::AddVal(const char* field, boost::spirit::hold_any val,
+                     std::vector<int>* shape) {
+  fields_.push_back(std::string(field));
+  return AddValBase(field, val, shape);
+}
+
+Datum* Datum::AddVal(std::string field, boost::spirit::hold_any val,
+                     std::vector<int>* shape) {
+  fields_.push_back(field);
+  return AddValBase(field.c_str(), val, shape);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -32,6 +44,7 @@ Datum::Datum(Recorder* m, std::string title) : title_(title), manager_(m) {
   // vector as vals are added to the datum.
   vals_.reserve(10);
   shapes_.reserve(10);
+  fields_.reserve(10);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,6 +60,10 @@ const Datum::Vals& Datum::vals() {
 
 const Datum::Shapes& Datum::shapes() {
   return shapes_;
+}
+
+const Datum::Fields& Datum::fields() {
+  return fields_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

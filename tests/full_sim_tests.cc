@@ -2,6 +2,7 @@
 
 #include "greedy_solver.h"
 #include "logger.h"
+#include "pyhooks.h"
 #include "test_context.h"
 #include "test_trader.h"
 
@@ -22,8 +23,10 @@ TEST(FullSimTests, LoneTrader) {
 
   int nsteps = 5;
 
+  PyStart();
   tc.timer()->Initialize(tc.get(), SimInfo(nsteps));
   tc.timer()->RunSim();
+  PyStop();
 
   EXPECT_EQ(nsteps, trader->requests);
   EXPECT_EQ(nsteps, trader->bids);
@@ -49,8 +52,10 @@ TEST(FullSimTests, NullTrade) {
 
   int nsteps = 2;
 
+  PyStart();
   tc.timer()->Initialize(tc.get(), SimInfo(nsteps));
   tc.timer()->RunSim();
+  PyStop();
 
   EXPECT_EQ(nsteps, supplier->requests);
   EXPECT_EQ(nsteps, supplier->bids);
@@ -85,8 +90,10 @@ TEST(FullSimTests, Trade) {
 
   int nsteps = 3;
 
+  PyStart();
   tc.timer()->Initialize(tc.get(), SimInfo(nsteps));
   tc.timer()->RunSim();
+  PyStop();
 
   EXPECT_EQ(nsteps, supplier->requests);
   EXPECT_EQ(nsteps, supplier->bids);

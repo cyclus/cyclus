@@ -16,6 +16,8 @@ from helper import tables_exist, clean_outs, agent_time_series, \
 prey = "Prey"
 pred = "Predator"
 
+DIR = os.path.dirname(__file__)
+
 def test_predator_only():
     """Tests simulations with Predators only.
 
@@ -24,11 +26,11 @@ def test_predator_only():
     clean_outs()
 
     # A reference simulation input for Lotka-Volterra simulation
-    sim_input = "./input/predator.xml"
+    sim_input = os.path.join(DIR, "input", "predator.xml")
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
-    
+
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
     yield check_cmd, cmd, '.', holdsrtn
     rtn = holdsrtn[0]
@@ -53,7 +55,7 @@ def test_prey_only():
     The population is expected to grow exponentially.
     """
     clean_outs()
-    sim_input = "./input/prey.xml"
+    sim_input = os.path.join(DIR, "input", "prey.xml")
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
 
@@ -90,7 +92,7 @@ def test_lotka_volterra():
     expected to occur after the peak of the prey population.
     """
     clean_outs()
-    sim_input = "./input/lotka_volterra_determ.xml"
+    sim_input = os.path.join(DIR, "input", "lotka_volterra_determ.xml")
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
 

@@ -21,16 +21,23 @@ class Context;
 void LoadRawStringstreamFromFile(std::stringstream& stream, std::string file);
 
 /// Reads the given file path as XML into the passed stream.
-void LoadStringstreamFromFile(std::stringstream& stream, std::string file);
+/// The format may be "none", "xml", "json", or "py".
+void LoadStringstreamFromFile(std::stringstream& stream, std::string file,
+                              std::string format="none");
+
+/// Reads the given file path and returns an XML string.
+/// The format may be "none", "xml", "json", or "py".
+std::string LoadStringFromFile(std::string file, std::string format="none");
 
 /// Returns a list of the full module+agent spec for all agents in the given
 /// input file.
-std::vector<AgentSpec> ParseSpecs(std::string infile);
+std::vector<AgentSpec> ParseSpecs(std::string infile, std::string format="none");
 
 /// Builds and returns a master cyclus input xml schema that includes the
 /// sub-schemas defined by all installed cyclus modules (e.g. facility agents).
 /// This is used to validate simulation input files.
-std::string BuildMasterSchema(std::string schema_path, std::string infile);
+std::string BuildMasterSchema(std::string schema_path, std::string infile,
+                              std::string format="none");
 
 /// Creates a composition from the recipe in the query engine.
 Composition::Ptr ReadRecipe(InfileTree* qe);
@@ -45,9 +52,10 @@ class XMLFileLoader {
   /// Create a new loader reading from the xml simulation input file and writing
   /// to and initializing the backends in r. r must already have b registered.
   /// schema_file identifies the master xml rng schema used to validate the
-  /// input file.
-  XMLFileLoader(Recorder* r, QueryableBackend* b, std::string schema_file,
-                const std::string input_file = "");
+  /// input file. The format specifies the input file format from one of:
+  /// "none", "xml", "json", or "py".
+  XMLFileLoader(Recorder* r, QueryableBackend* b, std::string schema_file, 
+                const std::string input_file="", const std::string format="none", bool ms_print=false);
 
   virtual ~XMLFileLoader();
 
@@ -91,6 +99,9 @@ class XMLFileLoader {
   Timer ti_;
   Context* ctx_;
   QueryableBackend* b_;
+  
+  /// flag to indicate printing master schema
+  bool ms_print_;
 
   /// filepath to the schema
   std::string schema_path_;
@@ -103,6 +114,9 @@ class XMLFileLoader {
 
   /// the input file name
   std::string file_;
+
+  /// the input file format
+  std::string format_;
 };
 
 }  // namespace cyclus

@@ -305,10 +305,11 @@ TEST_F(MaterialTest, DecayShortcut) {
   Composition::Ptr c = Composition::CreateFromAtom(mp);
   Material::Ptr m = Material::CreateUntracked(1.0, c);
 
-  ASSERT_NEAR(3.11996e-17, pyne::decay_const("u235"), 1e-20);
+  std::string u235 ("u235");
+  ASSERT_NEAR(3.11996e-17, pyne::decay_const(u235), 1e-20);
 
   double sec_per_month = 2629152;
-  double u235_lambda = pyne::decay_const("u235") * sec_per_month;  // per month
+  double u235_lambda = pyne::decay_const(u235) * sec_per_month;  // per month
   double eps = 1e-3;
   double threshold = -1 * std::log(1-eps) / u235_lambda;
 
@@ -322,7 +323,8 @@ TEST_F(MaterialTest, DecayShortcut) {
 // durations correctly w.r.t. decay.
 TEST_F(MaterialTest, DecayCustomTimeStep) {
   cyclus::Env::SetNucDataPath();
-  uint64_t custom_timestep = pyne::half_life("Cs137");
+  std::string cs137 ("Cs137");
+  uint64_t custom_timestep = pyne::half_life(cs137);
 
   SimInfo si(10, 2015, 1, "", "manual");
   si.dt = custom_timestep;
@@ -395,6 +397,19 @@ TEST_F(MaterialTest, AbsorbPrevDecay) {
   EXPECT_EQ(10, m1->prev_decay_time());
   m1->Absorb(m2);
   EXPECT_EQ(10, m1->prev_decay_time());
+}
+
+TEST_F(MaterialTest, DecayHeatTest) {
+  CompMap v;
+  v[922350000] = 0.05;
+  v[922380000] = 0.95;
+  Composition::Ptr diff_test_comp = Composition::CreateFromMass(
+                                              v);
+  Material::Ptr diff_test_mat = Material::CreateUntracked(
+                                        1.,
+                                        diff_test_comp);
+  double dec_heat = diff_test_mat->DecayHeat();
+  ASSERT_NEAR(3.614E-14 , dec_heat, 0.0005);
 }
 
 }  // namespace cyclus

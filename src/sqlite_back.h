@@ -50,6 +50,8 @@ class SqliteBack: public FullBackend {
   void Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt, int index);
 
   QueryResult GetTableInfo(std::string table);
+  
+  std::list<ColumnInfo> Schema(std::string table);
 
   /// returns a valid sql data type name for v (e.g.  INTEGER, REAL, TEXT, etc).
   std::string SqlType(boost::spirit::hold_any v);

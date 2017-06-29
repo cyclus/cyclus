@@ -83,7 +83,7 @@ class Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>,
       Product::Ptr> >& responses) {}
- 
+
  protected:
   Agent* manager_;
 

@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <map>
+#include <cmath>
 #include <string>
 #include <utility>
 #include <vector>
@@ -12,16 +13,25 @@
 #include "request.h"
 #include "request_portfolio.h"
 
+// Undefines isnan from pyne
+#ifdef isnan
+  #undef isnan
+#endif
+
+
 namespace cyclus {
 
 template <class T>
 struct PrefMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double> > type;
+  typedef Request<T>* request_ptr;
+  typedef Bid<T>* bid_ptr;
 };
 
 template <class T>
 struct CommodMap {
   typedef std::map<std::string, std::vector<Request<T>*> > type;
+  typedef Request<T>* request_ptr;
 };
 
 /// @class ExchangeContext
@@ -79,8 +89,9 @@ struct ExchangeContext {
 
     bids_by_request[pb->request()].push_back(pb);
 
+    double bid_pref = pb->preference();
     trader_prefs[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, pb->request()->preference()));
+        std::make_pair(pb, std::isnan(bid_pref) ? pb->request()->preference() : bid_pref));
   }
 
   /// @brief a reference to an exchange's set of requests

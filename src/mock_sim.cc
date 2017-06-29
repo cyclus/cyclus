@@ -2,6 +2,7 @@
 
 #include "cyclus.h"
 #include "sim_init.h"
+#include "pyhooks.h"
 #include <sstream>
 
 namespace cyclus {
@@ -198,10 +199,15 @@ void MockSim::AddRecipe(std::string name, Composition::Ptr c) {
 }
 
 int MockSim::Run() {
+  // Initialize Python functionality
+  PyStart();
+
   agent->Build(NULL);
   int id = agent->id();
   ti_.RunSim();
   rec_.Flush();
+
+  PyStop();
   return id;
 }
 
