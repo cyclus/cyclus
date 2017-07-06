@@ -109,7 +109,7 @@ QueryResult SqliteBack::Query(std::string table, std::vector<Cond>* conds) {
     sql << " WHERE ";
     for (int i = 0; i < conds->size(); ++i) {
       if (i > 0) {
-        sql << " OR ";
+        sql << " AND ";
       }
       Cond c = (*conds)[i];
       sql << c.field << " " << c.op << " ?";

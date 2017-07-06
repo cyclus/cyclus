@@ -131,28 +131,22 @@ void Timer::RecordInventory(Agent* a, std::string name, Material::Ptr m) {
   if (si_.explicit_inventory) {
     CompMap c = m->comp()->mass();
     compmath::Normalize(&c, m->quantity());
-    CompMap::iterator it;
-    for (it = c.begin(); it != c.end(); ++it) {
-      ctx_->NewDatum("ExplicitInventory")
-          ->AddVal("AgentId", a->id())
-          ->AddVal("Time", time_)
-          ->AddVal("InventoryName", name)
-          ->AddVal("NucId", it->first)
-          ->AddVal("Quantity", it->second)
-          ->Record();
-    }
-  }
-
-  if (si_.explicit_inventory_compact) {
-    CompMap c = m->comp()->mass();
-    compmath::Normalize(&c, 1);
-    ctx_->NewDatum("ExplicitInventoryCompact")
+    ctx_->NewDatum("ExplicitInventory")
         ->AddVal("AgentId", a->id())
         ->AddVal("Time", time_)
         ->AddVal("InventoryName", name)
-        ->AddVal("Quantity", m->quantity())
-        ->AddVal("Composition", c)
+        ->AddVal("Mass", m->quantity())
+        ->AddVal("CompositionId", CompositionId)
         ->Record();
+    CompMap::iterator it;
+    for (it = c.begin(); it != c.end(); ++it) {
+      ctx_->NewDatum("InventoryComposition")
+          ->AddVal("CompositionId", CompositionId)
+          ->AddVal("NucId", it->first)
+          ->AddVal("Mass", it->second)
+          ->Record();
+    }
+    CompositionId++;
   }
 }
 
@@ -233,6 +227,7 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   want_kill_ = false;
   ctx_ = ctx;
   time_ = 0;
+  CompositionId = 0;
   si_ = si;
 
   if (si.branch_time > -1) {
