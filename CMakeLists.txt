@@ -201,6 +201,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # find coin and link to it
     FIND_PACKAGE(COIN REQUIRED)
+    MESSAGE("-- COIN Version: ${COIN_VERSION}")
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
 
     #
