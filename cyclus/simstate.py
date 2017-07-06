@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 import os
 import queue
 import atexit
+import sys
 
 #from cyclus.system import curio
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
