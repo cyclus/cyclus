@@ -115,7 +115,7 @@ def install_cyclus(args):
 def uninstall_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
     if not os.path.exists(args.build_dir) or not os.path.exists(makefile):
-        sys.exist("May not uninstall Cyclus since it has not yet been built.")
+        sys.exit("May not uninstall Cyclus since it has not yet been built.")
     rtn = subprocess.check_call(['make', 'uninstall'], cwd=args.build_dir,
                                 shell=(os.name == 'nt'))
 
