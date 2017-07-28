@@ -22,13 +22,6 @@ ELSE()
     MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 ENDIF()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-#set(CMAKE_THREAD_LIBS_INIT "-lpthread")
-#SET(CMAKE_THREAD_PREFER_PTHREAD -lpthread)
-#SET(THREADS_PREFER_PTHREAD_FLAG TRUE)
-#FIND_PACKAGE( Threads REQUIRED )
-
 # quiets fortify_source warnings when not compiling with optimizations
 # in linux distros where compilers were compiled with fortify_source enabled by
 # default (e.g. Arch linux).
@@ -351,7 +344,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
-    #ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
+    ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     if(Cython_FOUND)

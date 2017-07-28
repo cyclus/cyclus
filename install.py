@@ -88,8 +88,9 @@ def install_cyclus(args):
             cmake_cmd += ['-DCORE_VERSION=' + args.core_version]
         if args.D is not None:
             cmake_cmd += ['-D' + x for x in args.D]
+        if args.cmake_debug:
+            cmake_cmd += ['-Wdev', '--debug-output']
         check_windows_cmake(cmake_cmd)
-        cmake_cmd += ['-Wdev', '--debug-output']
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
 
@@ -192,6 +193,9 @@ def main():
 
     parser.add_argument('-D', metavar='VAR', action='append',
                         help='Set enviornment variable(s).')
+    parser.add_argument('--cmake-debug', action='store_true', default=False,
+                        dest='cmake_debug', help='puts CMake itself in a debug mode '
+                                                 'when dealing with build system issues.')
 
     args = parser.parse_args()
     # modify roots as needed

@@ -90,7 +90,7 @@ SET(
 SET(CYCLUS_TEST_LIBRARIES
     "${CYCLUS_TEST_LIBRARIES}" gtest PARENT_SCOPE) # for stubs/agents
 
-#ADD_SUBDIRECTORY(test_agents)
+ADD_SUBDIRECTORY(test_agents)
 INSTALL(FILES ${test_agents}
     DESTINATION include/cyclus/test_agents
     COMPONENT testing
