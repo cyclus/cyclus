@@ -195,7 +195,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find lapack and link to it
-    FIND_PACKAGE(LAPACK REQUIRED)
+    FIND_PACKAGE(LAPACK REQUIRED ${DEPS_LIB_HINTS})
     set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
     MESSAGE("\tFound LAPACK Libraries: ${LAPACK_LIBRARIES}")
 
