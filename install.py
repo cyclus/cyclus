@@ -89,6 +89,7 @@ def install_cyclus(args):
         if args.D is not None:
             cmake_cmd += ['-D' + x for x in args.D]
         check_windows_cmake(cmake_cmd)
+        cmake_cmd += ['-Wdev', '--debug-output']
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
 
