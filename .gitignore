@@ -39,6 +39,11 @@ tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5
 tests/libcyclus-test.sqlite
+rs.cred
+
+# Docker stuff
+build-local/
+Debug/
 
 # generated cython ignores
 *.cc.gen
