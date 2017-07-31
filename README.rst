@@ -80,12 +80,15 @@ on the source code from github is fairly straightforward:
 
 - Clone the Cyclus repository: ``git clone https://github.com/cyclus/cyclus.git``,
 
-- to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
+- To install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
   from the ``cyclus`` folder,
 
-- finally, add the following Cyclus installation path (``~/.local/bin``) to
-  the **front** on your ``$PATH``.
-- additionnaly if you are using MacOSX, also add
+- Finally, add the following Cyclus installation path (``~/.local/bin``) to
+  the **front** on your ``$PATH``. Run:
+  > echo 'export PATH="$HOME/.local/bin:$PATH' >> ~/.bashrc
+  > source ~/.bashrc
+
+- Additionally if you are using MacOSX, also add
   ``~/.local/lib/pythonX.Y/site-packages`` to your ``$PYTHONPATH``
 
 For more detailed installation procedure, and/or custom installation please
