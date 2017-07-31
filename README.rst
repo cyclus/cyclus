@@ -27,7 +27,7 @@ The Cyclus Core contains all the fundamental pieces of the Cyclus framework
 required to interface with the input file, write the output file, and manage
 material flow during the simulation via the Dynamic Resource Exchange.  It
 does not contain any fuel cycle facility models. A set of nuclear facilities can be
-obtained by installing Cycamore, the Cyclus Additionnal Module.  Cycamore is
+obtained by installing Cycamore, the Cyclus Additional Module.  Cycamore is
 supported by the Cyclus Developer Team.  
 
 Third party modules can also be installed (or developed) with additional
@@ -84,8 +84,14 @@ on the source code from github is fairly straightforward:
   from the ``cyclus`` folder,
 
 - finally, add the following Cyclus installation path (``~/.local/bin``) to
-  the **front** on your ``$PATH``.
-- additionnaly if you are using MacOSX, also add
+  the **front** on your ``$PATH``. Run:
+
+.. code-block:: bash
+  
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+  source ~/.bashrc
+
+- additionally, if you are using MacOSX, also add
   ``~/.local/lib/pythonX.Y/site-packages`` to your ``$PYTHONPATH``
 
 For more detailed installation procedure, and/or custom installation please
