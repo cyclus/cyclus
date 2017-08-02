@@ -40,3 +40,12 @@ RUN conda update -y --all && \
 # pip packages to overide conda
 #
 RUN pip install docker
+
+#
+# Grab cyclus for the first time
+#
+RUN git clone https://github.com/cyclus/cyclus.git /cyclus && \
+    cd /cyclus && \
+    python install.py -j 2 || \
+    cd .. && \
+    rm -rf /cyclus
