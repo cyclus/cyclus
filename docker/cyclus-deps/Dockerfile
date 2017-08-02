@@ -32,7 +32,8 @@ RUN apt-get update && \
 #
 RUN conda config --add channels conda-forge
 RUN conda update -y --all && \
-    conda install -y gcc make docker-pycreds git xo xonsh python-json-logger cyclus-build-deps websockets pprintpp &&\
+    conda install -y gcc make docker-pycreds git xo xonsh python-json-logger \
+                     cyclus-build-deps websockets pprintpp && \
     conda clean -y --all
 
 #
