@@ -160,6 +160,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
     set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${LAPACK_LINKER_FLAGS})
+    MESSAGE("-- Found LAPACK Flags: ${LAPACK_LINKER_FLAGS}")
     MESSAGE("-- Found LAPACK Libraries: ${LAPACK_LIBRARIES}")
     MESSAGE("-- Found BLAS Libraries: ${BLAS_LIBRARIES}")
 
