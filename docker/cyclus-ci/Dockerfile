@@ -2,5 +2,6 @@ FROM cyclus/cyclus-deps
 
 COPY . /cyclus
 WORKDIR /cyclus
-RUN python install.py -j2 --build-type=Release --core-version 999999.999999 || \
-    python install.py -j2 --build-type=Release --core-version 999999.999999
+#RUN conda update --all && conda clean --all
+RUN python install.py -j2 --build-type=Release --core-version 999999.999999 \
+    -DBLAS_LIBRARIES="-L/opt/conda/lib -lopenblas" -DLAPACK_LIBRARIES="-L/opt/conda/lib -llapack"
