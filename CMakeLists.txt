@@ -157,6 +157,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     FIND_PACKAGE(LibXML++ REQUIRED)
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
 
+    # find lapack and link to it
+    FIND_PACKAGE(LAPACK REQUIRED)
+    set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
+    MESSAGE("-- Found LAPACK Libraries: ${LAPACK_LIBRARIES}")
+
     # Find Sqlite3
     FIND_PACKAGE(Sqlite3 REQUIRED)
     SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
@@ -193,11 +198,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Filesystem location: ${Boost_FILESYSTEM_LIBRARY}")
     SET(LIBS ${LIBS} ${Boost_SERIALIZATION_LIBRARY})
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
-
-    # find lapack and link to it
-    FIND_PACKAGE(LAPACK REQUIRED)
-    set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
-    MESSAGE("-- Found LAPACK Libraries: ${LAPACK_LIBRARIES}")
 
     # find coin and link to it
     FIND_PACKAGE(COIN REQUIRED)
