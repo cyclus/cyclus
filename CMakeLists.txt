@@ -158,7 +158,15 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
 
     # find lapack and link to it
-    FIND_PACKAGE(LAPACK REQUIRED)
+    FIND_PACKAGE(LAPACK)
+    if(NOT LAPACK_FOUND)
+        message("-- LAPACK not initially found, retrying with hints...")
+        FIND_PACKAGE(LAPACK ${DEPS_HINTS})
+    endif(NOT LAPACK_FOUND)
+    if(NOT LAPACK_FOUND)
+        message("-- LAPACK still not found, retrying as required...")
+        FIND_PACKAGE(LAPACK REQUIRED)
+    endif(NOT LAPACK_FOUND)
     set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
     MESSAGE("-- Found LAPACK Libraries: ${LAPACK_LIBRARIES}")
 
