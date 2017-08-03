@@ -41,3 +41,6 @@ and installs the cyclus kernel.  The built docker image is saved as
 cyclus/cyclus:local - which can be used to run tests, etc.  This could become
 an easy way to onboard new kernel developers - they no longer have to set up a
 fancy environment - all they have to do is clone cyclus and install docker.
+
+The ``dockerinst.sh`` script is similar to ``dockerbuild.sh`` except that it
+uses ``install.py`` to build and install cyclus.

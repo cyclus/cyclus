@@ -146,7 +146,7 @@ def agent_time_series(names):
     for name, ids in agent_ids.items():
         for id in ids:
             idx = np.where(to_ary(agent_entry,'AgentId') == id)[0]
-            entries[name][agent_entry[idx]['EnterTime']] += 1
+            entries[name][agent_entry[idx]['EnterTime'][0]] += 1
 
     # cumulative entries
     entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
