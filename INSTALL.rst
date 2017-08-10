@@ -53,7 +53,7 @@ You need to add ``~/.local/bin`` to the front of your ``$PATH``:
 
 .. code-block:: bash
   
-  echo 'export PATH="$HOME/.local/bin:$PATH' >> ~/.bashrc
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
   source ~/.bashrc
 
 On MacOSX you also need to add ~/.local/lib/pythonX.Y/site-packages to your
@@ -160,7 +160,7 @@ The main variables used are:
     - set Coin-OT library directory 
 
   * - ``BOOST_ROOT``    
-    - set Boost liraries directory
+    - set Boost libraries directory
 
   * - ``HDF5_ROOT``     
     - set HDF5 root directory
