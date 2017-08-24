@@ -178,11 +178,11 @@ All variables can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
 .. website_custom_end
 
-Note on Conda
--------------
+Note on Building Cyclus with Conda
+----------------------------------
 
 If your python libraries are installed using Conda, install cyclus
-dependencies through conda-forge
+dependencies through conda-forge.
 
 .. code-block:: bash
 
