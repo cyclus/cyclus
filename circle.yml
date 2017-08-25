@@ -131,9 +131,9 @@ jobs:
                   ./bin/circleci trigger cyclus/cymetric develop
                   job_name=`./bin/circleci await cyclus/cymetric |grep outcome`
                   if [[ "$job_name" == "success" ]] ; then i
-                    return 0;
+                    exit 0;
                   else 
-                    return 1;
+                    exit 1;
                   fi
                 no_output_timeout: "20m"
     
@@ -212,7 +212,7 @@ workflows:
                     - unit_test
                     - nosetest
 
-                      #- run_cycamore
+            - run_cycamore
             - run_cymetric
             
             - ci_test_push:
