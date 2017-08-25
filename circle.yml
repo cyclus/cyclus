@@ -105,10 +105,15 @@ jobs:
             - run:
                 name: Cycamore/Cymetric tests
                 command: |
-                    curl -u ${CYCAMORE_CIRCLE_TOKEN}: \
-                        --request POST \
-                        --form notify=false \
-                        https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop
+                  # Install dependencies
+                  mkdir ./bin
+                  curl -o ./bin/circleci https://raw.githubusercontent.com/rockymadden/circleci-cli/master/src/circleci 
+                  chmod 755 ./bin/circleci
+
+                  # Trigger the project
+                  circleci init --token $CYCAMORE_CIRCLE_TOKEN
+                  circleci trigger cyclus/cycamore develop
+                  circleci await cyclus/cycamore 1
                         #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
                         #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
     ci_test_push:
