@@ -106,7 +106,9 @@ jobs:
                 name: Cycamore/Cymetric tests
                 command: |
                     curl -u ${CYCAMORE_CIRCLE_TOKEN}: \
-                        --request POST \ 
+                        --request POST \
+                        --form config=@.circleci/config.yml \
+                        --form notify=false \
                         https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop
                         #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
                         #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
