@@ -107,7 +107,6 @@ jobs:
                 command: |
                     curl -u ${CYCAMORE_CIRCLE_TOKEN}: \
                         --request POST \
-                        --form config=@circle.yml \
                         --form notify=false \
                         https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop
                         #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
