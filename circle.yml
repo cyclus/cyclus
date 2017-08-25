@@ -113,8 +113,8 @@ jobs:
                   # Trigger the project
                   ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
                   ./bin/circleci trigger cyclus/cycamore develop
-                  job_name=`./bin/circleci await cyclus/cycamore |grep outcome`
-                  if [[ "$job_name" == "success" ]] ; then i
+                  job_name=`./bin/circleci await cyclus/cycamore |grep outcome |cut -d"\"" -f4`
+                  if [[ "$job_name" == "success" ]] ; then
                     exit 0;
                   else 
                     exit 1;
@@ -134,8 +134,8 @@ jobs:
                   # Trigger the project
                   ./bin/circleci init --token $CYMETRIC_CIRCLE_TOKEN
                   ./bin/circleci trigger cyclus/cymetric develop
-                  job_name=`./bin/circleci await cyclus/cymetric |grep outcome`
-                  if [[ "$job_name" == "success" ]] ; then i
+                  job_name=`./bin/circleci await cyclus/cymetric |grep outcome |cut -d"\"" -f4`
+                  if [[ "$job_name" == "success" ]] ; then
                     exit 0;
                   else 
                     exit 1;
