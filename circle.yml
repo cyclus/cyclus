@@ -113,7 +113,7 @@ jobs:
                   # Trigger the project
                   ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
                   ./bin/circleci trigger cyclus/cycamore develop
-                 ./bin/circleci builds cyclus/cycamore
+                  ./bin/circleci builds cyclus/cycamore
                   ./bin/circleci await cyclus/cycamore
                         #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
                         #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
