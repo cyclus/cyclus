@@ -129,7 +129,12 @@ jobs:
                   # Trigger the project
                   ./bin/circleci init --token $CYMETRIC_CIRCLE_TOKEN
                   ./bin/circleci trigger cyclus/cymetric develop
-                  ./bin/circleci await cyclus/cymetric 1 -r 30 -c
+                  job_name=`./bin/circleci await cyclus/cymetric |grep outcome`
+                  if [[ "$job_name" == "success" ]] ; then i
+                    return 0;
+                  else 
+                    return 1;
+                  fi
                 no_output_timeout: "20m"
     
     ci_test_push:
@@ -207,7 +212,7 @@ workflows:
                     - unit_test
                     - nosetest
 
-            - run_cycamore
+                      #- run_cycamore
             - run_cymetric
             
             - ci_test_push:
