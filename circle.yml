@@ -1,13 +1,5 @@
 version: 2
 
-machine:
-  services:
-    - docker
-
-dependencies:
-  override:
-    - docker build --rm=false -t cyclus/cyclus:latest .
-
 jobs:
     build:
         docker:
