@@ -113,7 +113,6 @@ jobs:
                   # Trigger the project
                   ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
                   ./bin/circleci trigger cyclus/cycamore develop
-                  ./bin/circleci builds cyclus/cycamore
                   ./bin/circleci await cyclus/cycamore 1 -r 30 -c
                 no_output_timeout: "20m"
     run_cymetric:
@@ -130,7 +129,6 @@ jobs:
                   # Trigger the project
                   ./bin/circleci init --token $CYMETRIC_CIRCLE_TOKEN
                   ./bin/circleci trigger cyclus/cymetric develop
-                  ./bin/circleci builds cyclus/cymetric
                   ./bin/circleci await cyclus/cymetric 1 -r 30 -c
                 no_output_timeout: "20m"
     
