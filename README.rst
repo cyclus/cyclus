@@ -12,7 +12,7 @@ Cyclus Projects Status
 ------------------------------------------------------------ 
    **Cyclus**         **Cycamore**           **Cymetric** 
 ================    ==================    ==================
-|cyclus_status|     |cycamore_status|     |cycamore_status|
+|cyclus_status|     |cycamore_status|     |cymetric_status|
 ================    ==================    ==================
 
 
