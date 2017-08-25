@@ -113,7 +113,12 @@ jobs:
                   # Trigger the project
                   ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
                   ./bin/circleci trigger cyclus/cycamore develop
-                  ./bin/circleci await cyclus/cycamore 1 -r 30 -c
+                  job_name=`./bin/circleci await cyclus/cycamore |grep outcome`
+                  if [[ "$job_name" == "success" ]] ; then i
+                    exit 0;
+                  else 
+                    exit 1;
+                  fi
                 no_output_timeout: "20m"
     run_cymetric:
         machine: true
