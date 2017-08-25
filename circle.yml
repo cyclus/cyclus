@@ -32,6 +32,9 @@ jobs:
         working_directory: ~/cyclus
         steps:
             - checkout
+            - run:
+                name: Place the proper Dockerfile
+                command: cp docker/cyclus-ci/Dockerfile .
             - setup_remote_docker
             - run:
                 name: log into Docker
