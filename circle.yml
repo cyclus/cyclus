@@ -99,7 +99,7 @@ jobs:
                   docker/deb-ci/build_upload_deb.sh 14
                   docker/deb-ci/build_upload_deb.sh 16
 
-    cystuff_test:
+    run_cycamore:
         machine: true
         steps:
             - run:
@@ -116,8 +116,24 @@ jobs:
                   ./bin/circleci builds cyclus/cycamore
                   ./bin/circleci await cyclus/cycamore -r 30 -c
                 no_output_timeout: "20m"
-                        #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
-                        #curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
+    run_cymetric:
+        machine: true
+        steps:
+            - run:
+                name: Cycamore/Cymetric tests
+                command: |
+                  # Install dependencies
+                  mkdir ./bin
+                  curl -o ./bin/circleci https://raw.githubusercontent.com/rockymadden/circleci-cli/master/src/circleci 
+                  chmod 755 ./bin/circleci
+
+                  # Trigger the project
+                  ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
+                  ./bin/circleci trigger cyclus/cymetric develop
+                  ./bin/circleci builds cyclus/cymetric
+                  ./bin/circleci await cyclus/cymetric -r 30 -c
+                no_output_timeout: "20m"
+    
     ci_test_push:
         docker:
             - image: circleci/ruby:2.4-node
@@ -193,7 +209,8 @@ workflows:
                     - unit_test
                     - nosetest
 
-            - cystuff_test
+            - run_cycamore
+            - run_cymetric
             
             - ci_test_push:
                 filters:
