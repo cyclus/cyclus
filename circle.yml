@@ -34,22 +34,25 @@ jobs:
             - image: circleci/ruby:2.4-node
             - image: cyclus/cyclus-deps
         working_directory: ~/cyclus
+        docker:
+            - image: circleci/ruby:2.4-node
+            - image: cyclus/cyclus-deps
+        working_directory: ~/cyclus
         steps:
             - checkout
             - setup_remote_docker
             - run:
-                name: Install Docker client
-                command: |
-                    set -x
-                    VER="17.03.0-ce"
-                    curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-                    tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-                    mv /tmp/docker/* /usr/bin
-            - run:
-                name: Push to DockerHub
+                name: log into Docker
                 command: |
                     docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-                    #docker push cyclus/cyclus:latest
+            - run:
+                name: build Docker container
+                command: |
+                    docker build --rm=false -t cyclus/cyclus:latest .
+            - run:
+                name: Push on DockerHub
+                command: |
+                    docker push cyclus/cyclus:latest # push to docker depot
 
     stable_deploy:
         docker:
@@ -59,14 +62,6 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
-            - run:
-                name: Install Docker client
-                command: |
-                    set -x
-                    VER="17.03.0-ce"
-                    curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-                    tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-                    mv /tmp/docker/* /usr/bin
             - run:
                 name: Log on DockerHub
                 command: |
@@ -86,26 +81,18 @@ jobs:
             - checkout
             - setup_remote_docker
             - run:
-                name: Install Docker client
-                command: |
-                    set -x
-                    VER="17.03.0-ce"
-                    curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-                    tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-                    mv /tmp/docker/* /usr/bin
-            - run:
                 name: Tag and Push on DockerHub
                 command: |
                   docker/deb-ci/build_upload_deb.sh 14
                   docker/deb-ci/build_upload_deb.sh 16
 
-    run_cycamore:
+    test_cycamore:
         machine: true
         steps:
             - run:
                 name: Cycamore/Cymetric tests
                 command: |
-                  # Install dependencies
+                  # Install circleci 
                   mkdir ./bin
                   curl -o ./bin/circleci https://raw.githubusercontent.com/rockymadden/circleci-cli/master/src/circleci 
                   chmod 755 ./bin/circleci
@@ -120,7 +107,7 @@ jobs:
                     exit 1;
                   fi
                 no_output_timeout: "20m"
-    run_cymetric:
+    test_cymetric:
         machine: true
         steps:
             - run:
@@ -141,28 +128,6 @@ jobs:
                     exit 1;
                   fi
                 no_output_timeout: "20m"
-    
-    ci_test_push:
-        docker:
-            - image: circleci/ruby:2.4-node
-            - image: cyclus/cyclus-deps
-        working_directory: ~/cyclus
-        steps:
-            - checkout
-            - setup_remote_docker
-            - run:
-                name: log into Docker
-                command: |
-                    docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-            - run:
-                name: build Docker container
-                command: |
-                    docker build --rm=false -t cyclus/cyclus:latest .
-                    docker tag cyclus/cyclus:latest cyclus/cyclus:ci-test # creation
-            - run:
-                name: Push on DockerHub
-                command: |
-                    docker push cyclus/cyclus:ci-test # push to docker depot
 
     unit_test:
         docker:
@@ -207,7 +172,7 @@ workflows:
             - nosetest:
                 requires:
                     - build
-            - deploy:
+            - deploy_latest:
                 filters:
                     branches:
                         only:
@@ -217,16 +182,23 @@ workflows:
                     - unit_test
                     - nosetest
 
-            - run_cycamore
-            - run_cymetric
-            
-            - ci_test_push:
+            - deploy_stable:
                 filters:
                     branches:
-                        only: ci-test
+                        only: master
                 requires:
                     - unit_test
                     - nosetest
+
+            - run_cycamore:
+                requires:
+                    - unit_test
+                    - nosetest
+            - run_cymetric:
+                requires:
+                    - unit_test
+                    - nosetest
+                    - run_cycamore
 
             - deb_generation:
                 filters:
