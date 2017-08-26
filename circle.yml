@@ -74,6 +74,18 @@ jobs:
                 command: |
                   docker/deb-ci/build_upload_deb.sh 14
                   docker/deb-ci/build_upload_deb.sh 16
+    
+    empty_test:
+        machine: true
+        steps:
+            - run:
+                name: Cycamore/Cymetric tests
+                command: |
+                    curl --user ${CYCAMORE_CIRCLE_TOKEN}: \
+                    --data build_parameters[CIRCLE_JOB]=empty_test \
+                    --data revision=$CIRCLE_SHA1 \
+                    https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/ci-test
+
 
     test_cycamore:
         machine: true
@@ -155,6 +167,7 @@ workflows:
     build_and_test:
         jobs:
             - build
+            - empty_test
             - unit_test:
                 requires:
                     - build
