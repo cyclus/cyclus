@@ -190,15 +190,15 @@ workflows:
                     - unit_test
                     - nosetest
 
-            - run_cycamore:
+            - test_cycamore:
                 requires:
                     - unit_test
                     - nosetest
-            - run_cymetric:
+            - test_cymetric:
                 requires:
                     - unit_test
                     - nosetest
-                    - run_cycamore
+                    - test_cycamore
 
             - deb_generation:
                 filters:
