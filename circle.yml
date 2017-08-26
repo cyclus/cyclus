@@ -21,7 +21,7 @@ jobs:
                 paths:
                   - /root
 
-    deploy:
+    deploy_latest:
         docker:
             - image: circleci/ruby:2.4-node
         working_directory: ~/cyclus
