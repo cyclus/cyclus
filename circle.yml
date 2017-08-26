@@ -94,7 +94,7 @@ jobs:
                   build_num="$(echo -e "${build_num}" | tr -d '[:space:]')"
                   echo "Build_num: ${build_num}"
                   echo "./bin/circleci await cyclus/cycamore ${build_num#0} |grep \"outcome\" |cut -d"\"" -f4"
-                  job_name=`./bin/circleci await cyclus/cycamore ${build_num#0} |grep \"outcome\" |cut -d"\"" -f4`
+                  job_name=`./bin/circleci await cyclus/cycamore 434 |grep \"outcome\" |cut -d"\"" -f4`
                   if [[ "$job_name" == "success" ]] ; then
                     exit 0;
                   else 
