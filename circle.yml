@@ -1,6 +1,7 @@
 version: 2
 
 jobs:
+    # Build Cyclus
     build:
         docker:
             - image: cyclus/cyclus-deps
@@ -21,7 +22,9 @@ jobs:
                 paths:
                   - /root
 
-    deploy_latest:
+
+    # Update docker container
+    deploy_latest: # Cyclus/dev -> Cyclus:latest
         docker:
             - image: circleci/ruby:2.4-node
         working_directory: ~/cyclus
@@ -43,7 +46,7 @@ jobs:
                 command: docker push cyclus/cyclus:latest # push to docker depot
 
     deploy_stable:
-        docker:
+        docker: # Cyclus/master -> Cyclus:stable
             - image: circleci/ruby:2.4-node
         working_directory: ~/cyclus
         steps:
@@ -62,6 +65,8 @@ jobs:
                   docker tag cyclus/cyclus:latest cyclus/cyclus:stable # creation
                   docker push cyclus/cyclus:stable # push to docker depot
 
+
+    # Debian package generation (on master update)
     deb_generation:
         docker:
             - image: circleci/ruby:2.4-node
@@ -75,7 +80,9 @@ jobs:
                   docker/deb-ci/build_upload_deb.sh 14
                   docker/deb-ci/build_upload_deb.sh 16
     
-    empty_test:
+
+    # External Triggers
+    cycamore_master: ## Cycamore/master against Cyclus/dev
         machine: true
         steps:
             - run:
@@ -88,12 +95,10 @@ jobs:
                   chmod 755 ./bin/circleci
 
                   build_num=`curl --user ${CYCAMORE_CIRCLE_TOKEN}: \
-                  --data build_parameters[CIRCLE_JOB]=empty_test \
-                  https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/ci-test | \
+                  --data build_parameters[CIRCLE_JOB]=cyclus_dev_cycamore_master \
+                  https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop | \
                   grep build_num | cut -d":" -f2 |cut -d"," -f1 | tail -n 2 | head -n 1`
                   build_num="$(echo -e "${build_num}" | tr -d '[:space:]')"
-                  echo "Build_num: ${build_num}"
-                  echo "./bin/circleci await cyclus/cycamore ${build_num#0} |grep \"outcome\" |cut -d"\"" -f4"
                   ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
                   job_name=`./bin/circleci await cyclus/cycamore ${build_num} |grep \"outcome\" |cut -d"\"" -f4`
                   if [[ "$job_name" == "success" ]] ; then
@@ -102,12 +107,12 @@ jobs:
                     exit 1;
                   fi
 
-
-    test_cycamore:
+    cycamore_dev: ## Cycamore/dev against Cyclus/dev
         machine: true
         steps:
             - run:
                 name: Cycamore/Cymetric 
+                no_output_timeout: "20m"
                 command: |
                   # Install circleci 
                   mkdir ./bin
@@ -123,12 +128,12 @@ jobs:
                   else 
                     exit 1;
                   fi
-                no_output_timeout: "20m"
-    test_cymetric:
+    cymetric_dev: ## Cymetric/dev against Cyclus/dev + Cyacamore/dev
         machine: true
         steps:
             - run:
                 name: Cycamore/Cymetric tests
+                no_output_timeout: "20m"
                 command: |
                   # Install dependencies
                   mkdir ./bin
@@ -144,8 +149,8 @@ jobs:
                   else 
                     exit 1;
                   fi
-                no_output_timeout: "20m"
 
+    # Test Jobs
     unit_test:
         docker:
             - image: cyclus/cyclus-deps
@@ -179,18 +184,34 @@ jobs:
                 command: nosetests -w ~/cyclus/tests; exit $?
 
 workflows:
-    version: 2
+    version: 2 #Needed ?? (already on the top of the file)
     build_and_test:
         jobs:
+            
+            # On a PR // All Branch
             - build
-            - empty_test
             - unit_test:
                 requires:
                     - build
             - nosetest:
                 requires:
                     - build
+
+            - cycamore_dev:
+                requires:
+                    - unit_test
+                    - nosetest
+            - cycamore_master:
+                requires:
+                    - unit_test
+                    - nosetest
+            - cymetric_dev:
+                requires:
+                    - unit_test
+                    - nosetest
+                    - cycamore_dev
             
+            # Merge on Develop
             - deploy_latest:
                 filters:
                     branches:
@@ -199,6 +220,8 @@ workflows:
                     - unit_test
                     - nosetest
 
+
+            # Merge on Master
             - deploy_stable:
                 filters:
                     branches:
@@ -206,17 +229,6 @@ workflows:
                 requires:
                     - unit_test
                     - nosetest
-
-            - test_cycamore:
-                requires:
-                    - unit_test
-                    - nosetest
-            - test_cymetric:
-                requires:
-                    - unit_test
-                    - nosetest
-                    - test_cycamore
-
             - deb_generation:
                 filters:
                     branches:
