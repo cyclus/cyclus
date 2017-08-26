@@ -86,9 +86,10 @@ jobs:
                   curl -o ./bin/circleci https://raw.githubusercontent.com/rockymadden/circleci-cli/master/src/circleci 
                   chmod 755 ./bin/circleci
 
-                  curl --user ${CYCAMORE_CIRCLE_TOKEN}: \
+                  build_num=` curl --user ${CYCAMORE_CIRCLE_TOKEN}: \
                   --data build_parameters[CIRCLE_JOB]=empty_test \
-                  https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/ci-test
+                  https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/ci-test |grep build_num | cut -d"\'"" -f3 |cut -d"," -f1`
+                  echo ${build_num}
                   job_name=`./bin/circleci await cyclus/cycamore |grep outcome |cut -d"\"" -f4`
                   if [[ "$job_name" == "success" ]] ; then
                     exit 0;
