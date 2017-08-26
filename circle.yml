@@ -26,10 +26,6 @@ jobs:
             - image: circleci/ruby:2.4-node
             - image: cyclus/cyclus-deps
         working_directory: ~/cyclus
-        docker:
-            - image: circleci/ruby:2.4-node
-            - image: cyclus/cyclus-deps
-        working_directory: ~/cyclus
         steps:
             - checkout
             - run:
@@ -44,10 +40,32 @@ jobs:
                 name: build Docker container
                 command: |
                     docker build --rm=false -t cyclus/cyclus:latest .
+                    #- run:
+                    #name: Push on DockerHub
+                    #command: |
+                    #docker push cyclus/cyclus:latest # push to docker depot
+    deploy_test:
+        docker:
+            - image: circleci/ruby:2.4-node
+        working_directory: ~/cyclus
+        steps:
+            - checkout
+            - run:
+                name: Place the proper Dockerfile
+                command: cp docker/cyclus-ci/Dockerfile .
+            - setup_remote_docker
+            - run:
+                name: log into Docker
+                command: |
+                    docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            - run:
+                name: build Docker container
+                command: |
+                    docker build --rm=false -t cyclus/cyclus:ci-test .
             - run:
                 name: Push on DockerHub
                 command: |
-                    docker push cyclus/cyclus:latest # push to docker depot
+                    docker push cyclus/cyclus:ci-test # push to docker depot
 
     stable_deploy:
         docker:
@@ -173,6 +191,18 @@ workflows:
                         only:
                             - develop
                             - master
+                requires:
+                    - unit_test
+                    - nosetest
+            - deploy_test:
+                filters:
+                    branches:
+                        only: ci-test
+            
+            - deploy_latest:
+                filters:
+                    branches:
+                        only: develop
                 requires:
                     - unit_test
                     - nosetest
