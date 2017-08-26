@@ -81,16 +81,28 @@ jobs:
             - run:
                 name: Cycamore/Cymetric tests
                 command: |
-                    curl --user ${CYCAMORE_CIRCLE_TOKEN}: \
-                    --data build_parameters[CIRCLE_JOB]=empty_test \
-                    https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/ci-test
+                  # Install circleci 
+                  mkdir ./bin
+                  curl -o ./bin/circleci https://raw.githubusercontent.com/rockymadden/circleci-cli/master/src/circleci 
+                  chmod 755 ./bin/circleci
+
+                  curl --user ${CYCAMORE_CIRCLE_TOKEN}: \
+                  --data build_parameters[CIRCLE_JOB]=empty_test \
+                  https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/ci-test
+                  job_name=`./bin/circleci await cyclus/cycamore |grep outcome |cut -d"\"" -f4`
+                  if [[ "$job_name" == "success" ]] ; then
+                    exit 0;
+                  else 
+                    exit 1;
+                  fi
+                no_output_timeout: "20m"
 
 
     test_cycamore:
         machine: true
         steps:
             - run:
-                name: Cycamore/Cymetric tests
+                name: Cycamore/Cymetric 
                 command: |
                   # Install circleci 
                   mkdir ./bin
