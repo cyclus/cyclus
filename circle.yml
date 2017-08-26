@@ -95,8 +95,8 @@ jobs:
                   echo "Build_num: ${build_num}"
                   echo "./bin/circleci await cyclus/cycamore ${build_num#0} |grep \"outcome\" |cut -d"\"" -f4"
                   sleep 1m
-                  ./bin/circleci await cyclus/cycamore 435 -r 30
-                  job_name=`./bin/circleci await cyclus/cycamore 435 |grep \"outcome\" |cut -d"\"" -f4`
+                  ./bin/circleci await cyclus/cycamore ${build_num} -r 30
+                  job_name=`./bin/circleci await cyclus/cycamore ${build_num} |grep \"outcome\" |cut -d"\"" -f4`
                   if [[ "$job_name" == "success" ]] ; then
                     exit 0;
                   else 
