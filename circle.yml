@@ -94,8 +94,7 @@ jobs:
                   build_num="$(echo -e "${build_num}" | tr -d '[:space:]')"
                   echo "Build_num: ${build_num}"
                   echo "./bin/circleci await cyclus/cycamore ${build_num#0} |grep \"outcome\" |cut -d"\"" -f4"
-                  sleep 1m
-                  ./bin/circleci await cyclus/cycamore ${build_num} -r 30
+                  ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
                   job_name=`./bin/circleci await cyclus/cycamore ${build_num} |grep \"outcome\" |cut -d"\"" -f4`
                   if [[ "$job_name" == "success" ]] ; then
                     exit 0;
