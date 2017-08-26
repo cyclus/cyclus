@@ -90,8 +90,7 @@ jobs:
                   --data build_parameters[CIRCLE_JOB]=empty_test \
                   https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/ci-test | \
                   grep build_num | cut -d":" -f2 |cut -d"," -f1 | tail -n 2 | head -n 1`
-                  echo "\n\n\n\n Build_num is : ${build_num} \n\n\n"
-                  job_name=`./bin/circleci await cyclus/cycamore |grep outcome |cut -d"\"" -f4`
+                  job_name=`./bin/circleci await cyclus/cycamore ${build_num} |grep outcome |cut -d"\"" -f4`
                   if [[ "$job_name" == "success" ]] ; then
                     exit 0;
                   else 
@@ -179,7 +178,7 @@ workflows:
     version: 2
     build_and_test:
         jobs:
-            - build
+            #- build
             - empty_test
             - unit_test:
                 requires:
