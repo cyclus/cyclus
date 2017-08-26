@@ -80,6 +80,7 @@ jobs:
         steps:
             - run:
                 name: Cycamore/Cymetric tests
+                no_output_timeout: "20m"
                 command: |
                   # Install circleci 
                   mkdir ./bin
@@ -96,7 +97,6 @@ jobs:
                   else 
                     exit 1;
                   fi
-                no_output_timeout: "20m"
 
 
     test_cycamore:
