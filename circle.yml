@@ -279,19 +279,15 @@ workflows:
             - cycamore_develop:
                 requires:
                     - unit_test
-                    - nosetest
             - cycamore_master:
                 requires:
                     - unit_test
-                    - nosetest
             - cymetric_master:
                 requires:
                     - unit_test
-                    - nosetest
             - cymetric_develop:
                 requires:
                     - unit_test
-                    - nosetest
 
 
             # Merge on Develop
