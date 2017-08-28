@@ -23,6 +23,41 @@ jobs:
                   - /root
 
 
+    # Test Jobs
+    unit_test:
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/root
+        steps:
+            - run:
+                name: save SHA to a file
+                command: echo $CIRCLE_SHA1 > .circle-sha
+            - restore_cache:
+                keys:
+                  - v1-repo-{{ checksum ".circle-sha" }}
+            - run:
+                name: Unit Test
+                command: /root/.local/bin/cyclus_unit_tests; exit $?
+
+    nosetest:
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/root
+        steps:
+            - run:
+                name: save SHA to a file
+                command: echo $CIRCLE_SHA1 > .circle-sha
+            - restore_cache:
+                keys:
+                  - v1-repo-{{ checksum ".circle-sha" }}
+            - run:
+                name: Install nosetest
+                command: pip install nose
+            - run:
+                name: Nosetest
+                command: nosetests -w ~/cyclus/tests; exit $?
+
+
     # Update docker container
     deploy_latest: # Cyclus/dev -> Cyclus:latest
         docker:
@@ -79,79 +114,9 @@ jobs:
                 command: |
                   docker/deb-ci/build_upload_deb.sh 14
                   docker/deb-ci/build_upload_deb.sh 16
-    
 
-    # External Triggers
+# Checking Cycamore and Cymetric compatibilities with the changes
     cycamore_master: ## Cycamore/master against Cyclus/dev
-        machine: true
-        steps:
-            - run:
-                name: Cycamore/Cymetric tests
-                no_output_timeout: "20m"
-                command: |
-                  # Install circleci 
-                  mkdir ./bin
-                  curl -o ./bin/circleci https://raw.githubusercontent.com/rockymadden/circleci-cli/master/src/circleci 
-                  chmod 755 ./bin/circleci
-
-                  build_num=`curl --user ${CYCAMORE_CIRCLE_TOKEN}: \
-                  --data build_parameters[CIRCLE_JOB]=cyclus_dev_cycamore_master \
-                  https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop | \
-                  grep build_num | cut -d":" -f2 |cut -d"," -f1 | tail -n 2 | head -n 1`
-                  build_num="$(echo -e "${build_num}" | tr -d '[:space:]')"
-                  ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
-                  job_name=`./bin/circleci await cyclus/cycamore ${build_num} |grep \"outcome\" |cut -d"\"" -f4`
-                  if [[ "$job_name" == "success" ]] ; then
-                    exit 0;
-                  else 
-                    exit 1;
-                  fi
-
-    cycamore_dev: ## Cycamore/dev against Cyclus/dev
-        machine: true
-        steps:
-            - run:
-                name: Cycamore/Cymetric 
-                no_output_timeout: "20m"
-                command: |
-                  # Install circleci 
-                  mkdir ./bin
-                  curl -o ./bin/circleci https://raw.githubusercontent.com/rockymadden/circleci-cli/master/src/circleci 
-                  chmod 755 ./bin/circleci
-
-                  # Trigger the project
-                  ./bin/circleci init --token $CYCAMORE_CIRCLE_TOKEN
-                  ./bin/circleci trigger cyclus/cycamore develop
-                  job_name=`./bin/circleci await cyclus/cycamore |grep outcome |cut -d"\"" -f4`
-                  if [[ "$job_name" == "success" ]] ; then
-                    exit 0;
-                  else 
-                    exit 1;
-                  fi
-    cymetric_dev: ## Cymetric/dev against Cyclus/dev + Cyacamore/dev
-        machine: true
-        steps:
-            - run:
-                name: Cycamore/Cymetric tests
-                no_output_timeout: "20m"
-                command: |
-                  # Install dependencies
-                  mkdir ./bin
-                  curl -o ./bin/circleci https://raw.githubusercontent.com/rockymadden/circleci-cli/master/src/circleci 
-                  chmod 755 ./bin/circleci
-
-                  # Trigger the project
-                  ./bin/circleci init --token $CYMETRIC_CIRCLE_TOKEN
-                  ./bin/circleci trigger cyclus/cymetric develop
-                  job_name=`./bin/circleci await cyclus/cymetric |grep outcome |cut -d"\"" -f4`
-                  if [[ "$job_name" == "success" ]] ; then
-                    exit 0;
-                  else 
-                    exit 1;
-                  fi
-
-    # Test Jobs
-    unit_test:
         docker:
             - image: cyclus/cyclus-deps
         working_directory: ~/root
@@ -162,32 +127,144 @@ jobs:
             - restore_cache:
                 keys:
                   - v1-repo-{{ checksum ".circle-sha" }}
+            - run:
+                name: Checkout Cycamore
+                comand:|
+                    git checkout https://github.com/cyclus/cycamore.git
+                    git fetch --all
+                    git checkout master
+            - run: cd cycamore
+            - run:
+                name: Build Cycamore
+                command: |
+                    python install.py -j 2 --build-type=Release \
+                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
+                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
             - run:
                 name: Unit Test
-                command: /root/.local/bin/cyclus_unit_tests; exit $?
-    nosetest:
-        docker:
-            - image: cyclus/cyclus-deps
-        working_directory: ~/root
-        steps:
-            - run:
-                name: save SHA to a file
-                command: echo $CIRCLE_SHA1 > .circle-sha
-            - restore_cache:
-                keys:
-                  - v1-repo-{{ checksum ".circle-sha" }}
+                command: /root/.local/bin/cycamore_unit_tests; exit $?
             - run:
                 name: Install nosetest
                 command: pip install nose
             - run:
-                name: Nosetest
-                command: nosetests -w ~/cyclus/tests; exit $?
+                name: Nosetests
+                command: nosetests -w ~/cycamore/tests; exit $?
+
+    cycamore_develop: ## Cycamore/master against Cyclus/dev
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/root
+        steps:
+            - run:
+                name: save SHA to a file
+                command: echo $CIRCLE_SHA1 > .circle-sha
+            - restore_cache:
+                keys:
+                  - v1-repo-{{ checksum ".circle-sha" }}
+            - run:
+                name: Checkout Cycamore
+                comand:|
+                    git checkout https://github.com/cyclus/cycamore.git
+                    git fetch --all
+                    git checkout develop
+            - run: cd cycamore
+            - run:
+                name: Build Cycamore
+                command: |
+                    python install.py -j 2 --build-type=Release \
+                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
+                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
+            - run:
+                name: Unit Test
+                command: /root/.local/bin/cycamore_unit_tests; exit $?
+            - run:
+                name: Install nosetest
+                command: pip install nose
+            - run:
+                name: Nosetests
+                command: nosetests -w ~/cycamore/tests; exit $?
+
+    cymetric_master: ## Cymetric/master against Cyclus/dev + Cycamore/dev
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/root
+        steps:
+            - run:
+                name: save SHA to a file
+                command: echo $CIRCLE_SHA1 > .circle-sha
+            - restore_cache:
+                keys:
+                  - v1-repo-{{ checksum ".circle-sha" }}
+            - run:
+                name: Checkout Cycamore
+                comand:|
+                    git checkout https://github.com/cyclus/cycamore.git
+                    git fetch --all
+                    git checkout master
+            - run: cd cycamore
+            - run:
+                name: Build Cycamore
+                command: |
+                    python install.py -j 2 --build-type=Release \
+                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
+                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
+            - run: cd ~/
+            - run:
+                name: Checkout Ccy
+                comand:|
+                    git checkout https://github.com/cyclus/cymetric.git
+                    git fetch --all
+                    git checkout master
+            - run:
+                name: Build/Install Cymetric
+                command: python setup.py install --prefix $(cyclus --install-path)
+            - run:
+                name: Cymetric Nosetest
+                command: nosetests -w ~/cymetric/tests; exit $?
+
+    cymetric_develop: ## Cymetric/develop against Cyclus/dev + Cycamore/dev
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/root
+        steps:
+            - run:
+                name: save SHA to a file
+                command: echo $CIRCLE_SHA1 > .circle-sha
+            - restore_cache:
+                keys:
+                  - v1-repo-{{ checksum ".circle-sha" }}
+            - run:
+                name: Checkout Cycamore
+                comand:|
+                    git checkout https://github.com/cyclus/cycamore.git
+                    git fetch --all
+                    git checkout develop
+            - run: cd cycamore
+            - run:
+                name: Build Cycamore
+                command: |
+                    python install.py -j 2 --build-type=Release \
+                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
+                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
+            - run: cd ~/
+            - run:
+                name: Checkout Ccy
+                comand:|
+                    git checkout https://github.com/cyclus/cymetric.git
+                    git fetch --all
+                    git checkout master
+            - run:
+                name: Build/Install Cymetric
+                command: python setup.py install --prefix $(cyclus --install-path)
+            - run:
+                name: Cymetric Nosetest
+                command: nosetests -w ~/cymetric/tests; exit $?
 
 workflows:
     version: 2 #Needed ?? (already on the top of the file)
     build_and_test:
         jobs:
-            
+
             # On a PR // All Branch
             - build
             - unit_test:
@@ -197,7 +274,7 @@ workflows:
                 requires:
                     - build
 
-            - cycamore_dev:
+            - cycamore_develop:
                 requires:
                     - unit_test
                     - nosetest
@@ -205,12 +282,16 @@ workflows:
                 requires:
                     - unit_test
                     - nosetest
-            - cymetric_dev:
+            - cymetric_master:
                 requires:
                     - unit_test
                     - nosetest
-                    - cycamore_dev
-            
+            - cymetric_develop:
+                requires:
+                    - unit_test
+                    - nosetest
+
+
             # Merge on Develop
             - deploy_latest:
                 filters:
