@@ -130,7 +130,7 @@ jobs:
             - run:
                 name: Checkout Cycamore master
                 command: |
-                    git checkout https://github.com/cyclus/cycamore.git
+                    git clone https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
                     git checkout master
@@ -164,7 +164,7 @@ jobs:
             - run:
                 name: Checkout Cycamore develop
                 command: |
-                    git checkout https://github.com/cyclus/cycamore.git
+                    git clone https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
                     git checkout develop
@@ -198,7 +198,7 @@ jobs:
             - run:
                 name: Checkout Cycamore develop
                 command: |
-                    git checkout https://github.com/cyclus/cycamore.git
+                    git clone https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
                     git checkout develop
@@ -212,7 +212,7 @@ jobs:
             - run:
                 name: Checkout Cymetric master
                 command: |
-                    git checkout https://github.com/cyclus/cymetric.git
+                    git clone https://github.com/cyclus/cymetric.git
                     cd cymetric
                     git fetch --all
                     git checkout master
@@ -237,7 +237,7 @@ jobs:
             - run:
                 name: Checkout Cycamore develop
                 command: |
-                    git checkout https://github.com/cyclus/cycamore.git
+                    git clone https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
                     git checkout develop
@@ -251,7 +251,7 @@ jobs:
             - run:
                 name: Checkout Cymetric develop
                 command: |
-                    git checkout https://github.com/cyclus/cymetric.git
+                    git clone https://github.com/cyclus/cymetric.git
                     cd cymetric
                     git fetch --all
                     git checkout master
