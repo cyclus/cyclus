@@ -129,7 +129,7 @@ jobs:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
                 name: Checkout Cycamore master
-                comand:|
+                comand: |
                     git checkout https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
@@ -163,7 +163,7 @@ jobs:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
                 name: Checkout Cycamore develop
-                comand:|
+                comand: |
                     git checkout https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
@@ -197,7 +197,7 @@ jobs:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
                 name: Checkout Cycamore develop
-                comand:|
+                comand: |
                     git checkout https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
@@ -211,7 +211,7 @@ jobs:
             - run: cd ~/
             - run:
                 name: Checkout Cymetric master
-                comand:|
+                comand: |
                     git checkout https://github.com/cyclus/cymetric.git
                     cd cymetric
                     git fetch --all
@@ -236,7 +236,7 @@ jobs:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
                 name: Checkout Cycamore develop
-                comand:|
+                comand: |
                     git checkout https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
@@ -250,7 +250,7 @@ jobs:
             - run: cd ~/
             - run:
                 name: Checkout Cymetric develop
-                comand:|
+                comand: |
                     git checkout https://github.com/cyclus/cymetric.git
                     cd cymetric
                     git fetch --all
