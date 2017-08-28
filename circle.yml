@@ -128,12 +128,12 @@ jobs:
                 keys:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
-                name: Checkout Cycamore
+                name: Checkout Cycamore master
                 comand:|
                     git checkout https://github.com/cyclus/cycamore.git
+                    cd cycamore
                     git fetch --all
                     git checkout master
-            - run: cd cycamore
             - run:
                 name: Build Cycamore
                 command: |
@@ -162,12 +162,12 @@ jobs:
                 keys:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
-                name: Checkout Cycamore
+                name: Checkout Cycamore develop
                 comand:|
                     git checkout https://github.com/cyclus/cycamore.git
+                    cd cycamore
                     git fetch --all
                     git checkout develop
-            - run: cd cycamore
             - run:
                 name: Build Cycamore
                 command: |
@@ -196,12 +196,12 @@ jobs:
                 keys:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
-                name: Checkout Cycamore
+                name: Checkout Cycamore develop
                 comand:|
                     git checkout https://github.com/cyclus/cycamore.git
+                    cd cycamore
                     git fetch --all
-                    git checkout master
-            - run: cd cycamore
+                    git checkout develop
             - run:
                 name: Build Cycamore
                 command: |
@@ -210,9 +210,10 @@ jobs:
                     -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
             - run: cd ~/
             - run:
-                name: Checkout Ccy
+                name: Checkout Cymetric master
                 comand:|
                     git checkout https://github.com/cyclus/cymetric.git
+                    cd cymetric
                     git fetch --all
                     git checkout master
             - run:
@@ -234,12 +235,12 @@ jobs:
                 keys:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
-                name: Checkout Cycamore
+                name: Checkout Cycamore develop
                 comand:|
                     git checkout https://github.com/cyclus/cycamore.git
+                    cd cycamore
                     git fetch --all
                     git checkout develop
-            - run: cd cycamore
             - run:
                 name: Build Cycamore
                 command: |
@@ -248,9 +249,10 @@ jobs:
                     -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
             - run: cd ~/
             - run:
-                name: Checkout Ccy
+                name: Checkout Cymetric develop
                 comand:|
                     git checkout https://github.com/cyclus/cymetric.git
+                    cd cymetric
                     git fetch --all
                     git checkout master
             - run:
