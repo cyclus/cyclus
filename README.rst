@@ -13,7 +13,6 @@ Cyclus Projects Status
 **Branch**              **Cyclus**         **Cycamore**           **Cymetric** 
 ================    =================    ===================    ===================
 master              |cyclus_master|       |cycamore_master|      |cymetric_master|
-================    =================    ===================    ===================
 develop             |cyclus_develop|      |cycamore_develop|     |cymetric_develop|
 ================    =================    ===================    ===================
 
