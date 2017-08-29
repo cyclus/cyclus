@@ -7,15 +7,15 @@ information on the entire "ecosystem" please refer to the `Cyclus website
 <http://fuelcycle.org>`_.
 
 
-================    ================    ==================    ==================
+================    =================    ===================    ===================
 Cyclus Projects Status
 -------------------------------------------------------------------------------- 
 **Branch**              **Cyclus**         **Cycamore**           **Cymetric** 
-================    ================    ==================    ==================
-master              |cyclusi_master|    |cycamore_master|     |cymetric_master|
-================    ================    ==================    ==================
-develop             |cyclus_develop|    |cycamore_develop|    |cymetric_develop|
-================    ================    ==================    ==================
+================    =================    ===================    ===================
+master              |cyclus_master|       |cycamore_master|      |cymetric_master|
+================    =================    ===================    ===================
+develop             |cyclus_develop|      |cycamore_develop|     |cymetric_develop|
+================    =================    ===================    ===================
 
 
 .. |cyclus_develop| image:: https://circleci.com/gh/cyclus/cyclus/tree/develop.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262
