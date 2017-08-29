@@ -234,7 +234,7 @@ jobs:
                 name: Build/Install Cymetric
                 command: |
                     cd cymetric
-                    python setup.py install
+                    python setup.py install --prefix=/opt/conda/lib/python3.6/site-packages
             - run:
                 name: Cymetric Nosetest
                 command: nosetests -w ~/cymetric/tests; exit $?
