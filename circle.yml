@@ -137,6 +137,7 @@ jobs:
             - run:
                 name: Build Cycamore
                 command: |
+                    cd cycamore
                     python install.py -j 2 --build-type=Release \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
                     -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
@@ -171,6 +172,7 @@ jobs:
             - run:
                 name: Build Cycamore
                 command: |
+                    cd cycamore
                     python install.py -j 2 --build-type=Release \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
                     -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
@@ -205,7 +207,7 @@ jobs:
             - run:
                 name: Build Cycamore
                 command: |
-                    pwd
+                    cd cycamore
                     python install.py -j 2 --build-type=Release \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
                     -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
@@ -219,7 +221,9 @@ jobs:
                     git checkout master
             - run:
                 name: Build/Install Cymetric
-                command: python setup.py install --prefix $(cyclus --install-path)
+                command: |
+                    cd cymetric
+                    python setup.py install --prefix $(cyclus --install-path)
             - run:
                 name: Cymetric Nosetest
                 command: nosetests -w ~/cymetric/tests; exit $?
@@ -245,6 +249,7 @@ jobs:
             - run:
                 name: Build Cycamore
                 command: |
+                    cd cycamore
                     python install.py -j 2 --build-type=Release \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
                     -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
@@ -258,7 +263,9 @@ jobs:
                     git checkout master
             - run:
                 name: Build/Install Cymetric
-                command: python setup.py install --prefix $(cyclus --install-path)
+                command: |
+                    cd cymetric
+                    python setup.py install --prefix $(cyclus --install-path)
             - run:
                 name: Cymetric Nosetest
                 command: nosetests -w ~/cymetric/tests; exit $?
