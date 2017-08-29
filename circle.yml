@@ -8,12 +8,12 @@ jobs:
         working_directory: ~/cyclus
         steps:
             - checkout
-              # - run:
-              # -   name: Build Docker Image
-              # -   command: |
-              # -       python install.py -j 2 --build-type=Release --core-version 999999.999999 \
-              # -       -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
-              # -       -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
+            - run:
+                name: Build Docker Image
+                command: |
+                    python install.py -j 2 --build-type=Release --core-version 999999.999999 \
+                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
+                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
             - run:
                 name: save SHA to a file
                 command: echo $CIRCLE_SHA1 > .circle-sha
