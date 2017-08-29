@@ -260,6 +260,16 @@ jobs:
                 name: Cymetric Nosetest
                 command: nosetests -w ~/cymetric/tests; exit $?
 
+    # some external triggers
+    cyXX_trig:
+        machine: true
+        steps:
+            - run:
+                name: Cymetric/Cycamore develop triggers
+                command: |
+                    curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
+                    curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
+
 workflows:
     version: 2 #Needed ?? (already on the top of the file)
     build_and_test:
@@ -300,7 +310,12 @@ workflows:
                 requires:
                     - unit_test
                     - nosetest
-
+            - exernal_trig:
+                filters: 
+                    branches:
+                        only: develop
+                requires:
+                    - deploy_latest
 
             # Merge on Master
             - deploy_stable:
