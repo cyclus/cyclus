@@ -310,7 +310,7 @@ workflows:
                 requires:
                     - unit_test
                     - nosetest
-            - exernal_trig:
+            - cyXX_trig:
                 filters: 
                     branches:
                         only: develop
