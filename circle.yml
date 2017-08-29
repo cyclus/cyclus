@@ -205,6 +205,7 @@ jobs:
             - run:
                 name: Build Cycamore
                 command: |
+                    pwd
                     python install.py -j 2 --build-type=Release \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
                     -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
