@@ -10,7 +10,7 @@ information on the entire "ecosystem" please refer to the `Cyclus website
 ================    ================    ==================    ==================
 Cyclus Projects Status
 -------------------------------------------------------------------------------- 
-**Branch**   **Cyclus**         **Cycamore**           **Cymetric** 
+**Branch**              **Cyclus**         **Cycamore**           **Cymetric** 
 ================    ================    ==================    ==================
 master              |cyclusi_master|    |cycamore_master|     |cymetric_master|
 ================    ================    ==================    ==================
