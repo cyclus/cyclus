@@ -213,7 +213,7 @@ jobs:
                 name: Build/Install Cymetric
                 command: |
                     cd cymetric
-                    python setup.py install --prefix $(cyclus --install-path)
+                    python setup.py install
             - run:
                 name: Cymetric Nosetest
                 command: nosetests -w ~/cymetric/tests; exit $?
@@ -255,7 +255,7 @@ jobs:
                 name: Build/Install Cymetric
                 command: |
                     cd cymetric
-                    python setup.py install --prefix $(cyclus --install-path)
+                    python setup.py install
             - run:
                 name: Cymetric Nosetest
                 command: nosetests -w ~/cymetric/tests; exit $?
