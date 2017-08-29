@@ -220,26 +220,6 @@ jobs:
 
     cymetric_develop: ## Cymetric/develop against Cyclus/dev + Cycamore/dev
         docker:
-            - image: cyclus/cycamore:latest
-        working_directory: /root
-        steps:
-            - run:
-                name: Checkout Cymetric develop
-                command: |
-                    git clone https://github.com/cyclus/cymetric.git
-                    cd cymetric
-                    git fetch --all
-                    git checkout master
-            - run:
-                name: Build/Install Cymetric
-                command: |
-                    cd cymetric
-                    python setup.py install --prefix=/opt/conda
-            - run:
-                name: Cymetric Nosetest
-                command: nosetests -w ~/cymetric/tests; exit $?
-    cymetric_develop_bkp: ## Cymetric/develop against Cyclus/dev + Cycamore/dev
-        docker:
             - image: cyclus/cyclus-deps
         working_directory: /root
         steps:
@@ -270,7 +250,7 @@ jobs:
                     git clone https://github.com/cyclus/cymetric.git
                     cd cymetric
                     git fetch --all
-                    git checkout master
+                    git checkout develop
             - run:
                 name: Build/Install Cymetric
                 command: |
