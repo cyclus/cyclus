@@ -27,7 +27,7 @@ jobs:
     unit_test:
         docker:
             - image: cyclus/cyclus-deps
-        working_directory: ~/root
+        working_directory: /root
         steps:
             - run:
                 name: save SHA to a file
@@ -42,7 +42,7 @@ jobs:
     nosetest:
         docker:
             - image: cyclus/cyclus-deps
-        working_directory: ~/root
+        working_directory: /root
         steps:
             - run:
                 name: save SHA to a file
@@ -119,7 +119,7 @@ jobs:
     cycamore_master: ## Cycamore/master against Cyclus/dev
         docker:
             - image: cyclus/cyclus-deps
-        working_directory: ~/root
+        working_directory: /root
         steps:
             - run:
                 name: save SHA to a file
@@ -154,7 +154,7 @@ jobs:
     cycamore_develop: ## Cycamore/master against Cyclus/dev
         docker:
             - image: cyclus/cyclus-deps
-        working_directory: ~/root
+        working_directory: /root
         steps:
             - run:
                 name: save SHA to a file
@@ -189,7 +189,7 @@ jobs:
     cymetric_master: ## Cymetric/master against Cyclus/dev + Cycamore/dev
         docker:
             - image: cyclus/cyclus-deps
-        working_directory: ~/root
+        working_directory: /root
         steps:
             - run:
                 name: save SHA to a file
@@ -231,7 +231,7 @@ jobs:
     cymetric_develop: ## Cymetric/develop against Cyclus/dev + Cycamore/dev
         docker:
             - image: cyclus/cyclus-deps
-        working_directory: ~/root
+        working_directory: /root
         steps:
             - run:
                 name: save SHA to a file
