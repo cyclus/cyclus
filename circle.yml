@@ -113,39 +113,7 @@ jobs:
                   docker/deb-ci/build_upload_deb.sh 16
 
 # Checking Cycamore and Cymetric compatibilities with the changes
-    cycamore_master: ## Cycamore/master against Cyclus/dev
-        docker:
-            - image: cyclus/cyclus-deps
-        working_directory: /root
-        steps:
-            - run:
-                name: save SHA to a file
-                command: echo $CIRCLE_SHA1 > .circle-sha
-            - restore_cache:
-                keys:
-                  - v1-repo-{{ checksum ".circle-sha" }}
-            - run:
-                name: Checkout Cycamore master
-                command: |
-                    git clone https://github.com/cyclus/cycamore.git
-                    cd cycamore
-                    git fetch --all
-                    git checkout master
-            - run:
-                name: Build Cycamore
-                command: |
-                    cd cycamore
-                    python install.py -j 2 --build-type=Release \
-                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
-                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
-            - run:
-                name: Unit Test
-                command: /root/.local/bin/cycamore_unit_tests; exit $?
-            - run:
-                name: Nosetests
-                command: nosetests -w ~/cycamore/tests; exit $?
-
-    cycamore_develop: ## Cycamore/master against Cyclus/dev
+    cycamore_develop: ## Cycamore/develop against Cyclus/dev
         docker:
             - image: cyclus/cyclus-deps
         working_directory: /root
@@ -176,47 +144,6 @@ jobs:
             - run:
                 name: Nosetests
                 command: nosetests -w ~/cycamore/tests; exit $?
-
-    cymetric_master: ## Cymetric/master against Cyclus/dev + Cycamore/dev
-        docker:
-            - image: cyclus/cyclus-deps
-        working_directory: /root
-        steps:
-            - run:
-                name: save SHA to a file
-                command: echo $CIRCLE_SHA1 > .circle-sha
-            - restore_cache:
-                keys:
-                  - v1-repo-{{ checksum ".circle-sha" }}
-            - run:
-                name: Checkout Cycamore develop
-                command: |
-                    git clone https://github.com/cyclus/cycamore.git
-                    cd cycamore
-                    git fetch --all
-                    git checkout develop
-            - run:
-                name: Build Cycamore
-                command: |
-                    cd cycamore
-                    python install.py -j 2 --build-type=Release \
-                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
-                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
-            - run:
-                name: Checkout Cymetric master
-                command: |
-                    git clone https://github.com/cyclus/cymetric.git
-                    cd cymetric
-                    git fetch --all
-                    git checkout master
-            - run:
-                name: Build/Install Cymetric
-                command: |
-                    cd cymetric
-                    python setup.py install
-            - run:
-                name: Cymetric Nosetest
-                command: nosetests -w ~/cymetric/tests; exit $?
 
     cymetric_develop: ## Cymetric/develop against Cyclus/dev + Cycamore/dev
         docker:
