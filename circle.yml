@@ -7,6 +7,7 @@ jobs:
             - image: cyclus/cyclus-deps
         working_directory: ~/cyclus
         steps:
+            - run: apt-get -qq update; apt-get -y install git
             - checkout
             - run:
                 name: Build Docker Image
