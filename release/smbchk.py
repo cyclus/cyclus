@@ -2,6 +2,9 @@
 """Collects & diffs public symobls in libcyclus.so. Used to ensure stability
 between versions. Now with 100% fewer vowels!
 
+WARNING: this file is now deprecated. It is provided here for future use and
+refactoring.
+
 The following tasks may be useful:
 
     # update the database to the most recent release tag
@@ -171,6 +174,7 @@ def check(db):
 
 
 def main(args=None):
+    raise RuntimeError("Symbol checking has been deprecated!")
     if os.name != 'posix':
         sys.exit("must be run on a posix system, "
                  "'nm' utility not compatible elsewhere.")
