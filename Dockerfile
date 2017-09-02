@@ -1,1 +1,0 @@
-./docker/cyclus-ci/Dockerfile

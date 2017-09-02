@@ -25,7 +25,7 @@ ENDIF()
 # quiets fortify_source warnings when not compiling with optimizations
 # in linux distros where compilers were compiled with fortify_source enabled by
 # default (e.g. Arch linux).
-MESSAGE("${CMAKE_BUILD_TYPE}")
+MESSAGE("-- CMake Build Type: ${CMAKE_BUILD_TYPE}")
 STRING(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 IF(NOT ${BUILD_TYPE} STREQUAL "release")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0")
@@ -89,7 +89,13 @@ IF(NOT CYCLUS_DOC_ONLY)
     LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
     IF("${isSystemDir}" STREQUAL "-1")
         SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/cyclus")
+        GET_FILENAME_COMPONENT(cxxCompilerRoot ${CMAKE_CXX_COMPILER} DIRECTORY)
+        GET_FILENAME_COMPONENT(cxxCompilerRoot ${cxxCompilerRoot} DIRECTORY)
+        IF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
+            SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${cxxCompilerRoot}/lib:${cxxCompilerRoot}/lib/cyclus")
+        ENDIF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
     ENDIF("${isSystemDir}" STREQUAL "-1")
+    MESSAGE("-- CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
 
     # Tell CMake where the modules are
     LIST(APPEND CMAKE_MODULE_PATH
@@ -108,6 +114,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         set(suffix ".dylib")
         set(dynamicloadlib "unix_helper_functions.h")
     ELSE()
+        set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--allow-shlib-undefined")
         set(suffix ".so")
         set(dynamicloadlib "unix_helper_functions.h")
     ENDIF()
@@ -127,18 +134,15 @@ IF(NOT CYCLUS_DOC_ONLY)
     ################################### begin find libraries #####################################
     ##############################################################################################
 
+    if (NOT DEPS_ROOT_DIR)
+        get_filename_component(compdir ${CMAKE_CXX_COMPILER} DIRECTORY)
+        get_filename_component(DEPS_ROOT_DIR ${compdir} DIRECTORY)
+    endif (NOT DEPS_ROOT_DIR)
+    SET(DEPS_HINTS HINTS "${DEPS_ROOT_DIR}")
+    SET(DEPS_BIN_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/bin")
+    SET(DEPS_LIB_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/lib")
+    SET(DEPS_INCLUDE_HINTS HINTS "${DEPS_ROOT_DIR}/include")
     MESSAGE("-- Dependency Root Dir (DEPS_ROOT_DIR): ${DEPS_ROOT_DIR}")
-    if (DEPS_ROOT_DIR)
-        SET(DEPS_HINTS HINTS "${DEPS_ROOT_DIR}")
-        SET(DEPS_BIN_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/bin")
-        SET(DEPS_LIB_HINTS ${DEPS_HINTS} "${DEPS_ROOT_DIR}/lib")
-        SET(DEPS_INCLUDE_HINTS HINTS "${DEPS_ROOT_DIR}/include")
-    else (DEPS_ROOT_DIR)
-        SET(DEPS_HINTS)
-        SET(DEPS_bin_HINTS)
-        SET(DEPS_LIB_HINTS)
-        SET(DEPS_INCLUDE_HINTS)
-    endif (DEPS_ROOT_DIR)
     MESSAGE("-- Dependency Hints (DEPS_HINTS): ${DEPS_HINTS}")
     MESSAGE("-- Dependency Binary Hints (DEPS_BIN_HINTS): ${DEPS_BIN_HINTS}")
     MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
@@ -154,18 +158,26 @@ IF(NOT CYCLUS_DOC_ONLY)
     FIND_PACKAGE(LibXML++ REQUIRED)
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
 
+    # find lapack and link to it
+    FIND_PACKAGE(LAPACK REQUIRED)
+    set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
+    MESSAGE("-- Found LAPACK Linker Flags: ${LAPACK_LINKER_FLAGS}")
+    MESSAGE("-- Found LAPACK Libraries: ${LAPACK_LIBRARIES}")
+    MESSAGE("-- Found BLAS Libraries: ${BLAS_LIBRARIES}")
+
     # Find Sqlite3
     FIND_PACKAGE(Sqlite3 REQUIRED)
     SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
     # Find HDF5
-    FIND_PACKAGE(HDF5 REQUIRED)
+    FIND_PACKAGE(HDF5 REQUIRED COMPONENTS HL)
     ADD_DEFINITIONS(${HDF5_DEFINITIONS})
-    set(LIBS ${LIBS} ${HDF5_LIBRARIES})
+    set(LIBS ${LIBS} ${HDF5_C_LIBRARIES} ${HDF5_C_HL_LIBRARIES})
     MESSAGE("--    HDF5 Root: ${HDF5_ROOT}")
     MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
     MESSAGE("--    HDF5 Library directories: ${HDF5_LIBRARY_DIRS}")
-    MESSAGE("--    HDF5 Libraries: ${HDF5_LIBRARIES}")
+    MESSAGE("--    HDF5 Libraries: ${HDF5_C_LIBRARIES}")
+    MESSAGE("--    HDF5 High Level Libraries: ${HDF5_C_HL_LIBRARIES}")
 
     # Include the boost header files and the program_options library
     # Please be sure to use Boost rather than BOOST.
@@ -190,13 +202,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(LIBS ${LIBS} ${Boost_SERIALIZATION_LIBRARY})
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
-    # find lapack and link to it
-    FIND_PACKAGE(LAPACK REQUIRED)
-    set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
-    MESSAGE("\tFound LAPACK Libraries: ${LAPACK_LIBRARIES}")
-
     # find coin and link to it
     FIND_PACKAGE(COIN REQUIRED)
+    MESSAGE("-- COIN Version: ${COIN_VERSION}")
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
 
     #
@@ -208,6 +216,13 @@ IF(NOT CYCLUS_DOC_ONLY)
     IF(PCRE_LIBRARIES)
         set(LIBS ${LIBS} ${PCRE_LIBRARIES})
     ENDIF(PCRE_LIBRARIES)
+
+    # gfortran
+    FIND_LIBRARY(GFORTRAN_LIBRARIES gfortran ${DEPS_LIB_HINTS})
+    MESSAGE("-- Found GFORTRAN Libraries (optional): ${GFORTRAN_LIBRARIES}")
+    IF(GFORTRAN_LIBRARIES)
+        set(LIBS ${LIBS} ${GFORTRAN_LIBRARIES})
+    ENDIF(GFORTRAN_LIBRARIES)
 
     # openblas
     FIND_LIBRARY(OPENBLAS_LIBRARIES openblas ${DEPS_LIB_HINTS})
