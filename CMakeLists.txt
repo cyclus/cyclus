@@ -272,7 +272,12 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Use new Python library finder
     find_package(PythonInterp)
     find_package(PythonLibs)
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c
+                            "import site; print(site.getsitepackages(['${CMAKE_INSTALL_PREFIX}'])[0])"
+                    OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
     message("-- PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
+    message("-- PYTHON_SITE_PACKAGES: ${PYTHON_SITE_PACKAGES}")
 
     # Include the CMake script UseCython.cmake.  This defines add_cython_module().
     # Instruction for use can be found at the top of cmake/UseCython.cmake.
