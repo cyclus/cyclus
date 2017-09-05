@@ -37,5 +37,9 @@ foreach(file ${CYCLUS_CYTHON_FILES})
     set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX
                                              OUTPUT_NAME ${name}
                                              LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+    # the following install is needed so that CMake sets the correct RPATH for the
+    # python extension modules, even though they are installed (with the wrong RPATH)
+    # by setup.py, along with the pure python files.
+    install(TARGETS ${targ} LIBRARY DESTINATION "${PYTHON_SITE_PACKAGES}/cyclus")
 endforeach()
 
