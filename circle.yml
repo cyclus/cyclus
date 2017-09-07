@@ -116,7 +116,7 @@ jobs:
                   docker/deb-ci/build_upload_deb.sh 16
 
 # Checking Cycamore and Cymetric compatibilities with the changes
-    cycamore_develop: ## Cycamore/develop against Cyclus/dev
+    cycamore_master: ## Cycamore/master against Cyclus/dev
         docker:
             - image: cyclus/cyclus-deps
         working_directory: /root
@@ -130,12 +130,12 @@ jobs:
                 keys:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
-                name: Checkout Cycamore develop
+                name: Checkout Cycamore Master
                 command: |
                     git clone https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
-                    git checkout develop
+                    git checkout master
             - run:
                 name: Build Cycamore
                 command: |
@@ -150,7 +150,7 @@ jobs:
                 name: Nosetests
                 command: nosetests -w ~/cycamore/tests; exit $?
 
-    cymetric_develop: ## Cymetric/develop against Cyclus/dev + Cycamore/dev
+    cymetric_master: ## Cymetric/master against Cyclus/dev + Cycamore/dev
         docker:
             - image: cyclus/cyclus-deps
         working_directory: /root
@@ -164,12 +164,12 @@ jobs:
                 keys:
                   - v1-repo-{{ checksum ".circle-sha" }}
             - run:
-                name: Checkout Cycamore develop
+                name: Checkout Cycamore Master
                 command: |
                     git clone https://github.com/cyclus/cycamore.git
                     cd cycamore
                     git fetch --all
-                    git checkout develop
+                    git checkout master
             - run:
                 name: Build Cycamore
                 command: |
@@ -179,12 +179,12 @@ jobs:
                     -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
             - run: cd ~/
             - run:
-                name: Checkout Cymetric develop
+                name: Checkout Cymetric Master
                 command: |
                     git clone https://github.com/cyclus/cymetric.git
                     cd cymetric
                     git fetch --all
-                    git checkout develop
+                    git checkout master
             - run:
                 name: Build/Install Cymetric
                 command: |
@@ -199,10 +199,10 @@ jobs:
         machine: true
         steps:
             - run:
-                name: Cymetric/Cycamore develop triggers
+                name: Cymetric/Cycamore Master Triggers
                 command: |
-                    curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/develop?circle-token=$CYCAMORE_CIRCLE_TOKEN
-                    curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/develop?circle-token=$CYMETRIC_CIRCLE_TOKEN
+                    curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cycamore/tree/master?circle-token=$CYCAMORE_CIRCLE_TOKEN
+                    curl -X POST https://circleci.com/api/v1.1/project/github/cyclus/cymetric/tree/master?circle-token=$CYMETRIC_CIRCLE_TOKEN
 
 workflows:
     version: 2 #Needed ?? (already on the top of the file)
@@ -218,43 +218,47 @@ workflows:
                 requires:
                     - build
 
-            - cycamore_develop:
+            - cycamore_master:
                 requires:
                     - unit_test
                     - nosetest
-            - cymetric_develop:
+            - cymetric_master:
                 requires:
                     - unit_test
                     - nosetest
 
 
-            # Merge on Develop
+            # Merge on Master
             - deploy_latest:
                 filters:
                     branches:
-                        only: develop
+                        only: master
                 requires:
                     - unit_test
                     - nosetest
             - cyXX_trig:
                 filters:
                     branches:
-                        only: develop
+                        only: master
                 requires:
                     - deploy_latest
 
-            # Merge on Master
+            # The following should now be done on version tag.
             - deploy_stable:
                 filters:
                     branches:
-                        only: master
+                        ignore: /.*/
+                    tags:
+                        only: /.*/
                 requires:
                     - unit_test
                     - nosetest
             - deb_generation:
                 filters:
                     branches:
-                        only: master
+                        ignore: /.*/
+                    tags:
+                        only: /.*/
                 requires:
                     - unit_test
                     - nosetest
