@@ -10,7 +10,8 @@ from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
-"""Tests"""
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
 def test_source_to_sink():
     """Tests simulations with one facility that has a conversion factor.
 
@@ -24,7 +25,7 @@ def test_source_to_sink():
     This equation is used to test each transaction amount.
     """
     # A reference simulation input for the trivial cycle simulation.
-    ref_input = "./input/trivial_cycle.xml"
+    ref_input = os.path.join(INPUT, "trivial_cycle.xml")
     # Conversion factors for the three simulations
     k_factors = [0.95, 1, 2]
 
@@ -69,7 +70,7 @@ def test_source_to_sink():
             resources = exc('SELECT * FROM Resources').fetchall()
             transactions = exc('SELECT * FROM Transactions').fetchall()
             conn.close()
-                
+
         # Find agent ids
         agent_ids = to_ary(agent_entry, "AgentId")
         spec = to_ary(agent_entry, "Spec")

@@ -46,3 +46,5 @@ INSTALL(FILES
     COMPONENT core
     )
 
+INSTALL(DIRECTORY webapp/ DESTINATION share/cyclus/webapp
+        COMPONENT core)

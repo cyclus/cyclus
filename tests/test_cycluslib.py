@@ -43,7 +43,19 @@ def test_conds_comp(db, fname, backend):
     for row in df['MassFrac']:
         assert_less(row, 0.00720000001)
 
+@dbtest
+def test_schema(db, fname, backend):
+    schema = db.schema("AgentEntry")
+    assert_equal(8, len(schema))
+    cols = ["SimId", "AgentId", "Kind", "Spec", "Prototype", "ParentId", "Lifetime", "EnterTime"]
+    dbs = [7, 1, 5, 5, 5, 1, 1, 1]
+    for i, ci in enumerate(schema):
+        assert_equal("AgentEntry", ci.table)
+        assert_equal(cols[i], ci.col)
+        assert_equal(dbs[i], ci.dbtype)
+        assert_equal(i, ci.index)
+        assert_equal(1, len(ci.shape))
+        assert_equal(-1, ci.shape)
 
 if __name__ == "__main__":
     nose.runmodule()
-    pass

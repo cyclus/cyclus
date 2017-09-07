@@ -82,14 +82,34 @@ class Logger {
     return report_level;
   }
 
+  /// Sets the report level. This is here because Cython cannot assign
+  /// to a reference from a function return yet.
+  static void SetReportLevel(LogLevel level) {
+    report_level = level;
+  }
+
   /// Set whether or not agent/agent log entries should be printed
   static bool& NoAgent() {
     return no_agent;
   }
 
+  /// Sets whether or not agent/agent log entries should be printed.
+  /// This is here because Cython cannot assign
+  /// to a reference from a function return yet.
+  static void SetNoAgent(bool na) {
+    no_agent = na;
+  }
+
   /// Set whether or not agent/agent log entries should be printed
   static bool& NoMem() {
     return no_mem;
+  }
+
+  /// Sets whether or not agent/agent log entries should be printed.
+  /// This is here because Cython cannot assign
+  /// to a reference from a function return yet.
+  static void SetNoMem(bool nm) {
+    no_agent = nm;
   }
 
   /// Converts a string into a corresponding LogLevel value.

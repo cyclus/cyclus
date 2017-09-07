@@ -19,7 +19,6 @@ suffix.h
 *#
 #*
 *.zip
-*.html
 *.tex
 src/Core/Utility/Env.cpp
 src/cyclus_nuc_data.h5
@@ -30,6 +29,7 @@ share/cyclus_nuc_data.h5
 src/pyne_decay.h
 src/pyne_decay.cc
 src/hdf5_back.cc
+src/hdf5_back.h
 share/dbtypes.json
 tests/db.h5
 cyclus/cpp_typesystem.pxd
@@ -39,3 +39,22 @@ tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5
 tests/libcyclus-test.sqlite
+rs.cred
+
+# Docker stuff
+build-local/
+Debug/
+
+# generated cython ignores
+*.cc.gen
+*.cc.h
+*.h.gen
+src/eventhooks.cc
+src/eventhooks.h
+src/pyinfile.cc
+src/pyinfile.h
+src/pymodule.cc
+src/pymodule.h
+
+# this is copied over by the installer
+cyclus/cycpp.py

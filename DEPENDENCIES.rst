@@ -55,7 +55,7 @@ Package                Minimum Version
 ====================   ==================
 doxygen (for docs)     1.7.6.1
 tcmalloc (for speed)   any
-Cython                 0.13.1
+Cython                 0.25+
 Python (dev version)   2.7 or 3.3+
 Jinja2                 any
 NumPy                  1.9+
@@ -72,7 +72,7 @@ only needed if Cython is installed.*
 Installing Dependencies
 ***********************
 
-Cyclus dependencies can either be installed mannualy or using an operating system's package
+Cyclus dependencies can either be installed manually or using an operating system's package
 manager.
 
 Installing Dependencies (Linux and Unix)
@@ -120,7 +120,7 @@ and (optionally):
 #. python-numpy  or  python3-numpy
 #. python-nose   or  python3-nose
 #. python-jinja2 or  python3-jinja2
-#. cython        or  cython3       
+#. cython        or  cython3       (see note below)
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -164,6 +164,36 @@ To determine which version of Python is already installed on your computer, run:
 .. code-block:: bash
 
    python -V
+
+
+Despite having installed python3, Ubuntu installations may still point at python2.7 by default. So Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command. 
+
+First, you can list alternatives with the following command:
+
+ .. code-block:: bash
+
+   update-alternatives --list python
+
+Ubuntu may not list any alternatives. To make Ubuntu aware of python 2.7 and python 3.5, use:
+
+ .. code-block:: bash
+
+   sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
+   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.5 2
+
+From now on, to switch between different versions, use:
+
+ .. code-block:: bash
+
+   sudo update-alternatives --config python
+
+
+Cython Note
+^^^^^^^^^^^
+If you get an error related to an old Cython version, then this may be 
+because the Debian stable version of Cython is 0.23.4. However, 
+Cyclus requires 0.25.0+. To install the latest cython version, please 
+visit the `Cython Documentation`_.
 
 Boost Note
 ^^^^^^^^^^
@@ -246,7 +276,7 @@ Finally, update your path and the following environment variables in your
   export PATH=${HDF5_DIR}:/opt/local/bin:${HOME}/.local/bin:$PATH
 
 
-
+.. _`Cython Documentation`: http://cython.readthedocs.io/en/latest/src/quickstart/install.html
 .. _`Cyclus Homepage`: http://fuelcycle.org/
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus

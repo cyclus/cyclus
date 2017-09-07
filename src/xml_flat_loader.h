@@ -15,9 +15,10 @@ std::string BuildFlatMasterSchema(std::string schema_path, std::string infile);
 /// a cyclus simulation from xml
 class XMLFlatLoader : public XMLFileLoader {
  public:
-  XMLFlatLoader(Recorder* r, QueryableBackend* b, std::string schema_path,
-                const std::string load_filename = "")
-      : XMLFileLoader(r, b, schema_path, load_filename) {}
+  XMLFlatLoader(Recorder* r, QueryableBackend* b, std::string schema_path, 
+                const std::string load_filename="", const std::string format="none",
+                bool ms_print=false)
+      : XMLFileLoader(r, b, schema_path, load_filename, format, ms_print) {}
 
   /// Creates all initial agent instances from the input file.
   void LoadInitialAgents();

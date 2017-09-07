@@ -33,13 +33,13 @@ void XMLFileLoaderTests::SetUp() {
 
   eps_file = "eps.xml";
   CreateTestInputFile(eps_file, ControlSequenceWithEps());
-  
+
   recipe_file = "recipes.xml";
   CreateTestInputFile(recipe_file, RecipeSequence());
 
   module_file = "modules.xml";
   CreateTestInputFile(module_file, ModuleSequence());
-  
+
 }
 
 void XMLFileLoaderTests::TearDown() {
@@ -100,7 +100,7 @@ std::string XMLFileLoaderTests::ControlSequenceWithSolver() {
 }
 
 std::string XMLFileLoaderTests::ControlSequenceWithEps() {
-  return  
+  return
           "<simulation>"
           "  <control>"
           "    <duration>1</duration>"
@@ -263,6 +263,11 @@ TEST_F(XMLFileLoaderTests, EpsFile) {
 
   EXPECT_DOUBLE_EQ(0.5e-5, cyclus::eps());
   EXPECT_DOUBLE_EQ(3e-4, cyclus::eps_rsrc());
+}
+
+TEST_F(XMLFileLoaderTests, ExplicitFormat) {
+  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, 
+                                     XMLFileLoaderTests::ControlSequenceWithEps(), "xml"));
 }
 
 TEST_F(XMLFileLoaderTests, throws) {

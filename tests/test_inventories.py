@@ -10,13 +10,15 @@ from tools import check_cmd
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
-"""Tests"""
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
 def test_inventories_false():
     """Testing for inventory and compact inventory table non-creation.
     """
     clean_outs()
     # Cyclus simulation input with inventory table
-    sim_inputs = ["./input/inventory_false.xml", "./input/inventory_compact_false.xml"]
+    sim_inputs = [os.path.join(INPUT, "inventory_false.xml"),
+                  os.path.join(INPUT, "inventory_compact_false.xml")]
     paths = [["/ExplicitInventory"], ["/ExplicitInventoryCompact"]]
     for sim, path in zip(sim_inputs, paths):
         holdsrtn = [1]  # needed because nose does not send() to test generator
@@ -40,7 +42,8 @@ def test_inventories():
     """
     clean_outs()
     # Cyclus simulation input with inventory table
-    sim_inputs = ["./input/inventory.xml", "./input/inventory_compact.xml"]
+    sim_inputs = [os.path.join(INPUT, "inventory.xml"),
+                  os.path.join(INPUT, "inventory_compact.xml")]
     paths = [["/ExplicitInventory"], ["/ExplicitInventoryCompact"]]
     for sim, path in zip(sim_inputs, paths):
         holdsrtn = [1]  # needed because nose does not send() to test generator
@@ -50,7 +53,7 @@ def test_inventories():
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
-            
+
         # Check if inventory tables exist
         assert_true, tables_exist(outfile, path)
         if not tables_exist(outfile, path):
@@ -58,7 +61,7 @@ def test_inventories():
             outfile.close()
             clean_outs()
             return  # don't execute further commands
-            
+
         # Get specific table
         table = path[0]
         if outfile == h5out:
@@ -76,14 +79,14 @@ def test_inventories():
             inventory = exc(sql).fetchall()
             compositions = exc('SELECT * FROM Compositions').fetchall()
             conn.close()
-        
+
     # Test that quantity increases as expected with k=1
     if "Compact" not in table:
         time = to_ary(inventory, "Time")
         quantity = to_ary(inventory, "Quantity")
         nucid = to_ary(inventory, "NucId")
         massfrac = to_ary(compositions, "MassFrac")
-        nucid_comp = to_ary(compositions, "NucId") 
+        nucid_comp = to_ary(compositions, "NucId")
         expected_quantity = []
         expected_nucid = []
         repeat = 100

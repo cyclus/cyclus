@@ -23,6 +23,8 @@ if sys.version_info[0] >= 3:
 unit = attr('unit')
 integration = attr('integration')
 
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
 def cleanfs(paths):
     """Removes the paths from the file system."""
     for p in paths:
@@ -148,7 +150,8 @@ def libcyclus_setup():
     for fname, oname, _ in DBS:
         if os.path.isfile(oname):
             continue
-        safe_call(['cyclus', '-o' + oname, 'input/inventory.xml'])
+        safe_call(['cyclus', '-o' + oname,
+                   os.path.join(INPUT, 'inventory.xml')])
 
 
 def dbtest(f):

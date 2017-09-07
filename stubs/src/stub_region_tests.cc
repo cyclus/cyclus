@@ -4,6 +4,7 @@
 
 #include "agent_tests.h"
 #include "region_tests.h"
+#include "pyhooks.h"
 
 using libname::StubRegion;
 
@@ -14,11 +15,13 @@ class StubRegionTest : public ::testing::Test {
   StubRegion* region;
 
   virtual void SetUp() {
+    cyclus::PyStart();
     region = new StubRegion(tc.get());
   }
 
   virtual void TearDown() {
     delete region;
+    cyclus::PyStop();
   }
 };
 

@@ -2,6 +2,9 @@
 """Collects & diffs public symobls in libcyclus.so. Used to ensure stability
 between versions. Now with 100% fewer vowels!
 
+WARNING: this file is now deprecated. It is provided here for future use and
+refactoring.
+
 The following tasks may be useful:
 
     # update the database to the most recent release tag
@@ -14,7 +17,7 @@ The following tasks may be useful:
     $ ./smbchk.py --update -t HEAD --no-save --check
 
 """
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import os
 import io
 import re
@@ -84,7 +87,8 @@ def nm(ns):
     # because everything else should be external to the cares of cyclus
     # stability
     lib = os.path.abspath(os.path.join(ns.prefix, 'lib', 'libcyclus.so'))
-    stdout = subprocess.check_output(['nm', '-g', '-p', '-C', '-fbsd', lib])
+    stdout = subprocess.check_output(['nm', '-g', '-p', '-C', '-fbsd', lib],
+                                     universal_newlines=True)
     names = set()
     ok_types = {'B', 'b', 'D', 'd', 'R', 'r',
                 'S', 's', 'T', 't', 'W', 'w', 'u'}
@@ -93,7 +97,7 @@ def nm(ns):
         for symbol in SYMBOLS_REPLACEMENTS:
             line = line.replace(symbol[0], symbol[1])
 
-        line = line.strip().decode()
+        line = line.strip()
         if len(line) == 0 or not line[0].isdigit():
             continue
         val, typ, name = line.split(None, 2)
@@ -170,6 +174,7 @@ def check(db):
 
 
 def main(args=None):
+    raise RuntimeError("Symbol checking has been deprecated!")
     if os.name != 'posix':
         sys.exit("must be run on a posix system, "
                  "'nm' utility not compatible elsewhere.")
