@@ -53,7 +53,7 @@ You need to add ``~/.local/bin`` to the front of your ``$PATH``:
 
 .. code-block:: bash
   
-  echo 'export PATH="$HOME/.local/bin:$PATH' >> ~/.bashrc
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
   source ~/.bashrc
 
 On MacOSX you also need to add ~/.local/lib/pythonX.Y/site-packages to your
@@ -160,7 +160,7 @@ The main variables used are:
     - set Coin-OT library directory 
 
   * - ``BOOST_ROOT``    
-    - set Boost liraries directory
+    - set Boost libraries directory
 
   * - ``HDF5_ROOT``     
     - set HDF5 root directory
@@ -177,6 +177,18 @@ The main variables used are:
 All variables can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
 .. website_custom_end
+
+Note on Building Cyclus with Conda
+----------------------------------
+
+If your python libraries are installed using Conda, install cyclus
+dependencies through conda-forge.
+
+.. code-block:: bash
+
+  conda config --add channels conda-forge
+  conda install cyclus-build-deps
+
 
 *************
 Running Tests

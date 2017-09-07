@@ -72,7 +72,7 @@ only needed if Cython is installed.*
 Installing Dependencies
 ***********************
 
-Cyclus dependencies can either be installed mannualy or using an operating system's package
+Cyclus dependencies can either be installed manually or using an operating system's package
 manager.
 
 Installing Dependencies (Linux and Unix)
