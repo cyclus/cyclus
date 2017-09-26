@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "infile_tree.h"
+#include "pyhooks.h"
 #include "xml_parser.h"
 
 /// this function should be called by all most derived agents in order to get
@@ -14,8 +15,10 @@ extern int ConnectAgentTests() { return 0; }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(AgentTests, Clone) {
+  cyclus::PyStart();
   cyclus::Agent* clone = agent_->Clone();
   delete clone;
+  cyclus::PyStop();
 }
 
 TEST_P(AgentTests, Print) {
