@@ -84,19 +84,12 @@ TEST(InfileConverters, JsonXmlRoundTrip) {
 TEST(InfileConverters, JsonPyRoundTrip) {
   using std::string;
   cyclus::PyStart();
-  std::cout << "0\n";
   string inp = cyclus::toolkit::XmlToJson(MakeInput());
-  std::cout << "2\n";
   string p1 = cyclus::toolkit::JsonToPy(inp);
-  std::cout << "4\n";
   string j1 = cyclus::toolkit::PyToJson(p1);
-  std::cout << "6\n";
   string p2 = cyclus::toolkit::JsonToPy(j1);
-  std::cout << "8\n";
   string j2 = cyclus::toolkit::PyToJson(p2);
-  std::cout << "10\n";
   cyclus::PyStop();
-  std::cout << "100\n";
 
   EXPECT_STREQ(j1.c_str(), j2.c_str());
   EXPECT_STREQ(p1.c_str(), p2.c_str());

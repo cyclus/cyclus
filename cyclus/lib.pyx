@@ -813,6 +813,14 @@ def py_import_init():
     """
     cpp_cyclus.PyImportInit()
 
+
+def py_import_call_init():
+    """Calls Cyclus-internal Python imports. This is called
+    automatically when cyclus is imported. Users should not need to call
+    this function.
+    """
+    cpp_cyclus.PyImportCallInit()
+
 #
 # XML
 #

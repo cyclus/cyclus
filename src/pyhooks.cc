@@ -2,7 +2,6 @@
 
 #ifdef CYCLUS_WITH_PYTHON
 #include <stdlib.h>
-#include <iostream>
 
 #include "Python.h"
 
@@ -29,21 +28,32 @@ void PyAppendInitTab(void) {
 
 void PyImportInit(void) {
 #if PY_MAJOR_VERSION < 3
-  std::cout << "version less than 3\n";
   initeventhooks();
   initpyinfile();
   initpymodule();
 #else
-  std::cout << "version 3 or greater\n";
   PyImport_ImportModule("_cyclus_eventhooks");
   PyImport_ImportModule("_cyclus_pyinfile");
   PyImport_ImportModule("_cyclus_pymodule");
 #endif
 };
 
+
+void PyImportCallInit(void) {
+#if PY_MAJOR_VERSION < 3
+  initeventhooks();
+  initpyinfile();
+  initpymodule();
+#else
+  PyInit_eventhooks();
+  PyInit_pyinfile();
+  PyInit_pymodule();
+#endif
+};
+
+
 void PyStart(void) {
   if (!PY_INTERP_INIT) {
-    std::cout << "Python started up\n";
     PyAppendInitTab();
     Py_Initialize();
     PyImportInit();
@@ -77,7 +87,7 @@ void PyDelAgent(int i) { CyclusPyDelAgent(i); };
 namespace toolkit {
 std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };
 
-std::string JsonToPy(std::string infile) { std::cout << "calling JSONtopy\n"; return CyclusJsonToPy(infile); };
+std::string JsonToPy(std::string infile) { return CyclusJsonToPy(infile); };
 }  // namespace toolkit
 }  // namespace cyclus
 #else   // else CYCLUS_WITH_PYTHON
@@ -90,6 +100,8 @@ bool PY_INTERP_INIT = false;
 void PyAppendInitTab(void) {};
 
 void PyImportInit(void) {};
+
+void PyImportCallInit(void) {};
 
 void PyStart(void) {};
 
