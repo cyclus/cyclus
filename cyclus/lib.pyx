@@ -798,12 +798,28 @@ def set_warn_as_error(bint wae):
 #
 # PyHooks
 #
-def py_init_hooks():
-    """Initializes Cyclus-internal Python hooks. This is called
+def py_append_init_tab():
+    """Initializes Cyclus-internal Python import table. This is called
     automatically when cyclus is imported. Users should not need to call
     this function.
     """
-    cpp_cyclus.PyInitHooks()
+    cpp_cyclus.PyAppendInitTab()
+
+
+def py_import_init():
+    """Initializes Cyclus-internal Python imports. This is called
+    automatically when cyclus is imported. Users should not need to call
+    this function.
+    """
+    cpp_cyclus.PyImportInit()
+
+
+def py_import_call_init():
+    """Calls Cyclus-internal Python imports. This is called
+    automatically when cyclus is imported. Users should not need to call
+    this function.
+    """
+    cpp_cyclus.PyImportCallInit()
 
 #
 # XML

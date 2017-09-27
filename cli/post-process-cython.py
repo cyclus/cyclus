@@ -5,6 +5,19 @@ import re
 RE_LAST_WORD = re.compile('.*?(\w+)[^\w]*$')
 RE_SQUARE_BRACKETS = re.compile('(\[[^\[\]]+?\])')
 RE_ANGLE_BRACKETS = re.compile('(<[^<>]+?>)')
+RE_VERSION = re.compile('.*?(\d+)\.(\d+)(\.\d+)?')
+
+
+def parse_version(src):
+    """Cython files start with a comment in the first line that comtains the version.
+    This finds it and returns a three-tuple of ints
+    """
+    m = RE_VERSION.match(src)
+    major = int(m.group(1))
+    minor = int(m.group(2))
+    micro = m.group(3)
+    micro = 0 if micro is None else int(micro[1:])
+    return (major, minor, micro)
 
 
 def remove_cython_templates(s):
@@ -61,7 +74,17 @@ def cppbases_replace_one(src, start):
     # insert bases
     pre, post = src[:close_sig+1], src[close_sig+1:]
     src = pre + ' : ' + bases + post
-    return src, close_sig + 3 + len(bases)
+    stop = close_sig + 3 + len(bases)
+    # Now rewrite the function name, if needed
+    void_space = src.find('void ', comment_end, open_sig)
+    if void_space >= 0:
+        orig_len = open_sig - void_space
+        name = src[void_space+5:open_sig].split(':')[0].strip()
+        replace_with = name + '::' + name
+        new_len = len(replace_with)
+        src = src[:void_space] + replace_with + src[open_sig:]
+        stop += new_len - orig_len
+    return src, stop
 
 
 def cppbases(src):
@@ -133,11 +156,13 @@ def main(args=None):
     fname = args[1]
     with open(fname, 'r') as f:
         orig = src = f.read()
+    ver = parse_version(src)
     src = cppbases(src)
     src = cppconstructors(src)
     if src != orig:
         with open(fname, 'w') as f:
             f.write(src)
+
 
 if __name__ == '__main__':
     import sys

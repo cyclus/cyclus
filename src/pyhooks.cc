@@ -15,7 +15,31 @@ namespace cyclus {
 int PY_INTERP_COUNT = 0;
 bool PY_INTERP_INIT = false;
 
-void PyInitHooks(void) {
+
+void PyAppendInitTab(void) {
+#if PY_MAJOR_VERSION < 3
+  // Not used before Python 3
+#else
+  PyImport_AppendInittab("_cyclus_eventhooks", PyInit_eventhooks);
+  PyImport_AppendInittab("_cyclus_pyinfile", PyInit_pyinfile);
+  PyImport_AppendInittab("_cyclus_pymodule", PyInit_pymodule);
+#endif
+}
+
+void PyImportInit(void) {
+#if PY_MAJOR_VERSION < 3
+  initeventhooks();
+  initpyinfile();
+  initpymodule();
+#else
+  PyImport_ImportModule("_cyclus_eventhooks");
+  PyImport_ImportModule("_cyclus_pyinfile");
+  PyImport_ImportModule("_cyclus_pymodule");
+#endif
+};
+
+
+void PyImportCallInit(void) {
 #if PY_MAJOR_VERSION < 3
   initeventhooks();
   initpyinfile();
@@ -27,10 +51,12 @@ void PyInitHooks(void) {
 #endif
 };
 
+
 void PyStart(void) {
   if (!PY_INTERP_INIT) {
+    PyAppendInitTab();
     Py_Initialize();
-    PyInitHooks();
+    PyImportInit();
     atexit(PyStop);
     PY_INTERP_INIT = true;
   };
@@ -71,7 +97,11 @@ namespace cyclus {
 int PY_INTERP_COUNT = 0;
 bool PY_INTERP_INIT = false;
 
-void PyInitHooks(void) {};
+void PyAppendInitTab(void) {};
+
+void PyImportInit(void) {};
+
+void PyImportCallInit(void) {};
 
 void PyStart(void) {};
 
