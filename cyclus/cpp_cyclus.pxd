@@ -138,7 +138,7 @@ cdef extern from "cyclus.h" namespace "cyclus":
         vector[std_string] fields
         vector[DbTypes] types
         vector[QueryRow] rows
-    
+
     cdef cppclass ColumnInfo:
         ColumnInfo()
         ColumnInfo(std_string, std_string, int, DbTypes, vector[int])
@@ -147,7 +147,7 @@ cdef extern from "cyclus.h" namespace "cyclus":
         int index
         DbTypes dbtype
         vector[int] shape
-    
+
     cdef cppclass QueryableBackend:
         QueryResult Query(std_string, vector[Cond]*) except +
         map[std_string, DbTypes] ColumnTypes(std_string) except +
@@ -275,7 +275,8 @@ cdef extern from "error.h" namespace "cyclus":
 
 cdef extern from "pyhooks.h" namespace "cyclus":
 
-    cdef void PyInitHooks() except +
+   cdef void PyAppendInitTab() except +
+   cdef void PyImportInit() except +
 
 
 cdef extern from "pyhooks.h" namespace "cyclus::toolkit":
