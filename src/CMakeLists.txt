@@ -160,12 +160,19 @@ SET(CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
     PARENT_SCOPE
     )
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
+list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
     ${cc_files}
-    "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/transmute.c"
     )
+
+if(COIN_FOUND)
+  SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
+      "${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc"
+      "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
+      )
+endif()
 
 add_definitions(-DPYNE_DECAY_IS_DUMMY)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

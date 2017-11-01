@@ -216,6 +216,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     FIND_PACKAGE(COIN)
     MESSAGE("-- COIN Version: ${COIN_VERSION}")
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
+    if(NOT COIN_FOUND)
+      # no COIN, so no MILPs
+      set(DEFAULT_ALLOW_MILPS false)
+    endif()
 
     #
     # Some optional libraries to link in, as availble. Required for conda.
