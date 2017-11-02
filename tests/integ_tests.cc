@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "cyclus.h"
+#include "platform.h"
 #include "pyhooks.h"
 #include "sim_init.h"
 #include "xml_file_loader.h"
@@ -69,12 +70,14 @@ TEST(IntegTests, RunAllInfiles) {
   infiles.push_back("inventory_compact_false.xml");
   infiles.push_back("inventory_false.xml");
   infiles.push_back("lotka_volterra_determ.xml");
-  infiles.push_back("minimal_cycle.xml");
-  infiles.push_back("null_sink.xml");
   infiles.push_back("predator.xml");
   infiles.push_back("prey.xml");
+#if CYCLUS_HAS_COIN
+  infiles.push_back("null_sink.xml");
   infiles.push_back("source_to_sink.xml");
+  infiles.push_back("minimal_cycle.xml");
   infiles.push_back("trivial_cycle.xml");
+#endif
 
   for (int i = 0; i < infiles.size(); i++) {
     {
