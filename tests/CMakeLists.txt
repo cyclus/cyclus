@@ -61,7 +61,20 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
 
 INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 
+set(CYCLUS_TEST_COIN_SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory_tests.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator_tests.cc"
+    )
+
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
+
+# Remove test source files that rely on COIN if we don't have it
+if(NOT COIN_FOUND)
+  foreach(ccfile ${CYCLUS_TEST_COIN_SRC})
+    list(REMOVE_ITEM cc_files ${ccfile})
+  endforeach()
+endif()
+
 SET(CYCLUS_CORE_TEST_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 
 FILE(GLOB header_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")

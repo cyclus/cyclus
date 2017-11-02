@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "agent.h"
-#include "suffix.h"
+#include "platform.h"
 #include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST
