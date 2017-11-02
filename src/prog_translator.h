@@ -1,5 +1,6 @@
 #ifndef CYCLUS_SRC_PROG_TRANSLATOR_H_
 #define CYCLUS_SRC_PROG_TRANSLATOR_H_
+#if CYLCUS_HAS_COIN
 
 #include <vector>
 
@@ -36,9 +37,9 @@ struct ProgTranslatorContext {
 class ProgTranslator {
  public:
   /// @brief This class is now deprecated.
-  struct Context { 
-    Context(); 
-    ~Context(); 
+  struct Context {
+    Context();
+    ~Context();
   };
 
   /// constructor
@@ -75,7 +76,7 @@ class ProgTranslator {
 
   /// @throws if preference is unsatisfactory (i.e., not greater than 0)
   void CheckPref(double pref);
-  
+
   /// perform all translation for a node group
   /// @param grp a pointer to the node group
   /// @param req a boolean flag, true if grp is a request group
@@ -91,4 +92,5 @@ class ProgTranslator {
 
 }  // namespace cyclus
 
+#endif  // CYLCUS_HAS_COIN
 #endif  // CYCLUS_SRC_PROG_TRANSLATOR_H_

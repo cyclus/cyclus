@@ -3,18 +3,24 @@
 
 #include "version.h"
 
+#if CYCLUS_HAS_COIN
 #include "CbcConfig.h"
 #include "ClpConfig.h"
+// required for coin-cbc v < 2.5
+#ifndef CBC_VERSION
+#define CBC_VERSION CBCVERSION
+#endif
+#else
+#define CBC_VERSION "-1"
+#define CLP_VERSION "-1"
+#endif
+
 #include "boost/version.hpp"
 #include "hdf5.h"
 #include "libxml/xmlversion.h"
 #include "libxml++config.h"
 #include "sqlite3.h"
 
-// required for coin-cbc v < 2.5
-#ifndef CBC_VERSION
-#define CBC_VERSION CBCVERSION
-#endif
 
 #define INNER(x) #x
 #define SVER(x,y,z) INNER(x.y.z)
