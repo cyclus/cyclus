@@ -163,6 +163,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         FIND_LIBRARY(LibXML++ REQUIRED ${DEPS_HINTS})
     ENDIF()
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
+    message("-- LibXML++ Include Dir: ${LibXML++_INCLUDE_DIR}")
 
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
@@ -352,8 +353,9 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
     IF(NOT inc_dirs STREQUAL "")
-      INCLUDE_DIRECTORIES(inc_dirs)
+      INCLUDE_DIRECTORIES(${inc_dirs})
     ENDIF()
+    message("-- Include Directories: ${inc_dirs}")
 
 
     if(Cython_FOUND)

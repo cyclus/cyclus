@@ -1,8 +1,12 @@
 #################################################################
 ############# special file configuration ########################
 #################################################################
-
-CONFIGURE_FILE(suffix.h.in "${CMAKE_CURRENT_SOURCE_DIR}/suffix.h" @ONLY)
+if(COIN_FOUND)
+  set(cyclus_has_coin 1)
+else()
+  set(cyclus_has_coin 0)
+endif()
+CONFIGURE_FILE(platform.h.in "${CMAKE_CURRENT_SOURCE_DIR}/platform.h" @ONLY)
 
 CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
 
@@ -160,6 +164,7 @@ SET(CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
     PARENT_SCOPE
     )
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
+list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc)
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
@@ -169,6 +174,7 @@ SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
 
 if(COIN_FOUND)
   SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
+      "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
       "${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc"
       "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
       )

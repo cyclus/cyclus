@@ -1,5 +1,6 @@
 #ifndef CYCLUS_SRC_PROG_SOLVER_H_
 #define CYCLUS_SRC_PROG_SOLVER_H_
+#if CYCLUS_HAS_COIN
 
 #include <string>
 
@@ -36,10 +37,10 @@ class ProgSolver: public ExchangeSolver {
  protected:
   /// @brief the ProgSolver solves an ExchangeGraph...
   virtual double SolveGraph();
-  
+
  private:
   void WriteMPS();
-  
+
   std::string solver_t_;
   double tmax_;
   bool verbose_, mps_;
@@ -47,5 +48,5 @@ class ProgSolver: public ExchangeSolver {
 };
 
 }  // namespace cyclus
-
+#endif  // CYCLUS_HAS_COIN
 #endif  // CYCLUS_SRC_PROG_SOLVER_H_

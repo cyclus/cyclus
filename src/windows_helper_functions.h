@@ -5,7 +5,7 @@
 #include <windows.h>
 
 #include "error.h"
-#include "suffix.h"
+#include "platform.h"
 
 namespace cyclus {
 

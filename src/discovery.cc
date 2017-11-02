@@ -14,8 +14,8 @@
 #include "context.h"
 #include "dynamic_module.h"
 #include "env.h"
+#include "platform.h"
 #include "recorder.h"
-#include "suffix.h"
 #include "timer.h"
 
 namespace cyclus {
