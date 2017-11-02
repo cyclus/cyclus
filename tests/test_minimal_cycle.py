@@ -3,12 +3,14 @@
 import nose
 
 from nose.tools import assert_equal, assert_almost_equal, assert_true
+from nose.plugins.skip import SkipTest
+
 from numpy.testing import assert_array_equal
 import os
 import sqlite3
 import tables
 import numpy as np
-from tools import check_cmd
+from tools import check_cmd, cyclus_has_coin
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, sha1array, to_ary, which_outfile
 
@@ -97,6 +99,9 @@ def test_minimal_cycle():
 
     This equation is used to test each transaction amount.
     """
+    if not cyclus_has_coin():
+        raise SkipTest("Cyclus does not have COIN")
+
     # A reference simulation input for minimal cycle with different commodities
     ref_input = os.path.join(INPUT, "minimal_cycle.xml")
     # Conversion factors for the simulations

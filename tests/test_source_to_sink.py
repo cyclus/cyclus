@@ -1,12 +1,14 @@
 #! /usr/bin/env python
 
 from nose.tools import assert_equal, assert_true
+from nose.plugins.skip import SkipTest
+
 from numpy.testing import assert_array_equal
 import os
 import sqlite3
 import tables
 import numpy as np
-from tools import check_cmd
+from tools import check_cmd, cyclus_has_coin
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
@@ -17,6 +19,8 @@ def check_source_to_sink(fname, source_spec, sink_spec):
     were of equal quantities and only between sink and source facilities.
     """
     clean_outs()
+    if not cyclus_has_coin():
+        raise SkipTest("Cyclus does not have COIN")
 
     # Cyclus simulation input for Source and Sink
     sim_inputs = [os.path.join(INPUT, fname)]
