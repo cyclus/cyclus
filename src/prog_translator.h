@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_PROG_TRANSLATOR_H_
 #define CYCLUS_SRC_PROG_TRANSLATOR_H_
-#if CYLCUS_HAS_COIN
+#include "platform.h"
+#if CYCLUS_HAS_COIN
 
 #include <vector>
 

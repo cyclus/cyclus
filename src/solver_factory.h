@@ -1,5 +1,6 @@
 #ifndef CYCLUS_SRC_SOLVER_FACTORY_H_
 #define CYCLUS_SRC_SOLVER_FACTORY_H_
+#include "platform.h"
 #if CYCLUS_HAS_COIN
 
 #include <string>

@@ -1,6 +1,7 @@
 #include <sstream>
 #include <cstring>
 
+#include "platform.h"
 #include "version.h"
 
 #if CYCLUS_HAS_COIN
