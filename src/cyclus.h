@@ -1,5 +1,7 @@
 #ifndef CYCLUS_SRC_CYCLUS_H_
 #define CYCLUS_SRC_CYCLUS_H_
+// platform needs to be before all other includes
+#include "platform.h"
 
 #include "bid.h"
 #include "bid_portfolio.h"
@@ -43,7 +45,9 @@ extern "C" {
 #include "version.h"
 
 #include "toolkit/builder.h"
+#if CYCLUS_HAS_COIN
 #include "toolkit/building_manager.h"
+#endif
 #include "toolkit/matl_buy_policy.h"
 #include "toolkit/matl_sell_policy.h"
 #include "toolkit/commodity.h"
