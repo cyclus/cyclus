@@ -6,7 +6,7 @@
 #include "agent_tests.h"
 #include "context.h"
 #include "region.h"
-#include "suffix.h"
+#include "platform.h"
 #include "test_context.h"
 
 #if GTEST_HAS_PARAM_TEST

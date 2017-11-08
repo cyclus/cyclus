@@ -7,8 +7,8 @@
 #include "context.h"
 #include "env.h"
 #include "agent.h"
+#include "platform.h"
 #include "pyhooks.h"
-#include "suffix.h"
 
 #include DYNAMICLOADLIB
 

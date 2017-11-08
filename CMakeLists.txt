@@ -163,6 +163,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         FIND_LIBRARY(LibXML++ REQUIRED ${DEPS_HINTS})
     ENDIF()
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
+    message("-- LibXML++ Include Dir: ${LibXML++_INCLUDE_DIR}")
 
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
@@ -213,9 +214,13 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find coin and link to it
-    FIND_PACKAGE(COIN REQUIRED)
+    FIND_PACKAGE(COIN)
     MESSAGE("-- COIN Version: ${COIN_VERSION}")
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
+    if(NOT COIN_FOUND)
+      # no COIN, so no MILPs
+      set(DEFAULT_ALLOW_MILPS false)
+    endif()
 
     #
     # Some optional libraries to link in, as availble. Required for conda.
@@ -338,7 +343,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     # include all the directories we just found
     # NOTE: for some reason, adding quotes around
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
-    INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
+    set(inc_dirs
+        "${LIBXML2_INCLUDE_DIR}"
         "${LibXML++_INCLUDE_DIR}"
         "${Glibmm_INCLUDE_DIRS}"
         "${LibXML++Config_INCLUDE_DIR}"
@@ -346,6 +352,11 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
+    IF(NOT inc_dirs STREQUAL "")
+      INCLUDE_DIRECTORIES(${inc_dirs})
+    ENDIF()
+    message("-- Include Directories: ${inc_dirs}")
+
 
     if(Cython_FOUND)
         INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}"

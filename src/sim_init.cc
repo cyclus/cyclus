@@ -2,6 +2,7 @@
 
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
+#include "platform.h"
 #include "prog_solver.h"
 #include "region.h"
 
@@ -162,7 +163,7 @@ void SimInit::LoadInfo() {
   qr = b_->Query("Epsilon", NULL);
   si_.eps = qr.GetVal<double>("GenericEpsilon");
   si_.eps_rsrc = qr.GetVal<double>("ResourceEpsilon");
-  
+
   qr = b_->Query("InfoExplicitInv", NULL);
   si_.explicit_inventory = qr.GetVal<bool>("RecordInventory");
   si_.explicit_inventory_compact = qr.GetVal<bool>("RecordInventoryCompact");
@@ -213,7 +214,7 @@ void* SimInit::LoadPreconditioner(std::string name) {
   return precon;
 }
 
-ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive, 
+ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
                                           std::set<std::string> tables) {
   using std::set;
   using std::string;
@@ -239,12 +240,13 @@ ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
   return solver;
 }
 
-ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive, 
+ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive,
                                         std::set<std::string> tables) {
+#if CYCLUS_HAS_COIN
   ExchangeSolver* solver;
   double timeout;
   bool verbose, mps;
-  
+
   std::string solver_info = "CoinSolverInfo";
   if (0 < tables.count(solver_info)) {
     QueryResult qr = b_->Query(solver_info, NULL);
@@ -257,6 +259,9 @@ ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive,
   timeout = timeout <= 0 ? ProgSolver::kDefaultTimeout : timeout;
   solver = new ProgSolver("cbc", timeout, exclusive, verbose, mps);
   return solver;
+#else
+  throw cyclus::Error("Cyclus was not compiled with COIN support, cannot load solver.");
+#endif
 }
 
 void SimInit::LoadSolverInfo() {

@@ -1,8 +1,12 @@
 #################################################################
 ############# special file configuration ########################
 #################################################################
-
-CONFIGURE_FILE(suffix.h.in "${CMAKE_CURRENT_SOURCE_DIR}/suffix.h" @ONLY)
+if(COIN_FOUND)
+  set(cyclus_has_coin 1)
+else()
+  set(cyclus_has_coin 0)
+endif()
+CONFIGURE_FILE(platform.h.in "${CMAKE_CURRENT_SOURCE_DIR}/platform.h" @ONLY)
 
 CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
 
@@ -155,17 +159,34 @@ endif(Cython_FOUND)
 
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 
+set(CYCLUS_COIN_SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
+    )
+
 SET(CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}"
     PARENT_SCOPE
     )
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
+foreach(ccfile ${CYCLUS_COIN_SRC})
+  list(REMOVE_ITEM cc_files ${ccfile})
+endforeach()
+list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
+list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc)
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
     ${cc_files}
-    "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/transmute.c"
     )
+
+# Add Cyclus source files that use COIN, if we have COIN
+if(COIN_FOUND)
+  SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${CYCLUS_COIN_SRC})
+endif()
 
 add_definitions(-DPYNE_DECAY_IS_DUMMY)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

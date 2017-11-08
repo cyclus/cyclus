@@ -3,7 +3,7 @@
 build
 debug
 doxygen.conf
-suffix.h
+platform.h
 *.pdf
 *.pyc
 *.dvi
