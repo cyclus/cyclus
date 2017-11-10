@@ -16,6 +16,7 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport reinterpret_cast, dynamic_cast
+from cpython cimport PyObject
 
 from binascii import hexlify
 import uuid
@@ -556,7 +557,6 @@ cdef class _DynamicModule:
 
 class DynamicModule(_DynamicModule):
     """Dynamic Module wrapper class."""
-
 
 #
 # Env
@@ -1903,3 +1903,41 @@ cpdef void _del_agent(int i):
     global _AGENT_REFS
     if i in _AGENT_REFS:
         del _AGENT_REFS[i]
+
+#
+# Functions to allow for time series facilities to interaction with the timeseries 
+# callbacks.  
+#
+
+cdef cppclass CyclusTimeSeriesListenerShim "CyclusTimeSeriesListenerShim":
+    void cpp_func(cpp_cyclus.Agent* agent, int time, double value):
+        py_agent = agent_to_py(agent, None)
+        (<object> this.py_func)(py_agent, time, value)
+
+cdef class _CyclusTimeSeriesListener:
+    
+    def __cinit__(self, py_func):
+        self.shim = new CyclusTimeSeriesListenerShim()
+        self.shim.py_func = <PyObject*> py_func
+
+    def __dealloc__(self):
+        if self.shim == NULL:
+            return
+        del self.shim
+
+class CyclusTimeSeriesListener(_CyclusTimeSeriesListener):
+    """Creates a time series listener wrapper
+    """
+
+def register_timeseries_listener(tstype, py_func):
+    """Registers a time series listener to the cyclus simulation.
+    """
+    cdef _CyclusTimeSeriesListener listener
+    double_types = {cpp_cyclus.POWER, cpp_cyclus.ENRICH_SWU, cpp_cyclus.ENRICH_FEED}
+    if tstype in double_types:
+        listener = CyclusTimeSeriesListener(py_func)
+        
+        cpp_cyclus.TIME_SERIES_LISTENERS_DOUBLE[tstype].push_back(cpp_cyclus.BindListenerMemberFunction((<_CyclusTimeSeriesListener> listener).shim.cpp_func))
+    else:
+        raise TypeError("Timeseries type {0} not valid.".format(tstype))
+    return listener

@@ -9,6 +9,7 @@ from cython.operator cimport dereference as deref
 from cython.operator cimport preincrement as inc
 from libc.stdlib cimport malloc, free
 from libcpp cimport bool as cpp_bool
+from cpython cimport PyObject
 
 # local imports
 from cyclus cimport cpp_jsoncpp
@@ -110,3 +111,15 @@ cdef dict _AGENT_REFS
 cpdef object make_py_agent(object libname, object agentname, object ctx)
 cpdef void _clear_agent_refs()
 cpdef void _del_agent(int i)
+
+#
+# Time Series Listeners
+#
+ctypedef CyclusTimeSeriesListenerShim* timeseries_listener_ptr
+
+cdef cppclass CyclusTimeSeriesListenerShim "CyclusTimeSeriesListenerShim":
+    void cpp_func(cpp_cyclus.Agent*, int, double) 
+    PyObject* py_func
+
+cdef class _CyclusTimeSeriesListener:
+    cdef timeseries_listener_ptr shim

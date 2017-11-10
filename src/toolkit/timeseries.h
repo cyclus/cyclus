@@ -24,7 +24,8 @@ enum TimeSeriesType {
 };
 
 /// Stores global information for the time series call backs.
-extern std::map<TimeSeriesType, std::vector<std::function<void(cyclus::Agent*, int, double)> > > TIME_SERIES_LISTENERS_DOUBLE;
+typedef std::function<void(cyclus::Agent*, int, double)> time_series_listener_t;
+extern std::map<TimeSeriesType, std::vector<time_series_listener_t> > TIME_SERIES_LISTENERS_DOUBLE;
 
 /// Records a per-time step quantity for a given type
 template <TimeSeriesType T>
@@ -39,6 +40,11 @@ void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
        ->AddVal("Time", agent->context()->time())
        ->AddVal("Value", value)
        ->Record();
+}
+
+template <class Ret, class T>
+time_series_listener_t BindListernerMemberFunction(Ret T::* pm){
+  return std::mem_fn(pm);
 }
 
 void CallListenersDouble(TimeSeriesType tstype, cyclus::Agent* agent, double value);
