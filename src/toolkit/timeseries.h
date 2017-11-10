@@ -2,6 +2,9 @@
 #define CYCLUS_SRC_TOOLKIT_TIMESERIES_H_
 
 #include <string>
+#include <map>
+#include <vector>
+#include <functional>
 
 #include "agent.h"
 #include "context.h"
@@ -20,6 +23,9 @@ enum TimeSeriesType {
   ENRICH_FEED,
 };
 
+/// Stores global information for the time series call backs.
+extern std::map<TimeSeriesType, std::vector<std::function<void(cyclus::Agent*, int, double)> > > TIME_SERIES_LISTENERS_DOUBLE;
+
 /// Records a per-time step quantity for a given type
 template <TimeSeriesType T>
 void RecordTimeSeries(cyclus::Agent* agent, double value);
@@ -34,6 +40,8 @@ void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
        ->AddVal("Value", value)
        ->Record();
 }
+
+void CallListenersDouble(TimeSeriesType tstype, cyclus::Agent* agent, double value);
 
 }  // namespace toolkit
 }  // namespace cyclus

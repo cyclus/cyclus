@@ -894,6 +894,18 @@ cdef extern from "toolkit/res_map.h" namespace "cyclus::toolkit":
         void ResValues(vector[Resource.Ptr] vals)
         shared_ptr[R] Pop(K)
 
+cdef extern from "toolkit/timeseries.h" namespace "cyclus::toolkit":
+
+    cdef enum TimeSeriesType:
+        POWER
+        ENRICH_SWU
+        ENRICH_FEED        
+
+    cdef map[TimeSeriesType, vector[function[Agent*, int, double]]] TIME_SERIES_LISTENERS_DOUBLE
+
+    void RecordTimeSeries[TimeSeriesType](Agent*, double)
+    void RecordTimeSeries[T](std_string, Agent*, T)
+    
 #
 # Some cutsom pyne wrapping
 #
