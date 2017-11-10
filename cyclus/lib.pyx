@@ -17,10 +17,11 @@ from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport reinterpret_cast, dynamic_cast
 from cpython cimport PyObject
+from cpython.pycapsule cimport PyCapsule_GetPointer
 
 from binascii import hexlify
 import uuid
-from collections import Mapping, Sequence, Iterable
+from collections import Mapping, Sequence, Iterable, defaultdict
 from importlib import import_module
 
 cimport numpy as np
@@ -1257,6 +1258,12 @@ class SimInit(_SimInit):
 # Agent
 #
 
+cpdef object capsule_agent_to_py(object agent, object ctx):
+    """Returns an agent from its id"""
+    cdef cpp_cyclus.Agent* avoid = <cpp_cyclus.Agent*> PyCapsule_GetPointer(agent, <char*> b"agent")        
+    a = agent_to_py(avoid, ctx)
+    return a    
+
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     """Converts and agent pointer to Python."""
     global _AGENT_REFS
@@ -1265,7 +1272,7 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     cdef int a_id = a_ptx.id()
     if a_id in _AGENT_REFS:
         return _AGENT_REFS[a_id]
-    # have to make new wrapper instance
+    # have to make new wrapper instance  
     if ctx is None:
         ctx = Context(init=False)
         (<_Context> ctx).ptx = a_ptx.context()
@@ -1909,35 +1916,15 @@ cpdef void _del_agent(int i):
 # callbacks.  
 #
 
-cdef cppclass CyclusTimeSeriesListenerShim "CyclusTimeSeriesListenerShim":
-    void cpp_func(cpp_cyclus.Agent* agent, int time, double value):
-        py_agent = agent_to_py(agent, None)
-        (<object> this.py_func)(py_agent, time, value)
 
-cdef class _CyclusTimeSeriesListener:
-    
-    def __cinit__(self, py_func):
-        self.shim = new CyclusTimeSeriesListenerShim()
-        self.shim.py_func = <PyObject*> py_func
+TIME_SERIES_LISTENERS = defaultdict(list)
 
-    def __dealloc__(self):
-        if self.shim == NULL:
-            return
-        del self.shim
-
-class CyclusTimeSeriesListener(_CyclusTimeSeriesListener):
-    """Creates a time series listener wrapper
+def call_listeners(tstype, agent, time, value):
+    """Calls the time series listener functions of cyclus agents. 
     """
+    vec = TIME_SERIES_LISTENERS[tstype]
+    for f in vec:
+        f(agent, time, value)
 
-def register_timeseries_listener(tstype, py_func):
-    """Registers a time series listener to the cyclus simulation.
-    """
-    cdef _CyclusTimeSeriesListener listener
-    double_types = {cpp_cyclus.POWER, cpp_cyclus.ENRICH_SWU, cpp_cyclus.ENRICH_FEED}
-    if tstype in double_types:
-        listener = CyclusTimeSeriesListener(py_func)
-        
-        cpp_cyclus.TIME_SERIES_LISTENERS_DOUBLE[tstype].push_back(cpp_cyclus.BindListenerMemberFunction((<_CyclusTimeSeriesListener> listener).shim.cpp_func))
-    else:
-        raise TypeError("Timeseries type {0} not valid.".format(tstype))
-    return listener
+
+

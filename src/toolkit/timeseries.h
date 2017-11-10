@@ -17,7 +17,7 @@ namespace toolkit {
 /// - POWER [MWe]
 /// - ENRICH_SWU [kg SWU]
 /// - ENRICH_FEED [kg]
-enum TimeSeriesType {
+enum TimeSeriesType : int{
   POWER,
   ENRICH_SWU,
   ENRICH_FEED,

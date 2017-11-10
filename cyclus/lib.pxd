@@ -78,7 +78,7 @@ cdef class _Timer:
 cdef class _SimInit:
     cdef cpp_cyclus.SimInit * ptx
 
-
+cpdef object capsule_agent_to_py(object agent, object ctx)
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptr, object ctx)
 cdef dict inventories_to_py(cpp_cyclus.Inventories& invs)
 cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs)
@@ -115,11 +115,4 @@ cpdef void _del_agent(int i)
 #
 # Time Series Listeners
 #
-ctypedef CyclusTimeSeriesListenerShim* timeseries_listener_ptr
 
-cdef cppclass CyclusTimeSeriesListenerShim "CyclusTimeSeriesListenerShim":
-    void cpp_func(cpp_cyclus.Agent*, int, double) 
-    PyObject* py_func
-
-cdef class _CyclusTimeSeriesListener:
-    cdef timeseries_listener_ptr shim

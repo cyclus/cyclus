@@ -61,3 +61,12 @@ cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ():
 cdef public void py_del_agent "CyclusPyDelAgent" (int i):
     """Clears the cache of a single agent ref"""
     cyclib._del_agent(i)
+
+cdef public void py_call_listeners "CyclusPyCallListeners" (TimeSeriesType tstype, Agent* cpp_agent, void* cpp_ctx, int time, double value):
+    """Calls the python time series listeners
+    """
+    ctx = PyCapsule_New(cpp_ctx, <char*> b"ctx", NULL)
+    agent = PyCapsule_New(cpp_agent, <char*> b"agent", NULL)
+    py_agent = cyclib.capsule_agent_to_py(agent, ctx)
+    cyclib.call_listeners(tstype, py_agent, time, value)
+

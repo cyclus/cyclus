@@ -900,15 +900,6 @@ cdef extern from "toolkit/timeseries.h" namespace "cyclus::toolkit":
         ENRICH_SWU
         ENRICH_FEED        
     
-    ctypedef Agent* agent_ptr
-    #ctypedef void (agent_ptr, int, double) 
-    ctypedef function[void (agent_ptr, int, double)] time_series_listener_t
-    cdef map[TimeSeriesType, vector[time_series_listener_t]] TIME_SERIES_LISTENERS_DOUBLE
-
-    ctypedef Ret T::* ret_t_star
-    time_series_listerner_t BindListenerMemberFunction[Ret, T](ret_t_star)
-    void RecordTimeSeries[TimeSeriesType](agent_ptr, double)
-    void RecordTimeSeries[T](std_string, agent_ptr, T)
     
 #
 # Some cutsom pyne wrapping

@@ -11,6 +11,7 @@ void CallListenersDouble(TimeSeriesType tstype, cyclus::Agent* agent, double val
   for(auto f=vec.begin(); f != vec.end(); ++f){
      (*f)(agent, time, value);
   }
+  PyCallListeners(tstype, agent, agent->context(), time, value);
 }
 
 template <>
