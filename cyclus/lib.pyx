@@ -1921,13 +1921,14 @@ POWER = cpp_cyclus.POWER
 ENRICH_SWU = cpp_cyclus.ENRICH_SWU
 ENRICH_FEED = cpp_cyclus.ENRICH_FEED
 
-def record_timeseries(int tstype, _Agent agent, float value):
+def record_time_series(int tstype, object agent, float value):
+    cdef cpp_cyclus.Agent* a_ptr = dynamic_agent_ptr(agent)
     if tstype == POWER:
-        cpp_cyclus.RecordTimeSeriesPower((<cpp_cyclus.Agent*>agent.ptx), value)
+        cpp_cyclus.RecordTimeSeriesPower(a_ptr, value)
     elif tstype == ENRICH_SWU:
-        cpp_cyclus.RecordTimeSeriesEnrichSWU((<cpp_cyclus.Agent*>agent.ptx), value)
+        cpp_cyclus.RecordTimeSeriesEnrichSWU(a_ptr, value)
     elif tstype == ENRICH_FEED:
-        cpp_cyclus.RecordTimeSeriesEnrichFeed((<cpp_cyclus.Agent*>agent.ptx), value)
+        cpp_cyclus.RecordTimeSeriesEnrichFeed(a_ptr, value)
 
 TIME_SERIES_LISTENERS = defaultdict(list)
 
