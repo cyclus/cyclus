@@ -28,10 +28,17 @@ def clean_outs():
     if os.path.exists(sqliteout):
         os.remove(sqliteout)
 
+
 def which_outfile():
-    """Uses sqlite if platform is Mac, otherwise uses hdf5
+    """Uses sqlite if platform is Mac or on CI, otherwise uses hdf5
     """
-    return h5out if platform.system() == 'Linux' else sqliteout
+    if 'CI' in os.environ or 'CIRCLECI' in os.environ:
+        return sqliteout
+    elif platform.system() == 'Linux':
+        return h5out
+    else:
+        return sqliteout
+
 
 def tables_exist(outfile, table_names):
     """Checks if output database contains the specified tables.
@@ -51,7 +58,7 @@ def tables_exist(outfile, table_names):
                              (t, )).fetchone()) for t in table_names])
         conn.close()
         return res
-    
+
 def find_ids(data, data_table, id_table):
     """Finds ids of the specified data located in the specified data_table,
     and extracts the corresponding id from the specified id_table.
@@ -110,7 +117,7 @@ def agent_time_series(names):
                      hasattr(f.root, 'AgentExit') else None
 
         f.close()
- 
+
     else :
         conn = sqlite3.connect(sqliteout)
         conn.row_factory = sqlite3.Row
@@ -139,8 +146,8 @@ def agent_time_series(names):
     for name, ids in agent_ids.items():
         for id in ids:
             idx = np.where(to_ary(agent_entry,'AgentId') == id)[0]
-            entries[name][agent_entry[idx]['EnterTime']] += 1
-            
+            entries[name][agent_entry[idx[0]]['EnterTime']] += 1
+
     # cumulative entries
     entries = {k: [sum(v[:i+1]) for i in range(len(v))] \
                    for k, v in entries.items()}

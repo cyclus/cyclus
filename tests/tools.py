@@ -23,6 +23,11 @@ if sys.version_info[0] >= 3:
 unit = attr('unit')
 integration = attr('integration')
 
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
+CYCLUS_HAS_COIN = None
+
+
 def cleanfs(paths):
     """Removes the paths from the file system."""
     for p in paths:
@@ -51,6 +56,18 @@ def check_cmd(args, cwd, holdsrtn):
     f.close()
     holdsrtn[0] = rtn
     assert_equal(rtn, 0)
+
+
+def cyclus_has_coin():
+    global CYCLUS_HAS_COIN
+    if CYCLUS_HAS_COIN is not None:
+        return CYCLUS_HAS_COIN
+    s = subprocess.check_output(['cyclus', '--version'], universal_newlines=True)
+    s = s.strip().replace('Dependencies:', '')
+    m = {k.strip(): v.strip() for k,v in [line.split()[:2] for line in s.splitlines()
+                                          if line != '']}
+    CYCLUS_HAS_COIN = m['Coin-Cbc'] != '-1'
+    return CYCLUS_HAS_COIN
 
 
 @contextmanager
@@ -148,7 +165,8 @@ def libcyclus_setup():
     for fname, oname, _ in DBS:
         if os.path.isfile(oname):
             continue
-        safe_call(['cyclus', '-o' + oname, 'input/inventory.xml'])
+        safe_call(['cyclus', '-o' + oname,
+                   os.path.join(INPUT, 'inventory.xml')])
 
 
 def dbtest(f):

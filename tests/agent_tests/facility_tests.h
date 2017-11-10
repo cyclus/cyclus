@@ -5,7 +5,7 @@
 
 #include "agent_tests.h"
 #include "facility.h"
-#include "suffix.h"
+#include "platform.h"
 #include "test_context.h"
 #include "test_agents/test_inst.h"
 

@@ -102,10 +102,12 @@ class Sink : public cyclus::Facility  {
   double max_inv_size;
 
   #pragma cyclus var { \
-    "doc": "capacity the sink facility can "		 \
-           "accept at each time step",				 \
-    "uilabel": "Maximum Throughput",			 \
-    "tooltip": "sink capacity"  \
+    "doc": "capacity the sink facility can " \
+           "accept at each time step", \
+    "uilabel": "Maximum Throughput", \
+    "uitype": "range", \
+    "range": [0.0, 1e299], \
+    "tooltip": "sink capacity" \
   }
   double capacity;
 

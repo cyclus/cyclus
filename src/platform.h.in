@@ -1,2 +1,3 @@
 #define SUFFIX "@suffix@"
 #define DYNAMICLOADLIB "@dynamicloadlib@"
+#define CYCLUS_HAS_COIN @cyclus_has_coin@

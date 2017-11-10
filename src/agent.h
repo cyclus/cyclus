@@ -287,12 +287,12 @@ class Agent : public StateWrangler, virtual public Ider {
   /// above an other agent in the family tree)
   /// @param other the other agent
   bool AncestorOf(Agent* other);
-  
+
   /// returns true if this agent is an decendent of an other agent (i.e., resides
   /// below an other agent in the family tree)
   /// @param other the other agent
   bool DecendentOf(Agent* other);
-  
+
   /// Called when the agent enters the smiulation as an active participant and
   /// is only ever called once.  Agents should NOT register for services (such
   /// as ticks/tocks and resource exchange) in this function. If agents implement
@@ -452,7 +452,7 @@ class Agent : public StateWrangler, virtual public Ider {
   /// Cloning and InitFrom should be used instead.
   Agent(const Agent& m) {}
 
-  /// adds an agent to the transactiont table
+  /// adds an agent to the transaction table
   void AddToTable();
 
   /// connects an agent to its parent.

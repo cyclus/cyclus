@@ -1,5 +1,7 @@
 #ifndef CYCLUS_SRC_CYCLUS_H_
 #define CYCLUS_SRC_CYCLUS_H_
+// platform needs to be before all other includes
+#include "platform.h"
 
 #include "bid.h"
 #include "bid_portfolio.h"
@@ -24,8 +26,8 @@
 #include "material.h"
 #include "mock_sim.h"
 #include "agent.h"
+#include "pyhooks.h"
 #include "pyne.h"
-#include "pyne_decay.h"
 #include "query_backend.h"
 #include "infile_tree.h"
 #include "recorder.h"
@@ -37,10 +39,15 @@
 #include "time_listener.h"
 #include "trade.h"
 #include "trader.h"
+extern "C" {
+#include "transmute.h"
+}
 #include "version.h"
 
 #include "toolkit/builder.h"
+#if CYCLUS_HAS_COIN
 #include "toolkit/building_manager.h"
+#endif
 #include "toolkit/matl_buy_policy.h"
 #include "toolkit/matl_sell_policy.h"
 #include "toolkit/commodity.h"
@@ -50,6 +57,7 @@
 #include "toolkit/enrichment.h"
 #include "toolkit/infile_converters.h"
 #include "toolkit/mat_query.h"
+#include "toolkit/position.h"
 #include "toolkit/resource_buff.h"
 #include "toolkit/res_buf.h"
 #include "toolkit/res_manip.h"

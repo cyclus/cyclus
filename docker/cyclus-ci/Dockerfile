@@ -2,7 +2,16 @@ FROM cyclus/cyclus-deps
 
 COPY . /cyclus
 WORKDIR /cyclus
-RUN mkdir Release
-WORKDIR /cyclus/Release
-RUN cmake .. -DCMAKE_BUILD_TYPE=Release
-RUN make -j2 && make install
+
+# Uncomment the following line to run cmake in verbose mode.
+# This is sometimes useful for debugging.
+#ENV VERBOSE=1
+
+RUN conda update -y --all && conda clean -y --all
+
+# You may add the option "--cmake-debug" to the following command
+# for further CMake debugging.
+RUN python install.py -j 2 --build-type=Release --core-version 999999.999999 \
+    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
+    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
+

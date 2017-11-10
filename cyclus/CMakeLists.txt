@@ -31,11 +31,15 @@ message("-- Include paths for ${CMAKE_CURRENT_SOURCE_DIR}: ${inc_dirs}")
 
 foreach(file ${CYCLUS_CYTHON_FILES})
     get_filename_component(name ${file} NAME_WE)
-    set(targ "__py_${name}__")
+    set(targ "py_${name}_")
     cython_add_module(${targ} ${file})
     target_link_libraries(${targ} dl ${LIBS} cyclus)
     set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX
                                              OUTPUT_NAME ${name}
                                              LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+    # the following install is needed so that CMake sets the correct RPATH for the
+    # python extension modules, even though they are installed (with the wrong RPATH)
+    # by setup.py, along with the pure python files.
+    install(TARGETS ${targ} LIBRARY DESTINATION "${PYTHON_SITE_PACKAGES}/cyclus")
 endforeach()
 

@@ -90,6 +90,7 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @param parent the parent of this facility
   virtual void Build(Agent* parent);
 
+  /// Called to give the agent an opportunity to register for services.
   virtual void EnterNotify();
 
   /// decommissions the facility, default behavior is for the facility
@@ -102,6 +103,64 @@ class Facility : public TimeListener, public Agent, public Trader {
 
   /// every agent should be able to print a verbose description
   virtual std::string str();
+
+  /// @brief default implementation for material requests
+  virtual std::set<RequestPortfolio<Material>::Ptr>
+      GetMatlRequests() {
+    return std::set<RequestPortfolio<Material>::Ptr>();
+  }
+
+  /// @brief default implementation for product requests
+  virtual std::set<RequestPortfolio<Product>::Ptr>
+      GetProductRequests() {
+    return std::set<RequestPortfolio<Product>::Ptr>();
+  }
+
+  /// @brief default implementation for material requests
+  virtual std::set<BidPortfolio<Material>::Ptr>
+      GetMatlBids(CommodMap<Material>::type& commod_requests) {
+    return std::set<BidPortfolio<Material>::Ptr>();
+  }
+
+  /// @brief default implementation for product requests
+  virtual std::set<BidPortfolio<Product>::Ptr>
+      GetProductBids(CommodMap<Product>::type& commod_requests) {
+    return std::set<BidPortfolio<Product>::Ptr>();
+  }
+
+  /// default implementation for material preferences.
+  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
+
+  /// default implementation for material preferences.
+  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
+
+  /// @brief default implementation for responding to material trades
+  /// @param trades all trades in which this trader is the supplier
+  /// @param responses a container to populate with responses to each trade
+  virtual void GetMatlTrades(
+      const std::vector< Trade<Material> >& trades,
+      std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
+    std::cout << "in material facility getmatltrades\n";
+    }
+
+  /// @brief default implementation for responding to product trades
+  /// @param trades all trades in which this trader is the supplier
+  /// @param responses a container to populate with responses to each trade
+  virtual void GetProductTrades(
+      const std::vector< Trade<Product> >& trades,
+      std::vector<std::pair<Trade<Product>,
+      Product::Ptr> >& responses) {}
+
+  /// @brief default implementation for material trade acceptance
+  virtual void AcceptMatlTrades(
+      const std::vector<std::pair<Trade<Material>,
+      Material::Ptr> >& responses) {}
+
+  /// @brief default implementation for product trade acceptance
+  virtual void AcceptProductTrades(
+      const std::vector<std::pair<Trade<Product>,
+      Product::Ptr> >& responses) {}
+
 };
 
 }  // namespace cyclus

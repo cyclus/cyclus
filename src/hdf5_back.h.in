@@ -93,7 +93,9 @@ class Hdf5Back : public FullBackend {
   virtual QueryResult Query(std::string table, std::vector<Cond>* conds);
 
   virtual std::map<std::string, DbTypes> ColumnTypes(std::string table);
-
+  
+  virtual std::list<ColumnInfo> Schema(std::string table);
+    
   virtual std::set<std::string> Tables();
 
  private:
@@ -102,7 +104,7 @@ class Hdf5Back : public FullBackend {
 
   /// Reads a table's column types into schemas_ if they aren't already there
   /// \{
-  void LoadTableTypes(std::string title, hsize_t ncols);
+  void LoadTableTypes(std::string title, hsize_t ncols, Datum *d);
   void LoadTableTypes(std::string title, hid_t dset, hsize_t ncols);
   /// \}
 
@@ -140,7 +142,10 @@ class Hdf5Back : public FullBackend {
     return VLWrite<T, U>(x->cast<T>());
   }
   /// \}
-
+  
+  template <DbTypes U>
+  void WriteToBuf(char* buf, std::vector<int>& shape, const boost::spirit::hold_any* a, size_t column);
+  
   /// Gets an HDF5 reference dataset for a variable length datatype
   /// If the dataset does not exist in the database, it will create it.
   ///
@@ -173,21 +178,7 @@ class Hdf5Back : public FullBackend {
 
   /// Converts a value to a variable length buffer for HDF5.
   /// \{
-  hvl_t VLValToBuf(const std::vector<int>& x);
-  hvl_t VLValToBuf(const std::vector<float>& x);
-  hvl_t VLValToBuf(const std::vector<double>& x);
-  hvl_t VLValToBuf(const std::vector<std::string>& x);
-  hvl_t VLValToBuf(const std::set<int>& x);
-  hvl_t VLValToBuf(const std::set<std::string>& x);
-  hvl_t VLValToBuf(const std::list<int>& x);
-  hvl_t VLValToBuf(const std::list<std::string>& x);
-  hvl_t VLValToBuf(const std::map<int, int>& x);
-  hvl_t VLValToBuf(const std::map<int, double>& x);
-  hvl_t VLValToBuf(const std::map<int, std::string>& x);
-  hvl_t VLValToBuf(const std::map<std::string, int>& x);
-  hvl_t VLValToBuf(const std::map<std::string, double>& x);
-  hvl_t VLValToBuf(const std::map<std::string, std::string>& x);
-  hvl_t VLValToBuf(const std::map<std::pair<int, std::string>, double>& x);
+@HDF5_BACK_CC_VAL_TO_BUF_H@
   /// \}
 
   /// Converts a variable length buffer to a value for HDF5.

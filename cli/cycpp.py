@@ -43,7 +43,7 @@ following handy table!
 cycpp is implemented entirely in this file and with tools from the Python standard
 library. It requires Python 2.7+ or Python 3.3+ to run.
 """
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import os
 import re
 import sys
@@ -814,33 +814,33 @@ class StateAccumulator(object):
                     p=pformat(self.supported_types))
                 raise TypeError(msg)
         return t
-    
+
     def _canonize_targs(self, newtname, targs):
         newt = [newtname]
         newt += [self.canonize_type(targ) for targ in targs]
         return tuple(newt)
 
     def canonize_shape(self, ann_dict):
-        """This canonizes a shape. We take a look at the current shape, and 
-        standardize its format if necessary. We append -1's to the shape if 
+        """This canonizes a shape. We take a look at the current shape, and
+        standardize its format if necessary. We append -1's to the shape if
         its length does not match our expected length. Returns the new shape
         or raises an error if the given shape was longer than expected.
         """
         type_canon = ann_dict['type']
-        try: 
+        try:
             current_shape = ann_dict['shape']
         except KeyError:
             ann_dict['shape'] = None
             current_shape = ann_dict['shape']
         new_shape = []
         # Flatten list dimensions
-        if isinstance(type_canon, str):
+        if isinstance(type_canon, STRING_TYPES):
             result = [type_canon]
         else:
             result = list(type_canon)
             i = 0
             while i < len(result):
-                if isinstance(result[i], str):
+                if isinstance(result[i], STRING_TYPES):
                     i += 1
                 else:
                     temp = result[i][1:]
@@ -855,17 +855,17 @@ class StateAccumulator(object):
         elif len(current_shape) == expected_shape_length:
             new_shape = current_shape
         # Shape is too short.
-        elif len(current_shape) < expected_shape_length:    
+        elif len(current_shape) < expected_shape_length:
             diff = expected_shape_length - len(current_shape)
             new_shape = current_shape.extend([-1] * diff)
         # Shape is too long- we throw an error.
         elif len(current_shape) > expected_shape_length:
             err_string = ("Shape array for type {t} is not formatted correctly."
                           " Expected length {length} or less.")
-            raise ValueError(err_string.format(t=str(type_canon), 
+            raise ValueError(err_string.format(t=str(type_canon),
                                                length=str(expected_shape_length)))
         return new_shape
-    
+
     def canonize_class(self, cls, _usens=True):
         """This canonizes a classname.  The class name need not be the current
         class whose scope we are in, but may be any class whatsoever. Returns
@@ -1672,6 +1672,8 @@ class SchemaFilter(CodeGeneratorFilter):
         'facility': None,
         'prototype': None,
         'recipe': None,
+        'inrecipe': None,
+        'outrecipe': None,
         'none': None,
         None: None,
         '': None,
@@ -1759,13 +1761,10 @@ class SchemaFilter(CodeGeneratorFilter):
 
         return impl
 
-    def impl(self, ind="  "):
-        cg = self.machine
-        context = cg.context
-        ctx = context[self.given_classname]['vars']
-
-        if len(ctx.keys()) == 0:
-            return ind + 'return "<text/>";\n'
+    def xml_from_ctx(self, ctx, ind="  "):
+        """Creates an XML string for an agent."""
+        if len(ctx) == 0:
+            return '<text/>'
 
         xml = '<interleave>'
         for member, info in ctx.items():
@@ -1777,7 +1776,7 @@ class SchemaFilter(CodeGeneratorFilter):
             alias = member
             if 'alias' in info:
                 alias = info['alias']
-            if self.pragmaname in info:
+            if info.get(self.pragmaname, False):
                 xml += info[self.pragmaname]
                 continue
             t = info['type']
@@ -1790,10 +1789,10 @@ class SchemaFilter(CodeGeneratorFilter):
 
             if key in BUFFERS:  # buffer state, skip
                 continue
-            if 'internal' in info:
+            if info.get('internal', False):
                 continue
 
-            opt = True if 'default' in info else False
+            opt = info.get('default', None) is not None
             if opt:
                 xml += '<optional>'
 
@@ -1802,8 +1801,14 @@ class SchemaFilter(CodeGeneratorFilter):
             if opt:
                 xml += '</optional>'
         xml += '</interleave>'
-
         del self._member
+        return xml
+
+    def impl(self, ind="  "):
+        cg = self.machine
+        context = cg.context
+        ctx = context[self.given_classname]['vars']
+        xml = self.xml_from_ctx(ctx, ind=ind)
         return ind + 'return ""\n' + escape_xml(xml, ind=ind+'  ') + ';\n'
 
 

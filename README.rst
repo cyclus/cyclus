@@ -6,6 +6,26 @@ modeling the flow of material through future nuclear fuel cycles.  For more
 information on the entire "ecosystem" please refer to the `Cyclus website
 <http://fuelcycle.org>`_.
 
+
+================    =================    ===================    ===================
+Cyclus Projects Status
+----------------------------------------------------------------------------------- 
+**Branch**              **Cyclus**         **Cycamore**           **Cymetric** 
+================    =================    ===================    ===================
+master              |cyclus_master|       |cycamore_master|      |cymetric_master|
+develop             |cyclus_develop|      |cycamore_develop|     |cymetric_develop|
+================    =================    ===================    ===================
+
+
+.. |cyclus_develop| image:: https://circleci.com/gh/cyclus/cyclus/tree/develop.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262
+.. |cycamore_develop| image:: https://circleci.com/gh/cyclus/cycamore/tree/develop.png?&amp;circle-token= 333211090d5d5a15110eed1adbe079a6f3a4a704
+.. |cymetric_develop| image:: https://circleci.com/gh/cyclus/cymetric/tree/develop.png?&amp;circle-token= 72639b59387f077973af98e7ce72996eac18b96c
+.. |cyclus_master| image:: https://circleci.com/gh/cyclus/cyclus/tree/master.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262
+.. |cycamore_master| image:: https://circleci.com/gh/cyclus/cycamore/tree/master.png?&amp;circle-token= 333211090d5d5a15110eed1adbe079a6f3a4a704
+.. |cymetric_master| image:: https://circleci.com/gh/cyclus/cymetric/tree/master.png?&amp;circle-token= 72639b59387f077973af98e7ce72996eac18b96c
+
+
+
 ###########
 Cyclus Core
 ###########
@@ -27,7 +47,7 @@ The Cyclus Core contains all the fundamental pieces of the Cyclus framework
 required to interface with the input file, write the output file, and manage
 material flow during the simulation via the Dynamic Resource Exchange.  It
 does not contain any fuel cycle facility models. A set of nuclear facilities can be
-obtained by installing Cycamore, the Cyclus Additionnal Module.  Cycamore is
+obtained by installing Cycamore, the Cyclus Additional Module.  Cycamore is
 supported by the Cyclus Developer Team.  
 
 Third party modules can also be installed (or developed) with additional
@@ -85,7 +105,7 @@ on the source code from github is fairly straightforward:
 
 - finally, add the following Cyclus installation path (``~/.local/bin``) to
   the **front** on your ``$PATH``.
-- additionnaly if you are using MacOSX, also add
+- additionally if you are using MacOSX, also add
   ``~/.local/lib/pythonX.Y/site-packages`` to your ``$PYTHONPATH``
 
 For more detailed installation procedure, and/or custom installation please

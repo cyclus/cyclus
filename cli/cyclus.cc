@@ -12,12 +12,14 @@
 
 #include "cyclus.h"
 #include "hdf5_back.h"
+#include "pyhooks.h"
 #include "pyne.h"
 #include "query_backend.h"
 #include "sim_init.h"
 #include "sqlite_back.h"
 #include "xml_file_loader.h"
 #include "xml_flat_loader.h"
+
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -52,6 +54,7 @@ static std::string usage = "Usage:   cyclus [opts] [input-file]";
 int main(int argc, char* argv[]) {
   // Close all dlopen'd modules AFTER everything else destructs
   DynamicModule::Closer cl;
+  PyStart();
 
   // Tell ENV the path between the cwd and the cyclus executable
   std::string path = Env::PathBase(argv[0]);
@@ -80,6 +83,13 @@ int main(int argc, char* argv[]) {
     return 1;
   } else if (ai.vm.count("input-file") > 0) {
     infile = ai.vm["input-file"].as<std::string>();
+  }
+  // get infile format
+  std::string format;
+  if (ai.vm.count("format") == 0) {
+    format = "none";
+  } else {
+    format = ai.vm["format"].as<std::string>();
   }
 
   // Announce yourself
@@ -128,7 +138,7 @@ int main(int argc, char* argv[]) {
 
   // Try to detect schema type
   std::stringstream input;
-  LoadStringstreamFromFile(input, infile);
+  LoadStringstreamFromFile(input, infile, format);
   boost::shared_ptr<XMLParser> parser =
       boost::shared_ptr<XMLParser>(new XMLParser());
   parser->Init(input);
@@ -146,19 +156,22 @@ int main(int argc, char* argv[]) {
   SimInit si;
   if (ai.restart == "") {
     // Read input file and initialize db and simulation from input file
+    bool ms_print;
+    if(ai.vm.count("rng-print") > 0){
+      ms_print = true;
+    }
     try {
       if (ai.flat_schema) {
-        XMLFlatLoader l(&rec, fback, ai.schema_path, infile);
+        XMLFlatLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
         l.LoadSim();
       } else {
-        XMLFileLoader l(&rec, fback, ai.schema_path, infile);
+        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);     
         l.LoadSim();
       }
     } catch (cyclus::Error e) {
       CLOG(LEV_ERROR) << e.what();
       return 1;
     }
-
     si.Init(&rec, fback);
   } else {
     // Read output db and restart simulation from specified simid and timestep
@@ -195,7 +208,6 @@ int main(int argc, char* argv[]) {
     si.recorder()->RegisterBackend(fback);
   }
 
-
   char* CYCLUS_NO_CATCH = getenv("CYCLUS_NO_CATCH");
   if( CYCLUS_NO_CATCH !=NULL && CYCLUS_NO_CATCH != "0" ){
     si.timer()->RunSim();
@@ -209,6 +221,8 @@ int main(int argc, char* argv[]) {
   }
 
   rec.Flush();
+
+  PyStop();
 
   std::cout << std::endl;
   std::cout << "Status: Cyclus run successful!" << std::endl;
@@ -245,7 +259,10 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("verb,v", po::value<std::string>(),
        "log verbosity. integer from 0 (quiet) to 11 (verbose).")
       ("output-path,o", po::value<std::string>(), "output path")
-      ("input-file", po::value<std::string>(), "input file")
+      ("input-file,i", po::value<std::string>(),
+       "input file, may be a path or a raw string")
+      ("format,f", po::value<std::string>()->default_value("none"),
+       "input file format if a raw string, may be none, xml, json, or py.")
       ("warn-limit", po::value<unsigned int>(),
        "number of warnings to issue per kind, defaults to 42")
       ("warn-as-error", "throw errors when warnings are issued")
@@ -255,9 +272,14 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("cmake-module-path", "print the cyclus CMake module path")
       ("build-path", "print the cyclus build directory")
       ("rng-schema", "print the path to cyclus.rng.in")
+      ("rng-print", "prints the full relaxng schema for the simulation")
       ("nuc-data", "print the path to cyclus_nuc_data.h5")
       ("json-to-xml", po::value<std::string>(), "*.json input file")
       ("xml-to-json", po::value<std::string>(), "*.xml input file")
+      ("json-to-py", po::value<std::string>(), "*.json input file")
+      ("py-to-json", po::value<std::string>(), "*.py input file")
+      ("py-to-xml", po::value<std::string>(), "*.py input file")
+      ("xml-to-py", po::value<std::string>(), "*.xml input file")
       ;
 
   po::variables_map vm;
@@ -410,6 +432,46 @@ int EarlyExitArgs(const ArgInfo& ai) {
       std::stringstream input;
       LoadRawStringstreamFromFile(input, infile);
       std::cout << cyclus::toolkit::XmlToJson(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("json-to-py")) {
+    std::string infile(ai.vm["json-to-py"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadRawStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::JsonToPy(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("py-to-json")) {
+    std::string infile(ai.vm["py-to-json"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadRawStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::PyToJson(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("py-to-xml")) {
+    std::string infile(ai.vm["py-to-xml"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadRawStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::PyToXml(input.str());
+    } catch (cyclus::IOError err) {
+      std::cout << err.what() << "\n";
+    }
+    return 0;
+  } else if (ai.vm.count("xml-to-py")) {
+    std::string infile(ai.vm["xml-to-py"].as<std::string>());
+    try {
+      std::stringstream input;
+      LoadRawStringstreamFromFile(input, infile);
+      std::cout << cyclus::toolkit::XmlToPy(input.str());
     } catch (cyclus::IOError err) {
       std::cout << err.what() << "\n";
     }

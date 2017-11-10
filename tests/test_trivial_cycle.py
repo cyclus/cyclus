@@ -1,16 +1,18 @@
 #! /usr/bin/env python
 
 from nose.tools import assert_equal, assert_almost_equal, assert_true
+from nose.plugins.skip import SkipTest
 from numpy.testing import assert_array_equal
 import os
 import sqlite3
 import tables
 import numpy as np
-from tools import check_cmd
+from tools import check_cmd, cyclus_has_coin
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
-"""Tests"""
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
 def test_source_to_sink():
     """Tests simulations with one facility that has a conversion factor.
 
@@ -23,8 +25,11 @@ def test_source_to_sink():
 
     This equation is used to test each transaction amount.
     """
+    if not cyclus_has_coin():
+        raise SkipTest("Cyclus does not have COIN")
+
     # A reference simulation input for the trivial cycle simulation.
-    ref_input = "./input/trivial_cycle.xml"
+    ref_input = os.path.join(INPUT, "trivial_cycle.xml")
     # Conversion factors for the three simulations
     k_factors = [0.95, 1, 2]
 
@@ -69,7 +74,7 @@ def test_source_to_sink():
             resources = exc('SELECT * FROM Resources').fetchall()
             transactions = exc('SELECT * FROM Transactions').fetchall()
             conn.close()
-                
+
         # Find agent ids
         agent_ids = to_ary(agent_entry, "AgentId")
         spec = to_ary(agent_entry, "Spec")

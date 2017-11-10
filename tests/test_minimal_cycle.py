@@ -3,14 +3,18 @@
 import nose
 
 from nose.tools import assert_equal, assert_almost_equal, assert_true
+from nose.plugins.skip import SkipTest
+
 from numpy.testing import assert_array_equal
 import os
 import sqlite3
 import tables
 import numpy as np
-from tools import check_cmd
+from tools import check_cmd, cyclus_has_coin
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, sha1array, to_ary, which_outfile
+
+INPUT = os.path.join(os.path.dirname(__file__), "input")
 
 def change_k_factors(fs_read, fs_write, k_factor_in, k_factor_out, n = 1):
     """Changes k_factor_in and k_factor_out for one facility.
@@ -95,8 +99,11 @@ def test_minimal_cycle():
 
     This equation is used to test each transaction amount.
     """
+    if not cyclus_has_coin():
+        raise SkipTest("Cyclus does not have COIN")
+
     # A reference simulation input for minimal cycle with different commodities
-    ref_input = "./input/minimal_cycle.xml"
+    ref_input = os.path.join(INPUT, "minimal_cycle.xml")
     # Conversion factors for the simulations
     k_factors = [0.95, 1, 2]
 
@@ -115,7 +122,7 @@ def test_minimal_cycle():
 
              # tables of interest
             paths = ["/AgentEntry", "/Resources", "/Transactions",
-                    "/Info"]
+                     "/Info"]
             # Check if these tables exist
             yield assert_true, tables_exist(outfile, paths)
             if not tables_exist(outfile, paths):
@@ -131,7 +138,7 @@ def test_minimal_cycle():
                 resources = output.get_node("/Resources")[:]
                 transactions = output.get_node("/Transactions")[:]
                 output.close()
- 
+
             else:
                 conn = sqlite3.connect(sqliteout)
                 conn.row_factory = sqlite3.Row
@@ -143,7 +150,7 @@ def test_minimal_cycle():
                 resources = exc('SELECT * FROM Resources').fetchall()
                 transactions = exc('SELECT * FROM Transactions').fetchall()
                 conn.close()
-                
+
             # Find agent ids
             agent_ids = to_ary(agent_entry, "AgentId")
             spec = to_ary(agent_entry, "Spec")

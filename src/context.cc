@@ -6,6 +6,7 @@
 #include "error.h"
 #include "exchange_solver.h"
 #include "logger.h"
+#include "pyhooks.h"
 #include "sim_init.h"
 #include "timer.h"
 #include "version.h"
@@ -97,6 +98,7 @@ Context::~Context() {
 void Context::DelAgent(Agent* m) {
   int n = agent_list_.erase(m);
   if (n == 1) {
+    PyDelAgent(m->id());
     delete m;
     m = NULL;
   }
@@ -144,7 +146,7 @@ void Context::AddPrototype(std::string name, Agent* p, bool overwrite) {
 
   protos_[name] = p;
   // explicit snapshot required for in situ (non-xml) prototype addition
-  SimInit::SnapAgent(p); 
+  SimInit::SnapAgent(p);
   NewDatum("Prototypes")
       ->AddVal("Prototype", name)
       ->AddVal("AgentId", p->id())
@@ -208,7 +210,7 @@ void Context::InitSim(SimInfo si) {
   NewDatum("TimeStepDur")
       ->AddVal("DurationSecs", static_cast<int>(si.dt))
       ->Record();
-  
+
   NewDatum("Epsilon")
       ->AddVal("GenericEpsilon", si.eps)
       ->AddVal("ResourceEpsilon", si.eps_rsrc)

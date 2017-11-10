@@ -16,6 +16,7 @@
 #include "composition.h"
 #include "agent.h"
 #include "greedy_solver.h"
+#include "pyhooks.h"
 #include "recorder.h"
 
 const uint64_t kDefaultTimeStepDur = 2629846;
@@ -46,7 +47,7 @@ class SimInfo {
   /// @param m0 start month for the simulation
   /// @param handle is this simulation's unique simulation handle
   /// @return a SimInfo instance
-  SimInfo(int dur, int y0 = 2010, int m0 = 1, 
+  SimInfo(int dur, int y0 = 2010, int m0 = 1,
           std::string handle = "");
 
   /// @brief constructs a SimInfo instance using no default variables
@@ -56,7 +57,7 @@ class SimInfo {
   /// @param handle is this simulation's unique simulation handle
   /// @param d the decay data member, "never" for no decay. "manual" otherwise
   /// @return a SimInfo instance
-  SimInfo(int dur, int y0, int m0, 
+  SimInfo(int dur, int y0, int m0,
           std::string handle, std::string d);
 
   /// @brief constructs a SimInfo instance
@@ -100,10 +101,10 @@ class SimInfo {
 
   /// Epsilon in the simulation.
   double eps;
-  
+
   /// Epsilon for resources in the simulation.
   double eps_rsrc;
-  
+
   /// True if per-agent inventories should be explicitly queried/recorded
   /// every time step in a table (i.e. agent ID, Time, Nuclide, Quantity).
   bool explicit_inventory;
@@ -153,7 +154,7 @@ class Context {
   void AddPrototype(std::string name, Agent* m);
   void AddPrototype(std::string name, Agent* m, bool overwrite);
   /// @}
-  
+
   /// Registers an agent as a participant in resource exchanges. Agents should
   /// register from their Deploy method.
   inline void RegisterTrader(Trader* e) {
@@ -185,6 +186,7 @@ class Context {
     Agent* clone = m->Clone();
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
+      PyDelAgent(clone->id());
       DelAgent(clone);
       throw CastError("Invalid cast for prototype " + proto_name);
     }
