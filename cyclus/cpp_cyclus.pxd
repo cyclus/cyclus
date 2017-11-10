@@ -23,7 +23,6 @@ cdef extern from "<functional>" namespace "std":
         function()
         function(T)
 
-
 cdef extern from "cyclus.h" namespace "boost::spirit":
 
     cdef cppclass hold_any:
@@ -894,6 +893,16 @@ cdef extern from "toolkit/res_map.h" namespace "cyclus::toolkit":
         void ResValues(vector[Resource.Ptr] vals)
         shared_ptr[R] Pop(K)
 
+cdef extern from "toolkit/timeseries.h" namespace "cyclus::toolkit":
+
+    cdef enum TimeSeriesType:
+        POWER
+        ENRICH_SWU
+        ENRICH_FEED        
+    
+    void RecordTimeSeriesPower "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>" (Agent*, double)
+    void RecordTimeSeriesEnrichSWU "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::ENRICH_SWU>" (Agent*, double)
+    void RecordTimeSeriesEnrichFeed "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::ENRICH_FEED>" (Agent*, double)
 #
 # Some cutsom pyne wrapping
 #

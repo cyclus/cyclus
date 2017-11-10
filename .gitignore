@@ -39,6 +39,8 @@ tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5
 tests/libcyclus-test.sqlite
+test/dummy.json
+test/dummy.h5
 rs.cred
 
 # Docker stuff

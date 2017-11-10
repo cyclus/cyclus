@@ -88,6 +88,11 @@ namespace toolkit {
 std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };
 
 std::string JsonToPy(std::string infile) { return CyclusJsonToPy(infile); };
+
+void PyCallListeners(TimeSeriesType tstype, Agent* agent, void* cpp_ctx, int time, double value){
+    CyclusPyCallListeners(tstype, agent, cpp_ctx, time, value);
+};
+
 }  // namespace toolkit
 }  // namespace cyclus
 #else   // else CYCLUS_WITH_PYTHON
@@ -129,6 +134,9 @@ std::string JsonToPy(std::string infile) {
                                 "Cyclus was not built with Python bindings.");
   return "";
 };
+
+void PyCallListeners(TimeSeriesType tstype, Agent* agent, void* cpp_ctx, int time, double value) {};
+
 } // namespace toolkit
 } // namespace cyclus
 #endif  // ends CYCLUS_WITH_PYTHON

@@ -16,10 +16,12 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport reinterpret_cast, dynamic_cast
+from cpython cimport PyObject
+from cpython.pycapsule cimport PyCapsule_GetPointer
 
 from binascii import hexlify
 import uuid
-from collections import Mapping, Sequence, Iterable
+from collections import Mapping, Sequence, Iterable, defaultdict
 from importlib import import_module
 
 cimport numpy as np
@@ -556,7 +558,6 @@ cdef class _DynamicModule:
 
 class DynamicModule(_DynamicModule):
     """Dynamic Module wrapper class."""
-
 
 #
 # Env
@@ -1257,6 +1258,13 @@ class SimInit(_SimInit):
 # Agent
 #
 
+cpdef object capsule_agent_to_py(object agent, object ctx):
+    """Returns an agent from its id"""
+    cdef cpp_cyclus.Agent* avoid = <cpp_cyclus.Agent*> PyCapsule_GetPointer(agent, <char*> b"agent")        
+    a = agent_to_py(avoid, ctx)
+    return a    
+
+
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     """Converts and agent pointer to Python."""
     global _AGENT_REFS
@@ -1903,3 +1911,43 @@ cpdef void _del_agent(int i):
     global _AGENT_REFS
     if i in _AGENT_REFS:
         del _AGENT_REFS[i]
+
+#
+# Functions to allow for time series facilities to interaction with the timeseries 
+# callbacks.  
+#
+
+
+POWER = cpp_cyclus.POWER
+ENRICH_SWU = cpp_cyclus.ENRICH_SWU
+ENRICH_FEED = cpp_cyclus.ENRICH_FEED
+
+def record_time_series(int tstype, object agent, float value):
+    """Python hook into RecordTimeSeries for Python archetypes
+    
+    Parameters
+    ----------
+    tstype : int
+        Time series type flag; POWER, ENRICH_SWU, etc.
+    agent : object
+        Python agent, usually self when called by an archetype.
+    value : float
+        The value being recorded in the time series.
+    """
+    cdef cpp_cyclus.Agent* a_ptr = dynamic_agent_ptr(agent)
+    if tstype == POWER:
+        cpp_cyclus.RecordTimeSeriesPower(a_ptr, value)
+    elif tstype == ENRICH_SWU:
+        cpp_cyclus.RecordTimeSeriesEnrichSWU(a_ptr, value)
+    elif tstype == ENRICH_FEED:
+        cpp_cyclus.RecordTimeSeriesEnrichFeed(a_ptr, value)
+
+
+TIME_SERIES_LISTENERS = defaultdict(list)
+
+def call_listeners(tstype, agent, time, value):
+    """Calls the time series listener functions of cyclus agents. 
+    """
+    vec = TIME_SERIES_LISTENERS[tstype]
+    for f in vec:
+        f(agent, time, value)
