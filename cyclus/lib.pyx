@@ -1917,6 +1917,18 @@ cpdef void _del_agent(int i):
 #
 
 
+POWER = cpp_cyclus.POWER
+ENRICH_SWU = cpp_cyclus.ENRICH_SWU
+ENRICH_FEED = cpp_cyclus.ENRICH_FEED
+
+def record_timeseries(int tstype, _Agent agent, float value):
+    if tstype == POWER:
+        cpp_cyclus.RecordTimeSeriesPower((<cpp_cyclus.Agent*>agent.ptx), value)
+    elif tstype == ENRICH_SWU:
+        cpp_cyclus.RecordTimeSeriesEnrichSWU((<cpp_cyclus.Agent*>agent.ptx), value)
+    elif tstype == ENRICH_FEED:
+        cpp_cyclus.RecordTimeSeriesEnrichFeed((<cpp_cyclus.Agent*>agent.ptx), value)
+
 TIME_SERIES_LISTENERS = defaultdict(list)
 
 def call_listeners(tstype, agent, time, value):

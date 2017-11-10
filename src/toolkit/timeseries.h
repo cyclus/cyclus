@@ -42,11 +42,6 @@ void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
        ->Record();
 }
 
-template <class Ret, class T>
-time_series_listener_t BindListernerMemberFunction(Ret T::* pm){
-  return std::mem_fn(pm);
-}
-
 void CallListenersDouble(TimeSeriesType tstype, cyclus::Agent* agent, double value);
 
 }  // namespace toolkit
