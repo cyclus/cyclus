@@ -46,4 +46,5 @@ cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
 cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ()
 cdef public void py_del_agent "CyclusPyDelAgent" (int i)
 
-cdef public void py_call_listeners "CyclusPyCallListeners" (TimeSeriesType tstype, Agent* cpp_agent, void* cpp_ctx, int time, double value)
+cdef public void py_call_listeners "CyclusPyCallListeners" (TimeSeriesType tstype, 
+                            Agent* cpp_agent, void* cpp_ctx, int time, double value)

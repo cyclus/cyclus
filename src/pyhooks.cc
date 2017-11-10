@@ -135,7 +135,7 @@ std::string JsonToPy(std::string infile) {
   return "";
 };
 
-void PyCallListeners(TimeSeriesType tstype, Agent* agent, void* cpp_ctx, int time, double value){};
+void PyCallListeners(TimeSeriesType tstype, Agent* agent, void* cpp_ctx, int time, double value) {};
 
 } // namespace toolkit
 } // namespace cyclus

@@ -1264,6 +1264,7 @@ cpdef object capsule_agent_to_py(object agent, object ctx):
     a = agent_to_py(avoid, ctx)
     return a    
 
+
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     """Converts and agent pointer to Python."""
     global _AGENT_REFS
@@ -1272,7 +1273,7 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     cdef int a_id = a_ptx.id()
     if a_id in _AGENT_REFS:
         return _AGENT_REFS[a_id]
-    # have to make new wrapper instance  
+    # have to make new wrapper instance
     if ctx is None:
         ctx = Context(init=False)
         (<_Context> ctx).ptx = a_ptx.context()
@@ -1922,6 +1923,17 @@ ENRICH_SWU = cpp_cyclus.ENRICH_SWU
 ENRICH_FEED = cpp_cyclus.ENRICH_FEED
 
 def record_time_series(int tstype, object agent, float value):
+    """Python hook into RecordTimeSeries for Python archetypes
+    
+    Parameters
+    ----------
+    tstype : int
+        Time series type flag; POWER, ENRICH_SWU, etc.
+    agent : object
+        Python agent, usually self when called by an archetype.
+    value : float
+        The value being recorded in the time series.
+    """
     cdef cpp_cyclus.Agent* a_ptr = dynamic_agent_ptr(agent)
     if tstype == POWER:
         cpp_cyclus.RecordTimeSeriesPower(a_ptr, value)
@@ -1929,6 +1941,7 @@ def record_time_series(int tstype, object agent, float value):
         cpp_cyclus.RecordTimeSeriesEnrichSWU(a_ptr, value)
     elif tstype == ENRICH_FEED:
         cpp_cyclus.RecordTimeSeriesEnrichFeed(a_ptr, value)
+
 
 TIME_SERIES_LISTENERS = defaultdict(list)
 
@@ -1938,6 +1951,3 @@ def call_listeners(tstype, agent, time, value):
     vec = TIME_SERIES_LISTENERS[tstype]
     for f in vec:
         f(agent, time, value)
-
-
-

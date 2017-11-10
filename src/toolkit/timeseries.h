@@ -42,6 +42,7 @@ void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
        ->Record();
 }
 
+/// Helper function for calling listeners, should not be called directly.
 void CallListenersDouble(TimeSeriesType tstype, cyclus::Agent* agent, double value);
 
 }  // namespace toolkit
