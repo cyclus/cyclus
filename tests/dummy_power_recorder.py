@@ -11,4 +11,4 @@ class DummyPowerRecorder(Facility):
 def echo_power(agent, time, value):
     print("The power is {0}".format(value))
 
-lib.TIME_SERIES_LISTENERS[lib.POWER].append(echo_power)
+lib.TIME_SERIES_LISTENERS["Power"].append(echo_power)
