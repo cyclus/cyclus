@@ -7,6 +7,7 @@ from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 from importlib import import_module
 
 import cyclus.lib as cyclib
+import cyclus.typesystem as ts
 
 cdef object std_string_to_py(std_string x):
     pyx = x
@@ -62,12 +63,15 @@ cdef public void py_del_agent "CyclusPyDelAgent" (int i):
     """Clears the cache of a single agent ref"""
     cyclib._del_agent(i)
 
-cdef public void py_call_listeners "CyclusPyCallListeners" (TimeSeriesType tstype, 
-                            Agent* cpp_agent, void* cpp_ctx, int time, double value):
+cdef public void py_call_listeners "CyclusPyCallListeners" (std_string cpp_tsname, 
+                            Agent* cpp_agent, void* cpp_ctx, int time, hold_any cpp_value):
     """Calls the python time series listeners
     """
     ctx = PyCapsule_New(cpp_ctx, <char*> b"ctx", NULL)
     agent = PyCapsule_New(cpp_agent, <char*> b"agent", NULL)
+    value = PyCapsule_New(&cpp_value, <char*> b"value", NULL)    
+    py_tsname = std_string_to_py(cpp_tsname)    
     py_agent = cyclib.capsule_agent_to_py(agent, ctx)
-    cyclib.call_listeners(tstype, py_agent, time, value)
+    py_value = ts.capsule_any_to_py(value)
+    cyclib.call_listeners(py_tsname, py_agent, time, py_value)
 

@@ -6,8 +6,12 @@
 #include <vector>
 #include <functional>
 
+#include "boost/variant.hpp"
+#include "boost/variant/get.hpp"
+
 #include "agent.h"
 #include "context.h"
+#include "any.hpp"
 
 namespace cyclus {
 namespace toolkit {
@@ -24,8 +28,15 @@ enum TimeSeriesType : int{
 };
 
 /// Stores global information for the time series call backs.
-typedef std::function<void(cyclus::Agent*, int, double)> time_series_listener_t;
-extern std::map<TimeSeriesType, std::vector<time_series_listener_t> > TIME_SERIES_LISTENERS_DOUBLE;
+typedef boost::variant<    
+    std::function<void(cyclus::Agent*, int, bool)>,
+    std::function<void(cyclus::Agent*, int, int)>,
+    std::function<void(cyclus::Agent*, int, float)>,
+    std::function<void(cyclus::Agent*, int, double)>,
+    std::function<void(cyclus::Agent*, int, std::string)>
+    > time_series_listener_t;
+
+extern std::map<std::string, std::vector<time_series_listener_t> > TIME_SERIES_LISTENERS;
 
 /// Records a per-time step quantity for a given type
 template <TimeSeriesType T>
@@ -35,15 +46,19 @@ void RecordTimeSeries(cyclus::Agent* agent, double value);
 template <typename T>
 void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
   std::string tblname = "TimeSeries" + tsname;
+  int time = agent->context()->time();
   agent->context()->NewDatum(tblname)
        ->AddVal("AgentId", agent->id())
-       ->AddVal("Time", agent->context()->time())
+       ->AddVal("Time", time)
        ->AddVal("Value", value)
        ->Record();
+  std::vector<time_series_listener_t> vec = TIME_SERIES_LISTENERS[tsname];
+  for (auto f=vec.begin(); f != vec.end(); ++f){
+    std::function<void(cyclus::Agent*, int, T)> fn = boost::get<std::function<void(cyclus::Agent*, int, T)> >(*f);
+    fn(agent, time, value); 
+  }
+  PyCallListeners(tsname, agent, agent->context(), time, value);
 }
-
-/// Helper function for calling listeners, should not be called directly.
-void CallListenersDouble(TimeSeriesType tstype, cyclus::Agent* agent, double value);
 
 }  // namespace toolkit
 }  // namespace cyclus

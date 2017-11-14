@@ -889,6 +889,8 @@ TYPESYSTEM_PYX = JENV.from_string('''
 
 {{ npy_imports }}
 
+from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
+
 # local imports
 from cyclus cimport cpp_typesystem
 from cyclus cimport cpp_cyclus
@@ -901,7 +903,6 @@ import collections
 from binascii import hexlify
 
 from cyclus import nucname
-
 #
 # Resources & Inventories
 #
@@ -1749,7 +1750,6 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
     # Bug #1561 in Cython
     {%- for i, t in enumerate(ts.uniquetypes) %}
     {% if i > 0 %}el{% endif %}if valhash == typeid({{ ts.funcname(t) }}_t).hash_code():
-        #rtn = {{ ts.hold_any_to_py('value', t) }}
         rtn = any_{{ ts.funcname(t) }}_to_py(value)
     {%- endfor %}
     else:
@@ -1757,6 +1757,13 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
         raise TypeError(msg)
     return rtn
 
+def capsule_any_to_py(value):
+    """Converts a PyCapsule that holds a boost::spirit::hold_any to a python
+    value. 
+    """
+    cdef cpp_cyclus.hold_any* cpp_value = <cpp_cyclus.hold_any*>PyCapsule_GetPointer(value, <char*> b"value")
+    py_value = any_to_py(deref(cpp_value))
+    return py_value
 
 cdef object new_py_inst(cpp_cyclus.DbTypes dbtype):
     """Creates a new, empty Python instance of a database type."""

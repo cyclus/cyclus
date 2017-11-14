@@ -900,6 +900,7 @@ cdef extern from "toolkit/timeseries.h" namespace "cyclus::toolkit":
         ENRICH_SWU
         ENRICH_FEED        
     
+    void RecordTimeSeries[T](std_string, Agent*, T)
     void RecordTimeSeriesPower "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>" (Agent*, double)
     void RecordTimeSeriesEnrichSWU "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::ENRICH_SWU>" (Agent*, double)
     void RecordTimeSeriesEnrichFeed "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::ENRICH_FEED>" (Agent*, double)
