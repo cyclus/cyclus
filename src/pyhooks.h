@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "any.hpp"
+
 namespace cyclus {
 class Agent;
 /// Because of NumPy #7595, we can only initialize & finalize the Python
@@ -57,7 +59,7 @@ std::string PyToJson(std::string);
 std::string JsonToPy(std::string);
 
 /// Calls the Python listeners
-void PyCallListeners(TimeSeriesType tstype, Agent* agent, void* cpp_ctx, int time, double value);
+void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value);
 
 }  // ends namespace toolkit
 }  // ends namespace cyclus

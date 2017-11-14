@@ -1922,32 +1922,44 @@ POWER = cpp_cyclus.POWER
 ENRICH_SWU = cpp_cyclus.ENRICH_SWU
 ENRICH_FEED = cpp_cyclus.ENRICH_FEED
 
-def record_time_series(int tstype, object agent, float value):
+def record_time_series(object tstype, object agent, object value):
     """Python hook into RecordTimeSeries for Python archetypes
     
     Parameters
     ----------
-    tstype : int
-        Time series type flag; POWER, ENRICH_SWU, etc.
+    tstype : int or string
+        Time series type flag; POWER, ENRICH_SWU, etc or the string flag.
     agent : object
         Python agent, usually self when called by an archetype.
     value : float
         The value being recorded in the time series.
     """
     cdef cpp_cyclus.Agent* a_ptr = dynamic_agent_ptr(agent)
-    if tstype == POWER:
-        cpp_cyclus.RecordTimeSeriesPower(a_ptr, value)
-    elif tstype == ENRICH_SWU:
-        cpp_cyclus.RecordTimeSeriesEnrichSWU(a_ptr, value)
-    elif tstype == ENRICH_FEED:
-        cpp_cyclus.RecordTimeSeriesEnrichFeed(a_ptr, value)
+    if isinstance(tstype, str):
+        if isinstance(value, bool):
+            cpp_cyclus.RecordTimeSeries[ts.bool_t](tstype, a_ptr, ts.bool_to_cpp(value))
+        elif isinstance(value, int):
+            cpp_cyclus.RecordTimeSeries[int](tstype, a_ptr, ts.int_to_cpp(value))
+        elif isinstance(value, float):
+            cpp_cyclus.RecordTimeSeries[double](tstype, a_ptr, ts.double_to_cpp(value))
+        elif isinstance(value, str):
+            cpp_cyclus.RecordTimeSeries[ts.std_string_t](tstype, a_ptr, ts.str_py_to_cpp(value))
+        else:
+            raise TypeError("Unsupported type in time series record")
+    else:
+        if tstype == POWER:
+            cpp_cyclus.RecordTimeSeriesPower(a_ptr, value)
+        elif tstype == ENRICH_SWU:
+            cpp_cyclus.RecordTimeSeriesEnrichSWU(a_ptr, value)
+        elif tstype == ENRICH_FEED:
+            cpp_cyclus.RecordTimeSeriesEnrichFeed(a_ptr, value)
 
 
 TIME_SERIES_LISTENERS = defaultdict(list)
 
-def call_listeners(tstype, agent, time, value):
+def call_listeners(tsname, agent, time, value):
     """Calls the time series listener functions of cyclus agents. 
     """
-    vec = TIME_SERIES_LISTENERS[tstype]
+    vec = TIME_SERIES_LISTENERS[tsname]
     for f in vec:
         f(agent, time, value)

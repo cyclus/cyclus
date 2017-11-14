@@ -1,6 +1,16 @@
 """Header for Cyclus Python Input Files."""
 from libcpp.string cimport string as std_string
+from libcpp.typeinfo cimport type_info
 from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
+
+cdef extern from "cyclus.h" namespace "boost::spirit":
+
+    cdef cppclass hold_any:
+        hold_any() except +
+        hold_any(const char*) except +
+        hold_any assign[T](T) except +
+        T cast[T]() except +
+        const type_info& type() except +
 
 cdef extern from "agent.h" namespace "cyclus":
 
@@ -46,5 +56,5 @@ cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
 cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ()
 cdef public void py_del_agent "CyclusPyDelAgent" (int i)
 
-cdef public void py_call_listeners "CyclusPyCallListeners" (TimeSeriesType tstype, 
-                            Agent* cpp_agent, void* cpp_ctx, int time, double value)
+cdef public void py_call_listeners "CyclusPyCallListeners" (std_string cpp_tsname, 
+                            Agent* cpp_agent, void* cpp_ctx, int time, hold_any cpp_value)
