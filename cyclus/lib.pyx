@@ -1271,7 +1271,6 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     if a_ptx == NULL:
         return None
     cdef int a_id = a_ptx.id()
-    print("trying to find", a_id, " ", _AGENT_REFS)
     if a_id in _AGENT_REFS:
         return _AGENT_REFS[a_id]
     if ctx is None:

@@ -98,7 +98,6 @@ Context::~Context() {
 void Context::DelAgent(Agent* m) {
   int n = agent_list_.erase(m);
   if (n == 1) {
-    std::cout << "Deleting agent " << m->id() << "\n";
     PyDelAgent(m->id());
     delete m;
     m = NULL;
