@@ -1899,7 +1899,6 @@ cpdef object make_py_agent(object libname, object agentname, object ctx_capsule)
                                                                       <char*> b"ctx")
     agent = cls(ctx)
     (<_Agent> agent)._free = False
-    print("made py agent ", cls.__name__, " number ", agent.id)
     _AGENT_REFS[agent.id] = agent
     rtn = PyCapsule_New((<_Agent> agent).ptx, <char*> b"agent", NULL)
     return rtn, agent.kind

@@ -182,23 +182,9 @@ class Context {
       throw KeyError("Invalid prototype name " + proto_name);
     }
 
-    std::cout << "Making angent and have prototypes:\n";
-    for (auto p = protos_.begin(); p != protos_.end(); ++p) {
-      std::cout << "  " << p->first << " " << p->second->id() << "\n";
-    }
-
     Agent* m = protos_[proto_name];
     T* casted(NULL);
     Agent* clone = m->Clone();
-/*
-    if (clone == NULL && DynamicModule::IsPyAgent(m->spec())) {
-      //DynamicModule* dm = DynamicModule::modules_[m->spec()];
-      std::cout << "~~~~ Found python agent!\n";
-      clone = DynamicModule::Make(this, m->spec());
-      cyclus::InitFromPyAgent(m, clone, this);
-    }
-*/
-    std::cout << "Just cloned " << proto_name << " " << m->id() << " to " << clone->id() <<  "\n";
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
       PyDelAgent(clone->id());

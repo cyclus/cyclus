@@ -93,15 +93,12 @@ Context::~Context() {
   for (int i = 0; i < to_del.size(); ++i) {
     DelAgent(to_del[i]);
   }
-  ClearPyAgentRefs();
 }
 
 void Context::DelAgent(Agent* m) {
   int n = agent_list_.erase(m);
   if (n == 1) {
     std::cout << "Deleting agent " << m->id() << "\n";
-    //if (m->id() == 6)
-    //  throw cyclus::Error("yo");
     PyDelAgent(m->id());
     delete m;
     m = NULL;
