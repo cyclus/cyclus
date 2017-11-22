@@ -485,13 +485,23 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         # call generic python
         (<object> this.self).infile_to_db(py_tree, py_di)
 
+    #void InitFrom(cpp_cyclus.QueryableBackend* b):
+    #    cpp_cyclus.Facility.InitFrom(b)
+    #    cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
+    #    res, _ = lib.single_query_result_to_py(qr, 0)
+    #    print("intializing from dict", res)
+    #    # call generic python
+    #    (<object> this.self).init_from_dict(res)
+
     void InitFrom(cpp_cyclus.QueryableBackend* b):
         cpp_cyclus.Facility.InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         print("intializing from dict", res)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)

@@ -1908,7 +1908,6 @@ cpdef object make_py_agent(object libname, object agentname, object ctx_capsule)
 cpdef void _clear_agent_refs():
     """Clears the agent references cache. Users should never need to call this."""
     global _AGENT_REFS
-    return
     _AGENT_REFS.clear()
 
 
@@ -1917,7 +1916,6 @@ cpdef void _del_agent(int i):
     call this.
     """
     global _AGENT_REFS
-    return
     if i in _AGENT_REFS:
         del _AGENT_REFS[i]
 
