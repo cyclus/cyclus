@@ -1,8 +1,9 @@
+import os
+import re
 import json
 import subprocess
-import os
 
-from nose.tools import assert_in
+from nose.tools import assert_in, assert_true, assert_greater_equal
 
 inputfile = {
  'simulation': {
@@ -44,7 +45,7 @@ inputfile = {
 }
 
 
-def test_record_time_series():
+def test_bear_deploy():
     if os.path.exists('bears.h5'):
         os.remove('bears.h5')
     with open('bears.json', 'w') as f:
@@ -55,10 +56,10 @@ def test_record_time_series():
                                 universal_newlines=True, env=env)
     # test that the institution deploys a BearStore
     assert_in("New fac: BearStore", s)
-    # test that the first agent exits and had expected minimum production
-    assert_in("Agent 14 8.0", s)
-    # test that the last or second to last agent exits and had expected minimum production
-    assert_in("Agent 30 8.0", s)
+    # test that the first agents exist with right minimum production.
+    agents = re.compile('Agent \d+ 8\.0')
+    all_agents = set(agents.findall(s))
+    assert_greater_equal(len(all_agents), 9)
     if os.path.exists('bears.json'):
         os.remove('bears.json')
     if os.path.exists('bears.h5'):
