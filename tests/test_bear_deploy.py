@@ -1,0 +1,65 @@
+import json
+import subprocess
+import os
+
+from nose.tools import assert_in
+
+inputfile = {
+ 'simulation': {
+  'archetypes': {
+   'spec': [
+    {'lib': 'bear_deploy', 'name': 'DemandFac'},
+    {'lib': 'agents', 'name': 'NullRegion'},
+    {'lib': 'bear_deploy', 'name': 'NOInst'},
+   ],
+  },
+  'control': {'duration': 35, 'startmonth': 1, 'startyear': 2000},
+  'facility': {
+   'config': {
+    'DemandFac': {
+     'commodity': 'bears',
+     'production_rate_max': 12,
+     'production_rate_min': 8,
+    },
+   },
+   'name': 'BearStore',
+  },
+  'region': {
+   'config': {'NullRegion': '\n      '},
+   'institution': {
+    'config': {
+     'NOInst': {
+      'growth_commod': 'bears',
+      'growth_rate': 0.05,
+      'initial_demand': 20.0,
+      'prototypes': {'val': 'BearStore'},
+     },
+    },
+    'initialfacilitylist': {'entry': {'number': 2, 'prototype': 'BearStore'}},
+    'name': 'SingleInstitution',
+   },
+   'name': 'SingleRegion',
+  },
+ },
+}
+
+
+def test_record_time_series():
+    if os.path.exists('bears.h5'):
+        os.remove('bears.h5')
+    with open('bears.json', 'w') as f:
+        json.dump(inputfile, f)
+    env = dict(os.environ)
+    env['PYTHONPATH'] = "."
+    s = subprocess.check_output(['cyclus', '-o', 'bears.h5', 'bears.json'],
+                                universal_newlines=True, env=env)
+    # test that the institution deploys a BearStore
+    assert_in("New fac: BearStore", s)
+    # test that the first agent exits and had expected minimum production
+    assert_in("Agent 14 8.0", s)
+    # test that the last or second to last agent exits and had expected minimum production
+    assert_in("Agent 30 8.0", s)
+    if os.path.exists('bears.json'):
+        os.remove('bears.json')
+    if os.path.exists('bears.h5'):
+        os.remove('bears.h5')
