@@ -467,10 +467,10 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
     #    return dynamic_cast[agent_ptr](
     #            reinterpret_cast[facility_shim_ptr]((<_Agent> a).shim))
     cpp_cyclus.Agent* Clone():
-        #return NULL
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
-        cdef _Facility a = (<_Facility> (<CyclusFacilityShim*> this).self)._new(ctx)
+        #cdef _Facility a = (<_Facility> (<CyclusFacilityShim*> this).self)._new(ctx)
+        cdef _Facility a = type(<object> this.self)(ctx)
         (<CyclusFacilityShim*> (<_Agent> a).shim).InitFromAgent(<CyclusFacilityShim*> this)
         (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
