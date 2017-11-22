@@ -32,6 +32,7 @@ class Trader;
 class Timer;
 class TimeListener;
 class SimInit;
+class DynamicModule;
 
 /// Container for a static simulation-global parameters that both describe
 /// the simulation and affect its behavior.
@@ -184,6 +185,11 @@ class Context {
     Agent* m = protos_[proto_name];
     T* casted(NULL);
     Agent* clone = m->Clone();
+    if (clone == NULL && DynamicModule::Exists(m->spec())) {
+      //DynamicModule* dm = DynamicModule::modules_[m->spec()];
+      clone = DynamicModule::Make(this, m->spec());
+    }
+    std::cout << "Just cloned " << proto_name << " " << m->id() << " to " << clone->id() <<  "\n";
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
       PyDelAgent(clone->id());

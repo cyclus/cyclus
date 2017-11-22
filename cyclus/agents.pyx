@@ -451,10 +451,20 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         rtn = (<object> this.self).version
         return str_py_to_cpp(rtn)
 
+    #cpp_cyclus.Agent* Clone():
+    #    cdef lib._Context ctx = lib.Context(init=False)
+    #    (<lib._Context> ctx).ptx = this.context()
+    #    cdef _Facility a = type(<object> this.self)(ctx)
+    #    (<CyclusFacilityShim*> (<_Agent> a).shim).InitFromAgent(<CyclusFacilityShim*> this)
+    #    (<lib._Agent> a)._free = False
+    #    lib._AGENT_REFS[a.id] = a
+    #    return dynamic_cast[agent_ptr](
+    #            reinterpret_cast[facility_shim_ptr]((<_Agent> a).shim))
     cpp_cyclus.Agent* Clone():
+        return NULL
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
-        cdef _Facility a = type(<object> this.self)(ctx)
+        cdef _Facility a = (<_Facility> (<CyclusFacilityShim*> this).self)._new(ctx)
         (<CyclusFacilityShim*> (<_Agent> a).shim).InitFromAgent(<CyclusFacilityShim*> this)
         (<lib._Agent> a)._free = False
         lib._AGENT_REFS[a.id] = a
@@ -479,6 +489,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         cpp_cyclus.Facility.InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
+        print("intializing from dict", res)
         # call generic python
         (<object> this.self).init_from_dict(res)
 
@@ -775,6 +786,8 @@ cdef class _Agent(lib._Agent):
         """
         for name, var in self._statevars:
             setattr(self, name, deepcopy(getattr(other, name, None)))
+            print("  setting ", name, " from ", other.id, " -> ", self.id,  " as ",
+                  getattr(other, name, None), getattr(self, name, None))
         for (name, inv), (_, other_inv) in zip(self._inventories, other._inventories):
             inv.value.capacity = other_inv.value.capacity
 
@@ -891,8 +904,9 @@ cdef class _Agent(lib._Agent):
         Users should not need to call this ever. However, brave
         users may choose to override it in exceptional cases.
         """
-        for name, val in d.items():
-            setattr(self, name, val)
+        for name, var in self._statevars:
+            print("  setting ", name, " on ", self.id, " as ", d[name])
+            setattr(self, name, d[name])
         for name, inv in self._inventories:
             if isinstance(inv.capacity, str):
                 inv.value.capacity = d[inv.capacity]
@@ -1113,7 +1127,7 @@ class Institution(_Institution):
 
 cdef class _Facility(_Agent):
 
-    def __cinit__(self, lib._Context ctx):
+    def __cinit__(self, lib._Context ctx, bint new=True):
         self.ptx = self.shim = <CyclusAgentShim*> new CyclusFacilityShim(ctx.ptx)
         self._free = True
         (<CyclusFacilityShim*> (<_Agent> self).shim).self = <PyObject*> self
@@ -1128,6 +1142,10 @@ cdef class _Facility(_Agent):
             self.ptx = self.shim = NULL
         else:
             self.ptx = self.shim = NULL
+
+    def _new(self, ctx):
+        n = self.__class__(ctx)
+        return n
 
     @property
     def id(self):
@@ -1250,7 +1268,7 @@ cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
     elif a.kind == "Region":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[region_ptr]((<lib._Agent> a).ptx))
-    elif a.kind == "Institution":
+    elif a.kind == "Inst":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[institution_ptr]((<lib._Agent> a).ptx))
     elif a.kind == "Facility":
