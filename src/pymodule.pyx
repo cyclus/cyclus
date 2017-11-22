@@ -54,6 +54,20 @@ cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
     return rtn
 
 
+cdef public void init_from_py_agent "CyclusInitFromPyAgent" (Agent* cpp_src,
+                                                             Agent* cpp_dst,
+                                                             void* cpp_ctx):
+    """Initializes the dst agent with the settings from the src. Users will not
+    normally need to call this. Useful for cloning prototypes.
+    """
+    ctx = PyCapsule_New(cpp_ctx, <char*> b"ctx", NULL)
+    src = PyCapsule_New(cpp_src, <char*> b"agent", NULL)
+    dst = PyCapsule_New(cpp_dst, <char*> b"agent", NULL)
+    py_src = cyclib.capsule_agent_to_py(src, ctx)
+    py_dst = cyclib.capsule_agent_to_py(dst, ctx)
+    py_dst.init_from_agent(py_src)
+
+
 cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ():
     """Clears the cache of agent referencess"""
     cyclib._clear_agent_refs()

@@ -71,6 +71,10 @@ class DynamicModule {
   /// been destructed.
   static void CloseAll();
 
+  /// Tests that an agent spec is for a Python Agent. This will also return false
+  /// if the agent doesn't already exist.
+  static bool IsPyAgent(AgentSpec spec);
+
   /// The path to the module's shared object library.
   std::string path();
 

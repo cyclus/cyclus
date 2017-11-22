@@ -185,8 +185,9 @@ class Context {
     Agent* m = protos_[proto_name];
     T* casted(NULL);
     Agent* clone = m->Clone();
-    if (clone == NULL && DynamicModule::Exists(m->spec())) {
+    if (clone == NULL && DynamicModule::IsPyAgent(m->spec())) {
       //DynamicModule* dm = DynamicModule::modules_[m->spec()];
+      std::cout << "~~~~ Found python agent!\n";
       clone = DynamicModule::Make(this, m->spec());
     }
     std::cout << "Just cloned " << proto_name << " " << m->id() << " to " << clone->id() <<  "\n";

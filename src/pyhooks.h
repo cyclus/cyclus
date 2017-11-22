@@ -43,6 +43,9 @@ std::string PyFindModule(std::string);
 /// Finds a Python module and returns an agent pointer from it.
 Agent* MakePyAgent(std::string, std::string, void*);
 
+/// Initializes a Python agent fron another agent
+void InitFromPyAgent(Agent*, Agent*, void*);
+
 /// Removes all Python agents from the internal cache. There is usually
 /// no need for a user to call this.
 void ClearPyAgentRefs(void);

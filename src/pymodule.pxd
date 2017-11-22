@@ -37,7 +37,7 @@ cdef extern from "facility.h" namespace "cyclus":
 ctypedef Facility* facility_ptr
 
 cdef extern from "toolkit/timeseries.h" namespace "cyclus::toolkit":
-    
+
     cdef enum TimeSeriesType:
         POWER
         ENRICH_SWU
@@ -53,8 +53,12 @@ cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
                                                       std_string cpp_agent,
                                                       void* cpp_ctx)
 
+cdef public void init_from_py_agent "CyclusInitFromPyAgent" (Agent* cpp_src,
+                                                             Agent* cpp_dst,
+                                                             void* cpp_ctx)
+
 cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ()
 cdef public void py_del_agent "CyclusPyDelAgent" (int i)
 
-cdef public void py_call_listeners "CyclusPyCallListeners" (std_string cpp_tsname, 
+cdef public void py_call_listeners "CyclusPyCallListeners" (std_string cpp_tsname,
                             Agent* cpp_agent, void* cpp_ctx, int time, hold_any cpp_value)
