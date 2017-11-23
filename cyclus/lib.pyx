@@ -57,7 +57,7 @@ cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
     elif a.kind == "Region":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[region_ptr]((<_Agent> a).ptx))
-    elif a.kind == "Institution":
+    elif a.kind == "Inst":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[institution_ptr]((<_Agent> a).ptx))
     elif a.kind == "Facility":
@@ -1260,9 +1260,9 @@ class SimInit(_SimInit):
 
 cpdef object capsule_agent_to_py(object agent, object ctx):
     """Returns an agent from its id"""
-    cdef cpp_cyclus.Agent* avoid = <cpp_cyclus.Agent*> PyCapsule_GetPointer(agent, <char*> b"agent")        
+    cdef cpp_cyclus.Agent* avoid = <cpp_cyclus.Agent*> PyCapsule_GetPointer(agent, <char*> b"agent")
     a = agent_to_py(avoid, ctx)
-    return a    
+    return a
 
 
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
@@ -1273,10 +1273,15 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     cdef int a_id = a_ptx.id()
     if a_id in _AGENT_REFS:
         return _AGENT_REFS[a_id]
-    # have to make new wrapper instance
     if ctx is None:
+        # have to make new wrapper instance
         ctx = Context(init=False)
         (<_Context> ctx).ptx = a_ptx.context()
+    elif not isinstance(ctx, Context):
+        # have a pycapsule, need to pull it out
+        cap = ctx
+        ctx = Context(init=False)
+        (<_Context> ctx).ptx = <cpp_cyclus.Context*> PyCapsule_GetPointer(cap, <char*> b"ctx")
     cdef _Agent a = Agent(ctx)
     a.ptx = a_ptx
     _AGENT_REFS[a_id] = a
@@ -1913,8 +1918,8 @@ cpdef void _del_agent(int i):
         del _AGENT_REFS[i]
 
 #
-# Functions to allow for time series facilities to interaction with the timeseries 
-# callbacks.  
+# Functions to allow for time series facilities to interaction with the timeseries
+# callbacks.
 #
 
 
@@ -1924,7 +1929,7 @@ ENRICH_FEED = cpp_cyclus.ENRICH_FEED
 
 def record_time_series(object tstype, object agent, object value):
     """Python hook into RecordTimeSeries for Python archetypes
-    
+
     Parameters
     ----------
     tstype : int or string
@@ -1958,7 +1963,7 @@ def record_time_series(object tstype, object agent, object value):
 TIME_SERIES_LISTENERS = defaultdict(list)
 
 def call_listeners(tsname, agent, time, value):
-    """Calls the time series listener functions of cyclus agents. 
+    """Calls the time series listener functions of cyclus agents.
     """
     vec = TIME_SERIES_LISTENERS[tsname]
     for f in vec:

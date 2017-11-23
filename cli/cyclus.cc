@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
         XMLFlatLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
         l.LoadSim();
       } else {
-        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);     
+        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
         l.LoadSim();
       }
     } catch (cyclus::Error e) {

@@ -60,3 +60,6 @@ src/pymodule.h
 
 # this is copied over by the installer
 cyclus/cycpp.py
+
+# Rever
+rever/

@@ -32,6 +32,7 @@ class Trader;
 class Timer;
 class TimeListener;
 class SimInit;
+class DynamicModule;
 
 /// Container for a static simulation-global parameters that both describe
 /// the simulation and affect its behavior.

@@ -93,7 +93,9 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
@@ -215,7 +217,9 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
@@ -343,7 +347,9 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
@@ -480,7 +486,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
@@ -891,8 +899,8 @@ cdef class _Agent(lib._Agent):
         Users should not need to call this ever. However, brave
         users may choose to override it in exceptional cases.
         """
-        for name, val in d.items():
-            setattr(self, name, val)
+        for name, var in self._statevars:
+            setattr(self, name, d[name])
         for name, inv in self._inventories:
             if isinstance(inv.capacity, str):
                 inv.value.capacity = d[inv.capacity]
@@ -1250,7 +1258,7 @@ cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
     elif a.kind == "Region":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[region_ptr]((<lib._Agent> a).ptx))
-    elif a.kind == "Institution":
+    elif a.kind == "Inst":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[institution_ptr]((<lib._Agent> a).ptx))
     elif a.kind == "Facility":

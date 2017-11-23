@@ -80,6 +80,10 @@ Agent* MakePyAgent(std::string lib, std::string agent, void* ctx) {
   return CyclusMakePyAgent(lib, agent, ctx);
 };
 
+void InitFromPyAgent(Agent* src, Agent* dst, void* ctx) {
+  CyclusInitFromPyAgent(src, dst, ctx);
+};
+
 void ClearPyAgentRefs(void) { CyclusClearPyAgentRefs(); };
 
 void PyDelAgent(int i) { CyclusPyDelAgent(i); };
@@ -117,6 +121,8 @@ void EventLoop(void) {};
 std::string PyFindModule(std::string lib) { return std::string(""); };
 
 Agent* MakePyAgent(std::string lib, std::string agent, void* ctx) { return NULL; };
+
+void InitFromPyAgent(Agent* src, Agent* dst, void* ctx) {};
 
 void ClearPyAgentRefs(void) {};
 
