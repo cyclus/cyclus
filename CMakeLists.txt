@@ -103,6 +103,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Include macros
     INCLUDE(CopyWhenDiffMacro)
+    INCLUDE(DownloadAndExtract)
     INCLUDE(UseCyclus)
 
     # set configuration for all library builds
