@@ -106,6 +106,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     INCLUDE(DownloadAndExtract)
     INCLUDE(UseCyclus)
 
+    # set configuration for fast compiling
+    cyclus_set_fast_compile()
+
     # set configuration for all library builds
     IF (WIN32)
         set(suffix ".dll")
