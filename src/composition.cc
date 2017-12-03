@@ -149,7 +149,7 @@ Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
 
   // perform decay
   std::vector<double> n1 (pyne_cram_transmute_info.n);
-  cyclus_expm_multiply14(decay_matrix.data(), n0.data(), n1.data());
+  pyne_cram_expm_multiply14(decay_matrix.data(), n0.data(), n1.data());
 
   // convert back to map
   CompMap cm;

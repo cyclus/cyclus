@@ -8,7 +8,7 @@ macro(download_and_extract _url _checkfile)
   else()
     get_filename_component(_base "${_url}" NAME)
     # download the file if we need to
-    if(NOT EXIST "${CMAKE_CURRENT_SOURCE_DIR}/${_base}")
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_base}")
       message(STATUS "Downloading ${_url} -> ${_base}")
       file(DOWNLOAD "${_url}" "${CMAKE_CURRENT_SOURCE_DIR}/${_base}"
            SHOW_PROGRESS STATUS _rtn TLS_VERIFY OFF)

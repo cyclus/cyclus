@@ -345,7 +345,7 @@ macro(fast_compile _srcname _gnuflags _clangflags _otherflags)
     message(STATUS "Compiling ${_srcname} fast from assembly ${_asmname}")
     set(_filename "${_asmname}")
   endif()
-  set(CYCLUS_CORE_SRC "${CYCLUS_CORE_SRC}" "${_filename}")
+  set(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} "${_filename}")
 
   # set some compile flags for the selected file
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
