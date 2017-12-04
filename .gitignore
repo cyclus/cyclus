@@ -41,6 +41,8 @@ tests/libcyclus-test.h5
 tests/libcyclus-test.sqlite
 test/dummy.json
 test/dummy.h5
+test/default-toaster.json
+test/default-toaster.h5
 rs.cred
 
 # Docker stuff
