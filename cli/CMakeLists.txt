@@ -51,6 +51,7 @@ TARGET_LINK_LIBRARIES(
     dl
     ${LIBS}
     cyclus
+    agents
     ${CYCLUS_TEST_LIBRARIES}
     )
 
