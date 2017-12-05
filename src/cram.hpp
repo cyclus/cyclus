@@ -22,7 +22,6 @@ int pyne_cram_transmute_ij(int i, int j);
 
 int pyne_cram_transmute_nucid_to_i(int nucid);
 
-
 void pyne_cram_solve_double(double* A, double* b, double* x);
 void pyne_cram_diag_add_double(double* A, double alpha);
 void pyne_cram_dot_double(double* A, double* x, double* y);
