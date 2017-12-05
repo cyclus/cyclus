@@ -9,8 +9,6 @@ use_cyclus("agents" "prey")
 use_cyclus("agents" "predator")
 install_cyclus_module("agents" "" "NONE")
 
-MESSAGE("agents_TEST_CC: ${agents_TEST_CC}")
-
 SET(
     CYCLUS_CORE_TEST_SOURCE "${CYCLUS_CORE_TEST_SOURCE}"
     "${agents_TEST_CC}"
