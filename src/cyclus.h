@@ -9,6 +9,9 @@
 #include "comp_math.h"
 #include "composition.h"
 #include "context.h"
+extern "C" {
+#include "cram.hpp"
+}
 #include "cyc_arithmetic.h"
 #include "cyc_limits.h"
 #include "cyc_std.h"
@@ -39,9 +42,6 @@
 #include "time_listener.h"
 #include "trade.h"
 #include "trader.h"
-extern "C" {
-#include "transmute.h"
-}
 #include "version.h"
 
 #include "toolkit/builder.h"
