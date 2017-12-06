@@ -801,7 +801,7 @@ cdef class _Agent(lib._Agent):
                 var.value = var.default
                 continue
             query = var.alias if isinstance(var.alias, str) else var.alias[0]
-            if var.default is not None and tree.nmatches(query) == 0:
+            if var.default is not None and sub.nmatches(query) == 0:
                 var.value = var.default
                 continue
             else:
