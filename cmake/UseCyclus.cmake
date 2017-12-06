@@ -212,7 +212,7 @@ MACRO(USE_CYCLUS lib_root src_root)
             DEPENDS ${CYCLUS_CUSTOM_HEADERS}
             COMMENT "Copying ${CCTIN} to ${CCTOUT}."
             )
-        SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCOUT}" "${CCTOUT}"
+        SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCTOUT}"
             CACHE INTERNAL "Agent test source" FORCE)
     ENDIF(EXISTS "${CCTIN}")
     MESSAGE(STATUS "Finished construction of build files for agent: ${src_root}")
@@ -290,6 +290,7 @@ MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
         TARGET_LINK_LIBRARIES(
             ${TGT} dl
             ${LIBS}
+            ${lib_name}
             ${CYCLUS_TEST_LIBRARIES}
             )
         INSTALL(
