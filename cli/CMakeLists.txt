@@ -47,8 +47,11 @@ ADD_EXECUTABLE(
     )
 
 TARGET_LINK_LIBRARIES(
-    cyclus_unit_tests dl
+    cyclus_unit_tests
+    dl
     ${LIBS}
+    cyclus
+    agents
     ${CYCLUS_TEST_LIBRARIES}
     )
 

@@ -212,7 +212,7 @@ MACRO(USE_CYCLUS lib_root src_root)
             DEPENDS ${CYCLUS_CUSTOM_HEADERS}
             COMMENT "Copying ${CCTIN} to ${CCTOUT}."
             )
-        SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCOUT}" "${CCTOUT}"
+        SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCTOUT}"
             CACHE INTERNAL "Agent test source" FORCE)
     ENDIF(EXISTS "${CCTIN}")
     MESSAGE(STATUS "Finished construction of build files for agent: ${src_root}")
@@ -290,6 +290,7 @@ MACRO(INSTALL_AGENT_TESTS_ lib_name test_src test_h driver inst_dir)
         TARGET_LINK_LIBRARIES(
             ${TGT} dl
             ${LIBS}
+            ${lib_name}
             ${CYCLUS_TEST_LIBRARIES}
             )
         INSTALL(
@@ -312,3 +313,48 @@ macro(add_all_subdirs)
         endif()
     endforeach(dir)
 endmacro()
+
+
+macro(cyclus_set_fast_compile)
+  if(NOT DEFINED CYCLUS_FAST_COMPILE)
+    set(CYCLUS_FAST_COMPILE TRUE)
+  endif()
+  message(STATUS "CYCLUS Fast Compile: ${CYCLUS_FAST_COMPILE}")
+endmacro()
+
+
+# fast compile with assembly, if available.
+macro(fast_compile _srcname _gnuflags _clangflags _otherflags)
+  get_filename_component(_base "${_srcname}" NAME_WE)  # get the base name, without the extension
+  # get the assembly file name
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(_asmname "${_base}-gnu.s")
+  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT APPLE)
+    set(_asmname "${_base}-clang.s")
+  else()
+    set(_asmname "${_base}-NOTFOUND")
+  endif()
+
+  # pick the filename to compile, either source or assembly
+  if(NOT CYCLUS_FAST_COMPILE)
+    message(STATUS "Not fast compiling ${_srcname} since PyNE fast compile is disabled.")
+    set(_filename "${_srcname}")
+  elseif(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_asmname}")
+    message(STATUS "Not fast compiling ${_srcname} since ${CMAKE_CURRENT_SOURCE_DIR}/${_asmname} does not exist.")
+    set(_filename "${_srcname}")
+  else()
+    message(STATUS "Compiling ${_srcname} fast from assembly ${_asmname}")
+    set(_filename "${_asmname}")
+  endif()
+  set(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} "${_filename}")
+
+  # set some compile flags for the selected file
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set_source_files_properties("${_filename}" PROPERTIES COMPILE_FLAGS "${_gnuflags}")
+  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT APPLE)
+    set_source_files_properties("${_filename}" PROPERTIES COMPILE_FLAGS "${_clangflags}")
+  else()
+    set_source_files_properties("${_filename}" PROPERTIES COMPILE_FLAGS "${_otherflags}")
+  endif()
+endmacro()
+
