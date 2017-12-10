@@ -25,6 +25,7 @@ class AttrToaster(Facility):
             'kind': self.kind,
             'spec': self.spec,
             'version': self.version,
+            'parent': self.parent_id,
             'prototype': self.prototype,
             }
         s = json.dumps(info)

@@ -1172,6 +1172,17 @@ cdef class _Facility(_Agent):
         cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
         (<CyclusFacilityShim*> (<_Agent> self).shim).spec(cpp_new_impl)
 
+    def parent(self):
+        """Returns parent of this agent.  Returns None if the agent has no parent.
+        """
+        rtn = lib.agent_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).parent(), None)
+        return rtn
+
+    @property
+    def parent_id(self):
+        """The id for this agent's parent or -1 if this agent has no parent."""
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).parent_id()
+
 
 class Facility(_Facility):
     """Python Facility that is subclassable into a facility archetype.

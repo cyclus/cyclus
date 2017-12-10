@@ -76,6 +76,9 @@ def test_pyagent_attr_toasters():
     info = json.loads(info)
     # test attrs
     assert_true(isinstance(info['id'], int))
+    assert_true(isinstance(info['parent'], int))
+    assert_true(info['parent'] != info['id'])
+    assert_true(0 <= info['parent'] < 10)
     assert_equals(info['kind'], 'Facility')
     assert_equals(info['spec'], ':toaster:AttrToaster')
     assert_equals(info['version'], '0.0.0')
