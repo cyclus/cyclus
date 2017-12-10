@@ -662,7 +662,7 @@ cdef extern from "agent.h" namespace "cyclus":
         cpp_jsoncpp.Value annotations() except +
         const std_string get_prototype "prototype" ()
         void prototype(std_string)
-        std_string spec()
+        std_string get_spec "spec" ()
         void spec(std_string)
         const std_string kind()
         Context* context()

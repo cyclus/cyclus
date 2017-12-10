@@ -1161,6 +1161,16 @@ cdef class _Facility(_Agent):
         cdef std_string cpp_p = str_py_to_cpp(p)
         (<CyclusFacilityShim*> (<_Agent> self).shim).prototype(cpp_p)
 
+    @property
+    def spec(self):
+        """The agent's spec."""
+        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).get_spec())
+        return rtn
+
+    @spec.setter
+    def spec(self, str new_impl):
+        cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
+        (<CyclusFacilityShim*> (<_Agent> self).shim).spec(cpp_new_impl)
 
 
 class Facility(_Facility):

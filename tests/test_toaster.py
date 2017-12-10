@@ -3,7 +3,7 @@ import re
 import json
 import subprocess
 
-from nose.tools import assert_in, assert_true
+from nose.tools import assert_in, assert_true, assert_equals
 
 
 DEFAULTFILE = {'simulation': {'archetypes': {'spec': [
@@ -43,8 +43,6 @@ def test_pyagent_defaults():
         os.remove('default-toaster.h5')
 
 
-RE_ID = re.compile('\w+ id is \d+')
-
 ATTRFILE = {'simulation': {'archetypes': {'spec': [
                                         {'lib': 'toaster', 'name': 'AttrToaster'},
                                         {'lib': 'agents', 'name': 'NullRegion'},
@@ -74,10 +72,14 @@ def test_pyagent_attr_toasters():
     env['PYTHONPATH'] = "."
     s = subprocess.check_output(['cyclus', '-o', oname, iname],
                                 universal_newlines=True, env=env)
-    # ids
-    assert_true(RE_ID.match(s[s.find('AttrToaster id is'):]) is not None)
-    # tests we can get prototype
-    assert_in("AttrToaster Prototype is HappyToaster", s)
+    info = s.split('=== Start AttrToaster ===\n')[-1].split('\n=== End AttrToaster ===')[0]
+    info = json.loads(info)
+    # test attrs
+    assert_true(isinstance(info['id'], int))
+    assert_equals(info['kind'], 'Facility')
+    assert_equals(info['spec'], ':toaster:AttrToaster')
+    assert_equals(info['version'], '0.0.0')
+    assert_equals(info['prototype'], 'HappyToaster')
     # clean up
     if os.path.exists(iname):
         os.remove(iname)

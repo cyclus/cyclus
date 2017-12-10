@@ -1429,7 +1429,7 @@ cdef class _Agent:
     @property
     def spec(self):
         """The agent's spec."""
-        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).spec())
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).get_spec())
         return rtn
 
     @spec.setter

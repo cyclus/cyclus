@@ -1,3 +1,5 @@
+import json
+
 from cyclus.agents import Facility
 from cyclus import lib
 import cyclus.typesystem as ts
@@ -18,7 +20,14 @@ class AttrToaster(Facility):
     """Meant for testing attributes values"""
 
     def tick(self):
-        print("=== Start AttrToaster ===\n{")
-        print('"id": {0},'.format(self.id))
-        print('"prototype": "{0}"'.format(self.prototype))
-        print("}\n=== End AttrToaster === ")
+        info = {
+            'id': self.id,
+            'kind': self.kind,
+            'spec': self.spec,
+            'version': self.version,
+            'prototype': self.prototype,
+            }
+        s = json.dumps(info)
+        print("=== Start AttrToaster ===\n")
+        print(s)
+        print("\n=== End AttrToaster ===")
