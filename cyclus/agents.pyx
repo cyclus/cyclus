@@ -1150,6 +1150,18 @@ cdef class _Facility(_Agent):
         rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).kind())
         return rtn
 
+    @property
+    def prototype(self):
+        """The agent's prototype."""
+        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).get_prototype())
+        return rtn
+
+    @prototype.setter
+    def prototype(self, str p):
+        cdef std_string cpp_p = str_py_to_cpp(p)
+        (<CyclusFacilityShim*> (<_Agent> self).shim).prototype(cpp_p)
+
+
 
 class Facility(_Facility):
     """Python Facility that is subclassable into a facility archetype.

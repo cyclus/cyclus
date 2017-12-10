@@ -1410,7 +1410,7 @@ cdef class _Agent:
     @property
     def prototype(self):
         """The agent's prototype."""
-        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).prototype())
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).get_prototype())
         return rtn
 
     @prototype.setter
@@ -1435,7 +1435,7 @@ cdef class _Agent:
     @spec.setter
     def spec(self, str new_impl):
         cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
-        (<cpp_cyclus.Agent*> self.ptx).prototype(cpp_new_impl)
+        (<cpp_cyclus.Agent*> self.ptx).spec(cpp_new_impl)
 
     @property
     def kind(self):
