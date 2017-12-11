@@ -1480,7 +1480,7 @@ cdef class _Agent:
         """The number of time steps this agent operates between building and
         decommissioning (-1 if the agent has an infinite lifetime)
         """
-        return (<cpp_cyclus.Agent*> self.ptx).lifetime()
+        return (<cpp_cyclus.Agent*> self.ptx).get_lifetime()
 
     @lifetime.setter
     def lifetime(self, int n_timesteps):

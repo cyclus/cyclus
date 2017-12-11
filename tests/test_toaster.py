@@ -74,15 +74,22 @@ def test_pyagent_attr_toasters():
                                 universal_newlines=True, env=env)
     info = s.split('=== Start AttrToaster ===\n')[-1].split('\n=== End AttrToaster ===')[0]
     info = json.loads(info)
-    # test attrs
+    # test ids
     assert_true(isinstance(info['id'], int))
     assert_true(isinstance(info['parent'], int))
     assert_true(info['parent'] != info['id'])
     assert_true(0 <= info['parent'] < 10)
+    assert_true(info['id'] == info['hash'])
+    # test attrs
+    assert_true(info['str'].startswith('Facility_HappyToaster'))
     assert_equals(info['kind'], 'Facility')
     assert_equals(info['spec'], ':toaster:AttrToaster')
     assert_equals(info['version'], '0.0.0')
     assert_equals(info['prototype'], 'HappyToaster')
+    assert_equals(info['enter_time'], 0)
+    assert_equals(info['lifetime'], -1)
+    assert_equals(info['exit_time'], -1)
+    assert_equals(len(info['childern']), 0)
     # clean up
     if os.path.exists(iname):
         os.remove(iname)

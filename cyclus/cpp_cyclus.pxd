@@ -670,8 +670,8 @@ cdef extern from "agent.h" namespace "cyclus":
         Agent* parent()
         const int parent_id()
         const int enter_time()
+        const int get_lifetime "lifetime" ()
         void lifetime(int)
-        const int lifetime()
         const int exit_time()
         const set[Agent*]& children()
 

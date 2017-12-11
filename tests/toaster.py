@@ -22,11 +22,17 @@ class AttrToaster(Facility):
     def tick(self):
         info = {
             'id': self.id,
+            'str': str(self),
+            'hash': hash(self),
             'kind': self.kind,
             'spec': self.spec,
             'version': self.version,
             'parent': self.parent_id,
             'prototype': self.prototype,
+            'enter_time': self.enter_time,
+            'lifetime': self.lifetime,
+            'exit_time': self.exit_time,
+            'childern': list(self.children),
             }
         s = json.dumps(info)
         print("=== Start AttrToaster ===\n")

@@ -1172,6 +1172,10 @@ cdef class _Facility(_Agent):
         cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
         (<CyclusFacilityShim*> (<_Agent> self).shim).spec(cpp_new_impl)
 
+    def __str__(self):
+        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).str())
+        return rtn
+
     def parent(self):
         """Returns parent of this agent.  Returns None if the agent has no parent.
         """
@@ -1182,6 +1186,46 @@ cdef class _Facility(_Agent):
     def parent_id(self):
         """The id for this agent's parent or -1 if this agent has no parent."""
         return (<CyclusFacilityShim*> (<_Agent> self).shim).parent_id()
+
+    @property
+    def enter_time(self):
+        """The time step at which this agent's Build function was called
+        (-1 if the agent has never been built).
+        """
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).enter_time()
+
+    @property
+    def lifetime(self):
+        """The number of time steps this agent operates between building and
+        decommissioning (-1 if the agent has an infinite lifetime)
+        """
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).get_lifetime()
+
+    @lifetime.setter
+    def lifetime(self, int n_timesteps):
+        (<CyclusFacilityShim*> (<_Agent> self).shim).lifetime(n_timesteps)
+
+    @property
+    def exit_time(self):
+        """The default time step at which this agent will exit the
+        simulation (-1 if the agent has an infinite lifetime).
+
+        Decomissioning happens at the end of a time step. With a lifetime of 1, we
+        expect an agent to go through only 1 entire time step. In this case, the
+        agent should be decommissioned on the same time step it was
+        created. Therefore, for agents with non-infinite lifetimes, the exit_time
+        will be the enter time plus its lifetime less 1.
+        """
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).exit_time()
+
+    @property
+    def children(self):
+        """A frozen set of the children of this agent."""
+        kids = []
+        for kid_ptx in (<CyclusFacilityShim*> (<_Agent> self).shim).children():
+            kid = lib.agent_to_py(kid_ptx, None)
+            kids.append(kid)
+        return frozenset(kids)
 
 
 class Facility(_Facility):
