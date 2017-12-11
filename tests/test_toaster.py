@@ -90,6 +90,7 @@ def test_pyagent_attr_toasters():
     assert_equals(info['lifetime'], -1)
     assert_equals(info['exit_time'], -1)
     assert_equals(len(info['childern']), 0)
+    assert_true(len(info['annotations']) > 0)
     # clean up
     if os.path.exists(iname):
         os.remove(iname)

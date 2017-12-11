@@ -26,11 +26,13 @@ from cyclus import lib
 from cyclus cimport cpp_typesystem
 from cyclus.typesystem cimport (py_to_any, any_to_py, str_py_to_cpp,
     std_string_to_py, bool_to_py, bool_to_cpp, std_set_std_string_to_py,
-    std_set_std_string_to_cpp)
+    std_set_std_string_to_cpp, std_vector_std_string_to_py)
 from cyclus cimport typesystem as ts
 from cyclus import typesystem as ts
 
 from cyclus cimport cpp_jsoncpp
+from cyclus cimport jsoncpp
+from cyclus import jsoncpp
 
 from cyclus import nucname
 
@@ -1137,18 +1139,59 @@ cdef class _Facility(_Agent):
         else:
             self.ptx = self.shim = NULL
 
-    @property
-    def id(self):
-        """The agent instance's unique ID within a simulation."""
-        return (<CyclusFacilityShim*> (<_Agent> self).shim).id()
+    def children_str(self):
+        """Returns recursively generated string of the parent-child tree."""
+        return std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).PrintChildren())
+
+    def tree_strs(self, m):
+        """Returns a list of children strings representing the parent-child tree
+        at the node for Agent m.
+        """
+        cdef cpp_cyclus.Agent* cpp_m = <cpp_cyclus.Agent*> (<_Agent> m).ptx
+        rtn = std_vector_std_string_to_py(
+                (<CyclusFacilityShim*> (<_Agent> self).shim).GetTreePrintOuts(cpp_m))
+        return rtn
+
+    def in_family_tree(self, other):
+        """Returns true if this agent is in the parent-child family tree of an
+        other agent.
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).InFamilyTree(cpp_other))
+        return rtn
+
+    def ancestor_of(self, other):
+        """Returns true if this agent is an ancestor of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).AncestorOf(cpp_other))
+        return rtn
+
+    def decendent_of(self, other):
+        """Returns true if this agent is an decendent of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
+        return rtn
+
+    def decomission(self):
+        """Decommissions the agent, removing it from the simulation. Results in
+        destruction of the agent object. If agents write their own decommission()
+        function, they must call their superclass' decommission function at the
+        END of their decommission() function.
+        """
+        (<CyclusFacilityShim*> (<_Agent> self).shim).Decommission()
 
     @property
-    def kind(self):
-        """Returns a string that describes the agent subclass (e.g. Region,
-        Facility, etc.)
-        """
-        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).kind())
-        return rtn
+    def annotations(self):
+        """Agent annotations."""
+        cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
+        if self._annotations is None:
+            cpp_rtn._inst[0] = (<CyclusFacilityShim*> (<_Agent> self).shim).annotations()
+        self._annotations = cpp_rtn
+        return self._annotations
 
     @property
     def prototype(self):
@@ -1171,6 +1214,24 @@ cdef class _Facility(_Agent):
     def spec(self, str new_impl):
         cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
         (<CyclusFacilityShim*> (<_Agent> self).shim).spec(cpp_new_impl)
+
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).id()
+
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).id()
+
+    @property
+    def kind(self):
+        """Returns a string that describes the agent subclass (e.g. Region,
+        Facility, etc.)
+        """
+        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).kind())
+        return rtn
 
     def __str__(self):
         rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).str())
