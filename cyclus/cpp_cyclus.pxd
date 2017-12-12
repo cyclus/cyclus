@@ -660,9 +660,9 @@ cdef extern from "agent.h" namespace "cyclus":
         void AdjustProductPrefs(PrefMap[Product].type&)
         std_string schema()
         cpp_jsoncpp.Value annotations() except +
-        const std_string prototype()
+        const std_string get_prototype "prototype" ()
         void prototype(std_string)
-        std_string spec()
+        std_string get_spec "spec" ()
         void spec(std_string)
         const std_string kind()
         Context* context()
@@ -670,8 +670,8 @@ cdef extern from "agent.h" namespace "cyclus":
         Agent* parent()
         const int parent_id()
         const int enter_time()
+        const int get_lifetime "lifetime" ()
         void lifetime(int)
-        const int lifetime()
         const int exit_time()
         const set[Agent*]& children()
 
@@ -898,8 +898,8 @@ cdef extern from "toolkit/timeseries.h" namespace "cyclus::toolkit":
     cdef enum TimeSeriesType:
         POWER
         ENRICH_SWU
-        ENRICH_FEED        
-    
+        ENRICH_FEED
+
     void RecordTimeSeries[T](std_string, Agent*, T)
     void RecordTimeSeriesPower "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>" (Agent*, double)
     void RecordTimeSeriesEnrichSWU "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::ENRICH_SWU>" (Agent*, double)

@@ -45,10 +45,14 @@ tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5
 tests/libcyclus-test.sqlite
-test/dummy.json
-test/dummy.h5
-test/default-toaster.json
-test/default-toaster.h5
+tests/dummy.json
+tests/dummy.h5
+tests/default-toaster.json
+tests/default-toaster.h5
+tests/attr-toaster-comapny.h5
+tests/attr-toaster-comapny.json
+tests/attr-toaster-region.h5
+tests/attr-toaster-region.json
 rs.cred
 
 # Docker stuff

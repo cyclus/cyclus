@@ -1410,7 +1410,7 @@ cdef class _Agent:
     @property
     def prototype(self):
         """The agent's prototype."""
-        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).prototype())
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).get_prototype())
         return rtn
 
     @prototype.setter
@@ -1429,13 +1429,13 @@ cdef class _Agent:
     @property
     def spec(self):
         """The agent's spec."""
-        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).spec())
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).get_spec())
         return rtn
 
     @spec.setter
     def spec(self, str new_impl):
         cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
-        (<cpp_cyclus.Agent*> self.ptx).prototype(cpp_new_impl)
+        (<cpp_cyclus.Agent*> self.ptx).spec(cpp_new_impl)
 
     @property
     def kind(self):
@@ -1480,7 +1480,7 @@ cdef class _Agent:
         """The number of time steps this agent operates between building and
         decommissioning (-1 if the agent has an infinite lifetime)
         """
-        return (<cpp_cyclus.Agent*> self.ptx).lifetime()
+        return (<cpp_cyclus.Agent*> self.ptx).get_lifetime()
 
     @lifetime.setter
     def lifetime(self, int n_timesteps):
