@@ -190,7 +190,7 @@ def test_pyagent_attr_toaster_region():
     assert_true(isinstance(info['id'], int))
     assert_true(isinstance(info['parent'], int))
     assert_true(info['parent'] != info['id'])
-    assert_equal(info['parent'], -1)
+    assert_equals(info['parent'], -1)
     assert_true(info['id'] == info['hash'])
     # test attrs
     assert_true(info['str'].startswith('Region_RepublicOfToast'))

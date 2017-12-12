@@ -41,6 +41,8 @@ class AttrTick(object):
         print("=== Start " + self.__class__.__name__ + " ===\n")
         print(s)
         print("\n=== End " + self.__class__.__name__ + " ===")
+        if isinstance(self, Region):
+            return  # following tests not applicable to regions
         # Can't easilty convert to JSON.
         # Make sure these don't segfault
         p = self.parent()
