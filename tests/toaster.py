@@ -1,6 +1,6 @@
 import json
 
-from cyclus.agents import Facility
+from cyclus.agents import Facility, Institution
 from cyclus import lib
 import cyclus.typesystem as ts
 
@@ -16,7 +16,7 @@ class DefaultToaster(Facility):
         print('Toast level is {0}'.format(self.level))
 
 
-class AttrToaster(Facility):
+class AttrTick(object):
     """Meant for testing attributes values"""
 
     def tick(self):
@@ -38,16 +38,24 @@ class AttrToaster(Facility):
             'annotations': str(self.annotations),
             }
         s = json.dumps(info)
-        print("=== Start AttrToaster ===\n")
+        print("=== Start " + self.__class__.__name__ + " ===\n")
         print(s)
-        print("\n=== End AttrToaster ===")
+        print("\n=== End " + self.__class__.__name__ + " ===")
         # Can't easilty convert to JSON.
         # Make sure these don't segfault
         p = self.parent()
         self.children_str()
         self.tree_strs(p)
-        self.in_family_tree(p),
-        self.ancestor_of(p),
-        self.decendent_of(p),
-        self.decomission()
+        self.in_family_tree(p)
+        self.ancestor_of(p)
+        self.decendent_of(p)
+        if isinstance(self, Facility):
+            self.decomission()
 
+
+class AttrToaster(AttrTick, Facility):
+    """A toaster for testing attributes values"""
+
+
+class AttrToasterCompany(AttrTick, Institution):
+    """A toaster company testing attributes values"""
