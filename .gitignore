@@ -51,6 +51,8 @@ tests/default-toaster.json
 tests/default-toaster.h5
 tests/attr-toaster-comapny.h5
 tests/attr-toaster-comapny.json
+tests/attr-toaster-region.h5
+tests/attr-toaster-region.json
 rs.cred
 
 # Docker stuff
