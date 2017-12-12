@@ -152,3 +152,59 @@ def test_pyagent_attr_toaster_company():
         os.remove(iname)
     if os.path.exists(oname):
         os.remove(oname)
+
+
+REGIONFILE = {'simulation': {'archetypes': {'spec': [
+                                        {'lib': 'toaster', 'name': 'DefaultToaster'},
+                                        {'lib': 'toaster', 'name': 'AttrToasterRegion'},
+                                        {'lib': 'agents', 'name': 'NullInst'}
+                                        ]},
+                'control': {'duration': '2',
+                            'startmonth': '1',
+                            'startyear': '2000'},
+                'facility': [{'config': {'DefaultToaster': {}},
+                              'name': 'HappyToaster'}],
+                'region': {'config': {'AttrToasterRegion': {}},
+                           'institution': {'config': {'NullInst': None},
+                                           'initialfacilitylist': {'entry': [{'number': '1',
+                                                                              'prototype': 'HappyToaster'}]},
+                                           'name': 'SingleInstitution'},
+                           'name': 'RepublicOfToast'}}}
+
+
+def test_pyagent_attr_toaster_region():
+    oname = 'attr-toaster-region.h5'
+    iname = 'attr-toaster-region.json'
+    if os.path.exists(oname):
+        os.remove(oname)
+    with open(iname, 'w') as f:
+        json.dump(REGIONFILE, f)
+    env = dict(os.environ)
+    env['PYTHONPATH'] = "."
+    s = subprocess.check_output(['cyclus', '-o', oname, iname],
+                                universal_newlines=True, env=env)
+    info = s.split('=== Start AttrToasterRegion ===\n')[-1]
+    info = info.split('\n=== End AttrToasterRegion ===')[0]
+    info = json.loads(info)
+    # test ids
+    assert_true(isinstance(info['id'], int))
+    assert_true(isinstance(info['parent'], int))
+    assert_true(info['parent'] != info['id'])
+    assert_equal(info['parent'], -1)
+    assert_true(info['id'] == info['hash'])
+    # test attrs
+    assert_true(info['str'].startswith('Region_RepublicOfToast'))
+    assert_equals(info['kind'], 'Region')
+    assert_equals(info['spec'], ':toaster:AttrToasterRegion')
+    assert_equals(info['version'], '0.0.0')
+    assert_equals(info['prototype'], 'RepublicOfToast')
+    assert_equals(info['enter_time'], 0)
+    assert_equals(info['lifetime'], -1)
+    assert_equals(info['exit_time'], -1)
+    assert_equals(len(info['childern']), 1)
+    assert_true(len(info['annotations']) > 0)
+    # clean up
+    if os.path.exists(iname):
+        os.remove(iname)
+    if os.path.exists(oname):
+        os.remove(oname)

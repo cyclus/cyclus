@@ -1,6 +1,6 @@
 import json
 
-from cyclus.agents import Facility, Institution
+from cyclus.agents import Facility, Institution, Region
 from cyclus import lib
 import cyclus.typesystem as ts
 
@@ -59,3 +59,7 @@ class AttrToaster(AttrTick, Facility):
 
 class AttrToasterCompany(AttrTick, Institution):
     """A toaster company testing attributes values"""
+
+
+class AttrToasterRegion(AttrTick, Region):
+    """A toaster region testing attributes values"""
