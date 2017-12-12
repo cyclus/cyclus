@@ -99,17 +99,17 @@ def test_pyagent_attr_toasters():
 
 
 COMPANYFILE = {'simulation': {'archetypes': {'spec': [
-                                        {'lib': 'agents', 'name': 'Source'},
+                                        {'lib': 'toaster', 'name': 'DefaultToaster'},
                                         {'lib': 'agents', 'name': 'NullRegion'},
-                                        {'lib': 'toaster', 'name': 'NullInst'}
+                                        {'lib': 'toaster', 'name': 'AttrToasterCompany'}
                                         ]},
                 'control': {'duration': '2',
                             'startmonth': '1',
                             'startyear': '2000'},
-                'facility': [{'config': {'Source': {}},
+                'facility': [{'config': {'DefaultToaster': {}},
                               'name': 'HappyToaster'}],
                 'region': {'config': {'NullRegion': None},
-                           'institution': {'config': {'AttrToasterCompany': None},
+                           'institution': {'config': {'AttrToasterCompany': {}},
                                            'initialfacilitylist': {'entry': [{'number': '1',
                                                                               'prototype': 'HappyToaster'}]},
                                            'name': 'FamousToastersLLC'},
@@ -134,18 +134,18 @@ def test_pyagent_attr_toaster_company():
     assert_true(isinstance(info['id'], int))
     assert_true(isinstance(info['parent'], int))
     assert_true(info['parent'] != info['id'])
-    assert_true(0 <= info['parent'] < 10)
+    assert_true(0 <= info['parent'] <= 10)
     assert_true(info['id'] == info['hash'])
     # test attrs
-    assert_true(info['str'].startswith('Facility_HappyToaster'))
-    assert_equals(info['kind'], 'Facility')
-    assert_equals(info['spec'], ':toaster:AttrToaster')
+    assert_true(info['str'].startswith('Inst_FamousToastersLLC'))
+    assert_equals(info['kind'], 'Inst')
+    assert_equals(info['spec'], ':toaster:AttrToasterCompany')
     assert_equals(info['version'], '0.0.0')
-    assert_equals(info['prototype'], 'HappyToaster')
+    assert_equals(info['prototype'], 'FamousToastersLLC')
     assert_equals(info['enter_time'], 0)
     assert_equals(info['lifetime'], -1)
     assert_equals(info['exit_time'], -1)
-    assert_equals(len(info['childern']), 0)
+    assert_equals(len(info['childern']), 1)
     assert_true(len(info['annotations']) > 0)
     # clean up
     if os.path.exists(iname):

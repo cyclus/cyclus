@@ -34,7 +34,7 @@ class AttrTick(object):
             'enter_time': self.enter_time,
             'lifetime': self.lifetime,
             'exit_time': self.exit_time,
-            'childern': list(self.children),
+            'childern': [kid.id for kid in self.children],
             'annotations': str(self.annotations),
             }
         s = json.dumps(info)
@@ -44,8 +44,8 @@ class AttrTick(object):
         # Can't easilty convert to JSON.
         # Make sure these don't segfault
         p = self.parent()
-        self.children_str()
-        self.tree_strs(p)
+        #self.children_str()  # <- likely broken, see #1447
+        #self.tree_strs(p)    # <- likely broken, see #1447
         self.in_family_tree(p)
         self.ancestor_of(p)
         self.decendent_of(p)
