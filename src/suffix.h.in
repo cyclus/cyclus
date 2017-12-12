@@ -1,0 +1,2 @@
+#define SUFFIX "@suffix@"
+#define DYNAMICLOADLIB "@dynamicloadlib@"

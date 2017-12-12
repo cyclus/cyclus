@@ -1,0 +1,63 @@
+<!-- Lotka-Volterra simulation with Preys and Predators -->
+
+<simulation>
+  <control>
+    <duration>20</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+  </control>
+
+  <archetypes>
+    <spec><lib>agents</lib><name>Prey</name></spec>
+    <spec><lib>agents</lib><name>Predator</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
+  </archetypes>
+
+  <facility>
+    <name>Prey</name>
+    <config>
+      <Prey>
+        <birth_freq>1</birth_freq>
+        <nchildren>1</nchildren>
+        <birth_and_death>0</birth_and_death>
+        <commod>wabbit</commod>
+      </Prey>
+    </config>
+  </facility>
+
+  <facility>
+    <name>Predator</name>
+    <config>
+      <Predator>
+        <hunt_cap>2</hunt_cap>
+        <hunt_freq>3</hunt_freq>
+        <full>2</full>
+        <lifespan>6</lifespan>
+        <commod>wabbit</commod>
+        <success>0.575</success>
+        <birth_and_death>0</birth_and_death>
+        <prey>Prey</prey>
+      </Predator>
+    </config>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <config> <NullRegion/> </config>
+    <institution>
+      <name>SingleInstitution</name>
+      <initialfacilitylist>
+        <entry>
+          <prototype>Prey</prototype>
+          <number>95</number>
+        </entry>
+        <entry>
+          <prototype>Predator</prototype>
+          <number>20</number>
+        </entry>
+      </initialfacilitylist>
+      <config> <NullInst/> </config>
+    </institution>
+  </region>
+</simulation>

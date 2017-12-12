@@ -1,0 +1,102 @@
+========================
+Cyclus 1.0 Release Notes
+========================
+
+:Author: Cyclus Developers
+:Website: http://fuelcycle.org/
+:Contact: https://groups.google.com/forum/#!forum/cyclus-dev
+
+The Cyclus core team is excited to announce the latest stable version 
+of the cyclus ecosystem!  This includes over 5000 commits by 
+8 developers.  
+
+Major features
+==============
+
+- Fast simulation performance
+
+- Memory management: model instantiation/deallocation
+
+- Cyclus Enhancement Proposal (CEP) system for large changes
+
+- Testing suite 
+
+   * unit tests
+   * integration tests (continuous through BaTLab and Polyphemus)
+   * regression tests
+
+- Resource tracking functionality and resource interface simplicity (CEP 17)
+
+- Complicated fuel cycles enabled via dynamic resource exchange (CEP 18)
+
+- Advanced time step execution for consistent agent behavior (CEP 20)
+
+- Basic modules in Cyclus core, advanced modules in Cycamore
+
+  * relatedly, agent identification (CEP 21)
+
+- Pre-processing
+
+  * auto-generate input/output archetype code for supported datatypes
+
+- Simulation initialization and restart
+
+- Now using PyNE for nuclear data (http://pyne.io)
+
+- Basic Lodtka-Volterra predator/prey-like simulation behavior demonstrated
+
+- Updated build system
+
+  * kernel in ``$PREFIX/lib/`` as ``cyclus`` (i.e., ``libcyclus.so`` or
+    ``libcyclus.dylib``)
+
+  * cyclus agents in ``$PREFIX/lib/cyclus`` as ``agents``
+
+  * cyclus generic agent archetype unit tests in ``$PREFIX/lib/cyclus`` as
+    ``baseagentunittests``
+
+  * cycamore agents in ``$PREFIX/lib/cyclus`` as ``cycamore``
+
+  * cyclus unit tests in ``$PREFIX/bin`` as ``cyclus_unit_tests``
+
+  * cycamore unit tests in ``$PREFIX/bin`` as ``cycamore_unit_tests``
+
+  * support for easy build/install of modules with single agent archetype and
+    associated tests
+
+  * support for easy build/install of modules of group of agent archetypes and
+    associated tests
+
+- Toolkit
+
+  * separation of additional "helper" classes and interfaces out of kernel
+    source directory and namespace
+
+- Significantly updated database schema, utilized for both canonical input and
+  output
+
+  * supports variable length datatypes for both sqlite and hdf5
+
+Since v0.4
+
+* Cyclus: 1,120 commits resulted in 262 changed files encompassing a net 33,820
+line insertions(+) and 9,673 deletions(-).
+
+* Cycamore: 270 commits resulted in 133 changed files encompassing a net 2,243
+line insertions(+) and 95,294 deletions(-).
+
+Contributors
+============
+
+The following people contributed to this release of Cyclus.  A "*" by their
+name indicates a first time contributor.  Names follow alphabetically, 
+
+* Robert Carlsen
+* Matthew Gidden
+* Katy Huff
+* Arrielle Opotowsky
+* Olzhas Rakhimov
+* Anthony Scopatz
+* Zach Welch
+* Paul Wilson
+

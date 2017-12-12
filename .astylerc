@@ -1,0 +1,15 @@
+--style=google
+--indent=spaces=2
+--indent-preprocessor
+--indent-switches
+--indent-col1-comments
+--max-instatement-indent=60
+--min-conditional-indent=2
+--pad-oper
+--pad-header
+--unpad-paren
+--add-brackets
+--align-pointer=type
+--convert-tabs
+--max-code-length=80
+--suffix=none

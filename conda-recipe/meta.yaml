@@ -1,0 +1,51 @@
+package:
+  name: cyclus
+  version: 0.0
+
+# Only use fn and url for polyphemus compatability
+source:
+  fn: cyclus-src.tar.gz # ["TRAVIS" not in environ] 
+  url: https://github.com/cyclus/cyclus/archive/develop.tar.gz # ["TRAVIS" not in environ]
+  path: ..  # ["TRAVIS" in environ]
+
+requirements:
+   build:
+    - sigcpp
+    - glibmm
+    - libxmlpp 
+    - coincbc
+    - boost
+    - hdf5
+    - mylibxml2 # [osx]
+    - libxml2  #  [linux]
+    - myglib   # [osx]  
+    - libffi # [osx]
+    - gettext # [osx]
+    - pkg-config-lite # [osx]
+    - cmake
+    - python
+   run:
+    - sigcpp
+    - glibmm
+    - libxmlpp
+    - coincbc
+    - boost
+    - hdf5
+    - mylibxml2 # [osx]
+    - libxml2  #  [linux]
+    - myglib   # [osx]  
+    - libffi # [osx]
+    - gettext # [osx]
+    - pkg-config-lite # [osx]
+
+build:
+  string: nightly
+
+test:
+  requires:
+    - nose
+    - pytables
+
+about:
+  home: Cyclus
+  license: BSD Clause 3
