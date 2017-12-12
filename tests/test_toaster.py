@@ -78,7 +78,7 @@ def test_pyagent_attr_toasters():
     assert_true(isinstance(info['id'], int))
     assert_true(isinstance(info['parent'], int))
     assert_true(info['parent'] != info['id'])
-    assert_true(0 <= info['parent'] < 10)
+    assert_true(0 <= info['parent'] < 100)
     assert_true(info['id'] == info['hash'])
     # test attrs
     assert_true(info['str'].startswith('Facility_HappyToaster'))
@@ -134,7 +134,7 @@ def test_pyagent_attr_toaster_company():
     assert_true(isinstance(info['id'], int))
     assert_true(isinstance(info['parent'], int))
     assert_true(info['parent'] != info['id'])
-    assert_true(0 <= info['parent'] <= 10)
+    assert_true(0 <= info['parent'] <= 100)
     assert_true(info['id'] == info['hash'])
     # test attrs
     assert_true(info['str'].startswith('Inst_FamousToastersLLC'))
