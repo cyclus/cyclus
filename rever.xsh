@@ -15,10 +15,8 @@ $DOCKER_INSTALL_COMMAND = (
     )
 
 
-with! dockeractivity(name='cyclus-tests'):
-    cd tests
-    cyclus_unit_tests
-    nosetests
+with! dockeractivity(name='cyclus-tests', lang='sh'):
+    cd tests && export PATH=${HOME}/.local/bin:${PATH} && cyclus_unit_tests && nosetests
 
 $ACTIVITIES = ['cyclus-tests',
                #'changelog',
