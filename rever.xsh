@@ -18,8 +18,6 @@ $DOCKER_INSTALL_COMMAND = (
 with! dockeractivity(name='cyclus-tests', lang='sh'):
     cd tests && export PATH=${HOME}/.local/bin:${PATH} && cyclus_unit_tests && nosetests
 
-$ACTIVITIES = ['cyclus-tests',
-               'changelog',
-               #'tag',
-               #'push_tag', 'conda_forge', 'ghrelease',
+$ACTIVITIES = ['cyclus-tests', 'changelog', 'tag',
+               'push_tag', 'conda_forge', 'ghrelease',
                ]
