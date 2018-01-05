@@ -10,6 +10,8 @@ namespace toolkit {
 Position::Position() : latitude_(0), longitude_(0) {}
 
 Position::Position(double decimal_lat, double decimal_lon) {
+  LatCheck(decimal_lat);
+  LonCheck(decimal_lon);
   latitude_ = SetPrecision(decimal_lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
   longitude_ = SetPrecision(decimal_lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
 }
@@ -25,16 +27,38 @@ double Position::longitude() const {
 }
 
 void Position::latitude(double lat) {
+  LatCheck(lat);
   latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 void Position::longitude(double lon) {
+  LonCheck(lon);
   longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
 void Position::set_position(double lat, double lon) {
+  LatCheck(lat);
+  LonCheck(lon);
   latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
   longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+}
+
+void Position::LatCheck(double lat) {
+  if (lat > 90 || lat < -90){
+    std::stringstream msg;
+    msg << "The provided latitude (" << lat
+        << ") is outside the acceptable range.";
+    throw ValueError(msg.str());
+  }
+}
+
+void Position::LonCheck(double lon) {
+  if (lon > 180 || lon < -180){
+    std::stringstream msg;
+    msg << "The provided longitude (" << lon
+        << ") is outside the acceptable range.";
+    throw ValueError(msg.str());
+  }
 }
 
 double Position::Distance(Position target) const {
