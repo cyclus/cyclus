@@ -97,16 +97,6 @@ class Position {
   /// @param lat latitude, and lon longitude expressed in decimal degrees.
   void set_position(double lat, double lon);
 
-  /// Checks if the decimal degree of longitude is within acceptable range.
-  /// The acceptable range is between -180 and 180 (inclusive).
-  /// @param lat latitude expressed in decimal degrees.
-  void LonCheck(double lon);
-
-  /// Checks if the decimal degree of latitude is within acceptable range.
-  /// The acceptable range is between -90 and 90 (inclusive).
-  /// @param lat latitude expressed in decimal degrees.
-  void LatCheck(double lat);
-
   /// Returns the distance (in km) between this Position object and the target
   /// Position object.
   /// @param target the Position object some distnace away from the current one
@@ -145,6 +135,16 @@ class Position {
 
   /// Longitude is stored as seconds of degree.
   double longitude_;
+
+  /// Checks if the decimal degree of longitude is within acceptable range.
+  /// The acceptable range is between -180 and 180 (inclusive).
+  /// @param lat latitude expressed in decimal degrees.
+  void LonCheck(double lon);
+
+  /// Checks if the decimal degree of latitude is within acceptable range.
+  /// The acceptable range is between -90 and 90 (inclusive).
+  /// @param lat latitude expressed in decimal degrees.
+  void LatCheck(double lat);
 
   /// Sets the precision for double values.
   /// @param value that requires change of precision
