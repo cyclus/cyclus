@@ -187,13 +187,13 @@ endif()
 
 # Add bateman solver from PyNE
 #add_definitions(-DPYNE_IS_AMALGAMATED)
-download_platform("https://raw.githubusercontent.com/pyne/data/master/" "decay"
+download_platform("https://raw.githubusercontent.com/pyne/data/master" "decay"
                   "decay" ".s")
 fast_compile(decay.cpp "-O0" "-O0" "-O0")
 set_source_files_properties(decay.cpp PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
 
 # Add CRAM solver from PyNE
-download_and_extract("http://raw.githubusercontent.com/pyne/data/master/" "cram"
+download_and_extract("http://raw.githubusercontent.com/pyne/data/master" "cram"
                      ".c" ".s")
 fast_compile(cram.c
   "-O0 -fcx-fortran-rules -fcx-limited-range -ftree-sra -ftree-ter -fexpensive-optimizations"
