@@ -113,7 +113,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     INCLUDE(DownloadAndExtract)
     INCLUDE(UseCyclus)
 
-    # set configuration for fast compiling
+    # set configuration variables
+    cyclus_platform()
     cyclus_set_fast_compile()
 
     # set configuration for all library builds

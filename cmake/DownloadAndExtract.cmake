@@ -1,4 +1,4 @@
-# Macro for downloading a tar file and extracting it if a sample file
+# Macros for downloading a tar file and extracting it if a sample file
 # doesn't already exist.
 
 macro(download_and_extract _url _checkfile)
@@ -22,4 +22,16 @@ macro(download_and_extract _url _checkfile)
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf "${_base}"
                     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
   endif()
+endmacro()
+
+
+macro(download_platform _base_url _base_name _ext_src _ext_plat)
+  # first download the src file
+  set(_url "${_base_url}/${_base_name}.tar.gz")
+  set(_checkfile "${_base_name}${_ext_src}")
+  download_and_extract("${_url}" "${_checkfile}")
+  # now download the platform specific file
+  set(_url "${_base_url}/${_base_name}-${CYCLUS_PLATFORM}.tar.gz")
+  set(_checkfile "${_base_name}-${CYCLUS_PLATFORM}${_ext_plat}")
+  download_and_extract("${_url}" "${_checkfile}")
 endmacro()
