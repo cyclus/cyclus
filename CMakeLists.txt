@@ -104,6 +104,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     ENDIF("${isSystemDir}" STREQUAL "-1")
     MESSAGE("-- CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
 
+    if (APPLE)
+      set(BUILD_WITH_INSTALL_NAME_DIR TRUE)
+    endif()
+
     # Tell CMake where the modules are
     LIST(APPEND CMAKE_MODULE_PATH
         "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/cmake")
