@@ -264,10 +264,15 @@ MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
     SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${lib_root})
     ADD_DEPENDENCIES(${lib_name} ${lib_src} ${lib_h})
 
+    set(dest_ "lib/cyclus")
+    if (inst_dir)
+      set(dest_ "${dest_}/${inst_dir}")
+    endif()
+
     # install library
     INSTALL(
         TARGETS ${lib_name}
-        LIBRARY DESTINATION lib/cyclus/${inst_dir}
+        LIBRARY DESTINATION "${dest_}"
         COMPONENT ${lib_name}
         )
     SET(${lib_name}_LIB ${lib_name} CACHE INTERNAL "Agent library alias." FORCE)
