@@ -26,5 +26,6 @@
 * Fixed SQLite backend bug with Boost v1.66.
 * CMake RPATH now correctly uses semicolon delimiters, rather
   than colons.
+* ``DynamicLoadingTests`` now properly start/stop Python.
 
 **Security:** None
