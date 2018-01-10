@@ -188,7 +188,7 @@ endif()
 # Add bateman solver from PyNE
 #add_definitions(-DPYNE_IS_AMALGAMATED)
 download_platform("https://raw.githubusercontent.com/pyne/data/master" "decay"
-                  "decay" ".s")
+                  ".cpp" ".s")
 fast_compile(decay.cpp "-O0" "-O0" "-O0")
 set_source_files_properties(decay.cpp PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
 
