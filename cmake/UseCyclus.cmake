@@ -263,15 +263,16 @@ MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
     TARGET_LINK_LIBRARIES(${lib_name} dl ${LIBS})
     SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${lib_root})
     ADD_DEPENDENCIES(${lib_name} ${lib_src} ${lib_h})
-    SET_TARGET_PROPERTIES(${lib_name}
-      PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/cyclus"
-      INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/cyclus"
-    )
 
     set(dest_ "lib/cyclus")
-    if (inst_dir)
+    string(COMPARE EQUAL "${inst_dir}" "" is_empty)
+    if (NOT is_empty)
       set(dest_ "${dest_}/${inst_dir}")
     endif()
+
+    SET_TARGET_PROPERTIES(${lib_name}
+      PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${dest_}"
+    )
 
     # install library
     INSTALL(
