@@ -10,6 +10,10 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "in-source build detected")
 ENDIF()
 
+# Set some policies
+cmake_policy(SET CMP0040 OLD)
+cmake_policy(SET CMP0042 OLD)
+
 # This project name is cyclus.
 PROJECT(CYCLUS)
 
@@ -82,7 +86,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # (but later on when installing)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/cyclus")
+    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/cyclus")
 
     # add the automatically determined parts of the RPATH
     # which point to directories outside the build tree to the install RPATH
@@ -91,14 +95,17 @@ IF(NOT CYCLUS_DOC_ONLY)
     # the RPATH to be used when installing, but only if it's not a system directory
     LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
     IF("${isSystemDir}" STREQUAL "-1")
-        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/cyclus")
+        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/cyclus")
         GET_FILENAME_COMPONENT(cxxCompilerRoot ${CMAKE_CXX_COMPILER} DIRECTORY)
         GET_FILENAME_COMPONENT(cxxCompilerRoot ${cxxCompilerRoot} DIRECTORY)
         IF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
-            SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${cxxCompilerRoot}/lib:${cxxCompilerRoot}/lib/cyclus")
+            SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${cxxCompilerRoot}/lib;${cxxCompilerRoot}/lib/cyclus")
         ENDIF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
     ENDIF("${isSystemDir}" STREQUAL "-1")
     MESSAGE("-- CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
+    if (APPLE)
+      set(BUILD_WITH_INSTALL_NAME_DIR TRUE)
+    endif()
 
     # Tell CMake where the modules are
     LIST(APPEND CMAKE_MODULE_PATH
@@ -109,7 +116,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     INCLUDE(DownloadAndExtract)
     INCLUDE(UseCyclus)
 
-    # set configuration for fast compiling
+    # set configuration variables
+    cyclus_platform()
     cyclus_set_fast_compile()
 
     # set configuration for all library builds
