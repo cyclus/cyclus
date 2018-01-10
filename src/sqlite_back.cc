@@ -377,7 +377,6 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
       T vect; \
       ar & BOOST_SERIALIZATION_NVP(vect); \
       v = vect; \
-      v = vect; \
       break; \
       }
 
