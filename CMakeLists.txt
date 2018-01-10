@@ -103,7 +103,6 @@ IF(NOT CYCLUS_DOC_ONLY)
         ENDIF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
     ENDIF("${isSystemDir}" STREQUAL "-1")
     MESSAGE("-- CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
-
     if (APPLE)
       set(BUILD_WITH_INSTALL_NAME_DIR TRUE)
     endif()
