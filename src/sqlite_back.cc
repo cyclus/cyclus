@@ -249,14 +249,20 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
                       int index) {
 
 // serializes the value v of type T and DBType D and binds it to stmt (inside
-// a case statement
+// a case statement.
+// NOTE: Since we are archiving to a stringstream, the archive must be closed before
+// the stringstream, so we put it in its own scope. This first became an issue in
+// Boost v1.66.0.  For more information, see http://boost.2283326.n4.nabble.com/the-boost-xml-serialization-to-a-stringstream-does-not-have-an-end-tag-tp2580772p2580773.html
 #define CYCLUS_COMMA ,
 #define CYCLUS_BINDVAL(D, T) \
     case D: { \
     T vect = v.cast<T>(); \
     std::stringstream ss; \
-    boost::archive::xml_oarchive ar(ss); \
-    ar & BOOST_SERIALIZATION_NVP(vect); \
+    { \
+      boost::archive::xml_oarchive ar(ss); \
+      ar & BOOST_SERIALIZATION_NVP(vect); \
+    } \
+    v = vect; \
     std::string s = ss.str(); \
     stmt->BindBlob(index, s.c_str(), s.size()); \
     break; \
@@ -370,6 +376,7 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
       boost::archive::xml_iarchive ar(ss); \
       T vect; \
       ar & BOOST_SERIALIZATION_NVP(vect); \
+      v = vect; \
       v = vect; \
       break; \
       }
