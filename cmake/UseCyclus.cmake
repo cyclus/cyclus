@@ -264,10 +264,20 @@ MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
     SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${lib_root})
     ADD_DEPENDENCIES(${lib_name} ${lib_src} ${lib_h})
 
+    set(dest_ "lib/cyclus")
+    string(COMPARE EQUAL "${inst_dir}" "" is_empty)
+    if (NOT is_empty)
+      set(dest_ "${dest_}/${inst_dir}")
+    endif()
+
+    SET_TARGET_PROPERTIES(${lib_name}
+      PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${dest_}"
+    )
+
     # install library
     INSTALL(
         TARGETS ${lib_name}
-        LIBRARY DESTINATION lib/cyclus/${inst_dir}
+        LIBRARY DESTINATION "${dest_}"
         COMPONENT ${lib_name}
         )
     SET(${lib_name}_LIB ${lib_name} CACHE INTERNAL "Agent library alias." FORCE)
@@ -315,6 +325,30 @@ macro(add_all_subdirs)
 endmacro()
 
 
+# sets a unique platform string
+macro(cyclus_platform)
+  if(NOT DEFINED CYCLUS_PLATFORM)
+    # first set OS
+    if (WIN32)
+      set(_plat "win")
+    elseif(APPLE)
+      set(_plat "apple")
+    else()
+      set(_plat "linux")
+    endif()
+    # next set compiler
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+      set(_plat "${_plat}-gnu")
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+      set(_plat "${_plat}-clang")
+    else()
+      set(_plat "${_plat}-NOTFOUND")
+    endif()
+    set(CYCLUS_PLATFORM "${_plat}")
+  endif()
+endmacro()
+
+
 macro(cyclus_set_fast_compile)
   if(NOT DEFINED CYCLUS_FAST_COMPILE)
     set(CYCLUS_FAST_COMPILE TRUE)
@@ -325,12 +359,10 @@ endmacro()
 
 # fast compile with assembly, if available.
 macro(fast_compile _srcname _gnuflags _clangflags _otherflags)
-  get_filename_component(_base "${_srcname}" NAME_WE)  # get the base name, without the extension
   # get the assembly file name
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(_asmname "${_base}-gnu.s")
-  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT APPLE)
-    set(_asmname "${_base}-clang.s")
+  get_filename_component(_base "${_srcname}" NAME_WE)  # get the base name, without the extension
+  if (CYCLUS_PLATFORM)
+    set(_asmname "${_base}-${CYCLUS_PLATFORM}.s")
   else()
     set(_asmname "${_base}-NOTFOUND")
   endif()
@@ -346,12 +378,12 @@ macro(fast_compile _srcname _gnuflags _clangflags _otherflags)
     message(STATUS "Compiling ${_srcname} fast from assembly ${_asmname}")
     set(_filename "${_asmname}")
   endif()
-  set(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} "${_filename}")
+  set(CYCLUS_CORE_SRC "${_filename}" ${CYCLUS_CORE_SRC})
 
   # set some compile flags for the selected file
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set_source_files_properties("${_filename}" PROPERTIES COMPILE_FLAGS "${_gnuflags}")
-  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT APPLE)
+  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set_source_files_properties("${_filename}" PROPERTIES COMPILE_FLAGS "${_clangflags}")
   else()
     set_source_files_properties("${_filename}" PROPERTIES COMPILE_FLAGS "${_otherflags}")
