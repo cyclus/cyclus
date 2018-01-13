@@ -99,4 +99,10 @@ TEST_F(PositionTest, ToStringDMS) {
   ASSERT_LE(urb_str.length(), 20);
 }
 
+TEST_F(PositionTest, Setters) {
+  EXPECT_THROW(eiffel_.latitude(1000), ValueError);
+  EXPECT_THROW(sydney_.set_position(-90.1, 0), ValueError);
+  EXPECT_THROW(museum_.longitude(180.1), ValueError);
+}
+
 }  // namespace cyclus
