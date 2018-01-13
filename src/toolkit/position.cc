@@ -47,7 +47,8 @@ void Position::LatCheck(double lat) {
   if (lat > 90 || lat < -90){
     std::stringstream msg;
     msg << "The provided latitude (" << lat
-        << ") is outside the acceptable range.";
+        << ") is outside the acceptable range. "
+        << "[-90, 90]";
     throw ValueError(msg.str());
   }
 }
@@ -56,7 +57,8 @@ void Position::LonCheck(double lon) {
   if (lon > 180 || lon < -180){
     std::stringstream msg;
     msg << "The provided longitude (" << lon
-        << ") is outside the acceptable range.";
+        << ") is outside the acceptable range."
+        << "[-180, 180]";
     throw ValueError(msg.str());
   }
 }
