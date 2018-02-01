@@ -21,6 +21,7 @@ from cpython.pycapsule cimport PyCapsule_GetPointer
 
 from binascii import hexlify
 import uuid
+import os
 from collections import Mapping, Sequence, Iterable, defaultdict
 from importlib import import_module
 
@@ -311,16 +312,6 @@ cdef class _SqliteBack(_FullBackend):
         """Closes the backend, flushing it in the process."""
         self.flush()  # just in case
         (<cpp_cyclus.SqliteBack*> self.ptx).Close()
-
-    def dbopen(fname):
-        """Opens a Cyclus database."""
-        _, ext = os.path.splitext(fname)
-        if ext not in EXT_BACKENDS:
-            msg = ('The backend database type of {0!r} could not be determined from '
-                   'extension {1!r}.')
-            raise ValueError(msg.format(fname, ext))
-        db = EXT_BACKENDS[ext](fname)
-        return db
 
     @property
     def name(self):
@@ -1978,3 +1969,17 @@ def call_listeners(tsname, agent, time, value):
     vec = TIME_SERIES_LISTENERS[tsname]
     for f in vec:
         f(agent, time, value)
+
+
+EXT_BACKENDS = {'.h5': Hdf5Back, '.sqlite': SqliteBack}
+
+def dbopen(fname):
+    """Opens a Cyclus database."""
+    _, ext = os.path.splitext(fname)
+    if ext not in EXT_BACKENDS:
+        msg = ('The backend database type of {0!r} could not be determined from '
+               'extension {1!r}.')
+        raise ValueError(msg.format(fname, ext))
+    db = EXT_BACKENDS[ext](fname)
+    return db
+

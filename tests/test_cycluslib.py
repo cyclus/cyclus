@@ -1,3 +1,4 @@
+
 """Tests for cyclus wrappers"""
 import os
 import subprocess
@@ -43,6 +44,11 @@ def test_conds_comp(db, fname, backend):
     for row in df['MassFrac']:
         assert_less(row, 0.00720000001)
 
+
+@dbtest
+def test_dbopen(db, fname, backend):
+    db = lib.dbopen(fname)
+
 @dbtest
 def test_schema(db, fname, backend):
     schema = db.schema("AgentEntry")
@@ -59,3 +65,4 @@ def test_schema(db, fname, backend):
 
 if __name__ == "__main__":
     nose.runmodule()
+
