@@ -178,27 +178,27 @@ endforeach()
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc)
 
-SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
-    ${cc_files}
-    "${CMAKE_CURRENT_SOURCE_DIR}/transmute.c"
-    )
+SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
 
 # Add Cyclus source files that use COIN, if we have COIN
 if(COIN_FOUND)
   SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${CYCLUS_COIN_SRC})
 endif()
 
-add_definitions(-DPYNE_DECAY_IS_DUMMY)
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # using Clang
-  set_source_files_properties(transmute.c PROPERTIES COMPILE_FLAGS "-O0 -ffast-math")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  # using GCC
-  set_source_files_properties(transmute.c PROPERTIES COMPILE_FLAGS
-    "-O0 -fcx-fortran-rules -fcx-limited-range -ftree-sra -ftree-ter -fexpensive-optimizations"
-  )
-endif()
+# Add bateman solver from PyNE
+#add_definitions(-DPYNE_IS_AMALGAMATED)
+download_platform("https://raw.githubusercontent.com/pyne/data/master" "decay"
+                  ".cpp" ".s")
+fast_compile(decay.cpp "-O0" "-O0" "-O0")
+set_source_files_properties(decay.cpp PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
 
+# Add CRAM solver from PyNE
+download_platform("http://raw.githubusercontent.com/pyne/data/master" "cram"
+                     ".c" ".s")
+fast_compile(cram.c
+  "-O0 -fcx-fortran-rules -fcx-limited-range -ftree-sra -ftree-ter -fexpensive-optimizations"
+  "-O0 -ffast-math"
+  "-O0")
 
 # write the include directories to a file for later use
 get_property(incdirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)

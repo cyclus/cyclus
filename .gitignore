@@ -20,6 +20,7 @@ platform.h
 #*
 *.zip
 *.tex
+*.s
 src/Core/Utility/Env.cpp
 src/cyclus_nuc_data.h5
 stubs/stub_version.h
@@ -30,6 +31,11 @@ src/pyne_decay.h
 src/pyne_decay.cc
 src/hdf5_back.cc
 src/hdf5_back.h
+src/*.tar.gz
+src/cram.c
+src/cram.h
+src/decay.cpp
+src/decay.h
 share/dbtypes.json
 tests/db.h5
 cyclus/cpp_typesystem.pxd
@@ -39,8 +45,14 @@ tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5
 tests/libcyclus-test.sqlite
-test/dummy.json
-test/dummy.h5
+tests/dummy.json
+tests/dummy.h5
+tests/default-toaster.json
+tests/default-toaster.h5
+tests/attr-toaster-comapny.h5
+tests/attr-toaster-comapny.json
+tests/attr-toaster-region.h5
+tests/attr-toaster-region.json
 rs.cred
 
 # Docker stuff

@@ -89,7 +89,6 @@ ADD_SUBDIRECTORY(toolkit)
 ADD_SUBDIRECTORY(agent_tests)
 SET(
     CYCLUS_CORE_TEST_SOURCE "${CYCLUS_CORE_TEST_SOURCE}"
-    "${CYCLUS_CORE_SRC}"
     "${cc_files}"
     PARENT_SCOPE
     )
