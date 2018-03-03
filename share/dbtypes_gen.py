@@ -50,10 +50,11 @@ def main():
                 enum = int(num.strip())
             if db == "":
                 continue
-            try:
-                x = json.loads(s)
-            except ValueError:
-                continue
+            #try:
+            #print(i, lines[i])
+            x = json.loads(s)
+            #except ValueError:
+            #    continue
             x.insert(ID_INDEX, enum)
             x.insert(DB_INDEX, db)
             supported_backends = x[BACK_INDEX]
