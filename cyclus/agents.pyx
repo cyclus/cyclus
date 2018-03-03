@@ -906,6 +906,9 @@ cdef class _Agent(lib._Agent):
         for name, inv in self._inventories:
             if isinstance(inv.capacity, str):
                 inv.value.capacity = d[inv.capacity]
+            elif inv.capacity is None:
+                # infinite capacity when unspecified
+                inv.value.capacity = 1e300
             else:
                 inv.value.capacity = inv.capacity
 
