@@ -306,8 +306,8 @@ enum DbTypes {
   PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE,  // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, ["HDF5"], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]], false]
 
   // Resource Tools
-  MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", fasle]
-  PRODUCT,  // ["cyclus::Product, 0, [], "Product", false]
+  MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", false]
+  PRODUCT,  // ["cyclus::Product", 0, [], "PRODUCT", false]
   RESOURCE_BUFF,  // ["cyclus::toolkit::ResourceBuff", 0, [], "RESOURCE_BUFF", false]
   RES_BUF_MATERIAL,  // ["cyclus::toolkit::ResBuf<cyclus::Material>", 1, [], ["RES_BUF", "MATERIAL"], false]
   RES_BUF_PRODUCT,  // ["cyclus::toolkit::ResBuf<cyclus::Product>", 1, [], ["RES_BUF", "PRODUCT"], false]
