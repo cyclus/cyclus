@@ -1983,3 +1983,31 @@ def dbopen(fname):
     db = EXT_BACKENDS[ext](fname)
     return db
 
+
+#
+# Position
+#
+cdef class _Position:
+
+    def __cinit__(self, double latitude=0.0, double longitude=0.0):
+        self.posptx = new cpp_cyclus.Positon(latitude, longitude)
+
+    def __dealloc__(self):
+        del self.posptx
+
+    @property
+    def latitude(self):
+        return self.posptx.latitude()
+
+    @latitude.setter
+    def latitude(self, double value):
+        self.posptx.latitude(value)
+
+    @property
+    def longitude(self):
+        return self.posptx.longitude()
+
+    @longitude.setter
+    def longitude(self, double value):
+        self.posptx.longitude(value)
+
