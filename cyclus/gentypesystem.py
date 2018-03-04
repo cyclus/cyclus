@@ -1063,7 +1063,7 @@ cdef class _Material(_Resource):
                     cpp_cyclus.Material.Create(lib.dynamic_agent_ptr(creator),
                                                quantity, comp))
         rtn = mat
-        return mat
+        return rtn
 
     @staticmethod
     def create_untracked(double quantity, c, basis='mass'):
@@ -1075,7 +1075,7 @@ cdef class _Material(_Resource):
         mat.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Material](
                     cpp_cyclus.Material.CreateUntracked(quantity, comp))
         rtn = mat
-        return mat
+        return rtn
 
     def clone(self):
         """Returns an untracked (not part of the simulation) copy of the material.
@@ -1182,7 +1182,7 @@ cdef class _Product(_Resource):
                     cpp_cyclus.Product.Create(lib.dynamic_agent_ptr(creator),
                                               quantity, str_py_to_cpp(quality)))
         rtn = prod
-        return prod
+        return rtn
 
     @staticmethod
     def create_untracked(double quantity, quality):
@@ -1194,7 +1194,7 @@ cdef class _Product(_Resource):
                     cpp_cyclus.Product.CreateUntracked(quantity,
                                                        str_py_to_cpp(quality)))
         rtn = prod
-        return prod
+        return rtn
 
     def clone(self):
         """Returns an untracked (not part of the simulation) copy of the product.
