@@ -941,6 +941,15 @@ class Sha1 {
     }
   }
 
+  inline void Update(const std::map<std::pair<std::string, std::string>, int>& x) {
+    std::map<std::pair<std::string, std::string>, int>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.first.c_str(), it->first.first.size());
+      hash_.process_bytes(it->first.second.c_str(), it->first.second.size());
+      hash_.process_bytes(&(it->second), sizeof(int));
+    }
+  }
+
   inline void Update(const std::map<std::string, std::vector<double>>& x) {
     std::map<std::string, std::vector<double>>::const_iterator it = x.begin();
     for (; it != x.end(); ++it) {
