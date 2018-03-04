@@ -1961,8 +1961,9 @@ cdef class StateVar:
 
 
 {% for t in ts.uniquetypes %}
-{% if t not in ts.inventory_types and t not in ts.resources %}
+{% if t not in ts.inventory_types %}
 {% set tclassname = ts.classname(t) %}
+{% if t in ts.resources %}{% set tclassname = tclassname + 'StateVar'%}{% endif %}
 cdef class {{tclassname}}(StateVar):
     """State variable descriptor for {{ts.cpptypes[t]}}"""
 
@@ -2601,8 +2602,9 @@ cdef class StateVar:
     cpdef StateVar copy(self)
 
 {% for t in ts.uniquetypes %}
-{% if t not in ts.inventory_types and t not in ts.resources %}
+{% if t not in ts.inventory_types %}
 {% set tclassname = ts.classname(t) %}
+{% if t in ts.resources %}{% set tclassname = tclassname + 'StateVar'%}{% endif %}
 cdef class {{tclassname}}(StateVar):
     cpdef {{tclassname}} copy(self)
 {% endif %}{% endfor %}
@@ -2792,7 +2794,6 @@ def main(argv=None):
         argv = sys.argv[1:]
     ns = parse_args(argv)
     ts = setup(ns)
-    print(ts.inventory_types)
     code_gen(ts, ns)
 
 
