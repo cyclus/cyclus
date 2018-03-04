@@ -342,10 +342,10 @@ enum DbTypes {
   MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], false]
   MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], false]
   MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], false]
-  VL_MAP_PAIR_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "STRING", "STRING"], "INT"], false]
-  VL_MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], false]
-  VL_MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], false]
-  VL_MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], false]
+  VL_MAP_PAIR_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "STRING", "STRING"], "INT"], true]
+  VL_MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], true]
+  VL_MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], true]
+  VL_MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], true]
 
   // append new types only:
 };
