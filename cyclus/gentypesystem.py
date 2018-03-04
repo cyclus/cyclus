@@ -134,7 +134,6 @@ class TypeSystem(object):
         self._new_py_insts = dict(NEW_PY_INSTS)
         self._to_py_converters = dict(TO_PY_CONVERTERS)
         self._to_cpp_converters = dict(TO_CPP_CONVERTERS)
-
         self._use_shared_ptr = defaultdict(lambda: False,
                                            {k: True for k in USE_SHARED_PTR})
 
@@ -545,8 +544,20 @@ TO_PY_CONVERTERS = {
                     'py{var}'),
     'cyclus::Blob': ('', '', 'blob_to_bytes({var})'),
     'boost::uuids::uuid': ('', '', 'uuid_cpp_to_py({var})'),
-    'cyclus::Material': ('', '', 'None'),
-    'cyclus::Product': ('', '', 'None'),
+    'cyclus::Material': (
+        'cdef _Material pyx_{var}',
+        'pyx_{var} = Material()\n'
+        'pyx_{var}.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource, '
+                            'cpp_cyclus.Material]({var})\n'
+        'py_{var} = pyx_{var}\n',
+        'py_{var}'),
+    'cyclus::Product': (
+        'cdef _Product pyx_{var}',
+        'pyx_{var} = Product()\n'
+        'pyx_{var}.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource, '
+                            'cpp_cyclus.Product]({var})\n'
+        'py_{var} = pyx_{var}\n',
+        'py_{var}'),
     'cyclus::toolkit::ResourceBuff': ('', '', 'None'),
     # templates
     'std::set': (
@@ -1672,7 +1683,7 @@ cdef std_string str_py_to_cpp(object x):
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
 {% set decl, body, expr = ts.convert_to_py('x', n) %}
-cdef object {{ ts.funcname(n) }}_to_py({{ ts.cython_type(n) }} x):
+cdef object {{ ts.funcname(n) }}_to_py({{ ts.possibly_shared_cython_type(n) }} x):
     {{ decl | indent(4) }}
     {{ body | indent(4) }}
     return {{ expr }}
@@ -1681,7 +1692,7 @@ cdef object {{ ts.funcname(n) }}_to_py({{ ts.cython_type(n) }} x):
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
 {% set decl, body, expr = ts.convert_to_py('x', n) %}
 cdef object any_{{ ts.funcname(n) }}_to_py(cpp_cyclus.hold_any value):
-    cdef {{ ts.cython_type(n) }} x = value.cast[{{ ts.cython_type(n) }}]()
+    cdef {{ ts.possibly_shared_cython_type(n) }} x = value.cast[{{ ts.possibly_shared_cython_type(n) }}]()
     {{ decl | indent(4) }}
     {{ body | indent(4) }}
     return {{ expr }}
@@ -2583,7 +2594,7 @@ cdef cpp_cyclus.uuid uuid_py_to_cpp(object x)
 cdef std_string str_py_to_cpp(object x)
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
-cdef object {{ ts.funcname(n) }}_to_py({{ ts.cython_type(n) }} x)
+cdef object {{ ts.funcname(n) }}_to_py({{ ts.possibly_shared_cython_type(n) }} x)
 {%- endfor %}
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
