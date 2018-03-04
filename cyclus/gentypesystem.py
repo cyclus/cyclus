@@ -448,8 +448,6 @@ VARS_TO_PY = {
     'std::string': 'bytes({var}).decode()',
     'cyclus::Blob': 'blob_to_bytes({var})',
     'boost::uuids::uuid': 'uuid_cpp_to_py({var})',
-    'cyclus::Material': 'None',
-    'cyclus::Product': 'None',
     'cyclus::toolkit::ResourceBuff': 'None',
     }
 
@@ -462,8 +460,6 @@ VARS_TO_CPP = {
     'std::string': 'str_py_to_cpp({var})',
     'cyclus::Blob': 'cpp_cyclus.Blob(std_string(<const char*> {var}))',
     'boost::uuids::uuid': 'uuid_py_to_cpp({var})',
-    'cyclus::Material': 'None',
-    'cyclus::Product': 'None',
     'cyclus::toolkit::ResourceBuff': 'resource_buff_to_cpp({var})',
     }
 
@@ -485,8 +481,8 @@ NPTYPES = {
     'std::string': 'np.NPY_OBJECT',
     'cyclus::Blob': 'np.NPY_OBJECT',
     'boost::uuids::uuid': 'np.NPY_OBJECT',
-    'cyclus::Material': 'None',
-    'cyclus::Product': 'None',
+    'cyclus::Material': 'np.NPY_OBJECT',
+    'cyclus::Product': 'np.NPY_OBJECT',
     'cyclus::toolkit::ResourceBuff': 'None',
     'std::set': 'np.NPY_OBJECT',
     'std::map': 'np.NPY_OBJECT',
@@ -505,8 +501,8 @@ NEW_PY_INSTS = {
     'std::string': '""',
     'cyclus::Blob': 'b""',
     'boost::uuids::uuid': 'uuid.UUID(int=0)',
-    'cyclus::Material': 'None',
-    'cyclus::Product': 'None',
+    'cyclus::Material': 'Material()',
+    'cyclus::Product': 'Product()',
     'cyclus::toolkit::ResourceBuff': 'None',
     'std::set': 'set()',
     'std::map': '{}',
@@ -638,13 +634,25 @@ TO_CPP_CONVERTERS = {
         'std_string(<const char*> b_{var})'),
     'cyclus::Blob': ('', '', 'cpp_cyclus.Blob(std_string(<const char*> {var}))'),
     'boost::uuids::uuid': ('', '', 'uuid_py_to_cpp({var})'),
-    'cyclus::Material': ('', '', 'None'),
-    'cyclus::Product': ('', '', 'None'),
+    'cyclus::Material': (
+        'cdef _Material py{var}\n'
+        'cdef cpp_cyclus.Material cpp{var}\n',
+        'py{var} = <_Material> {var}\n'
+        'cpp{var} = deref(reinterpret_pointer_cast[cpp_cyclus.Material, '
+                         'cpp_cyclus.Resource](py{var}.ptx))\n',
+        'cpp{var}'),
+    'cyclus::Product': (
+        'cdef _Material py{var}\n'
+        'cdef cpp_cyclus.Product cpp{var}\n',
+        'py{var} = <_Product> {var}\n'
+        'cpp{var} = deref(reinterpret_pointer_cast[cpp_cyclus.Product, '
+                         'cpp_cyclus.Resource](py{var}.ptx))\n',
+        'cpp{var}'),
     'cyclus::toolkit::ResourceBuff': (
         'cdef _{classname} py{var}\n'
-        'cdef cpp_cyclus.ResourceBuff cpp{var}\n',  #
+        'cdef cpp_cyclus.ResourceBuff cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
-        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
     # templates
     'std::set': (
@@ -715,16 +723,16 @@ TO_CPP_CONVERTERS = {
         'cpp{var}'),
     'cyclus::toolkit::ResBuf': (
         'cdef _{classname} py{var}\n'
-        'cdef cpp_cyclus.ResBuf[{valtype}] cpp{var}\n',  #
+        'cdef cpp_cyclus.ResBuf[{valtype}] cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
-        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
     'cyclus::toolkit::ResMap': (
         'print({var})\n'
         'cdef _{classname} py{var}\n'
-        'cdef cpp_cyclus.ResMap[{keytype}, {valtype}] cpp{var}\n',  #
+        'cdef cpp_cyclus.ResMap[{keytype}, {valtype}] cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
-        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
     }
 
