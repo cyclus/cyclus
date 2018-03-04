@@ -501,8 +501,8 @@ NEW_PY_INSTS = {
     'std::string': '""',
     'cyclus::Blob': 'b""',
     'boost::uuids::uuid': 'uuid.UUID(int=0)',
-    'cyclus::Material': 'Material()',
-    'cyclus::Product': 'Product()',
+    'cyclus::Material': 'None',
+    'cyclus::Product': 'None',
     'cyclus::toolkit::ResourceBuff': 'None',
     'std::set': 'set()',
     'std::map': '{}',
@@ -728,7 +728,6 @@ TO_CPP_CONVERTERS = {
         'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
     'cyclus::toolkit::ResMap': (
-        'print({var})\n'
         'cdef _{classname} py{var}\n'
         'cdef cpp_cyclus.ResMap[{keytype}, {valtype}] cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
