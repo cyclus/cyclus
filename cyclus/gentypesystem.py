@@ -103,7 +103,7 @@ class TypeSystem(object):
             cpptypes[t] = row[cpptype]
             ranks[t] = row[rank]
         self.norms = {t: parse_template(c) for t, c in cpptypes.items()}
-        self.dbtypes = sorted(types, key=lambda t: ids[t])
+        self.dbtypes = sorted(ids.keys(), key=lambda t: ids[t])
         # find unique types
         seen = set()
         self.uniquetypes = uniquetypes = []
@@ -720,6 +720,7 @@ TO_CPP_CONVERTERS = {
         'cpp{var} = deref(py{var}.ptx)\n',  #
         'cpp{var}'),
     'cyclus::toolkit::ResMap': (
+        'print({var})\n'
         'cdef _{classname} py{var}\n'
         'cdef cpp_cyclus.ResMap[{keytype}, {valtype}] cpp{var}\n',  #
         'py{var} = <_{classname}> {var}\n'
@@ -873,8 +874,10 @@ cdef extern from "cyclus.h" namespace "cyclus":
 
 def cpp_typesystem(ts, ns):
     """Creates the Cython header that wraps the Cyclus type system."""
+    temp = '{0} = {1}'
+    dbtypes = [temp.format(t, ts.ids[t]) for t in ts.dbtypes]
     ctx = dict(
-        dbtypes=ts.dbtypes,
+        dbtypes=dbtypes,
         cg_warning=CG_WARNING,
         stl_cimports=STL_CIMPORTS,
         )
@@ -1759,7 +1762,7 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
 
 def capsule_any_to_py(value):
     """Converts a PyCapsule that holds a boost::spirit::hold_any to a python
-    value. 
+    value.
     """
     cdef cpp_cyclus.hold_any* cpp_value = <cpp_cyclus.hold_any*>PyCapsule_GetPointer(value, <char*> b"value")
     py_value = any_to_py(deref(cpp_value))
