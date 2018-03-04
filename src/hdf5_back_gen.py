@@ -554,7 +554,6 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
         node = Block(nodes=setup_nodes)
     else:
         if DB_TO_VL[t.db]:
-            print(t.canon[0])
             setup_nodes.append(ExprStmt(child=DeclAssign(type=Type(cpp="unsigned int"),
                                                          target=Var(name=total_size_var),
                                                          value=Raw(code="CYCLUS_SHA1_SIZE"))))
@@ -613,7 +612,6 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                                 t.canon[1:],
                                                 template_args[t.canon[0]])]))
         else:
-          try:
             setup_nodes.append(Block(nodes=[get_setup(
                                                 CANON_TO_NODE[new_type],
                                                 depth=depth+1,
@@ -624,8 +622,6 @@ def get_setup(t, depth=0, prefix="", HDF5_type="tb_type", child_index='j'):
                                                 t.canon[1:],
                                                 template_args[t.canon[0]],
                                                 [i for i in range(children)])]))
-          except:
-            import pdb; pdb.set_trace()
         node = Block(nodes=setup_nodes)
     return node
 
