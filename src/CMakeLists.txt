@@ -15,8 +15,13 @@ if(DEFINED DEFAULT_ALLOW_MILPS)
         SET(default_allow_milps "false")
     endif (${DEFAULT_ALLOW_MILPS})
 else(DEFINED DEFAULT_ALLOW_MILPS)
-    SET(default_allow_milps "true")
+    if("${COIN_VERSION}" VERSION_GREATER_EQUAL "2.9")
+        SET(default_allow_milps "false")
+    else("${COIN_VERSION}" VERSION_GREATER_EQUAL "2.9")
+        SET(default_allow_milps "true")
+    endif("${COIN_VERSION}" VERSION_GREATER_EQUAL "2.9")
 endif(DEFINED DEFAULT_ALLOW_MILPS)
+MESSAGE("-- default_allow_milps: ${default_allow_milps}")
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
