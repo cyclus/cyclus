@@ -306,8 +306,8 @@ enum DbTypes {
   PAIR_PAIR_DOUBLE_DOUBLE_VL_MAP_VL_STRING_DOUBLE,  // ["std::pair<std::pair<double, double>, std::map<std::string, double>>", 4, ["HDF5"], ["PAIR", ["PAIR", "DOUBLE", "DOUBLE"], ["VL_MAP", "VL_STRING", "DOUBLE"]], false]
 
   // Resource Tools
-  MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", fasle]
-  PRODUCT,  // ["cyclus::Product, 0, [], "Product", false]
+  MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", false]
+  PRODUCT,  // ["cyclus::Product", 0, [], "PRODUCT", false]
   RESOURCE_BUFF,  // ["cyclus::toolkit::ResourceBuff", 0, [], "RESOURCE_BUFF", false]
   RES_BUF_MATERIAL,  // ["cyclus::toolkit::ResBuf<cyclus::Material>", 1, [], ["RES_BUF", "MATERIAL"], false]
   RES_BUF_PRODUCT,  // ["cyclus::toolkit::ResBuf<cyclus::Product>", 1, [], ["RES_BUF", "PRODUCT"], false]
@@ -338,14 +338,14 @@ enum DbTypes {
   PAIR_VL_STRING_VL_VECTOR_DOUBLE, // ["std::pair<std::string, std::vector<double>>", 1, ["HDF5"], ["PAIR", "VL_STRING", ["VL_VECTOR", "DOUBLE"]], false]
 
   //map<pair<string, string>, int>
-  MAP_PAIR_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "STRING", "STRING"], "INT"], false]
-  MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], false]
-  MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], false]
-  MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], false]
-  VL_MAP_PAIR_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "STRING", "STRING"], "INT"], false]
-  VL_MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], false]
-  VL_MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], false]
-  VL_MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>, 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], false]
+  MAP_PAIR_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "STRING", "STRING"], "INT"], false]
+  MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], false]
+  MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], false]
+  MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], false]
+  VL_MAP_PAIR_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "STRING", "STRING"], "INT"], true]
+  VL_MAP_PAIR_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "STRING", "VL_STRING"], "INT"], true]
+  VL_MAP_PAIR_VL_STRING_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "VL_STRING", "STRING"], "INT"], true]
+  VL_MAP_PAIR_VL_STRING_VL_STRING_INT, // ["std::map<std::pair<std::string, std::string>, int>", 4, ["HDF5","SQLite"], ["VL_MAP", ["PAIR", "VL_STRING", "VL_STRING"], "INT"], true]
 
   // append new types only:
 };
@@ -938,6 +938,15 @@ class Sha1 {
       hash_.process_bytes(&(it->first.first), sizeof(int));
       hash_.process_bytes(it->first.second.c_str(), it->first.second.size());
       hash_.process_bytes(&(it->second), sizeof(double));
+    }
+  }
+
+  inline void Update(const std::map<std::pair<std::string, std::string>, int>& x) {
+    std::map<std::pair<std::string, std::string>, int>::const_iterator it = x.begin();
+    for (; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.first.c_str(), it->first.first.size());
+      hash_.process_bytes(it->first.second.c_str(), it->first.second.size());
+      hash_.process_bytes(&(it->second), sizeof(int));
     }
   }
 
