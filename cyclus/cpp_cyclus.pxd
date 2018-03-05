@@ -815,9 +815,9 @@ cdef extern from "toolkit/position.h" namespace "cyclus::toolkit":
             DEGREES_MINUTES_SECONDS
         Position()
         Position(double, double)
-        double lattitude()
-        double longitute()
-        void lattitude(double)
+        double latitude()
+        double longitude()
+        void latitude(double)
         void longitude(double)
         void set_position(double, double)
         double Distance(Position)

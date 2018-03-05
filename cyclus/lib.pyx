@@ -1990,7 +1990,7 @@ def dbopen(fname):
 cdef class _Position:
 
     def __cinit__(self, double latitude=0.0, double longitude=0.0):
-        self.posptx = new cpp_cyclus.Positon(latitude, longitude)
+        self.posptx = new cpp_cyclus.Position(latitude, longitude)
 
     def __dealloc__(self):
         del self.posptx
