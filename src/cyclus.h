@@ -1,5 +1,7 @@
 #ifndef CYCLUS_SRC_CYCLUS_H_
 #define CYCLUS_SRC_CYCLUS_H_
+// platform needs to be before all other includes
+#include "platform.h"
 
 #include "bid.h"
 #include "bid_portfolio.h"
@@ -7,6 +9,9 @@
 #include "comp_math.h"
 #include "composition.h"
 #include "context.h"
+extern "C" {
+#include "cram.hpp"
+}
 #include "cyc_arithmetic.h"
 #include "cyc_limits.h"
 #include "cyc_std.h"
@@ -37,13 +42,12 @@
 #include "time_listener.h"
 #include "trade.h"
 #include "trader.h"
-extern "C" {
-#include "transmute.h"
-}
 #include "version.h"
 
 #include "toolkit/builder.h"
+#if CYCLUS_HAS_COIN
 #include "toolkit/building_manager.h"
+#endif
 #include "toolkit/matl_buy_policy.h"
 #include "toolkit/matl_sell_policy.h"
 #include "toolkit/commodity.h"

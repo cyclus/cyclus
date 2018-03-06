@@ -9,6 +9,7 @@ from cython.operator cimport dereference as deref
 from cython.operator cimport preincrement as inc
 from libc.stdlib cimport malloc, free
 from libcpp cimport bool as cpp_bool
+from cpython cimport PyObject
 
 # local imports
 from cyclus cimport cpp_jsoncpp
@@ -77,7 +78,7 @@ cdef class _Timer:
 cdef class _SimInit:
     cdef cpp_cyclus.SimInit * ptx
 
-
+cpdef object capsule_agent_to_py(object agent, object ctx)
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptr, object ctx)
 cdef dict inventories_to_py(cpp_cyclus.Inventories& invs)
 cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs)

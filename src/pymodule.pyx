@@ -7,6 +7,7 @@ from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 from importlib import import_module
 
 import cyclus.lib as cyclib
+import cyclus.typesystem as ts
 
 cdef object std_string_to_py(std_string x):
     pyx = x
@@ -44,13 +45,27 @@ cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
     cdef Agent* rtn
     if kind == "Region":
         rtn = dynamic_cast[agent_ptr](reinterpret_cast[region_ptr](avoid))
-    elif kind == "Institution":
+    elif kind == "Inst":
         rtn = dynamic_cast[agent_ptr](reinterpret_cast[institution_ptr](avoid))
     elif kind == "Facility":
         rtn = dynamic_cast[agent_ptr](reinterpret_cast[facility_ptr](avoid))
     else:
         rtn = dynamic_cast[agent_ptr](reinterpret_cast[agent_ptr](avoid))
     return rtn
+
+
+cdef public void init_from_py_agent "CyclusInitFromPyAgent" (Agent* cpp_src,
+                                                             Agent* cpp_dst,
+                                                             void* cpp_ctx):
+    """Initializes the dst agent with the settings from the src. Users will not
+    normally need to call this. Useful for cloning prototypes.
+    """
+    ctx = PyCapsule_New(cpp_ctx, <char*> b"ctx", NULL)
+    src = PyCapsule_New(cpp_src, <char*> b"agent", NULL)
+    dst = PyCapsule_New(cpp_dst, <char*> b"agent", NULL)
+    py_src = cyclib.capsule_agent_to_py(src, ctx)
+    py_dst = cyclib.capsule_agent_to_py(dst, ctx)
+    py_dst.init_from_agent(py_src)
 
 
 cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ():
@@ -61,3 +76,16 @@ cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ():
 cdef public void py_del_agent "CyclusPyDelAgent" (int i):
     """Clears the cache of a single agent ref"""
     cyclib._del_agent(i)
+
+cdef public void py_call_listeners "CyclusPyCallListeners" (std_string cpp_tsname,
+                            Agent* cpp_agent, void* cpp_ctx, int time, hold_any cpp_value):
+    """Calls the python time series listeners
+    """
+    ctx = PyCapsule_New(cpp_ctx, <char*> b"ctx", NULL)
+    agent = PyCapsule_New(cpp_agent, <char*> b"agent", NULL)
+    value = PyCapsule_New(&cpp_value, <char*> b"value", NULL)
+    py_tsname = std_string_to_py(cpp_tsname)
+    py_agent = cyclib.capsule_agent_to_py(agent, ctx)
+    py_value = ts.capsule_any_to_py(value)
+    cyclib.call_listeners(py_tsname, py_agent, time, py_value)
+

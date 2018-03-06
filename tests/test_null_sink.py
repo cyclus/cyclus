@@ -1,13 +1,18 @@
 #! /usr/bin/env python
 
-from nose.tools import assert_false, assert_true, assert_equal
 import os
-import tables
 import sqlite3
+
+from nose.tools import assert_false, assert_true, assert_equal
+from nose.plugins.skip import SkipTest
+
+
 import numpy as np
-from tools import check_cmd
+import tables
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
+
+from tools import check_cmd, cyclus_has_coin
 
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
@@ -19,6 +24,8 @@ def check_null_sink(fname, given_spec):
     transaction records must not exist in order to pass this test.
     """
     clean_outs()
+    if not cyclus_has_coin():
+        raise SkipTest("Cyclus does not have COIN")
 
     # Cyclus simulation input for null sink testing
     sim_input = os.path.join(INPUT, fname)

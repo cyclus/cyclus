@@ -10,6 +10,10 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "in-source build detected")
 ENDIF()
 
+# Set some policies
+cmake_policy(SET CMP0040 OLD)
+cmake_policy(SET CMP0042 OLD)
+
 # This project name is cyclus.
 PROJECT(CYCLUS)
 
@@ -21,6 +25,9 @@ IF(COMPILER_SUPPORTS_CXX11)
 ELSE()
     MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 ENDIF()
+
+# enable assembly
+enable_language(ASM)
 
 # quiets fortify_source warnings when not compiling with optimizations
 # in linux distros where compilers were compiled with fortify_source enabled by
@@ -79,7 +86,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # (but later on when installing)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/cyclus")
+    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/cyclus")
 
     # add the automatically determined parts of the RPATH
     # which point to directories outside the build tree to the install RPATH
@@ -88,14 +95,17 @@ IF(NOT CYCLUS_DOC_ONLY)
     # the RPATH to be used when installing, but only if it's not a system directory
     LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
     IF("${isSystemDir}" STREQUAL "-1")
-        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/cyclus")
+        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/cyclus")
         GET_FILENAME_COMPONENT(cxxCompilerRoot ${CMAKE_CXX_COMPILER} DIRECTORY)
         GET_FILENAME_COMPONENT(cxxCompilerRoot ${cxxCompilerRoot} DIRECTORY)
         IF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
-            SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${cxxCompilerRoot}/lib:${cxxCompilerRoot}/lib/cyclus")
+            SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${cxxCompilerRoot}/lib;${cxxCompilerRoot}/lib/cyclus")
         ENDIF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
     ENDIF("${isSystemDir}" STREQUAL "-1")
     MESSAGE("-- CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
+    if (APPLE)
+      set(BUILD_WITH_INSTALL_NAME_DIR TRUE)
+    endif()
 
     # Tell CMake where the modules are
     LIST(APPEND CMAKE_MODULE_PATH
@@ -103,7 +113,12 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Include macros
     INCLUDE(CopyWhenDiffMacro)
+    INCLUDE(DownloadAndExtract)
     INCLUDE(UseCyclus)
+
+    # set configuration variables
+    cyclus_platform()
+    cyclus_set_fast_compile()
 
     # set configuration for all library builds
     IF (WIN32)
@@ -150,13 +165,20 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
-    FIND_PACKAGE(LibXml2 REQUIRED ${DEPS_HINTS})
+    FIND_PACKAGE(LibXml2 ${DEPS_HINTS})
+    IF(NOT LIBXML2_LIBRARIES)
+        FIND_LIBRARY(LibXml2 REQUIRED ${DEPS_HINTS})
+    ENDIF()
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
     SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
 
     # Find LibXML++ and dependencies
-    FIND_PACKAGE(LibXML++ REQUIRED)
+    FIND_PACKAGE(LibXML++)
+    IF(NOT LibXML++_LIBRARIES)
+        FIND_LIBRARY(LibXML++ REQUIRED ${DEPS_HINTS})
+    ENDIF()
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
+    message("-- LibXML++ Include Dir: ${LibXML++_INCLUDE_DIR}")
 
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
@@ -172,6 +194,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Find HDF5
     FIND_PACKAGE(HDF5 REQUIRED COMPONENTS HL)
     ADD_DEFINITIONS(${HDF5_DEFINITIONS})
+    if(NOT HDF5_LIBRARY_DIRS STREQUAL "")
+      set(LIBS ${LIBS} ${HDF5_LIBRARIES})
+      link_directories(${HDF5_LIBRARY_DIRS})
+    endif()
     set(LIBS ${LIBS} ${HDF5_C_LIBRARIES} ${HDF5_C_HL_LIBRARIES})
     MESSAGE("--    HDF5 Root: ${HDF5_ROOT}")
     MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
@@ -203,9 +229,13 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find coin and link to it
-    FIND_PACKAGE(COIN REQUIRED)
+    FIND_PACKAGE(COIN)
     MESSAGE("-- COIN Version: ${COIN_VERSION}")
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
+    if(NOT COIN_FOUND)
+      # no COIN, so no MILPs
+      set(DEFAULT_ALLOW_MILPS false)
+    endif()
 
     #
     # Some optional libraries to link in, as availble. Required for conda.
@@ -328,7 +358,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     # include all the directories we just found
     # NOTE: for some reason, adding quotes around
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
-    INCLUDE_DIRECTORIES("${LIBXML2_INCLUDE_DIR}"
+    set(inc_dirs
+        "${LIBXML2_INCLUDE_DIR}"
         "${LibXML++_INCLUDE_DIR}"
         "${Glibmm_INCLUDE_DIRS}"
         "${LibXML++Config_INCLUDE_DIR}"
@@ -336,6 +367,11 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
+    IF(NOT inc_dirs STREQUAL "")
+      INCLUDE_DIRECTORIES(${inc_dirs})
+    ENDIF()
+    message("-- Include Directories: ${inc_dirs}")
+
 
     if(Cython_FOUND)
         INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}"

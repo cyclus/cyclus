@@ -26,11 +26,13 @@ from cyclus import lib
 from cyclus cimport cpp_typesystem
 from cyclus.typesystem cimport (py_to_any, any_to_py, str_py_to_cpp,
     std_string_to_py, bool_to_py, bool_to_cpp, std_set_std_string_to_py,
-    std_set_std_string_to_cpp)
+    std_set_std_string_to_cpp, std_vector_std_string_to_py)
 from cyclus cimport typesystem as ts
 from cyclus import typesystem as ts
 
 from cyclus cimport cpp_jsoncpp
+from cyclus cimport jsoncpp
+from cyclus import jsoncpp
 
 from cyclus import nucname
 
@@ -93,7 +95,9 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
@@ -215,7 +219,9 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
@@ -343,7 +349,9 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
@@ -480,7 +488,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
-        (<object> this.self).init_from_dict(res)
+        self = (<object> this.self)
+        self.init_from_dict(res)
+        lib._AGENT_REFS[self.id] = self
 
     void Snapshot(cpp_cyclus.DbInit di):
         cdef lib._DbInit py_di = lib.DbInit(free=False)
@@ -793,7 +803,7 @@ cdef class _Agent(lib._Agent):
                 var.value = var.default
                 continue
             query = var.alias if isinstance(var.alias, str) else var.alias[0]
-            if var.default is not None and tree.nmatches(query) == 0:
+            if var.default is not None and sub.nmatches(query) == 0:
                 var.value = var.default
                 continue
             else:
@@ -891,11 +901,14 @@ cdef class _Agent(lib._Agent):
         Users should not need to call this ever. However, brave
         users may choose to override it in exceptional cases.
         """
-        for name, val in d.items():
-            setattr(self, name, val)
+        for name, var in self._statevars:
+            setattr(self, name, d[name])
         for name, inv in self._inventories:
             if isinstance(inv.capacity, str):
                 inv.value.capacity = d[inv.capacity]
+            elif inv.capacity is None:
+                # infinite capacity when unspecified
+                inv.value.capacity = 1e300
             else:
                 inv.value.capacity = inv.capacity
 
@@ -1042,6 +1055,154 @@ cdef class _Region(_Agent):
         else:
             self.ptx = self.shim = NULL
 
+    def children_str(self):
+        """Returns recursively generated string of the parent-child tree."""
+        return std_string_to_py((<CyclusRegionShim*> (<_Agent> self).shim).PrintChildren())
+
+    def tree_strs(self, m):
+        """Returns a list of children strings representing the parent-child tree
+        at the node for Agent m.
+        """
+        cdef cpp_cyclus.Agent* cpp_m = <cpp_cyclus.Agent*> (<_Agent> m).ptx
+        rtn = std_vector_std_string_to_py(
+                (<CyclusRegionShim*> (<_Agent> self).shim).GetTreePrintOuts(cpp_m))
+        return rtn
+
+    def in_family_tree(self, other):
+        """Returns true if this agent is in the parent-child family tree of an
+        other agent.
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusRegionShim*> (<_Agent> self).shim).InFamilyTree(cpp_other))
+        return rtn
+
+    def ancestor_of(self, other):
+        """Returns true if this agent is an ancestor of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusRegionShim*> (<_Agent> self).shim).AncestorOf(cpp_other))
+        return rtn
+
+    def decendent_of(self, other):
+        """Returns true if this agent is an decendent of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusRegionShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
+        return rtn
+
+    def decomission(self):
+        """Decommissions the agent, removing it from the simulation. Results in
+        destruction of the agent object. If agents write their own decommission()
+        function, they must call their superclass' decommission function at the
+        END of their decommission() function.
+        """
+        (<CyclusRegionShim*> (<_Agent> self).shim).Decommission()
+
+    @property
+    def annotations(self):
+        """Agent annotations."""
+        cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
+        if self._annotations is None:
+            cpp_rtn._inst[0] = (<CyclusRegionShim*> (<_Agent> self).shim).annotations()
+        self._annotations = cpp_rtn
+        return self._annotations
+
+    @property
+    def prototype(self):
+        """The agent's prototype."""
+        rtn = std_string_to_py((<CyclusRegionShim*> (<_Agent> self).shim).get_prototype())
+        return rtn
+
+    @prototype.setter
+    def prototype(self, str p):
+        cdef std_string cpp_p = str_py_to_cpp(p)
+        (<CyclusRegionShim*> (<_Agent> self).shim).prototype(cpp_p)
+
+    @property
+    def spec(self):
+        """The agent's spec."""
+        rtn = std_string_to_py((<CyclusRegionShim*> (<_Agent> self).shim).get_spec())
+        return rtn
+
+    @spec.setter
+    def spec(self, str new_impl):
+        cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
+        (<CyclusRegionShim*> (<_Agent> self).shim).spec(cpp_new_impl)
+
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<CyclusRegionShim*> (<_Agent> self).shim).id()
+
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<CyclusRegionShim*> (<_Agent> self).shim).id()
+
+    @property
+    def kind(self):
+        """Returns a string that describes the agent subclass (e.g. Region,
+        Facility, etc.)
+        """
+        rtn = std_string_to_py((<CyclusRegionShim*> (<_Agent> self).shim).kind())
+        return rtn
+
+    def __str__(self):
+        rtn = std_string_to_py((<CyclusRegionShim*> (<_Agent> self).shim).str())
+        return rtn
+
+    def parent(self):
+        """Returns parent of this agent.  Returns None if the agent has no parent.
+        """
+        rtn = lib.agent_to_py((<CyclusRegionShim*> (<_Agent> self).shim).parent(), None)
+        return rtn
+
+    @property
+    def parent_id(self):
+        """The id for this agent's parent or -1 if this agent has no parent."""
+        return (<CyclusRegionShim*> (<_Agent> self).shim).parent_id()
+
+    @property
+    def enter_time(self):
+        """The time step at which this agent's Build function was called
+        (-1 if the agent has never been built).
+        """
+        return (<CyclusRegionShim*> (<_Agent> self).shim).enter_time()
+
+    @property
+    def lifetime(self):
+        """The number of time steps this agent operates between building and
+        decommissioning (-1 if the agent has an infinite lifetime)
+        """
+        return (<CyclusRegionShim*> (<_Agent> self).shim).get_lifetime()
+
+    @lifetime.setter
+    def lifetime(self, int n_timesteps):
+        (<CyclusRegionShim*> (<_Agent> self).shim).lifetime(n_timesteps)
+
+    @property
+    def exit_time(self):
+        """The default time step at which this agent will exit the
+        simulation (-1 if the agent has an infinite lifetime).
+
+        Decomissioning happens at the end of a time step. With a lifetime of 1, we
+        expect an agent to go through only 1 entire time step. In this case, the
+        agent should be decommissioned on the same time step it was
+        created. Therefore, for agents with non-infinite lifetimes, the exit_time
+        will be the enter time plus its lifetime less 1.
+        """
+        return (<CyclusRegionShim*> (<_Agent> self).shim).exit_time()
+
+    @property
+    def children(self):
+        """A frozen set of the children of this agent."""
+        kids = []
+        for kid_ptx in (<CyclusRegionShim*> (<_Agent> self).shim).children():
+            kid = lib.agent_to_py(kid_ptx, None)
+            kids.append(kid)
+        return frozenset(kids)
 
 
 class Region(_Region):
@@ -1086,6 +1247,155 @@ cdef class _Institution(_Agent):
         else:
             self.ptx = self.shim = NULL
 
+    def children_str(self):
+        """Returns recursively generated string of the parent-child tree."""
+        return std_string_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).PrintChildren())
+
+    def tree_strs(self, m):
+        """Returns a list of children strings representing the parent-child tree
+        at the node for Agent m.
+        """
+        cdef cpp_cyclus.Agent* cpp_m = <cpp_cyclus.Agent*> (<_Agent> m).ptx
+        rtn = std_vector_std_string_to_py(
+                (<CyclusInstitutionShim*> (<_Agent> self).shim).GetTreePrintOuts(cpp_m))
+        return rtn
+
+    def in_family_tree(self, other):
+        """Returns true if this agent is in the parent-child family tree of an
+        other agent.
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).InFamilyTree(cpp_other))
+        return rtn
+
+    def ancestor_of(self, other):
+        """Returns true if this agent is an ancestor of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).AncestorOf(cpp_other))
+        return rtn
+
+    def decendent_of(self, other):
+        """Returns true if this agent is an decendent of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
+        return rtn
+
+    def decomission(self):
+        """Decommissions the agent, removing it from the simulation. Results in
+        destruction of the agent object. If agents write their own decommission()
+        function, they must call their superclass' decommission function at the
+        END of their decommission() function.
+        """
+        (<CyclusInstitutionShim*> (<_Agent> self).shim).Decommission()
+
+    @property
+    def annotations(self):
+        """Agent annotations."""
+        cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
+        if self._annotations is None:
+            cpp_rtn._inst[0] = (<CyclusInstitutionShim*> (<_Agent> self).shim).annotations()
+        self._annotations = cpp_rtn
+        return self._annotations
+
+    @property
+    def prototype(self):
+        """The agent's prototype."""
+        rtn = std_string_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).get_prototype())
+        return rtn
+
+    @prototype.setter
+    def prototype(self, str p):
+        cdef std_string cpp_p = str_py_to_cpp(p)
+        (<CyclusInstitutionShim*> (<_Agent> self).shim).prototype(cpp_p)
+
+    @property
+    def spec(self):
+        """The agent's spec."""
+        rtn = std_string_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).get_spec())
+        return rtn
+
+    @spec.setter
+    def spec(self, str new_impl):
+        cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
+        (<CyclusInstitutionShim*> (<_Agent> self).shim).spec(cpp_new_impl)
+
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<CyclusInstitutionShim*> (<_Agent> self).shim).id()
+
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<CyclusInstitutionShim*> (<_Agent> self).shim).id()
+
+    @property
+    def kind(self):
+        """Returns a string that describes the agent subclass (e.g. Region,
+        Facility, etc.)
+        """
+        rtn = std_string_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).kind())
+        return rtn
+
+    def __str__(self):
+        rtn = std_string_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).str())
+        return rtn
+
+    def parent(self):
+        """Returns parent of this agent.  Returns None if the agent has no parent.
+        """
+        rtn = lib.agent_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).parent(), None)
+        return rtn
+
+    @property
+    def parent_id(self):
+        """The id for this agent's parent or -1 if this agent has no parent."""
+        return (<CyclusInstitutionShim*> (<_Agent> self).shim).parent_id()
+
+    @property
+    def enter_time(self):
+        """The time step at which this agent's Build function was called
+        (-1 if the agent has never been built).
+        """
+        return (<CyclusInstitutionShim*> (<_Agent> self).shim).enter_time()
+
+    @property
+    def lifetime(self):
+        """The number of time steps this agent operates between building and
+        decommissioning (-1 if the agent has an infinite lifetime)
+        """
+        return (<CyclusInstitutionShim*> (<_Agent> self).shim).get_lifetime()
+
+    @lifetime.setter
+    def lifetime(self, int n_timesteps):
+        (<CyclusInstitutionShim*> (<_Agent> self).shim).lifetime(n_timesteps)
+
+    @property
+    def exit_time(self):
+        """The default time step at which this agent will exit the
+        simulation (-1 if the agent has an infinite lifetime).
+
+        Decomissioning happens at the end of a time step. With a lifetime of 1, we
+        expect an agent to go through only 1 entire time step. In this case, the
+        agent should be decommissioned on the same time step it was
+        created. Therefore, for agents with non-infinite lifetimes, the exit_time
+        will be the enter time plus its lifetime less 1.
+        """
+        return (<CyclusInstitutionShim*> (<_Agent> self).shim).exit_time()
+
+    @property
+    def children(self):
+        """A frozen set of the children of this agent."""
+        kids = []
+        for kid_ptx in (<CyclusInstitutionShim*> (<_Agent> self).shim).children():
+            kid = lib.agent_to_py(kid_ptx, None)
+            kids.append(kid)
+        return frozenset(kids)
+
 
 class Institution(_Institution):
     """Python Institution that is subclassable into a institution archetype.
@@ -1129,6 +1439,87 @@ cdef class _Facility(_Agent):
         else:
             self.ptx = self.shim = NULL
 
+    def children_str(self):
+        """Returns recursively generated string of the parent-child tree."""
+        return std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).PrintChildren())
+
+    def tree_strs(self, m):
+        """Returns a list of children strings representing the parent-child tree
+        at the node for Agent m.
+        """
+        cdef cpp_cyclus.Agent* cpp_m = <cpp_cyclus.Agent*> (<_Agent> m).ptx
+        rtn = std_vector_std_string_to_py(
+                (<CyclusFacilityShim*> (<_Agent> self).shim).GetTreePrintOuts(cpp_m))
+        return rtn
+
+    def in_family_tree(self, other):
+        """Returns true if this agent is in the parent-child family tree of an
+        other agent.
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).InFamilyTree(cpp_other))
+        return rtn
+
+    def ancestor_of(self, other):
+        """Returns true if this agent is an ancestor of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).AncestorOf(cpp_other))
+        return rtn
+
+    def decendent_of(self, other):
+        """Returns true if this agent is an decendent of an other agent (i.e., resides
+        above an other agent in the family tree).
+        """
+        cdef cpp_cyclus.Agent* cpp_other = <cpp_cyclus.Agent*> (<_Agent> other).ptx
+        rtn = bool_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
+        return rtn
+
+    def decomission(self):
+        """Decommissions the agent, removing it from the simulation. Results in
+        destruction of the agent object. If agents write their own decommission()
+        function, they must call their superclass' decommission function at the
+        END of their decommission() function.
+        """
+        (<CyclusFacilityShim*> (<_Agent> self).shim).Decommission()
+
+    @property
+    def annotations(self):
+        """Agent annotations."""
+        cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
+        if self._annotations is None:
+            cpp_rtn._inst[0] = (<CyclusFacilityShim*> (<_Agent> self).shim).annotations()
+        self._annotations = cpp_rtn
+        return self._annotations
+
+    @property
+    def prototype(self):
+        """The agent's prototype."""
+        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).get_prototype())
+        return rtn
+
+    @prototype.setter
+    def prototype(self, str p):
+        cdef std_string cpp_p = str_py_to_cpp(p)
+        (<CyclusFacilityShim*> (<_Agent> self).shim).prototype(cpp_p)
+
+    @property
+    def spec(self):
+        """The agent's spec."""
+        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).get_spec())
+        return rtn
+
+    @spec.setter
+    def spec(self, str new_impl):
+        cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
+        (<CyclusFacilityShim*> (<_Agent> self).shim).spec(cpp_new_impl)
+
+    @property
+    def id(self):
+        """The agent instance's unique ID within a simulation."""
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).id()
+
     @property
     def id(self):
         """The agent instance's unique ID within a simulation."""
@@ -1141,6 +1532,61 @@ cdef class _Facility(_Agent):
         """
         rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).kind())
         return rtn
+
+    def __str__(self):
+        rtn = std_string_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).str())
+        return rtn
+
+    def parent(self):
+        """Returns parent of this agent.  Returns None if the agent has no parent.
+        """
+        rtn = lib.agent_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).parent(), None)
+        return rtn
+
+    @property
+    def parent_id(self):
+        """The id for this agent's parent or -1 if this agent has no parent."""
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).parent_id()
+
+    @property
+    def enter_time(self):
+        """The time step at which this agent's Build function was called
+        (-1 if the agent has never been built).
+        """
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).enter_time()
+
+    @property
+    def lifetime(self):
+        """The number of time steps this agent operates between building and
+        decommissioning (-1 if the agent has an infinite lifetime)
+        """
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).get_lifetime()
+
+    @lifetime.setter
+    def lifetime(self, int n_timesteps):
+        (<CyclusFacilityShim*> (<_Agent> self).shim).lifetime(n_timesteps)
+
+    @property
+    def exit_time(self):
+        """The default time step at which this agent will exit the
+        simulation (-1 if the agent has an infinite lifetime).
+
+        Decomissioning happens at the end of a time step. With a lifetime of 1, we
+        expect an agent to go through only 1 entire time step. In this case, the
+        agent should be decommissioned on the same time step it was
+        created. Therefore, for agents with non-infinite lifetimes, the exit_time
+        will be the enter time plus its lifetime less 1.
+        """
+        return (<CyclusFacilityShim*> (<_Agent> self).shim).exit_time()
+
+    @property
+    def children(self):
+        """A frozen set of the children of this agent."""
+        kids = []
+        for kid_ptx in (<CyclusFacilityShim*> (<_Agent> self).shim).children():
+            kid = lib.agent_to_py(kid_ptx, None)
+            kids.append(kid)
+        return frozenset(kids)
 
 
 class Facility(_Facility):
@@ -1250,7 +1696,7 @@ cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
     elif a.kind == "Region":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[region_ptr]((<lib._Agent> a).ptx))
-    elif a.kind == "Institution":
+    elif a.kind == "Inst":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[institution_ptr]((<lib._Agent> a).ptx))
     elif a.kind == "Facility":
