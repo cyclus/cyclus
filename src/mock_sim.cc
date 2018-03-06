@@ -183,7 +183,7 @@ void MockSim::DummyProto(std::string name, std::string commod, double capacity) 
   xml << "<facility><name>" << name << "</name>"
       << "<config><foo>"
       << "<commod>" << "commod" << "</commod>"
-      << "<capacity>" << capcity << "</capacity>"
+      << "<capacity>" << capacity << "</capacity>"
       << "</foo></config></facility>";
 
   InitAgent(a, xml, &rec_, back_);
