@@ -202,7 +202,7 @@ class MockSim {
 
   /// Adds a dummy prototype to the simulation that can be used by
   /// institutions and other agents for demand-driven deployment testing.
-  void MockSim::DummyProto(std::string name, std::string commod, double capacity);
+  void DummyProto(std::string name, std::string commod, double capacity);
 
   /// Runs the simulation.  This can only be called once.  After the simulation
   /// has been run, this MockSim object CANNOT be reused to run other
