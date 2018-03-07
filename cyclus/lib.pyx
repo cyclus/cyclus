@@ -1271,18 +1271,13 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     global _AGENT_REFS
     if a_ptx == NULL:
         return None
-    print("HERE")
     cdef int a_id = a_ptx.id()
-    print("Agent ID:" + str(a_id))
     if a_id in _AGENT_REFS:
-        print(str(a_id)+ " is in refs")
         return _AGENT_REFS[a_id]
     if ctx is None:
         # have to make new wrapper instance
         ctx = Context(init=False)
-        print("Context is none")
         (<_Context> ctx).ptx = a_ptx.context()
-        print("Made context")
     elif not isinstance(ctx, Context):
         # have a pycapsule, need to pull it out
         cap = ctx
