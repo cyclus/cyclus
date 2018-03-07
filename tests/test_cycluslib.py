@@ -1,4 +1,3 @@
-
 """Tests for cyclus wrappers"""
 import os
 import subprocess
@@ -62,6 +61,14 @@ def test_schema(db, fname, backend):
         assert_equal(i, ci.index)
         assert_equal(1, len(ci.shape))
         assert_equal(-1, ci.shape)
+
+
+def test_position():
+    p1 = lib.Position(42.65, 28.6)
+    p2 = lib.Position(42.65, 28.6)
+    d = p1.distance(p2)
+    assert_equal(0.0, d)
+
 
 if __name__ == "__main__":
     nose.runmodule()

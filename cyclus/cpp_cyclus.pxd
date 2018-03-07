@@ -802,6 +802,28 @@ cdef extern from "discovery.h" namespace "cyclus":
     cdef set[std_string] DiscoverSpecsInCyclusPath() except +
     cdef cpp_jsoncpp.Value DiscoverMetadataInCyclusPath() except +
 
+#
+# Positions
+#
+
+cdef extern from "toolkit/position.h" namespace "cyclus::toolkit":
+
+    cdef cppclass Position:
+        enum StringFormat:
+            DEGREES = 1
+            DEGREES_MINUTES
+            DEGREES_MINUTES_SECONDS
+        Position()
+        Position(double, double)
+        double latitude()
+        double longitude()
+        void latitude(double)
+        void longitude(double)
+        void set_position(double, double)
+        double Distance(Position)
+        std_string ToString()
+        std_string ToString(StringFormat)
+
 
 #
 # Inventories and Resource Buffers

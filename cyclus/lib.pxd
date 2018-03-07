@@ -97,10 +97,17 @@ cdef class _XMLFlatLoader:
 cdef class _Context:
     cdef cpp_cyclus.Context * ptx
     cdef bint _free
-    
+
 cdef class _ColumnInfo:
     cdef cpp_cyclus.ColumnInfo * ptx
     cdef void copy_from(_ColumnInfo, cpp_cyclus.ColumnInfo)
+
+
+#
+# Position
+#
+cdef class _Position:
+    cdef cpp_cyclus.Position* posptx
 
 #
 # Tools
