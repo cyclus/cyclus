@@ -17,7 +17,7 @@ from cyclus.cpp_cyclus cimport shared_ptr
 cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTRUCTORS CyclusAgentShim(cyclus::Context*)
     # Agent interface
     CyclusAgentShim(cpp_cyclus.Context*)
-    std_string version()  except +
+    std_string version() except +
     cpp_cyclus.Agent* Clone() except +
     void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except +
     void InitFromAgent "InitFrom" (CyclusAgentShim*) except +

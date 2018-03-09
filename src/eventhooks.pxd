@@ -1,3 +1,3 @@
 """Header for cyclus events."""
 
-cdef public void eventloophook "CyclusEventLoopHook" ()  except +
+cdef public void eventloophook "CyclusEventLoopHook" () except +
