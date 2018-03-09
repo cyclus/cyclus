@@ -15,6 +15,15 @@ class DefaultToaster(Facility):
         print('Bread is ' + self.bread)
         print('Toast level is {0}'.format(self.level))
 
+    def get_material_bids(self, requests):
+        reqs = requests[self.dest_commodity]
+        for req in reqs:
+            if req.requester.id == self.contractee:
+                bid = req
+                break
+        bids = [bid]
+        ports.append({"bids": bids, "constraints": self.capacity})
+        return ports
 
 class AttrTick(object):
     """Meant for testing attributes values"""
