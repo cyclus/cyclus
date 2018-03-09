@@ -47,18 +47,18 @@ cdef std_string str_py_to_cpp(object x)
 cdef object std_string_to_py(std_string x)
 
 
-cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib)
+cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib) except +
 
 cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
                                                       std_string cpp_agent,
-                                                      void* cpp_ctx)
+                                                      void* cpp_ctx) except +
 
 cdef public void init_from_py_agent "CyclusInitFromPyAgent" (Agent* cpp_src,
                                                              Agent* cpp_dst,
-                                                             void* cpp_ctx)
+                                                             void* cpp_ctx) except +
 
-cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" ()
-cdef public void py_del_agent "CyclusPyDelAgent" (int i)
+cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" () except +
+cdef public void py_del_agent "CyclusPyDelAgent" (int i) except +
 
 cdef public void py_call_listeners "CyclusPyCallListeners" (std_string cpp_tsname,
-                            Agent* cpp_agent, void* cpp_ctx, int time, hold_any cpp_value)
+                            Agent* cpp_agent, void* cpp_ctx, int time, hold_any cpp_value) except +

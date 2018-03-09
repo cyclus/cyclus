@@ -1,5 +1,6 @@
 """Cyclus Python input file tools."""
 from __future__ import print_function, unicode_literals
+from cpython.exc cimport PyErr_CheckSignals
 from libcpp.string cimport string as std_string
 
 try:
@@ -21,7 +22,7 @@ cdef std_string str_py_to_cpp(object x):
     return s
 
 
-cdef public std_string py_to_json "CyclusPyToJson" (std_string cpp_infile):
+cdef public std_string py_to_json "CyclusPyToJson" (std_string cpp_infile) except +:
     """Converts a Python file to JSON"""
     infile = std_string_to_py(cpp_infile)
     if not infile.endswith('\n'):
@@ -47,15 +48,17 @@ cdef public std_string py_to_json "CyclusPyToJson" (std_string cpp_infile):
         sim = json.dumps(sim, sort_keys=True, indent=1)
     else:
         raise RuntimeError('top-level simulation object does not have proper type.')
+    PyErr_CheckSignals()
     cdef std_string cpp_rtn = str_py_to_cpp(sim)
     return cpp_rtn
 
 
-cdef public std_string json_to_py "CyclusJsonToPy" (std_string cpp_infile):
+cdef public std_string json_to_py "CyclusJsonToPy" (std_string cpp_infile) except +:
     """Converts a JSON file to Python"""
     infile = std_string_to_py(cpp_infile)
     import json
     sim = json.loads(infile)
+    PyErr_CheckSignals()
     s = 'SIMULATION = ' + pformat(sim, indent=1) + '\n'
     cdef std_string cpp_rtn = str_py_to_cpp(s)
     return cpp_rtn
