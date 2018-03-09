@@ -1489,7 +1489,7 @@ cdef class _{{tclassname}}:
         For ResBuf, this iteratively calls push().
         """
         for r in rs:
-            self.push(rs)
+            self.push(r)
 
 {% elif ts.norms[t][0] == 'cyclus::toolkit::ResMap' %}
 {% set k = ts.norms[t][1] %}
