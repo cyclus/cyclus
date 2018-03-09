@@ -1439,7 +1439,7 @@ cdef class _{{tclassname}}:
             x = {{rcname}}()
             x.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
                     r)
-            x.append(x)
+            v.append(x)
         rtn = v
         return rtn
 
@@ -1451,7 +1451,7 @@ cdef class _{{tclassname}}:
         for r in rs:
             x = Resource()
             x.ptx = r
-            x.append(x)
+            v.append(x)
         rtn = v
         return rtn
 
@@ -1549,7 +1549,7 @@ cdef class _{{tclassname}}:
             x.ptx = \
                 reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
                     r)
-            x.append(x)
+            v.append(x)
         rtn = v
         return rtn
 
@@ -1563,7 +1563,7 @@ cdef class _{{tclassname}}:
         for r in rs:
             x = Resource()
             x.ptx = r
-            x.append(x)
+            v.append(x)
         rtn = v
         return rtn
 
