@@ -891,6 +891,7 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport const_cast
+from libcpp.cast cimport reinterpret_cast, dynamic_cast
 """.strip()
 
 NPY_IMPORTS = """
@@ -938,6 +939,7 @@ from cyclus cimport cpp_typesystem
 from cyclus cimport cpp_cyclus
 from cyclus.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
 from cyclus cimport lib
+
 
 # pure python imports
 import uuid
@@ -2196,7 +2198,7 @@ cdef class _{{rclsname}}Request:
         """This request's agent"""
         if self._requester is not None:
             return self._requester
-        self._requester = lib.agent_to_py(<cpp_cyclus.Agent*> self.ptx.requester(),
+        self._requester = lib.agent_to_py(dynamic_cast[agent_ptr](self.ptx.requester()),
                                           None)
         return self._requester
 
@@ -2580,7 +2582,7 @@ cpdef dict C_NORMS
 {% for t in ts.uniquetypes %}
 ctypedef {{ ts.cython_type(t) }} {{ ts.funcname(t) }}_t
 {%- endfor %}
-
+ctypedef cpp_cyclus.Agent* agent_ptr
 #
 # converters
 #
