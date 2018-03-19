@@ -21,6 +21,7 @@ from cpython.pycapsule cimport PyCapsule_GetPointer
 
 from binascii import hexlify
 import uuid
+import os
 from collections import Mapping, Sequence, Iterable, defaultdict
 from importlib import import_module
 
@@ -1968,3 +1969,79 @@ def call_listeners(tsname, agent, time, value):
     vec = TIME_SERIES_LISTENERS[tsname]
     for f in vec:
         f(agent, time, value)
+
+
+EXT_BACKENDS = {'.h5': Hdf5Back, '.sqlite': SqliteBack}
+
+def dbopen(fname):
+    """Opens a Cyclus database."""
+    _, ext = os.path.splitext(fname)
+    if ext not in EXT_BACKENDS:
+        msg = ('The backend database type of {0!r} could not be determined from '
+               'extension {1!r}.')
+        raise ValueError(msg.format(fname, ext))
+    db = EXT_BACKENDS[ext](fname)
+    return db
+
+
+#
+# Position
+#
+cdef class _Position:
+
+    def __cinit__(self, double latitude=0.0, double longitude=0.0):
+        self.posptx = new cpp_cyclus.Position(latitude, longitude)
+
+    def __dealloc__(self):
+        del self.posptx
+
+    def __str__(self):
+        s = std_string_to_py(self.posptx.ToString())
+        return s
+
+    def __repr__(self):
+        return str(self)
+
+    @property
+    def latitude(self):
+        return self.posptx.latitude()
+
+    @latitude.setter
+    def latitude(self, double value):
+        self.posptx.latitude(value)
+
+    @property
+    def longitude(self):
+        return self.posptx.longitude()
+
+    @longitude.setter
+    def longitude(self, double value):
+        self.posptx.longitude(value)
+
+    def update(self, latitude=None, longitude=None):
+        """Updates the latitude and/or longitude"""
+        cdef double lat, lon
+        lat = self.latitude() if latitude is None else latitude
+        lon = self.longitude() if longitude is None else longitude
+        self.posptx.set_position(lat, lon)
+
+    def distance(self, other):
+        """Computes the distance between this object and another position."""
+        if not isinstance(other, _Position):
+            msg = ("Can only compute distances between positions, "
+                   "{0!r} ({1}) is not a position.")
+            raise TypeError(msg.format(other, type(other)))
+        d = self.posptx.Distance(deref((<_Position> other).posptx))
+        return d
+
+
+class Position(_Position):
+    """a basic class that stores the geographic location
+    in latitude and longitude and follows the ISO 6709 standard.
+    Longitude and Latitude is stored as seconds of degrees.
+    This allows the coordinate elements such as degrees,
+    minutes, and seconds to "remain on the integral portion of values, with the
+    exception of decimal of seconds, avoiding loss of precision." This is
+    calculated by multiplying decimal degrees by 3600.
+    example: 05.2169 -> 18780.84
+    """

@@ -1,4 +1,6 @@
+"""Events module for interfacing with the main time step loop of a Cyclus simulation."""
 from __future__ import unicode_literals, print_function
+from cpython.exc cimport PyErr_CheckSignals
 import time
 import json
 from functools import wraps
@@ -14,6 +16,7 @@ def loop():
     """Adds tasks to the queue"""
     if STATE is None:
         return
+    PyErr_CheckSignals()
     STATE.rec.flush()
     for action in STATE.repeating_actions:
         if callable(action):
@@ -24,6 +27,7 @@ def loop():
                 action = EVENT_ACTIONS[action]
         STATE.action_queue.put(action(STATE, **params))
     while 'pause' in STATE.tasks or not STATE.action_queue.empty():
+        PyErr_CheckSignals()
         time.sleep(STATE.frequency)
 
 

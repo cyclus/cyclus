@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os
+import re
 import sys
 import json
+
 
 VERSION_READ_FAIL = "-1"
 
@@ -33,6 +35,9 @@ SUPPORTED_INDEX = 6
 CANON_INDEX = 7
 VL_INDEX = 8
 
+RE_ENUM_ENTRY = re.compile('\s*\w+\s*?(=\s*?\d+)?,\s*?//.*')
+
+
 def main():
     outer = []
     for back in ALL_BACKS:
@@ -41,6 +46,9 @@ def main():
         for i in range(ENUM_START+1, len(lines)):
             if lines[i].strip() == '};':
                 break
+            m = RE_ENUM_ENTRY.match(lines[i])
+            if m is None:
+                continue
             s = lines[i].split("//")[-1].strip()
             #The extra strip statements keep the " = 0" out of the BOOL dbtype name.
             pre = lines[i].split("//")[0].strip().strip(",")
@@ -50,10 +58,7 @@ def main():
                 enum = int(num.strip())
             if db == "":
                 continue
-            try:
-                x = json.loads(s)
-            except ValueError:
-                continue
+            x = json.loads(s)
             x.insert(ID_INDEX, enum)
             x.insert(DB_INDEX, db)
             supported_backends = x[BACK_INDEX]
@@ -66,6 +71,7 @@ def main():
 
     s = "," + ",\n    ".join(map(json.dumps, outer))
     print(s)
+
 
 if __name__ == '__main__':
     main()

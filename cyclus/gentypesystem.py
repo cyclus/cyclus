@@ -20,6 +20,7 @@ import subprocess
 from glob import glob
 from distutils import core, dir_util
 from pprint import pprint, pformat
+from collections import defaultdict
 if sys.version_info[0] > 2:
     from urllib.request import urlopen
     str_types = (str, bytes)
@@ -103,7 +104,7 @@ class TypeSystem(object):
             cpptypes[t] = row[cpptype]
             ranks[t] = row[rank]
         self.norms = {t: parse_template(c) for t, c in cpptypes.items()}
-        self.dbtypes = sorted(types, key=lambda t: ids[t])
+        self.dbtypes = sorted(ids.keys(), key=lambda t: ids[t])
         # find unique types
         seen = set()
         self.uniquetypes = uniquetypes = []
@@ -124,6 +125,7 @@ class TypeSystem(object):
         # caches
         self._cython_cpp_name = {}
         self._cython_types = dict(CYTHON_TYPES)
+        self._shared_ptrs = {}
         self._funcnames = dict(FUNCNAMES)
         self._classnames = dict(CLASSNAMES)
         self._vars_to_py = dict(VARS_TO_PY)
@@ -132,6 +134,9 @@ class TypeSystem(object):
         self._new_py_insts = dict(NEW_PY_INSTS)
         self._to_py_converters = dict(TO_PY_CONVERTERS)
         self._to_cpp_converters = dict(TO_CPP_CONVERTERS)
+        self._use_shared_ptr = defaultdict(lambda: False,
+                                           {k: True for k in USE_SHARED_PTR})
+
 
     def cython_cpp_name(self, t):
         """Returns the C++ name of the type, eg INT -> cpp_typesystem.INT."""
@@ -150,6 +155,19 @@ class TypeSystem(object):
         cyt = list(map(self.cython_type, t))
         cyt = '{0}[{1}]'.format(cyt[0], ', '.join(cyt[1:]))
         self._cython_types[t] = cyt
+        return cyt
+
+    def possibly_shared_cython_type(self, t):
+        """Returns the Cython type, or if it is a shared pointer type,
+        return the shared pointer version.
+        """
+        if self._use_shared_ptr[t]:
+            cyt = self._shared_ptrs.get(t, None)
+            if cyt is None:
+                self._shared_ptrs[t] = 'shared_ptr[' + self.cython_type(t) + ']'
+                cyt = self._shared_ptrs[t]
+        else:
+            cyt = self.cython_type(t)
         return cyt
 
     def funcname(self, t):
@@ -188,7 +206,7 @@ class TypeSystem(object):
 
     def hold_any_to_py(self, x, t):
         """Returns an expression for converting a hold_any object to Python."""
-        cyt = self.cython_type(t)
+        cyt = self.possibly_shared_cython_type(t)
         cast = '{0}.cast[{1}]()'.format(x, cyt)
         return self.var_to_py(cast, t)
 
@@ -205,7 +223,7 @@ class TypeSystem(object):
     def py_to_any(self, a, val, t):
         """Returns an expression for assigning a Python object (val) to an any
         object (a)."""
-        cyt = self.cython_type(t)
+        cyt = self.possibly_shared_cython_type(t)
         cpp = self.var_to_cpp(val, t)
         rtn = '{a}.assign[{cyt}]({cpp})'.format(a=a, cyt=cyt, cpp=cpp)
         return rtn
@@ -369,6 +387,8 @@ RESOURCES = ['MATERIAL', 'PRODUCT']
 INVENTORIES = ['cyclus::toolkit::ResourceBuff', 'cyclus::toolkit::ResBuf',
                'cyclus::toolkit::ResMap']
 
+USE_SHARED_PTR = ('MATERIAL', 'PRODUCT', 'cyclus::Material', 'cyclus::Product')
+
 FUNCNAMES = {
     # type system types
     'BOOL': 'bool',
@@ -448,8 +468,6 @@ VARS_TO_PY = {
     'std::string': 'bytes({var}).decode()',
     'cyclus::Blob': 'blob_to_bytes({var})',
     'boost::uuids::uuid': 'uuid_cpp_to_py({var})',
-    'cyclus::Material': 'None',
-    'cyclus::Product': 'None',
     'cyclus::toolkit::ResourceBuff': 'None',
     }
 
@@ -462,8 +480,6 @@ VARS_TO_CPP = {
     'std::string': 'str_py_to_cpp({var})',
     'cyclus::Blob': 'cpp_cyclus.Blob(std_string(<const char*> {var}))',
     'boost::uuids::uuid': 'uuid_py_to_cpp({var})',
-    'cyclus::Material': 'None',
-    'cyclus::Product': 'None',
     'cyclus::toolkit::ResourceBuff': 'resource_buff_to_cpp({var})',
     }
 
@@ -485,8 +501,8 @@ NPTYPES = {
     'std::string': 'np.NPY_OBJECT',
     'cyclus::Blob': 'np.NPY_OBJECT',
     'boost::uuids::uuid': 'np.NPY_OBJECT',
-    'cyclus::Material': 'None',
-    'cyclus::Product': 'None',
+    'cyclus::Material': 'np.NPY_OBJECT',
+    'cyclus::Product': 'np.NPY_OBJECT',
     'cyclus::toolkit::ResourceBuff': 'None',
     'std::set': 'np.NPY_OBJECT',
     'std::map': 'np.NPY_OBJECT',
@@ -528,8 +544,20 @@ TO_PY_CONVERTERS = {
                     'py{var}'),
     'cyclus::Blob': ('', '', 'blob_to_bytes({var})'),
     'boost::uuids::uuid': ('', '', 'uuid_cpp_to_py({var})'),
-    'cyclus::Material': ('', '', 'None'),
-    'cyclus::Product': ('', '', 'None'),
+    'cyclus::Material': (
+        'cdef _Material pyx_{var}',
+        'pyx_{var} = Material()\n'
+        'pyx_{var}.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource, '
+                            'cpp_cyclus.Material]({var})\n'
+        'py_{var} = pyx_{var}\n',
+        'py_{var}'),
+    'cyclus::Product': (
+        'cdef _Product pyx_{var}',
+        'pyx_{var} = Product()\n'
+        'pyx_{var}.ptx = cpp_cyclus.reinterpret_pointer_cast[cpp_cyclus.Resource, '
+                            'cpp_cyclus.Product]({var})\n'
+        'py_{var} = pyx_{var}\n',
+        'py_{var}'),
     'cyclus::toolkit::ResourceBuff': ('', '', 'None'),
     # templates
     'std::set': (
@@ -638,13 +666,25 @@ TO_CPP_CONVERTERS = {
         'std_string(<const char*> b_{var})'),
     'cyclus::Blob': ('', '', 'cpp_cyclus.Blob(std_string(<const char*> {var}))'),
     'boost::uuids::uuid': ('', '', 'uuid_py_to_cpp({var})'),
-    'cyclus::Material': ('', '', 'None'),
-    'cyclus::Product': ('', '', 'None'),
+    'cyclus::Material': (
+        'cdef _Material py{var}\n'
+        'cdef shared_ptr[cpp_cyclus.Material] cpp{var}\n',
+        'py{var} = <_Material> {var}\n'
+        'cpp{var} = reinterpret_pointer_cast[cpp_cyclus.Material, '
+                         'cpp_cyclus.Resource](py{var}.ptx)\n',
+        'cpp{var}'),
+    'cyclus::Product': (
+        'cdef _Material py{var}\n'
+        'cdef shared_ptr[cpp_cyclus.Product] cpp{var}\n',
+        'py{var} = <_Product> {var}\n'
+        'cpp{var} = reinterpret_pointer_cast[cpp_cyclus.Product, '
+                         'cpp_cyclus.Resource](py{var}.ptx)\n',
+        'cpp{var}'),
     'cyclus::toolkit::ResourceBuff': (
         'cdef _{classname} py{var}\n'
-        'cdef cpp_cyclus.ResourceBuff cpp{var}\n',  #
+        'cdef cpp_cyclus.ResourceBuff cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
-        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
     # templates
     'std::set': (
@@ -715,15 +755,15 @@ TO_CPP_CONVERTERS = {
         'cpp{var}'),
     'cyclus::toolkit::ResBuf': (
         'cdef _{classname} py{var}\n'
-        'cdef cpp_cyclus.ResBuf[{valtype}] cpp{var}\n',  #
+        'cdef cpp_cyclus.ResBuf[{valtype}] cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
-        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
     'cyclus::toolkit::ResMap': (
         'cdef _{classname} py{var}\n'
-        'cdef cpp_cyclus.ResMap[{keytype}, {valtype}] cpp{var}\n',  #
+        'cdef cpp_cyclus.ResMap[{keytype}, {valtype}] cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
-        'cpp{var} = deref(py{var}.ptx)\n',  #
+        'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
     }
 
@@ -851,6 +891,7 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport const_cast
+from libcpp.cast cimport reinterpret_cast, dynamic_cast
 """.strip()
 
 NPY_IMPORTS = """
@@ -873,8 +914,10 @@ cdef extern from "cyclus.h" namespace "cyclus":
 
 def cpp_typesystem(ts, ns):
     """Creates the Cython header that wraps the Cyclus type system."""
+    temp = '{0} = {1}'
+    dbtypes = [temp.format(t, ts.ids[t]) for t in ts.dbtypes]
     ctx = dict(
-        dbtypes=ts.dbtypes,
+        dbtypes=dbtypes,
         cg_warning=CG_WARNING,
         stl_cimports=STL_CIMPORTS,
         )
@@ -896,6 +939,7 @@ from cyclus cimport cpp_typesystem
 from cyclus cimport cpp_cyclus
 from cyclus.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
 from cyclus cimport lib
+
 
 # pure python imports
 import uuid
@@ -1053,7 +1097,7 @@ cdef class _Material(_Resource):
                     cpp_cyclus.Material.Create(lib.dynamic_agent_ptr(creator),
                                                quantity, comp))
         rtn = mat
-        return mat
+        return rtn
 
     @staticmethod
     def create_untracked(double quantity, c, basis='mass'):
@@ -1065,7 +1109,7 @@ cdef class _Material(_Resource):
         mat.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, cpp_cyclus.Material](
                     cpp_cyclus.Material.CreateUntracked(quantity, comp))
         rtn = mat
-        return mat
+        return rtn
 
     def clone(self):
         """Returns an untracked (not part of the simulation) copy of the material.
@@ -1172,7 +1216,7 @@ cdef class _Product(_Resource):
                     cpp_cyclus.Product.Create(lib.dynamic_agent_ptr(creator),
                                               quantity, str_py_to_cpp(quality)))
         rtn = prod
-        return prod
+        return rtn
 
     @staticmethod
     def create_untracked(double quantity, quality):
@@ -1184,7 +1228,7 @@ cdef class _Product(_Resource):
                     cpp_cyclus.Product.CreateUntracked(quantity,
                                                        str_py_to_cpp(quality)))
         rtn = prod
-        return prod
+        return rtn
 
     def clone(self):
         """Returns an untracked (not part of the simulation) copy of the product.
@@ -1397,7 +1441,7 @@ cdef class _{{tclassname}}:
             x = {{rcname}}()
             x.ptx = reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
                     r)
-            x.append(x)
+            v.append(x)
         rtn = v
         return rtn
 
@@ -1409,7 +1453,7 @@ cdef class _{{tclassname}}:
         for r in rs:
             x = Resource()
             x.ptx = r
-            x.append(x)
+            v.append(x)
         rtn = v
         return rtn
 
@@ -1447,7 +1491,7 @@ cdef class _{{tclassname}}:
         For ResBuf, this iteratively calls push().
         """
         for r in rs:
-            self.push(rs)
+            self.push(r)
 
 {% elif ts.norms[t][0] == 'cyclus::toolkit::ResMap' %}
 {% set k = ts.norms[t][1] %}
@@ -1507,7 +1551,7 @@ cdef class _{{tclassname}}:
             x.ptx = \
                 reinterpret_pointer_cast[cpp_cyclus.Resource, {{ts.cython_type(r)}}](
                     r)
-            x.append(x)
+            v.append(x)
         rtn = v
         return rtn
 
@@ -1521,7 +1565,7 @@ cdef class _{{tclassname}}:
         for r in rs:
             x = Resource()
             x.ptx = r
-            x.append(x)
+            v.append(x)
         rtn = v
         return rtn
 
@@ -1641,7 +1685,7 @@ cdef std_string str_py_to_cpp(object x):
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
 {% set decl, body, expr = ts.convert_to_py('x', n) %}
-cdef object {{ ts.funcname(n) }}_to_py({{ ts.cython_type(n) }} x):
+cdef object {{ ts.funcname(n) }}_to_py({{ ts.possibly_shared_cython_type(n) }} x):
     {{ decl | indent(4) }}
     {{ body | indent(4) }}
     return {{ expr }}
@@ -1650,7 +1694,7 @@ cdef object {{ ts.funcname(n) }}_to_py({{ ts.cython_type(n) }} x):
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
 {% set decl, body, expr = ts.convert_to_py('x', n) %}
 cdef object any_{{ ts.funcname(n) }}_to_py(cpp_cyclus.hold_any value):
-    cdef {{ ts.cython_type(n) }} x = value.cast[{{ ts.cython_type(n) }}]()
+    cdef {{ ts.possibly_shared_cython_type(n) }} x = value.cast[{{ ts.possibly_shared_cython_type(n) }}]()
     {{ decl | indent(4) }}
     {{ body | indent(4) }}
     return {{ expr }}
@@ -1658,7 +1702,7 @@ cdef object any_{{ ts.funcname(n) }}_to_py(cpp_cyclus.hold_any value):
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
 {% set decl, body, expr = ts.convert_to_cpp('x', n) %}
-cdef {{ ts.cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x):
+cdef {{ ts.possibly_shared_cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x):
     {{ decl | indent(4) }}
     {{ body | indent(4) }}
     return {{ expr }}
@@ -1759,7 +1803,7 @@ cdef object any_to_py(cpp_cyclus.hold_any value):
 
 def capsule_any_to_py(value):
     """Converts a PyCapsule that holds a boost::spirit::hold_any to a python
-    value. 
+    value.
     """
     cdef cpp_cyclus.hold_any* cpp_value = <cpp_cyclus.hold_any*>PyCapsule_GetPointer(value, <char*> b"value")
     py_value = any_to_py(deref(cpp_value))
@@ -1950,7 +1994,10 @@ cdef class StateVar:
         return s
 
 
-{% for t in ts.uniquetypes %}{% if t not in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
+{% for t in ts.uniquetypes %}
+{% if t not in ts.inventory_types %}
+{% set tclassname = ts.classname(t) %}
+{% if t in ts.resources %}{% set tclassname = tclassname + 'StateVar'%}{% endif %}
 cdef class {{tclassname}}(StateVar):
     """State variable descriptor for {{ts.cpptypes[t]}}"""
 
@@ -2151,7 +2198,7 @@ cdef class _{{rclsname}}Request:
         """This request's agent"""
         if self._requester is not None:
             return self._requester
-        self._requester = lib.agent_to_py(<cpp_cyclus.Agent*> self.ptx.requester(),
+        self._requester = lib.agent_to_py(dynamic_cast[agent_ptr](self.ptx.requester()),
                                           None)
         return self._requester
 
@@ -2535,7 +2582,7 @@ cpdef dict C_NORMS
 {% for t in ts.uniquetypes %}
 ctypedef {{ ts.cython_type(t) }} {{ ts.funcname(t) }}_t
 {%- endfor %}
-
+ctypedef cpp_cyclus.Agent* agent_ptr
 #
 # converters
 #
@@ -2549,7 +2596,7 @@ cdef cpp_cyclus.uuid uuid_py_to_cpp(object x)
 cdef std_string str_py_to_cpp(object x)
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
-cdef object {{ ts.funcname(n) }}_to_py({{ ts.cython_type(n) }} x)
+cdef object {{ ts.funcname(n) }}_to_py({{ ts.possibly_shared_cython_type(n) }} x)
 {%- endfor %}
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
@@ -2557,7 +2604,7 @@ cdef object any_{{ ts.funcname(n) }}_to_py(cpp_cyclus.hold_any value)
 {%- endfor %}
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
-cdef {{ ts.cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x)
+cdef {{ ts.possibly_shared_cython_type(n) }} {{ ts.funcname(n) }}_to_cpp(object x)
 {%- endfor %}
 
 
@@ -2588,7 +2635,10 @@ cdef class StateVar:
     cpdef dict to_dict(self)
     cpdef StateVar copy(self)
 
-{% for t in ts.uniquetypes %}{% if t not in ts.inventory_types %}{% set tclassname = ts.classname(t) %}
+{% for t in ts.uniquetypes %}
+{% if t not in ts.inventory_types %}
+{% set tclassname = ts.classname(t) %}
+{% if t in ts.resources %}{% set tclassname = tclassname + 'StateVar'%}{% endif %}
 cdef class {{tclassname}}(StateVar):
     cpdef {{tclassname}} copy(self)
 {% endif %}{% endfor %}
