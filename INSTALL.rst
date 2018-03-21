@@ -144,7 +144,7 @@ If you are ``CMake`` aficionado you can also install Cyclus without using the
 
 .. code-block:: bash
 
-  mkdir bld
+  mkdir build
   cd build
   cmake .. -DCMAKE_INSTALL_PREFIX=~/.local/
   make
