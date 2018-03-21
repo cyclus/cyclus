@@ -16,9 +16,9 @@ Let's put this code in a ``tutorial`` directory and go into it.
 
 .. code-block:: bash
 
-    $ mkdir $HOME/tutorial
-    $ cd $HOME/tutorial/
-    $ cycstub --type facility $HOME/tutorial/:libname:tutorialfacility
+    $ mkdir tutorial
+    $ cd tutorial/
+    $ cycstub --type facility libpath:libname:tutorialfacility
 
 ------------
 
