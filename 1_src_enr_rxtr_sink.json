@@ -1,0 +1,87 @@
+{
+ "simulation": {
+  "archetypes": {
+   "spec": [
+    {"lib": "cycamore", "name": "Sink"}, 
+    {"lib": "cycamore", "name": "Source"}, 
+    {"lib": "cycamore", "name": "Reactor"}, 
+    {"lib": "cycamore", "name": "Enrichment"}, 
+    {"lib": "agents", "name": "NullRegion"}, 
+    {"lib": "agents", "name": "NullInst"}
+   ]
+  }, 
+  "control": {"duration": "10", "startmonth": "1", "startyear": "2000"}, 
+  "facility": [
+   {
+    "config": {"Source": {"outcommod": "natl_u", "outrecipe": "natl_u", "throughput": "1000"}}, 
+    "name": "Source"
+   }, 
+   {
+    "config": {
+     "Enrichment": {
+      "feed_commod": "natl_u", 
+      "feed_recipe": "natl_u", 
+      "max_feed_inventory": "500", 
+      "product_commod": "enriched_u", 
+      "tails_assay": "0.003", 
+      "tails_commod": "ef_tails"
+     }
+    }, 
+    "name": "Enrichment"
+   }, 
+   {
+    "config": {
+     "Reactor": {
+      "assem_size": "2", 
+      "cycle_time": "1", 
+      "fuel_incommods": {"val": "enriched_u"}, 
+      "fuel_inrecipes": {"val": "fuel_recipe"}, 
+      "fuel_outcommods": {"val": "waste"}, 
+      "fuel_outrecipes": {"val": "used_fuel_recipe"}, 
+      "n_assem_batch": "1", 
+      "n_assem_core": "1", 
+      "refuel_time": "0"
+     }
+    }, 
+    "name": "Reactor"
+   }, 
+   {
+    "config": {"Sink": {"capacity": "1", "in_commods": {"val": "waste"}}}, 
+    "name": "Sink"
+   }
+  ], 
+  "recipe": [
+   {
+    "basis": "mass", 
+    "name": "natl_u", 
+    "nuclide": [{"comp": "0.7", "id": "922350000"}, {"comp": "99.3", "id": "922380000"}]
+   }, 
+   {
+    "basis": "mass", 
+    "name": "fuel_recipe", 
+    "nuclide": [{"comp": "4.5", "id": "922350000"}, {"comp": "95.5", "id": "922380000"}]
+   }, 
+   {
+    "basis": "atom", 
+    "name": "used_fuel_recipe", 
+    "nuclide": {"comp": "100", "id": "10010000"}
+   }
+  ], 
+  "region": {
+   "config": {"NullRegion": null}, 
+   "institution": {
+    "config": {"NullInst": null}, 
+    "initialfacilitylist": {
+     "entry": [
+      {"number": "1", "prototype": "Source"}, 
+      {"number": "1", "prototype": "Enrichment"}, 
+      {"number": "1", "prototype": "Reactor"}, 
+      {"number": "1", "prototype": "Sink"}
+     ]
+    }, 
+    "name": "SingleInstitution"
+   }, 
+   "name": "SingleRegion"
+  }
+ }
+}
