@@ -8,37 +8,17 @@ namely |Cyclus|, CMake, and a recent version of Python (2.7 or 3.3+).
 
 First, you need to get the ``cycstub`` code.  Cycstub is a skeleton code base
 that you can use to quick-start new |cyclus| module development projects.
-You can grab cycstub either by using git to
-`clone the repository <https://github.com/cyclus/cycstub.git>`_ or by
-`downloading the zip file <https://github.com/cyclus/cycstub/archive/develop.zip>`_.
+You can grab cycstub from |cyclus|.
+
 Let's put this code in a ``tutorial`` directory and go into it.
 
-**Getting cycstub via git:**
+**Getting cycstub via Cyclus:**
 
 .. code-block:: bash
 
-    $ git clone https://github.com/cyclus/cycstub.git tutorial
-    $ cd tutorial
-
-**Getting cycstub via zip:**
-
-.. code-block:: bash
-
-    $ curl -L https://api.github.com/repos/cyclus/cycstub/zipball > tutorial.zip
-    $ unzip tutorial.zip
-    $ mv cyclus-cycstub-* tutorial
-    $ cd tutorial
-
-------------
-
-Since cycstub is a template project everything is named ``stub``. We need to
-change this to reflect the name we want our new project to be called -
-``tutorial`` here.  Cycstub comes with a renaming tool to do just this! From
-the command line, run Python in the following way:
-
-.. code-block:: bash
-
-    tutorial $ python rename.py tutorial
+    $ mkdir tutorial
+    $ cd tutorial/
+    $ cycstub --type facility libpath:libname:tutorialfacility
 
 ------------
 
