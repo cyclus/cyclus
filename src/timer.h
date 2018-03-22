@@ -97,6 +97,8 @@ class Timer {
   /// started.
   int time_;
 
+  int CompositionId;
+
   SimInfo si_;
 
   bool want_snapshot_;
