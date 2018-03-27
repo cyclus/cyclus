@@ -91,6 +91,10 @@ class Timer {
   /// decommissions all agents queued for the current timestep.
   void DoDecom();
 
+  /// sends the decision signal to all agents recieving time 
+  /// notifications.
+  void DoDecision();
+
   Context* ctx_;
 
   /// The current time, measured in months from when the simulation
