@@ -1928,7 +1928,7 @@ POWER = cpp_cyclus.POWER
 ENRICH_SWU = cpp_cyclus.ENRICH_SWU
 ENRICH_FEED = cpp_cyclus.ENRICH_FEED
 
-def record_time_series(object tstype, object agent, object value, object comment):
+def record_time_series(object tstype, object agent, object value):
     """Python hook into RecordTimeSeries for Python archetypes
 
     Parameters
@@ -1943,13 +1943,13 @@ def record_time_series(object tstype, object agent, object value, object comment
     cdef cpp_cyclus.Agent* a_ptr = dynamic_agent_ptr(agent)
     if isinstance(tstype, str):
         if isinstance(value, bool):
-            cpp_cyclus.RecordTimeSeries[ts.bool_t](ts.std_string_to_cpp(tstype), a_ptr, ts.bool_to_cpp(value), ts.str_py_to_cpp(comment))
+            cpp_cyclus.RecordTimeSeries[ts.bool_t](ts.std_string_to_cpp(tstype), a_ptr, ts.bool_to_cpp(value))
         elif isinstance(value, int):
-            cpp_cyclus.RecordTimeSeries[int](ts.std_string_to_cpp(tstype), a_ptr, ts.int_to_cpp(value), ts.str_py_to_cpp(comment))
+            cpp_cyclus.RecordTimeSeries[int](ts.std_string_to_cpp(tstype), a_ptr, ts.int_to_cpp(value))
         elif isinstance(value, float):
-            cpp_cyclus.RecordTimeSeries[double](ts.std_string_to_cpp(tstype), a_ptr, ts.double_to_cpp(value), ts.str_py_to_cpp(comment))
+            cpp_cyclus.RecordTimeSeries[double](ts.std_string_to_cpp(tstype), a_ptr, ts.double_to_cpp(value))
         elif isinstance(value, str):
-            cpp_cyclus.RecordTimeSeries[ts.std_string_t](ts.std_string_to_cpp(tstype), a_ptr, ts.str_py_to_cpp(value), ts.str_py_to_cpp(comment))
+            cpp_cyclus.RecordTimeSeries[ts.std_string_t](ts.std_string_to_cpp(tstype), a_ptr, ts.str_py_to_cpp(value))
         else:
             raise TypeError("Unsupported type in time series record")
     else:
@@ -1963,12 +1963,12 @@ def record_time_series(object tstype, object agent, object value, object comment
 
 TIME_SERIES_LISTENERS = defaultdict(list)
 
-def call_listeners(tsname, agent, time, value, comment):
+def call_listeners(tsname, agent, time, value):
     """Calls the time series listener functions of cyclus agents.
     """
     vec = TIME_SERIES_LISTENERS[tsname]
     for f in vec:
-        f(agent, time, value, comment)
+        f(agent, time, value, tsname)
 
 
 EXT_BACKENDS = {'.h5': Hdf5Back, '.sqlite': SqliteBack}

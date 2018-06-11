@@ -29,11 +29,11 @@ enum TimeSeriesType : int{
 
 /// Stores global information for the time series call backs.
 typedef boost::variant<    
-    std::function<void(cyclus::Agent*, int, bool)>,
-    std::function<void(cyclus::Agent*, int, int)>,
-    std::function<void(cyclus::Agent*, int, float)>,
-    std::function<void(cyclus::Agent*, int, double)>,
-    std::function<void(cyclus::Agent*, int, std::string)>
+    std::function<void(cyclus::Agent*, int, bool, std::string)>,
+    std::function<void(cyclus::Agent*, int, int, std::string)>,
+    std::function<void(cyclus::Agent*, int, float, std::string)>,
+    std::function<void(cyclus::Agent*, int, double, std::string)>,
+    std::function<void(cyclus::Agent*, int, std::string, std::string)>
     > time_series_listener_t;
 
 extern std::map<std::string, std::vector<time_series_listener_t> > TIME_SERIES_LISTENERS;
@@ -54,8 +54,8 @@ void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value) {
        ->Record();
   std::vector<time_series_listener_t> vec = TIME_SERIES_LISTENERS[tsname];
   for (auto f=vec.begin(); f != vec.end(); ++f){
-    std::function<void(cyclus::Agent*, int, T)> fn = boost::get<std::function<void(cyclus::Agent*, int, T)> >(*f);
-    fn(agent, time, value); 
+    std::function<void(cyclus::Agent*, int, T, std::string)> fn = boost::get<std::function<void(cyclus::Agent*, int, T, std::string)> >(*f);
+    fn(agent, time, value, tsname); 
   }
   PyCallListeners(tsname, agent, agent->context(), time, value);
 }
