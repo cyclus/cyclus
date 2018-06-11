@@ -93,8 +93,8 @@ std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };
 
 std::string JsonToPy(std::string infile) { return CyclusJsonToPy(infile); };
 
-void PyCallListeners(std::string tstype, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value){
-    CyclusPyCallListeners(tstype, agent, cpp_ctx, time, value);
+void PyCallListeners(std::string tstype, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value, boost::spirit::hold_any comment){
+    CyclusPyCallListeners(tstype, agent, cpp_ctx, time, value, comment);
 };
 
 }  // namespace toolkit
@@ -141,7 +141,7 @@ std::string JsonToPy(std::string infile) {
   return "";
 };
 
-void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value) {};
+void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value, boost::spirit::hold_any comment) {};
 
 } // namespace toolkit
 } // namespace cyclus

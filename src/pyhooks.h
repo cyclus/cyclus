@@ -62,7 +62,7 @@ std::string PyToJson(std::string);
 std::string JsonToPy(std::string);
 
 /// Calls the Python listeners
-void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value);
+void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value, boost::spirit::hold_any comment);
 
 }  // ends namespace toolkit
 }  // ends namespace cyclus
