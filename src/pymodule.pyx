@@ -17,7 +17,6 @@ cdef object std_string_to_py(std_string x):
 
 cdef std_string str_py_to_cpp(object x):
     cdef std_string s
-    print("HERE")
     x = x.encode()
     s = std_string(<const char*> x)
     return s
