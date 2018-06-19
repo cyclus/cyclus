@@ -43,12 +43,14 @@ class NOInst(Institution):
     #The supply of a commodity
     commodity_supply = {}
 
+    def enter_notify(self):
+        super().enter_notify()
+        lib.TIME_SERIES_LISTENERS[self.growth_commod].append(self.extract_supply)
+    
     def tick(self):
         """
         #Method for the deployment of facilities.
         """
-        if self.growth_commod not in lib.TIME_SERIES_LISTENERS:
-            lib.TIME_SERIES_LISTENERS[self.growth_commod].append(self.extract_supply)
         time = self.context.time
         if time is 0:
             return
@@ -60,7 +62,7 @@ class NOInst(Institution):
             self.context.schedule_build(self, proto)
 
 
-    def extract_supply(self, agent, time, value):
+    def extract_supply(self, agent, time, value, commod):
         """
         Gather information on the available supply of a commodity over the
         lifetime of the simulation.
@@ -112,4 +114,4 @@ class DemandFac(Facility):
     def tick(self):
         rate = random.uniform(self.production_rate_min, self.production_rate_max)
         print("Agent {0} {1} {2}".format(self.id, self.production_rate_min, rate))
-        lib.record_time_series(self.commodity, self, rate)
+        lib.record_time_series(self.commodity, self, rate, commodity)
