@@ -114,4 +114,4 @@ class DemandFac(Facility):
     def tick(self):
         rate = random.uniform(self.production_rate_min, self.production_rate_max)
         print("Agent {0} {1} {2}".format(self.id, self.production_rate_min, rate))
-        lib.record_time_series(self.commodity, self, rate, commodity)
+        lib.record_time_series(self.commodity, self, rate, self.commodity)
