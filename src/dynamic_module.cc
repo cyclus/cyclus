@@ -115,6 +115,14 @@ void DynamicModule::CloseAll() {
   ClearPyAgentRefs();
 }
 
+bool DynamicModule::IsPyAgent(AgentSpec spec) {
+  bool rtn = false;
+  if (DynamicModule::Exists(spec) && boost::starts_with(modules_[spec.str()]->path(), "<py>")) {
+    rtn = true;
+  }
+  return rtn;
+}
+
 DynamicModule::DynamicModule(AgentSpec spec)
     : module_library_(0),
       ctor_(NULL) {

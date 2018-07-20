@@ -80,6 +80,10 @@ Agent* MakePyAgent(std::string lib, std::string agent, void* ctx) {
   return CyclusMakePyAgent(lib, agent, ctx);
 };
 
+void InitFromPyAgent(Agent* src, Agent* dst, void* ctx) {
+  CyclusInitFromPyAgent(src, dst, ctx);
+};
+
 void ClearPyAgentRefs(void) { CyclusClearPyAgentRefs(); };
 
 void PyDelAgent(int i) { CyclusPyDelAgent(i); };
@@ -88,6 +92,11 @@ namespace toolkit {
 std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };
 
 std::string JsonToPy(std::string infile) { return CyclusJsonToPy(infile); };
+
+void PyCallListeners(std::string tstype, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value){
+    CyclusPyCallListeners(tstype, agent, cpp_ctx, time, value);
+};
+
 }  // namespace toolkit
 }  // namespace cyclus
 #else   // else CYCLUS_WITH_PYTHON
@@ -113,6 +122,8 @@ std::string PyFindModule(std::string lib) { return std::string(""); };
 
 Agent* MakePyAgent(std::string lib, std::string agent, void* ctx) { return NULL; };
 
+void InitFromPyAgent(Agent* src, Agent* dst, void* ctx) {};
+
 void ClearPyAgentRefs(void) {};
 
 void PyDelAgent(int i) {};
@@ -129,6 +140,9 @@ std::string JsonToPy(std::string infile) {
                                 "Cyclus was not built with Python bindings.");
   return "";
 };
+
+void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value) {};
+
 } // namespace toolkit
 } // namespace cyclus
 #endif  // ends CYCLUS_WITH_PYTHON

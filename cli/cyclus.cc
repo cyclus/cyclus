@@ -157,7 +157,7 @@ int main(int argc, char* argv[]) {
   if (ai.restart == "") {
     // Read input file and initialize db and simulation from input file
     bool ms_print;
-    if(ai.vm.count("rng-print") > 0){
+    if(ai.vm.count("rng-print") >= 1){
       ms_print = true;
     }
     try {
@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
         XMLFlatLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
         l.LoadSim();
       } else {
-        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);     
+        XMLFileLoader l(&rec, fback, ai.schema_path, infile, format, ms_print);
         l.LoadSim();
       }
     } catch (cyclus::Error e) {

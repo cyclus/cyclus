@@ -16,10 +16,13 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport reinterpret_cast, dynamic_cast
+from cpython cimport PyObject
+from cpython.pycapsule cimport PyCapsule_GetPointer
 
 from binascii import hexlify
 import uuid
-from collections import Mapping, Sequence, Iterable
+import os
+from collections import Mapping, Sequence, Iterable, defaultdict
 from importlib import import_module
 
 cimport numpy as np
@@ -55,7 +58,7 @@ cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a):
     elif a.kind == "Region":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[region_ptr]((<_Agent> a).ptx))
-    elif a.kind == "Institution":
+    elif a.kind == "Inst":
         return dynamic_cast[agent_ptr](
             reinterpret_cast[institution_ptr]((<_Agent> a).ptx))
     elif a.kind == "Facility":
@@ -556,7 +559,6 @@ cdef class _DynamicModule:
 
 class DynamicModule(_DynamicModule):
     """Dynamic Module wrapper class."""
-
 
 #
 # Env
@@ -1257,6 +1259,13 @@ class SimInit(_SimInit):
 # Agent
 #
 
+cpdef object capsule_agent_to_py(object agent, object ctx):
+    """Returns an agent from its id"""
+    cdef cpp_cyclus.Agent* avoid = <cpp_cyclus.Agent*> PyCapsule_GetPointer(agent, <char*> b"agent")
+    a = agent_to_py(avoid, ctx)
+    return a
+
+
 cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     """Converts and agent pointer to Python."""
     global _AGENT_REFS
@@ -1265,10 +1274,15 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
     cdef int a_id = a_ptx.id()
     if a_id in _AGENT_REFS:
         return _AGENT_REFS[a_id]
-    # have to make new wrapper instance
     if ctx is None:
+        # have to make new wrapper instance
         ctx = Context(init=False)
         (<_Context> ctx).ptx = a_ptx.context()
+    elif not isinstance(ctx, Context):
+        # have a pycapsule, need to pull it out
+        cap = ctx
+        ctx = Context(init=False)
+        (<_Context> ctx).ptx = <cpp_cyclus.Context*> PyCapsule_GetPointer(cap, <char*> b"ctx")
     cdef _Agent a = Agent(ctx)
     a.ptx = a_ptx
     _AGENT_REFS[a_id] = a
@@ -1397,7 +1411,7 @@ cdef class _Agent:
     @property
     def prototype(self):
         """The agent's prototype."""
-        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).prototype())
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).get_prototype())
         return rtn
 
     @prototype.setter
@@ -1416,13 +1430,13 @@ cdef class _Agent:
     @property
     def spec(self):
         """The agent's spec."""
-        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).spec())
+        rtn = std_string_to_py((<cpp_cyclus.Agent*> self.ptx).get_spec())
         return rtn
 
     @spec.setter
     def spec(self, str new_impl):
         cdef std_string cpp_new_impl = str_py_to_cpp(new_impl)
-        (<cpp_cyclus.Agent*> self.ptx).prototype(cpp_new_impl)
+        (<cpp_cyclus.Agent*> self.ptx).spec(cpp_new_impl)
 
     @property
     def kind(self):
@@ -1467,7 +1481,7 @@ cdef class _Agent:
         """The number of time steps this agent operates between building and
         decommissioning (-1 if the agent has an infinite lifetime)
         """
-        return (<cpp_cyclus.Agent*> self.ptx).lifetime()
+        return (<cpp_cyclus.Agent*> self.ptx).get_lifetime()
 
     @lifetime.setter
     def lifetime(self, int n_timesteps):
@@ -1903,3 +1917,131 @@ cpdef void _del_agent(int i):
     global _AGENT_REFS
     if i in _AGENT_REFS:
         del _AGENT_REFS[i]
+
+#
+# Functions to allow for time series facilities to interaction with the timeseries
+# callbacks.
+#
+
+
+POWER = cpp_cyclus.POWER
+ENRICH_SWU = cpp_cyclus.ENRICH_SWU
+ENRICH_FEED = cpp_cyclus.ENRICH_FEED
+
+def record_time_series(object tstype, object agent, object value):
+    """Python hook into RecordTimeSeries for Python archetypes
+
+    Parameters
+    ----------
+    tstype : int or string
+        Time series type flag; POWER, ENRICH_SWU, etc or the string flag.
+    agent : object
+        Python agent, usually self when called by an archetype.
+    value : float
+        The value being recorded in the time series.
+    """
+    cdef cpp_cyclus.Agent* a_ptr = dynamic_agent_ptr(agent)
+    if isinstance(tstype, str):
+        if isinstance(value, bool):
+            cpp_cyclus.RecordTimeSeries[ts.bool_t](ts.std_string_to_cpp(tstype), a_ptr, ts.bool_to_cpp(value))
+        elif isinstance(value, int):
+            cpp_cyclus.RecordTimeSeries[int](ts.std_string_to_cpp(tstype), a_ptr, ts.int_to_cpp(value))
+        elif isinstance(value, float):
+            cpp_cyclus.RecordTimeSeries[double](ts.std_string_to_cpp(tstype), a_ptr, ts.double_to_cpp(value))
+        elif isinstance(value, str):
+            cpp_cyclus.RecordTimeSeries[ts.std_string_t](ts.std_string_to_cpp(tstype), a_ptr, ts.str_py_to_cpp(value))
+        else:
+            raise TypeError("Unsupported type in time series record")
+    else:
+        if tstype == POWER:
+            cpp_cyclus.RecordTimeSeriesPower(a_ptr, value)
+        elif tstype == ENRICH_SWU:
+            cpp_cyclus.RecordTimeSeriesEnrichSWU(a_ptr, value)
+        elif tstype == ENRICH_FEED:
+            cpp_cyclus.RecordTimeSeriesEnrichFeed(a_ptr, value)
+
+
+TIME_SERIES_LISTENERS = defaultdict(list)
+
+def call_listeners(tsname, agent, time, value):
+    """Calls the time series listener functions of cyclus agents.
+    """
+    vec = TIME_SERIES_LISTENERS[tsname]
+    for f in vec:
+        f(agent, time, value)
+
+
+EXT_BACKENDS = {'.h5': Hdf5Back, '.sqlite': SqliteBack}
+
+def dbopen(fname):
+    """Opens a Cyclus database."""
+    _, ext = os.path.splitext(fname)
+    if ext not in EXT_BACKENDS:
+        msg = ('The backend database type of {0!r} could not be determined from '
+               'extension {1!r}.')
+        raise ValueError(msg.format(fname, ext))
+    db = EXT_BACKENDS[ext](fname)
+    return db
+
+
+#
+# Position
+#
+cdef class _Position:
+
+    def __cinit__(self, double latitude=0.0, double longitude=0.0):
+        self.posptx = new cpp_cyclus.Position(latitude, longitude)
+
+    def __dealloc__(self):
+        del self.posptx
+
+    def __str__(self):
+        s = std_string_to_py(self.posptx.ToString())
+        return s
+
+    def __repr__(self):
+        return str(self)
+
+    @property
+    def latitude(self):
+        return self.posptx.latitude()
+
+    @latitude.setter
+    def latitude(self, double value):
+        self.posptx.latitude(value)
+
+    @property
+    def longitude(self):
+        return self.posptx.longitude()
+
+    @longitude.setter
+    def longitude(self, double value):
+        self.posptx.longitude(value)
+
+    def update(self, latitude=None, longitude=None):
+        """Updates the latitude and/or longitude"""
+        cdef double lat, lon
+        lat = self.latitude() if latitude is None else latitude
+        lon = self.longitude() if longitude is None else longitude
+        self.posptx.set_position(lat, lon)
+
+    def distance(self, other):
+        """Computes the distance between this object and another position."""
+        if not isinstance(other, _Position):
+            msg = ("Can only compute distances between positions, "
+                   "{0!r} ({1}) is not a position.")
+            raise TypeError(msg.format(other, type(other)))
+        d = self.posptx.Distance(deref((<_Position> other).posptx))
+        return d
+
+
+class Position(_Position):
+    """a basic class that stores the geographic location
+    in latitude and longitude and follows the ISO 6709 standard.
+    Longitude and Latitude is stored as seconds of degrees.
+    This allows the coordinate elements such as degrees,
+    minutes, and seconds to "remain on the integral portion of values, with the
+    exception of decimal of seconds, avoiding loss of precision." This is
+    calculated by multiplying decimal degrees by 3600.
+    example: 05.2169 -> 18780.84
+    """

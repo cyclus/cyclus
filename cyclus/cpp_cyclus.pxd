@@ -23,7 +23,6 @@ cdef extern from "<functional>" namespace "std":
         function()
         function(T)
 
-
 cdef extern from "cyclus.h" namespace "boost::spirit":
 
     cdef cppclass hold_any:
@@ -661,9 +660,9 @@ cdef extern from "agent.h" namespace "cyclus":
         void AdjustProductPrefs(PrefMap[Product].type&)
         std_string schema()
         cpp_jsoncpp.Value annotations() except +
-        const std_string prototype()
+        const std_string get_prototype "prototype" ()
         void prototype(std_string)
-        std_string spec()
+        std_string get_spec "spec" ()
         void spec(std_string)
         const std_string kind()
         Context* context()
@@ -671,8 +670,8 @@ cdef extern from "agent.h" namespace "cyclus":
         Agent* parent()
         const int parent_id()
         const int enter_time()
+        const int get_lifetime "lifetime" ()
         void lifetime(int)
-        const int lifetime()
         const int exit_time()
         const set[Agent*]& children()
 
@@ -803,6 +802,28 @@ cdef extern from "discovery.h" namespace "cyclus":
     cdef set[std_string] DiscoverSpecsInCyclusPath() except +
     cdef cpp_jsoncpp.Value DiscoverMetadataInCyclusPath() except +
 
+#
+# Positions
+#
+
+cdef extern from "toolkit/position.h" namespace "cyclus::toolkit":
+
+    cdef cppclass Position:
+        enum StringFormat:
+            DEGREES = 1
+            DEGREES_MINUTES
+            DEGREES_MINUTES_SECONDS
+        Position()
+        Position(double, double)
+        double latitude()
+        double longitude()
+        void latitude(double)
+        void longitude(double)
+        void set_position(double, double)
+        double Distance(Position)
+        std_string ToString()
+        std_string ToString(StringFormat)
+
 
 #
 # Inventories and Resource Buffers
@@ -894,6 +915,17 @@ cdef extern from "toolkit/res_map.h" namespace "cyclus::toolkit":
         void ResValues(vector[Resource.Ptr] vals)
         shared_ptr[R] Pop(K)
 
+cdef extern from "toolkit/timeseries.h" namespace "cyclus::toolkit":
+
+    cdef enum TimeSeriesType:
+        POWER
+        ENRICH_SWU
+        ENRICH_FEED
+
+    void RecordTimeSeries[T](std_string, Agent*, T)
+    void RecordTimeSeriesPower "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::POWER>" (Agent*, double)
+    void RecordTimeSeriesEnrichSWU "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::ENRICH_SWU>" (Agent*, double)
+    void RecordTimeSeriesEnrichFeed "cyclus::toolkit::RecordTimeSeries<cyclus::toolkit::ENRICH_FEED>" (Agent*, double)
 #
 # Some cutsom pyne wrapping
 #

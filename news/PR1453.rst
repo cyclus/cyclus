@@ -1,0 +1,13 @@
+**Added:** None
+
+- Input validation for Latitude and Longitude
+
+**Changed:** None
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

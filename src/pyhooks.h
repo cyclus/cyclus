@@ -3,9 +3,10 @@
 
 #include <string>
 
+#include "any.hpp"
+
 namespace cyclus {
 class Agent;
-
 /// Because of NumPy #7595, we can only initialize & finalize the Python
 /// interpreter once. This variable keeps a count of how many times we have
 /// initialized so that we can know when to really stop the interpreter.
@@ -42,6 +43,9 @@ std::string PyFindModule(std::string);
 /// Finds a Python module and returns an agent pointer from it.
 Agent* MakePyAgent(std::string, std::string, void*);
 
+/// Initializes a Python agent fron another agent
+void InitFromPyAgent(Agent*, Agent*, void*);
+
 /// Removes all Python agents from the internal cache. There is usually
 /// no need for a user to call this.
 void ClearPyAgentRefs(void);
@@ -50,11 +54,15 @@ void ClearPyAgentRefs(void);
 void PyDelAgent(int);
 
 namespace toolkit {
+enum TimeSeriesType : int;
 /// Convert Python simulation string to JSON
 std::string PyToJson(std::string);
 
 /// Convert JSON string to Python simulation string
 std::string JsonToPy(std::string);
+
+/// Calls the Python listeners
+void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value);
 
 }  // ends namespace toolkit
 }  // ends namespace cyclus
