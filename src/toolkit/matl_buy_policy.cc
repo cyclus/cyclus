@@ -160,9 +160,8 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     port->AddMutualReqs(grps[i]);
     ports.insert(port);
   }
-}
 
-return ports;
+  return ports;
 }
 
 void MatlBuyPolicy::AcceptMatlTrades(
