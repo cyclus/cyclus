@@ -32,6 +32,7 @@ class Dier : public cyclus::Facility {
     }
   }
   void Tock() {}
+  void Decision() {}
   static int decom_count;
 };
 
@@ -48,6 +49,7 @@ class Termer : public cyclus::Facility {
 
   void Tick() { context()->KillSim(); }
   void Tock() {}
+  void Decision() {}
 };
 
 class Snapper : public cyclus::Facility {
@@ -61,6 +63,7 @@ class Snapper : public cyclus::Facility {
 
   void Tick() { if (snap && (context()->time() % 3 == 0)) {context()->Snapshot();} }
   void Tock() {}
+  void Decision() {}
   bool snap;
 };
 

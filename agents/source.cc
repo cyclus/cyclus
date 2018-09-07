@@ -29,6 +29,8 @@ void Source::Tick() {
 
 void Source::Tock() {}
 
+void Source::Decision() {}
+
 cyclus::Material::Ptr Source::GetOffer(
     const cyclus::Material::Ptr target) const {
   using cyclus::Material;

@@ -33,6 +33,12 @@ class TimeListener: virtual public Ider {
   ///
   /// @param time is the current simulation timestep
   virtual void Tock() = 0;
+
+  /// Simulation agents do their end-of-timestep decisions in the
+  /// Decision method.
+  ///
+  /// @param time is the current simulation timestep
+  virtual void Decision() = 0;
 };
 
 }  // namespace cyclus

@@ -22,6 +22,7 @@ class TestFacility : public cyclus::Facility {
 
   void Tick() {}
   void Tock() {}
+  void Decision() {}
 
 #pragma cyclus var dict(shape = [10])
   std::vector<double> sized_test;

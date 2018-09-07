@@ -119,6 +119,8 @@ void Sink::Tock() {
                                  << context()->time() << ".";
 }
 
+void Sink::Decision() {}
+
 extern "C" cyclus::Agent* ConstructSink(cyclus::Context* ctx) {
   return new Sink(ctx);
 }

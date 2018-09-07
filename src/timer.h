@@ -85,15 +85,15 @@ class Timer {
   /// notifications.
   void DoTock();
 
+  /// sends the decision signal to all agents recieving time 
+  /// notifications.
+  void DoDecision();
+
   void RecordInventories(Agent* a);
   void RecordInventory(Agent* a, std::string name, Material::Ptr m);
 
   /// decommissions all agents queued for the current timestep.
   void DoDecom();
-
-  /// sends the decision signal to all agents recieving time 
-  /// notifications.
-  void DoDecision();
 
   Context* ctx_;
 

@@ -95,6 +95,8 @@ class Region : public Agent, public TimeListener {
 
   virtual void Tock() {}
 
+  virtual void Decision() {}
+
  protected:
   void InitFrom(Region* m);
 };

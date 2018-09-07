@@ -24,6 +24,7 @@ class TestAgent: public Agent {
 
   void Tick() {}
   void Tock() {}
+  void Decision() {}
 };
 
 } // namespace cyclus

@@ -64,6 +64,8 @@ class Institution : public Agent, public TimeListener {
 
   virtual void Tock();
 
+  virtual void Decision() {}
+
  protected:
   void InitFrom(Institution* m);
 };
