@@ -38,8 +38,6 @@ class Source : public cyclus::Facility {
 
   virtual void Tock();
 
-  virtual void Decision();
-
   /// @brief Responds to each request for this source facility's commodity.
   /// If a given request is more than this facility's capacity, it will offer
   /// its capacity.

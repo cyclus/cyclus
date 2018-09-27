@@ -32,8 +32,6 @@ class Sink : public cyclus::Facility  {
 
   virtual void Tock();
 
-  virtual void Decision();
-
   /// @brief Sink request Materials of their given commodity. Note
   /// that it is assumed the Sink operates on a single resource type!
   virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>

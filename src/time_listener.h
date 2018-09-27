@@ -38,7 +38,7 @@ class TimeListener: virtual public Ider {
   /// Decision method.
   ///
   /// @param time is the current simulation timestep
-  virtual void Decision() = 0;
+  virtual void Decision(){};
 };
 
 }  // namespace cyclus
