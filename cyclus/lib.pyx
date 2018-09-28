@@ -1942,7 +1942,13 @@ def record_time_series(object tstype, object agent, object value):
     """
     cdef cpp_cyclus.Agent* a_ptr = dynamic_agent_ptr(agent)
     if isinstance(tstype, str):
-        if isinstance(value, bool):
+        if tstype == 'POWER':
+            cpp_cyclus.RecordTimeSeriesPower(a_ptr, value)
+        elif tstype == 'ENRICH_SWU':
+            cpp_cyclus.RecordTimeSeriesEnrichSWU(a_ptr, value)
+        elif tstype == 'ENRICH_FEED':
+            cpp_cyclus.RecordTimeSeriesEnrichFeed(a_ptr, value)
+        elif isinstance(value, bool):
             cpp_cyclus.RecordTimeSeries[ts.bool_t](ts.std_string_to_cpp(tstype), a_ptr, ts.bool_to_cpp(value))
         elif isinstance(value, int):
             cpp_cyclus.RecordTimeSeries[int](ts.std_string_to_cpp(tstype), a_ptr, ts.int_to_cpp(value))
@@ -1952,13 +1958,6 @@ def record_time_series(object tstype, object agent, object value):
             cpp_cyclus.RecordTimeSeries[ts.std_string_t](ts.std_string_to_cpp(tstype), a_ptr, ts.str_py_to_cpp(value))
         else:
             raise TypeError("Unsupported type in time series record")
-    else:
-        if tstype == POWER:
-            cpp_cyclus.RecordTimeSeriesPower(a_ptr, value)
-        elif tstype == ENRICH_SWU:
-            cpp_cyclus.RecordTimeSeriesEnrichSWU(a_ptr, value)
-        elif tstype == ENRICH_FEED:
-            cpp_cyclus.RecordTimeSeriesEnrichFeed(a_ptr, value)
 
 
 TIME_SERIES_LISTENERS = defaultdict(list)
