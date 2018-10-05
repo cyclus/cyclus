@@ -19,8 +19,8 @@ inputfile = {
    'config': {
     'DemandFac': {
      'commodity': 'bears',
-     'production_rate_max': 10,
-     'production_rate_min': 10,
+     'production_rate_max': 12,
+     'production_rate_min': 8,
     },
    },
    'name': 'BearStore',
@@ -57,7 +57,7 @@ def test_bear_deploy():
     # test that the institution deploys a BearStore
     assert_in("New fac: BearStore", s)
     # test that the first agents exist with right minimum production.
-    agents = re.compile('Agent \d+ 10\.0')
+    agents = re.compile('Agent \d+ 8\.0')
     all_agents = set(agents.findall(s))
     assert_greater_equal(len(all_agents), 9)
     if os.path.exists('bears.json'):
