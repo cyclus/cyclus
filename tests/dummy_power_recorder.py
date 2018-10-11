@@ -4,7 +4,7 @@ from cyclus import lib
 class DummyPowerRecorder(Facility):
 
     def tick(self):
-        lib.record_time_series(lib.POWER, self, 10.)
+        lib.record_time_series('POWER', self, 10.)
         print("TICK")
 
 
