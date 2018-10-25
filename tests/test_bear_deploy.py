@@ -31,7 +31,7 @@ inputfile = {
     'config': {
      'NOInst': {
       'growth_commod': 'bears',
-      'growth_rate': 0.05,
+      'growth_rate': 0.1,
       'initial_demand': 20.0,
       'prototypes': {'val': 'BearStore'},
      },

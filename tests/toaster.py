@@ -15,7 +15,6 @@ class DefaultToaster(Facility):
         print('Bread is ' + self.bread)
         print('Toast level is {0}'.format(self.level))
 
-
 class AttrTick(object):
     """Meant for testing attributes values"""
 
