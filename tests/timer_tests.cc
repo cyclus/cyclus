@@ -32,6 +32,7 @@ class Dier : public cyclus::Facility {
     }
   }
   void Tock() {}
+  void Decision() {}
   static int decom_count;
 };
 
@@ -48,12 +49,13 @@ class Termer : public cyclus::Facility {
 
   void Tick() { context()->KillSim(); }
   void Tock() {}
+  void Decision() {}
 };
 
-class Snapper : public cyclus::Facility {
+class SnapperTick : public cyclus::Facility {
  public:
-  Snapper(cyclus::Context* ctx) : cyclus::Facility(ctx), snap(false) {}
-  virtual ~Snapper() {}
+  SnapperTick(cyclus::Context* ctx) : cyclus::Facility(ctx), snap(false) {}
+  virtual ~SnapperTick() {}
 
   virtual cyclus::Agent* Clone() { return new Dier(context()); }
   virtual void InitInv(cyclus::Inventories& inv) {}
@@ -61,6 +63,37 @@ class Snapper : public cyclus::Facility {
 
   void Tick() { if (snap && (context()->time() % 3 == 0)) {context()->Snapshot();} }
   void Tock() {}
+  void Decision() {}
+  bool snap;
+};
+
+class SnapperTock : public cyclus::Facility {
+ public:
+  SnapperTock(cyclus::Context* ctx) : cyclus::Facility(ctx), snap(false) {}
+  virtual ~SnapperTock() {}
+
+  virtual cyclus::Agent* Clone() { return new Dier(context()); }
+  virtual void InitInv(cyclus::Inventories& inv) {}
+  virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
+
+  void Tick() {}
+  void Tock() { if (snap && (context()->time() % 3 == 0)) {context()->Snapshot();} }
+  void Decision() {}
+  bool snap;
+};
+
+class SnapperDec : public cyclus::Facility {
+ public:
+  SnapperDec(cyclus::Context* ctx) : cyclus::Facility(ctx), snap(false) {}
+  virtual ~SnapperDec() {}
+
+  virtual cyclus::Agent* Clone() { return new Dier(context()); }
+  virtual void InitInv(cyclus::Inventories& inv) {}
+  virtual cyclus::Inventories SnapshotInv() { return cyclus::Inventories(); }
+
+  void Tick() {}
+  void Tock() {}
+  void Decision() { if (snap && (context()->time() % 3 == 0)) {context()->Snapshot();} }
   bool snap;
 };
 
@@ -101,7 +134,7 @@ TEST(TimerTests, EarlyTermination) {
   cyclus::PyStop();
 }
 
-TEST(TimerTests, DefaultSnapshot) {
+TEST(TimerTests, DefaultSnapshotTick) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -111,7 +144,52 @@ TEST(TimerTests, DefaultSnapshot) {
 
   ti.Initialize(&ctx, cyclus::SimInfo(10));
 
-  Snapper* turtle = new Snapper(&ctx);
+  SnapperTick* turtle = new SnapperTick(&ctx);
+  turtle->Build(NULL);
+
+  ti.RunSim();
+  rec.Close();
+
+  cyclus::QueryResult qr = b.Query("Snapshots", NULL);
+  EXPECT_EQ(1, qr.rows.size());
+  EXPECT_EQ(10, qr.GetVal<int>("Time", 0));
+  cyclus::PyStop();
+}
+
+TEST(TimerTests, DefaultSnapshotTock) {
+  cyclus::PyStart();
+  cyclus::Recorder rec;
+  cyclus::Timer ti;
+  cyclus::Context ctx(&ti, &rec);
+  cyclus::SqliteBack b(path);
+  rec.RegisterBackend(&b);
+
+  ti.Initialize(&ctx, cyclus::SimInfo(10));
+
+  SnapperTock* turtle = new SnapperTock(&ctx);
+  turtle->Build(NULL);
+
+  ti.RunSim();
+  rec.Close();
+
+  cyclus::QueryResult qr = b.Query("Snapshots", NULL);
+  EXPECT_EQ(1, qr.rows.size());
+  EXPECT_EQ(10, qr.GetVal<int>("Time", 0));
+  cyclus::PyStop();
+}
+
+
+TEST(TimerTests, DefaultSnapshotDec) {
+  cyclus::PyStart();
+  cyclus::Recorder rec;
+  cyclus::Timer ti;
+  cyclus::Context ctx(&ti, &rec);
+  cyclus::SqliteBack b(path);
+  rec.RegisterBackend(&b);
+
+  ti.Initialize(&ctx, cyclus::SimInfo(10));
+
+  SnapperDec* turtle = new SnapperDec(&ctx);
   turtle->Build(NULL);
 
   ti.RunSim();
@@ -133,7 +211,7 @@ TEST(TimerTests, CustomSnapshot) {
 
   ti.Initialize(&ctx, cyclus::SimInfo(10));
 
-  Snapper* turtle = new Snapper(&ctx);
+  SnapperTick* turtle = new SnapperTick(&ctx);
   turtle->snap = true;
   turtle->Build(NULL);
 
