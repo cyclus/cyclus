@@ -307,6 +307,9 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     void Tock() except +:
         (<object> this.self).tock()
 
+    void Decision() except +:
+        (<object> this.self).decision()
+
 
 cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institution):
     # A C++ class that acts as a Institution. It implements the Institution virtual
@@ -437,6 +440,9 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     void Tock() except +:
         cpp_cyclus.Institution.Tock()
         (<object> this.self).tock()
+
+    void Decision() except +:
+        (<object> this.self).decision()
 
 
 cdef int _GET_MAT_BIDS_TIME = -9999999999
@@ -575,6 +581,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
 
     void Tock() except +:
         (<object> this.self).tock()
+
+    void Decision() except +:
+        (<object> this.self).decision()
 
     cpp_bool CheckDecommissionCondition() except +:
         rtn = (<object> this.self).check_decomission_condition()
@@ -1228,6 +1237,11 @@ class Region(_Region):
         """
         pass
 
+    def decision(self):
+        """This function is called each time step and is meant to be
+        overlaoded in the subclass.
+        """
+        pass
 
 cdef class _Institution(_Agent):
 
@@ -1420,6 +1434,12 @@ class Institution(_Institution):
         """
         pass
 
+    def decision(self):
+        """This function is called each time step and is meant to be
+        overlaoded in the subclass.
+        """
+        pass
+
 
 cdef class _Facility(_Agent):
 
@@ -1607,6 +1627,12 @@ class Facility(_Facility):
         pass
 
     def tock(self):
+        """This function is called each time step and is meant to be
+        overlaoded in the subclass.
+        """
+        pass
+
+    def decision(self):
         """This function is called each time step and is meant to be
         overlaoded in the subclass.
         """

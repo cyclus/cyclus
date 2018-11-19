@@ -61,6 +61,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):  # C++CON
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except +
     void Tick() except +
     void Tock() except +
+    void Decision() except +
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -89,6 +90,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except +
     void Tick() except +
     void Tock() except +
+    void Decision() except +
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -117,6 +119,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # 
     void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except +
     void Tick() except +
     void Tock() except +
+    void Decision() except +
     cpp_bool CheckDecommissionCondition() except +
     std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests() except +
     std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests() except +
