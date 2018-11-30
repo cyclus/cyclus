@@ -681,6 +681,7 @@ cdef extern from "time_listener.h" namespace "cyclus":
     cdef cppclass TimeListener(Ider):
         void Tick()
         void Tock()
+        void Decision()
 
 
 cdef extern from "trade.h" namespace "cyclus":
@@ -724,6 +725,7 @@ cdef extern from "region.h" namespace "cyclus":
         void EnterNotify()
         void Tick()
         void Tock()
+        void Decision()
 
 
 cdef extern from "institution.h" namespace "cyclus":
@@ -737,6 +739,7 @@ cdef extern from "institution.h" namespace "cyclus":
         void EnterNotify()
         void Tick()
         void Tock()
+        void Decision()
 
 
 cdef extern from "facility.h" namespace "cyclus":
@@ -750,6 +753,7 @@ cdef extern from "facility.h" namespace "cyclus":
         void EnterNotify()
         void Tick()
         void Tock()
+        void Decision()
         cpp_bool CheckDecommissionCondition()
         set[RequestPortfolio[Material].Ptr] GetMatlRequests()
         set[RequestPortfolio[Product].Ptr] GetProductRequests()

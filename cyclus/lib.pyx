@@ -1968,7 +1968,7 @@ def call_listeners(tsname, agent, time, value):
     """
     vec = TIME_SERIES_LISTENERS[tsname]
     for f in vec:
-        f(agent, time, value)
+        f(agent, time, value, tsname)
 
 
 EXT_BACKENDS = {'.h5': Hdf5Back, '.sqlite': SqliteBack}
