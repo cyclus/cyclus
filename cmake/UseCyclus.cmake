@@ -89,11 +89,15 @@ MACRO(USE_CYCLUS lib_root src_root)
 
 
     # set cpp path
-    IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        SET(PREPROCESSOR "--cpp-path=clang++")
+    
+    IF(DEFINED ENV{CPP})
+        SET(SYS_CPP "ENV{CPP}")
+    ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        SET(SYS_CPP "clang++")
     ELSE()
-        SET(PREPROCESSOR "--cpp-path=cpp")
+        SET(SYS_CPP "cpp")
     ENDIF()
+    SET(PREPROCESSOR "--cpp-path=${SYS_CPP}")
 
     # copy custom headers
     FOREACH(fname ${CYCLUS_CUSTOM_HEADERS})
