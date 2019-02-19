@@ -91,7 +91,7 @@ MACRO(USE_CYCLUS lib_root src_root)
     # set cpp path
     
     IF(DEFINED ENV{CPP})
-        SET(SYS_CPP "ENV{CPP}")
+        SET(SYS_CPP "$ENV{CPP}")
     ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         SET(SYS_CPP "clang++")
     ELSE()
