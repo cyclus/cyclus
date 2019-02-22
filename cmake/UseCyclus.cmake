@@ -89,7 +89,11 @@ MACRO(USE_CYCLUS lib_root src_root)
 
 
     # set cpp path
-    
+    # Now use by default the $CPP enviromnement variable first, if not fallback
+    # on the previous behavior, so in order:
+    #   1- if defined use ${CPP}
+    #   2- if clang++ present use it
+    #   3- otherwise use cpp
     IF(DEFINED ENV{CPP})
         SET(SYS_CPP "$ENV{CPP}")
     ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
