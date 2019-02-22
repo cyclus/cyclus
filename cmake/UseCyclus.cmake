@@ -89,10 +89,10 @@ MACRO(USE_CYCLUS lib_root src_root)
 
 
     # set cpp path
-    # Now use by default the $CPP enviromnement variable first, if not fallback
-    # on the previous behavior, so in order:
-    #   1- if defined use ${CPP}
-    #   2- if clang++ present use it
+    # Now check first if the $CPP enrironment variable is defined, if not
+    # fallback on the previous behavior, so in order:
+    #   1- if defined uses ${CPP}
+    #   2- if clang++ is present, use it
     #   3- otherwise use cpp
     IF(DEFINED ENV{CPP})
         SET(SYS_CPP "$ENV{CPP}")
