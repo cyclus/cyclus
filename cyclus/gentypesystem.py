@@ -1684,6 +1684,7 @@ cdef std_string str_py_to_cpp(object x):
     s = std_string(<const char*> x)
     return s  
 
+
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
 {% set decl, body, expr = ts.convert_to_py('x', n) %}
 cdef object {{ ts.funcname(n) }}_to_py({{ ts.possibly_shared_cython_type(n) }} x):
