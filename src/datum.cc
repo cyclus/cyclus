@@ -2,7 +2,6 @@
 
 #include <boost/pool/singleton_pool.hpp>
 
-#include "timer.h"
 
 namespace cyclus {
 
