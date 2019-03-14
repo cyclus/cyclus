@@ -1677,12 +1677,10 @@ cdef cpp_cyclus.uuid uuid_py_to_cpp(object x):
     return u
 
 cdef std_string str_py_to_cpp(object x):
-    #if isinstance(x, list):
-    #    x = str(x[0]) 
     cdef std_string s
     x = x.encode()
     s = std_string(<const char*> x)
-    return s  
+    return s
 
 
 {% for n in sorted(set(ts.norms.values()), key=ts.funcname) %}
