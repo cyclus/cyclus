@@ -67,6 +67,10 @@ if sys.version_info[0] == 2:
     STRING_TYPES = (str, unicode, basestring)
 elif sys.version_info[0] >= 3:
     STRING_TYPES = (str,)
+
+# Get system $CPP variable
+sys_cpp = os.environ.get('CPP', 'cpp')
+
 # Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE!
 RE_MULTILINE_COMMENT = "(?:\s*?/\*(?!\*/)*?\*/)"
 RE_SINGLE_LINE_COMMENT = "(?:\s*?//[^\n]*?\n\s*?)"
@@ -146,7 +150,7 @@ def prepare_type(cpptype, othertype):
 #
 # pass 1
 #
-def preprocess_file(filename, includes=(), cpp_path='cpp',
+def preprocess_file(filename, includes=(), cpp_path=sys_cpp,
                     cpp_args=('-xc++', '-pipe', '-E', '-DCYCPP')):
     """Preprocess a file using cpp.
 
@@ -2331,7 +2335,7 @@ def main():
                               "with --pass3-use-pp."), dest="pass3_use_pp")
     parser.add_argument('-o', '--output', help=("output file name"))
     parser.add_argument('--cpp-path', dest='cpp_path', help="preprocessor to use",
-                        default='cpp')
+                        default=sys_cpp)
     parser.add_argument('-I', '--includes', action="append",
                         help=("include directories for preprocessing. Can be "
                               "a variable number of arguments (i.e., list of "
