@@ -5,6 +5,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <boost/version.hpp>
 
 #if BOOST_VERSION / 100 % 1000 <= 67
   #include <boost/uuid/sha1.hpp>
