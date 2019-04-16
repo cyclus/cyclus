@@ -15,7 +15,9 @@ jobs:
                 command: |
                     python install.py -j 2 --build-type=Release --core-version 999999.999999 \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
-                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
+                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so" \
+                    -DCMAKE_CXX_COMPILER='/opt/conda/bin/x86_64-conda_cos6-linux-gnu-c++' \
+                    -DCMAKE_C_COMPILER='/opt/conda/bin/x86_64-conda_cos6-linux-gnu-cc'
             - run:
                 name: save SHA to a file
                 command: echo $CIRCLE_SHA1 > .circle-sha

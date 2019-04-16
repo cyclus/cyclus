@@ -24,7 +24,7 @@ CMD [ "/bin/bash" ]
 # apt packages
 #
 RUN apt-get update && \
-    apt-get install -y gcc vim nano && \
+    apt-get install -y vim nano && \
     apt-get clean
 
 #
@@ -32,11 +32,11 @@ RUN apt-get update && \
 #
 RUN conda config --add channels conda-forge
 RUN conda update -y --all && \
-    conda install -y cmake make docker-pycreds git xo python-json-logger \
+    conda install -y gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger \
                      python=3.6 glibmm glib=2.56 libxml2 libxmlpp libblas \
                      libcblas liblapack pkg-config coincbc=2.9 boost-cpp hdf5 \
                      sqlite pcre gettext bzip2 xz setuptools nose pytables \
-                     pandas jinja2 cython websockets pprintpp gxx_linux-64 gcc_linux-64&& \
+                     pandas jinja2 cython websockets pprintpp &&\
     conda clean -y --all
 
 #
