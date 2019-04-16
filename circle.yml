@@ -8,6 +8,7 @@ jobs:
         working_directory: ~/cyclus
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
+            - run: source /opt/conda/etc/profile.d/conda.sh
             - checkout
             - run:
                 name: Build Docker Image
