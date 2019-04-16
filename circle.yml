@@ -10,6 +10,8 @@ jobs:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
             - run: apt-get -qq update; apt-get -y install git openssh-client
             - checkout
+            - run: ln -s /opt/conda/bin/x86_64-conda_cos6-linux-gnu-c++ /opt/conda/bin/g++
+            - run: ln -s /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cc /opt/conda/bin/gcc
             - run:
                 name: Build Docker Image
                 command: |
