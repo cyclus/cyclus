@@ -7,6 +7,20 @@
 namespace cyclus {
 namespace toolkit {
 
+enum key_hash {
+  DP, deployment = DP,
+  DC, decomision = DC,
+  TI, timestep = TI,
+  TH, throughput = TH
+};
+
+std::unordered_map<std::string, int> key_map = {
+  std::make_pair("DP", DP), std::make_pair("deployment", DP),
+  std::make_pair("DC", DC), std::make_pair("decomission", DC),
+  std::make_pair("TI", TI), std::make_pair("timestep", TI),
+  std::make_pair("TH", TH), std::make_pair("throughput", TH)
+};
+
 Metadatas::Metadatas() {}
 
 void Metadatas::RecordMetadatas(cyclus::Agent* agent) {
@@ -54,6 +68,7 @@ void Metadatas::RecordMetadatas(cyclus::Agent* agent) {
 }
 
 UsageMetadatas::UsageMetadatas() {}
+UsageMetadatas::~UsageMetadatas() {}
 
 void UsageMetadatas::LoadUsageMetadatas(
     std::map<std::string, std::map<std::string, float>> datas) {
