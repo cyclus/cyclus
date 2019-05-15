@@ -4,9 +4,11 @@
 #include <string>
 #include <unordered_map>
 #include "pyne.h"
-#include "cyclus.h"
+//#include "cyclus.h"
+
 
 namespace cyclus {
+class Agent;
 namespace toolkit {
 
 
@@ -24,7 +26,7 @@ class Metadatas {
   ~Metadatas();
 
   // write the metadata in the output table
-  virtual void RecordMetadatas(cyclus::Agent* agent); 
+  virtual void RecordMetadatas(Agent* agent); 
 
   /// container for arbitrary metadata, following the JSON rules.
   Json::Value metadatas;
@@ -38,13 +40,14 @@ class UsageMetadatas: public Metadatas {
   /// The default constructor for Metadatas. 
   UsageMetadatas();
 
+  UsageMetadatas(std::map<std::string, std::map<std::string, double >> datas);
   /// The default destructor for Metadatas
   ~UsageMetadatas();
 
-  void LoadUsageMetadatas(std::map<std::string, std::map<std::string, float >>);
+  void LoadUsageMetadatas(std::map<std::string, std::map<std::string, double >> data);
 
   // write the metadata in the output table
-  void RecordMetadatas(cyclus::Agent* agent); 
+  void RecordMetadatas(Agent* agent); 
   // check consistency in the keyword names
   void CheckConstistency();
 

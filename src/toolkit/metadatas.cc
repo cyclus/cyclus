@@ -3,7 +3,8 @@
 #include <sstream>
 
 #include "metadatas.h"
-
+#include "agent.h"
+#include "context.h"
 namespace cyclus {
 namespace toolkit {
 
@@ -23,7 +24,7 @@ std::unordered_map<std::string, int> key_map = {
 
 Metadatas::Metadatas() {}
 
-void Metadatas::RecordMetadatas(cyclus::Agent* agent) {
+void Metadatas::RecordMetadatas(Agent* agent) {
   std::string tblname = "Metadatas";
   Json::Value::Members keys = metadatas.getMemberNames();
   Json::Value::Members::const_iterator ikey = keys.begin();
@@ -68,10 +69,13 @@ void Metadatas::RecordMetadatas(cyclus::Agent* agent) {
 }
 
 UsageMetadatas::UsageMetadatas() {}
+UsageMetadatas::UsageMetadatas(std::map<std::string, std::map<std::string, double >> datas){
+  LoadUsageMetadatas(datas);
+}
 UsageMetadatas::~UsageMetadatas() {}
 
 void UsageMetadatas::LoadUsageMetadatas(
-    std::map<std::string, std::map<std::string, float>> datas) {
+    std::map<std::string, std::map<std::string, double>> datas) {
   for (auto keyword_datas : datas) {
     std::string keyword = keyword_datas.first;
     std::string meta_key = "";
@@ -107,7 +111,7 @@ void UsageMetadatas::LoadUsageMetadatas(
   }
 }
 
-void UsageMetadatas::RecordMetadatas(cyclus::Agent* agent) {
+void UsageMetadatas::RecordMetadatas(Agent* agent) {
   std::string tblname = "UsageMetadatas";
   Json::Value::Members keys = metadatas.getMemberNames();
   Json::Value::Members::const_iterator ikey = keys.begin();
