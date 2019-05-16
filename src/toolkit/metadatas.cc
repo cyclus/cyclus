@@ -23,6 +23,7 @@ std::unordered_map<std::string, int> key_map = {
 };
 
 Metadatas::Metadatas() {}
+Metadatas::~Metadatas() {}
 
 void Metadatas::RecordMetadatas(Agent* agent) {
   std::string tblname = "Metadatas";
