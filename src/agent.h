@@ -495,8 +495,11 @@ class Agent : public StateWrangler, virtual public Ider {
   Context* ctx_;
   
 // Additionnal Data that are not required for a Cyclus Run
+ protected :
   /// agent coordonates
   cyclus::toolkit::Position coordinates;
+  /// agent Metadata
+  cyclus::toolkit::Metadatas metadata;
   /// agent Usage Metadata
   cyclus::toolkit::UsageMetadatas usagesdata;
 };

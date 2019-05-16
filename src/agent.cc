@@ -166,8 +166,9 @@ void Agent::Build(Agent* parent) {
 void Agent::EnterNotify() {
   ctx_->RegisterAgent(this);
 
-  usagesdata.RecordMetadatas(this);
   coordinates.RecordPosition(this);
+  usagesdata.RecordMetadatas(this);
+  metadata.RecordMetadatas(this);
 
 }
 
