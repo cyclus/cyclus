@@ -2,12 +2,27 @@
 #include <stdio.h>
 #include <sstream>
 
-#include "metadatas.h"
 #include "agent.h"
 #include "context.h"
+#include "metadatas.h"
 namespace cyclus {
 namespace toolkit {
 
+enum type_hash {
+  s,  // string
+  b,  // boolean
+  i,  // int
+  u,  // uint
+  d   // double
+};
+
+std::unordered_map<std::string, int> type_map = {
+    std::make_pair("s", s),  // string
+    std::make_pair("b", b),  // boolean
+    std::make_pair("i", i),  // int
+    std::make_pair("u", u),  // uint
+    std::make_pair("d", d)   // double
+};
 
 Metadatas::Metadatas() {}
 Metadatas::~Metadatas() {}
@@ -26,18 +41,23 @@ void Metadatas::RecordMetadatas(Agent* agent) {
       case Json::stringValue:
         type = "string";
         value = metadatas[*ikey].asString();
+        break;
       case Json::booleanValue:
         type = "bool";
         value = metadatas[*ikey].asString();
+        break;
       case Json::intValue:
         type = "int";
         value = std::to_string(metadatas[*ikey].asInt());
+        break;
       case Json::uintValue:
         type = "uint";
         value = std::to_string(metadatas[*ikey].asInt());
+        break;
       case Json::realValue:
         type = "double";
         value = std::to_string(metadatas[*ikey].asDouble());
+        break;
       case Json::arrayValue:
       case Json::objectValue:
         ValueError("Type is not convertible to string");
@@ -56,28 +76,75 @@ void Metadatas::RecordMetadatas(Agent* agent) {
   }
 }
 
+void Metadatas::LoadData(std::map<std::string, std::string> datas) {
+  for (auto data : datas) {
+    std::string keyword = data.first;
+    std::string type = data.second.substr(data.second.length() - 2);
+    std::string value = data.second.substr(0, data.second.length() - 2);
+    if (type.substr(0, 1) == "%") {
+    switch (type_map[type.substr(1)]) {
+        case s:
+          metadatas[keyword] = value;
+          break;
+
+        case b:
+          if (pyne::to_lower(value) == "true") {
+            metadatas[keyword] = true;
+          } else if (pyne::to_lower(value) == "false") {
+            metadatas[keyword] = false;
+          } else {
+            metadatas[keyword] = std::stoi(value);
+          }
+          break;
+
+        case i:
+          metadatas[keyword] = std::stoi(value);
+          break;
+
+        case u:
+          metadatas[keyword] = uint(std::stoul(value));
+          break;
+
+        case d:
+          metadatas[keyword] = std::stod(value);
+          break;
+
+        default:
+          std::stringstream msg;
+          msg << "Allowed Usage Keyw are:"
+              << " deploymemt, decomision, timestep and throughput";
+          throw ValueError(msg.str());
+    }
+    } else {
+      ValueError("type encoding not reconised");
+    }
+  }
+}
 
 enum key_hash {
-  DP, deployment = DP,
-  DC, decomision = DC,
-  TI, timestep = TI,
-  TH, throughput = TH
+  DP,
+  deployment = DP,
+  DC,
+  decomision = DC,
+  TI,
+  timestep = TI,
+  TH,
+  throughput = TH
 };
 
 std::unordered_map<std::string, int> key_map = {
-  std::make_pair("DP", DP), std::make_pair("deployment", DP),
-  std::make_pair("DC", DC), std::make_pair("decomission", DC),
-  std::make_pair("TI", TI), std::make_pair("timestep", TI),
-  std::make_pair("TH", TH), std::make_pair("throughput", TH)
-};
+    std::make_pair("DP", DP), std::make_pair("deployment", DP),
+    std::make_pair("DC", DC), std::make_pair("decomission", DC),
+    std::make_pair("TI", TI), std::make_pair("timestep", TI),
+    std::make_pair("TH", TH), std::make_pair("throughput", TH)};
 
 UsageMetadatas::UsageMetadatas() {}
-UsageMetadatas::UsageMetadatas(std::map<std::string, std::map<std::string, double >> datas){
-  LoadUsageMetadatas(datas);
+UsageMetadatas::UsageMetadatas(
+    std::map<std::string, std::map<std::string, double>> datas) {
+  LoadData(datas);
 }
-UsageMetadatas::~UsageMetadatas() {}
 
-void UsageMetadatas::LoadUsageMetadatas(
+void UsageMetadatas::LoadData(
     std::map<std::string, std::map<std::string, double>> datas) {
   for (auto keyword_datas : datas) {
     std::string keyword = keyword_datas.first;
@@ -122,7 +189,7 @@ void UsageMetadatas::RecordMetadatas(Agent* agent) {
   for (; ikey != ikey_end; ++ikey) {
     std::string keyword = (*ikey).substr(3);
     std::string usage_key = "";
-    switch(key_map[(*ikey).substr(0,2)]) {
+    switch (key_map[(*ikey).substr(0, 2)]) {
       case DP:
         usage_key = "deployment";
         break;

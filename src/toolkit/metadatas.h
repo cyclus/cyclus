@@ -24,6 +24,8 @@ class Metadatas {
 
   /// The default destructor for Metadatas
   ~Metadatas();
+  
+  virtual void LoadData(std::map<std::string, std::string> data);
 
   // write the metadata in the output table
   virtual void RecordMetadatas(Agent* agent); 
@@ -42,9 +44,9 @@ class UsageMetadatas: public Metadatas {
 
   UsageMetadatas(std::map<std::string, std::map<std::string, double >> datas);
   /// The default destructor for Metadatas
-  ~UsageMetadatas();
+  ~UsageMetadatas() {};
 
-  void LoadUsageMetadatas(std::map<std::string, std::map<std::string, double >> data);
+  void LoadData(std::map<std::string, std::map<std::string, double >> data);
 
   // write the metadata in the output table
   void RecordMetadatas(Agent* agent); 
