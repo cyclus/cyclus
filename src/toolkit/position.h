@@ -4,14 +4,10 @@
 
 #include <string>
 
-//#include "cyclus.h"
-
-
+#include "cyclus.h"
 
 namespace cyclus {
-class Agent;
 namespace toolkit {
-
 /// @class Position
 /// The Position class is a basic class that stores the geographic location of
 /// each
@@ -131,9 +127,6 @@ class Position {
   /// ISO6709 Annex H
   std::string ToString(
       Position::StringFormat format = StringFormat::DEGREES) const;
-
-
-  void RecordPosition(Agent* agent); 
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is

@@ -16,7 +16,6 @@
 #include "query_backend.h"
 #include "resource.h"
 #include "state_wrangler.h"
-#include "toolkit/position.h"
 #include "toolkit/metadatas.h"
 
 
@@ -496,8 +495,6 @@ class Agent : public StateWrangler, virtual public Ider {
   
 // Additionnal Data that are not required for a Cyclus Run
  protected :
-  /// agent coordonates
-  cyclus::toolkit::Position coordinates;
   /// agent Metadata
   cyclus::toolkit::Metadatas metadata;
   /// agent Usage Metadata

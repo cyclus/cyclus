@@ -1,12 +1,9 @@
-#include "position.h"
-
 #include <math.h>
 #include <stdio.h>
-#include <iomanip>
 #include <sstream>
 
-#include "agent.h"
-#include "context.h"
+#include "position.h"
+
 namespace cyclus {
 namespace toolkit {
 
@@ -46,16 +43,6 @@ void Position::set_position(double lat, double lon) {
   longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
 }
 
-void Position::RecordPosition(Agent* agent) {
-  agent->context()
-      ->NewDatum("AgentPosition")
-      ->AddVal("Spec", agent->spec())
-      ->AddVal("Prototype", agent->prototype())
-      ->AddVal("AgentId", agent->id())
-      ->AddVal("Latitude", latitude_)
-      ->AddVal("Longitude", longitude_)
-      ->Record();
-}
 void Position::LatCheck(double lat) {
   if (lat > 90 || lat < -90){
     std::stringstream msg;
