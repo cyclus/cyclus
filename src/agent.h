@@ -14,8 +14,6 @@
 #include "query_backend.h"
 #include "resource.h"
 #include "state_wrangler.h"
-#include "toolkit/position.h"
-
 
 // Undefines isnan from pyne
 #ifdef isnan
@@ -487,14 +485,7 @@ class Agent : public StateWrangler, virtual public Ider {
   /// an instance-unique ID for the agent
   int id_;
 
-
-
   Context* ctx_;
-  
-// Additionnal Data that are not required for a Cyclus Run
- protected :
-  /// agent coordonates
-  cyclus::toolkit::Position coordinates;
 };
 
 }  // namespace cyclus
