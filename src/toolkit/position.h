@@ -3,13 +3,11 @@
 #define CYCLUS_DECIMAL_SECOND_MULTIPLIER 3600
 
 #include <string>
-
-//#include "cyclus.h"
+#include "cyclus.h"
 
 
 
 namespace cyclus {
-class Agent;
 namespace toolkit {
 
 /// @class Position

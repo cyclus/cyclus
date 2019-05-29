@@ -5,8 +5,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include "agent.h"
-#include "context.h"
+
 namespace cyclus {
 namespace toolkit {
 
