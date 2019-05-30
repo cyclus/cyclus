@@ -1,5 +1,6 @@
 #include "pyhooks.h"
 
+#include  <iostream>
 #ifdef CYCLUS_WITH_PYTHON
 #include <stdlib.h>
 
@@ -86,7 +87,11 @@ void InitFromPyAgent(Agent* src, Agent* dst, void* ctx) {
 
 void ClearPyAgentRefs(void) { CyclusClearPyAgentRefs(); };
 
-void PyDelAgent(int i) { CyclusPyDelAgent(i); };
+void PyDelAgent(int i) { 
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
+  CyclusPyDelAgent(i); 
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
+};
 
 namespace toolkit {
 std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };

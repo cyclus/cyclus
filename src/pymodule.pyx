@@ -80,8 +80,11 @@ cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" () except +:
 
 cdef public void py_del_agent "CyclusPyDelAgent" (int i) except +:
     """Clears the cache of a single agent ref"""
+    print("pymodule 83", flush=True)
     cyclib._del_agent(i)
+    print("pymodule 85", flush=True)
     PyErr_CheckSignals()
+    print("pymodule 87", flush=True)
 
 
 cdef public void py_call_listeners "CyclusPyCallListeners" (std_string cpp_tsname,

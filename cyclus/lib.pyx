@@ -1915,7 +1915,11 @@ cpdef void _del_agent(int i):
     call this.
     """
     global _AGENT_REFS
+    print("test")
+    print(_AGENT_REFS) 
+    print("test end")
     if i in _AGENT_REFS:
+        print(_AGENT_REFS[i]) 
         del _AGENT_REFS[i]
 
 #
