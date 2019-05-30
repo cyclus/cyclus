@@ -88,9 +88,7 @@ void InitFromPyAgent(Agent* src, Agent* dst, void* ctx) {
 void ClearPyAgentRefs(void) { CyclusClearPyAgentRefs(); };
 
 void PyDelAgent(int i) { 
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
   CyclusPyDelAgent(i); 
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl; 
 };
 
 namespace toolkit {
