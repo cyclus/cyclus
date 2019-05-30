@@ -4,7 +4,7 @@ jobs:
     # Build Cyclus
     build:
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps-cython
         working_directory: ~/cyclus
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
@@ -28,7 +28,7 @@ jobs:
     # Test Jobs
     unit_test:
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps-cython
         working_directory: /root
         steps:
             - run:
@@ -43,7 +43,7 @@ jobs:
 
     nosetest:
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps-cython
         working_directory: /root
         steps:
             - run:
@@ -118,7 +118,7 @@ jobs:
 # Checking Cycamore and Cymetric compatibilities with the changes
     cycamore_master: ## Cycamore/master against Cyclus/dev
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps-cython
         working_directory: /root
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
@@ -152,7 +152,7 @@ jobs:
 
     cymetric_master: ## Cymetric/master against Cyclus/dev + Cycamore/dev
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps-cython
         working_directory: /root
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
