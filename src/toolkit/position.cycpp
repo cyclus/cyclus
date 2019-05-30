@@ -5,6 +5,8 @@
        "be expressed in degrees as a double." \
 }
 double latitude;
+// required for compilation but not added by the cycpp preprocessor...
+std::vector<int> cycpp_shape_latitude;
 
 #pragma cyclus var { \
 "default": 0.0, \
@@ -13,3 +15,5 @@ double latitude;
        "be expressed in degrees as a double." \
 }
 double longitude;
+// required for compilation but not added by the cycpp preprocessor...
+std::vector<int> cycpp_shape_longitude;
