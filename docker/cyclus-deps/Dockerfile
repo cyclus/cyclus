@@ -24,7 +24,7 @@ CMD [ "/bin/bash" ]
 # apt packages
 #
 RUN apt-get update && \
-    apt-get install -y g++ gcc vim nano && \
+    apt-get install -y vim nano && \
     apt-get clean
 
 #
