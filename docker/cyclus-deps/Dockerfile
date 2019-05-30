@@ -39,6 +39,10 @@ RUN conda update -y --all && \
 	                     pandas jinja2 cython==0.26 websockets pprintpp &&\
     conda clean -y --all
 
+ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cc
+ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
+
+
 #
 # pip packages to overide conda
 #
