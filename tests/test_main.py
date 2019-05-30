@@ -14,7 +14,7 @@ def test_main():
         ['--agent-schema', ':agents:KFacility'],
         ['--agent-version', ':agents:KFacility'],
         ['--schema-path', '/path/to/schema'],
-        ['--agent-annotations', ':agents:NullRegion'],
+        ['--agent-annotations', ':agents:KFacility'],
         ['--agent-listing', ':agents'],
         ['--no-agent'],
         ['--no-mem'],
