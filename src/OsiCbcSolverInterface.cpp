@@ -12,8 +12,10 @@
 #endif
 
 
-#ifdef __APPLE__
 // for some reason these symbol doesn't exist in the mac binaries
+// Those were also not present in condaforge/linux-anvil-comp7 docker container
+// used to build conda recipes, using cpp/cxx 7.3, it also works with the docker
+// in unit test...
 void OsiSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
                                 double colub, double obj, std::string name) {
   // just ignore the name
@@ -38,4 +40,3 @@ void OsiSolverInterface::addRow(CoinPackedVectorBase const& vec, double rowlb,
   // just ignore the name
   addRow(vec, rowlb, rowub);
 }
-#endif

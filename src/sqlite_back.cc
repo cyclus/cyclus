@@ -90,7 +90,7 @@ void SqliteBack::Notify(DatumList data) {
 
 void SqliteBack::Flush() { }
 
-std::list<ColumnInfo> SqliteBack::Schema(std::string table) { 
+std::list<ColumnInfo> SqliteBack::Schema(std::string table) {
   std::list<ColumnInfo> schema;
   QueryResult qr = GetTableInfo(table);
   for (int i = 0; i < qr.fields.size(); ++i) {
@@ -154,6 +154,7 @@ std::set<std::string> SqliteBack::Tables() {
   while (stmt->Step()) {
     rtn.insert(stmt->GetText(0, NULL));
   }
+  rtn.erase("FieldTypes");
   return rtn;
 }
 
@@ -248,14 +249,20 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
                       int index) {
 
 // serializes the value v of type T and DBType D and binds it to stmt (inside
-// a case statement
+// a case statement.
+// NOTE: Since we are archiving to a stringstream, the archive must be closed before
+// the stringstream, so we put it in its own scope. This first became an issue in
+// Boost v1.66.0.  For more information, see http://boost.2283326.n4.nabble.com/the-boost-xml-serialization-to-a-stringstream-does-not-have-an-end-tag-tp2580772p2580773.html
 #define CYCLUS_COMMA ,
 #define CYCLUS_BINDVAL(D, T) \
     case D: { \
     T vect = v.cast<T>(); \
     std::stringstream ss; \
-    boost::archive::xml_oarchive ar(ss); \
-    ar & BOOST_SERIALIZATION_NVP(vect); \
+    { \
+      boost::archive::xml_oarchive ar(ss); \
+      ar & BOOST_SERIALIZATION_NVP(vect); \
+    } \
+    v = vect; \
     std::string s = ss.str(); \
     stmt->BindBlob(index, s.c_str(), s.size()); \
     break; \
@@ -339,6 +346,10 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
       std::vector<std::pair<
               std::pair<double CYCLUS_COMMA double> CYCLUS_COMMA
                   std::map<std::string CYCLUS_COMMA double> > > );
+
+  CYCLUS_BINDVAL(
+      MAP_PAIR_STRING_STRING_INT,
+      std::map<std::pair<std::string CYCLUS_COMMA std::string> CYCLUS_COMMA int > );
 
   default: {
     throw ValueError("attempted to retrieve unsupported sqlite backend type");
@@ -433,6 +444,7 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
       std::pair<std::string CYCLUS_COMMA std::vector<double> > > );
 
   CYCLUS_LOADVAL(LIST_PAIR_INT_INT, std::list< std::pair<int CYCLUS_COMMA int> >);
+
   CYCLUS_LOADVAL(
       MAP_STRING_MAP_STRING_INT,
       std::map<std::string CYCLUS_COMMA std::map<std::string CYCLUS_COMMA int> >);
@@ -442,11 +454,15 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
       std::vector<std::pair<
               std::pair<double CYCLUS_COMMA double> CYCLUS_COMMA
                   std::map<std::string CYCLUS_COMMA double> > > );
-  
+
+  CYCLUS_LOADVAL(
+      MAP_PAIR_STRING_STRING_INT,
+      std::map<std::pair<std::string CYCLUS_COMMA std::string> CYCLUS_COMMA int > );
+
   default: {
     throw ValueError("Attempted to retrieve unsupported backend type");
   }}
-  
+
 #undef CYCLUS_LOADVAL
 #undef CYCLUS_COMMA
 
@@ -520,17 +536,20 @@ DbTypes SqliteBack::Type(boost::spirit::hold_any v) {
                   std::pair<std::string,
                             std::vector<double> > >)] =
         MAP_STRING_PAIR_STRING_VECTOR_DOUBLE;
-    
+
     type_map[&typeid(std::map<std::string, std::map<std::string,int> >)] =
         MAP_STRING_MAP_STRING_INT;
-    
+
     type_map[&typeid(std::list<std::pair<int, int> >)] = LIST_PAIR_INT_INT;
-    
+
     type_map[&typeid(
         std::vector<std::pair<std::pair<double, double>,
                               std::map<std::string, double> > > )] =
         VECTOR_PAIR_PAIR_DOUBLE_DOUBLE_MAP_STRING_DOUBLE;
 
+    type_map[&typeid(
+        std::map<std::pair<std::string, std::string>, int > )] =
+        MAP_PAIR_STRING_STRING_INT;
   }
 
   const std::type_info* ti = &v.type();

@@ -5,7 +5,7 @@
 #include "agent_tests.h"
 #include "context.h"
 #include "facility_tests.h"
-#inlcude "pyhooks.h"
+#include "pyhooks.h"
 
 using libname::StubFacility;
 

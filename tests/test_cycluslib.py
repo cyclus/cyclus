@@ -43,6 +43,11 @@ def test_conds_comp(db, fname, backend):
     for row in df['MassFrac']:
         assert_less(row, 0.00720000001)
 
+
+@dbtest
+def test_dbopen(db, fname, backend):
+    db = lib.dbopen(fname)
+
 @dbtest
 def test_schema(db, fname, backend):
     schema = db.schema("AgentEntry")
@@ -54,7 +59,17 @@ def test_schema(db, fname, backend):
         assert_equal(cols[i], ci.col)
         assert_equal(dbs[i], ci.dbtype)
         assert_equal(i, ci.index)
-        assert_equal(0, len(ci.shape))
+        assert_equal(1, len(ci.shape))
+        assert_equal(-1, ci.shape)
+
+
+def test_position():
+    p1 = lib.Position(42.65, 28.6)
+    p2 = lib.Position(42.65, 28.6)
+    d = p1.distance(p2)
+    assert_equal(0.0, d)
+
 
 if __name__ == "__main__":
     nose.runmodule()
+

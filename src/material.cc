@@ -194,14 +194,16 @@ void Material::Decay(int curr_time) {
 }
 
 double Material::DecayHeat() {
-    double decay_heat = 0.;
-    // Pyne decay heat operates with grams, cyclus generally in kilograms.
-    pyne::Material p_map = pyne::Material(comp_->mass(), qty_ * 1000);
-    std::map<int, double> dec_heat = p_map.decay_heat();
-    for (auto nuc : dec_heat) {
-        decay_heat += nuc.second;
+  double decay_heat = 0.;
+  // Pyne decay heat operates with grams, cyclus generally in kilograms.
+  pyne::Material p_map = pyne::Material(comp_->mass(), qty_ * 1000);
+  std::map<int, double> dec_heat = p_map.decay_heat();
+  for (auto nuc : dec_heat) {
+    if (!std::isnan(nuc.second)) {
+      decay_heat += nuc.second;
     }
-    return decay_heat;
+  }
+  return decay_heat;
 }
 
 Composition::Ptr Material::comp() const {

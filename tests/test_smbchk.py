@@ -5,6 +5,7 @@ import sys
 from argparse import Namespace
 
 import nose
+from nose.plugins.deprecated import DeprecatedTest
 from nose.tools import assert_equal, assert_true, assert_false, assert_raises, \
     assert_in
 
@@ -21,6 +22,7 @@ except ImportError:
     smbchk = False
 
 def test_load():
+    raise DeprecatedTest("symbol test has been deprecated")
     if not smbchk:
         return
     ns = Namespace(filename=os.path.join(reldir, 'symbols.json'))
@@ -28,6 +30,7 @@ def test_load():
     assert_true(isinstance(db, list))
 
 def test_nm():
+    raise DeprecatedTest("symbol test has been deprecated")
     if platform.system() == 'Darwin':
         skip_then_continue("Skipping for Mac")
     if not smbchk:
@@ -39,6 +42,7 @@ def test_nm():
     assert_in("cyclus::Agent::Agent(cyclus::Context*)", syms)
 
 def test_diff():
+    raise DeprecatedTest("symbol test has been deprecated")
     if not smbchk:
         return
     db = [{'symbols': ["cyclus::Agent::Agent(cyclus::Context*)"],
@@ -50,6 +54,7 @@ def test_diff():
     assert_true(len(obs) > 0)
 
 def test_check():
+    raise DeprecatedTest("symbol test has been deprecated")
     if not smbchk:
         return
     # adds to API

@@ -7,15 +7,8 @@ import platform
 import subprocess
 import shutil
 import io
-if sys.version_info[0] < 3:
-    from urllib import urlopen
-else:
-    from urllib.request import urlopen
+import argparse as ap
 
-try:
-    import argparse as ap
-except ImportError:
-    import pyne._argparse as ap
 
 absexpanduser = lambda x: os.path.abspath(os.path.expanduser(x))
 
@@ -34,11 +27,13 @@ def check_windows_cmake(cmake_cmd):
             cmake_cmd += ['-G "MinGW Makefiles"']
         cmake_cmd = ' '.join(cmake_cmd)
 
+
 def update_describe():
     root_dir = os.path.split(__file__)[0]
     fname = os.path.join(root_dir, 'src', 'version.cc.in')
     cmd = 'touch {0}'.format(fname)
     subprocess.check_call(cmd.split(), shell=(os.name == 'nt'))
+
 
 def install_cyclus(args):
     if not os.path.exists(args.build_dir):
@@ -64,8 +59,9 @@ def install_cyclus(args):
         if args.cmake_prefix_path:
             cmake_cmd += ['-DCMAKE_PREFIX_PATH=' +
                           absexpanduser(args.cmake_prefix_path)]
-        cmake_cmd += ['-DDEFAULT_ALLOW_MILPS=' +
-                      ('TRUE' if args.allow_milps else 'FALSE')]
+        if cmake_cmd is not None:
+            cmake_cmd += ['-DDEFAULT_ALLOW_MILPS=' +
+                          ('TRUE' if args.allow_milps else 'FALSE')]
         if args.deps_root:
             cmake_cmd += ['-DDEPS_ROOT_DIR=' + absexpanduser(args.deps_root)]
         if args.coin_root:
@@ -87,6 +83,12 @@ def install_cyclus(args):
             cmake_cmd += ['-DCORE_VERSION=' + args.core_version]
         if args.D is not None:
             cmake_cmd += ['-D' + x for x in args.D]
+        if args.cmake_debug:
+            cmake_cmd += ['-Wdev', '--debug-output']
+        if args.fast is not None:
+            fast = 'TRUE' if args.fast else 'FALSE'
+            cmake_cmd.append('-DCYCLUS_FAST_COMPILE=' + fast)
+
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
@@ -111,10 +113,11 @@ def install_cyclus(args):
     rtn = subprocess.check_call(make_cmd, cwd=args.build_dir,
                                 shell=(os.name == 'nt'))
 
+
 def uninstall_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
     if not os.path.exists(args.build_dir) or not os.path.exists(makefile):
-        sys.exist("May not uninstall Cyclus since it has not yet been built.")
+        sys.exit("May not uninstall Cyclus since it has not yet been built.")
     rtn = subprocess.check_call(['make', 'uninstall'], cwd=args.build_dir,
                                 shell=(os.name == 'nt'))
 
@@ -155,7 +158,7 @@ def main():
     parser.add_argument('--test', action='store_true', help=test)
 
     parser.add_argument('--allow-milps', action='store_true',
-                        dest='allow_milps', default=True,
+                        dest='allow_milps', default=None,
                         help='Allows mixed integer linear programs by default')
     parser.add_argument('--dont-allow-milps', action='store_false',
                         dest='allow_milps',
@@ -190,6 +193,17 @@ def main():
 
     parser.add_argument('-D', metavar='VAR', action='append',
                         help='Set enviornment variable(s).')
+    parser.add_argument('--cmake-debug', action='store_true', default=False,
+                        dest='cmake_debug', help='puts CMake itself in a debug mode '
+                                                 'when dealing with build system issues.')
+    parser.add_argument('--fast', default=None, dest='fast',
+                        action='store_true', help="Will try to compile "
+                        "from assembly, if possible. This is faster than "
+                        "compiling from source (default).")
+    parser.add_argument('--slow', dest='fast',
+                        action='store_false', help="Will NOT try to compile "
+                        "from assembly, if possible. This is slower as it "
+                        "must compile from source.")
 
     args = parser.parse_args()
     # modify roots as needed
@@ -203,6 +217,7 @@ def main():
         uninstall_cyclus(args)
     else:
         install_cyclus(args)
+
 
 if __name__ == "__main__":
     main()

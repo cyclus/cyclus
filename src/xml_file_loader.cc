@@ -161,7 +161,7 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
                              QueryableBackend* b,
                              std::string schema_file,
                              const std::string input_file,
-                             const std::string format) : b_(b), rec_(r) {
+                             const std::string format, bool ms_print) : b_(b), rec_(r) {
   ctx_ = new Context(&ti_, rec_);
 
   schema_path_ = schema_file;
@@ -171,7 +171,7 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
   LoadStringstreamFromFile(input, file_, format);
   parser_ = boost::shared_ptr<XMLParser>(new XMLParser());
   parser_->Init(input);
-
+  ms_print_ = ms_print;
   std::stringstream ss;
   parser_->Document()->write_to_stream_formatted(ss);
   ctx_->NewDatum("InputFiles")
@@ -189,6 +189,9 @@ std::string XMLFileLoader::master_schema() {
 
 void XMLFileLoader::LoadSim() {
   std::stringstream ss(master_schema());
+  if(ms_print_){
+    std::cout << master_schema() << std::endl;
+  }
   parser_->Validate(ss);
   LoadControlParams();  // must be first
   LoadSolver();

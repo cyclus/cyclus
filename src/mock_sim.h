@@ -200,6 +200,10 @@ class MockSim {
   /// institutions and other agents for deployment/decommission testing.
   void DummyProto(std::string name);
 
+  /// Adds a dummy prototype to the simulation that can be used by
+  /// institutions and other agents for demand-driven deployment testing.
+  void DummyProto(std::string name, std::string commod, double capacity);
+
   /// Runs the simulation.  This can only be called once.  After the simulation
   /// has been run, this MockSim object CANNOT be reused to run other
   /// simulations.  Run returns the agent ID for the agent being tested for

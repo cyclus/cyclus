@@ -1,8 +1,12 @@
 #################################################################
 ############# special file configuration ########################
 #################################################################
-
-CONFIGURE_FILE(suffix.h.in "${CMAKE_CURRENT_SOURCE_DIR}/suffix.h" @ONLY)
+if(COIN_FOUND)
+  set(cyclus_has_coin 1)
+else()
+  set(cyclus_has_coin 0)
+endif()
+CONFIGURE_FILE(platform.h.in "${CMAKE_CURRENT_SOURCE_DIR}/platform.h" @ONLY)
 
 CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
 
@@ -15,8 +19,13 @@ if(DEFINED DEFAULT_ALLOW_MILPS)
         SET(default_allow_milps "false")
     endif (${DEFAULT_ALLOW_MILPS})
 else(DEFINED DEFAULT_ALLOW_MILPS)
-    SET(default_allow_milps "true")
+    if("${COIN_VERSION}" VERSION_GREATER_EQUAL "2.9")
+        SET(default_allow_milps "false")
+    else("${COIN_VERSION}" VERSION_GREATER_EQUAL "2.9")
+        SET(default_allow_milps "true")
+    endif("${COIN_VERSION}" VERSION_GREATER_EQUAL "2.9")
 endif(DEFINED DEFAULT_ALLOW_MILPS)
+MESSAGE("-- default_allow_milps: ${default_allow_milps}")
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
@@ -150,17 +159,46 @@ endif(Cython_FOUND)
 
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 
+set(CYCLUS_COIN_SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
+    )
+
 SET(CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}"
     PARENT_SCOPE
     )
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
-SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC}
-    ${cc_files}
-    "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
-    )
+foreach(ccfile ${CYCLUS_COIN_SRC})
+  list(REMOVE_ITEM cc_files ${ccfile})
+endforeach()
+list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
+list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc)
 
-set_source_files_properties(pyne_decay.cc PROPERTIES COMPILE_FLAGS "-O0")
+SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
+
+# Add Cyclus source files that use COIN, if we have COIN
+if(COIN_FOUND)
+  SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${CYCLUS_COIN_SRC})
+endif()
+
+# Add bateman solver from PyNE
+#add_definitions(-DPYNE_IS_AMALGAMATED)
+download_platform("https://raw.githubusercontent.com/pyne/data/master" "decay"
+                  ".cpp" ".s")
+fast_compile(decay.cpp "-O0" "-O0" "-O0")
+set_source_files_properties(decay.cpp PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
+
+# Add CRAM solver from PyNE
+download_platform("http://raw.githubusercontent.com/pyne/data/master" "cram"
+                     ".c" ".s")
+fast_compile(cram.c
+  "-O0 -fcx-fortran-rules -fcx-limited-range -ftree-sra -ftree-ter -fexpensive-optimizations"
+  "-O0 -ffast-math"
+  "-O0")
 
 # write the include directories to a file for later use
 get_property(incdirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)

@@ -7,8 +7,8 @@
 #include "context.h"
 #include "env.h"
 #include "agent.h"
+#include "platform.h"
 #include "pyhooks.h"
-#include "suffix.h"
 
 #include DYNAMICLOADLIB
 
@@ -113,6 +113,14 @@ void DynamicModule::CloseAll() {
   modules_.clear();
   man_ctors_.clear();
   ClearPyAgentRefs();
+}
+
+bool DynamicModule::IsPyAgent(AgentSpec spec) {
+  bool rtn = false;
+  if (DynamicModule::Exists(spec) && boost::starts_with(modules_[spec.str()]->path(), "<py>")) {
+    rtn = true;
+  }
+  return rtn;
 }
 
 DynamicModule::DynamicModule(AgentSpec spec)

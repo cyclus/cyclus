@@ -266,7 +266,7 @@ TEST_F(XMLFileLoaderTests, EpsFile) {
 }
 
 TEST_F(XMLFileLoaderTests, ExplicitFormat) {
-  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path,
+  EXPECT_NO_THROW(XMLFileLoader file(&rec_, b_, schema_path, 
                                      XMLFileLoaderTests::ControlSequenceWithEps(), "xml"));
 }
 

@@ -36,6 +36,8 @@ void Timer::RunSim() {
     DoResEx(&matl_manager, &genrsrc_manager);
     CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
     DoTock();
+    CLOG(LEV_INFO2) << "Beginning Decision for time: " << time_;
+    DoDecision();
     DoDecom();
 
 #ifdef CYCLUS_WITH_PYTHON
@@ -108,6 +110,13 @@ void Timer::DoTock() {
   }
 }
 
+void Timer::DoDecision() {
+  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
+       agent != tickers_.end();
+       agent++) {
+    agent->second->Decision();
+  }
+}
 
 void Timer::RecordInventories(Agent* a) {
   Inventories invs = a->SnapshotInv();

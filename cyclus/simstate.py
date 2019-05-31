@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 import os
 import queue
 import atexit
+import sys
 
 #from cyclus.system import curio
 from cyclus.lib import (DynamicModule, Env, version, load_string_from_file,
@@ -99,7 +100,7 @@ class SimState(object):
     def __init__(self, input_file=None, input_format=None, output_path=None,
                  memory_backend=False, registry=True, schema_path=None,
                  flat_schema=False, frequency=0.001, repeating_actions=None,
-                 heartbeat_frequency=5, debug=False):
+                 heartbeat_frequency=5, debug=False, print_ms = False):
         ensure_close_dynamic_modules()
         self.input_file = input_file
         self.input_format = input_format
@@ -114,6 +115,7 @@ class SimState(object):
         self._registry = registry
         self.flat_schema = flat_schema
         self.schema_path = schema_path
+        self.print_ms = print_ms
         self.frequency = frequency
         self.repeating_actions = [] if repeating_actions is None \
                                     else repeating_actions
@@ -169,7 +171,7 @@ class SimState(object):
         parser = XMLParser(filename=self.input_file, format=self.input_format)
         tree = InfileTree.from_parser(parser)
         schema_type = tree.optional_query("/simulation/schematype", "")
-        if schema_type == "flat" and not ns.flat_schema:
+        if schema_type == "flat" and not self.flat_schema:
             print("flat schema tag detected - switching to flat input schema",
                   file=sys.stderr)
             self.flat_schema = True
@@ -181,11 +183,11 @@ class SimState(object):
         if self.flat_schema:
             loader = XMLFlatLoader(self.rec, self.file_backend,
                                    self.schema_path, self.input_file,
-                                   self.input_format)
+                                   self.input_format, self.print_ms)
         else:
             loader = XMLFileLoader(self.rec, self.file_backend,
                                    self.schema_path, self.input_file,
-                                   self.input_format)
+                                   self.input_format, self.print_ms)
         loader.load_sim()
 
     def run(self):

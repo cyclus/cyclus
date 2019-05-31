@@ -33,6 +33,15 @@ class TimeListener: virtual public Ider {
   ///
   /// @param time is the current simulation timestep
   virtual void Tock() = 0;
+
+  /// Simulation agents do their end-of-timestep decisions in the
+  /// Decision method. The decision method allows for agents to
+  /// make decision based on the operation of facilities during the
+  /// tick and tock of the current timestep. Facility operations 
+  /// should not occur during this phase. 
+  ///
+  /// @param time is the current simulation timestep
+  virtual void Decision(){};
 };
 
 }  // namespace cyclus
