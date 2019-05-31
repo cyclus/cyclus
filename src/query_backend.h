@@ -1075,6 +1075,14 @@ class Sha1 {
     }
   }
 
+  inline void Update(const std::map<std::string, std::map<std::string, double>>& x) {
+    std::map<std::string, std::map<std::string, double>>::const_iterator it = x.begin();
+    for(; it != x.end(); ++it) {
+      hash_.process_bytes(it->first.c_str(), it->first.size());
+      Update(it->second);
+    }
+  }
+
   /// \}
 
   Digest digest() {
