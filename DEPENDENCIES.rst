@@ -55,7 +55,7 @@ Package                Minimum Version
 ====================   ==================
 doxygen (for docs)     1.7.6.1
 tcmalloc (for speed)   any
-Cython                 0.25+
+Cython                  >=0.25 and  <0.27
 Python (dev version)   2.7 or 3.3+
 Jinja2                 any
 NumPy                  1.9+
