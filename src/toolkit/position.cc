@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <sstream>
 
-
 namespace cyclus {
 namespace toolkit {
 
@@ -56,7 +55,7 @@ void Position::RecordPosition(Agent* agent) {
       ->Record();
 }
 void Position::LatCheck(double lat) {
-  if (lat > 90 || lat < -90){
+  if (lat > 90 || lat < -90) {
     std::stringstream msg;
     msg << "The provided latitude (" << lat
         << ") is outside the acceptable range. "
@@ -66,7 +65,7 @@ void Position::LatCheck(double lat) {
 }
 
 void Position::LonCheck(double lon) {
-  if (lon > 180 || lon < -180){
+  if (lon > 180 || lon < -180) {
     std::stringstream msg;
     msg << "The provided longitude (" << lon
         << ") is outside the acceptable range."

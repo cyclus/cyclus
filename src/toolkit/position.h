@@ -5,8 +5,6 @@
 #include <string>
 #include "cyclus.h"
 
-
-
 namespace cyclus {
 namespace toolkit {
 
@@ -130,8 +128,7 @@ class Position {
   std::string ToString(
       Position::StringFormat format = StringFormat::DEGREES) const;
 
-
-  void RecordPosition(Agent* agent); 
+  void RecordPosition(Agent* agent);
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is
