@@ -50,7 +50,7 @@ void Position::RecordPosition(Agent* agent) {
       ->AddVal("Spec", agent->spec())
       ->AddVal("Prototype", agent->prototype())
       ->AddVal("AgentId", agent->id())
-      ->AddVal("Latitude", latitude_ / CYCLUS_DECIMAL_SECOND_MULTIPLIER )
+      ->AddVal("Latitude", latitude_ / CYCLUS_DECIMAL_SECOND_MULTIPLIER)
       ->AddVal("Longitude", longitude_ / CYCLUS_DECIMAL_SECOND_MULTIPLIER)
       ->Record();
 }
