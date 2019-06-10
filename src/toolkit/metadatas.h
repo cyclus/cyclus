@@ -33,25 +33,7 @@ class Metadatas {
   /// container for arbitrary metadata, following the JSON rules.
   Json::Value metadatas;
 
-
-};
-
-
-class UsageMetadatas: public Metadatas {
- public:
-  /// The default constructor for Metadatas. 
-  UsageMetadatas();
-
-  UsageMetadatas(std::map<std::string, std::map<std::string, double >> datas);
-  /// The default destructor for Metadatas
-  ~UsageMetadatas() {};
-
-  void LoadData(std::map<std::string, std::map<std::string, double >> data);
-
-  // write the metadata in the output table
-  void RecordMetadatas(Agent* agent); 
-  // check consistency in the keyword names
-  void CheckConstistency();
+  void LoadUsageData(std::map<std::string, std::map<std::string, double >> data);
 
 
 };

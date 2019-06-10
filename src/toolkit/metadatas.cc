@@ -35,6 +35,7 @@ void Metadatas::RecordMetadatas(Agent* agent) {
   for (; ikey != ikey_end; ++ikey) {
     std::string value = "";
     std::string type = "";
+    std::string unit = "N.A.";
     switch (metadatas[*ikey].type()) {
       case Json::nullValue:
         break;
@@ -69,8 +70,9 @@ void Metadatas::RecordMetadatas(Agent* agent) {
           ->NewDatum(tblname)
           ->AddVal("AgentId", agent->id())
           ->AddVal("keyword", *ikey)
-          ->AddVal("Value", value)
           ->AddVal("Type", type)
+          ->AddVal("Value", value)
+          ->AddVal("Unit", unit)
           ->Record();
     }
   }
@@ -138,13 +140,8 @@ std::unordered_map<std::string, int> key_map = {
     std::make_pair("TI", TI), std::make_pair("timestep", TI),
     std::make_pair("TH", TH), std::make_pair("throughput", TH)};
 
-UsageMetadatas::UsageMetadatas() {}
-UsageMetadatas::UsageMetadatas(
-    std::map<std::string, std::map<std::string, double>> datas) {
-  LoadData(datas);
-}
 
-void UsageMetadatas::LoadData(
+void Metadatas::LoadUsageData(
     std::map<std::string, std::map<std::string, double>> datas) {
   for (auto keyword_datas : datas) {
     std::string keyword = keyword_datas.first;
@@ -181,7 +178,7 @@ void UsageMetadatas::LoadData(
   }
 }
 
-void UsageMetadatas::RecordMetadatas(Agent* agent) {
+void RecordMetadatas(Agent* agent) {
   std::string tblname = "UsageMetadatas";
   Json::Value::Members keys = metadatas.getMemberNames();
   Json::Value::Members::const_iterator ikey = keys.begin();
