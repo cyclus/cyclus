@@ -59,9 +59,10 @@ void Metadatas::RecordMetadatas(Agent* agent) {
         type = "double";
         value = std::to_string(metadatas[*ikey].asDouble());
         break;
-      case Json::arrayValue:
       case Json::objectValue:
         ValueError("Type is not convertible to string");
+      case Json::arrayValue:
+        
       default:
         ValueError("Type is not known.");
     }
@@ -123,57 +124,14 @@ void Metadatas::LoadData(std::map<std::string, std::string> datas) {
   }
 }
 
-enum key_hash {
-  DP,
-  deployment = DP,
-  DC,
-  decomision = DC,
-  TI,
-  timestep = TI,
-  TH,
-  throughput = TH
-};
-
-std::unordered_map<std::string, int> key_map = {
-    std::make_pair("DP", DP), std::make_pair("deployment", DP),
-    std::make_pair("DC", DC), std::make_pair("decomission", DC),
-    std::make_pair("TI", TI), std::make_pair("timestep", TI),
-    std::make_pair("TH", TH), std::make_pair("throughput", TH)};
 
 
 void Metadatas::LoadUsageData(
     std::map<std::string, std::map<std::string, double>> datas) {
   for (auto keyword_datas : datas) {
     std::string keyword = keyword_datas.first;
-    std::string meta_key = "";
     for (auto usage : keyword_datas.second) {
-      switch (key_map[usage.first]) {
-        case DP:
-          meta_key = "DP_" + keyword;
-          metadatas[meta_key] = usage.second;
-          break;
-
-        case DC:
-          meta_key = "DC_" + keyword;
-          metadatas[meta_key] = usage.second;
-          break;
-
-        case TI:
-          meta_key = "TI_" + keyword;
-          metadatas[meta_key] = usage.second;
-          break;
-
-        case TH:
-          meta_key = "TH_" + keyword;
-          metadatas[meta_key] = usage.second;
-          break;
-
-        default:
-          std::stringstream msg;
-          msg << "Allowed Usage Keyw are:"
-              << " deploymemt, decomision, timestep and throughput";
-          throw ValueError(msg.str());
-      }
+      metadatas[usage.first][keyword] = usage.second;
     }
   }
 }
