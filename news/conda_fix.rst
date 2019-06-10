@@ -14,6 +14,6 @@
 
 **Fixed:** None
 - `boost/uuid/sha1.hpp` include now varies according to the Boost version
-  installed du to its deprecation in boost > 1.67
+  installed due to its deprecation in boost > 1.67
 
 **Security:** None
