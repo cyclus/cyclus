@@ -25,15 +25,15 @@ class Metadata {
   /// The default destructor for Metadata
   ~Metadata();
   
-  virtual void LoadData(std::map<std::string, std::string> data);
+  void LoadData(std::map<std::string, std::string> data);
+
+  void LoadData(std::map<std::string, std::map<std::string, double >> data);
 
   // write the metadata in the output table
   virtual void RecordMetadata(Agent* agent); 
 
   /// container for arbitrary metadata, following the JSON rules.
   Json::Value metadata;
-
-  void LoadUsageData(std::map<std::string, std::map<std::string, double >> data);
 };
 
 }  // namespace toolkit

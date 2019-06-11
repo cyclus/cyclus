@@ -20,10 +20,12 @@
 
 #pragma cyclus var { \
     "alias": ["usagemetadata", "keyword", ["usage", "key", "value"]], \
-    "uitype": ["onemore", "string", ["onemore", "string", "string"]], \
+    "uitype": ["onemore", "string", "string"], \
     "uilabel": "", \
     "doc": "", \
   }
-  std::map<std::string, std::map<std::string, std::string> > metadata_;
+  std::map<std::string, std::string> metadata_;
 // required for compilation but not added by the cycpp preprocessor...
   std::vector<int> cycpp_shape_metadata_;
+
+  cyclus::toolkit::Metadata metadata; 

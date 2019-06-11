@@ -24,7 +24,8 @@ std::unordered_map<std::string, int> type_map = {
     std::make_pair("d", d)   // double
 };
 
-const std::list<std::string> usages = std::list<std::string>({"decommission", "deployment", "timestep", "throughput"});
+const std::list<std::string> usages = std::list<std::string>(
+    {"decommission", "deployment", "timestep", "throughput"});
 
 Metadata::Metadata() {}
 Metadata::~Metadata() {}
@@ -64,14 +65,14 @@ void Metadata::RecordMetadata(Agent* agent) {
         ValueError("Type is not convertible to string");
       case Json::arrayValue:
         for (auto usage : usages) {
-          if( metadata[*ikey].isMember(usage)) { 
-          agent->context()
-              ->NewDatum(tblname)
-              ->AddVal("AgentId", agent->id())
-              ->AddVal("keyword", *ikey)
-              ->AddVal("Type", usage)
-              ->AddVal("Value", std::to_string(metadata[*ikey].asDouble()))
-              ->Record();
+          if (metadata[*ikey].isMember(usage)) {
+            agent->context()
+                ->NewDatum(tblname)
+                ->AddVal("AgentId", agent->id())
+                ->AddVal("keyword", *ikey)
+                ->AddVal("Type", usage)
+                ->AddVal("Value", std::to_string(metadata[*ikey].asDouble()))
+                ->Record();
           }
         }
       default:
@@ -95,7 +96,7 @@ void Metadata::LoadData(std::map<std::string, std::string> data) {
     std::string type = data_elt.second.substr(data_elt.second.length() - 2);
     std::string value = data_elt.second.substr(0, data_elt.second.length() - 2);
     if (type.substr(0, 1) == "%") {
-    switch (type_map[type.substr(1)]) {
+      switch (type_map[type.substr(1)]) {
         case s:
           metadata[keyword] = value;
           break;
@@ -127,16 +128,14 @@ void Metadata::LoadData(std::map<std::string, std::string> data) {
           msg << "Allowed usage keywords are:"
               << " deployment, decommission, timestep, and throughput";
           throw ValueError(msg.str());
-    }
+      }
     } else {
       ValueError("type encoding not recognized");
     }
   }
 }
 
-
-
-void Metadata::LoadUsageData(
+void Metadata::LoadData(
     std::map<std::string, std::map<std::string, double>> datas) {
   for (auto keyword_datas : datas) {
     std::string keyword = keyword_datas.first;
@@ -145,7 +144,6 @@ void Metadata::LoadUsageData(
     }
   }
 }
-
 
 }  // namespace toolkit
 }  // namespace cyclus
