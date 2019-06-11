@@ -496,7 +496,7 @@ class Agent : public StateWrangler, virtual public Ider {
 // Additional data that are not required for a Cyclus run
  protected :
   /// agent Metadata
-  cyclus::toolkit::Metadatas metadata;
+  cyclus::toolkit::Metadata metadata;
   /// agent Usage Metadata
   cyclus::toolkit::UsageMetadatas usagesdata;
 };
