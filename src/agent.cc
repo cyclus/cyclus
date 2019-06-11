@@ -166,7 +166,7 @@ void Agent::Build(Agent* parent) {
 void Agent::EnterNotify() {
   ctx_->RegisterAgent(this);
 
-  usagesdata.RecordMetadatas(this);
+  usagedata.RecordMetadata(this);
   metadata.RecordMetadatas(this);
 
 }
