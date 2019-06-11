@@ -34,8 +34,6 @@ class Metadatas {
   Json::Value metadatas;
 
   void LoadUsageData(std::map<std::string, std::map<std::string, double >> data);
-
-
 };
 
 }  // namespace toolkit

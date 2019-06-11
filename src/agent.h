@@ -16,7 +16,7 @@
 #include "query_backend.h"
 #include "resource.h"
 #include "state_wrangler.h"
-#include "toolkit/metadatas.h"
+#include "toolkit/metadata.h"
 
 
 // Undefines isnan from pyne
@@ -488,7 +488,6 @@ class Agent : public StateWrangler, virtual public Ider {
 
   /// an instance-unique ID for the agent
   int id_;
-
 
 
   Context* ctx_;

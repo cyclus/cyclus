@@ -168,7 +168,6 @@ void Agent::EnterNotify() {
 
   usagedata.RecordMetadata(this);
   metadata.RecordMetadatas(this);
-
 }
 
 void Agent::Connect(Agent* parent) {

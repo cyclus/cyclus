@@ -88,7 +88,7 @@ void Metadatas::RecordMetadatas(Agent* agent) {
   }
 }
 
-void Metadatas::LoadData(std::map<std::string, std::string> datas) {
+void Metadatas::LoadData(std::map<std::string, std::string> data) {
   for (auto data : datas) {
     std::string keyword = data.first;
     std::string type = data.second.substr(data.second.length() - 2);
@@ -123,12 +123,12 @@ void Metadatas::LoadData(std::map<std::string, std::string> datas) {
 
         default:
           std::stringstream msg;
-          msg << "Allowed Usage Keyw are:"
-              << " deploymemt, decomision, timestep and throughput";
+          msg << "Allowed usage keywords are:"
+              << " deployment, decommission, timestep, and throughput";
           throw ValueError(msg.str());
     }
     } else {
-      ValueError("type encoding not reconised");
+      ValueError("type encoding not recognized");
     }
   }
 }
