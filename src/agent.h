@@ -493,7 +493,7 @@ class Agent : public StateWrangler, virtual public Ider {
 
   Context* ctx_;
   
-// Additionnal Data that are not required for a Cyclus Run
+// Additional data that are not required for a Cyclus run
  protected :
   /// agent Metadata
   cyclus::toolkit::Metadatas metadata;
