@@ -35,7 +35,6 @@ void Metadatas::RecordMetadatas(Agent* agent) {
   for (; ikey != ikey_end; ++ikey) {
     std::string value = "";
     std::string type = "";
-    std::string unit = "N.A.";
     switch (metadatas[*ikey].type()) {
       case Json::nullValue:
         break;
@@ -62,7 +61,18 @@ void Metadatas::RecordMetadatas(Agent* agent) {
       case Json::objectValue:
         ValueError("Type is not convertible to string");
       case Json::arrayValue:
+        Json::ObjectValues::iterator it;
+        for (it = metadatas[*ikey].begin(); it != metadatas[*ikey].end(); it ++) {
+          type = it->first;
+          agent->context()
+              ->NewDatum(tblname)
+              ->AddVal("AgentId", agent->id())
+              ->AddVal("keyword", *ikey)
+              ->AddVal("Type", it->first)
+              ->AddVal("Value", std::to_string(it->second).asDouble())
+              ->Record();
         
+        }
       default:
         ValueError("Type is not known.");
     }
@@ -73,7 +83,6 @@ void Metadatas::RecordMetadatas(Agent* agent) {
           ->AddVal("keyword", *ikey)
           ->AddVal("Type", type)
           ->AddVal("Value", value)
-          ->AddVal("Unit", unit)
           ->Record();
     }
   }
