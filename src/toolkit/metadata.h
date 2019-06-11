@@ -12,26 +12,26 @@ class Agent;
 namespace toolkit {
 
 
-/// @class Metadatas
+/// @class Metadata
 ///
 /// Brief Description of :
 ///
 
-class Metadatas {
+class Metadata {
  public:
-  /// The default constructor for Metadatas. 
-  Metadatas();
+  /// The default constructor for Metadata. 
+  Metadata();
 
-  /// The default destructor for Metadatas
-  ~Metadatas();
+  /// The default destructor for Metadata
+  ~Metadata();
   
   virtual void LoadData(std::map<std::string, std::string> data);
 
   // write the metadata in the output table
-  virtual void RecordMetadatas(Agent* agent); 
+  virtual void RecordMetadata(Agent* agent); 
 
   /// container for arbitrary metadata, following the JSON rules.
-  Json::Value metadatas;
+  Json::Value metadata;
 
   void LoadUsageData(std::map<std::string, std::map<std::string, double >> data);
 };

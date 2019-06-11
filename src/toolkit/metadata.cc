@@ -4,7 +4,7 @@
 
 #include "agent.h"
 #include "context.h"
-#include "metadatas.h"
+#include "metadata.h"
 namespace cyclus {
 namespace toolkit {
 
@@ -24,54 +24,55 @@ std::unordered_map<std::string, int> type_map = {
     std::make_pair("d", d)   // double
 };
 
-Metadatas::Metadatas() {}
-Metadatas::~Metadatas() {}
+const std::list<std::string> usages = std::list<std::string>({"decommission", "deployment", "timestep", "throughput"});
 
-void Metadatas::RecordMetadatas(Agent* agent) {
-  std::string tblname = "Metadatas";
-  Json::Value::Members keys = metadatas.getMemberNames();
+Metadata::Metadata() {}
+Metadata::~Metadata() {}
+
+void Metadata::RecordMetadata(Agent* agent) {
+  std::string tblname = "Metadata";
+  Json::Value::Members keys = metadata.getMemberNames();
   Json::Value::Members::const_iterator ikey = keys.begin();
   Json::Value::Members::const_iterator ikey_end = keys.end();
   for (; ikey != ikey_end; ++ikey) {
     std::string value = "";
     std::string type = "";
-    switch (metadatas[*ikey].type()) {
+    switch (metadata[*ikey].type()) {
       case Json::nullValue:
         break;
       case Json::stringValue:
         type = "string";
-        value = metadatas[*ikey].asString();
+        value = metadata[*ikey].asString();
         break;
       case Json::booleanValue:
         type = "bool";
-        value = metadatas[*ikey].asString();
+        value = metadata[*ikey].asString();
         break;
       case Json::intValue:
         type = "int";
-        value = std::to_string(metadatas[*ikey].asInt());
+        value = std::to_string(metadata[*ikey].asInt());
         break;
       case Json::uintValue:
         type = "uint";
-        value = std::to_string(metadatas[*ikey].asInt());
+        value = std::to_string(metadata[*ikey].asInt());
         break;
       case Json::realValue:
         type = "double";
-        value = std::to_string(metadatas[*ikey].asDouble());
+        value = std::to_string(metadata[*ikey].asDouble());
         break;
       case Json::objectValue:
         ValueError("Type is not convertible to string");
       case Json::arrayValue:
-        Json::ObjectValues::iterator it;
-        for (it = metadatas[*ikey].begin(); it != metadatas[*ikey].end(); it ++) {
-          type = it->first;
+        for (auto usage : usages) {
+          if( metadata[*ikey].isMember(usage)) { 
           agent->context()
               ->NewDatum(tblname)
               ->AddVal("AgentId", agent->id())
               ->AddVal("keyword", *ikey)
-              ->AddVal("Type", it->first)
-              ->AddVal("Value", std::to_string(it->second).asDouble())
+              ->AddVal("Type", usage)
+              ->AddVal("Value", std::to_string(metadata[*ikey].asDouble()))
               ->Record();
-        
+          }
         }
       default:
         ValueError("Type is not known.");
@@ -88,37 +89,37 @@ void Metadatas::RecordMetadatas(Agent* agent) {
   }
 }
 
-void Metadatas::LoadData(std::map<std::string, std::string> data) {
-  for (auto data : datas) {
-    std::string keyword = data.first;
-    std::string type = data.second.substr(data.second.length() - 2);
-    std::string value = data.second.substr(0, data.second.length() - 2);
+void Metadata::LoadData(std::map<std::string, std::string> data) {
+  for (auto data_elt : data) {
+    std::string keyword = data_elt.first;
+    std::string type = data_elt.second.substr(data_elt.second.length() - 2);
+    std::string value = data_elt.second.substr(0, data_elt.second.length() - 2);
     if (type.substr(0, 1) == "%") {
     switch (type_map[type.substr(1)]) {
         case s:
-          metadatas[keyword] = value;
+          metadata[keyword] = value;
           break;
 
         case b:
           if (pyne::to_lower(value) == "true") {
-            metadatas[keyword] = true;
+            metadata[keyword] = true;
           } else if (pyne::to_lower(value) == "false") {
-            metadatas[keyword] = false;
+            metadata[keyword] = false;
           } else {
-            metadatas[keyword] = std::stoi(value);
+            metadata[keyword] = std::stoi(value);
           }
           break;
 
         case i:
-          metadatas[keyword] = std::stoi(value);
+          metadata[keyword] = std::stoi(value);
           break;
 
         case u:
-          metadatas[keyword] = uint(std::stoul(value));
+          metadata[keyword] = uint(std::stoul(value));
           break;
 
         case d:
-          metadatas[keyword] = std::stod(value);
+          metadata[keyword] = std::stod(value);
           break;
 
         default:
@@ -135,53 +136,16 @@ void Metadatas::LoadData(std::map<std::string, std::string> data) {
 
 
 
-void Metadatas::LoadUsageData(
+void Metadata::LoadUsageData(
     std::map<std::string, std::map<std::string, double>> datas) {
   for (auto keyword_datas : datas) {
     std::string keyword = keyword_datas.first;
     for (auto usage : keyword_datas.second) {
-      metadatas[usage.first][keyword] = usage.second;
+      metadata[usage.first][keyword] = usage.second;
     }
   }
 }
 
-void RecordMetadatas(Agent* agent) {
-  std::string tblname = "UsageMetadatas";
-  Json::Value::Members keys = metadatas.getMemberNames();
-  Json::Value::Members::const_iterator ikey = keys.begin();
-  Json::Value::Members::const_iterator ikey_end = keys.end();
-  for (; ikey != ikey_end; ++ikey) {
-    std::string keyword = (*ikey).substr(3);
-    std::string usage_key = "";
-    switch (key_map[(*ikey).substr(0, 2)]) {
-      case DP:
-        usage_key = "deployment";
-        break;
-      case DC:
-        usage_key = "decomision";
-        break;
-      case TI:
-        usage_key = "timestep";
-        break;
-      case TH:
-        usage_key = "throughput";
-        break;
-
-      default:
-        std::stringstream msg;
-        msg << "Bad usage key. \"" << (*ikey).substr(0, 2)
-            << "\" is not a know key!";
-        throw ValueError(msg.str());
-    }
-    agent->context()
-        ->NewDatum(tblname)
-        ->AddVal("AgentId", agent->id())
-        ->AddVal("keyword", keyword)
-        ->AddVal("Value", metadatas[*ikey].asDouble())
-        ->AddVal("Usage", usage_key)
-        ->Record();
-  }
-}
 
 }  // namespace toolkit
 }  // namespace cyclus
