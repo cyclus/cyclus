@@ -9,8 +9,9 @@
 //      'coordinates = cyclus::toolkit::Position(latitude,longitude);'
 
 #pragma cyclus var { \
+    "default": {}, \
     "alias": ["usagemetadata", "keyword", ["usage", "key", "value"]], \
-    "uitype": ["onemore", "string", ["onemore", "string", "double"]], \
+    "uitype": ["zeromore", "string", ["zeromore", "string", "double"]], \
     "uilabel": "", \
     "doc": "", \
   }
@@ -19,13 +20,12 @@
   std::vector<int> cycpp_shape_usage_metadata_;
 
 #pragma cyclus var { \
+    "default": {}, \
     "alias": ["metadata", "key", "value"], \
-    "uitype": ["onemore", "string", "string"], \
+    "uitype": ["oneormore", "string", "string"], \
     "uilabel": "", \
     "doc": "", \
   }
   std::map<std::string, std::string> metadata_;
-// required for compilation but not added by the cycpp preprocessor...
+//// required for compilation but not added by the cycpp preprocessor...
   std::vector<int> cycpp_shape_metadata_;
-
-  cyclus::toolkit::Metadata metadata; 
