@@ -19,7 +19,7 @@
   std::vector<int> cycpp_shape_usage_metadata_;
 
 #pragma cyclus var { \
-    "alias": ["usagemetadata", "keyword", ["usage", "key", "value"]], \
+    "alias": ["metadata", "key", "value"], \
     "uitype": ["onemore", "string", "string"], \
     "uilabel": "", \
     "doc": "", \
