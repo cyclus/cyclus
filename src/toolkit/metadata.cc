@@ -32,11 +32,9 @@ Metadata::~Metadata() {}
 
 void Metadata::RecordMetadata(Agent* agent) {
   
-  std::cout << "In am IN " <<std::endl;
   Json::Value::Members keys = metadata.getMemberNames();
   Json::Value::Members::const_iterator ikey = keys.begin();
   Json::Value::Members::const_iterator ikey_end = keys.end();
-  std::cout << "key size " << keys.size() << std::endl;
   for (; ikey != ikey_end; ++ikey) {
     std::string value = "";
     std::string type = "";
@@ -80,10 +78,6 @@ void Metadata::RecordMetadata(Agent* agent) {
       default:
         ValueError("Type is not known.");
     }
-    std::cout << "Agent: " << agent->id()
-              << " key: " << *ikey 
-              << " type: " << type 
-              << " Value: " << value << std::endl;
     if (value != "") {
       agent->context()
           ->NewDatum("Metadata")
@@ -97,8 +91,6 @@ void Metadata::RecordMetadata(Agent* agent) {
 }
 
 void Metadata::LoadData(std::map<std::string, std::string> data) {
-  std::cout << "Load " <<std::endl;
-  std::cout << "load data " << data.size() <<std::endl; 
   for (auto data_elt : data) {
     std::string keyword = data_elt.first;
     std::string type = data_elt.second.substr(data_elt.second.length() - 2);
@@ -141,7 +133,6 @@ void Metadata::LoadData(std::map<std::string, std::string> data) {
       ValueError("type encoding not recognized");
     }
   }
-  std::cout << "load: " << metadata.size() << std::endl;
 }
 
 void Metadata::LoadData(
