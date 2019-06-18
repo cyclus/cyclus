@@ -11,7 +11,7 @@
 #pragma cyclus var { \
     "default": {}, \
     "alias": ["usagemetadata", "keyword", ["usage", "key", "value"]], \
-    "uitype": ["zeromore", "string", ["zeromore", "string", "double"]], \
+    "uitype": ["oneormore", "string", ["oneormore", "string", "double"]], \
     "uilabel": "", \
     "doc": "", \
   }

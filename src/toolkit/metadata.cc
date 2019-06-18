@@ -71,7 +71,7 @@ void Metadata::RecordMetadata(Agent* agent) {
                 ->AddVal("AgentId", agent->id())
                 ->AddVal("keyword", *ikey)
                 ->AddVal("Type", usage)
-                ->AddVal("Value", std::to_string(metadata[*ikey].asDouble()))
+                ->AddVal("Value", std::to_string(metadata[*ikey][usage].asDouble()))
                 ->Record();
           }
         }
@@ -140,7 +140,7 @@ void Metadata::LoadData(
   for (auto keyword_datas : datas) {
     std::string keyword = keyword_datas.first;
     for (auto usage : keyword_datas.second) {
-      metadata[usage.first][keyword] = usage.second;
+      metadata[keyword][usage.first] = usage.second;
     }
   }
 }
