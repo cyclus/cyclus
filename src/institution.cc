@@ -38,6 +38,7 @@ void Institution::Build(Agent* parent) {
 
 void Institution::EnterNotify() {
   context()->RegisterTimeListener(this);
+  metadata.RecordMetadata(this);
 }
 
 void Institution::Decommission() {
