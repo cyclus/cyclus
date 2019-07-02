@@ -4,7 +4,7 @@ cyclus Change Log
 
 .. current developments
 
-v1.5.3
+v1.5.4
 ====================
 
 **Added:**
