@@ -1,5 +1,4 @@
 version: 2
-
 jobs:
     # News update check
     news_update:
@@ -222,7 +221,6 @@ workflows:
     version: 2 #Needed ?? (already on the top of the file)
     build_and_test:
         jobs:
-
             # On a PR // All Branch
             - news_update:
                 filters:
