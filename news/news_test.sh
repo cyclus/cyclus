@@ -2,7 +2,7 @@
 folder=$1
 echo $folder
 echo `ls $folder`
-echo `git diff master --name-only $folder`
+echo `git diff master --name-only`
 added_news_file=$((`git diff master --name-only $folder |wc -l`))
 echo $added_news_file
 
