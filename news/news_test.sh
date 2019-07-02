@@ -1,15 +1,7 @@
 #!/bin/sh
 folder=$1
-echo $folder
-echo `ls $folder`
-echo `git diff origin/master --name-only`
-echo `git remote -v`
-echo `git --version`
-added_news_file=$((`git diff master --name-only $folder |wc -l`))
+added_news_file=$((`git diff origin/master --name-only $folder |wc -l`))
 echo $added_news_file
-
-
 if [ $added_news_file -eq 0 ]; then
-    echo "OUT"
     exit 1
 fi
