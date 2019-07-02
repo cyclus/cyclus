@@ -1,6 +1,20 @@
 version: 2
 
 jobs:
+    # News update check
+    news_update:
+        docker:
+            - image: cyclus/cyclus-deps
+        working_directory: ~/cyclus
+        steps:
+            # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
+            - run: apt-get -qq update; apt-get -y install git openssh-client
+            - checkout
+            - run:
+                name: Checking News Update
+                command: 
+                news/news_test.sh news
+                
     # Build Cyclus
     build:
         docker:
@@ -11,7 +25,7 @@ jobs:
             - run: apt-get -qq update; apt-get -y install git openssh-client
             - checkout
             - run:
-                name: Build Docker Image
+                name: Build Cyclus
                 command: |
                     python install.py -j 2 --build-type=Release --core-version 999999.999999 \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
@@ -210,6 +224,10 @@ workflows:
         jobs:
 
             # On a PR // All Branch
+            - news_test:
+                filters:
+                    tags:
+                        ignore: /.*/
             - build
             - unit_test:
                 requires:
