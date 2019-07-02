@@ -1,6 +1,6 @@
 #!/bin/sh
 folder=$1
-
+echo $folder
 added_news_file=$((`git diff master --name-only $folder |wc -l`))
 echo $added_news_file
 
