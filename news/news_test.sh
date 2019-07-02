@@ -1,7 +1,7 @@
 #!/bin/sh
 folder=$1
 
-added_news_file=$((`git diff master $folder --name-only |wc -l`))
+added_news_file=$((`git diff master --name-only $folder |wc -l`))
 echo $added_news_file
 
 
