@@ -226,6 +226,8 @@ workflows:
             # On a PR // All Branch
             - news_update:
                 filters:
+                    branches:
+                        only: /.*/
                     tags:
                         ignore: /.*/
             - build
