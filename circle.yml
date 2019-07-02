@@ -224,7 +224,7 @@ workflows:
         jobs:
 
             # On a PR // All Branch
-            - news_test:
+            - news_update:
                 filters:
                     tags:
                         ignore: /.*/
