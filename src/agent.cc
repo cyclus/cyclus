@@ -104,9 +104,17 @@ std::string Agent::str() {
      << " ) ";
   return ss.str();
 }
-
+/*
 void Agent::lifetime(int n_timesteps) {
   if (enter_time_ != -1) {
+    throw ValueError("cannot set the lifetime of an already-built facility");
+  }
+  lifetime_ = n_timesteps;
+}
+*/
+void Agent::lifetime(int n_timesteps, bool force) {
+  std::cout<<force;
+  if (enter_time_ != -1 && force == false) {
     throw ValueError("cannot set the lifetime of an already-built facility");
   }
   lifetime_ = n_timesteps;

@@ -1188,8 +1188,8 @@ cdef class _Region(_Agent):
         return (<CyclusRegionShim*> (<_Agent> self).shim).get_lifetime()
 
     @lifetime.setter
-    def lifetime(self, int n_timesteps):
-        (<CyclusRegionShim*> (<_Agent> self).shim).lifetime(n_timesteps)
+    def lifetime(self, int n_timesteps, cpp_bool force):
+        (<CyclusRegionShim*> (<_Agent> self).shim).lifetime(n_timesteps, force)
 
     @property
     def exit_time(self):
@@ -1385,8 +1385,8 @@ cdef class _Institution(_Agent):
         return (<CyclusInstitutionShim*> (<_Agent> self).shim).get_lifetime()
 
     @lifetime.setter
-    def lifetime(self, int n_timesteps):
-        (<CyclusInstitutionShim*> (<_Agent> self).shim).lifetime(n_timesteps)
+    def lifetime(self, int n_timesteps, cpp_bool force):
+        (<CyclusInstitutionShim*> (<_Agent> self).shim).lifetime(n_timesteps, force)
 
     @property
     def exit_time(self):
@@ -1583,8 +1583,8 @@ cdef class _Facility(_Agent):
         return (<CyclusFacilityShim*> (<_Agent> self).shim).get_lifetime()
 
     @lifetime.setter
-    def lifetime(self, int n_timesteps):
-        (<CyclusFacilityShim*> (<_Agent> self).shim).lifetime(n_timesteps)
+    def lifetime(self, int n_timesteps, cpp_bool force):
+        (<CyclusFacilityShim*> (<_Agent> self).shim).lifetime(n_timesteps, force)
 
     @property
     def exit_time(self):

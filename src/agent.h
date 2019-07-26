@@ -386,7 +386,12 @@ class Agent : public StateWrangler, virtual public Ider {
   /// decommissioning (-1 if the agent has an infinite lifetime).  This should
   /// generally only be called BEFORE an agent is added to a context as a
   /// prototype.  Throws ValueError if the agent has already been deployed.
-  void lifetime(int n_timesteps);
+  ///void lifetime(int n_timesteps);
+
+  /// Sets the number of time steps this agent operates between building and
+  /// decommissioning (-1 if the agent has an infinite lifetime).  The boolean
+  /// allows for an agent to override the ValueError.
+  void lifetime(int n_timesteps, bool force=false);
 
   /// Returns the number of time steps this agent operates between building and
   /// decommissioning (-1 if the agent has an infinite lifetime).
