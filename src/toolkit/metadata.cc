@@ -31,7 +31,6 @@ Metadata::Metadata() {}
 Metadata::~Metadata() {}
 
 void Metadata::RecordMetadata(Agent* agent) {
-  
   Json::Value::Members keys = metadata.getMemberNames();
   Json::Value::Members::const_iterator ikey = keys.begin();
   Json::Value::Members::const_iterator ikey_end = keys.end();
@@ -71,7 +70,8 @@ void Metadata::RecordMetadata(Agent* agent) {
                 ->AddVal("AgentId", agent->id())
                 ->AddVal("keyword", *ikey)
                 ->AddVal("Type", usage)
-                ->AddVal("Value", std::to_string(metadata[*ikey][usage].asDouble()))
+                ->AddVal("Value",
+                         std::to_string(metadata[*ikey][usage].asDouble()))
                 ->Record();
           }
         }
@@ -88,6 +88,15 @@ void Metadata::RecordMetadata(Agent* agent) {
           ->Record();
     }
   }
+}
+
+void Metadata::SetWorkLabel(std::string work_label) {
+  std::map<std::string, std::string> work_map = {{"WORKLABEL", work_label}};
+  LoadData(work_map);
+}
+
+std::string Metadata::GetWorkLabel() {
+  return metadata["WORKLABEL"].asString();
 }
 
 void Metadata::LoadData(std::map<std::string, std::string> data) {
@@ -141,9 +150,18 @@ void Metadata::LoadData(
     std::string keyword = keyword_datas.first;
     for (auto usage : keyword_datas.second) {
       metadata[keyword][usage.first] = usage.second;
+      if (std::find(usages.begin(), usages.end(), usage.first) ==
+          usages.end()) {
+        std::stringstream ss;
+        ss << "Usage " << usage.first << "is unknown... "
+           << "The value corresponding to the usage keyword, "
+           << "will not be written in the output file. "
+           << "Known usage keywords are: "
+           << "deployment, decommission, timestep, and throughput.";
+        cyclus::Warn<cyclus::VALUE_WARNING>(ss.str());
+      }
     }
   }
 }
-
 }  // namespace toolkit
 }  // namespace cyclus

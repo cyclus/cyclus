@@ -29,3 +29,5 @@
   std::map<std::string, std::string> metadata_;
 //// required for compilation but not added by the cycpp preprocessor...
   std::vector<int> cycpp_shape_metadata_;
+  std::string work_label;
+

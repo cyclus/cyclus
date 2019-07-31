@@ -28,7 +28,10 @@ class Metadata {
   void LoadData(std::map<std::string, std::string> data);
 
   void LoadData(std::map<std::string, std::map<std::string, double >> data);
-
+  
+  void SetWorkLabel(std::string work_label);
+  std::string GetWorkLabel();
+  
   // write the metadata in the output table
   virtual void RecordMetadata(Agent* agent); 
 
