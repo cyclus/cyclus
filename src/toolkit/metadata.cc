@@ -134,8 +134,9 @@ void Metadata::LoadData(std::map<std::string, std::string> data) {
 
         default:
           std::stringstream msg;
-          msg << "Allowed usage keywords are:"
-              << " deployment, decommission, timestep, and throughput";
+          msg << "Allowed usage types are:"
+              << "string, bolean, int, uint, and double encoded "
+              << "as \%s, \%b, \%i, \%u, \%d respectively.";
           throw ValueError(msg.str());
       }
     } else {
