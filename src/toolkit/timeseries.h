@@ -17,7 +17,7 @@ namespace cyclus {
 namespace toolkit {
 
 /// Time series types to be used in the RecordTimeSeries() functions.
-/// These types have the following unit which *must* be adhered to strictly:
+/// These types have the following units which *must* be adhered to strictly:
 /// - POWER [MWe]
 /// - ENRICH_SWU [kg SWU]
 /// - ENRICH_FEED [kg]
@@ -42,12 +42,12 @@ extern std::map<std::string, std::vector<time_series_listener_t>>
 /// Records a per-time step quantity for a given type
 template <TimeSeriesType T>
 void RecordTimeSeries(cyclus::Agent* agent, double value,
-                      std::string unit = "");
+                      std::string units = "");
 
 /// Records a per-time step quantity for a string
 template <typename T>
 void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value,
-                      std::string unit = "") {
+                      std::string units = "") {
   std::string tblname = "TimeSeries" + tsname;
   int time = agent->context()->time();
   agent->context()
@@ -55,7 +55,7 @@ void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value,
       ->AddVal("AgentId", agent->id())
       ->AddVal("Time", time)
       ->AddVal("Value", value)
-      ->AddVal("Unit", unit)
+      ->AddVal("Units", units)
       ->Record();
   std::vector<time_series_listener_t> vec = TIME_SERIES_LISTENERS[tsname];
   for (auto f=vec.begin(); f != vec.end(); ++f){

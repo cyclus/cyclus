@@ -148,7 +148,7 @@ void Timer::RecordInventory(Agent* a, std::string name, Material::Ptr m) {
           ->AddVal("InventoryName", name)
           ->AddVal("NucId", it->first)
           ->AddVal("Quantity", it->second)
-          ->AddVal("Unit", m->units())
+          ->AddVal("Units", m->units())
           ->Record();
     }
   }
@@ -161,7 +161,7 @@ void Timer::RecordInventory(Agent* a, std::string name, Material::Ptr m) {
         ->AddVal("Time", time_)
         ->AddVal("InventoryName", name)
         ->AddVal("Quantity", m->quantity())
-        ->AddVal("Unit", m->units())
+        ->AddVal("Units", m->units())
         ->AddVal("Composition", c)
         ->Record();
   }
