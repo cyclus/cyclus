@@ -15,7 +15,7 @@ jobs:
                 command: news/news_test.sh news
                 
     # Build Cyclus
-    build_cyclus:
+    build:
         docker:
             - image: cyclus/cyclus-deps
         working_directory: ~/cyclus
@@ -228,13 +228,13 @@ workflows:
                         only: /.*/
                     tags:
                         ignore: /.*/
-            - build_cyclus
+            - build
             - unit_test:
                 requires:
-                    - build_cyclus
+                    - build
             - nosetest:
                 requires:
-                    - build_cyclus
+                    - build
 
             - cycamore_master:
                 requires:
