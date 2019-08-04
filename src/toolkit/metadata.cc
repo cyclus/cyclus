@@ -91,6 +91,12 @@ void Metadata::RecordMetadata(Agent* agent) {
 }
 
 void Metadata::SetWorkLabel(std::string work_label) {
+  std::string type = work_label.substr(work_label.length() - 2);
+  if (type.substr(0, 1) != "%") {
+    work_label += "%s";
+  
+  }
+  
   std::map<std::string, std::string> work_map = {{"WORKLABEL", work_label}};
   LoadData(work_map);
 }
