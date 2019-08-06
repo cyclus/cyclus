@@ -68,7 +68,7 @@ void Metadata::RecordMetadata(Agent* agent) {
             agent->context()
                 ->NewDatum("Metadata")
                 ->AddVal("AgentId", agent->id())
-                ->AddVal("keyword", *ikey)
+                ->AddVal("Keyword", *ikey)
                 ->AddVal("Type", usage)
                 ->AddVal("Value",
                          std::to_string(metadata[*ikey][usage].asDouble()))
@@ -82,7 +82,7 @@ void Metadata::RecordMetadata(Agent* agent) {
       agent->context()
           ->NewDatum("Metadata")
           ->AddVal("AgentId", agent->id())
-          ->AddVal("keyword", *ikey)
+          ->AddVal("Keyword", *ikey)
           ->AddVal("Type", type)
           ->AddVal("Value", value)
           ->Record();
