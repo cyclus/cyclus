@@ -1,4 +1,4 @@
-INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(BEFORE ${CYCLUS_CORE_INCLUDE_DIRS})
 
 install_cyclus_standalone("TestAgent" "test_agent" "tests")
 install_cyclus_standalone("TestFacility" "test_facility" "tests")
