@@ -3,7 +3,7 @@ jobs:
     # News update check
     news_update:
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps_py37
         working_directory: ~/cyclus
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo

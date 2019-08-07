@@ -38,7 +38,7 @@ RUN conda update -y --all && \
                          python=3.6 glibmm glib=2.56 libxml2 libxmlpp libblas \
                          libcblas liblapack pkg-config coincbc=2.9 boost-cpp hdf5 \
                          sqlite pcre gettext bzip2 xz setuptools nose pytables \
-                         pandas jinja2 cython==0.26 websockets pprintpp &&\
+                         pandas jinja2 cython==0.28 websockets pprintpp &&\
     conda clean -y --all
 
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
