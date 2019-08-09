@@ -117,8 +117,10 @@ void Agent::lifetime_force(int n_timesteps) {
   try{
     lifetime(n_timesteps);
   }
-  catch (ValueError) {}
-  lifetime_ = n_timesteps;
+  catch (exception e){
+    std::cout<<e;
+    lifetime_ = n_timesteps;
+  }
 }
 
 bool Agent::AncestorOf(Agent* other) {
