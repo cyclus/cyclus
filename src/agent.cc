@@ -113,12 +113,10 @@ void Agent::lifetime(int n_timesteps) {
 }
 
 void Agent::lifetime_force(int n_timesteps) {
-  std::cout<<"force";
   try{
     lifetime(n_timesteps);
   }
-  catch (exception e){
-    std::cout<<e;
+  catch (ValueError e){
     lifetime_ = n_timesteps;
   }
 }
