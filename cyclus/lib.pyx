@@ -1483,13 +1483,12 @@ cdef class _Agent:
         """
         return (<cpp_cyclus.Agent*> self.ptx).get_lifetime()
 
-    #@lifetime.setter
-    #def lifetime(self, int n_timesteps):
-    #    (<cpp_cyclus.Agent*> self.ptx).lifetime(n_timesteps)
-
     @lifetime.setter
-    def lifetime(self, int n_timesteps, cpp_bool force):
-        (<cpp_cyclus.Agent*> self.ptx).lifetime(n_timesteps, force)
+    def lifetime(self, int n_timesteps):
+        (<cpp_cyclus.Agent*> self.ptx).lifetime(n_timesteps)
+
+    def lifetime_force(self, int n_timesteps):
+        (<cpp_cyclus.Agent*> self.ptx).lifetime_force(n_timesteps)
 
     @property
     def exit_time(self):
