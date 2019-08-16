@@ -175,9 +175,9 @@ void Agent::Connect(Agent* parent) {
 }
 
 void Agent::Decommission() {
+  std::cout << "Decommission2" << std::endl;
   CLOG(LEV_INFO3) << prototype() << "(" << this << ")"
                   << " is being decommissioned";
-
   ctx_->NewDatum("AgentExit")
       ->AddVal("AgentId", id())
       ->AddVal("ExitTime", ctx_->time())

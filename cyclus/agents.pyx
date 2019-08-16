@@ -586,7 +586,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         (<object> this.self).decision()
 
     cpp_bool CheckDecommissionCondition() except +:
-        rtn = (<object> this.self).check_decomission_condition()
+        rtn = (<object> this.self).check_decommission_condition()
         return bool_to_cpp(rtn)
 
     std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests() except +:
@@ -1101,7 +1101,7 @@ cdef class _Region(_Agent):
         rtn = bool_to_py((<CyclusRegionShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
         return rtn
 
-    def decomission(self):
+    def Decommission(self):
         """Decommissions the agent, removing it from the simulation. Results in
         destruction of the agent object. If agents write their own decommission()
         function, they must call their superclass' decommission function at the
@@ -1199,7 +1199,7 @@ cdef class _Region(_Agent):
         """The default time step at which this agent will exit the
         simulation (-1 if the agent has an infinite lifetime).
 
-        Decomissioning happens at the end of a time step. With a lifetime of 1, we
+        decommissioning happens at the end of a time step. With a lifetime of 1, we
         expect an agent to go through only 1 entire time step. In this case, the
         agent should be decommissioned on the same time step it was
         created. Therefore, for agents with non-infinite lifetimes, the exit_time
@@ -1301,7 +1301,7 @@ cdef class _Institution(_Agent):
         rtn = bool_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
         return rtn
 
-    def decomission(self):
+    def Decommission(self):
         """Decommissions the agent, removing it from the simulation. Results in
         destruction of the agent object. If agents write their own decommission()
         function, they must call their superclass' decommission function at the
@@ -1399,7 +1399,7 @@ cdef class _Institution(_Agent):
         """The default time step at which this agent will exit the
         simulation (-1 if the agent has an infinite lifetime).
 
-        Decomissioning happens at the end of a time step. With a lifetime of 1, we
+        decommissioning happens at the end of a time step. With a lifetime of 1, we
         expect an agent to go through only 1 entire time step. In this case, the
         agent should be decommissioned on the same time step it was
         created. Therefore, for agents with non-infinite lifetimes, the exit_time
@@ -1502,13 +1502,15 @@ cdef class _Facility(_Agent):
         rtn = bool_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
         return rtn
 
-    def decomission(self):
+    def Decommission(self):
         """Decommissions the agent, removing it from the simulation. Results in
         destruction of the agent object. If agents write their own decommission()
         function, they must call their superclass' decommission function at the
         END of their decommission() function.
         """
+        print('decomm2py')
         (<CyclusFacilityShim*> (<_Agent> self).shim).Decommission()
+        print('enddecomm2py')
 
     @property
     def annotations(self):
@@ -1600,7 +1602,7 @@ cdef class _Facility(_Agent):
         """The default time step at which this agent will exit the
         simulation (-1 if the agent has an infinite lifetime).
 
-        Decomissioning happens at the end of a time step. With a lifetime of 1, we
+        decommissioning happens at the end of a time step. With a lifetime of 1, we
         expect an agent to go through only 1 entire time step. In this case, the
         agent should be decommissioned on the same time step it was
         created. Therefore, for agents with non-infinite lifetimes, the exit_time
@@ -1647,10 +1649,10 @@ class Facility(_Facility):
         """
         pass
 
-    def check_decomission_condition(self):
+    def check_decommission_condition(self):
         """facilities over write this method if a condition must be met
         before their destructors can be called. Return True means that
-        the facility is ready for decomission. False prevents decomission.
+        the facility is ready for decommission. False prevents decommission.
         """
         return True
 

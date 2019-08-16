@@ -389,8 +389,7 @@ class Agent : public StateWrangler, virtual public Ider {
   void lifetime(int n_timesteps);
 
   /// Sets the number of time steps this agent operates between building and
-  /// decommissioning (-1 if the agent has an infinite lifetime).  The boolean
-  /// allows for an agent to override the ValueError.
+  /// decommissioning (-1 if the agent has an infinite lifetime).  
   void lifetime_force(int n_timesteps);
 
   /// Returns the number of time steps this agent operates between building and
