@@ -1508,9 +1508,7 @@ cdef class _Facility(_Agent):
         function, they must call their superclass' decommission function at the
         END of their decommission() function.
         """
-        print('decomm2py')
         (<CyclusFacilityShim*> (<_Agent> self).shim).Decommission()
-        print('enddecomm2py')
 
     @property
     def annotations(self):

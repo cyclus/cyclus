@@ -1387,9 +1387,7 @@ cdef class _Agent:
         function, they must call their superclass' decommission function at the
         END of their decommission() function.
         """
-        print('enter Decom call')
         (<cpp_cyclus.Agent*> self.ptx).Decommission()
-        print('exit decom call')
 
     @property
     def schema(self):
