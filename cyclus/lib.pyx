@@ -1381,7 +1381,7 @@ cdef class _Agent:
         rtn = bool_to_py((<cpp_cyclus.Agent*> self.ptx).DecendentOf(cpp_other))
         return rtn
 
-    def Decommission(self):
+    def decommission(self):
         """Decommissions the agent, removing it from the simulation. Results in
         destruction of the agent object. If agents write their own decommission()
         function, they must call their superclass' decommission function at the
