@@ -118,7 +118,7 @@ void Agent::lifetime_force(int n_timesteps) {
   }
   catch (ValueError e){
     if(enter_time_+n_timesteps <= context()->time()){
-      throw ValueError("cannot set lifetime to be less than current context time");
+      lifetime(context()->time()+1);
     }
     else{
       lifetime_ = n_timesteps;    
