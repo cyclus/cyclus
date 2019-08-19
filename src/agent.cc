@@ -118,7 +118,7 @@ void Agent::lifetime_force(int n_timesteps) {
   }
   catch (ValueError e){
     if(enter_time_+n_timesteps <= context()->time()){
-      lifetime(context()->time() - enter_time + 1);
+      lifetime(context()->time() - enter_time_ + 1);
     }
     else{
       lifetime_ = n_timesteps;    
