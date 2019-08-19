@@ -314,7 +314,7 @@ class Agent : public StateWrangler, virtual public Ider {
   /// initially existing agents are being setup.
   virtual void BuildNotify(Agent* m) {}
 
-  /// Called when a new child of this agent is about to be decommissioned.
+  /// Called when a child of this agent is about to be decommissioned.
   virtual void DecomNotify(Agent* m) {}
 
   /// Decommissions the agent, removing it from the simulation. Results in

@@ -1101,7 +1101,7 @@ cdef class _Region(_Agent):
         rtn = bool_to_py((<CyclusRegionShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
         return rtn
 
-    def Decommission(self):
+    def decommission(self):
         """Decommissions the agent, removing it from the simulation. Results in
         destruction of the agent object. If agents write their own decommission()
         function, they must call their superclass' decommission function at the
@@ -1301,7 +1301,7 @@ cdef class _Institution(_Agent):
         rtn = bool_to_py((<CyclusInstitutionShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
         return rtn
 
-    def Decommission(self):
+    def decommission(self):
         """Decommissions the agent, removing it from the simulation. Results in
         destruction of the agent object. If agents write their own decommission()
         function, they must call their superclass' decommission function at the
@@ -1502,7 +1502,7 @@ cdef class _Facility(_Agent):
         rtn = bool_to_py((<CyclusFacilityShim*> (<_Agent> self).shim).DecendentOf(cpp_other))
         return rtn
 
-    def Decommission(self):
+    def decommission(self):
         """Decommissions the agent, removing it from the simulation. Results in
         destruction of the agent object. If agents write their own decommission()
         function, they must call their superclass' decommission function at the
