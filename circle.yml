@@ -24,6 +24,8 @@ jobs:
             - run:
                 name: Build Cyclus
                 command: mkdir -p /root/.local/lib/python3.7/site-packages
+            - run:
+                name: Build Docker Image
                 command: |
                     python install.py -j 2 --build-type=Release --core-version 999999.999999 \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
