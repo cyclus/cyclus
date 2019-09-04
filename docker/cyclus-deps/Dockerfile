@@ -35,7 +35,7 @@ RUN apt-get update && \
 RUN conda config --add channels conda-forge
 RUN conda update -y --all && \
     conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger \
-                         python=3.7 glibmm glib=2.56 libxml2 libxmlpp libblas \
+                         python glibmm glib=2.56 libxml2 libxmlpp libblas \
                          libcblas liblapack pkg-config coincbc=2.9 boost-cpp hdf5 \
                          sqlite pcre gettext bzip2 xz setuptools nose pytables \
                          pandas jinja2 cython==0.28 websockets pprintpp &&\
@@ -44,7 +44,7 @@ RUN conda update -y --all && \
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
-
+ENV PYTHONPATH /home/conda/.local/lib/python3.7/site-packages/
 # required for the nosetest
 ENV PYTHONWARNINGS ignore
 
