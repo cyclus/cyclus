@@ -4,7 +4,7 @@ RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificate
     libglib2.0-0 libxext6 libsm6 libxrender1
 
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
     rm ~/miniconda.sh
 
@@ -33,21 +33,21 @@ RUN apt-get update && \
 # conda packages
 #
 RUN conda config --add channels conda-forge
+RUN conda update -n base -c defaults conda
 RUN conda update -y --all && \
     conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger \
-                         python glibmm glib=2.56 libxml2 libxmlpp libblas \
+                         glib=2.56 libxml2 libxmlpp libblas \
                          libcblas liblapack pkg-config coincbc=2.9 boost-cpp hdf5 \
                          sqlite pcre gettext bzip2 xz setuptools nose pytables \
-                         pandas jinja2 cython==0.28 websockets pprintpp &&\
+                         pandas jinja2 "cython<=0.28.5" websockets pprintpp &&\
     conda clean -y --all
-
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
 ENV PYTHONPATH /home/conda/.local/lib/python3.7/site-packages/
 # required for the nosetest
 ENV PYTHONWARNINGS ignore
-
+RUN mkdir -p /root/.local/lib/python3.7/site-packages/
 #
 # pip packages to overide conda
 #
