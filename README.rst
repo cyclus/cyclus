@@ -95,22 +95,6 @@ For detailed instructions on installing dependencies, see `Installing Dependenci
 Quick Cyclus Installation
 *************************
 
-Assuming you have the dependencies installed correctly, installing Cyclus based
-on the source code from github is fairly straightforward:
-
-- Clone the Cyclus repository: ``git clone https://github.com/cyclus/cyclus.git``,
-
-- to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
-  from the ``cyclus`` folder,
-
-- finally, add the following Cyclus installation path (``~/.local/bin``) to
-  the **front** on your ``$PATH``.
-- additionally if you are using MacOSX, also add
-  ``~/.local/lib/pythonX.Y/site-packages`` to your ``$PYTHONPATH``
-
-For more detailed installation procedure, and/or custom installation please
-refer to the `INSTALLATION guide <INSTALL.rst>`_.
-
 To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18.04 LTS):
 
 - Download the latest Anaconda installer for Linux at
@@ -129,11 +113,27 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 - ``conda config --add channels conda-forge``
 
 - ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo
-    python-json-logger python=3.6 glibmm glib=2.56 libxml2 libxmlpp libblas libcblas
-    liblapack pkg-config coincbc=2.9 boost-cpp hdf5 sqlite pcre gettext bzip2 xz
-    setuptools nose pytables pandas jinja2 cython==0.26 websockets pprintpp``
+  python-json-logger python=3.6 glibmm glib=2.56 libxml2 libxmlpp libblas libcblas
+  liblapack pkg-config coincbc=2.9 boost-cpp hdf5 sqlite pcre gettext bzip2 xz
+  setuptools nose pytables pandas jinja2 cython==0.26 websockets pprintpp``
 
-- Follow the instructions above to clone and build Cyclus
+- Follow the instructions below to clone and build Cyclus
+
+Assuming you have the dependencies installed correctly, installing Cyclus based
+on the source code from github is fairly straightforward:
+
+- Clone the Cyclus repository: ``git clone https://github.com/cyclus/cyclus.git``,
+
+- to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
+  from the ``cyclus`` folder,
+
+- finally, add the following Cyclus installation path (``~/.local/bin``) to
+  the **front** on your ``$PATH``.
+- additionally if you are using MacOSX, also add
+  ``~/.local/lib/pythonX.Y/site-packages`` to your ``$PYTHONPATH``
+
+For more detailed installation procedure, and/or custom installation please
+refer to the `INSTALLATION guide <INSTALL.rst>`_.
 
 *************
 Running Tests
