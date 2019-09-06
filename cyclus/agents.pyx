@@ -1508,6 +1508,7 @@ cdef class _Facility(_Agent):
         function, they must call their superclass' decommission function at the
         END of their decommission() function.
         """
+        print('decom_fac')
         (<CyclusFacilityShim*> (<_Agent> self).shim).Decommission()
 
     @property

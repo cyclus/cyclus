@@ -1387,6 +1387,7 @@ cdef class _Agent:
         function, they must call their superclass' decommission function at the
         END of their decommission() function.
         """
+        print('decom_agent')
         (<cpp_cyclus.Agent*> self.ptx).Decommission()
 
     @property
@@ -1658,12 +1659,14 @@ cdef class _Context:
         self.ptx.SchedBuild(dynamic_agent_ptr(parent),
                             str_py_to_cpp(proto_name), t)
 
-    def schedule_decom(self, parent, int t=-1):
+    def schedule_decom(self, agent, int t=-1):
         """Schedules the given Agent to be decommissioned at the specified timestep
         t. The default t=-1 results in the decommission being scheduled for the
         next decommission phase (i.e. the end of the current timestep).
         """
-        self.ptx.SchedDecom(dynamic_agent_ptr(parent), t)
+        print('schedule')
+        self.ptx.SchedDecom(dynamic_agent_ptr(agent), t)
+        print('schedule2')
 
     def new_datum(self, title):
         """Returns a new datum instance."""
