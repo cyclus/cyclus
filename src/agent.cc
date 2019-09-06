@@ -112,6 +112,20 @@ void Agent::lifetime(int n_timesteps) {
   lifetime_ = n_timesteps;
 }
 
+void Agent::lifetime_force(int n_timesteps) {
+  try{
+    lifetime(n_timesteps);
+  }
+  catch (ValueError e){
+    if(enter_time_+n_timesteps <= context()->time()){
+      lifetime(context()->time() - enter_time_ + 1);
+    }
+    else{
+      lifetime_ = n_timesteps;    
+    }
+  }
+}
+
 bool Agent::AncestorOf(Agent* other) {
   other = other->parent();
   while (other != NULL) {
@@ -168,7 +182,6 @@ void Agent::Connect(Agent* parent) {
 void Agent::Decommission() {
   CLOG(LEV_INFO3) << prototype() << "(" << this << ")"
                   << " is being decommissioned";
-
   ctx_->NewDatum("AgentExit")
       ->AddVal("AgentId", id())
       ->AddVal("ExitTime", ctx_->time())
