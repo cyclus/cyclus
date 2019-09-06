@@ -100,7 +100,7 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 - Download the latest Anaconda installer for Linux at
   ``https://www.anaconda.com/distribution/#download-section``
 
-- Move the ``.sh`` file you just downloaded to your Home directory
+- Move the ``.sh`` to your Home directory
 
 - In Terminal, execute the following commands:
 
@@ -117,20 +117,16 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
   liblapack pkg-config coincbc=2.9 boost-cpp hdf5 sqlite pcre gettext bzip2 xz
   setuptools nose pytables pandas jinja2 cython==0.26 websockets pprintpp``
 
-- Follow the instructions below to clone and build Cyclus
+- Use ``sudo apt install`` to install and configure git
 
-Assuming you have the dependencies installed correctly, installing Cyclus based
-on the source code from github is fairly straightforward:
+- ``git clone https://github.com/cyclus/cyclus.git``
 
-- Clone the Cyclus repository: ``git clone https://github.com/cyclus/cyclus.git``,
+- Navigate to the folder containing Cyclus
 
-- to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
-  from the ``cyclus`` folder,
+- ``python install.py``
 
-- finally, add the following Cyclus installation path (``~/.local/bin``) to
-  the **front** on your ``$PATH``.
-- additionally if you are using MacOSX, also add
-  ``~/.local/lib/pythonX.Y/site-packages`` to your ``$PYTHONPATH``
+- Once ``install.py`` has finished, use the command ``cyclus_unit_tests``
+  to check that Cyclus installed correctly
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
