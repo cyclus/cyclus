@@ -125,9 +125,6 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 
 - Run the command ``python install.py``
 
-- Once ``install.py`` has finished, use the command ``cyclus_unit_tests``
-  to check that Cyclus installed correctly
-
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
 
