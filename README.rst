@@ -119,11 +119,11 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 
 - Use ``sudo apt install`` to install and configure git
 
-- ``git clone https://github.com/cyclus/cyclus.git``
+- Clone the Cyclus repository by running ``git clone https://github.com/cyclus/cyclus.git``
 
 - Navigate to the folder containing Cyclus
 
-- ``python install.py``
+- Run the command ``python install.py``
 
 - Once ``install.py`` has finished, use the command ``cyclus_unit_tests``
   to check that Cyclus installed correctly
