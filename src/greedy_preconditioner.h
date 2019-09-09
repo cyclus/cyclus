@@ -76,7 +76,7 @@ class GreedyPreconditioner {
   GreedyPreconditioner(const std::map<std::string, double>& commod_weights,
                        WgtOrder order);
   /// @}
-  
+
   /// @brief conditions the graph as described above
   /// @throws KeyError if a commodity is in the graph but not in the weight
   /// mapping

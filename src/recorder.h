@@ -91,7 +91,7 @@ class Recorder {
     inject_sim_id_ = x;
     set_dump_count(dump_count_);
   };
- 
+
   /// Creates a new datum namespaced under the specified title.
   ///
   /// @warning choose title carefully to not conflict with Datum objects from other

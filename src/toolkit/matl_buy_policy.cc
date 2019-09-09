@@ -25,7 +25,7 @@ MatlBuyPolicy::MatlBuyPolicy() :
 }
 
 MatlBuyPolicy::~MatlBuyPolicy() {
-  if (manager() != NULL) 
+  if (manager() != NULL)
     manager()->context()->UnregisterTrader(this);
 }
 
@@ -161,7 +161,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     port->AddMutualReqs(mreqs);
     ports.insert(port);
   }
-  
+
   return ports;
 }
 

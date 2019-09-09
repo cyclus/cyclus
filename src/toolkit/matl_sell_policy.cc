@@ -133,7 +133,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   port->AddConstraint(cc);
   ports.insert(port);
   LGH(INFO3) << "bidding out " << limit << " kg";
-  
+
   bool excl = Excl();
   std::string commod;
   Request<Material>* req;

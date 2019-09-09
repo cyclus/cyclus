@@ -10,7 +10,7 @@ namespace cyclus {
 
 double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
   return (exclusive_orders && a.exclusive()) ?
-      a.excl_val() / a.pref() : 1.0 / a.pref();  
+      a.excl_val() / a.pref() : 1.0 / a.pref();
 }
 
 double ExchangeSolver::PseudoCost() {
@@ -41,7 +41,7 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
       std::map<Arc, std::vector<double> >::iterator c_it;
       std::map<Arc, std::vector<double> >& caps = (*n_it)->unit_capacities;
       for (c_it = caps.begin(); c_it != caps.end(); ++c_it) {
-        std::vector<double>& ucaps = c_it->second; 
+        std::vector<double>& ucaps = c_it->second;
         if (!ucaps.empty()) {
           min_cap = *std::min_element(ucaps.begin(), ucaps.end());
           if (min_cap < min_unit_cap)
@@ -60,14 +60,14 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
       std::map<Arc, std::vector<double> >::iterator c_it;
       std::map<Arc, std::vector<double> >& caps = (*n_it)->unit_capacities;
       for (c_it = caps.begin(); c_it != caps.end(); ++c_it) {
-        std::vector<double>& ucaps = c_it->second; 
+        std::vector<double>& ucaps = c_it->second;
         if (!ucaps.empty()) {
           min_cap = *std::min_element(ucaps.begin(), ucaps.end());
           if (min_cap < min_unit_cap)
             min_unit_cap = min_cap;
         }
       }
-      
+
       // update max_pref_
       std::map<Arc, double>& prefs = (*n_it)->prefs;
       for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
