@@ -655,7 +655,7 @@ cdef extern from "agent.h" namespace "cyclus":
         void EnterNotify()
         void BuildNotify(Agent*)
         void DecomNotify(Agent*)
-        void Decommission()
+        void Decommission() except +
         void AdjustMatlPrefs(PrefMap[Material].type&)
         void AdjustProductPrefs(PrefMap[Product].type&)
         std_string schema()
@@ -672,6 +672,7 @@ cdef extern from "agent.h" namespace "cyclus":
         const int enter_time()
         const int get_lifetime "lifetime" ()
         void lifetime(int)
+        void lifetime_force(int)
         const int exit_time()
         const set[Agent*]& children()
 
@@ -754,7 +755,7 @@ cdef extern from "facility.h" namespace "cyclus":
         void Tick()
         void Tock()
         void Decision()
-        cpp_bool CheckDecommissionCondition()
+        cpp_bool CheckDecommissionCondition() except +
         set[RequestPortfolio[Material].Ptr] GetMatlRequests()
         set[RequestPortfolio[Product].Ptr] GetProductRequests()
         set[BidPortfolio[Material].Ptr] GetMatlBids(CommodMap[Material].type&)
