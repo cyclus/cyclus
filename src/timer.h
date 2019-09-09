@@ -85,7 +85,7 @@ class Timer {
   /// notifications.
   void DoTock();
 
-  /// sends the decision signal to all agents recieving time 
+  /// sends the decision signal to all agents recieving time
   /// notifications.
   void DoDecision();
 

@@ -314,7 +314,7 @@ class Agent : public StateWrangler, virtual public Ider {
   /// initially existing agents are being setup.
   virtual void BuildNotify(Agent* m) {}
 
-  /// Called when a new child of this agent is about to be decommissioned.
+  /// Called when a child of this agent is about to be decommissioned.
   virtual void DecomNotify(Agent* m) {}
 
   /// Decommissions the agent, removing it from the simulation. Results in
@@ -382,11 +382,15 @@ class Agent : public StateWrangler, virtual public Ider {
   /// the agent has never been built).
   inline const int enter_time() const { return enter_time_; }
 
-  /// Sets the number of time steps this agent operates between building and
+  ///Sets the number of time steps this agent operates between building and
   /// decommissioning (-1 if the agent has an infinite lifetime).  This should
   /// generally only be called BEFORE an agent is added to a context as a
   /// prototype.  Throws ValueError if the agent has already been deployed.
   void lifetime(int n_timesteps);
+
+  /// Sets the number of time steps this agent operates between building and
+  /// decommissioning (-1 if the agent has an infinite lifetime).  
+  void lifetime_force(int n_timesteps);
 
   /// Returns the number of time steps this agent operates between building and
   /// decommissioning (-1 if the agent has an infinite lifetime).

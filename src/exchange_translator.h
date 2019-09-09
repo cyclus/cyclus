@@ -97,15 +97,15 @@ class ExchangeTranslator {
     Arc a = TranslateArc(xlation_ctx_, bid, pref);
     a.unode()->prefs[a] = pref;  // request node is a.unode()
     int n_prefs = a.unode()->prefs.size();
-    
+
     CLOG(LEV_DEBUG5) << "Updating preference for one of "
                      << req->requester()->manager()->prototype()
                      << "'s trade nodes:";
     CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-    
+
     graph->AddArc(a);
   }
-  
+
   /// @brief Provide a vector of Trades given a vector of Matches
   void BackTranslateSolution(const std::vector<Match>& matches,
                              std::vector< Trade<T> >& ret) {
@@ -244,8 +244,8 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
-  arc.pref(pref); 
-  
+  arc.pref(pref);
+
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
   typename RequestPortfolio<T>::Ptr rp = req->portfolio();
