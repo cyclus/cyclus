@@ -35,11 +35,40 @@ RUN apt-get update && \
 RUN conda config --add channels conda-forge
 RUN conda update -n base -c defaults conda
 RUN conda update -y --all && \
-    conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger \
-                         glib=2.56 libxml2 libxmlpp libblas \
-                         libcblas liblapack pkg-config coincbc=2.9 boost-cpp hdf5 \
-                         sqlite pcre gettext bzip2 xz setuptools nose pytables \
-                         pandas jinja2 "cython<=0.28.5" websockets pprintpp &&\
+    conda install -y \
+               openssh \
+               gxx_linux-64 \
+               gcc_linux-64 \
+               cmake \
+               make \
+               docker-pycreds \
+               git \
+               xo \
+               python-json-logger \
+               glib=2.56 \
+               libxml2 \
+               libxmlpp \
+               libblas \
+               libcblas \
+               liblapack \
+               pkg-config \
+               coincbc=2.9 \
+               boost-cpp \
+               hdf5 \
+               sqlite \
+               pcre \
+               gettext \
+               bzip2 \
+               xz \
+               setuptools \
+               nose \
+               pytables \
+               pandas \
+               jinja2 \
+               "cython<=0.28.5" \
+               websockets \
+               pprintpp \
+               && \
     conda clean -y --all
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
