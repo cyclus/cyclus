@@ -94,7 +94,7 @@ For detailed instructions on installing dependencies, see `Installing Dependenci
 *************************
 Quick Cyclus Installation
 *************************
-
+The quickest way to install Cyclus and its dependencies relies on using the `conda-forge` channel and the `conda` package manager within the Anaconda python environment.  The following instructions guide you through that approach.
 To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18.04 LTS):
 
 - Download the latest Anaconda installer for Linux at
