@@ -97,7 +97,7 @@ SymFunction::Ptr BasicFunctionFactory::GetFunctionPtr(std::string type,
         << " of the basic function factory.";
     throw Error(err.str());
   }
-  
+
   switch (enum_names_.at(type)) {
     case LIN: {
       LinFunctionFactory lff;

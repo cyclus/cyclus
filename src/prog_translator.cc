@@ -108,7 +108,7 @@ void ProgTranslator::Populate() {
   iface_->loadProblem(ctx_.m, &ctx_.col_lbs[0], &ctx_.col_ubs[0],
                       &ctx_.obj_coeffs[0], &ctx_.row_lbs[0], &ctx_.row_ubs[0]);
 
-  
+
   if (excl_) {
     std::vector<Arc>& arcs = g_->arcs();
     for (int i = 0; i != arcs.size(); i++) {
@@ -132,7 +132,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
 
   if (request && !grp->HasArcs())
     return; // no arcs, no reason to add variables/constraints
-  
+
   std::vector<CoinPackedVector> cap_rows;
   std::vector<CoinPackedVector> excl_rows;
   for (int i = 0; i != caps.size(); i++) {
@@ -183,7 +183,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
 
     // 1e15 is the largest value that doesn't make the solver fall over
     // (by emperical testing)
-    double rlb = std::min(caps[i], 1e15); 
+    double rlb = std::min(caps[i], 1e15);
     ctx_.row_lbs.push_back(request ? rlb : 0);
     ctx_.row_ubs.push_back(request ? inf : caps[i]);
     ctx_.m.appendRow(cap_rows[i]);

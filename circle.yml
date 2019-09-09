@@ -225,7 +225,7 @@ workflows:
             - news_update:
                 filters:
                     branches:
-                        only: /.*/
+                        ignore: master
                     tags:
                         ignore: /.*/
             - build

@@ -44,7 +44,7 @@ Resource::Ptr Squash(std::vector<Resource::Ptr> rs) {
 
   throw Error("cannot squash resource type " + rs[0]->type());
 }
-  
+
 std::vector<Resource::Ptr> ResCast(std::vector<Material::Ptr> rs) {
   std::vector<Resource::Ptr> casted;
   for (int i = 0; i < rs.size(); ++i) {

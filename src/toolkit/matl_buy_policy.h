@@ -88,7 +88,7 @@ class MatlBuyPolicy : public Trader {
                       double throughput, double fill_to,
                       double req_when_under, double quantize);
   /// @}
-    
+
   /// Instructs the policy to fill its buffer with requests on the given
   /// commodity of composition c and the given preference.  This must be called
   /// at least once or the policy will do nothing.  The policy can request on an
@@ -124,17 +124,17 @@ class MatlBuyPolicy : public Trader {
 
   /// whether trades will be denoted as exclusive or not
   inline bool Excl() const { return quantize_ > 0; }
-  
+
   /// the amount requested per each request
   inline double ReqQty() const {
     return Excl() ? quantize_ : TotalQty();
   }
-  
+
   /// the number of requests made per each commodity
   inline int NReq() const {
     return Excl() ? static_cast<int>(TotalQty() / quantize_) : 1;
   }
-  
+
   /// Returns corresponding commodities from which each material object
   /// was received for the current time step. The data returned by this function
   /// are ONLY valid during the Tock phase of a time step.
@@ -156,12 +156,12 @@ class MatlBuyPolicy : public Trader {
   };
 
   /// requires buf_ already set
-  void set_fill_to(double x); 
+  void set_fill_to(double x);
   /// requires buf_ already set
-  void set_req_when_under(double x); 
-  void set_quantize(double x); 
-  void set_throughput(double x); 
-  
+  void set_req_when_under(double x);
+  void set_quantize(double x);
+  void set_throughput(double x);
+
   ResBuf<Material>* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;

@@ -79,13 +79,13 @@ public:
                             void * otherInformation=NULL);
   /// Get a hint parameter
     virtual bool getHintParam(OsiHintParam key, bool& yesNo,
-			      OsiHintStrength& strength,
-			      void *& otherInformation) const;
+            OsiHintStrength& strength,
+            void *& otherInformation) const;
 
   using OsiSolverInterface::getHintParam ;
   /// Get a hint parameter
     virtual bool getHintParam(OsiHintParam key, bool& yesNo,
-			      OsiHintStrength& strength) const;
+            OsiHintStrength& strength) const;
   //@}
 
   //---------------------------------------------------------------------------
@@ -269,7 +269,7 @@ public:
       vector using delete[].
   */
   virtual std::vector<double*> getDualRays(int maxNumRays,
-					   bool fullRay = false) const;
+             bool fullRay = false) const;
   /** Get as many primal rays as the solver can provide. (In case of proven
       dual infeasibility there should be at least one.)
 
@@ -297,7 +297,7 @@ public:
     /*! \brief Generate a standard name of the form Rnnnnnnn or Cnnnnnnn */
 
     virtual std::string dfltRowColName(char rc,
-				 int ndx, unsigned digits = 7) const ;
+         int ndx, unsigned digits = 7) const ;
 
     /*! \brief Return the name of the objective function */
 
@@ -310,7 +310,7 @@ public:
     /*! \brief Return the name of the row.  */
 
     virtual std::string getRowName(int rowIndex,
-				   unsigned maxLen = std::string::npos) const ;
+           unsigned maxLen = std::string::npos) const ;
 
     /*! \brief Return a pointer to a vector of row names */
 
@@ -323,7 +323,7 @@ public:
     /*! \brief Set multiple row names */
 
     virtual void setRowNames(OsiNameVec &srcNames,
-		     int srcStart, int len, int tgtStart) ;
+         int srcStart, int len, int tgtStart) ;
 
     /*! \brief Delete len row names starting at index tgtStart */
 
@@ -332,7 +332,7 @@ public:
     /*! \brief Return the name of the column */
 
     virtual std::string getColName(int colIndex,
-				   unsigned maxLen = std::string::npos) const ;
+           unsigned maxLen = std::string::npos) const ;
 
     /*! \brief Return a pointer to a vector of column names */
 
@@ -345,7 +345,7 @@ public:
     /*! \brief Set multiple column names */
 
     virtual void setColNames(OsiNameVec &srcNames,
-		     int srcStart, int len, int tgtStart) ;
+         int srcStart, int len, int tgtStart) ;
 
     /*! \brief Delete len column names starting at index tgtStart */
     virtual void deleteColNames(int tgtStart, int len) ;
@@ -567,8 +567,8 @@ public:
       functions.
   */
   virtual void assignProblem(CoinPackedMatrix*& matrix,
-    			     double*& collb, double*& colub, double*& obj,
-    			     double*& rowlb, double*& rowub);
+               double*& collb, double*& colub, double*& obj,
+               double*& rowlb, double*& rowub);
 
   /** Load in an problem by copying the arguments (the constraints on the
       rows are given by sense/rhs/range triplets). If a pointer is 0 then the
@@ -583,10 +583,10 @@ public:
       </ul>
   */
   virtual void loadProblem(const CoinPackedMatrix& matrix,
-    			   const double* collb, const double* colub,
-    			   const double* obj,
-    			   const char* rowsen, const double* rowrhs,
-    			   const double* rowrng);
+             const double* collb, const double* colub,
+             const double* obj,
+             const char* rowsen, const double* rowrhs,
+             const double* rowrng);
 
   /** Load in an problem by assuming ownership of the arguments (the
       constraints on the rows are given by sense/rhs/range triplets). For
@@ -596,9 +596,9 @@ public:
       functions.
   */
   virtual void assignProblem(CoinPackedMatrix*& matrix,
-    			     double*& collb, double*& colub, double*& obj,
-    			     char*& rowsen, double*& rowrhs,
-    			     double*& rowrng);
+               double*& collb, double*& colub, double*& obj,
+               char*& rowsen, double*& rowrhs,
+               double*& rowrng);
 
   /** Just like the other loadProblem() methods except that the matrix is
       given in a standard column major ordered format (without gaps). */
