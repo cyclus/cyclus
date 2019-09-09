@@ -412,7 +412,7 @@ def print_master_schema(ns):
     state = SimState(input_file=ns.input_file, input_format=ns.format,
                      output_path=ns.output_path, schema_path=ns.schema_path,
                      flat_schema=ns.flat_schema, print_ms=True)
-    state.load() 
+    state.load()
 
 
 def main(args=None):

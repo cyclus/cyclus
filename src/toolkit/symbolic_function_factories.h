@@ -98,7 +98,7 @@ class BasicFunctionFactory {
     LIN,
     /// See cyclus::toolkit::ExpFunctionFactory for a description of function
     /// parameters
-    EXP  
+    EXP
   };
 
   /// Constructor sets up the enum names map

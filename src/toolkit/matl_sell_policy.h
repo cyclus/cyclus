@@ -82,10 +82,10 @@ class MatlSellPolicy : public Trader {
   MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        double throughput, bool ignore_comp);
   MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                       double throughput, bool ignore_comp, 
+                       double throughput, bool ignore_comp,
                        double quantize);
   /// @}
-  
+
   /// Instructs the policy to empty its buffer with offers on the given
   /// commodity.  This must be called at least once or the policy will do
   /// nothing.  The policy can offer on an arbitrary number of commodities by
@@ -110,7 +110,7 @@ class MatlSellPolicy : public Trader {
 
   /// whether trades will be denoted as exclusive or not
   inline bool Excl() const { return quantize_ > 0; }
-  
+
   /// Trader Methods
   /// @{
   virtual std::set<BidPortfolio<Material>::Ptr> GetMatlBids(
@@ -119,12 +119,12 @@ class MatlSellPolicy : public Trader {
       const std::vector<Trade<Material> >& trades,
       std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses);
   /// }@
-  
+
  private:
   void set_quantize(double x);
   void set_throughput(double x);
   void set_ignore_comp(bool x);
-  
+
   ResBuf<Material>* buf_;
   std::set<std::string> commods_;
   double quantize_;
